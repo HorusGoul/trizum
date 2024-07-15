@@ -1,4 +1,8 @@
+import { IconWithFallback } from "#src/ui/Icon.js";
+import { IconButton } from "#src/ui/IconButton.js";
+import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { createFileRoute } from "@tanstack/react-router";
+import { MenuTrigger, Popover } from "react-aria-components";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -6,18 +10,29 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-4 p-8">
-      <p>Vite SPA app generated with the `create-horus` generator.</p>
-      <p>
-        Use TailwindCSS to style your app. `accent`, `danger`, `success`,
-        `warning` are the color tokens you can use in your CSS. Some examples:
-      </p>
-      <div className="w-40 rounded-lg bg-accent-500 p-4 text-accent-50 dark:bg-accent-600">
-        This is an example of a component styled with TailwindCSS.
+    <>
+      <div className="container flex h-16 items-center pr-2">
+        <h1 className="pl-4 text-2xl font-bold">OpenCount</h1>
+
+        <div className="flex-1" />
+
+        <MenuTrigger>
+          <IconButton icon="ellipsis-vertical" aria-label="Menu" />
+
+          <Popover>
+            <Menu>
+              <MenuItem>
+                <IconWithFallback name="settings" size={20} className="mr-3" />
+                <span className="h-3.5 leading-none">Settings</span>
+              </MenuItem>
+              <MenuItem>
+                <IconWithFallback name="info" size={20} className="mr-3" />
+                <span className="h-3.5 leading-none">About</span>
+              </MenuItem>
+            </Menu>
+          </Popover>
+        </MenuTrigger>
       </div>
-      <div className="rounded-lg bg-warning-400 p-4 font-semibold text-warning-950 dark:bg-warning-500">
-        Found a bug? Please report it!
-      </div>
-    </div>
+    </>
   );
 }
