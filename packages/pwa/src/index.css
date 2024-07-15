@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  @apply bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+* {
+  @apply outline-accent-500 dark:outline-accent-400;
+}

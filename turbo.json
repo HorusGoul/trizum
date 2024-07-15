@@ -1,0 +1,33 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"],
+      "inputs": ["src/**", "public/**", "index.html", "vite.config.ts"]
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": ["src/**", "test/**", ".eslintrc.cjs", "tsconfig.json"]
+    },
+    "lint:fix": {
+      "cache": false
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": ["src/**", "test/**", "tsconfig.json"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": ["src/**", "test/**", "vite.config.ts", "vitest.config.ts"]
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "inputs": ["src/**", "test/**", "vite.config.ts", "vitest.config.ts"]
+    }
+  }
+}

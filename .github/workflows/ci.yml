@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    # Matrix of multiple Turbo jobs
+    strategy:
+      matrix:
+        turbo:
+          - lint
+          - typecheck
+          - build
+          - test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ${{ matrix.turbo }}
+        run: pnpm turbo run ${{ matrix.turbo }}

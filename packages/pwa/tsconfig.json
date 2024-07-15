@@ -1,0 +1,11 @@
+{
+  "extends": "@horus.dev/tsconfig/vite",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "#*": ["./*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

@@ -1,0 +1,80 @@
+/** @type {import("syncpack").RcFile} */
+const config = {
+  customTypes: [],
+  dependencyTypes: [
+    "dev",
+    "nodeEngine",
+    "local",
+    "overrides",
+    "peer",
+    "pnpmOverrides",
+    "prod",
+    "resolutions",
+  ],
+  filter: ".",
+  indent: "  ",
+  semverGroups: [
+    {
+      label: "use exact version numbers for dev and prod dependencies",
+      packages: ["**"],
+      dependencyTypes: ["prod", "dev"],
+      dependencies: ["**"],
+      range: "",
+    },
+  ],
+  semverRange: "",
+  sortAz: [
+    "keywords",
+    "scripts",
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "contributors",
+    "resolutions",
+  ],
+  sortFirst: [
+    "name",
+    "description",
+    "keywords",
+    "version",
+    "license",
+    "private",
+    "author",
+    "repository",
+    "homepage",
+    "bugs",
+    "funding",
+    "files",
+    "sideEffects",
+    "type",
+    "imports",
+    "exports",
+    "bin",
+    "scripts",
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+  ],
+  versionGroups: [
+    {
+      dependencies: ["@types/**"],
+      dependencyTypes: ["!dev"],
+      isBanned: true,
+      label: "@types packages should only be under devDependencies",
+    },
+    {
+      label: "Use workspace protocol when developing local packages",
+      dependencies: ["$LOCAL"],
+      dependencyTypes: ["dev"],
+      pinVersion: "workspace:*",
+    },
+  ],
+  customTypes: {
+    nodeEngine: {
+      path: "engines.node",
+      strategy: "version",
+    },
+  },
+};
+
+module.exports = config;
