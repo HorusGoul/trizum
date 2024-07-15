@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@horus.dev/tw-dynamic-themes": "0.0.3",
+    "@tanstack/react-router": "^1.45.2",
     "clsx": "^2.1.1",
     "dinero.js": "^1.9.1",
     "react": "19.0.0-rc-8b08e99e-20240713",
@@ -30,6 +31,8 @@
     "@horus.dev/eslint-config": "2.0.1",
     "@horus.dev/prettier-config": "1.0.0",
     "@horus.dev/tsconfig": "2.1.0",
+    "@tanstack/router-devtools": "^1.45.2",
+    "@tanstack/router-plugin": "^1.45.2",
     "@types/dinero.js": "^1.9.4",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",

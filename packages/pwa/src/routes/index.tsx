@@ -1,4 +1,10 @@
-function App() {
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("/")({
+  component: Index,
+});
+
+function Index() {
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4 p-8">
       <p>Vite SPA app generated with the `create-horus` generator.</p>
@@ -15,5 +21,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
