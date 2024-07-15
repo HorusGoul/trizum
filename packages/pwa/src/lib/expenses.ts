@@ -2,10 +2,11 @@
 import Dinero from "dinero.js";
 
 export type ExpenseUser = string;
+
 export interface ExpenseInput {
   version: 1;
-  paidBy: string;
-  paidFor: Record<string, number>;
+  paidBy: ExpenseUser;
+  paidFor: Record<ExpenseUser, number>;
   expense: number;
 }
 
@@ -95,7 +96,11 @@ export function calculateLogStatsOfUser(
   };
 }
 
-function getSplitTotal(expenses: ExpenseInput[], uid: string, reverse = false) {
+function getSplitTotal(
+  expenses: ExpenseInput[],
+  uid: ExpenseUser,
+  reverse = false,
+) {
   return expenses.reduce(
     (prev, next) => {
       let amount = Dinero({
