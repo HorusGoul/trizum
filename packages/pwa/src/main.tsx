@@ -1,6 +1,12 @@
 import { StrictMode } from "react";
 import * as ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import {
+  RouterProvider,
+  createRouter,
+  type NavigateOptions,
+  type ToOptions,
+  type RegisteredRouter,
+} from "@tanstack/react-router";
 import "./index.css";
 
 // Import the generated route tree
@@ -13,6 +19,21 @@ const router = createRouter({ routeTree });
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
+  }
+}
+
+type Routes = NonNullable<ToOptions["to"]>;
+type Href = {
+  [To in Routes]: ToOptions<RegisteredRouter, string, To>;
+}[Routes];
+
+declare module "react-aria-components" {
+  interface RouterConfig {
+    href: Href;
+    routerOptions: Omit<
+      NavigateOptions<RegisteredRouter>,
+      keyof ToOptions<RegisteredRouter>
+    >;
   }
 }
 

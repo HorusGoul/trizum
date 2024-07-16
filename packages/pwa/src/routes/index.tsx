@@ -3,7 +3,7 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, MenuTrigger, Popover } from "react-aria-components";
+import { Link, MenuTrigger, Popover } from "react-aria-components";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -81,11 +81,19 @@ function Index() {
 
           <Popover placement="bottom end">
             <Menu>
-              <MenuItem>
+              <MenuItem
+                href={{
+                  to: "/settings",
+                }}
+              >
                 <IconWithFallback name="settings" size={20} className="mr-3" />
                 <span className="h-3.5 leading-none">Settings</span>
               </MenuItem>
-              <MenuItem>
+              <MenuItem
+                href={{
+                  to: "/about",
+                }}
+              >
                 <IconWithFallback name="info" size={20} className="mr-3" />
                 <span className="h-3.5 leading-none">About</span>
               </MenuItem>
@@ -98,8 +106,14 @@ function Index() {
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
         {parties.map((party) => (
-          <Button
+          <Link
             key={party.id}
+            href={{
+              to: `/party/$partyId`,
+              params: {
+                partyId: party.id,
+              },
+            }}
             className={({
               isPressed,
               isFocusVisible,
@@ -118,7 +132,7 @@ function Index() {
           >
             <span className="text-xl font-medium">{party.name}</span>
             <span className="text-lg">{party.description}</span>
-          </Button>
+          </Link>
         ))}
 
         <div className="flex-1" />
@@ -134,7 +148,7 @@ function Index() {
 
             <Popover placement="top end" offset={16}>
               <Menu className="min-w-60">
-                <MenuItem>
+                <MenuItem href={{ to: "/join" }}>
                   <IconWithFallback
                     name="ampersand"
                     size={20}
@@ -142,7 +156,7 @@ function Index() {
                   />
                   <span className="h-3.5 leading-none">Join a Party</span>
                 </MenuItem>
-                <MenuItem>
+                <MenuItem href={{ to: "/new" }}>
                   <IconWithFallback
                     name="list-plus"
                     size={20}
