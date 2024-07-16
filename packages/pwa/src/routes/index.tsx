@@ -7,12 +7,14 @@ import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks";
 import {
+  deleteAt,
   isValidDocumentId,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button, Link, MenuTrigger, Popover } from "react-aria-components";
+import { loadDocumentsByIds } from "#src/lib/automerge";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -153,22 +155,22 @@ function useParties() {
     });
   }
 
-  useEffect(() => {
-    async function loadParties() {
-      if (!partyList || !partyList.parties.length) {
-        return [];
+  function removePartyFromList(partyId: Party["id"]) {
+    changePartyList((list) => {
+      const index = list.parties.findIndex((id) => id === partyId);
+      if (index >= 0) {
+        deleteAt(list.parties, index);
       }
-      return await Promise.all(
-        partyList.parties.map(async (partyId) => {
-          const handle = repo.find<Party>(partyId);
-          return await handle.doc();
-        }),
-      );
-    }
-    loadParties().then((parties) => setParties(parties.filter((doc) => !!doc)));
+    });
+  }
+
+  useEffect(() => {
+    loadDocumentsByIds<Party>(repo, partyList?.parties ?? []).then((parties) =>
+      setParties(parties),
+    );
   }, [partyList, repo]);
 
-  return { parties, appendPartyToList };
+  return { parties, appendPartyToList, removePartyFromList };
 }
 
 function usePartyList() {
