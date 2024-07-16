@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 const ReactCompilerConfig = {};
 
@@ -13,5 +15,7 @@ export default defineConfig({
         plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
       },
     }),
+    wasm(),
+    topLevelAwait(),
   ],
 });
