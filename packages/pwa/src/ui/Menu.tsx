@@ -9,8 +9,8 @@ export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
   return (
     <AriaMenu
       className={cn(
+        "min-w-40 overflow-hidden rounded-xl bg-white shadow-lg focus-visible:outline-none dark:bg-slate-900 dark:shadow-none",
         className,
-        "min-w-40 overflow-hidden rounded-xl bg-slate-900 focus-visible:outline-none",
       )}
       {...props}
     />
