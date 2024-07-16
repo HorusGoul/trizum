@@ -72,7 +72,7 @@ function Index() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center pr-2">
-        <h1 className="pl-4 text-2xl font-bold">OpenCount</h1>
+        <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
         <div className="flex-1" />
 
