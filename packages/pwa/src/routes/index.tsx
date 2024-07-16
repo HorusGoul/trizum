@@ -1,8 +1,16 @@
+import type { Party } from "#src/models/party.js";
+import type { PartyList } from "#src/models/partyList.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
+import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks";
+import {
+  isValidDocumentId,
+  type DocumentId,
+} from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 
 export const Route = createFileRoute("/")({
@@ -10,64 +18,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const parties = [
-    {
-      id: "0",
-      name: "Morosos de siempre",
-      description: "No pagadle a Hosaeb",
-    },
-    {
-      id: "1",
-      name: "Mario's Party",
-      description: "Paga la rata",
-    },
-    {
-      id: "2",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "3",
-      name: "A very very very long party name that should be correctly displayed",
-      description:
-        "A very very very long party description that should be correctly displayed",
-    },
-    {
-      id: "4",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "5",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "6",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "7",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "8",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "9",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "10",
-      name: "Test",
-      description: "Test",
-    },
-  ];
+  const parties = useParties();
 
   return (
     <div className="flex min-h-full flex-col">
@@ -171,4 +122,48 @@ function Index() {
       </div>
     </div>
   );
+}
+
+function useParties() {
+  const repo = useRepo();
+  const [parties, setParties] = useState<Party[]>([]);
+  const { partyList } = usePartyList();
+  useEffect(() => {
+    async function loadParties() {
+      if (!partyList || !partyList.parties.length) {
+        return [];
+      }
+      return await Promise.all(
+        partyList.parties.map(async (partyId) => {
+          const handle = repo.find<Party>(partyId);
+          return await handle.doc();
+        }),
+      );
+    }
+    loadParties().then((parties) => setParties(parties.filter((doc) => !!doc)));
+  }, [partyList, repo]);
+  return parties;
+}
+
+function usePartyList() {
+  const repo = useRepo();
+  const [partyListId, setPartyListId] = useState<DocumentId | undefined>();
+  const [partyList] = useDocument<PartyList>(partyListId);
+
+  useEffect(() => {
+    const id = localStorage.getItem("partyListId");
+    if (id && isValidDocumentId(id)) {
+      setPartyListId(id);
+    } else {
+      const handle = repo.create<PartyList>({
+        parties: [],
+      });
+      localStorage.setItem("partyListId", handle.documentId);
+      setPartyListId(handle.documentId);
+    }
+  }, [repo]);
+
+  return {
+    partyList,
+  };
 }

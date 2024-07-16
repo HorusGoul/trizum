@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import * as ReactDOM from "react-dom/client";
-import { Repo } from "@automerge/automerge-repo/slim";
+import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { RepoContext } from "@automerge/automerge-repo-react-hooks";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
