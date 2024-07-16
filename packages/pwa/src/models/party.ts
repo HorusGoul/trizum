@@ -8,5 +8,10 @@ export interface Party {
   description: string;
   currency: Currency;
   participants: ExpenseUser[];
-  expenses: DocumentId[];
+  expenses: PartyExpense[];
+}
+
+export interface PartyExpense {
+  paidAt: Date;
+  documentId: DocumentId; // Expense
 }
