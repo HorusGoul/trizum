@@ -1,5 +1,9 @@
 import { StrictMode } from "react";
 import * as ReactDOM from "react-dom/client";
+import { Repo } from "@automerge/automerge-repo/slim";
+import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
+import { RepoContext } from "@automerge/automerge-repo-react-hooks";
+import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
   RouterProvider,
   createRouter,
@@ -37,13 +41,21 @@ declare module "react-aria-components" {
   }
 }
 
+// Create automerge repository
+const repo = new Repo({
+  storage: new IndexedDBStorageAdapter("opencount"),
+  network: [new BrowserWebSocketClientAdapter("wss://sync.automerge.org")],
+});
+
 // Render the app
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+      </RepoContext.Provider>
     </StrictMode>,
   );
 }
