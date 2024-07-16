@@ -1,3 +1,4 @@
+import { EURO } from "#src/models/currency.js";
 import type { Party } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
@@ -11,14 +12,29 @@ import {
 } from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Link, MenuTrigger, Popover } from "react-aria-components";
+import { Button, Link, MenuTrigger, Popover } from "react-aria-components";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const parties = useParties();
+  const repo = useRepo();
+  const { parties, appendPartyToList } = useParties();
+
+  function onCreateParty() {
+    const handle = repo.create<Party>({
+      id: "" as DocumentId,
+      name: "Mario",
+      description: "This is Mario's Party",
+      currency: EURO,
+      participants: ["Mario", "Horus"],
+      expenses: [],
+    });
+    handle.change((doc) => (doc.id = handle.documentId));
+    appendPartyToList(handle.documentId);
+    return handle.documentId;
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -52,6 +68,8 @@ function Index() {
           </Popover>
         </MenuTrigger>
       </div>
+
+      <Button onPress={onCreateParty}>Create</Button>
 
       <div className="h-2" />
 
@@ -127,7 +145,14 @@ function Index() {
 function useParties() {
   const repo = useRepo();
   const [parties, setParties] = useState<Party[]>([]);
-  const { partyList } = usePartyList();
+  const { partyList, changePartyList } = usePartyList();
+
+  function appendPartyToList(partyId: Party["id"]) {
+    changePartyList((list) => {
+      list.parties.push(partyId);
+    });
+  }
+
   useEffect(() => {
     async function loadParties() {
       if (!partyList || !partyList.parties.length) {
@@ -142,13 +167,14 @@ function useParties() {
     }
     loadParties().then((parties) => setParties(parties.filter((doc) => !!doc)));
   }, [partyList, repo]);
-  return parties;
+
+  return { parties, appendPartyToList };
 }
 
 function usePartyList() {
   const repo = useRepo();
   const [partyListId, setPartyListId] = useState<DocumentId | undefined>();
-  const [partyList] = useDocument<PartyList>(partyListId);
+  const [partyList, changePartyList] = useDocument<PartyList>(partyListId);
 
   useEffect(() => {
     const id = localStorage.getItem("partyListId");
@@ -165,5 +191,6 @@ function usePartyList() {
 
   return {
     partyList,
+    changePartyList,
   };
 }

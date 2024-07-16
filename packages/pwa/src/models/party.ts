@@ -3,7 +3,7 @@ import type { ExpenseUser } from "#src/lib/expenses.js";
 import type { Currency } from "./currency";
 
 export interface Party {
-  id: string;
+  id: DocumentId;
   name: string;
   description: string;
   currency: Currency;
