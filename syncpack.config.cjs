@@ -20,6 +20,7 @@ const config = {
       dependencyTypes: ["prod", "dev"],
       dependencies: ["**"],
       range: "",
+      specifierTypes: ["!alias"],
     },
   ],
   semverRange: "",
@@ -58,7 +59,7 @@ const config = {
   versionGroups: [
     {
       dependencies: ["@types/**"],
-      dependencyTypes: ["!dev"],
+      dependencyTypes: ["!dev", "!overrides", "!pnpmOverrides"],
       isBanned: true,
       label: "@types packages should only be under devDependencies",
     },
