@@ -28,7 +28,7 @@ function Index() {
     const handle = repo.create<Party>({
       id: "" as DocumentId,
       name: "Mario",
-      description: "This is Mario's Party",
+      description: "This is Mario's Party 1",
       currency: EURO,
       participants: ["Mario", "Horus"],
       expenses: [],
