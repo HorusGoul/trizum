@@ -12,7 +12,7 @@
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "typecheck": "turbo run typecheck",
-    "syncpack:fix": "syncpack fix-mismatches && pnpm syncpack format"
+    "syncpack:fix": "syncpack fix-mismatches && syncpack format"
   },
   "dependencies": {
     "@changesets/cli": "2.27.7",
