@@ -16,12 +16,32 @@ function New() {
   const navigate = useNavigate();
 
   function onCreateParty() {
+    const participants = [
+      {
+        id: crypto.randomUUID(),
+        name: "Mario",
+      },
+      {
+        id: crypto.randomUUID(),
+        name: "Horus",
+      },
+    ];
+
     const handle = repo.create<Party>({
       id: "" as DocumentId,
       name: "Mario",
       description: "This is Mario's Party 1",
       currency: EURO,
-      participants: ["Mario", "Horus"],
+      participants: participants.reduce<Party["participants"]>(
+        (result, next) => {
+          result[next.id] = {
+            id: next.id,
+            name: next.name,
+          };
+          return result;
+        },
+        {},
+      ),
       expenses: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));

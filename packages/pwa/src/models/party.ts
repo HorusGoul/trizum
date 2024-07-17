@@ -7,11 +7,18 @@ export interface Party {
   name: string;
   description: string;
   currency: Currency;
-  participants: ExpenseUser[];
+  participants: Record<ExpenseUser, PartyParticipant>;
   expenses: PartyExpense[];
 }
 
 export interface PartyExpense {
   paidAt: Date;
   documentId: DocumentId; // Expense
+}
+
+export interface PartyParticipant {
+  id: ExpenseUser;
+  name: string;
+  phone?: string;
+  isArchived?: boolean;
 }
