@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import * as ReactDOM from "react-dom/client";
-import { Repo } from "@automerge/automerge-repo/slim";
+import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { RepoContext } from "@automerge/automerge-repo-react-hooks";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
@@ -11,6 +11,7 @@ import {
   type ToOptions,
   type RegisteredRouter,
 } from "@tanstack/react-router";
+import { PartyListProvider } from "#src/hooks/usePartyListProvider";
 import "./index.css";
 
 // Import the generated route tree
@@ -43,7 +44,7 @@ declare module "react-aria-components" {
 
 // Create automerge repository
 const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("opencount"),
+  storage: new IndexedDBStorageAdapter("trizum"),
   network: [new BrowserWebSocketClientAdapter("wss://sync.automerge.org")],
 });
 
@@ -54,7 +55,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <RepoContext.Provider value={repo}>
-        <RouterProvider router={router} />
+        <PartyListProvider>
+          <RouterProvider router={router} />
+        </PartyListProvider>
       </RepoContext.Provider>
     </StrictMode>,
   );

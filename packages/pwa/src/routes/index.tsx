@@ -1,73 +1,41 @@
+import { EURO } from "#src/models/currency.js";
+import type { Party } from "#src/models/party.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
+import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import {
+  isValidDocumentId,
+  type DocumentId,
+} from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
+import { loadDocumentsByIds } from "#src/lib/automerge";
+import { usePartyList } from "#src/hooks/usePartyList.js";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const parties = [
-    {
-      id: "0",
-      name: "Morosos de siempre",
-      description: "No pagadle a Hosaeb",
-    },
-    {
-      id: "1",
-      name: "Mario's Party",
-      description: "Paga la rata",
-    },
-    {
-      id: "2",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "3",
-      name: "A very very very long party name that should be correctly displayed",
-      description:
-        "A very very very long party description that should be correctly displayed",
-    },
-    {
-      id: "4",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "5",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "6",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "7",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "8",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "9",
-      name: "Test",
-      description: "Test",
-    },
-    {
-      id: "10",
-      name: "Test",
-      description: "Test",
-    },
-  ];
+  const repo = useRepo();
+  const { parties, addPartyToList } = useParties();
+
+  function onCreateParty() {
+    const handle = repo.create<Party>({
+      id: "" as DocumentId,
+      name: "Mario",
+      description: "This is Mario's Party 1",
+      currency: EURO,
+      participants: ["Mario", "Horus"],
+      expenses: [],
+    });
+    handle.change((doc) => (doc.id = handle.documentId));
+    addPartyToList(handle.documentId);
+    return handle.documentId;
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -156,7 +124,7 @@ function Index() {
                   />
                   <span className="h-3.5 leading-none">Join a Party</span>
                 </MenuItem>
-                <MenuItem href={{ to: "/new" }}>
+                <MenuItem onAction={onCreateParty}>
                   <IconWithFallback
                     name="list-plus"
                     size={20}
@@ -171,4 +139,17 @@ function Index() {
       </div>
     </div>
   );
+}
+
+function useParties() {
+  const repo = useRepo();
+  const [parties, setParties] = useState<Party[]>([]);
+  const { partyList, addPartyToList, removeParty } = usePartyList();
+
+  useEffect(() => {
+    const ids = Object.keys(partyList?.parties ?? {}).filter(isValidDocumentId);
+    loadDocumentsByIds<Party>(repo, ids).then(setParties);
+  }, [partyList, repo]);
+
+  return { parties, addPartyToList, removeParty };
 }
