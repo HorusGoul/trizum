@@ -44,7 +44,7 @@ declare module "react-aria-components" {
 
 // Create automerge repository
 const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("opencount"),
+  storage: new IndexedDBStorageAdapter("trizum"),
   network: [new BrowserWebSocketClientAdapter("wss://sync.automerge.org")],
 });
 
