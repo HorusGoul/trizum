@@ -7,6 +7,7 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -14,8 +15,13 @@ export const Route = createFileRoute("/party/$partyId")({
 
 function PartyById() {
   const { party, partyId } = useParty();
-  const { removeParty } = usePartyList();
+  const { addPartyToList, removeParty } = usePartyList();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!partyId) return;
+    addPartyToList(partyId);
+  }, [addPartyToList, partyId]);
 
   function onDeleteParty() {
     if (!partyId) return;

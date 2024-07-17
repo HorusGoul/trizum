@@ -14,6 +14,7 @@ export function PartyListProvider({ children }: { children: ReactNode }) {
   const { partyList, changePartyList } = usePartyListValue();
   function addPartyToList(partyId: Party["id"]) {
     changePartyList((list) => {
+      if (list.parties.includes(partyId)) return;
       list.parties.push(partyId);
     });
   }
