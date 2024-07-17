@@ -56,6 +56,14 @@ export type VariantsFromProps<
     : never;
 };
 
+export type VariantProps<CvaFn> = CvaFn extends (
+  options: Options<infer T>,
+) => string
+  ? {
+      [Key in keyof T]: keyof T[Key];
+    }
+  : never;
+
 export const cva =
   <SchemaVariants extends Variants>(
     schema: Partial<Schema<SchemaVariants>> = {},
