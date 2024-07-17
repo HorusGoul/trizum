@@ -1,14 +1,10 @@
-import { EURO } from "#src/models/currency.js";
 import type { Party } from "#src/models/party.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
-import {
-  isValidDocumentId,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
@@ -20,22 +16,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const repo = useRepo();
-  const { parties, addPartyToList } = useParties();
-
-  function onCreateParty() {
-    const handle = repo.create<Party>({
-      id: "" as DocumentId,
-      name: "Mario",
-      description: "This is Mario's Party 1",
-      currency: EURO,
-      participants: ["Mario", "Horus"],
-      expenses: [],
-    });
-    handle.change((doc) => (doc.id = handle.documentId));
-    addPartyToList(handle.documentId);
-    return handle.documentId;
-  }
+  const { parties } = useParties();
 
   return (
     <div className="flex min-h-full flex-col">
@@ -124,7 +105,7 @@ function Index() {
                   />
                   <span className="h-3.5 leading-none">Join a Party</span>
                 </MenuItem>
-                <MenuItem onAction={onCreateParty}>
+                <MenuItem href={{ to: "/new" }}>
                   <IconWithFallback
                     name="list-plus"
                     size={20}
@@ -144,12 +125,12 @@ function Index() {
 function useParties() {
   const repo = useRepo();
   const [parties, setParties] = useState<Party[]>([]);
-  const { partyList, addPartyToList, removeParty } = usePartyList();
+  const { partyList } = usePartyList();
 
   useEffect(() => {
     const ids = Object.keys(partyList?.parties ?? {}).filter(isValidDocumentId);
     loadDocumentsByIds<Party>(repo, ids).then(setParties);
   }, [partyList, repo]);
 
-  return { parties, addPartyToList, removeParty };
+  return { parties };
 }
