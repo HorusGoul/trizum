@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks";
 import {
-  deleteAt,
   isValidDocumentId,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
@@ -14,17 +13,13 @@ export function PartyListProvider({ children }: { children: ReactNode }) {
   const { partyList, changePartyList } = usePartyListValue();
   function addPartyToList(partyId: Party["id"]) {
     changePartyList((list) => {
-      if (list.parties.includes(partyId)) return;
-      list.parties.push(partyId);
+      list.parties[partyId] = true;
     });
   }
   function removeParty(partyId: Party["id"]) {
     repo.delete(partyId);
     changePartyList((list) => {
-      const index = list.parties.findIndex((id) => id === partyId);
-      if (index >= 0) {
-        deleteAt(list.parties, index);
-      }
+      delete list.parties[partyId];
     });
   }
   return (
@@ -47,7 +42,7 @@ function usePartyListValue() {
       setPartyListId(id);
     } else {
       const handle = repo.create<PartyList>({
-        parties: [],
+        parties: {},
       });
       localStorage.setItem("partyListId", handle.documentId);
       setPartyListId(handle.documentId);

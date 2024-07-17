@@ -5,7 +5,10 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
-import { type DocumentId } from "@automerge/automerge-repo/slim";
+import {
+  isValidDocumentId,
+  type DocumentId,
+} from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
@@ -144,9 +147,8 @@ function useParties() {
   const { partyList, addPartyToList, removeParty } = usePartyList();
 
   useEffect(() => {
-    loadDocumentsByIds<Party>(repo, partyList?.parties ?? []).then((parties) =>
-      setParties(parties),
-    );
+    const ids = Object.keys(partyList?.parties ?? {}).filter(isValidDocumentId);
+    loadDocumentsByIds<Party>(repo, ids).then(setParties);
   }, [partyList, repo]);
 
   return { parties, addPartyToList, removeParty };
