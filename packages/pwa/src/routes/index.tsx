@@ -1,20 +1,16 @@
 import { EURO } from "#src/models/currency.js";
 import type { Party } from "#src/models/party.js";
-import type { PartyList } from "#src/models/partyList.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
-import { useDocument, useRepo } from "@automerge/automerge-repo-react-hooks";
-import {
-  deleteAt,
-  isValidDocumentId,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
+import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { type DocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Button, Link, MenuTrigger, Popover } from "react-aria-components";
+import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { loadDocumentsByIds } from "#src/lib/automerge";
+import { usePartyList } from "#src/hooks/usePartyList.js";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -22,7 +18,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const repo = useRepo();
-  const { parties, appendPartyToList } = useParties();
+  const { parties, addPartyToList } = useParties();
 
   function onCreateParty() {
     const handle = repo.create<Party>({
@@ -34,7 +30,7 @@ function Index() {
       expenses: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
-    appendPartyToList(handle.documentId);
+    addPartyToList(handle.documentId);
     return handle.documentId;
   }
 
@@ -70,8 +66,6 @@ function Index() {
           </Popover>
         </MenuTrigger>
       </div>
-
-      <Button onPress={onCreateParty}>Create</Button>
 
       <div className="h-2" />
 
@@ -127,7 +121,7 @@ function Index() {
                   />
                   <span className="h-3.5 leading-none">Join a Party</span>
                 </MenuItem>
-                <MenuItem href={{ to: "/new" }}>
+                <MenuItem onAction={onCreateParty}>
                   <IconWithFallback
                     name="list-plus"
                     size={20}
@@ -147,22 +141,7 @@ function Index() {
 function useParties() {
   const repo = useRepo();
   const [parties, setParties] = useState<Party[]>([]);
-  const { partyList, changePartyList } = usePartyList();
-
-  function appendPartyToList(partyId: Party["id"]) {
-    changePartyList((list) => {
-      list.parties.push(partyId);
-    });
-  }
-
-  function removePartyFromList(partyId: Party["id"]) {
-    changePartyList((list) => {
-      const index = list.parties.findIndex((id) => id === partyId);
-      if (index >= 0) {
-        deleteAt(list.parties, index);
-      }
-    });
-  }
+  const { partyList, addPartyToList, removeParty } = usePartyList();
 
   useEffect(() => {
     loadDocumentsByIds<Party>(repo, partyList?.parties ?? []).then((parties) =>
@@ -170,29 +149,5 @@ function useParties() {
     );
   }, [partyList, repo]);
 
-  return { parties, appendPartyToList, removePartyFromList };
-}
-
-function usePartyList() {
-  const repo = useRepo();
-  const [partyListId, setPartyListId] = useState<DocumentId | undefined>();
-  const [partyList, changePartyList] = useDocument<PartyList>(partyListId);
-
-  useEffect(() => {
-    const id = localStorage.getItem("partyListId");
-    if (id && isValidDocumentId(id)) {
-      setPartyListId(id);
-    } else {
-      const handle = repo.create<PartyList>({
-        parties: [],
-      });
-      localStorage.setItem("partyListId", handle.documentId);
-      setPartyListId(handle.documentId);
-    }
-  }, [repo]);
-
-  return {
-    partyList,
-    changePartyList,
-  };
+  return { parties, addPartyToList, removeParty };
 }

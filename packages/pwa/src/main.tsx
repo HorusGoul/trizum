@@ -11,6 +11,7 @@ import {
   type ToOptions,
   type RegisteredRouter,
 } from "@tanstack/react-router";
+import { PartyListProvider } from "#src/hooks/usePartyListProvider";
 import "./index.css";
 
 // Import the generated route tree
@@ -54,7 +55,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <RepoContext.Provider value={repo}>
-        <RouterProvider router={router} />
+        <PartyListProvider>
+          <RouterProvider router={router} />
+        </PartyListProvider>
       </RepoContext.Provider>
     </StrictMode>,
   );
