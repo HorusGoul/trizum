@@ -79,7 +79,7 @@ function AppTextField({
       )}
       {...props}
     >
-      <Label>{label}</Label>
+      {label ? <Label>{label}</Label> : null}
       {textArea ? <TextArea /> : <Input />}
       {description && (
         <Text

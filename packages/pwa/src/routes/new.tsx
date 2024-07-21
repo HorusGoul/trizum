@@ -8,6 +8,7 @@ import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";
+import { flushSync } from "react-dom";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -17,6 +18,7 @@ interface NewPartyFormValues {
   name: string;
   description: string;
   participants: Pick<PartyParticipant, "name">[];
+  newParticipantName: string;
 }
 
 function New() {
@@ -62,7 +64,12 @@ function New() {
     defaultValues: {
       name: "",
       description: "",
-      participants: [],
+      participants: [
+        {
+          name: "You",
+        },
+      ],
+      newParticipantName: "",
     },
     onSubmit: ({ value }) => {
       onCreateParty(value);
@@ -70,6 +77,16 @@ function New() {
   });
 
   const formId = useId();
+
+  function addNewParticipant() {
+    const newParticipantName = form.getFieldValue("newParticipantName");
+
+    form.pushFieldValue("participants", {
+      name: newParticipantName,
+    });
+
+    form.setFieldValue("newParticipantName", "");
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -146,7 +163,94 @@ function New() {
             Who is invited to this party? You can add more participants later.
           </p>
 
-          {/* TODO: Participant editor */}
+          <form.Field name="participants" mode="array">
+            {(field) => (
+              <div className="mt-4 flex flex-col gap-4">
+                {field.state.value.map((_, index) => (
+                  <div key={index} className="flex w-full items-center gap-2">
+                    <form.Field name={`participants[${index}].name`}>
+                      {(field) => (
+                        <AppTextField
+                          name={field.name}
+                          value={field.state.value}
+                          onChange={field.handleChange}
+                          onBlur={field.handleBlur}
+                          aria-label="Participant name"
+                          className="w-full"
+                        />
+                      )}
+                    </form.Field>
+
+                    <IconButton
+                      icon="trash"
+                      aria-label="Remove"
+                      onPress={() => field.removeValue(index)}
+                      className="flex-shrink-0"
+                    />
+                  </div>
+                ))}
+
+                <div className="flex w-full items-center gap-2">
+                  <form.Field name="newParticipantName">
+                    {(field) => (
+                      <AppTextField
+                        name={field.name}
+                        value={field.state.value}
+                        onChange={field.handleChange}
+                        onBlur={field.handleBlur}
+                        aria-label="New participant name"
+                        className="w-full"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            flushSync(() => {
+                              addNewParticipant();
+                            });
+
+                            e.preventDefault();
+
+                            const target = e.target as HTMLInputElement;
+                            target.focus();
+
+                            // Check if fully in view with a little margin
+                            const rect = target.getBoundingClientRect();
+                            const margin = 10;
+
+                            if (
+                              rect.top >= margin &&
+                              rect.left >= margin &&
+                              rect.right <= window.innerWidth - margin &&
+                              rect.bottom <= window.innerHeight - margin
+                            ) {
+                              return;
+                            }
+
+                            const newScrollTop = window.scrollY + rect.top;
+                            const newScrollLeft = window.scrollX + rect.left;
+
+                            window.scrollTo({
+                              behavior: "smooth",
+                              top: newScrollTop,
+                              left: newScrollLeft,
+                            });
+                          }
+                        }}
+                      />
+                    )}
+                  </form.Field>
+
+                  <IconButton
+                    icon="plus"
+                    aria-label="Add participant"
+                    className="flex-shrink-0"
+                    color="accent"
+                    onPress={addNewParticipant}
+                  />
+                </div>
+              </div>
+            )}
+          </form.Field>
+
+          <div className="h-4" />
         </div>
       </form>
     </div>
