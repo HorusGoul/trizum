@@ -8,6 +8,7 @@ import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { useEffect } from "react";
+import { BackButton } from "#src/components/BackButton.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -35,7 +36,8 @@ function PartyById() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center pr-2">
+      <div className="container flex h-16 items-center px-2">
+        <BackButton />
         <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
         <div className="flex-1" />
         <MenuTrigger>

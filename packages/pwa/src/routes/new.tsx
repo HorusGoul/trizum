@@ -14,6 +14,7 @@ import {
   validatePartyParticipantName,
   validatePartyTitle,
 } from "#src/lib/validation.js";
+import { BackButton } from "#src/components/BackButton.js";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -110,7 +111,7 @@ function New() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2">
-        <IconButton icon="arrow-left" aria-label="Go Back" />
+        <BackButton />
 
         <h1 className="pl-4 text-2xl font-bold">New trizum</h1>
 
