@@ -9,6 +9,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";
 import { flushSync } from "react-dom";
+import {
+  validatePartyDescription,
+  validatePartyParticipantName,
+  validatePartyTitle,
+} from "#src/lib/validation.js";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -18,7 +23,6 @@ interface NewPartyFormValues {
   name: string;
   description: string;
   participants: Pick<PartyParticipant, "name">[];
-  newParticipantName: string;
 }
 
 function New() {
@@ -69,7 +73,6 @@ function New() {
           name: "You",
         },
       ],
-      newParticipantName: "",
     },
     onSubmit: ({ value }) => {
       onCreateParty(value);
@@ -78,14 +81,30 @@ function New() {
 
   const formId = useId();
 
+  const addParticipantForm = useForm({
+    defaultValues: {
+      newParticipantName: "",
+    },
+  });
+
   function addNewParticipant() {
-    const newParticipantName = form.getFieldValue("newParticipantName");
+    addParticipantForm.validateField("newParticipantName", "submit");
+
+    const meta = addParticipantForm.getFieldMeta("newParticipantName");
+    const errorCount = meta?.errors?.length ?? 0;
+
+    if (errorCount) {
+      return;
+    }
+
+    const newParticipantName =
+      addParticipantForm.getFieldValue("newParticipantName");
 
     form.pushFieldValue("participants", {
       name: newParticipantName,
     });
 
-    form.setFieldValue("newParticipantName", "");
+    addParticipantForm.setFieldValue("newParticipantName", "");
   }
 
   return (
@@ -124,7 +143,12 @@ function New() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <form.Field name="name">
+        <form.Field
+          name="name"
+          validators={{
+            onChange: ({ value }) => validatePartyTitle(value),
+          }}
+        >
           {(field) => (
             <AppTextField
               label="Title"
@@ -135,11 +159,21 @@ function New() {
               value={field.state.value}
               onChange={field.handleChange}
               onBlur={field.handleBlur}
+              errorMessage={field.state.meta.errors?.join(", ")}
+              isInvalid={
+                field.state.meta.isTouched &&
+                field.state.meta.errors?.length > 0
+              }
             />
           )}
         </form.Field>
 
-        <form.Field name="description">
+        <form.Field
+          name="description"
+          validators={{
+            onChange: ({ value }) => validatePartyDescription(value),
+          }}
+        >
           {(field) => (
             <AppTextField
               label="Description"
@@ -150,6 +184,11 @@ function New() {
               value={field.state.value}
               onChange={field.handleChange}
               onBlur={field.handleBlur}
+              errorMessage={field.state.meta.errors?.join(", ")}
+              isInvalid={
+                field.state.meta.isTouched &&
+                field.state.meta.errors?.length > 0
+              }
             />
           )}
         </form.Field>
@@ -163,12 +202,34 @@ function New() {
             Who is invited to this party? You can add more participants later.
           </p>
 
-          <form.Field name="participants" mode="array">
+          <form.Field
+            name="participants"
+            mode="array"
+            validators={{
+              onChange: ({ value }) => {
+                if (value.length === 0) {
+                  return "At least one participant is required";
+                }
+              },
+            }}
+          >
             {(field) => (
               <div className="mt-4 flex flex-col gap-4">
+                {field.state.meta.errors?.length > 0 && (
+                  <span className="text-sm font-medium text-danger-500">
+                    {field.state.meta.errors.join(", ")}
+                  </span>
+                )}
+
                 {field.state.value.map((_, index) => (
-                  <div key={index} className="flex w-full items-center gap-2">
-                    <form.Field name={`participants[${index}].name`}>
+                  <div key={index} className="flex w-full gap-2">
+                    <form.Field
+                      name={`participants[${index}].name`}
+                      validators={{
+                        onChange: ({ value }) =>
+                          validatePartyParticipantName(value),
+                      }}
+                    >
                       {(field) => (
                         <AppTextField
                           name={field.name}
@@ -177,6 +238,11 @@ function New() {
                           onBlur={field.handleBlur}
                           aria-label="Participant name"
                           className="w-full"
+                          errorMessage={field.state.meta.errors?.join(", ")}
+                          isInvalid={
+                            field.state.meta.isTouched &&
+                            field.state.meta.errors?.length > 0
+                          }
                         />
                       )}
                     </form.Field>
@@ -190,8 +256,14 @@ function New() {
                   </div>
                 ))}
 
-                <div className="flex w-full items-center gap-2">
-                  <form.Field name="newParticipantName">
+                <div className="flex w-full gap-2">
+                  <addParticipantForm.Field
+                    name="newParticipantName"
+                    validators={{
+                      onSubmit: ({ value }) =>
+                        validatePartyParticipantName(value),
+                    }}
+                  >
                     {(field) => (
                       <AppTextField
                         name={field.name}
@@ -200,6 +272,11 @@ function New() {
                         onBlur={field.handleBlur}
                         aria-label="New participant name"
                         className="w-full"
+                        errorMessage={field.state.meta.errors?.join(", ")}
+                        isInvalid={
+                          field.state.meta.isTouched &&
+                          field.state.meta.errors?.length > 0
+                        }
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             flushSync(() => {
@@ -236,7 +313,7 @@ function New() {
                         }}
                       />
                     )}
-                  </form.Field>
+                  </addParticipantForm.Field>
 
                   <IconButton
                     icon="plus"
