@@ -13,9 +13,15 @@ import {
 } from "@tanstack/react-router";
 import { PartyListProvider } from "#src/hooks/usePartyListProvider";
 import "./index.css";
-
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import * as catalogEn from "#locale/en/messages.po";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+
+// Load language
+i18n.load("en", catalogEn.messages);
+i18n.activate("en");
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -54,11 +60,13 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RepoContext.Provider value={repo}>
-        <PartyListProvider>
-          <RouterProvider router={router} />
-        </PartyListProvider>
-      </RepoContext.Provider>
+      <I18nProvider i18n={i18n}>
+        <RepoContext.Provider value={repo}>
+          <PartyListProvider>
+            <RouterProvider router={router} />
+          </PartyListProvider>
+        </RepoContext.Provider>
+      </I18nProvider>
     </StrictMode>,
   );
 }

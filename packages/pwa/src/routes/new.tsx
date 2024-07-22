@@ -15,6 +15,7 @@ import {
   validatePartyTitle,
 } from "#src/lib/validation.js";
 import { BackButton } from "#src/components/BackButton.js";
+import { t, Trans } from "@lingui/macro";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -113,7 +114,9 @@ function New() {
       <div className="container flex h-16 items-center px-2">
         <BackButton />
 
-        <h1 className="pl-4 text-2xl font-bold">New trizum</h1>
+        <h1 className="pl-4 text-2xl font-bold">
+          <Trans>New trizum</Trans>
+        </h1>
 
         <div className="flex-1" />
 
@@ -125,7 +128,7 @@ function New() {
               <Suspense fallback={null}>
                 <IconButton
                   icon="check"
-                  aria-label={isSubmitting ? "Submitting..." : "Save"}
+                  aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}
                   isDisabled={isSubmitting}
@@ -152,8 +155,8 @@ function New() {
         >
           {(field) => (
             <AppTextField
-              label="Title"
-              description="How do you want to call this party?"
+              label={t`Title`}
+              description={t`How do you want to call this party?`}
               minLength={1}
               maxLength={50}
               name={field.name}
@@ -177,8 +180,8 @@ function New() {
         >
           {(field) => (
             <AppTextField
-              label="Description"
-              description="What is this party about?"
+              label={t`Description`}
+              description={t`What is this party about?`}
               maxLength={500}
               textArea={true}
               name={field.name}
@@ -197,10 +200,14 @@ function New() {
         {/* TODO: Currency picker */}
 
         <div>
-          <h2 className="text-lg font-medium">Participants</h2>
+          <h2 className="text-lg font-medium">
+            <Trans>Participants</Trans>
+          </h2>
 
           <p className="mt-2">
-            Who is invited to this party? You can add more participants later.
+            <Trans>
+              Who is invited to this party? You can add more participants later.
+            </Trans>
           </p>
 
           <form.Field
@@ -209,7 +216,7 @@ function New() {
             validators={{
               onChange: ({ value }) => {
                 if (value.length === 0) {
-                  return "At least one participant is required";
+                  return t`At least one participant is required`;
                 }
               },
             }}
@@ -237,7 +244,7 @@ function New() {
                           value={field.state.value}
                           onChange={field.handleChange}
                           onBlur={field.handleBlur}
-                          aria-label="Participant name"
+                          aria-label={t`Participant name`}
                           className="w-full"
                           errorMessage={field.state.meta.errors?.join(", ")}
                           isInvalid={
@@ -250,7 +257,7 @@ function New() {
 
                     <IconButton
                       icon="trash"
-                      aria-label="Remove"
+                      aria-label={t`Remove`}
                       onPress={() => field.removeValue(index)}
                       className="flex-shrink-0"
                     />
@@ -271,7 +278,7 @@ function New() {
                         value={field.state.value}
                         onChange={field.handleChange}
                         onBlur={field.handleBlur}
-                        aria-label="New participant name"
+                        aria-label={t`New participant name`}
                         className="w-full"
                         errorMessage={field.state.meta.errors?.join(", ")}
                         isInvalid={
@@ -318,7 +325,7 @@ function New() {
 
                   <IconButton
                     icon="plus"
-                    aria-label="Add participant"
+                    aria-label={t`Add participant`}
                     className="flex-shrink-0"
                     color="accent"
                     onPress={addNewParticipant}

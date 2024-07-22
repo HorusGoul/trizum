@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { loadDocumentsByIds } from "#src/lib/automerge";
 import { usePartyList } from "#src/hooks/usePartyList.js";
+import { t, Trans } from "@lingui/macro";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -26,7 +27,7 @@ function Index() {
         <div className="flex-1" />
 
         <MenuTrigger>
-          <IconButton icon="ellipsis-vertical" aria-label="Menu" />
+          <IconButton icon="ellipsis-vertical" aria-label={t`Menu`} />
 
           <Popover placement="bottom end">
             <Menu>
@@ -36,7 +37,9 @@ function Index() {
                 }}
               >
                 <IconWithFallback name="settings" size={20} className="mr-3" />
-                <span className="h-3.5 leading-none">Settings</span>
+                <span className="h-3.5 leading-none">
+                  <Trans>Settings</Trans>
+                </span>
               </MenuItem>
               <MenuItem
                 href={{
@@ -44,7 +47,9 @@ function Index() {
                 }}
               >
                 <IconWithFallback name="info" size={20} className="mr-3" />
-                <span className="h-3.5 leading-none">About</span>
+                <span className="h-3.5 leading-none">
+                  <Trans>About</Trans>
+                </span>
               </MenuItem>
             </Menu>
           </Popover>
@@ -89,7 +94,7 @@ function Index() {
         <div className="sticky bottom-6 flex justify-end">
           <MenuTrigger>
             <IconButton
-              aria-label="Add or create"
+              aria-label={t`Add or create`}
               icon="plus"
               color="accent"
               className="h-14 w-14 shadow-md"
@@ -103,7 +108,9 @@ function Index() {
                     size={20}
                     className="mr-3"
                   />
-                  <span className="h-3.5 leading-none">Join a Party</span>
+                  <span className="h-3.5 leading-none">
+                    <Trans>Join a Party</Trans>
+                  </span>
                 </MenuItem>
                 <MenuItem href={{ to: "/new" }}>
                   <IconWithFallback
@@ -111,7 +118,9 @@ function Index() {
                     size={20}
                     className="mr-3"
                   />
-                  <span className="h-3.5 leading-none">Create a new Party</span>
+                  <span className="h-3.5 leading-none">
+                    <Trans>Create a new Party</Trans>
+                  </span>
                 </MenuItem>
               </Menu>
             </Popover>
