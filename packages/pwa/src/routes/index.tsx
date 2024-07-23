@@ -4,20 +4,25 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import {
+  isValidDocumentId,
+  type AnyDocumentId,
+} from "@automerge/automerge-repo/slim";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
-import { loadDocumentsByIds } from "#src/lib/automerge";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { t, Trans } from "@lingui/macro";
+import {
+  documentCache,
+  useSuspenseDocument,
+} from "#src/lib/automerge/suspense-hooks.js";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const { parties } = useParties();
+  const parties = usePartyItemRefs();
 
   return (
     <div className="flex min-h-full flex-col">
@@ -59,34 +64,8 @@ function Index() {
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
-        {parties.map((party) => (
-          <Link
-            key={party.id}
-            href={{
-              to: `/party/$partyId`,
-              params: {
-                partyId: party.id,
-              },
-            }}
-            className={({
-              isPressed,
-              isFocusVisible,
-              isHovered,
-              defaultClassName,
-            }) =>
-              cn(
-                defaultClassName,
-                "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
-                (isHovered || isFocusVisible) &&
-                  "shadow-md dark:bg-slate-800 dark:shadow-none",
-                isPressed &&
-                  "scale-105 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
-              )
-            }
-          >
-            <span className="text-xl font-medium">{party.name}</span>
-            <span className="text-lg">{party.description}</span>
-          </Link>
+        {parties.map((partyId) => (
+          <PartyItem key={partyId} partyId={partyId} />
         ))}
 
         <div className="flex-1" />
@@ -131,15 +110,48 @@ function Index() {
   );
 }
 
-function useParties() {
+function usePartyItemRefs() {
   const repo = useRepo();
-  const [parties, setParties] = useState<Party[]>([]);
   const { partyList } = usePartyList();
+  const refs = Object.keys(partyList.parties).filter(isValidDocumentId);
 
-  useEffect(() => {
-    const ids = Object.keys(partyList?.parties ?? {}).filter(isValidDocumentId);
-    loadDocumentsByIds<Party>(repo, ids).then(setParties);
-  }, [partyList, repo]);
+  for (const partyId of refs) {
+    documentCache.prefetch(repo, partyId);
+  }
 
-  return { parties };
+  return refs;
+}
+
+function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
+  const [party, handle] = useSuspenseDocument<Party>(partyId);
+
+  if (!party || handle.isDeleted()) {
+    // not sure if this is the right way to handle NULL
+    // or the isDeleted for list items, but this should work
+    return null;
+  }
+
+  return (
+    <Link
+      href={{
+        to: `/party/$partyId`,
+        params: {
+          partyId: party.id,
+        },
+      }}
+      className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
+        cn(
+          defaultClassName,
+          "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
+          (isHovered || isFocusVisible) &&
+            "shadow-md dark:bg-slate-800 dark:shadow-none",
+          isPressed &&
+            "scale-105 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
+        )
+      }
+    >
+      <span className="text-xl font-medium">{party.name}</span>
+      <span className="text-lg">{party.description}</span>
+    </Link>
+  );
 }
