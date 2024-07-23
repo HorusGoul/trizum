@@ -3,17 +3,18 @@ import type {
   Doc,
   DocHandle,
   Repo,
-} from "@automerge/automerge-repo";
+} from "@automerge/automerge-repo/slim";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { useEffect, useSyncExternalStore } from "react";
 
 import { createCache, useCacheMutation } from "suspense";
 
 export const handleCache = createCache<
-  [Repo, AnyDocumentId],
-  DocHandle<unknown>
+  [Repo, AnyDocumentId | undefined],
+  DocHandle<unknown> | undefined
 >({
   async load([repo, id]) {
+    if (!id) return undefined;
     return repo.find(id);
   },
 });
@@ -21,17 +22,20 @@ export const handleCache = createCache<
 // TODO: This probably needs to become a streaming cache instead of a simple cache
 // to facilitate real-time updates to documents
 export const documentCache = createCache<
-  [Repo, AnyDocumentId],
+  [Repo, AnyDocumentId | undefined],
   Doc<unknown> | undefined
 >({
   async load([repo, id]) {
     const handle = await handleCache.readAsync(repo, id);
+    if (!handle) return undefined;
     const doc = await handle.doc();
     return doc;
   },
 });
 
-export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> {
+export function useSuspenseHandle<T>(
+  id: AnyDocumentId | undefined,
+): DocHandle<T> {
   const repo = useRepo();
   return handleCache.read(repo, id) as DocHandle<T>;
 }
@@ -41,7 +45,7 @@ interface UseSuspenseDocumentOptions<IsRequired extends boolean = false> {
 }
 
 export function useSuspenseDocument<T>(
-  id: AnyDocumentId,
+  id: AnyDocumentId | undefined,
 ): [Doc<T> | undefined, DocHandle<T>];
 export function useSuspenseDocument<
   T,
@@ -56,7 +60,10 @@ export function useSuspenseDocument<
 export function useSuspenseDocument<
   T,
   Options extends UseSuspenseDocumentOptions = UseSuspenseDocumentOptions,
->(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T>] {
+>(
+  id: AnyDocumentId | undefined,
+  options?: Options,
+): [Doc<T> | undefined, DocHandle<T>] {
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
   const { mutateSync } = useCacheMutation(documentCache);
