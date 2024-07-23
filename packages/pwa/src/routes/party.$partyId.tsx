@@ -9,6 +9,7 @@ import { IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { useEffect } from "react";
 import { BackButton } from "#src/components/BackButton.js";
+import { t, Trans } from "@lingui/macro";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -51,6 +52,40 @@ function PartyById() {
             </Menu>
           </Popover>
         </MenuTrigger>
+      </div>
+
+      <div className="h-2" />
+
+      <div className="container flex flex-1 flex-col gap-4 px-2">
+        <div className="flex-1" />
+
+        <div className="sticky bottom-6 flex justify-end">
+          <MenuTrigger>
+            <IconButton
+              aria-label={t`Add or create`}
+              icon="plus"
+              color="accent"
+              className="h-14 w-14 shadow-md"
+            />
+
+            <Popover placement="top end" offset={16}>
+              <Menu className="min-w-60">
+                <MenuItem
+                  href={{ to: "/party/$partyId/add", params: { partyId } }}
+                >
+                  <IconWithFallback
+                    name="list-plus"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Add an expense</Trans>
+                  </span>
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </MenuTrigger>
+        </div>
       </div>
     </div>
   );

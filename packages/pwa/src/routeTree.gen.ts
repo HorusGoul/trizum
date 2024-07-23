@@ -17,6 +17,7 @@ import { Route as JoinImport } from './routes/join'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as PartyPartyIdImport } from './routes/party.$partyId'
+import { Route as PartyPartyIdAddImport } from './routes/party_.$partyId.add'
 
 // Create/Update Routes
 
@@ -47,6 +48,11 @@ const IndexRoute = IndexImport.update({
 
 const PartyPartyIdRoute = PartyPartyIdImport.update({
   path: '/party/$partyId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PartyPartyIdAddRoute = PartyPartyIdAddImport.update({
+  path: '/party/$partyId/add',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -96,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdImport
       parentRoute: typeof rootRoute
     }
+    '/party/$partyId/add': {
+      id: '/party/$partyId/add'
+      path: '/party/$partyId/add'
+      fullPath: '/party/$partyId/add'
+      preLoaderRoute: typeof PartyPartyIdAddImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -108,6 +121,7 @@ export const routeTree = rootRoute.addChildren({
   NewRoute,
   SettingsRoute,
   PartyPartyIdRoute,
+  PartyPartyIdAddRoute,
 })
 
 /* prettier-ignore-end */
@@ -123,7 +137,8 @@ export const routeTree = rootRoute.addChildren({
         "/join",
         "/new",
         "/settings",
-        "/party/$partyId"
+        "/party/$partyId",
+        "/party/$partyId/add"
       ]
     },
     "/": {
@@ -143,6 +158,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/party/$partyId": {
       "filePath": "party.$partyId.tsx"
+    },
+    "/party/$partyId/add": {
+      "filePath": "party_.$partyId.add.tsx"
     }
   }
 }
