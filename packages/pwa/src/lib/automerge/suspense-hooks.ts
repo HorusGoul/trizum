@@ -2,12 +2,10 @@ import type {
   AnyDocumentId,
   Doc,
   DocHandle,
-  DocHandleChangePayload,
-  DocHandleDeletePayload,
   Repo,
 } from "@automerge/automerge-repo";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { createCache, useCacheMutation } from "suspense";
 
@@ -22,12 +20,12 @@ export const handleCache = createCache<
 
 export const documentCache = createCache<
   [Repo, AnyDocumentId],
-  Doc<unknown> | null
+  Doc<unknown> | undefined
 >({
   async load([repo, id]) {
     const handle = await handleCache.readAsync(repo, id);
     const doc = await handle.doc();
-    return doc ?? null;
+    return doc;
   },
 });
 
@@ -42,12 +40,12 @@ interface UseSuspenseDocumentOptions<IsRequired extends boolean = false> {
 
 export function useSuspenseDocument<T>(
   id: AnyDocumentId,
-): [Doc<T> | null, DocHandle<T>];
+): [Doc<T> | undefined, DocHandle<T>];
 export function useSuspenseDocument<
   T,
   Options extends
     UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
->(id: AnyDocumentId, options?: Options): [Doc<T> | null, DocHandle<T>];
+>(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T>];
 export function useSuspenseDocument<
   T,
   Options extends
@@ -56,29 +54,33 @@ export function useSuspenseDocument<
 export function useSuspenseDocument<
   T,
   Options extends UseSuspenseDocumentOptions = UseSuspenseDocumentOptions,
->(id: AnyDocumentId, options?: Options): [Doc<T> | null, DocHandle<T>] {
+>(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T>] {
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
   const { mutateSync } = useCacheMutation(documentCache);
-  const doc = documentCache.read(repo, id) as Doc<T> | null;
-  const [, setRenderCount] = useState(0);
 
-  useEffect(() => {
-    function rerender(
-      payload: DocHandleChangePayload<T> | DocHandleDeletePayload<T>,
-    ) {
-      setRenderCount((count) => count + 1);
-      mutateSync([repo, id], payload.handle.docSync() ?? null);
-    }
+  // Suspense cache read to ensure the document is loaded
+  documentCache.read(repo, id) as Doc<T> | undefined;
 
-    handle.on("change", rerender);
-    handle.on("delete", rerender);
+  const doc = useSyncExternalStore(
+    (change) => {
+      function update() {
+        const doc = handle.docSync();
+        mutateSync([repo, id], doc);
+        change();
+      }
 
-    return () => {
-      handle.removeListener("change", rerender);
-      handle.removeListener("delete", rerender);
-    };
-  }, [handle, mutateSync, repo, id]);
+      handle.on("change", update);
+      handle.on("delete", update);
+      return () => {
+        handle.removeListener("change", update);
+        handle.removeListener("delete", update);
+      };
+    },
+    () => {
+      return handle.docSync();
+    },
+  );
 
   if (options?.required && doc === null) {
     throw new Error(`Document not found: ${id}`);
