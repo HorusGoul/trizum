@@ -3,7 +3,7 @@ import { EURO } from "#src/models/currency.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
