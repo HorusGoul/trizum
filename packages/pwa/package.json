@@ -36,7 +36,7 @@
     "react": "0.0.0-experimental-d025ddd3-20240722",
     "react-aria-components": "1.2.1",
     "react-dom": "0.0.0-experimental-d025ddd3-20240722",
-    "suspense": "^0.0.53",
+    "suspense": "0.0.53",
     "tailwind-merge": "2.4.0"
   },
   "devDependencies": {
