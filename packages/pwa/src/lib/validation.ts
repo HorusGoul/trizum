@@ -1,4 +1,19 @@
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { t } from "@lingui/macro";
+
+export function validateDocumentId(id: string) {
+  id = id.trim();
+
+  if (!id) {
+    return t`ID is required`;
+  }
+
+  if (!isValidDocumentId(id)) {
+    return t`This isn't a valid ID`;
+  }
+
+  return null;
+}
 
 export function validatePartyTitle(title: string) {
   title = title.trim();
