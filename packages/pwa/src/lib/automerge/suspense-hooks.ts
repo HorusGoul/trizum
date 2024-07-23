@@ -5,7 +5,7 @@ import type {
   Repo,
 } from "@automerge/automerge-repo";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import { createCache, useCacheMutation } from "suspense";
 
@@ -18,6 +18,8 @@ export const handleCache = createCache<
   },
 });
 
+// TODO: This probably needs to become a streaming cache instead of a simple cache
+// to facilitate real-time updates to documents
 export const documentCache = createCache<
   [Repo, AnyDocumentId],
   Doc<unknown> | undefined
@@ -60,27 +62,25 @@ export function useSuspenseDocument<
   const { mutateSync } = useCacheMutation(documentCache);
 
   // Suspense cache read to ensure the document is loaded
-  documentCache.read(repo, id) as Doc<T> | undefined;
+  documentCache.read(repo, id);
 
   const doc = useSyncExternalStore(
     (change) => {
-      function update() {
-        const doc = handle.docSync();
-        mutateSync([repo, id], doc);
-        change();
-      }
-
-      handle.on("change", update);
-      handle.on("delete", update);
+      handle.on("change", change);
+      handle.on("delete", change);
       return () => {
-        handle.removeListener("change", update);
-        handle.removeListener("delete", update);
+        handle.removeListener("change", change);
+        handle.removeListener("delete", change);
       };
     },
     () => {
       return handle.docSync();
     },
   );
+
+  useEffect(() => {
+    mutateSync([repo, id], doc);
+  }, [mutateSync, doc, repo, id]);
 
   if (options?.required && doc === null) {
     throw new Error(`Document not found: ${id}`);
