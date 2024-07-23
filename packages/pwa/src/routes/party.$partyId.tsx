@@ -3,7 +3,6 @@ import {
   updateText,
   type AnyDocumentId,
 } from "@automerge/automerge-repo/slim";
-import { useDocument } from "@automerge/automerge-repo-react-hooks";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
@@ -23,7 +22,7 @@ export const Route = createFileRoute("/party/$partyId")({
 });
 
 function PartyById() {
-  const { party, partyId } = useParty();
+  const { party, partyId, isLoading } = useParty();
   const { addPartyToList, removeParty } = usePartyList();
   const expenseIds =
     party?.expenses
@@ -42,7 +41,15 @@ function PartyById() {
     navigate({ to: "/", replace: true });
   }
 
-  if (partyId === undefined || party === undefined) {
+  if (partyId === undefined) {
+    return <span>Invalid Party ID</span>;
+  }
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (party === undefined) {
     return <span>404 bruv</span>;
   }
 
@@ -113,16 +120,21 @@ function PartyById() {
 function useParty() {
   const { partyId: _partyId } = Route.useParams();
   const partyId = isValidDocumentId(_partyId) ? _partyId : undefined;
-  const [party, changeParty] = useDocument<Party>(partyId);
+  const [party, handle] = useSuspenseDocument<Party>(partyId);
   function dispatch({ type, payload }: ChangePartyAction) {
     switch (type) {
       case "party_change_name":
-        return changeParty((party) => {
+        return handle.change((party) => {
           updateText(party, ["name"], payload.name);
         });
     }
   }
-  return { party, partyId, dispatch };
+  return {
+    party,
+    partyId,
+    isLoading: handle.inState(["loading"]),
+    dispatch,
+  };
 }
 
 interface ChangePartyNameAction {

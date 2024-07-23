@@ -15,7 +15,15 @@ export const Route = createFileRoute("/party/$partyId/expense/$expenseId")({
 });
 
 function ExpenseById() {
-  const { expense, onDeleteExpense } = useExpense();
+  const { expenseId, expense, onDeleteExpense, isLoading } = useExpense();
+
+  if (expenseId === undefined) {
+    return <span>Invalid Expense ID</span>;
+  }
+
+  if (isLoading) {
+    return null;
+  }
 
   if (!expense) {
     return "404 bruv";
@@ -61,5 +69,11 @@ function useExpense() {
     }
     history.back();
   }
-  return { partyId, onDeleteExpense, expense, expenseId };
+  return {
+    partyId,
+    onDeleteExpense,
+    expense,
+    expenseId,
+    isLoading: handle.inState(["loading"]),
+  };
 }
