@@ -11,7 +11,6 @@ import {
   type ToOptions,
   type RegisteredRouter,
 } from "@tanstack/react-router";
-import { PartyListProvider } from "#src/hooks/usePartyListProvider";
 import "./index.css";
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
@@ -62,9 +61,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <I18nProvider i18n={i18n}>
         <RepoContext.Provider value={repo}>
-          <PartyListProvider>
-            <RouterProvider router={router} />
-          </PartyListProvider>
+          <RouterProvider router={router} />
         </RepoContext.Provider>
       </I18nProvider>
     </StrictMode>,
