@@ -6,8 +6,10 @@ import {
   type TextAreaProps as AriaTextAreaProps,
   TextField as AriaTextField,
   type TextFieldProps as AriaTextFieldProps,
+  type NumberFieldProps as AriaNumberFieldProps,
   type ValidationResult as AriaValidationResult,
   composeRenderProps,
+  NumberField as AriaNumberField,
   Text,
 } from "react-aria-components";
 
@@ -16,6 +18,7 @@ import { cn } from "./utils";
 import { FieldError, Label } from "./Field";
 
 const TextField = AriaTextField;
+const NumberField = AriaNumberField;
 
 const Input = ({ className, ...props }: AriaInputProps) => {
   return (
@@ -94,5 +97,40 @@ function AppTextField({
   );
 }
 
-export { Input, TextField, AppTextField, TextArea };
+interface AppNumberFieldProps extends AriaNumberFieldProps {
+  label?: string;
+  description?: string;
+  errorMessage?: string | ((validation: AriaValidationResult) => string);
+}
+
+function AppNumberField({
+  label,
+  description,
+  errorMessage,
+  className,
+  ...props
+}: AppNumberFieldProps) {
+  return (
+    <NumberField
+      className={composeRenderProps(className, (className) =>
+        cn("group flex flex-col gap-2", className),
+      )}
+      {...props}
+    >
+      {label ? <Label>{label}</Label> : null}
+      <Input />
+      {description && (
+        <Text
+          className="text-sm text-slate-700 dark:text-slate-50"
+          slot="description"
+        >
+          {description}
+        </Text>
+      )}
+      <FieldError>{errorMessage}</FieldError>
+    </NumberField>
+  );
+}
+
+export { Input, TextField, AppTextField, AppNumberField, TextArea };
 export type { AppTextFieldProps };
