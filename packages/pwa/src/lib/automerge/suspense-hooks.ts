@@ -82,7 +82,7 @@ export function useSuspenseDocument<
     mutateSync([repo, id], doc);
   }, [mutateSync, doc, repo, id]);
 
-  if (options?.required && doc === null) {
+  if (options?.required && !doc) {
     throw new Error(`Document not found: ${id}`);
   }
 
