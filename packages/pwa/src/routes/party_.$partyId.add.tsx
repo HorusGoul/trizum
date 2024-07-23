@@ -6,7 +6,10 @@ import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
-import { type DocumentId } from "@automerge/automerge-repo/slim";
+import {
+  isValidDocumentId,
+  type DocumentId,
+} from "@automerge/automerge-repo/slim";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import type { Party } from "#src/models/party.js";
 import type { Expense } from "#src/models/expense.js";
@@ -14,7 +17,7 @@ import type { ExpenseUser } from "#src/lib/expenses.js";
 import { IconButton } from "#src/ui/IconButton.js";
 
 export const Route = createFileRoute("/party/$partyId/add")({
-  component: () => <AddExpense />,
+  component: AddExpense,
 });
 
 interface NewExpenseFormValues {
@@ -30,6 +33,10 @@ function AddExpense() {
   const navigate = useNavigate();
 
   function onCreateExpense(values: NewExpenseFormValues) {
+    if (!party || !partyId) {
+      console.warn("This party doesn't exist");
+      return;
+    }
     const paidAt = new Date();
     // TODO: handle more expense share types
     const shares: Expense["shares"] = Object.keys(party.participants).reduce(
@@ -49,7 +56,14 @@ function AddExpense() {
     });
     handle.change((doc) => (doc.id = handle.documentId));
     addExpenseToParty(handle.documentId, paidAt);
-    navigate({ to: "/party/$partyId", params: { partyId } });
+    navigate({
+      to: "/party/$partyId/expense/$expenseId",
+      replace: true,
+      params: {
+        partyId,
+        expenseId: handle.documentId,
+      },
+    });
     return handle.documentId;
   }
 
@@ -58,7 +72,7 @@ function AddExpense() {
       name: "",
       description: "",
       amount: 0,
-      paidBy: Object.keys(party.participants)[0],
+      paidBy: Object.keys(party?.participants ?? []).at(0) ?? "",
     },
     onSubmit: ({ value }) => {
       onCreateExpense(value);
@@ -66,6 +80,10 @@ function AddExpense() {
   });
 
   const formId = useId();
+
+  if (!party || !partyId) {
+    return t`Can't add an expense to a party that doesn't exist`;
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -111,7 +129,7 @@ function AddExpense() {
           {(field) => (
             <AppTextField
               label={t`Title`}
-              description={t`How do you want to call this expense?`}
+              description={t`How do you want to call this expense ? `}
               minLength={1}
               maxLength={50}
               name={field.name}
@@ -151,15 +169,13 @@ function AddExpense() {
 
 function useParty() {
   const { partyId: _partyId } = Route.useParams();
-  const partyId = _partyId as DocumentId; //= isValidDocumentId(_partyId) ? _partyId : undefined;
-  const [party, handle] = useSuspenseDocument<Party>(partyId, {
-    required: true,
-  });
+  const partyId = isValidDocumentId(_partyId) ? _partyId : undefined;
+  const [party, handle] = useSuspenseDocument<Party>(partyId);
   function addExpenseToParty(expenseId: Expense["id"], paidAt: Date) {
     handle.change((party) => {
       party.expenses.push({
         paidAt,
-        expenseId: handle.documentId,
+        expenseId,
       });
     });
   }

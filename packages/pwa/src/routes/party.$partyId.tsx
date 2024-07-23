@@ -1,8 +1,12 @@
-import { isValidDocumentId, updateText } from "@automerge/automerge-repo/slim";
+import {
+  isValidDocumentId,
+  updateText,
+  type AnyDocumentId,
+} from "@automerge/automerge-repo/slim";
 import { useDocument } from "@automerge/automerge-repo-react-hooks";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
-import { MenuTrigger, Popover } from "react-aria-components";
+import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
@@ -10,6 +14,9 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { useEffect } from "react";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
+import type { Expense } from "#src/models/expense.js";
+import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { cn } from "#src/ui/utils.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -18,6 +25,10 @@ export const Route = createFileRoute("/party/$partyId")({
 function PartyById() {
   const { party, partyId } = useParty();
   const { addPartyToList, removeParty } = usePartyList();
+  const expenseIds =
+    party?.expenses
+      ?.sort((a, b) => b.paidAt.getTime() - a.paidAt.getTime())
+      ?.map((e) => e.expenseId) ?? [];
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +42,7 @@ function PartyById() {
     navigate({ to: "/", replace: true });
   }
 
-  if (party === undefined) {
+  if (partyId === undefined || party === undefined) {
     return <span>404 bruv</span>;
   }
 
@@ -57,6 +68,14 @@ function PartyById() {
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
+        {expenseIds.map((expenseId) => (
+          <ExpenseItem
+            key={expenseId}
+            partyId={partyId}
+            expenseId={expenseId}
+          />
+        ))}
+
         <div className="flex-1" />
 
         <div className="sticky bottom-6 flex justify-end">
@@ -114,3 +133,45 @@ interface ChangePartyNameAction {
 }
 
 type ChangePartyAction = ChangePartyNameAction;
+
+function ExpenseItem({
+  partyId,
+  expenseId,
+}: {
+  partyId: AnyDocumentId;
+  expenseId: AnyDocumentId;
+}) {
+  const [expense, handle] = useSuspenseDocument<Expense>(expenseId);
+
+  if (!expense || handle.isDeleted()) {
+    // not sure if this is the right way to handle NULL
+    // or the isDeleted for list items, but this should work
+    return null;
+  }
+
+  return (
+    <Link
+      href={{
+        to: "/party/$partyId/expense/$expenseId",
+        params: {
+          partyId,
+          expenseId: expenseId,
+        },
+      }}
+      className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
+        cn(
+          defaultClassName,
+          "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
+          (isHovered || isFocusVisible) &&
+            "shadow-md dark:bg-slate-800 dark:shadow-none",
+          isPressed &&
+            "scale-105 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
+        )
+      }
+    >
+      <span className="text-xl font-medium">{expense.name}</span>
+      <span className="text-lg">{expense.description}</span>
+      <span className="text-lg">{expense.paidAt.toLocaleDateString()}</span>
+    </Link>
+  );
+}
