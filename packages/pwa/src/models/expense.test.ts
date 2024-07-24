@@ -1,6 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { exportIntoInput, type Expense, type ExpenseShare } from "./expense";
 import type { ExpenseInput, ExpenseUser } from "#src/lib/expenses.js";
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 
 describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   test("single exact", () => {
@@ -202,6 +203,7 @@ function createExpense({
   shares: Record<ExpenseUser, ExpenseShare>;
 }): Expense {
   return {
+    id: "1" as DocumentId,
     name: "",
     description: "",
     paidAt: new Date(),

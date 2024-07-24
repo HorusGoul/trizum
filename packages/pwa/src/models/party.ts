@@ -1,6 +1,7 @@
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import type { Currency } from "./currency";
+import type { Expense } from "./expense";
 
 export interface Party {
   id: DocumentId;
@@ -13,7 +14,7 @@ export interface Party {
 
 export interface PartyExpense {
   paidAt: Date;
-  documentId: DocumentId; // Expense
+  expenseId: Expense["id"];
 }
 
 export interface PartyParticipant {

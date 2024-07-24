@@ -3,7 +3,7 @@ import type {
   Doc,
   DocHandle,
   Repo,
-} from "@automerge/automerge-repo";
+} from "@automerge/automerge-repo/slim";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { useEffect, useSyncExternalStore } from "react";
 

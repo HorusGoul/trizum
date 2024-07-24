@@ -52,3 +52,5 @@ export function validatePartyParticipantName(name: string) {
 
   return null;
 }
+
+export const validateExpenseTitle = validatePartyTitle;

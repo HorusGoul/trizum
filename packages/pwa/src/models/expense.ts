@@ -1,6 +1,8 @@
 import type { ExpenseInput, ExpenseUser } from "#src/lib/expenses.js";
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 
 export interface Expense {
+  id: DocumentId;
   name: string;
   description: string;
   paidAt: Date;

@@ -17,6 +17,8 @@ import { Route as JoinImport } from './routes/join'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as PartyPartyIdImport } from './routes/party.$partyId'
+import { Route as PartyPartyIdAddImport } from './routes/party_.$partyId.add'
+import { Route as PartyPartyIdExpenseExpenseIdImport } from './routes/party_.$partyId.expense.$expenseId'
 
 // Create/Update Routes
 
@@ -49,6 +51,17 @@ const PartyPartyIdRoute = PartyPartyIdImport.update({
   path: '/party/$partyId',
   getParentRoute: () => rootRoute,
 } as any)
+
+const PartyPartyIdAddRoute = PartyPartyIdAddImport.update({
+  path: '/party/$partyId/add',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PartyPartyIdExpenseExpenseIdRoute =
+  PartyPartyIdExpenseExpenseIdImport.update({
+    path: '/party/$partyId/expense/$expenseId',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -96,6 +109,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdImport
       parentRoute: typeof rootRoute
     }
+    '/party/$partyId/add': {
+      id: '/party/$partyId/add'
+      path: '/party/$partyId/add'
+      fullPath: '/party/$partyId/add'
+      preLoaderRoute: typeof PartyPartyIdAddImport
+      parentRoute: typeof rootRoute
+    }
+    '/party/$partyId/expense/$expenseId': {
+      id: '/party/$partyId/expense/$expenseId'
+      path: '/party/$partyId/expense/$expenseId'
+      fullPath: '/party/$partyId/expense/$expenseId'
+      preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -108,6 +135,8 @@ export const routeTree = rootRoute.addChildren({
   NewRoute,
   SettingsRoute,
   PartyPartyIdRoute,
+  PartyPartyIdAddRoute,
+  PartyPartyIdExpenseExpenseIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -123,7 +152,9 @@ export const routeTree = rootRoute.addChildren({
         "/join",
         "/new",
         "/settings",
-        "/party/$partyId"
+        "/party/$partyId",
+        "/party/$partyId/add",
+        "/party/$partyId/expense/$expenseId"
       ]
     },
     "/": {
@@ -143,6 +174,12 @@ export const routeTree = rootRoute.addChildren({
     },
     "/party/$partyId": {
       "filePath": "party.$partyId.tsx"
+    },
+    "/party/$partyId/add": {
+      "filePath": "party_.$partyId.add.tsx"
+    },
+    "/party/$partyId/expense/$expenseId": {
+      "filePath": "party_.$partyId.expense.$expenseId.tsx"
     }
   }
 }
