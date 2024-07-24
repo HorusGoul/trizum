@@ -54,10 +54,10 @@ function ExpenseById() {
 function useExpense() {
   const repo = useRepo();
   const { history } = useRouter();
-  const { partyId: _partyId, expenseId: _expenseId } = Route.useParams();
-  const partyId = isValidDocumentId(_partyId) ? _partyId : undefined;
-  const expenseId = isValidDocumentId(_expenseId) ? _expenseId : undefined;
+  const { partyId, expenseId } = Route.useParams();
+  if (!isValidDocumentId(expenseId)) throw new Error("Malformed Expense ID");
   const [expense] = useSuspenseDocument<Expense>(expenseId);
+  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
   const [party, handle] = useSuspenseDocument<Party>(partyId);
   function onDeleteExpense() {
     if (expenseId === undefined || !isValidDocumentId(expenseId)) return;

@@ -118,8 +118,8 @@ function PartyById() {
 }
 
 function useParty() {
-  const { partyId: _partyId } = Route.useParams();
-  const partyId = isValidDocumentId(_partyId) ? _partyId : undefined;
+  const { partyId } = Route.useParams();
+  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
   const [party, handle] = useSuspenseDocument<Party>(partyId);
   function dispatch({ type, payload }: ChangePartyAction) {
     switch (type) {
