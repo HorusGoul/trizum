@@ -6,6 +6,7 @@
   "author": "Horus Lugo <hola@horus.dev>",
   "scripts": {
     "build": "turbo run build",
+    "lingui:extract": "turbo run lingui:extract",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "publish-packages": "changeset publish",
