@@ -23,7 +23,7 @@
   "engines": {
     "node": "^20"
   },
-  "packageManager": "pnpm@9.5.0",
+  "packageManager": "pnpm@9.6.0",
   "pnpm": {
     "overrides": {
       "react": "0.0.0-experimental-d025ddd3-20240722",
