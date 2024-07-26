@@ -42,7 +42,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20bfa68d879ec57187f2c5bf616158433763f05f06
+          node-version: 20
           cache: "pnpm"
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Install Dependencies
@@ -67,7 +67,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20bfa68d879ec57187f2c5bf616158433763f05f06
+          node-version: 20
           cache: "pnpm"
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
       - name: Install Dependencies
