@@ -13,15 +13,20 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/lib/validation.ts:31
+#: src/lib/validation.ts:46
 msgid "A name for the participant is required"
 msgstr "A name for the participant is required"
 
-#: src/routes/index.tsx:51
+#: src/routes/index.tsx:56
 msgid "About"
 msgstr "About"
 
-#: src/routes/index.tsx:97
+#: src/routes/party.$partyId.tsx:108
+msgid "Add an expense"
+msgstr "Add an expense"
+
+#: src/routes/index.tsx:76
+#: src/routes/party.$partyId.tsx:91
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -29,11 +34,19 @@ msgstr "Add or create"
 msgid "Add participant"
 msgstr "Add participant"
 
+#: src/routes/party_.$partyId.add.tsx:152
+msgid "Amount"
+msgstr "Amount"
+
 #: src/routes/new.tsx:219
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
-#: src/routes/index.tsx:122
+#: src/routes/party_.$partyId.add.tsx:85
+msgid "Can't add an expense to a party that doesn't exist"
+msgstr "Can't add an expense to a party that doesn't exist"
+
+#: src/routes/index.tsx:101
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -41,25 +54,37 @@ msgstr "Create a new Party"
 msgid "Description"
 msgstr "Description"
 
-#: src/lib/validation.ts:21
+#: src/lib/validation.ts:36
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
+
+#: src/routes/party_.$partyId.add.tsx:132
+msgid "How do you want to call this expense ?"
+msgstr "How do you want to call this expense ?"
 
 #: src/routes/new.tsx:159
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
-#: src/routes/index.tsx:112
+#: src/lib/validation.ts:8
+msgid "ID is required"
+msgstr "ID is required"
+
+#: src/routes/index.tsx:91
 msgid "Join a Party"
 msgstr "Join a Party"
 
-#: src/routes/index.tsx:30
+#: src/routes/index.tsx:35
 msgid "Menu"
 msgstr "Menu"
 
-#: src/lib/validation.ts:35
+#: src/lib/validation.ts:50
 msgid "Name must be less than 50 characters"
 msgstr "Name must be less than 50 characters"
+
+#: src/routes/party_.$partyId.add.tsx:93
+msgid "New expense"
+msgstr "New expense"
 
 #: src/routes/new.tsx:281
 msgid "New participant name"
@@ -81,29 +106,42 @@ msgstr "Participants"
 msgid "Remove"
 msgstr "Remove"
 
+#: src/routes/join.tsx:61
 #: src/routes/new.tsx:131
+#: src/routes/party_.$partyId.add.tsx:104
 msgid "Save"
 msgstr "Save"
 
-#: src/routes/index.tsx:41
+#: src/routes/index.tsx:46
 msgid "Settings"
 msgstr "Settings"
 
+#: src/routes/join.tsx:61
 #: src/routes/new.tsx:131
+#: src/routes/party_.$partyId.add.tsx:104
 msgid "Submitting..."
 msgstr "Submitting..."
 
+#: src/lib/validation.ts:12
+msgid "This isn't a valid ID"
+msgstr "This isn't a valid ID"
+
 #: src/routes/new.tsx:158
+#: src/routes/party_.$partyId.add.tsx:131
 msgid "Title"
 msgstr "Title"
 
-#: src/lib/validation.ts:7
+#: src/lib/validation.ts:22
 msgid "Title is required"
 msgstr "Title is required"
 
-#: src/lib/validation.ts:11
+#: src/lib/validation.ts:26
 msgid "Title must be less than 50 characters"
 msgstr "Title must be less than 50 characters"
+
+#: src/routes/join.tsx:90
+msgid "URL or Party ID"
+msgstr "URL or Party ID"
 
 #: src/routes/new.tsx:184
 msgid "What is this party about?"
