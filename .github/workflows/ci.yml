@@ -35,7 +35,7 @@ jobs:
         run: pnpm turbo run ${{ matrix.turbo }}
 
   extract-messages:
-    name: Autofix
+    name: Extract Locales
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,7 +49,6 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Extract Messages
-        continue-on-error: true
         run: pnpm lingui:extract
 
       - uses: EndBug/add-and-commit@v9
@@ -61,7 +60,7 @@ jobs:
           committer_email: actions@github.com
 
   autofix:
-    name: Autofix
+    name: Lint & Format autofix
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +74,6 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Autofix
-        continue-on-error: true
         run: pnpm lint:fix
 
       - uses: EndBug/add-and-commit@v9
