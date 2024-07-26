@@ -24,7 +24,7 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: package.json
           cache: "pnpm"
       - uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
@@ -33,3 +33,53 @@ jobs:
 
       - name: ${{ matrix.turbo }}
         run: pnpm turbo run ${{ matrix.turbo }}
+
+  extract-messages:
+    name: Extract Locales
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Extract Messages
+        run: pnpm lingui:extract
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          commit: --signoff
+          add: "--all"
+          message: "i18n: update locales"
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
+
+  autofix:
+    name: Lint & Format autofix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Autofix
+        run: pnpm lint:fix
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          commit: --signoff
+          add: --all
+          message: "style: apply automatic fixes"
+          committer_name: GitHub Actions
+          committer_email: actions@github.com
