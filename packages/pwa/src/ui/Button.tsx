@@ -18,7 +18,7 @@ const colorSchemes: Record<
     base: "bg-slate-950 bg-opacity-0 dark:bg-slate-50 dark:bg-opacity-0",
     focus: "bg-opacity-5 dark:bg-opacity-5",
     pressed: "bg-opacity-10 dark:bg-opacity-10",
-  },
+                },
   accent: {
     base: "text-slate-50 bg-accent-500 dark:bg-accent-500",
     focus: "bg-accent-600 dark:bg-accent-400",
