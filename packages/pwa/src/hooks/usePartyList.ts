@@ -18,6 +18,8 @@ export function usePartyList() {
     }
 
     const handle = repo.create<PartyList>({
+      username: "",
+      phone: "",
       parties: {},
     });
 
@@ -43,10 +45,18 @@ export function usePartyList() {
     });
   }
 
+  function updateSettings(values: Pick<PartyList, "username" | "phone">) {
+    partyListHandle.change((list) => {
+      list.username = values.username;
+      list.phone = values.phone;
+    });
+  }
+
   return {
     partyList,
     changePartyList: partyListHandle.change,
     addPartyToList,
     removeParty,
+    updateSettings,
   };
 }
