@@ -30,7 +30,7 @@ interface NewPartyFormValues {
 
 function New() {
   const repo = useRepo();
-  const { addPartyToList } = usePartyList();
+  const { addPartyToList, partyList } = usePartyList();
   const navigate = useNavigate();
 
   function onCreateParty(values: NewPartyFormValues) {
@@ -75,7 +75,7 @@ function New() {
       description: "",
       participants: [
         {
-          name: "You",
+          name: partyList.username,
         },
       ],
     },
