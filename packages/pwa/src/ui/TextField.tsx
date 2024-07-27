@@ -97,7 +97,7 @@ function AppTextField({
   );
 }
 
-interface AppNumberFieldProps extends AriaNumberFieldProps {
+export interface AppNumberFieldProps extends AriaNumberFieldProps {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: AriaValidationResult) => string);

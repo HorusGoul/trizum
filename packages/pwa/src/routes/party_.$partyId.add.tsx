@@ -1,6 +1,6 @@
 import { BackButton } from "#src/components/BackButton.js";
 import { validateExpenseTitle } from "#src/lib/validation.js";
-import { AppNumberField, AppTextField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/TextField.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
@@ -13,8 +13,9 @@ import {
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import type { Party } from "#src/models/party.js";
 import type { Expense } from "#src/models/expense.js";
-import type { ExpenseUser } from "#src/lib/expenses.js";
+import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
 import { IconButton } from "#src/ui/IconButton.js";
+import { CurrencyField } from "#src/components/CurrencyField.js";
 
 export const Route = createFileRoute("/party/$partyId/add")({
   component: AddExpense,
@@ -51,7 +52,7 @@ function AddExpense() {
       name: values.name,
       description: values.description,
       paidAt,
-      paidBy: { [values.paidBy]: values.amount },
+      paidBy: { [values.paidBy]: convertToUnits(values.amount) },
       shares,
     });
     handle.change((doc) => (doc.id = handle.documentId));
@@ -147,11 +148,10 @@ function AddExpense() {
 
         <form.Field name="amount">
           {(field) => (
-            <AppNumberField
+            <CurrencyField
               name={field.name}
               label={t`Amount`}
-              description="In cents" // TODO: better description
-              minValue={1}
+              description="How much did you pay?"
               value={field.state.value}
               onChange={field.handleChange}
               onBlur={field.handleBlur}

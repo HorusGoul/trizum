@@ -115,3 +115,9 @@ function getSplitTotal(
     Dinero({ amount: 0 }),
   );
 }
+
+export function convertToUnits(amount: number) {
+  return String(amount).includes(".")
+    ? Number(amount.toFixed(2).replace(".", ""))
+    : amount * 100;
+}
