@@ -58,6 +58,10 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
+#: src/routes/settings.tsx:119
+msgid "For payments through Bizum or similar services"
+msgstr "For payments through Bizum or similar services"
+
 #: src/routes/party_.$partyId.add.tsx:133
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
@@ -102,6 +106,18 @@ msgstr "Participant name"
 msgid "Participants"
 msgstr "Participants"
 
+#: src/routes/settings.tsx:118
+msgid "Phone number"
+msgstr "Phone number"
+
+#: src/lib/validation.ts:62
+msgid "Phone number is required"
+msgstr "Phone number is required"
+
+#: src/lib/validation.ts:66
+msgid "Phone number must be less than 20 characters"
+msgstr "Phone number must be less than 20 characters"
+
 #: src/routes/new.tsx:260
 msgid "Remove"
 msgstr "Remove"
@@ -109,16 +125,19 @@ msgstr "Remove"
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:131
 #: src/routes/party_.$partyId.add.tsx:105
+#: src/routes/settings.tsx:66
 msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:46
+#: src/routes/settings.tsx:49
 msgid "Settings"
 msgstr "Settings"
 
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:131
 #: src/routes/party_.$partyId.add.tsx:105
+#: src/routes/settings.tsx:66
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -143,9 +162,17 @@ msgstr "Title must be less than 50 characters"
 msgid "URL or Party ID"
 msgstr "URL or Party ID"
 
+#: src/routes/settings.tsx:93
+msgid "Username"
+msgstr "Username"
+
 #: src/routes/new.tsx:184
 msgid "What is this party about?"
 msgstr "What is this party about?"
+
+#: src/routes/settings.tsx:94
+msgid "What's your preferred way to be addressed?"
+msgstr "What's your preferred way to be addressed?"
 
 #: src/routes/new.tsx:208
 msgid "Who is invited to this party? You can add more participants later."
