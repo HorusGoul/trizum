@@ -34,7 +34,7 @@ msgstr "Add or create"
 msgid "Add participant"
 msgstr "Add participant"
 
-#: src/routes/party_.$partyId.add.tsx:152
+#: src/routes/party_.$partyId.add.tsx:153
 msgid "Amount"
 msgstr "Amount"
 
@@ -42,7 +42,7 @@ msgstr "Amount"
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
-#: src/routes/party_.$partyId.add.tsx:85
+#: src/routes/party_.$partyId.add.tsx:86
 msgid "Can't add an expense to a party that doesn't exist"
 msgstr "Can't add an expense to a party that doesn't exist"
 
@@ -58,7 +58,7 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
-#: src/routes/party_.$partyId.add.tsx:132
+#: src/routes/party_.$partyId.add.tsx:133
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
@@ -82,7 +82,7 @@ msgstr "Menu"
 msgid "Name must be less than 50 characters"
 msgstr "Name must be less than 50 characters"
 
-#: src/routes/party_.$partyId.add.tsx:93
+#: src/routes/party_.$partyId.add.tsx:94
 msgid "New expense"
 msgstr "New expense"
 
@@ -108,7 +108,7 @@ msgstr "Remove"
 
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:131
-#: src/routes/party_.$partyId.add.tsx:104
+#: src/routes/party_.$partyId.add.tsx:105
 msgid "Save"
 msgstr "Save"
 
@@ -118,7 +118,7 @@ msgstr "Settings"
 
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:131
-#: src/routes/party_.$partyId.add.tsx:104
+#: src/routes/party_.$partyId.add.tsx:105
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -127,7 +127,7 @@ msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
 #: src/routes/new.tsx:158
-#: src/routes/party_.$partyId.add.tsx:131
+#: src/routes/party_.$partyId.add.tsx:132
 msgid "Title"
 msgstr "Title"
 
