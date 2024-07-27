@@ -16,6 +16,7 @@ import {
 } from "#src/lib/validation.js";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -62,6 +63,8 @@ function New() {
       params: { partyId: handle.documentId },
       replace: true,
     });
+
+    toast.success(t`Party created`);
 
     return handle.documentId;
   }

@@ -16,6 +16,7 @@ import { t, Trans } from "@lingui/macro";
 import type { Expense } from "#src/models/expense.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -23,22 +24,36 @@ export const Route = createFileRoute("/party/$partyId")({
 
 function PartyById() {
   const { party, partyId, isLoading } = useParty();
-  const { addPartyToList, removeParty } = usePartyList();
+  const { addPartyToList, removeParty, partyList } = usePartyList();
   const expenseIds =
     party?.expenses
       ?.sort((a, b) => b.paidAt.getTime() - a.paidAt.getTime())
       ?.map((e) => e.expenseId) ?? [];
   const navigate = useNavigate();
 
+  const isInPartyList = partyList.parties[partyId] === true;
+  const partyExists = party !== undefined;
+
   useEffect(() => {
     if (!partyId) return;
+
+    if (isInPartyList) {
+      return;
+    }
+
+    if (!partyExists) {
+      return;
+    }
+
     addPartyToList(partyId);
-  }, [addPartyToList, partyId]);
+    toast.success(t`Joined ${party.name}!`);
+  }, [addPartyToList, partyId, isInPartyList, partyExists, party?.name]);
 
   function onDeleteParty() {
     if (!partyId) return;
     removeParty(partyId);
     navigate({ to: "/", replace: true });
+    toast.success(t`Party deleted`);
   }
 
   if (partyId === undefined) {

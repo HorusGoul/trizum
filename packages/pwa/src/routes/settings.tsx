@@ -10,6 +10,7 @@ import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -26,6 +27,7 @@ function Settings() {
   async function onSaveSettings(values: SettingsFormValues) {
     updateSettings(values);
     form.reset();
+    toast.success(t`Settings saved`);
   }
 
   const form = useForm<SettingsFormValues>({

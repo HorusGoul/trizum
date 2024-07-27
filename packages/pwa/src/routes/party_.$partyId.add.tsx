@@ -16,6 +16,7 @@ import type { Expense } from "#src/models/expense.js";
 import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { CurrencyField } from "#src/components/CurrencyField.js";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/party/$partyId/add")({
   component: AddExpense,
@@ -65,6 +66,7 @@ function AddExpense() {
         expenseId: handle.documentId,
       },
     });
+    toast.success(t`Expense added`);
     return handle.documentId;
   }
 

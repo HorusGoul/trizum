@@ -9,6 +9,7 @@ import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import type { Party } from "#src/models/party.js";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/party/$partyId/expense/$expenseId")({
   component: ExpenseById,
@@ -68,6 +69,7 @@ function useExpense() {
       handle.change((party) => deleteAt(party.expenses, index));
     }
     history.back();
+    toast.success("Expense deleted");
   }
   return {
     partyId,

@@ -14,6 +14,7 @@ import {
 import "./index.css";
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
+import { Toaster } from "./ui/Toaster.js";
 import * as catalogEn from "#locale/en/messages.po";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -62,6 +63,7 @@ if (!rootElement.innerHTML) {
       <I18nProvider i18n={i18n}>
         <RepoContext.Provider value={repo}>
           <RouterProvider router={router} />
+          <Toaster />
         </RepoContext.Provider>
       </I18nProvider>
     </StrictMode>,
