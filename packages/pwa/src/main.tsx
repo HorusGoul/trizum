@@ -23,9 +23,6 @@ import { routeTree } from "./routeTree.gen";
 i18n.load("en", catalogEn.messages);
 i18n.activate("en");
 
-// Create a new router instance
-const router = createRouter({ routeTree });
-
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
@@ -53,6 +50,9 @@ const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [new BrowserWebSocketClientAdapter("wss://sync.automerge.org")],
 });
+
+// Create a new router instance
+const router = createRouter({ routeTree, context: { repo } });
 
 // Render the app
 const rootElement = document.getElementById("root")!;

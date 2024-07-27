@@ -2,8 +2,9 @@ import {
   isValidDocumentId,
   updateText,
   type AnyDocumentId,
+  type DocumentId,
 } from "@automerge/automerge-repo/slim";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -14,21 +15,38 @@ import { useEffect } from "react";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import type { Expense } from "#src/models/expense.js";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import {
+  documentCache,
+  useSuspenseDocument,
+} from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
+import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
+  loader: async ({ context: { repo }, params: { partyId } }) => {
+    const doc = await documentCache.readAsync(repo, partyId as DocumentId);
+    const party = doc as Party | undefined;
+
+    if (!party) {
+      throw redirect({ to: "/" });
+    }
+
+    await Promise.all(
+      party.chunkIds.map((chunkId) => {
+        return documentCache.readAsync(repo, chunkId);
+      }),
+    );
+
+    return;
+  },
 });
 
 function PartyById() {
   const { party, partyId, isLoading } = useParty();
   const { addPartyToList, removeParty, partyList } = usePartyList();
-  const expenseIds =
-    party?.expenses
-      ?.sort((a, b) => b.paidAt.getTime() - a.paidAt.getTime())
-      ?.map((e) => e.expenseId) ?? [];
+  const expenses = usePartyExpenses(partyId);
   const navigate = useNavigate();
 
   const isInPartyList = partyList.parties[partyId] === true;
@@ -90,12 +108,8 @@ function PartyById() {
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
-        {expenseIds.map((expenseId) => (
-          <ExpenseItem
-            key={expenseId}
-            partyId={partyId}
-            expenseId={expenseId}
-          />
+        {expenses.map((expense) => (
+          <ExpenseItem key={expense.id} partyId={partyId} expense={expense} />
         ))}
 
         <div className="flex-1" />
@@ -163,26 +177,18 @@ type ChangePartyAction = ChangePartyNameAction;
 
 function ExpenseItem({
   partyId,
-  expenseId,
+  expense,
 }: {
   partyId: AnyDocumentId;
-  expenseId: AnyDocumentId;
+  expense: Expense;
 }) {
-  const [expense, handle] = useSuspenseDocument<Expense>(expenseId);
-
-  if (!expense || handle.isDeleted()) {
-    // not sure if this is the right way to handle NULL
-    // or the isDeleted for list items, but this should work
-    return null;
-  }
-
   return (
     <Link
       href={{
         to: "/party/$partyId/expense/$expenseId",
         params: {
           partyId,
-          expenseId: expenseId,
+          expenseId: expense.id,
         },
       }}
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>

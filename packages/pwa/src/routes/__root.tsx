@@ -1,4 +1,9 @@
-import { createRootRoute, Outlet, useRouter } from "@tanstack/react-router";
+import type { Repo } from "@automerge/automerge-repo/slim";
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useRouter,
+} from "@tanstack/react-router";
 import * as React from "react";
 import { RouterProvider } from "react-aria-components";
 
@@ -11,7 +16,11 @@ const TanStackRouterDevtools = import.meta.env.PROD
       })),
     );
 
-export const Route = createRootRoute({
+interface RouterContext {
+  repo: Repo;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: Root,
 });
 

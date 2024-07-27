@@ -1,8 +1,8 @@
 import type { ExpenseInput, ExpenseUser } from "#src/lib/expenses.js";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
+import type { DocumentId } from "@automerge/automerge-repo";
 
 export interface Expense {
-  id: DocumentId;
+  id: string;
   name: string;
   description: string;
   paidAt: Date;
@@ -71,4 +71,16 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       paidFor,
     };
   });
+}
+
+export function createExpenseId(chunkId: string): string {
+  return `${chunkId}:${crypto.randomUUID()}`;
+}
+
+export function decodeExpenseId(expenseId: string): {
+  chunkId: DocumentId;
+  expenseId: string;
+} {
+  const [chunkId, id] = expenseId.split(":");
+  return { chunkId: chunkId as DocumentId, expenseId: id };
 }

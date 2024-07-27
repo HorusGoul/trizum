@@ -9,12 +9,7 @@ export interface Party {
   description: string;
   currency: Currency;
   participants: Record<ExpenseUser, PartyParticipant>;
-  expenses: PartyExpense[];
-}
-
-export interface PartyExpense {
-  paidAt: Date;
-  expenseId: Expense["id"];
+  chunkIds: PartyExpenseChunk["id"][];
 }
 
 export interface PartyParticipant {
@@ -22,4 +17,11 @@ export interface PartyParticipant {
   name: string;
   phone?: string;
   isArchived?: boolean;
+}
+
+export interface PartyExpenseChunk {
+  id: DocumentId;
+  createdAt: Date;
+  expenses: Expense[];
+  maxSize: number;
 }

@@ -54,7 +54,7 @@ function New() {
         },
         {},
       ),
-      expenses: [],
+      chunkIds: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
     addPartyToList(handle.documentId);

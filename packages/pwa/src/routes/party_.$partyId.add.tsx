@@ -11,8 +11,8 @@ import {
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { Party } from "#src/models/party.js";
-import type { Expense } from "#src/models/expense.js";
+import type { Party, PartyExpenseChunk } from "#src/models/party.js";
+import { createExpenseId, type Expense } from "#src/models/expense.js";
 import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { CurrencyField } from "#src/components/CurrencyField.js";
@@ -30,44 +30,62 @@ interface NewExpenseFormValues {
 }
 
 function AddExpense() {
-  const repo = useRepo();
   const { party, partyId, addExpenseToParty } = useParty();
   const navigate = useNavigate();
 
-  function onCreateExpense(values: NewExpenseFormValues) {
-    if (!party || !partyId) {
-      console.warn("This party doesn't exist");
-      return;
+  async function onCreateExpense(values: NewExpenseFormValues) {
+    try {
+      if (!party || !partyId) {
+        console.warn("This party doesn't exist");
+        return;
+      }
+      const paidAt = new Date();
+      // TODO: handle more expense share types
+      const shares: Expense["shares"] = Object.keys(party.participants).reduce(
+        (acc, key) => {
+          acc[key as ExpenseUser] = { type: "divide", value: 1 };
+          return acc;
+        },
+        {} as Expense["shares"],
+      );
+
+      toast.loading(t`Adding expense...`, {
+        id: "add-expense",
+      });
+
+      const expense = await addExpenseToParty({
+        name: values.name,
+        description: values.description,
+        paidAt,
+        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+        shares,
+      });
+
+      navigate({
+        to: "/party/$partyId/expense/$expenseId",
+        replace: true,
+        params: {
+          partyId,
+          expenseId: expense.id,
+        },
+      });
+
+      toast.success(t`Expense added`, {
+        id: "add-expense",
+      });
+    } catch (error) {
+      console.error("Failed to add expense", error);
+      toast.error(t`Failed to add expense`, {
+        id: "add-expense",
+        description:
+          typeof error === "object" &&
+          error &&
+          "message" in error &&
+          typeof error.message === "string"
+            ? error.message
+            : undefined,
+      });
     }
-    const paidAt = new Date();
-    // TODO: handle more expense share types
-    const shares: Expense["shares"] = Object.keys(party.participants).reduce(
-      (acc, key) => {
-        acc[key as ExpenseUser] = { type: "divide", value: 1 };
-        return acc;
-      },
-      {} as Expense["shares"],
-    );
-    const handle = repo.create<Expense>({
-      id: "" as DocumentId,
-      name: values.name,
-      description: values.description,
-      paidAt,
-      paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-      shares,
-    });
-    handle.change((doc) => (doc.id = handle.documentId));
-    addExpenseToParty(handle.documentId, paidAt);
-    navigate({
-      to: "/party/$partyId/expense/$expenseId",
-      replace: true,
-      params: {
-        partyId,
-        expenseId: handle.documentId,
-      },
-    });
-    toast.success(t`Expense added`);
-    return handle.documentId;
   }
 
   const form = useForm<NewExpenseFormValues>({
@@ -173,13 +191,76 @@ function useParty() {
   const { partyId } = Route.useParams();
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
   const [party, handle] = useSuspenseDocument<Party>(partyId);
-  function addExpenseToParty(expenseId: Expense["id"], paidAt: Date) {
-    handle.change((party) => {
-      party.expenses.push({
-        paidAt,
-        expenseId,
-      });
+
+  const repo = useRepo();
+
+  function createChunk() {
+    const handle = repo.create<PartyExpenseChunk>({
+      id: "" as DocumentId,
+      createdAt: new Date(),
+      expenses: [],
+      maxSize: 500,
     });
+
+    handle.change((doc) => (doc.id = handle.documentId));
+
+    return [handle.documentId, handle] as const;
   }
+
+  async function addExpenseToParty(
+    expense: Omit<Expense, "id">,
+  ): Promise<Expense> {
+    if (!party) {
+      throw new Error("Party not found, this should not happen");
+    }
+
+    // Last chunk is the most recent one, so should be indexed at 0
+    let lastChunkId = party.chunkIds.at(0);
+
+    if (!lastChunkId) {
+      // Create a new chunk if there is none
+      const [chunkId] = createChunk();
+      lastChunkId = chunkId;
+    }
+
+    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkId);
+    let lastChunk = await lastChunkHandle.doc();
+
+    if (!lastChunk) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    if (lastChunk.expenses.length >= lastChunk.maxSize) {
+      // Create a new chunk if the last one is full
+      const [chunkId, handle] = createChunk();
+      lastChunkId = chunkId;
+      lastChunkHandle = handle;
+      lastChunk = await lastChunkHandle.doc();
+
+      if (!lastChunk) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+    }
+
+    const expenseWithId = {
+      ...expense,
+      id: createExpenseId(lastChunkId),
+    };
+
+    lastChunkHandle.change((doc) => {
+      doc.expenses.unshift(expenseWithId);
+    });
+
+    if (party.chunkIds.includes(lastChunkId)) {
+      return expenseWithId;
+    }
+
+    handle.change(async (party) => {
+      party.chunkIds.unshift(lastChunkId);
+    });
+
+    return expenseWithId;
+  }
+
   return { party, partyId, addExpenseToParty };
 }

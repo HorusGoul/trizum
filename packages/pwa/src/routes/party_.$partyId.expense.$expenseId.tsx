@@ -1,18 +1,25 @@
-import type { Expense } from "#src/models/expense.js";
+import { decodeExpenseId } from "#src/models/expense.js";
 import { deleteAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { Party } from "#src/models/party.js";
+import {
+  documentCache,
+  useSuspenseDocument,
+} from "#src/lib/automerge/suspense-hooks.js";
+import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/party/$partyId/expense/$expenseId")({
   component: ExpenseById,
+
+  async loader({ context: { repo }, params: { expenseId } }) {
+    const { chunkId } = decodeExpenseId(expenseId);
+    await documentCache.readAsync(repo, chunkId);
+  },
 });
 
 function ExpenseById() {
@@ -53,24 +60,33 @@ function ExpenseById() {
 }
 
 function useExpense() {
-  const repo = useRepo();
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
-  if (!isValidDocumentId(expenseId)) throw new Error("Malformed Expense ID");
-  const [expense] = useSuspenseDocument<Expense>(expenseId);
+
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
-  const [party, handle] = useSuspenseDocument<Party>(partyId);
+
+  const { chunkId } = decodeExpenseId(expenseId);
+
+  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
+    required: true,
+  });
+
+  const expenseIndex = chunk.expenses.findIndex((p) => p.id === expenseId);
+  const expense = chunk.expenses[expenseIndex];
+
   function onDeleteExpense() {
-    if (expenseId === undefined || !isValidDocumentId(expenseId)) return;
-    repo.delete(expenseId);
-    if (party) {
-      const index = party.expenses.findIndex((p) => p.expenseId === expenseId);
-      if (index === -1) return;
-      handle.change((party) => deleteAt(party.expenses, index));
-    }
+    if (expenseId === undefined) return;
+
+    const index = chunk.expenses.findIndex((p) => p.id === expenseId);
+
+    if (index === -1) return;
+
+    handle.change((party) => deleteAt(party.expenses, index));
+
     history.back();
     toast.success("Expense deleted");
   }
+
   return {
     partyId,
     onDeleteExpense,
