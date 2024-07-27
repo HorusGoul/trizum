@@ -21,28 +21,28 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:108
+#: src/routes/party.$partyId.tsx:123
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:76
-#: src/routes/party.$partyId.tsx:91
+#: src/routes/party.$partyId.tsx:106
 msgid "Add or create"
 msgstr "Add or create"
 
-#: src/routes/new.tsx:328
+#: src/routes/new.tsx:331
 msgid "Add participant"
 msgstr "Add participant"
 
-#: src/routes/party_.$partyId.add.tsx:153
+#: src/routes/party_.$partyId.add.tsx:155
 msgid "Amount"
 msgstr "Amount"
 
-#: src/routes/new.tsx:219
+#: src/routes/new.tsx:222
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
-#: src/routes/party_.$partyId.add.tsx:86
+#: src/routes/party_.$partyId.add.tsx:88
 msgid "Can't add an expense to a party that doesn't exist"
 msgstr "Can't add an expense to a party that doesn't exist"
 
@@ -50,7 +50,7 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
-#: src/routes/new.tsx:183
+#: src/routes/new.tsx:186
 msgid "Description"
 msgstr "Description"
 
@@ -58,15 +58,19 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
-#: src/routes/settings.tsx:119
+#: src/routes/party_.$partyId.add.tsx:69
+msgid "Expense added"
+msgstr "Expense added"
+
+#: src/routes/settings.tsx:121
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
-#: src/routes/party_.$partyId.add.tsx:133
+#: src/routes/party_.$partyId.add.tsx:135
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
-#: src/routes/new.tsx:159
+#: src/routes/new.tsx:162
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
@@ -78,6 +82,10 @@ msgstr "ID is required"
 msgid "Join a Party"
 msgstr "Join a Party"
 
+#: src/routes/party.$partyId.tsx:49
+msgid "Joined {0}!"
+msgstr "Joined {0}!"
+
 #: src/routes/index.tsx:35
 msgid "Menu"
 msgstr "Menu"
@@ -86,27 +94,35 @@ msgstr "Menu"
 msgid "Name must be less than 50 characters"
 msgstr "Name must be less than 50 characters"
 
-#: src/routes/party_.$partyId.add.tsx:94
+#: src/routes/party_.$partyId.add.tsx:96
 msgid "New expense"
 msgstr "New expense"
 
-#: src/routes/new.tsx:281
+#: src/routes/new.tsx:284
 msgid "New participant name"
 msgstr "New participant name"
 
-#: src/routes/new.tsx:118
+#: src/routes/new.tsx:121
 msgid "New trizum"
 msgstr "New trizum"
 
-#: src/routes/new.tsx:247
+#: src/routes/new.tsx:250
 msgid "Participant name"
 msgstr "Participant name"
 
-#: src/routes/new.tsx:204
+#: src/routes/new.tsx:207
 msgid "Participants"
 msgstr "Participants"
 
-#: src/routes/settings.tsx:118
+#: src/routes/new.tsx:67
+msgid "Party created"
+msgstr "Party created"
+
+#: src/routes/party.$partyId.tsx:56
+msgid "Party deleted"
+msgstr "Party deleted"
+
+#: src/routes/settings.tsx:120
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -118,26 +134,30 @@ msgstr "Phone number is required"
 msgid "Phone number must be less than 20 characters"
 msgstr "Phone number must be less than 20 characters"
 
-#: src/routes/new.tsx:260
+#: src/routes/new.tsx:263
 msgid "Remove"
 msgstr "Remove"
 
 #: src/routes/join.tsx:61
-#: src/routes/new.tsx:131
-#: src/routes/party_.$partyId.add.tsx:105
-#: src/routes/settings.tsx:66
+#: src/routes/new.tsx:134
+#: src/routes/party_.$partyId.add.tsx:107
+#: src/routes/settings.tsx:68
 msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:46
-#: src/routes/settings.tsx:49
+#: src/routes/settings.tsx:51
 msgid "Settings"
 msgstr "Settings"
 
+#: src/routes/settings.tsx:30
+msgid "Settings saved"
+msgstr "Settings saved"
+
 #: src/routes/join.tsx:61
-#: src/routes/new.tsx:131
-#: src/routes/party_.$partyId.add.tsx:105
-#: src/routes/settings.tsx:66
+#: src/routes/new.tsx:134
+#: src/routes/party_.$partyId.add.tsx:107
+#: src/routes/settings.tsx:68
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -145,8 +165,8 @@ msgstr "Submitting..."
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/routes/new.tsx:158
-#: src/routes/party_.$partyId.add.tsx:132
+#: src/routes/new.tsx:161
+#: src/routes/party_.$partyId.add.tsx:134
 msgid "Title"
 msgstr "Title"
 
@@ -162,18 +182,18 @@ msgstr "Title must be less than 50 characters"
 msgid "URL or Party ID"
 msgstr "URL or Party ID"
 
-#: src/routes/settings.tsx:93
+#: src/routes/settings.tsx:95
 msgid "Username"
 msgstr "Username"
 
-#: src/routes/new.tsx:184
+#: src/routes/new.tsx:187
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:94
+#: src/routes/settings.tsx:96
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
-#: src/routes/new.tsx:208
+#: src/routes/new.tsx:211
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "Who is invited to this party? You can add more participants later."
