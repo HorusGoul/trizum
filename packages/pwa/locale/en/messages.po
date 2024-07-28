@@ -17,16 +17,16 @@ msgstr ""
 msgid "A name for the participant is required"
 msgstr "A name for the participant is required"
 
-#: src/routes/index.tsx:56
+#: src/routes/index.tsx:64
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:149
+#: src/routes/party.$partyId.tsx:157
 msgid "Add an expense"
 msgstr "Add an expense"
 
-#: src/routes/index.tsx:76
-#: src/routes/party.$partyId.tsx:132
+#: src/routes/index.tsx:84
+#: src/routes/party.$partyId.tsx:140
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -60,7 +60,7 @@ msgstr "At least one participant is required"
 msgid "Can't add an expense to a party that doesn't exist"
 msgstr "Can't add an expense to a party that doesn't exist"
 
-#: src/routes/index.tsx:101
+#: src/routes/index.tsx:109
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -98,11 +98,11 @@ msgstr "How do you want to call this party?"
 msgid "ID is required"
 msgstr "ID is required"
 
-#: src/routes/party.$partyId.tsx:205
+#: src/routes/party.$partyId.tsx:213
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
-#: src/routes/index.tsx:91
+#: src/routes/index.tsx:99
 msgid "Join a Party"
 msgstr "Join a Party"
 
@@ -110,7 +110,7 @@ msgstr "Join a Party"
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
 
-#: src/routes/party.$partyId.tsx:112
+#: src/routes/party.$partyId.tsx:120
 msgid "Leave party"
 msgstr "Leave party"
 
@@ -196,8 +196,8 @@ msgstr "Restore"
 msgid "Save"
 msgstr "Save"
 
-#: src/routes/index.tsx:46
-#: src/routes/party.$partyId.tsx:105
+#: src/routes/index.tsx:50
+#: src/routes/party.$partyId.tsx:109
 #: src/routes/settings.tsx:51
 msgid "Settings"
 msgstr "Settings"
