@@ -30,7 +30,8 @@ export function usePartyList() {
     });
   }
   function removeParty(partyId: Party["id"]) {
-    repo.delete(partyId);
+    // TODO: mark for deletion during next boot
+
     partyListHandle.change((list) => {
       delete list.parties[partyId];
 

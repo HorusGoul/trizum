@@ -43,11 +43,11 @@ function PartyById() {
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
 
-  function onDeleteParty() {
+  async function onLeaveParty() {
     if (!partyId) return;
+    await navigate({ to: "/", replace: true });
     removeParty(partyId);
-    navigate({ to: "/", replace: true });
-    toast.success(t`Party deleted`);
+    toast.success(t`You left the party!`);
   }
 
   if (partyId === undefined) {
@@ -106,9 +106,11 @@ function PartyById() {
                 </span>
               </MenuItem>
 
-              <MenuItem onAction={onDeleteParty}>
-                <IconWithFallback name="trash" size={20} className="mr-3" />
-                <span className="h-3.5 leading-none">Delete</span>
+              <MenuItem onAction={onLeaveParty}>
+                <IconWithFallback name="log-out" size={20} className="mr-3" />
+                <span className="h-3.5 leading-none">
+                  <Trans>Leave party</Trans>
+                </span>
               </MenuItem>
             </Menu>
           </Popover>

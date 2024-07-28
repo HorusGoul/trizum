@@ -52,7 +52,12 @@ const repo = new Repo({
 });
 
 // Create a new router instance
-const router = createRouter({ routeTree, context: { repo } });
+const router = createRouter({
+  routeTree,
+  context: { repo },
+  defaultGcTime: 0,
+  defaultStaleTime: Infinity,
+});
 
 // Render the app
 const rootElement = document.getElementById("root")!;
