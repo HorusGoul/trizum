@@ -27,8 +27,6 @@ export function CurrencyText({
     }
   }
 
-  console.log(amount);
-
   return (
     <span className={cn(color, className)} {...props}>
       {Dinero({ amount, currency }).setLocale("es-ES").toFormat("$0.00")}
