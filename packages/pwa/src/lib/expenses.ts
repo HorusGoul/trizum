@@ -92,6 +92,7 @@ export function calculateLogStatsOfUser(
     userOwes,
     owedToUser,
     diffs,
+    balance: owedToUser.subtract(userOwes),
   };
 }
 

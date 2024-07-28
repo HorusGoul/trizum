@@ -5,7 +5,7 @@ export interface CurrencyTextProps
   extends React.HTMLAttributes<HTMLSpanElement> {
   amount: number;
   currency: Currency;
-  variant?: "diff" | "default";
+  variant?: "diff" | "default" | "inherit";
 }
 
 export function CurrencyText({
@@ -25,6 +25,10 @@ export function CurrencyText({
     if (amount > 0) {
       color = "text-success-400";
     }
+  }
+
+  if (variant === "inherit") {
+    color = "text-inherit";
   }
 
   return (

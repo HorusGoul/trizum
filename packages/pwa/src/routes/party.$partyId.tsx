@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { IconWithFallback } from "#src/ui/Icon.js";
+import { Icon, IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import {
+  exportIntoInput,
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,
   type Expense,
@@ -20,6 +21,9 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
+import { useMemo } from "react";
+import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
+import type { PartyParticipant } from "#src/models/party.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -138,7 +142,7 @@ function PartyById() {
             {
               id: "balances",
               label: t`Balances`,
-              node: <span>Balances</span>,
+              node: <Balances />,
               icon: "#lucide/scale",
             },
           ]}
@@ -253,5 +257,336 @@ function ExpenseItem({
         </span>
       </div>
     </Link>
+  );
+}
+
+function Balances() {
+  const { party } = useCurrentParty();
+  const expenses = usePartyExpenses(party.id);
+  const participant = useCurrentParticipant();
+
+  const balancesByParticipant = useMemo(() => {
+    const inputs = expenses.flatMap(exportIntoInput);
+    const participants = Object.values(party.participants);
+    const participantIds = Object.keys(party.participants);
+
+    const balances = participants
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((participant) => {
+        return {
+          participant,
+          stats: calculateLogStatsOfUser(
+            participant.id,
+            participantIds,
+            inputs,
+          ),
+          visualRatio: 0,
+        };
+      });
+
+    const biggestAbsoluteBalance = balances.reduce((prev, next) => {
+      const prevAbs = Math.abs(prev.stats.balance.getAmount());
+      const nextAbs = Math.abs(next.stats.balance.getAmount());
+
+      return prevAbs > nextAbs ? prev : next;
+    });
+
+    // Biggest absolute balance should be considered as the reference point (1)
+    const referenceBalance = biggestAbsoluteBalance.stats.balance.getAmount();
+
+    // Use the reference balance to calculate the visual ratio of each balance
+    for (const balance of balances) {
+      balance.visualRatio =
+        balance.stats.balance.getAmount() / referenceBalance;
+    }
+
+    return balances;
+  }, [party.participants, expenses]);
+
+  const myBalance = balancesByParticipant.find(
+    (balance) => balance.participant.id === participant.id,
+  );
+
+  if (!myBalance) {
+    throw new Error("Balance not found");
+  }
+
+  const userOwesMap = Object.entries(myBalance.stats.diffs)
+    .filter(([_, diff]) => {
+      return diff.diffUnsplitted.getAmount() < 0;
+    })
+    .map(([participantId, diff]) => {
+      return {
+        participantId,
+        amount: diff.diffUnsplitted.getAmount(),
+      };
+    });
+
+  const owedToUserMap = Object.entries(myBalance.stats.diffs)
+    .filter(([_, diff]) => {
+      return diff.diffUnsplitted.getAmount() > 0;
+    })
+    .map(([participantId, diff]) => {
+      return {
+        participantId,
+        amount: diff.diffUnsplitted.getAmount(),
+      };
+    });
+
+  const isFullyBalanced =
+    userOwesMap.length === 0 && owedToUserMap.length === 0;
+
+  const allOtherDiffs = balancesByParticipant
+    .filter((balance) => {
+      if (balance.participant.id === participant.id) {
+        return false;
+      }
+
+      if (balance.stats.balance.getAmount() >= 0) {
+        return false;
+      }
+
+      return true;
+    })
+    .flatMap((balance) => {
+      return Object.entries(balance.stats.diffs)
+        .filter(([participantId]) => {
+          if (participantId === participant.id) {
+            return false;
+          }
+
+          const diff = balance.stats.diffs[participantId];
+
+          if (diff.diffUnsplitted.getAmount() >= 0) {
+            return false;
+          }
+
+          return true;
+        })
+        .map(([participantId, diff]) => {
+          return {
+            fromId: balance.participant.id,
+            toId: participantId,
+            amount: diff.diffUnsplitted.getAmount(),
+          };
+        });
+    });
+
+  return (
+    <>
+      <div className="h-8 flex-shrink-0" />
+
+      <div className="container flex flex-col gap-4 px-4">
+        {balancesByParticipant.map(({ participant, stats, visualRatio }) => (
+          <BalanceItem
+            key={participant.id}
+            participant={participant}
+            stats={stats}
+            visualRatio={visualRatio}
+          />
+        ))}
+      </div>
+
+      <div className="h-8 flex-shrink-0" />
+
+      {isFullyBalanced ? null : (
+        <div className="container mt-4 flex flex-col gap-4 px-4">
+          <h2 className="px-2 text-xl font-semibold">
+            <Trans>How should I balance?</Trans>
+          </h2>
+
+          <p className="px-2 text-lg">
+            <Trans>
+              Here is a list of operations you and other party members can do to
+              balance your position.
+            </Trans>
+          </p>
+        </div>
+      )}
+
+      <div className="container flex flex-col gap-4 px-2">
+        {userOwesMap.length > 0 ? (
+          <>
+            <h3 className="mt-4 flex items-center px-4 text-warning-500">
+              <Icon name="#lucide/circle-alert" size={24} className="mr-3" />
+
+              <span className="text-xl font-semibold">
+                <Trans>You owe money to people</Trans>
+              </span>
+            </h3>
+
+            {userOwesMap.map(({ participantId, amount }) => (
+              <BalanceActionItem
+                key={participantId}
+                fromId={participant.id}
+                toId={participantId}
+                amount={amount}
+              />
+            ))}
+          </>
+        ) : (
+          <div className="flex items-center px-4 text-success-500">
+            <Icon name="#lucide/circle-check" size={24} className="mr-3" />
+
+            <span className="text-xl font-semibold">
+              <Trans>You&apos;re debt free!</Trans>
+            </span>
+          </div>
+        )}
+
+        {owedToUserMap.length > 0 ? (
+          <>
+            <h3 className="mt-4 flex items-center px-4 text-warning-500">
+              <Icon name="#lucide/circle-alert" size={24} className="mr-3" />
+
+              <span className="text-xl font-semibold">
+                <Trans>People that owe you money</Trans>
+              </span>
+            </h3>
+
+            {owedToUserMap.map(({ participantId, amount }) => (
+              <BalanceActionItem
+                key={participantId}
+                fromId={participantId}
+                toId={participant.id}
+                amount={amount}
+              />
+            ))}
+          </>
+        ) : (
+          <div className="flex items-center px-4 text-success-500">
+            <Icon name="#lucide/circle-check" size={24} className="mr-3" />
+
+            <span className="text-xl font-semibold">
+              <Trans>Nobody owes you money!</Trans>
+            </span>
+          </div>
+        )}
+
+        {allOtherDiffs.length > 0 ? (
+          <>
+            <h2 className="mt-4 flex items-center px-4 text-accent-400">
+              <Icon name="#lucide/circle-help" size={24} className="mr-3" />
+
+              <span className="text-xl font-semibold">
+                <Trans>Other operations</Trans>
+              </span>
+            </h2>
+
+            {allOtherDiffs.map((diff) => (
+              <BalanceActionItem key={diff.fromId + diff.toId} {...diff} />
+            ))}
+          </>
+        ) : (
+          <div className="flex items-center px-4 text-success-500">
+            <Icon name="#lucide/circle-check" size={24} className="mr-3" />
+
+            <span className="text-xl font-semibold">
+              <Trans>Party is completely balanced!</Trans>
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="h-8 flex-shrink-0" />
+    </>
+  );
+}
+
+interface BalanceItemProps {
+  participant: PartyParticipant;
+  stats: ReturnType<typeof calculateLogStatsOfUser>;
+  visualRatio: number;
+}
+
+function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
+  const { party } = useCurrentParty();
+
+  const balance = stats.balance.getAmount();
+  const isNegative = balance < 0;
+
+  const participantNode = (
+    <div
+      className={cn(
+        "flex items-center justify-end",
+        isNegative && "justify-start",
+      )}
+    >
+      <span className="text-lg font-medium">{participant.name}</span>
+    </div>
+  );
+
+  const balanceNode = (
+    <div
+      className={cn(
+        "relative flex items-center justify-start",
+        isNegative && "justify-end",
+      )}
+    >
+      <div
+        className={cn(
+          "h-10 rounded-lg  bg-success-300 dark:bg-success-600",
+          isNegative && "bg-danger-300 dark:bg-danger-700",
+        )}
+        style={{
+          width: `${Math.abs(visualRatio) * 100}%`,
+        }}
+      />
+
+      <CurrencyText
+        amount={stats.balance.getAmount()}
+        currency={party.currency}
+        variant="inherit"
+        className={cn(
+          "absolute top-1/2 -translate-y-1/2 text-lg font-bold leading-none",
+          isNegative ? "right-2" : "left-2",
+        )}
+      />
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {isNegative ? (
+        <>
+          {balanceNode}
+          {participantNode}
+        </>
+      ) : (
+        <>
+          {participantNode}
+          {balanceNode}
+        </>
+      )}
+    </div>
+  );
+}
+
+interface BalanceActionItemProps {
+  fromId: PartyParticipant["id"];
+  toId: PartyParticipant["id"];
+  amount: number;
+}
+
+function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
+  const { party } = useCurrentParty();
+  const from = party.participants[fromId];
+  const to = party.participants[toId];
+
+  return (
+    <div className="flex rounded-xl bg-white p-4 dark:bg-slate-900">
+      <div className="flex flex-1 flex-col">
+        <span className="text-lg text-accent-400">{from.name}</span>
+        <span className="text-sm text-slate-700 dark:text-slate-300">owes</span>
+        <span className="text-lg text-accent-400">{to.name}</span>
+      </div>
+
+      <div className="flex flex-shrink-0 items-center">
+        <CurrencyText
+          currency={party.currency}
+          amount={Math.abs(amount)}
+          className="text-xl"
+        />
+      </div>
+    </div>
   );
 }
