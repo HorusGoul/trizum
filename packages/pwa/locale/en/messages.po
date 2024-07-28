@@ -21,12 +21,12 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:157
+#: src/routes/party.$partyId.tsx:187
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:84
-#: src/routes/party.$partyId.tsx:140
+#: src/routes/party.$partyId.tsx:167
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -56,6 +56,10 @@ msgstr "Archived participants"
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
+#: src/routes/party.$partyId.tsx:139
+msgid "Balances"
+msgstr "Balances"
+
 #: src/routes/party_.$partyId.add.tsx:113
 msgid "Can't add an expense to a party that doesn't exist"
 msgstr "Can't add an expense to a party that doesn't exist"
@@ -76,6 +80,10 @@ msgstr "Description must be less than 500 characters"
 #: src/routes/party_.$partyId.add.tsx:80
 msgid "Expense added"
 msgstr "Expense added"
+
+#: src/routes/party.$partyId.tsx:133
+msgid "Expenses"
+msgstr "Expenses"
 
 #: src/routes/party_.$partyId.add.tsx:85
 msgid "Failed to add expense"
@@ -98,7 +106,7 @@ msgstr "How do you want to call this party?"
 msgid "ID is required"
 msgstr "ID is required"
 
-#: src/routes/party.$partyId.tsx:213
+#: src/routes/party.$partyId.tsx:243
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
