@@ -1,5 +1,6 @@
 import type { ExpenseInput, ExpenseUser } from "#src/lib/expenses.js";
 import type { DocumentId } from "@automerge/automerge-repo";
+import { ulid } from "ulidx";
 
 export interface Expense {
   id: string;
@@ -73,14 +74,53 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
   });
 }
 
-export function createExpenseId(chunkId: string): string {
-  return `${chunkId}:${crypto.randomUUID()}`;
+export function createExpenseId(chunkId: string, timestamp?: number): string {
+  return `${ulid(timestamp)}:${chunkId}`;
 }
 
 export function decodeExpenseId(expenseId: string): {
   chunkId: DocumentId;
   expenseId: string;
 } {
-  const [chunkId, id] = expenseId.split(":");
+  const [id, chunkId] = expenseId.split(":");
   return { chunkId: chunkId as DocumentId, expenseId: id };
+}
+
+/**
+ * Find an expense by its ID.
+ *
+ * This function uses a binary search to find the expense with the given ID
+ * within the given array of expenses.
+ *
+ * This is the best way to find expenses within chunks.
+ *
+ * @param expenses The array of expenses to search in, must be sorted in descending order.
+ * @param encodedId The encoded ID of the expense to find.
+ */
+export function findExpenseById(
+  expenses: Expense[],
+  encodedId: string,
+): [Expense | undefined, index: number] {
+  const { expenseId } = decodeExpenseId(encodedId);
+
+  let start = 0;
+  let end = expenses.length - 1;
+
+  while (start <= end) {
+    const mid = Math.floor((start + end) / 2);
+    const expense = expenses[mid];
+    const { expenseId: midExpenseId } = decodeExpenseId(expense.id);
+
+    if (midExpenseId === expenseId) {
+      return [expense, mid];
+    }
+
+    if (midExpenseId > expenseId) {
+      start = mid + 1;
+    } else {
+      end = mid - 1;
+    }
+  }
+
+  return [undefined, -1];
 }

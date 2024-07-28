@@ -1,4 +1,4 @@
-import { decodeExpenseId } from "#src/models/expense.js";
+import { decodeExpenseId, findExpenseById } from "#src/models/expense.js";
 import { deleteAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
@@ -71,17 +71,12 @@ function useExpense() {
     required: true,
   });
 
-  const expenseIndex = chunk.expenses.findIndex((p) => p.id === expenseId);
-  const expense = chunk.expenses[expenseIndex];
+  const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
 
   function onDeleteExpense() {
     if (expenseId === undefined) return;
 
-    const index = chunk.expenses.findIndex((p) => p.id === expenseId);
-
-    if (index === -1) return;
-
-    handle.change((party) => deleteAt(party.expenses, index));
+    handle.change((party) => deleteAt(party.expenses, expenseIndex));
 
     history.back();
     toast.success("Expense deleted");

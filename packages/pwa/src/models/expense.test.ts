@@ -1,7 +1,12 @@
 import { describe, test, expect } from "vitest";
-import { exportIntoInput, type Expense, type ExpenseShare } from "./expense";
+import {
+  createExpenseId,
+  exportIntoInput,
+  findExpenseById,
+  type Expense,
+  type ExpenseShare,
+} from "./expense";
 import type { ExpenseInput, ExpenseUser } from "#src/lib/expenses.js";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
 
 describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   test("single exact", () => {
@@ -195,15 +200,82 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   });
 });
 
-function createExpense({
-  paidBy,
-  shares,
-}: {
-  paidBy: Record<ExpenseUser, number>;
-  shares: Record<ExpenseUser, ExpenseShare>;
-}): Expense {
+describe("findExpenseById", () => {
+  function createMockExpense(timestamp?: number) {
+    return createExpense(
+      {
+        paidBy: {
+          "1": 50,
+        },
+        shares: {
+          "1": { type: "exact", value: 10 },
+          "2": { type: "exact", value: 25 },
+          "3": { type: "exact", value: 15 },
+        },
+      },
+      timestamp,
+    );
+  }
+
+  const expenses = Array.from({ length: 500 }, (_, index) => {
+    return createMockExpense(index);
+  }).reverse();
+
+  test("finds a random expense at the first half", () => {
+    const expense = expenses[100];
+    const [result, index] = findExpenseById(expenses, expense.id);
+
+    expect(result).toStrictEqual(expense);
+    expect(index).toBe(100);
+  });
+
+  test("finds a random expense at the second half", () => {
+    const expense = expenses[300];
+    const [result, index] = findExpenseById(expenses, expense.id);
+
+    expect(result).toStrictEqual(expense);
+    expect(index).toBe(300);
+  });
+
+  test("finds first expense", () => {
+    const expense = expenses[0];
+    const [result, index] = findExpenseById(expenses, expense.id);
+
+    expect(result).toStrictEqual(expense);
+    expect(index).toBe(0);
+  });
+
+  test("finds last expense", () => {
+    const expense = expenses.at(-1)!;
+    const [result, index] = findExpenseById(expenses, expense.id);
+
+    expect(result).toStrictEqual(expense);
+    expect(index).toBe(499);
+  });
+
+  test("finds expense when list only has one item", () => {
+    const expense = createMockExpense();
+    const expenses = [expense];
+
+    const [result, index] = findExpenseById(expenses, expense.id);
+
+    expect(result).toStrictEqual(expense);
+    expect(index).toBe(0);
+  });
+});
+
+function createExpense(
+  {
+    paidBy,
+    shares,
+  }: {
+    paidBy: Record<ExpenseUser, number>;
+    shares: Record<ExpenseUser, ExpenseShare>;
+  },
+  timestamp?: number,
+): Expense {
   return {
-    id: "1" as DocumentId,
+    id: createExpenseId("test", timestamp),
     name: "",
     description: "",
     paidAt: new Date(),

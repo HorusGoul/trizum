@@ -89,6 +89,9 @@ importers:
       tailwind-merge:
         specifier: 2.4.0
         version: 2.4.0
+      ulidx:
+        specifier: 2.3.0
+        version: 2.3.0
     devDependencies:
       '@horus.dev/eslint-config':
         specifier: 2.0.1
@@ -3311,6 +3314,9 @@ packages:
     resolution: {integrity: sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==}
     engines: {node: '>=0.10'}
 
+  layerr@2.1.0:
+    resolution: {integrity: sha512-xDD9suWxfBYeXgqffRVH/Wqh+mqZrQcqPRn0I0ijl7iJQ7vu8gMGPt1Qop59pEW/jaIDNUN7+PX1Qk40+vuflg==}
+
   leven@3.1.0:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
     engines: {node: '>=6'}
@@ -4525,6 +4531,10 @@ packages:
     resolution: {integrity: sha512-SyVVbcNBCk0dzr9XL/R/ySrmYf0s372K6/hFklzgcp2lBFyXtw4I7BOdDjlLhE1aVqaI/SHWXWmYdlZxuyF38A==}
     engines: {node: '>=0.8.0'}
     hasBin: true
+
+  ulidx@2.3.0:
+    resolution: {integrity: sha512-36piWNqcdp9hKlQewyeehCaALy4lyx3FodsCxHuV6i0YdexSkjDOubwxEVr2yi4kh62L/0MgyrxqG4K+qtovnw==}
+    engines: {node: '>=16'}
 
   unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
@@ -8865,6 +8875,8 @@ snapshots:
     dependencies:
       language-subtag-registry: 0.3.23
 
+  layerr@2.1.0: {}
+
   leven@3.1.0: {}
 
   levn@0.4.1:
@@ -10178,6 +10190,10 @@ snapshots:
 
   uglify-js@3.18.0:
     optional: true
+
+  ulidx@2.3.0:
+    dependencies:
+      layerr: 2.1.0
 
   unbox-primitive@1.0.2:
     dependencies:
