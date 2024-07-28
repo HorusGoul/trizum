@@ -63,8 +63,8 @@ function PartyById() {
   }
 
   return (
-    <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2">
+    <div className="flex h-full max-h-full flex-col">
+      <div className="container flex h-16 flex-shrink-0 items-center px-2">
         <BackButton />
         <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
         <div className="flex-1" />
@@ -125,23 +125,25 @@ function PartyById() {
         </MenuTrigger>
       </div>
 
-      <AnimatedTabs
-        tabListClassName="px-4 container"
-        tabs={[
-          {
-            id: "expenses",
-            label: t`Expenses`,
-            node: <ExpenseLog />,
-            icon: "#lucide/scroll-text",
-          },
-          {
-            id: "balances",
-            label: t`Balances`,
-            node: <span>Balances</span>,
-            icon: "#lucide/scale",
-          },
-        ]}
-      />
+      <div className="flex-1 overflow-y-hidden">
+        <AnimatedTabs
+          tabListClassName="px-4 container"
+          tabs={[
+            {
+              id: "expenses",
+              label: t`Expenses`,
+              node: <ExpenseLog />,
+              icon: "#lucide/scroll-text",
+            },
+            {
+              id: "balances",
+              label: t`Balances`,
+              node: <span>Balances</span>,
+              icon: "#lucide/scale",
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 }
@@ -151,8 +153,8 @@ function ExpenseLog() {
   const expenses = usePartyExpenses(party.id);
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="h-2" />
+    <>
+      <div className="h-2 flex-shrink-0" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
         {expenses.map((expense) => (
@@ -192,7 +194,7 @@ function ExpenseLog() {
           </MenuTrigger>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

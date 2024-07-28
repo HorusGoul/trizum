@@ -179,13 +179,13 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
       </div>
       <div
         ref={tabPanelsRef}
-        className="no-scrollbar mt-4 flex h-full flex-1 snap-x snap-mandatory overflow-auto"
+        className="no-scrollbar mt-2.5 flex h-full flex-1 snap-x snap-mandatory overflow-x-auto"
       >
         <Collection items={tabs}>
           {(tab) => (
             <TabPanel
               shouldForceMount
-              className="box-border w-full flex-shrink-0 snap-start rounded px-2 outline-none -outline-offset-2 focus-visible:outline-black"
+              className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto rounded outline-none -outline-offset-2 focus-visible:outline-black"
             >
               {tab.node}
             </TabPanel>
