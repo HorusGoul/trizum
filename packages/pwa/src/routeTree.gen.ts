@@ -17,6 +17,7 @@ import { Route as JoinImport } from './routes/join'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as PartyPartyIdImport } from './routes/party.$partyId'
+import { Route as PartyPartyIdSettingsImport } from './routes/party_.$partyId.settings'
 import { Route as PartyPartyIdAddImport } from './routes/party_.$partyId.add'
 import { Route as PartyPartyIdExpenseExpenseIdImport } from './routes/party_.$partyId.expense.$expenseId'
 
@@ -49,6 +50,11 @@ const IndexRoute = IndexImport.update({
 
 const PartyPartyIdRoute = PartyPartyIdImport.update({
   path: '/party/$partyId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PartyPartyIdSettingsRoute = PartyPartyIdSettingsImport.update({
+  path: '/party/$partyId/settings',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -116,6 +122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdAddImport
       parentRoute: typeof rootRoute
     }
+    '/party/$partyId/settings': {
+      id: '/party/$partyId/settings'
+      path: '/party/$partyId/settings'
+      fullPath: '/party/$partyId/settings'
+      preLoaderRoute: typeof PartyPartyIdSettingsImport
+      parentRoute: typeof rootRoute
+    }
     '/party/$partyId/expense/$expenseId': {
       id: '/party/$partyId/expense/$expenseId'
       path: '/party/$partyId/expense/$expenseId'
@@ -136,6 +149,7 @@ export const routeTree = rootRoute.addChildren({
   SettingsRoute,
   PartyPartyIdRoute,
   PartyPartyIdAddRoute,
+  PartyPartyIdSettingsRoute,
   PartyPartyIdExpenseExpenseIdRoute,
 })
 
@@ -154,6 +168,7 @@ export const routeTree = rootRoute.addChildren({
         "/settings",
         "/party/$partyId",
         "/party/$partyId/add",
+        "/party/$partyId/settings",
         "/party/$partyId/expense/$expenseId"
       ]
     },
@@ -177,6 +192,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/party/$partyId/add": {
       "filePath": "party_.$partyId.add.tsx"
+    },
+    "/party/$partyId/settings": {
+      "filePath": "party_.$partyId.settings.tsx"
     },
     "/party/$partyId/expense/$expenseId": {
       "filePath": "party_.$partyId.expense.$expenseId.tsx"

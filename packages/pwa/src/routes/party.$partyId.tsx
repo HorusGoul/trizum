@@ -1,6 +1,4 @@
 import {
-  isValidDocumentId,
-  updateText,
   type AnyDocumentId,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
@@ -15,13 +13,11 @@ import { useEffect } from "react";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import type { Expense } from "#src/models/expense.js";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
+import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
+import { useParty } from "#src/hooks/useParty.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -44,7 +40,8 @@ export const Route = createFileRoute("/party/$partyId")({
 });
 
 function PartyById() {
-  const { party, partyId, isLoading } = useParty();
+  const params = Route.useParams();
+  const { party, partyId, isLoading } = useParty(params.partyId);
   const { addPartyToList, removeParty, partyList } = usePartyList();
   const expenses = usePartyExpenses(partyId);
   const navigate = useNavigate();
@@ -96,6 +93,18 @@ function PartyById() {
           <IconButton icon="ellipsis-vertical" aria-label="Menu" />
           <Popover placement="bottom end">
             <Menu>
+              <MenuItem
+                href={{
+                  to: "/party/$partyId/settings",
+                  params: { partyId },
+                }}
+              >
+                <IconWithFallback name="settings" size={20} className="mr-3" />
+                <span className="h-3.5 leading-none">
+                  <Trans>Settings</Trans>
+                </span>
+              </MenuItem>
+
               <MenuItem onAction={onDeleteParty}>
                 <IconWithFallback name="trash" size={20} className="mr-3" />
                 <span className="h-3.5 leading-none">Delete</span>
@@ -145,35 +154,6 @@ function PartyById() {
     </div>
   );
 }
-
-function useParty() {
-  const { partyId } = Route.useParams();
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
-  const [party, handle] = useSuspenseDocument<Party>(partyId);
-  function dispatch({ type, payload }: ChangePartyAction) {
-    switch (type) {
-      case "party_change_name":
-        return handle.change((party) => {
-          updateText(party, ["name"], payload.name);
-        });
-    }
-  }
-  return {
-    party,
-    partyId,
-    isLoading: handle.inState(["loading"]),
-    dispatch,
-  };
-}
-
-interface ChangePartyNameAction {
-  type: "party_change_name";
-  payload: {
-    name: string;
-  };
-}
-
-type ChangePartyAction = ChangePartyNameAction;
 
 function ExpenseItem({
   partyId,
