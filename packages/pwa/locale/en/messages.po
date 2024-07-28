@@ -21,16 +21,17 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:137
+#: src/routes/party.$partyId.tsx:146
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:76
-#: src/routes/party.$partyId.tsx:120
+#: src/routes/party.$partyId.tsx:129
 msgid "Add or create"
 msgstr "Add or create"
 
 #: src/routes/new.tsx:331
+#: src/routes/party_.$partyId.settings.tsx:375
 msgid "Add participant"
 msgstr "Add participant"
 
@@ -42,7 +43,16 @@ msgstr "Adding expense..."
 msgid "Amount"
 msgstr "Amount"
 
+#: src/routes/party_.$partyId.settings.tsx:293
+msgid "Archive"
+msgstr "Archive"
+
+#: src/routes/party_.$partyId.settings.tsx:384
+msgid "Archived participants"
+msgstr "Archived participants"
+
 #: src/routes/new.tsx:222
+#: src/routes/party_.$partyId.settings.tsx:217
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
@@ -55,6 +65,7 @@ msgid "Create a new Party"
 msgstr "Create a new Party"
 
 #: src/routes/new.tsx:186
+#: src/routes/party_.$partyId.settings.tsx:174
 msgid "Description"
 msgstr "Description"
 
@@ -79,6 +90,7 @@ msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
 #: src/routes/new.tsx:162
+#: src/routes/party_.$partyId.settings.tsx:150
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
@@ -90,9 +102,13 @@ msgstr "ID is required"
 msgid "Join a Party"
 msgstr "Join a Party"
 
-#: src/routes/party.$partyId.tsx:67
+#: src/routes/party.$partyId.tsx:64
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
+
+#: src/routes/party_.$partyId.settings.tsx:197
+msgid "Manage the participants list. Existing members can only be archived."
+msgstr "Manage the participants list. Existing members can only be archived."
 
 #: src/routes/index.tsx:35
 msgid "Menu"
@@ -107,6 +123,7 @@ msgid "New expense"
 msgstr "New expense"
 
 #: src/routes/new.tsx:284
+#: src/routes/party_.$partyId.settings.tsx:328
 msgid "New participant name"
 msgstr "New participant name"
 
@@ -115,10 +132,13 @@ msgid "New trizum"
 msgstr "New trizum"
 
 #: src/routes/new.tsx:250
+#: src/routes/party_.$partyId.settings.tsx:270
+#: src/routes/party_.$partyId.settings.tsx:403
 msgid "Participant name"
 msgstr "Participant name"
 
 #: src/routes/new.tsx:207
+#: src/routes/party_.$partyId.settings.tsx:193
 msgid "Participants"
 msgstr "Participants"
 
@@ -126,9 +146,17 @@ msgstr "Participants"
 msgid "Party created"
 msgstr "Party created"
 
-#: src/routes/party.$partyId.tsx:74
+#: src/routes/party.$partyId.tsx:71
 msgid "Party deleted"
 msgstr "Party deleted"
+
+#: src/routes/party_.$partyId.settings.tsx:105
+msgid "Party Settings"
+msgstr "Party Settings"
+
+#: src/routes/party_.$partyId.settings.tsx:55
+msgid "Party settings saved!"
+msgstr "Party settings saved!"
 
 #: src/routes/settings.tsx:120
 msgid "Phone number"
@@ -143,17 +171,24 @@ msgid "Phone number must be less than 20 characters"
 msgstr "Phone number must be less than 20 characters"
 
 #: src/routes/new.tsx:263
+#: src/routes/party_.$partyId.settings.tsx:284
 msgid "Remove"
 msgstr "Remove"
+
+#: src/routes/party_.$partyId.settings.tsx:417
+msgid "Restore"
+msgstr "Restore"
 
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:134
 #: src/routes/party_.$partyId.add.tsx:125
+#: src/routes/party_.$partyId.settings.tsx:122
 #: src/routes/settings.tsx:68
 msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:46
+#: src/routes/party.$partyId.tsx:104
 #: src/routes/settings.tsx:51
 msgid "Settings"
 msgstr "Settings"
@@ -165,6 +200,7 @@ msgstr "Settings saved"
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:134
 #: src/routes/party_.$partyId.add.tsx:125
+#: src/routes/party_.$partyId.settings.tsx:122
 #: src/routes/settings.tsx:68
 msgid "Submitting..."
 msgstr "Submitting..."
@@ -175,6 +211,7 @@ msgstr "This isn't a valid ID"
 
 #: src/routes/new.tsx:161
 #: src/routes/party_.$partyId.add.tsx:152
+#: src/routes/party_.$partyId.settings.tsx:149
 msgid "Title"
 msgstr "Title"
 
@@ -195,6 +232,7 @@ msgid "Username"
 msgstr "Username"
 
 #: src/routes/new.tsx:187
+#: src/routes/party_.$partyId.settings.tsx:175
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
