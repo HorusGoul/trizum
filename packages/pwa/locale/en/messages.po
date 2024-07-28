@@ -21,12 +21,12 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:147
+#: src/routes/party.$partyId.tsx:149
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:76
-#: src/routes/party.$partyId.tsx:130
+#: src/routes/party.$partyId.tsx:132
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -98,7 +98,7 @@ msgstr "How do you want to call this party?"
 msgid "ID is required"
 msgstr "ID is required"
 
-#: src/routes/party.$partyId.tsx:203
+#: src/routes/party.$partyId.tsx:205
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -109,6 +109,10 @@ msgstr "Join a Party"
 #: src/routes/party.$partyId.tsx:66
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
+
+#: src/routes/party.$partyId.tsx:112
+msgid "Leave party"
+msgstr "Leave party"
 
 #: src/routes/party_.$partyId.settings.tsx:201
 msgid "Manage the participants list. Existing members can only be archived."
@@ -273,6 +277,10 @@ msgstr "Who are you?"
 #: src/routes/new.tsx:209
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "Who is invited to this party? You can add more participants later."
+
+#: src/routes/party.$partyId.tsx:50
+msgid "You left the party!"
+msgstr "You left the party!"
 
 #: src/routes/party_.$partyId.who.tsx:49
 msgid "You're now seeing the party as {0}"
