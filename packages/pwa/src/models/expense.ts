@@ -134,19 +134,13 @@ export function getExpenseTotalAmount(expense: Expense) {
 }
 
 export function getImpactOnBalanceForUser(expense: Expense, userId: string) {
-  console.log(expense);
-
   const input = exportIntoInput(expense);
 
-  console.log(input);
-
-  const { userOwes, owedToUser, diffs } = calculateLogStatsOfUser(
+  const { userOwes, owedToUser } = calculateLogStatsOfUser(
     userId,
     Object.keys(expense.shares),
     input,
   );
-
-  console.log(diffs, userOwes.getAmount(), owedToUser.getAmount());
 
   return owedToUser.subtract(userOwes).getAmount();
 }

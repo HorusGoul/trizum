@@ -119,7 +119,7 @@ function PartyById() {
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
-        {expenses.slice(0, 1).map((expense) => (
+        {expenses.map((expense) => (
           <ExpenseItem key={expense.id} partyId={partyId} expense={expense} />
         ))}
 
