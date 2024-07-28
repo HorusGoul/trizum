@@ -1,5 +1,4 @@
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { EURO } from "#src/models/currency.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
@@ -43,7 +42,7 @@ function New() {
       id: "" as DocumentId,
       name: values.name,
       description: values.description,
-      currency: EURO,
+      currency: "EUR",
       participants: participants.reduce<Party["participants"]>(
         (result, next) => {
           result[next.id] = {

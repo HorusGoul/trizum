@@ -1,7 +1,4 @@
-import {
-  type AnyDocumentId,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
+import { type DocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
@@ -12,12 +9,17 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { useEffect } from "react";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
-import type { Expense } from "#src/models/expense.js";
+import {
+  getExpenseTotalAmount,
+  getImpactOnBalanceForUser,
+  type Expense,
+} from "#src/models/expense.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
 import { useParty } from "#src/hooks/useParty.js";
+import { CurrencyText } from "#src/components/CurrencyText.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -117,7 +119,7 @@ function PartyById() {
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
-        {expenses.map((expense) => (
+        {expenses.slice(0, 1).map((expense) => (
           <ExpenseItem key={expense.id} partyId={partyId} expense={expense} />
         ))}
 
@@ -159,9 +161,13 @@ function ExpenseItem({
   partyId,
   expense,
 }: {
-  partyId: AnyDocumentId;
+  partyId: string;
   expense: Expense;
 }) {
+  const { party } = useParty(partyId);
+
+  const participantId = Object.keys(party?.participants ?? []).at(0) ?? "";
+
   return (
     <Link
       href={{
@@ -174,7 +180,7 @@ function ExpenseItem({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
+          "flex w-full scale-100 rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
           (isHovered || isFocusVisible) &&
             "shadow-md dark:bg-slate-800 dark:shadow-none",
           isPressed &&
@@ -182,9 +188,29 @@ function ExpenseItem({
         )
       }
     >
-      <span className="text-xl font-medium">{expense.name}</span>
-      <span className="text-lg">{expense.description}</span>
-      <span className="text-lg">{expense.paidAt.toLocaleDateString()}</span>
+      <div className="flex flex-1 flex-col">
+        <span className="font-medium">{expense.name}</span>
+        <span>{expense.description}</span>
+      </div>
+
+      <div className="flex flex-shrink-0 flex-col text-end">
+        <CurrencyText
+          amount={getExpenseTotalAmount(expense)}
+          currency={party.currency}
+          className="font-medium"
+        />
+        <span className="text-sm">{expense.paidAt.toLocaleDateString()}</span>
+        <span className="text-sm">
+          <Trans>
+            Impact on my balance:&nbsp;
+            <CurrencyText
+              amount={getImpactOnBalanceForUser(expense, participantId)}
+              currency={party.currency}
+              variant="diff"
+            />
+          </Trans>
+        </span>
+      </div>
     </Link>
   );
 }

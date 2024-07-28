@@ -1,7 +1,7 @@
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import type { Currency } from "./currency";
 import type { Expense } from "./expense";
+import type { Currency } from "dinero.js";
 
 export interface Party {
   id: DocumentId;

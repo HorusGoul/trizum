@@ -1,4 +1,8 @@
-import type { ExpenseInput, ExpenseUser } from "#src/lib/expenses.js";
+import {
+  calculateLogStatsOfUser,
+  type ExpenseInput,
+  type ExpenseUser,
+} from "#src/lib/expenses.js";
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
 
@@ -123,4 +127,26 @@ export function findExpenseById(
   }
 
   return [undefined, -1];
+}
+
+export function getExpenseTotalAmount(expense: Expense) {
+  return Object.values(expense.paidBy).reduce((acc, curr) => acc + curr, 0);
+}
+
+export function getImpactOnBalanceForUser(expense: Expense, userId: string) {
+  console.log(expense);
+
+  const input = exportIntoInput(expense);
+
+  console.log(input);
+
+  const { userOwes, owedToUser, diffs } = calculateLogStatsOfUser(
+    userId,
+    Object.keys(expense.shares),
+    input,
+  );
+
+  console.log(diffs, userOwes.getAmount(), owedToUser.getAmount());
+
+  return owedToUser.subtract(userOwes).getAmount();
 }
