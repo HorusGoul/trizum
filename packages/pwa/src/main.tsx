@@ -17,7 +17,8 @@ import { I18nProvider } from "@lingui/react";
 import { Toaster } from "./ui/Toaster.js";
 import * as catalogEn from "#locale/en/messages.po";
 // Import the generated route tree
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from "./routeTree.gen.js";
+import { preloadAllIcons } from "./preloadIcons.gen.js";
 
 // Load language
 i18n.load("en", catalogEn.messages);
@@ -58,6 +59,8 @@ const router = createRouter({
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
+
+preloadAllIcons();
 
 // Render the app
 const rootElement = document.getElementById("root")!;

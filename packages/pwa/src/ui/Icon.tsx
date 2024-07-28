@@ -8,12 +8,19 @@ export interface IconProps extends Omit<LucideProps, "ref"> {
 
 const iconCache = new Map<string, React.ComponentType<LucideProps>>();
 
-function getOrCreateIcon(name: keyof typeof dynamicIconImports) {
+function getOrCreateIcon(prefixedName: IconProps["name"]) {
+  const name = prefixedName.replace(
+    "#lucide/",
+    "",
+  ) as keyof typeof dynamicIconImports;
   let LucideIcon = iconCache.get(name);
 
   if (!LucideIcon) {
     const fn = dynamicIconImports[name];
     const promise = fn();
+    promise.then((mod) => {
+      iconCache.set(name, mod.default);
+    });
     LucideIcon = lazy(() => promise);
     iconCache.set(name, LucideIcon);
   }
@@ -26,9 +33,7 @@ export const Icon = ({ ...props }: IconProps) => {
 };
 
 export const IconWithFallback = ({ name, ...props }: IconProps) => {
-  const LucideIcon = getOrCreateIcon(
-    name.replace("#lucide/", "") as keyof typeof dynamicIconImports,
-  );
+  const LucideIcon = getOrCreateIcon(name);
 
   const fallbackStyle = {
     width: props.size || props.width,
@@ -52,6 +57,7 @@ export const IconWithFallback = ({ name, ...props }: IconProps) => {
   );
 };
 
-export function preloadIcon(name: keyof typeof dynamicIconImports) {
+// eslint-disable-next-line react-refresh/only-export-components
+export function preloadIcon(name: IconProps["name"]) {
   getOrCreateIcon(name);
 }
