@@ -83,10 +83,20 @@ export function preloadAllIcons() {
     await fs.writeFile(outFile, code, "utf-8");
   }
 
+  let isDev = false;
+
   return {
     name: "vite-plugin-preload-icons",
 
+    configResolved(config) {
+      isDev = config.command === "build";
+    },
+
     async transform(code, id) {
+      if (!isDev) {
+        return;
+      }
+
       const scanForIcons = id.includes(".ts") || id.includes(".tsx");
 
       if (id.includes(outFile) || !scanForIcons) {
