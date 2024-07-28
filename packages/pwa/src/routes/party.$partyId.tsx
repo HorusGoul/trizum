@@ -390,7 +390,7 @@ function Balances() {
       <div className="h-8 flex-shrink-0" />
 
       {isFullyBalanced ? null : (
-        <div className="container mt-4 flex flex-col gap-4 px-4">
+        <div className="container mb-4 mt-4 flex flex-col gap-4 px-4">
           <h2 className="px-2 text-xl font-semibold">
             <Trans>How should I balance?</Trans>
           </h2>
@@ -407,7 +407,7 @@ function Balances() {
       <div className="container flex flex-col gap-4 px-2">
         {userOwesMap.length > 0 ? (
           <>
-            <h3 className="mt-4 flex items-center px-4 text-warning-500">
+            <h3 className="flex items-center px-4 text-warning-500">
               <Icon name="#lucide/circle-alert" size={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
@@ -436,7 +436,7 @@ function Balances() {
 
         {owedToUserMap.length > 0 ? (
           <>
-            <h3 className="mt-4 flex items-center px-4 text-warning-500">
+            <h3 className="flex items-center px-4 text-warning-500">
               <Icon name="#lucide/circle-alert" size={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
@@ -465,7 +465,7 @@ function Balances() {
 
         {allOtherDiffs.length > 0 ? (
           <>
-            <h2 className="mt-4 flex items-center px-4 text-accent-400">
+            <h2 className="flex items-center px-4 text-accent-400">
               <Icon name="#lucide/circle-help" size={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
