@@ -15,7 +15,7 @@ import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
-import { useParty } from "#src/hooks/useParty.js";
+import { useCurrentParty, useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -39,7 +39,6 @@ function PartyById() {
   const params = Route.useParams();
   const { party, partyId, isLoading } = useParty(params.partyId);
   const { removeParty } = usePartyList();
-  const expenses = usePartyExpenses(partyId);
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
 
@@ -125,11 +124,22 @@ function PartyById() {
         </MenuTrigger>
       </div>
 
+      <ExpenseLog />
+    </div>
+  );
+}
+
+function ExpenseLog() {
+  const { party } = useCurrentParty();
+  const expenses = usePartyExpenses(party.id);
+
+  return (
+    <>
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
         {expenses.map((expense) => (
-          <ExpenseItem key={expense.id} partyId={partyId} expense={expense} />
+          <ExpenseItem key={expense.id} partyId={party.id} expense={expense} />
         ))}
 
         <div className="flex-1" />
@@ -146,7 +156,10 @@ function PartyById() {
             <Popover placement="top end" offset={16}>
               <Menu className="min-w-60">
                 <MenuItem
-                  href={{ to: "/party/$partyId/add", params: { partyId } }}
+                  href={{
+                    to: "/party/$partyId/add",
+                    params: { partyId: party.id },
+                  }}
                 >
                   <IconWithFallback
                     name="#lucide/list-plus"
@@ -162,7 +175,7 @@ function PartyById() {
           </MenuTrigger>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
