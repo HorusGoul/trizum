@@ -59,7 +59,18 @@ function preloadIconsPlugin({
     };
   }
 
+  let prev = "";
+
   async function writeFile() {
+    const sorted = Array.from(matches).sort();
+    const joined = sorted.join();
+
+    if (prev === joined) {
+      return;
+    }
+
+    prev = joined;
+
     const code = `/* prettier-ignore-start */
 /* eslint-disable */
 // @ts-nocheck
@@ -70,10 +81,7 @@ ${importPreloadFunction}
 
 export function preloadAllIcons() {
   return Promise.all([
-    ${Array.from(matches)
-      .sort()
-      .map((match) => `${preloadFunctionName}("${match}")`)
-      .join(",\n")}
+    ${sorted.map((match) => `${preloadFunctionName}("${match}")`).join(",\n")}
   ])
 }
   
