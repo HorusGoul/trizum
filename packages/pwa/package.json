@@ -32,6 +32,7 @@
     "@tanstack/react-router": "1.45.4",
     "clsx": "2.1.1",
     "dinero.js": "1.9.1",
+    "framer-motion": "11.3.19",
     "lucide-react": "0.408.0",
     "react": "0.0.0-experimental-d025ddd3-20240722",
     "react-aria-components": "1.2.1",

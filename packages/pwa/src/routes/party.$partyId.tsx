@@ -19,6 +19,7 @@ import { useCurrentParty, useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
+import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -124,7 +125,23 @@ function PartyById() {
         </MenuTrigger>
       </div>
 
-      <ExpenseLog />
+      <AnimatedTabs
+        tabListClassName="px-4 container"
+        tabs={[
+          {
+            id: "expenses",
+            label: t`Expenses`,
+            node: <ExpenseLog />,
+            icon: "#lucide/scroll-text",
+          },
+          {
+            id: "balances",
+            label: t`Balances`,
+            node: <span>Balances</span>,
+            icon: "#lucide/scale",
+          },
+        ]}
+      />
     </div>
   );
 }
@@ -134,7 +151,7 @@ function ExpenseLog() {
   const expenses = usePartyExpenses(party.id);
 
   return (
-    <>
+    <div className="flex h-full flex-col">
       <div className="h-2" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
@@ -175,7 +192,7 @@ function ExpenseLog() {
           </MenuTrigger>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

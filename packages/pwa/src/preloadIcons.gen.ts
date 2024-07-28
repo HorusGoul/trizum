@@ -8,21 +8,23 @@ import { preloadIcon } from "#src/ui/Icon.js";
 
 export function preloadAllIcons() {
   return Promise.all([
-    preloadIcon("#lucide/check"),
-preloadIcon("#lucide/trash"),
-preloadIcon("#lucide/plus"),
-preloadIcon("#lucide/ellipsis-vertical"),
-preloadIcon("#lucide/settings"),
-preloadIcon("#lucide/info"),
-preloadIcon("#lucide/ampersand"),
-preloadIcon("#lucide/list-plus"),
-preloadIcon("#lucide/user-round-pen"),
-preloadIcon("#lucide/log-out"),
-preloadIcon("#lucide/circle-check"),
-preloadIcon("#lucide/circle"),
+    preloadIcon("#lucide/ampersand"),
 preloadIcon("#lucide/archive"),
 preloadIcon("#lucide/archive-restore"),
-preloadIcon("#lucide/arrow-left")
+preloadIcon("#lucide/arrow-left"),
+preloadIcon("#lucide/check"),
+preloadIcon("#lucide/circle"),
+preloadIcon("#lucide/circle-check"),
+preloadIcon("#lucide/ellipsis-vertical"),
+preloadIcon("#lucide/info"),
+preloadIcon("#lucide/list-plus"),
+preloadIcon("#lucide/log-out"),
+preloadIcon("#lucide/plus"),
+preloadIcon("#lucide/scale"),
+preloadIcon("#lucide/scroll-text"),
+preloadIcon("#lucide/settings"),
+preloadIcon("#lucide/trash"),
+preloadIcon("#lucide/user-round-pen")
   ])
 }
   

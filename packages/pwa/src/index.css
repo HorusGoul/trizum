@@ -6,6 +6,10 @@
   .container {
     @apply mx-auto max-w-2xl;
   }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
 }
 
 html,

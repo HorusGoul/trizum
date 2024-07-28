@@ -68,6 +68,9 @@ importers:
       dinero.js:
         specifier: 1.9.1
         version: 1.9.1
+      framer-motion:
+        specifier: 11.3.19
+        version: 11.3.19(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       lucide-react:
         specifier: 0.408.0
         version: 0.408.0(react@0.0.0-experimental-d025ddd3-20240722)
@@ -2796,6 +2799,20 @@ packages:
 
   fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
+
+  framer-motion@11.3.19:
+    resolution: {integrity: sha512-+luuQdx4AsamyMcvzW7jUAJYIKvQs1KE7oHvKkW3eNzmo0S+3PSDWjBuQkuIP9WyneGnKGMLUSuHs8OP7jKpQg==}
+    peerDependencies:
+      '@emotion/is-prop-valid': '*'
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-dom: 0.0.0-experimental-d025ddd3-20240722
+    peerDependenciesMeta:
+      '@emotion/is-prop-valid':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
 
   fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
@@ -8328,6 +8345,13 @@ snapshots:
       signal-exit: 4.1.0
 
   fraction.js@4.3.7: {}
+
+  framer-motion@11.3.19(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722):
+    dependencies:
+      tslib: 2.6.3
+    optionalDependencies:
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-dom: 0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722)
 
   fs-extra@10.1.0:
     dependencies:
