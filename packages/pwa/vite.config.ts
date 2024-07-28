@@ -89,7 +89,7 @@ export function preloadAllIcons() {
     name: "vite-plugin-preload-icons",
 
     configResolved(config) {
-      isDev = config.command === "build";
+      isDev = config.command !== "build";
     },
 
     async transform(code, id) {
