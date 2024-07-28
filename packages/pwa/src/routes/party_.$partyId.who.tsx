@@ -8,7 +8,7 @@ import { cn } from "#src/ui/utils.js";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Suspense, useId } from "react";
+import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
 
@@ -29,9 +29,11 @@ function Who() {
   const { partyList, addPartyToList } = usePartyList();
   const navigate = useNavigate();
 
-  const needsToJoin =
-    partyList.parties[party.id] !== true ||
-    partyList.participantInParties?.[party.id] === undefined;
+  const [needsToJoin] = useState(
+    () =>
+      partyList.parties[party.id] !== true ||
+      partyList.participantInParties?.[party.id] === undefined,
+  );
 
   async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
