@@ -21,12 +21,12 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:187
+#: src/routes/party.$partyId.tsx:189
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:84
-#: src/routes/party.$partyId.tsx:167
+#: src/routes/party.$partyId.tsx:169
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -56,7 +56,7 @@ msgstr "Archived participants"
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
-#: src/routes/party.$partyId.tsx:139
+#: src/routes/party.$partyId.tsx:140
 msgid "Balances"
 msgstr "Balances"
 
@@ -81,7 +81,7 @@ msgstr "Description must be less than 500 characters"
 msgid "Expense added"
 msgstr "Expense added"
 
-#: src/routes/party.$partyId.tsx:133
+#: src/routes/party.$partyId.tsx:134
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -106,7 +106,7 @@ msgstr "How do you want to call this party?"
 msgid "ID is required"
 msgstr "ID is required"
 
-#: src/routes/party.$partyId.tsx:243
+#: src/routes/party.$partyId.tsx:245
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
