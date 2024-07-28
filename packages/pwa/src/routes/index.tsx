@@ -154,7 +154,7 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
           (isHovered || isFocusVisible) &&
             "shadow-md dark:bg-slate-800 dark:shadow-none",
           isPressed &&
-            "scale-105 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
+            "scale-95 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
         )
       }
     >

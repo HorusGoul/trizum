@@ -49,7 +49,7 @@ export function IconButton({
           "flex h-10 w-10 scale-100 items-center justify-center rounded-full  outline-none transition-all duration-200 ease-in-out",
           colorStyles.base,
           (isHovered || isFocusVisible) && colorStyles.focus,
-          isPressed && ["scale-110", colorStyles.pressed],
+          isPressed && ["scale-90", colorStyles.pressed],
           typeof className === "function"
             ? className({
                 isPressed,
