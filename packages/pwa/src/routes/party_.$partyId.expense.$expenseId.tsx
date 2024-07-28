@@ -47,11 +47,15 @@ function ExpenseById() {
         <h1 className="pl-4 text-2xl font-bold">{expense.name}</h1>
         <div className="flex-1" />
         <MenuTrigger>
-          <IconButton icon="ellipsis-vertical" aria-label="Menu" />
+          <IconButton icon="#lucide/ellipsis-vertical" aria-label="Menu" />
           <Popover placement="bottom end">
             <Menu>
               <MenuItem onAction={onDeleteExpense}>
-                <IconWithFallback name="trash" size={20} className="mr-3" />
+                <IconWithFallback
+                  name="#lucide/trash"
+                  size={20}
+                  className="mr-3"
+                />
                 <span className="h-3.5 leading-none">Delete</span>
               </MenuItem>
             </Menu>

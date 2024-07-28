@@ -6,7 +6,7 @@ export function BackButton() {
 
   return (
     <IconButton
-      icon="arrow-left"
+      icon="#lucide/arrow-left"
       aria-label="Go Back"
       onPress={() => {
         history.go(-1);

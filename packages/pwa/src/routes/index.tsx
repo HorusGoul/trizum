@@ -32,7 +32,7 @@ function Index() {
         <div className="flex-1" />
 
         <MenuTrigger>
-          <IconButton icon="ellipsis-vertical" aria-label={t`Menu`} />
+          <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
 
           <Popover placement="bottom end">
             <Menu>
@@ -41,7 +41,11 @@ function Index() {
                   to: "/settings",
                 }}
               >
-                <IconWithFallback name="settings" size={20} className="mr-3" />
+                <IconWithFallback
+                  name="#lucide/settings"
+                  size={20}
+                  className="mr-3"
+                />
                 <span className="h-3.5 leading-none">
                   <Trans>Settings</Trans>
                 </span>
@@ -51,7 +55,11 @@ function Index() {
                   to: "/about",
                 }}
               >
-                <IconWithFallback name="info" size={20} className="mr-3" />
+                <IconWithFallback
+                  name="#lucide/info"
+                  size={20}
+                  className="mr-3"
+                />
                 <span className="h-3.5 leading-none">
                   <Trans>About</Trans>
                 </span>
@@ -74,7 +82,7 @@ function Index() {
           <MenuTrigger>
             <IconButton
               aria-label={t`Add or create`}
-              icon="plus"
+              icon="#lucide/plus"
               color="accent"
               className="h-14 w-14 shadow-md"
             />
@@ -83,7 +91,7 @@ function Index() {
               <Menu className="min-w-60">
                 <MenuItem href={{ to: "/join" }}>
                   <IconWithFallback
-                    name="ampersand"
+                    name="#lucide/ampersand"
                     size={20}
                     className="mr-3"
                   />
@@ -93,7 +101,7 @@ function Index() {
                 </MenuItem>
                 <MenuItem href={{ to: "/new" }}>
                   <IconWithFallback
-                    name="list-plus"
+                    name="#lucide/list-plus"
                     size={20}
                     className="mr-3"
                   />

@@ -57,7 +57,7 @@ function Join() {
             canSubmit ? (
               <Suspense fallback={null}>
                 <IconButton
-                  icon="check"
+                  icon="#lucide/check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}

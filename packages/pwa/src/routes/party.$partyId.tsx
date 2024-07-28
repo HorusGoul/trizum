@@ -69,7 +69,7 @@ function PartyById() {
         <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
         <div className="flex-1" />
         <MenuTrigger>
-          <IconButton icon="ellipsis-vertical" aria-label="Menu" />
+          <IconButton icon="#lucide/ellipsis-vertical" aria-label="Menu" />
           <Popover placement="bottom end">
             <Menu>
               <MenuItem
@@ -79,7 +79,7 @@ function PartyById() {
                 }}
               >
                 <IconWithFallback
-                  name="user-round-pen"
+                  name="#lucide/user-round-pen"
                   size={20}
                   className="mr-3 self-start"
                 />
@@ -100,14 +100,22 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback name="settings" size={20} className="mr-3" />
+                <IconWithFallback
+                  name="#lucide/settings"
+                  size={20}
+                  className="mr-3"
+                />
                 <span className="h-3.5 leading-none">
                   <Trans>Settings</Trans>
                 </span>
               </MenuItem>
 
               <MenuItem onAction={onLeaveParty}>
-                <IconWithFallback name="log-out" size={20} className="mr-3" />
+                <IconWithFallback
+                  name="#lucide/log-out"
+                  size={20}
+                  className="mr-3"
+                />
                 <span className="h-3.5 leading-none">
                   <Trans>Leave party</Trans>
                 </span>
@@ -130,7 +138,7 @@ function PartyById() {
           <MenuTrigger>
             <IconButton
               aria-label={t`Add or create`}
-              icon="plus"
+              icon="#lucide/plus"
               color="accent"
               className="h-14 w-14 shadow-md"
             />
@@ -141,7 +149,7 @@ function PartyById() {
                   href={{ to: "/party/$partyId/add", params: { partyId } }}
                 >
                   <IconWithFallback
-                    name="list-plus"
+                    name="#lucide/list-plus"
                     size={20}
                     className="mr-3"
                   />
