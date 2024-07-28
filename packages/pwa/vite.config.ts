@@ -71,6 +71,7 @@ ${importPreloadFunction}
 export function preloadAllIcons() {
   return Promise.all([
     ${Array.from(matches)
+      .sort()
       .map((match) => `${preloadFunctionName}("${match}")`)
       .join(",\n")}
   ])
