@@ -262,7 +262,7 @@ function useParty() {
       return expenseWithId;
     }
 
-    handle.change(async (party) => {
+    handle.change((party) => {
       party.chunkIds.unshift(lastChunkId);
     });
 
