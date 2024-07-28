@@ -45,9 +45,13 @@ export function useParty(partyId: string) {
 
 export function useCurrentParty() {
   const partyId = useParams({
-    from: "/party/$partyId",
+    strict: false,
     select: (params) => params.partyId,
   });
+
+  if (!partyId) {
+    throw new Error("No Party ID found in URL");
+  }
 
   return useParty(partyId);
 }
