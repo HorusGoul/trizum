@@ -1,31 +1,13 @@
 import { useState } from "react";
-import type { PartyList } from "#src/models/partyList.js";
-import {
-  isValidDocumentId,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
-import type { Party } from "#src/models/party.js";
+import { getPartyListId, type PartyList } from "#src/models/partyList.js";
+import { type DocumentId } from "@automerge/automerge-repo/slim";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 
 export function usePartyList() {
   const repo = useRepo();
-  const [partyListId] = useState<DocumentId>(() => {
-    const id = localStorage.getItem("partyListId");
-
-    if (id && isValidDocumentId(id)) {
-      return id;
-    }
-
-    const handle = repo.create<PartyList>({
-      username: "",
-      phone: "",
-      parties: {},
-    });
-
-    localStorage.setItem("partyListId", handle.documentId);
-    return handle.documentId;
-  });
+  const [partyListId] = useState<DocumentId>(() => getPartyListId(repo));
   const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(
     partyListId,
     {
@@ -33,15 +15,30 @@ export function usePartyList() {
     },
   );
 
-  function addPartyToList(partyId: Party["id"]) {
+  function addPartyToList(
+    partyId: Party["id"],
+    participantId: PartyParticipant["id"],
+  ) {
     partyListHandle.change((list) => {
       list.parties[partyId] = true;
+
+      if (!list.participantInParties) {
+        list.participantInParties = {};
+      }
+
+      list.participantInParties[partyId] = participantId;
     });
   }
   function removeParty(partyId: Party["id"]) {
     repo.delete(partyId);
     partyListHandle.change((list) => {
       delete list.parties[partyId];
+
+      if (!list.participantInParties) {
+        return;
+      }
+
+      delete list.participantInParties[partyId];
     });
   }
 

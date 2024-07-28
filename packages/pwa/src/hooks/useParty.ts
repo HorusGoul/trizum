@@ -1,6 +1,7 @@
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { Party } from "#src/models/party.js";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { useParams } from "@tanstack/react-router";
 
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
@@ -18,10 +19,35 @@ export function useParty(partyId: string) {
     });
   }
 
+  function setParticipantDetails(
+    participantId: PartyParticipant["id"],
+    details: Partial<Pick<PartyParticipant, "phone">>,
+  ) {
+    handle.change((doc) => {
+      const participant = doc.participants[participantId];
+
+      if (!participant) {
+        return;
+      }
+
+      doc.participants[participantId].phone = details.phone;
+    });
+  }
+
   return {
     party,
     partyId,
     isLoading: handle.inState(["loading"]),
     updateSettings,
+    setParticipantDetails,
   };
+}
+
+export function useCurrentParty() {
+  const partyId = useParams({
+    from: "/party/$partyId",
+    select: (params) => params.partyId,
+  });
+
+  return useParty(partyId);
 }

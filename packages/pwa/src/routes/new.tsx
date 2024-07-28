@@ -29,7 +29,7 @@ interface NewPartyFormValues {
 
 function New() {
   const repo = useRepo();
-  const { addPartyToList, partyList } = usePartyList();
+  const { partyList } = usePartyList();
   const navigate = useNavigate();
 
   function onCreateParty(values: NewPartyFormValues) {
@@ -56,7 +56,6 @@ function New() {
       chunkIds: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
-    addPartyToList(handle.documentId);
     navigate({
       to: "/party/$partyId",
       params: { partyId: handle.documentId },

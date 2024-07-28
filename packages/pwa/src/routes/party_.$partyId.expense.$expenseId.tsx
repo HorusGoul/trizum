@@ -12,13 +12,16 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
+import { guardParticipatingInParty } from "#src/lib/guards.js";
 
 export const Route = createFileRoute("/party/$partyId/expense/$expenseId")({
   component: ExpenseById,
 
-  async loader({ context: { repo }, params: { expenseId } }) {
+  async loader({ context, params: { expenseId, partyId } }) {
+    await guardParticipatingInParty(partyId, context);
+
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(repo, chunkId);
+    await documentCache.readAsync(context.repo, chunkId);
   },
 });
 

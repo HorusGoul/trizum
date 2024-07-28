@@ -17,6 +17,7 @@ import { Route as JoinImport } from './routes/join'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as PartyPartyIdImport } from './routes/party.$partyId'
+import { Route as PartyPartyIdWhoImport } from './routes/party_.$partyId.who'
 import { Route as PartyPartyIdSettingsImport } from './routes/party_.$partyId.settings'
 import { Route as PartyPartyIdAddImport } from './routes/party_.$partyId.add'
 import { Route as PartyPartyIdExpenseExpenseIdImport } from './routes/party_.$partyId.expense.$expenseId'
@@ -50,6 +51,11 @@ const IndexRoute = IndexImport.update({
 
 const PartyPartyIdRoute = PartyPartyIdImport.update({
   path: '/party/$partyId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PartyPartyIdWhoRoute = PartyPartyIdWhoImport.update({
+  path: '/party/$partyId/who',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -129,6 +135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdSettingsImport
       parentRoute: typeof rootRoute
     }
+    '/party/$partyId/who': {
+      id: '/party/$partyId/who'
+      path: '/party/$partyId/who'
+      fullPath: '/party/$partyId/who'
+      preLoaderRoute: typeof PartyPartyIdWhoImport
+      parentRoute: typeof rootRoute
+    }
     '/party/$partyId/expense/$expenseId': {
       id: '/party/$partyId/expense/$expenseId'
       path: '/party/$partyId/expense/$expenseId'
@@ -150,6 +163,7 @@ export const routeTree = rootRoute.addChildren({
   PartyPartyIdRoute,
   PartyPartyIdAddRoute,
   PartyPartyIdSettingsRoute,
+  PartyPartyIdWhoRoute,
   PartyPartyIdExpenseExpenseIdRoute,
 })
 
@@ -169,6 +183,7 @@ export const routeTree = rootRoute.addChildren({
         "/party/$partyId",
         "/party/$partyId/add",
         "/party/$partyId/settings",
+        "/party/$partyId/who",
         "/party/$partyId/expense/$expenseId"
       ]
     },
@@ -195,6 +210,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/party/$partyId/settings": {
       "filePath": "party_.$partyId.settings.tsx"
+    },
+    "/party/$partyId/who": {
+      "filePath": "party_.$partyId.who.tsx"
     },
     "/party/$partyId/expense/$expenseId": {
       "filePath": "party_.$partyId.expense.$expenseId.tsx"

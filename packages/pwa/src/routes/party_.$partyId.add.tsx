@@ -17,9 +17,15 @@ import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { CurrencyField } from "#src/components/CurrencyField.js";
 import { toast } from "sonner";
+import { guardParticipatingInParty } from "#src/lib/guards.js";
+import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 
 export const Route = createFileRoute("/party/$partyId/add")({
   component: AddExpense,
+
+  async loader({ context, params }) {
+    await guardParticipatingInParty(params.partyId, context);
+  },
 });
 
 interface NewExpenseFormValues {
@@ -32,6 +38,7 @@ interface NewExpenseFormValues {
 function AddExpense() {
   const { party, partyId, addExpenseToParty } = useParty();
   const navigate = useNavigate();
+  const participant = useCurrentParticipant();
 
   async function onCreateExpense(values: NewExpenseFormValues) {
     try {
@@ -93,7 +100,7 @@ function AddExpense() {
       name: "",
       description: "",
       amount: 0,
-      paidBy: Object.keys(party?.participants ?? []).at(0) ?? "",
+      paidBy: participant.id,
     },
     onSubmit: ({ value }) => {
       onCreateExpense(value);

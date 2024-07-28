@@ -1,0 +1,59 @@
+import type { Party } from "#src/models/party.js";
+import {
+  redirect,
+  type RegisteredRouter,
+  type RouterContextOptions,
+} from "@tanstack/react-router";
+import { documentCache } from "./automerge/suspense-hooks";
+import { getPartyListId, type PartyList } from "#src/models/partyList.js";
+import type { DocumentId } from "@automerge/automerge-repo";
+
+export async function guardPartyExists(
+  partyId: string,
+  { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+) {
+  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as
+    | Party
+    | undefined;
+
+  if (!party) {
+    throw redirect({ to: "/" });
+  }
+
+  return party;
+}
+
+export async function guardPartyListExists({
+  repo,
+}: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
+  const partyListId = getPartyListId(repo);
+  const partyList = (await documentCache.readAsync(repo, partyListId)) as
+    | PartyList
+    | undefined;
+
+  if (!partyList) {
+    throw redirect({ to: "/" });
+  }
+
+  return partyList;
+}
+
+export async function guardParticipatingInParty(
+  partyId: string,
+  context: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+) {
+  const [party, partyList] = await Promise.all([
+    guardPartyExists(partyId, context),
+    guardPartyListExists(context),
+  ]);
+
+  const needsToJoin =
+    partyList.parties[party.id] !== true ||
+    partyList.participantInParties?.[party.id] === undefined;
+
+  if (needsToJoin) {
+    throw redirect({ to: "/party/$partyId/who", params: { partyId } });
+  }
+
+  return { party, partyList };
+}

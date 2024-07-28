@@ -1,12 +1,9 @@
-import { type DocumentId } from "@automerge/automerge-repo/slim";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import type { Party } from "#src/models/party.js";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { useEffect } from "react";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import {
@@ -19,21 +16,18 @@ import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
 import { useParty } from "#src/hooks/useParty.js";
+import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
+import { guardParticipatingInParty } from "#src/lib/guards.js";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
-  loader: async ({ context: { repo }, params: { partyId } }) => {
-    const doc = await documentCache.readAsync(repo, partyId as DocumentId);
-    const party = doc as Party | undefined;
-
-    if (!party) {
-      throw redirect({ to: "/" });
-    }
+  loader: async ({ context, params: { partyId } }) => {
+    const { party } = await guardParticipatingInParty(partyId, context);
 
     await Promise.all(
       party.chunkIds.map((chunkId) => {
-        return documentCache.readAsync(repo, chunkId);
+        return documentCache.readAsync(context.repo, chunkId);
       }),
     );
 
@@ -44,27 +38,10 @@ export const Route = createFileRoute("/party/$partyId")({
 function PartyById() {
   const params = Route.useParams();
   const { party, partyId, isLoading } = useParty(params.partyId);
-  const { addPartyToList, removeParty, partyList } = usePartyList();
+  const { removeParty } = usePartyList();
   const expenses = usePartyExpenses(partyId);
   const navigate = useNavigate();
-
-  const isInPartyList = partyList.parties[partyId] === true;
-  const partyExists = party !== undefined;
-
-  useEffect(() => {
-    if (!partyId) return;
-
-    if (isInPartyList) {
-      return;
-    }
-
-    if (!partyExists) {
-      return;
-    }
-
-    addPartyToList(partyId);
-    toast.success(t`Joined ${party.name}!`);
-  }, [addPartyToList, partyId, isInPartyList, partyExists, party?.name]);
+  const participant = useCurrentParticipant();
 
   function onDeleteParty() {
     if (!partyId) return;
@@ -95,6 +72,28 @@ function PartyById() {
           <IconButton icon="ellipsis-vertical" aria-label="Menu" />
           <Popover placement="bottom end">
             <Menu>
+              <MenuItem
+                href={{
+                  to: "/party/$partyId/who",
+                  params: { partyId },
+                }}
+              >
+                <IconWithFallback
+                  name="user-round-pen"
+                  size={20}
+                  className="mr-3 self-start"
+                />
+                <div className="flex flex-col">
+                  <span className="h-3.5 leading-none">
+                    <Trans>Viewing as {participant.name}</Trans>
+                  </span>
+
+                  <span className="mt-2 h-2.5 text-sm leading-none opacity-80">
+                    <Trans>Tap to change</Trans>
+                  </span>
+                </div>
+              </MenuItem>
+
               <MenuItem
                 href={{
                   to: "/party/$partyId/settings",
@@ -166,7 +165,7 @@ function ExpenseItem({
 }) {
   const { party } = useParty(partyId);
 
-  const participantId = Object.keys(party?.participants ?? []).at(0) ?? "";
+  const participant = useCurrentParticipant();
 
   return (
     <Link
@@ -204,7 +203,7 @@ function ExpenseItem({
           <Trans>
             Impact on my balance:&nbsp;
             <CurrencyText
-              amount={getImpactOnBalanceForUser(expense, participantId)}
+              amount={getImpactOnBalanceForUser(expense, participant.id)}
               currency={party.currency}
               variant="diff"
             />

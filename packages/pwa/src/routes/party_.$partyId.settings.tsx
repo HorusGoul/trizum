@@ -1,5 +1,6 @@
 import { BackButton } from "#src/components/BackButton.js";
 import { useParty } from "#src/hooks/useParty.js";
+import { guardParticipatingInParty } from "#src/lib/guards.js";
 import {
   validatePartyDescription,
   validatePartyParticipantName,
@@ -17,6 +18,9 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/party/$partyId/settings")({
   component: PartySettings,
+  loader: async ({ context, params }) => {
+    await guardParticipatingInParty(params.partyId, context);
+  },
 });
 
 interface PartySettingsFormValues {
