@@ -477,15 +477,7 @@ function Balances() {
               <BalanceActionItem key={diff.fromId + diff.toId} {...diff} />
             ))}
           </>
-        ) : (
-          <div className="flex items-center px-4 text-success-500">
-            <Icon name="#lucide/circle-check" size={24} className="mr-3" />
-
-            <span className="text-xl font-semibold">
-              <Trans>Party is completely balanced!</Trans>
-            </span>
-          </div>
-        )}
+        ) : null}
       </div>
       <div className="h-8 flex-shrink-0" />
     </>
