@@ -35,11 +35,11 @@ msgstr "Add or create"
 msgid "Add participant"
 msgstr "Add participant"
 
-#: src/routes/party_.$partyId.add.tsx:59
+#: src/routes/party_.$partyId.add.tsx:50
 msgid "Adding expense..."
 msgstr "Adding expense..."
 
-#: src/routes/party_.$partyId.add.tsx:180
+#: src/routes/party_.$partyId.add.tsx:167
 msgid "Amount"
 msgstr "Amount"
 
@@ -77,7 +77,7 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
-#: src/routes/party_.$partyId.add.tsx:80
+#: src/routes/party_.$partyId.add.tsx:71
 msgid "Expense added"
 msgstr "Expense added"
 
@@ -85,7 +85,7 @@ msgstr "Expense added"
 msgid "Expenses"
 msgstr "Expenses"
 
-#: src/routes/party_.$partyId.add.tsx:85
+#: src/routes/party_.$partyId.add.tsx:76
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
@@ -97,7 +97,7 @@ msgstr "For payments through Bizum or similar services"
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
-#: src/routes/party_.$partyId.add.tsx:160
+#: src/routes/party_.$partyId.add.tsx:147
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
@@ -142,7 +142,7 @@ msgstr "Menu"
 msgid "Name must be less than 50 characters"
 msgstr "Name must be less than 50 characters"
 
-#: src/routes/party_.$partyId.add.tsx:121
+#: src/routes/party_.$partyId.add.tsx:108
 msgid "New expense"
 msgstr "New expense"
 
@@ -221,9 +221,9 @@ msgstr "Restore"
 
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
-#: src/routes/party_.$partyId.add.tsx:132
+#: src/routes/party_.$partyId.add.tsx:119
 #: src/routes/party_.$partyId.settings.tsx:126
-#: src/routes/party_.$partyId.who.tsx:93
+#: src/routes/party_.$partyId.who.tsx:92
 #: src/routes/settings.tsx:68
 msgid "Save"
 msgstr "Save"
@@ -240,9 +240,9 @@ msgstr "Settings saved"
 
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
-#: src/routes/party_.$partyId.add.tsx:132
+#: src/routes/party_.$partyId.add.tsx:119
 #: src/routes/party_.$partyId.settings.tsx:126
-#: src/routes/party_.$partyId.who.tsx:93
+#: src/routes/party_.$partyId.who.tsx:92
 #: src/routes/settings.tsx:68
 msgid "Submitting..."
 msgstr "Submitting..."
@@ -256,7 +256,7 @@ msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
 #: src/routes/new.tsx:159
-#: src/routes/party_.$partyId.add.tsx:159
+#: src/routes/party_.$partyId.add.tsx:146
 #: src/routes/party_.$partyId.settings.tsx:153
 msgid "Title"
 msgstr "Title"
@@ -269,11 +269,11 @@ msgstr "Title is required"
 msgid "Title must be less than 50 characters"
 msgstr "Title must be less than 50 characters"
 
-#: src/routes/party_.$partyId.who.tsx:114
+#: src/routes/party_.$partyId.who.tsx:113
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.who.tsx:120
+#: src/routes/party_.$partyId.who.tsx:119
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
@@ -289,7 +289,7 @@ msgstr "Username"
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
-#: src/routes/party_.$partyId.who.tsx:47
+#: src/routes/party_.$partyId.who.tsx:48
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
@@ -302,7 +302,7 @@ msgstr "What is this party about?"
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
-#: src/routes/party_.$partyId.who.tsx:76
+#: src/routes/party_.$partyId.who.tsx:75
 msgid "Who are you?"
 msgstr "Who are you?"
 
@@ -322,6 +322,6 @@ msgstr "You owe money to people"
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
-#: src/routes/party_.$partyId.who.tsx:49
+#: src/routes/party_.$partyId.who.tsx:50
 msgid "You're now seeing the party as {0}"
 msgstr "You're now seeing the party as {0}"
