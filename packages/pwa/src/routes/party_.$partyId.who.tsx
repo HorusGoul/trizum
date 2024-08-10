@@ -1,6 +1,7 @@
 import { BackButton } from "#src/components/BackButton.js";
 import { useParty } from "#src/hooks/useParty.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
+import { usePartyParticipants } from "#src/hooks/usePartyParticipants.js";
 import { guardPartyExists } from "#src/lib/guards.js";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -63,9 +64,7 @@ function Who() {
 
   const formId = useId();
 
-  const participants = Object.values(party.participants).filter(
-    (participant) => !participant.isArchived,
-  );
+  const { active: participants } = usePartyParticipants();
 
   return (
     <div className="flex min-h-full flex-col">
