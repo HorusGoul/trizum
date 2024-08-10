@@ -1,24 +1,19 @@
 import { BackButton } from "#src/components/BackButton.js";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppTextField } from "#src/ui/TextField.js";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
-import {
-  isValidDocumentId,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { Party, PartyExpenseChunk } from "#src/models/party.js";
-import { createExpenseId, type Expense } from "#src/models/expense.js";
+
+import { type Expense } from "#src/models/expense.js";
 import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { CurrencyField } from "#src/components/CurrencyField.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
+import { useCurrentParty } from "#src/hooks/useParty.js";
 
 export const Route = createFileRoute("/party/$partyId/add")({
   component: AddExpense,
@@ -36,16 +31,12 @@ interface NewExpenseFormValues {
 }
 
 function AddExpense() {
-  const { party, partyId, addExpenseToParty } = useParty();
+  const { party, partyId, addExpenseToParty } = useCurrentParty();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
 
   async function onCreateExpense(values: NewExpenseFormValues) {
     try {
-      if (!party || !partyId) {
-        console.warn("This party doesn't exist");
-        return;
-      }
       const paidAt = new Date();
       // TODO: handle more expense share types
       const shares: Expense["shares"] = Object.keys(party.participants).reduce(
@@ -108,10 +99,6 @@ function AddExpense() {
   });
 
   const formId = useId();
-
-  if (!party || !partyId) {
-    return t`Can't add an expense to a party that doesn't exist`;
-  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -192,82 +179,4 @@ function AddExpense() {
       </form>
     </div>
   );
-}
-
-function useParty() {
-  const { partyId } = Route.useParams();
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
-  const [party, handle] = useSuspenseDocument<Party>(partyId);
-
-  const repo = useRepo();
-
-  function createChunk() {
-    const handle = repo.create<PartyExpenseChunk>({
-      id: "" as DocumentId,
-      createdAt: new Date(),
-      expenses: [],
-      maxSize: 500,
-    });
-
-    handle.change((doc) => (doc.id = handle.documentId));
-
-    return [handle.documentId, handle] as const;
-  }
-
-  async function addExpenseToParty(
-    expense: Omit<Expense, "id">,
-  ): Promise<Expense> {
-    if (!party) {
-      throw new Error("Party not found, this should not happen");
-    }
-
-    // Last chunk is the most recent one, so should be indexed at 0
-    let lastChunkId = party.chunkIds.at(0);
-
-    if (!lastChunkId) {
-      // Create a new chunk if there is none
-      const [chunkId] = createChunk();
-      lastChunkId = chunkId;
-    }
-
-    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkId);
-    let lastChunk = await lastChunkHandle.doc();
-
-    if (!lastChunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    if (lastChunk.expenses.length >= lastChunk.maxSize) {
-      // Create a new chunk if the last one is full
-      const [chunkId, handle] = createChunk();
-      lastChunkId = chunkId;
-      lastChunkHandle = handle;
-      lastChunk = await lastChunkHandle.doc();
-
-      if (!lastChunk) {
-        throw new Error("Chunk not found, this should not happen");
-      }
-    }
-
-    const expenseWithId = {
-      ...expense,
-      id: createExpenseId(lastChunkId),
-    };
-
-    lastChunkHandle.change((doc) => {
-      doc.expenses.unshift(expenseWithId);
-    });
-
-    if (party.chunkIds.includes(lastChunkId)) {
-      return expenseWithId;
-    }
-
-    handle.change((party) => {
-      party.chunkIds.unshift(lastChunkId);
-    });
-
-    return expenseWithId;
-  }
-
-  return { party, partyId, addExpenseToParty };
 }

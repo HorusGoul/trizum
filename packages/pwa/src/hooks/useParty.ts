@@ -1,6 +1,15 @@
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { Party, PartyParticipant } from "#src/models/party.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { createExpenseId, type Expense } from "#src/models/expense.js";
+import type {
+  Party,
+  PartyExpenseChunk,
+  PartyParticipant,
+} from "#src/models/party.js";
+import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import {
+  isValidDocumentId,
+  type DocumentId,
+} from "@automerge/automerge-repo/slim";
 import { useParams } from "@tanstack/react-router";
 
 export function useParty(partyId: string) {
@@ -34,12 +43,83 @@ export function useParty(partyId: string) {
     });
   }
 
+  const repo = useRepo();
+
+  function createChunk() {
+    const handle = repo.create<PartyExpenseChunk>({
+      id: "" as DocumentId,
+      createdAt: new Date(),
+      expenses: [],
+      maxSize: 500,
+    });
+
+    handle.change((doc) => (doc.id = handle.documentId));
+
+    return [handle.documentId, handle] as const;
+  }
+
+  async function addExpenseToParty(
+    expense: Omit<Expense, "id">,
+  ): Promise<Expense> {
+    if (!party) {
+      throw new Error("Party not found, this should not happen");
+    }
+
+    // Last chunk is the most recent one, so should be indexed at 0
+    let lastChunkId = party.chunkIds.at(0);
+
+    if (!lastChunkId) {
+      // Create a new chunk if there is none
+      const [chunkId] = createChunk();
+      lastChunkId = chunkId;
+    }
+
+    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkId);
+    let lastChunk = await lastChunkHandle.doc();
+
+    if (!lastChunk) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    if (lastChunk.expenses.length >= lastChunk.maxSize) {
+      // Create a new chunk if the last one is full
+      const [chunkId, handle] = createChunk();
+      lastChunkId = chunkId;
+      lastChunkHandle = handle;
+      lastChunk = await lastChunkHandle.doc();
+
+      if (!lastChunk) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+    }
+
+    const expenseWithId = {
+      ...expense,
+      id: createExpenseId(lastChunkId),
+    };
+
+    lastChunkHandle.change((doc) => {
+      doc.expenses.unshift(expenseWithId);
+    });
+
+    if (party.chunkIds.includes(lastChunkId)) {
+      return expenseWithId;
+    }
+
+    handle.change((party) => {
+      party.chunkIds.unshift(lastChunkId);
+    });
+
+    return expenseWithId;
+  }
+
   return {
     party,
     partyId,
     isLoading: handle.inState(["loading"]),
     updateSettings,
     setParticipantDetails,
+    addExpenseToParty,
   };
 }
 
