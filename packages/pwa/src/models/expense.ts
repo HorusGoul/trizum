@@ -54,7 +54,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
     for (const exact of Object.keys(exacts)) {
       const amount = exacts[exact].value * factor;
-      paidFor[exact] = amount;
+      paidFor[exact] = amount / partial;
       amountLeft -= amount;
     }
     if (amountLeft < 0) {
@@ -67,7 +67,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     for (const divide of Object.keys(divides)) {
       const dFactor = divides[divide].value / totalDivides;
       const amount = amountLeft * dFactor;
-      paidFor[divide] = amount;
+      paidFor[divide] = amount / partial;
     }
     return {
       version: 1,
