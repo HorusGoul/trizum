@@ -12,12 +12,16 @@ export function preloadAllIcons() {
 preloadIcon("#lucide/archive"),
 preloadIcon("#lucide/archive-restore"),
 preloadIcon("#lucide/arrow-left"),
+preloadIcon("#lucide/camera"),
 preloadIcon("#lucide/check"),
 preloadIcon("#lucide/circle"),
 preloadIcon("#lucide/circle-alert"),
 preloadIcon("#lucide/circle-check"),
 preloadIcon("#lucide/circle-help"),
 preloadIcon("#lucide/ellipsis-vertical"),
+preloadIcon("#lucide/image-off"),
+preloadIcon("#lucide/image-plus"),
+preloadIcon("#lucide/image-up"),
 preloadIcon("#lucide/info"),
 preloadIcon("#lucide/list-plus"),
 preloadIcon("#lucide/log-out"),
@@ -26,7 +30,8 @@ preloadIcon("#lucide/scale"),
 preloadIcon("#lucide/scroll-text"),
 preloadIcon("#lucide/settings"),
 preloadIcon("#lucide/trash"),
-preloadIcon("#lucide/user-round-pen")
+preloadIcon("#lucide/user-round-pen"),
+preloadIcon("#lucide/x")
   ])
 }
   
