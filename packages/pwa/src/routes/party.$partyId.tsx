@@ -516,7 +516,7 @@ function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
     >
       <div
         className={cn(
-          "h-10 rounded-lg  bg-success-300 dark:bg-success-600",
+          "h-10 rounded-lg bg-success-300 dark:bg-success-600",
           isNegative && "bg-danger-300 dark:bg-danger-700",
         )}
         style={{
