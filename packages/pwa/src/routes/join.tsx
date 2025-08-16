@@ -33,7 +33,7 @@ function Join() {
     });
   }
 
-  const form = useForm<JoinFormValues>({
+  const form = useForm({
     defaultValues: {
       id: "",
     },

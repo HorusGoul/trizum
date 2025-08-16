@@ -36,7 +36,6 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
 
   // Track the scroll position of the tab panel container.
   const { scrollXProgress } = useScroll({
-    // @ts-expect-error - The ref type is not compatible with the required type.
     container: tabPanelsRef,
   });
 
@@ -160,7 +159,6 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
                   {isFocusVisible && isSelected && (
                     // Focus ring.
                     <motion.span
-                      // @ts-expect-error - Wrong for some reason
                       className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
                       style={{ x, width }}
                     />
@@ -172,7 +170,6 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
         </TabList>
         {/* Selection indicator. */}
         <motion.span
-          // @ts-expect-error - Wrong for some reason
           className="absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500"
           style={{ x, width }}
         />

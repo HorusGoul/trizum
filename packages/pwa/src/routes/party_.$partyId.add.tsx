@@ -13,7 +13,7 @@ import {
   type ExpenseEditorFormValues,
 } from "#src/components/ExpenseEditor.js";
 
-export const Route = createFileRoute("/party/$partyId/add")({
+export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
 
   async loader({ context, params }) {

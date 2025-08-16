@@ -16,15 +16,15 @@
     "typecheck": "turbo run typecheck"
   },
   "dependencies": {
-    "@changesets/cli": "2.27.7",
-    "@turbo/gen": "2.0.6",
+    "@changesets/cli": "2.29.5",
+    "@turbo/gen": "2.5.6",
     "syncpack": "12.3.3",
-    "turbo": "2.0.6"
+    "turbo": "2.5.6"
   },
   "engines": {
     "node": "^20"
   },
-  "packageManager": "pnpm@9.6.0",
+  "packageManager": "pnpm@10.14.0",
   "pnpm": {
     "overrides": {
       "react": "0.0.0-experimental-d025ddd3-20240722",
