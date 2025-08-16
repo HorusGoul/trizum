@@ -255,7 +255,7 @@ function CurrentPhoto({ photoUrl, onRemove }: CurrentPhotoProps) {
       </Button>
       <Button
         color="slate"
-        className="absolute -right-2 -top-2 h-auto w-auto rounded-full p-1 "
+        className="absolute -right-2 -top-2 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
       >
         <Icon
