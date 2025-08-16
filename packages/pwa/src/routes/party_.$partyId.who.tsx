@@ -141,7 +141,7 @@ function Who() {
                       isFocusVisible &&
                         "ring-2 ring-accent-600 ring-offset-1 ring-offset-white/80",
                       isSelected
-                        ? " bg-accent-600 text-white"
+                        ? "bg-accent-600 text-white"
                         : "border-transparent",
                       isPressed && !isSelected
                         ? "bg-accent-50 dark:bg-slate-800"
@@ -154,7 +154,7 @@ function Who() {
                 >
                   {({ isSelected }) => (
                     <div className="flex w-full items-center justify-between gap-3">
-                      <div className=" flex shrink-0 items-center">
+                      <div className="flex shrink-0 items-center">
                         <Icon
                           name={
                             isSelected
