@@ -13,7 +13,7 @@ import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/party/$partyId/who")({
+export const Route = createFileRoute("/party_/$partyId/who")({
   component: Who,
   async loader({ context, params }) {
     await guardPartyExists(params.partyId, context);
@@ -53,7 +53,7 @@ function Who() {
     navigate({ to: "..", replace: true });
   }
 
-  const form = useForm<WhoFormValues>({
+  const form = useForm({
     defaultValues: {
       participantId: partyList.participantInParties?.[party.id] ?? "",
     },

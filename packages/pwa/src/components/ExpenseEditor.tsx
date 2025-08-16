@@ -26,7 +26,7 @@ export function ExpenseEditor({
   onSubmit,
   defaultValues,
 }: ExpenseEditorProps) {
-  const form = useForm<ExpenseEditorFormValues>({
+  const form = useForm({
     defaultValues,
     onSubmit: ({ value }) => onSubmit(value),
   });

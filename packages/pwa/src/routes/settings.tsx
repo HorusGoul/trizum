@@ -30,7 +30,7 @@ function Settings() {
     toast.success(t`Settings saved`);
   }
 
-  const form = useForm<SettingsFormValues>({
+  const form = useForm({
     defaultValues: {
       username: partyList.username ?? "",
       phone: partyList.phone ?? "",

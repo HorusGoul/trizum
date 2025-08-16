@@ -14,7 +14,7 @@ import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 
-export const Route = createFileRoute("/party/$partyId/expense/$expenseId")({
+export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   component: ExpenseById,
 
   async loader({ context, params: { expenseId, partyId } }) {

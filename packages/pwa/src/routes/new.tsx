@@ -67,7 +67,7 @@ function New() {
     return handle.documentId;
   }
 
-  const form = useForm<NewPartyFormValues>({
+  const form = useForm({
     defaultValues: {
       name: "",
       description: "",

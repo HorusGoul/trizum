@@ -16,7 +16,7 @@ import { Suspense, useId } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/party/$partyId/settings")({
+export const Route = createFileRoute("/party_/$partyId/settings")({
   component: PartySettings,
   loader: async ({ context, params }) => {
     await guardParticipatingInParty(params.partyId, context);
@@ -59,12 +59,12 @@ function PartySettings() {
     toast.success(t`Party settings saved!`);
   }
 
-  const form = useForm<PartySettingsFormValues>({
+  const form = useForm({
     defaultValues: {
       name: party.name,
       description: party.description,
       participants: Object.values(party.participants),
-    },
+    } as PartySettingsFormValues,
     onSubmit: ({ value }) => {
       onSaveSettings(value);
     },
