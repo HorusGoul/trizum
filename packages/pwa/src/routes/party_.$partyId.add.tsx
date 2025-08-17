@@ -45,7 +45,6 @@ function AddExpense() {
 
       const expense = await addExpenseToParty({
         name: values.name,
-        description: values.description,
         paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
@@ -84,7 +83,6 @@ function AddExpense() {
       onSubmit={onCreateExpense}
       defaultValues={{
         name: "",
-        description: "",
         amount: 0,
         paidBy: participant.id,
         shares: {},

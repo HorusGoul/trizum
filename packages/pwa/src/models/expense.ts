@@ -10,7 +10,6 @@ import Dinero from "dinero.js";
 export interface Expense {
   id: string;
   name: string;
-  description: string;
   paidAt: Date;
   paidBy: Record<ExpenseUser, number>;
   shares: Record<ExpenseUser, ExpenseShare>;

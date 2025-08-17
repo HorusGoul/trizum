@@ -15,7 +15,6 @@ import Dinero from "dinero.js";
 
 export interface ExpenseEditorFormValues {
   name: string;
-  description: string;
   amount: number;
   paidBy: ExpenseUser;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
@@ -181,25 +180,6 @@ export function ExpenseEditor({
               description={t`How do you want to call this expense ? `}
               minLength={1}
               maxLength={50}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="description">
-          {(field) => (
-            <AppTextField
-              label={t`Description`}
-              description={t`Optional description for this expense`}
-              maxLength={200}
               name={field.name}
               value={field.state.value}
               onChange={field.handleChange}

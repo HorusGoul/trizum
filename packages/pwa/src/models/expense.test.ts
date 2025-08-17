@@ -308,7 +308,6 @@ function createExpense(
   return {
     id: createExpenseId("test", timestamp),
     name: "",
-    description: "",
     paidAt: new Date(),
     paidBy,
     shares,
