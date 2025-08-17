@@ -2,7 +2,7 @@ import { t } from "@lingui/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { type Expense } from "#src/models/expense.js";
-import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
+import { convertToUnits } from "#src/lib/expenses.js";
 
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -29,15 +29,14 @@ function AddExpense() {
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
       const paidAt = new Date();
-      
+
       // Create shares based on the form values
       const shares: Expense["shares"] = {};
-      
+
       // Use the shares directly from the form
       Object.entries(values.shares).forEach(([participantId, share]) => {
         shares[participantId] = share;
       });
-
 
       toast.loading(t`Adding expense...`, {
         id: "add-expense",

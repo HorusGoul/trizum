@@ -1,7 +1,7 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import { Suspense, useId, useState, useMemo } from "react";
+import { Suspense, useId, useState } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
@@ -32,36 +32,49 @@ export function ExpenseEditor({
   defaultValues,
 }: ExpenseEditorProps) {
   const { party } = useCurrentParty();
-  
+
   // Derive initial mode from shares
-  const getInitialMode = (shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>) => {
+  const getInitialMode = (
+    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
+  ) => {
     for (const share of Object.values(shares)) {
-      if (share.type === "exact" || (share.type === "divide" && share.value !== 1)) {
+      if (
+        share.type === "exact" ||
+        (share.type === "divide" && share.value !== 1)
+      ) {
         return "advanced";
       }
     }
     return "simple";
   };
-  
+
   const [mode, setMode] = useState<"simple" | "advanced">(
-    getInitialMode(defaultValues.shares || {})
+    getInitialMode(defaultValues.shares || {}),
   );
-  
+
   const form = useForm({
     defaultValues: {
       ...defaultValues,
-      shares: defaultValues.shares || Object.keys(party.participants).reduce((acc, key) => {
-        if (!party.participants[key].isArchived) {
-          acc[key] = { type: "divide" as const, value: 1 };
-        }
-        return acc;
-      }, {} as Record<ExpenseUser, { type: "divide" | "exact"; value: number }>),
+      shares:
+        defaultValues.shares ||
+        Object.keys(party.participants).reduce(
+          (acc, key) => {
+            if (!party.participants[key].isArchived) {
+              acc[key] = { type: "divide" as const, value: 1 };
+            }
+            return acc;
+          },
+          {} as Record<
+            ExpenseUser,
+            { type: "divide" | "exact"; value: number }
+          >,
+        ),
     },
     onSubmit: ({ value }) => {
       // Validate that amounts add up correctly using Dinero.js for precise calculations
       const activeParticipants = Object.keys(value.shares);
       const totalAmount = Dinero({ amount: convertToUnits(value.amount) });
-      
+
       // Calculate total shares for divide participants
       const totalShares = activeParticipants.reduce((total, participantId) => {
         const share = value.shares[participantId];
@@ -70,16 +83,19 @@ export function ExpenseEditor({
         }
         return total;
       }, 0);
-      
+
       // Calculate total amount taken by exact shares using Dinero.js
-      const exactTotal = activeParticipants.reduce((total, participantId) => {
-        const share = value.shares[participantId];
-        if (share?.type === "exact") {
-          return total.add(Dinero({ amount: share.value }));
-        }
-        return total;
-      }, Dinero({ amount: 0 }));
-      
+      const exactTotal = activeParticipants.reduce(
+        (total, participantId) => {
+          const share = value.shares[participantId];
+          if (share?.type === "exact") {
+            return total.add(Dinero({ amount: share.value }));
+          }
+          return total;
+        },
+        Dinero({ amount: 0 }),
+      );
+
       // Calculate total split amount using Dinero.js
       let totalSplit = exactTotal;
       if (totalShares > 0) {
@@ -87,13 +103,15 @@ export function ExpenseEditor({
         const remainingAmount = totalAmount.subtract(exactTotal);
         totalSplit = exactTotal.add(remainingAmount);
       }
-      
+
       // Compare using Dinero.js equality
       if (!totalSplit.equalsTo(totalAmount)) {
-        toast.error(t`Expense amounts don't match total. Please check your split configuration.`);
+        toast.error(
+          t`Expense amounts don't match total. Please check your split configuration.`,
+        );
         return;
       }
-      
+
       onSubmit(value);
     },
   });
@@ -102,8 +120,8 @@ export function ExpenseEditor({
 
   const handleIncludeAllChange = (include: boolean) => {
     const newShares = { ...form.state.values.shares };
-    
-    Object.keys(party.participants).forEach(participantId => {
+
+    Object.keys(party.participants).forEach((participantId) => {
       if (!party.participants[participantId].isArchived) {
         if (include) {
           // Add participant - give them default share if they don't have one
@@ -116,17 +134,17 @@ export function ExpenseEditor({
         }
       }
     });
-    
+
     form.setFieldValue("shares", newShares);
   };
 
   const handleModeChange = (newMode: "simple" | "advanced") => {
     setMode(newMode);
-    
+
     if (newMode === "simple") {
       // Reset to even split for simple mode
       const newShares = { ...form.state.values.shares };
-      Object.keys(party.participants).forEach(participantId => {
+      Object.keys(party.participants).forEach((participantId) => {
         if (!party.participants[participantId].isArchived) {
           newShares[participantId] = { type: "divide" as const, value: 1 };
         }
@@ -224,8 +242,8 @@ export function ExpenseEditor({
                 className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700"
               >
                 {Object.values(party.participants)
-                  .filter(participant => !participant.isArchived)
-                  .map(participant => (
+                  .filter((participant) => !participant.isArchived)
+                  .map((participant) => (
                     <option key={participant.id} value={participant.id}>
                       {participant.name}
                     </option>
@@ -248,7 +266,7 @@ export function ExpenseEditor({
                 "flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                 mode === "simple"
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
               )}
             >
               {t`Simple`}
@@ -260,7 +278,7 @@ export function ExpenseEditor({
                 "flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                 mode === "advanced"
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
               )}
             >
               {t`Advanced`}
@@ -280,23 +298,34 @@ export function ExpenseEditor({
                   <input
                     type="checkbox"
                     id="include-all"
-                    checked={Object.keys(sharesField.state.value).length === Object.keys(party.participants).filter(id => !party.participants[id].isArchived).length}
+                    checked={
+                      Object.keys(sharesField.state.value).length ===
+                      Object.keys(party.participants).filter(
+                        (id) => !party.participants[id].isArchived,
+                      ).length
+                    }
                     onChange={(e) => {
                       handleIncludeAllChange(e.target.checked);
                     }}
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <label htmlFor="include-all" className="text-sm text-gray-600 dark:text-gray-400">
+                  <label
+                    htmlFor="include-all"
+                    className="text-sm text-gray-600 dark:text-gray-400"
+                  >
                     {t`Include all`}
                   </label>
                 </div>
               </div>
-              
+
               <div className="space-y-3">
                 {Object.values(party.participants)
-                  .filter(participant => !participant.isArchived)
-                  .map(participant => (
-                    <div key={participant.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+                  .filter((participant) => !participant.isArchived)
+                  .map((participant) => (
+                    <div
+                      key={participant.id}
+                      className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700"
+                    >
                       <div className="flex items-center gap-3">
                         <input
                           type="checkbox"
@@ -307,7 +336,10 @@ export function ExpenseEditor({
                               // Add participant - give them default share
                               const currentShares = sharesField.state.value;
                               const newShares = { ...currentShares };
-                              newShares[participant.id] = { type: "divide" as const, value: 1 };
+                              newShares[participant.id] = {
+                                type: "divide" as const,
+                                value: 1,
+                              };
                               sharesField.handleChange(newShares);
                             } else {
                               // Remove participant - remove their share
@@ -319,97 +351,175 @@ export function ExpenseEditor({
                           }}
                           className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <label htmlFor={`participant-${participant.id}`} className="font-medium">
+                        <label
+                          htmlFor={`participant-${participant.id}`}
+                          className="font-medium"
+                        >
                           {participant.name}
                         </label>
                       </div>
-                      
+
                       {sharesField.state.value[participant.id] && (
                         <div className="flex items-center gap-2">
                           {mode === "simple" ? (
                             <form.Subscribe
-                              selector={(state) => [state.values.shares, state.values.amount]}
+                              selector={(state) => [
+                                state.values.shares,
+                                state.values.amount,
+                              ]}
                             >
                               {([shares, amount]) => {
-                                const activeParticipants = Object.keys(form.state.values.shares);
+                                const activeParticipants = Object.keys(
+                                  form.state.values.shares,
+                                );
 
                                 // Calculate total shares for divide participants (this is just a count, not money)
-                                const totalShares = activeParticipants.reduce((total, participantId) => {
-                                  const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                                  if (share?.type === "divide") {
-                                    return total + share.value;
-                                  }
-                                  return total;
-                                }, 0);
+                                const totalShares = activeParticipants.reduce(
+                                  (total, participantId) => {
+                                    const share = (
+                                      shares as Record<
+                                        string,
+                                        {
+                                          type: "divide" | "exact";
+                                          value: number;
+                                        }
+                                      >
+                                    )[participantId];
+                                    if (share?.type === "divide") {
+                                      return total + share.value;
+                                    }
+                                    return total;
+                                  },
+                                  0,
+                                );
 
                                 const participantAmounts = (() => {
                                   // First, calculate the total amount taken by exact shares using Dinero.js
-                                  const exactTotal = activeParticipants.reduce((total, participantId) => {
-                                    const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                                    if (share?.type === "exact") {
-                                      return total.add(Dinero({ amount: share.value }));
-                                    }
-                                    return total;
-                                  }, Dinero({ amount: 0 }));
-                                  
-                                  // Remaining amount to be split among divide shares using Dinero.js
-                                  const totalAmount = Dinero({ amount: convertToUnits(amount as number) });
-                                  const remainingAmount = totalAmount.subtract(exactTotal);
-                                  
-                                  if (totalShares === 0) return {};
-                                  
-                                  // First pass: calculate proportional amounts
-                                  const proportionalAmounts = activeParticipants.reduce((acc, participantId) => {
-                                    const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                                    let participantAmount = 0;
-                                    
-                                    if (share?.type === "divide") {
-                                      // Calculate using Dinero.js for precise division
-                                      if (totalShares > 0) {
-                                        const shareRatio = share.value / totalShares;
-                                        const amountInUnits = remainingAmount.multiply(shareRatio);
-                                        participantAmount = amountInUnits.getAmount() / 100; // Convert cents to dollars/euros
+                                  const exactTotal = activeParticipants.reduce(
+                                    (total, participantId) => {
+                                      const share = (
+                                        shares as Record<
+                                          string,
+                                          {
+                                            type: "divide" | "exact";
+                                            value: number;
+                                          }
+                                        >
+                                      )[participantId];
+                                      if (share?.type === "exact") {
+                                        return total.add(
+                                          Dinero({ amount: share.value }),
+                                        );
                                       }
-                                    } else if (share?.type === "exact") {
-                                      // Convert units back to display amount
-                                      participantAmount = share.value / 100; // Convert cents to dollars/euros
-                                    }
-                                    
-                                    acc[participantId] = participantAmount;
-                                    return acc;
-                                  }, {} as Record<string, number>);
-                                  
+                                      return total;
+                                    },
+                                    Dinero({ amount: 0 }),
+                                  );
+
+                                  // Remaining amount to be split among divide shares using Dinero.js
+                                  const totalAmount = Dinero({
+                                    amount: convertToUnits(amount as number),
+                                  });
+                                  const remainingAmount =
+                                    totalAmount.subtract(exactTotal);
+
+                                  if (totalShares === 0) return {};
+
+                                  // First pass: calculate proportional amounts
+                                  const proportionalAmounts =
+                                    activeParticipants.reduce(
+                                      (acc, participantId) => {
+                                        const share = (
+                                          shares as Record<
+                                            string,
+                                            {
+                                              type: "divide" | "exact";
+                                              value: number;
+                                            }
+                                          >
+                                        )[participantId];
+                                        let participantAmount = 0;
+
+                                        if (share?.type === "divide") {
+                                          // Calculate using Dinero.js for precise division
+                                          if (totalShares > 0) {
+                                            const shareRatio =
+                                              share.value / totalShares;
+                                            const amountInUnits =
+                                              remainingAmount.multiply(
+                                                shareRatio,
+                                              );
+                                            participantAmount =
+                                              amountInUnits.getAmount() / 100; // Convert cents to dollars/euros
+                                          }
+                                        } else if (share?.type === "exact") {
+                                          // Convert units back to display amount
+                                          participantAmount = share.value / 100; // Convert cents to dollars/euros
+                                        }
+
+                                        acc[participantId] = participantAmount;
+                                        return acc;
+                                      },
+                                      {} as Record<string, number>,
+                                    );
+
                                   // Second pass: distribute remaining cents to ensure total adds up exactly
-                                  const totalCalculated = Object.values(proportionalAmounts).reduce((sum, amount) => sum + amount, 0);
-                                  const remainingCents = Math.round((amount as number - totalCalculated) * 100);
-                                  
+                                  const totalCalculated = Object.values(
+                                    proportionalAmounts,
+                                  ).reduce((sum, amount) => sum + amount, 0);
+                                  const remainingCents = Math.round(
+                                    ((amount as number) - totalCalculated) *
+                                      100,
+                                  );
+
                                   if (remainingCents !== 0) {
                                     // Find divide participants to distribute remaining cents
-                                    const divideParticipants = activeParticipants.filter(participantId => {
-                                      const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                                      return share?.type === "divide";
-                                    });
-                                    
+                                    const divideParticipants =
+                                      activeParticipants.filter(
+                                        (participantId) => {
+                                          const share = (
+                                            shares as Record<
+                                              string,
+                                              {
+                                                type: "divide" | "exact";
+                                                value: number;
+                                              }
+                                            >
+                                          )[participantId];
+                                          return share?.type === "divide";
+                                        },
+                                      );
+
                                     if (divideParticipants.length > 0) {
                                       // Distribute remaining cents one by one to divide participants
-                                      for (let i = 0; i < Math.abs(remainingCents); i++) {
-                                        const participantIndex = i % divideParticipants.length;
-                                        const participantId = divideParticipants[participantIndex];
+                                      for (
+                                        let i = 0;
+                                        i < Math.abs(remainingCents);
+                                        i++
+                                      ) {
+                                        const participantIndex =
+                                          i % divideParticipants.length;
+                                        const participantId =
+                                          divideParticipants[participantIndex];
                                         if (remainingCents > 0) {
-                                          proportionalAmounts[participantId] += 0.01;
+                                          proportionalAmounts[participantId] +=
+                                            0.01;
                                         } else {
-                                          proportionalAmounts[participantId] -= 0.01;
+                                          proportionalAmounts[participantId] -=
+                                            0.01;
                                         }
                                       }
                                     }
                                   }
-                                  
+
                                   return proportionalAmounts;
                                 })();
 
                                 return (
                                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    {participantAmounts[participant.id]?.toFixed(2) || "0.00"}
+                                    {participantAmounts[
+                                      participant.id
+                                    ]?.toFixed(2) || "0.00"}
                                   </span>
                                 );
                               }}
@@ -421,128 +531,233 @@ export function ExpenseEditor({
                                   selector={(state) => [state.values.amount]}
                                 >
                                   {([amount]) => {
-                                    const activeParticipants = Object.keys(form.state.values.shares);
+                                    const activeParticipants = Object.keys(
+                                      form.state.values.shares,
+                                    );
 
                                     // Calculate total shares for divide participants (this is just a count, not money)
-                                    const totalShares = activeParticipants.reduce((total, participantId) => {
-                                      const share = sharesField.state.value[participantId];
-                                      if (share?.type === "divide") {
-                                        return total + share.value;
-                                      }
-                                      return total;
-                                    }, 0);
+                                    const totalShares =
+                                      activeParticipants.reduce(
+                                        (total, participantId) => {
+                                          const share =
+                                            sharesField.state.value[
+                                              participantId
+                                            ];
+                                          if (share?.type === "divide") {
+                                            return total + share.value;
+                                          }
+                                          return total;
+                                        },
+                                        0,
+                                      );
 
                                     const participantAmounts = (() => {
                                       // First, calculate the total amount taken by exact shares using Dinero.js
-                                      const exactTotal = activeParticipants.reduce((total, participantId) => {
-                                        const share = sharesField.state.value[participantId];
-                                        if (share?.type === "exact") {
-                                          return total.add(Dinero({ amount: share.value }));
-                                        }
-                                        return total;
-                                      }, Dinero({ amount: 0 }));
-                                      
+                                      const exactTotal =
+                                        activeParticipants.reduce(
+                                          (total, participantId) => {
+                                            const share =
+                                              sharesField.state.value[
+                                                participantId
+                                              ];
+                                            if (share?.type === "exact") {
+                                              return total.add(
+                                                Dinero({ amount: share.value }),
+                                              );
+                                            }
+                                            return total;
+                                          },
+                                          Dinero({ amount: 0 }),
+                                        );
+
                                       // Remaining amount to be split among divide shares using Dinero.js
-                                      const totalAmount = Dinero({ amount: convertToUnits(amount as number) });
-                                      const remainingAmount = totalAmount.subtract(exactTotal);
-                                      
+                                      const totalAmount = Dinero({
+                                        amount: convertToUnits(
+                                          amount as number,
+                                        ),
+                                      });
+                                      const remainingAmount =
+                                        totalAmount.subtract(exactTotal);
+
                                       if (totalShares === 0) return {};
-                                      
+
                                       // First pass: calculate proportional amounts
-                                      const proportionalAmounts = activeParticipants.reduce((acc, participantId) => {
-                                        const share = sharesField.state.value[participantId];
-                                        let participantAmount = 0;
-                                        
-                                        if (share?.type === "divide") {
-                                          // Calculate using Dinero.js for precise division
-                                          if (totalShares > 0) {
-                                            const shareRatio = share.value / totalShares;
-                                            const amountInUnits = remainingAmount.multiply(shareRatio);
-                                            participantAmount = amountInUnits.getAmount() / 100; // Convert cents to dollars/euros
-                                          }
-                                        } else if (share?.type === "exact") {
-                                          // Convert units back to display amount
-                                          participantAmount = Dinero({ amount: share.value }).getAmount() / 100; // Convert cents to dollars/euros
-                                        }
-                                        
-                                        acc[participantId] = participantAmount;
-                                        return acc;
-                                      }, {} as Record<string, number>);
-                                      
+                                      const proportionalAmounts =
+                                        activeParticipants.reduce(
+                                          (acc, participantId) => {
+                                            const share =
+                                              sharesField.state.value[
+                                                participantId
+                                              ];
+                                            let participantAmount = 0;
+
+                                            if (share?.type === "divide") {
+                                              // Calculate using Dinero.js for precise division
+                                              if (totalShares > 0) {
+                                                const shareRatio =
+                                                  share.value / totalShares;
+                                                const amountInUnits =
+                                                  remainingAmount.multiply(
+                                                    shareRatio,
+                                                  );
+                                                participantAmount =
+                                                  amountInUnits.getAmount() /
+                                                  100; // Convert cents to dollars/euros
+                                              }
+                                            } else if (
+                                              share?.type === "exact"
+                                            ) {
+                                              // Convert units back to display amount
+                                              participantAmount =
+                                                Dinero({
+                                                  amount: share.value,
+                                                }).getAmount() / 100; // Convert cents to dollars/euros
+                                            }
+
+                                            acc[participantId] =
+                                              participantAmount;
+                                            return acc;
+                                          },
+                                          {} as Record<string, number>,
+                                        );
+
                                       // Second pass: distribute remaining cents to ensure total adds up exactly
-                                      const totalCalculated = Object.values(proportionalAmounts).reduce((sum, amount) => sum + amount, 0);
-                                      const remainingCents = Math.round((amount as number - totalCalculated) * 100);
-                                      
+                                      const totalCalculated = Object.values(
+                                        proportionalAmounts,
+                                      ).reduce(
+                                        (sum, amount) => sum + amount,
+                                        0,
+                                      );
+                                      const remainingCents = Math.round(
+                                        ((amount as number) - totalCalculated) *
+                                          100,
+                                      );
+
                                       if (remainingCents !== 0) {
                                         // Find divide participants to distribute remaining cents
-                                        const divideParticipants = activeParticipants.filter(participantId => {
-                                          const share = sharesField.state.value[participantId];
-                                          return share?.type === "divide";
-                                        });
-                                        
+                                        const divideParticipants =
+                                          activeParticipants.filter(
+                                            (participantId) => {
+                                              const share =
+                                                sharesField.state.value[
+                                                  participantId
+                                                ];
+                                              return share?.type === "divide";
+                                            },
+                                          );
+
                                         if (divideParticipants.length > 0) {
                                           // Distribute remaining cents one by one to divide participants
-                                          for (let i = 0; i < Math.abs(remainingCents); i++) {
-                                            const participantIndex = i % divideParticipants.length;
-                                            const participantId = divideParticipants[participantIndex];
+                                          for (
+                                            let i = 0;
+                                            i < Math.abs(remainingCents);
+                                            i++
+                                          ) {
+                                            const participantIndex =
+                                              i % divideParticipants.length;
+                                            const participantId =
+                                              divideParticipants[
+                                                participantIndex
+                                              ];
                                             if (remainingCents > 0) {
-                                              proportionalAmounts[participantId] += 0.01;
+                                              proportionalAmounts[
+                                                participantId
+                                              ] += 0.01;
                                             } else {
-                                              proportionalAmounts[participantId] -= 0.01;
+                                              proportionalAmounts[
+                                                participantId
+                                              ] -= 0.01;
                                             }
                                           }
                                         }
                                       }
-                                      
+
                                       return proportionalAmounts;
                                     })();
 
                                     return (
                                       <div className="flex items-center gap-2">
                                         <select
-                                          value={sharesField.state.value[participant.id]?.type || "divide"}
+                                          value={
+                                            sharesField.state.value[
+                                              participant.id
+                                            ]?.type || "divide"
+                                          }
                                           onChange={(e) => {
-                                            const newShares = { ...sharesField.state.value };
-                                            const newType = e.target.value as "divide" | "exact";
-                                            
+                                            const newShares = {
+                                              ...sharesField.state.value,
+                                            };
+                                            const newType = e.target.value as
+                                              | "divide"
+                                              | "exact";
+
                                             if (newType === "exact") {
                                               // When switching to exact, calculate the current divide amount
-                                              const currentShare = sharesField.state.value[participant.id];
+                                              const currentShare =
+                                                sharesField.state.value[
+                                                  participant.id
+                                                ];
                                               let exactValue = 0;
-                                              
-                                              if (currentShare?.type === "divide") {
+
+                                              if (
+                                                currentShare?.type === "divide"
+                                              ) {
                                                 // Calculate what this participant would pay with current divide
-                                                                                const activeParticipants = Object.keys(form.state.values.shares);
-                                                
-                                                const totalShares = activeParticipants.reduce((total, participantId) => {
-                                                  const share = sharesField.state.value[participantId];
-                                                  if (share?.type === "divide") {
-                                                    return total + share.value;
-                                                  }
-                                                  return total;
-                                                }, 0);
-                                                
+                                                const activeParticipants =
+                                                  Object.keys(
+                                                    form.state.values.shares,
+                                                  );
+
+                                                const totalShares =
+                                                  activeParticipants.reduce(
+                                                    (total, participantId) => {
+                                                      const share =
+                                                        sharesField.state.value[
+                                                          participantId
+                                                        ];
+                                                      if (
+                                                        share?.type === "divide"
+                                                      ) {
+                                                        return (
+                                                          total + share.value
+                                                        );
+                                                      }
+                                                      return total;
+                                                    },
+                                                    0,
+                                                  );
+
                                                 if (totalShares > 0) {
                                                   // Calculate using Dinero.js for precision
-                                                  const totalAmount = Dinero({ amount: convertToUnits(amount as number) });
-                                                  const shareRatio = currentShare.value / totalShares;
-                                                  const amountInUnits = totalAmount.multiply(shareRatio);
-                                                  exactValue = amountInUnits.getAmount();
+                                                  const totalAmount = Dinero({
+                                                    amount: convertToUnits(
+                                                      amount as number,
+                                                    ),
+                                                  });
+                                                  const shareRatio =
+                                                    currentShare.value /
+                                                    totalShares;
+                                                  const amountInUnits =
+                                                    totalAmount.multiply(
+                                                      shareRatio,
+                                                    );
+                                                  exactValue =
+                                                    amountInUnits.getAmount();
                                                 }
                                               }
-                                              
+
                                               newShares[participant.id] = {
                                                 type: "exact",
-                                                value: exactValue
+                                                value: exactValue,
                                               };
                                             } else {
                                               // When switching to divide, default to 1
                                               newShares[participant.id] = {
                                                 type: "divide",
-                                                value: 1
+                                                value: 1,
                                               };
                                             }
-                                            
+
                                             sharesField.handleChange(newShares);
                                           }}
                                           className="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
@@ -550,20 +765,31 @@ export function ExpenseEditor({
                                           <option value="divide">{t`Divide`}</option>
                                           <option value="exact">{t`Exact`}</option>
                                         </select>
-                                        
-                                        {sharesField.state.value[participant.id]?.type === "divide" ? (
+
+                                        {sharesField.state.value[participant.id]
+                                          ?.type === "divide" ? (
                                           <input
                                             type="number"
                                             min="0.1"
                                             step="0.1"
-                                            value={sharesField.state.value[participant.id]?.value || 1}
+                                            value={
+                                              sharesField.state.value[
+                                                participant.id
+                                              ]?.value || 1
+                                            }
                                             onChange={(e) => {
-                                              const newShares = { ...sharesField.state.value };
+                                              const newShares = {
+                                                ...sharesField.state.value,
+                                              };
                                               newShares[participant.id] = {
                                                 type: "divide",
-                                                value: parseFloat(e.target.value) || 1
+                                                value:
+                                                  parseFloat(e.target.value) ||
+                                                  1,
                                               };
-                                              sharesField.handleChange(newShares);
+                                              sharesField.handleChange(
+                                                newShares,
+                                              );
                                             }}
                                             className="w-20 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
                                           />
@@ -572,21 +798,40 @@ export function ExpenseEditor({
                                             type="number"
                                             min="0"
                                             step="0.01"
-                                            value={sharesField.state.value[participant.id]?.type === "exact" ? (sharesField.state.value[participant.id]?.value || 0) / 100 : sharesField.state.value[participant.id]?.value || 0}
+                                            value={
+                                              sharesField.state.value[
+                                                participant.id
+                                              ]?.type === "exact"
+                                                ? (sharesField.state.value[
+                                                    participant.id
+                                                  ]?.value || 0) / 100
+                                                : sharesField.state.value[
+                                                    participant.id
+                                                  ]?.value || 0
+                                            }
                                             onChange={(e) => {
-                                              const newShares = { ...sharesField.state.value };
+                                              const newShares = {
+                                                ...sharesField.state.value,
+                                              };
                                               newShares[participant.id] = {
                                                 type: "exact",
-                                                value: convertToUnits(parseFloat(e.target.value) || 0)
+                                                value: convertToUnits(
+                                                  parseFloat(e.target.value) ||
+                                                    0,
+                                                ),
                                               };
-                                              sharesField.handleChange(newShares);
+                                              sharesField.handleChange(
+                                                newShares,
+                                              );
                                             }}
                                             className="w-24 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
                                           />
                                         )}
-                                        
+
                                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                                          {participantAmounts[participant.id]?.toFixed(2) || "0.00"}
+                                          {participantAmounts[
+                                            participant.id
+                                          ]?.toFixed(2) || "0.00"}
                                         </span>
                                       </div>
                                     );
@@ -609,65 +854,110 @@ export function ExpenseEditor({
           selector={(state) => [state.values.shares, state.values.amount]}
         >
           {([shares, amount]) => {
-            const activeParticipants = Object.keys(shares as Record<string, { type: "divide" | "exact"; value: number }>);
+            const activeParticipants = Object.keys(
+              shares as Record<
+                string,
+                { type: "divide" | "exact"; value: number }
+              >,
+            );
 
             // Calculate total shares for divide participants (this is just a count, not money)
-            const totalShares = activeParticipants.reduce((total, participantId) => {
-              const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-              if (share?.type === "divide") {
-                return total + share.value;
-              }
-              return total;
-            }, 0);
+            const totalShares = activeParticipants.reduce(
+              (total, participantId) => {
+                const share = (
+                  shares as Record<
+                    string,
+                    { type: "divide" | "exact"; value: number }
+                  >
+                )[participantId];
+                if (share?.type === "divide") {
+                  return total + share.value;
+                }
+                return total;
+              },
+              0,
+            );
 
             const participantAmounts = (() => {
               // First, calculate the total amount taken by exact shares using Dinero.js
-              const exactTotal = activeParticipants.reduce((total, participantId) => {
-                const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                if (share?.type === "exact") {
-                  return total.add(Dinero({ amount: share.value }));
-                }
-                return total;
-              }, Dinero({ amount: 0 }));
-              
-              // Remaining amount to be split among divide shares using Dinero.js
-              const totalAmount = Dinero({ amount: convertToUnits(amount as number) });
-              const remainingAmount = totalAmount.subtract(exactTotal);
-              
-              if (totalShares === 0) return {};
-              
-              // First pass: calculate proportional amounts
-              const proportionalAmounts = activeParticipants.reduce((acc, participantId) => {
-                const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                let participantAmount = 0;
-                
-                if (share?.type === "divide") {
-                  // Calculate using Dinero.js for precise division
-                  if (totalShares > 0) {
-                    const shareRatio = share.value / totalShares;
-                    const amountInUnits = remainingAmount.multiply(shareRatio);
-                    participantAmount = amountInUnits.getAmount() / 100; // Convert cents to dollars/euros
+              const exactTotal = activeParticipants.reduce(
+                (total, participantId) => {
+                  const share = (
+                    shares as Record<
+                      string,
+                      { type: "divide" | "exact"; value: number }
+                    >
+                  )[participantId];
+                  if (share?.type === "exact") {
+                    return total.add(Dinero({ amount: share.value }));
                   }
-                } else if (share?.type === "exact") {
-                  // Convert units back to display amount
-                  participantAmount = Dinero({ amount: share.value }).getAmount() / 100; // Convert cents to dollars/euros
-                }
-                
-                acc[participantId] = participantAmount;
-                return acc;
-              }, {} as Record<string, number>);
-              
+                  return total;
+                },
+                Dinero({ amount: 0 }),
+              );
+
+              // Remaining amount to be split among divide shares using Dinero.js
+              const totalAmount = Dinero({
+                amount: convertToUnits(amount as number),
+              });
+              const remainingAmount = totalAmount.subtract(exactTotal);
+
+              if (totalShares === 0) return {};
+
+              // First pass: calculate proportional amounts
+              const proportionalAmounts = activeParticipants.reduce(
+                (acc, participantId) => {
+                  const share = (
+                    shares as Record<
+                      string,
+                      { type: "divide" | "exact"; value: number }
+                    >
+                  )[participantId];
+                  let participantAmount = 0;
+
+                  if (share?.type === "divide") {
+                    // Calculate using Dinero.js for precise division
+                    if (totalShares > 0) {
+                      const shareRatio = share.value / totalShares;
+                      const amountInUnits =
+                        remainingAmount.multiply(shareRatio);
+                      participantAmount = amountInUnits.getAmount() / 100; // Convert cents to dollars/euros
+                    }
+                  } else if (share?.type === "exact") {
+                    // Convert units back to display amount
+                    participantAmount =
+                      Dinero({ amount: share.value }).getAmount() / 100; // Convert cents to dollars/euros
+                  }
+
+                  acc[participantId] = participantAmount;
+                  return acc;
+                },
+                {} as Record<string, number>,
+              );
+
               // Second pass: distribute remaining cents to ensure total adds up exactly
-              const totalCalculated = Object.values(proportionalAmounts).reduce((sum, amount) => sum + amount, 0);
-              const remainingCents = Math.round((amount as number - totalCalculated) * 100);
-              
+              const totalCalculated = Object.values(proportionalAmounts).reduce(
+                (sum, amount) => sum + amount,
+                0,
+              );
+              const remainingCents = Math.round(
+                ((amount as number) - totalCalculated) * 100,
+              );
+
               if (remainingCents !== 0) {
                 // Find divide participants to distribute remaining cents
-                const divideParticipants = activeParticipants.filter(participantId => {
-                  const share = (shares as Record<string, { type: "divide" | "exact"; value: number }>)[participantId];
-                  return share?.type === "divide";
-                });
-                
+                const divideParticipants = activeParticipants.filter(
+                  (participantId) => {
+                    const share = (
+                      shares as Record<
+                        string,
+                        { type: "divide" | "exact"; value: number }
+                      >
+                    )[participantId];
+                    return share?.type === "divide";
+                  },
+                );
+
                 if (divideParticipants.length > 0) {
                   // Distribute remaining cents one by one to divide participants
                   for (let i = 0; i < Math.abs(remainingCents); i++) {
@@ -681,7 +971,7 @@ export function ExpenseEditor({
                   }
                 }
               }
-              
+
               return proportionalAmounts;
             })();
 
@@ -690,10 +980,17 @@ export function ExpenseEditor({
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">{t`Total split:`}</span>
                   <span className="font-medium">
-                    {Object.values(participantAmounts).reduce((sum: number, amount: number) => sum + amount, 0).toFixed(2)}
+                    {Object.values(participantAmounts)
+                      .reduce((sum: number, amount: number) => sum + amount, 0)
+                      .toFixed(2)}
                   </span>
                 </div>
-                {Math.abs(Object.values(participantAmounts).reduce((sum: number, amount: number) => sum + amount, 0) - (amount as number)) > 0.01 && (
+                {Math.abs(
+                  Object.values(participantAmounts).reduce(
+                    (sum: number, amount: number) => sum + amount,
+                    0,
+                  ) - (amount as number),
+                ) > 0.01 && (
                   <div className="mt-2 text-sm text-red-600 dark:text-red-400">
                     {t`Warning: Split amounts don't match total expense`}
                   </div>
