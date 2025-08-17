@@ -35,11 +35,15 @@ msgstr "Add or create"
 msgid "Add participant"
 msgstr "Add participant"
 
-#: src/routes/party_.$partyId.add.tsx:41
+#: src/routes/party_.$partyId.add.tsx:42
 msgid "Adding expense..."
 msgstr "Adding expense..."
 
-#: src/components/ExpenseEditor.tsx:98
+#: src/components/ExpenseEditor.tsx:286
+msgid "Advanced"
+msgstr "Advanced"
+
+#: src/components/ExpenseEditor.tsx:220
 msgid "Amount"
 msgstr "Amount"
 
@@ -68,6 +72,7 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
+#: src/components/ExpenseEditor.tsx:200
 #: src/routes/new.tsx:184
 #: src/routes/party_.$partyId.settings.tsx:178
 msgid "Description"
@@ -77,15 +82,31 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
-#: src/routes/party_.$partyId.add.tsx:62
+#: src/components/ExpenseEditor.tsx:570
+msgid "Divide"
+msgstr "Divide"
+
+#: src/components/ExpenseEditor.tsx:571
+msgid "Exact"
+msgstr "Exact"
+
+#: src/routes/party_.$partyId.add.tsx:63
 msgid "Expense added"
 msgstr "Expense added"
+
+#: src/components/ExpenseEditor.tsx:94
+msgid "Expense amounts don't match total. Please check your split configuration."
+msgstr "Expense amounts don't match total. Please check your split configuration."
+
+#: src/components/ExpenseEditor.tsx:261
+msgid "Expense Split Mode"
+msgstr "Expense Split Mode"
 
 #: src/routes/party.$partyId.tsx:138
 msgid "Expenses"
 msgstr "Expenses"
 
-#: src/routes/party_.$partyId.add.tsx:67
+#: src/routes/party_.$partyId.add.tsx:68
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
@@ -97,7 +118,7 @@ msgstr "For payments through Bizum or similar services"
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
-#: src/components/ExpenseEditor.tsx:78
+#: src/components/ExpenseEditor.tsx:181
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
@@ -117,6 +138,10 @@ msgstr "ID is required"
 #: src/routes/party.$partyId.tsx:249
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
+
+#: src/components/ExpenseEditor.tsx:310
+msgid "Include all"
+msgstr "Include all"
 
 #: src/routes/index.tsx:99
 msgid "Join a Party"
@@ -142,7 +167,7 @@ msgstr "Menu"
 msgid "Name must be less than 50 characters"
 msgstr "Name must be less than 50 characters"
 
-#: src/routes/party_.$partyId.add.tsx:82
+#: src/routes/party_.$partyId.add.tsx:83
 msgid "New expense"
 msgstr "New expense"
 
@@ -159,9 +184,17 @@ msgstr "New trizum"
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
+#: src/components/ExpenseEditor.tsx:201
+msgid "Optional description for this expense"
+msgstr "Optional description for this expense"
+
 #: src/routes/party.$partyId.tsx:472
 msgid "Other operations"
 msgstr "Other operations"
+
+#: src/components/ExpenseEditor.tsx:237
+msgid "Paid by"
+msgstr "Paid by"
 
 #: src/routes/new.tsx:248
 #: src/routes/party_.$partyId.settings.tsx:274
@@ -169,6 +202,7 @@ msgstr "Other operations"
 msgid "Participant name"
 msgstr "Participant name"
 
+#: src/components/ExpenseEditor.tsx:297
 #: src/routes/new.tsx:205
 #: src/routes/party_.$partyId.settings.tsx:197
 msgid "Participants"
@@ -219,7 +253,7 @@ msgstr "Remove"
 msgid "Restore"
 msgstr "Restore"
 
-#: src/components/ExpenseEditor.tsx:50
+#: src/components/ExpenseEditor.tsx:153
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
@@ -238,7 +272,11 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/components/ExpenseEditor.tsx:50
+#: src/components/ExpenseEditor.tsx:274
+msgid "Simple"
+msgstr "Simple"
+
+#: src/components/ExpenseEditor.tsx:153
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
@@ -255,7 +293,7 @@ msgstr "Tap to change"
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/components/ExpenseEditor.tsx:77
+#: src/components/ExpenseEditor.tsx:180
 #: src/routes/new.tsx:159
 #: src/routes/party_.$partyId.settings.tsx:153
 msgid "Title"
@@ -273,6 +311,10 @@ msgstr "Title must be less than 50 characters"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
+#: src/components/ExpenseEditor.tsx:711
+msgid "Total split:"
+msgstr "Total split:"
+
 #: src/routes/party_.$partyId.who.tsx:119
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
@@ -288,6 +330,10 @@ msgstr "Username"
 #: src/routes/party.$partyId.tsx:92
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
+
+#: src/components/ExpenseEditor.tsx:718
+msgid "Warning: Split amounts don't match total expense"
+msgstr "Warning: Split amounts don't match total expense"
 
 #: src/routes/party_.$partyId.who.tsx:48
 msgid "Welcome to the party, {0}!"
