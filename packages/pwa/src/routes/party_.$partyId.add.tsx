@@ -29,14 +29,15 @@ function AddExpense() {
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
       const paidAt = new Date();
-      // TODO: handle more expense share types
-      const shares: Expense["shares"] = Object.keys(party.participants).reduce(
-        (acc, key) => {
-          acc[key as ExpenseUser] = { type: "divide", value: 1 };
-          return acc;
-        },
-        {} as Expense["shares"],
-      );
+      
+      // Create shares based on the form values
+      const shares: Expense["shares"] = {};
+      
+      // Use the shares directly from the form
+      Object.entries(values.shares).forEach(([participantId, share]) => {
+        shares[participantId] = share;
+      });
+
 
       toast.loading(t`Adding expense...`, {
         id: "add-expense",
@@ -86,6 +87,7 @@ function AddExpense() {
         description: "",
         amount: 0,
         paidBy: participant.id,
+        shares: {},
       }}
     />
   );
