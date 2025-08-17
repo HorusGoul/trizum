@@ -3,6 +3,7 @@ import {
   createExpenseId,
   exportIntoInput,
   findExpenseById,
+  getImpactOnBalanceForUser,
   type Expense,
   type ExpenseShare,
 } from "./expense";
@@ -197,6 +198,31 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
       },
     ];
     expect(result).toStrictEqual(expected);
+  });
+
+  test("should handle rounding errors correctly - expense with 2.00 impact should not show 2.01", () => {
+    const expense = createExpense({
+      paidBy: {
+        "user1": 1000, // user1 paid 10.00 euros
+      },
+      shares: {
+        "user1": { type: "exact", value: 800 }, // user1 pays 800 = 8.00
+        "user2": { type: "divide", value: 1 }, // user2 pays 1/3 of remaining = 0.67
+        "user3": { type: "divide", value: 1 }, // user3 pays 1/3 of remaining = 0.67
+        "user4": { type: "divide", value: 1 }, // user4 pays 1/3 of remaining = 0.66
+      },
+    });
+
+    const result = exportIntoInput(expense);
+    
+    // The expense is 10.00 euros split with 4 peoples using exact and divide shares
+    // Users should owe 2.00 euros to user1
+    // This should not result in rounding errors that cause 2.01 to appear
+    expect(result).toHaveLength(1);
+    expect(result[0].expense).toBe(1000);
+
+    const impact = getImpactOnBalanceForUser(expense, "user1");
+    expect(impact).toBe(200);
   });
 });
 
