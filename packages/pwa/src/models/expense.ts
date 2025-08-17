@@ -5,6 +5,7 @@ import {
 } from "#src/lib/expenses.js";
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
+import Dinero from "dinero.js";
 
 export interface Expense {
   id: string;
@@ -33,42 +34,54 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     console.warn("Noone paid for this Expense");
     return [];
   }
+
   const total = Object.values(expense.paidBy).reduce(
-    (acc, curr) => acc + curr,
-    0,
+    (acc, curr) => acc.add(Dinero({ amount: curr })),
+    Dinero({ amount: 0 }),
   );
+
   return Object.keys(expense.paidBy).map((user): ExpenseInput => {
     const partial = expense.paidBy[user];
-    const factor = partial / total;
+    const factor = partial / total.getAmount();
     const paidFor: Record<ExpenseUser, number> = {};
-    let amountLeft = partial;
+    let amountLeft = Dinero({ amount: partial });
+  
     const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(
       expense.shares,
     )
       .filter((share) => expense.shares[share].type === "exact")
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
+
     const divides: Record<ExpenseUser, ExpenseShareDivide> = Object.keys(
       expense.shares,
     )
       .filter((share) => expense.shares[share].type === "divide")
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
+
     for (const exact of Object.keys(exacts)) {
-      const amount = exacts[exact].value * factor;
-      paidFor[exact] = amount / partial;
-      amountLeft -= amount;
+      const amount = Dinero({ amount: exacts[exact].value }).multiply(factor);
+      paidFor[exact] = amount.getAmount();
+      amountLeft = amountLeft.subtract(amount);
     }
-    if (amountLeft < 0) {
+
+    if (amountLeft.getAmount() < 0) {
       console.error("Negative amounts left");
     }
+
     const totalDivides = Object.values(divides).reduce(
       (acc, curr) => acc + curr.value,
       0,
     );
+
+    const totalLeftForDivides = Dinero({ amount: amountLeft.getAmount() });
+
     for (const divide of Object.keys(divides)) {
       const dFactor = divides[divide].value / totalDivides;
-      const amount = amountLeft * dFactor;
-      paidFor[divide] = amount / partial;
+      const amount = totalLeftForDivides.multiply(dFactor);
+      paidFor[divide] = amount.getAmount();
+      amountLeft = amountLeft.subtract(amount);
     }
+
     return {
       version: 1,
       paidBy: user,

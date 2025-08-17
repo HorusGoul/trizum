@@ -27,9 +27,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "1",
         paidFor: {
-          "1": 0.2,
-          "2": 0.5,
-          "3": 0.3,
+          "1": 10,
+          "2": 25,
+          "3": 15,
         },
         expense: 50,
       },
@@ -39,7 +39,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   test("single divide", () => {
     const expense = createExpense({
       paidBy: {
-        "1": 10,
+        "1": 100,
       },
       shares: {
         "1": { type: "divide", value: 1 },
@@ -53,11 +53,11 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "1",
         paidFor: {
-          "1": 0.25,
-          "2": 0.25,
-          "3": 0.5,
+          "1": 25,
+          "2": 25,
+          "3": 50,
         },
-        expense: 10,
+        expense: 100,
       },
     ];
     expect(result).toStrictEqual(expected);
@@ -79,9 +79,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "1",
         paidFor: {
-          "1": 0.25,
-          "2": 0.25,
-          "3": 0.5,
+          "1": 10,
+          "2": 10,
+          "3": 20,
         },
         expense: 40,
       },
@@ -106,9 +106,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "1",
         paidFor: {
-          "1": 0.35,
-          "2": 0.15,
-          "3": 0.5,
+          "1": 14,
+          "2": 6,
+          "3": 20,
         },
         expense: 40,
       },
@@ -116,9 +116,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "2",
         paidFor: {
-          "1": 0.35,
-          "2": 0.15,
-          "3": 0.5,
+          "1": 7,
+          "2": 3,
+          "3": 10,
         },
         expense: 20,
       },
@@ -143,9 +143,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "1",
         paidFor: {
-          "1": 0.25,
-          "2": 0.25,
-          "3": 0.5,
+          "1": 10,
+          "2": 10,
+          "3": 20,
         },
         expense: 40,
       },
@@ -153,9 +153,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "2",
         paidFor: {
-          "1": 0.25,
-          "2": 0.25,
-          "3": 0.5,
+          "1": 5,
+          "2": 5,
+          "3": 10,
         },
         expense: 20,
       },
@@ -180,9 +180,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "1",
         paidFor: {
-          "1": 0.1,
-          "2": 0.3,
-          "3": 0.6,
+          "1": 4,
+          "2": 12,
+          "3": 24,
         },
         expense: 40,
       },
@@ -190,9 +190,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "2",
         paidFor: {
-          "1": 0.1,
-          "2": 0.3,
-          "3": 0.6,
+          "1": 2,
+          "2": 6,
+          "3": 12,
         },
         expense: 20,
       },
