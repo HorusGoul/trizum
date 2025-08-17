@@ -5,6 +5,12 @@ export type ExpenseUser = string;
 export interface ExpenseInput {
   version: 1;
   paidBy: ExpenseUser;
+
+  /**
+   * A map of the users that will owe money to the paidBy user.
+   *
+   * Values are in units of cents.
+   */
   paidFor: Record<ExpenseUser, number>;
   expense: number;
 }
@@ -107,9 +113,11 @@ function getSplitTotal(
         amount: next.expense,
       });
 
-      amount = amount.multiply(
-        reverse ? 1 - next.paidFor[uid] : next.paidFor[uid],
-      );
+      amount = reverse
+        ? Dinero({ amount: next.expense }).subtract(
+            Dinero({ amount: next.paidFor[uid] }),
+          )
+        : Dinero({ amount: next.paidFor[uid] });
 
       return prev.add(amount);
     },

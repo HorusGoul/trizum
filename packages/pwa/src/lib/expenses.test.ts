@@ -16,19 +16,19 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 100,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
       {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 100, user2: 100 },
       },
       {
         version: 1,
         expense: 300,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 150, user2: 150 },
       },
     ];
 
@@ -45,13 +45,13 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 100,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
       {
         version: 1,
         expense: 300,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 150, user2: 150 },
       },
     ];
 
@@ -68,13 +68,13 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 300,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 150, user2: 150 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
     ];
 
@@ -91,13 +91,13 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 0.75, user2: 0.25 },
+        paidFor: { user1: 150, user2: 50 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
     ];
 
@@ -114,13 +114,13 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 1 },
+        paidFor: { user1: 200 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
     ];
 
@@ -137,13 +137,13 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 1 },
+        paidFor: { user1: 200 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
     ];
 
@@ -160,13 +160,13 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 50,
         paidBy: "user2",
-        paidFor: { user1: 1, user2: 0 },
+        paidFor: { user1: 50, user2: 0 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
     ];
 
@@ -188,16 +188,16 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 10000,
         paidBy: user2,
-        paidFor: { [user1]: 0.5, [user2]: 0.5 },
+        paidFor: { [user1]: 5000, [user2]: 5000 },
       },
       {
         version: 1,
         expense: 10000,
         paidBy: user1,
         paidFor: {
-          [user1]: 0.3333333333333333,
-          [user2]: 0.3333333333333333,
-          [user3]: 0.3333333333333333,
+          [user1]: 3334,
+          [user2]: 3333,
+          [user3]: 3333,
         },
       },
     ];
@@ -220,7 +220,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         version: 1,
         expense: 10000,
         paidBy: user2,
-        paidFor: { [user1]: 0.5, [user2]: 0.5 },
+        paidFor: { [user1]: 5000, [user2]: 5000 },
       },
       {
         version: 1,
@@ -228,7 +228,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         paidBy: user1,
         paidFor: {
           [user1]: 0,
-          [user2]: 1,
+          [user2]: 5000,
         },
       },
       {
@@ -236,9 +236,9 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
         expense: 10000,
         paidBy: user1,
         paidFor: {
-          [user1]: 0.3333333333333333,
-          [user2]: 0.3333333333333333,
-          [user3]: 0.3333333333333333,
+          [user1]: 3334,
+          [user2]: 3333,
+          [user3]: 3333,
         },
       },
     ];
@@ -262,25 +262,25 @@ describe("calculateLogStatsOfUser", () => {
         version: 1,
         expense: 100,
         paidBy: "user1",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 34, user2: 33, user3: 33 },
       },
       {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 66, user2: 67, user3: 67 },
       },
       {
         version: 1,
         expense: 300,
         paidBy: "user2",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 100, user2: 100, user3: 100 },
       },
       {
         version: 1,
         expense: 600,
         paidBy: "user3",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 200, user2: 200, user3: 200 },
       },
     ];
 
@@ -301,19 +301,19 @@ describe("calculateLogStatsOfUser", () => {
         version: 1,
         expense: 100,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
       {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 100, user2: 100 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user2",
-        paidFor: { user1: 0.5, user2: 0.5 },
+        paidFor: { user1: 50, user2: 50 },
       },
     ];
 
@@ -330,27 +330,27 @@ describe("calculateLogStatsOfUser", () => {
         version: 1,
         expense: 100,
         paidBy: "user1",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 34, user2: 33, user3: 33 },
       },
       {
         version: 1,
         expense: 200,
         paidBy: "user1",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 66, user2: 67, user3: 67 },
       },
       {
         version: 1,
         expense: 100,
         paidBy: "user2",
-        paidFor: { user1: 0.33333333, user2: 0.33333333, user3: 0.33333333 },
+        paidFor: { user1: 34, user2: 33, user3: 33 },
       },
     ];
 
     let result = calculateLogStatsOfUser("user1", ["user2", "user3"], expenses);
 
     expectDinero(result.userOwes).toEqual(0);
-    expectDinero(result.owedToUser).toEqual(167);
-    expectDinero(result.diffs.user2.diffUnsplitted).toEqual(67);
+    expectDinero(result.owedToUser).toEqual(166);
+    expectDinero(result.diffs.user2.diffUnsplitted).toEqual(66);
 
     result = calculateLogStatsOfUser("user3", ["user2", "user1"], expenses);
 
