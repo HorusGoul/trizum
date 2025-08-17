@@ -3,7 +3,6 @@ import {
   createExpenseId,
   exportIntoInput,
   findExpenseById,
-  getImpactOnBalanceForUser,
   type Expense,
   type ExpenseShare,
 } from "./expense";
@@ -203,27 +202,27 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   test("should handle rounding errors correctly", () => {
     const expense = createExpense({
       paidBy: {
-        "user1": 1000, // user1 paid 10.00 euros
+        user1: 1000, // user1 paid 10.00 euros
       },
       shares: {
-        "user1": { type: "exact", value: 800 }, // user1 pays 800 = 8.00
-        "user2": { type: "divide", value: 1 }, // user2 pays 1/3 of remaining = 0.66
-        "user3": { type: "divide", value: 1 }, // user3 pays 1/3 of remaining = 0.67
-        "user4": { type: "divide", value: 1 }, // user4 pays 1/3 of remaining = 0.67
+        user1: { type: "exact", value: 800 }, // user1 pays 800 = 8.00
+        user2: { type: "divide", value: 1 }, // user2 pays 1/3 of remaining = 0.66
+        user3: { type: "divide", value: 1 }, // user3 pays 1/3 of remaining = 0.67
+        user4: { type: "divide", value: 1 }, // user4 pays 1/3 of remaining = 0.67
       },
     });
 
     const result = exportIntoInput(expense);
-    
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
         paidBy: "user1",
         paidFor: {
-          "user1": 800,
-          "user2": 66,
-          "user3": 67,
-          "user4": 67,
+          user1: 800,
+          user2: 66,
+          user3: 67,
+          user4: 67,
         },
         expense: 1000,
       },

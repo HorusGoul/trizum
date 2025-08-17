@@ -114,9 +114,11 @@ function getSplitTotal(
       });
 
       amount = reverse
-          ? Dinero({ amount: next.expense }).subtract(Dinero({ amount: next.paidFor[uid] }))
-          : Dinero({ amount: next.paidFor[uid] });
-      
+        ? Dinero({ amount: next.expense }).subtract(
+            Dinero({ amount: next.paidFor[uid] }),
+          )
+        : Dinero({ amount: next.paidFor[uid] });
+
       return prev.add(amount);
     },
     Dinero({ amount: 0 }),

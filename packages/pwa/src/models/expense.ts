@@ -45,7 +45,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     const factor = partial / total.getAmount();
     const paidFor: Record<ExpenseUser, number> = {};
     let amountLeft = Dinero({ amount: partial });
-  
+
     const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(
       expense.shares,
     )
@@ -76,11 +76,11 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     if (totalDivides > 0) {
       const totalLeftForDivides = amountLeft.getAmount();
       const divideUsers = Object.keys(divides);
-      
+
       // Calculate divide shares with proper rounding
       let distributedTotal = 0;
       const divideAmounts: Record<ExpenseUser, number> = {};
-      
+
       // First pass: calculate initial amounts
       for (const divide of divideUsers) {
         const dFactor = divides[divide].value / totalDivides;
@@ -88,7 +88,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
         divideAmounts[divide] = amount;
         distributedTotal += amount;
       }
-      
+
       // Second pass: adjust for rounding errors
       const roundingError = totalLeftForDivides - distributedTotal;
       if (roundingError !== 0 && divideUsers.length > 0) {
@@ -96,11 +96,13 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
         const firstUser = divideUsers[0];
         divideAmounts[firstUser] += roundingError;
       }
-      
+
       // Apply the calculated amounts
       for (const divide of divideUsers) {
         paidFor[divide] = divideAmounts[divide];
-        amountLeft = amountLeft.subtract(Dinero({ amount: divideAmounts[divide] }));
+        amountLeft = amountLeft.subtract(
+          Dinero({ amount: divideAmounts[divide] }),
+        );
       }
     }
 
