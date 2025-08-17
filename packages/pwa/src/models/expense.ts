@@ -73,13 +73,35 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       0,
     );
 
-    const totalLeftForDivides = Dinero({ amount: amountLeft.getAmount() });
-
-    for (const divide of Object.keys(divides)) {
-      const dFactor = divides[divide].value / totalDivides;
-      const amount = totalLeftForDivides.multiply(dFactor);
-      paidFor[divide] = amount.getAmount();
-      amountLeft = amountLeft.subtract(amount);
+    if (totalDivides > 0) {
+      const totalLeftForDivides = amountLeft.getAmount();
+      const divideUsers = Object.keys(divides);
+      
+      // Calculate divide shares with proper rounding
+      let distributedTotal = 0;
+      const divideAmounts: Record<ExpenseUser, number> = {};
+      
+      // First pass: calculate initial amounts
+      for (const divide of divideUsers) {
+        const dFactor = divides[divide].value / totalDivides;
+        const amount = Math.round(totalLeftForDivides * dFactor);
+        divideAmounts[divide] = amount;
+        distributedTotal += amount;
+      }
+      
+      // Second pass: adjust for rounding errors
+      const roundingError = totalLeftForDivides - distributedTotal;
+      if (roundingError !== 0 && divideUsers.length > 0) {
+        // Distribute rounding error to the first user (or could be distributed differently)
+        const firstUser = divideUsers[0];
+        divideAmounts[firstUser] += roundingError;
+      }
+      
+      // Apply the calculated amounts
+      for (const divide of divideUsers) {
+        paidFor[divide] = divideAmounts[divide];
+        amountLeft = amountLeft.subtract(Dinero({ amount: divideAmounts[divide] }));
+      }
     }
 
     return {
