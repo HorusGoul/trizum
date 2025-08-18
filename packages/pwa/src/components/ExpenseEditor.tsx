@@ -16,6 +16,7 @@ import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
+import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -237,24 +238,22 @@ export function ExpenseEditor({
 
         <form.Field name="paidBy">
           {(field) => (
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t`Paid by`}
-              </label>
-              <select
-                name={field.name}
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-                className="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-600 dark:bg-gray-700"
-              >
-                {participants.map((participant) => (
-                  <option key={participant.id} value={participant.id}>
-                    {participant.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <AppSelect<(typeof participants)[number]>
+              label={t`Paid by`}
+              items={participants}
+              onSelectionChange={(value) => {
+                if (value) {
+                  field.handleChange(String(value));
+                }
+              }}
+              selectedKey={field.state.value}
+            >
+              {(participant) => (
+                <SelectItem key={participant.id} value={participant}>
+                  {participant.name}
+                </SelectItem>
+              )}
+            </AppSelect>
           )}
         </form.Field>
 
