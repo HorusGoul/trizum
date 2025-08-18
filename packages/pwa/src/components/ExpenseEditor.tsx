@@ -558,8 +558,6 @@ function calculateParticipantUnitAmounts(
     // Remaining amount to be split among divide shares using Dinero.js
     const remainingAmount = totalAmount.subtract(exactTotal);
 
-    if (totalShares === 0) return {};
-
     // First pass: calculate proportional amounts
     const proportionalAmounts = activeParticipants.reduce(
       (acc, participantId) => {
