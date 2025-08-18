@@ -7,13 +7,14 @@ import { t } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { CurrencyField } from "./CurrencyField";
-import { cn } from "#src/ui/utils.js";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
 import Dinero from "dinero.js";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
 import { CurrencyText } from "./CurrencyText";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { Checkbox } from "#src/ui/Checkbox.tsx";
+import { Button } from "#src/ui/Button.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -253,67 +254,41 @@ export function ExpenseEditor({
           )}
         </form.Field>
 
-        {/* Mode Selection */}
-        <div className="flex flex-col gap-3">
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t`Expense Split Mode`}
-          </label>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => handleModeChange("simple")}
-              className={cn(
-                "flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                mode === "simple"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
-              )}
-            >
-              {t`Simple`}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange("advanced")}
-              className={cn(
-                "flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-                mode === "advanced"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600",
-              )}
-            >
-              {t`Advanced`}
-            </button>
-          </div>
-        </div>
-
         {/* Participant Selection */}
         <form.Field name="shares">
           {(sharesField) => (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t`Participants`}
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="include-all"
-                    checked={
-                      Object.keys(sharesField.state.value).length ===
+                <Checkbox
+                  isSelected={
+                    Object.keys(sharesField.state.value).length ===
+                    participants.length
+                  }
+                  isIndeterminate={
+                    Object.keys(sharesField.state.value).length > 0 &&
+                    Object.keys(sharesField.state.value).length <
                       participants.length
+                  }
+                  onChange={(isSelected) => {
+                    handleIncludeAllChange(isSelected);
+                  }}
+                >
+                  {t`Include all`}
+                </Checkbox>
+
+                <Button
+                  color="input-like"
+                  className="h-8 w-24 rounded-lg px-3 text-sm"
+                  onPress={() => {
+                    if (mode === "simple") {
+                      handleModeChange("advanced");
+                    } else {
+                      handleModeChange("simple");
                     }
-                    onChange={(e) => {
-                      handleIncludeAllChange(e.target.checked);
-                    }}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <label
-                    htmlFor="include-all"
-                    className="text-sm text-gray-600 dark:text-gray-400"
-                  >
-                    {t`Include all`}
-                  </label>
-                </div>
+                  }}
+                >
+                  {mode === "simple" ? t`Advanced` : t`Simple`}
+                </Button>
               </div>
 
               <div className="space-y-3">
