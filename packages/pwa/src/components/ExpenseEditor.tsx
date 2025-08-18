@@ -1,5 +1,5 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
 import { Suspense, useId, useState } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -15,6 +15,7 @@ import { CurrencyText } from "./CurrencyText";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import { Button } from "#src/ui/Button.tsx";
+import type { PartyParticipant } from "#src/models/party.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -156,6 +157,9 @@ export function ExpenseEditor({
     }
   };
 
+  const shares = useStore(form.store, (state) => state.values.shares);
+  const amount = useStore(form.store, (state) => state.values.amount);
+
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2">
@@ -255,251 +259,220 @@ export function ExpenseEditor({
         </form.Field>
 
         {/* Participant Selection */}
-        <form.Field name="shares">
-          {(sharesField) => (
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <Checkbox
-                  isSelected={
-                    Object.keys(sharesField.state.value).length ===
-                    participants.length
-                  }
-                  isIndeterminate={
-                    Object.keys(sharesField.state.value).length > 0 &&
-                    Object.keys(sharesField.state.value).length <
-                      participants.length
-                  }
-                  onChange={(isSelected) => {
-                    handleIncludeAllChange(isSelected);
-                  }}
-                >
-                  {t`Include all`}
-                </Checkbox>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <Checkbox
+              isSelected={Object.keys(shares).length === participants.length}
+              isIndeterminate={
+                Object.keys(shares).length > 0 &&
+                Object.keys(shares).length < participants.length
+              }
+              onChange={(isSelected) => {
+                handleIncludeAllChange(isSelected);
+              }}
+            >
+              {t`Include all`}
+            </Checkbox>
 
-                <Button
-                  color="input-like"
-                  className="h-8 w-24 rounded-lg px-3 text-sm"
-                  onPress={() => {
-                    if (mode === "simple") {
-                      handleModeChange("advanced");
-                    } else {
-                      handleModeChange("simple");
-                    }
-                  }}
-                >
-                  {mode === "simple" ? t`Advanced` : t`Simple`}
-                </Button>
-              </div>
+            <Button
+              color="input-like"
+              className="h-8 w-24 rounded-lg px-3 text-sm"
+              onPress={() => {
+                if (mode === "simple") {
+                  handleModeChange("advanced");
+                } else {
+                  handleModeChange("simple");
+                }
+              }}
+            >
+              {mode === "simple" ? t`Advanced` : t`Simple`}
+            </Button>
+          </div>
 
-              <div className="space-y-3">
-                {participants.map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700"
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        id={`participant-${participant.id}`}
-                        checked={!!sharesField.state.value[participant.id]}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            // Add participant - give them default share
-                            const currentShares = sharesField.state.value;
-                            const newShares = { ...currentShares };
-                            newShares[participant.id] = {
-                              type: "divide" as const,
-                              value: 1,
-                            };
-                            sharesField.handleChange(newShares);
-                          } else {
-                            // Remove participant - remove their share
-                            const currentShares = sharesField.state.value;
-                            const newShares = { ...currentShares };
-                            delete newShares[participant.id];
-                            sharesField.handleChange(newShares);
-                          }
-                        }}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label
-                        htmlFor={`participant-${participant.id}`}
-                        className="font-medium"
-                      >
-                        {participant.name}
-                      </label>
-                    </div>
-
-                    {sharesField.state.value[participant.id] && (
-                      <div className="flex items-center gap-2">
-                        {mode === "simple" ? (
-                          <form.Subscribe
-                            selector={(state) =>
-                              [
-                                state.values.shares,
-                                state.values.amount,
-                              ] as const
-                            }
-                          >
-                            {([shares, amount]) => {
-                              return (
-                                <ParticipantSplitAmount
-                                  amount={amount}
-                                  shares={shares}
-                                  participantId={participant.id}
-                                />
-                              );
-                            }}
-                          </form.Subscribe>
-                        ) : (
-                          <form.Field name="shares">
-                            {(sharesField) => (
-                              <form.Subscribe
-                                selector={(state) =>
-                                  [
-                                    state.values.amount,
-                                    state.values.shares,
-                                  ] as const
-                                }
-                              >
-                                {([amount, shares]) => {
-                                  function onShareTypeChange(
-                                    event: React.ChangeEvent<HTMLSelectElement>,
-                                  ) {
-                                    const newShares = {
-                                      ...sharesField.state.value,
-                                    };
-                                    const newType = event.target.value as
-                                      | "divide"
-                                      | "exact";
-
-                                    if (newType === "exact") {
-                                      const amountsByParticipantId =
-                                        calculateParticipantUnitAmounts(
-                                          amount,
-                                          shares,
-                                        );
-
-                                      // Set the exact value to the calculated participant's amount
-                                      newShares[participant.id] = {
-                                        type: "exact",
-                                        value:
-                                          amountsByParticipantId[
-                                            participant.id
-                                          ],
-                                      };
-                                    } else {
-                                      // When switching to divide, default to 1
-                                      newShares[participant.id] = {
-                                        type: "divide",
-                                        value: 1,
-                                      };
-                                    }
-
-                                    sharesField.handleChange(newShares);
-                                  }
-
-                                  const participantShare =
-                                    sharesField.state.value[participant.id];
-
-                                  return (
-                                    <div className="flex items-center gap-2">
-                                      <select
-                                        value={
-                                          sharesField.state.value[
-                                            participant.id
-                                          ]?.type || "divide"
-                                        }
-                                        onChange={(e) => {
-                                          onShareTypeChange(e);
-                                        }}
-                                        className="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
-                                      >
-                                        <option value="divide">{t`Divide`}</option>
-                                        <option value="exact">{t`Exact`}</option>
-                                      </select>
-
-                                      {participantShare.type === "divide" ? (
-                                        <>
-                                          <input
-                                            type="number"
-                                            min="0.1"
-                                            step="0.1"
-                                            value={participantShare.value}
-                                            onChange={(e) => {
-                                              const newShares = {
-                                                ...sharesField.state.value,
-                                              };
-                                              newShares[participant.id] = {
-                                                type: "divide",
-                                                value:
-                                                  parseFloat(e.target.value) ||
-                                                  1,
-                                              };
-                                              sharesField.handleChange(
-                                                newShares,
-                                              );
-                                            }}
-                                            className="w-20 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
-                                          />
-                                          <ParticipantSplitAmount
-                                            amount={amount}
-                                            shares={shares}
-                                            participantId={participant.id}
-                                          />
-                                        </>
-                                      ) : (
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          step="0.01"
-                                          value={participantShare.value / 100}
-                                          onChange={(e) => {
-                                            const newShares = {
-                                              ...sharesField.state.value,
-                                            };
-                                            newShares[participant.id] = {
-                                              type: "exact",
-                                              value: convertToUnits(
-                                                parseFloat(e.target.value) || 0,
-                                              ),
-                                            };
-                                            sharesField.handleChange(newShares);
-                                          }}
-                                          className="w-24 rounded border border-gray-300 px-2 py-1 text-right text-sm dark:border-gray-600 dark:bg-gray-700"
-                                        />
-                                      )}
-                                    </div>
-                                  );
-                                }}
-                              </form.Subscribe>
-                            )}
-                          </form.Field>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </form.Field>
+          <div className="space-y-3">
+            {participants.map((participant) => (
+              <ParticipantItem
+                key={participant.id}
+                participant={participant}
+                amount={amount}
+                shares={shares}
+                mode={mode}
+                onSharesChange={(shares) =>
+                  form.setFieldValue("shares", shares)
+                }
+              />
+            ))}
+          </div>
+        </div>
 
         {/* Total Display */}
-        <form.Subscribe
-          selector={(state) =>
-            [state.values.shares, state.values.amount] as const
-          }
-        >
-          {([shares, amount]) => {
-            return <TotalSplitAmount amount={amount} shares={shares} />;
-          }}
-        </form.Subscribe>
+        <TotalSplitAmount amount={amount} shares={shares} />
       </form>
     </div>
   );
 }
 
+interface ParticipantItemProps {
+  amount: number;
+  participant: PartyParticipant;
+  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  mode: "simple" | "advanced";
+  onSharesChange: (
+    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
+  ) => void;
+}
+
+function ParticipantItem({
+  amount,
+  shares,
+  participant,
+  mode,
+  onSharesChange,
+}: ParticipantItemProps) {
+  const participantShare = shares[participant.id];
+
+  function updateShares(
+    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
+  ) {
+    onSharesChange(shares);
+  }
+
+  function onShareTypeChange(event: React.ChangeEvent<HTMLSelectElement>) {
+    const newShares = {
+      ...shares,
+    };
+    const newType = event.target.value as "divide" | "exact";
+
+    if (newType === "exact") {
+      const amountsByParticipantId = calculateParticipantUnitAmounts(
+        amount,
+        shares,
+      );
+
+      // Set the exact value to the calculated participant's amount
+      newShares[participant.id] = {
+        type: "exact",
+        value: amountsByParticipantId[participant.id],
+      };
+    } else {
+      // When switching to divide, default to 1
+      newShares[participant.id] = {
+        type: "divide",
+        value: 1,
+      };
+    }
+
+    updateShares(newShares);
+  }
+
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+      <div className="flex items-center gap-3">
+        <input
+          type="checkbox"
+          id={`participant-${participant.id}`}
+          checked={!!shares[participant.id]}
+          onChange={(e) => {
+            if (e.target.checked) {
+              // Add participant - give them default share
+              const currentShares = shares;
+              const newShares = { ...currentShares };
+              newShares[participant.id] = {
+                type: "divide" as const,
+                value: 1,
+              };
+
+              updateShares(newShares);
+            } else {
+              // Remove participant - remove their share
+              const currentShares = shares;
+              const newShares = { ...currentShares };
+              delete newShares[participant.id];
+              updateShares(newShares);
+            }
+          }}
+          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label
+          htmlFor={`participant-${participant.id}`}
+          className="font-medium"
+        >
+          {participant.name}
+        </label>
+      </div>
+
+      {shares[participant.id] && (
+        <div className="flex items-center gap-2">
+          {mode === "simple" ? (
+            <ParticipantSplitAmount
+              amount={amount}
+              shares={shares}
+              participantId={participant.id}
+            />
+          ) : (
+            <div className="flex items-center gap-2">
+              <select
+                value={shares[participant.id]?.type || "divide"}
+                onChange={(e) => {
+                  onShareTypeChange(e);
+                }}
+                className="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
+              >
+                <option value="divide">{t`Divide`}</option>
+                <option value="exact">{t`Exact`}</option>
+              </select>
+
+              {participantShare.type === "divide" ? (
+                <>
+                  <input
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    value={participantShare.value}
+                    onChange={(e) => {
+                      const newShares = {
+                        ...shares,
+                      };
+                      newShares[participant.id] = {
+                        type: "divide",
+                        value: parseFloat(e.target.value) || 1,
+                      };
+                      updateShares(newShares);
+                    }}
+                    className="w-20 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
+                  />
+                  <ParticipantSplitAmount
+                    amount={amount}
+                    shares={shares}
+                    participantId={participant.id}
+                  />
+                </>
+              ) : (
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={participantShare.value / 100}
+                  onChange={(e) => {
+                    const newShares = {
+                      ...shares,
+                    };
+                    newShares[participant.id] = {
+                      type: "exact",
+                      value: convertToUnits(parseFloat(e.target.value) || 0),
+                    };
+                    updateShares(newShares);
+                  }}
+                  className="w-24 rounded border border-gray-300 px-2 py-1 text-right text-sm dark:border-gray-600 dark:bg-gray-700"
+                />
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 interface ParticipantSplitAmountProps {
   amount: number;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
