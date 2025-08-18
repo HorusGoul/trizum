@@ -518,6 +518,10 @@ function calculateParticipantUnitAmounts(
   }, 0);
 
   const participantAmounts = (() => {
+    // Convert display amount to units for precise calculations
+    const amountInUnits = convertToUnits(amount);
+    const totalAmount = Dinero({ amount: amountInUnits });
+
     // First, calculate the total amount taken by exact shares using Dinero.js
     const exactTotal = activeParticipants.reduce(
       (total, participantId) => {
@@ -531,9 +535,6 @@ function calculateParticipantUnitAmounts(
     );
 
     // Remaining amount to be split among divide shares using Dinero.js
-    const totalAmount = Dinero({
-      amount: convertToUnits(amount as number),
-    });
     const remainingAmount = totalAmount.subtract(exactTotal);
 
     if (totalShares === 0) return {};
@@ -552,7 +553,7 @@ function calculateParticipantUnitAmounts(
             participantAmount = amountInUnits.getAmount();
           }
         } else if (share?.type === "exact") {
-          // Convert units back to display amount
+          // Exact shares are already in units
           participantAmount = share.value;
         }
 
@@ -567,7 +568,7 @@ function calculateParticipantUnitAmounts(
       (sum, amount) => sum + amount,
       0,
     );
-    const remainingCents = amount - totalCalculated;
+    const remainingCents = amountInUnits - totalCalculated;
 
     if (remainingCents !== 0) {
       // Find divide participants to distribute remaining cents
@@ -577,10 +578,22 @@ function calculateParticipantUnitAmounts(
       });
 
       if (divideParticipants.length > 0) {
+        // Sort participants by their current amount to distribute remaining cents
+        // to those with the smallest amounts first (for positive remaining) or
+        // to those with the largest amounts first (for negative remaining)
+        const sortedParticipants = [...divideParticipants].sort((a, b) => {
+          if (remainingCents > 0) {
+            return proportionalAmounts[a] - proportionalAmounts[b];
+          } else {
+            return proportionalAmounts[b] - proportionalAmounts[a];
+          }
+        });
+
         // Distribute remaining cents one by one to divide participants
-        for (let i = 0; i < remainingCents; i++) {
-          const participantIndex = i % divideParticipants.length;
-          const participantId = divideParticipants[participantIndex];
+        const absRemainingCents = Math.abs(remainingCents);
+        for (let i = 0; i < absRemainingCents; i++) {
+          const participantIndex = i % sortedParticipants.length;
+          const participantId = sortedParticipants[participantIndex];
           if (remainingCents > 0) {
             proportionalAmounts[participantId] += 1;
           } else {

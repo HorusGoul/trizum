@@ -229,6 +229,47 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
     ];
     expect(result).toStrictEqual(expected);
   });
+
+  test("should distribute rounding errors fairly among divide participants", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 1000, // user1 paid 10.00 euros
+      },
+      shares: {
+        user1: { type: "exact", value: 500 }, // user1 pays 500 = 5.00
+        user2: { type: "divide", value: 1 }, // user2 pays 1/3 of remaining = 166.67
+        user3: { type: "divide", value: 1 }, // user3 pays 1/3 of remaining = 166.67
+        user4: { type: "divide", value: 1 }, // user4 pays 1/3 of remaining = 166.67
+      },
+    });
+
+    const result = exportIntoInput(expense);
+
+    // The remaining 500 cents should be split among 3 people
+    // 500 / 3 = 166.67, which rounds to 166, 167, 167
+    // Total: 500 + 166 + 167 + 167 = 1000 (exactly)
+    const expected: ExpenseInput[] = [
+      {
+        version: 1,
+        paidBy: "user1",
+        paidFor: {
+          user1: 500,
+          user2: 166,
+          user3: 167,
+          user4: 167,
+        },
+        expense: 1000,
+      },
+    ];
+    expect(result).toStrictEqual(expected);
+
+    // Verify the total adds up exactly
+    const totalPaidFor = Object.values(result[0].paidFor).reduce(
+      (sum, amount) => sum + amount,
+      0,
+    );
+    expect(totalPaidFor).toBe(1000);
+  });
 });
 
 describe("findExpenseById", () => {
