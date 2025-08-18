@@ -5,7 +5,7 @@ import { Suspense, useId, useState } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
-import { AppTextField } from "#src/ui/TextField.js";
+import { AppNumberField, AppTextField } from "#src/ui/TextField.js";
 import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { Checkbox } from "#src/ui/Checkbox.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
+import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -258,8 +259,8 @@ export function ExpenseEditor({
         </form.Field>
 
         {/* Participant Selection */}
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between border-l border-transparent pl-3">
             <Checkbox
               isSelected={Object.keys(shares).length === participants.length}
               isIndeterminate={
@@ -288,7 +289,7 @@ export function ExpenseEditor({
             </Button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {participants.map((participant) => (
               <ParticipantItem
                 key={participant.id}
@@ -336,11 +337,11 @@ function ParticipantItem({
     onSharesChange(shares);
   }
 
-  function onShareTypeChange(event: React.ChangeEvent<HTMLSelectElement>) {
+  function onShareTypeChange(value: string) {
     const newShares = {
       ...shares,
     };
-    const newType = event.target.value as "divide" | "exact";
+    const newType = value as "divide" | "exact";
 
     if (newType === "exact") {
       const amountsByParticipantId = calculateParticipantUnitAmounts(
@@ -364,109 +365,130 @@ function ParticipantItem({
     updateShares(newShares);
   }
 
-  return (
-    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700">
-      <div className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          id={`participant-${participant.id}`}
-          checked={!!shares[participant.id]}
-          onChange={(e) => {
-            if (e.target.checked) {
-              // Add participant - give them default share
-              const currentShares = shares;
-              const newShares = { ...currentShares };
-              newShares[participant.id] = {
-                type: "divide" as const,
-                value: 1,
-              };
+  function onSelectParticipant(value: boolean) {
+    if (value) {
+      // Add participant - give them default share
+      const currentShares = shares;
+      const newShares = { ...currentShares };
+      newShares[participant.id] = {
+        type: "divide" as const,
+        value: 1,
+      };
 
-              updateShares(newShares);
-            } else {
-              // Remove participant - remove their share
-              const currentShares = shares;
-              const newShares = { ...currentShares };
-              delete newShares[participant.id];
-              updateShares(newShares);
-            }
-          }}
-          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-        />
-        <label
-          htmlFor={`participant-${participant.id}`}
-          className="font-medium"
+      updateShares(newShares);
+    } else {
+      // Remove participant - remove their share
+      const currentShares = shares;
+      const newShares = { ...currentShares };
+      delete newShares[participant.id];
+      updateShares(newShares);
+    }
+  }
+
+  const currentShareType = participantShare?.type || "divide";
+
+  return (
+    <div className="grid h-10 grid-cols-2 items-center justify-between rounded-lg border border-slate-500 bg-white pr-3 dark:border-slate-700 dark:bg-slate-900">
+      <div className="flex h-full items-center gap-3">
+        <Checkbox
+          isSelected={!!shares[participant.id]}
+          onChange={onSelectParticipant}
+          className="h-full flex-1 pl-3"
         >
           {participant.name}
-        </label>
+        </Checkbox>
       </div>
 
       {shares[participant.id] && (
-        <div className="flex items-center gap-2">
-          {mode === "simple" ? (
-            <ParticipantSplitAmount
-              amount={amount}
-              shares={shares}
-              participantId={participant.id}
-            />
-          ) : (
-            <div className="flex items-center gap-2">
-              <select
-                value={shares[participant.id]?.type || "divide"}
-                onChange={(e) => {
-                  onShareTypeChange(e);
-                }}
-                className="rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
-              >
-                <option value="divide">{t`Divide`}</option>
-                <option value="exact">{t`Exact`}</option>
-              </select>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {mode === "advanced" && (
+              <TooltipTrigger>
+                <IconButton
+                  color="input-like"
+                  icon={
+                    currentShareType === "divide"
+                      ? "#lucide/split"
+                      : "#lucide/equal"
+                  }
+                  onPress={() => {
+                    onShareTypeChange(
+                      currentShareType === "divide" ? "exact" : "divide",
+                    );
+                  }}
+                  className="h-7 w-7"
+                  iconClassName="size-3"
+                />
 
-              {participantShare.type === "divide" ? (
-                <>
+                <Tooltip>
+                  {currentShareType === "divide"
+                    ? t`Switch to a set amount`
+                    : t`Switch to fractional split`}
+                </Tooltip>
+              </TooltipTrigger>
+            )}
+
+            {participantShare.type === "divide" && mode === "advanced" ? (
+              <AppNumberField
+                className="h-7 w-7"
+                inputClassName="h-7 px-0 text-center"
+                value={participantShare.value}
+                maxValue={99}
+                minValue={0}
+                step={1}
+                onChange={(value) => {
+                  const newShares = {
+                    ...shares,
+                  };
+
+                  newShares[participant.id] = {
+                    type: "divide",
+                    value,
+                  };
+
+                  updateShares(newShares);
+                }}
+              />
+            ) : null}
+          </div>
+
+          <div>
+            {mode === "simple" ? (
+              <ParticipantSplitAmount
+                amount={amount}
+                shares={shares}
+                participantId={participant.id}
+              />
+            ) : (
+              <>
+                {participantShare.type === "exact" ? (
                   <input
                     type="number"
-                    min="0.1"
-                    step="0.1"
-                    value={participantShare.value}
+                    min="0"
+                    step="0.01"
+                    value={participantShare.value / 100}
                     onChange={(e) => {
                       const newShares = {
                         ...shares,
                       };
                       newShares[participant.id] = {
-                        type: "divide",
-                        value: parseFloat(e.target.value) || 1,
+                        type: "exact",
+                        value: convertToUnits(parseFloat(e.target.value) || 0),
                       };
                       updateShares(newShares);
                     }}
-                    className="w-20 rounded border border-gray-300 px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700"
+                    className="w-24 rounded border border-gray-300 px-2 py-1 text-right text-sm dark:border-gray-600 dark:bg-gray-700"
                   />
+                ) : (
                   <ParticipantSplitAmount
                     amount={amount}
                     shares={shares}
                     participantId={participant.id}
                   />
-                </>
-              ) : (
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={participantShare.value / 100}
-                  onChange={(e) => {
-                    const newShares = {
-                      ...shares,
-                    };
-                    newShares[participant.id] = {
-                      type: "exact",
-                      value: convertToUnits(parseFloat(e.target.value) || 0),
-                    };
-                    updateShares(newShares);
-                  }}
-                  className="w-24 rounded border border-gray-300 px-2 py-1 text-right text-sm dark:border-gray-600 dark:bg-gray-700"
-                />
-              )}
-            </div>
-          )}
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>

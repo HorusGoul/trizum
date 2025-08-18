@@ -13,7 +13,7 @@ import {
   Text,
 } from "react-aria-components";
 
-import { cn } from "./utils";
+import { cn, type ClassName } from "./utils";
 
 import { FieldError, Label } from "./Field";
 
@@ -101,6 +101,7 @@ export interface AppNumberFieldProps extends AriaNumberFieldProps {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: AriaValidationResult) => string);
+  inputClassName?: ClassName;
 }
 
 function AppNumberField({
@@ -108,6 +109,7 @@ function AppNumberField({
   description,
   errorMessage,
   className,
+  inputClassName,
   ...props
 }: AppNumberFieldProps) {
   return (
@@ -118,7 +120,7 @@ function AppNumberField({
       {...props}
     >
       {label ? <Label>{label}</Label> : null}
-      <Input />
+      <Input className={cn(inputClassName)} />
       {description && (
         <Text
           className="text-sm text-slate-700 dark:text-slate-50"

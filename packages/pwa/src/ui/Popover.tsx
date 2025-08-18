@@ -16,7 +16,7 @@ const Popover = ({ className, offset = 4, ...props }: AriaPopoverProps) => (
     offset={offset}
     className={composeRenderProps(className, (className) =>
       cn(
-        "z-50 rounded-md border border-slate-500 bg-white text-accent-50 shadow-md outline-none dark:border-slate-700 dark:bg-slate-900",
+        "z-50 rounded-md border border-slate-500 bg-white text-accent-900 shadow-md outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-accent-50",
         /* Entering */
         "data-[entering]:animate-in data-[entering]:fade-in-0 data-[entering]:zoom-in-95",
         /* Exiting */

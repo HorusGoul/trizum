@@ -32,7 +32,7 @@ const Checkbox = ({ className, children, ...props }: AriaCheckboxProps) => (
       <>
         <div
           className={cn(
-            "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-sm border border-accent-500 text-current",
+            "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-sm border border-slate-500 text-current dark:border-slate-700",
             /* Focus Visible */
             "group-data-[focus-visible]/checkbox:ring-ring group-data-[focus-visible]/checkbox:outline-none group-data-[focus-visible]/checkbox:ring-2 group-data-[focus-visible]/checkbox:ring-offset-2",
             /* Selected */
@@ -43,6 +43,8 @@ const Checkbox = ({ className, children, ...props }: AriaCheckboxProps) => (
             "group-data-[invalid]/checkbox:border-danger-500 group-data-[invalid]/checkbox:group-data-[selected]/checkbox:bg-danger-500 group-data-[invalid]/checkbox:group-data-[selected]/checkbox:text-danger-50",
             /* Resets */
             "focus:outline-none focus-visible:outline-none",
+            "transition-transform duration-200 ease-in-out",
+            renderProps.isPressed && "scale-90",
           )}
         >
           {renderProps.isIndeterminate ? (
