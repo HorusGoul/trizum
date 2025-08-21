@@ -18,6 +18,7 @@ import { Button } from "#src/ui/Button.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
+import { Icon } from "#src/ui/Icon.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -385,10 +386,40 @@ function ParticipantItem({
     }
   }
 
+  function onIncrementSharesPress() {
+    if (!participantShare || participantShare.type !== "divide") {
+      return;
+    }
+
+    const newShares = {
+      ...shares,
+    };
+
+    newShares[participant.id] = {
+      type: "divide",
+      value: Math.min(participantShare.value + 1, 99),
+    };
+    updateShares(newShares);
+  }
+
+  function onDecrementSharesPress() {
+    if (!participantShare || participantShare.type !== "divide") {
+      return;
+    }
+    const newShares = {
+      ...shares,
+    };
+    newShares[participant.id] = {
+      type: "divide",
+      value: Math.max(participantShare.value - 1, 0),
+    };
+    updateShares(newShares);
+  }
+
   const currentShareType = participantShare?.type || "divide";
 
   return (
-    <div className="grid h-10 grid-cols-2 items-center justify-between rounded-lg border border-slate-500 bg-white pr-3 dark:border-slate-700 dark:bg-slate-900">
+    <div className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-slate-500 bg-white pr-3 dark:border-slate-700 dark:bg-slate-900">
       <div className="flex h-full items-center gap-3">
         <Checkbox
           isSelected={!!shares[participant.id]}
@@ -429,26 +460,42 @@ function ParticipantItem({
             )}
 
             {participantShare.type === "divide" && mode === "advanced" ? (
-              <AppNumberField
-                className="h-7 w-7"
-                inputClassName="h-7 px-0 text-center"
-                value={participantShare.value}
-                maxValue={99}
-                minValue={0}
-                step={1}
-                onChange={(value) => {
-                  const newShares = {
-                    ...shares,
-                  };
+              <>
+                <IconButton
+                  icon="#lucide/minus"
+                  className="h-5 w-5"
+                  iconClassName="size-3"
+                  onPress={onDecrementSharesPress}
+                  color="input-like"
+                />
+                <AppNumberField
+                  className="h-7 w-7 flex-shrink-0"
+                  inputClassName="h-7 px-0 text-center"
+                  value={participantShare.value}
+                  maxValue={99}
+                  minValue={0}
+                  step={1}
+                  onChange={(value) => {
+                    const newShares = {
+                      ...shares,
+                    };
 
-                  newShares[participant.id] = {
-                    type: "divide",
-                    value,
-                  };
+                    newShares[participant.id] = {
+                      type: "divide",
+                      value,
+                    };
 
-                  updateShares(newShares);
-                }}
-              />
+                    updateShares(newShares);
+                  }}
+                />
+                <IconButton
+                  icon="#lucide/plus"
+                  className="h-5 w-5"
+                  iconClassName="size-3"
+                  onPress={onIncrementSharesPress}
+                  color="input-like"
+                />
+              </>
             ) : null}
           </div>
 
