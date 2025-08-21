@@ -24,8 +24,8 @@ export function calculateLogStatsBetweenTwoUsers(
     .filter(
       (expense) =>
         [userUid, otherUserUid].includes(expense.paidBy) &&
-        userUid in expense.paidFor &&
-        otherUserUid in expense.paidFor,
+        ((expense.paidBy === userUid && otherUserUid in expense.paidFor) ||
+          (expense.paidBy === otherUserUid && userUid in expense.paidFor)),
     )
     .reduce(
       (prev, next) => {

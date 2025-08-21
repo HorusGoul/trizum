@@ -268,6 +268,26 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     expectDinero(result.diffUnsplitted).toEqual(3333);
   });
+
+  test("should return diffUnsplited=100 for user1, and diffUnsplited=-100 for user2, when user1 pays something for user2", () => {
+    const user1 = "user1";
+    const user2 = "user2";
+
+    const expenses: ExpenseInput[] = [
+      {
+        version: 1,
+        expense: 100,
+        paidBy: user1,
+        paidFor: { [user2]: 100 },
+      },
+    ];
+
+    let result = calculateLogStatsBetweenTwoUsers(user1, user2, expenses);
+    expectDinero(result.diffUnsplitted).toEqual(100);
+
+    result = calculateLogStatsBetweenTwoUsers(user2, user1, expenses);
+    expectDinero(result.diffUnsplitted).toEqual(-100);
+  });
 });
 
 describe("calculateLogStatsOfUser", () => {
