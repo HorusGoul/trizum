@@ -43,9 +43,13 @@ msgstr "Adding expense..."
 msgid "Advanced"
 msgstr "Advanced"
 
-#: src/components/ExpenseEditor.tsx:228
+#: src/components/ExpenseEditor.tsx:194
 msgid "Amount"
 msgstr "Amount"
+
+#: src/components/ExpenseEditor.tsx:467
+msgid "Amount for {0}"
+msgstr "Amount for {0}"
 
 #: src/routes/party_.$partyId.settings.tsx:297
 msgid "Archive"
@@ -93,7 +97,7 @@ msgstr "Exact"
 msgid "Expense added"
 msgstr "Expense added"
 
-#: src/components/ExpenseEditor.tsx:120
+#: src/components/ExpenseEditor.tsx:101
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Expense amounts don't match total. Please check your split configuration."
 
@@ -117,7 +121,7 @@ msgstr "For payments through Bizum or similar services"
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
-#: src/components/ExpenseEditor.tsx:208
+#: src/components/ExpenseEditor.tsx:174
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
@@ -138,7 +142,7 @@ msgstr "ID is required"
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
-#: src/components/ExpenseEditor.tsx:275
+#: src/components/ExpenseEditor.tsx:241
 msgid "Include all"
 msgstr "Include all"
 
@@ -191,7 +195,7 @@ msgstr "Optional description for this expense"
 msgid "Other operations"
 msgstr "Other operations"
 
-#: src/components/ExpenseEditor.tsx:244
+#: src/components/ExpenseEditor.tsx:210
 msgid "Paid by"
 msgstr "Paid by"
 
@@ -251,7 +255,7 @@ msgstr "Remove"
 msgid "Restore"
 msgstr "Restore"
 
-#: src/components/ExpenseEditor.tsx:180
+#: src/components/ExpenseEditor.tsx:146
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
@@ -270,11 +274,15 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
+#: src/components/ExpenseEditor.tsx:430
+msgid "Shares for {0}"
+msgstr "Shares for {0}"
+
 #: src/components/ExpenseEditor.tsx:289
 msgid "Simple"
 msgstr "Simple"
 
-#: src/components/ExpenseEditor.tsx:180
+#: src/components/ExpenseEditor.tsx:146
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
@@ -283,11 +291,11 @@ msgstr "Simple"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/ExpenseEditor.tsx:456
+#: src/components/ExpenseEditor.tsx:454
 msgid "Switch to a set amount"
 msgstr "Switch to a set amount"
 
-#: src/components/ExpenseEditor.tsx:457
+#: src/components/ExpenseEditor.tsx:455
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
@@ -299,7 +307,7 @@ msgstr "Tap to change"
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/components/ExpenseEditor.tsx:207
+#: src/components/ExpenseEditor.tsx:173
 #: src/routes/new.tsx:159
 #: src/routes/party_.$partyId.settings.tsx:153
 msgid "Title"
@@ -317,7 +325,7 @@ msgstr "Title must be less than 50 characters"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
-#: src/components/ExpenseEditor.tsx:696
+#: src/components/ExpenseEditor.tsx:638
 msgid "Total split:"
 msgstr "Total split:"
 
@@ -337,7 +345,7 @@ msgstr "Username"
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
-#: src/components/ExpenseEditor.tsx:708
+#: src/components/ExpenseEditor.tsx:650
 msgid "Warning: Split amounts don't match total expense"
 msgstr "Warning: Split amounts don't match total expense"
 
