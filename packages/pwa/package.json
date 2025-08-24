@@ -25,6 +25,7 @@
     "@automerge/automerge-repo-react-hooks": "1.2.1",
     "@automerge/automerge-repo-storage-indexeddb": "1.2.1",
     "@horus.dev/tw-dynamic-themes": "0.0.3",
+    "@internationalized/date": "3.8.2",
     "@lingui/core": "4.14.1",
     "@lingui/macro": "4.11.2",
     "@lingui/react": "4.14.1",

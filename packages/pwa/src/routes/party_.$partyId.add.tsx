@@ -13,6 +13,8 @@ import {
   type ExpenseEditorFormValues,
 } from "#src/components/ExpenseEditor.js";
 
+import { getLocalTimeZone, today } from "@internationalized/date";
+
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
 
@@ -28,7 +30,7 @@ function AddExpense() {
 
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
-      const paidAt = new Date();
+      const paidAt = values.paidAt.toDate(getLocalTimeZone());
 
       // Create shares based on the form values
       const shares: Expense["shares"] = {};
@@ -85,6 +87,7 @@ function AddExpense() {
         amount: 0,
         paidBy: participant.id,
         shares: {},
+        paidAt: today(getLocalTimeZone()),
       }}
     />
   );

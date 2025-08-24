@@ -17,10 +17,13 @@ import { Checkbox } from "#src/ui/Checkbox.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
+import { AppDatePicker } from "#src/ui/DatePicker.tsx";
+import type { CalendarDate } from "@internationalized/date";
 
 export interface ExpenseEditorFormValues {
   name: string;
   amount: number;
+  paidAt: CalendarDate;
   paidBy: ExpenseUser;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
 }
@@ -158,34 +161,57 @@ export function ExpenseEditor({
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="container mt-4 flex flex-col gap-6 px-4"
+        className="container mt-4 flex flex-col px-4"
       >
-        <form.Field
-          name="name"
-          validators={{
-            onChange: ({ value }) => validateExpenseTitle(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Title`}
-              minLength={1}
-              maxLength={50}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
-              autoFocus={true}
-            />
-          )}
-        </form.Field>
+        <div className="grid grid-cols-2 gap-x-2 gap-y-4">
+          <form.Field
+            name="name"
+            validators={{
+              onChange: ({ value }) => validateExpenseTitle(value),
+            }}
+          >
+            {(field) => (
+              <AppTextField
+                label={t`Title`}
+                minLength={1}
+                maxLength={50}
+                name={field.name}
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                errorMessage={field.state.meta.errors?.join(", ")}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
+                }
+                autoFocus={true}
+                className="col-span-2"
+              />
+            )}
+          </form.Field>
 
-        <div className="grid grid-cols-2 gap-2">
+          <form.Field name="amount">
+            {(field) => (
+              <CurrencyField
+                name={field.name}
+                label={t`Amount`}
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
+                }
+                className="col-span-2"
+                onFocus={(event) => {
+                  const input = event.target as HTMLInputElement;
+                  input.select();
+                }}
+                inputMode="decimal"
+              />
+            )}
+          </form.Field>
+
           <form.Field name="paidBy">
             {(field) => (
               <AppSelect<(typeof participants)[number]>
@@ -207,25 +233,23 @@ export function ExpenseEditor({
             )}
           </form.Field>
 
-          <form.Field name="amount">
+          <form.Field name="paidAt">
             {(field) => (
-              <CurrencyField
-                name={field.name}
-                label={t`Amount`}
+              <AppDatePicker
+                label={t`Date`}
                 value={field.state.value}
-                onChange={field.handleChange}
-                onBlur={field.handleBlur}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                onChange={(value) => {
+                  if (value) {
+                    field.handleChange(value);
+                  }
+                }}
               />
             )}
           </form.Field>
         </div>
 
         {/* Participant Selection */}
-        <div className="flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-2">
           <div className="flex items-center justify-between border-l border-transparent pl-3">
             <Checkbox
               isSelected={Object.keys(shares).length === participants.length}

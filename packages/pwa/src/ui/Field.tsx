@@ -42,7 +42,7 @@ function FieldError({ className, ...props }: AriaFieldErrorProps) {
   );
 }
 
-const fieldGroupVariants = cva({
+export const fieldGroupVariants = cva({
   variants: {
     variant: {
       default: cn([
