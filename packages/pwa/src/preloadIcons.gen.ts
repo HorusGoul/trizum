@@ -14,6 +14,7 @@ preloadIcon("#lucide/archive-restore"),
 preloadIcon("#lucide/arrow-left"),
 preloadIcon("#lucide/badge-info"),
 preloadIcon("#lucide/calendar"),
+preloadIcon("#lucide/camera"),
 preloadIcon("#lucide/check"),
 preloadIcon("#lucide/chevron-down"),
 preloadIcon("#lucide/chevron-left"),
@@ -23,7 +24,7 @@ preloadIcon("#lucide/circle-alert"),
 preloadIcon("#lucide/circle-check"),
 preloadIcon("#lucide/circle-help"),
 preloadIcon("#lucide/ellipsis-vertical"),
-preloadIcon("#lucide/equal"),
+preloadIcon("#lucide/image-up"),
 preloadIcon("#lucide/info"),
 preloadIcon("#lucide/list-plus"),
 preloadIcon("#lucide/log-out"),
@@ -34,7 +35,8 @@ preloadIcon("#lucide/scroll-text"),
 preloadIcon("#lucide/settings"),
 preloadIcon("#lucide/split"),
 preloadIcon("#lucide/trash"),
-preloadIcon("#lucide/user-round-pen")
+preloadIcon("#lucide/user-round-pen"),
+preloadIcon("#lucide/x")
   ])
 }
   
