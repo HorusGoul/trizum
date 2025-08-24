@@ -1,9 +1,9 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import { Suspense, useId, useState } from "react";
+import { Suspense, useId } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
-import { t } from "@lingui/macro";
+import { t, Trans } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppNumberField, AppTextField } from "#src/ui/TextField.js";
 import { CurrencyField } from "./CurrencyField";
@@ -19,6 +19,8 @@ import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 import { AppDatePicker } from "#src/ui/DatePicker.tsx";
 import type { CalendarDate } from "@internationalized/date";
+import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
+import { Icon } from "#src/ui/Icon.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -290,10 +292,9 @@ export function ExpenseEditor({
               />
             ))}
           </div>
-        </div>
 
-        {/* Total Display */}
-        <TotalSplitAmount amount={amount} shares={shares} />
+          <SharesWarning amount={amount} shares={shares} />
+        </div>
       </form>
     </div>
   );
@@ -652,14 +653,19 @@ function calculateParticipantUnitAmounts(
   return participantAmounts;
 }
 
-interface TotalSplitAmountProps {
+interface SharesWarningProps {
   amount: number;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
 }
 
-function TotalSplitAmount({ amount, shares }: TotalSplitAmountProps) {
+function SharesWarning({ amount, shares }: SharesWarningProps) {
   const { party } = useCurrentParty();
   const activeParticipants = Object.keys(shares);
+
+  if (activeParticipants.length === 0) {
+    return null;
+  }
+
   const unitAmounts = calculateParticipantUnitAmounts(amount, shares);
   const totalUnitAmount = Object.values(unitAmounts).reduce(
     (sum, amount) => sum + amount,
@@ -667,24 +673,35 @@ function TotalSplitAmount({ amount, shares }: TotalSplitAmountProps) {
   );
   const showWarning = totalUnitAmount - convertToUnits(amount) !== 0;
 
-  return activeParticipants.length > 0 ? (
-    <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
-      <div className="flex justify-between text-sm">
-        <span className="text-gray-600 dark:text-gray-400">{t`Total split:`}</span>
-        <span className="font-medium">
-          <CurrencyText
-            amount={totalUnitAmount}
-            currency={party.currency}
-            variant="inherit"
-            format="0.00"
-          />
-        </span>
-      </div>
-      {showWarning && (
-        <div className="mt-2 text-sm text-red-600 dark:text-red-400">
-          {t`Warning: Split amounts don't match total expense`}
-        </div>
-      )}
-    </div>
-  ) : null;
+  if (!showWarning) {
+    return null;
+  }
+
+  return (
+    <Alert variant="default">
+      <Icon name="#lucide/badge-info" />
+
+      <AlertTitle>{t`Heads up!`}</AlertTitle>
+
+      <AlertDescription>
+        <p>
+          <Trans>
+            Shares sum up to{" "}
+            <strong>
+              {totalUnitAmount / 100} {party.currency}
+            </strong>{" "}
+            while the expense amount is{" "}
+            <strong>
+              {amount} {party.currency}
+            </strong>
+            .
+          </Trans>
+        </p>
+
+        <p>
+          <Trans>Please correct it before saving.</Trans>
+        </p>
+      </AlertDescription>
+    </Alert>
+  );
 }

@@ -12,6 +12,7 @@ export function preloadAllIcons() {
 preloadIcon("#lucide/archive"),
 preloadIcon("#lucide/archive-restore"),
 preloadIcon("#lucide/arrow-left"),
+preloadIcon("#lucide/badge-info"),
 preloadIcon("#lucide/calendar"),
 preloadIcon("#lucide/check"),
 preloadIcon("#lucide/chevron-down"),
