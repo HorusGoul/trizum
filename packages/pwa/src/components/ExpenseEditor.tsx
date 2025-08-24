@@ -14,11 +14,9 @@ import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
 import { CurrencyText } from "./CurrencyText";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
-import { Button } from "#src/ui/Button.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -171,7 +169,6 @@ export function ExpenseEditor({
           {(field) => (
             <AppTextField
               label={t`Title`}
-              description={t`How do you want to call this expense ? `}
               minLength={1}
               maxLength={50}
               name={field.name}
@@ -183,47 +180,49 @@ export function ExpenseEditor({
                 field.state.meta.isTouched &&
                 field.state.meta.errors?.length > 0
               }
+              autoFocus={true}
             />
           )}
         </form.Field>
 
-        <form.Field name="amount">
-          {(field) => (
-            <CurrencyField
-              name={field.name}
-              label={t`Amount`}
-              description="How much did you pay?"
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
-            />
-          )}
-        </form.Field>
+        <div className="grid grid-cols-2 gap-2">
+          <form.Field name="paidBy">
+            {(field) => (
+              <AppSelect<(typeof participants)[number]>
+                label={t`Paid by`}
+                items={participants}
+                onSelectionChange={(value) => {
+                  if (value) {
+                    field.handleChange(String(value));
+                  }
+                }}
+                selectedKey={field.state.value}
+              >
+                {(participant) => (
+                  <SelectItem key={participant.id} value={participant}>
+                    {participant.name}
+                  </SelectItem>
+                )}
+              </AppSelect>
+            )}
+          </form.Field>
 
-        <form.Field name="paidBy">
-          {(field) => (
-            <AppSelect<(typeof participants)[number]>
-              label={t`Paid by`}
-              items={participants}
-              onSelectionChange={(value) => {
-                if (value) {
-                  field.handleChange(String(value));
+          <form.Field name="amount">
+            {(field) => (
+              <CurrencyField
+                name={field.name}
+                label={t`Amount`}
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
                 }
-              }}
-              selectedKey={field.state.value}
-            >
-              {(participant) => (
-                <SelectItem key={participant.id} value={participant}>
-                  {participant.name}
-                </SelectItem>
-              )}
-            </AppSelect>
-          )}
-        </form.Field>
+              />
+            )}
+          </form.Field>
+        </div>
 
         {/* Participant Selection */}
         <div className="flex flex-col gap-2">
