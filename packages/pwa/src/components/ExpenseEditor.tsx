@@ -38,25 +38,6 @@ export function ExpenseEditor({
   onSubmit,
   defaultValues,
 }: ExpenseEditorProps) {
-  // Derive initial mode from shares
-  const getInitialMode = (
-    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
-  ) => {
-    for (const share of Object.values(shares)) {
-      if (
-        share.type === "exact" ||
-        (share.type === "divide" && share.value !== 1)
-      ) {
-        return "advanced";
-      }
-    }
-    return "simple";
-  };
-
-  const [mode, setMode] = useState<"simple" | "advanced">(
-    getInitialMode(defaultValues.shares || {}),
-  );
-
   const participants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
@@ -143,21 +124,6 @@ export function ExpenseEditor({
     }
 
     form.setFieldValue("shares", newShares);
-  };
-
-  const handleModeChange = (newMode: "simple" | "advanced") => {
-    setMode(newMode);
-
-    if (newMode === "simple") {
-      // Reset to even split for simple mode
-      const newShares = { ...form.getFieldValue("shares") };
-
-      for (const participant of participants) {
-        newShares[participant.id] = { type: "divide" as const, value: 1 };
-      }
-
-      form.setFieldValue("shares", newShares);
-    }
   };
 
   const shares = useStore(form.store, (state) => state.values.shares);
@@ -274,20 +240,6 @@ export function ExpenseEditor({
             >
               {t`Include all`}
             </Checkbox>
-
-            <Button
-              color="input-like"
-              className="h-8 w-24 rounded-lg px-3 text-sm"
-              onPress={() => {
-                if (mode === "simple") {
-                  handleModeChange("advanced");
-                } else {
-                  handleModeChange("simple");
-                }
-              }}
-            >
-              {mode === "simple" ? t`Advanced` : t`Simple`}
-            </Button>
           </div>
 
           <div className="space-y-2">
@@ -297,7 +249,6 @@ export function ExpenseEditor({
                 participant={participant}
                 amount={amount}
                 shares={shares}
-                mode={mode}
                 onSharesChange={(shares) =>
                   form.setFieldValue("shares", shares)
                 }
@@ -317,7 +268,6 @@ interface ParticipantItemProps {
   amount: number;
   participant: PartyParticipant;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
-  mode: "simple" | "advanced";
   onSharesChange: (
     shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
   ) => void;
@@ -327,7 +277,6 @@ function ParticipantItem({
   amount,
   shares,
   participant,
-  mode,
   onSharesChange,
 }: ParticipantItemProps) {
   const participantShare = shares[participant.id];
@@ -416,6 +365,17 @@ function ParticipantItem({
     updateShares(newShares);
   }
 
+  function onExactAmountChange(value: number) {
+    const newShares = {
+      ...shares,
+    };
+    newShares[participant.id] = {
+      type: "exact",
+      value: convertToUnits(value || 0),
+    };
+    updateShares(newShares);
+  }
+
   const currentShareType = participantShare?.type || "divide";
 
   return (
@@ -432,34 +392,8 @@ function ParticipantItem({
 
       {shares[participant.id] && (
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            {mode === "advanced" && (
-              <TooltipTrigger>
-                <IconButton
-                  color="input-like"
-                  icon={
-                    currentShareType === "divide"
-                      ? "#lucide/split"
-                      : "#lucide/equal"
-                  }
-                  onPress={() => {
-                    onShareTypeChange(
-                      currentShareType === "divide" ? "exact" : "divide",
-                    );
-                  }}
-                  className="h-7 w-7"
-                  iconClassName="size-3"
-                />
-
-                <Tooltip>
-                  {currentShareType === "divide"
-                    ? t`Switch to a set amount`
-                    : t`Switch to fractional split`}
-                </Tooltip>
-              </TooltipTrigger>
-            )}
-
-            {participantShare.type === "divide" && mode === "advanced" ? (
+          <div className="flex flex-1 items-center justify-center gap-2">
+            {participantShare.type === "divide" ? (
               <>
                 <IconButton
                   icon="#lucide/minus"
@@ -475,6 +409,12 @@ function ParticipantItem({
                   maxValue={99}
                   minValue={0}
                   step={1}
+                  inputMode="numeric"
+                  onFocus={(event) => {
+                    // Select all text
+                    const input = event.target as HTMLInputElement;
+                    input.select();
+                  }}
                   onChange={(value) => {
                     const newShares = {
                       ...shares,
@@ -487,6 +427,7 @@ function ParticipantItem({
 
                     updateShares(newShares);
                   }}
+                  aria-label={t`Shares for ${participant.name}`}
                 />
                 <IconButton
                   icon="#lucide/plus"
@@ -496,77 +437,78 @@ function ParticipantItem({
                   color="input-like"
                 />
               </>
-            ) : null}
+            ) : (
+              <TooltipTrigger>
+                <IconButton
+                  color="input-like"
+                  icon="#lucide/split"
+                  onPress={() => {
+                    onShareTypeChange("divide");
+                  }}
+                  className="h-7 w-7"
+                  iconClassName="size-3"
+                />
+
+                <Tooltip>
+                  {currentShareType === "divide"
+                    ? t`Switch to a set amount`
+                    : t`Switch to fractional split`}
+                </Tooltip>
+              </TooltipTrigger>
+            )}
           </div>
 
           <div>
-            {mode === "simple" ? (
-              <ParticipantSplitAmount
-                amount={amount}
-                shares={shares}
-                participantId={participant.id}
-              />
-            ) : (
-              <>
-                {participantShare.type === "exact" ? (
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={participantShare.value / 100}
-                    onChange={(e) => {
-                      const newShares = {
-                        ...shares,
-                      };
-                      newShares[participant.id] = {
-                        type: "exact",
-                        value: convertToUnits(parseFloat(e.target.value) || 0),
-                      };
-                      updateShares(newShares);
-                    }}
-                    className="w-24 rounded border border-gray-300 px-2 py-1 text-right text-sm dark:border-gray-600 dark:bg-gray-700"
-                  />
-                ) : (
-                  <ParticipantSplitAmount
-                    amount={amount}
-                    shares={shares}
-                    participantId={participant.id}
-                  />
-                )}
-              </>
-            )}
+            <ParticipantSplitAmountField
+              amount={amount}
+              shares={shares}
+              participantId={participant.id}
+              onChange={onExactAmountChange}
+              aria-label={t`Amount for ${participant.name}`}
+            />
           </div>
         </div>
       )}
     </div>
   );
 }
-interface ParticipantSplitAmountProps {
+interface ParticipantSplitAmountFieldProps {
   amount: number;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   participantId: ExpenseUser;
+  onChange: (value: number) => void;
+  isReadOnly?: boolean;
+  "aria-label"?: string;
 }
 
-function ParticipantSplitAmount({
+function ParticipantSplitAmountField({
   amount,
   shares,
   participantId,
-}: ParticipantSplitAmountProps) {
+  onChange,
+  isReadOnly = false,
+  "aria-label": ariaLabel,
+}: ParticipantSplitAmountFieldProps) {
   const amountsByParticipantId = calculateParticipantUnitAmounts(
     amount,
     shares,
   );
-  const { party } = useCurrentParty();
+  const participantAmount = amountsByParticipantId[participantId];
 
   return (
-    <span className="text-sm text-gray-600 dark:text-gray-400">
-      <CurrencyText
-        amount={amountsByParticipantId[participantId]}
-        currency={party.currency}
-        variant="inherit"
-        format="0.00"
-      />
-    </span>
+    <CurrencyField
+      value={participantAmount / 100}
+      onChange={onChange}
+      className="w-20"
+      inputClassName="h-7 px-0 text-right border-t-0 border-x-0 rounded-none border-b"
+      onFocus={(event) => {
+        // Select all text
+        const input = event.target as HTMLInputElement;
+        input.select();
+      }}
+      inputMode="decimal"
+      aria-label={ariaLabel}
+    />
   );
 }
 

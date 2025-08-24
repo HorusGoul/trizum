@@ -102,6 +102,7 @@ export interface AppNumberFieldProps extends AriaNumberFieldProps {
   description?: string;
   errorMessage?: string | ((validation: AriaValidationResult) => string);
   inputClassName?: ClassName;
+  inputMode?: "decimal" | "numeric";
 }
 
 function AppNumberField({
@@ -110,6 +111,7 @@ function AppNumberField({
   errorMessage,
   className,
   inputClassName,
+  inputMode = "decimal",
   ...props
 }: AppNumberFieldProps) {
   return (
@@ -120,7 +122,7 @@ function AppNumberField({
       {...props}
     >
       {label ? <Label>{label}</Label> : null}
-      <Input className={cn(inputClassName)} />
+      <Input className={cn(inputClassName)} inputMode={inputMode} />
       {description && (
         <Text
           className="text-sm text-slate-700 dark:text-slate-50"
