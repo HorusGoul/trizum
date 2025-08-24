@@ -190,7 +190,16 @@ export function ExpenseEditor({
             )}
           </form.Field>
 
-          <form.Field name="amount">
+          <form.Field
+            name="amount"
+            validators={{
+              onChange: ({ value }) => {
+                if (value <= 0) {
+                  return t`Amount must be greater than 0`;
+                }
+              },
+            }}
+          >
             {(field) => (
               <CurrencyField
                 name={field.name}
@@ -198,6 +207,7 @@ export function ExpenseEditor({
                 value={field.state.value}
                 onChange={field.handleChange}
                 onBlur={field.handleBlur}
+                errorMessage={field.state.meta.errors?.join(", ")}
                 isInvalid={
                   field.state.meta.isTouched &&
                   field.state.meta.errors?.length > 0
