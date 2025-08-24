@@ -205,7 +205,9 @@ export function ExpenseEditor({
                 name={field.name}
                 label={t`Amount`}
                 value={field.state.value}
-                onChange={field.handleChange}
+                onChange={(value) => {
+                  field.handleChange(value || 0);
+                }}
                 onBlur={field.handleBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
                 isInvalid={
