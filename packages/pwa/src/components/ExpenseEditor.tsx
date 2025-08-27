@@ -308,6 +308,8 @@ export function ExpenseEditor({
 
           <SharesWarning amount={amount} shares={shares} />
         </div>
+
+        <div className="h-16" />
       </form>
     </div>
   );
