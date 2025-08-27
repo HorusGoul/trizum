@@ -6,6 +6,7 @@ export interface CurrencyTextProps
   amount: number;
   currency: Currency;
   variant?: "diff" | "default" | "inherit";
+  format?: "$0.00" | "0.00";
 }
 
 export function CurrencyText({
@@ -13,6 +14,7 @@ export function CurrencyText({
   currency,
   className,
   variant = "default",
+  format = "$0.00",
   ...props
 }: CurrencyTextProps) {
   let color = "text-accent-400";
@@ -33,7 +35,7 @@ export function CurrencyText({
 
   return (
     <span className={cn(color, className)} {...props}>
-      {Dinero({ amount, currency }).setLocale("es-ES").toFormat("$0.00")}
+      {Dinero({ amount, currency }).setLocale("es-ES").toFormat(format)}
     </span>
   );
 }

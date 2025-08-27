@@ -24,8 +24,8 @@ export function calculateLogStatsBetweenTwoUsers(
     .filter(
       (expense) =>
         [userUid, otherUserUid].includes(expense.paidBy) &&
-        userUid in expense.paidFor &&
-        otherUserUid in expense.paidFor,
+        ((expense.paidBy === userUid && otherUserUid in expense.paidFor) ||
+          (expense.paidBy === otherUserUid && userUid in expense.paidFor)),
     )
     .reduce(
       (prev, next) => {
@@ -126,7 +126,7 @@ function getSplitTotal(
 }
 
 export function convertToUnits(amount: number) {
-  return String(amount).includes(".")
-    ? Number(amount.toFixed(2).replace(".", ""))
-    : amount * 100;
+  // Convert display amount (e.g., 10.50) to cents (1050)
+  // Use Math.round to avoid floating-point precision issues
+  return Math.round(amount * 100);
 }

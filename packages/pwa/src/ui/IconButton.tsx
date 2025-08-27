@@ -1,8 +1,8 @@
 import { Button, type ButtonProps } from "react-aria-components";
-import { cn } from "./utils";
+import { cn, type ClassName } from "./utils";
 import { Icon, type IconProps } from "./Icon";
 
-type IconButtonColorScheme = "transparent" | "accent";
+type IconButtonColorScheme = "transparent" | "accent" | "slate" | "input-like";
 
 const colorSchemes: Record<
   IconButtonColorScheme,
@@ -22,15 +22,27 @@ const colorSchemes: Record<
     focus: "bg-accent-600 dark:bg-accent-400",
     pressed: "bg-accent-700 dark:bg-accent-300",
   },
+  slate: {
+    base: "text-slate-50 bg-slate-500 dark:bg-slate-500",
+    focus: "bg-slate-600 dark:bg-slate-400",
+    pressed: "bg-slate-700 dark:bg-slate-300",
+  },
+  "input-like": {
+    base: "border border-slate-500 bg-white ring-offset-white dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-900",
+    focus: "ring-accent-500 dark:ring-accent-400",
+    pressed: "ring-accent-700 dark:ring-accent-300",
+  },
 };
 
 export function IconButton({
   className,
   icon,
   color = "transparent",
+  iconClassName,
   ...props
 }: Omit<ButtonProps, "children"> & {
   icon: IconProps["name"];
+  iconClassName?: ClassName;
   color?: IconButtonColorScheme;
 }) {
   const colorStyles = colorSchemes[color];
@@ -63,7 +75,7 @@ export function IconButton({
       }
       {...props}
     >
-      <Icon name={icon} />
+      <Icon name={icon} className={cn(iconClassName)} />
     </Button>
   );
 }

@@ -11,18 +11,16 @@ import {
 } from "react-aria-components";
 import { cn, cva, type VariantProps } from "./utils";
 
+const labelVariants = cn([
+  "text-sm font-medium leading-none",
+  /* Disabled */
+  "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70",
+  /* Invalid */
+  "group-data-[invalid]:text-danger-500",
+]);
+
 const Label = ({ className, ...props }: AriaLabelProps) => (
-  <AriaLabel
-    className={cn(
-      "text-sm font-medium leading-none",
-      /* Disabled */
-      "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70",
-      /* Invalid */
-      "group-data-[invalid]:text-danger-500",
-      className,
-    )}
-    {...props}
-  />
+  <AriaLabel className={cn(labelVariants, className)} {...props} />
 );
 
 function FormDescription({ className, ...props }: AriaTextProps) {
@@ -44,7 +42,7 @@ function FieldError({ className, ...props }: AriaFieldErrorProps) {
   );
 }
 
-const fieldGroupVariants = cva({
+export const fieldGroupVariants = cva({
   variants: {
     variant: {
       default: cn([
@@ -77,4 +75,4 @@ function FieldGroup({ className, variant, ...props }: GroupProps) {
   );
 }
 
-export { Label, FieldGroup, FieldError, FormDescription };
+export { labelVariants, Label, FieldGroup, FieldError, FormDescription };

@@ -235,7 +235,6 @@ function ExpenseItem({
     >
       <div className="flex flex-1 flex-col">
         <span className="font-medium">{expense.name}</span>
-        <span>{expense.description}</span>
       </div>
 
       <div className="flex flex-shrink-0 flex-col text-end">

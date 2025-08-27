@@ -6,14 +6,15 @@ import {
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
 import Dinero from "dinero.js";
+import type { MediaFile } from "./media";
 
 export interface Expense {
   id: string;
   name: string;
-  description: string;
   paidAt: Date;
   paidBy: Record<ExpenseUser, number>;
   shares: Record<ExpenseUser, ExpenseShare>;
+  photos: MediaFile["id"][];
 }
 
 export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;
@@ -92,9 +93,30 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       // Second pass: adjust for rounding errors
       const roundingError = totalLeftForDivides - distributedTotal;
       if (roundingError !== 0 && divideUsers.length > 0) {
-        // Distribute rounding error to the first user (or could be distributed differently)
-        const firstUser = divideUsers[0];
-        divideAmounts[firstUser] += roundingError;
+        // Distribute rounding error more fairly among divide participants
+        const absRoundingError = Math.abs(roundingError);
+
+        // Sort participants by their current amount to distribute rounding errors
+        // to those with the smallest amounts first (for positive error) or
+        // to those with the largest amounts first (for negative error)
+        const sortedDivideUsers = [...divideUsers].sort((a, b) => {
+          if (roundingError > 0) {
+            return divideAmounts[a] - divideAmounts[b];
+          } else {
+            return divideAmounts[b] - divideAmounts[a];
+          }
+        });
+
+        // Distribute rounding error one by one to divide participants
+        for (let i = 0; i < absRoundingError; i++) {
+          const participantIndex = i % sortedDivideUsers.length;
+          const participantId = sortedDivideUsers[participantIndex];
+          if (roundingError > 0) {
+            divideAmounts[participantId] += 1;
+          } else {
+            divideAmounts[participantId] -= 1;
+          }
+        }
       }
 
       // Apply the calculated amounts

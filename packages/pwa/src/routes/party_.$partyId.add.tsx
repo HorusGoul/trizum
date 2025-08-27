@@ -2,7 +2,7 @@ import { t } from "@lingui/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { type Expense } from "#src/models/expense.js";
-import { convertToUnits, type ExpenseUser } from "#src/lib/expenses.js";
+import { convertToUnits } from "#src/lib/expenses.js";
 
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -12,6 +12,9 @@ import {
   ExpenseEditor,
   type ExpenseEditorFormValues,
 } from "#src/components/ExpenseEditor.js";
+
+import { getLocalTimeZone, today } from "@internationalized/date";
+import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
@@ -23,19 +26,31 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 
 function AddExpense() {
   const { party, partyId, addExpenseToParty } = useCurrentParty();
+  const { createMediaFile } = useMediaFileActions();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
 
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
-      const paidAt = new Date();
-      // TODO: handle more expense share types
-      const shares: Expense["shares"] = Object.keys(party.participants).reduce(
-        (acc, key) => {
-          acc[key as ExpenseUser] = { type: "divide", value: 1 };
-          return acc;
-        },
-        {} as Expense["shares"],
+      const paidAt = values.paidAt.toDate(getLocalTimeZone());
+
+      // Create shares based on the form values
+      const shares: Expense["shares"] = {};
+
+      // Use the shares directly from the form
+      Object.entries(values.shares).forEach(([participantId, share]) => {
+        shares[participantId] = share;
+      });
+
+      toast.loading(t`Uploading pictures...`, {
+        id: "add-expense",
+      });
+
+      const photos = await Promise.all(
+        values.photos.map(async (photo) => {
+          const [mediaFileId] = await createMediaFile(photo.blob, {});
+          return mediaFileId;
+        }),
       );
 
       toast.loading(t`Adding expense...`, {
@@ -44,10 +59,10 @@ function AddExpense() {
 
       const expense = await addExpenseToParty({
         name: values.name,
-        description: values.description,
         paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
+        photos,
       });
 
       navigate({
@@ -83,9 +98,11 @@ function AddExpense() {
       onSubmit={onCreateExpense}
       defaultValues={{
         name: "",
-        description: "",
         amount: 0,
         paidBy: participant.id,
+        shares: {},
+        paidAt: today(getLocalTimeZone()),
+        photos: [],
       }}
     />
   );

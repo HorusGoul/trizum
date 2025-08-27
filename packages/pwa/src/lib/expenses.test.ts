@@ -4,8 +4,25 @@ import { describe, test, expect } from "vitest";
 import {
   calculateLogStatsBetweenTwoUsers,
   calculateLogStatsOfUser,
+  convertToUnits,
   type ExpenseInput,
 } from "./expenses";
+
+describe("convertToUnits", () => {
+  test("should convert display amounts to cents correctly", () => {
+    expect(convertToUnits(10)).toBe(1000);
+    expect(convertToUnits(10.5)).toBe(1050);
+    expect(convertToUnits(10.99)).toBe(1099);
+    expect(convertToUnits(0.01)).toBe(1);
+    expect(convertToUnits(0.99)).toBe(99);
+  });
+
+  test("should handle floating-point precision issues", () => {
+    // These are common floating-point precision issues
+    expect(convertToUnits(0.1 + 0.2)).toBe(30); // 0.1 + 0.2 = 0.30000000000000004
+    expect(convertToUnits(0.3)).toBe(30);
+  });
+});
 
 describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=0 when users spend the same amount", () => {
@@ -250,6 +267,26 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
     result = calculateLogStatsBetweenTwoUsers(user1, user3, expenses);
 
     expectDinero(result.diffUnsplitted).toEqual(3333);
+  });
+
+  test("should return diffUnsplited=100 for user1, and diffUnsplited=-100 for user2, when user1 pays something for user2", () => {
+    const user1 = "user1";
+    const user2 = "user2";
+
+    const expenses: ExpenseInput[] = [
+      {
+        version: 1,
+        expense: 100,
+        paidBy: user1,
+        paidFor: { [user2]: 100 },
+      },
+    ];
+
+    let result = calculateLogStatsBetweenTwoUsers(user1, user2, expenses);
+    expectDinero(result.diffUnsplitted).toEqual(100);
+
+    result = calculateLogStatsBetweenTwoUsers(user2, user1, expenses);
+    expectDinero(result.diffUnsplitted).toEqual(-100);
   });
 });
 
