@@ -6,6 +6,7 @@ import {
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
 import Dinero from "dinero.js";
+import type { MediaFile } from "./media";
 
 export interface Expense {
   id: string;
@@ -13,6 +14,7 @@ export interface Expense {
   paidAt: Date;
   paidBy: Record<ExpenseUser, number>;
   shares: Record<ExpenseUser, ExpenseShare>;
+  photos: MediaFile["id"][];
 }
 
 export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;

@@ -14,6 +14,7 @@ import {
 } from "#src/components/ExpenseEditor.js";
 
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 
 function AddExpense() {
   const { party, partyId, addExpenseToParty } = useCurrentParty();
+  const { createMediaFile } = useMediaFileActions();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
 
@@ -40,6 +42,17 @@ function AddExpense() {
         shares[participantId] = share;
       });
 
+      toast.loading(t`Uploading pictures...`, {
+        id: "add-expense",
+      });
+
+      const photos = await Promise.all(
+        values.photos.map(async (photo) => {
+          const [mediaFileId] = await createMediaFile(photo.blob, {});
+          return mediaFileId;
+        }),
+      );
+
       toast.loading(t`Adding expense...`, {
         id: "add-expense",
       });
@@ -49,6 +62,7 @@ function AddExpense() {
         paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
+        photos,
       });
 
       navigate({
@@ -88,6 +102,7 @@ function AddExpense() {
         paidBy: participant.id,
         shares: {},
         paidAt: today(getLocalTimeZone()),
+        photos: [],
       }}
     />
   );

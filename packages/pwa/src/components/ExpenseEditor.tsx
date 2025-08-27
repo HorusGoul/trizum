@@ -1,5 +1,5 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import { useForm, useStore } from "@tanstack/react-form";
+import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
 import { Suspense, useId, useRef, useState } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -29,6 +29,7 @@ export interface ExpenseEditorFormValues {
   paidAt: CalendarDate;
   paidBy: ExpenseUser;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  photos: LocalPhoto[];
 }
 
 interface ExpenseEditorProps {
@@ -168,7 +169,14 @@ export function ExpenseEditor({
       >
         <div className="grid grid-cols-2 gap-x-2 gap-y-4">
           <div className="col-span-2">
-            <PhotosField />
+            <form.Field name="photos">
+              {(field) => (
+                <PhotosField
+                  value={field.state.value}
+                  onChange={field.handleChange}
+                />
+              )}
+            </form.Field>
           </div>
 
           <form.Field
@@ -711,9 +719,12 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
   );
 }
 
-function PhotosField() {
-  const [photos, setPhotos] = useState<LocalPhoto[]>([]);
+interface PhotosFieldProps {
+  value: LocalPhoto[];
+  onChange: (updater: Updater<LocalPhoto[]>) => void;
+}
 
+function PhotosField({ value, onChange }: PhotosFieldProps) {
   return (
     <div
       className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
@@ -722,7 +733,7 @@ function PhotosField() {
         e.currentTarget.scrollLeft += e.deltaY;
       }}
     >
-      {photos.length === 0 ? (
+      {value.length === 0 ? (
         <div className="flex h-32 w-32 flex-col items-center justify-center rounded-xl bg-slate-50 p-4 dark:bg-slate-900 dark:text-slate-500">
           <span className="text-center text-sm">
             <Trans>Upload or capture an image of your receipt</Trans>
@@ -730,12 +741,12 @@ function PhotosField() {
         </div>
       ) : null}
 
-      {photos.map((photo) => (
+      {value.map((photo) => (
         <CurrentPhoto
-          key={photo.tempUrl}
-          photoUrl={photo.tempUrl}
+          key={photo.url}
+          photoUrl={photo.url}
           onRemove={() => {
-            setPhotos((prevPhotos) =>
+            onChange((prevPhotos) =>
               prevPhotos.filter((current) => current !== photo),
             );
           }}
@@ -743,7 +754,7 @@ function PhotosField() {
       ))}
       <AddPhotoButton
         onPhoto={(photo) => {
-          setPhotos((prevPhotos) => [...prevPhotos, ...photo]);
+          onChange((prevPhotos) => [...prevPhotos, ...photo]);
         }}
       />
     </div>
@@ -751,8 +762,8 @@ function PhotosField() {
 }
 
 interface LocalPhoto {
-  tempUrl: string;
-  file: File;
+  blob: Blob;
+  url: string;
 }
 
 interface AddPhotoButtonProps {
@@ -764,9 +775,9 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const localPhotos = Array.from(event.target.files ?? []).map((file) => {
-      const tempUrl = URL.createObjectURL(file);
-      return { tempUrl, file };
+    const localPhotos = Array.from(event.target.files ?? []).map((blob) => {
+      const url = URL.createObjectURL(blob);
+      return { url, blob };
     });
 
     onPhoto(localPhotos);
