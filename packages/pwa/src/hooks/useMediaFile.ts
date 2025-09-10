@@ -1,9 +1,6 @@
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
-import {
-  isValidDocumentId,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useEffect, useMemo } from "react";
 
 export function useMediaFile(mediaFileId: string) {

@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
@@ -67,13 +66,11 @@ const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <StrictMode>
-      <I18nProvider i18n={i18n}>
-        <RepoContext.Provider value={repo}>
-          <RouterProvider router={router} />
-          <Toaster />
-        </RepoContext.Provider>
-      </I18nProvider>
-    </StrictMode>,
+    <I18nProvider i18n={i18n}>
+      <RepoContext.Provider value={repo}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </RepoContext.Provider>
+    </I18nProvider>,
   );
 }

@@ -26,7 +26,7 @@ const Calendar = AriaCalendar;
 const RangeCalendar = AriaRangeCalendar;
 
 const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
-  let { direction } = useLocale();
+  const { direction } = useLocale();
 
   return (
     <header className="flex w-full items-center gap-1 px-1 pb-4" {...props}>

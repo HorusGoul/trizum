@@ -1,7 +1,7 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import { Suspense, useId, useRef, useState } from "react";
+import { Suspense, useId, useRef } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t, Trans } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
@@ -11,7 +11,6 @@ import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
 import Dinero from "dinero.js";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
-import { CurrencyText } from "./CurrencyText";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
@@ -22,6 +21,7 @@ import type { CalendarDate } from "@internationalized/date";
 import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
+import { getExpenseUnitShares } from "#src/models/expense.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -567,105 +567,12 @@ function calculateParticipantUnitAmounts(
   amount: number,
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
 ) {
-  const activeParticipants = Object.keys(shares);
+  const amountInUnits = convertToUnits(amount);
 
-  // Calculate total shares for divide participants (this is just a count, not money)
-  const totalShares = activeParticipants.reduce((total, participantId) => {
-    const share = shares[participantId];
-    if (share?.type === "divide") {
-      return total + share.value;
-    }
-    return total;
-  }, 0);
-
-  const participantAmounts = (() => {
-    // Convert display amount to units for precise calculations
-    const amountInUnits = convertToUnits(amount);
-    const totalAmount = Dinero({ amount: amountInUnits });
-
-    // First, calculate the total amount taken by exact shares using Dinero.js
-    const exactTotal = activeParticipants.reduce(
-      (total, participantId) => {
-        const share = shares[participantId];
-        if (share?.type === "exact") {
-          return total.add(Dinero({ amount: share.value }));
-        }
-        return total;
-      },
-      Dinero({ amount: 0 }),
-    );
-
-    // Remaining amount to be split among divide shares using Dinero.js
-    const remainingAmount = totalAmount.subtract(exactTotal);
-
-    // First pass: calculate proportional amounts
-    const proportionalAmounts = activeParticipants.reduce(
-      (acc, participantId) => {
-        const share = shares[participantId];
-        let participantAmount = 0;
-
-        if (share?.type === "divide") {
-          // Calculate using Dinero.js for precise division
-          if (totalShares > 0) {
-            const shareRatio = share.value / totalShares;
-            const amountInUnits = remainingAmount.multiply(shareRatio);
-            participantAmount = amountInUnits.getAmount();
-          }
-        } else if (share?.type === "exact") {
-          // Exact shares are already in units
-          participantAmount = share.value;
-        }
-
-        acc[participantId] = participantAmount;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
-    // Second pass: distribute remaining cents to ensure total adds up exactly
-    const totalCalculated = Object.values(proportionalAmounts).reduce(
-      (sum, amount) => sum + amount,
-      0,
-    );
-    const remainingCents = amountInUnits - totalCalculated;
-
-    if (remainingCents !== 0) {
-      // Find divide participants to distribute remaining cents
-      const divideParticipants = activeParticipants.filter((participantId) => {
-        const share = shares[participantId];
-        return share?.type === "divide";
-      });
-
-      if (divideParticipants.length > 0) {
-        // Sort participants by their current amount to distribute remaining cents
-        // to those with the smallest amounts first (for positive remaining) or
-        // to those with the largest amounts first (for negative remaining)
-        const sortedParticipants = [...divideParticipants].sort((a, b) => {
-          if (remainingCents > 0) {
-            return proportionalAmounts[a] - proportionalAmounts[b];
-          } else {
-            return proportionalAmounts[b] - proportionalAmounts[a];
-          }
-        });
-
-        // Distribute remaining cents one by one to divide participants
-        const absRemainingCents = Math.abs(remainingCents);
-        for (let i = 0; i < absRemainingCents; i++) {
-          const participantIndex = i % sortedParticipants.length;
-          const participantId = sortedParticipants[participantIndex];
-          if (remainingCents > 0) {
-            proportionalAmounts[participantId] += 1;
-          } else {
-            proportionalAmounts[participantId] -= 1;
-          }
-        }
-      }
-    }
-
-    return proportionalAmounts;
-  })();
-
-  return participantAmounts;
+  return getExpenseUnitShares({
+    shares,
+    paidBy: { noop: amountInUnits },
+  });
 }
 
 interface SharesWarningProps {
