@@ -352,5 +352,6 @@ function createExpense(
     paidAt: new Date(),
     paidBy,
     shares,
+    photos: [],
   };
 }
