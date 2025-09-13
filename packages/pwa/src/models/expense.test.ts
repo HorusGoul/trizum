@@ -353,5 +353,6 @@ function createExpense(
     paidBy,
     shares,
     photos: [],
+    __hash: "",
   };
 }
