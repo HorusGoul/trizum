@@ -17,6 +17,7 @@ export interface PartyParticipant {
   name: string;
   phone?: string;
   isArchived?: boolean;
+  personalMode?: boolean;
 }
 
 export interface PartyExpenseChunk {

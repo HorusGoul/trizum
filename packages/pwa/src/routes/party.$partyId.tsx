@@ -24,6 +24,7 @@ import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
 import { useMemo } from "react";
 import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
+import { Switch } from "#src/ui/Switch.tsx";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -42,7 +43,9 @@ export const Route = createFileRoute("/party/$partyId")({
 
 function PartyById() {
   const params = Route.useParams();
-  const { party, partyId, isLoading } = useParty(params.partyId);
+  const { party, partyId, isLoading, setParticipantDetails } = useParty(
+    params.partyId,
+  );
   const { removeParty } = usePartyList();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
@@ -66,6 +69,12 @@ function PartyById() {
     return <span>404 bruv</span>;
   }
 
+  function onTogglePersonalMode() {
+    setParticipantDetails(participant.id, {
+      personalMode: !participant.personalMode,
+    });
+  }
+
   return (
     <div className="flex h-full max-h-full flex-col">
       <div className="container flex h-16 flex-shrink-0 items-center px-2">
@@ -75,7 +84,7 @@ function PartyById() {
         <MenuTrigger>
           <IconButton icon="#lucide/ellipsis-vertical" aria-label="Menu" />
           <Popover placement="bottom end">
-            <Menu>
+            <Menu className="min-w-60">
               <MenuItem
                 href={{
                   to: "/party/$partyId/who",
@@ -88,14 +97,36 @@ function PartyById() {
                   className="mr-3 self-start"
                 />
                 <div className="flex flex-col">
-                  <span className="h-3.5 leading-none">
+                  <span className="leading-none">
                     <Trans>Viewing as {participant.name}</Trans>
                   </span>
 
-                  <span className="mt-2 h-2.5 text-sm leading-none opacity-80">
+                  <span className="mt-2 text-sm leading-none opacity-80">
                     <Trans>Tap to change</Trans>
                   </span>
                 </div>
+              </MenuItem>
+
+              <MenuItem onAction={onTogglePersonalMode}>
+                <IconWithFallback
+                  name="#lucide/user-round-check"
+                  size={20}
+                  className="mr-3 self-start"
+                />
+                <div className="mr-3 flex flex-col">
+                  <span className="leading-none">
+                    <Trans>Personal mode</Trans>
+                  </span>
+
+                  <span className="mt-2 text-sm leading-none opacity-80">
+                    <Trans>Only show your expenses</Trans>
+                  </span>
+                </div>
+                <Switch
+                  isSelected={participant.personalMode ?? false}
+                  onChange={onTogglePersonalMode}
+                  isReadOnly={true}
+                />
               </MenuItem>
 
               <MenuItem
@@ -155,15 +186,39 @@ function PartyById() {
 function ExpenseLog() {
   const { party } = useCurrentParty();
   const expenses = usePartyExpenses(party.id);
+  const participant = useCurrentParticipant();
 
   return (
     <>
       <div className="h-2 flex-shrink-0" />
 
       <div className="container flex flex-1 flex-col gap-4 px-2">
-        {expenses.map((expense) => (
-          <ExpenseItem key={expense.id} partyId={party.id} expense={expense} />
-        ))}
+        {expenses
+          .filter((expense) => {
+            if (participant.personalMode) {
+              // If personal mode is enabled
+              // Only show expenses that are paid by the participant
+              if (expense.paidBy[participant.id]) {
+                return true;
+              }
+
+              // Or if the participant is part of the shares of the expense
+              if (expense.shares[participant.id]) {
+                return true;
+              }
+
+              return false;
+            }
+
+            return true;
+          })
+          .map((expense) => (
+            <ExpenseItem
+              key={expense.id}
+              partyId={party.id}
+              expense={expense}
+            />
+          ))}
 
         <div className="flex-1" />
 

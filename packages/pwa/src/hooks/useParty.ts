@@ -34,7 +34,7 @@ export function useParty(partyId: string) {
 
   function setParticipantDetails(
     participantId: PartyParticipant["id"],
-    details: Partial<Pick<PartyParticipant, "phone">>,
+    details: Partial<Pick<PartyParticipant, "phone" | "personalMode">>,
   ) {
     handle.change((doc) => {
       const participant = doc.participants[participantId];
@@ -43,7 +43,16 @@ export function useParty(partyId: string) {
         return;
       }
 
-      doc.participants[participantId].phone = details.phone;
+      for (const key in details) {
+        const value = details[key as keyof typeof details];
+
+        if (value === undefined) {
+          delete participant[key as keyof typeof participant];
+        } else {
+          // @ts-expect-error -- idk tbh
+          participant[key] = value;
+        }
+      }
     });
   }
 
