@@ -3,6 +3,8 @@ import {
   type ExpenseEditorFormValues,
   type ExpenseEditorRef,
 } from "#src/components/ExpenseEditor.tsx";
+import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
+import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import {
   documentCache,
   useSuspenseDocument,
@@ -16,6 +18,7 @@ import {
   calculateExpenseHash,
   getExpenseTotalAmount,
   type Expense,
+  type ExpenseParticipantPresence,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import {
@@ -54,6 +57,7 @@ function RouteComponent() {
     onUpdateExpense,
     onChangeExpense,
     subscribeToExpenseChanges,
+    onPresenceUpdate,
   } = useExpense();
   const navigate = useNavigate();
 
@@ -164,19 +168,27 @@ function RouteComponent() {
   const formValues = getFormValues(expense);
 
   return (
-    <ExpenseEditor
-      title={t`Editing ${formValues.name}`}
-      onSubmit={onSubmit}
-      defaultValues={formValues}
-      onChange={onChange}
-      ref={editorRef}
-    />
+    <>
+      <RealtimeExpenseEditorPresence
+        presence={expense.__presence}
+        onPresenceUpdate={onPresenceUpdate}
+      />
+      <ExpenseEditor
+        title={t`Editing ${formValues.name}`}
+        onSubmit={onSubmit}
+        defaultValues={formValues}
+        onChange={onChange}
+        ref={editorRef}
+        autoFocus={false}
+      />
+    </>
   );
 }
 
 function useExpense() {
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
+  const participant = useCurrentParticipant();
 
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
 
@@ -261,6 +273,38 @@ function useExpense() {
     };
   }
 
+  function onPresenceUpdate(
+    value: Pick<ExpenseParticipantPresence, "elementId"> | null,
+  ) {
+    handle.change((chunk) => {
+      const entry = chunk.expenses[expenseIndex];
+
+      if (!entry) {
+        return;
+      }
+
+      if (entry.id !== expenseId) {
+        return;
+      }
+
+      if (!entry.__presence) {
+        entry.__presence = {};
+      }
+
+      if (value) {
+        entry.__presence[participant.id] = {
+          participantId: participant.id,
+          dateTime: new Date(),
+          elementId: value.elementId,
+        };
+      } else {
+        if (entry.__presence[participant.id]) {
+          delete entry.__presence[participant.id];
+        }
+      }
+    });
+  }
+
   return {
     partyId,
     expense,
@@ -269,6 +313,7 @@ function useExpense() {
     onChangeExpense,
     onUpdateExpense,
     subscribeToExpenseChanges,
+    onPresenceUpdate,
   };
 }
 

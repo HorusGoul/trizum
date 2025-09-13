@@ -50,6 +50,7 @@ interface ExpenseEditorProps {
   onChange?: (values: ExpenseEditorFormValues) => void;
   defaultValues: ExpenseEditorFormValues;
   ref?: React.RefObject<ExpenseEditorRef | null>;
+  autoFocus?: boolean;
 }
 
 export function ExpenseEditor({
@@ -58,6 +59,7 @@ export function ExpenseEditor({
   defaultValues,
   onChange,
   ref,
+  autoFocus = true,
 }: ExpenseEditorProps) {
   const participants = useExpenseParticipants({
     paidBy: {
@@ -250,8 +252,11 @@ export function ExpenseEditor({
                   field.state.meta.isTouched &&
                   field.state.meta.errors?.length > 0
                 }
-                autoFocus={true}
+                autoFocus={autoFocus}
                 className="col-span-2"
+                data-presence-element-id="title"
+                data-presence-offset-top={6}
+                data-presence-offset-left={-10}
               />
             )}
           </form.Field>
@@ -286,6 +291,9 @@ export function ExpenseEditor({
                   input.select();
                 }}
                 inputMode="decimal"
+                data-presence-element-id="amount"
+                data-presence-offset-top={6}
+                data-presence-offset-left={-10}
               />
             )}
           </form.Field>
@@ -301,6 +309,9 @@ export function ExpenseEditor({
                   }
                 }}
                 selectedKey={field.state.value}
+                data-presence-element-id="paidBy"
+                data-presence-offset-top={6}
+                data-presence-offset-left={-10}
               >
                 {(participant) => (
                   <SelectItem key={participant.id} value={participant}>
@@ -322,6 +333,9 @@ export function ExpenseEditor({
                     field.handleChange(value.toDate());
                   }
                 }}
+                data-presence-element-id="paidAt"
+                data-presence-offset-top={6}
+                data-presence-offset-left={-10}
               />
             )}
           </form.Field>
@@ -482,7 +496,10 @@ function ParticipantItem({
   const currentShareType = participantShare?.type || "divide";
 
   return (
-    <div className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-slate-500 bg-white pr-3 dark:border-slate-700 dark:bg-slate-900">
+    <div
+      data-presence-element-id={`participant-${participant.id}`}
+      className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-slate-500 bg-white pr-3 dark:border-slate-700 dark:bg-slate-900"
+    >
       <div className="flex h-full items-center gap-3">
         <Checkbox
           isSelected={!!shares[participant.id]}

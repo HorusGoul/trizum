@@ -11,6 +11,7 @@ import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import { clone } from "@opentf/std";
 import { md5 } from "@takker/md5";
+import type { PartyParticipant } from "./party";
 
 export interface Expense {
   id: string;
@@ -21,6 +22,10 @@ export interface Expense {
   photos: MediaFile["id"][];
   __hash: string;
   __editCopy?: Omit<Expense, "__editCopy">;
+  __presence?: Record<
+    ExpenseParticipantPresence["participantId"],
+    ExpenseParticipantPresence
+  >;
 }
 
 export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;
@@ -28,6 +33,12 @@ export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;
 export interface ExpenseShareExact {
   type: "exact";
   value: number;
+}
+
+export interface ExpenseParticipantPresence {
+  participantId: PartyParticipant["id"];
+  dateTime: Date;
+  elementId: string;
 }
 
 export interface ExpenseShareDivide {
