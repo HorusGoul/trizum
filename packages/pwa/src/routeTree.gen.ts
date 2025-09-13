@@ -19,6 +19,7 @@ import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.wh
 import { Route as PartyPartyIdSettingsRouteImport } from './routes/party_.$partyId.settings'
 import { Route as PartyPartyIdAddRouteImport } from './routes/party_.$partyId.add'
 import { Route as PartyPartyIdExpenseExpenseIdRouteImport } from './routes/party_.$partyId.expense.$expenseId'
+import { Route as PartyPartyIdExpenseExpenseIdEditRouteImport } from './routes/party_.$partyId.expense.$expenseId_.edit'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -71,6 +72,12 @@ const PartyPartyIdExpenseExpenseIdRoute =
     path: '/party/$partyId/expense/$expenseId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PartyPartyIdExpenseExpenseIdEditRoute =
+  PartyPartyIdExpenseExpenseIdEditRouteImport.update({
+    id: '/party_/$partyId/expense/$expenseId_/edit',
+    path: '/party/$partyId/expense/$expenseId/edit',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
+  '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -95,6 +103,7 @@ export interface FileRoutesByTo {
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
+  '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -108,6 +117,7 @@ export interface FileRoutesById {
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party_/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
+  '/party_/$partyId/expense/$expenseId_/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/settings'
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
+    | '/party/$partyId/expense/$expenseId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/settings'
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
+    | '/party/$partyId/expense/$expenseId/edit'
   id:
     | '__root__'
     | '/'
@@ -146,6 +158,7 @@ export interface FileRouteTypes {
     | '/party_/$partyId/settings'
     | '/party_/$partyId/who'
     | '/party_/$partyId/expense/$expenseId'
+    | '/party_/$partyId/expense/$expenseId_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -159,6 +172,7 @@ export interface RootRouteChildren {
   PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
   PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
   PartyPartyIdExpenseExpenseIdRoute: typeof PartyPartyIdExpenseExpenseIdRoute
+  PartyPartyIdExpenseExpenseIdEditRoute: typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -233,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/party_/$partyId/expense/$expenseId_/edit': {
+      id: '/party_/$partyId/expense/$expenseId_/edit'
+      path: '/party/$partyId/expense/$expenseId/edit'
+      fullPath: '/party/$partyId/expense/$expenseId/edit'
+      preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -247,6 +268,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,
   PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,
   PartyPartyIdExpenseExpenseIdRoute: PartyPartyIdExpenseExpenseIdRoute,
+  PartyPartyIdExpenseExpenseIdEditRoute: PartyPartyIdExpenseExpenseIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

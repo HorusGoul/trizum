@@ -121,3 +121,6 @@ dist
 
 # Turbo cache
 .turbo
+
+# TanStack Router cache
+.tanstack

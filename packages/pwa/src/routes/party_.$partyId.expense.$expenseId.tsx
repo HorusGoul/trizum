@@ -41,7 +41,8 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 });
 
 function ExpenseById() {
-  const { expenseId, expense, onDeleteExpense, isLoading } = useExpense();
+  const { expenseId, partyId, expense, onDeleteExpense, isLoading } =
+    useExpense();
 
   if (expenseId === undefined) {
     return <span>Invalid Expense ID</span>;
@@ -65,6 +66,22 @@ function ExpenseById() {
           <IconButton icon="#lucide/ellipsis-vertical" aria-label="Menu" />
           <Popover placement="bottom end">
             <Menu>
+              <MenuItem
+                href={{
+                  to: "/party/$partyId/expense/$expenseId/edit",
+                  params: {
+                    expenseId,
+                    partyId,
+                  },
+                }}
+              >
+                <IconWithFallback
+                  name="#lucide/pencil"
+                  size={20}
+                  className="mr-3"
+                />
+                <span className="h-3.5 leading-none">Edit</span>
+              </MenuItem>
               <MenuItem onAction={onDeleteExpense}>
                 <IconWithFallback
                   name="#lucide/trash"

@@ -7,6 +7,8 @@ import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
 import Dinero from "dinero.js";
 import type { MediaFile } from "./media";
+import { diff } from "@opentf/obj-diff";
+import { patchMutate } from "#src/lib/patchMutate.ts";
 
 export interface Expense {
   id: string;
@@ -306,4 +308,14 @@ export function getExpenseUnitShares({
   })();
 
   return participantAmounts;
+}
+
+export function applyExpenseDiff(base: Expense, updated: Expense) {
+  const expenseDiff = diff(base, updated);
+
+  if (expenseDiff.length === 0) {
+    return;
+  }
+
+  patchMutate(base, expenseDiff);
 }
