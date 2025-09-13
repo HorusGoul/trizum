@@ -68,7 +68,7 @@ msgstr "Archived participants"
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:216
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:233
 msgid "Attachments"
 msgstr "Attachments"
 
@@ -101,6 +101,10 @@ msgstr "Description must be less than 500 characters"
 msgid "Divide"
 msgstr "Divide"
 
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:129
+msgid "Editing {0}"
+msgstr "Editing {0}"
+
 #: src/components/ExpenseEditor.tsx:421
 msgid "Exact"
 msgstr "Exact"
@@ -117,6 +121,10 @@ msgstr "Expense amounts don't match total. Please check your split configuration
 msgid "Expense Split Mode"
 msgstr "Expense Split Mode"
 
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:97
+msgid "Expense updated"
+msgstr "Expense updated"
+
 #: src/routes/party.$partyId.tsx:138
 msgid "Expenses"
 msgstr "Expenses"
@@ -124,6 +132,10 @@ msgstr "Expenses"
 #: src/routes/party_.$partyId.add.tsx:82
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
+
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:102
+msgid "Failed to update expense"
+msgstr "Failed to update expense"
 
 #: src/routes/settings.tsx:121
 msgid "For payments through Bizum or similar services"
@@ -178,8 +190,8 @@ msgstr "Leave party"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:150
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:276
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:167
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:293
 msgid "Me"
 msgstr "Me"
 
@@ -216,12 +228,12 @@ msgstr "Optional description for this expense"
 msgid "Other operations"
 msgstr "Other operations"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:194
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:211
 msgid "Paid at"
 msgstr "Paid at"
 
 #: src/components/ExpenseEditor.tsx:245
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:178
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:195
 msgid "Paid by"
 msgstr "Paid by"
 
@@ -308,7 +320,7 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:258
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:275
 msgid "Shares"
 msgstr "Shares"
 
@@ -379,6 +391,10 @@ msgstr "Total split:"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:75
+msgid "Updating expense..."
+msgstr "Updating expense..."
+
 #: src/components/ExpenseEditor.tsx:648
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
@@ -388,6 +404,7 @@ msgid "Upload photo"
 msgstr "Upload photo"
 
 #: src/routes/party_.$partyId.add.tsx:45
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:64
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
@@ -400,7 +417,7 @@ msgid "Username"
 msgstr "Username"
 
 #: src/components/ExpenseEditor.tsx:760
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:236
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:253
 msgid "View photo"
 msgstr "View photo"
 
