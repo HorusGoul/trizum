@@ -22,6 +22,10 @@ import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import { getExpenseUnitShares } from "#src/models/expense.ts";
+import { useMediaFile } from "#src/hooks/useMediaFile.ts";
+import { Skeleton } from "#src/ui/Skeleton.tsx";
+import type { MediaFile } from "#src/models/media.ts";
+import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -29,7 +33,7 @@ export interface ExpenseEditorFormValues {
   paidAt: CalendarDate;
   paidBy: ExpenseUser;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
-  photos: LocalPhoto[];
+  photos: MediaFile["id"][];
 }
 
 interface ExpenseEditorProps {
@@ -629,8 +633,8 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
 }
 
 interface PhotosFieldProps {
-  value: LocalPhoto[];
-  onChange: (updater: Updater<LocalPhoto[]>) => void;
+  value: MediaFile["id"][];
+  onChange: (updater: Updater<MediaFile["id"][]>) => void;
 }
 
 function PhotosField({ value, onChange }: PhotosFieldProps) {
@@ -650,16 +654,18 @@ function PhotosField({ value, onChange }: PhotosFieldProps) {
         </div>
       ) : null}
 
-      {value.map((photo) => (
-        <CurrentPhoto
-          key={photo.url}
-          photoUrl={photo.url}
-          onRemove={() => {
-            onChange((prevPhotos) =>
-              prevPhotos.filter((current) => current !== photo),
-            );
-          }}
-        />
+      {value.map((photoId) => (
+        <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
+          <CurrentPhoto
+            key={photoId}
+            photoId={photoId}
+            onRemove={() => {
+              onChange((prevPhotos) =>
+                prevPhotos.filter((current) => current !== photoId),
+              );
+            }}
+          />
+        </Suspense>
       ))}
       <AddPhotoButton
         onPhoto={(photo) => {
@@ -676,20 +682,33 @@ interface LocalPhoto {
 }
 
 interface AddPhotoButtonProps {
-  onPhoto: (photos: LocalPhoto[]) => void;
+  onPhoto: (photos: MediaFile["id"][]) => void;
 }
 
 function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const { createMediaFile } = useMediaFileActions();
 
-  function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const localPhotos = Array.from(event.target.files ?? []).map((blob) => {
-      const url = URL.createObjectURL(blob);
-      return { url, blob };
-    });
+  async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const toastId: string | number = toast.loading(t`Uploading...`);
 
-    onPhoto(localPhotos);
+    try {
+      const photoIds = await Promise.all(
+        Array.from(event.target.files ?? []).map(async (blob) => {
+          const [mediaFileId] = await createMediaFile(blob, {});
+          return mediaFileId;
+        }),
+      );
+
+      onPhoto(photoIds);
+
+      toast.dismiss(toastId);
+    } catch (error) {
+      toast.error(t`Failed to upload, please try again`, {
+        id: toastId,
+      });
+    }
 
     // Reset the input value to allow the user to add more photos
     event.target.value = "";
@@ -748,11 +767,13 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 }
 
 interface CurrentPhotoProps {
-  photoUrl: string;
+  photoId: string;
   onRemove: () => void;
 }
 
-function CurrentPhoto({ photoUrl, onRemove }: CurrentPhotoProps) {
+function CurrentPhoto({ photoId, onRemove }: CurrentPhotoProps) {
+  const { url } = useMediaFile(photoId);
+
   return (
     <div className="relative flex-shrink-0">
       <Button
@@ -761,7 +782,7 @@ function CurrentPhoto({ photoUrl, onRemove }: CurrentPhotoProps) {
         className="h-auto w-auto p-0"
       >
         <img
-          src={photoUrl}
+          src={url}
           className="block h-32 w-32 rounded-xl object-cover"
           alt=""
           onContextMenu={(e) => e.preventDefault()}

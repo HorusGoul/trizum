@@ -61,17 +61,6 @@ function RouteComponent() {
         shares[participantId] = share;
       });
 
-      toast.loading(t`Uploading pictures...`, {
-        id: "update-expense",
-      });
-
-      // const photos = await Promise.all(
-      //   values.photos.map(async (photo) => {
-      //     const [mediaFileId] = await createMediaFile(photo.blob, {});
-      //     return mediaFileId;
-      //   }),
-      // );
-
       toast.loading(t`Updating expense...`, {
         id: "update-expense",
       });
@@ -82,7 +71,7 @@ function RouteComponent() {
         paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
-        photos: [],
+        photos: values.photos,
       });
 
       navigate({
@@ -189,6 +178,6 @@ function getFormValues(expense: Expense): ExpenseEditorFormValues {
     paidAt: initialPaidAt,
     paidBy: initialPaidBy,
     shares: expense.shares,
-    photos: [],
+    photos: expense.photos,
   };
 }

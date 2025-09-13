@@ -9,6 +9,7 @@ import Dinero from "dinero.js";
 import type { MediaFile } from "./media";
 import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
+import { clone } from "@opentf/std";
 
 export interface Expense {
   id: string;
@@ -311,7 +312,7 @@ export function getExpenseUnitShares({
 }
 
 export function applyExpenseDiff(base: Expense, updated: Expense) {
-  const expenseDiff = diff(base, updated);
+  const expenseDiff = diff(clone(base), clone(updated));
 
   if (expenseDiff.length === 0) {
     return;

@@ -42,17 +42,6 @@ function AddExpense() {
         shares[participantId] = share;
       });
 
-      toast.loading(t`Uploading pictures...`, {
-        id: "add-expense",
-      });
-
-      const photos = await Promise.all(
-        values.photos.map(async (photo) => {
-          const [mediaFileId] = await createMediaFile(photo.blob, {});
-          return mediaFileId;
-        }),
-      );
-
       toast.loading(t`Adding expense...`, {
         id: "add-expense",
       });
@@ -62,7 +51,7 @@ function AddExpense() {
         paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
-        photos,
+        photos: values.photos,
       });
 
       navigate({
