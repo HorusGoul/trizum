@@ -1,6 +1,7 @@
 import {
   ExpenseEditor,
   type ExpenseEditorFormValues,
+  type ExpenseEditorRef,
 } from "#src/components/ExpenseEditor.tsx";
 import {
   documentCache,
@@ -12,18 +13,23 @@ import {
   applyExpenseDiff,
   decodeExpenseId,
   findExpenseById,
+  calculateExpenseHash,
   getExpenseTotalAmount,
   type Expense,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
-import { isValidDocumentId } from "@automerge/automerge-repo";
-import { fromDate, getLocalTimeZone } from "@internationalized/date";
+import {
+  isValidDocumentId,
+  type DocHandleChangePayload,
+} from "@automerge/automerge-repo";
 import { t } from "@lingui/macro";
+import { clone } from "@opentf/std";
 import {
   createFileRoute,
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute(
@@ -40,9 +46,54 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { expenseId, partyId, expense, isLoading, onUpdateExpense } =
-    useExpense();
+  const {
+    expenseId,
+    partyId,
+    expense,
+    isLoading,
+    onUpdateExpense,
+    onChangeExpense,
+    subscribeToExpenseChanges,
+  } = useExpense();
   const navigate = useNavigate();
+
+  if (expenseId === undefined) {
+    return <span>Invalid Expense ID</span>;
+  }
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!expense) {
+    return "404 bruv";
+  }
+
+  const editorRef = useRef<ExpenseEditorRef>(null);
+  const currentHashRef = useRef<string>(getExpenseHash(expense));
+
+  function onChange(values: ExpenseEditorFormValues) {
+    const expense = {
+      id: expenseId,
+      name: values.name,
+      paidAt: values.paidAt,
+      paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+      shares: values.shares,
+      photos: values.photos,
+    };
+    const hash = calculateExpenseHash(expense);
+
+    if (hash === currentHashRef.current) {
+      return;
+    }
+
+    currentHashRef.current = hash;
+
+    onChangeExpense({
+      ...expense,
+      __hash: hash,
+    });
+  }
 
   async function onSubmit(values: ExpenseEditorFormValues) {
     try {
@@ -58,13 +109,18 @@ function RouteComponent() {
         id: "update-expense",
       });
 
-      onUpdateExpense({
+      const expense = {
         id: expenseId,
         name: values.name,
         paidAt: values.paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
         photos: values.photos,
+      };
+
+      onUpdateExpense({
+        ...expense,
+        __hash: calculateExpenseHash(expense),
       });
 
       navigate({
@@ -94,23 +150,26 @@ function RouteComponent() {
     }
   }
 
-  if (expenseId === undefined) {
-    return <span>Invalid Expense ID</span>;
-  }
+  useEffect(() => {
+    return subscribeToExpenseChanges((updatedExpense) => {
+      const raw = clone(updatedExpense);
 
-  if (isLoading) {
-    return null;
-  }
+      const currentHash = getExpenseHash(raw);
+      currentHashRef.current = currentHash;
 
-  if (!expense) {
-    return "404 bruv";
-  }
+      editorRef.current?.setValues(getFormValues(raw));
+    });
+  }, [onChange]);
+
+  const formValues = getFormValues(expense);
 
   return (
     <ExpenseEditor
-      title={t`Editing ${expense.name}`}
+      title={t`Editing ${formValues.name}`}
       onSubmit={onSubmit}
-      defaultValues={getFormValues(expense)}
+      defaultValues={formValues}
+      onChange={onChange}
+      ref={editorRef}
     />
   );
 }
@@ -144,7 +203,62 @@ function useExpense() {
       }
 
       applyExpenseDiff(entry, expense);
+      delete entry.__editCopy;
     });
+  }
+
+  function onChangeExpense(expense: Expense) {
+    if (expenseId === undefined) return;
+
+    handle.change((chunk) => {
+      const entry = chunk.expenses[expenseIndex];
+
+      if (!entry) {
+        return;
+      }
+
+      if (entry.id !== expense.id) {
+        return;
+      }
+
+      const copy = clone(expense);
+      delete copy.__editCopy;
+
+      if (!entry.__editCopy) {
+        entry.__editCopy = copy;
+        return;
+      }
+
+      applyExpenseDiff(entry.__editCopy, copy);
+    });
+  }
+
+  function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
+    let prevHash = expense ? getExpenseHash(expense) : "";
+
+    const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
+      const [expense] = findExpenseById(payload.doc.expenses, expenseId);
+
+      if (!expense) {
+        return;
+      }
+
+      const currentHash = getExpenseHash(expense);
+
+      if (currentHash === prevHash) {
+        return;
+      }
+
+      prevHash = currentHash;
+
+      callback(expense);
+    };
+
+    handle.on("change", handler);
+
+    return () => {
+      handle.off("change", handler);
+    };
   }
 
   return {
@@ -152,20 +266,34 @@ function useExpense() {
     expense,
     expenseId,
     isLoading: handle.inState(["loading"]),
+    onChangeExpense,
     onUpdateExpense,
+    subscribeToExpenseChanges,
   };
 }
 
 function getFormValues(expense: Expense): ExpenseEditorFormValues {
-  const initialAmount = getExpenseTotalAmount(expense) / 100;
-  const initialPaidBy = Object.keys(expense.paidBy)[0];
+  if (expense.__editCopy) {
+    return {
+      name: expense.__editCopy.name,
+      paidAt: expense.__editCopy.paidAt,
+      shares: expense.__editCopy.shares,
+      photos: expense.__editCopy.photos,
+      amount: getExpenseTotalAmount(expense.__editCopy) / 100,
+      paidBy: Object.keys(expense.__editCopy.paidBy)[0],
+    };
+  }
 
   return {
     name: expense.name,
-    amount: initialAmount,
+    amount: getExpenseTotalAmount(expense) / 100,
     paidAt: expense.paidAt,
-    paidBy: initialPaidBy,
+    paidBy: Object.keys(expense.paidBy)[0],
     shares: expense.shares,
     photos: expense.photos,
   };
+}
+
+function getExpenseHash(expense: Expense) {
+  return expense.__editCopy?.__hash ?? expense.__hash;
 }

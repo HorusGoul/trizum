@@ -1,5 +1,9 @@
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import { createExpenseId, type Expense } from "#src/models/expense.js";
+import {
+  createExpenseId,
+  calculateExpenseHash,
+  type Expense,
+} from "#src/models/expense.js";
 import type {
   Party,
   PartyExpenseChunk,
@@ -59,7 +63,7 @@ export function useParty(partyId: string) {
   }
 
   async function addExpenseToParty(
-    expense: Omit<Expense, "id">,
+    expense: Omit<Expense, "id" | "__hash">,
   ): Promise<Expense> {
     if (!party) {
       throw new Error("Party not found, this should not happen");
@@ -97,20 +101,27 @@ export function useParty(partyId: string) {
       ...expense,
       id: createExpenseId(lastChunkId),
     };
+    const expenseWithHash = {
+      ...expenseWithId,
+      __hash: calculateExpenseHash({
+        ...expenseWithId,
+        __hash: "",
+      }),
+    };
 
     lastChunkHandle.change((doc) => {
-      doc.expenses.unshift(expenseWithId);
+      doc.expenses.unshift(expenseWithHash);
     });
 
     if (party.chunkIds.includes(lastChunkId)) {
-      return expenseWithId;
+      return expenseWithHash;
     }
 
     handle.change((party) => {
       party.chunkIds.unshift(lastChunkId);
     });
 
-    return expenseWithId;
+    return expenseWithHash;
   }
 
   return {

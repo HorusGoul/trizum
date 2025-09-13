@@ -1,7 +1,7 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import { Suspense, useId, useRef } from "react";
+import { Suspense, useEffect, useId, useImperativeHandle, useRef } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t, Trans } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
@@ -40,16 +40,24 @@ export interface ExpenseEditorFormValues {
   photos: MediaFile["id"][];
 }
 
+export interface ExpenseEditorRef {
+  setValues: (values: ExpenseEditorFormValues) => void;
+}
+
 interface ExpenseEditorProps {
   title: string;
   onSubmit: (values: ExpenseEditorFormValues) => void;
+  onChange?: (values: ExpenseEditorFormValues) => void;
   defaultValues: ExpenseEditorFormValues;
+  ref?: React.RefObject<ExpenseEditorRef | null>;
 }
 
 export function ExpenseEditor({
   title,
   onSubmit,
   defaultValues,
+  onChange,
+  ref,
 }: ExpenseEditorProps) {
   const participants = useExpenseParticipants({
     paidBy: {
@@ -141,6 +149,41 @@ export function ExpenseEditor({
 
   const shares = useStore(form.store, (state) => state.values.shares);
   const amount = useStore(form.store, (state) => state.values.amount);
+
+  const isReceivingUpdatesRef = useRef(false);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      setValues: (values) => {
+        isReceivingUpdatesRef.current = true;
+
+        for (const key in values) {
+          form.setFieldValue(
+            key as keyof ExpenseEditorFormValues,
+            values[key as keyof ExpenseEditorFormValues],
+          );
+        }
+
+        isReceivingUpdatesRef.current = false;
+      },
+    }),
+    [form.setFieldValue],
+  );
+
+  useEffect(() => {
+    if (!onChange) {
+      return;
+    }
+
+    return form.store.subscribe(({ currentVal }) => {
+      if (isReceivingUpdatesRef.current) {
+        return;
+      }
+
+      onChange(currentVal.values);
+    });
+  }, [form.store.subscribe, onChange]);
 
   return (
     <div className="flex min-h-full flex-col">

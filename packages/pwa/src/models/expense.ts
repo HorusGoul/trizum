@@ -10,6 +10,7 @@ import type { MediaFile } from "./media";
 import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import { clone } from "@opentf/std";
+import { md5 } from "@takker/md5";
 
 export interface Expense {
   id: string;
@@ -18,6 +19,8 @@ export interface Expense {
   paidBy: Record<ExpenseUser, number>;
   shares: Record<ExpenseUser, ExpenseShare>;
   photos: MediaFile["id"][];
+  __hash: string;
+  __editCopy?: Omit<Expense, "__editCopy">;
 }
 
 export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;
@@ -311,12 +314,25 @@ export function getExpenseUnitShares({
   return participantAmounts;
 }
 
+export function getExpenseDiff(base: Expense, updated: Expense) {
+  return diff(clone(base), clone(updated));
+}
+
 export function applyExpenseDiff(base: Expense, updated: Expense) {
-  const expenseDiff = diff(clone(base), clone(updated));
+  const expenseDiff = getExpenseDiff(base, updated);
 
   if (expenseDiff.length === 0) {
     return;
   }
 
   patchMutate(base, expenseDiff);
+}
+
+export function calculateExpenseHash(expense: Partial<Expense>) {
+  const copy = clone(expense);
+
+  delete copy.__hash;
+  delete copy.__editCopy;
+
+  return new TextDecoder().decode(md5(JSON.stringify(copy)));
 }
