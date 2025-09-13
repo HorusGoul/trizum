@@ -13,7 +13,7 @@ import {
   type ExpenseEditorFormValues,
 } from "#src/components/ExpenseEditor.js";
 
-import { getLocalTimeZone, today } from "@internationalized/date";
+import { getLocalTimeZone, now } from "@internationalized/date";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 
 export const Route = createFileRoute("/party_/$partyId/add")({
@@ -32,8 +32,6 @@ function AddExpense() {
 
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
-      const paidAt = values.paidAt.toDate(getLocalTimeZone());
-
       // Create shares based on the form values
       const shares: Expense["shares"] = {};
 
@@ -48,7 +46,7 @@ function AddExpense() {
 
       const expense = await addExpenseToParty({
         name: values.name,
-        paidAt,
+        paidAt: values.paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
         photos: values.photos,
@@ -90,7 +88,7 @@ function AddExpense() {
         amount: 0,
         paidBy: participant.id,
         shares: {},
-        paidAt: today(getLocalTimeZone()),
+        paidAt: new Date(),
         photos: [],
       }}
     />

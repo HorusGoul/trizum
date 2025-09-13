@@ -17,18 +17,13 @@ import {
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import { isValidDocumentId } from "@automerge/automerge-repo";
-import {
-  CalendarDate,
-  getLocalTimeZone,
-  toCalendarDate,
-} from "@internationalized/date";
+import { fromDate, getLocalTimeZone } from "@internationalized/date";
 import { t } from "@lingui/macro";
 import {
   createFileRoute,
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
-import Dinero from "dinero.js";
 import { toast } from "sonner";
 
 export const Route = createFileRoute(
@@ -51,8 +46,6 @@ function RouteComponent() {
 
   async function onSubmit(values: ExpenseEditorFormValues) {
     try {
-      const paidAt = values.paidAt.toDate(getLocalTimeZone());
-
       // Create shares based on the form values
       const shares: Expense["shares"] = {};
 
@@ -68,7 +61,7 @@ function RouteComponent() {
       onUpdateExpense({
         id: expenseId,
         name: values.name,
-        paidAt,
+        paidAt: values.paidAt,
         paidBy: { [values.paidBy]: convertToUnits(values.amount) },
         shares,
         photos: values.photos,
@@ -166,16 +159,11 @@ function useExpense() {
 function getFormValues(expense: Expense): ExpenseEditorFormValues {
   const initialAmount = getExpenseTotalAmount(expense) / 100;
   const initialPaidBy = Object.keys(expense.paidBy)[0];
-  const initialPaidAt = new CalendarDate(
-    expense.paidAt.getFullYear(),
-    expense.paidAt.getMonth(),
-    expense.paidAt.getDate(),
-  );
 
   return {
     name: expense.name,
     amount: initialAmount,
-    paidAt: initialPaidAt,
+    paidAt: expense.paidAt,
     paidBy: initialPaidBy,
     shares: expense.shares,
     photos: expense.photos,

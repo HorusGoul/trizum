@@ -17,7 +17,11 @@ import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 import { AppDatePicker } from "#src/ui/DatePicker.tsx";
-import type { CalendarDate } from "@internationalized/date";
+import {
+  fromDate,
+  getLocalTimeZone,
+  type ZonedDateTime,
+} from "@internationalized/date";
 import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
@@ -30,7 +34,7 @@ import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 export interface ExpenseEditorFormValues {
   name: string;
   amount: number;
-  paidAt: CalendarDate;
+  paidAt: Date;
   paidBy: ExpenseUser;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   photos: MediaFile["id"][];
@@ -266,12 +270,13 @@ export function ExpenseEditor({
 
           <form.Field name="paidAt">
             {(field) => (
-              <AppDatePicker
+              <AppDatePicker<ZonedDateTime>
                 label={t`Date`}
-                value={field.state.value}
+                value={fromDate(field.state.value, getLocalTimeZone())}
+                granularity="day"
                 onChange={(value) => {
                   if (value) {
-                    field.handleChange(value);
+                    field.handleChange(value.toDate());
                   }
                 }}
               />
