@@ -37,11 +37,11 @@ preloadIcon("#lucide/scale"),
 preloadIcon("#lucide/scroll-text"),
 preloadIcon("#lucide/settings"),
 preloadIcon("#lucide/split"),
+preloadIcon("#lucide/test-tube-diagonal"),
 preloadIcon("#lucide/trash"),
 preloadIcon("#lucide/user"),
 preloadIcon("#lucide/user-round-check"),
 preloadIcon("#lucide/user-round-pen"),
-preloadIcon("#lucide/user-x"),
 preloadIcon("#lucide/users"),
 preloadIcon("#lucide/x")
   ])

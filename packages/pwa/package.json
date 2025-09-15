@@ -34,6 +34,7 @@
     "@takker/md5": "jsr:^0.1.0",
     "@tanstack/react-form": "1.19.2",
     "@tanstack/react-router": "1.131.17",
+    "@tanstack/react-virtual": "3.13.12",
     "clsx": "2.1.1",
     "dinero.js": "1.9.1",
     "framer-motion": "11.18.2",

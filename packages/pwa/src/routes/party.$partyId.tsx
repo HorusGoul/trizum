@@ -21,10 +21,12 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useNoMemo } from "#src/hooks/useNoMemo.ts";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -49,6 +51,7 @@ function PartyById() {
   const { removeParty } = usePartyList();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
+  const expenseLogTabPanelRef = useRef<HTMLDivElement>(null);
 
   async function onLeaveParty() {
     if (!partyId) return;
@@ -167,7 +170,8 @@ function PartyById() {
             {
               id: "expenses",
               label: t`Expenses`,
-              node: <ExpenseLog />,
+              node: <ExpenseLog panelRef={expenseLogTabPanelRef} />,
+              panelRef: expenseLogTabPanelRef,
               icon: "#lucide/scroll-text",
             },
             {
@@ -183,42 +187,76 @@ function PartyById() {
   );
 }
 
-function ExpenseLog() {
-  const { party } = useCurrentParty();
+function ExpenseLog({
+  panelRef,
+}: {
+  panelRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const { party, dev } = useCurrentParty();
   const expenses = usePartyExpenses(party.id);
   const participant = useCurrentParticipant();
+
+  const filteredExpenses = expenses.filter((expense) => {
+    if (participant.personalMode) {
+      // If personal mode is enabled
+      // Only show expenses that are paid by the participant
+      if (expense.paidBy[participant.id]) {
+        return true;
+      }
+
+      // Or if the participant is part of the shares of the expense
+      if (expense.shares[participant.id]) {
+        return true;
+      }
+
+      return false;
+    }
+
+    return true;
+  });
+
+  const rowVirtualizer = useVirtualizer({
+    count: filteredExpenses.length,
+    getScrollElement: () => panelRef.current,
+    estimateSize: () => 96,
+    getItemKey: (index) => filteredExpenses[index].id,
+    gap: 16,
+    overscan: 10,
+  });
+
+  // https://github.com/TanStack/virtual/issues/743#issuecomment-2894893548
+  const virtualItems = useNoMemo(() => rowVirtualizer.getVirtualItems());
 
   return (
     <>
       <div className="h-2 flex-shrink-0" />
 
-      <div className="container flex flex-1 flex-col gap-4 px-2">
-        {expenses
-          .filter((expense) => {
-            if (participant.personalMode) {
-              // If personal mode is enabled
-              // Only show expenses that are paid by the participant
-              if (expense.paidBy[participant.id]) {
-                return true;
-              }
-
-              // Or if the participant is part of the shares of the expense
-              if (expense.shares[participant.id]) {
-                return true;
-              }
-
-              return false;
-            }
-
-            return true;
-          })
-          .map((expense) => (
-            <ExpenseItem
-              key={expense.id}
-              partyId={party.id}
-              expense={expense}
-            />
+      <div className="container flex flex-1 flex-col px-2">
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+            width: "100%",
+          }}
+        >
+          {virtualItems.map((virtualItem) => (
+            <div
+              key={virtualItem.key}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+            >
+              <ExpenseItem
+                partyId={party.id}
+                expense={filteredExpenses[virtualItem.index]}
+              />
+            </div>
           ))}
+        </div>
 
         <div className="flex-1" />
 
@@ -233,6 +271,18 @@ function ExpenseLog() {
 
             <Popover placement="top end" offset={16}>
               <Menu className="min-w-60">
+                {import.meta.env.DEV ? (
+                  <MenuItem onAction={() => dev.createTestExpenses()}>
+                    <IconWithFallback
+                      name="#lucide/test-tube-diagonal"
+                      size={20}
+                      className="mr-3"
+                    />
+                    <span className="h-3.5 leading-none">
+                      <Trans>[DEV] Create expenses</Trans>
+                    </span>
+                  </MenuItem>
+                ) : null}
                 <MenuItem
                   href={{
                     to: "/party/$partyId/add",

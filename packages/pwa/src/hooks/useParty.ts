@@ -133,6 +133,43 @@ export function useParty(partyId: string) {
     return expenseWithHash;
   }
 
+  async function __dev_createTestExpenses() {
+    const promptAnswer = window.prompt("How many test expenses to create?");
+
+    if (!promptAnswer) {
+      console.log("No prompt answer");
+      return;
+    }
+
+    const amount = parseInt(promptAnswer ?? "0");
+
+    console.log("Creating", amount, "test expenses");
+
+    const participants = Object.keys(party.participants);
+
+    for (let i = 0; i < amount; i++) {
+      console.log("Creating test expense", i + 1);
+      await addExpenseToParty({
+        name: `Test Expense ${i + 1}`,
+        paidAt: new Date(),
+        shares: {
+          [participants.at(0)!]: {
+            type: "divide",
+            value: 1,
+          },
+          [participants.at(1)!]: {
+            type: "divide",
+            value: 1,
+          },
+        },
+        photos: [],
+        paidBy: {
+          [participants.at(0)!]: 100,
+        },
+      });
+    }
+  }
+
   return {
     party,
     partyId,
@@ -140,6 +177,9 @@ export function useParty(partyId: string) {
     updateSettings,
     setParticipantDetails,
     addExpenseToParty,
+    dev: {
+      createTestExpenses: __dev_createTestExpenses,
+    },
   };
 }
 

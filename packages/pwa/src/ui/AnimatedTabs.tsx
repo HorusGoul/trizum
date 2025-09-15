@@ -24,6 +24,7 @@ interface AnimatedTabsProps {
     label: string;
     node: React.ReactNode;
     icon: IconProps["name"];
+    panelRef?: React.RefObject<HTMLDivElement | null>;
   }[];
   tabListClassName?: string;
 }
@@ -183,6 +184,7 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
             <TabPanel
               shouldForceMount
               className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto rounded outline-none -outline-offset-2 focus-visible:outline-black"
+              ref={tab.panelRef}
             >
               {tab.node}
             </TabPanel>

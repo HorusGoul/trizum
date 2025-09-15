@@ -74,6 +74,9 @@ importers:
       '@tanstack/react-router':
         specifier: 1.131.17
         version: 1.131.17(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      '@tanstack/react-virtual':
+        specifier: 3.13.12
+        version: 3.13.12(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       clsx:
         specifier: 2.1.1
         version: 2.1.1
@@ -1922,6 +1925,12 @@ packages:
       react: 0.0.0-experimental-d025ddd3-20240722
       react-dom: 0.0.0-experimental-d025ddd3-20240722
 
+  '@tanstack/react-virtual@3.13.12':
+    resolution: {integrity: sha512-Gd13QdxPSukP8ZrkbgS2RwoZseTTbQPLnQEn7HY/rqtM+8Zt95f7xKC7N0EsKs7aoz0WzZ+fditZux+F8EzYxA==}
+    peerDependencies:
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-dom: 0.0.0-experimental-d025ddd3-20240722
+
   '@tanstack/router-core@1.131.17':
     resolution: {integrity: sha512-LnZqAhaQ1SGGYnbva3ijO73nRMNb7swC8K5MoQ/EOgX6g26PjgvEC15BNadoMe+04FkLnlAyKfnDBm6gvPcb5w==}
     engines: {node: '>=12'}
@@ -1981,6 +1990,9 @@ packages:
 
   '@tanstack/store@0.7.2':
     resolution: {integrity: sha512-RP80Z30BYiPX2Pyo0Nyw4s1SJFH2jyM6f9i3HfX4pA+gm5jsnYryscdq2aIQLnL4TaGuQMO+zXmN9nh1Qck+Pg==}
+
+  '@tanstack/virtual-core@3.13.12':
+    resolution: {integrity: sha512-1YBOJfRHV4sXUmWsFSf5rQor4Ss82G8dQWLRbnk3GA4jeP8hQt1hxXh0tmflpC0dz3VgEv/1+qwPyLeWkQuPFA==}
 
   '@tanstack/virtual-file-routes@1.131.2':
     resolution: {integrity: sha512-VEEOxc4mvyu67O+Bl0APtYjwcNRcL9it9B4HKbNgcBTIOEalhk+ufBl4kiqc8WP1sx1+NAaiS+3CcJBhrqaSRg==}
@@ -7534,6 +7546,12 @@ snapshots:
       react-dom: 0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722)
       use-sync-external-store: 1.5.0(react@0.0.0-experimental-d025ddd3-20240722)
 
+  '@tanstack/react-virtual@3.13.12(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)':
+    dependencies:
+      '@tanstack/virtual-core': 3.13.12
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-dom: 0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722)
+
   '@tanstack/router-core@1.131.17':
     dependencies:
       '@tanstack/history': 1.131.2
@@ -7616,6 +7634,8 @@ snapshots:
       - supports-color
 
   '@tanstack/store@0.7.2': {}
+
+  '@tanstack/virtual-core@3.13.12': {}
 
   '@tanstack/virtual-file-routes@1.131.2': {}
 
