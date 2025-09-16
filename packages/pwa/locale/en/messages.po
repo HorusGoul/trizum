@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party.$partyId.tsx:282
+#: src/routes/party.$partyId.tsx:250
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
@@ -25,12 +25,12 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:298
+#: src/routes/party.$partyId.tsx:266
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:84
-#: src/routes/party.$partyId.tsx:266
+#: src/routes/party.$partyId.tsx:234
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -153,7 +153,7 @@ msgstr "For payments through Bizum or similar services"
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId.tsx:503
+#: src/routes/party.$partyId.tsx:526
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -166,7 +166,7 @@ msgstr "How do you want to call this expense ?"
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
-#: src/routes/party.$partyId.tsx:499
+#: src/routes/party.$partyId.tsx:522
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -174,7 +174,7 @@ msgstr "How should I balance?"
 msgid "ID is required"
 msgstr "ID is required"
 
-#: src/routes/party.$partyId.tsx:353
+#: src/routes/party.$partyId.tsx:376
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -224,7 +224,7 @@ msgstr "New participant name"
 msgid "New trizum"
 msgstr "New trizum"
 
-#: src/routes/party.$partyId.tsx:565
+#: src/routes/party.$partyId.tsx:588
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
@@ -236,7 +236,7 @@ msgstr "Only show your expenses"
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
 
-#: src/routes/party.$partyId.tsx:576
+#: src/routes/party.$partyId.tsx:599
 msgid "Other operations"
 msgstr "Other operations"
 
@@ -280,7 +280,7 @@ msgstr "Party Settings"
 msgid "Party settings saved!"
 msgstr "Party settings saved!"
 
-#: src/routes/party.$partyId.tsx:547
+#: src/routes/party.$partyId.tsx:570
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
@@ -474,11 +474,11 @@ msgstr "Who is invited to this party? You can add more participants later."
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party.$partyId.tsx:518
+#: src/routes/party.$partyId.tsx:541
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId.tsx:536
+#: src/routes/party.$partyId.tsx:559
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
