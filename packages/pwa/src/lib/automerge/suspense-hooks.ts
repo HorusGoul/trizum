@@ -5,9 +5,9 @@ import type {
   Repo,
 } from "@automerge/automerge-repo/slim";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
-import { useEffect, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
-import { createCache, useCacheMutation } from "suspense";
+import { createCache, type Cache } from "suspense";
 
 export const handleCache = createCache<
   [Repo, AnyDocumentId],
@@ -16,20 +16,92 @@ export const handleCache = createCache<
   async load([repo, id]) {
     return repo.find(id);
   },
+  getKey: ([_, id]) => String(id),
 });
 
-// TODO: This probably needs to become a streaming cache instead of a simple cache
-// to facilitate real-time updates to documents
-export const documentCache = createCache<
+const getDocumentCacheKey = ([_, id]: [Repo, AnyDocumentId]) => String(id);
+
+export const documentCache = withLiveSubscription<
   [Repo, AnyDocumentId],
   Doc<unknown> | undefined
 >({
-  async load([repo, id]) {
-    const handle = await handleCache.readAsync(repo, id);
-    const doc = await handle.doc();
-    return doc;
-  },
+  getKey: getDocumentCacheKey,
+  getCache: ({ onEviction, getKey, onUpdate }) =>
+    createCache({
+      async load(params) {
+        const [repo, id] = params;
+        const handle = await handleCache.readAsync(repo, id);
+        const doc = await handle.doc();
+
+        function onChange() {
+          onUpdate(params, handle.docSync());
+        }
+
+        function onDelete() {
+          onUpdate(params, undefined);
+        }
+
+        handle.on("delete", onDelete);
+        handle.on("change", onChange);
+
+        onEviction(params, () => {
+          handle.off("delete", onDelete);
+          handle.off("change", onChange);
+        });
+
+        return doc;
+      },
+      getKey,
+    }),
 });
+
+function withLiveSubscription<Params extends any[], Value>({
+  getCache,
+  getKey,
+}: {
+  getCache: (params: {
+    onEviction: (params: Params, listener: () => void) => void;
+    onUpdate: (params: Params, value: Value) => void;
+    getKey: (params: Params) => string;
+  }) => Cache<Params, Value>;
+  getKey: (params: Params) => string;
+}): Cache<Params, Value> {
+  const evictionListeners = new Map<string, () => void>();
+
+  function onEviction(params: Params, listener: () => void) {
+    const key = getKey(params);
+    evictionListeners.set(key, listener);
+
+    return () => {
+      evictionListeners.delete(key);
+    };
+  }
+
+  const cache = getCache({ onEviction, onUpdate, getKey });
+
+  function onUpdate(params: Params, value: Value) {
+    cache.cache(value, ...params);
+  }
+
+  return {
+    ...cache,
+    evict: (...params) => {
+      const key = getKey(params);
+      const listener = evictionListeners.get(key);
+
+      if (listener) {
+        // Call the listener to remove the subscription
+        listener();
+      }
+
+      return cache.evict(...params);
+    },
+    evictAll() {
+      evictionListeners.forEach((listener) => listener());
+      return cache.evictAll();
+    },
+  };
+}
 
 export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> {
   const repo = useRepo();
@@ -59,32 +131,22 @@ export function useSuspenseDocument<
 >(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T>] {
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
-  const { mutateSync } = useCacheMutation(documentCache);
 
   // Suspense cache read to ensure the document is loaded
   documentCache.read(repo, id);
 
   const doc = useSyncExternalStore(
     (change) => {
-      handle.on("change", change);
-      handle.on("delete", change);
-      return () => {
-        handle.removeListener("change", change);
-        handle.removeListener("delete", change);
-      };
+      return documentCache.subscribe(change, repo, id);
     },
     () => {
-      return handle.docSync();
+      return documentCache.getValueIfCached(repo, id);
     },
   );
-
-  useEffect(() => {
-    mutateSync([repo, id], doc);
-  }, [mutateSync, doc, repo, id]);
 
   if (options?.required && !doc) {
     throw new Error(`Document not found: ${id}`);
   }
 
-  return [doc, handle] as const;
+  return [doc as Doc<T> | undefined, handle] as const;
 }
