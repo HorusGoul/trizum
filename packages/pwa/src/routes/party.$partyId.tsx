@@ -21,7 +21,7 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
-import { useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
@@ -215,48 +215,16 @@ function ExpenseLog({
     return true;
   });
 
-  const rowVirtualizer = useVirtualizer({
-    count: filteredExpenses.length,
-    getScrollElement: () => panelRef.current,
-    estimateSize: () => 96,
-    getItemKey: (index) => filteredExpenses[index].id,
-    gap: 16,
-    overscan: 10,
-  });
-
-  // https://github.com/TanStack/virtual/issues/743#issuecomment-2894893548
-  const virtualItems = useNoMemo(() => rowVirtualizer.getVirtualItems());
-
   return (
     <>
       <div className="h-2 flex-shrink-0" />
 
       <div className="container flex flex-1 flex-col px-2">
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            position: "relative",
-            width: "100%",
-          }}
-        >
-          {virtualItems.map((virtualItem) => (
-            <div
-              key={virtualItem.key}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                transform: `translateY(${virtualItem.start}px)`,
-              }}
-            >
-              <ExpenseItem
-                partyId={party.id}
-                expense={filteredExpenses[virtualItem.index]}
-              />
-            </div>
-          ))}
-        </div>
+        <VirtualizedExpenseList
+          expenses={filteredExpenses}
+          panelRef={panelRef}
+          partyId={party.id}
+        />
 
         <div className="flex-1" />
 
@@ -304,6 +272,61 @@ function ExpenseLog({
         </div>
       </div>
     </>
+  );
+}
+
+function VirtualizedExpenseList({
+  expenses,
+  panelRef,
+  partyId,
+}: {
+  expenses: Expense[];
+  panelRef: React.RefObject<HTMLDivElement | null>;
+  partyId: string;
+}) {
+  const rowVirtualizer = useVirtualizer({
+    count: expenses.length,
+    getScrollElement: () => panelRef.current,
+    estimateSize: () => 96,
+    getItemKey: (index) => expenses[index].id,
+    gap: 16,
+    overscan: 10,
+  });
+
+  const virtualItems = useNoMemo(() => rowVirtualizer.getVirtualItems());
+
+  // Rerendering because TanStack Virtual doesn't work very well with React 19+
+  const [_, setRerender] = useState(0);
+  useLayoutEffect(() => {
+    setRerender(1);
+  }, []);
+
+  return (
+    <div
+      style={{
+        height: `${rowVirtualizer.getTotalSize()}px`,
+        position: "relative",
+        width: "100%",
+      }}
+    >
+      {virtualItems.map((virtualItem) => (
+        <div
+          key={virtualItem.key}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            transform: `translateY(${virtualItem.start}px)`,
+          }}
+        >
+          <ExpenseItem
+            partyId={partyId}
+            expense={expenses[virtualItem.index]}
+          />
+        </div>
+      ))}
+    </div>
   );
 }
 
