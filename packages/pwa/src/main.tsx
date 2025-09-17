@@ -12,7 +12,8 @@ import {
 } from "@tanstack/react-router";
 import "./index.css";
 import { i18n } from "@lingui/core";
-import { I18nProvider } from "@lingui/react";
+import { I18nProvider, useLingui } from "@lingui/react";
+import { I18nProvider as AriaI18nProvider } from "react-aria-components";
 import { Toaster } from "./ui/Toaster.js";
 import * as catalogEn from "#locale/en/messages.po";
 // Import the generated route tree
@@ -22,6 +23,11 @@ import { preloadAllIcons } from "./preloadIcons.gen.js";
 // Load language
 i18n.load("en", catalogEn.messages);
 i18n.activate("en");
+document.documentElement.lang = i18n.locale;
+
+i18n.on("change", () => {
+  document.documentElement.lang = i18n.locale;
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
@@ -70,10 +76,17 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <RepoContext.Provider value={repo}>
-        <RouterProvider router={router} />
-        <Toaster />
-      </RepoContext.Provider>
+      <AriaProviders>
+        <RepoContext.Provider value={repo}>
+          <RouterProvider router={router} />
+          <Toaster />
+        </RepoContext.Provider>
+      </AriaProviders>
     </I18nProvider>,
   );
+}
+
+function AriaProviders({ children }: { children: React.ReactNode }) {
+  const { i18n } = useLingui();
+  return <AriaI18nProvider locale={i18n.locale}>{children}</AriaI18nProvider>;
 }

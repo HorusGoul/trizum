@@ -1,14 +1,12 @@
-import { AppNumberField, type AppNumberFieldProps } from "#src/ui/TextField.js";
+import { AppCurrencyField } from "#src/ui/TextField.js";
+import React, { use } from "react";
+import { CurrencyContext } from "./CurrencyContext";
 
-export interface CurrencyFieldProps extends AppNumberFieldProps {}
+export interface CurrencyFieldProps
+  extends React.ComponentProps<typeof AppCurrencyField> {}
 
 export function CurrencyField({ ...props }: CurrencyFieldProps) {
-  return (
-    <AppNumberField
-      {...props}
-      formatOptions={{
-        style: "decimal",
-      }}
-    />
-  );
+  const currency = use(CurrencyContext);
+
+  return <AppCurrencyField {...props} currency={currency} />;
 }
