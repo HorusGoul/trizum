@@ -33,6 +33,26 @@ const colorSchemes = [
 export function Avatar({ url, name, className, style }: AvatarProps) {
   const colorScheme = getColorScheme(name ?? "default");
 
+  // If we have a URL, display the image
+  if (url) {
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center overflow-hidden rounded-full",
+          className,
+        )}
+        style={style}
+      >
+        <img
+          src={url}
+          alt={name ? `${name}'s avatar` : "Avatar"}
+          className="h-full w-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  // Fallback to initials with color scheme
   return (
     <div
       className={cn(

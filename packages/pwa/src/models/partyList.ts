@@ -1,9 +1,14 @@
-import { isValidDocumentId, Repo } from "@automerge/automerge-repo/slim";
+import {
+  isValidDocumentId,
+  Repo,
+  type DocumentId,
+} from "@automerge/automerge-repo/slim";
 import type { Party, PartyParticipant } from "./party";
 
 export interface PartyList {
   username: string;
   phone: string;
+  avatarId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;
 }

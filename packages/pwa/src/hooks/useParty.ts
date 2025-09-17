@@ -34,7 +34,9 @@ export function useParty(partyId: string) {
 
   function setParticipantDetails(
     participantId: PartyParticipant["id"],
-    details: Partial<Pick<PartyParticipant, "phone" | "personalMode">>,
+    details: Partial<
+      Pick<PartyParticipant, "phone" | "personalMode" | "avatarId">
+    >,
   ) {
     handle.change((doc) => {
       const participant = doc.participants[participantId];

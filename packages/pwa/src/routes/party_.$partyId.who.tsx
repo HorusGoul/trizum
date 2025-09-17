@@ -39,12 +39,14 @@ function Who() {
   async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
 
-    setParticipantDetails(participant.id, {
-      phone: partyList.phone,
-    });
     addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
+      setParticipantDetails(participant.id, {
+        phone: partyList.phone,
+        avatarId: partyList.avatarId,
+      });
+
       toast.success(t`Welcome to the party, ${participant.name}!`);
     } else {
       toast.success(t`You're now seeing the party as ${participant.name}`);

@@ -1,9 +1,11 @@
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
+import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import type {
   Expense,
   ExpenseParticipantPresence,
 } from "#src/models/expense.ts";
+import type { MediaFile } from "#src/models/media.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -144,14 +146,71 @@ function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
     return null;
   }
 
+  if (participant.avatarId) {
+    return (
+      <Suspense
+        fallback={
+          <AvatarWrapper
+            name={participant.name}
+            top={position.top}
+            left={position.left}
+          />
+        }
+      >
+        <AvatarWithAvatarId
+          avatarId={participant.avatarId}
+          name={participant.name}
+          top={position.top}
+          left={position.left}
+        />
+      </Suspense>
+    );
+  }
+
+  return (
+    <AvatarWrapper
+      name={participant.name}
+      top={position.top}
+      left={position.left}
+    />
+  );
+}
+
+function AvatarWithAvatarId({
+  avatarId,
+  name,
+  top,
+  left,
+}: {
+  avatarId: MediaFile["id"];
+  name: string;
+  top: number;
+  left: number;
+}) {
+  const { url } = useMediaFile(avatarId);
+  return <AvatarWrapper url={url} name={name} top={top} left={left} />;
+}
+
+function AvatarWrapper({
+  url,
+  name,
+  top,
+  left,
+}: {
+  url?: string;
+  name: string;
+  top: number;
+  left: number;
+}) {
   return (
     <Avatar
+      url={url}
+      name={name}
       className="absolute z-50 h-5 w-5 -translate-x-1/2 -translate-y-1/2 bg-accent-500 text-white shadow-xl transition-all duration-500 ease-in-out"
       style={{
-        top: position.top,
-        left: position.left,
+        top,
+        left,
       }}
-      name={participant.name}
     />
   );
 }

@@ -1,4 +1,5 @@
 import { BackButton } from "#src/components/BackButton.js";
+import { AvatarPicker } from "#src/components/AvatarPicker.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import {
   validatePartyParticipantName,
@@ -11,6 +12,7 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
 import { toast } from "sonner";
+import type { MediaFile } from "#src/models/media.ts";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -19,13 +21,18 @@ export const Route = createFileRoute("/settings")({
 interface SettingsFormValues {
   username: string;
   phone: string;
+  avatarId: MediaFile["id"] | null;
 }
 
 function Settings() {
   const { partyList, updateSettings } = usePartyList();
 
   async function onSaveSettings(values: SettingsFormValues) {
-    updateSettings(values);
+    updateSettings({
+      username: values.username,
+      phone: values.phone,
+      avatarId: values.avatarId,
+    });
     form.reset();
     toast.success(t`Settings saved`);
   }
@@ -34,6 +41,7 @@ function Settings() {
     defaultValues: {
       username: partyList.username ?? "",
       phone: partyList.phone ?? "",
+      avatarId: partyList.avatarId ?? null,
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -84,6 +92,20 @@ function Settings() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
+        <form.Field name="avatarId">
+          {(field) => (
+            <form.Subscribe selector={(state) => state.values.username}>
+              {([username]) => (
+                <AvatarPicker
+                  value={field.state.value}
+                  name={username}
+                  onChange={field.handleChange}
+                />
+              )}
+            </form.Subscribe>
+          )}
+        </form.Field>
+
         <form.Field
           name="username"
           validators={{
