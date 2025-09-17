@@ -182,6 +182,7 @@ function RouteComponent() {
         onChange={onChange}
         ref={editorRef}
         autoFocus={false}
+        goBackFallbackOptions={{ to: "/party/$partyId/expense/$expenseId" }}
       />
     </>
   );

@@ -91,6 +91,7 @@ function AddExpense() {
         paidAt: new Date(),
         photos: [],
       }}
+      goBackFallbackOptions={{ to: "/party/$partyId" }}
     />
   );
 }

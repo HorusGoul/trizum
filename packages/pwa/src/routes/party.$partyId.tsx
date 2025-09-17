@@ -81,7 +81,7 @@ function PartyById() {
   return (
     <div className="flex h-full max-h-full flex-col">
       <div className="container flex h-16 flex-shrink-0 items-center px-2">
-        <BackButton />
+        <BackButton fallbackOptions={{ to: "/" }} />
         <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
         <div className="flex-1" />
         <MenuTrigger>

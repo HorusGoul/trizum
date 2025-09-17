@@ -53,7 +53,7 @@ function Settings() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2">
-        <BackButton />
+        <BackButton fallbackOptions={{ to: "/" }} />
 
         <h1 className="pl-4 text-2xl font-bold">
           <Trans>Settings</Trans>

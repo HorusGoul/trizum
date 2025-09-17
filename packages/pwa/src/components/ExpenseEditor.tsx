@@ -52,6 +52,9 @@ interface ExpenseEditorProps {
   defaultValues: ExpenseEditorFormValues;
   ref?: React.RefObject<ExpenseEditorRef | null>;
   autoFocus?: boolean;
+  goBackFallbackOptions: React.ComponentProps<
+    typeof BackButton
+  >["fallbackOptions"];
 }
 
 export function ExpenseEditor({
@@ -61,6 +64,7 @@ export function ExpenseEditor({
   onChange,
   ref,
   autoFocus = true,
+  goBackFallbackOptions,
 }: ExpenseEditorProps) {
   const participants = useExpenseParticipants({
     paidBy: {
@@ -191,7 +195,7 @@ export function ExpenseEditor({
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2">
-        <BackButton />
+        <BackButton fallbackOptions={goBackFallbackOptions} />
         <h1 className="pl-4 text-2xl font-bold">{title}</h1>
         <div className="flex-1" />
         <form.Subscribe

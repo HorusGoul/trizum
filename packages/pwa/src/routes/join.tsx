@@ -47,7 +47,7 @@ function Join() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center pr-2">
-        <BackButton />
+        <BackButton fallbackOptions={{ to: "/" }} />
         <h1 className="pl-4 text-2xl font-bold">Join a trizum</h1>
         <div className="flex-1" />
         <form.Subscribe
