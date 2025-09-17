@@ -48,6 +48,8 @@ export const Route = createFileRoute(
   },
 });
 
+const TIME_TO_DISCARD_EDIT_COPY = 1000 * 60 * 5; // 5 minutes
+
 function RouteComponent() {
   const {
     expenseId,
@@ -216,6 +218,7 @@ function useExpense() {
 
       applyExpenseDiff(entry, expense);
       delete entry.__editCopy;
+      delete entry.__editCopyLastUpdatedAt;
     });
   }
 
@@ -235,13 +238,16 @@ function useExpense() {
 
       const copy = clone(expense);
       delete copy.__editCopy;
+      delete copy.__editCopyLastUpdatedAt;
 
       if (!entry.__editCopy) {
         entry.__editCopy = copy;
+        entry.__editCopyLastUpdatedAt = new Date();
         return;
       }
 
       applyExpenseDiff(entry.__editCopy, copy);
+      entry.__editCopyLastUpdatedAt = new Date();
     });
   }
 
@@ -318,7 +324,7 @@ function useExpense() {
 }
 
 function getFormValues(expense: Expense): ExpenseEditorFormValues {
-  if (expense.__editCopy) {
+  if (shouldUseEditCopy(expense)) {
     return {
       name: expense.__editCopy.name,
       paidAt: expense.__editCopy.paidAt,
@@ -340,5 +346,26 @@ function getFormValues(expense: Expense): ExpenseEditorFormValues {
 }
 
 function getExpenseHash(expense: Expense) {
-  return expense.__editCopy?.__hash ?? expense.__hash;
+  if (shouldUseEditCopy(expense)) {
+    return expense.__editCopy.__hash;
+  }
+
+  return expense.__hash;
+}
+
+function shouldUseEditCopy(
+  expense: Expense,
+): expense is Expense & { __editCopy: Expense } {
+  if (!expense.__editCopy) {
+    return false;
+  }
+
+  if (!expense.__editCopyLastUpdatedAt) {
+    return false;
+  }
+
+  return (
+    expense.__editCopyLastUpdatedAt.getTime() + TIME_TO_DISCARD_EDIT_COPY >
+    Date.now()
+  );
 }

@@ -22,6 +22,7 @@ export interface Expense {
   photos: MediaFile["id"][];
   __hash: string;
   __editCopy?: Omit<Expense, "__editCopy">;
+  __editCopyLastUpdatedAt?: Date;
   __presence?: Record<
     ExpenseParticipantPresence["participantId"],
     ExpenseParticipantPresence
@@ -344,6 +345,7 @@ export function calculateExpenseHash(expense: Partial<Expense>) {
 
   delete copy.__hash;
   delete copy.__editCopy;
+  delete copy.__editCopyLastUpdatedAt;
 
   return new TextDecoder().decode(md5(JSON.stringify(copy)));
 }
