@@ -47,15 +47,15 @@ msgstr "Adding expense..."
 msgid "Advanced"
 msgstr "Advanced"
 
-#: src/components/ExpenseEditor.tsx:277
+#: src/components/ExpenseEditor.tsx:278
 msgid "Amount"
 msgstr "Amount"
 
-#: src/components/ExpenseEditor.tsx:587
+#: src/components/ExpenseEditor.tsx:588
 msgid "Amount for {0}"
 msgstr "Amount for {0}"
 
-#: src/components/ExpenseEditor.tsx:269
+#: src/components/ExpenseEditor.tsx:270
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
@@ -88,7 +88,7 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
-#: src/components/ExpenseEditor.tsx:328
+#: src/components/ExpenseEditor.tsx:329
 msgid "Date"
 msgstr "Date"
 
@@ -117,7 +117,7 @@ msgstr "Exact"
 msgid "Expense added"
 msgstr "Expense added"
 
-#: src/components/ExpenseEditor.tsx:124
+#: src/components/ExpenseEditor.tsx:125
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Expense amounts don't match total. Please check your split configuration."
 
@@ -141,7 +141,7 @@ msgstr "Failed to add expense"
 msgid "Failed to update expense"
 msgstr "Failed to update expense"
 
-#: src/components/ExpenseEditor.tsx:773
+#: src/components/ExpenseEditor.tsx:779
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -149,7 +149,7 @@ msgstr "Failed to upload, please try again"
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
-#: src/components/ExpenseEditor.tsx:675
+#: src/components/ExpenseEditor.tsx:676
 msgid "Heads up!"
 msgstr "Heads up!"
 
@@ -178,7 +178,7 @@ msgstr "ID is required"
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
-#: src/components/ExpenseEditor.tsx:357
+#: src/components/ExpenseEditor.tsx:358
 msgid "Include all"
 msgstr "Include all"
 
@@ -244,7 +244,7 @@ msgstr "Other operations"
 msgid "Paid at"
 msgstr "Paid at"
 
-#: src/components/ExpenseEditor.tsx:304
+#: src/components/ExpenseEditor.tsx:305
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:195
 msgid "Paid by"
 msgstr "Paid by"
@@ -300,7 +300,7 @@ msgstr "Phone number is required"
 msgid "Phone number must be less than 20 characters"
 msgstr "Phone number must be less than 20 characters"
 
-#: src/components/ExpenseEditor.tsx:693
+#: src/components/ExpenseEditor.tsx:694
 msgid "Please correct it before saving."
 msgstr "Please correct it before saving."
 
@@ -309,7 +309,7 @@ msgstr "Please correct it before saving."
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/ExpenseEditor.tsx:864
+#: src/components/ExpenseEditor.tsx:870
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -317,7 +317,7 @@ msgstr "Remove photo"
 msgid "Restore"
 msgstr "Restore"
 
-#: src/components/ExpenseEditor.tsx:204
+#: src/components/ExpenseEditor.tsx:205
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
@@ -340,11 +340,11 @@ msgstr "Settings saved"
 msgid "Shares"
 msgstr "Shares"
 
-#: src/components/ExpenseEditor.tsx:550
+#: src/components/ExpenseEditor.tsx:551
 msgid "Shares for {0}"
 msgstr "Shares for {0}"
 
-#: src/components/ExpenseEditor.tsx:679
+#: src/components/ExpenseEditor.tsx:680
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 
@@ -352,7 +352,7 @@ msgstr "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} 
 msgid "Simple"
 msgstr "Simple"
 
-#: src/components/ExpenseEditor.tsx:204
+#: src/components/ExpenseEditor.tsx:205
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
@@ -361,15 +361,15 @@ msgstr "Simple"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/ExpenseEditor.tsx:574
+#: src/components/ExpenseEditor.tsx:575
 msgid "Switch to a set amount"
 msgstr "Switch to a set amount"
 
-#: src/components/ExpenseEditor.tsx:575
+#: src/components/ExpenseEditor.tsx:576
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
-#: src/components/ExpenseEditor.tsx:798
+#: src/components/ExpenseEditor.tsx:804
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -381,7 +381,7 @@ msgstr "Tap to change"
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/components/ExpenseEditor.tsx:243
+#: src/components/ExpenseEditor.tsx:244
 #: src/routes/new.tsx:159
 #: src/routes/party_.$partyId.settings.tsx:153
 msgid "Title"
@@ -411,11 +411,11 @@ msgstr "Update who you are in this party so that we can show you the expenses an
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
-#: src/components/ExpenseEditor.tsx:717
+#: src/components/ExpenseEditor.tsx:718
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
-#: src/components/ExpenseEditor.tsx:807
+#: src/components/ExpenseEditor.tsx:813
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -424,7 +424,7 @@ msgstr "Upload photo"
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:759
+#: src/components/ExpenseEditor.tsx:760
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -436,7 +436,7 @@ msgstr "URL or Party ID"
 msgid "Username"
 msgstr "Username"
 
-#: src/components/ExpenseEditor.tsx:846
+#: src/components/ExpenseEditor.tsx:852
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:253
 msgid "View photo"
 msgstr "View photo"
