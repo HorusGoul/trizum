@@ -30,6 +30,7 @@ import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
+import { compressionPresets } from "#src/lib/imageCompression.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -761,7 +762,11 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
     try {
       const photoIds = await Promise.all(
         Array.from(event.target.files ?? []).map(async (blob) => {
-          const [mediaFileId] = await createMediaFile(blob, {});
+          const [mediaFileId] = await createMediaFile(
+            blob,
+            {},
+            compressionPresets.balanced,
+          );
           return mediaFileId;
         }),
       );
@@ -770,6 +775,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 
       toast.dismiss(toastId);
     } catch (error) {
+      console.error(error);
       toast.error(t`Failed to upload, please try again`, {
         id: toastId,
       });
