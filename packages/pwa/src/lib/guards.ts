@@ -1,6 +1,7 @@
 import type { Party } from "#src/models/party.js";
 import {
   redirect,
+  type ParsedLocation,
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
@@ -41,6 +42,7 @@ export async function guardPartyListExists({
 export async function guardParticipatingInParty(
   partyId: string,
   context: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+  location: ParsedLocation,
 ) {
   const [party, partyList] = await Promise.all([
     guardPartyExists(partyId, context),
@@ -52,7 +54,13 @@ export async function guardParticipatingInParty(
     partyList.participantInParties?.[party.id] === undefined;
 
   if (needsToJoin) {
-    throw redirect({ to: "/party/$partyId/who", params: { partyId } });
+    throw redirect({
+      to: "/party/$partyId/who",
+      params: { partyId },
+      search: {
+        redirectTo: location.href,
+      },
+    });
   }
 
   return { party, partyList };

@@ -18,8 +18,8 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/party_/$partyId/settings")({
   component: PartySettings,
-  loader: async ({ context, params }) => {
-    await guardParticipatingInParty(params.partyId, context);
+  loader: async ({ context, params, location }) => {
+    await guardParticipatingInParty(params.partyId, context, location);
   },
 });
 

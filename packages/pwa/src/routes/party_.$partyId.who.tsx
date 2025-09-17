@@ -13,8 +13,18 @@ import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
 
+interface WhoSearchParams {
+  redirectTo?: string;
+}
+
 export const Route = createFileRoute("/party_/$partyId/who")({
   component: Who,
+  validateSearch: (search): WhoSearchParams => {
+    // Save redirectTo path search param if it exists
+    return {
+      redirectTo: search.redirectTo as string | undefined,
+    };
+  },
   async loader({ context, params }) {
     await guardPartyExists(params.partyId, context);
   },
@@ -26,6 +36,7 @@ interface WhoFormValues {
 
 function Who() {
   const params = Route.useParams();
+  const search = Route.useSearch();
   const { party, setParticipantDetails } = useParty(params.partyId);
   const { partyList, addPartyToList } = usePartyList();
   const navigate = useNavigate();
@@ -52,7 +63,7 @@ function Who() {
       toast.success(t`You're now seeing the party as ${participant.name}`);
     }
 
-    navigate({ to: "..", replace: true });
+    navigate({ to: search.redirectTo ?? "..", replace: true });
   }
 
   const form = useForm({

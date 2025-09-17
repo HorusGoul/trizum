@@ -32,8 +32,8 @@ import { Skeleton } from "#src/ui/Skeleton.tsx";
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   component: ExpenseById,
 
-  async loader({ context, params: { expenseId, partyId } }) {
-    await guardParticipatingInParty(partyId, context);
+  async loader({ context, params: { expenseId, partyId }, location }) {
+    await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
     await documentCache.readAsync(context.repo, chunkId);

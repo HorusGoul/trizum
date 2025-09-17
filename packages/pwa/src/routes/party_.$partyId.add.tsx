@@ -19,8 +19,8 @@ import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
 
-  async loader({ context, params }) {
-    await guardParticipatingInParty(params.partyId, context);
+  async loader({ context, params, location }) {
+    await guardParticipatingInParty(params.partyId, context, location);
   },
 });
 

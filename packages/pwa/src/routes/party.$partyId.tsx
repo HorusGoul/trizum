@@ -30,8 +30,12 @@ import { useNoMemo } from "#src/hooks/useNoMemo.ts";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
-  loader: async ({ context, params: { partyId } }) => {
-    const { party } = await guardParticipatingInParty(partyId, context);
+  loader: async ({ context, params: { partyId }, location }) => {
+    const { party } = await guardParticipatingInParty(
+      partyId,
+      context,
+      location,
+    );
 
     await Promise.all(
       party.chunkIds.map((chunkId) => {

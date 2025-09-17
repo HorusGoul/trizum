@@ -40,8 +40,8 @@ export const Route = createFileRoute(
 )({
   component: RouteComponent,
 
-  async loader({ context, params: { expenseId, partyId } }) {
-    await guardParticipatingInParty(partyId, context);
+  async loader({ location, context, params: { expenseId, partyId } }) {
+    await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
     await documentCache.readAsync(context.repo, chunkId);
