@@ -499,7 +499,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-slate-500 bg-white pr-3 dark:border-slate-700 dark:bg-slate-900"
+      className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-accent-500 bg-white pr-3 dark:border-accent-700 dark:bg-accent-900"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -713,7 +713,7 @@ function PhotosField({ value, onChange }: PhotosFieldProps) {
       }}
     >
       {value.length === 0 ? (
-        <div className="flex h-32 w-32 flex-col items-center justify-center rounded-xl bg-slate-50 p-4 dark:bg-slate-900 dark:text-slate-500">
+        <div className="flex h-32 w-32 flex-col items-center justify-center rounded-xl bg-accent-50 p-4 dark:bg-accent-900 dark:text-accent-500">
           <span className="text-center text-sm">
             <Trans>Upload or capture an image of your receipt</Trans>
           </span>
@@ -860,7 +860,7 @@ function CurrentPhoto({ photoId, onRemove }: CurrentPhotoProps) {
         />
       </Button>
       <Button
-        color="slate"
+        color="input-like"
         className="absolute -right-2 -top-2 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
       >

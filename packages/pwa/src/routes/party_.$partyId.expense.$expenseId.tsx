@@ -283,7 +283,7 @@ function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
             return (
               <li
                 key={userId}
-                className="flex justify-between bg-accent-50 p-2 px-3 even:bg-accent-50/80 dark:bg-accent-950 dark:even:bg-accent-950/80"
+                className="flex justify-between bg-accent-50 p-2 px-3 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60"
               >
                 <span className="flex items-center gap-1 font-medium">
                   {party.participants[userId].name}

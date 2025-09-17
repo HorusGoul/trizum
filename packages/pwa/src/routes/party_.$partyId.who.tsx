@@ -146,10 +146,10 @@ function Who() {
                         ? "bg-accent-600 text-white"
                         : "border-transparent",
                       isPressed && !isSelected
-                        ? "bg-accent-50 dark:bg-slate-800"
+                        ? "bg-accent-50 dark:bg-accent-800"
                         : "",
                       !isSelected && !isPressed
-                        ? "bg-slate-50 dark:bg-slate-900"
+                        ? "bg-accent-50 dark:bg-accent-900"
                         : "",
                     )
                   }

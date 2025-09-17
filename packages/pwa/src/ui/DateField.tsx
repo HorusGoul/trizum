@@ -23,7 +23,7 @@ function DateSegment({ className, ...props }: AriaDateSegmentProps) {
         cn(
           "inline rounded p-0.5 caret-transparent outline outline-0 type-literal:px-0",
           /* Placeholder */
-          "data-[placeholder]:text-slate-700 dark:data-[placeholder]:text-slate-50",
+          "data-[placeholder]:text-accent-700 dark:data-[placeholder]:text-accent-50",
           /* Disabled */
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
           /* Focused */

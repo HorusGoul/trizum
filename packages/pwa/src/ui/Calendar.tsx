@@ -73,7 +73,7 @@ const CalendarHeaderCell = ({
 }: AriaCalendarHeaderCellProps) => (
   <AriaCalendarHeaderCell
     className={cn(
-      "w-9 rounded-md text-[0.8rem] font-normal text-slate-700 dark:text-slate-50",
+      "w-9 rounded-md text-[0.8rem] font-normal text-accent-700 dark:text-accent-50",
       className,
     )}
     {...props}
@@ -97,7 +97,7 @@ const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
           "relative flex size-9 items-center justify-center p-0 text-sm font-normal",
           /* Disabled */
           renderProps.isDisabled &&
-            "text-slate-700 opacity-50 dark:text-slate-50",
+            "text-accent-700 opacity-50 dark:text-accent-50",
           /* Selected */
           renderProps.isSelected &&
             "bg-accent-500 text-accent-50 data-[focused]:bg-accent-500 data-[focused]:text-accent-50",
@@ -116,7 +116,7 @@ const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
             "rounded-none bg-accent-500 text-accent-50",
           /* Outside Month */
           renderProps.isOutsideMonth &&
-            "text-slate-700 opacity-50 data-[selected]:bg-accent-500/50 data-[selected]:text-accent-50 data-[selected]:opacity-30 dark:text-slate-50",
+            "text-accent-700 opacity-50 data-[selected]:bg-accent-500/50 data-[selected]:text-accent-50 data-[selected]:opacity-30 dark:text-accent-50",
           /* Current Date */
           renderProps.date.compare(today(getLocalTimeZone())) === 0 &&
             !renderProps.isSelected &&

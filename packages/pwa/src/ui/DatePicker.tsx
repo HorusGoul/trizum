@@ -85,7 +85,7 @@ function AppDatePicker<T extends AriaDateValue>({
       </FieldGroup>
       {description && (
         <Text
-          className="text-sm text-slate-700 dark:text-slate-50"
+          className="text-sm text-accent-700 dark:text-accent-50"
           slot="description"
         >
           {description}

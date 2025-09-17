@@ -2,7 +2,7 @@ import { Button, type ButtonProps } from "react-aria-components";
 import { cn, type ClassName } from "./utils";
 import { Icon, type IconProps } from "./Icon";
 
-type IconButtonColorScheme = "transparent" | "accent" | "slate" | "input-like";
+type IconButtonColorScheme = "transparent" | "accent" | "input-like";
 
 const colorSchemes: Record<
   IconButtonColorScheme,
@@ -13,22 +13,17 @@ const colorSchemes: Record<
   }
 > = {
   transparent: {
-    base: "bg-slate-950 bg-opacity-0 dark:bg-slate-50 dark:bg-opacity-0",
+    base: "bg-accent-950 bg-opacity-0 dark:bg-accent-50 dark:bg-opacity-0",
     focus: "bg-opacity-5 dark:bg-opacity-5",
     pressed: "bg-opacity-10 dark:bg-opacity-10",
   },
   accent: {
-    base: "text-slate-50 bg-accent-500 dark:bg-accent-500",
+    base: "text-accent-50 bg-accent-500 dark:bg-accent-500",
     focus: "bg-accent-600 dark:bg-accent-400",
     pressed: "bg-accent-700 dark:bg-accent-300",
   },
-  slate: {
-    base: "text-slate-50 bg-slate-500 dark:bg-slate-500",
-    focus: "bg-slate-600 dark:bg-slate-400",
-    pressed: "bg-slate-700 dark:bg-slate-300",
-  },
   "input-like": {
-    base: "border border-slate-500 bg-white ring-offset-white dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-900",
+    base: "border border-accent-500 bg-white ring-offset-white dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
     focus: "ring-accent-500 dark:ring-accent-400",
     pressed: "ring-accent-700 dark:ring-accent-300",
   },

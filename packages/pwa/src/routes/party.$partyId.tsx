@@ -353,11 +353,11 @@ function ExpenseItem({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex w-full scale-100 rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
+          "flex w-full scale-100 rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-accent-900",
           (isHovered || isFocusVisible) &&
-            "shadow-md dark:bg-slate-800 dark:shadow-none",
+            "shadow-md dark:bg-accent-800 dark:shadow-none",
           isPressed &&
-            "scale-95 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
+            "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
         )
       }
     >
@@ -692,10 +692,12 @@ function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
   const to = party.participants[toId];
 
   return (
-    <div className="flex rounded-xl bg-white p-4 dark:bg-slate-900">
+    <div className="flex rounded-xl bg-white p-4 dark:bg-accent-900">
       <div className="flex flex-1 flex-col">
         <span className="text-lg text-accent-400">{from.name}</span>
-        <span className="text-sm text-slate-700 dark:text-slate-300">owes</span>
+        <span className="text-sm text-accent-700 dark:text-accent-300">
+          owes
+        </span>
         <span className="text-lg text-accent-400">{to.name}</span>
       </div>
 

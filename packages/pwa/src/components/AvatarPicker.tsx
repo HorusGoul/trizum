@@ -102,7 +102,7 @@ export function AvatarPicker({
         )}
         {value && (
           <Button
-            color="slate"
+            color="input-like"
             className="absolute right-1 top-1 h-auto w-auto rounded-full p-1"
             onPress={handleRemoveAvatar}
             isDisabled={isUploading}

@@ -32,7 +32,7 @@ const Checkbox = ({ className, children, ...props }: AriaCheckboxProps) => (
       <>
         <div
           className={cn(
-            "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-sm border border-slate-500 text-current dark:border-slate-700",
+            "ring-offset-background flex size-4 shrink-0 items-center justify-center rounded-sm border border-accent-500 text-current dark:border-accent-700",
             /* Focus Visible */
             "group-data-[focus-visible]/checkbox:ring-ring group-data-[focus-visible]/checkbox:outline-none group-data-[focus-visible]/checkbox:ring-2 group-data-[focus-visible]/checkbox:ring-offset-2",
             /* Selected */

@@ -25,7 +25,7 @@ const Input = ({ className, ...props }: AriaInputProps) => {
     <AriaInput
       className={composeRenderProps(className, (className) =>
         cn(
-          "flex h-10 w-full rounded-md border border-slate-500 bg-white px-3 py-2 text-sm ring-offset-slate-900 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-900 dark:placeholder:text-slate-50",
+          "flex h-10 w-full rounded-md border border-accent-500 bg-white px-3 py-2 text-sm ring-offset-accent-900 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-accent-700 dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900 dark:placeholder:text-accent-50",
           /* Disabled */
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
           /* Focused */
@@ -45,7 +45,7 @@ const TextArea = ({ className, ...props }: AriaTextAreaProps) => {
     <AriaTextArea
       className={composeRenderProps(className, (className) =>
         cn(
-          "flex min-h-[80px] w-full rounded-md border border-slate-500 bg-white px-3 py-2 text-sm ring-offset-slate-900 placeholder:text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-900 dark:placeholder:text-slate-50",
+          "flex min-h-[80px] w-full rounded-md border border-accent-500 bg-white px-3 py-2 text-sm ring-offset-accent-900 placeholder:text-accent-700 dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900 dark:placeholder:text-accent-50",
           /* Focused */
           "data-[focused]:ring-ring data-[focused]:outline-none data-[focused]:ring-2 data-[focused]:ring-offset-2",
           /* Disabled */
@@ -86,7 +86,7 @@ function AppTextField({
       {textArea ? <TextArea /> : <Input />}
       {description && (
         <Text
-          className="text-sm text-slate-700 dark:text-slate-50"
+          className="text-sm text-accent-700 dark:text-accent-50"
           slot="description"
         >
           {description}
@@ -125,7 +125,7 @@ function AppNumberField({
       <Input className={cn(inputClassName)} inputMode={inputMode} />
       {description && (
         <Text
-          className="text-sm text-slate-700 dark:text-slate-50"
+          className="text-sm text-accent-700 dark:text-accent-50"
           slot="description"
         >
           {description}
@@ -264,7 +264,7 @@ function AppCurrencyField({
       <Input inputMode="decimal" className={cn(inputClassName)} />
       {description && (
         <Text
-          className="text-sm text-slate-700 dark:text-slate-50"
+          className="text-sm text-accent-700 dark:text-accent-50"
           slot="description"
         >
           {description}

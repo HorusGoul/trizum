@@ -150,11 +150,11 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-slate-900",
+          "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-accent-900",
           (isHovered || isFocusVisible) &&
-            "shadow-md dark:bg-slate-800 dark:shadow-none",
+            "shadow-md dark:bg-accent-800 dark:shadow-none",
           isPressed &&
-            "scale-95 bg-opacity-90 shadow-lg dark:bg-slate-700 dark:shadow-none",
+            "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
         )
       }
     >

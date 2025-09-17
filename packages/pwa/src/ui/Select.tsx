@@ -42,7 +42,7 @@ const SelectValue = <T extends object>({
   <AriaSelectValue
     className={composeRenderProps(className, (className) =>
       cn(
-        "line-clamp-1 data-[placeholder]:text-slate-700 dark:placeholder:text-slate-50",
+        "line-clamp-1 data-[placeholder]:text-accent-700 dark:placeholder:text-accent-50",
         /* Description */
         "[&>[slot=description]]:hidden",
         className,
@@ -56,7 +56,7 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
   <AriaButton
     className={composeRenderProps(className, (className) =>
       cn(
-        "flex h-10 w-full items-center justify-between rounded-md border border-slate-500 bg-white px-3 py-2 text-sm ring-offset-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-900",
+        "flex h-10 w-full items-center justify-between rounded-md border border-accent-500 bg-white px-3 py-2 text-sm ring-offset-accent-900 dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
         /* Disabled */
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         /* Focused */
@@ -132,7 +132,7 @@ function AppSelect<T extends object>({
       </SelectTrigger>
       {description && (
         <Text
-          className="text-sm text-slate-950 dark:text-slate-50"
+          className="text-sm text-accent-950 dark:text-accent-50"
           slot="description"
         >
           {description}
