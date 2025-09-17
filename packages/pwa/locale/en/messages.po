@@ -76,6 +76,14 @@ msgstr "At least one participant is required"
 msgid "Attachments"
 msgstr "Attachments"
 
+#: src/components/AvatarPicker.tsx:77
+msgid "Avatar removed"
+msgstr "Avatar removed"
+
+#: src/components/AvatarPicker.tsx:63
+msgid "Avatar updated successfully"
+msgstr "Avatar updated successfully"
+
 #: src/routes/party.$partyId.tsx:179
 msgid "Balances"
 msgstr "Balances"
@@ -141,11 +149,15 @@ msgstr "Failed to add expense"
 msgid "Failed to update expense"
 msgstr "Failed to update expense"
 
+#: src/components/AvatarPicker.tsx:67
+msgid "Failed to upload avatar. Please try again."
+msgstr "Failed to upload avatar. Please try again."
+
 #: src/components/ExpenseEditor.tsx:779
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
-#: src/routes/settings.tsx:121
+#: src/routes/settings.tsx:143
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -173,6 +185,10 @@ msgstr "How should I balance?"
 #: src/lib/validation.ts:8
 msgid "ID is required"
 msgstr "ID is required"
+
+#: src/components/AvatarPicker.tsx:45
+msgid "Image must be smaller than 10MB"
+msgstr "Image must be smaller than 10MB"
 
 #: src/routes/party.$partyId.tsx:376
 msgid "Impact on my balance: <0/>"
@@ -288,7 +304,7 @@ msgstr "People that owe you money"
 msgid "Personal mode"
 msgstr "Personal mode"
 
-#: src/routes/settings.tsx:120
+#: src/routes/settings.tsx:142
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -304,10 +320,18 @@ msgstr "Phone number must be less than 20 characters"
 msgid "Please correct it before saving."
 msgstr "Please correct it before saving."
 
+#: src/components/AvatarPicker.tsx:38
+msgid "Please select an image file"
+msgstr "Please select an image file"
+
 #: src/routes/new.tsx:261
 #: src/routes/party_.$partyId.settings.tsx:288
 msgid "Remove"
 msgstr "Remove"
+
+#: src/components/AvatarPicker.tsx:113
+msgid "Remove avatar"
+msgstr "Remove avatar"
 
 #: src/components/ExpenseEditor.tsx:870
 msgid "Remove photo"
@@ -321,18 +345,18 @@ msgstr "Restore"
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
-#: src/routes/party_.$partyId.who.tsx:92
-#: src/routes/settings.tsx:68
+#: src/routes/party_.$partyId.who.tsx:94
+#: src/routes/settings.tsx:76
 msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:50
 #: src/routes/party.$partyId.tsx:147
-#: src/routes/settings.tsx:51
+#: src/routes/settings.tsx:59
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:30
+#: src/routes/settings.tsx:37
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -356,8 +380,8 @@ msgstr "Simple"
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:132
 #: src/routes/party_.$partyId.settings.tsx:126
-#: src/routes/party_.$partyId.who.tsx:92
-#: src/routes/settings.tsx:68
+#: src/routes/party_.$partyId.who.tsx:94
+#: src/routes/settings.tsx:76
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -369,6 +393,7 @@ msgstr "Switch to a set amount"
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
+#: src/components/AvatarPicker.tsx:126
 #: src/components/ExpenseEditor.tsx:804
 msgid "Take photo"
 msgstr "Take photo"
@@ -395,7 +420,7 @@ msgstr "Title is required"
 msgid "Title must be less than 50 characters"
 msgstr "Title must be less than 50 characters"
 
-#: src/routes/party_.$partyId.who.tsx:113
+#: src/routes/party_.$partyId.who.tsx:115
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
@@ -403,7 +428,7 @@ msgstr "To join the <0>{0}</0>, please select who you are so that we can show yo
 msgid "Total split:"
 msgstr "Total split:"
 
-#: src/routes/party_.$partyId.who.tsx:119
+#: src/routes/party_.$partyId.who.tsx:121
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
@@ -415,9 +440,14 @@ msgstr "Updating expense..."
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
+#: src/components/AvatarPicker.tsx:135
 #: src/components/ExpenseEditor.tsx:813
 msgid "Upload photo"
 msgstr "Upload photo"
+
+#: src/components/AvatarPicker.tsx:50
+msgid "Uploading avatar..."
+msgstr "Uploading avatar..."
 
 #: src/routes/party_.$partyId.add.tsx:45
 #: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:64
@@ -432,7 +462,7 @@ msgstr "Uploading..."
 msgid "URL or Party ID"
 msgstr "URL or Party ID"
 
-#: src/routes/settings.tsx:95
+#: src/routes/settings.tsx:117
 msgid "Username"
 msgstr "Username"
 
@@ -449,7 +479,7 @@ msgstr "Viewing as {0}"
 msgid "Warning: Split amounts don't match total expense"
 msgstr "Warning: Split amounts don't match total expense"
 
-#: src/routes/party_.$partyId.who.tsx:48
+#: src/routes/party_.$partyId.who.tsx:50
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
@@ -458,11 +488,11 @@ msgstr "Welcome to the party, {0}!"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:96
+#: src/routes/settings.tsx:118
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
-#: src/routes/party_.$partyId.who.tsx:75
+#: src/routes/party_.$partyId.who.tsx:77
 msgid "Who are you?"
 msgstr "Who are you?"
 
@@ -482,6 +512,6 @@ msgstr "You owe money to people"
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
-#: src/routes/party_.$partyId.who.tsx:50
+#: src/routes/party_.$partyId.who.tsx:52
 msgid "You're now seeing the party as {0}"
 msgstr "You're now seeing the party as {0}"
