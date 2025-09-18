@@ -7,9 +7,11 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import {
+  calculateBalancesByParticipant,
   exportIntoInput,
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,
+  type Balance,
   type Expense,
 } from "#src/models/expense.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
@@ -396,45 +398,22 @@ function Balances() {
   const expenses = usePartyExpenses(party.id);
   const participant = useCurrentParticipant();
 
-  const balancesByParticipant = useMemo(() => {
-    const inputs = expenses.flatMap(exportIntoInput);
-    const participants = Object.values(party.participants);
-    const participantIds = Object.keys(party.participants);
-
-    const balances = participants
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((participant) => {
-        return {
-          participant,
-          stats: calculateLogStatsOfUser(
-            participant.id,
-            participantIds,
-            inputs,
-          ),
-          visualRatio: 0,
-        };
-      });
-
-    const biggestAbsoluteBalance = balances.reduce((prev, next) => {
-      const prevAbs = Math.abs(prev.stats.balance.getAmount());
-      const nextAbs = Math.abs(next.stats.balance.getAmount());
-
-      return prevAbs > nextAbs ? prev : next;
+  const balancesByParticipant = calculateBalancesByParticipant(
+    expenses,
+    party.participants,
+  );
+  const sortedBalancesByParticipant = Object.values(balancesByParticipant)
+    .map((balance) => {
+      return {
+        ...balance,
+        participant: party.participants[balance.participantId],
+      };
+    })
+    .sort((a, b) => {
+      return a.participant.name.localeCompare(b.participant.name);
     });
 
-    // Biggest absolute balance should be considered as the reference point (1)
-    const referenceBalance = biggestAbsoluteBalance.stats.balance.getAmount();
-
-    // Use the reference balance to calculate the visual ratio of each balance
-    for (const balance of balances) {
-      balance.visualRatio =
-        balance.stats.balance.getAmount() / referenceBalance;
-    }
-
-    return balances;
-  }, [party.participants, expenses]);
-
-  const myBalance = balancesByParticipant.find(
+  const myBalance = sortedBalancesByParticipant.find(
     (balance) => balance.participant.id === participant.id,
   );
 
@@ -444,36 +423,36 @@ function Balances() {
 
   const userOwesMap = Object.entries(myBalance.stats.diffs)
     .filter(([_, diff]) => {
-      return diff.diffUnsplitted.getAmount() < 0;
+      return diff.diffUnsplitted < 0;
     })
     .map(([participantId, diff]) => {
       return {
         participantId,
-        amount: diff.diffUnsplitted.getAmount(),
+        amount: diff.diffUnsplitted,
       };
     });
 
   const owedToUserMap = Object.entries(myBalance.stats.diffs)
     .filter(([_, diff]) => {
-      return diff.diffUnsplitted.getAmount() > 0;
+      return diff.diffUnsplitted > 0;
     })
     .map(([participantId, diff]) => {
       return {
         participantId,
-        amount: diff.diffUnsplitted.getAmount(),
+        amount: diff.diffUnsplitted,
       };
     });
 
   const isFullyBalanced =
     userOwesMap.length === 0 && owedToUserMap.length === 0;
 
-  const allOtherDiffs = balancesByParticipant
+  const allOtherDiffs = sortedBalancesByParticipant
     .filter((balance) => {
       if (balance.participant.id === participant.id) {
         return false;
       }
 
-      if (balance.stats.balance.getAmount() >= 0) {
+      if (balance.stats.balance >= 0) {
         return false;
       }
 
@@ -488,7 +467,7 @@ function Balances() {
 
           const diff = balance.stats.diffs[participantId];
 
-          if (diff.diffUnsplitted.getAmount() >= 0) {
+          if (diff.diffUnsplitted >= 0) {
             return false;
           }
 
@@ -498,7 +477,7 @@ function Balances() {
           return {
             fromId: balance.participant.id,
             toId: participantId,
-            amount: diff.diffUnsplitted.getAmount(),
+            amount: diff.diffUnsplitted,
           };
         });
     });
@@ -508,14 +487,16 @@ function Balances() {
       <div className="h-8 flex-shrink-0" />
 
       <div className="container flex flex-col gap-4 px-4">
-        {balancesByParticipant.map(({ participant, stats, visualRatio }) => (
-          <BalanceItem
-            key={participant.id}
-            participant={participant}
-            stats={stats}
-            visualRatio={visualRatio}
-          />
-        ))}
+        {sortedBalancesByParticipant.map(
+          ({ participant, stats, visualRatio }) => (
+            <BalanceItem
+              key={participant.id}
+              participant={participant}
+              stats={stats}
+              visualRatio={visualRatio}
+            />
+          ),
+        )}
       </div>
 
       <div className="h-8 flex-shrink-0" />
@@ -617,14 +598,14 @@ function Balances() {
 
 interface BalanceItemProps {
   participant: PartyParticipant;
-  stats: ReturnType<typeof calculateLogStatsOfUser>;
+  stats: Balance["stats"];
   visualRatio: number;
 }
 
 function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
   const { party } = useCurrentParty();
 
-  const balance = stats.balance.getAmount();
+  const balance = stats.balance;
   const isNegative = balance < 0;
 
   const participantNode = (
@@ -656,7 +637,7 @@ function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
       />
 
       <CurrencyText
-        amount={stats.balance.getAmount()}
+        amount={stats.balance}
         currency={party.currency}
         variant="inherit"
         className={cn(

@@ -1,6 +1,6 @@
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import type { Expense } from "./expense";
+import type { BalancesByParticipant, Expense } from "./expense";
 import type { Currency } from "dinero.js";
 import type { MediaFile } from "./media";
 
@@ -20,6 +20,12 @@ export interface PartyParticipant {
   avatarId?: MediaFile["id"] | null;
   isArchived?: boolean;
   personalMode?: boolean;
+}
+
+export interface PartyExpenseChunkRef {
+  chunkId: DocumentId;
+  createdAt: Date;
+  balancesByParticipant: BalancesByParticipant;
 }
 
 export interface PartyExpenseChunk {
