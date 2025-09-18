@@ -401,6 +401,57 @@ export function calculateBalancesByParticipant(
     };
   });
 
+  const withVisualRatios = calculateVisualRatioForBalances(balances);
+
+  return Object.fromEntries(
+    withVisualRatios.map((balance) => [balance.participantId, balance]),
+  );
+}
+
+export function mergeBalancesByParticipant(
+  ...balancesByParticipant: BalancesByParticipant[]
+): BalancesByParticipant {
+  const merged: BalancesByParticipant = {};
+
+  for (const balances of balancesByParticipant) {
+    for (const [participantId, balance] of Object.entries(balances)) {
+      const existing = merged[participantId];
+
+      if (!existing) {
+        merged[participantId] = balance;
+      } else {
+        existing.stats.balance += balance.stats.balance;
+        existing.stats.userOwes += balance.stats.userOwes;
+        existing.stats.owedToUser += balance.stats.owedToUser;
+
+        // Merge diffs
+        for (const [participantId, diff] of Object.entries(
+          balance.stats.diffs,
+        )) {
+          const existingDiff = existing.stats.diffs[participantId];
+
+          if (!existingDiff) {
+            existing.stats.diffs[participantId] = diff;
+          } else {
+            existingDiff.diffUnsplitted += diff.diffUnsplitted;
+          }
+        }
+      }
+    }
+  }
+
+  const balancesArray = Object.values(merged);
+  const withVisualRatios =
+    balancesArray.length > 0
+      ? calculateVisualRatioForBalances(balancesArray)
+      : [];
+
+  return Object.fromEntries(
+    withVisualRatios.map((balance) => [balance.participantId, balance]),
+  );
+}
+
+function calculateVisualRatioForBalances(balances: Balance[]) {
   const biggestAbsoluteBalance = balances.reduce((prev, next) => {
     const prevAbs = Math.abs(prev.stats.balance);
     const nextAbs = Math.abs(next.stats.balance);
@@ -416,7 +467,5 @@ export function calculateBalancesByParticipant(
     balance.visualRatio = balance.stats.balance / referenceBalance;
   }
 
-  return Object.fromEntries(
-    balances.map((balance) => [balance.participantId, balance]),
-  );
+  return balances;
 }

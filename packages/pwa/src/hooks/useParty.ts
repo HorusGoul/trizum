@@ -3,14 +3,17 @@ import {
   createExpenseId,
   calculateExpenseHash,
   type Expense,
+  calculateBalancesByParticipant,
 } from "#src/models/expense.js";
 import type {
   Party,
   PartyExpenseChunk,
+  PartyExpenseChunkRef,
   PartyParticipant,
 } from "#src/models/party.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import {
+  insertAt,
   isValidDocumentId,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
@@ -70,7 +73,13 @@ export function useParty(partyId: string) {
 
     handle.change((doc) => (doc.id = handle.documentId));
 
-    return [handle.documentId, handle] as const;
+    const chunkRef: PartyExpenseChunkRef = {
+      chunkId: handle.documentId,
+      createdAt: new Date(),
+      balancesByParticipant: {},
+    };
+
+    return [chunkRef, handle] as const;
   }
 
   async function addExpenseToParty(
@@ -81,15 +90,15 @@ export function useParty(partyId: string) {
     }
 
     // Last chunk is the most recent one, so should be indexed at 0
-    let lastChunkId = party.chunkIds.at(0);
+    let lastChunkRef = party.chunkRefs.at(0);
 
-    if (!lastChunkId) {
+    if (!lastChunkRef) {
       // Create a new chunk if there is none
-      const [chunkId] = createChunk();
-      lastChunkId = chunkId;
+      const [chunkRef] = createChunk();
+      lastChunkRef = chunkRef;
     }
 
-    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkId);
+    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkRef.chunkId);
     let lastChunk = await lastChunkHandle.doc();
 
     if (!lastChunk) {
@@ -99,7 +108,7 @@ export function useParty(partyId: string) {
     if (lastChunk.expenses.length >= lastChunk.maxSize) {
       // Create a new chunk if the last one is full
       const [chunkId, handle] = createChunk();
-      lastChunkId = chunkId;
+      lastChunkRef = chunkId;
       lastChunkHandle = handle;
       lastChunk = await lastChunkHandle.doc();
 
@@ -110,7 +119,7 @@ export function useParty(partyId: string) {
 
     const expenseWithId = {
       ...expense,
-      id: createExpenseId(lastChunkId),
+      id: createExpenseId(lastChunkRef.chunkId),
     };
     const expenseWithHash = {
       ...expenseWithId,
@@ -121,16 +130,38 @@ export function useParty(partyId: string) {
     };
 
     lastChunkHandle.change((doc) => {
-      doc.expenses.unshift(expenseWithHash);
+      insertAt(doc.expenses, 0, expenseWithHash);
     });
+    lastChunk = lastChunkHandle.docSync();
 
-    if (party.chunkIds.includes(lastChunkId)) {
-      return expenseWithHash;
+    if (!lastChunk) {
+      throw new Error("Chunk not found, this should not happen");
     }
 
     handle.change((party) => {
-      party.chunkIds.unshift(lastChunkId);
+      const balancesByParticipant = calculateBalancesByParticipant(
+        lastChunk.expenses,
+        party.participants,
+      );
+
+      const lastChunkRef = party.chunkRefs.find(
+        (chunkRef) => chunkRef.chunkId === lastChunk.id,
+      );
+
+      if (!lastChunkRef) {
+        throw new Error("Chunk ref not found, this should not happen");
+      }
+
+      lastChunkRef.balancesByParticipant = balancesByParticipant;
+
+      if (!party.chunkRefs.includes(lastChunkRef)) {
+        insertAt(party.chunkRefs, 0, lastChunkRef);
+      }
     });
+
+    if (party.chunkRefs.includes(lastChunkRef)) {
+      return expenseWithHash;
+    }
 
     return expenseWithHash;
   }

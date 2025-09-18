@@ -17,7 +17,7 @@ import {
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
-import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
+import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
 import { useCurrentParty, useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
@@ -29,6 +29,7 @@ import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useNoMemo } from "#src/hooks/useNoMemo.ts";
+import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -39,11 +40,11 @@ export const Route = createFileRoute("/party/$partyId")({
       location,
     );
 
-    await Promise.all(
-      party.chunkIds.map((chunkId) => {
-        return documentCache.readAsync(context.repo, chunkId);
-      }),
-    );
+    const firstChunkRef = party.chunkRefs.at(0);
+
+    if (firstChunkRef) {
+      await documentCache.readAsync(context.repo, firstChunkRef.chunkId);
+    }
 
     return;
   },
@@ -199,7 +200,7 @@ function ExpenseLog({
   panelRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const { party, dev } = useCurrentParty();
-  const expenses = usePartyExpenses(party.id);
+  const expenses = usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -395,14 +396,10 @@ function ExpenseItem({
 
 function Balances() {
   const { party } = useCurrentParty();
-  const expenses = usePartyExpenses(party.id);
   const participant = useCurrentParticipant();
+  const balances = usePartyBalances(party.id);
 
-  const balancesByParticipant = calculateBalancesByParticipant(
-    expenses,
-    party.participants,
-  );
-  const sortedBalancesByParticipant = Object.values(balancesByParticipant)
+  const sortedBalancesByParticipant = Object.values(balances)
     .map((balance) => {
       return {
         ...balance,

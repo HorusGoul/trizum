@@ -53,7 +53,7 @@ function New() {
         },
         {},
       ),
-      chunkIds: [],
+      chunkRefs: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
     navigate({

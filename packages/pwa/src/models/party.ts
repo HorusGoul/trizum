@@ -10,7 +10,7 @@ export interface Party {
   description: string;
   currency: Currency;
   participants: Record<ExpenseUser, PartyParticipant>;
-  chunkIds: PartyExpenseChunk["id"][];
+  chunkRefs: PartyExpenseChunkRef[];
 }
 
 export interface PartyParticipant {

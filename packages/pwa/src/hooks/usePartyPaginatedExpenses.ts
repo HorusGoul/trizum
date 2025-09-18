@@ -8,7 +8,7 @@ import type { DocumentId } from "@automerge/automerge-repo";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import { startTransition, useCallback, useEffect, useState } from "react";
 
-export function usePartyExpenses(partyId: DocumentId) {
+export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const repo = useRepo();
 
   const [party] = useSuspenseDocument<Party>(partyId, {
@@ -16,11 +16,11 @@ export function usePartyExpenses(partyId: DocumentId) {
   });
 
   const groupExpenses = useCallback(() => {
-    return party.chunkIds
-      .flatMap((chunkId) => {
-        documentCache.prefetch(repo, chunkId);
+    return party.chunkRefs
+      .flatMap((chunkRef) => {
+        documentCache.prefetch(repo, chunkRef.chunkId);
 
-        const chunkHandle = repo.find<PartyExpenseChunk>(chunkId);
+        const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
 
         if (!chunkHandle.isReady()) {
           return [];
@@ -29,7 +29,7 @@ export function usePartyExpenses(partyId: DocumentId) {
         return chunkHandle.docSync()?.expenses ?? [];
       })
       .sort((a, b) => b.paidAt.getTime() - a.paidAt.getTime());
-  }, [party.chunkIds, repo]);
+  }, [party.chunkRefs, repo]);
 
   const [expenses, setExpenses] = useState(() => groupExpenses());
 
@@ -42,8 +42,8 @@ export function usePartyExpenses(partyId: DocumentId) {
       });
     };
 
-    const unsub = party.chunkIds.map((chunkId) => {
-      const handle = handleCache.getValueIfCached(repo, chunkId);
+    const unsub = party.chunkRefs.map((chunkRef) => {
+      const handle = handleCache.getValueIfCached(repo, chunkRef.chunkId);
 
       if (!handle) {
         return () => null;
@@ -59,7 +59,7 @@ export function usePartyExpenses(partyId: DocumentId) {
     return () => {
       unsub.forEach((fn) => fn());
     };
-  }, [party.chunkIds, repo, groupExpenses]);
+  }, [party.chunkRefs, repo, groupExpenses]);
 
   return expenses;
 }
