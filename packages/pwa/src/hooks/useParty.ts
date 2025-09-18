@@ -85,6 +85,8 @@ export function useParty(partyId: string) {
   async function addExpenseToParty(
     expense: Omit<Expense, "id" | "__hash">,
   ): Promise<Expense> {
+    const party = handle.docSync();
+
     if (!party) {
       throw new Error("Party not found, this should not happen");
     }
@@ -107,8 +109,8 @@ export function useParty(partyId: string) {
 
     if (lastChunk.expenses.length >= lastChunk.maxSize) {
       // Create a new chunk if the last one is full
-      const [chunkId, handle] = createChunk();
-      lastChunkRef = chunkId;
+      const [chunkRef, handle] = createChunk();
+      lastChunkRef = chunkRef;
       lastChunkHandle = handle;
       lastChunk = await lastChunkHandle.doc();
 
@@ -144,24 +146,17 @@ export function useParty(partyId: string) {
         party.participants,
       );
 
-      const lastChunkRef = party.chunkRefs.find(
+      let existingLastChunkRef = party.chunkRefs.find(
         (chunkRef) => chunkRef.chunkId === lastChunk.id,
       );
 
-      if (!lastChunkRef) {
-        throw new Error("Chunk ref not found, this should not happen");
+      if (!existingLastChunkRef) {
+        existingLastChunkRef = lastChunkRef;
+        insertAt(party.chunkRefs, 0, existingLastChunkRef);
       }
 
-      lastChunkRef.balancesByParticipant = balancesByParticipant;
-
-      if (!party.chunkRefs.includes(lastChunkRef)) {
-        insertAt(party.chunkRefs, 0, lastChunkRef);
-      }
+      existingLastChunkRef.balancesByParticipant = balancesByParticipant;
     });
-
-    if (party.chunkRefs.includes(lastChunkRef)) {
-      return expenseWithHash;
-    }
 
     return expenseWithHash;
   }

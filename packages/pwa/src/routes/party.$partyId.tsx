@@ -200,7 +200,7 @@ function ExpenseLog({
   panelRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const { party, dev } = useCurrentParty();
-  const expenses = usePartyPaginatedExpenses(party.id);
+  const { expenses } = usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
 
   const filteredExpenses = expenses.filter((expense) => {
