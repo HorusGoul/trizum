@@ -30,6 +30,7 @@ import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useNoMemo } from "#src/hooks/useNoMemo.ts";
 import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
+import { Skeleton } from "#src/ui/Skeleton.tsx";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -200,7 +201,8 @@ function ExpenseLog({
   panelRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const { party, dev } = useCurrentParty();
-  const { expenses } = usePartyPaginatedExpenses(party.id);
+  const { expenses, hasNext, isLoadingNext, loadNext } =
+    usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -231,6 +233,9 @@ function ExpenseLog({
           expenses={filteredExpenses}
           panelRef={panelRef}
           partyId={party.id}
+          hasNext={hasNext}
+          isLoadingNext={isLoadingNext}
+          loadNext={loadNext}
         />
 
         <div className="flex-1" />
@@ -286,16 +291,28 @@ function VirtualizedExpenseList({
   expenses,
   panelRef,
   partyId,
+  hasNext,
+  isLoadingNext,
+  loadNext,
 }: {
   expenses: Expense[];
   panelRef: React.RefObject<HTMLDivElement | null>;
   partyId: string;
+  hasNext: boolean;
+  isLoadingNext: boolean;
+  loadNext: () => void;
 }) {
   const rowVirtualizer = useVirtualizer({
-    count: expenses.length,
+    count: hasNext ? expenses.length + 1 : expenses.length,
     getScrollElement: () => panelRef.current,
     estimateSize: () => 96,
-    getItemKey: (index) => expenses[index].id,
+    getItemKey: (index) => {
+      if (index > expenses.length - 1) {
+        return "loader";
+      }
+
+      return expenses[index].id;
+    },
     gap: 16,
     overscan: 10,
   });
@@ -308,6 +325,21 @@ function VirtualizedExpenseList({
     setRerender(1);
   }, []);
 
+  useEffect(() => {
+    const lastItem = virtualItems.at(-1);
+
+    if (!lastItem) {
+      return;
+    }
+
+    const isRenderingLoadingItem = lastItem.index >= expenses.length;
+    const shouldLoadNext = isRenderingLoadingItem && hasNext && !isLoadingNext;
+
+    if (shouldLoadNext) {
+      loadNext();
+    }
+  }, [virtualItems, hasNext, isLoadingNext, loadNext, expenses.length]);
+
   return (
     <div
       style={{
@@ -316,23 +348,33 @@ function VirtualizedExpenseList({
         width: "100%",
       }}
     >
-      {virtualItems.map((virtualItem) => (
-        <div
-          key={virtualItem.key}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            transform: `translateY(${virtualItem.start}px)`,
-          }}
-        >
-          <ExpenseItem
-            partyId={partyId}
-            expense={expenses[virtualItem.index]}
-          />
-        </div>
-      ))}
+      {virtualItems.map((virtualItem) => {
+        const isLoaderRow = virtualItem.index > expenses.length - 1;
+
+        return (
+          <div
+            key={virtualItem.key}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
+          >
+            {isLoaderRow ? (
+              hasNext ? (
+                <Skeleton className="h-24 w-full" />
+              ) : null
+            ) : (
+              <ExpenseItem
+                partyId={partyId}
+                expense={expenses[virtualItem.index]}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

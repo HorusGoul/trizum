@@ -146,8 +146,20 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const hasNext = !!nextChunkRefId;
 
   function loadNext() {
-    if (!nextChunkRefId) {
-      return;
+    setIsLoadingNext(true);
+    load().finally(() => {
+      setIsLoadingNext(false);
+    });
+
+    async function load() {
+      if (!nextChunkRefId) {
+        return;
+      }
+
+      await documentCache.readAsync(repo, nextChunkRefId);
+      startTransition(() => {
+        rerender();
+      });
     }
   }
 
