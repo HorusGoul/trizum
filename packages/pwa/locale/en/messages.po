@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party.$partyId.tsx:262
+#: src/routes/party.$partyId.tsx:273
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
@@ -25,16 +25,16 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:278
+#: src/routes/party.$partyId.tsx:289
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:84
-#: src/routes/party.$partyId.tsx:246
+#: src/routes/party.$partyId.tsx:257
 msgid "Add or create"
 msgstr "Add or create"
 
-#: src/routes/new.tsx:329
+#: src/routes/new.tsx:339
 #: src/routes/party_.$partyId.settings.tsx:379
 msgid "Add participant"
 msgstr "Add participant"
@@ -67,7 +67,7 @@ msgstr "Archive"
 msgid "Archived participants"
 msgstr "Archived participants"
 
-#: src/routes/new.tsx:220
+#: src/routes/new.tsx:230
 #: src/routes/party_.$partyId.settings.tsx:221
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
@@ -84,7 +84,7 @@ msgstr "Avatar removed"
 msgid "Avatar updated successfully"
 msgstr "Avatar updated successfully"
 
-#: src/routes/party.$partyId.tsx:187
+#: src/routes/party.$partyId.tsx:194
 msgid "Balances"
 msgstr "Balances"
 
@@ -100,7 +100,7 @@ msgstr "Create a new Party"
 msgid "Date"
 msgstr "Date"
 
-#: src/routes/new.tsx:184
+#: src/routes/new.tsx:194
 #: src/routes/party_.$partyId.settings.tsx:178
 msgid "Description"
 msgstr "Description"
@@ -137,7 +137,7 @@ msgstr "Expense Split Mode"
 msgid "Expense updated"
 msgstr "Expense updated"
 
-#: src/routes/party.$partyId.tsx:180
+#: src/routes/party.$partyId.tsx:187
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -165,7 +165,7 @@ msgstr "For payments through Bizum or similar services"
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId.tsx:550
+#: src/routes/party.$partyId.tsx:561
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -173,12 +173,12 @@ msgstr "Here is a list of operations you and other party members can do to balan
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
-#: src/routes/new.tsx:160
+#: src/routes/new.tsx:170
 #: src/routes/party_.$partyId.settings.tsx:154
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
-#: src/routes/party.$partyId.tsx:546
+#: src/routes/party.$partyId.tsx:557
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -190,7 +190,7 @@ msgstr "ID is required"
 msgid "Image must be smaller than 10MB"
 msgstr "Image must be smaller than 10MB"
 
-#: src/routes/party.$partyId.tsx:425
+#: src/routes/party.$partyId.tsx:436
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -206,7 +206,7 @@ msgstr "Join a Party"
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
 
-#: src/routes/party.$partyId.tsx:166
+#: src/routes/party.$partyId.tsx:173
 msgid "Leave party"
 msgstr "Leave party"
 
@@ -231,20 +231,20 @@ msgstr "Name must be less than 50 characters"
 msgid "New expense"
 msgstr "New expense"
 
-#: src/routes/new.tsx:282
+#: src/routes/new.tsx:292
 #: src/routes/party_.$partyId.settings.tsx:332
 msgid "New participant name"
 msgstr "New participant name"
 
-#: src/routes/new.tsx:119
+#: src/routes/new.tsx:129
 msgid "New trizum"
 msgstr "New trizum"
 
-#: src/routes/party.$partyId.tsx:612
+#: src/routes/party.$partyId.tsx:623
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
-#: src/routes/party.$partyId.tsx:133
+#: src/routes/party.$partyId.tsx:140
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
@@ -252,7 +252,7 @@ msgstr "Only show your expenses"
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
 
-#: src/routes/party.$partyId.tsx:623
+#: src/routes/party.$partyId.tsx:634
 msgid "Other operations"
 msgstr "Other operations"
 
@@ -265,18 +265,18 @@ msgstr "Paid at"
 msgid "Paid by"
 msgstr "Paid by"
 
-#: src/routes/new.tsx:248
+#: src/routes/new.tsx:258
 #: src/routes/party_.$partyId.settings.tsx:274
 #: src/routes/party_.$partyId.settings.tsx:407
 msgid "Participant name"
 msgstr "Participant name"
 
-#: src/routes/new.tsx:205
+#: src/routes/new.tsx:215
 #: src/routes/party_.$partyId.settings.tsx:197
 msgid "Participants"
 msgstr "Participants"
 
-#: src/routes/new.tsx:65
+#: src/routes/new.tsx:75
 msgid "Party created"
 msgstr "Party created"
 
@@ -296,11 +296,11 @@ msgstr "Party Settings"
 msgid "Party settings saved!"
 msgstr "Party settings saved!"
 
-#: src/routes/party.$partyId.tsx:594
+#: src/routes/party.$partyId.tsx:605
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
-#: src/routes/party.$partyId.tsx:129
+#: src/routes/party.$partyId.tsx:136
 msgid "Personal mode"
 msgstr "Personal mode"
 
@@ -324,7 +324,7 @@ msgstr "Please correct it before saving."
 msgid "Please select an image file"
 msgstr "Please select an image file"
 
-#: src/routes/new.tsx:261
+#: src/routes/new.tsx:271
 #: src/routes/party_.$partyId.settings.tsx:288
 msgid "Remove"
 msgstr "Remove"
@@ -343,7 +343,7 @@ msgstr "Restore"
 
 #: src/components/ExpenseEditor.tsx:209
 #: src/routes/join.tsx:61
-#: src/routes/new.tsx:132
+#: src/routes/new.tsx:142
 #: src/routes/party_.$partyId.settings.tsx:126
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:76
@@ -351,7 +351,7 @@ msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:50
-#: src/routes/party.$partyId.tsx:155
+#: src/routes/party.$partyId.tsx:162
 #: src/routes/settings.tsx:59
 msgid "Settings"
 msgstr "Settings"
@@ -378,7 +378,7 @@ msgstr "Simple"
 
 #: src/components/ExpenseEditor.tsx:209
 #: src/routes/join.tsx:61
-#: src/routes/new.tsx:132
+#: src/routes/new.tsx:142
 #: src/routes/party_.$partyId.settings.tsx:126
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:76
@@ -398,7 +398,7 @@ msgstr "Switch to fractional split"
 msgid "Take photo"
 msgstr "Take photo"
 
-#: src/routes/party.$partyId.tsx:116
+#: src/routes/party.$partyId.tsx:123
 msgid "Tap to change"
 msgstr "Tap to change"
 
@@ -407,7 +407,7 @@ msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
 #: src/components/ExpenseEditor.tsx:248
-#: src/routes/new.tsx:159
+#: src/routes/new.tsx:169
 #: src/routes/party_.$partyId.settings.tsx:153
 msgid "Title"
 msgstr "Title"
@@ -471,7 +471,7 @@ msgstr "Username"
 msgid "View photo"
 msgstr "View photo"
 
-#: src/routes/party.$partyId.tsx:112
+#: src/routes/party.$partyId.tsx:119
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
@@ -483,7 +483,7 @@ msgstr "Warning: Split amounts don't match total expense"
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
-#: src/routes/new.tsx:185
+#: src/routes/new.tsx:195
 #: src/routes/party_.$partyId.settings.tsx:179
 msgid "What is this party about?"
 msgstr "What is this party about?"
@@ -496,19 +496,19 @@ msgstr "What's your preferred way to be addressed?"
 msgid "Who are you?"
 msgstr "Who are you?"
 
-#: src/routes/new.tsx:209
+#: src/routes/new.tsx:219
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "Who is invited to this party? You can add more participants later."
 
-#: src/routes/party.$partyId.tsx:68
+#: src/routes/party.$partyId.tsx:75
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party.$partyId.tsx:565
+#: src/routes/party.$partyId.tsx:576
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId.tsx:583
+#: src/routes/party.$partyId.tsx:594
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
