@@ -13,7 +13,7 @@ export const handleCache = createCache<
   [Repo, AnyDocumentId],
   DocHandle<unknown>
 >({
-  async load([repo, id]) {
+  load([repo, id]) {
     return repo.find(id);
   },
   getKey: ([_, id]) => String(id),
@@ -103,6 +103,41 @@ function withLiveSubscription<Params extends any[], Value>({
   };
 }
 
+// Reuses documentCache but for multiple documents, a way to cache arrays of documents essentially
+export const multipleDocumentCache = withLiveSubscription<
+  [Repo, AnyDocumentId[]],
+  (Doc<unknown> | undefined)[]
+>({
+  getCache: ({ onEviction, onUpdate, getKey }) =>
+    createCache({
+      async load(params) {
+        const [repo, ids] = params;
+        const docs = await Promise.all(
+          ids.map((id) => documentCache.readAsync(repo, id)),
+        );
+
+        function onChange() {
+          onUpdate(
+            params,
+            ids.map((id) => documentCache.getValueIfCached(repo, id)),
+          );
+        }
+
+        const unsubscribes = ids.map((id) =>
+          documentCache.subscribe(onChange, repo, id),
+        );
+
+        onEviction(params, () => {
+          unsubscribes.forEach((unsubscribe) => unsubscribe());
+        });
+
+        return docs;
+      },
+      getKey,
+    }),
+  getKey: ([_, ids]) => ids.join(","),
+});
+
 export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> {
   const repo = useRepo();
   return handleCache.read(repo, id) as DocHandle<T>;
@@ -149,4 +184,53 @@ export function useSuspenseDocument<
   }
 
   return [doc as Doc<T> | undefined, handle] as const;
+}
+
+export function useMultipleSuspenseDocument<T>(
+  ids: AnyDocumentId[],
+): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
+export function useMultipleSuspenseDocument<
+  T,
+  Options extends
+    UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
+>(
+  ids: AnyDocumentId[],
+  options?: Options,
+): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
+export function useMultipleSuspenseDocument<
+  T,
+  Options extends
+    UseSuspenseDocumentOptions<true> = UseSuspenseDocumentOptions<true>,
+>(
+  ids: AnyDocumentId[],
+  options: Options,
+): { doc: Doc<T>; handle: DocHandle<T> }[];
+export function useMultipleSuspenseDocument<
+  T,
+  Options extends UseSuspenseDocumentOptions = UseSuspenseDocumentOptions,
+>(
+  ids: AnyDocumentId[],
+  options?: Options,
+): { doc: Doc<T> | undefined; handle: DocHandle<T> }[] {
+  const repo = useRepo();
+
+  multipleDocumentCache.read(repo, ids);
+
+  const docs = useSyncExternalStore(
+    (change) => {
+      return multipleDocumentCache.subscribe(change, repo, ids);
+    },
+    () => {
+      return multipleDocumentCache.getValueIfCached(repo, ids);
+    },
+  );
+
+  if ((options?.required && !docs) || !docs?.every((doc) => doc)) {
+    throw new Error(`Document not found: ${ids.join(", ")}`);
+  }
+
+  return docs.map((doc, index) => ({
+    doc: doc as Doc<T> | undefined,
+    handle: handleCache.read(repo, ids[index]) as DocHandle<T>,
+  }));
 }

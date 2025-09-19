@@ -23,7 +23,14 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
@@ -185,7 +192,11 @@ function PartyById() {
             {
               id: "balances",
               label: t`Balances`,
-              node: <Balances />,
+              node: (
+                <Suspense fallback={null}>
+                  <Balances />
+                </Suspense>
+              ),
               icon: "#lucide/scale",
             },
           ]}

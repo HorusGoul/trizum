@@ -25,7 +25,7 @@ export interface PartyParticipant {
 export interface PartyExpenseChunkRef {
   chunkId: DocumentId;
   createdAt: Date;
-  balancesByParticipant: BalancesByParticipant;
+  balancesId: PartyExpenseChunkBalances["id"];
 }
 
 export interface PartyExpenseChunk {
@@ -33,4 +33,9 @@ export interface PartyExpenseChunk {
   createdAt: Date;
   expenses: Expense[];
   maxSize: number;
+}
+
+export interface PartyExpenseChunkBalances {
+  id: DocumentId;
+  balances: BalancesByParticipant;
 }
