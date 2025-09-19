@@ -11,7 +11,7 @@ import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import { clone } from "@opentf/std";
 import { md5 } from "@takker/md5";
-import type { PartyParticipant } from "./party";
+import type { Party, PartyParticipant } from "./party";
 
 export interface Expense {
   id: string;
@@ -348,4 +348,124 @@ export function calculateExpenseHash(expense: Partial<Expense>) {
   delete copy.__editCopyLastUpdatedAt;
 
   return new TextDecoder().decode(md5(JSON.stringify(copy)));
+}
+
+export interface Balance {
+  participantId: PartyParticipant["id"];
+  stats: {
+    userOwes: number;
+    owedToUser: number;
+    diffs: Record<
+      string,
+      {
+        diffUnsplitted: number;
+      }
+    >;
+    balance: number;
+  };
+  visualRatio: number;
+}
+
+export type BalancesByParticipant = Record<PartyParticipant["id"], Balance>;
+
+export function calculateBalancesByParticipant(
+  expenses: Expense[],
+  partyParticipants: Party["participants"],
+): BalancesByParticipant {
+  const inputs = expenses.flatMap(exportIntoInput);
+  const participantIds = Object.keys(partyParticipants);
+
+  const balances = participantIds.map((participantId) => {
+    const dineroStats = calculateLogStatsOfUser(
+      participantId,
+      participantIds,
+      inputs,
+    );
+
+    return {
+      participantId,
+      stats: {
+        userOwes: dineroStats.userOwes.getAmount(),
+        owedToUser: dineroStats.owedToUser.getAmount(),
+        diffs: Object.fromEntries(
+          Object.entries(dineroStats.diffs).map(([participantId, diff]) => [
+            participantId,
+            {
+              diffUnsplitted: diff.diffUnsplitted.getAmount(),
+            },
+          ]),
+        ),
+        balance: dineroStats.balance.getAmount(),
+      },
+      visualRatio: 0,
+    };
+  });
+
+  const withVisualRatios = calculateVisualRatioForBalances(balances);
+
+  return Object.fromEntries(
+    withVisualRatios.map((balance) => [balance.participantId, balance]),
+  );
+}
+
+export function mergeBalancesByParticipant(
+  ...balancesByParticipant: BalancesByParticipant[]
+): BalancesByParticipant {
+  const merged: BalancesByParticipant = {};
+
+  for (const balances of balancesByParticipant) {
+    for (const [participantId, balance] of Object.entries(balances)) {
+      const existing = merged[participantId];
+
+      if (!existing) {
+        merged[participantId] = balance;
+      } else {
+        existing.stats.balance += balance.stats.balance;
+        existing.stats.userOwes += balance.stats.userOwes;
+        existing.stats.owedToUser += balance.stats.owedToUser;
+
+        // Merge diffs
+        for (const [participantId, diff] of Object.entries(
+          balance.stats.diffs,
+        )) {
+          const existingDiff = existing.stats.diffs[participantId];
+
+          if (!existingDiff) {
+            existing.stats.diffs[participantId] = diff;
+          } else {
+            existingDiff.diffUnsplitted += diff.diffUnsplitted;
+          }
+        }
+      }
+    }
+  }
+
+  const balancesArray = Object.values(merged);
+  const withVisualRatios =
+    balancesArray.length > 0
+      ? calculateVisualRatioForBalances(balancesArray)
+      : [];
+
+  return Object.fromEntries(
+    withVisualRatios.map((balance) => [balance.participantId, balance]),
+  );
+}
+
+function calculateVisualRatioForBalances(balances: Balance[]) {
+  const biggestAbsoluteBalance = balances.reduce((prev, next) => {
+    const prevAbs = Math.abs(prev.stats.balance);
+    const nextAbs = Math.abs(next.stats.balance);
+
+    return prevAbs > nextAbs ? prev : next;
+  });
+
+  // Biggest absolute balance should be considered as the reference point (1)
+  const referenceBalance = biggestAbsoluteBalance.stats.balance;
+
+  // Use the reference balance to calculate the visual ratio of each balance
+  for (const balance of balances) {
+    balance.visualRatio = balance.stats.balance / referenceBalance;
+  }
+
+  return balances;
 }

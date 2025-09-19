@@ -1,19 +1,26 @@
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
   createExpenseId,
   calculateExpenseHash,
   type Expense,
+  calculateBalancesByParticipant,
 } from "#src/models/expense.js";
 import type {
   Party,
   PartyExpenseChunk,
+  PartyExpenseChunkBalances,
+  PartyExpenseChunkRef,
   PartyParticipant,
 } from "#src/models/party.js";
+import { diff } from "@opentf/obj-diff";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import {
+  insertAt,
   isValidDocumentId,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
+import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 
 export function useParty(partyId: string) {
@@ -70,26 +77,40 @@ export function useParty(partyId: string) {
 
     handle.change((doc) => (doc.id = handle.documentId));
 
-    return [handle.documentId, handle] as const;
+    const balancesHandle = repo.create<PartyExpenseChunkBalances>({
+      id: "" as DocumentId,
+      balances: {},
+    });
+    balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
+
+    const chunkRef: PartyExpenseChunkRef = {
+      chunkId: handle.documentId,
+      createdAt: new Date(),
+      balancesId: balancesHandle.documentId,
+    };
+
+    return [chunkRef, handle] as const;
   }
 
   async function addExpenseToParty(
     expense: Omit<Expense, "id" | "__hash">,
   ): Promise<Expense> {
+    const party = handle.docSync();
+
     if (!party) {
       throw new Error("Party not found, this should not happen");
     }
 
     // Last chunk is the most recent one, so should be indexed at 0
-    let lastChunkId = party.chunkIds.at(0);
+    let lastChunkRef = party.chunkRefs.at(0);
 
-    if (!lastChunkId) {
+    if (!lastChunkRef) {
       // Create a new chunk if there is none
-      const [chunkId] = createChunk();
-      lastChunkId = chunkId;
+      const [chunkRef] = createChunk();
+      lastChunkRef = chunkRef;
     }
 
-    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkId);
+    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkRef.chunkId);
     let lastChunk = await lastChunkHandle.doc();
 
     if (!lastChunk) {
@@ -98,8 +119,8 @@ export function useParty(partyId: string) {
 
     if (lastChunk.expenses.length >= lastChunk.maxSize) {
       // Create a new chunk if the last one is full
-      const [chunkId, handle] = createChunk();
-      lastChunkId = chunkId;
+      const [chunkRef, handle] = createChunk();
+      lastChunkRef = chunkRef;
       lastChunkHandle = handle;
       lastChunk = await lastChunkHandle.doc();
 
@@ -110,7 +131,7 @@ export function useParty(partyId: string) {
 
     const expenseWithId = {
       ...expense,
-      id: createExpenseId(lastChunkId),
+      id: createExpenseId(lastChunkRef.chunkId),
     };
     const expenseWithHash = {
       ...expenseWithId,
@@ -121,15 +142,44 @@ export function useParty(partyId: string) {
     };
 
     lastChunkHandle.change((doc) => {
-      doc.expenses.unshift(expenseWithHash);
+      insertAt(doc.expenses, 0, expenseWithHash);
     });
+    lastChunk = lastChunkHandle.docSync();
 
-    if (party.chunkIds.includes(lastChunkId)) {
-      return expenseWithHash;
+    if (!lastChunk) {
+      throw new Error("Chunk not found, this should not happen");
     }
 
     handle.change((party) => {
-      party.chunkIds.unshift(lastChunkId);
+      let existingLastChunkRef = party.chunkRefs.find(
+        (chunkRef) => chunkRef.chunkId === lastChunk.id,
+      );
+
+      if (!existingLastChunkRef) {
+        existingLastChunkRef = lastChunkRef;
+        insertAt(party.chunkRefs, 0, existingLastChunkRef);
+      }
+    });
+
+    const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+      lastChunkRef.balancesId,
+    );
+    const lastChunkBalances = await lastChunkBalancesHandle.doc();
+
+    if (!lastChunkBalances) {
+      throw new Error("Chunk balances not found, this should not happen");
+    }
+
+    const balancesByParticipant = calculateBalancesByParticipant(
+      lastChunk.expenses,
+      party.participants,
+    );
+
+    lastChunkBalancesHandle.change((doc) => {
+      patchMutate(
+        doc.balances,
+        diff(clone(doc.balances), clone(balancesByParticipant)),
+      );
     });
 
     return expenseWithHash;

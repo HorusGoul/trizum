@@ -1,5 +1,9 @@
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import type { Party, PartyParticipant } from "#src/models/party.js";
+import type {
+  Party,
+  PartyExpenseChunkBalances,
+  PartyParticipant,
+} from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
@@ -38,6 +42,12 @@ function New() {
       id: crypto.randomUUID(),
     }));
 
+    const balancesHandle = repo.create<PartyExpenseChunkBalances>({
+      id: "" as DocumentId,
+      balances: {},
+    });
+    balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
+
     const handle = repo.create<Party>({
       id: "" as DocumentId,
       name: values.name,
@@ -53,7 +63,7 @@ function New() {
         },
         {},
       ),
-      chunkIds: [],
+      chunkRefs: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
     navigate({

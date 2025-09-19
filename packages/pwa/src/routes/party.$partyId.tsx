@@ -7,26 +7,37 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import {
+  calculateBalancesByParticipant,
   exportIntoInput,
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,
+  type Balance,
   type Expense,
 } from "#src/models/expense.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
-import { usePartyExpenses } from "#src/hooks/usePartyExpenses.js";
+import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
 import { useCurrentParty, useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useNoMemo } from "#src/hooks/useNoMemo.ts";
+import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
+import { Skeleton } from "#src/ui/Skeleton.tsx";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -37,11 +48,11 @@ export const Route = createFileRoute("/party/$partyId")({
       location,
     );
 
-    await Promise.all(
-      party.chunkIds.map((chunkId) => {
-        return documentCache.readAsync(context.repo, chunkId);
-      }),
-    );
+    const firstChunkRef = party.chunkRefs.at(0);
+
+    if (firstChunkRef) {
+      await documentCache.readAsync(context.repo, firstChunkRef.chunkId);
+    }
 
     return;
   },
@@ -181,7 +192,11 @@ function PartyById() {
             {
               id: "balances",
               label: t`Balances`,
-              node: <Balances />,
+              node: (
+                <Suspense fallback={null}>
+                  <Balances />
+                </Suspense>
+              ),
               icon: "#lucide/scale",
             },
           ]}
@@ -197,7 +212,8 @@ function ExpenseLog({
   panelRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const { party, dev } = useCurrentParty();
-  const expenses = usePartyExpenses(party.id);
+  const { expenses, hasNext, isLoadingNext, loadNext } =
+    usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -228,6 +244,9 @@ function ExpenseLog({
           expenses={filteredExpenses}
           panelRef={panelRef}
           partyId={party.id}
+          hasNext={hasNext}
+          isLoadingNext={isLoadingNext}
+          loadNext={loadNext}
         />
 
         <div className="flex-1" />
@@ -283,16 +302,28 @@ function VirtualizedExpenseList({
   expenses,
   panelRef,
   partyId,
+  hasNext,
+  isLoadingNext,
+  loadNext,
 }: {
   expenses: Expense[];
   panelRef: React.RefObject<HTMLDivElement | null>;
   partyId: string;
+  hasNext: boolean;
+  isLoadingNext: boolean;
+  loadNext: () => void;
 }) {
   const rowVirtualizer = useVirtualizer({
-    count: expenses.length,
+    count: hasNext ? expenses.length + 1 : expenses.length,
     getScrollElement: () => panelRef.current,
     estimateSize: () => 96,
-    getItemKey: (index) => expenses[index].id,
+    getItemKey: (index) => {
+      if (index > expenses.length - 1) {
+        return "loader";
+      }
+
+      return expenses[index].id;
+    },
     gap: 16,
     overscan: 10,
   });
@@ -305,6 +336,21 @@ function VirtualizedExpenseList({
     setRerender(1);
   }, []);
 
+  useEffect(() => {
+    const lastItem = virtualItems.at(-1);
+
+    if (!lastItem) {
+      return;
+    }
+
+    const isRenderingLoadingItem = lastItem.index >= expenses.length;
+    const shouldLoadNext = isRenderingLoadingItem && hasNext && !isLoadingNext;
+
+    if (shouldLoadNext) {
+      loadNext();
+    }
+  }, [virtualItems, hasNext, isLoadingNext, loadNext, expenses.length]);
+
   return (
     <div
       style={{
@@ -313,23 +359,33 @@ function VirtualizedExpenseList({
         width: "100%",
       }}
     >
-      {virtualItems.map((virtualItem) => (
-        <div
-          key={virtualItem.key}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            transform: `translateY(${virtualItem.start}px)`,
-          }}
-        >
-          <ExpenseItem
-            partyId={partyId}
-            expense={expenses[virtualItem.index]}
-          />
-        </div>
-      ))}
+      {virtualItems.map((virtualItem) => {
+        const isLoaderRow = virtualItem.index > expenses.length - 1;
+
+        return (
+          <div
+            key={virtualItem.key}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
+          >
+            {isLoaderRow ? (
+              hasNext ? (
+                <Skeleton className="h-24 w-full" />
+              ) : null
+            ) : (
+              <ExpenseItem
+                partyId={partyId}
+                expense={expenses[virtualItem.index]}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -393,48 +449,21 @@ function ExpenseItem({
 
 function Balances() {
   const { party } = useCurrentParty();
-  const expenses = usePartyExpenses(party.id);
   const participant = useCurrentParticipant();
+  const balances = usePartyBalances(party.id);
 
-  const balancesByParticipant = useMemo(() => {
-    const inputs = expenses.flatMap(exportIntoInput);
-    const participants = Object.values(party.participants);
-    const participantIds = Object.keys(party.participants);
-
-    const balances = participants
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((participant) => {
-        return {
-          participant,
-          stats: calculateLogStatsOfUser(
-            participant.id,
-            participantIds,
-            inputs,
-          ),
-          visualRatio: 0,
-        };
-      });
-
-    const biggestAbsoluteBalance = balances.reduce((prev, next) => {
-      const prevAbs = Math.abs(prev.stats.balance.getAmount());
-      const nextAbs = Math.abs(next.stats.balance.getAmount());
-
-      return prevAbs > nextAbs ? prev : next;
+  const sortedBalancesByParticipant = Object.values(balances)
+    .map((balance) => {
+      return {
+        ...balance,
+        participant: party.participants[balance.participantId],
+      };
+    })
+    .sort((a, b) => {
+      return a.participant.name.localeCompare(b.participant.name);
     });
 
-    // Biggest absolute balance should be considered as the reference point (1)
-    const referenceBalance = biggestAbsoluteBalance.stats.balance.getAmount();
-
-    // Use the reference balance to calculate the visual ratio of each balance
-    for (const balance of balances) {
-      balance.visualRatio =
-        balance.stats.balance.getAmount() / referenceBalance;
-    }
-
-    return balances;
-  }, [party.participants, expenses]);
-
-  const myBalance = balancesByParticipant.find(
+  const myBalance = sortedBalancesByParticipant.find(
     (balance) => balance.participant.id === participant.id,
   );
 
@@ -444,36 +473,36 @@ function Balances() {
 
   const userOwesMap = Object.entries(myBalance.stats.diffs)
     .filter(([_, diff]) => {
-      return diff.diffUnsplitted.getAmount() < 0;
+      return diff.diffUnsplitted < 0;
     })
     .map(([participantId, diff]) => {
       return {
         participantId,
-        amount: diff.diffUnsplitted.getAmount(),
+        amount: diff.diffUnsplitted,
       };
     });
 
   const owedToUserMap = Object.entries(myBalance.stats.diffs)
     .filter(([_, diff]) => {
-      return diff.diffUnsplitted.getAmount() > 0;
+      return diff.diffUnsplitted > 0;
     })
     .map(([participantId, diff]) => {
       return {
         participantId,
-        amount: diff.diffUnsplitted.getAmount(),
+        amount: diff.diffUnsplitted,
       };
     });
 
   const isFullyBalanced =
     userOwesMap.length === 0 && owedToUserMap.length === 0;
 
-  const allOtherDiffs = balancesByParticipant
+  const allOtherDiffs = sortedBalancesByParticipant
     .filter((balance) => {
       if (balance.participant.id === participant.id) {
         return false;
       }
 
-      if (balance.stats.balance.getAmount() >= 0) {
+      if (balance.stats.balance >= 0) {
         return false;
       }
 
@@ -488,7 +517,7 @@ function Balances() {
 
           const diff = balance.stats.diffs[participantId];
 
-          if (diff.diffUnsplitted.getAmount() >= 0) {
+          if (diff.diffUnsplitted >= 0) {
             return false;
           }
 
@@ -498,7 +527,7 @@ function Balances() {
           return {
             fromId: balance.participant.id,
             toId: participantId,
-            amount: diff.diffUnsplitted.getAmount(),
+            amount: diff.diffUnsplitted,
           };
         });
     });
@@ -508,14 +537,16 @@ function Balances() {
       <div className="h-8 flex-shrink-0" />
 
       <div className="container flex flex-col gap-4 px-4">
-        {balancesByParticipant.map(({ participant, stats, visualRatio }) => (
-          <BalanceItem
-            key={participant.id}
-            participant={participant}
-            stats={stats}
-            visualRatio={visualRatio}
-          />
-        ))}
+        {sortedBalancesByParticipant.map(
+          ({ participant, stats, visualRatio }) => (
+            <BalanceItem
+              key={participant.id}
+              participant={participant}
+              stats={stats}
+              visualRatio={visualRatio}
+            />
+          ),
+        )}
       </div>
 
       <div className="h-8 flex-shrink-0" />
@@ -617,14 +648,14 @@ function Balances() {
 
 interface BalanceItemProps {
   participant: PartyParticipant;
-  stats: ReturnType<typeof calculateLogStatsOfUser>;
+  stats: Balance["stats"];
   visualRatio: number;
 }
 
 function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
   const { party } = useCurrentParty();
 
-  const balance = stats.balance.getAmount();
+  const balance = stats.balance;
   const isNegative = balance < 0;
 
   const participantNode = (
@@ -656,7 +687,7 @@ function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
       />
 
       <CurrencyText
-        amount={stats.balance.getAmount()}
+        amount={stats.balance}
         currency={party.currency}
         variant="inherit"
         className={cn(
