@@ -18,5 +18,5 @@ export default defineConfig({
     preset: "2023",
   },
   preset,
-  images: ["assets/maskable.svg"],
+  images: ["public/maskable.svg"],
 });
