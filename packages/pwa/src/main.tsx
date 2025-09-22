@@ -19,6 +19,7 @@ import * as catalogEn from "#locale/en/messages.po";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
 import { preloadAllIcons } from "./preloadIcons.gen.js";
+import { PartyTheme } from "./components/PartyTheme.tsx";
 
 // Load language
 i18n.load("en", catalogEn.messages);
@@ -75,7 +76,7 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <AriaProviders>
         <RepoContext.Provider value={repo}>
-          <RouterProvider router={router} />
+          <RouterProvider router={router} InnerWrap={InnerWrap} />
           <Toaster />
         </RepoContext.Provider>
       </AriaProviders>
@@ -86,4 +87,13 @@ if (!rootElement.innerHTML) {
 function AriaProviders({ children }: { children: React.ReactNode }) {
   const { i18n } = useLingui();
   return <AriaI18nProvider locale={i18n.locale}>{children}</AriaI18nProvider>;
+}
+
+function InnerWrap({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <PartyTheme />
+      {children}
+    </>
+  );
 }

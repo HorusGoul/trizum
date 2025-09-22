@@ -16,7 +16,8 @@
     "lint:fix": "pnpm run lint --fix",
     "preview": "vite preview",
     "test": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate:assets": "pwa-assets-generator"
   },
   "dependencies": {
     "@automerge/automerge": "2.2.5",
@@ -62,6 +63,7 @@
     "@types/dinero.js": "1.9.4",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
+    "@vite-pwa/assets-generator": "1.0.1",
     "@vitejs/plugin-react": "4.7.0",
     "autoprefixer": "10.4.21",
     "babel-plugin-macros": "3.1.0",
@@ -77,6 +79,7 @@
     "tailwindcss-react-aria-components": "1.2.0",
     "typescript": "5.9.2",
     "vite": "7.1.2",
+    "vite-plugin-pwa": "1.0.3",
     "vite-plugin-top-level-await": "1.6.0",
     "vite-plugin-wasm": "3.5.0",
     "vitest": "3.2.4"

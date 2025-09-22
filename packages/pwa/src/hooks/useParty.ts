@@ -30,12 +30,13 @@ export function useParty(partyId: string) {
   });
 
   function updateSettings(
-    values: Pick<Party, "name" | "description" | "participants">,
+    values: Pick<Party, "name" | "description" | "participants" | "hue">,
   ) {
     handle.change((doc) => {
       doc.name = values.name;
       doc.description = values.description;
       doc.participants = values.participants;
+      doc.hue = values.hue;
     });
   }
 

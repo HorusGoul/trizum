@@ -4,6 +4,7 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import { lingui } from "@lingui/vite-plugin";
+import { VitePWA } from "vite-plugin-pwa";
 
 const ReactCompilerConfig = {};
 
@@ -26,6 +27,43 @@ export default defineConfig({
       matchers: [/#lucide\/([^"'`]+)/g],
       importPreloadFunction: `import { preloadIcon } from "#src/ui/Icon.js";`,
       preloadFunctionName: "preloadIcon",
+    }),
+    VitePWA({
+      registerType: "autoUpdate",
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5242880,
+      },
+      manifest: {
+        name: "trizum",
+        short_name: "trizum",
+        description: "Split your bills with friends",
+        theme_color: "#000000",
+        background_color: "#000000",
+        display: "standalone",
+        icons: [
+          {
+            src: "maskable-icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+          {
+            src: "pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
+          },
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
     }),
   ],
 });

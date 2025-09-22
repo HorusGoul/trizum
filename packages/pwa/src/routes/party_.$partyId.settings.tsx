@@ -7,8 +7,11 @@ import {
   validatePartyTitle,
 } from "#src/lib/validation.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
+import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
+import { Label } from "#src/ui/Field.tsx";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
+import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
@@ -27,6 +30,7 @@ interface PartySettingsFormValues {
   name: string;
   description: string;
   participants: (PartyParticipant | (PartyParticipant & { __isNew: true }))[];
+  hue: number;
 }
 
 function PartySettings() {
@@ -54,6 +58,7 @@ function PartySettings() {
       name: values.name,
       description: values.description,
       participants,
+      hue: values.hue,
     });
 
     toast.success(t`Party settings saved!`);
@@ -64,6 +69,7 @@ function PartySettings() {
       name: party.name,
       description: party.description,
       participants: Object.values(party.participants),
+      hue: party.hue ?? defaultThemeHue,
     } as PartySettingsFormValues,
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -189,6 +195,29 @@ function PartySettings() {
                 field.state.meta.errors?.length > 0
               }
             />
+          )}
+        </form.Field>
+
+        <form.Field name="hue">
+          {(field) => (
+            <div className="flex flex-col gap-2">
+              <Label htmlFor={field.name}>{t`Color`}</Label>
+              <ColorSlider
+                id={field.name}
+                value={`hsl(${field.state.value}, 100%, 50%)`}
+                onChange={(value) => {
+                  const hue = value.getChannelValue("hue");
+                  field.setValue(hue);
+                  setThemeHue(hue);
+                }}
+                channel="hue"
+                className="w-full"
+              >
+                <SliderTrack className="w-full">
+                  <ColorThumb className="top-1/2" />
+                </SliderTrack>
+              </ColorSlider>
+            </div>
           )}
         </form.Field>
 
