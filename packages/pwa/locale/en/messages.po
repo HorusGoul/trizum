@@ -35,7 +35,7 @@ msgid "Add or create"
 msgstr "Add or create"
 
 #: src/routes/new.tsx:339
-#: src/routes/party_.$partyId.settings.tsx:379
+#: src/routes/party_.$partyId.settings.tsx:408
 msgid "Add participant"
 msgstr "Add participant"
 
@@ -59,16 +59,16 @@ msgstr "Amount for {0}"
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
-#: src/routes/party_.$partyId.settings.tsx:297
+#: src/routes/party_.$partyId.settings.tsx:326
 msgid "Archive"
 msgstr "Archive"
 
-#: src/routes/party_.$partyId.settings.tsx:388
+#: src/routes/party_.$partyId.settings.tsx:417
 msgid "Archived participants"
 msgstr "Archived participants"
 
 #: src/routes/new.tsx:230
-#: src/routes/party_.$partyId.settings.tsx:221
+#: src/routes/party_.$partyId.settings.tsx:250
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
@@ -92,6 +92,10 @@ msgstr "Balances"
 msgid "Can't add an expense to a party that doesn't exist"
 msgstr "Can't add an expense to a party that doesn't exist"
 
+#: src/routes/party_.$partyId.settings.tsx:204
+msgid "Color"
+msgstr "Color"
+
 #: src/routes/index.tsx:109
 msgid "Create a new Party"
 msgstr "Create a new Party"
@@ -101,7 +105,7 @@ msgid "Date"
 msgstr "Date"
 
 #: src/routes/new.tsx:194
-#: src/routes/party_.$partyId.settings.tsx:178
+#: src/routes/party_.$partyId.settings.tsx:184
 msgid "Description"
 msgstr "Description"
 
@@ -174,7 +178,7 @@ msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
 #: src/routes/new.tsx:170
-#: src/routes/party_.$partyId.settings.tsx:154
+#: src/routes/party_.$partyId.settings.tsx:160
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
@@ -210,7 +214,7 @@ msgstr "Joined {0}!"
 msgid "Leave party"
 msgstr "Leave party"
 
-#: src/routes/party_.$partyId.settings.tsx:201
+#: src/routes/party_.$partyId.settings.tsx:230
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
@@ -232,7 +236,7 @@ msgid "New expense"
 msgstr "New expense"
 
 #: src/routes/new.tsx:292
-#: src/routes/party_.$partyId.settings.tsx:332
+#: src/routes/party_.$partyId.settings.tsx:361
 msgid "New participant name"
 msgstr "New participant name"
 
@@ -266,13 +270,13 @@ msgid "Paid by"
 msgstr "Paid by"
 
 #: src/routes/new.tsx:258
-#: src/routes/party_.$partyId.settings.tsx:274
-#: src/routes/party_.$partyId.settings.tsx:407
+#: src/routes/party_.$partyId.settings.tsx:303
+#: src/routes/party_.$partyId.settings.tsx:436
 msgid "Participant name"
 msgstr "Participant name"
 
 #: src/routes/new.tsx:215
-#: src/routes/party_.$partyId.settings.tsx:197
+#: src/routes/party_.$partyId.settings.tsx:226
 msgid "Participants"
 msgstr "Participants"
 
@@ -288,11 +292,11 @@ msgstr "Party deleted"
 msgid "Party is completely balanced!"
 msgstr "Party is completely balanced!"
 
-#: src/routes/party_.$partyId.settings.tsx:109
+#: src/routes/party_.$partyId.settings.tsx:115
 msgid "Party Settings"
 msgstr "Party Settings"
 
-#: src/routes/party_.$partyId.settings.tsx:59
+#: src/routes/party_.$partyId.settings.tsx:64
 msgid "Party settings saved!"
 msgstr "Party settings saved!"
 
@@ -325,7 +329,7 @@ msgid "Please select an image file"
 msgstr "Please select an image file"
 
 #: src/routes/new.tsx:271
-#: src/routes/party_.$partyId.settings.tsx:288
+#: src/routes/party_.$partyId.settings.tsx:317
 msgid "Remove"
 msgstr "Remove"
 
@@ -337,14 +341,14 @@ msgstr "Remove avatar"
 msgid "Remove photo"
 msgstr "Remove photo"
 
-#: src/routes/party_.$partyId.settings.tsx:421
+#: src/routes/party_.$partyId.settings.tsx:450
 msgid "Restore"
 msgstr "Restore"
 
 #: src/components/ExpenseEditor.tsx:209
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:142
-#: src/routes/party_.$partyId.settings.tsx:126
+#: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:76
 msgid "Save"
@@ -379,7 +383,7 @@ msgstr "Simple"
 #: src/components/ExpenseEditor.tsx:209
 #: src/routes/join.tsx:61
 #: src/routes/new.tsx:142
-#: src/routes/party_.$partyId.settings.tsx:126
+#: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:76
 msgid "Submitting..."
@@ -408,7 +412,7 @@ msgstr "This isn't a valid ID"
 
 #: src/components/ExpenseEditor.tsx:248
 #: src/routes/new.tsx:169
-#: src/routes/party_.$partyId.settings.tsx:153
+#: src/routes/party_.$partyId.settings.tsx:159
 msgid "Title"
 msgstr "Title"
 
@@ -484,7 +488,7 @@ msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
 #: src/routes/new.tsx:195
-#: src/routes/party_.$partyId.settings.tsx:179
+#: src/routes/party_.$partyId.settings.tsx:185
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
