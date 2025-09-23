@@ -5,6 +5,7 @@ import {
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
+import { useCurrentParty } from "#src/hooks/useParty.ts";
 import {
   documentCache,
   useSuspenseDocument,
@@ -21,17 +22,10 @@ import {
   type ExpenseParticipantPresence,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
-import {
-  isValidDocumentId,
-  type DocHandleChangePayload,
-} from "@automerge/automerge-repo";
+import { type DocHandleChangePayload } from "@automerge/automerge-repo";
 import { t } from "@lingui/macro";
 import { clone } from "@opentf/std";
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
@@ -189,11 +183,10 @@ function RouteComponent() {
 }
 
 function useExpense() {
-  const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
   const participant = useCurrentParticipant();
 
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
+  const { updateExpense } = useCurrentParty();
 
   const { chunkId } = decodeExpenseId(expenseId);
 
@@ -204,23 +197,7 @@ function useExpense() {
   const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
 
   function onUpdateExpense(expense: Expense) {
-    if (expenseId === undefined) return;
-
-    handle.change((chunk) => {
-      const entry = chunk.expenses[expenseIndex];
-
-      if (!entry) {
-        return;
-      }
-
-      if (entry.id !== expense.id) {
-        return;
-      }
-
-      applyExpenseDiff(entry, expense);
-      delete entry.__editCopy;
-      delete entry.__editCopyLastUpdatedAt;
-    });
+    updateExpense(expense);
   }
 
   function onChangeExpense(expense: Expense) {

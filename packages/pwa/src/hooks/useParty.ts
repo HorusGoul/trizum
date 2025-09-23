@@ -5,6 +5,8 @@ import {
   calculateExpenseHash,
   type Expense,
   calculateBalancesByParticipant,
+  decodeExpenseId,
+  applyExpenseDiff,
 } from "#src/models/expense.js";
 import type {
   Party,
@@ -186,6 +188,63 @@ export function useParty(partyId: string) {
     return expenseWithHash;
   }
 
+  async function updateExpense(expense: Expense) {
+    const party = handle.docSync();
+
+    if (!party) {
+      throw new Error("Party not found, this should not happen");
+    }
+
+    const { chunkId } = decodeExpenseId(expense.id);
+
+    const chunkRef = party.chunkRefs.find((chunk) => chunk.chunkId === chunkId);
+
+    if (!chunkRef) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+    const chunk = await chunkHandle.doc();
+
+    if (!chunk) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    chunkHandle.change((doc) => {
+      const expenseEntry = doc.expenses.find((e) => e.id === expense.id);
+
+      if (!expenseEntry) {
+        throw new Error("Expense not found, this should not happen");
+      }
+
+      applyExpenseDiff(expenseEntry, expense);
+
+      delete expenseEntry.__editCopy;
+      delete expenseEntry.__editCopyLastUpdatedAt;
+    });
+
+    const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+      chunkRef.balancesId,
+    );
+    const lastChunkBalances = await lastChunkBalancesHandle.doc();
+
+    if (!lastChunkBalances) {
+      throw new Error("Chunk balances not found, this should not happen");
+    }
+
+    const balancesByParticipant = calculateBalancesByParticipant(
+      chunk.expenses,
+      party.participants,
+    );
+
+    lastChunkBalancesHandle.change((doc) => {
+      patchMutate(
+        doc.balances,
+        diff(clone(doc.balances), clone(balancesByParticipant)),
+      );
+    });
+  }
+
   async function __dev_createTestExpenses() {
     const promptAnswer = window.prompt("How many test expenses to create?");
 
@@ -230,6 +289,7 @@ export function useParty(partyId: string) {
     updateSettings,
     setParticipantDetails,
     addExpenseToParty,
+    updateExpense,
     dev: {
       createTestExpenses: __dev_createTestExpenses,
     },
