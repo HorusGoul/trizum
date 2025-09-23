@@ -117,7 +117,7 @@ msgstr "Description must be less than 500 characters"
 msgid "Divide"
 msgstr "Divide"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:179
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:173
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
@@ -137,7 +137,7 @@ msgstr "Expense amounts don't match total. Please check your split configuration
 msgid "Expense Split Mode"
 msgstr "Expense Split Mode"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:141
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:135
 msgid "Expense updated"
 msgstr "Expense updated"
 
@@ -149,7 +149,7 @@ msgstr "Expenses"
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:146
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:140
 msgid "Failed to update expense"
 msgstr "Failed to update expense"
 
@@ -436,7 +436,7 @@ msgstr "Total split:"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:114
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:108
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
