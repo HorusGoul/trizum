@@ -150,6 +150,22 @@ function PartyById() {
 
               <MenuItem
                 href={{
+                  to: "/party/$partyId/share",
+                  params: { partyId },
+                }}
+              >
+                <IconWithFallback
+                  name="#lucide/share"
+                  size={20}
+                  className="mr-3"
+                />
+                <span className="h-3.5 leading-none">
+                  <Trans>Share party</Trans>
+                </span>
+              </MenuItem>
+
+              <MenuItem
+                href={{
                   to: "/party/$partyId/settings",
                   params: { partyId },
                 }}

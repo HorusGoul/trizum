@@ -7,6 +7,7 @@ import { t } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/join")({
   component: Join,
@@ -20,15 +21,27 @@ function Join() {
   const navigate = useNavigate();
 
   function onJoinParty(value: JoinFormValues) {
-    if (!isValidDocumentId(value.id)) {
-      console.warn(`Not a valid partyId: ${value.id}`);
+    let partyId: string;
+
+    const isUrl = value.id.includes("/");
+
+    if (isUrl) {
+      partyId = value.id.split("/party/")[1].split("/")[0];
+    } else {
+      partyId = value.id;
+    }
+
+    if (!isValidDocumentId(partyId)) {
+      toast.error(
+        isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`,
+      );
       return;
     }
     navigate({
       to: "/party/$partyId",
       replace: true,
       params: {
-        partyId: value.id,
+        partyId,
       },
     });
   }
@@ -87,7 +100,8 @@ function Join() {
         >
           {(field) => (
             <AppTextField
-              label={t`URL or Party ID`}
+              label={t`Link or code`}
+              description={t`Enter the link or code of the trizum party you want to join`}
               minLength={1}
               name={field.name}
               value={field.state.value}
