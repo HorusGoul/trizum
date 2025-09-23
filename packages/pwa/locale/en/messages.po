@@ -125,7 +125,7 @@ msgstr "Divide"
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
-#: src/routes/join.tsx:104
+#: src/routes/join.tsx:115
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
 
@@ -214,11 +214,13 @@ msgstr "Impact on my balance: <0/>"
 msgid "Include all"
 msgstr "Include all"
 
-#: src/routes/join.tsx:36
+#: src/routes/join.tsx:30
+#: src/routes/join.tsx:47
 msgid "Invalid trizum party code"
 msgstr "Invalid trizum party code"
 
-#: src/routes/join.tsx:36
+#: src/routes/join.tsx:29
+#: src/routes/join.tsx:47
 msgid "Invalid trizum party link"
 msgstr "Invalid trizum party link"
 
@@ -238,7 +240,7 @@ msgstr "Joined {0}!"
 msgid "Leave party"
 msgstr "Leave party"
 
-#: src/routes/join.tsx:103
+#: src/routes/join.tsx:114
 msgid "Link or code"
 msgstr "Link or code"
 
@@ -382,7 +384,7 @@ msgid "Restore"
 msgstr "Restore"
 
 #: src/components/ExpenseEditor.tsx:209
-#: src/routes/join.tsx:74
+#: src/routes/join.tsx:85
 #: src/routes/new.tsx:142
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
@@ -423,7 +425,7 @@ msgid "Simple"
 msgstr "Simple"
 
 #: src/components/ExpenseEditor.tsx:209
-#: src/routes/join.tsx:74
+#: src/routes/join.tsx:85
 #: src/routes/new.tsx:142
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
