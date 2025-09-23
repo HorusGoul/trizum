@@ -1,5 +1,4 @@
 import { BackButton } from "#src/components/BackButton.js";
-import { validateDocumentId } from "#src/lib/validation.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
@@ -19,6 +18,18 @@ interface JoinFormValues {
 
 function Join() {
   const navigate = useNavigate();
+
+  function validateId(id: string) {
+    const isUrl = id.includes("/");
+    const partyId = isUrl ? id.split("/party/")[1].split("/")[0] : id;
+    const valid = isValidDocumentId(partyId);
+
+    if (!valid) {
+      return isUrl
+        ? t`Invalid trizum party link`
+        : t`Invalid trizum party code`;
+    }
+  }
 
   function onJoinParty(value: JoinFormValues) {
     let partyId: string;
@@ -95,7 +106,7 @@ function Join() {
         <form.Field
           name="id"
           validators={{
-            onChange: ({ value }) => validateDocumentId(value),
+            onChange: ({ value }) => validateId(value),
           }}
         >
           {(field) => (
