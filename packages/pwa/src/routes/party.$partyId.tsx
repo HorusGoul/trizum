@@ -38,6 +38,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useNoMemo } from "#src/hooks/useNoMemo.ts";
 import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
+import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -313,6 +314,9 @@ function VirtualizedExpenseList({
   isLoadingNext: boolean;
   loadNext: () => void;
 }) {
+  const scrollRestorationCache = useScrollRestorationCache(
+    `party-${partyId}-expense-list`,
+  );
   const rowVirtualizer = useVirtualizer({
     count: hasNext ? expenses.length + 1 : expenses.length,
     getScrollElement: () => panelRef.current,
@@ -326,6 +330,7 @@ function VirtualizedExpenseList({
     },
     gap: 16,
     overscan: 10,
+    ...scrollRestorationCache,
   });
 
   const virtualItems = useNoMemo(() => rowVirtualizer.getVirtualItems());
