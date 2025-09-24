@@ -204,7 +204,7 @@ export function useParty(partyId: string) {
     }
 
     const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    const chunk = await chunkHandle.doc();
+    let chunk = await chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -222,6 +222,12 @@ export function useParty(partyId: string) {
       delete expenseEntry.__editCopy;
       delete expenseEntry.__editCopyLastUpdatedAt;
     });
+
+    chunk = chunkHandle.docSync();
+
+    if (!chunk) {
+      throw new Error("Chunk not found, this should not happen");
+    }
 
     const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
       chunkRef.balancesId,
