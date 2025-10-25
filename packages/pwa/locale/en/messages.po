@@ -17,11 +17,11 @@ msgstr ""
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
-#: src/routes/migrate_.tricount.tsx:313
+#: src/routes/migrate_.tricount.tsx:307
 msgid "{message}"
 msgstr "{message}"
 
-#: src/routes/migrate_.tricount.tsx:257
+#: src/routes/migrate_.tricount.tsx:251
 msgid "{name}"
 msgstr "{name}"
 
@@ -133,7 +133,7 @@ msgstr "Divide"
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
-#: src/routes/migrate_.tricount.tsx:225
+#: src/routes/migrate_.tricount.tsx:219
 msgid "Enter the key of the Tricount account you want to migrate from"
 msgstr "Enter the key of the Tricount account you want to migrate from"
 
@@ -189,7 +189,7 @@ msgstr "Failed to upload, please try again"
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
-#: src/routes/migrate_.tricount.tsx:322
+#: src/routes/migrate_.tricount.tsx:316
 msgid "Go back to home"
 msgstr "Go back to home"
 
@@ -226,11 +226,11 @@ msgstr "Image must be smaller than 10MB"
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
-#: src/routes/migrate_.tricount.tsx:149
+#: src/routes/migrate_.tricount.tsx:144
 msgid "Imported {0} ({1} of {2})"
 msgstr "Imported {0} ({1} of {2})"
 
-#: src/routes/migrate_.tricount.tsx:107
+#: src/routes/migrate_.tricount.tsx:104
 msgid "Importing attachments ({0} of {1})"
 msgstr "Importing attachments ({0} of {1})"
 
@@ -286,15 +286,15 @@ msgid "Menu"
 msgstr "Menu"
 
 #: src/routes/index.tsx:119
-#: src/routes/migrate_.tricount.tsx:184
+#: src/routes/migrate_.tricount.tsx:178
 msgid "Migrate from Tricount"
 msgstr "Migrate from Tricount"
 
-#: src/routes/migrate_.tricount.tsx:254
+#: src/routes/migrate_.tricount.tsx:248
 msgid "Migration in progress"
 msgstr "Migration in progress"
 
-#: src/routes/migrate_.tricount.tsx:287
+#: src/routes/migrate_.tricount.tsx:281
 msgid "Migration successful"
 msgstr "Migration successful"
 
@@ -403,7 +403,7 @@ msgstr "Phone number must be less than 20 characters"
 msgid "Please correct it before saving."
 msgstr "Please correct it before saving."
 
-#: src/routes/migrate_.tricount.tsx:262
+#: src/routes/migrate_.tricount.tsx:256
 msgid "Please don't close the app while we migrate your data"
 msgstr "Please don't close the app while we migrate your data"
 
@@ -430,7 +430,7 @@ msgstr "Restore"
 
 #: src/components/ExpenseEditor.tsx:209
 #: src/routes/join.tsx:85
-#: src/routes/migrate_.tricount.tsx:197
+#: src/routes/migrate_.tricount.tsx:191
 #: src/routes/new.tsx:142
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
@@ -470,13 +470,13 @@ msgstr "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} 
 msgid "Simple"
 msgstr "Simple"
 
-#: src/routes/migrate_.tricount.tsx:310
+#: src/routes/migrate_.tricount.tsx:304
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
 #: src/components/ExpenseEditor.tsx:209
 #: src/routes/join.tsx:85
-#: src/routes/migrate_.tricount.tsx:197
+#: src/routes/migrate_.tricount.tsx:191
 #: src/routes/new.tsx:142
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
@@ -527,7 +527,7 @@ msgstr "To join the <0>{0}</0>, please select who you are so that we can show yo
 msgid "Total split:"
 msgstr "Total split:"
 
-#: src/routes/migrate_.tricount.tsx:224
+#: src/routes/migrate_.tricount.tsx:218
 msgid "Tricount key"
 msgstr "Tricount key"
 
@@ -573,7 +573,7 @@ msgstr "URL or Party ID"
 msgid "Username"
 msgstr "Username"
 
-#: src/routes/migrate_.tricount.tsx:297
+#: src/routes/migrate_.tricount.tsx:291
 msgid "View party"
 msgstr "View party"
 
