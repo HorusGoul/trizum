@@ -13,7 +13,7 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party.$partyId.tsx:290
+#: src/routes/party.$partyId.tsx:291
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
@@ -33,12 +33,12 @@ msgstr "A name for the participant is required"
 msgid "About"
 msgstr "About"
 
-#: src/routes/party.$partyId.tsx:306
+#: src/routes/party.$partyId.tsx:307
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:84
-#: src/routes/party.$partyId.tsx:274
+#: src/routes/party.$partyId.tsx:275
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -80,7 +80,7 @@ msgstr "Archived participants"
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:234
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:235
 msgid "Attachments"
 msgstr "Attachments"
 
@@ -92,7 +92,7 @@ msgstr "Avatar removed"
 msgid "Avatar updated successfully"
 msgstr "Avatar updated successfully"
 
-#: src/routes/party.$partyId.tsx:211
+#: src/routes/party.$partyId.tsx:212
 msgid "Balances"
 msgstr "Balances"
 
@@ -161,7 +161,7 @@ msgstr "Expense Split Mode"
 msgid "Expense updated"
 msgstr "Expense updated"
 
-#: src/routes/party.$partyId.tsx:204
+#: src/routes/party.$partyId.tsx:205
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -197,7 +197,7 @@ msgstr "Go back to home"
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId.tsx:582
+#: src/routes/party.$partyId.tsx:552
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -210,7 +210,7 @@ msgstr "How do you want to call this expense ?"
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
-#: src/routes/party.$partyId.tsx:578
+#: src/routes/party.$partyId.tsx:548
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -222,7 +222,7 @@ msgstr "ID is required"
 msgid "Image must be smaller than 10MB"
 msgstr "Image must be smaller than 10MB"
 
-#: src/routes/party.$partyId.tsx:457
+#: src/routes/party.$partyId.tsx:458
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -264,7 +264,7 @@ msgstr "Join a Party"
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
 
-#: src/routes/party.$partyId.tsx:190
+#: src/routes/party.$partyId.tsx:191
 msgid "Leave party"
 msgstr "Leave party"
 
@@ -276,8 +276,8 @@ msgstr "Link or code"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:168
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:294
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:169
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:295
 msgid "Me"
 msgstr "Me"
 
@@ -315,11 +315,11 @@ msgstr "New participant name"
 msgid "New trizum"
 msgstr "New trizum"
 
-#: src/routes/party.$partyId.tsx:644
+#: src/routes/party.$partyId.tsx:614
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
-#: src/routes/party.$partyId.tsx:141
+#: src/routes/party.$partyId.tsx:142
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
@@ -327,16 +327,16 @@ msgstr "Only show your expenses"
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
 
-#: src/routes/party.$partyId.tsx:655
+#: src/routes/party.$partyId.tsx:625
 msgid "Other operations"
 msgstr "Other operations"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:212
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:213
 msgid "Paid at"
 msgstr "Paid at"
 
 #: src/components/ExpenseEditor.tsx:309
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:196
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:197
 msgid "Paid by"
 msgstr "Paid by"
 
@@ -379,11 +379,11 @@ msgstr "Party settings saved!"
 msgid "Party shared!"
 msgstr "Party shared!"
 
-#: src/routes/party.$partyId.tsx:626
+#: src/routes/party.$partyId.tsx:596
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
-#: src/routes/party.$partyId.tsx:137
+#: src/routes/party.$partyId.tsx:138
 msgid "Personal mode"
 msgstr "Personal mode"
 
@@ -439,7 +439,7 @@ msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:50
-#: src/routes/party.$partyId.tsx:179
+#: src/routes/party.$partyId.tsx:180
 #: src/routes/settings.tsx:59
 msgid "Settings"
 msgstr "Settings"
@@ -450,11 +450,11 @@ msgstr "Settings saved"
 
 #: src/routes/party_.$partyId.share.tsx:47
 #: src/routes/party_.$partyId.share.tsx:82
-#: src/routes/party.$partyId.tsx:163
+#: src/routes/party.$partyId.tsx:164
 msgid "Share party"
 msgstr "Share party"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:276
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:277
 msgid "Shares"
 msgstr "Shares"
 
@@ -497,7 +497,7 @@ msgstr "Switch to fractional split"
 msgid "Take photo"
 msgstr "Take photo"
 
-#: src/routes/party.$partyId.tsx:124
+#: src/routes/party.$partyId.tsx:125
 msgid "Tap to change"
 msgstr "Tap to change"
 
@@ -578,11 +578,11 @@ msgid "View party"
 msgstr "View party"
 
 #: src/components/ExpenseEditor.tsx:856
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:254
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:255
 msgid "View photo"
 msgstr "View photo"
 
-#: src/routes/party.$partyId.tsx:120
+#: src/routes/party.$partyId.tsx:121
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
@@ -611,15 +611,15 @@ msgstr "Who are you?"
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "Who is invited to this party? You can add more participants later."
 
-#: src/routes/party.$partyId.tsx:76
+#: src/routes/party.$partyId.tsx:77
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party.$partyId.tsx:597
+#: src/routes/party.$partyId.tsx:567
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId.tsx:615
+#: src/routes/party.$partyId.tsx:585
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
