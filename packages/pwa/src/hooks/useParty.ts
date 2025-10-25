@@ -18,6 +18,7 @@ import type {
 import { diff } from "@opentf/obj-diff";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import {
+  deleteAt,
   DocHandle,
   insertAt,
   isValidDocumentId,
@@ -308,6 +309,20 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       party.participants,
     );
 
+    console.log(
+      JSON.parse(
+        JSON.stringify(
+          {
+            expenses: chunk.expenses,
+            participants: party.participants,
+            balancesByParticipant,
+          },
+          null,
+          2,
+        ),
+      ),
+    );
+
     lastChunkBalancesHandle.change((doc) => {
       patchMutate(
         doc.balances,
@@ -316,10 +331,74 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     });
   }
 
+  async function removeExpense(expenseId: Expense["id"]) {
+    const party = handle.docSync();
+
+    if (!party) {
+      throw new Error("Party not found, this should not happen");
+    }
+
+    const { chunkId } = decodeExpenseId(expenseId);
+
+    const chunkRef = party.chunkRefs.find((chunk) => chunk.chunkId === chunkId);
+
+    if (!chunkRef) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+    let chunk = await chunkHandle.doc();
+
+    if (!chunk) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    chunkHandle.change((doc) => {
+      const expenseIndex = doc.expenses.findIndex((e) => e.id === expenseId);
+
+      if (expenseIndex === -1) {
+        throw new Error("Expense not found, this should not happen");
+      }
+
+      deleteAt(doc.expenses, expenseIndex);
+    });
+
+    chunk = chunkHandle.docSync();
+
+    if (!chunk) {
+      throw new Error("Chunk not found, this should not happen");
+    }
+
+    const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+      chunkRef.balancesId,
+    );
+    const lastChunkBalances = await lastChunkBalancesHandle.doc();
+
+    if (!lastChunkBalances) {
+      throw new Error("Chunk balances not found, this should not happen");
+    }
+
+    const balancesByParticipant = calculateBalancesByParticipant(
+      chunk.expenses,
+      party.participants,
+    );
+
+    lastChunkBalancesHandle.change((doc) => {
+      patchMutate(
+        doc.balances,
+        diff(clone(doc.balances), clone(balancesByParticipant)),
+      );
+    });
+    await lastChunkBalancesHandle.doc();
+
+    return true;
+  }
+
   return {
     updateSettings,
     setParticipantDetails,
     addExpenseToParty,
     updateExpense,
+    removeExpense,
   };
 }
