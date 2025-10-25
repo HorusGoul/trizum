@@ -1,11 +1,6 @@
-import type { Party, PartyParticipant } from "../../src/models/party.js";
+import type { Party, PartyParticipant } from "../../src/models/party";
 import type { Expense, ExpenseShare } from "../../src/models/expense.js";
-
-export interface MigrationData {
-  party: Omit<Party, "id" | "chunkRefs">;
-  expenses: (Omit<Expense, "id" | "__hash" | "paidAt"> & { paidAt: string })[];
-  photos: { id: string; url: string }[];
-}
+import type { MigrationData } from "../../src/models/migration";
 
 interface TricountAPI {
   base_url: string;

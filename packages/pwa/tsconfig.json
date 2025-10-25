@@ -4,6 +4,9 @@
     "baseUrl": "./"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["functions/**/*"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": ["./functions/**/*.ts", "node_modules"],
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    { "path": "./functions/tsconfig.json" }
+  ]
 }

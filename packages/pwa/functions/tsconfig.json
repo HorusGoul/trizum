@@ -3,6 +3,9 @@
     "target": "esnext",
     "module": "esnext",
     "lib": ["esnext"],
-    "types": ["./types.d.ts"]
-  }
+    "types": ["./types.d.ts"],
+    "composite": true,
+    "skipLibCheck": true
+  },
+  "include": ["./**/*.ts"]
 }

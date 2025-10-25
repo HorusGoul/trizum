@@ -5,7 +5,6 @@ import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { startTransition, Suspense, useId, useState } from "react";
-import type { MigrationData } from "../../functions/api/migrate.ts";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
@@ -14,6 +13,7 @@ import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import type { MediaFile } from "#src/models/media.ts";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { Button } from "#src/ui/Button.tsx";
+import type { MigrationData } from "#src/models/migration.ts";
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
