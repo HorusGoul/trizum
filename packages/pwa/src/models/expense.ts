@@ -20,6 +20,7 @@ export interface Expense {
   paidBy: Record<ExpenseUser, number>;
   shares: Record<ExpenseUser, ExpenseShare>;
   photos: MediaFile["id"][];
+  isTransfer?: boolean;
   __hash: string;
   __editCopy?: Omit<Expense, "__editCopy">;
   __editCopyLastUpdatedAt?: Date;

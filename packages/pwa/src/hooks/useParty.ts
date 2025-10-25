@@ -18,8 +18,10 @@ import type {
 import { diff } from "@opentf/obj-diff";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import {
+  DocHandle,
   insertAt,
   isValidDocumentId,
+  Repo,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
 import { clone } from "@opentf/std";
@@ -30,7 +32,72 @@ export function useParty(partyId: string) {
   const [party, handle] = useSuspenseDocument<Party>(partyId, {
     required: true,
   });
+  const repo = useRepo();
 
+  const helpers = getPartyHelpers(repo, handle);
+
+  async function __dev_createTestExpenses() {
+    const promptAnswer = window.prompt("How many test expenses to create?");
+
+    if (!promptAnswer) {
+      console.log("No prompt answer");
+      return;
+    }
+
+    const amount = parseInt(promptAnswer ?? "0");
+
+    console.log("Creating", amount, "test expenses");
+
+    const participants = Object.keys(party.participants);
+
+    for (let i = 0; i < amount; i++) {
+      console.log("Creating test expense", i + 1);
+      await helpers.addExpenseToParty({
+        name: `Test Expense ${i + 1}`,
+        paidAt: new Date(),
+        shares: {
+          [participants.at(0)!]: {
+            type: "divide",
+            value: 1,
+          },
+          [participants.at(1)!]: {
+            type: "divide",
+            value: 1,
+          },
+        },
+        photos: [],
+        paidBy: {
+          [participants.at(0)!]: 100,
+        },
+      });
+    }
+  }
+
+  return {
+    party,
+    partyId,
+    isLoading: handle.inState(["loading"]),
+    ...helpers,
+    dev: {
+      createTestExpenses: __dev_createTestExpenses,
+    },
+  };
+}
+
+export function useCurrentParty() {
+  const partyId = useParams({
+    strict: false,
+    select: (params) => params.partyId,
+  });
+
+  if (!partyId) {
+    throw new Error("No Party ID found in URL");
+  }
+
+  return useParty(partyId);
+}
+
+export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function updateSettings(
     values: Pick<Party, "name" | "description" | "participants" | "hue">,
   ) {
@@ -67,8 +134,6 @@ export function useParty(partyId: string) {
       }
     });
   }
-
-  const repo = useRepo();
 
   function createChunk() {
     const handle = repo.create<PartyExpenseChunk>({
@@ -251,66 +316,10 @@ export function useParty(partyId: string) {
     });
   }
 
-  async function __dev_createTestExpenses() {
-    const promptAnswer = window.prompt("How many test expenses to create?");
-
-    if (!promptAnswer) {
-      console.log("No prompt answer");
-      return;
-    }
-
-    const amount = parseInt(promptAnswer ?? "0");
-
-    console.log("Creating", amount, "test expenses");
-
-    const participants = Object.keys(party.participants);
-
-    for (let i = 0; i < amount; i++) {
-      console.log("Creating test expense", i + 1);
-      await addExpenseToParty({
-        name: `Test Expense ${i + 1}`,
-        paidAt: new Date(),
-        shares: {
-          [participants.at(0)!]: {
-            type: "divide",
-            value: 1,
-          },
-          [participants.at(1)!]: {
-            type: "divide",
-            value: 1,
-          },
-        },
-        photos: [],
-        paidBy: {
-          [participants.at(0)!]: 100,
-        },
-      });
-    }
-  }
-
   return {
-    party,
-    partyId,
-    isLoading: handle.inState(["loading"]),
     updateSettings,
     setParticipantDetails,
     addExpenseToParty,
     updateExpense,
-    dev: {
-      createTestExpenses: __dev_createTestExpenses,
-    },
   };
-}
-
-export function useCurrentParty() {
-  const partyId = useParams({
-    strict: false,
-    select: (params) => params.partyId,
-  });
-
-  if (!partyId) {
-    throw new Error("No Party ID found in URL");
-  }
-
-  return useParty(partyId);
 }

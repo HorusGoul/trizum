@@ -237,11 +237,6 @@ function parseTricountData(data: TricountResponse): MigrationData {
   for (const entry of registry.all_registry_entry) {
     const transaction = entry.RegistryEntry;
 
-    // Skip non-normal transactions for now
-    if (transaction.type_transaction !== "NORMAL") {
-      continue;
-    }
-
     const totalAmount = Math.abs(parseFloat(transaction.amount.value));
     const totalAmountInCents = Math.round(totalAmount * 100);
     const currency = transaction.amount.currency;
@@ -253,6 +248,9 @@ function parseTricountData(data: TricountResponse): MigrationData {
       console.warn(`Could not find participant ID for payer: ${paidByName}`);
       continue;
     }
+
+    // Check if this is a transfer transaction
+    const isTransfer = transaction.type_transaction === "BALANCE";
 
     // Create paidBy record
     const paidBy: Record<string, number> = {};
@@ -292,6 +290,10 @@ function parseTricountData(data: TricountResponse): MigrationData {
       const amountInCents = Math.round(amount * 100);
 
       if (allocation.type === "AMOUNT") {
+        if (amountInCents === 0) {
+          continue;
+        }
+
         shares[participantId] = {
           type: "exact",
           value: amountInCents,
@@ -328,6 +330,7 @@ function parseTricountData(data: TricountResponse): MigrationData {
       paidBy,
       shares,
       photos: expensePhotos,
+      isTransfer,
       __editCopy: undefined,
       __editCopyLastUpdatedAt: undefined,
       __presence: undefined,
