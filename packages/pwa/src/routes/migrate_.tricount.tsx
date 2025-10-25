@@ -34,10 +34,34 @@ function RouteComponent() {
   }
 }
 
+function extractTricountId(input: string): string | null {
+  // Check if it's a tricount.com URL (standalone or within text)
+  const urlMatch = input.match(
+    /https?:\/\/(?:www\.)?tricount\.com\/([a-zA-Z0-9]+)/,
+  );
+  if (urlMatch) {
+    return urlMatch[1];
+  }
+
+  // Check if it's already a direct key (alphanumeric string)
+  const keyMatch = input.match(/^[a-zA-Z0-9]+$/);
+  if (keyMatch) {
+    return input;
+  }
+
+  return null;
+}
+
 function validateTricountKey(value: string) {
   if (!value) {
-    return t`Tricount key is required`;
+    return t`Tricount key or URL is required`;
   }
+
+  const extractedId = extractTricountId(value);
+  if (!extractedId) {
+    return t`Please paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or key`;
+  }
+
   return undefined;
 }
 
@@ -64,7 +88,7 @@ function useMigrateTricount() {
   const repo = useRepo();
   const { createMediaFile } = useMediaFileActions();
 
-  async function migrate(key: string) {
+  async function migrate(input: string) {
     setState({
       type: "in-progress",
       name: t`Importing Tricount data...`,
@@ -72,6 +96,11 @@ function useMigrateTricount() {
     });
 
     try {
+      const key = extractTricountId(input);
+      if (!key) {
+        throw new Error("Invalid tricount URL or key");
+      }
+
       const response = await fetch(`/api/migrate?key=${key}`);
       const data = (await response.json()) as MigrationData;
 
@@ -215,8 +244,8 @@ function IdleState({ onSubmit }: { onSubmit: (key: string) => void }) {
         >
           {(field) => (
             <AppTextField
-              label={t`Tricount key`}
-              description={t`Enter the key of the Tricount account you want to migrate from`}
+              label={t`Tricount URL or key`}
+              description={t`Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key`}
               name={field.name}
               value={field.state.value}
               onChange={field.handleChange}
