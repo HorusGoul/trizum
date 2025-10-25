@@ -90,10 +90,7 @@ function useMigrateTricount() {
       try {
         for (let i = 0; i < data.photos.length; i++) {
           const photo = data.photos[i];
-          const url = new URL(window.location.origin);
-          url.pathname = "/api/proxy";
-          url.searchParams.set("url", photo.url);
-          const response = await fetch(url.toString());
+          const response = await fetch(photo.url);
           const blob = await response.blob();
           const [mediaFileId] = await createMediaFile(
             blob,
@@ -101,12 +98,11 @@ function useMigrateTricount() {
             compressionPresets.balanced,
           );
           photoMap.set(photo.id, mediaFileId);
-          startTransition(() => {
-            setState({
-              type: "in-progress",
-              name: t`Importing attachments (${i + 1} of ${data.photos.length})`,
-              progress: (i + 1) / data.photos.length,
-            });
+
+          setState({
+            type: "in-progress",
+            name: t`Importing attachments (${i + 1} of ${data.photos.length})`,
+            progress: (i + 1) / data.photos.length,
           });
         }
       } catch (error) {
@@ -143,12 +139,10 @@ function useMigrateTricount() {
             );
           });
 
-        startTransition(() => {
-          setState({
-            type: "in-progress",
-            name: t`Imported ${expense.name} (${i + 1} of ${data.expenses.length})`,
-            progress: (i + 1) / data.expenses.length,
-          });
+        setState({
+          type: "in-progress",
+          name: t`Imported ${expense.name} (${i + 1} of ${data.expenses.length})`,
+          progress: (i + 1) / data.expenses.length,
         });
       }
 
