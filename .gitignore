@@ -124,3 +124,6 @@ dist
 
 # TanStack Router cache
 .tanstack
+
+# Wrangler cache
+.wrangler
