@@ -11,6 +11,7 @@ import {
   exportIntoInput,
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,
+  simplifyBalanceTransactions,
   type Balance,
   type Expense,
 } from "#src/models/expense.js";
@@ -492,66 +493,35 @@ function Balances() {
     throw new Error("Balance not found");
   }
 
-  const userOwesMap = Object.entries(myBalance.stats.diffs)
-    .filter(([_, diff]) => {
-      return diff.diffUnsplitted < 0;
-    })
-    .map(([participantId, diff]) => {
-      return {
-        participantId,
-        amount: diff.diffUnsplitted,
-      };
-    });
+  // Use simplified transaction algorithm to get minimal set of transactions
+  const simplifiedTransactions = simplifyBalanceTransactions(balances);
 
-  const owedToUserMap = Object.entries(myBalance.stats.diffs)
-    .filter(([_, diff]) => {
-      return diff.diffUnsplitted > 0;
-    })
-    .map(([participantId, diff]) => {
-      return {
-        participantId,
-        amount: diff.diffUnsplitted,
-      };
-    });
+  // Filter transactions relevant to the current user
+  const userOwesMap = simplifiedTransactions
+    .filter((tx) => tx.fromId === participant.id)
+    .map((tx) => ({
+      participantId: tx.toId,
+      amount: tx.amount,
+    }));
+
+  const owedToUserMap = simplifiedTransactions
+    .filter((tx) => tx.toId === participant.id)
+    .map((tx) => ({
+      participantId: tx.fromId,
+      amount: tx.amount,
+    }));
 
   const isFullyBalanced =
     userOwesMap.length === 0 && owedToUserMap.length === 0;
 
-  const allOtherDiffs = sortedBalancesByParticipant
-    .filter((balance) => {
-      if (balance.participant.id === participant.id) {
-        return false;
-      }
-
-      if (balance.stats.balance >= 0) {
-        return false;
-      }
-
-      return true;
-    })
-    .flatMap((balance) => {
-      return Object.entries(balance.stats.diffs)
-        .filter(([participantId]) => {
-          if (participantId === participant.id) {
-            return false;
-          }
-
-          const diff = balance.stats.diffs[participantId];
-
-          if (diff.diffUnsplitted >= 0) {
-            return false;
-          }
-
-          return true;
-        })
-        .map(([participantId, diff]) => {
-          return {
-            fromId: balance.participant.id,
-            toId: participantId,
-            amount: diff.diffUnsplitted,
-          };
-        });
-    });
+  // Show other transactions not involving the current user
+  const allOtherDiffs = simplifiedTransactions
+    .filter((tx) => tx.fromId !== participant.id && tx.toId !== participant.id)
+    .map((tx) => ({
+      fromId: tx.fromId,
+      toId: tx.toId,
+      amount: tx.amount,
+    }));
 
   return (
     <>

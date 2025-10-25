@@ -118,13 +118,14 @@ function useExpense() {
   const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
     required: true,
   });
+  const { removeExpense } = useCurrentParty();
 
   const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
 
-  function onDeleteExpense() {
+  async function onDeleteExpense() {
     if (expenseId === undefined) return;
 
-    handle.change((party) => deleteAt(party.expenses, expenseIndex));
+    await removeExpense(expenseId);
 
     history.back();
     toast.success("Expense deleted");

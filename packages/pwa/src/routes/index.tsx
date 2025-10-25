@@ -109,6 +109,16 @@ function Index() {
                     <Trans>Create a new Party</Trans>
                   </span>
                 </MenuItem>
+                <MenuItem href={{ to: "/migrate/tricount" }}>
+                  <IconWithFallback
+                    name="#lucide/import"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Migrate from Tricount</Trans>
+                  </span>
+                </MenuItem>
               </Menu>
             </Popover>
           </MenuTrigger>
