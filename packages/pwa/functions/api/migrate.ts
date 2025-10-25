@@ -1,9 +1,9 @@
 import type { Party, PartyParticipant } from "../../src/models/party.js";
 import type { Expense, ExpenseShare } from "../../src/models/expense.js";
 
-interface MigrationData {
+export interface MigrationData {
   party: Omit<Party, "id" | "chunkRefs">;
-  expenses: Omit<Expense, "id" | "__hash">[];
+  expenses: (Omit<Expense, "id" | "__hash" | "paidAt"> & { paidAt: string })[];
   photos: { id: string; url: string }[];
 }
 
@@ -230,7 +230,9 @@ function parseTricountData(data: TricountResponse): MigrationData {
   }
 
   // Transform expenses
-  const expenses: Omit<Expense, "id" | "__hash">[] = [];
+  const expenses: (Omit<Expense, "id" | "__hash" | "paidAt"> & {
+    paidAt: string;
+  })[] = [];
 
   for (const entry of registry.all_registry_entry) {
     const transaction = entry.RegistryEntry;
@@ -241,6 +243,7 @@ function parseTricountData(data: TricountResponse): MigrationData {
     }
 
     const totalAmount = Math.abs(parseFloat(transaction.amount.value));
+    const totalAmountInCents = Math.round(totalAmount * 100);
     const currency = transaction.amount.currency;
     const paidByName =
       transaction.membership_owned.RegistryMembershipNonUser.alias.display_name;
@@ -253,7 +256,7 @@ function parseTricountData(data: TricountResponse): MigrationData {
 
     // Create paidBy record
     const paidBy: Record<string, number> = {};
-    paidBy[paidById] = totalAmount;
+    paidBy[paidById] = totalAmountInCents;
 
     // Create shares record
     const shares: Record<string, ExpenseShare> = {};
@@ -286,11 +289,12 @@ function parseTricountData(data: TricountResponse): MigrationData {
       }
 
       const amount = Math.abs(parseFloat(allocation.amount.value));
+      const amountInCents = Math.round(amount * 100);
 
       if (allocation.type === "AMOUNT") {
         shares[participantId] = {
           type: "exact",
-          value: amount,
+          value: amountInCents,
         };
       } else if (allocation.type === "RATIO") {
         const ratio = (allocation.share_ratio || 1) / totalShares;
@@ -316,9 +320,11 @@ function parseTricountData(data: TricountResponse): MigrationData {
     // Parse date
     const paidAt = new Date(transaction.date);
 
-    const expense: Omit<Expense, "id" | "__hash"> = {
+    const expense: Omit<Expense, "id" | "__hash" | "paidAt"> & {
+      paidAt: string;
+    } = {
       name: transaction.description,
-      paidAt,
+      paidAt: paidAt.toISOString(),
       paidBy,
       shares,
       photos: expensePhotos,
@@ -347,6 +353,7 @@ function parseTricountData(data: TricountResponse): MigrationData {
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
+  let data: TricountResponse | null = null;
   try {
     const url = new URL(context.request.url);
     const tricountKey = url.searchParams.get("key");
@@ -358,7 +365,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const api = new TricountAPIClient();
     await api.initializeKeys();
     await api.authenticate();
-    const data = await api.fetchTricountData(tricountKey);
+    data = await api.fetchTricountData(tricountKey);
     const migrationData = parseTricountData(data);
 
     return new Response(JSON.stringify(migrationData), {
@@ -371,6 +378,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Unknown error",
+        data,
       }),
       {
         status: 500,
