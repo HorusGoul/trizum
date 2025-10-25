@@ -373,6 +373,76 @@ export interface Balance {
 
 export type BalancesByParticipant = Record<PartyParticipant["id"], Balance>;
 
+export interface SimplifiedTransaction {
+  fromId: PartyParticipant["id"];
+  toId: PartyParticipant["id"];
+  amount: number;
+}
+
+/**
+ * Simplifies balances into a minimal set of transactions using a greedy algorithm.
+ * This matches people who owe the most with people who are owed the most.
+ */
+export function simplifyBalanceTransactions(
+  balances: BalancesByParticipant,
+): SimplifiedTransaction[] {
+  // Create arrays of debtors (negative balance) and creditors (positive balance)
+  const debtors: Array<{ id: string; amount: number }> = [];
+  const creditors: Array<{ id: string; amount: number }> = [];
+
+  for (const [participantId, balance] of Object.entries(balances)) {
+    const balanceAmount = balance.stats.balance;
+
+    if (balanceAmount < 0) {
+      // This person owes money (debtor)
+      debtors.push({ id: participantId, amount: Math.abs(balanceAmount) });
+    } else if (balanceAmount > 0) {
+      // This person is owed money (creditor)
+      creditors.push({ id: participantId, amount: balanceAmount });
+    }
+    // Skip if balance is 0
+  }
+
+  // Sort debtors and creditors by amount (largest first) for efficiency
+  debtors.sort((a, b) => b.amount - a.amount);
+  creditors.sort((a, b) => b.amount - a.amount);
+
+  const transactions: SimplifiedTransaction[] = [];
+  let debtorIndex = 0;
+  let creditorIndex = 0;
+
+  // Greedy algorithm: match largest debts with largest credits
+  while (debtorIndex < debtors.length && creditorIndex < creditors.length) {
+    const debtor = debtors[debtorIndex];
+    const creditor = creditors[creditorIndex];
+
+    // Amount to transfer is the minimum of what debtor owes and what creditor is owed
+    const transferAmount = Math.min(debtor.amount, creditor.amount);
+
+    if (transferAmount > 0) {
+      transactions.push({
+        fromId: debtor.id,
+        toId: creditor.id,
+        amount: -transferAmount, // Negative because it represents debt
+      });
+    }
+
+    // Update remaining amounts
+    debtor.amount -= transferAmount;
+    creditor.amount -= transferAmount;
+
+    // Move to next debtor/creditor if current one is settled
+    if (debtor.amount === 0) {
+      debtorIndex++;
+    }
+    if (creditor.amount === 0) {
+      creditorIndex++;
+    }
+  }
+
+  return transactions;
+}
+
 export function calculateBalancesByParticipant(
   expenses: Expense[],
   partyParticipants: Party["participants"],
