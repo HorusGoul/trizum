@@ -213,10 +213,14 @@ export function getExpenseTotalAmount(expense: Pick<Expense, "paidBy">) {
 
 export function getImpactOnBalanceForUser(expense: Expense, userId: string) {
   const input = exportIntoInput(expense);
+  const expenseParticipantsIds = [
+    ...Object.keys(expense.paidBy),
+    ...Object.keys(expense.shares),
+  ];
 
   const { userOwes, owedToUser } = calculateLogStatsOfUser(
     userId,
-    Object.keys(expense.shares),
+    expenseParticipantsIds,
     input,
   );
 

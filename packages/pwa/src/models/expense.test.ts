@@ -3,6 +3,7 @@ import {
   createExpenseId,
   exportIntoInput,
   findExpenseById,
+  getImpactOnBalanceForUser,
   type Expense,
   type ExpenseShare,
 } from "./expense";
@@ -333,6 +334,75 @@ describe("findExpenseById", () => {
 
     expect(result).toStrictEqual(expense);
     expect(index).toBe(0);
+  });
+});
+
+describe("getImpactOnBalanceForUser", () => {
+  test("should calculate correct impact for reimbursement", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 28942, // 289.42 euros in cents
+      },
+      shares: {
+        user2: { type: "exact", value: 28942 },
+      },
+    });
+
+    const impact = getImpactOnBalanceForUser(expense, "user2");
+
+    // When user1 pays for user2 (reimbursement), user2's balance impact should be negative
+    // because someone else paid for them
+    expect(impact).toBe(-28942);
+  });
+
+  test("should calculate correct impact for expense where user pays", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 10000, // 100.00 euros in cents
+      },
+      shares: {
+        user1: { type: "exact", value: 5000 }, // 50.00 euros
+        user2: { type: "exact", value: 5000 }, // 50.00 euros
+      },
+    });
+
+    const impact = getImpactOnBalanceForUser(expense, "user1");
+
+    // user1 pays 100 but only owes 50, so net impact should be +50 (out of pocket)
+    expect(impact).toBe(5000);
+  });
+
+  test("should calculate correct impact for expense where user receives money", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 10000, // 100.00 euros in cents
+      },
+      shares: {
+        user2: { type: "exact", value: 6000 }, // 60.00 euros
+        user1: { type: "exact", value: 4000 }, // 40.00 euros
+      },
+    });
+
+    const impact = getImpactOnBalanceForUser(expense, "user2");
+
+    // user2 receives 60 but owes 0, so net impact should be -60 (receiving money)
+    expect(impact).toBe(-6000);
+  });
+
+  test("should calculate zero impact when user is not involved", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 10000, // 100.00 euros in cents
+      },
+      shares: {
+        user2: { type: "exact", value: 10000 }, // 100.00 euros
+      },
+    });
+
+    const impact = getImpactOnBalanceForUser(expense, "user3");
+
+    // user3 is not involved in this expense, so impact should be 0
+    expect(impact).toBe(0);
   });
 });
 
