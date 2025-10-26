@@ -1,7 +1,8 @@
 {
   "extends": "@horus.dev/tsconfig/vite",
   "compilerOptions": {
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "types": ["vite-plugin-pwa/react"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["./functions/**/*.ts", "node_modules"],

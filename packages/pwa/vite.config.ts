@@ -29,7 +29,7 @@ export default defineConfig({
       preloadFunctionName: "preloadIcon",
     }),
     VitePWA({
-      registerType: "autoUpdate",
+      registerType: "prompt",
       workbox: {
         maximumFileSizeToCacheInBytes: 5242880,
       },

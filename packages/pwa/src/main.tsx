@@ -20,6 +20,7 @@ import * as catalogEn from "#locale/en/messages.po";
 import { routeTree } from "./routeTree.gen.js";
 import { preloadAllIcons } from "./preloadIcons.gen.js";
 import { PartyTheme } from "./components/PartyTheme.tsx";
+import { UpdateController } from "./components/UpdateController.tsx";
 
 // Load language
 i18n.load("en", catalogEn.messages);
@@ -74,12 +75,14 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <AriaProviders>
-        <RepoContext.Provider value={repo}>
-          <RouterProvider router={router} InnerWrap={InnerWrap} />
-          <Toaster />
-        </RepoContext.Provider>
-      </AriaProviders>
+      <UpdateController>
+        <AriaProviders>
+          <RepoContext.Provider value={repo}>
+            <RouterProvider router={router} InnerWrap={InnerWrap} />
+            <Toaster />
+          </RepoContext.Provider>
+        </AriaProviders>
+      </UpdateController>
     </I18nProvider>,
   );
 }

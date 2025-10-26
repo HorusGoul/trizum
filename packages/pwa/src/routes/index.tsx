@@ -16,6 +16,9 @@ import {
   documentCache,
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
+import { use, useState } from "react";
+import { UpdateContext } from "#src/components/UpdateContext.tsx";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -23,6 +26,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const parties = usePartyItemRefs();
+  const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   return (
     <div className="flex min-h-full flex-col">
@@ -30,6 +35,25 @@ function Index() {
         <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
         <div className="flex-1" />
+
+        {isUpdateAvailable && (
+          <IconButton
+            icon={
+              isUpdating ? "#lucide/refresh-cw" : "#lucide/circle-arrow-down"
+            }
+            aria-label={t`Update available`}
+            onPress={() => {
+              setIsUpdating(true);
+              update();
+            }}
+            className="mr-2"
+            iconClassName={cn(
+              "duration-1000 ease-in-out",
+              isUpdating ? "animate-spin" : "animate-pulse",
+            )}
+            isDisabled={isUpdating}
+          />
+        )}
 
         <MenuTrigger>
           <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
@@ -50,6 +74,22 @@ function Index() {
                   <Trans>Settings</Trans>
                 </span>
               </MenuItem>
+
+              <MenuItem
+                onAction={() => {
+                  checkForUpdate();
+                }}
+              >
+                <IconWithFallback
+                  name="#lucide/refresh-cw"
+                  size={20}
+                  className="mr-3"
+                />
+                <span className="h-3.5 leading-none">
+                  <Trans>Check for updates</Trans>
+                </span>
+              </MenuItem>
+
               <MenuItem
                 href={{
                   to: "/about",
