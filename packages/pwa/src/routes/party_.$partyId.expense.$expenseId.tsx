@@ -26,8 +26,9 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useLingui } from "@lingui/react";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Button } from "#src/ui/Button.tsx";
-import { Fragment, Suspense } from "react";
+import { Fragment, Suspense, use } from "react";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
+import { MediaGalleryContext } from "#src/components/MediaGalleryContext.tsx";
 
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   component: ExpenseById,
@@ -248,12 +249,14 @@ function Photos({ photos = [] }: Partial<Pick<Expense, "photos">>) {
 
 function PhotoItemById({ photoId }: { photoId: string }) {
   const { url } = useMediaFile(photoId);
+  const { open } = use(MediaGalleryContext);
 
   return (
     <Button
       color="transparent"
       aria-label={t`View photo`}
       className="h-auto w-auto p-0"
+      onPress={() => open({ items: [{ src: url }], index: 0 })}
     >
       <img
         src={url}

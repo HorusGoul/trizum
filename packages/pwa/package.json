@@ -36,6 +36,7 @@
     "@tanstack/react-form": "1.19.2",
     "@tanstack/react-router": "1.131.17",
     "@tanstack/react-virtual": "3.13.12",
+    "@use-gesture/react": "10.3.1",
     "browser-image-compression": "2.0.2",
     "clsx": "2.1.1",
     "dinero.js": "1.9.1",

@@ -21,6 +21,7 @@ import { routeTree } from "./routeTree.gen.js";
 import { preloadAllIcons } from "./preloadIcons.gen.js";
 import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
+import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 
 // Load language
 i18n.load("en", catalogEn.messages);
@@ -78,8 +79,10 @@ if (!rootElement.innerHTML) {
       <UpdateController>
         <AriaProviders>
           <RepoContext.Provider value={repo}>
-            <RouterProvider router={router} InnerWrap={InnerWrap} />
-            <Toaster />
+            <MediaGalleryController>
+              <RouterProvider router={router} InnerWrap={InnerWrap} />
+              <Toaster />
+            </MediaGalleryController>
           </RepoContext.Provider>
         </AriaProviders>
       </UpdateController>

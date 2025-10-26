@@ -1,7 +1,14 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import { Suspense, useEffect, useId, useImperativeHandle, useRef } from "react";
+import {
+  Suspense,
+  use,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t, Trans } from "@lingui/macro";
 import { validateExpenseTitle } from "#src/lib/validation.js";
@@ -31,6 +38,7 @@ import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
+import { MediaGalleryContext } from "./MediaGalleryContext";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -848,6 +856,7 @@ interface CurrentPhotoProps {
 
 function CurrentPhoto({ photoId, onRemove }: CurrentPhotoProps) {
   const { url } = useMediaFile(photoId);
+  const { open } = use(MediaGalleryContext);
 
   return (
     <div className="relative flex-shrink-0">
@@ -855,6 +864,7 @@ function CurrentPhoto({ photoId, onRemove }: CurrentPhotoProps) {
         color="transparent"
         aria-label={t`View photo`}
         className="h-auto w-auto p-0"
+        onPress={() => open({ items: [{ src: url }], index: 0 })}
       >
         <img
           src={url}
