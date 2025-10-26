@@ -588,7 +588,7 @@ msgstr "Update who you are in this party so that we can show you the expenses an
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
-#: src/components/UpdateController.tsx:39
+#: src/components/UpdateController.tsx:37
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
