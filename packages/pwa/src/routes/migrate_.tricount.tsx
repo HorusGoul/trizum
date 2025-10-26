@@ -14,6 +14,7 @@ import type { MediaFile } from "#src/models/media.ts";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { Button } from "#src/ui/Button.tsx";
 import type { MigrationData } from "#src/models/migration.ts";
+import { Checkbox } from "#src/ui/Checkbox.tsx";
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
@@ -83,12 +84,17 @@ type MigrationState =
       message: string;
     };
 
+interface MigrateParams {
+  key: string;
+  importAttachments: boolean;
+}
+
 function useMigrateTricount() {
   const [state, setState] = useState<MigrationState>({ type: "idle" });
   const repo = useRepo();
   const { createMediaFile } = useMediaFileActions();
 
-  async function migrate(input: string) {
+  async function migrate({ key, importAttachments }: MigrateParams) {
     setState({
       type: "in-progress",
       name: t`Importing Tricount data...`,
@@ -96,11 +102,6 @@ function useMigrateTricount() {
     });
 
     try {
-      const key = extractTricountId(input);
-      if (!key) {
-        throw new Error("Invalid tricount URL or key");
-      }
-
       const response = await fetch(`/api/migrate?key=${key}`);
       const data = (await response.json()) as MigrationData;
 
@@ -116,29 +117,31 @@ function useMigrateTricount() {
 
       // Import photos
       const photoMap = new Map<string, MediaFile["id"]>();
-      try {
-        for (let i = 0; i < data.photos.length; i++) {
-          const photo = data.photos[i];
-          const response = await fetch(photo.url);
-          const blob = await response.blob();
-          const [mediaFileId] = await createMediaFile(
-            blob,
-            {},
-            compressionPresets.balanced,
-          );
-          photoMap.set(photo.id, mediaFileId);
+      if (importAttachments) {
+        try {
+          for (let i = 0; i < data.photos.length; i++) {
+            const photo = data.photos[i];
+            const response = await fetch(photo.url);
+            const blob = await response.blob();
+            const [mediaFileId] = await createMediaFile(
+              blob,
+              {},
+              compressionPresets.balanced,
+            );
+            photoMap.set(photo.id, mediaFileId);
 
-          setState({
-            type: "in-progress",
-            name: t`Importing attachments (${i + 1} of ${data.photos.length})`,
-            progress: (i + 1) / data.photos.length,
-          });
+            setState({
+              type: "in-progress",
+              name: t`Importing attachments (${i + 1} of ${data.photos.length})`,
+              progress: (i + 1) / data.photos.length,
+            });
+          }
+        } catch (error) {
+          console.error(error);
+          throw new Error(
+            `Error importing photos: ${error instanceof Error ? error.message : "Unknown error"}`,
+          );
         }
-      } catch (error) {
-        console.error(error);
-        throw new Error(
-          `Error importing photos: ${error instanceof Error ? error.message : "Unknown error"}`,
-        );
       }
 
       const helpers = getPartyHelpers(repo, handle);
@@ -148,25 +151,36 @@ function useMigrateTricount() {
         (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
       );
 
+      function waitIdleCallback(fn: () => Promise<void>) {
+        return new Promise<void>((resolve) => {
+          requestIdleCallback(async () => {
+            await fn();
+            resolve();
+          });
+        });
+      }
+
       for (let i = 0; i < data.expenses.length; i++) {
         const expense = data.expenses[i];
 
-        await helpers
-          .addExpenseToParty({
-            name: expense.name,
-            paidAt: new Date(expense.paidAt),
-            shares: expense.shares,
-            paidBy: expense.paidBy,
-            photos: expense.photos
-              .map((photoId) => photoMap.get(photoId))
-              .filter((photoId): photoId is MediaFile["id"] => !!photoId),
-          })
-          .catch((error) => {
-            console.error(error);
-            throw new Error(
-              `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
-            );
-          });
+        await waitIdleCallback(async () => {
+          await helpers
+            .addExpenseToParty({
+              name: expense.name,
+              paidAt: new Date(expense.paidAt),
+              shares: expense.shares,
+              paidBy: expense.paidBy,
+              photos: expense.photos
+                .map((photoId) => photoMap.get(photoId))
+                .filter((photoId): photoId is MediaFile["id"] => !!photoId),
+            })
+            .catch((error) => {
+              console.error(error);
+              throw new Error(
+                `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+              );
+            });
+        });
 
         setState({
           type: "in-progress",
@@ -187,13 +201,26 @@ function useMigrateTricount() {
   return [state, migrate] as const;
 }
 
-function IdleState({ onSubmit }: { onSubmit: (key: string) => void }) {
+function IdleState({
+  onSubmit,
+}: {
+  onSubmit: (values: { key: string; importAttachments: boolean }) => void;
+}) {
   const form = useForm({
     defaultValues: {
       key: "",
+      importAttachments: true,
     },
     onSubmit: ({ value }) => {
-      onSubmit(value.key);
+      const key = extractTricountId(value.key);
+      if (!key) {
+        throw new Error("Invalid tricount URL or key");
+      }
+
+      onSubmit({
+        key,
+        importAttachments: value.importAttachments,
+      });
     },
   });
   const formId = useId();
@@ -256,6 +283,20 @@ function IdleState({ onSubmit }: { onSubmit: (key: string) => void }) {
                 field.state.meta.errors?.length > 0
               }
             />
+          )}
+        </form.Field>
+
+        <form.Field name="importAttachments">
+          {(field) => (
+            <Checkbox
+              name={field.name}
+              isSelected={field.state.value}
+              onChange={(isSelected) => {
+                field.handleChange(isSelected);
+              }}
+            >
+              {t`Import attachments`}
+            </Checkbox>
           )}
         </form.Field>
       </form>
