@@ -19,5 +19,16 @@ export function setThemeHue(hue: number) {
 
   lastRAF = window.requestAnimationFrame(() => {
     updateVariables(variables);
+
+    const accent950 = variables.find(([name]) => name.includes("950"))?.[1];
+
+    if (!accent950) {
+      return;
+    }
+
+    // Set theme-color meta tag to the 950 color of the theme hue
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", `oklch(${accent950} / 1)`);
   });
 }
