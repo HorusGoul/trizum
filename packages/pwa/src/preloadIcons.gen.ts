@@ -8,7 +8,8 @@ import { preloadIcon } from "#src/ui/Icon.js";
 
 export function preloadAllIcons() {
   return Promise.all([
-    preloadIcon("#lucide/ampersand"),
+    preloadIcon("#lucide/${keyof typeof dynamicIconImports}"),
+preloadIcon("#lucide/ampersand"),
 preloadIcon("#lucide/archive"),
 preloadIcon("#lucide/archive-restore"),
 preloadIcon("#lucide/arrow-left"),

@@ -65,6 +65,8 @@ export default defineConfig({
         ],
       },
     }),
+    // Plugin to read preloaded icons and configure externals
+    excludeUnusedLucideIconsPlugin(),
   ],
   server: {
     proxy: {
@@ -95,6 +97,7 @@ function preloadIconsPlugin({
 }: PreloadIconsPluginOptions): Plugin {
   const matches = new Set<string>();
   const compile = debounce(writeFile, 1000);
+  let isBuild = false;
 
   function debounce(fn: () => void, ms: number) {
     let timeout: NodeJS.Timeout;
@@ -138,20 +141,14 @@ export function preloadAllIcons() {
     await fs.writeFile(outFile, code, "utf-8");
   }
 
-  let isDev = false;
-
   return {
     name: "vite-plugin-preload-icons",
 
     configResolved(config) {
-      isDev = config.command !== "build";
+      isBuild = config.command === "build";
     },
 
     async transform(code, id) {
-      if (!isDev) {
-        return;
-      }
-
       const scanForIcons = id.includes(".ts") || id.includes(".tsx");
 
       if (id.includes(outFile) || !scanForIcons) {
@@ -169,6 +166,130 @@ export function preloadAllIcons() {
           compile();
         }
       }
+    },
+
+    async buildStart() {
+      // During build, scan all source files to collect icons before writing
+      if (isBuild) {
+        const fs = await import("node:fs/promises");
+        const path = await import("node:path");
+        const root = process.cwd();
+        const srcDir = path.default.resolve(root, "src");
+
+        // Recursively scan directory for .ts and .tsx files
+        const scanDirectory = async (dir: string) => {
+          const entries = await fs.readdir(dir, { withFileTypes: true });
+
+          for (const entry of entries) {
+            const fullPath = path.default.join(dir, entry.name);
+
+            if (entry.isDirectory()) {
+              // Recursively scan subdirectories
+              await scanDirectory(fullPath);
+            } else if (
+              entry.isFile() &&
+              (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))
+            ) {
+              if (fullPath.includes(outFile)) continue;
+
+              try {
+                const content = await fs.readFile(fullPath, "utf-8");
+
+                for (const matcher of matchers) {
+                  const regexResult = content.match(matcher);
+
+                  if (regexResult) {
+                    regexResult.forEach((match) => {
+                      matches.add(match);
+                    });
+                  }
+                }
+              } catch (e) {
+                // File might not exist or be readable, continue
+              }
+            }
+          }
+        };
+
+        await scanDirectory(srcDir);
+
+        // Write the file immediately
+        if (matches.size > 0) {
+          await writeFile();
+        }
+      } else if (matches.size > 0) {
+        // Flush pending writes in dev mode
+        await writeFile();
+      }
+    },
+  };
+}
+
+function excludeUnusedLucideIconsPlugin(): Plugin {
+  let usedIcons: Set<string> | null = null;
+
+  return {
+    name: "vite-plugin-exclude-unused-lucide-icons",
+    async configResolved(config) {
+      // Read the generated preload icons file at config resolution
+      if (config.command !== "build") return;
+
+      const fs = await import("node:fs");
+      const path = await import("node:path");
+      const root = process.cwd();
+      const preloadFile = path.default.resolve(root, "src/preloadIcons.gen.ts");
+
+      if (fs.default.existsSync(preloadFile)) {
+        const content = fs.default.readFileSync(preloadFile, "utf-8");
+        const iconMatches =
+          content.match(/preloadIcon\(["']#lucide\/([^"']+)["']\)/g) || [];
+        const allowedIcons = iconMatches.map((match: string) =>
+          match.replace(/preloadIcon\(["']#lucide\/([^"']+)["']\)/, "$1"),
+        );
+
+        usedIcons = new Set(allowedIcons);
+      }
+    },
+
+    transform(code, id) {
+      // Intercept lucide-react/dynamicIconImports to filter it
+      if (id.includes("dynamicIconImports") && id.includes("lucide-react")) {
+        if (!usedIcons || usedIcons.size === 0) return null;
+
+        // Parse the file to filter out unused icons
+        // The file structure is: const dynamicIconImports = { ... }; export default dynamicIconImports;
+
+        // Extract the object content
+        const constRegex = /const\s+dynamicIconImports\s*=\s*\{([\s\S]*?)\};/;
+        const match = code.match(constRegex);
+
+        if (!match) return null;
+
+        const entries = match[1];
+        const entryRegex =
+          /"([a-zA-Z0-9_-]+)":\s*\(\)\s*=>\s*import\(['"]([^"']+)['"]\)/g;
+        const keptEntries: string[] = [];
+        let m;
+
+        while ((m = entryRegex.exec(entries)) !== null) {
+          const iconName = m[1];
+          const importPath = m[2];
+
+          if (usedIcons!.has(iconName)) {
+            keptEntries.push(`  "${iconName}": () => import("${importPath}")`);
+          }
+        }
+
+        // Reconstruct the file with only kept entries
+        const newCode = code.replace(
+          constRegex,
+          `const dynamicIconImports = {\n${keptEntries.join(",\n")}\n};`,
+        );
+
+        return newCode;
+      }
+
+      return null;
     },
   };
 }
