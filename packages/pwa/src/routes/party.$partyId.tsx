@@ -40,6 +40,7 @@ import { useNoMemo } from "#src/hooks/useNoMemo.ts";
 import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
+import { Button } from "#src/ui/Button.tsx";
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -714,25 +715,56 @@ interface BalanceActionItemProps {
 
 function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
   const { party } = useCurrentParty();
+  const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];
+  const isFromMe = fromId === me.id;
+  const navigate = useNavigate();
 
   return (
-    <div className="flex rounded-xl bg-white p-4 dark:bg-accent-900">
-      <div className="flex flex-1 flex-col">
-        <span className="text-lg text-accent-400">{from.name}</span>
-        <span className="text-sm text-accent-700 dark:text-accent-300">
-          owes
-        </span>
-        <span className="text-lg text-accent-400">{to.name}</span>
+    <div className="flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-accent-900">
+      <div className="flex">
+        <div className="flex flex-1 flex-col">
+          <span className="text-lg text-accent-400">
+            {from.name} {fromId === me.id ? t`(me)` : ""}
+          </span>
+          <span className="text-sm text-accent-700 dark:text-accent-300">
+            <Trans>owes</Trans>
+          </span>
+          <span className="text-lg text-accent-400">
+            {to.name} {toId === me.id ? t`(me)` : ""}
+          </span>
+        </div>
+
+        <div className="flex flex-shrink-0 items-center">
+          <CurrencyText
+            currency={party.currency}
+            amount={Math.abs(amount)}
+            className="text-xl"
+          />
+        </div>
       </div>
 
-      <div className="flex flex-shrink-0 items-center">
-        <CurrencyText
-          currency={party.currency}
-          amount={Math.abs(amount)}
-          className="text-xl"
-        />
+      <div className="flex">
+        <Button
+          color="input-like"
+          className="h-8 rounded-lg px-4"
+          onPress={() =>
+            navigate({
+              to: "/party/$partyId/pay",
+              params: {
+                partyId: party.id,
+              },
+              search: {
+                fromId,
+                toId,
+                amount: Math.abs(amount),
+              },
+            })
+          }
+        >
+          {isFromMe ? <Trans>Pay</Trans> : <Trans>Mark as paid</Trans>}
+        </Button>
       </div>
     </div>
   );

@@ -60,7 +60,6 @@ function ExpenseById() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2">
-        <Route.Link />
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
         <h1 className="pl-4 text-2xl font-bold">{expense.name}</h1>
         <div className="flex-1" />

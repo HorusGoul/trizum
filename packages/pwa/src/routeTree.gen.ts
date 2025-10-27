@@ -19,6 +19,7 @@ import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
 import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
 import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
 import { Route as PartyPartyIdSettingsRouteImport } from './routes/party_.$partyId.settings'
+import { Route as PartyPartyIdPayRouteImport } from './routes/party_.$partyId.pay'
 import { Route as PartyPartyIdAddRouteImport } from './routes/party_.$partyId.add'
 import { Route as PartyPartyIdExpenseExpenseIdRouteImport } from './routes/party_.$partyId.expense.$expenseId'
 import { Route as PartyPartyIdExpenseExpenseIdEditRouteImport } from './routes/party_.$partyId.expense.$expenseId_.edit'
@@ -73,6 +74,11 @@ const PartyPartyIdSettingsRoute = PartyPartyIdSettingsRouteImport.update({
   path: '/party/$partyId/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartyPartyIdPayRoute = PartyPartyIdPayRouteImport.update({
+  id: '/party_/$partyId/pay',
+  path: '/party/$partyId/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartyPartyIdAddRoute = PartyPartyIdAddRouteImport.update({
   id: '/party_/$partyId/add',
   path: '/party/$partyId/add',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
+  '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
+  '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/migrate_/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
   '/party_/$partyId/add': typeof PartyPartyIdAddRoute
+  '/party_/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party_/$partyId/share': typeof PartyPartyIdShareRoute
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/migrate/tricount'
     | '/party/$partyId'
     | '/party/$partyId/add'
+    | '/party/$partyId/pay'
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
     | '/party/$partyId/who'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/migrate/tricount'
     | '/party/$partyId'
     | '/party/$partyId/add'
+    | '/party/$partyId/pay'
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
     | '/party/$partyId/who'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/migrate_/tricount'
     | '/party/$partyId'
     | '/party_/$partyId/add'
+    | '/party_/$partyId/pay'
     | '/party_/$partyId/settings'
     | '/party_/$partyId/share'
     | '/party_/$partyId/who'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   MigrateTricountRoute: typeof MigrateTricountRoute
   PartyPartyIdRoute: typeof PartyPartyIdRoute
   PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
+  PartyPartyIdPayRoute: typeof PartyPartyIdPayRoute
   PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
   PartyPartyIdShareRoute: typeof PartyPartyIdShareRoute
   PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
@@ -273,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/party_/$partyId/pay': {
+      id: '/party_/$partyId/pay'
+      path: '/party/$partyId/pay'
+      fullPath: '/party/$partyId/pay'
+      preLoaderRoute: typeof PartyPartyIdPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/party_/$partyId/add': {
       id: '/party_/$partyId/add'
       path: '/party/$partyId/add'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   MigrateTricountRoute: MigrateTricountRoute,
   PartyPartyIdRoute: PartyPartyIdRoute,
   PartyPartyIdAddRoute: PartyPartyIdAddRoute,
+  PartyPartyIdPayRoute: PartyPartyIdPayRoute,
   PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,
   PartyPartyIdShareRoute: PartyPartyIdShareRoute,
   PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,
