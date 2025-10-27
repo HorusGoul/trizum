@@ -141,14 +141,20 @@ export function preloadAllIcons() {
     await fs.writeFile(outFile, code, "utf-8");
   }
 
+  let isDev = false;
+
   return {
     name: "vite-plugin-preload-icons",
 
     configResolved(config) {
-      isBuild = config.command === "build";
+      isDev = config.command !== "build";
     },
 
     async transform(code, id) {
+      if (!isDev) {
+        return;
+      }
+
       const scanForIcons = id.includes(".ts") || id.includes(".tsx");
 
       if (id.includes(outFile) || !scanForIcons) {
@@ -165,61 +171,6 @@ export function preloadAllIcons() {
 
           compile();
         }
-      }
-    },
-
-    async buildStart() {
-      // During build, scan all source files to collect icons before writing
-      if (isBuild) {
-        const fs = await import("node:fs/promises");
-        const path = await import("node:path");
-        const root = process.cwd();
-        const srcDir = path.default.resolve(root, "src");
-
-        // Recursively scan directory for .ts and .tsx files
-        const scanDirectory = async (dir: string) => {
-          const entries = await fs.readdir(dir, { withFileTypes: true });
-
-          for (const entry of entries) {
-            const fullPath = path.default.join(dir, entry.name);
-
-            if (entry.isDirectory()) {
-              // Recursively scan subdirectories
-              await scanDirectory(fullPath);
-            } else if (
-              entry.isFile() &&
-              (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))
-            ) {
-              if (fullPath.includes(outFile)) continue;
-
-              try {
-                const content = await fs.readFile(fullPath, "utf-8");
-
-                for (const matcher of matchers) {
-                  const regexResult = content.match(matcher);
-
-                  if (regexResult) {
-                    regexResult.forEach((match) => {
-                      matches.add(match);
-                    });
-                  }
-                }
-              } catch (e) {
-                // File might not exist or be readable, continue
-              }
-            }
-          }
-        };
-
-        await scanDirectory(srcDir);
-
-        // Write the file immediately
-        if (matches.size > 0) {
-          await writeFile();
-        }
-      } else if (matches.size > 0) {
-        // Flush pending writes in dev mode
-        await writeFile();
       }
     },
   };

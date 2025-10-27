@@ -16,7 +16,9 @@ function getOrCreateIcon(prefixedName: IconProps["name"]) {
   let LucideIcon = iconCache.get(name);
 
   if (!LucideIcon) {
-    const fn = dynamicIconImports[name];
+    const fn =
+      dynamicIconImports[name] ??
+      (() => Promise.resolve({ default: FallbackIcon }));
     const promise = fn();
     promise.then((mod) => {
       iconCache.set(name, mod.default);
@@ -32,9 +34,7 @@ export const Icon = ({ ...props }: IconProps) => {
   return <IconWithFallback {...props} />;
 };
 
-export const IconWithFallback = ({ name, ...props }: IconProps) => {
-  const LucideIcon = getOrCreateIcon(name);
-
+function FallbackIcon({ name, ...props }: IconProps) {
   const fallbackStyle = {
     width: props.size || props.width,
     height: props.size || props.height,
@@ -44,14 +44,15 @@ export const IconWithFallback = ({ name, ...props }: IconProps) => {
   };
 
   return (
-    <Suspense
-      fallback={
-        <div
-          {...(props as HTMLAttributes<HTMLDivElement>)}
-          style={fallbackStyle}
-        />
-      }
-    >
+    <div {...(props as HTMLAttributes<HTMLDivElement>)} style={fallbackStyle} />
+  );
+}
+
+export const IconWithFallback = ({ name, ...props }: IconProps) => {
+  const LucideIcon = getOrCreateIcon(name);
+
+  return (
+    <Suspense fallback={<FallbackIcon name={name} {...props} />}>
       <LucideIcon {...props} />
     </Suspense>
   );
