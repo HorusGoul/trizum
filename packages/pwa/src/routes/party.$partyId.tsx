@@ -31,6 +31,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type Key,
 } from "react";
 import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
@@ -40,7 +41,12 @@ import { useNoMemo } from "#src/hooks/useNoMemo.ts";
 import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
+import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { Button } from "#src/ui/Button.tsx";
+
+interface PartyByIdSearchParams {
+  tab: "expenses" | "balances";
+}
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
@@ -59,10 +65,16 @@ export const Route = createFileRoute("/party/$partyId")({
 
     return;
   },
+  validateSearch: (search): PartyByIdSearchParams => {
+    const tab = search.tab === "balances" ? "balances" : "expenses";
+
+    return { tab };
+  },
 });
 
 function PartyById() {
   const params = Route.useParams();
+  const { tab: selectedTab } = Route.useSearch();
   const { party, partyId, isLoading, setParticipantDetails } = useParty(
     params.partyId,
   );
@@ -70,6 +82,16 @@ function PartyById() {
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
   const expenseLogTabPanelRef = useRef<HTMLDivElement>(null);
+  const balancesTabPanelRef = useRef<HTMLDivElement>(null);
+
+  function onSelectedTabChange(tab: Key) {
+    navigate({
+      to: "/party/$partyId",
+      params: { partyId },
+      search: { tab: tab as "expenses" | "balances" },
+      replace: true,
+    });
+  }
 
   async function onLeaveParty() {
     if (!partyId) return;
@@ -200,6 +222,8 @@ function PartyById() {
       <div className="flex-1 overflow-y-hidden">
         <AnimatedTabs
           tabListClassName="px-4 container"
+          selectedTab={selectedTab}
+          onSelectedTabChange={onSelectedTabChange}
           tabs={[
             {
               id: "expenses",
@@ -213,9 +237,10 @@ function PartyById() {
               label: t`Balances`,
               node: (
                 <Suspense fallback={null}>
-                  <Balances />
+                  <Balances panelRef={balancesTabPanelRef} />
                 </Suspense>
               ),
+              panelRef: balancesTabPanelRef,
               icon: "#lucide/scale",
             },
           ]}
@@ -470,10 +495,19 @@ function ExpenseItem({
   );
 }
 
-function Balances() {
+function Balances({
+  panelRef,
+}: {
+  panelRef: React.RefObject<HTMLDivElement | null>;
+}) {
   const { party } = useCurrentParty();
   const participant = useCurrentParticipant();
   const balances = usePartyBalances(party.id);
+
+  useScrollRestoration({
+    cacheKey: `party-${party.id}-balances`,
+    scrollElementRef: panelRef,
+  });
 
   const sortedBalancesByParticipant = Object.values(balances)
     .map((balance) => {

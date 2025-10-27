@@ -14,7 +14,13 @@ import {
   useTransform,
   type AnimationPlaybackControls,
 } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "./utils";
 import { Icon, type IconProps } from "./Icon";
 
@@ -27,11 +33,16 @@ interface AnimatedTabsProps {
     panelRef?: React.RefObject<HTMLDivElement | null>;
   }[];
   tabListClassName?: string;
+  selectedTab: Key;
+  onSelectedTabChange: (tab: Key) => void;
 }
 
-export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
-  const [selectedKey, setSelectedKey] = useState<Key>(tabs[0].id);
-
+export function AnimatedTabs({
+  tabs,
+  tabListClassName,
+  selectedTab,
+  onSelectedTabChange,
+}: AnimatedTabsProps) {
   const tabListRef = useRef<HTMLDivElement>(null);
   const tabPanelsRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +61,21 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
       setTabElements([...tabs]);
     }
   }, [tabElements]);
+
+  // Initialize scroll position to match selectedTab on mount
+  useLayoutEffect(() => {
+    const tabPanel = tabPanelsRef.current;
+
+    if (!tabPanel) {
+      return;
+    }
+
+    const index = tabs.findIndex((tab) => tab.id === selectedTab);
+
+    if (index >= 0) {
+      tabPanel.scrollLeft = tabPanel.scrollWidth * (index / tabs.length);
+    }
+  }, []);
 
   // This function determines which tab should be selected
   // based on the scroll position.
@@ -92,14 +118,14 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
   // so that the correct tab panel becomes interactive.
   useMotionValueEvent(scrollXProgress, "change", (x) => {
     if (animationRef.current || !tabElements.length) return;
-    setSelectedKey(tabs[getIndex(x)].id);
+    onSelectedTabChange?.(tabs[getIndex(x)].id);
   });
 
   // When the user clicks on a tab perform an animation of
   // the scroll position to the newly selected tab panel.
   const animationRef = useRef<AnimationPlaybackControls>(null);
   const onSelectionChange = (selectedKey: Key) => {
-    setSelectedKey(selectedKey);
+    onSelectedTabChange?.(selectedKey);
 
     // If the scroll position is already moving but we aren't animating
     // then the key changed as a result of a user scrolling. Ignore.
@@ -140,7 +166,7 @@ export function AnimatedTabs({ tabs, tabListClassName }: AnimatedTabsProps) {
   return (
     <Tabs
       className="flex h-full flex-1 flex-col"
-      selectedKey={selectedKey}
+      selectedKey={selectedTab}
       onSelectionChange={onSelectionChange}
     >
       <div className="relative">
