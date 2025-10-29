@@ -54,7 +54,7 @@ msgstr "Add an expense"
 msgid "Add or create"
 msgstr "Add or create"
 
-#: src/routes/new.tsx:339
+#: src/routes/new.tsx:342
 #: src/routes/party_.$partyId.settings.tsx:408
 msgid "Add participant"
 msgstr "Add participant"
@@ -87,7 +87,7 @@ msgstr "Archive"
 msgid "Archived participants"
 msgstr "Archived participants"
 
-#: src/routes/new.tsx:230
+#: src/routes/new.tsx:233
 #: src/routes/party_.$partyId.settings.tsx:250
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
@@ -124,7 +124,7 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Cash or other ways"
 msgstr "Cash or other ways"
 
-#: src/routes/about.tsx:64
+#: src/routes/about.tsx:75
 msgid "Changes sync automatically across all your devices"
 msgstr "Changes sync automatically across all your devices"
 
@@ -140,7 +140,7 @@ msgstr "Checking for updates..."
 msgid "Color"
 msgstr "Color"
 
-#: src/routes/about.tsx:106
+#: src/routes/about.tsx:117
 msgid "Contributors"
 msgstr "Contributors"
 
@@ -160,7 +160,7 @@ msgstr "Create a new Party"
 msgid "Created with ❤️ by the open source community. Special thanks to all contributors who made this project possible."
 msgstr "Created with ❤️ by the open source community. Special thanks to all contributors who made this project possible."
 
-#: src/routes/about.tsx:117
+#: src/routes/about.tsx:128
 msgid "Credits"
 msgstr "Credits"
 
@@ -172,7 +172,7 @@ msgstr "Date"
 msgid "Debt settled between {0} and {1}!"
 msgstr "Debt settled between {0} and {1}!"
 
-#: src/routes/new.tsx:194
+#: src/routes/new.tsx:197
 #: src/routes/party_.$partyId.settings.tsx:184
 msgid "Description"
 msgstr "Description"
@@ -193,7 +193,7 @@ msgstr "Editing {0}"
 msgid "Enter the key of the Tricount account you want to migrate from"
 msgstr "Enter the key of the Tricount account you want to migrate from"
 
-#: src/routes/join.tsx:115
+#: src/routes/join.tsx:118
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
 
@@ -257,7 +257,7 @@ msgstr "Failed to upload avatar. Please try again."
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
-#: src/routes/about.tsx:48
+#: src/routes/about.tsx:59
 msgid "Features"
 msgstr "Features"
 
@@ -293,7 +293,7 @@ msgstr "Here's a list of ways you can pay, once done, press the button above to 
 msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
-#: src/routes/new.tsx:170
+#: src/routes/new.tsx:173
 #: src/routes/party_.$partyId.settings.tsx:160
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
@@ -364,15 +364,15 @@ msgstr "Joined {0}!"
 msgid "Leave party"
 msgstr "Leave party"
 
-#: src/routes/about.tsx:98
+#: src/routes/about.tsx:109
 msgid "License"
 msgstr "License"
 
-#: src/routes/join.tsx:114
+#: src/routes/join.tsx:117
 msgid "Link or code"
 msgstr "Link or code"
 
-#: src/routes/about.tsx:82
+#: src/routes/about.tsx:93
 msgid "Links"
 msgstr "Links"
 
@@ -416,7 +416,7 @@ msgstr "Migration in progress"
 msgid "Migration successful"
 msgstr "Migration successful"
 
-#: src/routes/about.tsx:71
+#: src/routes/about.tsx:82
 msgid "Multi-Party Splitting"
 msgstr "Multi-Party Splitting"
 
@@ -428,12 +428,12 @@ msgstr "Name must be less than 50 characters"
 msgid "New expense"
 msgstr "New expense"
 
-#: src/routes/new.tsx:292
+#: src/routes/new.tsx:295
 #: src/routes/party_.$partyId.settings.tsx:361
 msgid "New participant name"
 msgstr "New participant name"
 
-#: src/routes/new.tsx:129
+#: src/routes/new.tsx:132
 msgid "New trizum"
 msgstr "New trizum"
 
@@ -445,7 +445,7 @@ msgstr "No updates available"
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
-#: src/routes/about.tsx:53
+#: src/routes/about.tsx:64
 msgid "Offline-First"
 msgstr "Offline-First"
 
@@ -479,18 +479,18 @@ msgstr "Paid by"
 msgid "Paid debt to {0}"
 msgstr "Paid debt to {0}"
 
-#: src/routes/new.tsx:258
+#: src/routes/new.tsx:261
 #: src/routes/party_.$partyId.settings.tsx:303
 #: src/routes/party_.$partyId.settings.tsx:436
 msgid "Participant name"
 msgstr "Participant name"
 
-#: src/routes/new.tsx:215
+#: src/routes/new.tsx:218
 #: src/routes/party_.$partyId.settings.tsx:226
 msgid "Participants"
 msgstr "Participants"
 
-#: src/routes/new.tsx:75
+#: src/routes/new.tsx:78
 msgid "Party created"
 msgstr "Party created"
 
@@ -567,7 +567,7 @@ msgstr "Please paste the Tricount sharing message, URL (e.g., https://tricount.c
 msgid "Please select an image file"
 msgstr "Please select an image file"
 
-#: src/routes/about.tsx:62
+#: src/routes/about.tsx:73
 msgid "Real-Time Sync"
 msgstr "Real-Time Sync"
 
@@ -579,7 +579,7 @@ msgstr "Receipt Attachments"
 msgid "Reload"
 msgstr "Reload"
 
-#: src/routes/new.tsx:271
+#: src/routes/new.tsx:274
 #: src/routes/party_.$partyId.settings.tsx:317
 msgid "Remove"
 msgstr "Remove"
@@ -592,7 +592,7 @@ msgstr "Remove avatar"
 msgid "Remove photo"
 msgstr "Remove photo"
 
-#: src/routes/about.tsx:93
+#: src/routes/about.tsx:104
 msgid "Report an Issue"
 msgstr "Report an Issue"
 
@@ -601,9 +601,9 @@ msgid "Restore"
 msgstr "Restore"
 
 #: src/components/ExpenseEditor.tsx:217
-#: src/routes/join.tsx:85
+#: src/routes/join.tsx:88
 #: src/routes/migrate_.tricount.tsx:247
-#: src/routes/new.tsx:142
+#: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:76
@@ -646,18 +646,18 @@ msgstr "Simple"
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: src/routes/about.tsx:38
+#: src/routes/about.tsx:49
 msgid "Split bills with friends and family. Track, calculate, and settle expenses together."
 msgstr "Split bills with friends and family. Track, calculate, and settle expenses together."
 
-#: src/routes/about.tsx:73
+#: src/routes/about.tsx:84
 msgid "Split expenses fairly among multiple participants"
 msgstr "Split expenses fairly among multiple participants"
 
 #: src/components/ExpenseEditor.tsx:217
-#: src/routes/join.tsx:85
+#: src/routes/join.tsx:88
 #: src/routes/migrate_.tricount.tsx:247
-#: src/routes/new.tsx:142
+#: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:76
@@ -695,12 +695,12 @@ msgstr "This application uses the following open source libraries and tools. Bel
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/routes/about.tsx:120
+#: src/routes/about.tsx:131
 msgid "This project uses various open source libraries and tools."
 msgstr "This project uses various open source libraries and tools."
 
 #: src/components/ExpenseEditor.tsx:256
-#: src/routes/new.tsx:169
+#: src/routes/new.tsx:172
 #: src/routes/party_.$partyId.settings.tsx:159
 msgid "Title"
 msgstr "Title"
@@ -784,11 +784,11 @@ msgstr "URL or Party ID"
 msgid "Username"
 msgstr "Username"
 
-#: src/routes/about.tsx:32
+#: src/routes/about.tsx:33
 msgid "Version"
 msgstr "Version"
 
-#: src/routes/about.tsx:88
+#: src/routes/about.tsx:99
 msgid "View on GitHub"
 msgstr "View on GitHub"
 
@@ -801,7 +801,7 @@ msgstr "View party"
 msgid "View photo"
 msgstr "View photo"
 
-#: src/routes/about.tsx:127
+#: src/routes/about.tsx:138
 msgid "View Third-Party Licenses"
 msgstr "View Third-Party Licenses"
 
@@ -817,7 +817,7 @@ msgstr "Warning: Split amounts don't match total expense"
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
-#: src/routes/new.tsx:195
+#: src/routes/new.tsx:198
 #: src/routes/party_.$partyId.settings.tsx:185
 msgid "What is this party about?"
 msgstr "What is this party about?"
@@ -830,11 +830,11 @@ msgstr "What's your preferred way to be addressed?"
 msgid "Who are you?"
 msgstr "Who are you?"
 
-#: src/routes/new.tsx:219
+#: src/routes/new.tsx:222
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "Who is invited to this party? You can add more participants later."
 
-#: src/routes/about.tsx:55
+#: src/routes/about.tsx:66
 msgid "Works seamlessly offline with automatic sync when online"
 msgstr "Works seamlessly offline with automatic sync when online"
 
