@@ -521,6 +521,8 @@ function Balances({
       return a.participant.name.localeCompare(b.participant.name);
     });
 
+  const hasSortedBalances = sortedBalancesByParticipant.length > 0;
+
   // Use simplified transaction algorithm to get minimal set of transactions
   const simplifiedTransactions = simplifyBalanceTransactions(balances);
 
@@ -553,22 +555,27 @@ function Balances({
 
   return (
     <>
-      <div className="h-8 flex-shrink-0" />
+      {hasSortedBalances ? (
+        <>
+          <div className="h-8 flex-shrink-0" />
 
-      <div className="container flex flex-col gap-4 px-4">
-        {sortedBalancesByParticipant.map(
-          ({ participant, stats, visualRatio }) => (
-            <BalanceItem
-              key={participant.id}
-              participant={participant}
-              stats={stats}
-              visualRatio={visualRatio}
-            />
-          ),
-        )}
-      </div>
-
-      <div className="h-8 flex-shrink-0" />
+          <div className="container flex flex-col gap-4 px-4">
+            {sortedBalancesByParticipant.map(
+              ({ participant, stats, visualRatio }) => (
+                <BalanceItem
+                  key={participant.id}
+                  participant={participant}
+                  stats={stats}
+                  visualRatio={visualRatio}
+                />
+              ),
+            )}
+          </div>
+          <div className="h-8 flex-shrink-0" />
+        </>
+      ) : (
+        <div className="h-5 flex-shrink-0" />
+      )}
 
       {isFullyBalanced ? null : (
         <div className="container mb-4 mt-4 flex flex-col gap-4 px-4">
