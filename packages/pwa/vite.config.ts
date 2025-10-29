@@ -5,6 +5,8 @@ import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import { lingui } from "@lingui/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
+import license from "rollup-plugin-license";
+import path from "node:path";
 
 const ReactCompilerConfig = {};
 
@@ -32,6 +34,9 @@ export default defineConfig({
       registerType: "prompt",
       workbox: {
         maximumFileSizeToCacheInBytes: 5242880,
+        additionalManifestEntries: [
+          { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
+        ],
       },
       manifest: {
         name: "trizum",
@@ -67,6 +72,41 @@ export default defineConfig({
     }),
     // Plugin to read preloaded icons and configure externals
     excludeUnusedLucideIconsPlugin(),
+    // Generate third-party licenses file during build
+    license({
+      thirdParty: {
+        includePrivate: false,
+        output: {
+          file: path.resolve(__dirname, "dist", "THIRD-PARTY-LICENSES.txt"),
+          template(dependencies) {
+            return dependencies
+              .map((dep) => {
+                const repository =
+                  typeof dep.repository === "object" && dep.repository?.url
+                    ? dep.repository.url
+                    : dep.repository;
+
+                const lines = [
+                  `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
+                  dep.license ? `License: ${dep.license}` : "",
+                  dep.author ? `Author: ${dep.author.text()}` : "",
+                  repository ? `Repository: ${repository}` : "",
+                  "",
+                ];
+
+                if (dep.licenseText) {
+                  lines.push(dep.licenseText, "");
+                }
+
+                lines.push("-".repeat(80), "");
+
+                return lines.filter((line) => line !== undefined).join("\n");
+              })
+              .join("\n");
+          },
+        },
+      },
+    }),
   ],
   server: {
     proxy: {
