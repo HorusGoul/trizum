@@ -7,11 +7,33 @@ import { lingui } from "@lingui/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import license from "rollup-plugin-license";
 import path from "node:path";
+import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const ReactCompilerConfig = {};
 
+// Read package.json version
+const packageJson = JSON.parse(
+  readFileSync(path.resolve(__dirname, "package.json"), "utf-8"),
+);
+const appVersion = packageJson.version;
+const description = packageJson.description;
+
+// Get git commit hash
+let appCommit = "unknown";
+try {
+  appCommit = execSync("git rev-parse --short HEAD").toString().trim();
+} catch {
+  // Git not available or not in a git repository
+  console.warn("Could not determine git commit hash");
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(appVersion),
+    "import.meta.env.VITE_APP_COMMIT": JSON.stringify(appCommit),
+  },
   plugins: [
     TanStackRouterVite(),
     react({
@@ -41,7 +63,7 @@ export default defineConfig({
       manifest: {
         name: "trizum",
         short_name: "trizum",
-        description: "Split your bills with friends",
+        description,
         theme_color: "#000000",
         background_color: "#000000",
         display: "standalone",

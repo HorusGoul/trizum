@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Trizum** is an app that makes group expense sharing a breeze. Track, split and settle shared costs effortlessly - similar to apps like SplitWise or Tricount.
+**Trizum** helps you split bills with friends and family. Track, calculate, and settle expenses together - similar to apps like SplitWise or Tricount.
 
 **Primary Users:** Friends splitting bills, groups sharing expenses, roommates tracking shared costs.
 

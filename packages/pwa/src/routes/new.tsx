@@ -69,6 +69,9 @@ function New() {
     navigate({
       to: "/party/$partyId",
       params: { partyId: handle.documentId },
+      search: {
+        tab: "expenses",
+      },
       replace: true,
     });
 

@@ -54,6 +54,9 @@ function Join() {
       params: {
         partyId,
       },
+      search: {
+        tab: "expenses",
+      },
     });
   }
 

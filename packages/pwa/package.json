@@ -1,6 +1,6 @@
 {
   "name": "pwa",
-  "description": "Vite SPA Template by horus.dev",
+  "description": "Split bills with friends and family. Track, calculate, and settle expenses together.",
   "version": "0.0.0",
   "private": true,
   "type": "module",
