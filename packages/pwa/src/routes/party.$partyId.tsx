@@ -516,17 +516,10 @@ function Balances({
         participant: party.participants[balance.participantId],
       };
     })
+    .filter((balance) => balance.stats.balance !== 0)
     .sort((a, b) => {
       return a.participant.name.localeCompare(b.participant.name);
     });
-
-  const myBalance = sortedBalancesByParticipant.find(
-    (balance) => balance.participant.id === participant.id,
-  );
-
-  if (!myBalance) {
-    throw new Error("Balance not found");
-  }
 
   // Use simplified transaction algorithm to get minimal set of transactions
   const simplifiedTransactions = simplifyBalanceTransactions(balances);
