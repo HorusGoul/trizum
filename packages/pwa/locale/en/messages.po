@@ -15,8 +15,8 @@ msgstr ""
 
 #: src/routes/party_.$partyId.pay.tsx:96
 #: src/routes/party_.$partyId.pay.tsx:102
-#: src/routes/party.$partyId.tsx:763
-#: src/routes/party.$partyId.tsx:769
+#: src/routes/party.$partyId.tsx:756
+#: src/routes/party.$partyId.tsx:762
 msgid "(me)"
 msgstr "(me)"
 
@@ -240,7 +240,7 @@ msgstr "Go back to home"
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId.tsx:587
+#: src/routes/party.$partyId.tsx:580
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -257,7 +257,7 @@ msgstr "How do you want to call this expense ?"
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
-#: src/routes/party.$partyId.tsx:583
+#: src/routes/party.$partyId.tsx:576
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -333,7 +333,7 @@ msgstr "Manage the participants list. Existing members can only be archived."
 
 #: src/routes/party_.$partyId.pay.tsx:88
 #: src/routes/party_.$partyId.pay.tsx:117
-#: src/routes/party.$partyId.tsx:800
+#: src/routes/party.$partyId.tsx:793
 msgid "Mark as paid"
 msgstr "Mark as paid"
 
@@ -384,7 +384,7 @@ msgstr "New trizum"
 msgid "No updates available"
 msgstr "No updates available"
 
-#: src/routes/party.$partyId.tsx:649
+#: src/routes/party.$partyId.tsx:642
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
@@ -396,12 +396,12 @@ msgstr "Only show your expenses"
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
 
-#: src/routes/party.$partyId.tsx:660
+#: src/routes/party.$partyId.tsx:653
 msgid "Other operations"
 msgstr "Other operations"
 
 #: src/routes/party_.$partyId.pay.tsx:99
-#: src/routes/party.$partyId.tsx:766
+#: src/routes/party.$partyId.tsx:759
 msgid "owes"
 msgstr "owes"
 
@@ -462,11 +462,11 @@ msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc12
 msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 
 #: src/routes/party_.$partyId.pay.tsx:88
-#: src/routes/party.$partyId.tsx:800
+#: src/routes/party.$partyId.tsx:793
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party.$partyId.tsx:631
+#: src/routes/party.$partyId.tsx:624
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
@@ -731,11 +731,11 @@ msgstr "Who is invited to this party? You can add more participants later."
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party.$partyId.tsx:602
+#: src/routes/party.$partyId.tsx:595
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId.tsx:620
+#: src/routes/party.$partyId.tsx:613
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
