@@ -103,6 +103,8 @@ function ExpenseById() {
         <Photos {...expense} />
         <Shares {...expense} />
       </div>
+
+      <div className="h-16 flex-shrink-0" />
     </div>
   );
 }

@@ -471,7 +471,7 @@ function PartySettings() {
             }}
           </form.Field>
 
-          <div className="h-4" />
+          <div className="h-16 flex-shrink-0" />
         </div>
       </form>
     </div>

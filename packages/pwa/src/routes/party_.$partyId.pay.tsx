@@ -143,6 +143,8 @@ function RouteComponent() {
           return <div key={method.type}>{element}</div>;
         })}
       </div>
+
+      <div className="h-16 flex-shrink-0" />
     </div>
   );
 }

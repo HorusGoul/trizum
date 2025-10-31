@@ -426,7 +426,7 @@ export function ExpenseEditor({
           <SharesWarning amount={amount} shares={shares} />
         </div>
 
-        <div className="h-16" />
+        <div className="h-16 flex-shrink-0" />
       </form>
     </div>
   );
