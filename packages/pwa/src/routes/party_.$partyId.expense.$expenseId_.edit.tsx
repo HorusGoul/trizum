@@ -12,6 +12,7 @@ import {
 } from "#src/lib/automerge/suspense-hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
+import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
   applyExpenseDiff,
   decodeExpenseId,
@@ -24,6 +25,7 @@ import {
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import { type DocHandleChangePayload } from "@automerge/automerge-repo";
 import { t } from "@lingui/macro";
+import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
@@ -72,15 +74,22 @@ function RouteComponent() {
   const editorRef = useRef<ExpenseEditorRef>(null);
   const currentHashRef = useRef<string>(getExpenseHash(expense));
 
-  function onChange(values: ExpenseEditorFormValues) {
-    const expense = {
-      id: expenseId,
-      name: values.name,
-      paidAt: values.paidAt,
-      paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-      shares: values.shares,
-      photos: values.photos,
-    };
+  function onChange(
+    previousValues: ExpenseEditorFormValues,
+    currentValues: ExpenseEditorFormValues,
+  ) {
+    function createExpense(values: ExpenseEditorFormValues) {
+      return {
+        id: expenseId,
+        name: values.name,
+        paidAt: values.paidAt,
+        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+        shares: values.shares,
+        photos: values.photos,
+      };
+    }
+
+    const expense = createExpense(currentValues);
     const hash = calculateExpenseHash(expense);
 
     if (hash === currentHashRef.current) {
@@ -89,10 +98,8 @@ function RouteComponent() {
 
     currentHashRef.current = hash;
 
-    onChangeExpense({
-      ...expense,
-      __hash: hash,
-    });
+    const patches = diff(createExpense(previousValues), expense);
+    onChangeExpense(patches);
   }
 
   async function onSubmit(values: ExpenseEditorFormValues) {
@@ -200,31 +207,20 @@ function useExpense() {
     updateExpense(expense);
   }
 
-  function onChangeExpense(expense: Expense) {
-    if (expenseId === undefined) return;
-
+  function onChangeExpense(patches: DiffResult[]) {
     handle.change((chunk) => {
-      const entry = chunk.expenses[expenseIndex];
+      const entry = chunk.expenses.find((e) => e.id === expenseId);
 
       if (!entry) {
         return;
       }
 
-      if (entry.id !== expense.id) {
-        return;
-      }
-
-      const copy = clone(expense);
-      delete copy.__editCopy;
-      delete copy.__editCopyLastUpdatedAt;
-
       if (!entry.__editCopy) {
-        entry.__editCopy = copy;
-        entry.__editCopyLastUpdatedAt = new Date();
-        return;
+        entry.__editCopy = clone(entry);
       }
 
-      applyExpenseDiff(entry.__editCopy, copy);
+      patchMutate(entry.__editCopy, patches);
+      entry.__editCopy.__hash = calculateExpenseHash(entry.__editCopy);
       entry.__editCopyLastUpdatedAt = new Date();
     });
   }

@@ -1,5 +1,10 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import { useForm, useStore, type Updater } from "@tanstack/react-form";
+import {
+  FieldApi,
+  useForm,
+  useStore,
+  type Updater,
+} from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
 import {
   Suspense,
@@ -39,6 +44,7 @@ import type { MediaFile } from "#src/models/media.ts";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
+import { diff } from "@opentf/obj-diff";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -56,7 +62,10 @@ export interface ExpenseEditorRef {
 interface ExpenseEditorProps {
   title: string;
   onSubmit: (values: ExpenseEditorFormValues) => void;
-  onChange?: (values: ExpenseEditorFormValues) => void;
+  onChange?: (
+    previousValues: ExpenseEditorFormValues,
+    currentValues: ExpenseEditorFormValues,
+  ) => void;
   defaultValues: ExpenseEditorFormValues;
   ref?: React.RefObject<ExpenseEditorRef | null>;
   autoFocus?: boolean;
@@ -166,18 +175,43 @@ export function ExpenseEditor({
   const amount = useStore(form.store, (state) => state.values.amount);
 
   const isReceivingUpdatesRef = useRef(false);
+  const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);
+
+  function createFieldFocusHandlers(field: {
+    name: string;
+    handleBlur: () => void;
+  }) {
+    return {
+      onFocus: () => {
+        focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
+      },
+      onBlur: () => {
+        focusedFieldRef.current = null;
+        field.handleBlur();
+      },
+    };
+  }
 
   useImperativeHandle(
     ref,
     () => ({
       setValues: (values) => {
         isReceivingUpdatesRef.current = true;
+        const currentFocusedField = focusedFieldRef.current;
 
         for (const key in values) {
+          const isFocused = key === currentFocusedField;
+
+          if (isFocused) {
+            // If the field is focused, we don't want to update the value
+            continue;
+          }
+
           form.setFieldValue(
             key as keyof ExpenseEditorFormValues,
             values[key as keyof ExpenseEditorFormValues],
           );
+          form.validateField(key as keyof ExpenseEditorFormValues, "server");
         }
 
         isReceivingUpdatesRef.current = false;
@@ -191,12 +225,12 @@ export function ExpenseEditor({
       return;
     }
 
-    return form.store.subscribe(({ currentVal }) => {
+    return form.store.subscribe(({ currentVal, prevVal }) => {
       if (isReceivingUpdatesRef.current) {
         return;
       }
 
-      onChange(currentVal.values);
+      onChange(prevVal.values, currentVal.values);
     });
   }, [form.store.subscribe, onChange]);
 
@@ -259,7 +293,6 @@ export function ExpenseEditor({
                 name={field.name}
                 value={field.state.value}
                 onChange={field.handleChange}
-                onBlur={field.handleBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
                 isInvalid={
                   field.state.meta.isTouched &&
@@ -270,6 +303,7 @@ export function ExpenseEditor({
                 data-presence-element-id="title"
                 data-presence-offset-top={6}
                 data-presence-offset-left={-10}
+                {...createFieldFocusHandlers(field)}
               />
             )}
           </form.Field>
@@ -292,7 +326,7 @@ export function ExpenseEditor({
                 onChange={(value) => {
                   field.handleChange(value || 0);
                 }}
-                onBlur={field.handleBlur}
+                onBlur={createFieldFocusHandlers(field).onBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
                 isInvalid={
                   field.state.meta.isTouched &&
@@ -302,6 +336,8 @@ export function ExpenseEditor({
                 onFocus={(event) => {
                   const input = event.target as HTMLInputElement;
                   input.select();
+                  focusedFieldRef.current =
+                    field.name as keyof ExpenseEditorFormValues;
                 }}
                 inputMode="decimal"
                 data-presence-element-id="amount"
@@ -325,6 +361,7 @@ export function ExpenseEditor({
                 data-presence-element-id="paidBy"
                 data-presence-offset-top={6}
                 data-presence-offset-left={-10}
+                {...createFieldFocusHandlers(field)}
               >
                 {(participant) => (
                   <SelectItem key={participant.id} value={participant}>
@@ -349,6 +386,7 @@ export function ExpenseEditor({
                 data-presence-element-id="paidAt"
                 data-presence-offset-top={6}
                 data-presence-offset-left={-10}
+                {...createFieldFocusHandlers(field)}
               />
             )}
           </form.Field>
