@@ -309,20 +309,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       party.participants,
     );
 
-    console.log(
-      JSON.parse(
-        JSON.stringify(
-          {
-            expenses: chunk.expenses,
-            participants: party.participants,
-            balancesByParticipant,
-          },
-          null,
-          2,
-        ),
-      ),
-    );
-
     lastChunkBalancesHandle.change((doc) => {
       patchMutate(
         doc.balances,
@@ -394,11 +380,55 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     return true;
   }
 
+  async function recalculateBalances() {
+    const party = handle.docSync();
+
+    if (!party) {
+      throw new Error("Party not found, this should not happen");
+    }
+
+    const chunkRefs = party.chunkRefs;
+
+    for (const chunkRef of chunkRefs) {
+      const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+      let chunk = await chunkHandle.doc();
+
+      if (!chunk) {
+        throw new Error("Chunk not found, this should not happen");
+      }
+
+      const balancesByParticipant = calculateBalancesByParticipant(
+        chunk.expenses,
+        party.participants,
+      );
+
+      const chunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+        chunkRef.balancesId,
+      );
+      let chunkBalances = await chunkBalancesHandle.doc();
+
+      if (!chunkBalances) {
+        throw new Error("Chunk balances not found, this should not happen");
+      }
+
+      chunkBalancesHandle.change((doc) => {
+        patchMutate(
+          doc.balances,
+          diff(clone(doc.balances), clone(balancesByParticipant)),
+        );
+      });
+      await chunkBalancesHandle.doc();
+    }
+
+    return true;
+  }
+
   return {
     updateSettings,
     setParticipantDetails,
     addExpenseToParty,
     updateExpense,
     removeExpense,
+    recalculateBalances,
   };
 }

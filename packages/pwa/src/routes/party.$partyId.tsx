@@ -75,9 +75,13 @@ export const Route = createFileRoute("/party/$partyId")({
 function PartyById() {
   const params = Route.useParams();
   const { tab: selectedTab } = Route.useSearch();
-  const { party, partyId, isLoading, setParticipantDetails } = useParty(
-    params.partyId,
-  );
+  const {
+    party,
+    partyId,
+    isLoading,
+    setParticipantDetails,
+    recalculateBalances,
+  } = useParty(params.partyId);
   const { removeParty } = usePartyList();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
@@ -92,6 +96,23 @@ function PartyById() {
       replace: true,
     });
   }
+
+  const didRecalculateBalances = useRef(false);
+
+  useEffect(() => {
+    if (selectedTab !== "balances" || didRecalculateBalances.current) {
+      return;
+    }
+
+    const idleCallback = requestIdleCallback(() => {
+      didRecalculateBalances.current = true;
+      recalculateBalances().catch(() => null);
+    });
+
+    return () => {
+      cancelIdleCallback(idleCallback);
+    };
+  }, [selectedTab, recalculateBalances]);
 
   async function onLeaveParty() {
     if (!partyId) return;
