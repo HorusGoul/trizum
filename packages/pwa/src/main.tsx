@@ -21,6 +21,7 @@ import { preloadAllIcons } from "./preloadIcons.gen.js";
 import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
+import { usePartyList } from "./hooks/usePartyList.ts";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -89,6 +90,10 @@ function AriaProviders({ children }: { children: React.ReactNode }) {
 }
 
 function InnerWrap({ children }: { children: React.ReactNode }) {
+  // Initialize the party list to set the locale and other
+  // settings on bootstrap.
+  usePartyList();
+
   return (
     <>
       <PartyTheme />
