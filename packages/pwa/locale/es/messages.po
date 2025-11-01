@@ -118,7 +118,7 @@ msgstr "Comprobar actualizaciones"
 
 #: src/components/MediaGallery.tsx:139
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: src/routes/party_.$partyId.settings.tsx:204
 msgid "Color"
@@ -167,7 +167,7 @@ msgstr "Editando {0}"
 
 #: src/routes/settings.tsx:36
 msgid "English"
-msgstr ""
+msgstr "Inglés"
 
 #: src/routes/join.tsx:120
 msgid "Enter the link or code of the trizum party you want to join"
@@ -175,7 +175,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
 #: src/routes/settings.tsx:37
 msgid "Español"
-msgstr ""
+msgstr "Español"
 
 #: src/routes/party_.$partyId.add.tsx:64
 msgid "Expense added"
@@ -207,7 +207,7 @@ msgstr "Error al copiar el número de teléfono al portapapeles, por favor cópi
 
 #: src/routes/about_.third-party-licenses.tsx:9
 msgid "Failed to load licenses"
-msgstr ""
+msgstr "Error al cargar las licencias"
 
 #: src/routes/about_.third-party-licenses.tsx:50
 msgid "Failed to load licenses. Please try again later."
@@ -243,7 +243,7 @@ msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otr
 
 #: src/components/BackButton.tsx:23
 msgid "Go Back"
-msgstr ""
+msgstr "Volver"
 
 #: src/routes/migrate_.tricount.tsx:386
 msgid "Go back to home"
@@ -288,7 +288,7 @@ msgstr "Impacto en mi balance: <0/>"
 
 #: src/routes/party.$partyId.tsx:505
 msgid "Impact on my balance: <0/>"
-msgstr ""
+msgstr "Impacto en mi balance: <0/>"
 
 #: src/routes/migrate_.tricount.tsx:298
 msgid "Import attachments"
@@ -312,7 +312,7 @@ msgstr "Incluir todos"
 
 #: src/routes/migrate_.tricount.tsx:217
 msgid "Invalid tricount URL or key"
-msgstr ""
+msgstr "URL o clave de Tricount no válida"
 
 #: src/routes/join.tsx:30
 #: src/routes/join.tsx:47
@@ -334,11 +334,11 @@ msgstr "Unirse a un Grupo"
 
 #: src/routes/join.tsx:79
 msgid "Join a trizum"
-msgstr ""
+msgstr "Unirse a un trizum"
 
 #: src/routes/settings.tsx:178
 msgid "Language"
-msgstr ""
+msgstr "Idioma"
 
 #: src/routes/party.$partyId.tsx:235
 msgid "Leave party"
@@ -363,7 +363,7 @@ msgstr "Cargando licencias..."
 #: src/components/PartyTheme.tsx:26
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:116
 msgid "Malformed Party ID"
-msgstr ""
+msgstr "ID de grupo mal formado"
 
 #: src/routes/party_.$partyId.settings.tsx:230
 msgid "Manage the participants list. Existing members can only be archived."
@@ -405,7 +405,7 @@ msgstr "Migración exitosa"
 
 #: src/routes/party_.$partyId.pay.tsx:21
 msgid "Missing search params"
-msgstr ""
+msgstr "Faltan parámetros de búsqueda"
 
 #: src/routes/about.tsx:82
 msgid "Multi-Party Splitting"
@@ -430,7 +430,7 @@ msgstr "Nuevo trizum"
 
 #: src/components/MediaGallery.tsx:155
 msgid "Next"
-msgstr ""
+msgstr "Siguiente"
 
 #: src/routes/party.$partyId.tsx:670
 msgid "Nobody owes you money!"
@@ -548,7 +548,7 @@ msgstr "Por favor, selecciona un archivo de imagen"
 
 #: src/components/MediaGallery.tsx:148
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: src/routes/about.tsx:73
 msgid "Real-Time Sync"
