@@ -142,7 +142,9 @@ function About() {
 
         {/* Footer */}
         <section className="mt-8 border-t border-accent-200 pt-6 text-center text-sm text-accent-600 dark:border-accent-800 dark:text-accent-400">
-          <p>© {new Date().getFullYear()} trizum</p>
+          <p>
+            <Trans>© {new Date().getFullYear()} trizum</Trans>
+          </p>
         </section>
       </div>
     </div>

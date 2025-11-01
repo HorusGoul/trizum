@@ -64,7 +64,7 @@ function ExpenseById() {
         <h1 className="pl-4 text-2xl font-bold">{expense.name}</h1>
         <div className="flex-1" />
         <MenuTrigger>
-          <IconButton icon="#lucide/ellipsis-vertical" aria-label="Menu" />
+          <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
           <Popover placement="bottom end">
             <Menu>
               <MenuItem
@@ -113,7 +113,7 @@ function useExpense() {
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
 
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
+  if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
 
   const { chunkId } = decodeExpenseId(expenseId);
 

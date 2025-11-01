@@ -1,12 +1,12 @@
 import { BackButton } from "#src/components/BackButton.js";
-import { Trans } from "@lingui/macro";
+import { t, Trans } from "@lingui/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
 async function fetchLicenses(): Promise<string> {
   const response = await fetch("/THIRD-PARTY-LICENSES.txt");
 
   if (!response.ok) {
-    throw new Error("Failed to load licenses");
+    throw new Error(t`Failed to load licenses`);
   }
 
   return response.text();

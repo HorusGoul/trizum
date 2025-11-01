@@ -2,7 +2,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { t } from "@lingui/macro";
+import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
@@ -75,7 +75,9 @@ function Join() {
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center pr-2">
         <BackButton fallbackOptions={{ to: "/" }} />
-        <h1 className="pl-4 text-2xl font-bold">Join a trizum</h1>
+        <h1 className="pl-4 text-2xl font-bold">
+          <Trans>Join a trizum</Trans>
+        </h1>
         <div className="flex-1" />
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}

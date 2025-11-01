@@ -146,7 +146,7 @@ function PartyById() {
         <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
         <div className="flex-1" />
         <MenuTrigger>
-          <IconButton icon="#lucide/ellipsis-vertical" aria-label="Menu" />
+          <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
           <Popover placement="bottom end">
             <Menu className="min-w-60">
               <MenuItem

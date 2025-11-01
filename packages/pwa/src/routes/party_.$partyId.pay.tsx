@@ -18,7 +18,7 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
   component: RouteComponent,
   validateSearch: (search): PaySearchParams => {
     if (!search.fromId || !search.toId || !search.amount) {
-      throw new Error("Missing search params");
+      throw new Error(t`Missing search params`);
     }
 
     return {

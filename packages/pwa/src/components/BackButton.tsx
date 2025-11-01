@@ -7,6 +7,7 @@ import {
   type ToOptions,
 } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
+import { t } from "@lingui/macro";
 
 export function BackButton({
   fallbackOptions,
@@ -19,7 +20,7 @@ export function BackButton({
   return (
     <IconButton
       icon="#lucide/arrow-left"
-      aria-label="Go Back"
+      aria-label={t`Go Back`}
       onPress={() => {
         if (canGoBack) {
           history.go(-1);

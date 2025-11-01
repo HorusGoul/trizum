@@ -214,7 +214,7 @@ function IdleState({
     onSubmit: ({ value }) => {
       const key = extractTricountId(value.key);
       if (!key) {
-        throw new Error("Invalid tricount URL or key");
+        throw new Error(t`Invalid tricount URL or key`);
       }
 
       onSubmit({

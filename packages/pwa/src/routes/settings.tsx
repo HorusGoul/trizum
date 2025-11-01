@@ -33,8 +33,8 @@ interface LocaleOption {
 }
 
 const LOCALE_OPTIONS: LocaleOption[] = [
-  { id: "en", name: "English" },
-  { id: "es", name: "Español" },
+  { id: "en", name: t`English` },
+  { id: "es", name: t`Español` },
 ];
 
 function Settings() {

@@ -4,6 +4,7 @@ import { useGesture } from "@use-gesture/react";
 import { motion, useMotionValue } from "framer-motion";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
+import { t } from "@lingui/macro";
 
 export type MediaGalleryItem = {
   src: string;
@@ -135,7 +136,7 @@ export default function MediaGallery({
 
       <GalleryButton
         className="right-4 top-4"
-        label="Close"
+        label={t`Close`}
         icon="#lucide/x"
         onClick={onClose}
       />
@@ -144,14 +145,14 @@ export default function MediaGallery({
         <>
           <GalleryButton
             className="left-4 top-1/2 -translate-y-1/2 transform"
-            label="Previous"
+            label={t`Previous`}
             icon="#lucide/arrow-left"
             onClick={goToPrevious}
           />
 
           <GalleryButton
             className="right-4 top-1/2 -translate-y-1/2 transform"
-            label="Next"
+            label={t`Next`}
             icon="#lucide/arrow-right"
             onClick={goToNext}
           />

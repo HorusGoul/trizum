@@ -7,6 +7,7 @@ import {
 } from "@automerge/automerge-repo";
 import { useLocation, useMatch, useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { t } from "@lingui/macro";
 
 export function PartyTheme() {
   const partyId = useLocation({
@@ -22,7 +23,7 @@ export function PartyTheme() {
 }
 
 function SetPartyTheme({ partyId }: { partyId: string }) {
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
+  if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
   const [party] = useSuspenseDocument<Party>(partyId as AnyDocumentId, {
     required: false,
   });

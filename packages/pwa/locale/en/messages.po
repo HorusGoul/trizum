@@ -32,6 +32,10 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
+#: src/routes/about.tsx:146
+msgid "© {0} trizum"
+msgstr "© {0} trizum"
+
 #: src/routes/about.tsx:120
 msgid "© 2024 trizum. Open source software."
 msgstr "© 2024 trizum. Open source software."
@@ -136,6 +140,10 @@ msgstr "Check for updates"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
+#: src/components/MediaGallery.tsx:139
+msgid "Close"
+msgstr "Close"
+
 #: src/routes/party_.$partyId.settings.tsx:204
 msgid "Color"
 msgstr "Color"
@@ -189,13 +197,21 @@ msgstr "Divide"
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
+#: src/routes/settings.tsx:36
+msgid "English"
+msgstr "English"
+
 #: src/routes/migrate_.tricount.tsx:219
 msgid "Enter the key of the Tricount account you want to migrate from"
 msgstr "Enter the key of the Tricount account you want to migrate from"
 
-#: src/routes/join.tsx:118
+#: src/routes/join.tsx:120
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
+
+#: src/routes/settings.tsx:37
+msgid "Español"
+msgstr "Español"
 
 #: src/components/ExpenseEditor.tsx:421
 msgid "Exact"
@@ -237,6 +253,10 @@ msgstr "Failed to copy party link to clipboard, please copy it manually"
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Failed to copy phone number to clipboard, please copy it manually"
 
+#: src/routes/about_.third-party-licenses.tsx:9
+msgid "Failed to load licenses"
+msgstr "Failed to load licenses"
+
 #: src/routes/about_.third-party-licenses.tsx:50
 msgid "Failed to load licenses. Please try again later."
 msgstr "Failed to load licenses. Please try again later."
@@ -261,13 +281,17 @@ msgstr "Failed to upload, please try again"
 msgid "Features"
 msgstr "Features"
 
-#: src/routes/settings.tsx:143
+#: src/routes/settings.tsx:160
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
 #: src/routes/party_.$partyId.pay.tsx:192
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
+
+#: src/components/BackButton.tsx:23
+msgid "Go Back"
+msgstr "Go Back"
 
 #: src/routes/migrate_.tricount.tsx:386
 msgid "Go back to home"
@@ -338,6 +362,10 @@ msgstr "Importing Tricount data..."
 msgid "Include all"
 msgstr "Include all"
 
+#: src/routes/migrate_.tricount.tsx:217
+msgid "Invalid tricount URL or key"
+msgstr "Invalid tricount URL or key"
+
 #: src/routes/join.tsx:30
 #: src/routes/join.tsx:47
 msgid "Invalid trizum party code"
@@ -356,9 +384,17 @@ msgstr "Join {0} on trizum!"
 msgid "Join a Party"
 msgstr "Join a Party"
 
+#: src/routes/join.tsx:79
+msgid "Join a trizum"
+msgstr "Join a trizum"
+
 #: src/routes/party.$partyId.tsx:66
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
+
+#: src/routes/settings.tsx:178
+msgid "Language"
+msgstr "Language"
 
 #: src/routes/party.$partyId.tsx:235
 msgid "Leave party"
@@ -368,7 +404,7 @@ msgstr "Leave party"
 msgid "License"
 msgstr "License"
 
-#: src/routes/join.tsx:117
+#: src/routes/join.tsx:119
 msgid "Link or code"
 msgstr "Link or code"
 
@@ -379,6 +415,11 @@ msgstr "Links"
 #: src/routes/about_.third-party-licenses.tsx:33
 msgid "Loading licenses..."
 msgstr "Loading licenses..."
+
+#: src/components/PartyTheme.tsx:26
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:116
+msgid "Malformed Party ID"
+msgstr "Malformed Party ID"
 
 #: src/routes/party_.$partyId.settings.tsx:230
 msgid "Manage the participants list. Existing members can only be archived."
@@ -400,6 +441,8 @@ msgid "Me"
 msgstr "Me"
 
 #: src/routes/index.tsx:59
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:67
+#: src/routes/party.$partyId.tsx:149
 msgid "Menu"
 msgstr "Menu"
 
@@ -415,6 +458,10 @@ msgstr "Migration in progress"
 #: src/routes/migrate_.tricount.tsx:351
 msgid "Migration successful"
 msgstr "Migration successful"
+
+#: src/routes/party_.$partyId.pay.tsx:21
+msgid "Missing search params"
+msgstr "Missing search params"
 
 #: src/routes/about.tsx:82
 msgid "Multi-Party Splitting"
@@ -436,6 +483,10 @@ msgstr "New participant name"
 #: src/routes/new.tsx:132
 msgid "New trizum"
 msgstr "New trizum"
+
+#: src/components/MediaGallery.tsx:155
+msgid "Next"
+msgstr "Next"
 
 #: src/routes/index.tsx:93
 msgid "No updates available"
@@ -535,7 +586,7 @@ msgstr "People that owe you money"
 msgid "Personal mode"
 msgstr "Personal mode"
 
-#: src/routes/settings.tsx:142
+#: src/routes/settings.tsx:159
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -566,6 +617,10 @@ msgstr "Please paste the Tricount sharing message, URL (e.g., https://tricount.c
 #: src/components/AvatarPicker.tsx:38
 msgid "Please select an image file"
 msgstr "Please select an image file"
+
+#: src/components/MediaGallery.tsx:148
+msgid "Previous"
+msgstr "Previous"
 
 #: src/routes/about.tsx:73
 msgid "Real-Time Sync"
@@ -601,22 +656,22 @@ msgid "Restore"
 msgstr "Restore"
 
 #: src/components/ExpenseEditor.tsx:251
-#: src/routes/join.tsx:88
+#: src/routes/join.tsx:90
 #: src/routes/migrate_.tricount.tsx:247
 #: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
-#: src/routes/settings.tsx:76
+#: src/routes/settings.tsx:93
 msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:74
 #: src/routes/party.$partyId.tsx:224
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:76
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:37
+#: src/routes/settings.tsx:52
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -655,12 +710,12 @@ msgid "Split expenses fairly among multiple participants"
 msgstr "Split expenses fairly among multiple participants"
 
 #: src/components/ExpenseEditor.tsx:251
-#: src/routes/join.tsx:88
+#: src/routes/join.tsx:90
 #: src/routes/migrate_.tricount.tsx:247
 #: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
-#: src/routes/settings.tsx:76
+#: src/routes/settings.tsx:93
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -780,7 +835,7 @@ msgstr "Uploading..."
 msgid "URL or Party ID"
 msgstr "URL or Party ID"
 
-#: src/routes/settings.tsx:117
+#: src/routes/settings.tsx:134
 msgid "Username"
 msgstr "Username"
 
@@ -822,7 +877,7 @@ msgstr "Welcome to the party, {0}!"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:118
+#: src/routes/settings.tsx:135
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
