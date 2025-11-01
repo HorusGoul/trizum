@@ -11,11 +11,10 @@ import {
   type RegisteredRouter,
 } from "@tanstack/react-router";
 import "./index.css";
-import { i18n } from "@lingui/core";
 import { I18nProvider, useLingui } from "@lingui/react";
 import { I18nProvider as AriaI18nProvider } from "react-aria-components";
 import { Toaster } from "./ui/Toaster.js";
-import * as catalogEn from "#locale/en/messages.po";
+import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
 import { preloadAllIcons } from "./preloadIcons.gen.js";
@@ -23,14 +22,8 @@ import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 
-// Load language
-i18n.load("en", catalogEn.messages);
-i18n.activate("en");
-document.documentElement.lang = i18n.locale;
-
-i18n.on("change", () => {
-  document.documentElement.lang = i18n.locale;
-});
+// Initialize i18n
+const i18n = initializeI18n();
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {

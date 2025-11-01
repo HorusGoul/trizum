@@ -5,7 +5,7 @@ const config: LinguiConfig = {
   compileNamespace: "ts",
   sourceLocale: "en",
   format: formatter(),
-  locales: ["en"],
+  locales: ["en", "es"],
   fallbackLocales: {
     default: "en",
   },
