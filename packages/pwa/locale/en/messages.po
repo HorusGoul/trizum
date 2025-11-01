@@ -261,7 +261,7 @@ msgstr "Failed to upload, please try again"
 msgid "Features"
 msgstr "Features"
 
-#: src/routes/settings.tsx:143
+#: src/routes/settings.tsx:160
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -359,6 +359,10 @@ msgstr "Join a Party"
 #: src/routes/party.$partyId.tsx:66
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
+
+#: src/routes/settings.tsx:178
+msgid "Language"
+msgstr "Language"
 
 #: src/routes/party.$partyId.tsx:235
 msgid "Leave party"
@@ -535,7 +539,7 @@ msgstr "People that owe you money"
 msgid "Personal mode"
 msgstr "Personal mode"
 
-#: src/routes/settings.tsx:142
+#: src/routes/settings.tsx:159
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -606,17 +610,17 @@ msgstr "Restore"
 #: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
-#: src/routes/settings.tsx:76
+#: src/routes/settings.tsx:93
 msgid "Save"
 msgstr "Save"
 
 #: src/routes/index.tsx:74
 #: src/routes/party.$partyId.tsx:224
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:76
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:37
+#: src/routes/settings.tsx:52
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -660,7 +664,7 @@ msgstr "Split expenses fairly among multiple participants"
 #: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
-#: src/routes/settings.tsx:76
+#: src/routes/settings.tsx:93
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -780,7 +784,7 @@ msgstr "Uploading..."
 msgid "URL or Party ID"
 msgstr "URL or Party ID"
 
-#: src/routes/settings.tsx:117
+#: src/routes/settings.tsx:134
 msgid "Username"
 msgstr "Username"
 
@@ -822,7 +826,7 @@ msgstr "Welcome to the party, {0}!"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:118
+#: src/routes/settings.tsx:135
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 

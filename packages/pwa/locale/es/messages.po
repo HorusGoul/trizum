@@ -213,7 +213,7 @@ msgstr "Error al subir, por favor inténtalo de nuevo"
 msgid "Features"
 msgstr "Características"
 
-#: src/routes/settings.tsx:143
+#: src/routes/settings.tsx:160
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -303,6 +303,10 @@ msgstr "¡Únete a {0} en trizum!"
 #: src/routes/index.tsx:139
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
+
+#: src/routes/settings.tsx:178
+msgid "Language"
+msgstr ""
 
 #: src/routes/party.$partyId.tsx:235
 msgid "Leave party"
@@ -463,7 +467,7 @@ msgstr "Personas que te deben dinero"
 msgid "Personal mode"
 msgstr "Modo personal"
 
-#: src/routes/settings.tsx:142
+#: src/routes/settings.tsx:159
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -530,17 +534,17 @@ msgstr "Restaurar"
 #: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
-#: src/routes/settings.tsx:76
+#: src/routes/settings.tsx:93
 msgid "Save"
 msgstr "Guardar"
 
 #: src/routes/index.tsx:74
 #: src/routes/party.$partyId.tsx:224
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:76
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:37
+#: src/routes/settings.tsx:52
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -580,7 +584,7 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 #: src/routes/new.tsx:145
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
-#: src/routes/settings.tsx:76
+#: src/routes/settings.tsx:93
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -679,7 +683,7 @@ msgstr "Subiendo avatar..."
 msgid "Uploading..."
 msgstr "Subiendo..."
 
-#: src/routes/settings.tsx:117
+#: src/routes/settings.tsx:134
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -717,7 +721,7 @@ msgstr "¡Bienvenido al grupo, {0}!"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:118
+#: src/routes/settings.tsx:135
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
