@@ -330,7 +330,7 @@ msgstr "¡Únete a {0} en trizum!"
 
 #: src/routes/index.tsx:139
 msgid "Join a Party"
-msgstr "Unirse a un Grupo<<<<<<< HEAD"
+msgstr "Unirse a un Grupo"
 
 #: src/routes/join.tsx:79
 msgid "Join a trizum"
@@ -338,7 +338,7 @@ msgstr "Unirse a un trizum"
 
 #: src/routes/settings.tsx:178
 msgid "Language"
-msgstr ">>>>>>> cb18f49ba108ecc673c54d4b4a3ac1167b2e2076"
+msgstr "Idioma"
 
 #: src/routes/party.$partyId.tsx:235
 msgid "Leave party"
