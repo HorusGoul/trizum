@@ -9,10 +9,12 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
+import { getBrowserLocale, type SupportedLocale } from "#src/lib/i18n.js";
+import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -22,19 +24,33 @@ interface SettingsFormValues {
   username: string;
   phone: string;
   avatarId: MediaFile["id"] | null;
+  locale: SupportedLocale;
 }
+
+interface LocaleOption {
+  id: SupportedLocale;
+  name: string;
+}
+
+const LOCALE_OPTIONS: LocaleOption[] = [
+  { id: "en", name: "English" },
+  { id: "es", name: "Español" },
+];
 
 function Settings() {
   const { partyList, updateSettings } = usePartyList();
+  const navigate = useNavigate();
 
   async function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
       username: values.username,
       phone: values.phone,
       avatarId: values.avatarId,
+      locale: values.locale,
     });
     form.reset();
     toast.success(t`Settings saved`);
+    navigate({ to: "..", replace: true });
   }
 
   const form = useForm({
@@ -42,6 +58,7 @@ function Settings() {
       username: partyList.username ?? "",
       phone: partyList.phone ?? "",
       avatarId: partyList.avatarId ?? null,
+      locale: (partyList.locale ?? getBrowserLocale()) as SupportedLocale,
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -152,6 +169,27 @@ function Settings() {
                 field.state.meta.errors?.length > 0
               }
             />
+          )}
+        </form.Field>
+
+        <form.Field name="locale">
+          {(field) => (
+            <AppSelect<LocaleOption>
+              label={t`Language`}
+              items={LOCALE_OPTIONS}
+              selectedKey={field.state.value}
+              onSelectionChange={(value) => {
+                if (value) {
+                  field.handleChange(value as SupportedLocale);
+                }
+              }}
+            >
+              {(locale) => (
+                <SelectItem key={locale.id} value={locale}>
+                  {locale.name}
+                </SelectItem>
+              )}
+            </AppSelect>
           )}
         </form.Field>
       </form>

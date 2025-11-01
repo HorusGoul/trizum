@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getPartyListId, type PartyList } from "#src/models/partyList.js";
 import { DocHandle, type DocumentId } from "@automerge/automerge-repo/slim";
 import type { Party, PartyParticipant } from "#src/models/party.js";
@@ -8,6 +8,7 @@ import {
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 
 export function usePartyList() {
   const repo = useRepo();
@@ -18,6 +19,10 @@ export function usePartyList() {
       required: true,
     },
   );
+
+  useEffect(() => {
+    setLocale(partyList.locale ?? getBrowserLocale());
+  }, [partyList.locale]);
 
   function addPartyToList(
     partyId: Party["id"],
@@ -48,12 +53,13 @@ export function usePartyList() {
   }
 
   function updateSettings(
-    values: Pick<PartyList, "username" | "phone" | "avatarId">,
+    values: Pick<PartyList, "username" | "phone" | "avatarId" | "locale">,
   ) {
     partyListHandle.change((list) => {
       list.username = values.username;
       list.phone = values.phone;
       list.avatarId = values.avatarId;
+      list.locale = values.locale;
     });
 
     void updateAllParties();
