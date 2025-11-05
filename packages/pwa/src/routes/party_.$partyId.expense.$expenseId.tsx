@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
-import { t } from "@lingui/macro";
+import { t, Trans } from "@lingui/macro";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useLingui } from "@lingui/react";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
@@ -81,7 +81,9 @@ function ExpenseById() {
                   size={20}
                   className="mr-3"
                 />
-                <span className="h-3.5 leading-none">Edit</span>
+                <span className="h-3.5 leading-none">
+                  <Trans>Edit</Trans>
+                </span>
               </MenuItem>
               <MenuItem onAction={onDeleteExpense}>
                 <IconWithFallback
@@ -89,7 +91,9 @@ function ExpenseById() {
                   size={20}
                   className="mr-3"
                 />
-                <span className="h-3.5 leading-none">Delete</span>
+                <span className="h-3.5 leading-none">
+                  <Trans>Delete</Trans>
+                </span>
               </MenuItem>
             </Menu>
           </Popover>

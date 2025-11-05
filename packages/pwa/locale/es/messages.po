@@ -88,7 +88,7 @@ msgstr "Participantes archivados"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:237
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:241
 msgid "Attachments"
 msgstr "Adjuntos"
 
@@ -152,6 +152,10 @@ msgstr "Fecha"
 msgid "Debt settled between {0} and {1}!"
 msgstr "¡Deuda saldada entre {0} y {1}!"
 
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:95
+msgid "Delete"
+msgstr "Eliminar"
+
 #: src/routes/new.tsx:197
 #: src/routes/party_.$partyId.settings.tsx:184
 msgid "Description"
@@ -161,11 +165,15 @@ msgstr "Descripción"
 msgid "Description must be less than 500 characters"
 msgstr "La descripción debe tener menos de 500 caracteres"
 
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:85
+msgid "Edit"
+msgstr "Editar"
+
 #: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:180
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/settings.tsx:36
+#: src/routes/settings.tsx:40
 msgid "English"
 msgstr "Inglés"
 
@@ -173,7 +181,7 @@ msgstr "Inglés"
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
-#: src/routes/settings.tsx:37
+#: src/routes/settings.tsx:41
 msgid "Español"
 msgstr "Español"
 
@@ -361,7 +369,7 @@ msgid "Loading licenses..."
 msgstr "Cargando licencias..."
 
 #: src/components/PartyTheme.tsx:26
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:116
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:120
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
@@ -379,8 +387,8 @@ msgstr "Marcar como pagado"
 msgid "Marking expense as paid..."
 msgstr "Marcando gasto como pagado..."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:171
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:299
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:175
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:303
 msgid "Me"
 msgstr "Yo"
 
@@ -453,12 +461,12 @@ msgstr "Otras operaciones"
 msgid "owes"
 msgstr "le debe"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:215
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:219
 msgid "Paid at"
 msgstr "Pagado el"
 
 #: src/components/ExpenseEditor.tsx:353
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:199
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:203
 msgid "Paid by"
 msgstr "Pagado por"
 
@@ -605,7 +613,7 @@ msgstr "Configuración guardada"
 msgid "Share party"
 msgstr "Compartir grupo"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:281
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:285
 msgid "Shares"
 msgstr "Partes"
 
@@ -751,7 +759,7 @@ msgid "View party"
 msgstr "Ver grupo"
 
 #: src/components/ExpenseEditor.tsx:903
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:258
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:262
 msgid "View photo"
 msgstr "Ver foto"
 

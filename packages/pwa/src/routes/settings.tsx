@@ -32,14 +32,14 @@ interface LocaleOption {
   name: string;
 }
 
-const LOCALE_OPTIONS: LocaleOption[] = [
-  { id: "en", name: t`English` },
-  { id: "es", name: t`Español` },
-];
-
 function Settings() {
   const { partyList, updateSettings } = usePartyList();
   const navigate = useNavigate();
+
+  const LOCALE_OPTIONS: LocaleOption[] = [
+    { id: "en", name: t`English` },
+    { id: "es", name: t`Español` },
+  ];
 
   async function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
