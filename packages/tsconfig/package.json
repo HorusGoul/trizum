@@ -1,0 +1,8 @@
+{
+  "name": "@trizum/tsconfig",
+  "version": "0.0.1",
+  "files": [
+    "base.json",
+    "vite.json"
+  ]
+}

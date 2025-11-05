@@ -27,6 +27,12 @@ importers:
         specifier: 2.5.6
         version: 2.5.6
 
+  packages/prettier-config:
+    dependencies:
+      prettier-plugin-tailwindcss:
+        specifier: 0.7.1
+        version: 0.7.1(prettier@3.6.2)
+
   packages/pwa:
     dependencies:
       '@automerge/automerge':
@@ -126,12 +132,6 @@ importers:
       '@horus.dev/eslint-config':
         specifier: 2.0.1
         version: 2.0.1(eslint@8.57.0)(prettier@3.6.2)(typescript@5.9.2)
-      '@horus.dev/prettier-config':
-        specifier: 1.0.0
-        version: 1.0.0(prettier@3.6.2)
-      '@horus.dev/tsconfig':
-        specifier: 2.1.0
-        version: 2.1.0
       '@lingui/cli':
         specifier: 4.14.1
         version: 4.14.1(typescript@5.9.2)
@@ -150,6 +150,12 @@ importers:
       '@tanstack/router-plugin':
         specifier: 1.131.17
         version: 1.131.17(@tanstack/react-router@1.131.17(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722))(vite@7.1.2(@types/node@20.14.10)(jiti@2.6.0)(terser@5.44.0)(tsx@4.20.4)(yaml@2.4.5))
+      '@trizum/prettier-config':
+        specifier: workspace:*
+        version: link:../prettier-config
+      '@trizum/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
       '@types/dinero.js':
         specifier: 1.9.4
         version: 1.9.4
@@ -189,9 +195,6 @@ importers:
       prettier:
         specifier: 3.6.2
         version: 3.6.2
-      prettier-plugin-tailwindcss:
-        specifier: 0.6.14
-        version: 0.6.14(prettier@3.6.2)
       rollup-plugin-license:
         specifier: 3.6.0
         version: 3.6.0(picomatch@4.0.3)(rollup@4.46.2)
@@ -225,6 +228,8 @@ importers:
       wrangler:
         specifier: 4.45.0
         version: 4.45.0
+
+  packages/tsconfig: {}
 
 packages:
 
@@ -1555,12 +1560,6 @@ packages:
       eslint: ^8.48.0
       prettier: ^3.0.3
       typescript: ^5.2.2
-
-  '@horus.dev/prettier-config@1.0.0':
-    resolution: {integrity: sha512-s1LZXqmiVtjSQ9OoCEyfL4E5b02LjlAiEF3Ylo0RUDwA9vNrJFR9IJpbuft9Zhc6ODKMEh2UBvaeCStuf5uxQA==}
-
-  '@horus.dev/tsconfig@2.1.0':
-    resolution: {integrity: sha512-MKlVILD7M3lkZGd2OdrqElA208zX6PF46RpoBCeQb/zaqTaRQGaQu/tpV54FEG4AUGUeeIanom9FgbegtJMlNQ==}
 
   '@horus.dev/tw-dynamic-themes@0.0.3':
     resolution: {integrity: sha512-dc6UvLbVL8hgp/O/TCvqlOayGVOrAm52PISHk4nkTcwE1u0W5pYO3J8tBpMZe7/utyx8St8c7vbo9JrYjUSd5g==}
@@ -5225,58 +5224,9 @@ packages:
     resolution: {integrity: sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==}
     engines: {node: '>=6.0.0'}
 
-  prettier-plugin-tailwindcss@0.5.9:
-    resolution: {integrity: sha512-9x3t1s2Cjbut2QiP+O0mDqV3gLXTe2CgRlQDgucopVkUdw26sQi53p/q4qvGxMLBDfk/dcTV57Aa/zYwz9l8Ew==}
-    engines: {node: '>=14.21.3'}
-    peerDependencies:
-      '@ianvs/prettier-plugin-sort-imports': '*'
-      '@prettier/plugin-pug': '*'
-      '@shopify/prettier-plugin-liquid': '*'
-      '@trivago/prettier-plugin-sort-imports': '*'
-      prettier: ^3.0
-      prettier-plugin-astro: '*'
-      prettier-plugin-css-order: '*'
-      prettier-plugin-import-sort: '*'
-      prettier-plugin-jsdoc: '*'
-      prettier-plugin-marko: '*'
-      prettier-plugin-organize-attributes: '*'
-      prettier-plugin-organize-imports: '*'
-      prettier-plugin-style-order: '*'
-      prettier-plugin-svelte: '*'
-      prettier-plugin-twig-melody: '*'
-    peerDependenciesMeta:
-      '@ianvs/prettier-plugin-sort-imports':
-        optional: true
-      '@prettier/plugin-pug':
-        optional: true
-      '@shopify/prettier-plugin-liquid':
-        optional: true
-      '@trivago/prettier-plugin-sort-imports':
-        optional: true
-      prettier-plugin-astro:
-        optional: true
-      prettier-plugin-css-order:
-        optional: true
-      prettier-plugin-import-sort:
-        optional: true
-      prettier-plugin-jsdoc:
-        optional: true
-      prettier-plugin-marko:
-        optional: true
-      prettier-plugin-organize-attributes:
-        optional: true
-      prettier-plugin-organize-imports:
-        optional: true
-      prettier-plugin-style-order:
-        optional: true
-      prettier-plugin-svelte:
-        optional: true
-      prettier-plugin-twig-melody:
-        optional: true
-
-  prettier-plugin-tailwindcss@0.6.14:
-    resolution: {integrity: sha512-pi2e/+ZygeIqntN+vC573BcW5Cve8zUB0SSAGxqpB4f96boZF4M3phPVoOFCeypwkpRYdi7+jQ5YJJUwrkGUAg==}
-    engines: {node: '>=14.21.3'}
+  prettier-plugin-tailwindcss@0.7.1:
+    resolution: {integrity: sha512-Bzv1LZcuiR1Sk02iJTS1QzlFNp/o5l2p3xkopwOrbPmtMeh3fK9rVW5M3neBQzHq+kGKj/4LGQMTNcTH4NGPtQ==}
+    engines: {node: '>=20.19'}
     peerDependencies:
       '@ianvs/prettier-plugin-sort-imports': '*'
       '@prettier/plugin-hermes': '*'
@@ -5288,14 +5238,12 @@ packages:
       prettier: ^3.0
       prettier-plugin-astro: '*'
       prettier-plugin-css-order: '*'
-      prettier-plugin-import-sort: '*'
       prettier-plugin-jsdoc: '*'
       prettier-plugin-marko: '*'
       prettier-plugin-multiline-arrays: '*'
       prettier-plugin-organize-attributes: '*'
       prettier-plugin-organize-imports: '*'
       prettier-plugin-sort-imports: '*'
-      prettier-plugin-style-order: '*'
       prettier-plugin-svelte: '*'
     peerDependenciesMeta:
       '@ianvs/prettier-plugin-sort-imports':
@@ -5316,8 +5264,6 @@ packages:
         optional: true
       prettier-plugin-css-order:
         optional: true
-      prettier-plugin-import-sort:
-        optional: true
       prettier-plugin-jsdoc:
         optional: true
       prettier-plugin-marko:
@@ -5329,8 +5275,6 @@ packages:
       prettier-plugin-organize-imports:
         optional: true
       prettier-plugin-sort-imports:
-        optional: true
-      prettier-plugin-style-order:
         optional: true
       prettier-plugin-svelte:
         optional: true
@@ -8019,28 +7963,6 @@ snapshots:
       - eslint-import-resolver-node
       - eslint-import-resolver-webpack
       - supports-color
-
-  '@horus.dev/prettier-config@1.0.0(prettier@3.6.2)':
-    dependencies:
-      prettier-plugin-tailwindcss: 0.5.9(prettier@3.6.2)
-    transitivePeerDependencies:
-      - '@ianvs/prettier-plugin-sort-imports'
-      - '@prettier/plugin-pug'
-      - '@shopify/prettier-plugin-liquid'
-      - '@trivago/prettier-plugin-sort-imports'
-      - prettier
-      - prettier-plugin-astro
-      - prettier-plugin-css-order
-      - prettier-plugin-import-sort
-      - prettier-plugin-jsdoc
-      - prettier-plugin-marko
-      - prettier-plugin-organize-attributes
-      - prettier-plugin-organize-imports
-      - prettier-plugin-style-order
-      - prettier-plugin-svelte
-      - prettier-plugin-twig-melody
-
-  '@horus.dev/tsconfig@2.1.0': {}
 
   '@horus.dev/tw-dynamic-themes@0.0.3':
     dependencies:
@@ -12504,11 +12426,7 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier-plugin-tailwindcss@0.5.9(prettier@3.6.2):
-    dependencies:
-      prettier: 3.6.2
-
-  prettier-plugin-tailwindcss@0.6.14(prettier@3.6.2):
+  prettier-plugin-tailwindcss@0.7.1(prettier@3.6.2):
     dependencies:
       prettier: 3.6.2
 

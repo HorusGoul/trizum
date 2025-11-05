@@ -54,8 +54,8 @@
   },
   "devDependencies": {
     "@horus.dev/eslint-config": "2.0.1",
-    "@horus.dev/prettier-config": "1.0.0",
-    "@horus.dev/tsconfig": "2.1.0",
+    "@trizum/prettier-config": "workspace:*",
+    "@trizum/tsconfig": "workspace:*",
     "@lingui/cli": "4.14.1",
     "@lingui/conf": "4.14.1",
     "@lingui/format-po": "4.14.1",
@@ -75,7 +75,6 @@
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
-    "prettier-plugin-tailwindcss": "0.6.14",
     "rollup-plugin-license": "3.6.0",
     "tailwindcss": "3.4.5",
     "tailwindcss-animate": "1.0.7",
@@ -88,5 +87,5 @@
     "vitest": "3.2.4",
     "wrangler": "4.45.0"
   },
-  "prettier": "@horus.dev/prettier-config"
+  "prettier": "@trizum/prettier-config"
 }

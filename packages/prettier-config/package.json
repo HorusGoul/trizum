@@ -1,0 +1,14 @@
+{
+  "name": "@trizum/prettier-config",
+  "version": "0.0.1",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "prettier-plugin-tailwindcss": "0.7.1"
+  },
+  "peerDependencies": {
+    "prettier-plugin-tailwindcss": "0.7.1"
+  },
+  "main": "index.js"
+}
