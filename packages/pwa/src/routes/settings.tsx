@@ -58,7 +58,7 @@ function Settings() {
       username: partyList.username ?? "",
       phone: partyList.phone ?? "",
       avatarId: partyList.avatarId ?? null,
-      locale: (partyList.locale ?? getBrowserLocale()) as SupportedLocale,
+      locale: partyList.locale ?? getBrowserLocale(),
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);

@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-named-as-default
-import Dinero from "dinero.js";
+import type Dinero from "dinero.js";
 import { describe, test, expect } from "vitest";
 import {
   calculateLogStatsBetweenTwoUsers,

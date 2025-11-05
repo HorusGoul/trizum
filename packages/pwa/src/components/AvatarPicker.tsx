@@ -1,6 +1,5 @@
 import { Avatar } from "#src/ui/Avatar.js";
 import { Button } from "#src/ui/Button.js";
-import { IconButton } from "#src/ui/IconButton.js";
 import { Icon } from "#src/ui/Icon.js";
 import { Skeleton } from "#src/ui/Skeleton.js";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.js";

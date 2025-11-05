@@ -14,7 +14,6 @@ import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
-  applyExpenseDiff,
   decodeExpenseId,
   findExpenseById,
   calculateExpenseHash,

@@ -4,7 +4,7 @@ import { AppTextField } from "#src/ui/TextField.tsx";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { startTransition, Suspense, useId, useState } from "react";
+import { Suspense, useId, useState } from "react";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentId } from "@automerge/automerge-repo/slim";

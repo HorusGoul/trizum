@@ -17,13 +17,15 @@ import type {
 } from "#src/models/party.js";
 import { diff } from "@opentf/obj-diff";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import type {
+  DocHandle,
+  Repo,
+  DocumentId,
+} from "@automerge/automerge-repo/slim";
 import {
   deleteAt,
-  DocHandle,
   insertAt,
   isValidDocumentId,
-  Repo,
-  type DocumentId,
 } from "@automerge/automerge-repo/slim";
 import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
@@ -391,7 +393,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
     for (const chunkRef of chunkRefs) {
       const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-      let chunk = await chunkHandle.doc();
+      const chunk = await chunkHandle.doc();
 
       if (!chunk) {
         throw new Error("Chunk not found, this should not happen");
@@ -405,7 +407,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       const chunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
         chunkRef.balancesId,
       );
-      let chunkBalances = await chunkBalancesHandle.doc();
+      const chunkBalances = await chunkBalancesHandle.doc();
 
       if (!chunkBalances) {
         throw new Error("Chunk balances not found, this should not happen");

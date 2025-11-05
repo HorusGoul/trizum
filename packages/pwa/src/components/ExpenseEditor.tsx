@@ -1,10 +1,5 @@
 import type { ExpenseUser } from "#src/lib/expenses.js";
-import {
-  FieldApi,
-  useForm,
-  useStore,
-  type Updater,
-} from "@tanstack/react-form";
+import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
 import {
   Suspense,
@@ -44,7 +39,6 @@ import type { MediaFile } from "#src/models/media.ts";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
-import { diff } from "@opentf/obj-diff";
 
 export interface ExpenseEditorFormValues {
   name: string;

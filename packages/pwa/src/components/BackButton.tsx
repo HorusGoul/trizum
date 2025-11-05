@@ -1,12 +1,9 @@
 import { IconButton } from "#src/ui/IconButton.js";
 import {
-  Route,
   useCanGoBack,
   useRouter,
-  type RegisteredRouter,
   type ToOptions,
 } from "@tanstack/react-router";
-import type { ComponentProps } from "react";
 import { t } from "@lingui/macro";
 
 export function BackButton({

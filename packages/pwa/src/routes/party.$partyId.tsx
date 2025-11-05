@@ -7,8 +7,6 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import {
-  calculateBalancesByParticipant,
-  exportIntoInput,
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,
   simplifyBalanceTransactions,
@@ -28,12 +26,10 @@ import {
   Suspense,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
   type Key,
 } from "react";
-import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";

@@ -1,6 +1,6 @@
 import {
   isValidDocumentId,
-  Repo,
+  type Repo,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
 import type { Party, PartyParticipant } from "./party";

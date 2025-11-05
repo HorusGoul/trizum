@@ -1,9 +1,7 @@
 import {
   documentCache,
-  handleCache,
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
-import type { Expense } from "#src/models/expense.ts";
 import type { Party, PartyExpenseChunk } from "#src/models/party.js";
 import type { Doc, DocumentId } from "@automerge/automerge-repo";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
@@ -14,7 +12,6 @@ import {
   useReducer,
   useState,
 } from "react";
-import { useNoMemo } from "./useNoMemo";
 
 export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const repo = useRepo();
@@ -66,7 +63,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const [isLoadingNext, setIsLoadingNext] = useState(false);
 
   useEffect(() => {
-    let toLoadIds: DocumentId[] = [];
+    const toLoadIds: DocumentId[] = [];
     const loadedChunkIds = getLoadedChunkIds();
 
     if (loadedChunkIds.length === 0 && chunkIds.length > 0) {
