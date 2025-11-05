@@ -1,4 +1,8 @@
-// Just use defaults for now
-export default {
-  plugins: ["prettier-plugin-tailwindcss"],
+/**
+ * @type {import("prettier").Config}
+ */
+const config = {
+  plugins: [import("prettier-plugin-tailwindcss")],
 };
+
+export default config;

@@ -4,11 +4,15 @@
   "files": [
     "index.js"
   ],
+  "type": "module",
+  "exports": "./index.js",
   "dependencies": {
     "prettier-plugin-tailwindcss": "0.7.1"
   },
-  "peerDependencies": {
-    "prettier-plugin-tailwindcss": "0.7.1"
+  "devDependencies": {
+    "prettier": "3.6.2"
   },
-  "main": "index.js"
+  "peerDependencies": {
+    "prettier": "^3.6.2"
+  }
 }
