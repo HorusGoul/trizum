@@ -43,6 +43,7 @@ export default defineConfig([
       ],
       "import/no-unresolved": "off",
       "import/no-named-as-default-member": "off",
+      "import/consistent-type-specifier-style": "off",
     },
   },
 ]);
