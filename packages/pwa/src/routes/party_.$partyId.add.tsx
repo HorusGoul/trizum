@@ -51,7 +51,7 @@ function AddExpense() {
         photos: values.photos,
       });
 
-      navigate({
+      void navigate({
         to: "/party/$partyId/expense/$expenseId",
         replace: true,
         params: {
@@ -81,7 +81,7 @@ function AddExpense() {
   return (
     <ExpenseEditor
       title={t`New expense`}
-      onSubmit={onCreateExpense}
+      onSubmit={(values) => void onCreateExpense(values)}
       defaultValues={{
         name: "",
         amount: 0,

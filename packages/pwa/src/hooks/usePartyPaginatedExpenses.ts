@@ -94,7 +94,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     async function loadChunks() {
       await Promise.all(
         toLoadIds.map((chunkId) => {
-          return documentCache.readAsync(repo, chunkId);
+          return Promise.resolve(documentCache.readAsync(repo, chunkId));
         }),
       );
 
@@ -110,7 +110,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     return () => {
       unmounted = true;
     };
-  }, [chunkIds, key]);
+  }, [chunkIds, key, getLoadedChunkIds, repo]);
 
   // Subscribe to loaded chunk changes
   useEffect(() => {
@@ -144,7 +144,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
   function loadNext() {
     setIsLoadingNext(true);
-    load().finally(() => {
+    void load().finally(() => {
       setIsLoadingNext(false);
     });
 

@@ -188,43 +188,39 @@ function GalleryButton({
 const itemCacheBySrc = new Map<string, MediaGalleryItem>();
 const itemPromiseCacheBySrc = new Map<string, Promise<MediaGalleryItem>>();
 
-// Make use of Suspense throw promise to load the item
-
-function loadMediaGalleryItem(originalItem: MediaGalleryItem) {
-  const { src } = originalItem;
-
-  const cachedItem = itemCacheBySrc.get(src);
-
-  if (cachedItem) {
-    return cachedItem;
-  }
-
-  if (itemPromiseCacheBySrc.has(src)) {
-    return use(itemPromiseCacheBySrc.get(src) as Promise<MediaGalleryItem>);
-  }
-
-  const promise = new Promise<MediaGalleryItem>((resolve, reject) => {
-    const image = new Image();
-    image.src = src;
-    image.onload = () => {
-      const completeItem = {
-        ...originalItem,
-        width: image.width,
-        height: image.height,
-      };
-
-      itemCacheBySrc.set(src, completeItem);
-      resolve(completeItem);
-    };
-    image.onerror = () => {
-      reject(new Error(`Failed to load image ${src}`));
-    };
-  });
-
-  itemPromiseCacheBySrc.set(src, promise);
-  return use(promise);
-}
-
 function useAsyncMediaGalleryItems(items: MediaGalleryItem[]) {
-  return items.map(loadMediaGalleryItem);
+  return items.map((originalItem: MediaGalleryItem) => {
+    const { src } = originalItem;
+
+    const cachedItem = itemCacheBySrc.get(src);
+
+    if (cachedItem) {
+      return cachedItem;
+    }
+
+    if (itemPromiseCacheBySrc.has(src)) {
+      return use(itemPromiseCacheBySrc.get(src) as Promise<MediaGalleryItem>);
+    }
+
+    const promise = new Promise<MediaGalleryItem>((resolve, reject) => {
+      const image = new Image();
+      image.src = src;
+      image.onload = () => {
+        const completeItem = {
+          ...originalItem,
+          width: image.width,
+          height: image.height,
+        };
+
+        itemCacheBySrc.set(src, completeItem);
+        resolve(completeItem);
+      };
+      image.onerror = () => {
+        reject(new Error(`Failed to load image ${src}`));
+      };
+    });
+
+    itemPromiseCacheBySrc.set(src, promise);
+    return use(promise);
+  });
 }

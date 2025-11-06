@@ -48,7 +48,7 @@ function Join() {
       );
       return;
     }
-    navigate({
+    void navigate({
       to: "/party/$partyId",
       replace: true,
       params: {
@@ -104,7 +104,7 @@ function Join() {
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >

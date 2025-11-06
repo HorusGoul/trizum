@@ -22,7 +22,7 @@ export function BackButton({
         if (canGoBack) {
           history.go(-1);
         } else {
-          navigate({
+          void navigate({
             ...fallbackOptions,
             replace: true,
           });

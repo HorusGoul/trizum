@@ -85,7 +85,7 @@ function ExpenseById() {
                   <Trans>Edit</Trans>
                 </span>
               </MenuItem>
-              <MenuItem onAction={onDeleteExpense}>
+              <MenuItem onAction={() => void onDeleteExpense()}>
                 <IconWithFallback
                   name="#lucide/trash"
                   size={20}

@@ -205,13 +205,16 @@ export function ExpenseEditor({
             key as keyof ExpenseEditorFormValues,
             values[key as keyof ExpenseEditorFormValues],
           );
-          form.validateField(key as keyof ExpenseEditorFormValues, "server");
+          void form.validateField(
+            key as keyof ExpenseEditorFormValues,
+            "server",
+          );
         }
 
         isReceivingUpdatesRef.current = false;
       },
     }),
-    [form.setFieldValue],
+    [form],
   );
 
   useEffect(() => {
@@ -226,7 +229,7 @@ export function ExpenseEditor({
 
       onChange(prevVal.values, currentVal.values);
     });
-  }, [form.store.subscribe, onChange]);
+  }, [form.store, onChange]);
 
   return (
     <div className="flex min-h-full flex-col">
@@ -257,7 +260,7 @@ export function ExpenseEditor({
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col px-4"
       >
@@ -292,6 +295,7 @@ export function ExpenseEditor({
                   field.state.meta.isTouched &&
                   field.state.meta.errors?.length > 0
                 }
+                // eslint-disable-next-line jsx-a11y/no-autofocus -- We want to auto focus the title field when creating a new expense
                 autoFocus={autoFocus}
                 className="col-span-2"
                 data-presence-element-id="title"
@@ -642,7 +646,6 @@ interface ParticipantSplitAmountFieldProps {
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   participantId: ExpenseUser;
   onChange: (value: number) => void;
-  isReadOnly?: boolean;
   "aria-label"?: string;
 }
 
@@ -651,7 +654,6 @@ function ParticipantSplitAmountField({
   shares,
   participantId,
   onChange,
-  isReadOnly = false,
   "aria-label": ariaLabel,
 }: ParticipantSplitAmountFieldProps) {
   const amountsByParticipantId = calculateParticipantUnitAmounts(
@@ -786,11 +788,6 @@ function PhotosField({ value, onChange }: PhotosFieldProps) {
   );
 }
 
-interface LocalPhoto {
-  blob: Blob;
-  url: string;
-}
-
 interface AddPhotoButtonProps {
   onPhoto: (photos: MediaFile["id"][]) => void;
 }
@@ -863,7 +860,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         accept="image/*"
         capture="environment"
         multiple={false}
-        onChange={onFileChange}
+        onChange={(event) => void onFileChange(event)}
         ref={cameraInputRef}
         hidden={true}
       />
@@ -873,7 +870,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         className="sr-only"
         accept="image/*"
         multiple={true}
-        onChange={onFileChange}
+        onChange={(event) => void onFileChange(event)}
         ref={galleryInputRef}
         hidden={true}
       />

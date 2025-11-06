@@ -87,7 +87,7 @@ export function RealtimeExpenseEditorPresence({
       window.removeEventListener("blur", onWindowBlur);
       clearInterval(interval);
     };
-  }, []);
+  }, [onPresenceUpdate]);
 
   return (
     <div className="pointer-events-none absolute inset-0 touch-none">
@@ -98,6 +98,7 @@ export function RealtimeExpenseEditorPresence({
             return false;
           }
 
+          // eslint-disable-next-line react-hooks/purity -- TODO: Fix this and we probably want it to be a hook that updates from time to time
           if (presence.dateTime < new Date(Date.now() - 10000)) {
             // Don't show the bubble for participants who have not been active in the last 10 seconds
             return false;
@@ -136,6 +137,7 @@ function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
     const offsetTop = Number(element.dataset?.presenceOffsetTop ?? 0);
     const offsetLeft = Number(element.dataset?.presenceOffsetLeft ?? 0);
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- This is fine for now
     setPosition({
       top: element.offsetTop + offsetTop,
       left: element.offsetLeft + width + offsetLeft,

@@ -89,6 +89,7 @@ export const QRCode = ({
       ...options,
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- TODO: We probably need to update how this QRCode component works
     setQrCode(qrCode);
     qrCode.append(ref.current);
   }, [options, size, value]);

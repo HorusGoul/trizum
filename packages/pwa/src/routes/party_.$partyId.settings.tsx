@@ -37,7 +37,7 @@ function PartySettings() {
   const params = Route.useParams();
   const { party, updateSettings } = useParty(params.partyId);
 
-  async function onSaveSettings(values: PartySettingsFormValues) {
+  function onSaveSettings(values: PartySettingsFormValues) {
     const participants = values.participants
       .map((participant): PartyParticipant => {
         if ("__isNew" in participant) {
@@ -85,7 +85,7 @@ function PartySettings() {
   });
 
   function addNewParticipant() {
-    addParticipantForm.validateField("newParticipantName", "submit");
+    void addParticipantForm.validateField("newParticipantName", "submit");
 
     const meta = addParticipantForm.getFieldMeta("newParticipantName");
     const errorCount = meta?.errors?.length ?? 0;
@@ -144,7 +144,7 @@ function PartySettings() {
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >

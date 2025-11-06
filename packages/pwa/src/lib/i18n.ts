@@ -75,5 +75,3 @@ export function initializeI18n(locale?: SupportedLocale): typeof i18n {
 export function setLocale(locale: SupportedLocale): void {
   i18n.activate(locale);
 }
-
-(window as any).setLocale = setLocale;

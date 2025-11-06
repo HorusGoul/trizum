@@ -31,11 +31,11 @@ function Root() {
     <RouterProvider
       navigate={(to, options) => {
         if (typeof to === "string") {
-          router.navigate({ to, ...options });
+          void router.navigate({ to, ...options });
           return;
         }
 
-        router.navigate({
+        void router.navigate({
           ...to,
           ...options,
         });

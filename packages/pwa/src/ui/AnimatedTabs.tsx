@@ -62,6 +62,9 @@ export function AnimatedTabs({
     }
   }, [tabElements]);
 
+  const initialSelectedTab = useRef(selectedTab);
+  const initialTabs = useRef(tabs);
+
   // Initialize scroll position to match selectedTab on mount
   useLayoutEffect(() => {
     const tabPanel = tabPanelsRef.current;
@@ -70,10 +73,13 @@ export function AnimatedTabs({
       return;
     }
 
-    const index = tabs.findIndex((tab) => tab.id === selectedTab);
+    const index = initialTabs.current.findIndex(
+      (tab) => tab.id === initialSelectedTab.current,
+    );
 
     if (index >= 0) {
-      tabPanel.scrollLeft = tabPanel.scrollWidth * (index / tabs.length);
+      tabPanel.scrollLeft =
+        tabPanel.scrollWidth * (index / initialTabs.current.length);
     }
   }, []);
 
@@ -141,6 +147,7 @@ export function AnimatedTabs({
       return;
     }
 
+    // eslint-disable-next-line react-hooks/immutability -- What we're doing here is safe
     animationRef.current = animate(
       tabPanel.scrollLeft,
       tabPanel.scrollWidth * (index / tabs.length),

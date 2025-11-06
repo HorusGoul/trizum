@@ -55,7 +55,7 @@ export const documentCache = withLiveSubscription<
     }),
 });
 
-function withLiveSubscription<Params extends any[], Value>({
+function withLiveSubscription<Params extends unknown[], Value>({
   getCache,
   getKey,
 }: {
@@ -113,7 +113,7 @@ export const multipleDocumentCache = withLiveSubscription<
       async load(params) {
         const [repo, ids] = params;
         const docs = await Promise.all(
-          ids.map((id) => documentCache.readAsync(repo, id)),
+          ids.map((id) => Promise.resolve(documentCache.readAsync(repo, id))),
         );
 
         function onChange() {
@@ -180,7 +180,7 @@ export function useSuspenseDocument<
   );
 
   if (options?.required && !doc) {
-    throw new Error(`Document not found: ${id}`);
+    throw new Error(`Document not found: ${String(id)}`);
   }
 
   return [doc as Doc<T> | undefined, handle] as const;

@@ -29,6 +29,7 @@ export default defineConfig([
       "prettier/prettier": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/only-throw-error": "off",
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "unused-imports/no-unused-imports": "error",

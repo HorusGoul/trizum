@@ -12,7 +12,7 @@
     "cleanup": "rm -rf dist",
     "dev": "vite",
     "lingui:extract": "lingui extract src",
-    "lint": "eslint --ext .ts,.tsx src",
+    "lint": "eslint --cache --ext .ts,.tsx src",
     "lint:fix": "pnpm run lint --fix",
     "preview": "vite preview",
     "test": "vitest",

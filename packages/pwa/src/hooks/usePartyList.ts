@@ -113,7 +113,6 @@ export function usePartyList() {
 
   return {
     partyList,
-    changePartyList: partyListHandle.change,
     addPartyToList,
     removeParty,
     updateSettings,

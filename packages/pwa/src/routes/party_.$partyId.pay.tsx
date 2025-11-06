@@ -68,8 +68,8 @@ function RouteComponent() {
       error: t`Failed to mark expense as paid`,
     });
 
-    expensePromise.then((expense) => {
-      navigate({
+    void expensePromise.then((expense) => {
+      return navigate({
         to: "/party/$partyId/expense/$expenseId",
         params: {
           partyId: party.id,
@@ -123,8 +123,8 @@ function RouteComponent() {
 
         <p className="text-lg">
           <Trans>
-            Here's a list of ways you can pay, once done, press the button above
-            to mark the expense as paid in this trizum party.
+            Here&apos;s a list of ways you can pay, once done, press the button
+            above to mark the expense as paid in this trizum party.
           </Trans>
         </p>
 
@@ -161,18 +161,18 @@ function BizumItem({ phoneNumber }: { phoneNumber: string }) {
       <Button
         color="input-like"
         className="rounded-lg font-semibold"
-        onPress={async () => {
-          try {
-            // Attempt copy to clipboard
-            await navigator.clipboard.writeText(phoneNumber);
-
-            toast.success(t`Phone number copied to clipboard!`);
-          } catch {
-            prompt(
-              t`Failed to copy phone number to clipboard, please copy it manually`,
-              phoneNumber,
-            );
-          }
+        onPress={() => {
+          navigator.clipboard
+            .writeText(phoneNumber)
+            .then(() => {
+              toast.success(t`Phone number copied to clipboard!`);
+            })
+            .catch(() => {
+              prompt(
+                t`Failed to copy phone number to clipboard, please copy it manually`,
+                phoneNumber,
+              );
+            });
         }}
       >
         <Icon name="#lucide/copy" size={20} />
