@@ -1,11 +1,11 @@
-# {{ dashCase name }}
+# TypeScript Template
 
-This is a package generated using the `dom-library` template of the horus.dev monorepo.
+This is a package generated using the `ts-template` template of the trizum monorepo.
 
 It's the best starting point for a new package, as it provides the following out of the box:
 
-- `@horus.dev/eslint-config`
-- `@horus.dev/tsconfig`
+- `@trizum/eslint-config`
+- `@trizum/tsconfig`
 - Common npm scripts for developing, building, testing, and linting.
 
 ## Usage
@@ -13,7 +13,7 @@ It's the best starting point for a new package, as it provides the following out
 To use this package from another package or app in the monorepo, you can install it using the following command:
 
 ```bash
-pnpm add {{ dashCase name }}@workspace:*
+pnpm add ts-template
 ```
 
 ## Development
@@ -22,7 +22,7 @@ If you want to work on this package, you can clone the monorepo and run the foll
 
 ```bash
 pnpm install
-cd packages/{{ dashCase name }}
+cd packages/ts-template
 pnpm dev
 ```
 
