@@ -4,8 +4,7 @@ import importPlugin from "eslint-plugin-import";
 import unusedImports from "eslint-plugin-unused-imports";
 import js from "@eslint/js";
 import prettierConfig from "eslint-config-prettier/flat";
-import tseslint from 'typescript-eslint';
-
+import tseslint from "typescript-eslint";
 
 export default defineConfig([
   js.configs.recommended,
@@ -14,8 +13,8 @@ export default defineConfig([
     languageOptions: {
       parserOptions: {
         projectService: true,
-      }
-    }
+      },
+    },
   },
   importPlugin.flatConfigs.recommended,
   importPlugin.flatConfigs.typescript,
