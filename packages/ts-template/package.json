@@ -1,0 +1,43 @@
+{
+  "name": "@trizum/ts-template",
+  "description": "",
+  "keywords": [],
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "pnpm run lint --fix"
+  },
+  "devDependencies": {
+    "@trizum/eslint-config": "workspace:*",
+    "@trizum/prettier-config": "workspace:*",
+    "@trizum/tsconfig": "workspace:*",
+    "eslint": "9.39.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.2"
+  },
+  "prettier": "@trizum/prettier-config"
+}

@@ -9,7 +9,6 @@
     "preserveWatchOutput": true,
     "isolatedModules": true,
     "module": "ESNext",
-    "resolveJsonModule": true,
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": true,
