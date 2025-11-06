@@ -62,7 +62,7 @@ const router = createRouter({
   defaultStaleTime: Infinity,
 });
 
-preloadAllIcons();
+void preloadAllIcons();
 
 // Render the app
 const rootElement = document.getElementById("root")!;

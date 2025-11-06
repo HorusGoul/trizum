@@ -1,8 +1,4 @@
-import type {
-  VirtualItem,
-  Virtualizer,
-  VirtualizerOptions,
-} from "@tanstack/react-virtual";
+import type { VirtualItem, Virtualizer } from "@tanstack/react-virtual";
 import { useMemo } from "react";
 
 interface ScrollRestorationCache {
@@ -10,7 +6,7 @@ interface ScrollRestorationCache {
   initialMeasurementsCache: VirtualItem[];
 }
 
-let cache = new Map<string, ScrollRestorationCache>();
+const cache = new Map<string, ScrollRestorationCache>();
 
 function getOrCreateCache(key: string) {
   let instance = cache.get(key);

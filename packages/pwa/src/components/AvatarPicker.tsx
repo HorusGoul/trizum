@@ -1,6 +1,5 @@
 import { Avatar } from "#src/ui/Avatar.js";
 import { Button } from "#src/ui/Button.js";
-import { IconButton } from "#src/ui/IconButton.js";
 import { Icon } from "#src/ui/Icon.js";
 import { Skeleton } from "#src/ui/Skeleton.js";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
@@ -142,7 +141,7 @@ export function AvatarPicker({
         accept="image/*"
         capture="environment"
         multiple={false}
-        onChange={onFileChange}
+        onChange={(event) => void onFileChange(event)}
         ref={cameraInputRef}
         hidden={true}
       />
@@ -152,7 +151,7 @@ export function AvatarPicker({
         className="sr-only"
         accept="image/*"
         multiple={false}
-        onChange={onFileChange}
+        onChange={(event) => void onFileChange(event)}
         ref={galleryInputRef}
         hidden={true}
       />

@@ -5,7 +5,7 @@ import {
   isValidDocumentId,
   type AnyDocumentId,
 } from "@automerge/automerge-repo";
-import { useLocation, useMatch, useParams } from "@tanstack/react-router";
+import { useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { t } from "@lingui/macro";
 

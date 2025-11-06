@@ -13,7 +13,6 @@ import {
   type ExpenseEditorFormValues,
 } from "#src/components/ExpenseEditor.js";
 
-import { getLocalTimeZone, now } from "@internationalized/date";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 
 export const Route = createFileRoute("/party_/$partyId/add")({
@@ -52,7 +51,7 @@ function AddExpense() {
         photos: values.photos,
       });
 
-      navigate({
+      void navigate({
         to: "/party/$partyId/expense/$expenseId",
         replace: true,
         params: {
@@ -82,7 +81,7 @@ function AddExpense() {
   return (
     <ExpenseEditor
       title={t`New expense`}
-      onSubmit={onCreateExpense}
+      onSubmit={(values) => void onCreateExpense(values)}
       defaultValues={{
         name: "",
         amount: 0,

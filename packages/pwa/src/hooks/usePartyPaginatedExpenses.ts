@@ -1,9 +1,7 @@
 import {
   documentCache,
-  handleCache,
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
-import type { Expense } from "#src/models/expense.ts";
 import type { Party, PartyExpenseChunk } from "#src/models/party.js";
 import type { Doc, DocumentId } from "@automerge/automerge-repo";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
@@ -14,7 +12,6 @@ import {
   useReducer,
   useState,
 } from "react";
-import { useNoMemo } from "./useNoMemo";
 
 export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const repo = useRepo();
@@ -66,7 +63,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const [isLoadingNext, setIsLoadingNext] = useState(false);
 
   useEffect(() => {
-    let toLoadIds: DocumentId[] = [];
+    const toLoadIds: DocumentId[] = [];
     const loadedChunkIds = getLoadedChunkIds();
 
     if (loadedChunkIds.length === 0 && chunkIds.length > 0) {
@@ -97,7 +94,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     async function loadChunks() {
       await Promise.all(
         toLoadIds.map((chunkId) => {
-          return documentCache.readAsync(repo, chunkId);
+          return Promise.resolve(documentCache.readAsync(repo, chunkId));
         }),
       );
 
@@ -113,7 +110,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     return () => {
       unmounted = true;
     };
-  }, [chunkIds, key]);
+  }, [chunkIds, key, getLoadedChunkIds, repo]);
 
   // Subscribe to loaded chunk changes
   useEffect(() => {
@@ -147,7 +144,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
   function loadNext() {
     setIsLoadingNext(true);
-    load().finally(() => {
+    void load().finally(() => {
       setIsLoadingNext(false);
     });
 

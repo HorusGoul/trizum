@@ -16,7 +16,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
     immediate: true,
     onRegisteredSW: (_url, registration) => {
       registrationRef.current = registration ?? null;
-      registration?.update();
+      void registration?.update();
     },
     onNeedRefresh() {
       if (!didCheckForUpdateRef.current) {
@@ -37,7 +37,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
     toast.loading(t`Updating trizum...`, {
       id: UPDATE_TOAST_ID,
     });
-    updateServiceWorker(true);
+    void updateServiceWorker(true);
   }
 
   return (
@@ -47,7 +47,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
         update,
         checkForUpdate: () => {
           didCheckForUpdateRef.current = true;
-          registrationRef.current?.update();
+          void registrationRef.current?.update();
         },
       }}
     >

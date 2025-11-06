@@ -20,7 +20,7 @@ function getOrCreateIcon(prefixedName: IconProps["name"]) {
       dynamicIconImports[name] ??
       (() => Promise.resolve({ default: FallbackIcon }));
     const promise = fn();
-    promise.then((mod) => {
+    void promise.then((mod) => {
       iconCache.set(name, mod.default);
     });
     LucideIcon = lazy(() => promise);
@@ -53,6 +53,7 @@ export const IconWithFallback = ({ name, ...props }: IconProps) => {
 
   return (
     <Suspense fallback={<FallbackIcon name={name} {...props} />}>
+      {/* eslint-disable-next-line react-hooks/static-components -- getOrCreateIcon returns cached components */}
       <LucideIcon {...props} />
     </Suspense>
   );

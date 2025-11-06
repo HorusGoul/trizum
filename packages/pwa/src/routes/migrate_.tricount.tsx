@@ -4,7 +4,7 @@ import { AppTextField } from "#src/ui/TextField.tsx";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { startTransition, Suspense, useId, useState } from "react";
+import { Suspense, useId, useState } from "react";
 import { useRepo } from "@automerge/automerge-repo-react-hooks";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
@@ -25,7 +25,7 @@ function RouteComponent() {
 
   switch (state.type) {
     case "idle":
-      return <IdleState onSubmit={migrate} />;
+      return <IdleState onSubmit={(values) => void migrate(values)} />;
     case "in-progress":
       return <InProgressState {...state} />;
     case "success":
@@ -153,9 +153,8 @@ function useMigrateTricount() {
 
       function waitIdleCallback(fn: () => Promise<void>) {
         return new Promise<void>((resolve) => {
-          requestIdleCallback(async () => {
-            await fn();
-            resolve();
+          requestIdleCallback(() => {
+            void fn().then(() => resolve());
           });
         });
       }
@@ -261,7 +260,7 @@ function IdleState({
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
@@ -318,12 +317,14 @@ function InProgressState({
           <Trans>Migration in progress</Trans>
         </h1>
         <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">
-          <Trans>{name}</Trans>
+          {name}
         </p>
 
         <Progress value={progress} />
         <p className="mt-4 text-xs">
-          <Trans>Please don't close the app while we migrate your data</Trans>
+          <Trans>
+            Please don&apos;t close the app while we migrate your data
+          </Trans>
         </p>
       </div>
     </div>
@@ -354,7 +355,7 @@ function SuccessState({ partyId }: { partyId: string }) {
         <Button
           color="input-like"
           onClick={() => {
-            navigate({ to: `/party/${partyId}`, replace: true });
+            void navigate({ to: `/party/${partyId}`, replace: true });
           }}
           className="font-bold"
         >
@@ -374,12 +375,12 @@ function ErrorState({ message }: { message: string }) {
           <Trans>Something went wrong</Trans>
         </h1>
         <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">
-          <Trans>{message}</Trans>
+          {message}
         </p>
         <Button
           color="input-like"
           onClick={() => {
-            navigate({ to: `/`, replace: true });
+            void navigate({ to: `/`, replace: true });
           }}
           className="font-bold"
         >

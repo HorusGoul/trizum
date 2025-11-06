@@ -41,7 +41,7 @@ function Settings() {
     { id: "es", name: t`Español` },
   ];
 
-  async function onSaveSettings(values: SettingsFormValues) {
+  function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
       username: values.username,
       phone: values.phone,
@@ -50,7 +50,7 @@ function Settings() {
     });
     form.reset();
     toast.success(t`Settings saved`);
-    navigate({ to: "..", replace: true });
+    void navigate({ to: "..", replace: true });
   }
 
   const form = useForm({
@@ -58,7 +58,7 @@ function Settings() {
       username: partyList.username ?? "",
       phone: partyList.phone ?? "",
       avatarId: partyList.avatarId ?? null,
-      locale: (partyList.locale ?? getBrowserLocale()) as SupportedLocale,
+      locale: partyList.locale ?? getBrowserLocale(),
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -105,7 +105,7 @@ function Settings() {
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >

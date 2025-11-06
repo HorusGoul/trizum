@@ -66,7 +66,7 @@ function New() {
       chunkRefs: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
-    navigate({
+    void navigate({
       to: "/party/$partyId",
       params: { partyId: handle.documentId },
       search: {
@@ -104,7 +104,7 @@ function New() {
   });
 
   function addNewParticipant() {
-    addParticipantForm.validateField("newParticipantName", "submit");
+    void addParticipantForm.validateField("newParticipantName", "submit");
 
     const meta = addParticipantForm.getFieldMeta("newParticipantName");
     const errorCount = meta?.errors?.length ?? 0;
@@ -157,7 +157,7 @@ function New() {
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
-          form.handleSubmit();
+          void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >

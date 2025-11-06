@@ -18,7 +18,6 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   component: Index,

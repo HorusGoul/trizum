@@ -14,7 +14,6 @@ import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
-  applyExpenseDiff,
   decodeExpenseId,
   findExpenseById,
   calculateExpenseHash,
@@ -28,7 +27,7 @@ import { t } from "@lingui/macro";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute(
@@ -51,7 +50,6 @@ function RouteComponent() {
     expenseId,
     partyId,
     expense,
-    isLoading,
     onUpdateExpense,
     onChangeExpense,
     subscribeToExpenseChanges,
@@ -59,50 +57,45 @@ function RouteComponent() {
   } = useExpense();
   const navigate = useNavigate();
 
-  if (expenseId === undefined) {
-    return <span>Invalid Expense ID</span>;
-  }
-
-  if (isLoading) {
-    return null;
-  }
-
   if (!expense) {
-    return "404 bruv";
+    throw new Error("Expense not found");
   }
 
   const editorRef = useRef<ExpenseEditorRef>(null);
   const currentHashRef = useRef<string>(getExpenseHash(expense));
 
-  function onChange(
-    previousValues: ExpenseEditorFormValues,
-    currentValues: ExpenseEditorFormValues,
-  ) {
-    function createExpense(values: ExpenseEditorFormValues) {
-      return {
-        id: expenseId,
-        name: values.name,
-        paidAt: values.paidAt,
-        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-        shares: values.shares,
-        photos: values.photos,
-      };
-    }
+  const onChange = useCallback(
+    (
+      previousValues: ExpenseEditorFormValues,
+      currentValues: ExpenseEditorFormValues,
+    ) => {
+      function createExpense(values: ExpenseEditorFormValues) {
+        return {
+          id: expenseId,
+          name: values.name,
+          paidAt: values.paidAt,
+          paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+          shares: values.shares,
+          photos: values.photos,
+        };
+      }
 
-    const expense = createExpense(currentValues);
-    const hash = calculateExpenseHash(expense);
+      const expense = createExpense(currentValues);
+      const hash = calculateExpenseHash(expense);
 
-    if (hash === currentHashRef.current) {
-      return;
-    }
+      if (hash === currentHashRef.current) {
+        return;
+      }
 
-    currentHashRef.current = hash;
+      currentHashRef.current = hash;
 
-    const patches = diff(createExpense(previousValues), expense);
-    onChangeExpense(patches);
-  }
+      const patches = diff(createExpense(previousValues), expense);
+      onChangeExpense(patches);
+    },
+    [onChangeExpense, expenseId],
+  );
 
-  async function onSubmit(values: ExpenseEditorFormValues) {
+  function onSubmit(values: ExpenseEditorFormValues) {
     try {
       // Create shares based on the form values
       const shares: Expense["shares"] = {};
@@ -130,7 +123,7 @@ function RouteComponent() {
         __hash: calculateExpenseHash(expense),
       });
 
-      navigate({
+      void navigate({
         to: "/party/$partyId/expense/$expenseId",
         replace: true,
         params: {
@@ -166,9 +159,10 @@ function RouteComponent() {
 
       editorRef.current?.setValues(getFormValues(raw));
     });
-  }, [onChange]);
+  }, [onChange, subscribeToExpenseChanges]);
 
   const formValues = getFormValues(expense);
+  const expenseName = formValues.name;
 
   return (
     <>
@@ -177,11 +171,12 @@ function RouteComponent() {
         onPresenceUpdate={onPresenceUpdate}
       />
       <ExpenseEditor
-        title={t`Editing ${formValues.name}`}
+        title={t`Editing ${expenseName}`}
         onSubmit={onSubmit}
         defaultValues={formValues}
         onChange={onChange}
         ref={editorRef}
+        // eslint-disable-next-line jsx-a11y/no-autofocus -- We don't want to auto focus the edit form
         autoFocus={false}
         goBackFallbackOptions={{ to: "/party/$partyId/expense/$expenseId" }}
       />
@@ -204,7 +199,7 @@ function useExpense() {
   const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
 
   function onUpdateExpense(expense: Expense) {
-    updateExpense(expense);
+    void updateExpense(expense);
   }
 
   function onChangeExpense(patches: DiffResult[]) {

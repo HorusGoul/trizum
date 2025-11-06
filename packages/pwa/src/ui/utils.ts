@@ -9,7 +9,7 @@ export function cn(...className: ClassName[]) {
 
 const isBoolean = (maybeBoolean: unknown): maybeBoolean is boolean =>
   typeof maybeBoolean === "boolean";
-const toStringIfBoolean = (value: unknown): string | unknown =>
+const toStringIfBoolean = (value: unknown) =>
   isBoolean(value) ? String(value) : value;
 const isSimpleSubset = (
   a: Record<string, unknown>,
@@ -42,8 +42,7 @@ type Schema<SchemaVariants extends Variants> = {
 };
 
 export type VariantsFromProps<
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  Props extends {},
+  Props extends Record<string, unknown>,
   RequiredProps = Required<Props>,
 > = {
   [Key in keyof RequiredProps]: RequiredProps[Key] extends
@@ -96,12 +95,12 @@ export const cva =
     return cn([
       base,
       Object.keys(variants).map((variantName) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error - idc about the types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return variants[variantName][
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           toStringIfBoolean(options[variantName]) ||
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+            // @ts-expect-error - idc about the types
             defaultVariants[variantName]
         ];
       }),

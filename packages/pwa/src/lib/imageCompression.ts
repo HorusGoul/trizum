@@ -33,6 +33,13 @@ const DEFAULT_OPTIONS: Required<ImageCompressionOptions> = {
   maxSizeBeforeCompress: 5,
 };
 
+type ParseResult =
+  | {
+      Orientation?: number;
+    }
+  | null
+  | undefined;
+
 /**
  * Corrects image orientation based on EXIF data and removes EXIF metadata
  */
@@ -53,8 +60,8 @@ async function correctOrientation(
         // Read EXIF data to get orientation (with error handling for unsupported formats)
         let orientation = 1;
         try {
-          const exif = await parse(file);
-          orientation = exif?.Orientation || 1;
+          const exif = (await parse(file)) as ParseResult;
+          orientation = exif?.Orientation ?? 1;
         } catch (exifError) {
           // If EXIF parsing fails (e.g., for some WebP files), assume no rotation needed
           console.warn(
@@ -125,7 +132,11 @@ async function correctOrientation(
 
         resolve({ canvas, mimeType });
       } catch (error) {
-        reject(error);
+        if (error instanceof Error) {
+          reject(error);
+        } else {
+          reject(new Error("Unknown error while correcting orientation"));
+        }
       }
     };
 
@@ -277,7 +288,7 @@ export async function processImage(
     // Read orientation for metadata (with error handling)
     let orientation: number | undefined;
     try {
-      const exif = await parse(file);
+      const exif = (await parse(file)) as ParseResult;
       orientation = exif?.Orientation;
     } catch (exifError) {
       // If EXIF parsing fails, orientation will be undefined

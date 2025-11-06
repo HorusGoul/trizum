@@ -1,5 +1,5 @@
 {
-  "extends": "@horus.dev/tsconfig/vite",
+  "extends": "@trizum/tsconfig/vite",
   "compilerOptions": {
     "baseUrl": "./",
     "types": ["vite-plugin-pwa/react"]

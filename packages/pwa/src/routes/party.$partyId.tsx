@@ -7,8 +7,6 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import { t, Trans } from "@lingui/macro";
 import {
-  calculateBalancesByParticipant,
-  exportIntoInput,
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,
   simplifyBalanceTransactions,
@@ -28,12 +26,10 @@ import {
   Suspense,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
   type Key,
 } from "react";
-import { calculateLogStatsOfUser } from "#src/lib/expenses.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -89,7 +85,7 @@ function PartyById() {
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
 
   function onSelectedTabChange(tab: Key) {
-    navigate({
+    void navigate({
       to: "/party/$partyId",
       params: { partyId },
       search: { tab: tab as "expenses" | "balances" },
@@ -225,7 +221,7 @@ function PartyById() {
                 </span>
               </MenuItem>
 
-              <MenuItem onAction={onLeaveParty}>
+              <MenuItem onAction={() => void onLeaveParty()}>
                 <IconWithFallback
                   name="#lucide/log-out"
                   size={20}
@@ -328,7 +324,7 @@ function ExpenseLog({
             <Popover placement="top end" offset={16}>
               <Menu className="min-w-60">
                 {import.meta.env.DEV ? (
-                  <MenuItem onAction={() => dev.createTestExpenses()}>
+                  <MenuItem onAction={() => void dev.createTestExpenses()}>
                     <IconWithFallback
                       name="#lucide/test-tube-diagonal"
                       size={20}
@@ -805,7 +801,7 @@ function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
           color="input-like"
           className="h-8 rounded-lg px-4"
           onPress={() =>
-            navigate({
+            void navigate({
               to: "/party/$partyId/pay",
               params: {
                 partyId: party.id,

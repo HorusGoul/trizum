@@ -74,7 +74,7 @@ function RouteComponent() {
         <Button
           color="accent"
           className="mt-8 w-full max-w-56 rounded-lg font-medium"
-          onPress={onShareParty}
+          onPress={() => void onShareParty()}
         >
           {typeof navigator.share === "function" ? (
             <>

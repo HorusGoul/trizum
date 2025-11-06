@@ -5,7 +5,7 @@ import {
   getExpenseUnitShares,
   type Expense,
 } from "#src/models/expense.js";
-import { deleteAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
@@ -85,7 +85,7 @@ function ExpenseById() {
                   <Trans>Edit</Trans>
                 </span>
               </MenuItem>
-              <MenuItem onAction={onDeleteExpense}>
+              <MenuItem onAction={() => void onDeleteExpense()}>
                 <IconWithFallback
                   name="#lucide/trash"
                   size={20}
