@@ -34,33 +34,8 @@ jobs:
       - name: ${{ matrix.turbo }}
         run: pnpm turbo run ${{ matrix.turbo }}
 
-  extract-messages:
-    name: Extract Locales
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Extract Messages
-        run: pnpm lingui:extract
-
-      - uses: EndBug/add-and-commit@v9
-        with:
-          commit: --signoff
-          add: "--all"
-          message: "i18n: update locales"
-          committer_name: GitHub Actions
-          committer_email: actions@github.com
-
   autofix:
-    name: Lint & Format autofix
+    name: Autofix & Extract Messages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +49,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Autofix
+        id: autofix
         run: pnpm lint:fix
+        continue-on-error: true
+
+      - name: Extract Messages
+        id: extract-messages
+        run: pnpm lingui:extract
+        continue-on-error: true
 
       - uses: EndBug/add-and-commit@v9
         with:
@@ -83,3 +65,7 @@ jobs:
           message: "style: apply automatic fixes"
           committer_name: GitHub Actions
           committer_email: actions@github.com
+
+      - name: Check if autofix and extract messages were successful
+        if: ${{ steps.autofix.result != '0' || steps.extract-messages.result != '0' }}
+        run: echo "::error::Autofix or extract messages failed" && exit 1
