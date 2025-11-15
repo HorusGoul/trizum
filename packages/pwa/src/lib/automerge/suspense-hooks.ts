@@ -31,10 +31,10 @@ export const documentCache = withLiveSubscription<
       async load(params) {
         const [repo, id] = params;
         const handle = await handleCache.readAsync(repo, id);
-        const doc = await handle.doc();
+        const doc = handle.doc();
 
         function onChange() {
-          onUpdate(params, handle.docSync());
+          onUpdate(params, handle.doc());
         }
 
         function onDelete() {
