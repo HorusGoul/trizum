@@ -44,7 +44,7 @@ interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
 }
 
-export const Route = createFileRoute("/party/$partyId")({
+export const Route = createFileRoute("/party_/$partyId/")({
   component: PartyById,
   loader: async ({ context, params: { partyId }, location }) => {
     const { party } = await guardParticipatingInParty(
@@ -111,9 +111,11 @@ function PartyById() {
   }, [selectedTab, recalculateBalances]);
 
   async function onLeaveParty() {
-    if (!partyId) return;
     await navigate({ to: "/", replace: true });
-    removeParty(partyId);
+    removeParty({
+      partyRepoConfigId: party.partyRepoConfigId,
+      partyId: party.id,
+    });
     toast.success(t`You left the party!`);
   }
 

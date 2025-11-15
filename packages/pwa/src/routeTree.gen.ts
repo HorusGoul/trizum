@@ -14,9 +14,10 @@ import { Route as NewRouteImport } from './routes/new'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
+import { Route as PartyPartyIdRouteImport } from './routes/party_.$partyId'
 import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
+import { Route as PartyPartyIdIndexRouteImport } from './routes/party_.$partyId.index'
 import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
 import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
 import { Route as PartyPartyIdSettingsRouteImport } from './routes/party_.$partyId.settings'
@@ -51,7 +52,7 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartyPartyIdRoute = PartyPartyIdRouteImport.update({
-  id: '/party/$partyId',
+  id: '/party_/$partyId',
   path: '/party/$partyId',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -65,42 +66,47 @@ const AboutThirdPartyLicensesRoute = AboutThirdPartyLicensesRouteImport.update({
   path: '/about/third-party-licenses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartyPartyIdIndexRoute = PartyPartyIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartyPartyIdRoute,
+} as any)
 const PartyPartyIdWhoRoute = PartyPartyIdWhoRouteImport.update({
-  id: '/party_/$partyId/who',
-  path: '/party/$partyId/who',
-  getParentRoute: () => rootRouteImport,
+  id: '/who',
+  path: '/who',
+  getParentRoute: () => PartyPartyIdRoute,
 } as any)
 const PartyPartyIdShareRoute = PartyPartyIdShareRouteImport.update({
-  id: '/party_/$partyId/share',
-  path: '/party/$partyId/share',
-  getParentRoute: () => rootRouteImport,
+  id: '/share',
+  path: '/share',
+  getParentRoute: () => PartyPartyIdRoute,
 } as any)
 const PartyPartyIdSettingsRoute = PartyPartyIdSettingsRouteImport.update({
-  id: '/party_/$partyId/settings',
-  path: '/party/$partyId/settings',
-  getParentRoute: () => rootRouteImport,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => PartyPartyIdRoute,
 } as any)
 const PartyPartyIdPayRoute = PartyPartyIdPayRouteImport.update({
-  id: '/party_/$partyId/pay',
-  path: '/party/$partyId/pay',
-  getParentRoute: () => rootRouteImport,
+  id: '/pay',
+  path: '/pay',
+  getParentRoute: () => PartyPartyIdRoute,
 } as any)
 const PartyPartyIdAddRoute = PartyPartyIdAddRouteImport.update({
-  id: '/party_/$partyId/add',
-  path: '/party/$partyId/add',
-  getParentRoute: () => rootRouteImport,
+  id: '/add',
+  path: '/add',
+  getParentRoute: () => PartyPartyIdRoute,
 } as any)
 const PartyPartyIdExpenseExpenseIdRoute =
   PartyPartyIdExpenseExpenseIdRouteImport.update({
-    id: '/party_/$partyId/expense/$expenseId',
-    path: '/party/$partyId/expense/$expenseId',
-    getParentRoute: () => rootRouteImport,
+    id: '/expense/$expenseId',
+    path: '/expense/$expenseId',
+    getParentRoute: () => PartyPartyIdRoute,
   } as any)
 const PartyPartyIdExpenseExpenseIdEditRoute =
   PartyPartyIdExpenseExpenseIdEditRouteImport.update({
-    id: '/party_/$partyId/expense/$expenseId_/edit',
-    path: '/party/$partyId/expense/$expenseId/edit',
-    getParentRoute: () => rootRouteImport,
+    id: '/expense/$expenseId_/edit',
+    path: '/expense/$expenseId/edit',
+    getParentRoute: () => PartyPartyIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -111,12 +117,13 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
-  '/party/$partyId': typeof PartyPartyIdRoute
+  '/party/$partyId': typeof PartyPartyIdRouteWithChildren
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
+  '/party/$partyId/': typeof PartyPartyIdIndexRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
@@ -128,12 +135,12 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
-  '/party/$partyId': typeof PartyPartyIdRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
+  '/party/$partyId': typeof PartyPartyIdIndexRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
@@ -146,12 +153,13 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate_/tricount': typeof MigrateTricountRoute
-  '/party/$partyId': typeof PartyPartyIdRoute
+  '/party_/$partyId': typeof PartyPartyIdRouteWithChildren
   '/party_/$partyId/add': typeof PartyPartyIdAddRoute
   '/party_/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party_/$partyId/share': typeof PartyPartyIdShareRoute
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
+  '/party_/$partyId/': typeof PartyPartyIdIndexRoute
   '/party_/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party_/$partyId/expense/$expenseId_/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
 }
@@ -171,6 +179,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
     | '/party/$partyId/who'
+    | '/party/$partyId/'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/expense/$expenseId/edit'
   fileRoutesByTo: FileRoutesByTo
@@ -182,12 +191,12 @@ export interface FileRouteTypes {
     | '/settings'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
-    | '/party/$partyId'
     | '/party/$partyId/add'
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
     | '/party/$partyId/who'
+    | '/party/$partyId'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/expense/$expenseId/edit'
   id:
@@ -199,12 +208,13 @@ export interface FileRouteTypes {
     | '/settings'
     | '/about_/third-party-licenses'
     | '/migrate_/tricount'
-    | '/party/$partyId'
+    | '/party_/$partyId'
     | '/party_/$partyId/add'
     | '/party_/$partyId/pay'
     | '/party_/$partyId/settings'
     | '/party_/$partyId/share'
     | '/party_/$partyId/who'
+    | '/party_/$partyId/'
     | '/party_/$partyId/expense/$expenseId'
     | '/party_/$partyId/expense/$expenseId_/edit'
   fileRoutesById: FileRoutesById
@@ -217,14 +227,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
   MigrateTricountRoute: typeof MigrateTricountRoute
-  PartyPartyIdRoute: typeof PartyPartyIdRoute
-  PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
-  PartyPartyIdPayRoute: typeof PartyPartyIdPayRoute
-  PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
-  PartyPartyIdShareRoute: typeof PartyPartyIdShareRoute
-  PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
-  PartyPartyIdExpenseExpenseIdRoute: typeof PartyPartyIdExpenseExpenseIdRoute
-  PartyPartyIdExpenseExpenseIdEditRoute: typeof PartyPartyIdExpenseExpenseIdEditRoute
+  PartyPartyIdRoute: typeof PartyPartyIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -264,8 +267,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/party/$partyId': {
-      id: '/party/$partyId'
+    '/party_/$partyId': {
+      id: '/party_/$partyId'
       path: '/party/$partyId'
       fullPath: '/party/$partyId'
       preLoaderRoute: typeof PartyPartyIdRouteImport
@@ -285,57 +288,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutThirdPartyLicensesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/party_/$partyId/': {
+      id: '/party_/$partyId/'
+      path: '/'
+      fullPath: '/party/$partyId/'
+      preLoaderRoute: typeof PartyPartyIdIndexRouteImport
+      parentRoute: typeof PartyPartyIdRoute
+    }
     '/party_/$partyId/who': {
       id: '/party_/$partyId/who'
-      path: '/party/$partyId/who'
+      path: '/who'
       fullPath: '/party/$partyId/who'
       preLoaderRoute: typeof PartyPartyIdWhoRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
     '/party_/$partyId/share': {
       id: '/party_/$partyId/share'
-      path: '/party/$partyId/share'
+      path: '/share'
       fullPath: '/party/$partyId/share'
       preLoaderRoute: typeof PartyPartyIdShareRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
     '/party_/$partyId/settings': {
       id: '/party_/$partyId/settings'
-      path: '/party/$partyId/settings'
+      path: '/settings'
       fullPath: '/party/$partyId/settings'
       preLoaderRoute: typeof PartyPartyIdSettingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
     '/party_/$partyId/pay': {
       id: '/party_/$partyId/pay'
-      path: '/party/$partyId/pay'
+      path: '/pay'
       fullPath: '/party/$partyId/pay'
       preLoaderRoute: typeof PartyPartyIdPayRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
     '/party_/$partyId/add': {
       id: '/party_/$partyId/add'
-      path: '/party/$partyId/add'
+      path: '/add'
       fullPath: '/party/$partyId/add'
       preLoaderRoute: typeof PartyPartyIdAddRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
     '/party_/$partyId/expense/$expenseId': {
       id: '/party_/$partyId/expense/$expenseId'
-      path: '/party/$partyId/expense/$expenseId'
+      path: '/expense/$expenseId'
       fullPath: '/party/$partyId/expense/$expenseId'
       preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
     '/party_/$partyId/expense/$expenseId_/edit': {
       id: '/party_/$partyId/expense/$expenseId_/edit'
-      path: '/party/$partyId/expense/$expenseId/edit'
+      path: '/expense/$expenseId/edit'
       fullPath: '/party/$partyId/expense/$expenseId/edit'
       preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdEditRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartyPartyIdRoute
     }
   }
 }
+
+interface PartyPartyIdRouteChildren {
+  PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
+  PartyPartyIdPayRoute: typeof PartyPartyIdPayRoute
+  PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
+  PartyPartyIdShareRoute: typeof PartyPartyIdShareRoute
+  PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
+  PartyPartyIdIndexRoute: typeof PartyPartyIdIndexRoute
+  PartyPartyIdExpenseExpenseIdRoute: typeof PartyPartyIdExpenseExpenseIdRoute
+  PartyPartyIdExpenseExpenseIdEditRoute: typeof PartyPartyIdExpenseExpenseIdEditRoute
+}
+
+const PartyPartyIdRouteChildren: PartyPartyIdRouteChildren = {
+  PartyPartyIdAddRoute: PartyPartyIdAddRoute,
+  PartyPartyIdPayRoute: PartyPartyIdPayRoute,
+  PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,
+  PartyPartyIdShareRoute: PartyPartyIdShareRoute,
+  PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,
+  PartyPartyIdIndexRoute: PartyPartyIdIndexRoute,
+  PartyPartyIdExpenseExpenseIdRoute: PartyPartyIdExpenseExpenseIdRoute,
+  PartyPartyIdExpenseExpenseIdEditRoute: PartyPartyIdExpenseExpenseIdEditRoute,
+}
+
+const PartyPartyIdRouteWithChildren = PartyPartyIdRoute._addFileChildren(
+  PartyPartyIdRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -345,14 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,
   MigrateTricountRoute: MigrateTricountRoute,
-  PartyPartyIdRoute: PartyPartyIdRoute,
-  PartyPartyIdAddRoute: PartyPartyIdAddRoute,
-  PartyPartyIdPayRoute: PartyPartyIdPayRoute,
-  PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,
-  PartyPartyIdShareRoute: PartyPartyIdShareRoute,
-  PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,
-  PartyPartyIdExpenseExpenseIdRoute: PartyPartyIdExpenseExpenseIdRoute,
-  PartyPartyIdExpenseExpenseIdEditRoute: PartyPartyIdExpenseExpenseIdEditRoute,
+  PartyPartyIdRoute: PartyPartyIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
