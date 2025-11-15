@@ -5,7 +5,7 @@ import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId, useState } from "react";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { getPartyHelpers } from "#src/hooks/useParty.ts";

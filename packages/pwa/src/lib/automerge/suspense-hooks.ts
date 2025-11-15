@@ -4,7 +4,7 @@ import type {
   DocHandle,
   Repo,
 } from "@automerge/automerge-repo/slim";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { useSyncExternalStore } from "react";
 
 import { createCache, type Cache } from "suspense";

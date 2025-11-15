@@ -16,7 +16,7 @@ import type {
   PartyParticipant,
 } from "#src/models/party.js";
 import { diff } from "@opentf/obj-diff";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import type {
   DocHandle,
   Repo,
@@ -181,8 +181,10 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       lastChunkRef = chunkRef;
     }
 
-    let lastChunkHandle = repo.find<PartyExpenseChunk>(lastChunkRef.chunkId);
-    let lastChunk = await lastChunkHandle.doc();
+    let lastChunkHandle = await repo.find<PartyExpenseChunk>(
+      lastChunkRef.chunkId,
+    );
+    let lastChunk = lastChunkHandle.doc();
 
     if (!lastChunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -193,7 +195,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       const [chunkRef, handle] = createChunk();
       lastChunkRef = chunkRef;
       lastChunkHandle = handle;
-      lastChunk = await lastChunkHandle.doc();
+      lastChunk = lastChunkHandle.doc();
 
       if (!lastChunk) {
         throw new Error("Chunk not found, this should not happen");
@@ -232,10 +234,10 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       }
     });
 
-    const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
       lastChunkRef.balancesId,
     );
-    const lastChunkBalances = await lastChunkBalancesHandle.doc();
+    const lastChunkBalances = lastChunkBalancesHandle.doc();
 
     if (!lastChunkBalances) {
       throw new Error("Chunk balances not found, this should not happen");
@@ -257,7 +259,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   }
 
   async function updateExpense(expense: Expense) {
-    const party = handle.docSync();
+    const party = handle.doc();
 
     if (!party) {
       throw new Error("Party not found, this should not happen");
@@ -271,8 +273,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    let chunk = await chunkHandle.doc();
+    const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+    let chunk = chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -291,16 +293,16 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       delete expenseEntry.__editCopyLastUpdatedAt;
     });
 
-    chunk = chunkHandle.docSync();
+    chunk = chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
       chunkRef.balancesId,
     );
-    const lastChunkBalances = await lastChunkBalancesHandle.doc();
+    const lastChunkBalances = lastChunkBalancesHandle.doc();
 
     if (!lastChunkBalances) {
       throw new Error("Chunk balances not found, this should not happen");
@@ -320,7 +322,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   }
 
   async function removeExpense(expenseId: Expense["id"]) {
-    const party = handle.docSync();
+    const party = handle.doc();
 
     if (!party) {
       throw new Error("Party not found, this should not happen");
@@ -334,8 +336,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    let chunk = await chunkHandle.doc();
+    const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+    let chunk = chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -351,16 +353,16 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       deleteAt(doc.expenses, expenseIndex);
     });
 
-    chunk = chunkHandle.docSync();
+    chunk = chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const lastChunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
       chunkRef.balancesId,
     );
-    const lastChunkBalances = await lastChunkBalancesHandle.doc();
+    const lastChunkBalances = lastChunkBalancesHandle.doc();
 
     if (!lastChunkBalances) {
       throw new Error("Chunk balances not found, this should not happen");
@@ -377,7 +379,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         diff(clone(doc.balances), clone(balancesByParticipant)),
       );
     });
-    await lastChunkBalancesHandle.doc();
+    lastChunkBalancesHandle.doc();
 
     return true;
   }
@@ -392,8 +394,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     const chunkRefs = party.chunkRefs;
 
     for (const chunkRef of chunkRefs) {
-      const chunkHandle = repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-      const chunk = await chunkHandle.doc();
+      const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+      const chunk = chunkHandle.doc();
 
       if (!chunk) {
         throw new Error("Chunk not found, this should not happen");
@@ -404,10 +406,10 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         party.participants,
       );
 
-      const chunkBalancesHandle = repo.find<PartyExpenseChunkBalances>(
+      const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
         chunkRef.balancesId,
       );
-      const chunkBalances = await chunkBalancesHandle.doc();
+      const chunkBalances = chunkBalancesHandle.doc();
 
       if (!chunkBalances) {
         throw new Error("Chunk balances not found, this should not happen");
@@ -419,7 +421,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
           diff(clone(doc.balances), clone(balancesByParticipant)),
         );
       });
-      await chunkBalancesHandle.doc();
+      chunkBalancesHandle.doc();
     }
 
     return true;

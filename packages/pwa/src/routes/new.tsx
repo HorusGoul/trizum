@@ -7,7 +7,7 @@ import type {
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";

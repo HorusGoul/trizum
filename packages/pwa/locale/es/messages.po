@@ -175,7 +175,7 @@ msgstr "Editando {0}"
 
 #: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:174
 msgid "Editing {expenseName}"
-msgstr ""
+msgstr "Editando {expenseName}"
 
 #: src/routes/settings.tsx:40
 msgid "English"

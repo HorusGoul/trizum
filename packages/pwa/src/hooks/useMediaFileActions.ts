@@ -5,7 +5,7 @@ import {
   compressionPresets,
 } from "#src/lib/imageCompression.ts";
 import { RawString, type DocumentId } from "@automerge/automerge-repo";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 
 export function useMediaFileActions() {
   const repo = useRepo();

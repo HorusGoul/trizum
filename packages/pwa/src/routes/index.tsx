@@ -3,7 +3,7 @@ import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import {
   isValidDocumentId,
   type AnyDocumentId,

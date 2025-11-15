@@ -7,7 +7,7 @@ import {
   handleCache,
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 
 export function usePartyList() {

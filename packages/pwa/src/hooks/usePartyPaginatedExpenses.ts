@@ -4,7 +4,7 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import type { Party, PartyExpenseChunk } from "#src/models/party.js";
 import type { Doc, DocumentId } from "@automerge/automerge-repo";
-import { useRepo } from "@automerge/automerge-repo-react-hooks";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import {
   startTransition,
   useEffect,
@@ -115,25 +115,35 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
   // Subscribe to loaded chunk changes
   useEffect(() => {
     const disposeBag = new Set<() => void>();
+    let unmounted = false;
 
-    for (const chunkId of getLoadedChunkIds()) {
-      const handle = repo.find<PartyExpenseChunk>(chunkId);
+    async function subscribeToChunkChanges() {
+      for (const chunkId of getLoadedChunkIds()) {
+        const handle = await repo.find<PartyExpenseChunk>(chunkId);
 
-      handle.on("change", onChange);
+        if (unmounted) {
+          return;
+        }
 
-      function onChange() {
-        startTransition(() => {
-          rerender();
+        handle.on("change", onChange);
+
+        function onChange() {
+          startTransition(() => {
+            rerender();
+          });
+        }
+
+        disposeBag.add(() => {
+          handle.off("change", onChange);
         });
       }
-
-      disposeBag.add(() => {
-        handle.off("change", onChange);
-      });
     }
+
+    void subscribeToChunkChanges();
 
     return () => {
       disposeBag.forEach((dispose) => dispose());
+      unmounted = true;
     };
   }, [key]);
 

@@ -20,11 +20,10 @@
     "generate:assets": "pwa-assets-generator"
   },
   "dependencies": {
-    "@automerge/automerge": "2.2.5",
-    "@automerge/automerge-repo": "1.2.1",
-    "@automerge/automerge-repo-network-websocket": "1.2.1",
-    "@automerge/automerge-repo-react-hooks": "1.2.1",
-    "@automerge/automerge-repo-storage-indexeddb": "1.2.1",
+    "@automerge/automerge": "3.2.0",
+    "@automerge/automerge-repo": "2.5.0",
+    "@automerge/automerge-repo-network-websocket": "2.5.0",
+    "@automerge/automerge-repo-storage-indexeddb": "2.5.0",
     "@horus.dev/tw-dynamic-themes": "0.0.3",
     "@internationalized/date": "3.8.2",
     "@lingui/core": "4.14.1",

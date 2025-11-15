@@ -7,8 +7,8 @@ export async function loadDocumentsByIds<T>(
   return (
     await Promise.all(
       ids.map(async (id) => {
-        const handle = repo.find<T>(id);
-        return await handle.doc();
+        const handle = await repo.find<T>(id);
+        return handle.doc();
       }),
     )
   ).filter((doc) => !!doc);

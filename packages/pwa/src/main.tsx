@@ -1,7 +1,6 @@
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { RepoContext } from "@automerge/automerge-repo-react-hooks";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
   RouterProvider,
@@ -22,6 +21,7 @@ import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
+import { RepoContext } from "./lib/automerge/RepoContext.ts";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -72,12 +72,12 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <UpdateController>
         <AriaProviders>
-          <RepoContext.Provider value={repo}>
+          <RepoContext value={repo}>
             <MediaGalleryController>
               <RouterProvider router={router} InnerWrap={InnerWrap} />
               <Toaster />
             </MediaGalleryController>
-          </RepoContext.Provider>
+          </RepoContext>
         </AriaProviders>
       </UpdateController>
     </I18nProvider>,
