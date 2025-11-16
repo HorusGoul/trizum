@@ -50,6 +50,7 @@ export function useMediaFileActions() {
 
     const handle = repo.create<MediaFile>({
       id: "id" as DocumentId,
+      type: "mediaFile",
       encodedBlob: new RawString(await encodeBlob(processedBlob)),
       metadata: {
         ...metadata,

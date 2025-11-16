@@ -139,28 +139,33 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   }
 
   function createChunk() {
-    const handle = repo.create<PartyExpenseChunk>({
+    const party = handle.doc();
+    const chunkHandle = repo.create<PartyExpenseChunk>({
       id: "" as DocumentId,
+      type: "expenseChunk",
       createdAt: new Date(),
       expenses: [],
       maxSize: 500,
+      partyId: party.id,
     });
 
-    handle.change((doc) => (doc.id = handle.documentId));
+    chunkHandle.change((doc) => (doc.id = chunkHandle.documentId));
 
     const balancesHandle = repo.create<PartyExpenseChunkBalances>({
       id: "" as DocumentId,
+      type: "expenseChunkBalances",
       balances: {},
+      partyId: party.id,
     });
     balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
 
     const chunkRef: PartyExpenseChunkRef = {
-      chunkId: handle.documentId,
+      chunkId: chunkHandle.documentId,
       createdAt: new Date(),
       balancesId: balancesHandle.documentId,
     };
 
-    return [chunkRef, handle] as const;
+    return [chunkRef, chunkHandle] as const;
   }
 
   async function addExpenseToParty(

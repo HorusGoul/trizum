@@ -2,6 +2,7 @@ import type { DocumentId, RawString } from "@automerge/automerge-repo/slim";
 
 export interface MediaFile {
   id: DocumentId;
+  type: "mediaFile";
   encodedBlob: RawString;
   metadata: Record<string, unknown>;
 }

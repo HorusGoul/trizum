@@ -7,6 +7,8 @@ import type { Party, PartyParticipant } from "./party";
 import { getBrowserLocale, type SupportedLocale } from "#src/lib/i18n.js";
 
 export interface PartyList {
+  id: DocumentId;
+  type: "partyList";
   username: string;
   phone: string;
   avatarId?: DocumentId | null;
@@ -23,12 +25,16 @@ export function getPartyListId(repo: Repo) {
   }
 
   const handle = repo.create<PartyList>({
+    id: "" as DocumentId,
+    type: "partyList",
     username: "",
     phone: "",
     locale: getBrowserLocale(),
     parties: {},
     participantInParties: {},
   });
+
+  handle.change((doc) => (doc.id = handle.documentId));
 
   localStorage.setItem("partyListId", handle.documentId);
   return handle.documentId;

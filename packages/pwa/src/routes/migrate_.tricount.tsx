@@ -107,6 +107,7 @@ function useMigrateTricount() {
 
       const handle = repo.create<Party>({
         id: "" as DocumentId,
+        type: "party",
         name: data.party.name,
         description: data.party.description,
         currency: data.party.currency,
@@ -114,6 +115,7 @@ function useMigrateTricount() {
         chunkRefs: [],
       });
       handle.change((doc) => (doc.id = handle.documentId));
+      const partyId = handle.documentId;
 
       // Import photos
       const photoMap = new Map<string, MediaFile["id"]>();
@@ -125,7 +127,9 @@ function useMigrateTricount() {
             const blob = await response.blob();
             const [mediaFileId] = await createMediaFile(
               blob,
-              {},
+              {
+                partyId,
+              },
               compressionPresets.balanced,
             );
             photoMap.set(photo.id, mediaFileId);

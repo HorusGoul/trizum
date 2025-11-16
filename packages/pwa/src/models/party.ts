@@ -6,6 +6,7 @@ import type { MediaFile } from "./media";
 
 export interface Party {
   id: DocumentId;
+  type: "party";
   name: string;
   description: string;
   currency: Currency;
@@ -24,19 +25,23 @@ export interface PartyParticipant {
 }
 
 export interface PartyExpenseChunkRef {
-  chunkId: DocumentId;
+  chunkId: PartyExpenseChunk["id"];
   createdAt: Date;
   balancesId: PartyExpenseChunkBalances["id"];
 }
 
 export interface PartyExpenseChunk {
   id: DocumentId;
+  type: "expenseChunk";
   createdAt: Date;
   expenses: Expense[];
   maxSize: number;
+  partyId: Party["id"];
 }
 
 export interface PartyExpenseChunkBalances {
   id: DocumentId;
+  type: "expenseChunkBalances";
   balances: BalancesByParticipant;
+  partyId: Party["id"];
 }
