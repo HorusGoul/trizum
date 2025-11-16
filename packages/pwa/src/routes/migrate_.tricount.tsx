@@ -112,6 +112,7 @@ function useMigrateTricount() {
         currency: data.party.currency,
         participants: data.party.participants,
         chunkRefs: [],
+        syncUrls: [],
       });
       handle.change((doc) => (doc.id = handle.documentId));
 

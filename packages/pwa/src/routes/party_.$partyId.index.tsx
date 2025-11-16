@@ -112,10 +112,7 @@ function PartyById() {
 
   async function onLeaveParty() {
     await navigate({ to: "/", replace: true });
-    removeParty({
-      partyRepoConfigId: party.partyRepoConfigId,
-      partyId: party.id,
-    });
+    removeParty(party.id);
     toast.success(t`You left the party!`);
   }
 

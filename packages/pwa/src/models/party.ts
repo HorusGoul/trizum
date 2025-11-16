@@ -12,6 +12,7 @@ export interface Party {
   hue?: number;
   participants: Record<ExpenseUser, PartyParticipant>;
   chunkRefs: PartyExpenseChunkRef[];
+  syncUrls: string[];
 }
 
 export interface PartyParticipant {

@@ -64,6 +64,7 @@ function New() {
         {},
       ),
       chunkRefs: [],
+      syncUrls: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
     void navigate({
