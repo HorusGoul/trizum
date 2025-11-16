@@ -166,7 +166,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   async function addExpenseToParty(
     expense: Omit<Expense, "id" | "__hash">,
   ): Promise<Expense> {
-    const party = handle.docSync();
+    const party = handle.doc();
 
     if (!party) {
       throw new Error("Party not found, this should not happen");
@@ -217,7 +217,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     lastChunkHandle.change((doc) => {
       insertAt(doc.expenses, 0, expenseWithHash);
     });
-    lastChunk = lastChunkHandle.docSync();
+    lastChunk = lastChunkHandle.doc();
 
     if (!lastChunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -385,7 +385,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   }
 
   async function recalculateBalances() {
-    const party = handle.docSync();
+    const party = handle.doc();
 
     if (!party) {
       throw new Error("Party not found, this should not happen");

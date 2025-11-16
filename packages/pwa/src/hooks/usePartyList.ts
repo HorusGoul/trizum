@@ -66,7 +66,7 @@ export function usePartyList() {
 
     async function updateAllParties() {
       // Update all participants in all parties
-      const partyList = partyListHandle.docSync();
+      const partyList = partyListHandle.doc();
 
       if (!partyList) {
         return;

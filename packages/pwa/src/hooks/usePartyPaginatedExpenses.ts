@@ -37,7 +37,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
   }
 
   function getLoadedChunkIds() {
-    const party = handle.docSync();
+    const party = handle.doc();
 
     if (!party) {
       return [];
