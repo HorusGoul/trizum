@@ -54,7 +54,7 @@ msgstr "Añadir un gasto"
 msgid "Add or create"
 msgstr "Añadir o crear"
 
-#: src/routes/new.tsx:342
+#: src/routes/new.tsx:333
 #: src/routes/party_.$partyId.settings.tsx:408
 msgid "Add participant"
 msgstr "Añadir participante"
@@ -83,7 +83,7 @@ msgstr "Archivar"
 msgid "Archived participants"
 msgstr "Participantes archivados"
 
-#: src/routes/new.tsx:233
+#: src/routes/new.tsx:224
 #: src/routes/party_.$partyId.settings.tsx:250
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
@@ -156,7 +156,7 @@ msgstr "¡Deuda saldada entre {0} y {1}!"
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/routes/new.tsx:197
+#: src/routes/new.tsx:188
 #: src/routes/party_.$partyId.settings.tsx:184
 msgid "Description"
 msgstr "Descripción"
@@ -257,7 +257,7 @@ msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otr
 msgid "Go Back"
 msgstr "Volver"
 
-#: src/routes/migrate_.tricount.tsx:387
+#: src/routes/migrate_.tricount.tsx:391
 msgid "Go back to home"
 msgstr "Volver al inicio"
 
@@ -273,7 +273,7 @@ msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo
 msgid "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 msgstr "Aquí tienes una lista de formas en las que puedes pagar, una vez hecho, pulsa el botón de arriba para marcar el gasto como pagado en este grupo de trizum."
 
-#: src/routes/new.tsx:173
+#: src/routes/new.tsx:164
 #: src/routes/party_.$partyId.settings.tsx:160
 msgid "How do you want to call this party?"
 msgstr "¿Cómo quieres llamar a este grupo?"
@@ -302,15 +302,15 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
-#: src/routes/migrate_.tricount.tsx:297
+#: src/routes/migrate_.tricount.tsx:301
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
-#: src/routes/migrate_.tricount.tsx:186
+#: src/routes/migrate_.tricount.tsx:190
 msgid "Imported {0} ({1} of {2})"
 msgstr "Importado {0} ({1} de {2})"
 
-#: src/routes/migrate_.tricount.tsx:135
+#: src/routes/migrate_.tricount.tsx:139
 msgid "Importing attachments ({0} of {1})"
 msgstr "Importando adjuntos ({0} de {1})"
 
@@ -322,7 +322,7 @@ msgstr "Importando datos de Tricount..."
 msgid "Include all"
 msgstr "Incluir todos"
 
-#: src/routes/migrate_.tricount.tsx:216
+#: src/routes/migrate_.tricount.tsx:220
 msgid "Invalid tricount URL or key"
 msgstr "URL o clave de Tricount no válida"
 
@@ -403,15 +403,15 @@ msgid "Menu"
 msgstr "Menú"
 
 #: src/routes/index.tsx:158
-#: src/routes/migrate_.tricount.tsx:233
+#: src/routes/migrate_.tricount.tsx:237
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
 
-#: src/routes/migrate_.tricount.tsx:317
+#: src/routes/migrate_.tricount.tsx:321
 msgid "Migration in progress"
 msgstr "Migración en progreso"
 
-#: src/routes/migrate_.tricount.tsx:352
+#: src/routes/migrate_.tricount.tsx:356
 msgid "Migration successful"
 msgstr "Migración exitosa"
 
@@ -431,12 +431,12 @@ msgstr "El nombre debe tener menos de 50 caracteres"
 msgid "New expense"
 msgstr "Nuevo gasto"
 
-#: src/routes/new.tsx:295
+#: src/routes/new.tsx:286
 #: src/routes/party_.$partyId.settings.tsx:361
 msgid "New participant name"
 msgstr "Nombre del nuevo participante"
 
-#: src/routes/new.tsx:132
+#: src/routes/new.tsx:123
 msgid "New trizum"
 msgstr "Nuevo trizum"
 
@@ -478,18 +478,18 @@ msgstr "Pagado por"
 msgid "Paid debt to {0}"
 msgstr "Deuda pagada a {0}"
 
-#: src/routes/new.tsx:261
+#: src/routes/new.tsx:252
 #: src/routes/party_.$partyId.settings.tsx:303
 #: src/routes/party_.$partyId.settings.tsx:436
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/routes/new.tsx:218
+#: src/routes/new.tsx:209
 #: src/routes/party_.$partyId.settings.tsx:226
 msgid "Participants"
 msgstr "Participantes"
 
-#: src/routes/new.tsx:78
+#: src/routes/new.tsx:69
 msgid "Party created"
 msgstr "Grupo creado"
 
@@ -509,7 +509,7 @@ msgstr "¡Configuración del grupo guardada!"
 msgid "Party shared!"
 msgstr "¡Grupo compartido!"
 
-#: src/routes/migrate_.tricount.tsx:274
+#: src/routes/migrate_.tricount.tsx:278
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
@@ -546,7 +546,7 @@ msgstr "El número de teléfono debe tener menos de 20 caracteres"
 msgid "Please correct it before saving."
 msgstr "Por favor, corrígelo antes de guardar."
 
-#: src/routes/migrate_.tricount.tsx:325
+#: src/routes/migrate_.tricount.tsx:329
 msgid "Please don't close the app while we migrate your data"
 msgstr "Por favor, no cierres la aplicación mientras migramos tus datos"
 
@@ -570,7 +570,7 @@ msgstr "Sincronización en Tiempo Real"
 msgid "Reload"
 msgstr "Recargar"
 
-#: src/routes/new.tsx:274
+#: src/routes/new.tsx:265
 #: src/routes/party_.$partyId.settings.tsx:317
 msgid "Remove"
 msgstr "Eliminar"
@@ -593,8 +593,8 @@ msgstr "Restaurar"
 
 #: src/components/ExpenseEditor.tsx:248
 #: src/routes/join.tsx:90
-#: src/routes/migrate_.tricount.tsx:246
-#: src/routes/new.tsx:145
+#: src/routes/migrate_.tricount.tsx:250
+#: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:93
@@ -629,7 +629,7 @@ msgstr "Partes para {0}"
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1>{amount} {2}</1>."
 
-#: src/routes/migrate_.tricount.tsx:375
+#: src/routes/migrate_.tricount.tsx:379
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
@@ -643,8 +643,8 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 
 #: src/components/ExpenseEditor.tsx:248
 #: src/routes/join.tsx:90
-#: src/routes/migrate_.tricount.tsx:246
-#: src/routes/new.tsx:145
+#: src/routes/migrate_.tricount.tsx:250
+#: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:132
 #: src/routes/party_.$partyId.who.tsx:105
 #: src/routes/settings.tsx:93
@@ -687,7 +687,7 @@ msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
 #: src/components/ExpenseEditor.tsx:287
-#: src/routes/new.tsx:172
+#: src/routes/new.tsx:163
 #: src/routes/party_.$partyId.settings.tsx:159
 msgid "Title"
 msgstr "Título"
@@ -708,7 +708,7 @@ msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que pod
 msgid "Tricount key or URL is required"
 msgstr "Se requiere la clave o URL de Tricount"
 
-#: src/routes/migrate_.tricount.tsx:273
+#: src/routes/migrate_.tricount.tsx:277
 msgid "Tricount URL or key"
 msgstr "URL o clave de Tricount"
 
@@ -758,7 +758,7 @@ msgstr "Versión"
 msgid "View on GitHub"
 msgstr "Ver en GitHub"
 
-#: src/routes/migrate_.tricount.tsx:362
+#: src/routes/migrate_.tricount.tsx:366
 msgid "View party"
 msgstr "Ver grupo"
 
@@ -779,7 +779,7 @@ msgstr "Viendo como {0}"
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/new.tsx:198
+#: src/routes/new.tsx:189
 #: src/routes/party_.$partyId.settings.tsx:185
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
@@ -792,7 +792,7 @@ msgstr "¿Cuál es tu forma preferida de que te llamen?"
 msgid "Who are you?"
 msgstr "¿Quién eres?"
 
-#: src/routes/new.tsx:222
+#: src/routes/new.tsx:213
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "¿Quién está invitado a este grupo? Puedes añadir más participantes más tarde."
 
