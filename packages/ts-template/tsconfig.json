@@ -6,8 +6,5 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "baseUrl": "./",
-    "paths": {
-      "#*": ["./*"]
-    }
   }
 }

@@ -278,6 +278,9 @@ importers:
 
   packages/server:
     dependencies:
+      '@automerge/automerge-repo':
+        specifier: 2.5.0
+        version: 2.5.0
       '@libsql/client':
         specifier: 0.15.15
         version: 0.15.15

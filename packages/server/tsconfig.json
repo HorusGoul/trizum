@@ -6,9 +6,6 @@
     "rootDir": "./",
     "outDir": "./dist",
     "baseUrl": "./",
-    "paths": {
-      "#*": ["./*"]
-    },
     "types": ["node"],
     "noEmit": true,
     "module": "nodenext",
