@@ -127,3 +127,9 @@ dist
 
 # Wrangler cache
 .wrangler
+
+# Environment variables
+.env
+
+# Local SQLite database
+*.db
