@@ -7,8 +7,7 @@ import * as os from "node:os";
 import { Hono } from "hono";
 import { serve, type ServerType } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
-import { rootLogger as logger  } from "./log.ts";
-
+import { rootLogger as logger } from "./log.ts";
 
 async function main() {
   logger.info("Starting server...");
@@ -32,7 +31,9 @@ async function main() {
   });
 
   const storageId = await repo.storageId().catch(() => {
-    logger.error("Failed to get Automerge Storage ID, this could be related to not having ran migrations for the database.");
+    logger.error(
+      "Failed to get Automerge Storage ID, this could be related to not having ran migrations for the database.",
+    );
     process.exit(1);
   });
   logger.info("Automerge storage ID", { storageId });
