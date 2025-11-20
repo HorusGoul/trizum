@@ -40,7 +40,7 @@ async function main() {
 
   app.get(
     "/sync",
-    webSockets.upgradeWebSocket((c) => ({
+    webSockets.upgradeWebSocket(() => ({
       onOpen: () => {
         logger.info("WebSocket connection opened");
       },
@@ -54,7 +54,7 @@ async function main() {
   );
 
   const port = parseInt(env.PORT);
-  const server = await new Promise<ServerType>((resolve) => {
+  const _server = await new Promise<ServerType>((resolve) => {
     const server = serve(
       {
         ...app,
@@ -68,13 +68,13 @@ async function main() {
     process.on("SIGINT", () => {
       logger.info("SIGINT received, server is shutting down...");
       server.close();
-      repo.shutdown();
+      void repo.shutdown();
       process.exit(0);
     });
 
     process.on("SIGTERM", () => {
       logger.info("SIGTERM received, server is shutting down...");
-      repo.shutdown();
+      void repo.shutdown();
       server.close((err) => {
         if (err) {
           logger.error(err.message);
