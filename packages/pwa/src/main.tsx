@@ -51,7 +51,7 @@ declare module "react-aria-components" {
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
-  network: [new BrowserWebSocketClientAdapter("wss://dev-sync.trizum.app")],
+  network: [new BrowserWebSocketClientAdapter("ws://localhost:3000/sync")],
 });
 
 // Create a new router instance
