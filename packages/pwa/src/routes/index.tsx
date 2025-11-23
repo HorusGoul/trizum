@@ -33,6 +33,13 @@ function Index() {
       <div className="container flex h-16 items-center pr-2">
         <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
+        <span
+          aria-label="Beta"
+          className="mb-4 ml-0.5 font-mono text-xs font-semibold leading-none text-accent-600 dark:text-accent-400"
+        >
+          βeta
+        </span>
+
         <div className="flex-1" />
 
         {isUpdateAvailable && (
