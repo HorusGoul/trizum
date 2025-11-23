@@ -8,6 +8,7 @@ import { Hono } from "hono";
 import { serve, type ServerType } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { rootLogger as logger } from "./log.ts";
+import { withContext } from "@logtape/logtape";
 
 async function main() {
   logger.info("Starting server...");
@@ -37,6 +38,39 @@ async function main() {
     process.exit(1);
   });
   logger.info("Automerge storage ID", { storageId });
+
+  // Request logging middleware
+  app.use("*", async (c, next) => {
+    const requestId = crypto.randomUUID();
+    const startTime = Date.now();
+
+    await withContext(
+      {
+        requestId,
+        method: c.req.method,
+        url: c.req.url,
+        userAgent: c.req.header("User-Agent"),
+        ipAddress:
+          c.req.header("CF-Connecting-IP") || c.req.header("X-Forwarded-For"),
+      },
+      async () => {
+        logger.info("Request started", {
+          method: c.req.method,
+          url: c.req.url,
+          requestId,
+        });
+
+        await next();
+
+        const duration = Date.now() - startTime;
+        logger.info("Request completed", {
+          status: c.res.status,
+          duration,
+          requestId,
+        });
+      },
+    );
+  });
 
   app.get(
     "/sync",
@@ -68,6 +102,21 @@ async function main() {
       },
       200,
     );
+  });
+
+  // Error handling middleware
+  app.onError((err, c) => {
+    logger.error("Request error", {
+      error: {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+      },
+      method: c.req.method,
+      url: c.req.url,
+    });
+
+    return c.json({ error: "Internal server error" }, 500);
   });
 
   const port = parseInt(env.PORT);

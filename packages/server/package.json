@@ -26,7 +26,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
-    "node": "node --experimental-transform-types",
+    "node": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types",
     "db:drizzle": "pnpm node node_modules/drizzle-kit/bin.cjs",
     "db:generate": "pnpm db:drizzle generate",
     "db:migrate": "pnpm db:drizzle migrate",
