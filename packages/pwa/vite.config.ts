@@ -67,6 +67,7 @@ export default defineConfig(({ mode }) => {
             { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
           ],
         },
+        outDir: "dist/client",
         manifest: {
           name: "trizum",
           short_name: "trizum",
