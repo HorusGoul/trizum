@@ -18,6 +18,7 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
+import { defaultThemeHue } from "#src/ui/theme.ts";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -25,10 +26,13 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const parties = usePartyItemRefs();
+  const { partyList } = usePartyList();
   const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const showList = parties.length > 0;
+  const needsProfileSetup =
+    !partyList.username || partyList.username.trim() === "";
 
   return (
     <div className="flex min-h-full flex-col">
@@ -121,6 +125,8 @@ function Index() {
 
       {showList ? (
         <div className="container flex flex-1 flex-col gap-4 px-2">
+          {needsProfileSetup && <ProfileSetupCard />}
+
           {parties.map((partyId) => (
             <PartyItem key={partyId} partyId={partyId} />
           ))}
@@ -201,6 +207,13 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
     return null;
   }
 
+  const activeParticipants = Object.values(party.participants).filter(
+    (participant) => !participant.isArchived,
+  );
+  const participantCount = activeParticipants.length;
+  const hue = party.hue ?? defaultThemeHue;
+  const firstLetter = party.name.charAt(0).toUpperCase();
+
   return (
     <Link
       href={{
@@ -212,16 +225,40 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex w-full scale-100 flex-col rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-accent-900",
+          "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
           (isHovered || isFocusVisible) &&
-            "shadow-md dark:bg-accent-800 dark:shadow-none",
+            "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
           isPressed &&
             "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
         )
       }
     >
-      <span className="text-xl font-medium">{party.name}</span>
-      <span className="text-lg">{party.description}</span>
+      <div
+        className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+        style={{
+          backgroundColor: `oklch(0.513 0.116 ${hue} / 1)`,
+        }}
+      >
+        <span className="pt-0.5">{firstLetter}</span>
+      </div>
+      <div className="flex flex-1 flex-col gap-0.5">
+        <span className="text-lg font-semibold leading-tight text-accent-950 dark:text-accent-50">
+          {party.name}
+        </span>
+        <span className="text-xs font-medium uppercase tracking-wide text-accent-500 dark:text-accent-500">
+          {participantCount}{" "}
+          {participantCount === 1 ? (
+            <Trans>participant</Trans>
+          ) : (
+            <Trans>participants</Trans>
+          )}
+        </span>
+        {party.description && (
+          <span className="text-sm text-accent-600 dark:text-accent-400">
+            {party.description}
+          </span>
+        )}
+      </div>
     </Link>
   );
 }
@@ -252,7 +289,7 @@ function EmptyState() {
           }) =>
             cn(
               defaultClassName,
-              "flex scale-100 items-center gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
+              "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
               isPressed &&
@@ -285,7 +322,7 @@ function EmptyState() {
           }) =>
             cn(
               defaultClassName,
-              "flex scale-100 items-center gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
+              "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
               isPressed &&
@@ -318,7 +355,7 @@ function EmptyState() {
           }) =>
             cn(
               defaultClassName,
-              "flex scale-100 items-center gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
+              "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
               isPressed &&
@@ -351,7 +388,7 @@ function EmptyState() {
           }) =>
             cn(
               defaultClassName,
-              "flex scale-100 items-center gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
+              "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
               isPressed &&
@@ -375,5 +412,40 @@ function EmptyState() {
         </Link>
       </div>
     </div>
+  );
+}
+
+function ProfileSetupCard() {
+  return (
+    <Link
+      href={{ to: "/settings" }}
+      className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
+        cn(
+          defaultClassName,
+          "flex scale-100 items-start gap-4 rounded-xl border border-accent-400 bg-accent-50 p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-500 dark:bg-accent-950",
+          (isHovered || isFocusVisible) &&
+            "border-accent-500 shadow-md dark:border-accent-400 dark:bg-accent-900 dark:shadow-none",
+          isPressed &&
+            "scale-95 border-accent-600 bg-opacity-90 shadow-lg dark:border-accent-300 dark:bg-accent-800 dark:shadow-none",
+        )
+      }
+    >
+      <div className="-mt-0.5 flex h-8 w-8 flex-shrink-0 justify-center">
+        <IconWithFallback
+          name="#lucide/user-round-pen"
+          className="text-accent-600 dark:text-accent-400"
+        />
+      </div>
+      <div className="flex flex-1 flex-col gap-0.5">
+        <span className="text-lg font-semibold leading-tight text-accent-950 dark:text-accent-50">
+          <Trans>Complete your profile</Trans>
+        </span>
+        <span className="text-sm text-accent-600 dark:text-accent-400">
+          <Trans>
+            Add your name so others know who you are and how to pay you
+          </Trans>
+        </span>
+      </div>
+    </Link>
   );
 }
