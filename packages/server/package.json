@@ -22,7 +22,7 @@
   "scripts": {
     "cleanup": "rm -rf dist",
     "dev": "pnpm node --watch src/main.ts",
-    "start": "pnpm node src/main.ts",
+    "start": "pnpm db:migrate && pnpm node src/main.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
@@ -31,14 +31,14 @@
     "db:generate": "pnpm db:drizzle generate",
     "db:migrate": "pnpm db:drizzle migrate",
     "db:studio": "pnpm db:drizzle studio",
-    "db:push": "pnpm db:drizzle push"
+    "db:push": "pnpm db:drizzle push",
+    "deploy": "./deploy.sh"
   },
   "devDependencies": {
     "@trizum/eslint-config": "workspace:*",
     "@trizum/prettier-config": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "24.10.1",
-    "drizzle-kit": "0.31.7",
     "eslint": "9.39.1",
     "prettier": "3.6.2",
     "typescript": "5.9.2"
@@ -51,6 +51,7 @@
     "@hono/node-ws": "1.2.0",
     "@libsql/client": "0.15.15",
     "@logtape/logtape": "1.2.0",
+    "drizzle-kit": "0.31.7",
     "drizzle-orm": "0.44.7",
     "hono": "4.10.6",
     "zod": "4.1.12"

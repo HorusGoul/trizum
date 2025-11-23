@@ -1,0 +1,15 @@
+# Litestream configuration for SQLite replication
+# Configured for Tigris S3 replication using Fly.io secrets
+# Note: v0.5.0+ supports only one replica per database
+
+dbs:
+  - path: /mnt/data/trizum.db
+    replicas:
+      - type: s3
+        path: trizum.db
+        bucket: ${BUCKET_NAME}
+        endpoint: ${AWS_ENDPOINT_URL_S3}
+        region: ${AWS_REGION}
+        access-key-id: ${AWS_ACCESS_KEY_ID}
+        secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+

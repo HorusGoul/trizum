@@ -53,6 +53,23 @@ async function main() {
     })),
   );
 
+  app.get("/health", async (c) => {
+    const automerge = await repo
+      .storageId()
+      .then(() => ({ ok: true }))
+      .catch(() => ({ ok: false }));
+
+    return c.json(
+      {
+        http: {
+          ok: true,
+        },
+        automerge,
+      },
+      200,
+    );
+  });
+
   const port = parseInt(env.PORT);
   const _server = await new Promise<ServerType>((resolve) => {
     const server = serve(
