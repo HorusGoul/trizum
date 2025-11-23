@@ -45,7 +45,7 @@ msgid "A name for the participant is required"
 msgstr "A name for the participant is required"
 
 #: src/routes/about.tsx:20
-#: src/routes/index.tsx:103
+#: src/routes/index.tsx:110
 msgid "About"
 msgstr "About"
 
@@ -53,7 +53,7 @@ msgstr "About"
 msgid "Add an expense"
 msgstr "Add an expense"
 
-#: src/routes/index.tsx:123
+#: src/routes/index.tsx:130
 #: src/routes/party.$partyId.tsx:318
 msgid "Add or create"
 msgstr "Add or create"
@@ -132,7 +132,7 @@ msgstr "Cash or other ways"
 msgid "Changes sync automatically across all your devices"
 msgstr "Changes sync automatically across all your devices"
 
-#: src/routes/index.tsx:88
+#: src/routes/index.tsx:95
 msgid "Check for updates"
 msgstr "Check for updates"
 
@@ -160,7 +160,7 @@ msgstr "Copy party link"
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copy the phone number and pay through Bizum using your bank app."
 
-#: src/routes/index.tsx:148
+#: src/routes/index.tsx:155
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -392,7 +392,7 @@ msgstr "Invalid trizum party link"
 msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
-#: src/routes/index.tsx:138
+#: src/routes/index.tsx:145
 msgid "Join a Party"
 msgstr "Join a Party"
 
@@ -452,13 +452,13 @@ msgstr "Marking expense as paid..."
 msgid "Me"
 msgstr "Me"
 
-#: src/routes/index.tsx:58
+#: src/routes/index.tsx:65
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:67
 #: src/routes/party.$partyId.tsx:145
 msgid "Menu"
 msgstr "Menu"
 
-#: src/routes/index.tsx:158
+#: src/routes/index.tsx:165
 #: src/routes/migrate_.tricount.tsx:237
 msgid "Migrate from Tricount"
 msgstr "Migrate from Tricount"
@@ -677,7 +677,7 @@ msgstr "Restore"
 msgid "Save"
 msgstr "Save"
 
-#: src/routes/index.tsx:73
+#: src/routes/index.tsx:80
 #: src/routes/party.$partyId.tsx:220
 #: src/routes/settings.tsx:76
 msgid "Settings"
@@ -805,7 +805,7 @@ msgid "Tricount URL or key"
 msgstr "Tricount URL or key"
 
 #: src/components/UpdateController.tsx:26
-#: src/routes/index.tsx:43
+#: src/routes/index.tsx:50
 msgid "Update available"
 msgstr "Update available"
 
