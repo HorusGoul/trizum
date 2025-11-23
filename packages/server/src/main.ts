@@ -9,6 +9,7 @@ import { serve, type ServerType } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { rootLogger as logger } from "./log.ts";
 import { withContext } from "@logtape/logtape";
+import { cors } from "hono/cors";
 
 async function main() {
   logger.info("Starting server...");
@@ -71,6 +72,26 @@ async function main() {
       },
     );
   });
+
+  // CORS middleware
+  app.use(
+    "*",
+    cors({
+      origin:
+        env.NODE_ENV === "production"
+          ? [
+              "https://trizum.app",
+              "https://web.trizum.app",
+              "https://server.trizum.app",
+              "https://*.trizum.pages.dev",
+            ]
+          : "*",
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowHeaders: ["Content-Type", "Authorization"],
+      exposeHeaders: ["Content-Length"],
+      maxAge: 86400,
+    }),
+  );
 
   app.get(
     "/sync",
