@@ -61,7 +61,7 @@ msgstr "Añadir participante"
 
 #: src/routes/index.tsx:444
 msgid "Add your name so others know who you are and how to pay you"
-msgstr ""
+msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
 #: src/routes/party_.$partyId.add.tsx:42
 msgid "Adding expense..."
@@ -130,11 +130,11 @@ msgstr "Color"
 
 #: src/routes/index.tsx:441
 msgid "Complete your profile"
-msgstr ""
+msgstr "Completa tu perfil"
 
 #: src/routes/index.tsx:406
 msgid "Configure Profile"
-msgstr ""
+msgstr "Configurar perfil"
 
 #: src/routes/about.tsx:117
 msgid "Contributors"
@@ -196,7 +196,7 @@ msgstr "Inglés"
 
 #: src/routes/index.tsx:343
 msgid "Enter a party link or code to join"
-msgstr ""
+msgstr "Introduce un enlace o código de grupo para unirte"
 
 #: src/routes/join.tsx:120
 msgid "Enter the link or code of the trizum party you want to join"
@@ -325,7 +325,7 @@ msgstr "Importar adjuntos"
 
 #: src/routes/index.tsx:376
 msgid "Import your existing Tricount data"
-msgstr ""
+msgstr "Importa tu grupo de Tricount"
 
 #: src/routes/migrate_.tricount.tsx:190
 msgid "Imported {0} ({1} of {2})"
@@ -503,7 +503,7 @@ msgstr "Deuda pagada a {0}"
 
 #: src/routes/index.tsx:251
 msgid "participant"
-msgstr ""
+msgstr "participante"
 
 #: src/routes/new.tsx:252
 #: src/routes/party_.$partyId.settings.tsx:303
@@ -513,7 +513,7 @@ msgstr "Nombre del participante"
 
 #: src/routes/index.tsx:253
 msgid "participants"
-msgstr ""
+msgstr "participantes"
 
 #: src/routes/new.tsx:209
 #: src/routes/party_.$partyId.settings.tsx:226
@@ -634,7 +634,7 @@ msgstr "Guardar"
 
 #: src/routes/index.tsx:409
 msgid "Set up your username, avatar, and preferences"
-msgstr ""
+msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:86
 #: src/routes/party.$partyId.tsx:220
@@ -670,11 +670,11 @@ msgstr "Algo salió mal"
 
 #: src/routes/index.tsx:274
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
-msgstr ""
+msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
 
 #: src/routes/about.tsx:49
 msgid "Split bills with friends and family. Track, calculate, and settle expenses together."
-msgstr "Divide facturas con amigos y familia. Rastrea, calcula y salda gastos juntos."
+msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
 
 #: src/routes/about.tsx:84
 msgid "Split expenses fairly among multiple participants"
@@ -682,7 +682,7 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 
 #: src/routes/index.tsx:310
 msgid "Start tracking expenses with your group"
-msgstr ""
+msgstr "Comienza a registrar gastos con tu grupo"
 
 #: src/components/ExpenseEditor.tsx:248
 #: src/routes/join.tsx:90
@@ -824,7 +824,7 @@ msgstr "¡Bienvenido al grupo, {0}!"
 
 #: src/routes/index.tsx:271
 msgid "Welcome to trizum"
-msgstr ""
+msgstr "Bienvenid@ a trizum"
 
 #: src/routes/new.tsx:189
 #: src/routes/party_.$partyId.settings.tsx:185
