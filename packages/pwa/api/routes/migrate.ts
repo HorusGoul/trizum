@@ -1,6 +1,48 @@
+import { Hono } from "hono";
+
 import type { Party, PartyParticipant } from "../../src/models/party";
 import type { Expense, ExpenseShare } from "../../src/models/expense.js";
 import type { MigrationData } from "../../src/models/migration";
+
+export const apiMigrateRoute = new Hono();
+
+apiMigrateRoute.get("/", async (c) => {
+  let data: TricountResponse | null = null;
+  try {
+    const url = new URL(c.req.url);
+    const tricountKey = url.searchParams.get("key");
+
+    if (!tricountKey) {
+      return new Response("Missing 'key' query parameter", { status: 400 });
+    }
+
+    const api = new TricountAPIClient();
+    await api.initializeKeys();
+    await api.authenticate();
+    data = await api.fetchTricountData(tricountKey);
+    const migrationData = parseTricountData(data);
+
+    return new Response(JSON.stringify(migrationData), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    console.error("Migration error:", error);
+    return new Response(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Unknown error",
+        data,
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }
+});
 
 interface TricountAPI {
   base_url: string;
@@ -68,6 +110,12 @@ interface TricountResponse {
         };
       }>;
     };
+    Token: {
+      token: string;
+    };
+    UserPerson: {
+      id: number;
+    };
   }>;
 }
 
@@ -92,7 +140,7 @@ class TricountAPIClient {
   }
 
   async initializeKeys(): Promise<void> {
-    const keyPair = (await crypto.subtle.generateKey(
+    const keyPair = await crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
         modulusLength: 2048,
@@ -101,14 +149,14 @@ class TricountAPIClient {
       },
       true,
       ["encrypt", "decrypt"],
-    )) as CryptoKeyPair;
+    );
 
     // Export public key in PEM format
     const publicKeyBuffer = await crypto.subtle.exportKey(
       "spki",
       keyPair.publicKey,
     );
-    const publicKeyArray = new Uint8Array(publicKeyBuffer as ArrayBuffer);
+    const publicKeyArray = new Uint8Array(publicKeyBuffer);
     const publicKeyBase64 = btoa(String.fromCharCode(...publicKeyArray));
     this.public_key = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`;
 
@@ -117,7 +165,7 @@ class TricountAPIClient {
       "pkcs8",
       keyPair.privateKey,
     );
-    const privateKeyArray = new Uint8Array(privateKeyBuffer as ArrayBuffer);
+    const privateKeyArray = new Uint8Array(privateKeyBuffer);
     const privateKeyBase64 = btoa(String.fromCharCode(...privateKeyArray));
     this.private_key = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`;
   }
@@ -145,16 +193,16 @@ class TricountAPIClient {
       );
     }
 
-    const auth_data = (await response.json()) as TricountResponse;
+    const auth_data = await response.json<TricountResponse>();
     const response_items = auth_data.Response;
 
     // Extract token and user ID from response
     for (const item of response_items) {
       if ("Token" in item) {
-        this.auth_token = (item as any).Token.token;
+        this.auth_token = item.Token.token;
       }
       if ("UserPerson" in item) {
-        this.user_id = (item as any).UserPerson.id.toString();
+        this.user_id = item.UserPerson.id.toString();
       }
     }
 
@@ -181,7 +229,7 @@ class TricountAPIClient {
       );
     }
 
-    return (await response.json()) as TricountResponse;
+    return await response.json();
   }
 }
 
@@ -225,8 +273,9 @@ function parseTricountData(data: TricountResponse): MigrationData {
   }
 
   // Transform expenses
-  const expenses: (Omit<Expense, "id" | "__hash" | "paidAt"> & {
+  const expenses: (Omit<Expense, "id" | "__hash" | "paidAt" | "photos"> & {
     paidAt: string;
+    photos: string[];
   })[] = [];
 
   for (const entry of registry.all_registry_entry) {
@@ -317,8 +366,9 @@ function parseTricountData(data: TricountResponse): MigrationData {
     // Parse date
     const paidAt = new Date(transaction.date);
 
-    const expense: Omit<Expense, "id" | "__hash" | "paidAt"> & {
+    const expense: Omit<Expense, "id" | "__hash" | "paidAt" | "photos"> & {
       paidAt: string;
+      photos: string[];
     } = {
       name: transaction.description,
       paidAt: paidAt.toISOString(),
@@ -336,9 +386,10 @@ function parseTricountData(data: TricountResponse): MigrationData {
 
   // Create party
   const party: Omit<Party, "id" | "chunkRefs"> = {
+    type: "party",
     name: registry.title,
     description: registry.description || "",
-    currency: registry.currency as any, // Assuming currency string is valid
+    currency: registry.currency as Party["currency"], // Assuming currency string is valid
     participants,
     hue: undefined,
   };
@@ -349,41 +400,3 @@ function parseTricountData(data: TricountResponse): MigrationData {
     photos,
   };
 }
-
-export const onRequest: PagesFunction<Env> = async (context) => {
-  let data: TricountResponse | null = null;
-  try {
-    const url = new URL(context.request.url);
-    const tricountKey = url.searchParams.get("key");
-
-    if (!tricountKey) {
-      return new Response("Missing 'key' query parameter", { status: 400 });
-    }
-
-    const api = new TricountAPIClient();
-    await api.initializeKeys();
-    await api.authenticate();
-    data = await api.fetchTricountData(tricountKey);
-    const migrationData = parseTricountData(data);
-
-    return new Response(JSON.stringify(migrationData), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    console.error("Migration error:", error);
-    return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
-        data,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-  }
-};

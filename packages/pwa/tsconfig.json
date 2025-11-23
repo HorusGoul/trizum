@@ -5,9 +5,9 @@
     "types": ["vite-plugin-pwa/react"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["./functions/**/*.ts", "node_modules"],
+  "exclude": ["node_modules"],
   "references": [
     { "path": "./tsconfig.node.json" },
-    { "path": "./functions/tsconfig.json" }
+    { "path": "./tsconfig.cfworker.json" }
   ]
 }
