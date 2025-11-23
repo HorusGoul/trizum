@@ -1,4 +1,5 @@
-import { defineConfig, Plugin } from "vite";
+import type { Plugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import wasm from "vite-plugin-wasm";
@@ -15,7 +16,7 @@ const ReactCompilerConfig = {};
 // Read package.json version
 const packageJson = JSON.parse(
   readFileSync(path.resolve(__dirname, "package.json"), "utf-8"),
-);
+) as { version: string; description: string };
 const appVersion = packageJson.version;
 const description = packageJson.description;
 
@@ -29,115 +30,120 @@ try {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  define: {
-    "import.meta.env.VITE_APP_VERSION": JSON.stringify(appVersion),
-    "import.meta.env.VITE_APP_COMMIT": JSON.stringify(appCommit),
-  },
-  plugins: [
-    TanStackRouterVite(),
-    react({
-      babel: {
-        plugins: [
-          "babel-plugin-macros",
-          ["babel-plugin-react-compiler", ReactCompilerConfig],
-        ],
-      },
-    }),
-    wasm(),
-    topLevelAwait(),
-    lingui(),
-    preloadIconsPlugin({
-      matchers: [/#lucide\/([^"'`]+)/g],
-      importPreloadFunction: `import { preloadIcon } from "#src/ui/Icon.js";`,
-      preloadFunctionName: "preloadIcon",
-    }),
-    VitePWA({
-      registerType: "prompt",
-      workbox: {
-        maximumFileSizeToCacheInBytes: 5242880,
-        additionalManifestEntries: [
-          { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
-        ],
-      },
-      manifest: {
-        name: "trizum",
-        short_name: "trizum",
-        description,
-        theme_color: "#000000",
-        background_color: "#000000",
-        display: "standalone",
-        icons: [
-          {
-            src: "maskable-icon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "maskable",
-          },
-          {
-            src: "pwa-64x64.png",
-            sizes: "64x64",
-            type: "image/png",
-          },
-          {
-            src: "pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-        ],
-      },
-    }),
-    // Plugin to read preloaded icons and configure externals
-    excludeUnusedLucideIconsPlugin(),
-    // Generate third-party licenses file during build
-    license({
-      thirdParty: {
-        includePrivate: false,
-        output: {
-          file: path.resolve(__dirname, "dist", "THIRD-PARTY-LICENSES.txt"),
-          template(dependencies) {
-            return dependencies
-              .map((dep) => {
-                const repository =
-                  typeof dep.repository === "object" && dep.repository?.url
-                    ? dep.repository.url
-                    : dep.repository;
+export default defineConfig(({ mode }) => {
+  process.env.VITE_APP_WSS_URL =
+    mode === "production"
+      ? "wss://server.trizum.app/sync"
+      : "wss://dev-sync.trizum.app";
+  process.env.VITE_APP_VERSION = appVersion;
+  process.env.VITE_APP_COMMIT = appCommit;
 
-                const lines = [
-                  `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
-                  dep.license ? `License: ${dep.license}` : "",
-                  dep.author ? `Author: ${dep.author.text()}` : "",
-                  repository ? `Repository: ${repository}` : "",
-                  "",
-                ];
+  return {
+    plugins: [
+      TanStackRouterVite(),
+      react({
+        babel: {
+          plugins: [
+            "babel-plugin-macros",
+            ["babel-plugin-react-compiler", ReactCompilerConfig],
+          ],
+        },
+      }),
+      wasm(),
+      topLevelAwait(),
+      lingui(),
+      preloadIconsPlugin({
+        matchers: [/#lucide\/([^"'`]+)/g],
+        importPreloadFunction: `import { preloadIcon } from "#src/ui/Icon.js";`,
+        preloadFunctionName: "preloadIcon",
+      }),
+      VitePWA({
+        registerType: "prompt",
+        workbox: {
+          maximumFileSizeToCacheInBytes: 5242880,
+          additionalManifestEntries: [
+            { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
+          ],
+        },
+        manifest: {
+          name: "trizum",
+          short_name: "trizum",
+          description,
+          theme_color: "#000000",
+          background_color: "#000000",
+          display: "standalone",
+          icons: [
+            {
+              src: "maskable-icon-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
+            },
+            {
+              src: "pwa-64x64.png",
+              sizes: "64x64",
+              type: "image/png",
+            },
+            {
+              src: "pwa-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "pwa-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+          ],
+        },
+      }),
+      // Plugin to read preloaded icons and configure externals
+      excludeUnusedLucideIconsPlugin(),
+      // Generate third-party licenses file during build
+      license({
+        thirdParty: {
+          includePrivate: false,
+          output: {
+            file: path.resolve(__dirname, "dist", "THIRD-PARTY-LICENSES.txt"),
+            template(dependencies) {
+              return dependencies
+                .map((dep) => {
+                  const repository =
+                    typeof dep.repository === "object" && dep.repository?.url
+                      ? dep.repository.url
+                      : dep.repository;
 
-                if (dep.licenseText) {
-                  lines.push(dep.licenseText, "");
-                }
+                  const lines = [
+                    `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
+                    dep.license ? `License: ${dep.license}` : "",
+                    dep.author ? `Author: ${dep.author.text()}` : "",
+                    repository ? `Repository: ${repository}` : "",
+                    "",
+                  ];
 
-                lines.push("-".repeat(80), "");
+                  if (dep.licenseText) {
+                    lines.push(dep.licenseText, "");
+                  }
 
-                return lines.filter((line) => line !== undefined).join("\n");
-              })
-              .join("\n");
+                  lines.push("-".repeat(80), "");
+
+                  return lines.filter((line) => line !== undefined).join("\n");
+                })
+                .join("\n");
+            },
           },
         },
-      },
-    }),
-  ],
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:8788",
-        changeOrigin: true,
+      }),
+    ],
+    server: {
+      proxy: {
+        "/api": {
+          target: "http://localhost:8788",
+          changeOrigin: true,
+        },
       },
     },
-  },
+  };
 });
 
 interface PreloadIconsPluginOptions {
@@ -158,8 +164,7 @@ function preloadIconsPlugin({
   outFile = "src/preloadIcons.gen.ts",
 }: PreloadIconsPluginOptions): Plugin {
   const matches = new Set<string>();
-  const compile = debounce(writeFile, 1000);
-  let isBuild = false;
+  const compile = debounce(() => void writeFile(), 1000);
 
   function debounce(fn: () => void, ms: number) {
     let timeout: NodeJS.Timeout;
@@ -212,7 +217,7 @@ export function preloadAllIcons() {
       isDev = config.command !== "build";
     },
 
-    async transform(code, id) {
+    transform(code, id) {
       if (!isDev) {
         return;
       }
@@ -288,7 +293,7 @@ function excludeUnusedLucideIconsPlugin(): Plugin {
           const iconName = m[1];
           const importPath = m[2];
 
-          if (usedIcons!.has(iconName)) {
+          if (usedIcons.has(iconName)) {
             keptEntries.push(`  "${iconName}": () => import("${importPath}")`);
           }
         }

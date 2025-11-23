@@ -1,0 +1,43 @@
+# fly.toml app configuration file generated for trizum-server on 2025-11-23T02:05:47+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'trizum-server'
+primary_region = 'cdg'
+
+[build]
+dockerfile = "./Dockerfile"
+
+[http_service]
+internal_port = 3000
+force_https = true
+auto_stop_machines = 'stop'
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
+
+[[http_service.checks]]
+grace_period = "10s"
+interval = "30s"
+method = "GET"
+timeout = "5s"
+tls_skip_verify = false
+path = "/health"
+
+[[vm]]
+memory = '1gb'
+cpu_kind = 'shared'
+cpus = 1
+
+[mounts]
+source = "trizum_data"
+destination = "/mnt/data"
+initial_size = "10gb"
+auto_extend_size_increment = "5GB"
+auto_extend_size_threshold = 75
+auto_extend_size_limit = "200GB"
+
+[env]
+DB_FILE_NAME = "file:/mnt/data/trizum.db"
+PORT = "3000"

@@ -1,0 +1,59 @@
+{
+  "name": "@trizum/server",
+  "description": "",
+  "keywords": [],
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "pnpm node --watch src/main.ts",
+    "start": "pnpm db:migrate && pnpm node src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "pnpm run lint --fix",
+    "node": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types",
+    "db:drizzle": "pnpm node node_modules/drizzle-kit/bin.cjs",
+    "db:generate": "pnpm db:drizzle generate",
+    "db:migrate": "pnpm db:drizzle migrate",
+    "db:studio": "pnpm db:drizzle studio",
+    "db:push": "pnpm db:drizzle push",
+    "deploy": "./deploy.sh"
+  },
+  "devDependencies": {
+    "@trizum/eslint-config": "workspace:*",
+    "@trizum/prettier-config": "workspace:*",
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "eslint": "9.39.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.2"
+  },
+  "prettier": "@trizum/prettier-config",
+  "dependencies": {
+    "@automerge/automerge-repo": "2.5.0",
+    "@automerge/automerge-repo-network-websocket": "2.5.0",
+    "@hono/node-server": "1.19.6",
+    "@hono/node-ws": "1.2.0",
+    "@libsql/client": "0.15.15",
+    "@logtape/logtape": "1.2.0",
+    "drizzle-kit": "0.31.7",
+    "drizzle-orm": "0.44.7",
+    "hono": "4.10.6",
+    "zod": "4.1.12"
+  }
+}

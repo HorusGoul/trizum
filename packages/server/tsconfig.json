@@ -1,0 +1,15 @@
+{
+  "extends": "@trizum/tsconfig/base.json",
+  "include": ["./src", "./drizzle.config.ts"],
+  "exclude": ["dist", "node_modules"],
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "types": ["node"],
+    "noEmit": true,
+    "module": "nodenext",
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+  }
+}
