@@ -83,7 +83,7 @@ async function main() {
               "https://trizum.app",
               "https://web.trizum.app",
               "https://server.trizum.app",
-              "https://*.trizum.pages.dev",
+              "https://*.horusdev.workers.dev",
             ]
           : "*",
       allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
