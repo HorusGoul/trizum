@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
+    "moduleResolution": "bundler",
     "target": "esnext",
     "module": "esnext",
     "lib": ["esnext"],
-    "types": ["./types.d.ts"],
     "composite": true,
     "skipLibCheck": true
   },
-  "include": ["./**/*.ts"]
+  "include": ["./src/api/**/*.ts"]
 }

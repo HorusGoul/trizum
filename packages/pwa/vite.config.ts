@@ -10,6 +10,7 @@ import license from "rollup-plugin-license";
 import path from "node:path";
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 const ReactCompilerConfig = {};
 
@@ -40,6 +41,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
+      cloudflare(),
       TanStackRouterVite(),
       react({
         babel: {
@@ -49,7 +51,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
       }),
-      wasm(),
+      wasm() as Plugin,
       topLevelAwait(),
       lingui(),
       preloadIconsPlugin({
@@ -104,7 +106,11 @@ export default defineConfig(({ mode }) => {
         thirdParty: {
           includePrivate: false,
           output: {
-            file: path.resolve(__dirname, "dist", "THIRD-PARTY-LICENSES.txt"),
+            file: path.resolve(
+              __dirname,
+              "dist/client",
+              "THIRD-PARTY-LICENSES.txt",
+            ),
             template(dependencies) {
               return dependencies
                 .map((dep) => {
@@ -135,14 +141,6 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
-    server: {
-      proxy: {
-        "/api": {
-          target: "http://localhost:8788",
-          changeOrigin: true,
-        },
-      },
-    },
   };
 });
 
