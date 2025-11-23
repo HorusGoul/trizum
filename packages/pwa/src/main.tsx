@@ -48,10 +48,12 @@ declare module "react-aria-components" {
   }
 }
 
+const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
+
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
-  network: [new BrowserWebSocketClientAdapter("ws://localhost:3000/sync")],
+  network: [new BrowserWebSocketClientAdapter(WSS_URL)],
 });
 
 // Create a new router instance
