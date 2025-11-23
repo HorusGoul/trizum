@@ -58,10 +58,6 @@ export const validateExpenseTitle = validatePartyTitle;
 export function validatePhoneNumber(phone: string) {
   phone = phone.trim();
 
-  if (!phone) {
-    return t`Phone number is required`;
-  }
-
   if (phone.length > 20) {
     return t`Phone number must be less than 20 characters`;
   }
