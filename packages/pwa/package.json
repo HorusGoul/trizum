@@ -17,7 +17,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "generate:assets": "pwa-assets-generator"
+    "generate:assets": "pwa-assets-generator",
+    "deploy": "pnpm build && wrangler deploy"
   },
   "dependencies": {
     "@automerge/automerge": "3.2.0",
