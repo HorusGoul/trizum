@@ -39,6 +39,10 @@ import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { Button } from "#src/ui/Button.tsx";
+import {
+  requestIdleCallback,
+  cancelIdleCallback,
+} from "#src/lib/requestIdleCallback.ts";
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";

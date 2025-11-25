@@ -15,6 +15,7 @@ import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { Button } from "#src/ui/Button.tsx";
 import type { MigrationData } from "#src/models/migration.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
+import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
