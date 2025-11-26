@@ -82,6 +82,9 @@ importers:
       '@capacitor/android':
         specifier: 7.4.4
         version: 7.4.4(@capacitor/core@7.4.4)
+      '@capacitor/ios':
+        specifier: 7.4.4
+        version: 7.4.4(@capacitor/core@7.4.4)
       '@trizum/pwa':
         specifier: workspace:*
         version: link:../pwa
@@ -1073,6 +1076,11 @@ packages:
 
   '@capacitor/core@7.4.4':
     resolution: {integrity: sha512-xzjxpr+d2zwTpCaN0k+C6wKSZzWFAb9OVEUtmO72ihjr/NEDoLvsGl4WLfjWPcCO2zOy0b2X52tfRWjECFUjtw==}
+
+  '@capacitor/ios@7.4.4':
+    resolution: {integrity: sha512-Xp3bGWlSQAwsZGngRMWTdoD2agdMV12Whnm+/xsYPxfQSj+Tksbr7r/8Mso7VWkpnTKO4iMlx762g3PjW+wi4w==}
+    peerDependencies:
+      '@capacitor/core': ^7.4.0
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     resolution: {integrity: sha512-P7swiOAdF7aSi0H+tHtHtr6zrpF3aAq/W9FXx5HektRvLTM2O89xCyXF3pk7pLc7QpaY7AoaE8UowVf9QBdh3w==}
@@ -8503,6 +8511,10 @@ snapshots:
   '@capacitor/core@7.4.4':
     dependencies:
       tslib: 2.8.1
+
+  '@capacitor/ios@7.4.4(@capacitor/core@7.4.4)':
+    dependencies:
+      '@capacitor/core': 7.4.4
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     optional: true

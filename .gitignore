@@ -133,3 +133,6 @@ dist
 
 # Local SQLite database
 *.db
+
+# macOS files
+.DS_Store
