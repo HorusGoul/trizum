@@ -22,6 +22,8 @@ import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
 import { RepoContext } from "./lib/automerge/RepoContext.ts";
+import { SafeArea } from "capacitor-plugin-safe-area";
+import { Capacitor } from "@capacitor/core";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -65,6 +67,26 @@ const router = createRouter({
 });
 
 void preloadAllIcons();
+
+if (Capacitor.isNativePlatform()) {
+  void SafeArea.getSafeAreaInsets().then(({ insets }) => {
+    for (const [key, value] of Object.entries(insets)) {
+      document.documentElement.style.setProperty(
+        `--safe-area-inset-${key}`,
+        `${value}px`,
+      );
+    }
+  });
+
+  void SafeArea.addListener("safeAreaChanged", ({ insets }) => {
+    for (const [key, value] of Object.entries(insets)) {
+      document.documentElement.style.setProperty(
+        `--safe-area-inset-${key}`,
+        `${value}px`,
+      );
+    }
+  });
+}
 
 // Render the app
 const rootElement = document.getElementById("root")!;

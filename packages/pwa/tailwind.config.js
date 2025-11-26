@@ -3,6 +3,7 @@ import colors from "tailwindcss/colors";
 import { dynamicTwClasses } from "@horus.dev/tw-dynamic-themes/tailwind";
 import tailwindcssReactAriaComponents from "tailwindcss-react-aria-components";
 import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindSafeAreaCapacitor from "tailwindcss-safe-area-capacitor";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -18,5 +19,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssReactAriaComponents, tailwindcssAnimate],
+  plugins: [tailwindcssReactAriaComponents, tailwindcssAnimate, tailwindSafeAreaCapacitor],
 };

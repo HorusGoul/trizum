@@ -36,7 +36,7 @@ function Index() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center pr-2">
+      <div className="mt-safe container flex h-16 items-center pr-2">
         <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
         <span

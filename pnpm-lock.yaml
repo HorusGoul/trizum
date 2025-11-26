@@ -88,6 +88,9 @@ importers:
       '@trizum/pwa':
         specifier: workspace:*
         version: link:../pwa
+      capacitor-plugin-safe-area:
+        specifier: 4.0.3
+        version: 4.0.3(@capacitor/core@7.4.4)
     devDependencies:
       '@capacitor/cli':
         specifier: 7.4.4
@@ -138,6 +141,9 @@ importers:
       '@automerge/automerge-repo-storage-indexeddb':
         specifier: 2.5.0
         version: 2.5.0
+      '@capacitor/core':
+        specifier: 7.4.4
+        version: 7.4.4
       '@horus.dev/tw-dynamic-themes':
         specifier: 0.0.3
         version: 0.0.3
@@ -177,6 +183,9 @@ importers:
       browser-image-compression:
         specifier: 2.0.2
         version: 2.0.2
+      capacitor-plugin-safe-area:
+        specifier: 4.0.3
+        version: 4.0.3(@capacitor/core@7.4.4)
       clsx:
         specifier: 2.1.1
         version: 2.1.1
@@ -298,6 +307,9 @@ importers:
       tailwindcss-react-aria-components:
         specifier: 1.2.0
         version: 1.2.0(tailwindcss@3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2)))
+      tailwindcss-safe-area-capacitor:
+        specifier: 0.5.1
+        version: 0.5.1(tailwindcss@3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2)))
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -3941,6 +3953,11 @@ packages:
   caniuse-lite@1.0.30001743:
     resolution: {integrity: sha512-e6Ojr7RV14Un7dz6ASD0aZDmQPT/A+eZU+nuTNfjqmRrmkmQlnTNWH0SKmqagx9PeW87UVqapSurtAXifmtdmw==}
 
+  capacitor-plugin-safe-area@4.0.3:
+    resolution: {integrity: sha512-RteQU+EcwfQFup66fOrlfYNfkGi3jSVwD8YimUAdyZlelriiqRctmKK5ONYXyt+Wd2e5y5F1A081kB9SRHGg2Q==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
   cbor-extract@2.2.0:
     resolution: {integrity: sha512-Ig1zM66BjLfTXpNgKpvBePq271BPOvu8MR0Jl080yG7Jsl+wAZunfrwiwA+9ruzm/WEdIV5QF/bjDZTqyAIVHA==}
     hasBin: true
@@ -6883,6 +6900,12 @@ packages:
     peerDependencies:
       tailwindcss: '*'
 
+  tailwindcss-safe-area-capacitor@0.5.1:
+    resolution: {integrity: sha512-ieyA7odik1IKff+0QRVdKnCdmJl+XS6yXY70ALstBC87g5eNgSkCrsKyRVAatuX6jTyeRryHzaOFkqzFI/ZbTA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      tailwindcss: ^2.0.0 || >=3.0.0
+
   tailwindcss@3.4.5:
     resolution: {integrity: sha512-DlTxttYcogpDfx3tf/8jfnma1nfAYi2cBUYV2YNoPPecwmO3YGiFlOX9D8tGAu+EDF38ryBzvrDKU/BLMsUwbw==}
     engines: {node: '>=14.0.0'}
@@ -8732,17 +8755,17 @@ snapshots:
   '@emnapi/core@1.7.0':
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
-      tslib: 2.6.3
+      tslib: 2.8.1
     optional: true
 
   '@emnapi/runtime@1.5.0':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
     optional: true
 
   '@emnapi/wasi-threads@1.1.0':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
     optional: true
 
   '@esbuild-kit/core-utils@3.3.2':
@@ -9091,26 +9114,26 @@ snapshots:
   '@formatjs/ecma402-abstract@2.0.0':
     dependencies:
       '@formatjs/intl-localematcher': 0.5.4
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@formatjs/fast-memoize@2.2.0':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@formatjs/icu-messageformat-parser@2.7.8':
     dependencies:
       '@formatjs/ecma402-abstract': 2.0.0
       '@formatjs/icu-skeleton-parser': 1.8.2
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@formatjs/icu-skeleton-parser@1.8.2':
     dependencies:
       '@formatjs/ecma402-abstract': 2.0.0
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@formatjs/intl-localematcher@0.5.4':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@hono/node-server@1.19.6(hono@4.10.6)':
     dependencies:
@@ -10858,7 +10881,7 @@ snapshots:
 
   '@swc/helpers@0.5.12':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   '@swc/types@0.1.24':
     dependencies:
@@ -11075,7 +11098,7 @@ snapshots:
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
     optional: true
 
   '@types/babel__core@7.20.5':
@@ -11597,11 +11620,11 @@ snapshots:
 
   ast-types@0.13.4:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   ast-types@0.16.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   astral-regex@2.0.0: {}
 
@@ -11800,6 +11823,10 @@ snapshots:
   caniuse-lite@1.0.30001735: {}
 
   caniuse-lite@1.0.30001743: {}
+
+  capacitor-plugin-safe-area@4.0.3(@capacitor/core@7.4.4):
+    dependencies:
+      '@capacitor/core': 7.4.4
 
   cbor-extract@2.2.0:
     dependencies:
@@ -13311,7 +13338,7 @@ snapshots:
       '@formatjs/ecma402-abstract': 2.0.0
       '@formatjs/fast-memoize': 2.2.0
       '@formatjs/icu-messageformat-parser': 2.7.8
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   ip-address@9.0.5:
     dependencies:
@@ -14518,7 +14545,7 @@ snapshots:
       esprima: 4.0.1
       source-map: 0.6.1
       tiny-invariant: 1.3.3
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   reflect.getprototypeof@1.0.10:
     dependencies:
@@ -14692,7 +14719,7 @@ snapshots:
 
   rxjs@7.8.1:
     dependencies:
-      tslib: 2.6.3
+      tslib: 2.8.1
 
   safe-array-concat@1.1.2:
     dependencies:
@@ -15166,6 +15193,10 @@ snapshots:
       tailwindcss: 3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2))
 
   tailwindcss-react-aria-components@1.2.0(tailwindcss@3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2))):
+    dependencies:
+      tailwindcss: 3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2))
+
+  tailwindcss-safe-area-capacitor@0.5.1(tailwindcss@3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2))):
     dependencies:
       tailwindcss: 3.4.5(ts-node@10.9.2(@swc/core@1.13.3)(@swc/wasm@1.13.3)(@types/node@24.10.1)(typescript@5.9.2))
 
