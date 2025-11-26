@@ -1,0 +1,15 @@
+{
+  "extends": "@trizum/tsconfig/base.json",
+  "include": ["capacitor.config.ts"],
+  "exclude": ["dist", "node_modules"],
+  "compilerOptions": {
+    "types": ["node"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "target": "ES2017",
+    "composite": true,
+    "noEmit": false,
+    "verbatimModuleSyntax": false,
+  }
+}
