@@ -82,6 +82,9 @@ importers:
       '@capacitor/android':
         specifier: 7.4.4
         version: 7.4.4(@capacitor/core@7.4.4)
+      '@capacitor/app':
+        specifier: 7.1.0
+        version: 7.1.0(@capacitor/core@7.4.4)
       '@capacitor/ios':
         specifier: 7.4.4
         version: 7.4.4(@capacitor/core@7.4.4)
@@ -141,6 +144,9 @@ importers:
       '@automerge/automerge-repo-storage-indexeddb':
         specifier: 2.5.0
         version: 2.5.0
+      '@capacitor/app':
+        specifier: 7.1.0
+        version: 7.1.0(@capacitor/core@7.4.4)
       '@capacitor/core':
         specifier: 7.4.4
         version: 7.4.4
@@ -1080,6 +1086,11 @@ packages:
     resolution: {integrity: sha512-y8knfV1JXNrd6XZZLZireGT+EBCN0lvOo+HZ/s7L8LkrPBu4nY5UZn0Wxz4yOezItEII9rqYJSHsS5fMJG9gdw==}
     peerDependencies:
       '@capacitor/core': ^7.4.0
+
+  '@capacitor/app@7.1.0':
+    resolution: {integrity: sha512-W7m09IWrUjZbo7AKeq+rc/KyucxrJekTBg0l4QCm/yDtCejE3hebxp/W2esU26KKCzMc7H3ClkUw32E9lZkwRA==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   '@capacitor/cli@7.4.4':
     resolution: {integrity: sha512-J7ciBE7GlJ70sr2s8oz1+H4ZdNk4MGG41fsakUlDHWva5UWgFIZYMiEdDvGbYazAYTaxN3lVZpH9zil9FfZj+Q==}
@@ -8506,6 +8517,10 @@ snapshots:
   '@canvas/image-data@1.0.0': {}
 
   '@capacitor/android@7.4.4(@capacitor/core@7.4.4)':
+    dependencies:
+      '@capacitor/core': 7.4.4
+
+  '@capacitor/app@7.1.0(@capacitor/core@7.4.4)':
     dependencies:
       '@capacitor/core': 7.4.4
 

@@ -51,6 +51,7 @@
   "prettier": "@trizum/prettier-config",
   "dependencies": {
     "@capacitor/android": "7.4.4",
+    "@capacitor/app": "7.1.0",
     "@capacitor/ios": "7.4.4",
     "@trizum/pwa": "workspace:*",
     "capacitor-plugin-safe-area": "4.0.3"

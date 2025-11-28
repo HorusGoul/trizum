@@ -25,6 +25,7 @@
     "@automerge/automerge-repo": "2.5.0",
     "@automerge/automerge-repo-network-websocket": "2.5.0",
     "@automerge/automerge-repo-storage-indexeddb": "2.5.0",
+    "@capacitor/app": "7.1.0",
     "@capacitor/core": "7.4.4",
     "@horus.dev/tw-dynamic-themes": "0.0.3",
     "@internationalized/date": "3.8.2",
