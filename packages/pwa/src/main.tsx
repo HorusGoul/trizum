@@ -24,6 +24,7 @@ import { usePartyList } from "./hooks/usePartyList.ts";
 import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -84,6 +85,14 @@ if (Capacitor.isNativePlatform()) {
         `--safe-area-inset-${key}`,
         `${value}px`,
       );
+    }
+  });
+
+  void App.addListener("backButton", ({ canGoBack }) => {
+    if (canGoBack) {
+      router.history.go(-1);
+    } else {
+      void App.exitApp();
     }
   });
 }
