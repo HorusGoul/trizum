@@ -37,3 +37,8 @@ body {
 * {
   @apply outline-accent-500 dark:outline-accent-400;
 }
+
+img, a {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
