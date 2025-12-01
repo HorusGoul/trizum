@@ -40,7 +40,7 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2">
+      <div className="container flex h-16 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
 
         <h1 className="pl-4 text-2xl font-bold">

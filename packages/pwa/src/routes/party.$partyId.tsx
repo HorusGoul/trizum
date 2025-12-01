@@ -141,7 +141,7 @@ function PartyById() {
 
   return (
     <div className="flex h-full max-h-full flex-col">
-      <div className="container flex h-16 flex-shrink-0 items-center px-2">
+      <div className="container flex h-16 flex-shrink-0 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/" }} />
         <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
         <div className="flex-1" />
@@ -314,9 +314,9 @@ function ExpenseLog({
           loadNext={loadNext}
         />
 
-        <div className="flex-1" />
+        <div className="flex-1 pb-safe-offset-12" />
 
-        <div className="sticky bottom-6 flex justify-end">
+        <div className="sticky flex justify-end bottom-safe-offset-6">
           <MenuTrigger>
             <IconButton
               aria-label={t`Add or create`}

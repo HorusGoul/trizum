@@ -131,9 +131,9 @@ function Index() {
             <PartyItem key={partyId} partyId={partyId} />
           ))}
 
-          <div className="flex-1" />
+          <div className="flex-1 pb-safe-offset-12" />
 
-          <div className="sticky bottom-6 flex justify-end">
+          <div className="sticky flex justify-end bottom-safe-offset-6">
             <MenuTrigger>
               <IconButton
                 aria-label={t`Add or create`}
