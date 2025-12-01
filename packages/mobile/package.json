@@ -36,9 +36,11 @@
     "run:android": "cap run android",
     "run:ios": "cap run ios",
     "dev:android": "DEV_MODE=true pnpm run:android",
-    "dev:ios": "DEV_MODE=true pnpm run:ios"
+    "dev:ios": "DEV_MODE=true pnpm run:ios",
+    "assets:generate": "./generate-icons.sh"
   },
   "devDependencies": {
+    "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "7.4.4",
     "@trizum/eslint-config": "workspace:*",
     "@trizum/prettier-config": "workspace:*",
@@ -46,6 +48,8 @@
     "@types/node": "^24.10.1",
     "eslint": "9.39.1",
     "prettier": "3.6.2",
+    "sharp": "0.32.6",
+    "svgexport": "0.4.2",
     "typescript": "5.9.2"
   },
   "prettier": "@trizum/prettier-config",
