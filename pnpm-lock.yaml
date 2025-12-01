@@ -88,6 +88,9 @@ importers:
       '@capacitor/ios':
         specifier: 7.4.4
         version: 7.4.4(@capacitor/core@7.4.4)
+      '@capawesome/capacitor-app-update':
+        specifier: 7.2.0
+        version: 7.2.0(@capacitor/core@7.4.4)
       '@trizum/pwa':
         specifier: workspace:*
         version: link:../pwa
@@ -150,6 +153,9 @@ importers:
       '@capacitor/core':
         specifier: 7.4.4
         version: 7.4.4
+      '@capawesome/capacitor-app-update':
+        specifier: 7.2.0
+        version: 7.2.0(@capacitor/core@7.4.4)
       '@horus.dev/tw-dynamic-themes':
         specifier: 0.0.3
         version: 0.0.3
@@ -1104,6 +1110,11 @@ packages:
     resolution: {integrity: sha512-Xp3bGWlSQAwsZGngRMWTdoD2agdMV12Whnm+/xsYPxfQSj+Tksbr7r/8Mso7VWkpnTKO4iMlx762g3PjW+wi4w==}
     peerDependencies:
       '@capacitor/core': ^7.4.0
+
+  '@capawesome/capacitor-app-update@7.2.0':
+    resolution: {integrity: sha512-fwPxR9tV5qecn3FSgwS5wBwlHDV9JND5dnY1iqIYnqRG2s/Oq0h32u4hV6+/zpDARJFMZycb3pddEfwLwhglEg==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   '@cbor-extract/cbor-extract-darwin-arm64@2.2.0':
     resolution: {integrity: sha512-P7swiOAdF7aSi0H+tHtHtr6zrpF3aAq/W9FXx5HektRvLTM2O89xCyXF3pk7pLc7QpaY7AoaE8UowVf9QBdh3w==}
@@ -8551,6 +8562,10 @@ snapshots:
       tslib: 2.8.1
 
   '@capacitor/ios@7.4.4(@capacitor/core@7.4.4)':
+    dependencies:
+      '@capacitor/core': 7.4.4
+
+  '@capawesome/capacitor-app-update@7.2.0(@capacitor/core@7.4.4)':
     dependencies:
       '@capacitor/core': 7.4.4
 

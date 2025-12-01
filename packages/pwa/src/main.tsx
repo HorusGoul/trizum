@@ -25,6 +25,7 @@ import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
+import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -69,7 +70,11 @@ const router = createRouter({
 
 void preloadAllIcons();
 
+let UpdateControllerComponent = UpdateController;
+
 if (Capacitor.isNativePlatform()) {
+  UpdateControllerComponent = UpdateControllerNative;
+
   void SafeArea.getSafeAreaInsets().then(({ insets }) => {
     for (const [key, value] of Object.entries(insets)) {
       document.documentElement.style.setProperty(
@@ -103,7 +108,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <UpdateController>
+      <UpdateControllerComponent>
         <AriaProviders>
           <RepoContext value={repo}>
             <MediaGalleryController>
@@ -112,7 +117,7 @@ if (!rootElement.innerHTML) {
             </MediaGalleryController>
           </RepoContext>
         </AriaProviders>
-      </UpdateController>
+      </UpdateControllerComponent>
     </I18nProvider>,
   );
 }
