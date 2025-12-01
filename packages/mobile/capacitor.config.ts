@@ -35,6 +35,11 @@ const config: CapacitorConfig = {
   appName: "trizum",
   webDir: "dist",
   server: serverConfig,
+  plugins: {
+    SplashScreen: {
+      launchAutoHide: false,
+    },
+  },
 };
 
 export default config;

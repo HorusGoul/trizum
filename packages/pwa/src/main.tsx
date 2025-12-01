@@ -26,6 +26,8 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
+import { useEffect } from "react";
+import { SplashScreen } from "@capacitor/splash-screen";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -131,6 +133,12 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
   usePartyList();
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      void SplashScreen.hide();
+    }
+  }, []);
 
   return (
     <>
