@@ -35,6 +35,9 @@ const config: CapacitorConfig = {
   appName: "trizum",
   webDir: "dist",
   server: serverConfig,
+  ios: {
+    allowsLinkPreview: false,
+  },
   plugins: {
     SplashScreen: {
       launchAutoHide: false,
