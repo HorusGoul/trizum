@@ -102,6 +102,14 @@ if (Capacitor.isNativePlatform()) {
       void App.exitApp();
     }
   });
+
+  void App.addListener("appUrlOpen", (event) => {
+    const url = new URL(event.url);
+
+    const pathnameAndSearch = url.pathname + url.search;
+
+    void router.history.push(pathnameAndSearch);
+  });
 }
 
 // Render the app
