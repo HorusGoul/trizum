@@ -22,6 +22,12 @@ import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
 import { RepoContext } from "./lib/automerge/RepoContext.ts";
+import { SafeArea } from "capacitor-plugin-safe-area";
+import { Capacitor } from "@capacitor/core";
+import { App } from "@capacitor/app";
+import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
+import { useEffect } from "react";
+import { SplashScreen } from "@capacitor/splash-screen";
 
 // Initialize i18n
 const i18n = initializeI18n();
@@ -66,13 +72,53 @@ const router = createRouter({
 
 void preloadAllIcons();
 
+let UpdateControllerComponent = UpdateController;
+
+if (Capacitor.isNativePlatform()) {
+  UpdateControllerComponent = UpdateControllerNative;
+
+  void SafeArea.getSafeAreaInsets().then(({ insets }) => {
+    for (const [key, value] of Object.entries(insets)) {
+      document.documentElement.style.setProperty(
+        `--safe-area-inset-${key}`,
+        `${value}px`,
+      );
+    }
+  });
+
+  void SafeArea.addListener("safeAreaChanged", ({ insets }) => {
+    for (const [key, value] of Object.entries(insets)) {
+      document.documentElement.style.setProperty(
+        `--safe-area-inset-${key}`,
+        `${value}px`,
+      );
+    }
+  });
+
+  void App.addListener("backButton", ({ canGoBack }) => {
+    if (canGoBack) {
+      router.history.go(-1);
+    } else {
+      void App.exitApp();
+    }
+  });
+
+  void App.addListener("appUrlOpen", (event) => {
+    const url = new URL(event.url);
+
+    const pathnameAndSearch = url.pathname + url.search;
+
+    void router.history.push(pathnameAndSearch);
+  });
+}
+
 // Render the app
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <UpdateController>
+      <UpdateControllerComponent>
         <AriaProviders>
           <RepoContext value={repo}>
             <MediaGalleryController>
@@ -81,7 +127,7 @@ if (!rootElement.innerHTML) {
             </MediaGalleryController>
           </RepoContext>
         </AriaProviders>
-      </UpdateController>
+      </UpdateControllerComponent>
     </I18nProvider>,
   );
 }
@@ -95,6 +141,12 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
   usePartyList();
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      void SplashScreen.hide();
+    }
+  }, []);
 
   return (
     <>

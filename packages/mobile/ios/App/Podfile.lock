@@ -1,0 +1,46 @@
+PODS:
+  - Capacitor (7.4.4):
+    - CapacitorCordova
+  - CapacitorApp (7.1.0):
+    - Capacitor
+  - CapacitorCordova (7.4.4)
+  - CapacitorPluginSafeArea (4.0.3):
+    - Capacitor
+  - CapacitorSplashScreen (7.0.3):
+    - Capacitor
+  - CapawesomeCapacitorAppUpdate (7.2.0):
+    - Capacitor
+
+DEPENDENCIES:
+  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@7.1.0_@capacitor+core@7.4.4/node_modules/@capacitor/app`)"
+  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios`)"
+  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@4.0.3_@capacitor+core@7.4.4/node_modules/capacitor-plugin-safe-area`)"
+  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/splash-screen`)"
+  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@7.2.0_@capacitor+core@7.4.4/node_modules/@capawesome/capacitor-app-update`)"
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios"
+  CapacitorApp:
+    :path: "../../../../node_modules/.pnpm/@capacitor+app@7.1.0_@capacitor+core@7.4.4/node_modules/@capacitor/app"
+  CapacitorCordova:
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios"
+  CapacitorPluginSafeArea:
+    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@4.0.3_@capacitor+core@7.4.4/node_modules/capacitor-plugin-safe-area"
+  CapacitorSplashScreen:
+    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/splash-screen"
+  CapawesomeCapacitorAppUpdate:
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@7.2.0_@capacitor+core@7.4.4/node_modules/@capawesome/capacitor-app-update"
+
+SPEC CHECKSUMS:
+  Capacitor: 09d9ff8e9618e8c4b3cab2bbee34a17215dd2fef
+  CapacitorApp: 846d4b4a1dbb19dd1e9029c08ba6f028aa7be862
+  CapacitorCordova: bf648a636f3c153f652d312ae145fb508b6ffced
+  CapacitorPluginSafeArea: 0b05430642c0da92b5f174e900ccecf39a71e2c3
+  CapacitorSplashScreen: d06ae8804808e9f649a08e7bb7f283c77b688084
+  CapawesomeCapacitorAppUpdate: deee9aa6bd4d1a2167a000e5008f71adc3cb1b73
+
+PODFILE CHECKSUM: 98f6baf14d5c1ae6b4d2e2d242e1d8f0621a5492
+
+COCOAPODS: 1.13.0

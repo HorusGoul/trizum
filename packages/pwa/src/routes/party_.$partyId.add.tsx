@@ -13,8 +13,6 @@ import {
   type ExpenseEditorFormValues,
 } from "#src/components/ExpenseEditor.js";
 
-import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
-
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
 
@@ -24,8 +22,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { party, partyId, addExpenseToParty } = useCurrentParty();
-  const { createMediaFile } = useMediaFileActions();
+  const { partyId, addExpenseToParty } = useCurrentParty();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
 

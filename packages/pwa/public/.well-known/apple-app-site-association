@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "NYWQ2ZGWYB.app.trizum.capacitor",
+        "paths": ["*"]
+      }
+    ]
+  }
+}

@@ -36,7 +36,7 @@ function Index() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center pr-2">
+      <div className="container flex h-16 items-center pr-2 mt-safe">
         <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
         <span
@@ -131,9 +131,9 @@ function Index() {
             <PartyItem key={partyId} partyId={partyId} />
           ))}
 
-          <div className="flex-1" />
+          <div className="flex-1 pb-safe-offset-12" />
 
-          <div className="sticky bottom-6 flex justify-end">
+          <div className="sticky flex justify-end bottom-safe-offset-6">
             <MenuTrigger>
               <IconButton
                 aria-label={t`Add or create`}

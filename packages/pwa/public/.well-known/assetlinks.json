@@ -1,0 +1,5 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target" : { "namespace": "android_app", "package_name": "app.trizum.capacitor",
+               "sha256_cert_fingerprints": ["87:78:42:B0:F3:48:8E:23:19:E0:54:66:DA:3D:22:F2:26:0A:C8:F5:17:A9:24:E8:5E:BE:FA:71:A0:68:FB:19"] }
+}]
