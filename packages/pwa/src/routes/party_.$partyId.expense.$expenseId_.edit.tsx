@@ -19,7 +19,6 @@ import {
   calculateExpenseHash,
   getExpenseTotalAmount,
   type Expense,
-  type ExpenseParticipantPresence,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import { type DocHandleChangePayload } from "@automerge/automerge-repo";
@@ -53,7 +52,6 @@ function RouteComponent() {
     onUpdateExpense,
     onChangeExpense,
     subscribeToExpenseChanges,
-    onPresenceUpdate,
   } = useExpense();
   const navigate = useNavigate();
 
@@ -166,10 +164,7 @@ function RouteComponent() {
 
   return (
     <>
-      <RealtimeExpenseEditorPresence
-        presence={expense.__presence}
-        onPresenceUpdate={onPresenceUpdate}
-      />
+      <RealtimeExpenseEditorPresence expenseId={expenseId} />
       <ExpenseEditor
         title={t`Editing ${expenseName}`}
         onSubmit={onSubmit}
@@ -248,38 +243,6 @@ function useExpense() {
     };
   }
 
-  function onPresenceUpdate(
-    value: Pick<ExpenseParticipantPresence, "elementId"> | null,
-  ) {
-    handle.change((chunk) => {
-      const entry = chunk.expenses[expenseIndex];
-
-      if (!entry) {
-        return;
-      }
-
-      if (entry.id !== expenseId) {
-        return;
-      }
-
-      if (!entry.__presence) {
-        entry.__presence = {};
-      }
-
-      if (value) {
-        entry.__presence[participant.id] = {
-          participantId: participant.id,
-          dateTime: new Date(),
-          elementId: value.elementId,
-        };
-      } else {
-        if (entry.__presence[participant.id]) {
-          delete entry.__presence[participant.id];
-        }
-      }
-    });
-  }
-
   return {
     partyId,
     expense,
@@ -288,7 +251,6 @@ function useExpense() {
     onChangeExpense,
     onUpdateExpense,
     subscribeToExpenseChanges,
-    onPresenceUpdate,
   };
 }
 

@@ -24,10 +24,6 @@ export interface Expense {
   __hash: string;
   __editCopy?: Omit<Expense, "__editCopy">;
   __editCopyLastUpdatedAt?: Date;
-  __presence?: Record<
-    ExpenseParticipantPresence["participantId"],
-    ExpenseParticipantPresence
-  >;
 }
 
 export type ExpenseShare = ExpenseShareExact | ExpenseShareDivide;

@@ -1,27 +1,141 @@
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import type {
-  Expense,
-  ExpenseParticipantPresence,
+import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import {
+  decodeExpenseId,
+  type Expense,
+  type ExpenseParticipantPresence,
 } from "#src/models/expense.ts";
 import type { MediaFile } from "#src/models/media.ts";
+import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
-import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 interface RealtimeExpenseEditorPresenceProps {
-  presence: Expense["__presence"];
-  onPresenceUpdate: (
-    value: Pick<ExpenseParticipantPresence, "elementId"> | null,
-  ) => void;
+  expenseId: Expense["id"];
 }
 
+type ExpensePresenceUpdatePayload = {
+  type: "expense-presence-update";
+  data: ExpenseParticipantPresence & {
+    expenseId: Expense["id"];
+  };
+};
+
+type ExpensePresenceDeletePayload = {
+  type: "expense-presence-delete";
+  data: {
+    participantId: PartyParticipant["id"];
+    expenseId: Expense["id"];
+  };
+};
+
 export function RealtimeExpenseEditorPresence({
-  presence = {},
-  onPresenceUpdate,
+  expenseId,
 }: RealtimeExpenseEditorPresenceProps) {
+  const { chunkId } = decodeExpenseId(expenseId);
+  const [, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
+    required: true,
+  });
   const participant = useCurrentParticipant();
   const presenceElementIdRef = useRef<string | null>(null);
+  const [presence, setPresence] = useState<
+    Record<PartyParticipant["id"], ExpenseParticipantPresence>
+  >({});
+  const lastSentElementIdRef = useRef<string | null>(null);
+
+  const onPresenceUpdate = useCallback(
+    (value: Pick<ExpenseParticipantPresence, "elementId"> | null) => {
+      if (!value) {
+        lastSentElementIdRef.current = null;
+        const payload: ExpensePresenceDeletePayload = {
+          type: "expense-presence-delete",
+          data: {
+            participantId: participant.id,
+            expenseId,
+          },
+        };
+
+        handle.broadcast(payload);
+        return;
+      }
+
+      lastSentElementIdRef.current = value.elementId;
+      const payload: ExpensePresenceUpdatePayload = {
+        type: "expense-presence-update",
+        data: {
+          elementId: value.elementId,
+          participantId: participant.id,
+          dateTime: new Date(),
+          expenseId,
+        },
+      };
+
+      handle.broadcast(payload);
+    },
+    [expenseId, handle, participant.id],
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastSentElementIdRef.current) {
+        onPresenceUpdate({ elementId: lastSentElementIdRef.current });
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [onPresenceUpdate]);
+
+  useEffect(() => {
+    const listener = ({
+      message,
+    }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
+      const payload = message as
+        | ExpensePresenceDeletePayload
+        | ExpensePresenceUpdatePayload;
+
+      try {
+        if (payload.data.expenseId !== expenseId) {
+          return;
+        }
+
+        switch (payload.type) {
+          case "expense-presence-delete":
+            setPresence((prev) => {
+              const { [payload.data.participantId]: _, ...rest } = prev;
+              return rest;
+            });
+            break;
+          case "expense-presence-update":
+            setPresence((prev) => ({
+              ...prev,
+              [payload.data.participantId]: payload.data,
+            }));
+            break;
+        }
+      } catch {
+        console.error("Failed to handle ephemeral message", payload);
+        return;
+      }
+    };
+
+    handle.on("ephemeral-message", listener);
+
+    return () => {
+      handle.off("ephemeral-message", listener);
+    };
+  }, [handle, expenseId]);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
@@ -98,7 +212,6 @@ export function RealtimeExpenseEditorPresence({
             return false;
           }
 
-          // eslint-disable-next-line react-hooks/purity -- TODO: Fix this and we probably want it to be a hook that updates from time to time
           if (presence.dateTime < new Date(Date.now() - 10000)) {
             // Don't show the bubble for participants who have not been active in the last 10 seconds
             return false;
