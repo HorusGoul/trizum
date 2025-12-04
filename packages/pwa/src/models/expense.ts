@@ -12,6 +12,7 @@ import { patchMutate } from "#src/lib/patchMutate.ts";
 import { clone } from "@opentf/std";
 import { md5 } from "@takker/md5";
 import type { Party, PartyParticipant } from "./party";
+import { assertNever } from "#src/lib/assertNever.ts";
 
 export interface Expense {
   id: string;
@@ -348,7 +349,34 @@ export function calculateExpenseHash(expense: Partial<Expense>) {
   delete copy.__editCopy;
   delete copy.__editCopyLastUpdatedAt;
 
-  return new TextDecoder().decode(md5(JSON.stringify(copy)));
+  const input = [
+    copy.id,
+    copy.name,
+    copy.paidAt?.toISOString() || "",
+    Object.entries(copy.paidBy ?? {})
+      .map(([key, value]) => `${key}:${value}`)
+      .join(","),
+    Object.entries(copy.shares ?? {})
+      .map(([key, share]) => {
+        switch (share.type) {
+          case "exact":
+          case "divide":
+            return `${key}:${share.type}:${share.value}`;
+          default:
+            assertNever(share);
+        }
+      })
+      .join(","),
+    copy.photos?.join(","),
+  ].join("");
+
+  const hash = md5(input);
+  const hashArray = Array.from(new Uint8Array(hash));
+  const hashHex = hashArray
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+  return hashHex;
 }
 
 export interface Balance {
