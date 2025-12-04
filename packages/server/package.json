@@ -22,7 +22,7 @@
   "scripts": {
     "cleanup": "rm -rf dist",
     "dev": "pnpm node --watch src/main.ts",
-    "start": "pnpm db:migrate && pnpm node src/main.ts",
+    "start": "pnpm node src/main.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
