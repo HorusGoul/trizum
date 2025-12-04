@@ -45,8 +45,8 @@
   },
   "prettier": "@trizum/prettier-config",
   "dependencies": {
-    "@automerge/automerge-repo": "2.5.0",
-    "@automerge/automerge-repo-network-websocket": "2.5.0",
+    "@automerge/automerge-repo": "2.5.1",
+    "@automerge/automerge-repo-network-websocket": "2.5.1",
     "@hono/node-server": "1.19.6",
     "@hono/node-ws": "1.2.0",
     "@libsql/client": "0.15.15",
