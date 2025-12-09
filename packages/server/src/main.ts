@@ -12,7 +12,7 @@ import { withContext } from "@logtape/logtape";
 import { cors } from "hono/cors";
 
 async function main() {
-  logger.info("Starting server...");
+  logger.info("Starting server with version {version}...");
 
   const app = new Hono({});
   const webSockets = createNodeWebSocket({

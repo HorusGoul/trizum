@@ -11,6 +11,7 @@ import path from "node:path";
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 const ReactCompilerConfig = {};
 
@@ -30,6 +31,8 @@ try {
   console.warn("Could not determine git commit hash");
 }
 
+const fullVersion = `${appVersion}-${appCommit}`;
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   process.env.VITE_APP_WSS_URL =
@@ -38,6 +41,7 @@ export default defineConfig(({ mode }) => {
       : "wss://dev-sync.trizum.app";
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
+  process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
     plugins: [
@@ -139,6 +143,19 @@ export default defineConfig(({ mode }) => {
                 .join("\n");
             },
           },
+        },
+      }),
+      sentryVitePlugin({
+        org: "horusdev",
+        project: "trizum-pwa",
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        release: {
+          create: true,
+          name: fullVersion,
+          setCommits: {
+            auto: true,
+          },
+          inject: true,
         },
       }),
     ],
