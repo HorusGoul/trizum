@@ -33,10 +33,15 @@ import * as Sentry from "@sentry/react";
 if (import.meta.env.MODE === "production") {
   Sentry.init({
     dsn: "https://379ed68929ca4667e3466293189544a6@o524893.ingest.us.sentry.io/4510504067268608",
-    // eslint-disable-next-line import/namespace
-    integrations: [Sentry.browserTracingIntegration()],
+    integrations: [
+      // eslint-disable-next-line import/namespace
+      Sentry.browserTracingIntegration(),
+      // eslint-disable-next-line import/namespace
+      Sentry.browserProfilingIntegration(),
+    ],
     tracesSampleRate: 1,
     profileSessionSampleRate: 1,
+    profileLifecycle: "trace",
     tracePropagationTargets: ["localhost", /trizum\.app/],
     environment: import.meta.env.MODE,
   });
