@@ -595,7 +595,7 @@ msgstr "Anterior"
 
 #: src/routes/about.tsx:114
 msgid "Privacy Policy"
-msgstr ""
+msgstr "Política de Privacidad"
 
 #: src/routes/about.tsx:73
 msgid "Real-Time Sync"
