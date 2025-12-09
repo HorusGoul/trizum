@@ -32,7 +32,7 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
-#: src/routes/about.tsx:146
+#: src/routes/about.tsx:151
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
@@ -136,7 +136,7 @@ msgstr "Completa tu perfil"
 msgid "Configure Profile"
 msgstr "Configurar perfil"
 
-#: src/routes/about.tsx:117
+#: src/routes/about.tsx:122
 msgid "Contributors"
 msgstr "Colaboradores"
 
@@ -153,7 +153,7 @@ msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicació
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
-#: src/routes/about.tsx:128
+#: src/routes/about.tsx:133
 msgid "Credits"
 msgstr "Créditos"
 
@@ -593,6 +593,10 @@ msgstr "Por favor, selecciona un archivo de imagen"
 msgid "Previous"
 msgstr "Anterior"
 
+#: src/routes/about.tsx:114
+msgid "Privacy Policy"
+msgstr ""
+
 #: src/routes/about.tsx:73
 msgid "Real-Time Sync"
 msgstr "Sincronización en Tiempo Real"
@@ -725,7 +729,7 @@ msgstr "Esta aplicación utiliza las siguientes bibliotecas y herramientas de c�
 msgid "This isn't a valid ID"
 msgstr "Este no es un ID válido"
 
-#: src/routes/about.tsx:131
+#: src/routes/about.tsx:136
 msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
@@ -810,7 +814,7 @@ msgstr "Ver grupo"
 msgid "View photo"
 msgstr "Ver foto"
 
-#: src/routes/about.tsx:138
+#: src/routes/about.tsx:143
 msgid "View Third-Party Licenses"
 msgstr "Ver Licencias de Terceros"
 
