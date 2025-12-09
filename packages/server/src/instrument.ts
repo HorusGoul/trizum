@@ -8,9 +8,10 @@ if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV ?? "development",
     integrations: [nodeProfilingIntegration()],
+    sampleRate: 1,
     // Tracing
-    tracesSampleRate: 0.1,
-    profileSessionSampleRate: 0.1,
+    tracesSampleRate: 1,
+    profileSessionSampleRate: 1,
     // Trace lifecycle automatically enables profiling during active traces
     profileLifecycle: "trace",
     enableLogs: true,
