@@ -32,7 +32,7 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
-#: src/routes/about.tsx:151
+#: src/routes/about.tsx:152
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
@@ -160,7 +160,7 @@ msgstr "Complete your profile"
 msgid "Configure Profile"
 msgstr "Configure Profile"
 
-#: src/routes/about.tsx:122
+#: src/routes/about.tsx:123
 msgid "Contributors"
 msgstr "Contributors"
 
@@ -181,7 +181,7 @@ msgstr "Create a new Party"
 msgid "Created with ❤️ by the open source community. Special thanks to all contributors who made this project possible."
 msgstr "Created with ❤️ by the open source community. Special thanks to all contributors who made this project possible."
 
-#: src/routes/about.tsx:133
+#: src/routes/about.tsx:134
 msgid "Credits"
 msgstr "Credits"
 
@@ -809,7 +809,7 @@ msgstr "This application uses the following open source libraries and tools. Bel
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/routes/about.tsx:136
+#: src/routes/about.tsx:137
 msgid "This project uses various open source libraries and tools."
 msgstr "This project uses various open source libraries and tools."
 
@@ -915,7 +915,7 @@ msgstr "View party"
 msgid "View photo"
 msgstr "View photo"
 
-#: src/routes/about.tsx:143
+#: src/routes/about.tsx:144
 msgid "View Third-Party Licenses"
 msgstr "View Third-Party Licenses"
 
