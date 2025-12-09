@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - trizum</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #fff;
+      padding: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    @media (min-width: 640px) {
+      body {
+        padding: 2rem;
+      }
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #000;
+      font-weight: 600;
+    }
+    
+    h2 {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #333;
+      font-weight: 600;
+    }
+    
+    h3 {
+      font-size: 1.125rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #333;
+      font-weight: 600;
+    }
+    
+    p {
+      margin-bottom: 1rem;
+    }
+    
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    li {
+      margin-bottom: 0.5rem;
+    }
+    
+    strong {
+      font-weight: 600;
+    }
+    
+    a {
+      color: #2563eb;
+      text-decoration: underline;
+    }
+    
+    a:hover {
+      color: #1d4ed8;
+    }
+    
+    .last-updated {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    
+    .contact-info {
+      background-color: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 2rem;
+    }
+    
+    .contact-info a {
+      color: #2563eb;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+      }
+      
+      h1 {
+        color: #f0f0f0;
+      }
+      
+      h2 {
+        color: #f0f0f0;
+      }
+      
+      h3 {
+        color: #e0e0e0;
+      }
+      
+      a {
+        color: #60a5fa;
+      }
+      
+      a:hover {
+        color: #93c5fd;
+      }
+      
+      .contact-info {
+        background-color: #2a2a2a;
+      }
+      
+      .contact-info a {
+        color: #60a5fa;
+      }
+      
+      .last-updated {
+        color: #999;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <p class="last-updated">Last updated: December 9, 2025</p>
+  
+  <p>
+    This Privacy Policy describes how trizum ("we", "our", or "us") collects, uses, 
+    and protects your information when you use our expense splitting application 
+    ("Service").
+  </p>
+  
+  <h2>1. Information We Collect</h2>
+  
+  <h3>1.1 Information You Provide</h3>
+  <p>When you use trizum, you may provide the following information:</p>
+  <ul>
+    <li><strong>Party Information:</strong> Names of parties/groups, descriptions, and currency preferences</li>
+    <li><strong>Participant Information:</strong> Names of participants in your expense groups, and optionally phone numbers (if you choose to share them in your settings) and profile pictures</li>
+    <li><strong>Expense Data:</strong> Details about expenses including amounts, dates, descriptions, who paid, and how expenses are split</li>
+    <li><strong>Media Files:</strong> Photos and receipts you attach to expenses</li>
+  </ul>
+  
+  <h3>1.2 Automatically Collected Information</h3>
+  <ul>
+    <li><strong>Technical Data:</strong> Device information, browser type, operating system, and usage patterns</li>
+    <li><strong>Error Reports:</strong> When errors occur, we may collect diagnostic information through Sentry to help improve the Service</li>
+    <li><strong>Sync Data:</strong> Information about data synchronization between your devices</li>
+  </ul>
+  
+  <h2>2. How We Use Your Information</h2>
+  
+  <p>We use the information we collect to:</p>
+  <ul>
+    <li>Provide and maintain the Service</li>
+    <li>Enable real-time synchronization of your expense data across your devices</li>
+    <li>Allow collaboration with other participants in your expense groups</li>
+    <li>Calculate balances and settlements between participants</li>
+    <li>Store your data locally on your device for offline access</li>
+    <li>Identify and fix technical issues through error reporting</li>
+    <li>Improve and optimize the Service</li>
+  </ul>
+  
+  <h2>3. Data Storage and Synchronization</h2>
+  
+  <h3>3.1 Local Storage</h3>
+  <p>
+    trizum uses an offline-first architecture. Your data is primarily stored locally 
+    on your device using IndexedDB. This means your expense data is available even 
+    when you're offline.
+  </p>
+  
+  <h3>3.2 Cloud Synchronization</h3>
+  <p>
+    To enable synchronization across your devices and collaboration with others, 
+    your data is synchronized via WebSocket connections to our servers. This 
+    synchronization allows:
+  </p>
+  <ul>
+    <li>Real-time updates when multiple users access the same expense group</li>
+    <li>Access to your data from multiple devices</li>
+    <li>Automatic conflict resolution when changes occur simultaneously</li>
+  </ul>
+  
+  <h3>3.3 Data Encryption</h3>
+  <p>
+    Data transmitted between your device and our servers is encrypted using secure 
+    WebSocket connections (WSS). However, please note that data stored on our 
+    servers is not end-to-end encrypted and may be accessible to us for the 
+    purposes of providing the Service and synchronization.
+  </p>
+  
+  <h3>3.4 Access Model</h3>
+  <p>
+    trizum uses a peer-to-peer sharing model based on link-based access. Expense 
+    groups (parties) are accessed through shareable links. Anyone who has access 
+    to a link can view and modify the expense group associated with that link. 
+    Please keep your expense group links secure and only share them with trusted 
+    individuals.
+  </p>
+  
+  <h2>4. Data Sharing and Access</h2>
+  
+  <h3>4.1 Sharing with Other Users</h3>
+  <p>
+    trizum uses a peer-to-peer sharing model. When you create an expense group 
+    (party), it is accessible to anyone who has the link to that group. This 
+    means that anyone with access to the link can view and modify all information 
+    in that expense group, including participant names, expenses, media files, 
+    and any optional phone numbers if shared. Please keep your expense group 
+    links secure and only share them with people you trust.
+  </p>
+  <p>
+    <strong>Important:</strong> We do not require user accounts or authentication. 
+    Access to expense groups is controlled solely by link sharing. If someone 
+    gains access to a link, they can access the associated expense group.
+  </p>
+  
+  <h3>4.2 Third-Party Services</h3>
+  <p>We use the following third-party services:</p>
+  <ul>
+    <li>
+      <strong>Sentry:</strong> We use Sentry for error tracking and performance 
+      monitoring. Sentry may collect technical information about errors and 
+      performance issues. For more information, see 
+      <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer">Sentry's Privacy Policy</a>.
+    </li>
+  </ul>
+  
+  <h3>4.3 Legal Requirements</h3>
+  <p>
+    We may disclose your information if required by law or in response to valid 
+    legal requests, such as court orders or subpoenas.
+  </p>
+  
+  <h2>5. Your Rights and Choices</h2>
+  
+  <h3>5.1 Access and Deletion</h3>
+  <p>
+    You can access, modify, or delete your data at any time through the Service. 
+    To delete your data:
+  </p>
+  <ul>
+    <li>Delete individual expenses or participants within the app</li>
+    <li>Delete entire expense groups</li>
+    <li>Clear your local data by clearing your browser's IndexedDB storage</li>
+  </ul>
+  
+  <h3>5.2 Data Portability</h3>
+  <p>
+    Your data is stored in a standard format. You can export your data through 
+    the Service's export functionality, if available.
+  </p>
+  
+  <h3>5.3 Opt-Out of Error Reporting</h3>
+  <p>
+    Error reporting through Sentry is only active in production builds. If you 
+    prefer not to have error data collected, you may use a development build 
+    or contact us to discuss alternatives.
+  </p>
+  
+  <h2>6. Data Retention</h2>
+  
+  <p>
+    We retain your data to provide the Service. Data stored locally on your device 
+    will persist until you delete it or clear your browser's storage. Data stored 
+    on our synchronization servers is retained to enable synchronization across 
+    devices and collaboration between users.
+  </p>
+  <p>
+    All data that has not been accessed for 12 months may be automatically 
+    deleted from our synchronization servers.
+  </p>
+  <p>
+    When you delete an expense group or its data through the Service, it will be 
+    removed from our synchronization servers. Please note that this policy may 
+    change in the future with the introduction of paid plans and freemium limits.
+  </p>
+  
+  <h2>7. Children's Privacy</h2>
+  
+  <p>
+    trizum is not intended for users under the age of 18. We do not knowingly 
+    collect personal information from children. If you believe we have collected 
+    information from a child, please contact us immediately.
+  </p>
+  
+  <h2>8. International Data Transfers</h2>
+  
+  <p>
+    Your data may be stored and processed in servers located outside your country 
+    of residence. By using the Service, you consent to the transfer of your data 
+    to these locations.
+  </p>
+  
+  <h2>9. Security</h2>
+  
+  <p>
+    We implement reasonable security measures to protect your data, including:
+  </p>
+  <ul>
+    <li>Encrypted data transmission (WSS)</li>
+    <li>Secure server infrastructure</li>
+    <li>Regular security assessments</li>
+  </ul>
+  <p>
+    However, no method of transmission or storage is 100% secure. While we strive 
+    to protect your data, we cannot guarantee absolute security.
+  </p>
+  
+  <h2>10. Changes to This Privacy Policy</h2>
+  
+  <p>
+    We may update this Privacy Policy from time to time. We will notify you of 
+    any material changes by posting the new Privacy Policy on this page and 
+    updating the "Last updated" date. You are advised to review this Privacy 
+    Policy periodically for any changes.
+  </p>
+  
+  <h2>11. Contact Us</h2>
+  
+  <div class="contact-info">
+    <p>If you have any questions about this Privacy Policy, please contact us:</p>
+    <p>
+      <strong>Horus Lugo López</strong><br>
+      Calle Cardenal Lluch, 27<br>
+      Seville, Spain<br>
+      Email: <a href="mailto:hola@horus.dev">hola@horus.dev</a>
+    </p>
+  </div>
+  
+  <h2>12. Jurisdiction and Governing Law</h2>
+  
+  <p>
+    This Privacy Policy is governed by the laws of Spain and the European Union. 
+    As trizum is operated from Spain, we comply with the General Data Protection 
+    Regulation (GDPR) and Spanish data protection laws. If you are located in the 
+    European Economic Area (EEA), you have certain rights under GDPR, including:
+  </p>
+  <ul>
+    <li>The right to access your personal data</li>
+    <li>The right to rectification of inaccurate data</li>
+    <li>The right to erasure ("right to be forgotten")</li>
+    <li>The right to restrict processing</li>
+    <li>The right to data portability</li>
+    <li>The right to object to processing</li>
+  </ul>
+  <p>
+    To exercise these rights, please contact us using the information provided 
+    in Section 11. You also have the right to lodge a complaint with the 
+    Spanish Data Protection Agency (AEPD) if you believe your data rights 
+    have been violated.
+  </p>
+  
+</body>
+</html>
+

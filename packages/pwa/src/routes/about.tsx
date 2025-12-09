@@ -108,6 +108,11 @@ function About() {
               icon="#lucide/scale"
               label={<Trans>License</Trans>}
             />
+            <AboutLink
+              href="/privacy-policy.html"
+              icon="#lucide/shield"
+              label={<Trans>Privacy Policy</Trans>}
+            />
           </div>
         </section>
 
