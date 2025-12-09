@@ -71,6 +71,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
+          bundler: "2.7.2"
           bundler-cache: true
           working-directory: packages/mobile/android
 
@@ -145,6 +146,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
+          bundler: "2.7.2"
           bundler-cache: true
           working-directory: packages/mobile/ios/App
 
