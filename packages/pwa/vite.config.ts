@@ -70,8 +70,6 @@ export default defineConfig(({ mode }) => {
           additionalManifestEntries: [
             { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
           ],
-          globIgnores: ["**/privacy-policy.html"],
-          navigateFallbackDenylist: [/^\/privacy-policy\.html$/],
         },
         outDir: "dist/client",
         manifest: {

@@ -109,9 +109,10 @@ function About() {
               label={<Trans>License</Trans>}
             />
             <AboutLink
-              href="/privacy-policy.html"
+              href="/privacy-policy"
               icon="#lucide/shield"
               label={<Trans>Privacy Policy</Trans>}
+              isInternal
             />
           </div>
         </section>

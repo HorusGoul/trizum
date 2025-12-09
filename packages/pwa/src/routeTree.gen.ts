@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as AboutRouteImport } from './routes/about'
@@ -28,6 +29,11 @@ import { Route as PartyPartyIdExpenseExpenseIdEditRouteImport } from './routes/p
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewRoute = NewRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate_/tricount': typeof MigrateTricountRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/join'
     | '/new'
+    | '/privacy-policy'
     | '/settings'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/join'
     | '/new'
+    | '/privacy-policy'
     | '/settings'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/join'
     | '/new'
+    | '/privacy-policy'
     | '/settings'
     | '/about_/third-party-licenses'
     | '/migrate_/tricount'
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   JoinRoute: typeof JoinRoute
   NewRoute: typeof NewRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SettingsRoute: typeof SettingsRoute
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
   MigrateTricountRoute: typeof MigrateTricountRoute
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new': {
@@ -342,6 +362,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   JoinRoute: JoinRoute,
   NewRoute: NewRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   SettingsRoute: SettingsRoute,
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,
   MigrateTricountRoute: MigrateTricountRoute,
