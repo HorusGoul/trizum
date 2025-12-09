@@ -27,6 +27,7 @@ const envSchema = z.object({
       return !isNaN(num) && num > 0 && num < 65536;
     }, "PORT must be a valid port number"),
   NODE_ENV: z.enum(["development", "production"]).default("development"),
+  COMMIT_HASH: z.string().optional(),
 });
 
 type TypedEnv = z.infer<typeof envSchema>;
