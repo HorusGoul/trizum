@@ -58,9 +58,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build mobile
-        run: pnpm turbo run build --filter=@trizum/mobile
-
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -74,6 +71,9 @@ jobs:
           bundler: "2.7.2"
           bundler-cache: true
           working-directory: packages/mobile/android
+
+      - name: Build mobile
+        run: pnpm turbo run build --filter=@trizum/mobile
 
       - name: Decode Android keystore
         if: ${{ github.event.inputs.build_type == 'release' }}
@@ -139,9 +139,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build mobile
-        run: pnpm turbo run build --filter=@trizum/mobile
-
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -149,6 +146,9 @@ jobs:
           bundler: "2.7.2"
           bundler-cache: true
           working-directory: packages/mobile/ios/App
+
+      - name: Build mobile
+        run: pnpm turbo run build --filter=@trizum/mobile
 
       - name: Build iOS Debug
         if: ${{ github.event.inputs.build_type == 'debug' }}
