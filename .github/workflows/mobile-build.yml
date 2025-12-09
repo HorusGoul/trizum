@@ -1,0 +1,193 @@
+name: Mobile Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform to build"
+        required: true
+        default: "both"
+        type: choice
+        options:
+          - android
+          - ios
+          - both
+      build_type:
+        description: "Build type"
+        required: true
+        default: "release"
+        type: choice
+        options:
+          - debug
+          - release
+      android_artifact:
+        description: "Android artifact type (only for release builds)"
+        required: false
+        default: "apk"
+        type: choice
+        options:
+          - apk
+          - aab
+      ios_export_method:
+        description: "iOS export method (only for release builds)"
+        required: false
+        default: "app-store"
+        type: choice
+        options:
+          - app-store
+          - ad-hoc
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Build Android
+    if: ${{ github.event.inputs.platform == 'android' || github.event.inputs.platform == 'both' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build mobile
+        run: pnpm turbo run build --filter=@trizum/mobile
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: packages/mobile/android
+
+      - name: Decode Android keystore
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > packages/mobile/android/app/release.keystore
+
+      - name: Build Android Debug
+        if: ${{ github.event.inputs.build_type == 'debug' }}
+        working-directory: packages/mobile/android
+        run: bundle exec fastlane build_debug
+
+      - name: Build Android Release APK
+        if: ${{ github.event.inputs.build_type == 'release' && github.event.inputs.android_artifact == 'apk' }}
+        working-directory: packages/mobile/android
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/packages/mobile/android/app/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: bundle exec fastlane build_release
+
+      - name: Build Android Release AAB
+        if: ${{ github.event.inputs.build_type == 'release' && github.event.inputs.android_artifact == 'aab' }}
+        working-directory: packages/mobile/android
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/packages/mobile/android/app/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: bundle exec fastlane build_aab
+
+      - name: Upload Android APK artifact
+        if: ${{ github.event.inputs.android_artifact == 'apk' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ github.event.inputs.build_type }}-apk
+          path: packages/mobile/android/app/build/outputs/apk/**/*.apk
+          retention-days: 14
+
+      - name: Upload Android AAB artifact
+        if: ${{ github.event.inputs.build_type == 'release' && github.event.inputs.android_artifact == 'aab' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-aab
+          path: packages/mobile/android/app/build/outputs/bundle/**/*.aab
+          retention-days: 14
+
+  ios:
+    name: Build iOS
+    if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build mobile
+        run: pnpm turbo run build --filter=@trizum/mobile
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: packages/mobile/ios/App
+
+      - name: Build iOS Debug
+        if: ${{ github.event.inputs.build_type == 'debug' }}
+        working-directory: packages/mobile/ios/App
+        run: bundle exec fastlane build_debug
+
+      - name: Build iOS Release (App Store)
+        if: ${{ github.event.inputs.build_type == 'release' && github.event.inputs.ios_export_method == 'app-store' }}
+        working-directory: packages/mobile/ios/App
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+          APP_STORE_CONNECT_API_KEY_PATH: ${{ secrets.APP_STORE_CONNECT_API_KEY_PATH }}
+        run: bundle exec fastlane build_release
+
+      - name: Build iOS Release (Ad Hoc)
+        if: ${{ github.event.inputs.build_type == 'release' && github.event.inputs.ios_export_method == 'ad-hoc' }}
+        working-directory: packages/mobile/ios/App
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
+        run: bundle exec fastlane build_adhoc
+
+      - name: Upload iOS IPA artifact
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-${{ github.event.inputs.ios_export_method }}-ipa
+          path: packages/mobile/ios/App/*.ipa
+          retention-days: 14
+
+      - name: Upload iOS dSYM artifact
+        if: ${{ github.event.inputs.build_type == 'release' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-dsym
+          path: packages/mobile/ios/App/*.dSYM.zip
+          retention-days: 14

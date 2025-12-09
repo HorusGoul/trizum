@@ -139,3 +139,19 @@ dist
 
 # Sentry
 .env.sentry-build-plugin
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+**/fastlane/README.md
+
+# iOS build artifacts
+*.ipa
+*.dSYM.zip
+*.app.dSYM
+
+# Android build artifacts
+*.apk
+*.aab
