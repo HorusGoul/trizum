@@ -5,7 +5,6 @@ set -e
 LITESTREAM_CONFIG_PATH="/app/litestream.yml"
 DATABASE_PATH="/mnt/data/trizum.db"
 START_COMMAND="pnpm start"
-export COMMIT_HASH=$(git rev-parse --short HEAD)
 
 # Start litestream replicate with exec if config exists
 if [ -f "$LITESTREAM_CONFIG_PATH" ]; then

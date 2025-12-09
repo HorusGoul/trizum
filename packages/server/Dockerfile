@@ -14,7 +14,7 @@ RUN corepack enable && corepack prepare pnpm@10.14.0 --activate
 
 # Install litestream
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y git ca-certificates wget && \
+    apt-get install --no-install-recommends -y ca-certificates wget && \
     wget https://github.com/benbjohnson/litestream/releases/download/v0.5.2/litestream-0.5.2-linux-x86_64.deb && \
     dpkg -i litestream-0.5.2-linux-x86_64.deb && \
     rm litestream-0.5.2-linux-x86_64.deb && \
