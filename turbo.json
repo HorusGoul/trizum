@@ -4,7 +4,8 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      "inputs": ["src/**", "public/**", "index.html", "vite.config.ts"]
+      "inputs": ["src/**", "public/**", "index.html", "vite.config.ts"],
+      "passThroughEnv": ["SENTRY_AUTH_TOKEN"]
     },
     "lint": {
       "dependsOn": ["^build"],
