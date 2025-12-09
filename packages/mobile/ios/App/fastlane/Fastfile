@@ -13,6 +13,67 @@
 default_platform(:ios)
 
 platform :ios do
+  desc "Load App Store Connect API Key"
+  lane :load_api_key do
+    if ENV["APP_STORE_CONNECT_API_KEY_ID"] && ENV["APP_STORE_CONNECT_API_ISSUER_ID"] && ENV["APP_STORE_CONNECT_API_KEY_CONTENT"]
+      app_store_connect_api_key(
+        key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+        issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+        key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+        is_key_content_base64: true,
+        in_house: false
+      )
+    end
+  end
+
+  desc "Setup code signing for CI"
+  lane :setup_signing do |options|
+    if ENV["CI"]
+      setup_ci
+
+      # Create a temporary keychain for CI
+      keychain_name = "fastlane_keychain"
+      keychain_password = SecureRandom.base64(24)
+
+      create_keychain(
+        name: keychain_name,
+        password: keychain_password,
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600,
+        lock_when_sleeps: false
+      )
+
+      # Import distribution certificate
+      if ENV["IOS_DISTRIBUTION_CERTIFICATE_BASE64"]
+        certificate_path = "#{Dir.tmpdir}/distribution.p12"
+        File.write(certificate_path, Base64.decode64(ENV["IOS_DISTRIBUTION_CERTIFICATE_BASE64"]))
+
+        import_certificate(
+          certificate_path: certificate_path,
+          certificate_password: ENV["IOS_DISTRIBUTION_CERTIFICATE_PASSWORD"] || "",
+          keychain_name: keychain_name,
+          keychain_password: keychain_password
+        )
+      end
+
+      # Install provisioning profile
+      if ENV["IOS_PROVISIONING_PROFILE_BASE64"]
+        profile_path = "#{Dir.tmpdir}/profile.mobileprovision"
+        File.write(profile_path, Base64.decode64(ENV["IOS_PROVISIONING_PROFILE_BASE64"]))
+
+        install_provisioning_profile(path: profile_path)
+
+        # Extract profile name for later use
+        profile_info = `security cms -D -i "#{profile_path}" 2>/dev/null`
+        if profile_info.include?("<key>Name</key>")
+          profile_name = profile_info.match(/<key>Name<\/key>\s*<string>([^<]+)<\/string>/)[1]
+          ENV["PROVISIONING_PROFILE_NAME"] = profile_name
+        end
+      end
+    end
+  end
+
   desc "Install CocoaPods dependencies"
   lane :install_pods do
     cocoapods(
@@ -37,17 +98,8 @@ platform :ios do
 
   desc "Build release IPA for App Store"
   lane :build_release do |options|
-    # Setup code signing with match
-    if ENV["MATCH_GIT_URL"]
-      setup_ci if ENV["CI"]
-      match(
-        type: "appstore",
-        readonly: true,
-        git_url: ENV["MATCH_GIT_URL"],
-        app_identifier: "app.trizum.capacitor"
-      )
-    end
-
+    load_api_key
+    setup_signing(type: "appstore")
     install_pods
 
     # Increment build number if specified
@@ -56,6 +108,13 @@ platform :ios do
         build_number: options[:build_number],
         xcodeproj: "App.xcodeproj"
       )
+    end
+
+    export_options = {}
+    if ENV["PROVISIONING_PROFILE_NAME"]
+      export_options[:provisioningProfiles] = {
+        "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"]
+      }
     end
 
     build_app(
@@ -63,27 +122,14 @@ platform :ios do
       scheme: "App",
       configuration: "Release",
       export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"] || "match AppStore app.trizum.capacitor"
-        }
-      }
+      export_options: export_options.empty? ? nil : export_options
     )
   end
 
   desc "Build release IPA for Ad Hoc distribution"
   lane :build_adhoc do |options|
-    # Setup code signing with match
-    if ENV["MATCH_GIT_URL"]
-      setup_ci if ENV["CI"]
-      match(
-        type: "adhoc",
-        readonly: true,
-        git_url: ENV["MATCH_GIT_URL"],
-        app_identifier: "app.trizum.capacitor"
-      )
-    end
-
+    load_api_key
+    setup_signing(type: "adhoc")
     install_pods
 
     # Increment build number if specified
@@ -94,16 +140,19 @@ platform :ios do
       )
     end
 
+    export_options = {}
+    if ENV["PROVISIONING_PROFILE_NAME"]
+      export_options[:provisioningProfiles] = {
+        "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"]
+      }
+    end
+
     build_app(
       workspace: "App.xcworkspace",
       scheme: "App",
       configuration: "Release",
       export_method: "ad-hoc",
-      export_options: {
-        provisioningProfiles: {
-          "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"] || "match AdHoc app.trizum.capacitor"
-        }
-      }
+      export_options: export_options.empty? ? nil : export_options
     )
   end
 
@@ -111,8 +160,7 @@ platform :ios do
   lane :deploy_testflight do |options|
     build_release(build_number: options[:build_number])
     upload_to_testflight(
-      skip_waiting_for_build_processing: true,
-      api_key_path: ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+      skip_waiting_for_build_processing: true
     )
   end
 
@@ -123,16 +171,7 @@ platform :ios do
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
-      skip_metadata: true,
-      api_key_path: ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+      skip_metadata: true
     )
   end
-
-  desc "Register new devices from a file"
-  lane :register_devices_from_file do
-    register_devices(devices_file: "./devices.txt")
-    match(type: "development", force_for_new_devices: true)
-    match(type: "adhoc", force_for_new_devices: true)
-  end
 end
-
