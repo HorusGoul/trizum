@@ -27,7 +27,7 @@
     "capacitor:copy:before": "./copy-client.sh",
     "cleanup": "rm -rf dist",
     "dev": "tsc --watch",
-    "build": "./copy-client.sh && cap sync",
+    "build": "./copy-client.sh && ./sync.sh",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
