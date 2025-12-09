@@ -1,0 +1,85 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+default_platform(:android)
+
+platform :android do
+  desc "Build debug APK"
+  lane :build_debug do
+    gradle(
+      task: "assemble",
+      build_type: "Debug",
+      print_command: true
+    )
+  end
+
+  desc "Build release APK"
+  lane :build_release do
+    gradle(
+      task: "assemble",
+      build_type: "Release",
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_FILE"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
+      }
+    )
+  end
+
+  desc "Build release AAB (Android App Bundle)"
+  lane :build_aab do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_FILE"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
+      }
+    )
+  end
+
+  desc "Build and upload to Google Play internal track"
+  lane :deploy_internal do
+    build_aab
+    upload_to_play_store(
+      track: "internal",
+      release_status: "draft",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    )
+  end
+
+  desc "Build and upload to Google Play beta track"
+  lane :deploy_beta do
+    build_aab
+    upload_to_play_store(
+      track: "beta",
+      release_status: "draft",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    )
+  end
+
+  desc "Build and upload to Google Play production track"
+  lane :deploy_production do
+    build_aab
+    upload_to_play_store(
+      track: "production",
+      release_status: "draft",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    )
+  end
+end
+

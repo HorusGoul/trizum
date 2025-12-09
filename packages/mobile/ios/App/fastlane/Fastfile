@@ -1,0 +1,138 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Install CocoaPods dependencies"
+  lane :install_pods do
+    cocoapods(
+      podfile: "./Podfile",
+      try_repo_update_on_error: true
+    )
+  end
+
+  desc "Build debug build"
+  lane :build_debug do
+    install_pods
+    build_app(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      configuration: "Debug",
+      export_method: "development",
+      skip_codesigning: true,
+      skip_archive: true,
+      destination: "generic/platform=iOS Simulator"
+    )
+  end
+
+  desc "Build release IPA for App Store"
+  lane :build_release do |options|
+    # Setup code signing with match
+    if ENV["MATCH_GIT_URL"]
+      setup_ci if ENV["CI"]
+      match(
+        type: "appstore",
+        readonly: true,
+        git_url: ENV["MATCH_GIT_URL"],
+        app_identifier: "app.trizum.capacitor"
+      )
+    end
+
+    install_pods
+
+    # Increment build number if specified
+    if options[:build_number]
+      increment_build_number(
+        build_number: options[:build_number],
+        xcodeproj: "App.xcodeproj"
+      )
+    end
+
+    build_app(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"] || "match AppStore app.trizum.capacitor"
+        }
+      }
+    )
+  end
+
+  desc "Build release IPA for Ad Hoc distribution"
+  lane :build_adhoc do |options|
+    # Setup code signing with match
+    if ENV["MATCH_GIT_URL"]
+      setup_ci if ENV["CI"]
+      match(
+        type: "adhoc",
+        readonly: true,
+        git_url: ENV["MATCH_GIT_URL"],
+        app_identifier: "app.trizum.capacitor"
+      )
+    end
+
+    install_pods
+
+    # Increment build number if specified
+    if options[:build_number]
+      increment_build_number(
+        build_number: options[:build_number],
+        xcodeproj: "App.xcodeproj"
+      )
+    end
+
+    build_app(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "ad-hoc",
+      export_options: {
+        provisioningProfiles: {
+          "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"] || "match AdHoc app.trizum.capacitor"
+        }
+      }
+    )
+  end
+
+  desc "Upload to TestFlight"
+  lane :deploy_testflight do |options|
+    build_release(build_number: options[:build_number])
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      api_key_path: ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+    )
+  end
+
+  desc "Upload to App Store"
+  lane :deploy_appstore do |options|
+    build_release(build_number: options[:build_number])
+    upload_to_app_store(
+      submit_for_review: false,
+      automatic_release: false,
+      skip_screenshots: true,
+      skip_metadata: true,
+      api_key_path: ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+    )
+  end
+
+  desc "Register new devices from a file"
+  lane :register_devices_from_file do
+    register_devices(devices_file: "./devices.txt")
+    match(type: "development", force_for_new_devices: true)
+    match(type: "adhoc", force_for_new_devices: true)
+  end
+end
+
