@@ -75,6 +75,8 @@ jobs:
 
       - name: Build mobile
         run: pnpm turbo run build --filter=@trizum/mobile
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Decode Android keystore
         if: ${{ github.event.inputs.build_type == 'release' }}
@@ -151,6 +153,8 @@ jobs:
 
       - name: Build mobile
         run: pnpm turbo run build --filter=@trizum/mobile
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Build iOS Debug
         if: ${{ github.event.inputs.build_type == 'debug' }}

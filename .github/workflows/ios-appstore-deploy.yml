@@ -50,6 +50,8 @@ jobs:
 
       - name: Build mobile web assets
         run: pnpm turbo run build --filter=@trizum/mobile
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Download screenshots artifact
         uses: actions/download-artifact@v4

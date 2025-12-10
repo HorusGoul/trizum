@@ -33,6 +33,8 @@ jobs:
 
       - name: ${{ matrix.turbo }}
         run: pnpm turbo run ${{ matrix.turbo }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
   autofix:
     name: Autofix & Extract Messages
