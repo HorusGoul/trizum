@@ -5,6 +5,7 @@ import { getPartyHelpers } from "#src/hooks/useParty.ts";
 import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
+import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
 
 export interface MigrationData {
   party: Omit<Party, "id" | "chunkRefs">;
