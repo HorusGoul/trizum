@@ -15,34 +15,46 @@ interface SelectedDevice {
   suffix?: string;
 }
 
+// Custom device configurations for exact App Store screenshot sizes
+// Based on: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
+//
+// App Store requires specific pixel dimensions, so we set viewport sizes
+// that when multiplied by deviceScaleFactor give exact required dimensions
+
 const selectedDevices: SelectedDevice[] = [
-  // Android
+  // Android (Pixel 7 for Play Store)
   {
     device: devices["Pixel 7"],
     folder: "android",
     suffix: "portrait",
   },
-  // iPhone 6.7" Display (1284 x 2778) - Required for App Store
+  // iPhone 6.5" Display: 1284×2778 pixels
+  // Required if app runs on iPhone (and 6.9" screenshots aren't provided)
+  // Accepted sizes: 1284×2778 or 1242×2688
+  // viewport 428×926 × deviceScaleFactor 3 = 1284×2778
   {
-    device: devices["iPhone 14 Plus"],
-    folder: "iphone-6.7",
-    suffix: "portrait",
-  },
-  // iPhone 6.5" Display (1242 x 2688) - Alternative size for App Store
-  {
-    device: devices["iPhone 11 Pro Max"],
+    device: {
+      ...devices["iPhone 14 Plus"],
+      viewport: { width: 428, height: 926 },
+      deviceScaleFactor: 3,
+    },
     folder: "iphone-6.5",
     suffix: "portrait",
   },
-  // iPad Pro 12.9" Display (2048 x 2732) - Required for iPad universal apps
+  // iPad 13" Display: 2048×2732 pixels
+  // Required if app runs on iPad
+  // Accepted sizes: 2064×2752 or 2048×2732
+  // viewport 1024×1366 × deviceScaleFactor 2 = 2048×2732
   {
-    device: devices["iPad Pro 11"],
-    // Note: iPad Pro 11" produces 1668x2388, which maps to "iPad Pro 11" Display"
-    // For 12.9", we'd need a custom viewport, but 11" is commonly accepted
-    folder: "ipad-pro",
+    device: {
+      ...devices["iPad Pro 11"],
+      viewport: { width: 1024, height: 1366 },
+      deviceScaleFactor: 2,
+    },
+    folder: "ipad-13",
     suffix: "portrait",
   },
-  // Desktop
+  // Desktop (for web/marketing)
   {
     device: {
       ...devices["Desktop Chrome"],

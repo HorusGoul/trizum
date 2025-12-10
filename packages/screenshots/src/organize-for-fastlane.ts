@@ -25,18 +25,13 @@ const LOCALE_MAPPING: Record<string, string[]> = {
 };
 
 // Map from our device folders to App Store Connect device frame names
-// See: https://docs.fastlane.tools/actions/deliver/#available-screenshot-types
+// Based on: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
+// Fastlane uses human-readable names in screenshot filenames
 const DEVICE_FRAME_MAPPING: Record<string, string | null> = {
-  // iPhone 14 Plus = 6.7" display (1284 x 2778)
-  "iphone-6.7": 'iPhone 6.7" Display',
-  // iPhone 11 Pro Max = 6.5" display (1242 x 2688)
+  // iPhone 6.5" Display (1284×2778) - Required if app runs on iPhone
   "iphone-6.5": 'iPhone 6.5" Display',
-  // Legacy folder name (backwards compatibility)
-  iphone: 'iPhone 6.7" Display',
-  // iPad Pro 11" = 11" display (1668 x 2388)
-  "ipad-pro": 'iPad Pro 11" Display',
-  // Legacy folder name (backwards compatibility)
-  tablet: 'iPad Pro 11" Display',
+  // iPad 13" Display (2048×2732) - Required if app runs on iPad
+  "ipad-13": "iPad Pro (12.9-inch) (2nd generation)",
   // Skip android and desktop for iOS fastlane
   android: null,
   desktop: null,
