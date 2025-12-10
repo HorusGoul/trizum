@@ -13,6 +13,10 @@
 default_platform(:android)
 
 platform :android do
+  # ============================================
+  # Build Lanes
+  # ============================================
+
   desc "Build debug APK"
   lane :build_debug do
     gradle(
@@ -28,12 +32,7 @@ platform :android do
       task: "assemble",
       build_type: "Release",
       print_command: true,
-      properties: {
-        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_FILE"],
-        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
-        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
-        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
-      }
+      properties: signing_properties
     )
   end
 
@@ -43,20 +42,29 @@ platform :android do
       task: "bundle",
       build_type: "Release",
       print_command: true,
-      properties: {
-        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_FILE"],
-        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
-        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
-        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
-      }
+      properties: signing_properties
     )
   end
+
+  # ============================================
+  # Deployment Lanes
+  # ============================================
 
   desc "Build and upload to Google Play internal track"
   lane :deploy_internal do
     build_aab
     upload_to_play_store(
       track: "internal",
+      release_status: "draft",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    )
+  end
+
+  desc "Build and upload to Google Play alpha track"
+  lane :deploy_alpha do
+    build_aab
+    upload_to_play_store(
+      track: "alpha",
       release_status: "draft",
       aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
     )
@@ -81,5 +89,158 @@ platform :android do
       aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
     )
   end
-end
 
+  # ============================================
+  # Metadata Management Lanes
+  # ============================================
+
+  desc "Download existing metadata from Google Play"
+  lane :download_metadata do
+    download_from_play_store(
+      track: "production"
+    )
+  end
+
+  desc "Upload metadata only (no build)"
+  lane :upload_metadata do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Upload screenshots only"
+  lane :upload_screenshots do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true
+    )
+  end
+
+  desc "Upload images only (icon, feature graphic, etc.)"
+  lane :upload_images do
+    upload_to_play_store(
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  # ============================================
+  # Full Deployment Lanes
+  # ============================================
+
+  desc "Full Play Store deployment with metadata and screenshots"
+  desc "Options: track (internal/alpha/beta/production), release_status (draft/completed/halted)"
+  lane :deploy_playstore_full do |options|
+    track = options[:track] || "internal"
+    release_status = options[:release_status] || "draft"
+
+    build_aab
+
+    upload_to_play_store(
+      track: track,
+      release_status: release_status,
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: false,
+      skip_upload_changelogs: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+  end
+
+  desc "Deploy to internal track with full metadata"
+  lane :deploy_internal_full do
+    deploy_playstore_full(track: "internal", release_status: "draft")
+  end
+
+  desc "Deploy to beta track with full metadata"
+  lane :deploy_beta_full do
+    deploy_playstore_full(track: "beta", release_status: "draft")
+  end
+
+  desc "Deploy to production with full metadata (draft)"
+  lane :deploy_production_full do
+    deploy_playstore_full(track: "production", release_status: "draft")
+  end
+
+  # ============================================
+  # Promote Lanes
+  # ============================================
+
+  desc "Promote internal track to beta"
+  lane :promote_to_beta do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "beta",
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote beta track to production"
+  lane :promote_to_production do |options|
+    upload_to_play_store(
+      track: "beta",
+      track_promote_to: "production",
+      release_status: options[:release_status] || "draft",
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  # ============================================
+  # Utility Lanes
+  # ============================================
+
+  desc "Validate AAB without uploading"
+  lane :validate do
+    build_aab
+    validate_play_store_json_key
+    upload_to_play_store(
+      track: "internal",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      validate_only: true
+    )
+  end
+
+  desc "Print current version information"
+  lane :current_version do
+    # Read version from build.gradle
+    build_gradle = File.read("../app/build.gradle")
+    version_name = build_gradle.match(/versionName\s+"([^"]+)"/)[1]
+    version_code = build_gradle.match(/versionCode\s+(\d+)/)[1]
+    UI.success("Current version: #{version_name} (#{version_code})")
+  end
+
+  # ============================================
+  # Private Helper Methods
+  # ============================================
+
+  private_lane :signing_properties do
+    properties = {}
+    
+    if ENV["ANDROID_KEYSTORE_FILE"]
+      properties["android.injected.signing.store.file"] = ENV["ANDROID_KEYSTORE_FILE"]
+      properties["android.injected.signing.store.password"] = ENV["ANDROID_KEYSTORE_PASSWORD"]
+      properties["android.injected.signing.key.alias"] = ENV["ANDROID_KEY_ALIAS"]
+      properties["android.injected.signing.key.password"] = ENV["ANDROID_KEY_PASSWORD"]
+    end
+    
+    properties
+  end
+end

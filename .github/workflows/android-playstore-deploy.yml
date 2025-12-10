@@ -1,0 +1,122 @@
+name: Android Play Store Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Play Store track to deploy to"
+        required: true
+        default: "internal"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      release_status:
+        description: "Release status"
+        required: true
+        default: "draft"
+        type: choice
+        options:
+          - draft
+          - completed
+          - halted
+
+concurrency:
+  group: android-playstore-deploy
+  cancel-in-progress: false
+
+jobs:
+  screenshots:
+    name: Generate Screenshots
+    uses: ./.github/workflows/screenshots.yml
+
+  deploy:
+    name: Build & Deploy to Play Store
+    needs: [screenshots]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.7.2"
+          bundler-cache: true
+          cache-version: android-0
+          working-directory: packages/mobile/android
+
+      - name: Build mobile web assets
+        run: pnpm turbo run build --filter=@trizum/mobile
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Download screenshots artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: packages/screenshots/screenshots
+
+      - name: Organize screenshots for fastlane
+        working-directory: packages/screenshots
+        run: |
+          pnpm organize:fastlane --platform android --output ../mobile/android/fastlane/metadata/android
+          echo "Screenshots organized:"
+          ls -la ../mobile/android/fastlane/metadata/android/ || true
+          ls -la ../mobile/android/fastlane/metadata/android/en-US/images/phoneScreenshots/ || true
+
+      - name: Decode Android keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > packages/mobile/android/app/release.keystore
+
+      - name: Decode Google Play JSON key
+        env:
+          GOOGLE_PLAY_JSON_KEY_BASE64: ${{ secrets.GOOGLE_PLAY_JSON_KEY_BASE64 }}
+        run: |
+          echo "$GOOGLE_PLAY_JSON_KEY_BASE64" | base64 -d > packages/mobile/android/play-store-key.json
+
+      - name: Build and Deploy to Play Store
+        working-directory: packages/mobile/android
+        env:
+          ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/packages/mobile/android/app/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          GOOGLE_PLAY_JSON_KEY_FILE: ${{ github.workspace }}/packages/mobile/android/play-store-key.json
+        run: |
+          bundle exec fastlane deploy_playstore_full \
+            track:${{ inputs.track }} \
+            release_status:${{ inputs.release_status }}
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-playstore-aab
+          path: packages/mobile/android/app/build/outputs/bundle/**/*.aab
+          retention-days: 14
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: |
+          rm -f packages/mobile/android/play-store-key.json
+          rm -f packages/mobile/android/app/release.keystore
+

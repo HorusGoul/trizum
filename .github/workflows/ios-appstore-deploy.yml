@@ -62,7 +62,7 @@ jobs:
       - name: Organize screenshots for fastlane
         working-directory: packages/screenshots
         run: |
-          pnpm organize:fastlane --output ../mobile/ios/App/fastlane/screenshots
+          pnpm organize:fastlane --platform ios --output ../mobile/ios/App/fastlane/screenshots
           echo "Screenshots organized:"
           ls -la ../mobile/ios/App/fastlane/screenshots/
           ls -la ../mobile/ios/App/fastlane/screenshots/en-US/ || true

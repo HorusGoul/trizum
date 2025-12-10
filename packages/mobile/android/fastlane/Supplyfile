@@ -1,0 +1,36 @@
+# Supplyfile - Google Play Store configuration
+# Documentation: https://docs.fastlane.tools/actions/supply/
+
+# Path to Google Play JSON key file
+json_key_file ENV["GOOGLE_PLAY_JSON_KEY_FILE"]
+
+# Package name (application ID)
+package_name "app.trizum.capacitor"
+
+# Metadata path (relative to fastlane directory)
+metadata_path "./metadata/android"
+
+# Track for uploads (can be overridden in lanes)
+# Options: internal, alpha, beta, production
+track "internal"
+
+# Release status (can be overridden in lanes)
+# Options: draft, completed, halted
+release_status "draft"
+
+# Don't automatically submit for review
+# The release will be created as a draft
+skip_upload_metadata false
+skip_upload_changelogs false
+skip_upload_images false
+skip_upload_screenshots false
+
+# Timeout for upload operations (in seconds)
+timeout 300
+
+# Check for superseded versions
+check_superseded_tracks false
+
+# Sync image folder structure to metadata path
+sync_image_upload true
+
