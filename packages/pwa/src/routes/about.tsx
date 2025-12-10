@@ -1,7 +1,7 @@
 import { BackButton } from "#src/components/BackButton.js";
 import { IconWithFallback, type IconProps } from "#src/ui/Icon.js";
 import { Trans } from "@lingui/macro";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/about")({
   component: About,
@@ -107,6 +107,12 @@ function About() {
               href="https://github.com/HorusGoul/trizum/blob/main/LICENSE"
               icon="#lucide/scale"
               label={<Trans>License</Trans>}
+            />
+            <AboutLink
+              href="/support"
+              icon="#lucide/circle-help"
+              label={<Trans>Support</Trans>}
+              isInternal
             />
             <AboutLink
               href="/privacy-policy"
@@ -222,16 +228,11 @@ interface AboutLinkProps {
 }
 
 function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
-  const linkProps = isInternal
-    ? {}
-    : { target: "_blank" as const, rel: "noopener noreferrer" };
+  const className =
+    "flex items-center gap-3 rounded-lg bg-accent-50 px-4 py-3 text-accent-900 outline-none transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:text-accent-100 dark:hover:bg-accent-800";
 
-  return (
-    <a
-      href={href}
-      {...linkProps}
-      className="flex items-center gap-3 rounded-lg bg-accent-50 px-4 py-3 text-accent-900 outline-none transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:text-accent-100 dark:hover:bg-accent-800"
-    >
+  const content = (
+    <>
       {icon && <IconWithFallback name={icon} size={20} />}
       <span className="flex-1">{label}</span>
       {!isInternal && (
@@ -241,6 +242,25 @@ function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
           className="text-accent-600 dark:text-accent-400"
         />
       )}
+    </>
+  );
+
+  if (isInternal) {
+    return (
+      <Link to={href} className={className}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
+      {content}
     </a>
   );
 }

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as NewRouteImport } from './routes/new'
@@ -26,6 +27,11 @@ import { Route as PartyPartyIdAddRouteImport } from './routes/party_.$partyId.ad
 import { Route as PartyPartyIdExpenseExpenseIdRouteImport } from './routes/party_.$partyId.expense.$expenseId'
 import { Route as PartyPartyIdExpenseExpenseIdEditRouteImport } from './routes/party_.$partyId.expense.$expenseId_.edit'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
+  '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
+  '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
   '/settings': typeof SettingsRoute
+  '/support': typeof SupportRoute
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate_/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/new'
     | '/privacy-policy'
     | '/settings'
+    | '/support'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
     | '/party/$partyId'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/new'
     | '/privacy-policy'
     | '/settings'
+    | '/support'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
     | '/party/$partyId'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/new'
     | '/privacy-policy'
     | '/settings'
+    | '/support'
     | '/about_/third-party-licenses'
     | '/migrate_/tricount'
     | '/party/$partyId'
@@ -228,6 +240,7 @@ export interface RootRouteChildren {
   NewRoute: typeof NewRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   SettingsRoute: typeof SettingsRoute
+  SupportRoute: typeof SupportRoute
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
   MigrateTricountRoute: typeof MigrateTricountRoute
   PartyPartyIdRoute: typeof PartyPartyIdRoute
@@ -242,6 +255,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -364,6 +384,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewRoute: NewRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
   SettingsRoute: SettingsRoute,
+  SupportRoute: SupportRoute,
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,
   MigrateTricountRoute: MigrateTricountRoute,
   PartyPartyIdRoute: PartyPartyIdRoute,
