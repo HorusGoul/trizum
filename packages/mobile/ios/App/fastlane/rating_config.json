@@ -19,7 +19,7 @@
   "lootBox": false,
   "messagingAndChat": false,
   "parentalControls": false,
-  "unrestrictedWebAccess": false,
+  "unrestrictedWebAccess": true,
   "userGeneratedContent": false,
   "ageRatingOverrideV2": "NONE",
   "koreaAgeRatingOverride": "NONE",
