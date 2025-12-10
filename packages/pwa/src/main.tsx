@@ -1,3 +1,5 @@
+import "@fontsource-variable/inter";
+import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";

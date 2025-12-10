@@ -17,6 +17,10 @@ export default {
         success: colors.green,
         warning: colors.yellow,
       },
+      fontFamily: {
+        sans: ["Inter Variable", "sans-serif"],
+        mono: ["Fira Code Variable", "monospace"],
+      },
     },
   },
   plugins: [tailwindcssReactAriaComponents, tailwindcssAnimate, tailwindSafeAreaCapacitor],
