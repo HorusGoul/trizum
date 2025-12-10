@@ -8,9 +8,6 @@ app_identifier "app.trizum.capacitor"
 metadata_path "./fastlane/metadata"
 screenshots_path "./fastlane/screenshots"
 
-# Price tier (0 = free)
-price_tier 0
-
 # App Rating configuration
 app_rating_config_path "./fastlane/rating_config.json"
 
