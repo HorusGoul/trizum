@@ -63,6 +63,14 @@ svgexport $TEMP_SPLASH_SVG $ASSETS_DIR/splash.png 2732:2732
 echo "Exporting splash-dark.png"
 svgexport $TEMP_SPLASH_DARK_SVG $ASSETS_DIR/splash-dark.png 2732:2732
 
-echo "Done!"
+echo "Done generating base icons!"
 
 capacitor-assets generate --ios --android
+
+# Generate Play Store icon (512x512) for fastlane metadata
+echo "Exporting Play Store icon..."
+ANDROID_METADATA_DIR="$SCRIPT_DIR/android/fastlane/metadata/android"
+mkdir -p "$ANDROID_METADATA_DIR/en-US/images"
+svgexport $TEMP_ICON_ONLY_SVG "$ANDROID_METADATA_DIR/en-US/images/icon.png" 512:512
+
+echo "Done!"
