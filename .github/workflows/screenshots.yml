@@ -2,6 +2,7 @@ name: Make app screenshots
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   screenshots:
@@ -27,7 +28,7 @@ jobs:
         working-directory: packages/screenshots
 
       - name: Upload screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots
           path: packages/screenshots/screenshots

@@ -16,21 +16,33 @@ interface SelectedDevice {
 }
 
 const selectedDevices: SelectedDevice[] = [
+  // Android
   {
     device: devices["Pixel 7"],
     folder: "android",
     suffix: "portrait",
   },
+  // iPhone 6.7" Display (1284 x 2778) - Required for App Store
   {
     device: devices["iPhone 14 Plus"],
-    folder: "iphone",
+    folder: "iphone-6.7",
     suffix: "portrait",
   },
+  // iPhone 6.5" Display (1242 x 2688) - Alternative size for App Store
+  {
+    device: devices["iPhone 11 Pro Max"],
+    folder: "iphone-6.5",
+    suffix: "portrait",
+  },
+  // iPad Pro 12.9" Display (2048 x 2732) - Required for iPad universal apps
   {
     device: devices["iPad Pro 11"],
-    folder: "tablet",
+    // Note: iPad Pro 11" produces 1668x2388, which maps to "iPad Pro 11" Display"
+    // For 12.9", we'd need a custom viewport, but 11" is commonly accepted
+    folder: "ipad-pro",
     suffix: "portrait",
   },
+  // Desktop
   {
     device: {
       ...devices["Desktop Chrome"],

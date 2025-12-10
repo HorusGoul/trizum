@@ -1,0 +1,2 @@
+split,bills,expenses,money,friends,roommates,share,debt,settle,trip,group
+

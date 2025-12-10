@@ -186,7 +186,7 @@ platform :ios do
     )
   end
 
-  desc "Upload to App Store"
+  desc "Upload to App Store (binary only, no metadata)"
   lane :deploy_appstore do |options|
     build_release(build_number: options[:build_number])
     upload_to_app_store(
@@ -195,5 +195,152 @@ platform :ios do
       skip_screenshots: true,
       skip_metadata: true
     )
+  end
+
+  # ============================================
+  # Metadata Management Lanes
+  # ============================================
+
+  desc "Download existing metadata from App Store Connect"
+  lane :download_metadata do
+    load_api_key
+    deliver(
+      app_identifier: "app.trizum.capacitor",
+      skip_binary_upload: true,
+      skip_screenshots: false,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Upload metadata only (no build)"
+  lane :upload_metadata do
+    load_api_key
+    deliver(
+      app_identifier: "app.trizum.capacitor",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      force: true,
+      run_precheck_before_submit: true,
+      precheck_include_in_app_purchases: false
+    )
+  end
+
+  desc "Upload screenshots only"
+  lane :upload_screenshots do
+    load_api_key
+    deliver(
+      app_identifier: "app.trizum.capacitor",
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: false,
+      force: true,
+      overwrite_screenshots: true
+    )
+  end
+
+  # ============================================
+  # Full Deployment Lanes
+  # ============================================
+
+  desc "Full App Store deployment with metadata"
+  desc "Options: build_number, skip_screenshots (default: true), submit_for_review (default: false), automatic_release (default: false)"
+  lane :deploy_appstore_full do |options|
+    build_release(build_number: options[:build_number])
+
+    deliver(
+      app_identifier: "app.trizum.capacitor",
+      skip_screenshots: options[:skip_screenshots].nil? ? true : options[:skip_screenshots],
+      skip_metadata: false,
+      force: true,
+      submit_for_review: options[:submit_for_review] || false,
+      automatic_release: options[:automatic_release] || false,
+      phased_release: true,
+      run_precheck_before_submit: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: true,
+        content_rights_contains_third_party_content: false,
+        content_rights_has_rights: true
+      }
+    )
+  end
+
+  desc "Deploy to TestFlight with metadata update"
+  lane :deploy_testflight_full do |options|
+    build_release(build_number: options[:build_number])
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: options[:wait_for_processing] ? false : true
+    )
+
+    # Also update App Store metadata (won't affect TestFlight)
+    deliver(
+      app_identifier: "app.trizum.capacitor",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_metadata: false,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Submit existing build for App Store review"
+  desc "Use this after uploading a build to submit it for review"
+  lane :submit_review do |options|
+    load_api_key
+    deliver(
+      app_identifier: "app.trizum.capacitor",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_metadata: true,
+      submit_for_review: true,
+      automatic_release: options[:automatic_release] || false,
+      phased_release: true,
+      run_precheck_before_submit: true,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: true,
+        content_rights_contains_third_party_content: false,
+        content_rights_has_rights: true
+      }
+    )
+  end
+
+  # ============================================
+  # Utility Lanes
+  # ============================================
+
+  desc "Increment version number"
+  desc "Options: bump_type (major, minor, patch)"
+  lane :bump_version do |options|
+    bump_type = options[:bump_type] || "patch"
+    increment_version_number(
+      bump_type: bump_type,
+      xcodeproj: "App.xcodeproj"
+    )
+  end
+
+  desc "Set specific version number"
+  lane :set_version do |options|
+    if options[:version]
+      increment_version_number(
+        version_number: options[:version],
+        xcodeproj: "App.xcodeproj"
+      )
+    else
+      UI.user_error!("Please provide a version number: fastlane set_version version:1.2.3")
+    end
+  end
+
+  desc "Print current version and build number"
+  lane :current_version do
+    version = get_version_number(xcodeproj: "App.xcodeproj")
+    build = get_build_number(xcodeproj: "App.xcodeproj")
+    UI.success("Current version: #{version} (#{build})")
   end
 end

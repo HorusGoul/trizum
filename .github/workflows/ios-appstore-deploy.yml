@@ -1,0 +1,95 @@
+name: iOS App Store Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      submit_for_review:
+        description: "Submit for App Store review"
+        required: false
+        default: false
+        type: boolean
+      automatic_release:
+        description: "Automatically release after approval"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: ios-appstore-deploy
+  cancel-in-progress: false
+
+jobs:
+  screenshots:
+    name: Generate Screenshots
+    uses: ./.github/workflows/screenshots.yml
+
+  deploy:
+    name: Build & Deploy to App Store
+    needs: [screenshots]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.7.2"
+          bundler-cache: true
+          cache-version: ios-0
+          working-directory: packages/mobile/ios/App
+
+      - name: Build mobile web assets
+        run: pnpm turbo run build --filter=@trizum/mobile
+
+      - name: Download screenshots artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: screenshots
+          path: packages/screenshots/screenshots
+
+      - name: Organize screenshots for fastlane
+        working-directory: packages/screenshots
+        run: |
+          pnpm organize:fastlane --output ../mobile/ios/App/fastlane/screenshots
+          echo "Screenshots organized:"
+          ls -la ../mobile/ios/App/fastlane/screenshots/
+          ls -la ../mobile/ios/App/fastlane/screenshots/en-US/ || true
+
+      - name: Build and Deploy to App Store
+        working-directory: packages/mobile/ios/App
+        env:
+          IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROVISIONING_PROFILE_BASE64 }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: |
+          bundle exec fastlane deploy_appstore_full \
+            skip_screenshots:false \
+            submit_for_review:${{ inputs.submit_for_review }} \
+            automatic_release:${{ inputs.automatic_release }}
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-appstore-ipa
+          path: packages/mobile/ios/App/*.ipa
+          retention-days: 14
+
+      - name: Upload dSYM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-dsym
+          path: packages/mobile/ios/App/*.dSYM.zip
+          retention-days: 14

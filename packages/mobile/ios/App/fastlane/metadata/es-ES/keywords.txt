@@ -1,0 +1,3 @@
+dividir,gastos,cuentas,dinero,amigos,compartir,deuda,viaje,grupo,pagar
+
+

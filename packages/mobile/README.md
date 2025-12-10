@@ -79,6 +79,12 @@ packages/mobile/
 │   └── App/              # iOS native project
 │       ├── App/          # Main iOS app
 │       ├── fastlane/     # Fastlane configuration for iOS
+│       │   ├── Appfile           # App identifier config
+│       │   ├── Fastfile          # Lane definitions
+│       │   ├── Deliverfile       # App Store delivery config
+│       │   ├── metadata/         # App Store listing content
+│       │   ├── screenshots/      # App Store screenshots
+│       │   └── rating_config.json # Age rating
 │       └── Gemfile       # Ruby dependencies for fastlane
 ├── dist/                 # Copied PWA assets (gitignored)
 ├── assets/               # Source assets (icons, splash screens)
@@ -136,19 +142,125 @@ bundle exec fastlane build_release
 
 #### iOS (`packages/mobile/ios/App`)
 
+**Build Lanes:**
+
 | Lane               | Description                       |
 | ------------------ | --------------------------------- |
 | `build_debug`      | Build debug app for simulator     |
 | `build_release`    | Build release IPA for App Store   |
 | `build_adhoc`      | Build ad-hoc IPA for distribution |
-| `deploy_testflight`| Build and upload to TestFlight    |
-| `deploy_appstore`  | Build and upload to App Store     |
+
+**Deployment Lanes:**
+
+| Lane                  | Description                                      |
+| --------------------- | ------------------------------------------------ |
+| `deploy_testflight`   | Build and upload to TestFlight                   |
+| `deploy_testflight_full` | Build, upload to TestFlight, and update metadata |
+| `deploy_appstore`     | Build and upload to App Store (binary only)      |
+| `deploy_appstore_full`| Build and upload with metadata (full deployment) |
+| `submit_review`       | Submit existing build for App Store review       |
+
+**Metadata Lanes:**
+
+| Lane                | Description                                    |
+| ------------------- | ---------------------------------------------- |
+| `download_metadata` | Download existing metadata from App Store Connect |
+| `upload_metadata`   | Upload metadata only (no build)                |
+| `upload_screenshots`| Upload screenshots only                        |
+
+**Utility Lanes:**
+
+| Lane              | Description                              |
+| ----------------- | ---------------------------------------- |
+| `bump_version`    | Increment version (patch/minor/major)    |
+| `set_version`     | Set specific version number              |
+| `current_version` | Print current version and build number   |
 
 ```bash
 cd packages/mobile/ios/App
+
+# Build
 bundle exec fastlane build_debug
 bundle exec fastlane build_release
+
+# Deploy to TestFlight
+bundle exec fastlane deploy_testflight
+
+# Full App Store deployment with metadata
+bundle exec fastlane deploy_appstore_full
+
+# Full deployment and submit for review
+bundle exec fastlane deploy_appstore_full submit_for_review:true
+
+# Auto-release after approval
+bundle exec fastlane deploy_appstore_full submit_for_review:true automatic_release:true
+
+# Update metadata only (no new build)
+bundle exec fastlane upload_metadata
+
+# Download existing metadata from App Store Connect
+bundle exec fastlane download_metadata
 ```
+
+### App Store Metadata (iOS)
+
+App Store listing content is managed in code via Fastlane's [deliver](https://docs.fastlane.tools/actions/deliver/) tool. All metadata files are located in `ios/App/fastlane/metadata/`.
+
+#### Directory Structure
+
+```
+ios/App/fastlane/
+├── metadata/
+│   ├── copyright.txt              # Copyright notice
+│   ├── primary_category.txt       # Primary App Store category
+│   ├── secondary_category.txt     # Secondary category (optional)
+│   ├── en-US/                     # English (US) locale
+│   │   ├── name.txt               # App name (max 30 chars)
+│   │   ├── subtitle.txt           # Subtitle (max 30 chars)
+│   │   ├── description.txt        # Full description (max 4000 chars)
+│   │   ├── keywords.txt           # Keywords, comma-separated (max 100 chars)
+│   │   ├── promotional_text.txt   # Promotional text (max 170 chars)
+│   │   ├── release_notes.txt      # What's new
+│   │   ├── support_url.txt        # Support URL
+│   │   └── privacy_url.txt        # Privacy policy URL (required)
+│   └── review_information/        # App Review contact info
+│       ├── first_name.txt
+│       ├── last_name.txt
+│       ├── email_address.txt
+│       ├── phone_number.txt
+│       └── notes.txt              # Notes for reviewer
+├── screenshots/                   # App Store screenshots (by locale/device)
+│   └── en-US/
+│       └── *.png
+├── rating_config.json             # Age rating configuration
+└── Deliverfile                    # Deliver configuration
+```
+
+#### Adding Locales
+
+To add a new locale (e.g., German), create a new directory and add the same files:
+
+```bash
+mkdir -p ios/App/fastlane/metadata/de-DE
+# Copy and translate files from en-US
+```
+
+#### Updating Metadata
+
+1. Edit the text files in `metadata/`
+2. Run `bundle exec fastlane upload_metadata` to push changes
+3. Changes to `promotional_text.txt` don't require a new app version
+
+#### Screenshots
+
+Add screenshots to `ios/App/fastlane/screenshots/en-US/` with naming convention:
+
+- `iPhone 6.7-Inch Display-1.png` (iPhone 15 Pro Max, etc.)
+- `iPhone 6.5-Inch Display-1.png` (iPhone 11 Pro Max, etc.)
+- `iPhone 5.5-Inch Display-1.png` (iPhone 8 Plus, etc.)
+- `iPad Pro 12.9-Inch Display-1.png`
+
+Run `bundle exec fastlane upload_screenshots` to upload.
 
 ### Environment Variables
 

@@ -26,6 +26,7 @@
   "scripts": {
     "cleanup": "rm -rf screenshots",
     "start": "node --experimental-transform-types src/main.ts",
+    "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",

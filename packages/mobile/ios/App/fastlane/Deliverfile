@@ -1,0 +1,48 @@
+# Deliverfile - App Store Connect configuration
+# Documentation: https://docs.fastlane.tools/actions/deliver/
+
+# App identifier (bundle ID)
+app_identifier "app.trizum.capacitor"
+
+# Metadata and screenshots paths
+metadata_path "./fastlane/metadata"
+screenshots_path "./fastlane/screenshots"
+
+# Price tier (0 = free)
+price_tier 0
+
+# App Rating configuration
+app_rating_config_path "./fastlane/rating_config.json"
+
+# Phased release (gradual rollout over 7 days)
+phased_release true
+
+# Precheck settings (validates before upload)
+precheck_include_in_app_purchases false
+
+# Default submission information
+submission_information({
+  # IDFA (Identifier for Advertisers)
+  add_id_info_uses_idfa: false,
+  
+  # Export compliance (encryption)
+  export_compliance_uses_encryption: false,
+  export_compliance_is_exempt: true,
+  
+  # Content rights
+  content_rights_contains_third_party_content: false,
+  content_rights_has_rights: true
+})
+
+# Don't automatically submit for review (can be overridden in lane)
+submit_for_review false
+
+# Don't automatically release after approval (can be overridden in lane)
+automatic_release false
+
+# Force upload even if no changes detected
+force true
+
+# Run precheck before submit
+run_precheck_before_submit true
+

@@ -1,0 +1,2 @@
+trizum is an offline-first app that works without user accounts. No login is required to use the app. Simply create a group and start adding expenses.
+
