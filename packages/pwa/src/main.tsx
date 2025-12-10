@@ -30,6 +30,10 @@ import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { isNonNull } from "./lib/isNonNull.ts";
+import {
+  createPartyFromMigrationData,
+  type MigrationData,
+} from "./models/migration.ts";
 
 const initialUrl = new URL(window.location.href);
 
@@ -86,6 +90,25 @@ const repo = new Repo({
     isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL),
   ].filter(isNonNull),
 });
+
+declare global {
+  interface Window {
+    __internal_createPartyFromMigrationData: (
+      data: MigrationData,
+    ) => Promise<string>;
+  }
+}
+
+// For internal use only, like UI testing or screenshots
+window.__internal_createPartyFromMigrationData = async (
+  data: MigrationData,
+) => {
+  return createPartyFromMigrationData({
+    repo,
+    data,
+    importAttachments: false,
+  });
+};
 
 // Create a new router instance
 const router = createRouter({

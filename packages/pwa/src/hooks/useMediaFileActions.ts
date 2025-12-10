@@ -4,12 +4,20 @@ import {
   type ImageCompressionOptions,
   compressionPresets,
 } from "#src/lib/imageCompression.ts";
-import { RawString, type DocumentId } from "@automerge/automerge-repo";
+import {
+  type Repo,
+  RawString,
+  type DocumentId,
+} from "@automerge/automerge-repo";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 
 export function useMediaFileActions() {
   const repo = useRepo();
 
+  return getMediaFileHelpers(repo);
+}
+
+export function getMediaFileHelpers(repo: Repo) {
   async function createMediaFile(
     blob: Blob,
     metadata: Record<string, unknown>,
