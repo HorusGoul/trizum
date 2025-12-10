@@ -1,0 +1,47 @@
+{
+  "name": "@trizum/screenshots",
+  "description": "",
+  "keywords": [],
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf screenshots",
+    "start": "node --experimental-transform-types src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "pnpm run lint --fix",
+    "setup": "pnpm playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@trizum/eslint-config": "workspace:*",
+    "@trizum/prettier-config": "workspace:*",
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "24.10.2",
+    "eslint": "9.39.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.2"
+  },
+  "prettier": "@trizum/prettier-config",
+  "dependencies": {
+    "playwright": "1.57.0"
+  }
+}
