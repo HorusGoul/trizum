@@ -41,14 +41,13 @@ const selectedDevices: SelectedDevice[] = [
     folder: "iphone-6.5",
     suffix: "portrait",
   },
-  // iPad 13" Display: 2048×2732 pixels
+  // iPad 13" Display: 2064×2752 pixels
   // Required if app runs on iPad
-  // Accepted sizes: 2064×2752 or 2048×2732
-  // viewport 1024×1366 × deviceScaleFactor 2 = 2048×2732
+  // viewport 1032×1376 × deviceScaleFactor 2 = 2064×2752
   {
     device: {
       ...devices["iPad Pro 11"],
-      viewport: { width: 1024, height: 1366 },
+      viewport: { width: 1032, height: 1376 },
       deviceScaleFactor: 2,
     },
     folder: "ipad-13",

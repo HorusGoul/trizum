@@ -30,8 +30,8 @@ const LOCALE_MAPPING: Record<string, string[]> = {
 const DEVICE_FRAME_MAPPING: Record<string, string | null> = {
   // iPhone 6.5" Display (1284×2778) - Required if app runs on iPhone
   "iphone-6.5": 'iPhone 6.5" Display',
-  // iPad 13" Display (2048×2732) - Required if app runs on iPad
-  "ipad-13": "iPad Pro (12.9-inch) (2nd generation)",
+  // iPad 13" Display (2064×2752) - Required if app runs on iPad
+  "ipad-13": 'iPad 13" Display',
   // Skip android and desktop for iOS fastlane
   android: null,
   desktop: null,
