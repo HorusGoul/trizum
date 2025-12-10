@@ -29,6 +29,9 @@ import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx"
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
+import { isNonNull } from "./lib/isNonNull.ts";
+
+const initialUrl = new URL(window.location.href);
 
 if (import.meta.env.MODE === "production") {
   Sentry.init({
@@ -73,11 +76,15 @@ declare module "react-aria-components" {
 }
 
 const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
+const isOfflineOnly =
+  initialUrl.searchParams.get("__internal_offline_only") === "true";
 
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
-  network: [new BrowserWebSocketClientAdapter(WSS_URL)],
+  network: [
+    isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL),
+  ].filter(isNonNull),
 });
 
 // Create a new router instance
