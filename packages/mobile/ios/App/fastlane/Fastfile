@@ -258,6 +258,7 @@ platform :ios do
       phased_release: true,
       run_precheck_before_submit: true,
       precheck_include_in_app_purchases: false,
+      overwrite_screenshots: true,
       submission_information: {
         add_id_info_uses_idfa: false,
         export_compliance_uses_encryption: false,

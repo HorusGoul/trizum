@@ -1,5 +1,12 @@
 # @trizum/mobile
 
+## 1.0.3
+
+### Patch Changes
+
+- overwrite_screenshots: true for the full deploy lane
+  - @trizum/pwa@1.0.3
+
 ## 1.0.2
 
 ### Patch Changes
