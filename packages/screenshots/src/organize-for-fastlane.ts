@@ -56,9 +56,9 @@ const IOS_DEVICE_FRAME_MAPPING: Record<string, string | null> = {
 // - tenInchScreenshots: 10" tablet screenshots
 // - tvScreenshots: TV screenshots
 // - wearScreenshots: Wear OS screenshots
-const ANDROID_DEVICE_MAPPING: Record<string, string | null> = {
-  android: "phoneScreenshots",
-  desktop: "tenInchScreenshots", // Use desktop screenshots for 10" tablets
+const ANDROID_DEVICE_MAPPING: Record<string, string[] | null> = {
+  android: ["phoneScreenshots"],
+  desktop: ["sevenInchScreenshots", "tenInchScreenshots"], // Use desktop screenshots for tablets
   // Skip iOS-specific devices
   "iphone-6.5": null,
   "ipad-13": null,
@@ -215,12 +215,12 @@ async function organizeForAndroid(
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
-      const screenshotType = ANDROID_DEVICE_MAPPING[device];
-      if (screenshotType === null) {
+      const screenshotTypes = ANDROID_DEVICE_MAPPING[device];
+      if (screenshotTypes === null) {
         console.log(`Skipping ${locale}/${device} (not for Android)`);
         continue;
       }
-      if (screenshotType === undefined) {
+      if (screenshotTypes === undefined) {
         console.warn(`Warning: Unknown device "${device}", skipping`);
         continue;
       }
@@ -234,31 +234,33 @@ async function organizeForAndroid(
       // Sort files by screenshot order
       files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b));
 
-      // Copy files to each Play Store locale
+      // Copy files to each Play Store locale and screenshot type
       for (const playStoreLocale of playStoreLocales) {
-        // Android structure: {locale}/images/{screenshotType}/
-        const screenshotsOutputDir = path.join(
-          outputDir,
-          playStoreLocale,
-          "images",
-          screenshotType,
-        );
-        await mkdir(screenshotsOutputDir, { recursive: true });
-
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const name = file.split(".")[0]; // "expense-log.portrait.png" -> "expense-log"
-          const index = i + 1; // 1-based index
-
-          // Android format: "1_expense-log.png" (simple numbering)
-          const outputFilename = `${index}_${name}.png`;
-          const inputPath = path.join(SCREENSHOTS_DIR, locale, device, file);
-          const outputPath = path.join(screenshotsOutputDir, outputFilename);
-
-          await copyFile(inputPath, outputPath);
-          console.log(
-            `  ${locale}/${device}/${file} -> ${playStoreLocale}/images/${screenshotType}/${outputFilename}`,
+        for (const screenshotType of screenshotTypes) {
+          // Android structure: {locale}/images/{screenshotType}/
+          const screenshotsOutputDir = path.join(
+            outputDir,
+            playStoreLocale,
+            "images",
+            screenshotType,
           );
+          await mkdir(screenshotsOutputDir, { recursive: true });
+
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const name = file.split(".")[0]; // "expense-log.portrait.png" -> "expense-log"
+            const index = i + 1; // 1-based index
+
+            // Android format: "1_expense-log.png" (simple numbering)
+            const outputFilename = `${index}_${name}.png`;
+            const inputPath = path.join(SCREENSHOTS_DIR, locale, device, file);
+            const outputPath = path.join(screenshotsOutputDir, outputFilename);
+
+            await copyFile(inputPath, outputPath);
+            console.log(
+              `  ${locale}/${device}/${file} -> ${playStoreLocale}/images/${screenshotType}/${outputFilename}`,
+            );
+          }
         }
       }
     }
