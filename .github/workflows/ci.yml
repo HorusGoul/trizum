@@ -36,6 +36,16 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        # Only execute this in the main branch
+        if: github.ref == 'refs/heads/main'
+        uses: changesets/action@v1
+        with:
+          version: pnpm run update-version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   autofix:
     name: Autofix & Extract Messages
     runs-on: ubuntu-latest

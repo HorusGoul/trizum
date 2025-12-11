@@ -37,7 +37,8 @@
     "run:ios": "cap run ios",
     "dev:android": "DEV_MODE=true pnpm run:android",
     "dev:ios": "DEV_MODE=true pnpm run:ios",
-    "assets:generate": "./generate-icons.sh"
+    "assets:generate": "./generate-icons.sh",
+    "version:update": "capver set $(node -p \"require('./package.json').version\")"
   },
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
