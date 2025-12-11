@@ -1,5 +1,12 @@
 # @trizum/mobile
 
+## 1.0.1
+
+### Patch Changes
+
+- Update assets
+  - @trizum/pwa@1.0.1
+
 ## 1.0.0
 
 ### Major Changes
