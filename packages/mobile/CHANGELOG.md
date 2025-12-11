@@ -1,5 +1,12 @@
 # @trizum/mobile
 
+## 1.0.2
+
+### Patch Changes
+
+- c6c06b2: Add NSCameraUsageDescription
+  - @trizum/pwa@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
