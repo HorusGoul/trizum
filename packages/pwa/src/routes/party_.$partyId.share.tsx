@@ -6,35 +6,41 @@ import { QRCode } from "#src/ui/QRCode.tsx";
 import { t, Trans } from "@lingui/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { Share } from "@capacitor/share";
+import { getAppLink } from "#src/lib/link.ts";
 
 export const Route = createFileRoute("/party_/$partyId/share")({
   component: RouteComponent,
+  loader: async () => {
+    return {
+      canShare: await Share.canShare().then((result) => result.value),
+    };
+  },
 });
 
 function RouteComponent() {
   const { partyId, party } = useCurrentParty();
-  const shareUrl = `${window.location.origin}/party/${partyId}`;
-
+  const shareUrl = getAppLink(`/party/${partyId}`);
+  const { canShare } = Route.useLoaderData();
   async function onShareParty() {
-    try {
-      await navigator.share({
+    if (canShare) {
+      await Share.share({
         title: t`Join ${party.name} on trizum!`,
         url: shareUrl,
       });
 
       toast.success(t`Party shared!`);
-    } catch {
-      try {
-        // Attempt copy to clipboard
-        await navigator.clipboard.writeText(shareUrl);
+      return;
+    }
 
-        toast.success(t`Party link copied to clipboard!`);
-      } catch {
-        prompt(
-          t`Failed to copy party link to clipboard, please copy it manually`,
-          shareUrl,
-        );
-      }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success(t`Party link copied to clipboard!`);
+    } catch {
+      prompt(
+        t`Failed to copy party link to clipboard, please copy it manually`,
+        shareUrl,
+      );
     }
   }
 
@@ -76,7 +82,7 @@ function RouteComponent() {
           className="mt-8 w-full max-w-56 rounded-lg font-medium"
           onPress={() => void onShareParty()}
         >
-          {typeof navigator.share === "function" ? (
+          {canShare ? (
             <>
               <Icon name="#lucide/share" className="mr-2 h-5 w-5" />
               <Trans>Share party</Trans>
