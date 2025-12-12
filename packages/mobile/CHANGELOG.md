@@ -1,5 +1,15 @@
 # @trizum/mobile
 
+## 1.0.4
+
+### Patch Changes
+
+- f386729: Fix party sharing
+- Updated dependencies [f386729]
+- Updated dependencies [fa9bcd2]
+- Updated dependencies [a140c8a]
+  - @trizum/pwa@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes
