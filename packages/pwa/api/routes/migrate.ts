@@ -1,10 +1,20 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 import type { Party, PartyParticipant } from "../../src/models/party";
 import type { Expense, ExpenseShare } from "../../src/models/expense.js";
 import type { MigrationData } from "../../src/models/migration";
 
 export const apiMigrateRoute = new Hono();
+
+apiMigrateRoute.use(
+  "*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "OPTIONS"],
+    allowHeaders: ["Content-Type"],
+  }),
+);
 
 apiMigrateRoute.get("/", async (c) => {
   let data: TricountResponse | null = null;
