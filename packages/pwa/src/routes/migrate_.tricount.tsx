@@ -12,6 +12,7 @@ import {
   type MigrationData,
 } from "#src/models/migration.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
+import { getAppLink } from "#src/lib/link.ts";
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
@@ -98,7 +99,7 @@ function useMigrateTricount() {
     });
 
     try {
-      const response = await fetch(`/api/migrate?key=${key}`);
+      const response = await fetch(getAppLink(`/api/migrate?key=${key}`));
       const data = (await response.json()) as MigrationData;
 
       const partyId = await createPartyFromMigrationData({
