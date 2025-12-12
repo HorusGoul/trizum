@@ -156,7 +156,7 @@ msgstr "Contacto"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/routes/party_.$partyId.share.tsx:87
+#: src/routes/party_.$partyId.share.tsx:93
 msgid "Copy party link"
 msgstr "Copiar enlace del grupo"
 
@@ -246,7 +246,7 @@ msgstr "Gastos"
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
-#: src/routes/party_.$partyId.share.tsx:34
+#: src/routes/party_.$partyId.share.tsx:41
 msgid "Failed to copy party link to clipboard, please copy it manually"
 msgstr "Error al copiar el enlace del grupo al portapapeles, por favor cópialo manualmente"
 
@@ -401,7 +401,7 @@ msgstr "Enlace de grupo de trizum no válido"
 msgid "Is my data secure?"
 msgstr "¿Mis datos están seguros?"
 
-#: src/routes/party_.$partyId.share.tsx:21
+#: src/routes/party_.$partyId.share.tsx:28
 msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
@@ -576,7 +576,7 @@ msgstr "Participantes"
 msgid "Party created"
 msgstr "Grupo creado"
 
-#: src/routes/party_.$partyId.share.tsx:31
+#: src/routes/party_.$partyId.share.tsx:38
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
@@ -588,7 +588,7 @@ msgstr "Configuración del Grupo"
 msgid "Party settings saved!"
 msgstr "¡Configuración del grupo guardada!"
 
-#: src/routes/party_.$partyId.share.tsx:25
+#: src/routes/party_.$partyId.share.tsx:32
 msgid "Party shared!"
 msgstr "¡Grupo compartido!"
 
@@ -710,8 +710,8 @@ msgstr "Configuración"
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
-#: src/routes/party_.$partyId.share.tsx:47
-#: src/routes/party_.$partyId.share.tsx:82
+#: src/routes/party_.$partyId.share.tsx:53
+#: src/routes/party_.$partyId.share.tsx:88
 #: src/routes/party.$partyId.tsx:208
 msgid "Share party"
 msgstr "Compartir grupo"

@@ -180,7 +180,7 @@ msgstr "Contact Us"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/party_.$partyId.share.tsx:87
+#: src/routes/party_.$partyId.share.tsx:93
 msgid "Copy party link"
 msgstr "Copy party link"
 
@@ -294,7 +294,7 @@ msgstr "Failed to add expense"
 msgid "Failed to check for updates"
 msgstr "Failed to check for updates"
 
-#: src/routes/party_.$partyId.share.tsx:34
+#: src/routes/party_.$partyId.share.tsx:41
 msgid "Failed to copy party link to clipboard, please copy it manually"
 msgstr "Failed to copy party link to clipboard, please copy it manually"
 
@@ -453,7 +453,7 @@ msgstr "Invalid trizum party link"
 msgid "Is my data secure?"
 msgstr "Is my data secure?"
 
-#: src/routes/party_.$partyId.share.tsx:21
+#: src/routes/party_.$partyId.share.tsx:28
 msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
@@ -648,7 +648,7 @@ msgstr "Party deleted"
 msgid "Party is completely balanced!"
 msgstr "Party is completely balanced!"
 
-#: src/routes/party_.$partyId.share.tsx:31
+#: src/routes/party_.$partyId.share.tsx:38
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
 
@@ -660,7 +660,7 @@ msgstr "Party Settings"
 msgid "Party settings saved!"
 msgstr "Party settings saved!"
 
-#: src/routes/party_.$partyId.share.tsx:25
+#: src/routes/party_.$partyId.share.tsx:32
 msgid "Party shared!"
 msgstr "Party shared!"
 
@@ -786,8 +786,8 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/routes/party_.$partyId.share.tsx:47
-#: src/routes/party_.$partyId.share.tsx:82
+#: src/routes/party_.$partyId.share.tsx:53
+#: src/routes/party_.$partyId.share.tsx:88
 #: src/routes/party.$partyId.tsx:208
 msgid "Share party"
 msgstr "Share party"
