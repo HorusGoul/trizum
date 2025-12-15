@@ -1,12 +1,12 @@
-# Translation Guidelines for Trizum
+# Translation Guidelines for trizum
 
-This document contains translation rules, terminology guidelines, and explanations for translating Trizum to different languages.
+This document contains translation rules, terminology guidelines, and explanations for translating trizum to different languages.
 
 ## Core Concepts & Terminology
 
 ### Party
 
-**CRITICAL:** The term "party" in Trizum refers to a **group of people sharing expenses together**, NOT a celebration or social event.
+**CRITICAL:** The term "party" in trizum refers to a **group of people sharing expenses together**, NOT a celebration or social event.
 
 - A party is a collection of participants who track shared expenses
 - Users can create, join, and leave parties
@@ -205,10 +205,9 @@ Follow target language capitalization rules:
 
 ### App-Specific Terms
 
-**Trizum:**
+**trizum:**
 
 - Keep "trizum" as-is (app name)
-- Only capitalize when starting sentences
 - Don't translate app name
 
 **Bizum:**
@@ -264,7 +263,7 @@ Follow target language capitalization rules:
 ### Before Starting
 
 1. Read this document thoroughly
-2. Understand the context of Trizum (expense splitting app)
+2. Understand the context of trizum (expense splitting app)
 3. Review existing translations if available
 4. Identify any unclear terms and ask questions
 
