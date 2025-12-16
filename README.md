@@ -106,12 +106,12 @@ pnpm dev:ios
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Run checks: `pnpm lint && pnpm typecheck && pnpm test`
-5. Push to the branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+We welcome contributions! See our [Contributing Guide](./CONTRIBUTING.md) for details on:
+
+- Development setup and workflow
+- Code style guidelines
+- Testing requirements
+- Pull request process
 
 ## 📝 License
 
