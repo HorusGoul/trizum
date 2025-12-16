@@ -13,7 +13,7 @@
 - **Receipt attachments**. Attach photos of receipts to expenses
 - **PWA & Native apps**. Available as a Progressive Web App and native Android/iOS apps
 - **Multi-language support**. Internationalized with Lingui (English & Spanish for now)
-- **Migrate from other apps**. Migrate from other proprietary software, we only support migrating from Tricount for now.
+- **Migration support**. Import your data from other proprietary apps (currently only Tricount is supported).
 
 ## 🏗️ Architecture
 
