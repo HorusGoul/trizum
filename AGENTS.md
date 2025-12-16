@@ -1,8 +1,8 @@
-# Trizum - AI Agent Guide
+# trizum - AI Agent Guide
 
 ## Project Overview
 
-**Trizum** helps you split bills with friends and family. Track, calculate, and settle expenses together - similar to apps like SplitWise or Tricount.
+**trizum** helps you split bills with friends and family. Track, calculate, and settle expenses together - similar to apps like SplitWise or Tricount.
 
 **Primary Users:** Friends splitting bills, groups sharing expenses, roommates tracking shared costs.
 
@@ -207,7 +207,7 @@ pnpm test:coverage     # With coverage report
 
 ### Offline-First with Automerge
 
-Trizum uses Automerge for local-first data synchronization. All collaborative data (parties, expenses, participants) is stored in Automerge documents that automatically sync when online.
+trizum uses Automerge for local-first data synchronization. All collaborative data (parties, expenses, participants) is stored in Automerge documents that automatically sync when online.
 
 **Key Concepts:**
 
