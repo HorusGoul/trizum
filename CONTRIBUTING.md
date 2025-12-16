@@ -242,7 +242,6 @@ For new features or large changes, consider opening a **draft PR** early to get 
 ## Questions?
 
 - Check the [README](./README.md) for project overview
-- Review [AGENTS.md](./AGENTS.md) for detailed guidelines
 - Open an issue for questions or discussions
 
 ---
