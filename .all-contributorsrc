@@ -1,4 +1,40 @@
 {
   "projectName": "trizum",
-  "projectOwner": "HorusGoul"
+  "projectOwner": "HorusGoul",
+  "repoType": "github",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "HorusGoul",
+      "name": "Horus Lugo",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6759612?v=4",
+      "profile": "https://horus.dev/",
+      "contributions": [
+        "infra",
+        "maintenance",
+        "code",
+        "doc",
+        "design",
+        "security",
+        "tool",
+        "test",
+        "platform",
+        "bug",
+        "ideas"
+      ]
+    },
+    {
+      "login": "marionauta",
+      "name": "Mario Nachbaur",
+      "avatar_url": "https://avatars.githubusercontent.com/u/598416?v=4",
+      "profile": "https://mario.nachbaur.dev/contact/",
+      "contributions": [
+        "ideas",
+        "code",
+        "design",
+        "test",
+        "review"
+      ]
+    }
+  ]
 }

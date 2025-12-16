@@ -122,6 +122,14 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://horus.dev/"><img src="https://avatars.githubusercontent.com/u/6759612?v=4?s=100" width="100px;" alt="Horus Lugo"/><br /><sub><b>Horus Lugo</b></sub></a><br /><a href="#infra-HorusGoul" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-HorusGoul" title="Maintenance">🚧</a> <a href="https://github.com/HorusGoul/trizum/commits?author=HorusGoul" title="Code">💻</a> <a href="https://github.com/HorusGoul/trizum/commits?author=HorusGoul" title="Documentation">📖</a> <a href="#design-HorusGoul" title="Design">🎨</a> <a href="#security-HorusGoul" title="Security">🛡️</a> <a href="#tool-HorusGoul" title="Tools">🔧</a> <a href="https://github.com/HorusGoul/trizum/commits?author=HorusGoul" title="Tests">⚠️</a> <a href="#platform-HorusGoul" title="Packaging/porting to new platform">📦</a> <a href="https://github.com/HorusGoul/trizum/issues?q=author%3AHorusGoul" title="Bug reports">🐛</a> <a href="#ideas-HorusGoul" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://mario.nachbaur.dev/contact/"><img src="https://avatars.githubusercontent.com/u/598416?v=4?s=100" width="100px;" alt="Mario Nachbaur"/><br /><sub><b>Mario Nachbaur</b></sub></a><br /><a href="#ideas-marionauta" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/HorusGoul/trizum/commits?author=marionauta" title="Code">💻</a> <a href="#design-marionauta" title="Design">🎨</a> <a href="https://github.com/HorusGoul/trizum/commits?author=marionauta" title="Tests">⚠️</a> <a href="https://github.com/HorusGoul/trizum/pulls?q=is%3Apr+reviewed-by%3Amarionauta" title="Reviewed Pull Requests">👀</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
