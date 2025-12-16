@@ -26,37 +26,6 @@ trizum is built as a **monorepo** with a local-first architecture. The core prin
 3. **Sync**. When online, changes are synchronized via WebSocket to the server
 4. **Conflict Resolution**. Automerge CRDTs automatically merge changes from multiple devices
 
-## 📦 Packages
-
-| Package                                                 | Description                                                      |
-| ------------------------------------------------------- | ---------------------------------------------------------------- |
-| [`@trizum/pwa`](./packages/pwa)                         | Main web application. React + Vite PWA with offline support      |
-| [`@trizum/mobile`](./packages/mobile)                   | Native mobile apps wrapper using Capacitor (Android & iOS)       |
-| [`@trizum/server`](./packages/server)                   | Sync server. Hono + Automerge repo for WebSocket synchronization |
-| [`@trizum/screenshots`](./packages/screenshots)         | Automated screenshot generation for app stores using Playwright  |
-| [`@trizum/eslint-config`](./packages/eslint-config)     | Shared ESLint configuration                                      |
-| [`@trizum/prettier-config`](./packages/prettier-config) | Shared Prettier configuration                                    |
-| [`@trizum/tsconfig`](./packages/tsconfig)               | Shared TypeScript configuration                                  |
-
-## 🛠️ Tech Stack
-
-| Category            | Technology                              |
-| ------------------- | --------------------------------------- |
-| **Runtime**         | Node.js 24                              |
-| **Package Manager** | pnpm 10                                 |
-| **Monorepo**        | Turborepo + pnpm workspaces             |
-| **Frontend**        | React (experimental w/ React Compiler)  |
-| **Routing**         | TanStack Router                         |
-| **Styling**         | Tailwind CSS                            |
-| **State/Sync**      | Automerge (CRDT)                        |
-| **i18n**            | Lingui                                  |
-| **Build**           | Vite                                    |
-| **Testing**         | Vitest                                  |
-| **Mobile**          | Capacitor                               |
-| **Server**          | Hono + Drizzle ORM                      |
-| **Database**        | LibSQL (SQLite)                         |
-| **Deployment**      | Cloudflare Pages (PWA), Fly.io (Server) |
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -112,6 +81,18 @@ We welcome contributions! See our [Contributing Guide](./CONTRIBUTING.md) for de
 - Code style guidelines
 - Testing requirements
 - Pull request process
+
+## 📦 Packages
+
+| Package                                                 | Description                                                      |
+| ------------------------------------------------------- | ---------------------------------------------------------------- |
+| [`@trizum/pwa`](./packages/pwa)                         | Main web application. React + Vite PWA with offline support      |
+| [`@trizum/mobile`](./packages/mobile)                   | Native mobile apps wrapper using Capacitor (Android & iOS)       |
+| [`@trizum/server`](./packages/server)                   | Sync server. Hono + Automerge repo for WebSocket synchronization |
+| [`@trizum/screenshots`](./packages/screenshots)         | Automated screenshot generation for app stores using Playwright  |
+| [`@trizum/eslint-config`](./packages/eslint-config)     | Shared ESLint configuration                                      |
+| [`@trizum/prettier-config`](./packages/prettier-config) | Shared Prettier configuration                                    |
+| [`@trizum/tsconfig`](./packages/tsconfig)               | Shared TypeScript configuration                                  |
 
 ## 📝 License
 
