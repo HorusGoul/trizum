@@ -4,6 +4,18 @@
 
 **Split bills with friends and family.** Track, calculate, and settle expenses together, with a focus on offline-first, collaborative data synchronization.
 
+<p>
+  <a href="https://apps.apple.com/app/trizum/id6755971747">
+    <img src="./assets/download-on-the-app-store.svg" alt="Download on the App Store" height="40">
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=app.trizum.capacitor">
+    <img src="./assets/get-it-google-play.svg" alt="Get it on Google Play" height="40">
+  </a>
+  <a href="https://trizum.app">
+    <img src="./assets/launch-now-pwa.png" alt="Launch as PWA" height="40">
+  </a>
+</p>
+
 ## ✨ Features
 
 - **Offline-first architecture**. Works without internet, syncs when you're back online
