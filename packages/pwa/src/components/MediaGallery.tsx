@@ -135,7 +135,7 @@ export default function MediaGallery({
       </div>
 
       <GalleryButton
-        className="right-4 top-4"
+        className="right-safe-offset-4 top-safe-offset-4"
         label={t`Close`}
         icon="#lucide/x"
         onClick={onClose}
@@ -144,14 +144,14 @@ export default function MediaGallery({
       {showNavigation && (
         <>
           <GalleryButton
-            className="left-4 top-1/2 -translate-y-1/2 transform"
+            className="top-1/2 -translate-y-1/2 transform left-safe-offset-4"
             label={t`Previous`}
             icon="#lucide/arrow-left"
             onClick={goToPrevious}
           />
 
           <GalleryButton
-            className="right-4 top-1/2 -translate-y-1/2 transform"
+            className="top-1/2 -translate-y-1/2 transform right-safe-offset-4"
             label={t`Next`}
             icon="#lucide/arrow-right"
             onClick={goToNext}
