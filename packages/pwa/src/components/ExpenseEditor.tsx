@@ -561,13 +561,13 @@ function ParticipantItem({
 
       {shares[participant.id] && (
         <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-1 items-center justify-center gap-2">
+          <div className="flex flex-1 items-center justify-center gap-1">
             {participantShare.type === "divide" ? (
               <>
                 <IconButton
                   icon="#lucide/minus"
-                  className="h-5 w-5"
-                  iconClassName="size-3"
+                  className="h-7 w-7"
+                  iconClassName="size-3.5"
                   onPress={onDecrementSharesPress}
                   color="input-like"
                 />
@@ -600,8 +600,8 @@ function ParticipantItem({
                 />
                 <IconButton
                   icon="#lucide/plus"
-                  className="h-5 w-5"
-                  iconClassName="size-3"
+                  className="h-7 w-7"
+                  iconClassName="size-3.5"
                   onPress={onIncrementSharesPress}
                   color="input-like"
                 />
@@ -615,7 +615,7 @@ function ParticipantItem({
                     onShareTypeChange("divide");
                   }}
                   className="h-7 w-7"
-                  iconClassName="size-3"
+                  iconClassName="size-3.5"
                 />
 
                 <Tooltip>
