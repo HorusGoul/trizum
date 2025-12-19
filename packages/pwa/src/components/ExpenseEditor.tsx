@@ -547,7 +547,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-accent-500 bg-white pr-3 dark:border-accent-700 dark:bg-accent-900"
+      className="grid h-12 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-accent-500 bg-white pr-3 dark:border-accent-700 dark:bg-accent-900"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -566,8 +566,8 @@ function ParticipantItem({
               <>
                 <IconButton
                   icon="#lucide/minus"
-                  className="h-5 w-5"
-                  iconClassName="size-3"
+                  className="h-8 w-8"
+                  iconClassName="size-4"
                   onPress={onDecrementSharesPress}
                   color="input-like"
                 />
@@ -600,8 +600,8 @@ function ParticipantItem({
                 />
                 <IconButton
                   icon="#lucide/plus"
-                  className="h-5 w-5"
-                  iconClassName="size-3"
+                  className="h-8 w-8"
+                  iconClassName="size-4"
                   onPress={onIncrementSharesPress}
                   color="input-like"
                 />
