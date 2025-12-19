@@ -1,5 +1,12 @@
 # @trizum/pwa
 
+## 1.0.5
+
+### Patch Changes
+
+- 1b5ed07: Increase touch target sizes for +/- buttons and row height in the Expense Editor for better usability on touch devices.
+- 666de10: Fix safe area insets in gallery view to ensure buttons remain accessible on devices with notches or rounded corners.
+
 ## 1.0.4
 
 ### Patch Changes
