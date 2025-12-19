@@ -547,7 +547,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="grid h-12 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-accent-500 bg-white pr-3 dark:border-accent-700 dark:bg-accent-900"
+      className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-accent-500 bg-white pr-3 dark:border-accent-700 dark:bg-accent-900"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -561,13 +561,13 @@ function ParticipantItem({
 
       {shares[participant.id] && (
         <div className="flex items-center justify-between gap-2">
-          <div className="flex flex-1 items-center justify-center gap-2">
+          <div className="flex flex-1 items-center justify-center gap-1">
             {participantShare.type === "divide" ? (
               <>
                 <IconButton
                   icon="#lucide/minus"
-                  className="h-8 w-8"
-                  iconClassName="size-4"
+                  className="h-7 w-7"
+                  iconClassName="size-3.5"
                   onPress={onDecrementSharesPress}
                   color="input-like"
                 />
@@ -600,8 +600,8 @@ function ParticipantItem({
                 />
                 <IconButton
                   icon="#lucide/plus"
-                  className="h-8 w-8"
-                  iconClassName="size-4"
+                  className="h-7 w-7"
+                  iconClassName="size-3.5"
                   onPress={onIncrementSharesPress}
                   color="input-like"
                 />
@@ -615,7 +615,7 @@ function ParticipantItem({
                     onShareTypeChange("divide");
                   }}
                   className="h-7 w-7"
-                  iconClassName="size-3"
+                  iconClassName="size-3.5"
                 />
 
                 <Tooltip>
