@@ -28,7 +28,7 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { isNonNull } from "./lib/isNonNull.ts";
@@ -200,7 +200,9 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <PartyTheme />
+      <Suspense fallback={null}>
+        <PartyTheme />
+      </Suspense>
       {children}
     </>
   );
