@@ -9,12 +9,147 @@ import { useSyncExternalStore } from "react";
 
 import { createCache, type Cache } from "suspense";
 
+// TODO: These retry and delay stuff should be moved to the trizum SDK in the future, suspense hooks
+// should be simpler
+interface RetryOptions {
+  /** Maximum number of retry attempts. Default: 5 */
+  maxAttempts?: number;
+  /** Base delay in milliseconds. Default: 100 */
+  baseDelay?: number;
+  /** Maximum delay in milliseconds. Default: 10000 */
+  maxDelay?: number;
+  /** Jitter factor (0-1) to randomize delays. Default: 0.1 */
+  jitter?: number;
+}
+
+class RetryAbortedError extends Error {
+  constructor() {
+    super("Retry aborted");
+    this.name = "RetryAbortedError";
+  }
+}
+
+class MaxRetriesExceededError extends Error {
+  constructor(
+    attempts: number,
+    public readonly lastError: unknown,
+  ) {
+    super(`Max retries exceeded after ${attempts} attempts`);
+    this.name = "MaxRetriesExceededError";
+  }
+}
+
+function delay(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new RetryAbortedError());
+      return;
+    }
+
+    const timeoutId = setTimeout(resolve, ms);
+
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timeoutId);
+        reject(new RetryAbortedError());
+      },
+      { once: true },
+    );
+  });
+}
+
+function calculateBackoffDelay(
+  attempt: number,
+  baseDelay: number,
+  maxDelay: number,
+  jitter: number,
+): number {
+  // Exponential backoff: baseDelay * 2^attempt
+  const exponentialDelay = baseDelay * Math.pow(2, attempt);
+  const clampedDelay = Math.min(exponentialDelay, maxDelay);
+
+  // Add jitter to prevent thundering herd
+  const jitterAmount = clampedDelay * jitter * Math.random();
+  return clampedDelay + jitterAmount;
+}
+
+export async function retryWithExponentialBackoff<T>(
+  fn: (options: { signal: AbortSignal }) => Promise<T>,
+  options: RetryOptions & { signal?: AbortSignal } = {},
+): Promise<T> {
+  const {
+    maxAttempts = 10,
+    baseDelay = 100,
+    maxDelay = 10_000,
+    jitter = 0.1,
+    signal,
+  } = options;
+
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (signal?.aborted) {
+      throw new RetryAbortedError();
+    }
+
+    try {
+      // Create a child AbortController that aborts when the parent does
+      const attemptController = new AbortController();
+      const abortHandler = () => attemptController.abort();
+      signal?.addEventListener("abort", abortHandler, { once: true });
+
+      try {
+        return await fn({ signal: attemptController.signal });
+      } finally {
+        signal?.removeEventListener("abort", abortHandler);
+      }
+    } catch (error) {
+      lastError = error;
+
+      // Don't retry if aborted
+      if (signal?.aborted || error instanceof RetryAbortedError) {
+        throw new RetryAbortedError();
+      }
+
+      // If this was the last attempt, throw
+      if (attempt === maxAttempts - 1) {
+        break;
+      }
+
+      // Wait before retrying
+      const backoffDelay = calculateBackoffDelay(
+        attempt,
+        baseDelay,
+        maxDelay,
+        jitter,
+      );
+      await delay(backoffDelay, signal);
+    }
+  }
+
+  throw new MaxRetriesExceededError(maxAttempts, lastError);
+}
+
 export const handleCache = createCache<
   [Repo, AnyDocumentId],
-  DocHandle<unknown>
+  DocHandle<unknown> | undefined
 >({
-  load([repo, id]) {
-    return repo.find(id);
+  async load([repo, id]) {
+    try {
+      const handle = await retryWithExponentialBackoff(({ signal }) =>
+        repo.find(id, { signal }),
+      );
+
+      if (handle.isDeleted()) {
+        return undefined;
+      }
+
+      return handle;
+    } catch {
+      // If all retries fail, return undefined to indicate the document doesn't exist
+      return undefined;
+    }
   },
   getKey: ([_, id]) => String(id),
 });
@@ -30,7 +165,15 @@ export const documentCache = withLiveSubscription<
     createCache({
       async load(params) {
         const [repo, id] = params;
-        const handle = await handleCache.readAsync(repo, id);
+        const maybeHandle = await handleCache.readAsync(repo, id);
+
+        // Handle doesn't exist - document not found
+        if (!maybeHandle) {
+          return undefined;
+        }
+
+        // Capture in a const for closure usage
+        const handle = maybeHandle;
         const doc = handle.doc();
 
         function onChange() {
@@ -138,9 +281,12 @@ export const multipleDocumentCache = withLiveSubscription<
   getKey: ([_, ids]) => ids.join(","),
 });
 
-export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> {
+export function useSuspenseHandle<T>(
+  id: AnyDocumentId,
+): DocHandle<T> | undefined {
   const repo = useRepo();
-  return handleCache.read(repo, id) as DocHandle<T>;
+
+  return handleCache.read(repo, id) as DocHandle<T> | undefined;
 }
 
 interface UseSuspenseDocumentOptions<IsRequired extends boolean = false> {
@@ -149,12 +295,15 @@ interface UseSuspenseDocumentOptions<IsRequired extends boolean = false> {
 
 export function useSuspenseDocument<T>(
   id: AnyDocumentId,
-): [Doc<T> | undefined, DocHandle<T>];
+): [Doc<T> | undefined, DocHandle<T> | undefined];
 export function useSuspenseDocument<
   T,
   Options extends
     UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
->(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T>];
+>(
+  id: AnyDocumentId,
+  options?: Options,
+): [Doc<T> | undefined, DocHandle<T> | undefined];
 export function useSuspenseDocument<
   T,
   Options extends
@@ -163,7 +312,10 @@ export function useSuspenseDocument<
 export function useSuspenseDocument<
   T,
   Options extends UseSuspenseDocumentOptions = UseSuspenseDocumentOptions,
->(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T>] {
+>(
+  id: AnyDocumentId,
+  options?: Options,
+): [Doc<T> | undefined, DocHandle<T> | undefined] {
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
 

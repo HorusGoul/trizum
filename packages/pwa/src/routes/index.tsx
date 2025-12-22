@@ -201,9 +201,7 @@ function usePartyItemRefs() {
 function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
   const [party, handle] = useSuspenseDocument<Party>(partyId);
 
-  if (!party || handle.isDeleted()) {
-    // not sure if this is the right way to handle NULL
-    // or the isDeleted for list items, but this should work
+  if (!party || !handle) {
     return null;
   }
 
