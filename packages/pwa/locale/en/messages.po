@@ -67,7 +67,7 @@ msgstr "Add or create"
 msgid "Add participant"
 msgstr "Add participant"
 
-#: src/routes/index.tsx:444
+#: src/routes/index.tsx:442
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Add your name so others know who you are and how to pay you"
 
@@ -164,11 +164,11 @@ msgstr "Close"
 msgid "Color"
 msgstr "Color"
 
-#: src/routes/index.tsx:441
+#: src/routes/index.tsx:439
 msgid "Complete your profile"
 msgstr "Complete your profile"
 
-#: src/routes/index.tsx:406
+#: src/routes/index.tsx:404
 msgid "Configure Profile"
 msgstr "Configure Profile"
 
@@ -189,7 +189,7 @@ msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copy the phone number and pay through Bizum using your bank app."
 
 #: src/routes/index.tsx:164
-#: src/routes/index.tsx:307
+#: src/routes/index.tsx:305
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -246,7 +246,7 @@ msgstr "Email Support"
 msgid "English"
 msgstr "English"
 
-#: src/routes/index.tsx:343
+#: src/routes/index.tsx:341
 msgid "Enter a party link or code to join"
 msgstr "Enter a party link or code to join"
 
@@ -415,7 +415,7 @@ msgstr "Impact on my balance: <0/>"
 msgid "Import attachments"
 msgstr "Import attachments"
 
-#: src/routes/index.tsx:376
+#: src/routes/index.tsx:374
 msgid "Import your existing Tricount data"
 msgstr "Import your existing Tricount data"
 
@@ -458,7 +458,7 @@ msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
 #: src/routes/index.tsx:154
-#: src/routes/index.tsx:340
+#: src/routes/index.tsx:338
 msgid "Join a Party"
 msgstr "Join a Party"
 
@@ -525,7 +525,7 @@ msgid "Menu"
 msgstr "Menu"
 
 #: src/routes/index.tsx:174
-#: src/routes/index.tsx:373
+#: src/routes/index.tsx:371
 #: src/routes/migrate_.tricount.tsx:160
 msgid "Migrate from Tricount"
 msgstr "Migrate from Tricount"
@@ -617,7 +617,7 @@ msgstr "Paid by"
 msgid "Paid debt to {0}"
 msgstr "Paid debt to {0}"
 
-#: src/routes/index.tsx:251
+#: src/routes/index.tsx:249
 msgid "participant"
 msgstr "participant"
 
@@ -627,7 +627,7 @@ msgstr "participant"
 msgid "Participant name"
 msgstr "Participant name"
 
-#: src/routes/index.tsx:253
+#: src/routes/index.tsx:251
 msgid "participants"
 msgstr "participants"
 
@@ -772,7 +772,7 @@ msgstr "Save"
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Send us an email and we'll get back to you as soon as possible."
 
-#: src/routes/index.tsx:409
+#: src/routes/index.tsx:407
 msgid "Set up your username, avatar, and preferences"
 msgstr "Set up your username, avatar, and preferences"
 
@@ -812,7 +812,7 @@ msgstr "Simple"
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: src/routes/index.tsx:274
+#: src/routes/index.tsx:272
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 
@@ -824,7 +824,7 @@ msgstr "Split bills with friends and family. Track, calculate, and settle expens
 msgid "Split expenses fairly among multiple participants"
 msgstr "Split expenses fairly among multiple participants"
 
-#: src/routes/index.tsx:310
+#: src/routes/index.tsx:308
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
@@ -1008,7 +1008,7 @@ msgstr "Warning: Split amounts don't match total expense"
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
-#: src/routes/index.tsx:271
+#: src/routes/index.tsx:269
 msgid "Welcome to trizum"
 msgstr "Welcome to trizum"
 

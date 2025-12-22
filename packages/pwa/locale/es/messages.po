@@ -63,7 +63,7 @@ msgstr "Añadir o crear"
 msgid "Add participant"
 msgstr "Añadir participante"
 
-#: src/routes/index.tsx:444
+#: src/routes/index.tsx:442
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
@@ -140,11 +140,11 @@ msgstr "Cerrar"
 msgid "Color"
 msgstr "Color"
 
-#: src/routes/index.tsx:441
+#: src/routes/index.tsx:439
 msgid "Complete your profile"
 msgstr "Completa tu perfil"
 
-#: src/routes/index.tsx:406
+#: src/routes/index.tsx:404
 msgid "Configure Profile"
 msgstr "Configurar perfil"
 
@@ -165,7 +165,7 @@ msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
 
 #: src/routes/index.tsx:164
-#: src/routes/index.tsx:307
+#: src/routes/index.tsx:305
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -214,7 +214,7 @@ msgstr "Soporte por email"
 msgid "English"
 msgstr "Inglés"
 
-#: src/routes/index.tsx:343
+#: src/routes/index.tsx:341
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
@@ -363,7 +363,7 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
-#: src/routes/index.tsx:376
+#: src/routes/index.tsx:374
 msgid "Import your existing Tricount data"
 msgstr "Importa tu grupo de Tricount"
 
@@ -406,7 +406,7 @@ msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
 #: src/routes/index.tsx:154
-#: src/routes/index.tsx:340
+#: src/routes/index.tsx:338
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -469,7 +469,7 @@ msgid "Menu"
 msgstr "Menú"
 
 #: src/routes/index.tsx:174
-#: src/routes/index.tsx:373
+#: src/routes/index.tsx:371
 #: src/routes/migrate_.tricount.tsx:160
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -553,7 +553,7 @@ msgstr "Pagado por"
 msgid "Paid debt to {0}"
 msgstr "Deuda pagada a {0}"
 
-#: src/routes/index.tsx:251
+#: src/routes/index.tsx:249
 msgid "participant"
 msgstr "participante"
 
@@ -563,7 +563,7 @@ msgstr "participante"
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/routes/index.tsx:253
+#: src/routes/index.tsx:251
 msgid "participants"
 msgstr "participantes"
 
@@ -696,7 +696,7 @@ msgstr "Guardar"
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Envíanos un email y te responderemos lo antes posible."
 
-#: src/routes/index.tsx:409
+#: src/routes/index.tsx:407
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
@@ -732,7 +732,7 @@ msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/index.tsx:274
+#: src/routes/index.tsx:272
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
 
@@ -744,7 +744,7 @@ msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos j
 msgid "Split expenses fairly among multiple participants"
 msgstr "Divide los gastos de forma justa entre múltiples participantes"
 
-#: src/routes/index.tsx:310
+#: src/routes/index.tsx:308
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
@@ -903,7 +903,7 @@ msgstr "Viendo como {0}"
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/index.tsx:271
+#: src/routes/index.tsx:269
 msgid "Welcome to trizum"
 msgstr "Bienvenid@ a trizum"
 
