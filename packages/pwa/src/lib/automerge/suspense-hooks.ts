@@ -20,6 +20,8 @@ interface RetryOptions {
   maxDelay?: number;
   /** Jitter factor (0-1) to randomize delays. Default: 0.1 */
   jitter?: number;
+  /** Timeout per attempt in milliseconds. Default: 3000 */
+  timeout?: number;
 }
 
 class RetryAbortedError extends Error {
@@ -83,6 +85,7 @@ export async function retryWithExponentialBackoff<T>(
     baseDelay = 100,
     maxDelay = 10_000,
     jitter = 0.1,
+    timeout = 3_000,
     signal,
   } = options;
 
@@ -94,21 +97,25 @@ export async function retryWithExponentialBackoff<T>(
     }
 
     try {
-      // Create a child AbortController that aborts when the parent does
+      // Create a child AbortController that aborts when:
+      // 1. The parent signal aborts
+      // 2. The timeout is reached
       const attemptController = new AbortController();
+      const timeoutId = setTimeout(() => attemptController.abort(), timeout);
       const abortHandler = () => attemptController.abort();
       signal?.addEventListener("abort", abortHandler, { once: true });
 
       try {
         return await fn({ signal: attemptController.signal });
       } finally {
+        clearTimeout(timeoutId);
         signal?.removeEventListener("abort", abortHandler);
       }
     } catch (error) {
       lastError = error;
 
-      // Don't retry if aborted
-      if (signal?.aborted || error instanceof RetryAbortedError) {
+      // Don't retry if parent signal was aborted
+      if (signal?.aborted) {
         throw new RetryAbortedError();
       }
 
@@ -137,9 +144,12 @@ export const handleCache = createCache<
 >({
   async load([repo, id]) {
     try {
-      const handle = await retryWithExponentialBackoff(({ signal }) =>
-        repo.find(id, { signal }),
-      );
+      const handle = await retryWithExponentialBackoff(({ signal }) => {
+        return repo.find(id, {
+          signal,
+          allowableStates: ["ready"],
+        });
+      });
 
       if (handle.isDeleted()) {
         return undefined;
