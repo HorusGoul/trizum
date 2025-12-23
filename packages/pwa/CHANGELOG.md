@@ -1,5 +1,12 @@
 # @trizum/pwa
 
+## 1.0.6
+
+### Patch Changes
+
+- 6497ec6: Add pending state UI for party sync with loading animation, tips, and troubleshooting
+- 1e75b8c: Add exponential backoff retry for document handle fetching
+
 ## 1.0.5
 
 ### Patch Changes
