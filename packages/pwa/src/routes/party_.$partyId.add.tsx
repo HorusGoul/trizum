@@ -1,5 +1,6 @@
 import { t } from "@lingui/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 
 import { type Expense } from "#src/models/expense.js";
 import { convertToUnits } from "#src/lib/expenses.js";
@@ -15,6 +16,7 @@ import {
 
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
+  pendingComponent: PartyPendingComponent,
 
   async loader({ context, params, location }) {
     await guardParticipatingInParty(params.partyId, context, location);

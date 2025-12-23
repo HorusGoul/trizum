@@ -5,12 +5,14 @@ import { Icon } from "#src/ui/Icon.tsx";
 import { QRCode } from "#src/ui/QRCode.tsx";
 import { t, Trans } from "@lingui/macro";
 import { createFileRoute } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";
 import { Share } from "@capacitor/share";
 import { getAppLink } from "#src/lib/link.ts";
 
 export const Route = createFileRoute("/party_/$partyId/share")({
   component: RouteComponent,
+  pendingComponent: PartyPendingComponent,
   loader: async () => {
     return {
       canShare: await Share.canShare().then((result) => result.value),
