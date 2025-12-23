@@ -8,7 +8,6 @@ import { preloadIcon } from "#src/ui/Icon.js";
 
 export function preloadAllIcons() {
   return Promise.all([
-    preloadIcon("#lucide/alert-triangle"),
 preloadIcon("#lucide/ampersand"),
 preloadIcon("#lucide/archive"),
 preloadIcon("#lucide/archive-restore"),
@@ -32,7 +31,6 @@ preloadIcon("#lucide/copy"),
 preloadIcon("#lucide/ellipsis-vertical"),
 preloadIcon("#lucide/external-link"),
 preloadIcon("#lucide/github"),
-preloadIcon("#lucide/home"),
 preloadIcon("#lucide/house"),
 preloadIcon("#lucide/image"),
 preloadIcon("#lucide/image-up"),
