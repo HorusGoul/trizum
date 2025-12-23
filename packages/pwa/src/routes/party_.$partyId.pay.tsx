@@ -6,6 +6,7 @@ import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { t, Trans } from "@lingui/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";
 
 interface PaySearchParams {
@@ -16,6 +17,7 @@ interface PaySearchParams {
 
 export const Route = createFileRoute("/party_/$partyId/pay")({
   component: RouteComponent,
+  pendingComponent: PartyPendingComponent,
   validateSearch: (search): PaySearchParams => {
     if (!search.fromId || !search.toId || !search.amount) {
       throw new Error(t`Missing search params`);

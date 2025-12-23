@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -50,6 +51,7 @@ interface PartyByIdSearchParams {
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
+  pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
     const { party } = await guardParticipatingInParty(
       partyId,

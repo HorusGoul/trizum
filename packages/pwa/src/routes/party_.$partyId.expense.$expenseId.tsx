@@ -23,6 +23,7 @@ import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { t, Trans } from "@lingui/macro";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useLingui } from "@lingui/react";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Button } from "#src/ui/Button.tsx";
@@ -32,6 +33,7 @@ import { MediaGalleryContext } from "#src/components/MediaGalleryContext.tsx";
 
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   component: ExpenseById,
+  pendingComponent: PartyPendingComponent,
 
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);

@@ -42,3 +42,29 @@ img, a {
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
 }
+
+@keyframes swing-rotate {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(180deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  65% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

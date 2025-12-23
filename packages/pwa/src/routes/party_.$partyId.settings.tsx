@@ -15,12 +15,14 @@ import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Suspense, useId } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/party_/$partyId/settings")({
   component: PartySettings,
+  pendingComponent: PartyPendingComponent,
   loader: async ({ context, params, location }) => {
     await guardParticipatingInParty(params.partyId, context, location);
   },

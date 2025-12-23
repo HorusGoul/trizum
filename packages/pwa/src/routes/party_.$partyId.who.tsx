@@ -9,6 +9,7 @@ import { cn } from "#src/ui/utils.js";
 import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ interface WhoSearchParams {
 
 export const Route = createFileRoute("/party_/$partyId/who")({
   component: Who,
+  pendingComponent: PartyPendingComponent,
   validateSearch: (search): WhoSearchParams => {
     // Save redirectTo path search param if it exists
     return {

@@ -26,6 +26,7 @@ import { t } from "@lingui/macro";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
@@ -33,6 +34,7 @@ export const Route = createFileRoute(
   "/party_/$partyId/expense/$expenseId_/edit",
 )({
   component: RouteComponent,
+  pendingComponent: PartyPendingComponent,
 
   async loader({ location, context, params: { expenseId, partyId } }) {
     await guardParticipatingInParty(partyId, context, location);
