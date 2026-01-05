@@ -13,7 +13,7 @@ import {
   useScroll,
   useTransform,
   type AnimationPlaybackControls,
-} from "framer-motion";
+} from "motion/react";
 import {
   useCallback,
   useEffect,

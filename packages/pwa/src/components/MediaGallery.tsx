@@ -1,7 +1,7 @@
 import { cn, type ClassName } from "#src/ui/utils.ts";
 import { use, useCallback, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, useMotionValue } from "motion/react";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { t } from "@lingui/macro";
