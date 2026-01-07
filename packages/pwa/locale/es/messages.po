@@ -71,15 +71,15 @@ msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
 
-#: src/components/ExpenseEditor.tsx:322
+#: src/components/ExpenseEditor.tsx:327
 msgid "Amount"
 msgstr "Cantidad"
 
-#: src/components/ExpenseEditor.tsx:636
+#: src/components/ExpenseEditor.tsx:641
 msgid "Amount for {0}"
 msgstr "Cantidad para {0}"
 
-#: src/components/ExpenseEditor.tsx:314
+#: src/components/ExpenseEditor.tsx:319
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
@@ -177,7 +177,7 @@ msgstr "Crear un nuevo Grupo"
 msgid "Credits"
 msgstr "Créditos"
 
-#: src/components/ExpenseEditor.tsx:376
+#: src/components/ExpenseEditor.tsx:381
 msgid "Date"
 msgstr "Fecha"
 
@@ -238,7 +238,7 @@ msgstr "Español"
 msgid "Expense added"
 msgstr "Gasto añadido"
 
-#: src/components/ExpenseEditor.tsx:140
+#: src/components/ExpenseEditor.tsx:145
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
@@ -282,7 +282,7 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:820
+#: src/components/ExpenseEditor.tsx:825
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
@@ -326,7 +326,7 @@ msgstr "Volver al inicio"
 msgid "Have an idea to improve trizum? We'd love to hear it."
 msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 
-#: src/components/ExpenseEditor.tsx:722
+#: src/components/ExpenseEditor.tsx:727
 msgid "Heads up!"
 msgstr "¡Atención!"
 
@@ -391,7 +391,7 @@ msgstr "Importando adjuntos ({0} de {1})"
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
-#: src/components/ExpenseEditor.tsx:406
+#: src/components/ExpenseEditor.tsx:411
 msgid "Include all"
 msgstr "Incluir todos"
 
@@ -470,7 +470,7 @@ msgid "Marking expense as paid..."
 msgstr "Marcando gasto como pagado..."
 
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:177
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:305
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:313
 msgid "Me"
 msgstr "Yo"
 
@@ -556,7 +556,7 @@ msgstr "le debe"
 msgid "Paid at"
 msgstr "Pagado el"
 
-#: src/components/ExpenseEditor.tsx:351
+#: src/components/ExpenseEditor.tsx:356
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:205
 msgid "Paid by"
 msgstr "Pagado por"
@@ -637,7 +637,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/components/ExpenseEditor.tsx:740
+#: src/components/ExpenseEditor.tsx:745
 msgid "Please correct it before saving."
 msgstr "Por favor, corrígelo antes de guardar."
 
@@ -682,7 +682,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:913
+#: src/components/ExpenseEditor.tsx:918
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -702,7 +702,7 @@ msgstr "Restaurar"
 msgid "Retry"
 msgstr "Reintentar"
 
-#: src/components/ExpenseEditor.tsx:248
+#: src/components/ExpenseEditor.tsx:253
 #: src/routes/join.tsx:90
 #: src/routes/migrate_.tricount.tsx:173
 #: src/routes/new.tsx:136
@@ -740,15 +740,15 @@ msgstr "Compartir grupo"
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:287
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:288
 msgid "Shares"
 msgstr "Partes"
 
-#: src/components/ExpenseEditor.tsx:599
+#: src/components/ExpenseEditor.tsx:604
 msgid "Shares for {0}"
 msgstr "Partes para {0}"
 
-#: src/components/ExpenseEditor.tsx:726
+#: src/components/ExpenseEditor.tsx:731
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1>{amount} {2}</1>."
 
@@ -776,7 +776,7 @@ msgstr "Comienza a registrar gastos con tu grupo"
 msgid "Submit a Request"
 msgstr "Enviar sugerencia"
 
-#: src/components/ExpenseEditor.tsx:248
+#: src/components/ExpenseEditor.tsx:253
 #: src/routes/join.tsx:90
 #: src/routes/migrate_.tricount.tsx:173
 #: src/routes/new.tsx:136
@@ -795,11 +795,11 @@ msgstr "Soporte"
 msgid "Swipe between expenses and balances tabs."
 msgstr "Desliza entre las pestañas de gastos y balance."
 
-#: src/components/ExpenseEditor.tsx:623
+#: src/components/ExpenseEditor.tsx:628
 msgid "Switch to a set amount"
 msgstr "Cambiar a una cantidad fija"
 
-#: src/components/ExpenseEditor.tsx:624
+#: src/components/ExpenseEditor.tsx:629
 msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
@@ -808,7 +808,7 @@ msgid "Syncing party information..."
 msgstr "Sincronizando información del grupo..."
 
 #: src/components/AvatarPicker.tsx:125
-#: src/components/ExpenseEditor.tsx:845
+#: src/components/ExpenseEditor.tsx:850
 msgid "Take photo"
 msgstr "Hacer foto"
 
@@ -854,7 +854,7 @@ msgstr "Este no es un ID válido"
 msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
-#: src/components/ExpenseEditor.tsx:287
+#: src/components/ExpenseEditor.tsx:292
 #: src/routes/new.tsx:163
 #: src/routes/party_.$partyId.settings.tsx:161
 msgid "Title"
@@ -901,12 +901,12 @@ msgstr "Actualizando gasto..."
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
-#: src/components/ExpenseEditor.tsx:764
+#: src/components/ExpenseEditor.tsx:769
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:134
-#: src/components/ExpenseEditor.tsx:854
+#: src/components/ExpenseEditor.tsx:859
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -914,7 +914,7 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:801
+#: src/components/ExpenseEditor.tsx:806
 msgid "Uploading..."
 msgstr "Subiendo..."
 
@@ -938,7 +938,7 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:894
+#: src/components/ExpenseEditor.tsx:899
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:264
 msgid "View photo"
 msgstr "Ver foto"

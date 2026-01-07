@@ -11,6 +11,7 @@ import {
 } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t, Trans } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppNumberField, AppTextField } from "#src/ui/TextField.js";
 import { CurrencyField } from "./CurrencyField";
@@ -77,12 +78,16 @@ export function ExpenseEditor({
   autoFocus = true,
   goBackFallbackOptions,
 }: ExpenseEditorProps) {
-  const participants = useExpenseParticipants({
+  const { i18n } = useLingui();
+  const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
     },
     shares: defaultValues.shares,
   });
+  const participants = [...unsortedParticipants].sort((a, b) =>
+    a.name.localeCompare(b.name, i18n.locale),
+  );
 
   const form = useForm({
     defaultValues: {
