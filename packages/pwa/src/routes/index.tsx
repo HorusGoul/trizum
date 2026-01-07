@@ -37,9 +37,15 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    const partyList = documentCache.read(context.repo, partyListId) as
-      | PartyList
-      | undefined;
+    let partyList: PartyList | undefined;
+    try {
+      partyList = documentCache.read(context.repo, partyListId) as
+        | PartyList
+        | undefined;
+    } catch {
+      // Document not in cache yet, skip redirect
+      return;
+    }
     if (!partyList) {
       return;
     }
