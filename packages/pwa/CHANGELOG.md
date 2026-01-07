@@ -1,5 +1,16 @@
 # @trizum/pwa
 
+## 1.1.0
+
+### Minor Changes
+
+- 06020bd: Add "Open last party on launch" setting that automatically opens the last visited party when opening the app
+
+### Patch Changes
+
+- e9a4eec: Build with sourcemaps enabled
+- f477b6b: Sort participant lists alphabetically in expense editor and expense details
+
 ## 1.0.6
 
 ### Patch Changes
