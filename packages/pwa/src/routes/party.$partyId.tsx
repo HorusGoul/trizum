@@ -116,6 +116,14 @@ function PartyById() {
     };
   }, [selectedTab, recalculateBalances]);
 
+  const { setLastOpenedPartyId } = usePartyList();
+
+  useEffect(() => {
+    if (partyId) {
+      setLastOpenedPartyId(partyId);
+    }
+  }, [partyId, setLastOpenedPartyId]);
+
   async function onLeaveParty() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
