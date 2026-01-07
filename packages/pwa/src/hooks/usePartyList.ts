@@ -59,7 +59,10 @@ export function usePartyList() {
   }
 
   function updateSettings(
-    values: Pick<PartyList, "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch">,
+    values: Pick<
+      PartyList,
+      "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch"
+    >,
   ) {
     partyListHandle.change((list) => {
       list.username = values.username;
