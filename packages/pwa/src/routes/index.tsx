@@ -21,13 +21,12 @@ import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { defaultThemeHue } from "#src/ui/theme.ts";
 
+let hasRedirectedThisSession = false;
+
 export const Route = createFileRoute("/")({
   component: Index,
-  beforeLoad: ({ context }) => {
+  beforeLoad: async ({ context }) => {
     // Only redirect once per session (on app launch)
-    const hasRedirectedThisSession = sessionStorage.getItem(
-      "hasRedirectedToLastParty",
-    );
     if (hasRedirectedThisSession) {
       return;
     }
@@ -37,15 +36,11 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    let partyList: PartyList | undefined;
-    try {
-      partyList = documentCache.read(context.repo, partyListId) as
-        | PartyList
-        | undefined;
-    } catch {
-      // Document not in cache yet, skip redirect
-      return;
-    }
+    const partyList = (await documentCache.readAsync(
+      context.repo,
+      partyListId,
+    )) as PartyList | undefined;
+
     if (!partyList) {
       return;
     }
@@ -58,7 +53,7 @@ export const Route = createFileRoute("/")({
       isValidDocumentId(lastOpenedPartyId) &&
       parties[lastOpenedPartyId]
     ) {
-      sessionStorage.setItem("hasRedirectedToLastParty", "true");
+      hasRedirectedThisSession = true;
       throw redirect({
         to: "/party/$partyId",
         params: { partyId: lastOpenedPartyId },
