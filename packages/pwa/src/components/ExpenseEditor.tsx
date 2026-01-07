@@ -77,12 +77,15 @@ export function ExpenseEditor({
   autoFocus = true,
   goBackFallbackOptions,
 }: ExpenseEditorProps) {
-  const participants = useExpenseParticipants({
+  const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
     },
     shares: defaultValues.shares,
   });
+  const participants = [...unsortedParticipants].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 
   const form = useForm({
     defaultValues: {
