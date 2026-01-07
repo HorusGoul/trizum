@@ -52,14 +52,21 @@ export function usePartyList() {
     });
   }
 
+  function setLastOpenedPartyId(partyId: Party["id"] | null) {
+    partyListHandle.change((list) => {
+      list.lastOpenedPartyId = partyId;
+    });
+  }
+
   function updateSettings(
-    values: Pick<PartyList, "username" | "phone" | "avatarId" | "locale">,
+    values: Pick<PartyList, "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch">,
   ) {
     partyListHandle.change((list) => {
       list.username = values.username;
       list.phone = values.phone;
       list.avatarId = values.avatarId;
       list.locale = values.locale;
+      list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
     });
 
     void updateAllParties();
@@ -116,5 +123,6 @@ export function usePartyList() {
     addPartyToList,
     removeParty,
     updateSettings,
+    setLastOpenedPartyId,
   };
 }

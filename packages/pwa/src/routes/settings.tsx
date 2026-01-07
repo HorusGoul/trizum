@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
 import { getBrowserLocale, type SupportedLocale } from "#src/lib/i18n.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
+import { SwitchField } from "#src/components/SwitchField.tsx";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -25,6 +26,7 @@ interface SettingsFormValues {
   phone: string;
   avatarId: MediaFile["id"] | null;
   locale: SupportedLocale;
+  openLastPartyOnLaunch: boolean;
 }
 
 interface LocaleOption {
@@ -47,6 +49,7 @@ function Settings() {
       phone: values.phone,
       avatarId: values.avatarId,
       locale: values.locale,
+      openLastPartyOnLaunch: values.openLastPartyOnLaunch,
     });
     form.reset();
     toast.success(t`Settings saved`);
@@ -59,6 +62,7 @@ function Settings() {
       phone: partyList.phone ?? "",
       avatarId: partyList.avatarId ?? null,
       locale: partyList.locale ?? getBrowserLocale(),
+      openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -190,6 +194,22 @@ function Settings() {
                 </SelectItem>
               )}
             </AppSelect>
+          )}
+        </form.Field>
+
+        <form.Field name="openLastPartyOnLaunch">
+          {(field) => (
+            <SwitchField
+              label={<Trans>Open last party on launch</Trans>}
+              description={
+                <Trans>
+                  Automatically open the last visited party when you open the
+                  app
+                </Trans>
+              }
+              isSelected={field.state.value}
+              onChange={field.handleChange}
+            />
           )}
         </form.Field>
       </form>
