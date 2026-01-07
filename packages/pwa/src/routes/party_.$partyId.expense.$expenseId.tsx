@@ -276,6 +276,7 @@ function PhotoItemById({ photoId }: { photoId: string }) {
 }
 
 function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
+  const { i18n } = useLingui();
   const unitAmounts = getExpenseUnitShares(expense);
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
@@ -293,6 +294,7 @@ function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
             .sort(([a], [b]) =>
               party.participants[a].name.localeCompare(
                 party.participants[b].name,
+                i18n.locale,
               ),
             )
             .map(([userId, amount]) => {
