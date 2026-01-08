@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.2.1
+
+### Patch Changes
+
+- 7d26de5: Clicking on download update correctly opens the app store listing on iOS
+
 ## 1.2.0
 
 ### Minor Changes
