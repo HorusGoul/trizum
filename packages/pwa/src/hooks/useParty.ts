@@ -115,7 +115,10 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function setParticipantDetails(
     participantId: PartyParticipant["id"],
     details: Partial<
-      Pick<PartyParticipant, "phone" | "personalMode" | "avatarId">
+      Pick<
+        PartyParticipant,
+        "phone" | "personalMode" | "avatarId" | "balancesSortedBy"
+      >
     >,
   ) {
     handle.change((doc) => {
