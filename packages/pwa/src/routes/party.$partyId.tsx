@@ -31,7 +31,7 @@ import {
   useState,
   type Key,
 } from "react";
-import type { PartyParticipant } from "#src/models/party.js";
+import type { BalancesSortedBy, PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useNoMemo } from "#src/hooks/useNoMemo.ts";
@@ -44,10 +44,7 @@ import {
   requestIdleCallback,
   cancelIdleCallback,
 } from "#src/lib/requestIdleCallback.ts";
-import {
-  useBalancesSortedBy,
-  type BalancesSortedBy,
-} from "#src/hooks/useBalancesSortBy.ts";
+import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";

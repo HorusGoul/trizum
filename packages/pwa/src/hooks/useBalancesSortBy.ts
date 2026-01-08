@@ -1,30 +1,30 @@
-import { useState } from "react";
+import type { BalancesSortedBy } from "#src/models/party.ts";
+import { useCurrentParty } from "./useParty";
+import { useCurrentParticipant } from "./useCurrentParticipant";
 
-export type BalancesSortedBy =
-  | "name"
-  | "balance-ascending"
-  | "balance-descending";
+const defaultBalancesSortedBy: BalancesSortedBy = "name";
 
 function isBalanceSortedBy(sortedBy: string): sortedBy is BalancesSortedBy {
   return ["name", "balance-ascending", "balance-descending"].includes(sortedBy);
-}
-
-const balanceSortedByKey = "balances-sorted-by";
-
-function getBalanceSortedBy(): BalancesSortedBy {
-  const value = localStorage.getItem(balanceSortedByKey);
-  if (!value || !isBalanceSortedBy(value)) return "name";
-  return value;
 }
 
 export function useBalancesSortedBy(): [
   BalancesSortedBy,
   (sorted: BalancesSortedBy) => void,
 ] {
-  const [sortedBy, setSortedBy] = useState(getBalanceSortedBy);
+  const { setParticipantDetails } = useCurrentParty();
+  const participant = useCurrentParticipant();
+  const sortedBy =
+    participant.balancesSortedBy &&
+    isBalanceSortedBy(participant.balancesSortedBy)
+      ? participant.balancesSortedBy
+      : defaultBalancesSortedBy;
+
   function setter(sortedBy: BalancesSortedBy) {
-    setSortedBy(sortedBy);
-    localStorage.setItem(balanceSortedByKey, sortedBy);
+    setParticipantDetails(participant.id, {
+      balancesSortedBy: sortedBy,
+    });
   }
+
   return [sortedBy, setter];
 }
