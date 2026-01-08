@@ -362,6 +362,7 @@ function ExpenseLog({
   const { expenses, hasNext, isLoadingNext, loadNext } =
     usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
+  const navigate = useNavigate();
 
   const filteredExpenses = expenses.filter((expense) => {
     if (participant.personalMode) {
@@ -399,46 +400,61 @@ function ExpenseLog({
         <div className="flex-1 pb-safe-offset-12" />
 
         <div className="sticky flex justify-end bottom-safe-offset-6">
-          <MenuTrigger>
-            <IconButton
-              aria-label={t`Add or create`}
-              icon="#lucide/plus"
-              color="accent"
-              className="h-14 w-14 shadow-md"
-            />
+          {import.meta.env.DEV ? (
+            <MenuTrigger>
+              <IconButton
+                aria-label={t`Add or create`}
+                icon="#lucide/plus"
+                color="accent"
+                className="h-14 w-14 shadow-md"
+              />
 
-            <Popover placement="top end" offset={16}>
-              <Menu className="min-w-60">
-                {import.meta.env.DEV ? (
-                  <MenuItem onAction={() => void dev.createTestExpenses()}>
+              <Popover placement="top end" offset={16}>
+                <Menu className="min-w-60">
+                  {import.meta.env.DEV ? (
+                    <MenuItem onAction={() => void dev.createTestExpenses()}>
+                      <IconWithFallback
+                        name="#lucide/test-tube-diagonal"
+                        size={20}
+                        className="mr-3"
+                      />
+                      <span className="h-3.5 leading-none">
+                        <Trans>[DEV] Create expenses</Trans>
+                      </span>
+                    </MenuItem>
+                  ) : null}
+                  <MenuItem
+                    href={{
+                      to: "/party/$partyId/add",
+                      params: { partyId: party.id },
+                    }}
+                  >
                     <IconWithFallback
-                      name="#lucide/test-tube-diagonal"
+                      name="#lucide/list-plus"
                       size={20}
                       className="mr-3"
                     />
                     <span className="h-3.5 leading-none">
-                      <Trans>[DEV] Create expenses</Trans>
+                      <Trans>Add an expense</Trans>
                     </span>
                   </MenuItem>
-                ) : null}
-                <MenuItem
-                  href={{
-                    to: "/party/$partyId/add",
-                    params: { partyId: party.id },
-                  }}
-                >
-                  <IconWithFallback
-                    name="#lucide/list-plus"
-                    size={20}
-                    className="mr-3"
-                  />
-                  <span className="h-3.5 leading-none">
-                    <Trans>Add an expense</Trans>
-                  </span>
-                </MenuItem>
-              </Menu>
-            </Popover>
-          </MenuTrigger>
+                </Menu>
+              </Popover>
+            </MenuTrigger>
+          ) : (
+            <IconButton
+              aria-label={t`Add an expense`}
+              icon="#lucide/plus"
+              color="accent"
+              className="h-14 w-14 shadow-md"
+              onPress={() => {
+                void navigate({
+                  to: "/party/$partyId/add",
+                  params: { partyId: party.id },
+                });
+              }}
+            />
+          )}
         </div>
       </div>
     </>

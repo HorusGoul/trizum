@@ -15,12 +15,12 @@ msgstr ""
 
 #: src/routes/party_.$partyId.pay.tsx:98
 #: src/routes/party_.$partyId.pay.tsx:104
-#: src/routes/party.$partyId.tsx:875
-#: src/routes/party.$partyId.tsx:881
+#: src/routes/party.$partyId.tsx:891
+#: src/routes/party.$partyId.tsx:897
 msgid "(me)"
 msgstr "(me)"
 
-#: src/routes/party.$partyId.tsx:420
+#: src/routes/party.$partyId.tsx:422
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
@@ -53,12 +53,13 @@ msgstr "About"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 
-#: src/routes/party.$partyId.tsx:436
+#: src/routes/party.$partyId.tsx:438
+#: src/routes/party.$partyId.tsx:446
 msgid "Add an expense"
 msgstr "Add an expense"
 
 #: src/routes/index.tsx:179
-#: src/routes/party.$partyId.tsx:404
+#: src/routes/party.$partyId.tsx:406
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -394,7 +395,7 @@ msgstr "Have an idea to improve trizum? We'd love to hear it."
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId.tsx:699
+#: src/routes/party.$partyId.tsx:715
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -415,7 +416,7 @@ msgstr "How do you want to call this party?"
 msgid "How does offline sync work?"
 msgstr "How does offline sync work?"
 
-#: src/routes/party.$partyId.tsx:695
+#: src/routes/party.$partyId.tsx:711
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -431,7 +432,7 @@ msgstr "ID is required"
 msgid "Image must be smaller than 10MB"
 msgstr "Image must be smaller than 10MB"
 
-#: src/routes/party.$partyId.tsx:587
+#: src/routes/party.$partyId.tsx:603
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -529,7 +530,7 @@ msgstr "Manage the participants list. Existing members can only be archived."
 
 #: src/routes/party_.$partyId.pay.tsx:90
 #: src/routes/party_.$partyId.pay.tsx:119
-#: src/routes/party.$partyId.tsx:912
+#: src/routes/party.$partyId.tsx:928
 msgid "Mark as paid"
 msgstr "Mark as paid"
 
@@ -603,7 +604,7 @@ msgstr "Next"
 msgid "No updates available"
 msgstr "No updates available"
 
-#: src/routes/party.$partyId.tsx:761
+#: src/routes/party.$partyId.tsx:777
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
@@ -627,12 +628,12 @@ msgstr "Open last party on launch"
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
 
-#: src/routes/party.$partyId.tsx:772
+#: src/routes/party.$partyId.tsx:788
 msgid "Other operations"
 msgstr "Other operations"
 
 #: src/routes/party_.$partyId.pay.tsx:101
-#: src/routes/party.$partyId.tsx:878
+#: src/routes/party.$partyId.tsx:894
 msgid "owes"
 msgstr "owes"
 
@@ -701,11 +702,11 @@ msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc12
 msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 
 #: src/routes/party_.$partyId.pay.tsx:90
-#: src/routes/party.$partyId.tsx:912
+#: src/routes/party.$partyId.tsx:928
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party.$partyId.tsx:743
+#: src/routes/party.$partyId.tsx:759
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
@@ -1125,11 +1126,11 @@ msgstr "You can add photos to your expenses for better tracking."
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party.$partyId.tsx:714
+#: src/routes/party.$partyId.tsx:730
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId.tsx:732
+#: src/routes/party.$partyId.tsx:748
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
