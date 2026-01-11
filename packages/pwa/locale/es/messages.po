@@ -15,12 +15,12 @@ msgstr ""
 
 #: src/routes/party_.$partyId.pay.tsx:98
 #: src/routes/party_.$partyId.pay.tsx:104
-#: src/routes/party.$partyId.tsx:786
-#: src/routes/party.$partyId.tsx:792
+#: src/routes/party.$partyId.tsx:891
+#: src/routes/party.$partyId.tsx:897
 msgid "(me)"
 msgstr "(yo)"
 
-#: src/routes/party.$partyId.tsx:340
+#: src/routes/party.$partyId.tsx:422
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
@@ -41,7 +41,7 @@ msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
 #: src/routes/about.tsx:20
-#: src/routes/index.tsx:116
+#: src/routes/index.tsx:156
 msgid "About"
 msgstr "Acerca de"
 
@@ -49,12 +49,13 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/party.$partyId.tsx:356
+#: src/routes/party.$partyId.tsx:438
+#: src/routes/party.$partyId.tsx:446
 msgid "Add an expense"
 msgstr "Añadir un gasto"
 
-#: src/routes/index.tsx:139
-#: src/routes/party.$partyId.tsx:324
+#: src/routes/index.tsx:179
+#: src/routes/party.$partyId.tsx:406
 msgid "Add or create"
 msgstr "Añadir o crear"
 
@@ -63,7 +64,7 @@ msgstr "Añadir o crear"
 msgid "Add participant"
 msgstr "Añadir participante"
 
-#: src/routes/index.tsx:442
+#: src/routes/index.tsx:482
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
@@ -71,15 +72,15 @@ msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
 
-#: src/components/ExpenseEditor.tsx:322
+#: src/components/ExpenseEditor.tsx:328
 msgid "Amount"
 msgstr "Cantidad"
 
-#: src/components/ExpenseEditor.tsx:636
+#: src/components/ExpenseEditor.tsx:642
 msgid "Amount for {0}"
 msgstr "Cantidad para {0}"
 
-#: src/components/ExpenseEditor.tsx:314
+#: src/components/ExpenseEditor.tsx:320
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
@@ -100,9 +101,13 @@ msgstr "Participantes archivados"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:243
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:249
 msgid "Attachments"
 msgstr "Adjuntos"
+
+#: src/routes/settings.tsx:205
+msgid "Automatically open the last visited party when you open the app"
+msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
 #: src/components/AvatarPicker.tsx:76
 msgid "Avatar removed"
@@ -112,7 +117,15 @@ msgstr "Avatar eliminado"
 msgid "Avatar updated successfully"
 msgstr "Avatar actualizado correctamente"
 
-#: src/routes/party.$partyId.tsx:260
+#: src/routes/party.$partyId.tsx:212
+msgid "Balance, Highest First"
+msgstr "Balance, Mayor Primero"
+
+#: src/routes/party.$partyId.tsx:195
+msgid "Balance, Lowest First"
+msgstr "Balance, Menor Primero"
+
+#: src/routes/party.$partyId.tsx:337
 msgid "Balances"
 msgstr "Balance"
 
@@ -132,7 +145,7 @@ msgstr "Efectivo u otras formas"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/index.tsx:101
+#: src/routes/index.tsx:141
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
@@ -144,11 +157,11 @@ msgstr "Cerrar"
 msgid "Color"
 msgstr "Color"
 
-#: src/routes/index.tsx:439
+#: src/routes/index.tsx:479
 msgid "Complete your profile"
 msgstr "Completa tu perfil"
 
-#: src/routes/index.tsx:404
+#: src/routes/index.tsx:444
 msgid "Configure Profile"
 msgstr "Configurar perfil"
 
@@ -168,8 +181,8 @@ msgstr "Copiar enlace del grupo"
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
 
-#: src/routes/index.tsx:164
-#: src/routes/index.tsx:305
+#: src/routes/index.tsx:204
+#: src/routes/index.tsx:345
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -177,7 +190,7 @@ msgstr "Crear un nuevo Grupo"
 msgid "Credits"
 msgstr "Créditos"
 
-#: src/components/ExpenseEditor.tsx:376
+#: src/components/ExpenseEditor.tsx:382
 msgid "Date"
 msgstr "Fecha"
 
@@ -185,7 +198,7 @@ msgstr "Fecha"
 msgid "Debt settled between {0} and {1}!"
 msgstr "¡Deuda saldada entre {0} y {1}!"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:97
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:103
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -202,7 +215,7 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:87
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:93
 msgid "Edit"
 msgstr "Editar"
 
@@ -218,11 +231,11 @@ msgstr "Editando {expenseName}"
 msgid "Email Support"
 msgstr "Soporte por email"
 
-#: src/routes/settings.tsx:40
+#: src/routes/settings.tsx:42
 msgid "English"
 msgstr "Inglés"
 
-#: src/routes/index.tsx:341
+#: src/routes/index.tsx:381
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
@@ -230,7 +243,7 @@ msgstr "Introduce un enlace o código de grupo para unirte"
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
-#: src/routes/settings.tsx:41
+#: src/routes/settings.tsx:43
 msgid "Español"
 msgstr "Español"
 
@@ -238,7 +251,7 @@ msgstr "Español"
 msgid "Expense added"
 msgstr "Gasto añadido"
 
-#: src/components/ExpenseEditor.tsx:140
+#: src/components/ExpenseEditor.tsx:145
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
@@ -246,7 +259,7 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
-#: src/routes/party.$partyId.tsx:253
+#: src/routes/party.$partyId.tsx:330
 msgid "Expenses"
 msgstr "Gastos"
 
@@ -282,7 +295,7 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:820
+#: src/components/ExpenseEditor.tsx:826
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
@@ -294,7 +307,7 @@ msgstr "Sugerencias"
 msgid "Features"
 msgstr "Características"
 
-#: src/routes/settings.tsx:160
+#: src/routes/settings.tsx:164
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -326,11 +339,11 @@ msgstr "Volver al inicio"
 msgid "Have an idea to improve trizum? We'd love to hear it."
 msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 
-#: src/components/ExpenseEditor.tsx:722
+#: src/components/ExpenseEditor.tsx:728
 msgid "Heads up!"
 msgstr "¡Atención!"
 
-#: src/routes/party.$partyId.tsx:610
+#: src/routes/party.$partyId.tsx:715
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo podéis hacer para equilibrar vuestra posición."
 
@@ -347,7 +360,7 @@ msgstr "¿Cómo quieres llamar a este grupo?"
 msgid "How does offline sync work?"
 msgstr "¿Cómo funciona la sincronización sin conexión?"
 
-#: src/routes/party.$partyId.tsx:606
+#: src/routes/party.$partyId.tsx:711
 msgid "How should I balance?"
 msgstr "¿Cómo debería equilibrar?"
 
@@ -367,7 +380,7 @@ msgstr "La imagen debe ser menor de 10MB"
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
-#: src/routes/party.$partyId.tsx:507
+#: src/routes/party.$partyId.tsx:603
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
@@ -375,7 +388,7 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
-#: src/routes/index.tsx:374
+#: src/routes/index.tsx:414
 msgid "Import your existing Tricount data"
 msgstr "Importa tu grupo de Tricount"
 
@@ -391,7 +404,7 @@ msgstr "Importando adjuntos ({0} de {1})"
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
-#: src/components/ExpenseEditor.tsx:406
+#: src/components/ExpenseEditor.tsx:412
 msgid "Include all"
 msgstr "Incluir todos"
 
@@ -417,8 +430,8 @@ msgstr "¿Mis datos están seguros?"
 msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
-#: src/routes/index.tsx:154
-#: src/routes/index.tsx:338
+#: src/routes/index.tsx:194
+#: src/routes/index.tsx:378
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -426,11 +439,11 @@ msgstr "Unirse a un Grupo"
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
 
-#: src/routes/settings.tsx:178
+#: src/routes/settings.tsx:182
 msgid "Language"
 msgstr "Idioma"
 
-#: src/routes/party.$partyId.tsx:237
+#: src/routes/party.$partyId.tsx:314
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
@@ -451,7 +464,7 @@ msgid "Loading licenses..."
 msgstr "Cargando licencias..."
 
 #: src/components/PartyTheme.tsx:26
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:122
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:128
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
@@ -461,7 +474,7 @@ msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden 
 
 #: src/routes/party_.$partyId.pay.tsx:90
 #: src/routes/party_.$partyId.pay.tsx:119
-#: src/routes/party.$partyId.tsx:823
+#: src/routes/party.$partyId.tsx:928
 msgid "Mark as paid"
 msgstr "Marcar como pagado"
 
@@ -469,19 +482,19 @@ msgstr "Marcar como pagado"
 msgid "Marking expense as paid..."
 msgstr "Marcando gasto como pagado..."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:177
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:305
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:183
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:319
 msgid "Me"
 msgstr "Yo"
 
-#: src/routes/index.tsx:71
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:69
-#: src/routes/party.$partyId.tsx:151
+#: src/routes/index.tsx:111
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:73
+#: src/routes/party.$partyId.tsx:226
 msgid "Menu"
 msgstr "Menú"
 
-#: src/routes/index.tsx:174
-#: src/routes/index.tsx:371
+#: src/routes/index.tsx:214
+#: src/routes/index.tsx:411
 #: src/routes/migrate_.tricount.tsx:160
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -501,6 +514,10 @@ msgstr "Faltan parámetros de búsqueda"
 #: src/routes/about.tsx:82
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
+
+#: src/routes/party.$partyId.tsx:178
+msgid "Name"
+msgstr "Nombre"
 
 #: src/lib/validation.ts:50
 msgid "Name must be less than 50 characters"
@@ -527,7 +544,7 @@ msgstr "Nuevo trizum"
 msgid "Next"
 msgstr "Siguiente"
 
-#: src/routes/party.$partyId.tsx:672
+#: src/routes/party.$partyId.tsx:777
 msgid "Nobody owes you money!"
 msgstr "¡Nadie te debe dinero!"
 
@@ -535,7 +552,7 @@ msgstr "¡Nadie te debe dinero!"
 msgid "Offline-First"
 msgstr "Sin Conexión Primero"
 
-#: src/routes/party.$partyId.tsx:188
+#: src/routes/party.$partyId.tsx:265
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
@@ -543,21 +560,25 @@ msgstr "Mostrar solo tus gastos"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/party.$partyId.tsx:683
+#: src/routes/settings.tsx:203
+msgid "Open last party on launch"
+msgstr "Abrir el último grupo al abrir la app"
+
+#: src/routes/party.$partyId.tsx:788
 msgid "Other operations"
 msgstr "Otras operaciones"
 
 #: src/routes/party_.$partyId.pay.tsx:101
-#: src/routes/party.$partyId.tsx:789
+#: src/routes/party.$partyId.tsx:894
 msgid "owes"
 msgstr "le debe"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:221
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:227
 msgid "Paid at"
 msgstr "Pagado el"
 
-#: src/components/ExpenseEditor.tsx:351
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:205
+#: src/components/ExpenseEditor.tsx:357
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:211
 msgid "Paid by"
 msgstr "Pagado por"
 
@@ -565,7 +586,7 @@ msgstr "Pagado por"
 msgid "Paid debt to {0}"
 msgstr "Deuda pagada a {0}"
 
-#: src/routes/index.tsx:249
+#: src/routes/index.tsx:289
 msgid "participant"
 msgstr "participante"
 
@@ -575,7 +596,7 @@ msgstr "participante"
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/routes/index.tsx:251
+#: src/routes/index.tsx:291
 msgid "participants"
 msgstr "participantes"
 
@@ -609,19 +630,19 @@ msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc12
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
 #: src/routes/party_.$partyId.pay.tsx:90
-#: src/routes/party.$partyId.tsx:823
+#: src/routes/party.$partyId.tsx:928
 msgid "Pay"
 msgstr "Pagar"
 
-#: src/routes/party.$partyId.tsx:654
+#: src/routes/party.$partyId.tsx:759
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
-#: src/routes/party.$partyId.tsx:184
+#: src/routes/party.$partyId.tsx:261
 msgid "Personal mode"
 msgstr "Modo personal"
 
-#: src/routes/settings.tsx:159
+#: src/routes/settings.tsx:163
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -637,7 +658,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/components/ExpenseEditor.tsx:740
+#: src/components/ExpenseEditor.tsx:746
 msgid "Please correct it before saving."
 msgstr "Por favor, corrígelo antes de guardar."
 
@@ -682,7 +703,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:913
+#: src/components/ExpenseEditor.tsx:919
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -702,13 +723,13 @@ msgstr "Restaurar"
 msgid "Retry"
 msgstr "Reintentar"
 
-#: src/components/ExpenseEditor.tsx:248
+#: src/components/ExpenseEditor.tsx:253
 #: src/routes/join.tsx:90
 #: src/routes/migrate_.tricount.tsx:173
 #: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:134
 #: src/routes/party_.$partyId.who.tsx:107
-#: src/routes/settings.tsx:93
+#: src/routes/settings.tsx:97
 msgid "Save"
 msgstr "Guardar"
 
@@ -716,23 +737,23 @@ msgstr "Guardar"
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Envíanos un email y te responderemos lo antes posible."
 
-#: src/routes/index.tsx:407
+#: src/routes/index.tsx:447
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/index.tsx:86
-#: src/routes/party.$partyId.tsx:226
-#: src/routes/settings.tsx:76
+#: src/routes/index.tsx:126
+#: src/routes/party.$partyId.tsx:303
+#: src/routes/settings.tsx:80
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:52
+#: src/routes/settings.tsx:55
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
 #: src/routes/party_.$partyId.share.tsx:55
 #: src/routes/party_.$partyId.share.tsx:90
-#: src/routes/party.$partyId.tsx:210
+#: src/routes/party.$partyId.tsx:287
 msgid "Share party"
 msgstr "Compartir grupo"
 
@@ -740,15 +761,15 @@ msgstr "Compartir grupo"
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:287
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:294
 msgid "Shares"
 msgstr "Partes"
 
-#: src/components/ExpenseEditor.tsx:599
+#: src/components/ExpenseEditor.tsx:605
 msgid "Shares for {0}"
 msgstr "Partes para {0}"
 
-#: src/components/ExpenseEditor.tsx:726
+#: src/components/ExpenseEditor.tsx:732
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1>{amount} {2}</1>."
 
@@ -756,7 +777,11 @@ msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/index.tsx:272
+#: src/routes/party.$partyId.tsx:166
+msgid "Sort balances"
+msgstr "Ordenar balances"
+
+#: src/routes/index.tsx:312
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
 
@@ -768,7 +793,7 @@ msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos j
 msgid "Split expenses fairly among multiple participants"
 msgstr "Divide los gastos de forma justa entre múltiples participantes"
 
-#: src/routes/index.tsx:308
+#: src/routes/index.tsx:348
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
@@ -776,13 +801,13 @@ msgstr "Comienza a registrar gastos con tu grupo"
 msgid "Submit a Request"
 msgstr "Enviar sugerencia"
 
-#: src/components/ExpenseEditor.tsx:248
+#: src/components/ExpenseEditor.tsx:253
 #: src/routes/join.tsx:90
 #: src/routes/migrate_.tricount.tsx:173
 #: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:134
 #: src/routes/party_.$partyId.who.tsx:107
-#: src/routes/settings.tsx:93
+#: src/routes/settings.tsx:97
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -795,11 +820,11 @@ msgstr "Soporte"
 msgid "Swipe between expenses and balances tabs."
 msgstr "Desliza entre las pestañas de gastos y balance."
 
-#: src/components/ExpenseEditor.tsx:623
+#: src/components/ExpenseEditor.tsx:629
 msgid "Switch to a set amount"
 msgstr "Cambiar a una cantidad fija"
 
-#: src/components/ExpenseEditor.tsx:624
+#: src/components/ExpenseEditor.tsx:630
 msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
@@ -808,11 +833,11 @@ msgid "Syncing party information..."
 msgstr "Sincronizando información del grupo..."
 
 #: src/components/AvatarPicker.tsx:125
-#: src/components/ExpenseEditor.tsx:845
+#: src/components/ExpenseEditor.tsx:851
 msgid "Take photo"
 msgstr "Hacer foto"
 
-#: src/routes/party.$partyId.tsx:171
+#: src/routes/party.$partyId.tsx:248
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
@@ -854,7 +879,7 @@ msgstr "Este no es un ID válido"
 msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
-#: src/components/ExpenseEditor.tsx:287
+#: src/components/ExpenseEditor.tsx:293
 #: src/routes/new.tsx:163
 #: src/routes/party_.$partyId.settings.tsx:161
 msgid "Title"
@@ -885,7 +910,7 @@ msgid "trizum stores all your data locally on your device. When you're online an
 msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando estás conectado y compartes un grupo con otros, los cambios se sincronizan automáticamente en todos los dispositivos en tiempo real."
 
 #: src/components/UpdateController.tsx:26
-#: src/routes/index.tsx:56
+#: src/routes/index.tsx:96
 msgid "Update available"
 msgstr "Actualización disponible"
 
@@ -901,12 +926,12 @@ msgstr "Actualizando gasto..."
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
-#: src/components/ExpenseEditor.tsx:764
+#: src/components/ExpenseEditor.tsx:770
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:134
-#: src/components/ExpenseEditor.tsx:854
+#: src/components/ExpenseEditor.tsx:860
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -914,7 +939,7 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:801
+#: src/components/ExpenseEditor.tsx:807
 msgid "Uploading..."
 msgstr "Subiendo..."
 
@@ -922,7 +947,7 @@ msgstr "Subiendo..."
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
 
-#: src/routes/settings.tsx:134
+#: src/routes/settings.tsx:138
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -938,8 +963,8 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:894
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:264
+#: src/components/ExpenseEditor.tsx:900
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:270
 msgid "View photo"
 msgstr "Ver foto"
 
@@ -947,7 +972,7 @@ msgstr "Ver foto"
 msgid "View Third-Party Licenses"
 msgstr "Ver Licencias de Terceros"
 
-#: src/routes/party.$partyId.tsx:167
+#: src/routes/party.$partyId.tsx:244
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
@@ -955,7 +980,7 @@ msgstr "Viendo como {0}"
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/index.tsx:269
+#: src/routes/index.tsx:309
 msgid "Welcome to trizum"
 msgstr "Bienvenid@ a trizum"
 
@@ -964,7 +989,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:135
+#: src/routes/settings.tsx:139
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
@@ -992,15 +1017,15 @@ msgstr "¡Sí! Tus datos se almacenan localmente en tu dispositivo y solo se sin
 msgid "You can add photos to your expenses for better tracking."
 msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 
-#: src/routes/party.$partyId.tsx:123
+#: src/routes/party.$partyId.tsx:133
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
-#: src/routes/party.$partyId.tsx:625
+#: src/routes/party.$partyId.tsx:730
 msgid "You owe money to people"
 msgstr "Debes dinero a personas"
 
-#: src/routes/party.$partyId.tsx:643
+#: src/routes/party.$partyId.tsx:748
 msgid "You're debt free!"
 msgstr "¡Estás libre de deudas!"
 

@@ -156,7 +156,7 @@ function IdleState({
       <div className="container flex h-16 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/" }} />
 
-        <h1 className="pl-4 text-2xl font-bold">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Migrate from Tricount</Trans>
         </h1>
 
@@ -240,7 +240,7 @@ function InProgressState({
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm p-4 text-center">
-        <h1 className="text-2xl font-bold">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Migration in progress</Trans>
         </h1>
         <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">
@@ -275,7 +275,7 @@ function SuccessState({ partyId }: { partyId: string }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm p-4 text-center">
-        <h1 className="mb-4 text-2xl font-bold">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Migration successful</Trans>
         </h1>
 
@@ -298,7 +298,7 @@ function ErrorState({ message }: { message: string }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm p-4 text-center">
-        <h1 className="mb-4 text-2xl font-bold">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Something went wrong</Trans>
         </h1>
         <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">

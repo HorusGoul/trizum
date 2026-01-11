@@ -1,4 +1,5 @@
 import type { Party } from "#src/models/party.js";
+import type { PartyList } from "#src/models/partyList.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -8,7 +9,7 @@ import {
   isValidDocumentId,
   type AnyDocumentId,
 } from "@automerge/automerge-repo/slim";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { t, Trans } from "@lingui/macro";
@@ -20,8 +21,47 @@ import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { defaultThemeHue } from "#src/ui/theme.ts";
 
+let hasRedirectedThisSession = false;
+
 export const Route = createFileRoute("/")({
   component: Index,
+  beforeLoad: async ({ context }) => {
+    // Only redirect once per session (on app launch)
+    if (hasRedirectedThisSession) {
+      return;
+    }
+
+    const partyListId = localStorage.getItem("partyListId");
+    if (!partyListId || !isValidDocumentId(partyListId)) {
+      return;
+    }
+
+    const partyList = (await documentCache.readAsync(
+      context.repo,
+      partyListId,
+    )) as PartyList | undefined;
+
+    if (!partyList) {
+      return;
+    }
+
+    const { openLastPartyOnLaunch, lastOpenedPartyId, parties } = partyList;
+
+    if (
+      openLastPartyOnLaunch &&
+      lastOpenedPartyId &&
+      isValidDocumentId(lastOpenedPartyId) &&
+      parties[lastOpenedPartyId]
+    ) {
+      hasRedirectedThisSession = true;
+      throw redirect({
+        to: "/party/$partyId",
+        params: { partyId: lastOpenedPartyId },
+        search: { tab: "expenses" },
+        replace: true,
+      });
+    }
+  },
 });
 
 function Index() {

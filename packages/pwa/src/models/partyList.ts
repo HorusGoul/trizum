@@ -13,6 +13,8 @@ export interface PartyList {
   phone: string;
   avatarId?: DocumentId | null;
   locale?: SupportedLocale;
+  openLastPartyOnLaunch?: boolean;
+  lastOpenedPartyId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;
 }

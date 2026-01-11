@@ -63,10 +63,16 @@ function ExpenseById() {
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
-        <h1 className="pl-4 text-2xl font-bold">{expense.name}</h1>
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
+          {expense.name}
+        </h1>
         <div className="flex-1" />
         <MenuTrigger>
-          <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
+          <IconButton
+            icon="#lucide/ellipsis-vertical"
+            aria-label={t`Menu`}
+            className="flex-shrink-0"
+          />
           <Popover placement="bottom end">
             <Menu>
               <MenuItem
@@ -276,6 +282,7 @@ function PhotoItemById({ photoId }: { photoId: string }) {
 }
 
 function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
+  const { i18n } = useLingui();
   const unitAmounts = getExpenseUnitShares(expense);
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
@@ -289,31 +296,38 @@ function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
 
       <dd className="-mx-2 overflow-hidden rounded-lg">
         <ul>
-          {Object.entries(unitAmounts).map(([userId, amount]) => {
-            const isMe = userId === currentParticipant.id;
+          {Object.entries(unitAmounts)
+            .sort(([a], [b]) =>
+              party.participants[a].name.localeCompare(
+                party.participants[b].name,
+                i18n.locale,
+              ),
+            )
+            .map(([userId, amount]) => {
+              const isMe = userId === currentParticipant.id;
 
-            return (
-              <li
-                key={userId}
-                className="flex justify-between bg-accent-50 p-2 px-3 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60"
-              >
-                <span className="flex items-center gap-1 font-medium">
-                  {party.participants[userId].name}
+              return (
+                <li
+                  key={userId}
+                  className="flex justify-between bg-accent-50 p-2 px-3 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60"
+                >
+                  <span className="flex items-center gap-1 font-medium">
+                    {party.participants[userId].name}
 
-                  {isMe ? (
-                    <span className="h-4 rounded-sm bg-accent-500 px-1 text-xs font-semibold uppercase text-accent-50">
-                      {t`Me`}
-                    </span>
-                  ) : null}
-                </span>
-                <CurrencyText
-                  amount={amount}
-                  currency={party.currency}
-                  className="font-semibold"
-                />
-              </li>
-            );
-          })}
+                    {isMe ? (
+                      <span className="h-4 rounded-sm bg-accent-500 px-1 text-xs font-semibold uppercase text-accent-50">
+                        {t`Me`}
+                      </span>
+                    ) : null}
+                  </span>
+                  <CurrencyText
+                    amount={amount}
+                    currency={party.currency}
+                    className="font-semibold"
+                  />
+                </li>
+              );
+            })}
         </ul>
       </dd>
     </dl>

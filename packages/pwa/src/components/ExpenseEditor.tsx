@@ -11,6 +11,7 @@ import {
 } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t, Trans } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppNumberField, AppTextField } from "#src/ui/TextField.js";
 import { CurrencyField } from "./CurrencyField";
@@ -77,12 +78,16 @@ export function ExpenseEditor({
   autoFocus = true,
   goBackFallbackOptions,
 }: ExpenseEditorProps) {
-  const participants = useExpenseParticipants({
+  const { i18n } = useLingui();
+  const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
     },
     shares: defaultValues.shares,
   });
+  const participants = [...unsortedParticipants].sort((a, b) =>
+    a.name.localeCompare(b.name, i18n.locale),
+  );
 
   const form = useForm({
     defaultValues: {
@@ -235,7 +240,7 @@ export function ExpenseEditor({
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2 mt-safe">
         <BackButton fallbackOptions={goBackFallbackOptions} />
-        <h1 className="pl-4 text-2xl font-bold">{title}</h1>
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">{title}</h1>
         <div className="flex-1" />
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -249,6 +254,7 @@ export function ExpenseEditor({
                   type="submit"
                   form={formId}
                   isDisabled={isSubmitting}
+                  className="flex-shrink-0"
                 />
               </Suspense>
             ) : null

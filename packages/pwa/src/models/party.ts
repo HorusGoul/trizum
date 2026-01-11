@@ -15,6 +15,11 @@ export interface Party {
   chunkRefs: PartyExpenseChunkRef[];
 }
 
+export type BalancesSortedBy =
+  | "name"
+  | "balance-ascending"
+  | "balance-descending";
+
 export interface PartyParticipant {
   id: ExpenseUser;
   name: string;
@@ -22,6 +27,7 @@ export interface PartyParticipant {
   avatarId?: MediaFile["id"] | null;
   isArchived?: boolean;
   personalMode?: boolean;
+  balancesSortedBy?: BalancesSortedBy;
 }
 
 export interface PartyExpenseChunkRef {

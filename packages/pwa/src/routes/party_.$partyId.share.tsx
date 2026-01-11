@@ -51,7 +51,7 @@ function RouteComponent() {
       <div className="container flex h-16 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
 
-        <h1 className="pl-4 text-2xl font-bold">
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Share party</Trans>
         </h1>
       </div>

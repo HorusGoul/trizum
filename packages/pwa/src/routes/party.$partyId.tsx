@@ -32,7 +32,7 @@ import {
   useState,
   type Key,
 } from "react";
-import type { PartyParticipant } from "#src/models/party.js";
+import type { BalancesSortedBy, PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useNoMemo } from "#src/hooks/useNoMemo.ts";
@@ -45,6 +45,7 @@ import {
   requestIdleCallback,
   cancelIdleCallback,
 } from "#src/lib/requestIdleCallback.ts";
+import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
@@ -90,6 +91,7 @@ function PartyById() {
   const participant = useCurrentParticipant();
   const expenseLogTabPanelRef = useRef<HTMLDivElement>(null);
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
+  const [balancesSortedBy, setBalancesSortedBy] = useBalancesSortedBy();
 
   function onSelectedTabChange(tab: Key) {
     void navigate({
@@ -116,6 +118,14 @@ function PartyById() {
       cancelIdleCallback(idleCallback);
     };
   }, [selectedTab, recalculateBalances]);
+
+  const { setLastOpenedPartyId } = usePartyList();
+
+  useEffect(() => {
+    if (partyId) {
+      setLastOpenedPartyId(partyId);
+    }
+  }, [partyId, setLastOpenedPartyId]);
 
   async function onLeaveParty() {
     if (!partyId) return;
@@ -146,10 +156,77 @@ function PartyById() {
     <div className="flex h-full max-h-full flex-col">
       <div className="container flex h-16 flex-shrink-0 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/" }} />
-        <h1 className="pl-4 text-2xl font-bold">{party.name}</h1>
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
+          {party.name}
+        </h1>
         <div className="flex-1" />
+        {selectedTab === "balances" ? (
+          <MenuTrigger>
+            <IconButton
+              icon="#lucide/arrow-up-down"
+              aria-label={t`Sort balances`}
+              className="flex-shrink-0"
+            />
+            <Popover placement="bottom end">
+              <Menu className="min-w-60">
+                <MenuItem onAction={() => setBalancesSortedBy("name")}>
+                  <IconWithFallback
+                    name="#lucide/arrow-down-a-z"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Name</Trans>
+                  </span>
+                  <div className="flex-1" />
+                  {balancesSortedBy === "name" ? (
+                    <Icon name="#lucide/check" className="ml-3" />
+                  ) : null}
+                </MenuItem>
+
+                <MenuItem
+                  onAction={() => setBalancesSortedBy("balance-ascending")}
+                >
+                  <IconWithFallback
+                    name="#lucide/arrow-down-narrow-wide"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Balance, Lowest First</Trans>
+                  </span>
+                  <div className="flex-1" />
+                  {balancesSortedBy === "balance-ascending" ? (
+                    <Icon name="#lucide/check" className="ml-3" />
+                  ) : null}
+                </MenuItem>
+
+                <MenuItem
+                  onAction={() => setBalancesSortedBy("balance-descending")}
+                >
+                  <IconWithFallback
+                    name="#lucide/arrow-up-narrow-wide"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Balance, Highest First</Trans>
+                  </span>
+                  <div className="flex-1" />
+                  {balancesSortedBy === "balance-descending" ? (
+                    <Icon name="#lucide/check" className="ml-3" />
+                  ) : null}
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </MenuTrigger>
+        ) : null}
         <MenuTrigger>
-          <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
+          <IconButton
+            icon="#lucide/ellipsis-vertical"
+            aria-label={t`Menu`}
+            className="flex-shrink-0"
+          />
           <Popover placement="bottom end">
             <Menu className="min-w-60">
               <MenuItem
@@ -261,7 +338,10 @@ function PartyById() {
               label: t`Balances`,
               node: (
                 <Suspense fallback={null}>
-                  <Balances panelRef={balancesTabPanelRef} />
+                  <Balances
+                    panelRef={balancesTabPanelRef}
+                    sortedBy={balancesSortedBy}
+                  />
                 </Suspense>
               ),
               panelRef: balancesTabPanelRef,
@@ -283,6 +363,7 @@ function ExpenseLog({
   const { expenses, hasNext, isLoadingNext, loadNext } =
     usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
+  const navigate = useNavigate();
 
   const filteredExpenses = expenses.filter((expense) => {
     if (participant.personalMode) {
@@ -511,8 +592,10 @@ function ExpenseItem({
 
 function Balances({
   panelRef,
+  sortedBy,
 }: {
   panelRef: React.RefObject<HTMLDivElement | null>;
+  sortedBy: BalancesSortedBy;
 }) {
   const { party } = useCurrentParty();
   const participant = useCurrentParticipant();
@@ -532,7 +615,14 @@ function Balances({
     })
     .filter((balance) => balance.stats.balance !== 0)
     .sort((a, b) => {
-      return a.participant.name.localeCompare(b.participant.name);
+      switch (sortedBy) {
+        case "name":
+          return a.participant.name.localeCompare(b.participant.name);
+        case "balance-ascending":
+          return a.stats.balance - b.stats.balance;
+        case "balance-descending":
+          return b.stats.balance - a.stats.balance;
+      }
     });
 
   const hasSortedBalances = sortedBalancesByParticipant.length > 0;

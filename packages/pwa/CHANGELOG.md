@@ -1,5 +1,27 @@
 # @trizum/pwa
 
+## 1.2.0
+
+### Minor Changes
+
+- 6e913ab: Add button in balances tab that allows users to sort the balances
+
+### Patch Changes
+
+- 679d1b2: Remove add expense menu in production builds given that there's only one option
+- cd8c592: Adjust title sizes and truncate them
+
+## 1.1.0
+
+### Minor Changes
+
+- 06020bd: Add "Open last party on launch" setting that automatically opens the last visited party when opening the app
+
+### Patch Changes
+
+- e9a4eec: Build with sourcemaps enabled
+- f477b6b: Sort participant lists alphabetically in expense editor and expense details
+
 ## 1.0.6
 
 ### Patch Changes

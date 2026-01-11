@@ -44,6 +44,9 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
+    build: {
+      sourcemap: true,
+    },
     plugins: [
       cloudflare(),
       TanStackRouterVite(),

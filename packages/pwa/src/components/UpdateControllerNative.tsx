@@ -17,7 +17,7 @@ export function UpdateControllerNative({
     const platform = Capacitor.getPlatform();
     if (platform === "ios") {
       void AppUpdate.openAppStore({
-        appId: "TODO",
+        appId: "6755971747",
       });
     }
 
