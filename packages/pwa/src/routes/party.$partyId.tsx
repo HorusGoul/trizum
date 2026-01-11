@@ -3,6 +3,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
+import { BottomSheet, BottomSheetItem } from "#src/ui/BottomSheet.tsx";
 import { Icon, IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
@@ -400,61 +401,36 @@ function ExpenseLog({
         <div className="flex-1 pb-safe-offset-12" />
 
         <div className="sticky flex justify-end bottom-safe-offset-6">
-          {import.meta.env.DEV ? (
-            <MenuTrigger>
+          <BottomSheet
+            ariaLabel={t`Add or create`}
+            trigger={({ onOpen }) => (
               <IconButton
                 aria-label={t`Add or create`}
                 icon="#lucide/plus"
                 color="accent"
                 className="h-14 w-14 shadow-md"
+                onPress={onOpen}
               />
-
-              <Popover placement="top end" offset={16}>
-                <Menu className="min-w-60">
-                  {import.meta.env.DEV ? (
-                    <MenuItem onAction={() => void dev.createTestExpenses()}>
-                      <IconWithFallback
-                        name="#lucide/test-tube-diagonal"
-                        size={20}
-                        className="mr-3"
-                      />
-                      <span className="h-3.5 leading-none">
-                        <Trans>[DEV] Create expenses</Trans>
-                      </span>
-                    </MenuItem>
-                  ) : null}
-                  <MenuItem
-                    href={{
-                      to: "/party/$partyId/add",
-                      params: { partyId: party.id },
-                    }}
-                  >
-                    <IconWithFallback
-                      name="#lucide/list-plus"
-                      size={20}
-                      className="mr-3"
-                    />
-                    <span className="h-3.5 leading-none">
-                      <Trans>Add an expense</Trans>
-                    </span>
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            </MenuTrigger>
-          ) : (
-            <IconButton
-              aria-label={t`Add an expense`}
-              icon="#lucide/plus"
-              color="accent"
-              className="h-14 w-14 shadow-md"
-              onPress={() => {
-                void navigate({
-                  to: "/party/$partyId/add",
-                  params: { partyId: party.id },
-                });
+            )}
+          >
+            {import.meta.env.DEV ? (
+              <BottomSheetItem
+                icon="#lucide/test-tube-diagonal"
+                onAction={() => void dev.createTestExpenses()}
+              >
+                <Trans>[DEV] Create expenses</Trans>
+              </BottomSheetItem>
+            ) : null}
+            <BottomSheetItem
+              icon="#lucide/list-plus"
+              href={{
+                to: "/party/$partyId/add",
+                params: { partyId: party.id },
               }}
-            />
-          )}
+            >
+              <Trans>Add an expense</Trans>
+            </BottomSheetItem>
+          </BottomSheet>
         </div>
       </div>
     </>

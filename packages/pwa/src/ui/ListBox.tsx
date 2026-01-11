@@ -25,7 +25,7 @@ function ListBox<T extends object>({
       className={composeRenderProps(className, (className) =>
         cn(
           className,
-          "group overflow-auto rounded-md border bg-accent-900 p-1 text-accent-50 shadow-md outline-none",
+          "group overflow-auto rounded-md border border-accent-500 bg-white p-1 text-accent-900 shadow-md outline-none dark:border-accent-700 dark:bg-accent-900 dark:text-accent-50",
           /* Empty */
           "data-[empty]:p-6 data-[empty]:text-center data-[empty]:text-sm",
         ),
