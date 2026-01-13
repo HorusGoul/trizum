@@ -831,15 +831,15 @@ msgstr "Cambiar a división fraccional"
 #: src/routes/new.tsx:171
 #: src/routes/party_.$partyId.settings.tsx:194
 msgid "Symbol"
-msgstr ""
+msgstr "Símbolo"
 
 #: src/lib/validation.ts:49
 msgid "Symbol must be only one emoji"
-msgstr ""
+msgstr "El símbolo debe ser un solo emoji"
 
 #: src/lib/validation.ts:42
 msgid "Symbol must contain only emojis"
-msgstr ""
+msgstr "El símbolo sólo puede contener emojis"
 
 #: src/components/PartyPendingComponent.tsx:96
 msgid "Syncing party information..."
