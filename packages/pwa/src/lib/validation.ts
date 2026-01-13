@@ -29,6 +29,29 @@ export function validatePartyTitle(title: string) {
   return null;
 }
 
+// https://stackoverflow.com/a/73634247
+export function isEmojiOnly(str: string): boolean {
+  const stringToTest = str.replace(/ /g, "");
+  const emojiRegex =
+    /^(?:(?:\p{RI}\p{RI}|\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u{200D}\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?)*)|[\u{1f900}-\u{1f9ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}])+$/u;
+  return emojiRegex.test(stringToTest) && Number.isNaN(Number(stringToTest));
+}
+
+export function validatePartySymbol(symbol: string) {
+  if (!isEmojiOnly(symbol)) {
+    return t`Symbol must contain only emojis`;
+  }
+
+  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  const segments = Array.from(segmenter.segment(symbol));
+
+  if (segments.length > 1) {
+    return t`Symbol must be only one emoji`;
+  }
+
+  return null;
+}
+
 export function validatePartyDescription(description: string) {
   description = description.trim();
 

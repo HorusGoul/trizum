@@ -1,7 +1,11 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import type { Party, PartyParticipant } from "#src/models/party.js";
+import {
+  DEFAULT_PARTY_SYMBOL,
+  type Party,
+  type PartyParticipant,
+} from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
@@ -14,6 +18,7 @@ import { flushSync } from "react-dom";
 import {
   validatePartyDescription,
   validatePartyParticipantName,
+  validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
 import { BackButton } from "#src/components/BackButton.js";
@@ -32,6 +37,7 @@ interface CurrencyOption {
 
 interface NewPartyFormValues {
   name: string;
+  symbol: string;
   description: string;
   currency: Currency;
   participants: Pick<PartyParticipant, "name">[];
@@ -54,6 +60,7 @@ function New() {
       id: "" as DocumentId,
       type: "party",
       name: values.name,
+      symbol: values.symbol,
       description: values.description,
       currency: values.currency,
       participants: participants.reduce<Party["participants"]>(
@@ -86,6 +93,7 @@ function New() {
   const form = useForm({
     defaultValues: {
       name: "",
+      symbol: DEFAULT_PARTY_SYMBOL,
       description: "",
       currency: "EUR" as Currency,
       participants: [
@@ -165,6 +173,29 @@ function New() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
+        <form.Field
+          name="symbol"
+          validators={{
+            onChange: ({ value }) => validatePartySymbol(value),
+          }}
+        >
+          {(field) => (
+            <AppTextField
+              label={t`Symbol`}
+              minLength={1}
+              name={field.name}
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              errorMessage={field.state.meta.errors?.join(", ")}
+              isInvalid={
+                field.state.meta.isTouched &&
+                field.state.meta.errors?.length > 0
+              }
+            />
+          )}
+        </form.Field>
+
         <form.Field
           name="name"
           validators={{

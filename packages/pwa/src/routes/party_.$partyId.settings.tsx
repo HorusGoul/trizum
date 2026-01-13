@@ -6,9 +6,14 @@ import { guardParticipatingInParty } from "#src/lib/guards.js";
 import {
   validatePartyDescription,
   validatePartyParticipantName,
+  validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
-import type { Party, PartyParticipant } from "#src/models/party.js";
+import {
+  DEFAULT_PARTY_SYMBOL,
+  type Party,
+  type PartyParticipant,
+} from "#src/models/party.js";
 import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
 import { Label } from "#src/ui/Field.tsx";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -31,6 +36,7 @@ export const Route = createFileRoute("/party_/$partyId/settings")({
 
 interface PartySettingsFormValues {
   name: string;
+  symbol: string;
   description: string;
   participants: (PartyParticipant | (PartyParticipant & { __isNew: true }))[];
   hue: number;
@@ -59,6 +65,7 @@ function PartySettings() {
 
     updateSettings({
       name: values.name,
+      symbol: values.symbol,
       description: values.description,
       participants,
       hue: values.hue,
@@ -70,6 +77,7 @@ function PartySettings() {
   const form = useForm({
     defaultValues: {
       name: party.name,
+      symbol: party.symbol || DEFAULT_PARTY_SYMBOL,
       description: party.description,
       participants: Object.values(party.participants),
       hue: party.hue ?? defaultThemeHue,
@@ -163,6 +171,29 @@ function PartySettings() {
               description={t`How do you want to call this party?`}
               minLength={1}
               maxLength={50}
+              name={field.name}
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              errorMessage={field.state.meta.errors?.join(", ")}
+              isInvalid={
+                field.state.meta.isTouched &&
+                field.state.meta.errors?.length > 0
+              }
+            />
+          )}
+        </form.Field>
+
+        <form.Field
+          name="symbol"
+          validators={{
+            onChange: ({ value }) => validatePartySymbol(value),
+          }}
+        >
+          {(field) => (
+            <AppTextField
+              label={t`Symbol`}
+              minLength={1}
               name={field.name}
               value={field.state.value}
               onChange={field.handleChange}
