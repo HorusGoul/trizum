@@ -13,7 +13,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
-import { getBrowserLocale, type SupportedLocale } from "#src/lib/i18n.js";
+import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { SwitchField } from "#src/components/SwitchField.tsx";
 
@@ -25,12 +25,12 @@ interface SettingsFormValues {
   username: string;
   phone: string;
   avatarId: MediaFile["id"] | null;
-  locale: SupportedLocale;
+  locale: SupportedLocale | "system";
   openLastPartyOnLaunch: boolean;
 }
 
 interface LocaleOption {
-  id: SupportedLocale;
+  id: SupportedLocale | "system";
   name: string;
 }
 
@@ -39,6 +39,7 @@ function Settings() {
   const navigate = useNavigate();
 
   const LOCALE_OPTIONS: LocaleOption[] = [
+    { id: "system", name: t`System (fallbacks to ${DEFAULT_LOCALE})` },
     { id: "en", name: t`English` },
     { id: "es", name: t`Español` },
   ];
@@ -48,7 +49,7 @@ function Settings() {
       username: values.username,
       phone: values.phone,
       avatarId: values.avatarId,
-      locale: values.locale,
+      locale: values.locale === "system" ? undefined : values.locale,
       openLastPartyOnLaunch: values.openLastPartyOnLaunch,
     });
     form.reset();
@@ -61,7 +62,7 @@ function Settings() {
       username: partyList.username ?? "",
       phone: partyList.phone ?? "",
       avatarId: partyList.avatarId ?? null,
-      locale: partyList.locale ?? getBrowserLocale(),
+      locale: partyList.locale ?? ("system" as const),
       openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
     },
     onSubmit: ({ value }) => {

@@ -117,7 +117,7 @@ msgstr "Attach photos of receipts to your expenses"
 msgid "Attachments"
 msgstr "Attachments"
 
-#: src/routes/settings.tsx:205
+#: src/routes/settings.tsx:206
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
@@ -263,7 +263,7 @@ msgstr "Editing {expenseName}"
 msgid "Email Support"
 msgstr "Email Support"
 
-#: src/routes/settings.tsx:42
+#: src/routes/settings.tsx:43
 msgid "English"
 msgstr "English"
 
@@ -279,7 +279,7 @@ msgstr "Enter the key of the Tricount account you want to migrate from"
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
 
-#: src/routes/settings.tsx:43
+#: src/routes/settings.tsx:44
 msgid "Español"
 msgstr "Español"
 
@@ -355,7 +355,7 @@ msgstr "Feature Requests"
 msgid "Features"
 msgstr "Features"
 
-#: src/routes/settings.tsx:164
+#: src/routes/settings.tsx:165
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -495,7 +495,7 @@ msgstr "Join a trizum"
 msgid "Joined {0}!"
 msgstr "Joined {0}!"
 
-#: src/routes/settings.tsx:182
+#: src/routes/settings.tsx:183
 msgid "Language"
 msgstr "Language"
 
@@ -620,7 +620,7 @@ msgstr "Only show your expenses"
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
 
-#: src/routes/settings.tsx:203
+#: src/routes/settings.tsx:204
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
@@ -714,7 +714,7 @@ msgstr "People that owe you money"
 msgid "Personal mode"
 msgstr "Personal mode"
 
-#: src/routes/settings.tsx:163
+#: src/routes/settings.tsx:164
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -805,7 +805,7 @@ msgstr "Retry"
 #: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:134
 #: src/routes/party_.$partyId.who.tsx:107
-#: src/routes/settings.tsx:97
+#: src/routes/settings.tsx:98
 msgid "Save"
 msgstr "Save"
 
@@ -819,11 +819,11 @@ msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/index.tsx:126
 #: src/routes/party.$partyId.tsx:303
-#: src/routes/settings.tsx:80
+#: src/routes/settings.tsx:81
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:55
+#: src/routes/settings.tsx:56
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -887,7 +887,7 @@ msgstr "Submit a Request"
 #: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:134
 #: src/routes/party_.$partyId.who.tsx:107
-#: src/routes/settings.tsx:97
+#: src/routes/settings.tsx:98
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -911,6 +911,10 @@ msgstr "Switch to fractional split"
 #: src/components/PartyPendingComponent.tsx:96
 msgid "Syncing party information..."
 msgstr "Syncing party information..."
+
+#: src/routes/settings.tsx:42
+msgid "System (fallbacks to {DEFAULT_LOCALE})"
+msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 
 #: src/components/AvatarPicker.tsx:125
 #: src/components/ExpenseEditor.tsx:851
@@ -1048,7 +1052,7 @@ msgstr "URL or Party ID"
 msgid "Use personal mode to filter only your expenses."
 msgstr "Use personal mode to filter only your expenses."
 
-#: src/routes/settings.tsx:138
+#: src/routes/settings.tsx:139
 msgid "Username"
 msgstr "Username"
 
@@ -1094,7 +1098,7 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:139
+#: src/routes/settings.tsx:140
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
