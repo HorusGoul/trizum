@@ -1,5 +1,9 @@
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import type { Party, PartyParticipant } from "#src/models/party.js";
+import {
+  DEFAULT_PARTY_SYMBOL,
+  type Party,
+  type PartyParticipant,
+} from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
@@ -11,6 +15,7 @@ import { flushSync } from "react-dom";
 import {
   validatePartyDescription,
   validatePartyParticipantName,
+  validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
 import { BackButton } from "#src/components/BackButton.js";
@@ -23,6 +28,7 @@ export const Route = createFileRoute("/new")({
 
 interface NewPartyFormValues {
   name: string;
+  symbol: string;
   description: string;
   participants: Pick<PartyParticipant, "name">[];
 }
@@ -42,6 +48,7 @@ function New() {
       id: "" as DocumentId,
       type: "party",
       name: values.name,
+      symbol: values.symbol,
       description: values.description,
       currency: "EUR",
       participants: participants.reduce<Party["participants"]>(
@@ -74,6 +81,7 @@ function New() {
   const form = useForm({
     defaultValues: {
       name: "",
+      symbol: DEFAULT_PARTY_SYMBOL,
       description: "",
       participants: [
         {
@@ -152,6 +160,29 @@ function New() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
+        <form.Field
+          name="symbol"
+          validators={{
+            onChange: ({ value }) => validatePartySymbol(value),
+          }}
+        >
+          {(field) => (
+            <AppTextField
+              label={t`Symbol`}
+              minLength={1}
+              name={field.name}
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              errorMessage={field.state.meta.errors?.join(", ")}
+              isInvalid={
+                field.state.meta.isTouched &&
+                field.state.meta.errors?.length > 0
+              }
+            />
+          )}
+        </form.Field>
+
         <form.Field
           name="name"
           validators={{
