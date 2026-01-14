@@ -3,8 +3,8 @@ import {
   type Repo,
   type DocumentId,
 } from "@automerge/automerge-repo/slim";
+import type { SupportedLocale } from "#src/lib/i18n.js";
 import type { Party, PartyParticipant } from "./party";
-import { getBrowserLocale, type SupportedLocale } from "#src/lib/i18n.js";
 
 export interface PartyList {
   id: DocumentId;
@@ -26,12 +26,12 @@ export function getPartyListId(repo: Repo) {
     return id;
   }
 
+  // Can't explicity set `locale: undefined` because of automerge...
   const handle = repo.create<PartyList>({
     id: "" as DocumentId,
     type: "partyList",
     username: "",
     phone: "",
-    locale: getBrowserLocale(),
     parties: {},
     participantInParties: {},
   });

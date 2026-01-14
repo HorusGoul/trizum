@@ -68,7 +68,11 @@ export function usePartyList() {
       list.username = values.username;
       list.phone = values.phone;
       list.avatarId = values.avatarId;
-      list.locale = values.locale;
+      if (values.locale) {
+        list.locale = values.locale;
+      } else {
+        delete list["locale"];
+      }
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
     });
 
@@ -107,12 +111,7 @@ export function usePartyList() {
           }
 
           // Only update participant-relevant fields, not user-local settings
-          const participantFields = [
-            "username",
-            "phone",
-            "avatarId",
-            "locale",
-          ] as const;
+          const participantFields = ["phone", "avatarId"] as const;
           for (const key of participantFields) {
             const value = values[key];
 

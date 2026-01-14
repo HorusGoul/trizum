@@ -105,7 +105,7 @@ msgstr "Se requiere al menos un participante"
 msgid "Attachments"
 msgstr "Adjuntos"
 
-#: src/routes/settings.tsx:205
+#: src/routes/settings.tsx:206
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -231,7 +231,7 @@ msgstr "Editando {expenseName}"
 msgid "Email Support"
 msgstr "Soporte por email"
 
-#: src/routes/settings.tsx:42
+#: src/routes/settings.tsx:43
 msgid "English"
 msgstr "Inglés"
 
@@ -243,7 +243,7 @@ msgstr "Introduce un enlace o código de grupo para unirte"
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
-#: src/routes/settings.tsx:43
+#: src/routes/settings.tsx:44
 msgid "Español"
 msgstr "Español"
 
@@ -307,7 +307,7 @@ msgstr "Sugerencias"
 msgid "Features"
 msgstr "Características"
 
-#: src/routes/settings.tsx:164
+#: src/routes/settings.tsx:165
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -439,7 +439,7 @@ msgstr "Unirse a un Grupo"
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
 
-#: src/routes/settings.tsx:182
+#: src/routes/settings.tsx:183
 msgid "Language"
 msgstr "Idioma"
 
@@ -560,7 +560,7 @@ msgstr "Mostrar solo tus gastos"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:203
+#: src/routes/settings.tsx:204
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -642,7 +642,7 @@ msgstr "Personas que te deben dinero"
 msgid "Personal mode"
 msgstr "Modo personal"
 
-#: src/routes/settings.tsx:163
+#: src/routes/settings.tsx:164
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -729,7 +729,7 @@ msgstr "Reintentar"
 #: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:134
 #: src/routes/party_.$partyId.who.tsx:107
-#: src/routes/settings.tsx:97
+#: src/routes/settings.tsx:98
 msgid "Save"
 msgstr "Guardar"
 
@@ -743,11 +743,11 @@ msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:126
 #: src/routes/party.$partyId.tsx:303
-#: src/routes/settings.tsx:80
+#: src/routes/settings.tsx:81
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:55
+#: src/routes/settings.tsx:56
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -807,7 +807,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/new.tsx:136
 #: src/routes/party_.$partyId.settings.tsx:134
 #: src/routes/party_.$partyId.who.tsx:107
-#: src/routes/settings.tsx:97
+#: src/routes/settings.tsx:98
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -831,6 +831,10 @@ msgstr "Cambiar a división fraccional"
 #: src/components/PartyPendingComponent.tsx:96
 msgid "Syncing party information..."
 msgstr "Sincronizando información del grupo..."
+
+#: src/routes/settings.tsx:42
+msgid "System (fallbacks to {DEFAULT_LOCALE})"
+msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
 #: src/components/AvatarPicker.tsx:125
 #: src/components/ExpenseEditor.tsx:851
@@ -947,7 +951,7 @@ msgstr "Subiendo..."
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
 
-#: src/routes/settings.tsx:138
+#: src/routes/settings.tsx:139
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -989,7 +993,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:139
+#: src/routes/settings.tsx:140
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
