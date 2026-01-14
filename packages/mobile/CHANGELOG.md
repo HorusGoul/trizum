@@ -1,5 +1,17 @@
 # @trizum/mobile
 
+## 1.3.0
+
+### Minor Changes
+
+- b387fe2: App now defaults to "system" locale and app's language can be changed in system settings.
+
+### Patch Changes
+
+- Updated dependencies [b387fe2]
+- Updated dependencies [7d26de5]
+  - @trizum/pwa@1.3.0
+
 ## 1.2.0
 
 ### Patch Changes
