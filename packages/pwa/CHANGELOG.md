@@ -1,5 +1,15 @@
 # @trizum/pwa
 
+## 1.3.0
+
+### Minor Changes
+
+- b387fe2: App now defaults to "system" locale and app's language can be changed in system settings.
+
+### Patch Changes
+
+- 7d26de5: Clicking on download update correctly opens the app store listing on iOS
+
 ## 1.2.0
 
 ### Minor Changes
