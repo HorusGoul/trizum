@@ -25,16 +25,35 @@ import { type DocHandleChangePayload } from "@automerge/automerge-repo";
 import { t } from "@lingui/macro";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
+import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+
+interface EditExpenseSearchParams {
+  media?: number;
+}
 
 export const Route = createFileRoute(
   "/party_/$partyId/expense/$expenseId_/edit",
 )({
   component: RouteComponent,
   pendingComponent: PartyPendingComponent,
+
+  validateSearch: (search): EditExpenseSearchParams => {
+    return {
+      media:
+        typeof search.media === "number" && search.media >= 0
+          ? search.media
+          : undefined,
+    };
+  },
 
   async loader({ location, context, params: { expenseId, partyId } }) {
     await guardParticipatingInParty(partyId, context, location);
@@ -55,7 +74,18 @@ function RouteComponent() {
     onChangeExpense,
     subscribeToExpenseChanges,
   } = useExpense();
-  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { history } = useRouter();
+
+  const photos = expense?.photos ?? [];
+
+  const { galleryIndex, openGallery, closeGallery, onIndexChange } =
+    useRouteMediaGallery({
+      mediaIndex: search.media,
+      navigate: (options) => void navigate(options),
+      goBack: () => history.back(),
+    });
 
   if (!expense) {
     throw new Error("Expense not found");
@@ -176,6 +206,13 @@ function RouteComponent() {
         // eslint-disable-next-line jsx-a11y/no-autofocus -- We don't want to auto focus the edit form
         autoFocus={false}
         goBackFallbackOptions={{ to: "/party/$partyId/expense/$expenseId" }}
+        onViewPhoto={openGallery}
+      />
+      <RouteMediaGallery
+        photoIds={photos}
+        galleryIndex={galleryIndex}
+        onIndexChange={onIndexChange}
+        onClose={closeGallery}
       />
     </>
   );
