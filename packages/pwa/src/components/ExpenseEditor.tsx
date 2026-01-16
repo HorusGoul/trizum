@@ -67,6 +67,8 @@ interface ExpenseEditorProps {
   goBackFallbackOptions: React.ComponentProps<
     typeof BackButton
   >["fallbackOptions"];
+  /** Optional callback to view a photo at a given index (for route-based gallery) */
+  onViewPhoto?: (index: number) => void;
 }
 
 export function ExpenseEditor({
@@ -77,6 +79,7 @@ export function ExpenseEditor({
   ref,
   autoFocus = true,
   goBackFallbackOptions,
+  onViewPhoto,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
   const unsortedParticipants = useExpenseParticipants({
@@ -277,6 +280,7 @@ export function ExpenseEditor({
                 <PhotosField
                   value={field.state.value}
                   onChange={field.handleChange}
+                  onViewPhoto={onViewPhoto}
                 />
               )}
             </form.Field>
@@ -753,9 +757,10 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
 interface PhotosFieldProps {
   value: MediaFile["id"][];
   onChange: (updater: Updater<MediaFile["id"][]>) => void;
+  onViewPhoto?: (index: number) => void;
 }
 
-function PhotosField({ value, onChange }: PhotosFieldProps) {
+function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
   return (
     <div
       className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
@@ -772,7 +777,7 @@ function PhotosField({ value, onChange }: PhotosFieldProps) {
         </div>
       ) : null}
 
-      {value.map((photoId) => (
+      {value.map((photoId, index) => (
         <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
           <CurrentPhoto
             key={photoId}
@@ -782,6 +787,7 @@ function PhotosField({ value, onChange }: PhotosFieldProps) {
                 prevPhotos.filter((current) => current !== photoId),
               );
             }}
+            onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
           />
         </Suspense>
       ))}
@@ -887,11 +893,21 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 interface CurrentPhotoProps {
   photoId: string;
   onRemove: () => void;
+  onViewPhoto?: () => void;
 }
 
-function CurrentPhoto({ photoId, onRemove }: CurrentPhotoProps) {
+function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
   const { url } = useMediaFile(photoId);
   const { open } = use(MediaGalleryContext);
+
+  function handleViewPhoto() {
+    if (onViewPhoto) {
+      onViewPhoto();
+    } else {
+      // Fall back to context-based gallery for routes that don't use route-based gallery
+      open({ items: [{ src: url }], index: 0 });
+    }
+  }
 
   return (
     <div className="relative flex-shrink-0">
@@ -899,7 +915,7 @@ function CurrentPhoto({ photoId, onRemove }: CurrentPhotoProps) {
         color="transparent"
         aria-label={t`View photo`}
         className="h-auto w-auto p-0"
-        onPress={() => open({ items: [{ src: url }], index: 0 })}
+        onPress={handleViewPhoto}
       >
         <img
           src={url}

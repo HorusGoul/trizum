@@ -6,7 +6,11 @@ import {
   type Expense,
 } from "#src/models/expense.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -27,13 +31,25 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { useLingui } from "@lingui/react";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Button } from "#src/ui/Button.tsx";
-import { Fragment, Suspense, use } from "react";
+import { Fragment, Suspense } from "react";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
-import { MediaGalleryContext } from "#src/components/MediaGalleryContext.tsx";
+import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
+import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+
+interface ExpenseSearchParams {
+  media?: number;
+}
 
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   component: ExpenseById,
   pendingComponent: PartyPendingComponent,
+
+  validateSearch: (search): ExpenseSearchParams => {
+    const media = search.media;
+    return {
+      media: typeof media === "number" ? media : undefined,
+    };
+  },
 
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
@@ -46,6 +62,18 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 function ExpenseById() {
   const { expenseId, partyId, expense, onDeleteExpense, isLoading } =
     useExpense();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { history } = useRouter();
+
+  const photos = expense?.photos ?? [];
+
+  const { galleryIndex, openGallery, closeGallery, onIndexChange } =
+    useRouteMediaGallery({
+      mediaIndex: search.media,
+      navigate: (options) => void navigate(options),
+      goBack: () => history.back(),
+    });
 
   if (expenseId === undefined) {
     return <span>Invalid Expense ID</span>;
@@ -60,64 +88,73 @@ function ExpenseById() {
   }
 
   return (
-    <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
-        <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-          {expense.name}
-        </h1>
-        <div className="flex-1" />
-        <MenuTrigger>
-          <IconButton
-            icon="#lucide/ellipsis-vertical"
-            aria-label={t`Menu`}
-            className="flex-shrink-0"
-          />
-          <Popover placement="bottom end">
-            <Menu>
-              <MenuItem
-                href={{
-                  to: "/party/$partyId/expense/$expenseId/edit",
-                  params: {
-                    expenseId,
-                    partyId,
-                  },
-                }}
-              >
-                <IconWithFallback
-                  name="#lucide/pencil"
-                  size={20}
-                  className="mr-3"
-                />
-                <span className="h-3.5 leading-none">
-                  <Trans>Edit</Trans>
-                </span>
-              </MenuItem>
-              <MenuItem onAction={() => void onDeleteExpense()}>
-                <IconWithFallback
-                  name="#lucide/trash"
-                  size={20}
-                  className="mr-3"
-                />
-                <span className="h-3.5 leading-none">
-                  <Trans>Delete</Trans>
-                </span>
-              </MenuItem>
-            </Menu>
-          </Popover>
-        </MenuTrigger>
+    <>
+      <div className="flex min-h-full flex-col">
+        <div className="container flex h-16 items-center px-2 mt-safe">
+          <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
+          <h1 className="max-h-12 truncate px-4 text-xl font-medium">
+            {expense.name}
+          </h1>
+          <div className="flex-1" />
+          <MenuTrigger>
+            <IconButton
+              icon="#lucide/ellipsis-vertical"
+              aria-label={t`Menu`}
+              className="flex-shrink-0"
+            />
+            <Popover placement="bottom end">
+              <Menu>
+                <MenuItem
+                  href={{
+                    to: "/party/$partyId/expense/$expenseId/edit",
+                    params: {
+                      expenseId,
+                      partyId,
+                    },
+                  }}
+                >
+                  <IconWithFallback
+                    name="#lucide/pencil"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Edit</Trans>
+                  </span>
+                </MenuItem>
+                <MenuItem onAction={() => void onDeleteExpense()}>
+                  <IconWithFallback
+                    name="#lucide/trash"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Delete</Trans>
+                  </span>
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </MenuTrigger>
+        </div>
+
+        <div className="container flex flex-col gap-4 px-4 pt-4">
+          <Amount amount={getExpenseTotalAmount(expense)} />
+          <PaidBy {...expense} />
+          <PaidAt {...expense} />
+          <Photos photos={expense.photos} onOpenGallery={openGallery} />
+          <Shares {...expense} />
+        </div>
+
+        <div className="h-16 flex-shrink-0" />
       </div>
 
-      <div className="container flex flex-col gap-4 px-4 pt-4">
-        <Amount amount={getExpenseTotalAmount(expense)} />
-        <PaidBy {...expense} />
-        <PaidAt {...expense} />
-        <Photos {...expense} />
-        <Shares {...expense} />
-      </div>
-
-      <div className="h-16 flex-shrink-0" />
-    </div>
+      <RouteMediaGallery
+        photoIds={photos}
+        galleryIndex={galleryIndex}
+        onIndexChange={onIndexChange}
+        onClose={closeGallery}
+      />
+    </>
   );
 }
 
@@ -134,7 +171,7 @@ function useExpense() {
   });
   const { removeExpense } = useCurrentParty();
 
-  const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;
@@ -231,7 +268,11 @@ function PaidAt({ paidAt }: Pick<Expense, "paidAt">) {
   );
 }
 
-function Photos({ photos = [] }: Partial<Pick<Expense, "photos">>) {
+interface PhotosProps extends Partial<Pick<Expense, "photos">> {
+  onOpenGallery: (index: number) => void;
+}
+
+function Photos({ photos = [], onOpenGallery }: PhotosProps) {
   const hasMultiple = photos.length > 1;
 
   if (photos.length === 0) {
@@ -250,9 +291,12 @@ function Photos({ photos = [] }: Partial<Pick<Expense, "photos">>) {
       </dt>
 
       <dd className="-mx-4 -my-4 flex gap-4 overflow-x-auto px-4 py-4">
-        {photos.map((photoId) => (
+        {photos.map((photoId, index) => (
           <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
-            <PhotoItemById photoId={photoId} />
+            <PhotoItemById
+              photoId={photoId}
+              onPress={() => onOpenGallery(index)}
+            />
           </Suspense>
         ))}
       </dd>
@@ -260,16 +304,20 @@ function Photos({ photos = [] }: Partial<Pick<Expense, "photos">>) {
   );
 }
 
-function PhotoItemById({ photoId }: { photoId: string }) {
+interface PhotoItemByIdProps {
+  photoId: string;
+  onPress: () => void;
+}
+
+function PhotoItemById({ photoId, onPress }: PhotoItemByIdProps) {
   const { url } = useMediaFile(photoId);
-  const { open } = use(MediaGalleryContext);
 
   return (
     <Button
       color="transparent"
       aria-label={t`View photo`}
       className="h-auto w-auto p-0"
-      onPress={() => open({ items: [{ src: url }], index: 0 })}
+      onPress={onPress}
     >
       <img
         src={url}

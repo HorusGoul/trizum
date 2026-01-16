@@ -1,7 +1,7 @@
 import { cn, type ClassName } from "#src/ui/utils.ts";
 import { use, useCallback, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { t } from "@lingui/macro";
@@ -15,13 +15,17 @@ export interface MediaGalleryProps {
   index: number;
   onChange: (index: number) => void;
   onClose: () => void;
+  onDragProgress?: (progress: number) => void;
 }
+
+const CLOSE_THRESHOLD = 150;
 
 export default function MediaGallery({
   items,
   index,
   onClose,
   onChange,
+  onDragProgress,
 }: MediaGalleryProps) {
   const dataSource = useAsyncMediaGalleryItems(items);
   const maxIndex = dataSource.length - 1;
@@ -57,14 +61,49 @@ export default function MediaGallery({
   const viewportRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Track if we're in a "closing drag" gesture (dragging up at scale=1)
+  const isClosingDragRef = useRef(false);
+
   useGesture(
     {
-      // Update x and y values based on drag gesture
+      onDragStart: () => {
+        // Determine if this is a closing drag (only when not zoomed)
+        const currentScale = scale.get();
+        isClosingDragRef.current = currentScale <= 1;
+      },
       onDrag: ({ offset: [offsetX, offsetY], pinching, cancel }) => {
         if (pinching) return cancel();
 
-        x.set(offsetX);
-        y.set(offsetY);
+        // If we're in closing drag mode, track the upward movement
+        if (isClosingDragRef.current) {
+          // Only allow vertical movement for closing gesture
+          y.set(offsetY);
+
+          // Calculate progress (0 to 1) based on vertical drag distance
+          // Use absolute value so both up and down trigger close
+          const progress = Math.max(
+            0,
+            Math.min(1, Math.abs(offsetY) / CLOSE_THRESHOLD),
+          );
+          onDragProgress?.(progress);
+        } else {
+          // Normal pan behavior when zoomed
+          x.set(offsetX);
+          y.set(offsetY);
+        }
+      },
+      onDragEnd: ({ offset: [, offsetY] }) => {
+        if (isClosingDragRef.current) {
+          // Check if we crossed the threshold (dragged far enough in either direction)
+          if (Math.abs(offsetY) >= CLOSE_THRESHOLD) {
+            onClose();
+          } else {
+            // Animate back to center with spring effect
+            void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
+            onDragProgress?.(0);
+          }
+        }
+        isClosingDragRef.current = false;
       },
       onPinch: ({ offset: [s] }) => {
         scale.set(s);
@@ -82,6 +121,12 @@ export default function MediaGallery({
         from: () => [x.get(), y.get()],
         rubberband: false,
         bounds: () => {
+          // Check scale directly - when at normal scale (not zoomed), allow free vertical drag
+          const currentScale = scale.get();
+          if (currentScale <= 1) {
+            return { left: 0, right: 0, top: -Infinity, bottom: Infinity };
+          }
+
           const viewport = viewportRef.current;
           const element = ref.current;
 
@@ -116,7 +161,8 @@ export default function MediaGallery({
     x.set(0);
     y.set(0);
     scale.set(1);
-  }, [index, x, y, scale]);
+    onDragProgress?.(0);
+  }, [index, x, y, scale, onDragProgress]);
 
   return (
     <div
