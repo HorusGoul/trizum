@@ -149,7 +149,7 @@ msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
-#: src/components/MediaGallery.tsx:182
+#: src/components/MediaGallery.tsx:185
 msgid "Close"
 msgstr "Cerrar"
 
@@ -540,7 +540,7 @@ msgstr "Nombre del nuevo participante"
 msgid "New trizum"
 msgstr "Nuevo trizum"
 
-#: src/components/MediaGallery.tsx:198
+#: src/components/MediaGallery.tsx:201
 msgid "Next"
 msgstr "Siguiente"
 
@@ -678,7 +678,7 @@ msgstr "Por favor, selecciona un archivo de imagen"
 msgid "Please wait while we fetch the latest data"
 msgstr "Por favor espera mientras obtenemos los datos más recientes"
 
-#: src/components/MediaGallery.tsx:191
+#: src/components/MediaGallery.tsx:194
 msgid "Previous"
 msgstr "Anterior"
 

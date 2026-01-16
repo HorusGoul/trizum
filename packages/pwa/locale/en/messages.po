@@ -173,7 +173,7 @@ msgstr "Check for updates"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
-#: src/components/MediaGallery.tsx:182
+#: src/components/MediaGallery.tsx:185
 msgid "Close"
 msgstr "Close"
 
@@ -596,7 +596,7 @@ msgstr "New participant name"
 msgid "New trizum"
 msgstr "New trizum"
 
-#: src/components/MediaGallery.tsx:198
+#: src/components/MediaGallery.tsx:201
 msgid "Next"
 msgstr "Next"
 
@@ -750,7 +750,7 @@ msgstr "Please select an image file"
 msgid "Please wait while we fetch the latest data"
 msgstr "Please wait while we fetch the latest data"
 
-#: src/components/MediaGallery.tsx:191
+#: src/components/MediaGallery.tsx:194
 msgid "Previous"
 msgstr "Previous"
 
