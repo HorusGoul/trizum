@@ -79,9 +79,12 @@ export default function MediaGallery({
           // Only allow vertical movement for closing gesture
           y.set(offsetY);
 
-          // Calculate progress (0 to 1) based on upward drag
-          // Negative offsetY means dragging up
-          const progress = Math.max(0, Math.min(1, -offsetY / CLOSE_THRESHOLD));
+          // Calculate progress (0 to 1) based on vertical drag distance
+          // Use absolute value so both up and down trigger close
+          const progress = Math.max(
+            0,
+            Math.min(1, Math.abs(offsetY) / CLOSE_THRESHOLD),
+          );
           onDragProgress?.(progress);
         } else {
           // Normal pan behavior when zoomed
@@ -91,8 +94,8 @@ export default function MediaGallery({
       },
       onDragEnd: ({ offset: [, offsetY] }) => {
         if (isClosingDragRef.current) {
-          // Check if we crossed the threshold (dragged up enough)
-          if (-offsetY >= CLOSE_THRESHOLD) {
+          // Check if we crossed the threshold (dragged far enough in either direction)
+          if (Math.abs(offsetY) >= CLOSE_THRESHOLD) {
             onClose();
           } else {
             // Snap back to center
