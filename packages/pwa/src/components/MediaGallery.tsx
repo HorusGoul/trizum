@@ -1,7 +1,7 @@
 import { cn, type ClassName } from "#src/ui/utils.ts";
 import { use, useCallback, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
-import { motion, useMotionValue } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { t } from "@lingui/macro";
@@ -98,8 +98,8 @@ export default function MediaGallery({
           if (Math.abs(offsetY) >= CLOSE_THRESHOLD) {
             onClose();
           } else {
-            // Snap back to center
-            y.set(0);
+            // Animate back to center with spring effect
+            void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
             onDragProgress?.(0);
           }
         }
