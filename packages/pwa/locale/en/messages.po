@@ -72,7 +72,7 @@ msgstr "Add participant"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Add your name so others know who you are and how to pay you"
 
-#: src/routes/party_.$partyId.add.tsx:41
+#: src/routes/party_.$partyId.add.tsx:73
 msgid "Adding expense..."
 msgstr "Adding expense..."
 
@@ -287,7 +287,7 @@ msgstr "Español"
 msgid "Exact"
 msgstr "Exact"
 
-#: src/routes/party_.$partyId.add.tsx:62
+#: src/routes/party_.$partyId.add.tsx:94
 msgid "Expense added"
 msgstr "Expense added"
 
@@ -307,7 +307,7 @@ msgstr "Expense updated"
 msgid "Expenses"
 msgstr "Expenses"
 
-#: src/routes/party_.$partyId.add.tsx:67
+#: src/routes/party_.$partyId.add.tsx:99
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
@@ -583,7 +583,7 @@ msgstr "Name must be less than 50 characters"
 msgid "Need help with trizum? We're here to assist you."
 msgstr "Need help with trizum? We're here to assist you."
 
-#: src/routes/party_.$partyId.add.tsx:82
+#: src/routes/party_.$partyId.add.tsx:115
 msgid "New expense"
 msgstr "New expense"
 

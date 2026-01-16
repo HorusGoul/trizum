@@ -68,7 +68,7 @@ msgstr "Añadir participante"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
-#: src/routes/party_.$partyId.add.tsx:41
+#: src/routes/party_.$partyId.add.tsx:73
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
 
@@ -247,7 +247,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Español"
 msgstr "Español"
 
-#: src/routes/party_.$partyId.add.tsx:62
+#: src/routes/party_.$partyId.add.tsx:94
 msgid "Expense added"
 msgstr "Gasto añadido"
 
@@ -263,7 +263,7 @@ msgstr "Gasto actualizado"
 msgid "Expenses"
 msgstr "Gastos"
 
-#: src/routes/party_.$partyId.add.tsx:67
+#: src/routes/party_.$partyId.add.tsx:99
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
@@ -527,7 +527,7 @@ msgstr "El nombre debe tener menos de 50 caracteres"
 msgid "Need help with trizum? We're here to assist you."
 msgstr "¿Necesitas ayuda con trizum? Estamos aquí para ayudarte."
 
-#: src/routes/party_.$partyId.add.tsx:82
+#: src/routes/party_.$partyId.add.tsx:115
 msgid "New expense"
 msgstr "Nuevo gasto"
 
