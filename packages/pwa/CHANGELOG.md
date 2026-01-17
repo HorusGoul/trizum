@@ -1,5 +1,12 @@
 # @trizum/pwa
 
+## 1.4.0
+
+### Minor Changes
+
+- fee737b: Add currency selector to create party form with support for all ISO 4217 currencies
+- 007f6bb: Allow usage of back button within Gallery, also add swipe up gesture to close the gallery
+
 ## 1.3.0
 
 ### Minor Changes
