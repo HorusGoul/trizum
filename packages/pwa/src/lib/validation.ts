@@ -1,5 +1,5 @@
+import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { t } from "@lingui/macro";
 
 export function validateDocumentId(id: string) {
   id = id.trim();

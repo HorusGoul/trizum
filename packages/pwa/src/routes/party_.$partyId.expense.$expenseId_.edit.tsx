@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import {
   ExpenseEditor,
   type ExpenseEditorFormValues,
@@ -22,7 +23,6 @@ import {
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import { type DocHandleChangePayload } from "@automerge/automerge-repo";
-import { t } from "@lingui/macro";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import {

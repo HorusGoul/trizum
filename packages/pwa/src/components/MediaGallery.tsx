@@ -1,10 +1,10 @@
+import { t } from "@lingui/core/macro";
 import { cn, type ClassName } from "#src/ui/utils.ts";
 import { use, useCallback, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
-import { t } from "@lingui/macro";
 
 export type MediaGalleryItem = {
   src: string;

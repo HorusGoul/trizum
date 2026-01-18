@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -15,7 +17,6 @@ import {
   validatePartyTitle,
 } from "#src/lib/validation.js";
 import { BackButton } from "#src/components/BackButton.js";
-import { t, Trans } from "@lingui/macro";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
 

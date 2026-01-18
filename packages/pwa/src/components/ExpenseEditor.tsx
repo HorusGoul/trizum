@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
@@ -10,7 +12,6 @@ import {
   useRef,
 } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
-import { t, Trans } from "@lingui/macro";
 import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
 import { AppNumberField, AppTextField } from "#src/ui/TextField.js";

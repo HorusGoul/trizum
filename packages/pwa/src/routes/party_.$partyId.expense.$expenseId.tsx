@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import {
   decodeExpenseId,
   findExpenseById,
@@ -25,7 +27,6 @@ import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
-import { t, Trans } from "@lingui/macro";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useLingui } from "@lingui/react";

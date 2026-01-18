@@ -1,8 +1,8 @@
+import { t } from "@lingui/core/macro";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { UpdateContext } from "./UpdateContext";
 import { useRef } from "react";
 import { toast } from "sonner";
-import { t } from "@lingui/macro";
 
 const UPDATE_TOAST_ID = "update-toast";
 

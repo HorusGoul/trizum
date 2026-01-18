@@ -38,8 +38,10 @@
     },
     "onlyBuiltDependencies": [
       "@sentry-internal/node-cpu-profiler",
+      "esbuild",
       "puppeteer",
-      "sharp"
+      "sharp",
+      "workerd"
     ]
   },
   "devDependencies": {

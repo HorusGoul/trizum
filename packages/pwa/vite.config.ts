@@ -1,7 +1,7 @@
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import { lingui } from "@lingui/vite-plugin";
@@ -46,14 +46,15 @@ export default defineConfig(({ mode }) => {
   return {
     build: {
       sourcemap: true,
+      minify: true,
     },
     plugins: [
       cloudflare(),
-      TanStackRouterVite(),
+      tanstackRouter(),
       react({
         babel: {
           plugins: [
-            "babel-plugin-macros",
+            "@lingui/babel-plugin-lingui-macro",
             ["babel-plugin-react-compiler", ReactCompilerConfig],
           ],
         },
@@ -148,6 +149,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
+      appendSourceMappingURLPlugin(),
       sentryVitePlugin({
         org: "horusdev",
         project: "trizum-pwa",
@@ -164,6 +166,33 @@ export default defineConfig(({ mode }) => {
     ],
   };
 });
+
+/**
+ * Plugin to append //# sourceMappingURL= comments at the end of every JS asset.
+ */
+function appendSourceMappingURLPlugin(): Plugin {
+  return {
+    name: "vite-plugin-append-source-mapping-url",
+    enforce: "post",
+    generateBundle(_, bundle) {
+      for (const [fileName, chunk] of Object.entries(bundle)) {
+        if (
+          fileName.endsWith(".js") &&
+          chunk.type === "chunk" &&
+          bundle[`${fileName}.map`]
+        ) {
+          const mapFileName = `${fileName.split("/").pop()}.map`;
+          const comment = `\n//# sourceMappingURL=${mapFileName}`;
+
+          // Only append if not already present
+          if (!chunk.code.includes("//# sourceMappingURL=")) {
+            chunk.code += comment;
+          }
+        }
+      }
+    },
+  };
+}
 
 interface PreloadIconsPluginOptions {
   matchers: RegExp[];
@@ -323,7 +352,7 @@ function excludeUnusedLucideIconsPlugin(): Plugin {
           `const dynamicIconImports = {\n${keptEntries.join(",\n")}\n};`,
         );
 
-        return newCode;
+        return { code: newCode, map: null };
       }
 
       return null;

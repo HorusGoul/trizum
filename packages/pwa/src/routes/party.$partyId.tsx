@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
@@ -6,7 +8,6 @@ import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon, IconWithFallback } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
-import { t, Trans } from "@lingui/macro";
 import {
   getExpenseTotalAmount,
   getImpactOnBalanceForUser,

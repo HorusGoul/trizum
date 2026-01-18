@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { Avatar } from "#src/ui/Avatar.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
@@ -5,7 +7,6 @@ import { Skeleton } from "#src/ui/Skeleton.js";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
 import { compressionPresets } from "#src/lib/imageCompression.js";
-import { t, Trans } from "@lingui/macro";
 import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
