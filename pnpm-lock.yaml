@@ -18,6 +18,9 @@ importers:
       '@changesets/cli':
         specifier: 2.29.8
         version: 2.29.8(@types/node@24.10.2)
+      '@sentry/cli':
+        specifier: 3.1.0
+        version: 3.1.0
       '@turbo/gen':
         specifier: 2.5.6
         version: 2.5.6(@swc/core@1.13.3(@swc/helpers@0.5.17))(@swc/wasm@1.13.3)(@types/node@24.10.2)(typescript@5.9.2)
@@ -103,7 +106,7 @@ importers:
         version: 7.2.0(@capacitor/core@7.4.4)
       '@trizum/pwa':
         specifier: workspace:*
-        version: link:../pwa
+        version: file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)
       capacitor-plugin-safe-area:
         specifier: 4.0.3
         version: 4.0.3(@capacitor/core@7.4.4)
@@ -3705,9 +3708,20 @@ packages:
     engines: {node: '>=10'}
     os: [darwin]
 
+  '@sentry/cli-darwin@3.1.0':
+    resolution: {integrity: sha512-xT1WlCHenGGO29Lq/wKaIthdqZzNzZhlPs7dXrzlBx9DyA2Jnl0g7WEau0oWi8GyJGVRXCJMiCydR//Tb5qVwA==}
+    engines: {node: '>=18'}
+    os: [darwin]
+
   '@sentry/cli-linux-arm64@2.58.2':
     resolution: {integrity: sha512-ay3OeObnbbPrt45cjeUyQjsx5ain1laj1tRszWj37NkKu55NZSp4QCg1gGBZ0gBGhckI9nInEsmKtix00alw2g==}
     engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux, freebsd, android]
+
+  '@sentry/cli-linux-arm64@3.1.0':
+    resolution: {integrity: sha512-Jm/iHLKiHxrZYlAq2tT07amiegEVCOAQT9Unilr6djjcZzS2tcI9ThSRQvjP9tFpFRKop+NyNGE3XHXf69r00g==}
+    engines: {node: '>=18'}
     cpu: [arm64]
     os: [linux, freebsd, android]
 
@@ -3717,9 +3731,21 @@ packages:
     cpu: [arm]
     os: [linux, freebsd, android]
 
+  '@sentry/cli-linux-arm@3.1.0':
+    resolution: {integrity: sha512-kbP3/8/Ct/Jbm569KDXbFIyMyPypIegObvIT7LdSsfdYSZdBd396GV7vUpSGKiLUVVN0xjn8OqQ48AVGfjmuMg==}
+    engines: {node: '>=18'}
+    cpu: [arm]
+    os: [linux, freebsd, android]
+
   '@sentry/cli-linux-i686@2.58.2':
     resolution: {integrity: sha512-CN9p0nfDFsAT1tTGBbzOUGkIllwS3hygOUyTK7LIm9z+UHw5uNgNVqdM/3Vg+02ymjkjISNB3/+mqEM5osGXdA==}
     engines: {node: '>=10'}
+    cpu: [x86, ia32]
+    os: [linux, freebsd, android]
+
+  '@sentry/cli-linux-i686@3.1.0':
+    resolution: {integrity: sha512-f/PK/EGK5vFOy7LC4Riwb+BEE20Nk7RbEFEMjvRq26DpETCrZYUGlbpIKvJFKOaUmr79aAkFCA/EjJiYfcQP2Q==}
+    engines: {node: '>=18'}
     cpu: [x86, ia32]
     os: [linux, freebsd, android]
 
@@ -3729,9 +3755,21 @@ packages:
     cpu: [x64]
     os: [linux, freebsd, android]
 
+  '@sentry/cli-linux-x64@3.1.0':
+    resolution: {integrity: sha512-T+v8x1ujhixZrOrH0sVhsW6uLwK4n0WS+B+5xV46WqUKe32cbYotursp2y53ROjgat8SQDGeP/VnC0Qa3Y2fEA==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [linux, freebsd, android]
+
   '@sentry/cli-win32-arm64@2.58.2':
     resolution: {integrity: sha512-+cl3x2HPVMpoSVGVM1IDWlAEREZrrVQj4xBb0TRKII7g3hUxRsAIcsrr7+tSkie++0FuH4go/b5fGAv51OEF3w==}
     engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@sentry/cli-win32-arm64@3.1.0':
+    resolution: {integrity: sha512-2DIPq6aW2DC34EDC9J0xwD+9BpFnKdFGdIcQUZMS+5pXlU6V7o8wpZxZAM8TdYNmsPkkQGKp7Dhl/arWpvNgrw==}
+    engines: {node: '>=18'}
     cpu: [arm64]
     os: [win32]
 
@@ -3741,15 +3779,32 @@ packages:
     cpu: [x86, ia32]
     os: [win32]
 
+  '@sentry/cli-win32-i686@3.1.0':
+    resolution: {integrity: sha512-2NuywEiiZn6xJ1yAV2xjv/nuHiy6kZU5XR3RSAIrPdEZD1nBoMsH/gB2FufQw58Ziz/7otFcX+vtGpJjbIT5mQ==}
+    engines: {node: '>=18'}
+    cpu: [x86, ia32]
+    os: [win32]
+
   '@sentry/cli-win32-x64@2.58.2':
     resolution: {integrity: sha512-2NAFs9UxVbRztQbgJSP5i8TB9eJQ7xraciwj/93djrSMHSEbJ0vC47TME0iifgvhlHMs5vqETOKJtfbbpQAQFA==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [win32]
 
+  '@sentry/cli-win32-x64@3.1.0':
+    resolution: {integrity: sha512-Ip405Yqdrr+l9TImsZOJz6c9Nb4zvXcmtOIBKLHc9cowpfXfmlqsHbDp7Xh4+k4L0uLr9i+8ilgQ6ypcuF4UCg==}
+    engines: {node: '>=18'}
+    cpu: [x64]
+    os: [win32]
+
   '@sentry/cli@2.58.2':
     resolution: {integrity: sha512-U4u62V4vaTWF+o40Mih8aOpQKqKUbZQt9A3LorIJwaE3tO3XFLRI70eWtW2se1Qmy0RZ74zB14nYcFNFl2t4Rw==}
     engines: {node: '>= 10'}
+    hasBin: true
+
+  '@sentry/cli@3.1.0':
+    resolution: {integrity: sha512-ngnx6E8XjXpg1uzma45INfKCS8yurb/fl3cZdXTCa2wmek8b4N6WIlmOlTKFTBrV54OauF6mloJxAlpuzoQR6g==}
+    engines: {node: '>= 18'}
     hasBin: true
 
   '@sentry/core@10.29.0':
@@ -4040,6 +4095,9 @@ packages:
       eslint: ^9.39.1
       prettier: ^3.6.2
       typescript: ^5.9.2
+
+  '@trizum/pwa@file:packages/pwa':
+    resolution: {directory: packages/pwa, type: directory}
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -8849,6 +8907,10 @@ packages:
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
+  undici@6.23.0:
+    resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
+    engines: {node: '>=18.17'}
+
   undici@7.14.0:
     resolution: {integrity: sha512-Vqs8HTzjpQXZeXdpsfChQTlafcMQaaIwnGwLam1wudSSjlJeQ3bw1j+TLPePgrCnCpUXx7Ba5Pdpf5OBih62NQ==}
     engines: {node: '>=20.18.1'}
@@ -13142,25 +13204,49 @@ snapshots:
   '@sentry/cli-darwin@2.58.2':
     optional: true
 
+  '@sentry/cli-darwin@3.1.0':
+    optional: true
+
   '@sentry/cli-linux-arm64@2.58.2':
+    optional: true
+
+  '@sentry/cli-linux-arm64@3.1.0':
     optional: true
 
   '@sentry/cli-linux-arm@2.58.2':
     optional: true
 
+  '@sentry/cli-linux-arm@3.1.0':
+    optional: true
+
   '@sentry/cli-linux-i686@2.58.2':
+    optional: true
+
+  '@sentry/cli-linux-i686@3.1.0':
     optional: true
 
   '@sentry/cli-linux-x64@2.58.2':
     optional: true
 
+  '@sentry/cli-linux-x64@3.1.0':
+    optional: true
+
   '@sentry/cli-win32-arm64@2.58.2':
+    optional: true
+
+  '@sentry/cli-win32-arm64@3.1.0':
     optional: true
 
   '@sentry/cli-win32-i686@2.58.2':
     optional: true
 
+  '@sentry/cli-win32-i686@3.1.0':
+    optional: true
+
   '@sentry/cli-win32-x64@2.58.2':
+    optional: true
+
+  '@sentry/cli-win32-x64@3.1.0':
     optional: true
 
   '@sentry/cli@2.58.2':
@@ -13182,6 +13268,22 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  '@sentry/cli@3.1.0':
+    dependencies:
+      progress: 2.0.3
+      proxy-from-env: 1.1.0
+      undici: 6.23.0
+      which: 2.0.2
+    optionalDependencies:
+      '@sentry/cli-darwin': 3.1.0
+      '@sentry/cli-linux-arm': 3.1.0
+      '@sentry/cli-linux-arm64': 3.1.0
+      '@sentry/cli-linux-i686': 3.1.0
+      '@sentry/cli-linux-x64': 3.1.0
+      '@sentry/cli-win32-arm64': 3.1.0
+      '@sentry/cli-win32-i686': 3.1.0
+      '@sentry/cli-win32-x64': 3.1.0
 
   '@sentry/core@10.29.0': {}
 
@@ -13556,6 +13658,61 @@ snapshots:
       - eslint-import-resolver-webpack
       - eslint-plugin-import-x
       - supports-color
+
+  '@trizum/pwa@file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)':
+    dependencies:
+      '@automerge/automerge': 3.2.1
+      '@automerge/automerge-repo': 2.5.1
+      '@automerge/automerge-repo-network-websocket': 2.5.1
+      '@automerge/automerge-repo-storage-indexeddb': 2.5.1
+      '@capacitor/app': 7.1.0(@capacitor/core@7.4.4)
+      '@capacitor/core': 7.4.4
+      '@capacitor/share': 7.0.3(@capacitor/core@7.4.4)
+      '@capacitor/splash-screen': 7.0.3(@capacitor/core@7.4.4)
+      '@capawesome/capacitor-app-update': 7.2.0(@capacitor/core@7.4.4)
+      '@fontsource-variable/fira-code': 5.2.7
+      '@fontsource-variable/inter': 5.2.8
+      '@horus.dev/tw-dynamic-themes': 0.0.3
+      '@internationalized/date': 3.10.0
+      '@lingui/core': 5.8.0(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)
+      '@lingui/react': 5.8.0(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)(react@0.0.0-experimental-d025ddd3-20240722)
+      '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
+      '@opentf/std': '@jsr/opentf__std@0.12.0'
+      '@sentry/react': 10.29.0(react@0.0.0-experimental-d025ddd3-20240722)
+      '@sentry/vite-plugin': 4.6.2
+      '@takker/md5': '@jsr/takker__md5@0.1.0'
+      '@tanstack/react-form': 1.27.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      '@tanstack/react-router': 1.151.6(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      '@tanstack/react-virtual': 3.13.18(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      '@use-gesture/react': 10.3.1(react@0.0.0-experimental-d025ddd3-20240722)
+      browser-image-compression: 2.0.2
+      capacitor-plugin-safe-area: 4.0.3(@capacitor/core@7.4.4)
+      clsx: 2.1.1
+      dinero.js: 1.9.1
+      exifr: 7.1.3
+      framer-motion: 11.18.2(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      hono: 4.10.6
+      lucide-react: 0.408.0(react@0.0.0-experimental-d025ddd3-20240722)
+      qr-code-styling: 1.9.2
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-aria-components: 1.11.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      react-dom: 0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722)
+      sonner: 2.0.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      suspense: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      tailwind-merge: 2.6.0
+      ulidx: 2.4.1
+      workbox-build: 7.4.0(@types/babel__core@7.20.5)
+      workbox-window: 7.4.0
+    transitivePeerDependencies:
+      - '@emotion/is-prop-valid'
+      - '@lingui/babel-plugin-lingui-macro'
+      - '@tanstack/react-start'
+      - '@types/babel__core'
+      - babel-plugin-macros
+      - bufferutil
+      - encoding
+      - supports-color
+      - utf-8-validate
 
   '@tsconfig/node10@1.0.11': {}
 
@@ -19109,6 +19266,8 @@ snapshots:
       quansync: 0.2.11
 
   undici-types@7.16.0: {}
+
+  undici@6.23.0: {}
 
   undici@7.14.0: {}
 
