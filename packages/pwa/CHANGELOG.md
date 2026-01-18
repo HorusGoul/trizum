@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.4.1
+
+### Patch Changes
+
+- f2302c0: Fix sourcemaps and improve bundle size
+
 ## 1.4.0
 
 ### Minor Changes
