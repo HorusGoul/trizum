@@ -8,7 +8,7 @@
     "#*": "./*"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "./build.sh",
     "cleanup": "rm -rf dist",
     "dev": "vite",
     "lingui:extract": "lingui extract src",

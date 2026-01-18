@@ -35,30 +35,6 @@ jobs:
         run: pnpm turbo run ${{ matrix.turbo }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      
-      - name: Upload source maps
-        if: matrix.turbo == 'build'
-        uses: matbour/setup-sentry-cli@v2
-        with:
-          token: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          project: trizum-pwa
-          organization: horusdev
-
-      - name: Upload source maps
-        if: matrix.turbo == 'build'
-        shell: bash
-        working-directory: packages/pwa
-        run: |
-          # Get full version
-          pwa_version=$(cat package.json | jq -r '.version')
-          last_commit=$(git rev-parse --short HEAD)
-          full_version="${pwa_version}-${last_commit}"
-          
-          # Prepare sourcemaps
-          sentry-cli sourcemaps inject ./dist/client
-
-          # Upload sourcemaps
-          sentry-cli sourcemaps upload --release $full_version ./dist/client
 
   release:
     name: Release

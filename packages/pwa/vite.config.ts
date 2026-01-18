@@ -151,8 +151,8 @@ export default defineConfig(({ mode }) => {
       }),
       appendSourceMappingURLPlugin(),
       sentryVitePlugin({
-        org: "horusdev",
-        project: "trizum-pwa",
+        org: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
         authToken: process.env.SENTRY_AUTH_TOKEN,
         release: {
           create: true,
