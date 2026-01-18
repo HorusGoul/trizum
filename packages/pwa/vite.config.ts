@@ -149,6 +149,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
+      appendSourceMappingURLPlugin(),
       sentryVitePlugin({
         org: "horusdev",
         project: "trizum-pwa",
@@ -162,7 +163,6 @@ export default defineConfig(({ mode }) => {
           inject: true,
         },
       }),
-      appendSourceMappingURLPlugin(),
     ],
   };
 });
