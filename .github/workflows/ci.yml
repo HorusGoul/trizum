@@ -46,7 +46,7 @@ jobs:
 
       - name: Upload source maps
         if: matrix.turbo == 'build'
-        shell: /bin/bash
+        shell: bash
         working-directory: packages/pwa
         run: |
           # Get full version
