@@ -1,8 +1,9 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";

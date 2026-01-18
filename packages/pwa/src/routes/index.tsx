@@ -1,3 +1,5 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import type { Party } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
@@ -12,7 +14,6 @@ import {
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { t, Trans } from "@lingui/macro";
 import {
   documentCache,
   useSuspenseDocument,

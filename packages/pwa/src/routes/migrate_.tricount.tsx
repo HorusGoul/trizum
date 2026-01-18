@@ -1,7 +1,8 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { AppTextField } from "#src/ui/TextField.tsx";
-import { t, Trans } from "@lingui/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId, useState } from "react";

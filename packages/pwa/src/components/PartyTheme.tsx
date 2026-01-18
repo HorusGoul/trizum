@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import type { Party } from "#src/models/party.ts";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
@@ -7,7 +8,6 @@ import {
 } from "@automerge/automerge-repo";
 import { useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { t } from "@lingui/macro";
 
 export function PartyTheme() {
   const partyId = useLocation({

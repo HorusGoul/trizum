@@ -1,5 +1,6 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { t, Trans } from "@lingui/macro";
 import { createFileRoute } from "@tanstack/react-router";
 
 async function fetchLicenses(): Promise<string> {

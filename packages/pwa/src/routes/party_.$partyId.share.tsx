@@ -1,9 +1,10 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { QRCode } from "#src/ui/QRCode.tsx";
-import { t, Trans } from "@lingui/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";

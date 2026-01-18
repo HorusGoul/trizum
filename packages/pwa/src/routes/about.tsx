@@ -1,6 +1,6 @@
+import { Trans } from "@lingui/react/macro";
 import { BackButton } from "#src/components/BackButton.js";
 import { IconWithFallback, type IconProps } from "#src/ui/Icon.js";
-import { Trans } from "@lingui/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/about")({

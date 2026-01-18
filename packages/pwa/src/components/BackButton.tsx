@@ -1,10 +1,10 @@
+import { t } from "@lingui/core/macro";
 import { IconButton } from "#src/ui/IconButton.js";
 import {
   useCanGoBack,
   useRouter,
   type ToOptions,
 } from "@tanstack/react-router";
-import { t } from "@lingui/macro";
 
 export function BackButton({
   fallbackOptions,
