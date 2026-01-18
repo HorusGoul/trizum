@@ -162,6 +162,9 @@ export default defineConfig(({ mode }) => {
           },
           inject: true,
         },
+        sourcemaps: {
+          disable: true,
+        },
       }),
     ],
   };
