@@ -1,52 +1,52 @@
 PODS:
-  - Capacitor (7.4.4):
+  - Capacitor (8.0.1):
     - CapacitorCordova
-  - CapacitorApp (7.1.0):
+  - CapacitorApp (8.0.0):
     - Capacitor
-  - CapacitorCordova (7.4.4)
-  - CapacitorPluginSafeArea (4.0.3):
+  - CapacitorCordova (8.0.1)
+  - CapacitorPluginSafeArea (5.0.0):
     - Capacitor
-  - CapacitorShare (7.0.3):
+  - CapacitorShare (8.0.0):
     - Capacitor
-  - CapacitorSplashScreen (7.0.3):
+  - CapacitorSplashScreen (8.0.0):
     - Capacitor
-  - CapawesomeCapacitorAppUpdate (7.2.0):
+  - CapawesomeCapacitorAppUpdate (8.0.1):
     - Capacitor
 
 DEPENDENCIES:
-  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios`)"
-  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@7.1.0_@capacitor+core@7.4.4/node_modules/@capacitor/app`)"
-  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios`)"
-  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@4.0.3_@capacitor+core@7.4.4/node_modules/capacitor-plugin-safe-area`)"
-  - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/share`)"
-  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/splash-screen`)"
-  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@7.2.0_@capacitor+core@7.4.4/node_modules/@capawesome/capacitor-app-update`)"
+  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@8.0.1_@capacitor+core@8.0.1/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/app`)"
+  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@8.0.1_@capacitor+core@8.0.1/node_modules/@capacitor/ios`)"
+  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.0.1/node_modules/capacitor-plugin-safe-area`)"
+  - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/share`)"
+  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/splash-screen`)"
+  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.1_@capacitor+core@8.0.1/node_modules/@capawesome/capacitor-app-update`)"
 
 EXTERNAL SOURCES:
   Capacitor:
-    :path: "../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios"
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.0.1_@capacitor+core@8.0.1/node_modules/@capacitor/ios"
   CapacitorApp:
-    :path: "../../../../node_modules/.pnpm/@capacitor+app@7.1.0_@capacitor+core@7.4.4/node_modules/@capacitor/app"
+    :path: "../../../../node_modules/.pnpm/@capacitor+app@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/app"
   CapacitorCordova:
-    :path: "../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios"
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.0.1_@capacitor+core@8.0.1/node_modules/@capacitor/ios"
   CapacitorPluginSafeArea:
-    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@4.0.3_@capacitor+core@7.4.4/node_modules/capacitor-plugin-safe-area"
+    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.0.1/node_modules/capacitor-plugin-safe-area"
   CapacitorShare:
-    :path: "../../../../node_modules/.pnpm/@capacitor+share@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/share"
+    :path: "../../../../node_modules/.pnpm/@capacitor+share@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/share"
   CapacitorSplashScreen:
-    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/splash-screen"
+    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/splash-screen"
   CapawesomeCapacitorAppUpdate:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@7.2.0_@capacitor+core@7.4.4/node_modules/@capawesome/capacitor-app-update"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.1_@capacitor+core@8.0.1/node_modules/@capawesome/capacitor-app-update"
 
 SPEC CHECKSUMS:
-  Capacitor: 358dd1c3fdd71d969547b17e159fd8a7736cb45f
-  CapacitorApp: 26587c2ce485d88ddb39adb21cac64f8e481afe3
-  CapacitorCordova: bf648a636f3c153f652d312ae145fb508b6ffced
-  CapacitorPluginSafeArea: 1abd81c6facac9eae0c6ae3cb0b3b53ccc135522
-  CapacitorShare: a4f4f86eabd4b3ff52ba6a11b754713c6926a8d1
-  CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
-  CapawesomeCapacitorAppUpdate: 9fb16b07faaa1c86468c794e39bfedb822a1a446
+  Capacitor: ff35b0f66370b84aa238251b35b91886a3207c16
+  CapacitorApp: 3963a84197280757b84f126afd1520a85ae3b092
+  CapacitorCordova: 0d65b9bb74e995dcecb9463f34f1af2aba6f955c
+  CapacitorPluginSafeArea: 9d0682951c011bf0b36e513a89103c5fbff7ac49
+  CapacitorShare: 12f1d192170cbcf9f108fd675ac8e343761a4638
+  CapacitorSplashScreen: 422880d7117605c30699eb4b21644b62db42e86c
+  CapawesomeCapacitorAppUpdate: b51cf29f28f664ef942feb12a76116d87eee62f0
 
-PODFILE CHECKSUM: fc8d643964abb326d4f796c73246bcbd4a91e565
+PODFILE CHECKSUM: 056ec261bc54f6ac6e378c27ef5567f13b345d0e
 
 COCOAPODS: 1.16.2
