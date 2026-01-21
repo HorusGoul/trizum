@@ -230,6 +230,78 @@ The app uses React Suspense extensively:
 - Client-side only architecture (no backend auth currently)
 - Be mindful of data stored in IndexedDB (accessible to user)
 
+## Agent Workflow Rules
+
+### Before Writing Any Code
+
+1. **Ask which branch to work from** - Default is `main`, but confirm with the user. They may want stacked PRs or work off a feature branch.
+2. **Create a new branch** - Never commit directly to main or any base branch.
+
+### Branch Naming
+
+Use the format `type/description`:
+
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `refactor/` - Code refactoring (no functional changes)
+- `docs/` - Documentation changes
+- `chore/` - Maintenance tasks
+- `test/` - Adding or updating tests
+
+Examples: `feature/add-dark-mode`, `fix/expense-calculation-bug`, `docs/update-readme`
+
+### Commits
+
+- Make **frequent small commits** for easier review and revert
+- Write clear, descriptive commit messages
+- Keep commits atomic (one logical change per commit)
+- **Before every commit**, run `pnpm lingui:extract` to ensure i18n strings are up to date
+
+### Before Opening a PR
+
+Run all checks and ensure they pass:
+
+```bash
+pnpm test        # All tests must pass
+pnpm lint        # No linting errors
+pnpm typecheck   # No type errors
+```
+
+If you added new user-facing strings, also run:
+
+```bash
+pnpm lingui:extract
+```
+
+### Opening a PR
+
+1. Push the branch to remote
+2. Create a PR using the existing PR template
+3. Fill out **all sections** of the template:
+   - Description: What and why
+   - Related Issues: Link any relevant issues
+   - Type of Change: Check the appropriate box
+   - Checklist: Verify all items
+   - Screenshots: Include if there are UI changes
+   - Additional Notes: Any context reviewers need
+
+### Changesets
+
+Always create a changeset for user-facing changes:
+
+```bash
+pnpm changeset
+```
+
+### Safety Rules
+
+**NEVER:**
+
+- Force push (`git push --force`)
+- Push directly to main
+- Delete branches without asking the user
+- Merge PRs - humans review and merge
+
 ## Pull Request Guidelines
 
 - Ensure all tests pass: `pnpm test`
