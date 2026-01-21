@@ -22,6 +22,13 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    // Fix Kotlin stdlib duplicate class conflicts
+    // Starting with Kotlin 1.8, jdk7/jdk8 classes are included in the main stdlib
+    configurations.all {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
 }
 
 task clean(type: Delete) {
