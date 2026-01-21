@@ -129,7 +129,7 @@ jobs:
   ios:
     name: Build iOS
     if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

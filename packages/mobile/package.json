@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
-    "@capacitor/cli": "7.4.4",
+    "@capacitor/cli": "8.0.1",
     "@capawesome/capver": "0.1.0",
     "@trizum/eslint-config": "workspace:*",
     "@trizum/prettier-config": "workspace:*",
@@ -56,13 +56,14 @@
   },
   "prettier": "@trizum/prettier-config",
   "dependencies": {
-    "@capacitor/android": "7.4.4",
-    "@capacitor/app": "7.1.0",
-    "@capacitor/ios": "7.4.4",
-    "@capacitor/share": "7.0.3",
-    "@capacitor/splash-screen": "7.0.3",
-    "@capawesome/capacitor-app-update": "7.2.0",
+    "@capacitor/android": "8.0.1",
+    "@capacitor/app": "8.0.0",
+    "@capacitor/core": "8.0.1",
+    "@capacitor/ios": "8.0.1",
+    "@capacitor/share": "8.0.0",
+    "@capacitor/splash-screen": "8.0.0",
+    "@capawesome/capacitor-app-update": "8.0.1",
     "@trizum/pwa": "workspace:*",
-    "capacitor-plugin-safe-area": "4.0.3"
+    "capacitor-plugin-safe-area": "5.0.0"
   }
 }

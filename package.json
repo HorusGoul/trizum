@@ -39,9 +39,14 @@
     },
     "onlyBuiltDependencies": [
       "@sentry-internal/node-cpu-profiler",
+      "@sentry/cli",
+      "@swc/core",
+      "cbor-extract",
+      "core-js-pure",
       "esbuild",
       "puppeteer",
       "sharp",
+      "unrs-resolver",
       "workerd"
     ]
   },
