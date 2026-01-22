@@ -39,6 +39,7 @@ const QRCodeFrameHandle = ({
  */
 export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
   const [state, setState] = useState<ScannerState>({ status: "initializing" });
+  const [retryCount, setRetryCount] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -161,7 +162,7 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
       cancelAnimationFrame(animationFrameId);
       stopCamera();
     };
-  }, [onResult]);
+  }, [onResult, retryCount]);
 
   if (state.status === "permission-denied") {
     return (
@@ -197,6 +198,7 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
           type="button"
           onClick={() => {
             setState({ status: "initializing" });
+            setRetryCount((c) => c + 1);
             toast.dismiss();
           }}
           className="rounded-lg bg-accent-500 px-4 py-2 text-white"
