@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
+import { Button } from "#src/ui/Button.js";
+import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
@@ -133,6 +135,17 @@ function Join() {
           )}
         </form.Field>
       </form>
+
+      <div className="container mt-6 px-4">
+        <Button
+          color="input-like"
+          onPress={() => void navigate({ to: "/join/scan" })}
+          className="gap-2"
+        >
+          <Icon name="#lucide/scan-qr-code" size={20} />
+          <Trans>Scan QR code</Trans>
+        </Button>
+      </div>
     </div>
   );
 }
