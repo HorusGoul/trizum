@@ -263,7 +263,7 @@ msgstr "Burundian Franc"
 msgid "Cambodian Riel"
 msgstr "Cambodian Riel"
 
-#: src/components/QRCodeScanner.tsx:170
+#: src/components/QRCodeScanner.tsx:82
 msgid "Camera permission was denied"
 msgstr "Camera permission was denied"
 
@@ -332,6 +332,7 @@ msgid "Choose the currency for expenses in this party"
 msgstr "Choose the currency for expenses in this party"
 
 #: src/components/MediaGallery.tsx:185
+#: src/components/RouteQRScanner.tsx:57
 msgid "Close"
 msgstr "Close"
 
@@ -499,7 +500,7 @@ msgstr "Enter a party link or code to join"
 msgid "Enter the key of the Tricount account you want to migrate from"
 msgstr "Enter the key of the Tricount account you want to migrate from"
 
-#: src/routes/join.tsx:123
+#: src/routes/join.tsx:167
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
 
@@ -559,7 +560,7 @@ msgstr "Expense updated"
 msgid "Expenses"
 msgstr "Expenses"
 
-#: src/components/QRCodeScanner.tsx:100
+#: src/components/QRCodeScanner.tsx:98
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
 
@@ -784,7 +785,7 @@ msgstr "Indian Rupee"
 msgid "Indonesian Rupiah"
 msgstr "Indonesian Rupiah"
 
-#: src/routes/join_.scan.tsx:37
+#: src/routes/join.tsx:54
 msgid "Invalid QR code. This doesn't appear to be a trizum party code."
 msgstr "Invalid QR code. This doesn't appear to be a trizum party code."
 
@@ -792,13 +793,13 @@ msgstr "Invalid QR code. This doesn't appear to be a trizum party code."
 msgid "Invalid tricount URL or key"
 msgstr "Invalid tricount URL or key"
 
-#: src/routes/join.tsx:33
-#: src/routes/join.tsx:50
+#: src/routes/join.tsx:76
+#: src/routes/join.tsx:93
 msgid "Invalid trizum party code"
 msgstr "Invalid trizum party code"
 
-#: src/routes/join.tsx:32
-#: src/routes/join.tsx:50
+#: src/routes/join.tsx:75
+#: src/routes/join.tsx:93
 msgid "Invalid trizum party link"
 msgstr "Invalid trizum party link"
 
@@ -836,7 +837,7 @@ msgstr "Join {0} on trizum!"
 msgid "Join a Party"
 msgstr "Join a Party"
 
-#: src/routes/join.tsx:82
+#: src/routes/join.tsx:126
 msgid "Join a trizum"
 msgstr "Join a trizum"
 
@@ -896,7 +897,7 @@ msgstr "Libyan Dinar"
 msgid "License"
 msgstr "License"
 
-#: src/routes/join.tsx:122
+#: src/routes/join.tsx:166
 msgid "Link or code"
 msgstr "Link or code"
 
@@ -1077,7 +1078,7 @@ msgstr "Nicaraguan Córdoba"
 msgid "Nigerian Naira"
 msgstr "Nigerian Naira"
 
-#: src/components/QRCodeScanner.tsx:92
+#: src/components/QRCodeScanner.tsx:90
 msgid "No camera found on this device"
 msgstr "No camera found on this device"
 
@@ -1284,7 +1285,7 @@ msgstr "Please select an image file"
 msgid "Please wait while we fetch the latest data"
 msgstr "Please wait while we fetch the latest data"
 
-#: src/components/QRCodeScanner.tsx:245
+#: src/components/QRCodeScanner.tsx:199
 msgid "Point your camera at a trizum QR code"
 msgstr "Point your camera at a trizum QR code"
 
@@ -1378,7 +1379,7 @@ msgid "Saudi Riyal"
 msgstr "Saudi Riyal"
 
 #: src/components/ExpenseEditor.tsx:257
-#: src/routes/join.tsx:93
+#: src/routes/join.tsx:137
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:149
 #: src/routes/party_.$partyId.settings.tsx:135
@@ -1387,8 +1388,8 @@ msgstr "Saudi Riyal"
 msgid "Save"
 msgstr "Save"
 
-#: src/routes/join_.scan.tsx:58
-#: src/routes/join.tsx:146
+#: src/components/RouteQRScanner.tsx:63
+#: src/routes/join.tsx:186
 msgid "Scan QR code"
 msgstr "Scan QR code"
 
@@ -1517,7 +1518,7 @@ msgid "Submit a Request"
 msgstr "Submit a Request"
 
 #: src/components/ExpenseEditor.tsx:257
-#: src/routes/join.tsx:93
+#: src/routes/join.tsx:137
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:149
 #: src/routes/party_.$partyId.settings.tsx:135
