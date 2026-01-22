@@ -18,7 +18,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
 import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
-import { Route as JoinScanRouteImport } from './routes/join_.scan'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
 import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
 import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
@@ -73,11 +72,6 @@ const MigrateTricountRoute = MigrateTricountRouteImport.update({
   path: '/migrate/tricount',
   getParentRoute: () => rootRouteImport,
 } as any)
-const JoinScanRoute = JoinScanRouteImport.update({
-  id: '/join_/scan',
-  path: '/join/scan',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutThirdPartyLicensesRoute = AboutThirdPartyLicensesRouteImport.update({
   id: '/about_/third-party-licenses',
   path: '/about/third-party-licenses',
@@ -130,7 +124,6 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
-  '/join/scan': typeof JoinScanRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
@@ -150,7 +143,6 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
-  '/join/scan': typeof JoinScanRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
@@ -171,7 +163,6 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
-  '/join_/scan': typeof JoinScanRoute
   '/migrate_/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
   '/party_/$partyId/add': typeof PartyPartyIdAddRoute
@@ -193,7 +184,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/support'
     | '/about/third-party-licenses'
-    | '/join/scan'
     | '/migrate/tricount'
     | '/party/$partyId'
     | '/party/$partyId/add'
@@ -213,7 +203,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/support'
     | '/about/third-party-licenses'
-    | '/join/scan'
     | '/migrate/tricount'
     | '/party/$partyId'
     | '/party/$partyId/add'
@@ -233,7 +222,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/support'
     | '/about_/third-party-licenses'
-    | '/join_/scan'
     | '/migrate_/tricount'
     | '/party/$partyId'
     | '/party_/$partyId/add'
@@ -254,7 +242,6 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
-  JoinScanRoute: typeof JoinScanRoute
   MigrateTricountRoute: typeof MigrateTricountRoute
   PartyPartyIdRoute: typeof PartyPartyIdRoute
   PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
@@ -331,13 +318,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MigrateTricountRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/join_/scan': {
-      id: '/join_/scan'
-      path: '/join/scan'
-      fullPath: '/join/scan'
-      preLoaderRoute: typeof JoinScanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about_/third-party-licenses': {
       id: '/about_/third-party-licenses'
       path: '/about/third-party-licenses'
@@ -406,7 +386,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,
-  JoinScanRoute: JoinScanRoute,
   MigrateTricountRoute: MigrateTricountRoute,
   PartyPartyIdRoute: PartyPartyIdRoute,
   PartyPartyIdAddRoute: PartyPartyIdAddRoute,

@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { BarcodeDetector } from "#src/lib/qr.js";
 import { cn } from "#src/ui/utils.js";
 
@@ -14,11 +13,7 @@ interface QRCodeScannerProps {
   onResult: (result: ScanResult) => void;
 }
 
-type ScannerState =
-  | { status: "initializing" }
-  | { status: "scanning" }
-  | { status: "error"; message: string }
-  | { status: "permission-denied" };
+type ScannerState = { status: "initializing" } | { status: "scanning" };
 
 const QRCodeFrameHandle = ({
   className,
@@ -39,7 +34,6 @@ const QRCodeFrameHandle = ({
  */
 export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
   const [state, setState] = useState<ScannerState>({ status: "initializing" });
-  const [retryCount, setRetryCount] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -83,21 +77,24 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
             err.name === "NotAllowedError" ||
             err.name === "PermissionDeniedError"
           ) {
-            setState({ status: "permission-denied" });
+            onResult({
+              type: "error",
+              message: t`Camera permission was denied`,
+            });
             return;
           }
 
           if (err.name === "NotFoundError") {
-            setState({
-              status: "error",
+            onResult({
+              type: "error",
               message: t`No camera found on this device`,
             });
             return;
           }
         }
 
-        setState({
-          status: "error",
+        onResult({
+          type: "error",
           message: t`Failed to access camera`,
         });
       }
@@ -162,52 +159,7 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
       cancelAnimationFrame(animationFrameId);
       stopCamera();
     };
-  }, [onResult, retryCount]);
-
-  if (state.status === "permission-denied") {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-        <p className="text-danger-600 dark:text-danger-400">
-          <Trans>Camera permission was denied</Trans>
-        </p>
-        <p className="text-sm text-accent-600 dark:text-accent-400">
-          <Trans>
-            Please allow camera access in your browser settings to scan QR
-            codes.
-          </Trans>
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            setState({ status: "initializing" });
-            window.location.reload();
-          }}
-          className="rounded-lg bg-accent-500 px-4 py-2 text-white"
-        >
-          <Trans>Try again</Trans>
-        </button>
-      </div>
-    );
-  }
-
-  if (state.status === "error") {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-        <p className="text-danger-600 dark:text-danger-400">{state.message}</p>
-        <button
-          type="button"
-          onClick={() => {
-            setState({ status: "initializing" });
-            setRetryCount((c) => c + 1);
-            toast.dismiss();
-          }}
-          className="rounded-lg bg-accent-500 px-4 py-2 text-white"
-        >
-          <Trans>Try again</Trans>
-        </button>
-      </div>
-    );
-  }
+  }, [onResult]);
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center bg-black">
