@@ -89,6 +89,10 @@ msgstr "Lek Albanés"
 msgid "Algerian Dinar"
 msgstr "Dinar Argelino"
 
+#: src/components/QRCodeScanner.tsx:218
+msgid "Align QR code here"
+msgstr ""
+
 #: src/components/ExpenseEditor.tsx:333
 msgid "Amount"
 msgstr "Cantidad"
@@ -247,7 +251,7 @@ msgstr "Franco Burundés"
 msgid "Cambodian Riel"
 msgstr "Riel Camboyano"
 
-#: src/components/QRCodeScanner.tsx:82
+#: src/components/QRCodeScanner.tsx:87
 msgid "Camera permission was denied"
 msgstr ""
 
@@ -516,7 +520,7 @@ msgstr "Gasto actualizado"
 msgid "Expenses"
 msgstr "Gastos"
 
-#: src/components/QRCodeScanner.tsx:98
+#: src/components/QRCodeScanner.tsx:103
 msgid "Failed to access camera"
 msgstr ""
 
@@ -1026,7 +1030,7 @@ msgstr "Córdoba Nicaragüense"
 msgid "Nigerian Naira"
 msgstr "Naira Nigeriano"
 
-#: src/components/QRCodeScanner.tsx:90
+#: src/components/QRCodeScanner.tsx:95
 msgid "No camera found on this device"
 msgstr ""
 
@@ -1221,7 +1225,7 @@ msgstr "Por favor, selecciona un archivo de imagen"
 msgid "Please wait while we fetch the latest data"
 msgstr "Por favor espera mientras obtenemos los datos más recientes"
 
-#: src/components/QRCodeScanner.tsx:199
+#: src/components/QRCodeScanner.tsx:243
 msgid "Point your camera at a trizum QR code"
 msgstr ""
 
