@@ -105,12 +105,22 @@ export class TrizumWorkerClient {
 
         if (message.type === "initialized") {
           // Worker is ready to receive messages, now send config
-          const workerConfig: WorkerConfig = { storageName, syncUrl, offlineOnly };
-          const initMessage: MainToWorkerMessage = { type: "init", config: workerConfig };
+          const workerConfig: WorkerConfig = {
+            storageName,
+            syncUrl,
+            offlineOnly,
+          };
+          const initMessage: MainToWorkerMessage = {
+            type: "init",
+            config: workerConfig,
+          };
           this._worker.postMessage(initMessage);
 
           // Send the MessageChannel port to the worker
-          const portMessage: MainToWorkerMessage = { type: "port", port: port2 };
+          const portMessage: MainToWorkerMessage = {
+            type: "port",
+            port: port2,
+          };
           this._worker.postMessage(portMessage, [port2]);
         } else if (message.type === "ready") {
           this._worker.removeEventListener("message", handleMessage);
