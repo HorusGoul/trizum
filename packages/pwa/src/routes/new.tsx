@@ -7,7 +7,7 @@ import {
   type PartyParticipant,
 } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/TextField.js";
+import { AppTextField, AppEmojiField } from "#src/ui/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
@@ -173,53 +173,54 @@ function New() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <form.Field
-          name="symbol"
-          validators={{
-            onChange: ({ value }) => validatePartySymbol(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Symbol`}
-              minLength={1}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
-            />
-          )}
-        </form.Field>
+        <div className="flex items-start gap-2">
+          <form.Field
+            name="name"
+            validators={{
+              onChange: ({ value }) => validatePartyTitle(value),
+            }}
+          >
+            {(field) => (
+              <AppTextField
+                label={t`Name`}
+                description={t`How do you want to call this party?`}
+                minLength={1}
+                maxLength={50}
+                name={field.name}
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                errorMessage={field.state.meta.errors?.join(", ")}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
+                }
+                className="flex-1"
+              />
+            )}
+          </form.Field>
 
-        <form.Field
-          name="name"
-          validators={{
-            onChange: ({ value }) => validatePartyTitle(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Title`}
-              description={t`How do you want to call this party?`}
-              minLength={1}
-              maxLength={50}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
-            />
-          )}
-        </form.Field>
+          <form.Field
+            name="symbol"
+            validators={{
+              onChange: ({ value }) => validatePartySymbol(value),
+            }}
+          >
+            {(field) => (
+              <AppEmojiField
+                label={t`Symbol`}
+                visuallyHideLabel
+                value={field.state.value}
+                onChange={field.handleChange}
+                errorMessage={field.state.meta.errors?.join(", ")}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
+                }
+              />
+            )}
+          </form.Field>
+        </div>
 
         <form.Field
           name="description"
