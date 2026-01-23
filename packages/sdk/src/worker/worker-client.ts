@@ -5,14 +5,15 @@
  * keeping the main thread responsive for UI interactions.
  */
 
-import { Repo, type NetworkAdapterInterface } from "@automerge/automerge-repo";
-import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 import type {
   MainToWorkerMessage,
   WorkerToMainMessage,
   WorkerConfig,
 } from "./types.js";
 import {
+  Repo,
+  type NetworkAdapterInterface,
+  MessageChannelNetworkAdapter,
   wrapHandle,
   fromAMDocumentId,
   toAMDocumentId,

@@ -12,6 +12,7 @@ import {
 } from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 import type {
   DocumentId as AMDocumentId,
   AnyDocumentId as AMAnyDocumentId,
@@ -22,6 +23,8 @@ import {
   deleteAt as amDeleteAt,
   insertAt as amInsertAt,
   RawString,
+  generateAutomergeUrl,
+  parseAutomergeUrl,
 } from "@automerge/automerge-repo/slim";
 import type { DocumentId, DocumentHandle } from "../types.js";
 
@@ -34,7 +37,6 @@ export type {
   AMAnyDocumentId,
   AMDoc,
   AMDocHandle,
-  Repo,
   NetworkAdapterInterface,
 };
 
@@ -44,10 +46,12 @@ export { INTERNAL_REPO_SYMBOL } from "./symbols.js";
 // Re-export AnyDocumentId for use with repo.find
 export type { AMAnyDocumentId as AutomergeAnyDocumentId };
 
-// Re-export internal functions
+// Re-export internal classes and functions
 export {
+  Repo,
   BrowserWebSocketClientAdapter,
   IndexedDBStorageAdapter,
+  MessageChannelNetworkAdapter,
   amIsValidDocumentId,
   amDeleteAt,
   amInsertAt,
@@ -130,9 +134,26 @@ export function wrapHandle<T>(handle: AMDocHandle<T>): DocumentHandle<T> {
 }
 
 /**
- * Array mutation helpers that work with Automerge documents.
+ * Array mutation helpers that work with documents.
  */
 export const arrayHelpers = {
   insertAt: amInsertAt,
   deleteAt: amDeleteAt,
 };
+
+/**
+ * Generate a valid document URL for testing purposes.
+ * Wrapper around internal URL generation.
+ */
+export function generateDocumentUrl(): string {
+  return generateAutomergeUrl();
+}
+
+/**
+ * Parse a document URL to extract the document ID.
+ * Wrapper around internal URL parsing.
+ */
+export function parseDocumentUrl(url: string): { documentId: string } {
+  // Cast to the branded type since we know it's valid from generateDocumentUrl
+  return parseAutomergeUrl(url as ReturnType<typeof generateAutomergeUrl>);
+}

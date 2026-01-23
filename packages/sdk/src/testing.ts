@@ -15,10 +15,7 @@
  * ```
  */
 
-import {
-  generateAutomergeUrl,
-  parseAutomergeUrl,
-} from "@automerge/automerge-repo/slim";
+import { generateDocumentUrl, parseDocumentUrl } from "./internal/automerge.js";
 import type { DocumentId } from "./types.js";
 
 /**
@@ -30,8 +27,8 @@ import type { DocumentId } from "./types.js";
  * @returns A valid DocumentId string
  */
 export function generateTestDocumentId(): DocumentId {
-  const url = generateAutomergeUrl();
-  return parseAutomergeUrl(url).documentId as unknown as DocumentId;
+  const url = generateDocumentUrl();
+  return parseDocumentUrl(url).documentId as unknown as DocumentId;
 }
 
 /**

@@ -17,10 +17,13 @@
  * ```
  */
 
-import { Repo, type NetworkAdapterInterface } from "@automerge/automerge-repo";
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
-import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
+import {
+  Repo,
+  type NetworkAdapterInterface,
+  BrowserWebSocketClientAdapter,
+  IndexedDBStorageAdapter,
+  MessageChannelNetworkAdapter,
+} from "../internal/automerge.js";
 import type {
   MainToWorkerMessage,
   WorkerToMainMessage,

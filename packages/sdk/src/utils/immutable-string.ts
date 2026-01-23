@@ -22,7 +22,7 @@
 
 // We use a factory pattern to hide the internal implementation from the public type system
 
-import { RawString } from "@automerge/automerge-repo/slim";
+import { RawString } from "../internal/automerge.js";
 
 /**
  * Interface for ImmutableString - defines the public API.
