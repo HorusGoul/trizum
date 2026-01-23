@@ -11,8 +11,11 @@ import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 
-// Worker global scope
-declare const self: DedicatedWorkerGlobalScope;
+// Worker global scope - define minimal interface to avoid tsconfig conflicts
+declare const self: {
+  onmessage: ((event: MessageEvent) => void) | null;
+  postMessage(message: unknown): void;
+};
 
 interface WorkerConfig {
   storageName: string;
