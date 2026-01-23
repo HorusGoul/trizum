@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { Suspense, use, useState } from "react";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
 import {
   Button as AriaButton,
   Dialog,
@@ -13,54 +14,104 @@ import {
   composeRenderProps,
 } from "react-aria-components";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import emojisData from "emojibase-data/en/compact.json";
-import groupsData from "emojibase-data/meta/groups.json";
 import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.ts";
+import type { SupportedLocale } from "#src/lib/i18n.js";
 
-type Emoji = (typeof emojisData)[0];
+interface Emoji {
+  hexcode: string;
+  unicode: string;
+  label?: string;
+  tags?: string[];
+  group?: number;
+}
 
-const GROUP_LABELS: Record<number, string> = {
-  0: "Smileys & Emotion",
-  1: "People & Body",
-  2: "Component",
-  3: "Animals & Nature",
-  4: "Food & Drink",
-  5: "Travel & Places",
-  6: "Activities",
-  7: "Objects",
-  8: "Symbols",
-  9: "Flags",
+interface EmojiMessages {
+  groups: Array<{ order: number; message: string }>;
+}
+
+interface EmojiData {
+  emojis: Emoji[];
+  groupLabels: Record<number, string>;
+  groupedEmojis: Record<number, Emoji[]>;
+  orderedGroups: number[];
+}
+
+// Explicit imports for each supported locale
+const emojiImports: Record<
+  SupportedLocale,
+  () => Promise<{ compact: Emoji[]; messages: EmojiMessages }>
+> = {
+  en: async () => {
+    const [compact, messages] = await Promise.all([
+      import("emojibase-data/en/compact.json"),
+      import("emojibase-data/en/messages.json"),
+    ]);
+    return { compact: compact.default, messages: messages.default };
+  },
+  es: async () => {
+    const [compact, messages] = await Promise.all([
+      import("emojibase-data/es/compact.json"),
+      import("emojibase-data/es/messages.json"),
+    ]);
+    return { compact: compact.default, messages: messages.default };
+  },
 };
 
-// Filter out regional indicators and component emojis (skin tones, hair styles)
-const emojis: Emoji[] = emojisData.filter(
-  (e) =>
-    typeof e.label === "string" &&
-    !e.label.startsWith("regional indicator") &&
-    e.group !== 2,
-);
+// Cache for loaded emoji data per locale
+const emojiDataCache: Partial<Record<SupportedLocale, Promise<EmojiData>>> = {};
 
-// Group emojis by category
-const groupedEmojis = emojis.reduce(
-  (acc, emoji) => {
-    const group = emoji.group ?? 0;
-    if (!acc[group]) {
-      acc[group] = [];
-    }
-    acc[group].push(emoji);
-    return acc;
-  },
-  {} as Record<number, Emoji[]>,
-);
+function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
+  const cached = emojiDataCache[locale];
+  if (cached) {
+    return cached;
+  }
 
-// Get ordered list of groups that have emojis
-const orderedGroups = Object.keys(groupsData.groups)
-  .map(Number)
-  .filter((g) => g !== 2 && groupedEmojis[g]?.length > 0)
-  .sort((a, b) => a - b);
+  const promise = (async () => {
+    const { compact: rawEmojis, messages } = await emojiImports[locale]();
+
+    // Build group labels from messages
+    const groupLabels: Record<number, string> = Object.fromEntries(
+      messages.groups.map((g) => [g.order, g.message]),
+    );
+
+    // Filter out emojis without a group and component emojis (group 2)
+    const emojis = rawEmojis.filter(
+      (e) => e.group !== undefined && e.group !== 2,
+    );
+
+    // Group emojis by category
+    const groupedEmojis = emojis.reduce(
+      (acc, emoji) => {
+        const group = emoji.group ?? 0;
+        if (!acc[group]) {
+          acc[group] = [];
+        }
+        acc[group].push(emoji);
+        return acc;
+      },
+      {} as Record<number, Emoji[]>,
+    );
+
+    // Get ordered list of groups that have emojis
+    const orderedGroups = messages.groups
+      .filter((g) => g.order !== 2 && groupedEmojis[g.order]?.length > 0)
+      .map((g) => g.order);
+
+    return { emojis, groupLabels, groupedEmojis, orderedGroups };
+  })();
+
+  emojiDataCache[locale] = promise;
+  return promise;
+}
+
+function useEmojiData(): EmojiData {
+  const { i18n } = useLingui();
+  const locale = (i18n.locale as SupportedLocale) || "en";
+  return use(loadEmojiData(locale));
+}
 
 const GRID_COLUMNS = 8;
 const CELL_SIZE = 36;
@@ -90,20 +141,6 @@ export function EmojiPicker({
 
   const selectedEmoji = value ?? internalValue;
 
-  const filteredEmojis = searchQuery
-    ? emojis.filter((emoji) => {
-        const query = searchQuery.toLowerCase();
-        const labelMatch = emoji.label?.toLowerCase().includes(query);
-        const tagsMatch =
-          Array.isArray(emoji.tags) &&
-          emoji.tags.some((tag) => tag.toLowerCase().includes(query));
-        return labelMatch || tagsMatch;
-      })
-    : null;
-
-  // When searching, show flat list; otherwise show by category
-  const isSearching = searchQuery.length > 0;
-
   function handleSelect(emoji: string) {
     if (value === undefined) {
       setInternalValue(emoji);
@@ -129,7 +166,7 @@ export function EmojiPicker({
       >
         {selectedEmoji}
       </AriaButton>
-      <Popover placement="bottom start" className="overflow-hidden p-0">
+      <Popover placement="bottom end" className="overflow-hidden p-0">
         <Dialog className="outline-none">
           <div className="flex flex-col" style={{ width: GRID_WIDTH }}>
             <SearchField
@@ -163,15 +200,59 @@ export function EmojiPicker({
                 )}
               </div>
             </SearchField>
-            {isSearching ? (
-              <EmojiGrid emojis={filteredEmojis!} onSelect={handleSelect} />
-            ) : (
-              <CategorizedEmojiGrid onSelect={handleSelect} />
-            )}
+            <Suspense fallback={<EmojiGridSkeleton />}>
+              <EmojiGridContent
+                searchQuery={searchQuery}
+                onSelect={handleSelect}
+              />
+            </Suspense>
           </div>
         </Dialog>
       </Popover>
     </DialogTrigger>
+  );
+}
+
+function EmojiGridSkeleton() {
+  return (
+    <div className="flex h-[280px] items-center justify-center">
+      <div className="size-6 animate-spin rounded-full border-2 border-accent-300 border-t-accent-600" />
+    </div>
+  );
+}
+
+interface EmojiGridContentProps {
+  searchQuery: string;
+  onSelect: (emoji: string) => void;
+}
+
+function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
+  const { emojis, groupLabels, groupedEmojis, orderedGroups } = useEmojiData();
+
+  const filteredEmojis = searchQuery
+    ? emojis.filter((emoji) => {
+        const query = searchQuery.toLowerCase();
+        const labelMatch = emoji.label?.toLowerCase().includes(query);
+        const tagsMatch =
+          Array.isArray(emoji.tags) &&
+          emoji.tags.some((tag) => tag.toLowerCase().includes(query));
+        return labelMatch || tagsMatch;
+      })
+    : null;
+
+  const isSearching = searchQuery.length > 0;
+
+  if (isSearching) {
+    return <EmojiGrid emojis={filteredEmojis!} onSelect={onSelect} />;
+  }
+
+  return (
+    <CategorizedEmojiGrid
+      groupLabels={groupLabels}
+      groupedEmojis={groupedEmojis}
+      orderedGroups={orderedGroups}
+      onSelect={onSelect}
+    />
   );
 }
 
@@ -260,25 +341,38 @@ type VirtualRow =
   | { type: "header"; group: number }
   | { type: "emojis"; emojis: Emoji[] };
 
-// Build virtual rows: headers + emoji rows for each category
-const virtualRows: VirtualRow[] = orderedGroups.flatMap((group) => {
-  const categoryEmojis = groupedEmojis[group] || [];
-  const emojiRows: VirtualRow[] = [];
-  for (let i = 0; i < categoryEmojis.length; i += GRID_COLUMNS) {
-    emojiRows.push({
-      type: "emojis",
-      emojis: categoryEmojis.slice(i, i + GRID_COLUMNS),
-    });
-  }
-  return [{ type: "header", group } as VirtualRow, ...emojiRows];
-});
+function buildVirtualRows(
+  orderedGroups: number[],
+  groupedEmojis: Record<number, Emoji[]>,
+): VirtualRow[] {
+  return orderedGroups.flatMap((group) => {
+    const categoryEmojis = groupedEmojis[group] || [];
+    const emojiRows: VirtualRow[] = [];
+    for (let i = 0; i < categoryEmojis.length; i += GRID_COLUMNS) {
+      emojiRows.push({
+        type: "emojis",
+        emojis: categoryEmojis.slice(i, i + GRID_COLUMNS),
+      });
+    }
+    return [{ type: "header", group } as VirtualRow, ...emojiRows];
+  });
+}
 
 interface CategorizedEmojiGridProps {
+  groupLabels: Record<number, string>;
+  groupedEmojis: Record<number, Emoji[]>;
+  orderedGroups: number[];
   onSelect: (emoji: string) => void;
 }
 
-function CategorizedEmojiGrid({ onSelect }: CategorizedEmojiGridProps) {
+function CategorizedEmojiGrid({
+  groupLabels,
+  groupedEmojis,
+  orderedGroups,
+  onSelect,
+}: CategorizedEmojiGridProps) {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
+  const virtualRows = buildVirtualRows(orderedGroups, groupedEmojis);
 
   const virtualizer = useVirtualizer({
     count: virtualRows.length,
@@ -314,7 +408,7 @@ function CategorizedEmojiGrid({ onSelect }: CategorizedEmojiGridProps) {
                 height: HEADER_HEIGHT,
               }}
             >
-              {GROUP_LABELS[row.group]}
+              {groupLabels[row.group]}
             </div>
           );
         })}
