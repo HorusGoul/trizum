@@ -193,9 +193,9 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
         </div>
       </div>
 
-      {/* Instructions */}
-      <div className="absolute bottom-8 left-0 right-0 text-center">
-        <p className="text-sm text-white/80">
+      {/* Instructions with gradient background */}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pb-safe">
+        <p className="pb-8 pt-12 text-center text-sm text-white">
           <Trans>Point your camera at a trizum QR code</Trans>
         </p>
       </div>

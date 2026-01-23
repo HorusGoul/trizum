@@ -51,17 +51,20 @@ export function RouteQRScanner({
     >
       <Modal className="h-full w-full">
         <div className="flex h-full flex-col">
-          <div className="container absolute z-10 flex h-16 items-center px-2 mt-safe">
-            <IconButton
-              icon="#lucide/x"
-              aria-label={t`Close`}
-              className="flex-shrink-0 text-white"
-              onPress={onClose}
-            />
+          {/* Gradient overlay for header visibility */}
+          <div className="absolute inset-x-0 top-0 z-10 h-32 bg-gradient-to-b from-black/70 to-transparent pt-safe">
+            <div className="container flex h-16 items-center px-2">
+              <IconButton
+                icon="#lucide/x"
+                aria-label={t`Close`}
+                className="flex-shrink-0 text-white"
+                onPress={onClose}
+              />
 
-            <h1 className="max-h-12 truncate px-4 text-xl font-medium text-white drop-shadow-md">
-              <Trans>Scan QR code</Trans>
-            </h1>
+              <h1 className="max-h-12 truncate px-4 text-xl font-medium text-white">
+                <Trans>Scan QR code</Trans>
+              </h1>
+            </div>
           </div>
 
           <QRCodeScanner onResult={handleResult} />

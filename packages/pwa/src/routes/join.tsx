@@ -1,12 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
+import { CardButton } from "#src/components/CardButton.js";
 import { parseQRCodeForPartyId } from "#src/lib/qr.js";
 import { RouteQRScanner } from "#src/components/RouteQRScanner.js";
 import { useRouteQRScanner } from "#src/components/useRouteQRScanner.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
-import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useForm } from "@tanstack/react-form";
@@ -15,7 +15,7 @@ import {
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
-import { Suspense, useId } from "react";
+import { useId } from "react";
 import { toast } from "sonner";
 
 interface JoinSearchParams {
@@ -125,35 +125,44 @@ function Join() {
           <h1 className="max-h-12 truncate px-4 text-xl font-medium">
             <Trans>Join a trizum</Trans>
           </h1>
-          <div className="flex-1" />
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
-            {([canSubmit, isSubmitting]) =>
-              canSubmit ? (
-                <Suspense fallback={null}>
-                  <IconButton
-                    icon="#lucide/check"
-                    aria-label={isSubmitting ? t`Submitting...` : t`Save`}
-                    type="submit"
-                    form={formId}
-                    isDisabled={isSubmitting}
-                  />
-                </Suspense>
-              ) : null
-            }
-          </form.Subscribe>
         </div>
 
-        <div className="h-2" />
+        {/* Primary action: Scan QR code */}
+        <div className="container mt-4 px-4">
+          <CardButton onPress={openScanner}>
+            <Icon
+              name="#lucide/scan-qr-code"
+              size={24}
+              className="text-accent-600 dark:text-accent-400"
+            />
+            <div className="flex flex-1 flex-col">
+              <span className="text-lg font-semibold text-accent-950 dark:text-accent-50">
+                <Trans>Scan QR code</Trans>
+              </span>
+              <span className="text-sm text-accent-600 dark:text-accent-400">
+                <Trans>Use your camera to scan a trizum invite</Trans>
+              </span>
+            </div>
+          </CardButton>
+        </div>
 
+        {/* Divider */}
+        <div className="container mt-6 flex items-center gap-4 px-4">
+          <div className="h-px flex-1 bg-accent-200 dark:bg-accent-800" />
+          <span className="text-sm text-accent-500">
+            <Trans>or enter code</Trans>
+          </span>
+          <div className="h-px flex-1 bg-accent-200 dark:bg-accent-800" />
+        </div>
+
+        {/* Secondary action: Manual entry */}
         <form
           id={formId}
           onSubmit={(e) => {
             e.preventDefault();
             void form.handleSubmit();
           }}
-          className="container mt-4 flex flex-col gap-6 px-4"
+          className="container mt-6 flex flex-col gap-4 px-4"
         >
           <form.Field
             name="id"
@@ -178,14 +187,22 @@ function Join() {
               />
             )}
           </form.Field>
-        </form>
 
-        <div className="container mt-6 px-4">
-          <Button color="input-like" onPress={openScanner} className="gap-2">
-            <Icon name="#lucide/scan-qr-code" size={20} />
-            <Trans>Scan QR code</Trans>
-          </Button>
-        </div>
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting]}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                color="accent"
+                type="submit"
+                isDisabled={!canSubmit || isSubmitting}
+                className="gap-2"
+              >
+                <Trans>Join</Trans>
+              </Button>
+            )}
+          </form.Subscribe>
+        </form>
       </div>
 
       <RouteQRScanner
