@@ -203,7 +203,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
       cancelAnimationFrame(animationFrameId);
       stopCamera();
     };
-  }, [onResult]);
+  }, [onResult, validate]);
 
   return (
     <motion.div
