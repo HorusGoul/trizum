@@ -163,18 +163,6 @@ importers:
 
   packages/pwa:
     dependencies:
-      '@automerge/automerge':
-        specifier: 3.2.1
-        version: 3.2.1
-      '@automerge/automerge-repo':
-        specifier: 2.5.1
-        version: 2.5.1
-      '@automerge/automerge-repo-network-websocket':
-        specifier: 2.5.1
-        version: 2.5.1
-      '@automerge/automerge-repo-storage-indexeddb':
-        specifier: 2.5.1
-        version: 2.5.1
       '@capacitor/app':
         specifier: 8.0.0
         version: 8.0.0(@capacitor/core@8.0.1)
@@ -435,6 +423,9 @@ importers:
       '@automerge/automerge-repo':
         specifier: 2.5.1
         version: 2.5.1
+      '@automerge/automerge-repo-network-messagechannel':
+        specifier: 2.5.1
+        version: 2.5.1
       '@automerge/automerge-repo-network-websocket':
         specifier: 2.5.1
         version: 2.5.1
@@ -448,9 +439,6 @@ importers:
         specifier: 0.1.0
         version: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
     devDependencies:
-      '@automerge/automerge-repo-network-messagechannel':
-        specifier: 2.5.1
-        version: 2.5.1
       '@trizum/eslint-config':
         specifier: workspace:*
         version: file:packages/eslint-config(@typescript-eslint/eslint-plugin@8.46.3(@typescript-eslint/parser@8.46.3(eslint@9.39.1(jiti@2.6.0))(typescript@5.9.2))(eslint@9.39.1(jiti@2.6.0))(typescript@5.9.2))(@typescript-eslint/parser@8.46.3(eslint@9.39.1(jiti@2.6.0))(typescript@5.9.2))(eslint@9.39.1(jiti@2.6.0))(prettier@3.6.2)(typescript@5.9.2)
@@ -13750,10 +13738,6 @@ snapshots:
 
   '@trizum/pwa@file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)':
     dependencies:
-      '@automerge/automerge': 3.2.1
-      '@automerge/automerge-repo': 2.5.1
-      '@automerge/automerge-repo-network-websocket': 2.5.1
-      '@automerge/automerge-repo-storage-indexeddb': 2.5.1
       '@capacitor/app': 8.0.0(@capacitor/core@8.0.1)
       '@capacitor/core': 8.0.1
       '@capacitor/share': 8.0.0(@capacitor/core@8.0.1)
@@ -13810,6 +13794,7 @@ snapshots:
     dependencies:
       '@automerge/automerge': 3.2.1
       '@automerge/automerge-repo': 2.5.1
+      '@automerge/automerge-repo-network-messagechannel': 2.5.1
       '@automerge/automerge-repo-network-websocket': 2.5.1
       '@automerge/automerge-repo-storage-indexeddb': 2.5.1
       react: 0.0.0-experimental-d025ddd3-20240722

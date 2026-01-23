@@ -6,14 +6,13 @@
  */
 
 import { useSyncExternalStore } from "react";
-import { useRepo } from "./TrizumProvider.js";
+import { useInternalRepo } from "../internal/repo-context.js";
 import {
   documentCache,
   handleCache,
   multipleDocumentCache,
-  type AnyDocumentId,
 } from "../cache/document-cache.js";
-import type { DocumentHandle } from "../types.js";
+import type { DocumentHandle, AnyDocumentId } from "../types.js";
 import type { AMDocHandle } from "../internal/automerge.js";
 import { wrapHandle } from "../internal/automerge.js";
 
@@ -37,7 +36,7 @@ export interface UseSuspenseDocumentOptions {
 export function useSuspenseHandle<T>(
   id: AnyDocumentId,
 ): DocumentHandle<T> | undefined {
-  const repo = useRepo();
+  const repo = useInternalRepo();
   const handle = handleCache.read(repo, id) as AMDocHandle<T> | undefined;
 
   if (!handle) {
@@ -74,7 +73,7 @@ export function useSuspenseDocument<T>(
   id: AnyDocumentId,
   options?: UseSuspenseDocumentOptions,
 ): [T | undefined, DocumentHandle<T> | undefined] {
-  const repo = useRepo();
+  const repo = useInternalRepo();
   const handle = useSuspenseHandle<T>(id);
 
   // Suspense cache read to ensure the document is loaded
@@ -121,7 +120,7 @@ export function useMultipleSuspenseDocuments<T>(
   ids: AnyDocumentId[],
   options?: UseSuspenseDocumentOptions,
 ): { doc: T | undefined; handle: DocumentHandle<T> }[] {
-  const repo = useRepo();
+  const repo = useInternalRepo();
 
   multipleDocumentCache.read(repo, ids);
 

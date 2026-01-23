@@ -1,7 +1,7 @@
 /**
- * SDK-specific types that abstract away Automerge internals.
+ * SDK-specific types that provide a clean public API.
  *
- * These types provide a clean public API without exposing Automerge details.
+ * These types abstract away internal implementation details.
  */
 
 /**
@@ -9,6 +9,12 @@
  * This is an opaque string type that should not be manipulated directly.
  */
 export type DocumentId = string & { readonly __brand: "DocumentId" };
+
+/**
+ * Type for document IDs that can be passed to hooks and cache functions.
+ * Accepts both strongly-typed DocumentId and plain strings for flexibility.
+ */
+export type AnyDocumentId = DocumentId | string;
 
 // Import the internal validator
 import { isValidDocumentId as internalIsValidDocumentId } from "./internal/automerge.js";
@@ -25,7 +31,7 @@ export function isValidDocumentId(id: string): id is DocumentId {
 
 /**
  * A handle to a document that allows reading and modifying it.
- * This is an opaque type that wraps the underlying Automerge handle.
+ * This is an opaque type that wraps the underlying document handle.
  */
 export interface DocumentHandle<T> {
   /** The unique identifier of this document */
@@ -247,7 +253,7 @@ export type CurrencyCode =
 
 /**
  * Event payload types for document handle events.
- * These abstract the underlying Automerge event types.
+ * These abstract the underlying document event types.
  */
 
 /**

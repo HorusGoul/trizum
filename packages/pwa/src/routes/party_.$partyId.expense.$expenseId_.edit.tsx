@@ -217,7 +217,7 @@ function RouteComponent() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const participant = useCurrentParticipant();
+  useCurrentParticipant();
 
   const { updateExpense } = useCurrentParty();
 
@@ -227,7 +227,7 @@ function useExpense() {
     required: true,
   });
 
-  const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const [expense] = findExpenseById(chunk.expenses, expenseId);
 
   function onUpdateExpense(expense: Expense) {
     void updateExpense(expense);

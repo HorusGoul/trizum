@@ -2,7 +2,7 @@
  * Retry utilities with exponential backoff.
  *
  * These utilities are used internally by the SDK to handle transient failures
- * when loading documents from the Automerge repository.
+ * when loading documents from the document repository.
  */
 
 export interface RetryOptions {

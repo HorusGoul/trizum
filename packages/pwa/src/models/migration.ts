@@ -1,4 +1,4 @@
-import { type TrizumClient } from "@trizum/sdk";
+import { type ITrizumClient } from "@trizum/sdk";
 import type { Expense } from "./expense";
 import type { Party } from "./party";
 import { getPartyHelpers } from "#src/hooks/useParty.ts";
@@ -17,7 +17,7 @@ export interface MigrationData {
 }
 
 interface CreatePartyFromMigrationDataParams {
-  client: TrizumClient;
+  client: ITrizumClient;
   data: MigrationData;
   importAttachments?: boolean;
   onProgress?: ({ name, progress }: { name: string; progress: number }) => void;

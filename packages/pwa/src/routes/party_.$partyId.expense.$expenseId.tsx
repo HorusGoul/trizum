@@ -7,7 +7,7 @@ import {
   getExpenseUnitShares,
   type Expense,
 } from "#src/models/expense.js";
-import { isValidDocumentId } from "@trizum/sdk";
+import { isValidDocumentId, useSuspenseDocument, cache } from "@trizum/sdk";
 import {
   createFileRoute,
   useNavigate,
@@ -18,7 +18,6 @@ import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon, IconWithFallback } from "#src/ui/Icon.js";
-import { useSuspenseDocument, cache } from "@trizum/sdk";
 import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";

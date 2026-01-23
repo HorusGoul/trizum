@@ -1,8 +1,5 @@
 import type { Party, PartyExpenseChunkBalances } from "#src/models/party.ts";
-import {
-  useMultipleSuspenseDocument,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.ts";
+import { useMultipleSuspenseDocuments, useSuspenseDocument } from "@trizum/sdk";
 import {
   calculateBalancesByParticipant,
   mergeBalancesByParticipant,
@@ -14,7 +11,7 @@ export function usePartyBalances(partyId: Party["id"]): BalancesByParticipant {
     required: true,
   });
 
-  const results = useMultipleSuspenseDocument<PartyExpenseChunkBalances>(
+  const results = useMultipleSuspenseDocuments<PartyExpenseChunkBalances>(
     party.chunkRefs.map((chunkRef) => chunkRef.balancesId),
     {
       required: true,

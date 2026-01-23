@@ -5,25 +5,24 @@
  */
 
 import { createContext, use, type ReactNode } from "react";
-import type { TrizumClient } from "../client.js";
-import { type Repo, INTERNAL_REPO_SYMBOL } from "../internal/automerge.js";
+import type { ITrizumClient } from "../client.js";
+import { InternalTrizumContext } from "../internal/repo-context.js";
 
+/**
+ * Internal context value type for public client access.
+ */
 interface TrizumContextValue {
-  client: TrizumClient;
+  client: ITrizumClient;
 }
 
 const TrizumContext = createContext<TrizumContextValue | null>(null);
 
-/**
- * @internal
- * Internal Repo context for backwards compatibility during migration.
- * This is not part of the public API and should not be used directly.
- */
-export const RepoContext = createContext<Repo | null>(null);
-
 export interface TrizumProviderProps {
   children: ReactNode;
-  client: TrizumClient;
+  /**
+   * The Trizum client instance (TrizumClient or TrizumWorkerClient).
+   */
+  client: ITrizumClient;
 }
 
 /**
@@ -43,11 +42,15 @@ export interface TrizumProviderProps {
  * ```
  */
 export function TrizumProvider({ children, client }: TrizumProviderProps) {
-  const value: TrizumContextValue = {
-    client,
-  };
+  const publicValue: TrizumContextValue = { client };
+  // Internal context uses unknown cast to avoid exposing internal types
+  const internalValue = { client: client as unknown };
 
-  return <TrizumContext value={value}>{children}</TrizumContext>;
+  return (
+    <InternalTrizumContext value={internalValue as never}>
+      <TrizumContext value={publicValue}>{children}</TrizumContext>
+    </InternalTrizumContext>
+  );
 }
 
 /**
@@ -55,7 +58,7 @@ export function TrizumProvider({ children, client }: TrizumProviderProps) {
  *
  * @throws Error if used outside of a TrizumProvider
  */
-export function useTrizumClient(): TrizumClient {
+export function useTrizumClient(): ITrizumClient {
   const context = use(TrizumContext);
 
   if (!context) {
@@ -64,29 +67,3 @@ export function useTrizumClient(): TrizumClient {
 
   return context.client;
 }
-
-/**
- * @internal
- * Hook to access the internal repository.
- * This is for internal SDK use and backwards compatibility only.
- */
-export function useRepo(): Repo {
-  // Try TrizumContext first (full SDK pattern)
-  const trizumContext = use(TrizumContext);
-  if (trizumContext) {
-    return trizumContext.client[INTERNAL_REPO_SYMBOL];
-  }
-
-  // Fall back to standalone RepoContext (backwards compatibility)
-  const repoContext = use(RepoContext);
-  if (repoContext) {
-    return repoContext;
-  }
-
-  throw new Error(
-    "useRepo must be used within a TrizumProvider or RepoContext",
-  );
-}
-
-// Re-export for internal use
-export { TrizumContext };

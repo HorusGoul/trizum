@@ -1,8 +1,8 @@
 /**
- * Web Worker entry point for running Automerge Repo in a background thread.
+ * Web Worker entry point for running document repository in a background thread.
  *
  * This worker receives a MessageChannel port from the main thread and uses it
- * to communicate document changes bidirectionally. The heavy Automerge operations
+ * to communicate document changes bidirectionally. The heavy document operations
  * run in this worker thread, keeping the main thread responsive.
  *
  * Usage (from main thread):

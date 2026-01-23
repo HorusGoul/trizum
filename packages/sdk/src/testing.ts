@@ -2,7 +2,7 @@
  * Test utilities for the Trizum SDK.
  *
  * These utilities help generate valid document IDs and other test data
- * without exposing Automerge internals.
+ * for testing purposes.
  *
  * @example
  * ```ts

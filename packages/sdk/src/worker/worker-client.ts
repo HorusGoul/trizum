@@ -1,7 +1,7 @@
 /**
- * TrizumWorkerClient - A client that runs Automerge Repo in a Web Worker.
+ * TrizumWorkerClient - A client that runs the document repository in a Web Worker.
  *
- * This client offloads all heavy Automerge operations to a background thread,
+ * This client offloads all heavy document operations to a background thread,
  * keeping the main thread responsive for UI interactions.
  */
 
@@ -17,8 +17,8 @@ import {
   fromAMDocumentId,
   toAMDocumentId,
   isValidDocumentId,
-  INTERNAL_REPO_SYMBOL,
 } from "../internal/automerge.js";
+import { INTERNAL_REPO_SYMBOL } from "../internal/symbols.js";
 import type { DocumentId, DocumentHandle } from "../types.js";
 import type {
   DocumentModel,
@@ -41,7 +41,7 @@ export interface TrizumWorkerClientOptions {
 }
 
 /**
- * A Trizum client that runs the Automerge Repo in a Web Worker.
+ * A Trizum client that runs the document repository in a Web Worker.
  *
  * Benefits of using the worker client:
  * - Heavy document operations don't block the main thread

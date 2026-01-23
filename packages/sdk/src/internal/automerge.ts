@@ -38,13 +38,8 @@ export type {
   NetworkAdapterInterface,
 };
 
-/**
- * Symbol used to access the internal repository from TrizumClient.
- * This keeps the Repo access internal to the SDK without exposing it in types.
- *
- * @internal
- */
-export const INTERNAL_REPO_SYMBOL = Symbol.for("trizum.internal.repo");
+// Re-export symbol from separate file to avoid exposing Automerge in symbol imports
+export { INTERNAL_REPO_SYMBOL } from "./symbols.js";
 
 // Re-export AnyDocumentId for use with repo.find
 export type { AMAnyDocumentId as AutomergeAnyDocumentId };

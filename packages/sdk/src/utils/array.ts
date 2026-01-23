@@ -1,8 +1,8 @@
 /**
- * Array mutation utilities for working with Automerge documents.
+ * Array mutation utilities for working with CRDT documents.
  *
  * These functions provide safe array operations that work within
- * Automerge document change callbacks.
+ * CRDT document change callbacks.
  */
 
 import { amInsertAt, amDeleteAt } from "../internal/automerge.js";
@@ -11,7 +11,7 @@ import { amInsertAt, amDeleteAt } from "../internal/automerge.js";
  * Insert elements at a specific index in an array.
  *
  * Use this inside a `handle.change()` callback to insert elements
- * into an array property of an Automerge document.
+ * into an array property of an CRDT document.
  *
  * @param array - The array to insert into
  * @param index - The index at which to insert
@@ -32,7 +32,7 @@ export function insertAt<T>(array: T[], index: number, ...values: T[]): void {
  * Delete elements at a specific index in an array.
  *
  * Use this inside a `handle.change()` callback to delete elements
- * from an array property of an Automerge document.
+ * from an array property of an CRDT document.
  *
  * @param array - The array to delete from
  * @param index - The index at which to start deleting

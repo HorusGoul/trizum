@@ -1,8 +1,7 @@
 import { t } from "@lingui/core/macro";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { useSuspenseDocument, isValidDocumentId } from "@trizum/sdk";
 import type { Party } from "#src/models/party.ts";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
-import { isValidDocumentId } from "@trizum/sdk";
 import { useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 

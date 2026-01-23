@@ -21,10 +21,6 @@
     "deploy": "pnpm build && wrangler deploy"
   },
   "dependencies": {
-    "@automerge/automerge": "3.2.1",
-    "@automerge/automerge-repo": "2.5.1",
-    "@automerge/automerge-repo-network-websocket": "2.5.1",
-    "@automerge/automerge-repo-storage-indexeddb": "2.5.1",
     "@trizum/sdk": "workspace:*",
     "@capacitor/app": "8.0.0",
     "@capacitor/core": "8.0.1",

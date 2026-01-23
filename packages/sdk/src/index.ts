@@ -2,11 +2,15 @@
  * Trizum SDK - Public API
  *
  * This is the main entry point for the Trizum SDK.
- * All types and functions are SDK-specific and do not expose Automerge internals.
+ * All types and functions are SDK-specific and do not expose internal implementation details.
  */
 
 // Core client
-export { TrizumClient, type TrizumClientOptions } from "./client.js";
+export {
+  TrizumClient,
+  type TrizumClientOptions,
+  type ITrizumClient,
+} from "./client.js";
 
 // Web Worker client
 export {
@@ -48,6 +52,7 @@ export { insertAt, deleteAt } from "./utils/array.js";
 // Core types (SDK-specific, no Automerge exposure)
 export type {
   DocumentId,
+  AnyDocumentId,
   DocumentHandle,
   SupportedLocale,
   CurrencyCode,

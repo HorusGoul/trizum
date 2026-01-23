@@ -1,4 +1,4 @@
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { useSuspenseDocument } from "@trizum/sdk";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
   createExpenseId,
@@ -21,7 +21,7 @@ import {
   insertAt,
   deleteAt,
   type DocumentHandle,
-  type TrizumClient,
+  type ITrizumClient,
   useTrizumClient,
 } from "@trizum/sdk";
 import { clone } from "@opentf/std";
@@ -98,7 +98,7 @@ export function useCurrentParty() {
 }
 
 export function getPartyHelpers(
-  client: TrizumClient,
+  client: ITrizumClient,
   handle: DocumentHandle<Party>,
 ) {
   function updateSettings(

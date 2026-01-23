@@ -1,10 +1,7 @@
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import {
-  useSuspenseDocument,
-  type EphemeralMessagePayload,
-} from "@trizum/sdk";
+import { useSuspenseDocument, type EphemeralMessagePayload } from "@trizum/sdk";
 import {
   decodeExpenseId,
   type Expense,

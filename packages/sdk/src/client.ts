@@ -12,8 +12,8 @@ import {
   fromAMDocumentId,
   wrapHandle,
   type Repo,
-  INTERNAL_REPO_SYMBOL,
 } from "./internal/automerge.js";
+import { INTERNAL_REPO_SYMBOL } from "./internal/symbols.js";
 import type { DocumentId, DocumentHandle } from "./types.js";
 import type {
   DocumentModel,
@@ -28,6 +28,39 @@ export interface TrizumClientOptions {
   syncUrl?: string | null;
   /** Whether to enable offline-only mode (no network sync). Default: false */
   offlineOnly?: boolean;
+}
+
+/**
+ * Common interface for Trizum clients.
+ *
+ * Both TrizumClient and TrizumWorkerClient implement this interface,
+ * allowing them to be used interchangeably in application code.
+ */
+export interface ITrizumClient {
+  /** Check if a string is a valid document ID */
+  isValidDocumentId(id: string): id is DocumentId;
+
+  /** Define a document model and get type-safe helpers for CRUD operations */
+  defineModel<T extends DocumentModel, CreateInput = Omit<T, "id">>(
+    definition: DocumentModelDefinition<T, CreateInput>,
+  ): ModelHelpers<T>;
+
+  /** Get or create a root document (singleton pattern) */
+  getOrCreateRootDocument<T extends DocumentModel>(
+    localStorageKey: string,
+    createInitialState: () => Omit<T, "id">,
+  ): DocumentId;
+
+  /** Find a document handle by ID */
+  findHandle<T>(id: DocumentId): Promise<DocumentHandle<T>>;
+
+  /** Create a new document with the given initial state */
+  create<T extends DocumentModel>(
+    initialState: Omit<T, "id">,
+  ): { id: DocumentId; handle: DocumentHandle<T> };
+
+  /** Load multiple documents by their IDs */
+  loadMany<T>(ids: DocumentId[]): Promise<(T | undefined)[]>;
 }
 
 /**

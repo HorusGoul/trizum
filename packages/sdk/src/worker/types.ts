@@ -2,7 +2,7 @@
  * Types for Web Worker communication.
  *
  * These types define the message protocol between the main thread
- * and the Web Worker that runs the Automerge Repo.
+ * and the Web Worker that runs the document repository.
  */
 
 /**

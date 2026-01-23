@@ -1,14 +1,11 @@
 /**
  * Re-export PartyList model types from @trizum/sdk.
  */
-import type { TrizumClient } from "@trizum/sdk";
+import type { ITrizumClient, PartyList } from "@trizum/sdk";
 import { isValidDocumentId } from "@trizum/sdk";
 
 export type { PartyList, UpdatePartyListInput } from "@trizum/sdk";
 export { PARTY_LIST_STORAGE_KEY } from "@trizum/sdk";
-
-// Import for local use
-import type { PartyList } from "@trizum/sdk";
 
 /**
  * Get or create the PartyList document for this user.
@@ -17,14 +14,14 @@ import type { PartyList } from "@trizum/sdk";
  * @param client - The Trizum client
  * @returns The PartyList document ID
  */
-export function getPartyListId(client: TrizumClient) {
+export function getPartyListId(client: ITrizumClient) {
   const id = localStorage.getItem("partyListId");
 
   if (id && isValidDocumentId(id)) {
     return id;
   }
 
-  // Can't explicity set `locale: undefined` because of automerge...
+  // Can't explicitly set `locale: undefined` because CRDTs don't support undefined values
   const { id: newId } = client.create<PartyList>({
     type: "partyList",
     username: "",

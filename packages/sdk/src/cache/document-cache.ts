@@ -7,16 +7,12 @@
  * @internal This module is for internal SDK use only.
  */
 
-import type { Repo, AMDoc, AMDocHandle } from "../internal/automerge.js";
+import type { Repo, AMDocHandle } from "../internal/automerge.js";
 import { toAMDocumentId } from "../internal/automerge.js";
+import type { AnyDocumentId } from "../types.js";
 import { createCache, type Cache } from "suspense";
 import { retryWithExponentialBackoff } from "../utils/retry.js";
 
-/**
- * Type for document IDs that the cache accepts.
- * Using string to allow any document ID type (SDK DocumentId, Automerge DocumentId, or plain strings).
- */
-export type AnyDocumentId = string;
 
 /**
  * @internal
@@ -104,10 +100,11 @@ function withLiveSubscription<Params extends unknown[], Value>({
 /**
  * @internal
  * Cache for document snapshots with live subscriptions.
+ * Uses `unknown` type to avoid exposing internal document types in declarations.
  */
 export const documentCache = withLiveSubscription<
   [Repo, AnyDocumentId],
-  AMDoc<unknown> | undefined
+  unknown
 >({
   getKey: getDocumentCacheKey,
   getCache: ({ onEviction, getKey, onUpdate }) =>
@@ -148,10 +145,11 @@ export const documentCache = withLiveSubscription<
 /**
  * @internal
  * Cache for loading multiple documents at once.
+ * Uses `unknown` type to avoid exposing internal document types in declarations.
  */
 export const multipleDocumentCache = withLiveSubscription<
   [Repo, AnyDocumentId[]],
-  (AMDoc<unknown> | undefined)[]
+  unknown[]
 >({
   getCache: ({ onEviction, onUpdate, getKey }) =>
     createCache({

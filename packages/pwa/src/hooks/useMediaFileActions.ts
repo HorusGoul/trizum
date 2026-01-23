@@ -5,7 +5,7 @@ import {
   compressionPresets,
 } from "#src/lib/imageCompression.ts";
 import {
-  type TrizumClient,
+  type ITrizumClient,
   ImmutableString,
   useTrizumClient,
 } from "@trizum/sdk";
@@ -16,7 +16,7 @@ export function useMediaFileActions() {
   return getMediaFileHelpers(client);
 }
 
-export function getMediaFileHelpers(client: TrizumClient) {
+export function getMediaFileHelpers(client: ITrizumClient) {
   async function createMediaFile(
     blob: Blob,
     metadata: Record<string, unknown>,

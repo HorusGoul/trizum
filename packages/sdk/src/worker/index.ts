@@ -1,7 +1,7 @@
 /**
  * Web Worker support for Trizum SDK.
  *
- * This module provides utilities for running Automerge Repo in a Web Worker,
+ * This module provides utilities for running document repository in a Web Worker,
  * offloading heavy operations to a background thread.
  */
 

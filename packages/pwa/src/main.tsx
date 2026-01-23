@@ -1,7 +1,7 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
-import { TrizumClient, TrizumProvider } from "@trizum/sdk";
+import { TrizumWorkerClient, TrizumProvider } from "@trizum/sdk";
 import {
   RouterProvider,
   createRouter,
@@ -55,10 +55,13 @@ if (import.meta.env.MODE === "production") {
 // Initialize i18n
 const i18n = initializeI18n();
 
+// Create a typed router factory for type registration
+type AppRouter = ReturnType<typeof createRouter<typeof routeTree>>;
+
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router;
+    router: AppRouter;
   }
 }
 
@@ -81,13 +84,6 @@ const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
 const isOfflineOnly =
   initialUrl.searchParams.get("__internal_offline_only") === "true";
 
-// Create Trizum client
-const client = new TrizumClient({
-  storageName: "trizum",
-  syncUrl: isOfflineOnly ? null : WSS_URL,
-  offlineOnly: isOfflineOnly,
-});
-
 declare global {
   interface Window {
     __internal_createPartyFromMigrationData: (
@@ -95,25 +91,6 @@ declare global {
     ) => Promise<string>;
   }
 }
-
-// For internal use only, like UI testing or screenshots
-window.__internal_createPartyFromMigrationData = async (
-  data: MigrationData,
-) => {
-  return createPartyFromMigrationData({
-    client,
-    data,
-    importAttachments: false,
-  });
-};
-
-// Create a new router instance
-const router = createRouter({
-  routeTree,
-  context: { client },
-  defaultGcTime: 0,
-  defaultStaleTime: Infinity,
-});
 
 void preloadAllIcons();
 
@@ -139,43 +116,77 @@ if (Capacitor.isNativePlatform()) {
       );
     }
   });
-
-  void App.addListener("backButton", ({ canGoBack }) => {
-    if (canGoBack) {
-      router.history.go(-1);
-    } else {
-      void App.exitApp();
-    }
-  });
-
-  void App.addListener("appUrlOpen", (event) => {
-    const url = new URL(event.url);
-
-    const pathnameAndSearch = url.pathname + url.search;
-
-    void router.history.push(pathnameAndSearch);
-  });
 }
 
-// Render the app
-const rootElement = document.getElementById("root")!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <I18nProvider i18n={i18n}>
-      <UpdateControllerComponent>
-        <AriaProviders>
-          <TrizumProvider client={client}>
-            <MediaGalleryController>
-              <RouterProvider router={router} InnerWrap={InnerWrap} />
-              <Toaster />
-            </MediaGalleryController>
-          </TrizumProvider>
-        </AriaProviders>
-      </UpdateControllerComponent>
-    </I18nProvider>,
-  );
+// Initialize app with Web Worker client
+async function initializeApp() {
+  // Create Trizum client running in a Web Worker
+  const client = await TrizumWorkerClient.create({
+    storageName: "trizum",
+    syncUrl: isOfflineOnly ? null : WSS_URL,
+    offlineOnly: isOfflineOnly,
+    workerUrl: new URL("./worker/repo-worker.ts", import.meta.url),
+  });
+
+  // For internal use only, like UI testing or screenshots
+  window.__internal_createPartyFromMigrationData = async (
+    data: MigrationData,
+  ) => {
+    return createPartyFromMigrationData({
+      client,
+      data,
+      importAttachments: false,
+    });
+  };
+
+  // Create a new router instance
+  const router = createRouter({
+    routeTree,
+    context: { client },
+    defaultGcTime: 0,
+    defaultStaleTime: Infinity,
+  });
+
+  if (Capacitor.isNativePlatform()) {
+    void App.addListener("backButton", ({ canGoBack }) => {
+      if (canGoBack) {
+        router.history.go(-1);
+      } else {
+        void App.exitApp();
+      }
+    });
+
+    void App.addListener("appUrlOpen", (event) => {
+      const url = new URL(event.url);
+
+      const pathnameAndSearch = url.pathname + url.search;
+
+      void router.history.push(pathnameAndSearch);
+    });
+  }
+
+  // Render the app
+  const rootElement = document.getElementById("root")!;
+  if (!rootElement.innerHTML) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <I18nProvider i18n={i18n}>
+        <UpdateControllerComponent>
+          <AriaProviders>
+            <TrizumProvider client={client}>
+              <MediaGalleryController>
+                <RouterProvider router={router} InnerWrap={InnerWrap} />
+                <Toaster />
+              </MediaGalleryController>
+            </TrizumProvider>
+          </AriaProviders>
+        </UpdateControllerComponent>
+      </I18nProvider>,
+    );
+  }
 }
+
+void initializeApp();
 
 function AriaProviders({ children }: { children: React.ReactNode }) {
   const { i18n } = useLingui();

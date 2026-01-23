@@ -49,7 +49,7 @@ function New() {
       id: crypto.randomUUID(),
     }));
 
-    const { id: partyId, handle } = client.create<Party>({
+    const { id: partyId } = client.create<Party>({
       type: "party",
       name: values.name,
       description: values.description,

@@ -2,7 +2,15 @@ import {
   calculateLogStatsOfUser,
   type ExpenseInput,
 } from "#src/lib/expenses.js";
-import type { DocumentId } from "@trizum/sdk";
+import type {
+  DocumentId,
+  Expense,
+  ExpenseShareExact,
+  ExpenseShareDivide,
+  Balance,
+  BalancesByParticipant,
+  ExpenseUser,
+} from "@trizum/sdk";
 import { ulid } from "ulidx";
 import Dinero from "dinero.js";
 import { diff } from "@opentf/obj-diff";
@@ -21,16 +29,6 @@ export type {
   Balance,
   BalancesByParticipant,
   SimplifiedTransaction,
-  ExpenseUser,
-} from "@trizum/sdk";
-
-// Import types for local use
-import type {
-  Expense,
-  ExpenseShareExact,
-  ExpenseShareDivide,
-  Balance,
-  BalancesByParticipant,
   ExpenseUser,
 } from "@trizum/sdk";
 
