@@ -448,6 +448,9 @@ importers:
         specifier: 0.1.0
         version: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
     devDependencies:
+      '@automerge/automerge-repo-network-messagechannel':
+        specifier: 2.5.1
+        version: 2.5.1
       '@trizum/eslint-config':
         specifier: workspace:*
         version: file:packages/eslint-config(@typescript-eslint/eslint-plugin@8.46.3(@typescript-eslint/parser@8.46.3(eslint@9.39.1(jiti@2.6.0))(typescript@5.9.2))(eslint@9.39.1(jiti@2.6.0))(typescript@5.9.2))(@typescript-eslint/parser@8.46.3(eslint@9.39.1(jiti@2.6.0))(typescript@5.9.2))(eslint@9.39.1(jiti@2.6.0))(prettier@3.6.2)(typescript@5.9.2)
@@ -584,6 +587,9 @@ packages:
 
   '@apm-js-collab/tracing-hooks@0.3.1':
     resolution: {integrity: sha512-Vu1CbmPURlN5fTboVuKMoJjbO5qcq9fA5YXpskx3dXe/zTBvjODFoerw+69rVBlRLrJpwPqSDqEuJDEKIrTldw==}
+
+  '@automerge/automerge-repo-network-messagechannel@2.5.1':
+    resolution: {integrity: sha512-C2GKMoiGlyp7KQCwMt1Az/tJMYa+UtlrLtZ6WHT+PN3RQ9D/c/f5CkSNQSHgJRwFW/c2sU6PI3zcRasgrYaUOA==}
 
   '@automerge/automerge-repo-network-websocket@2.5.1':
     resolution: {integrity: sha512-urvhlmTZ6VoJi5o0T2mtkVd4X1cuUdBC5/C/UY5FFgWczEq7PwCdNhUndv1CQSn8ePPsT59z7ZnRzZJbqqu22Q==}
@@ -9531,6 +9537,14 @@ snapshots:
       '@apm-js-collab/code-transformer': 0.8.2
       debug: 4.4.3
       module-details-from-path: 1.0.4
+    transitivePeerDependencies:
+      - supports-color
+
+  '@automerge/automerge-repo-network-messagechannel@2.5.1':
+    dependencies:
+      '@automerge/automerge-repo': 2.5.1
+      debug: 4.4.3
+      eventemitter3: 5.0.1
     transitivePeerDependencies:
       - supports-color
 

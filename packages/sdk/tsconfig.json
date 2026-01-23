@@ -14,7 +14,7 @@
     "declarationMap": true,
     "emitDeclarationOnly": false,
     "noEmit": false,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "resolveJsonModule": true

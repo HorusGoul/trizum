@@ -29,6 +29,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./worker": {
+      "types": "./dist/worker/index.d.ts",
+      "import": "./dist/worker/index.js",
+      "default": "./dist/worker/index.js"
+    },
+    "./worker/repo-worker": {
+      "types": "./dist/worker/repo-worker.d.ts",
+      "import": "./dist/worker/repo-worker.js",
+      "default": "./dist/worker/repo-worker.js"
+    },
     "./*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*.js",
@@ -47,6 +57,7 @@
   "dependencies": {
     "@automerge/automerge": "3.2.1",
     "@automerge/automerge-repo": "2.5.1",
+    "@automerge/automerge-repo-network-messagechannel": "2.5.1",
     "@automerge/automerge-repo-network-websocket": "2.5.1",
     "@automerge/automerge-repo-storage-indexeddb": "2.5.1",
     "suspense": "0.1.0"

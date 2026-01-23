@@ -8,6 +8,19 @@
 // Core client
 export { TrizumClient, type TrizumClientOptions } from "./client.js";
 
+// Web Worker client
+export {
+  TrizumWorkerClient,
+  type TrizumWorkerClientOptions,
+} from "./worker/index.js";
+
+// Worker message types (for custom worker implementations)
+export type {
+  MainToWorkerMessage,
+  WorkerToMainMessage,
+  WorkerConfig,
+} from "./worker/index.js";
+
 // Internal repo type (needed for backwards compatibility during migration)
 // NOTE: This is an opaque type - consumers should not depend on Automerge internals
 export type {
