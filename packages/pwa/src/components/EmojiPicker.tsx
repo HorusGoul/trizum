@@ -1,4 +1,4 @@
-import { Suspense, use, useState } from "react";
+import { Suspense, use, useRef, useState } from "react";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
@@ -13,7 +13,7 @@ import {
   Button as ClearButton,
   composeRenderProps,
 } from "react-aria-components";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
@@ -37,6 +37,7 @@ interface EmojiData {
   groupLabels: Record<number, string>;
   groupedEmojis: Record<number, Emoji[]>;
   orderedGroups: number[];
+  emojiByHexcode: Map<string, Emoji>;
 }
 
 // Explicit imports for each supported locale
@@ -100,7 +101,16 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
       .filter((g) => g.order !== 2 && groupedEmojis[g.order]?.length > 0)
       .map((g) => g.order);
 
-    return { emojis, groupLabels, groupedEmojis, orderedGroups };
+    // Build lookup map for full emoji unicode by hexcode
+    const emojiByHexcode = new Map(emojis.map((e) => [e.hexcode, e]));
+
+    return {
+      emojis,
+      groupLabels,
+      groupedEmojis,
+      orderedGroups,
+      emojiByHexcode,
+    };
   })();
 
   emojiDataCache[locale] = promise;
@@ -146,8 +156,8 @@ export function EmojiPicker({
       setInternalValue(emoji);
     }
     onChange?.(emoji);
-    setIsOpen(false);
     setSearchQuery("");
+    setIsOpen(false);
   }
 
   return (
@@ -166,7 +176,7 @@ export function EmojiPicker({
       >
         {selectedEmoji}
       </AriaButton>
-      <Popover placement="bottom end" className="overflow-hidden p-0">
+      <Popover placement="bottom end" className="overflow-hidden">
         <Dialog className="outline-none">
           <div className="flex flex-col" style={{ width: GRID_WIDTH }}>
             <SearchField
@@ -227,7 +237,8 @@ interface EmojiGridContentProps {
 }
 
 function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
-  const { emojis, groupLabels, groupedEmojis, orderedGroups } = useEmojiData();
+  const { emojis, groupLabels, groupedEmojis, orderedGroups, emojiByHexcode } =
+    useEmojiData();
 
   const filteredEmojis = searchQuery
     ? emojis.filter((emoji) => {
@@ -242,8 +253,15 @@ function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
 
   const isSearching = searchQuery.length > 0;
 
+  function handleSelect(hexcode: string) {
+    const emoji = emojiByHexcode.get(hexcode);
+    if (emoji) {
+      onSelect(emoji.unicode);
+    }
+  }
+
   if (isSearching) {
-    return <EmojiGrid emojis={filteredEmojis!} onSelect={onSelect} />;
+    return <EmojiGrid emojis={filteredEmojis!} onSelect={handleSelect} />;
   }
 
   return (
@@ -251,7 +269,7 @@ function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
       groupLabels={groupLabels}
       groupedEmojis={groupedEmojis}
       orderedGroups={orderedGroups}
-      onSelect={onSelect}
+      onSelect={handleSelect}
     />
   );
 }
@@ -307,8 +325,8 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
 
           return rowEmojis.map((emoji, columnIndex) => (
             <ListBoxItem
-              key={emoji.unicode}
-              id={emoji.unicode}
+              key={emoji.hexcode}
+              id={emoji.hexcode}
               textValue={
                 (emoji.label || "") +
                 (Array.isArray(emoji.tags) ? " " + emoji.tags.join(" ") : "")
@@ -336,26 +354,51 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
 }
 
 const HEADER_HEIGHT = 28;
+const CATEGORY_TAB_HEIGHT = 36;
+
+// Representative emoji icons for each category
+const CATEGORY_ICONS: Record<number, string> = {
+  0: "😀", // Smileys & Emotion
+  1: "👋", // People & Body
+  3: "🐻", // Animals & Nature
+  4: "🍔", // Food & Drink
+  5: "✈️", // Travel & Places
+  6: "⚽", // Activities
+  7: "💡", // Objects
+  8: "💕", // Symbols
+  9: "🏳️", // Flags
+};
 
 type VirtualRow =
   | { type: "header"; group: number }
   | { type: "emojis"; emojis: Emoji[] };
 
+interface VirtualRowsResult {
+  rows: VirtualRow[];
+  groupStartIndices: Map<number, number>;
+}
+
 function buildVirtualRows(
   orderedGroups: number[],
   groupedEmojis: Record<number, Emoji[]>,
-): VirtualRow[] {
-  return orderedGroups.flatMap((group) => {
+): VirtualRowsResult {
+  const rows: VirtualRow[] = [];
+  const groupStartIndices = new Map<number, number>();
+
+  for (const group of orderedGroups) {
+    groupStartIndices.set(group, rows.length);
+    rows.push({ type: "header", group });
+
     const categoryEmojis = groupedEmojis[group] || [];
-    const emojiRows: VirtualRow[] = [];
     for (let i = 0; i < categoryEmojis.length; i += GRID_COLUMNS) {
-      emojiRows.push({
+      rows.push({
         type: "emojis",
         emojis: categoryEmojis.slice(i, i + GRID_COLUMNS),
       });
     }
-    return [{ type: "header", group } as VirtualRow, ...emojiRows];
-  });
+  }
+
+  return { rows, groupStartIndices };
 }
 
 interface CategorizedEmojiGridProps {
@@ -372,7 +415,13 @@ function CategorizedEmojiGrid({
   onSelect,
 }: CategorizedEmojiGridProps) {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
-  const virtualRows = buildVirtualRows(orderedGroups, groupedEmojis);
+  const { rows: virtualRows, groupStartIndices } = buildVirtualRows(
+    orderedGroups,
+    groupedEmojis,
+  );
+  const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element> | null>(
+    null,
+  );
 
   const virtualizer = useVirtualizer({
     count: virtualRows.length,
@@ -382,80 +431,118 @@ function CategorizedEmojiGrid({
     overscan: 5,
   });
 
+  // Store virtualizer in ref for tab clicks
+  virtualizerRef.current = virtualizer;
+
+  function scrollToGroup(group: number) {
+    const rowIndex = groupStartIndices.get(group);
+    if (rowIndex !== undefined && virtualizerRef.current) {
+      virtualizerRef.current.scrollToIndex(rowIndex, { align: "start" });
+    }
+  }
+
   return (
-    <div
-      ref={setParentRef}
-      className="h-[280px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      style={{ contain: "strict", padding: GRID_PADDING }}
-    >
+    <div className="flex flex-col">
+      {/* Category tabs */}
       <div
-        className="relative"
-        style={{
-          height: virtualizer.getTotalSize(),
-        }}
+        className="flex justify-between border-b border-accent-200 px-1 dark:border-accent-700"
+        style={{ height: CATEGORY_TAB_HEIGHT }}
       >
-        {/* Render headers as regular divs */}
-        {virtualizer.getVirtualItems().map((virtualItem) => {
-          const row = virtualRows[virtualItem.index];
-          if (row.type !== "header") return null;
+        {orderedGroups.map((group) => (
+          <button
+            key={group}
+            type="button"
+            onClick={() => scrollToGroup(group)}
+            aria-label={groupLabels[group]}
+            title={groupLabels[group]}
+            className={cn(
+              "flex flex-1 items-center justify-center text-lg transition-colors",
+              "hover:bg-accent-100 dark:hover:bg-accent-800",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500",
+            )}
+          >
+            {CATEGORY_ICONS[group] || "📁"}
+          </button>
+        ))}
+      </div>
 
-          return (
-            <div
-              key={`header-${row.group}`}
-              className="absolute left-0 right-0 flex items-center text-xs font-medium capitalize text-accent-600 dark:text-accent-400"
-              style={{
-                top: virtualItem.start,
-                height: HEADER_HEIGHT,
-              }}
-            >
-              {groupLabels[row.group]}
-            </div>
-          );
-        })}
-
-        {/* Render emoji grid */}
-        <ListBox
-          aria-label={t`Emoji list`}
-          selectionMode="single"
-          onSelectionChange={(keys) => {
-            const selectedKey = [...keys][0];
-            if (typeof selectedKey === "string") {
-              onSelect(selectedKey);
-            }
+      {/* Emoji grid */}
+      <div
+        ref={setParentRef}
+        className="h-[244px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{ contain: "strict", padding: GRID_PADDING }}
+      >
+        <div
+          className="relative"
+          style={{
+            height: virtualizer.getTotalSize(),
           }}
-          layout="grid"
-          className="outline-none"
         >
+          {/* Render headers as regular divs */}
           {virtualizer.getVirtualItems().map((virtualItem) => {
             const row = virtualRows[virtualItem.index];
-            if (row.type !== "emojis") return null;
+            if (row.type !== "header") return null;
 
-            return row.emojis.map((emoji, columnIndex) => (
-              <ListBoxItem
-                key={emoji.unicode}
-                id={emoji.unicode}
-                textValue={
-                  (emoji.label || "") +
-                  (Array.isArray(emoji.tags) ? " " + emoji.tags.join(" ") : "")
-                }
-                className={cn(
-                  "absolute flex cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
-                  "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
-                  "data-[focused]:bg-accent-200 dark:data-[focused]:bg-accent-700",
-                  "data-[selected]:bg-accent-500 data-[selected]:text-white",
-                )}
+            return (
+              <div
+                key={`header-${row.group}`}
+                className="absolute left-0 right-0 flex items-center text-xs font-medium capitalize text-accent-600 dark:text-accent-400"
                 style={{
                   top: virtualItem.start,
-                  left: columnIndex * (CELL_SIZE + GAP),
-                  width: CELL_SIZE,
-                  height: CELL_SIZE,
+                  height: HEADER_HEIGHT,
                 }}
               >
-                {emoji.unicode}
-              </ListBoxItem>
-            ));
+                {groupLabels[row.group]}
+              </div>
+            );
           })}
-        </ListBox>
+
+          {/* Render emoji grid */}
+          <ListBox
+            aria-label={t`Emoji list`}
+            selectionMode="single"
+            onSelectionChange={(keys) => {
+              const selectedKey = [...keys][0];
+              if (typeof selectedKey === "string") {
+                onSelect(selectedKey);
+              }
+            }}
+            layout="grid"
+            className="outline-none"
+          >
+            {virtualizer.getVirtualItems().map((virtualItem) => {
+              const row = virtualRows[virtualItem.index];
+              if (row.type !== "emojis") return null;
+
+              return row.emojis.map((emoji, columnIndex) => (
+                <ListBoxItem
+                  key={emoji.hexcode}
+                  id={emoji.hexcode}
+                  textValue={
+                    (emoji.label || "") +
+                    (Array.isArray(emoji.tags)
+                      ? " " + emoji.tags.join(" ")
+                      : "")
+                  }
+                  className={cn(
+                    "absolute flex cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
+                    "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
+                    "data-[focused]:bg-accent-200 dark:data-[focused]:bg-accent-700",
+                    "data-[selected]:bg-accent-500 data-[selected]:text-white",
+                  )}
+                  style={{
+                    top: virtualItem.start,
+                    left: columnIndex * (CELL_SIZE + GAP),
+                    width: CELL_SIZE,
+                    height: CELL_SIZE,
+                  }}
+                >
+                  {emoji.unicode}
+                </ListBoxItem>
+              ));
+            })}
+          </ListBox>
+        </div>
       </div>
     </div>
   );
