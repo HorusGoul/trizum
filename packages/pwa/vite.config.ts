@@ -48,6 +48,10 @@ export default defineConfig(({ mode }) => {
       sourcemap: true,
       minify: true,
     },
+    worker: {
+      format: "es",
+      plugins: () => [wasm() as Plugin, topLevelAwait()],
+    },
     plugins: [
       cloudflare(),
       tanstackRouter(),

@@ -35,10 +35,27 @@ export interface TrizumWorkerClientOptions {
   /** Whether to enable offline-only mode (no network sync). Default: false */
   offlineOnly?: boolean;
   /**
+   * A pre-created Worker instance.
+   * Use this when your bundler (e.g., Vite) handles worker bundling.
+   *
+   * @example
+   * ```ts
+   * // With Vite's ?worker import
+   * import RepoWorker from "./worker/repo-worker?worker";
+   * const client = await TrizumWorkerClient.create({
+   *   worker: new RepoWorker(),
+   * });
+   * ```
+   */
+  worker?: Worker;
+  /**
    * URL to the Web Worker script.
    * This should be the URL to the compiled repo-worker.js file.
+   * Either `worker` or `workerUrl` must be provided.
+   *
+   * @deprecated Prefer using `worker` with Vite's `?worker` import for better bundling.
    */
-  workerUrl: URL;
+  workerUrl?: URL;
 }
 
 /**
@@ -51,10 +68,13 @@ export interface TrizumWorkerClientOptions {
  *
  * @example
  * ```ts
+ * // With Vite's ?worker import (recommended)
+ * import RepoWorker from "./worker/repo-worker?worker";
+ *
  * const client = await TrizumWorkerClient.create({
  *   storageName: "my-app",
  *   syncUrl: "wss://sync.example.com",
- *   workerUrl: new URL('./worker/repo-worker.js', import.meta.url),
+ *   worker: new RepoWorker(),
  * });
  *
  * // Use client same as TrizumClient
@@ -68,20 +88,25 @@ export class TrizumWorkerClient {
   private options: Required<
     Pick<TrizumWorkerClientOptions, "storageName" | "offlineOnly">
   > &
-    TrizumWorkerClientOptions;
+    Omit<TrizumWorkerClientOptions, "storageName" | "offlineOnly">;
 
   private constructor(options: TrizumWorkerClientOptions) {
     const {
       storageName = "trizum",
       syncUrl = "wss://dev-sync.trizum.app",
       offlineOnly = false,
+      worker,
       workerUrl,
     } = options;
 
-    this.options = { storageName, syncUrl, offlineOnly, workerUrl };
+    if (!worker && !workerUrl) {
+      throw new Error("Either 'worker' or 'workerUrl' must be provided");
+    }
 
-    // Create the worker
-    this._worker = new Worker(workerUrl, { type: "module" });
+    this.options = { storageName, syncUrl, offlineOnly, worker, workerUrl };
+
+    // Create the worker (use provided instance or create from URL)
+    this._worker = worker ?? new Worker(workerUrl!, { type: "module" });
 
     // Create MessageChannel for bidirectional communication
     const { port1, port2 } = new MessageChannel();

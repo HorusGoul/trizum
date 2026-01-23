@@ -2,6 +2,9 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
 import { TrizumWorkerClient, TrizumProvider } from "@trizum/sdk";
+// Import the worker using Vite's ?worker pattern
+// This ensures proper bundling with WASM support
+import RepoWorker from "./worker/repo-worker.ts?worker";
 import {
   RouterProvider,
   createRouter,
@@ -125,7 +128,7 @@ async function initializeApp() {
     storageName: "trizum",
     syncUrl: isOfflineOnly ? null : WSS_URL,
     offlineOnly: isOfflineOnly,
-    workerUrl: new URL("./worker/repo-worker.ts", import.meta.url),
+    worker: new RepoWorker(),
   });
 
   // For internal use only, like UI testing or screenshots
