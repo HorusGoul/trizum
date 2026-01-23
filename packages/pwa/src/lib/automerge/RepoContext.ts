@@ -1,4 +1,4 @@
-import type { Repo } from "@automerge/automerge-repo";
-import { createContext } from "react";
-
-export const RepoContext = createContext<Repo | null>(null);
+/**
+ * Re-export RepoContext from @trizum/sdk for backwards compatibility.
+ */
+export { RepoContext } from "@trizum/sdk";

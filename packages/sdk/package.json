@@ -1,0 +1,68 @@
+{
+  "name": "@trizum/sdk",
+  "description": "Trizum SDK - CRUD operations, real-time updates, and React Suspense support for Automerge documents",
+  "keywords": [
+    "trizum",
+    "sdk",
+    "automerge",
+    "crdt",
+    "offline-first",
+    "suspense"
+  ],
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --ext .ts,.tsx src",
+    "lint:fix": "pnpm run lint --fix",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@automerge/automerge": "3.2.1",
+    "@automerge/automerge-repo": "2.5.1",
+    "@automerge/automerge-repo-network-websocket": "2.5.1",
+    "@automerge/automerge-repo-storage-indexeddb": "2.5.1",
+    "suspense": "0.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@trizum/eslint-config": "workspace:*",
+    "@trizum/prettier-config": "workspace:*",
+    "@trizum/tsconfig": "workspace:*",
+    "@types/react": "npm:types-react@rc",
+    "eslint": "9.39.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.2",
+    "vitest": "3.2.4"
+  },
+  "prettier": "@trizum/prettier-config"
+}
