@@ -1,6 +1,10 @@
 import { Trans } from "@lingui/react/macro";
 import { Modal, ModalOverlay } from "react-aria-components";
-import { QRCodeScanner, type ScanResult } from "./QRCodeScanner.js";
+import {
+  QRCodeScanner,
+  type ScanResult,
+  type ValidationResult,
+} from "./QRCodeScanner.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t } from "@lingui/core/macro";
 import { toast } from "sonner";
@@ -12,6 +16,11 @@ export interface RouteQRScannerProps {
   onScan: (value: string) => void;
   /** Called when the scanner should close */
   onClose: () => void;
+  /**
+   * Optional validation function to check if the scanned value is valid.
+   * If validation fails, an error animation is shown and scanning continues.
+   */
+  validate?: (value: string) => ValidationResult;
 }
 
 /**
@@ -22,6 +31,7 @@ export function RouteQRScanner({
   isOpen,
   onScan,
   onClose,
+  validate,
 }: RouteQRScannerProps) {
   function handleResult(result: ScanResult) {
     if (result.type === "cancelled") {
@@ -67,7 +77,7 @@ export function RouteQRScanner({
             </div>
           </div>
 
-          <QRCodeScanner onResult={handleResult} />
+          <QRCodeScanner onResult={handleResult} validate={validate} />
         </div>
       </Modal>
     </ModalOverlay>

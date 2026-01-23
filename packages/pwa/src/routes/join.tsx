@@ -46,16 +46,19 @@ function Join() {
     goBack: () => router.history.back(),
   });
 
+  function validateQRCode(value: string) {
+    const partyId = parseQRCodeForPartyId(value);
+    if (!partyId) {
+      return t`Not a valid trizum party code`;
+    }
+    return true as const;
+  }
+
   function handleScan(value: string) {
     const partyId = parseQRCodeForPartyId(value);
 
-    if (!partyId) {
-      toast.error(
-        t`Invalid QR code. This doesn't appear to be a trizum party code.`,
-      );
-      closeScanner();
-      return;
-    }
+    // At this point validation already passed, partyId should exist
+    if (!partyId) return;
 
     void navigate({
       to: "/party/$partyId",
@@ -209,6 +212,7 @@ function Join() {
         isOpen={isOpen}
         onScan={handleScan}
         onClose={closeScanner}
+        validate={validateQRCode}
       />
     </>
   );
