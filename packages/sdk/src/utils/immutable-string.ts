@@ -20,8 +20,7 @@
  * ```
  */
 
-// We use a factory pattern to hide the Automerge dependency from the public type system
-// The actual implementation uses RawString internally, but we expose it as ImmutableString
+// We use a factory pattern to hide the internal implementation from the public type system
 
 import { RawString } from "@automerge/automerge-repo/slim";
 
@@ -41,7 +40,6 @@ export interface ImmutableStringConstructor {
 }
 
 // Create the ImmutableString class using RawString internally
-// but cast it to our own interface to hide the Automerge inheritance
 class ImmutableStringImpl extends RawString {
   constructor(value: string) {
     super(value);

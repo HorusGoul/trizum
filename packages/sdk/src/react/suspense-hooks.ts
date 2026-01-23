@@ -11,7 +11,7 @@ import {
   documentCache,
   handleCache,
   multipleDocumentCache,
-} from "../cache/document-cache.js";
+} from "../internal/document-cache.js";
 import type { DocumentHandle, AnyDocumentId } from "../types.js";
 import type { AMDocHandle } from "../internal/automerge.js";
 import { wrapHandle } from "../internal/automerge.js";

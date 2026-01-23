@@ -7,8 +7,8 @@
  * @internal This module is for internal SDK use only.
  */
 
-import type { Repo, AMDocHandle } from "../internal/automerge.js";
-import { toAMDocumentId } from "../internal/automerge.js";
+import type { Repo, AMDocHandle } from "./automerge.js";
+import { toAMDocumentId } from "./automerge.js";
 import type { AnyDocumentId } from "../types.js";
 import { createCache, type Cache } from "suspense";
 import { retryWithExponentialBackoff } from "../utils/retry.js";

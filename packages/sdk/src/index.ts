@@ -49,7 +49,7 @@ export {
 // Array utilities for document mutations
 export { insertAt, deleteAt } from "./utils/array.js";
 
-// Core types (SDK-specific, no Automerge exposure)
+// Core types
 export type {
   DocumentId,
   AnyDocumentId,
@@ -62,7 +62,6 @@ export type {
 export { SUPPORTED_LOCALES, isValidDocumentId } from "./types.js";
 
 // ImmutableString class for creating immutable string values in documents
-// This wraps Automerge's RawString without exposing the underlying implementation
 export { ImmutableString } from "./utils/immutable-string.js";
 export type { ImmutableString as ImmutableStringType } from "./utils/immutable-string.js";
 

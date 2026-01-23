@@ -1,13 +1,13 @@
 {
   "name": "@trizum/sdk",
-  "description": "Trizum SDK - CRUD operations, real-time updates, and React Suspense support for Automerge documents",
+  "description": "Trizum SDK - CRUD operations, real-time sync, and React Suspense for offline-first documents",
   "keywords": [
     "trizum",
     "sdk",
-    "automerge",
     "crdt",
     "offline-first",
-    "suspense"
+    "suspense",
+    "local-first"
   ],
   "version": "0.0.1",
   "license": "MIT",
