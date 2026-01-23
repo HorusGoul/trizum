@@ -13,7 +13,6 @@ import type { AnyDocumentId } from "../types.js";
 import { createCache, type Cache } from "suspense";
 import { retryWithExponentialBackoff } from "../utils/retry.js";
 
-
 /**
  * @internal
  * Cache for document handles.
