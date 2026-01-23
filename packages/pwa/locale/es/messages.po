@@ -37,7 +37,7 @@ msgstr "{name}"
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
-#: src/lib/validation.ts:46
+#: src/lib/validation.ts:69
 msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
@@ -50,7 +50,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/new.tsx:565
+#: src/routes/new.tsx:596
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
@@ -64,12 +64,12 @@ msgstr "Añadir un gasto"
 msgid "Add or create"
 msgstr "Añadir o crear"
 
-#: src/routes/new.tsx:366
-#: src/routes/party_.$partyId.settings.tsx:411
+#: src/routes/new.tsx:397
+#: src/routes/party_.$partyId.settings.tsx:442
 msgid "Add participant"
 msgstr "Añadir participante"
 
-#: src/routes/index.tsx:483
+#: src/routes/index.tsx:484
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
@@ -77,15 +77,15 @@ msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
 
-#: src/routes/new.tsx:422
+#: src/routes/new.tsx:453
 msgid "Afghan Afghani"
 msgstr "Afgani Afgano"
 
-#: src/routes/new.tsx:423
+#: src/routes/new.tsx:454
 msgid "Albanian Lek"
 msgstr "Lek Albanés"
 
-#: src/routes/new.tsx:457
+#: src/routes/new.tsx:488
 msgid "Algerian Dinar"
 msgstr "Dinar Argelino"
 
@@ -106,11 +106,11 @@ msgstr "Cantidad para {0}"
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
-#: src/routes/new.tsx:426
+#: src/routes/new.tsx:457
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/routes/party_.$partyId.settings.tsx:329
+#: src/routes/party_.$partyId.settings.tsx:360
 msgid "Archive"
 msgstr "Archivar"
 
@@ -118,24 +118,24 @@ msgstr "Archivar"
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/party_.$partyId.settings.tsx:420
+#: src/routes/party_.$partyId.settings.tsx:451
 msgid "Archived participants"
 msgstr "Participantes archivados"
 
-#: src/routes/new.tsx:427
+#: src/routes/new.tsx:458
 msgid "Argentine Peso"
 msgstr "Peso Argentino"
 
-#: src/routes/new.tsx:424
+#: src/routes/new.tsx:455
 msgid "Armenian Dram"
 msgstr "Dram Armenio"
 
-#: src/routes/new.tsx:428
+#: src/routes/new.tsx:459
 msgid "Aruban Florin"
 msgstr "Florín Arubeño"
 
-#: src/routes/new.tsx:257
-#: src/routes/party_.$partyId.settings.tsx:253
+#: src/routes/new.tsx:288
+#: src/routes/party_.$partyId.settings.tsx:284
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
@@ -143,7 +143,7 @@ msgstr "Se requiere al menos un participante"
 msgid "Attachments"
 msgstr "Adjuntos"
 
-#: src/routes/new.tsx:396
+#: src/routes/new.tsx:427
 msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
@@ -159,15 +159,15 @@ msgstr "Avatar eliminado"
 msgid "Avatar updated successfully"
 msgstr "Avatar actualizado correctamente"
 
-#: src/routes/new.tsx:429
+#: src/routes/new.tsx:460
 msgid "Azerbaijani Manat"
 msgstr "Manat Azerbaiyano"
 
-#: src/routes/new.tsx:439
+#: src/routes/new.tsx:470
 msgid "Bahamian Dollar"
 msgstr "Dólar Bahameño"
 
-#: src/routes/new.tsx:433
+#: src/routes/new.tsx:464
 msgid "Bahraini Dinar"
 msgstr "Dinar Bareiní"
 
@@ -183,55 +183,55 @@ msgstr "Balance, Menor Primero"
 msgid "Balances"
 msgstr "Balance"
 
-#: src/routes/new.tsx:432
+#: src/routes/new.tsx:463
 msgid "Bangladeshi Taka"
 msgstr "Taka Bangladesí"
 
-#: src/routes/new.tsx:431
+#: src/routes/new.tsx:462
 msgid "Barbadian Dollar"
 msgstr "Dólar de Barbados"
 
-#: src/routes/new.tsx:442
+#: src/routes/new.tsx:473
 msgid "Belarusian Ruble"
 msgstr "Rublo Bielorruso"
 
-#: src/routes/new.tsx:443
+#: src/routes/new.tsx:474
 msgid "Belize Dollar"
 msgstr "Dólar Beliceño"
 
-#: src/routes/new.tsx:435
+#: src/routes/new.tsx:466
 msgid "Bermudan Dollar"
 msgstr "Dólar Bermudeño"
 
-#: src/routes/new.tsx:440
+#: src/routes/new.tsx:471
 msgid "Bhutanese Ngultrum"
 msgstr "Ngultrum Butanés"
 
-#: src/routes/new.tsx:437
+#: src/routes/new.tsx:468
 msgid "Bolivian Boliviano"
 msgstr "Boliviano"
 
-#: src/routes/new.tsx:438
+#: src/routes/new.tsx:469
 msgid "Bolivian Mvdol"
 msgstr "Mvdol Boliviano"
 
-#: src/routes/new.tsx:430
+#: src/routes/new.tsx:461
 msgid "Bosnia-Herzegovina Convertible Mark"
 msgstr "Marco Convertible de Bosnia-Herzegovina"
 
-#: src/routes/new.tsx:441
+#: src/routes/new.tsx:472
 msgid "Botswanan Pula"
 msgstr "Pula Botsuano"
 
-#: src/routes/new.tsx:400
+#: src/routes/new.tsx:431
 msgid "Brazilian Real"
 msgstr "Real Brasileño"
 
-#: src/routes/new.tsx:392
+#: src/routes/new.tsx:423
 msgid "British Pound"
 msgstr "Libra Esterlina"
 
-#: src/routes/new.tsx:436
+#: src/routes/new.tsx:467
 msgid "Brunei Dollar"
 msgstr "Dólar de Brunéi"
 
@@ -239,15 +239,15 @@ msgstr "Dólar de Brunéi"
 msgid "Bug Reports"
 msgstr "Reportar errores"
 
-#: src/routes/new.tsx:409
+#: src/routes/new.tsx:440
 msgid "Bulgarian Lev"
 msgstr "Lev Búlgaro"
 
-#: src/routes/new.tsx:434
+#: src/routes/new.tsx:465
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/routes/new.tsx:480
+#: src/routes/new.tsx:511
 msgid "Cambodian Riel"
 msgstr "Riel Camboyano"
 
@@ -259,11 +259,11 @@ msgstr "Se ha denegado el permiso de cámara"
 msgid "Can I use trizum without an account?"
 msgstr "¿Puedo usar trizum sin una cuenta?"
 
-#: src/routes/new.tsx:395
+#: src/routes/new.tsx:426
 msgid "Canadian Dollar"
 msgstr "Dólar Canadiense"
 
-#: src/routes/new.tsx:454
+#: src/routes/new.tsx:485
 msgid "Cape Verdean Escudo"
 msgstr "Escudo Caboverdiano"
 
@@ -271,19 +271,19 @@ msgstr "Escudo Caboverdiano"
 msgid "Cash or other ways"
 msgstr "Efectivo u otras formas"
 
-#: src/routes/new.tsx:484
+#: src/routes/new.tsx:515
 msgid "Cayman Islands Dollar"
 msgstr "Dólar de las Islas Caimán"
 
-#: src/routes/new.tsx:559
+#: src/routes/new.tsx:590
 msgid "CFA Franc BCEAO"
 msgstr "Franco CFA BCEAO"
 
-#: src/routes/new.tsx:550
+#: src/routes/new.tsx:581
 msgid "CFA Franc BEAC"
 msgstr "Franco CFA BEAC"
 
-#: src/routes/new.tsx:561
+#: src/routes/new.tsx:592
 msgid "CFP Franc"
 msgstr "Franco CFP"
 
@@ -295,19 +295,19 @@ msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
-#: src/routes/new.tsx:448
+#: src/routes/new.tsx:479
 msgid "Chilean Peso"
 msgstr "Peso Chileno"
 
-#: src/routes/new.tsx:447
+#: src/routes/new.tsx:478
 msgid "Chilean Unit of Account (UF)"
 msgstr "Unidad de Fomento Chilena (UF)"
 
-#: src/routes/new.tsx:397
+#: src/routes/new.tsx:428
 msgid "Chinese Yuan"
 msgstr "Yuan Chino"
 
-#: src/routes/new.tsx:222
+#: src/routes/new.tsx:253
 msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
@@ -316,35 +316,35 @@ msgstr "Elige la moneda para los gastos de este grupo"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/routes/new.tsx:564
+#: src/routes/new.tsx:595
 msgid "Code for testing"
 msgstr "Código para pruebas"
 
-#: src/routes/new.tsx:449
+#: src/routes/new.tsx:480
 msgid "Colombian Peso"
 msgstr "Peso Colombiano"
 
-#: src/routes/new.tsx:450
+#: src/routes/new.tsx:481
 msgid "Colombian Real Value Unit"
 msgstr "Unidad de Valor Real Colombiana"
 
-#: src/routes/party_.$partyId.settings.tsx:207
+#: src/routes/party_.$partyId.settings.tsx:238
 msgid "Color"
 msgstr "Color"
 
-#: src/routes/new.tsx:481
+#: src/routes/new.tsx:512
 msgid "Comorian Franc"
 msgstr "Franco Comorense"
 
-#: src/routes/index.tsx:480
+#: src/routes/index.tsx:481
 msgid "Complete your profile"
 msgstr "Completa tu perfil"
 
-#: src/routes/index.tsx:445
+#: src/routes/index.tsx:446
 msgid "Configure Profile"
 msgstr "Configurar perfil"
 
-#: src/routes/new.tsx:444
+#: src/routes/new.tsx:475
 msgid "Congolese Franc"
 msgstr "Franco Congoleño"
 
@@ -364,12 +364,12 @@ msgstr "Copiar enlace del grupo"
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
 
-#: src/routes/new.tsx:451
+#: src/routes/new.tsx:482
 msgid "Costa Rican Colón"
 msgstr "Colón Costarricense"
 
 #: src/routes/index.tsx:205
-#: src/routes/index.tsx:346
+#: src/routes/index.tsx:347
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -377,27 +377,27 @@ msgstr "Crear un nuevo Grupo"
 msgid "Credits"
 msgstr "Créditos"
 
-#: src/routes/new.tsx:410
+#: src/routes/new.tsx:441
 msgid "Croatian Kuna"
 msgstr "Kuna Croata"
 
-#: src/routes/new.tsx:452
+#: src/routes/new.tsx:483
 msgid "Cuban Convertible Peso"
 msgstr "Peso Cubano Convertible"
 
-#: src/routes/new.tsx:453
+#: src/routes/new.tsx:484
 msgid "Cuban Peso"
 msgstr "Peso Cubano"
 
-#: src/routes/new.tsx:221
+#: src/routes/new.tsx:252
 msgid "Currency"
 msgstr "Moneda"
 
-#: src/routes/new.tsx:406
+#: src/routes/new.tsx:437
 msgid "Czech Koruna"
 msgstr "Corona Checa"
 
-#: src/routes/new.tsx:404
+#: src/routes/new.tsx:435
 msgid "Danish Krone"
 msgstr "Corona Danesa"
 
@@ -415,12 +415,12 @@ msgstr "¡Deuda saldada entre {0} y {1}!"
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/routes/new.tsx:201
-#: src/routes/party_.$partyId.settings.tsx:187
+#: src/routes/new.tsx:232
+#: src/routes/party_.$partyId.settings.tsx:218
 msgid "Description"
 msgstr "Descripción"
 
-#: src/lib/validation.ts:36
+#: src/lib/validation.ts:59
 msgid "Description must be less than 500 characters"
 msgstr "La descripción debe tener menos de 500 caracteres"
 
@@ -428,15 +428,15 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/routes/new.tsx:455
+#: src/routes/new.tsx:486
 msgid "Djiboutian Franc"
 msgstr "Franco Yibutiano"
 
-#: src/routes/new.tsx:456
+#: src/routes/new.tsx:487
 msgid "Dominican Peso"
 msgstr "Peso Dominicano"
 
-#: src/routes/new.tsx:557
+#: src/routes/new.tsx:588
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
@@ -452,7 +452,7 @@ msgstr "Editando {0}"
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
-#: src/routes/new.tsx:458
+#: src/routes/new.tsx:489
 msgid "Egyptian Pound"
 msgstr "Libra Egipcia"
 
@@ -464,7 +464,7 @@ msgstr "Soporte por email"
 msgid "English"
 msgstr "Inglés"
 
-#: src/routes/index.tsx:382
+#: src/routes/index.tsx:383
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
@@ -472,7 +472,7 @@ msgstr "Introduce un enlace o código de grupo para unirte"
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
-#: src/routes/new.tsx:459
+#: src/routes/new.tsx:490
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
@@ -480,27 +480,27 @@ msgstr "Nakfa Eritreo"
 msgid "Español"
 msgstr "Español"
 
-#: src/routes/new.tsx:460
+#: src/routes/new.tsx:491
 msgid "Ethiopian Birr"
 msgstr "Birr Etíope"
 
-#: src/routes/new.tsx:390
+#: src/routes/new.tsx:421
 msgid "Euro"
 msgstr "Euro"
 
-#: src/routes/new.tsx:553
+#: src/routes/new.tsx:584
 msgid "European Composite Unit"
 msgstr "Unidad Compuesta Europea"
 
-#: src/routes/new.tsx:554
+#: src/routes/new.tsx:585
 msgid "European Monetary Unit"
 msgstr "Unidad Monetaria Europea"
 
-#: src/routes/new.tsx:556
+#: src/routes/new.tsx:587
 msgid "European Unit of Account 17"
 msgstr "Unidad de Cuenta Europea 17"
 
-#: src/routes/new.tsx:555
+#: src/routes/new.tsx:586
 msgid "European Unit of Account 9"
 msgstr "Unidad de Cuenta Europea 9"
 
@@ -560,7 +560,7 @@ msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
-#: src/routes/new.tsx:462
+#: src/routes/new.tsx:493
 msgid "Falkland Islands Pound"
 msgstr "Libra Malvinense"
 
@@ -572,7 +572,7 @@ msgstr "Sugerencias"
 msgid "Features"
 msgstr "Características"
 
-#: src/routes/new.tsx:461
+#: src/routes/new.tsx:492
 msgid "Fijian Dollar"
 msgstr "Dólar Fiyiano"
 
@@ -588,11 +588,11 @@ msgstr "¿Encontraste un error? Avísanos en GitHub y lo solucionaremos."
 msgid "Frequently Asked Questions"
 msgstr "Preguntas frecuentes"
 
-#: src/routes/new.tsx:466
+#: src/routes/new.tsx:497
 msgid "Gambian Dalasi"
 msgstr "Dalasi Gambiano"
 
-#: src/routes/new.tsx:463
+#: src/routes/new.tsx:494
 msgid "Georgian Lari"
 msgstr "Lari Georgiano"
 
@@ -600,11 +600,11 @@ msgstr "Lari Georgiano"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/routes/new.tsx:464
+#: src/routes/new.tsx:495
 msgid "Ghanaian Cedi"
 msgstr "Cedi Ghanés"
 
-#: src/routes/new.tsx:465
+#: src/routes/new.tsx:496
 msgid "Gibraltar Pound"
 msgstr "Libra de Gibraltar"
 
@@ -620,23 +620,23 @@ msgstr "Volver"
 msgid "Go back to home"
 msgstr "Volver al inicio"
 
-#: src/routes/new.tsx:552
+#: src/routes/new.tsx:583
 msgid "Gold (troy ounce)"
 msgstr "Oro (onza troy)"
 
-#: src/routes/new.tsx:468
+#: src/routes/new.tsx:499
 msgid "Guatemalan Quetzal"
 msgstr "Quetzal Guatemalteco"
 
-#: src/routes/new.tsx:467
+#: src/routes/new.tsx:498
 msgid "Guinean Franc"
 msgstr "Franco Guineano"
 
-#: src/routes/new.tsx:469
+#: src/routes/new.tsx:500
 msgid "Guyanaese Dollar"
 msgstr "Dólar Guyanés"
 
-#: src/routes/new.tsx:471
+#: src/routes/new.tsx:502
 msgid "Haitian Gourde"
 msgstr "Gourde Haitiano"
 
@@ -656,16 +656,16 @@ msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo
 msgid "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 msgstr "Aquí tienes una lista de formas en las que puedes pagar, una vez hecho, pulsa el botón de arriba para marcar el gasto como pagado en este grupo de trizum."
 
-#: src/routes/new.tsx:470
+#: src/routes/new.tsx:501
 msgid "Honduran Lempira"
 msgstr "Lempira Hondureño"
 
-#: src/routes/new.tsx:415
+#: src/routes/new.tsx:446
 msgid "Hong Kong Dollar"
 msgstr "Dólar de Hong Kong"
 
-#: src/routes/new.tsx:177
-#: src/routes/party_.$partyId.settings.tsx:163
+#: src/routes/new.tsx:208
+#: src/routes/party_.$partyId.settings.tsx:171
 msgid "How do you want to call this party?"
 msgstr "¿Cómo quieres llamar a este grupo?"
 
@@ -681,11 +681,11 @@ msgstr "¿Cómo debería equilibrar?"
 msgid "How to pay?"
 msgstr "¿Cómo pagar?"
 
-#: src/routes/new.tsx:407
+#: src/routes/new.tsx:438
 msgid "Hungarian Forint"
 msgstr "Forinto Húngaro"
 
-#: src/routes/new.tsx:475
+#: src/routes/new.tsx:506
 msgid "Icelandic Króna"
 msgstr "Corona Islandesa"
 
@@ -709,7 +709,7 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
-#: src/routes/index.tsx:415
+#: src/routes/index.tsx:416
 msgid "Import your existing Tricount data"
 msgstr "Importa tu grupo de Tricount"
 
@@ -729,11 +729,11 @@ msgstr "Importando datos de Tricount..."
 msgid "Include all"
 msgstr "Incluir todos"
 
-#: src/routes/new.tsx:398
+#: src/routes/new.tsx:429
 msgid "Indian Rupee"
 msgstr "Rupia India"
 
-#: src/routes/new.tsx:472
+#: src/routes/new.tsx:503
 msgid "Indonesian Rupiah"
 msgstr "Rupia Indonesia"
 
@@ -755,11 +755,11 @@ msgstr "Código de grupo de trizum no válido"
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
-#: src/routes/new.tsx:474
+#: src/routes/new.tsx:505
 msgid "Iranian Rial"
 msgstr "Rial Iraní"
 
-#: src/routes/new.tsx:473
+#: src/routes/new.tsx:504
 msgid "Iraqi Dinar"
 msgstr "Dinar Iraquí"
 
@@ -767,15 +767,15 @@ msgstr "Dinar Iraquí"
 msgid "Is my data secure?"
 msgstr "¿Mis datos están seguros?"
 
-#: src/routes/new.tsx:418
+#: src/routes/new.tsx:449
 msgid "Israeli Shekel"
 msgstr "Shekel Israelí"
 
-#: src/routes/new.tsx:476
+#: src/routes/new.tsx:507
 msgid "Jamaican Dollar"
 msgstr "Dólar Jamaicano"
 
-#: src/routes/new.tsx:393
+#: src/routes/new.tsx:424
 msgid "Japanese Yen"
 msgstr "Yen Japonés"
 
@@ -789,7 +789,7 @@ msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
 #: src/routes/index.tsx:195
-#: src/routes/index.tsx:379
+#: src/routes/index.tsx:380
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -797,23 +797,23 @@ msgstr "Unirse a un Grupo"
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
 
-#: src/routes/new.tsx:477
+#: src/routes/new.tsx:508
 msgid "Jordanian Dinar"
 msgstr "Dinar Jordano"
 
-#: src/routes/new.tsx:485
+#: src/routes/new.tsx:516
 msgid "Kazakhstani Tenge"
 msgstr "Tenge Kazajo"
 
-#: src/routes/new.tsx:478
+#: src/routes/new.tsx:509
 msgid "Kenyan Shilling"
 msgstr "Chelín Keniata"
 
-#: src/routes/new.tsx:483
+#: src/routes/new.tsx:514
 msgid "Kuwaiti Dinar"
 msgstr "Dinar Kuwaití"
 
-#: src/routes/new.tsx:479
+#: src/routes/new.tsx:510
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
@@ -821,7 +821,7 @@ msgstr "Som Kirguís"
 msgid "Language"
 msgstr "Idioma"
 
-#: src/routes/new.tsx:486
+#: src/routes/new.tsx:517
 msgid "Laotian Kip"
 msgstr "Kip Laosiano"
 
@@ -829,19 +829,19 @@ msgstr "Kip Laosiano"
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
-#: src/routes/new.tsx:487
+#: src/routes/new.tsx:518
 msgid "Lebanese Pound"
 msgstr "Libra Libanesa"
 
-#: src/routes/new.tsx:490
+#: src/routes/new.tsx:521
 msgid "Lesotho Loti"
 msgstr "Loti de Lesoto"
 
-#: src/routes/new.tsx:489
+#: src/routes/new.tsx:520
 msgid "Liberian Dollar"
 msgstr "Dólar Liberiano"
 
-#: src/routes/new.tsx:491
+#: src/routes/new.tsx:522
 msgid "Libyan Dinar"
 msgstr "Dinar Libio"
 
@@ -861,27 +861,27 @@ msgstr "Enlaces"
 msgid "Loading licenses..."
 msgstr "Cargando licencias..."
 
-#: src/routes/new.tsx:498
+#: src/routes/new.tsx:529
 msgid "Macanese Pataca"
 msgstr "Pataca de Macao"
 
-#: src/routes/new.tsx:495
+#: src/routes/new.tsx:526
 msgid "Macedonian Denar"
 msgstr "Denar Macedonio"
 
-#: src/routes/new.tsx:494
+#: src/routes/new.tsx:525
 msgid "Malagasy Ariary"
 msgstr "Ariary Malgache"
 
-#: src/routes/new.tsx:502
+#: src/routes/new.tsx:533
 msgid "Malawian Kwacha"
 msgstr "Kwacha Malauí"
 
-#: src/routes/new.tsx:504
+#: src/routes/new.tsx:535
 msgid "Malaysian Ringgit"
 msgstr "Ringgit Malasio"
 
-#: src/routes/new.tsx:501
+#: src/routes/new.tsx:532
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
@@ -890,7 +890,7 @@ msgstr "Rufiyaa Maldiva"
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
-#: src/routes/party_.$partyId.settings.tsx:233
+#: src/routes/party_.$partyId.settings.tsx:264
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden ser archivados."
 
@@ -904,11 +904,11 @@ msgstr "Marcar como pagado"
 msgid "Marking expense as paid..."
 msgstr "Marcando gasto como pagado..."
 
-#: src/routes/new.tsx:499
+#: src/routes/new.tsx:530
 msgid "Mauritanian Ouguiya"
 msgstr "Ouguiya Mauritano"
 
-#: src/routes/new.tsx:500
+#: src/routes/new.tsx:531
 msgid "Mauritian Rupee"
 msgstr "Rupia de Mauricio"
 
@@ -923,16 +923,16 @@ msgstr "Yo"
 msgid "Menu"
 msgstr "Menú"
 
-#: src/routes/new.tsx:503
+#: src/routes/new.tsx:534
 msgid "Mexican Investment Unit"
 msgstr "Unidad de Inversión Mexicana"
 
-#: src/routes/new.tsx:399
+#: src/routes/new.tsx:430
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
 #: src/routes/index.tsx:215
-#: src/routes/index.tsx:412
+#: src/routes/index.tsx:413
 #: src/routes/migrate_.tricount.tsx:161
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -949,19 +949,19 @@ msgstr "Migración exitosa"
 msgid "Missing search params"
 msgstr "Faltan parámetros de búsqueda"
 
-#: src/routes/new.tsx:493
+#: src/routes/new.tsx:524
 msgid "Moldovan Leu"
 msgstr "Leu Moldavo"
 
-#: src/routes/new.tsx:497
+#: src/routes/new.tsx:528
 msgid "Mongolian Tugrik"
 msgstr "Tugrik Mongol"
 
-#: src/routes/new.tsx:492
+#: src/routes/new.tsx:523
 msgid "Moroccan Dirham"
 msgstr "Dírham Marroquí"
 
-#: src/routes/new.tsx:505
+#: src/routes/new.tsx:536
 msgid "Mozambican Metical"
 msgstr "Metical Mozambiqueño"
 
@@ -969,7 +969,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/routes/new.tsx:496
+#: src/routes/new.tsx:527
 msgid "Myanma Kyat"
 msgstr "Kyat Birmano"
 
@@ -977,11 +977,11 @@ msgstr "Kyat Birmano"
 msgid "Name"
 msgstr "Nombre"
 
-#: src/lib/validation.ts:50
+#: src/lib/validation.ts:73
 msgid "Name must be less than 50 characters"
 msgstr "El nombre debe tener menos de 50 caracteres"
 
-#: src/routes/new.tsx:506
+#: src/routes/new.tsx:537
 msgid "Namibian Dollar"
 msgstr "Dólar Namibio"
 
@@ -989,11 +989,11 @@ msgstr "Dólar Namibio"
 msgid "Need help with trizum? We're here to assist you."
 msgstr "¿Necesitas ayuda con trizum? Estamos aquí para ayudarte."
 
-#: src/routes/new.tsx:509
+#: src/routes/new.tsx:540
 msgid "Nepalese Rupee"
 msgstr "Rupia Nepalí"
 
-#: src/routes/new.tsx:425
+#: src/routes/new.tsx:456
 msgid "Netherlands Antillean Guilder"
 msgstr "Florín de las Antillas Neerlandesas"
 
@@ -1001,20 +1001,20 @@ msgstr "Florín de las Antillas Neerlandesas"
 msgid "New expense"
 msgstr "Nuevo gasto"
 
-#: src/routes/new.tsx:319
-#: src/routes/party_.$partyId.settings.tsx:364
+#: src/routes/new.tsx:350
+#: src/routes/party_.$partyId.settings.tsx:395
 msgid "New participant name"
 msgstr "Nombre del nuevo participante"
 
-#: src/routes/new.tsx:537
+#: src/routes/new.tsx:568
 msgid "New Taiwan Dollar"
 msgstr "Nuevo Dólar Taiwanés"
 
-#: src/routes/new.tsx:136
+#: src/routes/new.tsx:144
 msgid "New trizum"
 msgstr "Nuevo trizum"
 
-#: src/routes/new.tsx:413
+#: src/routes/new.tsx:444
 msgid "New Zealand Dollar"
 msgstr "Dólar Neozelandés"
 
@@ -1022,11 +1022,11 @@ msgstr "Dólar Neozelandés"
 msgid "Next"
 msgstr "Siguiente"
 
-#: src/routes/new.tsx:508
+#: src/routes/new.tsx:539
 msgid "Nicaraguan Córdoba"
 msgstr "Córdoba Nicaragüense"
 
-#: src/routes/new.tsx:507
+#: src/routes/new.tsx:538
 msgid "Nigerian Naira"
 msgstr "Naira Nigeriano"
 
@@ -1034,7 +1034,7 @@ msgstr "Naira Nigeriano"
 msgid "No camera found on this device"
 msgstr "No se encontró cámara en este dispositivo"
 
-#: src/routes/new.tsx:566
+#: src/routes/new.tsx:597
 msgid "No currency"
 msgstr "Sin moneda"
 
@@ -1042,11 +1042,11 @@ msgstr "Sin moneda"
 msgid "Nobody owes you money!"
 msgstr "¡Nadie te debe dinero!"
 
-#: src/routes/new.tsx:482
+#: src/routes/new.tsx:513
 msgid "North Korean Won"
 msgstr "Won Norcoreano"
 
-#: src/routes/new.tsx:403
+#: src/routes/new.tsx:434
 msgid "Norwegian Krone"
 msgstr "Corona Noruega"
 
@@ -1058,7 +1058,7 @@ msgstr "No es un código de grupo de trizum válido"
 msgid "Offline-First"
 msgstr "Sin Conexión Primero"
 
-#: src/routes/new.tsx:510
+#: src/routes/new.tsx:541
 msgid "Omani Rial"
 msgstr "Rial Omaní"
 
@@ -1101,46 +1101,46 @@ msgstr "Pagado por"
 msgid "Paid debt to {0}"
 msgstr "Deuda pagada a {0}"
 
-#: src/routes/new.tsx:515
+#: src/routes/new.tsx:546
 msgid "Pakistani Rupee"
 msgstr "Rupia Paquistaní"
 
-#: src/routes/new.tsx:560
+#: src/routes/new.tsx:591
 msgid "Palladium (troy ounce)"
 msgstr "Paladio (onza troy)"
 
-#: src/routes/new.tsx:511
+#: src/routes/new.tsx:542
 msgid "Panamanian Balboa"
 msgstr "Balboa Panameño"
 
-#: src/routes/new.tsx:513
+#: src/routes/new.tsx:544
 msgid "Papua New Guinean Kina"
 msgstr "Kina de Papúa Nueva Guinea"
 
-#: src/routes/new.tsx:516
+#: src/routes/new.tsx:547
 msgid "Paraguayan Guarani"
 msgstr "Guaraní Paraguayo"
 
-#: src/routes/index.tsx:290
+#: src/routes/index.tsx:291
 msgid "participant"
 msgstr "participante"
 
-#: src/routes/new.tsx:285
-#: src/routes/party_.$partyId.settings.tsx:306
-#: src/routes/party_.$partyId.settings.tsx:439
+#: src/routes/new.tsx:316
+#: src/routes/party_.$partyId.settings.tsx:337
+#: src/routes/party_.$partyId.settings.tsx:470
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/routes/index.tsx:292
+#: src/routes/index.tsx:293
 msgid "participants"
 msgstr "participantes"
 
-#: src/routes/new.tsx:242
-#: src/routes/party_.$partyId.settings.tsx:229
+#: src/routes/new.tsx:273
+#: src/routes/party_.$partyId.settings.tsx:260
 msgid "Participants"
 msgstr "Participantes"
 
-#: src/routes/new.tsx:81
+#: src/routes/new.tsx:88
 msgid "Party created"
 msgstr "Grupo creado"
 
@@ -1148,11 +1148,11 @@ msgstr "Grupo creado"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/party_.$partyId.settings.tsx:118
+#: src/routes/party_.$partyId.settings.tsx:126
 msgid "Party Settings"
 msgstr "Configuración del Grupo"
 
-#: src/routes/party_.$partyId.settings.tsx:67
+#: src/routes/party_.$partyId.settings.tsx:74
 msgid "Party settings saved!"
 msgstr "¡Configuración del grupo guardada!"
 
@@ -1177,11 +1177,11 @@ msgstr "Personas que te deben dinero"
 msgid "Personal mode"
 msgstr "Modo personal"
 
-#: src/routes/new.tsx:512
+#: src/routes/new.tsx:543
 msgid "Peruvian Sol"
 msgstr "Sol Peruano"
 
-#: src/routes/new.tsx:514
+#: src/routes/new.tsx:545
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
@@ -1197,11 +1197,11 @@ msgstr "¡Número de teléfono copiado al portapapeles!"
 msgid "Phone number is required"
 msgstr "Se requiere el número de teléfono"
 
-#: src/lib/validation.ts:62
+#: src/lib/validation.ts:85
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/new.tsx:562
+#: src/routes/new.tsx:593
 msgid "Platinum (troy ounce)"
 msgstr "Platino (onza troy)"
 
@@ -1233,7 +1233,7 @@ msgstr "Por favor espera mientras obtenemos los datos más recientes"
 msgid "Point your camera at a trizum QR code"
 msgstr "Apunta tu cámara a un código QR de trizum"
 
-#: src/routes/new.tsx:405
+#: src/routes/new.tsx:436
 msgid "Polish Zloty"
 msgstr "Zloty Polaco"
 
@@ -1245,7 +1245,7 @@ msgstr "Anterior"
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
 
-#: src/routes/new.tsx:517
+#: src/routes/new.tsx:548
 msgid "Qatari Rial"
 msgstr "Rial Catarí"
 
@@ -1257,8 +1257,8 @@ msgstr "Sincronización en Tiempo Real"
 msgid "Reload"
 msgstr "Recargar"
 
-#: src/routes/new.tsx:298
-#: src/routes/party_.$partyId.settings.tsx:320
+#: src/routes/new.tsx:329
+#: src/routes/party_.$partyId.settings.tsx:351
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -1278,7 +1278,7 @@ msgstr "Reportar un Problema"
 msgid "Report Issues"
 msgstr "Reportar problemas"
 
-#: src/routes/party_.$partyId.settings.tsx:453
+#: src/routes/party_.$partyId.settings.tsx:484
 msgid "Restore"
 msgstr "Restaurar"
 
@@ -1286,42 +1286,42 @@ msgstr "Restaurar"
 msgid "Retry"
 msgstr "Reintentar"
 
-#: src/routes/new.tsx:408
+#: src/routes/new.tsx:439
 msgid "Romanian Leu"
 msgstr "Leu Rumano"
 
-#: src/routes/new.tsx:411
+#: src/routes/new.tsx:442
 msgid "Russian Ruble"
 msgstr "Rublo Ruso"
 
-#: src/routes/new.tsx:519
+#: src/routes/new.tsx:550
 msgid "Rwandan Franc"
 msgstr "Franco Ruandés"
 
-#: src/routes/new.tsx:523
+#: src/routes/new.tsx:554
 msgid "Saint Helena Pound"
 msgstr "Libra de Santa Elena"
 
-#: src/routes/new.tsx:529
+#: src/routes/new.tsx:560
 msgid "Salvadoran Colón"
 msgstr "Colón Salvadoreño"
 
-#: src/routes/new.tsx:549
+#: src/routes/new.tsx:580
 msgid "Samoan Tala"
 msgstr "Tala Samoano"
 
-#: src/routes/new.tsx:528
+#: src/routes/new.tsx:559
 msgid "São Tomé and Príncipe Dobra"
 msgstr "Dobra de Santo Tomé y Príncipe"
 
-#: src/routes/new.tsx:420
+#: src/routes/new.tsx:451
 msgid "Saudi Riyal"
 msgstr "Riyal Saudí"
 
 #: src/components/ExpenseEditor.tsx:257
 #: src/routes/migrate_.tricount.tsx:174
-#: src/routes/new.tsx:149
-#: src/routes/party_.$partyId.settings.tsx:135
+#: src/routes/new.tsx:157
+#: src/routes/party_.$partyId.settings.tsx:143
 #: src/routes/party_.$partyId.who.tsx:108
 #: src/routes/settings.tsx:99
 msgid "Save"
@@ -1336,11 +1336,11 @@ msgstr "Escanear código QR"
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Envíanos un email y te responderemos lo antes posible."
 
-#: src/routes/new.tsx:518
+#: src/routes/new.tsx:549
 msgid "Serbian Dinar"
 msgstr "Dinar Serbio"
 
-#: src/routes/index.tsx:448
+#: src/routes/index.tsx:449
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
@@ -1354,7 +1354,7 @@ msgstr "Configuración"
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
-#: src/routes/new.tsx:521
+#: src/routes/new.tsx:552
 msgid "Seychellois Rupee"
 msgstr "Rupia de Seychelles"
 
@@ -1384,23 +1384,23 @@ msgstr "Partes para {0}"
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1>{amount} {2}</1>."
 
-#: src/routes/new.tsx:524
+#: src/routes/new.tsx:555
 msgid "Sierra Leonean Leone"
 msgstr "Leone de Sierra Leona"
 
-#: src/routes/new.tsx:551
+#: src/routes/new.tsx:582
 msgid "Silver (troy ounce)"
 msgstr "Plata (onza troy)"
 
-#: src/routes/new.tsx:414
+#: src/routes/new.tsx:445
 msgid "Singapore Dollar"
 msgstr "Dólar de Singapur"
 
-#: src/routes/new.tsx:520
+#: src/routes/new.tsx:551
 msgid "Solomon Islands Dollar"
 msgstr "Dólar de las Islas Salomón"
 
-#: src/routes/new.tsx:525
+#: src/routes/new.tsx:556
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
@@ -1412,23 +1412,23 @@ msgstr "Algo salió mal"
 msgid "Sort balances"
 msgstr "Ordenar balances"
 
-#: src/routes/new.tsx:417
+#: src/routes/new.tsx:448
 msgid "South African Rand"
 msgstr "Rand Sudafricano"
 
-#: src/routes/new.tsx:401
+#: src/routes/new.tsx:432
 msgid "South Korean Won"
 msgstr "Won Surcoreano"
 
-#: src/routes/new.tsx:527
+#: src/routes/new.tsx:558
 msgid "South Sudanese Pound"
 msgstr "Libra Sursudanesa"
 
-#: src/routes/new.tsx:558
+#: src/routes/new.tsx:589
 msgid "Special Drawing Rights"
 msgstr "Derechos Especiales de Giro"
 
-#: src/routes/index.tsx:313
+#: src/routes/index.tsx:314
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
 
@@ -1440,11 +1440,11 @@ msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos j
 msgid "Split expenses fairly among multiple participants"
 msgstr "Divide los gastos de forma justa entre múltiples participantes"
 
-#: src/routes/new.tsx:488
+#: src/routes/new.tsx:519
 msgid "Sri Lankan Rupee"
 msgstr "Rupia de Sri Lanka"
 
-#: src/routes/index.tsx:349
+#: src/routes/index.tsx:350
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
@@ -1454,18 +1454,18 @@ msgstr "Enviar sugerencia"
 
 #: src/components/ExpenseEditor.tsx:257
 #: src/routes/migrate_.tricount.tsx:174
-#: src/routes/new.tsx:149
-#: src/routes/party_.$partyId.settings.tsx:135
+#: src/routes/new.tsx:157
+#: src/routes/party_.$partyId.settings.tsx:143
 #: src/routes/party_.$partyId.who.tsx:108
 #: src/routes/settings.tsx:99
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/routes/new.tsx:563
+#: src/routes/new.tsx:594
 msgid "Sucre"
 msgstr "Sucre"
 
-#: src/routes/new.tsx:522
+#: src/routes/new.tsx:553
 msgid "Sudanese Pound"
 msgstr "Libra Sudanesa"
 
@@ -1474,15 +1474,15 @@ msgstr "Libra Sudanesa"
 msgid "Support"
 msgstr "Soporte"
 
-#: src/routes/new.tsx:526
+#: src/routes/new.tsx:557
 msgid "Surinamese Dollar"
 msgstr "Dólar Surinamés"
 
-#: src/routes/new.tsx:531
+#: src/routes/new.tsx:562
 msgid "Swazi Lilangeni"
 msgstr "Lilangeni Suazi"
 
-#: src/routes/new.tsx:402
+#: src/routes/new.tsx:433
 msgid "Swedish Krona"
 msgstr "Corona Sueca"
 
@@ -1490,7 +1490,7 @@ msgstr "Corona Sueca"
 msgid "Swipe between expenses and balances tabs."
 msgstr "Desliza entre las pestañas de gastos y balance."
 
-#: src/routes/new.tsx:394
+#: src/routes/new.tsx:425
 msgid "Swiss Franc"
 msgstr "Franco Suizo"
 
@@ -1502,11 +1502,24 @@ msgstr "Cambiar a una cantidad fija"
 msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
+#: src/routes/new.tsx:184
+#: src/routes/party_.$partyId.settings.tsx:195
+msgid "Symbol"
+msgstr ""
+
+#: src/lib/validation.ts:49
+msgid "Symbol must be only one emoji"
+msgstr ""
+
+#: src/lib/validation.ts:42
+msgid "Symbol must contain only emojis"
+msgstr ""
+
 #: src/components/PartyPendingComponent.tsx:97
 msgid "Syncing party information..."
 msgstr "Sincronizando información del grupo..."
 
-#: src/routes/new.tsx:530
+#: src/routes/new.tsx:561
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
@@ -1514,7 +1527,7 @@ msgstr "Libra Siria"
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
-#: src/routes/new.tsx:532
+#: src/routes/new.tsx:563
 msgid "Tajikistani Somoni"
 msgstr "Somoni Tayiko"
 
@@ -1523,7 +1536,7 @@ msgstr "Somoni Tayiko"
 msgid "Take photo"
 msgstr "Hacer foto"
 
-#: src/routes/new.tsx:538
+#: src/routes/new.tsx:569
 msgid "Tanzanian Shilling"
 msgstr "Chelín Tanzano"
 
@@ -1531,7 +1544,7 @@ msgstr "Chelín Tanzano"
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
-#: src/routes/new.tsx:416
+#: src/routes/new.tsx:447
 msgid "Thai Baht"
 msgstr "Baht Tailandés"
 
@@ -1574,8 +1587,8 @@ msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
 #: src/components/ExpenseEditor.tsx:298
-#: src/routes/new.tsx:176
-#: src/routes/party_.$partyId.settings.tsx:162
+#: src/routes/new.tsx:207
+#: src/routes/party_.$partyId.settings.tsx:170
 msgid "Title"
 msgstr "Título"
 
@@ -1592,7 +1605,7 @@ msgstr "El título debe tener menos de 50 caracteres"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/new.tsx:535
+#: src/routes/new.tsx:566
 msgid "Tongan Paʻanga"
 msgstr "Paʻanga Tongano"
 
@@ -1604,7 +1617,7 @@ msgstr "Se requiere la clave o URL de Tricount"
 msgid "Tricount URL or key"
 msgstr "URL o clave de Tricount"
 
-#: src/routes/new.tsx:536
+#: src/routes/new.tsx:567
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
@@ -1621,31 +1634,31 @@ msgstr "Reintentar"
 msgid "Try scanning another code"
 msgstr "Prueba escaneando otro código"
 
-#: src/routes/new.tsx:534
+#: src/routes/new.tsx:565
 msgid "Tunisian Dinar"
 msgstr "Dinar Tunecino"
 
-#: src/routes/new.tsx:412
+#: src/routes/new.tsx:443
 msgid "Turkish Lira"
 msgstr "Lira Turca"
 
-#: src/routes/new.tsx:533
+#: src/routes/new.tsx:564
 msgid "Turkmenistani Manat"
 msgstr "Manat Turkmeno"
 
-#: src/routes/new.tsx:419
+#: src/routes/new.tsx:450
 msgid "UAE Dirham"
 msgstr "Dírham de los EAU"
 
-#: src/routes/new.tsx:540
+#: src/routes/new.tsx:571
 msgid "Ugandan Shilling"
 msgstr "Chelín Ugandés"
 
-#: src/routes/new.tsx:539
+#: src/routes/new.tsx:570
 msgid "Ukrainian Hryvnia"
 msgstr "Grivna Ucraniana"
 
-#: src/routes/new.tsx:544
+#: src/routes/new.tsx:575
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
@@ -1683,19 +1696,19 @@ msgstr "Subiendo avatar..."
 msgid "Uploading..."
 msgstr "Subiendo..."
 
-#: src/routes/new.tsx:542
+#: src/routes/new.tsx:573
 msgid "Uruguay Peso en Unidades Indexadas"
 msgstr "Peso Uruguayo en Unidades Indexadas"
 
-#: src/routes/new.tsx:543
+#: src/routes/new.tsx:574
 msgid "Uruguayan Peso"
 msgstr "Peso Uruguayo"
 
-#: src/routes/new.tsx:391
+#: src/routes/new.tsx:422
 msgid "US Dollar"
 msgstr "Dólar Estadounidense"
 
-#: src/routes/new.tsx:541
+#: src/routes/new.tsx:572
 msgid "US Dollar (Next day)"
 msgstr "Dólar Estadounidense (Día siguiente)"
 
@@ -1711,15 +1724,15 @@ msgstr "Usa tu cámara para escanear una invitación de trizum"
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: src/routes/new.tsx:545
+#: src/routes/new.tsx:576
 msgid "Uzbekistan Som"
 msgstr "Som Uzbeko"
 
-#: src/routes/new.tsx:548
+#: src/routes/new.tsx:579
 msgid "Vanuatu Vatu"
 msgstr "Vatu de Vanuatu"
 
-#: src/routes/new.tsx:546
+#: src/routes/new.tsx:577
 msgid "Venezuelan Bolívar Soberano"
 msgstr "Bolívar Soberano Venezolano"
 
@@ -1727,7 +1740,7 @@ msgstr "Bolívar Soberano Venezolano"
 msgid "Version"
 msgstr "Versión"
 
-#: src/routes/new.tsx:547
+#: src/routes/new.tsx:578
 msgid "Vietnamese Dong"
 msgstr "Dong Vietnamita"
 
@@ -1758,12 +1771,12 @@ msgstr "Viendo como {0}"
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/index.tsx:310
+#: src/routes/index.tsx:311
 msgid "Welcome to trizum"
 msgstr "Bienvenid@ a trizum"
 
-#: src/routes/new.tsx:202
-#: src/routes/party_.$partyId.settings.tsx:188
+#: src/routes/new.tsx:233
+#: src/routes/party_.$partyId.settings.tsx:219
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
@@ -1775,7 +1788,7 @@ msgstr "¿Cuál es tu forma preferida de que te llamen?"
 msgid "Who are you?"
 msgstr "¿Quién eres?"
 
-#: src/routes/new.tsx:246
+#: src/routes/new.tsx:277
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "¿Quién está invitado a este grupo? Puedes añadir más participantes más tarde."
 
@@ -1783,11 +1796,11 @@ msgstr "¿Quién está invitado a este grupo? Puedes añadir más participantes 
 msgid "Why is this taking so long?"
 msgstr "¿Por qué está tardando tanto?"
 
-#: src/routes/new.tsx:445
+#: src/routes/new.tsx:476
 msgid "WIR Euro"
 msgstr "Euro WIR"
 
-#: src/routes/new.tsx:446
+#: src/routes/new.tsx:477
 msgid "WIR Franc"
 msgstr "Franco WIR"
 
@@ -1795,7 +1808,7 @@ msgstr "Franco WIR"
 msgid "Works seamlessly offline with automatic sync when online"
 msgstr "Funciona sin problemas sin conexión con sincronización automática cuando estás en línea"
 
-#: src/routes/new.tsx:567
+#: src/routes/new.tsx:598
 msgid "Yemeni Rial"
 msgstr "Rial Yemení"
 
@@ -1832,10 +1845,10 @@ msgstr "Tus datos se almacenan localmente en tu dispositivo y se sincronizan con
 msgid "Your internet connection might be too slow."
 msgstr "Tu conexión a internet puede ser demasiado lenta."
 
-#: src/routes/new.tsx:568
+#: src/routes/new.tsx:599
 msgid "Zambian Kwacha"
 msgstr "Kwacha Zambiano"
 
-#: src/routes/new.tsx:569
+#: src/routes/new.tsx:600
 msgid "Zimbabwean Dollar"
 msgstr "Dólar Zimbabuense"
