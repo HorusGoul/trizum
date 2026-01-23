@@ -1,0 +1,29 @@
+import { cn } from "#src/ui/utils.js";
+
+interface TrizumSpinnerProps {
+  size?: number;
+  className?: string;
+}
+
+export function TrizumSpinner({ size = 48, className }: TrizumSpinnerProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 512 512"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("text-current", className)}
+      style={{
+        animation: "swing-rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+      }}
+    >
+      <path
+        d="M138.738 197.734H356.862C356.862 197.734 397.947 197.734 397.947 166.36C397.947 134.986 356.862 134.986 356.862 134.986C335.199 134.986 311.295 134.986 301.584 161.878M273.945 232.843C273.945 232.843 238.089 317.254 199.245 357.592C185.578 371.785 174.594 377.014 154.425 377.014C134.256 377.014 113.388 366.556 114.087 344.893C114.786 323.23 138.738 323.23 138.738 323.23H176.835M273.945 323.23H356.862"
+        stroke="currentColor"
+        strokeWidth="17.928"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
