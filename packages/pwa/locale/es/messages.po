@@ -311,7 +311,7 @@ msgstr "Yuan Chino"
 msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
-#: src/components/EmojiPicker.tsx:193
+#: src/components/EmojiPicker.tsx:203
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
@@ -464,8 +464,8 @@ msgstr "Libra Egipcia"
 msgid "Email Support"
 msgstr "Soporte por email"
 
-#: src/components/EmojiPicker.tsx:290
-#: src/components/EmojiPicker.tsx:418
+#: src/components/EmojiPicker.tsx:308
+#: src/components/EmojiPicker.tsx:502
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
@@ -1049,7 +1049,7 @@ msgstr "No se encontró cámara en este dispositivo"
 msgid "No currency"
 msgstr "Sin moneda"
 
-#: src/components/EmojiPicker.tsx:278
+#: src/components/EmojiPicker.tsx:296
 msgid "No emoji found"
 msgstr "No se encontraron emojis"
 
@@ -1347,15 +1347,15 @@ msgstr "Guardar"
 msgid "Scan QR code"
 msgstr "Escanear código QR"
 
-#: src/components/EmojiPicker.tsx:173
+#: src/components/EmojiPicker.tsx:183
 msgid "Search emoji"
 msgstr "Buscar emoji"
 
-#: src/components/EmojiPicker.tsx:184
+#: src/components/EmojiPicker.tsx:194
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
 
-#: src/components/EmojiPicker.tsx:156
+#: src/components/EmojiPicker.tsx:166
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
