@@ -308,7 +308,7 @@ msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
 #: src/components/MediaGallery.tsx:185
-#: src/components/RouteQRScanner.tsx:57
+#: src/components/RouteQRScanner.tsx:59
 msgid "Close"
 msgstr "Cerrar"
 
@@ -464,7 +464,7 @@ msgstr "Inglés"
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
-#: src/routes/join.tsx:167
+#: src/routes/join.tsx:176
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
@@ -775,6 +775,10 @@ msgstr "Dólar Jamaicano"
 msgid "Japanese Yen"
 msgstr "Yen Japonés"
 
+#: src/routes/join.tsx:201
+msgid "Join"
+msgstr ""
+
 #. placeholder {0}: party.name
 #: src/routes/party_.$partyId.share.tsx:31
 msgid "Join {0} on trizum!"
@@ -841,7 +845,7 @@ msgstr "Dinar Libio"
 msgid "License"
 msgstr "Licencia"
 
-#: src/routes/join.tsx:166
+#: src/routes/join.tsx:175
 msgid "Link or code"
 msgstr "Enlace o código"
 
@@ -1061,6 +1065,10 @@ msgstr "Abrir GitHub Issues"
 #: src/routes/settings.tsx:205
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
+
+#: src/routes/join.tsx:153
+msgid "or enter code"
+msgstr ""
 
 #: src/routes/party.$partyId.tsx:789
 msgid "Other operations"
@@ -1303,7 +1311,6 @@ msgid "Saudi Riyal"
 msgstr "Riyal Saudí"
 
 #: src/components/ExpenseEditor.tsx:257
-#: src/routes/join.tsx:137
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:149
 #: src/routes/party_.$partyId.settings.tsx:135
@@ -1312,8 +1319,8 @@ msgstr "Riyal Saudí"
 msgid "Save"
 msgstr "Guardar"
 
-#: src/components/RouteQRScanner.tsx:63
-#: src/routes/join.tsx:186
+#: src/components/RouteQRScanner.tsx:65
+#: src/routes/join.tsx:140
 msgid "Scan QR code"
 msgstr ""
 
@@ -1438,7 +1445,6 @@ msgid "Submit a Request"
 msgstr "Enviar sugerencia"
 
 #: src/components/ExpenseEditor.tsx:257
-#: src/routes/join.tsx:137
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:149
 #: src/routes/party_.$partyId.settings.tsx:135
@@ -1684,6 +1690,10 @@ msgstr "Dólar Estadounidense (Día siguiente)"
 #: src/components/PartyPendingComponent.tsx:16
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
+
+#: src/routes/join.tsx:143
+msgid "Use your camera to scan a trizum invite"
+msgstr ""
 
 #: src/routes/settings.tsx:140
 msgid "Username"

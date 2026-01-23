@@ -332,7 +332,7 @@ msgid "Choose the currency for expenses in this party"
 msgstr "Choose the currency for expenses in this party"
 
 #: src/components/MediaGallery.tsx:185
-#: src/components/RouteQRScanner.tsx:57
+#: src/components/RouteQRScanner.tsx:59
 msgid "Close"
 msgstr "Close"
 
@@ -500,7 +500,7 @@ msgstr "Enter a party link or code to join"
 msgid "Enter the key of the Tricount account you want to migrate from"
 msgstr "Enter the key of the Tricount account you want to migrate from"
 
-#: src/routes/join.tsx:167
+#: src/routes/join.tsx:176
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
 
@@ -827,6 +827,10 @@ msgstr "Jamaican Dollar"
 msgid "Japanese Yen"
 msgstr "Japanese Yen"
 
+#: src/routes/join.tsx:201
+msgid "Join"
+msgstr "Join"
+
 #. placeholder {0}: party.name
 #: src/routes/party_.$partyId.share.tsx:31
 msgid "Join {0} on trizum!"
@@ -897,7 +901,7 @@ msgstr "Libyan Dinar"
 msgid "License"
 msgstr "License"
 
-#: src/routes/join.tsx:166
+#: src/routes/join.tsx:175
 msgid "Link or code"
 msgstr "Link or code"
 
@@ -1125,6 +1129,10 @@ msgstr "Open last party on launch"
 #: src/components/ExpenseEditor.tsx:201
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
+
+#: src/routes/join.tsx:153
+msgid "or enter code"
+msgstr "or enter code"
 
 #: src/routes/party.$partyId.tsx:789
 msgid "Other operations"
@@ -1379,7 +1387,6 @@ msgid "Saudi Riyal"
 msgstr "Saudi Riyal"
 
 #: src/components/ExpenseEditor.tsx:257
-#: src/routes/join.tsx:137
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:149
 #: src/routes/party_.$partyId.settings.tsx:135
@@ -1388,8 +1395,8 @@ msgstr "Saudi Riyal"
 msgid "Save"
 msgstr "Save"
 
-#: src/components/RouteQRScanner.tsx:63
-#: src/routes/join.tsx:186
+#: src/components/RouteQRScanner.tsx:65
+#: src/routes/join.tsx:140
 msgid "Scan QR code"
 msgstr "Scan QR code"
 
@@ -1518,7 +1525,6 @@ msgid "Submit a Request"
 msgstr "Submit a Request"
 
 #: src/components/ExpenseEditor.tsx:257
-#: src/routes/join.tsx:137
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:149
 #: src/routes/party_.$partyId.settings.tsx:135
@@ -1785,6 +1791,10 @@ msgstr "US Dollar (Next day)"
 #: src/components/PartyPendingComponent.tsx:16
 msgid "Use personal mode to filter only your expenses."
 msgstr "Use personal mode to filter only your expenses."
+
+#: src/routes/join.tsx:143
+msgid "Use your camera to scan a trizum invite"
+msgstr "Use your camera to scan a trizum invite"
 
 #: src/routes/settings.tsx:140
 msgid "Username"
