@@ -209,9 +209,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
     <motion.div
       className="relative flex flex-1 flex-col items-center justify-center bg-black"
       animate={
-        state.status === "error"
-          ? { x: [0, -8, 8, -6, 6, -4, 4, 0] }
-          : { x: 0 }
+        state.status === "error" ? { x: [0, -8, 8, -6, 6, -4, 4, 0] } : { x: 0 }
       }
       transition={{ duration: 0.35, ease: "easeOut", delay: 0.2 }}
     >
