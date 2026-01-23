@@ -17,6 +17,7 @@ import {
   fromAMDocumentId,
   toAMDocumentId,
   isValidDocumentId,
+  INTERNAL_REPO_SYMBOL,
 } from "../internal/automerge.js";
 import type { DocumentId, DocumentHandle } from "../types.js";
 import type {
@@ -60,7 +61,8 @@ export interface TrizumWorkerClientOptions {
  */
 export class TrizumWorkerClient {
   private _worker: Worker;
-  private _repo: Repo;
+  /** @internal - Internal repository, access via INTERNAL_REPO_SYMBOL */
+  private [INTERNAL_REPO_SYMBOL]: Repo;
   private _ready: Promise<void>;
   private options: Required<
     Pick<TrizumWorkerClientOptions, "storageName" | "offlineOnly">
@@ -90,7 +92,7 @@ export class TrizumWorkerClient {
       new MessageChannelNetworkAdapter(port1),
     ];
 
-    this._repo = new Repo({
+    this[INTERNAL_REPO_SYMBOL] = new Repo({
       network,
       // No storage here - storage is in the worker
     });
@@ -142,15 +144,6 @@ export class TrizumWorkerClient {
 
   /**
    * @internal
-   * Get the underlying repository instance (main thread proxy).
-   * This is for internal SDK use only and should not be used by consumers.
-   */
-  get _internalRepo(): Repo {
-    return this._repo;
-  }
-
-  /**
-   * @internal
    * Get the worker instance.
    */
   get _internalWorker(): Worker {
@@ -178,7 +171,7 @@ export class TrizumWorkerClient {
     definition: DocumentModelDefinition<T, CreateInput>,
   ): ModelHelpers<T> {
     const { createInitialState } = definition;
-    const repo = this._repo;
+    const repo = this[INTERNAL_REPO_SYMBOL];
 
     return {
       create: (input) => {
@@ -296,7 +289,7 @@ export class TrizumWorkerClient {
       return existingId;
     }
 
-    const handle = this._repo.create<T>({
+    const handle = this[INTERNAL_REPO_SYMBOL].create<T>({
       ...createInitialState(),
       id: "" as unknown as DocumentId,
     } as unknown as T);
@@ -315,9 +308,12 @@ export class TrizumWorkerClient {
    * Find a document handle by ID.
    */
   async findHandle<T>(id: DocumentId): Promise<DocumentHandle<T>> {
-    const handle = await this._repo.find<T>(toAMDocumentId(id), {
-      allowableStates: ["ready"],
-    });
+    const handle = await this[INTERNAL_REPO_SYMBOL].find<T>(
+      toAMDocumentId(id),
+      {
+        allowableStates: ["ready"],
+      },
+    );
     return wrapHandle(handle);
   }
 
@@ -327,7 +323,7 @@ export class TrizumWorkerClient {
   create<T extends DocumentModel>(
     initialState: Omit<T, "id">,
   ): { id: DocumentId; handle: DocumentHandle<T> } {
-    const handle = this._repo.create<T>({
+    const handle = this[INTERNAL_REPO_SYMBOL].create<T>({
       ...initialState,
       id: "" as unknown as DocumentId,
     } as unknown as T);
@@ -350,7 +346,9 @@ export class TrizumWorkerClient {
     return Promise.all(
       ids.map(async (id) => {
         try {
-          const handle = await this._repo.find<T>(toAMDocumentId(id));
+          const handle = await this[INTERNAL_REPO_SYMBOL].find<T>(
+            toAMDocumentId(id),
+          );
           return handle.doc() as T | undefined;
         } catch {
           return undefined;

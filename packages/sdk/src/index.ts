@@ -54,12 +54,12 @@ export type {
   DocumentChangePayload,
   EphemeralMessagePayload,
 } from "./types.js";
-export { SUPPORTED_LOCALES } from "./types.js";
-export { isValidDocumentId } from "./internal/automerge.js";
+export { SUPPORTED_LOCALES, isValidDocumentId } from "./types.js";
 
 // ImmutableString class for creating immutable string values in documents
 // This wraps Automerge's RawString without exposing the underlying implementation
-export { RawString as ImmutableString } from "./internal/automerge.js";
+export { ImmutableString } from "./utils/immutable-string.js";
+export type { ImmutableString as ImmutableStringType } from "./utils/immutable-string.js";
 
 // Model types
 export type {

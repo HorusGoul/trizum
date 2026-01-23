@@ -6,7 +6,7 @@
 
 import { createContext, use, type ReactNode } from "react";
 import type { TrizumClient } from "../client.js";
-import type { Repo } from "../internal/automerge.js";
+import { type Repo, INTERNAL_REPO_SYMBOL } from "../internal/automerge.js";
 
 interface TrizumContextValue {
   client: TrizumClient;
@@ -74,7 +74,7 @@ export function useRepo(): Repo {
   // Try TrizumContext first (full SDK pattern)
   const trizumContext = use(TrizumContext);
   if (trizumContext) {
-    return trizumContext.client._internalRepo;
+    return trizumContext.client[INTERNAL_REPO_SYMBOL];
   }
 
   // Fall back to standalone RepoContext (backwards compatibility)

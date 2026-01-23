@@ -3,7 +3,7 @@
  */
 
 import type { DocumentId } from "../types.js";
-import type { RawString } from "../internal/automerge.js";
+import type { ImmutableString } from "../utils/immutable-string.js";
 
 /**
  * A media file document that stores binary data (e.g., images).
@@ -13,8 +13,8 @@ export interface MediaFile {
   id: DocumentId;
   /** Document type discriminator */
   type: "mediaFile";
-  /** Base64-encoded binary content */
-  encodedBlob: RawString;
+  /** Base64-encoded binary content stored as immutable string */
+  encodedBlob: ImmutableString;
   /** Additional metadata about the file */
   metadata: Record<string, unknown>;
 }

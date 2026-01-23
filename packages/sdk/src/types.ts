@@ -10,7 +10,18 @@
  */
 export type DocumentId = string & { readonly __brand: "DocumentId" };
 
-// isValidDocumentId is re-exported from internal/automerge.ts in index.ts
+// Import the internal validator
+import { isValidDocumentId as internalIsValidDocumentId } from "./internal/automerge.js";
+
+/**
+ * Check if a string is a valid document ID.
+ *
+ * @param id - The string to check
+ * @returns True if the string is a valid document ID, with type narrowing
+ */
+export function isValidDocumentId(id: string): id is DocumentId {
+  return internalIsValidDocumentId(id);
+}
 
 /**
  * A handle to a document that allows reading and modifying it.
@@ -42,20 +53,6 @@ export interface DocumentHandle<T> {
   /** Broadcast an ephemeral message to all connected peers */
   broadcast(message: unknown): void;
 }
-
-/**
- * A string that will be stored as an immutable value in documents.
- * Use this for large binary data (like base64-encoded files) that shouldn't
- * be tracked for character-by-character changes.
- */
-export interface ImmutableString {
-  readonly val: string;
-}
-
-/**
- * Type alias for the ImmutableString constructor.
- */
-export type ImmutableStringConstructor = new (value: string) => ImmutableString;
 
 /**
  * Supported locales in the Trizum application.
@@ -247,9 +244,6 @@ export type CurrencyCode =
   | "ZAR"
   | "ZMW"
   | "ZWL";
-
-// Note: RawString is exported as a class from @automerge/automerge-repo/slim
-// It's re-exported from the SDK index as a constructor for creating immutable strings
 
 /**
  * Event payload types for document handle events.

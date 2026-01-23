@@ -12,6 +12,7 @@ import {
   fromAMDocumentId,
   wrapHandle,
   type Repo,
+  INTERNAL_REPO_SYMBOL,
 } from "./internal/automerge.js";
 import type { DocumentId, DocumentHandle } from "./types.js";
 import type {
@@ -56,8 +57,8 @@ export interface TrizumClientOptions {
  * ```
  */
 export class TrizumClient {
-  /** @internal */
-  private _repo: Repo;
+  /** @internal - Internal repository, access via INTERNAL_REPO_SYMBOL */
+  private [INTERNAL_REPO_SYMBOL]: Repo;
   private options: Required<
     Pick<TrizumClientOptions, "storageName" | "offlineOnly">
   > &
@@ -72,20 +73,11 @@ export class TrizumClient {
 
     this.options = { storageName, syncUrl, offlineOnly };
 
-    this._repo = createRepo({
+    this[INTERNAL_REPO_SYMBOL] = createRepo({
       storageName,
       syncUrl,
       offlineOnly,
     });
-  }
-
-  /**
-   * @internal
-   * Get the underlying repository instance.
-   * This is for internal SDK use only and should not be used by consumers.
-   */
-  get _internalRepo(): Repo {
-    return this._repo;
   }
 
   /**
@@ -105,7 +97,7 @@ export class TrizumClient {
     definition: DocumentModelDefinition<T, CreateInput>,
   ): ModelHelpers<T> {
     const { createInitialState } = definition;
-    const repo = this._repo;
+    const repo = this[INTERNAL_REPO_SYMBOL];
 
     return {
       create: (input) => {
@@ -234,7 +226,7 @@ export class TrizumClient {
     }
 
     // Create with a placeholder ID that will be set after creation
-    const handle = this._repo.create<T>({
+    const handle = this[INTERNAL_REPO_SYMBOL].create<T>({
       ...createInitialState(),
       id: "" as unknown as DocumentId,
     } as unknown as T);
@@ -257,9 +249,12 @@ export class TrizumClient {
    * @returns The document handle wrapped in SDK types
    */
   async findHandle<T>(id: DocumentId): Promise<DocumentHandle<T>> {
-    const handle = await this._repo.find<T>(toAMDocumentId(id), {
-      allowableStates: ["ready"],
-    });
+    const handle = await this[INTERNAL_REPO_SYMBOL].find<T>(
+      toAMDocumentId(id),
+      {
+        allowableStates: ["ready"],
+      },
+    );
     return wrapHandle(handle);
   }
 
@@ -273,7 +268,7 @@ export class TrizumClient {
     initialState: Omit<T, "id">,
   ): { id: DocumentId; handle: DocumentHandle<T> } {
     // Create with a placeholder ID that will be set after creation
-    const handle = this._repo.create<T>({
+    const handle = this[INTERNAL_REPO_SYMBOL].create<T>({
       ...initialState,
       id: "" as unknown as DocumentId,
     } as unknown as T);
@@ -300,7 +295,9 @@ export class TrizumClient {
     return Promise.all(
       ids.map(async (id) => {
         try {
-          const handle = await this._repo.find<T>(toAMDocumentId(id));
+          const handle = await this[INTERNAL_REPO_SYMBOL].find<T>(
+            toAMDocumentId(id),
+          );
           return handle.doc() as T | undefined;
         } catch {
           return undefined;
