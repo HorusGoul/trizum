@@ -91,7 +91,7 @@ msgstr "Dinar Argelino"
 
 #: src/components/QRCodeScanner.tsx:218
 msgid "Align QR code here"
-msgstr ""
+msgstr "Alinea el código QR aquí"
 
 #: src/components/ExpenseEditor.tsx:333
 msgid "Amount"
@@ -253,7 +253,7 @@ msgstr "Riel Camboyano"
 
 #: src/components/QRCodeScanner.tsx:87
 msgid "Camera permission was denied"
-msgstr ""
+msgstr "Se ha denegado el permiso de cámara"
 
 #: src/routes/support.tsx:122
 msgid "Can I use trizum without an account?"
@@ -522,7 +522,7 @@ msgstr "Gastos"
 
 #: src/components/QRCodeScanner.tsx:103
 msgid "Failed to access camera"
-msgstr ""
+msgstr "Error al acceder a la cámara"
 
 #: src/routes/party_.$partyId.add.tsx:99
 msgid "Failed to add expense"
@@ -739,7 +739,7 @@ msgstr "Rupia Indonesia"
 
 #: src/routes/join.tsx:54
 msgid "Invalid QR code. This doesn't appear to be a trizum party code."
-msgstr ""
+msgstr "Código QR no válido. No parece ser un código de grupo de trizum."
 
 #: src/routes/migrate_.tricount.tsx:144
 msgid "Invalid tricount URL or key"
@@ -781,7 +781,7 @@ msgstr "Yen Japonés"
 
 #: src/routes/join.tsx:201
 msgid "Join"
-msgstr ""
+msgstr "Unirse"
 
 #. placeholder {0}: party.name
 #: src/routes/party_.$partyId.share.tsx:31
@@ -1032,7 +1032,7 @@ msgstr "Naira Nigeriano"
 
 #: src/components/QRCodeScanner.tsx:95
 msgid "No camera found on this device"
-msgstr ""
+msgstr "No se encontró cámara en este dispositivo"
 
 #: src/routes/new.tsx:566
 msgid "No currency"
@@ -1072,7 +1072,7 @@ msgstr "Abrir el último grupo al abrir la app"
 
 #: src/routes/join.tsx:153
 msgid "or enter code"
-msgstr ""
+msgstr "o introduce código"
 
 #: src/routes/party.$partyId.tsx:789
 msgid "Other operations"
@@ -1203,7 +1203,7 @@ msgstr "Platino (onza troy)"
 
 #: src/components/QRCodeScanner.tsx:173
 msgid "Please allow camera access in your browser settings to scan QR codes."
-msgstr ""
+msgstr "Por favor, permite el acceso a la cámara en la configuración de tu navegador para escanear códigos QR."
 
 #: src/components/ExpenseEditor.tsx:751
 msgid "Please correct it before saving."
@@ -1227,7 +1227,7 @@ msgstr "Por favor espera mientras obtenemos los datos más recientes"
 
 #: src/components/QRCodeScanner.tsx:243
 msgid "Point your camera at a trizum QR code"
-msgstr ""
+msgstr "Apunta tu cámara a un código QR de trizum"
 
 #: src/routes/new.tsx:405
 msgid "Polish Zloty"
@@ -1326,7 +1326,7 @@ msgstr "Guardar"
 #: src/components/RouteQRScanner.tsx:65
 #: src/routes/join.tsx:140
 msgid "Scan QR code"
-msgstr ""
+msgstr "Escanear código QR"
 
 #: src/routes/support.tsx:51
 msgid "Send us an email and we'll get back to you as soon as possible."
@@ -1611,7 +1611,7 @@ msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando est
 #: src/components/QRCodeScanner.tsx:186
 #: src/components/QRCodeScanner.tsx:204
 msgid "Try again"
-msgstr ""
+msgstr "Reintentar"
 
 #: src/routes/new.tsx:534
 msgid "Tunisian Dinar"
@@ -1697,7 +1697,7 @@ msgstr "Usa el modo personal para filtrar solo tus gastos."
 
 #: src/routes/join.tsx:143
 msgid "Use your camera to scan a trizum invite"
-msgstr ""
+msgstr "Usa tu cámara para escanear una invitación de trizum"
 
 #: src/routes/settings.tsx:140
 msgid "Username"
