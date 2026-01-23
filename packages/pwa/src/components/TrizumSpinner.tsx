@@ -13,7 +13,7 @@ export function TrizumSpinner({ size = 48, className }: TrizumSpinnerProps) {
       viewBox="0 0 512 512"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn("text-accent-600 dark:text-accent-400", className)}
+      className={cn("text-current", className)}
       style={{
         animation: "swing-rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
       }}
