@@ -1,7 +1,10 @@
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import {
+  useSuspenseDocument,
+  type EphemeralMessagePayload,
+} from "@trizum/sdk";
 import {
   decodeExpenseId,
   type Expense,
@@ -10,8 +13,6 @@ import {
 import type { MediaFile } from "#src/models/media.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
-// TODO: Move presence types to SDK
-import type { DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import {
   Suspense,
   useCallback,
@@ -100,8 +101,7 @@ export function RealtimeExpenseEditorPresence({
 
   useEffect(() => {
     const listener = (rawPayload?: unknown) => {
-      const { message } =
-        rawPayload as DocHandleEphemeralMessagePayload<PartyExpenseChunk>;
+      const { message } = rawPayload as EphemeralMessagePayload;
       const payload = message as
         | ExpensePresenceDeletePayload
         | ExpensePresenceUpdatePayload;

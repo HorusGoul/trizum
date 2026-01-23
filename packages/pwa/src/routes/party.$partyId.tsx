@@ -15,7 +15,7 @@ import {
   type Balance,
   type Expense,
 } from "#src/models/expense.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
+import { cache } from "@trizum/sdk";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
@@ -64,10 +64,7 @@ export const Route = createFileRoute("/party/$partyId")({
     const firstChunkRef = party.chunkRefs.at(0);
 
     if (firstChunkRef) {
-      await documentCache.readAsync(
-        context.client._internalRepo,
-        firstChunkRef.chunkId,
-      );
+      await cache.readAsync(context.client, firstChunkRef.chunkId);
     }
 
     return;

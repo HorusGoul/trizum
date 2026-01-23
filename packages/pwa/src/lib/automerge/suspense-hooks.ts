@@ -7,10 +7,9 @@
 
 // Re-export everything from the SDK
 export {
-  // Cache exports
-  handleCache,
-  documentCache,
-  multipleDocumentCache,
+  // Cache utilities
+  cache,
+  multiCache,
   // Retry utilities
   retryWithExponentialBackoff,
   // React hooks - note: useMultipleSuspenseDocuments is renamed for backwards compatibility

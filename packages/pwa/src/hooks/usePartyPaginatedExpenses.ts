@@ -1,9 +1,10 @@
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
 import type { Party, PartyExpenseChunk } from "#src/models/party.js";
-import { type DocumentId, useTrizumClient } from "@trizum/sdk";
+import {
+  type DocumentId,
+  useTrizumClient,
+  useSuspenseDocument,
+  cache,
+} from "@trizum/sdk";
 import {
   startTransition,
   useEffect,
@@ -14,7 +15,6 @@ import {
 
 export function usePartyPaginatedExpenses(partyId: DocumentId) {
   const client = useTrizumClient();
-  const repo = client._internalRepo;
   const [party, handle] = useSuspenseDocument<Party>(partyId, {
     required: true,
   });
@@ -23,9 +23,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
   function getLoadedChunkExpenses() {
     return getLoadedChunkIds().flatMap((chunkId) => {
-      const doc = documentCache.getValueIfCached(repo, chunkId) as
-        | PartyExpenseChunk
-        | undefined;
+      const doc = cache.getIfCached<PartyExpenseChunk>(client, chunkId);
 
       if (!doc) {
         return [];
@@ -46,7 +44,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
 
     for (const chunkId of chunkIds) {
-      const doc = documentCache.getValueIfCached(repo, chunkId);
+      const doc = cache.getIfCached(client, chunkId);
 
       if (!doc) {
         // If a chunk is not loaded, we can't load any more
@@ -93,7 +91,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     async function loadChunks() {
       await Promise.all(
         toLoadIds.map((chunkId) => {
-          return Promise.resolve(documentCache.readAsync(repo, chunkId));
+          return cache.readAsync(client, chunkId);
         }),
       );
 
@@ -109,7 +107,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
     return () => {
       unmounted = true;
     };
-  }, [chunkIds, key, getLoadedChunkIds, repo]);
+  }, [chunkIds, key, getLoadedChunkIds, client]);
 
   // Subscribe to loaded chunk changes
   useEffect(() => {
@@ -163,7 +161,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
         return;
       }
 
-      await documentCache.readAsync(repo, nextChunkRefId);
+      await cache.readAsync(client, nextChunkRefId);
       startTransition(() => {
         rerender();
       });

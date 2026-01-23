@@ -250,3 +250,35 @@ export type CurrencyCode =
 
 // Note: RawString is exported as a class from @automerge/automerge-repo/slim
 // It's re-exported from the SDK index as a constructor for creating immutable strings
+
+/**
+ * Event payload types for document handle events.
+ * These abstract the underlying Automerge event types.
+ */
+
+/**
+ * Payload for document change events.
+ */
+export interface DocumentChangePayload<T> {
+  /** The current document state after the change */
+  doc: T;
+  /** The document handle that changed */
+  handle: DocumentHandle<T>;
+  /** Additional patch information */
+  patchInfo?: {
+    /** The document before the change */
+    before: T;
+    /** The document after the change */
+    after: T;
+  };
+}
+
+/**
+ * Payload for ephemeral (presence) message events.
+ */
+export interface EphemeralMessagePayload<T = unknown> {
+  /** The message content */
+  message: T;
+  /** The peer ID that sent the message */
+  senderId: string;
+}

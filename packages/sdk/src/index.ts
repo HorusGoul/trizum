@@ -51,6 +51,8 @@ export type {
   DocumentHandle,
   SupportedLocale,
   CurrencyCode,
+  DocumentChangePayload,
+  EphemeralMessagePayload,
 } from "./types.js";
 export { SUPPORTED_LOCALES } from "./types.js";
 export { isValidDocumentId } from "./internal/automerge.js";
@@ -110,10 +112,5 @@ export {
   decodeBlob,
 } from "./models/index.js";
 
-// Internal cache (SDK-specific, no Automerge exposure)
-export {
-  documentCache,
-  handleCache,
-  multipleDocumentCache,
-  type AnyDocumentId,
-} from "./cache/document-cache.js";
+// Cache utilities (SDK-specific, uses TrizumClient)
+export { cache, multiCache } from "./cache/client-cache.js";

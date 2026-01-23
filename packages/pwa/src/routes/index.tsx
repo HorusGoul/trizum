@@ -9,14 +9,12 @@ import {
   isValidDocumentId,
   type DocumentId,
   useTrizumClient,
+  useSuspenseDocument,
+  cache,
 } from "@trizum/sdk";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { defaultThemeHue } from "#src/ui/theme.ts";
@@ -37,10 +35,10 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    const partyList = (await documentCache.readAsync(
-      context.client._internalRepo,
+    const partyList = await cache.readAsync<PartyList>(
+      context.client,
       partyListId,
-    )) as PartyList | undefined;
+    );
 
     if (!partyList) {
       return;
@@ -233,7 +231,7 @@ function usePartyItemRefs() {
   const refs = Object.keys(partyList.parties).filter(isValidDocumentId);
 
   for (const partyId of refs) {
-    documentCache.prefetch(client._internalRepo, partyId);
+    cache.prefetch(client, partyId);
   }
 
   return refs;

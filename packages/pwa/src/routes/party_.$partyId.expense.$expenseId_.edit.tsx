@@ -7,10 +7,7 @@ import {
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.ts";
+import { useSuspenseDocument, cache } from "@trizum/sdk";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { patchMutate } from "#src/lib/patchMutate.ts";
@@ -22,8 +19,7 @@ import {
   type Expense,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
-// TODO: Move document change event types to SDK
-import { type DocHandleChangePayload } from "@automerge/automerge-repo";
+import { type DocumentChangePayload } from "@trizum/sdk";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import {
@@ -60,7 +56,7 @@ export const Route = createFileRoute(
     await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.client._internalRepo, chunkId);
+    await cache.readAsync(context.client, chunkId);
   },
 });
 
@@ -259,7 +255,7 @@ function useExpense() {
     let prevHash = expense ? getExpenseHash(expense) : "";
 
     const handler = (payload?: unknown) => {
-      const typedPayload = payload as DocHandleChangePayload<PartyExpenseChunk>;
+      const typedPayload = payload as DocumentChangePayload<PartyExpenseChunk>;
       const [expense] = findExpenseById(typedPayload.doc.expenses, expenseId);
 
       if (!expense) {

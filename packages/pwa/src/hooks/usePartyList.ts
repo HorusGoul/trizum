@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@trizum/sdk";
-import { useTrizumClient } from "@trizum/sdk";
-import type { Party, PartyParticipant } from "#src/models/party.js";
 import {
-  documentCache,
+  type DocumentId,
+  useTrizumClient,
   useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
+  cache,
+} from "@trizum/sdk";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 
 export function usePartyList() {
   const client = useTrizumClient();
-  const repo = client._internalRepo;
   const [partyListId] = useState<DocumentId>(() => getPartyListId(client));
   const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(
     partyListId,
@@ -87,8 +86,8 @@ export function usePartyList() {
       }
 
       for (const partyId in partyList.participantInParties) {
-        const party = await documentCache.readAsync(
-          repo,
+        const party = await cache.readAsync<Party>(
+          client,
           partyId as DocumentId,
         );
 
