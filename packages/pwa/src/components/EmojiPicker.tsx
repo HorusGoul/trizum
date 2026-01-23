@@ -14,16 +14,53 @@ import {
 } from "react-aria-components";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import emojisData from "emojibase-data/en/compact.json";
+import groupsData from "emojibase-data/meta/groups.json";
 import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
+import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.ts";
 
 type Emoji = (typeof emojisData)[0];
 
+const GROUP_LABELS: Record<number, string> = {
+  0: "Smileys & Emotion",
+  1: "People & Body",
+  2: "Component",
+  3: "Animals & Nature",
+  4: "Food & Drink",
+  5: "Travel & Places",
+  6: "Activities",
+  7: "Objects",
+  8: "Symbols",
+  9: "Flags",
+};
+
+// Filter out regional indicators and component emojis (skin tones, hair styles)
 const emojis: Emoji[] = emojisData.filter(
   (e) =>
-    typeof e.label === "string" && !e.label.startsWith("regional indicator"),
+    typeof e.label === "string" &&
+    !e.label.startsWith("regional indicator") &&
+    e.group !== 2,
 );
+
+// Group emojis by category
+const groupedEmojis = emojis.reduce(
+  (acc, emoji) => {
+    const group = emoji.group ?? 0;
+    if (!acc[group]) {
+      acc[group] = [];
+    }
+    acc[group].push(emoji);
+    return acc;
+  },
+  {} as Record<number, Emoji[]>,
+);
+
+// Get ordered list of groups that have emojis
+const orderedGroups = Object.keys(groupsData.groups)
+  .map(Number)
+  .filter((g) => g !== 2 && groupedEmojis[g]?.length > 0)
+  .sort((a, b) => a - b);
 
 const GRID_COLUMNS = 8;
 const CELL_SIZE = 36;
@@ -42,7 +79,7 @@ interface EmojiPickerProps {
 
 export function EmojiPicker({
   value,
-  defaultValue = "\u{1F389}",
+  defaultValue = DEFAULT_PARTY_SYMBOL,
   onChange,
   "aria-label": ariaLabel,
   className,
@@ -62,9 +99,10 @@ export function EmojiPicker({
           emoji.tags.some((tag) => tag.toLowerCase().includes(query));
         return labelMatch || tagsMatch;
       })
-    : emojis;
+    : null;
 
-  const rowCount = Math.ceil(filteredEmojis.length / GRID_COLUMNS);
+  // When searching, show flat list; otherwise show by category
+  const isSearching = searchQuery.length > 0;
 
   function handleSelect(emoji: string) {
     if (value === undefined) {
@@ -125,11 +163,11 @@ export function EmojiPicker({
                 )}
               </div>
             </SearchField>
-            <EmojiGrid
-              emojis={filteredEmojis}
-              rowCount={rowCount}
-              onSelect={handleSelect}
-            />
+            {isSearching ? (
+              <EmojiGrid emojis={filteredEmojis!} onSelect={handleSelect} />
+            ) : (
+              <CategorizedEmojiGrid onSelect={handleSelect} />
+            )}
           </div>
         </Dialog>
       </Popover>
@@ -139,12 +177,12 @@ export function EmojiPicker({
 
 interface EmojiGridProps {
   emojis: Emoji[];
-  rowCount: number;
   onSelect: (emoji: string) => void;
 }
 
-function EmojiGrid({ emojis, rowCount, onSelect }: EmojiGridProps) {
+function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
+  const rowCount = Math.ceil(emojis.length / GRID_COLUMNS);
 
   const virtualizer = useVirtualizer({
     count: rowCount,
@@ -212,6 +250,119 @@ function EmojiGrid({ emojis, rowCount, onSelect }: EmojiGridProps) {
           ));
         })}
       </ListBox>
+    </div>
+  );
+}
+
+const HEADER_HEIGHT = 28;
+
+type VirtualRow =
+  | { type: "header"; group: number }
+  | { type: "emojis"; emojis: Emoji[] };
+
+// Build virtual rows: headers + emoji rows for each category
+const virtualRows: VirtualRow[] = orderedGroups.flatMap((group) => {
+  const categoryEmojis = groupedEmojis[group] || [];
+  const emojiRows: VirtualRow[] = [];
+  for (let i = 0; i < categoryEmojis.length; i += GRID_COLUMNS) {
+    emojiRows.push({
+      type: "emojis",
+      emojis: categoryEmojis.slice(i, i + GRID_COLUMNS),
+    });
+  }
+  return [{ type: "header", group } as VirtualRow, ...emojiRows];
+});
+
+interface CategorizedEmojiGridProps {
+  onSelect: (emoji: string) => void;
+}
+
+function CategorizedEmojiGrid({ onSelect }: CategorizedEmojiGridProps) {
+  const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
+
+  const virtualizer = useVirtualizer({
+    count: virtualRows.length,
+    getScrollElement: () => parentRef,
+    estimateSize: (index) =>
+      virtualRows[index].type === "header" ? HEADER_HEIGHT : CELL_SIZE + GAP,
+    overscan: 5,
+  });
+
+  return (
+    <div
+      ref={setParentRef}
+      className="h-[280px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      style={{ contain: "strict", padding: GRID_PADDING }}
+    >
+      <div
+        className="relative"
+        style={{
+          height: virtualizer.getTotalSize(),
+        }}
+      >
+        {/* Render headers as regular divs */}
+        {virtualizer.getVirtualItems().map((virtualItem) => {
+          const row = virtualRows[virtualItem.index];
+          if (row.type !== "header") return null;
+
+          return (
+            <div
+              key={`header-${row.group}`}
+              className="absolute left-0 right-0 flex items-center text-xs font-medium capitalize text-accent-600 dark:text-accent-400"
+              style={{
+                top: virtualItem.start,
+                height: HEADER_HEIGHT,
+              }}
+            >
+              {GROUP_LABELS[row.group]}
+            </div>
+          );
+        })}
+
+        {/* Render emoji grid */}
+        <ListBox
+          aria-label={t`Emoji list`}
+          selectionMode="single"
+          onSelectionChange={(keys) => {
+            const selectedKey = [...keys][0];
+            if (typeof selectedKey === "string") {
+              onSelect(selectedKey);
+            }
+          }}
+          layout="grid"
+          className="outline-none"
+        >
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const row = virtualRows[virtualItem.index];
+            if (row.type !== "emojis") return null;
+
+            return row.emojis.map((emoji, columnIndex) => (
+              <ListBoxItem
+                key={emoji.unicode}
+                id={emoji.unicode}
+                textValue={
+                  (emoji.label || "") +
+                  (Array.isArray(emoji.tags) ? " " + emoji.tags.join(" ") : "")
+                }
+                className={cn(
+                  "absolute flex cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
+                  "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
+                  "data-[focused]:bg-accent-200 dark:data-[focused]:bg-accent-700",
+                  "data-[selected]:bg-accent-500 data-[selected]:text-white",
+                )}
+                style={{
+                  top: virtualItem.start,
+                  left: columnIndex * (CELL_SIZE + GAP),
+                  width: CELL_SIZE,
+                  height: CELL_SIZE,
+                }}
+              >
+                {emoji.unicode}
+              </ListBoxItem>
+            ));
+          })}
+        </ListBox>
+      </div>
     </div>
   );
 }
