@@ -17,16 +17,15 @@ import type {
 } from "#src/models/party.js";
 import { diff } from "@opentf/obj-diff";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import type {
-  DocHandle,
-  Repo,
-  DocumentId,
-} from "@automerge/automerge-repo/slim";
 import {
-  deleteAt,
-  insertAt,
   isValidDocumentId,
-} from "@automerge/automerge-repo/slim";
+  insertAt,
+  deleteAt,
+  type DocumentId,
+  type DocumentHandle,
+  type Repo,
+  type AutomergeAnyDocumentId,
+} from "@trizum/sdk";
 import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 
@@ -100,7 +99,7 @@ export function useCurrentParty() {
   return useParty(partyId);
 }
 
-export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
+export function getPartyHelpers(repo: Repo, handle: DocumentHandle<Party>) {
   function updateSettings(
     values: Pick<Party, "name" | "description" | "participants" | "hue">,
   ) {
@@ -149,23 +148,27 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       createdAt: new Date(),
       expenses: [],
       maxSize: 500,
-      partyId: party.id,
+      partyId: party!.id,
     });
 
-    chunkHandle.change((doc) => (doc.id = chunkHandle.documentId));
+    chunkHandle.change(
+      (doc) => (doc.id = chunkHandle.documentId as unknown as DocumentId),
+    );
 
     const balancesHandle = repo.create<PartyExpenseChunkBalances>({
       id: "" as DocumentId,
       type: "expenseChunkBalances",
       balances: {},
-      partyId: party.id,
+      partyId: party!.id,
     });
-    balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
+    balancesHandle.change(
+      (doc) => (doc.id = balancesHandle.documentId as unknown as DocumentId),
+    );
 
     const chunkRef: PartyExpenseChunkRef = {
-      chunkId: chunkHandle.documentId,
+      chunkId: chunkHandle.documentId as unknown as DocumentId,
       createdAt: new Date(),
-      balancesId: balancesHandle.documentId,
+      balancesId: balancesHandle.documentId as unknown as DocumentId,
     };
 
     return [chunkRef, chunkHandle] as const;
@@ -190,7 +193,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     let lastChunkHandle = await repo.find<PartyExpenseChunk>(
-      lastChunkRef.chunkId,
+      lastChunkRef.chunkId as unknown as AutomergeAnyDocumentId,
     );
     let lastChunk = lastChunkHandle.doc();
 
@@ -243,7 +246,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     });
 
     const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      lastChunkRef.balancesId,
+      lastChunkRef.balancesId as unknown as AutomergeAnyDocumentId,
     );
     const lastChunkBalances = lastChunkBalancesHandle.doc();
 
@@ -281,7 +284,9 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+    const chunkHandle = await repo.find<PartyExpenseChunk>(
+      chunkRef.chunkId as unknown as AutomergeAnyDocumentId,
+    );
     let chunk = chunkHandle.doc();
 
     if (!chunk) {
@@ -308,7 +313,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      chunkRef.balancesId,
+      chunkRef.balancesId as unknown as AutomergeAnyDocumentId,
     );
     const lastChunkBalances = lastChunkBalancesHandle.doc();
 
@@ -344,7 +349,9 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+    const chunkHandle = await repo.find<PartyExpenseChunk>(
+      chunkRef.chunkId as unknown as AutomergeAnyDocumentId,
+    );
     let chunk = chunkHandle.doc();
 
     if (!chunk) {
@@ -368,7 +375,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      chunkRef.balancesId,
+      chunkRef.balancesId as unknown as AutomergeAnyDocumentId,
     );
     const lastChunkBalances = lastChunkBalancesHandle.doc();
 
@@ -402,7 +409,9 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     const chunkRefs = party.chunkRefs;
 
     for (const chunkRef of chunkRefs) {
-      const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
+      const chunkHandle = await repo.find<PartyExpenseChunk>(
+        chunkRef.chunkId as unknown as AutomergeAnyDocumentId,
+      );
       const chunk = chunkHandle.doc();
 
       if (!chunk) {
@@ -415,7 +424,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       );
 
       const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-        chunkRef.balancesId,
+        chunkRef.balancesId as unknown as AutomergeAnyDocumentId,
       );
       const chunkBalances = chunkBalancesHandle.doc();
 

@@ -8,7 +8,7 @@ import { useRouteQRScanner } from "#src/components/useRouteQRScanner.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
 import { AppTextField } from "#src/ui/TextField.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@trizum/sdk";
 import { useForm } from "@tanstack/react-form";
 import {
   createFileRoute,

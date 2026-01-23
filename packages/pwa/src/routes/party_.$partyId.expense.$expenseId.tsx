@@ -7,7 +7,7 @@ import {
   getExpenseUnitShares,
   type Expense,
 } from "#src/models/expense.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@trizum/sdk";
 import {
   createFileRoute,
   useNavigate,

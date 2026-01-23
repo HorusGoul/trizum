@@ -1,22 +1,19 @@
 /**
- * TrizumClient - The main client for interacting with Automerge documents.
+ * TrizumClient - The main client for interacting with documents.
  *
- * This client abstracts the Automerge repository and provides a clean API
- * for CRUD operations, real-time updates, and document subscriptions.
+ * This client abstracts the underlying storage and sync layer, providing a
+ * clean API for CRUD operations, real-time updates, and document subscriptions.
  */
 
 import {
-  Repo,
+  createRepo,
   isValidDocumentId,
-  type NetworkAdapterInterface,
-} from "@automerge/automerge-repo";
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
-import type {
-  DocumentId,
-  Doc,
-  DocHandle,
-} from "@automerge/automerge-repo/slim";
+  toAMDocumentId,
+  fromAMDocumentId,
+  wrapHandle,
+  type Repo,
+} from "./internal/automerge.js";
+import type { DocumentId, DocumentHandle } from "./types.js";
 import type {
   DocumentModel,
   DocumentModelDefinition,
@@ -33,7 +30,7 @@ export interface TrizumClientOptions {
 }
 
 /**
- * The main client for interacting with Automerge documents.
+ * The main client for interacting with Trizum documents.
  *
  * TrizumClient provides a high-level API for:
  * - Creating, reading, updating, and deleting documents
@@ -48,22 +45,19 @@ export interface TrizumClientOptions {
  *   syncUrl: "wss://sync.example.com",
  * });
  *
- * // Create type-safe model helpers
- * const PartyModel = client.defineModel({
- *   type: "party",
- *   createInitialState: (input) => ({
- *     type: "party",
- *     name: input.name,
- *     participants: {},
- *   }),
- * });
- *
- * // Use the model
- * const { id, doc } = await PartyModel.create({ name: "Beach Trip" });
+ * // Use the client to work with documents
+ * const partyId = client.getOrCreateRootDocument("partyListId", () => ({
+ *   type: "partyList",
+ *   username: "",
+ *   phone: "",
+ *   parties: {},
+ *   participantInParties: {},
+ * }));
  * ```
  */
 export class TrizumClient {
-  private repo: Repo;
+  /** @internal */
+  private _repo: Repo;
   private options: Required<
     Pick<TrizumClientOptions, "storageName" | "offlineOnly">
   > &
@@ -78,26 +72,20 @@ export class TrizumClient {
 
     this.options = { storageName, syncUrl, offlineOnly };
 
-    // Build network adapters
-    const network: NetworkAdapterInterface[] = [];
-
-    if (!offlineOnly && syncUrl) {
-      network.push(new BrowserWebSocketClientAdapter(syncUrl));
-    }
-
-    // Initialize the Automerge repository
-    this.repo = new Repo({
-      storage: new IndexedDBStorageAdapter(storageName),
-      network,
+    this._repo = createRepo({
+      storageName,
+      syncUrl,
+      offlineOnly,
     });
   }
 
   /**
-   * Get the underlying Automerge Repo instance.
-   * Use this for advanced operations or when integrating with existing code.
+   * @internal
+   * Get the underlying repository instance.
+   * This is for internal SDK use only and should not be used by consumers.
    */
-  getRepo(): Repo {
-    return this.repo;
+  get _internalRepo(): Repo {
+    return this._repo;
   }
 
   /**
@@ -112,43 +100,27 @@ export class TrizumClient {
    *
    * @param definition - The model definition including type and initial state factory
    * @returns Model helpers for create, find, update, delete, and subscribe operations
-   *
-   * @example
-   * ```ts
-   * interface Todo extends DocumentModel {
-   *   type: "todo";
-   *   title: string;
-   *   completed: boolean;
-   * }
-   *
-   * const TodoModel = client.defineModel<Todo>({
-   *   type: "todo",
-   *   createInitialState: (input) => ({
-   *     type: "todo",
-   *     title: input.title,
-   *     completed: input.completed ?? false,
-   *   }),
-   * });
-   * ```
    */
   defineModel<T extends DocumentModel, CreateInput = Omit<T, "id">>(
     definition: DocumentModelDefinition<T, CreateInput>,
   ): ModelHelpers<T> {
     const { createInitialState } = definition;
-    const repo = this.repo;
+    const repo = this._repo;
 
     return {
       create: (input) => {
         const initialState = createInitialState(input as CreateInput);
 
+        // Create with a placeholder ID that will be set after creation
         const handle = repo.create<T>({
           ...initialState,
-          id: "" as DocumentId,
-        } as T);
+          id: "" as unknown as DocumentId,
+        } as unknown as T);
 
-        // Set the self-referential ID
+        // Set the self-referential ID using SDK's DocumentId type
+        const docId = fromAMDocumentId(handle.documentId);
         handle.change((doc) => {
-          doc.id = handle.documentId;
+          (doc as unknown as { id: DocumentId }).id = docId;
         });
 
         const doc = handle.doc();
@@ -157,14 +129,14 @@ export class TrizumClient {
         }
 
         return Promise.resolve({
-          id: handle.documentId,
+          id: docId,
           doc: doc as T,
         });
       },
 
       find: async (id) => {
         try {
-          const handle = await repo.find<T>(id, {
+          const handle = await repo.find<T>(toAMDocumentId(id), {
             allowableStates: ["ready"],
           });
 
@@ -179,7 +151,7 @@ export class TrizumClient {
       },
 
       update: async (id, changeFn) => {
-        const handle = await repo.find<T>(id, {
+        const handle = await repo.find<T>(toAMDocumentId(id), {
           allowableStates: ["ready"],
         });
 
@@ -191,7 +163,7 @@ export class TrizumClient {
       },
 
       delete: async (id) => {
-        const handle = await repo.find<T>(id, {
+        const handle = await repo.find<T>(toAMDocumentId(id), {
           allowableStates: ["ready"],
         });
 
@@ -204,19 +176,16 @@ export class TrizumClient {
         let unsubChange: (() => void) | undefined;
         let unsubDelete: (() => void) | undefined;
 
-        // Find the handle and set up subscriptions
         void repo
-          .find<T>(id, { allowableStates: ["ready"] })
+          .find<T>(toAMDocumentId(id), { allowableStates: ["ready"] })
           .then((handle) => {
             if (handle.isDeleted()) {
               callback(undefined);
               return;
             }
 
-            // Initial callback with current state
             callback(handle.doc() as T | undefined);
 
-            // Subscribe to changes
             const onChange = () => {
               callback(handle.doc() as T | undefined);
             };
@@ -235,7 +204,6 @@ export class TrizumClient {
             callback(undefined);
           });
 
-        // Return unsubscribe function
         return () => {
           unsubChange?.();
           unsubDelete?.();
@@ -254,18 +222,6 @@ export class TrizumClient {
    * @param localStorageKey - Key to store the document ID in localStorage
    * @param createInitialState - Factory function to create initial state if document doesn't exist
    * @returns The document ID
-   *
-   * @example
-   * ```ts
-   * const settingsId = client.getOrCreateRootDocument(
-   *   "userSettings",
-   *   () => ({
-   *     type: "settings",
-   *     theme: "light",
-   *     language: "en",
-   *   })
-   * );
-   * ```
    */
   getOrCreateRootDocument<T extends DocumentModel>(
     localStorageKey: string,
@@ -277,61 +233,60 @@ export class TrizumClient {
       return existingId;
     }
 
-    // Create new document
-    const handle = this.repo.create<T>({
+    // Create with a placeholder ID that will be set after creation
+    const handle = this._repo.create<T>({
       ...createInitialState(),
-      id: "" as DocumentId,
-    } as T);
+      id: "" as unknown as DocumentId,
+    } as unknown as T);
 
-    // Set self-referential ID
+    // Set the self-referential ID using SDK's DocumentId type
+    const docId = fromAMDocumentId(handle.documentId);
     handle.change((doc) => {
-      doc.id = handle.documentId;
+      (doc as unknown as { id: DocumentId }).id = docId;
     });
 
-    // Persist the ID
-    localStorage.setItem(localStorageKey, handle.documentId);
+    localStorage.setItem(localStorageKey, docId);
 
-    return handle.documentId;
+    return docId;
   }
 
   /**
    * Find a document handle by ID.
    *
-   * This is a lower-level API for when you need direct access to the handle.
-   * For most use cases, prefer using model helpers from defineModel().
-   *
    * @param id - The document ID
-   * @returns The document handle
+   * @returns The document handle wrapped in SDK types
    */
-  async findHandle<T>(id: DocumentId): Promise<DocHandle<T>> {
-    return this.repo.find<T>(id, {
+  async findHandle<T>(id: DocumentId): Promise<DocumentHandle<T>> {
+    const handle = await this._repo.find<T>(toAMDocumentId(id), {
       allowableStates: ["ready"],
     });
+    return wrapHandle(handle);
   }
 
   /**
    * Create a new document with the given initial state.
    *
-   * This is a lower-level API. For type-safe operations, prefer defineModel().
-   *
    * @param initialState - The initial document state
-   * @returns A tuple of [documentId, handle]
+   * @returns The document ID and handle
    */
   create<T extends DocumentModel>(
     initialState: Omit<T, "id">,
-  ): { id: DocumentId; handle: DocHandle<T> } {
-    const handle = this.repo.create<T>({
+  ): { id: DocumentId; handle: DocumentHandle<T> } {
+    // Create with a placeholder ID that will be set after creation
+    const handle = this._repo.create<T>({
       ...initialState,
-      id: "" as DocumentId,
-    } as T);
+      id: "" as unknown as DocumentId,
+    } as unknown as T);
 
+    // Set the self-referential ID using SDK's DocumentId type
+    const docId = fromAMDocumentId(handle.documentId);
     handle.change((doc) => {
-      doc.id = handle.documentId;
+      (doc as unknown as { id: DocumentId }).id = docId;
     });
 
     return {
-      id: handle.documentId,
-      handle,
+      id: docId,
+      handle: wrapHandle(handle),
     };
   }
 
@@ -341,12 +296,12 @@ export class TrizumClient {
    * @param ids - Array of document IDs to load
    * @returns Array of documents (undefined for documents that don't exist)
    */
-  async loadMany<T>(ids: DocumentId[]): Promise<(Doc<T> | undefined)[]> {
+  async loadMany<T>(ids: DocumentId[]): Promise<(T | undefined)[]> {
     return Promise.all(
       ids.map(async (id) => {
         try {
-          const handle = await this.repo.find<T>(id);
-          return handle.doc();
+          const handle = await this._repo.find<T>(toAMDocumentId(id));
+          return handle.doc() as T | undefined;
         } catch {
           return undefined;
         }

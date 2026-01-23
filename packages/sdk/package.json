@@ -42,7 +42,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts,.tsx src",
     "lint:fix": "pnpm run lint --fix",
-    "test": "vitest"
+    "test": "vitest --passWithNoTests"
   },
   "dependencies": {
     "@automerge/automerge": "3.2.1",

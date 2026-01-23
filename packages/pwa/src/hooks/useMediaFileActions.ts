@@ -4,11 +4,7 @@ import {
   type ImageCompressionOptions,
   compressionPresets,
 } from "#src/lib/imageCompression.ts";
-import {
-  type Repo,
-  RawString,
-  type DocumentId,
-} from "@automerge/automerge-repo";
+import { type DocumentId, type Repo, RawString } from "@trizum/sdk";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 
 export function useMediaFileActions() {
@@ -67,10 +63,10 @@ export function getMediaFileHelpers(repo: Repo) {
     });
 
     handle.change((doc) => {
-      doc.id = handle.documentId;
+      doc.id = handle.documentId as unknown as DocumentId;
     });
 
-    return [handle.documentId, handle] as const;
+    return [handle.documentId as unknown as DocumentId, handle] as const;
   }
 
   return {

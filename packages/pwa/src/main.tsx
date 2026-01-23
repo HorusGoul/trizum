@@ -1,9 +1,7 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
-import { Repo } from "@automerge/automerge-repo"; // inits automerge
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { TrizumClient, TrizumProvider, RepoContext } from "@trizum/sdk";
 import {
   RouterProvider,
   createRouter,
@@ -23,7 +21,6 @@ import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
-import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
@@ -31,7 +28,6 @@ import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx"
 import { Suspense, useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
-import { isNonNull } from "./lib/isNonNull.ts";
 import {
   createPartyFromMigrationData,
   type MigrationData,
@@ -85,13 +81,15 @@ const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
 const isOfflineOnly =
   initialUrl.searchParams.get("__internal_offline_only") === "true";
 
-// Create automerge repository
-const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
-  network: [
-    isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL),
-  ].filter(isNonNull),
+// Create Trizum client (replaces direct Automerge Repo usage)
+const client = new TrizumClient({
+  storageName: "trizum",
+  syncUrl: isOfflineOnly ? null : WSS_URL,
+  offlineOnly: isOfflineOnly,
 });
+
+// For backwards compatibility during migration, expose the internal repo
+const repo = client._internalRepo;
 
 declare global {
   interface Window {
@@ -170,12 +168,15 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <UpdateControllerComponent>
         <AriaProviders>
-          <RepoContext value={repo}>
-            <MediaGalleryController>
-              <RouterProvider router={router} InnerWrap={InnerWrap} />
-              <Toaster />
-            </MediaGalleryController>
-          </RepoContext>
+          <TrizumProvider client={client}>
+            {/* RepoContext for backwards compatibility during migration */}
+            <RepoContext value={repo}>
+              <MediaGalleryController>
+                <RouterProvider router={router} InnerWrap={InnerWrap} />
+                <Toaster />
+              </MediaGalleryController>
+            </RepoContext>
+          </TrizumProvider>
         </AriaProviders>
       </UpdateControllerComponent>
     </I18nProvider>,

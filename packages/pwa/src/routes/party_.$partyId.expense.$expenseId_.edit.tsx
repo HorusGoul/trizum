@@ -22,6 +22,7 @@ import {
   type Expense,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
+// TODO: Move document change event types to SDK
 import { type DocHandleChangePayload } from "@automerge/automerge-repo";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
@@ -257,8 +258,9 @@ function useExpense() {
   function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
     let prevHash = expense ? getExpenseHash(expense) : "";
 
-    const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
-      const [expense] = findExpenseById(payload.doc.expenses, expenseId);
+    const handler = (payload?: unknown) => {
+      const typedPayload = payload as DocHandleChangePayload<PartyExpenseChunk>;
+      const [expense] = findExpenseById(typedPayload.doc.expenses, expenseId);
 
       if (!expense) {
         return;

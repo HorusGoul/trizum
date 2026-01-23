@@ -3,31 +3,34 @@
  *
  * This module provides caching utilities that integrate with React Suspense
  * and automatically subscribe to document changes for real-time updates.
+ *
+ * @internal This module is for internal SDK use only.
  */
 
-import type {
-  AnyDocumentId,
-  Doc,
-  DocHandle,
-  Repo,
-} from "@automerge/automerge-repo/slim";
+import type { Repo, AMDoc, AMDocHandle } from "../internal/automerge.js";
+import { toAMDocumentId } from "../internal/automerge.js";
 import { createCache, type Cache } from "suspense";
 import { retryWithExponentialBackoff } from "../utils/retry.js";
 
 /**
+ * Type for document IDs that the cache accepts.
+ * Using string to allow any document ID type (SDK DocumentId, Automerge DocumentId, or plain strings).
+ */
+export type AnyDocumentId = string;
+
+/**
+ * @internal
  * Cache for document handles.
- *
- * This cache stores document handles and automatically retries loading
- * documents with exponential backoff on failure.
  */
 export const handleCache = createCache<
   [Repo, AnyDocumentId],
-  DocHandle<unknown> | undefined
+  AMDocHandle<unknown> | undefined
 >({
   async load([repo, id]) {
     try {
+      const amId = toAMDocumentId(id);
       const handle = await retryWithExponentialBackoff(({ signal }) => {
-        return repo.find(id, {
+        return repo.find(amId, {
           signal,
           allowableStates: ["ready"],
         });
@@ -39,7 +42,6 @@ export const handleCache = createCache<
 
       return handle;
     } catch {
-      // If all retries fail, return undefined to indicate the document doesn't exist
       return undefined;
     }
   },
@@ -49,10 +51,8 @@ export const handleCache = createCache<
 const getDocumentCacheKey = ([_, id]: [Repo, AnyDocumentId]) => String(id);
 
 /**
+ * @internal
  * Wrapper that adds live subscription support to a cache.
- *
- * This enables caches to automatically update when the underlying data changes,
- * which is essential for real-time synchronization with Automerge documents.
  */
 function withLiveSubscription<Params extends unknown[], Value>({
   getCache,
@@ -89,7 +89,6 @@ function withLiveSubscription<Params extends unknown[], Value>({
       const listener = evictionListeners.get(key);
 
       if (listener) {
-        // Call the listener to remove the subscription
         listener();
       }
 
@@ -103,14 +102,12 @@ function withLiveSubscription<Params extends unknown[], Value>({
 }
 
 /**
+ * @internal
  * Cache for document snapshots with live subscriptions.
- *
- * This cache stores the current state of documents and automatically
- * subscribes to changes, updating the cache when documents change.
  */
 export const documentCache = withLiveSubscription<
   [Repo, AnyDocumentId],
-  Doc<unknown> | undefined
+  AMDoc<unknown> | undefined
 >({
   getKey: getDocumentCacheKey,
   getCache: ({ onEviction, getKey, onUpdate }) =>
@@ -119,12 +116,10 @@ export const documentCache = withLiveSubscription<
         const [repo, id] = params;
         const maybeHandle = await handleCache.readAsync(repo, id);
 
-        // Handle doesn't exist - document not found
         if (!maybeHandle) {
           return undefined;
         }
 
-        // Capture in a const for closure usage
         const handle = maybeHandle;
         const doc = handle.doc();
 
@@ -151,14 +146,12 @@ export const documentCache = withLiveSubscription<
 });
 
 /**
+ * @internal
  * Cache for loading multiple documents at once.
- *
- * This cache is optimized for loading arrays of documents in parallel
- * while maintaining subscriptions to each individual document's changes.
  */
 export const multipleDocumentCache = withLiveSubscription<
   [Repo, AnyDocumentId[]],
-  (Doc<unknown> | undefined)[]
+  (AMDoc<unknown> | undefined)[]
 >({
   getCache: ({ onEviction, onUpdate, getKey }) =>
     createCache({

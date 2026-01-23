@@ -7,10 +7,7 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import {
-  isValidDocumentId,
-  type AnyDocumentId,
-} from "@automerge/automerge-repo/slim";
+import { isValidDocumentId, type DocumentId } from "@trizum/sdk";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
@@ -239,7 +236,7 @@ function usePartyItemRefs() {
   return refs;
 }
 
-function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
+function PartyItem({ partyId }: { partyId: DocumentId }) {
   const [party, handle] = useSuspenseDocument<Party>(partyId);
 
   if (!party || !handle) {

@@ -1,4 +1,4 @@
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
+import { type DocumentId, type Repo, wrapHandle } from "@trizum/sdk";
 import type { Expense } from "./expense";
 import type { Party } from "./party";
 import { getPartyHelpers } from "#src/hooks/useParty.ts";
@@ -40,8 +40,8 @@ export async function createPartyFromMigrationData({
     participants: data.party.participants,
     chunkRefs: [],
   });
-  handle.change((doc) => (doc.id = handle.documentId));
-  const partyId = handle.documentId;
+  handle.change((doc) => (doc.id = handle.documentId as unknown as DocumentId));
+  const partyId = handle.documentId as unknown as DocumentId;
 
   // Import photos
   const photoMap = new Map<string, MediaFile["id"]>();
@@ -73,7 +73,7 @@ export async function createPartyFromMigrationData({
     }
   }
 
-  const helpers = getPartyHelpers(repo, handle);
+  const helpers = getPartyHelpers(repo, wrapHandle(handle));
 
   // Expenses from oldest to newest
   data.expenses.sort(

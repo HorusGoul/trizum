@@ -6,18 +6,14 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import type {
-  DocumentId,
-  Doc,
-  DocHandle,
-} from "@automerge/automerge-repo/slim";
 import { useTrizumClient } from "./TrizumProvider.js";
+import type { DocumentId, DocumentHandle } from "../types.js";
 
 export interface UseDocumentResult<T> {
   /** The document data, or undefined if loading or not found */
-  doc: Doc<T> | undefined;
+  doc: T | undefined;
   /** The document handle for making changes */
-  handle: DocHandle<T> | undefined;
+  handle: DocumentHandle<T> | undefined;
   /** Whether the document is currently loading */
   isLoading: boolean;
   /** Any error that occurred during loading */
@@ -34,26 +30,15 @@ export interface UseDocumentResult<T> {
  *
  * @param id - The document ID to load
  * @returns Object with doc, handle, isLoading, error, and refetch
- *
- * @example
- * ```tsx
- * function PartyDetail({ partyId }: { partyId: DocumentId }) {
- *   const { doc: party, handle, isLoading, error } = useDocument<Party>(partyId);
- *
- *   if (isLoading) return <Spinner />;
- *   if (error) return <Error message={error.message} />;
- *   if (!party) return <NotFound />;
- *
- *   return <div>{party.name}</div>;
- * }
- * ```
  */
 export function useDocument<T>(
-  id: DocumentId | undefined,
+  id: DocumentId | string | undefined,
 ): UseDocumentResult<T> {
   const client = useTrizumClient();
-  const [doc, setDoc] = useState<Doc<T> | undefined>(undefined);
-  const [handle, setHandle] = useState<DocHandle<T> | undefined>(undefined);
+  const [doc, setDoc] = useState<T | undefined>(undefined);
+  const [handle, setHandle] = useState<DocumentHandle<T> | undefined>(
+    undefined,
+  );
   const [isLoading, setIsLoading] = useState(!!id);
   const [error, setError] = useState<Error | undefined>(undefined);
   const [version, setVersion] = useState(0);
@@ -77,7 +62,7 @@ export function useDocument<T>(
 
     const loadDocument = async () => {
       try {
-        const h = await client.findHandle<T>(id);
+        const h = await client.findHandle<T>(id as DocumentId);
 
         if (cancelled) return;
 
@@ -89,13 +74,13 @@ export function useDocument<T>(
         }
 
         setHandle(h);
-        setDoc(h.doc() as Doc<T> | undefined);
+        setDoc(h.doc());
         setIsLoading(false);
 
         // Subscribe to changes
         const onChange = () => {
           if (!cancelled) {
-            setDoc(h.doc() as Doc<T> | undefined);
+            setDoc(h.doc());
           }
         };
 

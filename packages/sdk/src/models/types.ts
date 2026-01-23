@@ -5,13 +5,13 @@
  * with the Trizum SDK.
  */
 
-import type { DocumentId } from "@automerge/automerge-repo/slim";
+import type { DocumentId } from "../types.js";
 
 /**
  * Base interface that all document models must implement.
  *
  * Documents in the Trizum SDK always have an `id` field that stores
- * their Automerge DocumentId for self-reference.
+ * their DocumentId for self-reference.
  */
 export interface DocumentModel {
   /** The document's unique identifier (self-referential) */

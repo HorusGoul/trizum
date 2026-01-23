@@ -3,7 +3,7 @@ import {
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
 import type { Party, PartyExpenseChunk } from "#src/models/party.js";
-import type { Doc, DocumentId } from "@automerge/automerge-repo";
+import type { DocumentId } from "@trizum/sdk";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import {
   startTransition,
@@ -23,10 +23,9 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
   function getLoadedChunkExpenses() {
     return getLoadedChunkIds().flatMap((chunkId) => {
-      const doc = documentCache.getValueIfCached(
-        repo,
-        chunkId,
-      ) as Doc<PartyExpenseChunk>;
+      const doc = documentCache.getValueIfCached(repo, chunkId) as
+        | PartyExpenseChunk
+        | undefined;
 
       if (!doc) {
         return [];
@@ -119,7 +118,9 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
     async function subscribeToChunkChanges() {
       for (const chunkId of getLoadedChunkIds()) {
-        const handle = await repo.find<PartyExpenseChunk>(chunkId);
+        const handle = await repo.find<PartyExpenseChunk>(
+          chunkId as unknown as Parameters<typeof repo.find>[0],
+        );
 
         if (unmounted) {
           return;

@@ -2,10 +2,7 @@ import { t } from "@lingui/core/macro";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import type { Party } from "#src/models/party.ts";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
-import {
-  isValidDocumentId,
-  type AnyDocumentId,
-} from "@automerge/automerge-repo";
+import { isValidDocumentId } from "@trizum/sdk";
 import { useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
 
@@ -24,7 +21,7 @@ export function PartyTheme() {
 
 function SetPartyTheme({ partyId }: { partyId: string }) {
   if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
-  const [party] = useSuspenseDocument<Party>(partyId as AnyDocumentId, {
+  const [party] = useSuspenseDocument<Party>(partyId, {
     required: false,
   });
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocHandle, DocumentId } from "@automerge/automerge-repo/slim";
+import type { DocumentId, DocHandle } from "@trizum/sdk";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import {
   documentCache,

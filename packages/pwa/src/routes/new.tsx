@@ -5,7 +5,7 @@ import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
+import type { DocumentId } from "@trizum/sdk";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
@@ -68,7 +68,9 @@ function New() {
       ),
       chunkRefs: [],
     });
-    handle.change((doc) => (doc.id = handle.documentId));
+    handle.change(
+      (doc) => (doc.id = handle.documentId as unknown as DocumentId),
+    );
     void navigate({
       to: "/party/$partyId",
       params: { partyId: handle.documentId },

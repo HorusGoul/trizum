@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { documentCache } from "./automerge/suspense-hooks";
 import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import type { DocumentId } from "@trizum/sdk";
 
 export async function guardPartyExists(
   partyId: string,

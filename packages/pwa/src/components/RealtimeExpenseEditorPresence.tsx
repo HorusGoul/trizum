@@ -10,6 +10,7 @@ import {
 import type { MediaFile } from "#src/models/media.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
+// TODO: Move presence types to SDK
 import type { DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import {
   Suspense,
@@ -98,9 +99,9 @@ export function RealtimeExpenseEditorPresence({
   }, [onPresenceUpdate]);
 
   useEffect(() => {
-    const listener = ({
-      message,
-    }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
+    const listener = (rawPayload?: unknown) => {
+      const { message } =
+        rawPayload as DocHandleEphemeralMessagePayload<PartyExpenseChunk>;
       const payload = message as
         | ExpensePresenceDeletePayload
         | ExpensePresenceUpdatePayload;

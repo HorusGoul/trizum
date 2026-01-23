@@ -1,40 +1,23 @@
 /**
  * React context provider for the Trizum SDK.
  *
- * This provider makes the TrizumClient and underlying Repo available
- * to all components in the tree via React Context.
+ * This provider makes the TrizumClient available to all components in the tree.
  */
 
 import { createContext, use, type ReactNode } from "react";
-import type { Repo } from "@automerge/automerge-repo";
 import type { TrizumClient } from "../client.js";
+import type { Repo } from "../internal/automerge.js";
 
 interface TrizumContextValue {
   client: TrizumClient;
-  repo: Repo;
 }
 
 const TrizumContext = createContext<TrizumContextValue | null>(null);
 
 /**
- * Standalone Repo context for backwards compatibility.
- *
- * Use this when you want to provide a Repo directly without using the full
- * TrizumClient. This is useful when migrating existing code that already
- * creates its own Repo instance.
- *
- * @example
- * ```tsx
- * const repo = new Repo({ storage, network });
- *
- * function App() {
- *   return (
- *     <RepoContext value={repo}>
- *       <MyApp />
- *     </RepoContext>
- *   );
- * }
- * ```
+ * @internal
+ * Internal Repo context for backwards compatibility during migration.
+ * This is not part of the public API and should not be used directly.
  */
 export const RepoContext = createContext<Repo | null>(null);
 
@@ -62,7 +45,6 @@ export interface TrizumProviderProps {
 export function TrizumProvider({ children, client }: TrizumProviderProps) {
   const value: TrizumContextValue = {
     client,
-    repo: client.getRepo(),
   };
 
   return <TrizumContext value={value}>{children}</TrizumContext>;
@@ -72,14 +54,6 @@ export function TrizumProvider({ children, client }: TrizumProviderProps) {
  * Hook to access the TrizumClient from context.
  *
  * @throws Error if used outside of a TrizumProvider
- *
- * @example
- * ```tsx
- * function MyComponent() {
- *   const client = useTrizumClient();
- *   // Use client for operations
- * }
- * ```
  */
 export function useTrizumClient(): TrizumClient {
   const context = use(TrizumContext);
@@ -92,19 +66,15 @@ export function useTrizumClient(): TrizumClient {
 }
 
 /**
- * Hook to access the underlying Automerge Repo from context.
- *
- * This hook supports both:
- * 1. TrizumProvider (via TrizumContext) - for full SDK usage
- * 2. RepoContext (standalone) - for backwards compatibility
- *
- * @throws Error if used outside of a TrizumProvider or RepoContext
+ * @internal
+ * Hook to access the internal repository.
+ * This is for internal SDK use and backwards compatibility only.
  */
 export function useRepo(): Repo {
   // Try TrizumContext first (full SDK pattern)
   const trizumContext = use(TrizumContext);
   if (trizumContext) {
-    return trizumContext.repo;
+    return trizumContext.client._internalRepo;
   }
 
   // Fall back to standalone RepoContext (backwards compatibility)
@@ -118,5 +88,5 @@ export function useRepo(): Repo {
   );
 }
 
-// Re-export for backwards compatibility
+// Re-export for internal use
 export { TrizumContext };

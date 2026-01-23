@@ -1,24 +1,22 @@
-import {
-  isValidDocumentId,
-  type Repo,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
-import type { SupportedLocale } from "#src/lib/i18n.js";
-import type { Party, PartyParticipant } from "./party";
+/**
+ * Re-export PartyList model types from @trizum/sdk.
+ */
+import type { DocumentId, Repo } from "@trizum/sdk";
+import { isValidDocumentId } from "@trizum/sdk";
 
-export interface PartyList {
-  id: DocumentId;
-  type: "partyList";
-  username: string;
-  phone: string;
-  avatarId?: DocumentId | null;
-  locale?: SupportedLocale;
-  openLastPartyOnLaunch?: boolean;
-  lastOpenedPartyId?: DocumentId | null;
-  parties: Record<Party["id"], true | undefined>;
-  participantInParties: Record<Party["id"], PartyParticipant["id"]>;
-}
+export type { PartyList, UpdatePartyListInput } from "@trizum/sdk";
+export { PARTY_LIST_STORAGE_KEY } from "@trizum/sdk";
 
+// Import for local use
+import type { PartyList } from "@trizum/sdk";
+
+/**
+ * Get or create the PartyList document for this user.
+ * Uses localStorage to persist the document ID across sessions.
+ *
+ * @param repo - The Automerge repository
+ * @returns The PartyList document ID
+ */
 export function getPartyListId(repo: Repo) {
   const id = localStorage.getItem("partyListId");
 
@@ -36,8 +34,8 @@ export function getPartyListId(repo: Repo) {
     participantInParties: {},
   });
 
-  handle.change((doc) => (doc.id = handle.documentId));
+  handle.change((doc) => (doc.id = handle.documentId as unknown as DocumentId));
 
   localStorage.setItem("partyListId", handle.documentId);
-  return handle.documentId;
+  return handle.documentId as unknown as DocumentId;
 }

@@ -1,4 +1,4 @@
-import type { Repo } from "@automerge/automerge-repo/slim";
+import type { Repo } from "@trizum/sdk";
 import {
   createRootRouteWithContext,
   Outlet,

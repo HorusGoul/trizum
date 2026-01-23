@@ -1,22 +1,21 @@
 /**
- * React Suspense hooks for loading Automerge documents.
+ * React Suspense hooks for loading documents.
  *
  * These hooks integrate with React Suspense to provide a seamless
- * loading experience while fetching documents from the Automerge repository.
+ * loading experience while fetching documents.
  */
 
-import type {
-  AnyDocumentId,
-  Doc,
-  DocHandle,
-} from "@automerge/automerge-repo/slim";
 import { useSyncExternalStore } from "react";
 import { useRepo } from "./TrizumProvider.js";
 import {
   documentCache,
   handleCache,
   multipleDocumentCache,
+  type AnyDocumentId,
 } from "../cache/document-cache.js";
+import type { DocumentHandle } from "../types.js";
+import type { AMDocHandle } from "../internal/automerge.js";
+import { wrapHandle } from "../internal/automerge.js";
 
 export interface UseSuspenseDocumentOptions {
   /**
@@ -34,26 +33,18 @@ export interface UseSuspenseDocumentOptions {
  *
  * @param id - The document ID to load
  * @returns The document handle, or undefined if not found
- *
- * @example
- * ```tsx
- * function PartyDetail({ partyId }: { partyId: DocumentId }) {
- *   const handle = useSuspenseHandle<Party>(partyId);
- *
- *   if (!handle) {
- *     return <div>Party not found</div>;
- *   }
- *
- *   // Use handle.change() to modify the document
- * }
- * ```
  */
 export function useSuspenseHandle<T>(
   id: AnyDocumentId,
-): DocHandle<T> | undefined {
+): DocumentHandle<T> | undefined {
   const repo = useRepo();
+  const handle = handleCache.read(repo, id) as AMDocHandle<T> | undefined;
 
-  return handleCache.read(repo, id) as DocHandle<T> | undefined;
+  if (!handle) {
+    return undefined;
+  }
+
+  return wrapHandle(handle);
 }
 
 /**
@@ -67,44 +58,22 @@ export function useSuspenseHandle<T>(
  * @param id - The document ID to load
  * @param options - Options for controlling required behavior
  * @returns A tuple of [document, handle]
- *
- * @example
- * ```tsx
- * // Optional document - returns undefined if not found
- * function MaybeParty({ partyId }: { partyId: DocumentId }) {
- *   const [party, handle] = useSuspenseDocument<Party>(partyId);
- *
- *   if (!party) {
- *     return <div>Party not found</div>;
- *   }
- *
- *   return <div>{party.name}</div>;
- * }
- *
- * // Required document - throws if not found
- * function RequiredParty({ partyId }: { partyId: DocumentId }) {
- *   const [party, handle] = useSuspenseDocument<Party>(partyId, { required: true });
- *
- *   // party is guaranteed to exist here
- *   return <div>{party.name}</div>;
- * }
- * ```
  */
 export function useSuspenseDocument<T>(
   id: AnyDocumentId,
-): [Doc<T> | undefined, DocHandle<T> | undefined];
+): [T | undefined, DocumentHandle<T> | undefined];
 export function useSuspenseDocument<T>(
   id: AnyDocumentId,
   options: UseSuspenseDocumentOptions & { required?: false },
-): [Doc<T> | undefined, DocHandle<T> | undefined];
+): [T | undefined, DocumentHandle<T> | undefined];
 export function useSuspenseDocument<T>(
   id: AnyDocumentId,
   options: UseSuspenseDocumentOptions & { required: true },
-): [Doc<T>, DocHandle<T>];
+): [T, DocumentHandle<T>];
 export function useSuspenseDocument<T>(
   id: AnyDocumentId,
   options?: UseSuspenseDocumentOptions,
-): [Doc<T> | undefined, DocHandle<T> | undefined] {
+): [T | undefined, DocumentHandle<T> | undefined] {
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
 
@@ -124,7 +93,7 @@ export function useSuspenseDocument<T>(
     throw new Error(`Document not found: ${String(id)}`);
   }
 
-  return [doc as Doc<T> | undefined, handle] as const;
+  return [doc as T | undefined, handle] as const;
 }
 
 /**
@@ -136,41 +105,22 @@ export function useSuspenseDocument<T>(
  * @param ids - Array of document IDs to load
  * @param options - Options for controlling required behavior
  * @returns Array of { doc, handle } objects
- *
- * @example
- * ```tsx
- * function ExpenseList({ chunkIds }: { chunkIds: DocumentId[] }) {
- *   const chunks = useMultipleSuspenseDocuments<ExpenseChunk>(chunkIds, {
- *     required: true,
- *   });
- *
- *   return (
- *     <ul>
- *       {chunks.flatMap(({ doc }) =>
- *         doc.expenses.map((expense) => (
- *           <li key={expense.id}>{expense.name}</li>
- *         ))
- *       )}
- *     </ul>
- *   );
- * }
- * ```
  */
 export function useMultipleSuspenseDocuments<T>(
   ids: AnyDocumentId[],
-): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
+): { doc: T | undefined; handle: DocumentHandle<T> }[];
 export function useMultipleSuspenseDocuments<T>(
   ids: AnyDocumentId[],
   options: UseSuspenseDocumentOptions & { required?: false },
-): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
+): { doc: T | undefined; handle: DocumentHandle<T> }[];
 export function useMultipleSuspenseDocuments<T>(
   ids: AnyDocumentId[],
   options: UseSuspenseDocumentOptions & { required: true },
-): { doc: Doc<T>; handle: DocHandle<T> }[];
+): { doc: T; handle: DocumentHandle<T> }[];
 export function useMultipleSuspenseDocuments<T>(
   ids: AnyDocumentId[],
   options?: UseSuspenseDocumentOptions,
-): { doc: Doc<T> | undefined; handle: DocHandle<T> }[] {
+): { doc: T | undefined; handle: DocumentHandle<T> }[] {
   const repo = useRepo();
 
   multipleDocumentCache.read(repo, ids);
@@ -188,8 +138,13 @@ export function useMultipleSuspenseDocuments<T>(
     throw new Error(`Document not found: ${ids.join(", ")}`);
   }
 
-  return docs.map((doc, index) => ({
-    doc: doc as Doc<T> | undefined,
-    handle: handleCache.read(repo, ids[index]) as DocHandle<T>,
-  }));
+  return docs.map((doc, index) => {
+    const amHandle = handleCache.read(repo, ids[index]) as
+      | AMDocHandle<T>
+      | undefined;
+    return {
+      doc: doc as T | undefined,
+      handle: amHandle ? wrapHandle(amHandle) : (undefined as never),
+    };
+  });
 }

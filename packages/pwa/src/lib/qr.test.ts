@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeAll } from "vitest";
 import { parseQRCodeForPartyId } from "./qr";
+// Test utilities - these generate valid document IDs for testing
 import {
   generateAutomergeUrl,
   parseAutomergeUrl,
