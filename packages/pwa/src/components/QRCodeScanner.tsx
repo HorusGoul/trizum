@@ -2,6 +2,8 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
 import { BarcodeDetector } from "#src/lib/qr.js";
+import { TrizumSpinner } from "./TrizumSpinner.js";
+import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 
 export type ScanResult =
@@ -13,7 +15,10 @@ interface QRCodeScannerProps {
   onResult: (result: ScanResult) => void;
 }
 
-type ScannerState = { status: "initializing" } | { status: "scanning" };
+type ScannerState =
+  | { status: "initializing" }
+  | { status: "scanning" }
+  | { status: "success" };
 
 const QRCodeFrameHandle = ({
   className,
@@ -133,8 +138,13 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
         if (barcodes.length > 0 && barcodes[0].rawValue) {
           // Found a QR code!
           scanningRef.current = false;
-          stopCamera();
-          onResult({ type: "success", value: barcodes[0].rawValue });
+          setState({ status: "success" });
+
+          // Show success animation before calling onResult
+          setTimeout(() => {
+            stopCamera();
+            onResult({ type: "success", value: barcodes[0].rawValue });
+          }, 1500);
           return;
         }
       } catch (err) {
@@ -175,21 +185,55 @@ export function QRCodeScanner({ onResult }: QRCodeScannerProps) {
         autoPlay
       />
 
-      {/* Viewfinder overlay */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="relative size-64">
-          {/* Corner handles */}
-          <QRCodeFrameHandle className="absolute left-0 top-0" />
-          <QRCodeFrameHandle className="absolute right-0 top-0 rotate-90" />
-          <QRCodeFrameHandle className="absolute bottom-0 right-0 rotate-180" />
-          <QRCodeFrameHandle className="absolute bottom-0 left-0 -rotate-90" />
+      {/* Viewfinder overlay with darkened edges */}
+      <div className="pointer-events-none absolute inset-0">
+        {/* Semi-transparent overlay */}
+        <div className="absolute inset-0 bg-black/40" />
 
-          {/* Scanning indicator */}
-          {state.status === "initializing" && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="size-8 animate-spin rounded-full border-4 border-accent-200 border-t-accent-50" />
-            </div>
-          )}
+        {/* Clear center area */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative size-56">
+            {/* Cut out the center */}
+            <div
+              className="absolute inset-0 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"
+              style={{ background: "transparent" }}
+            />
+
+            {/* Corner handles */}
+            <QRCodeFrameHandle className="absolute left-0 top-0" />
+            <QRCodeFrameHandle className="absolute right-0 top-0 rotate-90" />
+            <QRCodeFrameHandle className="absolute bottom-0 right-0 rotate-180" />
+            <QRCodeFrameHandle className="absolute bottom-0 left-0 -rotate-90" />
+
+            {/* Status indicator */}
+            {state.status === "initializing" && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <TrizumSpinner size={48} className="text-white" />
+              </div>
+            )}
+
+            {state.status === "scanning" && (
+              <div className="absolute inset-x-0 bottom-4 flex justify-center">
+                <span className="rounded-full bg-black/60 px-3 py-1 text-xs text-white">
+                  <Trans>Align QR code here</Trans>
+                </span>
+              </div>
+            )}
+
+            {state.status === "success" && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div
+                  className="flex size-16 items-center justify-center rounded-full bg-success-500"
+                  style={{
+                    animation:
+                      "spring-scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  }}
+                >
+                  <Icon name="#lucide/check" size={40} className="text-white" />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
