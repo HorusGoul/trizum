@@ -5,7 +5,7 @@
  */
 
 import { createContext, use } from "react";
-import type { Repo } from "./automerge.js";
+import type { Repo } from "./crdt.js";
 import { INTERNAL_REPO_SYMBOL } from "./symbols.js";
 
 /**

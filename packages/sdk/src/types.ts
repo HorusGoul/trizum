@@ -17,7 +17,7 @@ export type DocumentId = string & { readonly __brand: "DocumentId" };
 export type AnyDocumentId = DocumentId | string;
 
 // Import the internal validator
-import { isValidDocumentId as internalIsValidDocumentId } from "./internal/automerge.js";
+import { isValidDocumentId as internalIsValidDocumentId } from "./internal/crdt.js";
 
 /**
  * Check if a string is a valid document ID.

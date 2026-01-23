@@ -12,7 +12,7 @@ import {
   documentCache,
   multipleDocumentCache,
 } from "../internal/document-cache.js";
-import type { Repo } from "../internal/automerge.js";
+import type { Repo } from "../internal/crdt.js";
 import { INTERNAL_REPO_SYMBOL } from "../internal/symbols.js";
 
 /**

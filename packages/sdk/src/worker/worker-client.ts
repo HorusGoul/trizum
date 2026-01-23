@@ -18,7 +18,7 @@ import {
   fromAMDocumentId,
   toAMDocumentId,
   isValidDocumentId,
-} from "../internal/automerge.js";
+} from "../internal/crdt.js";
 import { INTERNAL_REPO_SYMBOL } from "../internal/symbols.js";
 import type { DocumentId, DocumentHandle } from "../types.js";
 import type {

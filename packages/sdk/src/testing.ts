@@ -15,7 +15,7 @@
  * ```
  */
 
-import { generateDocumentUrl, parseDocumentUrl } from "./internal/automerge.js";
+import { generateDocumentUrl, parseDocumentUrl } from "./internal/crdt.js";
 import type { DocumentId } from "./types.js";
 
 /**

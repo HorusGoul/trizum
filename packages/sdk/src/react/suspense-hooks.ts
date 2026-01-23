@@ -13,8 +13,8 @@ import {
   multipleDocumentCache,
 } from "../internal/document-cache.js";
 import type { DocumentHandle, AnyDocumentId } from "../types.js";
-import type { AMDocHandle } from "../internal/automerge.js";
-import { wrapHandle } from "../internal/automerge.js";
+import type { AMDocHandle } from "../internal/crdt.js";
+import { wrapHandle } from "../internal/crdt.js";
 
 export interface UseSuspenseDocumentOptions {
   /**

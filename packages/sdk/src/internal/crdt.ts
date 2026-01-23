@@ -1,8 +1,9 @@
 /**
- * Internal Automerge utilities.
+ * Internal CRDT utilities.
  *
- * This module contains all direct Automerge access and is NOT exported publicly.
- * All Automerge types and functions should be imported from here within the SDK.
+ * This module contains all direct CRDT library access and is NOT exported publicly.
+ * All internal types and functions should be imported from here within the SDK.
+ * @internal
  */
 
 import {
@@ -40,7 +41,7 @@ export type {
   NetworkAdapterInterface,
 };
 
-// Re-export symbol from separate file to avoid exposing Automerge in symbol imports
+// Re-export symbol from separate file to avoid exposing internal types in symbol imports
 export { INTERNAL_REPO_SYMBOL } from "./symbols.js";
 
 // Re-export AnyDocumentId for use with repo.find
@@ -58,8 +59,8 @@ export {
 };
 
 /**
- * Convert an SDK DocumentId to an Automerge DocumentId.
- * The SDK uses a branded string type while Automerge uses its own branded type.
+ * Convert an SDK DocumentId to an internal DocumentId.
+ * The SDK uses a branded string type while the internal library uses its own branded type.
  * This function performs the necessary type assertion.
  */
 export function toAMDocumentId(id: DocumentId | string): AMDocumentId {
@@ -67,8 +68,8 @@ export function toAMDocumentId(id: DocumentId | string): AMDocumentId {
 }
 
 /**
- * Convert an Automerge DocumentId to an SDK DocumentId.
- * The SDK uses a branded string type while Automerge uses its own branded type.
+ * Convert an internal DocumentId to an SDK DocumentId.
+ * The SDK uses a branded string type while the internal library uses its own branded type.
  * This function performs the necessary type assertion.
  */
 export function fromAMDocumentId(id: AMDocumentId): DocumentId {
@@ -105,7 +106,7 @@ export function createRepo(options: {
 }
 
 /**
- * Wrap an Automerge DocHandle into an SDK DocumentHandle.
+ * Wrap an internal DocHandle into an SDK DocumentHandle.
  */
 export function wrapHandle<T>(handle: AMDocHandle<T>): DocumentHandle<T> {
   return {

@@ -5,7 +5,7 @@
  * CRDT document change callbacks.
  */
 
-import { amInsertAt, amDeleteAt } from "../internal/automerge.js";
+import { amInsertAt, amDeleteAt } from "../internal/crdt.js";
 
 /**
  * Insert elements at a specific index in an array.

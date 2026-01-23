@@ -23,7 +23,7 @@ import {
   BrowserWebSocketClientAdapter,
   IndexedDBStorageAdapter,
   MessageChannelNetworkAdapter,
-} from "../internal/automerge.js";
+} from "../internal/crdt.js";
 import type {
   MainToWorkerMessage,
   WorkerToMainMessage,
