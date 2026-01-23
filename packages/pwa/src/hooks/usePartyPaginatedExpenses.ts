@@ -23,9 +23,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
   function getLoadedChunkExpenses() {
     return getLoadedChunkIds().flatMap((chunkId) => {
-      const doc = documentCache.getValueIfCached(repo, chunkId) as
-        | PartyExpenseChunk
-        | undefined;
+      const doc = documentCache.getValueIfCached(repo, chunkId);
 
       if (!doc) {
         return [];

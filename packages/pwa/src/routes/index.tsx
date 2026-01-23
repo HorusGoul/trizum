@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import type { Party } from "#src/models/party.js";
-import type { PartyList } from "#src/models/partyList.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -34,10 +33,7 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    const partyList = (await documentCache.readAsync(
-      context.repo,
-      partyListId,
-    )) as PartyList | undefined;
+    const partyList = await documentCache.readAsync(context.repo, partyListId);
 
     if (!partyList) {
       return;
