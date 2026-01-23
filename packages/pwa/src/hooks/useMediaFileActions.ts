@@ -4,16 +4,19 @@ import {
   type ImageCompressionOptions,
   compressionPresets,
 } from "#src/lib/imageCompression.ts";
-import { type DocumentId, type Repo, RawString } from "@trizum/sdk";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import {
+  type TrizumClient,
+  ImmutableString,
+  useTrizumClient,
+} from "@trizum/sdk";
 
 export function useMediaFileActions() {
-  const repo = useRepo();
+  const client = useTrizumClient();
 
-  return getMediaFileHelpers(repo);
+  return getMediaFileHelpers(client);
 }
 
-export function getMediaFileHelpers(repo: Repo) {
+export function getMediaFileHelpers(client: TrizumClient) {
   async function createMediaFile(
     blob: Blob,
     metadata: Record<string, unknown>,
@@ -52,21 +55,16 @@ export function getMediaFileHelpers(repo: Repo) {
       }
     }
 
-    const handle = repo.create<MediaFile>({
-      id: "id" as DocumentId,
+    const { id, handle } = client.create<MediaFile>({
       type: "mediaFile",
-      encodedBlob: new RawString(await encodeBlob(processedBlob)),
+      encodedBlob: new ImmutableString(await encodeBlob(processedBlob)),
       metadata: {
         ...metadata,
         ...compressionMetadata,
       },
     });
 
-    handle.change((doc) => {
-      doc.id = handle.documentId as unknown as DocumentId;
-    });
-
-    return [handle.documentId as unknown as DocumentId, handle] as const;
+    return [id, handle] as const;
   }
 
   return {

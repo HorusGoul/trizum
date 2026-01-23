@@ -3,8 +3,7 @@ import {
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
 import type { Party, PartyExpenseChunk } from "#src/models/party.js";
-import type { DocumentId } from "@trizum/sdk";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { type DocumentId, useTrizumClient } from "@trizum/sdk";
 import {
   startTransition,
   useEffect,
@@ -14,7 +13,8 @@ import {
 } from "react";
 
 export function usePartyPaginatedExpenses(partyId: DocumentId) {
-  const repo = useRepo();
+  const client = useTrizumClient();
+  const repo = client._internalRepo;
   const [party, handle] = useSuspenseDocument<Party>(partyId, {
     required: true,
   });
@@ -23,7 +23,9 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
   function getLoadedChunkExpenses() {
     return getLoadedChunkIds().flatMap((chunkId) => {
-      const doc = documentCache.getValueIfCached(repo, chunkId);
+      const doc = documentCache.getValueIfCached(repo, chunkId) as
+        | PartyExpenseChunk
+        | undefined;
 
       if (!doc) {
         return [];
@@ -116,15 +118,14 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
 
     async function subscribeToChunkChanges() {
       for (const chunkId of getLoadedChunkIds()) {
-        const handle = await repo.find<PartyExpenseChunk>(
-          chunkId as unknown as Parameters<typeof repo.find>[0],
-        );
+        const wrappedHandle =
+          await client.findHandle<PartyExpenseChunk>(chunkId);
 
         if (unmounted) {
           return;
         }
 
-        handle.on("change", onChange);
+        wrappedHandle.on("change", onChange);
 
         function onChange() {
           startTransition(() => {
@@ -133,7 +134,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
         }
 
         disposeBag.add(() => {
-          handle.off("change", onChange);
+          wrappedHandle.off("change", onChange);
         });
       }
     }
@@ -144,7 +145,7 @@ export function usePartyPaginatedExpenses(partyId: DocumentId) {
       disposeBag.forEach((dispose) => dispose());
       unmounted = true;
     };
-  }, [key]);
+  }, [key, client]);
 
   const nextChunkRefId = chunkIds.find(
     (chunkId) => !getLoadedChunkIds().includes(chunkId),

@@ -1,4 +1,4 @@
-import { type DocumentId, type Repo, wrapHandle } from "@trizum/sdk";
+import { type TrizumClient } from "@trizum/sdk";
 import type { Expense } from "./expense";
 import type { Party } from "./party";
 import { getPartyHelpers } from "#src/hooks/useParty.ts";
@@ -17,22 +17,21 @@ export interface MigrationData {
 }
 
 interface CreatePartyFromMigrationDataParams {
-  repo: Repo;
+  client: TrizumClient;
   data: MigrationData;
   importAttachments?: boolean;
   onProgress?: ({ name, progress }: { name: string; progress: number }) => void;
 }
 
 export async function createPartyFromMigrationData({
-  repo,
+  client,
   data,
   importAttachments = false,
   onProgress,
 }: CreatePartyFromMigrationDataParams) {
-  const { createMediaFile } = getMediaFileHelpers(repo);
+  const { createMediaFile } = getMediaFileHelpers(client);
 
-  const handle = repo.create<Party>({
-    id: "" as DocumentId,
+  const { id: partyId, handle } = client.create<Party>({
     type: "party",
     name: data.party.name,
     description: data.party.description,
@@ -40,8 +39,6 @@ export async function createPartyFromMigrationData({
     participants: data.party.participants,
     chunkRefs: [],
   });
-  handle.change((doc) => (doc.id = handle.documentId as unknown as DocumentId));
-  const partyId = handle.documentId as unknown as DocumentId;
 
   // Import photos
   const photoMap = new Map<string, MediaFile["id"]>();
@@ -73,7 +70,7 @@ export async function createPartyFromMigrationData({
     }
   }
 
-  const helpers = getPartyHelpers(repo, wrapHandle(handle));
+  const helpers = getPartyHelpers(client, handle);
 
   // Expenses from oldest to newest
   data.expenses.sort(

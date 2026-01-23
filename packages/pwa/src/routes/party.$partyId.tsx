@@ -64,7 +64,10 @@ export const Route = createFileRoute("/party/$partyId")({
     const firstChunkRef = party.chunkRefs.at(0);
 
     if (firstChunkRef) {
-      await documentCache.readAsync(context.repo, firstChunkRef.chunkId);
+      await documentCache.readAsync(
+        context.client._internalRepo,
+        firstChunkRef.chunkId,
+      );
     }
 
     return;

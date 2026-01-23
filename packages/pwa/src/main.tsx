@@ -1,7 +1,7 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
-import { TrizumClient, TrizumProvider, RepoContext } from "@trizum/sdk";
+import { TrizumClient, TrizumProvider } from "@trizum/sdk";
 import {
   RouterProvider,
   createRouter,
@@ -81,15 +81,12 @@ const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
 const isOfflineOnly =
   initialUrl.searchParams.get("__internal_offline_only") === "true";
 
-// Create Trizum client (replaces direct Automerge Repo usage)
+// Create Trizum client
 const client = new TrizumClient({
   storageName: "trizum",
   syncUrl: isOfflineOnly ? null : WSS_URL,
   offlineOnly: isOfflineOnly,
 });
-
-// For backwards compatibility during migration, expose the internal repo
-const repo = client._internalRepo;
 
 declare global {
   interface Window {
@@ -104,7 +101,7 @@ window.__internal_createPartyFromMigrationData = async (
   data: MigrationData,
 ) => {
   return createPartyFromMigrationData({
-    repo,
+    client,
     data,
     importAttachments: false,
   });
@@ -113,7 +110,7 @@ window.__internal_createPartyFromMigrationData = async (
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: { repo },
+  context: { client },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
@@ -169,13 +166,10 @@ if (!rootElement.innerHTML) {
       <UpdateControllerComponent>
         <AriaProviders>
           <TrizumProvider client={client}>
-            {/* RepoContext for backwards compatibility during migration */}
-            <RepoContext value={repo}>
-              <MediaGalleryController>
-                <RouterProvider router={router} InnerWrap={InnerWrap} />
-                <Toaster />
-              </MediaGalleryController>
-            </RepoContext>
+            <MediaGalleryController>
+              <RouterProvider router={router} InnerWrap={InnerWrap} />
+              <Toaster />
+            </MediaGalleryController>
           </TrizumProvider>
         </AriaProviders>
       </UpdateControllerComponent>

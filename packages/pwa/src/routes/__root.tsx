@@ -1,4 +1,4 @@
-import type { Repo } from "@trizum/sdk";
+import type { TrizumClient } from "@trizum/sdk";
 import {
   createRootRouteWithContext,
   Outlet,
@@ -17,7 +17,7 @@ const TanStackRouterDevtools = import.meta.env.PROD
     );
 
 interface RouterContext {
-  repo: Repo;
+  client: TrizumClient;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

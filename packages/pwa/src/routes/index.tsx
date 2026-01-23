@@ -5,8 +5,11 @@ import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { isValidDocumentId, type DocumentId } from "@trizum/sdk";
+import {
+  isValidDocumentId,
+  type DocumentId,
+  useTrizumClient,
+} from "@trizum/sdk";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
@@ -17,6 +20,7 @@ import {
 import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { defaultThemeHue } from "#src/ui/theme.ts";
+import type { PartyList } from "#src/models/partyList.js";
 
 let hasRedirectedThisSession = false;
 
@@ -33,7 +37,10 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    const partyList = await documentCache.readAsync(context.repo, partyListId);
+    const partyList = (await documentCache.readAsync(
+      context.client._internalRepo,
+      partyListId,
+    )) as PartyList | undefined;
 
     if (!partyList) {
       return;
@@ -221,12 +228,12 @@ function Index() {
 }
 
 function usePartyItemRefs() {
-  const repo = useRepo();
+  const client = useTrizumClient();
   const { partyList } = usePartyList();
   const refs = Object.keys(partyList.parties).filter(isValidDocumentId);
 
   for (const partyId of refs) {
-    documentCache.prefetch(repo, partyId);
+    documentCache.prefetch(client._internalRepo, partyId);
   }
 
   return refs;

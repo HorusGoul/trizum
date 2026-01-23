@@ -5,8 +5,7 @@ import type { Party, PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import type { DocumentId } from "@trizum/sdk";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useTrizumClient } from "@trizum/sdk";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";
@@ -38,7 +37,7 @@ interface NewPartyFormValues {
 }
 
 function New() {
-  const repo = useRepo();
+  const client = useTrizumClient();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
 
@@ -50,8 +49,7 @@ function New() {
       id: crypto.randomUUID(),
     }));
 
-    const handle = repo.create<Party>({
-      id: "" as DocumentId,
+    const { id: partyId, handle } = client.create<Party>({
       type: "party",
       name: values.name,
       description: values.description,
@@ -68,12 +66,9 @@ function New() {
       ),
       chunkRefs: [],
     });
-    handle.change(
-      (doc) => (doc.id = handle.documentId as unknown as DocumentId),
-    );
     void navigate({
       to: "/party/$partyId",
-      params: { partyId: handle.documentId },
+      params: { partyId },
       search: {
         tab: "expenses",
       },
@@ -82,7 +77,7 @@ function New() {
 
     toast.success(t`Party created`);
 
-    return handle.documentId;
+    return partyId;
   }
 
   const form = useForm({

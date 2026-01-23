@@ -17,6 +17,8 @@ export type DocumentId = string & { readonly __brand: "DocumentId" };
  * This is an opaque type that wraps the underlying Automerge handle.
  */
 export interface DocumentHandle<T> {
+  /** The unique identifier of this document */
+  readonly documentId: DocumentId;
   /** Get the current state of the document */
   doc(): T | undefined;
   /** Apply a change to the document */
@@ -40,6 +42,20 @@ export interface DocumentHandle<T> {
   /** Broadcast an ephemeral message to all connected peers */
   broadcast(message: unknown): void;
 }
+
+/**
+ * A string that will be stored as an immutable value in documents.
+ * Use this for large binary data (like base64-encoded files) that shouldn't
+ * be tracked for character-by-character changes.
+ */
+export interface ImmutableString {
+  readonly val: string;
+}
+
+/**
+ * Type alias for the ImmutableString constructor.
+ */
+export type ImmutableStringConstructor = new (value: string) => ImmutableString;
 
 /**
  * Supported locales in the Trizum application.

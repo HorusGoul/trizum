@@ -6,7 +6,7 @@ import { AppTextField } from "#src/ui/TextField.tsx";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId, useState } from "react";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { useTrizumClient } from "@trizum/sdk";
 import { Button } from "#src/ui/Button.tsx";
 import {
   createPartyFromMigrationData,
@@ -90,7 +90,7 @@ interface MigrateParams {
 
 function useMigrateTricount() {
   const [state, setState] = useState<MigrationState>({ type: "idle" });
-  const repo = useRepo();
+  const client = useTrizumClient();
 
   async function migrate({ key, importAttachments }: MigrateParams) {
     setState({
@@ -104,7 +104,7 @@ function useMigrateTricount() {
       const data = (await response.json()) as MigrationData;
 
       const partyId = await createPartyFromMigrationData({
-        repo,
+        client,
         data,
         importAttachments,
         onProgress: (progress) => {

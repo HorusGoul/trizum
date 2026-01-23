@@ -60,7 +60,7 @@ export const Route = createFileRoute(
     await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await documentCache.readAsync(context.client._internalRepo, chunkId);
   },
 });
 

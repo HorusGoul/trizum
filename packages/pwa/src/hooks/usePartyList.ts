@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId, DocHandle } from "@trizum/sdk";
+import type { DocumentId } from "@trizum/sdk";
+import { useTrizumClient } from "@trizum/sdk";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import {
   documentCache,
-  handleCache,
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 
 export function usePartyList() {
-  const repo = useRepo();
-  const [partyListId] = useState<DocumentId>(() => getPartyListId(repo));
+  const client = useTrizumClient();
+  const repo = client._internalRepo;
+  const [partyListId] = useState<DocumentId>(() => getPartyListId(client));
   const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(
     partyListId,
     {
@@ -96,12 +96,11 @@ export function usePartyList() {
           continue;
         }
 
-        const partyHandle = handleCache.read(
-          repo,
+        const partyHandle = await client.findHandle<Party>(
           partyId as DocumentId,
-        ) as DocHandle<Party>;
+        );
 
-        partyHandle.change((doc) => {
+        partyHandle.change((doc: Party) => {
           const participantId =
             partyList.participantInParties[partyId as DocumentId];
           const participant = doc.participants[participantId];

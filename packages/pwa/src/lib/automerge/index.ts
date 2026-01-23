@@ -1,19 +1,12 @@
 /**
  * Re-export automerge utilities from @trizum/sdk.
  */
-import type { DocumentId, Repo } from "@trizum/sdk";
+import type { DocumentId, TrizumClient } from "@trizum/sdk";
 
 export async function loadDocumentsByIds<T>(
-  repo: Repo,
+  client: TrizumClient,
   ids: DocumentId[],
 ): Promise<T[]> {
-  const docs: (T | undefined)[] = await Promise.all(
-    ids.map(async (id) => {
-      const handle = await repo.find<T>(
-        id as unknown as Parameters<typeof repo.find>[0],
-      );
-      return handle.doc() as T | undefined;
-    }),
-  );
+  const docs = await client.loadMany<T>(ids);
   return docs.filter((doc): doc is T => doc !== undefined);
 }

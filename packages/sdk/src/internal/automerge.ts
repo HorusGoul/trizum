@@ -102,6 +102,7 @@ export function createRepo(options: {
  */
 export function wrapHandle<T>(handle: AMDocHandle<T>): DocumentHandle<T> {
   return {
+    documentId: fromAMDocumentId(handle.documentId),
     doc: () => handle.doc() as T | undefined,
     change: (fn: (doc: T) => void) => handle.change(fn),
     isLoading: () => handle.inState(["loading"]),

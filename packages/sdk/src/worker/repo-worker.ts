@@ -30,7 +30,7 @@ import type {
 // Worker global scope
 declare const self: DedicatedWorkerGlobalScope;
 
-let repo: Repo | null = null;
+let _repo: Repo | null = null;
 let config: WorkerConfig | null = null;
 
 self.onmessage = (event: MessageEvent<MainToWorkerMessage>) => {
@@ -48,7 +48,7 @@ self.onmessage = (event: MessageEvent<MainToWorkerMessage>) => {
       }
 
       try {
-        repo = createWorkerRepo(config, message.port);
+        _repo = createWorkerRepo(config, message.port);
         postReady();
       } catch (error) {
         postError(

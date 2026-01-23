@@ -12,14 +12,18 @@ import type {
   WorkerToMainMessage,
   WorkerConfig,
 } from "./types.js";
-import { wrapHandle, fromAMDocumentId, toAMDocumentId } from "../internal/automerge.js";
+import {
+  wrapHandle,
+  fromAMDocumentId,
+  toAMDocumentId,
+  isValidDocumentId,
+} from "../internal/automerge.js";
 import type { DocumentId, DocumentHandle } from "../types.js";
 import type {
   DocumentModel,
   DocumentModelDefinition,
   ModelHelpers,
 } from "../models/types.js";
-import { isValidDocumentId } from "../internal/automerge.js";
 
 export interface TrizumWorkerClientOptions {
   /** Name for the IndexedDB database. Default: "trizum" */

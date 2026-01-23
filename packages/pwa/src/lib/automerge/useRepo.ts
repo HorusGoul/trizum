@@ -1,4 +1,14 @@
 /**
- * Re-export useRepo from @trizum/sdk for backwards compatibility.
+ * @deprecated This file exists for backwards compatibility.
+ * New code should use useTrizumClient from @trizum/sdk instead.
  */
-export { useRepo } from "@trizum/sdk";
+import { useTrizumClient } from "@trizum/sdk";
+
+/**
+ * @deprecated Use useTrizumClient from @trizum/sdk instead.
+ * This function provides access to the internal repo for backwards compatibility.
+ */
+export function useRepo() {
+  const client = useTrizumClient();
+  return client._internalRepo;
+}

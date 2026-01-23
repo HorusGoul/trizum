@@ -21,25 +21,8 @@ export type {
   WorkerConfig,
 } from "./worker/index.js";
 
-// Internal repo type (needed for backwards compatibility during migration)
-// NOTE: This is an opaque type - consumers should not depend on Automerge internals
-export type {
-  Repo,
-  AMDocHandle as DocHandle,
-  AutomergeAnyDocumentId,
-} from "./internal/automerge.js";
-
-// RawString class for creating immutable string values in documents
-// wrapHandle function to convert Automerge DocHandle to SDK DocumentHandle
-export { RawString, wrapHandle } from "./internal/automerge.js";
-
 // React context and hooks
-export {
-  TrizumProvider,
-  useTrizumClient,
-  useRepo,
-  RepoContext,
-} from "./react/TrizumProvider.js";
+export { TrizumProvider, useTrizumClient } from "./react/TrizumProvider.js";
 
 // React suspense hooks
 export {
@@ -71,6 +54,10 @@ export type {
 } from "./types.js";
 export { SUPPORTED_LOCALES } from "./types.js";
 export { isValidDocumentId } from "./internal/automerge.js";
+
+// ImmutableString class for creating immutable string values in documents
+// This wraps Automerge's RawString without exposing the underlying implementation
+export { RawString as ImmutableString } from "./internal/automerge.js";
 
 // Model types
 export type {
@@ -123,7 +110,7 @@ export {
   decodeBlob,
 } from "./models/index.js";
 
-// Internal cache (marked as internal but exported for backwards compatibility)
+// Internal cache (SDK-specific, no Automerge exposure)
 export {
   documentCache,
   handleCache,
