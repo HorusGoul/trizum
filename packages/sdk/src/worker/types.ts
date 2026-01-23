@@ -16,7 +16,8 @@ export type MainToWorkerMessage =
  * Messages sent from the worker to the main thread.
  */
 export type WorkerToMainMessage =
-  | { type: "ready" }
+  | { type: "initialized" } // Worker is ready to receive messages
+  | { type: "ready" } // Worker has finished setup
   | { type: "error"; error: string };
 
 /**

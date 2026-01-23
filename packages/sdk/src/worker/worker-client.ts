@@ -98,20 +98,21 @@ export class TrizumWorkerClient {
       // No storage here - storage is in the worker
     });
 
-    // Initialize the worker
-    const config: WorkerConfig = { storageName, syncUrl, offlineOnly };
-    const initMessage: MainToWorkerMessage = { type: "init", config };
-    this._worker.postMessage(initMessage);
-
-    // Send the MessageChannel port to the worker
-    const portMessage: MainToWorkerMessage = { type: "port", port: port2 };
-    this._worker.postMessage(portMessage, [port2]);
-
     // Wait for worker to be ready
     this._ready = new Promise<void>((resolve, reject) => {
       const handleMessage = (event: MessageEvent<WorkerToMainMessage>) => {
         const message = event.data;
-        if (message.type === "ready") {
+
+        if (message.type === "initialized") {
+          // Worker is ready to receive messages, now send config
+          const workerConfig: WorkerConfig = { storageName, syncUrl, offlineOnly };
+          const initMessage: MainToWorkerMessage = { type: "init", config: workerConfig };
+          this._worker.postMessage(initMessage);
+
+          // Send the MessageChannel port to the worker
+          const portMessage: MainToWorkerMessage = { type: "port", port: port2 };
+          this._worker.postMessage(portMessage, [port2]);
+        } else if (message.type === "ready") {
           this._worker.removeEventListener("message", handleMessage);
           resolve();
         } else if (message.type === "error") {

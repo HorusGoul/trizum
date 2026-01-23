@@ -62,6 +62,10 @@ self.onmessage = (event: MessageEvent<MainToWorkerMessage>) => {
   }
 };
 
+// Signal that the worker is ready to receive messages
+// This must happen after setting up onmessage to avoid race conditions
+self.postMessage({ type: "initialized" } as WorkerToMainMessage);
+
 function createWorkerRepo(config: WorkerConfig, port: MessagePort): Repo {
   const { storageName, syncUrl, offlineOnly = false } = config;
 
