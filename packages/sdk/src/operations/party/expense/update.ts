@@ -4,10 +4,7 @@
 
 import type { ITrizumClient } from "../../../client.js";
 import type { DocumentId } from "../../../types.js";
-import type {
-  Party,
-  PartyExpenseChunk,
-} from "../../../models/party.js";
+import type { Party, PartyExpenseChunk } from "../../../models/party.js";
 import type { Expense } from "../../../models/expense.js";
 import { decodeExpenseId } from "../../../models/expense.js";
 import { applyExpenseDiff } from "../../utils/expense-diff.js";
@@ -46,7 +43,9 @@ export async function updateExpense(
     throw new Error("Chunk not found for expense");
   }
 
-  const chunkHandle = await client.findHandle<PartyExpenseChunk>(chunkRef.chunkId);
+  const chunkHandle = await client.findHandle<PartyExpenseChunk>(
+    chunkRef.chunkId,
+  );
   const chunk = chunkHandle.doc();
 
   if (!chunk) {

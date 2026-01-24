@@ -2,7 +2,11 @@
  * Party operations.
  */
 
-export { createParty, type CreatePartyInput, type CreatePartyResult } from "./create.js";
+export {
+  createParty,
+  type CreatePartyInput,
+  type CreatePartyResult,
+} from "./create.js";
 export {
   updateParty,
   updateParticipant,

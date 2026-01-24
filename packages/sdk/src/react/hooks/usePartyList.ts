@@ -7,7 +7,10 @@
 import { useTrizumClient } from "../TrizumProvider.js";
 import { useSuspenseDocument } from "../suspense-hooks.js";
 import type { DocumentId } from "../../types.js";
-import type { PartyList, UpdatePartyListInput } from "../../models/party-list.js";
+import type {
+  PartyList,
+  UpdatePartyListInput,
+} from "../../models/party-list.js";
 
 /**
  * Result of usePartyList hook.
@@ -54,7 +57,9 @@ export interface UsePartyListResult {
 export function usePartyList(): UsePartyListResult {
   const client = useTrizumClient();
   const partyListId = client.partyList.getOrCreate();
-  const [partyList] = useSuspenseDocument<PartyList>(partyListId, { required: true });
+  const [partyList] = useSuspenseDocument<PartyList>(partyListId, {
+    required: true,
+  });
 
   return {
     partyList,

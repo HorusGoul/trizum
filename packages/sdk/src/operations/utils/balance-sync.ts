@@ -11,7 +11,7 @@ import type {
   PartyExpenseChunk,
   PartyExpenseChunkBalances,
 } from "../../models/party.js";
-import type { Expense, BalancesByParticipant } from "../../models/expense.js";
+import type { Expense } from "../../models/expense.js";
 import { calculateBalancesByParticipant } from "../../calculations/balance.js";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
@@ -25,7 +25,8 @@ export async function recalculateChunkBalances(
   expenses: Expense[],
   participants: Party["participants"],
 ): Promise<void> {
-  const balancesHandle = await client.findHandle<PartyExpenseChunkBalances>(balancesId);
+  const balancesHandle =
+    await client.findHandle<PartyExpenseChunkBalances>(balancesId);
   const balances = balancesHandle.doc();
 
   if (!balances) {
@@ -56,7 +57,9 @@ export async function recalculateAllChunkBalances(
   }
 
   for (const chunkRef of party.chunkRefs) {
-    const chunkHandle = await client.findHandle<PartyExpenseChunk>(chunkRef.chunkId);
+    const chunkHandle = await client.findHandle<PartyExpenseChunk>(
+      chunkRef.chunkId,
+    );
     const chunk = chunkHandle.doc();
 
     if (!chunk) {
@@ -88,10 +91,7 @@ function applyPatches(
  * Apply a single patch to an object.
  * DiffResult.t: 0 = Add, 1 = Update, 2 = Remove
  */
-function applyPatch(
-  target: Record<string, unknown>,
-  patch: DiffResult,
-): void {
+function applyPatch(target: Record<string, unknown>, patch: DiffResult): void {
   const path = patch.p;
   let current: unknown = target;
 

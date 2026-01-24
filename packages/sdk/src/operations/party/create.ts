@@ -90,7 +90,8 @@ export async function createParty(
     doc.partyId = partyId;
   });
 
-  const balancesHandle = await client.findHandle<PartyExpenseChunkBalances>(balancesId);
+  const balancesHandle =
+    await client.findHandle<PartyExpenseChunkBalances>(balancesId);
   balancesHandle.change((doc) => {
     doc.partyId = partyId;
   });

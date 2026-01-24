@@ -91,8 +91,13 @@ export function getPartyHelpers(
   _client: unknown,
   _handle: unknown,
 ): {
-  updateSettings: (values: Pick<Party, "name" | "description" | "participants" | "hue">) => void;
-  setParticipantDetails: (participantId: string, details: Record<string, unknown>) => void;
+  updateSettings: (
+    values: Pick<Party, "name" | "description" | "participants" | "hue">,
+  ) => void;
+  setParticipantDetails: (
+    participantId: string,
+    details: Record<string, unknown>,
+  ) => void;
   addExpenseToParty: (expense: unknown) => Promise<unknown>;
   updateExpense: (expense: unknown) => Promise<void>;
   removeExpense: (expenseId: string) => Promise<boolean>;

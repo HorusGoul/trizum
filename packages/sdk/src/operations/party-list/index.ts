@@ -4,7 +4,10 @@
 
 import type { ITrizumClient } from "../../client.js";
 import type { DocumentId } from "../../types.js";
-import type { PartyList, UpdatePartyListInput } from "../../models/party-list.js";
+import type {
+  PartyList,
+  UpdatePartyListInput,
+} from "../../models/party-list.js";
 import type { Party } from "../../models/party.js";
 
 /**
@@ -144,16 +147,22 @@ export async function updatePartyListSettings(
     };
 
     // Skip if no participant fields to sync
-    if (participantFields.phone === undefined && participantFields.avatarId === undefined) {
+    if (
+      participantFields.phone === undefined &&
+      participantFields.avatarId === undefined
+    ) {
       return;
     }
 
     for (const partyId of Object.keys(updatedPartyList.participantInParties)) {
-      const participantId = updatedPartyList.participantInParties[partyId as DocumentId];
+      const participantId =
+        updatedPartyList.participantInParties[partyId as DocumentId];
       if (!participantId) continue;
 
       try {
-        const partyHandle = await client.findHandle<Party>(partyId as DocumentId);
+        const partyHandle = await client.findHandle<Party>(
+          partyId as DocumentId,
+        );
         const party = partyHandle.doc();
         if (!party) continue;
 

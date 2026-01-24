@@ -26,8 +26,6 @@ import type {
   DocumentModelDefinition,
   ModelHelpers,
 } from "../models/types.js";
-import type { Expense } from "../models/expense.js";
-import type { UpdatePartyListInput } from "../models/party-list.js";
 import type {
   ITrizumClient,
   PartyOperations,
@@ -44,8 +42,6 @@ import {
   updateExpense,
   deleteExpense,
   recalculateAllBalances,
-  type CreatePartyInput,
-  type CreateExpenseInput,
 } from "../operations/party/index.js";
 import {
   addPartyToList,

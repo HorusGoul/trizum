@@ -6,7 +6,10 @@
 
 import { useState, useCallback, useTransition, useMemo } from "react";
 import { useTrizumClient } from "../TrizumProvider.js";
-import { useSuspenseDocument, useMultipleSuspenseDocuments } from "../suspense-hooks.js";
+import {
+  useSuspenseDocument,
+  useMultipleSuspenseDocuments,
+} from "../suspense-hooks.js";
 import type { DocumentId } from "../../types.js";
 import type { Party, PartyExpenseChunk } from "../../models/party.js";
 import type { Expense } from "../../models/expense.js";
@@ -63,13 +66,12 @@ export function usePartyExpenses(partyId: DocumentId): UsePartyExpensesResult {
 
   // Get the IDs of chunks we want to load
   const chunkIdsToLoad = useMemo(() => {
-    return party.chunkRefs
-      .slice(0, loadedChunkCount)
-      .map((ref) => ref.chunkId);
+    return party.chunkRefs.slice(0, loadedChunkCount).map((ref) => ref.chunkId);
   }, [party.chunkRefs, loadedChunkCount]);
 
   // Load all chunks we want
-  const chunks = useMultipleSuspenseDocuments<PartyExpenseChunk>(chunkIdsToLoad);
+  const chunks =
+    useMultipleSuspenseDocuments<PartyExpenseChunk>(chunkIdsToLoad);
 
   // Merge expenses from all loaded chunks
   const expenses = useMemo(() => {

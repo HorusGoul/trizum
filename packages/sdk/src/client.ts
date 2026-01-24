@@ -102,7 +102,11 @@ export interface ExpenseOperations {
   /** Create a new expense in a party */
   create(partyId: DocumentId, input: CreateExpenseInput): Promise<Expense>;
   /** Update an existing expense */
-  update(partyId: DocumentId, expenseId: string, expense: Expense): Promise<void>;
+  update(
+    partyId: DocumentId,
+    expenseId: string,
+    expense: Expense,
+  ): Promise<void>;
   /** Delete an expense */
   delete(partyId: DocumentId, expenseId: string): Promise<void>;
 }
@@ -146,7 +150,10 @@ export interface PartyListOperations {
   /** Set the last opened party */
   setLastOpened(partyId: DocumentId | null): Promise<void>;
   /** Update settings and optionally sync to all parties */
-  updateSettings(input: UpdatePartyListInput, syncToParties?: boolean): Promise<void>;
+  updateSettings(
+    input: UpdatePartyListInput,
+    syncToParties?: boolean,
+  ): Promise<void>;
 }
 
 /**

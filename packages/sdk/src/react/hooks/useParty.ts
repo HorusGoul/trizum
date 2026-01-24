@@ -73,7 +73,9 @@ export interface UsePartyResult {
  */
 export function useParty(partyId: DocumentId): UsePartyResult {
   const client = useTrizumClient();
-  const [party, handle] = useSuspenseDocument<Party>(partyId, { required: true });
+  const [party, handle] = useSuspenseDocument<Party>(partyId, {
+    required: true,
+  });
 
   return {
     party,
@@ -90,7 +92,8 @@ export function useParty(partyId: DocumentId): UsePartyResult {
     updateExpense: (expense) =>
       client.party.expense.update(partyId, expense.id, expense),
 
-    removeExpense: (expenseId) => client.party.expense.delete(partyId, expenseId),
+    removeExpense: (expenseId) =>
+      client.party.expense.delete(partyId, expenseId),
 
     recalculateBalances: () => client.party.recalculateBalances(partyId),
   };

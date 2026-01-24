@@ -4,7 +4,10 @@
  * Aggregates balances across all expense chunks.
  */
 
-import { useSuspenseDocument, useMultipleSuspenseDocuments } from "../suspense-hooks.js";
+import {
+  useSuspenseDocument,
+  useMultipleSuspenseDocuments,
+} from "../suspense-hooks.js";
 import type { DocumentId } from "../../types.js";
 import type { Party, PartyExpenseChunkBalances } from "../../models/party.js";
 import type { BalancesByParticipant } from "../../models/expense.js";
@@ -43,9 +46,8 @@ export function usePartyBalances(partyId: DocumentId): BalancesByParticipant {
   const balanceIds = party.chunkRefs.map((ref) => ref.balancesId);
 
   // Load all balance documents
-  const balanceDocs = useMultipleSuspenseDocuments<PartyExpenseChunkBalances>(
-    balanceIds,
-  );
+  const balanceDocs =
+    useMultipleSuspenseDocuments<PartyExpenseChunkBalances>(balanceIds);
 
   // Merge balances from all chunks
   const allBalances = balanceDocs
