@@ -307,7 +307,9 @@ describe("exportIntoInput float validation", () => {
       },
     });
 
-    expect(() => exportIntoInput(expense)).toThrow(/expected integer but got 50.5/);
+    expect(() => exportIntoInput(expense)).toThrow(
+      /expected integer but got 50.5/,
+    );
   });
 
   test("should throw error when share value contains float values", () => {
@@ -320,7 +322,9 @@ describe("exportIntoInput float validation", () => {
       },
     });
 
-    expect(() => exportIntoInput(expense)).toThrow(/expected integer but got 25.5/);
+    expect(() => exportIntoInput(expense)).toThrow(
+      /expected integer but got 25.5/,
+    );
   });
 
   test("should throw descriptive error with expense id", () => {
