@@ -142,9 +142,15 @@ describe("validateExpensePaidBy", () => {
   });
 
   test("should return error for float amounts", () => {
-    expect(validateExpensePaidBy({ user1: 10.5 })).toBe(EXPENSE_PAID_BY_NOT_INTEGER);
-    expect(validateExpensePaidBy({ user1: 1000, user2: 10.5 })).toBe(EXPENSE_PAID_BY_NOT_INTEGER);
-    expect(validateExpensePaidBy({ user1: 0.01 })).toBe(EXPENSE_PAID_BY_NOT_INTEGER);
+    expect(validateExpensePaidBy({ user1: 10.5 })).toBe(
+      EXPENSE_PAID_BY_NOT_INTEGER,
+    );
+    expect(validateExpensePaidBy({ user1: 1000, user2: 10.5 })).toBe(
+      EXPENSE_PAID_BY_NOT_INTEGER,
+    );
+    expect(validateExpensePaidBy({ user1: 0.01 })).toBe(
+      EXPENSE_PAID_BY_NOT_INTEGER,
+    );
   });
 
   test("should return null for empty paidBy", () => {
@@ -154,34 +160,44 @@ describe("validateExpensePaidBy", () => {
 
 describe("validateExpenseShares", () => {
   test("should return null for integer share values", () => {
-    expect(validateExpenseShares({
-      user1: { type: "divide", value: 1 },
-      user2: { type: "divide", value: 2 },
-    })).toBeNull();
+    expect(
+      validateExpenseShares({
+        user1: { type: "divide", value: 1 },
+        user2: { type: "divide", value: 2 },
+      }),
+    ).toBeNull();
 
-    expect(validateExpenseShares({
-      user1: { type: "exact", value: 500 },
-      user2: { type: "exact", value: 500 },
-    })).toBeNull();
+    expect(
+      validateExpenseShares({
+        user1: { type: "exact", value: 500 },
+        user2: { type: "exact", value: 500 },
+      }),
+    ).toBeNull();
 
-    expect(validateExpenseShares({
-      user1: { type: "exact", value: 500 },
-      user2: { type: "divide", value: 1 },
-    })).toBeNull();
+    expect(
+      validateExpenseShares({
+        user1: { type: "exact", value: 500 },
+        user2: { type: "divide", value: 1 },
+      }),
+    ).toBeNull();
   });
 
   test("should return error for float divide values", () => {
-    expect(validateExpenseShares({
-      user1: { type: "divide", value: 1.5 },
-      user2: { type: "divide", value: 2 },
-    })).toBe(EXPENSE_SHARE_VALUE_NOT_INTEGER);
+    expect(
+      validateExpenseShares({
+        user1: { type: "divide", value: 1.5 },
+        user2: { type: "divide", value: 2 },
+      }),
+    ).toBe(EXPENSE_SHARE_VALUE_NOT_INTEGER);
   });
 
   test("should return error for float exact values", () => {
-    expect(validateExpenseShares({
-      user1: { type: "exact", value: 10.5 },
-      user2: { type: "exact", value: 500 },
-    })).toBe(EXPENSE_SHARE_VALUE_NOT_INTEGER);
+    expect(
+      validateExpenseShares({
+        user1: { type: "exact", value: 10.5 },
+        user2: { type: "exact", value: 500 },
+      }),
+    ).toBe(EXPENSE_SHARE_VALUE_NOT_INTEGER);
   });
 
   test("should return null for empty shares", () => {
