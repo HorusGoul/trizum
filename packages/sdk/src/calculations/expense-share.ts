@@ -31,6 +31,29 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     return [];
   }
 
+  // Validate that all paidBy values are integers
+  for (const [user, amount] of Object.entries(expense.paidBy)) {
+    if (!Number.isInteger(amount)) {
+      throw new Error(
+        `Invalid paidBy amount for user "${user}" in expense "${expense.id}": ` +
+          `expected integer but got ${amount} (type: ${typeof amount}). ` +
+          `This may indicate data corruption or a bug in expense creation.`,
+      );
+    }
+  }
+
+  // Validate that all share values are integers
+  for (const [user, share] of Object.entries(expense.shares)) {
+    if (!Number.isInteger(share.value)) {
+      throw new Error(
+        `Invalid share value for user "${user}" in expense "${expense.id}": ` +
+          `expected integer but got ${share.value} (type: ${typeof share.value}). ` +
+          `Share type: ${share.type}. ` +
+          `This may indicate data corruption or a bug in expense creation.`,
+      );
+    }
+  }
+
   const total = Object.values(expense.paidBy).reduce(
     (acc, curr) => acc.add(Dinero({ amount: curr })),
     Dinero({ amount: 0 }),

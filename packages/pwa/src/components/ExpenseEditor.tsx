@@ -521,9 +521,11 @@ function ParticipantItem({
       ...shares,
     };
 
+    // Ensure value is an integer (share counts must be whole numbers)
+    const currentValue = Math.floor(participantShare.value);
     newShares[participant.id] = {
       type: "divide",
-      value: Math.min(participantShare.value + 1, 99),
+      value: Math.min(currentValue + 1, 99),
     };
     updateShares(newShares);
   }
@@ -535,9 +537,11 @@ function ParticipantItem({
     const newShares = {
       ...shares,
     };
+    // Ensure value is an integer (share counts must be whole numbers)
+    const currentValue = Math.floor(participantShare.value);
     newShares[participant.id] = {
       type: "divide",
-      value: Math.max(participantShare.value - 1, 0),
+      value: Math.max(currentValue - 1, 0),
     };
     updateShares(newShares);
   }
@@ -600,9 +604,12 @@ function ParticipantItem({
                       ...shares,
                     };
 
+                    // Ensure value is an integer (share counts must be whole numbers)
+                    const intValue = Math.max(0, Math.floor(value));
+
                     newShares[participant.id] = {
                       type: "divide",
-                      value,
+                      value: intValue,
                     };
 
                     updateShares(newShares);

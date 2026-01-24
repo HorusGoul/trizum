@@ -296,6 +296,48 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   });
 });
 
+describe("exportIntoInput float validation", () => {
+  test("should throw error when paidBy contains float values", () => {
+    const expense = createExpense({
+      paidBy: {
+        "1": 50.5, // Float value - should throw
+      },
+      shares: {
+        "1": { type: "divide", value: 1 },
+      },
+    });
+
+    expect(() => exportIntoInput(expense)).toThrow(/expected integer but got 50.5/);
+  });
+
+  test("should throw error when share value contains float values", () => {
+    const expense = createExpense({
+      paidBy: {
+        "1": 50,
+      },
+      shares: {
+        "1": { type: "exact", value: 25.5 }, // Float value - should throw
+      },
+    });
+
+    expect(() => exportIntoInput(expense)).toThrow(/expected integer but got 25.5/);
+  });
+
+  test("should throw descriptive error with expense id", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 100.1,
+      },
+      shares: {
+        user1: { type: "divide", value: 1 },
+      },
+    });
+
+    expect(() => exportIntoInput(expense)).toThrow(/user1.*100.1/);
+    expect(() => exportIntoInput(expense)).toThrow(/expense/i);
+  });
+});
+
 describe("getExpenseUnitShares", () => {
   test("should calculate equal divide shares", () => {
     const result = getExpenseUnitShares({
