@@ -447,6 +447,12 @@ importers:
       '@automerge/automerge-repo-storage-indexeddb':
         specifier: 2.5.1
         version: 2.5.1
+      '@opentf/obj-diff':
+        specifier: 0.12.0
+        version: 0.12.0
+      '@opentf/std':
+        specifier: 0.13.0
+        version: 0.13.0
       dinero.js:
         specifier: 1.9.1
         version: 1.9.1
@@ -456,6 +462,9 @@ importers:
       suspense:
         specifier: 0.1.0
         version: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      ulidx:
+        specifier: 2.4.1
+        version: 2.4.1
     devDependencies:
       '@trizum/eslint-config':
         specifier: workspace:*
@@ -481,9 +490,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      ulidx:
-        specifier: 2.4.1
-        version: 2.4.1
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/node@24.10.2)(jiti@2.6.0)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5)
@@ -2871,6 +2877,18 @@ packages:
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
+
+  '@opentf/obj-diff@0.12.0':
+    resolution: {integrity: sha512-mxgT/RaarPGIcdFeQsdBxY7jFAFoH5L6P5BHOG8c+uytKAzylTchHa7tXhlXRt1bTW0gnqQ6fcTL8ex2GsXo1w==}
+    engines: {node: '>=16.20.2'}
+
+  '@opentf/std@0.12.0':
+    resolution: {integrity: sha512-UVK4sKbjtBmad8rbv3i5iIYR6xGjdBX75JN7uIKTKzZ40MObstuZkUoGfA5OpnVDCCOPLsPqioSYTBENJgcrMw==}
+    engines: {node: '>=16.20.2'}
+
+  '@opentf/std@0.13.0':
+    resolution: {integrity: sha512-VG9vn7oML5prxWipDvod1X7z9+3fyyCbw+SuD5F7cWx9F1bXFZdAYGIKGqqHLtfxz3mrXZWHcxnm8d0YwQ7tKQ==}
+    engines: {node: '>=16.20.2'}
 
   '@oxc-project/runtime@0.101.0':
     resolution: {integrity: sha512-t3qpfVZIqSiLQ5Kqt/MC4Ge/WCOGrrcagAdzTcDaggupjiGxUx4nJF2v6wUCXWSzWHn5Ns7XLv13fCJEwCOERQ==}
@@ -12024,6 +12042,14 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
 
+  '@opentf/obj-diff@0.12.0':
+    dependencies:
+      '@opentf/std': 0.12.0
+
+  '@opentf/std@0.12.0': {}
+
+  '@opentf/std@0.13.0': {}
+
   '@oxc-project/runtime@0.101.0': {}
 
   '@oxc-project/types@0.101.0': {}
@@ -13844,9 +13870,12 @@ snapshots:
       '@automerge/automerge-repo-network-messagechannel': 2.5.1
       '@automerge/automerge-repo-network-websocket': 2.5.1
       '@automerge/automerge-repo-storage-indexeddb': 2.5.1
+      '@opentf/obj-diff': 0.12.0
+      '@opentf/std': 0.13.0
       dinero.js: 1.9.1
       react: 0.0.0-experimental-d025ddd3-20240722
       suspense: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      ulidx: 2.4.1
     transitivePeerDependencies:
       - bufferutil
       - react-dom

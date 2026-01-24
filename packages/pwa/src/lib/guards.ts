@@ -5,7 +5,6 @@ import {
   type RouterContextOptions,
 } from "@tanstack/react-router";
 import { cache } from "@trizum/sdk";
-import { getPartyListId } from "#src/models/partyList.js";
 import type { DocumentId } from "@trizum/sdk";
 import type { Party } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
@@ -26,7 +25,7 @@ export async function guardPartyExists(
 export async function guardPartyListExists({
   client,
 }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
-  const partyListId = getPartyListId(client);
+  const partyListId = client.partyList.getOrCreate();
   const partyList = await cache.readAsync<PartyList>(client, partyListId);
 
   if (!partyList) {

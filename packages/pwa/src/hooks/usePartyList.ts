@@ -1,135 +1,35 @@
-import { useEffect, useState } from "react";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import {
-  type DocumentId,
-  useTrizumClient,
-  useSuspenseDocument,
-  cache,
-} from "@trizum/sdk";
-import type { Party, PartyParticipant } from "#src/models/party.js";
+import { useEffect } from "react";
+import { usePartyList as useSdkPartyList, type PartyList } from "@trizum/sdk";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 
+/**
+ * PWA hook for party list management.
+ *
+ * Wraps the SDK's usePartyList hook and adds locale syncing.
+ */
 export function usePartyList() {
-  const client = useTrizumClient();
-  const [partyListId] = useState<DocumentId>(() => getPartyListId(client));
-  const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(
-    partyListId,
-    {
-      required: true,
-    },
-  );
+  const sdkResult = useSdkPartyList();
 
+  // Sync locale to i18n when partyList.locale changes
   useEffect(() => {
-    setLocale(partyList.locale ?? getBrowserLocale());
-  }, [partyList.locale]);
+    setLocale(sdkResult.partyList.locale ?? getBrowserLocale());
+  }, [sdkResult.partyList.locale]);
 
-  function addPartyToList(
-    partyId: Party["id"],
-    participantId: PartyParticipant["id"],
-  ) {
-    partyListHandle.change((list) => {
-      list.parties[partyId] = true;
-
-      if (!list.participantInParties) {
-        list.participantInParties = {};
-      }
-
-      list.participantInParties[partyId] = participantId;
-    });
-  }
-  function removeParty(partyId: Party["id"]) {
-    // TODO: mark for deletion during next boot
-
-    partyListHandle.change((list) => {
-      delete list.parties[partyId];
-
-      if (!list.participantInParties) {
-        return;
-      }
-
-      delete list.participantInParties[partyId];
-    });
-  }
-
-  function setLastOpenedPartyId(partyId: Party["id"] | null) {
-    partyListHandle.change((list) => {
-      list.lastOpenedPartyId = partyId;
-    });
-  }
-
+  // Wrap updateSettings to accept the PWA's expected type
   function updateSettings(
     values: Pick<
       PartyList,
       "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch"
     >,
   ) {
-    partyListHandle.change((list) => {
-      list.username = values.username;
-      list.phone = values.phone;
-      list.avatarId = values.avatarId;
-      if (values.locale) {
-        list.locale = values.locale;
-      } else {
-        delete list["locale"];
-      }
-      list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
-    });
-
-    void updateAllParties();
-
-    async function updateAllParties() {
-      // Update all participants in all parties
-      const partyList = partyListHandle.doc();
-
-      if (!partyList) {
-        return;
-      }
-
-      for (const partyId in partyList.participantInParties) {
-        const party = await cache.readAsync<Party>(
-          client,
-          partyId as DocumentId,
-        );
-
-        if (!party) {
-          continue;
-        }
-
-        const partyHandle = await client.findHandle<Party>(
-          partyId as DocumentId,
-        );
-
-        partyHandle.change((doc: Party) => {
-          const participantId =
-            partyList.participantInParties[partyId as DocumentId];
-          const participant = doc.participants[participantId];
-
-          if (!participant) {
-            return;
-          }
-
-          // Only update participant-relevant fields, not user-local settings
-          const participantFields = ["phone", "avatarId"] as const;
-          for (const key of participantFields) {
-            const value = values[key];
-
-            if (value === undefined) {
-              delete participant[key as keyof typeof participant];
-            } else {
-              // @ts-expect-error -- idk tbh
-              participant[key] = value;
-            }
-          }
-        });
-      }
-    }
+    return sdkResult.updateSettings(values);
   }
 
   return {
-    partyList,
-    addPartyToList,
-    removeParty,
+    partyList: sdkResult.partyList,
+    addPartyToList: sdkResult.addPartyToList,
+    removeParty: sdkResult.removeParty,
     updateSettings,
-    setLastOpenedPartyId,
+    setLastOpenedPartyId: sdkResult.setLastOpenedPartyId,
   };
 }

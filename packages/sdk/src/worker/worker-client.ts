@@ -26,6 +26,34 @@ import type {
   DocumentModelDefinition,
   ModelHelpers,
 } from "../models/types.js";
+import type { Expense } from "../models/expense.js";
+import type { UpdatePartyListInput } from "../models/party-list.js";
+import type {
+  ITrizumClient,
+  PartyOperations,
+  PartyListOperations,
+} from "../client.js";
+
+// Import operations
+import {
+  createParty,
+  updateParty,
+  updateParticipant,
+  addParticipant,
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  recalculateAllBalances,
+  type CreatePartyInput,
+  type CreateExpenseInput,
+} from "../operations/party/index.js";
+import {
+  addPartyToList,
+  removePartyFromList,
+  setLastOpenedParty,
+  updatePartyListSettings,
+  getOrCreatePartyList,
+} from "../operations/party-list/index.js";
 
 export interface TrizumWorkerClientOptions {
   /** Name for the IndexedDB database. Default: "trizum" */
@@ -80,7 +108,7 @@ export interface TrizumWorkerClientOptions {
  * // Use client same as TrizumClient
  * ```
  */
-export class TrizumWorkerClient {
+export class TrizumWorkerClient implements ITrizumClient {
   private _worker: Worker;
   /** @internal - Internal repository, access via INTERNAL_REPO_SYMBOL */
   private [INTERNAL_REPO_SYMBOL]: Repo;
@@ -89,6 +117,17 @@ export class TrizumWorkerClient {
     Pick<TrizumWorkerClientOptions, "storageName" | "offlineOnly">
   > &
     Omit<TrizumWorkerClientOptions, "storageName" | "offlineOnly">;
+  private partyListId: DocumentId | null = null;
+
+  /**
+   * Party operations namespace.
+   */
+  party: PartyOperations;
+
+  /**
+   * PartyList operations namespace.
+   */
+  partyList: PartyListOperations;
 
   private constructor(options: TrizumWorkerClientOptions) {
     const {
@@ -164,6 +203,49 @@ export class TrizumWorkerClient {
         reject(new Error("Worker initialization timed out"));
       }, 10000);
     });
+
+    // Initialize party namespace
+    this.party = {
+      create: (input) => createParty(this, input),
+      update: (partyId, input) => updateParty(this, partyId, input),
+      updateParticipant: (partyId, participantId, input) =>
+        updateParticipant(this, partyId, participantId, input),
+      addParticipant: (partyId, participantId, participant) =>
+        addParticipant(this, partyId, participantId, participant),
+      recalculateBalances: (partyId) => recalculateAllBalances(this, partyId),
+      expense: {
+        create: (partyId, input) => createExpense(this, partyId, input),
+        update: (partyId, _expenseId, expense) =>
+          updateExpense(this, partyId, expense),
+        delete: (partyId, expenseId) => deleteExpense(this, partyId, expenseId),
+      },
+    };
+
+    // Initialize partyList namespace
+    this.partyList = {
+      getOrCreate: () => {
+        if (!this.partyListId) {
+          this.partyListId = getOrCreatePartyList(this);
+        }
+        return this.partyListId;
+      },
+      addParty: (partyId, participantId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return addPartyToList(this, partyListId, partyId, participantId);
+      },
+      removeParty: (partyId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return removePartyFromList(this, partyListId, partyId);
+      },
+      setLastOpened: (partyId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return setLastOpenedParty(this, partyListId, partyId);
+      },
+      updateSettings: (input, syncToParties) => {
+        const partyListId = this.partyList.getOrCreate();
+        return updatePartyListSettings(this, partyListId, input, syncToParties);
+      },
+    };
   }
 
   /**

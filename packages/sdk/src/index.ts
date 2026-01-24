@@ -10,7 +10,35 @@ export {
   TrizumClient,
   type TrizumClientOptions,
   type ITrizumClient,
+  type PartyOperations,
+  type PartyListOperations,
+  type ExpenseOperations,
 } from "./client.js";
+
+// Operations (for direct use without client instance)
+export {
+  // Party operations
+  createParty,
+  updateParty,
+  updateParticipant,
+  addParticipant,
+  // Expense operations
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  recalculateAllBalances,
+  // PartyList operations
+  addPartyToList,
+  removePartyFromList,
+  setLastOpenedParty,
+  updatePartyListSettings,
+  getOrCreatePartyList,
+  // Types
+  type CreatePartyResult,
+  type UpdatePartyInput,
+  type UpdateParticipantInput,
+  type CreateExpenseInput,
+} from "./operations/index.js";
 
 // Web Worker client
 export {
@@ -27,6 +55,17 @@ export type {
 
 // React context and hooks
 export { TrizumProvider, useTrizumClient } from "./react/TrizumProvider.js";
+
+// SDK domain hooks
+export {
+  useParty,
+  usePartyList,
+  usePartyBalances,
+  usePartyExpenses,
+  type UsePartyResult,
+  type UsePartyListResult,
+  type UsePartyExpensesResult,
+} from "./react/hooks/index.js";
 
 // React suspense hooks
 export {

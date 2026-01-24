@@ -20,6 +20,32 @@ import type {
   DocumentModelDefinition,
   ModelHelpers,
 } from "./models/types.js";
+import type { Expense } from "./models/expense.js";
+
+// Import operations
+import {
+  createParty,
+  updateParty,
+  updateParticipant,
+  addParticipant,
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  recalculateAllBalances,
+  type CreatePartyInput,
+  type CreatePartyResult,
+  type UpdatePartyInput,
+  type UpdateParticipantInput,
+  type CreateExpenseInput,
+} from "./operations/party/index.js";
+import {
+  addPartyToList,
+  removePartyFromList,
+  setLastOpenedParty,
+  updatePartyListSettings,
+  getOrCreatePartyList,
+} from "./operations/party-list/index.js";
+import type { UpdatePartyListInput } from "./models/party-list.js";
 
 export interface TrizumClientOptions {
   /** Name for the IndexedDB database. Default: "trizum" */
@@ -61,6 +87,66 @@ export interface ITrizumClient {
 
   /** Load multiple documents by their IDs */
   loadMany<T>(ids: DocumentId[]): Promise<(T | undefined)[]>;
+
+  /** Party operations namespace */
+  party: PartyOperations;
+
+  /** PartyList operations namespace */
+  partyList: PartyListOperations;
+}
+
+/**
+ * Expense operations interface.
+ */
+export interface ExpenseOperations {
+  /** Create a new expense in a party */
+  create(partyId: DocumentId, input: CreateExpenseInput): Promise<Expense>;
+  /** Update an existing expense */
+  update(partyId: DocumentId, expenseId: string, expense: Expense): Promise<void>;
+  /** Delete an expense */
+  delete(partyId: DocumentId, expenseId: string): Promise<void>;
+}
+
+/**
+ * Party operations interface.
+ */
+export interface PartyOperations {
+  /** Create a new party */
+  create(input: CreatePartyInput): Promise<CreatePartyResult>;
+  /** Update party settings */
+  update(partyId: DocumentId, input: UpdatePartyInput): Promise<void>;
+  /** Update a participant's details */
+  updateParticipant(
+    partyId: DocumentId,
+    participantId: string,
+    input: UpdateParticipantInput,
+  ): Promise<void>;
+  /** Add a new participant to a party */
+  addParticipant(
+    partyId: DocumentId,
+    participantId: string,
+    participant: Parameters<typeof addParticipant>[3],
+  ): Promise<void>;
+  /** Recalculate all balances for a party */
+  recalculateBalances(partyId: DocumentId): Promise<void>;
+  /** Expense operations */
+  expense: ExpenseOperations;
+}
+
+/**
+ * PartyList operations interface.
+ */
+export interface PartyListOperations {
+  /** Get or create the root PartyList document */
+  getOrCreate(): DocumentId;
+  /** Add a party to the user's list */
+  addParty(partyId: DocumentId, participantId: string): Promise<void>;
+  /** Remove a party from the user's list */
+  removeParty(partyId: DocumentId): Promise<void>;
+  /** Set the last opened party */
+  setLastOpened(partyId: DocumentId | null): Promise<void>;
+  /** Update settings and optionally sync to all parties */
+  updateSettings(input: UpdatePartyListInput, syncToParties?: boolean): Promise<void>;
 }
 
 /**
@@ -89,13 +175,56 @@ export interface ITrizumClient {
  * }));
  * ```
  */
-export class TrizumClient {
+export class TrizumClient implements ITrizumClient {
   /** @internal - Internal repository, access via INTERNAL_REPO_SYMBOL */
   private [INTERNAL_REPO_SYMBOL]: Repo;
   private options: Required<
     Pick<TrizumClientOptions, "storageName" | "offlineOnly">
   > &
     TrizumClientOptions;
+  private partyListId: DocumentId | null = null;
+
+  /**
+   * Party operations namespace.
+   *
+   * Provides methods for managing parties and their expenses.
+   *
+   * @example
+   * ```ts
+   * // Create a new party
+   * const { partyId } = await client.party.create({
+   *   name: "Trip to Paris",
+   *   currency: "EUR",
+   *   participants: { "user1": { name: "Alice" } },
+   * });
+   *
+   * // Add an expense
+   * const expense = await client.party.expense.create(partyId, {
+   *   name: "Dinner",
+   *   paidAt: new Date(),
+   *   paidBy: { "user1": 5000 },
+   *   shares: { "user1": { type: "divide", value: 1 } },
+   *   photos: [],
+   * });
+   * ```
+   */
+  party: PartyOperations;
+
+  /**
+   * PartyList operations namespace.
+   *
+   * Manages the user's list of parties they belong to.
+   *
+   * @example
+   * ```ts
+   * // Get or create the user's party list
+   * const partyListId = client.partyList.getOrCreate();
+   *
+   * // Add a party to the list
+   * await client.partyList.addParty(partyId, "user1");
+   * ```
+   */
+  partyList: PartyListOperations;
 
   constructor(options: TrizumClientOptions = {}) {
     const {
@@ -111,6 +240,49 @@ export class TrizumClient {
       syncUrl,
       offlineOnly,
     });
+
+    // Initialize party namespace
+    this.party = {
+      create: (input) => createParty(this, input),
+      update: (partyId, input) => updateParty(this, partyId, input),
+      updateParticipant: (partyId, participantId, input) =>
+        updateParticipant(this, partyId, participantId, input),
+      addParticipant: (partyId, participantId, participant) =>
+        addParticipant(this, partyId, participantId, participant),
+      recalculateBalances: (partyId) => recalculateAllBalances(this, partyId),
+      expense: {
+        create: (partyId, input) => createExpense(this, partyId, input),
+        update: (partyId, _expenseId, expense) =>
+          updateExpense(this, partyId, expense),
+        delete: (partyId, expenseId) => deleteExpense(this, partyId, expenseId),
+      },
+    };
+
+    // Initialize partyList namespace
+    this.partyList = {
+      getOrCreate: () => {
+        if (!this.partyListId) {
+          this.partyListId = getOrCreatePartyList(this);
+        }
+        return this.partyListId;
+      },
+      addParty: (partyId, participantId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return addPartyToList(this, partyListId, partyId, participantId);
+      },
+      removeParty: (partyId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return removePartyFromList(this, partyListId, partyId);
+      },
+      setLastOpened: (partyId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return setLastOpenedParty(this, partyListId, partyId);
+      },
+      updateSettings: (input, syncToParties) => {
+        const partyListId = this.partyList.getOrCreate();
+        return updatePartyListSettings(this, partyListId, input, syncToParties);
+      },
+    };
   }
 
   /**
