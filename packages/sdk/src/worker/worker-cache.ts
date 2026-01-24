@@ -121,7 +121,7 @@ export class WorkerCache {
 
       const entry: CacheEntry<T> = {
         doc: handle.doc(),
-        handle: handle as AMDocHandle<T>,
+        handle: handle,
         cleanup,
       };
 
