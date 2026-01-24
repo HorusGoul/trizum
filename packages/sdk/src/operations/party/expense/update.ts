@@ -9,6 +9,10 @@ import type { Expense } from "../../../models/expense.js";
 import { decodeExpenseId } from "../../../models/expense.js";
 import { applyExpenseDiff } from "../../utils/expense-diff.js";
 import { recalculateChunkBalances } from "../../utils/balance-sync.js";
+import {
+  validateExpensePaidBy,
+  validateExpenseShares,
+} from "../../../validation/index.js";
 
 /**
  * Update an existing expense in a party.
@@ -28,6 +32,22 @@ export async function updateExpense(
   partyId: DocumentId,
   expense: Expense,
 ): Promise<void> {
+  // Validate that paidBy amounts are integers (cents)
+  const paidByError = validateExpensePaidBy(expense.paidBy);
+  if (paidByError) {
+    throw new Error(
+      `Invalid paidBy amounts: values must be integers (cents). Got non-integer value. Error: ${paidByError}`,
+    );
+  }
+
+  // Validate that share values are integers
+  const sharesError = validateExpenseShares(expense.shares);
+  if (sharesError) {
+    throw new Error(
+      `Invalid share values: values must be integers. Got non-integer value. Error: ${sharesError}`,
+    );
+  }
+
   const partyHandle = await client.findHandle<Party>(partyId);
   const party = partyHandle.doc();
 

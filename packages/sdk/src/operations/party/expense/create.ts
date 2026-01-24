@@ -16,6 +16,10 @@ import { ulid } from "ulidx";
 import { insertAt } from "../../../utils/array.js";
 import { calculateExpenseHash } from "../../utils/expense-hash.js";
 import { recalculateChunkBalances } from "../../utils/balance-sync.js";
+import {
+  validateExpensePaidBy,
+  validateExpenseShares,
+} from "../../../validation/index.js";
 
 /**
  * Input for creating an expense.
@@ -41,6 +45,22 @@ export async function createExpense(
   partyId: DocumentId,
   input: CreateExpenseInput,
 ): Promise<Expense> {
+  // Validate that paidBy amounts are integers (cents)
+  const paidByError = validateExpensePaidBy(input.paidBy);
+  if (paidByError) {
+    throw new Error(
+      `Invalid paidBy amounts: values must be integers (cents). Got non-integer value. Error: ${paidByError}`,
+    );
+  }
+
+  // Validate that share values are integers
+  const sharesError = validateExpenseShares(input.shares);
+  if (sharesError) {
+    throw new Error(
+      `Invalid share values: values must be integers. Got non-integer value. Error: ${sharesError}`,
+    );
+  }
+
   const partyHandle = await client.findHandle<Party>(partyId);
   const party = partyHandle.doc();
 

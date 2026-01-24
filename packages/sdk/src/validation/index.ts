@@ -29,6 +29,8 @@ export {
   EXPENSE_TITLE_TOO_LONG,
   EXPENSE_AMOUNT_REQUIRED,
   EXPENSE_AMOUNT_INVALID,
+  EXPENSE_PAID_BY_NOT_INTEGER,
+  EXPENSE_SHARE_VALUE_NOT_INTEGER,
   DOCUMENT_ID_REQUIRED,
   DOCUMENT_ID_INVALID,
   type ValidationErrorKey,
@@ -47,7 +49,12 @@ export {
 } from "./party.js";
 
 // Expense validators
-export { validateExpenseTitle, validateExpenseAmount } from "./expense.js";
+export {
+  validateExpenseTitle,
+  validateExpenseAmount,
+  validateExpensePaidBy,
+  validateExpenseShares,
+} from "./expense.js";
 
 // Document validators
 export { validateDocumentId } from "./document.js";
