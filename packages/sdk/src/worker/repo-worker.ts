@@ -5,6 +5,11 @@
  * to communicate document changes bidirectionally. The heavy document operations
  * run in this worker thread, keeping the main thread responsive.
  *
+ * Architecture:
+ * - Worker has its own in-memory cache (WorkerCache) for fast document access
+ * - Main thread has a separate React Suspense cache for UI integration
+ * - Both caches subscribe to document changes for real-time updates
+ *
  * Usage (from main thread):
  * ```ts
  * const worker = new Worker(new URL('./worker/repo-worker.js', import.meta.url), { type: 'module' });
@@ -29,11 +34,13 @@ import type {
   WorkerToMainMessage,
   WorkerConfig,
 } from "./types.js";
+import { WorkerCache } from "./worker-cache.js";
 
 // Worker global scope
 declare const self: DedicatedWorkerGlobalScope;
 
 let _repo: Repo | null = null;
+let _cache: WorkerCache | null = null;
 let config: WorkerConfig | null = null;
 
 self.onmessage = (event: MessageEvent<MainToWorkerMessage>) => {
@@ -52,6 +59,7 @@ self.onmessage = (event: MessageEvent<MainToWorkerMessage>) => {
 
       try {
         _repo = createWorkerRepo(config, message.port);
+        _cache = new WorkerCache(_repo);
         postReady();
       } catch (error) {
         postError(

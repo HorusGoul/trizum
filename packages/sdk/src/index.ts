@@ -50,6 +50,9 @@ export {
   type TrizumWorkerClientOptions,
 } from "./worker/index.js";
 
+// Worker cache (for custom worker implementations)
+export { WorkerCache } from "./worker/index.js";
+
 // Worker message types (for custom worker implementations)
 export type {
   MainToWorkerMessage,
