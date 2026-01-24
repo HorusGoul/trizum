@@ -4,6 +4,14 @@
  * These models define the data structures used throughout the application.
  */
 
+// Versioning
+export type { VersionedModel } from "./versioned.js";
+export {
+  SDK_SCHEMA_VERSION,
+  needsMigration,
+  isFromNewerSdk,
+} from "./versioned.js";
+
 // Party List (root document)
 export type { PartyList, UpdatePartyListInput } from "./party-list.js";
 export { PARTY_LIST_STORAGE_KEY } from "./party-list.js";

@@ -16,6 +16,8 @@ export type ExpenseUser = string;
 export interface Expense {
   /** Unique expense ID (format: ulid:chunkId) */
   id: string;
+  /** Schema version for migrations (optional, defaults to 0 if missing) */
+  __schemaVersion?: number;
   /** Description of the expense */
   name: string;
   /** When the expense was paid */

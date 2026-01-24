@@ -16,6 +16,8 @@ export interface Party {
   id: DocumentId;
   /** Document type discriminator */
   type: "party";
+  /** Schema version for migrations (optional, defaults to 0 if missing) */
+  __schemaVersion?: number;
   /** Party name */
   name: string;
   /** Optional description */
@@ -79,6 +81,8 @@ export interface PartyExpenseChunk {
   id: DocumentId;
   /** Document type discriminator */
   type: "expenseChunk";
+  /** Schema version for migrations (optional, defaults to 0 if missing) */
+  __schemaVersion?: number;
   /** When this chunk was created */
   createdAt: Date;
   /** Expenses in this chunk (newest first) */
@@ -97,6 +101,8 @@ export interface PartyExpenseChunkBalances {
   id: DocumentId;
   /** Document type discriminator */
   type: "expenseChunkBalances";
+  /** Schema version for migrations (optional, defaults to 0 if missing) */
+  __schemaVersion?: number;
   /** Balances for this chunk */
   balances: BalancesByParticipant;
   /** Parent party ID */

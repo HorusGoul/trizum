@@ -72,6 +72,35 @@ export type {
   ModelHelpers,
 } from "./models/types.js";
 
+// Versioning
+export type { VersionedModel } from "./models/versioned.js";
+export {
+  SDK_SCHEMA_VERSION,
+  needsMigration,
+  isFromNewerSdk,
+} from "./models/versioned.js";
+
+// Migration
+export {
+  VersionMismatchError,
+  MigrationError,
+  NoMigrationPathError,
+  registerMigration,
+  getMigration,
+  getMigrationsForModel,
+  getMigrationChain,
+  hasMigrationPath,
+  clearMigrations,
+  getRegisteredModelTypes,
+  migrateDocument,
+  migrateIfNeeded,
+  setSchemaVersion,
+  type Migration,
+  type MigrationFn,
+  type MigrationResult,
+  type MigrateDocumentOptions,
+} from "./migration/index.js";
+
 // Domain models
 export type {
   // Party
@@ -115,6 +144,74 @@ export {
   encodeBlob,
   decodeBlob,
 } from "./models/index.js";
+
+// Calculations
+export {
+  calculateLogStatsBetweenTwoUsers,
+  calculateLogStatsOfUser,
+  convertToUnits,
+  exportIntoInput,
+  getExpenseUnitShares,
+  calculateBalancesByParticipant,
+  getImpactOnBalanceForUser,
+  type ExpenseInput,
+  type UserDiff,
+  type UserStats,
+} from "./calculations/index.js";
+
+// Validation
+export {
+  // Common utilities
+  composeValidators,
+  required,
+  maxLength,
+  minLength,
+  positive,
+  nonNegative,
+  createValidator,
+  type ValidationResult,
+  type Validator,
+  // Error keys
+  PARTY_TITLE_REQUIRED,
+  PARTY_TITLE_TOO_LONG,
+  PARTY_DESCRIPTION_TOO_LONG,
+  PARTICIPANT_NAME_REQUIRED,
+  PARTICIPANT_NAME_TOO_LONG,
+  PHONE_NUMBER_TOO_LONG,
+  EXPENSE_TITLE_REQUIRED,
+  EXPENSE_TITLE_TOO_LONG,
+  EXPENSE_AMOUNT_REQUIRED,
+  EXPENSE_AMOUNT_INVALID,
+  DOCUMENT_ID_REQUIRED,
+  DOCUMENT_ID_INVALID,
+  type ValidationErrorKey,
+  // Validators
+  validatePartyTitle,
+  validatePartyDescription,
+  validateParticipantName,
+  validatePhoneNumber,
+  validateExpenseTitle,
+  validateExpenseAmount,
+  validateDocumentId,
+  // Constants
+  MAX_PARTY_TITLE_LENGTH,
+  MAX_PARTY_DESCRIPTION_LENGTH,
+  MAX_PARTICIPANT_NAME_LENGTH,
+  MAX_PHONE_NUMBER_LENGTH,
+} from "./validation/index.js";
+
+// Pagination
+export {
+  createChunkPagination,
+  getNextChunkIds,
+  collectExpensesFromChunks,
+  updatePaginationAfterLoad,
+  needsInitialChunkLoad,
+  getInitialChunkId,
+  createPaginatedExpenses,
+  type ChunkPaginationState,
+  type PaginatedExpenses,
+} from "./pagination/index.js";
 
 // Cache utilities (SDK-specific, uses TrizumClient)
 export { cache, multiCache } from "./cache/client-cache.js";

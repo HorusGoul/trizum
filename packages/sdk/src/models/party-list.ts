@@ -15,6 +15,8 @@ export interface PartyList {
   id: DocumentId;
   /** Document type discriminator */
   type: "partyList";
+  /** Schema version for migrations (optional, defaults to 0 if missing) */
+  __schemaVersion?: number;
   /** User's display name */
   username: string;
   /** User's phone number */

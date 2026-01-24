@@ -6,14 +6,15 @@
  */
 
 import type { DocumentId } from "../types.js";
+import type { VersionedModel } from "./versioned.js";
 
 /**
  * Base interface that all document models must implement.
  *
  * Documents in the Trizum SDK always have an `id` field that stores
- * their DocumentId for self-reference.
+ * their DocumentId for self-reference, and a schema version for migrations.
  */
-export interface DocumentModel {
+export interface DocumentModel extends VersionedModel {
   /** The document's unique identifier (self-referential) */
   id: DocumentId;
   /** The document type discriminator */

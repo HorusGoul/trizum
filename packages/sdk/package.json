@@ -60,6 +60,7 @@
     "@automerge/automerge-repo-network-messagechannel": "2.5.1",
     "@automerge/automerge-repo-network-websocket": "2.5.1",
     "@automerge/automerge-repo-storage-indexeddb": "2.5.1",
+    "dinero.js": "1.9.1",
     "suspense": "0.1.0"
   },
   "peerDependencies": {
@@ -69,10 +70,12 @@
     "@trizum/eslint-config": "workspace:*",
     "@trizum/prettier-config": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
+    "@types/dinero.js": "1.9.4",
     "@types/react": "npm:types-react@rc",
     "eslint": "9.39.1",
     "prettier": "3.6.2",
     "typescript": "5.9.2",
+    "ulidx": "2.4.1",
     "vitest": "3.2.4"
   },
   "prettier": "@trizum/prettier-config"

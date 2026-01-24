@@ -33,6 +33,14 @@
     "lingui:extract": {
       "outputs": ["locale/**"],
       "inputs": ["src/**", "lingui.config.js"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
+    "test:e2e:preview": {
+      "dependsOn": ["build"],
+      "cache": false
     }
   }
 }

@@ -13,6 +13,8 @@ export interface MediaFile {
   id: DocumentId;
   /** Document type discriminator */
   type: "mediaFile";
+  /** Schema version for migrations (optional, defaults to 0 if missing) */
+  __schemaVersion?: number;
   /** Base64-encoded binary content stored as immutable string */
   encodedBlob: ImmutableString;
   /** Additional metadata about the file */

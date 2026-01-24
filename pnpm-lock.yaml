@@ -447,6 +447,9 @@ importers:
       '@automerge/automerge-repo-storage-indexeddb':
         specifier: 2.5.1
         version: 2.5.1
+      dinero.js:
+        specifier: 1.9.1
+        version: 1.9.1
       react:
         specifier: 0.0.0-experimental-d025ddd3-20240722
         version: 0.0.0-experimental-d025ddd3-20240722
@@ -463,6 +466,9 @@ importers:
       '@trizum/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@types/dinero.js':
+        specifier: 1.9.4
+        version: 1.9.4
       '@types/react':
         specifier: npm:types-react@rc
         version: types-react@19.0.0-rc.1
@@ -475,6 +481,9 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+      ulidx:
+        specifier: 2.4.1
+        version: 2.4.1
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/node@24.10.2)(jiti@2.6.0)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5)
@@ -13835,6 +13844,7 @@ snapshots:
       '@automerge/automerge-repo-network-messagechannel': 2.5.1
       '@automerge/automerge-repo-network-websocket': 2.5.1
       '@automerge/automerge-repo-storage-indexeddb': 2.5.1
+      dinero.js: 1.9.1
       react: 0.0.0-experimental-d025ddd3-20240722
       suspense: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
     transitivePeerDependencies:
