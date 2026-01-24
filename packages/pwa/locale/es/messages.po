@@ -37,7 +37,7 @@ msgstr "{name}"
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
-#: src/lib/validation.ts:46
+#: src/lib/validation.ts:31
 msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
@@ -420,7 +420,7 @@ msgstr "Eliminar"
 msgid "Description"
 msgstr "Descripción"
 
-#: src/lib/validation.ts:36
+#: src/lib/validation.ts:29
 msgid "Description must be less than 500 characters"
 msgstr "La descripción debe tener menos de 500 caracteres"
 
@@ -689,7 +689,7 @@ msgstr "Forinto Húngaro"
 msgid "Icelandic Króna"
 msgstr "Corona Islandesa"
 
-#: src/lib/validation.ts:8
+#: src/lib/validation.ts:37
 msgid "ID is required"
 msgstr "Se requiere un ID"
 
@@ -754,6 +754,10 @@ msgstr "Código de grupo de trizum no válido"
 #: src/routes/join.tsx:96
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
+
+#: src/lib/validation.ts:41
+msgid "Invalid value"
+msgstr ""
 
 #: src/routes/new.tsx:471
 msgid "Iranian Rial"
@@ -977,7 +981,7 @@ msgstr "Kyat Birmano"
 msgid "Name"
 msgstr "Nombre"
 
-#: src/lib/validation.ts:50
+#: src/lib/validation.ts:33
 msgid "Name must be less than 50 characters"
 msgstr "El nombre debe tener menos de 50 caracteres"
 
@@ -1197,7 +1201,7 @@ msgstr "¡Número de teléfono copiado al portapapeles!"
 msgid "Phone number is required"
 msgstr "Se requiere el número de teléfono"
 
-#: src/lib/validation.ts:62
+#: src/lib/validation.ts:35
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
@@ -1565,7 +1569,7 @@ msgstr "Licencias de Terceros"
 msgid "This application uses the following open source libraries and tools. Below are their licenses and attributions."
 msgstr "Esta aplicación utiliza las siguientes bibliotecas y herramientas de código abierto. A continuación se muestran sus licencias y atribuciones."
 
-#: src/lib/validation.ts:12
+#: src/lib/validation.ts:39
 msgid "This isn't a valid ID"
 msgstr "Este no es un ID válido"
 
@@ -1579,11 +1583,11 @@ msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abier
 msgid "Title"
 msgstr "Título"
 
-#: src/lib/validation.ts:22
+#: src/lib/validation.ts:25
 msgid "Title is required"
 msgstr "Se requiere un título"
 
-#: src/lib/validation.ts:26
+#: src/lib/validation.ts:27
 msgid "Title must be less than 50 characters"
 msgstr "El título debe tener menos de 50 caracteres"
 
