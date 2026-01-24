@@ -31,51 +31,51 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     return [];
   }
 
-  // Validate that all paidBy values are integers
+  // Round all paidBy values to handle floating-point precision issues from data storage
+  const safePaidBy: Record<string, number> = {};
   for (const [user, amount] of Object.entries(expense.paidBy)) {
-    if (!Number.isInteger(amount)) {
-      throw new Error(
-        `Invalid paidBy amount for user "${user}" in expense "${expense.id}": ` +
-          `expected integer but got ${amount} (type: ${typeof amount}). ` +
-          `This may indicate data corruption or a bug in expense creation.`,
-      );
-    }
+    safePaidBy[user] = Math.round(amount);
   }
 
-  // Validate that all share values are integers
+  // Round all share values to handle floating-point precision issues from data storage
+  const safeShares: Record<string, { type: "exact" | "divide"; value: number }> =
+    {};
   for (const [user, share] of Object.entries(expense.shares)) {
-    if (!Number.isInteger(share.value)) {
-      throw new Error(
-        `Invalid share value for user "${user}" in expense "${expense.id}": ` +
-          `expected integer but got ${share.value} (type: ${typeof share.value}). ` +
-          `Share type: ${share.type}. ` +
-          `This may indicate data corruption or a bug in expense creation.`,
-      );
-    }
+    safeShares[user] = { type: share.type, value: Math.round(share.value) };
   }
 
-  const total = Object.values(expense.paidBy).reduce(
+  const total = Object.values(safePaidBy).reduce(
     (acc, curr) => acc.add(Dinero({ amount: curr })),
     Dinero({ amount: 0 }),
   );
 
-  return Object.keys(expense.paidBy).map((user): ExpenseInput => {
-    const partial = expense.paidBy[user];
+  return Object.keys(safePaidBy).map((user): ExpenseInput => {
+    const partial = safePaidBy[user];
     const factor = partial / total.getAmount();
     const paidFor: Record<ExpenseUser, number> = {};
     let amountLeft = Dinero({ amount: partial });
 
-    const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(
-      expense.shares,
-    )
-      .filter((share) => expense.shares[share].type === "exact")
-      .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
+    const exacts: Record<ExpenseUser, { type: "exact"; value: number }> =
+      Object.keys(safeShares)
+        .filter((share) => safeShares[share].type === "exact")
+        .reduce(
+          (acc, curr) => ({
+            ...acc,
+            [curr]: safeShares[curr] as { type: "exact"; value: number },
+          }),
+          {},
+        );
 
-    const divides: Record<ExpenseUser, ExpenseShareDivide> = Object.keys(
-      expense.shares,
-    )
-      .filter((share) => expense.shares[share].type === "divide")
-      .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
+    const divides: Record<ExpenseUser, { type: "divide"; value: number }> =
+      Object.keys(safeShares)
+        .filter((share) => safeShares[share].type === "divide")
+        .reduce(
+          (acc, curr) => ({
+            ...acc,
+            [curr]: safeShares[curr] as { type: "divide"; value: number },
+          }),
+          {},
+        );
 
     for (const exact of Object.keys(exacts)) {
       const amount = Dinero({ amount: exacts[exact].value }).multiply(factor);
@@ -168,7 +168,9 @@ export function getExpenseUnitShares({
   shares,
   paidBy,
 }: Pick<Expense, "shares" | "paidBy">): Record<string, number> {
-  const amountInUnits = getExpenseTotalAmount({ paidBy });
+  const rawAmountInUnits = getExpenseTotalAmount({ paidBy });
+  // Round to handle any floating-point precision issues from data storage
+  const amountInUnits = Math.round(rawAmountInUnits);
   const activeParticipants = Object.keys(shares);
 
   // Calculate total shares for divide participants (this is just a count, not money)
@@ -188,7 +190,8 @@ export function getExpenseUnitShares({
       (total, participantId) => {
         const share = shares[participantId];
         if (share?.type === "exact") {
-          return total.add(Dinero({ amount: share.value }));
+          // Round to handle any floating-point precision issues from data storage
+          return total.add(Dinero({ amount: Math.round(share.value) }));
         }
         return total;
       },

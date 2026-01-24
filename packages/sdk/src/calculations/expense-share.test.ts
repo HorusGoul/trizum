@@ -296,49 +296,51 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
   });
 });
 
-describe("exportIntoInput float validation", () => {
-  test("should throw error when paidBy contains float values", () => {
+describe("exportIntoInput float handling", () => {
+  test("should round paidBy float values to integers", () => {
     const expense = createExpense({
       paidBy: {
-        "1": 50.5, // Float value - should throw
+        "1": 50.5, // Float value - should be rounded to 51
       },
       shares: {
         "1": { type: "divide", value: 1 },
       },
     });
 
-    expect(() => exportIntoInput(expense)).toThrow(
-      /expected integer but got 50.5/,
-    );
+    const result = exportIntoInput(expense);
+    expect(result).toHaveLength(1);
+    expect(result[0].expense).toBe(51); // Rounded from 50.5
+    expect(result[0].paidFor["1"]).toBe(51);
   });
 
-  test("should throw error when share value contains float values", () => {
+  test("should round share value float values to integers", () => {
     const expense = createExpense({
       paidBy: {
         "1": 50,
       },
       shares: {
-        "1": { type: "exact", value: 25.5 }, // Float value - should throw
+        "1": { type: "exact", value: 25.5 }, // Float value - should be rounded to 26
       },
     });
 
-    expect(() => exportIntoInput(expense)).toThrow(
-      /expected integer but got 25.5/,
-    );
+    const result = exportIntoInput(expense);
+    expect(result).toHaveLength(1);
+    expect(result[0].paidFor["1"]).toBe(26); // Rounded from 25.5
   });
 
-  test("should throw descriptive error with expense id", () => {
+  test("should handle multiple participants with float values", () => {
     const expense = createExpense({
       paidBy: {
-        user1: 100.1,
+        user1: 100.4, // Rounds to 100
       },
       shares: {
         user1: { type: "divide", value: 1 },
       },
     });
 
-    expect(() => exportIntoInput(expense)).toThrow(/user1.*100.1/);
-    expect(() => exportIntoInput(expense)).toThrow(/expense/i);
+    const result = exportIntoInput(expense);
+    expect(result).toHaveLength(1);
+    expect(result[0].expense).toBe(100); // Rounded from 100.4
   });
 });
 

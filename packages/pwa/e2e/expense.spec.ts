@@ -710,6 +710,114 @@ test.describe("Balance Calculations", () => {
 });
 
 test.describe("Multiple Expenses", () => {
+  // Test for the integer error bug - adding second expense should not crash
+  test("should not crash when viewing expense list after adding two expenses", async ({ page }) => {
+    // Capture ALL console messages
+    const consoleMessages: { type: string; text: string }[] = [];
+    page.on("console", (msg) => {
+      consoleMessages.push({ type: msg.type(), text: msg.text() });
+    });
+
+    // Create a party with 2 members (exactly as user reported)
+    const partyId = await createTestParty(page, {
+      name: "Integer Bug Test Party",
+      participantNames: ["Alice", "Bob"],
+    });
+
+    // Add first expense: 25 EUR split evenly (12.50 each)
+    // Navigate directly to add page instead of using the menu
+    await page.goto(`/party/${partyId}/add`);
+    await waitForAppInit(page);
+    await page.waitForSelector('[name="name"]', { timeout: 10000 });
+
+    // Fill in first expense
+    await page.getByRole("textbox", { name: /title/i }).fill("First Expense");
+    await page.getByRole("textbox", { name: /amount/i }).click();
+    await page.getByRole("textbox", { name: /amount/i }).fill("25");
+    await page.getByRole("checkbox", { name: /include all/i }).click({ force: true });
+    await expect(page.getByRole("checkbox", { name: /include all/i })).toBeChecked({ timeout: 3000 });
+
+    // Submit and wait
+    await page.getByRole("button", { name: /save/i }).click();
+
+    // Wait for either navigation or error
+    await page.waitForTimeout(3000);
+
+    // Check current URL
+    const urlAfterFirst = page.url();
+    console.log("URL after first expense:", urlAfterFirst);
+
+    // Check for console errors after first expense
+    const errorsAfterFirst = consoleMessages.filter(m => m.type === "error");
+    if (errorsAfterFirst.length > 0) {
+      console.log("Errors after first expense:", JSON.stringify(errorsAfterFirst, null, 2));
+    }
+
+    // If we're still on /add page, the expense failed
+    if (urlAfterFirst.includes("/add")) {
+      // Print all console messages for debugging
+      console.log("All console messages:", JSON.stringify(consoleMessages, null, 2));
+      throw new Error(`First expense creation failed. Console errors: ${JSON.stringify(errorsAfterFirst)}`);
+    }
+
+    // Add second expense: 100 EUR split evenly (50 each)
+    await page.goto(`/party/${partyId}/add`);
+    await waitForAppInit(page);
+    await page.waitForSelector('[name="name"]', { timeout: 10000 });
+
+    // Fill in second expense
+    await page.getByRole("textbox", { name: /title/i }).fill("Second Expense");
+    await page.getByRole("textbox", { name: /amount/i }).click();
+    await page.getByRole("textbox", { name: /amount/i }).fill("100");
+    await page.getByRole("checkbox", { name: /include all/i }).click({ force: true });
+    await expect(page.getByRole("checkbox", { name: /include all/i })).toBeChecked({ timeout: 3000 });
+
+    // Submit and wait
+    await page.getByRole("button", { name: /save/i }).click();
+
+    // Wait for either navigation or error
+    await page.waitForTimeout(3000);
+
+    // Check current URL
+    const urlAfterSecond = page.url();
+    console.log("URL after second expense:", urlAfterSecond);
+
+    // Check for console errors after second expense
+    const errorsAfterSecond = consoleMessages.filter(m => m.type === "error");
+    if (errorsAfterSecond.length > 0) {
+      console.log("Errors after second expense:", JSON.stringify(errorsAfterSecond, null, 2));
+    }
+
+    // If we're still on /add page, the expense failed
+    if (urlAfterSecond.includes("/add")) {
+      // Print all console messages for debugging
+      console.log("All console messages:", JSON.stringify(consoleMessages, null, 2));
+      throw new Error(`Second expense creation failed. Console errors: ${JSON.stringify(errorsAfterSecond)}`);
+    }
+
+    // Navigate back to expense list - this is where the crash happens
+    await page.goto(`/party/${partyId}?tab=expenses`);
+    await waitForAppInit(page);
+
+    // Wait for the page to load and check for errors
+    await page.waitForTimeout(3000);
+
+    // Check that no "integer" error occurred
+    const integerErrors = consoleMessages.filter(
+      (m) => m.type === "error" && (m.text.includes("integer") || m.text.includes("Integer"))
+    );
+
+    if (integerErrors.length > 0) {
+      console.log("Integer errors found:", integerErrors);
+    }
+
+    expect(integerErrors).toHaveLength(0);
+
+    // Verify both expenses are visible (page didn't crash)
+    await expect(page.getByText("First Expense")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("Second Expense")).toBeVisible({ timeout: 10000 });
+  });
+
   // Skip: Menu interaction issues in E2E test environment
   test.skip("should handle multiple expenses correctly", async ({ page }) => {
     const partyId = await createTestParty(page, {
