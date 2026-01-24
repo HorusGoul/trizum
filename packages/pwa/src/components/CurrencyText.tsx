@@ -46,7 +46,9 @@ export function CurrencyText({
 
   return (
     <span className={cn(color, className)} {...props}>
-      {Dinero({ amount: safeAmount, currency }).setLocale("es-ES").toFormat(format)}
+      {Dinero({ amount: safeAmount, currency })
+        .setLocale("es-ES")
+        .toFormat(format)}
     </span>
   );
 }

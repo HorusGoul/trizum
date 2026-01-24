@@ -6,12 +6,7 @@
  */
 
 import Dinero from "dinero.js";
-import type {
-  Expense,
-  ExpenseUser,
-  ExpenseShareExact,
-  ExpenseShareDivide,
-} from "../models/expense.js";
+import type { Expense, ExpenseUser } from "../models/expense.js";
 import { getExpenseTotalAmount } from "../models/expense.js";
 import type { ExpenseInput } from "./stats.js";
 
@@ -38,8 +33,10 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
   }
 
   // Round all share values to handle floating-point precision issues from data storage
-  const safeShares: Record<string, { type: "exact" | "divide"; value: number }> =
-    {};
+  const safeShares: Record<
+    string,
+    { type: "exact" | "divide"; value: number }
+  > = {};
   for (const [user, share] of Object.entries(expense.shares)) {
     safeShares[user] = { type: share.type, value: Math.round(share.value) };
   }
