@@ -220,9 +220,6 @@ importers:
       '@sentry/vite-plugin':
         specifier: 4.6.2
         version: 4.6.2
-      '@takker/md5':
-        specifier: jsr:^0.1.0
-        version: '@jsr/takker__md5@0.1.0'
       '@tanstack/react-form':
         specifier: 1.27.7
         version: 1.27.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
@@ -2519,9 +2516,6 @@ packages:
 
   '@jsr/opentf__std@0.12.0':
     resolution: {integrity: sha512-DDflUur9qpw88SimYPrsgO6nvKxRxSaDaYYRvCUtvyAdwA9YC955kN+MVbPk988ikV9JxUTJfVdxuVu/NRDRrg==, tarball: https://npm.jsr.io/~/11/@jsr/opentf__std/0.12.0.tgz}
-
-  '@jsr/takker__md5@0.1.0':
-    resolution: {integrity: sha512-PPE9oWxXq17shmtlml2Tl48Cq5ENM9AWk2i1caWCgqp2/Nn00ew8KZU0v/a563ulrapjm2XHLHgo/Ebm4BsX3Q==, tarball: https://npm.jsr.io/~/11/@jsr/takker__md5/0.1.0.tgz}
 
   '@kubiks/otel-drizzle@2.1.0':
     resolution: {integrity: sha512-9UHb0od3jwa6zTWMyEYPIZcUq5PDaziCmQLMLakSK2zeqy12SFZ3SAGWXJTgEr8valn/Wa+DKVs+Z3aqKQUpvg==}
@@ -11584,8 +11578,6 @@ snapshots:
 
   '@jsr/opentf__std@0.12.0': {}
 
-  '@jsr/takker__md5@0.1.0': {}
-
   '@kubiks/otel-drizzle@2.1.0(@opentelemetry/api@1.9.0)(drizzle-orm@0.44.7(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6))':
     dependencies:
       '@opentelemetry/api': 1.9.0
@@ -13826,7 +13818,6 @@ snapshots:
       '@opentf/std': '@jsr/opentf__std@0.12.0'
       '@sentry/react': 10.29.0(react@0.0.0-experimental-d025ddd3-20240722)
       '@sentry/vite-plugin': 4.6.2
-      '@takker/md5': '@jsr/takker__md5@0.1.0'
       '@tanstack/react-form': 1.27.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       '@tanstack/react-router': 1.151.6(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       '@tanstack/react-virtual': 3.13.18(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)

@@ -33,6 +33,10 @@ export {
   setLastOpenedParty,
   updatePartyListSettings,
   getOrCreatePartyList,
+  // Utilities
+  calculateExpenseHash,
+  getExpenseDiff,
+  applyExpenseDiff,
   // Types
   type CreatePartyResult,
   type UpdatePartyInput,

@@ -1,7 +1,6 @@
 import {
   useParty as useSdkParty,
   isValidDocumentId,
-  type DocumentId,
   type Party,
 } from "@trizum/sdk";
 import { useParams } from "@tanstack/react-router";
@@ -14,7 +13,7 @@ import { useParams } from "@tanstack/react-router";
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
 
-  const sdkResult = useSdkParty(partyId as DocumentId);
+  const sdkResult = useSdkParty(partyId);
 
   async function __dev_createTestExpenses() {
     const promptAnswer = window.prompt("How many test expenses to create?");
