@@ -393,6 +393,7 @@ function CategorizedEmojiGrid({
   onSelect,
 }: CategorizedEmojiGridProps) {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
+  const [activeGroup, setActiveGroup] = useState(orderedGroups[0]);
   const { rows: virtualRows, groupStartIndices } = buildVirtualRows(
     orderedGroups,
     groupedEmojis,
@@ -407,6 +408,35 @@ function CategorizedEmojiGrid({
     estimateSize: (index) =>
       virtualRows[index].type === "header" ? HEADER_HEIGHT : CELL_SIZE + GAP,
     overscan: 5,
+    onChange: (instance) => {
+      // Find the first visible header to determine the active group
+      const visibleItems = instance.getVirtualItems();
+      if (visibleItems.length === 0) return;
+
+      // Find the topmost visible header, or the last header before the first visible item
+      let currentGroup = orderedGroups[0];
+      for (const item of visibleItems) {
+        const row = virtualRows[item.index];
+        if (row.type === "header") {
+          currentGroup = row.group;
+          break;
+        }
+      }
+
+      // If no header is visible, find the group that contains the first visible item
+      if (currentGroup === orderedGroups[0]) {
+        const firstVisibleIndex = visibleItems[0].index;
+        for (let i = firstVisibleIndex; i >= 0; i--) {
+          const row = virtualRows[i];
+          if (row.type === "header") {
+            currentGroup = row.group;
+            break;
+          }
+        }
+      }
+
+      setActiveGroup(currentGroup);
+    },
   });
 
   // Store virtualizer in ref for tab clicks
@@ -437,6 +467,7 @@ function CategorizedEmojiGrid({
               "flex flex-1 items-center justify-center text-lg transition-colors",
               "hover:bg-accent-100 dark:hover:bg-accent-800",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500",
+              activeGroup === group && "bg-accent-100 dark:bg-accent-800",
             )}
           >
             {CATEGORY_ICONS[group] || "📁"}
