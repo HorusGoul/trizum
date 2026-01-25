@@ -2,6 +2,7 @@ import { Suspense, use, useRef, useState } from "react";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
+import type { Emoji, MessagesDataset } from "emojibase";
 import {
   Button as AriaButton,
   Dialog,
@@ -18,46 +19,33 @@ import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.ts";
-import type { SupportedLocale } from "#src/lib/i18n.js";
-
-interface Emoji {
-  hexcode: string;
-  unicode: string;
-  label?: string;
-  tags?: string[];
-  group?: number;
-}
-
-interface EmojiMessages {
-  groups: Array<{ order: number; message: string }>;
-}
+import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
 
 interface EmojiData {
   emojis: Emoji[];
   groupLabels: Record<number, string>;
   groupedEmojis: Record<number, Emoji[]>;
   orderedGroups: number[];
-  emojiByHexcode: Map<string, Emoji>;
 }
 
 // Explicit imports for each supported locale
 const emojiImports: Record<
   SupportedLocale,
-  () => Promise<{ compact: Emoji[]; messages: EmojiMessages }>
+  () => Promise<{ data: Emoji[]; messages: MessagesDataset }>
 > = {
   en: async () => {
-    const [compact, messages] = await Promise.all([
-      import("emojibase-data/en/compact.json"),
+    const [data, messages] = await Promise.all([
+      import("emojibase-data/en/data.json"),
       import("emojibase-data/en/messages.json"),
     ]);
-    return { compact: compact.default, messages: messages.default };
+    return { data: data.default, messages: messages.default };
   },
   es: async () => {
-    const [compact, messages] = await Promise.all([
-      import("emojibase-data/es/compact.json"),
+    const [data, messages] = await Promise.all([
+      import("emojibase-data/es/data.json"),
       import("emojibase-data/es/messages.json"),
     ]);
-    return { compact: compact.default, messages: messages.default };
+    return { data: data.default, messages: messages.default };
   },
 };
 
@@ -71,7 +59,7 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
   }
 
   const promise = (async () => {
-    const { compact: rawEmojis, messages } = await emojiImports[locale]();
+    const { data: rawEmojis, messages } = await emojiImports[locale]();
 
     // Build group labels from messages
     const groupLabels: Record<number, string> = Object.fromEntries(
@@ -80,7 +68,7 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
 
     // Filter out emojis without a group and component emojis (group 2)
     const emojis = rawEmojis.filter(
-      (e) => e.group !== undefined && e.group !== 2,
+      (e) => e.version <= 15 && e.group !== undefined && e.group !== 2,
     );
 
     // Group emojis by category
@@ -101,15 +89,11 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
       .filter((g) => g.order !== 2 && groupedEmojis[g.order]?.length > 0)
       .map((g) => g.order);
 
-    // Build lookup map for full emoji unicode by hexcode
-    const emojiByHexcode = new Map(emojis.map((e) => [e.hexcode, e]));
-
     return {
       emojis,
       groupLabels,
       groupedEmojis,
       orderedGroups,
-      emojiByHexcode,
     };
   })();
 
@@ -119,7 +103,9 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
 
 function useEmojiData(): EmojiData {
   const { i18n } = useLingui();
-  const locale = (i18n.locale as SupportedLocale) || "en";
+  const locale = Object.keys(emojiImports).includes(i18n.locale)
+    ? (i18n.locale as SupportedLocale)
+    : DEFAULT_LOCALE;
   return use(loadEmojiData(locale));
 }
 
@@ -237,8 +223,7 @@ interface EmojiGridContentProps {
 }
 
 function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
-  const { emojis, groupLabels, groupedEmojis, orderedGroups, emojiByHexcode } =
-    useEmojiData();
+  const { emojis, groupLabels, groupedEmojis, orderedGroups } = useEmojiData();
 
   const filteredEmojis = searchQuery
     ? emojis.filter((emoji) => {
@@ -253,15 +238,8 @@ function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
 
   const isSearching = searchQuery.length > 0;
 
-  function handleSelect(hexcode: string) {
-    const emoji = emojiByHexcode.get(hexcode);
-    if (emoji) {
-      onSelect(emoji.unicode);
-    }
-  }
-
   if (isSearching) {
-    return <EmojiGrid emojis={filteredEmojis!} onSelect={handleSelect} />;
+    return <EmojiGrid emojis={filteredEmojis!} onSelect={onSelect} />;
   }
 
   return (
@@ -269,7 +247,7 @@ function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
       groupLabels={groupLabels}
       groupedEmojis={groupedEmojis}
       orderedGroups={orderedGroups}
-      onSelect={handleSelect}
+      onSelect={onSelect}
     />
   );
 }
@@ -344,7 +322,7 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
                 height: CELL_SIZE,
               }}
             >
-              {emoji.unicode}
+              {emoji.emoji}
             </ListBoxItem>
           ));
         })}
@@ -516,8 +494,8 @@ function CategorizedEmojiGrid({
 
               return row.emojis.map((emoji, columnIndex) => (
                 <ListBoxItem
-                  key={emoji.hexcode}
-                  id={emoji.hexcode}
+                  key={emoji.emoji}
+                  id={emoji.emoji}
                   textValue={
                     (emoji.label || "") +
                     (Array.isArray(emoji.tags)
@@ -537,7 +515,7 @@ function CategorizedEmojiGrid({
                     height: CELL_SIZE,
                   }}
                 >
-                  {emoji.unicode}
+                  {emoji.emoji}
                 </ListBoxItem>
               ));
             })}

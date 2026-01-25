@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import EMOJI_REGEX from "emojibase-regex/emoji";
 
 export function validateDocumentId(id: string) {
   id = id.trim();
@@ -29,12 +30,8 @@ export function validatePartyTitle(title: string) {
   return null;
 }
 
-// https://stackoverflow.com/a/73634247
 export function isEmojiOnly(str: string): boolean {
-  const stringToTest = str.replace(/ /g, "");
-  const emojiRegex =
-    /^(?:(?:\p{RI}\p{RI}|\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?(?:\u{200D}\p{Emoji}(?:\p{Emoji_Modifier}|\u{FE0F}\u{20E3}?|[\u{E0020}-\u{E007E}]+\u{E007F})?)*)|[\u{1f900}-\u{1f9ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}])+$/u;
-  return emojiRegex.test(stringToTest) && Number.isNaN(Number(stringToTest));
+  return str.match(EMOJI_REGEX) !== null;
 }
 
 export function validatePartySymbol(symbol: string) {
