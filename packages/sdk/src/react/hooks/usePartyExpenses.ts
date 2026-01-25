@@ -59,7 +59,7 @@ export interface UsePartyExpensesResult {
  * ```
  */
 export function usePartyExpenses(partyId: DocumentId): UsePartyExpensesResult {
-  const client = useTrizumClient();
+  const _client = useTrizumClient();
   const [party] = useSuspenseDocument<Party>(partyId, { required: true });
   const [loadedChunkCount, setLoadedChunkCount] = useState(1);
   const [isPending, startTransition] = useTransition();

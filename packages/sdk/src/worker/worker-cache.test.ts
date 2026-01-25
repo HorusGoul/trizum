@@ -25,7 +25,7 @@ function createMockRepo() {
   >();
 
   return {
-    find: vi.fn(async (id: string) => {
+    find: vi.fn((id: string) => {
       if (!handles.has(id)) {
         const changeListeners = new Set<() => void>();
         const deleteListeners = new Set<() => void>();
@@ -44,7 +44,7 @@ function createMockRepo() {
           deleteListeners,
         });
       }
-      return handles.get(id)!;
+      return Promise.resolve(handles.get(id)!);
     }),
     handles,
   };

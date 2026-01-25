@@ -123,14 +123,14 @@ function PartyById() {
 
   useEffect(() => {
     if (partyId) {
-      setLastOpenedPartyId(partyId);
+      void setLastOpenedPartyId(partyId);
     }
   }, [partyId, setLastOpenedPartyId]);
 
   async function onLeaveParty() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
-    removeParty(partyId);
+    void removeParty(partyId);
     toast.success(t`You left the party!`);
   }
 
@@ -147,7 +147,7 @@ function PartyById() {
   }
 
   function onTogglePersonalMode() {
-    setParticipantDetails(participant.id, {
+    void setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
     });
   }

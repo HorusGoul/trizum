@@ -53,10 +53,10 @@ function Who() {
   function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
 
-    addPartyToList(party.id, participant.id);
+    void addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
-      setParticipantDetails(participant.id, {
+      void setParticipantDetails(participant.id, {
         phone: partyList.phone,
         avatarId: partyList.avatarId,
       });
