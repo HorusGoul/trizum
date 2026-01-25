@@ -17,7 +17,7 @@ import {
 import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
 import { Label } from "#src/ui/Field.tsx";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppEmojiField, AppTextField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/TextField.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
@@ -25,6 +25,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Suspense, useId } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
+import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
 
 export const Route = createFileRoute("/party_/$partyId/settings")({
   component: PartySettings,

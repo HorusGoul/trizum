@@ -7,7 +7,7 @@ import {
   type PartyParticipant,
 } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField, AppEmojiField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
@@ -24,6 +24,7 @@ import {
 import { BackButton } from "#src/components/BackButton.js";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
+import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
 
 export const Route = createFileRoute("/new")({
   component: New,
