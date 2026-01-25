@@ -1,9 +1,10 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
-import { Repo } from "@automerge/automerge-repo"; // inits automerge
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
+import { TrizumWorkerClient, TrizumProvider } from "@trizum/sdk";
+// Import the worker using Vite's ?worker pattern
+// This ensures proper bundling with WASM support
+import RepoWorker from "./worker/repo-worker.ts?worker";
 import {
   RouterProvider,
   createRouter,
@@ -23,7 +24,6 @@ import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
-import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
@@ -31,7 +31,6 @@ import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx"
 import { Suspense, useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
-import { isNonNull } from "./lib/isNonNull.ts";
 import {
   createPartyFromMigrationData,
   type MigrationData,
@@ -59,10 +58,13 @@ if (import.meta.env.MODE === "production") {
 // Initialize i18n
 const i18n = initializeI18n();
 
+// Create a typed router factory for type registration
+type AppRouter = ReturnType<typeof createRouter<typeof routeTree>>;
+
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router;
+    router: AppRouter;
   }
 }
 
@@ -85,14 +87,6 @@ const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
 const isOfflineOnly =
   initialUrl.searchParams.get("__internal_offline_only") === "true";
 
-// Create automerge repository
-const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
-  network: [
-    isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL),
-  ].filter(isNonNull),
-});
-
 declare global {
   interface Window {
     __internal_createPartyFromMigrationData: (
@@ -100,25 +94,6 @@ declare global {
     ) => Promise<string>;
   }
 }
-
-// For internal use only, like UI testing or screenshots
-window.__internal_createPartyFromMigrationData = async (
-  data: MigrationData,
-) => {
-  return createPartyFromMigrationData({
-    repo,
-    data,
-    importAttachments: false,
-  });
-};
-
-// Create a new router instance
-const router = createRouter({
-  routeTree,
-  context: { repo },
-  defaultGcTime: 0,
-  defaultStaleTime: Infinity,
-});
 
 void preloadAllIcons();
 
@@ -144,43 +119,77 @@ if (Capacitor.isNativePlatform()) {
       );
     }
   });
-
-  void App.addListener("backButton", ({ canGoBack }) => {
-    if (canGoBack) {
-      router.history.go(-1);
-    } else {
-      void App.exitApp();
-    }
-  });
-
-  void App.addListener("appUrlOpen", (event) => {
-    const url = new URL(event.url);
-
-    const pathnameAndSearch = url.pathname + url.search;
-
-    void router.history.push(pathnameAndSearch);
-  });
 }
 
-// Render the app
-const rootElement = document.getElementById("root")!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <I18nProvider i18n={i18n}>
-      <UpdateControllerComponent>
-        <AriaProviders>
-          <RepoContext value={repo}>
-            <MediaGalleryController>
-              <RouterProvider router={router} InnerWrap={InnerWrap} />
-              <Toaster />
-            </MediaGalleryController>
-          </RepoContext>
-        </AriaProviders>
-      </UpdateControllerComponent>
-    </I18nProvider>,
-  );
+// Initialize app with Web Worker client
+async function initializeApp() {
+  // Create Trizum client running in a Web Worker
+  const client = await TrizumWorkerClient.create({
+    storageName: "trizum",
+    syncUrl: isOfflineOnly ? null : WSS_URL,
+    offlineOnly: isOfflineOnly,
+    worker: new RepoWorker(),
+  });
+
+  // For internal use only, like UI testing or screenshots
+  window.__internal_createPartyFromMigrationData = async (
+    data: MigrationData,
+  ) => {
+    return createPartyFromMigrationData({
+      client,
+      data,
+      importAttachments: false,
+    });
+  };
+
+  // Create a new router instance
+  const router = createRouter({
+    routeTree,
+    context: { client },
+    defaultGcTime: 0,
+    defaultStaleTime: Infinity,
+  });
+
+  if (Capacitor.isNativePlatform()) {
+    void App.addListener("backButton", ({ canGoBack }) => {
+      if (canGoBack) {
+        router.history.go(-1);
+      } else {
+        void App.exitApp();
+      }
+    });
+
+    void App.addListener("appUrlOpen", (event) => {
+      const url = new URL(event.url);
+
+      const pathnameAndSearch = url.pathname + url.search;
+
+      void router.history.push(pathnameAndSearch);
+    });
+  }
+
+  // Render the app
+  const rootElement = document.getElementById("root")!;
+  if (!rootElement.innerHTML) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      <I18nProvider i18n={i18n}>
+        <UpdateControllerComponent>
+          <AriaProviders>
+            <TrizumProvider client={client}>
+              <MediaGalleryController>
+                <RouterProvider router={router} InnerWrap={InnerWrap} />
+                <Toaster />
+              </MediaGalleryController>
+            </TrizumProvider>
+          </AriaProviders>
+        </UpdateControllerComponent>
+      </I18nProvider>,
+    );
+  }
 }
+
+void initializeApp();
 
 function AriaProviders({ children }: { children: React.ReactNode }) {
   const { i18n } = useLingui();

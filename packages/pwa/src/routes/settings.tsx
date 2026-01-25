@@ -46,7 +46,7 @@ function Settings() {
   ];
 
   function onSaveSettings(values: SettingsFormValues) {
-    updateSettings({
+    void updateSettings({
       username: values.username,
       phone: values.phone,
       avatarId: values.avatarId,

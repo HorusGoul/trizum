@@ -7,10 +7,7 @@ import {
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.ts";
+import { useSuspenseDocument, cache } from "@trizum/sdk";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { patchMutate } from "#src/lib/patchMutate.ts";
@@ -22,7 +19,7 @@ import {
   type Expense,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
-import { type DocHandleChangePayload } from "@automerge/automerge-repo";
+import { type DocumentChangePayload } from "@trizum/sdk";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import {
@@ -59,7 +56,7 @@ export const Route = createFileRoute(
     await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await cache.readAsync(context.client, chunkId);
   },
 });
 
@@ -220,7 +217,7 @@ function RouteComponent() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const participant = useCurrentParticipant();
+  useCurrentParticipant();
 
   const { updateExpense } = useCurrentParty();
 
@@ -230,7 +227,7 @@ function useExpense() {
     required: true,
   });
 
-  const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const [expense] = findExpenseById(chunk.expenses, expenseId);
 
   function onUpdateExpense(expense: Expense) {
     void updateExpense(expense);
@@ -257,8 +254,9 @@ function useExpense() {
   function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
     let prevHash = expense ? getExpenseHash(expense) : "";
 
-    const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
-      const [expense] = findExpenseById(payload.doc.expenses, expenseId);
+    const handler = (payload?: unknown) => {
+      const typedPayload = payload as DocumentChangePayload<PartyExpenseChunk>;
+      const [expense] = findExpenseById(typedPayload.doc.expenses, expenseId);
 
       if (!expense) {
         return;

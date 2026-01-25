@@ -1,21 +1,19 @@
-import type { Party } from "#src/models/party.js";
 import {
   redirect,
   type ParsedLocation,
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { documentCache } from "./automerge/suspense-hooks";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import { cache } from "@trizum/sdk";
+import type { DocumentId } from "@trizum/sdk";
+import type { Party } from "#src/models/party.js";
+import type { PartyList } from "#src/models/partyList.js";
 
 export async function guardPartyExists(
   partyId: string,
-  { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+  { client }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
 ) {
-  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as
-    | Party
-    | undefined;
+  const party = await cache.readAsync<Party>(client, partyId as DocumentId);
 
   if (!party) {
     throw redirect({ to: "/" });
@@ -25,12 +23,10 @@ export async function guardPartyExists(
 }
 
 export async function guardPartyListExists({
-  repo,
+  client,
 }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
-  const partyListId = getPartyListId(repo);
-  const partyList = (await documentCache.readAsync(repo, partyListId)) as
-    | PartyList
-    | undefined;
+  const partyListId = client.partyList.getOrCreate();
+  const partyList = await cache.readAsync<PartyList>(client, partyListId);
 
   if (!partyList) {
     throw redirect({ to: "/" });

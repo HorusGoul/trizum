@@ -44,9 +44,16 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
+    test: {
+      exclude: ["**/node_modules/**", "**/dist/**", "**/e2e/**"],
+    },
     build: {
       sourcemap: true,
       minify: true,
+    },
+    worker: {
+      format: "es",
+      plugins: () => [wasm() as Plugin, topLevelAwait()],
     },
     plugins: [
       cloudflare(),

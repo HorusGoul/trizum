@@ -50,13 +50,13 @@ function Who() {
       partyList.participantInParties?.[party.id] === undefined,
   );
 
-  function onSaveSettings(values: WhoFormValues) {
+  async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
 
-    addPartyToList(party.id, participant.id);
+    await addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
-      setParticipantDetails(participant.id, {
+      await setParticipantDetails(participant.id, {
         phone: partyList.phone,
         avatarId: partyList.avatarId,
       });
@@ -66,7 +66,7 @@ function Who() {
       toast.success(t`You're now seeing the party as ${participant.name}`);
     }
 
-    void navigate({ to: search.redirectTo ?? "..", replace: true });
+    await navigate({ to: search.redirectTo ?? "..", replace: true });
   }
 
   const form = useForm({

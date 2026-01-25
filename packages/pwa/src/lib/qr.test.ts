@@ -1,17 +1,13 @@
 import { describe, test, expect, beforeAll } from "vitest";
 import { parseQRCodeForPartyId } from "./qr";
-import {
-  generateAutomergeUrl,
-  parseAutomergeUrl,
-} from "@automerge/automerge-repo/slim";
+import { generateTestDocumentId } from "@trizum/sdk/testing";
 
 describe("parseQRCodeForPartyId", () => {
-  // Generate a valid Automerge document ID for testing
+  // Generate a valid document ID for testing
   let VALID_DOCUMENT_ID: string;
 
   beforeAll(() => {
-    const url = generateAutomergeUrl();
-    VALID_DOCUMENT_ID = parseAutomergeUrl(url).documentId;
+    VALID_DOCUMENT_ID = generateTestDocumentId();
   });
 
   test("should return null for empty string", () => {

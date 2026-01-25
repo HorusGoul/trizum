@@ -34,7 +34,7 @@ export const Icon = ({ ...props }: IconProps) => {
   return <IconWithFallback {...props} />;
 };
 
-function FallbackIcon({ name, ...props }: IconProps) {
+function FallbackIcon({ name: _name, ...props }: IconProps) {
   const fallbackStyle = {
     width: props.size || props.width,
     height: props.size || props.height,

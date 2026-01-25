@@ -1,4 +1,4 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@trizum/sdk";
 import { BarcodeDetector, prepareZXingModule } from "barcode-detector/ponyfill";
 
 // Configure zxing-wasm to use local WASM file instead of CDN

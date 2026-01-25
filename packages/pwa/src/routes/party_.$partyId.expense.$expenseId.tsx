@@ -7,7 +7,7 @@ import {
   getExpenseUnitShares,
   type Expense,
 } from "#src/models/expense.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { isValidDocumentId, useSuspenseDocument, cache } from "@trizum/sdk";
 import {
   createFileRoute,
   useNavigate,
@@ -18,10 +18,6 @@ import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon, IconWithFallback } from "#src/ui/Icon.js";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
 import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -56,7 +52,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
     await guardParticipatingInParty(partyId, context, location);
 
     const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await cache.readAsync(context.client, chunkId);
   },
 });
 

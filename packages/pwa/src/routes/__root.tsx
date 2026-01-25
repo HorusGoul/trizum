@@ -1,4 +1,4 @@
-import type { Repo } from "@automerge/automerge-repo/slim";
+import type { ITrizumClient } from "@trizum/sdk";
 import {
   createRootRouteWithContext,
   Outlet,
@@ -17,7 +17,7 @@ const TanStackRouterDevtools = import.meta.env.PROD
     );
 
 interface RouterContext {
-  repo: Repo;
+  client: ITrizumClient;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

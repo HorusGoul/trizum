@@ -33,9 +33,22 @@ export function CurrencyText({
     color = "text-inherit";
   }
 
+  // Round amount to integer to handle any floating-point precision issues
+  // This is a safety net - the source data should always be integers
+  // Also handle NaN/Infinity edge cases
+  const safeAmount = Number.isFinite(amount) ? Math.round(amount) : 0;
+
+  if (!Number.isInteger(amount)) {
+    console.warn(
+      `[CurrencyText] Non-integer amount received: ${amount}. Using ${safeAmount}.`,
+    );
+  }
+
   return (
     <span className={cn(color, className)} {...props}>
-      {Dinero({ amount, currency }).setLocale("es-ES").toFormat(format)}
+      {Dinero({ amount: safeAmount, currency })
+        .setLocale("es-ES")
+        .toFormat(format)}
     </span>
   );
 }

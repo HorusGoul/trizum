@@ -158,3 +158,8 @@ dist
 
 # Claude
 .claude
+
+# Playwright
+.last-run
+playwright-report/
+test-results/

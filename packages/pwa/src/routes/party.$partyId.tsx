@@ -15,7 +15,7 @@ import {
   type Balance,
   type Expense,
 } from "#src/models/expense.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
+import { cache } from "@trizum/sdk";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/party/$partyId")({
     const firstChunkRef = party.chunkRefs.at(0);
 
     if (firstChunkRef) {
-      await documentCache.readAsync(context.repo, firstChunkRef.chunkId);
+      await cache.readAsync(context.client, firstChunkRef.chunkId);
     }
 
     return;
@@ -123,14 +123,14 @@ function PartyById() {
 
   useEffect(() => {
     if (partyId) {
-      setLastOpenedPartyId(partyId);
+      void setLastOpenedPartyId(partyId);
     }
   }, [partyId, setLastOpenedPartyId]);
 
   async function onLeaveParty() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
-    removeParty(partyId);
+    void removeParty(partyId);
     toast.success(t`You left the party!`);
   }
 
@@ -147,7 +147,7 @@ function PartyById() {
   }
 
   function onTogglePersonalMode() {
-    setParticipantDetails(participant.id, {
+    void setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
     });
   }

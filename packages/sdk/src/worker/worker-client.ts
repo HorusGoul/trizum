@@ -1,0 +1,474 @@
+/**
+ * TrizumWorkerClient - A client that runs the document repository in a Web Worker.
+ *
+ * This client offloads all heavy document operations to a background thread,
+ * keeping the main thread responsive for UI interactions.
+ */
+
+import type {
+  MainToWorkerMessage,
+  WorkerToMainMessage,
+  WorkerConfig,
+} from "./types.js";
+import {
+  Repo,
+  type NetworkAdapterInterface,
+  MessageChannelNetworkAdapter,
+  wrapHandle,
+  fromAMDocumentId,
+  toAMDocumentId,
+  isValidDocumentId,
+} from "../internal/crdt.js";
+import { INTERNAL_REPO_SYMBOL } from "../internal/symbols.js";
+import type { DocumentId, DocumentHandle } from "../types.js";
+import type {
+  DocumentModel,
+  DocumentModelDefinition,
+  ModelHelpers,
+} from "../models/types.js";
+import type {
+  ITrizumClient,
+  PartyOperations,
+  PartyListOperations,
+} from "../client.js";
+
+// Import operations
+import {
+  createParty,
+  updateParty,
+  updateParticipant,
+  addParticipant,
+  createExpense,
+  updateExpense,
+  deleteExpense,
+  recalculateAllBalances,
+} from "../operations/party/index.js";
+import {
+  addPartyToList,
+  removePartyFromList,
+  setLastOpenedParty,
+  updatePartyListSettings,
+  getOrCreatePartyList,
+} from "../operations/party-list/index.js";
+
+export interface TrizumWorkerClientOptions {
+  /** Name for the IndexedDB database. Default: "trizum" */
+  storageName?: string;
+  /** WebSocket URL for synchronization. Set to null to disable networking. */
+  syncUrl?: string | null;
+  /** Whether to enable offline-only mode (no network sync). Default: false */
+  offlineOnly?: boolean;
+  /**
+   * A pre-created Worker instance.
+   * Use this when your bundler (e.g., Vite) handles worker bundling.
+   *
+   * @example
+   * ```ts
+   * // With Vite's ?worker import
+   * import RepoWorker from "./worker/repo-worker?worker";
+   * const client = await TrizumWorkerClient.create({
+   *   worker: new RepoWorker(),
+   * });
+   * ```
+   */
+  worker?: Worker;
+  /**
+   * URL to the Web Worker script.
+   * This should be the URL to the compiled repo-worker.js file.
+   * Either `worker` or `workerUrl` must be provided.
+   *
+   * @deprecated Prefer using `worker` with Vite's `?worker` import for better bundling.
+   */
+  workerUrl?: URL;
+}
+
+/**
+ * A Trizum client that runs the document repository in a Web Worker.
+ *
+ * Benefits of using the worker client:
+ * - Heavy document operations don't block the main thread
+ * - Better performance for large documents or many concurrent changes
+ * - Improved responsiveness during sync operations
+ *
+ * @example
+ * ```ts
+ * // With Vite's ?worker import (recommended)
+ * import RepoWorker from "./worker/repo-worker?worker";
+ *
+ * const client = await TrizumWorkerClient.create({
+ *   storageName: "my-app",
+ *   syncUrl: "wss://sync.example.com",
+ *   worker: new RepoWorker(),
+ * });
+ *
+ * // Use client same as TrizumClient
+ * ```
+ */
+export class TrizumWorkerClient implements ITrizumClient {
+  private _worker: Worker;
+  /** @internal - Internal repository, access via INTERNAL_REPO_SYMBOL */
+  private [INTERNAL_REPO_SYMBOL]: Repo;
+  private _ready: Promise<void>;
+  private options: Required<
+    Pick<TrizumWorkerClientOptions, "storageName" | "offlineOnly">
+  > &
+    Omit<TrizumWorkerClientOptions, "storageName" | "offlineOnly">;
+  private partyListId: DocumentId | null = null;
+
+  /**
+   * Party operations namespace.
+   */
+  party: PartyOperations;
+
+  /**
+   * PartyList operations namespace.
+   */
+  partyList: PartyListOperations;
+
+  private constructor(options: TrizumWorkerClientOptions) {
+    const {
+      storageName = "trizum",
+      syncUrl = "wss://dev-sync.trizum.app",
+      offlineOnly = false,
+      worker,
+      workerUrl,
+    } = options;
+
+    if (!worker && !workerUrl) {
+      throw new Error("Either 'worker' or 'workerUrl' must be provided");
+    }
+
+    this.options = { storageName, syncUrl, offlineOnly, worker, workerUrl };
+
+    // Create the worker (use provided instance or create from URL)
+    this._worker = worker ?? new Worker(workerUrl!, { type: "module" });
+
+    // Create MessageChannel for bidirectional communication
+    const { port1, port2 } = new MessageChannel();
+
+    // Create a local repo that communicates with the worker via MessageChannel
+    // This repo doesn't have storage (storage is in the worker)
+    // It only has the MessageChannel adapter for syncing with the worker
+    const network: NetworkAdapterInterface[] = [
+      new MessageChannelNetworkAdapter(port1),
+    ];
+
+    this[INTERNAL_REPO_SYMBOL] = new Repo({
+      network,
+      // No storage here - storage is in the worker
+    });
+
+    // Wait for worker to be ready
+    this._ready = new Promise<void>((resolve, reject) => {
+      const handleMessage = (event: MessageEvent<WorkerToMainMessage>) => {
+        const message = event.data;
+
+        if (message.type === "initialized") {
+          // Worker is ready to receive messages, now send config
+          const workerConfig: WorkerConfig = {
+            storageName,
+            syncUrl,
+            offlineOnly,
+          };
+          const initMessage: MainToWorkerMessage = {
+            type: "init",
+            config: workerConfig,
+          };
+          this._worker.postMessage(initMessage);
+
+          // Send the MessageChannel port to the worker
+          const portMessage: MainToWorkerMessage = {
+            type: "port",
+            port: port2,
+          };
+          this._worker.postMessage(portMessage, [port2]);
+        } else if (message.type === "ready") {
+          this._worker.removeEventListener("message", handleMessage);
+          resolve();
+        } else if (message.type === "error") {
+          this._worker.removeEventListener("message", handleMessage);
+          reject(new Error(message.error));
+        }
+      };
+
+      this._worker.addEventListener("message", handleMessage);
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        this._worker.removeEventListener("message", handleMessage);
+        reject(new Error("Worker initialization timed out"));
+      }, 10000);
+    });
+
+    // Initialize party namespace
+    this.party = {
+      create: (input) => createParty(this, input),
+      update: (partyId, input) => updateParty(this, partyId, input),
+      updateParticipant: (partyId, participantId, input) =>
+        updateParticipant(this, partyId, participantId, input),
+      addParticipant: (partyId, participantId, participant) =>
+        addParticipant(this, partyId, participantId, participant),
+      recalculateBalances: (partyId) => recalculateAllBalances(this, partyId),
+      expense: {
+        create: (partyId, input) => createExpense(this, partyId, input),
+        update: (partyId, _expenseId, expense) =>
+          updateExpense(this, partyId, expense),
+        delete: (partyId, expenseId) => deleteExpense(this, partyId, expenseId),
+      },
+    };
+
+    // Initialize partyList namespace
+    this.partyList = {
+      getOrCreate: () => {
+        if (!this.partyListId) {
+          this.partyListId = getOrCreatePartyList(this);
+        }
+        return this.partyListId;
+      },
+      addParty: (partyId, participantId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return addPartyToList(this, partyListId, partyId, participantId);
+      },
+      removeParty: (partyId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return removePartyFromList(this, partyListId, partyId);
+      },
+      setLastOpened: (partyId) => {
+        const partyListId = this.partyList.getOrCreate();
+        return setLastOpenedParty(this, partyListId, partyId);
+      },
+      updateSettings: (input, syncToParties) => {
+        const partyListId = this.partyList.getOrCreate();
+        return updatePartyListSettings(this, partyListId, input, syncToParties);
+      },
+    };
+  }
+
+  /**
+   * Create a new TrizumWorkerClient.
+   *
+   * This is an async factory method because the worker needs time to initialize.
+   */
+  static async create(
+    options: TrizumWorkerClientOptions,
+  ): Promise<TrizumWorkerClient> {
+    const client = new TrizumWorkerClient(options);
+    await client._ready;
+    return client;
+  }
+
+  /**
+   * @internal
+   * Get the worker instance.
+   */
+  get _internalWorker(): Worker {
+    return this._worker;
+  }
+
+  /**
+   * Terminate the worker and clean up resources.
+   */
+  terminate(): void {
+    this._worker.terminate();
+  }
+
+  /**
+   * Check if a string is a valid document ID.
+   */
+  isValidDocumentId(id: string): id is DocumentId {
+    return isValidDocumentId(id);
+  }
+
+  /**
+   * Define a document model and get type-safe helpers for CRUD operations.
+   */
+  defineModel<T extends DocumentModel, CreateInput = Omit<T, "id">>(
+    definition: DocumentModelDefinition<T, CreateInput>,
+  ): ModelHelpers<T> {
+    const { createInitialState } = definition;
+    const repo = this[INTERNAL_REPO_SYMBOL];
+
+    return {
+      create: (input) => {
+        const initialState = createInitialState(input as CreateInput);
+
+        const handle = repo.create<T>({
+          ...initialState,
+          id: "" as unknown as DocumentId,
+        } as unknown as T);
+
+        const docId = fromAMDocumentId(handle.documentId);
+        handle.change((doc) => {
+          (doc as unknown as { id: DocumentId }).id = docId;
+        });
+
+        const doc = handle.doc();
+        if (!doc) {
+          return Promise.reject(new Error("Failed to create document"));
+        }
+
+        return Promise.resolve({
+          id: docId,
+          doc: doc as T,
+        });
+      },
+
+      find: async (id) => {
+        try {
+          const handle = await repo.find<T>(toAMDocumentId(id), {
+            allowableStates: ["ready"],
+          });
+
+          if (handle.isDeleted()) {
+            return undefined;
+          }
+
+          return handle.doc() as T | undefined;
+        } catch {
+          return undefined;
+        }
+      },
+
+      update: async (id, changeFn) => {
+        const handle = await repo.find<T>(toAMDocumentId(id), {
+          allowableStates: ["ready"],
+        });
+
+        if (handle.isDeleted()) {
+          throw new Error(`Document not found: ${id}`);
+        }
+
+        handle.change(changeFn);
+      },
+
+      delete: async (id) => {
+        const handle = await repo.find<T>(toAMDocumentId(id), {
+          allowableStates: ["ready"],
+        });
+
+        if (!handle.isDeleted()) {
+          handle.delete();
+        }
+      },
+
+      subscribe: (id, callback) => {
+        let unsubChange: (() => void) | undefined;
+        let unsubDelete: (() => void) | undefined;
+
+        void repo
+          .find<T>(toAMDocumentId(id), { allowableStates: ["ready"] })
+          .then((handle) => {
+            if (handle.isDeleted()) {
+              callback(undefined);
+              return;
+            }
+
+            callback(handle.doc() as T | undefined);
+
+            const onChange = () => {
+              callback(handle.doc() as T | undefined);
+            };
+
+            const onDelete = () => {
+              callback(undefined);
+            };
+
+            handle.on("change", onChange);
+            handle.on("delete", onDelete);
+
+            unsubChange = () => handle.off("change", onChange);
+            unsubDelete = () => handle.off("delete", onDelete);
+          })
+          .catch(() => {
+            callback(undefined);
+          });
+
+        return () => {
+          unsubChange?.();
+          unsubDelete?.();
+        };
+      },
+    };
+  }
+
+  /**
+   * Get or create a root document (singleton pattern).
+   */
+  getOrCreateRootDocument<T extends DocumentModel>(
+    localStorageKey: string,
+    createInitialState: () => Omit<T, "id">,
+  ): DocumentId {
+    const existingId = localStorage.getItem(localStorageKey);
+
+    if (existingId && this.isValidDocumentId(existingId)) {
+      return existingId;
+    }
+
+    const handle = this[INTERNAL_REPO_SYMBOL].create<T>({
+      ...createInitialState(),
+      id: "" as unknown as DocumentId,
+    } as unknown as T);
+
+    const docId = fromAMDocumentId(handle.documentId);
+    handle.change((doc) => {
+      (doc as unknown as { id: DocumentId }).id = docId;
+    });
+
+    localStorage.setItem(localStorageKey, docId);
+
+    return docId;
+  }
+
+  /**
+   * Find a document handle by ID.
+   */
+  async findHandle<T>(id: DocumentId): Promise<DocumentHandle<T>> {
+    const handle = await this[INTERNAL_REPO_SYMBOL].find<T>(
+      toAMDocumentId(id),
+      {
+        allowableStates: ["ready"],
+      },
+    );
+    return wrapHandle(handle);
+  }
+
+  /**
+   * Create a new document with the given initial state.
+   */
+  create<T extends DocumentModel>(
+    initialState: Omit<T, "id">,
+  ): { id: DocumentId; handle: DocumentHandle<T> } {
+    const handle = this[INTERNAL_REPO_SYMBOL].create<T>({
+      ...initialState,
+      id: "" as unknown as DocumentId,
+    } as unknown as T);
+
+    const docId = fromAMDocumentId(handle.documentId);
+    handle.change((doc) => {
+      (doc as unknown as { id: DocumentId }).id = docId;
+    });
+
+    return {
+      id: docId,
+      handle: wrapHandle(handle),
+    };
+  }
+
+  /**
+   * Load multiple documents by their IDs.
+   */
+  async loadMany<T>(ids: DocumentId[]): Promise<(T | undefined)[]> {
+    return Promise.all(
+      ids.map(async (id) => {
+        try {
+          const handle = await this[INTERNAL_REPO_SYMBOL].find<T>(
+            toAMDocumentId(id),
+          );
+          return handle.doc() as T | undefined;
+        } catch {
+          return undefined;
+        }
+      }),
+    );
+  }
+}

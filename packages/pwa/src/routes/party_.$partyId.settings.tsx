@@ -57,7 +57,7 @@ function PartySettings() {
         return result;
       }, {});
 
-    updateSettings({
+    void updateSettings({
       name: values.name,
       description: values.description,
       participants,
