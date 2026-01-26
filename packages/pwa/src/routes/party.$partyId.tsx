@@ -157,7 +157,7 @@ function PartyById() {
       <div className="container flex h-16 flex-shrink-0 items-center px-2 mt-safe">
         <BackButton fallbackOptions={{ to: "/" }} />
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-          {party.name}
+          {[party.symbol, party.name].filter((v) => !!v).join(" ")}
         </h1>
         <div className="flex-1" />
         {selectedTab === "balances" ? (

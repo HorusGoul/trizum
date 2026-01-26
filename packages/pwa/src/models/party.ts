@@ -8,12 +8,15 @@ export interface Party {
   id: DocumentId;
   type: "party";
   name: string;
+  symbol?: string;
   description: string;
   currency: Currency;
   hue?: number;
   participants: Record<ExpenseUser, PartyParticipant>;
   chunkRefs: PartyExpenseChunkRef[];
 }
+
+export const DEFAULT_PARTY_SYMBOL = "🏝️";
 
 export type BalancesSortedBy =
   | "name"

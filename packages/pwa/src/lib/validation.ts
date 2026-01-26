@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import EMOJI_REGEX from "emojibase-regex/emoji";
 
 export function validateDocumentId(id: string) {
   id = id.trim();
@@ -24,6 +25,25 @@ export function validatePartyTitle(title: string) {
 
   if (title.length > 50) {
     return t`Title must be less than 50 characters`;
+  }
+
+  return null;
+}
+
+export function isEmojiOnly(str: string): boolean {
+  return str.match(EMOJI_REGEX) !== null;
+}
+
+export function validatePartySymbol(symbol: string) {
+  if (!isEmojiOnly(symbol)) {
+    return t`Symbol must contain only emojis`;
+  }
+
+  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+  const segments = Array.from(segmenter.segment(symbol));
+
+  if (segments.length > 1) {
+    return t`Symbol must be only one emoji`;
   }
 
   return null;

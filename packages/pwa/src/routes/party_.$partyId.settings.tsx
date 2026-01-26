@@ -6,9 +6,14 @@ import { guardParticipatingInParty } from "#src/lib/guards.js";
 import {
   validatePartyDescription,
   validatePartyParticipantName,
+  validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
-import type { Party, PartyParticipant } from "#src/models/party.js";
+import {
+  DEFAULT_PARTY_SYMBOL,
+  type Party,
+  type PartyParticipant,
+} from "#src/models/party.js";
 import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
 import { Label } from "#src/ui/Field.tsx";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -20,6 +25,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Suspense, useId } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
+import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
 
 export const Route = createFileRoute("/party_/$partyId/settings")({
   component: PartySettings,
@@ -31,6 +37,7 @@ export const Route = createFileRoute("/party_/$partyId/settings")({
 
 interface PartySettingsFormValues {
   name: string;
+  symbol: string;
   description: string;
   participants: (PartyParticipant | (PartyParticipant & { __isNew: true }))[];
   hue: number;
@@ -59,6 +66,7 @@ function PartySettings() {
 
     updateSettings({
       name: values.name,
+      symbol: values.symbol,
       description: values.description,
       participants,
       hue: values.hue,
@@ -70,6 +78,7 @@ function PartySettings() {
   const form = useForm({
     defaultValues: {
       name: party.name,
+      symbol: party.symbol || DEFAULT_PARTY_SYMBOL,
       description: party.description,
       participants: Object.values(party.participants),
       hue: party.hue ?? defaultThemeHue,
@@ -151,30 +160,54 @@ function PartySettings() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <form.Field
-          name="name"
-          validators={{
-            onChange: ({ value }) => validatePartyTitle(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Title`}
-              description={t`How do you want to call this party?`}
-              minLength={1}
-              maxLength={50}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
-            />
-          )}
-        </form.Field>
+        <div className="flex items-start gap-2">
+          <form.Field
+            name="name"
+            validators={{
+              onChange: ({ value }) => validatePartyTitle(value),
+            }}
+          >
+            {(field) => (
+              <AppTextField
+                label={t`Name`}
+                description={t`How do you want to call this party?`}
+                minLength={1}
+                maxLength={50}
+                name={field.name}
+                value={field.state.value}
+                onChange={field.handleChange}
+                onBlur={field.handleBlur}
+                errorMessage={field.state.meta.errors?.join(", ")}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
+                }
+                className="flex-1"
+              />
+            )}
+          </form.Field>
+
+          <form.Field
+            name="symbol"
+            validators={{
+              onChange: ({ value }) => validatePartySymbol(value),
+            }}
+          >
+            {(field) => (
+              <AppEmojiField
+                label={t`Symbol`}
+                visuallyHideLabel
+                value={field.state.value}
+                onChange={field.handleChange}
+                errorMessage={field.state.meta.errors?.join(", ")}
+                isInvalid={
+                  field.state.meta.isTouched &&
+                  field.state.meta.errors?.length > 0
+                }
+              />
+            )}
+          </form.Field>
+        </div>
 
         <form.Field
           name="description"

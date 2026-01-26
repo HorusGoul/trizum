@@ -251,7 +251,8 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
   );
   const participantCount = activeParticipants.length;
   const hue = party.hue ?? defaultThemeHue;
-  const firstLetter = party.name.charAt(0).toUpperCase();
+  const symbolOrFirstLetter =
+    party.symbol || party.name.charAt(0).toUpperCase();
 
   return (
     <Link
@@ -278,7 +279,7 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
           backgroundColor: `oklch(0.513 0.116 ${hue} / 1)`,
         }}
       >
-        <span className="pt-0.5">{firstLetter}</span>
+        <span className="pt-0.5">{symbolOrFirstLetter}</span>
       </div>
       <div className="flex flex-1 flex-col gap-0.5">
         <span className="text-lg font-semibold leading-tight text-accent-950 dark:text-accent-50">
