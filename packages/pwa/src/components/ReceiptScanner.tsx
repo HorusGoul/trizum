@@ -22,7 +22,7 @@ type ScannerState =
   | { status: "initializing" }
   | { status: "camera-ready" }
   | { status: "confirm-download" }
-  | { status: "loading-model"; message?: string }
+  | { status: "loading-model"; message?: string; downloadProgress?: number }
   | { status: "processing" }
   | { status: "error"; message: string }
   | { status: "success" };
@@ -35,6 +35,7 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
   const [state, setState] = useState<ScannerState>({ status: "initializing" });
   const [capturedImage, setCapturedImage] = useState<ArrayBuffer | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [waitingForModel, setWaitingForModel] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -221,53 +222,6 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
     localStorage.setItem("trizum-ai-model-downloaded", "true");
   }
 
-  async function processPhoto() {
-    if (!capturedImage) return;
-
-    // Load model if not ready
-    if (!isReady) {
-      // If model hasn't been downloaded before, show confirmation first
-      if (!hasModelBeenDownloaded()) {
-        setState({ status: "confirm-download" });
-        return;
-      }
-
-      startModelDownload();
-      return;
-    }
-
-    await doProcess();
-  }
-
-  function startModelDownload() {
-    setState({ status: "loading-model" });
-    loadModel();
-
-    // Wait for model to be ready
-    const checkReady = setInterval(() => {
-      if (processorStatus === "ready") {
-        clearInterval(checkReady);
-        markModelAsDownloaded();
-        void doProcess();
-      } else if (processorStatus === "error") {
-        clearInterval(checkReady);
-        setState({
-          status: "error",
-          message: t`Failed to load AI model`,
-        });
-      }
-    }, 100);
-  }
-
-  function confirmDownload() {
-    startModelDownload();
-  }
-
-  function cancelDownload() {
-    // Go back to preview state
-    setState({ status: "camera-ready" });
-  }
-
   async function doProcess() {
     if (!capturedImage) return;
 
@@ -292,19 +246,76 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
     }
   }
 
+  // Handle model ready/error when waiting - triggers processing or error state
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    if (!waitingForModel) return;
+
+    if (processorStatus === "ready") {
+      setWaitingForModel(false);
+      markModelAsDownloaded();
+      void doProcess();
+    } else if (processorStatus === "error") {
+      setWaitingForModel(false);
+      setState({
+        status: "error",
+        message: t`Failed to load AI model`,
+      });
+    }
+    // doProcess depends on capturedImage, processImage, onResult which are stable or state
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waitingForModel, processorStatus]);
+
+  function startModelDownload() {
+    setState({ status: "loading-model" });
+    setWaitingForModel(true);
+    loadModel();
+  }
+
+  function confirmDownload() {
+    startModelDownload();
+  }
+
+  function cancelDownload() {
+    setWaitingForModel(false);
+    // Go back to preview state
+    setState({ status: "camera-ready" });
+  }
+
+  async function processPhoto() {
+    if (!capturedImage) return;
+
+    // Load model if not ready
+    if (!isReady) {
+      // If model hasn't been downloaded before, show confirmation first
+      if (!hasModelBeenDownloaded()) {
+        setState({ status: "confirm-download" });
+        return;
+      }
+
+      startModelDownload();
+      return;
+    }
+
+    await doProcess();
+  }
+
   // Update state message based on processor progress
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (state.status === "loading-model" && progress) {
       let message = t`Loading AI model...`;
+      let downloadProgress: number | undefined;
 
       if (progress.status === "download" && progress.progress !== undefined) {
         const percent = Math.round(progress.progress);
-        message = t`Downloading model: ${percent}%`;
+        downloadProgress = percent;
+        message = t`Downloading model...`;
       } else if (progress.status === "init") {
         message = t`Initializing model...`;
       }
 
-      setState({ status: "loading-model", message });
+      setState({ status: "loading-model", message, downloadProgress });
     }
   }, [state.status, progress]);
 
@@ -406,12 +417,27 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex flex-col items-center gap-2"
+                className="flex flex-col items-center gap-3"
               >
                 <TrizumSpinner size={48} className="text-white" />
                 <span className="text-sm text-white">
                   {state.message || <Trans>Loading AI model...</Trans>}
                 </span>
+                {state.downloadProgress !== undefined && (
+                  <div className="w-48">
+                    <div className="h-2 overflow-hidden rounded-full bg-white/20">
+                      <motion.div
+                        className="h-full bg-accent-500"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${state.downloadProgress}%` }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                      />
+                    </div>
+                    <span className="mt-1 block text-center text-xs text-white/70">
+                      {state.downloadProgress}%
+                    </span>
+                  </div>
+                )}
               </motion.div>
             )}
 
