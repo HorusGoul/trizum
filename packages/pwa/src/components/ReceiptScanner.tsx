@@ -43,6 +43,7 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
   const {
     status: processorStatus,
     progress,
+    error: processorError,
     loadModel,
     processImage,
     isReady,
@@ -257,9 +258,10 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
       void doProcess();
     } else if (processorStatus === "error") {
       setWaitingForModel(false);
+      console.error("Model loading error:", processorError);
       setState({
         status: "error",
-        message: t`Failed to load AI model`,
+        message: processorError || t`Failed to load AI model`,
       });
     }
     // doProcess depends on capturedImage, processImage, onResult which are stable or state
