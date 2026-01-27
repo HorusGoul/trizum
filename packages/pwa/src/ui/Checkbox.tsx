@@ -15,6 +15,7 @@ import { Icon } from "./Icon";
 
 const CheckboxGroup = AriaCheckboxGroup;
 
+/** @renders {AriaCheckbox} */
 const Checkbox = ({ className, children, ...props }: AriaCheckboxProps) => (
   <AriaCheckbox
     className={composeRenderProps(className, (className) =>
@@ -65,6 +66,7 @@ interface JollyCheckboxGroupProps extends AriaCheckboxGroupProps {
   errorMessage?: string | ((validation: AriaValidationResult) => string);
 }
 
+/** @renders {CheckboxGroup} */
 function JollyCheckboxGroup({
   label,
   description,

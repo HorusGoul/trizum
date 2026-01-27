@@ -11,6 +11,7 @@ interface SwitchFieldProps extends Omit<AriaSwitchProps, "children"> {
   description?: ReactNode;
 }
 
+/** @renders {AriaSwitch} */
 export function SwitchField({
   label,
   description,

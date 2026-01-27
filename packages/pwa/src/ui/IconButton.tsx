@@ -29,6 +29,7 @@ const colorSchemes: Record<
   },
 };
 
+/** @renders {Button} */
 export function IconButton({
   className,
   icon,
