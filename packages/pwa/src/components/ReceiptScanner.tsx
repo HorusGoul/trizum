@@ -247,7 +247,7 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
   }
 
   // Handle model ready/error when waiting - triggers processing or error state
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+
   useEffect(() => {
     if (!waitingForModel) return;
 
@@ -301,7 +301,7 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
   }
 
   // Update state message based on processor progress
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+
   useEffect(() => {
     if (state.status === "loading-model" && progress) {
       let message = t`Loading AI model...`;

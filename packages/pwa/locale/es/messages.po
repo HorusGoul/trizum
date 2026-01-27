@@ -106,7 +106,7 @@ msgstr "Cantidad para {0}"
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
-#: src/components/ReceiptScanner.tsx:428
+#: src/components/ReceiptScanner.tsx:454
 msgid "Analyzing receipt..."
 msgstr ""
 
@@ -256,7 +256,7 @@ msgid "Cambodian Riel"
 msgstr "Riel Camboyano"
 
 #: src/components/QRCodeScanner.tsx:101
-#: src/components/ReceiptScanner.tsx:89
+#: src/components/ReceiptScanner.tsx:90
 msgid "Camera permission was denied"
 msgstr "Se ha denegado el permiso de cámara"
 
@@ -268,8 +268,8 @@ msgstr "¿Puedo usar trizum sin una cuenta?"
 msgid "Canadian Dollar"
 msgstr "Dólar Canadiense"
 
-#: src/components/ReceiptScanner.tsx:390
-#: src/components/ReceiptScanner.tsx:482
+#: src/components/ReceiptScanner.tsx:401
+#: src/components/ReceiptScanner.tsx:508
 msgid "Cancel"
 msgstr ""
 
@@ -277,7 +277,7 @@ msgstr ""
 msgid "Cape Verdean Escudo"
 msgstr "Escudo Caboverdiano"
 
-#: src/components/ReceiptScanner.tsx:488
+#: src/components/ReceiptScanner.tsx:514
 msgid "Capture photo"
 msgstr ""
 
@@ -454,16 +454,20 @@ msgstr "Franco Yibutiano"
 msgid "Dominican Peso"
 msgstr "Peso Dominicano"
 
-#: src/components/ReceiptScanner.tsx:397
+#: src/components/ReceiptScanner.tsx:408
 msgid "Download"
 msgstr ""
 
-#: src/components/ReceiptScanner.tsx:369
+#: src/components/ReceiptScanner.tsx:380
 msgid "Download AI Model?"
 msgstr ""
 
 #: src/components/ReceiptScanner.tsx:302
 msgid "Downloading model: {percent}%"
+msgstr ""
+
+#: src/components/ReceiptScanner.tsx:313
+msgid "Downloading model..."
 msgstr ""
 
 #: src/routes/new.tsx:590
@@ -560,7 +564,7 @@ msgid "Expenses"
 msgstr "Gastos"
 
 #: src/components/QRCodeScanner.tsx:117
-#: src/components/ReceiptScanner.tsx:105
+#: src/components/ReceiptScanner.tsx:106
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
 
@@ -568,7 +572,7 @@ msgstr "Error al acceder a la cámara"
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
-#: src/components/ReceiptScanner.tsx:152
+#: src/components/ReceiptScanner.tsx:153
 msgid "Failed to capture photo"
 msgstr ""
 
@@ -580,7 +584,7 @@ msgstr "Error al copiar el enlace del grupo al portapapeles, por favor cópialo 
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Error al copiar el número de teléfono al portapapeles, por favor cópialo manualmente"
 
-#: src/components/ReceiptScanner.tsx:256
+#: src/components/ReceiptScanner.tsx:262
 msgid "Failed to load AI model"
 msgstr ""
 
@@ -596,11 +600,11 @@ msgstr "Error al cargar las licencias. Por favor, inténtalo más tarde."
 msgid "Failed to mark expense as paid"
 msgstr "Error al marcar el gasto como pagado"
 
-#: src/components/ReceiptScanner.tsx:290
+#: src/components/ReceiptScanner.tsx:244
 msgid "Failed to process receipt"
 msgstr ""
 
-#: src/components/ReceiptScanner.tsx:209
+#: src/components/ReceiptScanner.tsx:210
 msgid "Failed to restart camera"
 msgstr ""
 
@@ -793,7 +797,7 @@ msgstr "Rupia India"
 msgid "Indonesian Rupiah"
 msgstr "Rupia Indonesia"
 
-#: src/components/ReceiptScanner.tsx:304
+#: src/components/ReceiptScanner.tsx:315
 msgid "Initializing model..."
 msgstr ""
 
@@ -917,8 +921,8 @@ msgstr "Enlace o código"
 msgid "Links"
 msgstr "Enlaces"
 
-#: src/components/ReceiptScanner.tsx:298
-#: src/components/ReceiptScanner.tsx:413
+#: src/components/ReceiptScanner.tsx:307
+#: src/components/ReceiptScanner.tsx:424
 msgid "Loading AI model..."
 msgstr ""
 
@@ -1098,7 +1102,7 @@ msgid "Nigerian Naira"
 msgstr "Naira Nigeriano"
 
 #: src/components/QRCodeScanner.tsx:109
-#: src/components/ReceiptScanner.tsx:97
+#: src/components/ReceiptScanner.tsx:98
 msgid "No camera found on this device"
 msgstr "No se encontró cámara en este dispositivo"
 
@@ -1329,7 +1333,7 @@ msgstr "Sincronización en Tiempo Real"
 msgid "Receipt scanned successfully"
 msgstr ""
 
-#: src/components/ReceiptScanner.tsx:445
+#: src/components/ReceiptScanner.tsx:471
 msgid "Receipt scanned!"
 msgstr ""
 
@@ -1362,7 +1366,7 @@ msgstr "Reportar problemas"
 msgid "Restore"
 msgstr "Restaurar"
 
-#: src/components/ReceiptScanner.tsx:509
+#: src/components/ReceiptScanner.tsx:535
 msgid "Retake"
 msgstr ""
 
@@ -1411,7 +1415,7 @@ msgstr "Riyal Saudí"
 msgid "Save"
 msgstr "Guardar"
 
-#: src/components/ReceiptScanner.tsx:518
+#: src/components/ReceiptScanner.tsx:544
 msgid "Scan"
 msgstr ""
 
@@ -1556,7 +1560,7 @@ msgstr "Rupia de Sri Lanka"
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
-#: src/components/ReceiptScanner.tsx:351
+#: src/components/ReceiptScanner.tsx:362
 msgid "Starting camera..."
 msgstr ""
 
@@ -1715,7 +1719,7 @@ msgstr "El título debe tener menos de 50 caracteres"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/components/ReceiptScanner.tsx:373
+#: src/components/ReceiptScanner.tsx:384
 msgid "To scan receipts, we need to download an AI model (~100MB). This only happens once and the model runs locally on your device for privacy."
 msgstr ""
 
@@ -1739,7 +1743,7 @@ msgstr "Dólar de Trinidad y Tobago"
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando estás conectado y compartes un grupo con otros, los cambios se sincronizan automáticamente en todos los dispositivos en tiempo real."
 
-#: src/components/ReceiptScanner.tsx:465
+#: src/components/ReceiptScanner.tsx:491
 msgid "Try again"
 msgstr "Reintentar"
 
@@ -1883,7 +1887,7 @@ msgstr "Ver Licencias de Terceros"
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
-#: src/components/ReceiptScanner.tsx:380
+#: src/components/ReceiptScanner.tsx:391
 msgid "We recommend using Wi-Fi to avoid mobile data charges."
 msgstr ""
 
