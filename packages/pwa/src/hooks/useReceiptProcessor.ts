@@ -36,7 +36,11 @@ interface ErrorMessage {
   error: string;
 }
 
-type WorkerMessage = ProgressMessage | ReadyMessage | ResultMessage | ErrorMessage;
+type WorkerMessage =
+  | ProgressMessage
+  | ReadyMessage
+  | ResultMessage
+  | ErrorMessage;
 
 interface UseReceiptProcessorResult {
   /** Current status of the processor */
