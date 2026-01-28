@@ -303,8 +303,8 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
 
           return rowEmojis.map((emoji, columnIndex) => (
             <ListBoxItem
-              key={emoji.hexcode}
-              id={emoji.hexcode}
+              key={emoji.emoji}
+              id={emoji.emoji}
               textValue={
                 (emoji.label || "") +
                 (Array.isArray(emoji.tags) ? " " + emoji.tags.join(" ") : "")
