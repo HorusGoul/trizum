@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.5.1
+
+### Patch Changes
+
+- 605b6c1: Fix the emoji picker when searching for an emoji.
+
 ## 1.5.0
 
 ### Minor Changes
