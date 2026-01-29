@@ -4,10 +4,6 @@ import { pipeline, env } from "@huggingface/transformers";
 // Configure transformers.js
 env.allowLocalModels = false;
 env.useBrowserCache = true;
-// Disable multi-threading in the ONNX runtime to avoid SharedArrayBuffer issues in workers
-if (env.backends.onnx.wasm) {
-  env.backends.onnx.wasm.numThreads = 1;
-}
 
 interface ConfigureMessage {
   type: "configure";
