@@ -1,9 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { pipeline, env } from "@huggingface/transformers";
+import {
+  Florence2ForConditionalGeneration,
+  AutoProcessor,
+  AutoTokenizer,
+  AutoModelForCausalLM,
+  RawImage,
+  env,
+} from "@huggingface/transformers";
 
 // Configure transformers.js
 env.allowLocalModels = false;
 env.useBrowserCache = true;
+
+const OCR_MODEL_ID = "onnx-community/Florence-2-base-ft";
+const LLM_MODEL_ID = "onnx-community/Qwen2.5-0.5B-Instruct";
 
 interface ConfigureMessage {
   type: "configure";
@@ -54,9 +64,13 @@ interface ErrorEvent {
 type WorkerResponse = ProgressEvent | ReadyEvent | ResultEvent | ErrorEvent;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let ocrPipeline: any = null;
+let ocrModel: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let llmPipeline: any = null;
+let ocrProcessor: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let llmModel: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let llmTokenizer: any = null;
 
 function makeProgressCallback(model: "ocr" | "llm") {
   return (progress: {
@@ -81,31 +95,40 @@ function makeProgressCallback(model: "ocr" | "llm") {
 }
 
 async function loadModel() {
-  if (ocrPipeline && llmPipeline) {
+  if (ocrModel && ocrProcessor && llmModel && llmTokenizer) {
     self.postMessage({ type: "ready" } satisfies WorkerResponse);
     return;
   }
 
   try {
-    // Load OCR model (TrOCR base for better printed text recognition)
-    if (!ocrPipeline) {
-      ocrPipeline = await pipeline(
-        "image-to-text",
-        "Xenova/trocr-base-printed",
-        { progress_callback: makeProgressCallback("ocr") },
-      );
+    const ocrProgressCb = makeProgressCallback("ocr");
+    const llmProgressCb = makeProgressCallback("llm");
+
+    // Load Florence-2 OCR model + processor in parallel
+    if (!ocrModel || !ocrProcessor) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      [ocrModel, ocrProcessor] = await Promise.all([
+        Florence2ForConditionalGeneration.from_pretrained(OCR_MODEL_ID, {
+          dtype: "fp32",
+          progress_callback: ocrProgressCb,
+        }),
+        AutoProcessor.from_pretrained(OCR_MODEL_ID, {
+          progress_callback: ocrProgressCb,
+        }),
+      ]);
     }
 
-    // Load LLM model (Qwen2.5 0.5B instruction-tuned, q4f16 quantized)
-    if (!llmPipeline) {
-      llmPipeline = await pipeline(
-        "text-generation",
-        "onnx-community/Qwen2.5-0.5B-Instruct",
-        {
+    // Load Qwen2.5 LLM model + tokenizer in parallel
+    if (!llmModel || !llmTokenizer) {
+      [llmModel, llmTokenizer] = await Promise.all([
+        AutoModelForCausalLM.from_pretrained(LLM_MODEL_ID, {
           dtype: "q4f16",
-          progress_callback: makeProgressCallback("llm"),
-        },
-      );
+          progress_callback: llmProgressCb,
+        }),
+        AutoTokenizer.from_pretrained(LLM_MODEL_ID, {
+          progress_callback: llmProgressCb,
+        }),
+      ]);
     }
 
     self.postMessage({ type: "ready" } satisfies WorkerResponse);
@@ -118,6 +141,47 @@ async function loadModel() {
       type: "error",
       error: message,
     } satisfies WorkerResponse);
+  }
+}
+
+/**
+ * Run Florence-2 OCR on an image to extract text.
+ */
+async function runOCR(imageData: ArrayBuffer): Promise<string> {
+  const blob = new Blob([imageData], { type: "image/jpeg" });
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const image = await RawImage.fromURL(url);
+    const task = "<OCR>";
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const prompts = ocrProcessor.construct_prompts(task);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const inputs = await ocrProcessor(image, prompts);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const generatedIds = await ocrModel.generate({
+      ...inputs,
+      max_new_tokens: 1024,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const decoded: string[] = ocrProcessor.batch_decode(generatedIds, {
+      skip_special_tokens: false,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const result = ocrProcessor.post_process_generation(
+      decoded[0],
+      task,
+      image.size,
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return (result[task] as string) ?? decoded[0] ?? "";
+  } finally {
+    URL.revokeObjectURL(url);
   }
 }
 
@@ -180,38 +244,39 @@ Example: {"merchant": "STARBUCKS", "total": 5.99, "date": "01/15/2025"}`;
 
 const MAX_LLM_ATTEMPTS = 3;
 
-const LLM_MESSAGES: ((text: string) => { role: string; content: string }[])[] =
-  [
-    // Attempt 1: standard chat
-    (text: string) => [
-      { role: "system", content: SYSTEM_PROMPT },
-      { role: "user", content: `Extract data from this receipt:\n\n${text}` },
-    ],
+const LLM_MESSAGES: ((
+  text: string,
+) => { role: string; content: string }[])[] = [
+  // Attempt 1: standard chat
+  (text: string) => [
+    { role: "system", content: SYSTEM_PROMPT },
+    { role: "user", content: `Extract data from this receipt:\n\n${text}` },
+  ],
 
-    // Attempt 2: more explicit
-    (text: string) => [
-      { role: "system", content: SYSTEM_PROMPT },
-      {
-        role: "user",
-        content: `Parse this receipt text and return JSON with merchant, total, date:\n\n${text}`,
-      },
-    ],
+  // Attempt 2: more explicit
+  (text: string) => [
+    { role: "system", content: SYSTEM_PROMPT },
+    {
+      role: "user",
+      content: `Parse this receipt text and return JSON with merchant, total, date:\n\n${text}`,
+    },
+  ],
 
-    // Attempt 3: few-shot with example exchange
-    (text: string) => [
-      { role: "system", content: SYSTEM_PROMPT },
-      {
-        role: "user",
-        content:
-          "Extract data from this receipt:\n\nWALMART\nMILK 3.49\nBREAD 2.99\nTOTAL 6.48\n01/20/2025",
-      },
-      {
-        role: "assistant",
-        content: '{"merchant": "WALMART", "total": 6.48, "date": "01/20/2025"}',
-      },
-      { role: "user", content: `Extract data from this receipt:\n\n${text}` },
-    ],
-  ];
+  // Attempt 3: few-shot with example exchange
+  (text: string) => [
+    { role: "system", content: SYSTEM_PROMPT },
+    {
+      role: "user",
+      content:
+        "Extract data from this receipt:\n\nWALMART\nMILK 3.49\nBREAD 2.99\nTOTAL 6.48\n01/20/2025",
+    },
+    {
+      role: "assistant",
+      content: '{"merchant": "WALMART", "total": 6.48, "date": "01/20/2025"}',
+    },
+    { role: "user", content: `Extract data from this receipt:\n\n${text}` },
+  ],
+];
 
 /**
  * Use the LLM to extract structured data from OCR text.
@@ -222,7 +287,7 @@ async function extractWithLLM(rawText: string): Promise<{
   total: number | null;
   date: string | null;
 }> {
-  if (!llmPipeline) {
+  if (!llmModel || !llmTokenizer) {
     return { merchant: null, total: null, date: null };
   }
 
@@ -230,20 +295,38 @@ async function extractWithLLM(rawText: string): Promise<{
     try {
       const messages = LLM_MESSAGES[attempt](rawText);
 
+      // Apply chat template to get the full prompt string
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const chatText: string = llmTokenizer.apply_chat_template(messages, {
+        tokenize: false,
+        add_generation_prompt: true,
+      });
+
+      // Tokenize the prompt
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const result = await llmPipeline(messages, {
+      const inputs = llmTokenizer(chatText, { return_tensors: "pt" });
+
+      // Generate response
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const outputIds = await llmModel.generate({
+        ...inputs,
         max_new_tokens: 128,
         do_sample: attempt > 0,
         temperature: attempt > 0 ? 0.3 : undefined,
-        return_full_text: false,
       });
 
-      // text-generation pipeline returns [{generated_text: "..."}]
+      // Slice off the input tokens to get only generated tokens
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const inputLen: number = inputs.input_ids.dims[1];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const newTokens = outputIds.slice(null, [inputLen, null]);
 
-      const generated: string = Array.isArray(result)
-        ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          ((result[0]?.generated_text as string) ?? "")
-        : ((result as { generated_text?: string }).generated_text ?? "");
+      // Decode generated tokens
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const decoded: string[] = llmTokenizer.batch_decode(newTokens, {
+        skip_special_tokens: true,
+      });
+      const generated: string = decoded[0];
 
       const parsed = parseLLMOutput(generated);
       if (parsed) return parsed;
@@ -265,7 +348,7 @@ async function extractWithLLM(rawText: string): Promise<{
 }
 
 async function processImage(imageData: ArrayBuffer) {
-  if (!ocrPipeline) {
+  if (!ocrModel || !ocrProcessor) {
     self.postMessage({
       type: "error",
       error: "Model not loaded",
@@ -274,23 +357,8 @@ async function processImage(imageData: ArrayBuffer) {
   }
 
   try {
-    // Convert ArrayBuffer to Blob URL for the pipeline
-    const blob = new Blob([imageData], { type: "image/jpeg" });
-    const imageUrl = URL.createObjectURL(blob);
-
-    // Run OCR on the image
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const result = await ocrPipeline(imageUrl);
-
-    // Clean up the blob URL
-    URL.revokeObjectURL(imageUrl);
-
-    // Extract the text from the result
-    const rawText: string = Array.isArray(result)
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-        result.map((r: any) => r.generated_text ?? "").join("\n")
-      : // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        (result.generated_text as string) || "";
+    // Run Florence-2 OCR on the image
+    const rawText = await runOCR(imageData);
 
     // Extract structured data using LLM (retries on parse failure)
     const extractedData = await extractWithLLM(rawText);
