@@ -106,7 +106,6 @@ async function loadModel() {
 
     // Load Florence-2 OCR model + processor in parallel
     if (!ocrModel || !ocrProcessor) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       [ocrModel, ocrProcessor] = await Promise.all([
         Florence2ForConditionalGeneration.from_pretrained(OCR_MODEL_ID, {
           dtype: "fp32",
@@ -244,39 +243,38 @@ Example: {"merchant": "STARBUCKS", "total": 5.99, "date": "01/15/2025"}`;
 
 const MAX_LLM_ATTEMPTS = 3;
 
-const LLM_MESSAGES: ((
-  text: string,
-) => { role: string; content: string }[])[] = [
-  // Attempt 1: standard chat
-  (text: string) => [
-    { role: "system", content: SYSTEM_PROMPT },
-    { role: "user", content: `Extract data from this receipt:\n\n${text}` },
-  ],
+const LLM_MESSAGES: ((text: string) => { role: string; content: string }[])[] =
+  [
+    // Attempt 1: standard chat
+    (text: string) => [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: `Extract data from this receipt:\n\n${text}` },
+    ],
 
-  // Attempt 2: more explicit
-  (text: string) => [
-    { role: "system", content: SYSTEM_PROMPT },
-    {
-      role: "user",
-      content: `Parse this receipt text and return JSON with merchant, total, date:\n\n${text}`,
-    },
-  ],
+    // Attempt 2: more explicit
+    (text: string) => [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: `Parse this receipt text and return JSON with merchant, total, date:\n\n${text}`,
+      },
+    ],
 
-  // Attempt 3: few-shot with example exchange
-  (text: string) => [
-    { role: "system", content: SYSTEM_PROMPT },
-    {
-      role: "user",
-      content:
-        "Extract data from this receipt:\n\nWALMART\nMILK 3.49\nBREAD 2.99\nTOTAL 6.48\n01/20/2025",
-    },
-    {
-      role: "assistant",
-      content: '{"merchant": "WALMART", "total": 6.48, "date": "01/20/2025"}',
-    },
-    { role: "user", content: `Extract data from this receipt:\n\n${text}` },
-  ],
-];
+    // Attempt 3: few-shot with example exchange
+    (text: string) => [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content:
+          "Extract data from this receipt:\n\nWALMART\nMILK 3.49\nBREAD 2.99\nTOTAL 6.48\n01/20/2025",
+      },
+      {
+        role: "assistant",
+        content: '{"merchant": "WALMART", "total": 6.48, "date": "01/20/2025"}',
+      },
+      { role: "user", content: `Extract data from this receipt:\n\n${text}` },
+    ],
+  ];
 
 /**
  * Use the LLM to extract structured data from OCR text.
