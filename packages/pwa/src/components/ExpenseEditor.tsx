@@ -70,6 +70,8 @@ interface ExpenseEditorProps {
   >["fallbackOptions"];
   /** Optional callback to view a photo at a given index (for route-based gallery) */
   onViewPhoto?: (index: number) => void;
+  /** Optional callback to scan a receipt (for new expenses) */
+  onScanReceipt?: () => void;
 }
 
 export function ExpenseEditor({
@@ -81,6 +83,7 @@ export function ExpenseEditor({
   autoFocus = true,
   goBackFallbackOptions,
   onViewPhoto,
+  onScanReceipt,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
   const unsortedParticipants = useExpenseParticipants({
@@ -282,6 +285,7 @@ export function ExpenseEditor({
                   value={field.state.value}
                   onChange={field.handleChange}
                   onViewPhoto={onViewPhoto}
+                  onScanReceipt={onScanReceipt}
                 />
               )}
             </form.Field>
@@ -759,9 +763,15 @@ interface PhotosFieldProps {
   value: MediaFile["id"][];
   onChange: (updater: Updater<MediaFile["id"][]>) => void;
   onViewPhoto?: (index: number) => void;
+  onScanReceipt?: () => void;
 }
 
-function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
+function PhotosField({
+  value,
+  onChange,
+  onViewPhoto,
+  onScanReceipt,
+}: PhotosFieldProps) {
   return (
     <div
       className="no-scrollbar -my-4 flex gap-4 overflow-x-auto py-4"
@@ -796,6 +806,7 @@ function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
         onPhoto={(photo) => {
           onChange((prevPhotos) => [...prevPhotos, ...photo]);
         }}
+        onScanReceipt={onScanReceipt}
       />
     </div>
   );
@@ -803,9 +814,10 @@ function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
 
 interface AddPhotoButtonProps {
   onPhoto: (photos: MediaFile["id"][]) => void;
+  onScanReceipt?: () => void;
 }
 
-function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
+function AddPhotoButton({ onPhoto, onScanReceipt }: AddPhotoButtonProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { createMediaFile } = useMediaFileActions();
@@ -848,24 +860,36 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   }
 
   return (
-    <div className="flex h-32 w-max flex-shrink-0 flex-col gap-2">
-      <Button
-        onPress={openCamera}
-        color="input-like"
-        className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
-      >
-        <Icon name="#lucide/camera" className="h-5 w-5" />
-        <Trans>Take photo</Trans>
-      </Button>
+    <div className="flex h-32 w-max flex-shrink-0 gap-2">
+      {onScanReceipt && (
+        <Button
+          onPress={onScanReceipt}
+          color="input-like"
+          className="flex h-32 w-20 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+        >
+          <Icon name="#lucide/scan-text" className="h-5 w-5" />
+          <Trans>Scan receipt</Trans>
+        </Button>
+      )}
+      <div className="flex h-32 w-max flex-shrink-0 flex-col gap-2">
+        <Button
+          onPress={openCamera}
+          color="input-like"
+          className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+        >
+          <Icon name="#lucide/camera" className="h-5 w-5" />
+          <Trans>Take photo</Trans>
+        </Button>
 
-      <Button
-        onPress={openGallery}
-        color="input-like"
-        className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
-      >
-        <Icon name="#lucide/image-up" className="h-5 w-5" />
-        <Trans>Upload photo</Trans>
-      </Button>
+        <Button
+          onPress={openGallery}
+          color="input-like"
+          className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
+        >
+          <Icon name="#lucide/image-up" className="h-5 w-5" />
+          <Trans>Upload photo</Trans>
+        </Button>
+      </div>
 
       <input
         type="file"

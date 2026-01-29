@@ -212,6 +212,7 @@ function Contributor({ username, website }: ContributorProps) {
             alt={`@${username}`}
             className="h-8 w-8 rounded-full"
             loading="lazy"
+            crossOrigin="anonymous"
           />
           <span>@{username}</span>
         </div>

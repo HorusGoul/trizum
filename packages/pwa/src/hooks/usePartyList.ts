@@ -61,7 +61,12 @@ export function usePartyList() {
   function updateSettings(
     values: Pick<
       PartyList,
-      "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch"
+      | "username"
+      | "phone"
+      | "avatarId"
+      | "locale"
+      | "openLastPartyOnLaunch"
+      | "enableAIFeatures"
     >,
   ) {
     partyListHandle.change((list) => {
@@ -74,6 +79,7 @@ export function usePartyList() {
         delete list["locale"];
       }
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
+      list.enableAIFeatures = values.enableAIFeatures;
     });
 
     void updateAllParties();

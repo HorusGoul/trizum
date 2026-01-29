@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
+import { usePartyList } from "#src/hooks/usePartyList.js";
 import {
   ExpenseEditor,
   type ExpenseEditorFormValues,
@@ -23,6 +24,12 @@ import { useState } from "react";
 
 interface AddExpenseSearchParams {
   media?: number;
+  /** Pre-filled expense name from receipt scan */
+  name?: string;
+  /** Pre-filled amount from receipt scan */
+  amount?: string;
+  /** Pre-filled date from receipt scan (ISO string) */
+  date?: string;
 }
 
 export const Route = createFileRoute("/party_/$partyId/add")({
@@ -35,6 +42,9 @@ export const Route = createFileRoute("/party_/$partyId/add")({
         typeof search.media === "number" && search.media >= 0
           ? search.media
           : undefined,
+      name: typeof search.name === "string" ? search.name : undefined,
+      amount: typeof search.amount === "string" ? search.amount : undefined,
+      date: typeof search.date === "string" ? search.date : undefined,
     };
   },
 
@@ -45,10 +55,14 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 
 function AddExpense() {
   const { partyId, addExpenseToParty } = useCurrentParty();
+  const { partyList } = usePartyList();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
   const participant = useCurrentParticipant();
+
+  // AI features are enabled by default
+  const enableAIFeatures = partyList.enableAIFeatures ?? true;
 
   const { galleryIndex, openGallery, closeGallery, onIndexChange } =
     useRouteMediaGallery({
@@ -116,15 +130,25 @@ function AddExpense() {
         onSubmit={(values) => void onCreateExpense(values)}
         onChange={(_prev, current) => setPhotos(current.photos)}
         defaultValues={{
-          name: "",
-          amount: 0,
+          name: search.name ?? "",
+          amount: search.amount ? parseFloat(search.amount) : 0,
           paidBy: participant.id,
           shares: {},
-          paidAt: new Date(),
+          paidAt: search.date ? new Date(search.date) : new Date(),
           photos: [],
         }}
         goBackFallbackOptions={{ to: "/party/$partyId" }}
         onViewPhoto={openGallery}
+        onScanReceipt={
+          enableAIFeatures
+            ? () => {
+                void navigate({
+                  to: "/party/$partyId/scan-receipt",
+                  params: { partyId },
+                });
+              }
+            : undefined
+        }
       />
       <RouteMediaGallery
         photoIds={photos}

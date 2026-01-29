@@ -28,6 +28,7 @@ interface SettingsFormValues {
   avatarId: MediaFile["id"] | null;
   locale: SupportedLocale | "system";
   openLastPartyOnLaunch: boolean;
+  enableAIFeatures: boolean;
 }
 
 interface LocaleOption {
@@ -52,6 +53,7 @@ function Settings() {
       avatarId: values.avatarId,
       locale: values.locale === "system" ? undefined : values.locale,
       openLastPartyOnLaunch: values.openLastPartyOnLaunch,
+      enableAIFeatures: values.enableAIFeatures,
     });
     form.reset();
     toast.success(t`Settings saved`);
@@ -65,6 +67,7 @@ function Settings() {
       avatarId: partyList.avatarId ?? null,
       locale: partyList.locale ?? ("system" as const),
       openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
+      enableAIFeatures: partyList.enableAIFeatures ?? true,
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -207,6 +210,22 @@ function Settings() {
                 <Trans>
                   Automatically open the last visited party when you open the
                   app
+                </Trans>
+              }
+              isSelected={field.state.value}
+              onChange={field.handleChange}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="enableAIFeatures">
+          {(field) => (
+            <SwitchField
+              label={<Trans>Enable AI features</Trans>}
+              description={
+                <Trans>
+                  Use AI to scan receipts and extract expense data. The AI model
+                  (~100MB) runs locally on your device.
                 </Trans>
               }
               isSelected={field.state.value}
