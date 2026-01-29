@@ -10,6 +10,7 @@ overrides:
   react-dom: 0.0.0-experimental-d025ddd3-20240722
   '@types/react': npm:types-react@rc
   '@types/react-dom': npm:types-react-dom@rc
+  onnxruntime-common: 1.22.0-dev.20250409-89f8206ba4
 
 importers:
 
@@ -7482,9 +7483,6 @@ packages:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
 
-  onnxruntime-common@1.21.0:
-    resolution: {integrity: sha512-Q632iLLrtCAVOTO65dh2+mNbQir/QNTVBG3h/QdZBpns7mZ0RYbLRBgGABPbpU9351AgYy7SJf1WaeVwMrBFPQ==}
-
   onnxruntime-common@1.22.0-dev.20250409-89f8206ba4:
     resolution: {integrity: sha512-vDJMkfCfb0b1A836rgHj+ORuZf4B4+cc2bASQtpeoJLueuFc5DuYwjIZUBrSvx/fO5IrLjLz+oTrB3pcGlhovQ==}
 
@@ -13883,6 +13881,7 @@ snapshots:
       '@fontsource-variable/fira-code': 5.2.7
       '@fontsource-variable/inter': 5.2.8
       '@horus.dev/tw-dynamic-themes': 0.0.3
+      '@huggingface/transformers': 3.8.1
       '@internationalized/date': 3.10.0
       '@lingui/core': 5.8.0(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)
       '@lingui/react': 5.8.0(@lingui/babel-plugin-lingui-macro@5.8.0(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)(react@0.0.0-experimental-d025ddd3-20240722)
@@ -17657,14 +17656,12 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  onnxruntime-common@1.21.0: {}
-
   onnxruntime-common@1.22.0-dev.20250409-89f8206ba4: {}
 
   onnxruntime-node@1.21.0:
     dependencies:
       global-agent: 3.0.0
-      onnxruntime-common: 1.21.0
+      onnxruntime-common: 1.22.0-dev.20250409-89f8206ba4
       tar: 7.5.6
 
   onnxruntime-web@1.22.0-dev.20250409-89f8206ba4:
