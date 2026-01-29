@@ -45,7 +45,6 @@ async function proxyRequest(
       headers: {
         "User-Agent": "trizum-proxy",
       },
-      // Follow redirects server-side
       redirect: "follow",
     });
 
@@ -59,20 +58,11 @@ async function proxyRequest(
       );
     }
 
-    // Stream the response back with CORS headers
-    const headers = new Headers();
+    // Pass through all upstream headers and add CORS on top
+    const headers = new Headers(response.headers);
     headers.set("Access-Control-Allow-Origin", "*");
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
     headers.set("Access-Control-Allow-Headers", "*");
-
-    // Preserve content type and length from upstream
-    const contentType = response.headers.get("Content-Type");
-    if (contentType) headers.set("Content-Type", contentType);
-
-    const contentLength = response.headers.get("Content-Length");
-    if (contentLength) headers.set("Content-Length", contentLength);
-
-    // Allow browser caching (models are immutable)
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
 
     return new Response(response.body, {

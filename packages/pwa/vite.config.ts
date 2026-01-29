@@ -48,6 +48,9 @@ export default defineConfig(({ mode }) => {
       sourcemap: true,
       minify: true,
     },
+    optimizeDeps: {
+      exclude: ["onnxruntime-web"],
+    },
     plugins: [
       cloudflare(),
       tanstackRouter(),
