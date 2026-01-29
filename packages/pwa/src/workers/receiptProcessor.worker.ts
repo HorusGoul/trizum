@@ -5,8 +5,10 @@ import { pipeline, env } from "@huggingface/transformers";
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-// Proxy HuggingFace requests through our Cloudflare Worker to avoid CORS issues
-env.remoteHost = `${self.location.origin}/api/hf/models/`;
+// Proxy HuggingFace requests through our Cloudflare Worker to avoid CORS issues.
+// Uses build-time env var so it works in both web and Capacitor mobile builds.
+const apiUrl = import.meta.env.VITE_APP_API_URL as string;
+env.remoteHost = `${apiUrl}/api/hf/models/`;
 env.remotePathTemplate = "{model}/resolve/{revision}/";
 
 interface ProcessImageMessage {

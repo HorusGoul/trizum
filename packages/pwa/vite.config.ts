@@ -39,6 +39,10 @@ export default defineConfig(({ mode }) => {
     mode === "production"
       ? "wss://server.trizum.app/sync"
       : "wss://dev-sync.trizum.app";
+  process.env.VITE_APP_API_URL =
+    mode === "production"
+      ? "https://trizum.app"
+      : "http://localhost:5173";
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
   process.env.VITE_APP_FULL_VERSION = fullVersion;
