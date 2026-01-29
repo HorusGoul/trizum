@@ -114,7 +114,7 @@ msgstr "Amount for {0}"
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
-#: src/components/ReceiptScanner.tsx:456
+#: src/components/ReceiptScanner.tsx:462
 msgid "Analyzing receipt..."
 msgstr "Analyzing receipt..."
 
@@ -288,8 +288,8 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Canadian Dollar"
 msgstr "Canadian Dollar"
 
-#: src/components/ReceiptScanner.tsx:403
-#: src/components/ReceiptScanner.tsx:510
+#: src/components/ReceiptScanner.tsx:409
+#: src/components/ReceiptScanner.tsx:516
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -297,7 +297,7 @@ msgstr "Cancel"
 msgid "Cape Verdean Escudo"
 msgstr "Cape Verdean Escudo"
 
-#: src/components/ReceiptScanner.tsx:516
+#: src/components/ReceiptScanner.tsx:522
 msgid "Capture photo"
 msgstr "Capture photo"
 
@@ -486,13 +486,17 @@ msgstr "Djiboutian Franc"
 msgid "Dominican Peso"
 msgstr "Dominican Peso"
 
-#: src/components/ReceiptScanner.tsx:410
+#: src/components/ReceiptScanner.tsx:416
 msgid "Download"
 msgstr "Download"
 
-#: src/components/ReceiptScanner.tsx:382
+#: src/components/ReceiptScanner.tsx:388
 msgid "Download AI Model?"
 msgstr "Download AI Model?"
+
+#: src/components/ReceiptScanner.tsx:317
+msgid "Downloading extraction model..."
+msgstr "Downloading extraction model..."
 
 #: src/components/ReceiptScanner.tsx:302
 msgid "Downloading model: {percent}%"
@@ -501,6 +505,10 @@ msgstr "Downloading model: {percent}%"
 #: src/components/ReceiptScanner.tsx:315
 msgid "Downloading model..."
 msgstr "Downloading model..."
+
+#: src/components/ReceiptScanner.tsx:318
+msgid "Downloading OCR model..."
+msgstr "Downloading OCR model..."
 
 #: src/routes/new.tsx:590
 msgid "East Caribbean Dollar"
@@ -849,9 +857,17 @@ msgstr "Indian Rupee"
 msgid "Indonesian Rupiah"
 msgstr "Indonesian Rupiah"
 
+#: src/components/ReceiptScanner.tsx:322
+msgid "Initializing extraction model..."
+msgstr "Initializing extraction model..."
+
 #: src/components/ReceiptScanner.tsx:317
 msgid "Initializing model..."
 msgstr "Initializing model..."
+
+#: src/components/ReceiptScanner.tsx:323
+msgid "Initializing OCR model..."
+msgstr "Initializing OCR model..."
 
 #: src/routes/join.tsx:54
 msgid "Invalid QR code. This doesn't appear to be a trizum party code."
@@ -977,10 +993,13 @@ msgstr "Link or code"
 msgid "Links"
 msgstr "Links"
 
-#: src/components/ReceiptScanner.tsx:309
-#: src/components/ReceiptScanner.tsx:426
+#: src/components/ReceiptScanner.tsx:432
 msgid "Loading AI model..."
 msgstr "Loading AI model..."
+
+#: src/components/ReceiptScanner.tsx:309
+msgid "Loading AI models..."
+msgstr "Loading AI models..."
 
 #: src/routes/about_.third-party-licenses.tsx:34
 msgid "Loading licenses..."
@@ -1409,7 +1428,7 @@ msgstr "Receipt Attachments"
 msgid "Receipt scanned successfully"
 msgstr "Receipt scanned successfully"
 
-#: src/components/ReceiptScanner.tsx:473
+#: src/components/ReceiptScanner.tsx:479
 msgid "Receipt scanned!"
 msgstr "Receipt scanned!"
 
@@ -1442,7 +1461,7 @@ msgstr "Report Issues"
 msgid "Restore"
 msgstr "Restore"
 
-#: src/components/ReceiptScanner.tsx:537
+#: src/components/ReceiptScanner.tsx:543
 msgid "Retake"
 msgstr "Retake"
 
@@ -1491,7 +1510,7 @@ msgstr "Saudi Riyal"
 msgid "Save"
 msgstr "Save"
 
-#: src/components/ReceiptScanner.tsx:546
+#: src/components/ReceiptScanner.tsx:552
 msgid "Scan"
 msgstr "Scan"
 
@@ -1640,7 +1659,7 @@ msgstr "Sri Lankan Rupee"
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
-#: src/components/ReceiptScanner.tsx:364
+#: src/components/ReceiptScanner.tsx:370
 msgid "Starting camera..."
 msgstr "Starting camera..."
 
@@ -1799,6 +1818,10 @@ msgstr "Title must be less than 50 characters"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
+#: src/components/ReceiptScanner.tsx:392
+msgid "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
+msgstr "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
+
 #: src/components/ReceiptScanner.tsx:386
 msgid "To scan receipts, we need to download an AI model (~100MB). This only happens once and the model runs locally on your device for privacy."
 msgstr "To scan receipts, we need to download an AI model (~100MB). This only happens once and the model runs locally on your device for privacy."
@@ -1835,7 +1858,7 @@ msgstr "Trinidad and Tobago Dollar"
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 
-#: src/components/ReceiptScanner.tsx:493
+#: src/components/ReceiptScanner.tsx:499
 msgid "Try again"
 msgstr "Try again"
 
@@ -1992,7 +2015,7 @@ msgstr "Viewing as {0}"
 msgid "Warning: Split amounts don't match total expense"
 msgstr "Warning: Split amounts don't match total expense"
 
-#: src/components/ReceiptScanner.tsx:393
+#: src/components/ReceiptScanner.tsx:399
 msgid "We recommend using Wi-Fi to avoid mobile data charges."
 msgstr "We recommend using Wi-Fi to avoid mobile data charges."
 

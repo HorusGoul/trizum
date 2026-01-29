@@ -216,11 +216,11 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
   // Check if model has been downloaded before (cached in IndexedDB)
   function hasModelBeenDownloaded(): boolean {
     // Check localStorage flag that we set after first successful download
-    return localStorage.getItem("trizum-ai-model-downloaded") === "true";
+    return localStorage.getItem("trizum-ai-models-v2-downloaded") === "true";
   }
 
   function markModelAsDownloaded() {
-    localStorage.setItem("trizum-ai-model-downloaded", "true");
+    localStorage.setItem("trizum-ai-models-v2-downloaded", "true");
   }
 
   async function doProcess() {
@@ -306,15 +306,21 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
 
   useEffect(() => {
     if (state.status === "loading-model" && progress) {
-      let message = t`Loading AI model...`;
+      let message = t`Loading AI models...`;
       let downloadProgress: number | undefined;
 
       if (progress.status === "download" && progress.progress !== undefined) {
         const percent = Math.round(progress.progress);
         downloadProgress = percent;
-        message = t`Downloading model...`;
+        message =
+          progress.model === "llm"
+            ? t`Downloading extraction model...`
+            : t`Downloading OCR model...`;
       } else if (progress.status === "init") {
-        message = t`Initializing model...`;
+        message =
+          progress.model === "llm"
+            ? t`Initializing extraction model...`
+            : t`Initializing OCR model...`;
       }
 
       setState({ status: "loading-model", message, downloadProgress });
@@ -384,9 +390,9 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
                 </div>
                 <p className="text-sm text-accent-300">
                   <Trans>
-                    To scan receipts, we need to download an AI model (~100MB).
-                    This only happens once and the model runs locally on your
-                    device for privacy.
+                    To scan receipts, we need to download AI models (~500MB).
+                    This only happens once and all processing runs locally on
+                    your device for privacy.
                   </Trans>
                 </p>
                 <p className="text-sm text-accent-400">

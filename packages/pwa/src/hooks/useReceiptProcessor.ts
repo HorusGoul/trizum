@@ -6,6 +6,7 @@ type ProcessorStatus = "idle" | "loading" | "ready" | "processing" | "error";
 
 interface ProgressInfo {
   status: string;
+  model?: "ocr" | "llm";
   name?: string;
   file?: string;
   progress?: number;
@@ -16,6 +17,7 @@ interface ProgressInfo {
 interface ProgressMessage {
   type: "progress";
   status: string;
+  model?: "ocr" | "llm";
   name?: string;
   file?: string;
   progress?: number;
@@ -97,6 +99,7 @@ export function useReceiptProcessor(): UseReceiptProcessorResult {
         case "progress":
           setProgress({
             status: message.status,
+            model: message.model,
             name: message.name,
             file: message.file,
             progress: message.progress,

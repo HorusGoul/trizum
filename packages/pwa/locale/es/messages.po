@@ -106,7 +106,7 @@ msgstr "Cantidad para {0}"
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
-#: src/components/ReceiptScanner.tsx:456
+#: src/components/ReceiptScanner.tsx:462
 msgid "Analyzing receipt..."
 msgstr ""
 
@@ -268,8 +268,8 @@ msgstr "¿Puedo usar trizum sin una cuenta?"
 msgid "Canadian Dollar"
 msgstr "Dólar Canadiense"
 
-#: src/components/ReceiptScanner.tsx:403
-#: src/components/ReceiptScanner.tsx:510
+#: src/components/ReceiptScanner.tsx:409
+#: src/components/ReceiptScanner.tsx:516
 msgid "Cancel"
 msgstr ""
 
@@ -277,7 +277,7 @@ msgstr ""
 msgid "Cape Verdean Escudo"
 msgstr "Escudo Caboverdiano"
 
-#: src/components/ReceiptScanner.tsx:516
+#: src/components/ReceiptScanner.tsx:522
 msgid "Capture photo"
 msgstr ""
 
@@ -454,12 +454,16 @@ msgstr "Franco Yibutiano"
 msgid "Dominican Peso"
 msgstr "Peso Dominicano"
 
-#: src/components/ReceiptScanner.tsx:410
+#: src/components/ReceiptScanner.tsx:416
 msgid "Download"
 msgstr ""
 
-#: src/components/ReceiptScanner.tsx:382
+#: src/components/ReceiptScanner.tsx:388
 msgid "Download AI Model?"
+msgstr ""
+
+#: src/components/ReceiptScanner.tsx:317
+msgid "Downloading extraction model..."
 msgstr ""
 
 #: src/components/ReceiptScanner.tsx:302
@@ -468,6 +472,10 @@ msgstr ""
 
 #: src/components/ReceiptScanner.tsx:315
 msgid "Downloading model..."
+msgstr ""
+
+#: src/components/ReceiptScanner.tsx:318
+msgid "Downloading OCR model..."
 msgstr ""
 
 #: src/routes/new.tsx:590
@@ -797,8 +805,16 @@ msgstr "Rupia India"
 msgid "Indonesian Rupiah"
 msgstr "Rupia Indonesia"
 
+#: src/components/ReceiptScanner.tsx:322
+msgid "Initializing extraction model..."
+msgstr ""
+
 #: src/components/ReceiptScanner.tsx:317
 msgid "Initializing model..."
+msgstr ""
+
+#: src/components/ReceiptScanner.tsx:323
+msgid "Initializing OCR model..."
 msgstr ""
 
 #: src/routes/join.tsx:54
@@ -921,9 +937,12 @@ msgstr "Enlace o código"
 msgid "Links"
 msgstr "Enlaces"
 
-#: src/components/ReceiptScanner.tsx:309
-#: src/components/ReceiptScanner.tsx:426
+#: src/components/ReceiptScanner.tsx:432
 msgid "Loading AI model..."
+msgstr ""
+
+#: src/components/ReceiptScanner.tsx:309
+msgid "Loading AI models..."
 msgstr ""
 
 #: src/routes/about_.third-party-licenses.tsx:34
@@ -1333,7 +1352,7 @@ msgstr "Sincronización en Tiempo Real"
 msgid "Receipt scanned successfully"
 msgstr ""
 
-#: src/components/ReceiptScanner.tsx:473
+#: src/components/ReceiptScanner.tsx:479
 msgid "Receipt scanned!"
 msgstr ""
 
@@ -1366,7 +1385,7 @@ msgstr "Reportar problemas"
 msgid "Restore"
 msgstr "Restaurar"
 
-#: src/components/ReceiptScanner.tsx:537
+#: src/components/ReceiptScanner.tsx:543
 msgid "Retake"
 msgstr ""
 
@@ -1415,7 +1434,7 @@ msgstr "Riyal Saudí"
 msgid "Save"
 msgstr "Guardar"
 
-#: src/components/ReceiptScanner.tsx:546
+#: src/components/ReceiptScanner.tsx:552
 msgid "Scan"
 msgstr ""
 
@@ -1560,7 +1579,7 @@ msgstr "Rupia de Sri Lanka"
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
-#: src/components/ReceiptScanner.tsx:364
+#: src/components/ReceiptScanner.tsx:370
 msgid "Starting camera..."
 msgstr ""
 
@@ -1719,6 +1738,10 @@ msgstr "El título debe tener menos de 50 caracteres"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
+#: src/components/ReceiptScanner.tsx:392
+msgid "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
+msgstr ""
+
 #: src/components/ReceiptScanner.tsx:386
 msgid "To scan receipts, we need to download an AI model (~100MB). This only happens once and the model runs locally on your device for privacy."
 msgstr ""
@@ -1743,7 +1766,7 @@ msgstr "Dólar de Trinidad y Tobago"
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando estás conectado y compartes un grupo con otros, los cambios se sincronizan automáticamente en todos los dispositivos en tiempo real."
 
-#: src/components/ReceiptScanner.tsx:493
+#: src/components/ReceiptScanner.tsx:499
 msgid "Try again"
 msgstr "Reintentar"
 
@@ -1887,7 +1910,7 @@ msgstr "Ver Licencias de Terceros"
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
-#: src/components/ReceiptScanner.tsx:393
+#: src/components/ReceiptScanner.tsx:399
 msgid "We recommend using Wi-Fi to avoid mobile data charges."
 msgstr ""
 
