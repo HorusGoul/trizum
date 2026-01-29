@@ -100,7 +100,7 @@ async function loadModel() {
     if (!llmPipeline) {
       llmPipeline = await pipeline(
         "text2text-generation",
-        "Xenova/LaMini-Flan-T5-77M",
+        "Xenova/LaMini-Flan-T5-248M",
         { progress_callback: makeProgressCallback("llm") },
       );
     }
@@ -135,12 +135,22 @@ function parseLLMOutput(output: string): {
   } catch {
     // Try extracting a JSON object from the string
     const jsonMatch = trimmed.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return null;
-    try {
-      parsed = JSON.parse(jsonMatch[0]);
-    } catch {
-      return null;
+    if (jsonMatch) {
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        // fall through
+      }
     }
+    // Wrap bare key-value pairs with braces (model sometimes omits {})
+    if (parsed === undefined && trimmed.includes('"')) {
+      try {
+        parsed = JSON.parse("{" + trimmed + "}");
+      } catch {
+        // fall through
+      }
+    }
+    if (parsed === undefined) return null;
   }
 
   if (typeof parsed !== "object" || parsed === null) return null;
