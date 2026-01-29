@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { pipeline, env } from "@huggingface/transformers";
 
-// Configure transformers.js to use local caching
+// Configure transformers.js
 env.allowLocalModels = false;
 env.useBrowserCache = true;
+
+// Proxy HuggingFace requests through our Cloudflare Worker to avoid CORS issues
+env.remoteHost = `${self.location.origin}/api/hf/models/`;
+env.remotePathTemplate = "{model}/resolve/{revision}/";
 
 interface ProcessImageMessage {
   type: "process";
