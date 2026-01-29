@@ -5,11 +5,10 @@ import { pipeline, env } from "@huggingface/transformers";
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-// Proxy HuggingFace requests through our Cloudflare Worker to avoid CORS issues.
-// Uses build-time env var so it works in both web and Capacitor mobile builds.
-const apiUrl = import.meta.env.VITE_APP_API_URL;
-env.remoteHost = `${apiUrl}/api/hf/models/`;
-env.remotePathTemplate = "{model}/resolve/{revision}/";
+interface ConfigureMessage {
+  type: "configure";
+  apiOrigin: string;
+}
 
 interface ProcessImageMessage {
   type: "process";
@@ -20,7 +19,7 @@ interface LoadModelMessage {
   type: "load";
 }
 
-type WorkerMessage = ProcessImageMessage | LoadModelMessage;
+type WorkerMessage = ConfigureMessage | ProcessImageMessage | LoadModelMessage;
 
 interface ProgressEvent {
   type: "progress";
@@ -237,6 +236,12 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   const message = event.data;
 
   switch (message.type) {
+    case "configure":
+      // Proxy HuggingFace requests through our Cloudflare Worker to avoid CORS issues.
+      // The API origin is sent from the main thread so it works in both web and Capacitor mobile builds.
+      env.remoteHost = `${message.apiOrigin}/api/hf/models/`;
+      env.remotePathTemplate = "{model}/resolve/{revision}/";
+      break;
     case "load":
       await loadModel();
       break;

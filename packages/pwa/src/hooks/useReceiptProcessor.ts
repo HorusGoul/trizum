@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ExtractedReceiptData } from "#src/lib/receiptExtraction.js";
+import { getApiOrigin } from "#src/lib/link.js";
 
 type ProcessorStatus = "idle" | "loading" | "ready" | "processing" | "error";
 
@@ -81,6 +82,12 @@ export function useReceiptProcessor(): UseReceiptProcessorResult {
       new URL("../workers/receiptProcessor.worker.ts", import.meta.url),
       { type: "module" },
     );
+
+    // Send API origin so the worker can proxy HuggingFace requests
+    workerRef.current.postMessage({
+      type: "configure",
+      apiOrigin: getApiOrigin(),
+    });
 
     // Set up message handler
     workerRef.current.onmessage = (event: MessageEvent<WorkerMessage>) => {
