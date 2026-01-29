@@ -1822,6 +1822,10 @@ msgstr "To join the <0>{0}</0>, please select who you are so that we can show yo
 msgid "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
 msgstr "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
 
+#: src/components/ReceiptScanner.tsx:392
+msgid "To scan receipts, we need to download AI models (~800MB). This only happens once and all processing runs locally on your device for privacy."
+msgstr "To scan receipts, we need to download AI models (~800MB). This only happens once and all processing runs locally on your device for privacy."
+
 #: src/components/ReceiptScanner.tsx:386
 msgid "To scan receipts, we need to download an AI model (~100MB). This only happens once and the model runs locally on your device for privacy."
 msgstr "To scan receipts, we need to download an AI model (~100MB). This only happens once and the model runs locally on your device for privacy."

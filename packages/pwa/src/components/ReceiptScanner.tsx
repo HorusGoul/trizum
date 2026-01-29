@@ -390,7 +390,7 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
                 </div>
                 <p className="text-sm text-accent-300">
                   <Trans>
-                    To scan receipts, we need to download AI models (~500MB).
+                    To scan receipts, we need to download AI models (~800MB).
                     This only happens once and all processing runs locally on
                     your device for privacy.
                   </Trans>

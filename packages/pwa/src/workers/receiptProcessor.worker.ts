@@ -87,21 +87,24 @@ async function loadModel() {
   }
 
   try {
-    // Load OCR model (TrOCR for printed text)
+    // Load OCR model (TrOCR base for better printed text recognition)
     if (!ocrPipeline) {
       ocrPipeline = await pipeline(
         "image-to-text",
-        "Xenova/trocr-small-printed",
+        "Xenova/trocr-base-printed",
         { progress_callback: makeProgressCallback("ocr") },
       );
     }
 
-    // Load LLM model (instruction-tuned T5 for structured extraction)
+    // Load LLM model (Qwen2.5 0.5B instruction-tuned, q4f16 quantized)
     if (!llmPipeline) {
       llmPipeline = await pipeline(
-        "text2text-generation",
-        "Xenova/LaMini-Flan-T5-248M",
-        { progress_callback: makeProgressCallback("llm") },
+        "text-generation",
+        "onnx-community/Qwen2.5-0.5B-Instruct",
+        {
+          dtype: "q4f16",
+          progress_callback: makeProgressCallback("llm"),
+        },
       );
     }
 
@@ -129,28 +132,25 @@ function parseLLMOutput(output: string): {
 } | null {
   const trimmed = output.trim();
 
+  // Try parsing strategies in order:
+  // 1. Direct JSON parse
+  // 2. Extract {...} block from surrounding text
+  // 3. Wrap bare key-value pairs with braces (model sometimes omits {})
   let parsed: unknown;
-  try {
-    parsed = JSON.parse(trimmed);
-  } catch {
-    // Try extracting a JSON object from the string
-    const jsonMatch = trimmed.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      try {
-        parsed = JSON.parse(jsonMatch[0]);
-      } catch {
-        // fall through
-      }
+  const candidates = [
+    trimmed,
+    trimmed.match(/\{[\s\S]*\}/)?.[0],
+    trimmed.includes('"') ? `{${trimmed}}` : undefined,
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    try {
+      parsed = JSON.parse(candidate);
+      break;
+    } catch {
+      // try next strategy
     }
-    // Wrap bare key-value pairs with braces (model sometimes omits {})
-    if (parsed === undefined && trimmed.includes('"')) {
-      try {
-        parsed = JSON.parse("{" + trimmed + "}");
-      } catch {
-        // fall through
-      }
-    }
-    if (parsed === undefined) return null;
   }
 
   if (typeof parsed !== "object" || parsed === null) return null;
@@ -172,35 +172,46 @@ function parseLLMOutput(output: string): {
   return { merchant, total, date };
 }
 
+const SYSTEM_PROMPT = `You extract structured data from receipt text. Return ONLY a valid JSON object with keys "merchant", "total", "date". Rules:
+- "merchant": store/restaurant name as a string, or null
+- "total": final amount as a number (not string), or null
+- "date": date string in any format found, or null
+Example: {"merchant": "STARBUCKS", "total": 5.99, "date": "01/15/2025"}`;
+
 const MAX_LLM_ATTEMPTS = 3;
 
-const LLM_PROMPTS = [
-  // Attempt 1: direct instruction with example
-  (text: string) =>
-    `Extract the merchant name, total amount, and date from this receipt text. Return ONLY a JSON object with keys "merchant", "total", "date". Use null for any field you cannot find. The total must be a number.
+const LLM_MESSAGES: ((text: string) => { role: string; content: string }[])[] =
+  [
+    // Attempt 1: standard chat
+    (text: string) => [
+      { role: "system", content: SYSTEM_PROMPT },
+      { role: "user", content: `Extract data from this receipt:\n\n${text}` },
+    ],
 
-Example output: {"merchant": "STARBUCKS", "total": 5.99, "date": "01/15/2025"}
+    // Attempt 2: more explicit
+    (text: string) => [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: `Parse this receipt text and return JSON with merchant, total, date:\n\n${text}`,
+      },
+    ],
 
-Receipt text:
-${text}
-
-JSON:`,
-
-  // Attempt 2: example-guided
-  (text: string) =>
-    `Given a receipt, extract data as JSON. Example output: {"merchant": "WALMART", "total": 42.99, "date": "01/15/2025"}
-
-Receipt text:
-${text}
-
-Output:`,
-
-  // Attempt 3: simpler framing
-  (text: string) =>
-    `What is the store name, total price, and date on this receipt? Answer as JSON with keys "merchant", "total", "date". Use null if unknown.
-
-${text}`,
-] as const;
+    // Attempt 3: few-shot with example exchange
+    (text: string) => [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content:
+          "Extract data from this receipt:\n\nWALMART\nMILK 3.49\nBREAD 2.99\nTOTAL 6.48\n01/20/2025",
+      },
+      {
+        role: "assistant",
+        content: '{"merchant": "WALMART", "total": 6.48, "date": "01/20/2025"}',
+      },
+      { role: "user", content: `Extract data from this receipt:\n\n${text}` },
+    ],
+  ];
 
 /**
  * Use the LLM to extract structured data from OCR text.
@@ -217,14 +228,17 @@ async function extractWithLLM(rawText: string): Promise<{
 
   for (let attempt = 0; attempt < MAX_LLM_ATTEMPTS; attempt++) {
     try {
-      const prompt = LLM_PROMPTS[attempt](rawText);
+      const messages = LLM_MESSAGES[attempt](rawText);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const result = await llmPipeline(prompt, {
+      const result = await llmPipeline(messages, {
         max_new_tokens: 128,
-        do_sample: attempt > 0, // use sampling on retries for variety
+        do_sample: attempt > 0,
         temperature: attempt > 0 ? 0.3 : undefined,
+        return_full_text: false,
       });
+
+      // text-generation pipeline returns [{generated_text: "..."}]
 
       const generated: string = Array.isArray(result)
         ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
