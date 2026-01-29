@@ -91,10 +91,13 @@ async function loadModel() {
 
     self.postMessage({ type: "ready" } satisfies WorkerResponse);
   } catch (error) {
+    const message =
+      error instanceof Error
+        ? `${error.message}\n${error.stack ?? ""}`
+        : String(error);
     self.postMessage({
       type: "error",
-      error:
-        error instanceof Error ? error.message : "Failed to load OCR model",
+      error: message,
     } satisfies WorkerResponse);
   }
 }
@@ -138,9 +141,13 @@ async function processImage(imageData: ArrayBuffer) {
       },
     } satisfies WorkerResponse);
   } catch (error) {
+    const message =
+      error instanceof Error
+        ? `${error.message}\n${error.stack ?? ""}`
+        : String(error);
     self.postMessage({
       type: "error",
-      error: error instanceof Error ? error.message : "Failed to process image",
+      error: message,
     } satisfies WorkerResponse);
   }
 }
