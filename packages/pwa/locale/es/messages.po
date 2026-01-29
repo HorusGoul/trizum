@@ -621,7 +621,7 @@ msgstr "Libra de Gibraltar"
 msgid "Go back"
 msgstr "Volver"
 
-#: src/components/BackButton.tsx:20
+#: src/components/BackButton.tsx:21
 msgid "Go Back"
 msgstr "Volver"
 

@@ -31,6 +31,7 @@ const colorSchemes: Record<
   },
 };
 
+/** @renders {AriaButton} */
 export function Button({
   className,
   color = "transparent",

@@ -1,6 +1,7 @@
 import { Button, type ButtonProps } from "react-aria-components";
 import { cn } from "#src/ui/utils.js";
 
+/** @renders {Button} */
 export function CardButton({ className, children, ...props }: ButtonProps) {
   return (
     <Button

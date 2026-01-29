@@ -5,6 +5,7 @@ import {
 } from "react-aria-components";
 import { cn } from "./utils";
 
+/** @renders {AriaMenu} */
 export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
   return (
     <AriaMenu
@@ -17,6 +18,7 @@ export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
   );
 }
 
+/** @renders {AriaMenuItem} */
 export function MenuItem<T extends object>({
   className,
   ...props

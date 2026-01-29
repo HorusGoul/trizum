@@ -6,6 +6,7 @@ import {
   type ToOptions,
 } from "@tanstack/react-router";
 
+/** @renders {IconButton} */
 export function BackButton({
   fallbackOptions,
 }: {

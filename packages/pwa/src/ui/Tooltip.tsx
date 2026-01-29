@@ -9,6 +9,7 @@ import { cn } from "./utils";
 
 const TooltipTrigger = AriaTooltipTrigger;
 
+/** @renders {AriaTooltip} */
 const Tooltip = ({ className, offset = 4, ...props }: AriaTooltipProps) => (
   <AriaTooltip
     offset={offset}

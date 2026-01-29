@@ -20,6 +20,7 @@ import { FieldError, Label } from "./Field";
 const TextField = AriaTextField;
 const NumberField = AriaNumberField;
 
+/** @renders {AriaInput} */
 const Input = ({ className, ...props }: AriaInputProps) => {
   return (
     <AriaInput
@@ -40,6 +41,7 @@ const Input = ({ className, ...props }: AriaInputProps) => {
   );
 };
 
+/** @renders {AriaTextArea} */
 const TextArea = ({ className, ...props }: AriaTextAreaProps) => {
   return (
     <AriaTextArea
@@ -67,6 +69,7 @@ interface AppTextFieldProps extends AriaTextFieldProps {
   textArea?: boolean;
 }
 
+/** @renders {TextField} */
 function AppTextField({
   label,
   description,
@@ -105,6 +108,7 @@ export interface AppNumberFieldProps extends AriaNumberFieldProps {
   inputMode?: "decimal" | "numeric";
 }
 
+/** @renders {NumberField} */
 function AppNumberField({
   label,
   description,
@@ -147,6 +151,7 @@ interface AppCurrencyFieldProps
   currency?: string;
 }
 
+/** @renders {TextField} */
 function AppCurrencyField({
   label,
   description,

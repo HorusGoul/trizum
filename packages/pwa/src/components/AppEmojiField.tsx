@@ -17,6 +17,7 @@ interface AppEmojiFieldProps extends AriaTextFieldProps {
   visuallyHideLabel?: boolean;
 }
 
+/** @renders {TextField} */
 export function AppEmojiField({
   label,
   description,

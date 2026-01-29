@@ -4,6 +4,7 @@ import { CurrencyContext } from "./CurrencyContext";
 
 export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField>;
 
+/** @renders {AppCurrencyField} */
 export function CurrencyField({ ...props }: CurrencyFieldProps) {
   const currency = use(CurrencyContext);
 
