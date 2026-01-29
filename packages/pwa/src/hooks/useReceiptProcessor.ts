@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ExtractedReceiptData } from "#src/lib/receiptExtraction.js";
-import { getApiOrigin } from "#src/lib/link.js";
+import { getAppLink } from "#src/lib/link.js";
 
 type ProcessorStatus = "idle" | "loading" | "ready" | "processing" | "error";
 
@@ -83,10 +83,10 @@ export function useReceiptProcessor(): UseReceiptProcessorResult {
       { type: "module" },
     );
 
-    // Send API origin so the worker can proxy HuggingFace requests
+    // Send HF proxy base URL so the worker routes model downloads through our API
     workerRef.current.postMessage({
       type: "configure",
-      apiOrigin: getApiOrigin(),
+      hfProxyUrl: getAppLink("/api/hf/models/"),
     });
 
     // Set up message handler

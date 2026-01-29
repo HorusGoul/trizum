@@ -7,7 +7,7 @@ env.useBrowserCache = true;
 
 interface ConfigureMessage {
   type: "configure";
-  apiOrigin: string;
+  hfProxyUrl: string;
 }
 
 interface ProcessImageMessage {
@@ -238,8 +238,8 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   switch (message.type) {
     case "configure":
       // Proxy HuggingFace requests through our Cloudflare Worker to avoid CORS issues.
-      // The API origin is sent from the main thread so it works in both web and Capacitor mobile builds.
-      env.remoteHost = `${message.apiOrigin}/api/hf/models/`;
+      // The URL is sent from the main thread so it works across web, previews, and mobile builds.
+      env.remoteHost = message.hfProxyUrl;
       env.remotePathTemplate = "{model}/resolve/{revision}/";
       break;
     case "load":
