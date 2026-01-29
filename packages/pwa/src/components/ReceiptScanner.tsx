@@ -216,11 +216,11 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
   // Check if model has been downloaded before (cached in IndexedDB)
   function hasModelBeenDownloaded(): boolean {
     // Check localStorage flag that we set after first successful download
-    return localStorage.getItem("trizum-ai-models-v3-downloaded") === "true";
+    return localStorage.getItem("trizum-ai-models-v4-downloaded") === "true";
   }
 
   function markModelAsDownloaded() {
-    localStorage.setItem("trizum-ai-models-v3-downloaded", "true");
+    localStorage.setItem("trizum-ai-models-v4-downloaded", "true");
   }
 
   async function doProcess() {
@@ -395,7 +395,7 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
                 </div>
                 <p className="text-sm text-accent-300">
                   <Trans>
-                    To scan receipts, we need to download AI models (~800MB).
+                    To scan receipts, we need to download AI models (~300MB).
                     This only happens once and all processing runs locally on
                     your device for privacy.
                   </Trans>

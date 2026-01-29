@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
-  Florence2ForConditionalGeneration,
-  AutoProcessor,
   AutoTokenizer,
   AutoModelForCausalLM,
-  RawImage,
   env,
 } from "@huggingface/transformers";
+import Tesseract from "tesseract.js";
 
-// Configure transformers.js
+// Configure transformers.js (for LLM only)
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-const OCR_MODEL_ID = "onnx-community/Florence-2-base-ft";
 const LLM_MODEL_ID = "onnx-community/Qwen2.5-0.5B-Instruct";
 
 interface ConfigureMessage {
@@ -63,16 +60,13 @@ interface ErrorEvent {
 
 type WorkerResponse = ProgressEvent | ReadyEvent | ResultEvent | ErrorEvent;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let ocrModel: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let ocrProcessor: any = null;
+let ocrWorker: Tesseract.Worker | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let llmModel: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let llmTokenizer: any = null;
 
-function makeProgressCallback(model: "ocr" | "llm") {
+function makeLLMProgressCallback() {
   return (progress: {
     status: string;
     name?: string;
@@ -83,7 +77,7 @@ function makeProgressCallback(model: "ocr" | "llm") {
   }) => {
     self.postMessage({
       type: "progress",
-      model,
+      model: "llm",
       status: progress.status,
       name: progress.name,
       file: progress.file,
@@ -94,31 +88,36 @@ function makeProgressCallback(model: "ocr" | "llm") {
   };
 }
 
+function makeTesseractLogger() {
+  return (message: Tesseract.LoggerMessage) => {
+    self.postMessage({
+      type: "progress",
+      model: "ocr",
+      // Map tesseract's "recognizing text" to "progress" for consistency with the UI
+      status:
+        message.status === "recognizing text" ? "progress" : message.status,
+      progress: message.progress * 100, // tesseract reports 0-1, our UI expects 0-100
+    } satisfies WorkerResponse);
+  };
+}
+
 async function loadModel() {
-  if (ocrModel && ocrProcessor && llmModel && llmTokenizer) {
+  if (ocrWorker && llmModel && llmTokenizer) {
     self.postMessage({ type: "ready" } satisfies WorkerResponse);
     return;
   }
 
   try {
-    const ocrProgressCb = makeProgressCallback("ocr");
-    const llmProgressCb = makeProgressCallback("llm");
-
-    // Load Florence-2 OCR model + processor in parallel
-    if (!ocrModel || !ocrProcessor) {
-      [ocrModel, ocrProcessor] = await Promise.all([
-        Florence2ForConditionalGeneration.from_pretrained(OCR_MODEL_ID, {
-          dtype: "fp32",
-          progress_callback: ocrProgressCb,
-        }),
-        AutoProcessor.from_pretrained(OCR_MODEL_ID, {
-          progress_callback: ocrProgressCb,
-        }),
-      ]);
+    // Load tesseract.js OCR worker
+    if (!ocrWorker) {
+      ocrWorker = await Tesseract.createWorker("eng", undefined, {
+        logger: makeTesseractLogger(),
+      });
     }
 
     // Load Qwen2.5 LLM model + tokenizer in parallel
     if (!llmModel || !llmTokenizer) {
+      const llmProgressCb = makeLLMProgressCallback();
       [llmModel, llmTokenizer] = await Promise.all([
         AutoModelForCausalLM.from_pretrained(LLM_MODEL_ID, {
           dtype: "q4f16",
@@ -144,44 +143,16 @@ async function loadModel() {
 }
 
 /**
- * Run Florence-2 OCR on an image to extract text.
+ * Run tesseract.js OCR on an image to extract text.
  */
 async function runOCR(imageData: ArrayBuffer): Promise<string> {
-  const blob = new Blob([imageData], { type: "image/jpeg" });
-  const url = URL.createObjectURL(blob);
-
-  try {
-    const image = await RawImage.fromURL(url);
-    const task = "<OCR>";
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const prompts = ocrProcessor.construct_prompts(task);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const inputs = await ocrProcessor(image, prompts);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const generatedIds = await ocrModel.generate({
-      ...inputs,
-      max_new_tokens: 1024,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const decoded: string[] = ocrProcessor.batch_decode(generatedIds, {
-      skip_special_tokens: false,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    const result = ocrProcessor.post_process_generation(
-      decoded[0],
-      task,
-      image.size,
-    );
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return (result[task] as string) ?? decoded[0] ?? "";
-  } finally {
-    URL.revokeObjectURL(url);
+  if (!ocrWorker) {
+    throw new Error("Tesseract worker not initialized");
   }
+
+  const blob = new Blob([imageData], { type: "image/jpeg" });
+  const result = await ocrWorker.recognize(blob);
+  return result.data.text;
 }
 
 /**
@@ -346,7 +317,7 @@ async function extractWithLLM(rawText: string): Promise<{
 }
 
 async function processImage(imageData: ArrayBuffer) {
-  if (!ocrModel || !ocrProcessor) {
+  if (!ocrWorker) {
     self.postMessage({
       type: "error",
       error: "Model not loaded",
@@ -355,7 +326,7 @@ async function processImage(imageData: ArrayBuffer) {
   }
 
   try {
-    // Run Florence-2 OCR on the image
+    // Run tesseract.js OCR on the image
     const rawText = await runOCR(imageData);
 
     // Extract structured data using LLM (retries on parse failure)

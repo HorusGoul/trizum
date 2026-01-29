@@ -1742,6 +1742,10 @@ msgstr "El título debe tener menos de 50 caracteres"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
+#: src/components/ReceiptScanner.tsx:397
+msgid "To scan receipts, we need to download AI models (~300MB). This only happens once and all processing runs locally on your device for privacy."
+msgstr ""
+
 #: src/components/ReceiptScanner.tsx:392
 msgid "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
 msgstr ""
