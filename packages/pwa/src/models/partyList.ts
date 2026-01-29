@@ -14,6 +14,8 @@ export interface PartyList {
   avatarId?: DocumentId | null;
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
+  /** Enable AI-powered features like receipt scanning. Defaults to true. */
+  enableAIFeatures?: boolean;
   lastOpenedPartyId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;

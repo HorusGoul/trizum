@@ -15,6 +15,32 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 const ReactCompilerConfig = {};
 
+/**
+ * Rolldown converts `new.target` into an `import.meta`-based polyfill. In web
+ * workers `import.meta` becomes `{url: self.location.href}`, so
+ * `new.target.prototype` resolves to `undefined` and throws
+ * "Object prototype may only be an Object or null".
+ *
+ * This rewrites the one problematic pattern in @huggingface/transformers'
+ * Callable class before the bundler sees it.
+ */
+function fixNewTargetInWorker(): Plugin {
+  return {
+    name: "fix-new-target-in-worker",
+    transform(code, id) {
+      if (!id.includes("@huggingface/transformers")) return;
+      if (!code.includes("new.target.prototype")) return;
+      return {
+        code: code.replaceAll(
+          "new.target.prototype",
+          "this.constructor.prototype",
+        ),
+        map: null,
+      };
+    },
+  };
+}
+
 // Read package.json version
 const packageJson = JSON.parse(
   readFileSync(path.resolve(__dirname, "package.json"), "utf-8"),
@@ -47,6 +73,12 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: true,
       minify: true,
+    },
+    optimizeDeps: {
+      exclude: ["onnxruntime-web"],
+    },
+    worker: {
+      plugins: [fixNewTargetInWorker()],
     },
     plugins: [
       cloudflare(),

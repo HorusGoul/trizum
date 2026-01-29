@@ -33,6 +33,7 @@
     "@fontsource-variable/fira-code": "5.2.7",
     "@fontsource-variable/inter": "5.2.8",
     "@horus.dev/tw-dynamic-themes": "0.0.3",
+    "@huggingface/transformers": "3.8.1",
     "@internationalized/date": "3.10.0",
     "@lingui/core": "5.8.0",
     "@lingui/react": "5.8.0",
@@ -64,6 +65,7 @@
     "sonner": "2.0.7",
     "suspense": "0.1.0",
     "tailwind-merge": "2.6.0",
+    "tesseract.js": "7.0.0",
     "ulidx": "2.4.1",
     "workbox-build": "7.4.0",
     "workbox-window": "7.4.0"
