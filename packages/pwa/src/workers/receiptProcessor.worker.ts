@@ -361,6 +361,19 @@ async function processImage(imageData: ArrayBuffer) {
     // Extract structured data using LLM (retries on parse failure)
     const extractedData = await extractWithLLM(rawText);
 
+    // If no meaningful data was extracted, report an error
+    if (
+      !extractedData.merchant &&
+      extractedData.total === null &&
+      !extractedData.date
+    ) {
+      self.postMessage({
+        type: "error",
+        error: "no_receipt_found",
+      } satisfies WorkerResponse);
+      return;
+    }
+
     self.postMessage({
       type: "result",
       data: {

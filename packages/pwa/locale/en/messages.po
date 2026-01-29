@@ -114,7 +114,7 @@ msgstr "Amount for {0}"
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
-#: src/components/ReceiptScanner.tsx:462
+#: src/components/ReceiptScanner.tsx:467
 msgid "Analyzing receipt..."
 msgstr "Analyzing receipt..."
 
@@ -288,8 +288,8 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Canadian Dollar"
 msgstr "Canadian Dollar"
 
-#: src/components/ReceiptScanner.tsx:409
-#: src/components/ReceiptScanner.tsx:516
+#: src/components/ReceiptScanner.tsx:414
+#: src/components/ReceiptScanner.tsx:521
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -297,7 +297,7 @@ msgstr "Cancel"
 msgid "Cape Verdean Escudo"
 msgstr "Cape Verdean Escudo"
 
-#: src/components/ReceiptScanner.tsx:522
+#: src/components/ReceiptScanner.tsx:527
 msgid "Capture photo"
 msgstr "Capture photo"
 
@@ -486,15 +486,15 @@ msgstr "Djiboutian Franc"
 msgid "Dominican Peso"
 msgstr "Dominican Peso"
 
-#: src/components/ReceiptScanner.tsx:416
+#: src/components/ReceiptScanner.tsx:421
 msgid "Download"
 msgstr "Download"
 
-#: src/components/ReceiptScanner.tsx:388
+#: src/components/ReceiptScanner.tsx:393
 msgid "Download AI Model?"
 msgstr "Download AI Model?"
 
-#: src/components/ReceiptScanner.tsx:317
+#: src/components/ReceiptScanner.tsx:322
 msgid "Downloading extraction model..."
 msgstr "Downloading extraction model..."
 
@@ -506,7 +506,7 @@ msgstr "Downloading model: {percent}%"
 msgid "Downloading model..."
 msgstr "Downloading model..."
 
-#: src/components/ReceiptScanner.tsx:318
+#: src/components/ReceiptScanner.tsx:323
 msgid "Downloading OCR model..."
 msgstr "Downloading OCR model..."
 
@@ -640,7 +640,7 @@ msgstr "Failed to copy party link to clipboard, please copy it manually"
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Failed to copy phone number to clipboard, please copy it manually"
 
-#: src/components/ReceiptScanner.tsx:264
+#: src/components/ReceiptScanner.tsx:269
 msgid "Failed to load AI model"
 msgstr "Failed to load AI model"
 
@@ -656,7 +656,7 @@ msgstr "Failed to load licenses. Please try again later."
 msgid "Failed to mark expense as paid"
 msgstr "Failed to mark expense as paid"
 
-#: src/components/ReceiptScanner.tsx:245
+#: src/components/ReceiptScanner.tsx:247
 msgid "Failed to process receipt"
 msgstr "Failed to process receipt"
 
@@ -857,7 +857,7 @@ msgstr "Indian Rupee"
 msgid "Indonesian Rupiah"
 msgstr "Indonesian Rupiah"
 
-#: src/components/ReceiptScanner.tsx:322
+#: src/components/ReceiptScanner.tsx:327
 msgid "Initializing extraction model..."
 msgstr "Initializing extraction model..."
 
@@ -865,7 +865,7 @@ msgstr "Initializing extraction model..."
 msgid "Initializing model..."
 msgstr "Initializing model..."
 
-#: src/components/ReceiptScanner.tsx:323
+#: src/components/ReceiptScanner.tsx:328
 msgid "Initializing OCR model..."
 msgstr "Initializing OCR model..."
 
@@ -993,11 +993,11 @@ msgstr "Link or code"
 msgid "Links"
 msgstr "Links"
 
-#: src/components/ReceiptScanner.tsx:432
+#: src/components/ReceiptScanner.tsx:437
 msgid "Loading AI model..."
 msgstr "Loading AI model..."
 
-#: src/components/ReceiptScanner.tsx:309
+#: src/components/ReceiptScanner.tsx:314
 msgid "Loading AI models..."
 msgstr "Loading AI models..."
 
@@ -1188,6 +1188,10 @@ msgstr "No currency"
 #: src/components/EmojiPicker.tsx:274
 msgid "No emoji found"
 msgstr "No emoji found"
+
+#: src/components/ReceiptScanner.tsx:244
+msgid "No receipt found in the photo. Please try again with a clearer image of a receipt."
+msgstr "No receipt found in the photo. Please try again with a clearer image of a receipt."
 
 #: src/routes/index.tsx:93
 msgid "No updates available"
@@ -1428,7 +1432,7 @@ msgstr "Receipt Attachments"
 msgid "Receipt scanned successfully"
 msgstr "Receipt scanned successfully"
 
-#: src/components/ReceiptScanner.tsx:479
+#: src/components/ReceiptScanner.tsx:484
 msgid "Receipt scanned!"
 msgstr "Receipt scanned!"
 
@@ -1461,7 +1465,7 @@ msgstr "Report Issues"
 msgid "Restore"
 msgstr "Restore"
 
-#: src/components/ReceiptScanner.tsx:543
+#: src/components/ReceiptScanner.tsx:548
 msgid "Retake"
 msgstr "Retake"
 
@@ -1510,7 +1514,7 @@ msgstr "Saudi Riyal"
 msgid "Save"
 msgstr "Save"
 
-#: src/components/ReceiptScanner.tsx:552
+#: src/components/ReceiptScanner.tsx:557
 msgid "Scan"
 msgstr "Scan"
 
@@ -1659,7 +1663,7 @@ msgstr "Sri Lankan Rupee"
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
-#: src/components/ReceiptScanner.tsx:370
+#: src/components/ReceiptScanner.tsx:375
 msgid "Starting camera..."
 msgstr "Starting camera..."
 
@@ -1822,7 +1826,7 @@ msgstr "To join the <0>{0}</0>, please select who you are so that we can show yo
 msgid "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
 msgstr "To scan receipts, we need to download AI models (~500MB). This only happens once and all processing runs locally on your device for privacy."
 
-#: src/components/ReceiptScanner.tsx:392
+#: src/components/ReceiptScanner.tsx:397
 msgid "To scan receipts, we need to download AI models (~800MB). This only happens once and all processing runs locally on your device for privacy."
 msgstr "To scan receipts, we need to download AI models (~800MB). This only happens once and all processing runs locally on your device for privacy."
 
@@ -1862,7 +1866,7 @@ msgstr "Trinidad and Tobago Dollar"
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 
-#: src/components/ReceiptScanner.tsx:499
+#: src/components/ReceiptScanner.tsx:504
 msgid "Try again"
 msgstr "Try again"
 
@@ -2019,7 +2023,7 @@ msgstr "Viewing as {0}"
 msgid "Warning: Split amounts don't match total expense"
 msgstr "Warning: Split amounts don't match total expense"
 
-#: src/components/ReceiptScanner.tsx:399
+#: src/components/ReceiptScanner.tsx:404
 msgid "We recommend using Wi-Fi to avoid mobile data charges."
 msgstr "We recommend using Wi-Fi to avoid mobile data charges."
 

@@ -239,10 +239,15 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
       }, 500);
     } catch (err) {
       console.error("Processing error:", err);
+      const errorMessage =
+        err instanceof Error && err.message === "no_receipt_found"
+          ? t`No receipt found in the photo. Please try again with a clearer image of a receipt.`
+          : err instanceof Error
+            ? err.message
+            : t`Failed to process receipt`;
       setState({
         status: "error",
-        message:
-          err instanceof Error ? err.message : t`Failed to process receipt`,
+        message: errorMessage,
       });
     }
   }
@@ -309,14 +314,14 @@ export function ReceiptScanner({ onResult }: ReceiptScannerProps) {
       let message = t`Loading AI models...`;
       let downloadProgress: number | undefined;
 
-      if (progress.status === "download" && progress.progress !== undefined) {
+      if (progress.status === "progress" && progress.progress !== undefined) {
         const percent = Math.round(progress.progress);
         downloadProgress = percent;
         message =
           progress.model === "llm"
             ? t`Downloading extraction model...`
             : t`Downloading OCR model...`;
-      } else if (progress.status === "init") {
+      } else if (progress.status === "initiate") {
         message =
           progress.model === "llm"
             ? t`Initializing extraction model...`
