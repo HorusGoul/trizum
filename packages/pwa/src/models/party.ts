@@ -11,7 +11,6 @@ export interface Party {
   symbol?: string;
   description: string;
   currency: Currency;
-  hue?: number;
   participants: Record<ExpenseUser, PartyParticipant>;
   chunkRefs: PartyExpenseChunkRef[];
 }

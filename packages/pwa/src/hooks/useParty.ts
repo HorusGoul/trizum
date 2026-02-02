@@ -104,7 +104,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function updateSettings(
     values: Pick<
       Party,
-      "name" | "symbol" | "description" | "participants" | "hue"
+      "name" | "symbol" | "description" | "participants"
     >,
   ) {
     handle.change((doc) => {
@@ -112,7 +112,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       doc.symbol = values.symbol;
       doc.description = values.description;
       doc.participants = values.participants;
-      doc.hue = values.hue;
     });
   }
 

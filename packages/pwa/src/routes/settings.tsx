@@ -17,6 +17,9 @@ import type { MediaFile } from "#src/models/media.ts";
 import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { SwitchField } from "#src/components/SwitchField.tsx";
+import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
+import { Label } from "#src/ui/Field.tsx";
+import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -28,6 +31,7 @@ interface SettingsFormValues {
   avatarId: MediaFile["id"] | null;
   locale: SupportedLocale | "system";
   openLastPartyOnLaunch: boolean;
+  hue: number;
 }
 
 interface LocaleOption {
@@ -52,6 +56,7 @@ function Settings() {
       avatarId: values.avatarId,
       locale: values.locale === "system" ? undefined : values.locale,
       openLastPartyOnLaunch: values.openLastPartyOnLaunch,
+      hue: values.hue,
     });
     form.reset();
     toast.success(t`Settings saved`);
@@ -65,6 +70,7 @@ function Settings() {
       avatarId: partyList.avatarId ?? null,
       locale: partyList.locale ?? ("system" as const),
       openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
+      hue: partyList.hue ?? defaultThemeHue,
     },
     onSubmit: ({ value }) => {
       onSaveSettings(value);
@@ -212,6 +218,29 @@ function Settings() {
               isSelected={field.state.value}
               onChange={field.handleChange}
             />
+          )}
+        </form.Field>
+
+        <form.Field name="hue">
+          {(field) => (
+            <div className="flex flex-col gap-2">
+              <Label htmlFor={field.name}>{t`Color`}</Label>
+              <ColorSlider
+                id={field.name}
+                value={`hsl(${field.state.value}, 100%, 50%)`}
+                onChange={(value) => {
+                  const hue = value.getChannelValue("hue");
+                  field.setValue(hue);
+                  setThemeHue(hue);
+                }}
+                channel="hue"
+                className="w-full"
+              >
+                <SliderTrack className="w-full">
+                  <ColorThumb className="top-1/2" />
+                </SliderTrack>
+              </ColorSlider>
+            </div>
           )}
         </form.Field>
       </form>

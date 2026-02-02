@@ -19,7 +19,6 @@ import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
 import { preloadAllIcons } from "./preloadIcons.gen.js";
-import { PartyTheme } from "./components/PartyTheme.tsx";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
@@ -28,7 +27,7 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { isNonNull } from "./lib/isNonNull.ts";
@@ -198,12 +197,5 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  return (
-    <>
-      <Suspense fallback={null}>
-        <PartyTheme />
-      </Suspense>
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

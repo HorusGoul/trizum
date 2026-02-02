@@ -9,6 +9,7 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
+import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 
 export function usePartyList() {
   const repo = useRepo();
@@ -23,6 +24,10 @@ export function usePartyList() {
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());
   }, [partyList.locale]);
+
+  useEffect(() => {
+    setThemeHue(partyList.hue ?? defaultThemeHue);
+  }, [partyList.hue]);
 
   function addPartyToList(
     partyId: Party["id"],
@@ -61,7 +66,7 @@ export function usePartyList() {
   function updateSettings(
     values: Pick<
       PartyList,
-      "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch"
+      "username" | "phone" | "avatarId" | "locale" | "openLastPartyOnLaunch" | "hue"
     >,
   ) {
     partyListHandle.change((list) => {
@@ -74,6 +79,7 @@ export function usePartyList() {
         delete list["locale"];
       }
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
+      list.hue = values.hue;
     });
 
     void updateAllParties();
