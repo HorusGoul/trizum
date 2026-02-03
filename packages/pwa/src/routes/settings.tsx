@@ -224,7 +224,7 @@ function Settings() {
         <form.Field name="hue">
           {(field) => (
             <div className="flex flex-col gap-2">
-              <Label htmlFor={field.name}>{t`Color`}</Label>
+              <Label htmlFor={field.name}>{t`Accent color`}</Label>
               <ColorSlider
                 id={field.name}
                 value={`hsl(${field.state.value}, 100%, 50%)`}

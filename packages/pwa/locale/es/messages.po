@@ -50,6 +50,10 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
+#: src/routes/settings.tsx:227
+msgid "Accent color"
+msgstr "Color de acento"
+
 #: src/routes/new.tsx:598
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
