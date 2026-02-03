@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.6.0
+
+### Minor Changes
+
+- 7e08bca: Move color theme selector from party settings to global user settings. The accent color is now a user-wide preference instead of per-party.
+
 ## 1.5.1
 
 ### Patch Changes
