@@ -6,6 +6,7 @@ import {
 
 import { cn } from "./utils";
 
+/** @renders {AriaSwitch} */
 const Switch = ({ children, className, ...props }: AriaSwitchProps) => (
   <AriaSwitch
     className={composeRenderProps(className, (className) =>

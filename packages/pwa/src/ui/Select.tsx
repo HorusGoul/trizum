@@ -35,6 +35,7 @@ const SelectSection = ListBoxSection;
 
 const SelectCollection = ListBoxCollection;
 
+/** @renders {AriaSelectValue} */
 const SelectValue = <T extends object>({
   className,
   ...props
@@ -52,6 +53,7 @@ const SelectValue = <T extends object>({
   />
 );
 
+/** @renders {AriaButton} */
 const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
   <AriaButton
     className={composeRenderProps(className, (className) =>
@@ -77,6 +79,7 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
   </AriaButton>
 );
 
+/** @renders {Popover} */
 const SelectPopover = ({ className, ...props }: AriaPopoverProps) => (
   <Popover
     className={composeRenderProps(className, (className) =>
@@ -86,6 +89,7 @@ const SelectPopover = ({ className, ...props }: AriaPopoverProps) => (
   />
 );
 
+/** @renders {AriaListBox} */
 const SelectListBox = <T extends object>({
   className,
   ...props
@@ -110,6 +114,7 @@ interface AppSelectProps<T extends object>
   children: React.ReactNode | ((item: T) => React.ReactNode);
 }
 
+/** @renders {Select} */
 function AppSelect<T extends object>({
   label,
   description,
