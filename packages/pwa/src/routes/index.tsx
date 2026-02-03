@@ -271,9 +271,7 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
         )
       }
     >
-      <div
-        className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent-600 text-sm font-semibold text-white"
-      >
+      <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent-600 text-sm font-semibold text-white">
         <span className="pt-0.5">{symbolOrFirstLetter}</span>
       </div>
       <div className="flex flex-1 flex-col gap-0.5">

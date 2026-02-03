@@ -102,10 +102,7 @@ export function useCurrentParty() {
 
 export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function updateSettings(
-    values: Pick<
-      Party,
-      "name" | "symbol" | "description" | "participants"
-    >,
+    values: Pick<Party, "name" | "symbol" | "description" | "participants">,
   ) {
     handle.change((doc) => {
       doc.name = values.name;
