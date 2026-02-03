@@ -42,13 +42,17 @@ msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
 #: src/routes/about.tsx:20
-#: src/routes/index.tsx:157
+#: src/routes/index.tsx:156
 msgid "About"
 msgstr "Acerca de"
 
 #: src/routes/support.tsx:124
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
+
+#: src/routes/settings.tsx:227
+msgid "Accent color"
+msgstr "Color de acento"
 
 #: src/routes/new.tsx:598
 msgid "ADB Unit of Account"
@@ -59,17 +63,17 @@ msgstr "Unidad de Cuenta del BAsD"
 msgid "Add an expense"
 msgstr "Añadir un gasto"
 
-#: src/routes/index.tsx:180
+#: src/routes/index.tsx:179
 #: src/routes/party.$partyId.tsx:407
 msgid "Add or create"
 msgstr "Añadir o crear"
 
 #: src/routes/new.tsx:399
-#: src/routes/party_.$partyId.settings.tsx:444
+#: src/routes/party_.$partyId.settings.tsx:415
 msgid "Add participant"
 msgstr "Añadir participante"
 
-#: src/routes/index.tsx:484
+#: src/routes/index.tsx:477
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
@@ -110,7 +114,7 @@ msgstr "La cantidad debe ser mayor que 0"
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/routes/party_.$partyId.settings.tsx:362
+#: src/routes/party_.$partyId.settings.tsx:333
 msgid "Archive"
 msgstr "Archivar"
 
@@ -118,7 +122,7 @@ msgstr "Archivar"
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/party_.$partyId.settings.tsx:453
+#: src/routes/party_.$partyId.settings.tsx:424
 msgid "Archived participants"
 msgstr "Participantes archivados"
 
@@ -135,7 +139,7 @@ msgid "Aruban Florin"
 msgstr "Florín Arubeño"
 
 #: src/routes/new.tsx:290
-#: src/routes/party_.$partyId.settings.tsx:286
+#: src/routes/party_.$partyId.settings.tsx:257
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
@@ -147,7 +151,7 @@ msgstr "Adjuntos"
 msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
-#: src/routes/settings.tsx:207
+#: src/routes/settings.tsx:213
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -291,7 +295,7 @@ msgstr "Franco CFP"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/index.tsx:142
+#: src/routes/index.tsx:141
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
@@ -332,7 +336,7 @@ msgstr "Peso Colombiano"
 msgid "Colombian Real Value Unit"
 msgstr "Unidad de Valor Real Colombiana"
 
-#: src/routes/party_.$partyId.settings.tsx:240
+#: src/routes/settings.tsx:227
 msgid "Color"
 msgstr "Color"
 
@@ -340,11 +344,11 @@ msgstr "Color"
 msgid "Comorian Franc"
 msgstr "Franco Comorense"
 
-#: src/routes/index.tsx:481
+#: src/routes/index.tsx:474
 msgid "Complete your profile"
 msgstr "Completa tu perfil"
 
-#: src/routes/index.tsx:446
+#: src/routes/index.tsx:439
 msgid "Configure Profile"
 msgstr "Configurar perfil"
 
@@ -372,8 +376,8 @@ msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicació
 msgid "Costa Rican Colón"
 msgstr "Colón Costarricense"
 
-#: src/routes/index.tsx:205
-#: src/routes/index.tsx:347
+#: src/routes/index.tsx:204
+#: src/routes/index.tsx:340
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -420,7 +424,7 @@ msgid "Delete"
 msgstr "Eliminar"
 
 #: src/routes/new.tsx:234
-#: src/routes/party_.$partyId.settings.tsx:220
+#: src/routes/party_.$partyId.settings.tsx:214
 msgid "Description"
 msgstr "Descripción"
 
@@ -469,11 +473,11 @@ msgstr "Soporte por email"
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
-#: src/routes/settings.tsx:44
+#: src/routes/settings.tsx:48
 msgid "English"
 msgstr "Inglés"
 
-#: src/routes/index.tsx:383
+#: src/routes/index.tsx:376
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
@@ -485,7 +489,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
-#: src/routes/settings.tsx:45
+#: src/routes/settings.tsx:49
 msgid "Español"
 msgstr "Español"
 
@@ -585,7 +589,7 @@ msgstr "Características"
 msgid "Fijian Dollar"
 msgstr "Dólar Fiyiano"
 
-#: src/routes/settings.tsx:166
+#: src/routes/settings.tsx:172
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -674,7 +678,7 @@ msgid "Hong Kong Dollar"
 msgstr "Dólar de Hong Kong"
 
 #: src/routes/new.tsx:187
-#: src/routes/party_.$partyId.settings.tsx:173
+#: src/routes/party_.$partyId.settings.tsx:167
 msgid "How do you want to call this party?"
 msgstr "¿Cómo quieres llamar a este grupo?"
 
@@ -718,7 +722,7 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
-#: src/routes/index.tsx:416
+#: src/routes/index.tsx:409
 msgid "Import your existing Tricount data"
 msgstr "Importa tu grupo de Tricount"
 
@@ -797,8 +801,8 @@ msgstr "Unirse"
 msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
-#: src/routes/index.tsx:195
-#: src/routes/index.tsx:380
+#: src/routes/index.tsx:194
+#: src/routes/index.tsx:373
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -826,7 +830,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:184
+#: src/routes/settings.tsx:190
 msgid "Language"
 msgstr "Idioma"
 
@@ -894,12 +898,11 @@ msgstr "Ringgit Malasio"
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
-#: src/components/PartyTheme.tsx:26
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:166
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
-#: src/routes/party_.$partyId.settings.tsx:266
+#: src/routes/party_.$partyId.settings.tsx:237
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden ser archivados."
 
@@ -926,7 +929,7 @@ msgstr "Rupia de Mauricio"
 msgid "Me"
 msgstr "Yo"
 
-#: src/routes/index.tsx:112
+#: src/routes/index.tsx:111
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:103
 #: src/routes/party.$partyId.tsx:227
 msgid "Menu"
@@ -940,8 +943,8 @@ msgstr "Unidad de Inversión Mexicana"
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
-#: src/routes/index.tsx:215
-#: src/routes/index.tsx:413
+#: src/routes/index.tsx:214
+#: src/routes/index.tsx:406
 #: src/routes/migrate_.tricount.tsx:161
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -983,7 +986,7 @@ msgid "Myanma Kyat"
 msgstr "Kyat Birmano"
 
 #: src/routes/new.tsx:186
-#: src/routes/party_.$partyId.settings.tsx:172
+#: src/routes/party_.$partyId.settings.tsx:166
 #: src/routes/party.$partyId.tsx:179
 msgid "Name"
 msgstr "Nombre"
@@ -1013,7 +1016,7 @@ msgid "New expense"
 msgstr "Nuevo gasto"
 
 #: src/routes/new.tsx:352
-#: src/routes/party_.$partyId.settings.tsx:397
+#: src/routes/party_.$partyId.settings.tsx:368
 msgid "New participant name"
 msgstr "Nombre del nuevo participante"
 
@@ -1085,7 +1088,7 @@ msgstr "Mostrar solo tus gastos"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:205
+#: src/routes/settings.tsx:211
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -1136,22 +1139,22 @@ msgstr "Kina de Papúa Nueva Guinea"
 msgid "Paraguayan Guarani"
 msgstr "Guaraní Paraguayo"
 
-#: src/routes/index.tsx:291
+#: src/routes/index.tsx:284
 msgid "participant"
 msgstr "participante"
 
 #: src/routes/new.tsx:318
-#: src/routes/party_.$partyId.settings.tsx:339
-#: src/routes/party_.$partyId.settings.tsx:472
+#: src/routes/party_.$partyId.settings.tsx:310
+#: src/routes/party_.$partyId.settings.tsx:443
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/routes/index.tsx:293
+#: src/routes/index.tsx:286
 msgid "participants"
 msgstr "participantes"
 
 #: src/routes/new.tsx:275
-#: src/routes/party_.$partyId.settings.tsx:262
+#: src/routes/party_.$partyId.settings.tsx:233
 msgid "Participants"
 msgstr "Participantes"
 
@@ -1163,11 +1166,11 @@ msgstr "Grupo creado"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/party_.$partyId.settings.tsx:127
+#: src/routes/party_.$partyId.settings.tsx:121
 msgid "Party Settings"
 msgstr "Configuración del Grupo"
 
-#: src/routes/party_.$partyId.settings.tsx:75
+#: src/routes/party_.$partyId.settings.tsx:70
 msgid "Party settings saved!"
 msgstr "¡Configuración del grupo guardada!"
 
@@ -1200,7 +1203,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:165
+#: src/routes/settings.tsx:171
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -1273,7 +1276,7 @@ msgid "Reload"
 msgstr "Recargar"
 
 #: src/routes/new.tsx:331
-#: src/routes/party_.$partyId.settings.tsx:353
+#: src/routes/party_.$partyId.settings.tsx:324
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -1293,7 +1296,7 @@ msgstr "Reportar un Problema"
 msgid "Report Issues"
 msgstr "Reportar problemas"
 
-#: src/routes/party_.$partyId.settings.tsx:486
+#: src/routes/party_.$partyId.settings.tsx:457
 msgid "Restore"
 msgstr "Restaurar"
 
@@ -1336,9 +1339,9 @@ msgstr "Riyal Saudí"
 #: src/components/ExpenseEditor.tsx:257
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:158
-#: src/routes/party_.$partyId.settings.tsx:144
+#: src/routes/party_.$partyId.settings.tsx:138
 #: src/routes/party_.$partyId.who.tsx:108
-#: src/routes/settings.tsx:99
+#: src/routes/settings.tsx:105
 msgid "Save"
 msgstr "Guardar"
 
@@ -1367,17 +1370,17 @@ msgstr "Envíanos un email y te responderemos lo antes posible."
 msgid "Serbian Dinar"
 msgstr "Dinar Serbio"
 
-#: src/routes/index.tsx:449
+#: src/routes/index.tsx:442
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/index.tsx:127
+#: src/routes/index.tsx:126
 #: src/routes/party.$partyId.tsx:304
-#: src/routes/settings.tsx:82
+#: src/routes/settings.tsx:88
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:57
+#: src/routes/settings.tsx:62
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -1455,7 +1458,7 @@ msgstr "Libra Sursudanesa"
 msgid "Special Drawing Rights"
 msgstr "Derechos Especiales de Giro"
 
-#: src/routes/index.tsx:314
+#: src/routes/index.tsx:307
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
 
@@ -1471,7 +1474,7 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 msgid "Sri Lankan Rupee"
 msgstr "Rupia de Sri Lanka"
 
-#: src/routes/index.tsx:350
+#: src/routes/index.tsx:343
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
@@ -1482,9 +1485,9 @@ msgstr "Enviar sugerencia"
 #: src/components/ExpenseEditor.tsx:257
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:158
-#: src/routes/party_.$partyId.settings.tsx:144
+#: src/routes/party_.$partyId.settings.tsx:138
 #: src/routes/party_.$partyId.who.tsx:108
-#: src/routes/settings.tsx:99
+#: src/routes/settings.tsx:105
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -1530,7 +1533,7 @@ msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
 #: src/routes/new.tsx:212
-#: src/routes/party_.$partyId.settings.tsx:198
+#: src/routes/party_.$partyId.settings.tsx:192
 msgid "Symbol"
 msgstr "Símbolo"
 
@@ -1550,7 +1553,7 @@ msgstr "Sincronizando información del grupo..."
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
-#: src/routes/settings.tsx:43
+#: src/routes/settings.tsx:47
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
@@ -1688,7 +1691,7 @@ msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
 #: src/components/UpdateController.tsx:26
-#: src/routes/index.tsx:97
+#: src/routes/index.tsx:96
 msgid "Update available"
 msgstr "Actualización disponible"
 
@@ -1745,7 +1748,7 @@ msgstr "Usa el modo personal para filtrar solo tus gastos."
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
-#: src/routes/settings.tsx:140
+#: src/routes/settings.tsx:146
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -1796,16 +1799,16 @@ msgstr "Viendo como {0}"
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/index.tsx:311
+#: src/routes/index.tsx:304
 msgid "Welcome to trizum"
 msgstr "Bienvenid@ a trizum"
 
 #: src/routes/new.tsx:235
-#: src/routes/party_.$partyId.settings.tsx:221
+#: src/routes/party_.$partyId.settings.tsx:215
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:141
+#: src/routes/settings.tsx:147
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 

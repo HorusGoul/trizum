@@ -20,7 +20,6 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
-import { defaultThemeHue } from "#src/ui/theme.ts";
 
 let hasRedirectedThisSession = false;
 
@@ -250,7 +249,6 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
     (participant) => !participant.isArchived,
   );
   const participantCount = activeParticipants.length;
-  const hue = party.hue ?? defaultThemeHue;
   const symbolOrFirstLetter =
     party.symbol || party.name.charAt(0).toUpperCase();
 
@@ -273,12 +271,7 @@ function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
         )
       }
     >
-      <div
-        className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
-        style={{
-          backgroundColor: `oklch(0.513 0.116 ${hue} / 1)`,
-        }}
-      >
+      <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-sm font-semibold text-white">
         <span className="pt-0.5">{symbolOrFirstLetter}</span>
       </div>
       <div className="flex flex-1 flex-col gap-0.5">
