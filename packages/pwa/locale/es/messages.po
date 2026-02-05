@@ -345,6 +345,10 @@ msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
 #: src/components/CalculatorToolbar.tsx:332
+msgid "Clear all"
+msgstr ""
+
+#: src/components/CalculatorToolbar.tsx:332
 msgid "Clear expression"
 msgstr "Borrar expresión"
 
@@ -352,13 +356,11 @@ msgstr "Borrar expresión"
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
-#: src/components/CalculatorToolbar.tsx:468
 #: src/components/MediaGallery.tsx:185
 #: src/components/RouteQRScanner.tsx:69
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:464
 #: src/components/CurrencyField.tsx:82
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
