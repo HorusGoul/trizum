@@ -20,6 +20,7 @@ interface CalculatorToolbarProps {
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   presenceElementId?: string;
   previewValue: number | null;
+  currency?: string;
 }
 
 export function CalculatorToolbar({
@@ -35,6 +36,7 @@ export function CalculatorToolbar({
   fieldContainerRef,
   presenceElementId,
   previewValue,
+  currency,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
@@ -174,6 +176,30 @@ export function CalculatorToolbar({
     charRefs.current[index] = el;
   };
 
+  // Format preview value based on currency decimals
+  function formatPreviewValue(value: number): string {
+    if (!currency) {
+      return value.toString();
+    }
+
+    try {
+      const formatter = new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency,
+        currencyDisplay: "code",
+      });
+
+      // Get decimal precision from currency
+      const parts = formatter.formatToParts(1.23456789);
+      const fractionPart = parts.find((part) => part.type === "fraction");
+      const decimals = fractionPart?.value.length ?? 2;
+
+      return value.toFixed(decimals);
+    } catch {
+      return value.toString();
+    }
+  }
+
   return createPortal(
     <div
       ref={toolbarRef}
@@ -188,10 +214,19 @@ export function CalculatorToolbar({
       }}
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
+        {/* Preview value on its own line to avoid layout shifts */}
+        <div className="flex h-5 items-center justify-end px-1">
+          {previewValue !== null && expression && (
+            <span className="text-sm font-medium text-accent-600 dark:text-accent-400">
+              = {formatPreviewValue(previewValue)}
+            </span>
+          )}
+        </div>
+
         {/* Expression display with cursor - tap to position, drag to move cursor */}
         <div
           ref={expressionRef}
-          className="flex cursor-text touch-none select-none items-center justify-between gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
+          className="flex cursor-text touch-none select-none items-center rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
         >
           <span
             className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-right font-mono text-xl font-medium"
@@ -217,16 +252,13 @@ export function CalculatorToolbar({
                   </span>
                 ))}
                 {cursorPosition === expression.length && (
-                  <span className="animate-blink">|</span>
+                  <span className="absolute right-0 top-0 h-full w-0 animate-blink">
+                    <span className="absolute -translate-x-1/2">|</span>
+                  </span>
                 )}
               </span>
             )}
           </span>
-          {previewValue !== null && expression && (
-            <span className="flex-shrink-0 text-sm font-medium text-accent-600 dark:text-accent-400">
-              = {previewValue}
-            </span>
-          )}
         </div>
 
         {/* iOS-style calculator buttons grid - 4 columns */}

@@ -101,6 +101,7 @@ function CurrencyFieldWithCalculator({
           fieldContainerRef={fieldContainerRef}
           presenceElementId={presenceElementId}
           previewValue={state.previewValue}
+          currency={props.currency}
         />
       )}
     </div>
