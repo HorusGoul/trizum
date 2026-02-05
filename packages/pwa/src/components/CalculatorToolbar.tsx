@@ -162,7 +162,7 @@ export function CalculatorToolbar({
         {/* Expression display with cursor - drag left/right to move cursor */}
         <div
           ref={expressionRef}
-          className="flex cursor-ew-resize touch-none items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 select-none dark:border-accent-600 dark:bg-accent-800"
+          className="flex cursor-ew-resize touch-none select-none items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
         >
           <span
             className="min-w-0 flex-1 text-right font-mono text-lg font-medium"
