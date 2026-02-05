@@ -150,7 +150,6 @@ export function useCalculatorMode({
     setIsActive(false);
     setExpressionRaw("");
     setCursorPositionRaw(0);
-    focusField();
   }
 
   function clear() {

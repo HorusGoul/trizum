@@ -326,14 +326,14 @@ export function CalculatorToolbar({
 
         {/* iOS-style calculator buttons grid - 4 columns */}
         <div className="grid grid-cols-4 gap-1.5">
-          {/* Row 1: C ( ) ÷ */}
+          {/* Row 1: AC ( ) ÷ */}
           <Button
             color="input-like"
-            aria-label={t`Clear expression`}
+            aria-label={t`Clear all`}
             onPress={onClear}
             className="h-12 rounded-xl text-lg font-medium"
           >
-            C
+            AC
           </Button>
           <Button
             color="input-like"
@@ -457,16 +457,6 @@ export function CalculatorToolbar({
             =
           </Button>
         </div>
-
-        {/* Close button */}
-        <Button
-          color="input-like"
-          aria-label={t`Close calculator`}
-          onPress={onDismiss}
-          className="h-10 rounded-xl text-sm font-medium"
-        >
-          {t`Close`}
-        </Button>
       </div>
     </div>,
     document.body,
