@@ -38,7 +38,7 @@ export function CalculatorToolbar({
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
-  const expressionTextRef = useRef<HTMLSpanElement>(null);
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(
     null,
   );
@@ -66,7 +66,6 @@ export function CalculatorToolbar({
       if (Math.abs(newAccumulator) >= DRAG_THRESHOLD) {
         const direction = newAccumulator > 0 ? "right" : "left";
         onMoveCursor(direction);
-        // Reset accumulator but keep tracking from current position
         setDragAccumulator(0);
       } else {
         setDragAccumulator(newAccumulator);
@@ -78,20 +77,38 @@ export function CalculatorToolbar({
       // Check if this was a tap (minimal movement)
       if (
         pointerStartRef.current &&
-        pointerStartRef.current.totalMovement < TAP_THRESHOLD &&
-        expression.length > 0
+        pointerStartRef.current.totalMovement < TAP_THRESHOLD
       ) {
-        // Calculate cursor position based on click location
-        const textEl = expressionTextRef.current;
-        if (textEl) {
-          const rect = textEl.getBoundingClientRect();
-          const clickX = e.clientX - rect.left;
-          const charWidth = rect.width / (expression.length + 1); // +1 for cursor
-          const newPosition = Math.round(clickX / charWidth);
-          onSetCursorPosition(
-            Math.max(0, Math.min(newPosition, expression.length)),
-          );
+        // Find the closest character position based on click location
+        const clickX = e.clientX;
+        let bestPosition = 0;
+        let bestDistance = Infinity;
+
+        // Check position before each character and after the last one
+        for (let i = 0; i <= expression.length; i++) {
+          let posX: number;
+
+          if (i === 0 && charRefs.current[0]) {
+            // Position before first character
+            posX = charRefs.current[0].getBoundingClientRect().left;
+          } else if (i === expression.length && charRefs.current[i - 1]) {
+            // Position after last character
+            posX = charRefs.current[i - 1]!.getBoundingClientRect().right;
+          } else if (charRefs.current[i]) {
+            // Position before character i (which is left edge of char i)
+            posX = charRefs.current[i]!.getBoundingClientRect().left;
+          } else {
+            continue;
+          }
+
+          const distance = Math.abs(clickX - posX);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestPosition = i;
+          }
         }
+
+        onSetCursorPosition(bestPosition);
       }
 
       pointerStartRef.current = null;
@@ -152,23 +169,10 @@ export function CalculatorToolbar({
     };
   }, [onDismiss, fieldContainerRef]);
 
-  // Render expression with cursor indicator
-  function renderExpressionWithCursor() {
-    if (!expression) {
-      return <span className="animate-blink">|</span>;
-    }
-
-    const before = expression.slice(0, cursorPosition);
-    const after = expression.slice(cursorPosition);
-
-    return (
-      <>
-        {before}
-        <span className="animate-blink">|</span>
-        {after}
-      </>
-    );
-  }
+  // Callback ref setter for character spans
+  const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
+    charRefs.current[index] = el;
+  };
 
   return createPortal(
     <div
@@ -187,15 +191,32 @@ export function CalculatorToolbar({
         {/* Expression display with cursor - tap to position, drag to move cursor */}
         <div
           ref={expressionRef}
-          className="flex cursor-text touch-none select-none items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
+          className="flex cursor-text touch-none select-none items-center justify-between gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
         >
           <span
-            ref={expressionTextRef}
-            className="min-w-0 flex-1 text-right font-mono text-lg font-medium"
+            className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-right font-mono text-xl font-medium"
             aria-live="polite"
             aria-label={t`Calculator expression`}
           >
-            {renderExpressionWithCursor()}
+            {!expression ? (
+              <span className="animate-blink">|</span>
+            ) : (
+              <span className="relative inline-flex">
+                {expression.split("").map((char, index) => (
+                  <span key={index} ref={setCharRef(index)} className="relative">
+                    {index === cursorPosition && (
+                      <span className="absolute left-0 top-0 h-full w-0 animate-blink">
+                        <span className="absolute -translate-x-1/2">|</span>
+                      </span>
+                    )}
+                    {char}
+                  </span>
+                ))}
+                {cursorPosition === expression.length && (
+                  <span className="animate-blink">|</span>
+                )}
+              </span>
+            )}
           </span>
           {previewValue !== null && expression && (
             <span className="flex-shrink-0 text-sm font-medium text-accent-600 dark:text-accent-400">
@@ -204,14 +225,22 @@ export function CalculatorToolbar({
           )}
         </div>
 
-        {/* Calculator buttons grid - 6 columns */}
-        <div className="grid grid-cols-6 gap-1.5">
-          {/* Row 1: ( ) 7 8 9 ÷ */}
+        {/* iOS-style calculator buttons grid - 4 columns */}
+        <div className="grid grid-cols-4 gap-1.5">
+          {/* Row 1: C ( ) ÷ */}
+          <Button
+            color="input-like"
+            aria-label={t`Clear expression`}
+            onPress={onClear}
+            className="h-12 rounded-xl text-lg font-medium"
+          >
+            C
+          </Button>
           <Button
             color="input-like"
             aria-label={t`Open parenthesis`}
             onPress={() => onInsert("(")}
-            className="h-11 rounded-lg text-lg font-medium"
+            className="h-12 rounded-xl text-lg font-medium"
           >
             (
           </Button>
@@ -219,118 +248,88 @@ export function CalculatorToolbar({
             color="input-like"
             aria-label={t`Close parenthesis`}
             onPress={() => onInsert(")")}
-            className="h-11 rounded-lg text-lg font-medium"
+            className="h-12 rounded-xl text-lg font-medium"
           >
             )
           </Button>
+          <Button
+            color="accent"
+            aria-label={t`Divide`}
+            onPress={() => onInsert("/")}
+            className="h-12 rounded-xl text-lg font-medium"
+          >
+            ÷
+          </Button>
+
+          {/* Row 2: 7 8 9 × */}
           {["7", "8", "9"].map((digit) => (
             <Button
               key={digit}
               color="input-like"
               aria-label={digit}
               onPress={() => onInsert(digit)}
-              className="h-11 rounded-lg text-lg font-medium"
+              className="h-12 rounded-xl text-xl font-medium"
             >
               {digit}
             </Button>
           ))}
           <Button
-            color="input-like"
-            aria-label={t`Divide`}
-            onPress={() => onInsert("/")}
-            className="h-11 rounded-lg text-lg font-medium"
+            color="accent"
+            aria-label={t`Multiply`}
+            onPress={() => onInsert("*")}
+            className="h-12 rounded-xl text-lg font-medium"
           >
-            ÷
+            ×
           </Button>
 
-          {/* Row 2: ← → 4 5 6 × */}
-          <Button
-            color="input-like"
-            aria-label={t`Move cursor left`}
-            onPress={() => onMoveCursor("left")}
-            className="h-11 rounded-lg text-lg font-medium"
-          >
-            <IconWithFallback name="#lucide/chevron-left" className="size-5" />
-          </Button>
-          <Button
-            color="input-like"
-            aria-label={t`Move cursor right`}
-            onPress={() => onMoveCursor("right")}
-            className="h-11 rounded-lg text-lg font-medium"
-          >
-            <IconWithFallback name="#lucide/chevron-right" className="size-5" />
-          </Button>
+          {/* Row 3: 4 5 6 − */}
           {["4", "5", "6"].map((digit) => (
             <Button
               key={digit}
               color="input-like"
               aria-label={digit}
               onPress={() => onInsert(digit)}
-              className="h-11 rounded-lg text-lg font-medium"
+              className="h-12 rounded-xl text-xl font-medium"
             >
               {digit}
             </Button>
           ))}
           <Button
-            color="input-like"
-            aria-label={t`Multiply`}
-            onPress={() => onInsert("*")}
-            className="h-11 rounded-lg text-lg font-medium"
+            color="accent"
+            aria-label={t`Subtract`}
+            onPress={() => onInsert("-")}
+            className="h-12 rounded-xl text-lg font-medium"
           >
-            ×
+            −
           </Button>
 
-          {/* Row 3: C ⌫ 1 2 3 − */}
-          <Button
-            color="input-like"
-            aria-label={t`Clear expression`}
-            onPress={onClear}
-            className="h-11 rounded-lg text-lg font-medium"
-          >
-            C
-          </Button>
-          <Button
-            color="input-like"
-            aria-label={t`Backspace`}
-            onPress={onBackspace}
-            className="h-11 rounded-lg text-lg font-medium"
-          >
-            <IconWithFallback name="#lucide/delete" className="size-5" />
-          </Button>
+          {/* Row 4: 1 2 3 + */}
           {["1", "2", "3"].map((digit) => (
             <Button
               key={digit}
               color="input-like"
               aria-label={digit}
               onPress={() => onInsert(digit)}
-              className="h-11 rounded-lg text-lg font-medium"
+              className="h-12 rounded-xl text-xl font-medium"
             >
               {digit}
             </Button>
           ))}
           <Button
-            color="input-like"
-            aria-label={t`Subtract`}
-            onPress={() => onInsert("-")}
-            className="h-11 rounded-lg text-lg font-medium"
+            color="accent"
+            aria-label={t`Add`}
+            onPress={() => onInsert("+")}
+            className="h-12 rounded-xl text-lg font-medium"
           >
-            −
+            +
           </Button>
 
-          {/* Row 4: ✕ 0 . + = */}
-          <Button
-            color="input-like"
-            aria-label={t`Close calculator`}
-            onPress={onDismiss}
-            className="h-11 rounded-lg text-lg font-medium"
-          >
-            <IconWithFallback name="#lucide/x" className="size-5" />
-          </Button>
+          {/* Row 5: 0 . ⌫ = */}
           <Button
             color="input-like"
             aria-label="0"
             onPress={() => onInsert("0")}
-            className="h-11 rounded-lg text-lg font-medium"
+            className="h-12 rounded-xl text-xl font-medium"
           >
             0
           </Button>
@@ -338,27 +337,37 @@ export function CalculatorToolbar({
             color="input-like"
             aria-label={t`Decimal point`}
             onPress={() => onInsert(".")}
-            className="h-11 rounded-lg text-lg font-medium"
+            className="h-12 rounded-xl text-xl font-medium"
           >
             .
           </Button>
           <Button
             color="input-like"
-            aria-label={t`Add`}
-            onPress={() => onInsert("+")}
-            className="h-11 rounded-lg text-lg font-medium"
+            aria-label={t`Backspace`}
+            onPress={onBackspace}
+            className="h-12 rounded-xl text-lg font-medium"
           >
-            +
+            <IconWithFallback name="#lucide/delete" className="size-5" />
           </Button>
           <Button
             color="accent"
             aria-label={t`Calculate result`}
             onPress={onCommit}
-            className="col-span-2 h-11 rounded-lg text-lg font-medium"
+            className="h-12 rounded-xl text-lg font-medium"
           >
             =
           </Button>
         </div>
+
+        {/* Close button */}
+        <Button
+          color="input-like"
+          aria-label={t`Close calculator`}
+          onPress={onDismiss}
+          className="h-10 rounded-xl text-sm font-medium"
+        >
+          {t`Close`}
+        </Button>
       </div>
     </div>,
     document.body,
