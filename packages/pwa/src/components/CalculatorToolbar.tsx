@@ -92,11 +92,17 @@ export function CalculatorToolbar({
     }
   }
 
+  const presenceElementId =
+    fieldContainerRef.current?.querySelector<HTMLElement>(
+      "[data-presence-element-id]",
+    )?.dataset.presenceElementId ?? undefined;
+
   return createPortal(
     <div
       ref={toolbarRef}
       role="toolbar"
       aria-label={t`Calculator`}
+      data-presence-element-id={presenceElementId}
       className="fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
       style={{ bottom: `${bottom}px` }}
     >
