@@ -50,8 +50,8 @@ function CurrencyFieldWithCalculator(
           icon="#lucide/sigma"
           aria-label={t`Open calculator`}
           color="transparent"
-          className="absolute bottom-1 right-1 h-8 w-8"
-          iconClassName="size-4"
+          className="absolute bottom-0.5 right-0.5 h-6 w-6"
+          iconClassName="size-3.5"
           onPress={actions.activate}
         />
       )}
