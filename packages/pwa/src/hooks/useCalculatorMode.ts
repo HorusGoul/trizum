@@ -20,6 +20,7 @@ export interface CalculatorActions {
   insertAtCursor: (text: string) => void;
   backspace: () => void;
   moveCursor: (direction: "left" | "right") => void;
+  setCursorPosition: (position: number) => void;
   commit: () => void;
   clear: () => void;
 }
@@ -98,6 +99,11 @@ export function useCalculatorMode({
     }
   }
 
+  function setCursorPosition(position: number) {
+    const clampedPosition = Math.max(0, Math.min(position, expression.length));
+    setCursorPositionRaw(clampedPosition);
+  }
+
   function commit() {
     const result = evaluateExpression(expression);
     if (result !== null) {
@@ -123,6 +129,7 @@ export function useCalculatorMode({
       insertAtCursor,
       backspace,
       moveCursor,
+      setCursorPosition,
       commit,
       clear,
     },

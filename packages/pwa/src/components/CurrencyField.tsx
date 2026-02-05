@@ -94,6 +94,7 @@ function CurrencyFieldWithCalculator({
           onInsert={actions.insertAtCursor}
           onBackspace={actions.backspace}
           onMoveCursor={actions.moveCursor}
+          onSetCursorPosition={actions.setCursorPosition}
           onCommit={actions.commit}
           onClear={actions.clear}
           onDismiss={actions.deactivate}

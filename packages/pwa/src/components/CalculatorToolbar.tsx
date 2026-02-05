@@ -4,7 +4,8 @@ import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
 import { IconWithFallback } from "#src/ui/Icon.tsx";
 
-const SWIPE_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
+const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
+const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
 
 interface CalculatorToolbarProps {
   expression: string;
@@ -12,6 +13,7 @@ interface CalculatorToolbarProps {
   onInsert: (text: string) => void;
   onBackspace: () => void;
   onMoveCursor: (direction: "left" | "right") => void;
+  onSetCursorPosition: (position: number) => void;
   onCommit: () => void;
   onClear: () => void;
   onDismiss: () => void;
@@ -26,6 +28,7 @@ export function CalculatorToolbar({
   onInsert,
   onBackspace,
   onMoveCursor,
+  onSetCursorPosition,
   onCommit,
   onClear,
   onDismiss,
@@ -35,50 +38,72 @@ export function CalculatorToolbar({
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
-  const [swipeStartX, setSwipeStartX] = useState<number | null>(null);
-  const [swipeAccumulator, setSwipeAccumulator] = useState(0);
+  const expressionTextRef = useRef<HTMLSpanElement>(null);
+  const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(
+    null,
+  );
+  const [dragAccumulator, setDragAccumulator] = useState(0);
 
-  // Handle swipe gestures on expression display for cursor movement
+  // Handle pointer gestures on expression display for cursor movement
   useEffect(() => {
     const expressionEl = expressionRef.current;
     if (!expressionEl) return;
 
     function handlePointerDown(e: PointerEvent) {
-      setSwipeStartX(e.clientX);
-      setSwipeAccumulator(0);
+      pointerStartRef.current = { x: e.clientX, totalMovement: 0 };
+      setDragAccumulator(0);
       expressionEl!.setPointerCapture(e.pointerId);
     }
 
     function handlePointerMove(e: PointerEvent) {
-      if (swipeStartX === null) return;
+      if (!pointerStartRef.current) return;
 
-      const deltaX = e.clientX - swipeStartX;
-      const newAccumulator = swipeAccumulator + deltaX;
+      const deltaX = e.clientX - pointerStartRef.current.x;
+      pointerStartRef.current.totalMovement += Math.abs(deltaX);
+      const newAccumulator = dragAccumulator + deltaX;
 
       // Check if we've accumulated enough movement to trigger a cursor move
-      if (Math.abs(newAccumulator) >= SWIPE_THRESHOLD) {
+      if (Math.abs(newAccumulator) >= DRAG_THRESHOLD) {
         const direction = newAccumulator > 0 ? "right" : "left";
         onMoveCursor(direction);
         // Reset accumulator but keep tracking from current position
-        setSwipeAccumulator(0);
-        setSwipeStartX(e.clientX);
+        setDragAccumulator(0);
       } else {
-        setSwipeAccumulator(newAccumulator);
-        setSwipeStartX(e.clientX);
+        setDragAccumulator(newAccumulator);
       }
+      pointerStartRef.current.x = e.clientX;
     }
 
     function handlePointerUp(e: PointerEvent) {
-      setSwipeStartX(null);
-      setSwipeAccumulator(0);
+      // Check if this was a tap (minimal movement)
+      if (
+        pointerStartRef.current &&
+        pointerStartRef.current.totalMovement < TAP_THRESHOLD &&
+        expression.length > 0
+      ) {
+        // Calculate cursor position based on click location
+        const textEl = expressionTextRef.current;
+        if (textEl) {
+          const rect = textEl.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const charWidth = rect.width / (expression.length + 1); // +1 for cursor
+          const newPosition = Math.round(clickX / charWidth);
+          onSetCursorPosition(
+            Math.max(0, Math.min(newPosition, expression.length)),
+          );
+        }
+      }
+
+      pointerStartRef.current = null;
+      setDragAccumulator(0);
       if (expressionEl!.hasPointerCapture(e.pointerId)) {
         expressionEl!.releasePointerCapture(e.pointerId);
       }
     }
 
     function handlePointerCancel(e: PointerEvent) {
-      setSwipeStartX(null);
-      setSwipeAccumulator(0);
+      pointerStartRef.current = null;
+      setDragAccumulator(0);
       if (expressionEl!.hasPointerCapture(e.pointerId)) {
         expressionEl!.releasePointerCapture(e.pointerId);
       }
@@ -95,7 +120,7 @@ export function CalculatorToolbar({
       expressionEl.removeEventListener("pointerup", handlePointerUp);
       expressionEl.removeEventListener("pointercancel", handlePointerCancel);
     };
-  }, [swipeStartX, swipeAccumulator, onMoveCursor]);
+  }, [dragAccumulator, expression, onMoveCursor, onSetCursorPosition]);
 
   useEffect(() => {
     function isOutside(target: Node | null) {
@@ -159,12 +184,13 @@ export function CalculatorToolbar({
       }}
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
-        {/* Expression display with cursor - drag left/right to move cursor */}
+        {/* Expression display with cursor - tap to position, drag to move cursor */}
         <div
           ref={expressionRef}
-          className="flex cursor-ew-resize touch-none select-none items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
+          className="flex cursor-text touch-none select-none items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
         >
           <span
+            ref={expressionTextRef}
             className="min-w-0 flex-1 text-right font-mono text-lg font-medium"
             aria-live="polite"
             aria-label={t`Calculator expression`}
