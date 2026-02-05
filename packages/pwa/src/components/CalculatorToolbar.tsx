@@ -79,17 +79,17 @@ export function CalculatorToolbar({
       }
     }
 
-    function handlePointerDown(e: PointerEvent) {
+    function handlePointerUp(e: PointerEvent) {
       if (isOutside(e.target as Node | null)) {
         onDismiss();
       }
     }
 
     document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("pointerup", handlePointerUp);
     return () => {
       document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("pointerup", handlePointerUp);
     };
   }, [onDismiss, fieldContainerRef]);
 
