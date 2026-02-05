@@ -93,7 +93,10 @@ export function CalculatorToolbar({
     if (cursorX < visibleStart + padding) {
       newOffset = Math.max(0, cursorX - padding);
     } else if (cursorX > visibleEnd - padding) {
-      newOffset = Math.min(contentWidth - containerWidth, cursorX - containerWidth + padding);
+      newOffset = Math.min(
+        contentWidth - containerWidth,
+        cursorX - containerWidth + padding,
+      );
     }
 
     if (newOffset !== scrollOffset) {
