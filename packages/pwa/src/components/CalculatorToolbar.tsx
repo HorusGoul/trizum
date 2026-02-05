@@ -41,18 +41,24 @@ export function CalculatorToolbar({
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
   const expressionScrollRef = useRef<HTMLSpanElement>(null);
+  const expressionContentRef = useRef<HTMLSpanElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(
     null,
   );
   const [dragAccumulator, setDragAccumulator] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
 
   // Scroll cursor into view when cursor position changes
   useEffect(() => {
     const scrollContainer = expressionScrollRef.current;
-    if (!scrollContainer || !expression) return;
+    const contentEl = expressionContentRef.current;
+    if (!scrollContainer || !contentEl || !expression) {
+      setScrollOffset(0);
+      return;
+    }
 
-    // Get cursor position element
+    // Get cursor position relative to content
     let cursorX: number;
     if (cursorPosition === 0 && charRefs.current[0]) {
       cursorX = charRefs.current[0].offsetLeft;
@@ -69,16 +75,31 @@ export function CalculatorToolbar({
     }
 
     const containerWidth = scrollContainer.clientWidth;
-    const scrollLeft = scrollContainer.scrollLeft;
-    const padding = 20; // Some padding to keep cursor visible
+    const contentWidth = contentEl.scrollWidth;
+    const padding = 20;
+
+    // No need to scroll if content fits
+    if (contentWidth <= containerWidth) {
+      setScrollOffset(0);
+      return;
+    }
+
+    // Calculate visible range with current offset
+    const visibleStart = scrollOffset;
+    const visibleEnd = scrollOffset + containerWidth;
 
     // Scroll if cursor is outside visible area
-    if (cursorX < scrollLeft + padding) {
-      scrollContainer.scrollLeft = Math.max(0, cursorX - padding);
-    } else if (cursorX > scrollLeft + containerWidth - padding) {
-      scrollContainer.scrollLeft = cursorX - containerWidth + padding;
+    let newOffset = scrollOffset;
+    if (cursorX < visibleStart + padding) {
+      newOffset = Math.max(0, cursorX - padding);
+    } else if (cursorX > visibleEnd - padding) {
+      newOffset = Math.min(contentWidth - containerWidth, cursorX - containerWidth + padding);
     }
-  }, [cursorPosition, expression]);
+
+    if (newOffset !== scrollOffset) {
+      setScrollOffset(newOffset);
+    }
+  }, [cursorPosition, expression, scrollOffset]);
 
   // Handle pointer gestures on expression display for cursor movement
   useEffect(() => {
@@ -264,14 +285,18 @@ export function CalculatorToolbar({
         >
           <span
             ref={expressionScrollRef}
-            className="no-scrollbar min-w-0 flex-1 overflow-x-scroll whitespace-nowrap text-right font-mono text-xl font-medium"
+            className="min-w-0 flex-1 overflow-hidden whitespace-nowrap text-right font-mono text-xl font-medium"
             aria-live="polite"
             aria-label={t`Calculator expression`}
           >
             {!expression ? (
               <span className="animate-blink">|</span>
             ) : (
-              <span className="relative inline-flex">
+              <span
+                ref={expressionContentRef}
+                className="relative inline-flex"
+                style={{ transform: `translateX(-${scrollOffset}px)` }}
+              >
                 {expression.split("").map((char, index) => (
                   <span
                     key={index}
