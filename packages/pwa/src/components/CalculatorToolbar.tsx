@@ -115,6 +115,13 @@ export function CalculatorToolbar({
       data-presence-element-id={presenceElementId}
       className="fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
       style={{ bottom: `${bottom}px` }}
+      onPointerDown={(e) => {
+        // Prevent buttons from blurring the expression input,
+        // which would close the mobile keyboard.
+        if (e.target !== expressionInputRef.current) {
+          e.preventDefault();
+        }
+      }}
     >
       <div className="flex flex-col gap-1.5 px-2 py-1.5">
         <div className="flex items-center gap-2">
