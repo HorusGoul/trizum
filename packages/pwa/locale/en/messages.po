@@ -271,15 +271,15 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/components/CalculatorToolbar.tsx:149
+#: src/components/CalculatorToolbar.tsx:155
 msgid "Calculate result"
 msgstr "Calculate result"
 
-#: src/components/CalculatorToolbar.tsx:99
+#: src/components/CalculatorToolbar.tsx:104
 msgid "Calculator"
 msgstr "Calculator"
 
-#: src/components/CalculatorToolbar.tsx:112
+#: src/components/CalculatorToolbar.tsx:118
 msgid "Calculator expression"
 msgstr "Calculator expression"
 
@@ -355,7 +355,7 @@ msgstr "Chinese Yuan"
 msgid "Choose the currency for expenses in this party"
 msgstr "Choose the currency for expenses in this party"
 
-#: src/components/CalculatorToolbar.tsx:138
+#: src/components/CalculatorToolbar.tsx:144
 msgid "Clear expression"
 msgstr "Clear expression"
 
