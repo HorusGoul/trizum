@@ -10,10 +10,12 @@ export type CurrencyFieldProps = React.ComponentProps<
   typeof AppCurrencyField
 > & {
   calculator?: boolean;
+  calculatorButtonClassName?: string;
 };
 
 export function CurrencyField({
   calculator = false,
+  calculatorButtonClassName,
   ...props
 }: CurrencyFieldProps) {
   const currency = use(CurrencyContext);
@@ -22,12 +24,21 @@ export function CurrencyField({
     return <AppCurrencyField {...props} currency={currency} />;
   }
 
-  return <CurrencyFieldWithCalculator {...props} currency={currency} />;
+  return (
+    <CurrencyFieldWithCalculator
+      {...props}
+      currency={currency}
+      calculatorButtonClassName={calculatorButtonClassName}
+    />
+  );
 }
 
-function CurrencyFieldWithCalculator(
-  props: React.ComponentProps<typeof AppCurrencyField>,
-) {
+function CurrencyFieldWithCalculator({
+  calculatorButtonClassName,
+  ...props
+}: React.ComponentProps<typeof AppCurrencyField> & {
+  calculatorButtonClassName?: string;
+}) {
   const expressionInputRef = useRef<HTMLInputElement>(null);
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const [state, actions] = useCalculatorMode({
@@ -50,8 +61,11 @@ function CurrencyFieldWithCalculator(
           icon="#lucide/sigma"
           aria-label={t`Open calculator`}
           color="transparent"
-          className="absolute bottom-0.5 right-0.5 h-6 w-6"
-          iconClassName="size-3.5"
+          className={
+            calculatorButtonClassName ??
+            "absolute bottom-1 right-1 h-8 w-8"
+          }
+          iconClassName="size-4"
           onPress={actions.activate}
         />
       )}

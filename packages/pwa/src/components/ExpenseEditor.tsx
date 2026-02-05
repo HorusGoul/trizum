@@ -677,6 +677,7 @@ function ParticipantSplitAmountField({
   return (
     <CurrencyField
       calculator
+      calculatorButtonClassName="absolute bottom-0.5 left-0 h-6 w-6"
       value={participantAmount / 100}
       onChange={onChange}
       className="w-20"
