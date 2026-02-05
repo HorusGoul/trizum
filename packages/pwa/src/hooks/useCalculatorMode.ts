@@ -27,8 +27,12 @@ function getCurrencyDecimals(currency: string | undefined): number | null {
 
 function roundToDecimals(value: number, decimals: number | null): number {
   if (decimals === null) return value;
+  // Financial rounding: round half away from zero
+  // This ensures 0.005 -> 0.01 and -0.005 -> -0.01
   const factor = Math.pow(10, decimals);
-  return Math.round(value * factor) / factor;
+  const sign = value < 0 ? -1 : 1;
+  // Add a small epsilon to handle floating point precision issues
+  return (sign * Math.round(Math.abs(value) * factor + 1e-10)) / factor;
 }
 
 export interface CalculatorState {
