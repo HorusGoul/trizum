@@ -48,12 +48,10 @@ function CurrencyFieldWithCalculator({
   const presenceElementId = (props as { "data-presence-element-id"?: string })[
     "data-presence-element-id"
   ];
-  const expressionInputRef = useRef<HTMLInputElement>(null);
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const [state, actions] = useCalculatorMode({
     value: props.value ?? 0,
     onChange: (value) => props.onChange?.(value),
-    expressionInputRef,
     fieldContainerRef,
   });
 
@@ -97,7 +95,6 @@ function CurrencyFieldWithCalculator({
           onCommit={actions.commit}
           onClear={actions.clear}
           onDismiss={actions.deactivate}
-          expressionInputRef={expressionInputRef}
           fieldContainerRef={fieldContainerRef}
           presenceElementId={presenceElementId}
           previewValue={state.previewValue}

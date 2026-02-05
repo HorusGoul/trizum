@@ -1,7 +1,8 @@
 import { t } from "@lingui/core/macro";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
+import { IconWithFallback } from "#src/ui/Icon.tsx";
 
 interface CalculatorToolbarProps {
   expression: string;
@@ -10,43 +11,10 @@ interface CalculatorToolbarProps {
   onCommit: () => void;
   onClear: () => void;
   onDismiss: () => void;
-  expressionInputRef: React.RefObject<HTMLInputElement | null>;
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   presenceElementId?: string;
   previewValue: number | null;
 }
-
-function useKeyboardBottom() {
-  const [bottom, setBottom] = useState(0);
-
-  useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    function onResize() {
-      const offset = window.innerHeight - (vv!.offsetTop + vv!.height);
-      setBottom(Math.max(0, offset));
-    }
-
-    onResize();
-    vv.addEventListener("resize", onResize);
-    vv.addEventListener("scroll", onResize);
-
-    return () => {
-      vv.removeEventListener("resize", onResize);
-      vv.removeEventListener("scroll", onResize);
-    };
-  }, []);
-
-  return bottom;
-}
-
-const operatorButtons = [
-  { op: "+", label: "+", ariaLabel: () => t`Add` },
-  { op: "-", label: "−", ariaLabel: () => t`Subtract` },
-  { op: "*", label: "×", ariaLabel: () => t`Multiply` },
-  { op: "/", label: "÷", ariaLabel: () => t`Divide` },
-] as const;
 
 export function CalculatorToolbar({
   expression,
@@ -55,12 +23,10 @@ export function CalculatorToolbar({
   onCommit,
   onClear,
   onDismiss,
-  expressionInputRef,
   fieldContainerRef,
   presenceElementId,
   previewValue,
 }: CalculatorToolbarProps) {
-  const bottom = useKeyboardBottom();
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,86 +59,174 @@ export function CalculatorToolbar({
     };
   }, [onDismiss, fieldContainerRef]);
 
-  function handleExpressionInput(e: React.FormEvent<HTMLInputElement>) {
-    onExpressionChange(e.currentTarget.value);
+  function appendDigit(digit: string) {
+    onExpressionChange(expression + digit);
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" || e.key === "=") {
-      e.preventDefault();
-      onCommit();
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      onDismiss();
+  function appendDecimal() {
+    // Find the last number in the expression to check if it already has a decimal
+    const parts = expression.split(/[+\-*/]/);
+    const lastPart = parts[parts.length - 1];
+    if (!lastPart.includes(".")) {
+      onExpressionChange(expression + ".");
+    }
+  }
+
+  function backspace() {
+    if (expression.length > 0) {
+      onExpressionChange(expression.slice(0, -1));
     }
   }
 
   return createPortal(
     <div
       ref={toolbarRef}
-      role="toolbar"
+      role="application"
       aria-label={t`Calculator`}
       data-presence-element-id={presenceElementId}
       className="fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
-      style={{ bottom: `${bottom}px` }}
+      style={{ bottom: 0 }}
       onPointerDown={(e) => {
-        // Prevent buttons from blurring the expression input,
-        // which would close the mobile keyboard.
-        // Only allow default behavior when tapping directly on the input itself.
-        if (!expressionInputRef.current?.contains(e.target as Node)) {
-          e.preventDefault();
-        }
+        // Prevent any focus changes that could interfere with the calculator
+        e.preventDefault();
       }}
     >
-      <div className="flex flex-col gap-1.5 px-2 py-1.5">
-        <div className="flex items-center gap-2">
-          <input
-            ref={expressionInputRef}
-            type="text"
-            inputMode="text"
-            value={expression}
-            onInput={handleExpressionInput}
-            onKeyDown={handleKeyDown}
+      <div className="flex flex-col gap-1.5 px-2 py-2">
+        {/* Expression display */}
+        <div className="flex items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800">
+          <span
+            className="min-w-0 flex-1 truncate text-right text-lg font-medium"
+            aria-live="polite"
             aria-label={t`Calculator expression`}
-            className="min-w-0 flex-1 rounded-md border border-accent-400 bg-accent-50 px-2 py-1.5 text-sm outline-none dark:border-accent-600 dark:bg-accent-800"
-            autoComplete="off"
-          />
-          {previewValue !== null && (
+          >
+            {expression || "0"}
+          </span>
+          {previewValue !== null && expression && (
             <span className="flex-shrink-0 text-sm font-medium text-accent-600 dark:text-accent-400">
               = {previewValue}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-1.5">
-          {operatorButtons.map(({ op, label, ariaLabel }) => (
+        {/* Calculator buttons grid */}
+        <div className="grid grid-cols-5 gap-1.5">
+          {/* Row 1: 7 8 9 ÷ ⌫ */}
+          {["7", "8", "9"].map((digit) => (
             <Button
-              key={op}
+              key={digit}
               color="input-like"
-              aria-label={ariaLabel()}
-              onPress={() => onOperator(op)}
-              className="h-9 w-9 flex-shrink-0 rounded-lg text-base font-medium"
+              aria-label={digit}
+              onPress={() => appendDigit(digit)}
+              className="h-11 rounded-lg text-lg font-medium"
             >
-              {label}
+              {digit}
             </Button>
           ))}
+          <Button
+            color="input-like"
+            aria-label={t`Divide`}
+            onPress={() => onOperator("/")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            ÷
+          </Button>
+          <Button
+            color="input-like"
+            aria-label={t`Backspace`}
+            onPress={backspace}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            <IconWithFallback name="#lucide/delete" className="size-5" />
+          </Button>
 
+          {/* Row 2: 4 5 6 × C */}
+          {["4", "5", "6"].map((digit) => (
+            <Button
+              key={digit}
+              color="input-like"
+              aria-label={digit}
+              onPress={() => appendDigit(digit)}
+              className="h-11 rounded-lg text-lg font-medium"
+            >
+              {digit}
+            </Button>
+          ))}
+          <Button
+            color="input-like"
+            aria-label={t`Multiply`}
+            onPress={() => onOperator("*")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            ×
+          </Button>
           <Button
             color="input-like"
             aria-label={t`Clear expression`}
             onPress={onClear}
-            className="h-9 w-9 flex-shrink-0 rounded-lg text-sm font-medium"
+            className="h-11 rounded-lg text-lg font-medium"
           >
             C
           </Button>
 
-          <div className="flex-1" />
+          {/* Row 3: 1 2 3 − (empty or close) */}
+          {["1", "2", "3"].map((digit) => (
+            <Button
+              key={digit}
+              color="input-like"
+              aria-label={digit}
+              onPress={() => appendDigit(digit)}
+              className="h-11 rounded-lg text-lg font-medium"
+            >
+              {digit}
+            </Button>
+          ))}
+          <Button
+            color="input-like"
+            aria-label={t`Subtract`}
+            onPress={() => onOperator("-")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            −
+          </Button>
+          <Button
+            color="input-like"
+            aria-label={t`Close calculator`}
+            onPress={onDismiss}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            <IconWithFallback name="#lucide/x" className="size-5" />
+          </Button>
 
+          {/* Row 4: 0 . + = */}
+          <Button
+            color="input-like"
+            aria-label="0"
+            onPress={() => appendDigit("0")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            0
+          </Button>
+          <Button
+            color="input-like"
+            aria-label={t`Decimal point`}
+            onPress={appendDecimal}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            .
+          </Button>
+          <Button
+            color="input-like"
+            aria-label={t`Add`}
+            onPress={() => onOperator("+")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            +
+          </Button>
           <Button
             color="accent"
             aria-label={t`Calculate result`}
             onPress={onCommit}
-            className="h-9 w-9 flex-shrink-0 rounded-lg text-base font-medium"
+            className="col-span-2 h-11 rounded-lg text-lg font-medium"
           >
             =
           </Button>

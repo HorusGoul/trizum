@@ -4,7 +4,6 @@ import { evaluateExpression } from "#src/lib/evaluateExpression.ts";
 interface UseCalculatorModeOptions {
   value: number;
   onChange: (value: number) => void;
-  expressionInputRef: React.RefObject<HTMLInputElement | null>;
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -26,7 +25,6 @@ export interface CalculatorActions {
 export function useCalculatorMode({
   value,
   onChange,
-  expressionInputRef,
   fieldContainerRef,
 }: UseCalculatorModeOptions): [CalculatorState, CalculatorActions] {
   const [isActive, setIsActive] = useState(false);
@@ -45,9 +43,6 @@ export function useCalculatorMode({
     const initialExpr = value === 0 ? "" : String(value);
     setExpressionRaw(initialExpr);
     setIsActive(true);
-    requestAnimationFrame(() => {
-      expressionInputRef.current?.focus();
-    });
   }
 
   function deactivate() {
