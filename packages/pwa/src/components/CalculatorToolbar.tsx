@@ -40,11 +40,42 @@ export function CalculatorToolbar({
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
+  const expressionScrollRef = useRef<HTMLSpanElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(
     null,
   );
   const [dragAccumulator, setDragAccumulator] = useState(0);
+
+  // Scroll cursor into view when cursor position changes
+  useEffect(() => {
+    const scrollContainer = expressionScrollRef.current;
+    if (!scrollContainer || !expression) return;
+
+    // Get cursor position element
+    let cursorX: number;
+    if (cursorPosition === 0 && charRefs.current[0]) {
+      cursorX = charRefs.current[0].offsetLeft;
+    } else if (cursorPosition === expression.length && charRefs.current[cursorPosition - 1]) {
+      const lastChar = charRefs.current[cursorPosition - 1]!;
+      cursorX = lastChar.offsetLeft + lastChar.offsetWidth;
+    } else if (charRefs.current[cursorPosition]) {
+      cursorX = charRefs.current[cursorPosition]!.offsetLeft;
+    } else {
+      return;
+    }
+
+    const containerWidth = scrollContainer.clientWidth;
+    const scrollLeft = scrollContainer.scrollLeft;
+    const padding = 20; // Some padding to keep cursor visible
+
+    // Scroll if cursor is outside visible area
+    if (cursorX < scrollLeft + padding) {
+      scrollContainer.scrollLeft = Math.max(0, cursorX - padding);
+    } else if (cursorX > scrollLeft + containerWidth - padding) {
+      scrollContainer.scrollLeft = cursorX - containerWidth + padding;
+    }
+  }, [cursorPosition, expression]);
 
   // Handle pointer gestures on expression display for cursor movement
   useEffect(() => {
@@ -229,7 +260,8 @@ export function CalculatorToolbar({
           className="flex cursor-text touch-none select-none items-center rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
         >
           <span
-            className="no-scrollbar min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-right font-mono text-xl font-medium"
+            ref={expressionScrollRef}
+            className="no-scrollbar min-w-0 flex-1 overflow-x-scroll whitespace-nowrap text-right font-mono text-xl font-medium"
             aria-live="polite"
             aria-label={t`Calculator expression`}
           >
