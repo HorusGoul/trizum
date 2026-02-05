@@ -12,6 +12,7 @@ interface CalculatorToolbarProps {
   onDismiss: () => void;
   expressionInputRef: React.RefObject<HTMLInputElement | null>;
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  presenceElementId?: string;
   previewValue: number | null;
 }
 
@@ -56,6 +57,7 @@ export function CalculatorToolbar({
   onDismiss,
   expressionInputRef,
   fieldContainerRef,
+  presenceElementId,
   previewValue,
 }: CalculatorToolbarProps) {
   const bottom = useKeyboardBottom();
@@ -91,11 +93,6 @@ export function CalculatorToolbar({
       onDismiss();
     }
   }
-
-  const presenceElementId =
-    fieldContainerRef.current?.querySelector<HTMLElement>(
-      "[data-presence-element-id]",
-    )?.dataset.presenceElementId ?? undefined;
 
   return createPortal(
     <div
