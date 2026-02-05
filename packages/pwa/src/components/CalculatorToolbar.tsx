@@ -48,6 +48,43 @@ export function CalculatorToolbar({
   );
   const [dragAccumulator, setDragAccumulator] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
+
+  // Detect large screen and calculate popover position
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+
+    function updatePosition() {
+      setIsLargeScreen(mediaQuery.matches);
+
+      if (mediaQuery.matches && fieldContainerRef.current) {
+        const rect = fieldContainerRef.current.getBoundingClientRect();
+        setPopoverPosition({
+          top: rect.bottom + 8,
+          left: rect.left,
+          width: Math.max(rect.width, 280),
+        });
+      } else {
+        setPopoverPosition(null);
+      }
+    }
+
+    updatePosition();
+    mediaQuery.addEventListener("change", updatePosition);
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updatePosition);
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [fieldContainerRef]);
 
   // Scroll cursor into view when cursor position changes
   useEffect(() => {
@@ -229,6 +266,72 @@ export function CalculatorToolbar({
     };
   }, [onDismiss, fieldContainerRef]);
 
+  // Handle keyboard input
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Don't capture if user is typing in another input
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      // Number keys
+      if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        onInsert(e.key);
+        return;
+      }
+
+      // Operators and symbols
+      switch (e.key) {
+        case "+":
+        case "-":
+        case "*":
+        case "/":
+        case ".":
+        case "(":
+        case ")":
+          e.preventDefault();
+          onInsert(e.key);
+          break;
+        case "Backspace":
+          e.preventDefault();
+          onBackspace();
+          break;
+        case "Delete":
+          e.preventDefault();
+          onClear();
+          break;
+        case "Enter":
+        case "=":
+          e.preventDefault();
+          onCommit();
+          break;
+        case "Escape":
+          e.preventDefault();
+          onDismiss();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          onMoveCursor("left");
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          onMoveCursor("right");
+          break;
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onInsert, onBackspace, onClear, onCommit, onDismiss, onMoveCursor]);
+
   // Callback ref setter for character spans
   const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
     charRefs.current[index] = el;
@@ -264,8 +367,20 @@ export function CalculatorToolbar({
       role="application"
       aria-label={t`Calculator`}
       data-presence-element-id={presenceElementId}
-      className="fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
-      style={{ bottom: 0 }}
+      className={
+        isLargeScreen && popoverPosition
+          ? "fixed z-50 rounded-lg border border-accent-300 bg-white shadow-lg dark:border-accent-700 dark:bg-accent-900"
+          : "fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
+      }
+      style={
+        isLargeScreen && popoverPosition
+          ? {
+              top: popoverPosition.top,
+              left: popoverPosition.left,
+              width: popoverPosition.width,
+            }
+          : { bottom: 0 }
+      }
       onPointerDown={(e) => {
         // Prevent any focus changes that could interfere with the calculator
         e.preventDefault();
