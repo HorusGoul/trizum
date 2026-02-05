@@ -118,7 +118,8 @@ export function CalculatorToolbar({
       onPointerDown={(e) => {
         // Prevent buttons from blurring the expression input,
         // which would close the mobile keyboard.
-        if (e.target !== expressionInputRef.current) {
+        // Only allow default behavior when tapping directly on the input itself.
+        if (!expressionInputRef.current?.contains(e.target as Node)) {
           e.preventDefault();
         }
       }}
