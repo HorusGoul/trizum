@@ -5,6 +5,7 @@ import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
 import { CalculatorToolbar } from "./CalculatorToolbar";
 import { IconButton } from "#src/ui/IconButton.js";
+import { cn } from "#src/ui/utils.js";
 
 export type CurrencyFieldProps = React.ComponentProps<
   typeof AppCurrencyField
@@ -54,6 +55,10 @@ function CurrencyFieldWithCalculator({
         {...props}
         value={props.value}
         isReadOnly={state.isActive}
+        inputClassName={cn(
+          props.inputClassName,
+          state.isActive && "ring-ring ring-2 ring-offset-2",
+        )}
       />
 
       <IconButton
