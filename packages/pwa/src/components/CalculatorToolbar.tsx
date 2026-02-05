@@ -416,10 +416,7 @@ export function CalculatorToolbar({
             {!expression ? (
               <span className="animate-blink">|</span>
             ) : (
-              <span
-                ref={expressionContentRef}
-                className="relative inline-flex"
-              >
+              <span ref={expressionContentRef} className="relative inline-flex">
                 {expression.split("").map((char, index) => (
                   <span
                     key={index}
