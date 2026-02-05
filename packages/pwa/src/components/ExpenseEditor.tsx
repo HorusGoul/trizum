@@ -134,7 +134,8 @@ export function ExpenseEditor({
         (total, participantId) => {
           const share = value.shares[participantId];
           if (share?.type === "exact") {
-            return total.add(Dinero({ amount: share.value }));
+            // Use Math.round to handle any floating point precision issues
+            return total.add(Dinero({ amount: Math.round(share.value) }));
           }
           return total;
         },
