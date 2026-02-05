@@ -6,8 +6,10 @@ import { IconWithFallback } from "#src/ui/Icon.tsx";
 
 interface CalculatorToolbarProps {
   expression: string;
-  onExpressionChange: (expr: string) => void;
-  onOperator: (op: "+" | "-" | "*" | "/") => void;
+  cursorPosition: number;
+  onInsert: (text: string) => void;
+  onBackspace: () => void;
+  onMoveCursor: (direction: "left" | "right") => void;
   onCommit: () => void;
   onClear: () => void;
   onDismiss: () => void;
@@ -18,8 +20,10 @@ interface CalculatorToolbarProps {
 
 export function CalculatorToolbar({
   expression,
-  onExpressionChange,
-  onOperator,
+  cursorPosition,
+  onInsert,
+  onBackspace,
+  onMoveCursor,
   onCommit,
   onClear,
   onDismiss,
@@ -59,23 +63,22 @@ export function CalculatorToolbar({
     };
   }, [onDismiss, fieldContainerRef]);
 
-  function appendDigit(digit: string) {
-    onExpressionChange(expression + digit);
-  }
-
-  function appendDecimal() {
-    // Find the last number in the expression to check if it already has a decimal
-    const parts = expression.split(/[+\-*/]/);
-    const lastPart = parts[parts.length - 1];
-    if (!lastPart.includes(".")) {
-      onExpressionChange(expression + ".");
+  // Render expression with cursor indicator
+  function renderExpressionWithCursor() {
+    if (!expression) {
+      return <span className="animate-blink">|</span>;
     }
-  }
 
-  function backspace() {
-    if (expression.length > 0) {
-      onExpressionChange(expression.slice(0, -1));
-    }
+    const before = expression.slice(0, cursorPosition);
+    const after = expression.slice(cursorPosition);
+
+    return (
+      <>
+        {before}
+        <span className="animate-blink">|</span>
+        {after}
+      </>
+    );
   }
 
   return createPortal(
@@ -92,14 +95,14 @@ export function CalculatorToolbar({
       }}
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
-        {/* Expression display */}
+        {/* Expression display with cursor */}
         <div className="flex items-center gap-2 rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800">
           <span
-            className="min-w-0 flex-1 truncate text-right text-lg font-medium"
+            className="min-w-0 flex-1 text-right font-mono text-lg font-medium"
             aria-live="polite"
             aria-label={t`Calculator expression`}
           >
-            {expression || "0"}
+            {renderExpressionWithCursor()}
           </span>
           {previewValue !== null && expression && (
             <span className="flex-shrink-0 text-sm font-medium text-accent-600 dark:text-accent-400">
@@ -108,15 +111,31 @@ export function CalculatorToolbar({
           )}
         </div>
 
-        {/* Calculator buttons grid */}
-        <div className="grid grid-cols-5 gap-1.5">
-          {/* Row 1: 7 8 9 ÷ ⌫ */}
+        {/* Calculator buttons grid - 6 columns */}
+        <div className="grid grid-cols-6 gap-1.5">
+          {/* Row 1: ( ) 7 8 9 ÷ */}
+          <Button
+            color="input-like"
+            aria-label={t`Open parenthesis`}
+            onPress={() => onInsert("(")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            (
+          </Button>
+          <Button
+            color="input-like"
+            aria-label={t`Close parenthesis`}
+            onPress={() => onInsert(")")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            )
+          </Button>
           {["7", "8", "9"].map((digit) => (
             <Button
               key={digit}
               color="input-like"
               aria-label={digit}
-              onPress={() => appendDigit(digit)}
+              onPress={() => onInsert(digit)}
               className="h-11 rounded-lg text-lg font-medium"
             >
               {digit}
@@ -125,27 +144,35 @@ export function CalculatorToolbar({
           <Button
             color="input-like"
             aria-label={t`Divide`}
-            onPress={() => onOperator("/")}
+            onPress={() => onInsert("/")}
             className="h-11 rounded-lg text-lg font-medium"
           >
             ÷
           </Button>
+
+          {/* Row 2: ← → 4 5 6 × */}
           <Button
             color="input-like"
-            aria-label={t`Backspace`}
-            onPress={backspace}
+            aria-label={t`Move cursor left`}
+            onPress={() => onMoveCursor("left")}
             className="h-11 rounded-lg text-lg font-medium"
           >
-            <IconWithFallback name="#lucide/delete" className="size-5" />
+            <IconWithFallback name="#lucide/chevron-left" className="size-5" />
           </Button>
-
-          {/* Row 2: 4 5 6 × C */}
+          <Button
+            color="input-like"
+            aria-label={t`Move cursor right`}
+            onPress={() => onMoveCursor("right")}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            <IconWithFallback name="#lucide/chevron-right" className="size-5" />
+          </Button>
           {["4", "5", "6"].map((digit) => (
             <Button
               key={digit}
               color="input-like"
               aria-label={digit}
-              onPress={() => appendDigit(digit)}
+              onPress={() => onInsert(digit)}
               className="h-11 rounded-lg text-lg font-medium"
             >
               {digit}
@@ -154,11 +181,13 @@ export function CalculatorToolbar({
           <Button
             color="input-like"
             aria-label={t`Multiply`}
-            onPress={() => onOperator("*")}
+            onPress={() => onInsert("*")}
             className="h-11 rounded-lg text-lg font-medium"
           >
             ×
           </Button>
+
+          {/* Row 3: C ⌫ 1 2 3 − */}
           <Button
             color="input-like"
             aria-label={t`Clear expression`}
@@ -167,14 +196,20 @@ export function CalculatorToolbar({
           >
             C
           </Button>
-
-          {/* Row 3: 1 2 3 − (empty or close) */}
+          <Button
+            color="input-like"
+            aria-label={t`Backspace`}
+            onPress={onBackspace}
+            className="h-11 rounded-lg text-lg font-medium"
+          >
+            <IconWithFallback name="#lucide/delete" className="size-5" />
+          </Button>
           {["1", "2", "3"].map((digit) => (
             <Button
               key={digit}
               color="input-like"
               aria-label={digit}
-              onPress={() => appendDigit(digit)}
+              onPress={() => onInsert(digit)}
               className="h-11 rounded-lg text-lg font-medium"
             >
               {digit}
@@ -183,11 +218,13 @@ export function CalculatorToolbar({
           <Button
             color="input-like"
             aria-label={t`Subtract`}
-            onPress={() => onOperator("-")}
+            onPress={() => onInsert("-")}
             className="h-11 rounded-lg text-lg font-medium"
           >
             −
           </Button>
+
+          {/* Row 4: ✕ 0 . + = */}
           <Button
             color="input-like"
             aria-label={t`Close calculator`}
@@ -196,12 +233,10 @@ export function CalculatorToolbar({
           >
             <IconWithFallback name="#lucide/x" className="size-5" />
           </Button>
-
-          {/* Row 4: 0 . + = */}
           <Button
             color="input-like"
             aria-label="0"
-            onPress={() => appendDigit("0")}
+            onPress={() => onInsert("0")}
             className="h-11 rounded-lg text-lg font-medium"
           >
             0
@@ -209,7 +244,7 @@ export function CalculatorToolbar({
           <Button
             color="input-like"
             aria-label={t`Decimal point`}
-            onPress={appendDecimal}
+            onPress={() => onInsert(".")}
             className="h-11 rounded-lg text-lg font-medium"
           >
             .
@@ -217,7 +252,7 @@ export function CalculatorToolbar({
           <Button
             color="input-like"
             aria-label={t`Add`}
-            onPress={() => onOperator("+")}
+            onPress={() => onInsert("+")}
             className="h-11 rounded-lg text-lg font-medium"
           >
             +

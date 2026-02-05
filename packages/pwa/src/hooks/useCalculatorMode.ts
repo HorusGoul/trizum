@@ -10,14 +10,16 @@ interface UseCalculatorModeOptions {
 export interface CalculatorState {
   isActive: boolean;
   expression: string;
+  cursorPosition: number;
   previewValue: number | null;
 }
 
 export interface CalculatorActions {
   activate: () => void;
   deactivate: () => void;
-  setExpression: (expr: string) => void;
-  appendOperator: (op: "+" | "-" | "*" | "/") => void;
+  insertAtCursor: (text: string) => void;
+  backspace: () => void;
+  moveCursor: (direction: "left" | "right") => void;
   commit: () => void;
   clear: () => void;
 }
@@ -29,6 +31,7 @@ export function useCalculatorMode({
 }: UseCalculatorModeOptions): [CalculatorState, CalculatorActions] {
   const [isActive, setIsActive] = useState(false);
   const [expression, setExpressionRaw] = useState("");
+  const [cursorPosition, setCursorPositionRaw] = useState(0);
 
   const previewValue = evaluateExpression(expression);
 
@@ -42,6 +45,7 @@ export function useCalculatorMode({
   function activate() {
     const initialExpr = value === 0 ? "" : String(value);
     setExpressionRaw(initialExpr);
+    setCursorPositionRaw(initialExpr.length);
     setIsActive(true);
   }
 
@@ -52,21 +56,46 @@ export function useCalculatorMode({
     }
     setIsActive(false);
     setExpressionRaw("");
+    setCursorPositionRaw(0);
     focusField();
   }
 
-  function setExpression(expr: string) {
-    setExpressionRaw(expr);
+  function insertAtCursor(text: string) {
+    const before = expression.slice(0, cursorPosition);
+    const after = expression.slice(cursorPosition);
+    const newExpr = before + text + after;
+    setExpressionRaw(newExpr);
+    setCursorPositionRaw(cursorPosition + text.length);
 
-    const result = evaluateExpression(expr);
+    const result = evaluateExpression(newExpr);
     if (result !== null) {
       onChange(result);
     }
   }
 
-  function appendOperator(op: "+" | "-" | "*" | "/") {
-    const newExpr = expression + op;
-    setExpressionRaw(newExpr);
+  function backspace() {
+    if (cursorPosition > 0) {
+      const before = expression.slice(0, cursorPosition - 1);
+      const after = expression.slice(cursorPosition);
+      const newExpr = before + after;
+      setExpressionRaw(newExpr);
+      setCursorPositionRaw(cursorPosition - 1);
+
+      const result = evaluateExpression(newExpr);
+      if (result !== null) {
+        onChange(result);
+      } else if (newExpr === "") {
+        onChange(0);
+      }
+    }
+  }
+
+  function moveCursor(direction: "left" | "right") {
+    if (direction === "left" && cursorPosition > 0) {
+      setCursorPositionRaw(cursorPosition - 1);
+    } else if (direction === "right" && cursorPosition < expression.length) {
+      setCursorPositionRaw(cursorPosition + 1);
+    }
   }
 
   function commit() {
@@ -76,21 +105,24 @@ export function useCalculatorMode({
     }
     setIsActive(false);
     setExpressionRaw("");
+    setCursorPositionRaw(0);
     focusField();
   }
 
   function clear() {
     setExpressionRaw("");
+    setCursorPositionRaw(0);
     onChange(0);
   }
 
   return [
-    { isActive, expression, previewValue },
+    { isActive, expression, cursorPosition, previewValue },
     {
       activate,
       deactivate,
-      setExpression,
-      appendOperator,
+      insertAtCursor,
+      backspace,
+      moveCursor,
       commit,
       clear,
     },

@@ -58,7 +58,7 @@ msgstr "Color de acento"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:219
+#: src/components/CalculatorToolbar.tsx:254
 msgid "Add"
 msgstr "Sumar"
 
@@ -180,7 +180,7 @@ msgstr "Avatar actualizado correctamente"
 msgid "Azerbaijani Manat"
 msgstr "Manat Azerbaiyano"
 
-#: src/components/CalculatorToolbar.tsx:135
+#: src/components/CalculatorToolbar.tsx:201
 msgid "Backspace"
 msgstr ""
 
@@ -268,15 +268,15 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/components/CalculatorToolbar.tsx:227
+#: src/components/CalculatorToolbar.tsx:262
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:85
+#: src/components/CalculatorToolbar.tsx:88
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:100
+#: src/components/CalculatorToolbar.tsx:103
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
@@ -344,7 +344,7 @@ msgstr "Yuan Chino"
 msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
-#: src/components/CalculatorToolbar.tsx:164
+#: src/components/CalculatorToolbar.tsx:193
 msgid "Clear expression"
 msgstr "Borrar expresión"
 
@@ -357,10 +357,14 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:193
+#: src/components/CalculatorToolbar.tsx:230
 #: src/components/CurrencyField.tsx:81
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
+
+#: src/components/CalculatorToolbar.tsx:127
+msgid "Close parenthesis"
+msgstr ""
 
 #: src/routes/new.tsx:597
 msgid "Code for testing"
@@ -457,7 +461,7 @@ msgstr "Fecha"
 msgid "Debt settled between {0} and {1}!"
 msgstr "¡Deuda saldada entre {0} y {1}!"
 
-#: src/components/CalculatorToolbar.tsx:211
+#: src/components/CalculatorToolbar.tsx:246
 msgid "Decimal point"
 msgstr ""
 
@@ -478,7 +482,7 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/CalculatorToolbar.tsx:127
+#: src/components/CalculatorToolbar.tsx:146
 msgid "Divide"
 msgstr "Dividir"
 
@@ -1020,6 +1024,14 @@ msgstr "Tugrik Mongol"
 msgid "Moroccan Dirham"
 msgstr "Dírham Marroquí"
 
+#: src/components/CalculatorToolbar.tsx:156
+msgid "Move cursor left"
+msgstr ""
+
+#: src/components/CalculatorToolbar.tsx:164
+msgid "Move cursor right"
+msgstr ""
+
 #: src/routes/new.tsx:538
 msgid "Mozambican Metical"
 msgstr "Metical Mozambiqueño"
@@ -1028,7 +1040,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:156
+#: src/components/CalculatorToolbar.tsx:183
 msgid "Multiply"
 msgstr "Multiplicar"
 
@@ -1150,6 +1162,10 @@ msgstr "Abrir GitHub Issues"
 #: src/routes/settings.tsx:214
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
+
+#: src/components/CalculatorToolbar.tsx:119
+msgid "Open parenthesis"
+msgstr ""
 
 #: src/routes/join.tsx:156
 msgid "or enter code"
@@ -1550,7 +1566,7 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:185
+#: src/components/CalculatorToolbar.tsx:220
 msgid "Subtract"
 msgstr "Restar"
 

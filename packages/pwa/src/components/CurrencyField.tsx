@@ -90,8 +90,10 @@ function CurrencyFieldWithCalculator({
       {state.isActive && (
         <CalculatorToolbar
           expression={state.expression}
-          onExpressionChange={actions.setExpression}
-          onOperator={actions.appendOperator}
+          cursorPosition={state.cursorPosition}
+          onInsert={actions.insertAtCursor}
+          onBackspace={actions.backspace}
+          onMoveCursor={actions.moveCursor}
           onCommit={actions.commit}
           onClear={actions.clear}
           onDismiss={actions.deactivate}
