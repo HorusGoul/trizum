@@ -58,6 +58,10 @@ msgstr "Color de acento"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
+#: src/components/CalculatorToolbar.tsx:43
+msgid "Add"
+msgstr "Sumar"
+
 #: src/routes/party.$partyId.tsx:439
 #: src/routes/party.$partyId.tsx:447
 msgid "Add an expense"
@@ -97,12 +101,12 @@ msgstr "Dinar Argelino"
 msgid "Align QR code here"
 msgstr "Alinea el código QR aquí"
 
-#: src/components/ExpenseEditor.tsx:333
+#: src/components/ExpenseEditor.tsx:334
 msgid "Amount"
 msgstr "Cantidad"
 
 #. placeholder {0}: participant.name
-#: src/components/ExpenseEditor.tsx:647
+#: src/components/ExpenseEditor.tsx:648
 msgid "Amount for {0}"
 msgstr "Cantidad para {0}"
 
@@ -251,6 +255,18 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
+#: src/components/CalculatorToolbar.tsx:128
+msgid "Calculate result"
+msgstr "Calcular resultado"
+
+#: src/components/CalculatorToolbar.tsx:78
+msgid "Calculator"
+msgstr "Calculadora"
+
+#: src/components/CalculatorToolbar.tsx:91
+msgid "Calculator expression"
+msgstr "Expresión de calculadora"
+
 #: src/routes/new.tsx:513
 msgid "Cambodian Riel"
 msgstr "Riel Camboyano"
@@ -314,6 +330,10 @@ msgstr "Yuan Chino"
 #: src/routes/new.tsx:255
 msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
+
+#: src/components/CalculatorToolbar.tsx:117
+msgid "Clear expression"
+msgstr "Borrar expresión"
 
 #: src/components/EmojiPicker.tsx:189
 msgid "Clear search"
@@ -409,7 +429,7 @@ msgstr "Corona Checa"
 msgid "Danish Krone"
 msgstr "Corona Danesa"
 
-#: src/components/ExpenseEditor.tsx:387
+#: src/components/ExpenseEditor.tsx:388
 msgid "Date"
 msgstr "Fecha"
 
@@ -435,6 +455,10 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 #: src/components/PartyPendingComponent.tsx:112
 msgid "Did you know?"
 msgstr "¿Sabías que?"
+
+#: src/components/CalculatorToolbar.tsx:46
+msgid "Divide"
+msgstr "Dividir"
 
 #: src/routes/new.tsx:488
 msgid "Djiboutian Franc"
@@ -569,7 +593,7 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:833
+#: src/components/ExpenseEditor.tsx:835
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
@@ -657,7 +681,7 @@ msgstr "Gourde Haitiano"
 msgid "Have an idea to improve trizum? We'd love to hear it."
 msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 
-#: src/components/ExpenseEditor.tsx:733
+#: src/components/ExpenseEditor.tsx:735
 msgid "Heads up!"
 msgstr "¡Atención!"
 
@@ -738,7 +762,7 @@ msgstr "Importando adjuntos ({0} de {1})"
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
-#: src/components/ExpenseEditor.tsx:417
+#: src/components/ExpenseEditor.tsx:418
 msgid "Include all"
 msgstr "Incluir todos"
 
@@ -981,6 +1005,10 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
+#: src/components/CalculatorToolbar.tsx:45
+msgid "Multiply"
+msgstr "Multiplicar"
+
 #: src/routes/new.tsx:529
 msgid "Myanma Kyat"
 msgstr "Kyat Birmano"
@@ -1084,6 +1112,10 @@ msgstr "Rial Omaní"
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
+#: src/components/CurrencyField.tsx:62
+msgid "Open calculator"
+msgstr "Abrir calculadora"
+
 #: src/routes/support.tsx:76
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
@@ -1109,7 +1141,7 @@ msgstr "le debe"
 msgid "Paid at"
 msgstr "Pagado el"
 
-#: src/components/ExpenseEditor.tsx:362
+#: src/components/ExpenseEditor.tsx:363
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:249
 msgid "Paid by"
 msgstr "Pagado por"
@@ -1227,7 +1259,7 @@ msgstr "Platino (onza troy)"
 msgid "Please allow camera access in your browser settings to scan QR codes."
 msgstr "Por favor, permite el acceso a la cámara en la configuración de tu navegador para escanear códigos QR."
 
-#: src/components/ExpenseEditor.tsx:751
+#: src/components/ExpenseEditor.tsx:753
 msgid "Please correct it before saving."
 msgstr "Por favor, corrígelo antes de guardar."
 
@@ -1284,7 +1316,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:936
+#: src/components/ExpenseEditor.tsx:938
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -1403,14 +1435,14 @@ msgid "Shares"
 msgstr "Partes"
 
 #. placeholder {0}: participant.name
-#: src/components/ExpenseEditor.tsx:610
+#: src/components/ExpenseEditor.tsx:611
 msgid "Shares for {0}"
 msgstr "Partes para {0}"
 
 #. placeholder {0}: totalUnitAmount / 100
 #. placeholder {1}: party.currency
 #. placeholder {2}: party.currency
-#: src/components/ExpenseEditor.tsx:737
+#: src/components/ExpenseEditor.tsx:739
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1>{amount} {2}</1>."
 
@@ -1491,6 +1523,10 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
+#: src/components/CalculatorToolbar.tsx:44
+msgid "Subtract"
+msgstr "Restar"
+
 #: src/routes/new.tsx:596
 msgid "Sucre"
 msgstr "Sucre"
@@ -1524,11 +1560,11 @@ msgstr "Desliza entre las pestañas de gastos y balance."
 msgid "Swiss Franc"
 msgstr "Franco Suizo"
 
-#: src/components/ExpenseEditor.tsx:634
+#: src/components/ExpenseEditor.tsx:635
 msgid "Switch to a set amount"
 msgstr "Cambiar a una cantidad fija"
 
-#: src/components/ExpenseEditor.tsx:635
+#: src/components/ExpenseEditor.tsx:636
 msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
@@ -1562,7 +1598,7 @@ msgid "Tajikistani Somoni"
 msgstr "Somoni Tayiko"
 
 #: src/components/AvatarPicker.tsx:126
-#: src/components/ExpenseEditor.tsx:858
+#: src/components/ExpenseEditor.tsx:860
 msgid "Take photo"
 msgstr "Hacer foto"
 
@@ -1707,12 +1743,12 @@ msgstr "Actualizando gasto..."
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
-#: src/components/ExpenseEditor.tsx:776
+#: src/components/ExpenseEditor.tsx:778
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:135
-#: src/components/ExpenseEditor.tsx:867
+#: src/components/ExpenseEditor.tsx:869
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -1720,7 +1756,7 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:814
+#: src/components/ExpenseEditor.tsx:816
 msgid "Uploading..."
 msgstr "Subiendo..."
 
@@ -1780,7 +1816,7 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:917
+#: src/components/ExpenseEditor.tsx:919
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:319
 msgid "View photo"
 msgstr "Ver foto"

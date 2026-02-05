@@ -329,6 +329,7 @@ export function ExpenseEditor({
           >
             {(field) => (
               <CurrencyField
+                calculator
                 name={field.name}
                 label={t`Amount`}
                 value={field.state.value}
@@ -675,6 +676,7 @@ function ParticipantSplitAmountField({
 
   return (
     <CurrencyField
+      calculator
       value={participantAmount / 100}
       onChange={onChange}
       className="w-20"
