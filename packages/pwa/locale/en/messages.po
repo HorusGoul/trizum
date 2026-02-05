@@ -1168,7 +1168,7 @@ msgstr "Omani Rial"
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
-#: src/components/CurrencyField.tsx:62
+#: src/components/CurrencyField.tsx:51
 msgid "Open calculator"
 msgstr "Open calculator"
 

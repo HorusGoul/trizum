@@ -1112,7 +1112,7 @@ msgstr "Rial Omaní"
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
-#: src/components/CurrencyField.tsx:62
+#: src/components/CurrencyField.tsx:51
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
