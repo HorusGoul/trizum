@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
 import { IconWithFallback } from "#src/ui/Icon.tsx";
@@ -47,7 +47,7 @@ export function CalculatorToolbar({
     null,
   );
   const [dragAccumulator, setDragAccumulator] = useState(0);
-  const [scrollOffset, setScrollOffset] = useState(0);
+  const scrollOffsetRef = useRef(0);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<{
     top: number;
@@ -87,11 +87,14 @@ export function CalculatorToolbar({
   }, [fieldContainerRef]);
 
   // Scroll cursor into view when cursor position changes
-  useEffect(() => {
+  useLayoutEffect(() => {
     const scrollContainer = expressionScrollRef.current;
     const contentEl = expressionContentRef.current;
     if (!scrollContainer || !contentEl || !expression) {
-      setScrollOffset(0);
+      scrollOffsetRef.current = 0;
+      if (contentEl) {
+        contentEl.style.transform = "translateX(0px)";
+      }
       return;
     }
 
@@ -114,10 +117,12 @@ export function CalculatorToolbar({
     const containerWidth = scrollContainer.clientWidth;
     const contentWidth = contentEl.scrollWidth;
     const padding = 20;
+    const scrollOffset = scrollOffsetRef.current;
 
     // No need to scroll if content fits
     if (contentWidth <= containerWidth) {
-      setScrollOffset(0);
+      scrollOffsetRef.current = 0;
+      contentEl.style.transform = "translateX(0px)";
       return;
     }
 
@@ -137,9 +142,10 @@ export function CalculatorToolbar({
     }
 
     if (newOffset !== scrollOffset) {
-      setScrollOffset(newOffset);
+      scrollOffsetRef.current = newOffset;
+      contentEl.style.transform = `translateX(-${newOffset}px)`;
     }
-  }, [cursorPosition, expression, scrollOffset]);
+  }, [cursorPosition, expression]);
 
   // Handle pointer gestures on expression display for cursor movement
   useEffect(() => {
@@ -413,7 +419,6 @@ export function CalculatorToolbar({
               <span
                 ref={expressionContentRef}
                 className="relative inline-flex"
-                style={{ transform: `translateX(-${scrollOffset}px)` }}
               >
                 {expression.split("").map((char, index) => (
                   <span
