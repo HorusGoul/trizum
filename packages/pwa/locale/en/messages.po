@@ -368,7 +368,7 @@ msgstr "Clear search"
 msgid "Close"
 msgstr "Close"
 
-#: src/components/CurrencyField.tsx:61
+#: src/components/CurrencyField.tsx:66
 msgid "Close calculator"
 msgstr "Close calculator"
 
@@ -1172,7 +1172,7 @@ msgstr "Omani Rial"
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
-#: src/components/CurrencyField.tsx:61
+#: src/components/CurrencyField.tsx:66
 msgid "Open calculator"
 msgstr "Open calculator"
 
