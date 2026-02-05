@@ -157,4 +157,5 @@ dist
 *.aab
 
 # Claude
-.claude
+.claude/*
+!.claude/skills/
