@@ -203,7 +203,11 @@ export function CalculatorToolbar({
             ) : (
               <span className="relative inline-flex">
                 {expression.split("").map((char, index) => (
-                  <span key={index} ref={setCharRef(index)} className="relative">
+                  <span
+                    key={index}
+                    ref={setCharRef(index)}
+                    className="relative"
+                  >
                     {index === cursorPosition && (
                       <span className="absolute left-0 top-0 h-full w-0 animate-blink">
                         <span className="absolute -translate-x-1/2">|</span>
