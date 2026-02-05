@@ -5,6 +5,30 @@ interface UseCalculatorModeOptions {
   value: number;
   onChange: (value: number) => void;
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  currency?: string;
+}
+
+function getCurrencyDecimals(currency: string | undefined): number | null {
+  if (!currency) return null;
+
+  try {
+    const formatter = new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      currencyDisplay: "code",
+    });
+    const parts = formatter.formatToParts(1.23456789);
+    const fractionPart = parts.find((part) => part.type === "fraction");
+    return fractionPart?.value.length ?? 2;
+  } catch {
+    return null;
+  }
+}
+
+function roundToDecimals(value: number, decimals: number | null): number {
+  if (decimals === null) return value;
+  const factor = Math.pow(10, decimals);
+  return Math.round(value * factor) / factor;
 }
 
 export interface CalculatorState {
@@ -29,12 +53,20 @@ export function useCalculatorMode({
   value,
   onChange,
   fieldContainerRef,
+  currency,
 }: UseCalculatorModeOptions): [CalculatorState, CalculatorActions] {
   const [isActive, setIsActive] = useState(false);
   const [expression, setExpressionRaw] = useState("");
   const [cursorPosition, setCursorPositionRaw] = useState(0);
 
-  const previewValue = evaluateExpression(expression);
+  const decimals = getCurrencyDecimals(currency);
+  const rawPreviewValue = evaluateExpression(expression);
+  const previewValue =
+    rawPreviewValue !== null ? roundToDecimals(rawPreviewValue, decimals) : null;
+
+  function applyValue(val: number) {
+    onChange(roundToDecimals(val, decimals));
+  }
 
   function focusField() {
     requestAnimationFrame(() => {
@@ -53,7 +85,7 @@ export function useCalculatorMode({
   function deactivate() {
     const result = evaluateExpression(expression);
     if (result !== null) {
-      onChange(result);
+      applyValue(result);
     }
     setIsActive(false);
     setExpressionRaw("");
@@ -70,7 +102,7 @@ export function useCalculatorMode({
 
     const result = evaluateExpression(newExpr);
     if (result !== null) {
-      onChange(result);
+      applyValue(result);
     }
   }
 
@@ -84,9 +116,9 @@ export function useCalculatorMode({
 
       const result = evaluateExpression(newExpr);
       if (result !== null) {
-        onChange(result);
+        applyValue(result);
       } else if (newExpr === "") {
-        onChange(0);
+        applyValue(0);
       }
     }
   }
@@ -107,7 +139,7 @@ export function useCalculatorMode({
   function commit() {
     const result = evaluateExpression(expression);
     if (result !== null) {
-      onChange(result);
+      applyValue(result);
     }
     setIsActive(false);
     setExpressionRaw("");
@@ -118,7 +150,7 @@ export function useCalculatorMode({
   function clear() {
     setExpressionRaw("");
     setCursorPositionRaw(0);
-    onChange(0);
+    applyValue(0);
   }
 
   return [

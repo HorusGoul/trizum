@@ -53,6 +53,7 @@ function CurrencyFieldWithCalculator({
     value: props.value ?? 0,
     onChange: (value) => props.onChange?.(value),
     fieldContainerRef,
+    currency: props.currency,
   });
 
   function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
