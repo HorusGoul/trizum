@@ -56,18 +56,18 @@ function CurrencyFieldWithCalculator({
         isReadOnly={state.isActive}
       />
 
-      {!state.isActive && (
-        <IconButton
-          icon="#lucide/calculator"
-          aria-label={t`Open calculator`}
-          color="transparent"
-          className={
-            calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"
-          }
-          iconClassName="size-4"
-          onPress={actions.activate}
-        />
-      )}
+      <IconButton
+        icon={state.isActive ? "#lucide/x" : "#lucide/calculator"}
+        aria-label={
+          state.isActive ? t`Close calculator` : t`Open calculator`
+        }
+        color="transparent"
+        className={
+          calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"
+        }
+        iconClassName="size-4"
+        onPress={state.isActive ? actions.deactivate : actions.activate}
+      />
 
       {state.isActive && (
         <CalculatorToolbar
@@ -78,6 +78,7 @@ function CurrencyFieldWithCalculator({
           onClear={actions.clear}
           onDismiss={actions.deactivate}
           expressionInputRef={expressionInputRef}
+          fieldContainerRef={fieldContainerRef}
           previewValue={state.previewValue}
         />
       )}

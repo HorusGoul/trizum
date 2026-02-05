@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
 
@@ -11,6 +11,7 @@ interface CalculatorToolbarProps {
   onClear: () => void;
   onDismiss: () => void;
   expressionInputRef: React.RefObject<HTMLInputElement | null>;
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   previewValue: number | null;
 }
 
@@ -54,9 +55,28 @@ export function CalculatorToolbar({
   onClear,
   onDismiss,
   expressionInputRef,
+  fieldContainerRef,
   previewValue,
 }: CalculatorToolbarProps) {
   const bottom = useKeyboardBottom();
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleFocusIn(e: FocusEvent) {
+      const target = e.target as Node | null;
+      if (!target) return;
+
+      const inToolbar = toolbarRef.current?.contains(target);
+      const inField = fieldContainerRef.current?.contains(target);
+
+      if (!inToolbar && !inField) {
+        onDismiss();
+      }
+    }
+
+    document.addEventListener("focusin", handleFocusIn);
+    return () => document.removeEventListener("focusin", handleFocusIn);
+  }, [onDismiss, fieldContainerRef]);
 
   function handleExpressionInput(e: React.FormEvent<HTMLInputElement>) {
     onExpressionChange(e.currentTarget.value);
@@ -74,6 +94,7 @@ export function CalculatorToolbar({
 
   return createPortal(
     <div
+      ref={toolbarRef}
       role="toolbar"
       aria-label={t`Calculator`}
       className="fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
