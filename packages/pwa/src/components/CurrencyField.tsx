@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { AppCurrencyField } from "#src/ui/TextField.js";
-import React, { use, useRef, useState } from "react";
+import React, { use, useRef } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
 import { CalculatorToolbar } from "./CalculatorToolbar";
@@ -28,7 +28,6 @@ export function CurrencyField({
 function CurrencyFieldWithCalculator(
   props: React.ComponentProps<typeof AppCurrencyField>,
 ) {
-  const [isFocused, setIsFocused] = useState(false);
   const expressionInputRef = useRef<HTMLInputElement>(null);
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const [state, actions] = useCalculatorMode({
@@ -44,21 +43,11 @@ function CurrencyFieldWithCalculator(
         {...props}
         value={props.value}
         isReadOnly={state.isActive}
-        onFocus={(e) => {
-          setIsFocused(true);
-          props.onFocus?.(e);
-        }}
-        onBlur={(e) => {
-          setIsFocused(false);
-          if (!state.isActive) {
-            props.onBlur?.(e);
-          }
-        }}
       />
 
-      {isFocused && !state.isActive && (
+      {!state.isActive && (
         <IconButton
-          icon="#lucide/calculator"
+          icon="#lucide/sigma"
           aria-label={t`Open calculator`}
           color="transparent"
           className="absolute bottom-1 right-1 h-8 w-8"
