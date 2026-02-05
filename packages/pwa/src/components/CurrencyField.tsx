@@ -40,9 +40,9 @@ function CurrencyFieldWithCalculator({
 }: React.ComponentProps<typeof AppCurrencyField> & {
   calculatorButtonClassName?: string;
 }) {
-  const presenceElementId = (
-    props as { "data-presence-element-id"?: string }
-  )["data-presence-element-id"];
+  const presenceElementId = (props as { "data-presence-element-id"?: string })[
+    "data-presence-element-id"
+  ];
   const expressionInputRef = useRef<HTMLInputElement>(null);
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const [state, actions] = useCalculatorMode({

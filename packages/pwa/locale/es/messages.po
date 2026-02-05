@@ -58,7 +58,7 @@ msgstr "Color de acento"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:44
+#: src/components/CalculatorToolbar.tsx:45
 msgid "Add"
 msgstr "Sumar"
 
@@ -255,15 +255,15 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/components/CalculatorToolbar.tsx:155
+#: src/components/CalculatorToolbar.tsx:165
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:104
+#: src/components/CalculatorToolbar.tsx:114
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:118
+#: src/components/CalculatorToolbar.tsx:128
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
@@ -331,7 +331,7 @@ msgstr "Yuan Chino"
 msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
-#: src/components/CalculatorToolbar.tsx:144
+#: src/components/CalculatorToolbar.tsx:154
 msgid "Clear expression"
 msgstr "Borrar expresión"
 
@@ -344,7 +344,7 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CurrencyField.tsx:66
+#: src/components/CurrencyField.tsx:69
 msgid "Close calculator"
 msgstr ""
 
@@ -460,7 +460,7 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/CalculatorToolbar.tsx:47
+#: src/components/CalculatorToolbar.tsx:48
 msgid "Divide"
 msgstr "Dividir"
 
@@ -1009,7 +1009,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:46
+#: src/components/CalculatorToolbar.tsx:47
 msgid "Multiply"
 msgstr "Multiplicar"
 
@@ -1116,7 +1116,7 @@ msgstr "Rial Omaní"
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
-#: src/components/CurrencyField.tsx:66
+#: src/components/CurrencyField.tsx:69
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
@@ -1527,7 +1527,7 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:45
+#: src/components/CalculatorToolbar.tsx:46
 msgid "Subtract"
 msgstr "Restar"
 
