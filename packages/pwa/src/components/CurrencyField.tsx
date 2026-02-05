@@ -58,7 +58,7 @@ function CurrencyFieldWithCalculator({
 
       {!state.isActive && (
         <IconButton
-          icon="#lucide/sigma"
+          icon="#lucide/calculator"
           aria-label={t`Open calculator`}
           color="transparent"
           className={
