@@ -281,11 +281,11 @@ export function CalculatorToolbar({
         {/* Expression display with cursor - tap to position, drag to move cursor */}
         <div
           ref={expressionRef}
-          className="flex cursor-text touch-none select-none items-center overflow-hidden rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
+          className="flex cursor-text touch-none select-none items-center rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
         >
           <span
             ref={expressionScrollRef}
-            className="min-w-0 flex-1 whitespace-nowrap text-right font-mono text-xl font-medium"
+            className="min-w-0 flex-1 overflow-hidden whitespace-nowrap text-right font-mono text-xl font-medium"
             aria-live="polite"
             aria-label={t`Calculator expression`}
           >
