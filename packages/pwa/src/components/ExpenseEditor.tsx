@@ -32,8 +32,12 @@ import {
   type ZonedDateTime,
 } from "@internationalized/date";
 import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Icon, IconWithFallback } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
+import { MenuTrigger, Popover } from "react-aria-components";
+import { Menu, MenuItem } from "#src/ui/Menu.js";
+import { Switch } from "#src/ui/Switch.tsx";
+import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { getExpenseUnitShares } from "#src/models/expense.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
@@ -83,6 +87,8 @@ export function ExpenseEditor({
   onViewPhoto,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
+  const { partyList, setAutoOpenCalculator } = usePartyList();
+  const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
@@ -246,6 +252,39 @@ export function ExpenseEditor({
         <BackButton fallbackOptions={goBackFallbackOptions} />
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">{title}</h1>
         <div className="flex-1" />
+        <MenuTrigger>
+          <IconButton
+            icon="#lucide/ellipsis-vertical"
+            aria-label={t`Menu`}
+            className="flex-shrink-0"
+          />
+          <Popover placement="bottom end">
+            <Menu>
+              <MenuItem
+                onAction={() => setAutoOpenCalculator(!autoOpenCalculator)}
+              >
+                <IconWithFallback
+                  name="#lucide/calculator"
+                  size={20}
+                  className="mr-3 self-start"
+                />
+                <div className="mr-3 flex flex-col">
+                  <span className="leading-none">
+                    <Trans>Auto-open calculator</Trans>
+                  </span>
+                  <span className="mt-2 text-sm leading-none opacity-80">
+                    <Trans>Open calculator when focusing amount fields</Trans>
+                  </span>
+                </div>
+                <Switch
+                  isSelected={autoOpenCalculator}
+                  onChange={() => setAutoOpenCalculator(!autoOpenCalculator)}
+                  isReadOnly
+                />
+              </MenuItem>
+            </Menu>
+          </Popover>
+        </MenuTrigger>
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
         >
@@ -330,6 +369,7 @@ export function ExpenseEditor({
             {(field) => (
               <CurrencyField
                 calculator
+                autoOpenCalculator={autoOpenCalculator}
                 name={field.name}
                 label={t`Amount`}
                 value={field.state.value}
@@ -426,6 +466,7 @@ export function ExpenseEditor({
                 participant={participant}
                 amount={amount}
                 shares={shares}
+                autoOpenCalculator={autoOpenCalculator}
                 onSharesChange={(shares) =>
                   form.setFieldValue("shares", shares)
                 }
@@ -446,6 +487,7 @@ interface ParticipantItemProps {
   amount: number;
   participant: PartyParticipant;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  autoOpenCalculator?: boolean;
   onSharesChange: (
     shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
   ) => void;
@@ -455,6 +497,7 @@ function ParticipantItem({
   amount,
   shares,
   participant,
+  autoOpenCalculator,
   onSharesChange,
 }: ParticipantItemProps) {
   const participantShare = shares[participant.id];
@@ -644,6 +687,7 @@ function ParticipantItem({
               amount={amount}
               shares={shares}
               participantId={participant.id}
+              autoOpenCalculator={autoOpenCalculator}
               onChange={onExactAmountChange}
               aria-label={t`Amount for ${participant.name}`}
             />
@@ -657,6 +701,7 @@ interface ParticipantSplitAmountFieldProps {
   amount: number;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   participantId: ExpenseUser;
+  autoOpenCalculator?: boolean;
   onChange: (value: number) => void;
   "aria-label"?: string;
 }
@@ -665,6 +710,7 @@ function ParticipantSplitAmountField({
   amount,
   shares,
   participantId,
+  autoOpenCalculator,
   onChange,
   "aria-label": ariaLabel,
 }: ParticipantSplitAmountFieldProps) {
@@ -677,6 +723,7 @@ function ParticipantSplitAmountField({
   return (
     <CurrencyField
       calculator
+      autoOpenCalculator={autoOpenCalculator}
       calculatorButtonClassName="absolute bottom-0.5 -left-8 h-6 w-6"
       value={participantAmount / 100}
       onChange={onChange}

@@ -14,6 +14,7 @@ export interface PartyList {
   avatarId?: DocumentId | null;
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
+  autoOpenCalculator?: boolean;
   hue?: number;
   lastOpenedPartyId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;

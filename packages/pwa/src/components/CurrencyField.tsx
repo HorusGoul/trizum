@@ -12,11 +12,13 @@ export type CurrencyFieldProps = React.ComponentProps<
 > & {
   calculator?: boolean;
   calculatorButtonClassName?: string;
+  autoOpenCalculator?: boolean;
 };
 
 export function CurrencyField({
   calculator = false,
   calculatorButtonClassName,
+  autoOpenCalculator = false,
   ...props
 }: CurrencyFieldProps) {
   const currency = use(CurrencyContext);
@@ -30,15 +32,18 @@ export function CurrencyField({
       {...props}
       currency={currency}
       calculatorButtonClassName={calculatorButtonClassName}
+      autoOpenCalculator={autoOpenCalculator}
     />
   );
 }
 
 function CurrencyFieldWithCalculator({
   calculatorButtonClassName,
+  autoOpenCalculator = false,
   ...props
 }: React.ComponentProps<typeof AppCurrencyField> & {
   calculatorButtonClassName?: string;
+  autoOpenCalculator?: boolean;
 }) {
   const presenceElementId = (props as { "data-presence-element-id"?: string })[
     "data-presence-element-id"
@@ -52,12 +57,21 @@ function CurrencyFieldWithCalculator({
     fieldContainerRef,
   });
 
+  function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
+    props.onFocus?.(event);
+
+    if (autoOpenCalculator && !state.isActive) {
+      actions.activate();
+    }
+  }
+
   return (
     <div className="relative" ref={fieldContainerRef}>
       <AppCurrencyField
         {...props}
         value={props.value}
         isReadOnly={state.isActive}
+        onFocus={handleFocus}
         inputClassName={cn(
           props.inputClassName,
           state.isActive && "ring-ring ring-2 ring-offset-2",
