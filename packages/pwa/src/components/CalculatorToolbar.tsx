@@ -64,20 +64,33 @@ export function CalculatorToolbar({
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleFocusIn(e: FocusEvent) {
-      const target = e.target as Node | null;
-      if (!target) return;
+    function isOutside(target: Node | null) {
+      if (!target) return false;
 
       const inToolbar = toolbarRef.current?.contains(target);
       const inField = fieldContainerRef.current?.contains(target);
 
-      if (!inToolbar && !inField) {
+      return !inToolbar && !inField;
+    }
+
+    function handleFocusIn(e: FocusEvent) {
+      if (isOutside(e.target as Node | null)) {
+        onDismiss();
+      }
+    }
+
+    function handlePointerDown(e: PointerEvent) {
+      if (isOutside(e.target as Node | null)) {
         onDismiss();
       }
     }
 
     document.addEventListener("focusin", handleFocusIn);
-    return () => document.removeEventListener("focusin", handleFocusIn);
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
   }, [onDismiss, fieldContainerRef]);
 
   function handleExpressionInput(e: React.FormEvent<HTMLInputElement>) {
