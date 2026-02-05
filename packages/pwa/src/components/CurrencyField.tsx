@@ -62,8 +62,7 @@ function CurrencyFieldWithCalculator({
           aria-label={t`Open calculator`}
           color="transparent"
           className={
-            calculatorButtonClassName ??
-            "absolute bottom-1 right-1 h-8 w-8"
+            calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"
           }
           iconClassName="size-4"
           onPress={actions.activate}

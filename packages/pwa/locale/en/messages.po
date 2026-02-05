@@ -637,7 +637,7 @@ msgstr "Failed to update expense"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Failed to upload avatar. Please try again."
 
-#: src/components/ExpenseEditor.tsx:835
+#: src/components/ExpenseEditor.tsx:836
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -729,7 +729,7 @@ msgstr "Haitian Gourde"
 msgid "Have an idea to improve trizum? We'd love to hear it."
 msgstr "Have an idea to improve trizum? We'd love to hear it."
 
-#: src/components/ExpenseEditor.tsx:735
+#: src/components/ExpenseEditor.tsx:736
 msgid "Heads up!"
 msgstr "Heads up!"
 
@@ -1168,7 +1168,7 @@ msgstr "Omani Rial"
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
-#: src/components/CurrencyField.tsx:51
+#: src/components/CurrencyField.tsx:62
 msgid "Open calculator"
 msgstr "Open calculator"
 
@@ -1327,7 +1327,7 @@ msgstr "Platinum (troy ounce)"
 msgid "Please allow camera access in your browser settings to scan QR codes."
 msgstr "Please allow camera access in your browser settings to scan QR codes."
 
-#: src/components/ExpenseEditor.tsx:753
+#: src/components/ExpenseEditor.tsx:754
 msgid "Please correct it before saving."
 msgstr "Please correct it before saving."
 
@@ -1388,7 +1388,7 @@ msgstr "Remove"
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/ExpenseEditor.tsx:938
+#: src/components/ExpenseEditor.tsx:939
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -1514,7 +1514,7 @@ msgstr "Shares for {0}"
 #. placeholder {0}: totalUnitAmount / 100
 #. placeholder {1}: party.currency
 #. placeholder {2}: party.currency
-#: src/components/ExpenseEditor.tsx:739
+#: src/components/ExpenseEditor.tsx:740
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 
@@ -1674,7 +1674,7 @@ msgid "Tajikistani Somoni"
 msgstr "Tajikistani Somoni"
 
 #: src/components/AvatarPicker.tsx:126
-#: src/components/ExpenseEditor.tsx:860
+#: src/components/ExpenseEditor.tsx:861
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -1831,12 +1831,12 @@ msgstr "Updating expense..."
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
-#: src/components/ExpenseEditor.tsx:778
+#: src/components/ExpenseEditor.tsx:779
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
 #: src/components/AvatarPicker.tsx:135
-#: src/components/ExpenseEditor.tsx:869
+#: src/components/ExpenseEditor.tsx:870
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -1849,7 +1849,7 @@ msgstr "Uploading avatar..."
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:816
+#: src/components/ExpenseEditor.tsx:817
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -1913,7 +1913,7 @@ msgstr "View on GitHub"
 msgid "View party"
 msgstr "View party"
 
-#: src/components/ExpenseEditor.tsx:919
+#: src/components/ExpenseEditor.tsx:920
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:319
 msgid "View photo"
 msgstr "View photo"
