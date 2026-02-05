@@ -56,11 +56,14 @@ export function CalculatorToolbar({
     let cursorX: number;
     if (cursorPosition === 0 && charRefs.current[0]) {
       cursorX = charRefs.current[0].offsetLeft;
-    } else if (cursorPosition === expression.length && charRefs.current[cursorPosition - 1]) {
+    } else if (
+      cursorPosition === expression.length &&
+      charRefs.current[cursorPosition - 1]
+    ) {
       const lastChar = charRefs.current[cursorPosition - 1]!;
       cursorX = lastChar.offsetLeft + lastChar.offsetWidth;
     } else if (charRefs.current[cursorPosition]) {
-      cursorX = charRefs.current[cursorPosition]!.offsetLeft;
+      cursorX = charRefs.current[cursorPosition].offsetLeft;
     } else {
       return;
     }
