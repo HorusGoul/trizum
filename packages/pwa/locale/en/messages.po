@@ -62,7 +62,7 @@ msgstr "Accent color"
 msgid "ADB Unit of Account"
 msgstr "ADB Unit of Account"
 
-#: src/components/CalculatorToolbar.tsx:43
+#: src/components/CalculatorToolbar.tsx:44
 msgid "Add"
 msgstr "Add"
 
@@ -271,15 +271,15 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/components/CalculatorToolbar.tsx:128
+#: src/components/CalculatorToolbar.tsx:149
 msgid "Calculate result"
 msgstr "Calculate result"
 
-#: src/components/CalculatorToolbar.tsx:78
+#: src/components/CalculatorToolbar.tsx:99
 msgid "Calculator"
 msgstr "Calculator"
 
-#: src/components/CalculatorToolbar.tsx:91
+#: src/components/CalculatorToolbar.tsx:112
 msgid "Calculator expression"
 msgstr "Calculator expression"
 
@@ -355,7 +355,7 @@ msgstr "Chinese Yuan"
 msgid "Choose the currency for expenses in this party"
 msgstr "Choose the currency for expenses in this party"
 
-#: src/components/CalculatorToolbar.tsx:117
+#: src/components/CalculatorToolbar.tsx:138
 msgid "Clear expression"
 msgstr "Clear expression"
 
@@ -367,6 +367,10 @@ msgstr "Clear search"
 #: src/components/RouteQRScanner.tsx:69
 msgid "Close"
 msgstr "Close"
+
+#: src/components/CurrencyField.tsx:61
+msgid "Close calculator"
+msgstr "Close calculator"
 
 #: src/routes/new.tsx:597
 msgid "Code for testing"
@@ -484,7 +488,7 @@ msgstr "Description must be less than 500 characters"
 msgid "Did you know?"
 msgstr "Did you know?"
 
-#: src/components/CalculatorToolbar.tsx:46
+#: src/components/CalculatorToolbar.tsx:47
 msgid "Divide"
 msgstr "Divide"
 
@@ -1057,7 +1061,7 @@ msgstr "Mozambican Metical"
 msgid "Multi-Party Splitting"
 msgstr "Multi-Party Splitting"
 
-#: src/components/CalculatorToolbar.tsx:45
+#: src/components/CalculatorToolbar.tsx:46
 msgid "Multiply"
 msgstr "Multiply"
 
@@ -1168,7 +1172,7 @@ msgstr "Omani Rial"
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
-#: src/components/CurrencyField.tsx:62
+#: src/components/CurrencyField.tsx:61
 msgid "Open calculator"
 msgstr "Open calculator"
 
@@ -1599,7 +1603,7 @@ msgstr "Submit a Request"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/CalculatorToolbar.tsx:44
+#: src/components/CalculatorToolbar.tsx:45
 msgid "Subtract"
 msgstr "Subtract"
 

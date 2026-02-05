@@ -58,9 +58,7 @@ function CurrencyFieldWithCalculator({
 
       <IconButton
         icon={state.isActive ? "#lucide/x" : "#lucide/calculator"}
-        aria-label={
-          state.isActive ? t`Close calculator` : t`Open calculator`
-        }
+        aria-label={state.isActive ? t`Close calculator` : t`Open calculator`}
         color="transparent"
         className={
           calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"
