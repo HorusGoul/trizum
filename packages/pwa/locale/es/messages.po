@@ -50,7 +50,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:227
+#: src/routes/settings.tsx:245
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -156,6 +156,7 @@ msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
 #: src/components/ExpenseEditor.tsx:274
+#: src/routes/settings.tsx:230
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
@@ -163,7 +164,7 @@ msgstr "Abrir calculadora automáticamente"
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:213
+#: src/routes/settings.tsx:216
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -525,7 +526,7 @@ msgstr "Soporte por email"
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
-#: src/routes/settings.tsx:48
+#: src/routes/settings.tsx:49
 msgid "English"
 msgstr "Inglés"
 
@@ -541,7 +542,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
-#: src/routes/settings.tsx:49
+#: src/routes/settings.tsx:50
 msgid "Español"
 msgstr "Español"
 
@@ -641,7 +642,7 @@ msgstr "Características"
 msgid "Fijian Dollar"
 msgstr "Dólar Fiyiano"
 
-#: src/routes/settings.tsx:172
+#: src/routes/settings.tsx:175
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -882,7 +883,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:190
+#: src/routes/settings.tsx:193
 msgid "Language"
 msgstr "Idioma"
 
@@ -1161,7 +1162,7 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:211
+#: src/routes/settings.tsx:214
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -1280,7 +1281,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:171
+#: src/routes/settings.tsx:174
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -1418,7 +1419,7 @@ msgstr "Riyal Saudí"
 #: src/routes/new.tsx:158
 #: src/routes/party_.$partyId.settings.tsx:138
 #: src/routes/party_.$partyId.who.tsx:108
-#: src/routes/settings.tsx:105
+#: src/routes/settings.tsx:108
 msgid "Save"
 msgstr "Guardar"
 
@@ -1453,11 +1454,11 @@ msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:126
 #: src/routes/party.$partyId.tsx:304
-#: src/routes/settings.tsx:88
+#: src/routes/settings.tsx:91
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:62
+#: src/routes/settings.tsx:64
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -1564,7 +1565,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/new.tsx:158
 #: src/routes/party_.$partyId.settings.tsx:138
 #: src/routes/party_.$partyId.who.tsx:108
-#: src/routes/settings.tsx:105
+#: src/routes/settings.tsx:108
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -1634,7 +1635,7 @@ msgstr "Sincronizando información del grupo..."
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
-#: src/routes/settings.tsx:47
+#: src/routes/settings.tsx:48
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
@@ -1829,7 +1830,7 @@ msgstr "Usa el modo personal para filtrar solo tus gastos."
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
-#: src/routes/settings.tsx:146
+#: src/routes/settings.tsx:149
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -1889,7 +1890,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:147
+#: src/routes/settings.tsx:150
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
