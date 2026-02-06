@@ -71,6 +71,7 @@ export function usePartyList() {
       | "avatarId"
       | "locale"
       | "openLastPartyOnLaunch"
+      | "autoOpenCalculator"
       | "hue"
     >,
   ) {
@@ -84,6 +85,7 @@ export function usePartyList() {
         delete list["locale"];
       }
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
+      list.autoOpenCalculator = values.autoOpenCalculator;
       list.hue = values.hue;
     });
 
@@ -138,11 +140,18 @@ export function usePartyList() {
     }
   }
 
+  function setAutoOpenCalculator(value: boolean) {
+    partyListHandle.change((list) => {
+      list.autoOpenCalculator = value;
+    });
+  }
+
   return {
     partyList,
     addPartyToList,
     removeParty,
     updateSettings,
     setLastOpenedPartyId,
+    setAutoOpenCalculator,
   };
 }

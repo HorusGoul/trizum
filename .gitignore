@@ -156,5 +156,10 @@ dist
 *.apk
 *.aab
 
+# Playwright
+playwright-report/
+test-results/
+
 # Claude
-.claude
+.claude/*
+!.claude/skills/
