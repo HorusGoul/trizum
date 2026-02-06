@@ -50,7 +50,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:245
+#: src/routes/settings.tsx:227
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -156,7 +156,6 @@ msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
 #: src/components/ExpenseEditor.tsx:274
-#: src/routes/settings.tsx:230
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
@@ -164,7 +163,7 @@ msgstr "Abrir calculadora automáticamente"
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:216
+#: src/routes/settings.tsx:213
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -182,7 +181,7 @@ msgstr "Manat Azerbaiyano"
 
 #: src/components/CalculatorToolbar.tsx:562
 msgid "Backspace"
-msgstr ""
+msgstr "Retroceso"
 
 #: src/routes/new.tsx:472
 msgid "Bahamian Dollar"
@@ -346,7 +345,7 @@ msgstr "Elige la moneda para los gastos de este grupo"
 
 #: src/components/CalculatorToolbar.tsx:449
 msgid "Clear all"
-msgstr ""
+msgstr "Borrar todo"
 
 #: src/components/CalculatorToolbar.tsx:332
 msgid "Clear expression"
@@ -367,7 +366,7 @@ msgstr "Cerrar calculadora"
 
 #: src/components/CalculatorToolbar.tsx:465
 msgid "Close parenthesis"
-msgstr ""
+msgstr "Cerrar paréntesis"
 
 #: src/routes/new.tsx:597
 msgid "Code for testing"
@@ -466,7 +465,7 @@ msgstr "¡Deuda saldada entre {0} y {1}!"
 
 #: src/components/CalculatorToolbar.tsx:554
 msgid "Decimal point"
-msgstr ""
+msgstr "Punto decimal"
 
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:133
 msgid "Delete"
@@ -526,7 +525,7 @@ msgstr "Soporte por email"
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
-#: src/routes/settings.tsx:49
+#: src/routes/settings.tsx:48
 msgid "English"
 msgstr "Inglés"
 
@@ -542,7 +541,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
-#: src/routes/settings.tsx:50
+#: src/routes/settings.tsx:49
 msgid "Español"
 msgstr "Español"
 
@@ -642,7 +641,7 @@ msgstr "Características"
 msgid "Fijian Dollar"
 msgstr "Dólar Fiyiano"
 
-#: src/routes/settings.tsx:175
+#: src/routes/settings.tsx:172
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -883,7 +882,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:193
+#: src/routes/settings.tsx:190
 msgid "Language"
 msgstr "Idioma"
 
@@ -1029,11 +1028,11 @@ msgstr "Dírham Marroquí"
 
 #: src/components/CalculatorToolbar.tsx:223
 msgid "Move cursor left"
-msgstr ""
+msgstr "Mover cursor a la izquierda"
 
 #: src/components/CalculatorToolbar.tsx:231
 msgid "Move cursor right"
-msgstr ""
+msgstr "Mover cursor a la derecha"
 
 #: src/routes/new.tsx:538
 msgid "Mozambican Metical"
@@ -1162,13 +1161,13 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:214
+#: src/routes/settings.tsx:211
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
 #: src/components/CalculatorToolbar.tsx:457
 msgid "Open parenthesis"
-msgstr ""
+msgstr "Abrir paréntesis"
 
 #: src/routes/join.tsx:156
 msgid "or enter code"
@@ -1281,7 +1280,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:174
+#: src/routes/settings.tsx:171
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -1419,7 +1418,7 @@ msgstr "Riyal Saudí"
 #: src/routes/new.tsx:158
 #: src/routes/party_.$partyId.settings.tsx:138
 #: src/routes/party_.$partyId.who.tsx:108
-#: src/routes/settings.tsx:108
+#: src/routes/settings.tsx:105
 msgid "Save"
 msgstr "Guardar"
 
@@ -1454,11 +1453,11 @@ msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:126
 #: src/routes/party.$partyId.tsx:304
-#: src/routes/settings.tsx:91
+#: src/routes/settings.tsx:88
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:64
+#: src/routes/settings.tsx:62
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -1565,7 +1564,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/new.tsx:158
 #: src/routes/party_.$partyId.settings.tsx:138
 #: src/routes/party_.$partyId.who.tsx:108
-#: src/routes/settings.tsx:108
+#: src/routes/settings.tsx:105
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -1635,7 +1634,7 @@ msgstr "Sincronizando información del grupo..."
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
-#: src/routes/settings.tsx:48
+#: src/routes/settings.tsx:47
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
@@ -1830,7 +1829,7 @@ msgstr "Usa el modo personal para filtrar solo tus gastos."
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
-#: src/routes/settings.tsx:149
+#: src/routes/settings.tsx:146
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -1890,7 +1889,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:150
+#: src/routes/settings.tsx:147
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 

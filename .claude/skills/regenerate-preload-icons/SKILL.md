@@ -15,7 +15,7 @@ description: >
 
 1. Start the dev server, load the page to trigger icon scanning, then stop:
    ```bash
-   cd /home/horus/projects/trizum/packages/pwa && pnpm dev &
+   cd packages/pwa && pnpm dev &
    sleep 5
    curl -s http://localhost:5173/ > /dev/null 2>&1 || curl -s http://localhost:5174/ > /dev/null 2>&1 || curl -s http://localhost:5175/ > /dev/null 2>&1
    sleep 5

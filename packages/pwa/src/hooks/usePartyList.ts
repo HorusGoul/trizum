@@ -71,7 +71,6 @@ export function usePartyList() {
       | "avatarId"
       | "locale"
       | "openLastPartyOnLaunch"
-      | "autoOpenCalculator"
       | "hue"
     >,
   ) {
@@ -85,7 +84,6 @@ export function usePartyList() {
         delete list["locale"];
       }
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
-      list.autoOpenCalculator = values.autoOpenCalculator;
       list.hue = values.hue;
     });
 
