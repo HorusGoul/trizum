@@ -1,5 +1,20 @@
 # @trizum/pwa
 
+## 1.6.0
+
+### Minor Changes
+
+- 9d73432: Add calculator toolbar for currency fields
+  - Full iOS-style calculator UI with number pad
+  - Cursor positioning via tap and drag gestures
+  - Keyboard support (numbers, operators, backspace, enter, escape, arrow keys)
+  - Transform-based scrolling for long expressions
+  - Popover mode on large screens, bottom toolbar on mobile
+  - Currency-aware financial rounding (e.g., 2 decimals for USD)
+  - Parentheses support for complex expressions
+
+- 7e08bca: Move color theme selector from party settings to global user settings. The accent color is now a user-wide preference instead of per-party.
+
 ## 1.5.1
 
 ### Patch Changes
