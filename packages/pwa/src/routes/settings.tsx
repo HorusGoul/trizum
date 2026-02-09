@@ -31,6 +31,7 @@ interface SettingsFormValues {
   avatarId: MediaFile["id"] | null;
   locale: SupportedLocale | "system";
   openLastPartyOnLaunch: boolean;
+  autoOpenCalculator: boolean;
   hue: number;
 }
 
@@ -56,6 +57,7 @@ function Settings() {
       avatarId: values.avatarId,
       locale: values.locale === "system" ? undefined : values.locale,
       openLastPartyOnLaunch: values.openLastPartyOnLaunch,
+      autoOpenCalculator: values.autoOpenCalculator,
       hue: values.hue,
     });
     form.reset();
@@ -70,6 +72,7 @@ function Settings() {
       avatarId: partyList.avatarId ?? null,
       locale: partyList.locale ?? ("system" as const),
       openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
+      autoOpenCalculator: partyList.autoOpenCalculator ?? false,
       hue: partyList.hue ?? defaultThemeHue,
     },
     onSubmit: ({ value }) => {
@@ -213,6 +216,21 @@ function Settings() {
                 <Trans>
                   Automatically open the last visited party when you open the
                   app
+                </Trans>
+              }
+              isSelected={field.state.value}
+              onChange={field.handleChange}
+            />
+          )}
+        </form.Field>
+
+        <form.Field name="autoOpenCalculator">
+          {(field) => (
+            <SwitchField
+              label={<Trans>Auto-open calculator</Trans>}
+              description={
+                <Trans>
+                  Automatically open the calculator when focusing amount fields
                 </Trans>
               }
               isSelected={field.state.value}
