@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import asyncio
 import json
+import os
 import random
 import re
 from dataclasses import dataclass
@@ -17,6 +18,18 @@ CODEX_BOTS = {
 }
 MAX_GH_RETRIES = 5
 BASE_GH_BACKOFF_SECONDS = 2
+DEFAULT_REVIEWER_LOGINS = {"HorusGoul"}
+
+
+def configured_reviewer_logins() -> set[str]:
+    raw = os.environ.get("SYMPHONY_REVIEWER_LOGINS")
+    if raw is None:
+        return DEFAULT_REVIEWER_LOGINS
+    logins = {login.strip() for login in raw.split(",") if login.strip()}
+    return logins or DEFAULT_REVIEWER_LOGINS
+
+
+REVIEWER_LOGINS = configured_reviewer_logins()
 
 
 @dataclass
@@ -221,7 +234,7 @@ def summarize_checks(check_runs: list[dict[str, Any]]) -> tuple[bool, bool, list
 def latest_review_request_at(comments: list[dict[str, Any]]) -> datetime | None:
     latest: datetime | None = None
     for comment in comments:
-        if is_codex_bot_user(comment.get("user", {})):
+        if not is_allowed_human_user(comment.get("user", {})):
             continue
         body = comment.get("body") or ""
         if "@codex review" not in body:
@@ -279,6 +292,13 @@ def is_bot_user(user: dict[str, Any]) -> bool:
     return login.endswith("[bot]")
 
 
+def is_allowed_human_user(user: dict[str, Any]) -> bool:
+    if is_bot_user(user):
+        return False
+    login = user.get("login") or ""
+    return login in REVIEWER_LOGINS
+
+
 def is_codex_reply_body(body: str) -> bool:
     return body.startswith("[codex]")
 
@@ -307,7 +327,7 @@ def filter_human_issue_comments(comments: list[dict[str, Any]]) -> list[dict[str
     latest_ack = latest_codex_issue_reply_time(comments)
     filtered: list[dict[str, Any]] = []
     for comment in comments:
-        if is_bot_user(comment.get("user", {})):
+        if not is_allowed_human_user(comment.get("user", {})):
             continue
         body = (comment.get("body") or "").strip()
         if is_codex_reply_body(body):
@@ -382,7 +402,7 @@ def filter_human_review_comments(
     latest_codex_reply = latest_codex_reply_by_thread(comments)
     filtered: list[dict[str, Any]] = []
     for comment in comments:
-        if is_bot_user(comment.get("user", {})):
+        if not is_allowed_human_user(comment.get("user", {})):
             continue
         body = (comment.get("body") or "").strip()
         if is_codex_reply_body(body):
@@ -412,6 +432,8 @@ def is_blocking_review(
         and review_requested_at is not None
         and created_time <= review_requested_at
     ):
+        return False
+    if user_login not in REVIEWER_LOGINS and user_login not in CODEX_BOTS:
         return False
     body = (review.get("body") or "").strip()
     state = review.get("state")

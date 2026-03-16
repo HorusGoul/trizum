@@ -196,7 +196,8 @@ Required workpad structure:
 When the issue has an attached PR:
 
 1. Read top-level PR comments, inline review comments, and review summaries.
-2. Treat each actionable human or bot comment as blocking until either:
+2. Treat only actionable comments and reviews from the configured reviewer
+   login(s) plus bot feedback as blocking until either:
    - code/docs/tests were updated, or
    - a justified pushback reply was posted.
 3. Reflect each feedback item in the workpad plan or notes.
@@ -217,7 +218,8 @@ When the issue has an attached PR:
 
 ## Human Review and merge handling
 
-1. In `Human Review`, do not code unless review feedback requires rework.
+1. In `Human Review`, do not code unless review feedback from the configured
+   reviewer login(s) requires rework.
 2. If feedback requires changes, move the issue to `Rework` and restart from a fresh branch.
 3. In `Merging`, run the `land` skill until the PR is merged.
 4. After merge completes, move the issue to `Done`.
