@@ -16,6 +16,9 @@
     "lint:fix": "pnpm run lint --fix",
     "preview": "vite preview",
     "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:install": "playwright install chromium webkit",
     "typecheck": "tsc --noEmit",
     "generate:assets": "pwa-assets-generator",
     "deploy": "pnpm build && wrangler deploy"
@@ -78,6 +81,7 @@
     "@lingui/conf": "5.9.3",
     "@lingui/format-po": "5.9.3",
     "@lingui/vite-plugin": "5.9.3",
+    "@playwright/test": "1.58.2",
     "@rolldown/plugin-babel": "0.2.1",
     "@tanstack/router-devtools": "1.166.9",
     "@tanstack/router-plugin": "1.166.12",

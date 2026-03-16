@@ -3,6 +3,11 @@ name: CI
 on:
   push:
 
+permissions:
+  contents: read
+  checks: read
+  statuses: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -26,7 +31,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - uses: rharkor/caching-for-turbo@v2.3.11
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -36,11 +41,11 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
-  release:
-    name: Release
+  e2e:
+    name: E2E
     runs-on: ubuntu-latest
     needs: [check]
-    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -48,7 +53,193 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - uses: rharkor/caching-for-turbo@v2.3.11
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Wait for Cloudflare Preview
+        id: cloudflare-preview
+        uses: actions/github-script@v7
+        env:
+          HEAD_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const ref = process.env.HEAD_SHA;
+            const shortSha = ref.slice(0, 8);
+            const fallbackUrl = `https://${shortSha}-trizum.horusdev.workers.dev/`;
+            const timeoutMs = 20 * 60 * 1000;
+            const pollIntervalMs = 15 * 1000;
+            const startedAt = Date.now();
+
+            const isCloudflareContext = (value = "") =>
+              /workers builds:\s*trizum/i.test(value) ||
+              /cloudflare/i.test(value);
+
+            const extractWorkersUrl = (...values) => {
+              for (const value of values) {
+                if (!value || typeof value !== "string") {
+                  continue;
+                }
+
+                const match = value.match(
+                  /https:\/\/[a-z0-9-]+\.workers\.dev\/?/i,
+                );
+
+                if (match) {
+                  return match[0];
+                }
+              }
+
+              return null;
+            };
+
+            const dedupeBy = (items, keyFn) => {
+              const seen = new Set();
+              return items.filter((item) => {
+                const key = keyFn(item);
+                if (seen.has(key)) {
+                  return false;
+                }
+
+                seen.add(key);
+                return true;
+              });
+            };
+
+            while (Date.now() - startedAt < timeoutMs) {
+              const [checkRunsResponse, statusesResponse] = await Promise.all([
+                github.rest.checks.listForRef({
+                  owner,
+                  repo,
+                  ref,
+                  per_page: 100,
+                }),
+                github.rest.repos.listCommitStatusesForRef({
+                  owner,
+                  repo,
+                  ref,
+                  per_page: 100,
+                }),
+              ]);
+
+              const relevantChecks = checkRunsResponse.data.check_runs.filter(
+                (checkRun) =>
+                  isCloudflareContext(checkRun.name) ||
+                  isCloudflareContext(checkRun.app?.name ?? ""),
+              );
+
+              const relevantStatuses = dedupeBy(
+                statusesResponse.data.filter((status) =>
+                  isCloudflareContext(status.context),
+                ),
+                (status) => status.context,
+              );
+
+              const successfulCheck = relevantChecks.find(
+                (checkRun) =>
+                  checkRun.status === "completed" &&
+                  checkRun.conclusion === "success",
+              );
+
+              const successfulStatus = relevantStatuses.find(
+                (status) => status.state === "success",
+              );
+
+              if (successfulCheck || successfulStatus) {
+                const previewUrl =
+                  extractWorkersUrl(
+                    successfulCheck?.details_url,
+                    successfulCheck?.output?.summary,
+                    successfulCheck?.output?.title,
+                    successfulCheck?.output?.text,
+                    successfulStatus?.target_url,
+                    successfulStatus?.description,
+                  ) ?? fallbackUrl;
+
+                core.info(`Using Cloudflare preview URL: ${previewUrl}`);
+                core.setOutput("preview_url", previewUrl);
+                return;
+              }
+
+              const hasPendingCheck = relevantChecks.some(
+                (checkRun) =>
+                  checkRun.status !== "completed" ||
+                  checkRun.conclusion === null,
+              );
+
+              const hasPendingStatus = relevantStatuses.some((status) =>
+                ["pending"].includes(status.state),
+              );
+
+              const hasFailure =
+                relevantChecks.some(
+                  (checkRun) =>
+                    checkRun.status === "completed" &&
+                    ["failure", "cancelled", "timed_out", "action_required"].includes(
+                      checkRun.conclusion ?? "",
+                    ),
+                ) ||
+                relevantStatuses.some((status) =>
+                  ["error", "failure"].includes(status.state),
+                );
+
+              if ((relevantChecks.length > 0 || relevantStatuses.length > 0) && hasFailure && !hasPendingCheck && !hasPendingStatus) {
+                core.setFailed(
+                  "Cloudflare preview checks finished without a successful deployment.",
+                );
+                return;
+              }
+
+              core.info(
+                `Waiting for Cloudflare preview on ${shortSha}. Checks: ${relevantChecks.length}, statuses: ${relevantStatuses.length}.`,
+              );
+
+              await new Promise((resolve) =>
+                setTimeout(resolve, pollIntervalMs),
+              );
+            }
+
+            core.setFailed(
+              "Timed out waiting for a successful Cloudflare preview deployment.",
+            );
+
+      - name: Install Playwright Browser
+        run: pnpm --filter @trizum/pwa exec playwright install --with-deps chromium webkit
+
+      - name: Run Playwright E2E
+        run: pnpm test:e2e
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.cloudflare-preview.outputs.preview_url }}
+
+      - name: Upload Playwright Report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            packages/pwa/playwright-report
+            packages/pwa/test-results
+          if-no-files-found: ignore
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [check]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+      - uses: rharkor/caching-for-turbo@v2.3.11
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Create Release Pull Request or Publish
@@ -62,6 +253,8 @@ jobs:
   autofix:
     name: Autofix & Extract Messages
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -69,7 +262,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - uses: rharkor/caching-for-turbo@v2.3.11
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
