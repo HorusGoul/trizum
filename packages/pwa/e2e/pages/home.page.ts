@@ -42,33 +42,3 @@ export class HomePage {
     await this.joinPartyLink.click();
   }
 }
-
-export class NewTrizumPage {
-  readonly page: Page;
-  readonly heading: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.heading = page.getByRole("heading", { name: "New trizum" });
-  }
-
-  async expectLoaded() {
-    await expect(this.page).toHaveURL(/\/new$/);
-    await expect(this.heading).toBeVisible();
-  }
-}
-
-export class JoinTrizumPage {
-  readonly page: Page;
-  readonly heading: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.heading = page.getByRole("heading", { name: "Join a trizum" });
-  }
-
-  async expectLoaded() {
-    await expect(this.page).toHaveURL(/\/join(?:\?.*)?$/);
-    await expect(this.heading).toBeVisible();
-  }
-}

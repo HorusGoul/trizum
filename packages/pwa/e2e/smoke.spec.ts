@@ -1,9 +1,7 @@
 import { test } from "@playwright/test";
-import {
-  HomePage,
-  JoinTrizumPage,
-  NewTrizumPage,
-} from "./pages/home.page";
+import { HomePage } from "./pages/home.page";
+import { JoinTrizumPage } from "./pages/join-trizum.page";
+import { NewTrizumPage } from "./pages/new-trizum.page";
 
 test.describe("Home smoke @smoke", () => {
   test("shows the empty-state actions on the home screen", async ({ page }) => {
