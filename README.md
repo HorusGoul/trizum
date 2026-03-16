@@ -31,8 +31,9 @@
 
 ### Prerequisites
 
-- Node.js 24+ (use `nvm use` to set the correct version)
-- pnpm 10.14.0+
+- Node.js version from [`.nvmrc`](./.nvmrc) (use `nvm use` to set the correct
+  version)
+- pnpm version from the root [`package.json`](./package.json)
 
 ### Installation
 

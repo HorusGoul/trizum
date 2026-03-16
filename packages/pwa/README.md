@@ -1,10 +1,33 @@
-# Vite SPA with React
+# trizum PWA
 
-This template provides a minimal setup to get a SPA up and running with [Vite](https://vitejs.dev/) and [React](https://reactjs.org/).
+This package is the main application and the default package-level entry point
+for most product work. Read the repo [AGENTS guide](../../AGENTS.md) first,
+then use this document to decide where to work inside the PWA.
 
-Out of the box, it comes with some opinionated defaults:
+## Canonical Sources
 
-- `@horus.dev/eslint-config`
-- `@horus.dev/prettier-config`
-- `@horus.dev/tsconfig`
-- Tailwind CSS with `@horus.dev/tw-dynamic-themes` configured
+- [`package.json`](./package.json) is the source of truth for package scripts.
+- [`src/routes`](./src/routes) contains route entry points.
+- [`src/ui`](./src/ui) contains the shared design-system components.
+- [`src/components`](./src/components) contains app-specific UI.
+- [`src/lib`](./src/lib) and [`src/models`](./src/models) contain business logic
+  and domain models.
+- [`locale/AGENTS.md`](./locale/AGENTS.md) contains translation terminology and
+  localization guardrails.
+
+## Package Notes
+
+- The app is offline-first and uses Automerge for shared, persisted data.
+- User-facing copy must use Lingui macros, then run `pnpm lingui:extract`.
+- `src/routeTree.gen.ts` is generated. Do not edit it manually.
+- `src/preloadIcons.gen.ts` is generated from icon usage. Regenerate it through
+  the documented workflow or the corresponding skill instead of hand-editing it.
+
+## Validation
+
+Run the package scripts defined in [`package.json`](./package.json):
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm lingui:extract` when copy changes
