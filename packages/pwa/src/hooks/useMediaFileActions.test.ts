@@ -22,6 +22,28 @@ import {
   processImage,
 } from "#src/lib/imageCompression.ts";
 
+function assertNoUndefinedValues(value: unknown, path: string) {
+  if (value === undefined) {
+    throw new RangeError(
+      `Cannot assign undefined value at ${path}, because \`undefined\` is not a valid JSON data type. You might consider setting the property's value to \`null\`, or using \`delete\` to remove it altogether.`,
+    );
+  }
+
+  if (Array.isArray(value)) {
+    for (const [index, item] of value.entries()) {
+      assertNoUndefinedValues(item, `${path}/${index}`);
+    }
+
+    return;
+  }
+
+  if (value && typeof value === "object") {
+    for (const [key, item] of Object.entries(value)) {
+      assertNoUndefinedValues(item, `${path}/${key}`);
+    }
+  }
+}
+
 function createMockRepo() {
   let nextId = 0;
   let lastCreatedHandle:
@@ -35,6 +57,13 @@ function createMockRepo() {
   return {
     repo: {
       create<T>(doc: T) {
+        if (doc && typeof doc === "object" && "metadata" in doc) {
+          assertNoUndefinedValues(
+            (doc as { metadata: unknown }).metadata,
+            "/metadata",
+          );
+        }
+
         const handle = {
           doc,
           documentId: `mock-doc-${++nextId}`,
@@ -162,6 +191,49 @@ describe("getMediaFileHelpers", () => {
       convertedFromHeic: true,
       processed: true,
     });
+  });
+
+  test("omits undefined optional metadata when storing processed images", async () => {
+    const processedImage: ProcessedImage = {
+      blob: new Blob(["jpeg-output"], { type: "image/jpeg" }),
+      originalSize: 100,
+      compressedSize: 60,
+      compressionRatio: 100 / 60,
+      orientation: undefined,
+      outputMimeType: "image/jpeg",
+      originalMimeType: undefined,
+      convertedFromHeic: true,
+    };
+    processImageMock.mockResolvedValue(processedImage);
+
+    const { repo, getLastCreatedHandle } = createMockRepo();
+    const { createMediaFile } = getMediaFileHelpers(repo);
+
+    const file = new File(["heic-input"], "receipt.heic", {
+      type: "",
+      lastModified: 789,
+    });
+
+    await expect(
+      createMediaFile(file, { source: "test", cameraModel: undefined }),
+    ).resolves.toBeDefined();
+
+    const handle = getLastCreatedHandle();
+    const mediaFile = handle.doc;
+
+    expect(mediaFile.metadata).toMatchObject({
+      source: "test",
+      mimeType: "image/jpeg",
+      originalFilename: "receipt.heic",
+      lastModified: 789,
+      originalSize: 100,
+      compressedSize: 60,
+      convertedFromHeic: true,
+      processed: true,
+    });
+    expect(mediaFile.metadata).not.toHaveProperty("orientation");
+    expect(mediaFile.metadata).not.toHaveProperty("originalMimeType");
+    expect(mediaFile.metadata).not.toHaveProperty("cameraModel");
   });
 
   test("maps HEIC processing failures to a user-facing error", () => {

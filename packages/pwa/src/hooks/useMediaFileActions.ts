@@ -32,6 +32,12 @@ export function getImageUploadErrorMessage(error: unknown): string | null {
   }
 }
 
+function omitUndefinedMetadataValues(metadata: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(metadata).filter(([, value]) => value !== undefined),
+  );
+}
+
 export function getMediaFileHelpers(repo: Repo) {
   async function createMediaFile(
     blob: Blob,
@@ -57,7 +63,7 @@ export function getMediaFileHelpers(repo: Repo) {
         processedBlob = processed.blob;
 
         // Add compression metadata
-        compressionMetadata = {
+        compressionMetadata = omitUndefinedMetadataValues({
           mimeType: processed.outputMimeType || processedBlob.type,
           originalMimeType: processed.originalMimeType,
           originalFilename: file.name,
@@ -68,7 +74,7 @@ export function getMediaFileHelpers(repo: Repo) {
           orientation: processed.orientation,
           convertedFromHeic: processed.convertedFromHeic,
           processed: true,
-        };
+        });
       } catch (error) {
         console.warn("Image compression failed, using original:", error);
 
@@ -79,14 +85,14 @@ export function getMediaFileHelpers(repo: Repo) {
         }
 
         // If compression fails for non-HEIC images, use the original blob
-        compressionMetadata = {
+        compressionMetadata = omitUndefinedMetadataValues({
           mimeType: file.type || blob.type,
           originalMimeType: file.type || blob.type,
           originalFilename: file.name,
           lastModified: file.lastModified,
           processed: false,
           error: error instanceof Error ? error.message : "Unknown error",
-        };
+        });
       }
     }
 
@@ -94,10 +100,10 @@ export function getMediaFileHelpers(repo: Repo) {
       id: "id" as DocumentId,
       type: "mediaFile",
       encodedBlob: new RawString(await encodeBlob(processedBlob)),
-      metadata: {
+      metadata: omitUndefinedMetadataValues({
         ...metadata,
         ...compressionMetadata,
-      },
+      }),
     });
 
     handle.change((doc) => {
