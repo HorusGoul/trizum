@@ -1,8 +1,11 @@
 import { encodeBlob, type MediaFile } from "#src/models/media.ts";
 import {
+  ImageProcessingError,
   processImage,
   type ImageCompressionOptions,
   compressionPresets,
+  isHeicImageFile,
+  isSupportedImageFile,
 } from "#src/lib/imageCompression.ts";
 import {
   type Repo,
@@ -26,12 +29,14 @@ export function getMediaFileHelpers(repo: Repo) {
     let processedBlob = blob;
     let compressionMetadata = {};
 
-    // Check if the blob is an image file
-    if (blob.type.startsWith("image/")) {
-      try {
-        // Convert blob to file for processing
-        const file = new File([blob], "image", { type: blob.type });
+    // Check if the blob is an image file or a HEIC/HEIF upload.
+    if (isSupportedImageFile(blob)) {
+      const file =
+        blob instanceof File
+          ? blob
+          : new File([blob], "image", { type: blob.type });
 
+      try {
         // Process the image with compression
         const processed = await processImage(
           file,
@@ -41,15 +46,32 @@ export function getMediaFileHelpers(repo: Repo) {
 
         // Add compression metadata
         compressionMetadata = {
+          mimeType: processed.outputMimeType || processedBlob.type,
+          originalMimeType: processed.originalMimeType,
+          originalFilename: file.name,
+          lastModified: file.lastModified,
           originalSize: processed.originalSize,
           compressedSize: processed.compressedSize,
           compressionRatio: processed.compressionRatio,
+          orientation: processed.orientation,
+          convertedFromHeic: processed.convertedFromHeic,
           processed: true,
         };
       } catch (error) {
         console.warn("Image compression failed, using original:", error);
-        // If compression fails, use the original blob
+
+        if (isHeicImageFile(file)) {
+          throw error instanceof ImageProcessingError
+            ? error
+            : new ImageProcessingError("heic_conversion_failed", error);
+        }
+
+        // If compression fails for non-HEIC images, use the original blob
         compressionMetadata = {
+          mimeType: file.type || blob.type,
+          originalMimeType: file.type || blob.type,
+          originalFilename: file.name,
+          lastModified: file.lastModified,
           processed: false,
           error: error instanceof Error ? error.message : "Unknown error",
         };

@@ -6,7 +6,12 @@ import { Icon } from "#src/ui/Icon.js";
 import { Skeleton } from "#src/ui/Skeleton.js";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
-import { compressionPresets } from "#src/lib/imageCompression.js";
+import {
+  compressionPresets,
+  getImageUploadErrorMessage,
+  imageUploadAccept,
+  isSupportedImageFile,
+} from "#src/lib/imageCompression.js";
 import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
@@ -34,7 +39,7 @@ export function AvatarPicker({
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith("image/")) {
+    if (!isSupportedImageFile(file)) {
       toast.error(t`Please select an image file`);
       return;
     }
@@ -64,7 +69,10 @@ export function AvatarPicker({
     } catch (error) {
       console.error("Failed to upload avatar:", error);
       toast.dismiss(toastId);
-      toast.error(t`Failed to upload avatar. Please try again.`);
+      toast.error(
+        getImageUploadErrorMessage(error) ??
+          t`Failed to upload avatar. Please try again.`,
+      );
     } finally {
       setIsUploading(false);
       // Reset the input value to allow selecting the same file again
@@ -139,7 +147,7 @@ export function AvatarPicker({
       <input
         type="file"
         className="sr-only"
-        accept="image/*"
+        accept={imageUploadAccept}
         capture="environment"
         multiple={false}
         onChange={(event) => void onFileChange(event)}
@@ -150,7 +158,7 @@ export function AvatarPicker({
       <input
         type="file"
         className="sr-only"
-        accept="image/*"
+        accept={imageUploadAccept}
         multiple={false}
         onChange={(event) => void onFileChange(event)}
         ref={galleryInputRef}

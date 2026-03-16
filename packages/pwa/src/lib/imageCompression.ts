@@ -1,4 +1,5 @@
 import imageCompression from "browser-image-compression";
+import { t } from "@lingui/core/macro";
 import { parse } from "exifr";
 
 export interface ImageCompressionOptions {
@@ -22,6 +23,9 @@ export interface ProcessedImage {
   compressedSize: number;
   compressionRatio: number;
   orientation?: number;
+  outputMimeType: string;
+  originalMimeType?: string;
+  convertedFromHeic: boolean;
 }
 
 const DEFAULT_OPTIONS: Required<ImageCompressionOptions> = {
@@ -33,6 +37,32 @@ const DEFAULT_OPTIONS: Required<ImageCompressionOptions> = {
   maxSizeBeforeCompress: 5,
 };
 
+const HEIC_MIME_TYPES = new Set([
+  "image/heic",
+  "image/heif",
+  "image/heic-sequence",
+  "image/heif-sequence",
+]);
+
+const HEIC_EXTENSIONS = new Set([".heic", ".heif"]);
+
+export const imageUploadAccept =
+  "image/*,.heic,.heif,image/heic,image/heif,image/heic-sequence,image/heif-sequence";
+
+export type ImageProcessingErrorCode = "heic_conversion_failed";
+
+export class ImageProcessingError extends Error {
+  declare cause?: unknown;
+  readonly code: ImageProcessingErrorCode;
+
+  constructor(code: ImageProcessingErrorCode, cause?: unknown) {
+    super(code);
+    this.name = "ImageProcessingError";
+    this.code = code;
+    this.cause = cause;
+  }
+}
+
 type ParseResult =
   | {
       Orientation?: number;
@@ -40,37 +70,117 @@ type ParseResult =
   | null
   | undefined;
 
+function getFileExtension(fileName: string): string | undefined {
+  const lastDot = fileName.lastIndexOf(".");
+  if (lastDot < 0) {
+    return undefined;
+  }
+
+  return fileName.slice(lastDot).toLowerCase();
+}
+
+function replaceFileExtension(fileName: string, extension: string): string {
+  const lastDot = fileName.lastIndexOf(".");
+
+  if (lastDot < 0) {
+    return `${fileName}${extension}`;
+  }
+
+  return `${fileName.slice(0, lastDot)}${extension}`;
+}
+
+export function isHeicImageFile(blob: Blob): boolean {
+  if (HEIC_MIME_TYPES.has(blob.type.toLowerCase())) {
+    return true;
+  }
+
+  if (!(blob instanceof File)) {
+    return false;
+  }
+
+  const extension = getFileExtension(blob.name);
+
+  return extension ? HEIC_EXTENSIONS.has(extension) : false;
+}
+
+export function isSupportedImageFile(blob: Blob): boolean {
+  return blob.type.startsWith("image/") || isHeicImageFile(blob);
+}
+
+export function getImageUploadErrorMessage(error: unknown): string | null {
+  if (!(error instanceof ImageProcessingError)) {
+    return null;
+  }
+
+  switch (error.code) {
+    case "heic_conversion_failed":
+      return t`This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG.`;
+  }
+}
+
+async function readOrientation(file: File): Promise<number | undefined> {
+  try {
+    const exif = (await parse(file)) as ParseResult;
+    return exif?.Orientation;
+  } catch (exifError) {
+    console.warn("EXIF parsing failed for metadata:", exifError);
+    return undefined;
+  }
+}
+
+async function convertHeicImage(file: File): Promise<File> {
+  try {
+    const { heicTo } = await import("heic-to/csp");
+    const convertedBlob = await heicTo({
+      blob: file,
+      type: "image/jpeg",
+      quality: 0.9,
+    });
+
+    return new File([convertedBlob], replaceFileExtension(file.name, ".jpg"), {
+      type: convertedBlob.type || "image/jpeg",
+      lastModified: file.lastModified,
+    });
+  } catch (error) {
+    throw new ImageProcessingError("heic_conversion_failed", error);
+  }
+}
+
+async function normalizeImageFile(
+  file: File,
+): Promise<{ file: File; convertedFromHeic: boolean }> {
+  if (!isHeicImageFile(file)) {
+    return {
+      file,
+      convertedFromHeic: false,
+    };
+  }
+
+  return {
+    file: await convertHeicImage(file),
+    convertedFromHeic: true,
+  };
+}
+
 /**
  * Corrects image orientation based on EXIF data and removes EXIF metadata
  */
 async function correctOrientation(
   file: File,
+  orientation: number = 1,
 ): Promise<{ canvas: HTMLCanvasElement; mimeType: string }> {
   const img = new Image();
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
+  const objectUrl = URL.createObjectURL(file);
 
   if (!ctx) {
     throw new Error("Could not get canvas context");
   }
 
   return new Promise((resolve, reject) => {
-    img.onload = async () => {
+    img.onload = () => {
       try {
-        // Read EXIF data to get orientation (with error handling for unsupported formats)
-        let orientation = 1;
-        try {
-          const exif = (await parse(file)) as ParseResult;
-          orientation = exif?.Orientation ?? 1;
-        } catch (exifError) {
-          // If EXIF parsing fails (e.g., for some WebP files), assume no rotation needed
-          console.warn(
-            "EXIF parsing failed, assuming no rotation needed:",
-            exifError,
-          );
-          orientation = 1;
-        }
-
         // Set canvas dimensions based on orientation
         if (orientation >= 5) {
           canvas.width = img.height;
@@ -137,11 +247,16 @@ async function correctOrientation(
         } else {
           reject(new Error("Unknown error while correcting orientation"));
         }
+      } finally {
+        URL.revokeObjectURL(objectUrl);
       }
     };
 
-    img.onerror = () => reject(new Error("Failed to load image"));
-    img.src = URL.createObjectURL(file);
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Failed to load image"));
+    };
+    img.src = objectUrl;
   });
 }
 
@@ -236,21 +351,35 @@ export async function processImage(
 ): Promise<ProcessedImage> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const originalSize = file.size;
+  const originalMimeType = file.type || undefined;
 
-  // If it's not an image file, return it as-is
-  if (!file.type.startsWith("image/")) {
+  // If it's not an image-like upload, return it as-is
+  if (!isSupportedImageFile(file)) {
     return {
       blob: file,
       originalSize,
       compressedSize: originalSize,
       compressionRatio: 1,
+      outputMimeType: file.type,
+      originalMimeType,
+      convertedFromHeic: false,
     };
   }
 
   try {
+    const originalOrientation = await readOrientation(file);
+    const { file: normalizedFile, convertedFromHeic } =
+      await normalizeImageFile(file);
+    const normalizedOrientation =
+      normalizedFile === file
+        ? originalOrientation
+        : await readOrientation(normalizedFile);
+
     // First, correct orientation and remove EXIF data
-    const { canvas: correctedCanvas, mimeType } =
-      await correctOrientation(file);
+    const { canvas: correctedCanvas, mimeType } = await correctOrientation(
+      normalizedFile,
+      normalizedOrientation ?? 1,
+    );
 
     // Convert canvas to blob (this removes EXIF data)
     const correctedBlob = await canvasToBlob(correctedCanvas, mimeType, 0.9);
@@ -264,9 +393,9 @@ export async function processImage(
 
     if (needsCompression) {
       // Convert blob to file for compression
-      const correctedFile = new File([correctedBlob], file.name, {
+      const correctedFile = new File([correctedBlob], normalizedFile.name, {
         type: mimeType,
-        lastModified: file.lastModified,
+        lastModified: normalizedFile.lastModified,
       });
 
       // Compress the image
@@ -285,22 +414,15 @@ export async function processImage(
       compressedSize = correctedBlob.size;
     }
 
-    // Read orientation for metadata (with error handling)
-    let orientation: number | undefined;
-    try {
-      const exif = (await parse(file)) as ParseResult;
-      orientation = exif?.Orientation;
-    } catch (exifError) {
-      // If EXIF parsing fails, orientation will be undefined
-      console.warn("EXIF parsing failed for metadata:", exifError);
-    }
-
     return {
       blob: finalBlob,
       originalSize,
       compressedSize,
       compressionRatio: originalSize / compressedSize,
-      orientation,
+      orientation: originalOrientation,
+      outputMimeType: finalBlob.type || mimeType,
+      originalMimeType,
+      convertedFromHeic,
     };
   } catch (error) {
     console.error("Image processing failed:", error);
