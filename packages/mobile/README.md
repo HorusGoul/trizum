@@ -2,14 +2,18 @@
 
 Capacitor-based mobile application for trizum.
 
+Read the repo [AGENTS guide](../../AGENTS.md) first. This document is the
+package-level entry point for native wrapper and store-distribution work.
+
 ## Overview
 
 This package wraps the PWA (`@trizum/pwa`) as a native mobile application using [Capacitor](https://capacitorjs.com/). It provides native functionality and distribution via the App Store and Google Play.
 
 ## Prerequisites
 
-- **Node.js** ^24 (use `nvm use` in the repo root)
-- **pnpm** 10.14.0
+- **Node.js** version from the repo root [`.nvmrc`](../../.nvmrc) (use
+  `nvm use` in the repo root)
+- **pnpm** version from the root [`package.json`](../../package.json)
 - **For iOS:**
   - macOS with Xcode 15+
   - CocoaPods (`gem install cocoapods`)
@@ -94,16 +98,16 @@ packages/mobile/
 
 ## Scripts
 
-| Script           | Description                                |
-| ---------------- | ------------------------------------------ |
-| `build`          | Copy PWA assets and sync Capacitor         |
-| `open:android`   | Open Android project in Android Studio     |
-| `open:ios`       | Open iOS project in Xcode                  |
-| `run:android`    | Build and run on Android device/emulator   |
-| `run:ios`        | Build and run on iOS device/simulator      |
-| `dev:android`    | Run in dev mode with live reload (Android) |
-| `dev:ios`        | Run in dev mode with live reload (iOS)     |
-| `assets:generate`| Generate app icons and splash screens      |
+| Script            | Description                                |
+| ----------------- | ------------------------------------------ |
+| `build`           | Copy PWA assets and sync Capacitor         |
+| `open:android`    | Open Android project in Android Studio     |
+| `open:ios`        | Open iOS project in Xcode                  |
+| `run:android`     | Build and run on Android device/emulator   |
+| `run:ios`         | Build and run on iOS device/simulator      |
+| `dev:android`     | Run in dev mode with live reload (Android) |
+| `dev:ios`         | Run in dev mode with live reload (iOS)     |
+| `assets:generate` | Generate app icons and splash screens      |
 
 ## Fastlane
 
@@ -125,14 +129,14 @@ bundle install
 
 #### Android (`packages/mobile/android`)
 
-| Lane                | Description                          |
-| ------------------- | ------------------------------------ |
-| `build_debug`       | Build debug APK                      |
-| `build_release`     | Build release APK (signed)           |
-| `build_aab`         | Build release AAB for Play Store     |
-| `deploy_internal`   | Upload to Play Store internal track  |
-| `deploy_beta`       | Upload to Play Store beta track      |
-| `deploy_production` | Upload to Play Store production      |
+| Lane                | Description                         |
+| ------------------- | ----------------------------------- |
+| `build_debug`       | Build debug APK                     |
+| `build_release`     | Build release APK (signed)          |
+| `build_aab`         | Build release AAB for Play Store    |
+| `deploy_internal`   | Upload to Play Store internal track |
+| `deploy_beta`       | Upload to Play Store beta track     |
+| `deploy_production` | Upload to Play Store production     |
 
 ```bash
 cd packages/mobile/android
@@ -144,37 +148,37 @@ bundle exec fastlane build_release
 
 **Build Lanes:**
 
-| Lane               | Description                       |
-| ------------------ | --------------------------------- |
-| `build_debug`      | Build debug app for simulator     |
-| `build_release`    | Build release IPA for App Store   |
-| `build_adhoc`      | Build ad-hoc IPA for distribution |
+| Lane            | Description                       |
+| --------------- | --------------------------------- |
+| `build_debug`   | Build debug app for simulator     |
+| `build_release` | Build release IPA for App Store   |
+| `build_adhoc`   | Build ad-hoc IPA for distribution |
 
 **Deployment Lanes:**
 
-| Lane                  | Description                                      |
-| --------------------- | ------------------------------------------------ |
-| `deploy_testflight`   | Build and upload to TestFlight                   |
+| Lane                     | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| `deploy_testflight`      | Build and upload to TestFlight                   |
 | `deploy_testflight_full` | Build, upload to TestFlight, and update metadata |
-| `deploy_appstore`     | Build and upload to App Store (binary only)      |
-| `deploy_appstore_full`| Build and upload with metadata (full deployment) |
-| `submit_review`       | Submit existing build for App Store review       |
+| `deploy_appstore`        | Build and upload to App Store (binary only)      |
+| `deploy_appstore_full`   | Build and upload with metadata (full deployment) |
+| `submit_review`          | Submit existing build for App Store review       |
 
 **Metadata Lanes:**
 
-| Lane                | Description                                    |
-| ------------------- | ---------------------------------------------- |
-| `download_metadata` | Download existing metadata from App Store Connect |
-| `upload_metadata`   | Upload metadata only (no build)                |
-| `upload_screenshots`| Upload screenshots only                        |
+| Lane                 | Description                                       |
+| -------------------- | ------------------------------------------------- |
+| `download_metadata`  | Download existing metadata from App Store Connect |
+| `upload_metadata`    | Upload metadata only (no build)                   |
+| `upload_screenshots` | Upload screenshots only                           |
 
 **Utility Lanes:**
 
-| Lane              | Description                              |
-| ----------------- | ---------------------------------------- |
-| `bump_version`    | Increment version (patch/minor/major)    |
-| `set_version`     | Set specific version number              |
-| `current_version` | Print current version and build number   |
+| Lane              | Description                            |
+| ----------------- | -------------------------------------- |
+| `bump_version`    | Increment version (patch/minor/major)  |
+| `set_version`     | Set specific version number            |
+| `current_version` | Print current version and build number |
 
 ```bash
 cd packages/mobile/ios/App
@@ -266,24 +270,24 @@ Run `bundle exec fastlane upload_screenshots` to upload.
 
 #### Android
 
-| Variable                      | Description                                    |
-| ----------------------------- | ---------------------------------------------- |
-| `ANDROID_KEYSTORE_FILE`       | Path to the release keystore file              |
-| `ANDROID_KEYSTORE_PASSWORD`   | Keystore password                              |
-| `ANDROID_KEY_ALIAS`           | Key alias in the keystore                      |
-| `ANDROID_KEY_PASSWORD`        | Key password                                   |
-| `GOOGLE_PLAY_JSON_KEY_FILE`   | Path to Google Play service account JSON       |
+| Variable                    | Description                              |
+| --------------------------- | ---------------------------------------- |
+| `ANDROID_KEYSTORE_FILE`     | Path to the release keystore file        |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password                        |
+| `ANDROID_KEY_ALIAS`         | Key alias in the keystore                |
+| `ANDROID_KEY_PASSWORD`      | Key password                             |
+| `GOOGLE_PLAY_JSON_KEY_FILE` | Path to Google Play service account JSON |
 
 #### iOS
 
-| Variable                                 | Description                                      |
-| ---------------------------------------- | ------------------------------------------------ |
-| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`    | Base64-encoded distribution certificate (.p12)   |
-| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`  | Password for the .p12 certificate                |
-| `IOS_PROVISIONING_PROFILE_BASE64`        | Base64-encoded provisioning profile              |
-| `APP_STORE_CONNECT_API_KEY_ID`           | App Store Connect API Key ID                     |
-| `APP_STORE_CONNECT_API_ISSUER_ID`        | App Store Connect API Issuer ID                  |
-| `APP_STORE_CONNECT_API_KEY_CONTENT`      | Base64-encoded App Store Connect API Key (.p8)   |
+| Variable                                | Description                                    |
+| --------------------------------------- | ---------------------------------------------- |
+| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`   | Base64-encoded distribution certificate (.p12) |
+| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password for the .p12 certificate              |
+| `IOS_PROVISIONING_PROFILE_BASE64`       | Base64-encoded provisioning profile            |
+| `APP_STORE_CONNECT_API_KEY_ID`          | App Store Connect API Key ID                   |
+| `APP_STORE_CONNECT_API_ISSUER_ID`       | App Store Connect API Issuer ID                |
+| `APP_STORE_CONNECT_API_KEY_CONTENT`     | Base64-encoded App Store Connect API Key (.p8) |
 
 ## GitHub Actions
 
@@ -300,12 +304,12 @@ Configure these secrets in your GitHub repository settings (**Settings → Secre
 
 #### Android Secrets
 
-| Secret                       | Description                                |
-| ---------------------------- | ------------------------------------------ |
-| `ANDROID_KEYSTORE_BASE64`    | Base64-encoded release keystore            |
-| `ANDROID_KEYSTORE_PASSWORD`  | Keystore password                          |
-| `ANDROID_KEY_ALIAS`          | Key alias                                  |
-| `ANDROID_KEY_PASSWORD`       | Key password                               |
+| Secret                      | Description                     |
+| --------------------------- | ------------------------------- |
+| `ANDROID_KEYSTORE_BASE64`   | Base64-encoded release keystore |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password               |
+| `ANDROID_KEY_ALIAS`         | Key alias                       |
+| `ANDROID_KEY_PASSWORD`      | Key password                    |
 
 **How to get Android secrets:**
 
@@ -316,15 +320,15 @@ base64 -i your-release.keystore | tr -d '\n'
 
 #### iOS Secrets
 
-| Secret                                    | Description                                      |
-| ----------------------------------------- | ------------------------------------------------ |
-| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`     | Base64-encoded distribution certificate (.p12)   |
-| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`   | Password used when exporting the .p12            |
-| `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64`| Base64-encoded App Store provisioning profile    |
-| `IOS_ADHOC_PROVISIONING_PROFILE_BASE64`   | Base64-encoded Ad Hoc provisioning profile (optional) |
-| `APP_STORE_CONNECT_API_KEY_ID`            | App Store Connect API Key ID                     |
-| `APP_STORE_CONNECT_API_ISSUER_ID`         | App Store Connect API Issuer ID                  |
-| `APP_STORE_CONNECT_API_KEY_CONTENT`       | Base64-encoded API Key content (.p8 file)        |
+| Secret                                     | Description                                           |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`      | Base64-encoded distribution certificate (.p12)        |
+| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`    | Password used when exporting the .p12                 |
+| `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64` | Base64-encoded App Store provisioning profile         |
+| `IOS_ADHOC_PROVISIONING_PROFILE_BASE64`    | Base64-encoded Ad Hoc provisioning profile (optional) |
+| `APP_STORE_CONNECT_API_KEY_ID`             | App Store Connect API Key ID                          |
+| `APP_STORE_CONNECT_API_ISSUER_ID`          | App Store Connect API Issuer ID                       |
+| `APP_STORE_CONNECT_API_KEY_CONTENT`        | Base64-encoded API Key content (.p8 file)             |
 
 ### How to Get iOS Secrets
 
@@ -378,21 +382,21 @@ base64 -i AuthKey_ABC123XYZ.p8 | tr -d '\n'
 
 ### Local Development vs CI
 
-| Environment | Signing Method |
-| ----------- | -------------- |
-| **Local (Xcode)** | Automatic signing - Xcode manages everything with your Apple ID |
+| Environment             | Signing Method                                                      |
+| ----------------------- | ------------------------------------------------------------------- |
+| **Local (Xcode)**       | Automatic signing - Xcode manages everything with your Apple ID     |
 | **CI (GitHub Actions)** | Manual signing - uses exported certificate and provisioning profile |
 
 For local development, just open the project in Xcode and ensure **"Automatically manage signing"** is enabled in the Signing & Capabilities tab.
 
 ## App Configuration
 
-| Property          | Value                    |
-| ----------------- | ------------------------ |
-| App ID            | `app.trizum.capacitor`   |
-| iOS Deployment    | iOS 14.0+                |
-| Android Min SDK   | 23 (Android 6.0)         |
-| Android Target SDK| 35 (Android 15)          |
+| Property           | Value                  |
+| ------------------ | ---------------------- |
+| App ID             | `app.trizum.capacitor` |
+| iOS Deployment     | iOS 14.0+              |
+| Android Min SDK    | 23 (Android 6.0)       |
+| Android Target SDK | 35 (Android 15)        |
 
 ## Capacitor Plugins
 

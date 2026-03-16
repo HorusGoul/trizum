@@ -1,384 +1,89 @@
 # trizum - AI Agent Guide
 
-## Project Overview
-
-**trizum** helps you split bills with friends and family. Track, calculate, and settle expenses together - similar to apps like SplitWise or Tricount.
-
-**Primary Users:** Friends splitting bills, groups sharing expenses, roommates tracking shared costs.
-
-**Key Features:**
-
-- **Offline-first architecture** powered by Automerge for local-first, collaborative expense tracking
-- Real-time synchronization across devices
-- Multi-party expense splitting and settlement calculations
-- Media attachments for receipts
-- Progressive Web App (PWA) with offline capabilities
-
-## Technology Stack
-
-- **Runtime:** Node.js ^20 (use `nvm` for version management)
-- **Package Manager:** pnpm 10.14.0
-- **Framework:** React (experimental version with React Compiler)
-- **Routing:** TanStack Router
-- **Styling:** Tailwind CSS
-- **State Management:** Automerge for distributed/persisted state
-- **Internationalization:** Lingui
-- **Build Tool:** Vite
-- **Testing:** Vitest
-- **Language:** TypeScript (required for all code)
-
-## Development Setup
-
-### Prerequisites
-
-```bash
-# Use correct Node version
-nvm use
-
-# Install dependencies
-pnpm install
-```
-
-### Development Commands
-
-**From monorepo root:**
-
-```bash
-pnpm agent-browser -- --help  # Browser automation CLI
-pnpm agent-browser:install    # Download Chrome for agent-browser (first time only)
-pnpm build              # Build all packages
-pnpm test               # Run all tests
-pnpm test:coverage      # Run tests with coverage
-pnpm lint               # Lint all packages
-pnpm lint:fix           # Auto-fix linting issues
-pnpm typecheck          # Type check all packages
-pnpm lingui:extract     # Extract i18n strings
-```
-
-**From `packages/pwa` directory:**
-
-```bash
-pnpm dev                # Start development server
-pnpm build              # Build for production
-pnpm preview            # Preview production build
-pnpm test               # Run tests
-pnpm lint               # Lint code
-pnpm lint:fix           # Auto-fix linting issues
-pnpm typecheck          # Type check
-```
-
-### Environment Setup
-
-No special environment variables required for local development. The app works offline-first by default.
-
-## Agent Skills
-
-Project-local skills are standardized under `.agents/skills`.
-
-- Keep all project-local skill content in `.agents/skills`
-- Do not add mirrored copies under tool-specific folders
-
-## Browser Automation
-
-Use `agent-browser` from the monorepo root for browser automation across packages.
-
-**Core workflow:**
-
-1. `pnpm agent-browser:install` - Download Chrome for Testing on first use
-2. `pnpm agent-browser -- open <url>` - Navigate to a page
-3. `pnpm agent-browser -- snapshot -i` - Get interactive element refs (`@e1`, `@e2`, ...)
-4. `pnpm agent-browser -- click @e1` / `fill @e2 "text"` - Interact using refs
-5. Re-run `snapshot` after page changes before the next interaction
-
-Prefer `agent-browser` over ad-hoc browser tooling when validating web flows or capturing screenshots.
-
-## Project Structure
-
-```
-packages/pwa/
-├── src/
-│   ├── ui/                    # Design system components
-│   ├── components/            # General application components
-│   ├── routes/                # Route components (TanStack Router)
-│   ├── hooks/                 # Custom React hooks
-│   ├── lib/                   # Utility functions and helpers
-│   ├── models/                # Automerge document models and types
-│   └── main.tsx               # Application entry point
-├── public/                    # Static assets
-└── functions/                 # Cloudflare Functions (API)
-```
-
-**Co-location is encouraged** - keep related files close to where they're used.
-
-## Code Style Guidelines
-
-### React Patterns
-
-**✅ DO:**
-
-- Use React Suspense for async operations
-- Leverage React Transitions for UI updates
-- Follow the [Rules of React](https://react.dev/reference/rules)
-- Prefer React-first libraries over vanilla JS alternatives
-- Write all code in TypeScript
-
-**❌ AVOID:**
-
-- `useMemo`, `memo`, and `useCallback` (React Compiler handles optimization)
-- Non-React libraries when React alternatives exist
-
-### Component Organization
-
-- **Design system components** → `src/ui/`
-- **Application components** → `src/components/`
-- **Route components** → `src/routes/`
-- Co-locate related files when appropriate
-
-### Styling Conventions
-
-**Color System:**
-
-- Use `accent` color variants for all UI elements
-  - `bg-accent-950` → Darkest background
-  - `bg-accent-50` → Lightest background
-  - Range: 50, 100, 200, ..., 900, 950
-- Use semantic variants for statuses:
-  - `danger` → Error states
-  - `success` → Success states
-  - `warning` → Warning states
-
-**Dark Mode:**
-
-- Must be explicitly defined with `dark:` prefix
-- Example: `bg-accent-50 dark:bg-accent-950`
-
-**Example:**
-
-```tsx
-<div className="bg-accent-50 dark:bg-accent-950 text-accent-900 dark:text-accent-100">
-  Content
-</div>
-```
-
-### Internationalization
-
-**✅ REQUIRED:** All user-facing strings must use Lingui.
-
-```tsx
-import { Trans } from "@lingui/macro";
-import { t } from "@lingui/macro";
-
-// For JSX content
-<Trans>Hello, world!</Trans>;
-
-// For string values
-const placeholder = t`Enter your name`;
-```
-
-After adding new strings, run:
-
-```bash
-pnpm lingui:extract
-```
-
-### State Management
-
-**Automerge Documents:**
-
-- Use for data that should be:
-  - Persisted across sessions
-  - Shared/synced across the network
-  - Collaboratively edited
-
-**Local State:**
-
-- Use standard React state (`useState`) for:
-  - UI-only state (modals, dropdowns, etc.)
-  - Temporary form state
-  - Ephemeral interactions
-
-**Example:**
-
-```tsx
-// Persisted/shared state
-const { party } = useParty(partyId); // Automerge document
-
-// Local UI state
-const [isModalOpen, setIsModalOpen] = useState(false);
-```
-
-## Testing
-
-**Philosophy:** Prefer unit testing and integration testing.
-
-**Current Focus:**
-
-- Expense calculations must be tested
-- Critical business logic should have tests
-- No strict coverage target currently
-
-**Running Tests:**
-
-```bash
-pnpm test              # Run tests
-pnpm test:coverage     # With coverage report
-```
-
-**Testing Framework:** Vitest
-
-## Architecture Patterns
-
-### Offline-First with Automerge
-
-trizum uses Automerge for local-first data synchronization. All collaborative data (parties, expenses, participants) is stored in Automerge documents that automatically sync when online.
-
-**Key Concepts:**
-
-- Changes work offline immediately
-- Automatic conflict resolution
-- Real-time collaboration when connected
-- No backend API calls for CRUD operations
-
-### Suspense & Async Patterns
-
-The app uses React Suspense extensively:
-
-- Data fetching suspends during loading
-- Use `<Suspense>` boundaries with fallbacks
-- Leverage transitions for smoother UX
-
-## Security Considerations
-
-- No sensitive credentials in code
-- Client-side only architecture (no backend auth currently)
-- Be mindful of data stored in IndexedDB (accessible to user)
-
-## Agent Workflow Rules
-
-### Before Writing Any Code
-
-1. **Ask which branch to work from** - Default is `main`, but confirm with the user. They may want stacked PRs or work off a feature branch.
-2. **Create a new branch** - Never commit directly to main or any base branch.
-
-### Branch Naming
-
-Use the format `type/description`:
-
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `refactor/` - Code refactoring (no functional changes)
-- `docs/` - Documentation changes
-- `chore/` - Maintenance tasks
-- `test/` - Adding or updating tests
-
-Examples: `feature/add-dark-mode`, `fix/expense-calculation-bug`, `docs/update-readme`
-
-### Commits
-
-- Make **frequent small commits** for easier review and revert
-- Write clear, descriptive commit messages
-- Keep commits atomic (one logical change per commit)
-- **Before every commit**, run `pnpm lingui:extract` to ensure i18n strings are up to date
-
-### Before Opening a PR
-
-Run all checks and ensure they pass:
-
-```bash
-pnpm test        # All tests must pass
-pnpm lint        # No linting errors
-pnpm typecheck   # No type errors
-```
-
-If you added new user-facing strings, also run:
-
-```bash
-pnpm lingui:extract
-```
-
-### Opening a PR
-
-1. Push the branch to remote
-2. Create a PR using the existing PR template
-3. Fill out **all sections** of the template:
-   - Description: What and why
-   - Related Issues: Link any relevant issues
-   - Type of Change: Check the appropriate box
-   - Checklist: Verify all items
-   - Screenshots: Include if there are UI changes
-   - Additional Notes: Any context reviewers need
-
-### Changesets
-
-Always create a changeset for user-facing changes:
-
-```bash
-pnpm changeset
-```
-
-### Safety Rules
-
-**NEVER:**
-
-- Force push (`git push --force`)
-- Push directly to main
-- Delete branches without asking the user
-- Merge PRs - humans review and merge
-
-## Pull Request Guidelines
-
-- Ensure all tests pass: `pnpm test`
-- Verify no linting errors: `pnpm lint`
-- Verify types are correct: `pnpm typecheck`
-- Extract i18n strings if added: `pnpm lingui:extract`
-- Follow existing code conventions
-- Keep commits atomic and well-described
-
-## Common Tasks
-
-### Adding a New Feature
-
-1. Identify if it needs Automerge (persistent/shared) or local state
-2. Create components in appropriate directory (`ui/` or `components/`)
-3. Add i18n strings with Lingui macros
-4. Use `accent` color variants for styling
-5. Add tests for business logic
-6. Run `pnpm lint:fix` and `pnpm typecheck`
-
-### Working with Expenses
-
-- Expense calculations are critical - always add tests
-- Use existing models in `src/models/expense.ts`
-- Follow patterns in `src/lib/expenses.ts`
-
-### Adding Routes
-
-- Routes are file-based in `src/routes/`
-- Use TanStack Router conventions
-- Route files are auto-generated in `routeTree.gen.ts` (don't edit manually)
-
-### Working with Media
-
-- Leverage image compression utilities in `src/lib/imageCompression.ts`
-- Media files are stored with Automerge
-
-## Monorepo Structure
-
-This is a monorepo managed by:
-
-- **Turbo** - Build system and task runner
-- **pnpm workspaces** - Package management
-- **Syncpack** - Keep dependencies in sync
-
-The main application is in `packages/pwa/`.
-
-## Additional Notes
-
-- Using experimental React version with React Compiler enabled
-- PWA features configured via Vite PWA plugin
-- Service worker handles offline caching
-- Cloudflare Pages/Functions used for deployment
-
----
-
-**Questions or Issues?** Check the README or package.json scripts for available commands.
+This file is the repo entry point for coding agents. It should stay small,
+stable, and focused on routing.
+
+## What trizum is
+
+`trizum` helps people split bills with friends, family, and roommates. The repo
+is centered on an offline-first PWA backed by Automerge, with mobile wrappers,
+a sync server, and tooling for release screenshots.
+
+## Start Here
+
+Read these sources in order:
+
+1. this file for repo-wide workflow and guardrails,
+2. [`docs/agent-knowledge-map.md`](./docs/agent-knowledge-map.md) for the
+   source-of-truth map of agent-facing surfaces,
+3. the package README for the area you are changing,
+4. any deeper `AGENTS.md` in that domain,
+5. the relevant skill under [`.agents/skills`](./.agents/skills),
+6. the package's `package.json` for exact commands.
+
+Canonical examples:
+
+- [`.nvmrc`](./.nvmrc) and [`package.json`](./package.json) are the source of
+  truth for Node, pnpm, and workspace scripts.
+- [`packages/pwa/README.md`](./packages/pwa/README.md) is the package entry
+  point for most product work.
+- [`packages/pwa/locale/AGENTS.md`](./packages/pwa/locale/AGENTS.md) is the
+  source of truth for translation terminology.
+- [`packages/server/README.md`](./packages/server/README.md) and
+  [`packages/mobile/README.md`](./packages/mobile/README.md) are specialist
+  entry points for those packages.
+- [`packages/screenshots/README.md`](./packages/screenshots/README.md) is a
+  specialist doc and should not be part of the default read path for normal app
+  work.
+
+## Repo-Wide Rules
+
+### Branching
+
+1. Ask which branch to work from before starting code changes.
+2. Create a new branch. Never work directly on `main` or another base branch.
+
+Use `type/description` naming:
+
+- `feature/` for new features
+- `fix/` for bug fixes
+- `refactor/` for refactors without behavior changes
+- `docs/` for documentation work
+- `chore/` for maintenance
+- `test/` for test-focused changes
+
+### Code And Product Guardrails
+
+- TypeScript is required for all code.
+- Prefer React patterns over non-React alternatives.
+- Do not add `useMemo`, `memo`, or `useCallback` by default.
+- User-facing strings must use Lingui.
+- Use the `accent` color scale and explicit `dark:` variants in the PWA.
+- Expense calculations and other critical business logic need tests.
+- Use Automerge for persisted or shared collaborative state; use normal React
+  state for local UI state.
+- Do not edit generated files such as `routeTree.gen.ts` manually.
+
+### Validation And Release Hygiene
+
+- Use `nvm use`, then `pnpm install` when setting up locally.
+- Before opening a PR, run the standard root validation commands defined in
+  [`package.json`](./package.json): `pnpm test`, `pnpm lint`, and
+  `pnpm typecheck`.
+- Run `pnpm lingui:extract` when user-facing copy changes.
+- Create a changeset for user-facing changes.
+- Keep commits small and descriptive.
+
+### Workflow Safety
+
+- Do not push directly to `main`.
+- Do not force-push with `git push --force`.
+- Do not delete branches without asking.
+- Do not merge PRs; humans review and merge.
+
+## Skills
+
+Project-local skills live in [`.agents/skills`](./.agents/skills). Use them for
+repeatable workflows such as browser automation, push and PR handling, or
+generated-file regeneration. Keep project-local skill content there instead of
+duplicating it in general docs.
