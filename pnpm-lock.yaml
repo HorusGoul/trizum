@@ -265,6 +265,9 @@ importers:
       framer-motion:
         specifier: 11.18.2
         version: 11.18.2(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      heic-to:
+        specifier: 1.4.2
+        version: 1.4.2
       hono:
         specifier: 4.10.6
         version: 4.10.6
@@ -6341,6 +6344,9 @@ packages:
 
   header-case@1.0.1:
     resolution: {integrity: sha512-i0q9mkOeSuhXw6bGgiQCCBgY/jlZuV/7dZXyZ9c6LcBrqwvT8eT719E9uxE5LiZftdl+z81Ugbg/VvXV4OJOeQ==}
+
+  heic-to@1.4.2:
+    resolution: {integrity: sha512-y69thwxfNcEm2Vk8lbOD/cMabnvMJyOREfJYiCHcXCDqlfcPyJoBhyRc8+iDe1B95LRfpbTOpzxzY1xbRkdwBA==}
 
   hermes-estree@0.25.1:
     resolution: {integrity: sha512-0wUoCcLp+5Ev5pDW2OriHC2MJCbwLwuRx+gAqMTOkGKJJiBCLjtrvy4PWUGn6MIVefecRpzoOZ/UV6iGdOr+Cw==}
@@ -13782,6 +13788,7 @@ snapshots:
       framer-motion: 11.18.2(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       hono: 4.10.6
       lucide-react: 0.408.0(react@0.0.0-experimental-d025ddd3-20240722)
+      mathjs: 15.1.0
       qr-code-styling: 1.9.2
       react: 0.0.0-experimental-d025ddd3-20240722
       react-aria-components: 1.11.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
@@ -16443,6 +16450,8 @@ snapshots:
     dependencies:
       no-case: 2.3.2
       upper-case: 1.1.3
+
+  heic-to@1.4.2: {}
 
   hermes-estree@0.25.1: {}
 

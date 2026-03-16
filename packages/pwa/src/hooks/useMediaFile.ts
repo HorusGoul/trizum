@@ -13,9 +13,13 @@ export function useMediaFile(mediaFileId: string) {
   });
 
   const url = useMemo(() => {
-    const blob = decodeBlob(mediaFile.encodedBlob.val);
+    const mimeType =
+      typeof mediaFile.metadata.mimeType === "string"
+        ? mediaFile.metadata.mimeType
+        : undefined;
+    const blob = decodeBlob(mediaFile.encodedBlob.val, mimeType);
     return URL.createObjectURL(blob);
-  }, [mediaFile.encodedBlob]);
+  }, [mediaFile.encodedBlob, mediaFile.metadata.mimeType]);
 
   useEffect(() => {
     return () => {
