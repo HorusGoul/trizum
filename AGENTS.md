@@ -44,6 +44,8 @@ pnpm install
 **From monorepo root:**
 
 ```bash
+pnpm agent-browser -- --help  # Browser automation CLI
+pnpm agent-browser:install    # Download Chrome for agent-browser (first time only)
 pnpm build              # Build all packages
 pnpm test               # Run all tests
 pnpm test:coverage      # Run tests with coverage
@@ -68,6 +70,27 @@ pnpm typecheck          # Type check
 ### Environment Setup
 
 No special environment variables required for local development. The app works offline-first by default.
+
+## Agent Skills
+
+Project-local skills are standardized under `.agents/skills`.
+
+- Keep all project-local skill content in `.agents/skills`
+- Do not add mirrored copies under tool-specific folders
+
+## Browser Automation
+
+Use `agent-browser` from the monorepo root for browser automation across packages.
+
+**Core workflow:**
+
+1. `pnpm agent-browser:install` - Download Chrome for Testing on first use
+2. `pnpm agent-browser -- open <url>` - Navigate to a page
+3. `pnpm agent-browser -- snapshot -i` - Get interactive element refs (`@e1`, `@e2`, ...)
+4. `pnpm agent-browser -- click @e1` / `fill @e2 "text"` - Interact using refs
+5. Re-run `snapshot` after page changes before the next interaction
+
+Prefer `agent-browser` over ad-hoc browser tooling when validating web flows or capturing screenshots.
 
 ## Project Structure
 

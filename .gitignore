@@ -162,9 +162,12 @@ test-results/
 
 # Claude
 .claude/*
-!.claude/skills/
 
 # Codex
 .codex/*
-!.codex/skills/
 !.codex/worktree_init.sh
+
+# Shared project-local agent assets
+.agents/*
+!.agents/skills/
+!.agents/skills/**
