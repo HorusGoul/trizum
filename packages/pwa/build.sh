@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 export SENTRY_ORG="horusdev"
 export SENTRY_PROJECT="trizum-pwa"
 
@@ -7,7 +9,7 @@ vite build
 
 sentry-cli sourcemaps inject ./dist/client
 
-if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+if [ -z "${SENTRY_AUTH_TOKEN:-}" ]; then
   echo "SENTRY_AUTH_TOKEN is not set, skipping sourcemaps upload"
   exit 0
 fi
