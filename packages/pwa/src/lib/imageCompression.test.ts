@@ -1,19 +1,11 @@
-import { i18n } from "@lingui/core";
-import { beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import {
-  ImageProcessingError,
-  getImageUploadErrorMessage,
   imageUploadAccept,
   isHeicImageFile,
   isSupportedImageFile,
 } from "./imageCompression";
 
 describe("image upload helpers", () => {
-  beforeAll(() => {
-    i18n.load("en", {});
-    i18n.activate("en");
-  });
-
   test("detects HEIC and HEIF files from MIME type or extension", () => {
     expect(
       isHeicImageFile(
@@ -63,13 +55,5 @@ describe("image upload helpers", () => {
     expect(imageUploadAccept).toContain(".heif");
     expect(imageUploadAccept).toContain("image/heic");
     expect(imageUploadAccept).toContain("image/heif");
-  });
-
-  test("maps HEIC conversion failures to a user-facing error", () => {
-    expect(
-      getImageUploadErrorMessage(
-        new ImageProcessingError("heic_conversion_failed"),
-      ),
-    ).toContain("HEIC");
   });
 });

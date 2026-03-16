@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { encodeBlob, type MediaFile } from "#src/models/media.ts";
 import {
   ImageProcessingError,
@@ -18,6 +19,17 @@ export function useMediaFileActions() {
   const repo = useRepo();
 
   return getMediaFileHelpers(repo);
+}
+
+export function getImageUploadErrorMessage(error: unknown): string | null {
+  if (!(error instanceof ImageProcessingError)) {
+    return null;
+  }
+
+  switch (error.code) {
+    case "heic_conversion_failed":
+      return t`This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG.`;
+  }
 }
 
 export function getMediaFileHelpers(repo: Repo) {

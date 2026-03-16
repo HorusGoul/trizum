@@ -4,11 +4,13 @@ import { Avatar } from "#src/ui/Avatar.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
 import { Skeleton } from "#src/ui/Skeleton.js";
-import { useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
+import {
+  getImageUploadErrorMessage,
+  useMediaFileActions,
+} from "#src/hooks/useMediaFileActions.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
 import {
   compressionPresets,
-  getImageUploadErrorMessage,
   imageUploadAccept,
   isSupportedImageFile,
 } from "#src/lib/imageCompression.js";

@@ -1,3 +1,4 @@
+import { i18n } from "@lingui/core";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { Repo } from "@automerge/automerge-repo";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
@@ -11,8 +12,12 @@ vi.mock("#src/lib/imageCompression.ts", async () => {
   };
 });
 
-import { getMediaFileHelpers } from "./useMediaFileActions";
 import {
+  getImageUploadErrorMessage,
+  getMediaFileHelpers,
+} from "./useMediaFileActions";
+import {
+  ImageProcessingError,
   type ProcessedImage,
   processImage,
 } from "#src/lib/imageCompression.ts";
@@ -55,6 +60,11 @@ function createMockRepo() {
 describe("getMediaFileHelpers", () => {
   const processImageMock = vi.mocked(processImage);
   let warnSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    i18n.load("en", {});
+    i18n.activate("en");
+  });
 
   beforeEach(() => {
     processImageMock.mockReset();
@@ -152,5 +162,13 @@ describe("getMediaFileHelpers", () => {
       convertedFromHeic: true,
       processed: true,
     });
+  });
+
+  test("maps HEIC processing failures to a user-facing error", () => {
+    expect(
+      getImageUploadErrorMessage(
+        new ImageProcessingError("heic_conversion_failed"),
+      ),
+    ).toContain("HEIC");
   });
 });

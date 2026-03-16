@@ -42,10 +42,12 @@ import { getExpenseUnitShares } from "#src/models/expense.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
-import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
+import {
+  getImageUploadErrorMessage,
+  useMediaFileActions,
+} from "#src/hooks/useMediaFileActions.ts";
 import {
   compressionPresets,
-  getImageUploadErrorMessage,
   imageUploadAccept,
 } from "#src/lib/imageCompression.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";

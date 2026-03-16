@@ -1,5 +1,4 @@
 import imageCompression from "browser-image-compression";
-import { t } from "@lingui/core/macro";
 import { parse } from "exifr";
 
 export interface ImageCompressionOptions {
@@ -105,17 +104,6 @@ export function isHeicImageFile(blob: Blob): boolean {
 
 export function isSupportedImageFile(blob: Blob): boolean {
   return blob.type.startsWith("image/") || isHeicImageFile(blob);
-}
-
-export function getImageUploadErrorMessage(error: unknown): string | null {
-  if (!(error instanceof ImageProcessingError)) {
-    return null;
-  }
-
-  switch (error.code) {
-    case "heic_conversion_failed":
-      return t`This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG.`;
-  }
 }
 
 async function readOrientation(file: File): Promise<number | undefined> {
@@ -426,6 +414,10 @@ export async function processImage(
     };
   } catch (error) {
     console.error("Image processing failed:", error);
+    if (error instanceof ImageProcessingError) {
+      throw error;
+    }
+
     throw new Error(
       `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
