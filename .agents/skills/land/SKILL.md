@@ -34,7 +34,8 @@ description:
    resolve conflicts, then use the `push` skill to publish the updated branch.
 6. Ensure Codex review comments (if present) are acknowledged and any required
    fixes are handled before merging.
-7. Watch checks until complete.
+7. Watch checks until complete and keep polling the PR for new review feedback
+   while the PR is still open.
 8. If checks fail, pull logs, fix the issue, commit with the `commit` skill,
    push with the `push` skill, and re-run checks.
 9. When all checks are green and review feedback is addressed, squash-merge and
@@ -104,7 +105,7 @@ Preferred: use the asyncio watcher to monitor review comments, CI, and head
 updates in parallel:
 
 ```
-python3 .codex/skills/land/land_watch.py
+python3 .agents/skills/land/land_watch.py
 ```
 
 Exit codes:
@@ -128,6 +129,8 @@ Exit codes:
   remediation is to fetch latest `origin/main`, merge, force-push, and rerun CI.
 - If mergeability is `UNKNOWN`, wait and re-check.
 - Do not merge while review comments (human or Codex review) are outstanding.
+- A clean review sweep is not terminal while the PR is still open; keep polling
+  until the merge succeeds or new feedback/check failures block you.
 - Codex review jobs retry on failure and are non-blocking; use the presence of
   `## Codex Review — <persona>` issue comments (not job status) as the signal
   that review feedback is available.
@@ -145,6 +148,9 @@ Exit codes:
   acknowledged before merge.
 - Human review comments are blocking and must be addressed (responded to and
   resolved) before requesting a new review or merging.
+- Informational service-bot comments are non-blocking unless they request a
+  real code/docs/test change. Do not reply just to clear changeset-bot or
+  deploy status comments.
 - If multiple reviewers comment in the same thread, respond to each comment
   (batching is fine) before closing the thread.
 - Fetch review comments via `gh api` and reply with a prefixed comment.

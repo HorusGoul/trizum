@@ -92,7 +92,7 @@ Instructions:
 - `Backlog` -> out of scope; do not modify.
 - `Todo` -> move immediately to `In Progress` before active work.
 - `In Progress` -> active implementation.
-- `Human Review` -> wait for human review and poll for feedback.
+- `Human Review` -> wait for human review and keep polling the open PR for feedback.
 - `Merging` -> run the `land` skill; do not call `gh pr merge` directly outside that flow.
 - `Rework` -> start a new implementation attempt from `origin/main`.
 - `Done` -> terminal; do nothing.
@@ -111,7 +111,7 @@ Instructions:
    - `Backlog` -> stop.
    - `Todo` -> move to `In Progress`, then create or reuse the workpad comment.
    - `In Progress` -> continue using the existing workpad comment.
-   - `Human Review` -> do not code; poll for PR feedback and wait.
+   - `Human Review` -> do not code; poll the open PR for feedback and keep waiting even when the latest sweep is clean.
    - `Merging` -> use the `land` skill.
    - `Rework` -> close prior PR if needed, remove the old workpad comment, create a fresh branch from `origin/main`, and restart.
    - `Done` -> stop.
@@ -197,9 +197,12 @@ When the issue has an attached PR:
 
 1. Read top-level PR comments, inline review comments, and review summaries.
 2. Treat only actionable comments and reviews from the configured reviewer
-   login(s) plus bot feedback as blocking until either:
+   login(s), Codex reviews, and actionable bot feedback as blocking until either:
    - code/docs/tests were updated, or
    - a justified pushback reply was posted.
+   Informational bot comments that do not require a change or substantive reply
+   (for example changeset-bot reminders on internal-only PRs or deploy status
+   updates) are non-blocking and should not receive rote acknowledgement replies.
 3. Reflect each feedback item in the workpad plan or notes.
 4. Re-run validation after feedback-driven changes.
 5. Repeat until no actionable comments remain.
@@ -214,15 +217,18 @@ When the issue has an attached PR:
 3. Ensure the PR body is filled from `.github/PULL_REQUEST_TEMPLATE.md`.
 4. Ensure the PR has the `symphony` label.
 5. Merge `origin/main` again before moving to `Human Review`, rerun checks, and update the workpad with final validation results.
-6. Only then move the issue to `Human Review`.
+6. Only then move the issue to `Human Review` and keep polling until it advances to `Rework` or `Merging`.
 
 ## Human Review and merge handling
 
 1. In `Human Review`, do not code unless review feedback from the configured
    reviewer login(s) requires rework.
-2. If feedback requires changes, move the issue to `Rework` and restart from a fresh branch.
-3. In `Merging`, run the `land` skill until the PR is merged.
-4. After merge completes, move the issue to `Done`.
+2. Stay in `Human Review` and keep polling the open PR even when the latest
+   sweep finds no actionable feedback. A clean sweep is not terminal; only
+   leave this state when the issue moves to `Rework` or `Merging`.
+3. If feedback requires changes, move the issue to `Rework` and restart from a fresh branch.
+4. In `Merging`, run the `land` skill until the PR is merged.
+5. After merge completes, move the issue to `Done`.
 
 ## Guardrails
 
@@ -233,5 +239,6 @@ When the issue has an attached PR:
 - Every comment or reply posted by the agent on a GitHub pull request must
   start with this exact disclaimer, followed by a blank line:
   `🤖 **This is an Agent Response**`
+- Do not reply to informational bot comments just to clear them.
 - Keep comments concise and reviewer-oriented.
 - If blocked by missing required auth, permissions, or secrets, record the blocker in the workpad and stop.
