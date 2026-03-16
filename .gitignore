@@ -163,3 +163,8 @@ test-results/
 # Claude
 .claude/*
 !.claude/skills/
+
+# Codex
+.codex/*
+!.codex/skills/
+!.codex/worktree_init.sh
