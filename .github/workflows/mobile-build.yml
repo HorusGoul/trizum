@@ -53,7 +53,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2
+      - uses: rharkor/caching-for-turbo@v2.3.11
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -137,7 +137,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2
+      - uses: rharkor/caching-for-turbo@v2.3.11
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

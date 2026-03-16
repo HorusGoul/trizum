@@ -43,7 +43,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2
+      - uses: rharkor/caching-for-turbo@v2.3.11
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -119,4 +119,3 @@ jobs:
         run: |
           rm -f packages/mobile/android/play-store-key.json
           rm -f packages/mobile/android/app/release.keystore
-
