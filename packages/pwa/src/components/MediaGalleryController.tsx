@@ -47,7 +47,7 @@ export function MediaGalleryController({
       <ModalOverlay
         isOpen={state.index !== -1}
         className={({ isEntering, isExiting }) =>
-          `absolute left-0 top-0 isolate z-10 h-full w-full ${isEntering ? "duration-300 ease-out animate-in fade-in" : ""} ${isExiting ? "duration-200 ease-in animate-out fade-out" : ""} `
+          `fixed inset-0 isolate z-50 ${isEntering ? "duration-300 ease-out animate-in fade-in" : ""} ${isExiting ? "duration-200 ease-in animate-out fade-out" : ""} `
         }
         style={{
           backgroundColor: `rgba(0, 0, 0, ${backgroundOpacity})`,
