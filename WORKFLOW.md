@@ -219,9 +219,9 @@ When the issue has an attached PR:
 2. Use the `push` skill to publish the branch and create or update the PR.
 3. Ensure the PR body is filled from `.github/PULL_REQUEST_TEMPLATE.md`.
 4. Ensure the PR has the `symphony` label.
-5. After each push, wait for the PR gates to finish with `gh pr checks --watch` (or an equivalent non-interactive poll).
-6. If any PR gate fails, inspect the failing checks/logs, update the code/docs/tests, rerun the local validation gate, push again, and repeat until the PR gates pass.
-7. Merge `origin/main` again before moving to `Human Review`, rerun the local validation gate, confirm the latest PR gates are still passing, and update the workpad with the final local and PR validation results.
+5. Before moving the issue to `Human Review`, wait for the PR gates to finish with `gh pr checks --watch` (or an equivalent non-interactive poll) for the latest push that will be handed to a human.
+6. If any PR gate fails, inspect the failing checks/logs, update the code/docs/tests, rerun the local validation gate, push again, and repeat until the latest PR gates pass for the handoff push.
+7. Merge `origin/main` again before moving to `Human Review`, rerun the local validation gate, confirm the latest PR gates are still passing for the final handoff push, and update the workpad with the final local and PR validation results.
 8. Only then move the issue to `Human Review` and keep polling until it advances to `Rework` or `Merging`.
 
 ## Human Review and merge handling
