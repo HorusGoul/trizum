@@ -88,7 +88,6 @@ function createMockRepo() {
 
 describe("getMediaFileHelpers", () => {
   const processImageMock = vi.mocked(processImage);
-  let warnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     i18n.load("en", {});
@@ -97,11 +96,11 @@ describe("getMediaFileHelpers", () => {
 
   beforeEach(() => {
     processImageMock.mockReset();
-    warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
   });
 
   afterEach(() => {
-    warnSpy.mockRestore();
+    vi.restoreAllMocks();
   });
 
   test("rethrows HEIC processing failures instead of storing the original blob", async () => {

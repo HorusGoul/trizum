@@ -1,6 +1,7 @@
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
@@ -35,6 +36,8 @@ const fullVersion = `${appVersion}-${appCommit}`;
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const isTest = mode === "test" || process.env.VITEST === "true";
+
   process.env.VITE_APP_WSS_URL =
     mode === "production"
       ? "wss://server.trizum.app/sync"
@@ -49,15 +52,13 @@ export default defineConfig(({ mode }) => {
       minify: true,
     },
     plugins: [
-      cloudflare(),
+      ...(isTest ? [] : [cloudflare()]),
       tanstackRouter(),
-      react({
-        babel: {
-          plugins: [
-            "@lingui/babel-plugin-lingui-macro",
-            ["babel-plugin-react-compiler", ReactCompilerConfig],
-          ],
-        },
+      react(),
+      babel({
+        include: /\/src\/.*\.[cm]?[jt]sx?$/,
+        plugins: ["@lingui/babel-plugin-lingui-macro"],
+        presets: [reactCompilerPreset(ReactCompilerConfig)],
       }),
       wasm() as Plugin,
       topLevelAwait(),
