@@ -236,6 +236,9 @@ When the issue has an attached PR:
 - Use exactly one persistent workpad comment per issue.
 - Do not push directly to `main`.
 - Do not force-push unless it is the safest required way to update a rewritten branch, and use `--force-with-lease` only.
+- Every comment or reply posted by the agent on a GitHub pull request must
+  start with this exact disclaimer, followed by a blank line:
+  `🤖 **This is an Agent Response**`
 - Do not reply to informational bot comments just to clear them.
 - Keep comments concise and reviewer-oriented.
 - If blocked by missing required auth, permissions, or secrets, record the blocker in the workpad and stop.
