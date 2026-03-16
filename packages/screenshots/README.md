@@ -1,37 +1,33 @@
-# TypeScript Template
+# trizum screenshots
 
-This is a package generated using the `ts-template` template of the trizum monorepo.
+This package generates store and marketing screenshots with Playwright. It is
+not part of the default coding-agent read path for normal app or server work.
+Only read this package when the task explicitly involves screenshot capture or
+Fastlane screenshot handoff.
 
-It's the best starting point for a new package, as it provides the following out of the box:
+## Canonical Sources
 
-- `@trizum/eslint-config`
-- `@trizum/tsconfig`
-- Common npm scripts for developing, building, testing, and linting.
+- [`package.json`](./package.json) is the source of truth for package scripts.
+- [`src/main.ts`](./src/main.ts) captures screenshots across locales and device
+  profiles.
+- [`src/organize-for-fastlane.ts`](./src/organize-for-fastlane.ts) reshapes the
+  generated assets for App Store and Play Store upload flows.
 
-## Usage
+## Package Notes
 
-To use this package from another package or app in the monorepo, you can install it using the following command:
+- Generated screenshots are written under `screenshots/<locale>/<device>/`.
+- The package currently targets `en` and `es` locales and captures Android,
+  iPhone, iPad, and desktop variants.
+- This package should stay specialist and avoid becoming a generic harness entry
+  point.
 
-```bash
-pnpm add ts-template
-```
+## Validation
 
-## Development
+Run the package scripts defined in [`package.json`](./package.json):
 
-If you want to work on this package, you can clone the monorepo and run the following commands:
-
-```bash
-pnpm install
-cd packages/ts-template
-pnpm dev
-```
-
-## Scripts
-
-The following scripts are available:
-
-- `pnpm dev`. Starts the compiler in watch mode.
-- `pnpm build`. Builds the package.
-- `pnpm lint`. Lints the package with ESLint and Prettier.
-- `pnpm lint:fix`. Runs ESLint and Prettier to fix any styling issues.
-- `pnpm typecheck`. Runs the TypeScript type checker.
+- `pnpm setup` on first use to install Playwright browser dependencies
+- `pnpm start` to capture screenshots
+- `pnpm organize:fastlane --platform <ios|android> --output <path>` to prepare
+  store-upload assets
+- `pnpm lint`
+- `pnpm typecheck`

@@ -1,37 +1,30 @@
-# TypeScript Template
+# trizum server
 
-This is a package generated using the `ts-template` template of the trizum monorepo.
+This package contains the sync server for `trizum`. Read the repo
+[AGENTS guide](../../AGENTS.md) first, then use this document when the task
+touches server runtime, database, or deployment concerns.
 
-It's the best starting point for a new package, as it provides the following out of the box:
+## Canonical Sources
 
-- `@trizum/eslint-config`
-- `@trizum/tsconfig`
-- Common npm scripts for developing, building, testing, and linting.
+- [`package.json`](./package.json) is the source of truth for server scripts.
+- [`src/main.ts`](./src/main.ts) is the runtime entry point.
+- [`src/db.ts`](./src/db.ts) and [`src/db`](./src/db) cover database setup and
+  data access.
+- [`src/repo`](./src/repo) contains Automerge repo storage integration.
+- [`drizzle`](./drizzle) contains schema and migration artifacts.
 
-## Usage
+## Package Notes
 
-To use this package from another package or app in the monorepo, you can install it using the following command:
+- The server provides the WebSocket sync endpoint and health endpoint.
+- Database workflows live behind the `db:*` scripts in
+  [`package.json`](./package.json).
+- Server deployment assumptions should live near this package instead of in the
+  root guide.
 
-```bash
-pnpm add ts-template
-```
+## Validation
 
-## Development
+Run the package scripts defined in [`package.json`](./package.json):
 
-If you want to work on this package, you can clone the monorepo and run the following commands:
-
-```bash
-pnpm install
-cd packages/ts-template
-pnpm dev
-```
-
-## Scripts
-
-The following scripts are available:
-
-- `pnpm dev`. Starts the compiler in watch mode.
-- `pnpm build`. Builds the package.
-- `pnpm lint`. Lints the package with ESLint and Prettier.
-- `pnpm lint:fix`. Runs ESLint and Prettier to fix any styling issues.
-- `pnpm typecheck`. Runs the TypeScript type checker.
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm dev` or `pnpm start` when validating runtime behavior
