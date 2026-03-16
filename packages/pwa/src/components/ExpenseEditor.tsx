@@ -43,7 +43,11 @@ import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
 import { useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
-import { compressionPresets } from "#src/lib/imageCompression.ts";
+import {
+  compressionPresets,
+  getImageUploadErrorMessage,
+  imageUploadAccept,
+} from "#src/lib/imageCompression.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 
 export interface ExpenseEditorFormValues {
@@ -881,9 +885,13 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       toast.dismiss(toastId);
     } catch (error) {
       console.error(error);
-      toast.error(t`Failed to upload, please try again`, {
-        id: toastId,
-      });
+      toast.error(
+        getImageUploadErrorMessage(error) ??
+          t`Failed to upload, please try again`,
+        {
+          id: toastId,
+        },
+      );
     }
 
     // Reset the input value to allow the user to add more photos
@@ -921,7 +929,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       <input
         type="file"
         className="sr-only"
-        accept="image/*"
+        accept={imageUploadAccept}
         capture="environment"
         multiple={false}
         onChange={(event) => void onFileChange(event)}
@@ -932,7 +940,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       <input
         type="file"
         className="sr-only"
-        accept="image/*"
+        accept={imageUploadAccept}
         multiple={true}
         onChange={(event) => void onFileChange(event)}
         ref={galleryInputRef}
