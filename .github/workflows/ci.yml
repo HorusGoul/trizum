@@ -207,7 +207,7 @@ jobs:
             );
 
       - name: Install Playwright Browser
-        run: pnpm --filter @trizum/pwa exec playwright install --with-deps chromium
+        run: pnpm --filter @trizum/pwa exec playwright install --with-deps chromium webkit
 
       - name: Run Playwright E2E
         run: pnpm test:e2e

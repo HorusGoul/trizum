@@ -18,7 +18,7 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:install": "playwright install chromium",
+    "test:e2e:install": "playwright install chromium webkit",
     "typecheck": "tsc --noEmit",
     "generate:assets": "pwa-assets-generator",
     "deploy": "pnpm build && wrangler deploy"
