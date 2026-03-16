@@ -75,6 +75,7 @@ jobs:
             const startedAt = Date.now();
 
             const isCloudflareContext = (value = "") =>
+              /workers builds:\s*trizum/i.test(value) ||
               /cloudflare/i.test(value);
 
             const extractWorkersUrl = (...values) => {
