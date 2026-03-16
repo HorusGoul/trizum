@@ -20,7 +20,7 @@ export async function encodeBlob(blob: Blob) {
   return btoa(binaryString);
 }
 
-export function decodeBlob(encodedBlob: string) {
+export function decodeBlob(encodedBlob: string, mimeType?: string) {
   const encodedBlobString = atob(encodedBlob);
 
   const uint8Array = new Uint8Array(encodedBlobString.length);
@@ -28,5 +28,5 @@ export function decodeBlob(encodedBlob: string) {
     uint8Array[i] = encodedBlobString.charCodeAt(i);
   }
 
-  return new Blob([uint8Array]);
+  return new Blob([uint8Array], mimeType ? { type: mimeType } : undefined);
 }
