@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
       minify: true,
     },
     plugins: [
-      cloudflare(),
+      ...(mode === "test" ? [] : cloudflare()),
       tanstackRouter(),
       react({
         babel: {
