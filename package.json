@@ -5,6 +5,8 @@
   "private": true,
   "author": "Horus Lugo <hola@horus.dev>",
   "scripts": {
+    "agent-browser": "agent-browser",
+    "agent-browser:install": "agent-browser install",
     "build": "turbo run build",
     "lingui:extract": "turbo run lingui:extract",
     "lint": "turbo run lint",
@@ -38,6 +40,7 @@
       "@types/react-dom": "npm:types-react-dom@rc"
     },
     "onlyBuiltDependencies": [
+      "agent-browser",
       "@sentry-internal/node-cpu-profiler",
       "@sentry/cli",
       "@swc/core",
@@ -51,6 +54,8 @@
     ]
   },
   "devDependencies": {
-    "all-contributors-cli": "6.26.1"
+    "agent-browser": "0.20.13",
+    "all-contributors-cli": "6.26.1",
+    "skills": "1.4.5"
   }
 }
