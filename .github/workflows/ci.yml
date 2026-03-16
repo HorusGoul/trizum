@@ -31,7 +31,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - uses: rharkor/caching-for-turbo@v2.3.11
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -236,7 +236,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - uses: rharkor/caching-for-turbo@v2.3.11
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Create Release Pull Request or Publish
@@ -257,7 +257,7 @@ jobs:
         with:
           node-version-file: package.json
           cache: "pnpm"
-      - uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - uses: rharkor/caching-for-turbo@v2.3.11
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
