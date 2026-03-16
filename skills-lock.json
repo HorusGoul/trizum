@@ -16,6 +16,11 @@
       "sourceType": "github",
       "computedHash": "2ebeb243fa39ca3b233d7fe618cfaea89f618b619ceea6a33b708faeca7efc94"
     },
+    "playwright-best-practices": {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "sourceType": "github",
+      "computedHash": "320eaf861e3a0a923bfaad0726cb311a3fe30093378f8d26c89b9c5ae5c42b35"
+    },
     "swc-plugin-compatibility": {
       "source": "lingui/skills",
       "sourceType": "github",

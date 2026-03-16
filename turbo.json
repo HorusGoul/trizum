@@ -25,6 +25,17 @@
       "outputs": [],
       "inputs": ["src/**", "test/**", "vite.config.ts", "vitest.config.ts"]
     },
+    "test:e2e": {
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "inputs": [
+        "src/**",
+        "e2e/**",
+        "index.html",
+        "public/**",
+        "playwright.config.ts",
+        "vite.config.ts"
+      ]
+    },
     "test:coverage": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],

@@ -12,6 +12,7 @@
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "publish-packages": "changeset publish",
+    "test:e2e": "turbo run test:e2e",
     "update-version": "changeset version && cd packages/mobile && pnpm version:update",
     "syncpack:fix": "syncpack fix-mismatches && syncpack format",
     "test": "turbo run test",
