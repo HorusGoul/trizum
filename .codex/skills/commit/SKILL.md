@@ -1,50 +1,71 @@
 ---
 name: commit
 description:
-  Create a well-formed git commit for this repo, including required Lingui
-  extraction and a message that matches the staged changes.
+  Create a well-formed git commit from current changes using session history for
+  rationale and summary; use when asked to commit, prepare a commit message, or
+  finalize staged work.
 ---
 
 # Commit
 
-## Repo rules
+## Goals
 
-- Run `pnpm lingui:extract` before every commit.
-- If the change is user-facing, confirm a changeset exists before committing.
-- Do not rely on interactive prompts in unattended runs. Add the changeset
-  markdown file directly if needed instead of launching interactive flows.
-- Do not commit unrelated files.
+- Produce a commit that reflects the actual code changes and the session
+  context.
+- Follow common git conventions (type prefix, short subject, wrapped body).
+- Include both summary and rationale in the body.
+
+## Inputs
+
+- Codex session history for intent and rationale.
+- `git status`, `git diff`, and `git diff --staged` for actual changes.
+- Repo-specific commit conventions if documented.
 
 ## Steps
 
-1. Inspect `git status`, `git diff`, and `git diff --staged`.
-2. Run `pnpm lingui:extract`.
-3. If the change is user-facing and there is no changeset yet, add the
-   `.changeset/*.md` file directly.
-4. Stage only the intended files.
-5. Write a conventional commit subject that matches the change:
-   - `feat(...)`
-   - `fix(...)`
-   - `refactor(...)`
-   - `docs(...)`
-   - `chore(...)`
-   - `test(...)`
-6. Add a short body covering:
-   - what changed,
-   - why it changed,
-   - validation run.
-7. Append `Co-authored-by: Codex <codex@openai.com>`.
-8. Commit with `git commit -F <file>` so newlines are preserved literally.
+1. Read session history to identify scope, intent, and rationale.
+2. Inspect the working tree and staged changes (`git status`, `git diff`,
+   `git diff --staged`).
+3. Stage intended changes, including new files (`git add -A`) after confirming
+   scope.
+4. Sanity-check newly added files; if anything looks random or likely ignored
+   (build artifacts, logs, temp files), flag it to the user before committing.
+5. If staging is incomplete or includes unrelated files, fix the index or ask
+   for confirmation.
+6. Choose a conventional type and optional scope that match the change (e.g.,
+   `feat(scope): ...`, `fix(scope): ...`, `refactor(scope): ...`).
+7. Write a subject line in imperative mood, <= 72 characters, no trailing
+   period.
+8. Write a body that includes:
+   - Summary of key changes (what changed).
+   - Rationale and trade-offs (why it changed).
+   - Tests or validation run (or explicit note if not run).
+9. Append a `Co-authored-by` trailer for Codex using `Codex <codex@openai.com>`
+   unless the user explicitly requests a different identity.
+10. Wrap body lines at 72 characters.
+11. Create the commit message with a here-doc or temp file and use
+    `git commit -F <file>` so newlines are literal (avoid `-m` with `\n`).
+12. Commit only when the message matches the staged changes: if the staged diff
+    includes unrelated files or the message describes work that isn't staged,
+    fix the index or revise the message before committing.
+
+## Output
+
+- A single commit created with `git commit` whose message reflects the session.
 
 ## Template
 
-```text
+Type and scope are examples only; adjust to fit the repo and changes.
+
+```
 <type>(<scope>): <short summary>
 
 Summary:
 - <what changed>
+- <what changed>
 
 Rationale:
+- <why>
 - <why>
 
 Tests:
