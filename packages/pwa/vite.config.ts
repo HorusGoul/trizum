@@ -13,6 +13,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { configDefaults } from "vitest/config";
 
 const ReactCompilerConfig = {};
 
@@ -50,6 +51,9 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: true,
       minify: true,
+    },
+    test: {
+      exclude: [...configDefaults.exclude, "e2e/**"],
     },
     plugins: [
       ...(isTest ? [] : [cloudflare()]),
