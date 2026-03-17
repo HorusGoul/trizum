@@ -66,7 +66,12 @@ function Who() {
       toast.success(t`You're now seeing the party as ${participant.name}`);
     }
 
-    void navigate({ to: search.redirectTo ?? "..", replace: true });
+    if (search.redirectTo) {
+      void navigate({ href: search.redirectTo, replace: true });
+      return;
+    }
+
+    void navigate({ to: "..", replace: true });
   }
 
   const form = useForm({
