@@ -20,6 +20,7 @@ import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
 import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
 import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
+import { Route as PartyPartyIdStatsRouteImport } from './routes/party_.$partyId.stats'
 import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
 import { Route as PartyPartyIdSettingsRouteImport } from './routes/party_.$partyId.settings'
 import { Route as PartyPartyIdPayRouteImport } from './routes/party_.$partyId.pay'
@@ -82,6 +83,11 @@ const PartyPartyIdWhoRoute = PartyPartyIdWhoRouteImport.update({
   path: '/party/$partyId/who',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartyPartyIdStatsRoute = PartyPartyIdStatsRouteImport.update({
+  id: '/party_/$partyId/stats',
+  path: '/party/$partyId/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartyPartyIdShareRoute = PartyPartyIdShareRouteImport.update({
   id: '/party_/$partyId/share',
   path: '/party/$partyId/share',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
+  '/party/$partyId/stats': typeof PartyPartyIdStatsRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
+  '/party/$partyId/stats': typeof PartyPartyIdStatsRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/party_/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party_/$partyId/share': typeof PartyPartyIdShareRoute
+  '/party_/$partyId/stats': typeof PartyPartyIdStatsRoute
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party_/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party_/$partyId/expense/$expenseId_/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
+    | '/party/$partyId/stats'
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/expense/$expenseId/edit'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
+    | '/party/$partyId/stats'
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/expense/$expenseId/edit'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/party_/$partyId/pay'
     | '/party_/$partyId/settings'
     | '/party_/$partyId/share'
+    | '/party_/$partyId/stats'
     | '/party_/$partyId/who'
     | '/party_/$partyId/expense/$expenseId'
     | '/party_/$partyId/expense/$expenseId_/edit'
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   PartyPartyIdPayRoute: typeof PartyPartyIdPayRoute
   PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
   PartyPartyIdShareRoute: typeof PartyPartyIdShareRoute
+  PartyPartyIdStatsRoute: typeof PartyPartyIdStatsRoute
   PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
   PartyPartyIdExpenseExpenseIdRoute: typeof PartyPartyIdExpenseExpenseIdRoute
   PartyPartyIdExpenseExpenseIdEditRoute: typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdWhoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/party_/$partyId/stats': {
+      id: '/party_/$partyId/stats'
+      path: '/party/$partyId/stats'
+      fullPath: '/party/$partyId/stats'
+      preLoaderRoute: typeof PartyPartyIdStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/party_/$partyId/share': {
       id: '/party_/$partyId/share'
       path: '/party/$partyId/share'
@@ -392,6 +412,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartyPartyIdPayRoute: PartyPartyIdPayRoute,
   PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,
   PartyPartyIdShareRoute: PartyPartyIdShareRoute,
+  PartyPartyIdStatsRoute: PartyPartyIdStatsRoute,
   PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,
   PartyPartyIdExpenseExpenseIdRoute: PartyPartyIdExpenseExpenseIdRoute,
   PartyPartyIdExpenseExpenseIdEditRoute: PartyPartyIdExpenseExpenseIdEditRoute,
