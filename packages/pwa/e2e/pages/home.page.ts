@@ -24,7 +24,7 @@ export class HomePage {
   }
 
   async goto() {
-    await this.page.goto("/?__internal_offline_only=true");
+    await this.page.goto("/");
   }
 
   async expectLoaded() {

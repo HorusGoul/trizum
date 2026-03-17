@@ -21,13 +21,7 @@ export interface PartyList {
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;
 }
 
-export function getPartyListId(repo: Repo) {
-  const id = localStorage.getItem("partyListId");
-
-  if (id && isValidDocumentId(id)) {
-    return id;
-  }
-
+function createPartyListHandle(repo: Repo) {
   // Can't explicity set `locale: undefined` because of automerge...
   const handle = repo.create<PartyList>({
     id: "" as DocumentId,
@@ -41,5 +35,30 @@ export function getPartyListId(repo: Repo) {
   handle.change((doc) => (doc.id = handle.documentId));
 
   localStorage.setItem("partyListId", handle.documentId);
-  return handle.documentId;
+  return handle;
+}
+
+export async function getPartyListHandle(repo: Repo) {
+  const id = localStorage.getItem("partyListId");
+
+  if (id && isValidDocumentId(id)) {
+    try {
+      return await repo.find<PartyList>(id);
+    } catch {
+      // Fall back to a fresh party list if the existing handle cannot be
+      // recovered from local storage.
+    }
+  }
+
+  return createPartyListHandle(repo);
+}
+
+export function getPartyListId(repo: Repo) {
+  const id = localStorage.getItem("partyListId");
+
+  if (id && isValidDocumentId(id)) {
+    return id;
+  }
+
+  return createPartyListHandle(repo).documentId;
 }

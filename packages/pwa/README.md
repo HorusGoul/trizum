@@ -12,6 +12,8 @@ then use this document to decide where to work inside the PWA.
 - [`src/components`](./src/components) contains app-specific UI.
 - [`src/lib`](./src/lib) and [`src/models`](./src/models) contain business logic
   and domain models.
+- [`e2e/README.md`](./e2e/README.md) defines the shared Playwright browser
+  harness and deterministic journey setup strategy.
 - [`locale/AGENTS.md`](./locale/AGENTS.md) contains translation terminology and
   localization guardrails.
 

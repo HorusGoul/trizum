@@ -35,6 +35,7 @@ export async function createPartyFromMigrationData({
     id: "" as DocumentId,
     type: "party",
     name: data.party.name,
+    symbol: data.party.symbol,
     description: data.party.description,
     currency: data.party.currency,
     participants: data.party.participants,
