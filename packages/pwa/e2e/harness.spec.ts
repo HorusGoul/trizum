@@ -1,8 +1,16 @@
+import { ExpenseDetailPage } from "./pages/expense-detail.page";
+import { ExpenseEditorPage } from "./pages/expense-editor.page";
 import { JoinTrizumPage } from "./pages/join-trizum.page";
+import { PartyPage } from "./pages/party.page";
 import { defaultParticipants } from "./harness/scenarios";
+import { expenseEntryJourney } from "./harness/scenarios";
 import { createImbalancedPartyFixture } from "./harness/scenarios";
 import { createPartyFixture } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
+
+function formatAmountText(amount: number) {
+  return amount.toFixed(2).replace(".", ",");
+}
 
 test.describe("Browser harness", () => {
   test("starts every journey from a fresh offline home screen", async ({
@@ -64,6 +72,47 @@ test.describe("Browser harness", () => {
     await expect(
       page.getByRole("heading", { name: /Weekend trip/ }),
     ).toBeVisible();
+  });
+
+  test("can add an expense in an existing party and see it in detail and list views", async ({
+    harness,
+    page,
+  }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const expectedAmountText = formatAmountText(expenseEntryJourney.amount);
+
+    const seededParty = await harness.joinSeededParty({
+      fixture: createPartyFixture(),
+      participantName: expenseEntryJourney.selectedParticipantName,
+    });
+
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await partyPage.openAddExpense();
+
+    await expenseEditorPage.expectLoaded();
+    await expenseEditorPage.fillTitle(expenseEntryJourney.title);
+    await expenseEditorPage.fillAmount(expenseEntryJourney.amount);
+
+    for (const participantName of expenseEntryJourney.participantNames) {
+      await expenseEditorPage.setParticipantIncluded(participantName, true);
+    }
+
+    await expenseEditorPage.save();
+
+    await expenseDetailPage.expectLoaded(
+      seededParty.partyId,
+      expenseEntryJourney.title,
+      expectedAmountText,
+    );
+    await expenseDetailPage.goBack();
+
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await partyPage.expectExpenseInLog(
+      expenseEntryJourney.title,
+      expectedAmountText,
+    );
   });
 
   test("can seed an imbalanced party for balances journeys", async ({
