@@ -1,12 +1,20 @@
 import { ExpenseDetailPage } from "./pages/expense-detail.page";
 import { ExpenseEditorPage } from "./pages/expense-editor.page";
-import { JoinTrizumPage } from "./pages/join-trizum.page";
-import { PartyPage } from "./pages/party.page";
-import { defaultParticipants } from "./harness/scenarios";
-import { expenseEntryJourney } from "./harness/scenarios";
-import { createImbalancedPartyFixture } from "./harness/scenarios";
-import { createPartyFixture } from "./harness/scenarios";
+import { ExpensePage } from "./pages/expense.page";
 import { HomePage } from "./pages/home.page";
+import { JoinTrizumPage } from "./pages/join-trizum.page";
+import { NewTrizumPage } from "./pages/new-trizum.page";
+import { PartyPage } from "./pages/party.page";
+import { PayPage } from "./pages/pay.page";
+import { WhoAreYouPage } from "./pages/who-are-you.page";
+import {
+  createPartyActivationScenario,
+  createImbalancedPartyFixture,
+  createPartyFixture,
+  createSettlementPartyFixture,
+  defaultParticipants,
+  expenseEntryJourney,
+} from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
 
 function formatAmountText(amount: number) {
@@ -81,6 +89,62 @@ test.describe("Browser harness", () => {
     ).toBeVisible();
   });
 
+  test("can create a party and complete participant selection from empty state", async ({
+    harness,
+    page,
+  }) => {
+    const newTrizumPage = new NewTrizumPage(page);
+    const whoAreYouPage = new WhoAreYouPage(page);
+    let partyId = "";
+
+    await test.step("create a new party from /new", async () => {
+      await harness.goto("/new");
+      await newTrizumPage.expectLoaded();
+      await newTrizumPage.createParty({
+        name: createPartyActivationScenario.partyName,
+        participants: createPartyActivationScenario.participants,
+      });
+    });
+
+    await test.step("redirect through participant selection", async () => {
+      await whoAreYouPage.expectLoaded();
+
+      const partyPageUrl = new URL(page.url());
+      const match = partyPageUrl.pathname.match(/^\/party\/([^/]+)\/who$/);
+
+      expect(match?.[1]).toBeTruthy();
+      partyId = match![1];
+
+      await expect(
+        whoAreYouPage.participantOption(
+          createPartyActivationScenario.selectedParticipantName,
+        ),
+      ).toBeVisible();
+    });
+
+    await test.step("save the selected participant identity", async () => {
+      await whoAreYouPage.selectParticipant(
+        createPartyActivationScenario.selectedParticipantName,
+      );
+    });
+
+    await test.step("land on the party expenses page", async () => {
+      await expect(page).toHaveURL(
+        new RegExp(`/party/${partyId}\\?tab=expenses(?:&.*)?$`),
+      );
+      await expect(
+        page.getByRole("heading", {
+          name: new RegExp(createPartyActivationScenario.partyName),
+        }),
+      ).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Expenses" })).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Expenses" })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      );
+    });
+  });
+
   test("can add an expense in an existing party and see it in detail and list views", async ({
     harness,
     page,
@@ -138,5 +202,68 @@ test.describe("Browser harness", () => {
     ).toBeVisible();
     await expect(page.getByText("You owe money to people")).toBeVisible();
     await expect(page.getByRole("button", { name: "Pay" })).toBeVisible();
+  });
+
+  test("can settle a balance from the balances tab", async ({
+    harness,
+    page,
+  }) => {
+    const expensePage = new ExpensePage(page);
+    const partyPage = new PartyPage(page);
+    const payPage = new PayPage(page);
+    const action = {
+      actionLabel: "Pay" as const,
+      fromLabel: `${defaultParticipants.blair.name} (me)`,
+      toLabel: defaultParticipants.alex.name,
+    };
+
+    const seededParty = await test.step(
+      "seed a deterministic party with one unsettled balance",
+      async () =>
+        harness.joinSeededParty({
+          fixture: createSettlementPartyFixture(),
+          participantName: defaultParticipants.blair.name,
+        }),
+    );
+
+    await test.step(
+      "open Balances and confirm the settlement action is rendered",
+      async () => {
+        await partyPage.openBalances();
+        await partyPage.expectSettlementActionVisible(action);
+      },
+    );
+
+    await test.step("open the payment route for that settlement", async () => {
+      await partyPage.openSettlementAction(action);
+      await payPage.expectLoaded("Pay");
+      await payPage.expectSearchParams({
+        amount: "3000",
+        fromId: defaultParticipants.blair.id,
+        toId: defaultParticipants.alex.id,
+      });
+    });
+
+    await test.step(
+      "complete the settlement and land on the transfer expense",
+      async () => {
+        await payPage.completeSettlement();
+        await expensePage.expectLoaded(
+          `Paid debt to ${defaultParticipants.alex.name}`,
+        );
+      },
+    );
+
+    await test.step(
+      "return to Balances and confirm the prior settlement action is gone",
+      async () => {
+        await page.goBack();
+        await expect(page).toHaveURL(
+          new RegExp(`/party/${seededParty.partyId}\\?tab=balances(?:&.*)?$`),
+        );
+        await partyPage.expectSettlementActionRemoved(action);
+        await partyPage.expectFullySettled();
+      },
+    );
   });
 });

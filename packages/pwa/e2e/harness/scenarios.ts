@@ -13,6 +13,12 @@ export const defaultParticipants = {
   },
 } as const;
 
+export const createPartyActivationScenario = {
+  partyName: "Harness road trip",
+  participants: ["Morgan", "Riley", "Taylor"],
+  selectedParticipantName: "Riley",
+} as const;
+
 export const expenseEntryJourney = {
   selectedParticipantName: defaultParticipants.blair.name,
   title: "Harness coffee run",
@@ -68,6 +74,32 @@ export function createImbalancedPartyFixture() {
             value: 1,
           },
           [defaultParticipants.casey.id]: {
+            type: "divide" as const,
+            value: 1,
+          },
+        },
+        photos: [],
+      },
+    ],
+  };
+}
+
+export function createSettlementPartyFixture() {
+  return {
+    ...createPartyFixture(),
+    expenses: [
+      {
+        name: "Cabin groceries",
+        paidAt: "2026-02-14T18:30:00.000Z",
+        paidBy: {
+          [defaultParticipants.alex.id]: 6000,
+        },
+        shares: {
+          [defaultParticipants.alex.id]: {
+            type: "divide" as const,
+            value: 1,
+          },
+          [defaultParticipants.blair.id]: {
             type: "divide" as const,
             value: 1,
           },
