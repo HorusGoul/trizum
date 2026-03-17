@@ -1,4 +1,7 @@
 import { JoinTrizumPage } from "./pages/join-trizum.page";
+import { NewTrizumPage } from "./pages/new-trizum.page";
+import { WhoAreYouPage } from "./pages/who-are-you.page";
+import { createPartyActivationScenario } from "./harness/scenarios";
 import { defaultParticipants } from "./harness/scenarios";
 import { createImbalancedPartyFixture } from "./harness/scenarios";
 import { createPartyFixture } from "./harness/scenarios";
@@ -64,6 +67,62 @@ test.describe("Browser harness", () => {
     await expect(
       page.getByRole("heading", { name: /Weekend trip/ }),
     ).toBeVisible();
+  });
+
+  test("can create a party and complete participant selection from empty state", async ({
+    harness,
+    page,
+  }) => {
+    const newTrizumPage = new NewTrizumPage(page);
+    const whoAreYouPage = new WhoAreYouPage(page);
+    let partyId = "";
+
+    await test.step("create a new party from /new", async () => {
+      await harness.goto("/new");
+      await newTrizumPage.expectLoaded();
+      await newTrizumPage.createParty({
+        name: createPartyActivationScenario.partyName,
+        participants: createPartyActivationScenario.participants,
+      });
+    });
+
+    await test.step("redirect through participant selection", async () => {
+      await whoAreYouPage.expectLoaded();
+
+      const partyPageUrl = new URL(page.url());
+      const match = partyPageUrl.pathname.match(/^\/party\/([^/]+)\/who$/);
+
+      expect(match?.[1]).toBeTruthy();
+      partyId = match![1];
+
+      await expect(
+        whoAreYouPage.participantOption(
+          createPartyActivationScenario.selectedParticipantName,
+        ),
+      ).toBeVisible();
+    });
+
+    await test.step("save the selected participant identity", async () => {
+      await whoAreYouPage.selectParticipant(
+        createPartyActivationScenario.selectedParticipantName,
+      );
+    });
+
+    await test.step("land on the party expenses page", async () => {
+      await expect(page).toHaveURL(
+        new RegExp(`/party/${partyId}\\?tab=expenses(?:&.*)?$`),
+      );
+      await expect(
+        page.getByRole("heading", {
+          name: new RegExp(createPartyActivationScenario.partyName),
+        }),
+      ).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Expenses" })).toBeVisible();
+      await expect(page.getByRole("tab", { name: "Expenses" })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      );
+    });
   });
 
   test("can seed an imbalanced party for balances journeys", async ({

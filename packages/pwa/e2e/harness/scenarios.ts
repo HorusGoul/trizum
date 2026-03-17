@@ -13,6 +13,12 @@ export const defaultParticipants = {
   },
 } as const;
 
+export const createPartyActivationScenario = {
+  partyName: "Harness road trip",
+  participants: ["Morgan", "Riley", "Taylor"],
+  selectedParticipantName: "Riley",
+} as const;
+
 export function createPartyFixture() {
   return {
     party: {
