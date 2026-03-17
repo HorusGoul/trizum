@@ -2,6 +2,7 @@ import { JoinTrizumPage } from "./pages/join-trizum.page";
 import { defaultParticipants } from "./harness/scenarios";
 import { createImbalancedPartyFixture } from "./harness/scenarios";
 import { createPartyFixture } from "./harness/scenarios";
+import { HomePage } from "./pages/home.page";
 import { expect, test } from "./harness/trizum.fixture";
 
 test.describe("Browser harness", () => {
@@ -20,28 +21,34 @@ test.describe("Browser harness", () => {
     ).toBeVisible();
   });
 
-  test("can seed a persisted joined party without driving setup UI", async ({
+  test("can reopen an existing persisted party from the home screen", async ({
     harness,
     page,
   }) => {
+    const homePage = new HomePage(page);
     const seededParty = await harness.joinSeededParty({
-      fixture: createPartyFixture(),
+      fixture: createImbalancedPartyFixture(),
       participantName: defaultParticipants.blair.name,
     });
 
-    await harness.navigate("/");
+    await test.step("load the home screen with persisted membership", async () => {
+      await harness.gotoHome();
 
-    const seededPartyLink = page.getByRole("link", { name: /Weekend trip/ });
+      await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
+      await homePage.expectPartyVisible(/Weekend trip/);
+    });
 
-    await expect(seededPartyLink).toBeVisible();
-    await seededPartyLink.click();
+    await test.step("open the existing party from the home list", async () => {
+      await homePage.openParty(/Weekend trip/);
 
-    await expect(page).toHaveURL(
-      new RegExp(`/party/${seededParty.partyId}\\?tab=expenses(?:&.*)?$`),
-    );
-    await expect(
-      page.getByRole("heading", { name: /Weekend trip/ }),
-    ).toBeVisible();
+      await expect(page).toHaveURL(
+        new RegExp(`/party/${seededParty.partyId}\\?tab=expenses(?:&.*)?$`),
+      );
+      await expect(
+        page.getByRole("heading", { name: /Weekend trip/ }),
+      ).toBeVisible();
+      await expect(page.getByText("Cabin groceries")).toBeVisible();
+    });
   });
 
   test("can exercise join flow without depending on live sync", async ({
@@ -80,9 +87,7 @@ test.describe("Browser harness", () => {
     await expect(
       page.getByRole("heading", { name: "How should I balance?" }),
     ).toBeVisible();
-    await expect(
-      page.getByText("You owe money to people"),
-    ).toBeVisible();
+    await expect(page.getByText("You owe money to people")).toBeVisible();
     await expect(page.getByRole("button", { name: "Pay" })).toBeVisible();
   });
 });
