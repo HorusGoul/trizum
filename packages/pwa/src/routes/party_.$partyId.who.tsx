@@ -9,7 +9,11 @@ import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
@@ -43,6 +47,7 @@ function Who() {
   const { party, setParticipantDetails } = useParty(params.partyId);
   const { partyList, addPartyToList } = usePartyList();
   const navigate = useNavigate();
+  const { history } = useRouter();
 
   const [needsToJoin] = useState(
     () =>
@@ -66,7 +71,12 @@ function Who() {
       toast.success(t`You're now seeing the party as ${participant.name}`);
     }
 
-    void navigate({ to: search.redirectTo ?? "..", replace: true });
+    if (search.redirectTo) {
+      history.replace(search.redirectTo);
+      return;
+    }
+
+    void navigate({ to: "..", replace: true });
   }
 
   const form = useForm({

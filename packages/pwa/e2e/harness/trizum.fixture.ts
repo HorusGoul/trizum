@@ -5,6 +5,12 @@ interface InternalHarnessWindow extends Window {
   __internal_seedPartyListState: (seed: unknown) => Promise<{
     partyListId: string;
   }>;
+  __internal_readPartyListState: () => Promise<{
+    partyListId: string;
+    lastOpenedPartyId: string | null;
+    parties: Record<string, true | undefined>;
+    participantInParties: Record<string, string>;
+  }>;
 }
 
 interface PartyListSeed {
@@ -25,6 +31,13 @@ interface JoinedPartySeed {
 interface JoinedPartyThroughUiSeed {
   fixture: unknown;
   participantName: string;
+}
+
+interface PartyListSnapshot {
+  partyListId: string;
+  lastOpenedPartyId: string | null;
+  parties: Record<string, true | undefined>;
+  participantInParties: Record<string, string>;
 }
 
 export interface BrowserHarness {
@@ -55,6 +68,7 @@ export interface BrowserHarness {
     joinUrl: string;
     partyId: string;
   }>;
+  readPartyList(): Promise<PartyListSnapshot>;
   selectParticipantIdentity(participantName: string): Promise<void>;
 }
 
@@ -109,7 +123,8 @@ function createBrowserHarness(page: Page): BrowserHarness {
           return (
             typeof internalWindow.__internal_createPartyFromMigrationData ===
               "function" &&
-            typeof internalWindow.__internal_seedPartyListState === "function"
+            typeof internalWindow.__internal_seedPartyListState === "function" &&
+            typeof internalWindow.__internal_readPartyListState === "function"
           );
         });
       })
@@ -191,6 +206,15 @@ function createBrowserHarness(page: Page): BrowserHarness {
     return buildPartySeedResult(seededParty);
   }
 
+  async function readPartyList() {
+    await waitForInternalHooks();
+
+    return page.evaluate(async () => {
+      const internalWindow = window as InternalHarnessWindow;
+      return internalWindow.__internal_readPartyListState();
+    });
+  }
+
   async function gotoParty(
     partyId: string,
     tab: "expenses" | "balances" = "expenses",
@@ -229,6 +253,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     seedJoinableParty,
     joinSeededParty,
     seedJoinedParty,
+    readPartyList,
     selectParticipantIdentity,
   };
 }

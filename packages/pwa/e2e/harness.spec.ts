@@ -50,20 +50,87 @@ test.describe("Browser harness", () => {
   }) => {
     const joinPage = new JoinTrizumPage(page);
     const seededParty = await harness.seedJoinableParty(createPartyFixture());
+    const inviteLink = `https://trizum.app${seededParty.joinUrl}`;
+    const redirectedPartyPath = `/party/${seededParty.partyId}`;
+    const expectedRedirectTarget = `${redirectedPartyPath}?tab=expenses`;
 
-    await harness.navigate("/join");
-    await joinPage.expectLoaded();
-    await joinPage.joinWithCode(seededParty.joinCode);
+    await test.step(
+      "start from a browser state that does not already belong to the party",
+      async () => {
+        const partyList = await harness.readPartyList();
 
-    await expect(
-      page.getByRole("heading", { name: "Who are you?" }),
-    ).toBeVisible();
+        expect(partyList.parties[seededParty.partyId]).toBeUndefined();
+        expect(
+          partyList.participantInParties[seededParty.partyId],
+        ).toBeUndefined();
+      },
+    );
 
-    await harness.selectParticipantIdentity(defaultParticipants.blair.name);
+    await test.step(
+      "enter a valid invite link and land on participant selection",
+      async () => {
+        await harness.navigate("/join");
+        await joinPage.expectLoaded();
+        await joinPage.joinWithLinkOrCode(inviteLink);
 
-    await expect(
-      page.getByRole("heading", { name: /Weekend trip/ }),
-    ).toBeVisible();
+        await expect
+          .poll(async () => page.evaluate(() => window.location.pathname))
+          .toBe(`${redirectedPartyPath}/who`);
+        await expect
+          .poll(async () => page.evaluate(() => window.location.search))
+          .toBe(`?redirectTo=${encodeURIComponent(expectedRedirectTarget)}`);
+        await expect(
+          page.getByRole("heading", { name: "Who are you?" }),
+        ).toBeVisible();
+      },
+    );
+
+    await test.step("select an identity and save the membership", async () => {
+      await harness.selectParticipantIdentity(defaultParticipants.blair.name);
+
+      await expect
+        .poll(async () => page.evaluate(() => window.location.pathname))
+        .toBe(redirectedPartyPath);
+      await expect
+        .poll(async () => page.evaluate(() => window.location.search))
+        .toBe("?tab=expenses");
+      await expect(
+        page.getByRole("heading", { name: /Weekend trip/ }),
+      ).toBeVisible();
+
+      const partyList = await harness.readPartyList();
+
+      expect(partyList.parties[seededParty.partyId]).toBe(true);
+      expect(partyList.participantInParties[seededParty.partyId]).toBe(
+        defaultParticipants.blair.id,
+      );
+    });
+
+    await test.step("reopen the party from persisted offline state", async () => {
+      await harness.gotoParty(seededParty.partyId);
+
+      await expect
+        .poll(async () => page.evaluate(() => window.location.pathname))
+        .toBe(redirectedPartyPath);
+      await expect
+        .poll(
+          async () =>
+            page.evaluate(() => {
+              const search = new URLSearchParams(window.location.search);
+              return {
+                tab: search.get("tab"),
+                offlineOnly: search.get("__internal_offline_only"),
+              };
+            }),
+        )
+        .toEqual({
+          tab: "expenses",
+          offlineOnly: "true",
+        });
+      await expect(
+        page.getByRole("heading", { name: /Weekend trip/ }),
+      ).toBeVisible();
+    });
   });
 
   test("can seed an imbalanced party for balances journeys", async ({

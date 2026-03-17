@@ -1418,7 +1418,7 @@ msgstr "Riyal Saudí"
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:158
 #: src/routes/party_.$partyId.settings.tsx:138
-#: src/routes/party_.$partyId.who.tsx:108
+#: src/routes/party_.$partyId.who.tsx:118
 #: src/routes/settings.tsx:108
 msgid "Save"
 msgstr "Guardar"
@@ -1564,7 +1564,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/migrate_.tricount.tsx:174
 #: src/routes/new.tsx:158
 #: src/routes/party_.$partyId.settings.tsx:138
-#: src/routes/party_.$partyId.who.tsx:108
+#: src/routes/party_.$partyId.who.tsx:118
 #: src/routes/settings.tsx:108
 msgid "Submitting..."
 msgstr "Enviando..."
@@ -1715,7 +1715,7 @@ msgid "Title must be less than 50 characters"
 msgstr "El título debe tener menos de 50 caracteres"
 
 #. placeholder {0}: party.name
-#: src/routes/party_.$partyId.who.tsx:129
+#: src/routes/party_.$partyId.who.tsx:139
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
@@ -1781,7 +1781,7 @@ msgstr "Unidad Previsional"
 msgid "Update available"
 msgstr "Actualización disponible"
 
-#: src/routes/party_.$partyId.who.tsx:135
+#: src/routes/party_.$partyId.who.tsx:145
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
@@ -1881,7 +1881,7 @@ msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
 #. placeholder {0}: participant.name
-#: src/routes/party_.$partyId.who.tsx:64
+#: src/routes/party_.$partyId.who.tsx:69
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
@@ -1898,7 +1898,7 @@ msgstr "¿De qué trata este grupo?"
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
-#: src/routes/party_.$partyId.who.tsx:91
+#: src/routes/party_.$partyId.who.tsx:101
 msgid "Who are you?"
 msgstr "¿Quién eres?"
 
@@ -1947,7 +1947,7 @@ msgid "You're debt free!"
 msgstr "¡Estás libre de deudas!"
 
 #. placeholder {0}: participant.name
-#: src/routes/party_.$partyId.who.tsx:66
+#: src/routes/party_.$partyId.who.tsx:71
 msgid "You're now seeing the party as {0}"
 msgstr "Ahora estás viendo el grupo como {0}"
 

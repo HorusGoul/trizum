@@ -18,8 +18,12 @@ export class JoinTrizumPage {
     await expect(this.heading).toBeVisible();
   }
 
-  async joinWithCode(code: string) {
-    await this.codeField.fill(code);
+  async joinWithLinkOrCode(value: string) {
+    await this.codeField.fill(value);
     await this.joinButton.click();
+  }
+
+  async joinWithCode(code: string) {
+    await this.joinWithLinkOrCode(code);
   }
 }

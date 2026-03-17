@@ -36,8 +36,10 @@ import {
   type MigrationData,
 } from "./models/migration.ts";
 import {
+  readPartyListState,
   seedPartyListState,
   type InternalPartyListSeed,
+  type InternalPartyListSnapshot,
   type InternalPartyListSeedResult,
 } from "./lib/testing/browserHarness.ts";
 
@@ -105,6 +107,7 @@ declare global {
     __internal_seedPartyListState: (
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
+    __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
   }
 }
 
@@ -123,6 +126,12 @@ window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {
   return seedPartyListState({
     repo,
     seed,
+  });
+};
+
+window.__internal_readPartyListState = async () => {
+  return readPartyListState({
+    repo,
   });
 };
 
