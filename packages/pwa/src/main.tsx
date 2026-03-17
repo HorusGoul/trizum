@@ -35,6 +35,11 @@ import {
   createPartyFromMigrationData,
   type MigrationData,
 } from "./models/migration.ts";
+import {
+  seedPartyListState,
+  type InternalPartyListSeed,
+  type InternalPartyListSeedResult,
+} from "./lib/testing/browserHarness.ts";
 
 const initialUrl = new URL(window.location.href);
 
@@ -97,6 +102,9 @@ declare global {
     __internal_createPartyFromMigrationData: (
       data: MigrationData,
     ) => Promise<string>;
+    __internal_seedPartyListState: (
+      seed: InternalPartyListSeed,
+    ) => Promise<InternalPartyListSeedResult>;
   }
 }
 
@@ -108,6 +116,13 @@ window.__internal_createPartyFromMigrationData = async (
     repo,
     data,
     importAttachments: false,
+  });
+};
+
+window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {
+  return seedPartyListState({
+    repo,
+    seed,
   });
 };
 
