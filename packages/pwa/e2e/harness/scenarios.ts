@@ -83,3 +83,29 @@ export function createImbalancedPartyFixture() {
     ],
   };
 }
+
+export function createSettlementPartyFixture() {
+  return {
+    ...createPartyFixture(),
+    expenses: [
+      {
+        name: "Cabin groceries",
+        paidAt: "2026-02-14T18:30:00.000Z",
+        paidBy: {
+          [defaultParticipants.alex.id]: 6000,
+        },
+        shares: {
+          [defaultParticipants.alex.id]: {
+            type: "divide" as const,
+            value: 1,
+          },
+          [defaultParticipants.blair.id]: {
+            type: "divide" as const,
+            value: 1,
+          },
+        },
+        photos: [],
+      },
+    ],
+  };
+}
