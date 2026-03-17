@@ -41,4 +41,16 @@ export class HomePage {
   async openJoinParty() {
     await this.joinPartyLink.click();
   }
+
+  partyLink(name: string | RegExp) {
+    return this.page.getByRole("link", { name });
+  }
+
+  async expectPartyVisible(name: string | RegExp) {
+    await expect(this.partyLink(name)).toBeVisible();
+  }
+
+  async openParty(name: string | RegExp) {
+    await this.partyLink(name).click();
+  }
 }
