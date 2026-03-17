@@ -19,6 +19,13 @@ export interface InternalPartyListSeedResult {
   partyListId: DocumentId;
 }
 
+export interface InternalPartyListSnapshot {
+  partyListId: DocumentId;
+  lastOpenedPartyId: DocumentId | null;
+  parties: PartyList["parties"];
+  participantInParties: PartyList["participantInParties"];
+}
+
 export async function seedPartyListState({
   repo,
   seed,
@@ -74,5 +81,23 @@ export async function seedPartyListState({
 
   return {
     partyListId,
+  };
+}
+
+export async function readPartyListState({
+  repo,
+}: {
+  repo: Repo;
+}): Promise<InternalPartyListSnapshot> {
+  const partyListHandle = await getPartyListHandle(repo);
+  const partyList = partyListHandle.doc();
+
+  return {
+    partyListId: partyListHandle.documentId,
+    lastOpenedPartyId: partyList?.lastOpenedPartyId ?? null,
+    parties: { ...(partyList?.parties ?? {}) },
+    participantInParties: {
+      ...(partyList?.participantInParties ?? {}),
+    },
   };
 }
