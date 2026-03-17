@@ -19,6 +19,16 @@ export const createPartyActivationScenario = {
   selectedParticipantName: "Riley",
 } as const;
 
+export const expenseEntryJourney = {
+  selectedParticipantName: defaultParticipants.blair.name,
+  title: "Harness coffee run",
+  amount: 42.5,
+  participantNames: [
+    defaultParticipants.blair.name,
+    defaultParticipants.casey.name,
+  ],
+} as const;
+
 export function createPartyFixture() {
   return {
     party: {
