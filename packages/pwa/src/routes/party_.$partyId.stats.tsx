@@ -32,7 +32,10 @@ function PartyStatsRoute() {
   const scrollElementRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="flex h-full max-h-full flex-col">
+    <div
+      ref={scrollElementRef}
+      className="flex h-full max-h-full flex-col overflow-y-auto"
+    >
       <div className="container flex h-16 flex-shrink-0 items-center px-2 mt-safe">
         <BackButton
           fallbackOptions={{
@@ -46,9 +49,7 @@ function PartyStatsRoute() {
         </h1>
       </div>
 
-      <div ref={scrollElementRef} className="flex-1 overflow-y-auto">
-        <PartyStatsView scrollElementRef={scrollElementRef} />
-      </div>
+      <PartyStatsView scrollElementRef={scrollElementRef} />
     </div>
   );
 }

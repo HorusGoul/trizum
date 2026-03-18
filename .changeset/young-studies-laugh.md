@@ -2,4 +2,4 @@
 "@trizum/pwa": patch
 ---
 
-Add timeframe-filtered party spending stats with rankings and per-participant totals.
+Add a dedicated party stats screen with flexible date filters and spender rankings.

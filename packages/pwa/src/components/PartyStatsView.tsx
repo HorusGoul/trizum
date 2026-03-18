@@ -1,3 +1,4 @@
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { CurrencyText } from "#src/components/CurrencyText.js";
@@ -7,10 +8,13 @@ import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import {
   calculatePartyStats,
+  getPartyStatsAvailablePastYears,
+  getPartyStatsDateBounds,
   type PartyStatsParticipantStat,
   type PartyStatsTimeframe,
 } from "#src/lib/partyStats.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.js";
+import { AppDatePicker } from "#src/ui/DatePicker.tsx";
 import { Icon } from "#src/ui/Icon.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { cn } from "#src/ui/utils.js";
@@ -27,14 +31,8 @@ interface PartyStatsViewProps {
   scrollElementRef: RefObject<HTMLDivElement | null>;
 }
 
-interface PartyStatsContentProps {
-  scrollElementRef: RefObject<HTMLDivElement | null>;
-  timeframe: PartyStatsTimeframe;
-  onTimeframeChange: (timeframe: PartyStatsTimeframe) => void;
-}
-
 interface StatsTimeframeOption {
-  id: PartyStatsTimeframe;
+  id: PartyStatsTimeframeKey;
   label: string;
 }
 
@@ -47,7 +45,6 @@ interface StatsSummaryCardProps {
 
 interface StatsSectionProps {
   title: string;
-  description: ReactNode;
   children: ReactNode;
 }
 
@@ -62,25 +59,27 @@ interface StatsEmptyStateProps {
   hasAnyTrackedExpense: boolean;
 }
 
-export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
-  const [timeframe, setTimeframe] = useState<PartyStatsTimeframe>("all-time");
+interface StatsCustomRange {
+  start: CalendarDate;
+  end: CalendarDate;
+}
 
+type PartyStatsTimeframeKey =
+  | "all-time"
+  | "current-year"
+  | "current-month"
+  | "custom-range"
+  | `year:${number}`;
+
+export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
   return (
     <Suspense fallback={null}>
-      <PartyStatsContent
-        scrollElementRef={scrollElementRef}
-        timeframe={timeframe}
-        onTimeframeChange={setTimeframe}
-      />
+      <PartyStatsContent scrollElementRef={scrollElementRef} />
     </Suspense>
   );
 }
 
-function PartyStatsContent({
-  scrollElementRef,
-  timeframe,
-  onTimeframeChange,
-}: PartyStatsContentProps) {
+function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
   const chunkDocuments = useMultipleSuspenseDocument<PartyExpenseChunk>(
@@ -88,13 +87,60 @@ function PartyStatsContent({
     { required: true },
   );
   const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
+  const timezone = getLocalTimeZone();
+  const pastYears = getPartyStatsAvailablePastYears({ expenses });
+  const trackedDateBounds = getPartyStatsDateBounds(expenses);
+  const [timeframeKey, setTimeframeKey] =
+    useState<PartyStatsTimeframeKey>("all-time");
+  const [customRange, setCustomRange] = useState<StatsCustomRange>(() => {
+    if (trackedDateBounds === null) {
+      const todayValue = today(timezone);
+
+      return {
+        start: todayValue,
+        end: todayValue,
+      };
+    }
+
+    return {
+      start: toCalendarDay(trackedDateBounds.start),
+      end: toCalendarDay(trackedDateBounds.end),
+    };
+  });
   const allTimeStats = calculatePartyStats({
     expenses,
     participants: party.participants,
     timeframe: "all-time",
   });
+  const timeframeOptions: StatsTimeframeOption[] = [
+    { id: "all-time", label: t`All time` },
+    { id: "current-month", label: t`Current month` },
+    { id: "current-year", label: t`Current year` },
+    ...pastYears.map((year) => ({
+      id: `year:${year}` as const,
+      label: String(year),
+    })),
+    {
+      id: "custom-range",
+      label: t({
+        comment:
+          "Timeframe option on the party stats screen for choosing any start and end dates",
+        message: "Custom range",
+      }),
+    },
+  ];
+  const selectedTimeframeKey = timeframeOptions.some(
+    (option) => option.id === timeframeKey,
+  )
+    ? timeframeKey
+    : "all-time";
+  const timeframe = getStatsTimeframe(
+    selectedTimeframeKey,
+    customRange,
+    timezone,
+  );
   const stats =
-    timeframe === "all-time"
+    selectedTimeframeKey === "all-time"
       ? allTimeStats
       : calculatePartyStats({
           expenses,
@@ -105,13 +151,21 @@ function PartyStatsContent({
     (participant) => participant.participantId === currentParticipant.id,
   );
   const currentParticipantName = currentParticipant.name;
-  const timeframeOptions: StatsTimeframeOption[] = [
-    { id: "all-time", label: t`All time` },
-    { id: "last-year", label: t`Last year` },
-    { id: "current-year", label: t`Current year` },
-    { id: "current-month", label: t`Current month` },
-  ];
   const hasAnyTrackedExpense = allTimeStats.totalExpenseCount > 0;
+  const participantRanks = new Map(
+    stats.ranking.map((participant, index) => [
+      participant.participantId,
+      index + 1,
+    ]),
+  );
+  const minimumCustomDate =
+    trackedDateBounds === null
+      ? undefined
+      : toCalendarDay(trackedDateBounds.start);
+  const maximumCustomDate =
+    trackedDateBounds === null
+      ? undefined
+      : toCalendarDay(trackedDateBounds.end);
 
   useScrollRestoration({
     cacheKey: `party-${party.id}-stats`,
@@ -121,33 +175,23 @@ function PartyStatsContent({
   return (
     <div className="container flex flex-col gap-4 px-4 pb-8 pt-4">
       <div className="rounded-2xl bg-accent-50 p-4 shadow-sm dark:bg-accent-900 dark:shadow-none">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <h2 className="text-xl font-semibold">
-              <Trans>Party stats</Trans>
-            </h2>
-
-            <p className="mt-2 text-sm text-accent-700 dark:text-accent-200">
-              <Trans>
-                Compare how much everyone has paid across different timeframes.
-                Settlement transfers are excluded from these totals.
-              </Trans>
-            </p>
-          </div>
-
-          <div className="w-full md:max-w-56">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="w-full lg:max-w-56">
             <AppSelect<StatsTimeframeOption>
-              label={t`Timeframe`}
-              description={t`Filter totals and rankings`}
+              label={t({
+                comment:
+                  "Label for the timeframe filter on the party stats screen",
+                message: "Timeframe",
+              })}
               items={timeframeOptions}
-              selectedKey={timeframe}
+              selectedKey={selectedTimeframeKey}
               onSelectionChange={(nextTimeframe) => {
                 if (!nextTimeframe) {
                   return;
                 }
 
                 startTransition(() => {
-                  onTimeframeChange(nextTimeframe as PartyStatsTimeframe);
+                  setTimeframeKey(nextTimeframe as PartyStatsTimeframeKey);
                 });
               }}
             >
@@ -158,6 +202,62 @@ function PartyStatsContent({
               )}
             </AppSelect>
           </div>
+
+          {timeframeKey === "custom-range" ? (
+            <div className="grid w-full gap-3 md:grid-cols-2 lg:max-w-2xl">
+              <AppDatePicker<CalendarDate>
+                label={t({
+                  comment:
+                    "Label for the start date field in the custom range filter on the party stats screen",
+                  message: "Start date",
+                })}
+                value={customRange.start}
+                minValue={minimumCustomDate}
+                maxValue={customRange.end}
+                onChange={(nextStart) => {
+                  if (nextStart === null) {
+                    return;
+                  }
+
+                  startTransition(() => {
+                    setCustomRange((currentRange) => ({
+                      start: nextStart,
+                      end:
+                        nextStart.compare(currentRange.end) > 0
+                          ? nextStart
+                          : currentRange.end,
+                    }));
+                  });
+                }}
+              />
+
+              <AppDatePicker<CalendarDate>
+                label={t({
+                  comment:
+                    "Label for the end date field in the custom range filter on the party stats screen",
+                  message: "End date",
+                })}
+                value={customRange.end}
+                minValue={customRange.start}
+                maxValue={maximumCustomDate}
+                onChange={(nextEnd) => {
+                  if (nextEnd === null) {
+                    return;
+                  }
+
+                  startTransition(() => {
+                    setCustomRange((currentRange) => ({
+                      start:
+                        nextEnd.compare(currentRange.start) < 0
+                          ? nextEnd
+                          : currentRange.start,
+                      end: nextEnd,
+                    }));
+                  });
+                }}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -233,49 +333,19 @@ function PartyStatsContent({
 
       {hasAnyTrackedExpense ? (
         stats.totalExpenseCount > 0 ? (
-          <>
-            <StatsSection
-              title={t`Biggest spenders`}
-              description={
-                <Trans>
-                  Ranking based on how much each participant paid in the
-                  selected timeframe.
-                </Trans>
-              }
-            >
-              <div className="flex flex-col gap-3">
-                {stats.ranking.map((participant, index) => (
-                  <StatsParticipantRow
-                    key={participant.participantId}
-                    currency={party.currency}
-                    participant={participant}
-                    currentParticipantId={currentParticipant.id}
-                    rank={index + 1}
-                  />
-                ))}
-              </div>
-            </StatsSection>
-
-            <StatsSection
-              title={t`Individual totals`}
-              description={
-                <Trans>
-                  Total paid by each participant in the selected timeframe.
-                </Trans>
-              }
-            >
-              <div className="flex flex-col gap-3">
-                {stats.participantStats.map((participant) => (
-                  <StatsParticipantRow
-                    key={participant.participantId}
-                    currency={party.currency}
-                    participant={participant}
-                    currentParticipantId={currentParticipant.id}
-                  />
-                ))}
-              </div>
-            </StatsSection>
-          </>
+          <StatsSection title={t`Participants`}>
+            <div className="flex flex-col gap-3">
+              {stats.participantStats.map((participant) => (
+                <StatsParticipantRow
+                  key={participant.participantId}
+                  currency={party.currency}
+                  participant={participant}
+                  currentParticipantId={currentParticipant.id}
+                  rank={participantRanks.get(participant.participantId)}
+                />
+              ))}
+            </div>
+          </StatsSection>
         ) : (
           <StatsEmptyState hasAnyTrackedExpense={true} />
         )
@@ -317,15 +387,11 @@ function StatsSummaryCard({
   );
 }
 
-function StatsSection({ title, description, children }: StatsSectionProps) {
+function StatsSection({ title, children }: StatsSectionProps) {
   return (
     <section className="rounded-2xl bg-accent-50 p-4 dark:bg-accent-900">
       <div className="mb-4">
         <h2 className="text-xl font-semibold">{title}</h2>
-
-        <p className="mt-2 text-sm text-accent-700 dark:text-accent-200">
-          {description}
-        </p>
       </div>
 
       {children}
@@ -416,5 +482,37 @@ function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
         )}
       </p>
     </div>
+  );
+}
+
+function getStatsTimeframe(
+  timeframeKey: PartyStatsTimeframeKey,
+  customRange: StatsCustomRange,
+  timezone: string,
+): PartyStatsTimeframe {
+  switch (timeframeKey) {
+    case "all-time":
+    case "current-month":
+    case "current-year":
+      return timeframeKey;
+    case "custom-range":
+      return {
+        type: "custom-range",
+        start: customRange.start.toDate(timezone),
+        end: customRange.end.toDate(timezone),
+      };
+    default:
+      return {
+        type: "calendar-year",
+        year: Number.parseInt(timeframeKey.replace("year:", ""), 10),
+      };
+  }
+}
+
+function toCalendarDay(date: Date) {
+  return new CalendarDate(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    date.getDate(),
   );
 }

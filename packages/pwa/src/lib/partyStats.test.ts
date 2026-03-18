@@ -1,7 +1,11 @@
 import { describe, expect, test } from "vitest";
 import type { Expense } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
-import { calculatePartyStats } from "./partyStats";
+import {
+  calculatePartyStats,
+  getPartyStatsAvailablePastYears,
+  getPartyStatsDateBounds,
+} from "./partyStats";
 
 const participants = {
   alice: {
@@ -101,6 +105,54 @@ describe("calculatePartyStats", () => {
     expect(lastYear.totalSpent).toBe(300);
     expect(lastYear.totalExpenseCount).toBe(1);
     expect(lastYear.topSpender?.participantId).toBe("carol");
+  });
+
+  test("supports filtering a specific past year", () => {
+    const stats = calculatePartyStats({
+      expenses: createFixtureExpenses(),
+      participants,
+      timeframe: { type: "calendar-year", year: 2024 },
+      now: referenceDate,
+    });
+
+    expect(stats.totalSpent).toBe(400);
+    expect(stats.totalExpenseCount).toBe(1);
+    expect(stats.topSpender?.participantId).toBe("alice");
+  });
+
+  test("supports inclusive custom date ranges", () => {
+    const stats = calculatePartyStats({
+      expenses: createFixtureExpenses(),
+      participants,
+      timeframe: {
+        type: "custom-range",
+        start: new Date("2026-03-05T23:59:59.000Z"),
+        end: new Date("2026-01-15T00:00:00.000Z"),
+      },
+      now: referenceDate,
+    });
+
+    expect(stats.totalSpent).toBe(350);
+    expect(stats.totalExpenseCount).toBe(2);
+    expect(
+      stats.ranking.map((participant) => participant.participantId),
+    ).toEqual(["bob", "alice"]);
+  });
+
+  test("lists the available past years and tracked bounds", () => {
+    const expenses = createFixtureExpenses();
+
+    expect(
+      getPartyStatsAvailablePastYears({
+        expenses,
+        now: referenceDate,
+      }),
+    ).toEqual([2025, 2024]);
+
+    expect(getPartyStatsDateBounds(expenses)).toEqual({
+      start: new Date("2024-10-01T12:00:00.000Z"),
+      end: new Date("2026-03-05T12:00:00.000Z"),
+    });
   });
 });
 

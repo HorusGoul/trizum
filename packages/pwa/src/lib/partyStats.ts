@@ -1,11 +1,32 @@
 import { getExpenseTotalAmount, type Expense } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
 
-export type PartyStatsTimeframe =
+export type PartyStatsTimeframePreset =
   | "all-time"
   | "last-year"
   | "current-year"
   | "current-month";
+
+export interface PartyStatsCalendarYearTimeframe {
+  type: "calendar-year";
+  year: number;
+}
+
+export interface PartyStatsCustomRangeTimeframe {
+  type: "custom-range";
+  start: Date;
+  end: Date;
+}
+
+export type PartyStatsTimeframe =
+  | PartyStatsTimeframePreset
+  | PartyStatsCalendarYearTimeframe
+  | PartyStatsCustomRangeTimeframe;
+
+export interface PartyStatsDateBounds {
+  start: Date;
+  end: Date;
+}
 
 export interface PartyStatsParticipantStat {
   participantId: PartyParticipant["id"];
@@ -29,6 +50,11 @@ interface CalculatePartyStatsOptions {
   expenses: Expense[];
   participants: Record<PartyParticipant["id"], PartyParticipant>;
   timeframe: PartyStatsTimeframe;
+  now?: Date;
+}
+
+interface PartyStatsExpenseDatesOptions {
+  expenses: Pick<Expense, "isTransfer" | "paidAt">[];
   now?: Date;
 }
 
@@ -94,6 +120,64 @@ export function calculatePartyStats({
   };
 }
 
+export function getPartyStatsAvailablePastYears({
+  expenses,
+  now = new Date(),
+}: PartyStatsExpenseDatesOptions) {
+  const currentYear = now.getFullYear();
+  const years = new Set<number>();
+
+  for (const expense of expenses) {
+    if (expense.isTransfer) {
+      continue;
+    }
+
+    const year = expense.paidAt.getFullYear();
+
+    if (year < currentYear) {
+      years.add(year);
+    }
+  }
+
+  return [...years].sort((left, right) => right - left);
+}
+
+export function getPartyStatsDateBounds(
+  expenses: Pick<Expense, "isTransfer" | "paidAt">[],
+): PartyStatsDateBounds | null {
+  let earliestExpense: Date | null = null;
+  let latestExpense: Date | null = null;
+
+  for (const expense of expenses) {
+    if (expense.isTransfer) {
+      continue;
+    }
+
+    if (
+      earliestExpense === null ||
+      expense.paidAt.getTime() < earliestExpense.getTime()
+    ) {
+      earliestExpense = expense.paidAt;
+    }
+
+    if (
+      latestExpense === null ||
+      expense.paidAt.getTime() > latestExpense.getTime()
+    ) {
+      latestExpense = expense.paidAt;
+    }
+  }
+
+  if (earliestExpense === null || latestExpense === null) {
+    return null;
+  }
+
+  return {
+    start: earliestExpense,
+    end: latestExpense,
+  };
+}
+
 function createParticipantStat(
   participant: Pick<PartyParticipant, "id" | "name" | "isArchived">,
 ): PartyStatsParticipantStat {
@@ -136,6 +220,27 @@ function isExpenseWithinTimeframe(
 }
 
 function getTimeframeRange(timeframe: PartyStatsTimeframe, now: Date) {
+  if (typeof timeframe !== "string") {
+    if (timeframe.type === "calendar-year") {
+      return {
+        start: new Date(timeframe.year, 0, 1),
+        end: new Date(timeframe.year + 1, 0, 1),
+      };
+    }
+
+    const [start, end] =
+      timeframe.start.getTime() <= timeframe.end.getTime()
+        ? [timeframe.start, timeframe.end]
+        : [timeframe.end, timeframe.start];
+    const normalizedStart = startOfDay(start);
+    const normalizedEnd = startOfDay(end);
+
+    return {
+      start: normalizedStart,
+      end: addDays(normalizedEnd, 1),
+    };
+  }
+
   switch (timeframe) {
     case "current-month":
       return {
@@ -158,4 +263,12 @@ function getTimeframeRange(timeframe: PartyStatsTimeframe, now: Date) {
         end: new Date(Number.MAX_SAFE_INTEGER),
       };
   }
+}
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addDays(date: Date, days: number) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 }

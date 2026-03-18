@@ -47,14 +47,8 @@ import {
 } from "#src/lib/requestIdleCallback.ts";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 
-type PartyTab = "expenses" | "balances";
-
 interface PartyByIdSearchParams {
-  tab: PartyTab;
-}
-
-function isPartyTab(tab: unknown): tab is PartyTab {
-  return tab === "expenses" || tab === "balances";
+  tab: "expenses" | "balances";
 }
 
 export const Route = createFileRoute("/party/$partyId")({
@@ -76,7 +70,7 @@ export const Route = createFileRoute("/party/$partyId")({
     return;
   },
   validateSearch: (search): PartyByIdSearchParams => {
-    const tab = isPartyTab(search.tab) ? search.tab : "expenses";
+    const tab = search.tab === "balances" ? "balances" : "expenses";
 
     return { tab };
   },
@@ -103,7 +97,7 @@ function PartyById() {
     void navigate({
       to: "/party/$partyId",
       params: { partyId },
-      search: { tab: tab as PartyTab },
+      search: { tab: tab as "expenses" | "balances" },
       replace: true,
     });
   }
