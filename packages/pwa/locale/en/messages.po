@@ -58,7 +58,7 @@ msgstr "Absolutely! trizum works without requiring any account or sign-up. Just 
 msgid "Accent color"
 msgstr "Accent color"
 
-#: src/components/PartyStatsView.tsx:277
+#: src/components/PartyStatsView.tsx:291
 msgid "Across the selected timeframe"
 msgstr "Across the selected timeframe"
 
@@ -75,7 +75,7 @@ msgstr "Add"
 msgid "Add an expense"
 msgstr "Add an expense"
 
-#: src/components/PartyStatsView.tsx:478
+#: src/components/PartyStatsView.tsx:815
 msgid "Add expenses to this party to unlock totals, rankings, and individual spend."
 msgstr "Add expenses to this party to unlock totals, rankings, and individual spend."
 
@@ -117,7 +117,7 @@ msgstr "Algerian Dinar"
 msgid "Align QR code here"
 msgstr "Align QR code here"
 
-#: src/components/PartyStatsView.tsx:116
+#: src/components/PartyStatsView.tsx:150
 msgid "All time"
 msgstr "All time"
 
@@ -146,7 +146,7 @@ msgstr "Archive"
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archive participants who left to keep balances clean."
 
-#: src/components/PartyStatsView.tsx:437
+#: src/components/PartyStatsView.tsx:497
 msgid "Archived"
 msgstr "Archived"
 
@@ -433,7 +433,7 @@ msgstr "Color"
 msgid "Comorian Franc"
 msgstr "Comorian Franc"
 
-#: src/components/PartyStatsView.tsx:131
+#: src/components/PartyStatsView.tsx:181
 msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
 msgstr "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
 
@@ -498,16 +498,18 @@ msgstr "Cuban Peso"
 msgid "Currency"
 msgstr "Currency"
 
-#: src/components/PartyStatsView.tsx:117
+#: src/components/PartyStatsView.tsx:151
 msgid "Current month"
 msgstr "Current month"
 
-#: src/components/PartyStatsView.tsx:118
+#: src/components/PartyStatsView.tsx:152
 msgid "Current year"
 msgstr "Current year"
 
+#. Label for the custom range calendar popover on the party stats screen
 #. Timeframe option on the party stats screen for choosing any start and end dates
-#: src/components/PartyStatsView.tsx:125
+#: src/components/PartyStatsView.tsx:159
+#: src/components/PartyStatsView.tsx:763
 msgid "Custom range"
 msgstr "Custom range"
 
@@ -592,7 +594,7 @@ msgid "Emoji list"
 msgstr "Emoji list"
 
 #. Label for the end date field in the custom range filter on the party stats screen
-#: src/components/PartyStatsView.tsx:235
+#: src/components/PartyStatsView.tsx:244
 msgid "End date"
 msgstr "End date"
 
@@ -668,7 +670,7 @@ msgstr "Expense updated"
 msgid "Expenses"
 msgstr "Expenses"
 
-#: src/components/PartyStatsView.tsx:296
+#: src/components/PartyStatsView.tsx:298
 msgid "Expenses counted"
 msgstr "Expenses counted"
 
@@ -1087,7 +1089,8 @@ msgstr "Mauritanian Ouguiya"
 msgid "Mauritian Rupee"
 msgstr "Mauritian Rupee"
 
-#: src/components/PartyStatsView.tsx:431
+#: src/components/PartyStatsView.tsx:603
+#: src/components/PartyStatsView.tsx:673
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:221
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:368
 msgid "Me"
@@ -1233,16 +1236,16 @@ msgstr "No currency"
 msgid "No emoji found"
 msgstr "No emoji found"
 
-#: src/components/PartyStatsView.tsx:327
-#: src/components/PartyStatsView.tsx:444
+#: src/components/PartyStatsView.tsx:299
+#: src/components/PartyStatsView.tsx:513
 msgid "No spending in this timeframe"
 msgstr "No spending in this timeframe"
 
-#: src/components/PartyStatsView.tsx:466
+#: src/components/PartyStatsView.tsx:803
 msgid "No spending stats for this timeframe"
 msgstr "No spending stats for this timeframe"
 
-#: src/components/PartyStatsView.tsx:468
+#: src/components/PartyStatsView.tsx:805
 msgid "No spending stats yet"
 msgstr "No spending stats yet"
 
@@ -1254,11 +1257,11 @@ msgstr "No updates available"
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
-#: src/components/PartyStatsView.tsx:315
+#: src/components/PartyStatsView.tsx:286
 msgid "Nobody yet"
 msgstr "Nobody yet"
 
-#: src/components/PartyStatsView.tsx:302
+#: src/components/PartyStatsView.tsx:304
 msgid "Non-transfer expenses in this timeframe"
 msgstr "Non-transfer expenses in this timeframe"
 
@@ -1273,6 +1276,10 @@ msgstr "Norwegian Krone"
 #: src/routes/join.tsx:52
 msgid "Not a valid trizum party code"
 msgstr "Not a valid trizum party code"
+
+#: src/components/PartyStatsView.tsx:685
+msgid "of total spending"
+msgstr "of total spending"
 
 #: src/routes/about.tsx:64
 msgid "Offline-First"
@@ -1323,7 +1330,7 @@ msgstr "Other operations"
 msgid "owes"
 msgstr "owes"
 
-#: src/components/PartyStatsView.tsx:291
+#: src/components/PartyStatsView.tsx:350
 msgid "Paid as {currentParticipantName}"
 msgstr "Paid as {currentParticipantName}"
 
@@ -1371,11 +1378,12 @@ msgstr "participant"
 msgid "Participant name"
 msgstr "Participant name"
 
+#: src/components/PartyStatsView.tsx:318
 #: src/routes/index.tsx:286
 msgid "participants"
 msgstr "participants"
 
-#: src/components/PartyStatsView.tsx:336
+#: src/components/PartyStatsView.tsx:314
 #: src/routes/new.tsx:275
 #: src/routes/party_.$partyId.settings.tsx:233
 msgid "Participants"
@@ -1392,6 +1400,10 @@ msgstr "Party deleted"
 #: src/routes/party.$partyId.tsx:485
 msgid "Party is completely balanced!"
 msgstr "Party is completely balanced!"
+
+#: src/components/PartyStatsView.tsx:177
+msgid "Party leaderboard"
+msgstr "Party leaderboard"
 
 #: src/routes/party_.$partyId.share.tsx:41
 msgid "Party link copied to clipboard!"
@@ -1726,7 +1738,7 @@ msgid "Sri Lankan Rupee"
 msgstr "Sri Lankan Rupee"
 
 #. Label for the start date field in the custom range filter on the party stats screen
-#: src/components/PartyStatsView.tsx:209
+#: src/components/PartyStatsView.tsx:218
 msgid "Start date"
 msgstr "Start date"
 
@@ -1885,7 +1897,7 @@ msgid "This project uses various open source libraries and tools."
 msgstr "This project uses various open source libraries and tools."
 
 #. Label for the timeframe filter on the party stats screen
-#: src/components/PartyStatsView.tsx:181
+#: src/components/PartyStatsView.tsx:236
 msgid "Timeframe"
 msgstr "Timeframe"
 
@@ -1910,7 +1922,7 @@ msgstr "To join the <0>{0}</0>, please select who you are so that we can show yo
 msgid "Tongan Paʻanga"
 msgstr "Tongan Paʻanga"
 
-#: src/components/PartyStatsView.tsx:307
+#: src/components/PartyStatsView.tsx:428
 msgid "Top spender"
 msgstr "Top spender"
 
@@ -1918,7 +1930,7 @@ msgstr "Top spender"
 msgid "Total paid by each participant in the selected timeframe."
 msgstr "Total paid by each participant in the selected timeframe."
 
-#: src/components/PartyStatsView.tsx:268
+#: src/components/PartyStatsView.tsx:278
 msgid "Total spent"
 msgstr "Total spent"
 
@@ -1955,7 +1967,7 @@ msgstr "trizum stores all your data locally on your device. When you're online a
 msgid "Try again"
 msgstr "Try again"
 
-#: src/components/PartyStatsView.tsx:474
+#: src/components/PartyStatsView.tsx:811
 msgid "Try another timeframe to compare a different period of your party."
 msgstr "Try another timeframe to compare a different period of your party."
 
@@ -2190,7 +2202,7 @@ msgstr "Your data is stored locally on your device and synced to trizum servers 
 msgid "Your internet connection might be too slow."
 msgstr "Your internet connection might be too slow."
 
-#: src/components/PartyStatsView.tsx:282
+#: src/components/PartyStatsView.tsx:341
 msgid "Your total"
 msgstr "Your total"
 
