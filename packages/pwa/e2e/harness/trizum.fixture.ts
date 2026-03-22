@@ -192,22 +192,22 @@ function createBrowserHarness(page: Page): BrowserHarness {
   }: JoinedPartySeed) {
     await bootstrapForSeeding();
 
-    const seededParty = await createParty(fixture);
+    const partyId = await createParty(fixture);
 
     await writePartyList({
       username: "Harness User",
       phone: "",
       openLastPartyOnLaunch,
-      lastOpenedPartyId: openLastPartyOnLaunch ? seededParty.partyId : null,
+      lastOpenedPartyId: openLastPartyOnLaunch ? partyId : null,
       parties: {
-        [seededParty.partyId]: true,
+        [partyId]: true,
       },
       participantInParties: {
-        [seededParty.partyId]: memberParticipantId,
+        [partyId]: memberParticipantId,
       },
     });
 
-    return buildPartySeedResult(seededParty);
+    return buildPartySeedResult(partyId);
   }
 
   async function readPartyList() {

@@ -15,7 +15,6 @@ import {
   type Balance,
   type Expense,
 } from "#src/models/expense.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { cn } from "#src/ui/utils.js";
 import { toast } from "sonner";
 import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
@@ -46,6 +45,7 @@ import {
   cancelIdleCallback,
 } from "#src/lib/requestIdleCallback.ts";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
+import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
@@ -61,11 +61,10 @@ export const Route = createFileRoute("/party/$partyId")({
       location,
     );
 
-    const firstChunkRef = party.chunkRefs.at(0);
-
-    if (firstChunkRef) {
-      await documentCache.readAsync(context.repo, firstChunkRef.chunkId);
-    }
+    await loadVisiblePartyExpenseChunks(
+      context.repo,
+      party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
+    );
 
     return;
   },
@@ -353,7 +352,11 @@ function PartyById() {
             {
               id: "expenses",
               label: t`Expenses`,
-              node: <ExpenseLog panelRef={expenseLogTabPanelRef} />,
+              node: (
+                <Suspense fallback={null}>
+                  <ExpenseLog panelRef={expenseLogTabPanelRef} />
+                </Suspense>
+              ),
               panelRef: expenseLogTabPanelRef,
               icon: "#lucide/scroll-text",
             },

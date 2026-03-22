@@ -2,183 +2,94 @@ import {
   documentCache,
   useSuspenseDocument,
 } from "#src/lib/automerge/suspense-hooks.js";
-import type { Party, PartyExpenseChunk } from "#src/models/party.js";
-import type { Doc, DocumentId } from "@automerge/automerge-repo";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import {
-  startTransition,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from "react";
+  getPartyPaginatedExpensesSnapshot,
+  getVisiblePartyExpenseChunkIdsToLoad,
+  loadNextPartyExpenseChunks,
+  type PartyPaginatedExpensesSnapshot,
+  subscribeToPartyPaginatedExpenses,
+} from "#src/lib/partyPaginatedExpenses.ts";
+import type { Party } from "#src/models/party.js";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { use, useRef, useSyncExternalStore } from "react";
 
-export function usePartyPaginatedExpenses(partyId: DocumentId) {
+export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   const repo = useRepo();
-  const [party, handle] = useSuspenseDocument<Party>(partyId, {
+  const [party] = useSuspenseDocument<Party>(partyId, {
     required: true,
   });
   const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
-  const [key, rerender] = useReducer((state) => state + 1, 1);
-
-  function getLoadedChunkExpenses() {
-    return getLoadedChunkIds().flatMap((chunkId) => {
-      const doc = documentCache.getValueIfCached(
-        repo,
-        chunkId,
-      ) as Doc<PartyExpenseChunk>;
-
-      if (!doc) {
-        return [];
-      }
-
-      return doc.expenses;
-    });
-  }
-
-  function getLoadedChunkIds() {
-    const party = handle.doc();
-
-    if (!party) {
-      return [];
-    }
-
-    const ids = [];
-    const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
-
-    for (const chunkId of chunkIds) {
-      const doc = documentCache.getValueIfCached(repo, chunkId);
-
-      if (!doc) {
-        // If a chunk is not loaded, we can't load any more
-        break;
-      }
-
-      ids.push(chunkId);
-    }
-
-    return ids;
-  }
-
-  const [isLoadingNext, setIsLoadingNext] = useState(false);
-
-  useEffect(() => {
-    const toLoadIds: DocumentId[] = [];
-    const loadedChunkIds = getLoadedChunkIds();
-
-    if (loadedChunkIds.length === 0 && chunkIds.length > 0) {
-      toLoadIds.push(chunkIds[0]);
-    } else {
-      for (let i = 0; i < chunkIds.length; i++) {
-        const loadedChunkId =
-          loadedChunkIds.length > i ? loadedChunkIds[i] : null;
-        const chunkId = chunkIds[i];
-        const isNewerChunk = loadedChunkId ? chunkId !== loadedChunkId : false;
-
-        if (isNewerChunk) {
-          toLoadIds.push(chunkId);
-        }
-
-        if (loadedChunkId === null) {
-          break;
-        }
-      }
-    }
-
-    let unmounted = false;
-
-    if (toLoadIds.length > 0) {
-      void loadChunks();
-    }
-
-    async function loadChunks() {
-      await Promise.all(
-        toLoadIds.map((chunkId) => {
-          return Promise.resolve(documentCache.readAsync(repo, chunkId));
-        }),
-      );
-
-      if (unmounted) {
-        return;
-      }
-
-      startTransition(() => {
-        rerender();
-      });
-    }
-
-    return () => {
-      unmounted = true;
-    };
-  }, [chunkIds, key, getLoadedChunkIds, repo]);
-
-  // Subscribe to loaded chunk changes
-  useEffect(() => {
-    const disposeBag = new Set<() => void>();
-    let unmounted = false;
-
-    async function subscribeToChunkChanges() {
-      for (const chunkId of getLoadedChunkIds()) {
-        const handle = await repo.find<PartyExpenseChunk>(chunkId);
-
-        if (unmounted) {
-          return;
-        }
-
-        handle.on("change", onChange);
-
-        function onChange() {
-          startTransition(() => {
-            rerender();
-          });
-        }
-
-        disposeBag.add(() => {
-          handle.off("change", onChange);
-        });
-      }
-    }
-
-    void subscribeToChunkChanges();
-
-    return () => {
-      disposeBag.forEach((dispose) => dispose());
-      unmounted = true;
-    };
-  }, [key]);
-
-  const nextChunkRefId = chunkIds.find(
-    (chunkId) => !getLoadedChunkIds().includes(chunkId),
+  const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(
+    undefined,
   );
-  const hasNext = !!nextChunkRefId;
+  const snapshotKeyRef = useRef<string>("");
+  const snapshotKey = `${String(partyId)}:${chunkIds.join(",")}`;
+
+  for (const chunkId of getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds)) {
+    const maybeChunk = documentCache.readAsync(repo, chunkId);
+
+    if (isPromiseLike(maybeChunk)) {
+      use(maybeChunk);
+    }
+  }
+
+  const snapshot = useSyncExternalStore(
+    (onStoreChange) =>
+      subscribeToPartyPaginatedExpenses(onStoreChange, repo, chunkIds),
+    () => {
+      if (snapshotKeyRef.current !== snapshotKey) {
+        snapshotKeyRef.current = snapshotKey;
+        snapshotRef.current = undefined;
+      }
+
+      const nextSnapshot = getPartyPaginatedExpensesSnapshot(repo, chunkIds);
+
+      if (
+        snapshotRef.current &&
+        areSnapshotsEqual(snapshotRef.current, nextSnapshot)
+      ) {
+        return snapshotRef.current;
+      }
+
+      snapshotRef.current = nextSnapshot;
+      return nextSnapshot;
+    },
+  );
 
   function loadNext() {
-    setIsLoadingNext(true);
-    void load().finally(() => {
-      setIsLoadingNext(false);
-    });
-
-    async function load() {
-      if (!nextChunkRefId) {
-        return;
-      }
-
-      await documentCache.readAsync(repo, nextChunkRefId);
-      startTransition(() => {
-        rerender();
-      });
-    }
+    void loadNextPartyExpenseChunks(repo, chunkIds);
   }
 
-  const expenses = useMemo(
-    () => getLoadedChunkExpenses(),
-    [key, getLoadedChunkExpenses],
-  );
-
   return {
-    expenses,
+    expenses: snapshot.expenses,
     loadNext,
-    isLoadingNext,
-    hasNext,
+    isLoadingNext: snapshot.isLoadingNext,
+    hasNext: snapshot.hasNext,
   };
+}
+
+function isPromiseLike<T>(value: PromiseLike<T> | T): value is PromiseLike<T> {
+  return (
+    (typeof value === "object" || typeof value === "function") &&
+    value !== null &&
+    "then" in value &&
+    typeof value.then === "function"
+  );
+}
+
+function areSnapshotsEqual(
+  previous: PartyPaginatedExpensesSnapshot,
+  next: PartyPaginatedExpensesSnapshot,
+): boolean {
+  if (
+    previous.hasNext !== next.hasNext ||
+    previous.isLoadingNext !== next.isLoadingNext ||
+    previous.expenses.length !== next.expenses.length
+  ) {
+    return false;
+  }
+
+  return previous.expenses.every(
+    (expense, index) => expense === next.expenses[index],
+  );
 }
