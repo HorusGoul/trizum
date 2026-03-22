@@ -15,12 +15,12 @@ msgstr ""
 
 #: src/routes/party_.$partyId.pay.tsx:99
 #: src/routes/party_.$partyId.pay.tsx:105
-#: src/routes/party.$partyId.tsx:892
-#: src/routes/party.$partyId.tsx:898
+#: src/routes/party.$partyId.tsx:916
+#: src/routes/party.$partyId.tsx:922
 msgid "(me)"
 msgstr "(yo)"
 
-#: src/routes/party.$partyId.tsx:423
+#: src/routes/party.$partyId.tsx:447
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
@@ -54,6 +54,10 @@ msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o regi
 msgid "Accent color"
 msgstr "Color de acento"
 
+#: src/components/PartyStatsView.tsx:323
+msgid "Across the selected timeframe"
+msgstr "En el período seleccionado"
+
 #: src/routes/new.tsx:598
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
@@ -62,13 +66,17 @@ msgstr "Unidad de Cuenta del BAsD"
 msgid "Add"
 msgstr "Sumar"
 
-#: src/routes/party.$partyId.tsx:439
-#: src/routes/party.$partyId.tsx:447
+#: src/routes/party.$partyId.tsx:463
+#: src/routes/party.$partyId.tsx:471
 msgid "Add an expense"
 msgstr "Añadir un gasto"
 
+#: src/components/PartyStatsView.tsx:901
+msgid "Add expenses to this party to unlock totals, rankings, and individual spend."
+msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto individual."
+
 #: src/routes/index.tsx:179
-#: src/routes/party.$partyId.tsx:407
+#: src/routes/party.$partyId.tsx:431
 msgid "Add or create"
 msgstr "Añadir o crear"
 
@@ -101,6 +109,10 @@ msgstr "Dinar Argelino"
 msgid "Align QR code here"
 msgstr "Alinea el código QR aquí"
 
+#: src/components/PartyStatsView.tsx:192
+msgid "All time"
+msgstr "Todo el tiempo"
+
 #: src/components/ExpenseEditor.tsx:381
 msgid "Amount"
 msgstr "Cantidad"
@@ -125,6 +137,10 @@ msgstr "Archivar"
 #: src/components/PartyPendingComponent.tsx:18
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
+
+#: src/components/PartyStatsView.tsx:497
+msgid "Archived"
+msgstr "Archivado"
 
 #: src/routes/party_.$partyId.settings.tsx:424
 msgid "Archived participants"
@@ -192,15 +208,15 @@ msgstr "Dólar Bahameño"
 msgid "Bahraini Dinar"
 msgstr "Dinar Bareiní"
 
-#: src/routes/party.$partyId.tsx:213
+#: src/routes/party.$partyId.tsx:215
 msgid "Balance, Highest First"
 msgstr "Balance, Mayor Primero"
 
-#: src/routes/party.$partyId.tsx:196
+#: src/routes/party.$partyId.tsx:198
 msgid "Balance, Lowest First"
 msgstr "Balance, Menor Primero"
 
-#: src/routes/party.$partyId.tsx:338
+#: src/routes/party.$partyId.tsx:362
 msgid "Balances"
 msgstr "Balance"
 
@@ -227,6 +243,10 @@ msgstr "Dólar Bermudeño"
 #: src/routes/new.tsx:473
 msgid "Bhutanese Ngultrum"
 msgstr "Ngultrum Butanés"
+
+#: src/components/PartyStatsView.tsx:238
+msgid "Biggest spenders"
+msgstr "Quiénes más han pagado"
 
 #: src/routes/new.tsx:470
 msgid "Bolivian Boliviano"
@@ -389,6 +409,10 @@ msgstr "Color"
 msgid "Comorian Franc"
 msgstr "Franco Comorense"
 
+#: src/components/PartyStatsView.tsx:181
+msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
+msgstr "Compara cuánto ha pagado cada persona en distintos períodos. Las transferencias de saldos no se incluyen en estos totales."
+
 #: src/routes/index.tsx:474
 msgid "Complete your profile"
 msgstr "Completa tu perfil"
@@ -445,6 +469,21 @@ msgstr "Peso Cubano"
 #: src/routes/new.tsx:254
 msgid "Currency"
 msgstr "Moneda"
+
+#: src/components/PartyStatsView.tsx:193
+msgid "Current month"
+msgstr "Mes actual"
+
+#: src/components/PartyStatsView.tsx:194
+msgid "Current year"
+msgstr "Año actual"
+
+#. Label for the custom range calendar popover on the party stats screen
+#. Timeframe option on the party stats screen for choosing any start and end dates
+#: src/components/PartyStatsView.tsx:201
+#: src/components/PartyStatsView.tsx:851
+msgid "Custom range"
+msgstr "Rango personalizado"
 
 #: src/routes/new.tsx:439
 msgid "Czech Koruna"
@@ -526,6 +565,11 @@ msgstr "Soporte por email"
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
+#. Label for the end date field in the custom range filter on the party stats screen
+#: src/components/PartyStatsView.tsx:244
+msgid "End date"
+msgstr "Fecha de fin"
+
 #: src/routes/settings.tsx:49
 msgid "English"
 msgstr "Inglés"
@@ -582,9 +626,13 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
-#: src/routes/party.$partyId.tsx:331
+#: src/routes/party.$partyId.tsx:355
 msgid "Expenses"
 msgstr "Gastos"
+
+#: src/components/PartyStatsView.tsx:330
+msgid "Expenses counted"
+msgstr "Gastos contabilizados"
 
 #: src/components/QRCodeScanner.tsx:117
 msgid "Failed to access camera"
@@ -641,6 +689,10 @@ msgstr "Características"
 #: src/routes/new.tsx:494
 msgid "Fijian Dollar"
 msgstr "Dólar Fiyiano"
+
+#: src/components/PartyStatsView.tsx:141
+msgid "Filter totals and rankings"
+msgstr "Filtra totales y rankings"
 
 #: src/routes/settings.tsx:175
 msgid "For payments through Bizum or similar services"
@@ -714,7 +766,7 @@ msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 msgid "Heads up!"
 msgstr "¡Atención!"
 
-#: src/routes/party.$partyId.tsx:716
+#: src/routes/party.$partyId.tsx:740
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo podéis hacer para equilibrar vuestra posición."
 
@@ -739,7 +791,7 @@ msgstr "¿Cómo quieres llamar a este grupo?"
 msgid "How does offline sync work?"
 msgstr "¿Cómo funciona la sincronización sin conexión?"
 
-#: src/routes/party.$partyId.tsx:712
+#: src/routes/party.$partyId.tsx:736
 msgid "How should I balance?"
 msgstr "¿Cómo debería equilibrar?"
 
@@ -767,7 +819,7 @@ msgstr "La imagen debe ser menor de 10MB"
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
-#: src/routes/party.$partyId.tsx:604
+#: src/routes/party.$partyId.tsx:628
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
@@ -798,6 +850,10 @@ msgstr "Incluir todos"
 #: src/routes/new.tsx:431
 msgid "Indian Rupee"
 msgstr "Rupia India"
+
+#: src/components/PartyStatsView.tsx:260
+msgid "Individual totals"
+msgstr "Totales individuales"
 
 #: src/routes/new.tsx:505
 msgid "Indonesian Rupiah"
@@ -891,7 +947,11 @@ msgstr "Idioma"
 msgid "Laotian Kip"
 msgstr "Kip Laosiano"
 
-#: src/routes/party.$partyId.tsx:315
+#: src/components/PartyStatsView.tsx:110
+msgid "Last year"
+msgstr "Año pasado"
+
+#: src/routes/party.$partyId.tsx:339
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
@@ -961,7 +1021,7 @@ msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden 
 
 #: src/routes/party_.$partyId.pay.tsx:91
 #: src/routes/party_.$partyId.pay.tsx:120
-#: src/routes/party.$partyId.tsx:929
+#: src/routes/party.$partyId.tsx:953
 msgid "Mark as paid"
 msgstr "Marcar como pagado"
 
@@ -977,6 +1037,8 @@ msgstr "Ouguiya Mauritano"
 msgid "Mauritian Rupee"
 msgstr "Rupia de Mauricio"
 
+#: src/components/PartyStatsView.tsx:638
+#: src/components/PartyStatsView.tsx:734
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:221
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:368
 msgid "Me"
@@ -985,7 +1047,7 @@ msgstr "Yo"
 #: src/components/ExpenseEditor.tsx:265
 #: src/routes/index.tsx:111
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:103
-#: src/routes/party.$partyId.tsx:227
+#: src/routes/party.$partyId.tsx:229
 msgid "Menu"
 msgstr "Menú"
 
@@ -1053,7 +1115,7 @@ msgstr "Kyat Birmano"
 
 #: src/routes/new.tsx:186
 #: src/routes/party_.$partyId.settings.tsx:166
-#: src/routes/party.$partyId.tsx:179
+#: src/routes/party.$partyId.tsx:181
 msgid "Name"
 msgstr "Nombre"
 
@@ -1122,9 +1184,30 @@ msgstr "Sin moneda"
 msgid "No emoji found"
 msgstr "No se encontraron emojis"
 
-#: src/routes/party.$partyId.tsx:778
+#: src/components/PartyStatsView.tsx:299
+#: src/components/PartyStatsView.tsx:513
+msgid "No spending in this timeframe"
+msgstr "No hay gastos en este período"
+
+#: src/components/PartyStatsView.tsx:889
+msgid "No spending stats for this timeframe"
+msgstr "No hay estadísticas de gastos para este período"
+
+#: src/components/PartyStatsView.tsx:891
+msgid "No spending stats yet"
+msgstr "Aún no hay estadísticas de gastos"
+
+#: src/routes/party.$partyId.tsx:802
 msgid "Nobody owes you money!"
 msgstr "¡Nadie te debe dinero!"
+
+#: src/components/PartyStatsView.tsx:286
+msgid "Nobody yet"
+msgstr "Todavía nadie"
+
+#: src/components/PartyStatsView.tsx:336
+msgid "Non-transfer expenses in this timeframe"
+msgstr "Gastos no asociados a transferencias en este período"
 
 #: src/routes/new.tsx:515
 msgid "North Korean Won"
@@ -1138,6 +1221,10 @@ msgstr "Corona Noruega"
 msgid "Not a valid trizum party code"
 msgstr "No es un código de grupo de trizum válido"
 
+#: src/components/PartyStatsView.tsx:746
+msgid "of total spending"
+msgstr "del gasto total"
+
 #: src/routes/about.tsx:64
 msgid "Offline-First"
 msgstr "Sin Conexión Primero"
@@ -1146,7 +1233,7 @@ msgstr "Sin Conexión Primero"
 msgid "Omani Rial"
 msgstr "Rial Omaní"
 
-#: src/routes/party.$partyId.tsx:266
+#: src/routes/party.$partyId.tsx:268
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
@@ -1174,14 +1261,18 @@ msgstr "Abrir paréntesis"
 msgid "or enter code"
 msgstr "o introduce código"
 
-#: src/routes/party.$partyId.tsx:789
+#: src/routes/party.$partyId.tsx:813
 msgid "Other operations"
 msgstr "Otras operaciones"
 
 #: src/routes/party_.$partyId.pay.tsx:102
-#: src/routes/party.$partyId.tsx:895
+#: src/routes/party.$partyId.tsx:919
 msgid "owes"
 msgstr "le debe"
+
+#: src/components/PartyStatsView.tsx:350
+msgid "Paid as {currentParticipantName}"
+msgstr "Pagado por {currentParticipantName}"
 
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:265
 msgid "Paid at"
@@ -1227,10 +1318,12 @@ msgstr "participante"
 msgid "Participant name"
 msgstr "Nombre del participante"
 
+#: src/components/PartyStatsView.tsx:350
 #: src/routes/index.tsx:286
 msgid "participants"
 msgstr "participantes"
 
+#: src/components/PartyStatsView.tsx:346
 #: src/routes/new.tsx:275
 #: src/routes/party_.$partyId.settings.tsx:233
 msgid "Participants"
@@ -1239,6 +1332,10 @@ msgstr "Participantes"
 #: src/routes/new.tsx:89
 msgid "Party created"
 msgstr "Grupo creado"
+
+#: src/components/PartyStatsView.tsx:177
+msgid "Party leaderboard"
+msgstr "Clasificación del grupo"
 
 #: src/routes/party_.$partyId.share.tsx:41
 msgid "Party link copied to clipboard!"
@@ -1256,20 +1353,24 @@ msgstr "¡Configuración del grupo guardada!"
 msgid "Party shared!"
 msgstr "¡Grupo compartido!"
 
+#: src/routes/party_.$partyId.stats.tsx:46
+msgid "Party stats"
+msgstr "Estadísticas del grupo"
+
 #: src/routes/migrate_.tricount.tsx:202
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
 #: src/routes/party_.$partyId.pay.tsx:91
-#: src/routes/party.$partyId.tsx:929
+#: src/routes/party.$partyId.tsx:953
 msgid "Pay"
 msgstr "Pagar"
 
-#: src/routes/party.$partyId.tsx:760
+#: src/routes/party.$partyId.tsx:784
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
-#: src/routes/party.$partyId.tsx:262
+#: src/routes/party.$partyId.tsx:264
 msgid "Personal mode"
 msgstr "Modo personal"
 
@@ -1344,6 +1445,10 @@ msgstr "Política de Privacidad"
 #: src/routes/new.tsx:550
 msgid "Qatari Rial"
 msgstr "Rial Catarí"
+
+#: src/components/PartyStatsView.tsx:240
+msgid "Ranking based on how much each participant paid in the selected timeframe."
+msgstr "Clasificación según cuánto ha pagado cada participante en el período seleccionado."
 
 #: src/routes/about.tsx:73
 msgid "Real-Time Sync"
@@ -1436,6 +1541,10 @@ msgstr "Buscar emoji"
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
 
+#: src/routes/party.$partyId.tsx:295
+msgid "See spending totals and rankings"
+msgstr "Ver totales y clasificación de gasto"
+
 #: src/components/EmojiPicker.tsx:152
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
@@ -1453,7 +1562,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:126
-#: src/routes/party.$partyId.tsx:304
+#: src/routes/party.$partyId.tsx:328
 #: src/routes/settings.tsx:91
 msgid "Settings"
 msgstr "Configuración"
@@ -1468,7 +1577,7 @@ msgstr "Rupia de Seychelles"
 
 #: src/routes/party_.$partyId.share.tsx:56
 #: src/routes/party_.$partyId.share.tsx:91
-#: src/routes/party.$partyId.tsx:288
+#: src/routes/party.$partyId.tsx:312
 msgid "Share party"
 msgstr "Compartir grupo"
 
@@ -1516,7 +1625,7 @@ msgstr "Chelín Somalí"
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/party.$partyId.tsx:167
+#: src/routes/party.$partyId.tsx:169
 msgid "Sort balances"
 msgstr "Ordenar balances"
 
@@ -1552,9 +1661,18 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 msgid "Sri Lankan Rupee"
 msgstr "Rupia de Sri Lanka"
 
+#. Label for the start date field in the custom range filter on the party stats screen
+#: src/components/PartyStatsView.tsx:218
+msgid "Start date"
+msgstr "Fecha de inicio"
+
 #: src/routes/index.tsx:343
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
+
+#: src/routes/party.$partyId.tsx:291
+msgid "Stats"
+msgstr "Estadísticas"
 
 #: src/routes/support.tsx:88
 msgid "Submit a Request"
@@ -1652,7 +1770,7 @@ msgstr "Hacer foto"
 msgid "Tanzanian Shilling"
 msgstr "Chelín Tanzano"
 
-#: src/routes/party.$partyId.tsx:249
+#: src/routes/party.$partyId.tsx:251
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
@@ -1702,6 +1820,11 @@ msgstr "Este no es un ID válido"
 msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
+#. Label for the timeframe filter on the party stats screen
+#: src/components/PartyStatsView.tsx:270
+msgid "Timeframe"
+msgstr "Período"
+
 #: src/components/ExpenseEditor.tsx:344
 msgid "Title"
 msgstr "Título"
@@ -1723,6 +1846,18 @@ msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que pod
 msgid "Tongan Paʻanga"
 msgstr "Paʻanga Tongano"
 
+#: src/components/PartyStatsView.tsx:428
+msgid "Top spender"
+msgstr "Quién más ha pagado"
+
+#: src/components/PartyStatsView.tsx:262
+msgid "Total paid by each participant in the selected timeframe."
+msgstr "Total pagado por cada participante en el período seleccionado."
+
+#: src/components/PartyStatsView.tsx:310
+msgid "Total spent"
+msgstr "Total gastado"
+
 #: src/routes/migrate_.tricount.tsx:57
 msgid "Tricount key or URL is required"
 msgstr "Se requiere la clave o URL de Tricount"
@@ -1743,6 +1878,10 @@ msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando est
 #: src/components/QRCodeScanner.tsx:204
 msgid "Try again"
 msgstr "Reintentar"
+
+#: src/components/PartyStatsView.tsx:897
+msgid "Try another timeframe to compare a different period of your party."
+msgstr "Prueba otro período para comparar otra etapa de tu grupo."
 
 #: src/components/QRCodeScanner.tsx:339
 msgid "Try scanning another code"
@@ -1875,10 +2014,13 @@ msgstr "Ver foto"
 msgid "View Third-Party Licenses"
 msgstr "Ver Licencias de Terceros"
 
-#. placeholder {0}: participant.name
 #: src/routes/party.$partyId.tsx:245
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
+
+#: src/routes/party.$partyId.tsx:247
+msgid "Viewing as {participantName}"
+msgstr "Viendo como {participantName}"
 
 #. placeholder {0}: participant.name
 #: src/routes/party_.$partyId.who.tsx:64
@@ -1938,11 +2080,11 @@ msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
-#: src/routes/party.$partyId.tsx:731
+#: src/routes/party.$partyId.tsx:755
 msgid "You owe money to people"
 msgstr "Debes dinero a personas"
 
-#: src/routes/party.$partyId.tsx:749
+#: src/routes/party.$partyId.tsx:773
 msgid "You're debt free!"
 msgstr "¡Estás libre de deudas!"
 
@@ -1958,6 +2100,10 @@ msgstr "Tus datos se almacenan localmente en tu dispositivo y se sincronizan con
 #: src/components/PartyPendingComponent.tsx:25
 msgid "Your internet connection might be too slow."
 msgstr "Tu conexión a internet puede ser demasiado lenta."
+
+#: src/components/PartyStatsView.tsx:341
+msgid "Your total"
+msgstr "Tu total"
 
 #: src/routes/new.tsx:601
 msgid "Zambian Kwacha"

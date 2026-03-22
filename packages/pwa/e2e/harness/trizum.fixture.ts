@@ -44,7 +44,10 @@ export interface BrowserHarness {
   goto(path?: string): Promise<void>;
   gotoHome(): Promise<void>;
   navigate(path: string): Promise<void>;
-  gotoParty(partyId: string, tab?: "expenses" | "balances"): Promise<void>;
+  gotoParty(
+    partyId: string,
+    tab?: "expenses" | "balances" | "stats",
+  ): Promise<void>;
   seedParty(fixture: unknown): Promise<{
     joinCode: string;
     joinUrl: string;
@@ -123,7 +126,8 @@ function createBrowserHarness(page: Page): BrowserHarness {
           return (
             typeof internalWindow.__internal_createPartyFromMigrationData ===
               "function" &&
-            typeof internalWindow.__internal_seedPartyListState === "function" &&
+            typeof internalWindow.__internal_seedPartyListState ===
+              "function" &&
             typeof internalWindow.__internal_readPartyListState === "function"
           );
         });
@@ -217,7 +221,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
   async function gotoParty(
     partyId: string,
-    tab: "expenses" | "balances" = "expenses",
+    tab: "expenses" | "balances" | "stats" = "expenses",
   ) {
     await goto(`/party/${partyId}?tab=${tab}`);
   }

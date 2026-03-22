@@ -146,6 +146,8 @@ function PartyById() {
     return <span>404 bruv</span>;
   }
 
+  const participantName = participant.name;
+
   function onTogglePersonalMode() {
     setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
@@ -242,7 +244,7 @@ function PartyById() {
                 />
                 <div className="flex flex-col">
                   <span className="leading-none">
-                    <Trans>Viewing as {participant.name}</Trans>
+                    <Trans>Viewing as {participantName}</Trans>
                   </span>
 
                   <span className="mt-2 text-sm leading-none opacity-80">
@@ -271,6 +273,28 @@ function PartyById() {
                   onChange={onTogglePersonalMode}
                   isReadOnly={true}
                 />
+              </MenuItem>
+
+              <MenuItem
+                href={{
+                  to: "/party/$partyId/stats",
+                  params: { partyId },
+                }}
+              >
+                <IconWithFallback
+                  name="#lucide/users"
+                  size={20}
+                  className="mr-3 self-start"
+                />
+                <div className="flex flex-col">
+                  <span className="leading-none">
+                    <Trans>Stats</Trans>
+                  </span>
+
+                  <span className="mt-2 text-sm leading-none opacity-80">
+                    <Trans>See spending totals and rankings</Trans>
+                  </span>
+                </div>
               </MenuItem>
 
               <MenuItem
