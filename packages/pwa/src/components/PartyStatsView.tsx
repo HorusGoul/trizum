@@ -1,5 +1,12 @@
-import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
+import {
+  endOfWeek,
+  getLocalTimeZone,
+  startOfWeek,
+  today,
+} from "@internationalized/date";
+import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
@@ -10,7 +17,6 @@ import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.j
 import {
   calculatePartyStats,
   getPartyStatsAvailablePastYears,
-  getPartyStatsDateBounds,
   type PartyStatsParticipantStat,
   type PartyStatsTimeframe,
 } from "#src/lib/partyStats.ts";
@@ -92,8 +98,6 @@ interface StatsCustomRange {
 }
 
 interface CompactRangePickerProps {
-  maxValue?: CalendarDate;
-  minValue?: CalendarDate;
   value: StatsCustomRange;
   onChange: (value: StatsCustomRange) => void;
 }
@@ -163,6 +167,7 @@ export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
 function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
+  const { i18n } = useLingui();
   const chunkDocuments = useMultipleSuspenseDocument<PartyExpenseChunk>(
     party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
     { required: true },
@@ -170,24 +175,14 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
-  const trackedDateBounds = getPartyStatsDateBounds(expenses);
   const [timeframeKey, setTimeframeKey] =
     useState<PartyStatsTimeframeKey>("all-time");
-  const [customRange, setCustomRange] = useState<StatsCustomRange>(() => {
-    if (trackedDateBounds === null) {
-      const todayValue = today(timezone);
-
-      return {
-        start: todayValue,
-        end: todayValue,
-      };
-    }
-
-    return {
-      start: toCalendarDay(trackedDateBounds.start),
-      end: toCalendarDay(trackedDateBounds.end),
-    };
-  });
+  const [customRange, setCustomRange] = useState<StatsCustomRange>(() =>
+    getDefaultCustomRange({
+      locale: i18n.locale,
+      timezone,
+    }),
+  );
   const allTimeStats = calculatePartyStats({
     expenses,
     participants: party.participants,
@@ -263,14 +258,6 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         tier: "third" as const,
       }
     : undefined;
-  const minimumCustomDate =
-    trackedDateBounds === null
-      ? undefined
-      : toCalendarDay(trackedDateBounds.start);
-  const maximumCustomDate =
-    trackedDateBounds === null
-      ? undefined
-      : toCalendarDay(trackedDateBounds.end);
   useScrollRestoration({
     cacheKey: `party-${party.id}-stats`,
     scrollElementRef,
@@ -306,8 +293,6 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
 
         {selectedTimeframeKey === "custom-range" ? (
           <CompactRangePicker
-            maxValue={maximumCustomDate}
-            minValue={minimumCustomDate}
             value={customRange}
             onChange={(nextRange) => {
               startTransition(() => {
@@ -846,12 +831,7 @@ function StatsAvatarBadge({
   );
 }
 
-function CompactRangePicker({
-  minValue,
-  maxValue,
-  value,
-  onChange,
-}: CompactRangePickerProps) {
+function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
   return (
     <PopoverTrigger>
       <Button
@@ -873,8 +853,6 @@ function CompactRangePicker({
                 "Label for the custom range calendar popover on the party stats screen",
               message: "Custom range",
             })}
-            maxValue={maxValue}
-            minValue={minValue}
             value={value}
             onChange={(nextRange) => {
               if (!nextRange.start || !nextRange.end) {
@@ -954,12 +932,19 @@ function getStatsTimeframe(
   }
 }
 
-function toCalendarDay(date: Date) {
-  return new CalendarDate(
-    date.getFullYear(),
-    date.getMonth() + 1,
-    date.getDate(),
-  );
+function getDefaultCustomRange({
+  locale,
+  timezone,
+}: {
+  locale: string;
+  timezone: string;
+}): StatsCustomRange {
+  const currentDay = today(timezone);
+
+  return {
+    start: startOfWeek(currentDay, locale),
+    end: endOfWeek(currentDay, locale),
+  };
 }
 
 function formatPercent(value: number) {

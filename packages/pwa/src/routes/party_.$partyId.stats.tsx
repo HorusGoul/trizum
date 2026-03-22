@@ -17,10 +17,8 @@ export const Route = createFileRoute("/party_/$partyId/stats")({
       location,
     );
 
-    const firstChunkRef = party.chunkRefs.at(0);
-
-    if (firstChunkRef) {
-      await documentCache.readAsync(context.repo, firstChunkRef.chunkId);
+    for (const chunkRef of party.chunkRefs) {
+      await documentCache.readAsync(context.repo, chunkRef.chunkId);
     }
 
     return;
