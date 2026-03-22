@@ -352,11 +352,7 @@ function PartyById() {
             {
               id: "expenses",
               label: t`Expenses`,
-              node: (
-                <Suspense fallback={null}>
-                  <ExpenseLog panelRef={expenseLogTabPanelRef} />
-                </Suspense>
-              ),
+              node: <ExpenseLog panelRef={expenseLogTabPanelRef} />,
               panelRef: expenseLogTabPanelRef,
               icon: "#lucide/scroll-text",
             },

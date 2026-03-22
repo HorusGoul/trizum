@@ -160,6 +160,15 @@ describe("partyPaginatedExpenses", () => {
     expect(Array.from(cachedChunks.keys())).toEqual([chunk1, chunk2]);
   });
 
+  test("loads the next older page after the visible loaded window", () => {
+    registerChunk(chunk1);
+    registerChunk(chunk2);
+    registerChunk(chunk3);
+    cacheChunk(chunk2);
+
+    expect(getNextPartyExpenseChunkIds(repo, allChunkIds)).toEqual([chunk3]);
+  });
+
   test("loads all missing chunks when requested", async () => {
     registerChunk(chunk1);
     registerChunk(chunk2);
@@ -207,6 +216,24 @@ describe("partyPaginatedExpenses", () => {
       `${chunk2}-expense-1`,
       `${chunk1}-expense-1`,
     ]);
+  });
+
+  test("keeps showing loaded expenses while new leading chunks load", () => {
+    registerChunk(chunk1, ["2025-01-01T00:00:00.000Z"]);
+    registerChunk(chunk2, ["2024-01-01T00:00:00.000Z"]);
+    registerChunk(chunk3, ["2023-01-01T00:00:00.000Z"]);
+    cacheChunk(chunk2);
+    cacheChunk(chunk3);
+    chunkStatuses.set(chunk1, STATUS_PENDING);
+
+    expect(getPartyPaginatedExpensesSnapshot(repo, allChunkIds)).toEqual({
+      expenses: [
+        ...(availableChunks.get(chunk2)?.expenses ?? []),
+        ...(availableChunks.get(chunk3)?.expenses ?? []),
+      ],
+      hasNext: false,
+      isLoadingNext: false,
+    });
   });
 
   test("subscribes to loaded chunks and the next page", () => {

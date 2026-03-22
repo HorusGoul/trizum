@@ -53,9 +53,24 @@ export function getNextPartyExpenseChunkIds(
   chunkIds: readonly DocumentId[],
   pageSize = DEFAULT_PAGE_SIZE,
 ): DocumentId[] {
-  const loadedChunkCount = getLoadedPartyExpenseChunkIds(repo, chunkIds).length;
+  const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(
+    repo,
+    chunkIds,
+  );
 
-  return chunkIds.slice(loadedChunkCount, loadedChunkCount + pageSize);
+  if (firstLoadedChunkIndex === -1) {
+    return chunkIds.slice(0, pageSize);
+  }
+
+  const visibleLoadedChunkCount = getVisibleLoadedPartyExpenseChunkIds(
+    repo,
+    chunkIds,
+  ).length;
+
+  return chunkIds.slice(
+    firstLoadedChunkIndex + visibleLoadedChunkCount,
+    firstLoadedChunkIndex + visibleLoadedChunkCount + pageSize,
+  );
 }
 
 export async function loadVisiblePartyExpenseChunks(
@@ -93,7 +108,7 @@ export function getPartyPaginatedExpensesSnapshot(
   repo: Repo,
   chunkIds: readonly DocumentId[],
 ): PartyPaginatedExpensesSnapshot {
-  const loadedChunkIds = getLoadedPartyExpenseChunkIds(repo, chunkIds);
+  const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
   const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
   const expenses = loadedChunkIds.flatMap((chunkId) => {
     const chunk = getCachedPartyExpenseChunk(repo, chunkId);
@@ -119,11 +134,15 @@ export function subscribeToPartyPaginatedExpenses(
   repo: Repo,
   chunkIds: readonly DocumentId[],
 ): () => void {
-  const loadedChunkIds = getLoadedPartyExpenseChunkIds(repo, chunkIds);
+  const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
+  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(
+    repo,
+    chunkIds,
+  );
   const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
   const chunkIdsToSubscribe = nextChunkId
-    ? [...loadedChunkIds, nextChunkId]
-    : loadedChunkIds;
+    ? [...loadedChunkIds, ...visibleChunkIdsToLoad, nextChunkId]
+    : [...loadedChunkIds, ...visibleChunkIdsToLoad];
   const uniqueChunkIds = new Set(chunkIdsToSubscribe);
   const unsubscribeCallbacks = Array.from(uniqueChunkIds, (chunkId) =>
     documentCache.subscribe(onStoreChange, repo, chunkId),
@@ -143,6 +162,41 @@ function getCachedPartyExpenseChunk(
   return documentCache.getValueIfCached(repo, chunkId) as
     | PartyExpenseChunk
     | undefined;
+}
+
+function getFirstLoadedPartyExpenseChunkIndex(
+  repo: Repo,
+  chunkIds: readonly DocumentId[],
+): number {
+  return chunkIds.findIndex((chunkId) =>
+    Boolean(getCachedPartyExpenseChunk(repo, chunkId)),
+  );
+}
+
+function getVisibleLoadedPartyExpenseChunkIds(
+  repo: Repo,
+  chunkIds: readonly DocumentId[],
+): DocumentId[] {
+  const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(
+    repo,
+    chunkIds,
+  );
+
+  if (firstLoadedChunkIndex === -1) {
+    return [];
+  }
+
+  const visibleLoadedChunkIds: DocumentId[] = [];
+
+  for (const chunkId of chunkIds.slice(firstLoadedChunkIndex)) {
+    if (!getCachedPartyExpenseChunk(repo, chunkId)) {
+      break;
+    }
+
+    visibleLoadedChunkIds.push(chunkId);
+  }
+
+  return visibleLoadedChunkIds;
 }
 
 async function loadPartyExpenseChunks(

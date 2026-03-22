@@ -1,17 +1,15 @@
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
+import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import {
   getPartyPaginatedExpensesSnapshot,
   getVisiblePartyExpenseChunkIdsToLoad,
+  loadVisiblePartyExpenseChunks,
   loadNextPartyExpenseChunks,
   type PartyPaginatedExpensesSnapshot,
   subscribeToPartyPaginatedExpenses,
 } from "#src/lib/partyPaginatedExpenses.ts";
 import type { Party } from "#src/models/party.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { use, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   const repo = useRepo();
@@ -19,19 +17,31 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
     required: true,
   });
   const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
+  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(
+    repo,
+    chunkIds,
+  );
   const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(
     undefined,
   );
   const snapshotKeyRef = useRef<string>("");
   const snapshotKey = `${String(partyId)}:${chunkIds.join(",")}`;
+  const requestedVisibleChunkIdsKeyRef = useRef("");
+  const visibleChunkIdsToLoadKey = visibleChunkIdsToLoad.join(",");
 
-  for (const chunkId of getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds)) {
-    const maybeChunk = documentCache.readAsync(repo, chunkId);
-
-    if (isPromiseLike(maybeChunk)) {
-      use(maybeChunk);
+  useEffect(() => {
+    if (visibleChunkIdsToLoad.length === 0) {
+      requestedVisibleChunkIdsKeyRef.current = "";
+      return;
     }
-  }
+
+    if (requestedVisibleChunkIdsKeyRef.current === visibleChunkIdsToLoadKey) {
+      return;
+    }
+
+    requestedVisibleChunkIdsKeyRef.current = visibleChunkIdsToLoadKey;
+    void loadVisiblePartyExpenseChunks(repo, chunkIds);
+  }, [chunkIds, repo, visibleChunkIdsToLoad, visibleChunkIdsToLoadKey]);
 
   const snapshot = useSyncExternalStore(
     (onStoreChange) =>
@@ -66,15 +76,6 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
     isLoadingNext: snapshot.isLoadingNext,
     hasNext: snapshot.hasNext,
   };
-}
-
-function isPromiseLike<T>(value: PromiseLike<T> | T): value is PromiseLike<T> {
-  return (
-    (typeof value === "object" || typeof value === "function") &&
-    value !== null &&
-    "then" in value &&
-    typeof value.then === "function"
-  );
 }
 
 function areSnapshotsEqual(
