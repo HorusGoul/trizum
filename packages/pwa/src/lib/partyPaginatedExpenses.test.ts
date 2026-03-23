@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { createMockDocumentCacheCollection } from "#src/lib/testing/mockDocumentCache.ts";
 import type { Expense } from "#src/models/expense.ts";
-import { STATUS_PENDING, STATUS_RESOLVED } from "suspense";
+import { STATUS_PENDING } from "suspense";
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 
 type MockChunk = {
@@ -8,80 +9,25 @@ type MockChunk = {
   expenses: Expense[];
 };
 
-const hoisted = vi.hoisted(() => {
-  const availableChunks = new Map<DocumentId, MockChunk>();
-  const cachedChunks = new Map<DocumentId, MockChunk>();
-  const chunkStatuses = new Map<DocumentId, string>();
-  const subscribers = new Map<DocumentId, Set<() => void>>();
+const mockDocumentCacheCollection =
+  createMockDocumentCacheCollection<MockChunk>();
 
-  function notifySubscribers(chunkId: DocumentId) {
-    subscribers.get(chunkId)?.forEach((callback) => callback());
-  }
+const {
+  availableDocuments: availableChunks,
+  cachedDocuments: cachedChunks,
+  documentStatuses: chunkStatuses,
+  subscribers,
+  documentCache,
+  cacheDocument,
+  notifySubscribers,
+  reset,
+} = mockDocumentCacheCollection;
 
-  const documentCache = {
-    getStatus: vi.fn((_: Repo, chunkId: DocumentId) => {
-      return chunkStatuses.get(chunkId) ?? "not-found";
-    }),
-    getValueIfCached: vi.fn((_: Repo, chunkId: DocumentId) => {
-      return cachedChunks.get(chunkId);
-    }),
-    readAsync: vi.fn((_: Repo, chunkId: DocumentId) => {
-      const cachedChunk = cachedChunks.get(chunkId);
-
-      if (cachedChunk) {
-        return cachedChunk;
-      }
-
-      const availableChunk = availableChunks.get(chunkId);
-
-      if (!availableChunk) {
-        return undefined;
-      }
-
-      cachedChunks.set(chunkId, availableChunk);
-      chunkStatuses.set(chunkId, STATUS_RESOLVED);
-      notifySubscribers(chunkId);
-
-      return Promise.resolve(availableChunk);
-    }),
-    subscribe: vi.fn((callback: () => void, _: Repo, chunkId: DocumentId) => {
-      const callbacks = subscribers.get(chunkId) ?? new Set<() => void>();
-
-      callbacks.add(callback);
-      subscribers.set(chunkId, callbacks);
-
-      return () => {
-        callbacks.delete(callback);
-
-        if (callbacks.size === 0) {
-          subscribers.delete(chunkId);
-        }
-      };
-    }),
-  };
-
-  return {
-    availableChunks,
-    cachedChunks,
-    chunkStatuses,
-    subscribers,
-    documentCache,
-  };
+vi.mock("#src/lib/automerge/suspense-hooks.ts", () => {
+  return { documentCache: mockDocumentCacheCollection.documentCache };
 });
 
 const {
-  availableChunks,
-  cachedChunks,
-  chunkStatuses,
-  subscribers,
-  documentCache,
-} = hoisted;
-
-vi.mock("#src/lib/automerge/suspense-hooks.ts", () => {
-  return { documentCache: hoisted.documentCache };
-});
-
-import {
   getLoadedPartyExpenseChunkIds,
   getNextPartyExpenseChunkIds,
   getPartyPaginatedExpensesSnapshot,
@@ -90,7 +36,7 @@ import {
   loadNextPartyExpenseChunks,
   loadVisiblePartyExpenseChunks,
   subscribeToPartyPaginatedExpenses,
-} from "./partyPaginatedExpenses";
+} = await import("./partyPaginatedExpenses");
 
 const repo = {} as Repo;
 const chunk1 = toChunkId("chunk-1");
@@ -100,10 +46,7 @@ const allChunkIds = [chunk1, chunk2, chunk3];
 
 describe("partyPaginatedExpenses", () => {
   beforeEach(() => {
-    availableChunks.clear();
-    cachedChunks.clear();
-    chunkStatuses.clear();
-    subscribers.clear();
+    reset();
     vi.clearAllMocks();
   });
 
@@ -310,14 +253,7 @@ function registerChunk(
 }
 
 function cacheChunk(chunkId: DocumentId) {
-  const chunk = availableChunks.get(chunkId);
-
-  if (!chunk) {
-    throw new Error(`Chunk not registered: ${chunkId}`);
-  }
-
-  cachedChunks.set(chunkId, chunk);
-  chunkStatuses.set(chunkId, STATUS_RESOLVED);
+  cacheDocument(chunkId);
 }
 
 function createExpenseWithPaidAt(id: string, paidAt: string): Expense {
@@ -340,7 +276,7 @@ function appendExpenseToCachedChunk(chunkId: DocumentId, paidAt: string) {
       paidAt,
     ),
   );
-  subscribers.get(chunkId)?.forEach((callback) => callback());
+  notifySubscribers(chunkId);
 }
 
 function toChunkId(value: string): DocumentId {
