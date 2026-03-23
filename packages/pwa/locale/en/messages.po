@@ -15,12 +15,12 @@ msgstr ""
 
 #: src/routes/party_.$partyId.pay.tsx:99
 #: src/routes/party_.$partyId.pay.tsx:105
-#: src/routes/party.$partyId.tsx:919
-#: src/routes/party.$partyId.tsx:925
+#: src/routes/party.$partyId.tsx:915
+#: src/routes/party.$partyId.tsx:921
 msgid "(me)"
 msgstr "(me)"
 
-#: src/routes/party.$partyId.tsx:450
+#: src/routes/party.$partyId.tsx:446
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
@@ -70,8 +70,8 @@ msgstr "ADB Unit of Account"
 msgid "Add"
 msgstr "Add"
 
-#: src/routes/party.$partyId.tsx:466
-#: src/routes/party.$partyId.tsx:474
+#: src/routes/party.$partyId.tsx:462
+#: src/routes/party.$partyId.tsx:470
 msgid "Add an expense"
 msgstr "Add an expense"
 
@@ -80,7 +80,7 @@ msgid "Add expenses to this party to unlock totals, rankings, and individual spe
 msgstr "Add expenses to this party to unlock totals, rankings, and individual spend."
 
 #: src/routes/index.tsx:179
-#: src/routes/party.$partyId.tsx:434
+#: src/routes/party.$partyId.tsx:430
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -228,7 +228,7 @@ msgstr "Balance, Highest First"
 msgid "Balance, Lowest First"
 msgstr "Balance, Lowest First"
 
-#: src/routes/party.$partyId.tsx:365
+#: src/routes/party.$partyId.tsx:361
 msgid "Balances"
 msgstr "Balances"
 
@@ -814,7 +814,7 @@ msgstr "Have an idea to improve trizum? We'd love to hear it."
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId.tsx:743
+#: src/routes/party.$partyId.tsx:739
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -843,7 +843,7 @@ msgstr "How do you want to call this party?"
 msgid "How does offline sync work?"
 msgstr "How does offline sync work?"
 
-#: src/routes/party.$partyId.tsx:739
+#: src/routes/party.$partyId.tsx:735
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -867,7 +867,7 @@ msgstr "ID is required"
 msgid "Image must be smaller than 10MB"
 msgstr "Image must be smaller than 10MB"
 
-#: src/routes/party.$partyId.tsx:631
+#: src/routes/party.$partyId.tsx:627
 msgid "Impact on my balance: <0/>"
 msgstr "Impact on my balance: <0/>"
 
@@ -1073,7 +1073,7 @@ msgstr "Manage the participants list. Existing members can only be archived."
 
 #: src/routes/party_.$partyId.pay.tsx:91
 #: src/routes/party_.$partyId.pay.tsx:120
-#: src/routes/party.$partyId.tsx:956
+#: src/routes/party.$partyId.tsx:952
 msgid "Mark as paid"
 msgstr "Mark as paid"
 
@@ -1253,7 +1253,7 @@ msgstr "No spending stats yet"
 msgid "No updates available"
 msgstr "No updates available"
 
-#: src/routes/party.$partyId.tsx:805
+#: src/routes/party.$partyId.tsx:801
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
@@ -1321,12 +1321,12 @@ msgstr "Optional description for this expense"
 msgid "or enter code"
 msgstr "or enter code"
 
-#: src/routes/party.$partyId.tsx:816
+#: src/routes/party.$partyId.tsx:812
 msgid "Other operations"
 msgstr "Other operations"
 
 #: src/routes/party_.$partyId.pay.tsx:102
-#: src/routes/party.$partyId.tsx:922
+#: src/routes/party.$partyId.tsx:918
 msgid "owes"
 msgstr "owes"
 
@@ -1430,11 +1430,11 @@ msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc12
 msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 
 #: src/routes/party_.$partyId.pay.tsx:91
-#: src/routes/party.$partyId.tsx:956
+#: src/routes/party.$partyId.tsx:952
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party.$partyId.tsx:787
+#: src/routes/party.$partyId.tsx:783
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
@@ -2181,11 +2181,11 @@ msgstr "You can add photos to your expenses for better tracking."
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party.$partyId.tsx:758
+#: src/routes/party.$partyId.tsx:754
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId.tsx:776
+#: src/routes/party.$partyId.tsx:772
 msgid "You're debt free!"
 msgstr "You're debt free!"
 
