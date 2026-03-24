@@ -28,7 +28,7 @@
     "cleanup": "rm -rf dist",
     "dev": "tsc --watch",
     "build": "./copy-client.sh && ./sync.sh",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.capacitor.json --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
     "open:android": "cap open android",

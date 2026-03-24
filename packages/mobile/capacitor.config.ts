@@ -1,7 +1,7 @@
 import { loadEnvFile } from "node:process";
 import * as path from "node:path";
 import type { CapacitorConfig } from "@capacitor/cli";
-import { configureMobileLogging, getLogger } from "./src/log.js";
+import { configureMobileLogging, getLogger } from "./capacitor.log";
 
 configureMobileLogging();
 

@@ -1,6 +1,6 @@
 {
   "extends": "@trizum/tsconfig/base.json",
-  "include": ["capacitor.config.ts"],
+  "include": ["capacitor.config.ts", "capacitor.log.ts"],
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "types": ["node"],
@@ -8,8 +8,11 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "target": "ES2017",
-    "composite": true,
     "noEmit": false,
     "verbatimModuleSyntax": false,
+    "baseUrl": ".",
+    "paths": {
+      "@trizum/logging": ["../logging/src/index.ts"]
+    }
   }
 }
