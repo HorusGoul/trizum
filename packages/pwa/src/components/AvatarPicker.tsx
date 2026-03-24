@@ -19,7 +19,7 @@ import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
 
-const logger = getLogger("components", "avatarPicker");
+const logger = getLogger("components", "AvatarPicker");
 
 interface AvatarPickerProps {
   value: MediaFile["id"] | null;

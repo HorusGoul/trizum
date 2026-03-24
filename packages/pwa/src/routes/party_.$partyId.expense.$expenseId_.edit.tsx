@@ -5,7 +5,6 @@ import {
   type ExpenseEditorRef,
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
-import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import {
   documentCache,
@@ -44,7 +43,7 @@ interface EditExpenseSearchParams {
 export const Route = createFileRoute(
   "/party_/$partyId/expense/$expenseId_/edit",
 )({
-  component: RouteComponent,
+  component: EditExpense,
   pendingComponent: PartyPendingComponent,
 
   validateSearch: (search): EditExpenseSearchParams => {
@@ -65,9 +64,9 @@ export const Route = createFileRoute(
 });
 
 const TIME_TO_DISCARD_EDIT_COPY = 1000 * 60 * 5; // 5 minutes
-const logger = getLogger("routes", "editExpense");
+const logger = getLogger("routes", "EditExpense");
 
-function RouteComponent() {
+function EditExpense() {
   const {
     expenseId,
     partyId,
@@ -222,8 +221,6 @@ function RouteComponent() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const participant = useCurrentParticipant();
-
   const { updateExpense } = useCurrentParty();
 
   const { chunkId } = decodeExpenseId(expenseId);
@@ -232,7 +229,7 @@ function useExpense() {
     required: true,
   });
 
-  const [expense, expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const [expense] = findExpenseById(chunk.expenses, expenseId);
 
   function onUpdateExpense(expense: Expense) {
     void updateExpense(expense);

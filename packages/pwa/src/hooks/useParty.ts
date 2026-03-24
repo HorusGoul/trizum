@@ -31,7 +31,7 @@ import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
 
-const logger = getLogger("hooks", "party");
+const logger = getLogger("hooks", "useParty");
 
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");

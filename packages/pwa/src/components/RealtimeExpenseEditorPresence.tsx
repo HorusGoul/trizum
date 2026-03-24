@@ -21,7 +21,7 @@ import {
   useState,
 } from "react";
 
-const logger = getLogger("components", "realtimeExpenseEditorPresence");
+const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
 interface RealtimeExpenseEditorPresenceProps {
   expenseId: Expense["id"];

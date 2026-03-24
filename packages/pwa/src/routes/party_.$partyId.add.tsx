@@ -26,7 +26,7 @@ interface AddExpenseSearchParams {
   media?: number;
 }
 
-const logger = getLogger("routes", "addExpense");
+const logger = getLogger("routes", "AddExpense");
 
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,

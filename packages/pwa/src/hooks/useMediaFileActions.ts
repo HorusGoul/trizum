@@ -16,7 +16,7 @@ import {
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getLogger } from "#src/lib/log.ts";
 
-const logger = getLogger("hooks", "mediaFileActions");
+const logger = getLogger("hooks", "useMediaFileActions");
 
 export function useMediaFileActions() {
   const repo = useRepo();

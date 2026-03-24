@@ -8,7 +8,7 @@ import { TrizumSpinner } from "./TrizumSpinner.js";
 import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 
-const logger = getLogger("components", "qrCodeScanner");
+const logger = getLogger("components", "QRCodeScanner");
 
 export type ScanResult =
   | { type: "success"; value: string }

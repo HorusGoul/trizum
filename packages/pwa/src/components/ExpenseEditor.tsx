@@ -66,7 +66,7 @@ export interface ExpenseEditorRef {
   setValues: (values: ExpenseEditorFormValues) => void;
 }
 
-const logger = getLogger("components", "expenseEditor");
+const logger = getLogger("components", "ExpenseEditor");
 
 interface ExpenseEditorProps {
   title: string;
