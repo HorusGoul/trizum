@@ -47,6 +47,8 @@ Useful logs usually include:
 Do not log:
 
 - passwords, tokens, API keys, session identifiers, cookies, or auth headers,
+- Automerge document IDs or other shareable document identifiers; treat them as
+  secrets,
 - raw personal data unless there is an explicit, reviewed need,
 - large payload dumps by default,
 - high-frequency UI or render noise,
@@ -117,11 +119,12 @@ Good structured context often includes:
 
 - version or release identifiers,
 - request IDs,
-- party, expense, or document IDs when relevant,
+- party or expense IDs when relevant,
 - operation names,
 - and environment or runtime details that explain behavior.
 
 Avoid attaching objects wholesale unless they are already safe and small.
+Do not attach Automerge document IDs as structured context.
 
 ## Sentry
 
