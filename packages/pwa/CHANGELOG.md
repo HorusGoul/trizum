@@ -1,5 +1,15 @@
 # @trizum/pwa
 
+## 1.6.1
+
+### Patch Changes
+
+- 344b355: Support Android HEIC and HEIF photo uploads by converting them before preview and storage.
+- d00e326: Fix the create-party activation redirect after identity selection and add harness coverage for the `/new` journey.
+- 85bbffe: Fix party expense log pagination so seeded and newly added expenses load reliably in newest-first order.
+- 0e95819: Fix the photo gallery overlay so it stays fixed to the viewport after scrolling.
+- 925914c: Add a dedicated party stats screen with flexible date filters and spender rankings.
+
 ## 1.6.0
 
 ### Minor Changes

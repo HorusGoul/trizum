@@ -1,5 +1,16 @@
 # @trizum/mobile
 
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [344b355]
+- Updated dependencies [d00e326]
+- Updated dependencies [85bbffe]
+- Updated dependencies [0e95819]
+- Updated dependencies [925914c]
+  - @trizum/pwa@1.6.1
+
 ## 1.6.0
 
 ### Patch Changes
