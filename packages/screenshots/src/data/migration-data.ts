@@ -1,6 +1,7 @@
 interface Party {
   type: "party";
   name: string;
+  symbol?: string;
   description: string;
   currency: string;
   hue?: number;
@@ -61,6 +62,7 @@ export const migrationData: MigrationData = {
   party: {
     type: "party",
     name: "Andalusian Point",
+    symbol: "🏕️",
     description: "Trip to the best place in the world",
     currency: "EUR",
     participants: {
