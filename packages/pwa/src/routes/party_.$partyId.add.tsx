@@ -8,6 +8,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 
 import { type Expense } from "#src/models/expense.js";
 import { convertToUnits } from "#src/lib/expenses.js";
+import { getLogger } from "#src/lib/log.ts";
 
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -24,6 +25,8 @@ import { useState } from "react";
 interface AddExpenseSearchParams {
   media?: number;
 }
+
+const logger = getLogger("routes", "addExpense");
 
 export const Route = createFileRoute("/party_/$partyId/add")({
   component: AddExpense,
@@ -95,7 +98,7 @@ function AddExpense() {
         id: "add-expense",
       });
     } catch (error) {
-      console.error("Failed to add expense", error);
+      logger.error("Failed to add expense", { error });
       toast.error(t`Failed to add expense`, {
         id: "add-expense",
         description:

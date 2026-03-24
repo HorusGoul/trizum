@@ -13,6 +13,9 @@ import { clone } from "@opentf/std";
 import { md5 } from "@takker/md5";
 import type { Party, PartyParticipant } from "./party";
 import { assertNever } from "#src/lib/assertNever.ts";
+import { getLogger } from "#src/lib/log.ts";
+
+const logger = getLogger("models", "expense");
 
 export interface Expense {
   id: string;
@@ -48,7 +51,7 @@ export interface ExpenseShareDivide {
 
 export function exportIntoInput(expense: Expense): ExpenseInput[] {
   if (Object.keys(expense.paidBy).length === 0) {
-    console.warn("Noone paid for this Expense");
+    logger.warning("No one paid for this expense");
     return [];
   }
 
@@ -82,7 +85,9 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     }
 
     if (amountLeft.getAmount() < 0) {
-      console.error("Negative amounts left");
+      logger.error("Negative amounts left while exporting expense input", {
+        expenseId: expense.id,
+      });
     }
 
     const totalDivides = Object.values(divides).reduce(

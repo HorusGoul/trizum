@@ -55,6 +55,7 @@
     "@logtape/sentry": "1.2.2",
     "@sentry/node": "10.29.0",
     "@sentry/profiling-node": "10.29.0",
+    "@trizum/logging": "workspace:*",
     "drizzle-kit": "0.31.7",
     "drizzle-orm": "0.44.7",
     "hono": "4.10.6",

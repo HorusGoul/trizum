@@ -1,3 +1,5 @@
+import { rootLogger } from "./log.js";
+
 export function helloWorld() {
-  console.log("Hello world!");
+  rootLogger.info("Hello world!");
 }

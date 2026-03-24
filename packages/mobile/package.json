@@ -63,6 +63,7 @@
     "@capacitor/share": "8.0.0",
     "@capacitor/splash-screen": "8.0.0",
     "@capawesome/capacitor-app-update": "8.0.1",
+    "@trizum/logging": "workspace:*",
     "@trizum/pwa": "workspace:*",
     "capacitor-plugin-safe-area": "5.0.0"
   }

@@ -103,6 +103,7 @@ trizum is built as a **monorepo** with a local-first architecture. The core prin
 | [`@trizum/mobile`](./packages/mobile)                   | Native mobile apps wrapper using Capacitor (Android & iOS)       |
 | [`@trizum/server`](./packages/server)                   | Sync server. Hono + Automerge repo for WebSocket synchronization |
 | [`@trizum/screenshots`](./packages/screenshots)         | Automated screenshot generation for app stores using Playwright  |
+| [`@trizum/logging`](./packages/logging)                | Shared LogTape logging conventions and configuration helpers     |
 | [`@trizum/eslint-config`](./packages/eslint-config)     | Shared ESLint configuration                                      |
 | [`@trizum/prettier-config`](./packages/prettier-config) | Shared Prettier configuration                                    |
 | [`@trizum/tsconfig`](./packages/tsconfig)               | Shared TypeScript configuration                                  |

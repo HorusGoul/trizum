@@ -29,6 +29,9 @@ import {
 } from "@automerge/automerge-repo/slim";
 import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
+import { getLogger } from "#src/lib/log.ts";
+
+const logger = getLogger("hooks", "party");
 
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
@@ -43,18 +46,18 @@ export function useParty(partyId: string) {
     const promptAnswer = window.prompt("How many test expenses to create?");
 
     if (!promptAnswer) {
-      console.log("No prompt answer");
+      logger.debug("No prompt answer");
       return;
     }
 
     const amount = parseInt(promptAnswer ?? "0");
 
-    console.log("Creating", amount, "test expenses");
+    logger.debug("Creating test expenses", { amount });
 
     const participants = Object.keys(party.participants);
 
     for (let i = 0; i < amount; i++) {
-      console.log("Creating test expense", i + 1);
+      logger.debug("Creating test expense {index}", { index: i + 1 });
       await helpers.addExpenseToParty({
         name: `Test Expense ${i + 1}`,
         paidAt: new Date(),

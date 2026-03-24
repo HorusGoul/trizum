@@ -7,9 +7,11 @@ import * as os from "node:os";
 import { Hono } from "hono";
 import { serve, type ServerType } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
-import { rootLogger as logger } from "./log.ts";
+import { configureServerLogging, rootLogger as logger } from "./log.ts";
 import { withContext } from "@logtape/logtape";
 import { cors } from "hono/cors";
+
+configureServerLogging();
 
 async function main() {
   logger.info("Starting server with version {version}...");

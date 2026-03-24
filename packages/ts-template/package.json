@@ -31,6 +31,9 @@
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix"
   },
+  "dependencies": {
+    "@trizum/logging": "workspace:*"
+  },
   "devDependencies": {
     "@trizum/eslint-config": "workspace:*",
     "@trizum/prettier-config": "workspace:*",

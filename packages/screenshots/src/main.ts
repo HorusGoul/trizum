@@ -3,9 +3,14 @@ import { chromium, devices } from "playwright";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { migrationData } from "./data/migration-data.ts";
+import { configureScreenshotsLogging, getLogger } from "./log.ts";
 
 const ROOT_DIR = path.resolve(import.meta.dirname, "..");
 const SCREENSHOTS_OUTPUT_DIR = path.resolve(ROOT_DIR, "screenshots");
+
+configureScreenshotsLogging();
+
+const logger = getLogger("capture");
 
 type DeviceDescriptor = (typeof devices)[keyof typeof devices];
 
@@ -86,7 +91,7 @@ function escapeGitHubActionsMessage(message: string) {
 
 function reportGitHubActionsError(message: string) {
   if (process.env.GITHUB_ACTIONS === "true") {
-    console.error(`::error::${escapeGitHubActionsMessage(message)}`);
+    process.stderr.write(`::error::${escapeGitHubActionsMessage(message)}\n`);
   }
 }
 
@@ -94,7 +99,7 @@ async function main() {
   let browser: Browser | null = null;
 
   try {
-    console.log("Starting browser");
+    logger.info("Starting browser");
     browser = await chromium.launch({ headless: true });
 
     for (const language of languages) {
@@ -105,9 +110,11 @@ async function main() {
           selectedDevice.folder,
         );
 
-        console.log(
-          `Taking screenshots for ${language} on ${selectedDevice.folder} saved to ${screenshotsFolder}`,
-        );
+        logger.info("Taking screenshots for {language} on {device}", {
+          language,
+          device: selectedDevice.folder,
+          screenshotsFolder,
+        });
 
         await mkdir(screenshotsFolder, { recursive: true });
 
@@ -118,14 +125,16 @@ async function main() {
         });
 
         try {
-          console.log("Importing screenshots module");
+          logger.info("Importing screenshots module");
 
           await import("./screenshots/all-screenshots.ts");
 
           for (const [screenshotName, screenshotFn] of global.__screenshots) {
-            console.log(
-              `Running screenshot ${screenshotName} for ${language} on ${selectedDevice.folder}`,
-            );
+            logger.info("Running screenshot {screenshotName}", {
+              screenshotName,
+              language,
+              device: selectedDevice.folder,
+            });
 
             const page = await context.newPage();
             const screenshotTarget = `${language}/${selectedDevice.folder}/${screenshotName}`;
@@ -219,6 +228,6 @@ void main().catch((error) => {
   const reportedError = toError(error);
 
   reportGitHubActionsError(reportedError.message);
-  console.error(reportedError);
+  logger.error("Screenshot capture failed", { error: reportedError });
   process.exitCode = 1;
 });

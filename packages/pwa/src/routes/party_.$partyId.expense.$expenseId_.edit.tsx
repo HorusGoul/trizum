@@ -13,6 +13,7 @@ import {
 } from "#src/lib/automerge/suspense-hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
+import { getLogger } from "#src/lib/log.ts";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
   decodeExpenseId,
@@ -64,6 +65,7 @@ export const Route = createFileRoute(
 });
 
 const TIME_TO_DISCARD_EDIT_COPY = 1000 * 60 * 5; // 5 minutes
+const logger = getLogger("routes", "editExpense");
 
 function RouteComponent() {
   const {
@@ -166,7 +168,7 @@ function RouteComponent() {
         id: "update-expense",
       });
     } catch (error) {
-      console.error("Failed to update expense", error);
+      logger.error("Failed to update expense", { error });
       toast.error(t`Failed to update expense`, {
         id: "update-expense",
         description:

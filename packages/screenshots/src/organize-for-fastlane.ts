@@ -18,9 +18,14 @@
 import { copyFile, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
+import { configureScreenshotsLogging, getLogger } from "./log.ts";
 
 const ROOT_DIR = path.resolve(import.meta.dirname, "..");
 const SCREENSHOTS_DIR = path.resolve(ROOT_DIR, "screenshots");
+
+configureScreenshotsLogging();
+
+const logger = getLogger("organizeForFastlane");
 
 type Platform = "ios" | "android";
 
@@ -98,8 +103,8 @@ function parseOptions(): Options {
   });
 
   if (!values.output) {
-    console.error("Error: --output is required");
-    console.error(
+    logger.error("Missing required --output argument");
+    logger.error(
       "Usage: pnpm organize:fastlane --platform <ios|android> --output <path>",
     );
     process.exit(1);
@@ -107,7 +112,7 @@ function parseOptions(): Options {
 
   const platform = values.platform as Platform;
   if (platform !== "ios" && platform !== "android") {
-    console.error('Error: --platform must be either "ios" or "android"');
+    logger.error('Invalid platform; expected "ios" or "android"');
     process.exit(1);
   }
 
@@ -146,7 +151,7 @@ async function organizeForIOS(
   for (const locale of locales) {
     const appStoreLocales = IOS_LOCALE_MAPPING[locale];
     if (!appStoreLocales) {
-      console.warn(`Warning: Unknown locale "${locale}", skipping`);
+      logger.warning("Unknown locale {locale}; skipping", { locale });
       continue;
     }
 
@@ -157,17 +162,23 @@ async function organizeForIOS(
     for (const device of devices) {
       const deviceFrame = IOS_DEVICE_FRAME_MAPPING[device];
       if (deviceFrame === null) {
-        console.log(`Skipping ${locale}/${device} (not for iOS)`);
+        logger.info("Skipping {locale}/{device}; not for iOS", {
+          locale,
+          device,
+        });
         continue;
       }
       if (deviceFrame === undefined) {
-        console.warn(`Warning: Unknown device "${device}", skipping`);
+        logger.warning("Unknown device {device}; skipping", { device, locale });
         continue;
       }
 
       const files = await getScreenshotFiles(locale, device);
       if (files.length === 0) {
-        console.warn(`Warning: No screenshots found for ${locale}/${device}`);
+        logger.warning("No screenshots found for {locale}/{device}", {
+          locale,
+          device,
+        });
         continue;
       }
 
@@ -190,9 +201,13 @@ async function organizeForIOS(
           const outputPath = path.join(localeOutputDir, outputFilename);
 
           await copyFile(inputPath, outputPath);
-          console.log(
-            `  ${locale}/${device}/${file} -> ${appStoreLocale}/${outputFilename}`,
-          );
+          logger.info("Copied screenshot to iOS output", {
+            locale,
+            device,
+            file,
+            appStoreLocale,
+            outputFilename,
+          });
         }
       }
     }
@@ -206,7 +221,7 @@ async function organizeForAndroid(
   for (const locale of locales) {
     const playStoreLocales = ANDROID_LOCALE_MAPPING[locale];
     if (!playStoreLocales) {
-      console.warn(`Warning: Unknown locale "${locale}", skipping`);
+      logger.warning("Unknown locale {locale}; skipping", { locale });
       continue;
     }
 
@@ -217,17 +232,23 @@ async function organizeForAndroid(
     for (const device of devices) {
       const screenshotTypes = ANDROID_DEVICE_MAPPING[device];
       if (screenshotTypes === null) {
-        console.log(`Skipping ${locale}/${device} (not for Android)`);
+        logger.info("Skipping {locale}/{device}; not for Android", {
+          locale,
+          device,
+        });
         continue;
       }
       if (screenshotTypes === undefined) {
-        console.warn(`Warning: Unknown device "${device}", skipping`);
+        logger.warning("Unknown device {device}; skipping", { device, locale });
         continue;
       }
 
       const files = await getScreenshotFiles(locale, device);
       if (files.length === 0) {
-        console.warn(`Warning: No screenshots found for ${locale}/${device}`);
+        logger.warning("No screenshots found for {locale}/{device}", {
+          locale,
+          device,
+        });
         continue;
       }
 
@@ -257,9 +278,14 @@ async function organizeForAndroid(
             const outputPath = path.join(screenshotsOutputDir, outputFilename);
 
             await copyFile(inputPath, outputPath);
-            console.log(
-              `  ${locale}/${device}/${file} -> ${playStoreLocale}/images/${screenshotType}/${outputFilename}`,
-            );
+            logger.info("Copied screenshot to Android output", {
+              locale,
+              device,
+              file,
+              playStoreLocale,
+              screenshotType,
+              outputFilename,
+            });
           }
         }
       }
@@ -270,13 +296,15 @@ async function organizeForAndroid(
 async function organizeScreenshots(options: Options): Promise<void> {
   const outputDir = path.resolve(options.output);
 
-  console.log(`Platform: ${options.platform}`);
-  console.log(`Input directory: ${SCREENSHOTS_DIR}`);
-  console.log(`Output directory: ${outputDir}`);
+  logger.info("Organizing screenshots", {
+    platform: options.platform,
+    inputDirectory: SCREENSHOTS_DIR,
+    outputDirectory: outputDir,
+  });
 
   // Clean output directory if requested
   if (options.clean) {
-    console.log("Cleaning output directory...");
+    logger.info("Cleaning output directory");
     try {
       await rm(outputDir, { recursive: true, force: true });
     } catch {
@@ -293,7 +321,7 @@ async function organizeScreenshots(options: Options): Promise<void> {
     await organizeForAndroid(outputDir, locales);
   }
 
-  console.log("\nDone!");
+  logger.info("Finished organizing screenshots");
 }
 
 const options = parseOptions();

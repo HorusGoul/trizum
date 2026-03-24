@@ -43,6 +43,7 @@
   },
   "prettier": "@trizum/prettier-config",
   "dependencies": {
+    "@trizum/logging": "workspace:*",
     "playwright": "1.57.0"
   }
 }

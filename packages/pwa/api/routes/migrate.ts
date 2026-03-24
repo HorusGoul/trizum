@@ -1,9 +1,16 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
+import { configurePwaLogging, getLogger } from "../../src/lib/log.ts";
 import type { Party, PartyParticipant } from "../../src/models/party";
 import type { Expense, ExpenseShare } from "../../src/models/expense.js";
 import type { MigrationData } from "../../src/models/migration";
+
+configurePwaLogging({
+  lowestLevel: "info",
+});
+
+const logger = getLogger("api", "migrate");
 
 export const apiMigrateRoute = new Hono();
 
@@ -38,7 +45,7 @@ apiMigrateRoute.get("/", async (c) => {
       },
     });
   } catch (error) {
-    console.error("Migration error:", error);
+    logger.error("Migration error", { error });
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Unknown error",
@@ -299,7 +306,9 @@ function parseTricountData(data: TricountResponse): MigrationData {
     const paidById = nameToIdMap.get(paidByName);
 
     if (!paidById) {
-      console.warn(`Could not find participant ID for payer: ${paidByName}`);
+      logger.warning("Could not find participant ID for payer {paidByName}", {
+        paidByName,
+      });
       continue;
     }
 
@@ -321,7 +330,10 @@ function parseTricountData(data: TricountResponse): MigrationData {
       const participantId = nameToIdMap.get(participantName);
 
       if (!participantId) {
-        console.warn(`Could not find participant ID for: ${participantName}`);
+        logger.warning(
+          "Could not find participant ID for participant {participantName}",
+          { participantName },
+        );
         continue;
       }
 
