@@ -69,6 +69,27 @@ const selectedDevices: SelectedDevice[] = [
 
 const languages = ["en", "es"];
 
+function toError(error: unknown): Error {
+  if (error instanceof Error) {
+    return error;
+  }
+
+  return new Error(String(error));
+}
+
+function escapeGitHubActionsMessage(message: string) {
+  return message
+    .replaceAll("%", "%25")
+    .replaceAll("\r", "%0D")
+    .replaceAll("\n", "%0A");
+}
+
+function reportGitHubActionsError(message: string) {
+  if (process.env.GITHUB_ACTIONS === "true") {
+    console.error(`::error::${escapeGitHubActionsMessage(message)}`);
+  }
+}
+
 async function main() {
   let browser: Browser | null = null;
 
@@ -96,86 +117,108 @@ async function main() {
           baseURL: "https://trizum.app/?__internal_offline_only=true",
         });
 
-        console.log("Importing screenshots module");
+        try {
+          console.log("Importing screenshots module");
 
-        await import("./screenshots/all-screenshots.ts");
+          await import("./screenshots/all-screenshots.ts");
 
-        for (const screenshotFn of global.__screenshots.values()) {
-          const page = await context.newPage();
+          for (const [screenshotName, screenshotFn] of global.__screenshots) {
+            console.log(
+              `Running screenshot ${screenshotName} for ${language} on ${selectedDevice.folder}`,
+            );
 
-          async function takeScreenshot(name: string) {
-            await page.evaluate(() => {
-              // Insert this style to hide toasts before taking a screenshot
-              const style = document.createElement("style");
-              style.textContent = `
-                [aria-label="Notifications alt+T"] {
-                  display: none !important;
-                }
-              `;
-              document.head.appendChild(style);
-            });
+            const page = await context.newPage();
+            const screenshotTarget = `${language}/${selectedDevice.folder}/${screenshotName}`;
 
-            await page.screenshot({
-              path: path.resolve(
-                screenshotsFolder,
-                [name, selectedDevice.suffix, "png"].filter(Boolean).join("."),
-              ),
-            });
-          }
-
-          async function setupParty() {
-            await page.goto("/");
-            await page
-              .getByText("trizum", {
-                exact: true,
-              })
-              .waitFor({
-                state: "visible",
+            async function takeScreenshot(name: string) {
+              await page.evaluate(() => {
+                // Insert this style to hide toasts before taking a screenshot
+                const style = document.createElement("style");
+                style.textContent = `
+                  [aria-label="Notifications alt+T"] {
+                    display: none !important;
+                  }
+                `;
+                document.head.appendChild(style);
               });
-            const partyId = await page.evaluate(async (data) => {
-              // @ts-expect-error - Internal function
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-              return (await window.__internal_createPartyFromMigrationData(
-                data,
-              )) as string;
-            }, migrationData);
 
-            await page.goto(`/party/${partyId}/who`);
-            await page
-              .getByRole("radio", { name: "Modest" })
-              .click({ force: true });
-            await page.getByRole("button", { name: /save|guardar/i }).click();
-
-            // Wait for Balances text to show up
-            await page
-              .locator("[role='tab']", {
-                hasText: /balances|balance/i,
-              })
-              .waitFor({
-                state: "visible",
+              await page.screenshot({
+                path: path.resolve(
+                  screenshotsFolder,
+                  [name, selectedDevice.suffix, "png"]
+                    .filter(Boolean)
+                    .join("."),
+                ),
               });
-          }
+            }
 
-          try {
-            await screenshotFn({ page, takeScreenshot, setupParty });
-          } catch (error) {
-            console.error(error);
-            throw error;
-          } finally {
-            await page.close();
-          }
+            async function setupParty() {
+              try {
+                await page.goto("/");
+                await page
+                  .getByText("trizum", {
+                    exact: true,
+                  })
+                  .waitFor({
+                    state: "visible",
+                  });
+                const partyId = await page.evaluate(async (data) => {
+                  // @ts-expect-error - Internal function
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                  return (await window.__internal_createPartyFromMigrationData(
+                    data,
+                  )) as string;
+                }, migrationData);
 
-          await page.close();
+                await page.goto(`/party/${partyId}/who`);
+                await page
+                  .getByRole("radio", { name: "Modest" })
+                  .click({ force: true });
+                await page
+                  .getByRole("button", { name: /save|guardar/i })
+                  .click();
+
+                // Wait for Balances text to show up
+                await page
+                  .locator("[role='tab']", {
+                    hasText: /balances|balance/i,
+                  })
+                  .waitFor({
+                    state: "visible",
+                  });
+              } catch (error) {
+                throw new Error(
+                  `Failed to seed screenshot party for ${screenshotTarget}: ${toError(error).message}`,
+                  { cause: toError(error) },
+                );
+              }
+            }
+
+            try {
+              await screenshotFn({ page, takeScreenshot, setupParty });
+            } catch (error) {
+              throw new Error(
+                `Failed to run screenshot ${screenshotTarget}: ${toError(error).message}`,
+                { cause: toError(error) },
+              );
+            } finally {
+              await page.close();
+            }
+          }
+        } finally {
+          await context.close();
         }
-
-        await context.close();
       }
     }
-  } catch (error) {
-    console.error(error);
   } finally {
     await browser?.close();
   }
 }
 
-void main();
+void main().catch((error) => {
+  const reportedError = toError(error);
+
+  reportGitHubActionsError(reportedError.message);
+  console.error(reportedError);
+  process.exitCode = 1;
+});

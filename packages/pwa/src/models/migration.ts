@@ -31,16 +31,21 @@ export async function createPartyFromMigrationData({
 }: CreatePartyFromMigrationDataParams) {
   const { createMediaFile } = getMediaFileHelpers(repo);
 
-  const handle = repo.create<Party>({
+  const party: Party = {
     id: "" as DocumentId,
     type: "party",
     name: data.party.name,
-    symbol: data.party.symbol,
     description: data.party.description,
     currency: data.party.currency,
     participants: data.party.participants,
     chunkRefs: [],
-  });
+  };
+
+  if (typeof data.party.symbol === "string") {
+    party.symbol = data.party.symbol;
+  }
+
+  const handle = repo.create<Party>(party);
   handle.change((doc) => (doc.id = handle.documentId));
   const partyId = handle.documentId;
 
