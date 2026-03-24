@@ -29,6 +29,14 @@ export const expenseEntryJourney = {
   ],
 } as const;
 
+export const expenseLogJourney = {
+  expenseCount: 503,
+  seededExpenseAmountCents: 1234,
+  selectedParticipantName: defaultParticipants.blair.name,
+  memberParticipantId: defaultParticipants.blair.id,
+  newExpenseTitle: "Late checkout snacks",
+} as const;
+
 export function createPartyFixture() {
   return {
     party: {
@@ -107,5 +115,40 @@ export function createSettlementPartyFixture() {
         photos: [],
       },
     ],
+  };
+}
+
+export function createExpenseLogTitle(index: number) {
+  return `Seeded expense ${String(index).padStart(3, "0")}`;
+}
+
+export function createExpenseLogFixture(
+  expenseCount = expenseLogJourney.expenseCount,
+) {
+  return {
+    ...createPartyFixture(),
+    expenses: Array.from({ length: expenseCount }, (_, index) => ({
+      name: createExpenseLogTitle(index),
+      paidAt: new Date(Date.UTC(2025, 0, 1, 0, index)).toISOString(),
+      paidBy: {
+        [defaultParticipants.alex.id]:
+          expenseLogJourney.seededExpenseAmountCents,
+      },
+      shares: {
+        [defaultParticipants.alex.id]: {
+          type: "divide" as const,
+          value: 1,
+        },
+        [defaultParticipants.blair.id]: {
+          type: "divide" as const,
+          value: 1,
+        },
+        [defaultParticipants.casey.id]: {
+          type: "divide" as const,
+          value: 1,
+        },
+      },
+      photos: [],
+    })),
   };
 }
