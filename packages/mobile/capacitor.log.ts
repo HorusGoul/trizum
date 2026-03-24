@@ -6,7 +6,7 @@ import {
 
 type MobileLoggingOptions<TSinkId extends string = never> = Omit<
   ConfigureTrizumLoggingOptions<TSinkId>,
-  "app"
+  "surface"
 >;
 
 export function getLogger(...scope: string[]) {
@@ -17,7 +17,7 @@ export function configureMobileLogging<TSinkId extends string = never>(
   options: MobileLoggingOptions<TSinkId> = {},
 ): void {
   configureTrizumLogging({
-    app: "mobile",
+    surface: "mobile",
     ...options,
   });
 }

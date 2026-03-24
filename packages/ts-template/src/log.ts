@@ -6,7 +6,7 @@ import {
 
 type TemplateLoggingOptions<TSinkId extends string = never> = Omit<
   ConfigureTrizumLoggingOptions<TSinkId>,
-  "app"
+  "surface"
 >;
 
 export const rootLogger = getTrizumLogger("ts-template");
@@ -19,7 +19,7 @@ export function configureTemplateLogging<TSinkId extends string = never>(
   options: TemplateLoggingOptions<TSinkId> = {},
 ): void {
   configureTrizumLogging({
-    app: "ts-template",
+    surface: "ts-template",
     ...options,
   });
 }

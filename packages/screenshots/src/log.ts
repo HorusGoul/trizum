@@ -6,7 +6,7 @@ import {
 
 type ScreenshotsLoggingOptions<TSinkId extends string = never> = Omit<
   ConfigureTrizumLoggingOptions<TSinkId>,
-  "app"
+  "surface"
 >;
 
 export const rootLogger = getTrizumLogger("screenshots");
@@ -19,7 +19,7 @@ export function configureScreenshotsLogging<TSinkId extends string = never>(
   options: ScreenshotsLoggingOptions<TSinkId> = {},
 ): void {
   configureTrizumLogging({
-    app: "screenshots",
+    surface: "screenshots",
     ...options,
   });
 }

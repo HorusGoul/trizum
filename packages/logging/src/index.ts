@@ -10,16 +10,12 @@ import {
   type Sink,
 } from "@logtape/logtape";
 
-export const TRIZUM_APPS = [
-  "server",
-  "pwa",
-  "mobile",
-  "screenshots",
-  "ts-template",
-] as const;
-
-export type TrizumApp = (typeof TRIZUM_APPS)[number];
-export type TrizumCategory = ["trizum", TrizumApp, ...string[]];
+export type TrizumSurface = string;
+export type TrizumCategory<TSurface extends string = TrizumSurface> = [
+  "trizum",
+  TSurface,
+  ...string[],
+];
 export type TrizumSinkId<TSinkId extends string = never> = "console" | TSinkId;
 export type TrizumLoggerConfig<TSinkId extends string = never> = LoggerConfig<
   TrizumSinkId<TSinkId>,
@@ -27,7 +23,7 @@ export type TrizumLoggerConfig<TSinkId extends string = never> = LoggerConfig<
 >;
 
 export interface ConfigureTrizumLoggingOptions<TSinkId extends string = never> {
-  app: TrizumApp;
+  surface: TrizumSurface;
   lowestLevel?: LogLevel | null;
   extraSinks?: Record<TSinkId, Sink>;
   extraLoggers?: TrizumLoggerConfig<TSinkId>[];
@@ -36,19 +32,22 @@ export interface ConfigureTrizumLoggingOptions<TSinkId extends string = never> {
   reset?: boolean;
 }
 
-export function getTrizumCategory(
-  app: TrizumApp,
+export function getTrizumCategory<TSurface extends string>(
+  surface: TSurface,
   ...scope: string[]
-): TrizumCategory {
-  return ["trizum", app, ...scope];
+): TrizumCategory<TSurface> {
+  return ["trizum", surface, ...scope];
 }
 
-export function getTrizumLogger(app: TrizumApp, ...scope: string[]): Logger {
-  return getLogger(getTrizumCategory(app, ...scope));
+export function getTrizumLogger<TSurface extends string>(
+  surface: TSurface,
+  ...scope: string[]
+): Logger {
+  return getLogger(getTrizumCategory(surface, ...scope));
 }
 
 export function configureTrizumLogging<TSinkId extends string = never>({
-  app,
+  surface,
   lowestLevel = "info",
   extraSinks,
   extraLoggers = [],
@@ -70,7 +69,7 @@ export function configureTrizumLogging<TSinkId extends string = never>({
     loggers: [
       ...extraLoggers,
       {
-        category: getTrizumCategory(app),
+        category: getTrizumCategory(surface),
         lowestLevel,
         sinks: ["console"],
       },

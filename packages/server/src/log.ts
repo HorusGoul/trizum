@@ -10,7 +10,7 @@ const version = process.env.COMMIT_HASH
 
 export function configureServerLogging(): void {
   configureTrizumLogging({
-    app: "server",
+    surface: "server",
     lowestLevel: process.env.NODE_ENV === "production" ? "info" : "debug",
     extraSinks: {
       sentry: getSentrySink(),

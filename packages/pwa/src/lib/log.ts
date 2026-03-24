@@ -6,7 +6,7 @@ import {
 
 type PwaLoggingOptions<TSinkId extends string = never> = Omit<
   ConfigureTrizumLoggingOptions<TSinkId>,
-  "app"
+  "surface"
 >;
 
 export const rootLogger = getTrizumLogger("pwa");
@@ -19,7 +19,7 @@ export function configurePwaLogging<TSinkId extends string = never>(
   options: PwaLoggingOptions<TSinkId> = {},
 ): void {
   configureTrizumLogging({
-    app: "pwa",
+    surface: "pwa",
     ...options,
   });
 }

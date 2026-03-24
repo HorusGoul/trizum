@@ -8,7 +8,7 @@ Use this doc for high-level guidance such as:
 - which severity level to use,
 - what must never be logged,
 - when logs should also reach Sentry,
-- and how logging responsibilities are split across applications and shared
+- and how logging responsibilities are split across runtime surfaces and shared
   code.
 
 Use [`packages/logging/README.md`](../packages/logging/README.md) for the
@@ -131,7 +131,7 @@ Do not attach Automerge document IDs as structured context.
 Sentry is for errors and high-value operational signals, not for replacing the
 normal console sink.
 
-Application entry points may configure extra sinks, including Sentry, based on
+Runtime entry points may configure extra sinks, including Sentry, based on
 their runtime needs. Shared libraries and reusable modules should not configure
 Sentry on import.
 
@@ -148,14 +148,14 @@ In general:
 
 Follow these rules:
 
-- applications configure LogTape in their runtime entry points,
+- runtime entry points configure LogTape,
 - shared packages and reusable modules only ask for scoped loggers,
 - use the shared helpers from [`@trizum/logging`](../packages/logging),
 - and do not use raw `console.*` in normal repo code.
 
 The shared category convention is:
 
-- `["trizum", app, ...scope]`
+- `["trizum", surface, ...scope]`
 
 This keeps log streams consistent across server, PWA, mobile, screenshots, and
 future packages.
