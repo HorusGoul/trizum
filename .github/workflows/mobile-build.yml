@@ -74,9 +74,7 @@ jobs:
           working-directory: packages/mobile/android
 
       - name: Build mobile
-        # Capacitor sync mutates native project files on the runner, so this
-        # build must execute directly instead of being satisfied by Turbo cache.
-        run: pnpm --filter @trizum/mobile build
+        run: pnpm turbo run build --filter=@trizum/mobile
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -154,9 +152,7 @@ jobs:
           working-directory: packages/mobile/ios/App
 
       - name: Build mobile
-        # Capacitor sync mutates native project files on the runner, so this
-        # build must execute directly instead of being satisfied by Turbo cache.
-        run: pnpm --filter @trizum/mobile build
+        run: pnpm turbo run build --filter=@trizum/mobile
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
