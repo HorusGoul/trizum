@@ -160,6 +160,22 @@ The shared category convention is:
 This keeps log streams consistent across server, PWA, mobile, screenshots, and
 future packages.
 
+## Category Naming
+
+Keep scope segments stable and readable. Prefer the canonical name already used
+in code instead of inventing a normalized variant.
+
+Examples:
+
+- React components should use their component name in PascalCase, such as
+  `getLogger("components", "ExpenseEditor")`
+- hooks should use the hook name, such as `getLogger("hooks", "useParty")`
+- other scopes should use the clearest stable code-level name available for the
+  module, feature, or operation
+
+Avoid ad-hoc casing changes like turning `ExpenseEditor` into
+`expenseEditor` just for the logger category.
+
 ## Review Checklist
 
 When adding or reviewing logs, check:
