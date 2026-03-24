@@ -548,7 +548,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:203
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:202
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -622,7 +622,7 @@ msgstr "Gasto añadido"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:167
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:166
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -662,7 +662,7 @@ msgstr "Error al cargar las licencias. Por favor, inténtalo más tarde."
 msgid "Failed to mark expense as paid"
 msgstr "Error al marcar el gasto como pagado"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:172
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:171
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -1924,7 +1924,7 @@ msgstr "Actualización disponible"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:140
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:139
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
