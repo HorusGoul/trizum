@@ -6,7 +6,8 @@ It's the best starting point for a new package, as it provides the following out
 
 - `@trizum/eslint-config`
 - `@trizum/tsconfig`
-- Common npm scripts for developing, building, testing, and linting.
+- Common npm scripts for developing, building, testing, linting, and typechecking.
+- A built-package TypeScript setup with a separate test-inclusive `tsconfig.test.json`.
 
 ## Usage
 
@@ -32,6 +33,7 @@ The following scripts are available:
 
 - `pnpm dev`. Starts the compiler in watch mode.
 - `pnpm build`. Builds the package.
+- `pnpm test`. Runs the package tests with Vitest.
 - `pnpm lint`. Lints the package with ESLint and Prettier.
 - `pnpm lint:fix`. Runs ESLint and Prettier to fix any styling issues.
 - `pnpm typecheck`. Runs the TypeScript type checker.

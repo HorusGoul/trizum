@@ -1,4 +1,4 @@
-import { rootLogger } from "./log.ts";
+import { rootLogger } from "./log.js";
 
 export function helloWorld() {
   rootLogger.info("Hello world!");
