@@ -17,8 +17,10 @@ For repo-wide guidance on what to log and which severity level to use, see
   configuration helpers.
 - [`src/github-actions.ts`](./src/github-actions.ts) contains the GitHub
   Actions annotation sink entrypoint.
-- [`tsconfig.json`](./tsconfig.json) is the source of truth for both emitted
-  package output and `--noEmit` typechecking.
+- [`tsconfig.json`](./tsconfig.json) is the source of truth for emitted package
+  output.
+- [`tsconfig.test.json`](./tsconfig.test.json) is the source of truth for the
+  test-inclusive `--noEmit` typecheck.
 
 ## Package Notes
 
