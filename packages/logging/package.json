@@ -19,6 +19,7 @@
   "scripts": {
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,7 +31,8 @@
     "@trizum/tsconfig": "workspace:*",
     "eslint": "9.39.1",
     "prettier": "3.6.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "4.1.0"
   },
   "prettier": "@trizum/prettier-config"
 }

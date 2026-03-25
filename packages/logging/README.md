@@ -33,4 +33,5 @@ For repo-wide guidance on what to log and which severity level to use, see
 Run the package scripts defined in [`package.json`](./package.json):
 
 - `pnpm lint`
+- `pnpm test`
 - `pnpm typecheck`

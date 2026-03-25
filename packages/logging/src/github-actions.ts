@@ -76,7 +76,10 @@ function getGitHubActionsErrorSummary(error: unknown): string | null {
 const defaultGitHubActionsAnnotationFormatter: TextFormatter = (
   record: LogRecord,
 ): string => {
-  const message = defaultGitHubActionsAnnotationBaseFormatter(record);
+  const message = defaultGitHubActionsAnnotationBaseFormatter(record).replace(
+    /[\r\n]+$/u,
+    "",
+  );
   const errorSummary = getGitHubActionsErrorSummary(record.properties.error);
 
   if (errorSummary == null || message.includes(errorSummary)) {
@@ -111,7 +114,7 @@ export function getGitHubActionsAnnotationSink({
       return;
     }
 
-    const message = formatter(record);
+    const message = formatter(record).replace(/[\r\n]+$/u, "");
     writeCommand(
       `::${annotationCommand}::${escapeGitHubActionsCommandValue(message)}\n`,
     );
