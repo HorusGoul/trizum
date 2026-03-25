@@ -71,9 +71,9 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const ref = process.env.HEAD_SHA;
+            const branchName = context.ref.replace(/^refs\/heads\//, "");
             const shortSha = ref.slice(0, 8);
             const productionUrl = "https://trizum.horusdev.workers.dev/";
-            const fallbackUrl = `https://${shortSha}-trizum.horusdev.workers.dev/`;
             const timeoutMs = 20 * 60 * 1000;
             const pollIntervalMs = 15 * 1000;
             const startedAt = Date.now();
@@ -88,18 +88,55 @@ jobs:
               /workers builds:\s*trizum/i.test(value) ||
               /cloudflare/i.test(value);
 
-            const extractWorkersUrl = (...values) => {
-              for (const value of values) {
-                if (!value || typeof value !== "string") {
-                  continue;
-                }
+            const escapeRegex = (value = "") =>
+              value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-                const match = value.match(
-                  /https:\/\/[a-z0-9-]+\.workers\.dev\/?/i,
+            const extractWorkersUrlByLabel = (value = "", labels = []) => {
+              if (!value || typeof value !== "string") {
+                return null;
+              }
+
+              const lines = value.split("\n");
+
+              for (const label of labels) {
+                const markdownLine = lines.find((line) =>
+                  line.toLowerCase().includes(`${label.toLowerCase()}:`),
                 );
 
-                if (match) {
-                  return match[0];
+                if (markdownLine) {
+                  const markdownMatch = markdownLine.match(
+                    /https:\/\/[a-z0-9-]+\.workers\.dev\/?/i,
+                  );
+
+                  if (markdownMatch) {
+                    return markdownMatch[0];
+                  }
+                }
+
+                const escapedLabel = escapeRegex(label);
+                const linkTextPattern = new RegExp(
+                  `<a[^>]+href=['"](https:\\/\\/[a-z0-9-]+\\.workers\\.dev\\/?)['"][^>]*>\\s*${escapedLabel}\\s*<\\/a>`,
+                  "i",
+                );
+                const linkTextMatch = value.match(linkTextPattern);
+
+                if (linkTextMatch) {
+                  return linkTextMatch[1];
+                }
+              }
+
+              return null;
+            };
+
+            const extractBranchPreviewUrl = (...values) => {
+              for (const value of values) {
+                const branchPreviewUrl = extractWorkersUrlByLabel(value, [
+                  "Preview Alias URL",
+                  "Branch Preview URL",
+                ]);
+
+                if (branchPreviewUrl) {
+                  return branchPreviewUrl;
                 }
               }
 
@@ -120,20 +157,28 @@ jobs:
             };
 
             while (Date.now() - startedAt < timeoutMs) {
-              const [checkRunsResponse, statusesResponse] = await Promise.all([
-                github.rest.checks.listForRef({
-                  owner,
-                  repo,
-                  ref,
-                  per_page: 100,
-                }),
-                github.rest.repos.listCommitStatusesForRef({
-                  owner,
-                  repo,
-                  ref,
-                  per_page: 100,
-                }),
-              ]);
+              const [checkRunsResponse, statusesResponse, pullsResponse] =
+                await Promise.all([
+                  github.rest.checks.listForRef({
+                    owner,
+                    repo,
+                    ref,
+                    per_page: 100,
+                  }),
+                  github.rest.repos.listCommitStatusesForRef({
+                    owner,
+                    repo,
+                    ref,
+                    per_page: 100,
+                  }),
+                  github.rest.pulls.list({
+                    owner,
+                    repo,
+                    head: `${owner}:${branchName}`,
+                    state: "open",
+                    per_page: 1,
+                  }),
+                ]);
 
               const relevantChecks = checkRunsResponse.data.check_runs.filter(
                 (checkRun) =>
@@ -158,20 +203,46 @@ jobs:
                 (status) => status.state === "success",
               );
 
-              if (successfulCheck || successfulStatus) {
-                const baseUrl =
-                  extractWorkersUrl(
-                    successfulCheck?.details_url,
-                    successfulCheck?.output?.summary,
-                    successfulCheck?.output?.title,
-                    successfulCheck?.output?.text,
-                    successfulStatus?.target_url,
-                    successfulStatus?.description,
-                  ) ?? fallbackUrl;
+              const baseUrlFromStatus = extractBranchPreviewUrl(
+                successfulCheck?.output?.summary,
+                successfulCheck?.output?.text,
+                successfulCheck?.output?.title,
+                successfulStatus?.description,
+              );
 
-                core.info(`Using Cloudflare preview URL: ${baseUrl}`);
-                core.setOutput("base_url", baseUrl);
+              if (baseUrlFromStatus) {
+                core.info(`Using Cloudflare branch preview URL: ${baseUrlFromStatus}`);
+                core.setOutput("base_url", baseUrlFromStatus);
                 return;
+              }
+
+              const pullRequest = pullsResponse.data[0];
+
+              if (pullRequest) {
+                const commentsResponse = await github.rest.issues.listComments({
+                  owner,
+                  repo,
+                  issue_number: pullRequest.number,
+                  per_page: 100,
+                });
+
+                const cloudflareComment = [...commentsResponse.data]
+                  .reverse()
+                  .find(
+                    (comment) =>
+                      comment.user?.login === "cloudflare-workers-and-pages[bot]",
+                  );
+                const baseUrlFromComment = extractBranchPreviewUrl(
+                  cloudflareComment?.body,
+                );
+
+                if (baseUrlFromComment) {
+                  core.info(
+                    `Using Cloudflare branch preview URL from PR comment: ${baseUrlFromComment}`,
+                  );
+                  core.setOutput("base_url", baseUrlFromComment);
+                  return;
+                }
               }
 
               const hasPendingCheck = relevantChecks.some(
@@ -196,15 +267,20 @@ jobs:
                   ["error", "failure"].includes(status.state),
                 );
 
-              if ((relevantChecks.length > 0 || relevantStatuses.length > 0) && hasFailure && !hasPendingCheck && !hasPendingStatus) {
+              if (
+                (relevantChecks.length > 0 || relevantStatuses.length > 0) &&
+                hasFailure &&
+                !hasPendingCheck &&
+                !hasPendingStatus
+              ) {
                 core.setFailed(
-                  "Cloudflare preview checks finished without a successful deployment.",
+                  "Cloudflare preview checks finished without a usable branch preview URL.",
                 );
                 return;
               }
 
               core.info(
-                `Waiting for Cloudflare preview on ${shortSha}. Checks: ${relevantChecks.length}, statuses: ${relevantStatuses.length}.`,
+                `Waiting for Cloudflare branch preview on ${shortSha}. Checks: ${relevantChecks.length}, statuses: ${relevantStatuses.length}, pull requests: ${pullsResponse.data.length}.`,
               );
 
               await new Promise((resolve) =>
