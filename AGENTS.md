@@ -25,6 +25,9 @@ Canonical examples:
 
 - [`.nvmrc`](./.nvmrc) and [`package.json`](./package.json) are the source of
   truth for Node, pnpm, and workspace scripts.
+- [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)
+  is the source of truth for creating changesets when a user-facing change
+  needs release notes or a version bump.
 - [`packages/pwa/README.md`](./packages/pwa/README.md) is the package entry
   point for most product work.
 - [`packages/pwa/locale/AGENTS.md`](./packages/pwa/locale/AGENTS.md) is the
@@ -71,7 +74,10 @@ Use `type/description` naming:
   [`package.json`](./package.json): `pnpm test`, `pnpm lint`, and
   `pnpm typecheck`.
 - Run `pnpm lingui:extract` when user-facing copy changes.
-- Create a changeset for user-facing changes.
+- Create a changeset before opening a PR for user-facing changes, and have the
+  agent do it when possible. Use
+  [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)
+  for the workflow and bump guidance.
 - Keep commits small and descriptive.
 
 ### Workflow Safety
@@ -84,6 +90,6 @@ Use `type/description` naming:
 ## Skills
 
 Project-local skills live in [`.agents/skills`](./.agents/skills). Use them for
-repeatable workflows such as browser automation, push and PR handling, or
-generated-file regeneration. Keep project-local skill content there instead of
-duplicating it in general docs.
+repeatable workflows such as browser automation, push and PR handling,
+changeset creation, or generated-file regeneration. Keep project-local skill
+content there instead of duplicating it in general docs.

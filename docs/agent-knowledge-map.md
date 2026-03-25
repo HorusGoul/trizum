@@ -81,7 +81,8 @@ specific, scoped, and durable.
 
 Move repeated, named workflows into skills when the procedure is stable but
 still human-invoked. Skills are the right place for tool usage patterns such as
-browser automation, PR push flow, or generated-file regeneration.
+browser automation, PR push flow, changeset creation, or generated-file
+regeneration.
 
 ### Scripts and CI
 
@@ -128,6 +129,10 @@ Examples in this repo:
 
 - Toolchain versions belong in [`.nvmrc`](../.nvmrc) and
   [`package.json`](../package.json), not in `AGENTS.md`.
+- Changeset creation belongs in
+  [`.agents/skills/creating-changesets/SKILL.md`](../.agents/skills/creating-changesets/SKILL.md)
+  because the trigger is repo-wide and the workflow is ordered, repeatable, and
+  a good fit for agent execution.
 - Icon preload regeneration belongs in a skill because it is repeatable and
   human-invoked.
 - Validation that can be enforced in CI should eventually stop relying on prose
