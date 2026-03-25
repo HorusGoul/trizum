@@ -11,7 +11,7 @@ import {
   getTrizumCategory,
   getTrizumLogger,
   type TrizumLoggerConfig,
-} from "@trizum/logging";
+} from "./index.js";
 
 function createRecordingSink() {
   const records: LogRecord[] = [];

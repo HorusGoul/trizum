@@ -5,7 +5,7 @@ import {
   resetSync,
   type Logger,
 } from "@logtape/logtape";
-import { getGitHubActionsAnnotationSink } from "@trizum/logging/github-actions";
+import { getGitHubActionsAnnotationSink } from "./github-actions.js";
 
 interface TestProcess {
   env: Record<string, string | undefined>;
