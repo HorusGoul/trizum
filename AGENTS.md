@@ -43,8 +43,11 @@ Canonical examples:
 
 ### Branching
 
-1. Ask which branch to work from before starting code changes.
-2. Create a new branch. Never work directly on `main` or another base branch.
+1. If you are already on `main`, assume `main` is the base branch unless the
+   user says otherwise.
+2. If you are not already on `main`, ask which branch to work from before
+   starting code changes.
+3. Create a new branch. Never work directly on `main` or another base branch.
 
 Use `type/description` naming:
 
