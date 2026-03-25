@@ -9,6 +9,11 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./github-actions": {
+      "types": "./src/github-actions.ts",
+      "import": "./src/github-actions.ts",
+      "default": "./src/github-actions.ts"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

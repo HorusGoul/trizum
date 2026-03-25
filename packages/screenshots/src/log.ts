@@ -1,9 +1,9 @@
 import {
   configureTrizumLogging,
-  getGitHubActionsAnnotationSink,
   getTrizumLogger,
   type ConfigureTrizumLoggingOptions,
 } from "@trizum/logging";
+import { getGitHubActionsAnnotationSink } from "@trizum/logging/github-actions";
 
 const GITHUB_ACTIONS_ANNOTATION_SINK_ID = "githubActionsAnnotations";
 

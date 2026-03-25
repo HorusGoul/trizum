@@ -15,6 +15,8 @@ For repo-wide guidance on what to log and which severity level to use, see
   and dependencies.
 - [`src/index.ts`](./src/index.ts) contains the shared category and
   configuration helpers.
+- [`src/github-actions.ts`](./src/github-actions.ts) contains the GitHub
+  Actions annotation sink entrypoint.
 
 ## Package Notes
 
@@ -23,7 +25,8 @@ For repo-wide guidance on what to log and which severity level to use, see
 - Runtime entry points should call `configureTrizumLogging()`, and shared code
   should use `getTrizumLogger()` elsewhere.
 - Runtime-specific integrations like GitHub Actions annotations should be
-  modeled as opt-in sinks configured by the owning surface.
+  modeled as opt-in sinks configured by the owning surface via separate
+  entrypoints.
 
 ## Validation
 
