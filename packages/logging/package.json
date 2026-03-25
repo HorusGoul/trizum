@@ -29,13 +29,13 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -b tsconfig.json",
     "cleanup": "rm -rf dist",
-    "dev": "tsc --watch",
+    "dev": "tsc -b tsconfig.json --watch",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.test.json"
+    "typecheck": "tsc -b tsconfig.test.json"
   },
   "dependencies": {
     "@logtape/logtape": "1.2.2"

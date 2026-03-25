@@ -8,6 +8,7 @@
     "baseUrl": "./",
     "moduleResolution": "nodenext",
     "module": "nodenext",
+    "composite": true,
     "declaration": true,
     "noEmit": false
   }
