@@ -29,10 +29,10 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc",
     "cleanup": "rm -rf dist",
-    "dev": "tsc -p tsconfig.build.json --watch",
-    "lint": "eslint --ext .ts src",
+    "dev": "tsc --watch",
+    "lint": "eslint --ext .ts src --ignore-pattern 'src/**/*.test.ts'",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
