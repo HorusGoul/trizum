@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "3c1e3549339c98c44c8c75f676f56ebc0adcd4494ec27b7f1851f7c5a7c2deaf"
     },
+    "creating-changesets": {
+      "source": "saleor/configurator",
+      "sourceType": "github",
+      "computedHash": "1c42991a47eb5faf803be1e3e2ae6f3b95ec2931baeb3137a4a1aa02f4036f2b"
+    },
     "enhanced-message-context": {
       "source": "lingui/skills",
       "sourceType": "github",
