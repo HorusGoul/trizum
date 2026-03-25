@@ -17,6 +17,8 @@ For repo-wide guidance on what to log and which severity level to use, see
   configuration helpers.
 - [`src/github-actions.ts`](./src/github-actions.ts) contains the GitHub
   Actions annotation sink entrypoint.
+- [`tsconfig.build.json`](./tsconfig.build.json) is the source of truth for the
+  emitted package build.
 
 ## Package Notes
 
@@ -32,6 +34,7 @@ For repo-wide guidance on what to log and which severity level to use, see
 
 Run the package scripts defined in [`package.json`](./package.json):
 
+- `pnpm build`
 - `pnpm lint`
 - `pnpm test`
 - `pnpm typecheck`

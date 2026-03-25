@@ -18,18 +18,20 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./github-actions": {
-      "types": "./src/github-actions.ts",
-      "import": "./src/github-actions.ts",
-      "default": "./src/github-actions.ts"
+      "types": "./dist/github-actions.d.ts",
+      "import": "./dist/github-actions.js",
+      "default": "./dist/github-actions.js"
     }
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "cleanup": "rm -rf dist",
+    "dev": "tsc -p tsconfig.build.json --watch",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
     "test": "vitest run",
