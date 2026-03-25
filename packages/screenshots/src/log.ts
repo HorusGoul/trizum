@@ -1,11 +1,15 @@
 import {
   configureTrizumLogging,
+  getGitHubActionsAnnotationSink,
   getTrizumLogger,
   type ConfigureTrizumLoggingOptions,
 } from "@trizum/logging";
 
+const GITHUB_ACTIONS_ANNOTATION_SINK_ID = "githubActionsAnnotations";
+
+type ScreenshotsBuiltInSinkId = typeof GITHUB_ACTIONS_ANNOTATION_SINK_ID;
 type ScreenshotsLoggingOptions<TSinkId extends string = never> = Omit<
-  ConfigureTrizumLoggingOptions<TSinkId>,
+  ConfigureTrizumLoggingOptions<ScreenshotsBuiltInSinkId | TSinkId>,
   "surface"
 >;
 
@@ -18,8 +22,24 @@ export function getLogger(...scope: string[]) {
 export function configureScreenshotsLogging<TSinkId extends string = never>(
   options: ScreenshotsLoggingOptions<TSinkId> = {},
 ): void {
+  const { extraSinks, surfaceSinks, ...rest } = options;
+
   configureTrizumLogging({
     surface: "screenshots",
-    ...options,
+    ...rest,
+    extraSinks: {
+      [GITHUB_ACTIONS_ANNOTATION_SINK_ID]: getGitHubActionsAnnotationSink(),
+      ...(extraSinks ?? {}),
+    } as NonNullable<
+      ConfigureTrizumLoggingOptions<
+        ScreenshotsBuiltInSinkId | TSinkId
+      >["extraSinks"]
+    >,
+    surfaceSinks: Array.from(
+      new Set([
+        ...(surfaceSinks ?? ["console"]),
+        GITHUB_ACTIONS_ANNOTATION_SINK_ID,
+      ]),
+    ) as (ScreenshotsBuiltInSinkId | TSinkId | "console")[],
   });
 }

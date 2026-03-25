@@ -82,19 +82,6 @@ function toError(error: unknown): Error {
   return new Error(String(error));
 }
 
-function escapeGitHubActionsMessage(message: string) {
-  return message
-    .replaceAll("%", "%25")
-    .replaceAll("\r", "%0D")
-    .replaceAll("\n", "%0A");
-}
-
-function reportGitHubActionsError(message: string) {
-  if (process.env.GITHUB_ACTIONS === "true") {
-    process.stderr.write(`::error::${escapeGitHubActionsMessage(message)}\n`);
-  }
-}
-
 async function main() {
   let browser: Browser | null = null;
 
@@ -227,7 +214,6 @@ async function main() {
 void main().catch((error) => {
   const reportedError = toError(error);
 
-  reportGitHubActionsError(reportedError.message);
   logger.error("Screenshot capture failed", { error: reportedError });
   process.exitCode = 1;
 });
