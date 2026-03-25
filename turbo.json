@@ -13,6 +13,7 @@
       "inputs": ["src/**", "test/**", ".eslintrc.cjs", "tsconfig.json"]
     },
     "lint:fix": {
+      "dependsOn": ["^build"],
       "cache": false
     },
     "typecheck": {
