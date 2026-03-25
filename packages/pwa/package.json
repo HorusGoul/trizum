@@ -39,6 +39,7 @@
     "@internationalized/date": "3.10.0",
     "@lingui/core": "5.9.3",
     "@lingui/react": "5.9.3",
+    "@logtape/sentry": "1.2.2",
     "@opentf/obj-diff": "jsr:0.11.0",
     "@opentf/std": "jsr:0.12.0",
     "@sentry/react": "10.29.0",
@@ -69,6 +70,7 @@
     "sonner": "2.0.7",
     "suspense": "0.1.0",
     "tailwind-merge": "2.6.0",
+    "@trizum/logging": "workspace:*",
     "ulidx": "2.4.1",
     "workbox-build": "7.4.0",
     "workbox-window": "7.4.0"

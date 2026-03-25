@@ -30,7 +30,9 @@ import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx"
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
+import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
+import { configurePwaLogging } from "./lib/log.ts";
 import {
   createPartyFromMigrationData,
   type MigrationData,
@@ -59,6 +61,18 @@ if (import.meta.env.MODE === "production") {
     profileLifecycle: "trace",
     tracePropagationTargets: ["localhost", /trizum\.app/],
     environment: import.meta.env.MODE,
+  });
+
+  configurePwaLogging({
+    lowestLevel: "info",
+    extraSinks: {
+      sentry: getSentrySink(),
+    },
+    extraLoggers: [{ category: [], lowestLevel: "error", sinks: ["sentry"] }],
+  });
+} else {
+  configurePwaLogging({
+    lowestLevel: "debug",
   });
 }
 

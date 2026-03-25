@@ -10,6 +10,7 @@ import {
 import type { MediaFile } from "#src/models/media.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
+import { getLogger } from "#src/lib/log.ts";
 import type { DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import {
   Suspense,
@@ -19,6 +20,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
 interface RealtimeExpenseEditorPresenceProps {
   expenseId: Expense["id"];
@@ -125,7 +128,7 @@ export function RealtimeExpenseEditorPresence({
             break;
         }
       } catch {
-        console.error("Failed to handle ephemeral message", payload);
+        logger.error("Failed to handle ephemeral message", { payload });
         return;
       }
     };

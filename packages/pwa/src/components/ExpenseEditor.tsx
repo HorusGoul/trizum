@@ -50,6 +50,7 @@ import {
   compressionPresets,
   imageUploadAccept,
 } from "#src/lib/imageCompression.ts";
+import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 
 export interface ExpenseEditorFormValues {
@@ -64,6 +65,8 @@ export interface ExpenseEditorFormValues {
 export interface ExpenseEditorRef {
   setValues: (values: ExpenseEditorFormValues) => void;
 }
+
+const logger = getLogger("components", "ExpenseEditor");
 
 interface ExpenseEditorProps {
   title: string;
@@ -886,7 +889,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 
       toast.dismiss(toastId);
     } catch (error) {
-      console.error(error);
+      logger.error("Failed to upload expense attachment", { error });
       toast.error(
         getImageUploadErrorMessage(error) ??
           t`Failed to upload, please try again`,

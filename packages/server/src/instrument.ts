@@ -1,7 +1,9 @@
 import * as Sentry from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import packageJson from "#package.json" with { type: "json" };
-import { rootLogger } from "./log.ts";
+import { configureServerLogging, rootLogger } from "./log.ts";
+
+configureServerLogging();
 
 if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
   Sentry.init({

@@ -14,9 +14,12 @@ import {
   imageUploadAccept,
   isSupportedImageFile,
 } from "#src/lib/imageCompression.js";
+import { getLogger } from "#src/lib/log.ts";
 import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
+
+const logger = getLogger("components", "AvatarPicker");
 
 interface AvatarPickerProps {
   value: MediaFile["id"] | null;
@@ -69,7 +72,7 @@ export function AvatarPicker({
       toast.dismiss(toastId);
       toast.success(t`Avatar updated successfully`);
     } catch (error) {
-      console.error("Failed to upload avatar:", error);
+      logger.error("Failed to upload avatar", { error });
       toast.dismiss(toastId);
       toast.error(
         getImageUploadErrorMessage(error) ??

@@ -14,8 +14,12 @@ import { readFileSync } from "node:fs";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { configDefaults } from "vitest/config";
+import { configurePwaLogging, getLogger } from "./src/lib/log.ts";
 
 const ReactCompilerConfig = {};
+configurePwaLogging({ lowestLevel: "info" });
+
+const logger = getLogger("tooling", "vite");
 
 // Read package.json version
 const packageJson = JSON.parse(
@@ -30,7 +34,7 @@ try {
   appCommit = execSync("git rev-parse --short HEAD").toString().trim();
 } catch {
   // Git not available or not in a git repository
-  console.warn("Could not determine git commit hash");
+  logger.warning("Could not determine git commit hash");
 }
 
 const fullVersion = `${appVersion}-${appCommit}`;

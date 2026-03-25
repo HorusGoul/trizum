@@ -1,5 +1,5 @@
 {
-  "name": "@trizum/screenshots",
+  "name": "@trizum/logging",
   "description": "",
   "keywords": [],
   "version": "1.0.0",
@@ -17,33 +17,37 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "import": "./dist/*.js",
-      "default": "./dist/*.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./github-actions": {
+      "types": "./dist/github-actions.d.ts",
+      "import": "./dist/github-actions.js",
+      "default": "./dist/github-actions.js"
     }
   },
   "scripts": {
-    "cleanup": "rm -rf screenshots",
-    "start": "node --experimental-transform-types src/main.ts",
-    "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",
-    "typecheck": "tsc --noEmit",
+    "build": "tsc -b tsconfig.json",
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
-    "setup": "pnpm playwright install --with-deps chromium"
+    "test": "vitest run",
+    "typecheck": "tsc -b tsconfig.test.json"
+  },
+  "dependencies": {
+    "@logtape/logtape": "1.2.2"
   },
   "devDependencies": {
     "@trizum/eslint-config": "workspace:*",
     "@trizum/prettier-config": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
-    "@types/node": "24.10.2",
     "eslint": "9.39.1",
     "prettier": "3.6.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "4.1.0"
   },
-  "prettier": "@trizum/prettier-config",
-  "dependencies": {
-    "@trizum/logging": "workspace:*",
-    "playwright": "1.57.0"
-  }
+  "prettier": "@trizum/prettier-config"
 }

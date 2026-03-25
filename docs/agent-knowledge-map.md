@@ -22,6 +22,8 @@ and owned close to the code it describes.
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
 | [`/AGENTS.md`](../AGENTS.md)                                           | Repo entry point, repo-wide workflow, and routing to deeper sources             | Repo maintainer         | Update in the same PR when repo-wide workflow, package entry points, or routing changes |
 | [`/docs/agent-knowledge-map.md`](./agent-knowledge-map.md)             | Source-of-truth map for agent-facing surfaces and ownership model               | Repo maintainer         | Update in the same PR when a surface is added, removed, or re-scoped                    |
+| [`/docs/logging.md`](./logging.md)                                     | Repo-wide logging policy, severity guidance, and redaction expectations         | Repo maintainer         | Update in the same PR as repo-wide logging policy or observability expectations change  |
+| [`/docs/package-authoring.md`](./package-authoring.md)                 | Standard workflow and defaults for authoring new workspace packages             | Repo maintainer         | Update in the same PR as new-package conventions or template defaults change            |
 | [`/.nvmrc`](../.nvmrc) and [`/package.json`](../package.json)          | Node version, package manager version, and workspace-level commands             | Workspace maintainer    | Update in the same PR as toolchain or root script changes                               |
 | [`/packages/*/package.json`](../packages)                              | Package-local scripts and executable package metadata                           | Package maintainer      | Update in the same PR as script or runtime changes                                      |
 | [`/packages/pwa/README.md`](../packages/pwa/README.md)                 | Main app package map, PWA-specific validation, and where common app work lives  | PWA maintainer          | Update in the same PR as package structure or workflow changes                          |
@@ -85,6 +87,12 @@ browser automation, PR push flow, or generated-file regeneration.
 
 If a rule can be enforced mechanically, prefer a script, generated file, or CI
 check. Docs should explain the rule, not be the only place it lives.
+
+### Cross-Cutting Repo Policies
+
+Use `docs/*.md` for stable, repo-wide policies that cut across multiple
+packages but do not belong in the root routing guide. The logging policy in
+[`/docs/logging.md`](./logging.md) is the model for this kind of document.
 
 ## Default Read Path
 

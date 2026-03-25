@@ -25,11 +25,15 @@
   },
   "scripts": {
     "cleanup": "rm -rf dist",
-    "dev": "tsc --watch",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
+    "dev": "tsc -b tsconfig.json --watch",
+    "build": "tsc -b tsconfig.json",
+    "typecheck": "tsc -b tsconfig.test.json",
     "lint": "eslint --ext .ts src",
-    "lint:fix": "pnpm run lint --fix"
+    "lint:fix": "pnpm run lint --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@trizum/logging": "workspace:*"
   },
   "devDependencies": {
     "@trizum/eslint-config": "workspace:*",
@@ -37,7 +41,8 @@
     "@trizum/tsconfig": "workspace:*",
     "eslint": "9.39.1",
     "prettier": "3.6.2",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "4.1.0"
   },
   "prettier": "@trizum/prettier-config"
 }

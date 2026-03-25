@@ -14,6 +14,9 @@ import {
   type DocumentId,
 } from "@automerge/automerge-repo";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { getLogger } from "#src/lib/log.ts";
+
+const logger = getLogger("hooks", "useMediaFileActions");
 
 export function useMediaFileActions() {
   const repo = useRepo();
@@ -76,7 +79,7 @@ export function getMediaFileHelpers(repo: Repo) {
           processed: true,
         });
       } catch (error) {
-        console.warn("Image compression failed, using original:", error);
+        logger.warning("Image compression failed, using original", { error });
 
         if (isHeicImageFile(file)) {
           throw error instanceof ImageProcessingError

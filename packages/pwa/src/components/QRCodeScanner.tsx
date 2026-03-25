@@ -3,9 +3,12 @@ import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BarcodeDetector } from "#src/lib/qr.js";
+import { getLogger } from "#src/lib/log.ts";
 import { TrizumSpinner } from "./TrizumSpinner.js";
 import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
+
+const logger = getLogger("components", "QRCodeScanner");
 
 export type ScanResult =
   | { type: "success"; value: string }
@@ -89,7 +92,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
           void scanFrame();
         }
       } catch (err) {
-        console.error("Camera initialization error:", err);
+        logger.error("Camera initialization error", { error: err });
 
         if (err instanceof Error) {
           if (
@@ -182,7 +185,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
           return;
         }
       } catch (err) {
-        console.error("Barcode detection error:", err);
+        logger.error("Barcode detection error", { error: err });
       }
 
       // Continue scanning

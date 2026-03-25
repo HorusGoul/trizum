@@ -10,10 +10,5 @@
     "module": "nodenext",
     "types": ["node"],
     "noEmit": true,
-  },
-  "references": [
-    {
-      "path": "./tsconfig.capacitor.json",
-    }
-  ],
+  }
 }

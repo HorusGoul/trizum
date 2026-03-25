@@ -1,5 +1,6 @@
 import imageCompression from "browser-image-compression";
 import { parse } from "exifr";
+import { getLogger } from "#src/lib/log.ts";
 
 export interface ImageCompressionOptions {
   /** Maximum file size in MB (default: 2) */
@@ -44,6 +45,7 @@ const HEIC_MIME_TYPES = new Set([
 ]);
 
 const HEIC_EXTENSIONS = new Set([".heic", ".heif"]);
+const logger = getLogger("lib", "imageCompression");
 
 export const imageUploadAccept =
   "image/*,.heic,.heif,image/heic,image/heif,image/heic-sequence,image/heif-sequence";
@@ -111,7 +113,7 @@ async function readOrientation(file: File): Promise<number | undefined> {
     const exif = (await parse(file)) as ParseResult;
     return exif?.Orientation;
   } catch (exifError) {
-    console.warn("EXIF parsing failed for metadata:", exifError);
+    logger.warning("EXIF parsing failed for metadata", { error: exifError });
     return undefined;
   }
 }
@@ -305,8 +307,9 @@ async function canvasToBlob(
         } else {
           // Fallback to JPEG if the requested format fails
           if (mimeType !== "image/jpeg") {
-            console.warn(
-              `Failed to convert to ${mimeType}, falling back to JPEG`,
+            logger.warning(
+              "Failed to convert image to {mimeType}; falling back to JPEG",
+              { mimeType },
             );
             canvas.toBlob(
               (fallbackBlob) => {
@@ -413,7 +416,7 @@ export async function processImage(
       convertedFromHeic,
     };
   } catch (error) {
-    console.error("Image processing failed:", error);
+    logger.error("Image processing failed", { error });
     if (error instanceof ImageProcessingError) {
       throw error;
     }

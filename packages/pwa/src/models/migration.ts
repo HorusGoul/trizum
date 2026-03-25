@@ -5,7 +5,10 @@ import { getPartyHelpers } from "#src/hooks/useParty.ts";
 import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
+import { getLogger } from "#src/lib/log.ts";
 import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
+
+const logger = getLogger("models", "migration");
 
 export interface MigrationData {
   party: Omit<Party, "id" | "chunkRefs">;
@@ -72,7 +75,7 @@ export async function createPartyFromMigrationData({
         });
       }
     } catch (error) {
-      console.error(error);
+      logger.error("Failed to import photos during migration", { error });
       throw new Error(
         `Error importing photos: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
@@ -109,7 +112,10 @@ export async function createPartyFromMigrationData({
             .filter((photoId): photoId is MediaFile["id"] => !!photoId),
         })
         .catch((error) => {
-          console.error(error);
+          logger.error("Failed to import migrated expense", {
+            error,
+            expenseName: expense.name,
+          });
           throw new Error(
             `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
           );
