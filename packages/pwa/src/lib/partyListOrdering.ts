@@ -32,13 +32,15 @@ export function getOrderedPartySections(
     activePartyIds.push(partyId);
   }
 
-  const sortPartyIds = (ids: PartyId[]) =>
+  const sortPartyIds = (ids: PartyId[], includePinned: boolean) =>
     [...ids].sort((leftPartyId: PartyId, rightPartyId: PartyId) => {
-      const leftPinned = Number(isPartyPinned(partyList, leftPartyId));
-      const rightPinned = Number(isPartyPinned(partyList, rightPartyId));
+      if (includePinned) {
+        const leftPinned = Number(isPartyPinned(partyList, leftPartyId));
+        const rightPinned = Number(isPartyPinned(partyList, rightPartyId));
 
-      if (leftPinned !== rightPinned) {
-        return rightPinned - leftPinned;
+        if (leftPinned !== rightPinned) {
+          return rightPinned - leftPinned;
+        }
       }
 
       const leftLastUsedAt = getPartyLastUsedAt(partyList, leftPartyId);
@@ -54,8 +56,8 @@ export function getOrderedPartySections(
       );
     });
 
-  const orderedActivePartyIds = sortPartyIds(activePartyIds);
-  const orderedArchivedPartyIds = sortPartyIds(archivedPartyIds);
+  const orderedActivePartyIds = sortPartyIds(activePartyIds, true);
+  const orderedArchivedPartyIds = sortPartyIds(archivedPartyIds, false);
 
   return {
     activePartyIds: orderedActivePartyIds,

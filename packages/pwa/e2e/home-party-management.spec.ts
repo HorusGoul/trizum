@@ -10,7 +10,7 @@ test.describe("Home party management", () => {
     const homePage = new HomePage(page);
     await harness.seedPartyList({});
 
-    await page.evaluate(
+    const partyIds = await page.evaluate(
       async ({ fixtures, memberParticipantId }) => {
         const internalWindow = window as Window & {
           __internal_createPartyFromMigrationData: (
@@ -57,6 +57,12 @@ test.describe("Home party management", () => {
             [archivedPartyId]: memberParticipantId,
           },
         });
+
+        return {
+          pinnedPartyId,
+          recentPartyId,
+          archivedPartyId,
+        };
       },
       {
         fixtures: [
@@ -89,6 +95,16 @@ test.describe("Home party management", () => {
       await expect(homePage.partyLink(/Archived picnic/)).toHaveCount(0);
     });
 
+    await test.step("clicking the card surface still opens the party", async () => {
+      const partyCards = page.locator('[data-testid="party-list-card"]');
+
+      await partyCards.nth(1).click();
+      await expect(page).toHaveURL(new RegExp(partyIds.recentPartyId));
+
+      await harness.navigate("/");
+      await expect(homePage.partyLink(/Recent ski trip/)).toBeVisible();
+    });
+
     await test.step("list archived parties on the archived screen", async () => {
       await homePage.openArchivedParties();
 
@@ -99,6 +115,9 @@ test.describe("Home party management", () => {
       await expect(
         page.locator('[data-testid="party-list-card"]').nth(0),
       ).toContainText("Archived picnic");
+      await expect(
+        page.locator('[data-testid="party-list-card"]').nth(0),
+      ).not.toContainText("Last used");
     });
 
     await test.step("restore an archived party back to the home screen", async () => {

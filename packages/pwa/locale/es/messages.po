@@ -134,12 +134,11 @@ msgstr "La cantidad debe ser mayor que 0"
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/routes/archived.tsx:44
 #: src/routes/party_.$partyId.settings.tsx:333
 msgid "Archive"
 msgstr "Archivar"
 
-#: src/routes/archived.tsx:163
+#: src/routes/archived.tsx:108
 msgid "Archive a party from the home screen when you want to clear some space without losing it."
 msgstr ""
 
@@ -151,7 +150,7 @@ msgstr "Archiva a los participantes que se fueron para mantener el balance limpi
 msgid "Archive party"
 msgstr ""
 
-#: src/components/PartyListCard.tsx:106
+#: src/components/PartyListCard.tsx:47
 msgid "Archived"
 msgstr "Archivado"
 
@@ -163,7 +162,7 @@ msgstr "Participantes archivados"
 msgid "Archived parties"
 msgstr ""
 
-#: src/routes/archived.tsx:35
+#: src/routes/archived.tsx:32
 msgid "Archived Parties"
 msgstr ""
 
@@ -221,7 +220,7 @@ msgstr "Avatar actualizado correctamente"
 msgid "Azerbaijani Manat"
 msgstr "Manat Azerbaiyano"
 
-#: src/routes/archived.tsx:187
+#: src/routes/archived.tsx:132
 msgid "Back to home"
 msgstr ""
 
@@ -988,7 +987,7 @@ msgstr "Idioma"
 msgid "Laotian Kip"
 msgstr "Kip Laosiano"
 
-#: src/components/PartyListCard.tsx:112
+#: src/components/PartyListCard.tsx:132
 msgid "Last used"
 msgstr ""
 
@@ -1221,7 +1220,7 @@ msgstr "Naira Nigeriano"
 msgid "No active parties right now"
 msgstr ""
 
-#: src/routes/archived.tsx:160
+#: src/routes/archived.tsx:105
 msgid "No archived parties"
 msgstr ""
 
@@ -1369,7 +1368,7 @@ msgstr "Kina de Papúa Nueva Guinea"
 msgid "Paraguayan Guarani"
 msgstr "Guaraní Paraguayo"
 
-#: src/components/PartyListCard.tsx:92
+#: src/components/PartyListCard.tsx:124
 msgid "participant"
 msgstr "participante"
 
@@ -1379,7 +1378,7 @@ msgstr "participante"
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/components/PartyListCard.tsx:94
+#: src/components/PartyListCard.tsx:126
 #: src/components/PartyStatsView.tsx:350
 msgid "participants"
 msgstr "participantes"
@@ -1390,7 +1389,7 @@ msgstr "participantes"
 msgid "Participants"
 msgstr "Participantes"
 
-#: src/routes/archived.tsx:81
+#: src/routes/archived.tsx:48
 #: src/routes/index.tsx:207
 msgid "Party actions"
 msgstr ""
@@ -1411,12 +1410,11 @@ msgstr "Clasificación del grupo"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/archived.tsx:108
 #: src/routes/index.tsx:218
 msgid "Party pinned"
 msgstr ""
 
-#: src/routes/archived.tsx:91
+#: src/routes/archived.tsx:58
 msgid "Party restored to home"
 msgstr ""
 
@@ -1436,7 +1434,6 @@ msgstr "¡Grupo compartido!"
 msgid "Party stats"
 msgstr "Estadísticas del grupo"
 
-#: src/routes/archived.tsx:108
 #: src/routes/index.tsx:218
 msgid "Party unpinned"
 msgstr ""
@@ -1482,12 +1479,11 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/archived.tsx:121
 #: src/routes/index.tsx:233
 msgid "Pin party"
 msgstr ""
 
-#: src/components/PartyListCard.tsx:100
+#: src/components/PartyListCard.tsx:52
 msgid "Pinned"
 msgstr ""
 
@@ -1584,7 +1580,7 @@ msgstr "Reportar problemas"
 msgid "Restore"
 msgstr "Restaurar"
 
-#: src/routes/archived.tsx:100
+#: src/routes/archived.tsx:67
 msgid "Restore to home"
 msgstr ""
 
@@ -2020,7 +2016,6 @@ msgstr "Grivna Ucraniana"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/archived.tsx:119
 #: src/routes/index.tsx:231
 msgid "Unpin party"
 msgstr ""

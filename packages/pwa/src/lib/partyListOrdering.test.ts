@@ -42,7 +42,7 @@ describe("getOrderedPartySections", () => {
     });
   });
 
-  test("moves archived parties into their own ordered section", () => {
+  test("moves archived parties into their own ordered section by recent use", () => {
     const partyList = createPartyList({
       parties: createFlagMap(PARTY_A_ID, PARTY_B_ID, PARTY_C_ID, PARTY_D_ID),
       pinnedParties: createFlagMap(PARTY_C_ID, PARTY_D_ID),
@@ -57,7 +57,7 @@ describe("getOrderedPartySections", () => {
 
     expect(getOrderedPartySections(partyList)).toMatchObject({
       activePartyIds: [PARTY_C_ID, PARTY_A_ID],
-      archivedPartyIds: [PARTY_D_ID, PARTY_B_ID],
+      archivedPartyIds: [PARTY_B_ID, PARTY_D_ID],
       activeCount: 2,
       archivedCount: 2,
       pinnedActiveCount: 1,

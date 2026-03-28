@@ -105,8 +105,13 @@ export function usePartyList() {
   function setPartyPinned(partyId: Party["id"], pinned: boolean) {
     partyListHandle.change((list) => {
       const pinnedParties = ensurePinnedParties(list);
+      const archivedParties = ensureArchivedParties(list);
 
       if (pinned) {
+        if (archivedParties[partyId]) {
+          return;
+        }
+
         pinnedParties[partyId] = true;
         return;
       }
@@ -118,9 +123,11 @@ export function usePartyList() {
   function setPartyArchived(partyId: Party["id"], archived: boolean) {
     partyListHandle.change((list) => {
       const archivedParties = ensureArchivedParties(list);
+      const pinnedParties = ensurePinnedParties(list);
 
       if (archived) {
         archivedParties[partyId] = true;
+        delete pinnedParties[partyId];
 
         if (list.lastOpenedPartyId === partyId) {
           list.lastOpenedPartyId = null;

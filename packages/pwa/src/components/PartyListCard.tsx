@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import type { AnyDocumentId } from "@automerge/automerge-repo/slim";
+import { useNavigate } from "@tanstack/react-router";
 import { Link } from "react-aria-components";
 import type { ReactNode } from "react";
 import type { Party } from "#src/models/party.js";
@@ -22,6 +23,7 @@ export function PartyListCard({
   lastUsedAt = null,
   renderMenu,
 }: PartyListCardProps) {
+  const navigate = useNavigate();
   const [party, handle] = useSuspenseDocument<Party>(partyId);
 
   if (!party || !handle) {
@@ -39,84 +41,108 @@ export function PartyListCard({
     lastUsedAt && Number.isFinite(lastUsedAt)
       ? formatLastUsedAt(lastUsedAt)
       : null;
+  const partyRouteParams = {
+    partyId: party.id,
+  };
+  const statusBadge = isArchived
+    ? {
+        icon: "#lucide/archive" as const,
+        label: <Trans>Archived</Trans>,
+      }
+    : isPinned
+      ? {
+          icon: "#lucide/pin" as const,
+          label: <Trans>Pinned</Trans>,
+        }
+      : null;
 
   return (
     <div
       data-testid="party-list-card"
-      className="rounded-[1.75rem] border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none"
+      className="group relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out hover:border-accent-300/90 hover:shadow-md active:scale-[0.99] focus-within:border-accent-500 focus-within:shadow-md dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:hover:border-accent-700 dark:hover:shadow-none dark:focus-within:border-accent-500 dark:shadow-none"
     >
-      <div className="flex items-start gap-2 p-2">
-        <Link
-          href={{
+      <button
+        type="button"
+        aria-hidden="true"
+        tabIndex={-1}
+        className="absolute inset-0 rounded-xl"
+        onClick={() => {
+          void navigate({
             to: "/party/$partyId",
-            params: {
-              partyId: party.id,
+            params: partyRouteParams,
+            search: {
+              tab: "expenses",
             },
-          }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
-            cn(
+          });
+        }}
+      />
+
+      <div className="pointer-events-none relative flex items-start gap-4 p-4">
+        <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-accent-100 dark:text-accent-950 dark:shadow-none">
+          <span className="pt-0.5">{symbolOrFirstLetter}</span>
+
+          {statusBadge ? (
+            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-700 shadow-sm dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200">
+              <IconWithFallback name={statusBadge.icon} size={11} />
+              <span className="sr-only">{statusBadge.label}</span>
+            </span>
+          ) : null}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <Link
+            data-party-card-interactive=""
+            href={{
+              to: "/party/$partyId",
+              params: partyRouteParams,
+            }}
+            className={({
+              isFocusVisible,
+              isHovered,
               defaultClassName,
-              "flex min-w-0 flex-1 scale-100 items-start gap-4 rounded-[1.45rem] p-3 text-start outline-none transition-all duration-200 ease-in-out",
-              (isHovered || isFocusVisible) &&
-                "bg-white/80 shadow-sm dark:bg-accent-900/60 dark:shadow-none",
-              isPressed && "scale-[0.98] bg-white/70 dark:bg-accent-900/80",
-            )
-          }
-        >
-          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-[1.15rem] bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-accent-100 dark:text-accent-950 dark:shadow-none">
-            <span className="pt-0.5">{symbolOrFirstLetter}</span>
-          </div>
+            }) =>
+              cn(
+                defaultClassName,
+                "pointer-events-auto inline-flex max-w-full rounded-sm text-start outline-none transition-colors duration-200 ease-in-out",
+                (isHovered || isFocusVisible) &&
+                  "text-accent-700 underline decoration-accent-300 decoration-2 underline-offset-4 dark:text-accent-200 dark:decoration-accent-500",
+              )
+            }
+          >
+            <span className="block truncate text-lg font-semibold tracking-tight text-accent-950 group-hover:text-accent-700 dark:text-accent-50 dark:group-hover:text-accent-200">
+              {party.name}
+            </span>
+          </Link>
 
-          <div className="min-w-0 flex-1">
-            <div className="min-w-0">
-              <span className="block truncate text-lg font-semibold tracking-tight text-accent-950 dark:text-accent-50">
-                {party.name}
-              </span>
+          {description ? (
+            <p className="mt-1 text-sm leading-6 text-accent-700 dark:text-accent-300">
+              {description}
+            </p>
+          ) : null}
 
-              {description ? (
-                <p className="mt-1 text-sm leading-6 text-accent-700 dark:text-accent-300">
-                  {description}
-                </p>
-              ) : null}
-            </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-accent-700 dark:text-accent-300">
+            <PartyMetaChip>
+              {participantCount}{" "}
+              {participantCount === 1 ? (
+                <Trans>participant</Trans>
+              ) : (
+                <Trans>participants</Trans>
+              )}
+            </PartyMetaChip>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-accent-700 dark:text-accent-300">
-              <PartyMetaChip>
-                {participantCount}{" "}
-                {participantCount === 1 ? (
-                  <Trans>participant</Trans>
-                ) : (
-                  <Trans>participants</Trans>
-                )}
+            {formattedLastUsedAt ? (
+              <PartyMetaChip icon="#lucide/history">
+                <Trans>Last used</Trans> {formattedLastUsedAt}
               </PartyMetaChip>
-
-              {isPinned ? (
-                <PartyMetaChip icon="#lucide/pin">
-                  <Trans>Pinned</Trans>
-                </PartyMetaChip>
-              ) : null}
-
-              {isArchived ? (
-                <PartyMetaChip icon="#lucide/archive">
-                  <Trans>Archived</Trans>
-                </PartyMetaChip>
-              ) : null}
-
-              {formattedLastUsedAt ? (
-                <PartyMetaChip icon="#lucide/history">
-                  <Trans>Last used</Trans> {formattedLastUsedAt}
-                </PartyMetaChip>
-              ) : null}
-            </div>
+            ) : null}
           </div>
-        </Link>
+        </div>
 
-        {renderMenu ? <div className="pt-1">{renderMenu(party)}</div> : null}
+        {renderMenu ? (
+          <div data-party-card-interactive="" className="pointer-events-auto pt-0.5">
+            {renderMenu(party)}
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -333,7 +333,7 @@ function usePartySections(partyList: PartyList) {
 
 function NoActivePartiesCard() {
   return (
-    <div className="rounded-[1.75rem] border border-dashed border-accent-300 bg-white/80 p-6 shadow-sm dark:border-accent-700 dark:bg-accent-950/70 dark:shadow-none">
+    <div className="rounded-xl border border-dashed border-accent-300 bg-white/80 p-6 shadow-sm dark:border-accent-700 dark:bg-accent-950/70 dark:shadow-none">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-4">
           <div className="rounded-full bg-accent-100 p-3 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
