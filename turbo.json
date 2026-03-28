@@ -27,9 +27,7 @@
       "inputs": ["src/**", "test/**", "vite.config.ts", "vitest.config.ts"]
     },
     "test:e2e": {
-      "cache": false,
       "outputs": ["playwright-report/**", "test-results/**"],
-      "env": ["PLAYWRIGHT_BASE_URL"],
       "inputs": [
         "src/**",
         "e2e/**",
