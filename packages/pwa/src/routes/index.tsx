@@ -6,7 +6,7 @@ import {
   getOrderedPartySections,
   isPartyPinned,
 } from "#src/lib/partyListOrdering.ts";
-import { IconWithFallback, type IconProps } from "#src/ui/Icon.js";
+import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
@@ -66,7 +66,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
-  const { activePartyIds, activeCount, archivedCount, pinnedActiveCount } =
+  const { activePartyIds, activeCount, archivedCount } =
     usePartySections(partyList);
   const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -181,12 +181,6 @@ function Index() {
 
       {showPartyHub ? (
         <div className="container flex flex-1 flex-col gap-4 px-2">
-          <HomeOverviewCard
-            activeCount={activeCount}
-            archivedCount={archivedCount}
-            pinnedCount={pinnedActiveCount}
-          />
-
           {needsProfileSetup ? <ProfileSetupCard /> : null}
 
           {activeCount > 0 ? (
@@ -195,12 +189,6 @@ function Index() {
                 <h2 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-accent-600 dark:text-accent-300">
                   <Trans>Your parties</Trans>
                 </h2>
-                <p className="mt-1 text-sm text-accent-700 dark:text-accent-300">
-                  <Trans>
-                    Pinned parties stay on top, then the rest follow your latest
-                    activity.
-                  </Trans>
-                </p>
               </div>
 
               {activePartyIds.map((partyId) => {
@@ -341,101 +329,6 @@ function usePartySections(partyList: PartyList) {
   }
 
   return sections;
-}
-
-function HomeOverviewCard({
-  activeCount,
-  archivedCount,
-  pinnedCount,
-}: {
-  activeCount: number;
-  archivedCount: number;
-  pinnedCount: number;
-}) {
-  return (
-    <section className="rounded-[1.9rem] border border-accent-300/80 bg-gradient-to-br from-accent-500 via-accent-600 to-accent-700 p-5 text-accent-50 shadow-sm dark:border-accent-500/60 dark:from-accent-700 dark:via-accent-800 dark:to-accent-950 dark:shadow-none">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-lg">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-accent-50/75">
-            <Trans>Home</Trans>
-          </div>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-accent-50">
-            <Trans>Jump back into the groups you use most</Trans>
-          </h2>
-          <p className="mt-2 text-sm text-accent-50/80">
-            <Trans>
-              Pinned parties stay close. Recent activity keeps the rest in
-              order.
-            </Trans>
-          </p>
-        </div>
-
-        <Link
-          href={{ to: "/archived" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
-            cn(
-              defaultClassName,
-              "inline-flex items-center gap-3 self-start rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-sm font-semibold text-accent-50 shadow-sm outline-none backdrop-blur-sm transition-all duration-200 ease-in-out dark:bg-accent-950/30 dark:shadow-none",
-              (isHovered || isFocusVisible) &&
-                "bg-white/18 dark:bg-accent-950/45",
-              isPressed && "bg-white/22 scale-95 dark:bg-accent-950/55",
-            )
-          }
-        >
-          <IconWithFallback name="#lucide/folder-archive" size={16} />
-          <span>
-            <Trans>Open archived parties</Trans>
-          </span>
-          <span className="rounded-full bg-white/15 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-50">
-            {archivedCount}
-          </span>
-        </Link>
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-3">
-        <HomeMetric
-          icon="#lucide/layout-list"
-          value={activeCount}
-          label={t`Active`}
-        />
-        <HomeMetric icon="#lucide/pin" value={pinnedCount} label={t`Pinned`} />
-        <HomeMetric
-          icon="#lucide/archive"
-          value={archivedCount}
-          label={t`Archived`}
-        />
-      </div>
-    </section>
-  );
-}
-
-function HomeMetric({
-  icon,
-  value,
-  label,
-}: {
-  icon: IconProps["name"];
-  value: number;
-  label: string;
-}) {
-  return (
-    <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-accent-50 shadow-sm backdrop-blur-sm dark:bg-accent-950/30 dark:shadow-none">
-      <div className="bg-white/12 rounded-full p-2 text-accent-50">
-        <IconWithFallback name={icon} size={14} />
-      </div>
-      <div className="flex flex-col leading-none">
-        <span className="text-lg font-semibold">{value}</span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-50/70">
-          {label}
-        </span>
-      </div>
-    </div>
-  );
 }
 
 function NoActivePartiesCard() {
