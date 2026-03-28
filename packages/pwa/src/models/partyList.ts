@@ -18,6 +18,9 @@ export interface PartyList {
   hue?: number;
   lastOpenedPartyId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;
+  pinnedParties?: Record<Party["id"], true | undefined>;
+  archivedParties?: Record<Party["id"], true | undefined>;
+  lastUsedAt?: Record<Party["id"], number | undefined>;
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;
 }
 
@@ -29,6 +32,9 @@ function createPartyListHandle(repo: Repo) {
     username: "",
     phone: "",
     parties: {},
+    pinnedParties: {},
+    archivedParties: {},
+    lastUsedAt: {},
     participantInParties: {},
   });
 

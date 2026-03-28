@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as JoinRouteImport } from './routes/join'
+import { Route as ArchivedRouteImport } from './routes/archived'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
@@ -51,6 +52,11 @@ const NewRoute = NewRouteImport.update({
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchivedRoute = ArchivedRouteImport.update({
+  id: '/archived',
+  path: '/archived',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -124,6 +130,7 @@ const PartyPartyIdExpenseExpenseIdEditRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/archived'
     | '/join'
     | '/new'
     | '/privacy-policy'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/archived'
     | '/join'
     | '/new'
     | '/privacy-policy'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/archived'
     | '/join'
     | '/new'
     | '/privacy-policy'
@@ -248,6 +260,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ArchivedRoute: typeof ArchivedRoute
   JoinRoute: typeof JoinRoute
   NewRoute: typeof NewRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -301,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archived': {
+      id: '/archived'
+      path: '/archived'
+      fullPath: '/archived'
+      preLoaderRoute: typeof ArchivedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -400,6 +420,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ArchivedRoute: ArchivedRoute,
   JoinRoute: JoinRoute,
   NewRoute: NewRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
