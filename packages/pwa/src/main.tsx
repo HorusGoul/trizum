@@ -61,6 +61,7 @@ if (import.meta.env.MODE === "production") {
     profileLifecycle: "trace",
     tracePropagationTargets: ["localhost", /trizum\.app/],
     environment: import.meta.env.MODE,
+    enableLogs: true,
   });
 
   configurePwaLogging({
