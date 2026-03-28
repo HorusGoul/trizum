@@ -27,6 +27,7 @@
       "inputs": ["src/**", "test/**", "vite.config.ts", "vitest.config.ts"]
     },
     "test:e2e": {
+      "dependsOn": ["^build"],
       "outputs": ["playwright-report/**", "test-results/**"],
       "inputs": [
         "src/**",
