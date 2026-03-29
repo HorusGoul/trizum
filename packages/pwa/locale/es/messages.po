@@ -87,7 +87,7 @@ msgstr "Añadir o crear"
 #: src/routes/new.tsx:399
 #: src/routes/party_.$partyId.settings.tsx:415
 msgid "Add participant"
-msgstr "Añadir participante"
+msgstr "Añadir participante<<<<<<< HEAD"
 
 #: src/routes/index.tsx:546
 msgid "Add your name so others know who you are and how to pay you"
@@ -439,7 +439,7 @@ msgstr "Franco Comorense"
 
 #: src/components/PartyStatsView.tsx:181
 msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
-msgstr "Compara cuánto ha pagado cada persona en distintos períodos. Las transferencias de saldos no se incluyen en estos totales."
+msgstr "Compara cuánto ha pagado cada persona en distintos períodos. Las transferencias de saldos no se incluyen en estos totales.<<<<<<< HEAD"
 
 #: src/routes/index.tsx:543
 msgid "Complete your profile"
@@ -471,7 +471,7 @@ msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicació
 
 #: src/routes/new.tsx:484
 msgid "Costa Rican Colón"
-msgstr "Colón Costarricense"
+msgstr "Colón Costarricense<<<<<<< HEAD"
 
 #: src/routes/index.tsx:288
 #: src/routes/index.tsx:409
@@ -600,7 +600,7 @@ msgstr "Fecha de fin"
 
 #: src/routes/settings.tsx:49
 msgid "English"
-msgstr "Inglés"
+msgstr "Inglés<<<<<<< HEAD"
 
 #: src/routes/index.tsx:445
 msgid "Enter a party link or code to join"
@@ -640,7 +640,7 @@ msgstr "Unidad de Cuenta Europea 17"
 
 #: src/routes/new.tsx:588
 msgid "European Unit of Account 9"
-msgstr "Unidad de Cuenta Europea 9"
+msgstr "Unidad de Cuenta Europea 9<<<<<<< HEAD"
 
 #: src/routes/index.tsx:339
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
@@ -861,7 +861,7 @@ msgstr "Impacto en mi balance: <0/>"
 
 #: src/routes/migrate_.tricount.tsx:225
 msgid "Import attachments"
-msgstr "Importar adjuntos"
+msgstr "Importar adjuntos<<<<<<< HEAD"
 
 #: src/routes/index.tsx:478
 msgid "Import your existing Tricount data"
@@ -944,7 +944,7 @@ msgstr "Unirse"
 #. placeholder {0}: party.name
 #: src/routes/party_.$partyId.share.tsx:31
 msgid "Join {0} on trizum!"
-msgstr "¡Únete a {0} en trizum!"
+msgstr "¡Únete a {0} en trizum!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:278
 #: src/routes/index.tsx:442
@@ -1101,7 +1101,7 @@ msgstr "Unidad de Inversión Mexicana"
 
 #: src/routes/new.tsx:432
 msgid "Mexican Peso"
-msgstr "Peso Mexicano"
+msgstr "Peso Mexicano<<<<<<< HEAD"
 
 #: src/routes/index.tsx:298
 #: src/routes/index.tsx:475
@@ -1214,7 +1214,7 @@ msgstr "Córdoba Nicaragüense"
 
 #: src/routes/new.tsx:540
 msgid "Nigerian Naira"
-msgstr "Naira Nigeriano"
+msgstr "Naira Nigeriano<<<<<<< HEAD"
 
 #: src/routes/index.tsx:336
 msgid "No active parties right now"
@@ -1291,7 +1291,7 @@ msgstr "Rial Omaní"
 
 #: src/routes/party.$partyId.tsx:270
 msgid "Only show your expenses"
-msgstr "Mostrar solo tus gastos"
+msgstr "Mostrar solo tus gastos<<<<<<< HEAD"
 
 #: src/routes/index.tsx:362
 msgid "Open archived parties"
@@ -1376,7 +1376,7 @@ msgstr "participante"
 #: src/routes/party_.$partyId.settings.tsx:310
 #: src/routes/party_.$partyId.settings.tsx:443
 msgid "Participant name"
-msgstr "Nombre del participante"
+msgstr "Nombre del participante<<<<<<< HEAD======="
 
 #: src/components/PartyStatsView.tsx:350
 msgid "participants"
@@ -1655,7 +1655,7 @@ msgstr "Envíanos un email y te responderemos lo antes posible."
 
 #: src/routes/new.tsx:551
 msgid "Serbian Dinar"
-msgstr "Dinar Serbio"
+msgstr "Dinar Serbio<<<<<<< HEAD"
 
 #: src/routes/index.tsx:511
 msgid "Set up your username, avatar, and preferences"
@@ -1743,7 +1743,7 @@ msgstr "Libra Sursudanesa"
 
 #: src/routes/new.tsx:591
 msgid "Special Drawing Rights"
-msgstr "Derechos Especiales de Giro"
+msgstr "Derechos Especiales de Giro<<<<<<< HEAD"
 
 #: src/routes/index.tsx:376
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
@@ -1764,7 +1764,7 @@ msgstr "Rupia de Sri Lanka"
 #. Label for the start date field in the custom range filter on the party stats screen
 #: src/components/PartyStatsView.tsx:218
 msgid "Start date"
-msgstr "Fecha de inicio"
+msgstr "Fecha de inicio<<<<<<< HEAD"
 
 #: src/routes/index.tsx:412
 msgid "Start tracking expenses with your group"
@@ -2129,7 +2129,7 @@ msgstr "Viendo como {participantName}"
 #. placeholder {0}: participant.name
 #: src/routes/party_.$partyId.who.tsx:64
 msgid "Welcome to the party, {0}!"
-msgstr "¡Bienvenido al grupo, {0}!"
+msgstr "¡Bienvenido al grupo, {0}!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:373
 msgid "Welcome to trizum"
