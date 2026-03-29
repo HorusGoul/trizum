@@ -46,7 +46,7 @@ function ArchivedParties() {
                     <IconButton
                       icon="#lucide/ellipsis-vertical"
                       aria-label={t`Party actions`}
-                      color="input-like"
+                      color="transparent"
                       className="h-10 w-10 flex-shrink-0"
                     />
 

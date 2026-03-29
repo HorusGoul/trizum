@@ -59,10 +59,11 @@ export function PartyListCard({
   return (
     <div
       data-testid="party-list-card"
-      className="group relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out hover:border-accent-300/90 hover:shadow-md active:scale-[0.99] focus-within:border-accent-500 focus-within:shadow-md dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:hover:border-accent-700 dark:hover:shadow-none dark:focus-within:border-accent-500 dark:shadow-none"
+      className="group relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out has-[>[data-party-card-surface]:active]:scale-[0.99] focus-within:border-accent-500 focus-within:shadow-md hover:border-accent-300/90 hover:shadow-md dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none dark:focus-within:border-accent-500 dark:hover:border-accent-700 dark:hover:shadow-none"
     >
       <button
         type="button"
+        data-party-card-surface=""
         aria-hidden="true"
         tabIndex={-1}
         className="absolute inset-0 rounded-xl"
@@ -96,16 +97,12 @@ export function PartyListCard({
               to: "/party/$partyId",
               params: partyRouteParams,
             }}
-            className={({
-              isFocusVisible,
-              isHovered,
-              defaultClassName,
-            }) =>
+            className={({ isFocusVisible, isHovered, defaultClassName }) =>
               cn(
                 defaultClassName,
                 "pointer-events-auto inline-flex max-w-full rounded-sm text-start outline-none transition-colors duration-200 ease-in-out",
                 (isHovered || isFocusVisible) &&
-                  "text-accent-700 underline decoration-accent-300 decoration-2 underline-offset-4 dark:text-accent-200 dark:decoration-accent-500",
+                  "text-accent-700 dark:text-accent-200",
               )
             }
           >
@@ -139,7 +136,10 @@ export function PartyListCard({
         </div>
 
         {renderMenu ? (
-          <div data-party-card-interactive="" className="pointer-events-auto pt-0.5">
+          <div
+            data-party-card-interactive=""
+            className="pointer-events-auto pt-0.5"
+          >
             {renderMenu(party)}
           </div>
         ) : null}

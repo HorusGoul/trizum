@@ -205,7 +205,7 @@ function Index() {
                         <IconButton
                           icon="#lucide/ellipsis-vertical"
                           aria-label={t`Party actions`}
-                          color="input-like"
+                          color="transparent"
                           className="h-10 w-10 flex-shrink-0"
                         />
 
@@ -333,46 +333,42 @@ function usePartySections(partyList: PartyList) {
 
 function NoActivePartiesCard() {
   return (
-    <div className="rounded-xl border border-dashed border-accent-300 bg-white/80 p-6 shadow-sm dark:border-accent-700 dark:bg-accent-950/70 dark:shadow-none">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-4">
-          <div className="rounded-full bg-accent-100 p-3 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
-            <IconWithFallback name="#lucide/folder-archive" size={20} />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-accent-950 dark:text-accent-50">
-              <Trans>No active parties right now</Trans>
-            </h2>
-            <p className="mt-2 text-sm text-accent-700 dark:text-accent-300">
-              <Trans>
-                Everything is archived for now. You can reopen any party from
-                the archived screen whenever you need it.
-              </Trans>
-            </p>
-          </div>
-        </div>
-
-        <Link
-          href={{ to: "/archived" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
-            cn(
-              defaultClassName,
-              "inline-flex items-center justify-center rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-accent-50 outline-none transition-all duration-200 ease-in-out dark:bg-accent-500",
-              (isHovered || isFocusVisible) &&
-                "bg-accent-600 dark:bg-accent-400",
-              isPressed && "scale-95 bg-accent-700 dark:bg-accent-300",
-            )
-          }
-        >
-          <Trans>Open archived parties</Trans>
-        </Link>
+    <section className="flex flex-col items-center justify-center gap-5 px-4 py-12 text-center">
+      <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
+        <IconWithFallback name="#lucide/folder-archive" size={22} />
       </div>
-    </div>
+
+      <div className="max-w-md">
+        <h2 className="text-xl font-semibold text-accent-950 dark:text-accent-50">
+          <Trans>No active parties right now</Trans>
+        </h2>
+        <p className="mt-2 text-sm text-accent-700 dark:text-accent-300">
+          <Trans>
+            Everything is archived for now. You can reopen any party from the
+            archived screen whenever you need it.
+          </Trans>
+        </p>
+      </div>
+
+      <Link
+        href={{ to: "/archived" }}
+        className={({
+          isPressed,
+          isFocusVisible,
+          isHovered,
+          defaultClassName,
+        }) =>
+          cn(
+            defaultClassName,
+            "inline-flex items-center justify-center rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-accent-50 outline-none transition-all duration-200 ease-in-out dark:bg-accent-500",
+            (isHovered || isFocusVisible) && "bg-accent-600 dark:bg-accent-400",
+            isPressed && "scale-95 bg-accent-700 dark:bg-accent-300",
+          )
+        }
+      >
+        <Trans>Open archived parties</Trans>
+      </Link>
+    </section>
   );
 }
 
