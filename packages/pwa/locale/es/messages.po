@@ -150,7 +150,7 @@ msgstr "Archiva a los participantes que se fueron para mantener el balance limpi
 msgid "Archive party"
 msgstr ""
 
-#: src/components/PartyListCard.tsx:47
+#: src/components/PartyListCard.tsx:50
 msgid "Archived"
 msgstr "Archivado"
 
@@ -987,7 +987,7 @@ msgstr "Idioma"
 msgid "Laotian Kip"
 msgstr "Kip Laosiano"
 
-#: src/components/PartyListCard.tsx:132
+#: src/components/PartyListCard.tsx:135
 msgid "Last used"
 msgstr ""
 
@@ -1368,7 +1368,7 @@ msgstr "Kina de Papúa Nueva Guinea"
 msgid "Paraguayan Guarani"
 msgstr "Guaraní Paraguayo"
 
-#: src/components/PartyListCard.tsx:124
+#: src/components/PartyListCard.tsx:127
 msgid "participant"
 msgstr "participante"
 
@@ -1378,7 +1378,7 @@ msgstr "participante"
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/components/PartyListCard.tsx:126
+#: src/components/PartyListCard.tsx:129
 #: src/components/PartyStatsView.tsx:350
 msgid "participants"
 msgstr "participantes"
@@ -1483,7 +1483,7 @@ msgstr "El número de teléfono debe tener menos de 20 caracteres"
 msgid "Pin party"
 msgstr ""
 
-#: src/components/PartyListCard.tsx:52
+#: src/components/PartyListCard.tsx:55
 msgid "Pinned"
 msgstr ""
 
