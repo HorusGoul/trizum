@@ -91,7 +91,7 @@ msgstr "Add or create"
 #: src/routes/new.tsx:399
 #: src/routes/party_.$partyId.settings.tsx:415
 msgid "Add participant"
-msgstr "Add participant"
+msgstr "Add participant<<<<<<< HEAD"
 
 #: src/routes/index.tsx:546
 msgid "Add your name so others know who you are and how to pay you"
@@ -463,7 +463,7 @@ msgstr "Comorian Franc"
 
 #: src/components/PartyStatsView.tsx:181
 msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
-msgstr "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
+msgstr "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals.<<<<<<< HEAD"
 
 #: src/routes/index.tsx:543
 msgid "Complete your profile"
@@ -495,7 +495,7 @@ msgstr "Copy the phone number and pay through Bizum using your bank app."
 
 #: src/routes/new.tsx:484
 msgid "Costa Rican Colón"
-msgstr "Costa Rican Colón"
+msgstr "Costa Rican Colón<<<<<<< HEAD"
 
 #: src/routes/index.tsx:288
 #: src/routes/index.tsx:409
@@ -628,7 +628,7 @@ msgstr "End date"
 
 #: src/routes/settings.tsx:49
 msgid "English"
-msgstr "English"
+msgstr "English<<<<<<< HEAD"
 
 #: src/routes/index.tsx:445
 msgid "Enter a party link or code to join"
@@ -672,7 +672,7 @@ msgstr "European Unit of Account 17"
 
 #: src/routes/new.tsx:588
 msgid "European Unit of Account 9"
-msgstr "European Unit of Account 9"
+msgstr "European Unit of Account 9<<<<<<< HEAD"
 
 #: src/routes/index.tsx:339
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
@@ -909,7 +909,7 @@ msgstr "Impact on my balance: <0/>"
 
 #: src/routes/migrate_.tricount.tsx:225
 msgid "Import attachments"
-msgstr "Import attachments"
+msgstr "Import attachments<<<<<<< HEAD"
 
 #: src/routes/index.tsx:478
 msgid "Import your existing Tricount data"
@@ -992,7 +992,7 @@ msgstr "Join"
 #. placeholder {0}: party.name
 #: src/routes/party_.$partyId.share.tsx:31
 msgid "Join {0} on trizum!"
-msgstr "Join {0} on trizum!"
+msgstr "Join {0} on trizum!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:278
 #: src/routes/index.tsx:442
@@ -1039,7 +1039,7 @@ msgstr "Language"
 msgid "Laotian Kip"
 msgstr "Laotian Kip"
 
-#: src/components/PartyListCard.tsx:135
+#: src/components/PartyListCard.tsx:132
 msgid "Last used"
 msgstr "Last used"
 
@@ -1153,7 +1153,7 @@ msgstr "Mexican Investment Unit"
 
 #: src/routes/new.tsx:432
 msgid "Mexican Peso"
-msgstr "Mexican Peso"
+msgstr "Mexican Peso<<<<<<< HEAD"
 
 #: src/routes/index.tsx:298
 #: src/routes/index.tsx:475
@@ -1266,7 +1266,7 @@ msgstr "Nicaraguan Córdoba"
 
 #: src/routes/new.tsx:540
 msgid "Nigerian Naira"
-msgstr "Nigerian Naira"
+msgstr "Nigerian Naira<<<<<<< HEAD"
 
 #: src/routes/index.tsx:336
 msgid "No active parties right now"
@@ -1347,7 +1347,7 @@ msgstr "Omani Rial"
 
 #: src/routes/party.$partyId.tsx:270
 msgid "Only show your expenses"
-msgstr "Only show your expenses"
+msgstr "Only show your expenses<<<<<<< HEAD"
 
 #: src/routes/index.tsx:362
 msgid "Open archived parties"
@@ -1428,7 +1428,7 @@ msgstr "Papua New Guinean Kina"
 msgid "Paraguayan Guarani"
 msgstr "Paraguayan Guarani"
 
-#: src/components/PartyListCard.tsx:127
+#: src/components/PartyListCard.tsx:124
 msgid "participant"
 msgstr "participant"
 
@@ -1436,7 +1436,7 @@ msgstr "participant"
 #: src/routes/party_.$partyId.settings.tsx:310
 #: src/routes/party_.$partyId.settings.tsx:443
 msgid "Participant name"
-msgstr "Participant name"
+msgstr "Participant name<<<<<<< HEAD======="
 
 #: src/components/PartyStatsView.tsx:350
 msgid "participants"
@@ -1727,7 +1727,7 @@ msgstr "Send us an email and we'll get back to you as soon as possible."
 
 #: src/routes/new.tsx:551
 msgid "Serbian Dinar"
-msgstr "Serbian Dinar"
+msgstr "Serbian Dinar<<<<<<< HEAD"
 
 #: src/routes/index.tsx:511
 msgid "Set up your username, avatar, and preferences"
@@ -1819,7 +1819,7 @@ msgstr "South Sudanese Pound"
 
 #: src/routes/new.tsx:591
 msgid "Special Drawing Rights"
-msgstr "Special Drawing Rights"
+msgstr "Special Drawing Rights<<<<<<< HEAD"
 
 #: src/routes/index.tsx:376
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
@@ -1840,7 +1840,7 @@ msgstr "Sri Lankan Rupee"
 #. Label for the start date field in the custom range filter on the party stats screen
 #: src/components/PartyStatsView.tsx:218
 msgid "Start date"
-msgstr "Start date"
+msgstr "Start date<<<<<<< HEAD"
 
 #: src/routes/index.tsx:412
 msgid "Start tracking expenses with your group"
@@ -2230,7 +2230,7 @@ msgstr "Warning: Split amounts don't match total expense"
 #. placeholder {0}: participant.name
 #: src/routes/party_.$partyId.who.tsx:64
 msgid "Welcome to the party, {0}!"
-msgstr "Welcome to the party, {0}!"
+msgstr "Welcome to the party, {0}!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:373
 msgid "Welcome to trizum"
