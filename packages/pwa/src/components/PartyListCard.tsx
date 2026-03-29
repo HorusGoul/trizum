@@ -31,6 +31,7 @@ export function PartyListCard({
   const symbolOrFirstLetter =
     party.symbol || party.name.charAt(0).toUpperCase();
   const description = party.description.trim();
+  const hasDescription = description.length > 0;
   const partyRouteParams = {
     partyId: party.id,
   };
@@ -68,7 +69,12 @@ export function PartyListCard({
         }}
       />
 
-      <div className="pointer-events-none relative flex items-start gap-4 p-4">
+      <div
+        className={cn(
+          "pointer-events-none relative flex gap-4 p-4",
+          hasDescription ? "items-start" : "items-center",
+        )}
+      >
         <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-black/35 dark:text-accent-50 dark:shadow-none">
           <span className="pt-0.5">{symbolOrFirstLetter}</span>
 
@@ -80,7 +86,12 @@ export function PartyListCard({
           ) : null}
         </div>
 
-        <div className="min-w-0 flex-1">
+        <div
+          className={cn(
+            "min-w-0 flex-1",
+            hasDescription ? undefined : "flex min-h-14 items-center",
+          )}
+        >
           <Link
             data-party-card-interactive=""
             href={{
@@ -101,7 +112,7 @@ export function PartyListCard({
             </span>
           </Link>
 
-          {description ? (
+          {hasDescription ? (
             <p className="mt-1 text-sm leading-6 text-accent-700 dark:text-accent-300">
               {description}
             </p>
@@ -111,7 +122,10 @@ export function PartyListCard({
         {renderMenu ? (
           <div
             data-party-card-interactive=""
-            className="pointer-events-auto pt-0.5"
+            className={cn(
+              "pointer-events-auto",
+              hasDescription ? "pt-0.5" : undefined,
+            )}
           >
             {renderMenu(party)}
           </div>
