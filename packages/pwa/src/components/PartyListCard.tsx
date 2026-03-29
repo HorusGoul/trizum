@@ -5,14 +5,13 @@ import { Link } from "react-aria-components";
 import type { ReactNode } from "react";
 import type { Party } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import { IconWithFallback, type IconProps } from "#src/ui/Icon.js";
+import { IconWithFallback } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 
 interface PartyListCardProps {
   partyId: AnyDocumentId;
   isArchived?: boolean;
   isPinned?: boolean;
-  lastUsedAt?: number | null;
   renderMenu?: (party: Party) => ReactNode;
 }
 
@@ -20,7 +19,6 @@ export function PartyListCard({
   partyId,
   isArchived = false,
   isPinned = false,
-  lastUsedAt = null,
   renderMenu,
 }: PartyListCardProps) {
   const navigate = useNavigate();
@@ -30,17 +28,9 @@ export function PartyListCard({
     return null;
   }
 
-  const activeParticipants = Object.values(party.participants).filter(
-    (participant) => !participant.isArchived,
-  );
-  const participantCount = activeParticipants.length;
   const symbolOrFirstLetter =
     party.symbol || party.name.charAt(0).toUpperCase();
   const description = party.description.trim();
-  const formattedLastUsedAt =
-    lastUsedAt && Number.isFinite(lastUsedAt)
-      ? formatLastUsedAt(lastUsedAt)
-      : null;
   const partyRouteParams = {
     partyId: party.id,
   };
@@ -79,7 +69,7 @@ export function PartyListCard({
       />
 
       <div className="pointer-events-none relative flex items-start gap-4 p-4">
-        <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-accent-100 dark:text-accent-950 dark:shadow-none">
+        <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-black/35 dark:text-accent-50 dark:shadow-none">
           <span className="pt-0.5">{symbolOrFirstLetter}</span>
 
           {statusBadge ? (
@@ -116,23 +106,6 @@ export function PartyListCard({
               {description}
             </p>
           ) : null}
-
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-accent-700 dark:text-accent-300">
-            <PartyMetaChip>
-              {participantCount}{" "}
-              {participantCount === 1 ? (
-                <Trans>participant</Trans>
-              ) : (
-                <Trans>participants</Trans>
-              )}
-            </PartyMetaChip>
-
-            {formattedLastUsedAt ? (
-              <PartyMetaChip icon="#lucide/history">
-                <Trans>Last used</Trans> {formattedLastUsedAt}
-              </PartyMetaChip>
-            ) : null}
-          </div>
         </div>
 
         {renderMenu ? (
@@ -146,31 +119,4 @@ export function PartyListCard({
       </div>
     </div>
   );
-}
-
-function PartyMetaChip({
-  children,
-  icon,
-}: {
-  children: ReactNode;
-  icon?: IconProps["name"];
-}) {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-700 dark:bg-accent-800 dark:text-accent-200">
-      {icon ? <IconWithFallback name={icon} size={12} /> : null}
-      <span>{children}</span>
-    </span>
-  );
-}
-
-function formatLastUsedAt(lastUsedAt: number) {
-  const date = new Date(lastUsedAt);
-  const now = new Date();
-  const includeYear = date.getFullYear() !== now.getFullYear();
-
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    ...(includeYear ? { year: "numeric" } : {}),
-  }).format(date);
 }

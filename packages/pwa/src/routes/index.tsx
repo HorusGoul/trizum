@@ -185,12 +185,6 @@ function Index() {
 
           {activeCount > 0 ? (
             <section className="flex flex-col gap-3">
-              <div className="px-2">
-                <h2 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-accent-600 dark:text-accent-300">
-                  <Trans>Your parties</Trans>
-                </h2>
-              </div>
-
               {activePartyIds.map((partyId) => {
                 const pinned = isPartyPinned(partyList, partyId);
 
@@ -199,7 +193,6 @@ function Index() {
                     key={partyId}
                     partyId={partyId}
                     isPinned={pinned}
-                    lastUsedAt={partyList.lastUsedAt?.[partyId] ?? null}
                     renderMenu={(party) => (
                       <MenuTrigger>
                         <IconButton

@@ -88,7 +88,6 @@ test.describe("Home party management", () => {
 
       const partyCards = page.locator('[data-testid="party-list-card"]');
 
-      await expect(page.getByText("Your parties")).toBeVisible();
       await expect(partyCards).toHaveCount(2);
       await expect(partyCards.nth(0)).toContainText("Pinned dinner club");
       await expect(partyCards.nth(1)).toContainText("Recent ski trip");
