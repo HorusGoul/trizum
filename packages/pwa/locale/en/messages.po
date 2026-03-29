@@ -93,7 +93,7 @@ msgstr "Add or create"
 msgid "Add participant"
 msgstr "Add participant"
 
-#: src/routes/index.tsx:557
+#: src/routes/index.tsx:553
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Add your name so others know who you are and how to pay you"
 
@@ -465,11 +465,11 @@ msgstr "Comorian Franc"
 msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
 msgstr "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
 
-#: src/routes/index.tsx:554
+#: src/routes/index.tsx:550
 msgid "Complete your profile"
 msgstr "Complete your profile"
 
-#: src/routes/index.tsx:519
+#: src/routes/index.tsx:515
 msgid "Configure Profile"
 msgstr "Configure Profile"
 
@@ -498,7 +498,7 @@ msgid "Costa Rican Colón"
 msgstr "Costa Rican Colón"
 
 #: src/routes/index.tsx:295
-#: src/routes/index.tsx:420
+#: src/routes/index.tsx:416
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -630,7 +630,7 @@ msgstr "End date"
 msgid "English"
 msgstr "English"
 
-#: src/routes/index.tsx:456
+#: src/routes/index.tsx:452
 msgid "Enter a party link or code to join"
 msgstr "Enter a party link or code to join"
 
@@ -674,7 +674,7 @@ msgstr "European Unit of Account 17"
 msgid "European Unit of Account 9"
 msgstr "European Unit of Account 9"
 
-#: src/routes/index.tsx:347
+#: src/routes/index.tsx:346
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
 msgstr "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
 
@@ -911,7 +911,7 @@ msgstr "Impact on my balance: <0/>"
 msgid "Import attachments"
 msgstr "Import attachments"
 
-#: src/routes/index.tsx:489
+#: src/routes/index.tsx:485
 msgid "Import your existing Tricount data"
 msgstr "Import your existing Tricount data"
 
@@ -995,7 +995,7 @@ msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
 #: src/routes/index.tsx:285
-#: src/routes/index.tsx:453
+#: src/routes/index.tsx:449
 msgid "Join a Party"
 msgstr "Join a Party"
 
@@ -1039,7 +1039,7 @@ msgstr "Language"
 msgid "Laotian Kip"
 msgstr "Laotian Kip"
 
-#: src/components/PartyListCard.tsx:135
+#: src/components/PartyListCard.tsx:132
 msgid "Last used"
 msgstr "Last used"
 
@@ -1156,7 +1156,7 @@ msgid "Mexican Peso"
 msgstr "Mexican Peso"
 
 #: src/routes/index.tsx:305
-#: src/routes/index.tsx:486
+#: src/routes/index.tsx:482
 #: src/routes/migrate_.tricount.tsx:161
 msgid "Migrate from Tricount"
 msgstr "Migrate from Tricount"
@@ -1268,7 +1268,7 @@ msgstr "Nicaraguan Córdoba"
 msgid "Nigerian Naira"
 msgstr "Nigerian Naira"
 
-#: src/routes/index.tsx:344
+#: src/routes/index.tsx:343
 msgid "No active parties right now"
 msgstr "No active parties right now"
 
@@ -1349,7 +1349,7 @@ msgstr "Omani Rial"
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
-#: src/routes/index.tsx:372
+#: src/routes/index.tsx:369
 msgid "Open archived parties"
 msgstr "Open archived parties"
 
@@ -1428,7 +1428,7 @@ msgstr "Papua New Guinean Kina"
 msgid "Paraguayan Guarani"
 msgstr "Paraguayan Guarani"
 
-#: src/components/PartyListCard.tsx:127
+#: src/components/PartyListCard.tsx:124
 msgid "participant"
 msgstr "participant"
 
@@ -1438,7 +1438,7 @@ msgstr "participant"
 msgid "Participant name"
 msgstr "Participant name"
 
-#: src/components/PartyListCard.tsx:129
+#: src/components/PartyListCard.tsx:126
 #: src/components/PartyStatsView.tsx:350
 msgid "participants"
 msgstr "participants"
@@ -1730,7 +1730,7 @@ msgstr "Send us an email and we'll get back to you as soon as possible."
 msgid "Serbian Dinar"
 msgstr "Serbian Dinar"
 
-#: src/routes/index.tsx:522
+#: src/routes/index.tsx:518
 msgid "Set up your username, avatar, and preferences"
 msgstr "Set up your username, avatar, and preferences"
 
@@ -1822,7 +1822,7 @@ msgstr "South Sudanese Pound"
 msgid "Special Drawing Rights"
 msgstr "Special Drawing Rights"
 
-#: src/routes/index.tsx:387
+#: src/routes/index.tsx:383
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 
@@ -1843,7 +1843,7 @@ msgstr "Sri Lankan Rupee"
 msgid "Start date"
 msgstr "Start date"
 
-#: src/routes/index.tsx:423
+#: src/routes/index.tsx:419
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
@@ -2233,7 +2233,7 @@ msgstr "Warning: Split amounts don't match total expense"
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
-#: src/routes/index.tsx:384
+#: src/routes/index.tsx:380
 msgid "Welcome to trizum"
 msgstr "Welcome to trizum"
 
