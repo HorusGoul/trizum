@@ -158,7 +158,7 @@ msgstr "Archive participants who left to keep balances clean."
 msgid "Archive party"
 msgstr "Archive party"
 
-#: src/components/PartyListCard.tsx:40
+#: src/components/PartyListCard.tsx:41
 msgid "Archived"
 msgstr "Archived"
 
@@ -1550,7 +1550,7 @@ msgstr "Phone number must be less than 20 characters"
 msgid "Pin party"
 msgstr "Pin party"
 
-#: src/components/PartyListCard.tsx:45
+#: src/components/PartyListCard.tsx:46
 msgid "Pinned"
 msgstr "Pinned"
 
