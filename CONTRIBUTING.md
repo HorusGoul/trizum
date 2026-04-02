@@ -223,7 +223,7 @@ Follow the prompts to describe your changes. This creates a file in `.changeset/
 
 ### PR Guidelines
 
-- **Title:** Clear, descriptive summary of changes
+- **Title:** Use Conventional Commit format, for example `fix(pwa): prevent duplicate expense rows`
 - **Description:** Explain what and why, not just how
 - **Size:** Keep PRs focused and reasonably sized — smaller PRs get reviewed faster!
 - **Screenshots:** Include for UI changes
