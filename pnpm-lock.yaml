@@ -334,6 +334,9 @@ importers:
       react-dom:
         specifier: 0.0.0-experimental-d025ddd3-20240722
         version: 0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722)
+      react-modal-sheet:
+        specifier: 5.6.0
+        version: 5.6.0(motion@12.38.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722))(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       sonner:
         specifier: 2.0.7
         version: 2.0.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
@@ -7976,10 +7979,26 @@ packages:
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
 
+  react-modal-sheet@5.6.0:
+    resolution: {integrity: sha512-+WE2nVPdB/Jx0QbndIBqGvy6k0IXriW2lFaPeZSW1xOVri6rWhAwrSnArtsR1rxOxW8HBdAYeIPUcbjMvNeeyw==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      motion: '>=11'
+      react: 0.0.0-experimental-d025ddd3-20240722
+
   react-stately@3.40.0:
     resolution: {integrity: sha512-Icg2q1pxTskx2dph3cFUu9RUQcInq25WZfUcKroX1Kl4jWxBobnfMvuxvJHHkysJh77IsnLmhF3+8If5oCoMFQ==}
     peerDependencies:
       react: 0.0.0-experimental-d025ddd3-20240722
+
+  react-use-measure@2.1.7:
+    resolution: {integrity: sha512-KrvcAo13I/60HpwGO5jpW7E9DfusKyLPLvuHlUyP5zqnmAPhNc6qTRjUQrdTADl0lpPpDVU2/Gg51UlOGHXbdg==}
+    peerDependencies:
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-dom: 0.0.0-experimental-d025ddd3-20240722
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
 
   react@0.0.0-experimental-d025ddd3-20240722:
     resolution: {integrity: sha512-lUNY9nGBD6q29c+4a3owiEbQo8v/XMGwcbqLrtF9Z6meGKMpVyq+PfRsJwl94x7r+E75MpP0Eo4v4TfhUY8w5w==}
@@ -18058,6 +18077,14 @@ snapshots:
 
   react-is@18.3.1: {}
 
+  react-modal-sheet@5.6.0(motion@12.38.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722))(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722):
+    dependencies:
+      motion: 12.38.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      react: 0.0.0-experimental-d025ddd3-20240722
+      react-use-measure: 2.1.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+    transitivePeerDependencies:
+      - react-dom
+
   react-stately@3.40.0(react@0.0.0-experimental-d025ddd3-20240722):
     dependencies:
       '@react-stately/calendar': 3.8.3(react@0.0.0-experimental-d025ddd3-20240722)
@@ -18087,6 +18114,12 @@ snapshots:
       '@react-stately/tree': 3.9.1(react@0.0.0-experimental-d025ddd3-20240722)
       '@react-types/shared': 3.31.0(react@0.0.0-experimental-d025ddd3-20240722)
       react: 0.0.0-experimental-d025ddd3-20240722
+
+  react-use-measure@2.1.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722):
+    dependencies:
+      react: 0.0.0-experimental-d025ddd3-20240722
+    optionalDependencies:
+      react-dom: 0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722)
 
   react@0.0.0-experimental-d025ddd3-20240722: {}
 

@@ -70,10 +70,7 @@ test.describe("Home party management", () => {
             "Pinned dinner club",
             "A standing monthly tab.",
           ),
-          createNamedPartyFixture(
-            "Recent ski trip",
-            "",
-          ),
+          createNamedPartyFixture("Recent ski trip", ""),
           createNamedPartyFixture(
             "Archived picnic",
             "Done and dusted, but still worth keeping.",
@@ -110,6 +107,31 @@ test.describe("Home party management", () => {
       await expect(homePage.partyLink(/Recent ski trip/)).toBeVisible();
     });
 
+    await test.step("show the desktop action button only while the card is hovered", async () => {
+      const recentPartyCard = page
+        .locator('[data-testid="party-list-card"]')
+        .nth(1);
+      const recentPartyActionButton = recentPartyCard.getByRole("button", {
+        name: "Party actions",
+      });
+
+      await page.mouse.move(0, 0);
+      await expect(recentPartyActionButton).toHaveCount(0);
+
+      await recentPartyCard.hover();
+
+      await expect(recentPartyActionButton).toBeVisible();
+
+      await recentPartyActionButton.click();
+
+      await expect(recentPartyActionButton).toBeVisible();
+      await expect(
+        page.getByRole("menuitem", { name: "Archive party" }),
+      ).toBeVisible();
+
+      await page.keyboard.press("Escape");
+    });
+
     await test.step("list archived parties on the archived screen", async () => {
       await homePage.openArchivedParties();
 
@@ -141,6 +163,104 @@ test.describe("Home party management", () => {
       await expect(partyCards).toHaveCount(3);
       await expect(partyCards.nth(0)).toContainText("Pinned dinner club");
     });
+  });
+
+  test("opens home party actions from a mobile long press", async ({
+    harness,
+    page,
+  }) => {
+    await harness.seedPartyList({});
+
+    await page.evaluate(
+      async ({ fixture, memberParticipantId }) => {
+        const internalWindow = window as Window & {
+          __internal_createPartyFromMigrationData: (
+            data: unknown,
+          ) => Promise<string>;
+          __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
+        };
+        const partyId =
+          await internalWindow.__internal_createPartyFromMigrationData(fixture);
+
+        await internalWindow.__internal_seedPartyListState({
+          username: "Harness User",
+          phone: "",
+          parties: {
+            [partyId]: true,
+          },
+          participantInParties: {
+            [partyId]: memberParticipantId,
+          },
+        });
+      },
+      {
+        fixture: createNamedPartyFixture(
+          "Camping weekend",
+          "Shared meals and supplies.",
+        ),
+        memberParticipantId: defaultParticipants.blair.id,
+      },
+    );
+
+    await harness.navigate("/");
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await expect(
+      page.getByRole("button", { name: "Party actions" }),
+    ).toHaveCount(0);
+
+    const partyCard = page.locator('[data-testid="party-list-card"]').first();
+    const box = await partyCard.boundingBox();
+
+    expect(box).not.toBeNull();
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.waitForTimeout(650);
+    await page.mouse.up();
+
+    await expect(
+      page.getByRole("heading", { name: "Camping weekend" }),
+    ).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Camping weekend" })).toContainText(
+      "Archive party",
+    );
+
+    const dragHandle = page.locator("[data-modal-sheet-drag-handle]").first();
+    const dragHandleBox = await dragHandle.boundingBox();
+
+    expect(dragHandleBox).not.toBeNull();
+
+    await page.mouse.move(
+      dragHandleBox!.x + dragHandleBox!.width / 2,
+      dragHandleBox!.y + dragHandleBox!.height / 2,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      dragHandleBox!.x + dragHandleBox!.width / 2,
+      dragHandleBox!.y + dragHandleBox!.height + 180,
+      { steps: 12 },
+    );
+    await page.mouse.up();
+
+    await expect(
+      page.getByRole("heading", { name: "Camping weekend" }),
+    ).toHaveCount(0);
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.down();
+    await page.waitForTimeout(650);
+    await page.mouse.up();
+
+    await expect(
+      page.getByRole("heading", { name: "Camping weekend" }),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Archive party" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "No active parties right now" }),
+    ).toBeVisible();
   });
 });
 

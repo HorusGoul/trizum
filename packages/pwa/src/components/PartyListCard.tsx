@@ -6,6 +6,7 @@ import {
   useFocusRing,
   useFocusWithin,
   useHover,
+  useLongPress,
   usePress,
 } from "react-aria";
 import { Link } from "react-aria-components";
@@ -20,7 +21,15 @@ interface PartyListCardProps {
   isArchived?: boolean;
   isPinned?: boolean;
   currentParticipantId?: PartyParticipant["id"] | null;
-  renderMenu?: (party: Party) => ReactNode;
+  renderMenu?: (
+    party: Party,
+    state: {
+      isHovered: boolean;
+      isFocusWithin: boolean;
+    },
+  ) => ReactNode;
+  onLongPress?: (party: Party) => void;
+  longPressAccessibilityDescription?: string;
 }
 
 export function PartyListCard({
@@ -29,6 +38,8 @@ export function PartyListCard({
   isPinned = false,
   currentParticipantId = null,
   renderMenu,
+  onLongPress,
+  longPressAccessibilityDescription,
 }: PartyListCardProps) {
   const navigate = useNavigate();
   const [party, handle] = useSuspenseDocument<Party>(partyId);
@@ -55,6 +66,17 @@ export function PartyListCard({
           tab: "expenses",
         },
       });
+    },
+  });
+  const { longPressProps } = useLongPress({
+    isDisabled: !onLongPress,
+    accessibilityDescription: longPressAccessibilityDescription,
+    onLongPress: () => {
+      if (!party || !onLongPress) {
+        return;
+      }
+
+      onLongPress(party);
     },
   });
 
@@ -100,7 +122,7 @@ export function PartyListCard({
       <div
         data-party-card-surface=""
         aria-hidden="true"
-        {...pressProps}
+        {...mergeProps(pressProps, longPressProps)}
         className="absolute inset-0 rounded-xl"
       />
 
@@ -185,7 +207,10 @@ export function PartyListCard({
               hasDescription ? "pt-0.5" : undefined,
             )}
           >
-            {renderMenu(party)}
+            {renderMenu(party, {
+              isHovered,
+              isFocusWithin,
+            })}
           </div>
         ) : null}
       </div>
