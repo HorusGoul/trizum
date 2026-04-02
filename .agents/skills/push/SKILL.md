@@ -41,7 +41,8 @@ description:
    - If no PR exists, create one.
    - If a PR exists and is open, update it.
    - If branch is tied to a closed/merged PR, create a new branch + PR.
-   - Write a proper PR title that clearly describes the change outcome
+   - Write the PR title in Conventional Commit format and make sure it clearly
+     describes the change outcome
    - For branch updates, explicitly reconsider whether current PR title still
      matches the latest scope; update it if it no longer does.
 6. Write/update PR body explicitly using `.github/pull_request_template.md`:
@@ -84,8 +85,8 @@ if [ "$pr_state" = "MERGED" ] || [ "$pr_state" = "CLOSED" ]; then
   exit 1
 fi
 
-# Write a clear, human-friendly title that summarizes the shipped change.
-pr_title="<clear PR title written for this change>"
+# Write a Conventional Commit style title that summarizes the shipped change.
+pr_title="<type>(<scope>): <clear change summary>"
 if [ -z "$pr_state" ]; then
   gh pr create --title "$pr_title"
 else

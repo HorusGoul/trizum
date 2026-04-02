@@ -90,6 +90,8 @@ Use `type/description` naming:
 - Do not push directly to `main`.
 - Do not force-push with `git push --force`.
 - Do not delete branches without asking.
+- Use Conventional Commit format for pull request titles, such as
+  `refactor(pwa): migrate animations to motion`.
 - Do not merge PRs; humans review and merge.
 
 ## Skills
