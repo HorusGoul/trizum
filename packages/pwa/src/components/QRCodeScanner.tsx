@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { BarcodeDetector } from "#src/lib/qr.js";
 import { getLogger } from "#src/lib/log.ts";
 import { TrizumSpinner } from "./TrizumSpinner.js";

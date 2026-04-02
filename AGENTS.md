@@ -43,8 +43,13 @@ Canonical examples:
 
 ### Branching
 
-1. Ask which branch to work from before starting code changes.
-2. Create a new branch. Never work directly on `main` or another base branch.
+1. If the user does not specify a base branch, pick a sensible default yourself
+   (usually the current `main` or remote default branch) and mention that
+   assumption in your progress update.
+2. Create a new branch before editing. Never work directly on `main` or another
+   base branch.
+3. Only stop to ask about the base branch when the correct starting point is
+   ambiguous or risky.
 
 Use `type/description` naming:
 
