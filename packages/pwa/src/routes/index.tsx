@@ -193,6 +193,9 @@ function Index() {
                     key={partyId}
                     partyId={partyId}
                     isPinned={pinned}
+                    currentParticipantId={
+                      partyList.participantInParties[partyId] ?? null
+                    }
                     renderMenu={(party) => (
                       <MenuTrigger>
                         <IconButton

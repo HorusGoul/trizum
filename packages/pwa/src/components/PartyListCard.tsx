@@ -3,7 +3,7 @@ import type { AnyDocumentId } from "@automerge/automerge-repo/slim";
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "react-aria-components";
 import type { ReactNode } from "react";
-import type { Party } from "#src/models/party.js";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
@@ -12,6 +12,7 @@ interface PartyListCardProps {
   partyId: AnyDocumentId;
   isArchived?: boolean;
   isPinned?: boolean;
+  currentParticipantId?: PartyParticipant["id"] | null;
   renderMenu?: (party: Party) => ReactNode;
 }
 
@@ -19,6 +20,7 @@ export function PartyListCard({
   partyId,
   isArchived = false,
   isPinned = false,
+  currentParticipantId = null,
   renderMenu,
 }: PartyListCardProps) {
   const navigate = useNavigate();
@@ -31,7 +33,12 @@ export function PartyListCard({
   const symbolOrFirstLetter =
     party.symbol || party.name.charAt(0).toUpperCase();
   const description = party.description.trim();
+  const participantPreview = getParticipantPreview(
+    party,
+    currentParticipantId,
+  );
   const hasDescription = description.length > 0;
+  const hasSupportingCopy = hasDescription || participantPreview !== null;
   const partyRouteParams = {
     partyId: party.id,
   };
@@ -72,7 +79,7 @@ export function PartyListCard({
       <div
         className={cn(
           "pointer-events-none relative flex gap-4 p-4",
-          hasDescription ? "items-start" : "items-center",
+          hasSupportingCopy ? "items-start" : "items-center",
         )}
       >
         <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-black/35 dark:text-accent-50 dark:shadow-none">
@@ -89,7 +96,7 @@ export function PartyListCard({
         <div
           className={cn(
             "min-w-0 flex-1",
-            hasDescription ? undefined : "flex min-h-14 items-center",
+            hasSupportingCopy ? undefined : "flex min-h-14 items-center",
           )}
         >
           <Link
@@ -117,6 +124,12 @@ export function PartyListCard({
               {description}
             </p>
           ) : null}
+
+          {!hasDescription && participantPreview ? (
+            <p className="mt-1 text-sm leading-6 text-accent-600 dark:text-accent-400">
+              {participantPreview}
+            </p>
+          ) : null}
         </div>
 
         {renderMenu ? (
@@ -133,4 +146,32 @@ export function PartyListCard({
       </div>
     </div>
   );
+}
+
+function getParticipantPreview(
+  party: Party,
+  currentParticipantId: PartyParticipant["id"] | null,
+) {
+  const visibleParticipantNames = Object.values(party.participants)
+    .filter(
+      (participant) =>
+        !participant.isArchived &&
+        participant.id !== currentParticipantId &&
+        participant.name.trim() !== "",
+    )
+    .map((participant) => participant.name.trim());
+
+  if (visibleParticipantNames.length === 0) {
+    return null;
+  }
+
+  const previewNames = visibleParticipantNames.slice(0, 3);
+  const remainingCount = visibleParticipantNames.length - previewNames.length;
+
+  return [
+    ...previewNames,
+    remainingCount > 0 ? `+${remainingCount}` : null,
+  ]
+    .filter((value) => value !== null)
+    .join(" · ");
 }

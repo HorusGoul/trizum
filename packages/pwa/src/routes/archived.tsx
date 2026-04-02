@@ -41,6 +41,9 @@ function ArchivedParties() {
                 key={partyId}
                 partyId={partyId}
                 isArchived={true}
+                currentParticipantId={
+                  partyList.participantInParties[partyId] ?? null
+                }
                 renderMenu={(party) => (
                   <MenuTrigger>
                     <IconButton
