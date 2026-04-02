@@ -46,7 +46,6 @@ Keep only:
 
 - repo purpose and major package layout,
 - repo-wide workflow rules,
-- defaults for choosing a base branch and creating a working branch,
 - the short list of canonical deeper entry points,
 - stable guardrails that apply across most work.
 
