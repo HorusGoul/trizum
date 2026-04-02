@@ -7,6 +7,7 @@ import {
   Disclosure,
   DisclosurePanel,
 } from "react-aria-components";
+import { TrizumSpinner } from "./TrizumSpinner.js";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { cn } from "#src/ui/utils.ts";
@@ -29,7 +30,7 @@ const troubleshootingReasons = [
 
 /**
  * Thresholds for different states:
- * - showTroubleshooting: 8 seconds (show troubleshooting info)
+ * - showTroubleshooting: 10 seconds (show troubleshooting info)
  */
 const SHOW_TROUBLESHOOTING_DELAY = 10000;
 const TIP_ROTATION_INTERVAL = 5000;
@@ -72,24 +73,10 @@ export function PartyPendingComponent() {
     <div className="flex min-h-full flex-col items-center px-6 pt-safe-offset-24">
       {/* Animated Logo - swing rotation */}
       <div className="relative mb-8">
-        <svg
-          width="80"
-          height="80"
-          viewBox="0 0 512 512"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <TrizumSpinner
+          size={80}
           className="text-accent-600 dark:text-accent-400"
-          style={{
-            animation: "swing-rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-          }}
-        >
-          <path
-            d="M138.738 197.734H356.862C356.862 197.734 397.947 197.734 397.947 166.36C397.947 134.986 356.862 134.986 356.862 134.986C335.199 134.986 311.295 134.986 301.584 161.878M273.945 232.843C273.945 232.843 238.089 317.254 199.245 357.592C185.578 371.785 174.594 377.014 154.425 377.014C134.256 377.014 113.388 366.556 114.087 344.893C114.786 323.23 138.738 323.23 138.738 323.23H176.835M273.945 323.23H356.862"
-            stroke="currentColor"
-            strokeWidth="17.928"
-            strokeLinecap="round"
-          />
-        </svg>
+        />
       </div>
 
       {/* Main title */}
