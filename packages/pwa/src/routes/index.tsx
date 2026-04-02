@@ -1,24 +1,23 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import type { Party } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
+import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import {
+  getOrderedPartySections,
+  isPartyPinned,
+} from "#src/lib/partyListOrdering.ts";
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import {
-  isValidDocumentId,
-  type AnyDocumentId,
-} from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
+import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
+import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 
 let hasRedirectedThisSession = false;
@@ -51,7 +50,8 @@ export const Route = createFileRoute("/")({
       openLastPartyOnLaunch &&
       lastOpenedPartyId &&
       isValidDocumentId(lastOpenedPartyId) &&
-      parties[lastOpenedPartyId]
+      parties[lastOpenedPartyId] &&
+      partyList.archivedParties?.[lastOpenedPartyId] !== true
     ) {
       hasRedirectedThisSession = true;
       throw redirect({
@@ -65,12 +65,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const parties = usePartyItemRefs();
-  const { partyList } = usePartyList();
+  const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
+  const { activePartyIds, activeCount, archivedCount } =
+    usePartySections(partyList);
   const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const showList = parties.length > 0;
+  const showPartyHub = activeCount > 0 || archivedCount > 0;
   const needsProfileSetup =
     !partyList.username || partyList.username.trim() === "";
 
@@ -88,7 +89,7 @@ function Index() {
 
         <div className="flex-1" />
 
-        {isUpdateAvailable && (
+        {isUpdateAvailable ? (
           <IconButton
             icon={
               isUpdating ? "#lucide/refresh-cw" : "#lucide/circle-arrow-down"
@@ -105,7 +106,7 @@ function Index() {
             )}
             isDisabled={isUpdating}
           />
-        )}
+        ) : null}
 
         <MenuTrigger>
           <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
@@ -124,6 +125,21 @@ function Index() {
                 />
                 <span className="h-3.5 leading-none">
                   <Trans>Settings</Trans>
+                </span>
+              </MenuItem>
+
+              <MenuItem
+                href={{
+                  to: "/archived",
+                }}
+              >
+                <IconWithFallback
+                  name="#lucide/folder-archive"
+                  size={20}
+                  className="mr-3"
+                />
+                <span className="h-3.5 leading-none">
+                  <Trans>Archived parties</Trans>
                 </span>
               </MenuItem>
 
@@ -163,13 +179,84 @@ function Index() {
 
       <div className="h-2" />
 
-      {showList ? (
+      {showPartyHub ? (
         <div className="container flex flex-1 flex-col gap-4 px-2">
-          {needsProfileSetup && <ProfileSetupCard />}
+          {needsProfileSetup ? <ProfileSetupCard /> : null}
 
-          {parties.map((partyId) => (
-            <PartyItem key={partyId} partyId={partyId} />
-          ))}
+          {activeCount > 0 ? (
+            <section className="flex flex-col gap-3">
+              {activePartyIds.map((partyId) => {
+                const pinned = isPartyPinned(partyList, partyId);
+
+                return (
+                  <PartyListCard
+                    key={partyId}
+                    partyId={partyId}
+                    isPinned={pinned}
+                    currentParticipantId={
+                      partyList.participantInParties[partyId] ?? null
+                    }
+                    renderMenu={(party) => (
+                      <MenuTrigger>
+                        <IconButton
+                          icon="#lucide/ellipsis-vertical"
+                          aria-label={t`Party actions`}
+                          color="transparent"
+                          className="h-10 w-10 flex-shrink-0"
+                        />
+
+                        <Popover placement="bottom end">
+                          <Menu className="min-w-60">
+                            <MenuItem
+                              onAction={() => {
+                                setPartyPinned(party.id, !pinned);
+                                toast.success(
+                                  pinned ? t`Party unpinned` : t`Party pinned`,
+                                );
+                              }}
+                            >
+                              <IconWithFallback
+                                name={
+                                  pinned ? "#lucide/pin-off" : "#lucide/pin"
+                                }
+                                size={20}
+                                className="mr-3"
+                              />
+                              <span className="h-3.5 leading-none">
+                                {pinned ? (
+                                  <Trans>Unpin party</Trans>
+                                ) : (
+                                  <Trans>Pin party</Trans>
+                                )}
+                              </span>
+                            </MenuItem>
+
+                            <MenuItem
+                              onAction={() => {
+                                setPartyArchived(party.id, true);
+                                toast.success(t`Party archived`);
+                              }}
+                            >
+                              <IconWithFallback
+                                name="#lucide/archive"
+                                size={20}
+                                className="mr-3"
+                              />
+                              <span className="h-3.5 leading-none">
+                                <Trans>Archive party</Trans>
+                              </span>
+                            </MenuItem>
+                          </Menu>
+                        </Popover>
+                      </MenuTrigger>
+                    )}
+                  />
+                );
+              })}
+            </section>
+          ) : (
+            <NoActivePartiesCard />
+          )}
 
           <div className="flex-1 pb-safe-offset-12" />
 
@@ -226,73 +313,58 @@ function Index() {
   );
 }
 
-function usePartyItemRefs() {
+function usePartySections(partyList: PartyList) {
   const repo = useRepo();
-  const { partyList } = usePartyList();
-  const refs = Object.keys(partyList.parties).filter(isValidDocumentId);
+  const sections = getOrderedPartySections(partyList);
 
-  for (const partyId of refs) {
+  for (const partyId of [
+    ...sections.activePartyIds,
+    ...sections.archivedPartyIds,
+  ]) {
     documentCache.prefetch(repo, partyId);
   }
 
-  return refs;
+  return sections;
 }
 
-function PartyItem({ partyId }: { partyId: AnyDocumentId }) {
-  const [party, handle] = useSuspenseDocument<Party>(partyId);
-
-  if (!party || !handle) {
-    return null;
-  }
-
-  const activeParticipants = Object.values(party.participants).filter(
-    (participant) => !participant.isArchived,
-  );
-  const participantCount = activeParticipants.length;
-  const symbolOrFirstLetter =
-    party.symbol || party.name.charAt(0).toUpperCase();
-
+function NoActivePartiesCard() {
   return (
-    <Link
-      href={{
-        to: `/party/$partyId`,
-        params: {
-          partyId: party.id,
-        },
-      }}
-      className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
-        cn(
+    <section className="flex flex-col items-center justify-center gap-5 px-4 py-12 text-center">
+      <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
+        <IconWithFallback name="#lucide/folder-archive" size={22} />
+      </div>
+
+      <div className="max-w-md">
+        <h2 className="text-xl font-semibold text-accent-950 dark:text-accent-50">
+          <Trans>No active parties right now</Trans>
+        </h2>
+        <p className="mt-2 text-sm text-accent-700 dark:text-accent-300">
+          <Trans>
+            Everything is archived for now. You can reopen any party from the
+            archived screen whenever you need it.
+          </Trans>
+        </p>
+      </div>
+
+      <Link
+        href={{ to: "/archived" }}
+        className={({
+          isPressed,
+          isFocusVisible,
+          isHovered,
           defaultClassName,
-          "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
-          (isHovered || isFocusVisible) &&
-            "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
-          isPressed &&
-            "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
-        )
-      }
-    >
-      <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-sm font-semibold text-white">
-        <span className="pt-0.5">{symbolOrFirstLetter}</span>
-      </div>
-      <div className="flex flex-1 flex-col gap-0.5">
-        <span className="text-lg font-semibold leading-tight text-accent-950 dark:text-accent-50">
-          {party.name}
-        </span>
-        <span className="text-xs font-medium uppercase tracking-wide text-accent-500 dark:text-accent-500">
-          {participantCount}{" "}
-          {participantCount === 1 ? (
-            <Trans>participant</Trans>
-          ) : (
-            <Trans>participants</Trans>
-          )}
-        </span>
-        {party.description && (
-          <span className="text-sm text-accent-600 dark:text-accent-400">
-            {party.description}
-          </span>
-        )}
-      </div>
-    </Link>
+        }) =>
+          cn(
+            defaultClassName,
+            "inline-flex items-center justify-center rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-accent-50 outline-none transition-all duration-200 ease-in-out dark:bg-accent-500",
+            (isHovered || isFocusVisible) && "bg-accent-600 dark:bg-accent-400",
+            isPressed && "scale-95 bg-accent-700 dark:bg-accent-300",
+          )
+        }
+      >
+        <Trans>Open archived parties</Trans>
+      </Link>
+    </section>
   );
 }
 

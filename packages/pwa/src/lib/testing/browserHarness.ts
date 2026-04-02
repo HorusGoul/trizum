@@ -12,6 +12,9 @@ export interface InternalPartyListSeed {
   hue?: number;
   lastOpenedPartyId?: DocumentId | null;
   parties?: PartyList["parties"];
+  pinnedParties?: NonNullable<PartyList["pinnedParties"]>;
+  archivedParties?: NonNullable<PartyList["archivedParties"]>;
+  lastUsedAt?: NonNullable<PartyList["lastUsedAt"]>;
   participantInParties?: PartyList["participantInParties"];
 }
 
@@ -23,6 +26,9 @@ export interface InternalPartyListSnapshot {
   partyListId: DocumentId;
   lastOpenedPartyId: DocumentId | null;
   parties: PartyList["parties"];
+  pinnedParties: NonNullable<PartyList["pinnedParties"]>;
+  archivedParties: NonNullable<PartyList["archivedParties"]>;
+  lastUsedAt: NonNullable<PartyList["lastUsedAt"]>;
   participantInParties: PartyList["participantInParties"];
 }
 
@@ -40,6 +46,9 @@ export async function seedPartyListState({
     partyList.username = seed.username ?? "";
     partyList.phone = seed.phone ?? "";
     partyList.parties = seed.parties ?? {};
+    partyList.pinnedParties = seed.pinnedParties ?? {};
+    partyList.archivedParties = seed.archivedParties ?? {};
+    partyList.lastUsedAt = seed.lastUsedAt ?? {};
     partyList.participantInParties = seed.participantInParties ?? {};
 
     if (seed.avatarId === undefined) {
@@ -96,6 +105,9 @@ export async function readPartyListState({
     partyListId: partyListHandle.documentId,
     lastOpenedPartyId: partyList?.lastOpenedPartyId ?? null,
     parties: { ...(partyList?.parties ?? {}) },
+    pinnedParties: { ...(partyList?.pinnedParties ?? {}) },
+    archivedParties: { ...(partyList?.archivedParties ?? {}) },
+    lastUsedAt: { ...(partyList?.lastUsedAt ?? {}) },
     participantInParties: {
       ...(partyList?.participantInParties ?? {}),
     },

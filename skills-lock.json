@@ -26,6 +26,11 @@
       "sourceType": "github",
       "computedHash": "320eaf861e3a0a923bfaad0726cb311a3fe30093378f8d26c89b9c5ae5c42b35"
     },
+    "react-aria": {
+      "source": "react-aria.adobe.com",
+      "sourceType": "well-known",
+      "computedHash": "88f92384476cee8ab0a588b8e6fb7e759bbf952ccdcd5080522a27a12312ed9c"
+    },
     "swc-plugin-compatibility": {
       "source": "lingui/skills",
       "sourceType": "github",

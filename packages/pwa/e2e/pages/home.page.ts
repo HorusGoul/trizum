@@ -6,6 +6,8 @@ export class HomePage {
   readonly createPartyLink: Locator;
   readonly joinPartyLink: Locator;
   readonly migrateFromTricountLink: Locator;
+  readonly menuButton: Locator;
+  readonly archivedPartiesMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -20,6 +22,12 @@ export class HomePage {
     });
     this.migrateFromTricountLink = page.getByRole("link", {
       name: "Migrate from Tricount",
+    });
+    this.menuButton = page.getByRole("button", {
+      name: "Menu",
+    });
+    this.archivedPartiesMenuItem = page.getByRole("menuitem", {
+      name: "Archived parties",
     });
   }
 
@@ -40,6 +48,11 @@ export class HomePage {
 
   async openJoinParty() {
     await this.joinPartyLink.click();
+  }
+
+  async openArchivedParties() {
+    await this.menuButton.click();
+    await this.archivedPartiesMenuItem.click();
   }
 
   partyLink(name: string | RegExp) {

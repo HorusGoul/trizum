@@ -9,6 +9,9 @@ interface InternalHarnessWindow extends Window {
     partyListId: string;
     lastOpenedPartyId: string | null;
     parties: Record<string, true | undefined>;
+    pinnedParties: Record<string, true | undefined>;
+    archivedParties: Record<string, true | undefined>;
+    lastUsedAt: Record<string, number | undefined>;
     participantInParties: Record<string, string>;
   }>;
 }
@@ -19,6 +22,9 @@ interface PartyListSeed {
   openLastPartyOnLaunch?: boolean;
   lastOpenedPartyId?: string | null;
   parties?: Record<string, true>;
+  pinnedParties?: Record<string, true>;
+  archivedParties?: Record<string, true>;
+  lastUsedAt?: Record<string, number>;
   participantInParties?: Record<string, string>;
 }
 
@@ -37,6 +43,9 @@ interface PartyListSnapshot {
   partyListId: string;
   lastOpenedPartyId: string | null;
   parties: Record<string, true | undefined>;
+  pinnedParties: Record<string, true | undefined>;
+  archivedParties: Record<string, true | undefined>;
+  lastUsedAt: Record<string, number | undefined>;
   participantInParties: Record<string, string>;
 }
 

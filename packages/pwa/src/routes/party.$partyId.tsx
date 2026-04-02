@@ -102,6 +102,8 @@ function PartyById() {
   }
 
   const didRecalculateBalances = useRef(false);
+  const { setLastOpenedPartyId } = usePartyList();
+  const lastRecordedPartyIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (selectedTab !== "balances" || didRecalculateBalances.current) {
@@ -118,12 +120,13 @@ function PartyById() {
     };
   }, [selectedTab, recalculateBalances]);
 
-  const { setLastOpenedPartyId } = usePartyList();
-
   useEffect(() => {
-    if (partyId) {
-      setLastOpenedPartyId(partyId);
+    if (!partyId || lastRecordedPartyIdRef.current === partyId) {
+      return;
     }
+
+    lastRecordedPartyIdRef.current = partyId;
+    setLastOpenedPartyId(partyId);
   }, [partyId, setLastOpenedPartyId]);
 
   async function onLeaveParty() {

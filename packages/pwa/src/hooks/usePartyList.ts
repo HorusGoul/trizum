@@ -11,6 +11,30 @@ import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 
+function ensurePinnedParties(list: PartyList) {
+  if (!list.pinnedParties) {
+    list.pinnedParties = {};
+  }
+
+  return list.pinnedParties;
+}
+
+function ensureArchivedParties(list: PartyList) {
+  if (!list.archivedParties) {
+    list.archivedParties = {};
+  }
+
+  return list.archivedParties;
+}
+
+function ensureLastUsedAt(list: PartyList) {
+  if (!list.lastUsedAt) {
+    list.lastUsedAt = {};
+  }
+
+  return list.lastUsedAt;
+}
+
 export function usePartyList() {
   const repo = useRepo();
   const [partyListId] = useState<DocumentId>(() => getPartyListId(repo));
@@ -35,6 +59,8 @@ export function usePartyList() {
   ) {
     partyListHandle.change((list) => {
       list.parties[partyId] = true;
+      delete ensureArchivedParties(list)[partyId];
+      ensureLastUsedAt(list)[partyId] = Date.now();
 
       if (!list.participantInParties) {
         list.participantInParties = {};
@@ -48,6 +74,13 @@ export function usePartyList() {
 
     partyListHandle.change((list) => {
       delete list.parties[partyId];
+      delete ensurePinnedParties(list)[partyId];
+      delete ensureArchivedParties(list)[partyId];
+      delete ensureLastUsedAt(list)[partyId];
+
+      if (list.lastOpenedPartyId === partyId) {
+        list.lastOpenedPartyId = null;
+      }
 
       if (!list.participantInParties) {
         return;
@@ -60,6 +93,50 @@ export function usePartyList() {
   function setLastOpenedPartyId(partyId: Party["id"] | null) {
     partyListHandle.change((list) => {
       list.lastOpenedPartyId = partyId;
+
+      if (!partyId) {
+        return;
+      }
+
+      ensureLastUsedAt(list)[partyId] = Date.now();
+    });
+  }
+
+  function setPartyPinned(partyId: Party["id"], pinned: boolean) {
+    partyListHandle.change((list) => {
+      const pinnedParties = ensurePinnedParties(list);
+      const archivedParties = ensureArchivedParties(list);
+
+      if (pinned) {
+        if (archivedParties[partyId]) {
+          return;
+        }
+
+        pinnedParties[partyId] = true;
+        return;
+      }
+
+      delete pinnedParties[partyId];
+    });
+  }
+
+  function setPartyArchived(partyId: Party["id"], archived: boolean) {
+    partyListHandle.change((list) => {
+      const archivedParties = ensureArchivedParties(list);
+      const pinnedParties = ensurePinnedParties(list);
+
+      if (archived) {
+        archivedParties[partyId] = true;
+        delete pinnedParties[partyId];
+
+        if (list.lastOpenedPartyId === partyId) {
+          list.lastOpenedPartyId = null;
+        }
+
+        return;
+      }
+
+      delete archivedParties[partyId];
     });
   }
 
@@ -152,6 +229,8 @@ export function usePartyList() {
     removeParty,
     updateSettings,
     setLastOpenedPartyId,
+    setPartyPinned,
+    setPartyArchived,
     setAutoOpenCalculator,
   };
 }
