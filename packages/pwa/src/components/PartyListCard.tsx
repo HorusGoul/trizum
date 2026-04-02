@@ -1,8 +1,15 @@
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import type { AnyDocumentId } from "@automerge/automerge-repo/slim";
 import { useNavigate } from "@tanstack/react-router";
+import {
+  mergeProps,
+  useFocusRing,
+  useFocusWithin,
+  useHover,
+  usePress,
+} from "react-aria";
 import { Link } from "react-aria-components";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
@@ -25,6 +32,31 @@ export function PartyListCard({
 }: PartyListCardProps) {
   const navigate = useNavigate();
   const [party, handle] = useSuspenseDocument<Party>(partyId);
+  const [isFocusWithin, setIsFocusWithin] = useState(false);
+  const { hoverProps, isHovered } = useHover({});
+  const { focusProps, isFocusVisible } = useFocusRing({
+    within: true,
+  });
+  const { focusWithinProps } = useFocusWithin({
+    onFocusWithinChange: setIsFocusWithin,
+  });
+  const { pressProps, isPressed } = usePress({
+    onPress: () => {
+      if (!party) {
+        return;
+      }
+
+      void navigate({
+        to: "/party/$partyId",
+        params: {
+          partyId: party.id,
+        },
+        search: {
+          tab: "expenses",
+        },
+      });
+    },
+  });
 
   if (!party || !handle) {
     return null;
@@ -33,10 +65,7 @@ export function PartyListCard({
   const symbolOrFirstLetter =
     party.symbol || party.name.charAt(0).toUpperCase();
   const description = party.description.trim();
-  const participantPreview = getParticipantPreview(
-    party,
-    currentParticipantId,
-  );
+  const participantPreview = getParticipantPreview(party, currentParticipantId);
   const hasDescription = description.length > 0;
   const hasSupportingCopy = hasDescription || participantPreview !== null;
   const partyRouteParams = {
@@ -57,23 +86,22 @@ export function PartyListCard({
   return (
     <div
       data-testid="party-list-card"
-      className="group relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out has-[>[data-party-card-surface]:active]:scale-[0.99] focus-within:border-accent-500 focus-within:shadow-md hover:border-accent-300/90 hover:shadow-md dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none dark:focus-within:border-accent-500 dark:hover:border-accent-700 dark:hover:shadow-none"
+      {...mergeProps(hoverProps, focusProps, focusWithinProps)}
+      className={cn(
+        "relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out has-[>[data-party-card-surface][data-pressed]]:scale-[0.99] dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none",
+        isHovered &&
+          "border-accent-300/90 shadow-md dark:border-accent-700 dark:shadow-none",
+        isFocusWithin && "shadow-md dark:shadow-none",
+        isFocusVisible &&
+          "border-accent-500 dark:border-accent-500 dark:shadow-none",
+        isPressed && "scale-[0.96]",
+      )}
     >
-      <button
-        type="button"
+      <div
         data-party-card-surface=""
         aria-hidden="true"
-        tabIndex={-1}
+        {...pressProps}
         className="absolute inset-0 rounded-xl"
-        onClick={() => {
-          void navigate({
-            to: "/party/$partyId",
-            params: partyRouteParams,
-            search: {
-              tab: "expenses",
-            },
-          });
-        }}
       />
 
       <div
@@ -82,11 +110,11 @@ export function PartyListCard({
           hasSupportingCopy ? "items-start" : "items-center",
         )}
       >
-        <div className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-accent-950 text-xl font-semibold text-white shadow-sm dark:bg-black/35 dark:text-accent-50 dark:shadow-none">
+        <div className="relative mt-1 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border bg-accent-950 text-xl font-semibold text-white shadow-sm dark:border-accent-700/20 dark:bg-black/20 dark:text-accent-50 dark:shadow-none">
           <span className="pt-0.5">{symbolOrFirstLetter}</span>
 
           {statusBadge ? (
-            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-700 shadow-sm dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200">
+            <span className="absolute -bottom-0.5 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-700 shadow-sm dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200">
               <IconWithFallback name={statusBadge.icon} size={11} />
               <span className="sr-only">{statusBadge.label}</span>
             </span>
@@ -105,34 +133,46 @@ export function PartyListCard({
               to: "/party/$partyId",
               params: partyRouteParams,
             }}
-            className={({ isFocusVisible, isHovered, defaultClassName }) =>
+            onContextMenu={(event) => {
+              event.preventDefault();
+            }}
+            style={{ WebkitTouchCallout: "none" }}
+            className={({ defaultClassName }) =>
               cn(
                 defaultClassName,
                 "pointer-events-auto inline-flex max-w-full rounded-sm text-start outline-none transition-colors duration-200 ease-in-out",
-                (isHovered || isFocusVisible) &&
-                  "text-accent-700 dark:text-accent-200",
               )
             }
           >
-            <span className="block truncate text-lg font-semibold tracking-tight text-accent-950 group-hover:text-accent-700 dark:text-accent-50 dark:group-hover:text-accent-200">
+            <span className="line-clamp-2 block text-lg font-semibold tracking-tight text-accent-950 sm:line-clamp-1 dark:text-accent-50">
               {party.name}
             </span>
           </Link>
 
-          {hasDescription ? (
-            <p className="mt-1 text-sm leading-6 text-accent-700 dark:text-accent-300">
-              {description}
+          {participantPreview ? (
+            <p className="mt-1 flex min-w-0 items-start gap-2 text-sm leading-6 text-accent-900/80 dark:text-accent-200">
+              <IconWithFallback
+                name="#lucide/users"
+                size={16}
+                aria-hidden="true"
+                className="mt-1 flex-shrink-0 opacity-90"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="line-clamp-2 block sm:hidden">
+                  <ParticipantPreviewText preview={participantPreview.mobile} />
+                </span>
+                <span className="line-clamp-1 hidden sm:block">
+                  <ParticipantPreviewText
+                    preview={participantPreview.desktop}
+                  />
+                </span>
+              </span>
             </p>
           ) : null}
 
-          {participantPreview ? (
-            <p
-              className={cn(
-                "text-sm leading-6 text-accent-600 dark:text-accent-400",
-                hasDescription ? "mt-2" : "mt-1",
-              )}
-            >
-              {participantPreview}
+          {hasDescription ? (
+            <p className="mt-1 text-sm italic leading-6 text-accent-900 dark:text-accent-100/80">
+              {description}
             </p>
           ) : null}
         </div>
@@ -153,6 +193,31 @@ export function PartyListCard({
   );
 }
 
+function ParticipantPreviewText({
+  preview,
+}: {
+  preview: {
+    names: string;
+    remainingCount: number;
+  };
+}) {
+  return (
+    <>
+      {preview.names}
+      {preview.remainingCount > 0 ? (
+        <>
+          {" "}
+          <Plural
+            value={preview.remainingCount}
+            one="and # other"
+            other="and # others"
+          />
+        </>
+      ) : null}
+    </>
+  );
+}
+
 function getParticipantPreview(
   party: Party,
   currentParticipantId: PartyParticipant["id"] | null,
@@ -170,13 +235,20 @@ function getParticipantPreview(
     return null;
   }
 
-  const previewNames = visibleParticipantNames.slice(0, 3);
-  const remainingCount = visibleParticipantNames.length - previewNames.length;
+  return {
+    mobile: getParticipantPreviewVariant(visibleParticipantNames, 2),
+    desktop: getParticipantPreviewVariant(visibleParticipantNames, 3),
+  };
+}
 
-  return [
-    ...previewNames,
-    remainingCount > 0 ? `+${remainingCount}` : null,
-  ]
-    .filter((value) => value !== null)
-    .join(" · ");
+function getParticipantPreviewVariant(
+  visibleParticipantNames: string[],
+  maxNames: number,
+) {
+  const previewNames = visibleParticipantNames.slice(0, maxNames);
+
+  return {
+    names: previewNames.join(", "),
+    remainingCount: visibleParticipantNames.length - previewNames.length,
+  };
 }
