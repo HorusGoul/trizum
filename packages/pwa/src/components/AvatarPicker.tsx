@@ -18,6 +18,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
+import { TrizumSpinner } from "./TrizumSpinner.js";
 
 const logger = getLogger("components", "AvatarPicker");
 
@@ -110,7 +111,7 @@ export function AvatarPicker({
         )}
         {isUploading && (
           <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <TrizumSpinner size={24} className="text-white" />
           </div>
         )}
         {value && (

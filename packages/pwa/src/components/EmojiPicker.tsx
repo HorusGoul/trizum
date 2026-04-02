@@ -20,6 +20,7 @@ import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.ts";
 import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
+import { TrizumSpinner } from "./TrizumSpinner.js";
 
 interface EmojiData {
   emojis: Emoji[];
@@ -212,7 +213,10 @@ export function EmojiPicker({
 function EmojiGridSkeleton() {
   return (
     <div className="flex h-[280px] items-center justify-center">
-      <div className="size-6 animate-spin rounded-full border-2 border-accent-300 border-t-accent-600" />
+      <TrizumSpinner
+        size={24}
+        className="text-accent-600 dark:text-accent-400"
+      />
     </div>
   );
 }
