@@ -147,7 +147,7 @@ msgstr "Archivar"
 msgid "Archive a party from the home screen when you want to clear some space without losing it."
 msgstr ""
 
-#: src/components/PartyPendingComponent.tsx:18
+#: src/components/PartyPendingComponent.tsx:19
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
@@ -213,11 +213,11 @@ msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
-#: src/components/AvatarPicker.tsx:90
+#: src/components/AvatarPicker.tsx:91
 msgid "Avatar removed"
 msgstr "Avatar eliminado"
 
-#: src/components/AvatarPicker.tsx:73
+#: src/components/AvatarPicker.tsx:74
 msgid "Avatar updated successfully"
 msgstr "Avatar actualizado correctamente"
 
@@ -405,7 +405,7 @@ msgstr "Borrar todo"
 msgid "Clear expression"
 msgstr "Borrar expresión"
 
-#: src/components/EmojiPicker.tsx:189
+#: src/components/EmojiPicker.tsx:190
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
@@ -553,7 +553,7 @@ msgstr "Descripción"
 msgid "Description must be less than 500 characters"
 msgstr "La descripción debe tener menos de 500 caracteres"
 
-#: src/components/PartyPendingComponent.tsx:112
+#: src/components/PartyPendingComponent.tsx:99
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
@@ -593,8 +593,8 @@ msgstr "Libra Egipcia"
 msgid "Email Support"
 msgstr "Soporte por email"
 
-#: src/components/EmojiPicker.tsx:286
-#: src/components/EmojiPicker.tsx:511
+#: src/components/EmojiPicker.tsx:290
+#: src/components/EmojiPicker.tsx:515
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
@@ -703,7 +703,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
-#: src/components/AvatarPicker.tsx:79
+#: src/components/AvatarPicker.tsx:80
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
@@ -763,7 +763,7 @@ msgstr "Cedi Ghanés"
 msgid "Gibraltar Pound"
 msgstr "Libra de Gibraltar"
 
-#: src/components/PartyPendingComponent.tsx:144
+#: src/components/PartyPendingComponent.tsx:131
 msgid "Go back"
 msgstr "Volver"
 
@@ -852,7 +852,7 @@ msgstr "Corona Islandesa"
 msgid "ID is required"
 msgstr "Se requiere un ID"
 
-#: src/components/AvatarPicker.tsx:55
+#: src/components/AvatarPicker.tsx:56
 msgid "Image must be smaller than 10MB"
 msgstr "La imagen debe ser menor de 10MB"
 
@@ -1237,7 +1237,7 @@ msgstr "No se encontró cámara en este dispositivo"
 msgid "No currency"
 msgstr "Sin moneda"
 
-#: src/components/EmojiPicker.tsx:274
+#: src/components/EmojiPicker.tsx:278
 msgid "No emoji found"
 msgstr "No se encontraron emojis"
 
@@ -1519,11 +1519,11 @@ msgstr "Por favor, no cierres la aplicación mientras migramos tus datos"
 msgid "Please paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or key"
 msgstr "Por favor, pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave"
 
-#: src/components/AvatarPicker.tsx:48
+#: src/components/AvatarPicker.tsx:49
 msgid "Please select an image file"
 msgstr "Por favor, selecciona un archivo de imagen"
 
-#: src/components/PartyPendingComponent.tsx:102
+#: src/components/PartyPendingComponent.tsx:89
 msgid "Please wait while we fetch the latest data"
 msgstr "Por favor espera mientras obtenemos los datos más recientes"
 
@@ -1564,7 +1564,7 @@ msgstr "Recargar"
 msgid "Remove"
 msgstr "Eliminar"
 
-#: src/components/AvatarPicker.tsx:126
+#: src/components/AvatarPicker.tsx:127
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
@@ -1588,7 +1588,7 @@ msgstr "Restaurar"
 msgid "Restore to home"
 msgstr ""
 
-#: src/components/PartyPendingComponent.tsx:153
+#: src/components/PartyPendingComponent.tsx:140
 msgid "Retry"
 msgstr "Reintentar"
 
@@ -1638,11 +1638,11 @@ msgstr "Guardar"
 msgid "Scan QR code"
 msgstr "Escanear código QR"
 
-#: src/components/EmojiPicker.tsx:169
+#: src/components/EmojiPicker.tsx:170
 msgid "Search emoji"
 msgstr "Buscar emoji"
 
-#: src/components/EmojiPicker.tsx:180
+#: src/components/EmojiPicker.tsx:181
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
 
@@ -1650,7 +1650,7 @@ msgstr "Buscar emoji..."
 msgid "See spending totals and rankings"
 msgstr "Ver totales y clasificación de gasto"
 
-#: src/components/EmojiPicker.tsx:152
+#: src/components/EmojiPicker.tsx:153
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
@@ -1686,7 +1686,7 @@ msgstr "Rupia de Seychelles"
 msgid "Share party"
 msgstr "Compartir grupo"
 
-#: src/components/PartyPendingComponent.tsx:17
+#: src/components/PartyPendingComponent.tsx:18
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
@@ -1821,7 +1821,7 @@ msgstr "Lilangeni Suazi"
 msgid "Swedish Krona"
 msgstr "Corona Sueca"
 
-#: src/components/PartyPendingComponent.tsx:20
+#: src/components/PartyPendingComponent.tsx:21
 msgid "Swipe between expenses and balances tabs."
 msgstr "Desliza entre las pestañas de gastos y balance."
 
@@ -1850,7 +1850,7 @@ msgstr "El símbolo debe ser solo un emoji"
 msgid "Symbol must contain only emojis"
 msgstr "El símbolo solo debe contener emojis"
 
-#: src/components/PartyPendingComponent.tsx:97
+#: src/components/PartyPendingComponent.tsx:84
 msgid "Syncing party information..."
 msgstr "Sincronizando información del grupo..."
 
@@ -1866,7 +1866,7 @@ msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 msgid "Tajikistani Somoni"
 msgstr "Somoni Tayiko"
 
-#: src/components/AvatarPicker.tsx:139
+#: src/components/AvatarPicker.tsx:140
 #: src/components/ExpenseEditor.tsx:922
 msgid "Take photo"
 msgstr "Hacer foto"
@@ -1887,19 +1887,19 @@ msgstr "Baht Tailandés"
 msgid "Thank you for using trizum. Your feedback helps us improve!"
 msgstr "Gracias por usar trizum. ¡Tus comentarios nos ayudan a mejorar!"
 
-#: src/components/PartyPendingComponent.tsx:19
+#: src/components/PartyPendingComponent.tsx:20
 msgid "The app works offline too!"
 msgstr "¡La app también funciona sin conexión!"
 
-#: src/components/PartyPendingComponent.tsx:26
+#: src/components/PartyPendingComponent.tsx:27
 msgid "The party data hasn't synced to the sync server yet."
 msgstr "Los datos del grupo aún no se han sincronizado con el servidor."
 
-#: src/components/PartyPendingComponent.tsx:27
+#: src/components/PartyPendingComponent.tsx:28
 msgid "The party link may be invalid or expired."
 msgstr "El enlace del grupo puede ser inválido o haber expirado."
 
-#: src/components/PartyPendingComponent.tsx:24
+#: src/components/PartyPendingComponent.tsx:25
 msgid "The party may have been deleted by another member."
 msgstr "El grupo puede haber sido eliminado por otro miembro."
 
@@ -2045,12 +2045,12 @@ msgstr "Actualizando trizum..."
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
-#: src/components/AvatarPicker.tsx:148
+#: src/components/AvatarPicker.tsx:149
 #: src/components/ExpenseEditor.tsx:931
 msgid "Upload photo"
 msgstr "Subir foto"
 
-#: src/components/AvatarPicker.tsx:60
+#: src/components/AvatarPicker.tsx:61
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
@@ -2074,7 +2074,7 @@ msgstr "Dólar Estadounidense"
 msgid "US Dollar (Next day)"
 msgstr "Dólar Estadounidense (Día siguiente)"
 
-#: src/components/PartyPendingComponent.tsx:16
+#: src/components/PartyPendingComponent.tsx:17
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
 
@@ -2157,7 +2157,7 @@ msgstr "¿Quién eres?"
 msgid "Who is invited to this party? You can add more participants later."
 msgstr "¿Quién está invitado a este grupo? Puedes añadir más participantes más tarde."
 
-#: src/components/PartyPendingComponent.tsx:168
+#: src/components/PartyPendingComponent.tsx:155
 msgid "Why is this taking so long?"
 msgstr "¿Por qué está tardando tanto?"
 
@@ -2181,7 +2181,7 @@ msgstr "Rial Yemení"
 msgid "Yes! Your data is stored locally on your device and only synced with people you explicitly share your groups with. We don't have access to your expense data."
 msgstr "¡Sí! Tus datos se almacenan localmente en tu dispositivo y solo se sincronizan con las personas con las que compartes explícitamente tus grupos. No tenemos acceso a tus datos de gastos."
 
-#: src/components/PartyPendingComponent.tsx:15
+#: src/components/PartyPendingComponent.tsx:16
 msgid "You can add photos to your expenses for better tracking."
 msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 
@@ -2206,7 +2206,7 @@ msgstr "Ahora estás viendo el grupo como {0}"
 msgid "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 msgstr "Tus datos se almacenan localmente en tu dispositivo y se sincronizan con los servidores de trizum para colaborar. Los datos se cifran durante la transmisión. Los grupos se comparten mediante enlaces - cualquiera con el enlace puede acceder al grupo. Consulta nuestra Política de Privacidad para más detalles."
 
-#: src/components/PartyPendingComponent.tsx:25
+#: src/components/PartyPendingComponent.tsx:26
 msgid "Your internet connection might be too slow."
 msgstr "Tu conexión a internet puede ser demasiado lenta."
 
