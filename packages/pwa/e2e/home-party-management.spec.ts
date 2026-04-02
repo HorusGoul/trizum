@@ -90,6 +90,9 @@ test.describe("Home party management", () => {
 
       await expect(partyCards).toHaveCount(2);
       await expect(partyCards.nth(0)).toContainText("Pinned dinner club");
+      await expect(partyCards.nth(0)).toContainText("Alex");
+      await expect(partyCards.nth(0)).toContainText("Casey");
+      await expect(partyCards.nth(0)).not.toContainText("Blair");
       await expect(partyCards.nth(1)).toContainText("Recent ski trip");
       await expect(partyCards.nth(1)).toContainText("Alex");
       await expect(partyCards.nth(1)).toContainText("Casey");

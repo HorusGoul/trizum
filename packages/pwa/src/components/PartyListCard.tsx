@@ -125,8 +125,13 @@ export function PartyListCard({
             </p>
           ) : null}
 
-          {!hasDescription && participantPreview ? (
-            <p className="mt-1 text-sm leading-6 text-accent-600 dark:text-accent-400">
+          {participantPreview ? (
+            <p
+              className={cn(
+                "text-sm leading-6 text-accent-600 dark:text-accent-400",
+                hasDescription ? "mt-2" : "mt-1",
+              )}
+            >
               {participantPreview}
             </p>
           ) : null}
