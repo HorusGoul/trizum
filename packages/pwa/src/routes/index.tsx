@@ -2,7 +2,10 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import type { PartyList } from "#src/models/partyList.js";
 import type { Party } from "#src/models/party.js";
-import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import {
+  PartyListCard,
+  type PartyListCardAction,
+} from "#src/components/PartyListCard.tsx";
 import {
   getOrderedPartySections,
   isPartyPinned,
@@ -10,25 +13,14 @@ import {
 import { IconWithFallback } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import {
-  ModalSheetAction,
-  type ModalSheetActionTone,
-  ModalSheetActions,
-  ModalSheet,
-  ModalSheetContent,
-  ModalSheetHeader,
-  ModalSheetSection,
-  ModalSheetTitle,
-} from "#src/ui/ModalSheet.js";
 import { cn } from "#src/ui/utils.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { useMediaQuery } from "#src/hooks/useMediaQuery.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
-import { type ComponentProps, type ReactNode, use, useState } from "react";
+import { use, useState } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 
@@ -81,39 +73,11 @@ function Index() {
   const { activePartyIds, activeCount, archivedCount } =
     usePartySections(partyList);
   const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
-  const isLargeScreen = useMediaQuery("(min-width: 768px)");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [openDesktopMenuPartyId, setOpenDesktopMenuPartyId] = useState<
-    Party["id"] | null
-  >(null);
-  const [partyActionSheetState, setPartyActionSheetState] = useState<{
-    id: Party["id"];
-    name: Party["name"];
-  } | null>(null);
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;
   const needsProfileSetup =
     !partyList.username || partyList.username.trim() === "";
-  const selectedPartyPinned = partyActionSheetState
-    ? isPartyPinned(partyList, partyActionSheetState.id)
-    : false;
-  const selectedPartyActions = partyActionSheetState
-    ? createPartyActions({
-        isPinned: selectedPartyPinned,
-        onTogglePinned: () => {
-          setPartyActionSheetState(null);
-          togglePartyPinned(
-            partyList,
-            partyActionSheetState.id,
-            setPartyPinned,
-          );
-        },
-        onArchive: () => {
-          setPartyActionSheetState(null);
-          archiveParty(partyActionSheetState.id, setPartyArchived);
-        },
-      })
-    : [];
 
   return (
     <>
@@ -228,7 +192,6 @@ function Index() {
               <section className="flex flex-col gap-3">
                 {activePartyIds.map((partyId) => {
                   const pinned = isPartyPinned(partyList, partyId);
-                  const isDesktopMenuOpen = openDesktopMenuPartyId === partyId;
                   const actions = createPartyActions({
                     isPinned: pinned,
                     onTogglePinned: () => {
@@ -242,60 +205,11 @@ function Index() {
                   return (
                     <PartyListCard
                       key={partyId}
+                      actions={actions}
                       partyId={partyId}
                       isPinned={pinned}
                       currentParticipantId={
                         partyList.participantInParties[partyId] ?? null
-                      }
-                      onLongPress={
-                        isLargeScreen
-                          ? undefined
-                          : (party) => {
-                              setPartyActionSheetState({
-                                id: party.id,
-                                name: party.name,
-                              });
-                            }
-                      }
-                      longPressAccessibilityDescription={t`Long press for party actions`}
-                      renderMenu={
-                        isLargeScreen
-                          ? (_party, cardState) => (
-                              <div className="w-10 flex-shrink-0">
-                                {cardState.isHovered ||
-                                cardState.isFocusWithin ||
-                                isDesktopMenuOpen ? (
-                                  <MenuTrigger
-                                    isOpen={isDesktopMenuOpen}
-                                    onOpenChange={(isOpen) => {
-                                      setOpenDesktopMenuPartyId(
-                                        isOpen ? partyId : null,
-                                      );
-                                    }}
-                                  >
-                                    <IconButton
-                                      icon="#lucide/ellipsis-vertical"
-                                      aria-label={t`Party actions`}
-                                      color="transparent"
-                                      className={cn(
-                                        "h-10 w-10 flex-shrink-0",
-                                        isDesktopMenuOpen &&
-                                          "bg-accent-950 bg-opacity-5 dark:bg-accent-50 dark:bg-opacity-5",
-                                      )}
-                                    />
-
-                                    <Popover placement="bottom end">
-                                      <Menu className="min-w-60">
-                                        <PartyActionMenuItems
-                                          actions={actions}
-                                        />
-                                      </Menu>
-                                    </Popover>
-                                  </MenuTrigger>
-                                ) : null}
-                              </div>
-                            )
-                          : undefined
                       }
                     />
                   );
@@ -357,40 +271,6 @@ function Index() {
           <EmptyState />
         )}
       </div>
-
-      <ModalSheet
-        isOpen={partyActionSheetState !== null && !isLargeScreen}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) {
-            setPartyActionSheetState(null);
-          }
-        }}
-      >
-        <ModalSheetHeader>
-          {partyActionSheetState ? (
-            <ModalSheetSection>
-              <ModalSheetTitle className="line-clamp-2">
-                {partyActionSheetState.name}
-              </ModalSheetTitle>
-            </ModalSheetSection>
-          ) : null}
-        </ModalSheetHeader>
-
-        <ModalSheetContent>
-          <ModalSheetActions>
-            {selectedPartyActions.map((action) => (
-              <ModalSheetAction
-                key={action.key}
-                icon={action.icon}
-                tone={action.tone}
-                onPress={action.onAction}
-              >
-                {action.label}
-              </ModalSheetAction>
-            ))}
-          </ModalSheetActions>
-        </ModalSheetContent>
-      </ModalSheet>
     </>
   );
 }
@@ -409,14 +289,6 @@ function usePartySections(partyList: PartyList) {
   return sections;
 }
 
-type PartyAction = {
-  key: string;
-  icon: ComponentProps<typeof IconWithFallback>["name"];
-  label: ReactNode;
-  onAction: () => void;
-  tone?: ModalSheetActionTone;
-};
-
 function createPartyActions({
   isPinned,
   onTogglePinned,
@@ -425,7 +297,7 @@ function createPartyActions({
   isPinned: boolean;
   onTogglePinned: () => void;
   onArchive: () => void;
-}): PartyAction[] {
+}): PartyListCardAction[] {
   return [
     {
       key: "pin",
@@ -458,22 +330,6 @@ function archiveParty(
 ) {
   setPartyArchived(partyId, true);
   toast.success(t`Party archived`);
-}
-
-function PartyActionMenuItems({ actions }: { actions: PartyAction[] }) {
-  return actions.map((action) => (
-    <MenuItem key={action.key} onAction={action.onAction}>
-      <IconWithFallback name={action.icon} size={20} className="mr-3" />
-      <span
-        className={cn(
-          "h-3.5 leading-none",
-          action.tone === "danger" && "text-rose-700 dark:text-rose-300",
-        )}
-      >
-        {action.label}
-      </span>
-    </MenuItem>
-  ));
 }
 
 function NoActivePartiesCard() {

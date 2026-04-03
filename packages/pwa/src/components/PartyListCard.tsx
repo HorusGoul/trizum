@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import type { AnyDocumentId } from "@automerge/automerge-repo/slim";
 import { useNavigate } from "@tanstack/react-router";
@@ -9,41 +10,55 @@ import {
   useLongPress,
   usePress,
 } from "react-aria";
-import { Link } from "react-aria-components";
-import { type ReactNode, useState } from "react";
+import { Link, MenuTrigger, Popover } from "react-aria-components";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { useMediaQuery } from "#src/hooks/useMediaQuery.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import { IconWithFallback } from "#src/ui/Icon.js";
+import { IconButton } from "#src/ui/IconButton.js";
+import { Menu, MenuItem } from "#src/ui/Menu.js";
+import {
+  ModalSheet,
+  ModalSheetAction,
+  type ModalSheetActionTone,
+  ModalSheetActions,
+  ModalSheetContent,
+  ModalSheetHeader,
+  ModalSheetSection,
+  ModalSheetTitle,
+} from "#src/ui/ModalSheet.js";
 import { cn } from "#src/ui/utils.js";
 
+export interface PartyListCardAction {
+  key: string;
+  icon: ComponentProps<typeof IconWithFallback>["name"];
+  label: ReactNode;
+  onAction: () => void;
+  tone?: ModalSheetActionTone;
+}
+
 interface PartyListCardProps {
+  actions?: PartyListCardAction[];
   partyId: AnyDocumentId;
   isArchived?: boolean;
   isPinned?: boolean;
   currentParticipantId?: PartyParticipant["id"] | null;
-  renderMenu?: (
-    party: Party,
-    state: {
-      isHovered: boolean;
-      isFocusWithin: boolean;
-    },
-  ) => ReactNode;
-  onLongPress?: (party: Party) => void;
-  longPressAccessibilityDescription?: string;
 }
 
 export function PartyListCard({
+  actions = [],
   partyId,
   isArchived = false,
   isPinned = false,
   currentParticipantId = null,
-  renderMenu,
-  onLongPress,
-  longPressAccessibilityDescription,
 }: PartyListCardProps) {
   const navigate = useNavigate();
+  const isLargeScreen = useMediaQuery("(min-width: 768px)");
   const [party, handle] = useSuspenseDocument<Party>(partyId);
   const [isFocusWithin, setIsFocusWithin] = useState(false);
+  const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
   const { hoverProps, isHovered } = useHover({});
   const { focusProps, isFocusVisible } = useFocusRing({
     within: true,
@@ -68,15 +83,16 @@ export function PartyListCard({
       });
     },
   });
+  const hasActions = actions.length > 0;
   const { longPressProps } = useLongPress({
-    isDisabled: !onLongPress,
-    accessibilityDescription: longPressAccessibilityDescription,
+    isDisabled: !hasActions || isLargeScreen,
+    accessibilityDescription: t`Long press for party actions`,
     onLongPress: () => {
-      if (!party || !onLongPress) {
+      if (!party || !hasActions) {
         return;
       }
 
-      onLongPress(party);
+      setIsMobileSheetOpen(true);
     },
   });
 
@@ -90,6 +106,10 @@ export function PartyListCard({
   const participantPreview = getParticipantPreview(party, currentParticipantId);
   const hasDescription = description.length > 0;
   const hasSupportingCopy = hasDescription || participantPreview !== null;
+  const showDesktopActionButton =
+    hasActions &&
+    isLargeScreen &&
+    (isHovered || isFocusWithin || isDesktopMenuOpen);
   const partyRouteParams = {
     partyId: party.id,
   };
@@ -199,21 +219,96 @@ export function PartyListCard({
           ) : null}
         </div>
 
-        {renderMenu ? (
+        {hasActions && isLargeScreen ? (
           <div
             data-party-card-interactive=""
             className={cn(
-              "pointer-events-auto",
+              "pointer-events-auto w-10 flex-shrink-0",
               hasDescription ? "pt-0.5" : undefined,
             )}
           >
-            {renderMenu(party, {
-              isHovered,
-              isFocusWithin,
-            })}
+            {showDesktopActionButton ? (
+              <MenuTrigger
+                isOpen={isDesktopMenuOpen}
+                onOpenChange={setIsDesktopMenuOpen}
+              >
+                <IconButton
+                  icon="#lucide/ellipsis-vertical"
+                  aria-label={t`Party actions`}
+                  color="transparent"
+                  className={cn(
+                    "h-10 w-10 flex-shrink-0",
+                    isDesktopMenuOpen &&
+                      "bg-accent-950 bg-opacity-5 dark:bg-accent-50 dark:bg-opacity-5",
+                  )}
+                />
+
+                <Popover placement="bottom end">
+                  <Menu className="min-w-60">
+                    {actions.map((action) => (
+                      <MenuItem
+                        key={action.key}
+                        onAction={() => {
+                          setIsDesktopMenuOpen(false);
+                          action.onAction();
+                        }}
+                      >
+                        <IconWithFallback
+                          name={action.icon}
+                          size={20}
+                          className="mr-3"
+                        />
+                        <span
+                          className={cn(
+                            "h-3.5 leading-none",
+                            action.tone === "danger" &&
+                              "text-rose-700 dark:text-rose-300",
+                          )}
+                        >
+                          {action.label}
+                        </span>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Popover>
+              </MenuTrigger>
+            ) : null}
           </div>
         ) : null}
       </div>
+
+      {hasActions ? (
+        <ModalSheet
+          isOpen={isMobileSheetOpen && !isLargeScreen}
+          onOpenChange={setIsMobileSheetOpen}
+        >
+          <ModalSheetHeader>
+            <ModalSheetSection>
+              <ModalSheetTitle className="line-clamp-2">
+                {party.name}
+              </ModalSheetTitle>
+            </ModalSheetSection>
+          </ModalSheetHeader>
+
+          <ModalSheetContent>
+            <ModalSheetActions>
+              {actions.map((action) => (
+                <ModalSheetAction
+                  key={action.key}
+                  icon={action.icon}
+                  tone={action.tone}
+                  onPress={() => {
+                    setIsMobileSheetOpen(false);
+                    action.onAction();
+                  }}
+                >
+                  {action.label}
+                </ModalSheetAction>
+              ))}
+            </ModalSheetActions>
+          </ModalSheetContent>
+        </ModalSheet>
+      ) : null}
     </div>
   );
 }

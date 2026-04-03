@@ -148,7 +148,20 @@ test.describe("Home party management", () => {
     });
 
     await test.step("restore an archived party back to the home screen", async () => {
-      await page.getByRole("button", { name: "Party actions" }).click();
+      const archivedPartyCard = page
+        .locator('[data-testid="party-list-card"]')
+        .nth(0);
+      const archivedPartyActionButton = archivedPartyCard.getByRole("button", {
+        name: "Party actions",
+      });
+
+      await page.mouse.move(0, 0);
+      await expect(archivedPartyActionButton).toHaveCount(0);
+
+      await archivedPartyCard.hover();
+      await expect(archivedPartyActionButton).toBeVisible();
+
+      await archivedPartyActionButton.click();
       await page.getByRole("menuitem", { name: "Restore to home" }).click();
 
       await expect(
