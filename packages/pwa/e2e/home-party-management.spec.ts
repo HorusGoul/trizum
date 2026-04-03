@@ -94,7 +94,7 @@ test.describe("Home party management", () => {
       await expect(partyCards.nth(1)).toContainText("Alex");
       await expect(partyCards.nth(1)).toContainText("Casey");
       await expect(partyCards.nth(1)).not.toContainText("Blair");
-      await expect(homePage.partyLink(/Archived picnic/)).toHaveCount(0);
+      await expect(homePage.partyCard(/Archived picnic/)).toHaveCount(0);
     });
 
     await test.step("clicking the card surface still opens the party", async () => {
@@ -104,7 +104,7 @@ test.describe("Home party management", () => {
       await expect(page).toHaveURL(new RegExp(partyIds.recentPartyId));
 
       await harness.navigate("/");
-      await expect(homePage.partyLink(/Recent ski trip/)).toBeVisible();
+      await expect(homePage.partyCard(/Recent ski trip/)).toBeVisible();
     });
 
     await test.step("show the desktop action button only while the card is hovered", async () => {
@@ -172,7 +172,7 @@ test.describe("Home party management", () => {
 
       const partyCards = page.locator('[data-testid="party-list-card"]');
 
-      await expect(homePage.partyLink(/Archived picnic/)).toBeVisible();
+      await expect(homePage.partyCard(/Archived picnic/)).toBeVisible();
       await expect(partyCards).toHaveCount(3);
       await expect(partyCards.nth(0)).toContainText("Pinned dinner club");
     });
@@ -232,12 +232,12 @@ test.describe("Home party management", () => {
     await page.waitForTimeout(650);
     await page.mouse.up();
 
-    await expect(
-      page.getByRole("heading", { name: "Camping weekend" }),
-    ).toBeVisible();
-    await expect(page.getByRole("dialog", { name: "Camping weekend" })).toContainText(
-      "Archive party",
-    );
+    const partyActionsDialog = page.getByRole("dialog", {
+      name: "Camping weekend",
+    });
+
+    await expect(partyActionsDialog).toBeVisible();
+    await expect(partyActionsDialog).toContainText("Archive party");
 
     const dragHandle = page.locator("[data-modal-sheet-drag-handle]").first();
     const dragHandleBox = await dragHandle.boundingBox();
@@ -256,18 +256,14 @@ test.describe("Home party management", () => {
     );
     await page.mouse.up();
 
-    await expect(
-      page.getByRole("heading", { name: "Camping weekend" }),
-    ).toHaveCount(0);
+    await expect(partyActionsDialog).toHaveCount(0);
 
     await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
     await page.mouse.down();
     await page.waitForTimeout(650);
     await page.mouse.up();
 
-    await expect(
-      page.getByRole("heading", { name: "Camping weekend" }),
-    ).toBeVisible();
+    await expect(partyActionsDialog).toBeVisible();
 
     await page.getByRole("button", { name: "Archive party" }).click();
 

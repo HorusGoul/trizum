@@ -59,11 +59,17 @@ export class HomePage {
     return this.page.getByRole("link", { name });
   }
 
+  partyCard(name: string | RegExp) {
+    return this.page
+      .locator('[data-testid="party-list-card"]')
+      .filter({ hasText: name });
+  }
+
   async expectPartyVisible(name: string | RegExp) {
-    await expect(this.partyLink(name)).toBeVisible();
+    await expect(this.partyCard(name)).toBeVisible();
   }
 
   async openParty(name: string | RegExp) {
-    await this.partyLink(name).click();
+    await this.partyCard(name).click();
   }
 }
