@@ -438,7 +438,6 @@ function createPartyActions({
       icon: "#lucide/archive",
       label: <Trans>Archive party</Trans>,
       onAction: onArchive,
-      tone: "danger",
     },
   ];
 }
