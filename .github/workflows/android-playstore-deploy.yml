@@ -28,13 +28,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-blocking-pr:
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/check-blocking-pr.yml
+    with:
+      pull_request_number: 140
+
   screenshots:
     name: Generate Screenshots
+    needs: [check-blocking-pr]
     uses: ./.github/workflows/screenshots.yml
 
   deploy:
     name: Build & Deploy to Play Store
-    needs: [screenshots]
+    needs: [check-blocking-pr, screenshots]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
