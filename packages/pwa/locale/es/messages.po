@@ -27,7 +27,7 @@ msgstr "[DEV] Crear gastos"
 #. placeholder {0}: preview.remainingCount
 #: src/components/PartyListCard.tsx:340
 msgid "{0, plural, one {and # other} other {and # others}}"
-msgstr "{0, plural, one {y # más} other {y # más}}"
+msgstr ""
 
 #: src/routes/migrate_.tricount.tsx:377
 msgid "{message}"
@@ -65,7 +65,7 @@ msgstr "En el período seleccionado"
 
 #: src/routes/index.tsx:404
 msgid "Active"
-msgstr "Activos"
+msgstr ""
 
 #: src/routes/new.tsx:598
 msgid "ADB Unit of Account"
@@ -92,7 +92,7 @@ msgstr "Añadir o crear"
 #: src/routes/new.tsx:399
 #: src/routes/party_.$partyId.settings.tsx:415
 msgid "Add participant"
-msgstr "Añadir participante"
+msgstr "Añadir participante<<<<<<< HEAD"
 
 #: src/routes/index.tsx:554
 msgid "Add your name so others know who you are and how to pay you"
@@ -145,7 +145,7 @@ msgstr "Archivar"
 
 #: src/routes/archived.tsx:95
 msgid "Archive a party from the home screen when you want to clear some space without losing it."
-msgstr "Archiva un grupo desde la pantalla de inicio cuando quieras despejar espacio sin perderlo."
+msgstr ""
 
 #: src/components/PartyPendingComponent.tsx:19
 msgid "Archive participants who left to keep balances clean."
@@ -153,7 +153,7 @@ msgstr "Archiva a los participantes que se fueron para mantener el balance limpi
 
 #: src/routes/index.tsx:311
 msgid "Archive party"
-msgstr "Archivar grupo"
+msgstr ""
 
 #: src/components/PartyListCard.tsx:119
 msgid "Archived"
@@ -165,15 +165,15 @@ msgstr "Participantes archivados"
 
 #: src/routes/index.tsx:147
 msgid "Archived parties"
-msgstr "Grupos archivados"
+msgstr ""
 
 #: src/routes/archived.tsx:33
 msgid "Archived Parties"
-msgstr "Grupos archivados"
+msgstr ""
 
 #: src/routes/archived.tsx:50
 msgid "Archived parties live here until you restore them to the home screen."
-msgstr "Los grupos archivados se quedan aquí hasta que los restaures al inicio."
+msgstr ""
 
 #: src/routes/new.tsx:460
 msgid "Argentine Peso"
@@ -227,7 +227,7 @@ msgstr "Manat Azerbaiyano"
 
 #: src/routes/archived.tsx:119
 msgid "Back to home"
-msgstr "Volver al inicio"
+msgstr ""
 
 #: src/components/CalculatorToolbar.tsx:562
 msgid "Backspace"
@@ -444,7 +444,7 @@ msgstr "Franco Comorense"
 
 #: src/components/PartyStatsView.tsx:181
 msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
-msgstr "Compara cuánto ha pagado cada persona en distintos períodos. Las transferencias de saldos no se incluyen en estos totales."
+msgstr "Compara cuánto ha pagado cada persona en distintos períodos. Las transferencias de saldos no se incluyen en estos totales.<<<<<<< HEAD"
 
 #: src/routes/index.tsx:551
 msgid "Complete your profile"
@@ -476,7 +476,7 @@ msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicació
 
 #: src/routes/new.tsx:484
 msgid "Costa Rican Colón"
-msgstr "Colón Costarricense"
+msgstr "Colón Costarricense<<<<<<< HEAD"
 
 #: src/routes/index.tsx:252
 #: src/routes/index.tsx:417
@@ -605,7 +605,7 @@ msgstr "Fecha de fin"
 
 #: src/routes/settings.tsx:49
 msgid "English"
-msgstr "Inglés"
+msgstr "Inglés<<<<<<< HEAD"
 
 #: src/routes/index.tsx:453
 msgid "Enter a party link or code to join"
@@ -645,11 +645,11 @@ msgstr "Unidad de Cuenta Europea 17"
 
 #: src/routes/new.tsx:588
 msgid "European Unit of Account 9"
-msgstr "Unidad de Cuenta Europea 9"
+msgstr "Unidad de Cuenta Europea 9<<<<<<< HEAD"
 
 #: src/routes/index.tsx:347
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
-msgstr "Por ahora todo está archivado. Puedes reabrir cualquier grupo desde la pantalla de archivados cuando lo necesites."
+msgstr ""
 
 #: src/routes/party_.$partyId.add.tsx:97
 msgid "Expense added"
@@ -813,7 +813,7 @@ msgstr "Aquí tienes una lista de formas en las que puedes pagar, una vez hecho,
 
 #: src/routes/index.tsx:360
 msgid "Home"
-msgstr "Inicio"
+msgstr ""
 
 #: src/routes/new.tsx:503
 msgid "Honduran Lempira"
@@ -866,7 +866,7 @@ msgstr "Impacto en mi balance: <0/>"
 
 #: src/routes/migrate_.tricount.tsx:225
 msgid "Import attachments"
-msgstr "Importar adjuntos"
+msgstr "Importar adjuntos<<<<<<< HEAD"
 
 #: src/routes/index.tsx:486
 msgid "Import your existing Tricount data"
@@ -949,7 +949,7 @@ msgstr "Unirse"
 #. placeholder {0}: party.name
 #: src/routes/party_.$partyId.share.tsx:31
 msgid "Join {0} on trizum!"
-msgstr "¡Únete a {0} en trizum!"
+msgstr "¡Únete a {0} en trizum!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:242
 #: src/routes/index.tsx:450
@@ -966,7 +966,7 @@ msgstr "Dinar Jordano"
 
 #: src/routes/index.tsx:363
 msgid "Jump back into the groups you use most"
-msgstr "Vuelve a los grupos que más usas"
+msgstr ""
 
 #: src/routes/new.tsx:518
 msgid "Kazakhstani Tenge"
@@ -994,7 +994,7 @@ msgstr "Kip Laosiano"
 
 #: src/components/PartyListCard.tsx:132
 msgid "Last used"
-msgstr "Último uso"
+msgstr ""
 
 #: src/components/PartyStatsView.tsx:110
 msgid "Last year"
@@ -1038,7 +1038,7 @@ msgstr "Cargando licencias..."
 
 #: src/components/PartyListCard.tsx:89
 msgid "Long press for party actions"
-msgstr "Mantén pulsado para abrir las acciones del grupo"
+msgstr ""
 
 #: src/routes/new.tsx:531
 msgid "Macanese Pataca"
@@ -1110,7 +1110,7 @@ msgstr "Unidad de Inversión Mexicana"
 
 #: src/routes/new.tsx:432
 msgid "Mexican Peso"
-msgstr "Peso Mexicano"
+msgstr "Peso Mexicano<<<<<<< HEAD"
 
 #: src/routes/index.tsx:262
 #: src/routes/index.tsx:483
@@ -1223,15 +1223,15 @@ msgstr "Córdoba Nicaragüense"
 
 #: src/routes/new.tsx:540
 msgid "Nigerian Naira"
-msgstr "Naira Nigeriano"
+msgstr "Naira Nigeriano<<<<<<< HEAD"
 
 #: src/routes/index.tsx:344
 msgid "No active parties right now"
-msgstr "Ahora mismo no hay grupos activos"
+msgstr ""
 
 #: src/routes/archived.tsx:92
 msgid "No archived parties"
-msgstr "No hay grupos archivados"
+msgstr ""
 
 #: src/components/QRCodeScanner.tsx:112
 msgid "No camera found on this device"
@@ -1292,7 +1292,7 @@ msgstr "Sin Conexión Primero"
 
 #: src/routes/archived.tsx:47
 msgid "Older parties stay tucked away, not gone"
-msgstr "Los grupos antiguos quedan apartados, no desaparecen"
+msgstr ""
 
 #: src/routes/new.tsx:543
 msgid "Omani Rial"
@@ -1300,11 +1300,11 @@ msgstr "Rial Omaní"
 
 #: src/routes/party.$partyId.tsx:270
 msgid "Only show your expenses"
-msgstr "Mostrar solo tus gastos"
+msgstr "Mostrar solo tus gastos<<<<<<< HEAD"
 
 #: src/routes/index.tsx:370
 msgid "Open archived parties"
-msgstr "Abrir grupos archivados"
+msgstr ""
 
 #: src/components/CurrencyField.tsx:82
 msgid "Open calculator"
@@ -1399,11 +1399,11 @@ msgstr "Participantes"
 
 #: src/components/PartyListCard.tsx:247
 msgid "Party actions"
-msgstr "Acciones del grupo"
+msgstr "<<<<<<< HEAD"
 
 #: src/routes/index.tsx:332
 msgid "Party archived"
-msgstr "Grupo archivado"
+msgstr ""
 
 #: src/routes/new.tsx:89
 msgid "Party created"
@@ -1415,15 +1415,15 @@ msgstr "Clasificación del grupo"
 
 #: src/routes/party_.$partyId.share.tsx:41
 msgid "Party link copied to clipboard!"
-msgstr "¡Enlace del grupo copiado al portapapeles!"
+msgstr "¡Enlace del grupo copiado al portapapeles!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:324
 msgid "Party pinned"
-msgstr "Grupo fijado"
+msgstr ""
 
 #: src/routes/archived.tsx:47
 msgid "Party restored to home"
-msgstr "Grupo restaurado al inicio"
+msgstr ""
 
 #: src/routes/party_.$partyId.settings.tsx:121
 msgid "Party Settings"
@@ -1439,11 +1439,11 @@ msgstr "¡Grupo compartido!"
 
 #: src/routes/party_.$partyId.stats.tsx:46
 msgid "Party stats"
-msgstr "Estadísticas del grupo"
+msgstr "Estadísticas del grupo<<<<<<< HEAD"
 
 #: src/routes/index.tsx:324
 msgid "Party unpinned"
-msgstr "Grupo desfijado"
+msgstr ""
 
 #: src/routes/migrate_.tricount.tsx:202
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
@@ -1488,19 +1488,19 @@ msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
 #: src/routes/index.tsx:305
 msgid "Pin party"
-msgstr "Fijar grupo"
+msgstr ""
 
 #: src/components/PartyListCard.tsx:124
 msgid "Pinned"
-msgstr "Fijado"
+msgstr ""
 
 #: src/routes/index.tsx:366
 msgid "Pinned parties stay close. Recent activity keeps the rest in order."
-msgstr "Los grupos fijados se mantienen a mano. La actividad reciente mantiene el resto en orden."
+msgstr ""
 
 #: src/routes/index.tsx:199
 msgid "Pinned parties stay on top, then the rest follow your latest activity."
-msgstr "Los grupos fijados se quedan arriba y el resto sigue tu actividad más reciente."
+msgstr ""
 
 #: src/routes/new.tsx:595
 msgid "Platinum (troy ounce)"
@@ -1589,7 +1589,7 @@ msgstr "Restaurar"
 
 #: src/routes/archived.tsx:44
 msgid "Restore to home"
-msgstr "Restaurar al inicio"
+msgstr ""
 
 #: src/components/PartyPendingComponent.tsx:140
 msgid "Retry"
@@ -1663,7 +1663,7 @@ msgstr "Envíanos un email y te responderemos lo antes posible."
 
 #: src/routes/new.tsx:551
 msgid "Serbian Dinar"
-msgstr "Dinar Serbio"
+msgstr "Dinar Serbio<<<<<<< HEAD"
 
 #: src/routes/index.tsx:519
 msgid "Set up your username, avatar, and preferences"
@@ -1751,7 +1751,7 @@ msgstr "Libra Sursudanesa"
 
 #: src/routes/new.tsx:591
 msgid "Special Drawing Rights"
-msgstr "Derechos Especiales de Giro"
+msgstr "Derechos Especiales de Giro<<<<<<< HEAD"
 
 #: src/routes/index.tsx:384
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
@@ -1772,7 +1772,7 @@ msgstr "Rupia de Sri Lanka"
 #. Label for the start date field in the custom range filter on the party stats screen
 #: src/components/PartyStatsView.tsx:218
 msgid "Start date"
-msgstr "Fecha de inicio"
+msgstr "Fecha de inicio<<<<<<< HEAD"
 
 #: src/routes/index.tsx:420
 msgid "Start tracking expenses with your group"
@@ -2025,7 +2025,7 @@ msgstr "Unidad Previsional"
 
 #: src/routes/index.tsx:305
 msgid "Unpin party"
-msgstr "Desfijar grupo"
+msgstr ""
 
 #: src/components/UpdateController.tsx:26
 #: src/routes/index.tsx:102
@@ -2137,7 +2137,7 @@ msgstr "Viendo como {participantName}"
 #. placeholder {0}: participant.name
 #: src/routes/party_.$partyId.who.tsx:64
 msgid "Welcome to the party, {0}!"
-msgstr "¡Bienvenido al grupo, {0}!"
+msgstr "¡Bienvenido al grupo, {0}!<<<<<<< HEAD"
 
 #: src/routes/index.tsx:381
 msgid "Welcome to trizum"
@@ -2215,7 +2215,7 @@ msgstr "Tu conexión a internet puede ser demasiado lenta."
 
 #: src/routes/index.tsx:190
 msgid "Your parties"
-msgstr "Tus grupos"
+msgstr ""
 
 #: src/components/PartyStatsView.tsx:341
 msgid "Your total"
