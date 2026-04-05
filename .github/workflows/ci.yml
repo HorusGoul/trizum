@@ -129,7 +129,7 @@ jobs:
 
       - name: Guard Catalog Conflict Markers
         run: |
-          if rg -n '<<<<<<<|>>>>>>>|=======' packages/pwa/locale/*/messages.po; then
+          if grep -n -E '<<<<<<<|>>>>>>>|=======' packages/pwa/locale/*/messages.po; then
             echo "::error::Refusing to auto-commit Lingui catalogs containing conflict markers."
             exit 1
           fi
