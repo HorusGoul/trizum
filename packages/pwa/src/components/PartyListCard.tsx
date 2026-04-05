@@ -124,6 +124,11 @@ export function PartyListCard({
           label: <Trans>Pinned</Trans>,
         }
       : null;
+  const suppressNativeLongPress = {
+    WebkitTouchCallout: "none",
+    WebkitUserSelect: "none",
+    userSelect: "none",
+  } as const;
 
   return (
     <div
@@ -143,6 +148,10 @@ export function PartyListCard({
         data-party-card-surface=""
         aria-hidden="true"
         {...mergeProps(pressProps, longPressProps)}
+        onContextMenu={(event) => {
+          event.preventDefault();
+        }}
+        style={suppressNativeLongPress}
         className="absolute inset-0 rounded-xl"
       />
 
@@ -178,11 +187,12 @@ export function PartyListCard({
             onContextMenu={(event) => {
               event.preventDefault();
             }}
-            style={{ WebkitTouchCallout: "none" }}
+            style={suppressNativeLongPress}
             className={({ defaultClassName }) =>
               cn(
                 defaultClassName,
-                "pointer-events-auto inline-flex max-w-full rounded-sm text-start outline-none transition-colors duration-200 ease-in-out",
+                "inline-flex max-w-full rounded-sm text-start outline-none transition-colors duration-200 ease-in-out",
+                isLargeScreen ? "pointer-events-auto" : "pointer-events-none",
               )
             }
           >

@@ -222,12 +222,15 @@ test.describe("Home party management", () => {
       page.getByRole("button", { name: "Party actions" }),
     ).toHaveCount(0);
 
-    const partyCard = page.locator('[data-testid="party-list-card"]').first();
-    const box = await partyCard.boundingBox();
+    const partyLink = page.getByRole("link", { name: "Camping weekend" });
+    const linkBox = await partyLink.boundingBox();
 
-    expect(box).not.toBeNull();
+    expect(linkBox).not.toBeNull();
 
-    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.move(
+      linkBox!.x + linkBox!.width / 2,
+      linkBox!.y + linkBox!.height / 2,
+    );
     await page.mouse.down();
     await page.waitForTimeout(650);
     await page.mouse.up();
@@ -235,9 +238,15 @@ test.describe("Home party management", () => {
     const partyActionsDialog = page.getByRole("dialog", {
       name: "Camping weekend",
     });
+    const archivePartyButton = page.getByRole("button", {
+      name: "Archive party",
+    });
 
+    await expect
+      .poll(async () => page.evaluate(() => window.location.pathname))
+      .toBe("/");
     await expect(partyActionsDialog).toBeVisible();
-    await expect(partyActionsDialog).toContainText("Archive party");
+    await expect(archivePartyButton).toBeVisible();
 
     const dragHandle = page.locator("[data-modal-sheet-drag-handle]").first();
     const dragHandleBox = await dragHandle.boundingBox();
@@ -256,16 +265,19 @@ test.describe("Home party management", () => {
     );
     await page.mouse.up();
 
-    await expect(partyActionsDialog).toHaveCount(0);
+    await expect(archivePartyButton).toHaveCount(0);
 
-    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+    await page.mouse.move(
+      linkBox!.x + linkBox!.width / 2,
+      linkBox!.y + linkBox!.height / 2,
+    );
     await page.mouse.down();
     await page.waitForTimeout(650);
     await page.mouse.up();
 
-    await expect(partyActionsDialog).toBeVisible();
+    await expect(archivePartyButton).toBeVisible();
 
-    await page.getByRole("button", { name: "Archive party" }).click();
+    await archivePartyButton.click();
 
     await expect(
       page.getByRole("heading", { name: "No active parties right now" }),
