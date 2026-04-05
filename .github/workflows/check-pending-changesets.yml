@@ -1,0 +1,41 @@
+name: Check Pending Changesets
+
+on:
+  workflow_call:
+    inputs:
+      changeset_directory:
+        description: "Directory that contains pending changeset markdown files"
+        required: false
+        default: ".changeset"
+        type: string
+
+jobs:
+  check:
+    name: Check Pending Changesets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure no pending changesets remain before release
+        shell: bash
+        env:
+          CHANGESET_DIRECTORY: ${{ inputs.changeset_directory }}
+        run: |
+          if [ ! -d "$CHANGESET_DIRECTORY" ]; then
+            echo "Changeset directory $CHANGESET_DIRECTORY was not found; continuing."
+            exit 0
+          fi
+
+          pending_changesets="$(
+            find "$CHANGESET_DIRECTORY" -maxdepth 1 -type f -name '*.md' ! -name 'README.md' | sort
+          )"
+
+          if [ -n "$pending_changesets" ]; then
+            echo "::error::Pending changesets were found in $CHANGESET_DIRECTORY. Merge the release PR before running this deploy workflow."
+            printf '%s\n' "$pending_changesets"
+            exit 1
+          fi
+
+          echo "No pending changesets were found in $CHANGESET_DIRECTORY."

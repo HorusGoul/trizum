@@ -28,22 +28,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check-blocking-pr:
+  check-pending-changesets:
     permissions:
       contents: read
-      pull-requests: read
-    uses: ./.github/workflows/check-blocking-pr.yml
+    uses: ./.github/workflows/check-pending-changesets.yml
     with:
-      pull_request_number: 140
+      changeset_directory: .changeset
 
   screenshots:
     name: Generate Screenshots
-    needs: [check-blocking-pr]
+    needs: [check-pending-changesets]
     uses: ./.github/workflows/screenshots.yml
 
   deploy:
     name: Build & Deploy to Play Store
-    needs: [check-blocking-pr, screenshots]
+    needs: [check-pending-changesets, screenshots]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
