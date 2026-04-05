@@ -25,7 +25,7 @@ msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
 #. placeholder {0}: preview.remainingCount
-#: src/components/PartyListCard.tsx:330
+#: src/components/PartyListCard.tsx:340
 msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {and # other} other {and # others}}"
 
@@ -1457,7 +1457,7 @@ msgstr "participants"
 msgid "Participants"
 msgstr "Participants"
 
-#: src/components/PartyListCard.tsx:237
+#: src/components/PartyListCard.tsx:247
 msgid "Party actions"
 msgstr "Party actions<<<<<<< HEAD"
 
