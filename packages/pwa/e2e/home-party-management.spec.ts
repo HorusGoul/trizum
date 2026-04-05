@@ -70,10 +70,7 @@ test.describe("Home party management", () => {
             "Pinned dinner club",
             "A standing monthly tab.",
           ),
-          createNamedPartyFixture(
-            "Recent ski trip",
-            "",
-          ),
+          createNamedPartyFixture("Recent ski trip", ""),
           createNamedPartyFixture(
             "Archived picnic",
             "Done and dusted, but still worth keeping.",
@@ -97,7 +94,7 @@ test.describe("Home party management", () => {
       await expect(partyCards.nth(1)).toContainText("Alex");
       await expect(partyCards.nth(1)).toContainText("Casey");
       await expect(partyCards.nth(1)).not.toContainText("Blair");
-      await expect(homePage.partyLink(/Archived picnic/)).toHaveCount(0);
+      await expect(homePage.partyCard(/Archived picnic/)).toHaveCount(0);
     });
 
     await test.step("clicking the card surface still opens the party", async () => {
@@ -107,7 +104,32 @@ test.describe("Home party management", () => {
       await expect(page).toHaveURL(new RegExp(partyIds.recentPartyId));
 
       await harness.navigate("/");
-      await expect(homePage.partyLink(/Recent ski trip/)).toBeVisible();
+      await expect(homePage.partyCard(/Recent ski trip/)).toBeVisible();
+    });
+
+    await test.step("show the desktop action button only while the card is hovered", async () => {
+      const recentPartyCard = page
+        .locator('[data-testid="party-list-card"]')
+        .nth(1);
+      const recentPartyActionButton = recentPartyCard.getByRole("button", {
+        name: "Party actions",
+      });
+
+      await page.mouse.move(0, 0);
+      await expect(recentPartyActionButton).toHaveCount(0);
+
+      await recentPartyCard.hover();
+
+      await expect(recentPartyActionButton).toBeVisible();
+
+      await recentPartyActionButton.click();
+
+      await expect(recentPartyActionButton).toBeVisible();
+      await expect(
+        page.getByRole("menuitem", { name: "Archive party" }),
+      ).toBeVisible();
+
+      await page.keyboard.press("Escape");
     });
 
     await test.step("list archived parties on the archived screen", async () => {
@@ -126,7 +148,20 @@ test.describe("Home party management", () => {
     });
 
     await test.step("restore an archived party back to the home screen", async () => {
-      await page.getByRole("button", { name: "Party actions" }).click();
+      const archivedPartyCard = page
+        .locator('[data-testid="party-list-card"]')
+        .nth(0);
+      const archivedPartyActionButton = archivedPartyCard.getByRole("button", {
+        name: "Party actions",
+      });
+
+      await page.mouse.move(0, 0);
+      await expect(archivedPartyActionButton).toHaveCount(0);
+
+      await archivedPartyCard.hover();
+      await expect(archivedPartyActionButton).toBeVisible();
+
+      await archivedPartyActionButton.click();
       await page.getByRole("menuitem", { name: "Restore to home" }).click();
 
       await expect(
@@ -137,10 +172,116 @@ test.describe("Home party management", () => {
 
       const partyCards = page.locator('[data-testid="party-list-card"]');
 
-      await expect(homePage.partyLink(/Archived picnic/)).toBeVisible();
+      await expect(homePage.partyCard(/Archived picnic/)).toBeVisible();
       await expect(partyCards).toHaveCount(3);
       await expect(partyCards.nth(0)).toContainText("Pinned dinner club");
     });
+  });
+
+  test("opens home party actions from a mobile long press", async ({
+    harness,
+    page,
+  }) => {
+    await harness.seedPartyList({});
+
+    await page.evaluate(
+      async ({ fixture, memberParticipantId }) => {
+        const internalWindow = window as Window & {
+          __internal_createPartyFromMigrationData: (
+            data: unknown,
+          ) => Promise<string>;
+          __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
+        };
+        const partyId =
+          await internalWindow.__internal_createPartyFromMigrationData(fixture);
+
+        await internalWindow.__internal_seedPartyListState({
+          username: "Harness User",
+          phone: "",
+          parties: {
+            [partyId]: true,
+          },
+          participantInParties: {
+            [partyId]: memberParticipantId,
+          },
+        });
+      },
+      {
+        fixture: createNamedPartyFixture(
+          "Camping weekend",
+          "Shared meals and supplies.",
+        ),
+        memberParticipantId: defaultParticipants.blair.id,
+      },
+    );
+
+    await harness.navigate("/");
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await expect(
+      page.getByRole("button", { name: "Party actions" }),
+    ).toHaveCount(0);
+
+    const partyLink = page.getByRole("link", { name: "Camping weekend" });
+    const linkBox = await partyLink.boundingBox();
+
+    expect(linkBox).not.toBeNull();
+
+    await page.mouse.move(
+      linkBox!.x + linkBox!.width / 2,
+      linkBox!.y + linkBox!.height / 2,
+    );
+    await page.mouse.down();
+    await page.waitForTimeout(650);
+    await page.mouse.up();
+
+    const partyActionsDialog = page.getByRole("dialog", {
+      name: "Camping weekend",
+    });
+    const archivePartyButton = page.getByRole("button", {
+      name: "Archive party",
+    });
+
+    await expect
+      .poll(async () => page.evaluate(() => window.location.pathname))
+      .toBe("/");
+    await expect(partyActionsDialog).toBeVisible();
+    await expect(archivePartyButton).toBeVisible();
+
+    const dragHandle = page.locator("[data-modal-sheet-drag-handle]").first();
+    const dragHandleBox = await dragHandle.boundingBox();
+
+    expect(dragHandleBox).not.toBeNull();
+
+    await page.mouse.move(
+      dragHandleBox!.x + dragHandleBox!.width / 2,
+      dragHandleBox!.y + dragHandleBox!.height / 2,
+    );
+    await page.mouse.down();
+    await page.mouse.move(
+      dragHandleBox!.x + dragHandleBox!.width / 2,
+      dragHandleBox!.y + dragHandleBox!.height + 180,
+      { steps: 12 },
+    );
+    await page.mouse.up();
+
+    await expect(archivePartyButton).toHaveCount(0);
+
+    await page.mouse.move(
+      linkBox!.x + linkBox!.width / 2,
+      linkBox!.y + linkBox!.height / 2,
+    );
+    await page.mouse.down();
+    await page.waitForTimeout(650);
+    await page.mouse.up();
+
+    await expect(archivePartyButton).toBeVisible();
+
+    await archivePartyButton.click();
+
+    await expect(
+      page.getByRole("heading", { name: "No active parties right now" }),
+    ).toBeVisible();
   });
 });
 

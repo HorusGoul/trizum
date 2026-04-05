@@ -1,18 +1,19 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
-import { Link, MenuTrigger, Popover } from "react-aria-components";
+import { Link } from "react-aria-components";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
-import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import {
+  PartyListCard,
+  type PartyListCardAction,
+} from "#src/components/PartyListCard.tsx";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { IconWithFallback } from "#src/ui/Icon.js";
-import { IconButton } from "#src/ui/IconButton.js";
-import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
 
 export const Route = createFileRoute("/archived")({
@@ -36,44 +37,27 @@ function ArchivedParties() {
       <div className="container mt-4 flex flex-1 flex-col gap-4 px-2 pb-safe-offset-8">
         {archivedPartyIds.length > 0 ? (
           archivedPartyIds.map((partyId) => {
+            const actions: PartyListCardAction[] = [
+              {
+                key: "restore",
+                icon: "#lucide/archive-restore",
+                label: <Trans>Restore to home</Trans>,
+                onAction: () => {
+                  setPartyArchived(partyId, false);
+                  toast.success(t`Party restored to home`);
+                },
+              },
+            ];
+
             return (
               <PartyListCard
+                actions={actions}
                 key={partyId}
                 partyId={partyId}
                 isArchived={true}
                 currentParticipantId={
                   partyList.participantInParties[partyId] ?? null
                 }
-                renderMenu={(party) => (
-                  <MenuTrigger>
-                    <IconButton
-                      icon="#lucide/ellipsis-vertical"
-                      aria-label={t`Party actions`}
-                      color="transparent"
-                      className="h-10 w-10 flex-shrink-0"
-                    />
-
-                    <Popover placement="bottom end">
-                      <Menu className="min-w-60">
-                        <MenuItem
-                          onAction={() => {
-                            setPartyArchived(party.id, false);
-                            toast.success(t`Party restored to home`);
-                          }}
-                        >
-                          <IconWithFallback
-                            name="#lucide/archive-restore"
-                            size={20}
-                            className="mr-3"
-                          />
-                          <span className="h-3.5 leading-none">
-                            <Trans>Restore to home</Trans>
-                          </span>
-                        </MenuItem>
-                      </Menu>
-                    </Popover>
-                  </MenuTrigger>
-                )}
               />
             );
           })

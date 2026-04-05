@@ -44,8 +44,7 @@
       "inputs": ["src/**", "test/**", "vite.config.ts", "vitest.config.ts"]
     },
     "lingui:extract": {
-      "outputs": ["locale/**"],
-      "inputs": ["src/**", "lingui.config.js"]
+      "cache": false
     }
   }
 }

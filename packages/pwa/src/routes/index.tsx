@@ -1,7 +1,11 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import type { PartyList } from "#src/models/partyList.js";
-import { PartyListCard } from "#src/components/PartyListCard.tsx";
+import type { Party } from "#src/models/party.js";
+import {
+  PartyListCard,
+  type PartyListCardAction,
+} from "#src/components/PartyListCard.tsx";
 import {
   getOrderedPartySections,
   isPartyPinned,
@@ -76,240 +80,198 @@ function Index() {
     !partyList.username || partyList.username.trim() === "";
 
   return (
-    <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center pr-2 mt-safe">
-        <h1 className="pl-4 text-2xl font-bold">trizum</h1>
+    <>
+      <div className="flex min-h-full flex-col">
+        <div className="container flex h-16 items-center pr-2 mt-safe">
+          <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
-        <span
-          aria-label="Beta"
-          className="mb-4 ml-0.5 font-mono text-xs font-semibold leading-none text-accent-600 dark:text-accent-400"
-        >
-          βeta
-        </span>
+          <span
+            aria-label="Beta"
+            className="mb-4 ml-0.5 font-mono text-xs font-semibold leading-none text-accent-600 dark:text-accent-400"
+          >
+            βeta
+          </span>
 
-        <div className="flex-1" />
+          <div className="flex-1" />
 
-        {isUpdateAvailable ? (
-          <IconButton
-            icon={
-              isUpdating ? "#lucide/refresh-cw" : "#lucide/circle-arrow-down"
-            }
-            aria-label={t`Update available`}
-            onPress={() => {
-              setIsUpdating(true);
-              update();
-            }}
-            className="mr-2"
-            iconClassName={cn(
-              "duration-1000 ease-in-out",
-              isUpdating ? "animate-spin" : "animate-pulse",
-            )}
-            isDisabled={isUpdating}
-          />
-        ) : null}
+          {isUpdateAvailable ? (
+            <IconButton
+              icon={
+                isUpdating ? "#lucide/refresh-cw" : "#lucide/circle-arrow-down"
+              }
+              aria-label={t`Update available`}
+              onPress={() => {
+                setIsUpdating(true);
+                update();
+              }}
+              className="mr-2"
+              iconClassName={cn(
+                "duration-1000 ease-in-out",
+                isUpdating ? "animate-spin" : "animate-pulse",
+              )}
+              isDisabled={isUpdating}
+            />
+          ) : null}
 
-        <MenuTrigger>
-          <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
+          <MenuTrigger>
+            <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
 
-          <Popover placement="bottom end">
-            <Menu>
-              <MenuItem
-                href={{
-                  to: "/settings",
-                }}
-              >
-                <IconWithFallback
-                  name="#lucide/settings"
-                  size={20}
-                  className="mr-3"
-                />
-                <span className="h-3.5 leading-none">
-                  <Trans>Settings</Trans>
-                </span>
-              </MenuItem>
-
-              <MenuItem
-                href={{
-                  to: "/archived",
-                }}
-              >
-                <IconWithFallback
-                  name="#lucide/folder-archive"
-                  size={20}
-                  className="mr-3"
-                />
-                <span className="h-3.5 leading-none">
-                  <Trans>Archived parties</Trans>
-                </span>
-              </MenuItem>
-
-              <MenuItem
-                onAction={() => {
-                  checkForUpdate();
-                }}
-              >
-                <IconWithFallback
-                  name="#lucide/refresh-cw"
-                  size={20}
-                  className="mr-3"
-                />
-                <span className="h-3.5 leading-none">
-                  <Trans>Check for updates</Trans>
-                </span>
-              </MenuItem>
-
-              <MenuItem
-                href={{
-                  to: "/about",
-                }}
-              >
-                <IconWithFallback
-                  name="#lucide/info"
-                  size={20}
-                  className="mr-3"
-                />
-                <span className="h-3.5 leading-none">
-                  <Trans>About</Trans>
-                </span>
-              </MenuItem>
-            </Menu>
-          </Popover>
-        </MenuTrigger>
-      </div>
-
-      <div className="h-2" />
-
-      {showPartyHub ? (
-        <div className="container flex flex-1 flex-col gap-4 px-2">
-          {needsProfileSetup ? <ProfileSetupCard /> : null}
-
-          {activeCount > 0 ? (
-            <section className="flex flex-col gap-3">
-              {activePartyIds.map((partyId) => {
-                const pinned = isPartyPinned(partyList, partyId);
-
-                return (
-                  <PartyListCard
-                    key={partyId}
-                    partyId={partyId}
-                    isPinned={pinned}
-                    currentParticipantId={
-                      partyList.participantInParties[partyId] ?? null
-                    }
-                    renderMenu={(party) => (
-                      <MenuTrigger>
-                        <IconButton
-                          icon="#lucide/ellipsis-vertical"
-                          aria-label={t`Party actions`}
-                          color="transparent"
-                          className="h-10 w-10 flex-shrink-0"
-                        />
-
-                        <Popover placement="bottom end">
-                          <Menu className="min-w-60">
-                            <MenuItem
-                              onAction={() => {
-                                setPartyPinned(party.id, !pinned);
-                                toast.success(
-                                  pinned ? t`Party unpinned` : t`Party pinned`,
-                                );
-                              }}
-                            >
-                              <IconWithFallback
-                                name={
-                                  pinned ? "#lucide/pin-off" : "#lucide/pin"
-                                }
-                                size={20}
-                                className="mr-3"
-                              />
-                              <span className="h-3.5 leading-none">
-                                {pinned ? (
-                                  <Trans>Unpin party</Trans>
-                                ) : (
-                                  <Trans>Pin party</Trans>
-                                )}
-                              </span>
-                            </MenuItem>
-
-                            <MenuItem
-                              onAction={() => {
-                                setPartyArchived(party.id, true);
-                                toast.success(t`Party archived`);
-                              }}
-                            >
-                              <IconWithFallback
-                                name="#lucide/archive"
-                                size={20}
-                                className="mr-3"
-                              />
-                              <span className="h-3.5 leading-none">
-                                <Trans>Archive party</Trans>
-                              </span>
-                            </MenuItem>
-                          </Menu>
-                        </Popover>
-                      </MenuTrigger>
-                    )}
+            <Popover placement="bottom end">
+              <Menu>
+                <MenuItem
+                  href={{
+                    to: "/settings",
+                  }}
+                >
+                  <IconWithFallback
+                    name="#lucide/settings"
+                    size={20}
+                    className="mr-3"
                   />
-                );
-              })}
-            </section>
-          ) : (
-            <NoActivePartiesCard />
-          )}
+                  <span className="h-3.5 leading-none">
+                    <Trans>Settings</Trans>
+                  </span>
+                </MenuItem>
 
-          <div className="flex-1 pb-safe-offset-12" />
+                <MenuItem
+                  href={{
+                    to: "/archived",
+                  }}
+                >
+                  <IconWithFallback
+                    name="#lucide/folder-archive"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Archived parties</Trans>
+                  </span>
+                </MenuItem>
 
-          <div className="sticky flex justify-end bottom-safe-offset-6">
-            <MenuTrigger>
-              <IconButton
-                aria-label={t`Add or create`}
-                icon="#lucide/plus"
-                color="accent"
-                className="h-14 w-14 shadow-md"
-              />
+                <MenuItem
+                  onAction={() => {
+                    checkForUpdate();
+                  }}
+                >
+                  <IconWithFallback
+                    name="#lucide/refresh-cw"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>Check for updates</Trans>
+                  </span>
+                </MenuItem>
 
-              <Popover placement="top end" offset={16}>
-                <Menu className="min-w-60">
-                  <MenuItem href={{ to: "/join" }}>
-                    <IconWithFallback
-                      name="#lucide/ampersand"
-                      size={20}
-                      className="mr-3"
-                    />
-                    <span className="h-3.5 leading-none">
-                      <Trans>Join a Party</Trans>
-                    </span>
-                  </MenuItem>
-                  <MenuItem href={{ to: "/new" }}>
-                    <IconWithFallback
-                      name="#lucide/list-plus"
-                      size={20}
-                      className="mr-3"
-                    />
-                    <span className="h-3.5 leading-none">
-                      <Trans>Create a new Party</Trans>
-                    </span>
-                  </MenuItem>
-                  <MenuItem href={{ to: "/migrate/tricount" }}>
-                    <IconWithFallback
-                      name="#lucide/import"
-                      size={20}
-                      className="mr-3"
-                    />
-                    <span className="h-3.5 leading-none">
-                      <Trans>Migrate from Tricount</Trans>
-                    </span>
-                  </MenuItem>
-                </Menu>
-              </Popover>
-            </MenuTrigger>
-          </div>
+                <MenuItem
+                  href={{
+                    to: "/about",
+                  }}
+                >
+                  <IconWithFallback
+                    name="#lucide/info"
+                    size={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    <Trans>About</Trans>
+                  </span>
+                </MenuItem>
+              </Menu>
+            </Popover>
+          </MenuTrigger>
         </div>
-      ) : (
-        <EmptyState />
-      )}
-    </div>
+
+        <div className="h-2" />
+
+        {showPartyHub ? (
+          <div className="container flex flex-1 flex-col gap-4 px-2">
+            {needsProfileSetup ? <ProfileSetupCard /> : null}
+
+            {activeCount > 0 ? (
+              <section className="flex flex-col gap-3">
+                {activePartyIds.map((partyId) => {
+                  const pinned = isPartyPinned(partyList, partyId);
+                  const actions = createPartyActions({
+                    isPinned: pinned,
+                    onTogglePinned: () => {
+                      togglePartyPinned(partyList, partyId, setPartyPinned);
+                    },
+                    onArchive: () => {
+                      archiveParty(partyId, setPartyArchived);
+                    },
+                  });
+
+                  return (
+                    <PartyListCard
+                      key={partyId}
+                      actions={actions}
+                      partyId={partyId}
+                      isPinned={pinned}
+                      currentParticipantId={
+                        partyList.participantInParties[partyId] ?? null
+                      }
+                    />
+                  );
+                })}
+              </section>
+            ) : (
+              <NoActivePartiesCard />
+            )}
+
+            <div className="flex-1 pb-safe-offset-12" />
+
+            <div className="sticky flex justify-end bottom-safe-offset-6">
+              <MenuTrigger>
+                <IconButton
+                  aria-label={t`Add or create`}
+                  icon="#lucide/plus"
+                  color="accent"
+                  className="h-14 w-14 shadow-md"
+                />
+
+                <Popover placement="top end" offset={16}>
+                  <Menu className="min-w-60">
+                    <MenuItem href={{ to: "/join" }}>
+                      <IconWithFallback
+                        name="#lucide/ampersand"
+                        size={20}
+                        className="mr-3"
+                      />
+                      <span className="h-3.5 leading-none">
+                        <Trans>Join a Party</Trans>
+                      </span>
+                    </MenuItem>
+                    <MenuItem href={{ to: "/new" }}>
+                      <IconWithFallback
+                        name="#lucide/list-plus"
+                        size={20}
+                        className="mr-3"
+                      />
+                      <span className="h-3.5 leading-none">
+                        <Trans>Create a new Party</Trans>
+                      </span>
+                    </MenuItem>
+                    <MenuItem href={{ to: "/migrate/tricount" }}>
+                      <IconWithFallback
+                        name="#lucide/import"
+                        size={20}
+                        className="mr-3"
+                      />
+                      <span className="h-3.5 leading-none">
+                        <Trans>Migrate from Tricount</Trans>
+                      </span>
+                    </MenuItem>
+                  </Menu>
+                </Popover>
+              </MenuTrigger>
+            </div>
+          </div>
+        ) : (
+          <EmptyState />
+        )}
+      </div>
+    </>
   );
 }
 
@@ -325,6 +287,49 @@ function usePartySections(partyList: PartyList) {
   }
 
   return sections;
+}
+
+function createPartyActions({
+  isPinned,
+  onTogglePinned,
+  onArchive,
+}: {
+  isPinned: boolean;
+  onTogglePinned: () => void;
+  onArchive: () => void;
+}): PartyListCardAction[] {
+  return [
+    {
+      key: "pin",
+      icon: isPinned ? "#lucide/pin-off" : "#lucide/pin",
+      label: isPinned ? <Trans>Unpin party</Trans> : <Trans>Pin party</Trans>,
+      onAction: onTogglePinned,
+    },
+    {
+      key: "archive",
+      icon: "#lucide/archive",
+      label: <Trans>Archive party</Trans>,
+      onAction: onArchive,
+    },
+  ];
+}
+
+function togglePartyPinned(
+  partyList: PartyList,
+  partyId: Party["id"],
+  setPartyPinned: ReturnType<typeof usePartyList>["setPartyPinned"],
+) {
+  const currentlyPinned = isPartyPinned(partyList, partyId);
+  setPartyPinned(partyId, !currentlyPinned);
+  toast.success(currentlyPinned ? t`Party unpinned` : t`Party pinned`);
+}
+
+function archiveParty(
+  partyId: Party["id"],
+  setPartyArchived: ReturnType<typeof usePartyList>["setPartyArchived"],
+) {
+  setPartyArchived(partyId, true);
+  toast.success(t`Party archived`);
 }
 
 function NoActivePartiesCard() {

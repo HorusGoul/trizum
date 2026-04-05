@@ -127,6 +127,13 @@ jobs:
         run: pnpm lingui:extract
         continue-on-error: true
 
+      - name: Guard Catalog Conflict Markers
+        run: |
+          if grep -n -E '<<<<<<<|>>>>>>>|=======' packages/pwa/locale/*/messages.po; then
+            echo "::error::Refusing to auto-commit Lingui catalogs containing conflict markers."
+            exit 1
+          fi
+
       - uses: EndBug/add-and-commit@v9
         with:
           commit: --signoff
