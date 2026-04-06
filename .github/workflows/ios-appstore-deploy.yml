@@ -23,8 +23,6 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/check-pending-changesets.yml
-    with:
-      changeset_directory: .changeset
 
   screenshots:
     name: Generate Screenshots

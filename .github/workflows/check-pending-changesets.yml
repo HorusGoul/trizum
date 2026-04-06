@@ -2,12 +2,6 @@ name: Check Pending Changesets
 
 on:
   workflow_call:
-    inputs:
-      changeset_directory:
-        description: "Directory that contains pending changeset markdown files"
-        required: false
-        default: ".changeset"
-        type: string
 
 jobs:
   check:
@@ -20,9 +14,9 @@ jobs:
 
       - name: Ensure no pending changesets remain before release
         shell: bash
-        env:
-          CHANGESET_DIRECTORY: ${{ inputs.changeset_directory }}
         run: |
+          CHANGESET_DIRECTORY=".changeset"
+
           if [ ! -d "$CHANGESET_DIRECTORY" ]; then
             echo "Changeset directory $CHANGESET_DIRECTORY was not found; continuing."
             exit 0
