@@ -608,6 +608,7 @@ function ParticipantItem({
   }
 
   const currentShareType = participantShare?.type || "divide";
+  const participantName = participant.name;
 
   return (
     <div
@@ -661,7 +662,7 @@ function ParticipantItem({
 
                     updateShares(newShares);
                   }}
-                  aria-label={t`Shares for ${participant.name}`}
+                  aria-label={t`Shares for ${participantName}`}
                 />
                 <IconButton
                   icon="#lucide/plus"
@@ -699,7 +700,7 @@ function ParticipantItem({
               participantId={participant.id}
               autoOpenCalculator={autoOpenCalculator}
               onChange={onExactAmountChange}
-              aria-label={t`Amount for ${participant.name}`}
+              aria-label={t`Amount for ${participantName}`}
             />
           </div>
         </div>
@@ -781,6 +782,9 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
     0,
   );
   const showWarning = totalUnitAmount - convertToUnits(amount) !== 0;
+  const currency = party.currency;
+  const totalAmount = totalUnitAmount / 100;
+  const expenseAmount = amount;
 
   if (!showWarning) {
     return null;
@@ -797,11 +801,11 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
           <Trans>
             Shares sum up to{" "}
             <strong>
-              {totalUnitAmount / 100} {party.currency}
+              {totalAmount} {currency}
             </strong>{" "}
             while the expense amount is{" "}
             <strong>
-              {amount} {party.currency}
+              {expenseAmount} {currency}
             </strong>
             .
           </Trans>

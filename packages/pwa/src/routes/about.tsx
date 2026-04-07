@@ -10,6 +10,7 @@ export const Route = createFileRoute("/about")({
 function About() {
   const version = import.meta.env.VITE_APP_VERSION;
   const commit = import.meta.env.VITE_APP_COMMIT;
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="flex min-h-full flex-col">
@@ -155,7 +156,7 @@ function About() {
         {/* Footer */}
         <section className="mt-8 border-t border-accent-200 pt-6 text-center text-sm text-accent-600 dark:border-accent-800 dark:text-accent-400">
           <p>
-            <Trans>© {new Date().getFullYear()} trizum</Trans>
+            <Trans>© {currentYear} trizum</Trans>
           </p>
         </section>
       </div>

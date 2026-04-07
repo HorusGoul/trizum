@@ -43,6 +43,7 @@ function Who() {
   const { party, setParticipantDetails } = useParty(params.partyId);
   const { partyList, addPartyToList } = usePartyList();
   const navigate = useNavigate();
+  const partyName = party.name;
 
   const [needsToJoin] = useState(
     () =>
@@ -52,6 +53,7 @@ function Who() {
 
   function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
+    const participantName = participant.name;
 
     addPartyToList(party.id, participant.id);
 
@@ -61,9 +63,9 @@ function Who() {
         avatarId: partyList.avatarId,
       });
 
-      toast.success(t`Welcome to the party, ${participant.name}!`);
+      toast.success(t`Welcome to the party, ${participantName}!`);
     } else {
-      toast.success(t`You're now seeing the party as ${participant.name}`);
+      toast.success(t`You're now seeing the party as ${participantName}`);
     }
 
     if (search.redirectTo) {
@@ -132,7 +134,7 @@ function Who() {
         <p className="whitespace-pre-wrap px-2">
           {needsToJoin ? (
             <Trans>
-              To join the <span className="font-medium">{party.name}</span>,
+              To join the <span className="font-medium">{partyName}</span>,
               please select who you are so that we can show you the expenses and
               stats that matter to you.
             </Trans>
