@@ -28,13 +28,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-pending-changesets:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/check-pending-changesets.yml
+
   screenshots:
     name: Generate Screenshots
+    needs: [check-pending-changesets]
     uses: ./.github/workflows/screenshots.yml
 
   deploy:
     name: Build & Deploy to Play Store
-    needs: [screenshots]
+    needs: [check-pending-changesets, screenshots]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
