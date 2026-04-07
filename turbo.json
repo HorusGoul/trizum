@@ -45,6 +45,9 @@
     },
     "lingui:extract": {
       "cache": false
+    },
+    "browserslist:update-db": {
+      "cache": false
     }
   }
 }

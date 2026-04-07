@@ -1,0 +1,46 @@
+name: Update Browserslist DB
+
+on:
+  schedule:
+    # Every Tuesday at 03:17 UTC.
+    # We avoid the top of the hour because GitHub scheduled workflows can be delayed more often than usual.
+    - cron: "17 3 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: Update Browserslist DB
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Update Browserslist DB
+        run: pnpm browserslist:update-db
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-browserslist-db
+          delete-branch: true
+          commit-message: "chore(deps): update Browserslist DB"
+          title: "chore(deps): update Browserslist DB"
+          body: |
+            Updates the Browserslist database in `pnpm-lock.yaml` using
+            `pnpm browserslist:update-db`.

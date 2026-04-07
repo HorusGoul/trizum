@@ -8,6 +8,7 @@
     "#*": "./*"
   },
   "scripts": {
+    "browserslist:update-db": "cd ../.. && update-browserslist-db latest",
     "build": "./build.sh",
     "cleanup": "rm -rf dist",
     "dev": "vite",
@@ -97,7 +98,7 @@
     "@types/react-dom": "npm:types-react-dom@rc",
     "@vite-pwa/assets-generator": "1.0.2",
     "@vitejs/plugin-react": "6.0.1",
-    "autoprefixer": "10.4.21",
+    "autoprefixer": "10.4.27",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "9.39.1",
     "eslint-plugin-lingui": "0.11.0",
@@ -110,6 +111,7 @@
     "tailwindcss-react-aria-components": "1.2.0",
     "tailwindcss-safe-area-capacitor": "0.5.1",
     "typescript": "5.9.2",
+    "update-browserslist-db": "1.2.3",
     "vite": "8.0.0",
     "vite-plugin-pwa": "1.2.0",
     "vite-plugin-top-level-await": "1.6.0",
