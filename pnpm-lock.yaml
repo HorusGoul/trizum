@@ -452,9 +452,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      update-browserslist-db:
-        specifier: 1.2.3
-        version: 1.2.3(browserslist@4.28.2)
       vite:
         specifier: 8.0.0
         version: 8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5)

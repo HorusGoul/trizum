@@ -8,7 +8,6 @@
     "#*": "./*"
   },
   "scripts": {
-    "browserslist:update-db": "cd ../.. && update-browserslist-db latest",
     "build": "./build.sh",
     "cleanup": "rm -rf dist",
     "dev": "vite",
@@ -111,7 +110,6 @@
     "tailwindcss-react-aria-components": "1.2.0",
     "tailwindcss-safe-area-capacitor": "0.5.1",
     "typescript": "5.9.2",
-    "update-browserslist-db": "1.2.3",
     "vite": "8.0.0",
     "vite-plugin-pwa": "1.2.0",
     "vite-plugin-top-level-await": "1.6.0",
