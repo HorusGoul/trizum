@@ -43,9 +43,9 @@ jobs:
     needs: [check-pending-changesets, screenshots]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: package.json
           cache: "pnpm"
@@ -75,7 +75,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Download screenshots artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: screenshots
           path: packages/screenshots/screenshots
@@ -114,7 +114,7 @@ jobs:
             release_status:${{ inputs.release_status }}
 
       - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android-playstore-aab
           path: packages/mobile/android/app/build/outputs/bundle/**/*.aab

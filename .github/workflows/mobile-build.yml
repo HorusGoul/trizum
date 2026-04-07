@@ -47,9 +47,9 @@ jobs:
     if: ${{ github.event.inputs.platform == 'android' || github.event.inputs.platform == 'both' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: package.json
           cache: "pnpm"
@@ -112,7 +112,7 @@ jobs:
 
       - name: Upload Android APK artifact
         if: ${{ github.event.inputs.android_artifact == 'apk' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android-${{ github.event.inputs.build_type }}-apk
           path: packages/mobile/android/app/build/outputs/apk/**/*.apk
@@ -120,7 +120,7 @@ jobs:
 
       - name: Upload Android AAB artifact
         if: ${{ github.event.inputs.build_type == 'release' && github.event.inputs.android_artifact == 'aab' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android-release-aab
           path: packages/mobile/android/app/build/outputs/bundle/**/*.aab
@@ -131,9 +131,9 @@ jobs:
     if: ${{ github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'both' }}
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: package.json
           cache: "pnpm"
@@ -187,7 +187,7 @@ jobs:
 
       - name: Upload iOS IPA artifact
         if: ${{ github.event.inputs.build_type == 'release' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios-${{ github.event.inputs.ios_export_method }}-ipa
           path: packages/mobile/ios/App/*.ipa
@@ -195,7 +195,7 @@ jobs:
 
       - name: Upload iOS dSYM artifact
         if: ${{ github.event.inputs.build_type == 'release' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ios-dsym
           path: packages/mobile/ios/App/*.dSYM.zip
