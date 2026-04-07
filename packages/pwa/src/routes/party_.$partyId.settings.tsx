@@ -15,7 +15,7 @@ import {
   type PartyParticipant,
 } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/fields/TextField.js";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";

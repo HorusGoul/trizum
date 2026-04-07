@@ -42,6 +42,9 @@ const fullVersion = `${appVersion}-${appCommit}`;
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
+  // Skip the Sentry Vite plugin in local/dev builds when auth is unavailable.
+  const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
+  const hasSentryAuthToken = Boolean(sentryAuthToken);
 
   process.env.VITE_APP_WSS_URL =
     mode === "production"
@@ -159,22 +162,26 @@ export default defineConfig(({ mode }) => {
         },
       }),
       appendSourceMappingURLPlugin(),
-      sentryVitePlugin({
-        org: process.env.SENTRY_ORG,
-        project: process.env.SENTRY_PROJECT,
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        release: {
-          create: true,
-          name: fullVersion,
-          setCommits: {
-            auto: true,
-          },
-          inject: true,
-        },
-        sourcemaps: {
-          disable: true,
-        },
-      }),
+      ...(hasSentryAuthToken
+        ? [
+            sentryVitePlugin({
+              org: process.env.SENTRY_ORG,
+              project: process.env.SENTRY_PROJECT,
+              authToken: sentryAuthToken,
+              release: {
+                create: true,
+                name: fullVersion,
+                setCommits: {
+                  auto: true,
+                },
+                inject: true,
+              },
+              sourcemaps: {
+                disable: true,
+              },
+            }),
+          ]
+        : []),
     ],
   };
 });

@@ -25,10 +25,12 @@ function RouteComponent() {
   const { partyId, party } = useCurrentParty();
   const shareUrl = getAppLink(`/party/${partyId}`);
   const { canShare } = Route.useLoaderData();
+  const partyName = party.name;
+
   async function onShareParty() {
     if (canShare) {
       await Share.share({
-        title: t`Join ${party.name} on trizum!`,
+        title: t`Join ${partyName} on trizum!`,
         url: shareUrl,
       });
 
@@ -102,7 +104,7 @@ function RouteComponent() {
   );
 }
 
-export function getQRCodeImage() {
+function getQRCodeImage() {
   // Get color from CSS variable
   const variable = getComputedStyle(document.documentElement).getPropertyValue(
     "--accent-400",

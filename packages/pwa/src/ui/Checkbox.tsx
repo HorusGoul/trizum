@@ -10,7 +10,8 @@ import {
 
 import { cn } from "./utils";
 
-import { FieldError, Label, labelVariants } from "./Field";
+import { FieldError, Label } from "./fields/Field";
+import { labelVariants } from "./fields/Field.styles";
 import { Icon } from "./Icon";
 
 const CheckboxGroup = AriaCheckboxGroup;

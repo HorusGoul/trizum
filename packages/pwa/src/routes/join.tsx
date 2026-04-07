@@ -7,7 +7,7 @@ import { RouteQRScanner } from "#src/components/RouteQRScanner.js";
 import { useRouteQRScanner } from "#src/components/useRouteQRScanner.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
-import { AppTextField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/fields/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useForm } from "@tanstack/react-form";
 import {

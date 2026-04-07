@@ -15,7 +15,7 @@ import {
 
 import { cn } from "./utils";
 
-import { FieldError, Label } from "./Field";
+import { FieldError, Label } from "./fields/Field";
 import {
   ListBoxCollection,
   ListBoxHeader,

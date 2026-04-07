@@ -9,6 +9,12 @@ export default defineConfig([
     ignores: ["dist", "eslint.config.js"],
   },
   {
+    files: ["src/main.tsx"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
     rules: {
       "import/no-named-as-default-member": "off",
       "import/no-named-as-default": "off",

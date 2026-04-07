@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { AppCurrencyField } from "#src/ui/TextField.js";
+import { AppCurrencyField } from "#src/ui/fields/TextField.js";
 import React, { use, useRef } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";

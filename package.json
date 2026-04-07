@@ -7,6 +7,7 @@
   "scripts": {
     "agent-browser": "agent-browser",
     "agent-browser:install": "agent-browser install",
+    "browserslist:update-db": "pnpm dlx update-browserslist-db@latest",
     "build": "turbo run build",
     "lingui:extract": "turbo run lingui:extract",
     "lint": "turbo run lint",
@@ -56,6 +57,5 @@
       "unrs-resolver",
       "workerd"
     ]
-  },
-  "devDependencies": {}
+  }
 }

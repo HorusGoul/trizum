@@ -49,6 +49,8 @@ function RouteComponent() {
   const to = party.participants[toId];
   const isFromMe = fromId === me.id;
   const navigate = useNavigate();
+  const fromName = from.name;
+  const toName = to.name;
 
   const methods: PaymentMethod[] = [
     to.phone ? { type: "bizum", phoneNumber: to.phone } : null,
@@ -57,7 +59,7 @@ function RouteComponent() {
 
   function onMarkAsPaid() {
     const expensePromise = addExpenseToParty({
-      name: t`Paid debt to ${to.name}`,
+      name: t`Paid debt to ${toName}`,
       paidAt: new Date(),
       paidBy: { [fromId]: amount },
       isTransfer: true,
@@ -67,7 +69,7 @@ function RouteComponent() {
 
     toast.promise(expensePromise, {
       loading: t`Marking expense as paid...`,
-      success: t`Debt settled between ${from.name} and ${to.name}!`,
+      success: t`Debt settled between ${fromName} and ${toName}!`,
       error: t`Failed to mark expense as paid`,
     });
 
