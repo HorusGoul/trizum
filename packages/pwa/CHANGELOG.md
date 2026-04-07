@@ -1,5 +1,29 @@
 # @trizum/pwa
 
+## 1.7.0
+
+### Minor Changes
+
+- 750a8f6: Refresh the home screen party list with a new card-based layout and party management controls.
+  - order parties by pinned status and most recent use
+  - let users pin and archive parties from the home screen
+  - add a dedicated archived parties screen with restore actions
+
+- a42ebec: Add reusable modal sheet action primitives and use them for home party actions.
+  - add a shared modal sheet primitive built on `react-modal-sheet`
+  - open party actions from a long press on mobile and a hover-revealed menu on desktop
+  - preserve the existing card press feedback while improving sheet action layout and safe-area handling
+
+### Patch Changes
+
+- 9116b2b: Standardize several loading states on the shared Trizum spinner component.
+  - replace the party pending screen's inline spinner SVG with `TrizumSpinner`
+  - use `TrizumSpinner` for avatar uploads and the emoji picker loading state
+
+- 652cf7a: Switch the PWA's animation runtime from `framer-motion` to the `motion` package.
+  - update the animated tabs, QR scanner, and media gallery imports to use Motion's React entrypoint
+  - keep the existing animation behavior while aligning with the current package name
+
 ## 1.6.1
 
 ### Patch Changes
