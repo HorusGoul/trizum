@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build screenshots dependencies
+        run: pnpm turbo run build --filter=@trizum/screenshots^...
+
       - name: Install Playwright Browsers
         run: pnpm run setup
         working-directory: packages/screenshots
