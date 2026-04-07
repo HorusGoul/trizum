@@ -5,7 +5,7 @@ import {
   Text,
 } from "react-aria-components";
 import { cn } from "#src/ui/utils.js";
-import { FieldError, Label } from "#src/ui/Field.js";
+import { FieldError, Label } from "#src/ui/fields/Field.js";
 import { EmojiPicker } from "#src/components/EmojiPicker.js";
 
 const TextField = AriaTextField;

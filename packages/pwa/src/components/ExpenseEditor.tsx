@@ -14,7 +14,7 @@ import {
 import { IconButton } from "#src/ui/IconButton.js";
 import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
-import { AppNumberField, AppTextField } from "#src/ui/TextField.js";
+import { AppNumberField, AppTextField } from "#src/ui/fields/TextField.js";
 import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";

@@ -22,8 +22,8 @@ import {
   CalendarHeaderCell,
   CalendarHeading,
 } from "./Calendar";
-import { DateInput } from "./DateField";
-import { FieldError, FieldGroup, Label } from "./Field";
+import { DateInput } from "./fields/DateField";
+import { FieldError, FieldGroup, Label } from "./fields/Field";
 import { Popover } from "./Popover";
 import { IconButton } from "./IconButton";
 

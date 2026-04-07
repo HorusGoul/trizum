@@ -8,7 +8,7 @@ import {
   validatePhoneNumber,
 } from "#src/lib/validation.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/fields/TextField.js";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
@@ -18,7 +18,7 @@ import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { SwitchField } from "#src/components/SwitchField.tsx";
 import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
-import { Label } from "#src/ui/Field.tsx";
+import { Label } from "#src/ui/fields/Field.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 
 export const Route = createFileRoute("/settings")({

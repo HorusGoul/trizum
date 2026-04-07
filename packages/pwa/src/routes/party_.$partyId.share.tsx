@@ -104,7 +104,7 @@ function RouteComponent() {
   );
 }
 
-export function getQRCodeImage() {
+function getQRCodeImage() {
   // Get color from CSS variable
   const variable = getComputedStyle(document.documentElement).getPropertyValue(
     "--accent-400",

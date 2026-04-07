@@ -7,7 +7,7 @@ import {
   type PartyParticipant,
 } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/TextField.js";
+import { AppTextField } from "#src/ui/fields/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
