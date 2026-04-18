@@ -61,7 +61,7 @@ function About() {
           </h3>
           <ul className="flex flex-col gap-3">
             <FeatureItem
-              icon="#lucide/wifi-off"
+              icon="lucide.wifi-off"
               title={<Trans>Offline-First</Trans>}
               description={
                 <Trans>
@@ -70,7 +70,7 @@ function About() {
               }
             />
             <FeatureItem
-              icon="#lucide/refresh-cw"
+              icon="lucide.refresh-cw"
               title={<Trans>Real-Time Sync</Trans>}
               description={
                 <Trans>
@@ -79,7 +79,7 @@ function About() {
               }
             />
             <FeatureItem
-              icon="#lucide/users"
+              icon="lucide.users"
               title={<Trans>Multi-Party Splitting</Trans>}
               description={
                 <Trans>Split expenses fairly among multiple participants</Trans>
@@ -96,28 +96,28 @@ function About() {
           <div className="flex flex-col gap-3">
             <AboutLink
               href="https://github.com/HorusGoul/trizum"
-              icon="#lucide/github"
+              icon="brand.github"
               label={<Trans>View on GitHub</Trans>}
             />
             <AboutLink
               href="https://github.com/HorusGoul/trizum/issues"
-              icon="#lucide/bug"
+              icon="lucide.bug"
               label={<Trans>Report an Issue</Trans>}
             />
             <AboutLink
               href="https://github.com/HorusGoul/trizum/blob/main/LICENSE"
-              icon="#lucide/scale"
+              icon="lucide.scale"
               label={<Trans>License</Trans>}
             />
             <AboutLink
               href="/support"
-              icon="#lucide/circle-help"
+              icon="lucide.circle-help"
               label={<Trans>Support</Trans>}
               isInternal
             />
             <AboutLink
               href="/privacy-policy"
-              icon="#lucide/shield"
+              icon="lucide.shield"
               label={<Trans>Privacy Policy</Trans>}
               isInternal
             />
@@ -147,7 +147,7 @@ function About() {
           </p>
           <AboutLink
             href="/about/third-party-licenses"
-            icon="#lucide/book-open"
+            icon="lucide.book-open"
             label={<Trans>View Third-Party Licenses</Trans>}
             isInternal
           />
@@ -165,7 +165,7 @@ function About() {
 }
 
 interface FeatureItemProps {
-  icon: IconProps["name"];
+  icon: IconProps["icon"];
   title: React.ReactNode;
   description: React.ReactNode;
 }
@@ -176,8 +176,9 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
       <div className="flex-shrink-0">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
           <IconWithFallback
-            name={icon}
-            size={20}
+            icon={icon}
+            width={20}
+            height={20}
             className="text-accent-700 dark:text-accent-300"
           />
         </div>
@@ -223,7 +224,7 @@ function Contributor({ username, website }: ContributorProps) {
 
 interface AboutLinkProps {
   href: string;
-  icon?: IconProps["name"];
+  icon?: IconProps["icon"];
   label: React.ReactNode;
   isInternal?: boolean;
 }
@@ -234,12 +235,13 @@ function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
 
   const content = (
     <>
-      {icon && <IconWithFallback name={icon} size={20} />}
+      {icon && <IconWithFallback icon={icon} width={20} height={20} />}
       <span className="flex-1">{label}</span>
       {!isInternal && (
         <IconWithFallback
-          name="#lucide/external-link"
-          size={16}
+          icon="lucide.external-link"
+          width={16}
+          height={16}
           className="text-accent-600 dark:text-accent-400"
         />
       )}

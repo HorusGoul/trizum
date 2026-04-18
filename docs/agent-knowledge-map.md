@@ -133,7 +133,7 @@ Examples in this repo:
   [`.agents/skills/creating-changesets/SKILL.md`](../.agents/skills/creating-changesets/SKILL.md)
   because the trigger is repo-wide and the workflow is ordered, repeatable, and
   a good fit for agent execution.
-- Icon preload regeneration belongs in a skill because it is repeatable and
+- Icon sprite regeneration belongs in a skill because it is repeatable and
   human-invoked.
 - Validation that can be enforced in CI should eventually stop relying on prose
   reminders alone.

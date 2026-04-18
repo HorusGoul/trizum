@@ -22,8 +22,10 @@ then use this document to decide where to work inside the PWA.
 - The app is offline-first and uses Automerge for shared, persisted data.
 - User-facing copy must use Lingui macros, then run `pnpm lingui:extract`.
 - `src/routeTree.gen.ts` is generated. Do not edit it manually.
-- `src/preloadIcons.gen.ts` is generated from icon usage. Regenerate it through
-  the documented workflow or the corresponding skill instead of hand-editing it.
+- `src/generated/iconSprite.gen.ts` and `src/generated/iconSprite.svg` are
+  generated from the available icon catalog and current icon usage. Regenerate
+  them with `pnpm icons:generate` or the corresponding skill instead of
+  hand-editing them.
 
 ## Validation
 

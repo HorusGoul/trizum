@@ -287,8 +287,9 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                 >
                   <div className="flex size-16 items-center justify-center rounded-full bg-success-500">
                     <Icon
-                      name="#lucide/check"
-                      size={40}
+                      icon="lucide.check"
+                      width={40}
+                      height={40}
                       className="text-white"
                     />
                   </div>
@@ -310,7 +311,12 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                     transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}
                     className="flex size-16 items-center justify-center rounded-full bg-danger-500"
                   >
-                    <Icon name="#lucide/x" size={40} className="text-white" />
+                    <Icon
+                      icon="lucide.x"
+                      width={40}
+                      height={40}
+                      className="text-white"
+                    />
                   </motion.div>
                   <motion.span
                     initial={{ opacity: 0, y: 5 }}

@@ -32,7 +32,7 @@ import { cn } from "#src/ui/utils.js";
 
 export interface PartyListCardAction {
   key: string;
-  icon: ComponentProps<typeof IconWithFallback>["name"];
+  icon: ComponentProps<typeof IconWithFallback>["icon"];
   label: ReactNode;
   onAction: () => void;
   tone?: ModalSheetActionTone;
@@ -115,12 +115,12 @@ export function PartyListCard({
   };
   const statusBadge = isArchived
     ? {
-        icon: "#lucide/archive" as const,
+        icon: "lucide.archive" as const,
         label: <Trans>Archived</Trans>,
       }
     : isPinned
       ? {
-          icon: "#lucide/pin" as const,
+          icon: "lucide.pin" as const,
           label: <Trans>Pinned</Trans>,
         }
       : null;
@@ -166,7 +166,11 @@ export function PartyListCard({
 
           {statusBadge ? (
             <span className="absolute -bottom-0.5 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-700 shadow-sm dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200">
-              <IconWithFallback name={statusBadge.icon} size={11} />
+              <IconWithFallback
+                icon={statusBadge.icon}
+                width={11}
+                height={11}
+              />
               <span className="sr-only">{statusBadge.label}</span>
             </span>
           ) : null}
@@ -204,8 +208,9 @@ export function PartyListCard({
           {participantPreview ? (
             <p className="mt-1 flex min-w-0 items-start gap-2 text-sm leading-6 text-accent-900/80 dark:text-accent-200">
               <IconWithFallback
-                name="#lucide/users"
-                size={16}
+                icon="lucide.users"
+                width={16}
+                height={16}
                 aria-hidden="true"
                 className="mt-1 flex-shrink-0 opacity-90"
               />
@@ -243,7 +248,7 @@ export function PartyListCard({
                 onOpenChange={setIsDesktopMenuOpen}
               >
                 <IconButton
-                  icon="#lucide/ellipsis-vertical"
+                  icon="lucide.ellipsis-vertical"
                   aria-label={t`Party actions`}
                   color="transparent"
                   className={cn(
@@ -264,8 +269,9 @@ export function PartyListCard({
                         }}
                       >
                         <IconWithFallback
-                          name={action.icon}
-                          size={20}
+                          icon={action.icon}
+                          width={20}
+                          height={20}
                           className="mr-3"
                         />
                         <span

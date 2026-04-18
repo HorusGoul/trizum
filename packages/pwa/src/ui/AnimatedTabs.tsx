@@ -29,7 +29,7 @@ interface AnimatedTabsProps {
     id: Key;
     label: string;
     node: React.ReactNode;
-    icon: IconProps["name"];
+    icon: IconProps["icon"];
     panelRef?: React.RefObject<HTMLDivElement | null>;
   }[];
   tabListClassName?: string;
@@ -186,7 +186,12 @@ export function AnimatedTabs({
             <Tab className="flex flex-1 cursor-default touch-none items-center justify-center px-4 py-2.5 outline-none transition">
               {({ isSelected, isFocusVisible }) => (
                 <>
-                  <Icon name={tab.icon} size={20} className="mr-3" />
+                  <Icon
+                    icon={tab.icon}
+                    width={20}
+                    height={20}
+                    className="mr-3"
+                  />
                   <span className="h-4.5 text-lg leading-none">
                     {tab.label}
                   </span>

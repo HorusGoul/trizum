@@ -134,8 +134,9 @@ function Join() {
         <div className="container mt-4 px-4">
           <CardButton onPress={openScanner}>
             <Icon
-              name="#lucide/scan-qr-code"
-              size={24}
+              icon="lucide.scan-qr-code"
+              width={24}
+              height={24}
               className="text-accent-600 dark:text-accent-400"
             />
             <div className="flex flex-1 flex-col">

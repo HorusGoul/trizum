@@ -24,8 +24,9 @@ function Support() {
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
               <IconWithFallback
-                name="#lucide/circle-help"
-                size={32}
+                icon="lucide.circle-help"
+                width={32}
+                height={32}
                 className="text-accent-700 dark:text-accent-300"
               />
             </div>
@@ -45,7 +46,7 @@ function Support() {
           <div className="flex flex-col gap-3">
             <SupportLink
               href="mailto:contact@trizum.app"
-              icon="#lucide/mail"
+              icon="lucide.mail"
               title={<Trans>Email Support</Trans>}
               description={
                 <Trans>
@@ -66,7 +67,7 @@ function Support() {
           <div className="flex flex-col gap-3">
             <SupportLink
               href="https://github.com/HorusGoul/trizum/issues"
-              icon="#lucide/bug"
+              icon="lucide.bug"
               title={<Trans>Bug Reports</Trans>}
               description={
                 <Trans>
@@ -78,7 +79,7 @@ function Support() {
             />
             <SupportLink
               href="https://github.com/HorusGoul/trizum/issues/new"
-              icon="#lucide/lightbulb"
+              icon="lucide.lightbulb"
               title={<Trans>Feature Requests</Trans>}
               description={
                 <Trans>
@@ -145,7 +146,7 @@ function Support() {
 
 interface SupportLinkProps {
   href: string;
-  icon: IconProps["name"];
+  icon: IconProps["icon"];
   title: React.ReactNode;
   description: React.ReactNode;
   linkText: React.ReactNode;
@@ -173,8 +174,9 @@ function SupportLink({
       <div className="flex-shrink-0">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-200 dark:bg-accent-700">
           <IconWithFallback
-            name={icon}
-            size={24}
+            icon={icon}
+            width={24}
+            height={24}
             className="text-accent-700 dark:text-accent-300"
           />
         </div>
@@ -190,8 +192,9 @@ function SupportLink({
           {linkText}
           {isExternal && (
             <IconWithFallback
-              name="#lucide/external-link"
-              size={14}
+              icon="lucide.external-link"
+              width={14}
+              height={14}
               className="text-accent-500"
             />
           )}

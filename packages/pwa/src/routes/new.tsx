@@ -154,7 +154,7 @@ function New() {
             canSubmit ? (
               <Suspense fallback={null}>
                 <IconButton
-                  icon="#lucide/check"
+                  icon="lucide.check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}
@@ -327,7 +327,7 @@ function New() {
                     </form.Field>
 
                     <IconButton
-                      icon="#lucide/trash"
+                      icon="lucide.trash"
                       aria-label={t`Remove`}
                       onPress={() => field.removeValue(index)}
                       className="flex-shrink-0"
@@ -395,7 +395,7 @@ function New() {
                   </addParticipantForm.Field>
 
                   <IconButton
-                    icon="#lucide/plus"
+                    icon="lucide.plus"
                     aria-label={t`Add participant`}
                     className="flex-shrink-0"
                     color="accent"

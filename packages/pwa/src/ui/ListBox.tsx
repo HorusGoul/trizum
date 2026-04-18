@@ -65,7 +65,7 @@ const ListBoxItem = <T extends object>({
         <>
           {renderProps.isSelected && (
             <span className="absolute left-2 flex size-4 items-center justify-center">
-              <Icon name="#lucide/check" className="size-4" />
+              <Icon icon="lucide.check" className="size-4" />
             </span>
           )}
           {children}

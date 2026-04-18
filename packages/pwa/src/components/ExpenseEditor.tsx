@@ -264,7 +264,7 @@ export function ExpenseEditor({
         <div className="flex-1" />
         <MenuTrigger>
           <IconButton
-            icon="#lucide/ellipsis-vertical"
+            icon="lucide.ellipsis-vertical"
             aria-label={t`Menu`}
             className="flex-shrink-0"
           />
@@ -274,8 +274,9 @@ export function ExpenseEditor({
                 onAction={() => setAutoOpenCalculator(!autoOpenCalculator)}
               >
                 <IconWithFallback
-                  name="#lucide/calculator"
-                  size={20}
+                  icon="lucide.calculator"
+                  width={20}
+                  height={20}
                   className="mr-3 self-start"
                 />
                 <div className="mr-3 flex flex-col">
@@ -302,7 +303,7 @@ export function ExpenseEditor({
             canSubmit ? (
               <Suspense fallback={null}>
                 <IconButton
-                  icon="#lucide/check"
+                  icon="lucide.check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}
@@ -631,7 +632,7 @@ function ParticipantItem({
             {participantShare.type === "divide" ? (
               <>
                 <IconButton
-                  icon="#lucide/minus"
+                  icon="lucide.minus"
                   className="h-7 w-7"
                   iconClassName="size-3.5"
                   onPress={onDecrementSharesPress}
@@ -665,7 +666,7 @@ function ParticipantItem({
                   aria-label={t`Shares for ${participantName}`}
                 />
                 <IconButton
-                  icon="#lucide/plus"
+                  icon="lucide.plus"
                   className="h-7 w-7"
                   iconClassName="size-3.5"
                   onPress={onIncrementSharesPress}
@@ -676,7 +677,7 @@ function ParticipantItem({
               <TooltipTrigger>
                 <IconButton
                   color="input-like"
-                  icon="#lucide/split"
+                  icon="lucide.split"
                   onPress={() => {
                     onShareTypeChange("divide");
                   }}
@@ -792,7 +793,7 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
 
   return (
     <Alert variant="default">
-      <Icon name="#lucide/badge-info" />
+      <Icon icon="lucide.badge-info" />
 
       <AlertTitle>{t`Heads up!`}</AlertTitle>
 
@@ -922,7 +923,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         color="input-like"
         className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
       >
-        <Icon name="#lucide/camera" className="h-5 w-5" />
+        <Icon icon="lucide.camera" className="h-5 w-5" />
         <Trans>Take photo</Trans>
       </Button>
 
@@ -931,7 +932,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         color="input-like"
         className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
       >
-        <Icon name="#lucide/image-up" className="h-5 w-5" />
+        <Icon icon="lucide.image-up" className="h-5 w-5" />
         <Trans>Upload photo</Trans>
       </Button>
 
@@ -999,7 +1000,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
         onPress={onRemove}
       >
         <Icon
-          name="#lucide/x"
+          icon="lucide.x"
           className="h-4 w-4"
           aria-label={t`Remove photo`}
         />

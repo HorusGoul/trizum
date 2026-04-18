@@ -1,65 +1,42 @@
-import { lazy, Suspense, type HTMLAttributes } from "react";
-import type { LucideProps } from "lucide-react";
-import dynamicIconImports from "lucide-react/dynamicIconImports";
+import { useId } from "react";
+import type { SVGProps } from "react";
+import spriteHref from "#src/generated/iconSprite.svg?url";
+import type { SpriteId } from "#src/generated/iconSprite.gen.js";
 
-export interface IconProps extends Omit<LucideProps, "ref"> {
-  name: `#lucide/${keyof typeof dynamicIconImports}`;
+export interface IconProps extends SVGProps<SVGSVGElement> {
+  icon: SpriteId;
+  title?: string;
 }
 
-const iconCache = new Map<string, React.ComponentType<LucideProps>>();
-
-function getOrCreateIcon(prefixedName: IconProps["name"]) {
-  const name = prefixedName.replace(
-    "#lucide/",
-    "",
-  ) as keyof typeof dynamicIconImports;
-  let LucideIcon = iconCache.get(name);
-
-  if (!LucideIcon) {
-    const fn =
-      dynamicIconImports[name] ??
-      (() => Promise.resolve({ default: FallbackIcon }));
-    const promise = fn();
-    void promise.then((mod) => {
-      iconCache.set(name, mod.default);
-    });
-    LucideIcon = lazy(() => promise);
-    iconCache.set(name, LucideIcon);
-  }
-
-  return LucideIcon;
-}
-
-export const Icon = ({ ...props }: IconProps) => {
-  return <IconWithFallback {...props} />;
-};
-
-function FallbackIcon({ ...props }: IconProps) {
-  const fallbackStyle = {
-    width: props.size || props.width,
-    height: props.size || props.height,
-    backgroundColor: props.color || "currentColor",
-    opacity: 0.1,
-    borderRadius: "999999px",
-  };
+export function Icon({
+  "aria-hidden": ariaHidden,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  height = 24,
+  icon,
+  title,
+  width = 24,
+  ...props
+}: IconProps) {
+  const generatedTitleId = useId();
+  const titleId =
+    title && !ariaLabel && !ariaLabelledBy ? generatedTitleId : undefined;
+  const isDecorative = ariaHidden ?? (!ariaLabel && !ariaLabelledBy && !title);
 
   return (
-    <div {...(props as HTMLAttributes<HTMLDivElement>)} style={fallbackStyle} />
+    <svg
+      {...props}
+      aria-hidden={isDecorative}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy ?? titleId}
+      focusable="false"
+      height={height}
+      width={width}
+    >
+      {titleId ? <title id={titleId}>{title}</title> : null}
+      <use href={`${spriteHref}#${icon}`} />
+    </svg>
   );
 }
 
-export const IconWithFallback = ({ name, ...props }: IconProps) => {
-  const LucideIcon = getOrCreateIcon(name);
-
-  return (
-    <Suspense fallback={<FallbackIcon name={name} {...props} />}>
-      {/* eslint-disable-next-line react-hooks/static-components -- getOrCreateIcon returns cached components */}
-      <LucideIcon {...props} />
-    </Suspense>
-  );
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function preloadIcon(name: IconProps["name"]) {
-  getOrCreateIcon(name);
-}
+export const IconWithFallback = Icon;

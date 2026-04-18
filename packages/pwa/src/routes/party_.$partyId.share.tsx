@@ -89,12 +89,12 @@ function RouteComponent() {
         >
           {canShare ? (
             <>
-              <Icon name="#lucide/share" className="mr-2 h-5 w-5" />
+              <Icon icon="lucide.share" className="mr-2 h-5 w-5" />
               <Trans>Share party</Trans>
             </>
           ) : (
             <>
-              <Icon name="#lucide/copy" className="mr-2 h-5 w-5" />
+              <Icon icon="lucide.copy" className="mr-2 h-5 w-5" />
               <Trans>Copy party link</Trans>
             </>
           )}

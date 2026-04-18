@@ -40,7 +40,7 @@ function ArchivedParties() {
             const actions: PartyListCardAction[] = [
               {
                 key: "restore",
-                icon: "#lucide/archive-restore",
+                icon: "lucide.archive-restore",
                 label: <Trans>Restore to home</Trans>,
                 onAction: () => {
                   setPartyArchived(partyId, false);
@@ -85,7 +85,11 @@ function ArchivedEmptyState() {
     <div className="rounded-xl border border-dashed border-accent-300 bg-white/80 p-6 text-center shadow-sm dark:border-accent-700 dark:bg-accent-950/70 dark:shadow-none">
       <div className="mx-auto flex max-w-md flex-col items-center gap-4">
         <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
-          <IconWithFallback name="#lucide/archive-restore" size={22} />
+          <IconWithFallback
+            icon="lucide.archive-restore"
+            width={22}
+            height={22}
+          />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-accent-950 dark:text-accent-50">

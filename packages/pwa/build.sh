@@ -5,6 +5,7 @@ set -euo pipefail
 export SENTRY_ORG="horusdev"
 export SENTRY_PROJECT="trizum-pwa"
 
+pnpm icons:generate
 vite build
 
 sentry-cli sourcemaps inject ./dist/client

@@ -111,7 +111,7 @@ function Who() {
             canSubmit && isDirty ? (
               <Suspense fallback={null}>
                 <IconButton
-                  icon="#lucide/check"
+                  icon="lucide.check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}
@@ -179,10 +179,8 @@ function Who() {
                     <div className="flex w-full items-center justify-between gap-3">
                       <div className="flex shrink-0 items-center">
                         <Icon
-                          name={
-                            isSelected
-                              ? "#lucide/circle-check"
-                              : "#lucide/circle"
+                          icon={
+                            isSelected ? "lucide.circle-check" : "lucide.circle"
                           }
                         />
                       </div>

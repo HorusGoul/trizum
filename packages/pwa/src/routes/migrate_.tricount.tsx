@@ -170,7 +170,7 @@ function IdleState({
             canSubmit ? (
               <Suspense fallback={null}>
                 <IconButton
-                  icon="#lucide/check"
+                  icon="lucide.check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}

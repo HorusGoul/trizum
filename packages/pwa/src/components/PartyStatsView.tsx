@@ -55,7 +55,7 @@ interface StatsTimeframeOption {
 }
 
 interface StatsSummaryCardProps {
-  icon: "#lucide/calendar" | "#lucide/scale";
+  icon: "lucide.calendar" | "lucide.scale";
   label: string;
   value: ReactNode;
   description: ReactNode;
@@ -326,7 +326,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
 
           <StatsSummaryCard
             compact
-            icon="#lucide/calendar"
+            icon="lucide.calendar"
             label={t`Expenses counted`}
             value={
               <span className="text-lg font-semibold tracking-tight">
@@ -403,7 +403,7 @@ function StatsSummaryCard({
     return (
       <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3 py-2 text-accent-50 shadow-sm backdrop-blur-sm sm:self-start dark:bg-accent-950/30 dark:shadow-none">
         <span className="bg-white/12 rounded-full p-1.5 text-accent-50">
-          <Icon name={icon} size={14} />
+          <Icon icon={icon} width={14} height={14} />
         </span>
 
         <span className="text-base font-semibold tracking-tight">{value}</span>
@@ -431,7 +431,7 @@ function StatsSummaryCard({
     >
       <div className="flex items-start gap-3">
         <div className={cn("bg-white/12 rounded-full p-3 text-accent-50")}>
-          <Icon name={icon} size={20} />
+          <Icon icon={icon} width={20} height={20} />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -526,7 +526,7 @@ function FirstPlacePodiumColumn({
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
-      iconName="#lucide/trophy"
+      iconName="lucide.trophy"
       nameClassName="text-xl"
       pedestalClassName="min-h-40 border-yellow-300/70 bg-gradient-to-t from-yellow-500 via-amber-400 to-yellow-300 text-yellow-950 dark:border-yellow-500/60 dark:from-yellow-600 dark:via-amber-500 dark:to-yellow-400"
       rankClassName="bg-yellow-400/20 text-yellow-100 dark:bg-yellow-400/15 dark:text-yellow-200"
@@ -553,7 +553,7 @@ function SecondPlacePodiumColumn({
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
-      iconName="#lucide/scale"
+      iconName="lucide.scale"
       nameClassName="text-lg"
       pedestalClassName="min-h-32 border-accent-300 bg-gradient-to-t from-accent-300 to-accent-100 text-accent-950 dark:border-accent-700 dark:from-accent-800 dark:to-accent-700 dark:text-accent-50"
       rankClassName="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200"
@@ -580,7 +580,7 @@ function ThirdPlacePodiumColumn({
       currency={currency}
       currentParticipantId={currentParticipantId}
       entry={entry}
-      iconName="#lucide/scale"
+      iconName="lucide.scale"
       nameClassName="text-lg"
       pedestalClassName="min-h-24 border-orange-300/70 bg-gradient-to-t from-orange-300 to-amber-100 text-orange-950 dark:border-orange-700 dark:from-orange-900 dark:to-amber-800 dark:text-amber-50"
       rankClassName="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200"
@@ -606,7 +606,7 @@ function StatsPodiumColumnShell({
   entry: StatsPodiumEntry;
   amountClassName: string;
   avatarClassName: string;
-  iconName: ComponentProps<typeof Icon>["name"];
+  iconName: ComponentProps<typeof Icon>["icon"];
   nameClassName: string;
   pedestalClassName: string;
   rankClassName: string;
@@ -666,7 +666,7 @@ function StatsPodiumColumnShell({
           pedestalClassName,
         )}
       >
-        <Icon name={iconName} className="mb-2 size-5" />
+        <Icon icon={iconName} className="mb-2 size-5" />
 
         <CurrencyText
           amount={participant.totalSpent}
@@ -839,7 +839,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
         className="h-9 w-full gap-2 rounded-full px-3 text-sm font-medium sm:w-auto"
       >
         <Icon
-          name="#lucide/calendar"
+          icon="lucide.calendar"
           className="size-4 shrink-0 text-accent-600 dark:text-accent-300"
         />
         <span className="truncate">{formatRangeLabel(value)}</span>

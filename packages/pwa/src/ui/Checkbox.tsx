@@ -49,9 +49,9 @@ const Checkbox = ({ className, children, ...props }: AriaCheckboxProps) => (
           )}
         >
           {renderProps.isIndeterminate ? (
-            <Icon name="#lucide/minus" className="size-4" />
+            <Icon icon="lucide.minus" className="size-4" />
           ) : renderProps.isSelected ? (
-            <Icon name="#lucide/check" className="size-4" />
+            <Icon icon="lucide.check" className="size-4" />
           ) : null}
         </div>
         {children}

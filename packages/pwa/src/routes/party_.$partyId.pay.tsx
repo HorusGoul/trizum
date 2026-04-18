@@ -118,7 +118,12 @@ function RouteComponent() {
         </div>
 
         <Button color="accent" className="font-semibold" onPress={onMarkAsPaid}>
-          <Icon name="#lucide/circle-check" size={20} className="mr-2" />
+          <Icon
+            icon="lucide.circle-check"
+            width={20}
+            height={20}
+            className="mr-2"
+          />
           <Trans>Mark as paid</Trans>
         </Button>
 
@@ -180,7 +185,7 @@ function BizumItem({ phoneNumber }: { phoneNumber: string }) {
             });
         }}
       >
-        <Icon name="#lucide/copy" size={20} />
+        <Icon icon="lucide.copy" width={20} height={20} />
         <span className="ml-2">{phoneNumber}</span>
       </Button>
     </div>

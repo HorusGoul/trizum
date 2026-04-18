@@ -36,7 +36,7 @@ export function IconButton({
   iconClassName,
   ...props
 }: Omit<ButtonProps, "children"> & {
-  icon: IconProps["name"];
+  icon: IconProps["icon"];
   iconClassName?: ClassName;
   color?: IconButtonColorScheme;
 }) {
@@ -70,7 +70,7 @@ export function IconButton({
       }
       {...props}
     >
-      <Icon name={icon} className={cn(iconClassName)} />
+      <Icon icon={icon} className={cn(iconClassName)} />
     </Button>
   );
 }

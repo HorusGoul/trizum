@@ -563,7 +563,7 @@ export function CalculatorToolbar({
             onPress={onBackspace}
             className="h-12 rounded-xl text-lg font-medium"
           >
-            <IconWithFallback name="#lucide/delete" className="size-5" />
+            <IconWithFallback icon="lucide.delete" className="size-5" />
           </Button>
           <Button
             color="accent"

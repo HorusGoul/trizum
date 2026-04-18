@@ -183,7 +183,7 @@ export default function MediaGallery({
       <GalleryButton
         className="right-safe-offset-4 top-safe-offset-4"
         label={t`Close`}
-        icon="#lucide/x"
+        icon="lucide.x"
         onClick={onClose}
       />
 
@@ -192,14 +192,14 @@ export default function MediaGallery({
           <GalleryButton
             className="top-1/2 -translate-y-1/2 transform left-safe-offset-4"
             label={t`Previous`}
-            icon="#lucide/arrow-left"
+            icon="lucide.arrow-left"
             onClick={goToPrevious}
           />
 
           <GalleryButton
             className="top-1/2 -translate-y-1/2 transform right-safe-offset-4"
             label={t`Next`}
-            icon="#lucide/arrow-right"
+            icon="lucide.arrow-right"
             onClick={goToNext}
           />
         </>
@@ -212,7 +212,7 @@ interface GalleryButtonProps {
   className?: ClassName;
   label: string;
   onClick: () => void;
-  icon: IconProps["name"];
+  icon: IconProps["icon"];
 }
 
 function GalleryButton({
