@@ -25,7 +25,7 @@ msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
 #. placeholder {0}: preview.remainingCount
-#: src/components/PartyListCard.tsx:346
+#: src/components/PartyListCard.tsx:342
 msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {and # other} other {and # others}}"
 
@@ -157,7 +157,7 @@ msgstr "Angolan Kwanza"
 msgid "Archive"
 msgstr "Archive"
 
-#: src/routes/archived.tsx:99
+#: src/routes/archived.tsx:95
 msgid "Archive a party from the home screen when you want to clear some space without losing it."
 msgstr "Archive a party from the home screen when you want to clear some space without losing it."
 
@@ -243,7 +243,7 @@ msgstr "Avatar updated successfully"
 msgid "Azerbaijani Manat"
 msgstr "Azerbaijani Manat"
 
-#: src/routes/archived.tsx:123
+#: src/routes/archived.tsx:119
 msgid "Back to home"
 msgstr "Back to home"
 
@@ -1292,7 +1292,7 @@ msgstr "Nigerian Naira"
 msgid "No active parties right now"
 msgstr "No active parties right now"
 
-#: src/routes/archived.tsx:96
+#: src/routes/archived.tsx:92
 msgid "No archived parties"
 msgstr "No archived parties"
 
@@ -1471,7 +1471,7 @@ msgstr "participants"
 msgid "Participants"
 msgstr "Participants"
 
-#: src/components/PartyListCard.tsx:252
+#: src/components/PartyListCard.tsx:248
 msgid "Party actions"
 msgstr "Party actions"
 
