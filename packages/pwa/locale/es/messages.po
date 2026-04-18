@@ -15,12 +15,12 @@ msgstr ""
 
 #: src/routes/party_.$partyId.pay.tsx:101
 #: src/routes/party_.$partyId.pay.tsx:107
-#: src/routes/party.$partyId.tsx:918
-#: src/routes/party.$partyId.tsx:924
+#: src/routes/party.$partyId.tsx:937
+#: src/routes/party.$partyId.tsx:943
 msgid "(me)"
 msgstr "(yo)"
 
-#: src/routes/party.$partyId.tsx:449
+#: src/routes/party.$partyId.tsx:432
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
@@ -78,8 +78,8 @@ msgstr "Unidad de Cuenta del BAsD"
 msgid "Add"
 msgstr "Sumar"
 
-#: src/routes/party.$partyId.tsx:465
-#: src/routes/party.$partyId.tsx:473
+#: src/routes/party.$partyId.tsx:448
+#: src/routes/party.$partyId.tsx:456
 msgid "Add an expense"
 msgstr "Añadir un gasto"
 
@@ -88,7 +88,7 @@ msgid "Add expenses to this party to unlock totals, rankings, and individual spe
 msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto individual."
 
 #: src/routes/index.tsx:227
-#: src/routes/party.$partyId.tsx:433
+#: src/routes/party.$partyId.tsx:416
 msgid "Add or create"
 msgstr "Añadir o crear"
 
@@ -247,15 +247,15 @@ msgstr "Dólar Bahameño"
 msgid "Bahraini Dinar"
 msgstr "Dinar Bareiní"
 
-#: src/routes/party.$partyId.tsx:217
+#: src/routes/party.$partyId.tsx:208
 msgid "Balance, Highest First"
 msgstr "Balance, Mayor Primero"
 
-#: src/routes/party.$partyId.tsx:200
+#: src/routes/party.$partyId.tsx:191
 msgid "Balance, Lowest First"
 msgstr "Balance, Menor Primero"
 
-#: src/routes/party.$partyId.tsx:364
+#: src/routes/party.$partyId.tsx:354
 msgid "Balances"
 msgstr "Balance"
 
@@ -411,7 +411,7 @@ msgstr "Borrar todo"
 msgid "Clear expression"
 msgstr "Borrar expresión"
 
-#: src/components/EmojiPicker.tsx:190
+#: src/components/EmojiPicker.tsx:188
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
@@ -601,8 +601,8 @@ msgstr "Libra Egipcia"
 msgid "Email Support"
 msgstr "Soporte por email"
 
-#: src/components/EmojiPicker.tsx:290
-#: src/components/EmojiPicker.tsx:515
+#: src/components/EmojiPicker.tsx:340
+#: src/components/EmojiPicker.tsx:534
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
@@ -671,7 +671,7 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
-#: src/routes/party.$partyId.tsx:357
+#: src/routes/party.$partyId.tsx:348
 msgid "Expenses"
 msgstr "Gastos"
 
@@ -811,7 +811,7 @@ msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 msgid "Heads up!"
 msgstr "¡Atención!"
 
-#: src/routes/party.$partyId.tsx:742
+#: src/routes/party.$partyId.tsx:761
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo podéis hacer para equilibrar vuestra posición."
 
@@ -840,7 +840,7 @@ msgstr "¿Cómo quieres llamar a este grupo?"
 msgid "How does offline sync work?"
 msgstr "¿Cómo funciona la sincronización sin conexión?"
 
-#: src/routes/party.$partyId.tsx:738
+#: src/routes/party.$partyId.tsx:757
 msgid "How should I balance?"
 msgstr "¿Cómo debería equilibrar?"
 
@@ -868,7 +868,7 @@ msgstr "La imagen debe ser menor de 10MB"
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
-#: src/routes/party.$partyId.tsx:630
+#: src/routes/party.$partyId.tsx:649
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
@@ -1011,7 +1011,7 @@ msgstr "Último uso"
 msgid "Last year"
 msgstr "Año pasado"
 
-#: src/routes/party.$partyId.tsx:341
+#: src/routes/party.$partyId.tsx:332
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
@@ -1085,7 +1085,7 @@ msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden 
 
 #: src/routes/party_.$partyId.pay.tsx:93
 #: src/routes/party_.$partyId.pay.tsx:122
-#: src/routes/party.$partyId.tsx:955
+#: src/routes/party.$partyId.tsx:974
 msgid "Mark as paid"
 msgstr "Marcar como pagado"
 
@@ -1111,7 +1111,7 @@ msgstr "Yo"
 #: src/components/ExpenseEditor.tsx:268
 #: src/routes/index.tsx:117
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:103
-#: src/routes/party.$partyId.tsx:231
+#: src/routes/party.$partyId.tsx:222
 msgid "Menu"
 msgstr "Menú"
 
@@ -1179,7 +1179,7 @@ msgstr "Kyat Birmano"
 
 #: src/routes/new.tsx:186
 #: src/routes/party_.$partyId.settings.tsx:166
-#: src/routes/party.$partyId.tsx:183
+#: src/routes/party.$partyId.tsx:174
 msgid "Name"
 msgstr "Nombre"
 
@@ -1252,7 +1252,7 @@ msgstr "No se encontró cámara en este dispositivo"
 msgid "No currency"
 msgstr "Sin moneda"
 
-#: src/components/EmojiPicker.tsx:278
+#: src/components/EmojiPicker.tsx:333
 msgid "No emoji found"
 msgstr "No se encontraron emojis"
 
@@ -1269,7 +1269,7 @@ msgstr "No hay estadísticas de gastos para este período"
 msgid "No spending stats yet"
 msgstr "Aún no hay estadísticas de gastos"
 
-#: src/routes/party.$partyId.tsx:804
+#: src/routes/party.$partyId.tsx:823
 msgid "Nobody owes you money!"
 msgstr "¡Nadie te debe dinero!"
 
@@ -1309,7 +1309,7 @@ msgstr "Los grupos antiguos quedan apartados, no desaparecen"
 msgid "Omani Rial"
 msgstr "Rial Omaní"
 
-#: src/routes/party.$partyId.tsx:270
+#: src/routes/party.$partyId.tsx:261
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
@@ -1341,12 +1341,12 @@ msgstr "Abrir paréntesis"
 msgid "or enter code"
 msgstr "o introduce código"
 
-#: src/routes/party.$partyId.tsx:815
+#: src/routes/party.$partyId.tsx:834
 msgid "Other operations"
 msgstr "Otras operaciones"
 
 #: src/routes/party_.$partyId.pay.tsx:104
-#: src/routes/party.$partyId.tsx:921
+#: src/routes/party.$partyId.tsx:940
 msgid "owes"
 msgstr "le debe"
 
@@ -1464,15 +1464,15 @@ msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc12
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
 #: src/routes/party_.$partyId.pay.tsx:93
-#: src/routes/party.$partyId.tsx:955
+#: src/routes/party.$partyId.tsx:974
 msgid "Pay"
 msgstr "Pagar"
 
-#: src/routes/party.$partyId.tsx:786
+#: src/routes/party.$partyId.tsx:805
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
-#: src/routes/party.$partyId.tsx:266
+#: src/routes/party.$partyId.tsx:257
 msgid "Personal mode"
 msgstr "Modo personal"
 
@@ -1655,19 +1655,19 @@ msgstr "Guardar"
 msgid "Scan QR code"
 msgstr "Escanear código QR"
 
-#: src/components/EmojiPicker.tsx:170
+#: src/components/EmojiPicker.tsx:168
 msgid "Search emoji"
 msgstr "Buscar emoji"
 
-#: src/components/EmojiPicker.tsx:181
+#: src/components/EmojiPicker.tsx:179
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
 
-#: src/routes/party.$partyId.tsx:297
+#: src/routes/party.$partyId.tsx:288
 msgid "See spending totals and rankings"
 msgstr "Ver totales y clasificación de gasto"
 
-#: src/components/EmojiPicker.tsx:153
+#: src/components/EmojiPicker.tsx:151
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
@@ -1684,7 +1684,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:132
-#: src/routes/party.$partyId.tsx:330
+#: src/routes/party.$partyId.tsx:321
 #: src/routes/settings.tsx:91
 msgid "Settings"
 msgstr "Configuración"
@@ -1699,7 +1699,7 @@ msgstr "Rupia de Seychelles"
 
 #: src/routes/party_.$partyId.share.tsx:58
 #: src/routes/party_.$partyId.share.tsx:93
-#: src/routes/party.$partyId.tsx:314
+#: src/routes/party.$partyId.tsx:305
 msgid "Share party"
 msgstr "Compartir grupo"
 
@@ -1751,7 +1751,7 @@ msgstr "Chelín Somalí"
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/party.$partyId.tsx:171
+#: src/routes/party.$partyId.tsx:162
 msgid "Sort balances"
 msgstr "Ordenar balances"
 
@@ -1796,7 +1796,7 @@ msgstr "Fecha de inicio"
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
-#: src/routes/party.$partyId.tsx:293
+#: src/routes/party.$partyId.tsx:284
 msgid "Stats"
 msgstr "Estadísticas"
 
@@ -1896,7 +1896,7 @@ msgstr "Hacer foto"
 msgid "Tanzanian Shilling"
 msgstr "Chelín Tanzano"
 
-#: src/routes/party.$partyId.tsx:253
+#: src/routes/party.$partyId.tsx:244
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
@@ -2151,7 +2151,7 @@ msgstr "Ver Licencias de Terceros"
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
-#: src/routes/party.$partyId.tsx:249
+#: src/routes/party.$partyId.tsx:240
 msgid "Viewing as {participantName}"
 msgstr "Viendo como {participantName}"
 
@@ -2212,15 +2212,15 @@ msgstr "¡Sí! Tus datos se almacenan localmente en tu dispositivo y solo se sin
 msgid "You can add photos to your expenses for better tracking."
 msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 
-#: src/routes/party.$partyId.tsx:136
+#: src/routes/party.$partyId.tsx:127
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
-#: src/routes/party.$partyId.tsx:757
+#: src/routes/party.$partyId.tsx:776
 msgid "You owe money to people"
 msgstr "Debes dinero a personas"
 
-#: src/routes/party.$partyId.tsx:775
+#: src/routes/party.$partyId.tsx:794
 msgid "You're debt free!"
 msgstr "¡Estás libre de deudas!"
 
