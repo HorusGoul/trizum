@@ -79,6 +79,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: "prompt",
         workbox: {
+          globPatterns: ["**/*.{js,wasm,css,html,svg}"],
           maximumFileSizeToCacheInBytes: 5242880,
           additionalManifestEntries: [
             { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
