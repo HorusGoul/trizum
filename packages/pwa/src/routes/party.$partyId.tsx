@@ -26,15 +26,14 @@ import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
 import {
   Suspense,
   useEffect,
-  useLayoutEffect,
   useRef,
-  useState,
+  type CSSProperties,
   type Key,
+  type UIEvent,
 } from "react";
 import type { BalancesSortedBy, PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { useNoMemo } from "#src/hooks/useNoMemo.ts";
+import { List, type ListImperativeAPI } from "react-window";
 import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
@@ -88,7 +87,6 @@ function PartyById() {
   const { removeParty } = usePartyList();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
-  const expenseLogTabPanelRef = useRef<HTMLDivElement>(null);
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
   const [balancesSortedBy, setBalancesSortedBy] = useBalancesSortedBy();
 
@@ -364,8 +362,7 @@ function PartyById() {
             {
               id: "expenses",
               label: t`Expenses`,
-              node: <ExpenseLog panelRef={expenseLogTabPanelRef} />,
-              panelRef: expenseLogTabPanelRef,
+              node: <ExpenseLog />,
               icon: "lucide.scroll-text",
             },
             {
@@ -389,11 +386,7 @@ function PartyById() {
   );
 }
 
-function ExpenseLog({
-  panelRef,
-}: {
-  panelRef: React.RefObject<HTMLDivElement | null>;
-}) {
+function ExpenseLog() {
   const { party, dev } = useCurrentParty();
   const { expenses, hasNext, isLoadingNext, loadNext } =
     usePartyPaginatedExpenses(party.id);
@@ -423,26 +416,23 @@ function ExpenseLog({
     <>
       <div className="h-2 flex-shrink-0" />
 
-      <div className="container flex flex-1 flex-col px-2">
+      <div className="container relative flex min-h-0 flex-1 flex-col px-2">
         <VirtualizedExpenseList
           expenses={filteredExpenses}
-          panelRef={panelRef}
           partyId={party.id}
           hasNext={hasNext}
           isLoadingNext={isLoadingNext}
           loadNext={loadNext}
         />
 
-        <div className="flex-1 pb-safe-offset-12" />
-
-        <div className="sticky flex justify-end bottom-safe-offset-6">
+        <div className="pointer-events-none absolute inset-x-2 flex justify-end bottom-safe-offset-6">
           {import.meta.env.DEV ? (
             <MenuTrigger>
               <IconButton
                 aria-label={t`Add or create`}
                 icon="lucide.plus"
                 color="accent"
-                className="h-14 w-14 shadow-md"
+                className="pointer-events-auto h-14 w-14 shadow-md"
               />
 
               <Popover placement="top end" offset={16}>
@@ -484,7 +474,7 @@ function ExpenseLog({
               aria-label={t`Add an expense`}
               icon="lucide.plus"
               color="accent"
-              className="h-14 w-14 shadow-md"
+              className="pointer-events-auto h-14 w-14 shadow-md"
               onPress={() => {
                 void navigate({
                   to: "/party/$partyId/add",
@@ -499,98 +489,151 @@ function ExpenseLog({
   );
 }
 
+const EXPENSE_ROW_GAP = 16;
+const EXPENSE_LIST_BOTTOM_SPACER_HEIGHT = 120;
+const EXPENSE_LIST_DEFAULT_ROW_HEIGHT = 96 + EXPENSE_ROW_GAP;
+
+interface ExpenseListRowProps {
+  expenses: Expense[];
+  partyId: string;
+  loaderIndex: number;
+  spacerIndex: number;
+}
+
+interface ListVisibleRows {
+  startIndex: number;
+  stopIndex: number;
+}
+
+interface ListRowAriaAttributes {
+  "aria-posinset": number;
+  "aria-setsize": number;
+  role: "listitem";
+}
+
+interface ListRowBaseProps {
+  ariaAttributes: ListRowAriaAttributes;
+  index: number;
+  style: CSSProperties;
+}
+
+function ExpenseListRow({
+  ariaAttributes,
+  expenses,
+  index,
+  loaderIndex,
+  partyId,
+  spacerIndex,
+  style,
+}: ListRowBaseProps & ExpenseListRowProps) {
+  if (index === spacerIndex) {
+    return <div aria-hidden="true" style={style} />;
+  }
+
+  return (
+    <div
+      {...ariaAttributes}
+      style={{
+        ...style,
+        boxSizing: "border-box",
+        paddingBottom: EXPENSE_ROW_GAP,
+      }}
+    >
+      {index === loaderIndex ? (
+        <Skeleton className="h-24 w-full" />
+      ) : (
+        <ExpenseItem partyId={partyId} expense={expenses[index]} />
+      )}
+    </div>
+  );
+}
+
 function VirtualizedExpenseList({
   expenses,
-  panelRef,
   partyId,
   hasNext,
   isLoadingNext,
   loadNext,
 }: {
   expenses: Expense[];
-  panelRef: React.RefObject<HTMLDivElement | null>;
   partyId: string;
   hasNext: boolean;
   isLoadingNext: boolean;
   loadNext: () => void;
 }) {
+  const listRef = useRef<ListImperativeAPI | null>(null);
   const scrollRestorationCache = useScrollRestorationCache(
     `party-${partyId}-expense-list`,
   );
-  const rowVirtualizer = useVirtualizer({
-    count: hasNext ? expenses.length + 1 : expenses.length,
-    getScrollElement: () => panelRef.current,
-    estimateSize: () => 96,
-    getItemKey: (index) => {
-      if (index > expenses.length - 1) {
-        return "loader";
-      }
-
-      return expenses[index].id;
-    },
-    gap: 16,
-    overscan: 10,
-    ...scrollRestorationCache,
-  });
-
-  const virtualItems = useNoMemo(() => rowVirtualizer.getVirtualItems());
-
-  // Rerendering because TanStack Virtual doesn't work very well with React 19+
-  const [_, setRerender] = useState(0);
-  useLayoutEffect(() => {
-    setRerender(1);
-  }, []);
+  const loaderIndex = hasNext ? expenses.length : -1;
+  const spacerIndex = expenses.length + (hasNext ? 1 : 0);
+  const rowCount = spacerIndex + 1;
+  const requestedNextPageRef = useRef(false);
 
   useEffect(() => {
-    const lastItem = virtualItems.at(-1);
+    if (!isLoadingNext) {
+      requestedNextPageRef.current = false;
+    }
+  }, [isLoadingNext]);
 
-    if (!lastItem) {
+  useEffect(() => {
+    const listElement = listRef.current?.element;
+    if (!listElement) {
       return;
     }
 
-    const isRenderingLoadingItem = lastItem.index >= expenses.length;
-    const shouldLoadNext = isRenderingLoadingItem && hasNext && !isLoadingNext;
+    const rAF = window.requestAnimationFrame(() => {
+      listElement.scrollTop = scrollRestorationCache.initialScrollTop;
+    });
 
-    if (shouldLoadNext) {
-      loadNext();
+    return () => {
+      cancelAnimationFrame(rAF);
+    };
+  }, [listRef, scrollRestorationCache.initialScrollTop]);
+
+  useEffect(() => {
+    const listElement = listRef.current?.element;
+    if (!listElement) {
+      return;
     }
-  }, [virtualItems, hasNext, isLoadingNext, loadNext, expenses.length]);
+
+    return () => {
+      scrollRestorationCache.setScrollTop(listElement.scrollTop);
+    };
+  }, [listRef, scrollRestorationCache]);
 
   return (
-    <div
-      style={{
-        height: `${rowVirtualizer.getTotalSize()}px`,
-        position: "relative",
-        width: "100%",
-      }}
-    >
-      {virtualItems.map((virtualItem) => {
-        const isLoaderRow = virtualItem.index > expenses.length - 1;
+    <div className="min-h-0 flex-1">
+      <List
+        className="no-scrollbar h-full overflow-y-auto"
+        data-testid="expense-log-list"
+        listRef={listRef}
+        onRowsRendered={(visibleRows: ListVisibleRows) => {
+          const shouldLoadNext =
+            loaderIndex >= 0 &&
+            visibleRows.stopIndex >= loaderIndex &&
+            !isLoadingNext &&
+            !requestedNextPageRef.current;
 
-        return (
-          <div
-            key={virtualItem.key}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              transform: `translateY(${virtualItem.start}px)`,
-            }}
-          >
-            {isLoaderRow ? (
-              hasNext ? (
-                <Skeleton className="h-24 w-full" />
-              ) : null
-            ) : (
-              <ExpenseItem
-                partyId={partyId}
-                expense={expenses[virtualItem.index]}
-              />
-            )}
-          </div>
-        );
-      })}
+          if (shouldLoadNext) {
+            requestedNextPageRef.current = true;
+            loadNext();
+          }
+        }}
+        onScroll={(event: UIEvent<HTMLDivElement>) => {
+          scrollRestorationCache.setScrollTop(event.currentTarget.scrollTop);
+        }}
+        overscanCount={10}
+        rowComponent={ExpenseListRow}
+        rowCount={rowCount}
+        rowHeight={(index: number) =>
+          index === spacerIndex
+            ? EXPENSE_LIST_BOTTOM_SPACER_HEIGHT
+            : EXPENSE_LIST_DEFAULT_ROW_HEIGHT
+        }
+        rowProps={{ expenses, partyId, loaderIndex, spacerIndex }}
+        style={{ height: "100%", width: "100%" }}
+      />
     </div>
   );
 }
@@ -618,7 +661,7 @@ function ExpenseItem({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex w-full scale-100 rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-accent-900",
+          "flex min-h-24 w-full scale-100 rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-accent-900",
           (isHovered || isFocusVisible) &&
             "shadow-md dark:bg-accent-800 dark:shadow-none",
           isPressed &&

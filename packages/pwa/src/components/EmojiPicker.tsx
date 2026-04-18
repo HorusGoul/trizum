@@ -1,4 +1,4 @@
-import { Suspense, use, useRef, useState } from "react";
+import { Suspense, use, useRef, useState, type CSSProperties } from "react";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
@@ -8,13 +8,11 @@ import {
   Dialog,
   DialogTrigger,
   Input,
-  ListBox,
-  ListBoxItem,
   SearchField,
   Button as ClearButton,
   composeRenderProps,
 } from "react-aria-components";
-import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
+import { List, type ListImperativeAPI } from "react-window";
 import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
@@ -261,16 +259,90 @@ interface EmojiGridProps {
   onSelect: (emoji: string) => void;
 }
 
-function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
-  const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
-  const rowCount = Math.ceil(emojis.length / GRID_COLUMNS);
+function EmojiButton({
+  emoji,
+  onSelect,
+}: {
+  emoji: Emoji;
+  onSelect: (emoji: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={emoji.label}
+      title={emoji.label}
+      onClick={() => onSelect(emoji.emoji)}
+      className={cn(
+        "flex size-9 cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
+        "hover:bg-accent-100 dark:hover:bg-accent-800",
+        "focus-visible:bg-accent-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500 dark:focus-visible:bg-accent-700",
+        "active:bg-accent-500 active:text-white",
+      )}
+    >
+      {emoji.emoji}
+    </button>
+  );
+}
 
-  const virtualizer = useVirtualizer({
-    count: rowCount,
-    getScrollElement: () => parentRef,
-    estimateSize: () => CELL_SIZE + GAP,
-    overscan: 5,
-  });
+interface EmojiGridRowProps {
+  emojis: Emoji[];
+  onSelect: (emoji: string) => void;
+}
+
+interface ListVisibleRows {
+  startIndex: number;
+  stopIndex: number;
+}
+
+interface ListRowAriaAttributes {
+  "aria-posinset": number;
+  "aria-setsize": number;
+  role: "listitem";
+}
+
+interface ListRowBaseProps {
+  ariaAttributes: ListRowAriaAttributes;
+  index: number;
+  style: CSSProperties;
+}
+
+function EmojiGridRow({
+  ariaAttributes,
+  emojis,
+  index,
+  onSelect,
+  style,
+}: ListRowBaseProps & EmojiGridRowProps) {
+  const startIndex = index * GRID_COLUMNS;
+  const rowEmojis = emojis.slice(startIndex, startIndex + GRID_COLUMNS);
+
+  return (
+    <div
+      {...ariaAttributes}
+      style={{
+        ...style,
+        boxSizing: "border-box",
+        paddingInline: GRID_PADDING,
+      }}
+      className="flex items-start"
+    >
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: `repeat(${GRID_COLUMNS}, ${CELL_SIZE}px)`,
+          columnGap: GAP,
+        }}
+      >
+        {rowEmojis.map((emoji) => (
+          <EmojiButton key={emoji.emoji} emoji={emoji} onSelect={onSelect} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
+  const rowCount = Math.ceil(emojis.length / GRID_COLUMNS);
 
   if (emojis.length === 0) {
     return (
@@ -281,57 +353,20 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
   }
 
   return (
-    <div
-      ref={setParentRef}
+    <List<EmojiGridRowProps>
+      aria-label={t`Emoji list`}
       className="h-[280px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      style={{ contain: "strict", padding: GRID_PADDING }}
-    >
-      <ListBox
-        aria-label={t`Emoji list`}
-        selectionMode="single"
-        onSelectionChange={(keys) => {
-          const selectedKey = [...keys][0];
-          if (typeof selectedKey === "string") {
-            onSelect(selectedKey);
-          }
-        }}
-        layout="grid"
-        className="relative outline-none"
-        style={{
-          height: virtualizer.getTotalSize(),
-        }}
-      >
-        {virtualizer.getVirtualItems().map((virtualRow) => {
-          const startIndex = virtualRow.index * GRID_COLUMNS;
-          const rowEmojis = emojis.slice(startIndex, startIndex + GRID_COLUMNS);
-
-          return rowEmojis.map((emoji, columnIndex) => (
-            <ListBoxItem
-              key={emoji.emoji}
-              id={emoji.emoji}
-              textValue={
-                (emoji.label || "") +
-                (Array.isArray(emoji.tags) ? " " + emoji.tags.join(" ") : "")
-              }
-              className={cn(
-                "absolute flex cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
-                "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
-                "data-[focused]:bg-accent-200 dark:data-[focused]:bg-accent-700",
-                "data-[selected]:bg-accent-500 data-[selected]:text-white",
-              )}
-              style={{
-                top: virtualRow.start,
-                left: columnIndex * (CELL_SIZE + GAP),
-                width: CELL_SIZE,
-                height: CELL_SIZE,
-              }}
-            >
-              {emoji.emoji}
-            </ListBoxItem>
-          ));
-        })}
-      </ListBox>
-    </div>
+      overscanCount={5}
+      rowComponent={EmojiGridRow}
+      rowCount={rowCount}
+      rowHeight={CELL_SIZE + GAP}
+      rowProps={{ emojis, onSelect }}
+      style={{
+        contain: "strict",
+        height: 280,
+        width: GRID_WIDTH,
+      }}
+    />
   );
 }
 
@@ -383,6 +418,81 @@ function buildVirtualRows(
   return { rows, groupStartIndices };
 }
 
+function getGroupForRowIndex(
+  rows: VirtualRow[],
+  orderedGroups: number[],
+  rowIndex: number,
+) {
+  const fallbackGroup = orderedGroups[0] ?? 0;
+  const boundedIndex = Math.min(rowIndex, rows.length - 1);
+
+  for (let index = boundedIndex; index >= 0; index -= 1) {
+    const row = rows[index];
+    if (row.type === "header") {
+      return row.group;
+    }
+  }
+
+  return fallbackGroup;
+}
+
+interface CategorizedEmojiRowProps {
+  groupLabels: Record<number, string>;
+  onSelect: (emoji: string) => void;
+  rows: VirtualRow[];
+}
+
+function CategorizedEmojiRow({
+  ariaAttributes,
+  groupLabels,
+  index,
+  onSelect,
+  rows,
+  style,
+}: ListRowBaseProps & CategorizedEmojiRowProps) {
+  const row = rows[index];
+
+  if (row.type === "header") {
+    return (
+      <div
+        {...ariaAttributes}
+        style={{
+          ...style,
+          boxSizing: "border-box",
+          paddingInline: GRID_PADDING,
+        }}
+        className="flex items-center text-xs font-medium capitalize text-accent-600 dark:text-accent-400"
+      >
+        {groupLabels[row.group]}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      {...ariaAttributes}
+      style={{
+        ...style,
+        boxSizing: "border-box",
+        paddingInline: GRID_PADDING,
+      }}
+      className="flex items-start"
+    >
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns: `repeat(${GRID_COLUMNS}, ${CELL_SIZE}px)`,
+          columnGap: GAP,
+        }}
+      >
+        {row.emojis.map((emoji) => (
+          <EmojiButton key={emoji.emoji} emoji={emoji} onSelect={onSelect} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 interface CategorizedEmojiGridProps {
   groupLabels: Record<number, string>;
   groupedEmojis: Record<number, Emoji[]>;
@@ -396,60 +506,18 @@ function CategorizedEmojiGrid({
   orderedGroups,
   onSelect,
 }: CategorizedEmojiGridProps) {
-  const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
-  const [activeGroup, setActiveGroup] = useState(orderedGroups[0]);
+  const firstGroup = orderedGroups[0] ?? 0;
+  const [activeGroup, setActiveGroup] = useState(firstGroup);
   const { rows: virtualRows, groupStartIndices } = buildVirtualRows(
     orderedGroups,
     groupedEmojis,
   );
-  const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element> | null>(
-    null,
-  );
-
-  const virtualizer = useVirtualizer({
-    count: virtualRows.length,
-    getScrollElement: () => parentRef,
-    estimateSize: (index) =>
-      virtualRows[index].type === "header" ? HEADER_HEIGHT : CELL_SIZE + GAP,
-    overscan: 5,
-    onChange: (instance) => {
-      // Find the first visible header to determine the active group
-      const visibleItems = instance.getVirtualItems();
-      if (visibleItems.length === 0) return;
-
-      // Find the topmost visible header, or the last header before the first visible item
-      let currentGroup = orderedGroups[0];
-      for (const item of visibleItems) {
-        const row = virtualRows[item.index];
-        if (row.type === "header") {
-          currentGroup = row.group;
-          break;
-        }
-      }
-
-      // If no header is visible, find the group that contains the first visible item
-      if (currentGroup === orderedGroups[0]) {
-        const firstVisibleIndex = visibleItems[0].index;
-        for (let i = firstVisibleIndex; i >= 0; i--) {
-          const row = virtualRows[i];
-          if (row.type === "header") {
-            currentGroup = row.group;
-            break;
-          }
-        }
-      }
-
-      setActiveGroup(currentGroup);
-    },
-  });
-
-  // Store virtualizer in ref for tab clicks
-  virtualizerRef.current = virtualizer;
+  const listRef = useRef<ListImperativeAPI | null>(null);
 
   function scrollToGroup(group: number) {
     const rowIndex = groupStartIndices.get(group);
-    if (rowIndex !== undefined && virtualizerRef.current) {
-      virtualizerRef.current.scrollToIndex(rowIndex, { align: "start" });
+    if (rowIndex !== undefined) {
+      listRef.current?.scrollToRow({ align: "start", index: rowIndex });
     }
   }
 
@@ -479,84 +547,34 @@ function CategorizedEmojiGrid({
         ))}
       </div>
 
-      {/* Emoji grid */}
-      <div
-        ref={setParentRef}
+      <List<CategorizedEmojiRowProps>
+        aria-label={t`Emoji list`}
         className="h-[244px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        style={{ contain: "strict", padding: GRID_PADDING }}
-      >
-        <div
-          className="relative"
-          style={{
-            height: virtualizer.getTotalSize(),
-          }}
-        >
-          {/* Render headers as regular divs */}
-          {virtualizer.getVirtualItems().map((virtualItem) => {
-            const row = virtualRows[virtualItem.index];
-            if (row.type !== "header") return null;
+        listRef={listRef}
+        onRowsRendered={(visibleRows: ListVisibleRows) => {
+          const currentGroup = getGroupForRowIndex(
+            virtualRows,
+            orderedGroups,
+            visibleRows.startIndex,
+          );
 
-            return (
-              <div
-                key={`header-${row.group}`}
-                className="absolute left-0 right-0 flex items-center text-xs font-medium capitalize text-accent-600 dark:text-accent-400"
-                style={{
-                  top: virtualItem.start,
-                  height: HEADER_HEIGHT,
-                }}
-              >
-                {groupLabels[row.group]}
-              </div>
-            );
-          })}
-
-          {/* Render emoji grid */}
-          <ListBox
-            aria-label={t`Emoji list`}
-            selectionMode="single"
-            onSelectionChange={(keys) => {
-              const selectedKey = [...keys][0];
-              if (typeof selectedKey === "string") {
-                onSelect(selectedKey);
-              }
-            }}
-            layout="grid"
-            className="outline-none"
-          >
-            {virtualizer.getVirtualItems().map((virtualItem) => {
-              const row = virtualRows[virtualItem.index];
-              if (row.type !== "emojis") return null;
-
-              return row.emojis.map((emoji, columnIndex) => (
-                <ListBoxItem
-                  key={emoji.emoji}
-                  id={emoji.emoji}
-                  textValue={
-                    (emoji.label || "") +
-                    (Array.isArray(emoji.tags)
-                      ? " " + emoji.tags.join(" ")
-                      : "")
-                  }
-                  className={cn(
-                    "absolute flex cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
-                    "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
-                    "data-[focused]:bg-accent-200 dark:data-[focused]:bg-accent-700",
-                    "data-[selected]:bg-accent-500 data-[selected]:text-white",
-                  )}
-                  style={{
-                    top: virtualItem.start,
-                    left: columnIndex * (CELL_SIZE + GAP),
-                    width: CELL_SIZE,
-                    height: CELL_SIZE,
-                  }}
-                >
-                  {emoji.emoji}
-                </ListBoxItem>
-              ));
-            })}
-          </ListBox>
-        </div>
-      </div>
+          setActiveGroup((previousGroup) =>
+            previousGroup === currentGroup ? previousGroup : currentGroup,
+          );
+        }}
+        overscanCount={5}
+        rowComponent={CategorizedEmojiRow}
+        rowCount={virtualRows.length}
+        rowHeight={(index: number) =>
+          virtualRows[index].type === "header" ? HEADER_HEIGHT : CELL_SIZE + GAP
+        }
+        rowProps={{ groupLabels, onSelect, rows: virtualRows }}
+        style={{
+          contain: "strict",
+          height: 244,
+          width: GRID_WIDTH,
+        }}
+      />
     </div>
   );
 }

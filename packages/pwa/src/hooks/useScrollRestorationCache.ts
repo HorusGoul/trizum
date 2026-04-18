@@ -1,38 +1,22 @@
-import type { VirtualItem, Virtualizer } from "@tanstack/react-virtual";
 import { useMemo } from "react";
 
 interface ScrollRestorationCache {
-  initialOffset: number;
-  initialMeasurementsCache: VirtualItem[];
+  initialScrollTop: number;
+  setScrollTop: (scrollTop: number) => void;
 }
 
-const cache = new Map<string, ScrollRestorationCache>();
+const cache = new Map<string, number>();
 
-function getOrCreateCache(key: string) {
-  let instance = cache.get(key);
+function getOrCreateCache(key: string): ScrollRestorationCache {
+  const initialScrollTop = cache.get(key) ?? 0;
 
-  if (!instance) {
-    instance = {
-      initialOffset: 0,
-      initialMeasurementsCache: [],
-    };
-    cache.set(key, instance);
-  }
-
-  function onChange(virtualizer: Virtualizer<HTMLDivElement, HTMLDivElement>) {
-    if (!instance) {
-      return;
-    }
-
-    if (!virtualizer.isScrolling) {
-      instance.initialMeasurementsCache = virtualizer.measurementsCache;
-      instance.initialOffset = virtualizer.scrollOffset ?? 0;
-    }
+  function setScrollTop(scrollTop: number) {
+    cache.set(key, scrollTop);
   }
 
   return {
-    ...instance,
-    onChange,
+    initialScrollTop,
+    setScrollTop,
   };
 }
 
