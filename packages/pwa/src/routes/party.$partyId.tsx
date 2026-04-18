@@ -5,7 +5,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { Icon, IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import {
@@ -174,7 +174,7 @@ function PartyById() {
             <Popover placement="bottom end">
               <Menu className="min-w-60">
                 <MenuItem onAction={() => setBalancesSortedBy("name")}>
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.arrow-down-a-z"
                     width={20}
                     height={20}
@@ -192,7 +192,7 @@ function PartyById() {
                 <MenuItem
                   onAction={() => setBalancesSortedBy("balance-ascending")}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.arrow-down-narrow-wide"
                     width={20}
                     height={20}
@@ -210,7 +210,7 @@ function PartyById() {
                 <MenuItem
                   onAction={() => setBalancesSortedBy("balance-descending")}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.arrow-up-narrow-wide"
                     width={20}
                     height={20}
@@ -242,7 +242,7 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
+                <Icon
                   icon="lucide.user-round-pen"
                   width={20}
                   height={20}
@@ -260,7 +260,7 @@ function PartyById() {
               </MenuItem>
 
               <MenuItem onAction={onTogglePersonalMode}>
-                <IconWithFallback
+                <Icon
                   icon="lucide.user-round-check"
                   width={20}
                   height={20}
@@ -288,7 +288,7 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
+                <Icon
                   icon="lucide.users"
                   width={20}
                   height={20}
@@ -311,7 +311,7 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
+                <Icon
                   icon="lucide.share"
                   width={20}
                   height={20}
@@ -328,7 +328,7 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
+                <Icon
                   icon="lucide.settings"
                   width={20}
                   height={20}
@@ -340,7 +340,7 @@ function PartyById() {
               </MenuItem>
 
               <MenuItem onAction={() => void onLeaveParty()}>
-                <IconWithFallback
+                <Icon
                   icon="lucide.log-out"
                   width={20}
                   height={20}
@@ -449,7 +449,7 @@ function ExpenseLog({
                 <Menu className="min-w-60">
                   {import.meta.env.DEV ? (
                     <MenuItem onAction={() => void dev.createTestExpenses()}>
-                      <IconWithFallback
+                      <Icon
                         icon="lucide.test-tube-diagonal"
                         width={20}
                         height={20}
@@ -466,7 +466,7 @@ function ExpenseLog({
                       params: { partyId: party.id },
                     }}
                   >
-                    <IconWithFallback
+                    <Icon
                       icon="lucide.list-plus"
                       width={20}
                       height={20}

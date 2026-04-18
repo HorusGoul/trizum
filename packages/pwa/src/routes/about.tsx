@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { IconWithFallback, type IconProps } from "#src/ui/Icon.js";
+import { Icon, type IconProps } from "#src/ui/Icon.js";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/about")({
@@ -175,7 +175,7 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
     <li className="flex gap-3">
       <div className="flex-shrink-0">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
-          <IconWithFallback
+          <Icon
             icon={icon}
             width={20}
             height={20}
@@ -235,10 +235,10 @@ function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
 
   const content = (
     <>
-      {icon && <IconWithFallback icon={icon} width={20} height={20} />}
+      {icon && <Icon icon={icon} width={20} height={20} />}
       <span className="flex-1">{label}</span>
       {!isInternal && (
-        <IconWithFallback
+        <Icon
           icon="lucide.external-link"
           width={16}
           height={16}

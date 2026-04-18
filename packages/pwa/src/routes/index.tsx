@@ -10,7 +10,7 @@ import {
   getOrderedPartySections,
   isPartyPinned,
 } from "#src/lib/partyListOrdering.ts";
-import { IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
@@ -123,7 +123,7 @@ function Index() {
                     to: "/settings",
                   }}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.settings"
                     width={20}
                     height={20}
@@ -139,7 +139,7 @@ function Index() {
                     to: "/archived",
                   }}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.folder-archive"
                     width={20}
                     height={20}
@@ -155,7 +155,7 @@ function Index() {
                     checkForUpdate();
                   }}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.refresh-cw"
                     width={20}
                     height={20}
@@ -171,7 +171,7 @@ function Index() {
                     to: "/about",
                   }}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.info"
                     width={20}
                     height={20}
@@ -237,7 +237,7 @@ function Index() {
                 <Popover placement="top end" offset={16}>
                   <Menu className="min-w-60">
                     <MenuItem href={{ to: "/join" }}>
-                      <IconWithFallback
+                      <Icon
                         icon="lucide.ampersand"
                         width={20}
                         height={20}
@@ -248,7 +248,7 @@ function Index() {
                       </span>
                     </MenuItem>
                     <MenuItem href={{ to: "/new" }}>
-                      <IconWithFallback
+                      <Icon
                         icon="lucide.list-plus"
                         width={20}
                         height={20}
@@ -259,7 +259,7 @@ function Index() {
                       </span>
                     </MenuItem>
                     <MenuItem href={{ to: "/migrate/tricount" }}>
-                      <IconWithFallback
+                      <Icon
                         icon="lucide.import"
                         width={20}
                         height={20}
@@ -343,7 +343,7 @@ function NoActivePartiesCard() {
   return (
     <section className="flex flex-col items-center justify-center gap-5 px-4 py-12 text-center">
       <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
-        <IconWithFallback icon="lucide.folder-archive" width={22} height={22} />
+        <Icon icon="lucide.folder-archive" width={22} height={22} />
       </div>
 
       <div className="max-w-md">
@@ -414,7 +414,7 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
+          <Icon
             icon="lucide.list-plus"
             width={24}
             height={24}
@@ -448,7 +448,7 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
+          <Icon
             icon="lucide.ampersand"
             width={24}
             height={24}
@@ -482,7 +482,7 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
+          <Icon
             icon="lucide.import"
             width={24}
             height={24}
@@ -516,7 +516,7 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
+          <Icon
             icon="lucide.user"
             width={24}
             height={24}
@@ -552,7 +552,7 @@ function ProfileSetupCard() {
       }
     >
       <div className="-mt-0.5 flex h-8 w-8 flex-shrink-0 justify-center">
-        <IconWithFallback
+        <Icon
           icon="lucide.user-round-pen"
           className="text-accent-600 dark:text-accent-400"
         />

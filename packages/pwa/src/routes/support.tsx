@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { IconWithFallback, type IconProps } from "#src/ui/Icon.js";
+import { Icon, type IconProps } from "#src/ui/Icon.js";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/support")({
@@ -23,7 +23,7 @@ function Support() {
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
-              <IconWithFallback
+              <Icon
                 icon="lucide.circle-help"
                 width={32}
                 height={32}
@@ -173,7 +173,7 @@ function SupportLink({
     >
       <div className="flex-shrink-0">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-200 dark:bg-accent-700">
-          <IconWithFallback
+          <Icon
             icon={icon}
             width={24}
             height={24}
@@ -191,7 +191,7 @@ function SupportLink({
         <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-300">
           {linkText}
           {isExternal && (
-            <IconWithFallback
+            <Icon
               icon="lucide.external-link"
               width={14}
               height={14}

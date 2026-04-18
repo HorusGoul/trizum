@@ -17,7 +17,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { Icon, IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import {
   documentCache,
   useSuspenseDocument,
@@ -114,7 +114,7 @@ function ExpenseById() {
                     },
                   }}
                 >
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.pencil"
                     width={20}
                     height={20}
@@ -125,7 +125,7 @@ function ExpenseById() {
                   </span>
                 </MenuItem>
                 <MenuItem onAction={() => void onDeleteExpense()}>
-                  <IconWithFallback
+                  <Icon
                     icon="lucide.trash"
                     width={20}
                     height={20}

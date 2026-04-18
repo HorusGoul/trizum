@@ -32,7 +32,7 @@ import {
   type ZonedDateTime,
 } from "@internationalized/date";
 import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
-import { Icon, IconWithFallback } from "#src/ui/Icon.tsx";
+import { Icon } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -273,7 +273,7 @@ export function ExpenseEditor({
               <MenuItem
                 onAction={() => setAutoOpenCalculator(!autoOpenCalculator)}
               >
-                <IconWithFallback
+                <Icon
                   icon="lucide.calculator"
                   width={20}
                   height={20}

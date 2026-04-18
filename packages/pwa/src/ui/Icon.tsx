@@ -38,5 +38,3 @@ export function Icon({
     </svg>
   );
 }
-
-export const IconWithFallback = Icon;

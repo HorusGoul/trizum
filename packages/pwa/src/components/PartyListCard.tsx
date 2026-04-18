@@ -15,7 +15,7 @@ import { type ComponentProps, type ReactNode, useState } from "react";
 import { useMediaQuery } from "#src/hooks/useMediaQuery.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import { IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import {
@@ -32,7 +32,7 @@ import { cn } from "#src/ui/utils.js";
 
 export interface PartyListCardAction {
   key: string;
-  icon: ComponentProps<typeof IconWithFallback>["icon"];
+  icon: ComponentProps<typeof Icon>["icon"];
   label: ReactNode;
   onAction: () => void;
   tone?: ModalSheetActionTone;
@@ -166,11 +166,7 @@ export function PartyListCard({
 
           {statusBadge ? (
             <span className="absolute -bottom-0.5 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-700 shadow-sm dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200">
-              <IconWithFallback
-                icon={statusBadge.icon}
-                width={11}
-                height={11}
-              />
+              <Icon icon={statusBadge.icon} width={11} height={11} />
               <span className="sr-only">{statusBadge.label}</span>
             </span>
           ) : null}
@@ -207,7 +203,7 @@ export function PartyListCard({
 
           {participantPreview ? (
             <p className="mt-1 flex min-w-0 items-start gap-2 text-sm leading-6 text-accent-900/80 dark:text-accent-200">
-              <IconWithFallback
+              <Icon
                 icon="lucide.users"
                 width={16}
                 height={16}
@@ -268,7 +264,7 @@ export function PartyListCard({
                           action.onAction();
                         }}
                       >
-                        <IconWithFallback
+                        <Icon
                           icon={action.icon}
                           width={20}
                           height={20}

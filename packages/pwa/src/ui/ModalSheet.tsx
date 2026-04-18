@@ -24,7 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { IconWithFallback, type IconProps } from "./Icon";
+import { Icon, type IconProps } from "./Icon";
 import { cn, type ClassName } from "./utils";
 
 interface ModalSheetContextValue {
@@ -317,7 +317,7 @@ export function ModalSheetAction({
       }
       {...props}
     >
-      <IconWithFallback
+      <Icon
         icon={icon}
         width={20}
         height={20}
