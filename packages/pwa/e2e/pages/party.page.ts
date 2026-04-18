@@ -14,7 +14,7 @@ export class PartyPage {
   readonly page: Page;
   readonly addExpenseFab: Locator;
   readonly balancesTab: Locator;
-  readonly expenseLogPanel: Locator;
+  readonly expenseLogList: Locator;
   readonly balanceGuidanceHeading: Locator;
   readonly debtFreeMessage: Locator;
   readonly nobodyOwesYouMessage: Locator;
@@ -25,7 +25,7 @@ export class PartyPage {
       name: /Add an expense|Add or create/,
     });
     this.balancesTab = page.getByRole("tab", { name: "Balances" });
-    this.expenseLogPanel = page.getByRole("tabpanel").first();
+    this.expenseLogList = page.locator('[data-testid="expense-log-list"]');
     this.balanceGuidanceHeading = page.getByRole("heading", {
       name: "How should I balance?",
     });
@@ -98,8 +98,8 @@ export class PartyPage {
         return;
       }
 
-      await this.expenseLogPanel.evaluate((panel) => {
-        panel.scrollTop = panel.scrollHeight;
+      await this.expenseLogList.evaluate((list) => {
+        list.scrollTop = list.scrollHeight;
       });
 
       try {
