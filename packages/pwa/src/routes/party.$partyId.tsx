@@ -23,17 +23,10 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
-import {
-  Suspense,
-  useEffect,
-  useRef,
-  type CSSProperties,
-  type Key,
-  type UIEvent,
-} from "react";
+import { Suspense, useEffect, useRef, type Key } from "react";
 import type { BalancesSortedBy, PartyParticipant } from "#src/models/party.js";
 import { Switch } from "#src/ui/Switch.tsx";
-import { List, type ListImperativeAPI } from "react-window";
+import { List, useListRef, type RowComponentProps } from "react-window";
 import { usePartyBalances } from "#src/hooks/usePartyBalances.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
@@ -500,23 +493,6 @@ interface ExpenseListRowProps {
   spacerIndex: number;
 }
 
-interface ListVisibleRows {
-  startIndex: number;
-  stopIndex: number;
-}
-
-interface ListRowAriaAttributes {
-  "aria-posinset": number;
-  "aria-setsize": number;
-  role: "listitem";
-}
-
-interface ListRowBaseProps {
-  ariaAttributes: ListRowAriaAttributes;
-  index: number;
-  style: CSSProperties;
-}
-
 function ExpenseListRow({
   ariaAttributes,
   expenses,
@@ -525,7 +501,7 @@ function ExpenseListRow({
   partyId,
   spacerIndex,
   style,
-}: ListRowBaseProps & ExpenseListRowProps) {
+}: RowComponentProps<ExpenseListRowProps>) {
   if (index === spacerIndex) {
     return <div aria-hidden="true" style={style} />;
   }
@@ -561,7 +537,7 @@ function VirtualizedExpenseList({
   isLoadingNext: boolean;
   loadNext: () => void;
 }) {
-  const listRef = useRef<ListImperativeAPI | null>(null);
+  const listRef = useListRef(null);
   const scrollRestorationCache = useScrollRestorationCache(
     `party-${partyId}-expense-list`,
   );
@@ -608,7 +584,7 @@ function VirtualizedExpenseList({
         className="no-scrollbar h-full overflow-y-auto"
         data-testid="expense-log-list"
         listRef={listRef}
-        onRowsRendered={(visibleRows: ListVisibleRows) => {
+        onRowsRendered={(visibleRows) => {
           const shouldLoadNext =
             loaderIndex >= 0 &&
             visibleRows.stopIndex >= loaderIndex &&
@@ -620,13 +596,13 @@ function VirtualizedExpenseList({
             loadNext();
           }
         }}
-        onScroll={(event: UIEvent<HTMLDivElement>) => {
+        onScroll={(event) => {
           scrollRestorationCache.setScrollTop(event.currentTarget.scrollTop);
         }}
         overscanCount={10}
         rowComponent={ExpenseListRow}
         rowCount={rowCount}
-        rowHeight={(index: number) =>
+        rowHeight={(index) =>
           index === spacerIndex
             ? EXPENSE_LIST_BOTTOM_SPACER_HEIGHT
             : EXPENSE_LIST_DEFAULT_ROW_HEIGHT

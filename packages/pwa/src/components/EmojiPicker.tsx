@@ -1,4 +1,4 @@
-import { Suspense, use, useRef, useState, type CSSProperties } from "react";
+import { Suspense, use, useState } from "react";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
@@ -12,7 +12,7 @@ import {
   Button as ClearButton,
   composeRenderProps,
 } from "react-aria-components";
-import { List, type ListImperativeAPI } from "react-window";
+import { List, useListRef, type RowComponentProps } from "react-window";
 import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
@@ -289,30 +289,13 @@ interface EmojiGridRowProps {
   onSelect: (emoji: string) => void;
 }
 
-interface ListVisibleRows {
-  startIndex: number;
-  stopIndex: number;
-}
-
-interface ListRowAriaAttributes {
-  "aria-posinset": number;
-  "aria-setsize": number;
-  role: "listitem";
-}
-
-interface ListRowBaseProps {
-  ariaAttributes: ListRowAriaAttributes;
-  index: number;
-  style: CSSProperties;
-}
-
 function EmojiGridRow({
   ariaAttributes,
   emojis,
   index,
   onSelect,
   style,
-}: ListRowBaseProps & EmojiGridRowProps) {
+}: RowComponentProps<EmojiGridRowProps>) {
   const startIndex = index * GRID_COLUMNS;
   const rowEmojis = emojis.slice(startIndex, startIndex + GRID_COLUMNS);
 
@@ -353,7 +336,7 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
   }
 
   return (
-    <List<EmojiGridRowProps>
+    <List
       aria-label={t`Emoji list`}
       className="h-[280px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       overscanCount={5}
@@ -449,7 +432,7 @@ function CategorizedEmojiRow({
   onSelect,
   rows,
   style,
-}: ListRowBaseProps & CategorizedEmojiRowProps) {
+}: RowComponentProps<CategorizedEmojiRowProps>) {
   const row = rows[index];
 
   if (row.type === "header") {
@@ -512,7 +495,7 @@ function CategorizedEmojiGrid({
     orderedGroups,
     groupedEmojis,
   );
-  const listRef = useRef<ListImperativeAPI | null>(null);
+  const listRef = useListRef(null);
 
   function scrollToGroup(group: number) {
     const rowIndex = groupStartIndices.get(group);
@@ -547,11 +530,11 @@ function CategorizedEmojiGrid({
         ))}
       </div>
 
-      <List<CategorizedEmojiRowProps>
+      <List
         aria-label={t`Emoji list`}
         className="h-[244px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         listRef={listRef}
-        onRowsRendered={(visibleRows: ListVisibleRows) => {
+        onRowsRendered={(visibleRows) => {
           const currentGroup = getGroupForRowIndex(
             virtualRows,
             orderedGroups,
@@ -565,7 +548,7 @@ function CategorizedEmojiGrid({
         overscanCount={5}
         rowComponent={CategorizedEmojiRow}
         rowCount={virtualRows.length}
-        rowHeight={(index: number) =>
+        rowHeight={(index) =>
           virtualRows[index].type === "header" ? HEADER_HEIGHT : CELL_SIZE + GAP
         }
         rowProps={{ groupLabels, onSelect, rows: virtualRows }}
