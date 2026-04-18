@@ -17,7 +17,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { Icon, IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import {
   documentCache,
   useSuspenseDocument,
@@ -99,7 +99,7 @@ function ExpenseById() {
           <div className="flex-1" />
           <MenuTrigger>
             <IconButton
-              icon="#lucide/ellipsis-vertical"
+              icon="lucide.ellipsis-vertical"
               aria-label={t`Menu`}
               className="flex-shrink-0"
             />
@@ -114,9 +114,10 @@ function ExpenseById() {
                     },
                   }}
                 >
-                  <IconWithFallback
-                    name="#lucide/pencil"
-                    size={20}
+                  <Icon
+                    icon="lucide.pencil"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -124,9 +125,10 @@ function ExpenseById() {
                   </span>
                 </MenuItem>
                 <MenuItem onAction={() => void onDeleteExpense()}>
-                  <IconWithFallback
-                    name="#lucide/trash"
-                    size={20}
+                  <Icon
+                    icon="lucide.trash"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -242,7 +244,7 @@ function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
     <dl className="flex">
       <dt className="flex items-center gap-2">
         <Icon
-          name={hasMultiple ? "#lucide/users" : "#lucide/user"}
+          icon={hasMultiple ? "lucide.users" : "lucide.user"}
           aria-hidden="true"
         />
 
@@ -262,7 +264,7 @@ function PaidAt({ paidAt }: Pick<Expense, "paidAt">) {
   return (
     <dl className="flex items-center gap-2">
       <dt>
-        <Icon name="#lucide/calendar" aria-label={t`Paid at`} />
+        <Icon icon="lucide.calendar" aria-label={t`Paid at`} />
       </dt>
       <dd className="font-medium">{paidAt.toLocaleDateString(i18n.locale)}</dd>
     </dl>
@@ -284,7 +286,7 @@ function Photos({ photos = [], onOpenGallery }: PhotosProps) {
     <dl className="flex flex-col gap-4">
       <dt className="flex items-center gap-2">
         <Icon
-          name={hasMultiple ? "#lucide/images" : "#lucide/image"}
+          icon={hasMultiple ? "lucide.images" : "lucide.image"}
           aria-hidden="true"
         />
 
@@ -339,7 +341,7 @@ function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
   return (
     <dl className="flex flex-col gap-4">
       <dt className="flex items-center gap-2">
-        <Icon name="#lucide/split" aria-hidden="true" />
+        <Icon icon="lucide.split" aria-hidden="true" />
         <span className="font-medium">{t`Shares`}</span>
       </dt>
 

@@ -79,7 +79,7 @@ function AppDatePicker<T extends AriaDateValue>({
         <IconButton
           color="transparent"
           className="mr-1 size-6 data-[focus-visible]:ring-offset-0"
-          icon="#lucide/calendar"
+          icon="lucide.calendar"
           iconClassName="size-4"
         />
       </FieldGroup>

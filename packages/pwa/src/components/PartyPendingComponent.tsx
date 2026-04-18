@@ -93,7 +93,7 @@ export function PartyPendingComponent() {
       <div className="mt-8 w-full max-w-sm">
         <div className="relative overflow-hidden rounded-2xl border border-accent-200 bg-gradient-to-br from-accent-50 to-accent-100 p-5 dark:border-accent-800 dark:from-accent-900/80 dark:to-accent-900/40">
           <div className="absolute right-3 top-3 text-accent-300 dark:text-accent-700">
-            <Icon name="#lucide/lightbulb" size={20} />
+            <Icon icon="lucide.lightbulb" width={20} height={20} />
           </div>
           <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-accent-500 dark:text-accent-400">
             <Trans>Did you know?</Trans>
@@ -127,7 +127,12 @@ export function PartyPendingComponent() {
               className="flex-1 rounded-xl font-medium"
               onPress={handleGoHome}
             >
-              <Icon name="#lucide/arrow-left" size={18} className="mr-2" />
+              <Icon
+                icon="lucide.arrow-left"
+                width={18}
+                height={18}
+                className="mr-2"
+              />
               <Trans>Go back</Trans>
             </Button>
 
@@ -136,7 +141,12 @@ export function PartyPendingComponent() {
               className="flex-1 rounded-xl font-medium"
               onPress={handleReload}
             >
-              <Icon name="#lucide/refresh-cw" size={18} className="mr-2" />
+              <Icon
+                icon="lucide.refresh-cw"
+                width={18}
+                height={18}
+                className="mr-2"
+              />
               <Trans>Retry</Trans>
             </Button>
           </div>
@@ -150,14 +160,15 @@ export function PartyPendingComponent() {
                   className="flex w-full items-center justify-between gap-2 p-4 text-accent-600 outline-none dark:text-accent-400"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon name="#lucide/circle-help" size={18} />
+                    <Icon icon="lucide.circle-help" width={18} height={18} />
                     <span className="font-medium">
                       <Trans>Why is this taking so long?</Trans>
                     </span>
                   </div>
                   <Icon
-                    name="#lucide/chevron-down"
-                    size={18}
+                    icon="lucide.chevron-down"
+                    width={18}
+                    height={18}
                     className={cn(
                       "transition-transform duration-200",
                       isExpanded && "rotate-180",

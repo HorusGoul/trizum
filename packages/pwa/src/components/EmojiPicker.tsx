@@ -172,7 +172,7 @@ export function EmojiPicker({
             >
               <div className="relative">
                 <Icon
-                  name="#lucide/search"
+                  icon="lucide.search"
                   className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-accent-500 dark:text-accent-400"
                 />
                 <Input
@@ -190,7 +190,7 @@ export function EmojiPicker({
                     slot={null}
                     onPress={() => setSearchQuery("")}
                   >
-                    <Icon name="#lucide/x" className="size-3.5" />
+                    <Icon icon="lucide.x" className="size-3.5" />
                   </ClearButton>
                 )}
               </div>

@@ -10,7 +10,7 @@ import {
   getOrderedPartySections,
   isPartyPinned,
 } from "#src/lib/partyListOrdering.ts";
-import { IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
@@ -97,7 +97,7 @@ function Index() {
           {isUpdateAvailable ? (
             <IconButton
               icon={
-                isUpdating ? "#lucide/refresh-cw" : "#lucide/circle-arrow-down"
+                isUpdating ? "lucide.refresh-cw" : "lucide.circle-arrow-down"
               }
               aria-label={t`Update available`}
               onPress={() => {
@@ -114,7 +114,7 @@ function Index() {
           ) : null}
 
           <MenuTrigger>
-            <IconButton icon="#lucide/ellipsis-vertical" aria-label={t`Menu`} />
+            <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Menu`} />
 
             <Popover placement="bottom end">
               <Menu>
@@ -123,9 +123,10 @@ function Index() {
                     to: "/settings",
                   }}
                 >
-                  <IconWithFallback
-                    name="#lucide/settings"
-                    size={20}
+                  <Icon
+                    icon="lucide.settings"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -138,9 +139,10 @@ function Index() {
                     to: "/archived",
                   }}
                 >
-                  <IconWithFallback
-                    name="#lucide/folder-archive"
-                    size={20}
+                  <Icon
+                    icon="lucide.folder-archive"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -153,9 +155,10 @@ function Index() {
                     checkForUpdate();
                   }}
                 >
-                  <IconWithFallback
-                    name="#lucide/refresh-cw"
-                    size={20}
+                  <Icon
+                    icon="lucide.refresh-cw"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -168,9 +171,10 @@ function Index() {
                     to: "/about",
                   }}
                 >
-                  <IconWithFallback
-                    name="#lucide/info"
-                    size={20}
+                  <Icon
+                    icon="lucide.info"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -225,7 +229,7 @@ function Index() {
               <MenuTrigger>
                 <IconButton
                   aria-label={t`Add or create`}
-                  icon="#lucide/plus"
+                  icon="lucide.plus"
                   color="accent"
                   className="h-14 w-14 shadow-md"
                 />
@@ -233,9 +237,10 @@ function Index() {
                 <Popover placement="top end" offset={16}>
                   <Menu className="min-w-60">
                     <MenuItem href={{ to: "/join" }}>
-                      <IconWithFallback
-                        name="#lucide/ampersand"
-                        size={20}
+                      <Icon
+                        icon="lucide.ampersand"
+                        width={20}
+                        height={20}
                         className="mr-3"
                       />
                       <span className="h-3.5 leading-none">
@@ -243,9 +248,10 @@ function Index() {
                       </span>
                     </MenuItem>
                     <MenuItem href={{ to: "/new" }}>
-                      <IconWithFallback
-                        name="#lucide/list-plus"
-                        size={20}
+                      <Icon
+                        icon="lucide.list-plus"
+                        width={20}
+                        height={20}
                         className="mr-3"
                       />
                       <span className="h-3.5 leading-none">
@@ -253,9 +259,10 @@ function Index() {
                       </span>
                     </MenuItem>
                     <MenuItem href={{ to: "/migrate/tricount" }}>
-                      <IconWithFallback
-                        name="#lucide/import"
-                        size={20}
+                      <Icon
+                        icon="lucide.import"
+                        width={20}
+                        height={20}
                         className="mr-3"
                       />
                       <span className="h-3.5 leading-none">
@@ -301,13 +308,13 @@ function createPartyActions({
   return [
     {
       key: "pin",
-      icon: isPinned ? "#lucide/pin-off" : "#lucide/pin",
+      icon: isPinned ? "lucide.pin-off" : "lucide.pin",
       label: isPinned ? <Trans>Unpin party</Trans> : <Trans>Pin party</Trans>,
       onAction: onTogglePinned,
     },
     {
       key: "archive",
-      icon: "#lucide/archive",
+      icon: "lucide.archive",
       label: <Trans>Archive party</Trans>,
       onAction: onArchive,
     },
@@ -336,7 +343,7 @@ function NoActivePartiesCard() {
   return (
     <section className="flex flex-col items-center justify-center gap-5 px-4 py-12 text-center">
       <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
-        <IconWithFallback name="#lucide/folder-archive" size={22} />
+        <Icon icon="lucide.folder-archive" width={22} height={22} />
       </div>
 
       <div className="max-w-md">
@@ -407,9 +414,10 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
-            name="#lucide/list-plus"
-            size={24}
+          <Icon
+            icon="lucide.list-plus"
+            width={24}
+            height={24}
             className="text-accent-600 dark:text-accent-400"
           />
           <div className="flex flex-1 flex-col">
@@ -440,9 +448,10 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
-            name="#lucide/ampersand"
-            size={24}
+          <Icon
+            icon="lucide.ampersand"
+            width={24}
+            height={24}
             className="text-accent-600 dark:text-accent-400"
           />
           <div className="flex flex-1 flex-col">
@@ -473,9 +482,10 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
-            name="#lucide/import"
-            size={24}
+          <Icon
+            icon="lucide.import"
+            width={24}
+            height={24}
             className="text-accent-600 dark:text-accent-400"
           />
           <div className="flex flex-1 flex-col">
@@ -506,9 +516,10 @@ function EmptyState() {
             )
           }
         >
-          <IconWithFallback
-            name="#lucide/user"
-            size={24}
+          <Icon
+            icon="lucide.user"
+            width={24}
+            height={24}
             className="text-accent-600 dark:text-accent-400"
           />
           <div className="flex flex-1 flex-col">
@@ -541,8 +552,8 @@ function ProfileSetupCard() {
       }
     >
       <div className="-mt-0.5 flex h-8 w-8 flex-shrink-0 justify-center">
-        <IconWithFallback
-          name="#lucide/user-round-pen"
+        <Icon
+          icon="lucide.user-round-pen"
           className="text-accent-600 dark:text-accent-400"
         />
       </div>

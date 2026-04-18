@@ -5,7 +5,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { Icon, IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { BackButton } from "#src/components/BackButton.js";
 import {
@@ -158,16 +158,17 @@ function PartyById() {
         {selectedTab === "balances" ? (
           <MenuTrigger>
             <IconButton
-              icon="#lucide/arrow-up-down"
+              icon="lucide.arrow-up-down"
               aria-label={t`Sort balances`}
               className="flex-shrink-0"
             />
             <Popover placement="bottom end">
               <Menu className="min-w-60">
                 <MenuItem onAction={() => setBalancesSortedBy("name")}>
-                  <IconWithFallback
-                    name="#lucide/arrow-down-a-z"
-                    size={20}
+                  <Icon
+                    icon="lucide.arrow-down-a-z"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -175,16 +176,17 @@ function PartyById() {
                   </span>
                   <div className="flex-1" />
                   {balancesSortedBy === "name" ? (
-                    <Icon name="#lucide/check" className="ml-3" />
+                    <Icon icon="lucide.check" className="ml-3" />
                   ) : null}
                 </MenuItem>
 
                 <MenuItem
                   onAction={() => setBalancesSortedBy("balance-ascending")}
                 >
-                  <IconWithFallback
-                    name="#lucide/arrow-down-narrow-wide"
-                    size={20}
+                  <Icon
+                    icon="lucide.arrow-down-narrow-wide"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -192,16 +194,17 @@ function PartyById() {
                   </span>
                   <div className="flex-1" />
                   {balancesSortedBy === "balance-ascending" ? (
-                    <Icon name="#lucide/check" className="ml-3" />
+                    <Icon icon="lucide.check" className="ml-3" />
                   ) : null}
                 </MenuItem>
 
                 <MenuItem
                   onAction={() => setBalancesSortedBy("balance-descending")}
                 >
-                  <IconWithFallback
-                    name="#lucide/arrow-up-narrow-wide"
-                    size={20}
+                  <Icon
+                    icon="lucide.arrow-up-narrow-wide"
+                    width={20}
+                    height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
@@ -209,7 +212,7 @@ function PartyById() {
                   </span>
                   <div className="flex-1" />
                   {balancesSortedBy === "balance-descending" ? (
-                    <Icon name="#lucide/check" className="ml-3" />
+                    <Icon icon="lucide.check" className="ml-3" />
                   ) : null}
                 </MenuItem>
               </Menu>
@@ -218,7 +221,7 @@ function PartyById() {
         ) : null}
         <MenuTrigger>
           <IconButton
-            icon="#lucide/ellipsis-vertical"
+            icon="lucide.ellipsis-vertical"
             aria-label={t`Menu`}
             className="flex-shrink-0"
           />
@@ -230,9 +233,10 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
-                  name="#lucide/user-round-pen"
-                  size={20}
+                <Icon
+                  icon="lucide.user-round-pen"
+                  width={20}
+                  height={20}
                   className="mr-3 self-start"
                 />
                 <div className="flex flex-col">
@@ -247,9 +251,10 @@ function PartyById() {
               </MenuItem>
 
               <MenuItem onAction={onTogglePersonalMode}>
-                <IconWithFallback
-                  name="#lucide/user-round-check"
-                  size={20}
+                <Icon
+                  icon="lucide.user-round-check"
+                  width={20}
+                  height={20}
                   className="mr-3 self-start"
                 />
                 <div className="mr-3 flex flex-col">
@@ -274,9 +279,10 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
-                  name="#lucide/users"
-                  size={20}
+                <Icon
+                  icon="lucide.users"
+                  width={20}
+                  height={20}
                   className="mr-3 self-start"
                 />
                 <div className="flex flex-col">
@@ -296,9 +302,10 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
-                  name="#lucide/share"
-                  size={20}
+                <Icon
+                  icon="lucide.share"
+                  width={20}
+                  height={20}
                   className="mr-3"
                 />
                 <span className="h-3.5 leading-none">
@@ -312,9 +319,10 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <IconWithFallback
-                  name="#lucide/settings"
-                  size={20}
+                <Icon
+                  icon="lucide.settings"
+                  width={20}
+                  height={20}
                   className="mr-3"
                 />
                 <span className="h-3.5 leading-none">
@@ -323,9 +331,10 @@ function PartyById() {
               </MenuItem>
 
               <MenuItem onAction={() => void onLeaveParty()}>
-                <IconWithFallback
-                  name="#lucide/log-out"
-                  size={20}
+                <Icon
+                  icon="lucide.log-out"
+                  width={20}
+                  height={20}
                   className="mr-3"
                 />
                 <span className="h-3.5 leading-none">
@@ -347,7 +356,7 @@ function PartyById() {
               id: "expenses",
               label: t`Expenses`,
               node: <ExpenseLog />,
-              icon: "#lucide/scroll-text",
+              icon: "lucide.scroll-text",
             },
             {
               id: "balances",
@@ -361,7 +370,7 @@ function PartyById() {
                 </Suspense>
               ),
               panelRef: balancesTabPanelRef,
-              icon: "#lucide/scale",
+              icon: "lucide.scale",
             },
           ]}
         />
@@ -414,7 +423,7 @@ function ExpenseLog() {
             <MenuTrigger>
               <IconButton
                 aria-label={t`Add or create`}
-                icon="#lucide/plus"
+                icon="lucide.plus"
                 color="accent"
                 className="pointer-events-auto h-14 w-14 shadow-md"
               />
@@ -423,9 +432,10 @@ function ExpenseLog() {
                 <Menu className="min-w-60">
                   {import.meta.env.DEV ? (
                     <MenuItem onAction={() => void dev.createTestExpenses()}>
-                      <IconWithFallback
-                        name="#lucide/test-tube-diagonal"
-                        size={20}
+                      <Icon
+                        icon="lucide.test-tube-diagonal"
+                        width={20}
+                        height={20}
                         className="mr-3"
                       />
                       <span className="h-3.5 leading-none">
@@ -439,9 +449,10 @@ function ExpenseLog() {
                       params: { partyId: party.id },
                     }}
                   >
-                    <IconWithFallback
-                      name="#lucide/list-plus"
-                      size={20}
+                    <Icon
+                      icon="lucide.list-plus"
+                      width={20}
+                      height={20}
                       className="mr-3"
                     />
                     <span className="h-3.5 leading-none">
@@ -454,7 +465,7 @@ function ExpenseLog() {
           ) : (
             <IconButton
               aria-label={t`Add an expense`}
-              icon="#lucide/plus"
+              icon="lucide.plus"
               color="accent"
               className="pointer-events-auto h-14 w-14 shadow-md"
               onPress={() => {
@@ -770,7 +781,12 @@ function Balances({
         {userOwesMap.length > 0 ? (
           <>
             <h3 className="flex items-center px-4 text-warning-500">
-              <Icon name="#lucide/circle-alert" size={24} className="mr-3" />
+              <Icon
+                icon="lucide.circle-alert"
+                width={24}
+                height={24}
+                className="mr-3"
+              />
 
               <span className="text-xl font-semibold">
                 <Trans>You owe money to people</Trans>
@@ -788,7 +804,12 @@ function Balances({
           </>
         ) : (
           <div className="flex items-center px-4 text-success-500">
-            <Icon name="#lucide/circle-check" size={24} className="mr-3" />
+            <Icon
+              icon="lucide.circle-check"
+              width={24}
+              height={24}
+              className="mr-3"
+            />
 
             <span className="text-xl font-semibold">
               <Trans>You&apos;re debt free!</Trans>
@@ -799,7 +820,12 @@ function Balances({
         {owedToUserMap.length > 0 ? (
           <>
             <h3 className="flex items-center px-4 text-warning-500">
-              <Icon name="#lucide/circle-alert" size={24} className="mr-3" />
+              <Icon
+                icon="lucide.circle-alert"
+                width={24}
+                height={24}
+                className="mr-3"
+              />
 
               <span className="text-xl font-semibold">
                 <Trans>People that owe you money</Trans>
@@ -817,7 +843,12 @@ function Balances({
           </>
         ) : (
           <div className="flex items-center px-4 text-success-500">
-            <Icon name="#lucide/circle-check" size={24} className="mr-3" />
+            <Icon
+              icon="lucide.circle-check"
+              width={24}
+              height={24}
+              className="mr-3"
+            />
 
             <span className="text-xl font-semibold">
               <Trans>Nobody owes you money!</Trans>
@@ -828,7 +859,12 @@ function Balances({
         {allOtherDiffs.length > 0 ? (
           <>
             <h2 className="flex items-center px-4 text-accent-400">
-              <Icon name="#lucide/circle-help" size={24} className="mr-3" />
+              <Icon
+                icon="lucide.circle-help"
+                width={24}
+                height={24}
+                className="mr-3"
+              />
 
               <span className="text-xl font-semibold">
                 <Trans>Other operations</Trans>

@@ -18,7 +18,6 @@ import { Toaster } from "./ui/Toaster.js";
 import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
-import { preloadAllIcons } from "./preloadIcons.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
@@ -157,8 +156,6 @@ const router = createRouter({
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
-
-void preloadAllIcons();
 
 let UpdateControllerComponent = UpdateController;
 

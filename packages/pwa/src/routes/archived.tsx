@@ -13,7 +13,7 @@ import type { PartyList } from "#src/models/partyList.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { IconWithFallback } from "#src/ui/Icon.js";
+import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 
 export const Route = createFileRoute("/archived")({
@@ -40,7 +40,7 @@ function ArchivedParties() {
             const actions: PartyListCardAction[] = [
               {
                 key: "restore",
-                icon: "#lucide/archive-restore",
+                icon: "lucide.archive-restore",
                 label: <Trans>Restore to home</Trans>,
                 onAction: () => {
                   setPartyArchived(partyId, false);
@@ -85,7 +85,7 @@ function ArchivedEmptyState() {
     <div className="rounded-xl border border-dashed border-accent-300 bg-white/80 p-6 text-center shadow-sm dark:border-accent-700 dark:bg-accent-950/70 dark:shadow-none">
       <div className="mx-auto flex max-w-md flex-col items-center gap-4">
         <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
-          <IconWithFallback name="#lucide/archive-restore" size={22} />
+          <Icon icon="lucide.archive-restore" width={22} height={22} />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-accent-950 dark:text-accent-50">

@@ -248,22 +248,9 @@ test.describe("Home party management", () => {
     await expect(partyActionsDialog).toBeVisible();
     await expect(archivePartyButton).toBeVisible();
 
-    const dragHandle = page.locator("[data-modal-sheet-drag-handle]").first();
-    const dragHandleBox = await dragHandle.boundingBox();
+    const sheetBackdrop = page.locator(".react-modal-sheet-backdrop");
 
-    expect(dragHandleBox).not.toBeNull();
-
-    await page.mouse.move(
-      dragHandleBox!.x + dragHandleBox!.width / 2,
-      dragHandleBox!.y + dragHandleBox!.height / 2,
-    );
-    await page.mouse.down();
-    await page.mouse.move(
-      dragHandleBox!.x + dragHandleBox!.width / 2,
-      dragHandleBox!.y + dragHandleBox!.height + 180,
-      { steps: 12 },
-    );
-    await page.mouse.up();
+    await sheetBackdrop.click({ position: { x: 10, y: 10 } });
 
     await expect(archivePartyButton).toHaveCount(0);
 

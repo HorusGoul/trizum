@@ -1,0 +1,54 @@
+{
+  "name": "@trizum/icon-sprite",
+  "description": "Reusable SVG sprite generation and Vite integration.",
+  "keywords": [],
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "type": "module",
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js",
+      "default": "./dist/vite.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch",
+    "build": "tsc -b tsconfig.json",
+    "typecheck": "tsc -b tsconfig.test.json",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "pnpm run lint --fix",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "svgo": "4.0.1"
+  },
+  "devDependencies": {
+    "@trizum/eslint-config": "workspace:*",
+    "@trizum/prettier-config": "workspace:*",
+    "@trizum/tsconfig": "workspace:*",
+    "eslint": "9.39.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.2",
+    "vite": "8.0.0",
+    "vitest": "4.1.0"
+  },
+  "prettier": "@trizum/prettier-config"
+}

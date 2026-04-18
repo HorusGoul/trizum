@@ -35,7 +35,7 @@ const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
         color="input-like"
         className="size-7 pr-0.5"
         icon={
-          direction === "rtl" ? "#lucide/chevron-right" : "#lucide/chevron-left"
+          direction === "rtl" ? "lucide.chevron-right" : "lucide.chevron-left"
         }
         iconClassName="size-4"
       />
@@ -45,7 +45,7 @@ const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
         color="input-like"
         className="size-7 pl-0.5"
         icon={
-          direction === "rtl" ? "#lucide/chevron-left" : "#lucide/chevron-right"
+          direction === "rtl" ? "lucide.chevron-left" : "lucide.chevron-right"
         }
         iconClassName="size-4"
       />

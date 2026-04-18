@@ -71,7 +71,7 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
     {composeRenderProps(children, (children) => (
       <>
         {children}
-        <Icon name="#lucide/chevron-down" className="size-4 opacity-50" />
+        <Icon icon="lucide.chevron-down" className="size-4 opacity-50" />
       </>
     ))}
   </AriaButton>

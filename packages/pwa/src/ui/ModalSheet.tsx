@@ -24,7 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { IconWithFallback, type IconProps } from "./Icon";
+import { Icon, type IconProps } from "./Icon";
 import { cn, type ClassName } from "./utils";
 
 interface ModalSheetContextValue {
@@ -288,7 +288,7 @@ export function ModalSheetAction({
   ...props
 }: Omit<AriaButtonProps, "children"> & {
   children: ReactNode;
-  icon: IconProps["name"];
+  icon: IconProps["icon"];
   tone?: ModalSheetActionTone;
 }) {
   return (
@@ -317,9 +317,10 @@ export function ModalSheetAction({
       }
       {...props}
     >
-      <IconWithFallback
-        name={icon}
-        size={20}
+      <Icon
+        icon={icon}
+        width={20}
+        height={20}
         className={cn(
           "col-start-1 row-start-1 flex-shrink-0",
           tone === "danger"

@@ -1,0 +1,15 @@
+{
+  "extends": "@trizum/tsconfig/base.json",
+  "include": ["./src"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "composite": true,
+    "declaration": true,
+    "noEmit": false
+  }
+}

@@ -122,7 +122,7 @@ export function AvatarPicker({
             isDisabled={isUploading}
           >
             <Icon
-              name="#lucide/x"
+              icon="lucide.x"
               className="h-4 w-4"
               aria-label={t`Remove avatar`}
             />
@@ -136,7 +136,7 @@ export function AvatarPicker({
           color="input-like"
           className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
         >
-          <Icon name="#lucide/camera" className="h-5 w-5" />
+          <Icon icon="lucide.camera" className="h-5 w-5" />
           <Trans>Take photo</Trans>
         </Button>
 
@@ -145,7 +145,7 @@ export function AvatarPicker({
           color="input-like"
           className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
         >
-          <Icon name="#lucide/image-up" className="h-5 w-5" />
+          <Icon icon="lucide.image-up" className="h-5 w-5" />
           <Trans>Upload photo</Trans>
         </Button>
       </div>

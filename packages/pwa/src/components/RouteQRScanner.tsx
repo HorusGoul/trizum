@@ -65,7 +65,7 @@ export function RouteQRScanner({
           <div className="absolute inset-x-0 top-0 z-10 h-32 bg-gradient-to-b from-black/70 to-transparent pt-safe">
             <div className="container flex h-16 items-center px-2">
               <IconButton
-                icon="#lucide/x"
+                icon="lucide.x"
                 aria-label={t`Close`}
                 className="flex-shrink-0 text-white"
                 onPress={onClose}

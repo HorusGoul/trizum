@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
-import { IconWithFallback } from "#src/ui/Icon.tsx";
+import { Icon } from "#src/ui/Icon.tsx";
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
@@ -563,7 +563,7 @@ export function CalculatorToolbar({
             onPress={onBackspace}
             className="h-12 rounded-xl text-lg font-medium"
           >
-            <IconWithFallback name="#lucide/delete" className="size-5" />
+            <Icon icon="lucide.delete" className="size-5" />
           </Button>
           <Button
             color="accent"

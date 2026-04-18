@@ -134,7 +134,7 @@ function PartySettings() {
             canSubmit && isDirty ? (
               <Suspense fallback={null}>
                 <IconButton
-                  icon="#lucide/check"
+                  icon="lucide.check"
                   aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                   type="submit"
                   form={formId}
@@ -320,7 +320,7 @@ function PartySettings() {
 
                       {"__isNew" in participant ? (
                         <IconButton
-                          icon="#lucide/trash"
+                          icon="lucide.trash"
                           aria-label={t`Remove`}
                           onPress={() =>
                             field.removeValue(indexOf(participant))
@@ -329,7 +329,7 @@ function PartySettings() {
                         />
                       ) : (
                         <IconButton
-                          icon="#lucide/archive"
+                          icon="lucide.archive"
                           aria-label={t`Archive`}
                           onPress={() => {
                             field.setValue((values) => {
@@ -411,7 +411,7 @@ function PartySettings() {
                     </addParticipantForm.Field>
 
                     <IconButton
-                      icon="#lucide/plus"
+                      icon="lucide.plus"
                       aria-label={t`Add participant`}
                       className="flex-shrink-0"
                       color="accent"
@@ -453,7 +453,7 @@ function PartySettings() {
                       </form.Field>
 
                       <IconButton
-                        icon="#lucide/archive-restore"
+                        icon="lucide.archive-restore"
                         aria-label={t`Restore`}
                         onPress={() => {
                           field.setValue((values) => {
