@@ -14,7 +14,8 @@ import { readFileSync } from "node:fs";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { configDefaults } from "vitest/config";
-import { generateIconSpriteArtifacts } from "./scripts/iconSprite";
+import { createIconSpritePlugin } from "@trizum/icon-sprite/vite";
+import iconSpriteConfig from "./iconSprite.config.mjs";
 import { configurePwaLogging, getLogger } from "./src/lib/log.ts";
 
 const ReactCompilerConfig = {};
@@ -75,7 +76,7 @@ export default defineConfig(({ mode }) => {
       wasm() as Plugin,
       topLevelAwait(),
       lingui(),
-      iconSpritePlugin(),
+      createIconSpritePlugin(iconSpriteConfig),
       VitePWA({
         registerType: "prompt",
         workbox: {
@@ -204,70 +205,6 @@ function appendSourceMappingURLPlugin(): Plugin {
             chunk.code += comment;
           }
         }
-      }
-    },
-  };
-}
-
-function iconSpritePlugin(): Plugin {
-  let root = "";
-
-  const regenerate = () => {
-    if (!root) {
-      return { changed: false };
-    }
-
-    return generateIconSpriteArtifacts(root);
-  };
-
-  const shouldRegenerate = (filePath: string) => {
-    if (!root) {
-      return false;
-    }
-
-    const generatedDir = path.resolve(root, "src/generated");
-    const sourceDir = path.resolve(root, "src");
-    const customIconsDir = path.resolve(root, "src/icons");
-
-    if (filePath.startsWith(generatedDir)) {
-      return false;
-    }
-
-    if (filePath.startsWith(customIconsDir) && filePath.endsWith(".svg")) {
-      return true;
-    }
-
-    return (
-      filePath.startsWith(sourceDir) &&
-      /\.(?:[cm]?[jt]sx?)$/u.test(path.extname(filePath))
-    );
-  };
-
-  return {
-    name: "vite-plugin-icon-sprite",
-
-    configResolved(config) {
-      root = config.root;
-    },
-
-    buildStart() {
-      regenerate();
-    },
-
-    configureServer(server) {
-      server.watcher.add(path.resolve(root, "src/icons"));
-      regenerate();
-    },
-
-    handleHotUpdate({ file, server }) {
-      if (!shouldRegenerate(file)) {
-        return;
-      }
-
-      const { changed } = regenerate();
-
-      if (changed) {
-        server.ws.send({ type: "full-reload" });
       }
     },
   };

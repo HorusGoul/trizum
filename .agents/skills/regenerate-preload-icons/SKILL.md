@@ -23,5 +23,5 @@ change.
 2. Verify the changes in:
    - `packages/pwa/src/generated/iconSprite.gen.ts`
    - `packages/pwa/src/generated/iconSprite.svg`
-3. Commit the updated generated files alongside the source changes that required
-   them.
+3. Do not commit the generated files. They are intentionally ignored and should
+   be regenerated locally as needed.

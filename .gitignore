@@ -160,6 +160,9 @@ dist
 playwright-report/
 test-results/
 
+# Generated icon sprite artifacts
+packages/pwa/src/generated/
+
 # Claude
 .claude/*
 
