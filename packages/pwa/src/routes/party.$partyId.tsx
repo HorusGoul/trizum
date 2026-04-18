@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
 import { useCurrentParty, useParty } from "#src/hooks/useParty.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
+import { useEligibleDebtTransferParties } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { CurrencyText } from "#src/components/CurrencyText.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
@@ -728,6 +729,8 @@ function Balances({
 
   const isFullyBalanced =
     userOwesMap.length === 0 && owedToUserMap.length === 0;
+  const eligibleTransferParties = useEligibleDebtTransferParties();
+  const canTransferDebt = eligibleTransferParties.length > 0;
 
   // Show other transactions not involving the current user
   const allOtherDiffs = simplifiedTransactions
@@ -799,6 +802,7 @@ function Balances({
                 fromId={participant.id}
                 toId={participantId}
                 amount={amount}
+                canTransferDebt={canTransferDebt}
               />
             ))}
           </>
@@ -955,9 +959,15 @@ interface BalanceActionItemProps {
   fromId: PartyParticipant["id"];
   toId: PartyParticipant["id"];
   amount: number;
+  canTransferDebt?: boolean;
 }
 
-function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
+function BalanceActionItem({
+  fromId,
+  toId,
+  amount,
+  canTransferDebt = false,
+}: BalanceActionItemProps) {
   const { party } = useCurrentParty();
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
@@ -989,7 +999,7 @@ function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
         </div>
       </div>
 
-      <div className="flex">
+      <div className="flex gap-2">
         <Button
           color="input-like"
           className="h-8 rounded-lg px-4"
@@ -1009,6 +1019,28 @@ function BalanceActionItem({ fromId, toId, amount }: BalanceActionItemProps) {
         >
           {isFromMe ? <Trans>Pay</Trans> : <Trans>Mark as paid</Trans>}
         </Button>
+
+        {isFromMe && canTransferDebt ? (
+          <Button
+            color="input-like"
+            className="h-8 rounded-lg px-4"
+            onPress={() =>
+              void navigate({
+                to: "/party/$partyId/transfer-debt",
+                params: {
+                  partyId: party.id,
+                },
+                search: {
+                  fromId,
+                  toId,
+                  amount: Math.abs(amount),
+                },
+              })
+            }
+          >
+            <Trans>Transfer debt</Trans>
+          </Button>
+        ) : null}
       </div>
     </div>
   );
