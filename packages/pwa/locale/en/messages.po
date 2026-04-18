@@ -427,11 +427,11 @@ msgstr "Chinese Yuan"
 msgid "Choose the currency for expenses in this party"
 msgstr "Choose the currency for expenses in this party"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:250
+#: src/routes/party_.$partyId.transfer-debt.tsx:260
 msgid "Choose the participant who should receive the transferred debt"
 msgstr "Choose the participant who should receive the transferred debt"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:222
+#: src/routes/party_.$partyId.transfer-debt.tsx:232
 msgid "Choose the party where this debt should continue"
 msgstr "Choose the party where this debt should continue"
 
@@ -580,15 +580,15 @@ msgstr "Debt settled between {0} and {1}!"
 msgid "Debt settled between {fromName} and {toName}!"
 msgstr "Debt settled between {fromName} and {toName}!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:182
+#: src/routes/party_.$partyId.transfer-debt.tsx:192
 msgid "Debt transfer from another party"
 msgstr "Debt transfer from another party"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:181
+#: src/routes/party_.$partyId.transfer-debt.tsx:191
 msgid "Debt transfer to another party"
 msgstr "Debt transfer to another party"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:187
+#: src/routes/party_.$partyId.transfer-debt.tsx:197
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
@@ -609,7 +609,7 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:221
+#: src/routes/party_.$partyId.transfer-debt.tsx:231
 msgid "Destination party"
 msgstr "Destination party"
 
@@ -775,7 +775,7 @@ msgstr "Failed to load licenses. Please try again later."
 msgid "Failed to mark expense as paid"
 msgstr "Failed to mark expense as paid"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:188
+#: src/routes/party_.$partyId.transfer-debt.tsx:198
 msgid "Failed to transfer debt"
 msgstr "Failed to transfer debt"
 
@@ -851,7 +851,7 @@ msgstr "Go back"
 msgid "Go Back"
 msgstr "Go Back"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:121
+#: src/routes/party_.$partyId.transfer-debt.tsx:131
 msgid "Go back and try again from the balances list."
 msgstr "Go back and try again from the balances list."
 
@@ -1337,7 +1337,7 @@ msgstr "No camera found on this device"
 msgid "No currency"
 msgstr "No currency"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:215
+#: src/routes/party_.$partyId.transfer-debt.tsx:225
 msgid "No destination party available"
 msgstr "No destination party available"
 
@@ -1362,7 +1362,7 @@ msgstr "No spending stats yet"
 msgid "No updates available"
 msgstr "No updates available"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:291
+#: src/routes/party_.$partyId.transfer-debt.tsx:301
 msgid "Nobody else is available in this party"
 msgstr "Nobody else is available in this party"
 
@@ -1410,7 +1410,7 @@ msgstr "Omani Rial"
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:131
+#: src/routes/party_.$partyId.transfer-debt.tsx:141
 msgid "Only your own debt can be transferred"
 msgstr "Only your own debt can be transferred"
 
@@ -1451,7 +1451,7 @@ msgid "Other operations"
 msgstr "Other operations"
 
 #: src/routes/party_.$partyId.pay.tsx:104
-#: src/routes/party_.$partyId.transfer-debt.tsx:380
+#: src/routes/party_.$partyId.transfer-debt.tsx:390
 #: src/routes/party.$partyId.tsx:986
 msgid "owes"
 msgstr "owes"
@@ -1690,7 +1690,7 @@ msgstr "Real-Time Sync"
 msgid "Receipt Attachments"
 msgstr "Receipt Attachments"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:268
+#: src/routes/party_.$partyId.transfer-debt.tsx:278
 msgid "Recommendations"
 msgstr "Recommendations"
 
@@ -2060,7 +2060,7 @@ msgstr "Third-Party Licenses"
 msgid "This application uses the following open source libraries and tools. Below are their licenses and attributions."
 msgstr "This application uses the following open source libraries and tools. Below are their licenses and attributions."
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:120
+#: src/routes/party_.$partyId.transfer-debt.tsx:130
 msgid "This debt is no longer available"
 msgstr "This debt is no longer available"
 
@@ -2072,7 +2072,7 @@ msgstr "This HEIC or HEIF image could not be processed. Try another photo or exp
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:292
+#: src/routes/party_.$partyId.transfer-debt.tsx:302
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "This party needs another active participant besides you to receive the transferred debt."
 
@@ -2084,7 +2084,7 @@ msgstr "This project uses various open source libraries and tools."
 msgid "This will settle the debt in <0>{0}</0> and create the same debt in <1>{1}</1>, where <2>{2}</2> is owed by <3>{3}</3>."
 msgstr "This will settle the debt in <0>{0}</0> and create the same debt in <1>{1}</1>, where <2>{2}</2> is owed by <3>{3}</3>."
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:306
+#: src/routes/party_.$partyId.transfer-debt.tsx:316
 msgid "This will settle the debt in <0>{originPartyName}</0> and create the same debt in <1>{destinationPartyName}</1>, where <2>{selectedDestinationCounterpartyName}</2> is owed by <3>{destinationCurrentParticipantName}</3>."
 msgstr "This will settle the debt in <0>{originPartyName}</0> and create the same debt in <1>{destinationPartyName}</1>, where <2>{selectedDestinationCounterpartyName}</2> is owed by <3>{destinationCurrentParticipantName}</3>."
 
@@ -2133,15 +2133,15 @@ msgstr "Total spent"
 msgid "Total split:"
 msgstr "Total split:"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:118
-#: src/routes/party_.$partyId.transfer-debt.tsx:129
-#: src/routes/party_.$partyId.transfer-debt.tsx:204
-#: src/routes/party_.$partyId.transfer-debt.tsx:333
+#: src/routes/party_.$partyId.transfer-debt.tsx:128
+#: src/routes/party_.$partyId.transfer-debt.tsx:139
+#: src/routes/party_.$partyId.transfer-debt.tsx:214
+#: src/routes/party_.$partyId.transfer-debt.tsx:343
 #: src/routes/party.$partyId.tsx:1041
 msgid "Transfer debt"
 msgstr "Transfer debt"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:186
+#: src/routes/party_.$partyId.transfer-debt.tsx:196
 msgid "Transferring debt..."
 msgstr "Transferring debt..."
 
@@ -2351,7 +2351,7 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:301
+#: src/routes/party_.$partyId.transfer-debt.tsx:311
 msgid "What will happen"
 msgstr "What will happen"
 
@@ -2367,7 +2367,7 @@ msgstr "Who are you?"
 msgid "Who is {0} in this party?"
 msgstr "Who is {0} in this party?"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:249
+#: src/routes/party_.$partyId.transfer-debt.tsx:259
 msgid "Who is {sourceCreditorName} in this party?"
 msgstr "Who is {sourceCreditorName} in this party?"
 
@@ -2399,7 +2399,7 @@ msgstr "Yemeni Rial"
 msgid "Yes! Your data is stored locally on your device and only synced with people you explicitly share your groups with. We don't have access to your expense data."
 msgstr "Yes! Your data is stored locally on your device and only synced with people you explicitly share your groups with. We don't have access to your expense data."
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:239
+#: src/routes/party_.$partyId.transfer-debt.tsx:249
 msgid "You are"
 msgstr "You are"
 
@@ -2407,7 +2407,7 @@ msgstr "You are"
 msgid "You can add photos to your expenses for better tracking."
 msgstr "You can add photos to your expenses for better tracking."
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:132
+#: src/routes/party_.$partyId.transfer-debt.tsx:142
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "You can only transfer debt from actions where you are the one who owes the money."
 
@@ -2415,7 +2415,7 @@ msgstr "You can only transfer debt from actions where you are the one who owes t
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:216
+#: src/routes/party_.$partyId.transfer-debt.tsx:226
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr "You need another active party with the same currency to transfer this debt."
 
