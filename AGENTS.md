@@ -97,6 +97,6 @@ Use `type/description` naming:
 ## Skills
 
 Project-local skills live in [`.agents/skills`](./.agents/skills). Use them for
-repeatable workflows such as browser automation, push and PR handling,
-changeset creation, or generated-file regeneration. Keep project-local skill
-content there instead of duplicating it in general docs.
+repeatable workflows such as browser automation, push and PR handling, or
+changeset creation. Keep project-local skill content there instead of
+duplicating it in general docs.
