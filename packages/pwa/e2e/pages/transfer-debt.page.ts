@@ -2,21 +2,27 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 export class TransferDebtPage {
   readonly page: Page;
-  readonly transferDebtButton: Locator;
-  readonly destinationPartySelect: Locator;
+  readonly selectionStep: Locator;
+  readonly confirmationStep: Locator;
+  readonly reviewTransferButton: Locator;
+  readonly confirmTransferButton: Locator;
   readonly recommendationsSection: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.transferDebtButton = page.getByRole("button", {
-      name: "Transfer debt",
+    this.selectionStep = page.getByTestId("transfer-debt-selection-step");
+    this.confirmationStep = page.getByTestId("transfer-debt-confirmation-step");
+    this.reviewTransferButton = page.getByRole("button", {
+      name: "Review transfer",
     });
-    this.destinationPartySelect = page.getByRole("button", {
-      name: "Destination party",
+    this.confirmTransferButton = page.getByRole("button", {
+      name: "Confirm transfer",
     });
-    this.recommendationsSection = page
-      .locator("div.rounded-xl")
-      .filter({ hasText: "Recommendations" });
+    this.recommendationsSection = this.selectionStep
+      .locator("div.rounded-3xl")
+      .filter({
+        has: page.getByText("Quick recommendations", { exact: true }),
+      });
   }
 
   async expectLoaded() {
@@ -24,8 +30,10 @@ export class TransferDebtPage {
     await expect(
       this.page.getByRole("heading", { exact: true, name: "Transfer debt" }),
     ).toBeVisible();
-    await expect(this.destinationPartySelect).toBeVisible();
-    await expect(this.transferDebtButton).toBeVisible();
+    await expect(this.selectionStep).toBeVisible();
+    await expect(
+      this.page.getByText("Choose where the debt should continue"),
+    ).toBeVisible();
   }
 
   async expectSearchParams(params: {
@@ -46,23 +54,34 @@ export class TransferDebtPage {
   }
 
   async chooseDestinationParty(partyName: string) {
-    await this.destinationPartySelect.click();
-    await this.page.getByRole("option", { name: partyName }).click();
+    await this.selectionStep
+      .locator("button")
+      .filter({ hasText: partyName })
+      .first()
+      .click();
   }
 
   async expectRecommendation(participantName: string) {
     await expect(
-      this.recommendationsSection.getByRole("button", { name: participantName }),
+      this.recommendationsSection
+        .locator("button")
+        .filter({ hasText: participantName })
+        .first(),
     ).toBeVisible();
   }
 
   async chooseRecommendation(participantName: string) {
     await this.recommendationsSection
-      .getByRole("button", { name: participantName })
+      .locator("button")
+      .filter({ hasText: participantName })
+      .first()
       .click();
   }
 
   async completeTransfer() {
-    await this.transferDebtButton.click();
+    await expect(this.reviewTransferButton).toBeVisible();
+    await this.reviewTransferButton.click();
+    await expect(this.confirmationStep).toBeVisible();
+    await this.confirmTransferButton.click();
   }
 }
