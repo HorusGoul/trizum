@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Plural, Trans } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Currency } from "dinero.js";
 import { AnimatePresence, motion } from "motion/react";
@@ -25,6 +25,7 @@ import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Avatar } from "#src/ui/Avatar.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
+import { IconButton } from "#src/ui/IconButton.tsx";
 import { cn } from "#src/ui/utils.ts";
 
 interface TransferDebtSearchParams {
@@ -33,7 +34,7 @@ interface TransferDebtSearchParams {
   amount: number;
 }
 
-type TransferStep = "configure" | "confirm" | "success";
+type TransferStep = "party" | "participant" | "confirm" | "success";
 
 interface DestinationPartyOption {
   id: string;
@@ -83,10 +84,7 @@ function RouteComponent() {
   const [destinationPartyId, setDestinationPartyId] = useState<string>("");
   const [destinationParticipantId, setDestinationParticipantId] =
     useState<string>("");
-  const [dismissedRecommendationIds, setDismissedRecommendationIds] = useState<
-    string[]
-  >([]);
-  const [step, setStep] = useState<TransferStep>("configure");
+  const [step, setStep] = useState<TransferStep>("party");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successExpenseId, setSuccessExpenseId] = useState<string | null>(null);
 
@@ -145,15 +143,12 @@ function RouteComponent() {
   const selectedDestinationParty = destinationPartyOptions.find(
     ({ id }) => id === destinationPartyId,
   );
+  const hasPartyStep = destinationPartyOptions.length > 1;
   const destinationParticipants =
     selectedDestinationParty?.otherParticipants ?? [];
   const selectedDestinationCounterparty = destinationParticipants.find(
     (participant) => participant.id === destinationParticipantId,
   );
-  const displayedRecommendedParticipants =
-    selectedDestinationParty?.recommendedParticipants.filter(
-      (participant) => !dismissedRecommendationIds.includes(participant.id),
-    ) ?? [];
   const canTransfer =
     !!selectedDestinationParty &&
     !!selectedDestinationCounterparty &&
@@ -180,11 +175,9 @@ function RouteComponent() {
   useEffect(() => {
     if (!selectedDestinationParty) {
       setDestinationParticipantId("");
-      setDismissedRecommendationIds([]);
       return;
     }
 
-    setDismissedRecommendationIds([]);
     setDestinationParticipantId((currentValue) => {
       if (
         selectedDestinationParty.otherParticipants.some(
@@ -201,10 +194,25 @@ function RouteComponent() {
   }, [selectedDestinationParty]);
 
   useEffect(() => {
-    if (step !== "configure" && !canTransfer) {
-      setStep("configure");
+    if (step === "success") {
+      return;
     }
-  }, [canTransfer, step]);
+
+    if (!selectedDestinationParty) {
+      setStep("party");
+      return;
+    }
+
+    if (step === "party" && !hasPartyStep) {
+      setStep("participant");
+    }
+  }, [hasPartyStep, selectedDestinationParty, step]);
+
+  useEffect(() => {
+    if (step === "confirm" && !canTransfer) {
+      setStep(selectedDestinationParty ? "participant" : "party");
+    }
+  }, [canTransfer, selectedDestinationParty, step]);
 
   useEffect(() => {
     if (step !== "success" || !successExpenseId) {
@@ -256,23 +264,26 @@ function RouteComponent() {
     selectedDestinationParty?.currentParticipant.name ?? "";
   const selectedDestinationCounterpartyName =
     selectedDestinationCounterparty?.name ?? "";
-  const selectedExactMatchParticipantName =
-    selectedDestinationParty?.exactMatchParticipant?.name ?? "";
   const pageTitle =
     step === "confirm"
       ? t`Confirm transfer`
       : step === "success"
         ? t`Debt transferred`
         : t`Transfer debt`;
-
-  function handleRecommendationPress(participantId: string) {
-    setDestinationParticipantId(participantId);
-    setDismissedRecommendationIds((currentValue) =>
-      currentValue.includes(participantId)
-        ? currentValue
-        : [...currentValue, participantId],
-    );
-  }
+  const participantStepDescription = selectedDestinationParty
+    ? t`In ${destinationPartyName}, ${destinationCurrentParticipantName} will owe the selected person.`
+    : t`Choose who should be owed after the transfer.`;
+  const reviewStepDescription = t`This will settle the debt in ${originPartyName} and recreate it in ${destinationPartyName}.`;
+  const onBackPress =
+    step === "confirm"
+      ? () => {
+          setStep("participant");
+        }
+      : step === "participant" && hasPartyStep
+        ? () => {
+            setStep("party");
+          }
+        : undefined;
 
   async function onConfirmTransfer() {
     if (!selectedDestinationParty || !selectedDestinationCounterparty) {
@@ -303,19 +314,27 @@ function RouteComponent() {
   }
 
   return (
-    <TransferDebtLayout title={pageTitle} showBackButton={step !== "success"}>
-      <div className="container px-4 pt-4">
-        <DebtSummaryCard
-          currency={party.currency}
-          fromName={from.name}
-          toName={to.name}
-          amount={amount}
-        />
-      </div>
+    <TransferDebtLayout
+      title={pageTitle}
+      showBackButton={step !== "success"}
+      onBackPress={onBackPress}
+    >
+      {step === "party" || step === "participant" ? (
+        <div className="container px-4 pt-4">
+          <DebtSummaryCard
+            currency={party.currency}
+            fromName={from.name}
+            toName={to.name}
+            amount={amount}
+          />
+        </div>
+      ) : null}
 
-      <div className="container px-4 pt-4">
-        <TransferStepIndicator step={step} />
-      </div>
+      {step !== "success" ? (
+        <div className="container px-4 pt-4">
+          <TransferStepIndicator step={step} hasPartyStep={hasPartyStep} />
+        </div>
+      ) : null}
 
       <AnimatePresence initial={false} mode="wait">
         {step === "success" ? (
@@ -345,8 +364,8 @@ function RouteComponent() {
             <div className="container flex flex-col gap-4 px-4 pt-4">
               <SectionIntro
                 eyebrow={t`Review`}
-                title={t`Confirm this transfer`}
-                description={t`Check the parties and participants before creating the two expenses.`}
+                title={t`Confirm transfer`}
+                description={reviewStepDescription}
               />
 
               <TransferReviewCard
@@ -360,44 +379,10 @@ function RouteComponent() {
                 destinationCreditorName={selectedDestinationCounterpartyName}
               />
 
-              <div className="rounded-3xl border border-accent-200/80 bg-white p-4 shadow-sm dark:border-accent-800 dark:bg-accent-900 dark:shadow-none">
-                <div className="flex items-center gap-2 text-sm font-medium text-accent-700 dark:text-accent-300">
-                  <Icon icon="lucide.receipt-text" width={16} height={16} />
-                  <span>
-                    <Trans>Expenses that will be created</Trans>
-                  </span>
-                </div>
-
-                <div className="mt-4 grid gap-3">
-                  <ExpensePreviewCard
-                    label={t`Origin party`}
-                    partyName={originPartyName}
-                    expenseName={t`Debt transfer to another party`}
-                    detail={t`Settles the current debt`}
-                  />
-                  <ExpensePreviewCard
-                    label={t`Destination party`}
-                    partyName={destinationPartyName}
-                    expenseName={t`Debt transfer from another party`}
-                    detail={t`Creates the same debt in the selected party`}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-2 flex gap-3">
-                <Button
-                  color="input-like"
-                  className="flex-1 font-semibold"
-                  onPress={() => {
-                    setStep("configure");
-                  }}
-                >
-                  <Trans>Back</Trans>
-                </Button>
-
+              <div className="mt-2">
                 <Button
                   color="accent"
-                  className="flex-1 font-semibold"
+                  className="w-full font-semibold"
                   isDisabled={!canTransfer || isSubmitting}
                   onPress={() => {
                     void onConfirmTransfer();
@@ -427,14 +412,74 @@ function RouteComponent() {
               </div>
             </div>
           </motion.div>
-        ) : (
+        ) : step === "participant" ? (
           <motion.div
-            key="configure"
+            key="participant"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.22 }}
-            data-testid="transfer-debt-selection-step"
+            data-testid="transfer-debt-participant-step"
+          >
+            <div className="container flex flex-col gap-4 px-4 pt-4">
+              <SectionIntro
+                eyebrow={t`Creditor`}
+                title={t`Choose who receives it`}
+                description={participantStepDescription}
+              />
+
+              {destinationParticipants.length === 0 ? (
+                <InlineAlert
+                  title={t`Nobody else is available in this party`}
+                  description={t`This party needs another active participant besides you to receive the transferred debt.`}
+                />
+              ) : (
+                <div className="grid gap-3">
+                  {destinationParticipants.map((participant) => (
+                    <DestinationParticipantCard
+                      key={participant.id}
+                      isRecommended={
+                        selectedDestinationParty?.recommendedParticipants.some(
+                          (candidate) => candidate.id === participant.id,
+                        ) ?? false
+                      }
+                      isExactMatch={
+                        selectedDestinationParty?.exactMatchParticipant?.id ===
+                        participant.id
+                      }
+                      isSelected={participant.id === destinationParticipantId}
+                      participant={participant}
+                      onPress={() => {
+                        setDestinationParticipantId(participant.id);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <Button
+                color="accent"
+                className="mt-2 font-semibold"
+                isDisabled={!canTransfer}
+                onPress={() => {
+                  setStep("confirm");
+                }}
+              >
+                <Icon icon="lucide.chevrons-right" width={18} height={18} />
+                <span className="ml-2">
+                  <Trans>Continue</Trans>
+                </span>
+              </Button>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="party"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.22 }}
+            data-testid="transfer-debt-party-step"
           >
             <div className="container flex flex-col gap-4 px-4 pt-4">
               {destinationPartyOptions.length === 0 ? (
@@ -445,9 +490,9 @@ function RouteComponent() {
               ) : (
                 <>
                   <SectionIntro
-                    eyebrow={t`Step 1`}
-                    title={t`Choose where the debt should continue`}
-                    description={t`Parties show your identity there and the best match we can find for ${sourceCreditorName}.`}
+                    eyebrow={t`Destination party`}
+                    title={t`Choose a destination party`}
+                    description={t`Move this debt into one of your other active parties.`}
                   />
 
                   <div className="grid gap-3">
@@ -459,152 +504,11 @@ function RouteComponent() {
                         sourceCreditorName={sourceCreditorName}
                         onPress={() => {
                           setDestinationPartyId(option.id);
+                          setStep("participant");
                         }}
                       />
                     ))}
                   </div>
-
-                  {selectedDestinationParty ? (
-                    <>
-                      <SectionIntro
-                        eyebrow={t`Step 2`}
-                        title={t`Choose who receives the debt there`}
-                        description={t`Pick the person in ${destinationPartyName} who should be owed after the transfer.`}
-                      />
-
-                      {selectedDestinationParty.exactMatchParticipant ? (
-                        <InfoPill>
-                          <Icon icon="lucide.sparkles" width={14} height={14} />
-                          <span>
-                            <Trans>
-                              Exact name match selected automatically:{" "}
-                              {selectedExactMatchParticipantName}
-                            </Trans>
-                          </span>
-                        </InfoPill>
-                      ) : null}
-
-                      {displayedRecommendedParticipants.length > 0 ? (
-                        <div className="rounded-3xl border border-accent-200/80 bg-white p-4 shadow-sm dark:border-accent-800 dark:bg-accent-900 dark:shadow-none">
-                          <div className="text-sm font-medium text-accent-700 dark:text-accent-300">
-                            <Trans>Quick recommendations</Trans>
-                          </div>
-
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <AnimatePresence initial={false}>
-                              {displayedRecommendedParticipants.map(
-                                (participant) => (
-                                  <motion.button
-                                    key={participant.id}
-                                    type="button"
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.92 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.92 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="inline-flex w-auto items-center gap-2 rounded-full border border-accent-300 bg-accent-50 px-2.5 py-1.5 text-xs font-semibold text-accent-900 transition-colors hover:border-accent-400 hover:bg-accent-100 dark:border-accent-700 dark:bg-accent-950 dark:text-accent-100 dark:hover:border-accent-600 dark:hover:bg-accent-900"
-                                    onClick={() => {
-                                      handleRecommendationPress(participant.id);
-                                    }}
-                                  >
-                                    <TransferParticipantAvatar
-                                      participant={participant}
-                                      className="h-5 w-5 text-[9px]"
-                                    />
-                                    <span>{participant.name}</span>
-                                  </motion.button>
-                                ),
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        </div>
-                      ) : null}
-
-                      {destinationParticipants.length === 0 ? (
-                        <InlineAlert
-                          title={t`Nobody else is available in this party`}
-                          description={t`This party needs another active participant besides you to receive the transferred debt.`}
-                        />
-                      ) : (
-                        <div className="grid gap-3">
-                          {destinationParticipants.map((participant) => (
-                            <DestinationParticipantCard
-                              key={participant.id}
-                              isRecommended={selectedDestinationParty.recommendedParticipants.some(
-                                (candidate) => candidate.id === participant.id,
-                              )}
-                              isExactMatch={
-                                selectedDestinationParty.exactMatchParticipant
-                                  ?.id === participant.id
-                              }
-                              isSelected={
-                                participant.id === destinationParticipantId
-                              }
-                              participant={participant}
-                              onPress={() => {
-                                setDestinationParticipantId(participant.id);
-                              }}
-                            />
-                          ))}
-                        </div>
-                      )}
-
-                      {selectedDestinationCounterparty ? (
-                        <div className="rounded-3xl border border-accent-200/80 bg-gradient-to-br from-accent-50 to-white p-5 shadow-sm dark:border-accent-800 dark:from-accent-950 dark:to-accent-900 dark:shadow-none">
-                          <div className="flex items-center gap-2 text-sm font-medium text-accent-700 dark:text-accent-300">
-                            <Icon
-                              icon="lucide.arrow-right-left"
-                              width={16}
-                              height={16}
-                            />
-                            <span>
-                              <Trans>Preview</Trans>
-                            </span>
-                          </div>
-
-                          <p className="mt-3 leading-7">
-                            <Trans>
-                              This will settle the debt in{" "}
-                              <span className="font-semibold">
-                                {originPartyName}
-                              </span>{" "}
-                              and recreate it in{" "}
-                              <span className="font-semibold">
-                                {destinationPartyName}
-                              </span>
-                              , where{" "}
-                              <span className="font-semibold">
-                                {selectedDestinationCounterpartyName}
-                              </span>{" "}
-                              will be owed by{" "}
-                              <span className="font-semibold">
-                                {destinationCurrentParticipantName}
-                              </span>
-                              .
-                            </Trans>
-                          </p>
-                        </div>
-                      ) : null}
-
-                      <Button
-                        color="accent"
-                        className="mt-2 font-semibold"
-                        isDisabled={!canTransfer}
-                        onPress={() => {
-                          setStep("confirm");
-                        }}
-                      >
-                        <Icon
-                          icon="lucide.chevrons-right"
-                          width={18}
-                          height={18}
-                        />
-                        <span className="ml-2">
-                          <Trans>Review transfer</Trans>
-                        </span>
-                      </Button>
-                    </>
-                  ) : null}
                 </>
               )}
             </div>
@@ -621,16 +525,27 @@ function TransferDebtLayout({
   title,
   children,
   showBackButton = true,
+  onBackPress,
 }: {
   title: string;
   children: React.ReactNode;
   showBackButton?: boolean;
+  onBackPress?: () => void;
 }) {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2 mt-safe">
         {showBackButton ? (
-          <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
+          onBackPress ? (
+            <IconButton
+              icon="lucide.arrow-left"
+              aria-label={t`Go Back`}
+              className="flex-shrink-0"
+              onPress={onBackPress}
+            />
+          ) : (
+            <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
+          )
         ) : (
           <div className="h-10 w-10 flex-shrink-0" />
         )}
@@ -642,41 +557,39 @@ function TransferDebtLayout({
   );
 }
 
-function TransferStepIndicator({ step }: { step: TransferStep }) {
-  return (
-    <div className="flex items-center gap-2 rounded-full border border-accent-200/80 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent-700 shadow-sm dark:border-accent-800 dark:bg-accent-900 dark:text-accent-300 dark:shadow-none">
-      <StepDot isActive={step !== "success"} label={t`Choose`} />
-      <span className="opacity-40">/</span>
-      <StepDot
-        isActive={step === "confirm" || step === "success"}
-        label={t`Review`}
-      />
-      <span className="opacity-40">/</span>
-      <StepDot isActive={step === "success"} label={t`Done`} />
-    </div>
-  );
-}
+function TransferStepIndicator({
+  step,
+  hasPartyStep,
+}: {
+  step: Exclude<TransferStep, "success">;
+  hasPartyStep: boolean;
+}) {
+  const totalSteps = hasPartyStep ? 3 : 2;
+  const currentStep =
+    step === "party"
+      ? 1
+      : step === "participant"
+        ? hasPartyStep
+          ? 2
+          : 1
+        : totalSteps;
+  const currentStepLabel =
+    step === "party"
+      ? t`Choose a party`
+      : step === "participant"
+        ? t`Choose a person`
+        : t`Confirm`;
 
-function StepDot({ isActive, label }: { isActive: boolean; label: string }) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-2 rounded-full px-2 py-1 transition-colors",
-        isActive
-          ? "bg-accent-100 text-accent-950 dark:bg-accent-800 dark:text-accent-50"
-          : "text-accent-500 dark:text-accent-500",
-      )}
-    >
-      <span
-        className={cn(
-          "h-1.5 w-1.5 rounded-full",
-          isActive
-            ? "bg-accent-500 dark:bg-accent-300"
-            : "bg-accent-300 dark:bg-accent-700",
-        )}
-      />
-      {label}
-    </span>
+    <div className="flex items-center gap-3 rounded-full border border-accent-200/80 bg-white px-3 py-2 text-sm font-medium text-accent-700 shadow-sm dark:border-accent-800 dark:bg-accent-900 dark:text-accent-300 dark:shadow-none">
+      <span className="rounded-full bg-accent-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-accent-900 dark:bg-accent-800 dark:text-accent-50">
+        <Trans>
+          Step {currentStep} of {totalSteps}
+        </Trans>
+      </span>
+      <span className="h-1.5 w-1.5 rounded-full bg-accent-300 dark:bg-accent-700" />
+      <span>{currentStepLabel}</span>
+    </div>
   );
 }
 
@@ -788,27 +701,11 @@ function DestinationPartyCard({
             ) : null}
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-accent-700 dark:text-accent-300">
-            <InfoPill>
-              <Icon icon="lucide.user-round" width={12} height={12} />
-              <span>
-                <Trans>You are {currentParticipantName}</Trans>
-              </span>
-            </InfoPill>
-
-            <InfoPill>
-              <Icon icon="lucide.users" width={12} height={12} />
-              <span>
-                <Plural
-                  value={option.otherParticipants.length}
-                  one="# possible creditor"
-                  other="# possible creditors"
-                />
-              </span>
-            </InfoPill>
+          <div className="mt-3 text-sm text-accent-700 dark:text-accent-300">
+            <Trans>You are {currentParticipantName}</Trans>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-accent-200/80 bg-accent-50/80 px-3 py-2 text-sm dark:border-accent-800 dark:bg-accent-950/70">
+          <div className="mt-3 rounded-2xl border border-accent-200/80 bg-accent-50/80 px-3 py-2 text-sm dark:border-accent-800 dark:bg-accent-950/70">
             {option.exactMatchParticipant ? (
               <Trans>
                 Best match for {sourceCreditorName}:{" "}
@@ -818,11 +715,11 @@ function DestinationPartyCard({
               </Trans>
             ) : topRecommendation ? (
               <Trans>
-                Likely match for {sourceCreditorName}:{" "}
+                Best match for {sourceCreditorName}:{" "}
                 <span className="font-semibold">{topRecommendationName}</span>
               </Trans>
             ) : (
-              <Trans>No obvious match for {sourceCreditorName} yet</Trans>
+              <Trans>Choose the person on the next step</Trans>
             )}
           </div>
         </div>
@@ -883,15 +780,6 @@ function DestinationParticipantCard({
                     <Icon icon="lucide.badge-plus" width={12} height={12} />
                     <span>
                       <Trans>Recommended</Trans>
-                    </span>
-                  </InfoPill>
-                ) : null}
-
-                {isSelected ? (
-                  <InfoPill tone="accent">
-                    <Icon icon="lucide.check" width={12} height={12} />
-                    <span>
-                      <Trans>Selected</Trans>
                     </span>
                   </InfoPill>
                 ) : null}
@@ -998,35 +886,6 @@ function ReviewPartyRow({
         <div className="mt-1 text-sm text-accent-700 dark:text-accent-300">
           {detail}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function ExpensePreviewCard({
-  label,
-  partyName,
-  expenseName,
-  detail,
-}: {
-  label: string;
-  partyName: string;
-  expenseName: string;
-  detail: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-accent-200/80 bg-accent-50/60 p-4 dark:border-accent-800 dark:bg-accent-950/70">
-      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-500 dark:text-accent-400">
-        {label}
-      </div>
-      <div className="mt-1 text-base font-semibold text-accent-950 dark:text-accent-50">
-        {partyName}
-      </div>
-      <div className="mt-2 text-sm font-medium text-accent-800 dark:text-accent-200">
-        {expenseName}
-      </div>
-      <div className="mt-1 text-sm text-accent-700 dark:text-accent-300">
-        {detail}
       </div>
     </div>
   );
