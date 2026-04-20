@@ -71,7 +71,7 @@ test.describe("Debt transfer", () => {
     );
 
     await test.step(
-      "pick the destination party and use the recommended creditor match",
+      "continue in the eligible destination party and choose the creditor",
       async () => {
         await originPartyPage.openSettlementActionButton(
           originAction,
@@ -84,13 +84,11 @@ test.describe("Debt transfer", () => {
           fromId: defaultParticipants.blair.id,
           toId: defaultParticipants.alex.id,
         });
-        await transferDebtPage.chooseDestinationParty(
-          debtTransferJourney.destinationPartyName,
-        );
-        await transferDebtPage.expectRecommendation(
+        await transferDebtPage.expectParticipantStep();
+        await transferDebtPage.expectRecommendedParticipant(
           debtTransferJourney.destinationCreditorParticipant.name,
         );
-        await transferDebtPage.chooseRecommendation(
+        await transferDebtPage.chooseParticipant(
           debtTransferJourney.destinationCreditorParticipant.name,
         );
       },

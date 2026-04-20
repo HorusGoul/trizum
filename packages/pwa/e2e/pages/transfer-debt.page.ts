@@ -2,37 +2,29 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 export class TransferDebtPage {
   readonly page: Page;
-  readonly selectionStep: Locator;
+  readonly partyStep: Locator;
+  readonly participantStep: Locator;
   readonly confirmationStep: Locator;
-  readonly reviewTransferButton: Locator;
+  readonly continueButton: Locator;
   readonly confirmTransferButton: Locator;
-  readonly recommendationsSection: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.selectionStep = page.getByTestId("transfer-debt-selection-step");
+    this.partyStep = page.getByTestId("transfer-debt-party-step");
+    this.participantStep = page.getByTestId("transfer-debt-participant-step");
     this.confirmationStep = page.getByTestId("transfer-debt-confirmation-step");
-    this.reviewTransferButton = page.getByRole("button", {
-      name: "Review transfer",
+    this.continueButton = page.getByRole("button", {
+      name: "Continue",
     });
     this.confirmTransferButton = page.getByRole("button", {
       name: "Confirm transfer",
     });
-    this.recommendationsSection = this.selectionStep
-      .locator("div.rounded-3xl")
-      .filter({
-        has: page.getByText("Quick recommendations", { exact: true }),
-      });
   }
 
   async expectLoaded() {
     await expect(this.page).toHaveURL(/\/party\/[^/]+\/transfer-debt\?.+/);
     await expect(
       this.page.getByRole("heading", { exact: true, name: "Transfer debt" }),
-    ).toBeVisible();
-    await expect(this.selectionStep).toBeVisible();
-    await expect(
-      this.page.getByText("Choose where the debt should continue"),
     ).toBeVisible();
   }
 
@@ -54,24 +46,27 @@ export class TransferDebtPage {
   }
 
   async chooseDestinationParty(partyName: string) {
-    await this.selectionStep
+    await this.partyStep
       .locator("button")
       .filter({ hasText: partyName })
       .first()
       .click();
+    await expect(this.participantStep).toBeVisible();
   }
 
-  async expectRecommendation(participantName: string) {
+  async expectParticipantStep() {
+    await expect(this.participantStep).toBeVisible();
+    await expect(this.page.getByText("Choose who receives it")).toBeVisible();
+  }
+
+  async expectRecommendedParticipant(participantName: string) {
     await expect(
-      this.recommendationsSection
-        .locator("button")
-        .filter({ hasText: participantName })
-        .first(),
-    ).toBeVisible();
+      this.participantStep.locator("button").filter({ hasText: participantName }),
+    ).toContainText("Recommended");
   }
 
-  async chooseRecommendation(participantName: string) {
-    await this.recommendationsSection
+  async chooseParticipant(participantName: string) {
+    await this.participantStep
       .locator("button")
       .filter({ hasText: participantName })
       .first()
@@ -79,9 +74,12 @@ export class TransferDebtPage {
   }
 
   async completeTransfer() {
-    await expect(this.reviewTransferButton).toBeVisible();
-    await this.reviewTransferButton.click();
+    await expect(this.continueButton).toBeVisible();
+    await this.continueButton.click();
     await expect(this.confirmationStep).toBeVisible();
+    await expect(
+      this.page.getByText("This will settle the debt", { exact: false }),
+    ).toBeVisible();
     await this.confirmTransferButton.click();
   }
 }
