@@ -1,5 +1,17 @@
 # @trizum/mobile
 
+## 1.7.1
+
+### Patch Changes
+
+- 92c0ea9: Migrate the PWA's virtualized emoji picker and expense log from `@tanstack/react-virtual` to `react-window`.
+
+  This keeps the existing user flows intact while simplifying scroll restoration and removing the React 19 workaround the old virtualization layer required.
+
+- Updated dependencies [09ef7ba]
+- Updated dependencies [92c0ea9]
+  - @trizum/pwa@1.7.1
+
 ## 1.7.0
 
 ### Patch Changes
