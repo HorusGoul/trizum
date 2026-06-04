@@ -20,7 +20,9 @@ export class TransferDebtPage {
   async expectLoaded() {
     await expect(this.page).toHaveURL(/\/party\/[^/]+\/transfer-debt\?.+/);
     await expect(
-      this.page.getByRole("heading", { exact: true, name: "Transfer debt" }),
+      this.page.getByRole("heading", {
+        name: /^(Confirm transfer|Transfer debt)$/,
+      }),
     ).toBeVisible();
   }
 
@@ -56,12 +58,17 @@ export class TransferDebtPage {
     await expect(this.page.getByText("Choose who receives it")).toBeVisible();
   }
 
-  async expectRecommendedParticipant(participantName: string) {
-    const participantRow = this.participantStep
-      .locator("button")
-      .filter({ hasText: participantName });
+  async expectConfirmationStep() {
+    await expect(this.confirmationStep).toBeVisible();
+    await expect(this.partyStep).toBeHidden();
+    await expect(this.participantStep).toBeHidden();
+    await expect(this.page.getByText("Moved to")).toBeVisible();
+  }
 
-    await expect(participantRow).toBeVisible();
+  async expectRecommendedParticipant(participantName: string) {
+    const participantRow = this.participantStep.locator("button").first();
+
+    await expect(participantRow).toContainText(participantName);
     await expect(participantRow.getByLabel("Recommended match")).toBeVisible();
   }
 
@@ -75,8 +82,7 @@ export class TransferDebtPage {
   }
 
   async completeTransfer() {
-    await expect(this.confirmationStep).toBeVisible();
-    await expect(this.page.getByText("Moved to")).toBeVisible();
+    await this.expectConfirmationStep();
     await this.confirmTransferButton.click();
   }
 }

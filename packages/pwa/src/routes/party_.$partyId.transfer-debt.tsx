@@ -171,13 +171,24 @@ function RouteComponent() {
       ({ id }) => !priorityDestinationParticipantIds.has(id),
     ),
   ];
+  const defaultDestinationParticipantId =
+    destinationParticipants.length === 1
+      ? (destinationParticipants[0]?.id ?? "")
+      : "";
+  const hasSelectedDestinationParticipant = destinationParticipants.some(
+    ({ id }) => id === destinationParticipantId,
+  );
+  const selectedDestinationParticipantId = hasSelectedDestinationParticipant
+    ? destinationParticipantId
+    : defaultDestinationParticipantId;
+  const hasParticipantStep = destinationParticipants.length !== 1;
   const selectedDestinationCounterparty = destinationParticipants.find(
-    (participant) => participant.id === destinationParticipantId,
+    (participant) => participant.id === selectedDestinationParticipantId,
   );
   const canTransfer =
     !!selectedDestinationParty &&
     !!selectedDestinationCounterparty &&
-    destinationParticipantId !== "";
+    selectedDestinationParticipantId !== "";
 
   useEffect(() => {
     if (step !== "success" || !successExpenseId) {
@@ -227,18 +238,24 @@ function RouteComponent() {
     selectedDestinationParty?.currentParticipant.name ?? "";
   const selectedDestinationCounterpartyName =
     selectedDestinationCounterparty?.name ?? "";
-  const activeStep =
-    step === "success"
-      ? step
-      : step === "confirm" && !canTransfer
-        ? selectedDestinationParty
-          ? "participant"
-          : "party"
-        : !selectedDestinationParty
-          ? "party"
-          : step === "party" && !hasPartyStep
-            ? "participant"
-            : step;
+  let activeStep: TransferStep;
+
+  if (step === "success") {
+    activeStep = "success";
+  } else if (step === "party" && hasPartyStep) {
+    activeStep = "party";
+  } else if (!selectedDestinationParty) {
+    activeStep = "party";
+  } else if (step === "confirm" && !canTransfer) {
+    activeStep = hasParticipantStep ? "participant" : "party";
+  } else if (!hasParticipantStep) {
+    activeStep = "confirm";
+  } else if (step === "party") {
+    activeStep = "participant";
+  } else {
+    activeStep = step;
+  }
+
   const pageTitle =
     activeStep === "confirm"
       ? t`Confirm transfer`
@@ -246,15 +263,19 @@ function RouteComponent() {
         ? t`Debt transferred`
         : t`Transfer debt`;
   const onBackPress =
-    activeStep === "confirm"
+    activeStep === "confirm" && hasParticipantStep
       ? () => {
           setStep("participant");
         }
-      : activeStep === "participant" && hasPartyStep
+      : activeStep === "confirm" && hasPartyStep
         ? () => {
             setStep("party");
           }
-        : undefined;
+        : activeStep === "participant" && hasPartyStep
+          ? () => {
+              setStep("party");
+            }
+          : undefined;
 
   async function onConfirmTransfer() {
     if (!selectedDestinationParty || !selectedDestinationCounterparty) {
@@ -319,12 +340,14 @@ function RouteComponent() {
               <TransferReviewCard
                 amount={amount}
                 currency={party.currency}
-                fromName={from.name}
-                toName={to.name}
                 originParty={party}
                 destinationParty={selectedDestinationParty?.entry.party}
-                destinationDebtorName={destinationCurrentParticipantName}
-                destinationCreditorName={selectedDestinationCounterpartyName}
+                from={from}
+                to={to}
+                destinationDebtor={
+                  selectedDestinationParty?.currentParticipant ?? null
+                }
+                destinationCreditor={selectedDestinationCounterparty ?? null}
               />
 
               <Button
@@ -379,7 +402,7 @@ function RouteComponent() {
                   description={t`This party needs another active participant besides you to receive the transferred debt.`}
                 />
               ) : (
-                <div className="grid gap-3">
+                <div className="divide-y divide-accent-200/80 overflow-hidden rounded-xl border border-accent-200/80 bg-white shadow-sm dark:divide-accent-800 dark:border-accent-800 dark:bg-accent-900 dark:shadow-none">
                   {orderedDestinationParticipants.map((participant) => (
                     <DestinationParticipantCard
                       key={participant.id}
@@ -426,7 +449,12 @@ function RouteComponent() {
                         option={option}
                         onPress={() => {
                           setDestinationPartyId(option.id);
-                          setStep("participant");
+                          setDestinationParticipantId("");
+                          setStep(
+                            option.otherParticipants.length === 1
+                              ? "confirm"
+                              : "participant",
+                          );
                         }}
                       />
                     ))}
@@ -501,27 +529,26 @@ function DestinationPartyCard({
     <button
       type="button"
       className={cn(
-        "w-full rounded-3xl border p-4 text-left transition-all duration-200",
-        "border-accent-200/80 bg-white hover:border-accent-300 hover:bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900 dark:hover:border-accent-700 dark:hover:bg-accent-950",
+        "w-full rounded-xl border p-4 text-left shadow-sm transition-all duration-200 ease-in-out",
+        "border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 active:scale-[0.99] hover:border-accent-300/90 hover:shadow-md focus-visible:border-accent-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500/20 dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none dark:hover:border-accent-700 dark:focus-visible:border-accent-500",
       )}
       onClick={onPress}
     >
       <div className="flex items-start gap-4">
-        <PartySymbolBadge party={option.entry.party} className="h-12 w-12" />
+        <PartySymbolBadge
+          party={option.entry.party}
+          className="mt-1 h-12 w-12 text-xl shadow-sm"
+        />
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-lg font-semibold text-accent-950 dark:text-accent-50">
-                {option.entry.party.name}
-              </div>
-              {option.entry.party.description ? (
-                <p className="mt-1 line-clamp-2 text-sm text-accent-700 dark:text-accent-300">
-                  {option.entry.party.description}
-                </p>
-              ) : null}
-            </div>
+          <div className="text-lg font-semibold tracking-tight text-accent-950 dark:text-accent-50">
+            {option.entry.party.name}
           </div>
+          {option.entry.party.description ? (
+            <p className="mt-1 line-clamp-2 text-sm italic leading-6 text-accent-900 dark:text-accent-100/80">
+              {option.entry.party.description}
+            </p>
+          ) : null}
         </div>
       </div>
     </button>
@@ -541,37 +568,29 @@ function DestinationParticipantCard({
     <button
       type="button"
       className={cn(
-        "w-full rounded-3xl border p-4 text-left transition-all duration-200",
-        "border-accent-200/80 bg-white hover:border-accent-300 hover:bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900 dark:hover:border-accent-700 dark:hover:bg-accent-950",
+        "flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors duration-200",
+        "hover:bg-accent-50 focus-visible:bg-accent-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500/30 dark:hover:bg-accent-950 dark:focus-visible:bg-accent-950",
       )}
       onClick={onPress}
     >
-      <div className="flex items-center gap-4">
-        <div className="relative flex-shrink-0">
-          <TransferParticipantAvatar
-            participant={participant}
-            className="h-12 w-12 text-sm shadow-sm"
-          />
-          {isRecommended ? (
-            <span
-              aria-label={t`Recommended match`}
-              className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-accent-500 text-accent-50 shadow-sm dark:border-accent-950 dark:bg-accent-400 dark:text-accent-950"
-            >
-              <Icon icon="lucide.sparkles" width={11} height={11} />
-            </span>
-          ) : null}
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <div className="text-base font-semibold text-accent-950 dark:text-accent-50">
-                {participant.name}
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="relative flex-shrink-0">
+        <TransferParticipantAvatar
+          participant={participant}
+          className="h-9 w-9 text-xs shadow-sm"
+        />
+        {isRecommended ? (
+          <span
+            aria-label={t`Recommended match`}
+            className="absolute -right-1 -top-1 inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-accent-500 text-accent-50 shadow-sm dark:border-accent-900 dark:bg-accent-400 dark:text-accent-950"
+          >
+            <Icon icon="lucide.sparkles" width={9} height={9} />
+          </span>
+        ) : null}
       </div>
+
+      <span className="min-w-0 flex-1 truncate text-base font-medium text-accent-950 dark:text-accent-50">
+        {participant.name}
+      </span>
     </button>
   );
 }
@@ -579,30 +598,35 @@ function DestinationParticipantCard({
 function TransferReviewCard({
   amount,
   currency,
-  fromName,
-  toName,
   originParty,
   destinationParty,
-  destinationDebtorName,
-  destinationCreditorName,
+  from,
+  to,
+  destinationDebtor,
+  destinationCreditor,
 }: {
   amount: number;
   currency: Currency;
-  fromName: string;
-  toName: string;
   originParty: Party;
   destinationParty?: Party;
-  destinationDebtorName: string;
-  destinationCreditorName: string;
+  from: PartyParticipant;
+  to: PartyParticipant;
+  destinationDebtor: PartyParticipant | null;
+  destinationCreditor: PartyParticipant | null;
 }) {
+  const fromName = from.name;
+  const toName = to.name;
+  const destinationDebtorName = destinationDebtor?.name ?? "";
+  const destinationCreditorName = destinationCreditor?.name ?? "";
+
   return (
     <div className="grid gap-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 rounded-2xl border border-accent-200/80 bg-white/80 p-4 shadow-sm dark:border-accent-800 dark:bg-accent-950/70 dark:shadow-none">
         <div>
           <div className="text-sm font-medium text-accent-700 dark:text-accent-300">
             <Trans>Debt being moved</Trans>
           </div>
-          <div className="mt-1 text-2xl font-semibold tracking-tight">
+          <div className="mt-1 text-xl font-semibold tracking-tight">
             {fromName} <span className="text-accent-500">→</span> {toName}
           </div>
         </div>
@@ -614,10 +638,12 @@ function TransferReviewCard({
         />
       </div>
 
-      <div className="mt-5 grid gap-3">
+      <div className="grid gap-3">
         <ReviewPartyRow
           caption={t`Settled in`}
           party={originParty}
+          from={from}
+          to={to}
           detail={
             <Trans>
               {fromName} stops owing {toName}
@@ -629,6 +655,8 @@ function TransferReviewCard({
           <ReviewPartyRow
             caption={t`Moved to`}
             party={destinationParty}
+            from={destinationDebtor}
+            to={destinationCreditor}
             detail={
               <Trans>
                 {destinationCreditorName} is owed by {destinationDebtorName}
@@ -644,25 +672,58 @@ function TransferReviewCard({
 function ReviewPartyRow({
   caption,
   party,
+  from,
+  to,
   detail,
 }: {
   caption: string;
   party: Party;
+  from: PartyParticipant | null;
+  to: PartyParticipant | null;
   detail: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-accent-200/80 bg-white/80 p-3 dark:border-accent-800 dark:bg-accent-950/70">
-      <PartySymbolBadge party={party} className="h-11 w-11" />
+    <div className="rounded-xl border border-accent-200/80 bg-white/80 p-3 dark:border-accent-800 dark:bg-accent-950/70">
+      <div className="flex items-start gap-3">
+        <PartySymbolBadge
+          party={party}
+          className="mt-0.5 h-10 w-10 flex-shrink-0 text-base"
+        />
 
-      <div className="min-w-0 flex-1">
-        <div className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-500 dark:text-accent-400">
-          {caption}
-        </div>
-        <div className="mt-1 text-base font-semibold text-accent-950 dark:text-accent-50">
-          {party.name}
-        </div>
-        <div className="mt-1 text-sm text-accent-700 dark:text-accent-300">
-          {detail}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-500 dark:text-accent-400">
+              {caption}
+            </div>
+            <div className="h-px min-w-4 flex-1 bg-accent-200/80 dark:bg-accent-800" />
+          </div>
+          <div className="mt-1 truncate text-base font-semibold text-accent-950 dark:text-accent-50">
+            {party.name}
+          </div>
+
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-accent-50/70 px-2.5 py-2 dark:bg-accent-900">
+            {from ? (
+              <TransferParticipantAvatar
+                participant={from}
+                className="h-8 w-8 flex-shrink-0 text-xs"
+              />
+            ) : null}
+            <Icon
+              icon="lucide.arrow-right"
+              width={14}
+              height={14}
+              className="flex-shrink-0 text-accent-500 dark:text-accent-400"
+            />
+            {to ? (
+              <TransferParticipantAvatar
+                participant={to}
+                className="h-8 w-8 flex-shrink-0 text-xs"
+              />
+            ) : null}
+            <div className="min-w-0 flex-1 text-sm text-accent-700 dark:text-accent-300">
+              {detail}
+            </div>
+          </div>
         </div>
       </div>
     </div>
