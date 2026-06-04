@@ -5,7 +5,6 @@ export class TransferDebtPage {
   readonly partyStep: Locator;
   readonly participantStep: Locator;
   readonly confirmationStep: Locator;
-  readonly continueButton: Locator;
   readonly confirmTransferButton: Locator;
 
   constructor(page: Page) {
@@ -13,9 +12,6 @@ export class TransferDebtPage {
     this.partyStep = page.getByTestId("transfer-debt-party-step");
     this.participantStep = page.getByTestId("transfer-debt-participant-step");
     this.confirmationStep = page.getByTestId("transfer-debt-confirmation-step");
-    this.continueButton = page.getByRole("button", {
-      name: "Continue",
-    });
     this.confirmTransferButton = page.getByRole("button", {
       name: "Confirm transfer",
     });
@@ -75,15 +71,11 @@ export class TransferDebtPage {
       .filter({ hasText: participantName })
       .first()
       .click();
+    await expect(this.confirmationStep).toBeVisible();
   }
 
   async completeTransfer() {
-    await expect(this.continueButton).toBeVisible();
-    await this.continueButton.click();
     await expect(this.confirmationStep).toBeVisible();
-    await expect(
-      this.page.getByText("This settles", { exact: false }),
-    ).toBeVisible();
     await expect(this.page.getByText("Moved to")).toBeVisible();
     await this.confirmTransferButton.click();
   }

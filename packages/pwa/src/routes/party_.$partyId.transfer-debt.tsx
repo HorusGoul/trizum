@@ -144,8 +144,12 @@ function RouteComponent() {
     destinationPartyOptions.length === 1
       ? (destinationPartyOptions[0]?.id ?? "")
       : "";
-  const selectedDestinationPartyId =
-    destinationPartyId || defaultDestinationPartyId;
+  const hasSelectedDestinationParty = destinationPartyOptions.some(
+    ({ id }) => id === destinationPartyId,
+  );
+  const selectedDestinationPartyId = hasSelectedDestinationParty
+    ? destinationPartyId
+    : defaultDestinationPartyId;
   const selectedDestinationParty = destinationPartyOptions.find(
     ({ id }) => id === selectedDestinationPartyId,
   );
@@ -174,55 +178,6 @@ function RouteComponent() {
     !!selectedDestinationParty &&
     !!selectedDestinationCounterparty &&
     destinationParticipantId !== "";
-
-  useEffect(() => {
-    if (destinationPartyOptions.length === 0) {
-      setDestinationPartyId("");
-      return;
-    }
-
-    if (
-      destinationPartyId &&
-      destinationPartyOptions.some((option) => option.id === destinationPartyId)
-    ) {
-      return;
-    }
-
-    setDestinationPartyId("");
-  }, [destinationPartyId, destinationPartyOptions]);
-
-  useEffect(() => {
-    if (!selectedDestinationParty) {
-      setDestinationParticipantId("");
-      return;
-    }
-
-    setDestinationParticipantId((currentValue) => {
-      if (
-        selectedDestinationParty.otherParticipants.some(
-          (participant) => participant.id === currentValue,
-        )
-      ) {
-        return currentValue;
-      }
-
-      return (
-        selectedDestinationParty.participantMatch.exactMatchParticipantId ?? ""
-      );
-    });
-  }, [selectedDestinationParty]);
-
-  useEffect(() => {
-    if (step !== "success" && !selectedDestinationParty && step !== "party") {
-      setStep("party");
-    }
-  }, [selectedDestinationParty, step]);
-
-  useEffect(() => {
-    if (step === "confirm" && !canTransfer) {
-      setStep(selectedDestinationParty ? "participant" : "party");
-    }
-  }, [canTransfer, selectedDestinationParty, step]);
 
   useEffect(() => {
     if (step !== "success" || !successExpenseId) {
@@ -267,7 +222,6 @@ function RouteComponent() {
     );
   }
 
-  const originPartyName = party.name;
   const destinationPartyName = selectedDestinationParty?.entry.party.name ?? "";
   const destinationCurrentParticipantName =
     selectedDestinationParty?.currentParticipant.name ?? "";
@@ -276,18 +230,21 @@ function RouteComponent() {
   const activeStep =
     step === "success"
       ? step
-      : !selectedDestinationParty
-        ? "party"
-        : step === "party" && !hasPartyStep
+      : step === "confirm" && !canTransfer
+        ? selectedDestinationParty
           ? "participant"
-          : step;
+          : "party"
+        : !selectedDestinationParty
+          ? "party"
+          : step === "party" && !hasPartyStep
+            ? "participant"
+            : step;
   const pageTitle =
     activeStep === "confirm"
       ? t`Confirm transfer`
       : activeStep === "success"
         ? t`Debt transferred`
         : t`Transfer debt`;
-  const reviewStepDescription = t`This settles ${originPartyName} and moves the debt to ${destinationPartyName}.`;
   const onBackPress =
     activeStep === "confirm"
       ? () => {
@@ -359,12 +316,6 @@ function RouteComponent() {
             data-testid="transfer-debt-confirmation-step"
           >
             <div className="container flex flex-col gap-4 px-4 pt-4">
-              <SectionIntro
-                eyebrow={t`Review`}
-                title={t`Confirm transfer`}
-                description={reviewStepDescription}
-              />
-
               <TransferReviewCard
                 amount={amount}
                 currency={party.currency}
@@ -435,10 +386,10 @@ function RouteComponent() {
                       isRecommended={priorityDestinationParticipantIds.has(
                         participant.id,
                       )}
-                      isSelected={participant.id === destinationParticipantId}
                       participant={participant}
                       onPress={() => {
                         setDestinationParticipantId(participant.id);
+                        setStep("confirm");
                       }}
                     />
                   ))}
@@ -473,7 +424,6 @@ function RouteComponent() {
                       <DestinationPartyCard
                         key={option.id}
                         option={option}
-                        isSelected={option.id === destinationPartyId}
                         onPress={() => {
                           setDestinationPartyId(option.id);
                           setStep("participant");
@@ -487,24 +437,6 @@ function RouteComponent() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {activeStep === "participant" ? (
-        <TransferActionFooter>
-          <Button
-            color="accent"
-            className="font-semibold"
-            isDisabled={!canTransfer}
-            onPress={() => {
-              setStep("confirm");
-            }}
-          >
-            <Icon icon="lucide.chevrons-right" width={18} height={18} />
-            <span className="ml-2">
-              <Trans>Continue</Trans>
-            </span>
-          </Button>
-        </TransferActionFooter>
-      ) : null}
 
       {activeStep === "success" ? null : <div className="h-8 flex-shrink-0" />}
     </TransferDebtLayout>
@@ -547,45 +479,22 @@ function TransferDebtLayout({
   );
 }
 
-function SectionIntro({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
-  title: string;
-  description?: string;
-}) {
+function SectionIntro({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div>
       <div className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-500 dark:text-accent-400">
         {eyebrow}
       </div>
       <h2 className="mt-2 text-2xl font-semibold tracking-tight">{title}</h2>
-      {description ? (
-        <p className="mt-2 text-sm leading-6 text-accent-800 dark:text-accent-200">
-          {description}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function TransferActionFooter({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-accent-200 bg-white/95 shadow-[0_-12px_32px_rgba(15,23,42,0.08)] backdrop-blur pb-safe dark:border-accent-800 dark:bg-accent-950/95 dark:shadow-none">
-      <div className="container px-4 py-3">{children}</div>
     </div>
   );
 }
 
 function DestinationPartyCard({
   option,
-  isSelected,
   onPress,
 }: {
   option: DestinationPartyOption;
-  isSelected: boolean;
   onPress: () => void;
 }) {
   return (
@@ -593,9 +502,7 @@ function DestinationPartyCard({
       type="button"
       className={cn(
         "w-full rounded-3xl border p-4 text-left transition-all duration-200",
-        isSelected
-          ? "border-accent-500 bg-accent-50 shadow-sm dark:border-accent-400 dark:bg-accent-950"
-          : "border-accent-200/80 bg-white hover:border-accent-300 hover:bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900 dark:hover:border-accent-700 dark:hover:bg-accent-950",
+        "border-accent-200/80 bg-white hover:border-accent-300 hover:bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900 dark:hover:border-accent-700 dark:hover:bg-accent-950",
       )}
       onClick={onPress}
     >
@@ -614,12 +521,6 @@ function DestinationPartyCard({
                 </p>
               ) : null}
             </div>
-
-            {isSelected ? (
-              <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent-500 text-accent-50 dark:bg-accent-400 dark:text-accent-950">
-                <Icon icon="lucide.check" width={16} height={16} />
-              </span>
-            ) : null}
           </div>
         </div>
       </div>
@@ -629,12 +530,10 @@ function DestinationPartyCard({
 
 function DestinationParticipantCard({
   participant,
-  isSelected,
   isRecommended,
   onPress,
 }: {
   participant: PartyParticipant;
-  isSelected: boolean;
   isRecommended: boolean;
   onPress: () => void;
 }) {
@@ -643,9 +542,7 @@ function DestinationParticipantCard({
       type="button"
       className={cn(
         "w-full rounded-3xl border p-4 text-left transition-all duration-200",
-        isSelected
-          ? "border-accent-500 bg-accent-50 shadow-sm dark:border-accent-400 dark:bg-accent-950"
-          : "border-accent-200/80 bg-white hover:border-accent-300 hover:bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900 dark:hover:border-accent-700 dark:hover:bg-accent-950",
+        "border-accent-200/80 bg-white hover:border-accent-300 hover:bg-accent-50/70 dark:border-accent-800 dark:bg-accent-900 dark:hover:border-accent-700 dark:hover:bg-accent-950",
       )}
       onClick={onPress}
     >
@@ -672,12 +569,6 @@ function DestinationParticipantCard({
                 {participant.name}
               </div>
             </div>
-
-            {isSelected ? (
-              <span className="inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent-500 text-accent-50 dark:bg-accent-400 dark:text-accent-950">
-                <Icon icon="lucide.check" width={16} height={16} />
-              </span>
-            ) : null}
           </div>
         </div>
       </div>
