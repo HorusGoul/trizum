@@ -2363,9 +2363,12 @@ msgstr "Total split:"
 #: src/routes/party_.$partyId.transfer-debt.tsx:216
 #: src/routes/party_.$partyId.transfer-debt.tsx:227
 #: src/routes/party_.$partyId.transfer-debt.tsx:264
-#: src/routes/party.$partyId.tsx:1041
 msgid "Transfer debt"
 msgstr "Transfer debt"
+
+#: src/routes/party.$partyId.tsx:1047
+msgid "Transfer to another party"
+msgstr "Transfer to another party"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:196
 msgid "Transferring debt..."

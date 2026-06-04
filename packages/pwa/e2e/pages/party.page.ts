@@ -164,7 +164,7 @@ export class PartyPage {
     await expect(this.nobodyOwesYouMessage).toBeVisible();
     await expect(
       this.page.getByRole("button", {
-        name: /^(Pay|Mark as paid|Transfer debt)$/,
+        name: /^(Pay|Mark as paid|Transfer to another party)$/,
       }),
     ).toHaveCount(0);
   }

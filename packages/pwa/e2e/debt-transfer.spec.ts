@@ -61,14 +61,14 @@ test.describe("Debt transfer", () => {
       await originPartyPage.expectSettlementActionVisible(originAction);
       await originPartyPage.expectSettlementActionButtonVisible(
         originAction,
-        "Transfer debt",
+        "Transfer to another party",
       );
     });
 
     await test.step("choose the recommended destination creditor", async () => {
       await originPartyPage.openSettlementActionButton(
         originAction,
-        "Transfer debt",
+        "Transfer to another party",
       );
 
       await transferDebtPage.expectLoaded();
@@ -146,7 +146,7 @@ test.describe("Debt transfer", () => {
     await harness.navigate(`/party/${originParty.partyId}?tab=balances`);
     await originPartyPage.openSettlementActionButton(
       originAction,
-      "Transfer debt",
+      "Transfer to another party",
     );
 
     await transferDebtPage.expectLoaded();

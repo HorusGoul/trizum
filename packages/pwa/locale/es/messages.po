@@ -2283,8 +2283,11 @@ msgstr "Total gastado"
 #: src/routes/party_.$partyId.transfer-debt.tsx:216
 #: src/routes/party_.$partyId.transfer-debt.tsx:227
 #: src/routes/party_.$partyId.transfer-debt.tsx:264
-#: src/routes/party.$partyId.tsx:1041
 msgid "Transfer debt"
+msgstr ""
+
+#: src/routes/party.$partyId.tsx:1047
+msgid "Transfer to another party"
 msgstr ""
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:196

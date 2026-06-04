@@ -999,10 +999,10 @@ function BalanceActionItem({
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-1">
         <Button
           color="input-like"
-          className="h-8 rounded-lg px-4"
+          className="h-10 rounded-lg px-4 font-semibold"
           onPress={() =>
             void navigate({
               to: "/party/$partyId/pay",
@@ -1022,8 +1022,8 @@ function BalanceActionItem({
 
         {isFromMe && canTransferDebt ? (
           <Button
-            color="input-like"
-            className="h-8 rounded-lg px-4"
+            color="transparent"
+            className="h-11 rounded-lg px-3 text-sm font-medium text-accent-500 hover:text-accent-400 dark:text-accent-300 dark:hover:text-accent-200"
             onPress={() =>
               void navigate({
                 to: "/party/$partyId/transfer-debt",
@@ -1038,7 +1038,13 @@ function BalanceActionItem({
               })
             }
           >
-            <Trans>Transfer debt</Trans>
+            <Icon
+              icon="lucide.corner-down-right"
+              width={16}
+              height={16}
+              className="mr-2 flex-shrink-0"
+            />
+            <Trans>Transfer to another party</Trans>
           </Button>
         ) : null}
       </div>
