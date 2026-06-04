@@ -56,13 +56,17 @@ export class TransferDebtPage {
 
   async expectParticipantStep() {
     await expect(this.participantStep).toBeVisible();
+    await expect(this.partyStep).toBeHidden();
     await expect(this.page.getByText("Choose who receives it")).toBeVisible();
   }
 
   async expectRecommendedParticipant(participantName: string) {
-    await expect(
-      this.participantStep.locator("button").filter({ hasText: participantName }),
-    ).toContainText("Recommended");
+    const participantRow = this.participantStep
+      .locator("button")
+      .filter({ hasText: participantName });
+
+    await expect(participantRow).toBeVisible();
+    await expect(participantRow.getByLabel("Recommended match")).toBeVisible();
   }
 
   async chooseParticipant(participantName: string) {
@@ -78,8 +82,9 @@ export class TransferDebtPage {
     await this.continueButton.click();
     await expect(this.confirmationStep).toBeVisible();
     await expect(
-      this.page.getByText("This will settle the debt", { exact: false }),
+      this.page.getByText("This settles", { exact: false }),
     ).toBeVisible();
+    await expect(this.page.getByText("Moved to")).toBeVisible();
     await this.confirmTransferButton.click();
   }
 }
