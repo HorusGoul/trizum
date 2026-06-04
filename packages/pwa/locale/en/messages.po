@@ -30,14 +30,15 @@ msgstr "{0, plural, one {# possible creditor} other {# possible creditors}}"
 
 #. placeholder {0}: preview.remainingCount
 #: src/components/PartyListCard.tsx:342
+#: src/routes/party_.$partyId.transfer-debt.tsx:603
 msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {and # other} other {and # others}}"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:661
+#: src/routes/party_.$partyId.transfer-debt.tsx:747
 msgid "{destinationCreditorName} is owed by {destinationDebtorName}"
 msgstr "{destinationCreditorName} is owed by {destinationDebtorName}"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:648
+#: src/routes/party_.$partyId.transfer-debt.tsx:734
 msgid "{fromName} stops owing {toName}"
 msgstr "{fromName} stops owing {toName}"
 
@@ -665,7 +666,7 @@ msgstr "Danish Krone"
 msgid "Date"
 msgstr "Date"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:627
+#: src/routes/party_.$partyId.transfer-debt.tsx:713
 msgid "Debt being moved"
 msgstr "Debt being moved"
 
@@ -686,7 +687,7 @@ msgid "Debt transfer to another party"
 msgstr "Debt transfer to another party"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:263
-#: src/routes/party_.$partyId.transfer-debt.tsx:768
+#: src/routes/party_.$partyId.transfer-debt.tsx:852
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
@@ -1373,7 +1374,7 @@ msgstr "Move cursor right"
 msgid "Move this debt into one of your other active parties."
 msgstr "Move this debt into one of your other active parties."
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:656
+#: src/routes/party_.$partyId.transfer-debt.tsx:742
 msgid "Moved to"
 msgstr "Moved to"
 
@@ -1573,7 +1574,7 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:783
+#: src/routes/party_.$partyId.transfer-debt.tsx:867
 msgid "Opening updated expense…"
 msgstr "Opening updated expense…"
 
@@ -1856,7 +1857,7 @@ msgstr "Recommendations"
 msgid "Recommended"
 msgstr "Recommended"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:583
+#: src/routes/party_.$partyId.transfer-debt.tsx:669
 msgid "Recommended match"
 msgstr "Recommended match"
 
@@ -1997,7 +1998,7 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:643
+#: src/routes/party_.$partyId.transfer-debt.tsx:729
 msgid "Settled in"
 msgstr "Settled in"
 
@@ -2240,7 +2241,7 @@ msgstr "Thank you for using trizum. Your feedback helps us improve!"
 msgid "The app works offline too!"
 msgstr "The app works offline too!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:772
+#: src/routes/party_.$partyId.transfer-debt.tsx:856
 msgid "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
 msgstr "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
 

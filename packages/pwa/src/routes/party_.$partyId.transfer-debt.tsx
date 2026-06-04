@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Trans } from "@lingui/react/macro";
+import { Plural, Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Currency } from "dinero.js";
 import { AnimatePresence, motion } from "motion/react";
@@ -525,6 +525,11 @@ function DestinationPartyCard({
   option: DestinationPartyOption;
   onPress: () => void;
 }) {
+  const participantPreview = getParticipantPreview(option.otherParticipants);
+  const description = option.entry.party.description.trim();
+  const hasDescription = description.length > 0;
+  const hasSupportingCopy = hasDescription || participantPreview !== null;
+
   return (
     <button
       type="button"
@@ -534,7 +539,12 @@ function DestinationPartyCard({
       )}
       onClick={onPress}
     >
-      <div className="flex items-start gap-4">
+      <div
+        className={cn(
+          "flex gap-4",
+          hasSupportingCopy ? "items-start" : "items-center",
+        )}
+      >
         <PartySymbolBadge
           party={option.entry.party}
           className="mt-1 h-12 w-12 text-xl shadow-sm"
@@ -544,15 +554,91 @@ function DestinationPartyCard({
           <div className="text-lg font-semibold tracking-tight text-accent-950 dark:text-accent-50">
             {option.entry.party.name}
           </div>
-          {option.entry.party.description ? (
+          {participantPreview ? (
+            <p className="mt-1 flex min-w-0 items-start gap-2 text-sm leading-6 text-accent-900/80 dark:text-accent-200">
+              <Icon
+                icon="lucide.users"
+                width={16}
+                height={16}
+                aria-hidden="true"
+                className="mt-1 flex-shrink-0 opacity-90"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="line-clamp-2 block sm:hidden">
+                  <ParticipantPreviewText preview={participantPreview.mobile} />
+                </span>
+                <span className="line-clamp-1 hidden sm:block">
+                  <ParticipantPreviewText
+                    preview={participantPreview.desktop}
+                  />
+                </span>
+              </span>
+            </p>
+          ) : null}
+          {hasDescription ? (
             <p className="mt-1 line-clamp-2 text-sm italic leading-6 text-accent-900 dark:text-accent-100/80">
-              {option.entry.party.description}
+              {description}
             </p>
           ) : null}
         </div>
       </div>
     </button>
   );
+}
+
+function ParticipantPreviewText({
+  preview,
+}: {
+  preview: {
+    names: string;
+    remainingCount: number;
+  };
+}) {
+  return (
+    <>
+      {preview.names}
+      {preview.remainingCount > 0 ? (
+        <>
+          {" "}
+          <Plural
+            value={preview.remainingCount}
+            one="and # other"
+            other="and # others"
+          />
+        </>
+      ) : null}
+    </>
+  );
+}
+
+function getParticipantPreview(participants: PartyParticipant[]) {
+  const visibleParticipantNames = participants
+    .filter(
+      (participant) =>
+        !participant.isArchived && participant.name.trim() !== "",
+    )
+    .map((participant) => participant.name.trim());
+
+  if (visibleParticipantNames.length === 0) {
+    return null;
+  }
+
+  return {
+    mobile: getParticipantPreviewVariant(visibleParticipantNames, 2),
+    desktop: getParticipantPreviewVariant(visibleParticipantNames, 3),
+  };
+}
+
+function getParticipantPreviewVariant(
+  visibleParticipantNames: string[],
+  maxNames: number,
+) {
+  const previewNames = visibleParticipantNames.slice(0, maxNames);
+
+  return {
+    names: previewNames.join(", "),
+    remainingCount: visibleParticipantNames.length - previewNames.length,
+  };
 }
 
 function DestinationParticipantCard({
@@ -621,7 +707,7 @@ function TransferReviewCard({
 
   return (
     <div className="grid gap-4">
-      <div className="flex items-start justify-between gap-4 rounded-2xl border border-accent-200/80 bg-white/80 p-4 shadow-sm dark:border-accent-800 dark:bg-accent-950/70 dark:shadow-none">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm font-medium text-accent-700 dark:text-accent-300">
             <Trans>Debt being moved</Trans>
@@ -683,46 +769,44 @@ function ReviewPartyRow({
   detail: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-accent-200/80 bg-white/80 p-3 dark:border-accent-800 dark:bg-accent-950/70">
-      <div className="flex items-start gap-3">
-        <PartySymbolBadge
-          party={party}
-          className="mt-0.5 h-10 w-10 flex-shrink-0 text-base"
-        />
+    <div className="flex items-start gap-3">
+      <PartySymbolBadge
+        party={party}
+        className="mt-0.5 h-10 w-10 flex-shrink-0 text-base"
+      />
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-500 dark:text-accent-400">
-              {caption}
-            </div>
-            <div className="h-px min-w-4 flex-1 bg-accent-200/80 dark:bg-accent-800" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-500 dark:text-accent-400">
+            {caption}
           </div>
-          <div className="mt-1 truncate text-base font-semibold text-accent-950 dark:text-accent-50">
-            {party.name}
-          </div>
+          <div className="h-px min-w-4 flex-1 bg-accent-200/80 dark:bg-accent-800" />
+        </div>
+        <div className="mt-1 truncate text-base font-semibold text-accent-950 dark:text-accent-50">
+          {party.name}
+        </div>
 
-          <div className="mt-3 flex items-center gap-2 rounded-lg bg-accent-50/70 px-2.5 py-2 dark:bg-accent-900">
-            {from ? (
-              <TransferParticipantAvatar
-                participant={from}
-                className="h-8 w-8 flex-shrink-0 text-xs"
-              />
-            ) : null}
-            <Icon
-              icon="lucide.arrow-right"
-              width={14}
-              height={14}
-              className="flex-shrink-0 text-accent-500 dark:text-accent-400"
+        <div className="mt-3 flex items-center gap-2">
+          {from ? (
+            <TransferParticipantAvatar
+              participant={from}
+              className="h-8 w-8 flex-shrink-0 text-xs"
             />
-            {to ? (
-              <TransferParticipantAvatar
-                participant={to}
-                className="h-8 w-8 flex-shrink-0 text-xs"
-              />
-            ) : null}
-            <div className="min-w-0 flex-1 text-sm text-accent-700 dark:text-accent-300">
-              {detail}
-            </div>
+          ) : null}
+          <Icon
+            icon="lucide.arrow-right"
+            width={14}
+            height={14}
+            className="flex-shrink-0 text-accent-500 dark:text-accent-400"
+          />
+          {to ? (
+            <TransferParticipantAvatar
+              participant={to}
+              className="h-8 w-8 flex-shrink-0 text-xs"
+            />
+          ) : null}
+          <div className="min-w-0 flex-1 text-sm text-accent-700 dark:text-accent-300">
+            {detail}
           </div>
         </div>
       </div>
