@@ -790,7 +790,7 @@ function ReviewPartyRow({
           {party.name}
         </div>
 
-        <div className="mt-3 text-sm leading-7 text-accent-700 dark:text-accent-300">
+        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5 text-accent-700 dark:text-accent-300">
           {detail}
         </div>
       </div>
@@ -806,7 +806,7 @@ function ReviewParticipantInline({
   children: React.ReactNode;
 }) {
   return (
-    <span className="inline-flex max-w-full items-center gap-1.5 align-middle leading-none text-accent-950 dark:text-accent-50">
+    <span className="inline-flex max-w-full items-center gap-1.5 leading-5 text-accent-950 dark:text-accent-50">
       <TransferParticipantAvatar
         participant={participant}
         className="h-5 w-5 flex-shrink-0 text-[0.5rem]"
