@@ -33,11 +33,11 @@ msgstr ""
 msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {y # más} other {y # más}}"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:744
+#: src/routes/party_.$partyId.transfer-debt.tsx:742
 msgid "{destinationCreditorName} is owed by {destinationDebtorName}"
 msgstr ""
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:733
+#: src/routes/party_.$partyId.transfer-debt.tsx:731
 msgid "{fromName} stops owing {toName}"
 msgstr ""
 
@@ -431,7 +431,7 @@ msgstr "Yuan Chino"
 msgid "Choose"
 msgstr ""
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:470
+#: src/routes/party_.$partyId.transfer-debt.tsx:468
 msgid "Choose a destination party"
 msgstr ""
 
@@ -558,7 +558,7 @@ msgstr "Franco Congoleño"
 msgid "Contact Us"
 msgstr "Contacto"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:505
+#: src/routes/party_.$partyId.transfer-debt.tsx:503
 msgid "Continue"
 msgstr ""
 
@@ -638,7 +638,7 @@ msgstr "Corona Danesa"
 msgid "Date"
 msgstr "Fecha"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:714
+#: src/routes/party_.$partyId.transfer-debt.tsx:712
 msgid "Debt being moved"
 msgstr ""
 
@@ -659,7 +659,7 @@ msgid "Debt transfer to another party"
 msgstr ""
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:288
-#: src/routes/party_.$partyId.transfer-debt.tsx:818
+#: src/routes/party_.$partyId.transfer-debt.tsx:816
 msgid "Debt transferred"
 msgstr ""
 
@@ -680,7 +680,7 @@ msgstr "Descripción"
 msgid "Description must be less than 500 characters"
 msgstr "La descripción debe tener menos de 500 caracteres"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:469
+#: src/routes/party_.$partyId.transfer-debt.tsx:467
 msgid "Destination party"
 msgstr ""
 
@@ -919,7 +919,7 @@ msgid "Go back"
 msgstr "Volver"
 
 #: src/components/BackButton.tsx:20
-#: src/routes/party_.$partyId.transfer-debt.tsx:534
+#: src/routes/party_.$partyId.transfer-debt.tsx:532
 msgid "Go Back"
 msgstr "Volver"
 
@@ -1322,7 +1322,7 @@ msgstr "Mover cursor a la derecha"
 msgid "Move this debt into one of your other active parties."
 msgstr ""
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:741
+#: src/routes/party_.$partyId.transfer-debt.tsx:739
 msgid "Moved to"
 msgstr ""
 
@@ -1417,7 +1417,7 @@ msgstr "No se encontró cámara en este dispositivo"
 msgid "No currency"
 msgstr "Sin moneda"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:463
+#: src/routes/party_.$partyId.transfer-debt.tsx:461
 msgid "No destination party available"
 msgstr ""
 
@@ -1518,7 +1518,7 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:833
+#: src/routes/party_.$partyId.transfer-debt.tsx:831
 msgid "Opening updated expense…"
 msgstr ""
 
@@ -1785,7 +1785,7 @@ msgstr ""
 msgid "Recommended"
 msgstr ""
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:662
+#: src/routes/party_.$partyId.transfer-debt.tsx:660
 msgid "Recommended match"
 msgstr ""
 
@@ -1926,7 +1926,7 @@ msgstr "Configuración"
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:730
+#: src/routes/party_.$partyId.transfer-debt.tsx:728
 msgid "Settled in"
 msgstr ""
 
@@ -2165,7 +2165,7 @@ msgstr "Gracias por usar trizum. ¡Tus comentarios nos ayudan a mejorar!"
 msgid "The app works offline too!"
 msgstr "¡La app también funciona sin conexión!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:822
+#: src/routes/party_.$partyId.transfer-debt.tsx:820
 msgid "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
 msgstr ""
 
@@ -2536,7 +2536,7 @@ msgstr ""
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:464
+#: src/routes/party_.$partyId.transfer-debt.tsx:462
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr ""
 

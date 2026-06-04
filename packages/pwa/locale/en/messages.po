@@ -33,11 +33,11 @@ msgstr "{0, plural, one {# possible creditor} other {# possible creditors}}"
 msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {and # other} other {and # others}}"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:744
+#: src/routes/party_.$partyId.transfer-debt.tsx:742
 msgid "{destinationCreditorName} is owed by {destinationDebtorName}"
 msgstr "{destinationCreditorName} is owed by {destinationDebtorName}"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:733
+#: src/routes/party_.$partyId.transfer-debt.tsx:731
 msgid "{fromName} stops owing {toName}"
 msgstr "{fromName} stops owing {toName}"
 
@@ -455,7 +455,7 @@ msgstr "Chinese Yuan"
 msgid "Choose"
 msgstr "Choose"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:470
+#: src/routes/party_.$partyId.transfer-debt.tsx:468
 msgid "Choose a destination party"
 msgstr "Choose a destination party"
 
@@ -582,7 +582,7 @@ msgstr "Congolese Franc"
 msgid "Contact Us"
 msgstr "Contact Us"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:505
+#: src/routes/party_.$partyId.transfer-debt.tsx:503
 msgid "Continue"
 msgstr "Continue"
 
@@ -666,7 +666,7 @@ msgstr "Danish Krone"
 msgid "Date"
 msgstr "Date"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:714
+#: src/routes/party_.$partyId.transfer-debt.tsx:712
 msgid "Debt being moved"
 msgstr "Debt being moved"
 
@@ -687,7 +687,7 @@ msgid "Debt transfer to another party"
 msgstr "Debt transfer to another party"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:288
-#: src/routes/party_.$partyId.transfer-debt.tsx:818
+#: src/routes/party_.$partyId.transfer-debt.tsx:816
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
@@ -708,7 +708,7 @@ msgstr "Description"
 msgid "Description must be less than 500 characters"
 msgstr "Description must be less than 500 characters"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:469
+#: src/routes/party_.$partyId.transfer-debt.tsx:467
 msgid "Destination party"
 msgstr "Destination party"
 
@@ -963,7 +963,7 @@ msgid "Go back"
 msgstr "Go back"
 
 #: src/components/BackButton.tsx:20
-#: src/routes/party_.$partyId.transfer-debt.tsx:534
+#: src/routes/party_.$partyId.transfer-debt.tsx:532
 msgid "Go Back"
 msgstr "Go Back"
 
@@ -1374,7 +1374,7 @@ msgstr "Move cursor right"
 msgid "Move this debt into one of your other active parties."
 msgstr "Move this debt into one of your other active parties."
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:741
+#: src/routes/party_.$partyId.transfer-debt.tsx:739
 msgid "Moved to"
 msgstr "Moved to"
 
@@ -1469,7 +1469,7 @@ msgstr "No camera found on this device"
 msgid "No currency"
 msgstr "No currency"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:463
+#: src/routes/party_.$partyId.transfer-debt.tsx:461
 msgid "No destination party available"
 msgstr "No destination party available"
 
@@ -1574,7 +1574,7 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:833
+#: src/routes/party_.$partyId.transfer-debt.tsx:831
 msgid "Opening updated expense…"
 msgstr "Opening updated expense…"
 
@@ -1857,7 +1857,7 @@ msgstr "Recommendations"
 msgid "Recommended"
 msgstr "Recommended"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:662
+#: src/routes/party_.$partyId.transfer-debt.tsx:660
 msgid "Recommended match"
 msgstr "Recommended match"
 
@@ -1998,7 +1998,7 @@ msgstr "Settings"
 msgid "Settings saved"
 msgstr "Settings saved"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:730
+#: src/routes/party_.$partyId.transfer-debt.tsx:728
 msgid "Settled in"
 msgstr "Settled in"
 
@@ -2241,7 +2241,7 @@ msgstr "Thank you for using trizum. Your feedback helps us improve!"
 msgid "The app works offline too!"
 msgstr "The app works offline too!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:822
+#: src/routes/party_.$partyId.transfer-debt.tsx:820
 msgid "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
 msgstr "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
 
@@ -2637,7 +2637,7 @@ msgstr "You can only transfer debt from actions where you are the one who owes t
 msgid "You left the party!"
 msgstr "You left the party!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:464
+#: src/routes/party_.$partyId.transfer-debt.tsx:462
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr "You need another active party with the same currency to transfer this debt."
 
