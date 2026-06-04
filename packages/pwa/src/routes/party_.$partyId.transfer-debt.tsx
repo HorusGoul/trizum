@@ -706,7 +706,7 @@ function TransferReviewCard({
   const destinationCreditorName = destinationCreditor?.name ?? "";
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-7">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm font-medium text-accent-700 dark:text-accent-300">
@@ -724,28 +724,36 @@ function TransferReviewCard({
         />
       </div>
 
-      <div className="grid gap-3">
+      <div className="grid gap-6">
         <ReviewPartyRow
           caption={t`Settled in`}
           party={originParty}
-          from={from}
-          to={to}
           detail={
             <Trans>
-              {fromName} stops owing {toName}
+              <ReviewParticipantInline participant={from}>
+                {fromName}
+              </ReviewParticipantInline>{" "}
+              stops owing{" "}
+              <ReviewParticipantInline participant={to}>
+                {toName}
+              </ReviewParticipantInline>
             </Trans>
           }
         />
 
-        {destinationParty ? (
+        {destinationParty && destinationDebtor && destinationCreditor ? (
           <ReviewPartyRow
             caption={t`Moved to`}
             party={destinationParty}
-            from={destinationDebtor}
-            to={destinationCreditor}
             detail={
               <Trans>
-                {destinationCreditorName} is owed by {destinationDebtorName}
+                <ReviewParticipantInline participant={destinationCreditor}>
+                  {destinationCreditorName}
+                </ReviewParticipantInline>{" "}
+                is owed by{" "}
+                <ReviewParticipantInline participant={destinationDebtor}>
+                  {destinationDebtorName}
+                </ReviewParticipantInline>
               </Trans>
             }
           />
@@ -758,14 +766,10 @@ function TransferReviewCard({
 function ReviewPartyRow({
   caption,
   party,
-  from,
-  to,
   detail,
 }: {
   caption: string;
   party: Party;
-  from: PartyParticipant | null;
-  to: PartyParticipant | null;
   detail: React.ReactNode;
 }) {
   return (
@@ -786,31 +790,29 @@ function ReviewPartyRow({
           {party.name}
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
-          {from ? (
-            <TransferParticipantAvatar
-              participant={from}
-              className="h-8 w-8 flex-shrink-0 text-xs"
-            />
-          ) : null}
-          <Icon
-            icon="lucide.arrow-right"
-            width={14}
-            height={14}
-            className="flex-shrink-0 text-accent-500 dark:text-accent-400"
-          />
-          {to ? (
-            <TransferParticipantAvatar
-              participant={to}
-              className="h-8 w-8 flex-shrink-0 text-xs"
-            />
-          ) : null}
-          <div className="min-w-0 flex-1 text-sm text-accent-700 dark:text-accent-300">
-            {detail}
-          </div>
+        <div className="mt-3 text-sm leading-9 text-accent-700 dark:text-accent-300">
+          {detail}
         </div>
       </div>
     </div>
+  );
+}
+
+function ReviewParticipantInline({
+  participant,
+  children,
+}: {
+  participant: PartyParticipant;
+  children: React.ReactNode;
+}) {
+  return (
+    <span className="inline-flex max-w-full items-center gap-2 align-middle text-accent-950 dark:text-accent-50">
+      <TransferParticipantAvatar
+        participant={participant}
+        className="h-7 w-7 flex-shrink-0 text-[0.65rem]"
+      />
+      <span className="truncate font-medium">{children}</span>
+    </span>
   );
 }
 

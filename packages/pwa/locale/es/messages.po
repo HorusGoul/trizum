@@ -58,6 +58,14 @@ msgstr "© {0} trizum"
 msgid "© {currentYear} trizum"
 msgstr "© {currentYear} trizum"
 
+#: src/routes/party_.$partyId.transfer-debt.tsx:749
+msgid "<0>{destinationCreditorName}</0> is owed by <1>{destinationDebtorName}</1>"
+msgstr ""
+
+#: src/routes/party_.$partyId.transfer-debt.tsx:732
+msgid "<0>{fromName}</0> stops owing <1>{toName}</1>"
+msgstr ""
+
 #: src/lib/validation.ts:66
 msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
@@ -659,7 +667,7 @@ msgid "Debt transfer to another party"
 msgstr ""
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:263
-#: src/routes/party_.$partyId.transfer-debt.tsx:852
+#: src/routes/party_.$partyId.transfer-debt.tsx:854
 msgid "Debt transferred"
 msgstr ""
 
@@ -1322,7 +1330,7 @@ msgstr "Mover cursor a la derecha"
 msgid "Move this debt into one of your other active parties."
 msgstr ""
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:742
+#: src/routes/party_.$partyId.transfer-debt.tsx:746
 msgid "Moved to"
 msgstr ""
 
@@ -1518,7 +1526,7 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:867
+#: src/routes/party_.$partyId.transfer-debt.tsx:869
 msgid "Opening updated expense…"
 msgstr ""
 
@@ -2165,7 +2173,7 @@ msgstr "Gracias por usar trizum. ¡Tus comentarios nos ayudan a mejorar!"
 msgid "The app works offline too!"
 msgstr "¡La app también funciona sin conexión!"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:856
+#: src/routes/party_.$partyId.transfer-debt.tsx:858
 msgid "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
 msgstr ""
 
