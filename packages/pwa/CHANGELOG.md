@@ -1,5 +1,22 @@
 # @trizum/pwa
 
+## 1.8.0
+
+### Minor Changes
+
+- 0ce9a2a: Add a debt transfer flow that lets users move their own debt from one party to another from the balances screen, including the streamlined selection and review experience.
+
+### Patch Changes
+
+- 09ef7ba: Replace the PWA icon loader with a generated SVG sprite pipeline.
+  - generate a minimal sprite from the icons actually referenced in the app
+  - add typed sprite IDs for Lucide static icons and custom SVG icon sets
+  - remove the old Lucide lazy-loading and preload generation setup
+
+- 92c0ea9: Migrate the PWA's virtualized emoji picker and expense log from `@tanstack/react-virtual` to `react-window`.
+
+  This keeps the existing user flows intact while simplifying scroll restoration and removing the React 19 workaround the old virtualization layer required.
+
 ## 1.7.0
 
 ### Minor Changes
