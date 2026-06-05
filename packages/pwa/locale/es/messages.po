@@ -1415,10 +1415,6 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:976
-msgid "Opening updated expense…"
-msgstr "Abriendo el gasto actualizado…"
-
 #: src/routes/join.tsx:157
 msgid "or enter code"
 msgstr "o introduce código"

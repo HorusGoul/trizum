@@ -1471,10 +1471,6 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
-#: src/routes/party_.$partyId.transfer-debt.tsx:976
-msgid "Opening updated expense…"
-msgstr "Opening updated expense…"
-
 #: src/components/ExpenseEditor.tsx:201
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"

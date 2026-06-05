@@ -970,11 +970,6 @@ function TransferSuccessState({
           <span className="font-semibold">{destinationDebtorName}</span>.
         </Trans>
       </p>
-
-      <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-accent-200 bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent-600 dark:border-accent-800 dark:bg-accent-900 dark:text-accent-300">
-        <Icon icon="lucide.sparkles" width={14} height={14} />
-        <Trans>Opening updated expense…</Trans>
-      </div>
     </div>
   );
 }
