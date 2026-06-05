@@ -26,7 +26,7 @@ msgstr "[DEV] Crear gastos"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:802
 msgid "{0, plural, one {# possible creditor} other {# possible creditors}}"
-msgstr ""
+msgstr "{0, plural, one {# posible acreedor} other {# posibles acreedores}}"
 
 #. placeholder {0}: preview.remainingCount
 #: src/components/PartyListCard.tsx:342
@@ -36,11 +36,11 @@ msgstr "{0, plural, one {y # más} other {y # más}}"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:747
 msgid "{destinationCreditorName} is owed by {destinationDebtorName}"
-msgstr ""
+msgstr "{destinationDebtorName} debe dinero a {destinationCreditorName}"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:734
 msgid "{fromName} stops owing {toName}"
-msgstr ""
+msgstr "{fromName} deja de deber dinero a {toName}"
 
 #: src/routes/migrate_.tricount.tsx:377
 msgid "{message}"
@@ -60,11 +60,11 @@ msgstr "© {currentYear} trizum"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:749
 msgid "<0>{destinationCreditorName}</0> is owed by <1>{destinationDebtorName}</1>"
-msgstr ""
+msgstr "<1>{destinationDebtorName}</1> debe dinero a <0>{destinationCreditorName}</0>"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:732
 msgid "<0>{fromName}</0> stops owing <1>{toName}</1>"
-msgstr ""
+msgstr "<0>{fromName}</0> deja de deber dinero a <1>{toName}</1>"
 
 #: src/lib/validation.ts:66
 msgid "A name for the participant is required"
@@ -254,7 +254,7 @@ msgstr "Manat Azerbaiyano"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:395
 msgid "Back"
-msgstr ""
+msgstr "Atrás"
 
 #: src/routes/archived.tsx:119
 msgid "Back to home"
@@ -306,11 +306,11 @@ msgstr "Dólar Bermudeño"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:710
 msgid "Best match for {sourceCreditorName}: <0>{exactMatchParticipantName}</0>"
-msgstr ""
+msgstr "Mejor coincidencia para {sourceCreditorName}: <0>{exactMatchParticipantName}</0>"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:717
 msgid "Best match for {sourceCreditorName}: <0>{topRecommendationName}</0>"
-msgstr ""
+msgstr "Mejor coincidencia para {sourceCreditorName}: <0>{topRecommendationName}</0>"
 
 #: src/routes/new.tsx:473
 msgid "Bhutanese Ngultrum"
@@ -422,7 +422,7 @@ msgstr "Comprobar actualizaciones"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:349
 msgid "Check the parties and participants before creating the two expenses."
-msgstr ""
+msgstr "Revisa los grupos y participantes antes de crear los dos gastos."
 
 #: src/routes/new.tsx:481
 msgid "Chilean Peso"
@@ -438,19 +438,19 @@ msgstr "Yuan Chino"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:648
 msgid "Choose"
-msgstr ""
+msgstr "Elegir"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:442
 msgid "Choose a destination party"
-msgstr ""
+msgstr "Elige un grupo de destino"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:578
 msgid "Choose a party"
-msgstr ""
+msgstr "Elige un grupo"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:580
 msgid "Choose a person"
-msgstr ""
+msgstr "Elige una persona"
 
 #: src/routes/new.tsx:255
 msgid "Choose the currency for expenses in this party"
@@ -458,31 +458,31 @@ msgstr "Elige la moneda para los gastos de este grupo"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:260
 msgid "Choose the participant who should receive the transferred debt"
-msgstr ""
+msgstr "Elige el participante que debe recibir la deuda transferida"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:232
 msgid "Choose the party where this debt should continue"
-msgstr ""
+msgstr "Elige el grupo donde debe continuar esta deuda"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:722
 msgid "Choose the person on the next step"
-msgstr ""
+msgstr "Elige a la persona en el siguiente paso"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:449
 msgid "Choose where the debt should continue"
-msgstr ""
+msgstr "Elige dónde debe continuar la deuda"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:396
 msgid "Choose who receives it"
-msgstr ""
+msgstr "Elige quién la recibe"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:471
 msgid "Choose who receives the debt there"
-msgstr ""
+msgstr "Elige quién recibe la deuda allí"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:275
 msgid "Choose who should be owed after the transfer."
-msgstr ""
+msgstr "Elige a quién se le deberá dinero después de la transferencia."
 
 #: src/components/CalculatorToolbar.tsx:449
 msgid "Clear all"
@@ -543,20 +543,20 @@ msgstr "Configurar perfil"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:581
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmar"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:348
 msgid "Confirm this transfer"
-msgstr ""
+msgstr "Confirma esta transferencia"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:261
 #: src/routes/party_.$partyId.transfer-debt.tsx:377
 msgid "Confirm transfer"
-msgstr ""
+msgstr "Confirmar transferencia"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:370
 msgid "Confirming..."
-msgstr ""
+msgstr "Confirmando..."
 
 #: src/routes/new.tsx:477
 msgid "Congolese Franc"
@@ -568,7 +568,7 @@ msgstr "Contacto"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:503
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #: src/routes/about.tsx:130
 msgid "Contributors"
@@ -593,11 +593,11 @@ msgstr "Crear un nuevo Grupo"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:382
 msgid "Creates the same debt in the selected party"
-msgstr ""
+msgstr "Crea la misma deuda en el grupo seleccionado"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:395
 msgid "Creditor"
-msgstr ""
+msgstr "Acreedor"
 
 #: src/routes/about.tsx:141
 msgid "Credits"
@@ -648,7 +648,7 @@ msgstr "Fecha"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:713
 msgid "Debt being moved"
-msgstr ""
+msgstr "Deuda que se va a mover"
 
 #: src/routes/party_.$partyId.pay.tsx:70
 msgid "Debt settled between {0} and {1}!"
@@ -660,16 +660,16 @@ msgstr "¡Deuda saldada entre {fromName} y {toName}!"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:297
 msgid "Debt transfer from another party"
-msgstr ""
+msgstr "Transferencia de deuda desde otro grupo"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:296
 msgid "Debt transfer to another party"
-msgstr ""
+msgstr "Transferencia de deuda a otro grupo"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:263
 #: src/routes/party_.$partyId.transfer-debt.tsx:854
 msgid "Debt transferred"
-msgstr ""
+msgstr "Deuda transferida"
 
 #: src/components/CalculatorToolbar.tsx:554
 msgid "Decimal point"
@@ -690,7 +690,7 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:441
 msgid "Destination party"
-msgstr ""
+msgstr "Grupo de destino"
 
 #: src/components/PartyPendingComponent.tsx:99
 msgid "Did you know?"
@@ -710,7 +710,7 @@ msgstr "Peso Dominicano"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:655
 msgid "Done"
-msgstr ""
+msgstr "Hecho"
 
 #: src/routes/new.tsx:590
 msgid "East Caribbean Dollar"
@@ -796,11 +796,11 @@ msgstr "Por ahora todo está archivado. Puedes reabrir cualquier grupo desde la 
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:773
 msgid "Exact match"
-msgstr ""
+msgstr "Coincidencia exacta"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:479
 msgid "Exact name match selected automatically: {selectedExactMatchParticipantName}"
-msgstr ""
+msgstr "Coincidencia exacta de nombre seleccionada automáticamente: {selectedExactMatchParticipantName}"
 
 #: src/routes/party_.$partyId.add.tsx:97
 msgid "Expense added"
@@ -824,7 +824,7 @@ msgstr "Gastos contabilizados"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:367
 msgid "Expenses that will be created"
-msgstr ""
+msgstr "Gastos que se crearán"
 
 #: src/components/QRCodeScanner.tsx:120
 msgid "Failed to access camera"
@@ -856,7 +856,7 @@ msgstr "Error al marcar el gasto como pagado"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:304
 msgid "Failed to transfer debt"
-msgstr ""
+msgstr "No se pudo transferir la deuda"
 
 #: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:171
 msgid "Failed to update expense"
@@ -933,7 +933,7 @@ msgstr "Volver"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:219
 msgid "Go back and try again from the balances list."
-msgstr ""
+msgstr "Vuelve atrás e inténtalo de nuevo desde la lista de saldos."
 
 #: src/routes/migrate_.tricount.tsx:315
 msgid "Go back to home"
@@ -1050,7 +1050,7 @@ msgstr "Importando datos de Tricount..."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:274
 msgid "In {destinationPartyName}, {destinationCurrentParticipantName} will owe the selected person."
-msgstr ""
+msgstr "En {destinationPartyName}, {destinationCurrentParticipantName} deberá dinero a la persona seleccionada."
 
 #: src/components/ExpenseEditor.tsx:469
 msgid "Include all"
@@ -1197,7 +1197,7 @@ msgstr "Licencia"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:820
 msgid "Likely match for {sourceCreditorName}: <0>{topRecommendationName}</0>"
-msgstr ""
+msgstr "Coincidencia probable para {sourceCreditorName}: <0>{topRecommendationName}</0>"
 
 #: src/routes/join.tsx:179
 msgid "Link or code"
@@ -1328,11 +1328,11 @@ msgstr "Mover cursor a la derecha"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:495
 msgid "Move this debt into one of your other active parties."
-msgstr ""
+msgstr "Mueve esta deuda a uno de tus otros grupos activos."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:746
 msgid "Moved to"
-msgstr ""
+msgstr "Movida a"
 
 #: src/routes/new.tsx:538
 msgid "Mozambican Metical"
@@ -1427,7 +1427,7 @@ msgstr "Sin moneda"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:435
 msgid "No destination party available"
-msgstr ""
+msgstr "No hay ningún grupo de destino disponible"
 
 #: src/components/EmojiPicker.tsx:333
 msgid "No emoji found"
@@ -1435,7 +1435,7 @@ msgstr "No se encontraron emojis"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:825
 msgid "No obvious match for {sourceCreditorName} yet"
-msgstr ""
+msgstr "Aún no hay una coincidencia clara para {sourceCreditorName}"
 
 #: src/components/PartyStatsView.tsx:299
 #: src/components/PartyStatsView.tsx:513
@@ -1452,7 +1452,7 @@ msgstr "Aún no hay estadísticas de gastos"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:401
 msgid "Nobody else is available in this party"
-msgstr ""
+msgstr "No hay nadie más disponible en este grupo"
 
 #: src/routes/party.$partyId.tsx:858
 msgid "Nobody owes you money!"
@@ -1500,7 +1500,7 @@ msgstr "Mostrar solo tus gastos"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:229
 msgid "Only your own debt can be transferred"
-msgstr ""
+msgstr "Solo puedes transferir tus propias deudas"
 
 #: src/routes/index.tsx:377
 msgid "Open archived parties"
@@ -1528,7 +1528,7 @@ msgstr "Abrir paréntesis"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:869
 msgid "Opening updated expense…"
-msgstr ""
+msgstr "Abriendo el gasto actualizado…"
 
 #: src/routes/join.tsx:157
 msgid "or enter code"
@@ -1536,7 +1536,7 @@ msgstr "o introduce código"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:373
 msgid "Origin party"
-msgstr ""
+msgstr "Grupo de origen"
 
 #: src/routes/party.$partyId.tsx:874
 msgid "Other operations"
@@ -1610,7 +1610,7 @@ msgstr "Participantes"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:450
 msgid "Parties show your identity there and the best match we can find for {sourceCreditorName}."
-msgstr ""
+msgstr "Los grupos muestran tu identidad allí y la mejor coincidencia que podemos encontrar para {sourceCreditorName}."
 
 #: src/components/PartyListCard.tsx:248
 msgid "Party actions"
@@ -1703,7 +1703,7 @@ msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:472
 msgid "Pick the person in {destinationPartyName} who should be owed after the transfer."
-msgstr ""
+msgstr "Elige a la persona de {destinationPartyName} a quien se le deberá dinero después de la transferencia."
 
 #: src/routes/index.tsx:312
 msgid "Pin party"
@@ -1759,7 +1759,7 @@ msgstr "Zloty Polaco"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:561
 msgid "Preview"
-msgstr ""
+msgstr "Vista previa"
 
 #: src/components/MediaGallery.tsx:194
 msgid "Previous"
@@ -1775,7 +1775,7 @@ msgstr "Rial Catarí"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:490
 msgid "Quick recommendations"
-msgstr ""
+msgstr "Recomendaciones rápidas"
 
 #: src/components/PartyStatsView.tsx:240
 msgid "Ranking based on how much each participant paid in the selected timeframe."
@@ -1787,19 +1787,19 @@ msgstr "Sincronización en Tiempo Real"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:278
 msgid "Recommendations"
-msgstr ""
+msgstr "Recomendaciones"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:782
 msgid "Recommended"
-msgstr ""
+msgstr "Recomendado"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:669
 msgid "Recommended match"
-msgstr ""
+msgstr "Coincidencia recomendada"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:852
 msgid "Recreated in"
-msgstr ""
+msgstr "Recreada en"
 
 #: src/components/UpdateController.tsx:28
 msgid "Reload"
@@ -1840,11 +1840,11 @@ msgstr "Reintentar"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:363
 msgid "Review"
-msgstr ""
+msgstr "Revisar"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:603
 msgid "Review transfer"
-msgstr ""
+msgstr "Revisar transferencia"
 
 #: src/routes/new.tsx:441
 msgid "Romanian Leu"
@@ -1910,7 +1910,7 @@ msgstr "Seleccionar emoji"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:894
 msgid "Selected"
-msgstr ""
+msgstr "Seleccionado"
 
 #: src/routes/support.tsx:52
 msgid "Send us an email and we'll get back to you as soon as possible."
@@ -1936,11 +1936,11 @@ msgstr "Configuración guardada"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:729
 msgid "Settled in"
-msgstr ""
+msgstr "Saldada en"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:376
 msgid "Settles the current debt"
-msgstr ""
+msgstr "Salda la deuda actual"
 
 #: src/routes/new.tsx:554
 msgid "Seychellois Rupee"
@@ -2051,15 +2051,15 @@ msgstr "Estadísticas"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:586
 msgid "Step {currentStep} of {totalSteps}"
-msgstr ""
+msgstr "Paso {currentStep} de {totalSteps}"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:448
 msgid "Step 1"
-msgstr ""
+msgstr "Paso 1"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:470
 msgid "Step 2"
-msgstr ""
+msgstr "Paso 2"
 
 #: src/routes/support.tsx:89
 msgid "Submit a Request"
@@ -2175,7 +2175,7 @@ msgstr "¡La app también funciona sin conexión!"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:858
 msgid "The new debt is now in <0>{destinationPartyName}</0>, where <1>{destinationCounterpartyName}</1> is owed by <2>{destinationDebtorName}</2>."
-msgstr ""
+msgstr "La nueva deuda está ahora en <0>{destinationPartyName}</0>, donde <2>{destinationDebtorName}</2> debe dinero a <1>{destinationCounterpartyName}</1>."
 
 #: src/components/PartyPendingComponent.tsx:27
 msgid "The party data hasn't synced to the sync server yet."
@@ -2201,7 +2201,7 @@ msgstr "Esta aplicación utiliza las siguientes bibliotecas y herramientas de c�
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:218
 msgid "This debt is no longer available"
-msgstr ""
+msgstr "Esta deuda ya no está disponible"
 
 #: src/hooks/useMediaFileActions.ts:34
 msgid "This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG."
@@ -2213,7 +2213,7 @@ msgstr "Este no es un ID válido"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:402
 msgid "This party needs another active participant besides you to receive the transferred debt."
-msgstr ""
+msgstr "Este grupo necesita otro participante activo además de ti para recibir la deuda transferida."
 
 #: src/routes/about.tsx:144
 msgid "This project uses various open source libraries and tools."
@@ -2221,23 +2221,23 @@ msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abier
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:290
 msgid "This settles {originPartyName} and moves the debt to {destinationPartyName}."
-msgstr ""
+msgstr "Esto salda {originPartyName} y mueve la deuda a {destinationPartyName}."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:276
 msgid "This will settle the debt in {originPartyName} and recreate it in {destinationPartyName}."
-msgstr ""
+msgstr "Esto saldará la deuda en {originPartyName} y la recreará en {destinationPartyName}."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:296
 msgid "This will settle the debt in <0>{0}</0> and create the same debt in <1>{1}</1>, where <2>{2}</2> is owed by <3>{3}</3>."
-msgstr ""
+msgstr "Esto saldará la deuda en <0>{0}</0> y creará la misma deuda en <1>{1}</1>, donde <3>{3}</3> debe dinero a <2>{2}</2>."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:316
 msgid "This will settle the debt in <0>{originPartyName}</0> and create the same debt in <1>{destinationPartyName}</1>, where <2>{selectedDestinationCounterpartyName}</2> is owed by <3>{destinationCurrentParticipantName}</3>."
-msgstr ""
+msgstr "Esto saldará la deuda en <0>{originPartyName}</0> y creará la misma deuda en <1>{destinationPartyName}</1>, donde <3>{destinationCurrentParticipantName}</3> debe dinero a <2>{selectedDestinationCounterpartyName}</2>."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:566
 msgid "This will settle the debt in <0>{originPartyName}</0> and recreate it in <1>{destinationPartyName}</1>, where <2>{selectedDestinationCounterpartyName}</2> will be owed by <3>{destinationCurrentParticipantName}</3>."
-msgstr ""
+msgstr "Esto saldará la deuda en <0>{originPartyName}</0> y la recreará en <1>{destinationPartyName}</1>, donde <3>{destinationCurrentParticipantName}</3> deberá dinero a <2>{selectedDestinationCounterpartyName}</2>."
 
 #. Label for the timeframe filter on the party stats screen
 #: src/components/PartyStatsView.tsx:270
@@ -2284,15 +2284,15 @@ msgstr "Total gastado"
 #: src/routes/party_.$partyId.transfer-debt.tsx:227
 #: src/routes/party_.$partyId.transfer-debt.tsx:264
 msgid "Transfer debt"
-msgstr ""
+msgstr "Transferir deuda"
 
 #: src/routes/party.$partyId.tsx:1047
 msgid "Transfer to another party"
-msgstr ""
+msgstr "Transferir a otro grupo"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:196
 msgid "Transferring debt..."
-msgstr ""
+msgstr "Transfiriendo deuda..."
 
 #: src/routes/migrate_.tricount.tsx:57
 msgid "Tricount key or URL is required"
@@ -2481,7 +2481,7 @@ msgstr "¿De qué trata este grupo?"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:311
 msgid "What will happen"
-msgstr ""
+msgstr "Qué ocurrirá"
 
 #: src/routes/settings.tsx:150
 msgid "What's your preferred way to be addressed?"
@@ -2493,11 +2493,11 @@ msgstr "¿Quién eres?"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:239
 msgid "Who is {0} in this party?"
-msgstr ""
+msgstr "¿Quién es {0} en este grupo?"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:259
 msgid "Who is {sourceCreditorName} in this party?"
-msgstr ""
+msgstr "¿Quién es {sourceCreditorName} en este grupo?"
 
 #: src/routes/new.tsx:279
 msgid "Who is invited to this party? You can add more participants later."
@@ -2529,11 +2529,11 @@ msgstr "¡Sí! Tus datos se almacenan localmente en tu dispositivo y solo se sin
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:249
 msgid "You are"
-msgstr ""
+msgstr "Tú eres"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:705
 msgid "You are {currentParticipantName}"
-msgstr ""
+msgstr "Tú eres {currentParticipantName}"
 
 #: src/components/PartyPendingComponent.tsx:16
 msgid "You can add photos to your expenses for better tracking."
@@ -2541,7 +2541,7 @@ msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:230
 msgid "You can only transfer debt from actions where you are the one who owes the money."
-msgstr ""
+msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe el dinero."
 
 #: src/routes/party.$partyId.tsx:128
 msgid "You left the party!"
@@ -2549,7 +2549,7 @@ msgstr "¡Has dejado el grupo!"
 
 #: src/routes/party_.$partyId.transfer-debt.tsx:436
 msgid "You need another active party with the same currency to transfer this debt."
-msgstr ""
+msgstr "Necesitas otro grupo activo con la misma moneda para transferir esta deuda."
 
 #: src/routes/party.$partyId.tsx:795
 msgid "You owe money to people"
