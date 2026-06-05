@@ -152,4 +152,49 @@ test.describe("Debt transfer", () => {
     await transferDebtPage.expectLoaded();
     await transferDebtPage.expectConfirmationStep();
   });
+
+  test("hides the transfer action when no destination can receive the debt", async ({
+    harness,
+    page,
+  }) => {
+    const originPartyPage = new PartyPage(page);
+    const originAction = {
+      actionLabel: "Pay" as const,
+      fromLabel: `${defaultParticipants.blair.name} (me)`,
+      toLabel: defaultParticipants.alex.name,
+    };
+
+    const [originParty, destinationParty] = await harness.seedParties([
+      createSettlementPartyFixture(),
+      createDebtTransferDestinationFixture({
+        includeCreditor: false,
+        includeExtraParticipant: false,
+      }),
+    ]);
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      parties: {
+        [originParty.partyId]: true,
+        [destinationParty.partyId]: true,
+      },
+      participantInParties: {
+        [originParty.partyId]: debtTransferJourney.originMemberParticipantId,
+        [destinationParty.partyId]:
+          debtTransferJourney.destinationMemberParticipant.id,
+      },
+    });
+
+    await harness.navigate(`/party/${originParty.partyId}?tab=balances`);
+    await originPartyPage.expectLoaded(
+      originParty.partyId,
+      debtTransferJourney.originPartyName,
+    );
+    await originPartyPage.expectSettlementActionVisible(originAction);
+    await originPartyPage.expectSettlementActionButtonHidden(
+      originAction,
+      "Transfer to another party",
+    );
+  });
 });

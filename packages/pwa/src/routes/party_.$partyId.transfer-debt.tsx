@@ -85,24 +85,8 @@ function RouteComponent() {
   const [successExpenseId, setSuccessExpenseId] = useState<string | null>(null);
 
   const destinationPartyOptions = useMemo<DestinationPartyOption[]>(() => {
-    return eligibleDestinationParties.flatMap((entry) => {
-      const currentDestinationParticipant =
-        entry.party.participants[entry.currentParticipantId];
-
-      if (
-        !currentDestinationParticipant ||
-        currentDestinationParticipant.isArchived
-      ) {
-        return [];
-      }
-
-      const otherParticipants = Object.values(entry.party.participants)
-        .filter(
-          (participant) =>
-            !participant.isArchived &&
-            participant.id !== currentDestinationParticipant.id,
-        )
-        .sort((left, right) => left.name.localeCompare(right.name));
+    return eligibleDestinationParties.map((entry) => {
+      const otherParticipants = entry.otherParticipants;
       const participantMatch = getDebtTransferParticipantMatch({
         sourceName: to?.name ?? "",
         participants: otherParticipants,
@@ -122,16 +106,14 @@ function RouteComponent() {
           (participant): participant is PartyParticipant => !!participant,
         );
 
-      return [
-        {
-          id: entry.party.id,
-          entry,
-          currentParticipant: currentDestinationParticipant,
-          otherParticipants,
-          exactMatchParticipant,
-          recommendedParticipants,
-        },
-      ];
+      return {
+        id: entry.party.id,
+        entry,
+        currentParticipant: entry.currentParticipant,
+        otherParticipants,
+        exactMatchParticipant,
+        recommendedParticipants,
+      };
     });
   }, [eligibleDestinationParties, to?.name]);
 

@@ -168,8 +168,10 @@ export function createExpenseLogFixture(
 }
 
 export function createDebtTransferDestinationFixture({
+  includeCreditor = true,
   includeExtraParticipant = true,
 }: {
+  includeCreditor?: boolean;
   includeExtraParticipant?: boolean;
 } = {}) {
   return {
@@ -183,9 +185,13 @@ export function createDebtTransferDestinationFixture({
         [debtTransferJourney.destinationMemberParticipant.id]: {
           ...debtTransferJourney.destinationMemberParticipant,
         },
-        [debtTransferJourney.destinationCreditorParticipant.id]: {
-          ...debtTransferJourney.destinationCreditorParticipant,
-        },
+        ...(includeCreditor
+          ? {
+              [debtTransferJourney.destinationCreditorParticipant.id]: {
+                ...debtTransferJourney.destinationCreditorParticipant,
+              },
+            }
+          : {}),
         ...(includeExtraParticipant
           ? {
               [defaultParticipants.casey.id]: {

@@ -387,11 +387,11 @@ export function useMultipleSuspenseDocument<
     },
   );
 
-  if ((options?.required && !docs) || !docs?.every((doc) => doc)) {
+  if (options?.required && (!docs || !docs.every((doc) => doc))) {
     throw new Error(`Document not found: ${ids.join(", ")}`);
   }
 
-  return docs.map((doc, index) => ({
+  return (docs ?? []).map((doc, index) => ({
     doc: doc as Doc<T> | undefined,
     handle: handleCache.read(repo, ids[index]) as DocHandle<T>,
   }));

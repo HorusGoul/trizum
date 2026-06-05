@@ -139,6 +139,17 @@ export class PartyPage {
     ).toBeVisible();
   }
 
+  async expectSettlementActionButtonHidden(
+    action: SettlementAction,
+    buttonName: string,
+  ) {
+    await expect(
+      this.settlementActionCard(action).getByRole("button", {
+        name: buttonName,
+      }),
+    ).toHaveCount(0);
+  }
+
   async openSettlementAction(action: SettlementAction) {
     await this.settlementActionCard(action)
       .getByRole("button", { name: action.actionLabel })
