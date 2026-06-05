@@ -1002,7 +1002,7 @@ function BalanceActionItem({
       <div className="flex flex-col gap-1">
         <Button
           color="input-like"
-          className="h-10 rounded-lg px-4 font-semibold"
+          className="h-8 rounded-lg px-3 font-semibold"
           onPress={() =>
             void navigate({
               to: "/party/$partyId/pay",
@@ -1023,7 +1023,7 @@ function BalanceActionItem({
         {isFromMe && canTransferDebt ? (
           <Button
             color="transparent"
-            className="h-11 rounded-lg px-3 text-sm font-medium text-accent-500 hover:text-accent-400 dark:text-accent-300 dark:hover:text-accent-200"
+            className="h-8 rounded-lg px-3 text-sm font-medium text-accent-500 hover:text-accent-400 dark:text-accent-300 dark:hover:text-accent-200"
             onPress={() =>
               void navigate({
                 to: "/party/$partyId/transfer-debt",
