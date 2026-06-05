@@ -36,12 +36,18 @@ type TransferStep = "party" | "participant" | "confirm" | "success";
 interface TransferDebtState {
   destinationPartyId: string;
   destinationParticipantId: string;
-  requestedStep: TransferStep;
+  step: TransferStep;
+  partySelectionPrefilled: boolean;
+  participantSelectionPrefilled: boolean;
   isSubmitting: boolean;
 }
 
 type TransferDebtAction =
-  | { type: "destinationPartySelected"; partyId: string }
+  | {
+      type: "destinationPartySelected";
+      partyId: string;
+      prefilledParticipantId: string;
+    }
   | { type: "destinationParticipantSelected"; participantId: string }
   | { type: "stepRequested"; step: TransferStep }
   | { type: "submitStarted" }
@@ -57,12 +63,41 @@ interface DestinationPartyOption {
   recommendedParticipants: PartyParticipant[];
 }
 
-const initialTransferDebtState: TransferDebtState = {
-  destinationPartyId: "",
-  destinationParticipantId: "",
-  requestedStep: "party",
-  isSubmitting: false,
-};
+function getPrefilledParticipantId(option: DestinationPartyOption): string {
+  return option.otherParticipants.length === 1
+    ? (option.otherParticipants[0]?.id ?? "")
+    : "";
+}
+
+function createInitialTransferDebtState(
+  destinationPartyOptions: DestinationPartyOption[],
+): TransferDebtState {
+  const prefilledParty =
+    destinationPartyOptions.length === 1 ? destinationPartyOptions[0] : null;
+  const prefilledParticipantId = prefilledParty
+    ? getPrefilledParticipantId(prefilledParty)
+    : "";
+
+  if (!prefilledParty) {
+    return {
+      destinationPartyId: "",
+      destinationParticipantId: "",
+      step: "party",
+      partySelectionPrefilled: false,
+      participantSelectionPrefilled: false,
+      isSubmitting: false,
+    };
+  }
+
+  return {
+    destinationPartyId: prefilledParty.id,
+    destinationParticipantId: prefilledParticipantId,
+    step: prefilledParticipantId ? "confirm" : "participant",
+    partySelectionPrefilled: true,
+    participantSelectionPrefilled: prefilledParticipantId !== "",
+    isSubmitting: false,
+  };
+}
 
 function transferDebtReducer(
   state: TransferDebtState,
@@ -73,21 +108,24 @@ function transferDebtReducer(
       return {
         ...state,
         destinationPartyId: action.partyId,
-        destinationParticipantId: "",
-        requestedStep: "participant",
+        destinationParticipantId: action.prefilledParticipantId,
+        step: action.prefilledParticipantId ? "confirm" : "participant",
+        partySelectionPrefilled: false,
+        participantSelectionPrefilled: action.prefilledParticipantId !== "",
       };
 
     case "destinationParticipantSelected":
       return {
         ...state,
         destinationParticipantId: action.participantId,
-        requestedStep: "confirm",
+        step: "confirm",
+        participantSelectionPrefilled: false,
       };
 
     case "stepRequested":
       return {
         ...state,
-        requestedStep: action.step,
+        step: action.step,
       };
 
     case "submitStarted":
@@ -99,7 +137,7 @@ function transferDebtReducer(
     case "submitSucceeded":
       return {
         ...state,
-        requestedStep: "success",
+        step: "success",
         isSubmitting: false,
       };
 
@@ -111,62 +149,46 @@ function transferDebtReducer(
   }
 }
 
-function getActiveTransferStep({
-  requestedStep,
-  hasPartyStep,
+function getVisibleTransferStep({
+  step,
   hasSelectedDestinationParty,
-  hasParticipantStep,
-  canTransfer,
+  hasSelectedDestinationParticipant,
 }: {
-  requestedStep: TransferStep;
-  hasPartyStep: boolean;
+  step: TransferStep;
   hasSelectedDestinationParty: boolean;
-  hasParticipantStep: boolean;
-  canTransfer: boolean;
+  hasSelectedDestinationParticipant: boolean;
 }): TransferStep {
-  if (requestedStep === "success") {
+  if (step === "success") {
     return "success";
-  }
-
-  if (requestedStep === "party" && hasPartyStep) {
-    return "party";
   }
 
   if (!hasSelectedDestinationParty) {
     return "party";
   }
 
-  if (requestedStep === "confirm" && !canTransfer) {
-    return hasParticipantStep ? "participant" : "party";
-  }
-
-  if (!hasParticipantStep) {
-    return "confirm";
-  }
-
-  if (requestedStep === "party") {
+  if (step === "confirm" && !hasSelectedDestinationParticipant) {
     return "participant";
   }
 
-  return requestedStep;
+  return step;
 }
 
 function getPreviousTransferStep({
   activeStep,
-  hasPartyStep,
-  hasParticipantStep,
+  partySelectionPrefilled,
+  participantSelectionPrefilled,
 }: {
   activeStep: TransferStep;
-  hasPartyStep: boolean;
-  hasParticipantStep: boolean;
+  partySelectionPrefilled: boolean;
+  participantSelectionPrefilled: boolean;
 }): TransferStep | null {
-  if (activeStep === "confirm" && hasParticipantStep) {
+  if (activeStep === "confirm" && !participantSelectionPrefilled) {
     return "participant";
   }
 
   if (
     (activeStep === "confirm" || activeStep === "participant") &&
-    hasPartyStep
+    !partySelectionPrefilled
   ) {
     return "party";
   }
@@ -209,11 +231,6 @@ function RouteComponent() {
   const to = party.participants[toId];
   const isSupportedTransfer = fromId === currentParticipant.id;
 
-  const [state, dispatch] = useReducer(
-    transferDebtReducer,
-    initialTransferDebtState,
-  );
-
   const destinationPartyOptions = useMemo<DestinationPartyOption[]>(() => {
     return eligibleDestinationParties.map((entry) => {
       const otherParticipants = entry.otherParticipants;
@@ -247,20 +264,14 @@ function RouteComponent() {
     });
   }, [eligibleDestinationParties, to?.name]);
 
-  const defaultDestinationPartyId =
-    destinationPartyOptions.length === 1
-      ? (destinationPartyOptions[0]?.id ?? "")
-      : "";
-  const hasSelectedDestinationParty = destinationPartyOptions.some(
+  const [state, dispatch] = useReducer(
+    transferDebtReducer,
+    destinationPartyOptions,
+    createInitialTransferDebtState,
+  );
+  const selectedDestinationParty = destinationPartyOptions.find(
     ({ id }) => id === state.destinationPartyId,
   );
-  const selectedDestinationPartyId = hasSelectedDestinationParty
-    ? state.destinationPartyId
-    : defaultDestinationPartyId;
-  const selectedDestinationParty = destinationPartyOptions.find(
-    ({ id }) => id === selectedDestinationPartyId,
-  );
-  const hasPartyStep = destinationPartyOptions.length > 1;
   const destinationParticipants =
     selectedDestinationParty?.otherParticipants ?? [];
   const priorityDestinationParticipants = selectedDestinationParty
@@ -278,17 +289,12 @@ function RouteComponent() {
       ({ id }) => !priorityDestinationParticipantIds.has(id),
     ),
   ];
-  const defaultDestinationParticipantId =
-    destinationParticipants.length === 1
-      ? (destinationParticipants[0]?.id ?? "")
-      : "";
   const hasSelectedDestinationParticipant = destinationParticipants.some(
     ({ id }) => id === state.destinationParticipantId,
   );
   const selectedDestinationParticipantId = hasSelectedDestinationParticipant
     ? state.destinationParticipantId
-    : defaultDestinationParticipantId;
-  const hasParticipantStep = destinationParticipants.length !== 1;
+    : "";
   const selectedDestinationCounterparty = destinationParticipants.find(
     (participant) => participant.id === selectedDestinationParticipantId,
   );
@@ -324,12 +330,10 @@ function RouteComponent() {
     selectedDestinationParty?.currentParticipant.name ?? "";
   const selectedDestinationCounterpartyName =
     selectedDestinationCounterparty?.name ?? "";
-  const activeStep = getActiveTransferStep({
-    requestedStep: state.requestedStep,
-    hasPartyStep,
+  const activeStep = getVisibleTransferStep({
+    step: state.step,
     hasSelectedDestinationParty: !!selectedDestinationParty,
-    hasParticipantStep,
-    canTransfer,
+    hasSelectedDestinationParticipant: !!selectedDestinationCounterparty,
   });
 
   const pageTitle =
@@ -340,8 +344,8 @@ function RouteComponent() {
         : t`Transfer debt`;
   const previousStep = getPreviousTransferStep({
     activeStep,
-    hasPartyStep,
-    hasParticipantStep,
+    partySelectionPrefilled: state.partySelectionPrefilled,
+    participantSelectionPrefilled: state.participantSelectionPrefilled,
   });
   const onBackPress = previousStep
     ? () => {
@@ -545,6 +549,8 @@ function RouteComponent() {
                           dispatch({
                             type: "destinationPartySelected",
                             partyId: option.id,
+                            prefilledParticipantId:
+                              getPrefilledParticipantId(option),
                           });
                         }}
                       />
