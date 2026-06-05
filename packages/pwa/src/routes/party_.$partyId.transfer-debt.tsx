@@ -3,7 +3,7 @@ import { Plural, Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Currency } from "dinero.js";
 import { AnimatePresence, motion } from "motion/react";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useReducer } from "react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
@@ -33,6 +33,21 @@ interface TransferDebtSearchParams {
 
 type TransferStep = "party" | "participant" | "confirm" | "success";
 
+interface TransferDebtState {
+  destinationPartyId: string;
+  destinationParticipantId: string;
+  requestedStep: TransferStep;
+  isSubmitting: boolean;
+}
+
+type TransferDebtAction =
+  | { type: "destinationPartySelected"; partyId: string }
+  | { type: "destinationParticipantSelected"; participantId: string }
+  | { type: "stepRequested"; step: TransferStep }
+  | { type: "submitStarted" }
+  | { type: "submitSucceeded" }
+  | { type: "submitFailed" };
+
 interface DestinationPartyOption {
   id: string;
   entry: EligibleDebtTransferParty;
@@ -40,6 +55,123 @@ interface DestinationPartyOption {
   otherParticipants: PartyParticipant[];
   exactMatchParticipant: PartyParticipant | null;
   recommendedParticipants: PartyParticipant[];
+}
+
+const initialTransferDebtState: TransferDebtState = {
+  destinationPartyId: "",
+  destinationParticipantId: "",
+  requestedStep: "party",
+  isSubmitting: false,
+};
+
+function transferDebtReducer(
+  state: TransferDebtState,
+  action: TransferDebtAction,
+): TransferDebtState {
+  switch (action.type) {
+    case "destinationPartySelected":
+      return {
+        ...state,
+        destinationPartyId: action.partyId,
+        destinationParticipantId: "",
+        requestedStep: "participant",
+      };
+
+    case "destinationParticipantSelected":
+      return {
+        ...state,
+        destinationParticipantId: action.participantId,
+        requestedStep: "confirm",
+      };
+
+    case "stepRequested":
+      return {
+        ...state,
+        requestedStep: action.step,
+      };
+
+    case "submitStarted":
+      return {
+        ...state,
+        isSubmitting: true,
+      };
+
+    case "submitSucceeded":
+      return {
+        ...state,
+        requestedStep: "success",
+        isSubmitting: false,
+      };
+
+    case "submitFailed":
+      return {
+        ...state,
+        isSubmitting: false,
+      };
+  }
+}
+
+function getActiveTransferStep({
+  requestedStep,
+  hasPartyStep,
+  hasSelectedDestinationParty,
+  hasParticipantStep,
+  canTransfer,
+}: {
+  requestedStep: TransferStep;
+  hasPartyStep: boolean;
+  hasSelectedDestinationParty: boolean;
+  hasParticipantStep: boolean;
+  canTransfer: boolean;
+}): TransferStep {
+  if (requestedStep === "success") {
+    return "success";
+  }
+
+  if (requestedStep === "party" && hasPartyStep) {
+    return "party";
+  }
+
+  if (!hasSelectedDestinationParty) {
+    return "party";
+  }
+
+  if (requestedStep === "confirm" && !canTransfer) {
+    return hasParticipantStep ? "participant" : "party";
+  }
+
+  if (!hasParticipantStep) {
+    return "confirm";
+  }
+
+  if (requestedStep === "party") {
+    return "participant";
+  }
+
+  return requestedStep;
+}
+
+function getPreviousTransferStep({
+  activeStep,
+  hasPartyStep,
+  hasParticipantStep,
+}: {
+  activeStep: TransferStep;
+  hasPartyStep: boolean;
+  hasParticipantStep: boolean;
+}): TransferStep | null {
+  if (activeStep === "confirm" && hasParticipantStep) {
+    return "participant";
+  }
+
+  if (
+    (activeStep === "confirm" || activeStep === "participant") &&
+    hasPartyStep
+  ) {
+    return "party";
+  }
+
+  return null;
 }
 
 export const Route = createFileRoute("/party_/$partyId/transfer-debt")({
@@ -77,12 +209,10 @@ function RouteComponent() {
   const to = party.participants[toId];
   const isSupportedTransfer = fromId === currentParticipant.id;
 
-  const [destinationPartyId, setDestinationPartyId] = useState<string>("");
-  const [destinationParticipantId, setDestinationParticipantId] =
-    useState<string>("");
-  const [step, setStep] = useState<TransferStep>("party");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successExpenseId, setSuccessExpenseId] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(
+    transferDebtReducer,
+    initialTransferDebtState,
+  );
 
   const destinationPartyOptions = useMemo<DestinationPartyOption[]>(() => {
     return eligibleDestinationParties.map((entry) => {
@@ -122,10 +252,10 @@ function RouteComponent() {
       ? (destinationPartyOptions[0]?.id ?? "")
       : "";
   const hasSelectedDestinationParty = destinationPartyOptions.some(
-    ({ id }) => id === destinationPartyId,
+    ({ id }) => id === state.destinationPartyId,
   );
   const selectedDestinationPartyId = hasSelectedDestinationParty
-    ? destinationPartyId
+    ? state.destinationPartyId
     : defaultDestinationPartyId;
   const selectedDestinationParty = destinationPartyOptions.find(
     ({ id }) => id === selectedDestinationPartyId,
@@ -153,10 +283,10 @@ function RouteComponent() {
       ? (destinationParticipants[0]?.id ?? "")
       : "";
   const hasSelectedDestinationParticipant = destinationParticipants.some(
-    ({ id }) => id === destinationParticipantId,
+    ({ id }) => id === state.destinationParticipantId,
   );
   const selectedDestinationParticipantId = hasSelectedDestinationParticipant
-    ? destinationParticipantId
+    ? state.destinationParticipantId
     : defaultDestinationParticipantId;
   const hasParticipantStep = destinationParticipants.length !== 1;
   const selectedDestinationCounterparty = destinationParticipants.find(
@@ -166,27 +296,6 @@ function RouteComponent() {
     !!selectedDestinationParty &&
     !!selectedDestinationCounterparty &&
     selectedDestinationParticipantId !== "";
-
-  useEffect(() => {
-    if (step !== "success" || !successExpenseId) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      void navigate({
-        to: "/party/$partyId/expense/$expenseId",
-        params: {
-          partyId: party.id,
-          expenseId: successExpenseId,
-        },
-        replace: true,
-      });
-    }, 1250);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [navigate, party.id, step, successExpenseId]);
 
   if (!from || !to) {
     return (
@@ -215,23 +324,13 @@ function RouteComponent() {
     selectedDestinationParty?.currentParticipant.name ?? "";
   const selectedDestinationCounterpartyName =
     selectedDestinationCounterparty?.name ?? "";
-  let activeStep: TransferStep;
-
-  if (step === "success") {
-    activeStep = "success";
-  } else if (step === "party" && hasPartyStep) {
-    activeStep = "party";
-  } else if (!selectedDestinationParty) {
-    activeStep = "party";
-  } else if (step === "confirm" && !canTransfer) {
-    activeStep = hasParticipantStep ? "participant" : "party";
-  } else if (!hasParticipantStep) {
-    activeStep = "confirm";
-  } else if (step === "party") {
-    activeStep = "participant";
-  } else {
-    activeStep = step;
-  }
+  const activeStep = getActiveTransferStep({
+    requestedStep: state.requestedStep,
+    hasPartyStep,
+    hasSelectedDestinationParty: !!selectedDestinationParty,
+    hasParticipantStep,
+    canTransfer,
+  });
 
   const pageTitle =
     activeStep === "confirm"
@@ -239,20 +338,29 @@ function RouteComponent() {
       : activeStep === "success"
         ? t`Debt transferred`
         : t`Transfer debt`;
-  const onBackPress =
-    activeStep === "confirm" && hasParticipantStep
-      ? () => {
-          setStep("participant");
-        }
-      : activeStep === "confirm" && hasPartyStep
-        ? () => {
-            setStep("party");
-          }
-        : activeStep === "participant" && hasPartyStep
-          ? () => {
-              setStep("party");
-            }
-          : undefined;
+  const previousStep = getPreviousTransferStep({
+    activeStep,
+    hasPartyStep,
+    hasParticipantStep,
+  });
+  const onBackPress = previousStep
+    ? () => {
+        dispatch({ type: "stepRequested", step: previousStep });
+      }
+    : undefined;
+
+  function scheduleSuccessRedirect(expenseId: string) {
+    window.setTimeout(() => {
+      void navigate({
+        to: "/party/$partyId/expense/$expenseId",
+        params: {
+          partyId: party.id,
+          expenseId,
+        },
+        replace: true,
+      });
+    }, 1250);
+  }
 
   async function onConfirmTransfer() {
     if (!selectedDestinationParty || !selectedDestinationCounterparty) {
@@ -260,7 +368,7 @@ function RouteComponent() {
     }
 
     try {
-      setIsSubmitting(true);
+      dispatch({ type: "submitStarted" });
 
       const { originExpense } = await transferDebtToParty({
         destinationPartyId: selectedDestinationParty.entry.party.id,
@@ -274,10 +382,10 @@ function RouteComponent() {
         destinationExpenseName: t`Debt transfer from another party`,
       });
 
-      setSuccessExpenseId(originExpense.id);
-      setStep("success");
+      dispatch({ type: "submitSucceeded" });
+      scheduleSuccessRedirect(originExpense.id);
     } catch {
-      setIsSubmitting(false);
+      dispatch({ type: "submitFailed" });
       toast.error(t`Failed to transfer debt`);
     }
   }
@@ -331,12 +439,12 @@ function RouteComponent() {
               <Button
                 color="accent"
                 className="mt-2 font-semibold"
-                isDisabled={!canTransfer || isSubmitting}
+                isDisabled={!canTransfer || state.isSubmitting}
                 onPress={() => {
                   void onConfirmTransfer();
                 }}
               >
-                {isSubmitting ? (
+                {state.isSubmitting ? (
                   <>
                     <Icon
                       icon="lucide.loader-circle"
@@ -392,8 +500,10 @@ function RouteComponent() {
                       )}
                       participant={participant}
                       onPress={() => {
-                        setDestinationParticipantId(participant.id);
-                        setStep("confirm");
+                        dispatch({
+                          type: "destinationParticipantSelected",
+                          participantId: participant.id,
+                        });
                       }}
                     />
                   ))}
@@ -432,13 +542,10 @@ function RouteComponent() {
                         key={option.id}
                         option={option}
                         onPress={() => {
-                          setDestinationPartyId(option.id);
-                          setDestinationParticipantId("");
-                          setStep(
-                            option.otherParticipants.length === 1
-                              ? "confirm"
-                              : "participant",
-                          );
+                          dispatch({
+                            type: "destinationPartySelected",
+                            partyId: option.id,
+                          });
                         }}
                       />
                     ))}
