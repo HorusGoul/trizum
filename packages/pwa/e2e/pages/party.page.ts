@@ -128,9 +128,40 @@ export class PartyPage {
     ).toBeVisible();
   }
 
+  async expectSettlementActionButtonVisible(
+    action: SettlementAction,
+    buttonName: string,
+  ) {
+    await expect(
+      this.settlementActionCard(action).getByRole("button", {
+        name: buttonName,
+      }),
+    ).toBeVisible();
+  }
+
+  async expectSettlementActionButtonHidden(
+    action: SettlementAction,
+    buttonName: string,
+  ) {
+    await expect(
+      this.settlementActionCard(action).getByRole("button", {
+        name: buttonName,
+      }),
+    ).toHaveCount(0);
+  }
+
   async openSettlementAction(action: SettlementAction) {
     await this.settlementActionCard(action)
       .getByRole("button", { name: action.actionLabel })
+      .click();
+  }
+
+  async openSettlementActionButton(
+    action: SettlementAction,
+    buttonName: string,
+  ) {
+    await this.settlementActionCard(action)
+      .getByRole("button", { name: buttonName })
       .click();
   }
 
@@ -143,7 +174,9 @@ export class PartyPage {
     await expect(this.debtFreeMessage).toBeVisible();
     await expect(this.nobodyOwesYouMessage).toBeVisible();
     await expect(
-      this.page.getByRole("button", { name: /^(Pay|Mark as paid)$/ }),
+      this.page.getByRole("button", {
+        name: /^(Pay|Mark as paid|Transfer to another party)$/,
+      }),
     ).toHaveCount(0);
   }
 

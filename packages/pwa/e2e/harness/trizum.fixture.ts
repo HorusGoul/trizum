@@ -62,6 +62,13 @@ export interface BrowserHarness {
     joinUrl: string;
     partyId: string;
   }>;
+  seedParties(fixtures: unknown[]): Promise<
+    {
+      joinCode: string;
+      joinUrl: string;
+      partyId: string;
+    }[]
+  >;
   seedPartyList(seed: PartyListSeed): Promise<{
     partyListId: string;
   }>;
@@ -91,16 +98,28 @@ function createOfflinePath(pathname = "/") {
 }
 
 function createBrowserHarness(page: Page): BrowserHarness {
+  async function hasInternalHooks() {
+    return page
+      .evaluate(() => {
+        const internalWindow = window as Partial<InternalHarnessWindow>;
+        return (
+          typeof internalWindow.__internal_createPartyFromMigrationData ===
+            "function" &&
+          typeof internalWindow.__internal_seedPartyListState === "function" &&
+          typeof internalWindow.__internal_readPartyListState === "function"
+        );
+      })
+      .catch(() => false);
+  }
+
   async function goto(path = "/") {
     await page.goto(createOfflinePath(path));
   }
 
   async function navigate(path: string) {
-    const nextPath = createOfflinePath(path).replace(
-      /\?__internal_offline_only=true$/,
-      "",
-    );
-    const nextUrl = new URL(nextPath, "http://trizum.local");
+    const nextUrl = new URL(createOfflinePath(path), "http://trizum.local");
+    nextUrl.searchParams.delete("__internal_offline_only");
+    const nextPath = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 
     await page.evaluate((targetPath) => {
       const url = new URL(targetPath, window.location.origin);
@@ -130,22 +149,16 @@ function createBrowserHarness(page: Page): BrowserHarness {
   async function waitForInternalHooks() {
     await expect
       .poll(async () => {
-        return page.evaluate(() => {
-          const internalWindow = window as Partial<InternalHarnessWindow>;
-          return (
-            typeof internalWindow.__internal_createPartyFromMigrationData ===
-              "function" &&
-            typeof internalWindow.__internal_seedPartyListState ===
-              "function" &&
-            typeof internalWindow.__internal_readPartyListState === "function"
-          );
-        });
+        return hasInternalHooks();
       })
       .toBe(true);
   }
 
   async function bootstrapForSeeding() {
-    await goto("/");
+    if (!(await hasInternalHooks())) {
+      await goto("/");
+    }
+
     await waitForInternalHooks();
   }
 
@@ -166,6 +179,25 @@ function createBrowserHarness(page: Page): BrowserHarness {
     }, fixture);
 
     return buildPartySeedResult(partyId);
+  }
+
+  async function seedParties(fixtures: unknown[]) {
+    await bootstrapForSeeding();
+
+    const partyIds = await page.evaluate(async (partyFixtures) => {
+      const internalWindow = window as InternalHarnessWindow;
+      const nextPartyIds: string[] = [];
+
+      for (const fixture of partyFixtures) {
+        nextPartyIds.push(
+          await internalWindow.__internal_createPartyFromMigrationData(fixture),
+        );
+      }
+
+      return nextPartyIds;
+    }, fixtures);
+
+    return partyIds.map(buildPartySeedResult);
   }
 
   async function seedPartyList(seed: PartyListSeed) {
@@ -262,6 +294,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     navigate,
     gotoParty,
     seedParty,
+    seedParties,
     seedPartyList,
     seedJoinableParty,
     joinSeededParty,

@@ -37,6 +37,20 @@ export const expenseLogJourney = {
   newExpenseTitle: "Late checkout snacks",
 } as const;
 
+export const debtTransferJourney = {
+  originPartyName: "Weekend trip",
+  destinationPartyName: "City break",
+  originMemberParticipantId: defaultParticipants.blair.id,
+  destinationMemberParticipant: {
+    id: "participant-blair-city",
+    name: "Blair Downtown",
+  },
+  destinationCreditorParticipant: {
+    id: "participant-alex-smith",
+    name: "Alex Smith",
+  },
+} as const;
+
 export function createPartyFixture() {
   return {
     party: {
@@ -150,5 +164,44 @@ export function createExpenseLogFixture(
       },
       photos: [],
     })),
+  };
+}
+
+export function createDebtTransferDestinationFixture({
+  includeCreditor = true,
+  includeExtraParticipant = true,
+}: {
+  includeCreditor?: boolean;
+  includeExtraParticipant?: boolean;
+} = {}) {
+  return {
+    party: {
+      type: "party" as const,
+      name: debtTransferJourney.destinationPartyName,
+      symbol: "🌆",
+      description: "Costs for the city break.",
+      currency: "EUR" as const,
+      participants: {
+        [debtTransferJourney.destinationMemberParticipant.id]: {
+          ...debtTransferJourney.destinationMemberParticipant,
+        },
+        ...(includeCreditor
+          ? {
+              [debtTransferJourney.destinationCreditorParticipant.id]: {
+                ...debtTransferJourney.destinationCreditorParticipant,
+              },
+            }
+          : {}),
+        ...(includeExtraParticipant
+          ? {
+              [defaultParticipants.casey.id]: {
+                ...defaultParticipants.casey,
+              },
+            }
+          : {}),
+      },
+    },
+    expenses: [],
+    photos: [],
   };
 }

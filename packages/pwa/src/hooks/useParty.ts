@@ -30,6 +30,7 @@ import {
 import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
+import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -395,6 +396,103 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     return true;
   }
 
+  async function transferDebtToParty({
+    destinationPartyId,
+    originDebtorId,
+    originCreditorId,
+    destinationDebtorId,
+    destinationCreditorId,
+    amount,
+    paidAt,
+    originExpenseName,
+    destinationExpenseName,
+  }: {
+    destinationPartyId: Party["id"];
+    originDebtorId: PartyParticipant["id"];
+    originCreditorId: PartyParticipant["id"];
+    destinationDebtorId: PartyParticipant["id"];
+    destinationCreditorId: PartyParticipant["id"];
+    amount: number;
+    paidAt: Date;
+    originExpenseName: string;
+    destinationExpenseName: string;
+  }) {
+    const originParty = handle.doc();
+
+    if (!originParty) {
+      throw new Error("Party not found, this should not happen");
+    }
+
+    if (destinationPartyId === originParty.id) {
+      throw new Error("Cannot transfer debt to the same party");
+    }
+
+    if (!originParty.participants[originDebtorId]) {
+      throw new Error("Origin debtor not found");
+    }
+
+    if (!originParty.participants[originCreditorId]) {
+      throw new Error("Origin creditor not found");
+    }
+
+    const destinationHandle = await repo.find<Party>(destinationPartyId);
+    const destinationParty = destinationHandle.doc();
+
+    if (!destinationParty) {
+      throw new Error("Destination party not found");
+    }
+
+    if (destinationParty.currency !== originParty.currency) {
+      throw new Error(
+        "Cannot transfer debt between parties with different currencies",
+      );
+    }
+
+    if (!destinationParty.participants[destinationDebtorId]) {
+      throw new Error("Destination debtor not found");
+    }
+
+    if (!destinationParty.participants[destinationCreditorId]) {
+      throw new Error("Destination creditor not found");
+    }
+
+    const destinationHelpers = getPartyHelpers(repo, destinationHandle);
+    const { originExpense, destinationExpense } = createDebtTransferExpenses({
+      amount,
+      originDebtorId,
+      originCreditorId,
+      destinationDebtorId,
+      destinationCreditorId,
+      paidAt,
+      originExpenseName,
+      destinationExpenseName,
+    });
+
+    const createdDestinationExpense =
+      await destinationHelpers.addExpenseToParty(destinationExpense);
+
+    try {
+      const createdOriginExpense = await addExpenseToParty(originExpense);
+
+      return {
+        originExpense: createdOriginExpense,
+        destinationExpense: createdDestinationExpense,
+      };
+    } catch (error) {
+      try {
+        await destinationHelpers.removeExpense(createdDestinationExpense.id);
+      } catch (rollbackError) {
+        logger.error("Failed to rollback destination debt transfer expense", {
+          rollbackError,
+          destinationExpenseId: createdDestinationExpense.id,
+          destinationPartyId,
+        });
+      }
+
+      throw error;
+    }
+  }
+
   async function recalculateBalances() {
     const party = handle.doc();
 
@@ -442,6 +540,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     updateSettings,
     setParticipantDetails,
     addExpenseToParty,
+    transferDebtToParty,
     updateExpense,
     removeExpense,
     recalculateBalances,

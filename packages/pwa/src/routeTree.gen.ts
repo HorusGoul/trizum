@@ -21,6 +21,7 @@ import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
 import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
 import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
+import { Route as PartyPartyIdTransferDebtRouteImport } from './routes/party_.$partyId.transfer-debt'
 import { Route as PartyPartyIdStatsRouteImport } from './routes/party_.$partyId.stats'
 import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
 import { Route as PartyPartyIdSettingsRouteImport } from './routes/party_.$partyId.settings'
@@ -89,6 +90,12 @@ const PartyPartyIdWhoRoute = PartyPartyIdWhoRouteImport.update({
   path: '/party/$partyId/who',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartyPartyIdTransferDebtRoute =
+  PartyPartyIdTransferDebtRouteImport.update({
+    id: '/party_/$partyId/transfer-debt',
+    path: '/party/$partyId/transfer-debt',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PartyPartyIdStatsRoute = PartyPartyIdStatsRouteImport.update({
   id: '/party_/$partyId/stats',
   path: '/party/$partyId/stats',
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/stats': typeof PartyPartyIdStatsRoute
+  '/party/$partyId/transfer-debt': typeof PartyPartyIdTransferDebtRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -165,6 +173,7 @@ export interface FileRoutesByTo {
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party/$partyId/share': typeof PartyPartyIdShareRoute
   '/party/$partyId/stats': typeof PartyPartyIdStatsRoute
+  '/party/$partyId/transfer-debt': typeof PartyPartyIdTransferDebtRoute
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -187,6 +196,7 @@ export interface FileRoutesById {
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
   '/party_/$partyId/share': typeof PartyPartyIdShareRoute
   '/party_/$partyId/stats': typeof PartyPartyIdStatsRoute
+  '/party_/$partyId/transfer-debt': typeof PartyPartyIdTransferDebtRoute
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party_/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRoute
   '/party_/$partyId/expense/$expenseId_/edit': typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
     | '/party/$partyId/stats'
+    | '/party/$partyId/transfer-debt'
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/expense/$expenseId/edit'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/party/$partyId/settings'
     | '/party/$partyId/share'
     | '/party/$partyId/stats'
+    | '/party/$partyId/transfer-debt'
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/expense/$expenseId/edit'
@@ -252,6 +264,7 @@ export interface FileRouteTypes {
     | '/party_/$partyId/settings'
     | '/party_/$partyId/share'
     | '/party_/$partyId/stats'
+    | '/party_/$partyId/transfer-debt'
     | '/party_/$partyId/who'
     | '/party_/$partyId/expense/$expenseId'
     | '/party_/$partyId/expense/$expenseId_/edit'
@@ -274,6 +287,7 @@ export interface RootRouteChildren {
   PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
   PartyPartyIdShareRoute: typeof PartyPartyIdShareRoute
   PartyPartyIdStatsRoute: typeof PartyPartyIdStatsRoute
+  PartyPartyIdTransferDebtRoute: typeof PartyPartyIdTransferDebtRoute
   PartyPartyIdWhoRoute: typeof PartyPartyIdWhoRoute
   PartyPartyIdExpenseExpenseIdRoute: typeof PartyPartyIdExpenseExpenseIdRoute
   PartyPartyIdExpenseExpenseIdEditRoute: typeof PartyPartyIdExpenseExpenseIdEditRoute
@@ -365,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdWhoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/party_/$partyId/transfer-debt': {
+      id: '/party_/$partyId/transfer-debt'
+      path: '/party/$partyId/transfer-debt'
+      fullPath: '/party/$partyId/transfer-debt'
+      preLoaderRoute: typeof PartyPartyIdTransferDebtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/party_/$partyId/stats': {
       id: '/party_/$partyId/stats'
       path: '/party/$partyId/stats'
@@ -434,6 +455,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,
   PartyPartyIdShareRoute: PartyPartyIdShareRoute,
   PartyPartyIdStatsRoute: PartyPartyIdStatsRoute,
+  PartyPartyIdTransferDebtRoute: PartyPartyIdTransferDebtRoute,
   PartyPartyIdWhoRoute: PartyPartyIdWhoRoute,
   PartyPartyIdExpenseExpenseIdRoute: PartyPartyIdExpenseExpenseIdRoute,
   PartyPartyIdExpenseExpenseIdEditRoute: PartyPartyIdExpenseExpenseIdEditRoute,
