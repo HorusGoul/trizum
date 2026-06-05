@@ -43,15 +43,6 @@ export class TransferDebtPage {
       .toEqual(params);
   }
 
-  async chooseDestinationParty(partyName: string) {
-    await this.partyStep
-      .locator("button")
-      .filter({ hasText: partyName })
-      .first()
-      .click();
-    await expect(this.participantStep).toBeVisible();
-  }
-
   async expectParticipantStep() {
     await expect(this.participantStep).toBeVisible();
     await expect(this.partyStep).toBeHidden();

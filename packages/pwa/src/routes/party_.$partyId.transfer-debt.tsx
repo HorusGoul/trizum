@@ -15,10 +15,7 @@ import {
 } from "#src/hooks/useEligibleDebtTransferParties.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import {
-  getDebtTransferParticipantMatch,
-  type DebtTransferParticipantMatch,
-} from "#src/lib/debtTransfer.ts";
+import { getDebtTransferParticipantMatch } from "#src/lib/debtTransfer.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
@@ -41,7 +38,6 @@ interface DestinationPartyOption {
   entry: EligibleDebtTransferParty;
   currentParticipant: PartyParticipant;
   otherParticipants: PartyParticipant[];
-  participantMatch: DebtTransferParticipantMatch;
   exactMatchParticipant: PartyParticipant | null;
   recommendedParticipants: PartyParticipant[];
 }
@@ -132,7 +128,6 @@ function RouteComponent() {
           entry,
           currentParticipant: currentDestinationParticipant,
           otherParticipants,
-          participantMatch,
           exactMatchParticipant,
           recommendedParticipants,
         },
