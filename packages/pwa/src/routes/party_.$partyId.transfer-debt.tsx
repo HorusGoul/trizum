@@ -296,7 +296,6 @@ function RouteComponent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.22 }}
-            data-testid="transfer-debt-success-step"
           >
             <TransferSuccessState
               destinationPartyName={destinationPartyName}
@@ -311,9 +310,11 @@ function RouteComponent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.22 }}
-            data-testid="transfer-debt-confirmation-step"
           >
-            <div className="container flex flex-col gap-4 px-4 pt-4">
+            <section
+              aria-label={t`Confirm transfer`}
+              className="container flex flex-col gap-4 px-4 pt-4"
+            >
               <TransferReviewCard
                 amount={amount}
                 currency={party.currency}
@@ -356,7 +357,7 @@ function RouteComponent() {
                   </>
                 )}
               </Button>
-            </div>
+            </section>
           </motion.div>
         ) : activeStep === "participant" ? (
           <motion.div
@@ -365,11 +366,14 @@ function RouteComponent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.22 }}
-            data-testid="transfer-debt-participant-step"
           >
-            <div className="container flex flex-col gap-4 px-4 pb-24 pt-4">
+            <section
+              aria-labelledby="transfer-debt-participant-title"
+              className="container flex flex-col gap-4 px-4 pb-24 pt-4"
+            >
               <SectionIntro
                 eyebrow={t`Creditor`}
+                titleId="transfer-debt-participant-title"
                 title={t`Choose who receives it`}
               />
 
@@ -395,7 +399,7 @@ function RouteComponent() {
                   ))}
                 </div>
               )}
-            </div>
+            </section>
           </motion.div>
         ) : (
           <motion.div
@@ -404,9 +408,11 @@ function RouteComponent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.22 }}
-            data-testid="transfer-debt-party-step"
           >
-            <div className="container flex flex-col gap-4 px-4 pt-4">
+            <section
+              aria-labelledby="transfer-debt-party-title"
+              className="container flex flex-col gap-4 px-4 pt-4"
+            >
               {destinationPartyOptions.length === 0 ? (
                 <InlineAlert
                   title={t`No destination party available`}
@@ -416,6 +422,7 @@ function RouteComponent() {
                 <>
                   <SectionIntro
                     eyebrow={t`Destination party`}
+                    titleId="transfer-debt-party-title"
                     title={t`Choose a destination party`}
                   />
 
@@ -438,7 +445,7 @@ function RouteComponent() {
                   </div>
                 </>
               )}
-            </div>
+            </section>
           </motion.div>
         )}
       </AnimatePresence>
@@ -484,13 +491,23 @@ function TransferDebtLayout({
   );
 }
 
-function SectionIntro({ eyebrow, title }: { eyebrow: string; title: string }) {
+function SectionIntro({
+  eyebrow,
+  title,
+  titleId,
+}: {
+  eyebrow: string;
+  title: string;
+  titleId?: string;
+}) {
   return (
     <div>
       <div className="text-xs font-semibold uppercase tracking-[0.18em] text-accent-500 dark:text-accent-400">
         {eyebrow}
       </div>
-      <h2 className="mt-2 text-2xl font-semibold tracking-tight">{title}</h2>
+      <h2 id={titleId} className="mt-2 text-2xl font-semibold tracking-tight">
+        {title}
+      </h2>
     </div>
   );
 }

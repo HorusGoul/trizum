@@ -9,9 +9,15 @@ export class TransferDebtPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.partyStep = page.getByTestId("transfer-debt-party-step");
-    this.participantStep = page.getByTestId("transfer-debt-participant-step");
-    this.confirmationStep = page.getByTestId("transfer-debt-confirmation-step");
+    this.partyStep = page.getByRole("region", {
+      name: "Choose a destination party",
+    });
+    this.participantStep = page.getByRole("region", {
+      name: "Choose who receives it",
+    });
+    this.confirmationStep = page.getByRole("region", {
+      name: "Confirm transfer",
+    });
     this.confirmTransferButton = page.getByRole("button", {
       name: "Confirm transfer",
     });
