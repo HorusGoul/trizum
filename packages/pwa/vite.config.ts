@@ -18,7 +18,6 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
-import { ignorePatterns } from "./vite.ignores";
 
 const ReactCompilerConfig = {};
 const sentryOrg = "horusdev";
@@ -79,12 +78,6 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
-    fmt: {
-      ignorePatterns,
-    },
-    lint: {
-      ignorePatterns,
-    },
     build: {
       sourcemap: true,
       minify: true,

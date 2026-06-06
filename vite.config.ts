@@ -1,7 +1,4 @@
 import { defineConfig, type UserConfig } from "vite-plus";
-import { ignorePatterns as mobileIgnorePatterns } from "./packages/mobile/vite.ignores";
-import { ignorePatterns as pwaIgnorePatterns } from "./packages/pwa/vite.ignores";
-import { ignorePatterns as serverIgnorePatterns } from "./packages/server/vite.ignores";
 
 const rootAppCommandMessage = [
   "The workspace root is not an app package.",
@@ -15,7 +12,10 @@ const rootAppCommandMessage = [
   "  cd packages/pwa && vp run build",
 ].join("\n");
 
-const rootIgnorePatterns = [
+// Vite+ workspace checks read lint/fmt settings from the root config. Keep
+// package-relative and workspace-relative generated paths here so root checks
+// and package-local `vp check .` commands skip the same generated outputs.
+const ignorePatterns = [
   ".vite-hooks/**",
   "**/dist/**",
   "**/node_modules/**",
@@ -23,22 +23,18 @@ const rootIgnorePatterns = [
   "**/.turbo/**",
   "**/.tanstack/**",
   "**/.wrangler/**",
-];
-
-// Vite+ workspace checks read lint/fmt settings from the root config, so the
-// root composes package-owned generated paths colocated with package Vite config.
-function packageIgnorePatterns(packageRoot: string, ignorePatterns: string[]) {
-  return ignorePatterns.flatMap((ignorePattern) => [
-    ignorePattern,
-    `${packageRoot}/${ignorePattern}`,
-  ]);
-}
-
-const ignorePatterns = [
-  ...rootIgnorePatterns,
-  ...packageIgnorePatterns("packages/mobile", mobileIgnorePatterns),
-  ...packageIgnorePatterns("packages/pwa", pwaIgnorePatterns),
-  ...packageIgnorePatterns("packages/server", serverIgnorePatterns),
+  "android/**",
+  "ios/**",
+  "api/types.d.ts",
+  "src/generated/**",
+  "src/routeTree.gen.ts",
+  "drizzle/meta/**",
+  "packages/mobile/android/**",
+  "packages/mobile/ios/**",
+  "packages/pwa/api/types.d.ts",
+  "packages/pwa/src/generated/**",
+  "packages/pwa/src/routeTree.gen.ts",
+  "packages/server/drizzle/meta/**",
 ];
 
 // Agent skill docs are maintained outside the app/tooling source tree; keep
