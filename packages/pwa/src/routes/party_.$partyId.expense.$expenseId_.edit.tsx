@@ -126,7 +126,7 @@ function EditExpense() {
     [onChangeExpense, expenseId],
   );
 
-  function onSubmit(values: ExpenseEditorFormValues) {
+  async function onSubmit(values: ExpenseEditorFormValues) {
     try {
       // Create shares based on the form values
       const shares: Expense["shares"] = {};
@@ -149,12 +149,12 @@ function EditExpense() {
         photos: values.photos,
       };
 
-      onUpdateExpense({
+      await onUpdateExpense({
         ...expense,
         __hash: calculateExpenseHash(expense),
       });
 
-      void navigate({
+      await navigate({
         to: "/party/$partyId/expense/$expenseId",
         replace: true,
         params: {
@@ -232,7 +232,7 @@ function useExpense() {
   const [expense] = findExpenseById(chunk.expenses, expenseId);
 
   function onUpdateExpense(expense: Expense) {
-    void updateExpense(expense);
+    return updateExpense(expense);
   }
 
   function onChangeExpense(patches: DiffResult[]) {
