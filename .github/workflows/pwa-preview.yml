@@ -45,13 +45,18 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.preview.jsonc --name trizum-pr-${{ github.event.pull_request.number }}
+          command: >-
+            versions upload
+            --preview-alias pr-${{ github.event.pull_request.number }}
+            --tag pr-${{ github.event.pull_request.number }}
+            --message "Preview for PR #${{ github.event.pull_request.number }}"
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           packageManager: pnpm
           workingDirectory: packages/pwa
 
       - name: Comment preview URL
         env:
+          COMMAND_OUTPUT: ${{ steps.deploy.outputs.command-output }}
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAGES_DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
@@ -61,7 +66,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          preview_url="${PAGES_DEPLOYMENT_ALIAS_URL:-${DEPLOYMENT_URL:-}}"
+          preview_url="$(
+            printf '%s\n%s\n%s\n' "${PAGES_DEPLOYMENT_ALIAS_URL:-}" "${DEPLOYMENT_URL:-}" "${COMMAND_OUTPUT:-}" |
+              grep -Eo 'https://[^[:space:]]+' |
+              grep -E '(workers\.dev|pages\.dev)' |
+              head -n 1 || true
+          )"
+
           if [ -z "$preview_url" ]; then
             echo "::error::Cloudflare deployment did not return a preview URL."
             exit 1
