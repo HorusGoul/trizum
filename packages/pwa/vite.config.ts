@@ -18,6 +18,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
+import { ignorePatterns } from "./vite.ignores";
 
 const ReactCompilerConfig = {};
 const sentryOrg = "horusdev";
@@ -33,7 +34,6 @@ const linguiConfig = getLinguiConfig({
 });
 const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
 const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
-const generatedIgnoredPaths = ["api/types.d.ts", "src/generated/**", "src/routeTree.gen.ts"];
 const reactCompilerPreset = {
   preset: () => ({
     plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
@@ -80,10 +80,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     fmt: {
-      ignorePatterns: generatedIgnoredPaths,
+      ignorePatterns,
     },
     lint: {
-      ignorePatterns: generatedIgnoredPaths,
+      ignorePatterns,
     },
     build: {
       sourcemap: true,

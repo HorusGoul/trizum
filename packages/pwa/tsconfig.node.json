@@ -8,6 +8,7 @@
   },
   "include": [
     "vite.config.ts",
+    "vite.ignores.ts",
     "lingui.config.ts",
     "iconSprite.config.d.mts",
     "../icon-sprite/src/vite.ts"

@@ -1,12 +1,11 @@
 import { defineConfig } from "vite-plus";
-
-const generatedIgnoredPaths = ["drizzle/meta/**"];
+import { ignorePatterns } from "./vite.ignores";
 
 export default defineConfig({
   fmt: {
-    ignorePatterns: generatedIgnoredPaths,
+    ignorePatterns,
   },
   lint: {
-    ignorePatterns: generatedIgnoredPaths,
+    ignorePatterns,
   },
 });
