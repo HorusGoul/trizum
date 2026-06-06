@@ -19,12 +19,14 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./src/index.ts",
-      "import": "./dist/index.js",
+      "source": "./src/index.ts",
+      "import": "./src/index.ts",
       "default": "./dist/index.js"
     },
     "./github-actions": {
       "types": "./src/github-actions.ts",
-      "import": "./dist/github-actions.js",
+      "source": "./src/github-actions.ts",
+      "import": "./src/github-actions.ts",
       "default": "./dist/github-actions.js"
     }
   },

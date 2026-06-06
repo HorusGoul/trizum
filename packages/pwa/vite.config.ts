@@ -79,14 +79,6 @@ export default defineConfig(({ mode }) => {
         plugins: [tailwindcss({ config: tailwindConfigPath }), autoprefixer()],
       },
     },
-    resolve: {
-      alias: [
-        {
-          find: "@trizum/logging",
-          replacement: path.resolve(packageRoot, "../logging/src/index.ts"),
-        },
-      ],
-    },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
     },

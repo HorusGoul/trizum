@@ -33,24 +33,6 @@ const ignoredPaths = [
 
 const lintIgnoredPaths = [...ignoredPaths, "packages/pwa/api/**", "packages/pwa/e2e/**"];
 
-const loggingAliases = [
-  {
-    find: "@trizum/logging/github-actions",
-    replacement: path.join(workspaceRoot, "packages/logging/src/github-actions.ts"),
-  },
-  {
-    find: "@trizum/logging",
-    replacement: path.join(workspaceRoot, "packages/logging/src/index.ts"),
-  },
-];
-
-const pwaAliases = [
-  {
-    find: /^#src\/(.*)$/u,
-    replacement: `${path.join(pwaRoot, "src")}/$1`,
-  },
-];
-
 const toolingConfig = {
   fmt: {
     ignorePatterns: ignoredPaths,
@@ -145,9 +127,6 @@ const toolingConfig = {
         },
       },
       {
-        resolve: {
-          alias: loggingAliases,
-        },
         root: "packages/ts-template",
         test: {
           include: ["src/**/*.test.ts"],
@@ -163,14 +142,7 @@ export default defineConfig(async (env) => {
   const isAppCommand = !isVitest && (env.command === "build" || env.command === "serve");
 
   if (!isAppCommand) {
-    return mergeConfig(
-      {
-        resolve: {
-          alias: [...loggingAliases, ...pwaAliases],
-        },
-      },
-      toolingConfig,
-    );
+    return toolingConfig;
   }
 
   return mergeConfig(
