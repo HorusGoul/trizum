@@ -26,6 +26,7 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:install": "playwright install chromium webkit",
+    "test:e2e:install:ci": "playwright install --with-deps --only-shell chromium webkit",
     "pretypecheck": "pnpm icons:generate",
     "typecheck": "tsc --noEmit",
     "generate:assets": "pwa-assets-generator",

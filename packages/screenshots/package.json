@@ -30,7 +30,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
-    "setup": "pnpm playwright install --with-deps chromium"
+    "setup": "pnpm playwright install --with-deps --only-shell chromium"
   },
   "devDependencies": {
     "@trizum/eslint-config": "workspace:*",

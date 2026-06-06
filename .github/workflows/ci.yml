@@ -57,8 +57,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Browser
-        run: pnpm --filter @trizum/pwa exec playwright install --with-deps chromium webkit
+      - name: Install Playwright Browsers
+        timeout-minutes: 5
+        run: pnpm --filter @trizum/pwa run test:e2e:install:ci
 
       - name: Run Playwright E2E
         run: pnpm test:e2e
