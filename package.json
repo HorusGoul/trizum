@@ -10,7 +10,6 @@
     "browserslist:update-db": "vp dlx update-browserslist-db@latest",
     "build": "vp run --filter './packages/*' build",
     "check": "vp check",
-    "check:fix": "vp check --fix",
     "dev": "vp dev packages/pwa",
     "lingui:extract": "vp run --filter @trizum/pwa lingui:extract",
     "lint": "vp lint",

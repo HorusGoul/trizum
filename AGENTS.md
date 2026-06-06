@@ -95,6 +95,8 @@ Use `type/description` naming:
 - Use `vp install` when setting up locally.
 - Before opening a PR, run the standard Vite+ validation commands:
   `vp run check`, `vp run test`, and `vp run build`.
+- From the workspace root, use `vp run check --fix` when you need Vite+ to
+  apply formatting and lint fixes.
 - From the workspace root, run PWA dev and preview through package scripts:
   `vp run dev` and `vp run preview`.
 - Run `vp run lingui:extract` when user-facing copy changes.

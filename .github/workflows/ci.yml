@@ -174,7 +174,7 @@ jobs:
 
       - name: Autofix
         id: autofix
-        run: vp run check:fix
+        run: vp run check --fix
         continue-on-error: true
 
       - name: Extract Messages

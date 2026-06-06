@@ -10,7 +10,6 @@
   "scripts": {
     "build": "vp build",
     "check": "vp check .",
-    "check:fix": "vp check . --fix",
     "cleanup": "rm -rf dist",
     "dev": "vp dev",
     "icons:generate": "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",

@@ -69,6 +69,10 @@ Packages do not need separate lint or typecheck scripts for routine validation.
 If a package has runtime-specific commands beyond this baseline, keep the
 standard scripts and add the extra ones alongside them.
 
+Packages do not need a dedicated `check:fix` script. From the workspace root,
+use `vp run check --fix`; from a package directory, use `vp check --fix .` so
+the `--fix` flag comes before the checked path.
+
 Packages with tests should define their local Vitest settings in
 `vite.config.ts` and have the package `test` script call `vp test .`.
 
