@@ -19,6 +19,7 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
 import { ignorePatterns } from "./vite.ignores";
+import { lintOverrides } from "./vite.lint";
 
 const ReactCompilerConfig = {};
 const sentryOrg = "horusdev";
@@ -84,6 +85,7 @@ export default defineConfig(({ mode }) => {
     },
     lint: {
       ignorePatterns,
+      overrides: lintOverrides,
     },
     build: {
       sourcemap: true,

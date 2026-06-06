@@ -1,5 +1,6 @@
 import { defineConfig } from "vite-plus";
 import { ignorePatterns } from "./vite.ignores";
+import { lintOverrides } from "./vite.lint";
 
 export default defineConfig({
   fmt: {
@@ -7,5 +8,6 @@ export default defineConfig({
   },
   lint: {
     ignorePatterns,
+    overrides: lintOverrides,
   },
 });
