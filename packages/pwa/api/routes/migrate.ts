@@ -202,7 +202,7 @@ class TricountAPIClient {
       throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
     }
 
-    const auth_data = await response.json<TricountResponse>();
+    const auth_data = (await response.json()) as TricountResponse;
     const response_items = auth_data.Response;
 
     // Extract token and user ID from response
@@ -386,7 +386,6 @@ function parseTricountData(data: TricountResponse): MigrationData {
       isTransfer,
       __editCopy: undefined,
       __editCopyLastUpdatedAt: undefined,
-      __presence: undefined,
     };
 
     expenses.push(expense);
@@ -399,7 +398,6 @@ function parseTricountData(data: TricountResponse): MigrationData {
     description: registry.description || "",
     currency: registry.currency as Party["currency"], // Assuming currency string is valid
     participants,
-    hue: undefined,
   };
 
   return {

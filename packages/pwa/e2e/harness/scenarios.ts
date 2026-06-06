@@ -133,7 +133,7 @@ export function createExpenseLogTitle(index: number) {
   return `Seeded expense ${String(index).padStart(3, "0")}`;
 }
 
-export function createExpenseLogFixture(expenseCount = expenseLogJourney.expenseCount) {
+export function createExpenseLogFixture(expenseCount: number = expenseLogJourney.expenseCount) {
   return {
     ...createPartyFixture(),
     expenses: Array.from({ length: expenseCount }, (_, index) => ({

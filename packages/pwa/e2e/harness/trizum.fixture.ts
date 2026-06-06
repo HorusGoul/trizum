@@ -1,6 +1,6 @@
 import { expect, test as base, type Page } from "@playwright/test";
 
-interface InternalHarnessWindow extends Window {
+export interface InternalHarnessWindow extends Window {
   __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
   __internal_seedPartyListState: (seed: unknown) => Promise<{
     partyListId: string;
@@ -168,7 +168,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await bootstrapForSeeding();
 
     const partyId = await page.evaluate(async (data) => {
-      const internalWindow = window as InternalHarnessWindow;
+      const internalWindow = window as unknown as InternalHarnessWindow;
       return internalWindow.__internal_createPartyFromMigrationData(data);
     }, fixture);
 
@@ -179,7 +179,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await bootstrapForSeeding();
 
     const partyIds = await page.evaluate(async (partyFixtures) => {
-      const internalWindow = window as InternalHarnessWindow;
+      const internalWindow = window as unknown as InternalHarnessWindow;
       const nextPartyIds: string[] = [];
 
       for (const fixture of partyFixtures) {
@@ -242,7 +242,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await waitForInternalHooks();
 
     return page.evaluate(async () => {
-      const internalWindow = window as InternalHarnessWindow;
+      const internalWindow = window as unknown as InternalHarnessWindow;
       return internalWindow.__internal_readPartyListState();
     });
   }
@@ -260,14 +260,14 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
   async function createParty(fixture: unknown) {
     return page.evaluate(async (data) => {
-      const internalWindow = window as InternalHarnessWindow;
+      const internalWindow = window as unknown as InternalHarnessWindow;
       return internalWindow.__internal_createPartyFromMigrationData(data);
     }, fixture);
   }
 
   async function writePartyList(seed: PartyListSeed) {
     return page.evaluate(async (nextSeed) => {
-      const internalWindow = window as InternalHarnessWindow;
+      const internalWindow = window as unknown as InternalHarnessWindow;
       return internalWindow.__internal_seedPartyListState(nextSeed);
     }, seed);
   }
@@ -291,15 +291,15 @@ function createBrowserHarness(page: Page): BrowserHarness {
 export const test = base.extend<{
   harness: BrowserHarness;
 }>({
-  context: async ({ context }, use) => {
+  context: async ({ context }, applyContext) => {
     await context.route(isSentryUrl, async (route) => {
       await route.abort();
     });
 
-    await use(context);
+    await applyContext(context);
   },
-  harness: async ({ page }, use) => {
-    await use(createBrowserHarness(page));
+  harness: async ({ page }, applyHarness) => {
+    await applyHarness(createBrowserHarness(page));
   },
 });
 

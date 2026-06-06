@@ -12,8 +12,9 @@ const rootAppCommandMessage = [
   "  cd packages/pwa && vp run build",
 ].join("\n");
 
-const ignoredPaths = [
-  ".agents/**",
+// Keep both package-relative and workspace-relative generated paths so Vite+
+// skips the same generated outputs from root checks and package-local checks.
+const generatedIgnoredPaths = [
   ".vite-hooks/**",
   "**/dist/**",
   "**/node_modules/**",
@@ -21,24 +22,23 @@ const ignoredPaths = [
   "**/.turbo/**",
   "**/.tanstack/**",
   "**/.wrangler/**",
+  "android/**",
+  "ios/**",
+  "api/types.d.ts",
+  "src/generated/**",
+  "src/routeTree.gen.ts",
+  "drizzle/meta/**",
   "packages/mobile/android/**",
   "packages/mobile/ios/**",
   "packages/pwa/api/types.d.ts",
   "packages/pwa/src/generated/**",
   "packages/pwa/src/routeTree.gen.ts",
   "packages/server/drizzle/meta/**",
-  "api/types.d.ts",
-  "src/generated/**",
-  "src/routeTree.gen.ts",
 ];
 
-const lintIgnoredPaths = [
-  ...ignoredPaths,
-  "api/**",
-  "e2e/**",
-  "packages/pwa/api/**",
-  "packages/pwa/e2e/**",
-];
+// Agent skill docs are maintained outside the app/tooling source tree; keep
+// them out of formatting checks so routine validation does not reflow them.
+const formatIgnoredPaths = [".agents/**", ...generatedIgnoredPaths];
 
 function rootAppCommandGuard() {
   return {
@@ -58,7 +58,7 @@ function rootAppCommandGuard() {
 
 const toolingConfig = {
   fmt: {
-    ignorePatterns: ignoredPaths,
+    ignorePatterns: formatIgnoredPaths,
     sortPackageJson: true,
     sortTailwindcss: true,
   },
@@ -68,7 +68,7 @@ const toolingConfig = {
       es2024: true,
       node: true,
     },
-    ignorePatterns: lintIgnoredPaths,
+    ignorePatterns: generatedIgnoredPaths,
     jsPlugins: [
       {
         name: "vite-plus",

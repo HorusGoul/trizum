@@ -1,4 +1,4 @@
-import { expect, test } from "./harness/trizum.fixture";
+import { expect, test, type InternalHarnessWindow } from "./harness/trizum.fixture";
 import { HomePage } from "./pages/home.page";
 import { defaultParticipants } from "./harness/scenarios";
 
@@ -12,7 +12,7 @@ test.describe("Home party management", () => {
 
     const partyIds = await page.evaluate(
       async ({ fixtures, memberParticipantId }) => {
-        const internalWindow = window as Window & {
+        const internalWindow = window as unknown as InternalHarnessWindow & {
           __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
           __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
         };
@@ -159,7 +159,7 @@ test.describe("Home party management", () => {
 
     await page.evaluate(
       async ({ fixture, memberParticipantId }) => {
-        const internalWindow = window as Window & {
+        const internalWindow = window as unknown as InternalHarnessWindow & {
           __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
           __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
         };

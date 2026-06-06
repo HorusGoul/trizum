@@ -33,6 +33,7 @@ const linguiConfig = getLinguiConfig({
 });
 const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
 const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
+const generatedIgnoredPaths = ["api/types.d.ts", "src/generated/**", "src/routeTree.gen.ts"];
 const reactCompilerPreset = {
   preset: () => ({
     plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
@@ -78,6 +79,12 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
+    fmt: {
+      ignorePatterns: generatedIgnoredPaths,
+    },
+    lint: {
+      ignorePatterns: generatedIgnoredPaths,
+    },
     build: {
       sourcemap: true,
       minify: true,
