@@ -63,26 +63,32 @@ jobs:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAGES_DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          PREVIEW_ALIAS: pr-${{ github.event.pull_request.number }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPOSITORY: ${{ github.repository }}
         shell: bash
         run: |
           set -euo pipefail
 
-          preview_url="$(
+          all_preview_urls="$(
             printf '%s\n%s\n%s\n' "${PAGES_DEPLOYMENT_ALIAS_URL:-}" "${DEPLOYMENT_URL:-}" "${COMMAND_OUTPUT:-}" |
               grep -Eo 'https://[^[:space:]]+' |
-              grep -E '(workers\.dev|pages\.dev)' |
+              grep -E '(workers\.dev|pages\.dev)' || true
+          )"
+
+          preview_url="$(
+            printf '%s\n' "$all_preview_urls" |
+              grep -E "^https://${PREVIEW_ALIAS}-[^/[:space:]]+\\.(workers|pages)\\.dev" |
               head -n 1 || true
           )"
 
           if [ -z "$preview_url" ]; then
-            echo "::error::Cloudflare deployment did not return a preview URL."
+            echo "::error::Cloudflare deployment did not return a ${PREVIEW_ALIAS} aliased preview URL."
             exit 1
           fi
 
           marker="<!-- trizum-pwa-preview -->"
-          body="${marker}"$'\n'"PWA preview: ${preview_url}"
+          body="${marker}"$'\n'"PWA preview (${PREVIEW_ALIAS}): ${preview_url}"
 
           comment_id="$(
             gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" --paginate |
