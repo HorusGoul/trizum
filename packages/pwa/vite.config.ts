@@ -15,6 +15,7 @@ import { lingui } from "@lingui/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import license from "rollup-plugin-license";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
 
@@ -67,6 +68,8 @@ const fullVersion = `${appVersion}-${appCommit}`;
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
+  const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
+  const hasSentryAuthToken = Boolean(sentryAuthToken);
 
   process.env.VITE_APP_WSS_URL =
     mode === "production" ? "wss://server.trizum.app/sync" : "wss://dev-sync.trizum.app";
@@ -174,6 +177,26 @@ export default defineConfig(({ mode }) => {
         },
       }),
       appendSourceMappingURLPlugin(),
+      ...(hasSentryAuthToken
+        ? [
+            sentryVitePlugin({
+              org: sentryOrg,
+              project: sentryProject,
+              authToken: sentryAuthToken,
+              release: {
+                create: true,
+                name: fullVersion,
+                setCommits: {
+                  auto: true,
+                },
+                inject: true,
+              },
+              sourcemaps: {
+                disable: true,
+              },
+            }),
+          ]
+        : []),
       sentrySourcemapsPlugin(),
     ],
   };
