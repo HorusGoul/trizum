@@ -1,22 +1,18 @@
-import type { Plugin } from "vite-plus";
-import { defineConfig, lazyPlugins } from "vite-plus";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import { getConfig as getLinguiConfig } from "@lingui/conf";
-import type { AcceptedPlugin as PostcssPlugin } from "postcss";
-import { configDefaults } from "vite-plus";
+import type { Plugin } from "vite-plus";
+import { configDefaults, defineConfig, lazyPlugins } from "vite-plus";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
 
 const ReactCompilerConfig = {};
+
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
-const tailwindConfigPath = path.resolve(packageRoot, "tailwind.config.js");
-const tailwindcss = packageRequire("tailwindcss") as (options: { config: string }) => PostcssPlugin;
-const autoprefixer = packageRequire("autoprefixer") as () => PostcssPlugin;
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
 const linguiConfig = getLinguiConfig({
   cwd: packageRoot,
@@ -24,6 +20,7 @@ const linguiConfig = getLinguiConfig({
 });
 const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
 const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
+const vitePwaModulePath = packageRequire.resolve("vite-plugin-pwa");
 const reactCompilerPreset = {
   preset: () => ({
     plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
@@ -74,26 +71,21 @@ export default defineConfig(({ mode }) => {
       sourcemap: true,
       minify: true,
     },
-    css: {
-      postcss: {
-        plugins: [tailwindcss({ config: tailwindConfigPath }), autoprefixer()],
-      },
-    },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
     },
     plugins: lazyPlugins(async () => {
       const [
-        cloudflareModule,
-        reactModule,
-        babelModule,
-        tanstackRouterModule,
-        wasmModule,
-        topLevelAwaitModule,
-        linguiModule,
-        pwaModule,
-        licenseModule,
-        sentryModule,
+        { cloudflare },
+        { default: react },
+        { default: babel },
+        { tanstackRouter },
+        { default: wasm },
+        { default: topLevelAwait },
+        { lingui },
+        { VitePWA },
+        { default: license },
+        { sentryVitePlugin },
       ] = await Promise.all([
         import("@cloudflare/vite-plugin"),
         import("@vitejs/plugin-react"),
@@ -102,20 +94,14 @@ export default defineConfig(({ mode }) => {
         import("vite-plugin-wasm"),
         import("vite-plugin-top-level-await"),
         import("@lingui/vite-plugin"),
-        import("vite-plugin-pwa"),
+        import(vitePwaModulePath),
         import("rollup-plugin-license"),
         import("@sentry/vite-plugin"),
       ]);
 
-      const react = reactModule.default;
-      const babel = babelModule.default;
-      const wasm = wasmModule.default;
-      const topLevelAwait = topLevelAwaitModule.default;
-      const license = licenseModule.default;
-
       return [
-        ...(isTest ? [] : [cloudflareModule.cloudflare()]),
-        tanstackRouterModule.tanstackRouter(),
+        ...(isTest ? [] : [cloudflare()]),
+        tanstackRouter(),
         react(),
         babel({
           include: /\/src\/.*\.[cm]?[jt]sx?$/,
@@ -124,12 +110,12 @@ export default defineConfig(({ mode }) => {
         }),
         wasm() as Plugin,
         topLevelAwait(),
-        linguiModule.lingui({
+        lingui({
           cwd: packageRoot,
           configPath: linguiConfigPath,
         }),
         createIconSpritePlugin(iconSpriteConfig),
-        pwaModule.VitePWA({
+        VitePWA({
           registerType: "prompt",
           workbox: {
             globPatterns: ["**/*.{js,wasm,css,html,svg}"],
@@ -207,7 +193,7 @@ export default defineConfig(({ mode }) => {
         appendSourceMappingURLPlugin(),
         ...(hasSentryAuthToken
           ? [
-              sentryModule.sentryVitePlugin({
+              sentryVitePlugin({
                 org: process.env.SENTRY_ORG,
                 project: process.env.SENTRY_PROJECT,
                 authToken: sentryAuthToken,
