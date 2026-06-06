@@ -1,10 +1,7 @@
 import { defineConfig, type UserConfig } from "vite-plus";
-import { lintOverrides as iconSpriteLintOverrides } from "./packages/icon-sprite/vite.lint";
 import { ignorePatterns as mobileIgnorePatterns } from "./packages/mobile/vite.ignores";
 import { ignorePatterns as pwaIgnorePatterns } from "./packages/pwa/vite.ignores";
-import { lintOverrides as pwaLintOverrides } from "./packages/pwa/vite.lint";
 import { ignorePatterns as serverIgnorePatterns } from "./packages/server/vite.ignores";
-import { lintOverrides as serverLintOverrides } from "./packages/server/vite.lint";
 
 const rootAppCommandMessage = [
   "The workspace root is not an app package.",
@@ -42,22 +39,6 @@ const ignorePatterns = [
   ...packageIgnorePatterns("packages/mobile", mobileIgnorePatterns),
   ...packageIgnorePatterns("packages/pwa", pwaIgnorePatterns),
   ...packageIgnorePatterns("packages/server", serverIgnorePatterns),
-];
-
-function packageLintOverrides(
-  packageRoot: string,
-  overrides: NonNullable<NonNullable<UserConfig["lint"]>["overrides"]>,
-) {
-  return overrides.map((override) => ({
-    ...override,
-    files: override.files.map((file) => `${packageRoot}/${file}`),
-  }));
-}
-
-const lintOverrides = [
-  ...packageLintOverrides("packages/icon-sprite", iconSpriteLintOverrides),
-  ...packageLintOverrides("packages/pwa", pwaLintOverrides),
-  ...packageLintOverrides("packages/server", serverLintOverrides),
 ];
 
 // Agent skill docs are maintained outside the app/tooling source tree; keep
@@ -130,7 +111,36 @@ const toolingConfig = {
         version: "19.0.0",
       },
     },
-    overrides: lintOverrides,
+    overrides: [
+      {
+        files: ["packages/pwa/src/main.tsx", "packages/pwa/src/routes/**/*.tsx"],
+        rules: {
+          "react/only-export-components": "off",
+        },
+      },
+      {
+        files: [
+          "packages/*/src/**/*.test.ts",
+          "packages/*/src/**/*.test.tsx",
+          "packages/pwa/src/lib/testing/**/*.ts",
+        ],
+        rules: {
+          "vitest/require-mock-type-parameters": "off",
+        },
+      },
+      {
+        files: ["packages/pwa/src/lib/expenses.test.ts"],
+        rules: {
+          "vitest/valid-expect": "off",
+        },
+      },
+      {
+        files: ["packages/server/src/main.ts"],
+        rules: {
+          "typescript/no-misused-spread": "off",
+        },
+      },
+    ],
   },
   staged: {
     "*": "vp check --fix",

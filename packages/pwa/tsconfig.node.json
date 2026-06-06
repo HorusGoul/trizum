@@ -9,7 +9,6 @@
   "include": [
     "vite.config.ts",
     "vite.ignores.ts",
-    "vite.lint.ts",
     "lingui.config.ts",
     "iconSprite.config.d.mts",
     "../icon-sprite/src/vite.ts"
