@@ -2,6 +2,8 @@ source "https://rubygems.org"
 
 gem "fastlane", git: "https://github.com/fastlane/fastlane.git", branch: "master"
 
+# Fastlane's Google API stack loads representable/json, which requires multi_json.
+gem "multi_json", "~> 1.19"
+
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
 eval_gemfile(plugins_path) if File.exist?(plugins_path)
-
