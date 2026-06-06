@@ -160,9 +160,7 @@ export default defineConfig(({ mode }) => {
               return dependencies
                 .map((dep) => {
                   const repository =
-                    typeof dep.repository === "object" && dep.repository?.url
-                      ? dep.repository.url
-                      : dep.repository;
+                    typeof dep.repository === "string" ? dep.repository : dep.repository?.url;
 
                   const lines = [
                     `${dep.name}${dep.version ? `@${dep.version}` : ""}`,

@@ -883,6 +883,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 
       <input
         type="file"
+        aria-label={t`Take photo`}
         className="sr-only"
         accept={imageUploadAccept}
         capture="environment"
@@ -894,6 +895,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
 
       <input
         type="file"
+        aria-label={t`Upload photo`}
         className="sr-only"
         accept={imageUploadAccept}
         multiple={true}

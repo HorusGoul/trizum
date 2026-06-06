@@ -201,10 +201,17 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
       transition={{ duration: 0.35, ease: "easeOut", delay: 0.2 }}
     >
       {/* Hidden canvas for frame capture */}
-      <canvas ref={canvasRef} className="hidden" />
+      <canvas ref={canvasRef} className="hidden" aria-label={t`QR code frame capture`} />
 
       {/* Video element showing camera feed */}
-      <video ref={videoRef} className="h-full w-full object-cover" playsInline muted autoPlay />
+      <video
+        ref={videoRef}
+        className="h-full w-full object-cover"
+        playsInline
+        muted
+        autoPlay
+        aria-label={t`Camera preview`}
+      />
 
       {/* Viewfinder overlay with darkened edges */}
       <div className="pointer-events-none absolute inset-0">

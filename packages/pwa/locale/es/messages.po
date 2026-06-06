@@ -126,7 +126,7 @@ msgstr "Lek Albanés"
 msgid "Algerian Dinar"
 msgstr "Dinar Argelino"
 
-#: src/components/QRCodeScanner.tsx:253
+#: src/components/QRCodeScanner.tsx:260
 msgid "Align QR code here"
 msgstr "Alinea el código QR aquí"
 
@@ -355,6 +355,10 @@ msgstr "Riel Camboyano"
 #: src/components/QRCodeScanner.tsx:95
 msgid "Camera permission was denied"
 msgstr "Se ha denegado el permiso de cámara"
+
+#: src/components/QRCodeScanner.tsx:213
+msgid "Camera preview"
+msgstr "Vista previa de la cámara"
 
 #: src/routes/support.tsx:111
 msgid "Can I use trizum without an account?"
@@ -1622,7 +1626,7 @@ msgstr "Por favor, selecciona un archivo de imagen"
 msgid "Please wait while we fetch the latest data"
 msgstr "Por favor espera mientras obtenemos los datos más recientes"
 
-#: src/components/QRCodeScanner.tsx:318
+#: src/components/QRCodeScanner.tsx:325
 msgid "Point your camera at a trizum QR code"
 msgstr "Apunta tu cámara a un código QR de trizum"
 
@@ -1641,6 +1645,10 @@ msgstr "Política de Privacidad"
 #: src/routes/new.tsx:525
 msgid "Qatari Rial"
 msgstr "Rial Catarí"
+
+#: src/components/QRCodeScanner.tsx:204
+msgid "QR code frame capture"
+msgstr "Captura de fotograma del código QR"
 
 #: src/components/PartyStatsView.tsx:240
 msgid "Ranking based on how much each participant paid in the selected timeframe."
@@ -1667,7 +1675,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:947
+#: src/components/ExpenseEditor.tsx:949
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -1974,7 +1982,9 @@ msgid "Tajikistani Somoni"
 msgstr "Somoni Tayiko"
 
 #: src/components/AvatarPicker.tsx:127
+#: src/components/AvatarPicker.tsx:142
 #: src/components/ExpenseEditor.tsx:872
+#: src/components/ExpenseEditor.tsx:886
 msgid "Take photo"
 msgstr "Hacer foto"
 
@@ -2120,7 +2130,7 @@ msgstr "Reintentar"
 msgid "Try another timeframe to compare a different period of your party."
 msgstr "Prueba otro período para comparar otra etapa de tu grupo."
 
-#: src/components/QRCodeScanner.tsx:316
+#: src/components/QRCodeScanner.tsx:323
 msgid "Try scanning another code"
 msgstr "Prueba escaneando otro código"
 
@@ -2178,7 +2188,9 @@ msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:136
+#: src/components/AvatarPicker.tsx:154
 #: src/components/ExpenseEditor.tsx:881
+#: src/components/ExpenseEditor.tsx:898
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -2246,7 +2258,7 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:931
+#: src/components/ExpenseEditor.tsx:933
 #: src/routes/party_.$partyId.expense.$expenseId.tsx:285
 msgid "View photo"
 msgstr "Ver foto"

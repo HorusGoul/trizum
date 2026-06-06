@@ -139,6 +139,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
 
       <input
         type="file"
+        aria-label={t`Take photo`}
         className="sr-only"
         accept={imageUploadAccept}
         capture="environment"
@@ -150,6 +151,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
 
       <input
         type="file"
+        aria-label={t`Upload photo`}
         className="sr-only"
         accept={imageUploadAccept}
         multiple={false}
