@@ -29,7 +29,7 @@
     }
   },
   "scripts": {
-    "check": "vp check && vp test .",
+    "check": "vp check .",
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch",
     "build": "tsc -b tsconfig.json",

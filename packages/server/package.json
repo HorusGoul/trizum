@@ -20,7 +20,7 @@
     }
   },
   "scripts": {
-    "check": "vp check",
+    "check": "vp check .",
     "cleanup": "rm -rf dist",
     "dev": "vp run node --watch src/main.ts",
     "start": "vp run node --import ./src/instrument.ts src/main.ts",

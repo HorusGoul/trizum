@@ -32,7 +32,13 @@ const ignoredPaths = [
   "src/routeTree.gen.ts",
 ];
 
-const lintIgnoredPaths = [...ignoredPaths, "packages/pwa/api/**", "packages/pwa/e2e/**"];
+const lintIgnoredPaths = [
+  ...ignoredPaths,
+  "api/**",
+  "e2e/**",
+  "packages/pwa/api/**",
+  "packages/pwa/e2e/**",
+];
 
 function rootAppCommandGuard() {
   return {

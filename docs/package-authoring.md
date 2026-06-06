@@ -61,13 +61,13 @@ Only deviate from the built-package pattern intentionally.
 
 New packages should usually provide scripts that are run through `vp run`:
 
-- `vp run check` using `vp check`, plus `vp test .` when the package owns tests
+- `vp run check` using `vp check .`
 - `vp run build` using `tsc -b tsconfig.json`
 - `vp run dev` using `tsc -b tsconfig.json --watch`
 
-Packages do not need separate lint, typecheck, or test scripts for routine
-validation. If a package has runtime-specific commands beyond this baseline,
-keep the standard scripts and add the extra ones alongside them.
+Packages do not need separate lint or typecheck scripts for routine validation.
+If a package has runtime-specific commands beyond this baseline, keep the
+standard scripts and add the extra ones alongside them.
 
 Packages with tests should define their local Vitest settings in
 `vite.config.ts` and have the package `test` script call `vp test .`.
@@ -78,8 +78,8 @@ Keep tests next to the source as `src/**/*.test.ts`.
 
 Root `vp run check` delegates to `vp check`, which handles type-aware linting
 through the Vite+ `lint` block in [`vite.config.ts`](../vite.config.ts). Keep
-package `tsconfig.test.json` files for package-local typecheck scripts and
-Vitest coverage.
+package `tsconfig.test.json` files for Vitest coverage and package-local test
+type checking.
 
 ## Logging
 
