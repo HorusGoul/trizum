@@ -97,6 +97,10 @@ function createOfflinePath(pathname = "/") {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+function isSentryUrl(url: URL) {
+  return url.hostname === "sentry.io" || url.hostname.endsWith(".sentry.io");
+}
+
 function createBrowserHarness(page: Page): BrowserHarness {
   async function hasInternalHooks() {
     return page
@@ -307,6 +311,13 @@ function createBrowserHarness(page: Page): BrowserHarness {
 export const test = base.extend<{
   harness: BrowserHarness;
 }>({
+  context: async ({ context }, use) => {
+    await context.route(isSentryUrl, async (route) => {
+      await route.abort();
+    });
+
+    await use(context);
+  },
   harness: async ({ page }, use) => {
     await use(createBrowserHarness(page));
   },
