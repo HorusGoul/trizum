@@ -28,9 +28,6 @@
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch",
     "build": "tsc -b tsconfig.json",
-    "typecheck": "tsc -b tsconfig.test.json",
-    "lint": "vp lint src",
-    "lint:fix": "vp lint src --fix",
     "test": "vp test ."
   },
   "dependencies": {

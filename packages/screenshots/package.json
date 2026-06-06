@@ -28,9 +28,6 @@
     "cleanup": "rm -rf screenshots",
     "start": "node --experimental-transform-types src/main.ts",
     "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "vp lint src",
-    "lint:fix": "vp lint src --fix",
     "setup": "vp exec playwright install --with-deps --only-shell chromium"
   },
   "dependencies": {

@@ -18,9 +18,6 @@
     "predev": "vp run icons:generate",
     "preicons:generate": "vp run --filter @trizum/icon-sprite build",
     "lingui:extract": "vp exec lingui extract src",
-    "lint": "vp lint src",
-    "lint:fix": "vp lint src --fix",
-    "prelint": "vp run icons:generate",
     "preview": "vp preview",
     "pretest": "vp run icons:generate",
     "test": "vp test .",
@@ -29,8 +26,6 @@
     "test:e2e:headed": "vp exec playwright test --headed",
     "test:e2e:install": "vp exec playwright install chromium webkit",
     "test:e2e:install:ci": "vp exec playwright install --with-deps --only-shell chromium webkit",
-    "pretypecheck": "vp run icons:generate",
-    "typecheck": "tsc --noEmit",
     "generate:assets": "vp exec pwa-assets-generator",
     "deploy": "vp run build && vp exec wrangler deploy"
   },

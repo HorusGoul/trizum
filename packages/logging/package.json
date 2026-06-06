@@ -35,10 +35,7 @@
     "check": "vp check && vp test .",
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch",
-    "lint": "vp lint src",
-    "lint:fix": "vp lint src --fix",
-    "test": "vp test .",
-    "typecheck": "tsc -b tsconfig.test.json"
+    "test": "vp test ."
   },
   "dependencies": {
     "@logtape/logtape": "1.2.2"
