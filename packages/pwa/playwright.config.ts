@@ -7,6 +7,10 @@ const host = "127.0.0.1";
 const localBaseURL = `http://${host}:${port}`;
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 const cwd = path.dirname(fileURLToPath(import.meta.url));
+const webServerCommand = [
+  "VITE_APP_DISABLE_SENTRY=true pnpm run build",
+  `pnpm exec vite preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+].join(" && ");
 
 export default defineConfig({
   testDir: "./e2e",
@@ -23,7 +27,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: `pnpm run build && pnpm exec vite preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+        command: webServerCommand,
         url: localBaseURL,
         reuseExistingServer: !process.env.CI,
         cwd,
