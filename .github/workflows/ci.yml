@@ -15,28 +15,24 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # Matrix of multiple Turbo jobs
     strategy:
       matrix:
-        turbo:
-          - lint
-          - typecheck
+        command:
+          - check
           - build
           - test
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version: "24"
+          cache: true
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
-      - name: ${{ matrix.turbo }}
-        run: pnpm turbo run ${{ matrix.turbo }}
+      - name: vp ${{ matrix.command }}
+        run: vp ${{ matrix.command }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -47,22 +43,20 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version: "24"
+          cache: true
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Install Playwright Browsers
         timeout-minutes: 5
-        run: pnpm --filter @trizum/pwa run test:e2e:install:ci
+        run: vp run --filter @trizum/pwa test:e2e:install:ci
 
       - name: Run Playwright E2E
-        run: pnpm test:e2e
+        run: vp run --filter @trizum/pwa test:e2e
 
       - name: Upload Playwright Report
         if: failure()
@@ -85,19 +79,17 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version: "24"
+          cache: true
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
-          version: pnpm run update-version
+          version: vp run update-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -109,23 +101,21 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version: "24"
+          cache: true
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Autofix
         id: autofix
-        run: pnpm lint:fix
+        run: vp check --fix
         continue-on-error: true
 
       - name: Extract Messages
         id: extract-messages
-        run: pnpm lingui:extract
+        run: vp run lingui:extract
         continue-on-error: true
 
       - name: Guard Catalog Conflict Markers

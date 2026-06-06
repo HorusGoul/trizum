@@ -48,15 +48,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version: "24"
+          cache: true
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -74,7 +72,7 @@ jobs:
           working-directory: packages/mobile/android
 
       - name: Build mobile
-        run: pnpm turbo run build --filter=@trizum/mobile
+        run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -132,15 +130,13 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version: "24"
+          cache: true
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -152,7 +148,7 @@ jobs:
           working-directory: packages/mobile/ios/App
 
       - name: Build mobile
-        run: pnpm turbo run build --filter=@trizum/mobile
+        run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
