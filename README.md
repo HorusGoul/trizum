@@ -50,15 +50,14 @@ vp install
 ### Development
 
 ```bash
-# Start the PWA development server
-cd packages/pwa
-vp dev
+# Start the PWA development server from the repo root
+vp dev packages/pwa
 
-# Or run commands from root
-vp build          # Build the PWA
-vp test           # Run unit tests
-vp check          # Format, lint, and type check
-vp run build      # Run workspace build scripts
+# Run checks and build scripts from the repo root
+vp check                               # Format, lint, and type check
+vp test                                # Run unit tests
+vp run --filter @trizum/pwa build      # Build the PWA package script
+vp run build                           # Run workspace build scripts
 ```
 
 ### Running Mobile Apps

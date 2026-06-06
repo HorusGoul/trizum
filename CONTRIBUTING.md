@@ -76,9 +76,9 @@ This project is currently maintained by one person. Response times may vary — 
 4. **Run checks** before committing:
 
 ```bash
-vp check         # Format, lint, and type check
-vp test          # Run tests
-vp build         # Build the PWA
+vp check          # Format, lint, and type check
+vp test           # Run tests
+vp run build      # Run workspace build scripts
 ```
 
 ### Commit Messages
@@ -193,7 +193,7 @@ src/models/expense.test.ts
 1. Ensure all checks pass:
 
 ```bash
-vp check && vp test && vp build
+vp check && vp test && vp run build
 ```
 
 2. Extract i18n strings if you added any:

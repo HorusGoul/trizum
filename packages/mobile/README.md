@@ -30,7 +30,7 @@ This package wraps the PWA (`@trizum/pwa`) as a native mobile application using 
 vp install
 
 # Build the PWA first
-vp build
+vp run --filter @trizum/pwa build
 
 # Sync Capacitor (copies web assets to native projects)
 cd packages/mobile

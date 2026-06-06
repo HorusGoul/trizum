@@ -102,5 +102,5 @@ Before opening a PR for a new package, run:
 
 - the package-local `build`, `test`, `lint`, and `typecheck` scripts through
   `vp run <script>`
-- `vp check`, `vp test`, and `vp build` if the package is already wired into
+- `vp check`, `vp test`, and `vp run build` if the package is already wired into
   the workspace graph

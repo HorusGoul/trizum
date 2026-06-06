@@ -79,7 +79,7 @@ Instructions:
   - local repo gate:
     - `vp check`
     - `vp test`
-    - `vp build`
+    - `vp run build`
   - PR gate: `gh pr checks` for the current PR must be passing after the latest push.
 
 ## Related skills
@@ -159,7 +159,7 @@ Required workpad structure:
 - [ ] targeted check: `<command>`
 - [ ] repo gate: `vp check`
 - [ ] repo gate: `vp test`
-- [ ] repo gate: `vp build`
+- [ ] repo gate: `vp run build`
 - [ ] PR gate: `gh pr checks`
 
 ### Notes
