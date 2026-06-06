@@ -8,7 +8,7 @@
     "#*": "./*"
   },
   "scripts": {
-    "build": "./build.sh",
+    "build": "vp build",
     "cleanup": "rm -rf dist",
     "dev": "vp dev",
     "icons:generate": "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
@@ -52,7 +52,6 @@
     "@opentf/obj-diff": "jsr:0.11.0",
     "@opentf/std": "jsr:0.12.0",
     "@sentry/react": "10.29.0",
-    "@sentry/vite-plugin": "5.1.1",
     "@takker/md5": "jsr:^0.1.0",
     "@tanstack/react-form": "1.27.7",
     "@tanstack/react-router": "1.167.3",

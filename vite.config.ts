@@ -5,10 +5,11 @@ const rootAppCommandMessage = [
   "",
   "Run app commands from a package instead:",
   "  cd packages/pwa && vp dev",
-  "  cd packages/pwa && vp run build",
+  "  cd packages/pwa && vp build",
   "",
   "From the workspace root, pass the package root or run package scripts:",
   "  vp dev packages/pwa",
+  "  vp build packages/pwa",
   "  vp run --filter @trizum/pwa build",
   "  vp run build",
 ].join("\n");

@@ -1,6 +1,6 @@
 import path from "node:path";
-import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { execFileSync, execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { getConfig as getLinguiConfig } from "@lingui/conf";
@@ -15,14 +15,16 @@ import { lingui } from "@lingui/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import license from "rollup-plugin-license";
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
 
 const ReactCompilerConfig = {};
+const sentryOrg = "horusdev";
+const sentryProject = "trizum-pwa";
 
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
+const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
 const linguiConfig = getLinguiConfig({
   cwd: packageRoot,
@@ -65,9 +67,6 @@ const fullVersion = `${appVersion}-${appCommit}`;
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
-  // Skip the Sentry Vite plugin in local/dev builds when auth is unavailable.
-  const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
-  const hasSentryAuthToken = Boolean(sentryAuthToken);
 
   process.env.VITE_APP_WSS_URL =
     mode === "production" ? "wss://server.trizum.app/sync" : "wss://dev-sync.trizum.app";
@@ -175,26 +174,7 @@ export default defineConfig(({ mode }) => {
         },
       }),
       appendSourceMappingURLPlugin(),
-      ...(hasSentryAuthToken
-        ? [
-            sentryVitePlugin({
-              org: process.env.SENTRY_ORG,
-              project: process.env.SENTRY_PROJECT,
-              authToken: sentryAuthToken,
-              release: {
-                create: true,
-                name: fullVersion,
-                setCommits: {
-                  auto: true,
-                },
-                inject: true,
-              },
-              sourcemaps: {
-                disable: true,
-              },
-            }),
-          ]
-        : []),
+      sentrySourcemapsPlugin(),
     ],
   };
 });
@@ -220,4 +200,67 @@ function appendSourceMappingURLPlugin(): Plugin {
       }
     },
   };
+}
+
+function sentrySourcemapsPlugin(): Plugin {
+  const clientDist = path.resolve(packageRoot, "dist/client");
+  let sawClientBundle = false;
+  let processed = false;
+
+  return {
+    name: "trizum-sentry-sourcemaps",
+    apply: "build",
+    enforce: "post",
+    writeBundle(options) {
+      if (options.dir && path.resolve(packageRoot, options.dir) === clientDist) {
+        sawClientBundle = true;
+      }
+    },
+    closeBundle() {
+      if (!sawClientBundle || processed) {
+        return;
+      }
+
+      processed = true;
+
+      if (!existsSync(clientDist)) {
+        throw new Error(`Expected client build output at ${clientDist}`);
+      }
+
+      runSentryCli(["sourcemaps", "inject", clientDist]);
+
+      if (!process.env.SENTRY_AUTH_TOKEN?.trim()) {
+        process.stdout.write("SENTRY_AUTH_TOKEN is not set, skipping sourcemaps upload\n");
+        return;
+      }
+
+      process.stdout.write(
+        `Uploading sourcemaps to Sentry for release ${fullVersion}. Org: ${sentryOrg}, Project: ${sentryProject}\n`,
+      );
+
+      runSentryCli([
+        "sourcemaps",
+        "upload",
+        "--release",
+        fullVersion,
+        "--org",
+        sentryOrg,
+        "--project",
+        sentryProject,
+        clientDist,
+      ]);
+    },
+  };
+}
+
+function runSentryCli(args: string[]) {
+  execFileSync(process.execPath, [sentryCliBin, ...args], {
+    cwd: packageRoot,
+    env: {
+      ...process.env,
+      SENTRY_ORG: sentryOrg,
+      SENTRY_PROJECT: sentryProject,
+    },
+    stdio: "inherit",
+  });
 }
