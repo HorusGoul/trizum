@@ -53,7 +53,7 @@ const logger = getLogger("components", "ExpenseEditor");
 
 interface ExpenseEditorProps {
   title: string;
-  onSubmit: (values: ExpenseEditorFormValues) => void;
+  onSubmit: (values: ExpenseEditorFormValues) => void | Promise<void>;
   onChange?: (
     previousValues: ExpenseEditorFormValues,
     currentValues: ExpenseEditorFormValues,
@@ -79,6 +79,7 @@ export function ExpenseEditor({
   const { i18n } = useLingui();
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
+  const saveInFlightRef = useRef(false);
   const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
@@ -102,7 +103,11 @@ export function ExpenseEditor({
           {} as Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
         ),
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
+      if (saveInFlightRef.current) {
+        return;
+      }
+
       // Validate that amounts add up correctly using Dinero.js for precise calculations
       const activeParticipants = Object.keys(value.shares);
       const totalAmount = Dinero({ amount: convertToUnits(value.amount) });
@@ -143,7 +148,13 @@ export function ExpenseEditor({
         return;
       }
 
-      onSubmit(value);
+      saveInFlightRef.current = true;
+
+      try {
+        await onSubmit(value);
+      } finally {
+        saveInFlightRef.current = false;
+      }
     },
   });
 
@@ -281,6 +292,10 @@ export function ExpenseEditor({
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
+          if (form.state.isSubmitting || saveInFlightRef.current) {
+            return;
+          }
+
           void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col px-4"

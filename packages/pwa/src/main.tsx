@@ -42,8 +42,10 @@ import {
 } from "./lib/testing/browserHarness.ts";
 
 const initialUrl = new URL(window.location.href);
+const isProduction = import.meta.env.MODE === "production";
+const shouldInitializeSentry = isProduction && import.meta.env.VITE_APP_DISABLE_SENTRY !== "true";
 
-if (import.meta.env.MODE === "production") {
+if (shouldInitializeSentry) {
   Sentry.init({
     dsn: "https://379ed68929ca4667e3466293189544a6@o524893.ingest.us.sentry.io/4510504067268608",
     integrations: [
@@ -69,7 +71,7 @@ if (import.meta.env.MODE === "production") {
   });
 } else {
   configurePwaLogging({
-    lowestLevel: "debug",
+    lowestLevel: isProduction ? "info" : "debug",
   });
 }
 

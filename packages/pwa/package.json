@@ -100,6 +100,7 @@
     "@trizum/icon-sprite": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
     "@types/dinero.js": "1.9.4",
+    "@types/node": "24.10.2",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
     "@vite-pwa/assets-generator": "1.0.2",

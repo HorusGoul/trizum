@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { defineConfig, devices } from "@playwright/test";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,6 +9,10 @@ const host = "127.0.0.1";
 const localBaseURL = `http://${host}:${port}`;
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 const cwd = path.dirname(fileURLToPath(import.meta.url));
+const webServerCommand = [
+  "VITE_APP_DISABLE_SENTRY=true vp run build",
+  `vp preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+].join(" && ");
 
 export default defineConfig({
   testDir: "./e2e",
@@ -23,7 +29,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: `vp run build && vp preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+        command: webServerCommand,
         url: localBaseURL,
         reuseExistingServer: !process.env.CI,
         cwd,
