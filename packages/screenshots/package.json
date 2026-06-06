@@ -30,7 +30,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .ts src",
     "lint:fix": "pnpm run lint --fix",
-    "setup": "pnpm playwright install --with-deps chromium"
+    "setup": "pnpm playwright install --with-deps --only-shell chromium"
   },
   "devDependencies": {
     "@trizum/eslint-config": "workspace:*",
@@ -44,6 +44,6 @@
   "prettier": "@trizum/prettier-config",
   "dependencies": {
     "@trizum/logging": "workspace:*",
-    "playwright": "1.57.0"
+    "playwright": "1.60.0"
   }
 }
