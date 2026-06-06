@@ -32,11 +32,12 @@
   },
   "scripts": {
     "build": "tsc -b tsconfig.json",
+    "check": "vp check && vp test .",
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch",
     "lint": "vp lint src",
     "lint:fix": "vp lint src --fix",
-    "test": "vp test run",
+    "test": "vp test .",
     "typecheck": "tsc -b tsconfig.test.json"
   },
   "dependencies": {

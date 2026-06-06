@@ -17,9 +17,9 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        command:
+        script:
           - check
-          - run build
+          - build
           - test
     steps:
       - uses: actions/checkout@v6
@@ -31,8 +31,8 @@ jobs:
       - name: Install Dependencies
         run: vp install --frozen-lockfile
 
-      - name: vp ${{ matrix.command }}
-        run: vp ${{ matrix.command }}
+      - name: vp run ${{ matrix.script }}
+        run: vp run ${{ matrix.script }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -174,7 +174,7 @@ jobs:
 
       - name: Autofix
         id: autofix
-        run: vp check --fix
+        run: vp run check:fix
         continue-on-error: true
 
       - name: Extract Messages

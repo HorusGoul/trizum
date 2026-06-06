@@ -59,24 +59,27 @@ Only deviate from the built-package pattern intentionally.
 
 ## Scripts
 
-New packages should usually provide:
+New packages should usually provide scripts that are run through `vp run`:
 
+- `vp run check` using `vp check`, plus `vp test .` when the package owns tests
 - `vp run build` using `tsc -b tsconfig.json`
 - `vp run dev` using `tsc -b tsconfig.json --watch`
-- `vp run test` using `vp test run`
-- `vp run lint` using `vp lint src`
-- `vp run typecheck` using `tsc -b tsconfig.test.json`
 
-If a package has runtime-specific commands beyond this baseline, keep the
-standard scripts and add the extra ones alongside them.
+Packages do not need separate lint, typecheck, or test scripts for routine
+validation. If a package has runtime-specific commands beyond this baseline,
+keep the standard scripts and add the extra ones alongside them.
+
+Packages with tests should define their local Vitest settings in
+`vite.config.ts` and have the package `test` script call `vp test .`.
 
 ## Tests
 
 Keep tests next to the source as `src/**/*.test.ts`.
 
-Root `vp check` handles type-aware linting through the Vite+ `lint` block in
-[`vite.config.ts`](../vite.config.ts). Keep package `tsconfig.test.json` files
-for package-local typecheck scripts and Vitest coverage.
+Root `vp run check` delegates to `vp check`, which handles type-aware linting
+through the Vite+ `lint` block in [`vite.config.ts`](../vite.config.ts). Keep
+package `tsconfig.test.json` files for package-local typecheck scripts and
+Vitest coverage.
 
 ## Logging
 
@@ -100,7 +103,6 @@ Every new package should update or provide:
 
 Before opening a PR for a new package, run:
 
-- the package-local `build`, `test`, `lint`, and `typecheck` scripts through
-  `vp run <script>`
-- `vp check`, `vp test`, and `vp run build` if the package is already wired into
-  the workspace graph
+- the package-local `check` and `build` scripts through `vp run <script>`
+- `vp run check`, `vp run test`, and `vp run build` if the package is already
+  wired into the workspace graph

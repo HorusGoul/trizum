@@ -25,6 +25,7 @@
   },
   "scripts": {
     "capacitor:copy:before": "./copy-client.sh",
+    "check": "vp check",
     "cleanup": "rm -rf dist",
     "dev": "tsc --watch",
     "build": "./copy-client.sh && ./sync.sh",

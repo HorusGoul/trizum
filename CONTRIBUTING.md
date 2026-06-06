@@ -76,8 +76,8 @@ This project is currently maintained by one person. Response times may vary — 
 4. **Run checks** before committing:
 
 ```bash
-vp check          # Format, lint, and type check
-vp test           # Run tests
+vp run check      # Format, lint, and type check
+vp run test       # Run tests
 vp run build      # Run workspace build scripts
 ```
 
@@ -173,7 +173,7 @@ For translation guidelines, see [`packages/pwa/locale/AGENTS.md`](./packages/pwa
 ### Running Tests
 
 ```bash
-vp test                # Run tests
+vp run test            # Run tests
 vp run test:coverage   # Run with coverage report
 ```
 
@@ -193,7 +193,7 @@ src/models/expense.test.ts
 1. Ensure all checks pass:
 
 ```bash
-vp check && vp test && vp run build
+vp run check && vp run test && vp run build
 ```
 
 2. Extract i18n strings if you added any:

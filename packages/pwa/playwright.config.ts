@@ -11,7 +11,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 const cwd = path.dirname(fileURLToPath(import.meta.url));
 const webServerCommand = [
   "VITE_APP_DISABLE_SENTRY=true vp run build",
-  `vp preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+  `vp run preview -- --host ${host} --port ${port} --strictPort --outDir dist/client`,
 ].join(" && ");
 
 export default defineConfig({

@@ -31,8 +31,7 @@ then use this document to decide where to work inside the PWA.
 
 Run the package scripts defined in [`package.json`](./package.json):
 
-- `vp check`
-- `vp test`
+- `vp run check`
 - `vp run build`
 - `vp run lingui:extract` when copy changes
 

@@ -31,8 +31,5 @@ vp run dev
 The following scripts are available:
 
 - `vp run dev`. Starts the compiler in watch mode.
+- `vp run check`. Runs the package validation script.
 - `vp run build`. Builds the package.
-- `vp run test`. Runs the package tests with Vite+.
-- `vp run lint`. Lints the package with Vite+.
-- `vp run lint:fix`. Runs Vite+ lint fixes.
-- `vp run typecheck`. Runs the TypeScript type checker.

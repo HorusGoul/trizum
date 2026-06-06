@@ -1,17 +1,15 @@
-import { configDefaults, defineConfig, type UserConfig } from "vite-plus";
+import { defineConfig, type UserConfig } from "vite-plus";
 
 const rootAppCommandMessage = [
   "The workspace root is not an app package.",
   "",
-  "Run app commands from a package instead:",
-  "  cd packages/pwa && vp dev",
-  "  cd packages/pwa && vp build",
-  "",
-  "From the workspace root, pass the package root or run package scripts:",
-  "  vp dev packages/pwa",
-  "  vp build packages/pwa",
-  "  vp run --filter @trizum/pwa build",
+  "Run repo scripts from the workspace root:",
+  "  vp run dev",
   "  vp run build",
+  "",
+  "Or run package scripts from the package directory:",
+  "  cd packages/pwa && vp run dev",
+  "  cd packages/pwa && vp run build",
 ].join("\n");
 
 const ignoredPaths = [
@@ -120,40 +118,6 @@ const toolingConfig = {
       scripts: true,
       tasks: true,
     },
-  },
-  test: {
-    projects: [
-      {
-        root: "packages/icon-sprite",
-        test: {
-          include: ["src/**/*.test.ts"],
-          name: "icon-sprite",
-        },
-      },
-      {
-        root: "packages/logging",
-        test: {
-          include: ["src/**/*.test.ts"],
-          name: "logging",
-        },
-      },
-      {
-        extends: "./packages/pwa/vite.config.ts",
-        root: "packages/pwa",
-        test: {
-          exclude: [...configDefaults.exclude, "e2e/**"],
-          include: ["src/**/*.test.ts"],
-          name: "pwa",
-        },
-      },
-      {
-        root: "packages/ts-template",
-        test: {
-          include: ["src/**/*.test.ts"],
-          name: "ts-template",
-        },
-      },
-    ],
   },
 } satisfies UserConfig;
 

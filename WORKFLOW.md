@@ -77,8 +77,8 @@ Instructions:
   change needs a changeset, create the `.changeset/*.md` file directly.
 - Before moving an issue to `Human Review`, the required validation gates are:
   - local repo gate:
-    - `vp check`
-    - `vp test`
+    - `vp run check`
+    - `vp run test`
     - `vp run build`
   - PR gate: `gh pr checks` for the current PR must be passing after the latest push.
 
@@ -157,8 +157,8 @@ Required workpad structure:
 ### Validation
 
 - [ ] targeted check: `<command>`
-- [ ] repo gate: `vp check`
-- [ ] repo gate: `vp test`
+- [ ] repo gate: `vp run check`
+- [ ] repo gate: `vp run test`
 - [ ] repo gate: `vp run build`
 - [ ] PR gate: `gh pr checks`
 

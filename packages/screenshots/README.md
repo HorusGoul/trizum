@@ -25,10 +25,9 @@ Fastlane screenshot handoff.
 
 Run the package scripts defined in [`package.json`](./package.json):
 
+- `vp run check`
 - `vp run setup` on first use to install Playwright browser dependencies with
   the smaller Chromium headless shell
 - `vp run start` to capture screenshots
 - `vp run organize:fastlane --platform <ios|android> --output <path>` to prepare
   store-upload assets
-- `vp run lint`
-- `vp run typecheck`

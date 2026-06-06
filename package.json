@@ -9,6 +9,8 @@
     "agent-browser:install": "agent-browser install",
     "browserslist:update-db": "vp dlx update-browserslist-db@latest",
     "build": "vp run --filter './packages/*' build",
+    "check": "vp check",
+    "check:fix": "vp check --fix",
     "dev": "vp dev packages/pwa",
     "lingui:extract": "vp run --filter @trizum/pwa lingui:extract",
     "lint": "vp lint",
@@ -18,8 +20,8 @@
     "test:e2e": "vp run --filter @trizum/pwa test:e2e",
     "update-version": "vp exec changeset version && cd packages/mobile && vp run version:update",
     "syncpack:fix": "vp exec syncpack fix-mismatches && vp exec syncpack format",
-    "test": "vp test run",
-    "test:coverage": "vp test run --coverage",
+    "test": "vp run --filter './packages/*' test",
+    "test:coverage": "vp run --filter './packages/*' test --coverage",
     "typecheck": "vp check --no-fmt --no-lint",
     "generate:ts-template": "vp exec turbo gen workspace --copy @trizum/ts-template --type package",
     "contributors:add": "vp exec all-contributors add",
@@ -37,6 +39,7 @@
     "turbo": "2.5.6"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "4.1.8",
     "eslint": "9.39.1",
     "eslint-plugin-lingui": "0.11.0",
     "vite-plus": "catalog:"

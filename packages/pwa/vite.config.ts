@@ -84,6 +84,8 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
+      include: ["src/**/*.test.ts"],
+      name: "pwa",
     },
     plugins: [
       ...(isTest ? [] : [cloudflare()]),

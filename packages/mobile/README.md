@@ -51,7 +51,7 @@ DEV_URL=http://YOUR_LOCAL_IP:5173
 
 ```bash
 cd packages/pwa
-vp dev --host
+vp run dev -- --host
 ```
 
 3. Run on device/simulator:
@@ -99,6 +99,7 @@ packages/mobile/
 | Script            | Description                                |
 | ----------------- | ------------------------------------------ |
 | `build`           | Copy PWA assets and sync Capacitor         |
+| `check`           | Run package validation                     |
 | `open:android`    | Open Android project in Android Studio     |
 | `open:ios`        | Open iOS project in Xcode                  |
 | `run:android`     | Build and run on Android device/emulator   |

@@ -9,6 +9,8 @@
   },
   "scripts": {
     "build": "vp build",
+    "check": "cd ../.. && vp check && cd packages/pwa && vp test .",
+    "check:fix": "cd ../.. && vp check --fix",
     "cleanup": "rm -rf dist",
     "dev": "vp dev",
     "icons:generate": "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
@@ -21,7 +23,7 @@
     "prelint": "vp run icons:generate",
     "preview": "vp preview",
     "pretest": "vp run icons:generate",
-    "test": "vp test run",
+    "test": "vp test .",
     "pretest:e2e": "vp run icons:generate",
     "test:e2e": "vp exec playwright test",
     "test:e2e:headed": "vp exec playwright test --headed",

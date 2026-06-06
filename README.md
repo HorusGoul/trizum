@@ -51,11 +51,11 @@ vp install
 
 ```bash
 # Start the PWA development server from the repo root
-vp dev packages/pwa
+vp run dev
 
 # Run checks and build scripts from the repo root
-vp check                               # Format, lint, and type check
-vp test                                # Run unit tests
+vp run check                           # Format, lint, and type check
+vp run test                            # Run unit tests
 vp run --filter @trizum/pwa build      # Build the PWA package script
 vp run build                           # Run workspace build scripts
 ```
