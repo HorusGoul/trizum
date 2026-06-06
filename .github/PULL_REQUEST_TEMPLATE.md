@@ -20,10 +20,11 @@
 ## Checklist
 
 - [ ] I've read the [Contributing Guide](./CONTRIBUTING.md)
-- [ ] I've run `pnpm lint` and `pnpm typecheck`
-- [ ] I've run `pnpm test` and all tests pass
+- [ ] I've run `vp run check`
+- [ ] I've run `vp run test` and all tests pass
+- [ ] I've run `vp run build`
 - [ ] I've added tests for new functionality (if applicable)
-- [ ] I've run `pnpm lingui:extract` (if I added new strings)
+- [ ] I've run `vp run lingui:extract` (if I added new strings)
 - [ ] I've added a changeset (if this is a user-facing change)
 
 ## Screenshots
