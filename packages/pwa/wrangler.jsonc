@@ -3,6 +3,19 @@
   "name": "trizum",
   "compatibility_date": "2025-11-18",
   "main": "api/worker.ts",
+  "build": {
+    "command": "npx --yes --package vite-plus@latest vp install --frozen-lockfile && npx --yes --package vite-plus@latest vp run --filter @trizum/pwa build",
+    "cwd": "../..",
+    "watch_dir": [
+      "package.json",
+      "pnpm-lock.yaml",
+      "pnpm-workspace.yaml",
+      "vite.config.ts",
+      "packages/icon-sprite",
+      "packages/logging",
+      "packages/pwa",
+    ],
+  },
   "assets": {
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",
