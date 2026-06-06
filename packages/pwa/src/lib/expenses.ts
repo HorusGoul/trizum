@@ -40,10 +40,7 @@ export function calculateLogStatsBetweenTwoUsers(
       {} as Record<string, ExpenseInput[]>,
     );
 
-  const {
-    [userUid]: userExpenses = [],
-    [otherUserUid]: otherUserExpenses = [],
-  } = groupedExpenses;
+  const { [userUid]: userExpenses = [], [otherUserUid]: otherUserExpenses = [] } = groupedExpenses;
 
   /**
    * What U2 has to pay to U1
@@ -72,11 +69,7 @@ export function calculateLogStatsOfUser(
   const diffs: Record<string, UserDiff> = {};
 
   for (const otherUserUid of listUsers.filter((uid) => uid !== userUid)) {
-    diffs[otherUserUid] = calculateLogStatsBetweenTwoUsers(
-      userUid,
-      otherUserUid,
-      expenses,
-    );
+    diffs[otherUserUid] = calculateLogStatsBetweenTwoUsers(userUid, otherUserUid, expenses);
   }
 
   const zero = Dinero({ amount: 0 });
@@ -102,11 +95,7 @@ export function calculateLogStatsOfUser(
   };
 }
 
-function getSplitTotal(
-  expenses: ExpenseInput[],
-  uid: ExpenseUser,
-  reverse = false,
-) {
+function getSplitTotal(expenses: ExpenseInput[], uid: ExpenseUser, reverse = false) {
   return expenses.reduce(
     (prev, next) => {
       let amount = Dinero({
@@ -114,9 +103,7 @@ function getSplitTotal(
       });
 
       amount = reverse
-        ? Dinero({ amount: next.expense }).subtract(
-            Dinero({ amount: next.paidFor[uid] }),
-          )
+        ? Dinero({ amount: next.expense }).subtract(Dinero({ amount: next.paidFor[uid] }))
         : Dinero({ amount: next.paidFor[uid] });
 
       return prev.add(amount);

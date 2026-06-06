@@ -5,10 +5,9 @@
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./dist",
-    "baseUrl": "./",
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "types": ["node"],
-    "noEmit": true,
+    "noEmit": true
   }
 }

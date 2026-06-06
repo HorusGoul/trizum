@@ -36,7 +36,7 @@ For repo-wide guidance on what to log and which severity level to use, see
 
 Run the package scripts defined in [`package.json`](./package.json):
 
-- `pnpm build`
-- `pnpm lint`
-- `pnpm test`
-- `pnpm typecheck`
+- `vp run build`
+- `vp run lint`
+- `vp run test`
+- `vp run typecheck`

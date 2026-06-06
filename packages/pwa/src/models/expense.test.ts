@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect } from "vite-plus/test";
 import {
   createExpenseId,
   exportIntoInput,
@@ -265,10 +265,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
     expect(result).toStrictEqual(expected);
 
     // Verify the total adds up exactly
-    const totalPaidFor = Object.values(result[0].paidFor).reduce(
-      (sum, amount) => sum + amount,
-      0,
-    );
+    const totalPaidFor = Object.values(result[0].paidFor).reduce((sum, amount) => sum + amount, 0);
     expect(totalPaidFor).toBe(1000);
   });
 });

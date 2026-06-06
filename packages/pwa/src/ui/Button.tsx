@@ -1,7 +1,4 @@
-import {
-  Button as AriaButton,
-  type ButtonProps as AriaButtonProps,
-} from "react-aria-components";
+import { Button as AriaButton, type ButtonProps as AriaButtonProps } from "react-aria-components";
 import { cn } from "./utils";
 
 type ButtonColorScheme = "transparent" | "accent" | "input-like";
@@ -43,13 +40,7 @@ export function Button({
 
   return (
     <AriaButton
-      className={({
-        isPressed,
-        isFocusVisible,
-        isHovered,
-        defaultClassName,
-        ...state
-      }) =>
+      className={({ isPressed, isFocusVisible, isHovered, defaultClassName, ...state }) =>
         cn(
           defaultClassName,
           "flex h-10 w-full scale-100 items-center justify-center rounded-full outline-none transition-all duration-200 ease-in-out",

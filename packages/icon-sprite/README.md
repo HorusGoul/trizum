@@ -29,7 +29,7 @@ and keep generated sprite assets in sync during Vite development and builds.
 
 Run the package scripts defined in [`package.json`](./package.json):
 
-- `pnpm build`
-- `pnpm lint`
-- `pnpm test`
-- `pnpm typecheck`
+- `vp run build`
+- `vp run lint`
+- `vp run test`
+- `vp run typecheck`

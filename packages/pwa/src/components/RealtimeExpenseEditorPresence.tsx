@@ -12,14 +12,7 @@ import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
@@ -42,9 +35,7 @@ type ExpensePresenceDeletePayload = {
   };
 };
 
-export function RealtimeExpenseEditorPresence({
-  expenseId,
-}: RealtimeExpenseEditorPresenceProps) {
+export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
   const { chunkId } = decodeExpenseId(expenseId);
   const [, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
     required: true,
@@ -101,12 +92,8 @@ export function RealtimeExpenseEditorPresence({
   }, [onPresenceUpdate]);
 
   useEffect(() => {
-    const listener = ({
-      message,
-    }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
-      const payload = message as
-        | ExpensePresenceDeletePayload
-        | ExpensePresenceUpdatePayload;
+    const listener = ({ message }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
+      const payload = message as ExpensePresenceDeletePayload | ExpensePresenceUpdatePayload;
 
       try {
         if (payload.data.expenseId !== expenseId) {
@@ -267,13 +254,7 @@ function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
   if (participant.avatarId) {
     return (
       <Suspense
-        fallback={
-          <AvatarWrapper
-            name={participant.name}
-            top={position.top}
-            left={position.left}
-          />
-        }
+        fallback={<AvatarWrapper name={participant.name} top={position.top} left={position.left} />}
       >
         <AvatarWithAvatarId
           avatarId={participant.avatarId}
@@ -285,13 +266,7 @@ function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
     );
   }
 
-  return (
-    <AvatarWrapper
-      name={participant.name}
-      top={position.top}
-      left={position.left}
-    />
-  );
+  return <AvatarWrapper name={participant.name} top={position.top} left={position.left} />;
 }
 
 function AvatarWithAvatarId({
@@ -352,18 +327,12 @@ function findPresenceElementFromTarget(target: HTMLElement): string | null {
   return null;
 }
 
-function findPopoverFormElementFromTarget(
-  target: HTMLElement,
-): HTMLElement | null {
+function findPopoverFormElementFromTarget(target: HTMLElement): HTMLElement | null {
   if (!target) {
     return null;
   }
 
-  if (
-    target.tagName === "DIALOG" ||
-    target.role === "dialog" ||
-    target.role === "listbox"
-  ) {
+  if (target.tagName === "DIALOG" || target.role === "dialog" || target.role === "listbox") {
     return target;
   }
 

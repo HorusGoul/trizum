@@ -5,11 +5,10 @@
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./dist",
-    "baseUrl": "./",
     "types": ["node"],
     "noEmit": true,
     "module": "nodenext",
     "verbatimModuleSyntax": true,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": true
   }
 }

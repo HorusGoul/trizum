@@ -37,16 +37,10 @@ type ScannerState =
   | { status: "error"; message: string }
   | { status: "success" };
 
-const QRCodeFrameHandle = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
+const QRCodeFrameHandle = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
-    className={cn(
-      "border-l-3 border-t-3 size-4 rounded-tl-lg border-accent-50",
-      className,
-    )}
+    className={cn("border-l-3 border-t-3 size-4 rounded-tl-lg border-accent-50", className)}
   />
 );
 
@@ -95,10 +89,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
         logger.error("Camera initialization error", { error: err });
 
         if (err instanceof Error) {
-          if (
-            err.name === "NotAllowedError" ||
-            err.name === "PermissionDeniedError"
-          ) {
+          if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
             onResult({
               type: "error",
               message: t`Camera permission was denied`,
@@ -123,12 +114,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
     }
 
     async function scanFrame() {
-      if (
-        !scanningRef.current ||
-        !videoRef.current ||
-        !canvasRef.current ||
-        !detector
-      ) {
+      if (!scanningRef.current || !videoRef.current || !canvasRef.current || !detector) {
         return;
       }
 
@@ -211,22 +197,14 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
   return (
     <motion.div
       className="relative flex flex-1 flex-col items-center justify-center bg-black"
-      animate={
-        state.status === "error" ? { x: [0, -8, 8, -6, 6, -4, 4, 0] } : { x: 0 }
-      }
+      animate={state.status === "error" ? { x: [0, -8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
       transition={{ duration: 0.35, ease: "easeOut", delay: 0.2 }}
     >
       {/* Hidden canvas for frame capture */}
       <canvas ref={canvasRef} className="hidden" />
 
       {/* Video element showing camera feed */}
-      <video
-        ref={videoRef}
-        className="h-full w-full object-cover"
-        playsInline
-        muted
-        autoPlay
-      />
+      <video ref={videoRef} className="h-full w-full object-cover" playsInline muted autoPlay />
 
       {/* Viewfinder overlay with darkened edges */}
       <div className="pointer-events-none absolute inset-0">
@@ -286,12 +264,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                   className="absolute inset-0 flex items-center justify-center"
                 >
                   <div className="flex size-16 items-center justify-center rounded-full bg-success-500">
-                    <Icon
-                      icon="lucide.check"
-                      width={40}
-                      height={40}
-                      className="text-white"
-                    />
+                    <Icon icon="lucide.check" width={40} height={40} className="text-white" />
                   </div>
                 </motion.div>
               )}
@@ -311,12 +284,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                     transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}
                     className="flex size-16 items-center justify-center rounded-full bg-danger-500"
                   >
-                    <Icon
-                      icon="lucide.x"
-                      width={40}
-                      height={40}
-                      className="text-white"
-                    />
+                    <Icon icon="lucide.x" width={40} height={40} className="text-white" />
                   </motion.div>
                   <motion.span
                     initial={{ opacity: 0, y: 5 }}

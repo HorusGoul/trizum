@@ -29,10 +29,7 @@ export function getBrowserLocale(): SupportedLocale {
     const baseLocale = browserLocale.split("-")[0]?.toLowerCase();
 
     // Check if it's a supported locale
-    if (
-      baseLocale &&
-      SUPPORTED_LOCALES.includes(baseLocale as SupportedLocale)
-    ) {
+    if (baseLocale && SUPPORTED_LOCALES.includes(baseLocale as SupportedLocale)) {
       return baseLocale as SupportedLocale;
     }
   }

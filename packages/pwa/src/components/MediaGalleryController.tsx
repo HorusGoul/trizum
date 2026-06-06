@@ -13,9 +13,7 @@ export interface MediaGalleryControllerState {
   index: number;
 }
 
-export function MediaGalleryController({
-  children,
-}: MediaGalleryControllerProps) {
+export function MediaGalleryController({ children }: MediaGalleryControllerProps) {
   const [state, setState] = useState<MediaGalleryControllerState>({
     items: [],
     index: -1,
@@ -60,9 +58,7 @@ export function MediaGalleryController({
             <MediaGallery
               index={state.index}
               items={state.items}
-              onChange={(index) =>
-                setState((current) => ({ ...current, index }))
-              }
+              onChange={(index) => setState((current) => ({ ...current, index }))}
               onClose={close}
               onDragProgress={handleDragProgress}
             />

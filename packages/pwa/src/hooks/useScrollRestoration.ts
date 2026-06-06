@@ -7,10 +7,7 @@ interface UseScrollRestorationOptions {
   scrollElementRef: RefObject<HTMLElement | null>;
 }
 
-export function useScrollRestoration({
-  cacheKey,
-  scrollElementRef,
-}: UseScrollRestorationOptions) {
+export function useScrollRestoration({ cacheKey, scrollElementRef }: UseScrollRestorationOptions) {
   useEffect(() => {
     const scrollElement = scrollElementRef.current;
 

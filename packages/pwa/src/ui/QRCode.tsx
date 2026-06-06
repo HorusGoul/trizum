@@ -1,27 +1,16 @@
 import type { HTMLAttributes } from "react";
 import { useEffect, useRef, useState } from "react";
-import QRCodeStyling, {
-  type Options as QRCodeStylingOptions,
-} from "qr-code-styling";
+import QRCodeStyling, { type Options as QRCodeStylingOptions } from "qr-code-styling";
 import { cn } from "./utils.ts";
 
-const QRCodeFrameHandle = ({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) => (
+const QRCodeFrameHandle = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
-    className={cn(
-      "size-3 rounded-tl border-l-2 border-t-2 border-accent-400",
-      className,
-    )}
+    className={cn("size-3 rounded-tl border-l-2 border-t-2 border-accent-400", className)}
   />
 );
 
-export const GradientScan = ({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) => (
+export const GradientScan = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
     className={cn(
@@ -29,10 +18,8 @@ export const GradientScan = ({
       className,
     )}
     style={{
-      maskImage:
-        "radial-gradient(52.19% 100% at 50% 0%, #000 0%, rgba(0,0,0,0) 95.31%)",
-      WebkitMaskImage:
-        "radial-gradient(52.19% 100% at 50% 0%, #000 0%, rgba(0,0,0,0) 95.31%)",
+      maskImage: "radial-gradient(52.19% 100% at 50% 0%, #000 0%, rgba(0,0,0,0) 95.31%)",
+      WebkitMaskImage: "radial-gradient(52.19% 100% at 50% 0%, #000 0%, rgba(0,0,0,0) 95.31%)",
       ...props.style,
     }}
   />
@@ -69,12 +56,7 @@ interface QRCodeProps {
   className?: string;
 }
 
-export const QRCode = ({
-  size = "md",
-  value,
-  options,
-  className,
-}: QRCodeProps) => {
+export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const [qrCode, setQrCode] = useState<QRCodeStyling | null>(null);
 
@@ -101,13 +83,7 @@ export const QRCode = ({
   }, [qrCode, value, options]);
 
   return (
-    <div
-      className={cn(
-        "relative flex items-center justify-center",
-        styles[size].root,
-        className,
-      )}
-    >
+    <div className={cn("relative flex items-center justify-center", styles[size].root, className)}>
       <div ref={ref} />
 
       <QRCodeFrameHandle className="absolute left-0 top-0" />

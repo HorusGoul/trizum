@@ -27,10 +27,7 @@ export function getEligibleDebtTransferParticipants(
   }
 
   const otherParticipants = Object.values(party.participants)
-    .filter(
-      (participant) =>
-        !participant.isArchived && participant.id !== currentParticipant.id,
-    )
+    .filter((participant) => !participant.isArchived && participant.id !== currentParticipant.id)
     .sort((left, right) => left.name.localeCompare(right.name));
 
   if (otherParticipants.length === 0) {
@@ -79,10 +76,7 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     }
 
     const currentParticipantId = joinedActiveParty.currentParticipantId;
-    const eligibleParticipants = getEligibleDebtTransferParticipants(
-      doc,
-      currentParticipantId,
-    );
+    const eligibleParticipants = getEligibleDebtTransferParticipants(doc, currentParticipantId);
 
     if (!eligibleParticipants) {
       return [];

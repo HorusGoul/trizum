@@ -8,11 +8,11 @@ template.
 Start from the workspace template:
 
 ```bash
-pnpm generate:ts-template
+vp run generate:ts-template
 ```
 
-That gives new packages the default `package.json`, README, ESLint config,
-TypeScript config, logging facade, and Vitest setup that the repo expects.
+That gives new packages the default `package.json`, README, TypeScript config,
+logging facade, Vite+ lint script, and Vitest setup that the repo expects.
 
 ## Default Shape
 
@@ -22,8 +22,7 @@ New library-style packages should default to:
 - `type: "module"` with `moduleResolution: "nodenext"`
 - `sideEffects: false` unless the package truly has import-time side effects
 - `files` including `dist` and `src`
-- package-local `README.md`, `eslint.config.js`, `tsconfig.json`, and
-  `tsconfig.test.json`
+- package-local `README.md`, `tsconfig.json`, and `tsconfig.test.json`
 
 Prefer the `ts-template` package as the canonical example for this shape.
 
@@ -62,11 +61,11 @@ Only deviate from the built-package pattern intentionally.
 
 New packages should usually provide:
 
-- `pnpm build` using `tsc -b tsconfig.json`
-- `pnpm dev` using `tsc -b tsconfig.json --watch`
-- `pnpm test` using `vitest run`
-- `pnpm lint` using `eslint --ext .ts src`
-- `pnpm typecheck` using `tsc -b tsconfig.test.json`
+- `vp run build` using `tsc -b tsconfig.json`
+- `vp run dev` using `tsc -b tsconfig.json --watch`
+- `vp run test` using `vp test run`
+- `vp run lint` using `vp lint src`
+- `vp run typecheck` using `tsc -b tsconfig.test.json`
 
 If a package has runtime-specific commands beyond this baseline, keep the
 standard scripts and add the extra ones alongside them.
@@ -75,9 +74,9 @@ standard scripts and add the extra ones alongside them.
 
 Keep tests next to the source as `src/**/*.test.ts`.
 
-When using typed ESLint with `projectService`, add a test-file override in the
-package ESLint config so test files point at `tsconfig.test.json`. This lets
-tests participate in typed linting even though the build config excludes them.
+Root `vp check` handles type-aware linting through the Vite+ `lint` block in
+[`vite.config.ts`](../vite.config.ts). Keep package `tsconfig.test.json` files
+for package-local typecheck scripts and Vitest coverage.
 
 ## Logging
 
@@ -101,6 +100,7 @@ Every new package should update or provide:
 
 Before opening a PR for a new package, run:
 
-- the package-local `build`, `test`, `lint`, and `typecheck` scripts
-- the relevant root validation command if the package is already wired into the
-  workspace graph
+- the package-local `build`, `test`, `lint`, and `typecheck` scripts through
+  `vp run <script>`
+- `vp check`, `vp test`, and `vp build` if the package is already wired into
+  the workspace graph

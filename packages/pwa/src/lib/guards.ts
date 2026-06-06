@@ -13,9 +13,7 @@ export async function guardPartyExists(
   partyId: string,
   { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
 ) {
-  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as
-    | Party
-    | undefined;
+  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as Party | undefined;
 
   if (!party) {
     throw redirect({ to: "/" });
@@ -28,9 +26,7 @@ export async function guardPartyListExists({
   repo,
 }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
   const partyListId = getPartyListId(repo);
-  const partyList = (await documentCache.readAsync(repo, partyListId)) as
-    | PartyList
-    | undefined;
+  const partyList = (await documentCache.readAsync(repo, partyListId)) as PartyList | undefined;
 
   if (!partyList) {
     throw redirect({ to: "/" });

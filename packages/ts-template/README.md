@@ -4,7 +4,6 @@ This is a package generated using the `ts-template` template of the trizum monor
 
 It's the best starting point for a new package, as it provides the following out of the box:
 
-- `@trizum/eslint-config`
 - `@trizum/tsconfig`
 - Common npm scripts for developing, building, testing, linting, and typechecking.
 - A built-package TypeScript setup with a separate test-inclusive `tsconfig.test.json`.
@@ -14,7 +13,7 @@ It's the best starting point for a new package, as it provides the following out
 To use this package from another package or app in the monorepo, you can install it using the following command:
 
 ```bash
-pnpm add ts-template
+vp add ts-template
 ```
 
 ## Development
@@ -22,18 +21,18 @@ pnpm add ts-template
 If you want to work on this package, you can clone the monorepo and run the following commands:
 
 ```bash
-pnpm install
+vp install
 cd packages/ts-template
-pnpm dev
+vp run dev
 ```
 
 ## Scripts
 
 The following scripts are available:
 
-- `pnpm dev`. Starts the compiler in watch mode.
-- `pnpm build`. Builds the package.
-- `pnpm test`. Runs the package tests with Vitest.
-- `pnpm lint`. Lints the package with ESLint and Prettier.
-- `pnpm lint:fix`. Runs ESLint and Prettier to fix any styling issues.
-- `pnpm typecheck`. Runs the TypeScript type checker.
+- `vp run dev`. Starts the compiler in watch mode.
+- `vp run build`. Builds the package.
+- `vp run test`. Runs the package tests with Vite+.
+- `vp run lint`. Lints the package with Vite+.
+- `vp run lint:fix`. Runs Vite+ lint fixes.
+- `vp run typecheck`. Runs the TypeScript type checker.

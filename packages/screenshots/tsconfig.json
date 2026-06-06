@@ -5,11 +5,10 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": "./",
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "types": ["node"],
     "noEmit": true,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": true
   }
 }

@@ -42,10 +42,7 @@ function RouteComponent() {
       await navigator.clipboard.writeText(shareUrl);
       toast.success(t`Party link copied to clipboard!`);
     } catch {
-      prompt(
-        t`Failed to copy party link to clipboard, please copy it manually`,
-        shareUrl,
-      );
+      prompt(t`Failed to copy party link to clipboard, please copy it manually`, shareUrl);
     }
   }
 
@@ -106,9 +103,7 @@ function RouteComponent() {
 
 function getQRCodeImage() {
   // Get color from CSS variable
-  const variable = getComputedStyle(document.documentElement).getPropertyValue(
-    "--accent-400",
-  );
+  const variable = getComputedStyle(document.documentElement).getPropertyValue("--accent-400");
 
   const color = `oklch(${variable} / 1)`;
 

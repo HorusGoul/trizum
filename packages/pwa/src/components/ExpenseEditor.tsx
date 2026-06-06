@@ -3,14 +3,7 @@ import { t } from "@lingui/core/macro";
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import {
-  Suspense,
-  use,
-  useEffect,
-  useId,
-  useImperativeHandle,
-  useRef,
-} from "react";
+import { Suspense, use, useEffect, useId, useImperativeHandle, useRef } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
@@ -26,11 +19,7 @@ import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 import { AppDatePicker } from "#src/ui/DatePicker.tsx";
-import {
-  fromDate,
-  getLocalTimeZone,
-  type ZonedDateTime,
-} from "@internationalized/date";
+import { fromDate, getLocalTimeZone, type ZonedDateTime } from "@internationalized/date";
 import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
@@ -42,14 +31,8 @@ import { getExpenseUnitShares } from "#src/models/expense.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
-import {
-  getImageUploadErrorMessage,
-  useMediaFileActions,
-} from "#src/hooks/useMediaFileActions.ts";
-import {
-  compressionPresets,
-  imageUploadAccept,
-} from "#src/lib/imageCompression.ts";
+import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
+import { compressionPresets, imageUploadAccept } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 
@@ -78,9 +61,7 @@ interface ExpenseEditorProps {
   defaultValues: ExpenseEditorFormValues;
   ref?: React.RefObject<ExpenseEditorRef | null>;
   autoFocus?: boolean;
-  goBackFallbackOptions: React.ComponentProps<
-    typeof BackButton
-  >["fallbackOptions"];
+  goBackFallbackOptions: React.ComponentProps<typeof BackButton>["fallbackOptions"];
   /** Optional callback to view a photo at a given index (for route-based gallery) */
   onViewPhoto?: (index: number) => void;
 }
@@ -118,10 +99,7 @@ export function ExpenseEditor({
             acc[id] = { type: "divide" as const, value: 1 };
             return acc;
           },
-          {} as Record<
-            ExpenseUser,
-            { type: "divide" | "exact"; value: number }
-          >,
+          {} as Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
         ),
     },
     onSubmit: ({ value }) => {
@@ -161,9 +139,7 @@ export function ExpenseEditor({
 
       // Compare using Dinero.js equality
       if (!totalSplit.equalsTo(totalAmount)) {
-        toast.error(
-          t`Expense amounts don't match total. Please check your split configuration.`,
-        );
+        toast.error(t`Expense amounts don't match total. Please check your split configuration.`);
         return;
       }
 
@@ -196,10 +172,7 @@ export function ExpenseEditor({
   const isReceivingUpdatesRef = useRef(false);
   const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);
 
-  function createFieldFocusHandlers(field: {
-    name: string;
-    handleBlur: () => void;
-  }) {
+  function createFieldFocusHandlers(field: { name: string; handleBlur: () => void }) {
     return {
       onFocus: () => {
         focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
@@ -230,10 +203,7 @@ export function ExpenseEditor({
             key as keyof ExpenseEditorFormValues,
             values[key as keyof ExpenseEditorFormValues],
           );
-          void form.validateField(
-            key as keyof ExpenseEditorFormValues,
-            "server",
-          );
+          void form.validateField(key as keyof ExpenseEditorFormValues, "server");
         }
 
         isReceivingUpdatesRef.current = false;
@@ -270,15 +240,8 @@ export function ExpenseEditor({
           />
           <Popover placement="bottom end">
             <Menu>
-              <MenuItem
-                onAction={() => setAutoOpenCalculator(!autoOpenCalculator)}
-              >
-                <Icon
-                  icon="lucide.calculator"
-                  width={20}
-                  height={20}
-                  className="mr-3 self-start"
-                />
+              <MenuItem onAction={() => setAutoOpenCalculator(!autoOpenCalculator)}>
+                <Icon icon="lucide.calculator" width={20} height={20} className="mr-3 self-start" />
                 <div className="mr-3 flex flex-col">
                   <span className="leading-none">
                     <Trans>Auto-open calculator</Trans>
@@ -296,9 +259,7 @@ export function ExpenseEditor({
             </Menu>
           </Popover>
         </MenuTrigger>
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) =>
             canSubmit ? (
               <Suspense fallback={null}>
@@ -352,10 +313,7 @@ export function ExpenseEditor({
                 value={field.state.value}
                 onChange={field.handleChange}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
                 // eslint-disable-next-line jsx-a11y/no-autofocus -- We want to auto focus the title field when creating a new expense
                 autoFocus={autoFocus}
                 className="col-span-2"
@@ -389,16 +347,12 @@ export function ExpenseEditor({
                 }}
                 onBlur={createFieldFocusHandlers(field).onBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
                 className="col-span-2"
                 onFocus={(event) => {
                   const input = event.target as HTMLInputElement;
                   input.select();
-                  focusedFieldRef.current =
-                    field.name as keyof ExpenseEditorFormValues;
+                  focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
                 }}
                 inputMode="decimal"
                 data-presence-element-id="amount"
@@ -459,8 +413,7 @@ export function ExpenseEditor({
             <Checkbox
               isSelected={Object.keys(shares).length === participants.length}
               isIndeterminate={
-                Object.keys(shares).length > 0 &&
-                Object.keys(shares).length < participants.length
+                Object.keys(shares).length > 0 && Object.keys(shares).length < participants.length
               }
               onChange={(isSelected) => {
                 handleIncludeAllChange(isSelected);
@@ -478,9 +431,7 @@ export function ExpenseEditor({
                 amount={amount}
                 shares={shares}
                 autoOpenCalculator={autoOpenCalculator}
-                onSharesChange={(shares) =>
-                  form.setFieldValue("shares", shares)
-                }
+                onSharesChange={(shares) => form.setFieldValue("shares", shares)}
               />
             ))}
           </div>
@@ -513,9 +464,7 @@ function ParticipantItem({
 }: ParticipantItemProps) {
   const participantShare = shares[participant.id];
 
-  function updateShares(
-    shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
-  ) {
+  function updateShares(shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>) {
     onSharesChange(shares);
   }
 
@@ -526,10 +475,7 @@ function ParticipantItem({
     const newType = value as "divide" | "exact";
 
     if (newType === "exact") {
-      const amountsByParticipantId = calculateParticipantUnitAmounts(
-        amount,
-        shares,
-      );
+      const amountsByParticipantId = calculateParticipantUnitAmounts(amount, shares);
 
       // Set the exact value to the calculated participant's amount
       newShares[participant.id] = {
@@ -726,10 +672,7 @@ function ParticipantSplitAmountField({
   onChange,
   "aria-label": ariaLabel,
 }: ParticipantSplitAmountFieldProps) {
-  const amountsByParticipantId = calculateParticipantUnitAmounts(
-    amount,
-    shares,
-  );
+  const amountsByParticipantId = calculateParticipantUnitAmounts(amount, shares);
   const participantAmount = amountsByParticipantId[participantId];
 
   return (
@@ -778,10 +721,7 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
   }
 
   const unitAmounts = calculateParticipantUnitAmounts(amount, shares);
-  const totalUnitAmount = Object.values(unitAmounts).reduce(
-    (sum, amount) => sum + amount,
-    0,
-  );
+  const totalUnitAmount = Object.values(unitAmounts).reduce((sum, amount) => sum + amount, 0);
   const showWarning = totalUnitAmount - convertToUnits(amount) !== 0;
   const currency = party.currency;
   const totalAmount = totalUnitAmount / 100;
@@ -849,9 +789,7 @@ function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
             key={photoId}
             photoId={photoId}
             onRemove={() => {
-              onChange((prevPhotos) =>
-                prevPhotos.filter((current) => current !== photoId),
-              );
+              onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
             }}
             onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
           />
@@ -881,11 +819,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
     try {
       const photoIds = await Promise.all(
         Array.from(event.target.files ?? []).map(async (blob) => {
-          const [mediaFileId] = await createMediaFile(
-            blob,
-            {},
-            compressionPresets.balanced,
-          );
+          const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
           return mediaFileId;
         }),
       );
@@ -895,13 +829,9 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       toast.dismiss(toastId);
     } catch (error) {
       logger.error("Failed to upload expense attachment", { error });
-      toast.error(
-        getImageUploadErrorMessage(error) ??
-          t`Failed to upload, please try again`,
-        {
-          id: toastId,
-        },
-      );
+      toast.error(getImageUploadErrorMessage(error) ?? t`Failed to upload, please try again`, {
+        id: toastId,
+      });
     }
 
     // Reset the input value to allow the user to add more photos
@@ -999,11 +929,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
         className="absolute -right-2 -top-2 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
       >
-        <Icon
-          icon="lucide.x"
-          className="h-4 w-4"
-          aria-label={t`Remove photo`}
-        />
+        <Icon icon="lucide.x" className="h-4 w-4" aria-label={t`Remove photo`} />
       </Button>
     </div>
   );

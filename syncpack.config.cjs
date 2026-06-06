@@ -1,6 +1,5 @@
 /** @type {import("syncpack").RcFile} */
 const config = {
-  customTypes: [],
   dependencyTypes: [
     "dev",
     "nodeEngine",

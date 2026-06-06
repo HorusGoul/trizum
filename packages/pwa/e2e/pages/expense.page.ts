@@ -9,8 +9,6 @@ export class ExpensePage {
 
   async expectLoaded(expenseName: string) {
     await expect(this.page).toHaveURL(/\/party\/[^/]+\/expense\/[^/]+(?:\?.*)?$/);
-    await expect(
-      this.page.getByRole("heading", { name: expenseName }),
-    ).toBeVisible();
+    await expect(this.page.getByRole("heading", { name: expenseName })).toBeVisible();
   }
 }

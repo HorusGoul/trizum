@@ -1,11 +1,7 @@
 import type { Database } from "#src/db.ts";
 import { CURRENT_TIMESTAMP } from "#src/db/columns.helpers.ts";
 import { automergeKV } from "#src/db/schema.ts";
-import type {
-  Chunk,
-  StorageAdapterInterface,
-  StorageKey,
-} from "@automerge/automerge-repo/slim";
+import type { Chunk, StorageAdapterInterface, StorageKey } from "@automerge/automerge-repo/slim";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -64,9 +60,7 @@ export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
   async removeRange(keyPrefix: StorageKey): Promise<void> {
     const dbKey = storageKeyToDbKey(keyPrefix);
 
-    await this.db
-      .delete(automergeKV)
-      .where(sql`${automergeKV.key} GLOB ${`${dbKey}*`}`);
+    await this.db.delete(automergeKV).where(sql`${automergeKV.key} GLOB ${`${dbKey}*`}`);
   }
 }
 
@@ -78,10 +72,7 @@ function dbKeyToStorageKey(key: string): StorageKey {
   return key.split(".");
 }
 
-export type AutomergeDocumentChunkType =
-  | "snapshot"
-  | "incremental"
-  | "sync-state";
+export type AutomergeDocumentChunkType = "snapshot" | "incremental" | "sync-state";
 export type AutomergeDocumentKey = [string, AutomergeDocumentChunkType, string];
 
 const AutomergeDocumentKeySchema = z.tuple([
@@ -95,11 +86,7 @@ function isAutomergeDocumentKey(key: StorageKey): key is AutomergeDocumentKey {
 }
 
 function bufferToUint8Array(buf: Buffer): Uint8Array {
-  return new Uint8Array(
-    buf.buffer,
-    buf.byteOffset,
-    buf.length / Uint8Array.BYTES_PER_ELEMENT,
-  );
+  return new Uint8Array(buf.buffer, buf.byteOffset, buf.length / Uint8Array.BYTES_PER_ELEMENT);
 }
 
 function uint8ArrayToBuffer(arr: Uint8Array): Buffer {

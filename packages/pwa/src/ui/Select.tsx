@@ -16,12 +16,7 @@ import {
 import { cn } from "./utils";
 
 import { FieldError, Label } from "./fields/Field";
-import {
-  ListBoxCollection,
-  ListBoxHeader,
-  ListBoxItem,
-  ListBoxSection,
-} from "./ListBox";
+import { ListBoxCollection, ListBoxHeader, ListBoxItem, ListBoxSection } from "./ListBox";
 import { Popover } from "./Popover";
 import { Icon } from "./Icon";
 
@@ -35,10 +30,7 @@ const SelectSection = ListBoxSection;
 
 const SelectCollection = ListBoxCollection;
 
-const SelectValue = <T extends object>({
-  className,
-  ...props
-}: AriaSelectValueProps<T>) => (
+const SelectValue = <T extends object>({ className, ...props }: AriaSelectValueProps<T>) => (
   <AriaSelectValue
     className={composeRenderProps(className, (className) =>
       cn(
@@ -79,17 +71,12 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
 
 const SelectPopover = ({ className, ...props }: AriaPopoverProps) => (
   <Popover
-    className={composeRenderProps(className, (className) =>
-      cn("w-[--trigger-width]", className),
-    )}
+    className={composeRenderProps(className, (className) => cn("w-[--trigger-width]", className))}
     {...props}
   />
 );
 
-const SelectListBox = <T extends object>({
-  className,
-  ...props
-}: AriaListBoxProps<T>) => (
+const SelectListBox = <T extends object>({ className, ...props }: AriaListBoxProps<T>) => (
   <AriaListBox
     className={composeRenderProps(className, (className) =>
       cn(
@@ -101,8 +88,7 @@ const SelectListBox = <T extends object>({
   />
 );
 
-interface AppSelectProps<T extends object>
-  extends Omit<AriaSelectProps<T>, "children"> {
+interface AppSelectProps<T extends object> extends Omit<AriaSelectProps<T>, "children"> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: AriaValidationResult) => string);
@@ -131,10 +117,7 @@ function AppSelect<T extends object>({
         <SelectValue />
       </SelectTrigger>
       {description && (
-        <Text
-          className="text-sm text-accent-950 dark:text-accent-50"
-          slot="description"
-        >
+        <Text className="text-sm text-accent-950 dark:text-accent-50" slot="description">
           {description}
         </Text>
       )}

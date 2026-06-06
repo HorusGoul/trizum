@@ -87,4 +87,3 @@ body:
       label: Additional Context
       description: Any other context about the problem (e.g., does it happen offline? after a specific action?)
       placeholder: Add any other context...
-

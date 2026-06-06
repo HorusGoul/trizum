@@ -100,13 +100,7 @@ function Who() {
 
         <div className="flex-1" />
 
-        <form.Subscribe
-          selector={(state) => [
-            state.canSubmit,
-            state.isSubmitting,
-            state.isDirty,
-          ]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}>
           {([canSubmit, isSubmitting, isDirty]) =>
             canSubmit && isDirty ? (
               <Suspense fallback={null}>
@@ -134,14 +128,13 @@ function Who() {
         <p className="whitespace-pre-wrap px-2">
           {needsToJoin ? (
             <Trans>
-              To join the <span className="font-medium">{partyName}</span>,
-              please select who you are so that we can show you the expenses and
-              stats that matter to you.
+              To join the <span className="font-medium">{partyName}</span>, please select who you
+              are so that we can show you the expenses and stats that matter to you.
             </Trans>
           ) : (
             <Trans>
-              Update who you are in this party so that we can show you the
-              expenses and stats that matter to you.
+              Update who you are in this party so that we can show you the expenses and stats that
+              matter to you.
             </Trans>
           )}
         </p>
@@ -161,28 +154,17 @@ function Who() {
                   className={({ isFocusVisible, isSelected, isPressed }) =>
                     cn(
                       "group relative flex cursor-default rounded-xl bg-clip-padding px-4 py-3 shadow-lg outline-none",
-                      isFocusVisible &&
-                        "ring-2 ring-accent-600 ring-offset-1 ring-offset-white/80",
-                      isSelected
-                        ? "bg-accent-600 text-white"
-                        : "border-transparent",
-                      isPressed && !isSelected
-                        ? "bg-accent-50 dark:bg-accent-800"
-                        : "",
-                      !isSelected && !isPressed
-                        ? "bg-accent-50 dark:bg-accent-900"
-                        : "",
+                      isFocusVisible && "ring-2 ring-accent-600 ring-offset-1 ring-offset-white/80",
+                      isSelected ? "bg-accent-600 text-white" : "border-transparent",
+                      isPressed && !isSelected ? "bg-accent-50 dark:bg-accent-800" : "",
+                      !isSelected && !isPressed ? "bg-accent-50 dark:bg-accent-900" : "",
                     )
                   }
                 >
                   {({ isSelected }) => (
                     <div className="flex w-full items-center justify-between gap-3">
                       <div className="flex shrink-0 items-center">
-                        <Icon
-                          icon={
-                            isSelected ? "lucide.circle-check" : "lucide.circle"
-                          }
-                        />
+                        <Icon icon={isSelected ? "lucide.circle-check" : "lucide.circle"} />
                       </div>
                       <div className="flex flex-1 flex-col">
                         <div className="text-accent-10 text-lg font-semibold">

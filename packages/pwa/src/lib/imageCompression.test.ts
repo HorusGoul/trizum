@@ -1,9 +1,5 @@
-import { describe, expect, test } from "vitest";
-import {
-  imageUploadAccept,
-  isHeicImageFile,
-  isSupportedImageFile,
-} from "./imageCompression";
+import { describe, expect, test } from "vite-plus/test";
+import { imageUploadAccept, isHeicImageFile, isSupportedImageFile } from "./imageCompression";
 
 describe("image upload helpers", () => {
   test("detects HEIC and HEIF files from MIME type or extension", () => {

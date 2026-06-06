@@ -23,18 +23,10 @@ test.describe("Expense log", () => {
 
     const partyPage = new PartyPage(page);
     const expenseDetailPage = new ExpenseDetailPage(page);
-    const seededAmountText = formatAmountText(
-      expenseLogJourney.seededExpenseAmountCents / 100,
-    );
-    const newestTitle = createExpenseLogTitle(
-      expenseLogJourney.expenseCount - 1,
-    );
-    const secondNewestTitle = createExpenseLogTitle(
-      expenseLogJourney.expenseCount - 2,
-    );
-    const thirdNewestTitle = createExpenseLogTitle(
-      expenseLogJourney.expenseCount - 3,
-    );
+    const seededAmountText = formatAmountText(expenseLogJourney.seededExpenseAmountCents / 100);
+    const newestTitle = createExpenseLogTitle(expenseLogJourney.expenseCount - 1);
+    const secondNewestTitle = createExpenseLogTitle(expenseLogJourney.expenseCount - 2);
+    const thirdNewestTitle = createExpenseLogTitle(expenseLogJourney.expenseCount - 3);
     const oldestTitle = createExpenseLogTitle(0);
 
     const seededParty =
@@ -61,18 +53,11 @@ test.describe("Expense log", () => {
 
     await test.step("open the oldest expense from the log", async () => {
       await partyPage.openExpenseInLog(oldestTitle);
-      await expenseDetailPage.expectLoaded(
-        seededParty.partyId,
-        oldestTitle,
-        seededAmountText,
-      );
+      await expenseDetailPage.expectLoaded(seededParty.partyId, oldestTitle, seededAmountText);
     });
   });
 
-  test("returns a newly added expense to the top of the log", async ({
-    harness,
-    page,
-  }) => {
+  test("returns a newly added expense to the top of the log", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
     const expenseEditorPage = new ExpenseEditorPage(page);
     const expenseDetailPage = new ExpenseDetailPage(page);
@@ -112,10 +97,7 @@ test.describe("Expense log", () => {
         createExpenseLogTitle(1),
         createExpenseLogTitle(0),
       ]);
-      await partyPage.expectExpenseInLog(
-        expenseLogJourney.newExpenseTitle,
-        expectedAmountText,
-      );
+      await partyPage.expectExpenseInLog(expenseLogJourney.newExpenseTitle, expectedAmountText);
     });
   });
 });

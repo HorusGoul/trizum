@@ -1,5 +1,5 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
 
 const addExpenseToPartyMock = vi.fn();
@@ -78,9 +78,7 @@ function createMockRepo() {
   };
 }
 
-function createMigrationData(
-  partyOverrides: Partial<MigrationData["party"]> = {},
-): MigrationData {
+function createMigrationData(partyOverrides: Partial<MigrationData["party"]> = {}): MigrationData {
   return {
     party: {
       type: "party",

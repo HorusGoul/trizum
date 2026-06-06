@@ -1,8 +1,4 @@
-import {
-  isValidDocumentId,
-  type Repo,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
+import { isValidDocumentId, type Repo, type DocumentId } from "@automerge/automerge-repo/slim";
 import type { SupportedLocale } from "#src/lib/i18n.js";
 import type { Party, PartyParticipant } from "./party";
 

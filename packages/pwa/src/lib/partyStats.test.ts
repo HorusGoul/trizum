@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "vite-plus/test";
 import type { Expense } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
 import {
@@ -83,9 +83,7 @@ describe("calculatePartyStats", () => {
     });
     expect(currentMonth.totalSpent).toBe(100);
     expect(currentMonth.totalExpenseCount).toBe(1);
-    expect(
-      currentMonth.ranking.map((participant) => participant.participantId),
-    ).toEqual(["alice"]);
+    expect(currentMonth.ranking.map((participant) => participant.participantId)).toEqual(["alice"]);
 
     const currentYear = calculatePartyStats({
       expenses,
@@ -134,9 +132,7 @@ describe("calculatePartyStats", () => {
 
     expect(stats.totalSpent).toBe(350);
     expect(stats.totalExpenseCount).toBe(2);
-    expect(
-      stats.ranking.map((participant) => participant.participantId),
-    ).toEqual(["bob", "alice"]);
+    expect(stats.ranking.map((participant) => participant.participantId)).toEqual(["bob", "alice"]);
   });
 
   test("lists the available past years and tracked bounds", () => {

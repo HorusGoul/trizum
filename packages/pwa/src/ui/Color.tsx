@@ -33,18 +33,12 @@ const ColorPicker = AriaColorPicker;
 
 const SliderOutput = AriaSliderOutput;
 
-interface ColorWheelProps
-  extends Omit<AriaColorWheelProps, "outerRadius" | "innerRadius"> {
+interface ColorWheelProps extends Omit<AriaColorWheelProps, "outerRadius" | "innerRadius"> {
   outerRadius?: number;
   innerRadius?: number;
 }
 
-function ColorWheel({
-  className,
-  outerRadius = 100,
-  innerRadius = 74,
-  ...props
-}: ColorWheelProps) {
+function ColorWheel({ className, outerRadius = 100, innerRadius = 74, ...props }: ColorWheelProps) {
   return (
     <AriaColorWheel
       innerRadius={innerRadius}
@@ -59,10 +53,7 @@ function ColorArea({ className, ...props }: AriaColorAreaProps) {
   return (
     <AriaColorArea
       className={composeRenderProps(className, (className) =>
-        cn(
-          "border-border size-[192px] shrink-0 rounded-md border shadow-md",
-          className,
-        ),
+        cn("border-border size-[192px] shrink-0 rounded-md border shadow-md", className),
       )}
       {...props}
     />
@@ -96,10 +87,7 @@ function ColorThumb({ className, ...props }: AriaColorThumbProps) {
   );
 }
 
-function ColorSwatchPicker({
-  className,
-  ...props
-}: AriaColorSwatchPickerProps) {
+function ColorSwatchPicker({ className, ...props }: AriaColorSwatchPickerProps) {
   return (
     <AriaColorSwatchPicker
       className={composeRenderProps(className, (className) =>
@@ -110,10 +98,7 @@ function ColorSwatchPicker({
   );
 }
 
-function ColorSwatchPickerItem({
-  className,
-  ...props
-}: AriaColorSwatchPickerItemProps) {
+function ColorSwatchPickerItem({ className, ...props }: AriaColorSwatchPickerItemProps) {
   return (
     <AriaColorSwatchPickerItem
       className={composeRenderProps(className, (className) =>
@@ -136,9 +121,7 @@ function ColorSwatchPickerItem({
 function ColorSwatch({ className, ...props }: AriaColorSwatchProps) {
   return (
     <AriaColorSwatch
-      className={composeRenderProps(className, (className) =>
-        cn("size-8", className),
-      )}
+      className={composeRenderProps(className, (className) => cn("size-8", className))}
       {...props}
     />
   );

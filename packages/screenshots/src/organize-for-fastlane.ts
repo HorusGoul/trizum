@@ -70,12 +70,7 @@ const ANDROID_DEVICE_MAPPING: Record<string, string[] | null> = {
 };
 
 // Order of screenshots (determines the index in filename)
-const SCREENSHOT_ORDER = [
-  "balances",
-  "expense-log",
-  "expense-details",
-  "expense-editor",
-];
+const SCREENSHOT_ORDER = ["balances", "expense-log", "expense-details", "expense-editor"];
 
 interface Options {
   platform: Platform;
@@ -104,9 +99,7 @@ function parseOptions(): Options {
 
   if (!values.output) {
     logger.error("Missing required --output argument");
-    logger.error(
-      "Usage: pnpm organize:fastlane --platform <ios|android> --output <path>",
-    );
+    logger.error("Usage: vp run organize:fastlane --platform <ios|android> --output <path>");
     process.exit(1);
   }
 
@@ -123,10 +116,7 @@ function parseOptions(): Options {
   };
 }
 
-async function getScreenshotFiles(
-  locale: string,
-  device: string,
-): Promise<string[]> {
+async function getScreenshotFiles(locale: string, device: string): Promise<string[]> {
   const deviceDir = path.join(SCREENSHOTS_DIR, locale, device);
 
   try {
@@ -144,10 +134,7 @@ function getScreenshotIndex(filename: string): number {
   return index === -1 ? 999 : index;
 }
 
-async function organizeForIOS(
-  outputDir: string,
-  locales: string[],
-): Promise<void> {
+async function organizeForIOS(outputDir: string, locales: string[]): Promise<void> {
   for (const locale of locales) {
     const appStoreLocales = IOS_LOCALE_MAPPING[locale];
     if (!appStoreLocales) {
@@ -214,10 +201,7 @@ async function organizeForIOS(
   }
 }
 
-async function organizeForAndroid(
-  outputDir: string,
-  locales: string[],
-): Promise<void> {
+async function organizeForAndroid(outputDir: string, locales: string[]): Promise<void> {
   for (const locale of locales) {
     const playStoreLocales = ANDROID_LOCALE_MAPPING[locale];
     if (!playStoreLocales) {

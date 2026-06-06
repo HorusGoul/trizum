@@ -1,11 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import {
-  DEFAULT_PARTY_SYMBOL,
-  type Party,
-  type PartyParticipant,
-} from "#src/models/party.js";
+import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
@@ -64,16 +60,13 @@ function New() {
       symbol: values.symbol,
       description: values.description,
       currency: values.currency,
-      participants: participants.reduce<Party["participants"]>(
-        (result, next) => {
-          result[next.id] = {
-            id: next.id,
-            name: next.name,
-          };
-          return result;
-        },
-        {},
-      ),
+      participants: participants.reduce<Party["participants"]>((result, next) => {
+        result[next.id] = {
+          id: next.id,
+          name: next.name,
+        };
+        return result;
+      }, {}),
       chunkRefs: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
@@ -126,8 +119,7 @@ function New() {
       return;
     }
 
-    const newParticipantName =
-      addParticipantForm.getFieldValue("newParticipantName");
+    const newParticipantName = addParticipantForm.getFieldValue("newParticipantName");
 
     form.pushFieldValue("participants", {
       name: newParticipantName,
@@ -147,9 +139,7 @@ function New() {
 
         <div className="flex-1" />
 
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) =>
             canSubmit ? (
               <Suspense fallback={null}>
@@ -192,10 +182,7 @@ function New() {
                 onChange={field.handleChange}
                 onBlur={field.handleBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
                 className="flex-1"
               />
             )}
@@ -214,10 +201,7 @@ function New() {
                 value={field.state.value}
                 onChange={field.handleChange}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
               />
             )}
           </form.Field>
@@ -240,10 +224,7 @@ function New() {
               onChange={field.handleChange}
               onBlur={field.handleBlur}
               errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
+              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             />
           )}
         </form.Field>
@@ -276,9 +257,7 @@ function New() {
           </h2>
 
           <p className="mt-2">
-            <Trans>
-              Who is invited to this party? You can add more participants later.
-            </Trans>
+            <Trans>Who is invited to this party? You can add more participants later.</Trans>
           </p>
 
           <form.Field
@@ -305,8 +284,7 @@ function New() {
                     <form.Field
                       name={`participants[${index}].name`}
                       validators={{
-                        onChange: ({ value }) =>
-                          validatePartyParticipantName(value),
+                        onChange: ({ value }) => validatePartyParticipantName(value),
                       }}
                     >
                       {(field) => (
@@ -319,8 +297,7 @@ function New() {
                           className="w-full"
                           errorMessage={field.state.meta.errors?.join(", ")}
                           isInvalid={
-                            field.state.meta.isTouched &&
-                            field.state.meta.errors?.length > 0
+                            field.state.meta.isTouched && field.state.meta.errors?.length > 0
                           }
                         />
                       )}
@@ -339,8 +316,7 @@ function New() {
                   <addParticipantForm.Field
                     name="newParticipantName"
                     validators={{
-                      onSubmit: ({ value }) =>
-                        validatePartyParticipantName(value),
+                      onSubmit: ({ value }) => validatePartyParticipantName(value),
                     }}
                   >
                     {(field) => (
@@ -353,8 +329,7 @@ function New() {
                         className="w-full"
                         errorMessage={field.state.meta.errors?.join(", ")}
                         isInvalid={
-                          field.state.meta.isTouched &&
-                          field.state.meta.errors?.length > 0
+                          field.state.meta.isTouched && field.state.meta.errors?.length > 0
                         }
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {

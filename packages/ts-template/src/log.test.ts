@@ -1,14 +1,10 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "vite-plus/test";
 import { configureTemplateLogging, getLogger, rootLogger } from "./log.js";
 
 describe("@trizum/ts-template logging", () => {
   test("creates package-scoped loggers", () => {
     expect(rootLogger.category).toEqual(["trizum", "ts-template"]);
-    expect(getLogger("feature").category).toEqual([
-      "trizum",
-      "ts-template",
-      "feature",
-    ]);
+    expect(getLogger("feature").category).toEqual(["trizum", "ts-template", "feature"]);
   });
 
   test("configures template logging through the shared facade", () => {

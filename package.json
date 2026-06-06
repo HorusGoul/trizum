@@ -1,27 +1,28 @@
 {
   "name": "root",
   "version": "0.0.0",
-  "license": "MIT",
   "private": true,
+  "license": "MIT",
   "author": "Horus Lugo <hola@horus.dev>",
   "scripts": {
     "agent-browser": "agent-browser",
     "agent-browser:install": "agent-browser install",
-    "browserslist:update-db": "pnpm dlx update-browserslist-db@latest",
-    "build": "turbo run build",
-    "lingui:extract": "turbo run lingui:extract",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix",
-    "publish-packages": "changeset publish",
-    "test:e2e": "turbo run test:e2e",
-    "update-version": "changeset version && cd packages/mobile && pnpm version:update",
-    "syncpack:fix": "syncpack fix-mismatches && syncpack format",
-    "test": "turbo run test",
-    "test:coverage": "turbo run test:coverage",
-    "typecheck": "turbo run typecheck",
-    "generate:ts-template": "turbo gen workspace --copy @trizum/ts-template --type package",
-    "contributors:add": "all-contributors add",
-    "contributors:generate": "all-contributors generate"
+    "browserslist:update-db": "vp dlx update-browserslist-db@latest",
+    "build": "vp run -r --filter './packages/*' build",
+    "lingui:extract": "vp run --filter @trizum/pwa lingui:extract",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "publish-packages": "vp exec changeset publish",
+    "test:e2e": "vp run --filter @trizum/pwa test:e2e",
+    "update-version": "vp exec changeset version && cd packages/mobile && vp run version:update",
+    "syncpack:fix": "vp exec syncpack fix-mismatches && vp exec syncpack format",
+    "test": "vp test run",
+    "test:coverage": "vp test run --coverage",
+    "typecheck": "vp check --no-fmt --no-lint",
+    "generate:ts-template": "vp exec turbo gen workspace --copy @trizum/ts-template --type package",
+    "contributors:add": "vp exec all-contributors add",
+    "contributors:generate": "vp exec all-contributors generate",
+    "prepare": "vp config"
   },
   "dependencies": {
     "@changesets/cli": "2.29.8",
@@ -33,17 +34,16 @@
     "syncpack": "12.3.3",
     "turbo": "2.5.6"
   },
+  "devDependencies": {
+    "eslint": "9.39.1",
+    "eslint-plugin-lingui": "0.11.0",
+    "vite-plus": "catalog:"
+  },
   "engines": {
     "node": "^24"
   },
   "packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99447b7c3bf7a73286afaaf6be99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316",
   "pnpm": {
-    "overrides": {
-      "react": "0.0.0-experimental-d025ddd3-20240722",
-      "react-dom": "0.0.0-experimental-d025ddd3-20240722",
-      "@types/react": "npm:types-react@rc",
-      "@types/react-dom": "npm:types-react-dom@rc"
-    },
     "onlyBuiltDependencies": [
       "agent-browser",
       "@sentry-internal/node-cpu-profiler",

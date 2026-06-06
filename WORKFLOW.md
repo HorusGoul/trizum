@@ -68,17 +68,18 @@ Instructions:
 ## Required repo context
 
 - Follow [AGENTS.md](./AGENTS.md) plus any closer nested `AGENTS.md` files for touched paths.
-- This is a `pnpm` monorepo. The main app is under `packages/pwa`.
+- This is a Vite+ monorepo. The main app is under `packages/pwa`.
 - User-facing strings must use Lingui.
 - User-facing changes require a changeset.
-- Before every commit, run `pnpm lingui:extract`.
+- Before every commit that changes user-facing copy, run
+  `vp run lingui:extract`.
 - Do not rely on interactive prompts during unattended runs. If a user-facing
   change needs a changeset, create the `.changeset/*.md` file directly.
 - Before moving an issue to `Human Review`, the required validation gates are:
   - local repo gate:
-    - `pnpm lint`
-    - `pnpm typecheck`
-    - `pnpm test`
+    - `vp check`
+    - `vp test`
+    - `vp build`
   - PR gate: `gh pr checks` for the current PR must be passing after the latest push.
 
 ## Related skills
@@ -156,9 +157,9 @@ Required workpad structure:
 ### Validation
 
 - [ ] targeted check: `<command>`
-- [ ] repo gate: `pnpm lint`
-- [ ] repo gate: `pnpm typecheck`
-- [ ] repo gate: `pnpm test`
+- [ ] repo gate: `vp check`
+- [ ] repo gate: `vp test`
+- [ ] repo gate: `vp build`
 - [ ] PR gate: `gh pr checks`
 
 ### Notes
@@ -189,7 +190,7 @@ Required workpad structure:
 3. If you touch UI or user-facing behavior, add a concrete walkthrough acceptance criterion.
 4. If you add or change user-facing copy:
    - use Lingui macros,
-   - run `pnpm lingui:extract`,
+   - run `vp run lingui:extract`,
    - update the workpad to show that it was done.
 5. If the change is user-facing, add a changeset before handoff.
 6. Never leave completed work unchecked in the workpad.
@@ -203,9 +204,9 @@ When the issue has an attached PR:
    login(s), Codex reviews, and actionable bot feedback as blocking until either:
    - code/docs/tests were updated, or
    - a justified pushback reply was posted.
-   Informational bot comments that do not require a change or substantive reply
-   (for example changeset-bot reminders on internal-only PRs or deploy status
-   updates) are non-blocking and should not receive rote acknowledgement replies.
+     Informational bot comments that do not require a change or substantive reply
+     (for example changeset-bot reminders on internal-only PRs or deploy status
+     updates) are non-blocking and should not receive rote acknowledgement replies.
 3. Reflect each feedback item in the workpad plan or notes.
 4. Re-run validation after feedback-driven changes.
 5. Repeat until no actionable comments remain.
@@ -213,7 +214,7 @@ When the issue has an attached PR:
 ## Step 4: Publish and hand off
 
 1. Before every push:
-   - run `pnpm lingui:extract`,
+   - run `vp run lingui:extract`,
    - run the required validation gate,
    - confirm any needed changeset exists.
 2. Use the `push` skill to publish the branch and create or update the PR.

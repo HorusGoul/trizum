@@ -8,11 +8,7 @@ import {
   isHeicImageFile,
   isSupportedImageFile,
 } from "#src/lib/imageCompression.ts";
-import {
-  type Repo,
-  RawString,
-  type DocumentId,
-} from "@automerge/automerge-repo";
+import { type Repo, RawString, type DocumentId } from "@automerge/automerge-repo";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getLogger } from "#src/lib/log.ts";
 
@@ -36,9 +32,7 @@ export function getImageUploadErrorMessage(error: unknown): string | null {
 }
 
 function omitUndefinedMetadataValues(metadata: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(metadata).filter(([, value]) => value !== undefined),
-  );
+  return Object.fromEntries(Object.entries(metadata).filter(([, value]) => value !== undefined));
 }
 
 export function getMediaFileHelpers(repo: Repo) {
@@ -52,10 +46,7 @@ export function getMediaFileHelpers(repo: Repo) {
 
     // Check if the blob is an image file or a HEIC/HEIF upload.
     if (isSupportedImageFile(blob)) {
-      const file =
-        blob instanceof File
-          ? blob
-          : new File([blob], "image", { type: blob.type });
+      const file = blob instanceof File ? blob : new File([blob], "image", { type: blob.type });
 
       try {
         // Process the image with compression

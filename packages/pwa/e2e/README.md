@@ -50,8 +50,8 @@ setup and reusable journey state.
 
 ## Validation
 
-- `pnpm --filter @trizum/pwa test:e2e:install` installs the local browser set.
-- `pnpm --filter @trizum/pwa test:e2e:install:ci` installs the CI browser set
+- `vp run --filter @trizum/pwa test:e2e:install` installs the local browser set.
+- `vp run --filter @trizum/pwa test:e2e:install:ci` installs the CI browser set
   with system dependencies and the smaller Chromium headless shell.
-- `pnpm --filter @trizum/pwa test:e2e -- e2e/harness.spec.ts`
-- `pnpm --filter @trizum/pwa test:e2e -- e2e/smoke.spec.ts`
+- `vp run --filter @trizum/pwa test:e2e -- e2e/harness.spec.ts`
+- `vp run --filter @trizum/pwa test:e2e -- e2e/smoke.spec.ts`

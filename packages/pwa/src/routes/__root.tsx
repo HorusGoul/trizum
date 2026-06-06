@@ -1,9 +1,5 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
-import {
-  createRootRouteWithContext,
-  Outlet,
-  useRouter,
-} from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet, useRouter } from "@tanstack/react-router";
 import * as React from "react";
 import { RouterProvider } from "react-aria-components";
 

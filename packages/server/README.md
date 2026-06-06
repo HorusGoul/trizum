@@ -25,6 +25,6 @@ touches server runtime, database, or deployment concerns.
 
 Run the package scripts defined in [`package.json`](./package.json):
 
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm dev` or `pnpm start` when validating runtime behavior
+- `vp run lint`
+- `vp run typecheck`
+- `vp run dev` or `vp run start` when validating runtime behavior

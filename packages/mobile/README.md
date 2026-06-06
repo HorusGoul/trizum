@@ -11,9 +11,7 @@ This package wraps the PWA (`@trizum/pwa`) as a native mobile application using 
 
 ## Prerequisites
 
-- **Node.js** version from the repo root [`.nvmrc`](../../.nvmrc) (use
-  `nvm use` in the repo root)
-- **pnpm** version from the root [`package.json`](../../package.json)
+- **Vite+ (`vp`)** for the repo-managed Node.js and package manager versions
 - **For iOS:**
   - macOS with Xcode 15+
   - CocoaPods (`gem install cocoapods`)
@@ -29,14 +27,14 @@ This package wraps the PWA (`@trizum/pwa`) as a native mobile application using 
 
 ```bash
 # From repo root
-pnpm install
+vp install
 
 # Build the PWA first
-pnpm turbo run build --filter=@trizum/pwa
+vp build
 
 # Sync Capacitor (copies web assets to native projects)
 cd packages/mobile
-pnpm build
+vp run build
 ```
 
 ### Development
@@ -53,22 +51,22 @@ DEV_URL=http://YOUR_LOCAL_IP:5173
 
 ```bash
 cd packages/pwa
-pnpm dev --host
+vp dev --host
 ```
 
 3. Run on device/simulator:
 
 ```bash
 cd packages/mobile
-pnpm dev:android  # For Android
-pnpm dev:ios      # For iOS
+vp run dev:android  # For Android
+vp run dev:ios      # For iOS
 ```
 
 ### Opening in IDEs
 
 ```bash
-pnpm open:android  # Opens in Android Studio
-pnpm open:ios      # Opens in Xcode
+vp run open:android  # Opens in Android Studio
+vp run open:ios      # Opens in Xcode
 ```
 
 ## Project Structure
@@ -410,7 +408,7 @@ For local development, just open the project in Xcode and ensure **"Automaticall
 To regenerate app icons and splash screens from source assets:
 
 ```bash
-pnpm assets:generate
+vp run assets:generate
 ```
 
 Source assets are in `packages/mobile/assets/`.

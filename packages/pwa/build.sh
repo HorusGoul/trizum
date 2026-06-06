@@ -5,7 +5,7 @@ set -euo pipefail
 export SENTRY_ORG="horusdev"
 export SENTRY_PROJECT="trizum-pwa"
 
-vite build
+vp build .
 
 sentry-cli sourcemaps inject ./dist/client
 
@@ -15,7 +15,7 @@ if [ -z "${SENTRY_AUTH_TOKEN:-}" ]; then
 fi
 
 # Get full version
-PWA_VERSION=$(pnpm pkg get version | xargs)
+PWA_VERSION=$(node -p "require('./package.json').version")
 LAST_COMMIT="$(git rev-parse --short HEAD)"
 FULL_VERSION="${PWA_VERSION}-${LAST_COMMIT}"
 

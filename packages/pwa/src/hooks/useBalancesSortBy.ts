@@ -8,15 +8,11 @@ function isBalanceSortedBy(sortedBy: string): sortedBy is BalancesSortedBy {
   return ["name", "balance-ascending", "balance-descending"].includes(sortedBy);
 }
 
-export function useBalancesSortedBy(): [
-  BalancesSortedBy,
-  (sorted: BalancesSortedBy) => void,
-] {
+export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSortedBy) => void] {
   const { setParticipantDetails } = useCurrentParty();
   const participant = useCurrentParticipant();
   const sortedBy =
-    participant.balancesSortedBy &&
-    isBalanceSortedBy(participant.balancesSortedBy)
+    participant.balancesSortedBy && isBalanceSortedBy(participant.balancesSortedBy)
       ? participant.balancesSortedBy
       : defaultBalancesSortedBy;
 

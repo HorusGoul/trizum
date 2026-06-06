@@ -53,8 +53,7 @@ async function main() {
         method: c.req.method,
         url: c.req.url,
         userAgent: c.req.header("User-Agent"),
-        ipAddress:
-          c.req.header("CF-Connecting-IP") || c.req.header("X-Forwarded-For"),
+        ipAddress: c.req.header("CF-Connecting-IP") || c.req.header("X-Forwarded-For"),
       },
       async () => {
         logger.info("Request started", {

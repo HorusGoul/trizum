@@ -7,8 +7,8 @@ and owned close to the code it describes.
 ## Principles
 
 - Executable metadata beats prose. Tool versions and runnable commands belong in
-  [`.nvmrc`](../.nvmrc) and [`package.json`](../package.json), not in narrative
-  docs.
+  [`.node-version`](../.node-version), [`package.json`](../package.json), and
+  [`vite.config.ts`](../vite.config.ts), not in narrative docs.
 - The root guide should route, not explain everything. Package and domain docs
   should hold the details that change with the code.
 - Narrow docs beat monoliths. If a rule only matters for one package or one
@@ -18,21 +18,21 @@ and owned close to the code it describes.
 
 ## Canonical Surfaces
 
-| Surface                                                                | Canonical for                                                                   | Owner                   | Freshness expectation                                                                   |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
-| [`/AGENTS.md`](../AGENTS.md)                                           | Repo entry point, repo-wide workflow, and routing to deeper sources             | Repo maintainer         | Update in the same PR when repo-wide workflow, package entry points, or routing changes |
-| [`/docs/agent-knowledge-map.md`](./agent-knowledge-map.md)             | Source-of-truth map for agent-facing surfaces and ownership model               | Repo maintainer         | Update in the same PR when a surface is added, removed, or re-scoped                    |
-| [`/docs/logging.md`](./logging.md)                                     | Repo-wide logging policy, severity guidance, and redaction expectations         | Repo maintainer         | Update in the same PR as repo-wide logging policy or observability expectations change  |
-| [`/docs/package-authoring.md`](./package-authoring.md)                 | Standard workflow and defaults for authoring new workspace packages             | Repo maintainer         | Update in the same PR as new-package conventions or template defaults change            |
-| [`/.nvmrc`](../.nvmrc) and [`/package.json`](../package.json)          | Node version, package manager version, and workspace-level commands             | Workspace maintainer    | Update in the same PR as toolchain or root script changes                               |
-| [`/packages/*/package.json`](../packages)                              | Package-local scripts and executable package metadata                           | Package maintainer      | Update in the same PR as script or runtime changes                                      |
-| [`/packages/pwa/README.md`](../packages/pwa/README.md)                 | Main app package map, PWA-specific validation, and where common app work lives  | PWA maintainer          | Update in the same PR as package structure or workflow changes                          |
-| [`/packages/pwa/e2e/README.md`](../packages/pwa/e2e/README.md)         | Browser journey harness strategy, seeded-state conventions, and E2E setup seams | PWA maintainer          | Update in the same PR as the Playwright harness shape or setup strategy changes         |
-| [`/packages/pwa/locale/AGENTS.md`](../packages/pwa/locale/AGENTS.md)   | Translation terminology and locale-specific guardrails                          | Localization maintainer | Update in the same PR as translation rules or product terminology changes               |
-| [`/packages/mobile/README.md`](../packages/mobile/README.md)           | Native wrapper workflow and package-specific operational details                | Mobile maintainer       | Update in the same PR as mobile setup or release workflow changes                       |
-| [`/packages/server/README.md`](../packages/server/README.md)           | Sync server architecture, runbook entry points, and package-specific validation | Server maintainer       | Update in the same PR as server structure, run flow, or deployment assumptions change   |
-| [`/packages/screenshots/README.md`](../packages/screenshots/README.md) | Store-screenshot workflow and Fastlane handoff details                          | Release maintainer      | Update in the same PR as screenshot capture or organization flow changes                |
-| [`/.agents/skills/*/SKILL.md`](../.agents/skills)                      | Named, reusable workflows with tool-specific procedures                         | Skill owner             | Update in the same PR as the workflow, tools, or assumptions change                     |
+| Surface                                                                                                              | Canonical for                                                                     | Owner                   | Freshness expectation                                                                   |
+| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
+| [`/AGENTS.md`](../AGENTS.md)                                                                                         | Repo entry point, repo-wide workflow, and routing to deeper sources               | Repo maintainer         | Update in the same PR when repo-wide workflow, package entry points, or routing changes |
+| [`/docs/agent-knowledge-map.md`](./agent-knowledge-map.md)                                                           | Source-of-truth map for agent-facing surfaces and ownership model                 | Repo maintainer         | Update in the same PR when a surface is added, removed, or re-scoped                    |
+| [`/docs/logging.md`](./logging.md)                                                                                   | Repo-wide logging policy, severity guidance, and redaction expectations           | Repo maintainer         | Update in the same PR as repo-wide logging policy or observability expectations change  |
+| [`/docs/package-authoring.md`](./package-authoring.md)                                                               | Standard workflow and defaults for authoring new workspace packages               | Repo maintainer         | Update in the same PR as new-package conventions or template defaults change            |
+| [`/.node-version`](../.node-version), [`/package.json`](../package.json), and [`/vite.config.ts`](../vite.config.ts) | Node version, package manager version, Vite+ config, and workspace-level commands | Workspace maintainer    | Update in the same PR as toolchain or root script changes                               |
+| [`/packages/*/package.json`](../packages)                                                                            | Package-local scripts and executable package metadata                             | Package maintainer      | Update in the same PR as script or runtime changes                                      |
+| [`/packages/pwa/README.md`](../packages/pwa/README.md)                                                               | Main app package map, PWA-specific validation, and where common app work lives    | PWA maintainer          | Update in the same PR as package structure or workflow changes                          |
+| [`/packages/pwa/e2e/README.md`](../packages/pwa/e2e/README.md)                                                       | Browser journey harness strategy, seeded-state conventions, and E2E setup seams   | PWA maintainer          | Update in the same PR as the Playwright harness shape or setup strategy changes         |
+| [`/packages/pwa/locale/AGENTS.md`](../packages/pwa/locale/AGENTS.md)                                                 | Translation terminology and locale-specific guardrails                            | Localization maintainer | Update in the same PR as translation rules or product terminology changes               |
+| [`/packages/mobile/README.md`](../packages/mobile/README.md)                                                         | Native wrapper workflow and package-specific operational details                  | Mobile maintainer       | Update in the same PR as mobile setup or release workflow changes                       |
+| [`/packages/server/README.md`](../packages/server/README.md)                                                         | Sync server architecture, runbook entry points, and package-specific validation   | Server maintainer       | Update in the same PR as server structure, run flow, or deployment assumptions change   |
+| [`/packages/screenshots/README.md`](../packages/screenshots/README.md)                                               | Store-screenshot workflow and Fastlane handoff details                            | Release maintainer      | Update in the same PR as screenshot capture or organization flow changes                |
+| [`/.agents/skills/*/SKILL.md`](../.agents/skills)                                                                    | Named, reusable workflows with tool-specific procedures                           | Skill owner             | Update in the same PR as the workflow, tools, or assumptions change                     |
 
 Until the repo has formal code ownership, the maintainer who changes one of
 these surfaces in a PR is responsible for keeping its adjacent agent-facing docs
@@ -126,8 +126,9 @@ Use this progression:
 
 Examples in this repo:
 
-- Toolchain versions belong in [`.nvmrc`](../.nvmrc) and
-  [`package.json`](../package.json), not in `AGENTS.md`.
+- Toolchain versions belong in [`.node-version`](../.node-version),
+  [`package.json`](../package.json), and [`vite.config.ts`](../vite.config.ts),
+  not in `AGENTS.md`.
 - Changeset creation belongs in
   [`.agents/skills/creating-changesets/SKILL.md`](../.agents/skills/creating-changesets/SKILL.md)
   because the trigger is repo-wide and the workflow is ordered, repeatable, and

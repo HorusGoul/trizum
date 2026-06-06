@@ -85,10 +85,7 @@ function AppTextField({
       {label ? <Label>{label}</Label> : null}
       {textArea ? <TextArea /> : <Input />}
       {description && (
-        <Text
-          className="text-sm text-accent-700 dark:text-accent-50"
-          slot="description"
-        >
+        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
           {description}
         </Text>
       )}
@@ -124,10 +121,7 @@ function AppNumberField({
       {label ? <Label>{label}</Label> : null}
       <Input className={cn(inputClassName)} inputMode={inputMode} />
       {description && (
-        <Text
-          className="text-sm text-accent-700 dark:text-accent-50"
-          slot="description"
-        >
+        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
           {description}
         </Text>
       )}
@@ -136,8 +130,7 @@ function AppNumberField({
   );
 }
 
-interface AppCurrencyFieldProps
-  extends Omit<AriaTextFieldProps, "value" | "onChange"> {
+interface AppCurrencyFieldProps extends Omit<AriaTextFieldProps, "value" | "onChange"> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: AriaValidationResult) => string);
@@ -158,9 +151,7 @@ function AppCurrencyField({
   currency,
   ...props
 }: AppCurrencyFieldProps) {
-  const [internalValue, setInternalValue] = React.useState(
-    () => value?.toString() || "",
-  );
+  const [internalValue, setInternalValue] = React.useState(() => value?.toString() || "");
 
   const parsedInternalValue = parseFloat(internalValue || "0");
   const parsedValue = parseFloat(value?.toString() || "0");
@@ -218,31 +209,19 @@ function AppCurrencyField({
         if (lastDotIndex !== -1) {
           const decimalPart = withoutDots.substring(lastDotIndex + 1);
           if (decimalPart.length > decimalPrecision) {
-            withoutDots = withoutDots.substring(
-              0,
-              lastDotIndex + 1 + decimalPrecision,
-            );
+            withoutDots = withoutDots.substring(0, lastDotIndex + 1 + decimalPrecision);
           }
         }
 
         event.currentTarget.value = withoutDots;
 
         // Adjust selection positions
-        const newSelectionStart = Math.max(
-          0,
-          selectionStart - removedBeforeCursor,
-        );
+        const newSelectionStart = Math.max(0, selectionStart - removedBeforeCursor);
         const newSelectionEnd = Math.max(0, selectionEnd - removedBeforeCursor);
 
         // Ensure selection doesn't exceed the new value length
-        event.currentTarget.selectionStart = Math.min(
-          newSelectionStart,
-          withoutDots.length,
-        );
-        event.currentTarget.selectionEnd = Math.min(
-          newSelectionEnd,
-          withoutDots.length,
-        );
+        event.currentTarget.selectionStart = Math.min(newSelectionStart, withoutDots.length);
+        event.currentTarget.selectionEnd = Math.min(newSelectionEnd, withoutDots.length);
       }}
       onChange={(value) => {
         setInternalValue(value);
@@ -263,10 +242,7 @@ function AppCurrencyField({
       {label ? <Label>{label}</Label> : null}
       <Input inputMode="decimal" className={cn(inputClassName)} />
       {description && (
-        <Text
-          className="text-sm text-accent-700 dark:text-accent-50"
-          slot="description"
-        >
+        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
           {description}
         </Text>
       )}
@@ -275,12 +251,5 @@ function AppCurrencyField({
   );
 }
 
-export {
-  Input,
-  TextField,
-  AppTextField,
-  AppNumberField,
-  TextArea,
-  AppCurrencyField,
-};
+export { Input, TextField, AppTextField, AppNumberField, TextArea, AppCurrencyField };
 export type { AppTextFieldProps };

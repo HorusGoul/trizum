@@ -37,13 +37,7 @@ const STRING_LITERAL_REGEX = /(["'`])([^"'`\r\n]+)\1/g;
 const SVG_ROOT_REGEX = /<svg\b([^>]*)>([\s\S]*?)<\/svg>/i;
 const SVG_ATTRIBUTE_REGEX = /\b([a-zA-Z_:][-a-zA-Z0-9_:.]*)=(["'])(.*?)\2/g;
 const VIEWBOX_REGEX = /\bviewBox=(["'])([^"']+)\1/i;
-const STRIPPED_SVG_ATTRIBUTES = new Set([
-  "class",
-  "height",
-  "role",
-  "width",
-  "xmlns",
-]);
+const STRIPPED_SVG_ATTRIBUTES = new Set(["class", "height", "role", "width", "xmlns"]);
 
 export function defineIconSpriteConfig(config: IconSpriteConfig) {
   return config;
@@ -63,18 +57,14 @@ export function createPrefixedIconSource(options: {
   };
 }
 
-export function createSetDirectoryIconSource(options: {
-  directory: string;
-}): IconSource {
+export function createSetDirectoryIconSource(options: { directory: string }): IconSource {
   const { directory } = options;
 
   return {
     directory,
     idFromRelativePath(relativePath) {
       const normalizedPath = relativePath.split(path.sep).join("/");
-      const [setName, ...segments] = normalizedPath
-        .replace(/\.svg$/u, "")
-        .split("/");
+      const [setName, ...segments] = normalizedPath.replace(/\.svg$/u, "").split("/");
 
       if (!setName || segments.length === 0) {
         return null;
@@ -122,10 +112,7 @@ export function generateIconSpriteArtifacts(
   };
 }
 
-export function getIconSpriteGeneratedDirectories(
-  config: IconSpriteConfig,
-  rootDir: string,
-) {
+export function getIconSpriteGeneratedDirectories(config: IconSpriteConfig, rootDir: string) {
   return Array.from(
     new Set([
       path.dirname(resolveFromRoot(rootDir, config.generatedSpriteFile)),
@@ -134,28 +121,15 @@ export function getIconSpriteGeneratedDirectories(
   );
 }
 
-export function getIconSpriteSourceDirectories(
-  config: IconSpriteConfig,
-  rootDir: string,
-) {
-  return config.iconSources.map((source) =>
-    resolveFromRoot(rootDir, source.directory),
-  );
+export function getIconSpriteSourceDirectories(config: IconSpriteConfig, rootDir: string) {
+  return config.iconSources.map((source) => resolveFromRoot(rootDir, source.directory));
 }
 
-export function getIconSpriteUsageRoots(
-  config: IconSpriteConfig,
-  rootDir: string,
-) {
-  return getUsageRoots(config).map((usageRoot) =>
-    resolveFromRoot(rootDir, usageRoot),
-  );
+export function getIconSpriteUsageRoots(config: IconSpriteConfig, rootDir: string) {
+  return getUsageRoots(config).map((usageRoot) => resolveFromRoot(rootDir, usageRoot));
 }
 
-export function isIconSpriteUsageFile(
-  config: IconSpriteConfig,
-  filePath: string,
-) {
+export function isIconSpriteUsageFile(config: IconSpriteConfig, filePath: string) {
   return getUsageFileExtensions(config).has(path.extname(filePath));
 }
 
@@ -165,25 +139,16 @@ export function shouldRegenerateIconSprite(
   filePath: string,
 ) {
   const resolvedFilePath = path.resolve(filePath);
-  const generatedDirectories = getIconSpriteGeneratedDirectories(
-    config,
-    rootDir,
-  );
+  const generatedDirectories = getIconSpriteGeneratedDirectories(config, rootDir);
   const sourceDirectories = getIconSpriteSourceDirectories(config, rootDir);
   const usageRoots = getIconSpriteUsageRoots(config, rootDir);
 
-  if (
-    generatedDirectories.some((directory) =>
-      isPathInside(directory, resolvedFilePath),
-    )
-  ) {
+  if (generatedDirectories.some((directory) => isPathInside(directory, resolvedFilePath))) {
     return false;
   }
 
   if (
-    sourceDirectories.some((directory) =>
-      isPathInside(directory, resolvedFilePath),
-    ) &&
+    sourceDirectories.some((directory) => isPathInside(directory, resolvedFilePath)) &&
     resolvedFilePath.endsWith(".svg")
   ) {
     return true;
@@ -196,17 +161,12 @@ export function shouldRegenerateIconSprite(
 }
 
 function collectIconCatalog(config: IconSpriteConfig, rootDir: string) {
-  const catalog = config.iconSources.flatMap((source) =>
-    collectSourceIcons(source, rootDir),
-  );
+  const catalog = config.iconSources.flatMap((source) => collectSourceIcons(source, rootDir));
 
   return catalog.sort((left, right) => left.id.localeCompare(right.id));
 }
 
-function collectSourceIcons(
-  source: IconSource,
-  rootDir: string,
-): IconCatalogEntry[] {
+function collectSourceIcons(source: IconSource, rootDir: string): IconCatalogEntry[] {
   const sourceDirectory = resolveFromRoot(rootDir, source.directory);
 
   if (!fs.existsSync(sourceDirectory)) {
@@ -235,17 +195,12 @@ function collectUsedSpriteIds(
   const availableIdSet = new Set(availableIds);
   const usedIds = new Set<string>();
   const usageRoots = getIconSpriteUsageRoots(config, rootDir);
-  const generatedDirectories = getIconSpriteGeneratedDirectories(
-    config,
-    rootDir,
-  );
+  const generatedDirectories = getIconSpriteGeneratedDirectories(config, rootDir);
 
   for (const usageRoot of usageRoots) {
     for (const filePath of walkFiles(usageRoot)) {
       if (
-        generatedDirectories.some((directory) =>
-          isPathInside(directory, filePath),
-        ) ||
+        generatedDirectories.some((directory) => isPathInside(directory, filePath)) ||
         !isIconSpriteUsageFile(config, filePath)
       ) {
         continue;
@@ -334,9 +289,7 @@ function createSymbolSource(id: string, filePath: string) {
   });
 
   if ("error" in optimized) {
-    throw new Error(
-      `Failed to optimize icon "${id}" from ${filePath}: ${String(optimized.error)}`,
-    );
+    throw new Error(`Failed to optimize icon "${id}" from ${filePath}: ${String(optimized.error)}`);
   }
 
   const svgMatch = optimized.data.match(SVG_ROOT_REGEX);
@@ -361,9 +314,8 @@ function createSymbolSource(id: string, filePath: string) {
   }
 
   const hasPresentationAttributes =
-    Array.from(symbolAttributes.keys()).some(
-      (name) => name === "fill" || name === "stroke",
-    ) || /\b(?:fill|stroke)=["']/u.test(innerContent);
+    Array.from(symbolAttributes.keys()).some((name) => name === "fill" || name === "stroke") ||
+    /\b(?:fill|stroke)=["']/u.test(innerContent);
 
   if (!hasPresentationAttributes) {
     symbolAttributes.set("fill", "currentColor");
@@ -378,9 +330,7 @@ function createSymbolSource(id: string, filePath: string) {
 }
 
 function writeIfChanged(filePath: string, nextContents: string) {
-  const previousContents = fs.existsSync(filePath)
-    ? fs.readFileSync(filePath, "utf8")
-    : null;
+  const previousContents = fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : null;
 
   if (previousContents === nextContents) {
     return false;
@@ -413,10 +363,7 @@ function resolveFromRoot(rootDir: string, filePath: string) {
 function isPathInside(rootDir: string, targetPath: string) {
   const relativePath = path.relative(rootDir, targetPath);
 
-  return (
-    relativePath === "" ||
-    (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))
-  );
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
 }
 
 function escapeAttribute(value: string) {

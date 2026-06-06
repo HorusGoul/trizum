@@ -1,8 +1,5 @@
-import { describe, expect, test } from "vitest";
-import {
-  createDebtTransferExpenses,
-  getDebtTransferParticipantMatch,
-} from "./debtTransfer";
+import { describe, expect, test } from "vite-plus/test";
+import { createDebtTransferExpenses, getDebtTransferParticipantMatch } from "./debtTransfer";
 
 describe("createDebtTransferExpenses", () => {
   test("creates a settlement expense in the origin party and a new debt in the destination party", () => {

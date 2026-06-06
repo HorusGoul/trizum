@@ -32,11 +32,7 @@ export class TransferDebtPage {
     ).toBeVisible();
   }
 
-  async expectSearchParams(params: {
-    amount: string;
-    fromId: string;
-    toId: string;
-  }) {
+  async expectSearchParams(params: { amount: string; fromId: string; toId: string }) {
     await expect
       .poll(() => {
         const url = new URL(this.page.url());

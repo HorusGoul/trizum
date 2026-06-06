@@ -109,21 +109,12 @@ function RouteComponent() {
           </div>
 
           <div className="flex flex-shrink-0 items-center">
-            <CurrencyText
-              currency={party.currency}
-              amount={Math.abs(amount)}
-              className="text-xl"
-            />
+            <CurrencyText currency={party.currency} amount={Math.abs(amount)} className="text-xl" />
           </div>
         </div>
 
         <Button color="accent" className="font-semibold" onPress={onMarkAsPaid}>
-          <Icon
-            icon="lucide.circle-check"
-            width={20}
-            height={20}
-            className="mr-2"
-          />
+          <Icon icon="lucide.circle-check" width={20} height={20} className="mr-2" />
           <Trans>Mark as paid</Trans>
         </Button>
 
@@ -133,8 +124,8 @@ function RouteComponent() {
 
         <p className="text-lg">
           <Trans>
-            Here&apos;s a list of ways you can pay, once done, press the button
-            above to mark the expense as paid in this trizum party.
+            Here&apos;s a list of ways you can pay, once done, press the button above to mark the
+            expense as paid in this trizum party.
           </Trans>
         </p>
 
@@ -164,9 +155,7 @@ function BizumItem({ phoneNumber }: { phoneNumber: string }) {
     <div className="flex flex-col gap-2 rounded-xl bg-white p-4 dark:bg-accent-900">
       <h3 className="text-lg font-semibold">Bizum</h3>
       <p className="text-accent-700 dark:text-accent-300">
-        <Trans>
-          Copy the phone number and pay through Bizum using your bank app.
-        </Trans>
+        <Trans>Copy the phone number and pay through Bizum using your bank app.</Trans>
       </p>
       <Button
         color="input-like"
@@ -200,8 +189,8 @@ function CashItem() {
       </h3>
       <p className="text-accent-700 dark:text-accent-300">
         <Trans>
-          Get in touch with the person to make the payment in cash or a
-          different way outside of the ones described above.
+          Get in touch with the person to make the payment in cash or a different way outside of the
+          ones described above.
         </Trans>
       </p>
     </div>

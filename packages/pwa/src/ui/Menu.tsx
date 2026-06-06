@@ -1,8 +1,5 @@
 import type { MenuProps, MenuItemProps } from "react-aria-components";
-import {
-  Menu as AriaMenu,
-  MenuItem as AriaMenuItem,
-} from "react-aria-components";
+import { Menu as AriaMenu, MenuItem as AriaMenuItem } from "react-aria-components";
 import { cn } from "./utils";
 
 export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
@@ -17,10 +14,7 @@ export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
   );
 }
 
-export function MenuItem<T extends object>({
-  className,
-  ...props
-}: MenuItemProps<T>) {
+export function MenuItem<T extends object>({ className, ...props }: MenuItemProps<T>) {
   return (
     <AriaMenuItem
       className={({ defaultClassName, isPressed, isHovered, isFocusVisible }) =>

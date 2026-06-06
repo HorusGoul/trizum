@@ -22,9 +22,7 @@ let serverConfig: CapacitorConfig["server"] = undefined;
 
 if (DEV_MODE) {
   if (!DEV_URL) {
-    logger.error(
-      "Ensure DEV_URL is set in the .env file when you are trying to develop the app.",
-    );
+    logger.error("Ensure DEV_URL is set in the .env file when you are trying to develop the app.");
     logger.error("Example: DEV_URL=http://192.168.1.101:5173");
     // process.exit(1);
   } else {

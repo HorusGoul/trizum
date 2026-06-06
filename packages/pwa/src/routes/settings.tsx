@@ -3,10 +3,7 @@ import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
 import { AvatarPicker } from "#src/components/AvatarPicker.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import {
-  validatePartyParticipantName,
-  validatePhoneNumber,
-} from "#src/lib/validation.js";
+import { validatePartyParticipantName, validatePhoneNumber } from "#src/lib/validation.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { useForm } from "@tanstack/react-form";
@@ -93,13 +90,7 @@ function Settings() {
 
         <div className="flex-1" />
 
-        <form.Subscribe
-          selector={(state) => [
-            state.canSubmit,
-            state.isSubmitting,
-            state.isDirty,
-          ]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}>
           {([canSubmit, isSubmitting, isDirty]) =>
             canSubmit && isDirty ? (
               <Suspense fallback={null}>
@@ -155,10 +146,7 @@ function Settings() {
               onChange={field.handleChange}
               onBlur={field.handleBlur}
               errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
+              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             />
           )}
         </form.Field>
@@ -179,10 +167,7 @@ function Settings() {
               onChange={field.handleChange}
               onBlur={field.handleBlur}
               errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
+              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             />
           )}
         </form.Field>
@@ -213,10 +198,7 @@ function Settings() {
             <SwitchField
               label={<Trans>Open last party on launch</Trans>}
               description={
-                <Trans>
-                  Automatically open the last visited party when you open the
-                  app
-                </Trans>
+                <Trans>Automatically open the last visited party when you open the app</Trans>
               }
               isSelected={field.state.value}
               onChange={field.handleChange}
@@ -229,9 +211,7 @@ function Settings() {
             <SwitchField
               label={<Trans>Auto-open calculator</Trans>}
               description={
-                <Trans>
-                  Automatically open the calculator when focusing amount fields
-                </Trans>
+                <Trans>Automatically open the calculator when focusing amount fields</Trans>
               }
               isSelected={field.state.value}
               onChange={field.handleChange}

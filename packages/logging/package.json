@@ -1,29 +1,29 @@
 {
   "name": "@trizum/logging",
+  "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
-  "version": "1.0.0",
   "license": "MIT",
-  "private": true,
   "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
   "files": [
     "dist",
     "src"
   ],
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "imports": {
     "#*": "./*"
   },
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./github-actions": {
-      "types": "./dist/github-actions.d.ts",
+      "types": "./src/github-actions.ts",
       "import": "./dist/github-actions.js",
       "default": "./dist/github-actions.js"
     }
@@ -32,22 +32,18 @@
     "build": "tsc -b tsconfig.json",
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch",
-    "lint": "eslint --ext .ts src",
-    "lint:fix": "pnpm run lint --fix",
-    "test": "vitest run",
+    "lint": "vp lint src",
+    "lint:fix": "vp lint src --fix",
+    "test": "vp test run",
     "typecheck": "tsc -b tsconfig.test.json"
   },
   "dependencies": {
     "@logtape/logtape": "1.2.2"
   },
   "devDependencies": {
-    "@trizum/eslint-config": "workspace:*",
-    "@trizum/prettier-config": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
-    "eslint": "9.39.1",
-    "prettier": "3.6.2",
     "typescript": "5.9.2",
-    "vitest": "4.1.0"
-  },
-  "prettier": "@trizum/prettier-config"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
 }

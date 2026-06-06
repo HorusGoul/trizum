@@ -23,8 +23,9 @@ Read these sources in order:
 
 Canonical examples:
 
-- [`.nvmrc`](./.nvmrc) and [`package.json`](./package.json) are the source of
-  truth for Node, pnpm, and workspace scripts.
+- [`.node-version`](./.node-version), [`package.json`](./package.json), and
+  [`vite.config.ts`](./vite.config.ts) are the source of truth for Node, the
+  package manager, and Vite+ workspace commands.
 - [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)
   is the source of truth for creating changesets when a user-facing change
   needs release notes or a version bump.
@@ -74,11 +75,10 @@ Use `type/description` naming:
 
 ### Validation And Release Hygiene
 
-- Use `nvm use`, then `pnpm install` when setting up locally.
-- Before opening a PR, run the standard root validation commands defined in
-  [`package.json`](./package.json): `pnpm test`, `pnpm lint`, and
-  `pnpm typecheck`.
-- Run `pnpm lingui:extract` when user-facing copy changes.
+- Use `vp install` when setting up locally.
+- Before opening a PR, run the standard Vite+ validation commands:
+  `vp check`, `vp test`, and `vp build`.
+- Run `vp run lingui:extract` when user-facing copy changes.
 - Create a changeset before opening a PR for user-facing changes, and have the
   agent do it when possible. Use
   [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)

@@ -14,9 +14,7 @@ export function useMediaFile(mediaFileId: string) {
 
   const url = useMemo(() => {
     const mimeType =
-      typeof mediaFile.metadata.mimeType === "string"
-        ? mediaFile.metadata.mimeType
-        : undefined;
+      typeof mediaFile.metadata.mimeType === "string" ? mediaFile.metadata.mimeType : undefined;
     const blob = decodeBlob(mediaFile.encodedBlob.val, mimeType);
     return URL.createObjectURL(blob);
   }, [mediaFile.encodedBlob, mediaFile.metadata.mimeType]);

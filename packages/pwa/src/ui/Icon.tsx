@@ -19,8 +19,7 @@ export function Icon({
   ...props
 }: IconProps) {
   const generatedTitleId = useId();
-  const titleId =
-    title && !ariaLabel && !ariaLabelledBy ? generatedTitleId : undefined;
+  const titleId = title && !ariaLabel && !ariaLabelledBy ? generatedTitleId : undefined;
   const isDecorative = ariaHidden ?? (!ariaLabel && !ariaLabelledBy && !title);
 
   return (

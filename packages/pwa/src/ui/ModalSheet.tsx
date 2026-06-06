@@ -36,16 +36,10 @@ interface ModalSheetContextValue {
 
 const ModalSheetContext = createContext<ModalSheetContextValue | null>(null);
 
-interface ModalSheetProps
-  extends Omit<
-    SheetProps,
-    | "children"
-    | "className"
-    | "isOpen"
-    | "onClose"
-    | "onContextMenu"
-    | "unstyled"
-  > {
+interface ModalSheetProps extends Omit<
+  SheetProps,
+  "children" | "className" | "isOpen" | "onClose" | "onContextMenu" | "unstyled"
+> {
   children: ReactNode;
   className?: ClassName;
   isDismissable?: boolean;
@@ -94,10 +88,7 @@ export function ModalSheet({
         </FocusScope>
 
         <Sheet.Backdrop
-          className={cn(
-            "bg-accent-950/45 backdrop-blur-[2px]",
-            overlayClassName,
-          )}
+          className={cn("bg-accent-950/45 backdrop-blur-[2px]", overlayClassName)}
           onContextMenu={(event) => {
             onContextMenu?.(event);
             event.preventDefault();
@@ -222,10 +213,7 @@ export function ModalSheetTitle({ className, ...props }: HeadingProps) {
   );
 }
 
-export function ModalSheetDescription({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"p">) {
+export function ModalSheetDescription({ className, ...props }: ComponentPropsWithoutRef<"p">) {
   const context = useModalSheetContext();
 
   useEffect(() => {
@@ -245,17 +233,11 @@ export function ModalSheetDescription({
   );
 }
 
-export function ModalSheetContent({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) {
+export function ModalSheetContent({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return (
     <Sheet.Content className="min-h-0">
       <div
-        className={cn(
-          "min-h-0 overflow-y-auto px-safe pb-safe-offset-4",
-          className,
-        )}
+        className={cn("min-h-0 overflow-y-auto px-safe pb-safe-offset-4", className)}
         {...props}
       />
     </Sheet.Content>
@@ -264,19 +246,11 @@ export function ModalSheetContent({
 
 export type ModalSheetActionTone = "default" | "danger";
 
-export function ModalSheetSection({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) {
-  return (
-    <div className={cn("px-safe-or-4 sm:px-safe-or-5", className)} {...props} />
-  );
+export function ModalSheetSection({ className, ...props }: ComponentPropsWithoutRef<"div">) {
+  return <div className={cn("px-safe-or-4 sm:px-safe-or-5", className)} {...props} />;
 }
 
-export function ModalSheetActions({
-  className,
-  ...props
-}: ComponentPropsWithoutRef<"div">) {
+export function ModalSheetActions({ className, ...props }: ComponentPropsWithoutRef<"div">) {
   return <div className={cn("flex flex-col gap-1", className)} {...props} />;
 }
 

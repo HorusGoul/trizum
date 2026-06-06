@@ -1,8 +1,4 @@
-import {
-  calculateLogStatsOfUser,
-  type ExpenseInput,
-  type ExpenseUser,
-} from "#src/lib/expenses.js";
+import { calculateLogStatsOfUser, type ExpenseInput, type ExpenseUser } from "#src/lib/expenses.js";
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
 import Dinero from "dinero.js";
@@ -66,15 +62,11 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     const paidFor: Record<ExpenseUser, number> = {};
     let amountLeft = Dinero({ amount: partial });
 
-    const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(
-      expense.shares,
-    )
+    const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(expense.shares)
       .filter((share) => expense.shares[share].type === "exact")
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
 
-    const divides: Record<ExpenseUser, ExpenseShareDivide> = Object.keys(
-      expense.shares,
-    )
+    const divides: Record<ExpenseUser, ExpenseShareDivide> = Object.keys(expense.shares)
       .filter((share) => expense.shares[share].type === "divide")
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
 
@@ -90,10 +82,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       });
     }
 
-    const totalDivides = Object.values(divides).reduce(
-      (acc, curr) => acc + curr.value,
-      0,
-    );
+    const totalDivides = Object.values(divides).reduce((acc, curr) => acc + curr.value, 0);
 
     if (totalDivides > 0) {
       const totalLeftForDivides = amountLeft.getAmount();
@@ -143,9 +132,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       // Apply the calculated amounts
       for (const divide of divideUsers) {
         paidFor[divide] = divideAmounts[divide];
-        amountLeft = amountLeft.subtract(
-          Dinero({ amount: divideAmounts[divide] }),
-        );
+        amountLeft = amountLeft.subtract(Dinero({ amount: divideAmounts[divide] }));
       }
     }
 
@@ -215,24 +202,14 @@ export function getExpenseTotalAmount(expense: Pick<Expense, "paidBy">) {
 
 export function getImpactOnBalanceForUser(expense: Expense, userId: string) {
   const input = exportIntoInput(expense);
-  const expenseParticipantsIds = [
-    ...Object.keys(expense.paidBy),
-    ...Object.keys(expense.shares),
-  ];
+  const expenseParticipantsIds = [...Object.keys(expense.paidBy), ...Object.keys(expense.shares)];
 
-  const { userOwes, owedToUser } = calculateLogStatsOfUser(
-    userId,
-    expenseParticipantsIds,
-    input,
-  );
+  const { userOwes, owedToUser } = calculateLogStatsOfUser(userId, expenseParticipantsIds, input);
 
   return owedToUser.subtract(userOwes).getAmount();
 }
 
-export function getExpenseUnitShares({
-  shares,
-  paidBy,
-}: Pick<Expense, "shares" | "paidBy">) {
+export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" | "paidBy">) {
   const amountInUnits = getExpenseTotalAmount({ paidBy });
   const activeParticipants = Object.keys(shares);
 
@@ -378,9 +355,7 @@ export function calculateExpenseHash(expense: Partial<Expense>) {
 
   const hash = md5(input);
   const hashArray = Array.from(new Uint8Array(hash));
-  const hashHex = hashArray
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
+  const hashHex = hashArray.map((byte) => byte.toString(16).padStart(2, "0")).join("");
 
   return hashHex;
 }
@@ -481,11 +456,7 @@ export function calculateBalancesByParticipant(
   const participantIds = Object.keys(partyParticipants);
 
   const balances = participantIds.map((participantId) => {
-    const dineroStats = calculateLogStatsOfUser(
-      participantId,
-      participantIds,
-      inputs,
-    );
+    const dineroStats = calculateLogStatsOfUser(participantId, participantIds, inputs);
 
     return {
       participantId,
@@ -508,9 +479,7 @@ export function calculateBalancesByParticipant(
 
   const withVisualRatios = calculateVisualRatioForBalances(balances);
 
-  return Object.fromEntries(
-    withVisualRatios.map((balance) => [balance.participantId, balance]),
-  );
+  return Object.fromEntries(withVisualRatios.map((balance) => [balance.participantId, balance]));
 }
 
 export function mergeBalancesByParticipant(
@@ -530,9 +499,7 @@ export function mergeBalancesByParticipant(
         existing.stats.owedToUser += balance.stats.owedToUser;
 
         // Merge diffs
-        for (const [participantId, diff] of Object.entries(
-          balance.stats.diffs,
-        )) {
+        for (const [participantId, diff] of Object.entries(balance.stats.diffs)) {
           const existingDiff = existing.stats.diffs[participantId];
 
           if (!existingDiff) {
@@ -547,13 +514,9 @@ export function mergeBalancesByParticipant(
 
   const balancesArray = Object.values(merged);
   const withVisualRatios =
-    balancesArray.length > 0
-      ? calculateVisualRatioForBalances(balancesArray)
-      : [];
+    balancesArray.length > 0 ? calculateVisualRatioForBalances(balancesArray) : [];
 
-  return Object.fromEntries(
-    withVisualRatios.map((balance) => [balance.participantId, balance]),
-  );
+  return Object.fromEntries(withVisualRatios.map((balance) => [balance.participantId, balance]));
 }
 
 function calculateVisualRatioForBalances(balances: Balance[]) {

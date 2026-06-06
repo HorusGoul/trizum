@@ -29,15 +29,8 @@ export function AppEmojiField({
   ...props
 }: AppEmojiFieldProps) {
   return (
-    <TextField
-      className={cn("group flex flex-col gap-2", className)}
-      {...props}
-    >
-      {label ? (
-        <Label className={cn(visuallyHideLabel && "w-0 opacity-0")}>
-          {label}
-        </Label>
-      ) : null}
+    <TextField className={cn("group flex flex-col gap-2", className)} {...props}>
+      {label ? <Label className={cn(visuallyHideLabel && "w-0 opacity-0")}>{label}</Label> : null}
       <EmojiPicker
         aria-label={label}
         value={value}
@@ -45,10 +38,7 @@ export function AppEmojiField({
         onChange={onChange}
       />
       {description && (
-        <Text
-          className="text-sm text-accent-700 dark:text-accent-50"
-          slot="description"
-        >
+        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
           {description}
         </Text>
       )}

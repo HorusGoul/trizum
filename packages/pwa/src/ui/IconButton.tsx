@@ -44,13 +44,7 @@ export function IconButton({
 
   return (
     <Button
-      className={({
-        isPressed,
-        isFocusVisible,
-        isHovered,
-        defaultClassName,
-        ...state
-      }) =>
+      className={({ isPressed, isFocusVisible, isHovered, defaultClassName, ...state }) =>
         cn(
           defaultClassName,
           "flex h-10 w-10 scale-100 items-center justify-center rounded-full outline-none transition-all duration-200 ease-in-out",

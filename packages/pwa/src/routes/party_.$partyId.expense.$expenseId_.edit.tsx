@@ -6,10 +6,7 @@ import {
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.ts";
+import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
@@ -25,11 +22,7 @@ import type { PartyExpenseChunk } from "#src/models/party.ts";
 import { type DocHandleChangePayload } from "@automerge/automerge-repo";
 import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -40,18 +33,13 @@ interface EditExpenseSearchParams {
   media?: number;
 }
 
-export const Route = createFileRoute(
-  "/party_/$partyId/expense/$expenseId_/edit",
-)({
+export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit")({
   component: EditExpense,
   pendingComponent: PartyPendingComponent,
 
   validateSearch: (search): EditExpenseSearchParams => {
     return {
-      media:
-        typeof search.media === "number" && search.media >= 0
-          ? search.media
-          : undefined,
+      media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
     };
   },
 
@@ -81,12 +69,11 @@ function EditExpense() {
 
   const photos = expense?.photos ?? [];
 
-  const { galleryIndex, openGallery, closeGallery, onIndexChange } =
-    useRouteMediaGallery({
-      mediaIndex: search.media,
-      navigate: (options) => void navigate(options),
-      goBack: () => history.back(),
-    });
+  const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
+    mediaIndex: search.media,
+    navigate: (options) => void navigate(options),
+    goBack: () => history.back(),
+  });
 
   if (!expense) {
     throw new Error("Expense not found");
@@ -96,10 +83,7 @@ function EditExpense() {
   const currentHashRef = useRef<string>(getExpenseHash(expense));
 
   const onChange = useCallback(
-    (
-      previousValues: ExpenseEditorFormValues,
-      currentValues: ExpenseEditorFormValues,
-    ) => {
+    (previousValues: ExpenseEditorFormValues, currentValues: ExpenseEditorFormValues) => {
       function createExpense(values: ExpenseEditorFormValues) {
         return {
           id: expenseId,
@@ -322,9 +306,7 @@ function getExpenseHash(expense: Expense) {
   return expense.__hash;
 }
 
-function shouldUseEditCopy(
-  expense: Expense,
-): expense is Expense & { __editCopy: Expense } {
+function shouldUseEditCopy(expense: Expense): expense is Expense & { __editCopy: Expense } {
   if (!expense.__editCopy) {
     return false;
   }
@@ -333,8 +315,5 @@ function shouldUseEditCopy(
     return false;
   }
 
-  return (
-    expense.__editCopyLastUpdatedAt.getTime() + TIME_TO_DISCARD_EDIT_COPY >
-    Date.now()
-  );
+  return expense.__editCopyLastUpdatedAt.getTime() + TIME_TO_DISCARD_EDIT_COPY > Date.now();
 }

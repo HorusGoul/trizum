@@ -43,9 +43,7 @@ export function CalculatorToolbar({
   const expressionScrollRef = useRef<HTMLSpanElement>(null);
   const expressionContentRef = useRef<HTMLSpanElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(
-    null,
-  );
+  const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(null);
   const [dragAccumulator, setDragAccumulator] = useState(0);
   const scrollOffsetRef = useRef(0);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -102,10 +100,7 @@ export function CalculatorToolbar({
     let cursorX: number;
     if (cursorPosition === 0 && charRefs.current[0]) {
       cursorX = charRefs.current[0].offsetLeft;
-    } else if (
-      cursorPosition === expression.length &&
-      charRefs.current[cursorPosition - 1]
-    ) {
+    } else if (cursorPosition === expression.length && charRefs.current[cursorPosition - 1]) {
       const lastChar = charRefs.current[cursorPosition - 1]!;
       cursorX = lastChar.offsetLeft + lastChar.offsetWidth;
     } else if (charRefs.current[cursorPosition]) {
@@ -135,10 +130,7 @@ export function CalculatorToolbar({
     if (cursorX < visibleStart + padding) {
       newOffset = Math.max(0, cursorX - padding);
     } else if (cursorX > visibleEnd - padding) {
-      newOffset = Math.min(
-        contentWidth - containerWidth,
-        cursorX - containerWidth + padding,
-      );
+      newOffset = Math.min(contentWidth - containerWidth, cursorX - containerWidth + padding);
     }
 
     if (newOffset !== scrollOffset) {
@@ -178,10 +170,7 @@ export function CalculatorToolbar({
 
     function handlePointerUp(e: PointerEvent) {
       // Check if this was a tap (minimal movement)
-      if (
-        pointerStartRef.current &&
-        pointerStartRef.current.totalMovement < TAP_THRESHOLD
-      ) {
+      if (pointerStartRef.current && pointerStartRef.current.totalMovement < TAP_THRESHOLD) {
         // Find the closest character position based on click location
         const clickX = e.clientX;
         let bestPosition = 0;
@@ -277,11 +266,7 @@ export function CalculatorToolbar({
     function handleKeyDown(e: KeyboardEvent) {
       // Don't capture if user is typing in another input
       const target = e.target as HTMLElement;
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
@@ -418,11 +403,7 @@ export function CalculatorToolbar({
             ) : (
               <span ref={expressionContentRef} className="relative inline-flex">
                 {expression.split("").map((char, index) => (
-                  <span
-                    key={index}
-                    ref={setCharRef(index)}
-                    className="relative"
-                  >
+                  <span key={index} ref={setCharRef(index)} className="relative">
                     {index === cursorPosition && (
                       <span className="absolute left-0 top-0 h-full w-0 animate-blink">
                         <span className="absolute -translate-x-1/2">|</span>

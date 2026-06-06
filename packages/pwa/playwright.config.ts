@@ -23,7 +23,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: `pnpm run build && pnpm exec vite preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+        command: `vp run build && vp preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
         url: localBaseURL,
         reuseExistingServer: !process.env.CI,
         cwd,

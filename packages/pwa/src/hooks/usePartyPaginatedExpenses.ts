@@ -17,13 +17,8 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
     required: true,
   });
   const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
-  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(
-    repo,
-    chunkIds,
-  );
-  const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(
-    undefined,
-  );
+  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds);
+  const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(undefined);
   const snapshotKeyRef = useRef<string>("");
   const snapshotKey = `${String(partyId)}:${chunkIds.join(",")}`;
   const requestedVisibleChunkIdsKeyRef = useRef("");
@@ -44,8 +39,7 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   }, [chunkIds, repo, visibleChunkIdsToLoad, visibleChunkIdsToLoadKey]);
 
   const snapshot = useSyncExternalStore(
-    (onStoreChange) =>
-      subscribeToPartyPaginatedExpenses(onStoreChange, repo, chunkIds),
+    (onStoreChange) => subscribeToPartyPaginatedExpenses(onStoreChange, repo, chunkIds),
     () => {
       if (snapshotKeyRef.current !== snapshotKey) {
         snapshotKeyRef.current = snapshotKey;
@@ -54,10 +48,7 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
 
       const nextSnapshot = getPartyPaginatedExpensesSnapshot(repo, chunkIds);
 
-      if (
-        snapshotRef.current &&
-        areSnapshotsEqual(snapshotRef.current, nextSnapshot)
-      ) {
+      if (snapshotRef.current && areSnapshotsEqual(snapshotRef.current, nextSnapshot)) {
         return snapshotRef.current;
       }
 
@@ -90,7 +81,5 @@ function areSnapshotsEqual(
     return false;
   }
 
-  return previous.expenses.every(
-    (expense, index) => expense === next.expenses[index],
-  );
+  return previous.expenses.every((expense, index) => expense === next.expenses[index]);
 }

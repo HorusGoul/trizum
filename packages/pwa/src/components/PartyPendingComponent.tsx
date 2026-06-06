@@ -2,11 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import {
-  Button as AriaButton,
-  Disclosure,
-  DisclosurePanel,
-} from "react-aria-components";
+import { Button as AriaButton, Disclosure, DisclosurePanel } from "react-aria-components";
 import { TrizumSpinner } from "./TrizumSpinner.js";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
@@ -73,10 +69,7 @@ export function PartyPendingComponent() {
     <div className="flex min-h-full flex-col items-center px-6 pt-safe-offset-24">
       {/* Animated Logo - swing rotation */}
       <div className="relative mb-8">
-        <TrizumSpinner
-          size={80}
-          className="text-accent-600 dark:text-accent-400"
-        />
+        <TrizumSpinner size={80} className="text-accent-600 dark:text-accent-400" />
       </div>
 
       {/* Main title */}
@@ -127,26 +120,12 @@ export function PartyPendingComponent() {
               className="flex-1 rounded-xl font-medium"
               onPress={handleGoHome}
             >
-              <Icon
-                icon="lucide.arrow-left"
-                width={18}
-                height={18}
-                className="mr-2"
-              />
+              <Icon icon="lucide.arrow-left" width={18} height={18} className="mr-2" />
               <Trans>Go back</Trans>
             </Button>
 
-            <Button
-              color="accent"
-              className="flex-1 rounded-xl font-medium"
-              onPress={handleReload}
-            >
-              <Icon
-                icon="lucide.refresh-cw"
-                width={18}
-                height={18}
-                className="mr-2"
-              />
+            <Button color="accent" className="flex-1 rounded-xl font-medium" onPress={handleReload}>
+              <Icon icon="lucide.refresh-cw" width={18} height={18} className="mr-2" />
               <Trans>Retry</Trans>
             </Button>
           </div>
@@ -169,10 +148,7 @@ export function PartyPendingComponent() {
                     icon="lucide.chevron-down"
                     width={18}
                     height={18}
-                    className={cn(
-                      "transition-transform duration-200",
-                      isExpanded && "rotate-180",
-                    )}
+                    className={cn("transition-transform duration-200", isExpanded && "rotate-180")}
                   />
                 </AriaButton>
 

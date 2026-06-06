@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { createMockDocumentCacheCollection } from "#src/lib/testing/mockDocumentCache.ts";
 import type { Expense } from "#src/models/expense.ts";
 import { STATUS_PENDING } from "suspense";
@@ -9,8 +9,7 @@ type MockChunk = {
   expenses: Expense[];
 };
 
-const mockDocumentCacheCollection =
-  createMockDocumentCacheCollection<MockChunk>();
+const mockDocumentCacheCollection = createMockDocumentCacheCollection<MockChunk>();
 
 const {
   availableDocuments: availableChunks,
@@ -65,9 +64,7 @@ describe("partyPaginatedExpenses", () => {
     registerChunk(chunk2);
     registerChunk(chunk3);
 
-    expect(getVisiblePartyExpenseChunkIdsToLoad(repo, allChunkIds)).toEqual([
-      chunk1,
-    ]);
+    expect(getVisiblePartyExpenseChunkIdsToLoad(repo, allChunkIds)).toEqual([chunk1]);
 
     await loadVisiblePartyExpenseChunks(repo, allChunkIds);
 
@@ -80,10 +77,7 @@ describe("partyPaginatedExpenses", () => {
     registerChunk(chunk3);
     cacheChunk(chunk3);
 
-    expect(getVisiblePartyExpenseChunkIdsToLoad(repo, allChunkIds)).toEqual([
-      chunk1,
-      chunk2,
-    ]);
+    expect(getVisiblePartyExpenseChunkIdsToLoad(repo, allChunkIds)).toEqual([chunk1, chunk2]);
 
     await loadVisiblePartyExpenseChunks(repo, allChunkIds);
 
@@ -138,14 +132,8 @@ describe("partyPaginatedExpenses", () => {
   });
 
   test("sorts loaded expenses from newest to oldest by paidAt", () => {
-    registerChunk(chunk1, [
-      "2024-01-01T00:00:00.000Z",
-      "2021-01-01T00:00:00.000Z",
-    ]);
-    registerChunk(chunk2, [
-      "2025-01-01T00:00:00.000Z",
-      "2022-01-01T00:00:00.000Z",
-    ]);
+    registerChunk(chunk1, ["2024-01-01T00:00:00.000Z", "2021-01-01T00:00:00.000Z"]);
+    registerChunk(chunk2, ["2025-01-01T00:00:00.000Z", "2022-01-01T00:00:00.000Z"]);
     cacheChunk(chunk1);
     cacheChunk(chunk2);
 
@@ -187,31 +175,12 @@ describe("partyPaginatedExpenses", () => {
     cacheChunk(chunk2);
 
     const onStoreChange = vi.fn();
-    const unsubscribe = subscribeToPartyPaginatedExpenses(
-      onStoreChange,
-      repo,
-      allChunkIds,
-    );
+    const unsubscribe = subscribeToPartyPaginatedExpenses(onStoreChange, repo, allChunkIds);
 
     expect(documentCache.subscribe).toHaveBeenCalledTimes(3);
-    expect(documentCache.subscribe).toHaveBeenNthCalledWith(
-      1,
-      onStoreChange,
-      repo,
-      chunk1,
-    );
-    expect(documentCache.subscribe).toHaveBeenNthCalledWith(
-      2,
-      onStoreChange,
-      repo,
-      chunk2,
-    );
-    expect(documentCache.subscribe).toHaveBeenNthCalledWith(
-      3,
-      onStoreChange,
-      repo,
-      chunk3,
-    );
+    expect(documentCache.subscribe).toHaveBeenNthCalledWith(1, onStoreChange, repo, chunk1);
+    expect(documentCache.subscribe).toHaveBeenNthCalledWith(2, onStoreChange, repo, chunk2);
+    expect(documentCache.subscribe).toHaveBeenNthCalledWith(3, onStoreChange, repo, chunk3);
 
     unsubscribe();
 
@@ -223,27 +192,20 @@ describe("partyPaginatedExpenses", () => {
     cacheChunk(chunk1);
 
     const onStoreChange = vi.fn();
-    const unsubscribe = subscribeToPartyPaginatedExpenses(onStoreChange, repo, [
-      chunk1,
-    ]);
+    const unsubscribe = subscribeToPartyPaginatedExpenses(onStoreChange, repo, [chunk1]);
 
     appendExpenseToCachedChunk(chunk1, "2025-01-01T00:00:00.000Z");
 
     expect(onStoreChange).toHaveBeenCalledTimes(1);
     expect(
-      getPartyPaginatedExpensesSnapshot(repo, [chunk1]).expenses.map(
-        (expense) => expense.id,
-      ),
+      getPartyPaginatedExpensesSnapshot(repo, [chunk1]).expenses.map((expense) => expense.id),
     ).toEqual([`${chunk1}-expense-1`, `${chunk1}-expense-0`]);
 
     unsubscribe();
   });
 });
 
-function registerChunk(
-  chunkId: DocumentId,
-  paidAtValues = ["2024-01-01T00:00:00.000Z"],
-) {
+function registerChunk(chunkId: DocumentId, paidAtValues = ["2024-01-01T00:00:00.000Z"]) {
   availableChunks.set(chunkId, {
     id: chunkId,
     expenses: paidAtValues.map((paidAt, index) =>
@@ -271,10 +233,7 @@ function appendExpenseToCachedChunk(chunkId: DocumentId, paidAt: string) {
   }
 
   chunk.expenses.push(
-    createExpenseWithPaidAt(
-      `${chunkId}-expense-${chunk.expenses.length}`,
-      paidAt,
-    ),
+    createExpenseWithPaidAt(`${chunkId}-expense-${chunk.expenses.length}`, paidAt),
   );
   notifySubscribers(chunkId);
 }

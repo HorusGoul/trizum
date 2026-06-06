@@ -53,10 +53,7 @@ export interface BrowserHarness {
   goto(path?: string): Promise<void>;
   gotoHome(): Promise<void>;
   navigate(path: string): Promise<void>;
-  gotoParty(
-    partyId: string,
-    tab?: "expenses" | "balances" | "stats",
-  ): Promise<void>;
+  gotoParty(partyId: string, tab?: "expenses" | "balances" | "stats"): Promise<void>;
   seedParty(fixture: unknown): Promise<{
     joinCode: string;
     joinUrl: string;
@@ -103,8 +100,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
       .evaluate(() => {
         const internalWindow = window as Partial<InternalHarnessWindow>;
         return (
-          typeof internalWindow.__internal_createPartyFromMigrationData ===
-            "function" &&
+          typeof internalWindow.__internal_createPartyFromMigrationData === "function" &&
           typeof internalWindow.__internal_seedPartyListState === "function" &&
           typeof internalWindow.__internal_readPartyListState === "function"
         );
@@ -123,11 +119,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
     await page.evaluate((targetPath) => {
       const url = new URL(targetPath, window.location.origin);
-      window.history.pushState(
-        {},
-        "",
-        `${url.pathname}${url.search}${url.hash}`,
-      );
+      window.history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
       window.dispatchEvent(new PopStateEvent("popstate"));
     }, nextPath);
 
@@ -141,9 +133,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
         .toBe(nextUrl.search);
     }
 
-    await expect
-      .poll(async () => page.evaluate(() => window.location.hash))
-      .toBe(nextUrl.hash);
+    await expect.poll(async () => page.evaluate(() => window.location.hash)).toBe(nextUrl.hash);
   }
 
   async function waitForInternalHooks() {
@@ -189,9 +179,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
       const nextPartyIds: string[] = [];
 
       for (const fixture of partyFixtures) {
-        nextPartyIds.push(
-          await internalWindow.__internal_createPartyFromMigrationData(fixture),
-        );
+        nextPartyIds.push(await internalWindow.__internal_createPartyFromMigrationData(fixture));
       }
 
       return nextPartyIds;
@@ -209,18 +197,13 @@ function createBrowserHarness(page: Page): BrowserHarness {
     return seedParty(fixture);
   }
 
-  async function joinSeededParty({
-    fixture,
-    participantName,
-  }: JoinedPartyThroughUiSeed) {
+  async function joinSeededParty({ fixture, participantName }: JoinedPartyThroughUiSeed) {
     const seededParty = await seedJoinableParty(fixture);
 
     await navigate("/join");
     await page.getByLabel("Link or code").fill(seededParty.joinCode);
     await page.getByRole("button", { name: "Join" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Who are you?" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Who are you?" })).toBeVisible();
     await selectParticipantIdentity(participantName);
 
     return seededParty;
@@ -260,10 +243,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     });
   }
 
-  async function gotoParty(
-    partyId: string,
-    tab: "expenses" | "balances" | "stats" = "expenses",
-  ) {
+  async function gotoParty(partyId: string, tab: "expenses" | "balances" | "stats" = "expenses") {
     await goto(`/party/${partyId}?tab=${tab}`);
   }
 

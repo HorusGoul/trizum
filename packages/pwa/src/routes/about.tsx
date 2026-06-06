@@ -26,9 +26,7 @@ function About() {
         {/* App Info Section */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-4xl font-bold text-accent-900 dark:text-accent-100">
-              trizum
-            </h2>
+            <h2 className="text-4xl font-bold text-accent-900 dark:text-accent-100">trizum</h2>
             <div className="flex items-center justify-center gap-2 text-sm text-accent-600 dark:text-accent-400">
               <p>
                 <Trans>Version</Trans> {version}
@@ -48,8 +46,7 @@ function About() {
 
           <p className="text-center text-lg text-accent-700 dark:text-accent-300">
             <Trans>
-              Split bills with friends and family. Track, calculate, and settle
-              expenses together.
+              Split bills with friends and family. Track, calculate, and settle expenses together.
             </Trans>
           </p>
         </section>
@@ -63,27 +60,17 @@ function About() {
             <FeatureItem
               icon="lucide.wifi-off"
               title={<Trans>Offline-First</Trans>}
-              description={
-                <Trans>
-                  Works seamlessly offline with automatic sync when online
-                </Trans>
-              }
+              description={<Trans>Works seamlessly offline with automatic sync when online</Trans>}
             />
             <FeatureItem
               icon="lucide.refresh-cw"
               title={<Trans>Real-Time Sync</Trans>}
-              description={
-                <Trans>
-                  Changes sync automatically across all your devices
-                </Trans>
-              }
+              description={<Trans>Changes sync automatically across all your devices</Trans>}
             />
             <FeatureItem
               icon="lucide.users"
               title={<Trans>Multi-Party Splitting</Trans>}
-              description={
-                <Trans>Split expenses fairly among multiple participants</Trans>
-              }
+              description={<Trans>Split expenses fairly among multiple participants</Trans>}
             />
           </ul>
         </section>
@@ -141,9 +128,7 @@ function About() {
             <Trans>Credits</Trans>
           </h3>
           <p className="text-accent-700 dark:text-accent-300">
-            <Trans>
-              This project uses various open source libraries and tools.
-            </Trans>
+            <Trans>This project uses various open source libraries and tools.</Trans>
           </p>
           <AboutLink
             href="/about/third-party-licenses"
@@ -184,12 +169,8 @@ function FeatureItem({ icon, title, description }: FeatureItemProps) {
         </div>
       </div>
       <div className="flex flex-col gap-1">
-        <h4 className="font-semibold text-accent-900 dark:text-accent-100">
-          {title}
-        </h4>
-        <p className="text-sm text-accent-600 dark:text-accent-400">
-          {description}
-        </p>
+        <h4 className="font-semibold text-accent-900 dark:text-accent-100">{title}</h4>
+        <p className="text-sm text-accent-600 dark:text-accent-400">{description}</p>
       </div>
     </li>
   );
@@ -257,12 +238,7 @@ function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
   }
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={className}
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
       {content}
     </a>
   );

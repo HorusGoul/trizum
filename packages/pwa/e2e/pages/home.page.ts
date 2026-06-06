@@ -60,9 +60,7 @@ export class HomePage {
   }
 
   partyCard(name: string | RegExp) {
-    return this.page
-      .locator('[data-testid="party-list-card"]')
-      .filter({ hasText: name });
+    return this.page.locator('[data-testid="party-list-card"]').filter({ hasText: name });
   }
 
   async expectPartyVisible(name: string | RegExp) {

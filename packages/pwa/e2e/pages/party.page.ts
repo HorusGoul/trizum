@@ -44,12 +44,8 @@ export class PartyPage {
   }
 
   async expectLoaded(partyId: string, partyName: string) {
-    await expect(this.page).toHaveURL(
-      new RegExp(`/party/${partyId}(?:\\?.*)?$`),
-    );
-    await expect(
-      this.heading(new RegExp(escapeRegExp(partyName))),
-    ).toBeVisible();
+    await expect(this.page).toHaveURL(new RegExp(`/party/${partyId}(?:\\?.*)?$`));
+    await expect(this.heading(new RegExp(escapeRegExp(partyName)))).toBeVisible();
     await expect(this.addExpenseFab).toBeVisible();
   }
 
@@ -123,15 +119,10 @@ export class PartyPage {
 
     await expect(this.balanceGuidanceHeading).toBeVisible();
     await expect(actionCard).toBeVisible();
-    await expect(
-      actionCard.getByRole("button", { name: action.actionLabel }),
-    ).toBeVisible();
+    await expect(actionCard.getByRole("button", { name: action.actionLabel })).toBeVisible();
   }
 
-  async expectSettlementActionButtonVisible(
-    action: SettlementAction,
-    buttonName: string,
-  ) {
+  async expectSettlementActionButtonVisible(action: SettlementAction, buttonName: string) {
     await expect(
       this.settlementActionCard(action).getByRole("button", {
         name: buttonName,
@@ -139,10 +130,7 @@ export class PartyPage {
     ).toBeVisible();
   }
 
-  async expectSettlementActionButtonHidden(
-    action: SettlementAction,
-    buttonName: string,
-  ) {
+  async expectSettlementActionButtonHidden(action: SettlementAction, buttonName: string) {
     await expect(
       this.settlementActionCard(action).getByRole("button", {
         name: buttonName,
@@ -156,13 +144,8 @@ export class PartyPage {
       .click();
   }
 
-  async openSettlementActionButton(
-    action: SettlementAction,
-    buttonName: string,
-  ) {
-    await this.settlementActionCard(action)
-      .getByRole("button", { name: buttonName })
-      .click();
+  async openSettlementActionButton(action: SettlementAction, buttonName: string) {
+    await this.settlementActionCard(action).getByRole("button", { name: buttonName }).click();
   }
 
   async expectSettlementActionRemoved(action: SettlementAction) {

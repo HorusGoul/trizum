@@ -1,5 +1,5 @@
 import type Dinero from "dinero.js";
-import { describe, test, expect } from "vitest";
+import { describe, test, expect } from "vite-plus/test";
 import {
   calculateLogStatsBetweenTwoUsers,
   calculateLogStatsOfUser,

@@ -9,12 +9,9 @@ export function cn(...className: ClassName[]) {
 
 const isBoolean = (maybeBoolean: unknown): maybeBoolean is boolean =>
   typeof maybeBoolean === "boolean";
-const toStringIfBoolean = (value: unknown) =>
-  isBoolean(value) ? String(value) : value;
-const isSimpleSubset = (
-  a: Record<string, unknown>,
-  b: Record<string, unknown>,
-) => Object.entries(a).every(([key, value]) => b[key] === value);
+const toStringIfBoolean = (value: unknown) => (isBoolean(value) ? String(value) : value);
+const isSimpleSubset = (a: Record<string, unknown>, b: Record<string, unknown>) =>
+  Object.entries(a).every(([key, value]) => b[key] === value);
 
 type Variants = {
   [key: string]: {
@@ -45,35 +42,23 @@ export type VariantsFromProps<
   Props extends Record<string, unknown>,
   RequiredProps = Required<Props>,
 > = {
-  [Key in keyof RequiredProps]: RequiredProps[Key] extends
-    | string
-    | symbol
-    | number
+  [Key in keyof RequiredProps]: RequiredProps[Key] extends string | symbol | number
     ? {
         [Variant in RequiredProps[Key]]: string;
       }
     : never;
 };
 
-export type VariantProps<CvaFn> = CvaFn extends (
-  options: Options<infer T>,
-) => string
+export type VariantProps<CvaFn> = CvaFn extends (options: Options<infer T>) => string
   ? {
       [Key in keyof T]: keyof T[Key];
     }
   : never;
 
 export const cva =
-  <SchemaVariants extends Variants>(
-    schema: Partial<Schema<SchemaVariants>> = {},
-  ) =>
+  <SchemaVariants extends Variants>(schema: Partial<Schema<SchemaVariants>> = {}) =>
   (options: Options<SchemaVariants> = {}, classNames: ClassName = []) => {
-    const {
-      base,
-      defaultVariants = {},
-      variants = {},
-      compoundVariants = [],
-    } = schema;
+    const { base, defaultVariants = {}, variants = {}, compoundVariants = [] } = schema;
 
     const optionsWithUndefinedsRemoved = Object.entries(options).reduce(
       (acc, [key, value]) => {
@@ -104,15 +89,12 @@ export const cva =
             defaultVariants[variantName]
         ];
       }),
-      compoundVariants.reduce(
-        (list, { classes, ...compoundVariantOptions }) => {
-          if (isSimpleSubset(compoundVariantOptions, currentOptions)) {
-            list.push(classes);
-          }
-          return list;
-        },
-        [] as string[],
-      ),
+      compoundVariants.reduce((list, { classes, ...compoundVariantOptions }) => {
+        if (isSimpleSubset(compoundVariantOptions, currentOptions)) {
+          list.push(classes);
+        }
+        return list;
+      }, [] as string[]),
       classNames,
     ]);
   };

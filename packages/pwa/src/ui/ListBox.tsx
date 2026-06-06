@@ -16,10 +16,7 @@ const ListBoxSection = AriaListBoxSection;
 
 const ListBoxCollection = AriaCollection;
 
-function ListBox<T extends object>({
-  className,
-  ...props
-}: AriaListBoxProps<T>) {
+function ListBox<T extends object>({ className, ...props }: AriaListBoxProps<T>) {
   return (
     <AriaListBox
       className={composeRenderProps(className, (className) =>
@@ -42,9 +39,7 @@ const ListBoxItem = <T extends object>({
 }: AriaListBoxItemProps<T>) => {
   return (
     <AriaListBoxItem
-      textValue={
-        props.textValue || (typeof children === "string" ? children : undefined)
-      }
+      textValue={props.textValue || (typeof children === "string" ? children : undefined)}
       className={composeRenderProps(className, (className) =>
         cn(
           "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
@@ -75,22 +70,10 @@ const ListBoxItem = <T extends object>({
   );
 };
 
-function ListBoxHeader({
-  className,
-  ...props
-}: React.ComponentProps<typeof AriaHeader>) {
+function ListBoxHeader({ className, ...props }: React.ComponentProps<typeof AriaHeader>) {
   return (
-    <AriaHeader
-      className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
-      {...props}
-    />
+    <AriaHeader className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)} {...props} />
   );
 }
 
-export {
-  ListBox,
-  ListBoxItem,
-  ListBoxHeader,
-  ListBoxSection,
-  ListBoxCollection,
-};
+export { ListBox, ListBoxItem, ListBoxHeader, ListBoxSection, ListBoxCollection };

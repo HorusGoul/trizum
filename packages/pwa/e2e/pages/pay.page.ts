@@ -11,17 +11,11 @@ export class PayPage {
 
   async expectLoaded(title: "Pay" | "Mark as paid") {
     await expect(this.page).toHaveURL(/\/party\/[^/]+\/pay\?.+/);
-    await expect(
-      this.page.getByRole("heading", { exact: true, name: title }),
-    ).toBeVisible();
+    await expect(this.page.getByRole("heading", { exact: true, name: title })).toBeVisible();
     await expect(this.markAsPaidButton).toBeVisible();
   }
 
-  async expectSearchParams(params: {
-    amount: string;
-    fromId: string;
-    toId: string;
-  }) {
+  async expectSearchParams(params: { amount: string; fromId: string; toId: string }) {
     await expect
       .poll(() => {
         const url = new URL(this.page.url());

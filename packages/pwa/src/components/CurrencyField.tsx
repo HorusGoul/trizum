@@ -7,9 +7,7 @@ import { CalculatorToolbar } from "./CalculatorToolbar";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
 
-export type CurrencyFieldProps = React.ComponentProps<
-  typeof AppCurrencyField
-> & {
+export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> & {
   calculator?: boolean;
   calculatorButtonClassName?: string;
   autoOpenCalculator?: boolean;
@@ -81,9 +79,7 @@ function CurrencyFieldWithCalculator({
         icon={state.isActive ? "lucide.x" : "lucide.calculator"}
         aria-label={state.isActive ? t`Close calculator` : t`Open calculator`}
         color="transparent"
-        className={
-          calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"
-        }
+        className={calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"}
         iconClassName="size-4"
         onPress={state.isActive ? actions.deactivate : actions.activate}
       />

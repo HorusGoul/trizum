@@ -38,12 +38,9 @@ function ensureLastUsedAt(list: PartyList) {
 export function usePartyList() {
   const repo = useRepo();
   const [partyListId] = useState<DocumentId>(() => getPartyListId(repo));
-  const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(
-    partyListId,
-    {
-      required: true,
-    },
-  );
+  const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(partyListId, {
+    required: true,
+  });
 
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());
@@ -53,10 +50,7 @@ export function usePartyList() {
     setThemeHue(partyList.hue ?? defaultThemeHue);
   }, [partyList.hue]);
 
-  function addPartyToList(
-    partyId: Party["id"],
-    participantId: PartyParticipant["id"],
-  ) {
+  function addPartyToList(partyId: Party["id"], participantId: PartyParticipant["id"]) {
     partyListHandle.change((list) => {
       list.parties[partyId] = true;
       delete ensureArchivedParties(list)[partyId];
@@ -177,23 +171,16 @@ export function usePartyList() {
       }
 
       for (const partyId in partyList.participantInParties) {
-        const party = await documentCache.readAsync(
-          repo,
-          partyId as DocumentId,
-        );
+        const party = await documentCache.readAsync(repo, partyId as DocumentId);
 
         if (!party) {
           continue;
         }
 
-        const partyHandle = handleCache.read(
-          repo,
-          partyId as DocumentId,
-        ) as DocHandle<Party>;
+        const partyHandle = handleCache.read(repo, partyId as DocumentId) as DocHandle<Party>;
 
         partyHandle.change((doc) => {
-          const participantId =
-            partyList.participantInParties[partyId as DocumentId];
+          const participantId = partyList.participantInParties[partyId as DocumentId];
           const participant = doc.participants[participantId];
 
           if (!participant) {

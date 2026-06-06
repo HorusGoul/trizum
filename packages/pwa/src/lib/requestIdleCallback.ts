@@ -18,10 +18,7 @@ interface IdleCallbackOptions {
  * @returns Handle ID that can be used to cancel the callback
  */
 export function requestIdleCallback(
-  callback: (deadline: {
-    didTimeout: boolean;
-    timeRemaining: () => number;
-  }) => void,
+  callback: (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void,
   options?: IdleCallbackOptions,
 ): number {
   if (typeof window !== "undefined" && "requestIdleCallback" in window) {

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { createPrefixedIconSource } from "./index.js";
 import { createIconSpritePlugin } from "./vite.js";
 
@@ -23,12 +23,7 @@ function getHookHandler(hook: unknown) {
     return hook;
   }
 
-  if (
-    hook &&
-    typeof hook === "object" &&
-    "handler" in hook &&
-    typeof hook.handler === "function"
-  ) {
+  if (hook && typeof hook === "object" && "handler" in hook && typeof hook.handler === "function") {
     return hook.handler;
   }
 
