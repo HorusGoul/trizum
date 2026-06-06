@@ -34,3 +34,16 @@ Run the package scripts defined in [`package.json`](./package.json):
 - `vp check`
 - `vp test`
 - `vp run lingui:extract` when copy changes
+
+## Deployment
+
+Cloudflare deployments are managed by GitHub Actions instead of Cloudflare's
+connected repository builds.
+
+- Production deploys run after a changeset release updates the PWA version or
+  changelog on `main`.
+- Pull requests get Cloudflare preview deployments from the
+  `PWA Preview` workflow, and the workflow updates a PR comment with the latest
+  preview URL.
+- The workflows require `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+  repository secrets.

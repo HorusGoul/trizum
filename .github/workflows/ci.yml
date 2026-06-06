@@ -77,8 +77,12 @@ jobs:
       contents: write
       pull-requests: write
     timeout-minutes: 5
+    outputs:
+      should_deploy_pwa: ${{ steps.release-state.outputs.should_deploy_pwa }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
@@ -92,6 +96,63 @@ jobs:
           version: vp run update-version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect PWA changeset release
+        id: release-state
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+
+          echo "should_deploy_pwa=false" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ steps.changesets.outputs.hasChangesets }}" != "false" ]; then
+            echo "Changesets are still pending; skipping production deploy."
+            exit 0
+          fi
+
+          changed_files="$(git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA")"
+          printf '%s\n' "$changed_files"
+
+          if printf '%s\n' "$changed_files" | grep -Eq '^packages/pwa/(package\.json|CHANGELOG\.md)$'; then
+            echo "should_deploy_pwa=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy-pwa-production:
+    name: Deploy PWA Production
+    runs-on: ubuntu-latest
+    needs: [release]
+    if: github.ref == 'refs/heads/main' && needs.release.outputs.should_deploy_pwa == 'true'
+    permissions:
+      contents: read
+      deployments: write
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+
+      - name: Install Dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Build PWA
+        run: vp run --filter @trizum/pwa build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Deploy PWA to Cloudflare
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          packageManager: pnpm
+          workingDirectory: packages/pwa
 
   autofix:
     name: Autofix & Extract Messages

@@ -1,20 +1,21 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "trizum",
+  "name": "trizum-preview",
   "compatibility_date": "2025-11-18",
-  "main": "api/worker.ts",
+  "main": "dist/trizum/index.js",
+  "no_bundle": true,
+  "rules": [
+    {
+      "type": "ESModule",
+      "globs": ["**/*.js", "**/*.mjs"],
+    },
+  ],
   "assets": {
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"],
   },
-  "routes": [
-    {
-      "pattern": "trizum.app",
-      "custom_domain": true,
-    },
-  ],
   "preview_urls": true,
   "workers_dev": true,
 }
