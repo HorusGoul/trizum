@@ -1,15 +1,4 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import {
-  configDefaults,
-  defineConfig,
-  mergeConfig,
-  type ConfigEnv,
-  type UserConfig,
-} from "vite-plus";
-
-const workspaceRoot = fileURLToPath(new URL(".", import.meta.url));
-const pwaRoot = path.join(workspaceRoot, "packages/pwa");
+import { configDefaults, defineConfig, type UserConfig } from "vite-plus";
 
 const ignoredPaths = [
   ".agents/**",
@@ -137,27 +126,4 @@ const toolingConfig = {
   },
 } satisfies UserConfig;
 
-export default defineConfig(async (env) => {
-  const isVitest = env.mode === "test" || process.env.VITEST === "true";
-  const isAppCommand = !isVitest && (env.command === "build" || env.command === "serve");
-
-  if (!isAppCommand) {
-    return toolingConfig;
-  }
-
-  return mergeConfig(
-    await resolvePwaConfig(env),
-    mergeConfig(
-      {
-        root: pwaRoot,
-      },
-      toolingConfig,
-    ),
-  );
-});
-
-async function resolvePwaConfig(env: ConfigEnv) {
-  const { default: pwaConfig } = await import("./packages/pwa/vite.config.ts");
-
-  return typeof pwaConfig === "function" ? pwaConfig(env) : pwaConfig;
-}
+export default defineConfig(toolingConfig);

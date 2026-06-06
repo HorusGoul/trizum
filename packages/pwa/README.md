@@ -33,6 +33,7 @@ Run the package scripts defined in [`package.json`](./package.json):
 
 - `vp check`
 - `vp test`
+- `vp run build`
 - `vp run lingui:extract` when copy changes
 
 ## Deployment

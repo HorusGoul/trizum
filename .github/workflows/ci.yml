@@ -19,7 +19,7 @@ jobs:
       matrix:
         command:
           - check
-          - build
+          - run build
           - test
     steps:
       - uses: actions/checkout@v6

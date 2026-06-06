@@ -5,7 +5,17 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { getConfig as getLinguiConfig } from "@lingui/conf";
 import type { Plugin } from "vite-plus";
-import { configDefaults, defineConfig, lazyPlugins } from "vite-plus";
+import { configDefaults, defineConfig } from "vite-plus";
+import react from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
+import { lingui } from "@lingui/vite-plugin";
+import { VitePWA } from "vite-plugin-pwa";
+import license from "rollup-plugin-license";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
 
@@ -20,7 +30,6 @@ const linguiConfig = getLinguiConfig({
 });
 const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
 const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
-const vitePwaModulePath = packageRequire.resolve("vite-plugin-pwa");
 const reactCompilerPreset = {
   preset: () => ({
     plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
@@ -74,145 +83,119 @@ export default defineConfig(({ mode }) => {
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
     },
-    plugins: lazyPlugins(async () => {
-      const [
-        { cloudflare },
-        { default: react },
-        { default: babel },
-        { tanstackRouter },
-        { default: wasm },
-        { default: topLevelAwait },
-        { lingui },
-        { VitePWA },
-        { default: license },
-        { sentryVitePlugin },
-      ] = await Promise.all([
-        import("@cloudflare/vite-plugin"),
-        import("@vitejs/plugin-react"),
-        import("@rolldown/plugin-babel"),
-        import("@tanstack/router-plugin/vite"),
-        import("vite-plugin-wasm"),
-        import("vite-plugin-top-level-await"),
-        import("@lingui/vite-plugin"),
-        import(vitePwaModulePath),
-        import("rollup-plugin-license"),
-        import("@sentry/vite-plugin"),
-      ]);
+    plugins: [
+      ...(isTest ? [] : [cloudflare()]),
+      tanstackRouter(),
+      react(),
+      babel({
+        include: /\/src\/.*\.[cm]?[jt]sx?$/,
+        plugins: [[linguiBabelPlugin, { linguiConfig }]],
+        presets: [reactCompilerPreset],
+      }),
+      wasm() as Plugin,
+      topLevelAwait(),
+      lingui({
+        cwd: packageRoot,
+        configPath: linguiConfigPath,
+      }),
+      createIconSpritePlugin(iconSpriteConfig),
+      VitePWA({
+        registerType: "prompt",
+        workbox: {
+          globPatterns: ["**/*.{js,wasm,css,html,svg}"],
+          maximumFileSizeToCacheInBytes: 5242880,
+          additionalManifestEntries: [{ url: "/THIRD-PARTY-LICENSES.txt", revision: null }],
+        },
+        outDir: "dist/client",
+        manifest: {
+          name: "trizum",
+          short_name: "trizum",
+          description,
+          theme_color: "#000000",
+          background_color: "#000000",
+          display: "standalone",
+          icons: [
+            {
+              src: "maskable-icon-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
+            },
+            {
+              src: "pwa-64x64.png",
+              sizes: "64x64",
+              type: "image/png",
+            },
+            {
+              src: "pwa-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "pwa-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+          ],
+        },
+      }),
+      // Generate third-party licenses file during build
+      license({
+        thirdParty: {
+          includePrivate: false,
+          output: {
+            file: path.resolve(packageRoot, "dist/client", "THIRD-PARTY-LICENSES.txt"),
+            template(dependencies) {
+              return dependencies
+                .map((dep) => {
+                  const repository =
+                    typeof dep.repository === "object" && dep.repository?.url
+                      ? dep.repository.url
+                      : dep.repository;
 
-      return [
-        ...(isTest ? [] : [cloudflare()]),
-        tanstackRouter(),
-        react(),
-        babel({
-          include: /\/src\/.*\.[cm]?[jt]sx?$/,
-          plugins: [[linguiBabelPlugin, { linguiConfig }]],
-          presets: [reactCompilerPreset],
-        }),
-        wasm() as Plugin,
-        topLevelAwait(),
-        lingui({
-          cwd: packageRoot,
-          configPath: linguiConfigPath,
-        }),
-        createIconSpritePlugin(iconSpriteConfig),
-        VitePWA({
-          registerType: "prompt",
-          workbox: {
-            globPatterns: ["**/*.{js,wasm,css,html,svg}"],
-            maximumFileSizeToCacheInBytes: 5242880,
-            additionalManifestEntries: [{ url: "/THIRD-PARTY-LICENSES.txt", revision: null }],
-          },
-          outDir: "dist/client",
-          manifest: {
-            name: "trizum",
-            short_name: "trizum",
-            description,
-            theme_color: "#000000",
-            background_color: "#000000",
-            display: "standalone",
-            icons: [
-              {
-                src: "maskable-icon-512x512.png",
-                sizes: "512x512",
-                type: "image/png",
-                purpose: "maskable",
-              },
-              {
-                src: "pwa-64x64.png",
-                sizes: "64x64",
-                type: "image/png",
-              },
-              {
-                src: "pwa-192x192.png",
-                sizes: "192x192",
-                type: "image/png",
-              },
-              {
-                src: "pwa-512x512.png",
-                sizes: "512x512",
-                type: "image/png",
-              },
-            ],
-          },
-        }),
-        // Generate third-party licenses file during build
-        license({
-          thirdParty: {
-            includePrivate: false,
-            output: {
-              file: path.resolve(packageRoot, "dist/client", "THIRD-PARTY-LICENSES.txt"),
-              template(dependencies) {
-                return dependencies
-                  .map((dep) => {
-                    const repository =
-                      typeof dep.repository === "object" && dep.repository?.url
-                        ? dep.repository.url
-                        : dep.repository;
+                  const lines = [
+                    `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
+                    dep.license ? `License: ${dep.license}` : "",
+                    dep.author ? `Author: ${dep.author.text()}` : "",
+                    repository ? `Repository: ${repository}` : "",
+                    "",
+                  ];
 
-                    const lines = [
-                      `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
-                      dep.license ? `License: ${dep.license}` : "",
-                      dep.author ? `Author: ${dep.author.text()}` : "",
-                      repository ? `Repository: ${repository}` : "",
-                      "",
-                    ];
+                  if (dep.licenseText) {
+                    lines.push(dep.licenseText, "");
+                  }
 
-                    if (dep.licenseText) {
-                      lines.push(dep.licenseText, "");
-                    }
+                  lines.push("-".repeat(80), "");
 
-                    lines.push("-".repeat(80), "");
-
-                    return lines.filter((line) => line !== undefined).join("\n");
-                  })
-                  .join("\n");
-              },
+                  return lines.filter((line) => line !== undefined).join("\n");
+                })
+                .join("\n");
             },
           },
-        }),
-        appendSourceMappingURLPlugin(),
-        ...(hasSentryAuthToken
-          ? [
-              sentryVitePlugin({
-                org: process.env.SENTRY_ORG,
-                project: process.env.SENTRY_PROJECT,
-                authToken: sentryAuthToken,
-                release: {
-                  create: true,
-                  name: fullVersion,
-                  setCommits: {
-                    auto: true,
-                  },
-                  inject: true,
+        },
+      }),
+      appendSourceMappingURLPlugin(),
+      ...(hasSentryAuthToken
+        ? [
+            sentryVitePlugin({
+              org: process.env.SENTRY_ORG,
+              project: process.env.SENTRY_PROJECT,
+              authToken: sentryAuthToken,
+              release: {
+                create: true,
+                name: fullVersion,
+                setCommits: {
+                  auto: true,
                 },
-                sourcemaps: {
-                  disable: true,
-                },
-              }),
-            ]
-          : []),
-      ];
-    }),
+                inject: true,
+              },
+              sourcemaps: {
+                disable: true,
+              },
+            }),
+          ]
+        : []),
+    ],
   };
 });
 
