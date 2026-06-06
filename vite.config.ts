@@ -1,5 +1,18 @@
 import { configDefaults, defineConfig, type UserConfig } from "vite-plus";
 
+const rootAppCommandMessage = [
+  "The workspace root is not an app package.",
+  "",
+  "Run app commands from a package instead:",
+  "  cd packages/pwa && vp dev",
+  "  cd packages/pwa && vp run build",
+  "",
+  "From the workspace root, pass the package root or run package scripts:",
+  "  vp dev packages/pwa",
+  "  vp run --filter @trizum/pwa build",
+  "  vp run build",
+].join("\n");
+
 const ignoredPaths = [
   ".agents/**",
   ".vite-hooks/**",
@@ -21,6 +34,22 @@ const ignoredPaths = [
 ];
 
 const lintIgnoredPaths = [...ignoredPaths, "packages/pwa/api/**", "packages/pwa/e2e/**"];
+
+function rootAppCommandGuard() {
+  return {
+    config() {
+      if (process.env.VP_COMMAND !== "dev" && process.env.VP_COMMAND !== "build") {
+        return;
+      }
+
+      const error = new Error(rootAppCommandMessage);
+      error.stack = rootAppCommandMessage;
+      throw error;
+    },
+    enforce: "pre",
+    name: "trizum-root-app-command-guard",
+  } satisfies NonNullable<UserConfig["plugins"]>[number];
+}
 
 const toolingConfig = {
   fmt: {
@@ -84,6 +113,7 @@ const toolingConfig = {
   staged: {
     "*": "vp check --fix",
   },
+  plugins: [rootAppCommandGuard()],
   run: {
     cache: {
       scripts: true,
