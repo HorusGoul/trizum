@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_VERSION: string;
   readonly VITE_APP_COMMIT: string;
   readonly VITE_APP_WSS_URL: string;
+  readonly VITE_APP_DISABLE_SENTRY?: string;
 }
 
 interface ImportMeta {

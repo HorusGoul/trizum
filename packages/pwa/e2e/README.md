@@ -18,8 +18,9 @@ setup and reusable journey state.
 - Start new browser journeys from [`harness/trizum.fixture.ts`](./harness/trizum.fixture.ts)
   instead of importing `@playwright/test` directly.
 - The fixture always boots the app with `__internal_offline_only=true` and
-  blocks service workers. Each Playwright test gets a fresh browser context, so
-  local storage, IndexedDB, and party-list state do not leak across runs.
+  blocks service workers and Sentry network requests. Each Playwright test gets
+  a fresh browser context, so local storage, IndexedDB, and party-list state do
+  not leak across runs.
 - Seed state directly only when it is a precondition, not the behavior being
   tested. Use seeded setup for existing party docs, last-opened party behavior,
   and imbalanced balances.
