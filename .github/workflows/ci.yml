@@ -145,13 +145,13 @@ jobs:
 
       - name: Deploy PWA to Cloudflare
         id: deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          packageManager: pnpm
+          packageManager: npm
           workingDirectory: packages/pwa
 
   autofix:

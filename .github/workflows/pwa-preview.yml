@@ -41,7 +41,7 @@ jobs:
 
       - name: Deploy PWA preview to Cloudflare
         id: deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -51,7 +51,7 @@ jobs:
             --tag pr-${{ github.event.pull_request.number }}
             --message "Preview for PR #${{ github.event.pull_request.number }}"
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          packageManager: pnpm
+          packageManager: npm
           workingDirectory: packages/pwa
 
       - name: Comment preview URL
