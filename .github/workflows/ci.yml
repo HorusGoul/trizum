@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: "24"
+          node-version-file: ".node-version"
           cache: true
 
       - name: Install Dependencies
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: "24"
+          node-version-file: ".node-version"
           cache: true
 
       - name: Install Dependencies
@@ -85,7 +85,7 @@ jobs:
           fetch-depth: 0
       - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: "24"
+          node-version-file: ".node-version"
           cache: true
       - name: Install Dependencies
         run: vp install --frozen-lockfile
@@ -132,7 +132,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: "24"
+          node-version-file: ".node-version"
           cache: true
 
       - name: Install Dependencies
@@ -167,7 +167,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: "24"
+          node-version-file: ".node-version"
           cache: true
       - name: Install Dependencies
         run: vp install --frozen-lockfile
