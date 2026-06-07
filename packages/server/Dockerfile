@@ -59,6 +59,10 @@ COPY packages/server/entrypoint.sh ./entrypoint.sh
 COPY packages/server/drizzle ./drizzle
 COPY --from=build /app/packages/server/build/trizum-server ./trizum-server
 COPY --from=build /app/node_modules/.pnpm/@libsql+linux-x64-gnu@0.5.22/node_modules/@libsql/linux-x64-gnu ./node_modules/@libsql/linux-x64-gnu
+COPY --from=build /app/node_modules/.pnpm/@sentry-internal+node-cpu-profiler@2.2.0/node_modules/@sentry-internal/node-cpu-profiler ./node_modules/@sentry-internal/node-cpu-profiler
+COPY --from=build /app/node_modules/.pnpm/detect-libc@2.1.2/node_modules/detect-libc ./node_modules/detect-libc
+COPY --from=build /app/node_modules/.pnpm/node-abi@3.85.0/node_modules/node-abi ./node_modules/node-abi
+COPY --from=build /app/node_modules/.pnpm/semver@7.7.3/node_modules/semver ./node_modules/semver
 
 RUN chmod +x ./entrypoint.sh ./trizum-server
 

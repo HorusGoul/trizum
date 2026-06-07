@@ -8,7 +8,7 @@ export default defineConfig({
   pack: {
     deps: {
       alwaysBundle: /.*/,
-      neverBundle: [/^@sentry\/profiling-node$/, /^@sentry-internal\/node-cpu-profiler/],
+      neverBundle: [/^@sentry-internal\/node-cpu-profiler/],
       onlyBundle: false,
     },
     entry: ["src/cli.ts"],
