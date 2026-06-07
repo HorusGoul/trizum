@@ -1,12 +1,13 @@
 {
   "extends": "@trizum/tsconfig/base.json",
-  "include": ["./src"],
+  "include": ["./src", "./capacitor.log.ts"],
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./dist",
     "moduleResolution": "nodenext",
     "module": "nodenext",
+    "customConditions": ["source"],
     "types": ["node"],
     "noEmit": true
   }

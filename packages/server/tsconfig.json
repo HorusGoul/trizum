@@ -8,6 +8,7 @@
     "types": ["node"],
     "noEmit": true,
     "module": "nodenext",
+    "customConditions": ["source"],
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true
   }

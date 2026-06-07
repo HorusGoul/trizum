@@ -144,7 +144,7 @@ const toolingConfig = {
   plugins: [rootAppCommandGuard()],
   run: {
     cache: {
-      scripts: true,
+      scripts: false,
       tasks: true,
     },
   },
