@@ -1,7 +1,6 @@
 # syntax = docker/dockerfile:1
 
-# Node 25.7+ is required by Vite+ / tsdown executable packing.
-ARG NODE_VERSION=25.7.0
+ARG NODE_VERSION=24.11.1
 ARG VITE_PLUS_VERSION=0.1.24
 FROM node:${NODE_VERSION}-slim AS build
 
@@ -40,12 +39,12 @@ COPY packages ./packages
 # Build workspace packages needed by the server runtime
 RUN vp run --filter @trizum/logging build
 
-# Pack the server and migrator as standalone executables
+# Pack the server and migrator as a standalone Node module
 WORKDIR /app/packages/server
 RUN vp pack
 
-# Runtime base - no Node.js, pnpm, or Vite+
-FROM debian:bookworm-slim AS runtime-base
+# Runtime base - Node.js without pnpm or Vite+
+FROM node:${NODE_VERSION}-slim AS runtime-base
 
 ENV NODE_ENV="production"
 
@@ -57,14 +56,14 @@ RUN apt-get update -qq && \
 
 COPY packages/server/entrypoint.sh ./entrypoint.sh
 COPY packages/server/drizzle ./drizzle
-COPY --from=build /app/packages/server/build/trizum-server ./trizum-server
+COPY --from=build /app/packages/server/build/cli.mjs ./server.mjs
 COPY --from=build /app/node_modules/.pnpm/@libsql+linux-x64-gnu@0.5.22/node_modules/@libsql/linux-x64-gnu ./node_modules/@libsql/linux-x64-gnu
 COPY --from=build /app/node_modules/.pnpm/@sentry-internal+node-cpu-profiler@2.2.0/node_modules/@sentry-internal/node-cpu-profiler ./node_modules/@sentry-internal/node-cpu-profiler
 COPY --from=build /app/node_modules/.pnpm/detect-libc@2.1.2/node_modules/detect-libc ./node_modules/detect-libc
 COPY --from=build /app/node_modules/.pnpm/node-abi@3.85.0/node_modules/node-abi ./node_modules/node-abi
 COPY --from=build /app/node_modules/.pnpm/semver@7.7.3/node_modules/semver ./node_modules/semver
 
-RUN chmod +x ./entrypoint.sh ./trizum-server
+RUN chmod +x ./entrypoint.sh
 
 # Expose port
 EXPOSE 3000

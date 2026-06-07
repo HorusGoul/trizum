@@ -13,14 +13,8 @@ export default defineConfig({
     },
     entry: ["src/cli.ts"],
     dts: false,
-    exe: {
-      fileName: "trizum-server",
-      outDir: "build",
-      seaConfig: {
-        execArgv: ["--disable-warning=ExperimentalWarning"],
-      },
-    },
     format: "esm",
+    outDir: "build",
     sourcemap: false,
   },
 });
