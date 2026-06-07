@@ -25,7 +25,7 @@ FROM base AS build
 
 # Install packages needed to build node modules
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3 && \
+    apt-get install --no-install-recommends -y build-essential git node-gyp pkg-config python-is-python3 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 WORKDIR /app
@@ -39,19 +39,8 @@ COPY packages ./packages
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
-# Deploy stage - create production deployment
-FROM base AS deploy
-
-WORKDIR /app
-
-# Copy workspace configuration files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Copy all packages
-COPY packages ./packages
-
-# Install dependencies (production only)
-RUN pnpm install --frozen-lockfile --prod
+# Build workspace packages needed by the server runtime
+RUN pnpm --filter @trizum/logging build
 
 # Use pnpm deploy to create a clean production deployment of the server package
 # This will copy only the server package and its production dependencies
@@ -63,7 +52,7 @@ FROM base AS runtime
 WORKDIR /app
 
 # Copy deployed server code
-COPY --from=deploy /app/deploy ./
+COPY --from=build /app/deploy ./
 
 # Expose port
 EXPOSE 3000

@@ -18,15 +18,15 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "source": "./src/index.ts",
-      "import": "./src/index.ts",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./github-actions": {
-      "types": "./src/github-actions.ts",
+      "types": "./dist/github-actions.d.ts",
       "source": "./src/github-actions.ts",
-      "import": "./src/github-actions.ts",
+      "import": "./dist/github-actions.js",
       "default": "./dist/github-actions.js"
     }
   },
