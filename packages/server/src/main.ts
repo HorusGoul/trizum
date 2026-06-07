@@ -1,20 +1,31 @@
 import { env } from "#src/env.ts";
-import { Repo, type PeerId } from "@automerge/automerge-repo";
+import { automergeWasmBase64 } from "@automerge/automerge/automerge.wasm.base64";
+import { initializeBase64Wasm, Repo, type PeerId } from "@automerge/automerge-repo/slim";
 import { DrizzleSqliteStorageAdapter } from "./repo/DrizzleSqliteStorageAdapter.ts";
 import { db } from "./db.ts";
 import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
 import * as os from "node:os";
+import path from "node:path";
 import { Hono } from "hono";
 import { serve, type ServerType } from "@hono/node-server";
 import { createNodeWebSocket } from "@hono/node-ws";
 import { configureServerLogging, rootLogger as logger } from "./log.ts";
 import { withContext } from "@logtape/logtape";
 import { cors } from "hono/cors";
+import { fileURLToPath } from "node:url";
 
 configureServerLogging();
 
-async function main() {
+let automergeWasm: Promise<void> | undefined;
+
+function initializeAutomerge() {
+  automergeWasm ??= initializeBase64Wasm(automergeWasmBase64);
+  return automergeWasm;
+}
+
+export async function startServer() {
   logger.info("Starting server with version {version}...");
+  await initializeAutomerge();
 
   const app = new Hono({});
   const webSockets = createNodeWebSocket({
@@ -176,7 +187,21 @@ async function main() {
   logger.info(`Server is running on 0.0.0.0:${port}`);
 }
 
-main().catch((error) => {
-  logger.error(error instanceof Error ? error.message : String(error));
-  process.exit(1);
-});
+function isSourceEntrypoint() {
+  if (!process.argv[1]) {
+    return false;
+  }
+
+  const modulePath = fileURLToPath(import.meta.url);
+  return (
+    modulePath.endsWith(`${path.sep}src${path.sep}main.ts`) &&
+    path.resolve(process.argv[1]) === modulePath
+  );
+}
+
+if (isSourceEntrypoint()) {
+  startServer().catch((error) => {
+    logger.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  });
+}
