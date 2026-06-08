@@ -115,28 +115,6 @@ const toolingConfig = {
           "react/only-export-components": "off",
         },
       },
-      {
-        files: [
-          "packages/*/src/**/*.test.ts",
-          "packages/*/src/**/*.test.tsx",
-          "packages/pwa/src/lib/testing/**/*.ts",
-        ],
-        rules: {
-          "vitest/require-mock-type-parameters": "off",
-        },
-      },
-      {
-        files: ["packages/pwa/src/lib/expenses.test.ts"],
-        rules: {
-          "vitest/valid-expect": "off",
-        },
-      },
-      {
-        files: ["packages/server/src/main.ts"],
-        rules: {
-          "typescript/no-misused-spread": "off",
-        },
-      },
     ],
   },
   staged: {

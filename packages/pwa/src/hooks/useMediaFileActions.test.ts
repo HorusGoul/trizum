@@ -2,13 +2,16 @@ import { i18n } from "@lingui/core";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Repo } from "@automerge/automerge-repo";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
+import type * as imageCompressionModule from "#src/lib/imageCompression.ts";
 
 vi.mock("#src/lib/imageCompression.ts", async () => {
-  const actual = await vi.importActual("#src/lib/imageCompression.ts");
+  const actual = await vi.importActual<typeof imageCompressionModule>(
+    "#src/lib/imageCompression.ts",
+  );
 
   return {
     ...actual,
-    processImage: vi.fn(),
+    processImage: vi.fn<typeof imageCompressionModule.processImage>(),
   };
 });
 

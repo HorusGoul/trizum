@@ -1,5 +1,5 @@
 import type Dinero from "dinero.js";
-import { describe, test, expect } from "vite-plus/test";
+import { describe, expect, test } from "vite-plus/test";
 import {
   calculateLogStatsBetweenTwoUsers,
   calculateLogStatsOfUser,
@@ -50,7 +50,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     const result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(0);
+    expectDineroAmount(result.diffUnsplitted, 0);
   });
 
   test("should return diffUnsplitted=-100 when expenses splits are 50%, user1 paid 100, and user1 paid 300", () => {
@@ -73,7 +73,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     const result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(-100);
+    expectDineroAmount(result.diffUnsplitted, -100);
   });
 
   test("should return diffUnsplitted=100 when expenses splits are 50%, user1 paid 300, and user2 paid 100", () => {
@@ -96,7 +96,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     const result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(100);
+    expectDineroAmount(result.diffUnsplitted, 100);
   });
 
   test("should return diffUnsplitted=0 when expenses are splitted evenly", () => {
@@ -119,7 +119,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     const result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(0);
+    expectDineroAmount(result.diffUnsplitted, 0);
   });
 
   test("should return diffUnsplitted=-50 when user1 pays something for themselves", () => {
@@ -142,7 +142,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     const result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(-50);
+    expectDineroAmount(result.diffUnsplitted, -50);
   });
 
   test("should return diffUnsplitted=50 when user1 pays something for themselves", () => {
@@ -165,7 +165,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     const result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(50);
+    expectDineroAmount(result.diffUnsplitted, 50);
   });
 
   test("should return diffUnsplitted=0 when user2 pays a debt to user1", () => {
@@ -188,11 +188,11 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     let result = calculateLogStatsBetweenTwoUsers(user, otherUser, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(0);
+    expectDineroAmount(result.diffUnsplitted, 0);
 
     result = calculateLogStatsBetweenTwoUsers(otherUser, user, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(0);
+    expectDineroAmount(result.diffUnsplitted, 0);
   });
 
   test("should return diffUnsplitted=-1667 for user2, diffUnsplitted=3333 for user3", () => {
@@ -220,11 +220,11 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     let result = calculateLogStatsBetweenTwoUsers(user1, user2, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(-1667);
+    expectDineroAmount(result.diffUnsplitted, -1667);
 
     result = calculateLogStatsBetweenTwoUsers(user1, user3, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(3333);
+    expectDineroAmount(result.diffUnsplitted, 3333);
   });
 
   test("should return diffUnsplitted=3333 for user2, diffUnsplitted=3333 for user3", () => {
@@ -261,11 +261,11 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
 
     let result = calculateLogStatsBetweenTwoUsers(user1, user2, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(3333);
+    expectDineroAmount(result.diffUnsplitted, 3333);
 
     result = calculateLogStatsBetweenTwoUsers(user1, user3, expenses);
 
-    expectDinero(result.diffUnsplitted).toEqual(3333);
+    expectDineroAmount(result.diffUnsplitted, 3333);
   });
 
   test("should return diffUnsplited=100 for user1, and diffUnsplited=-100 for user2, when user1 pays something for user2", () => {
@@ -282,10 +282,10 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
     ];
 
     let result = calculateLogStatsBetweenTwoUsers(user1, user2, expenses);
-    expectDinero(result.diffUnsplitted).toEqual(100);
+    expectDineroAmount(result.diffUnsplitted, 100);
 
     result = calculateLogStatsBetweenTwoUsers(user2, user1, expenses);
-    expectDinero(result.diffUnsplitted).toEqual(-100);
+    expectDineroAmount(result.diffUnsplitted, -100);
   });
 });
 
@@ -322,11 +322,11 @@ describe("calculateLogStatsOfUser", () => {
 
     const result = calculateLogStatsOfUser(user, otherUsers, expenses);
 
-    expectDinero(result.userOwes).toEqual(100);
-    expectDinero(result.owedToUser).toEqual(0);
+    expectDineroAmount(result.userOwes, 100);
+    expectDineroAmount(result.owedToUser, 0);
 
-    expectDinero(result.diffs.user2.diffUnsplitted).toEqual(0);
-    expectDinero(result.diffs.user3.diffUnsplitted).toEqual(-100);
+    expectDineroAmount(result.diffs.user2.diffUnsplitted, 0);
+    expectDineroAmount(result.diffs.user3.diffUnsplitted, -100);
   });
 
   test("user2 should owe 2 to user1", () => {
@@ -355,9 +355,9 @@ describe("calculateLogStatsOfUser", () => {
 
     const result = calculateLogStatsOfUser(user, otherUsers, expenses);
 
-    expectDinero(result.userOwes).toEqual(0);
-    expectDinero(result.owedToUser).toEqual(100);
-    expectDinero(result.diffs.user2.diffUnsplitted).toEqual(100);
+    expectDineroAmount(result.userOwes, 0);
+    expectDineroAmount(result.owedToUser, 100);
+    expectDineroAmount(result.diffs.user2.diffUnsplitted, 100);
   });
 
   test("user2 should owe 200 to user1, and user3 should owe 150 to user1, but user3 should only owe 50 to user2", () => {
@@ -384,18 +384,18 @@ describe("calculateLogStatsOfUser", () => {
 
     let result = calculateLogStatsOfUser("user1", ["user2", "user3"], expenses);
 
-    expectDinero(result.userOwes).toEqual(0);
-    expectDinero(result.owedToUser).toEqual(166);
-    expectDinero(result.diffs.user2.diffUnsplitted).toEqual(66);
+    expectDineroAmount(result.userOwes, 0);
+    expectDineroAmount(result.owedToUser, 166);
+    expectDineroAmount(result.diffs.user2.diffUnsplitted, 66);
 
     result = calculateLogStatsOfUser("user3", ["user2", "user1"], expenses);
 
-    expectDinero(result.userOwes).toEqual(133);
-    expectDinero(result.owedToUser).toEqual(0);
-    expectDinero(result.diffs.user2.diffUnsplitted).toEqual(-33);
+    expectDineroAmount(result.userOwes, 133);
+    expectDineroAmount(result.owedToUser, 0);
+    expectDineroAmount(result.diffs.user2.diffUnsplitted, -33);
   });
 });
 
-function expectDinero(dinero: Dinero.Dinero) {
-  return expect(dinero.getAmount());
+function expectDineroAmount(dinero: Dinero.Dinero, expectedAmount: number) {
+  expect(dinero.getAmount()).toEqual(expectedAmount);
 }
