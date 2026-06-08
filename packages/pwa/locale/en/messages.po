@@ -1743,11 +1743,11 @@ msgstr "Reload"
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/AvatarPicker.tsx:115
+#: src/components/AvatarPicker.tsx:114
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/ExpenseEditor.tsx:949
+#: src/components/ExpenseEditor.tsx:948
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -2057,8 +2057,8 @@ msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 msgid "Tajikistani Somoni"
 msgstr "Tajikistani Somoni"
 
-#: src/components/AvatarPicker.tsx:127
-#: src/components/AvatarPicker.tsx:142
+#: src/components/AvatarPicker.tsx:128
+#: src/components/AvatarPicker.tsx:143
 #: src/components/ExpenseEditor.tsx:872
 #: src/components/ExpenseEditor.tsx:886
 msgid "Take photo"
@@ -2275,8 +2275,8 @@ msgstr "Updating trizum..."
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
-#: src/components/AvatarPicker.tsx:136
-#: src/components/AvatarPicker.tsx:154
+#: src/components/AvatarPicker.tsx:137
+#: src/components/AvatarPicker.tsx:155
 #: src/components/ExpenseEditor.tsx:881
 #: src/components/ExpenseEditor.tsx:898
 msgid "Upload photo"
