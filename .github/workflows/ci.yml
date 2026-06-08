@@ -86,6 +86,7 @@ jobs:
         uses: changesets/action@v1
         with:
           version: vp run update-version
+          publish: vp run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -93,23 +94,23 @@ jobs:
         id: release-state
         shell: bash
         env:
-          BEFORE_SHA: ${{ github.event.before }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
         run: |
           set -euo pipefail
 
           echo "should_deploy_pwa=false" >> "$GITHUB_OUTPUT"
+          echo "Published packages: ${PUBLISHED_PACKAGES:-[]}"
 
-          if [ "${{ steps.changesets.outputs.hasChangesets }}" != "false" ]; then
-            echo "Changesets are still pending; skipping production deploy."
-            exit 0
-          fi
+          node <<'NODE' >> "$GITHUB_OUTPUT"
+          const publishedPackages = JSON.parse(process.env.PUBLISHED_PACKAGES || "[]");
+          const shouldDeployPwa = publishedPackages.some(
+            (pkg) => pkg.name === "@trizum/pwa",
+          );
 
-          changed_files="$(git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA")"
-          printf '%s\n' "$changed_files"
-
-          if printf '%s\n' "$changed_files" | grep -Eq '^packages/pwa/(package\.json|CHANGELOG\.md)$'; then
-            echo "should_deploy_pwa=true" >> "$GITHUB_OUTPUT"
-          fi
+          if (shouldDeployPwa) {
+            console.log("should_deploy_pwa=true");
+          }
+          NODE
 
   deploy-pwa-production:
     name: Deploy PWA Production
