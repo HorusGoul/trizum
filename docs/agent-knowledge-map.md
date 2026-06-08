@@ -103,7 +103,7 @@ For most coding tasks, an agent should read in this order:
 3. the package README for the area being changed
 4. any deeper subdirectory `AGENTS.md` for that domain
 5. the relevant skill, if the task matches one
-6. the package's `package.json` for the exact runnable commands
+6. the package's `vite.config.ts` and `package.json` for the exact runnable commands
 
 The screenshots package is intentionally not part of the default path for normal
 app or server work. It is a specialist package and should say so explicitly.

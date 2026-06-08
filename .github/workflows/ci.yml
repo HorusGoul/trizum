@@ -198,5 +198,5 @@ jobs:
           committer_email: actions@github.com
 
       - name: Check if autofix and extract messages were successful
-        if: ${{ steps.autofix.result != '0' || steps.extract-messages.result != '0' }}
+        if: ${{ steps.autofix.outcome != 'success' || steps.extract-messages.outcome != 'success' }}
         run: echo "::error::Autofix or extract messages failed" && exit 1

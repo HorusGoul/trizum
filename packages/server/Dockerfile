@@ -1,8 +1,11 @@
 # syntax = docker/dockerfile:1
 
 ARG NODE_VERSION=24.11.1
+ARG LITESTREAM_VERSION=0.5.2
 ARG VITE_PLUS_VERSION=0.1.24
 FROM node:${NODE_VERSION}-slim AS build
+ARG TARGETARCH
+ARG VITE_PLUS_VERSION
 
 LABEL fly_launch_runtime="Node.js"
 
@@ -43,6 +46,21 @@ RUN vp run --filter @trizum/logging build
 WORKDIR /app/packages/server
 RUN vp pack
 
+# Normalize target-specific native packages into a stable path for runtime COPY.
+RUN set -eux; \
+    case "$TARGETARCH" in \
+      amd64) libsql_arch="x64" ;; \
+      arm64) libsql_arch="arm64" ;; \
+      *) echo "Unsupported TARGETARCH for @libsql native package: $TARGETARCH" >&2; exit 1 ;; \
+    esac; \
+    mkdir -p /app/runtime-node-modules/@libsql; \
+    libsql_dir="$(find /app/node_modules/.pnpm -path "*/node_modules/@libsql/linux-${libsql_arch}-gnu" -type d | head -n 1)"; \
+    if [ -z "$libsql_dir" ]; then \
+      echo "Could not find @libsql/linux-${libsql_arch}-gnu in node_modules" >&2; \
+      exit 1; \
+    fi; \
+    cp -a "$libsql_dir" "/app/runtime-node-modules/@libsql/linux-${libsql_arch}-gnu"
+
 # Runtime base - Node.js without pnpm or Vite+
 FROM node:${NODE_VERSION}-slim AS runtime-base
 
@@ -57,7 +75,7 @@ RUN apt-get update -qq && \
 COPY packages/server/entrypoint.sh ./entrypoint.sh
 COPY packages/server/drizzle ./drizzle
 COPY --from=build /app/packages/server/build/cli.mjs ./server.mjs
-COPY --from=build /app/node_modules/.pnpm/@libsql+linux-x64-gnu@0.5.22/node_modules/@libsql/linux-x64-gnu ./node_modules/@libsql/linux-x64-gnu
+COPY --from=build /app/runtime-node-modules ./node_modules
 COPY --from=build /app/node_modules/.pnpm/@sentry-internal+node-cpu-profiler@2.2.0/node_modules/@sentry-internal/node-cpu-profiler ./node_modules/@sentry-internal/node-cpu-profiler
 COPY --from=build /app/node_modules/.pnpm/detect-libc@2.1.2/node_modules/detect-libc ./node_modules/detect-libc
 COPY --from=build /app/node_modules/.pnpm/node-abi@3.85.0/node_modules/node-abi ./node_modules/node-abi
@@ -76,11 +94,19 @@ FROM runtime-base AS runtime-local
 # Production runtime image with Litestream replication.
 FROM runtime-base AS runtime
 
+ARG LITESTREAM_VERSION
+ARG TARGETARCH
+
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y wget && \
-    wget https://github.com/benbjohnson/litestream/releases/download/v0.5.2/litestream-0.5.2-linux-x86_64.deb && \
-    dpkg -i litestream-0.5.2-linux-x86_64.deb && \
-    rm litestream-0.5.2-linux-x86_64.deb && \
+    case "$TARGETARCH" in \
+      amd64) litestream_arch="x86_64" ;; \
+      arm64) litestream_arch="arm64" ;; \
+      *) echo "Unsupported TARGETARCH for Litestream: $TARGETARCH" >&2; exit 1 ;; \
+    esac && \
+    wget -O litestream.deb "https://github.com/benbjohnson/litestream/releases/download/v${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-${litestream_arch}.deb" && \
+    dpkg -i litestream.deb && \
+    rm litestream.deb && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 COPY packages/server/litestream.yml ./litestream.yml

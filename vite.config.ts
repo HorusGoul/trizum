@@ -34,6 +34,7 @@ const ignorePatterns = [
   "packages/pwa/api/types.d.ts",
   "packages/pwa/src/generated/**",
   "packages/pwa/src/routeTree.gen.ts",
+  "packages/server/build/**",
   "packages/server/drizzle/meta/**",
 ];
 
