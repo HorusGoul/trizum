@@ -85,9 +85,7 @@ export async function createPartyFromMigrationData({
   const helpers = getPartyHelpers(repo, handle);
 
   // Expenses from oldest to newest
-  data.expenses.sort(
-    (a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime(),
-  );
+  data.expenses.sort((a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime());
 
   function waitIdleCallback(fn: () => Promise<void>) {
     return new Promise<void>((resolve) => {

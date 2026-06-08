@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "vite-plus/test";
 import type { Party } from "#src/models/party.ts";
 import { getEligibleDebtTransferParticipants } from "./useEligibleDebtTransferParties";
 
@@ -15,10 +15,7 @@ describe("getEligibleDebtTransferParticipants", () => {
     );
 
     expect(result?.currentParticipant.id).toBe("me");
-    expect(result?.otherParticipants.map(({ id }) => id)).toEqual([
-      "alex",
-      "zoe",
-    ]);
+    expect(result?.otherParticipants.map(({ id }) => id)).toEqual(["alex", "zoe"]);
   });
 
   test("rejects parties where the joined participant is archived", () => {

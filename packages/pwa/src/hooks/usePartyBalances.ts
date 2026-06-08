@@ -26,8 +26,5 @@ export function usePartyBalances(partyId: Party["id"]): BalancesByParticipant {
   // all participants that exist when running this hook
   const baseBalance = calculateBalancesByParticipant([], party.participants);
 
-  return mergeBalancesByParticipant(
-    baseBalance,
-    ...results.map(({ doc }) => doc.balances),
-  );
+  return mergeBalancesByParticipant(baseBalance, ...results.map(({ doc }) => doc.balances));
 }

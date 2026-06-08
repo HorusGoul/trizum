@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { defineConfig, devices } from "@playwright/test";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,8 +10,8 @@ const localBaseURL = `http://${host}:${port}`;
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 const cwd = path.dirname(fileURLToPath(import.meta.url));
 const webServerCommand = [
-  "VITE_APP_DISABLE_SENTRY=true pnpm run build",
-  `pnpm exec vite preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
+  "VITE_APP_DISABLE_SENTRY=true vp run build",
+  `vp run preview -- --host ${host} --port ${port} --strictPort --outDir dist/client`,
 ].join(" && ");
 
 export default defineConfig({

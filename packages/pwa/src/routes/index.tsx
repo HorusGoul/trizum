@@ -2,14 +2,8 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import type { PartyList } from "#src/models/partyList.js";
 import type { Party } from "#src/models/party.js";
-import {
-  PartyListCard,
-  type PartyListCardAction,
-} from "#src/components/PartyListCard.tsx";
-import {
-  getOrderedPartySections,
-  isPartyPinned,
-} from "#src/lib/partyListOrdering.ts";
+import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
+import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrdering.ts";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -39,10 +33,9 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    const partyList = (await documentCache.readAsync(
-      context.repo,
-      partyListId,
-    )) as PartyList | undefined;
+    const partyList = (await documentCache.readAsync(context.repo, partyListId)) as
+      | PartyList
+      | undefined;
 
     if (!partyList) {
       return;
@@ -70,14 +63,12 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
-  const { activePartyIds, activeCount, archivedCount } =
-    usePartySections(partyList);
+  const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;
-  const needsProfileSetup =
-    !partyList.username || partyList.username.trim() === "";
+  const needsProfileSetup = !partyList.username || partyList.username.trim() === "";
 
   return (
     <>
@@ -96,9 +87,7 @@ function Index() {
 
           {isUpdateAvailable ? (
             <IconButton
-              icon={
-                isUpdating ? "lucide.refresh-cw" : "lucide.circle-arrow-down"
-              }
+              icon={isUpdating ? "lucide.refresh-cw" : "lucide.circle-arrow-down"}
               aria-label={t`Update available`}
               onPress={() => {
                 setIsUpdating(true);
@@ -123,12 +112,7 @@ function Index() {
                     to: "/settings",
                   }}
                 >
-                  <Icon
-                    icon="lucide.settings"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.settings" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Settings</Trans>
                   </span>
@@ -139,12 +123,7 @@ function Index() {
                     to: "/archived",
                   }}
                 >
-                  <Icon
-                    icon="lucide.folder-archive"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.folder-archive" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Archived parties</Trans>
                   </span>
@@ -155,12 +134,7 @@ function Index() {
                     checkForUpdate();
                   }}
                 >
-                  <Icon
-                    icon="lucide.refresh-cw"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.refresh-cw" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Check for updates</Trans>
                   </span>
@@ -171,12 +145,7 @@ function Index() {
                     to: "/about",
                   }}
                 >
-                  <Icon
-                    icon="lucide.info"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.info" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>About</Trans>
                   </span>
@@ -212,9 +181,7 @@ function Index() {
                       actions={actions}
                       partyId={partyId}
                       isPinned={pinned}
-                      currentParticipantId={
-                        partyList.participantInParties[partyId] ?? null
-                      }
+                      currentParticipantId={partyList.participantInParties[partyId] ?? null}
                     />
                   );
                 })}
@@ -237,34 +204,19 @@ function Index() {
                 <Popover placement="top end" offset={16}>
                   <Menu className="min-w-60">
                     <MenuItem href={{ to: "/join" }}>
-                      <Icon
-                        icon="lucide.ampersand"
-                        width={20}
-                        height={20}
-                        className="mr-3"
-                      />
+                      <Icon icon="lucide.ampersand" width={20} height={20} className="mr-3" />
                       <span className="h-3.5 leading-none">
                         <Trans>Join a Party</Trans>
                       </span>
                     </MenuItem>
                     <MenuItem href={{ to: "/new" }}>
-                      <Icon
-                        icon="lucide.list-plus"
-                        width={20}
-                        height={20}
-                        className="mr-3"
-                      />
+                      <Icon icon="lucide.list-plus" width={20} height={20} className="mr-3" />
                       <span className="h-3.5 leading-none">
                         <Trans>Create a new Party</Trans>
                       </span>
                     </MenuItem>
                     <MenuItem href={{ to: "/migrate/tricount" }}>
-                      <Icon
-                        icon="lucide.import"
-                        width={20}
-                        height={20}
-                        className="mr-3"
-                      />
+                      <Icon icon="lucide.import" width={20} height={20} className="mr-3" />
                       <span className="h-3.5 leading-none">
                         <Trans>Migrate from Tricount</Trans>
                       </span>
@@ -286,10 +238,7 @@ function usePartySections(partyList: PartyList) {
   const repo = useRepo();
   const sections = getOrderedPartySections(partyList);
 
-  for (const partyId of [
-    ...sections.activePartyIds,
-    ...sections.archivedPartyIds,
-  ]) {
+  for (const partyId of [...sections.activePartyIds, ...sections.archivedPartyIds]) {
     documentCache.prefetch(repo, partyId);
   }
 
@@ -352,20 +301,15 @@ function NoActivePartiesCard() {
         </h2>
         <p className="mt-2 text-sm text-accent-700 dark:text-accent-300">
           <Trans>
-            Everything is archived for now. You can reopen any party from the
-            archived screen whenever you need it.
+            Everything is archived for now. You can reopen any party from the archived screen
+            whenever you need it.
           </Trans>
         </p>
       </div>
 
       <Link
         href={{ to: "/archived" }}
-        className={({
-          isPressed,
-          isFocusVisible,
-          isHovered,
-          defaultClassName,
-        }) =>
+        className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
           cn(
             defaultClassName,
             "inline-flex items-center justify-center rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-accent-50 outline-none transition-all duration-200 ease-in-out dark:bg-accent-500",
@@ -389,8 +333,8 @@ function EmptyState() {
         </h1>
         <p className="text-lg text-accent-700 dark:text-accent-300">
           <Trans>
-            Split bills with friends and family. Track expenses, calculate
-            balances, and settle up together.
+            Split bills with friends and family. Track expenses, calculate balances, and settle up
+            together.
           </Trans>
         </p>
       </div>
@@ -398,19 +342,13 @@ function EmptyState() {
       <div className="flex w-full max-w-md flex-col gap-4">
         <Link
           href={{ to: "/new" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
+          className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
               "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
-              isPressed &&
-                "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
+              isPressed && "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
             )
           }
         >
@@ -432,19 +370,13 @@ function EmptyState() {
 
         <Link
           href={{ to: "/join" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
+          className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
               "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
-              isPressed &&
-                "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
+              isPressed && "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
             )
           }
         >
@@ -466,19 +398,13 @@ function EmptyState() {
 
         <Link
           href={{ to: "/migrate/tricount" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
+          className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
               "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
-              isPressed &&
-                "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
+              isPressed && "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
             )
           }
         >
@@ -500,19 +426,13 @@ function EmptyState() {
 
         <Link
           href={{ to: "/settings" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
+          className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
               "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
               (isHovered || isFocusVisible) &&
                 "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
-              isPressed &&
-                "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
+              isPressed && "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
             )
           }
         >
@@ -552,19 +472,14 @@ function ProfileSetupCard() {
       }
     >
       <div className="-mt-0.5 flex h-8 w-8 flex-shrink-0 justify-center">
-        <Icon
-          icon="lucide.user-round-pen"
-          className="text-accent-600 dark:text-accent-400"
-        />
+        <Icon icon="lucide.user-round-pen" className="text-accent-600 dark:text-accent-400" />
       </div>
       <div className="flex flex-1 flex-col gap-0.5">
         <span className="text-lg font-semibold leading-tight text-accent-950 dark:text-accent-50">
           <Trans>Complete your profile</Trans>
         </span>
         <span className="text-sm text-accent-600 dark:text-accent-400">
-          <Trans>
-            Add your name so others know who you are and how to pay you
-          </Trans>
+          <Trans>Add your name so others know who you are and how to pay you</Trans>
         </span>
       </div>
     </Link>

@@ -8,8 +8,8 @@ and keep generated sprite assets in sync during Vite development and builds.
 
 ## Canonical Sources
 
-- [`package.json`](./package.json) is the source of truth for scripts and
-  dependencies.
+- [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
+  are the source of truth for package tasks, scripts, and dependencies.
 - [`src/index.ts`](./src/index.ts) exports the sprite config helpers and
   generation entrypoints.
 - [`src/vite.ts`](./src/vite.ts) contains the generic Vite plugin.
@@ -27,9 +27,9 @@ and keep generated sprite assets in sync during Vite development and builds.
 
 ## Validation
 
-Run the package scripts defined in [`package.json`](./package.json):
+Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts)
+and [`package.json`](./package.json):
 
-- `pnpm build`
-- `pnpm lint`
-- `pnpm test`
-- `pnpm typecheck`
+- `vp run check`
+- `vp run test`
+- `vp run build`

@@ -34,9 +34,7 @@ const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
         slot="previous"
         color="input-like"
         className="size-7 pr-0.5"
-        icon={
-          direction === "rtl" ? "lucide.chevron-right" : "lucide.chevron-left"
-        }
+        icon={direction === "rtl" ? "lucide.chevron-right" : "lucide.chevron-left"}
         iconClassName="size-4"
       />
       <AriaHeading className="grow text-center text-sm font-medium" />
@@ -44,9 +42,7 @@ const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
         slot="next"
         color="input-like"
         className="size-7 pl-0.5"
-        icon={
-          direction === "rtl" ? "lucide.chevron-left" : "lucide.chevron-right"
-        }
+        icon={direction === "rtl" ? "lucide.chevron-left" : "lucide.chevron-right"}
         iconClassName="size-4"
       />
     </header>
@@ -55,10 +51,7 @@ const CalendarHeading = (props: React.HTMLAttributes<HTMLElement>) => {
 
 const CalendarGrid = ({ className, ...props }: AriaCalendarGridProps) => (
   <AriaCalendarGrid
-    className={cn(
-      "border-separate border-spacing-x-1 border-spacing-y-1",
-      className,
-    )}
+    className={cn("border-separate border-spacing-x-1 border-spacing-y-1", className)}
     {...props}
   />
 );
@@ -67,10 +60,7 @@ const CalendarGridHeader = ({ ...props }: AriaCalendarGridHeaderProps) => (
   <AriaCalendarGridHeader {...props} />
 );
 
-const CalendarHeaderCell = ({
-  className,
-  ...props
-}: AriaCalendarHeaderCellProps) => (
+const CalendarHeaderCell = ({ className, ...props }: AriaCalendarHeaderCellProps) => (
   <AriaCalendarHeaderCell
     className={cn(
       "w-9 rounded-md text-[0.8rem] font-normal text-accent-700 dark:text-accent-50",
@@ -80,10 +70,7 @@ const CalendarHeaderCell = ({
   />
 );
 
-const CalendarGridBody = ({
-  className,
-  ...props
-}: AriaCalendarGridBodyProps) => (
+const CalendarGridBody = ({ className, ...props }: AriaCalendarGridBodyProps) => (
   <AriaCalendarGridBody className={cn("[&>tr>td]:p-0", className)} {...props} />
 );
 
@@ -96,17 +83,14 @@ const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
           "data-[hovered]:bg-accent-500/20 data-[hovered]:text-accent-50", // TODO: replace this with button ghost variant or something
           "relative flex size-9 items-center justify-center p-0 text-sm font-normal",
           /* Disabled */
-          renderProps.isDisabled &&
-            "text-accent-700 opacity-50 dark:text-accent-50",
+          renderProps.isDisabled && "text-accent-700 opacity-50 dark:text-accent-50",
           /* Selected */
           renderProps.isSelected &&
             "bg-accent-500 text-accent-50 data-[focused]:bg-accent-500 data-[focused]:text-accent-50",
           /* Hover */
           renderProps.isHovered &&
             renderProps.isSelected &&
-            (renderProps.isSelectionStart ||
-              renderProps.isSelectionEnd ||
-              !isRange) &&
+            (renderProps.isSelectionStart || renderProps.isSelectionEnd || !isRange) &&
             "data-[hovered]:bg-accent-400 data-[hovered]:text-accent-50",
           /* Selection Start/End */
           renderProps.isSelected &&

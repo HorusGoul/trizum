@@ -12,9 +12,7 @@ interface ScreenshotUserFunctionParams {
   setupParty: () => Promise<void>;
 }
 
-type ScreenshotUserFunction = (
-  params: ScreenshotUserFunctionParams,
-) => Promise<void>;
+type ScreenshotUserFunction = (params: ScreenshotUserFunctionParams) => Promise<void>;
 
 interface ScreenshotFunctionParams {
   page: Page;
@@ -22,21 +20,12 @@ interface ScreenshotFunctionParams {
   setupParty: () => Promise<void>;
 }
 
-type ScreenshotFunction = ((
-  params: ScreenshotFunctionParams,
-) => Promise<void>) & {
+type ScreenshotFunction = ((params: ScreenshotFunctionParams) => Promise<void>) & {
   __isScreenshotFunction: true;
 };
 
-export function screenshot(
-  name: string,
-  fn: ScreenshotUserFunction,
-): ScreenshotFunction {
-  const wrappedFn: ScreenshotFunction = async ({
-    page,
-    takeScreenshot,
-    setupParty,
-  }) => {
+export function screenshot(name: string, fn: ScreenshotUserFunction): ScreenshotFunction {
+  const wrappedFn: ScreenshotFunction = async ({ page, takeScreenshot, setupParty }) => {
     await fn({
       page,
       takeScreenshot: async () => await takeScreenshot(name),
@@ -52,8 +41,6 @@ export function screenshot(
 
 export function isScreenshotFunction(fn: unknown): fn is ScreenshotFunction {
   return (
-    typeof fn === "function" &&
-    "__isScreenshotFunction" in fn &&
-    fn.__isScreenshotFunction === true
+    typeof fn === "function" && "__isScreenshotFunction" in fn && fn.__isScreenshotFunction === true
   );
 }

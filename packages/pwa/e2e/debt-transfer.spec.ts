@@ -46,18 +46,14 @@ test.describe("Debt transfer", () => {
         },
         participantInParties: {
           [originParty.partyId]: debtTransferJourney.originMemberParticipantId,
-          [destinationParty.partyId]:
-            debtTransferJourney.destinationMemberParticipant.id,
+          [destinationParty.partyId]: debtTransferJourney.destinationMemberParticipant.id,
         },
       });
     });
 
     await test.step("open balances in the origin party and confirm the transfer action is available", async () => {
       await harness.navigate(`/party/${originParty.partyId}?tab=balances`);
-      await originPartyPage.expectLoaded(
-        originParty.partyId,
-        debtTransferJourney.originPartyName,
-      );
+      await originPartyPage.expectLoaded(originParty.partyId, debtTransferJourney.originPartyName);
       await originPartyPage.expectSettlementActionVisible(originAction);
       await originPartyPage.expectSettlementActionButtonVisible(
         originAction,
@@ -66,10 +62,7 @@ test.describe("Debt transfer", () => {
     });
 
     await test.step("choose the recommended destination creditor", async () => {
-      await originPartyPage.openSettlementActionButton(
-        originAction,
-        "Transfer to another party",
-      );
+      await originPartyPage.openSettlementActionButton(originAction, "Transfer to another party");
 
       await transferDebtPage.expectLoaded();
       await transferDebtPage.expectSearchParams({
@@ -104,9 +97,7 @@ test.describe("Debt transfer", () => {
         destinationParty.partyId,
         debtTransferJourney.destinationPartyName,
       );
-      await destinationPartyPage.expectSettlementActionVisible(
-        destinationAction,
-      );
+      await destinationPartyPage.expectSettlementActionVisible(destinationAction);
     });
   });
 
@@ -138,16 +129,12 @@ test.describe("Debt transfer", () => {
       },
       participantInParties: {
         [originParty.partyId]: debtTransferJourney.originMemberParticipantId,
-        [destinationParty.partyId]:
-          debtTransferJourney.destinationMemberParticipant.id,
+        [destinationParty.partyId]: debtTransferJourney.destinationMemberParticipant.id,
       },
     });
 
     await harness.navigate(`/party/${originParty.partyId}?tab=balances`);
-    await originPartyPage.openSettlementActionButton(
-      originAction,
-      "Transfer to another party",
-    );
+    await originPartyPage.openSettlementActionButton(originAction, "Transfer to another party");
 
     await transferDebtPage.expectLoaded();
     await transferDebtPage.expectConfirmationStep();
@@ -181,16 +168,12 @@ test.describe("Debt transfer", () => {
       },
       participantInParties: {
         [originParty.partyId]: debtTransferJourney.originMemberParticipantId,
-        [destinationParty.partyId]:
-          debtTransferJourney.destinationMemberParticipant.id,
+        [destinationParty.partyId]: debtTransferJourney.destinationMemberParticipant.id,
       },
     });
 
     await harness.navigate(`/party/${originParty.partyId}?tab=balances`);
-    await originPartyPage.expectLoaded(
-      originParty.partyId,
-      debtTransferJourney.originPartyName,
-    );
+    await originPartyPage.expectLoaded(originParty.partyId, debtTransferJourney.originPartyName);
     await originPartyPage.expectSettlementActionVisible(originAction);
     await originPartyPage.expectSettlementActionButtonHidden(
       originAction,

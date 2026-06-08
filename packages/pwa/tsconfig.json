@@ -1,13 +1,9 @@
 {
   "extends": "@trizum/tsconfig/vite",
   "compilerOptions": {
-    "baseUrl": "./",
     "types": ["vite-plugin-pwa/react"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules"],
-  "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.cfworker.json" }
-  ]
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "./tsconfig.cfworker.json" }]
 }

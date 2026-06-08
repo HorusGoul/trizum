@@ -1,13 +1,13 @@
 {
   "name": "@trizum/server",
+  "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
-  "version": "1.0.0",
   "license": "MIT",
-  "private": true,
   "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "imports": {
     "#*": "./*"
   },
@@ -21,30 +21,18 @@
   },
   "scripts": {
     "cleanup": "rm -rf dist",
-    "dev": "pnpm node --watch src/main.ts",
-    "start": "pnpm node --import ./src/instrument.ts src/main.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint --ext .ts src",
-    "lint:fix": "pnpm run lint --fix",
+    "dev": "vp run node --watch src/main.ts",
+    "start": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types --import ./src/instrument.ts src/main.ts",
     "node": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types",
-    "db:drizzle": "pnpm node node_modules/drizzle-kit/bin.cjs",
-    "db:generate": "pnpm db:drizzle generate",
-    "db:migrate": "pnpm db:drizzle migrate",
-    "db:studio": "pnpm db:drizzle studio",
-    "db:push": "pnpm db:drizzle push",
+    "db:drizzle": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs",
+    "db:generate": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs generate",
+    "db:migrate": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs migrate",
+    "db:studio": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs studio",
+    "db:push": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs push",
     "deploy": "./deploy.sh"
   },
-  "devDependencies": {
-    "@trizum/eslint-config": "workspace:*",
-    "@trizum/prettier-config": "workspace:*",
-    "@trizum/tsconfig": "workspace:*",
-    "@types/node": "24.10.1",
-    "eslint": "9.39.1",
-    "prettier": "3.6.2",
-    "typescript": "5.9.2"
-  },
-  "prettier": "@trizum/prettier-config",
   "dependencies": {
+    "@automerge/automerge": "3.2.4",
     "@automerge/automerge-repo": "2.5.3",
     "@automerge/automerge-repo-network-websocket": "2.5.3",
     "@hono/node-server": "1.19.6",
@@ -60,5 +48,10 @@
     "drizzle-orm": "0.44.7",
     "hono": "4.10.6",
     "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.2"
   }
 }

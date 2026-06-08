@@ -1,16 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { IconButton } from "#src/ui/IconButton.js";
-import {
-  useCanGoBack,
-  useRouter,
-  type ToOptions,
-} from "@tanstack/react-router";
+import { useCanGoBack, useRouter, type ToOptions } from "@tanstack/react-router";
 
-export function BackButton({
-  fallbackOptions,
-}: {
-  fallbackOptions: Omit<ToOptions, "replace">;
-}) {
+export function BackButton({ fallbackOptions }: { fallbackOptions: Omit<ToOptions, "replace"> }) {
   const { history, navigate } = useRouter();
   const canGoBack = useCanGoBack();
 

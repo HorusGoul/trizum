@@ -2,9 +2,7 @@ import type { Expense } from "#src/models/expense.ts";
 import { useCurrentParty } from "./useParty";
 import { usePartyParticipants } from "./usePartyParticipants";
 
-export function useExpenseParticipants(
-  expense: Pick<Expense, "paidBy" | "shares">,
-) {
+export function useExpenseParticipants(expense: Pick<Expense, "paidBy" | "shares">) {
   const { party } = useCurrentParty();
   const { active } = usePartyParticipants();
 

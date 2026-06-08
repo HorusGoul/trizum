@@ -8,11 +8,11 @@ template.
 Start from the workspace template:
 
 ```bash
-pnpm generate:ts-template
+vp run generate:ts-template
 ```
 
-That gives new packages the default `package.json`, README, ESLint config,
-TypeScript config, logging facade, and Vitest setup that the repo expects.
+That gives new packages the default `package.json`, README, TypeScript config,
+logging facade, Vite+ lint script, and Vitest setup that the repo expects.
 
 ## Default Shape
 
@@ -22,8 +22,7 @@ New library-style packages should default to:
 - `type: "module"` with `moduleResolution: "nodenext"`
 - `sideEffects: false` unless the package truly has import-time side effects
 - `files` including `dist` and `src`
-- package-local `README.md`, `eslint.config.js`, `tsconfig.json`, and
-  `tsconfig.test.json`
+- package-local `README.md`, `tsconfig.json`, and `tsconfig.test.json`
 
 Prefer the `ts-template` package as the canonical example for this shape.
 
@@ -58,26 +57,39 @@ Exports should normally point at `dist` artifacts:
 
 Only deviate from the built-package pattern intentionally.
 
-## Scripts
+## Tasks And Scripts
 
-New packages should usually provide:
+New packages should usually provide routine commands as Vite+ tasks in
+`vite.config.ts`, run through `vp run`:
 
-- `pnpm build` using `tsc -b tsconfig.json`
-- `pnpm dev` using `tsc -b tsconfig.json --watch`
-- `pnpm test` using `vitest run`
-- `pnpm lint` using `eslint --ext .ts src`
-- `pnpm typecheck` using `tsc -b tsconfig.test.json`
+- `vp run check` using `vp check .`
+- `vp run build` using `tsc -b tsconfig.json`
+- `vp run dev` using `tsc -b tsconfig.json --watch`
 
-If a package has runtime-specific commands beyond this baseline, keep the
-standard scripts and add the extra ones alongside them.
+Packages do not need separate lint or typecheck scripts for routine validation.
+If a package has runtime-specific commands beyond this baseline, keep those
+extra commands in `package.json` scripts or Vite+ tasks as appropriate.
+
+When a routine task needs workspace dependencies to be built first, express that
+in `vite.config.ts` with `run.tasks.<task>.dependsOn` and explicit
+`package#task` entries. Do not use package-manager lifecycle `pre*` scripts for
+this dependency graph.
+
+Packages do not need a dedicated `check:fix` script. From the workspace root,
+use `vp run check --fix`; from a package directory, use `vp check --fix .` so
+the `--fix` flag comes before the checked path.
+
+Packages with tests should define their local Vitest settings in
+`vite.config.ts` and have the package `test` task call `vp test .`.
 
 ## Tests
 
 Keep tests next to the source as `src/**/*.test.ts`.
 
-When using typed ESLint with `projectService`, add a test-file override in the
-package ESLint config so test files point at `tsconfig.test.json`. This lets
-tests participate in typed linting even though the build config excludes them.
+Root `vp run check` delegates to `vp check`, which handles type-aware linting
+through the Vite+ `lint` block in [`vite.config.ts`](../vite.config.ts). Keep
+package `tsconfig.test.json` files for Vitest coverage and package-local test
+type checking.
 
 ## Logging
 
@@ -97,10 +109,10 @@ Applications and runtime entrypoints own LogTape configuration.
 Every new package should update or provide:
 
 - `README.md` with package purpose, key files, and validation commands
-- `package.json` with the exact runnable scripts
+- `vite.config.ts` and `package.json` with the exact runnable tasks and scripts
 
 Before opening a PR for a new package, run:
 
-- the package-local `build`, `test`, `lint`, and `typecheck` scripts
-- the relevant root validation command if the package is already wired into the
-  workspace graph
+- the package-local `check` and `build` tasks through `vp run <task>`
+- `vp run check`, `vp run test`, and `vp run build` if the package is already
+  wired into the workspace graph

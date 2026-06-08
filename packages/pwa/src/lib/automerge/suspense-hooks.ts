@@ -1,9 +1,4 @@
-import type {
-  AnyDocumentId,
-  Doc,
-  DocHandle,
-  Repo,
-} from "@automerge/automerge-repo/slim";
+import type { AnyDocumentId, Doc, DocHandle, Repo } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { useSyncExternalStore } from "react";
 
@@ -125,12 +120,7 @@ export async function retryWithExponentialBackoff<T>(
       }
 
       // Wait before retrying
-      const backoffDelay = calculateBackoffDelay(
-        attempt,
-        baseDelay,
-        maxDelay,
-        jitter,
-      );
+      const backoffDelay = calculateBackoffDelay(attempt, baseDelay, maxDelay, jitter);
       await delay(backoffDelay, signal);
     }
   }
@@ -138,10 +128,7 @@ export async function retryWithExponentialBackoff<T>(
   throw new MaxRetriesExceededError(maxAttempts, lastError);
 }
 
-export const handleCache = createCache<
-  [Repo, AnyDocumentId],
-  DocHandle<unknown> | undefined
->({
+export const handleCache = createCache<[Repo, AnyDocumentId], DocHandle<unknown> | undefined>({
   async load([repo, id]) {
     try {
       const handle = await retryWithExponentialBackoff(({ signal }) => {
@@ -166,10 +153,7 @@ export const handleCache = createCache<
 
 const getDocumentCacheKey = ([_, id]: [Repo, AnyDocumentId]) => String(id);
 
-export const documentCache = withLiveSubscription<
-  [Repo, AnyDocumentId],
-  Doc<unknown> | undefined
->({
+export const documentCache = withLiveSubscription<[Repo, AnyDocumentId], Doc<unknown> | undefined>({
   getKey: getDocumentCacheKey,
   getCache: ({ onEviction, getKey, onUpdate }) =>
     createCache({
@@ -276,9 +260,7 @@ export const multipleDocumentCache = withLiveSubscription<
           );
         }
 
-        const unsubscribes = ids.map((id) =>
-          documentCache.subscribe(onChange, repo, id),
-        );
+        const unsubscribes = ids.map((id) => documentCache.subscribe(onChange, repo, id));
 
         onEviction(params, () => {
           unsubscribes.forEach((unsubscribe) => unsubscribe());
@@ -291,9 +273,7 @@ export const multipleDocumentCache = withLiveSubscription<
   getKey: ([_, ids]) => ids.join(","),
 });
 
-export function useSuspenseHandle<T>(
-  id: AnyDocumentId,
-): DocHandle<T> | undefined {
+export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> | undefined {
   const repo = useRepo();
 
   return handleCache.read(repo, id) as DocHandle<T> | undefined;
@@ -308,24 +288,16 @@ export function useSuspenseDocument<T>(
 ): [Doc<T> | undefined, DocHandle<T> | undefined];
 export function useSuspenseDocument<
   T,
-  Options extends
-    UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
->(
-  id: AnyDocumentId,
-  options?: Options,
-): [Doc<T> | undefined, DocHandle<T> | undefined];
+  Options extends UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
+>(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T> | undefined];
 export function useSuspenseDocument<
   T,
-  Options extends
-    UseSuspenseDocumentOptions<true> = UseSuspenseDocumentOptions<true>,
+  Options extends UseSuspenseDocumentOptions<true> = UseSuspenseDocumentOptions<true>,
 >(id: AnyDocumentId, options: Options): [Doc<T>, DocHandle<T>];
 export function useSuspenseDocument<
   T,
   Options extends UseSuspenseDocumentOptions = UseSuspenseDocumentOptions,
->(
-  id: AnyDocumentId,
-  options?: Options,
-): [Doc<T> | undefined, DocHandle<T> | undefined] {
+>(id: AnyDocumentId, options?: Options): [Doc<T> | undefined, DocHandle<T> | undefined] {
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
 
@@ -353,27 +325,16 @@ export function useMultipleSuspenseDocument<T>(
 ): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
 export function useMultipleSuspenseDocument<
   T,
-  Options extends
-    UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
->(
-  ids: AnyDocumentId[],
-  options?: Options,
-): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
+  Options extends UseSuspenseDocumentOptions<false> = UseSuspenseDocumentOptions<false>,
+>(ids: AnyDocumentId[], options?: Options): { doc: Doc<T> | undefined; handle: DocHandle<T> }[];
 export function useMultipleSuspenseDocument<
   T,
-  Options extends
-    UseSuspenseDocumentOptions<true> = UseSuspenseDocumentOptions<true>,
->(
-  ids: AnyDocumentId[],
-  options: Options,
-): { doc: Doc<T>; handle: DocHandle<T> }[];
+  Options extends UseSuspenseDocumentOptions<true> = UseSuspenseDocumentOptions<true>,
+>(ids: AnyDocumentId[], options: Options): { doc: Doc<T>; handle: DocHandle<T> }[];
 export function useMultipleSuspenseDocument<
   T,
   Options extends UseSuspenseDocumentOptions = UseSuspenseDocumentOptions,
->(
-  ids: AnyDocumentId[],
-  options?: Options,
-): { doc: Doc<T> | undefined; handle: DocHandle<T> }[] {
+>(ids: AnyDocumentId[], options?: Options): { doc: Doc<T> | undefined; handle: DocHandle<T> }[] {
   const repo = useRepo();
 
   multipleDocumentCache.read(repo, ids);

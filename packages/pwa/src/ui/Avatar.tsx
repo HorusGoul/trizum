@@ -37,10 +37,7 @@ export function Avatar({ url, name, className, style }: AvatarProps) {
   if (url) {
     return (
       <div
-        className={cn(
-          "flex items-center justify-center overflow-hidden rounded-full",
-          className,
-        )}
+        className={cn("flex items-center justify-center overflow-hidden rounded-full", className)}
         style={style}
       >
         <img

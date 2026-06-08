@@ -20,10 +20,10 @@ if [ -d "$CLIENT_DIR" ]; then
   cp -r $CLIENT_DIR $DIST_DIR
 else
   echo "Client directory $CLIENT_DIR does not exist"
-  echo "Running pnpm build in $CLIENT_DIR"
+  echo "Running vp run build in $PWA_DIR"
 
   pushd "$PWA_DIR"
-  pnpm build
+  vp run build
   popd
 
   echo "Copying client files from $CLIENT_DIR to $DIST_DIR"

@@ -64,19 +64,14 @@ interface DestinationPartyOption {
 }
 
 function getPrefilledParticipantId(option: DestinationPartyOption): string {
-  return option.otherParticipants.length === 1
-    ? (option.otherParticipants[0]?.id ?? "")
-    : "";
+  return option.otherParticipants.length === 1 ? (option.otherParticipants[0]?.id ?? "") : "";
 }
 
 function createInitialTransferDebtState(
   destinationPartyOptions: DestinationPartyOption[],
 ): TransferDebtState {
-  const prefilledParty =
-    destinationPartyOptions.length === 1 ? destinationPartyOptions[0] : null;
-  const prefilledParticipantId = prefilledParty
-    ? getPrefilledParticipantId(prefilledParty)
-    : "";
+  const prefilledParty = destinationPartyOptions.length === 1 ? destinationPartyOptions[0] : null;
+  const prefilledParticipantId = prefilledParty ? getPrefilledParticipantId(prefilledParty) : "";
 
   if (!prefilledParty) {
     return {
@@ -186,10 +181,7 @@ function getPreviousTransferStep({
     return "participant";
   }
 
-  if (
-    (activeStep === "confirm" || activeStep === "participant") &&
-    !partySelectionPrefilled
-  ) {
+  if ((activeStep === "confirm" || activeStep === "participant") && !partySelectionPrefilled) {
     return "party";
   }
 
@@ -240,18 +232,13 @@ function RouteComponent() {
       });
       const exactMatchParticipant =
         otherParticipants.find(
-          (participant) =>
-            participant.id === participantMatch.exactMatchParticipantId,
+          (participant) => participant.id === participantMatch.exactMatchParticipantId,
         ) ?? null;
       const recommendedParticipants = participantMatch.recommendedParticipantIds
         .map((participantId) =>
-          otherParticipants.find(
-            (participant) => participant.id === participantId,
-          ),
+          otherParticipants.find((participant) => participant.id === participantId),
         )
-        .filter(
-          (participant): participant is PartyParticipant => !!participant,
-        );
+        .filter((participant): participant is PartyParticipant => !!participant);
 
       return {
         id: entry.party.id,
@@ -272,8 +259,7 @@ function RouteComponent() {
   const selectedDestinationParty = destinationPartyOptions.find(
     ({ id }) => id === state.destinationPartyId,
   );
-  const destinationParticipants =
-    selectedDestinationParty?.otherParticipants ?? [];
+  const destinationParticipants = selectedDestinationParty?.otherParticipants ?? [];
   const priorityDestinationParticipants = selectedDestinationParty
     ? [
         selectedDestinationParty.exactMatchParticipant,
@@ -285,9 +271,7 @@ function RouteComponent() {
   );
   const orderedDestinationParticipants = [
     ...priorityDestinationParticipants,
-    ...destinationParticipants.filter(
-      ({ id }) => !priorityDestinationParticipantIds.has(id),
-    ),
+    ...destinationParticipants.filter(({ id }) => !priorityDestinationParticipantIds.has(id)),
   ];
   const hasSelectedDestinationParticipant = destinationParticipants.some(
     ({ id }) => id === state.destinationParticipantId,
@@ -326,10 +310,8 @@ function RouteComponent() {
   }
 
   const destinationPartyName = selectedDestinationParty?.entry.party.name ?? "";
-  const destinationCurrentParticipantName =
-    selectedDestinationParty?.currentParticipant.name ?? "";
-  const selectedDestinationCounterpartyName =
-    selectedDestinationCounterparty?.name ?? "";
+  const destinationCurrentParticipantName = selectedDestinationParty?.currentParticipant.name ?? "";
+  const selectedDestinationCounterpartyName = selectedDestinationCounterparty?.name ?? "";
   const activeStep = getVisibleTransferStep({
     step: state.step,
     hasSelectedDestinationParty: !!selectedDestinationParty,
@@ -434,9 +416,7 @@ function RouteComponent() {
                 destinationParty={selectedDestinationParty?.entry.party}
                 from={from}
                 to={to}
-                destinationDebtor={
-                  selectedDestinationParty?.currentParticipant ?? null
-                }
+                destinationDebtor={selectedDestinationParty?.currentParticipant ?? null}
                 destinationCreditor={selectedDestinationCounterparty ?? null}
               />
 
@@ -499,9 +479,7 @@ function RouteComponent() {
                   {orderedDestinationParticipants.map((participant) => (
                     <DestinationParticipantCard
                       key={participant.id}
-                      isRecommended={priorityDestinationParticipantIds.has(
-                        participant.id,
-                      )}
+                      isRecommended={priorityDestinationParticipantIds.has(participant.id)}
                       participant={participant}
                       onPress={() => {
                         dispatch({
@@ -549,8 +527,7 @@ function RouteComponent() {
                           dispatch({
                             type: "destinationPartySelected",
                             partyId: option.id,
-                            prefilledParticipantId:
-                              getPrefilledParticipantId(option),
+                            prefilledParticipantId: getPrefilledParticipantId(option),
                           });
                         }}
                       />
@@ -646,16 +623,8 @@ function DestinationPartyCard({
       )}
       onClick={onPress}
     >
-      <div
-        className={cn(
-          "flex gap-4",
-          hasSupportingCopy ? "items-start" : "items-center",
-        )}
-      >
-        <PartySymbolBadge
-          party={option.entry.party}
-          className="mt-1 h-12 w-12 text-xl shadow-sm"
-        />
+      <div className={cn("flex gap-4", hasSupportingCopy ? "items-start" : "items-center")}>
+        <PartySymbolBadge party={option.entry.party} className="mt-1 h-12 w-12 text-xl shadow-sm" />
 
         <div className="min-w-0 flex-1">
           <div className="text-lg font-semibold tracking-tight text-accent-950 dark:text-accent-50">
@@ -675,9 +644,7 @@ function DestinationPartyCard({
                   <ParticipantPreviewText preview={participantPreview.mobile} />
                 </span>
                 <span className="line-clamp-1 hidden sm:block">
-                  <ParticipantPreviewText
-                    preview={participantPreview.desktop}
-                  />
+                  <ParticipantPreviewText preview={participantPreview.desktop} />
                 </span>
               </span>
             </p>
@@ -707,11 +674,7 @@ function ParticipantPreviewText({
       {preview.remainingCount > 0 ? (
         <>
           {" "}
-          <Plural
-            value={preview.remainingCount}
-            one="and # other"
-            other="and # others"
-          />
+          <Plural value={preview.remainingCount} one="and # other" other="and # others" />
         </>
       ) : null}
     </>
@@ -720,10 +683,7 @@ function ParticipantPreviewText({
 
 function getParticipantPreview(participants: PartyParticipant[]) {
   const visibleParticipantNames = participants
-    .filter(
-      (participant) =>
-        !participant.isArchived && participant.name.trim() !== "",
-    )
+    .filter((participant) => !participant.isArchived && participant.name.trim() !== "")
     .map((participant) => participant.name.trim());
 
   if (visibleParticipantNames.length === 0) {
@@ -736,10 +696,7 @@ function getParticipantPreview(participants: PartyParticipant[]) {
   };
 }
 
-function getParticipantPreviewVariant(
-  visibleParticipantNames: string[],
-  maxNames: number,
-) {
+function getParticipantPreviewVariant(visibleParticipantNames: string[], maxNames: number) {
   const previewNames = visibleParticipantNames.slice(0, maxNames);
 
   return {
@@ -824,11 +781,7 @@ function TransferReviewCard({
           </div>
         </div>
 
-        <CurrencyText
-          currency={currency}
-          amount={amount}
-          className="text-2xl font-semibold"
-        />
+        <CurrencyText currency={currency} amount={amount} className="text-2xl font-semibold" />
       </div>
 
       <div className="grid gap-6">
@@ -837,13 +790,8 @@ function TransferReviewCard({
           party={originParty}
           detail={
             <Trans>
-              <ReviewParticipantInline participant={from}>
-                {fromName}
-              </ReviewParticipantInline>{" "}
-              stops owing{" "}
-              <ReviewParticipantInline participant={to}>
-                {toName}
-              </ReviewParticipantInline>
+              <ReviewParticipantInline participant={from}>{fromName}</ReviewParticipantInline> stops
+              owing <ReviewParticipantInline participant={to}>{toName}</ReviewParticipantInline>
             </Trans>
           }
         />
@@ -881,10 +829,7 @@ function ReviewPartyRow({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <PartySymbolBadge
-        party={party}
-        className="mt-0.5 h-10 w-10 flex-shrink-0 text-base"
-      />
+      <PartySymbolBadge party={party} className="mt-0.5 h-10 w-10 flex-shrink-0 text-base" />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
@@ -963,10 +908,8 @@ function TransferSuccessState({
 
       <p className="mt-3 max-w-sm text-sm leading-6 text-accent-800 dark:text-accent-200">
         <Trans>
-          The new debt is now in{" "}
-          <span className="font-semibold">{destinationPartyName}</span>, where{" "}
-          <span className="font-semibold">{destinationCounterpartyName}</span>{" "}
-          is owed by{" "}
+          The new debt is now in <span className="font-semibold">{destinationPartyName}</span>,
+          where <span className="font-semibold">{destinationCounterpartyName}</span> is owed by{" "}
           <span className="font-semibold">{destinationDebtorName}</span>.
         </Trans>
       </p>
@@ -986,9 +929,7 @@ function TransferParticipantAvatar({
   }
 
   return (
-    <Suspense
-      fallback={<Avatar className={className} name={participant.name} />}
-    >
+    <Suspense fallback={<Avatar className={className} name={participant.name} />}>
       <TransferParticipantAvatarImage
         avatarId={participant.avatarId}
         className={className}
@@ -1012,13 +953,7 @@ function TransferParticipantAvatarImage({
   return <Avatar className={className} name={name} url={url} />;
 }
 
-function PartySymbolBadge({
-  party,
-  className,
-}: {
-  party: Party;
-  className?: string;
-}) {
+function PartySymbolBadge({ party, className }: { party: Party; className?: string }) {
   const symbol = party.symbol || party.name.charAt(0).toUpperCase();
 
   return (
@@ -1033,13 +968,7 @@ function PartySymbolBadge({
   );
 }
 
-function InlineAlert({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+function InlineAlert({ title, description }: { title: string; description: string }) {
   return (
     <div className="container px-4 pt-4">
       <Alert variant="default">

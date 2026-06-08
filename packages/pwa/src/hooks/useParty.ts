@@ -17,16 +17,8 @@ import type {
 } from "#src/models/party.js";
 import { diff } from "@opentf/obj-diff";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import type {
-  DocHandle,
-  Repo,
-  DocumentId,
-} from "@automerge/automerge-repo/slim";
-import {
-  deleteAt,
-  insertAt,
-  isValidDocumentId,
-} from "@automerge/automerge-repo/slim";
+import type { DocHandle, Repo, DocumentId } from "@automerge/automerge-repo/slim";
+import { deleteAt, insertAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
@@ -105,9 +97,7 @@ export function useCurrentParty() {
 }
 
 export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
-  function updateSettings(
-    values: Pick<Party, "name" | "symbol" | "description" | "participants">,
-  ) {
+  function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
     handle.change((doc) => {
       doc.name = values.name;
       doc.symbol = values.symbol;
@@ -119,10 +109,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function setParticipantDetails(
     participantId: PartyParticipant["id"],
     details: Partial<
-      Pick<
-        PartyParticipant,
-        "phone" | "personalMode" | "avatarId" | "balancesSortedBy"
-      >
+      Pick<PartyParticipant, "phone" | "personalMode" | "avatarId" | "balancesSortedBy">
     >,
   ) {
     handle.change((doc) => {
@@ -175,9 +162,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     return [chunkRef, chunkHandle] as const;
   }
 
-  async function addExpenseToParty(
-    expense: Omit<Expense, "id" | "__hash">,
-  ): Promise<Expense> {
+  async function addExpenseToParty(expense: Omit<Expense, "id" | "__hash">): Promise<Expense> {
     const party = handle.doc();
 
     if (!party) {
@@ -193,9 +178,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       lastChunkRef = chunkRef;
     }
 
-    let lastChunkHandle = await repo.find<PartyExpenseChunk>(
-      lastChunkRef.chunkId,
-    );
+    let lastChunkHandle = await repo.find<PartyExpenseChunk>(lastChunkRef.chunkId);
     let lastChunk = lastChunkHandle.doc();
 
     if (!lastChunk) {
@@ -261,10 +244,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     );
 
     lastChunkBalancesHandle.change((doc) => {
-      patchMutate(
-        doc.balances,
-        diff(clone(doc.balances), clone(balancesByParticipant)),
-      );
+      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
 
     return expenseWithHash;
@@ -311,9 +291,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      chunkRef.balancesId,
-    );
+    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
     const lastChunkBalances = lastChunkBalancesHandle.doc();
 
     if (!lastChunkBalances) {
@@ -326,10 +304,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     );
 
     lastChunkBalancesHandle.change((doc) => {
-      patchMutate(
-        doc.balances,
-        diff(clone(doc.balances), clone(balancesByParticipant)),
-      );
+      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
   }
 
@@ -371,9 +346,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      chunkRef.balancesId,
-    );
+    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
     const lastChunkBalances = lastChunkBalancesHandle.doc();
 
     if (!lastChunkBalances) {
@@ -386,10 +359,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     );
 
     lastChunkBalancesHandle.change((doc) => {
-      patchMutate(
-        doc.balances,
-        diff(clone(doc.balances), clone(balancesByParticipant)),
-      );
+      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
     lastChunkBalancesHandle.doc();
 
@@ -443,9 +413,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     if (destinationParty.currency !== originParty.currency) {
-      throw new Error(
-        "Cannot transfer debt between parties with different currencies",
-      );
+      throw new Error("Cannot transfer debt between parties with different currencies");
     }
 
     if (!destinationParty.participants[destinationDebtorId]) {
@@ -515,9 +483,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         party.participants,
       );
 
-      const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-        chunkRef.balancesId,
-      );
+      const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
       const chunkBalances = chunkBalancesHandle.doc();
 
       if (!chunkBalances) {
@@ -525,10 +491,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       }
 
       chunkBalancesHandle.change((doc) => {
-        patchMutate(
-          doc.balances,
-          diff(clone(doc.balances), clone(balancesByParticipant)),
-        );
+        patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
       });
       chunkBalancesHandle.doc();
     }

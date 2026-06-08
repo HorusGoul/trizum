@@ -1,9 +1,7 @@
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
-import MediaGallery, {
-  type MediaGalleryItem,
-} from "#src/components/MediaGallery.tsx";
+import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
 
 export interface RouteMediaGalleryProps {
   /** List of photo IDs to display in the gallery */

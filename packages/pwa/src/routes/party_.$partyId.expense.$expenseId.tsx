@@ -8,20 +8,13 @@ import {
   type Expense,
 } from "#src/models/expense.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon } from "#src/ui/Icon.js";
-import {
-  documentCache,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.js";
+import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
@@ -61,20 +54,18 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 });
 
 function ExpenseById() {
-  const { expenseId, partyId, expense, onDeleteExpense, isLoading } =
-    useExpense();
+  const { expenseId, partyId, expense, onDeleteExpense, isLoading } = useExpense();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
 
   const photos = expense?.photos ?? [];
 
-  const { galleryIndex, openGallery, closeGallery, onIndexChange } =
-    useRouteMediaGallery({
-      mediaIndex: search.media,
-      navigate: (options) => void navigate(options),
-      goBack: () => history.back(),
-    });
+  const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
+    mediaIndex: search.media,
+    navigate: (options) => void navigate(options),
+    goBack: () => history.back(),
+  });
 
   if (expenseId === undefined) {
     return <span>Invalid Expense ID</span>;
@@ -93,9 +84,7 @@ function ExpenseById() {
       <div className="flex min-h-full flex-col">
         <div className="container flex h-16 items-center px-2 mt-safe">
           <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
-          <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-            {expense.name}
-          </h1>
+          <h1 className="max-h-12 truncate px-4 text-xl font-medium">{expense.name}</h1>
           <div className="flex-1" />
           <MenuTrigger>
             <IconButton
@@ -114,23 +103,13 @@ function ExpenseById() {
                     },
                   }}
                 >
-                  <Icon
-                    icon="lucide.pencil"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.pencil" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Edit</Trans>
                   </span>
                 </MenuItem>
                 <MenuItem onAction={() => void onDeleteExpense()}>
-                  <Icon
-                    icon="lucide.trash"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.trash" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Delete</Trans>
                   </span>
@@ -197,13 +176,7 @@ function useExpense() {
 function Amount({ amount }: { amount: number }) {
   const { party } = useCurrentParty();
 
-  return (
-    <CurrencyText
-      amount={amount}
-      currency={party.currency}
-      className="text-4xl font-bold"
-    />
-  );
+  return <CurrencyText amount={amount} currency={party.currency} className="text-4xl font-bold" />;
 }
 
 function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
@@ -243,10 +216,7 @@ function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
   return (
     <dl className="flex">
       <dt className="flex items-center gap-2">
-        <Icon
-          icon={hasMultiple ? "lucide.users" : "lucide.user"}
-          aria-hidden="true"
-        />
+        <Icon icon={hasMultiple ? "lucide.users" : "lucide.user"} aria-hidden="true" />
 
         <span className="font-medium">{t`Paid by`}</span>
       </dt>
@@ -285,10 +255,7 @@ function Photos({ photos = [], onOpenGallery }: PhotosProps) {
   return (
     <dl className="flex flex-col gap-4">
       <dt className="flex items-center gap-2">
-        <Icon
-          icon={hasMultiple ? "lucide.images" : "lucide.image"}
-          aria-hidden="true"
-        />
+        <Icon icon={hasMultiple ? "lucide.images" : "lucide.image"} aria-hidden="true" />
 
         <span className="font-medium">{t`Attachments`}</span>
       </dt>
@@ -296,10 +263,7 @@ function Photos({ photos = [], onOpenGallery }: PhotosProps) {
       <dd className="-mx-4 -my-4 flex gap-4 overflow-x-auto px-4 py-4">
         {photos.map((photoId, index) => (
           <Suspense key={photoId} fallback={<Skeleton className="h-32 w-32" />}>
-            <PhotoItemById
-              photoId={photoId}
-              onPress={() => onOpenGallery(index)}
-            />
+            <PhotoItemById photoId={photoId} onPress={() => onOpenGallery(index)} />
           </Suspense>
         ))}
       </dd>
@@ -349,10 +313,7 @@ function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
         <ul>
           {Object.entries(unitAmounts)
             .sort(([a], [b]) =>
-              party.participants[a].name.localeCompare(
-                party.participants[b].name,
-                i18n.locale,
-              ),
+              party.participants[a].name.localeCompare(party.participants[b].name, i18n.locale),
             )
             .map(([userId, amount]) => {
               const isMe = userId === currentParticipant.id;

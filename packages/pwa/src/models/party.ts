@@ -17,10 +17,7 @@ export interface Party {
 
 export const DEFAULT_PARTY_SYMBOL = "🏝️";
 
-export type BalancesSortedBy =
-  | "name"
-  | "balance-ascending"
-  | "balance-descending";
+export type BalancesSortedBy = "name" | "balance-ascending" | "balance-descending";
 
 export interface PartyParticipant {
   id: ExpenseUser;

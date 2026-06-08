@@ -6,11 +6,7 @@ import {
   type TextFormatter,
 } from "@logtape/logtape";
 
-export type GitHubActionsAnnotationCommand =
-  | "debug"
-  | "notice"
-  | "warning"
-  | "error";
+export type GitHubActionsAnnotationCommand = "debug" | "notice" | "warning" | "error";
 
 export interface GitHubActionsAnnotationSinkOptions {
   enabled?: boolean;
@@ -44,8 +40,7 @@ const defaultGitHubActionsAnnotationBaseFormatter = getTextFormatter({
 });
 
 function getGitHubActionsProcess(): GitHubActionsProcess | undefined {
-  return (globalThis as typeof globalThis & { process?: GitHubActionsProcess })
-    .process;
+  return (globalThis as typeof globalThis & { process?: GitHubActionsProcess }).process;
 }
 
 function isGitHubActionsEnvironment(): boolean {
@@ -73,13 +68,8 @@ function getGitHubActionsErrorSummary(error: unknown): string | null {
   return null;
 }
 
-const defaultGitHubActionsAnnotationFormatter: TextFormatter = (
-  record: LogRecord,
-): string => {
-  const message = defaultGitHubActionsAnnotationBaseFormatter(record).replace(
-    /[\r\n]+$/u,
-    "",
-  );
+const defaultGitHubActionsAnnotationFormatter: TextFormatter = (record: LogRecord): string => {
+  const message = defaultGitHubActionsAnnotationBaseFormatter(record).replace(/[\r\n]+$/u, "");
   const errorSummary = getGitHubActionsErrorSummary(record.properties.error);
 
   if (errorSummary == null || message.includes(errorSummary)) {
@@ -115,8 +105,6 @@ export function getGitHubActionsAnnotationSink({
     }
 
     const message = formatter(record).replace(/[\r\n]+$/u, "");
-    writeCommand(
-      `::${annotationCommand}::${escapeGitHubActionsCommandValue(message)}\n`,
-    );
+    writeCommand(`::${annotationCommand}::${escapeGitHubActionsCommandValue(message)}\n`);
   };
 }

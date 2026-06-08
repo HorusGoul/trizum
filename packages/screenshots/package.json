@@ -1,17 +1,17 @@
 {
   "name": "@trizum/screenshots",
+  "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
-  "version": "1.0.0",
   "license": "MIT",
-  "private": true,
   "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
   "files": [
     "dist",
     "src"
   ],
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "imports": {
     "#*": "./*"
   },
@@ -27,23 +27,15 @@
     "cleanup": "rm -rf screenshots",
     "start": "node --experimental-transform-types src/main.ts",
     "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint --ext .ts src",
-    "lint:fix": "pnpm run lint --fix",
-    "setup": "pnpm playwright install --with-deps --only-shell chromium"
+    "setup": "vp exec playwright install --with-deps --only-shell chromium"
   },
-  "devDependencies": {
-    "@trizum/eslint-config": "workspace:*",
-    "@trizum/prettier-config": "workspace:*",
-    "@trizum/tsconfig": "workspace:*",
-    "@types/node": "24.10.2",
-    "eslint": "9.39.1",
-    "prettier": "3.6.2",
-    "typescript": "5.9.2"
-  },
-  "prettier": "@trizum/prettier-config",
   "dependencies": {
     "@trizum/logging": "workspace:*",
     "playwright": "1.60.0"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "24.10.2",
+    "typescript": "5.9.2"
   }
 }

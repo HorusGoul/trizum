@@ -33,10 +33,7 @@ import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { useScrollRestorationCache } from "#src/hooks/useScrollRestorationCache.ts";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { Button } from "#src/ui/Button.tsx";
-import {
-  requestIdleCallback,
-  cancelIdleCallback,
-} from "#src/lib/requestIdleCallback.ts";
+import { requestIdleCallback, cancelIdleCallback } from "#src/lib/requestIdleCallback.ts";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 
@@ -48,11 +45,7 @@ export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
-    const { party } = await guardParticipatingInParty(
-      partyId,
-      context,
-      location,
-    );
+    const { party } = await guardParticipatingInParty(partyId, context, location);
 
     await loadVisiblePartyExpenseChunks(
       context.repo,
@@ -71,13 +64,9 @@ export const Route = createFileRoute("/party/$partyId")({
 function PartyById() {
   const params = Route.useParams();
   const { tab: selectedTab } = Route.useSearch();
-  const {
-    party,
-    partyId,
-    isLoading,
-    setParticipantDetails,
-    recalculateBalances,
-  } = useParty(params.partyId);
+  const { party, partyId, isLoading, setParticipantDetails, recalculateBalances } = useParty(
+    params.partyId,
+  );
   const { removeParty } = usePartyList();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
@@ -166,12 +155,7 @@ function PartyById() {
             <Popover placement="bottom end">
               <Menu className="min-w-60">
                 <MenuItem onAction={() => setBalancesSortedBy("name")}>
-                  <Icon
-                    icon="lucide.arrow-down-a-z"
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
+                  <Icon icon="lucide.arrow-down-a-z" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Name</Trans>
                   </span>
@@ -181,9 +165,7 @@ function PartyById() {
                   ) : null}
                 </MenuItem>
 
-                <MenuItem
-                  onAction={() => setBalancesSortedBy("balance-ascending")}
-                >
+                <MenuItem onAction={() => setBalancesSortedBy("balance-ascending")}>
                   <Icon
                     icon="lucide.arrow-down-narrow-wide"
                     width={20}
@@ -199,9 +181,7 @@ function PartyById() {
                   ) : null}
                 </MenuItem>
 
-                <MenuItem
-                  onAction={() => setBalancesSortedBy("balance-descending")}
-                >
+                <MenuItem onAction={() => setBalancesSortedBy("balance-descending")}>
                   <Icon
                     icon="lucide.arrow-up-narrow-wide"
                     width={20}
@@ -280,12 +260,7 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <Icon
-                  icon="lucide.users"
-                  width={20}
-                  height={20}
-                  className="mr-3 self-start"
-                />
+                <Icon icon="lucide.users" width={20} height={20} className="mr-3 self-start" />
                 <div className="flex flex-col">
                   <span className="leading-none">
                     <Trans>Stats</Trans>
@@ -303,12 +278,7 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <Icon
-                  icon="lucide.share"
-                  width={20}
-                  height={20}
-                  className="mr-3"
-                />
+                <Icon icon="lucide.share" width={20} height={20} className="mr-3" />
                 <span className="h-3.5 leading-none">
                   <Trans>Share party</Trans>
                 </span>
@@ -320,24 +290,14 @@ function PartyById() {
                   params: { partyId },
                 }}
               >
-                <Icon
-                  icon="lucide.settings"
-                  width={20}
-                  height={20}
-                  className="mr-3"
-                />
+                <Icon icon="lucide.settings" width={20} height={20} className="mr-3" />
                 <span className="h-3.5 leading-none">
                   <Trans>Settings</Trans>
                 </span>
               </MenuItem>
 
               <MenuItem onAction={() => void onLeaveParty()}>
-                <Icon
-                  icon="lucide.log-out"
-                  width={20}
-                  height={20}
-                  className="mr-3"
-                />
+                <Icon icon="lucide.log-out" width={20} height={20} className="mr-3" />
                 <span className="h-3.5 leading-none">
                   <Trans>Leave party</Trans>
                 </span>
@@ -364,10 +324,7 @@ function PartyById() {
               label: t`Balances`,
               node: (
                 <Suspense fallback={null}>
-                  <Balances
-                    panelRef={balancesTabPanelRef}
-                    sortedBy={balancesSortedBy}
-                  />
+                  <Balances panelRef={balancesTabPanelRef} sortedBy={balancesSortedBy} />
                 </Suspense>
               ),
               panelRef: balancesTabPanelRef,
@@ -382,8 +339,7 @@ function PartyById() {
 
 function ExpenseLog() {
   const { party, dev } = useCurrentParty();
-  const { expenses, hasNext, isLoadingNext, loadNext } =
-    usePartyPaginatedExpenses(party.id);
+  const { expenses, hasNext, isLoadingNext, loadNext } = usePartyPaginatedExpenses(party.id);
   const participant = useCurrentParticipant();
   const navigate = useNavigate();
 
@@ -450,12 +406,7 @@ function ExpenseLog() {
                       params: { partyId: party.id },
                     }}
                   >
-                    <Icon
-                      icon="lucide.list-plus"
-                      width={20}
-                      height={20}
-                      className="mr-3"
-                    />
+                    <Icon icon="lucide.list-plus" width={20} height={20} className="mr-3" />
                     <span className="h-3.5 leading-none">
                       <Trans>Add an expense</Trans>
                     </span>
@@ -539,9 +490,7 @@ function VirtualizedExpenseList({
   loadNext: () => void;
 }) {
   const listRef = useListRef(null);
-  const scrollRestorationCache = useScrollRestorationCache(
-    `party-${partyId}-expense-list`,
-  );
+  const scrollRestorationCache = useScrollRestorationCache(`party-${partyId}-expense-list`);
   const loaderIndex = hasNext ? expenses.length : -1;
   const spacerIndex = expenses.length + (hasNext ? 1 : 0);
   const rowCount = spacerIndex + 1;
@@ -615,13 +564,7 @@ function VirtualizedExpenseList({
   );
 }
 
-function ExpenseItem({
-  partyId,
-  expense,
-}: {
-  partyId: string;
-  expense: Expense;
-}) {
+function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
   const { party } = useParty(partyId);
 
   const participant = useCurrentParticipant();
@@ -639,10 +582,8 @@ function ExpenseItem({
         cn(
           defaultClassName,
           "flex min-h-24 w-full scale-100 rounded-xl bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:bg-accent-900",
-          (isHovered || isFocusVisible) &&
-            "shadow-md dark:bg-accent-800 dark:shadow-none",
-          isPressed &&
-            "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
+          (isHovered || isFocusVisible) && "shadow-md dark:bg-accent-800 dark:shadow-none",
+          isPressed && "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
         )
       }
     >
@@ -727,8 +668,7 @@ function Balances({
       amount: tx.amount,
     }));
 
-  const isFullyBalanced =
-    userOwesMap.length === 0 && owedToUserMap.length === 0;
+  const isFullyBalanced = userOwesMap.length === 0 && owedToUserMap.length === 0;
   const eligibleTransferParties = useEligibleDebtTransferParties();
   const canTransferDebt = eligibleTransferParties.length > 0;
 
@@ -748,16 +688,14 @@ function Balances({
           <div className="h-8 flex-shrink-0" />
 
           <div className="container flex flex-col gap-4 px-4">
-            {sortedBalancesByParticipant.map(
-              ({ participant, stats, visualRatio }) => (
-                <BalanceItem
-                  key={participant.id}
-                  participant={participant}
-                  stats={stats}
-                  visualRatio={visualRatio}
-                />
-              ),
-            )}
+            {sortedBalancesByParticipant.map(({ participant, stats, visualRatio }) => (
+              <BalanceItem
+                key={participant.id}
+                participant={participant}
+                stats={stats}
+                visualRatio={visualRatio}
+              />
+            ))}
           </div>
           <div className="h-8 flex-shrink-0" />
         </>
@@ -773,8 +711,8 @@ function Balances({
 
           <p className="px-2 text-lg">
             <Trans>
-              Here is a list of operations you and other party members can do to
-              balance your position.
+              Here is a list of operations you and other party members can do to balance your
+              position.
             </Trans>
           </p>
         </div>
@@ -784,12 +722,7 @@ function Balances({
         {userOwesMap.length > 0 ? (
           <>
             <h3 className="flex items-center px-4 text-warning-500">
-              <Icon
-                icon="lucide.circle-alert"
-                width={24}
-                height={24}
-                className="mr-3"
-              />
+              <Icon icon="lucide.circle-alert" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
                 <Trans>You owe money to people</Trans>
@@ -808,12 +741,7 @@ function Balances({
           </>
         ) : (
           <div className="flex items-center px-4 text-success-500">
-            <Icon
-              icon="lucide.circle-check"
-              width={24}
-              height={24}
-              className="mr-3"
-            />
+            <Icon icon="lucide.circle-check" width={24} height={24} className="mr-3" />
 
             <span className="text-xl font-semibold">
               <Trans>You&apos;re debt free!</Trans>
@@ -824,12 +752,7 @@ function Balances({
         {owedToUserMap.length > 0 ? (
           <>
             <h3 className="flex items-center px-4 text-warning-500">
-              <Icon
-                icon="lucide.circle-alert"
-                width={24}
-                height={24}
-                className="mr-3"
-              />
+              <Icon icon="lucide.circle-alert" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
                 <Trans>People that owe you money</Trans>
@@ -847,12 +770,7 @@ function Balances({
           </>
         ) : (
           <div className="flex items-center px-4 text-success-500">
-            <Icon
-              icon="lucide.circle-check"
-              width={24}
-              height={24}
-              className="mr-3"
-            />
+            <Icon icon="lucide.circle-check" width={24} height={24} className="mr-3" />
 
             <span className="text-xl font-semibold">
               <Trans>Nobody owes you money!</Trans>
@@ -863,12 +781,7 @@ function Balances({
         {allOtherDiffs.length > 0 ? (
           <>
             <h2 className="flex items-center px-4 text-accent-400">
-              <Icon
-                icon="lucide.circle-help"
-                width={24}
-                height={24}
-                className="mr-3"
-              />
+              <Icon icon="lucide.circle-help" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
                 <Trans>Other operations</Trans>
@@ -899,23 +812,13 @@ function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
   const isNegative = balance < 0;
 
   const participantNode = (
-    <div
-      className={cn(
-        "flex items-center justify-end",
-        isNegative && "justify-start",
-      )}
-    >
+    <div className={cn("flex items-center justify-end", isNegative && "justify-start")}>
       <span className="text-lg font-medium">{participant.name}</span>
     </div>
   );
 
   const balanceNode = (
-    <div
-      className={cn(
-        "relative flex items-center justify-start",
-        isNegative && "justify-end",
-      )}
-    >
+    <div className={cn("relative flex items-center justify-start", isNegative && "justify-end")}>
       <div
         className={cn(
           "h-10 rounded-lg bg-success-300 dark:bg-success-600",
@@ -991,11 +894,7 @@ function BalanceActionItem({
         </div>
 
         <div className="flex flex-shrink-0 items-center">
-          <CurrencyText
-            currency={party.currency}
-            amount={Math.abs(amount)}
-            className="text-xl"
-          />
+          <CurrencyText currency={party.currency} amount={Math.abs(amount)} className="text-xl" />
         </div>
       </div>
 

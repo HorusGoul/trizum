@@ -76,9 +76,9 @@ This project is currently maintained by one person. Response times may vary — 
 4. **Run checks** before committing:
 
 ```bash
-pnpm lint        # Check for linting errors
-pnpm typecheck   # Verify TypeScript types
-pnpm test        # Run tests
+vp run check      # Format, lint, and type check
+vp run test       # Run tests
+vp run build      # Run workspace build scripts
 ```
 
 ### Commit Messages
@@ -119,9 +119,7 @@ Use Tailwind CSS with the project's color system:
 
 ```tsx
 // Use accent color variants
-<div className="bg-accent-50 dark:bg-accent-950 text-accent-900 dark:text-accent-100">
-  Content
-</div>
+<div className="bg-accent-50 dark:bg-accent-950 text-accent-900 dark:text-accent-100">Content</div>
 ```
 
 **Color variants:** `accent-50` through `accent-950`  
@@ -146,7 +144,7 @@ const placeholder = t`Enter your name`;
 After adding strings, run:
 
 ```bash
-pnpm lingui:extract
+vp run lingui:extract
 ```
 
 For translation guidelines, see [`packages/pwa/locale/AGENTS.md`](./packages/pwa/locale/AGENTS.md).
@@ -175,8 +173,8 @@ For translation guidelines, see [`packages/pwa/locale/AGENTS.md`](./packages/pwa
 ### Running Tests
 
 ```bash
-pnpm test              # Run tests
-pnpm test:coverage     # Run with coverage report
+vp run test            # Run tests
+vp run test:coverage   # Run with coverage report
 ```
 
 ### Adding Tests
@@ -195,13 +193,13 @@ src/models/expense.test.ts
 1. Ensure all checks pass:
 
 ```bash
-pnpm lint && pnpm typecheck && pnpm test
+vp run check && vp run test && vp run build
 ```
 
 2. Extract i18n strings if you added any:
 
 ```bash
-pnpm lingui:extract
+vp run lingui:extract
 ```
 
 3. Update documentation if needed
@@ -216,7 +214,7 @@ We use [Changesets](https://github.com/changesets/changesets) to manage versioni
 To add a changeset:
 
 ```bash
-pnpm changeset
+vp exec changeset
 ```
 
 Follow the prompts to describe your changes. This creates a file in `.changeset/` that should be included in your PR.

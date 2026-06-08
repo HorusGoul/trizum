@@ -44,15 +44,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          node-version-file: ".node-version"
+          cache: true
 
       - name: Setup Java
         uses: actions/setup-java@v5
@@ -70,7 +65,7 @@ jobs:
           working-directory: packages/mobile/android
 
       - name: Build mobile web assets
-        run: pnpm turbo run build --filter=@trizum/mobile
+        run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -83,7 +78,7 @@ jobs:
       - name: Organize screenshots for fastlane
         working-directory: packages/screenshots
         run: |
-          pnpm organize:fastlane --platform android --output ../mobile/android/fastlane/metadata/android
+          vp run organize:fastlane --platform android --output ../mobile/android/fastlane/metadata/android
           echo "Screenshots organized:"
           ls -la ../mobile/android/fastlane/metadata/android/ || true
           ls -la ../mobile/android/fastlane/metadata/android/en-US/images/phoneScreenshots/ || true

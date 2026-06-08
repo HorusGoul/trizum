@@ -90,9 +90,7 @@ export function getDebtTransferParticipantMatch({
 
   const normalizedSourceTokens = tokenizeParticipantName(normalizedSourceName);
   const participantsWithMatchScore = participants.map((participant) => {
-    const normalizedParticipantName = normalizeParticipantName(
-      participant.name,
-    );
+    const normalizedParticipantName = normalizeParticipantName(participant.name);
 
     return {
       participant,
@@ -106,8 +104,7 @@ export function getDebtTransferParticipantMatch({
   });
 
   const exactMatches = participantsWithMatchScore.filter(
-    ({ normalizedParticipantName }) =>
-      normalizedParticipantName === normalizedSourceName,
+    ({ normalizedParticipantName }) => normalizedParticipantName === normalizedSourceName,
   );
 
   if (exactMatches.length === 1) {

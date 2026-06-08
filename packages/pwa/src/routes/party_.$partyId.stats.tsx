@@ -11,11 +11,7 @@ export const Route = createFileRoute("/party_/$partyId/stats")({
   component: PartyStatsRoute,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
-    const { party } = await guardParticipatingInParty(
-      partyId,
-      context,
-      location,
-    );
+    const { party } = await guardParticipatingInParty(partyId, context, location);
 
     for (const chunkRef of party.chunkRefs) {
       await documentCache.readAsync(context.repo, chunkRef.chunkId);

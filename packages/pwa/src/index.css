@@ -26,7 +26,7 @@ body {
   margin: 0;
   padding: 0;
 
-  @apply bg-accent-50 text-accent-950 dark:bg-accent-950 dark:text-accent-50 font-sans;
+  @apply bg-accent-50 font-sans text-accent-950 dark:bg-accent-950 dark:text-accent-50;
 }
 
 #root {
@@ -38,13 +38,15 @@ body {
   @apply outline-accent-500 dark:outline-accent-400;
 }
 
-img, a {
+img,
+a {
   -webkit-touch-callout: none;
   -webkit-user-drag: none;
 }
 
 @keyframes swing-rotate {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(0deg);
   }
   15% {

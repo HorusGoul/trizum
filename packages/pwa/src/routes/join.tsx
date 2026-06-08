@@ -10,11 +10,7 @@ import { Icon } from "#src/ui/Icon.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useForm } from "@tanstack/react-form";
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
 import { toast } from "sonner";
 
@@ -74,9 +70,7 @@ function Join() {
     const valid = isValidDocumentId(partyId);
 
     if (!valid) {
-      return isUrl
-        ? t`Invalid trizum party link`
-        : t`Invalid trizum party code`;
+      return isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`;
     }
   }
 
@@ -92,9 +86,7 @@ function Join() {
     }
 
     if (!isValidDocumentId(partyId)) {
-      toast.error(
-        isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`,
-      );
+      toast.error(isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`);
       return;
     }
     void navigate({
@@ -184,17 +176,12 @@ function Join() {
                 onChange={field.handleChange}
                 onBlur={field.handleBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
               />
             )}
           </form.Field>
 
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-          >
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button
                 color="accent"

@@ -28,16 +28,11 @@ function FormDescription({ className, ...props }: AriaTextProps) {
 
 function FieldError({ className, ...props }: AriaFieldErrorProps) {
   return (
-    <AriaFieldError
-      className={cn("text-sm font-medium text-danger-500", className)}
-      {...props}
-    />
+    <AriaFieldError className={cn("text-sm font-medium text-danger-500", className)} {...props} />
   );
 }
 
-interface GroupProps
-  extends AriaGroupProps,
-    VariantProps<typeof fieldGroupVariants> {}
+interface GroupProps extends AriaGroupProps, VariantProps<typeof fieldGroupVariants> {}
 
 function FieldGroup({ className, variant, ...props }: GroupProps) {
   return (

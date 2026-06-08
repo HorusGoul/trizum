@@ -1,6 +1,6 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import { STATUS_RESOLVED } from "suspense";
-import { vi } from "vitest";
+import { vi } from "vite-plus/test";
 
 export interface MockDocumentCacheCollection<TDocument> {
   availableDocuments: Map<DocumentId, TDocument>;
@@ -66,22 +66,20 @@ export function createMockDocumentCacheCollection<
 
       return Promise.resolve(availableDocument);
     }),
-    subscribe: vi.fn(
-      (callback: () => void, _: Repo, documentId: DocumentId) => {
-        const callbacks = subscribers.get(documentId) ?? new Set<() => void>();
+    subscribe: vi.fn((callback: () => void, _: Repo, documentId: DocumentId) => {
+      const callbacks = subscribers.get(documentId) ?? new Set<() => void>();
 
-        callbacks.add(callback);
-        subscribers.set(documentId, callbacks);
+      callbacks.add(callback);
+      subscribers.set(documentId, callbacks);
 
-        return () => {
-          callbacks.delete(callback);
+      return () => {
+        callbacks.delete(callback);
 
-          if (callbacks.size === 0) {
-            subscribers.delete(documentId);
-          }
-        };
-      },
-    ),
+        if (callbacks.size === 0) {
+          subscribers.delete(documentId);
+        }
+      };
+    }),
   };
 
   return {

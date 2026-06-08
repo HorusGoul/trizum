@@ -141,9 +141,7 @@ async function main() {
               await page.screenshot({
                 path: path.resolve(
                   screenshotsFolder,
-                  [name, selectedDevice.suffix, "png"]
-                    .filter(Boolean)
-                    .join("."),
+                  [name, selectedDevice.suffix, "png"].filter(Boolean).join("."),
                 ),
               });
             }
@@ -161,18 +159,12 @@ async function main() {
                 const partyId = await page.evaluate(async (data) => {
                   // @ts-expect-error - Internal function
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                  return (await window.__internal_createPartyFromMigrationData(
-                    data,
-                  )) as string;
+                  return (await window.__internal_createPartyFromMigrationData(data)) as string;
                 }, migrationData);
 
                 await page.goto(`/party/${partyId}/who`);
-                await page
-                  .getByRole("radio", { name: "Modest" })
-                  .click({ force: true });
-                await page
-                  .getByRole("button", { name: /save|guardar/i })
-                  .click();
+                await page.getByRole("radio", { name: "Modest" }).click({ force: true });
+                await page.getByRole("button", { name: /save|guardar/i }).click();
 
                 // Wait for Balances text to show up
                 await page

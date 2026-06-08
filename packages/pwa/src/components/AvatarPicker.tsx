@@ -4,10 +4,7 @@ import { Avatar } from "#src/ui/Avatar.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
 import { Skeleton } from "#src/ui/Skeleton.js";
-import {
-  getImageUploadErrorMessage,
-  useMediaFileActions,
-} from "#src/hooks/useMediaFileActions.js";
+import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
 import {
   compressionPresets,
@@ -29,12 +26,7 @@ interface AvatarPickerProps {
   className?: string;
 }
 
-export function AvatarPicker({
-  value,
-  name,
-  onChange,
-  className,
-}: AvatarPickerProps) {
+export function AvatarPicker({ value, name, onChange, className }: AvatarPickerProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { createMediaFile } = useMediaFileActions();
@@ -76,8 +68,7 @@ export function AvatarPicker({
       logger.error("Failed to upload avatar", { error });
       toast.dismiss(toastId);
       toast.error(
-        getImageUploadErrorMessage(error) ??
-          t`Failed to upload avatar. Please try again.`,
+        getImageUploadErrorMessage(error) ?? t`Failed to upload avatar. Please try again.`,
       );
     } finally {
       setIsUploading(false);
@@ -120,12 +111,9 @@ export function AvatarPicker({
             className="absolute right-1 top-1 h-auto w-auto rounded-full p-1"
             onPress={handleRemoveAvatar}
             isDisabled={isUploading}
+            aria-label={t`Remove avatar`}
           >
-            <Icon
-              icon="lucide.x"
-              className="h-4 w-4"
-              aria-label={t`Remove avatar`}
-            />
+            <Icon icon="lucide.x" className="h-4 w-4" />
           </Button>
         )}
       </div>
@@ -152,6 +140,7 @@ export function AvatarPicker({
 
       <input
         type="file"
+        aria-label={t`Take photo`}
         className="sr-only"
         accept={imageUploadAccept}
         capture="environment"
@@ -163,6 +152,7 @@ export function AvatarPicker({
 
       <input
         type="file"
+        aria-label={t`Upload photo`}
         className="sr-only"
         accept={imageUploadAccept}
         multiple={false}

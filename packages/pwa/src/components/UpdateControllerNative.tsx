@@ -1,16 +1,9 @@
 import { Capacitor } from "@capacitor/core";
-import {
-  AppUpdate,
-  AppUpdateAvailability,
-} from "@capawesome/capacitor-app-update";
+import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
 import { UpdateContext } from "./UpdateContext";
 import { useCallback, useEffect, useState } from "react";
 
-export function UpdateControllerNative({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function UpdateControllerNative({ children }: { children: React.ReactNode }) {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
 
   const update = useCallback(() => {

@@ -10,7 +10,6 @@
     "target": "ES2017",
     "noEmit": false,
     "verbatimModuleSyntax": false,
-    "baseUrl": ".",
     "paths": {
       "@trizum/logging": ["../logging/src/index.ts"]
     }

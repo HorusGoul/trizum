@@ -100,16 +100,13 @@ export function PartyListCard({
     return null;
   }
 
-  const symbolOrFirstLetter =
-    party.symbol || party.name.charAt(0).toUpperCase();
+  const symbolOrFirstLetter = party.symbol || party.name.charAt(0).toUpperCase();
   const description = party.description.trim();
   const participantPreview = getParticipantPreview(party, currentParticipantId);
   const hasDescription = description.length > 0;
   const hasSupportingCopy = hasDescription || participantPreview !== null;
   const showDesktopActionButton =
-    hasActions &&
-    isLargeScreen &&
-    (isHovered || isFocusWithin || isDesktopMenuOpen);
+    hasActions && isLargeScreen && (isHovered || isFocusWithin || isDesktopMenuOpen);
   const partyRouteParams = {
     partyId: party.id,
   };
@@ -136,11 +133,9 @@ export function PartyListCard({
       {...mergeProps(hoverProps, focusProps, focusWithinProps)}
       className={cn(
         "relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out has-[>[data-party-card-surface][data-pressed]]:scale-[0.99] dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none",
-        isHovered &&
-          "border-accent-300/90 shadow-md dark:border-accent-700 dark:shadow-none",
+        isHovered && "border-accent-300/90 shadow-md dark:border-accent-700 dark:shadow-none",
         isFocusWithin && "shadow-md dark:shadow-none",
-        isFocusVisible &&
-          "border-accent-500 dark:border-accent-500 dark:shadow-none",
+        isFocusVisible && "border-accent-500 dark:border-accent-500 dark:shadow-none",
         isPressed && "scale-[0.96]",
       )}
     >
@@ -215,9 +210,7 @@ export function PartyListCard({
                   <ParticipantPreviewText preview={participantPreview.mobile} />
                 </span>
                 <span className="line-clamp-1 hidden sm:block">
-                  <ParticipantPreviewText
-                    preview={participantPreview.desktop}
-                  />
+                  <ParticipantPreviewText preview={participantPreview.desktop} />
                 </span>
               </span>
             </p>
@@ -239,10 +232,7 @@ export function PartyListCard({
             )}
           >
             {showDesktopActionButton ? (
-              <MenuTrigger
-                isOpen={isDesktopMenuOpen}
-                onOpenChange={setIsDesktopMenuOpen}
-              >
+              <MenuTrigger isOpen={isDesktopMenuOpen} onOpenChange={setIsDesktopMenuOpen}>
                 <IconButton
                   icon="lucide.ellipsis-vertical"
                   aria-label={t`Party actions`}
@@ -264,17 +254,11 @@ export function PartyListCard({
                           action.onAction();
                         }}
                       >
-                        <Icon
-                          icon={action.icon}
-                          width={20}
-                          height={20}
-                          className="mr-3"
-                        />
+                        <Icon icon={action.icon} width={20} height={20} className="mr-3" />
                         <span
                           className={cn(
                             "h-3.5 leading-none",
-                            action.tone === "danger" &&
-                              "text-rose-700 dark:text-rose-300",
+                            action.tone === "danger" && "text-rose-700 dark:text-rose-300",
                           )}
                         >
                           {action.label}
@@ -296,9 +280,7 @@ export function PartyListCard({
         >
           <ModalSheetHeader>
             <ModalSheetSection>
-              <ModalSheetTitle className="line-clamp-2">
-                {party.name}
-              </ModalSheetTitle>
+              <ModalSheetTitle className="line-clamp-2">{party.name}</ModalSheetTitle>
             </ModalSheetSection>
           </ModalSheetHeader>
 
@@ -339,21 +321,14 @@ function ParticipantPreviewText({
       {preview.remainingCount > 0 ? (
         <>
           {" "}
-          <Plural
-            value={preview.remainingCount}
-            one="and # other"
-            other="and # others"
-          />
+          <Plural value={preview.remainingCount} one="and # other" other="and # others" />
         </>
       ) : null}
     </>
   );
 }
 
-function getParticipantPreview(
-  party: Party,
-  currentParticipantId: PartyParticipant["id"] | null,
-) {
+function getParticipantPreview(party: Party, currentParticipantId: PartyParticipant["id"] | null) {
   const visibleParticipantNames = Object.values(party.participants)
     .filter(
       (participant) =>
@@ -373,10 +348,7 @@ function getParticipantPreview(
   };
 }
 
-function getParticipantPreviewVariant(
-  visibleParticipantNames: string[],
-  maxNames: number,
-) {
+function getParticipantPreviewVariant(visibleParticipantNames: string[], maxNames: number) {
   const previewNames = visibleParticipantNames.slice(0, maxNames);
 
   return {

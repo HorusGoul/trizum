@@ -1,11 +1,9 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "vite-plus/test";
 import { decodeBlob, encodeBlob } from "./media";
 
 describe("media blob encoding", () => {
   test("restores the MIME type when decoding a blob", async () => {
-    const encoded = await encodeBlob(
-      new Blob(["image-data"], { type: "image/jpeg" }),
-    );
+    const encoded = await encodeBlob(new Blob(["image-data"], { type: "image/jpeg" }));
     const decoded = decodeBlob(encoded, "image/jpeg");
 
     expect(decoded.type).toBe("image/jpeg");

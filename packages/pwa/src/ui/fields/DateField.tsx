@@ -38,15 +38,9 @@ function DateSegment({ className, ...props }: AriaDateSegmentProps) {
   );
 }
 
-interface DateInputProps
-  extends AriaDateInputProps,
-    VariantProps<typeof fieldGroupVariants> {}
+interface DateInputProps extends AriaDateInputProps, VariantProps<typeof fieldGroupVariants> {}
 
-function DateInput({
-  className,
-  variant = "default",
-  ...props
-}: Omit<DateInputProps, "children">) {
+function DateInput({ className, variant, ...props }: Omit<DateInputProps, "children">) {
   return (
     <AriaDateInput
       className={composeRenderProps(className, (className) =>

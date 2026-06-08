@@ -8,10 +8,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId, useState } from "react";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { Button } from "#src/ui/Button.tsx";
-import {
-  createPartyFromMigrationData,
-  type MigrationData,
-} from "#src/models/migration.ts";
+import { createPartyFromMigrationData, type MigrationData } from "#src/models/migration.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import { getAppLink } from "#src/lib/link.ts";
 
@@ -36,9 +33,7 @@ function RouteComponent() {
 
 function extractTricountId(input: string): string | null {
   // Check if it's a tricount.com URL (standalone or within text)
-  const urlMatch = input.match(
-    /https?:\/\/(?:www\.)?tricount\.com\/([a-zA-Z0-9]+)/,
-  );
+  const urlMatch = input.match(/https?:\/\/(?:www\.)?tricount\.com\/([a-zA-Z0-9]+)/);
   if (urlMatch) {
     return urlMatch[1];
   }
@@ -163,9 +158,7 @@ function IdleState({
 
         <div className="flex-1" />
 
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) =>
             canSubmit ? (
               <Suspense fallback={null}>
@@ -192,10 +185,7 @@ function IdleState({
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <form.Field
-          name="key"
-          validators={{ onChange: ({ value }) => validateTricountKey(value) }}
-        >
+        <form.Field name="key" validators={{ onChange: ({ value }) => validateTricountKey(value) }}>
           {(field) => (
             <AppTextField
               label={t`Tricount URL or key`}
@@ -205,10 +195,7 @@ function IdleState({
               onChange={field.handleChange}
               onBlur={field.handleBlur}
               errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
+              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             />
           )}
         </form.Field>
@@ -231,28 +218,18 @@ function IdleState({
   );
 }
 
-function InProgressState({
-  name,
-  progress,
-}: {
-  name: string;
-  progress: number;
-}) {
+function InProgressState({ name, progress }: { name: string; progress: number }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm p-4 text-center">
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Migration in progress</Trans>
         </h1>
-        <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">
-          {name}
-        </p>
+        <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">{name}</p>
 
         <Progress value={progress} />
         <p className="mt-4 text-xs">
-          <Trans>
-            Please don&apos;t close the app while we migrate your data
-          </Trans>
+          <Trans>Please don&apos;t close the app while we migrate your data</Trans>
         </p>
       </div>
     </div>
@@ -302,9 +279,7 @@ function ErrorState({ message }: { message: string }) {
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Something went wrong</Trans>
         </h1>
-        <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">
-          {message}
-        </p>
+        <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">{message}</p>
         <Button
           color="input-like"
           onClick={() => {

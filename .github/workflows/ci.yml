@@ -15,28 +15,21 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    # Matrix of multiple Turbo jobs
     strategy:
       matrix:
-        turbo:
-          - lint
-          - typecheck
+        script:
+          - check
           - build
           - test
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
+          node-version-file: ".node-version"
+          cache: true
 
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: ${{ matrix.turbo }}
-        run: pnpm turbo run ${{ matrix.turbo }}
+      - name: vp run ${{ matrix.script }}
+        run: vp run ${{ matrix.script }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
@@ -47,22 +40,17 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+          node-version-file: ".node-version"
+          cache: true
 
       - name: Install Playwright Browsers
         timeout-minutes: 5
-        run: pnpm --filter @trizum/pwa run test:e2e:install:ci
+        run: vp run --filter @trizum/pwa test:e2e:install:ci
 
       - name: Run Playwright E2E
-        run: pnpm test:e2e
+        run: vp run --filter @trizum/pwa test:e2e
 
       - name: Upload Playwright Report
         if: failure()
@@ -74,33 +62,6 @@ jobs:
             packages/pwa/test-results
           if-no-files-found: ignore
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: [check]
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
-      pull-requests: write
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Create Release Pull Request or Publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: pnpm run update-version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   autofix:
     name: Autofix & Extract Messages
     runs-on: ubuntu-latest
@@ -109,23 +70,19 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version-file: package.json
-          cache: "pnpm"
-      - uses: rharkor/caching-for-turbo@v2.3.11
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+          node-version-file: ".node-version"
+          cache: true
 
       - name: Autofix
         id: autofix
-        run: pnpm lint:fix
+        run: vp run check --fix
         continue-on-error: true
 
       - name: Extract Messages
         id: extract-messages
-        run: pnpm lingui:extract
+        run: vp run lingui:extract
         continue-on-error: true
 
       - name: Guard Catalog Conflict Markers
@@ -144,5 +101,5 @@ jobs:
           committer_email: actions@github.com
 
       - name: Check if autofix and extract messages were successful
-        if: ${{ steps.autofix.result != '0' || steps.extract-messages.result != '0' }}
+        if: ${{ steps.autofix.outcome != 'success' || steps.extract-messages.outcome != 'success' }}
         run: echo "::error::Autofix or extract messages failed" && exit 1

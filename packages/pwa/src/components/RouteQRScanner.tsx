@@ -1,10 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Modal, ModalOverlay } from "react-aria-components";
-import {
-  QRCodeScanner,
-  type ScanResult,
-  type ValidationResult,
-} from "./QRCodeScanner.js";
+import { QRCodeScanner, type ScanResult, type ValidationResult } from "./QRCodeScanner.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { t } from "@lingui/core/macro";
 import { toast } from "sonner";
@@ -27,12 +23,7 @@ export interface RouteQRScannerProps {
  * A QR scanner component designed to be used with route search params.
  * Renders as a fullscreen modal overlay with camera viewfinder.
  */
-export function RouteQRScanner({
-  isOpen,
-  onScan,
-  onClose,
-  validate,
-}: RouteQRScannerProps) {
+export function RouteQRScanner({ isOpen, onScan, onClose, validate }: RouteQRScannerProps) {
   function handleResult(result: ScanResult) {
     if (result.type === "cancelled") {
       onClose();

@@ -1,0 +1,100 @@
+name: PWA Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+  deployments: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Build PWA
+        run: vp run --filter @trizum/pwa build
+
+      - name: Deploy PWA preview to Cloudflare
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            versions upload
+            --preview-alias pr-${{ github.event.pull_request.number }}
+            --tag pr-${{ github.event.pull_request.number }}
+            --message "Preview for PR #${{ github.event.pull_request.number }}"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          packageManager: npm
+          workingDirectory: packages/pwa
+
+      - name: Comment preview URL
+        env:
+          COMMAND_OUTPUT: ${{ steps.deploy.outputs.command-output }}
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAGES_DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          PREVIEW_ALIAS: pr-${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          all_preview_urls="$(
+            printf '%s\n%s\n%s\n' "${PAGES_DEPLOYMENT_ALIAS_URL:-}" "${DEPLOYMENT_URL:-}" "${COMMAND_OUTPUT:-}" |
+              grep -Eo 'https://[^[:space:]]+' |
+              grep -E '(workers\.dev|pages\.dev)' || true
+          )"
+
+          preview_url="$(
+            printf '%s\n' "$all_preview_urls" |
+              grep -E "^https://${PREVIEW_ALIAS}-[^/[:space:]]+\\.(workers|pages)\\.dev" |
+              head -n 1 || true
+          )"
+
+          if [ -z "$preview_url" ]; then
+            echo "::error::Cloudflare deployment did not return a ${PREVIEW_ALIAS} aliased preview URL."
+            exit 1
+          fi
+
+          marker="<!-- trizum-pwa-preview -->"
+          body="${marker}"$'\n'"PWA preview (${PREVIEW_ALIAS}): ${preview_url}"
+
+          comment_id="$(
+            gh api "repos/$REPOSITORY/issues/$PR_NUMBER/comments" --paginate |
+              jq -r '.[] | select(.user.type == "Bot" and (.body | contains("<!-- trizum-pwa-preview -->"))) | .id' |
+              tail -n 1
+          )"
+
+          if [ -n "$comment_id" ]; then
+            gh api --method PATCH "repos/$REPOSITORY/issues/comments/$comment_id" -f body="$body" >/dev/null
+          else
+            gh api --method POST "repos/$REPOSITORY/issues/$PR_NUMBER/comments" -f body="$body" >/dev/null
+          fi

@@ -4,10 +4,7 @@ export interface UseRouteQRScannerOptions {
   /** Whether scanner is active from route search params */
   scanning: boolean | undefined;
   /** Navigate function to update search params */
-  navigate: (options: {
-    search: { scanning?: boolean };
-    replace?: boolean;
-  }) => void;
+  navigate: (options: { search: { scanning?: boolean }; replace?: boolean }) => void;
   /** Function to navigate back (e.g., history.back) */
   goBack: () => void;
 }

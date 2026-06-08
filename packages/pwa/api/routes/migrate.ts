@@ -169,19 +169,13 @@ class TricountAPIClient {
     );
 
     // Export public key in PEM format
-    const publicKeyBuffer = await crypto.subtle.exportKey(
-      "spki",
-      keyPair.publicKey,
-    );
+    const publicKeyBuffer = await crypto.subtle.exportKey("spki", keyPair.publicKey);
     const publicKeyArray = new Uint8Array(publicKeyBuffer);
     const publicKeyBase64 = btoa(String.fromCharCode(...publicKeyArray));
     this.public_key = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`;
 
     // Export private key in PEM format
-    const privateKeyBuffer = await crypto.subtle.exportKey(
-      "pkcs8",
-      keyPair.privateKey,
-    );
+    const privateKeyBuffer = await crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
     const privateKeyArray = new Uint8Array(privateKeyBuffer);
     const privateKeyBase64 = btoa(String.fromCharCode(...privateKeyArray));
     this.private_key = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`;
@@ -205,12 +199,10 @@ class TricountAPIClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Authentication failed: ${response.status} ${response.statusText}`,
-      );
+      throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
     }
 
-    const auth_data = await response.json<TricountResponse>();
+    const auth_data = (await response.json()) as TricountResponse;
     const response_items = auth_data.Response;
 
     // Extract token and user ID from response
@@ -241,9 +233,7 @@ class TricountAPIClient {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to fetch Tricount data: ${response.status} ${response.statusText}`,
-      );
+      throw new Error(`Failed to fetch Tricount data: ${response.status} ${response.statusText}`);
     }
 
     return await response.json();
@@ -301,8 +291,7 @@ function parseTricountData(data: TricountResponse): MigrationData {
     const totalAmount = Math.abs(parseFloat(transaction.amount.value));
     const totalAmountInCents = Math.round(totalAmount * 100);
     const currency = transaction.amount.currency;
-    const paidByName =
-      transaction.membership_owned.RegistryMembershipNonUser.alias.display_name;
+    const paidByName = transaction.membership_owned.RegistryMembershipNonUser.alias.display_name;
     const paidById = nameToIdMap.get(paidByName);
 
     if (!paidById) {
@@ -325,15 +314,13 @@ function parseTricountData(data: TricountResponse): MigrationData {
 
     // First pass: calculate total shares for divide participants
     for (const allocation of transaction.allocations) {
-      const participantName =
-        allocation.membership.RegistryMembershipNonUser.alias.display_name;
+      const participantName = allocation.membership.RegistryMembershipNonUser.alias.display_name;
       const participantId = nameToIdMap.get(participantName);
 
       if (!participantId) {
-        logger.warning(
-          "Could not find participant ID for participant {participantName}",
-          { participantName },
-        );
+        logger.warning("Could not find participant ID for participant {participantName}", {
+          participantName,
+        });
         continue;
       }
 
@@ -344,8 +331,7 @@ function parseTricountData(data: TricountResponse): MigrationData {
 
     // Second pass: create shares
     for (const allocation of transaction.allocations) {
-      const participantName =
-        allocation.membership.RegistryMembershipNonUser.alias.display_name;
+      const participantName = allocation.membership.RegistryMembershipNonUser.alias.display_name;
       const participantId = nameToIdMap.get(participantName);
 
       if (!participantId) {
@@ -400,7 +386,6 @@ function parseTricountData(data: TricountResponse): MigrationData {
       isTransfer,
       __editCopy: undefined,
       __editCopyLastUpdatedAt: undefined,
-      __presence: undefined,
     };
 
     expenses.push(expense);
@@ -413,7 +398,6 @@ function parseTricountData(data: TricountResponse): MigrationData {
     description: registry.description || "",
     currency: registry.currency as Party["currency"], // Assuming currency string is valid
     participants,
-    hue: undefined,
   };
 
   return {

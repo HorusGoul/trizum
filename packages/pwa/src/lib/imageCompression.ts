@@ -136,9 +136,7 @@ async function convertHeicImage(file: File): Promise<File> {
   }
 }
 
-async function normalizeImageFile(
-  file: File,
-): Promise<{ file: File; convertedFromHeic: boolean }> {
+async function normalizeImageFile(file: File): Promise<{ file: File; convertedFromHeic: boolean }> {
   if (!isHeicImageFile(file)) {
     return {
       file,
@@ -307,10 +305,9 @@ async function canvasToBlob(
         } else {
           // Fallback to JPEG if the requested format fails
           if (mimeType !== "image/jpeg") {
-            logger.warning(
-              "Failed to convert image to {mimeType}; falling back to JPEG",
-              { mimeType },
-            );
+            logger.warning("Failed to convert image to {mimeType}; falling back to JPEG", {
+              mimeType,
+            });
             canvas.toBlob(
               (fallbackBlob) => {
                 if (fallbackBlob) {
@@ -359,12 +356,9 @@ export async function processImage(
 
   try {
     const originalOrientation = await readOrientation(file);
-    const { file: normalizedFile, convertedFromHeic } =
-      await normalizeImageFile(file);
+    const { file: normalizedFile, convertedFromHeic } = await normalizeImageFile(file);
     const normalizedOrientation =
-      normalizedFile === file
-        ? originalOrientation
-        : await readOrientation(normalizedFile);
+      normalizedFile === file ? originalOrientation : await readOrientation(normalizedFile);
 
     // First, correct orientation and remove EXIF data
     const { canvas: correctedCanvas, mimeType } = await correctOrientation(
@@ -376,8 +370,7 @@ export async function processImage(
     const correctedBlob = await canvasToBlob(correctedCanvas, mimeType, 0.9);
 
     // Check if compression is needed
-    const needsCompression =
-      originalSize > opts.maxSizeBeforeCompress * 1024 * 1024;
+    const needsCompression = originalSize > opts.maxSizeBeforeCompress * 1024 * 1024;
 
     let finalBlob: Blob;
     let compressedSize: number;

@@ -1,17 +1,17 @@
 {
   "name": "@trizum/ts-template",
+  "version": "1.0.0",
+  "private": true,
   "description": "",
   "keywords": [],
-  "version": "1.0.0",
   "license": "MIT",
-  "private": true,
   "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
   "files": [
     "dist",
     "src"
   ],
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "imports": {
     "#*": "./*"
   },
@@ -25,24 +25,15 @@
   },
   "scripts": {
     "cleanup": "rm -rf dist",
-    "dev": "tsc -b tsconfig.json --watch",
-    "build": "tsc -b tsconfig.json",
-    "typecheck": "tsc -b tsconfig.test.json",
-    "lint": "eslint --ext .ts src",
-    "lint:fix": "pnpm run lint --fix",
-    "test": "vitest run"
+    "dev": "tsc -b tsconfig.json --watch"
   },
   "dependencies": {
     "@trizum/logging": "workspace:*"
   },
   "devDependencies": {
-    "@trizum/eslint-config": "workspace:*",
-    "@trizum/prettier-config": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
-    "eslint": "9.39.1",
-    "prettier": "3.6.2",
     "typescript": "5.9.2",
-    "vitest": "4.1.0"
-  },
-  "prettier": "@trizum/prettier-config"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
 }

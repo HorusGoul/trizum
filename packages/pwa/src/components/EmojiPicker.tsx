@@ -112,8 +112,7 @@ const GRID_COLUMNS = 8;
 const CELL_SIZE = 36;
 const GAP = 4;
 const GRID_PADDING = 8;
-const GRID_WIDTH =
-  GRID_COLUMNS * CELL_SIZE + (GRID_COLUMNS - 1) * GAP + GRID_PADDING * 2;
+const GRID_WIDTH = GRID_COLUMNS * CELL_SIZE + (GRID_COLUMNS - 1) * GAP + GRID_PADDING * 2;
 
 interface EmojiPickerProps {
   value?: string;
@@ -196,10 +195,7 @@ export function EmojiPicker({
               </div>
             </SearchField>
             <Suspense fallback={<EmojiGridSkeleton />}>
-              <EmojiGridContent
-                searchQuery={searchQuery}
-                onSelect={handleSelect}
-              />
+              <EmojiGridContent searchQuery={searchQuery} onSelect={handleSelect} />
             </Suspense>
           </div>
         </Dialog>
@@ -211,10 +207,7 @@ export function EmojiPicker({
 function EmojiGridSkeleton() {
   return (
     <div className="flex h-[280px] items-center justify-center">
-      <TrizumSpinner
-        size={24}
-        className="text-accent-600 dark:text-accent-400"
-      />
+      <TrizumSpinner size={24} className="text-accent-600 dark:text-accent-400" />
     </div>
   );
 }
@@ -232,8 +225,7 @@ function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
         const query = searchQuery.toLowerCase();
         const labelMatch = emoji.label?.toLowerCase().includes(query);
         const tagsMatch =
-          Array.isArray(emoji.tags) &&
-          emoji.tags.some((tag) => tag.toLowerCase().includes(query));
+          Array.isArray(emoji.tags) && emoji.tags.some((tag) => tag.toLowerCase().includes(query));
         return labelMatch || tagsMatch;
       })
     : null;
@@ -259,13 +251,7 @@ interface EmojiGridProps {
   onSelect: (emoji: string) => void;
 }
 
-function EmojiButton({
-  emoji,
-  onSelect,
-}: {
-  emoji: Emoji;
-  onSelect: (emoji: string) => void;
-}) {
+function EmojiButton({ emoji, onSelect }: { emoji: Emoji; onSelect: (emoji: string) => void }) {
   return (
     <button
       type="button"
@@ -369,9 +355,7 @@ const CATEGORY_ICONS: Record<number, string> = {
   9: "🏳️", // Flags
 };
 
-type VirtualRow =
-  | { type: "header"; group: number }
-  | { type: "emojis"; emojis: Emoji[] };
+type VirtualRow = { type: "header"; group: number } | { type: "emojis"; emojis: Emoji[] };
 
 interface VirtualRowsResult {
   rows: VirtualRow[];
@@ -401,11 +385,7 @@ function buildVirtualRows(
   return { rows, groupStartIndices };
 }
 
-function getGroupForRowIndex(
-  rows: VirtualRow[],
-  orderedGroups: number[],
-  rowIndex: number,
-) {
+function getGroupForRowIndex(rows: VirtualRow[], orderedGroups: number[], rowIndex: number) {
   const fallbackGroup = orderedGroups[0] ?? 0;
   const boundedIndex = Math.min(rowIndex, rows.length - 1);
 
@@ -491,10 +471,7 @@ function CategorizedEmojiGrid({
 }: CategorizedEmojiGridProps) {
   const firstGroup = orderedGroups[0] ?? 0;
   const [activeGroup, setActiveGroup] = useState(firstGroup);
-  const { rows: virtualRows, groupStartIndices } = buildVirtualRows(
-    orderedGroups,
-    groupedEmojis,
-  );
+  const { rows: virtualRows, groupStartIndices } = buildVirtualRows(orderedGroups, groupedEmojis);
   const listRef = useListRef(null);
 
   function scrollToGroup(group: number) {

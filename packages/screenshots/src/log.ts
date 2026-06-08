@@ -31,15 +31,10 @@ export function configureScreenshotsLogging<TSinkId extends string = never>(
       [GITHUB_ACTIONS_ANNOTATION_SINK_ID]: getGitHubActionsAnnotationSink(),
       ...(extraSinks ?? {}),
     } as NonNullable<
-      ConfigureTrizumLoggingOptions<
-        ScreenshotsBuiltInSinkId | TSinkId
-      >["extraSinks"]
+      ConfigureTrizumLoggingOptions<ScreenshotsBuiltInSinkId | TSinkId>["extraSinks"]
     >,
     surfaceSinks: Array.from(
-      new Set([
-        ...(surfaceSinks ?? ["console"]),
-        GITHUB_ACTIONS_ANNOTATION_SINK_ID,
-      ]),
+      new Set([...(surfaceSinks ?? ["console"]), GITHUB_ACTIONS_ANNOTATION_SINK_ID]),
     ) as (ScreenshotsBuiltInSinkId | TSinkId | "console")[],
   });
 }

@@ -1,9 +1,4 @@
-import {
-  blob,
-  text,
-  sqliteTable,
-  SQLiteBooleanBuilder,
-} from "drizzle-orm/sqlite-core";
+import { blob, text, sqliteTable, SQLiteBooleanBuilder } from "drizzle-orm/sqlite-core";
 import { timestamps } from "./columns.helpers.ts";
 
 export const automergeKV = sqliteTable("automerge_kv", {

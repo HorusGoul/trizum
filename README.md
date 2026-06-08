@@ -31,9 +31,10 @@
 
 ### Prerequisites
 
-- Node.js version from [`.nvmrc`](./.nvmrc) (use `nvm use` to set the correct
-  version)
-- pnpm version from the root [`package.json`](./package.json)
+- Vite+ (`vp`) installed locally
+- Node.js version from [`.node-version`](./.node-version)
+- pnpm version from the root [`package.json`](./package.json), managed through
+  Vite+
 
 ### Installation
 
@@ -42,25 +43,21 @@
 git clone https://github.com/HorusGoul/trizum.git
 cd trizum
 
-# Use correct Node version
-nvm use
-
 # Install dependencies
-pnpm install
+vp install
 ```
 
 ### Development
 
 ```bash
-# Start the PWA development server
-cd packages/pwa
-pnpm dev
+# Start the PWA development server from the repo root
+vp run dev
 
-# Or run commands from root
-pnpm build        # Build all packages
-pnpm test         # Run all tests
-pnpm lint         # Lint all packages
-pnpm typecheck    # Type check all packages
+# Run checks and build scripts from the repo root
+vp run check                           # Format, lint, and type check
+vp run test                            # Run unit tests
+vp run --filter @trizum/pwa build      # Build the PWA package script
+vp run build                           # Run workspace build scripts
 ```
 
 ### Running Mobile Apps
@@ -69,10 +66,10 @@ pnpm typecheck    # Type check all packages
 cd packages/mobile
 
 # Android
-pnpm dev:android
+vp run dev:android
 
 # iOS
-pnpm dev:ios
+vp run dev:ios
 ```
 
 ## 🤝 Contributing
@@ -97,16 +94,14 @@ trizum is built as a **monorepo** with a local-first architecture. The core prin
 
 ## 📦 Packages
 
-| Package                                                 | Description                                                      |
-| ------------------------------------------------------- | ---------------------------------------------------------------- |
-| [`@trizum/pwa`](./packages/pwa)                         | Main web application. React + Vite PWA with offline support      |
-| [`@trizum/mobile`](./packages/mobile)                   | Native mobile apps wrapper using Capacitor (Android & iOS)       |
-| [`@trizum/server`](./packages/server)                   | Sync server. Hono + Automerge repo for WebSocket synchronization |
-| [`@trizum/screenshots`](./packages/screenshots)         | Automated screenshot generation for app stores using Playwright  |
-| [`@trizum/logging`](./packages/logging)                | Shared LogTape logging conventions and configuration helpers     |
-| [`@trizum/eslint-config`](./packages/eslint-config)     | Shared ESLint configuration                                      |
-| [`@trizum/prettier-config`](./packages/prettier-config) | Shared Prettier configuration                                    |
-| [`@trizum/tsconfig`](./packages/tsconfig)               | Shared TypeScript configuration                                  |
+| Package                                         | Description                                                      |
+| ----------------------------------------------- | ---------------------------------------------------------------- |
+| [`@trizum/pwa`](./packages/pwa)                 | Main web application. React + Vite PWA with offline support      |
+| [`@trizum/mobile`](./packages/mobile)           | Native mobile apps wrapper using Capacitor (Android & iOS)       |
+| [`@trizum/server`](./packages/server)           | Sync server. Hono + Automerge repo for WebSocket synchronization |
+| [`@trizum/screenshots`](./packages/screenshots) | Automated screenshot generation for app stores using Playwright  |
+| [`@trizum/logging`](./packages/logging)         | Shared LogTape logging conventions and configuration helpers     |
+| [`@trizum/tsconfig`](./packages/tsconfig)       | Shared TypeScript configuration                                  |
 
 ## 📝 License
 

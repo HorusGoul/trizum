@@ -9,6 +9,23 @@ stable, and focused on routing.
 is centered on an offline-first PWA backed by Automerge, with mobile wrappers,
 a sync server, and tooling for release screenshots.
 
+<!--VITE PLUS START-->
+
+# Using Vite+, the Unified Toolchain for the Web
+
+This project is using Vite+, a unified toolchain built on top of Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt, and Vite Task. Vite+ wraps runtime management, package management, and frontend tooling in a single global CLI called `vp`. Vite+ is distinct from Vite, and it invokes Vite through `vp dev` and `vp build`. Run `vp help` to print a list of commands and `vp <command> --help` for information about a specific command.
+
+Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.dev/guide/.
+
+## Review Checklist
+
+- [ ] Run `vp install` after pulling remote changes and before getting started.
+- [ ] Run `vp run check` and `vp run test` to format, lint, type check and test changes.
+- [ ] Check if there are `vite.config.ts` tasks or `package.json` scripts necessary for validation, run via `vp run <task-or-script>`.
+- [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
+
+<!--VITE PLUS END-->
+
 ## Start Here
 
 Read these sources in order:
@@ -19,12 +36,13 @@ Read these sources in order:
 3. the package README for the area you are changing,
 4. any deeper `AGENTS.md` in that domain,
 5. the relevant skill under [`.agents/skills`](./.agents/skills),
-6. the package's `package.json` for exact commands.
+6. the package's `vite.config.ts` and `package.json` for exact commands.
 
 Canonical examples:
 
-- [`.nvmrc`](./.nvmrc) and [`package.json`](./package.json) are the source of
-  truth for Node, pnpm, and workspace scripts.
+- [`.node-version`](./.node-version), [`package.json`](./package.json), and
+  [`vite.config.ts`](./vite.config.ts) are the source of truth for Node, the
+  package manager, and Vite+ workspace commands.
 - [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)
   is the source of truth for creating changesets when a user-facing change
   needs release notes or a version bump.
@@ -74,11 +92,14 @@ Use `type/description` naming:
 
 ### Validation And Release Hygiene
 
-- Use `nvm use`, then `pnpm install` when setting up locally.
-- Before opening a PR, run the standard root validation commands defined in
-  [`package.json`](./package.json): `pnpm test`, `pnpm lint`, and
-  `pnpm typecheck`.
-- Run `pnpm lingui:extract` when user-facing copy changes.
+- Use `vp install` when setting up locally.
+- Before opening a PR, run the standard Vite+ validation commands:
+  `vp run check`, `vp run test`, and `vp run build`.
+- From the workspace root, use `vp run check --fix` when you need Vite+ to
+  apply formatting and lint fixes.
+- From the workspace root, run PWA dev and preview through package tasks:
+  `vp run dev` and `vp run preview`.
+- Run `vp run lingui:extract` when user-facing copy changes.
 - Create a changeset before opening a PR for user-facing changes, and have the
   agent do it when possible. Use
   [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)

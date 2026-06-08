@@ -1,6 +1,12 @@
-import type { Plugin } from "vite";
-import { defineConfig } from "vite";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import path from "node:path";
+import { execFileSync, execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
+import { getConfig as getLinguiConfig } from "@lingui/conf";
+import type { Plugin } from "vite-plus";
+import { configDefaults, defineConfig } from "vite-plus";
+import react from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import wasm from "vite-plugin-wasm";
@@ -8,24 +14,42 @@ import topLevelAwait from "vite-plugin-top-level-await";
 import { lingui } from "@lingui/vite-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import license from "rollup-plugin-license";
-import path from "node:path";
-import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { configDefaults } from "vitest/config";
-import { createIconSpritePlugin } from "@trizum/icon-sprite/vite";
+import { createIconSpritePlugin } from "../icon-sprite/src/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
-import { configurePwaLogging, getLogger } from "./src/lib/log.ts";
 
 const ReactCompilerConfig = {};
-configurePwaLogging({ lowestLevel: "info" });
+const sentryOrg = "horusdev";
+const sentryProject = "trizum-pwa";
 
-const logger = getLogger("tooling", "vite");
+const packageRoot = fileURLToPath(new URL(".", import.meta.url));
+const packageRequire = createRequire(new URL("package.json", import.meta.url));
+const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
+const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
+const linguiConfig = getLinguiConfig({
+  cwd: packageRoot,
+  configPath: linguiConfigPath,
+});
+const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
+const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
+const reactCompilerPreset = {
+  preset: () => ({
+    plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
+  }),
+  rolldown: {
+    filter: { code: /\b[A-Z]|\buse/ },
+    applyToEnvironmentHook: (env: { config: { consumer?: string } }) =>
+      env.config.consumer === "client",
+    optimizeDeps: {
+      include: ["react/compiler-runtime"],
+    },
+  },
+};
 
 // Read package.json version
 const packageJson = JSON.parse(
-  readFileSync(path.resolve(__dirname, "package.json"), "utf-8"),
+  readFileSync(path.resolve(packageRoot, "package.json"), "utf-8"),
 ) as { version: string; description: string };
 const appVersion = packageJson.version;
 const description = packageJson.description;
@@ -36,33 +60,79 @@ try {
   appCommit = execSync("git rev-parse --short HEAD").toString().trim();
 } catch {
   // Git not available or not in a git repository
-  logger.warning("Could not determine git commit hash");
+  process.stderr.write("Could not determine git commit hash\n");
 }
 
 const fullVersion = `${appVersion}-${appCommit}`;
-
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
-  // Skip the Sentry Vite plugin in local/dev builds when auth is unavailable.
   const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim();
   const hasSentryAuthToken = Boolean(sentryAuthToken);
 
   process.env.VITE_APP_WSS_URL =
-    mode === "production"
-      ? "wss://server.trizum.app/sync"
-      : "wss://dev-sync.trizum.app";
+    mode === "production" ? "wss://server.trizum.app/sync" : "wss://dev-sync.trizum.app";
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
   process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
+    run: {
+      tasks: {
+        build: {
+          command: "vp build",
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          env: ["SENTRY_AUTH_TOKEN"],
+          output: ["dist/**"],
+        },
+        check: {
+          command: "vp check .",
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
+        },
+        deploy: {
+          command: "vp exec wrangler deploy",
+          cache: false,
+          dependsOn: ["build"],
+        },
+        dev: {
+          command: "vp dev",
+          cache: false,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
+        },
+        "icons:generate": {
+          command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
+          dependsOn: ["@trizum/icon-sprite#build"],
+          input: [{ auto: true }, "!src/generated/**"],
+          output: ["src/generated/iconSprite.svg", "src/generated/iconSprite.gen.ts"],
+        },
+        preview: {
+          command: "vp preview",
+          cache: false,
+        },
+        test: {
+          command: "vp test .",
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
+        },
+        "test:e2e": {
+          command: "vp exec playwright test",
+          cache: false,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
+        },
+        "test:e2e:headed": {
+          command: "vp exec playwright test --headed",
+          cache: false,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
+        },
+      },
+    },
     build: {
       sourcemap: true,
       minify: true,
     },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
+      include: ["src/**/*.test.ts"],
+      name: "pwa",
     },
     plugins: [
       ...(isTest ? [] : [cloudflare()]),
@@ -70,21 +140,22 @@ export default defineConfig(({ mode }) => {
       react(),
       babel({
         include: /\/src\/.*\.[cm]?[jt]sx?$/,
-        plugins: ["@lingui/babel-plugin-lingui-macro"],
-        presets: [reactCompilerPreset(ReactCompilerConfig)],
+        plugins: [[linguiBabelPlugin, { linguiConfig }]],
+        presets: [reactCompilerPreset],
       }),
       wasm() as Plugin,
       topLevelAwait(),
-      lingui(),
+      lingui({
+        cwd: packageRoot,
+        configPath: linguiConfigPath,
+      }),
       createIconSpritePlugin(iconSpriteConfig),
       VitePWA({
         registerType: "prompt",
         workbox: {
           globPatterns: ["**/*.{js,wasm,css,html,svg}"],
           maximumFileSizeToCacheInBytes: 5242880,
-          additionalManifestEntries: [
-            { url: "/THIRD-PARTY-LICENSES.txt", revision: null },
-          ],
+          additionalManifestEntries: [{ url: "/THIRD-PARTY-LICENSES.txt", revision: null }],
         },
         outDir: "dist/client",
         manifest: {
@@ -124,18 +195,12 @@ export default defineConfig(({ mode }) => {
         thirdParty: {
           includePrivate: false,
           output: {
-            file: path.resolve(
-              __dirname,
-              "dist/client",
-              "THIRD-PARTY-LICENSES.txt",
-            ),
+            file: path.resolve(packageRoot, "dist/client", "THIRD-PARTY-LICENSES.txt"),
             template(dependencies) {
               return dependencies
                 .map((dep) => {
                   const repository =
-                    typeof dep.repository === "object" && dep.repository?.url
-                      ? dep.repository.url
-                      : dep.repository;
+                    typeof dep.repository === "string" ? dep.repository : dep.repository?.url;
 
                   const lines = [
                     `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
@@ -162,8 +227,8 @@ export default defineConfig(({ mode }) => {
       ...(hasSentryAuthToken
         ? [
             sentryVitePlugin({
-              org: process.env.SENTRY_ORG,
-              project: process.env.SENTRY_PROJECT,
+              org: sentryOrg,
+              project: sentryProject,
               authToken: sentryAuthToken,
               release: {
                 create: true,
@@ -179,6 +244,7 @@ export default defineConfig(({ mode }) => {
             }),
           ]
         : []),
+      sentrySourcemapsPlugin(),
     ],
   };
 });
@@ -192,11 +258,7 @@ function appendSourceMappingURLPlugin(): Plugin {
     enforce: "post",
     generateBundle(_, bundle) {
       for (const [fileName, chunk] of Object.entries(bundle)) {
-        if (
-          fileName.endsWith(".js") &&
-          chunk.type === "chunk" &&
-          bundle[`${fileName}.map`]
-        ) {
+        if (fileName.endsWith(".js") && chunk.type === "chunk" && bundle[`${fileName}.map`]) {
           const mapFileName = `${fileName.split("/").pop()}.map`;
           const comment = `\n//# sourceMappingURL=${mapFileName}`;
 
@@ -208,4 +270,67 @@ function appendSourceMappingURLPlugin(): Plugin {
       }
     },
   };
+}
+
+function sentrySourcemapsPlugin(): Plugin {
+  const clientDist = path.resolve(packageRoot, "dist/client");
+  let sawClientBundle = false;
+  let processed = false;
+
+  return {
+    name: "trizum-sentry-sourcemaps",
+    apply: "build",
+    enforce: "post",
+    writeBundle(options) {
+      if (options.dir && path.resolve(packageRoot, options.dir) === clientDist) {
+        sawClientBundle = true;
+      }
+    },
+    closeBundle() {
+      if (!sawClientBundle || processed) {
+        return;
+      }
+
+      processed = true;
+
+      if (!existsSync(clientDist)) {
+        throw new Error(`Expected client build output at ${clientDist}`);
+      }
+
+      runSentryCli(["sourcemaps", "inject", clientDist]);
+
+      if (!process.env.SENTRY_AUTH_TOKEN?.trim()) {
+        process.stdout.write("SENTRY_AUTH_TOKEN is not set, skipping sourcemaps upload\n");
+        return;
+      }
+
+      process.stdout.write(
+        `Uploading sourcemaps to Sentry for release ${fullVersion}. Org: ${sentryOrg}, Project: ${sentryProject}\n`,
+      );
+
+      runSentryCli([
+        "sourcemaps",
+        "upload",
+        "--release",
+        fullVersion,
+        "--org",
+        sentryOrg,
+        "--project",
+        sentryProject,
+        clientDist,
+      ]);
+    },
+  };
+}
+
+function runSentryCli(args: string[]) {
+  execFileSync(process.execPath, [sentryCliBin, ...args], {
+    cwd: packageRoot,
+    env: {
+      ...process.env,
+      SENTRY_ORG: sentryOrg,
+      SENTRY_PROJECT: sentryProject,
+    },
+    stdio: "inherit",
+  });
 }

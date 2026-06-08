@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows:
+      - CI
+    branches:
+      - main
+    types:
+      - completed
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+jobs:
+  changesets:
+    name: Changesets
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: changesets-release-main
+      cancel-in-progress: true
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          branch: main
+          version: vp run update-version
+          publish: vp run publish-packages
+          github-token: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
+
+  deploy-pwa-production:
+    name: Deploy PWA Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/pwa@') && !github.event.release.prerelease
+    permissions:
+      contents: read
+      deployments: write
+    concurrency:
+      group: pwa-production
+      cancel-in-progress: false
+    environment:
+      name: pwa-production
+      url: https://trizum.app
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Build PWA
+        run: vp run --filter @trizum/pwa build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Deploy PWA to Cloudflare
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          packageManager: npm
+          workingDirectory: packages/pwa

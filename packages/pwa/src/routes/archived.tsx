@@ -4,10 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "react-aria-components";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
-import {
-  PartyListCard,
-  type PartyListCardAction,
-} from "#src/components/PartyListCard.tsx";
+import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
@@ -55,9 +52,7 @@ function ArchivedParties() {
                 key={partyId}
                 partyId={partyId}
                 isArchived={true}
-                currentParticipantId={
-                  partyList.participantInParties[partyId] ?? null
-                }
+                currentParticipantId={partyList.participantInParties[partyId] ?? null}
               />
             );
           })
@@ -93,25 +88,19 @@ function ArchivedEmptyState() {
           </h2>
           <p className="mt-2 text-sm text-accent-700 dark:text-accent-300">
             <Trans>
-              Archive a party from the home screen when you want to clear some
-              space without losing it.
+              Archive a party from the home screen when you want to clear some space without losing
+              it.
             </Trans>
           </p>
         </div>
 
         <Link
           href={{ to: "/" }}
-          className={({
-            isPressed,
-            isFocusVisible,
-            isHovered,
-            defaultClassName,
-          }) =>
+          className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
               "inline-flex items-center justify-center rounded-full bg-accent-500 px-4 py-2.5 text-sm font-semibold text-accent-50 outline-none transition-all duration-200 ease-in-out dark:bg-accent-500",
-              (isHovered || isFocusVisible) &&
-                "bg-accent-600 dark:bg-accent-400",
+              (isHovered || isFocusVisible) && "bg-accent-600 dark:bg-accent-400",
               isPressed && "scale-95 bg-accent-700 dark:bg-accent-300",
             )
           }

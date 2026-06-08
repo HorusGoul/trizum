@@ -81,10 +81,7 @@ export default function MediaGallery({
 
           // Calculate progress (0 to 1) based on vertical drag distance
           // Use absolute value so both up and down trigger close
-          const progress = Math.max(
-            0,
-            Math.min(1, Math.abs(offsetY) / CLOSE_THRESHOLD),
-          );
+          const progress = Math.max(0, Math.min(1, Math.abs(offsetY) / CLOSE_THRESHOLD));
           onDragProgress?.(progress);
         } else {
           // Normal pan behavior when zoomed
@@ -165,10 +162,7 @@ export default function MediaGallery({
   }, [index, x, y, scale, onDragProgress]);
 
   return (
-    <div
-      ref={viewportRef}
-      className="relative h-full w-full touch-none overflow-hidden"
-    >
+    <div ref={viewportRef} className="relative h-full w-full touch-none overflow-hidden">
       <div className="flex h-full w-full select-none items-center justify-center [-webkit-user-drag:_none]">
         <motion.div ref={ref} className="relative" style={{ x, y, scale }}>
           <div className="absolute inset-0" />
@@ -215,12 +209,7 @@ interface GalleryButtonProps {
   icon: IconProps["icon"];
 }
 
-function GalleryButton({
-  className,
-  label,
-  onClick,
-  icon,
-}: GalleryButtonProps) {
+function GalleryButton({ className, label, onClick, icon }: GalleryButtonProps) {
   return (
     <IconButton
       className={cn("text-surface-0 absolute drop-shadow-lg", className)}

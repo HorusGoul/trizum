@@ -6,7 +6,8 @@ then use this document to decide where to work inside the PWA.
 
 ## Canonical Sources
 
-- [`package.json`](./package.json) is the source of truth for package scripts.
+- [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
+  are the source of truth for package tasks and scripts.
 - [`src/routes`](./src/routes) contains route entry points.
 - [`src/ui`](./src/ui) contains the shared design-system components.
 - [`src/components`](./src/components) contains app-specific UI.
@@ -20,18 +21,32 @@ then use this document to decide where to work inside the PWA.
 ## Package Notes
 
 - The app is offline-first and uses Automerge for shared, persisted data.
-- User-facing copy must use Lingui macros, then run `pnpm lingui:extract`.
+- User-facing copy must use Lingui macros, then run `vp run lingui:extract`.
 - `src/routeTree.gen.ts` is generated. Do not edit it manually.
 - `src/generated/iconSprite.gen.ts` and `src/generated/iconSprite.svg` are
   generated from the available icon catalog and current icon usage. They are
-  intentionally untracked; regenerate them with `pnpm icons:generate` or let
+  intentionally untracked; regenerate them with `vp run icons:generate` or let
   the package scripts do it automatically instead of hand-editing them.
 
 ## Validation
 
-Run the package scripts defined in [`package.json`](./package.json):
+Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts)
+and [`package.json`](./package.json):
 
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm test`
-- `pnpm lingui:extract` when copy changes
+- `vp run check`
+- `vp run test`
+- `vp run build`
+- `vp run lingui:extract` when copy changes
+
+## Deployment
+
+Cloudflare deployments are managed by GitHub Actions instead of Cloudflare's
+connected repository builds.
+
+- Production deploys run after a changeset release updates the PWA version or
+  changelog on `main`.
+- Pull requests get Cloudflare preview deployments from the
+  `PWA Preview` workflow, and the workflow updates a PR comment with the latest
+  preview URL.
+- The workflows require `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+  repository secrets.

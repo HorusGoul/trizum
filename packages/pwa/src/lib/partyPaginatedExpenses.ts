@@ -53,19 +53,13 @@ export function getNextPartyExpenseChunkIds(
   chunkIds: readonly DocumentId[],
   pageSize = DEFAULT_PAGE_SIZE,
 ): DocumentId[] {
-  const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(
-    repo,
-    chunkIds,
-  );
+  const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(repo, chunkIds);
 
   if (firstLoadedChunkIndex === -1) {
     return chunkIds.slice(0, pageSize);
   }
 
-  const visibleLoadedChunkCount = getVisibleLoadedPartyExpenseChunkIds(
-    repo,
-    chunkIds,
-  ).length;
+  const visibleLoadedChunkCount = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds).length;
 
   return chunkIds.slice(
     firstLoadedChunkIndex + visibleLoadedChunkCount,
@@ -77,29 +71,21 @@ export async function loadVisiblePartyExpenseChunks(
   repo: Repo,
   chunkIds: readonly DocumentId[],
 ): Promise<void> {
-  await loadPartyExpenseChunks(
-    repo,
-    getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds),
-  );
+  await loadPartyExpenseChunks(repo, getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds));
 }
 
 export async function loadNextPartyExpenseChunks(
   repo: Repo,
   chunkIds: readonly DocumentId[],
 ): Promise<void> {
-  await loadPartyExpenseChunks(
-    repo,
-    getNextPartyExpenseChunkIds(repo, chunkIds),
-  );
+  await loadPartyExpenseChunks(repo, getNextPartyExpenseChunkIds(repo, chunkIds));
 }
 
 export async function loadAllPartyExpenseChunks(
   repo: Repo,
   chunkIds: readonly DocumentId[],
 ): Promise<void> {
-  const missingChunkIds = chunkIds.filter(
-    (chunkId) => !getCachedPartyExpenseChunk(repo, chunkId),
-  );
+  const missingChunkIds = chunkIds.filter((chunkId) => !getCachedPartyExpenseChunk(repo, chunkId));
 
   await loadPartyExpenseChunks(repo, missingChunkIds);
 }
@@ -124,8 +110,7 @@ export function getPartyPaginatedExpensesSnapshot(
     expenses,
     hasNext: Boolean(nextChunkId),
     isLoadingNext:
-      nextChunkId != null &&
-      documentCache.getStatus(repo, nextChunkId) === STATUS_PENDING,
+      nextChunkId != null && documentCache.getStatus(repo, nextChunkId) === STATUS_PENDING,
   };
 }
 
@@ -135,10 +120,7 @@ export function subscribeToPartyPaginatedExpenses(
   chunkIds: readonly DocumentId[],
 ): () => void {
   const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
-  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(
-    repo,
-    chunkIds,
-  );
+  const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds);
   const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
   const chunkIdsToSubscribe = nextChunkId
     ? [...loadedChunkIds, ...visibleChunkIdsToLoad, nextChunkId]
@@ -159,28 +141,18 @@ function getCachedPartyExpenseChunk(
   repo: Repo,
   chunkId: DocumentId,
 ): PartyExpenseChunk | undefined {
-  return documentCache.getValueIfCached(repo, chunkId) as
-    | PartyExpenseChunk
-    | undefined;
+  return documentCache.getValueIfCached(repo, chunkId) as PartyExpenseChunk | undefined;
 }
 
-function getFirstLoadedPartyExpenseChunkIndex(
-  repo: Repo,
-  chunkIds: readonly DocumentId[],
-): number {
-  return chunkIds.findIndex((chunkId) =>
-    Boolean(getCachedPartyExpenseChunk(repo, chunkId)),
-  );
+function getFirstLoadedPartyExpenseChunkIndex(repo: Repo, chunkIds: readonly DocumentId[]): number {
+  return chunkIds.findIndex((chunkId) => Boolean(getCachedPartyExpenseChunk(repo, chunkId)));
 }
 
 function getVisibleLoadedPartyExpenseChunkIds(
   repo: Repo,
   chunkIds: readonly DocumentId[],
 ): DocumentId[] {
-  const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(
-    repo,
-    chunkIds,
-  );
+  const firstLoadedChunkIndex = getFirstLoadedPartyExpenseChunkIndex(repo, chunkIds);
 
   if (firstLoadedChunkIndex === -1) {
     return [];
@@ -199,18 +171,13 @@ function getVisibleLoadedPartyExpenseChunkIds(
   return visibleLoadedChunkIds;
 }
 
-async function loadPartyExpenseChunks(
-  repo: Repo,
-  chunkIds: readonly DocumentId[],
-): Promise<void> {
+async function loadPartyExpenseChunks(repo: Repo, chunkIds: readonly DocumentId[]): Promise<void> {
   if (chunkIds.length === 0) {
     return;
   }
 
   await Promise.all(
-    chunkIds.map((chunkId) =>
-      Promise.resolve(documentCache.readAsync(repo, chunkId)),
-    ),
+    chunkIds.map((chunkId) => Promise.resolve(documentCache.readAsync(repo, chunkId))),
   );
 }
 

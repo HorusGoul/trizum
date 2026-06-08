@@ -9,11 +9,7 @@ import {
   validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
-import {
-  DEFAULT_PARTY_SYMBOL,
-  type Party,
-  type PartyParticipant,
-} from "#src/models/party.js";
+import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { useForm } from "@tanstack/react-form";
@@ -100,8 +96,7 @@ function PartySettings() {
       return;
     }
 
-    const newParticipantName =
-      addParticipantForm.getFieldValue("newParticipantName");
+    const newParticipantName = addParticipantForm.getFieldValue("newParticipantName");
 
     form.pushFieldValue("participants", {
       id: crypto.randomUUID(),
@@ -123,13 +118,7 @@ function PartySettings() {
 
         <div className="flex-1" />
 
-        <form.Subscribe
-          selector={(state) => [
-            state.canSubmit,
-            state.isSubmitting,
-            state.isDirty,
-          ]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}>
           {([canSubmit, isSubmitting, isDirty]) =>
             canSubmit && isDirty ? (
               <Suspense fallback={null}>
@@ -172,10 +161,7 @@ function PartySettings() {
                 onChange={field.handleChange}
                 onBlur={field.handleBlur}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
                 className="flex-1"
               />
             )}
@@ -194,10 +180,7 @@ function PartySettings() {
                 value={field.state.value}
                 onChange={field.handleChange}
                 errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={
-                  field.state.meta.isTouched &&
-                  field.state.meta.errors?.length > 0
-                }
+                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
               />
             )}
           </form.Field>
@@ -220,10 +203,7 @@ function PartySettings() {
               onChange={field.handleChange}
               onBlur={field.handleBlur}
               errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={
-                field.state.meta.isTouched &&
-                field.state.meta.errors?.length > 0
-              }
+              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             />
           )}
         </form.Field>
@@ -234,10 +214,7 @@ function PartySettings() {
           </h2>
 
           <p className="mt-2">
-            <Trans>
-              Manage the participants list. Existing members can only be
-              archived.
-            </Trans>
+            <Trans>Manage the participants list. Existing members can only be archived.</Trans>
           </p>
 
           <form.Field
@@ -260,25 +237,21 @@ function PartySettings() {
             }}
           >
             {(field) => {
-              const notArchivedParticipants = field.state.value.filter(
-                (participant) => {
-                  if ("__isNew" in participant) {
-                    return true;
-                  }
+              const notArchivedParticipants = field.state.value.filter((participant) => {
+                if ("__isNew" in participant) {
+                  return true;
+                }
 
-                  return !participant.isArchived;
-                },
-              );
+                return !participant.isArchived;
+              });
 
-              const archivedParticipants = field.state.value.filter(
-                (participant) => {
-                  if ("__isNew" in participant) {
-                    return false;
-                  }
+              const archivedParticipants = field.state.value.filter((participant) => {
+                if ("__isNew" in participant) {
+                  return false;
+                }
 
-                  return participant.isArchived;
-                },
-              );
+                return participant.isArchived;
+              });
 
               function indexOf(participant: PartyParticipant) {
                 return field.state.value.indexOf(participant);
@@ -297,8 +270,7 @@ function PartySettings() {
                       <form.Field
                         name={`participants[${indexOf(participant)}].name`}
                         validators={{
-                          onChange: ({ value }) =>
-                            validatePartyParticipantName(value),
+                          onChange: ({ value }) => validatePartyParticipantName(value),
                         }}
                       >
                         {(field) => (
@@ -311,8 +283,7 @@ function PartySettings() {
                             className="w-full"
                             errorMessage={field.state.meta.errors?.join(", ")}
                             isInvalid={
-                              field.state.meta.isTouched &&
-                              field.state.meta.errors?.length > 0
+                              field.state.meta.isTouched && field.state.meta.errors?.length > 0
                             }
                           />
                         )}
@@ -322,9 +293,7 @@ function PartySettings() {
                         <IconButton
                           icon="lucide.trash"
                           aria-label={t`Remove`}
-                          onPress={() =>
-                            field.removeValue(indexOf(participant))
-                          }
+                          onPress={() => field.removeValue(indexOf(participant))}
                           className="flex-shrink-0"
                         />
                       ) : (
@@ -355,8 +324,7 @@ function PartySettings() {
                     <addParticipantForm.Field
                       name="newParticipantName"
                       validators={{
-                        onSubmit: ({ value }) =>
-                          validatePartyParticipantName(value),
+                        onSubmit: ({ value }) => validatePartyParticipantName(value),
                       }}
                     >
                       {(field) => (
@@ -369,8 +337,7 @@ function PartySettings() {
                           className="w-full"
                           errorMessage={field.state.meta.errors?.join(", ")}
                           isInvalid={
-                            field.state.meta.isTouched &&
-                            field.state.meta.errors?.length > 0
+                            field.state.meta.isTouched && field.state.meta.errors?.length > 0
                           }
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -430,8 +397,7 @@ function PartySettings() {
                       <form.Field
                         name={`participants[${indexOf(participant)}].name`}
                         validators={{
-                          onChange: ({ value }) =>
-                            validatePartyParticipantName(value),
+                          onChange: ({ value }) => validatePartyParticipantName(value),
                         }}
                       >
                         {(field) => (
@@ -444,8 +410,7 @@ function PartySettings() {
                             className="w-full"
                             errorMessage={field.state.meta.errors?.join(", ")}
                             isInvalid={
-                              field.state.meta.isTouched &&
-                              field.state.meta.errors?.length > 0
+                              field.state.meta.isTouched && field.state.meta.errors?.length > 0
                             }
                             isDisabled={true}
                           />

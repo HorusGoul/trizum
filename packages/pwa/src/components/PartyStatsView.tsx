@@ -1,9 +1,4 @@
-import {
-  endOfWeek,
-  getLocalTimeZone,
-  startOfWeek,
-  today,
-} from "@internationalized/date";
+import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
@@ -135,10 +130,7 @@ const getRankingNameClassName = (name: string, variant: "list" | "podium") => {
   return "text-lg";
 };
 
-const getRankingAmountClassName = (
-  amount: number,
-  variant: "list" | "podium" | "winner",
-) => {
+const getRankingAmountClassName = (amount: number, variant: "list" | "podium" | "winner") => {
   const digits = Math.abs(Math.trunc(amount)).toString().length;
 
   if (variant === "winner") {
@@ -175,8 +167,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
-  const [timeframeKey, setTimeframeKey] =
-    useState<PartyStatsTimeframeKey>("all-time");
+  const [timeframeKey, setTimeframeKey] = useState<PartyStatsTimeframeKey>("all-time");
   const [customRange, setCustomRange] = useState<StatsCustomRange>(() =>
     getDefaultCustomRange({
       locale: i18n.locale,
@@ -199,22 +190,15 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
     {
       id: "custom-range",
       label: t({
-        comment:
-          "Timeframe option on the party stats screen for choosing any start and end dates",
+        comment: "Timeframe option on the party stats screen for choosing any start and end dates",
         message: "Custom range",
       }),
     },
   ];
-  const selectedTimeframeKey = timeframeOptions.some(
-    (option) => option.id === timeframeKey,
-  )
+  const selectedTimeframeKey = timeframeOptions.some((option) => option.id === timeframeKey)
     ? timeframeKey
     : "all-time";
-  const timeframe = getStatsTimeframe(
-    selectedTimeframeKey,
-    customRange,
-    timezone,
-  );
+  const timeframe = getStatsTimeframe(selectedTimeframeKey, customRange, timezone);
   const stats =
     selectedTimeframeKey === "all-time"
       ? allTimeStats
@@ -233,8 +217,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         avatarId: party.participants[winner.participantId]?.avatarId,
         participant: winner,
         rank: 1,
-        shareOfTotal:
-          stats.totalSpent > 0 ? winner.totalSpent / stats.totalSpent : 0,
+        shareOfTotal: stats.totalSpent > 0 ? winner.totalSpent / stats.totalSpent : 0,
         tier: "first" as const,
       }
     : undefined;
@@ -243,8 +226,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         avatarId: party.participants[podium[1].participantId]?.avatarId,
         participant: podium[1],
         rank: 2,
-        shareOfTotal:
-          stats.totalSpent > 0 ? podium[1].totalSpent / stats.totalSpent : 0,
+        shareOfTotal: stats.totalSpent > 0 ? podium[1].totalSpent / stats.totalSpent : 0,
         tier: "second" as const,
       }
     : undefined;
@@ -253,8 +235,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         avatarId: party.participants[podium[2].participantId]?.avatarId,
         participant: podium[2],
         rank: 3,
-        shareOfTotal:
-          stats.totalSpent > 0 ? podium[2].totalSpent / stats.totalSpent : 0,
+        shareOfTotal: stats.totalSpent > 0 ? podium[2].totalSpent / stats.totalSpent : 0,
         tier: "third" as const,
       }
     : undefined;
@@ -365,9 +346,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
               <div className="flex flex-col gap-3">
                 {restOfLeaderboard.map((participant, index) => (
                   <StatsParticipantRow
-                    avatarId={
-                      party.participants[participant.participantId]?.avatarId
-                    }
+                    avatarId={party.participants[participant.participantId]?.avatarId}
                     key={participant.participantId}
                     currency={party.currency}
                     currentParticipantId={currentParticipant.id}
@@ -448,22 +427,14 @@ function StatsSummaryCard({
           </div>
 
           <div className="mt-3 text-accent-50">{value}</div>
-          <div className={cn("text-accent-50/70", "mt-2 text-sm")}>
-            {description}
-          </div>
+          <div className={cn("text-accent-50/70", "mt-2 text-sm")}>{description}</div>
         </div>
       </div>
     </div>
   );
 }
 
-function StatsPodium({
-  currency,
-  currentParticipantId,
-  first,
-  second,
-  third,
-}: StatsPodiumProps) {
+function StatsPodium({ currency, currentParticipantId, first, second, third }: StatsPodiumProps) {
   return (
     <div className="rounded-[1.75rem] border border-accent-200/80 bg-accent-50/80 p-4 shadow-sm dark:border-accent-800 dark:bg-accent-950/70 dark:shadow-none">
       <div className="grid grid-cols-3 items-end gap-3">
@@ -612,8 +583,7 @@ function StatsPodiumColumnShell({
   rankClassName: string;
 }) {
   const { participant, rank, shareOfTotal } = entry;
-  const isCurrentParticipant =
-    participant.participantId === currentParticipantId;
+  const isCurrentParticipant = participant.participantId === currentParticipantId;
   const nameSizeClassName = getRankingNameClassName(participant.name, "podium");
   const amountSizeClassName = getRankingAmountClassName(
     participant.totalSpent,
@@ -634,9 +604,7 @@ function StatsPodiumColumnShell({
       <StatsParticipantAvatar
         avatarId={avatarId}
         badge={
-          isCurrentParticipant ? (
-            <StatsAvatarBadge tone="accent">{t`Me`}</StatsAvatarBadge>
-          ) : null
+          isCurrentParticipant ? <StatsAvatarBadge tone="accent">{t`Me`}</StatsAvatarBadge> : null
         }
         className={cn("relative z-10 mt-3 ring-4 ring-inset", avatarClassName)}
         name={participant.name}
@@ -671,11 +639,7 @@ function StatsPodiumColumnShell({
         <CurrencyText
           amount={participant.totalSpent}
           currency={currency}
-          className={cn(
-            "font-semibold tracking-tight",
-            amountClassName,
-            amountSizeClassName,
-          )}
+          className={cn("font-semibold tracking-tight", amountClassName, amountSizeClassName)}
           variant="inherit"
         />
       </div>
@@ -691,13 +655,9 @@ function StatsParticipantRow({
   totalSpent,
   rank,
 }: StatsParticipantRowProps) {
-  const isCurrentParticipant =
-    participant.participantId === currentParticipantId;
+  const isCurrentParticipant = participant.participantId === currentParticipantId;
   const nameSizeClassName = getRankingNameClassName(participant.name, "list");
-  const amountSizeClassName = getRankingAmountClassName(
-    participant.totalSpent,
-    "list",
-  );
+  const amountSizeClassName = getRankingAmountClassName(participant.totalSpent, "list");
 
   return (
     <div
@@ -738,9 +698,7 @@ function StatsParticipantRow({
 
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-accent-700 dark:text-accent-300">
                 <span className="rounded-full bg-accent-100 px-2 py-1 dark:bg-accent-800">
-                  {formatPercent(
-                    totalSpent > 0 ? participant.totalSpent / totalSpent : 0,
-                  )}
+                  {formatPercent(totalSpent > 0 ? participant.totalSpent / totalSpent : 0)}
                 </span>
                 <span>
                   <Trans>of total spending</Trans>
@@ -774,11 +732,7 @@ function StatsParticipantAvatar({
 }) {
   const avatar = avatarId ? (
     <Suspense fallback={<Avatar className={className} name={name} />}>
-      <StatsParticipantAvatarImage
-        avatarId={avatarId}
-        className={className}
-        name={name}
-      />
+      <StatsParticipantAvatarImage avatarId={avatarId} className={className} name={name} />
     </Suspense>
   ) : (
     <Avatar className={className} name={name} />
@@ -849,8 +803,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
         <PopoverDialog className="p-2">
           <RangeCalendar
             aria-label={t({
-              comment:
-                "Label for the custom range calendar popover on the party stats screen",
+              comment: "Label for the custom range calendar popover on the party stats screen",
               message: "Custom range",
             })}
             value={value}
@@ -870,9 +823,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
               <CalendarGridHeader>
                 {(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}
               </CalendarGridHeader>
-              <CalendarGridBody>
-                {(date) => <CalendarCell date={date} />}
-              </CalendarGridBody>
+              <CalendarGridBody>{(date) => <CalendarCell date={date} />}</CalendarGridBody>
             </CalendarGrid>
           </RangeCalendar>
         </PopoverDialog>
@@ -894,13 +845,10 @@ function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
 
       <p className="mt-2 text-sm text-accent-700 dark:text-accent-200">
         {hasAnyTrackedExpense ? (
-          <Trans>
-            Try another timeframe to compare a different period of your party.
-          </Trans>
+          <Trans>Try another timeframe to compare a different period of your party.</Trans>
         ) : (
           <Trans>
-            Add expenses to this party to unlock totals, rankings, and
-            individual spend.
+            Add expenses to this party to unlock totals, rankings, and individual spend.
           </Trans>
         )}
       </p>
@@ -958,11 +906,7 @@ function formatRangeLabel(range: StatsCustomRange) {
   });
 
   const sameYear = range.start.year === range.end.year;
-  const startDate = new Date(
-    range.start.year,
-    range.start.month - 1,
-    range.start.day,
-  );
+  const startDate = new Date(range.start.year, range.start.month - 1, range.start.day);
   const endDate = new Date(range.end.year, range.end.month - 1, range.end.day);
   const startLabel = formatter.format(startDate);
   const endFormatter = new Intl.DateTimeFormat(undefined, {

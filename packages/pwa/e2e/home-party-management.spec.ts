@@ -1,4 +1,4 @@
-import { expect, test } from "./harness/trizum.fixture";
+import { expect, test, type InternalHarnessWindow } from "./harness/trizum.fixture";
 import { HomePage } from "./pages/home.page";
 import { defaultParticipants } from "./harness/scenarios";
 
@@ -12,25 +12,17 @@ test.describe("Home party management", () => {
 
     const partyIds = await page.evaluate(
       async ({ fixtures, memberParticipantId }) => {
-        const internalWindow = window as Window & {
-          __internal_createPartyFromMigrationData: (
-            data: unknown,
-          ) => Promise<string>;
+        const internalWindow = window as unknown as InternalHarnessWindow & {
+          __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
           __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
         };
         const [pinnedFixture, recentFixture, archivedFixture] = fixtures;
         const pinnedPartyId =
-          await internalWindow.__internal_createPartyFromMigrationData(
-            pinnedFixture,
-          );
+          await internalWindow.__internal_createPartyFromMigrationData(pinnedFixture);
         const recentPartyId =
-          await internalWindow.__internal_createPartyFromMigrationData(
-            recentFixture,
-          );
+          await internalWindow.__internal_createPartyFromMigrationData(recentFixture);
         const archivedPartyId =
-          await internalWindow.__internal_createPartyFromMigrationData(
-            archivedFixture,
-          );
+          await internalWindow.__internal_createPartyFromMigrationData(archivedFixture);
 
         await internalWindow.__internal_seedPartyListState({
           username: "Harness User",
@@ -66,15 +58,9 @@ test.describe("Home party management", () => {
       },
       {
         fixtures: [
-          createNamedPartyFixture(
-            "Pinned dinner club",
-            "A standing monthly tab.",
-          ),
+          createNamedPartyFixture("Pinned dinner club", "A standing monthly tab."),
           createNamedPartyFixture("Recent ski trip", ""),
-          createNamedPartyFixture(
-            "Archived picnic",
-            "Done and dusted, but still worth keeping.",
-          ),
+          createNamedPartyFixture("Archived picnic", "Done and dusted, but still worth keeping."),
         ],
         memberParticipantId: defaultParticipants.blair.id,
       },
@@ -108,9 +94,7 @@ test.describe("Home party management", () => {
     });
 
     await test.step("show the desktop action button only while the card is hovered", async () => {
-      const recentPartyCard = page
-        .locator('[data-testid="party-list-card"]')
-        .nth(1);
+      const recentPartyCard = page.locator('[data-testid="party-list-card"]').nth(1);
       const recentPartyActionButton = recentPartyCard.getByRole("button", {
         name: "Party actions",
       });
@@ -125,9 +109,7 @@ test.describe("Home party management", () => {
       await recentPartyActionButton.click();
 
       await expect(recentPartyActionButton).toBeVisible();
-      await expect(
-        page.getByRole("menuitem", { name: "Archive party" }),
-      ).toBeVisible();
+      await expect(page.getByRole("menuitem", { name: "Archive party" })).toBeVisible();
 
       await page.keyboard.press("Escape");
     });
@@ -136,21 +118,17 @@ test.describe("Home party management", () => {
       await homePage.openArchivedParties();
 
       await expect(page).toHaveURL(/\/archived(?:\?.*)?$/);
-      await expect(page.locator('[data-testid="party-list-card"]')).toHaveCount(
-        1,
+      await expect(page.locator('[data-testid="party-list-card"]')).toHaveCount(1);
+      await expect(page.locator('[data-testid="party-list-card"]').nth(0)).toContainText(
+        "Archived picnic",
       );
-      await expect(
-        page.locator('[data-testid="party-list-card"]').nth(0),
-      ).toContainText("Archived picnic");
-      await expect(
-        page.locator('[data-testid="party-list-card"]').nth(0),
-      ).not.toContainText("Last used");
+      await expect(page.locator('[data-testid="party-list-card"]').nth(0)).not.toContainText(
+        "Last used",
+      );
     });
 
     await test.step("restore an archived party back to the home screen", async () => {
-      const archivedPartyCard = page
-        .locator('[data-testid="party-list-card"]')
-        .nth(0);
+      const archivedPartyCard = page.locator('[data-testid="party-list-card"]').nth(0);
       const archivedPartyActionButton = archivedPartyCard.getByRole("button", {
         name: "Party actions",
       });
@@ -164,9 +142,7 @@ test.describe("Home party management", () => {
       await archivedPartyActionButton.click();
       await page.getByRole("menuitem", { name: "Restore to home" }).click();
 
-      await expect(
-        page.getByRole("heading", { name: "No archived parties" }),
-      ).toBeVisible();
+      await expect(page.getByRole("heading", { name: "No archived parties" })).toBeVisible();
 
       await harness.navigate("/");
 
@@ -178,22 +154,16 @@ test.describe("Home party management", () => {
     });
   });
 
-  test("opens home party actions from a mobile long press", async ({
-    harness,
-    page,
-  }) => {
+  test("opens home party actions from a mobile long press", async ({ harness, page }) => {
     await harness.seedPartyList({});
 
     await page.evaluate(
       async ({ fixture, memberParticipantId }) => {
-        const internalWindow = window as Window & {
-          __internal_createPartyFromMigrationData: (
-            data: unknown,
-          ) => Promise<string>;
+        const internalWindow = window as unknown as InternalHarnessWindow & {
+          __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
           __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
         };
-        const partyId =
-          await internalWindow.__internal_createPartyFromMigrationData(fixture);
+        const partyId = await internalWindow.__internal_createPartyFromMigrationData(fixture);
 
         await internalWindow.__internal_seedPartyListState({
           username: "Harness User",
@@ -207,10 +177,7 @@ test.describe("Home party management", () => {
         });
       },
       {
-        fixture: createNamedPartyFixture(
-          "Camping weekend",
-          "Shared meals and supplies.",
-        ),
+        fixture: createNamedPartyFixture("Camping weekend", "Shared meals and supplies."),
         memberParticipantId: defaultParticipants.blair.id,
       },
     );
@@ -218,19 +185,14 @@ test.describe("Home party management", () => {
     await harness.navigate("/");
     await page.setViewportSize({ width: 390, height: 844 });
 
-    await expect(
-      page.getByRole("button", { name: "Party actions" }),
-    ).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Party actions" })).toHaveCount(0);
 
     const partyLink = page.getByRole("link", { name: "Camping weekend" });
     const linkBox = await partyLink.boundingBox();
 
     expect(linkBox).not.toBeNull();
 
-    await page.mouse.move(
-      linkBox!.x + linkBox!.width / 2,
-      linkBox!.y + linkBox!.height / 2,
-    );
+    await page.mouse.move(linkBox!.x + linkBox!.width / 2, linkBox!.y + linkBox!.height / 2);
     await page.mouse.down();
     await page.waitForTimeout(650);
     await page.mouse.up();
@@ -242,9 +204,7 @@ test.describe("Home party management", () => {
       name: "Archive party",
     });
 
-    await expect
-      .poll(async () => page.evaluate(() => window.location.pathname))
-      .toBe("/");
+    await expect.poll(async () => page.evaluate(() => window.location.pathname)).toBe("/");
     await expect(partyActionsDialog).toBeVisible();
     await expect(archivePartyButton).toBeVisible();
 
@@ -254,10 +214,7 @@ test.describe("Home party management", () => {
 
     await expect(archivePartyButton).toHaveCount(0);
 
-    await page.mouse.move(
-      linkBox!.x + linkBox!.width / 2,
-      linkBox!.y + linkBox!.height / 2,
-    );
+    await page.mouse.move(linkBox!.x + linkBox!.width / 2, linkBox!.y + linkBox!.height / 2);
     await page.mouse.down();
     await page.waitForTimeout(650);
     await page.mouse.up();
@@ -266,9 +223,7 @@ test.describe("Home party management", () => {
 
     await archivePartyButton.click();
 
-    await expect(
-      page.getByRole("heading", { name: "No active parties right now" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "No active parties right now" })).toBeVisible();
   });
 });
 

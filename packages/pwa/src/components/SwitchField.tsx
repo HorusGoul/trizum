@@ -11,12 +11,7 @@ interface SwitchFieldProps extends Omit<AriaSwitchProps, "children"> {
   description?: ReactNode;
 }
 
-export function SwitchField({
-  label,
-  description,
-  className,
-  ...props
-}: SwitchFieldProps) {
+export function SwitchField({ label, description, className, ...props }: SwitchFieldProps) {
   return (
     <AriaSwitch
       className={composeRenderProps(className, (className) =>
@@ -30,9 +25,7 @@ export function SwitchField({
     >
       <div className="flex flex-col">
         <span className="text-sm font-medium">{label}</span>
-        {description && (
-          <span className="text-sm text-accent-500">{description}</span>
-        )}
+        {description && <span className="text-sm text-accent-500">{description}</span>}
       </div>
       <div
         className={cn(

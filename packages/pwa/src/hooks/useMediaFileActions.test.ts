@@ -1,5 +1,5 @@
 import { i18n } from "@lingui/core";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Repo } from "@automerge/automerge-repo";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
 
@@ -12,10 +12,7 @@ vi.mock("#src/lib/imageCompression.ts", async () => {
   };
 });
 
-import {
-  getImageUploadErrorMessage,
-  getMediaFileHelpers,
-} from "./useMediaFileActions";
+import { getImageUploadErrorMessage, getMediaFileHelpers } from "./useMediaFileActions";
 import {
   ImageProcessingError,
   type ProcessedImage,
@@ -58,10 +55,7 @@ function createMockRepo() {
     repo: {
       create<T>(doc: T) {
         if (doc && typeof doc === "object" && "metadata" in doc) {
-          assertNoUndefinedValues(
-            (doc as { metadata: unknown }).metadata,
-            "/metadata",
-          );
+          assertNoUndefinedValues((doc as { metadata: unknown }).metadata, "/metadata");
         }
 
         const handle = {
@@ -134,10 +128,7 @@ describe("getMediaFileHelpers", () => {
     await createMediaFile(file, { source: "test" });
     const handle = getLastCreatedHandle();
     const mediaFile = handle.doc;
-    const blob = decodeBlob(
-      mediaFile.encodedBlob.val,
-      mediaFile.metadata.mimeType as string,
-    );
+    const blob = decodeBlob(mediaFile.encodedBlob.val, mediaFile.metadata.mimeType as string);
 
     expect(mediaFile.id).toBe(handle.documentId);
     expect(mediaFile.metadata).toMatchObject({
@@ -237,9 +228,7 @@ describe("getMediaFileHelpers", () => {
 
   test("maps HEIC processing failures to a user-facing error", () => {
     expect(
-      getImageUploadErrorMessage(
-        new ImageProcessingError("heic_conversion_failed"),
-      ),
+      getImageUploadErrorMessage(new ImageProcessingError("heic_conversion_failed")),
     ).toContain("HEIC");
   });
 });

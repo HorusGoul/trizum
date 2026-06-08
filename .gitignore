@@ -163,6 +163,9 @@ test-results/
 # Generated icon sprite artifacts
 packages/pwa/src/generated/
 
+# Packed server runtime
+packages/server/build/
+
 # Claude
 .claude/*
 

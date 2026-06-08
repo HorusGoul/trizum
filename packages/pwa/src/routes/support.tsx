@@ -31,9 +31,7 @@ function Support() {
               />
             </div>
             <p className="text-lg text-accent-700 dark:text-accent-300">
-              <Trans>
-                Need help with trizum? We&apos;re here to assist you.
-              </Trans>
+              <Trans>Need help with trizum? We&apos;re here to assist you.</Trans>
             </p>
           </div>
         </section>
@@ -49,10 +47,7 @@ function Support() {
               icon="lucide.mail"
               title={<Trans>Email Support</Trans>}
               description={
-                <Trans>
-                  Send us an email and we&apos;ll get back to you as soon as
-                  possible.
-                </Trans>
+                <Trans>Send us an email and we&apos;ll get back to you as soon as possible.</Trans>
               }
               linkText="contact@trizum.app"
             />
@@ -69,11 +64,7 @@ function Support() {
               href="https://github.com/HorusGoul/trizum/issues"
               icon="lucide.bug"
               title={<Trans>Bug Reports</Trans>}
-              description={
-                <Trans>
-                  Found a bug? Let us know on GitHub and we&apos;ll fix it.
-                </Trans>
-              }
+              description={<Trans>Found a bug? Let us know on GitHub and we&apos;ll fix it.</Trans>}
               linkText={<Trans>Open GitHub Issues</Trans>}
               isExternal
             />
@@ -82,9 +73,7 @@ function Support() {
               icon="lucide.lightbulb"
               title={<Trans>Feature Requests</Trans>}
               description={
-                <Trans>
-                  Have an idea to improve trizum? We&apos;d love to hear it.
-                </Trans>
+                <Trans>Have an idea to improve trizum? We&apos;d love to hear it.</Trans>
               }
               linkText={<Trans>Submit a Request</Trans>}
               isExternal
@@ -102,9 +91,9 @@ function Support() {
               question={<Trans>How does offline sync work?</Trans>}
               answer={
                 <Trans>
-                  trizum stores all your data locally on your device. When
-                  you&apos;re online and share a group with others, changes sync
-                  automatically across all devices in real-time.
+                  trizum stores all your data locally on your device. When you&apos;re online and
+                  share a group with others, changes sync automatically across all devices in
+                  real-time.
                 </Trans>
               }
             />
@@ -112,10 +101,9 @@ function Support() {
               question={<Trans>Is my data secure?</Trans>}
               answer={
                 <Trans>
-                  Your data is stored locally on your device and synced to
-                  trizum servers for collaboration. Data is encrypted during
-                  transmission. Groups are shared via links - anyone with the
-                  link can access the group. See our Privacy Policy for details.
+                  Your data is stored locally on your device and synced to trizum servers for
+                  collaboration. Data is encrypted during transmission. Groups are shared via links
+                  - anyone with the link can access the group. See our Privacy Policy for details.
                 </Trans>
               }
             />
@@ -123,8 +111,8 @@ function Support() {
               question={<Trans>Can I use trizum without an account?</Trans>}
               answer={
                 <Trans>
-                  Absolutely! trizum works without requiring any account or
-                  sign-up. Just create a group and start tracking expenses.
+                  Absolutely! trizum works without requiring any account or sign-up. Just create a
+                  group and start tracking expenses.
                 </Trans>
               }
             />
@@ -134,9 +122,7 @@ function Support() {
         {/* Footer */}
         <section className="mt-8 border-t border-accent-200 pt-6 text-center text-sm text-accent-600 dark:border-accent-800 dark:text-accent-400">
           <p>
-            <Trans>
-              Thank you for using trizum. Your feedback helps us improve!
-            </Trans>
+            <Trans>Thank you for using trizum. Your feedback helps us improve!</Trans>
           </p>
         </section>
       </div>
@@ -153,17 +139,8 @@ interface SupportLinkProps {
   isExternal?: boolean;
 }
 
-function SupportLink({
-  href,
-  icon,
-  title,
-  description,
-  linkText,
-  isExternal,
-}: SupportLinkProps) {
-  const linkProps = isExternal
-    ? { target: "_blank" as const, rel: "noopener noreferrer" }
-    : {};
+function SupportLink({ href, icon, title, description, linkText, isExternal }: SupportLinkProps) {
+  const linkProps = isExternal ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
 
   return (
     <a
@@ -182,21 +159,12 @@ function SupportLink({
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-1">
-        <h3 className="font-semibold text-accent-900 dark:text-accent-100">
-          {title}
-        </h3>
-        <p className="text-sm text-accent-600 dark:text-accent-400">
-          {description}
-        </p>
+        <h3 className="font-semibold text-accent-900 dark:text-accent-100">{title}</h3>
+        <p className="text-sm text-accent-600 dark:text-accent-400">{description}</p>
         <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-300">
           {linkText}
           {isExternal && (
-            <Icon
-              icon="lucide.external-link"
-              width={14}
-              height={14}
-              className="text-accent-500"
-            />
+            <Icon icon="lucide.external-link" width={14} height={14} className="text-accent-500" />
           )}
         </span>
       </div>
@@ -212,12 +180,8 @@ interface FAQItemProps {
 function FAQItem({ question, answer }: FAQItemProps) {
   return (
     <div className="rounded-lg bg-accent-50 p-4 dark:bg-accent-900">
-      <h3 className="font-semibold text-accent-900 dark:text-accent-100">
-        {question}
-      </h3>
-      <p className="mt-2 text-sm text-accent-600 dark:text-accent-400">
-        {answer}
-      </p>
+      <h3 className="font-semibold text-accent-900 dark:text-accent-100">{question}</h3>
+      <p className="mt-2 text-sm text-accent-600 dark:text-accent-400">{answer}</p>
     </div>
   );
 }

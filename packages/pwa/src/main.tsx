@@ -32,10 +32,7 @@ import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging } from "./lib/log.ts";
-import {
-  createPartyFromMigrationData,
-  type MigrationData,
-} from "./models/migration.ts";
+import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import {
   readPartyListState,
   seedPartyListState,
@@ -46,8 +43,7 @@ import {
 
 const initialUrl = new URL(window.location.href);
 const isProduction = import.meta.env.MODE === "production";
-const shouldInitializeSentry =
-  isProduction && import.meta.env.VITE_APP_DISABLE_SENTRY !== "true";
+const shouldInitializeSentry = isProduction && import.meta.env.VITE_APP_DISABLE_SENTRY !== "true";
 
 if (shouldInitializeSentry) {
   Sentry.init({
@@ -97,30 +93,22 @@ type Href = {
 declare module "react-aria-components" {
   interface RouterConfig {
     href: Href;
-    routerOptions: Omit<
-      NavigateOptions<RegisteredRouter>,
-      keyof ToOptions<RegisteredRouter>
-    >;
+    routerOptions: Omit<NavigateOptions<RegisteredRouter>, keyof ToOptions<RegisteredRouter>>;
   }
 }
 
 const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
-const isOfflineOnly =
-  initialUrl.searchParams.get("__internal_offline_only") === "true";
+const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
 
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
-  network: [
-    isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL),
-  ].filter(isNonNull),
+  network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
 
 declare global {
   interface Window {
-    __internal_createPartyFromMigrationData: (
-      data: MigrationData,
-    ) => Promise<string>;
+    __internal_createPartyFromMigrationData: (data: MigrationData) => Promise<string>;
     __internal_seedPartyListState: (
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
@@ -129,9 +117,7 @@ declare global {
 }
 
 // For internal use only, like UI testing or screenshots
-window.__internal_createPartyFromMigrationData = async (
-  data: MigrationData,
-) => {
+window.__internal_createPartyFromMigrationData = async (data: MigrationData) => {
   return createPartyFromMigrationData({
     repo,
     data,
@@ -167,19 +153,13 @@ if (Capacitor.isNativePlatform()) {
 
   void SafeArea.getSafeAreaInsets().then(({ insets }) => {
     for (const [key, value] of Object.entries(insets)) {
-      document.documentElement.style.setProperty(
-        `--safe-area-inset-${key}`,
-        `${value}px`,
-      );
+      document.documentElement.style.setProperty(`--safe-area-inset-${key}`, `${value}px`);
     }
   });
 
   void SafeArea.addListener("safeAreaChanged", ({ insets }) => {
     for (const [key, value] of Object.entries(insets)) {
-      document.documentElement.style.setProperty(
-        `--safe-area-inset-${key}`,
-        `${value}px`,
-      );
+      document.documentElement.style.setProperty(`--safe-area-inset-${key}`, `${value}px`);
     }
   });
 
@@ -196,7 +176,7 @@ if (Capacitor.isNativePlatform()) {
 
     const pathnameAndSearch = url.pathname + url.search;
 
-    void router.history.push(pathnameAndSearch);
+    router.history.push(pathnameAndSearch);
   });
 }
 

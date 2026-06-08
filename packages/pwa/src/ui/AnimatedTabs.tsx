@@ -1,11 +1,4 @@
-import {
-  Collection,
-  Tab,
-  TabList,
-  TabPanel,
-  Tabs,
-  type Key,
-} from "react-aria-components";
+import { Collection, Tab, TabList, TabPanel, Tabs, type Key } from "react-aria-components";
 import {
   animate,
   motion,
@@ -14,13 +7,7 @@ import {
   useTransform,
   type AnimationPlaybackControls,
 } from "motion/react";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "./utils";
 import { Icon, type IconProps } from "./Icon";
 
@@ -73,13 +60,10 @@ export function AnimatedTabs({
       return;
     }
 
-    const index = initialTabs.current.findIndex(
-      (tab) => tab.id === initialSelectedTab.current,
-    );
+    const index = initialTabs.current.findIndex((tab) => tab.id === initialSelectedTab.current);
 
     if (index >= 0) {
-      tabPanel.scrollLeft =
-        tabPanel.scrollWidth * (index / initialTabs.current.length);
+      tabPanel.scrollLeft = tabPanel.scrollWidth * (index / initialTabs.current.length);
     }
   }, []);
 
@@ -116,9 +100,7 @@ export function AnimatedTabs({
   };
 
   const x = useTransform(scrollXProgress, (x) => transform(x, "offsetLeft"));
-  const width = useTransform(scrollXProgress, (x) =>
-    transform(x, "offsetWidth"),
-  );
+  const width = useTransform(scrollXProgress, (x) => transform(x, "offsetWidth"));
 
   // When the user scrolls, update the selected key
   // so that the correct tab panel becomes interactive.
@@ -186,22 +168,16 @@ export function AnimatedTabs({
             <Tab className="flex flex-1 cursor-default touch-none items-center justify-center px-4 py-2.5 outline-none transition">
               {({ isSelected, isFocusVisible }) => (
                 <>
-                  <Icon
-                    icon={tab.icon}
-                    width={20}
-                    height={20}
-                    className="mr-3"
-                  />
-                  <span className="h-4.5 text-lg leading-none">
-                    {tab.label}
-                  </span>
-                  {isFocusVisible && isSelected && (
-                    // Focus ring.
-                    <motion.span
-                      className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
-                      style={{ x, width }}
-                    />
-                  )}
+                  <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
+                  <span className="h-4.5 text-lg leading-none">{tab.label}</span>
+                  {isFocusVisible &&
+                    isSelected && (
+                      // Focus ring.
+                      <motion.span
+                        className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
+                        style={{ x, width }}
+                      />
+                    )}
                 </>
               )}
             </Tab>

@@ -1,7 +1,4 @@
-import {
-  defaultParticipants,
-  createImbalancedPartyFixture,
-} from "./harness/scenarios";
+import { defaultParticipants, createImbalancedPartyFixture } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
 import { HomePage } from "./pages/home.page";
 import { JoinTrizumPage } from "./pages/join-trizum.page";
@@ -15,9 +12,7 @@ test.describe("Home smoke @smoke", () => {
     await homePage.expectLoaded();
   });
 
-  test("navigates to create and join flows from the home screen", async ({
-    page,
-  }) => {
+  test("navigates to create and join flows from the home screen", async ({ page }) => {
     const homePage = new HomePage(page);
     const newTrizumPage = new NewTrizumPage(page);
     const joinTrizumPage = new JoinTrizumPage(page);
@@ -35,10 +30,7 @@ test.describe("Home smoke @smoke", () => {
     });
   });
 
-  test("reopens an existing party from the home screen", async ({
-    harness,
-    page,
-  }) => {
+  test("reopens an existing party from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
     const seededParty = await harness.joinSeededParty({
       fixture: createImbalancedPartyFixture(),
@@ -58,9 +50,7 @@ test.describe("Home smoke @smoke", () => {
       await expect(page).toHaveURL(
         new RegExp(`/party/${seededParty.partyId}\\?tab=expenses(?:&.*)?$`),
       );
-      await expect(
-        page.getByRole("heading", { name: /Weekend trip/ }),
-      ).toBeVisible();
+      await expect(page.getByRole("heading", { name: /Weekend trip/ })).toBeVisible();
       await expect(page.getByText("Cabin groceries")).toBeVisible();
     });
   });

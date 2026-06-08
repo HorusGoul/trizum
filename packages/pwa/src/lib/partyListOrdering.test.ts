@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vite-plus/test";
 import {
   generateAutomergeUrl,
   parseAutomergeUrl,
@@ -26,11 +26,7 @@ describe("getOrderedPartySections", () => {
     const partyList = createPartyList({
       parties: createFlagMap(PARTY_A_ID, PARTY_B_ID, PARTY_C_ID),
       pinnedParties: createFlagMap(PARTY_B_ID),
-      lastUsedAt: createLastUsedAtMap(
-        [PARTY_A_ID, 200],
-        [PARTY_B_ID, 50],
-        [PARTY_C_ID, 100],
-      ),
+      lastUsedAt: createLastUsedAtMap([PARTY_A_ID, 200], [PARTY_B_ID, 50], [PARTY_C_ID, 100]),
     });
 
     expect(getOrderedPartySections(partyList)).toMatchObject({
@@ -70,10 +66,7 @@ describe("getOrderedPartySections", () => {
       lastOpenedPartyId: PARTY_B_ID,
     });
 
-    expect(getOrderedPartySections(partyList).activePartyIds).toEqual([
-      PARTY_B_ID,
-      PARTY_A_ID,
-    ]);
+    expect(getOrderedPartySections(partyList).activePartyIds).toEqual([PARTY_B_ID, PARTY_A_ID]);
   });
 });
 
@@ -97,9 +90,10 @@ function createDocumentId(): DocumentId {
 }
 
 function createFlagMap(...partyIds: DocumentId[]) {
-  return Object.fromEntries(
-    partyIds.map((partyId) => [partyId, true as const]),
-  ) as Record<DocumentId, true>;
+  return Object.fromEntries(partyIds.map((partyId) => [partyId, true as const])) as Record<
+    DocumentId,
+    true
+  >;
 }
 
 function createLastUsedAtMap(...entries: [DocumentId, number][]) {

@@ -12,13 +12,9 @@ interface OrderedPartySections {
   pinnedActiveCount: number;
 }
 
-export function getOrderedPartySections(
-  partyList: PartyList,
-): OrderedPartySections {
+export function getOrderedPartySections(partyList: PartyList): OrderedPartySections {
   const partyIds = Object.keys(partyList.parties).filter(isValidDocumentId);
-  const insertionOrder = new Map(
-    partyIds.map((partyId, index) => [partyId, index]),
-  );
+  const insertionOrder = new Map(partyIds.map((partyId, index) => [partyId, index]));
 
   const activePartyIds: PartyId[] = [];
   const archivedPartyIds: PartyId[] = [];
@@ -50,10 +46,7 @@ export function getOrderedPartySections(
         return rightLastUsedAt - leftLastUsedAt;
       }
 
-      return (
-        (insertionOrder.get(leftPartyId) ?? 0) -
-        (insertionOrder.get(rightPartyId) ?? 0)
-      );
+      return (insertionOrder.get(leftPartyId) ?? 0) - (insertionOrder.get(rightPartyId) ?? 0);
     });
 
   const orderedActivePartyIds = sortPartyIds(activePartyIds, true);
@@ -64,9 +57,8 @@ export function getOrderedPartySections(
     archivedPartyIds: orderedArchivedPartyIds,
     activeCount: orderedActivePartyIds.length,
     archivedCount: orderedArchivedPartyIds.length,
-    pinnedActiveCount: orderedActivePartyIds.filter((partyId) =>
-      isPartyPinned(partyList, partyId),
-    ).length,
+    pinnedActiveCount: orderedActivePartyIds.filter((partyId) => isPartyPinned(partyList, partyId))
+      .length,
   };
 }
 

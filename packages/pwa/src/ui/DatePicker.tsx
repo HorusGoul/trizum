@@ -37,9 +37,7 @@ const DatePickerContent = ({
   ...props
 }: AriaDialogProps & { popoverClassName?: AriaPopoverProps["className"] }) => (
   <Popover
-    className={composeRenderProps(popoverClassName, (className) =>
-      cn("w-auto p-2", className),
-    )}
+    className={composeRenderProps(popoverClassName, (className) => cn("w-auto p-2", className))}
     placement="bottom end"
   >
     <AriaDialog
@@ -52,8 +50,7 @@ const DatePickerContent = ({
   </Popover>
 );
 
-interface AppDatePickerProps<T extends AriaDateValue>
-  extends AriaDatePickerProps<T> {
+interface AppDatePickerProps<T extends AriaDateValue> extends AriaDatePickerProps<T> {
   label?: string;
   description?: string;
   errorMessage?: string | ((validation: AriaValidationResult) => string);
@@ -84,10 +81,7 @@ function AppDatePicker<T extends AriaDateValue>({
         />
       </FieldGroup>
       {description && (
-        <Text
-          className="text-sm text-accent-700 dark:text-accent-50"
-          slot="description"
-        >
+        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
           {description}
         </Text>
       )}
@@ -99,9 +93,7 @@ function AppDatePicker<T extends AriaDateValue>({
             <CalendarGridHeader>
               {(day) => <CalendarHeaderCell>{day}</CalendarHeaderCell>}
             </CalendarGridHeader>
-            <CalendarGridBody>
-              {(date) => <CalendarCell date={date} />}
-            </CalendarGridBody>
+            <CalendarGridBody>{(date) => <CalendarCell date={date} />}</CalendarGridBody>
           </CalendarGrid>
         </Calendar>
       </DatePickerContent>

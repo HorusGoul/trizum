@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+/// <reference types="vite-plus/client" />
 
 interface ImportMetaEnv {
   readonly VITE_APP_VERSION: string;
@@ -14,3 +14,7 @@ interface ImportMeta {
 declare module "*.po" {
   export const messages: Record<string, string>;
 }
+
+declare module "@fontsource-variable/fira-code";
+
+declare module "@fontsource-variable/inter";

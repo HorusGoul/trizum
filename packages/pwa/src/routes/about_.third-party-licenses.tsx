@@ -76,8 +76,8 @@ function ThirdPartyLicenses() {
       <div className="container flex flex-1 flex-col gap-4 px-4">
         <p className="text-accent-700 dark:text-accent-300">
           <Trans>
-            This application uses the following open source libraries and tools.
-            Below are their licenses and attributions.
+            This application uses the following open source libraries and tools. Below are their
+            licenses and attributions.
           </Trans>
         </p>
 

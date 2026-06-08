@@ -1,10 +1,5 @@
-import { afterEach, describe, expect, test, vi } from "vitest";
-import {
-  configureSync,
-  getLogger,
-  resetSync,
-  type Logger,
-} from "@logtape/logtape";
+import { afterEach, describe, expect, test, vi } from "vite-plus/test";
+import { configureSync, getLogger, resetSync, type Logger } from "@logtape/logtape";
 import { getGitHubActionsAnnotationSink } from "./github-actions.js";
 
 interface TestProcess {
@@ -60,9 +55,7 @@ describe("@trizum/logging/github-actions", () => {
     originalGitHubActions = processRef.env.GITHUB_ACTIONS;
     processRef.env.GITHUB_ACTIONS = undefined;
 
-    const writeSpy = vi
-      .spyOn(processRef.stdout, "write")
-      .mockImplementation(() => true);
+    const writeSpy = vi.spyOn(processRef.stdout, "write").mockImplementation(() => true);
 
     emitWithSink(getGitHubActionsAnnotationSink(), (logger) => {
       logger.error("Screenshot capture failed", {
@@ -78,9 +71,7 @@ describe("@trizum/logging/github-actions", () => {
     originalGitHubActions = processRef.env.GITHUB_ACTIONS;
     processRef.env.GITHUB_ACTIONS = "true";
 
-    const writeSpy = vi
-      .spyOn(processRef.stdout, "write")
-      .mockImplementation(() => true);
+    const writeSpy = vi.spyOn(processRef.stdout, "write").mockImplementation(() => true);
 
     emitWithSink(getGitHubActionsAnnotationSink(), (logger) => {
       logger.error("Screenshot capture failed", {

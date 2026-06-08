@@ -1,11 +1,7 @@
 import { getExpenseTotalAmount, type Expense } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
 
-export type PartyStatsTimeframePreset =
-  | "all-time"
-  | "last-year"
-  | "current-year"
-  | "current-month";
+export type PartyStatsTimeframePreset = "all-time" | "last-year" | "current-year" | "current-month";
 
 export interface PartyStatsCalendarYearTimeframe {
   type: "calendar-year";
@@ -75,10 +71,7 @@ export function calculatePartyStats({
   let totalExpenseCount = 0;
 
   for (const expense of expenses) {
-    if (
-      expense.isTransfer ||
-      !isExpenseWithinTimeframe(expense, timeframe, now)
-    ) {
+    if (expense.isTransfer || !isExpenseWithinTimeframe(expense, timeframe, now)) {
       continue;
     }
 
@@ -102,12 +95,8 @@ export function calculatePartyStats({
     }
   }
 
-  const participantStats = [...Object.values(participantStatsById)].sort(
-    compareParticipantStats,
-  );
-  const ranking = participantStats.filter(
-    (participant) => participant.totalSpent > 0,
-  );
+  const participantStats = [...Object.values(participantStatsById)].sort(compareParticipantStats);
+  const ranking = participantStats.filter((participant) => participant.totalSpent > 0);
 
   return {
     timeframe,
@@ -153,17 +142,11 @@ export function getPartyStatsDateBounds(
       continue;
     }
 
-    if (
-      earliestExpense === null ||
-      expense.paidAt.getTime() < earliestExpense.getTime()
-    ) {
+    if (earliestExpense === null || expense.paidAt.getTime() < earliestExpense.getTime()) {
       earliestExpense = expense.paidAt;
     }
 
-    if (
-      latestExpense === null ||
-      expense.paidAt.getTime() > latestExpense.getTime()
-    ) {
+    if (latestExpense === null || expense.paidAt.getTime() > latestExpense.getTime()) {
       latestExpense = expense.paidAt;
     }
   }
@@ -213,10 +196,7 @@ function isExpenseWithinTimeframe(
   const expenseTimestamp = expense.paidAt.getTime();
   const range = getTimeframeRange(timeframe, now);
 
-  return (
-    expenseTimestamp >= range.start.getTime() &&
-    expenseTimestamp < range.end.getTime()
-  );
+  return expenseTimestamp >= range.start.getTime() && expenseTimestamp < range.end.getTime();
 }
 
 function getTimeframeRange(timeframe: PartyStatsTimeframe, now: Date) {

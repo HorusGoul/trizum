@@ -1,9 +1,5 @@
 import { t } from "@lingui/core/macro";
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 
 import { type Expense } from "#src/models/expense.js";
@@ -14,10 +10,7 @@ import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
-import {
-  ExpenseEditor,
-  type ExpenseEditorFormValues,
-} from "#src/components/ExpenseEditor.js";
+import { ExpenseEditor, type ExpenseEditorFormValues } from "#src/components/ExpenseEditor.js";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
@@ -34,10 +27,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 
   validateSearch: (search): AddExpenseSearchParams => {
     return {
-      media:
-        typeof search.media === "number" && search.media >= 0
-          ? search.media
-          : undefined,
+      media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
     };
   },
 
@@ -53,12 +43,11 @@ function AddExpense() {
   const { history } = useRouter();
   const participant = useCurrentParticipant();
 
-  const { galleryIndex, openGallery, closeGallery, onIndexChange } =
-    useRouteMediaGallery({
-      mediaIndex: search.media,
-      navigate: (options) => void navigate(options),
-      goBack: () => history.back(),
-    });
+  const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
+    mediaIndex: search.media,
+    navigate: (options) => void navigate(options),
+    goBack: () => history.back(),
+  });
 
   // Track photos for gallery - updates when form changes
   const [photos, setPhotos] = useState<string[]>([]);

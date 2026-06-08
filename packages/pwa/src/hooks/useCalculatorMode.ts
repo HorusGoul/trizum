@@ -65,10 +65,7 @@ export function useCalculatorMode({
 
   const decimals = getCurrencyDecimals(currency);
   const rawPreviewValue = evaluateExpression(expression);
-  const previewValue =
-    rawPreviewValue !== null
-      ? roundToDecimals(rawPreviewValue, decimals)
-      : null;
+  const previewValue = rawPreviewValue !== null ? roundToDecimals(rawPreviewValue, decimals) : null;
 
   function applyValue(val: number) {
     onChange(roundToDecimals(val, decimals));

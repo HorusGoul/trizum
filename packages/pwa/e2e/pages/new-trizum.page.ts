@@ -2,7 +2,7 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 interface NewPartyDetails {
   name: string;
-  participants: [string, ...string[]];
+  participants: readonly [string, ...string[]];
 }
 
 export class NewTrizumPage {
