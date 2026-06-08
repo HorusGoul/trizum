@@ -111,8 +111,9 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
             className="absolute right-1 top-1 h-auto w-auto rounded-full p-1"
             onPress={handleRemoveAvatar}
             isDisabled={isUploading}
+            aria-label={t`Remove avatar`}
           >
-            <Icon icon="lucide.x" className="h-4 w-4" aria-label={t`Remove avatar`} />
+            <Icon icon="lucide.x" className="h-4 w-4" />
           </Button>
         )}
       </div>

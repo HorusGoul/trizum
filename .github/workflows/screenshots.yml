@@ -15,9 +15,6 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
-
       - name: Build screenshots dependencies
         run: vp run --filter @trizum/screenshots^... build
 

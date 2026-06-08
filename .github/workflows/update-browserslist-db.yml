@@ -27,9 +27,6 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
-
       - name: Update Browserslist DB
         run: vp run browserslist:update-db
 

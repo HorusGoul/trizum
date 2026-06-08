@@ -53,9 +53,6 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
-
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -134,9 +131,6 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: true
-
-      - name: Install dependencies
-        run: vp install --frozen-lockfile
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1

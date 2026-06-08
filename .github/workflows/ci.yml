@@ -28,9 +28,6 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
-
       - name: vp run ${{ matrix.script }}
         run: vp run ${{ matrix.script }}
         env:
@@ -47,9 +44,6 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: true
-
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
 
       - name: Install Playwright Browsers
         timeout-minutes: 5
@@ -87,8 +81,6 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: true
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
@@ -135,9 +127,6 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
-
       - name: Build PWA
         run: vp run --filter @trizum/pwa build
         env:
@@ -169,8 +158,6 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: true
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
 
       - name: Autofix
         id: autofix

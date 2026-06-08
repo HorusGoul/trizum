@@ -945,8 +945,9 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
         color="input-like"
         className="absolute -right-2 -top-2 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
+        aria-label={t`Remove photo`}
       >
-        <Icon icon="lucide.x" className="h-4 w-4" aria-label={t`Remove photo`} />
+        <Icon icon="lucide.x" className="h-4 w-4" />
       </Button>
     </div>
   );

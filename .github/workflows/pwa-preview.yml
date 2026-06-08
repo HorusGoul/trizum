@@ -33,9 +33,6 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install Dependencies
-        run: vp install --frozen-lockfile
-
       - name: Build PWA
         run: vp run --filter @trizum/pwa build
 
