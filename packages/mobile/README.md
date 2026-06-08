@@ -297,18 +297,26 @@ A `workflow_dispatch` workflow is available for building mobile apps in CI. Navi
 - **Android artifact**: `apk` or `aab` (for release builds)
 - **iOS export method**: `app-store` or `ad-hoc` (for release builds)
 
+Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
+trigger the shared release workflow. That path reuses the mobile build and
+store deployment workflows to generate store screenshots, publish Android to the
+Play Store production track with `release_status` `completed`, submit iOS to
+App Store review with `automatic_release` enabled, and attach the signed Android
+APK and AAB to the GitHub release.
+
 ### Required Secrets
 
 Configure these secrets in your GitHub repository settings (**Settings → Secrets and variables → Actions**):
 
 #### Android Secrets
 
-| Secret                      | Description                     |
-| --------------------------- | ------------------------------- |
-| `ANDROID_KEYSTORE_BASE64`   | Base64-encoded release keystore |
-| `ANDROID_KEYSTORE_PASSWORD` | Keystore password               |
-| `ANDROID_KEY_ALIAS`         | Key alias                       |
-| `ANDROID_KEY_PASSWORD`      | Key password                    |
+| Secret                        | Description                                     |
+| ----------------------------- | ----------------------------------------------- |
+| `ANDROID_KEYSTORE_BASE64`     | Base64-encoded release keystore                 |
+| `ANDROID_KEYSTORE_PASSWORD`   | Keystore password                               |
+| `ANDROID_KEY_ALIAS`           | Key alias                                       |
+| `ANDROID_KEY_PASSWORD`        | Key password                                    |
+| `GOOGLE_PLAY_JSON_KEY_BASE64` | Base64-encoded Google Play service account JSON |
 
 **How to get Android secrets:**
 
