@@ -59,6 +59,9 @@ jobs:
     concurrency:
       group: pwa-production
       cancel-in-progress: false
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
