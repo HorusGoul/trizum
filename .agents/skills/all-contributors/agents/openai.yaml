@@ -1,0 +1,4 @@
+interface:
+  display_name: "All Contributors"
+  short_description: "Update All Contributors metadata and README output."
+  default_prompt: "Use $all-contributors to update contributor credits, regenerate README.md, validate the diff, and prepare the change for review."

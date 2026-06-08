@@ -844,7 +844,7 @@ msgstr "Volver"
 msgid "Go back and try again from the balances list."
 msgstr "Vuelve atrás e inténtalo de nuevo desde la lista de saldos."
 
-#: src/routes/migrate_.tricount.tsx:290
+#: src/routes/migrate_.tricount.tsx:283
 msgid "Go back to home"
 msgstr "Volver al inicio"
 
@@ -937,7 +937,7 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Impact on my balance: <0/>"
 msgstr "Impacto en mi balance: <0/>"
 
-#: src/routes/migrate_.tricount.tsx:212
+#: src/routes/migrate_.tricount.tsx:205
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
@@ -953,7 +953,7 @@ msgstr "Importado {0} ({1} de {2})"
 msgid "Importing attachments ({0} of {1})"
 msgstr "Importando adjuntos ({0} de {1})"
 
-#: src/routes/migrate_.tricount.tsx:93
+#: src/routes/migrate_.tricount.tsx:78
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
@@ -977,7 +977,7 @@ msgstr "Rupia Indonesia"
 msgid "Invalid QR code. This doesn't appear to be a trizum party code."
 msgstr "Código QR no válido. No parece ser un código de grupo de trizum."
 
-#: src/routes/migrate_.tricount.tsx:139
+#: src/routes/migrate_.tricount.tsx:132
 msgid "Invalid tricount URL or key"
 msgstr "URL o clave de Tricount no válida"
 
@@ -1190,15 +1190,15 @@ msgstr "Peso Mexicano"
 
 #: src/routes/index.tsx:221
 #: src/routes/index.tsx:419
-#: src/routes/migrate_.tricount.tsx:156
+#: src/routes/migrate_.tricount.tsx:149
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
 
-#: src/routes/migrate_.tricount.tsx:226
+#: src/routes/migrate_.tricount.tsx:219
 msgid "Migration in progress"
 msgstr "Migración en progreso"
 
-#: src/routes/migrate_.tricount.tsx:257
+#: src/routes/migrate_.tricount.tsx:250
 msgid "Migration successful"
 msgstr "Migración exitosa"
 
@@ -1541,7 +1541,7 @@ msgstr "Estadísticas del grupo"
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
-#: src/routes/migrate_.tricount.tsx:192
+#: src/routes/migrate_.tricount.tsx:185
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
@@ -1610,11 +1610,11 @@ msgstr "Por favor, permite el acceso a la cámara en la configuración de tu nav
 msgid "Please correct it before saving."
 msgstr "Por favor, corrígelo antes de guardar."
 
-#: src/routes/migrate_.tricount.tsx:232
+#: src/routes/migrate_.tricount.tsx:225
 msgid "Please don't close the app while we migrate your data"
 msgstr "Por favor, no cierres la aplicación mientras migramos tus datos"
 
-#: src/routes/migrate_.tricount.tsx:57
+#: src/routes/migrate_.tricount.tsx:42
 msgid "Please paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or key"
 msgstr "Por favor, pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave"
 
@@ -1732,7 +1732,7 @@ msgid "Saudi Riyal"
 msgstr "Riyal Saudí"
 
 #: src/components/ExpenseEditor.tsx:279
-#: src/routes/migrate_.tricount.tsx:167
+#: src/routes/migrate_.tricount.tsx:160
 #: src/routes/new.tsx:148
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
@@ -1841,7 +1841,7 @@ msgstr "Dólar de las Islas Salomón"
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
-#: src/routes/migrate_.tricount.tsx:280
+#: src/routes/migrate_.tricount.tsx:273
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
@@ -1899,7 +1899,7 @@ msgid "Submit a Request"
 msgstr "Enviar sugerencia"
 
 #: src/components/ExpenseEditor.tsx:279
-#: src/routes/migrate_.tricount.tsx:167
+#: src/routes/migrate_.tricount.tsx:160
 #: src/routes/new.tsx:148
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
@@ -2105,11 +2105,11 @@ msgstr "Transferir deuda"
 msgid "Transfer to another party"
 msgstr "Transferir a otro grupo"
 
-#: src/routes/migrate_.tricount.tsx:52
+#: src/routes/migrate_.tricount.tsx:37
 msgid "Tricount key or URL is required"
 msgstr "Se requiere la clave o URL de Tricount"
 
-#: src/routes/migrate_.tricount.tsx:191
+#: src/routes/migrate_.tricount.tsx:184
 msgid "Tricount URL or key"
 msgstr "URL o clave de Tricount"
 
@@ -2254,7 +2254,7 @@ msgstr "Dong Vietnamita"
 msgid "View on GitHub"
 msgstr "Ver en GitHub"
 
-#: src/routes/migrate_.tricount.tsx:267
+#: src/routes/migrate_.tricount.tsx:260
 msgid "View party"
 msgstr "Ver grupo"
 

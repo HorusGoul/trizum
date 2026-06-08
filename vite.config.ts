@@ -118,7 +118,7 @@ const toolingConfig = {
     ],
   },
   staged: {
-    "*": "vp check --fix",
+    "*": ["vp check --fix", () => "vp run lingui:extract"],
   },
   plugins: [rootAppCommandGuard()],
   run: {
