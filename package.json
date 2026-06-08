@@ -20,7 +20,7 @@
     "generate:ts-template": "vp exec turbo gen workspace --copy @trizum/ts-template --type package",
     "contributors:add": "vp exec all-contributors add",
     "contributors:generate": "vp exec all-contributors generate",
-    "prepare": "vp config"
+    "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs"
   },
   "dependencies": {
     "@changesets/cli": "2.29.8",
