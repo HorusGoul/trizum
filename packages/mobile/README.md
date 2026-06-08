@@ -14,12 +14,12 @@ This package wraps the PWA (`@trizum/pwa`) as a native mobile application using 
 - **Vite+ (`vp`)** for the repo-managed Node.js and package manager versions
 - **For iOS:**
   - macOS with Xcode 15+
-  - CocoaPods (`gem install cocoapods`)
+  - CocoaPods from the iOS bundle
   - Apple Developer account (for device testing/distribution)
 - **For Android:**
   - Android Studio with SDK 35
   - Java 17+
-- **Fastlane** (for automated builds): `gem install fastlane`
+- **Fastlane** (for automated builds), installed through the native bundles
 
 ## Getting Started
 
@@ -28,11 +28,22 @@ This package wraps the PWA (`@trizum/pwa`) as a native mobile application using 
 ```bash
 # From repo root
 vp install
-
-# Build the PWA first
 vp run --filter @trizum/pwa build
+```
 
-# Sync Capacitor (copies web assets to native projects)
+### Native Ruby Environment
+
+`vp run build` runs Capacitor sync. On macOS, Capacitor uses the iOS
+`Gemfile.lock` to run `bundle exec pod install`, so use the repo mise config to
+match the Ruby version used by CI:
+
+```bash
+# From repo root
+mise trust
+mise install
+mise exec -- gem install bundler:2.7.2
+(cd packages/mobile/ios/App && mise exec -- bundle install)
+
 cd packages/mobile
 vp run build
 ```
