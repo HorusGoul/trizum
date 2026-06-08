@@ -1,7 +1,7 @@
 ---
 name: creating-changesets
 description: "Creates changesets for semantic versioning. Use when adding changesets, preparing releases, determining version bumps (patch/minor/major), generating changelog entries, or documenting breaking changes."
-allowed-tools: "Read, Grep, Glob, Write, Edit, Bash(git:*), Bash(vp exec changeset:*)"
+allowed-tools: "Read, Grep, Glob, Write, Edit, Bash(git:*), Bash(gh auth token), Bash(vp exec changeset:*)"
 metadata:
   author: Ollie Shop
   version: 1.0.0
@@ -90,6 +90,20 @@ Add party invite QR code sharing
 - Includes validation for malformed invite payloads
 ```
 
+### Issue Closing References
+
+When a change fixes a GitHub issue, include the exact closing reference in the
+changeset body:
+
+```markdown
+Fixes #123.
+```
+
+Put closing keywords such as `Fixes`, `Closes`, or `Resolves` in the changeset,
+not in the PR title or body. PRs should link related issues with non-closing
+phrasing such as `Related to #123` so the issue remains open until the generated
+Version Packages PR is merged.
+
 ### File Format
 
 ```markdown
@@ -103,6 +117,7 @@ Optional longer description with:
 - Bullet points for details
 - Code examples if needed
 - Migration instructions for breaking changes
+- `Fixes #ISSUE` when the changeset fixes a GitHub issue
 ```
 
 ## Release Workflow
@@ -124,11 +139,13 @@ git commit -m "chore: add changeset for feature"
 
 - Changesets action creates "Version Packages" PR
 - This PR updates version and CHANGELOG
+- Issue-closing references from changeset bodies are carried into this PR
 
 ### 4. Merge Version PR
 
 - Triggers npm publish
 - Creates GitHub release
+- Closes fixed GitHub issues referenced with `Fixes #ISSUE`
 
 ## Checking Status
 
@@ -136,8 +153,8 @@ git commit -m "chore: add changeset for feature"
 # See what changesets exist
 vp exec changeset status
 
-# Preview version bump
-vp exec changeset version --dry-run
+# Preview version bump with GitHub contributor metadata
+GITHUB_TOKEN=$(gh auth token) vp exec changeset version --dry-run
 ```
 
 ## Common Mistakes

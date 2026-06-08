@@ -4,7 +4,7 @@
 
 ## Related Issues
 
-<!-- Link any related issues: Fixes #123, Closes #456, Related to #789 -->
+<!-- Link related issues without closing keywords: Related to #123 -->
 
 ## Type of Change
 

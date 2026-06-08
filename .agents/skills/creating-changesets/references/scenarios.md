@@ -11,6 +11,8 @@ Fix duplicate expense save submissions
 
 Rapidly tapping save on an expense editor now creates a single expense instead
 of submitting duplicate writes.
+
+Fixes #123.
 ```
 
 ## New Feature
@@ -136,7 +138,7 @@ fix bug
 
 1. **Start with a verb**: Add, Fix, Update, Remove, Improve
 2. **Be specific**: What changed and why
-3. **Include context**: Reference issue numbers if applicable
+3. **Include context**: Add `Fixes #ISSUE` in the changeset body when fixing a GitHub issue
 4. **Document migration**: For breaking changes
 
 ## Analyzing Changes for Bump Type

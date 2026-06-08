@@ -219,13 +219,17 @@ vp exec changeset
 
 Follow the prompts to describe your changes. This creates a file in `.changeset/` that should be included in your PR.
 
+If your change fixes a GitHub issue, include `Fixes #123` in the body of the
+changeset. The generated Version Packages PR carries that closing reference so
+the issue is closed when the release update is merged.
+
 ### PR Guidelines
 
 - **Title:** Use Conventional Commit format, for example `fix(pwa): prevent duplicate expense rows`
 - **Description:** Explain what and why, not just how
 - **Size:** Keep PRs focused and reasonably sized — smaller PRs get reviewed faster!
 - **Screenshots:** Include for UI changes
-- **Link issues:** Reference related issues (e.g., "Fixes #123")
+- **Link issues:** Reference related issues without closing keywords (e.g., "Related to #123")
 
 ### Draft PRs
 
