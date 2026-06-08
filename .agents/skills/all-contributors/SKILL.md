@@ -42,9 +42,6 @@ description: Update All Contributors metadata and generated README output in thi
 
 ## Repo Notes
 
-- Root `package.json` also exposes `contributors:add` and
-  `contributors:generate`, but `vp exec all-contributors ...` is the clearest
-  way to pass exact CLI arguments.
 - Commit both `.all-contributorsrc` and `README.md` after contributor changes.
 - Do not add a changeset for contributor metadata-only updates unless the user
   explicitly requests one.
