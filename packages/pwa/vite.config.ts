@@ -64,8 +64,6 @@ try {
 }
 
 const fullVersion = `${appVersion}-${appCommit}`;
-const pwaDependencyTasks = ["@trizum/logging#build", "icons:generate"];
-
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
@@ -83,13 +81,13 @@ export default defineConfig(({ mode }) => {
       tasks: {
         build: {
           command: "vp build",
-          dependsOn: pwaDependencyTasks,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
           env: ["SENTRY_AUTH_TOKEN"],
           output: ["dist/**"],
         },
         check: {
           command: "vp check .",
-          dependsOn: pwaDependencyTasks,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
         deploy: {
           command: "vp exec wrangler deploy",
@@ -99,7 +97,7 @@ export default defineConfig(({ mode }) => {
         dev: {
           command: "vp dev",
           cache: false,
-          dependsOn: pwaDependencyTasks,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
         "icons:generate": {
           command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
@@ -113,17 +111,17 @@ export default defineConfig(({ mode }) => {
         },
         test: {
           command: "vp test .",
-          dependsOn: pwaDependencyTasks,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
         "test:e2e": {
           command: "vp exec playwright test",
           cache: false,
-          dependsOn: pwaDependencyTasks,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
         "test:e2e:headed": {
           command: "vp exec playwright test --headed",
           cache: false,
-          dependsOn: pwaDependencyTasks,
+          dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
       },
     },
