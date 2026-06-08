@@ -25,10 +25,8 @@
   },
   "scripts": {
     "capacitor:copy:before": "./copy-client.sh",
-    "check": "vp check .",
     "cleanup": "rm -rf dist",
     "dev": "tsc --watch",
-    "build": "./copy-client.sh && ./sync.sh",
     "open:android": "vp exec cap open android",
     "open:ios": "vp exec cap open ios",
     "run:android": "vp exec cap run android",

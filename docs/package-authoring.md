@@ -57,24 +57,30 @@ Exports should normally point at `dist` artifacts:
 
 Only deviate from the built-package pattern intentionally.
 
-## Scripts
+## Tasks And Scripts
 
-New packages should usually provide scripts that are run through `vp run`:
+New packages should usually provide routine commands as Vite+ tasks in
+`vite.config.ts`, run through `vp run`:
 
 - `vp run check` using `vp check .`
 - `vp run build` using `tsc -b tsconfig.json`
 - `vp run dev` using `tsc -b tsconfig.json --watch`
 
 Packages do not need separate lint or typecheck scripts for routine validation.
-If a package has runtime-specific commands beyond this baseline, keep the
-standard scripts and add the extra ones alongside them.
+If a package has runtime-specific commands beyond this baseline, keep those
+extra commands in `package.json` scripts or Vite+ tasks as appropriate.
+
+When a routine task needs workspace dependencies to be built first, express that
+in `vite.config.ts` with `run.tasks.<task>.dependsOn` and explicit
+`package#task` entries. Do not use package-manager lifecycle `pre*` scripts for
+this dependency graph.
 
 Packages do not need a dedicated `check:fix` script. From the workspace root,
 use `vp run check --fix`; from a package directory, use `vp check --fix .` so
 the `--fix` flag comes before the checked path.
 
 Packages with tests should define their local Vitest settings in
-`vite.config.ts` and have the package `test` script call `vp test .`.
+`vite.config.ts` and have the package `test` task call `vp test .`.
 
 ## Tests
 
@@ -103,10 +109,10 @@ Applications and runtime entrypoints own LogTape configuration.
 Every new package should update or provide:
 
 - `README.md` with package purpose, key files, and validation commands
-- `package.json` with the exact runnable scripts
+- `vite.config.ts` and `package.json` with the exact runnable tasks and scripts
 
 Before opening a PR for a new package, run:
 
-- the package-local `check` and `build` scripts through `vp run <script>`
+- the package-local `check` and `build` tasks through `vp run <task>`
 - `vp run check`, `vp run test`, and `vp run build` if the package is already
   wired into the workspace graph

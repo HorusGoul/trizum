@@ -18,24 +18,19 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./github-actions": {
-      "source": "./src/github-actions.ts",
       "types": "./dist/github-actions.d.ts",
       "import": "./dist/github-actions.js",
       "default": "./dist/github-actions.js"
     }
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json --force",
-    "check": "vp check .",
     "cleanup": "rm -rf dist",
-    "dev": "tsc -b tsconfig.json --watch",
-    "test": "vp test ."
+    "dev": "tsc -b tsconfig.json --watch"
   },
   "dependencies": {
     "@logtape/logtape": "1.2.2"

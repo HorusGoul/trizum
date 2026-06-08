@@ -24,12 +24,8 @@
     }
   },
   "scripts": {
-    "check": "vp check .",
     "cleanup": "rm -rf dist",
-    "dev": "tsc -b tsconfig.json --watch",
-    "build": "tsc -b tsconfig.json --force",
-    "pretest": "vp run --filter @trizum/logging build",
-    "test": "vp test ."
+    "dev": "tsc -b tsconfig.json --watch"
   },
   "dependencies": {
     "@trizum/logging": "workspace:*"

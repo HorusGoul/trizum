@@ -7,7 +7,6 @@
     "outDir": "./dist",
     "moduleResolution": "nodenext",
     "module": "nodenext",
-    "customConditions": ["source"],
     "types": ["node"],
     "noEmit": true
   }

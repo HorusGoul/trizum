@@ -24,7 +24,6 @@
     }
   },
   "scripts": {
-    "check": "vp check .",
     "cleanup": "rm -rf screenshots",
     "start": "node --experimental-transform-types src/main.ts",
     "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",

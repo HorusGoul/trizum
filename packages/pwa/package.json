@@ -8,27 +8,11 @@
     "#*": "./*"
   },
   "scripts": {
-    "build": "vp build",
-    "check": "vp check .",
     "cleanup": "rm -rf dist",
-    "dev": "vp dev",
-    "icons:generate": "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
-    "logging:build": "vp run --filter @trizum/logging build",
-    "prebuild": "vp run logging:build && vp run icons:generate",
-    "precheck": "vp run icons:generate",
-    "predev": "vp run logging:build && vp run icons:generate",
-    "preicons:generate": "vp run --filter @trizum/icon-sprite build",
     "lingui:extract": "vp exec lingui extract src",
-    "preview": "vp preview",
-    "pretest": "vp run logging:build && vp run icons:generate",
-    "test": "vp test .",
-    "pretest:e2e": "vp run logging:build && vp run icons:generate",
-    "test:e2e": "vp exec playwright test",
-    "test:e2e:headed": "vp exec playwright test --headed",
     "test:e2e:install": "vp exec playwright install chromium webkit",
     "test:e2e:install:ci": "vp exec playwright install --with-deps --only-shell chromium webkit",
-    "generate:assets": "vp exec pwa-assets-generator",
-    "deploy": "vp run build && vp exec wrangler deploy"
+    "generate:assets": "vp exec pwa-assets-generator"
   },
   "dependencies": {
     "@automerge/automerge": "3.2.4",

@@ -147,6 +147,26 @@ const toolingConfig = {
       scripts: false,
       tasks: true,
     },
+    tasks: {
+      check: {
+        command: "vp check",
+        dependsOn: ["@trizum/logging#build", "@trizum/pwa#icons:generate"],
+      },
+      dev: {
+        command: "vp run @trizum/pwa#dev",
+        cache: false,
+      },
+      preview: {
+        command: "vp run @trizum/pwa#preview",
+        cache: false,
+      },
+      test: {
+        command: "vp run --filter './packages/*' test",
+      },
+      "test:coverage": {
+        command: "vp run --filter './packages/*' test --coverage",
+      },
+    },
   },
 } satisfies UserConfig;
 

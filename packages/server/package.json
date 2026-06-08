@@ -20,7 +20,6 @@
     }
   },
   "scripts": {
-    "check": "vp check .",
     "cleanup": "rm -rf dist",
     "dev": "vp run node --watch src/main.ts",
     "start": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types --import ./src/instrument.ts src/main.ts",

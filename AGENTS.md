@@ -36,7 +36,7 @@ Read these sources in order:
 3. the package README for the area you are changing,
 4. any deeper `AGENTS.md` in that domain,
 5. the relevant skill under [`.agents/skills`](./.agents/skills),
-6. the package's `package.json` for exact commands.
+6. the package's `vite.config.ts` and `package.json` for exact commands.
 
 Canonical examples:
 
@@ -97,7 +97,7 @@ Use `type/description` naming:
   `vp run check`, `vp run test`, and `vp run build`.
 - From the workspace root, use `vp run check --fix` when you need Vite+ to
   apply formatting and lint fixes.
-- From the workspace root, run PWA dev and preview through package scripts:
+- From the workspace root, run PWA dev and preview through package tasks:
   `vp run dev` and `vp run preview`.
 - Run `vp run lingui:extract` when user-facing copy changes.
 - Create a changeset before opening a PR for user-facing changes, and have the
