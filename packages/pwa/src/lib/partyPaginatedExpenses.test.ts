@@ -174,7 +174,7 @@ describe("partyPaginatedExpenses", () => {
     cacheChunk(chunk1);
     cacheChunk(chunk2);
 
-    const onStoreChange = vi.fn();
+    const onStoreChange = vi.fn<() => void>();
     const unsubscribe = subscribeToPartyPaginatedExpenses(onStoreChange, repo, allChunkIds);
 
     expect(documentCache.subscribe).toHaveBeenCalledTimes(3);
@@ -191,7 +191,7 @@ describe("partyPaginatedExpenses", () => {
     registerChunk(chunk1, ["2024-01-01T00:00:00.000Z"]);
     cacheChunk(chunk1);
 
-    const onStoreChange = vi.fn();
+    const onStoreChange = vi.fn<() => void>();
     const unsubscribe = subscribeToPartyPaginatedExpenses(onStoreChange, repo, [chunk1]);
 
     appendExpenseToCachedChunk(chunk1, "2025-01-01T00:00:00.000Z");

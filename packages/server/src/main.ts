@@ -156,7 +156,7 @@ export async function startServer() {
   const _server = await new Promise<ServerType>((resolve) => {
     const server = serve(
       {
-        ...app,
+        fetch: app.fetch,
         port,
         hostname: "0.0.0.0",
       },

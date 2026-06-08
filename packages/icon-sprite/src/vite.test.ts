@@ -59,8 +59,8 @@ describe("createIconSpritePlugin", () => {
         }),
       ],
     });
-    const watcherAdd = vi.fn();
-    const wsSend = vi.fn();
+    const watcherAdd = vi.fn<(paths: string[]) => void>();
+    const wsSend = vi.fn<(payload: { type: "full-reload" }) => void>();
 
     getHookHandler(plugin.configResolved)?.({
       root: rootDir,
@@ -113,7 +113,7 @@ describe("createIconSpritePlugin", () => {
         }),
       ],
     });
-    const wsSend = vi.fn();
+    const wsSend = vi.fn<(payload: { type: "full-reload" }) => void>();
 
     getHookHandler(plugin.configResolved)?.({
       root: rootDir,

@@ -1,8 +1,10 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
+import type { Expense } from "./expense";
 
-const addExpenseToPartyMock = vi.fn();
+const addExpenseToPartyMock =
+  vi.fn<(expense: Omit<Expense, "id" | "__hash">) => Promise<Expense>>();
 
 vi.mock("#src/hooks/useParty.ts", () => ({
   getPartyHelpers: () => ({
@@ -12,7 +14,13 @@ vi.mock("#src/hooks/useParty.ts", () => ({
 
 vi.mock("#src/hooks/useMediaFileActions.ts", () => ({
   getMediaFileHelpers: () => ({
-    createMediaFile: vi.fn(),
+    createMediaFile:
+      vi.fn<
+        (
+          blob: Blob,
+          metadata: Record<string, unknown>,
+        ) => Promise<readonly [mediaFileId: string, handle: unknown]>
+      >(),
   }),
 }));
 

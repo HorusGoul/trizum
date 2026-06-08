@@ -2,16 +2,22 @@ import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import { STATUS_RESOLVED } from "suspense";
 import { vi } from "vite-plus/test";
 
+type DocumentCacheMock<TDocument> = {
+  getStatus: (repo: Repo, documentId: DocumentId) => string;
+  getValueIfCached: (repo: Repo, documentId: DocumentId) => TDocument | undefined;
+  readAsync: (repo: Repo, documentId: DocumentId) => TDocument | Promise<TDocument> | undefined;
+  subscribe: (callback: () => void, repo: Repo, documentId: DocumentId) => () => void;
+};
+
 export interface MockDocumentCacheCollection<TDocument> {
   availableDocuments: Map<DocumentId, TDocument>;
   cachedDocuments: Map<DocumentId, TDocument>;
   documentStatuses: Map<DocumentId, string>;
   subscribers: Map<DocumentId, Set<() => void>>;
   documentCache: {
-    getStatus: ReturnType<typeof vi.fn>;
-    getValueIfCached: ReturnType<typeof vi.fn>;
-    readAsync: ReturnType<typeof vi.fn>;
-    subscribe: ReturnType<typeof vi.fn>;
+    [TKey in keyof DocumentCacheMock<TDocument>]: ReturnType<
+      typeof vi.fn<DocumentCacheMock<TDocument>[TKey]>
+    >;
   };
   cacheDocument: (documentId: DocumentId) => void;
   notifySubscribers: (documentId: DocumentId) => void;
@@ -42,13 +48,15 @@ export function createMockDocumentCacheCollection<
   }
 
   const documentCache = {
-    getStatus: vi.fn((_: Repo, documentId: DocumentId) => {
+    getStatus: vi.fn<DocumentCacheMock<TDocument>["getStatus"]>((_: Repo, documentId) => {
       return documentStatuses.get(documentId) ?? "not-found";
     }),
-    getValueIfCached: vi.fn((_: Repo, documentId: DocumentId) => {
-      return cachedDocuments.get(documentId);
-    }),
-    readAsync: vi.fn((_: Repo, documentId: DocumentId) => {
+    getValueIfCached: vi.fn<DocumentCacheMock<TDocument>["getValueIfCached"]>(
+      (_: Repo, documentId) => {
+        return cachedDocuments.get(documentId);
+      },
+    ),
+    readAsync: vi.fn<DocumentCacheMock<TDocument>["readAsync"]>((_: Repo, documentId) => {
       const cachedDocument = cachedDocuments.get(documentId);
 
       if (cachedDocument) {
@@ -66,7 +74,7 @@ export function createMockDocumentCacheCollection<
 
       return Promise.resolve(availableDocument);
     }),
-    subscribe: vi.fn((callback: () => void, _: Repo, documentId: DocumentId) => {
+    subscribe: vi.fn<DocumentCacheMock<TDocument>["subscribe"]>((callback, _: Repo, documentId) => {
       const callbacks = subscribers.get(documentId) ?? new Set<() => void>();
 
       callbacks.add(callback);
