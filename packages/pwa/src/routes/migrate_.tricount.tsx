@@ -11,6 +11,7 @@ import { Button } from "#src/ui/Button.tsx";
 import { createPartyFromMigrationData, type MigrationData } from "#src/models/migration.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import { getAppLink } from "#src/lib/link.ts";
+import { extractTricountId } from "#src/lib/tricount.ts";
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
@@ -29,22 +30,6 @@ function RouteComponent() {
     case "error":
       return <ErrorState {...state} />;
   }
-}
-
-function extractTricountId(input: string): string | null {
-  // Check if it's a tricount.com URL (standalone or within text)
-  const urlMatch = input.match(/https?:\/\/(?:www\.)?tricount\.com\/([a-zA-Z0-9]+)/);
-  if (urlMatch) {
-    return urlMatch[1];
-  }
-
-  // Check if it's already a direct key (alphanumeric string)
-  const keyMatch = input.match(/^[a-zA-Z0-9]+$/);
-  if (keyMatch) {
-    return input;
-  }
-
-  return null;
 }
 
 function validateTricountKey(value: string) {
@@ -95,12 +80,20 @@ function useMigrateTricount() {
     });
 
     try {
-      const response = await fetch(getAppLink(`/api/migrate?key=${key}`));
-      const data = (await response.json()) as MigrationData;
+      const response = await fetch(getAppLink(`/api/migrate?key=${encodeURIComponent(key)}`));
+      const data = (await response.json()) as MigrationData | { error?: unknown };
+
+      if (!response.ok) {
+        const message =
+          typeof data === "object" && data && "error" in data && typeof data.error === "string"
+            ? data.error
+            : response.statusText;
+        throw new Error(message);
+      }
 
       const partyId = await createPartyFromMigrationData({
         repo,
-        data,
+        data: data as MigrationData,
         importAttachments,
         onProgress: (progress) => {
           setState({
