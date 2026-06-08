@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@2.29.8/schema.json",
-  "changelog": "@changesets/cli/changelog",
+  "changelog": ["@changesets/changelog-github", { "repo": "HorusGoul/trizum" }],
   "commit": false,
   "fixed": [["@trizum/mobile", "@trizum/pwa"]],
   "linked": [],

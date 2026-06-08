@@ -48,6 +48,8 @@ description:
 6. Write/update PR body explicitly using `.github/pull_request_template.md`:
    - Fill every section with concrete content for this change.
    - Replace all placeholder comments (`<!-- ... -->`).
+   - Link related issues without closing keywords, for example
+     `Related to #123`; issue-closing keywords belong in changeset bodies.
    - Keep bullets/checkboxes where template expects them.
    - If PR already exists, refresh body content so it reflects the total PR
      scope (all intended work on the branch), not just the newest commits,
