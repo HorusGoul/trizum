@@ -60,7 +60,7 @@ jobs:
       group: pwa-production
       cancel-in-progress: false
     environment:
-      name: production
+      name: pwa-production
       url: ${{ steps.deploy.outputs.deployment-url }}
     timeout-minutes: 15
     steps:
