@@ -91,3 +91,79 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           packageManager: npm
           workingDirectory: packages/pwa
+
+  build-mobile-android-release-apk:
+    name: Build Mobile Android Release APK
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
+    permissions:
+      contents: read
+    uses: ./.github/workflows/mobile-build.yml
+    with:
+      platform: android
+      build_type: release
+      android_artifact: apk
+    secrets: inherit
+
+  deploy-mobile-android-production:
+    name: Deploy Mobile Android Production
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
+    permissions:
+      contents: read
+    uses: ./.github/workflows/android-playstore-deploy.yml
+    with:
+      track: production
+      release_status: completed
+    secrets: inherit
+
+  deploy-mobile-ios-production:
+    name: Deploy Mobile iOS Production
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ios-appstore-deploy.yml
+    with:
+      submit_for_review: true
+      automatic_release: true
+    secrets: inherit
+
+  attach-mobile-android-release-assets:
+    name: Attach Mobile Android Release Assets
+    needs: [build-mobile-android-release-apk, deploy-mobile-android-production]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
+    permissions:
+      contents: write
+    steps:
+      - name: Download signed APK artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: android-release-apk
+          path: release-assets/apk
+
+      - name: Download signed AAB artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: android-playstore-aab
+          path: release-assets/aab
+
+      - name: Attach Android release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#@trizum/mobile@}"
+          apk_path="$(find release-assets/apk -name "*.apk" -print -quit)"
+          aab_path="$(find release-assets/aab -name "*.aab" -print -quit)"
+
+          if [ -z "$apk_path" ] || [ -z "$aab_path" ]; then
+            echo "Missing Android APK or AAB artifact" >&2
+            exit 1
+          fi
+
+          cp "$apk_path" "trizum-mobile-${version}-signed.apk"
+          cp "$aab_path" "trizum-mobile-${version}-signed.aab"
+          gh release upload "$RELEASE_TAG" \
+            "trizum-mobile-${version}-signed.apk" \
+            "trizum-mobile-${version}-signed.aab" \
+            --clobber

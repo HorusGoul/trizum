@@ -22,6 +22,16 @@ on:
           - draft
           - completed
           - halted
+  workflow_call:
+    inputs:
+      track:
+        description: "Play Store track to deploy to"
+        required: true
+        type: string
+      release_status:
+        description: "Release status"
+        required: true
+        type: string
 
 concurrency:
   group: android-playstore-deploy
@@ -37,6 +47,8 @@ jobs:
     name: Generate Screenshots
     needs: [check-pending-changesets]
     uses: ./.github/workflows/screenshots.yml
+    with:
+      artifact_name: android-screenshots
 
   deploy:
     name: Build & Deploy to Play Store
@@ -72,7 +84,7 @@ jobs:
       - name: Download screenshots artifact
         uses: actions/download-artifact@v8
         with:
-          name: screenshots
+          name: android-screenshots
           path: packages/screenshots/screenshots
 
       - name: Organize screenshots for fastlane

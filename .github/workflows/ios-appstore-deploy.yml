@@ -13,6 +13,18 @@ on:
         required: false
         default: false
         type: boolean
+  workflow_call:
+    inputs:
+      submit_for_review:
+        description: "Submit for App Store review"
+        required: false
+        default: false
+        type: boolean
+      automatic_release:
+        description: "Automatically release after approval"
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ios-appstore-deploy
@@ -28,6 +40,8 @@ jobs:
     name: Generate Screenshots
     needs: [check-pending-changesets]
     uses: ./.github/workflows/screenshots.yml
+    with:
+      artifact_name: ios-screenshots
 
   deploy:
     name: Build & Deploy to App Store
@@ -57,7 +71,7 @@ jobs:
       - name: Download screenshots artifact
         uses: actions/download-artifact@v8
         with:
-          name: screenshots
+          name: ios-screenshots
           path: packages/screenshots/screenshots
 
       - name: Organize screenshots for fastlane
