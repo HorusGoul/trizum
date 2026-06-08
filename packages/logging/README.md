@@ -11,8 +11,8 @@ For repo-wide guidance on what to log and which severity level to use, see
 
 ## Canonical Sources
 
-- [`package.json`](./package.json) is the source of truth for package scripts
-  and dependencies.
+- [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
+  are the source of truth for package tasks, scripts, and dependencies.
 - [`src/index.ts`](./src/index.ts) contains the shared category and
   configuration helpers.
 - [`src/github-actions.ts`](./src/github-actions.ts) contains the GitHub
@@ -34,7 +34,9 @@ For repo-wide guidance on what to log and which severity level to use, see
 
 ## Validation
 
-Run the package scripts defined in [`package.json`](./package.json):
+Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts)
+and [`package.json`](./package.json):
 
 - `vp run check`
+- `vp run test`
 - `vp run build`

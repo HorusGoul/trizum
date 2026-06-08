@@ -7,7 +7,8 @@ Fastlane screenshot handoff.
 
 ## Canonical Sources
 
-- [`package.json`](./package.json) is the source of truth for package scripts.
+- [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
+  are the source of truth for package tasks and scripts.
 - [`src/main.ts`](./src/main.ts) captures screenshots across locales and device
   profiles.
 - [`src/organize-for-fastlane.ts`](./src/organize-for-fastlane.ts) reshapes the
@@ -23,7 +24,8 @@ Fastlane screenshot handoff.
 
 ## Validation
 
-Run the package scripts defined in [`package.json`](./package.json):
+Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts)
+and [`package.json`](./package.json):
 
 - `vp run check`
 - `vp run setup` on first use to install Playwright browser dependencies with

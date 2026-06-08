@@ -18,7 +18,3 @@ declare module "*.po" {
 declare module "@fontsource-variable/fira-code";
 
 declare module "@fontsource-variable/inter";
-
-declare module "#src/generated/iconSprite.gen.js" {
-  export type SpriteId = string;
-}

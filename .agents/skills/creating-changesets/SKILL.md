@@ -1,11 +1,11 @@
 ---
 name: creating-changesets
 description: "Creates changesets for semantic versioning. Use when adding changesets, preparing releases, determining version bumps (patch/minor/major), generating changelog entries, or documenting breaking changes."
-allowed-tools: "Read, Grep, Glob, Write, Edit, Bash(git:*), Bash(npx changeset:*)"
+allowed-tools: "Read, Grep, Glob, Write, Edit, Bash(git:*), Bash(vp exec changeset:*)"
 metadata:
   author: Ollie Shop
   version: 1.0.0
-compatibility: "Claude Code with Node.js >=20, pnpm, TypeScript 5.5+"
+compatibility: "Claude Code or Codex with Vite+, Node.js 24+, TypeScript 5.9+"
 ---
 
 # Changeset & Release Manager
@@ -66,7 +66,7 @@ A changeset is a markdown file in the `.changeset/` directory that describes:
 ### Interactive Method
 
 ```bash
-pnpm changeset
+vp exec changeset
 ```
 
 Follow the prompts:
@@ -80,14 +80,14 @@ Create a file in `.changeset/` with a random name:
 
 ```markdown
 ---
-"@saleor/configurator": minor
+"@trizum/pwa": minor
 ---
 
-Add support for reference attributes with entityType field
+Add party invite QR code sharing
 
-- Attributes of type REFERENCE now require an entityType field
-- Introspection properly captures entity type references
-- Deploy correctly handles reference attribute creation
+- Adds an in-app QR share flow for party invites
+- Keeps generated share links compatible with existing invite URLs
+- Includes validation for malformed invite payloads
 ```
 
 ### File Format
@@ -110,7 +110,7 @@ Optional longer description with:
 ### 1. Create Changeset
 
 ```bash
-pnpm changeset
+vp exec changeset
 git add .changeset/
 git commit -m "chore: add changeset for feature"
 ```
@@ -134,10 +134,10 @@ git commit -m "chore: add changeset for feature"
 
 ```bash
 # See what changesets exist
-npx changeset status
+vp exec changeset status
 
 # Preview version bump
-npx changeset version --dry-run
+vp exec changeset version --dry-run
 ```
 
 ## Common Mistakes

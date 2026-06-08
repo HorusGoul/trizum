@@ -6,7 +6,8 @@ then use this document to decide where to work inside the PWA.
 
 ## Canonical Sources
 
-- [`package.json`](./package.json) is the source of truth for package scripts.
+- [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
+  are the source of truth for package tasks and scripts.
 - [`src/routes`](./src/routes) contains route entry points.
 - [`src/ui`](./src/ui) contains the shared design-system components.
 - [`src/components`](./src/components) contains app-specific UI.
@@ -29,9 +30,11 @@ then use this document to decide where to work inside the PWA.
 
 ## Validation
 
-Run the package scripts defined in [`package.json`](./package.json):
+Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts)
+and [`package.json`](./package.json):
 
 - `vp run check`
+- `vp run test`
 - `vp run build`
 - `vp run lingui:extract` when copy changes
 

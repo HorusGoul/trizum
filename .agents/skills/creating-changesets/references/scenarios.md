@@ -4,91 +4,87 @@
 
 ```markdown
 ---
-"@saleor/configurator": patch
+"@trizum/pwa": patch
 ---
 
-Fix category parent reference not being set during deployment
+Fix duplicate expense save submissions
 
-Categories with parent slugs now correctly link to their parent
-categories during the deploy operation.
+Rapidly tapping save on an expense editor now creates a single expense instead
+of submitting duplicate writes.
 ```
 
 ## New Feature
 
 ```markdown
 ---
-"@saleor/configurator": minor
+"@trizum/pwa": minor
 ---
 
-Add diff command for previewing configuration changes
+Add settlement summary sharing
 
-New `diff` command shows what would change before deploying:
-- Displays creates, updates, and deletes
-- Color-coded output for easy reading
-- Supports `--json` flag for programmatic use
+Parties can now share a summary of current balances:
+- Includes the current settlement plan
+- Uses existing party share affordances
+- Keeps generated copy localized through Lingui
 ```
 
 ## Breaking Change
 
 ```markdown
 ---
-"@saleor/configurator": major
+"@trizum/pwa": major
 ---
 
-Change attribute configuration format
+Change invite payload format
 
-**BREAKING**: Attribute values are now defined inline instead of by reference.
+**BREAKING**: Party invites now encode the Automerge document URL and display
+metadata in a versioned payload.
 
 Before:
-```yaml
-attributes:
-  - name: Color
-    values:
-      - red
-      - blue
+```json
+{
+  "partyId": "..."
+}
 ```
 
 After:
-```yaml
-attributes:
-  - name: Color
-    values:
-      - name: Red
-        slug: red
-      - name: Blue
-        slug: blue
+```json
+{
+  "version": 2,
+  "documentUrl": "...",
+  "name": "Trip"
+}
 ```
 
-Migration: Update your config.yml to use the new format.
+Migration: Regenerate active party invite links after upgrading.
 ```
 
 ## Multiple Related Changes
 
 ```markdown
 ---
-"@saleor/configurator": minor
+"@trizum/server": minor
 ---
 
-Improve deployment reliability and progress reporting
+Improve sync server observability
 
-- Add retry logic for failed GraphQL operations
-- Display progress bar during bulk deployments
-- Report partial failures at the end of deployment
-- Add `--continue-on-error` flag to proceed despite failures
+- Add structured logs for sync sessions
+- Report health check latency
+- Include deployment commit metadata in startup logs
 ```
 
-## Reference Attributes Support
+## PWA Accessibility Improvements
 
 ```markdown
 ---
-"@saleor/configurator": minor
+"@trizum/pwa": patch
 ---
 
-Add support for reference attributes with entityType field
+Improve accessibility labels for expense actions
 
-- Attributes of type REFERENCE now require an entityType field
-- Introspection properly captures entity type references
-- Deploy correctly handles reference attribute creation
+- Adds accessible labels to icon-only expense action buttons
+- Improves screen reader names for share and delete controls
+- Keeps visual styling unchanged
 ```
 
 ## Consolidated Changeset Example
@@ -97,17 +93,16 @@ When multiple changesets should be combined before release:
 
 ```markdown
 ---
-"@saleor/configurator": minor
+"@trizum/pwa": minor
 ---
 
-Multiple improvements to bulk operations
+Multiple improvements to party sharing
 
 This release includes several related improvements:
 
-- Add retry logic for failed GraphQL operations (#123)
-- Display progress bar during bulk deployments (#124)
-- Report partial failures at the end of deployment (#125)
-- Add `--continue-on-error` flag (#126)
+- Add QR code invite sharing (#123)
+- Improve copied invite message text (#124)
+- Add validation for expired invites (#125)
 ```
 
 ## Writing Good Descriptions
@@ -116,22 +111,22 @@ This release includes several related improvements:
 
 ```markdown
 ---
-"@saleor/configurator": minor
+"@trizum/pwa": minor
 ---
 
-Add bulk product import command
+Add recurring expense templates
 
-New `import` command allows importing products from CSV files:
-- Supports mapping CSV columns to product fields
-- Validates data before import
-- Reports import progress and errors
+Parties can now create reusable expense templates:
+- Supports common payer and split combinations
+- Validates template data before saving
+- Reuses the existing expense editor flow
 ```
 
 ### Don'ts
 
 ```markdown
 ---
-"@saleor/configurator": patch
+"@trizum/pwa": patch
 ---
 
 fix bug
@@ -191,11 +186,11 @@ For beta/alpha releases:
 
 ```bash
 # Enter pre-release mode
-npx changeset pre enter beta
+vp exec changeset pre enter beta
 
 # Create changesets as normal
-pnpm changeset
+vp exec changeset
 
 # Exit pre-release mode
-npx changeset pre exit
+vp exec changeset pre exit
 ```

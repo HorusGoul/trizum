@@ -32,4 +32,5 @@ The following Vite+ tasks are available:
 
 - `vp run dev`. Starts the compiler in watch mode.
 - `vp run check`. Runs the package validation script.
+- `vp run test`. Runs the package unit tests.
 - `vp run build`. Builds the package.

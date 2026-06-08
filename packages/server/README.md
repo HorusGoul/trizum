@@ -6,7 +6,8 @@ touches server runtime, database, or deployment concerns.
 
 ## Canonical Sources
 
-- [`package.json`](./package.json) is the source of truth for server scripts.
+- [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
+  are the source of truth for server tasks and scripts.
 - [`src/main.ts`](./src/main.ts) is the runtime entry point.
 - [`src/db.ts`](./src/db.ts) and [`src/db`](./src/db) cover database setup and
   data access.
@@ -23,7 +24,8 @@ touches server runtime, database, or deployment concerns.
 
 ## Validation
 
-Run the package scripts defined in [`package.json`](./package.json):
+Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts)
+and [`package.json`](./package.json):
 
 - `vp run check`
 - `vp run dev` or `vp run start` when validating runtime behavior
