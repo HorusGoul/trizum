@@ -61,7 +61,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: pwa-production
-      url: ${{ steps.deploy.outputs.deployment-url }}
+      url: https://trizum.app
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
