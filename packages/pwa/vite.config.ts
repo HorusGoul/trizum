@@ -104,6 +104,7 @@ export default defineConfig(({ mode }) => {
         "icons:generate": {
           command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
           dependsOn: ["@trizum/icon-sprite#build"],
+          input: [{ auto: true }, "!src/generated/**"],
           output: ["src/generated/iconSprite.svg", "src/generated/iconSprite.gen.ts"],
         },
         preview: {
