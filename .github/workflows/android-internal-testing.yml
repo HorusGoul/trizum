@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: android-internal-testing-pr-${{ github.event.pull_request.number }}
@@ -74,6 +75,11 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           GOOGLE_PLAY_JSON_KEY_FILE: ${{ github.workspace }}/packages/mobile/android/play-store-key.json
         run: bundle exec fastlane deploy_internal_testing
+
+      - name: Remove internal testing label
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit ${{ github.event.pull_request.number }} --remove-label "android:internal-testing"
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v6
