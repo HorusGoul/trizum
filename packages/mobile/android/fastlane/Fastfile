@@ -27,12 +27,17 @@ platform :android do
   end
 
   desc "Build release APK"
-  lane :build_release do
+  lane :build_release do |options|
+    properties = signing_properties
+    if options[:version_code]
+      properties["trizumVersionCode"] = options[:version_code].to_s
+    end
+
     gradle(
       task: "assemble",
       build_type: "Release",
       print_command: true,
-      properties: signing_properties
+      properties: properties
     )
   end
 
@@ -69,10 +74,12 @@ platform :android do
   lane :deploy_internal_testing do
     version_code = next_internal_testing_version_code
     build_aab(version_code: version_code)
+    aab_path = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    build_release(version_code: version_code)
     upload_to_play_store(
       track: "internal",
       release_status: "completed",
-      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      aab: aab_path,
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
       skip_upload_images: true,

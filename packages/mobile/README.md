@@ -308,12 +308,14 @@ A `workflow_dispatch` workflow is available for building mobile apps in CI. Navi
 - **Android artifact**: `apk` or `aab` (for release builds)
 - **iOS export method**: `app-store` or `ad-hoc` (for release builds)
 
-Add the `android:internal-testing` label to a non-fork pull request to build a
-signed Android App Bundle from the PR head and upload it to the Google Play
-internal testing track. The workflow computes a temporary Android `versionCode`
-from the highest version code already present in Play Store tracks and fails
-before it reaches the next release version-code range, so PR uploads do not
-silently block the next production patch release.
+Add the `android:internal-testing` label to a non-fork pull request to build
+signed Android APK and AAB artifacts from the PR head, upload the AAB to the
+Google Play internal testing track, and comment on the PR with links to both
+artifacts. The workflow computes a temporary Android `versionCode` from the
+highest version code already present in Play Store tracks and fails before it
+reaches the next release version-code range, so PR uploads do not silently block
+the next production patch release. After a successful internal release and PR
+comment, the workflow removes the label.
 
 Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
 trigger the shared release workflow. That path reuses the mobile build and

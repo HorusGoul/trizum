@@ -77,12 +77,95 @@ jobs:
           GOOGLE_PLAY_JSON_KEY_FILE: ${{ github.workspace }}/packages/mobile/android/play-store-key.json
         run: bundle exec fastlane deploy_internal_testing
 
+      - name: Collect Android artifact metadata
+        id: android_artifacts
+        run: |
+          apk_path="$(find packages/mobile/android/app/build/outputs/apk/release -type f -name "*.apk" | sort | head -n 1)"
+          aab_path="$(find packages/mobile/android/app/build/outputs/bundle/release -type f -name "*.aab" | sort | head -n 1)"
+
+          if [ -z "$apk_path" ]; then
+            echo "Missing release APK" >&2
+            exit 1
+          fi
+
+          if [ -z "$aab_path" ]; then
+            echo "Missing release AAB" >&2
+            exit 1
+          fi
+
+          build_tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
+          version_code="$("$build_tools_dir/aapt" dump badging "$apk_path" | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")"
+
+          if [ -z "$version_code" ]; then
+            echo "Unable to determine APK versionCode" >&2
+            exit 1
+          fi
+
+          echo "apk_path=$apk_path" >> "$GITHUB_OUTPUT"
+          echo "aab_path=$aab_path" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+
+      - name: Upload APK artifact
+        id: upload_apk_artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: android-internal-testing-apk
+          path: ${{ steps.android_artifacts.outputs.apk_path }}
+          retention-days: 14
+
       - name: Upload AAB artifact
+        id: upload_aab_artifact
         uses: actions/upload-artifact@v6
         with:
           name: android-internal-testing-aab
-          path: packages/mobile/android/app/build/outputs/bundle/**/*.aab
+          path: ${{ steps.android_artifacts.outputs.aab_path }}
           retention-days: 14
+
+      - name: Comment with Android artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          APK_ARTIFACT_URL: ${{ steps.upload_apk_artifact.outputs.artifact-url }}
+          AAB_ARTIFACT_URL: ${{ steps.upload_aab_artifact.outputs.artifact-url }}
+          VERSION_CODE: ${{ steps.android_artifacts.outputs.version_code }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          marker="<!-- trizum-android-internal-testing-artifacts -->"
+          body_file="$(mktemp)"
+
+          cat > "$body_file" <<EOF
+          $marker
+          Android internal testing build is ready.
+
+          - APK: [download artifact]($APK_ARTIFACT_URL)
+          - AAB: [download artifact]($AAB_ARTIFACT_URL)
+          - Play Store track: internal testing
+          - Version code: \`$VERSION_CODE\`
+          - Workflow run: [#${GITHUB_RUN_NUMBER}]($RUN_URL)
+
+          Artifacts are retained for 14 days and require GitHub access to this repository.
+          EOF
+
+          comment_id="$(
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --paginate \
+              --jq '.[] | select(.body | contains("<!-- trizum-android-internal-testing-artifacts -->")) | .id' \
+              | tail -n 1
+          )"
+
+          if [ -n "$comment_id" ]; then
+            gh api \
+              --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" \
+              --field body="$(cat "$body_file")" \
+              --silent
+          else
+            gh api \
+              --method POST \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --field body="$(cat "$body_file")" \
+              --silent
+          fi
 
       - name: Remove internal testing label
         env:
