@@ -1,5 +1,25 @@
 # @trizum/pwa
 
+## 1.9.0
+
+### Minor Changes
+
+- [#177](https://github.com/HorusGoul/trizum/pull/177) [`9f8611e`](https://github.com/HorusGoul/trizum/commit/9f8611e8994886becbc9945e2c67f82f54a17430) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Release the next minor version of the PWA.
+
+### Patch Changes
+
+- [#176](https://github.com/HorusGoul/trizum/pull/176) [`7c6e272`](https://github.com/HorusGoul/trizum/commit/7c6e272d04128c4d8d422c9d65166d9dc338a46e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix Android expense and avatar camera buttons opening the gallery instead of camera capture.
+
+- [#163](https://github.com/HorusGoul/trizum/pull/163) [`162e385`](https://github.com/HorusGoul/trizum/commit/162e385c74b8b5d06df33f4bc90542f36c570ec2) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix Tricount imports from localized share URLs.
+
+- [#156](https://github.com/HorusGoul/trizum/pull/156) [`a2881ed`](https://github.com/HorusGoul/trizum/commit/a2881edf589180216b031fd4c7db3f20fae722d6) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Improve accessible labels for PWA media inputs, QR scanning, and icon-only actions.
+
+- [#174](https://github.com/HorusGoul/trizum/pull/174) [`78c5a03`](https://github.com/HorusGoul/trizum/commit/78c5a034cce38d90c004b422fc36091ac7baaeb4) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent Android startup from invoking Google Play in-app update checks on unsupported installs or devices without Google Play support.
+
+- [#158](https://github.com/HorusGoul/trizum/pull/158) [`f27ff00`](https://github.com/HorusGoul/trizum/commit/f27ff00cdf06d88d5bd1f4a702f8784c461f62ba) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent duplicate Expense Editor saves while an existing save is still in progress.
+
+- [#164](https://github.com/HorusGoul/trizum/pull/164) [`9e6893a`](https://github.com/HorusGoul/trizum/commit/9e6893a77e4bb31be3a9695f58aef50cf92edd61) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Preserve Tricount ratio part counts during import so expenses split by parts reopen with the original participant counts in the editor.
+
 ## 1.8.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@trizum/pwa",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "private": true,
   "description": "Split bills with friends and family. Track, calculate, and settle expenses together.",
   "type": "module",
