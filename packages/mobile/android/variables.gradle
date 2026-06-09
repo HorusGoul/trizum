@@ -13,4 +13,6 @@ ext {
     androidxJunitVersion = '1.2.1'
     androidxEspressoCoreVersion = '3.6.1'
     cordovaAndroidVersion = '10.1.1'
+    androidPlayAppUpdateVersion = '2.1.0'
+    androidPlayServicesBaseVersion = '18.9.0'
 }

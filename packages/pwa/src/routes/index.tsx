@@ -17,6 +17,7 @@ import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
+import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
 
 let hasRedirectedThisSession = false;
 
@@ -89,9 +90,14 @@ function Index() {
             <IconButton
               icon={isUpdating ? "lucide.refresh-cw" : "lucide.circle-arrow-down"}
               aria-label={t`Update available`}
-              onPress={() => {
+              onPress={async () => {
                 setIsUpdating(true);
-                update();
+                try {
+                  const result = await update();
+                  showUpdateResultFeedback(result);
+                } finally {
+                  setIsUpdating(false);
+                }
               }}
               className="mr-2"
               iconClassName={cn(

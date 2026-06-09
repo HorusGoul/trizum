@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { useRegisterSW } from "virtual:pwa-register/react";
-import { UpdateContext } from "./UpdateContext";
+import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
+import { type UpdateResult, UpdateContext } from "./UpdateContext";
 import { useRef } from "react";
 import { toast } from "sonner";
 
@@ -26,18 +27,24 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
       toast(t`Update available`, {
         action: {
           label: t`Reload`,
-          onClick: () => update(),
+          onClick: () => void update().then(showUpdateResultFeedback),
         },
         id: UPDATE_TOAST_ID,
       });
     },
   });
 
-  function update() {
+  async function update(): Promise<UpdateResult> {
     toast.loading(t`Updating trizum...`, {
       id: UPDATE_TOAST_ID,
     });
-    void updateServiceWorker(true);
+    try {
+      await updateServiceWorker(true);
+      return { status: "started" };
+    } catch {
+      toast.dismiss(UPDATE_TOAST_ID);
+      return { status: "failed" };
+    }
   }
 
   return (

@@ -10,7 +10,7 @@ PODS:
     - Capacitor
   - CapacitorSplashScreen (8.0.0):
     - Capacitor
-  - CapawesomeCapacitorAppUpdate (8.0.1):
+  - CapawesomeCapacitorAppUpdate (8.0.3):
     - Capacitor
 
 DEPENDENCIES:
@@ -20,7 +20,7 @@ DEPENDENCIES:
   - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.0.1/node_modules/capacitor-plugin-safe-area`)"
   - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/splash-screen`)"
-  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.1_@capacitor+core@8.0.1/node_modules/@capawesome/capacitor-app-update`)"
+  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.0.1/node_modules/@capawesome/capacitor-app-update`)"
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -36,7 +36,7 @@ EXTERNAL SOURCES:
   CapacitorSplashScreen:
     :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.0_@capacitor+core@8.0.1/node_modules/@capacitor/splash-screen"
   CapawesomeCapacitorAppUpdate:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.1_@capacitor+core@8.0.1/node_modules/@capawesome/capacitor-app-update"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.0.1/node_modules/@capawesome/capacitor-app-update"
 
 SPEC CHECKSUMS:
   Capacitor: ff35b0f66370b84aa238251b35b91886a3207c16
@@ -45,8 +45,8 @@ SPEC CHECKSUMS:
   CapacitorPluginSafeArea: 9d0682951c011bf0b36e513a89103c5fbff7ac49
   CapacitorShare: 12f1d192170cbcf9f108fd675ac8e343761a4638
   CapacitorSplashScreen: 422880d7117605c30699eb4b21644b62db42e86c
-  CapawesomeCapacitorAppUpdate: b51cf29f28f664ef942feb12a76116d87eee62f0
+  CapawesomeCapacitorAppUpdate: 3a7537c6a6696837b51d06f26b2e909fd7b9226f
 
-PODFILE CHECKSUM: 056ec261bc54f6ac6e378c27ef5567f13b345d0e
+PODFILE CHECKSUM: 8b7ae295054fdc39c14ab12f5c0061db0b61d83f
 
 COCOAPODS: 1.16.2
