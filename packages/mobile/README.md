@@ -319,10 +319,12 @@ comment, the workflow removes the label.
 
 Add the `ios:testflight` label to a non-fork pull request to build a signed iOS
 release from the PR head and upload it to TestFlight. The workflow computes a
-temporary iOS build number from the highest TestFlight build already present
-for the current app version and fails before it reaches the next release
-build-number range. After a successful TestFlight upload, the workflow comments
-on the PR with the TestFlight version/build details and removes the label.
+temporary iOS version/build pair from the next patch TestFlight train, then
+fails before it reaches the following patch's build-number range. This avoids
+uploading to a released App Store train that App Store Connect has already
+closed for new pre-release builds. After a successful TestFlight upload, the
+workflow comments on the PR with the TestFlight version/build details and
+removes the label.
 
 Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
 trigger the shared release workflow. That path reuses the mobile build and

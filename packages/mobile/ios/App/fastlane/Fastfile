@@ -188,7 +188,12 @@ platform :ios do
 
   desc "Build and upload PR build to TestFlight"
   lane :deploy_pr_testflight do
-    build_number = next_pr_testflight_build_number
+    version = next_pr_testflight_version
+    build_number = next_pr_testflight_build_number(version: version)
+    increment_version_number(
+      version_number: version,
+      xcodeproj: "App.xcodeproj"
+    )
     build_release(build_number: build_number)
     upload_to_testflight(
       app_identifier: "app.trizum.capacitor",
@@ -356,11 +361,17 @@ platform :ios do
     UI.success("Current version: #{version} (#{build})")
   end
 
-  private_lane :next_pr_testflight_build_number do
+  private_lane :next_pr_testflight_version do
+    release_version = get_version_number(xcodeproj: "App.xcodeproj")
+    major, minor, patch = version_segments(release_version)
+    "#{major}.#{minor}.#{patch + 1}"
+  end
+
+  private_lane :next_pr_testflight_build_number do |options|
     load_api_key
 
-    version = get_version_number(xcodeproj: "App.xcodeproj")
-    base_build_number = get_build_number(xcodeproj: "App.xcodeproj").to_i
+    version = options[:version] || next_pr_testflight_version
+    base_build_number = build_number_base_for_version(version: version)
     next_release_build_number = base_build_number + 100
     latest_testflight_build = latest_testflight_build_number(
       app_identifier: "app.trizum.capacitor",
@@ -383,5 +394,19 @@ platform :ios do
       "next release range #{next_release_build_number})"
     )
     build_number
+  end
+
+  private_lane :build_number_base_for_version do |options|
+    major, minor, patch = version_segments(options[:version])
+    major * 10_000_000 + minor * 10_000 + patch * 100
+  end
+
+  def version_segments(version)
+    segments = version.to_s.split(".")
+    if segments.length != 3 || segments.any? { |segment| !segment.match?(/\A\d+\z/) }
+      UI.user_error!("Expected semantic version with three numeric parts, got #{version.inspect}")
+    end
+
+    segments.map(&:to_i)
   end
 end
