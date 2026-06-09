@@ -1,5 +1,16 @@
 # @trizum/mobile
 
+## 1.9.1
+
+### Patch Changes
+
+- [#179](https://github.com/HorusGoul/trizum/pull/179) [`2810b55`](https://github.com/HorusGoul/trizum/commit/2810b553a3b4fa960d84998a2fa17187f193a7fb) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Attach Android GitHub release assets as raw APK and AAB files.
+
+- [#180](https://github.com/HorusGoul/trizum/pull/180) [`13d97b3`](https://github.com/HorusGoul/trizum/commit/13d97b30b7e2e1695b94d7d5bffac316c715a829) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add the iOS photo library purpose string required for App Store submission and sync the iOS Camera pod.
+
+- Updated dependencies []:
+  - @trizum/pwa@1.9.1
+
 ## 1.9.0
 
 ### Patch Changes
