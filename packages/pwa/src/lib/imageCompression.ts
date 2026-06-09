@@ -49,6 +49,7 @@ const logger = getLogger("lib", "imageCompression");
 
 export const imageUploadAccept =
   "image/*,.heic,.heif,image/heic,image/heif,image/heic-sequence,image/heif-sequence";
+export const imageCaptureAccept = "image/*";
 
 export type ImageProcessingErrorCode = "heic_conversion_failed";
 

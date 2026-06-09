@@ -1,5 +1,10 @@
 import { describe, expect, test } from "vite-plus/test";
-import { imageUploadAccept, isHeicImageFile, isSupportedImageFile } from "./imageCompression";
+import {
+  imageCaptureAccept,
+  imageUploadAccept,
+  isHeicImageFile,
+  isSupportedImageFile,
+} from "./imageCompression";
 
 describe("image upload helpers", () => {
   test("detects HEIC and HEIF files from MIME type or extension", () => {
@@ -51,5 +56,9 @@ describe("image upload helpers", () => {
     expect(imageUploadAccept).toContain(".heif");
     expect(imageUploadAccept).toContain("image/heic");
     expect(imageUploadAccept).toContain("image/heif");
+  });
+
+  test("keeps camera capture accept narrow for Android WebView", () => {
+    expect(imageCaptureAccept).toBe("image/*");
   });
 });
