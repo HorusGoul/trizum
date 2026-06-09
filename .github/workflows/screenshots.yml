@@ -19,6 +19,7 @@ on:
 jobs:
   screenshots:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v6
@@ -28,6 +29,7 @@ jobs:
           cache: true
 
       - name: Build screenshots dependencies
+        timeout-minutes: 10
         run: vp run --filter @trizum/screenshots^... build
 
       - name: Install Playwright Browsers
@@ -36,10 +38,12 @@ jobs:
         working-directory: packages/screenshots
 
       - name: Take screenshots
+        timeout-minutes: 15
         run: vp run start
         working-directory: packages/screenshots
 
       - name: Upload screenshots
+        timeout-minutes: 5
         uses: actions/upload-artifact@v6
         with:
           name: ${{ inputs.artifact_name }}

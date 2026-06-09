@@ -47,6 +47,7 @@ jobs:
     name: Build & Deploy to App Store
     needs: [check-pending-changesets, screenshots]
     runs-on: macos-26
+    timeout-minutes: 110
     steps:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
@@ -64,17 +65,20 @@ jobs:
           working-directory: packages/mobile/ios/App
 
       - name: Build mobile web assets
+        timeout-minutes: 15
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Download screenshots artifact
+        timeout-minutes: 5
         uses: actions/download-artifact@v8
         with:
           name: ios-screenshots
           path: packages/screenshots/screenshots
 
       - name: Organize screenshots for fastlane
+        timeout-minutes: 5
         working-directory: packages/screenshots
         run: |
           vp run organize:fastlane --platform ios --output ../mobile/ios/App/fastlane/screenshots
@@ -83,6 +87,7 @@ jobs:
           ls -la ../mobile/ios/App/fastlane/screenshots/en-US/ || true
 
       - name: Build and Deploy to App Store
+        timeout-minutes: 80
         working-directory: packages/mobile/ios/App
         env:
           IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
@@ -98,6 +103,7 @@ jobs:
             automatic_release:${{ inputs.automatic_release }}
 
       - name: Upload IPA artifact
+        timeout-minutes: 5
         uses: actions/upload-artifact@v6
         with:
           name: ios-appstore-ipa
@@ -105,6 +111,7 @@ jobs:
           retention-days: 14
 
       - name: Upload dSYM artifact
+        timeout-minutes: 5
         uses: actions/upload-artifact@v6
         with:
           name: ios-dsym
