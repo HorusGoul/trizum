@@ -66,6 +66,7 @@ jobs:
     name: Build Android
     if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
@@ -89,12 +90,14 @@ jobs:
           working-directory: packages/mobile/android
 
       - name: Build mobile
+        timeout-minutes: 8
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Decode Android keystore
         if: ${{ inputs.build_type == 'release' }}
+        timeout-minutes: 2
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
@@ -102,11 +105,13 @@ jobs:
 
       - name: Build Android Debug
         if: ${{ inputs.build_type == 'debug' }}
+        timeout-minutes: 15
         working-directory: packages/mobile/android
         run: bundle exec fastlane build_debug
 
       - name: Build Android Release APK
         if: ${{ inputs.build_type == 'release' && inputs.android_artifact == 'apk' }}
+        timeout-minutes: 20
         working-directory: packages/mobile/android
         env:
           ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/packages/mobile/android/app/release.keystore
@@ -117,6 +122,7 @@ jobs:
 
       - name: Build Android Release AAB
         if: ${{ inputs.build_type == 'release' && inputs.android_artifact == 'aab' }}
+        timeout-minutes: 20
         working-directory: packages/mobile/android
         env:
           ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/packages/mobile/android/app/release.keystore
@@ -127,6 +133,7 @@ jobs:
 
       - name: Upload Android APK artifact
         if: ${{ inputs.android_artifact == 'apk' }}
+        timeout-minutes: 2
         uses: actions/upload-artifact@v6
         with:
           name: android-${{ inputs.build_type }}-apk
@@ -135,6 +142,7 @@ jobs:
 
       - name: Upload Android AAB artifact
         if: ${{ inputs.build_type == 'release' && inputs.android_artifact == 'aab' }}
+        timeout-minutes: 2
         uses: actions/upload-artifact@v6
         with:
           name: android-release-aab
@@ -145,6 +153,7 @@ jobs:
     name: Build iOS
     if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
     runs-on: macos-26
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v6
       - uses: voidzero-dev/setup-vp@v1
@@ -162,17 +171,20 @@ jobs:
           working-directory: packages/mobile/ios/App
 
       - name: Build mobile
+        timeout-minutes: 8
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Build iOS Debug
         if: ${{ inputs.build_type == 'debug' }}
+        timeout-minutes: 15
         working-directory: packages/mobile/ios/App
         run: bundle exec fastlane build_debug
 
       - name: Build iOS Release (App Store)
         if: ${{ inputs.build_type == 'release' && inputs.ios_export_method == 'app-store' }}
+        timeout-minutes: 20
         working-directory: packages/mobile/ios/App
         env:
           IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
@@ -185,6 +197,7 @@ jobs:
 
       - name: Build iOS Release (Ad Hoc)
         if: ${{ inputs.build_type == 'release' && inputs.ios_export_method == 'ad-hoc' }}
+        timeout-minutes: 20
         working-directory: packages/mobile/ios/App
         env:
           IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
@@ -197,6 +210,7 @@ jobs:
 
       - name: Upload iOS IPA artifact
         if: ${{ inputs.build_type == 'release' }}
+        timeout-minutes: 2
         uses: actions/upload-artifact@v6
         with:
           name: ios-${{ inputs.ios_export_method }}-ipa
@@ -205,6 +219,7 @@ jobs:
 
       - name: Upload iOS dSYM artifact
         if: ${{ inputs.build_type == 'release' }}
+        timeout-minutes: 2
         uses: actions/upload-artifact@v6
         with:
           name: ios-dsym
