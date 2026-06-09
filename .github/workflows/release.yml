@@ -134,19 +134,19 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v6
+
       - name: Download signed APK artifact
         uses: actions/download-artifact@v8
         with:
           name: android-release-apk
           path: release-assets/apk
-          skip-decompress: false
 
       - name: Download signed AAB artifact
         uses: actions/download-artifact@v8
         with:
           name: android-playstore-aab
           path: release-assets/aab
-          skip-decompress: false
 
       - name: Attach Android release assets
         env:
@@ -168,5 +168,4 @@ jobs:
           gh release upload "$RELEASE_TAG" \
             "trizum-mobile-${version}-signed.apk" \
             "trizum-mobile-${version}-signed.aab" \
-            --repo "$GITHUB_REPOSITORY" \
             --clobber
