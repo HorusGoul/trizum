@@ -8,9 +8,15 @@ import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useM
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
 import {
   compressionPresets,
+  imageCaptureAccept,
   imageUploadAccept,
   isSupportedImageFile,
 } from "#src/lib/imageCompression.js";
+import {
+  getNativeCameraCaptureFile,
+  isNativeCameraCancel,
+  shouldUseNativeCameraCapture,
+} from "#src/lib/nativeCamera.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -32,8 +38,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
   const { createMediaFile } = useMediaFileActions();
   const [isUploading, setIsUploading] = useState(false);
 
-  async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
+  async function updateAvatarFromFile(file: File) {
     if (!file) return;
 
     // Validate file type
@@ -72,6 +77,16 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
       );
     } finally {
       setIsUploading(false);
+    }
+  }
+
+  async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await updateAvatarFromFile(file);
+    } finally {
       // Reset the input value to allow selecting the same file again
       event.target.value = "";
     }
@@ -82,8 +97,24 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
     toast.success(t`Avatar removed`);
   }
 
-  function openCamera() {
-    cameraInputRef.current?.click();
+  async function openCamera() {
+    if (!shouldUseNativeCameraCapture()) {
+      cameraInputRef.current?.click();
+      return;
+    }
+
+    let file: File;
+    try {
+      file = await getNativeCameraCaptureFile();
+    } catch (error) {
+      if (!isNativeCameraCancel(error)) {
+        logger.error("Failed to capture avatar", { error });
+        toast.error(t`Failed to access camera`);
+      }
+      return;
+    }
+
+    await updateAvatarFromFile(file);
   }
 
   function openGallery() {
@@ -120,7 +151,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
 
       <div className="flex h-32 w-max flex-shrink-0 flex-col gap-2">
         <Button
-          onPress={openCamera}
+          onPress={() => void openCamera()}
           color="input-like"
           className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
         >
@@ -142,7 +173,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         type="file"
         aria-label={t`Take photo`}
         className="sr-only"
-        accept={imageUploadAccept}
+        accept={imageCaptureAccept}
         capture="environment"
         multiple={false}
         onChange={(event) => void onFileChange(event)}

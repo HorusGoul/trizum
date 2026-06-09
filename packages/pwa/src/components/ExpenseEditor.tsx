@@ -32,7 +32,16 @@ import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
-import { compressionPresets, imageUploadAccept } from "#src/lib/imageCompression.ts";
+import {
+  compressionPresets,
+  imageCaptureAccept,
+  imageUploadAccept,
+} from "#src/lib/imageCompression.ts";
+import {
+  getNativeCameraCaptureFile,
+  isNativeCameraCancel,
+  shouldUseNativeCameraCapture,
+} from "#src/lib/nativeCamera.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 
@@ -828,12 +837,16 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { createMediaFile } = useMediaFileActions();
 
-  async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  async function addPhotoFiles(files: Blob[]) {
+    if (files.length === 0) {
+      return;
+    }
+
     const toastId: string | number = toast.loading(t`Uploading...`);
 
     try {
       const photoIds = await Promise.all(
-        Array.from(event.target.files ?? []).map(async (blob) => {
+        files.map(async (blob) => {
           const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
           return mediaFileId;
         }),
@@ -848,13 +861,33 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         id: toastId,
       });
     }
+  }
+
+  async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    await addPhotoFiles(Array.from(event.target.files ?? []));
 
     // Reset the input value to allow the user to add more photos
     event.target.value = "";
   }
 
-  function openCamera() {
-    cameraInputRef.current?.click();
+  async function openCamera() {
+    if (!shouldUseNativeCameraCapture()) {
+      cameraInputRef.current?.click();
+      return;
+    }
+
+    let file: File;
+    try {
+      file = await getNativeCameraCaptureFile();
+    } catch (error) {
+      if (!isNativeCameraCancel(error)) {
+        logger.error("Failed to capture expense attachment", { error });
+        toast.error(t`Failed to access camera`);
+      }
+      return;
+    }
+
+    await addPhotoFiles([file]);
   }
 
   function openGallery() {
@@ -864,7 +897,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   return (
     <div className="flex h-32 w-max flex-shrink-0 flex-col gap-2">
       <Button
-        onPress={openCamera}
+        onPress={() => void openCamera()}
         color="input-like"
         className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-xl px-3 text-xs"
       >
@@ -885,7 +918,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         type="file"
         aria-label={t`Take photo`}
         className="sr-only"
-        accept={imageUploadAccept}
+        accept={imageCaptureAccept}
         capture="environment"
         multiple={false}
         onChange={(event) => void onFileChange(event)}
