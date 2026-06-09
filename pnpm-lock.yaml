@@ -126,8 +126,8 @@ importers:
         specifier: 8.0.0
         version: 8.0.0(@capacitor/core@8.0.1)
       '@capawesome/capacitor-app-update':
-        specifier: 8.0.1
-        version: 8.0.1(@capacitor/core@8.0.1)
+        specifier: 8.0.3
+        version: 8.0.3(@capacitor/core@8.0.1)
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -190,8 +190,8 @@ importers:
         specifier: 8.0.0
         version: 8.0.0(@capacitor/core@8.0.1)
       '@capawesome/capacitor-app-update':
-        specifier: 8.0.1
-        version: 8.0.1(@capacitor/core@8.0.1)
+        specifier: 8.0.3
+        version: 8.0.3(@capacitor/core@8.0.1)
       '@fontsource-variable/fira-code':
         specifier: 5.2.7
         version: 5.2.7
@@ -1177,8 +1177,8 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
-  '@capawesome/capacitor-app-update@8.0.1':
-    resolution: {integrity: sha512-NE7J2igAUuXdB7kCdfm4SnCae58PmesITBYXF152NjPItBefznPVUu09p+xg4+rJ2JmKCJa0fBGi/YGB8xvwUg==}
+  '@capawesome/capacitor-app-update@8.0.3':
+    resolution: {integrity: sha512-5pS9I+i2TuUl8b6L3h2WsWF/PE68exzoc9CciXK/I2SdB2fIkdxObrYBeYS2Z09ndCGqJgx4iwZJmhXwVcMh4w==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -10364,7 +10364,7 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.0.1
 
-  '@capawesome/capacitor-app-update@8.0.1(@capacitor/core@8.0.1)':
+  '@capawesome/capacitor-app-update@8.0.3(@capacitor/core@8.0.1)':
     dependencies:
       '@capacitor/core': 8.0.1
 
@@ -13729,7 +13729,7 @@ snapshots:
       '@capacitor/core': 8.0.1
       '@capacitor/share': 8.0.0(@capacitor/core@8.0.1)
       '@capacitor/splash-screen': 8.0.0(@capacitor/core@8.0.1)
-      '@capawesome/capacitor-app-update': 8.0.1(@capacitor/core@8.0.1)
+      '@capawesome/capacitor-app-update': 8.0.3(@capacitor/core@8.0.1)
       '@fontsource-variable/fira-code': 5.2.7
       '@fontsource-variable/inter': 5.2.8
       '@horus.dev/tw-dynamic-themes': 0.0.3
