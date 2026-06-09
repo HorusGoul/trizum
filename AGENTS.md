@@ -40,9 +40,10 @@ Read these sources in order:
 
 Canonical examples:
 
-- [`.node-version`](./.node-version), [`package.json`](./package.json), and
-  [`vite.config.ts`](./vite.config.ts) are the source of truth for Node, the
-  package manager, and Vite+ workspace commands.
+- [`.node-version`](./.node-version), [`.mise.toml`](./.mise.toml),
+  [`package.json`](./package.json), and [`vite.config.ts`](./vite.config.ts)
+  are the source of truth for Node, native-tooling Ruby, the package manager,
+  and Vite+ workspace commands.
 - [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)
   is the source of truth for creating changesets when a user-facing change
   needs release notes or a version bump.
