@@ -37,12 +37,17 @@ platform :android do
   end
 
   desc "Build release AAB (Android App Bundle)"
-  lane :build_aab do
+  lane :build_aab do |options|
+    properties = signing_properties
+    if options[:version_code]
+      properties["trizumVersionCode"] = options[:version_code].to_s
+    end
+
     gradle(
       task: "bundle",
       build_type: "Release",
       print_command: true,
-      properties: signing_properties
+      properties: properties
     )
   end
 
@@ -57,6 +62,21 @@ platform :android do
       track: "internal",
       release_status: "draft",
       aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    )
+  end
+
+  desc "Build and upload PR build to Google Play internal testing"
+  lane :deploy_internal_testing do
+    version_code = next_internal_testing_version_code
+    build_aab(version_code: version_code)
+    upload_to_play_store(
+      track: "internal",
+      release_status: "completed",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
     )
   end
 
@@ -223,13 +243,43 @@ platform :android do
     # Read version from build.gradle
     build_gradle = File.read("../app/build.gradle")
     version_name = build_gradle.match(/versionName\s+"([^"]+)"/)[1]
-    version_code = build_gradle.match(/versionCode\s+(\d+)/)[1]
+    version_code = release_version_code
     UI.success("Current version: #{version_name} (#{version_code})")
   end
 
   # ============================================
   # Private Helper Methods
   # ============================================
+
+  private_lane :release_version_code do
+    build_gradle = File.read("../app/build.gradle")
+    build_gradle.match(/versionCode\s+(\d+)/)[1].to_i
+  end
+
+  private_lane :next_internal_testing_version_code do
+    base_version_code = release_version_code
+    next_release_version_code = base_version_code + 100
+    tracks = ["internal", "alpha", "beta", "production"]
+    track_version_codes = tracks.flat_map do |track|
+      google_play_track_version_codes(track: track).map(&:to_i)
+    end
+    highest_play_version_code = track_version_codes.max || base_version_code
+    version_code = [highest_play_version_code + 1, base_version_code + 1].max
+
+    if version_code >= next_release_version_code
+      UI.user_error!(
+        "Next internal testing versionCode #{version_code} would reach " \
+        "the next release range #{next_release_version_code}. " \
+        "Bump the mobile version before uploading more internal testing builds."
+      )
+    end
+
+    UI.message(
+      "Using Android internal testing versionCode #{version_code} " \
+      "(release base #{base_version_code}, next release range #{next_release_version_code})"
+    )
+    version_code
+  end
 
   private_lane :signing_properties do
     properties = {}

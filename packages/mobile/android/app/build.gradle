@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def trizumVersionCodeOverride = findProperty("trizumVersionCode")
+
 android {
     namespace "app.trizum.capacitor"
     compileSdk rootProject.ext.compileSdkVersion
@@ -8,6 +10,9 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 10080000
+        if (trizumVersionCodeOverride != null) {
+            versionCode trizumVersionCodeOverride.toString().toInteger()
+        }
         versionName "1.8.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
