@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 concurrency:
   group: android-internal-testing-pr-${{ github.event.pull_request.number }}
@@ -76,17 +77,28 @@ jobs:
           GOOGLE_PLAY_JSON_KEY_FILE: ${{ github.workspace }}/packages/mobile/android/play-store-key.json
         run: bundle exec fastlane deploy_internal_testing
 
-      - name: Remove internal testing label
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh pr edit ${{ github.event.pull_request.number }} --remove-label "android:internal-testing"
-
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v6
         with:
           name: android-internal-testing-aab
           path: packages/mobile/android/app/build/outputs/bundle/**/*.aab
           retention-days: 14
+
+      - name: Remove internal testing label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if ! gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" \
+            --jq '.[].name' | grep -qx "android:internal-testing"; then
+            echo "android:internal-testing label is already absent."
+            exit 0
+          fi
+
+          gh api \
+            --method DELETE \
+            "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels/android%3Ainternal-testing" \
+            --silent
 
       - name: Cleanup sensitive files
         if: always()
