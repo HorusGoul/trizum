@@ -80,6 +80,7 @@ platform :android do
       track: "internal",
       release_status: "completed",
       aab: aab_path,
+      skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
       skip_upload_images: true,
