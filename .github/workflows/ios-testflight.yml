@@ -25,7 +25,7 @@ jobs:
       !github.event.pull_request.head.repo.fork &&
       contains(github.event.pull_request.labels.*.name, 'ios:testflight')
     runs-on: macos-26
-    timeout-minutes: 85
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
@@ -46,13 +46,13 @@ jobs:
           working-directory: packages/mobile/ios/App
 
       - name: Build mobile web assets
-        timeout-minutes: 15
+        timeout-minutes: 8
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Deploy to TestFlight
-        timeout-minutes: 60
+        timeout-minutes: 20
         working-directory: packages/mobile/ios/App
         env:
           IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
@@ -65,7 +65,7 @@ jobs:
 
       - name: Collect TestFlight metadata
         id: testflight
-        timeout-minutes: 5
+        timeout-minutes: 2
         run: |
           version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" packages/mobile/ios/App/App/Info.plist)"
           build_number="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" packages/mobile/ios/App/App/Info.plist)"
@@ -84,7 +84,7 @@ jobs:
           echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
 
       - name: Comment with TestFlight availability
-        timeout-minutes: 5
+        timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -128,7 +128,7 @@ jobs:
           fi
 
       - name: Remove TestFlight label
-        timeout-minutes: 5
+        timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
