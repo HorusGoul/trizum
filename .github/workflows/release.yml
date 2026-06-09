@@ -134,6 +134,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v6
+
       - name: Download signed APK artifact
         uses: actions/download-artifact@v8
         with:
