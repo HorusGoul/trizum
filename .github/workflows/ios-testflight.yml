@@ -1,0 +1,139 @@
+name: iOS TestFlight
+
+run-name: "iOS TestFlight for PR #${{ github.event.pull_request.number }}"
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ios-testflight-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy PR build to TestFlight
+    if: >-
+      !github.event.pull_request.head.repo.fork &&
+      contains(github.event.pull_request.labels.*.name, 'ios:testflight')
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.7.2"
+          bundler-cache: true
+          cache-version: ios-0
+          working-directory: packages/mobile/ios/App
+
+      - name: Build mobile web assets
+        run: vp run --filter @trizum/mobile build
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Deploy to TestFlight
+        working-directory: packages/mobile/ios/App
+        env:
+          IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROVISIONING_PROFILE_BASE64 }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: bundle exec fastlane deploy_pr_testflight
+
+      - name: Collect TestFlight metadata
+        id: testflight
+        run: |
+          version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" packages/mobile/ios/App/App/Info.plist)"
+          build_number="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" packages/mobile/ios/App/App/Info.plist)"
+
+          if [ -z "$version" ]; then
+            echo "Unable to determine iOS version" >&2
+            exit 1
+          fi
+
+          if [ -z "$build_number" ]; then
+            echo "Unable to determine iOS build number" >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "build_number=$build_number" >> "$GITHUB_OUTPUT"
+
+      - name: Comment with TestFlight availability
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          VERSION: ${{ steps.testflight.outputs.version }}
+          BUILD_NUMBER: ${{ steps.testflight.outputs.build_number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          marker="<!-- trizum-ios-testflight -->"
+          body_file="$(mktemp)"
+
+          cat > "$body_file" <<EOF
+          $marker
+          This PR is available on TestFlight.
+
+          - Version: \`$VERSION\`
+          - Build: \`$BUILD_NUMBER\`
+          - Workflow run: [#${GITHUB_RUN_NUMBER}]($RUN_URL)
+
+          The TestFlight build was uploaded from this PR head and may require App Store Connect access depending on tester permissions.
+          EOF
+
+          comment_id="$(
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --paginate \
+              --jq '.[] | select(.body | contains("<!-- trizum-ios-testflight -->")) | .id' \
+              | tail -n 1
+          )"
+
+          if [ -n "$comment_id" ]; then
+            gh api \
+              --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" \
+              --field body="$(cat "$body_file")" \
+              --silent
+          else
+            gh api \
+              --method POST \
+              "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" \
+              --field body="$(cat "$body_file")" \
+              --silent
+          fi
+
+      - name: Remove TestFlight label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if ! gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels" \
+            --jq '.[].name' | grep -qx "ios:testflight"; then
+            echo "ios:testflight label is already absent."
+            exit 0
+          fi
+
+          gh api \
+            --method DELETE \
+            "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/labels/ios%3Atestflight" \
+            --silent

@@ -186,6 +186,17 @@ platform :ios do
     )
   end
 
+  desc "Build and upload PR build to TestFlight"
+  lane :deploy_pr_testflight do
+    build_number = next_pr_testflight_build_number
+    build_release(build_number: build_number)
+    upload_to_testflight(
+      app_identifier: "app.trizum.capacitor",
+      skip_waiting_for_build_processing: false,
+      uses_non_exempt_encryption: false
+    )
+  end
+
   desc "Upload to App Store (binary only, no metadata)"
   lane :deploy_appstore do |options|
     build_release(build_number: options[:build_number])
@@ -343,5 +354,34 @@ platform :ios do
     version = get_version_number(xcodeproj: "App.xcodeproj")
     build = get_build_number(xcodeproj: "App.xcodeproj")
     UI.success("Current version: #{version} (#{build})")
+  end
+
+  private_lane :next_pr_testflight_build_number do
+    load_api_key
+
+    version = get_version_number(xcodeproj: "App.xcodeproj")
+    base_build_number = get_build_number(xcodeproj: "App.xcodeproj").to_i
+    next_release_build_number = base_build_number + 100
+    latest_testflight_build = latest_testflight_build_number(
+      app_identifier: "app.trizum.capacitor",
+      version: version,
+      initial_build_number: base_build_number
+    ).to_i
+    build_number = [latest_testflight_build + 1, base_build_number + 1].max
+
+    if build_number >= next_release_build_number
+      UI.user_error!(
+        "Next TestFlight build number #{build_number} would reach " \
+        "the next release range #{next_release_build_number}. " \
+        "Bump the mobile version before uploading more PR TestFlight builds."
+      )
+    end
+
+    UI.message(
+      "Using iOS TestFlight build number #{build_number} " \
+      "(version #{version}, release base #{base_build_number}, " \
+      "next release range #{next_release_build_number})"
+    )
+    build_number
   end
 end

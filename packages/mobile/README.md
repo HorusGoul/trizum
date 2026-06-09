@@ -317,6 +317,13 @@ reaches the next release version-code range, so PR uploads do not silently block
 the next production patch release. After a successful internal release and PR
 comment, the workflow removes the label.
 
+Add the `ios:testflight` label to a non-fork pull request to build a signed iOS
+release from the PR head and upload it to TestFlight. The workflow computes a
+temporary iOS build number from the highest TestFlight build already present
+for the current app version and fails before it reaches the next release
+build-number range. After a successful TestFlight upload, the workflow comments
+on the PR with the TestFlight version/build details and removes the label.
+
 Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
 trigger the shared release workflow. That path reuses the mobile build and
 store deployment workflows to generate store screenshots, publish Android to the
