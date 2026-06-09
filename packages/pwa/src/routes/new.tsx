@@ -21,6 +21,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
+import { createPartyActivityLog } from "#src/models/partyActivity.ts";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -69,7 +70,17 @@ function New() {
       }, {}),
       chunkRefs: [],
     });
-    handle.change((doc) => (doc.id = handle.documentId));
+    const activityLogHandle = createPartyActivityLog(repo, handle.documentId, [
+      {
+        type: "party-created",
+        partyName: values.name,
+      },
+    ]);
+
+    handle.change((doc) => {
+      doc.id = handle.documentId;
+      doc.activityLogId = activityLogHandle.documentId;
+    });
     void navigate({
       to: "/party/$partyId",
       params: { partyId: handle.documentId },

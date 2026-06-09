@@ -10,6 +10,7 @@ import {
 } from "#src/models/expense.js";
 import type {
   Party,
+  PartyActivityLogEntryInput,
   PartyExpenseChunk,
   PartyExpenseChunkBalances,
   PartyExpenseChunkRef,
@@ -23,6 +24,13 @@ import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
+import {
+  appendPartyActivityLogEntry,
+  appendPartyActivityLogEntries,
+  createExpenseActivityLogEntry,
+  getPartySettingsActivityEntries,
+  getParticipantActivityChanges,
+} from "#src/models/partyActivity.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -97,27 +105,59 @@ export function useCurrentParty() {
 }
 
 export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
-  function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
+  async function updateSettings(
+    values: Pick<Party, "name" | "symbol" | "description" | "participants">,
+  ) {
+    let activityEntries: PartyActivityLogEntryInput[] = [];
+
     handle.change((doc) => {
+      activityEntries = getPartySettingsActivityEntries(doc, values);
+
       doc.name = values.name;
       doc.symbol = values.symbol;
       doc.description = values.description;
       doc.participants = values.participants;
     });
+
+    await appendPartyActivityLogEntries(repo, handle, activityEntries);
   }
 
-  function setParticipantDetails(
+  async function setParticipantDetails(
     participantId: PartyParticipant["id"],
     details: Partial<
       Pick<PartyParticipant, "phone" | "personalMode" | "avatarId" | "balancesSortedBy">
     >,
   ) {
+    let activityEntry:
+      | {
+          type: "participant-updated";
+          participantId: PartyParticipant["id"];
+          participantName: PartyParticipant["name"];
+          changes: ReturnType<typeof getParticipantActivityChanges>;
+        }
+      | undefined;
+
     handle.change((doc) => {
       const participant = doc.participants[participantId];
 
       if (!participant) {
         return;
       }
+
+      const nextParticipant = { ...participant };
+
+      for (const key in details) {
+        const value = details[key as keyof typeof details];
+
+        if (value === undefined) {
+          delete nextParticipant[key as keyof typeof participant];
+        } else {
+          // @ts-expect-error -- idk tbh
+          nextParticipant[key] = value;
+        }
+      }
+
+      const activityChanges = getParticipantActivityChanges(participant, nextParticipant);
 
       for (const key in details) {
         const value = details[key as keyof typeof details];
@@ -129,7 +169,20 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
           participant[key] = value;
         }
       }
+
+      if (activityChanges.length > 0) {
+        activityEntry = {
+          type: "participant-updated",
+          participantId: participant.id,
+          participantName: participant.name,
+          changes: activityChanges,
+        };
+      }
     });
+
+    if (activityEntry) {
+      await appendPartyActivityLogEntry(repo, handle, activityEntry);
+    }
   }
 
   function createChunk() {
@@ -247,6 +300,12 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
 
+    await appendPartyActivityLogEntry(
+      repo,
+      handle,
+      createExpenseActivityLogEntry("expense-added", expenseWithHash),
+    );
+
     return expenseWithHash;
   }
 
@@ -306,6 +365,12 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     lastChunkBalancesHandle.change((doc) => {
       patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
+
+    await appendPartyActivityLogEntry(
+      repo,
+      handle,
+      createExpenseActivityLogEntry("expense-updated", expense),
+    );
   }
 
   async function removeExpense(expenseId: Expense["id"]) {
@@ -330,6 +395,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Chunk not found, this should not happen");
     }
 
+    let removedExpense: Expense | undefined;
+
     chunkHandle.change((doc) => {
       const expenseIndex = doc.expenses.findIndex((e) => e.id === expenseId);
 
@@ -337,6 +404,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         throw new Error("Expense not found, this should not happen");
       }
 
+      removedExpense = clone(doc.expenses[expenseIndex]);
       deleteAt(doc.expenses, expenseIndex);
     });
 
@@ -362,6 +430,16 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
     lastChunkBalancesHandle.doc();
+
+    const expenseForLog = removedExpense;
+
+    if (expenseForLog) {
+      await appendPartyActivityLogEntry(
+        repo,
+        handle,
+        createExpenseActivityLogEntry("expense-removed", expenseForLog),
+      );
+    }
 
     return true;
   }
@@ -442,6 +520,15 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     try {
       const createdOriginExpense = await addExpenseToParty(originExpense);
 
+      await appendPartyActivityLogEntry(repo, handle, {
+        type: "debt-transferred",
+        originExpenseId: createdOriginExpense.id,
+        originExpenseName: createdOriginExpense.name,
+        destinationExpenseId: createdDestinationExpense.id,
+        destinationExpenseName: createdDestinationExpense.name,
+        amount,
+      });
+
       return {
         originExpense: createdOriginExpense,
         destinationExpense: createdDestinationExpense,
@@ -453,7 +540,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         logger.error("Failed to rollback destination debt transfer expense", {
           rollbackError,
           destinationExpenseId: createdDestinationExpense.id,
-          destinationPartyId,
         });
       }
 

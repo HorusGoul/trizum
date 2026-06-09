@@ -39,7 +39,7 @@ function PartySettings() {
   const params = Route.useParams();
   const { party, updateSettings } = useParty(params.partyId);
 
-  function onSaveSettings(values: PartySettingsFormValues) {
+  async function onSaveSettings(values: PartySettingsFormValues) {
     const participants = values.participants
       .map((participant): PartyParticipant => {
         if ("__isNew" in participant) {
@@ -56,7 +56,7 @@ function PartySettings() {
         return result;
       }, {});
 
-    updateSettings({
+    await updateSettings({
       name: values.name,
       symbol: values.symbol,
       description: values.description,
@@ -73,8 +73,8 @@ function PartySettings() {
       description: party.description,
       participants: Object.values(party.participants),
     } as PartySettingsFormValues,
-    onSubmit: ({ value }) => {
-      onSaveSettings(value);
+    onSubmit: async ({ value }) => {
+      await onSaveSettings(value);
     },
   });
 
