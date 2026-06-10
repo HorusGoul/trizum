@@ -94,11 +94,15 @@ declare module "react-aria-components" {
   }
 }
 
-const JAZZ_SERVER_URL = import.meta.env.VITE_APP_JAZZ_SERVER_URL?.trim() || undefined;
+const JAZZ_APP_ID =
+  import.meta.env.VITE_JAZZ_APP_ID?.trim() || "f3c88cf5-97c1-41fc-a6ba-ebb209719a61";
+const JAZZ_SERVER_URL =
+  import.meta.env.VITE_JAZZ_SERVER_URL?.trim() || "https://v2.sync.jazz.tools/";
 const INTERNAL_DB_NAME = initialUrl.searchParams.get("__internal_db_name")?.trim() || undefined;
 const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
 
 const trizumData = await createLocalFirstTrizumDataClient({
+  appId: JAZZ_APP_ID,
   dbName: INTERNAL_DB_NAME ?? "trizum-jazz-fate-pwa",
   disableBrowserWorker: isWebKitBrowser(),
   serverUrl: isOfflineOnly ? undefined : JAZZ_SERVER_URL,
