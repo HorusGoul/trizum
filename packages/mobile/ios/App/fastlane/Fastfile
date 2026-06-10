@@ -289,7 +289,7 @@ platform :ios do
       force: true,
       submit_for_review: false,
       automatic_release: false,
-      phased_release: true,
+      phased_release: false,
       run_precheck_before_submit: !submit_for_review,
       precheck_include_in_app_purchases: false,
       overwrite_screenshots: true,
@@ -352,7 +352,7 @@ platform :ios do
       app_version: app_version,
       submit_for_review: true,
       automatic_release: options[:automatic_release] || false,
-      phased_release: true,
+      phased_release: false,
       run_precheck_before_submit: true,
       precheck_include_in_app_purchases: false,
       submission_information: app_store_submission_information
@@ -409,7 +409,7 @@ platform :ios do
       app_version: build.app_version,
       submit_for_review: true,
       automatic_release: options[:automatic_release] || false,
-      phased_release: true,
+      phased_release: false,
       run_precheck_before_submit: true,
       precheck_include_in_app_purchases: false,
       submission_information: app_store_submission_information
