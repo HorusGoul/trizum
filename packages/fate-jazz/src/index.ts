@@ -75,6 +75,7 @@ export type JazzFateListDefinition<TEntity extends JazzFateEntity = JazzFateEnti
     column: string;
     direction: "asc" | "desc";
   };
+  pagination?: "offset";
   root: string;
   type: TEntity["__typename"];
   where?: (args?: Record<string, unknown>) => Record<string, unknown> | undefined;
@@ -138,11 +139,17 @@ export function createJazzDbRepository<
     async fetchList(root, select, args) {
       const list = expectListDefinition(listByRoot, root);
       const entity = expectEntityDefinition(entityByType, list.type);
-      const query = selectColumns(applyListDefinition(entity.table, list, args), entity, select);
+      const pagination = getOffsetPagination(args, list.pagination);
+      const query = applyOffsetPagination(
+        selectColumns(applyListDefinition(entity.table, list, args), entity, select),
+        pagination,
+      );
       const rows = await db.all(query, queryOptions);
+      const visibleRows = pagination.limit === undefined ? rows : rows.slice(0, pagination.limit);
+      const hasNext = pagination.limit !== undefined && rows.length > pagination.limit;
 
       return {
-        items: rows.map((row) => {
+        items: visibleRows.map((row) => {
           const node = toEntity(entity, row as RowLike, select);
 
           return {
@@ -151,8 +158,16 @@ export function createJazzDbRepository<
           };
         }),
         pagination: {
-          hasNext: false,
-          hasPrevious: false,
+          hasNext,
+          hasPrevious: pagination.offset > 0,
+          nextCursor:
+            hasNext && pagination.limit !== undefined
+              ? String(pagination.offset + pagination.limit)
+              : undefined,
+          previousCursor:
+            pagination.offset > 0 && pagination.limit !== undefined
+              ? String(Math.max(0, pagination.offset - pagination.limit))
+              : undefined,
         },
       };
     },
@@ -384,6 +399,87 @@ function orderBy(query: unknown, column: string, direction: "asc" | "desc"): unk
       orderBy(column: string, direction: "asc" | "desc"): unknown;
     }
   ).orderBy(column, direction);
+}
+
+function limit(query: unknown, count: number): unknown {
+  return (
+    query as {
+      limit(count: number): unknown;
+    }
+  ).limit(count);
+}
+
+function offset(query: unknown, count: number): unknown {
+  return (
+    query as {
+      offset(count: number): unknown;
+    }
+  ).offset(count);
+}
+
+function getOffsetPagination(
+  args: Record<string, unknown> | undefined,
+  pagination: JazzFateListDefinition["pagination"],
+) {
+  if (pagination !== "offset") {
+    return {
+      limit: undefined,
+      offset: 0,
+    };
+  }
+
+  const limit = coercePositiveInteger(args?.limit ?? args?.first);
+  const offsetValue = coerceNonNegativeInteger(args?.offset ?? args?.after);
+
+  return {
+    limit,
+    offset: offsetValue ?? 0,
+  };
+}
+
+function applyOffsetPagination(
+  query: QueryBuilder<RowLike>,
+  pagination: ReturnType<typeof getOffsetPagination>,
+): QueryBuilder<RowLike> {
+  let nextQuery: unknown = query;
+
+  if (pagination.offset > 0) {
+    nextQuery = offset(nextQuery, pagination.offset);
+  }
+
+  if (pagination.limit !== undefined) {
+    nextQuery = limit(nextQuery, pagination.limit + 1);
+  }
+
+  return nextQuery as QueryBuilder<RowLike>;
+}
+
+function coercePositiveInteger(value: unknown): number | undefined {
+  const number = coerceNonNegativeInteger(value);
+
+  if (number === undefined || number <= 0) {
+    return undefined;
+  }
+
+  return number;
+}
+
+function coerceNonNegativeInteger(value: unknown): number | undefined {
+  if (typeof value !== "number" && typeof value !== "string") {
+    return undefined;
+  }
+
+  if (typeof value === "string" && value.trim() === "") {
+    return undefined;
+  }
+
+  const number = typeof value === "number" ? value : Number(value);
+
+  if (!Number.isSafeInteger(number) || number < 0) {
+    return undefined;
+  }
+
+  return number;
 }
 
 function insertRow(db: JazzFateDb, table: unknown, input: unknown): { value: unknown } {

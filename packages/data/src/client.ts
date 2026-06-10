@@ -8,15 +8,13 @@ import {
 import { createTrizumJazzRepository, type TrizumDataRepository } from "./repository.js";
 import { trizumFateMutations } from "./views.js";
 import type {
-  ExpenseChunkBalancesEntity,
-  ExpenseChunkEntity,
   ExpenseEntity,
+  JoinedPartyEntity,
   MediaFileEntity,
   ParticipantEntity,
   PartyEntity,
   PartyMemberEntity,
   UserEntity,
-  UserPartyStateEntity,
 } from "./views.js";
 
 export const trizumFateRoots = {
@@ -26,20 +24,12 @@ export const trizumFateRoots = {
   parties: clientRoot<PartyEntity, "Party">("Party"),
   partyMember: clientRoot<PartyMemberEntity, "PartyMember">("PartyMember"),
   partyMembers: clientRoot<PartyMemberEntity, "PartyMember">("PartyMember"),
-  userPartyState: clientRoot<UserPartyStateEntity, "UserPartyState">("UserPartyState"),
-  userPartyStates: clientRoot<UserPartyStateEntity, "UserPartyState">("UserPartyState"),
+  joinedParty: clientRoot<JoinedPartyEntity, "JoinedParty">("JoinedParty"),
+  joinedParties: clientRoot<JoinedPartyEntity, "JoinedParty">("JoinedParty"),
   participant: clientRoot<ParticipantEntity, "Participant">("Participant"),
   participants: clientRoot<ParticipantEntity, "Participant">("Participant"),
   mediaFile: clientRoot<MediaFileEntity, "MediaFile">("MediaFile"),
   mediaFiles: clientRoot<MediaFileEntity, "MediaFile">("MediaFile"),
-  expenseChunk: clientRoot<ExpenseChunkEntity, "ExpenseChunk">("ExpenseChunk"),
-  expenseChunks: clientRoot<ExpenseChunkEntity, "ExpenseChunk">("ExpenseChunk"),
-  expenseChunkBalance: clientRoot<ExpenseChunkBalancesEntity, "ExpenseChunkBalances">(
-    "ExpenseChunkBalances",
-  ),
-  expenseChunkBalances: clientRoot<ExpenseChunkBalancesEntity, "ExpenseChunkBalances">(
-    "ExpenseChunkBalances",
-  ),
   expense: clientRoot<ExpenseEntity, "Expense">("Expense"),
   expenses: clientRoot<ExpenseEntity, "Expense">("Expense"),
 };
@@ -59,11 +49,9 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
       { type: "User" },
       { type: "Party" },
       { type: "PartyMember" },
-      { type: "UserPartyState" },
+      { type: "JoinedParty" },
       { type: "Participant" },
       { type: "MediaFile" },
-      { type: "ExpenseChunk" },
-      { type: "ExpenseChunkBalances" },
       { type: "Expense" },
     ],
   });

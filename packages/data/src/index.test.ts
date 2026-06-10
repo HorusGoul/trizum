@@ -2,6 +2,7 @@ import { describe, expect, test } from "vite-plus/test";
 import {
   createTrizumFateClient,
   ExpenseListItemView,
+  JoinedPartyView,
   MediaFileMetadataView,
   PartySummaryView,
   projectTrizumEntity,
@@ -10,11 +11,11 @@ import {
   trizumListDefinitions,
   UserSettingsView,
   type CreateExpenseMutationInput,
+  type CreateJoinedPartyMutationInput,
   type CreateParticipantMutationInput,
   type CreatePartyMutationInput,
-  type ExpenseChunkBalancesEntity,
-  type ExpenseChunkEntity,
   type ExpenseEntity,
+  type JoinedPartyEntity,
   type MediaFileEntity,
   type PartyMemberEntity,
   type ParticipantEntity,
@@ -25,7 +26,6 @@ import {
   type TrizumFateListRoot,
   type TrizumFateTypename,
   type UserEntity,
-  type UserPartyStateEntity,
 } from "./index.js";
 
 describe("Jazz alpha schema", () => {
@@ -45,10 +45,9 @@ describe("Jazz alpha schema", () => {
     expect(trizumJazzWasmSchema.mediaFiles?.policies?.select?.using).toMatchObject({
       type: "Or",
     });
-    expect(trizumJazzWasmSchema.expenseChunks?.policies?.select?.using).toStrictEqual({
-      operation: "Select",
-      type: "Inherits",
-      via_column: "partyId",
+    expect(trizumJazzWasmSchema.joinedParties?.policies?.select?.using).toMatchObject({
+      column: "userId",
+      type: "Cmp",
     });
     expect(trizumJazzWasmSchema.expenses?.policies?.select?.using).toStrictEqual({
       operation: "Select",
@@ -69,24 +68,25 @@ describe("Trizum Jazz model surface", () => {
       "User",
       "Party",
       "PartyMember",
-      "UserPartyState",
+      "JoinedParty",
       "Participant",
       "MediaFile",
-      "ExpenseChunk",
-      "ExpenseChunkBalances",
       "Expense",
     ]);
     expect(trizumListDefinitions.map((definition) => definition.root)).toStrictEqual([
       "users",
       "parties",
       "partyMembers",
-      "userPartyStates",
+      "joinedParties",
       "participants",
       "mediaFiles",
-      "expenseChunks",
-      "expenseChunkBalances",
       "expenses",
     ]);
+    expect(
+      trizumListDefinitions.find((definition) => definition.root === "expenses"),
+    ).toMatchObject({
+      pagination: "offset",
+    });
   });
 });
 
@@ -167,6 +167,32 @@ describe("Fate masking over Trizum Jazz entities", () => {
       partyId: "party-1",
     });
     expect(Object.hasOwn(snapshot.data, "encodedBlob")).toBe(false);
+  });
+
+  test("stores the joined parties a user sees in their party list", async () => {
+    const repository = createMemoryRepository();
+    const client = createTrizumFateClient({ repository });
+
+    const { joinedParties } = await client.request({
+      joinedParties: {
+        args: { userId: "alice-local-first" },
+        list: JoinedPartyView,
+      },
+    });
+    const [joinedPartyRef] = joinedParties;
+    expect(joinedPartyRef).toBeDefined();
+
+    const snapshot = await client.readView(JoinedPartyView, joinedPartyRef!);
+
+    expect(snapshot.data).toMatchObject({
+      __typename: "JoinedParty",
+      id: "joined-party-1",
+      isArchived: false,
+      isPinned: true,
+      participantId: "participant-1",
+      partyId: "party-1",
+      userId: "alice-local-first",
+    });
   });
 
   test("projects mutation payloads to the Fate view selection", async () => {
@@ -274,12 +300,13 @@ function createMemoryRepository() {
       userId: "alice-local-first",
     },
   ];
-  const userPartyStates: UserPartyStateEntity[] = [
+  const joinedParties: JoinedPartyEntity[] = [
     {
-      __typename: "UserPartyState",
-      id: "user-party-state-1",
+      __typename: "JoinedParty",
+      id: "joined-party-1",
       isArchived: false,
       isPinned: true,
+      joinedAt: new Date("2026-06-10T09:30:00.000Z"),
       lastUsedAt: new Date("2026-06-10T10:00:00.000Z"),
       participantId: "participant-1",
       partyId: "party-1",
@@ -311,31 +338,10 @@ function createMemoryRepository() {
       partyId: "party-1",
     },
   ];
-  const expenseChunks: ExpenseChunkEntity[] = [
-    {
-      __typename: "ExpenseChunk",
-      createdAt: new Date("2026-06-10T09:00:00.000Z"),
-      id: "chunk-1",
-      maxSize: 500,
-      partyId: "party-1",
-    },
-  ];
-  const expenseChunkBalances: ExpenseChunkBalancesEntity[] = [
-    {
-      __typename: "ExpenseChunkBalances",
-      balances: {
-        alice: {},
-      },
-      chunkId: "chunk-1",
-      id: "chunk-balances-1",
-      partyId: "party-1",
-    },
-  ];
   const expenses: ExpenseEntity[] = [
     {
       __typename: "Expense",
       amount: 12_50,
-      chunkId: "chunk-1",
       editCopy: null,
       editCopyLastUpdatedAt: null,
       hash: "expense-hash",
@@ -369,11 +375,9 @@ function createMemoryRepository() {
       "User",
       "Party",
       "PartyMember",
-      "UserPartyState",
+      "JoinedParty",
       "Participant",
       "MediaFile",
-      "ExpenseChunk",
-      "ExpenseChunkBalances",
       "Expense",
     ]),
     expenses,
@@ -382,11 +386,9 @@ function createMemoryRepository() {
       "users",
       "parties",
       "partyMembers",
-      "userPartyStates",
+      "joinedParties",
       "participants",
       "mediaFiles",
-      "expenseChunks",
-      "expenseChunkBalances",
       "expenses",
     ]),
     lists: [],
@@ -453,12 +455,26 @@ function createMemoryRepository() {
           participants.push(participant);
           return projectTrizumEntity(participant, select);
         }
+        case "joinedParty.create": {
+          const joinedPartyInput = input as CreateJoinedPartyMutationInput;
+          const joinedParty: JoinedPartyEntity = {
+            __typename: "JoinedParty",
+            ...joinedPartyInput,
+            id: nextId("joined-party", joinedParties.length),
+            isArchived: joinedPartyInput.isArchived ?? false,
+            isPinned: joinedPartyInput.isPinned ?? false,
+            joinedAt: joinedPartyInput.joinedAt ?? null,
+            lastUsedAt: joinedPartyInput.lastUsedAt ?? null,
+            participantId: joinedPartyInput.participantId ?? null,
+          };
+          joinedParties.push(joinedParty);
+          return projectTrizumEntity(joinedParty, select);
+        }
         case "expense.create": {
           const expenseInput = input as CreateExpenseMutationInput;
           const expense: ExpenseEntity = {
             __typename: "Expense",
             ...expenseInput,
-            chunkId: expenseInput.chunkId ?? null,
             editCopy: expenseInput.editCopy ?? null,
             editCopyLastUpdatedAt: expenseInput.editCopyLastUpdatedAt ?? null,
             hash: expenseInput.hash ?? null,
@@ -486,16 +502,12 @@ function createMemoryRepository() {
         return parties;
       case "PartyMember":
         return partyMembers;
-      case "UserPartyState":
-        return userPartyStates;
+      case "JoinedParty":
+        return joinedParties;
       case "Participant":
         return participants;
       case "MediaFile":
         return mediaFiles;
-      case "ExpenseChunk":
-        return expenseChunks;
-      case "ExpenseChunkBalances":
-        return expenseChunkBalances;
       case "Expense":
         return expenses;
     }
@@ -512,23 +524,19 @@ function typeForRoot(root: TrizumFateListRoot): TrizumFateTypename {
       return "Party";
     case "partyMembers":
       return "PartyMember";
-    case "userPartyStates":
-      return "UserPartyState";
+    case "joinedParties":
+      return "JoinedParty";
     case "participants":
       return "Participant";
     case "mediaFiles":
       return "MediaFile";
-    case "expenseChunks":
-      return "ExpenseChunk";
-    case "expenseChunkBalances":
-      return "ExpenseChunkBalances";
     case "expenses":
       return "Expense";
   }
 }
 
 function matchesArgs(entity: TrizumFateEntity, args?: Record<string, unknown>) {
-  for (const key of ["chunkId", "ownerUserId", "partyId", "userId"] as const) {
+  for (const key of ["ownerUserId", "partyId", "userId"] as const) {
     if (typeof args?.[key] === "string" && key in entity) {
       return (entity as Record<string, unknown>)[key] === args[key];
     }

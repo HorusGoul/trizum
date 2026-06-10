@@ -1,17 +1,21 @@
 import { describe, expect, test, vi } from "vite-plus/test";
 import type { AuthSecretStore } from "jazz-tools";
 import {
+  createJazzDbRepository,
   createJazzFateTransport,
   projectEntity,
   resolveJazzFateAuthConfig,
   type JazzFateEntity,
+  type JazzFateDb,
   type JazzFateRepository,
 } from "./index.js";
 
 type NoteEntity = JazzFateEntity & {
   __typename: "Note";
   body?: string;
+  createdAt?: number;
   privateMemo?: string;
+  projectId?: string;
   title?: string;
 };
 
@@ -52,6 +56,113 @@ describe("Jazz Fate auth", () => {
         mode: "anonymousGuest",
       }),
     ).resolves.toStrictEqual({});
+  });
+});
+
+describe("Jazz DB repository", () => {
+  test("supports offset pagination for Jazz-backed Fate lists", async () => {
+    const table = new FakeNoteQuery([
+      createNoteRow("note-1", "project-1", "Oldest", 1),
+      createNoteRow("note-2", "project-1", "Middle", 2),
+      createNoteRow("note-3", "project-1", "Newest", 3),
+      createNoteRow("note-4", "project-1", "Overflow", 4),
+      createNoteRow("note-5", "project-2", "Other project", 5),
+    ]);
+    const db = {
+      async all(query: unknown) {
+        return (query as FakeNoteQuery).execute();
+      },
+      insert(_table: unknown, _input: unknown) {
+        throw new Error("insert is not used by this test");
+      },
+      async one(_query: unknown) {
+        throw new Error("one is not used by this test");
+      },
+    } as unknown as JazzFateDb;
+    const repository = createJazzDbRepository<NoteEntity>({
+      db,
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [
+        {
+          orderBy: {
+            column: "createdAt",
+            direction: "asc",
+          },
+          pagination: "offset",
+          root: "notes",
+          type: "Note",
+          where(args) {
+            return {
+              projectId: args?.projectId,
+            };
+          },
+        },
+      ],
+    });
+
+    await expect(
+      repository.fetchList("notes", ["id", "title", "privateMemo"], {
+        after: "1",
+        first: 2,
+        projectId: "project-1",
+      }),
+    ).resolves.toStrictEqual({
+      items: [
+        {
+          cursor: "note-2",
+          node: {
+            __typename: "Note",
+            id: "note-2",
+            title: "Middle",
+          },
+        },
+        {
+          cursor: "note-3",
+          node: {
+            __typename: "Note",
+            id: "note-3",
+            title: "Newest",
+          },
+        },
+      ],
+      pagination: {
+        hasNext: true,
+        hasPrevious: true,
+        nextCursor: "3",
+        previousCursor: "0",
+      },
+    });
+    expect(table.calls).toStrictEqual([
+      {
+        conditions: {
+          projectId: "project-1",
+        },
+        method: "where",
+      },
+      {
+        column: "createdAt",
+        direction: "asc",
+        method: "orderBy",
+      },
+      {
+        columns: ["id", "title"],
+        method: "select",
+      },
+      {
+        count: 1,
+        method: "offset",
+      },
+      {
+        count: 3,
+        method: "limit",
+      },
+    ]);
   });
 });
 
@@ -120,6 +231,155 @@ describe("projectEntity", () => {
     });
   });
 });
+
+type NoteRow = {
+  body: string;
+  createdAt: number;
+  id: string;
+  privateMemo: string;
+  projectId: string;
+  title: string;
+};
+
+type FakeNoteQueryCall =
+  | {
+      conditions: Record<string, unknown>;
+      method: "where";
+    }
+  | {
+      column: string;
+      direction: "asc" | "desc";
+      method: "orderBy";
+    }
+  | {
+      columns: string[];
+      method: "select";
+    }
+  | {
+      count: number;
+      method: "limit" | "offset";
+    };
+
+class FakeNoteQuery {
+  readonly calls: FakeNoteQueryCall[] = [];
+  private conditions: Record<string, unknown> | undefined;
+  private limitCount: number | undefined;
+  private offsetCount = 0;
+  private order: { column: keyof NoteRow; direction: "asc" | "desc" } | undefined;
+  private selectedColumns: string[] | undefined;
+
+  constructor(private readonly rows: NoteRow[]) {}
+
+  where(conditions: Record<string, unknown>) {
+    this.conditions = conditions;
+    this.calls.push({
+      conditions,
+      method: "where",
+    });
+
+    return this;
+  }
+
+  orderBy(column: string, direction: "asc" | "desc") {
+    this.order = {
+      column: column as keyof NoteRow,
+      direction,
+    };
+    this.calls.push({
+      column,
+      direction,
+      method: "orderBy",
+    });
+
+    return this;
+  }
+
+  select(...columns: [string, ...string[]]) {
+    this.selectedColumns = columns;
+    this.calls.push({
+      columns,
+      method: "select",
+    });
+
+    return this;
+  }
+
+  offset(count: number) {
+    this.offsetCount = count;
+    this.calls.push({
+      count,
+      method: "offset",
+    });
+
+    return this;
+  }
+
+  limit(count: number) {
+    this.limitCount = count;
+    this.calls.push({
+      count,
+      method: "limit",
+    });
+
+    return this;
+  }
+
+  execute() {
+    let rows = this.rows.filter((row) => {
+      if (!this.conditions) {
+        return true;
+      }
+
+      return Object.entries(this.conditions).every(
+        ([key, value]) => row[key as keyof NoteRow] === value,
+      );
+    });
+
+    if (this.order) {
+      const { column, direction } = this.order;
+      const multiplier = direction === "asc" ? 1 : -1;
+
+      rows = [...rows].sort((left, right) => {
+        if (left[column] === right[column]) {
+          return 0;
+        }
+
+        return left[column] < right[column] ? -1 * multiplier : multiplier;
+      });
+    }
+
+    rows = rows.slice(this.offsetCount);
+
+    if (this.limitCount !== undefined) {
+      rows = rows.slice(0, this.limitCount);
+    }
+
+    return rows.map((row) => {
+      if (!this.selectedColumns) {
+        return row;
+      }
+
+      const selected: Record<string, unknown> = {};
+
+      for (const column of this.selectedColumns) {
+        selected[column] = row[column as keyof NoteRow];
+      }
+
+      return selected;
+    });
+  }
+}
+
+function createNoteRow(id: string, projectId: string, title: string, createdAt: number): NoteRow {
+  return {
+    body: `${title} body`,
+    createdAt,
+    id,
+    privateMemo: `${title} private memo`,
+    projectId,
+    title,
+  };
+}
 
 function createMemoryRepository() {
   const notes: NoteEntity[] = [

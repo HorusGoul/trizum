@@ -43,16 +43,17 @@ export const trizumJazzSchema = s.defineSchema({
       role: s.enum("owner", "editor", "viewer").default("editor"),
     })
     .indexOnly(["partyId", "userId"]),
-  userPartyStates: s
+  joinedParties: s
     .table({
       userId: s.string(),
       partyId: s.ref("parties"),
       participantId: s.ref("participants").optional(),
       isPinned: s.boolean().default(false),
       isArchived: s.boolean().default(false),
+      joinedAt: s.timestamp().optional(),
       lastUsedAt: s.timestamp().optional(),
     })
-    .indexOnly(["userId", "partyId"]),
+    .indexOnly(["userId", "partyId", "isArchived"]),
   participants: s
     .table({
       partyId: s.ref("parties"),
@@ -72,24 +73,9 @@ export const trizumJazzSchema = s.defineSchema({
       metadata: s.json().default({}),
     })
     .indexOnly(["ownerUserId", "partyId"]),
-  expenseChunks: s
-    .table({
-      partyId: s.ref("parties"),
-      createdAt: s.timestamp(),
-      maxSize: s.int().default(500),
-    })
-    .indexOnly(["partyId", "createdAt"]),
-  expenseChunkBalances: s
-    .table({
-      partyId: s.ref("parties"),
-      chunkId: s.ref("expenseChunks"),
-      balances: s.json().default({}),
-    })
-    .indexOnly(["partyId", "chunkId"]),
   expenses: s
     .table({
       partyId: s.ref("parties"),
-      chunkId: s.ref("expenseChunks").optional(),
       name: s.string(),
       paidAt: s.timestamp(),
       amount: s.int(),
@@ -102,7 +88,7 @@ export const trizumJazzSchema = s.defineSchema({
       editCopy: s.json().optional(),
       editCopyLastUpdatedAt: s.timestamp().optional(),
     })
-    .indexOnly(["partyId", "chunkId", "paidAt"]),
+    .indexOnly(["partyId", "paidAt"]),
 });
 
 export const trizumJazzApp = s.defineApp(trizumJazzSchema);
@@ -110,21 +96,17 @@ export const trizumJazzApp = s.defineApp(trizumJazzSchema);
 export type UserRow = RowOf<typeof trizumJazzApp.users>;
 export type PartyRow = RowOf<typeof trizumJazzApp.parties>;
 export type PartyMemberRow = RowOf<typeof trizumJazzApp.partyMembers>;
-export type UserPartyStateRow = RowOf<typeof trizumJazzApp.userPartyStates>;
+export type JoinedPartyRow = RowOf<typeof trizumJazzApp.joinedParties>;
 export type ParticipantRow = RowOf<typeof trizumJazzApp.participants>;
 export type MediaFileRow = RowOf<typeof trizumJazzApp.mediaFiles>;
-export type ExpenseChunkRow = RowOf<typeof trizumJazzApp.expenseChunks>;
-export type ExpenseChunkBalancesRow = RowOf<typeof trizumJazzApp.expenseChunkBalances>;
 export type ExpenseRow = RowOf<typeof trizumJazzApp.expenses>;
 
 export type CreateUserInput = InsertOf<typeof trizumJazzApp.users>;
 export type CreatePartyInput = InsertOf<typeof trizumJazzApp.parties>;
 export type CreatePartyMemberInput = InsertOf<typeof trizumJazzApp.partyMembers>;
-export type CreateUserPartyStateInput = InsertOf<typeof trizumJazzApp.userPartyStates>;
+export type CreateJoinedPartyInput = InsertOf<typeof trizumJazzApp.joinedParties>;
 export type CreateParticipantInput = InsertOf<typeof trizumJazzApp.participants>;
 export type CreateMediaFileInput = InsertOf<typeof trizumJazzApp.mediaFiles>;
-export type CreateExpenseChunkInput = InsertOf<typeof trizumJazzApp.expenseChunks>;
-export type CreateExpenseChunkBalancesInput = InsertOf<typeof trizumJazzApp.expenseChunkBalances>;
 export type CreateExpenseInput = InsertOf<typeof trizumJazzApp.expenses>;
 
 export const trizumJazzPermissions = definePermissions(
@@ -159,12 +141,12 @@ export const trizumJazzPermissions = definePermissions(
       .whereNew(allowedTo.update("partyId")),
     policy.partyMembers.allowDelete.where(allowedTo.update("partyId")),
 
-    policy.userPartyStates.allowRead.where({ userId: session.userId }),
-    policy.userPartyStates.allowInsert.where({ userId: session.userId }),
-    policy.userPartyStates.allowUpdate
+    policy.joinedParties.allowRead.where({ userId: session.userId }),
+    policy.joinedParties.allowInsert.where({ userId: session.userId }),
+    policy.joinedParties.allowUpdate
       .whereOld({ userId: session.userId })
       .whereNew({ userId: session.userId }),
-    policy.userPartyStates.allowDelete.where({ userId: session.userId }),
+    policy.joinedParties.allowDelete.where({ userId: session.userId }),
 
     policy.participants.allowRead.where(allowedTo.read("partyId")),
     policy.participants.allowInsert.where(allowedTo.update("partyId")),
@@ -181,20 +163,6 @@ export const trizumJazzPermissions = definePermissions(
       .whereOld({ ownerUserId: session.userId })
       .whereNew({ ownerUserId: session.userId }),
     policy.mediaFiles.allowDelete.where({ ownerUserId: session.userId }),
-
-    policy.expenseChunks.allowRead.where(allowedTo.read("partyId")),
-    policy.expenseChunks.allowInsert.where(allowedTo.update("partyId")),
-    policy.expenseChunks.allowUpdate
-      .whereOld(allowedTo.update("partyId"))
-      .whereNew(allowedTo.update("partyId")),
-    policy.expenseChunks.allowDelete.where(allowedTo.update("partyId")),
-
-    policy.expenseChunkBalances.allowRead.where(allowedTo.read("partyId")),
-    policy.expenseChunkBalances.allowInsert.where(allowedTo.update("partyId")),
-    policy.expenseChunkBalances.allowUpdate
-      .whereOld(allowedTo.update("partyId"))
-      .whereNew(allowedTo.update("partyId")),
-    policy.expenseChunkBalances.allowDelete.where(allowedTo.update("partyId")),
 
     policy.expenses.allowRead.where(allowedTo.read("partyId")),
     policy.expenses.allowInsert.where(allowedTo.update("partyId")),

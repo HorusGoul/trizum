@@ -10,18 +10,15 @@ import {
 } from "fate-jazz";
 import { trizumJazzApp } from "./schema.js";
 import type {
-  CreateExpenseChunkBalancesMutationInput,
-  CreateExpenseChunkMutationInput,
   CreateExpenseMutationInput,
+  CreateJoinedPartyMutationInput,
   CreateMediaFileMutationInput,
   CreatePartyMemberMutationInput,
   CreateParticipantMutationInput,
   CreatePartyMutationInput,
   CreateUserMutationInput,
-  CreateUserPartyStateMutationInput,
-  ExpenseChunkBalancesEntity,
-  ExpenseChunkEntity,
   ExpenseEntity,
+  JoinedPartyEntity,
   MediaFileEntity,
   PartyMemberEntity,
   ParticipantEntity,
@@ -29,18 +26,15 @@ import type {
   TrizumFateEntity,
   TrizumFateTypename,
   UserEntity,
-  UserPartyStateEntity,
 } from "./views.js";
 
 export type TrizumFateListRoot =
-  | "expenseChunkBalances"
-  | "expenseChunks"
   | "expenses"
+  | "joinedParties"
   | "mediaFiles"
   | "participants"
   | "parties"
   | "partyMembers"
-  | "userPartyStates"
   | "users";
 
 export type TrizumFateMutationMap = {
@@ -56,9 +50,9 @@ export type TrizumFateMutationMap = {
     input: CreatePartyMemberMutationInput;
     output: PartyMemberEntity;
   };
-  "userPartyState.create": {
-    input: CreateUserPartyStateMutationInput;
-    output: UserPartyStateEntity;
+  "joinedParty.create": {
+    input: CreateJoinedPartyMutationInput;
+    output: JoinedPartyEntity;
   };
   "participant.create": {
     input: CreateParticipantMutationInput;
@@ -67,14 +61,6 @@ export type TrizumFateMutationMap = {
   "mediaFile.create": {
     input: CreateMediaFileMutationInput;
     output: MediaFileEntity;
-  };
-  "expenseChunk.create": {
-    input: CreateExpenseChunkMutationInput;
-    output: ExpenseChunkEntity;
-  };
-  "expenseChunkBalances.create": {
-    input: CreateExpenseChunkBalancesMutationInput;
-    output: ExpenseChunkBalancesEntity;
   };
   "expense.create": {
     input: CreateExpenseMutationInput;
@@ -123,9 +109,18 @@ export const trizumEntityDefinitions = [
     type: "PartyMember",
   },
   {
-    columns: ["id", "userId", "partyId", "participantId", "isPinned", "isArchived", "lastUsedAt"],
-    table: trizumJazzApp.userPartyStates,
-    type: "UserPartyState",
+    columns: [
+      "id",
+      "userId",
+      "partyId",
+      "participantId",
+      "isPinned",
+      "isArchived",
+      "joinedAt",
+      "lastUsedAt",
+    ],
+    table: trizumJazzApp.joinedParties,
+    type: "JoinedParty",
   },
   {
     columns: [
@@ -147,20 +142,9 @@ export const trizumEntityDefinitions = [
     type: "MediaFile",
   },
   {
-    columns: ["id", "partyId", "createdAt", "maxSize"],
-    table: trizumJazzApp.expenseChunks,
-    type: "ExpenseChunk",
-  },
-  {
-    columns: ["id", "partyId", "chunkId", "balances"],
-    table: trizumJazzApp.expenseChunkBalances,
-    type: "ExpenseChunkBalances",
-  },
-  {
     columns: [
       "id",
       "partyId",
-      "chunkId",
       "name",
       "paidAt",
       "amount",
@@ -193,8 +177,8 @@ export const trizumListDefinitions = [
     where: partyScopedWhere,
   },
   {
-    root: "userPartyStates",
-    type: "UserPartyState",
+    root: "joinedParties",
+    type: "JoinedParty",
     where: userOrPartyScopedWhere,
   },
   {
@@ -209,23 +193,10 @@ export const trizumListDefinitions = [
   },
   {
     orderBy: {
-      column: "createdAt",
-      direction: "desc",
-    },
-    root: "expenseChunks",
-    type: "ExpenseChunk",
-    where: partyScopedWhere,
-  },
-  {
-    root: "expenseChunkBalances",
-    type: "ExpenseChunkBalances",
-    where: chunkOrPartyScopedWhere,
-  },
-  {
-    orderBy: {
       column: "paidAt",
       direction: "desc",
     },
+    pagination: "offset",
     root: "expenses",
     type: "Expense",
     where: partyScopedWhere,
@@ -249,9 +220,9 @@ export const trizumMutationDefinitions = [
     type: "PartyMember",
   },
   {
-    proc: "userPartyState.create",
-    table: trizumJazzApp.userPartyStates,
-    type: "UserPartyState",
+    proc: "joinedParty.create",
+    table: trizumJazzApp.joinedParties,
+    type: "JoinedParty",
   },
   {
     proc: "participant.create",
@@ -262,16 +233,6 @@ export const trizumMutationDefinitions = [
     proc: "mediaFile.create",
     table: trizumJazzApp.mediaFiles,
     type: "MediaFile",
-  },
-  {
-    proc: "expenseChunk.create",
-    table: trizumJazzApp.expenseChunks,
-    type: "ExpenseChunk",
-  },
-  {
-    proc: "expenseChunkBalances.create",
-    table: trizumJazzApp.expenseChunkBalances,
-    type: "ExpenseChunkBalances",
   },
   {
     proc: "expense.create",
@@ -336,14 +297,4 @@ function userOrPartyScopedWhere(args?: Record<string, unknown>) {
   }
 
   return undefined;
-}
-
-function chunkOrPartyScopedWhere(args?: Record<string, unknown>) {
-  if (typeof args?.chunkId === "string") {
-    return {
-      chunkId: args.chunkId,
-    };
-  }
-
-  return partyScopedWhere(args);
 }

@@ -1,22 +1,18 @@
 import { mutation, view } from "@nkzw/fate";
 import type {
-  CreateExpenseChunkBalancesInput,
-  CreateExpenseChunkInput,
   CreateExpenseInput,
+  CreateJoinedPartyInput,
   CreateMediaFileInput,
   CreatePartyMemberInput,
   CreateParticipantInput,
   CreatePartyInput,
   CreateUserInput,
-  CreateUserPartyStateInput,
-  ExpenseChunkBalancesRow,
-  ExpenseChunkRow,
   ExpenseRow,
+  JoinedPartyRow,
   MediaFileRow,
   PartyMemberRow,
   ParticipantRow,
   PartyRow,
-  UserPartyStateRow,
   UserRow,
 } from "./schema.js";
 
@@ -35,14 +31,9 @@ export type PartyEntity = WithTypename<
 >;
 
 export type PartyMemberEntity = WithTypename<"PartyMember", PartyMemberRow>;
-export type UserPartyStateEntity = WithTypename<"UserPartyState", UserPartyStateRow>;
+export type JoinedPartyEntity = WithTypename<"JoinedParty", JoinedPartyRow>;
 export type ParticipantEntity = WithTypename<"Participant", ParticipantRow>;
 export type MediaFileEntity = WithTypename<"MediaFile", MediaFileRow>;
-export type ExpenseChunkEntity = WithTypename<"ExpenseChunk", ExpenseChunkRow>;
-export type ExpenseChunkBalancesEntity = WithTypename<
-  "ExpenseChunkBalances",
-  ExpenseChunkBalancesRow
->;
 
 export type ExpenseEntity = WithTypename<
   "Expense",
@@ -53,15 +44,13 @@ export type ExpenseEntity = WithTypename<
 >;
 
 export type TrizumFateEntity =
-  | ExpenseChunkBalancesEntity
-  | ExpenseChunkEntity
   | ExpenseEntity
+  | JoinedPartyEntity
   | MediaFileEntity
   | ParticipantEntity
   | PartyEntity
   | PartyMemberEntity
-  | UserEntity
-  | UserPartyStateEntity;
+  | UserEntity;
 export type TrizumFateTypename = TrizumFateEntity["__typename"];
 
 type WithTypename<Typename extends string, Row extends { id: string }> = Row & {
@@ -113,13 +102,14 @@ export const PartyMemberView = view<PartyMemberEntity>()({
   role: true,
 });
 
-export const UserPartyStateView = view<UserPartyStateEntity>()({
+export const JoinedPartyView = view<JoinedPartyEntity>()({
   id: true,
   userId: true,
   partyId: true,
   participantId: true,
   isPinned: true,
   isArchived: true,
+  joinedAt: true,
   lastUsedAt: true,
 });
 
@@ -146,24 +136,9 @@ export const MediaFileBlobView = view<MediaFileEntity>()({
   encodedBlob: true,
 });
 
-export const ExpenseChunkView = view<ExpenseChunkEntity>()({
-  id: true,
-  partyId: true,
-  createdAt: true,
-  maxSize: true,
-});
-
-export const ExpenseChunkBalancesView = view<ExpenseChunkBalancesEntity>()({
-  id: true,
-  partyId: true,
-  chunkId: true,
-  balances: true,
-});
-
 export const ExpenseListItemView = view<ExpenseEntity>()({
   id: true,
   partyId: true,
-  chunkId: true,
   name: true,
   paidAt: true,
   amount: true,
@@ -176,11 +151,9 @@ export const ExpenseListItemView = view<ExpenseEntity>()({
 export type CreateUserMutationInput = CreateUserInput;
 export type CreatePartyMutationInput = CreatePartyInput;
 export type CreatePartyMemberMutationInput = CreatePartyMemberInput;
-export type CreateUserPartyStateMutationInput = CreateUserPartyStateInput;
+export type CreateJoinedPartyMutationInput = CreateJoinedPartyInput;
 export type CreateParticipantMutationInput = CreateParticipantInput;
 export type CreateMediaFileMutationInput = CreateMediaFileInput;
-export type CreateExpenseChunkMutationInput = CreateExpenseChunkInput;
-export type CreateExpenseChunkBalancesMutationInput = CreateExpenseChunkBalancesInput;
 export type CreateExpenseMutationInput = CreateExpenseInput;
 
 export const trizumFateMutations = {
@@ -191,11 +164,11 @@ export const trizumFateMutations = {
     CreatePartyMemberMutationInput,
     PartyMemberEntity
   >("PartyMember"),
-  "userPartyState.create": mutation<
-    UserPartyStateEntity,
-    CreateUserPartyStateMutationInput,
-    UserPartyStateEntity
-  >("UserPartyState"),
+  "joinedParty.create": mutation<
+    JoinedPartyEntity,
+    CreateJoinedPartyMutationInput,
+    JoinedPartyEntity
+  >("JoinedParty"),
   "participant.create": mutation<
     ParticipantEntity,
     CreateParticipantMutationInput,
@@ -204,15 +177,5 @@ export const trizumFateMutations = {
   "mediaFile.create": mutation<MediaFileEntity, CreateMediaFileMutationInput, MediaFileEntity>(
     "MediaFile",
   ),
-  "expenseChunk.create": mutation<
-    ExpenseChunkEntity,
-    CreateExpenseChunkMutationInput,
-    ExpenseChunkEntity
-  >("ExpenseChunk"),
-  "expenseChunkBalances.create": mutation<
-    ExpenseChunkBalancesEntity,
-    CreateExpenseChunkBalancesMutationInput,
-    ExpenseChunkBalancesEntity
-  >("ExpenseChunkBalances"),
   "expense.create": mutation<ExpenseEntity, CreateExpenseMutationInput, ExpenseEntity>("Expense"),
 };
