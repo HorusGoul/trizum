@@ -13,6 +13,8 @@ then use this document to decide where to work inside the PWA.
 - [`src/components`](./src/components) contains app-specific UI.
 - [`src/lib`](./src/lib) and [`src/models`](./src/models) contain business logic
   and domain models.
+- [`src/lib/data`](./src/lib/data) contains the app-facing Fate/Jazz data
+  client context and migration bridge for legacy Automerge state.
 - [`e2e/README.md`](./e2e/README.md) defines the shared Playwright browser
   harness and deterministic journey setup strategy.
 - [`locale/AGENTS.md`](./locale/AGENTS.md) contains translation terminology and

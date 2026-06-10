@@ -26,6 +26,11 @@ import type {
   TrizumFateEntity,
   TrizumFateTypename,
   UserEntity,
+  UpsertJoinedPartyMutationInput,
+  UpsertParticipantMutationInput,
+  UpsertPartyMemberMutationInput,
+  UpsertPartyMutationInput,
+  UpsertUserMutationInput,
 } from "./views.js";
 
 export type TrizumFateListRoot =
@@ -42,20 +47,40 @@ export type TrizumFateMutationMap = {
     input: CreateUserMutationInput;
     output: UserEntity;
   };
+  "user.upsert": {
+    input: UpsertUserMutationInput;
+    output: UserEntity;
+  };
   "party.create": {
     input: CreatePartyMutationInput;
+    output: PartyEntity;
+  };
+  "party.upsert": {
+    input: UpsertPartyMutationInput;
     output: PartyEntity;
   };
   "partyMember.create": {
     input: CreatePartyMemberMutationInput;
     output: PartyMemberEntity;
   };
+  "partyMember.upsert": {
+    input: UpsertPartyMemberMutationInput;
+    output: PartyMemberEntity;
+  };
   "joinedParty.create": {
     input: CreateJoinedPartyMutationInput;
     output: JoinedPartyEntity;
   };
+  "joinedParty.upsert": {
+    input: UpsertJoinedPartyMutationInput;
+    output: JoinedPartyEntity;
+  };
   "participant.create": {
     input: CreateParticipantMutationInput;
+    output: ParticipantEntity;
+  };
+  "participant.upsert": {
+    input: UpsertParticipantMutationInput;
     output: ParticipantEntity;
   };
   "mediaFile.create": {
@@ -210,7 +235,19 @@ export const trizumMutationDefinitions = [
     type: "User",
   },
   {
+    operation: "upsert",
+    proc: "user.upsert",
+    table: trizumJazzApp.users,
+    type: "User",
+  },
+  {
     proc: "party.create",
+    table: trizumJazzApp.parties,
+    type: "Party",
+  },
+  {
+    operation: "upsert",
+    proc: "party.upsert",
     table: trizumJazzApp.parties,
     type: "Party",
   },
@@ -220,12 +257,30 @@ export const trizumMutationDefinitions = [
     type: "PartyMember",
   },
   {
+    operation: "upsert",
+    proc: "partyMember.upsert",
+    table: trizumJazzApp.partyMembers,
+    type: "PartyMember",
+  },
+  {
     proc: "joinedParty.create",
     table: trizumJazzApp.joinedParties,
     type: "JoinedParty",
   },
   {
+    operation: "upsert",
+    proc: "joinedParty.upsert",
+    table: trizumJazzApp.joinedParties,
+    type: "JoinedParty",
+  },
+  {
     proc: "participant.create",
+    table: trizumJazzApp.participants,
+    type: "Participant",
+  },
+  {
+    operation: "upsert",
+    proc: "participant.upsert",
     table: trizumJazzApp.participants,
     type: "Participant",
   },

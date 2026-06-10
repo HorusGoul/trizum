@@ -77,6 +77,12 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_FULL_VERSION = fullVersion;
 
   return {
+    resolve: {
+      alias: {
+        "@trizum/data": fileURLToPath(new URL("../data/src/index.ts", import.meta.url)),
+        "fate-jazz": fileURLToPath(new URL("../fate-jazz/src/index.ts", import.meta.url)),
+      },
+    },
     run: {
       tasks: {
         build: {
@@ -154,7 +160,7 @@ export default defineConfig(({ mode }) => {
         registerType: "prompt",
         workbox: {
           globPatterns: ["**/*.{js,wasm,css,html,svg}"],
-          maximumFileSizeToCacheInBytes: 5242880,
+          maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
           additionalManifestEntries: [{ url: "/THIRD-PARTY-LICENSES.txt", revision: null }],
         },
         outDir: "dist/client",

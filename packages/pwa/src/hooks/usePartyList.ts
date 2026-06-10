@@ -9,7 +9,18 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
+import {
+  mirrorPartyReferenceToFate,
+  upsertFateJoinedParty,
+  upsertFateUserFromPartyList,
+  useFatePartyListState,
+  useMirrorPartyListToFate,
+} from "#src/lib/data/fatePartyList.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { getLogger } from "#src/lib/log.ts";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
+
+const logger = getLogger("hooks", "usePartyList");
 
 function ensurePinnedParties(list: PartyList) {
   if (!list.pinnedParties) {
@@ -37,10 +48,14 @@ function ensureLastUsedAt(list: PartyList) {
 
 export function usePartyList() {
   const repo = useRepo();
+  const { client, userId } = useTrizumData();
   const [partyListId] = useState<DocumentId>(() => getPartyListId(repo));
-  const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(partyListId, {
+  const [legacyPartyList, partyListHandle] = useSuspenseDocument<PartyList>(partyListId, {
     required: true,
   });
+  const partyList = useFatePartyListState(legacyPartyList);
+
+  useMirrorPartyListToFate(repo, legacyPartyList);
 
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());
@@ -62,6 +77,7 @@ export function usePartyList() {
 
       list.participantInParties[partyId] = participantId;
     });
+    mirrorPartyToFate(partyId);
   }
   function removeParty(partyId: Party["id"]) {
     // TODO: mark for deletion during next boot
@@ -82,6 +98,11 @@ export function usePartyList() {
 
       delete list.participantInParties[partyId];
     });
+    mirrorJoinedPartyToFate(partyId, {
+      isArchived: true,
+      isPinned: false,
+      lastUsedAt: new Date(),
+    });
   }
 
   function setLastOpenedPartyId(partyId: Party["id"] | null) {
@@ -94,6 +115,16 @@ export function usePartyList() {
 
       ensureLastUsedAt(list)[partyId] = Date.now();
     });
+
+    const nextPartyList = partyListHandle.doc();
+
+    if (nextPartyList) {
+      mirrorUserToFate(nextPartyList);
+    }
+
+    if (partyId) {
+      mirrorPartyToFate(partyId);
+    }
   }
 
   function setPartyPinned(partyId: Party["id"], pinned: boolean) {
@@ -112,6 +143,7 @@ export function usePartyList() {
 
       delete pinnedParties[partyId];
     });
+    mirrorPartyToFate(partyId);
   }
 
   function setPartyArchived(partyId: Party["id"], archived: boolean) {
@@ -132,6 +164,7 @@ export function usePartyList() {
 
       delete archivedParties[partyId];
     });
+    mirrorPartyToFate(partyId);
   }
 
   function updateSettings(
@@ -158,6 +191,10 @@ export function usePartyList() {
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
       list.autoOpenCalculator = values.autoOpenCalculator;
       list.hue = values.hue;
+    });
+    mirrorUserToFate({
+      ...legacyPartyList,
+      ...values,
     });
 
     void updateAllParties();
@@ -207,6 +244,46 @@ export function usePartyList() {
   function setAutoOpenCalculator(value: boolean) {
     partyListHandle.change((list) => {
       list.autoOpenCalculator = value;
+    });
+    mirrorUserToFate({
+      ...legacyPartyList,
+      autoOpenCalculator: value,
+    });
+  }
+
+  function mirrorUserToFate(nextPartyList: PartyList) {
+    void upsertFateUserFromPartyList(client, userId, nextPartyList).catch((error) => {
+      logger.warn("Could not mirror party list user settings to Fate", { error });
+    });
+  }
+
+  function mirrorPartyToFate(partyId: Party["id"]) {
+    const nextPartyList = partyListHandle.doc() ?? partyList;
+
+    void mirrorPartyReferenceToFate({
+      client,
+      partyId,
+      partyList: nextPartyList,
+      repo,
+      userId,
+    }).catch((error) => {
+      logger.warn("Could not mirror joined party state to Fate", { error });
+    });
+  }
+
+  function mirrorJoinedPartyToFate(
+    partyId: Party["id"],
+    values: {
+      isArchived: boolean;
+      isPinned: boolean;
+      lastUsedAt: Date;
+    },
+  ) {
+    void upsertFateJoinedParty(client, userId, partyId, {
+      ...values,
+      participantId: partyList.participantInParties[partyId],
+    }).catch((error) => {
+      logger.warn("Could not mirror joined party state to Fate", { error });
     });
   }
 

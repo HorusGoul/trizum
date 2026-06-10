@@ -28,6 +28,17 @@ type MutationMap = {
     };
     output: NoteEntity;
   };
+  "note.upsert": {
+    input: {
+      body: string;
+      createdAt: number;
+      id: string;
+      privateMemo?: string;
+      projectId: string;
+      title: string;
+    };
+    output: NoteEntity;
+  };
 };
 
 describe("Jazz Fate auth", () => {
@@ -164,6 +175,71 @@ describe("Jazz DB repository", () => {
       },
     ]);
   });
+
+  test("rereads upserted rows through the Fate selection", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "upsert",
+          proc: "note.upsert",
+          table,
+          type: "Note",
+        },
+      ],
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.upsert",
+        {
+          body: "Visible details",
+          createdAt: 2,
+          id: "note-2",
+          privateMemo: "hidden",
+          projectId: "project-1",
+          title: "Draft",
+        },
+        ["id", "title", "privateMemo"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-2",
+      title: "Draft",
+    });
+    expect(table.calls).toStrictEqual([
+      {
+        data: {
+          body: "Visible details",
+          createdAt: 2,
+          privateMemo: "hidden",
+          projectId: "project-1",
+          title: "Draft",
+        },
+        id: "note-2",
+        method: "upsert",
+      },
+      {
+        conditions: {
+          id: "note-2",
+        },
+        method: "where",
+      },
+      {
+        columns: ["id", "title"],
+        method: "select",
+      },
+    ]);
+  });
 });
 
 describe("Fate Jazz transport", () => {
@@ -258,6 +334,11 @@ type FakeNoteQueryCall =
   | {
       count: number;
       method: "limit" | "offset";
+    }
+  | {
+      data: Partial<NoteRow>;
+      id: string;
+      method: "upsert";
     };
 
 class FakeNoteQuery {
@@ -324,6 +405,32 @@ class FakeNoteQuery {
     return this;
   }
 
+  upsert(id: string, data: Partial<NoteRow>) {
+    const index = this.rows.findIndex((row) => row.id === id);
+    const row: NoteRow = {
+      body: "",
+      createdAt: 0,
+      id,
+      privateMemo: "",
+      projectId: "",
+      title: "",
+      ...(index >= 0 ? this.rows[index] : undefined),
+      ...data,
+    };
+
+    if (index >= 0) {
+      this.rows.splice(index, 1, row);
+    } else {
+      this.rows.push(row);
+    }
+
+    this.calls.push({
+      data,
+      id,
+      method: "upsert",
+    });
+  }
+
   execute() {
     let rows = this.rows.filter((row) => {
       if (!this.conditions) {
@@ -379,6 +486,30 @@ function createNoteRow(id: string, projectId: string, title: string, createdAt: 
     projectId,
     title,
   };
+}
+
+function createFakeNoteDb(table: FakeNoteQuery): JazzFateDb {
+  return {
+    async all(query: unknown) {
+      return (query as FakeNoteQuery).execute();
+    },
+    insert(_table: unknown, _input: unknown) {
+      throw new Error("insert is not used by this test");
+    },
+    async one(query: unknown) {
+      return (query as FakeNoteQuery).execute().at(0) ?? null;
+    },
+    update(_table: unknown, _id: string, _input: unknown) {
+      throw new Error("update is not used by this test");
+    },
+    upsert(_table: unknown, input: unknown, options: { id: string }) {
+      table.upsert(options.id, input as Partial<NoteRow>);
+
+      return {
+        wait: async () => {},
+      };
+    },
+  } as unknown as JazzFateDb;
 }
 
 function createMemoryRepository() {

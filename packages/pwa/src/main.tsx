@@ -30,9 +30,11 @@ import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
+import { createLocalFirstTrizumDataClient } from "@trizum/data";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging } from "./lib/log.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
+import { TrizumDataContext } from "./lib/data/TrizumDataContext.ts";
 import {
   readPartyListState,
   seedPartyListState,
@@ -98,12 +100,17 @@ declare module "react-aria-components" {
 }
 
 const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
+const JAZZ_SERVER_URL = import.meta.env.VITE_APP_JAZZ_SERVER_URL?.trim() || undefined;
 const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
 
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
+});
+const trizumData = await createLocalFirstTrizumDataClient({
+  dbName: "trizum-jazz-fate-pwa",
+  serverUrl: isOfflineOnly ? undefined : JAZZ_SERVER_URL,
 });
 
 declare global {
@@ -141,7 +148,7 @@ window.__internal_readPartyListState = async () => {
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: { repo },
+  context: { data: trizumData, repo },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
@@ -189,10 +196,12 @@ if (!rootElement.innerHTML) {
       <UpdateControllerComponent>
         <AriaProviders>
           <RepoContext value={repo}>
-            <MediaGalleryController>
-              <RouterProvider router={router} InnerWrap={InnerWrap} />
-              <Toaster />
-            </MediaGalleryController>
+            <TrizumDataContext value={trizumData}>
+              <MediaGalleryController>
+                <RouterProvider router={router} InnerWrap={InnerWrap} />
+                <Toaster />
+              </MediaGalleryController>
+            </TrizumDataContext>
           </RepoContext>
         </AriaProviders>
       </UpdateControllerComponent>

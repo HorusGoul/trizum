@@ -62,7 +62,7 @@ export interface JazzFateRepository<
   ): Promise<TMutationMap[K]["output"]>;
 }
 
-export type JazzFateDb = Pick<Db, "all" | "insert" | "one">;
+export type JazzFateDb = Pick<Db, "all" | "insert" | "one" | "update" | "upsert">;
 
 export type JazzFateEntityDefinition<TEntity extends JazzFateEntity = JazzFateEntity> = {
   columns: readonly string[];
@@ -82,6 +82,8 @@ export type JazzFateListDefinition<TEntity extends JazzFateEntity = JazzFateEnti
 };
 
 export type JazzFateMutationDefinition<TEntity extends JazzFateEntity = JazzFateEntity> = {
+  id?: (input: unknown) => string | number | undefined;
+  operation?: "insert" | "update" | "upsert";
   proc: string;
   table: unknown;
   type: TEntity["__typename"];
@@ -179,14 +181,37 @@ export function createJazzDbRepository<
         throw new Error(`Unsupported Fate mutation: ${String(proc)}`);
       }
 
-      const result = insertRow(db, mutation.table, input);
       const entity = expectEntityDefinition(entityByType, mutation.type);
+      const operation = mutation.operation ?? "insert";
 
-      return toEntity(
-        entity,
-        result.value as RowLike,
-        select,
-      ) as TMutationMap[typeof proc]["output"];
+      if (operation === "insert") {
+        const result = insertRow(db, mutation.table, input);
+
+        return toEntity(
+          entity,
+          result.value as RowLike,
+          select,
+        ) as TMutationMap[typeof proc]["output"];
+      }
+
+      const id = getMutationId(mutation, input);
+
+      if (operation === "update") {
+        updateRow(db, mutation.table, id, input);
+      } else {
+        upsertRow(db, mutation.table, id, input);
+      }
+
+      const row = await db.one(
+        selectColumns(where(mutation.table, { id: String(id) }), entity, select),
+        queryOptions,
+      );
+
+      if (!row) {
+        throw new Error(`Fate mutation ${String(proc)} did not return row ${String(id)}`);
+      }
+
+      return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
     },
   };
 }
@@ -483,14 +508,73 @@ function coerceNonNegativeInteger(value: unknown): number | undefined {
 }
 
 function insertRow(db: JazzFateDb, table: unknown, input: unknown): { value: unknown } {
+  const id = getInputId(input);
+
   return (
     db.insert as (
       table: unknown,
       input: unknown,
+      options?: { id: string },
     ) => {
       value: unknown;
     }
-  )(table, input);
+  )(table, stripInputId(input), id === undefined ? undefined : { id: String(id) });
+}
+
+function updateRow(db: JazzFateDb, table: unknown, id: string | number, input: unknown): void {
+  (
+    db.update as (
+      table: unknown,
+      id: string,
+      input: unknown,
+    ) => {
+      wait?: unknown;
+    }
+  )(table, String(id), stripInputId(input));
+}
+
+function upsertRow(db: JazzFateDb, table: unknown, id: string | number, input: unknown): void {
+  (
+    db.upsert as (
+      table: unknown,
+      input: unknown,
+      options: {
+        id: string;
+      },
+    ) => {
+      wait?: unknown;
+    }
+  )(table, stripInputId(input), { id: String(id) });
+}
+
+function getMutationId(definition: JazzFateMutationDefinition, input: unknown): string | number {
+  const id = definition.id?.(input) ?? getInputId(input);
+
+  if (typeof id !== "string" && typeof id !== "number") {
+    throw new Error(`Fate mutation ${definition.proc} requires a string or number id`);
+  }
+
+  return id;
+}
+
+function getInputId(input: unknown): string | number | undefined {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return undefined;
+  }
+
+  const id = (input as { id?: unknown }).id;
+
+  return typeof id === "string" || typeof id === "number" ? id : undefined;
+}
+
+function stripInputId(input: unknown): unknown {
+  if (!input || typeof input !== "object" || Array.isArray(input) || !("id" in input)) {
+    return input;
+  }
+
+  const { id: _id, ...withoutId } = input as Record<string, unknown>;
+
+  return withoutId;
 }
 
 function normalizeArgs(args: unknown): Record<string, unknown> | undefined {

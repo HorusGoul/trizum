@@ -155,13 +155,35 @@ export type CreateJoinedPartyMutationInput = CreateJoinedPartyInput;
 export type CreateParticipantMutationInput = CreateParticipantInput;
 export type CreateMediaFileMutationInput = CreateMediaFileInput;
 export type CreateExpenseMutationInput = CreateExpenseInput;
+export type UpsertUserMutationInput = Partial<CreateUserInput> & {
+  id: string;
+};
+export type UpsertPartyMutationInput = CreatePartyInput & {
+  id: string;
+};
+export type UpsertPartyMemberMutationInput = CreatePartyMemberInput & {
+  id: string;
+};
+export type UpsertJoinedPartyMutationInput = CreateJoinedPartyInput & {
+  id: string;
+};
+export type UpsertParticipantMutationInput = CreateParticipantInput & {
+  id: string;
+};
 
 export const trizumFateMutations = {
   "user.create": mutation<UserEntity, CreateUserMutationInput, UserEntity>("User"),
+  "user.upsert": mutation<UserEntity, UpsertUserMutationInput, UserEntity>("User"),
   "party.create": mutation<PartyEntity, CreatePartyMutationInput, PartyEntity>("Party"),
+  "party.upsert": mutation<PartyEntity, UpsertPartyMutationInput, PartyEntity>("Party"),
   "partyMember.create": mutation<
     PartyMemberEntity,
     CreatePartyMemberMutationInput,
+    PartyMemberEntity
+  >("PartyMember"),
+  "partyMember.upsert": mutation<
+    PartyMemberEntity,
+    UpsertPartyMemberMutationInput,
     PartyMemberEntity
   >("PartyMember"),
   "joinedParty.create": mutation<
@@ -169,9 +191,19 @@ export const trizumFateMutations = {
     CreateJoinedPartyMutationInput,
     JoinedPartyEntity
   >("JoinedParty"),
+  "joinedParty.upsert": mutation<
+    JoinedPartyEntity,
+    UpsertJoinedPartyMutationInput,
+    JoinedPartyEntity
+  >("JoinedParty"),
   "participant.create": mutation<
     ParticipantEntity,
     CreateParticipantMutationInput,
+    ParticipantEntity
+  >("Participant"),
+  "participant.upsert": mutation<
+    ParticipantEntity,
+    UpsertParticipantMutationInput,
     ParticipantEntity
   >("Participant"),
   "mediaFile.create": mutation<MediaFileEntity, CreateMediaFileMutationInput, MediaFileEntity>(

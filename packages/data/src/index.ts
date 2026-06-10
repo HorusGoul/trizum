@@ -65,6 +65,11 @@ export {
   type PartyEntity,
   type TrizumFateEntity,
   type TrizumFateTypename,
+  type UpsertJoinedPartyMutationInput,
+  type UpsertParticipantMutationInput,
+  type UpsertPartyMemberMutationInput,
+  type UpsertPartyMutationInput,
+  type UpsertUserMutationInput,
   type UserEntity,
 } from "./views.js";
 export {

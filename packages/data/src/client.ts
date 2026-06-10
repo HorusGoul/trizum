@@ -74,13 +74,29 @@ export async function createLocalFirstTrizumDataClient(
     serverUrl: options.serverUrl,
     userBranch: options.userBranch,
   });
+  const userId = getAuthenticatedUserId(db.getAuthState());
 
   return {
     client: createTrizumFateClient({
       repository: createTrizumJazzRepository(db),
     }),
     db,
+    userId,
   };
 }
 
 export type { JazzFateAuth };
+
+function getAuthenticatedUserId(authState: {
+  session: {
+    user_id: string;
+  } | null;
+}) {
+  const userId = authState.session?.user_id;
+
+  if (!userId) {
+    throw new Error("Trizum data client requires an authenticated Jazz user session");
+  }
+
+  return userId;
+}

@@ -25,6 +25,8 @@ import {
   type TrizumFateEntity,
   type TrizumFateListRoot,
   type TrizumFateTypename,
+  type UpsertJoinedPartyMutationInput,
+  type UpsertUserMutationInput,
   type UserEntity,
 } from "./index.js";
 
@@ -228,6 +230,58 @@ describe("Fate masking over Trizum Jazz entities", () => {
     expect(Object.hasOwn(created.result, "internalMemo")).toBe(false);
   });
 
+  test("upserts user settings and joined party state through Fate", async () => {
+    const repository = createMemoryRepository();
+    const client = createTrizumFateClient({ repository });
+
+    const user = await client.mutations.user.upsert({
+      input: {
+        authMode: "localFirst",
+        displayName: "Updated Alice",
+        hue: 190,
+        id: "alice-local-first",
+        openLastPartyOnLaunch: true,
+      },
+      view: UserSettingsView,
+    });
+    const joinedParty = await client.mutations.joinedParty.upsert({
+      input: {
+        id: "joined-party-1",
+        isArchived: true,
+        isPinned: false,
+        lastUsedAt: new Date("2026-06-10T12:00:00.000Z"),
+        participantId: "participant-1",
+        partyId: "party-1",
+        userId: "alice-local-first",
+      },
+      view: JoinedPartyView,
+    });
+
+    if (user.error) {
+      throw user.error;
+    }
+
+    if (joinedParty.error) {
+      throw joinedParty.error;
+    }
+
+    expect(user.result).toMatchObject({
+      __typename: "User",
+      displayName: "Updated Alice",
+      hue: 190,
+      id: "alice-local-first",
+      openLastPartyOnLaunch: true,
+    });
+    expect(joinedParty.result).toMatchObject({
+      __typename: "JoinedParty",
+      id: "joined-party-1",
+      isArchived: true,
+      isPinned: false,
+      partyId: "party-1",
+      userId: "alice-local-first",
+    });
+  });
+
   test("exposes list roots through Fate while preserving per-view masking", async () => {
     const repository = createMemoryRepository();
     const client = createTrizumFateClient({ repository });
@@ -426,6 +480,25 @@ function createMemoryRepository() {
 
     async mutate(proc, input, select) {
       switch (proc) {
+        case "user.upsert": {
+          const userInput = input as UpsertUserMutationInput;
+          const user = upsertEntity(users, userInput.id, {
+            __typename: "User",
+            accountProvider: null,
+            authMode: userInput.authMode ?? "localFirst",
+            autoOpenCalculator: userInput.autoOpenCalculator ?? false,
+            avatarId: userInput.avatarId ?? null,
+            displayName: userInput.displayName ?? null,
+            fullAccountUserId: null,
+            hue: userInput.hue ?? null,
+            id: userInput.id,
+            lastOpenedPartyId: userInput.lastOpenedPartyId ?? null,
+            locale: userInput.locale ?? null,
+            openLastPartyOnLaunch: userInput.openLastPartyOnLaunch ?? false,
+            phone: userInput.phone ?? null,
+          });
+          return projectTrizumEntity(user, select);
+        }
         case "party.create": {
           const partyInput = input as CreatePartyMutationInput;
           const party: PartyEntity = {
@@ -468,6 +541,19 @@ function createMemoryRepository() {
             participantId: joinedPartyInput.participantId ?? null,
           };
           joinedParties.push(joinedParty);
+          return projectTrizumEntity(joinedParty, select);
+        }
+        case "joinedParty.upsert": {
+          const joinedPartyInput = input as UpsertJoinedPartyMutationInput;
+          const joinedParty = upsertEntity(joinedParties, joinedPartyInput.id, {
+            __typename: "JoinedParty",
+            ...joinedPartyInput,
+            isArchived: joinedPartyInput.isArchived ?? false,
+            isPinned: joinedPartyInput.isPinned ?? false,
+            joinedAt: joinedPartyInput.joinedAt ?? null,
+            lastUsedAt: joinedPartyInput.lastUsedAt ?? null,
+            participantId: joinedPartyInput.participantId ?? null,
+          });
           return projectTrizumEntity(joinedParty, select);
         }
         case "expense.create": {
@@ -514,6 +600,26 @@ function createMemoryRepository() {
   }
 
   return repository;
+}
+
+function upsertEntity<TEntity extends TrizumFateEntity>(
+  entities: TEntity[],
+  id: string,
+  nextEntity: TEntity,
+) {
+  const index = entities.findIndex((entity) => entity.id === id);
+
+  if (index === -1) {
+    entities.push(nextEntity);
+    return nextEntity;
+  }
+
+  entities[index] = {
+    ...entities[index],
+    ...nextEntity,
+  };
+
+  return entities[index]!;
 }
 
 function typeForRoot(root: TrizumFateListRoot): TrizumFateTypename {
