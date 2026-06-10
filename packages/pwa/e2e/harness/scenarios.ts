@@ -1,14 +1,14 @@
 export const defaultParticipants = {
   alex: {
-    id: "participant-alex",
+    id: "0b2edc6a-e0e5-4bf9-9a18-b79c704cf1c5",
     name: "Alex",
   },
   blair: {
-    id: "participant-blair",
+    id: "47e040e2-cff0-4f36-99eb-d459ab248141",
     name: "Blair",
   },
   casey: {
-    id: "participant-casey",
+    id: "f86441af-6c5e-4ee8-97c8-30798aca6612",
     name: "Casey",
   },
 } as const;
@@ -39,11 +39,11 @@ export const debtTransferJourney = {
   destinationPartyName: "City break",
   originMemberParticipantId: defaultParticipants.blair.id,
   destinationMemberParticipant: {
-    id: "participant-blair-city",
+    id: "c7d11a42-3288-4d6e-8553-99a2b9ea69b4",
     name: "Blair Downtown",
   },
   destinationCreditorParticipant: {
-    id: "participant-alex-smith",
+    id: "18870461-9483-4d7c-bf79-874867325f0a",
     name: "Alex Smith",
   },
 } as const;

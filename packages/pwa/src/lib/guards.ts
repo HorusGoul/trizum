@@ -4,8 +4,7 @@ import {
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { readParty } from "#src/lib/data/fateAppData.ts";
-import { fatePartyListCache } from "#src/lib/data/fateAppData.ts";
+import { readParty, readPartyList } from "#src/lib/data/fateAppData.ts";
 
 type RouterContext = RouterContextOptions<RegisteredRouter["routeTree"]>["context"];
 
@@ -20,7 +19,7 @@ export async function guardPartyExists(partyId: string, { data }: RouterContext)
 }
 
 export async function guardPartyListExists({ data }: RouterContext) {
-  const partyList = await fatePartyListCache.readAsync(data.client, data.userId);
+  const partyList = await readPartyList(data.client, data.userId);
 
   if (!partyList) {
     throw redirect({ to: "/" });

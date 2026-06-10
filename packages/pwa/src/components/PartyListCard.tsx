@@ -12,9 +12,8 @@ import {
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { type ComponentProps, type ReactNode, useState } from "react";
 import { useMediaQuery } from "#src/hooks/useMediaQuery.js";
+import { useParty } from "#src/hooks/useParty.ts";
 import type { Party, PartyParticipant } from "#src/models/party.js";
-import { fatePartyCache, useFateCache } from "#src/lib/data/fateAppData.ts";
-import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -53,10 +52,9 @@ export function PartyListCard({
   isPinned = false,
   currentParticipantId = null,
 }: PartyListCardProps) {
-  const { client } = useTrizumData();
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery("(min-width: 768px)");
-  const party = useFateCache(fatePartyCache, client, partyId);
+  const { party } = useParty(partyId);
   const [isFocusWithin, setIsFocusWithin] = useState(false);
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);

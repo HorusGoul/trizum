@@ -38,6 +38,24 @@ export type JazzFateMutationShape = {
 
 export type JazzFateMutationMap = Record<string, JazzFateMutationShape>;
 
+export type JazzFateMutationOperation = "delete" | "insert" | "update" | "upsert";
+
+export type JazzFateAffectedList = {
+  args?: Record<string, unknown>;
+  root: string;
+};
+
+export type JazzFateMutationEvent<
+  TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
+  TProc extends Extract<keyof TMutationMap, string> = Extract<keyof TMutationMap, string>,
+> = {
+  affectedLists: readonly JazzFateAffectedList[];
+  input: TMutationMap[TProc]["input"];
+  operation: JazzFateMutationOperation;
+  output: TMutationMap[TProc]["output"];
+  proc: TProc;
+};
+
 export interface JazzFateRepository<
   TEntity extends JazzFateEntity = JazzFateEntity,
   TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
@@ -60,6 +78,14 @@ export interface JazzFateRepository<
     input: TMutationMap[K]["input"],
     select: Iterable<string>,
   ): Promise<TMutationMap[K]["output"]>;
+  getAffectedLists?<K extends Extract<keyof TMutationMap, string>>(
+    proc: K,
+    input: TMutationMap[K]["input"],
+    output: TMutationMap[K]["output"],
+  ): readonly JazzFateAffectedList[];
+  getMutationOperation?<K extends Extract<keyof TMutationMap, string>>(
+    proc: K,
+  ): JazzFateMutationOperation;
 }
 
 export type JazzFateDb = Pick<Db, "all" | "delete" | "insert" | "one" | "update" | "upsert">;
@@ -82,12 +108,78 @@ export type JazzFateListDefinition<TEntity extends JazzFateEntity = JazzFateEnti
 };
 
 export type JazzFateMutationDefinition<TEntity extends JazzFateEntity = JazzFateEntity> = {
+  affectedLists?: (context: { input: unknown; output: TEntity }) => readonly JazzFateAffectedList[];
   id?: (input: unknown) => string | number | undefined;
-  operation?: "delete" | "insert" | "update" | "upsert";
+  operation?: JazzFateMutationOperation;
   proc: string;
   table: unknown;
   type: TEntity["__typename"];
 };
+
+export type CreateJazzFateTransportOptions<TMutationMap extends JazzFateMutationMap> = {
+  onMutation?: <K extends Extract<keyof TMutationMap, string>>(
+    event: JazzFateMutationEvent<TMutationMap, K>,
+  ) => Promise<void> | void;
+};
+
+export type JazzFateCacheUpdateEvent = {
+  affectedLists: readonly JazzFateAffectedList[];
+};
+
+type JazzFateCacheUpdateListener = (event: JazzFateCacheUpdateEvent) => void;
+
+type FateRequestHandle = PromiseLike<unknown> & {
+  descriptor?: {
+    items?: Array<{
+      argsPayload?: Record<string, unknown>;
+      kind?: string;
+      listKey?: string;
+      name?: string;
+    }>;
+  };
+};
+
+type FateRequestMap = Map<string, Map<string, FateRequestHandle>>;
+
+type FateCacheSyncStore = {
+  getListState?: (key: string) => unknown;
+  restoreList?: (key: string, list: unknown) => void;
+};
+
+type FateCacheSyncTarget = {
+  executeRequestHandle?: (handle: FateRequestHandle, mode: string) => void;
+  requests?: FateRequestMap;
+  store?: FateCacheSyncStore;
+};
+
+type JazzFateLiveViewHandlers = Parameters<NonNullable<Transport["subscribeById"]>>[4];
+type JazzFateLiveConnectionHandlers = Parameters<NonNullable<Transport["subscribeConnection"]>>[5];
+type JazzFateLiveViewSubscription = {
+  args?: Record<string, unknown>;
+  handlers: JazzFateLiveViewHandlers;
+  select: readonly string[];
+};
+type JazzFateLiveConnectionSubscription = {
+  args?: Record<string, unknown>;
+  handlers: JazzFateLiveConnectionHandlers;
+  procedure: string;
+};
+type NotifyJazzFateLiveSubscribersOptions<
+  TMutationMap extends JazzFateMutationMap,
+  TProc extends Extract<keyof TMutationMap, string>,
+> = {
+  affectedLists: readonly JazzFateAffectedList[];
+  connectionSubscriptions: ReadonlySet<JazzFateLiveConnectionSubscription>;
+  entitySubscriptions: ReadonlyMap<string, ReadonlySet<JazzFateLiveViewSubscription>>;
+  input: TMutationMap[TProc]["input"];
+  operation: JazzFateMutationOperation;
+  output: TMutationMap[TProc]["output"];
+  proc: TProc;
+  repository: JazzFateRepository<JazzFateEntity, TMutationMap>;
+};
+
+const cacheUpdateListeners = new WeakMap<object, Set<JazzFateCacheUpdateListener>>();
+const cacheRefreshQueues = new WeakMap<object, Promise<unknown>>();
 
 export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzFateEntity> = {
   db: JazzFateDb;
@@ -142,13 +234,21 @@ export function createJazzDbRepository<
       const list = expectListDefinition(listByRoot, root);
       const entity = expectEntityDefinition(entityByType, list.type);
       const pagination = getOffsetPagination(args, list.pagination);
-      const query = applyOffsetPagination(
-        selectColumns(applyListDefinition(entity.table, list, args), entity, select),
-        pagination,
+      const selectForFetch = withOrderByColumn(select, list.orderBy?.column);
+      const baseQuery = selectColumns(
+        applyListDefinition(entity.table, list, args),
+        entity,
+        selectForFetch,
       );
+      const query = list.orderBy ? baseQuery : applyOffsetPagination(baseQuery, pagination);
       const rows = await db.all(query, queryOptions);
-      const visibleRows = pagination.limit === undefined ? rows : rows.slice(0, pagination.limit);
-      const hasNext = pagination.limit !== undefined && rows.length > pagination.limit;
+      const sortedRows = list.orderBy ? sortRows(rows as RowLike[], list.orderBy) : rows;
+      const paginatedRows = list.orderBy
+        ? sortedRows.slice(pagination.offset)
+        : (sortedRows as RowLike[]);
+      const visibleRows =
+        pagination.limit === undefined ? paginatedRows : paginatedRows.slice(0, pagination.limit);
+      const hasNext = pagination.limit !== undefined && paginatedRows.length > pagination.limit;
 
       return {
         items: visibleRows.map((row) => {
@@ -186,6 +286,8 @@ export function createJazzDbRepository<
 
       if (operation === "insert") {
         const result = insertRow(db, mutation.table, input);
+
+        await waitForWrite(result, queryOptions);
 
         return toEntity(
           entity,
@@ -228,12 +330,33 @@ export function createJazzDbRepository<
 
       return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
     },
+
+    getAffectedLists(proc, input, output) {
+      const mutation = mutationByProc.get(proc);
+
+      if (!mutation?.affectedLists) {
+        return [];
+      }
+
+      return mutation.affectedLists({
+        input,
+        output: output as TEntity,
+      });
+    },
+
+    getMutationOperation(proc) {
+      return mutationByProc.get(proc)?.operation ?? "insert";
+    },
   };
 }
 
 export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap>(
   repository: JazzFateRepository<JazzFateEntity, TMutationMap>,
+  options: CreateJazzFateTransportOptions<TMutationMap> = {},
 ): Transport<TMutationMap> {
+  const entitySubscriptions = new Map<string, Set<JazzFateLiveViewSubscription>>();
+  const connectionSubscriptions = new Set<JazzFateLiveConnectionSubscription>();
+
   return {
     fetchById(type, ids, select, args) {
       if (!repository.entityTypes.has(type)) {
@@ -256,9 +379,165 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
         throw new Error(`Unsupported Fate mutation: ${String(proc)}`);
       }
 
-      return repository.mutate(proc, input, select);
+      const output = await repository.mutate(proc, input, select);
+      const affectedLists = repository.getAffectedLists?.(proc, input, output) ?? [];
+      const operation = repository.getMutationOperation?.(proc) ?? "insert";
+      await notifyJazzFateLiveSubscribers({
+        affectedLists,
+        connectionSubscriptions,
+        entitySubscriptions,
+        input,
+        operation,
+        output,
+        proc,
+        repository,
+      });
+      await options.onMutation?.({
+        affectedLists,
+        input,
+        operation,
+        output,
+        proc,
+      });
+
+      return output;
+    },
+
+    subscribeById(type, id, select, args, handlers) {
+      const key = getEntitySubscriptionKey(type, id);
+      let subscriptions = entitySubscriptions.get(key);
+
+      if (!subscriptions) {
+        subscriptions = new Set();
+        entitySubscriptions.set(key, subscriptions);
+      }
+
+      const subscription = {
+        args: normalizeArgs(args),
+        handlers,
+        select: [...select],
+      } satisfies JazzFateLiveViewSubscription;
+      subscriptions.add(subscription);
+
+      return () => {
+        const current = entitySubscriptions.get(key);
+
+        if (!current) {
+          return;
+        }
+
+        current.delete(subscription);
+
+        if (current.size === 0) {
+          entitySubscriptions.delete(key);
+        }
+      };
+    },
+
+    subscribeConnection(procedure, _type, args, _select, _selectionArgs, handlers) {
+      const subscription = {
+        args: normalizeArgs(args),
+        handlers,
+        procedure,
+      } satisfies JazzFateLiveConnectionSubscription;
+      connectionSubscriptions.add(subscription);
+
+      return () => {
+        connectionSubscriptions.delete(subscription);
+      };
     },
   };
+}
+
+export function subscribeToJazzFateCacheUpdates(
+  client: object,
+  listener: JazzFateCacheUpdateListener,
+) {
+  let listeners = cacheUpdateListeners.get(client);
+
+  if (!listeners) {
+    listeners = new Set();
+    cacheUpdateListeners.set(client, listeners);
+  }
+
+  listeners.add(listener);
+
+  return () => {
+    const current = cacheUpdateListeners.get(client);
+
+    if (!current) {
+      return;
+    }
+
+    current.delete(listener);
+
+    if (current.size === 0) {
+      cacheUpdateListeners.delete(client);
+    }
+  };
+}
+
+export async function refreshJazzFateCache(
+  client: object,
+  affectedLists: readonly JazzFateAffectedList[],
+) {
+  const previous = cacheRefreshQueues.get(client) ?? Promise.resolve();
+  const current = previous
+    .catch(() => undefined)
+    .then(() => refreshJazzFateCacheNow(client, affectedLists));
+  const tail = current.catch(() => undefined);
+
+  cacheRefreshQueues.set(client, tail);
+
+  try {
+    return await current;
+  } finally {
+    if (cacheRefreshQueues.get(client) === tail) {
+      cacheRefreshQueues.delete(client);
+    }
+  }
+}
+
+async function refreshJazzFateCacheNow(
+  client: object,
+  affectedLists: readonly JazzFateAffectedList[],
+) {
+  const syncTarget = client as FateCacheSyncTarget;
+  const requests = syncTarget.requests;
+  const executeRequestHandle = syncTarget.executeRequestHandle?.bind(client);
+
+  if (!requests || !executeRequestHandle) {
+    emitJazzFateCacheUpdate(client, { affectedLists });
+    return 0;
+  }
+
+  const handles = new Set<FateRequestHandle>();
+
+  for (const requestModes of requests.values()) {
+    for (const handle of requestModes.values()) {
+      if (doesRequestMatchAffectedLists(handle, affectedLists)) {
+        handles.add(handle);
+      }
+    }
+  }
+
+  const listSnapshots = resetAffectedListStates(syncTarget.store, handles, affectedLists);
+
+  try {
+    await Promise.all(
+      [...handles].map(async (handle) => {
+        executeRequestHandle(handle, "network-only");
+        await handle;
+      }),
+    );
+  } catch (error) {
+    restoreListStates(syncTarget.store, listSnapshots);
+    throw error;
+  }
+
+  emitJazzFateCacheUpdate(client, { affectedLists });
+
+  return handles.size;
 }
 
 export function projectEntity<TEntity extends JazzFateEntity>(
@@ -311,6 +590,7 @@ export type CreateJazzFateDbOptions = {
   appId: string;
   auth?: JazzFateAuth;
   dbName?: string;
+  disableBrowserWorker?: boolean;
   driver?: DbConfig["driver"];
   env?: string;
   serverUrl?: string;
@@ -320,7 +600,7 @@ export type CreateJazzFateDbOptions = {
 export async function createJazzFateDb(options: CreateJazzFateDbOptions) {
   const auth = await resolveJazzFateAuthConfig(options.appId, options.auth);
 
-  return createDb({
+  return createDbWithBrowserWorkerOverride(options.disableBrowserWorker === true, {
     appId: options.appId,
     dbName: options.dbName,
     driver: options.driver,
@@ -329,6 +609,30 @@ export async function createJazzFateDb(options: CreateJazzFateDbOptions) {
     userBranch: options.userBranch,
     ...auth,
   });
+}
+
+async function createDbWithBrowserWorkerOverride(disableBrowserWorker: boolean, config: DbConfig) {
+  if (!disableBrowserWorker || typeof window === "undefined" || typeof Worker === "undefined") {
+    return createDb(config);
+  }
+
+  const originalWorker = Worker;
+
+  try {
+    Object.defineProperty(globalThis, "Worker", {
+      configurable: true,
+      value: undefined,
+      writable: true,
+    });
+
+    return await createDb(config);
+  } finally {
+    Object.defineProperty(globalThis, "Worker", {
+      configurable: true,
+      value: originalWorker,
+      writable: true,
+    });
+  }
 }
 
 export async function resolveJazzFateAuthConfig(
@@ -392,6 +696,14 @@ function selectedColumns<TEntity extends JazzFateEntity>(
   return [...selectedFieldSet(select, definition.columns)] as [string, ...string[]];
 }
 
+function withOrderByColumn(select: Iterable<string>, column: string | undefined) {
+  if (!column) {
+    return select;
+  }
+
+  return new Set([...select, column]);
+}
+
 function selectColumns<TEntity extends JazzFateEntity>(
   query: unknown,
   definition: JazzFateEntityDefinition<TEntity>,
@@ -439,6 +751,65 @@ function orderBy(query: unknown, column: string, direction: "asc" | "desc"): unk
       orderBy(column: string, direction: "asc" | "desc"): unknown;
     }
   ).orderBy(column, direction);
+}
+
+function sortRows(rows: readonly RowLike[], order: NonNullable<JazzFateListDefinition["orderBy"]>) {
+  const multiplier = order.direction === "asc" ? 1 : -1;
+
+  return [...rows].sort((left, right) => {
+    const comparison = compareSortValues(left[order.column], right[order.column]);
+
+    return comparison * multiplier;
+  });
+}
+
+function compareSortValues(left: unknown, right: unknown) {
+  const leftValue = toSortValue(left);
+  const rightValue = toSortValue(right);
+
+  if (leftValue === rightValue) {
+    return 0;
+  }
+
+  return leftValue < rightValue ? -1 : 1;
+}
+
+function toSortValue(value: unknown) {
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  if (typeof value === "string") {
+    const time = Date.parse(value);
+
+    return Number.isNaN(time) ? value : time;
+  }
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value) ?? "";
+    } catch {
+      return Object.prototype.toString.call(value);
+    }
+  }
+
+  if (typeof value === "bigint" || typeof value === "boolean" || typeof value === "symbol") {
+    return value.toString();
+  }
+
+  if (typeof value === "function") {
+    return value.name ? `[function ${value.name}]` : "[function]";
+  }
+
+  return "";
 }
 
 function limit(query: unknown, count: number): unknown {
@@ -494,6 +865,187 @@ function applyOffsetPagination(
   return nextQuery as QueryBuilder<RowLike>;
 }
 
+function doesRequestMatchAffectedLists(
+  handle: FateRequestHandle,
+  affectedLists: readonly JazzFateAffectedList[],
+) {
+  if (affectedLists.length === 0) {
+    return false;
+  }
+
+  return (
+    handle.descriptor?.items?.some(
+      (item) =>
+        item.kind === "list" &&
+        affectedLists.some((affectedList) =>
+          doesAffectedListMatchRequestItem(affectedList, item.name, item.argsPayload),
+        ),
+    ) === true
+  );
+}
+
+function resetAffectedListStates(
+  store: FateCacheSyncStore | undefined,
+  handles: ReadonlySet<FateRequestHandle>,
+  affectedLists: readonly JazzFateAffectedList[],
+) {
+  const listSnapshots = new Map<string, unknown>();
+
+  if (!store?.getListState || !store.restoreList) {
+    return listSnapshots;
+  }
+
+  for (const handle of handles) {
+    for (const item of handle.descriptor?.items ?? []) {
+      if (
+        item.kind !== "list" ||
+        !item.listKey ||
+        !affectedLists.some((affectedList) =>
+          doesAffectedListMatchRequestItem(affectedList, item.name, item.argsPayload),
+        ) ||
+        listSnapshots.has(item.listKey)
+      ) {
+        continue;
+      }
+
+      listSnapshots.set(item.listKey, store.getListState(item.listKey));
+      store.restoreList(item.listKey, undefined);
+    }
+  }
+
+  return listSnapshots;
+}
+
+function restoreListStates(
+  store: FateCacheSyncStore | undefined,
+  listSnapshots: ReadonlyMap<string, unknown>,
+) {
+  if (!store?.restoreList) {
+    return;
+  }
+
+  for (const [key, list] of listSnapshots) {
+    store.restoreList(key, list);
+  }
+}
+
+function doesAffectedListMatchRequestItem(
+  affectedList: JazzFateAffectedList,
+  root: string | undefined,
+  args: Record<string, unknown> | undefined,
+) {
+  if (affectedList.root !== root) {
+    return false;
+  }
+
+  if (!affectedList.args) {
+    return true;
+  }
+
+  for (const [key, value] of Object.entries(affectedList.args)) {
+    if (!Object.is(args?.[key], value)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function notifyJazzFateLiveSubscribers<
+  TMutationMap extends JazzFateMutationMap,
+  TProc extends Extract<keyof TMutationMap, string>,
+>({
+  affectedLists,
+  connectionSubscriptions,
+  entitySubscriptions,
+  operation,
+  output,
+  repository,
+}: NotifyJazzFateLiveSubscribersOptions<TMutationMap, TProc>) {
+  if (!isJazzFateEntity(output)) {
+    return;
+  }
+
+  const entityKey = getEntitySubscriptionKey(output.__typename, output.id);
+  const subscriptions = entitySubscriptions.get(entityKey);
+
+  if (subscriptions) {
+    await Promise.all(
+      [...subscriptions].map(async (subscription) => {
+        try {
+          if (operation === "delete") {
+            subscription.handlers.onDelete?.(output.id);
+            return;
+          }
+
+          const [record] = await repository.fetchEntities(
+            output.__typename,
+            [output.id],
+            subscription.select,
+            subscription.args,
+          );
+
+          if (record) {
+            subscription.handlers.onData(record, subscription.select);
+          } else {
+            subscription.handlers.onDelete?.(output.id);
+          }
+        } catch (error) {
+          subscription.handlers.onError?.(error);
+        }
+      }),
+    );
+  }
+
+  for (const subscription of connectionSubscriptions) {
+    if (
+      affectedLists.some((affectedList) =>
+        doesAffectedListMatchRequestItem(affectedList, subscription.procedure, subscription.args),
+      )
+    ) {
+      if (operation === "delete") {
+        subscription.handlers.onEvent({
+          id: output.id,
+          nodeType: output.__typename,
+          type: "deleteEdge",
+        });
+      } else {
+        subscription.handlers.onEvent({
+          type: "invalidate",
+        });
+      }
+    }
+  }
+}
+
+function isJazzFateEntity(value: unknown): value is JazzFateEntity {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    "__typename" in value &&
+    "id" in value &&
+    typeof (value as { __typename: unknown }).__typename === "string" &&
+    (typeof (value as { id: unknown }).id === "string" ||
+      typeof (value as { id: unknown }).id === "number")
+  );
+}
+
+function getEntitySubscriptionKey(type: string, id: string | number) {
+  return `${type}:${String(id)}`;
+}
+
+function emitJazzFateCacheUpdate(client: object, event: JazzFateCacheUpdateEvent) {
+  const listeners = cacheUpdateListeners.get(client);
+
+  if (!listeners) {
+    return;
+  }
+
+  for (const listener of listeners) {
+    listener(event);
+  }
+}
+
 function coercePositiveInteger(value: unknown): number | undefined {
   const number = coerceNonNegativeInteger(value);
 
@@ -522,7 +1074,11 @@ function coerceNonNegativeInteger(value: unknown): number | undefined {
   return number;
 }
 
-function insertRow(db: JazzFateDb, table: unknown, input: unknown): { value: unknown } {
+function insertRow(
+  db: JazzFateDb,
+  table: unknown,
+  input: unknown,
+): { value: unknown; wait?: unknown } {
   const id = getInputId(input);
 
   return (
@@ -596,7 +1152,10 @@ async function deleteRow(
   await waitForWrite(result, queryOptions);
 }
 
-function getMutationId(definition: JazzFateMutationDefinition, input: unknown): string | number {
+function getMutationId<TEntity extends JazzFateEntity>(
+  definition: JazzFateMutationDefinition<TEntity>,
+  input: unknown,
+): string | number {
   const id = definition.id?.(input) ?? getInputId(input);
 
   if (typeof id !== "string" && typeof id !== "number") {

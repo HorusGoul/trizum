@@ -4,6 +4,7 @@ import {
   createJazzDbRepository,
   createJazzFateTransport,
   projectEntity,
+  refreshJazzFateCache,
   resolveJazzFateAuthConfig,
   type JazzFateEntity,
   type JazzFateDb,
@@ -71,7 +72,7 @@ describe("Jazz Fate auth", () => {
 });
 
 describe("Jazz DB repository", () => {
-  test("supports offset pagination for Jazz-backed Fate lists", async () => {
+  test("supports ordered offset pagination for Jazz-backed Fate lists", async () => {
     const table = new FakeNoteQuery([
       createNoteRow("note-1", "project-1", "Oldest", 1),
       createNoteRow("note-2", "project-1", "Middle", 2),
@@ -162,16 +163,8 @@ describe("Jazz DB repository", () => {
         method: "orderBy",
       },
       {
-        columns: ["id", "title"],
+        columns: ["id", "title", "createdAt"],
         method: "select",
-      },
-      {
-        count: 1,
-        method: "offset",
-      },
-      {
-        count: 3,
-        method: "limit",
       },
     ]);
   });
@@ -283,6 +276,62 @@ describe("Fate Jazz transport", () => {
       id: "note-2",
       title: "Roadmap",
     });
+  });
+
+  test("invalidates affected live list connections after mutations", async () => {
+    const repository = createMemoryRepository();
+    const transport = createJazzFateTransport<MutationMap>(repository);
+    const events: unknown[] = [];
+    const unsubscribe = transport.subscribeConnection?.(
+      "notes",
+      "Note",
+      {},
+      new Set(["id", "title"]),
+      undefined,
+      {
+        onEvent(event) {
+          events.push(event);
+        },
+      },
+    );
+
+    await transport.mutate?.(
+      "note.create",
+      {
+        body: "Ship the package split",
+        title: "Roadmap",
+      },
+      new Set(["id", "title"]),
+    );
+
+    expect(events).toStrictEqual([{ type: "invalidate" }]);
+    unsubscribe?.();
+  });
+
+  test("serializes retained Fate request refreshes for the same client", async () => {
+    const handle = createRefreshHandle();
+    const client = {
+      executeRequestHandle: vi.fn<(requestHandle: typeof handle) => void>((requestHandle) => {
+        requestHandle.start();
+      }),
+      requests: new Map([["notes", new Map([["cache-first", handle]])]]),
+    };
+
+    const firstRefresh = refreshJazzFateCache(client, [{ root: "notes" }]);
+    await vi.waitFor(() => expect(client.executeRequestHandle).toHaveBeenCalledTimes(1));
+
+    const secondRefresh = refreshJazzFateCache(client, [{ root: "notes" }]);
+    await Promise.resolve();
+
+    expect(client.executeRequestHandle).toHaveBeenCalledTimes(1);
+
+    handle.resolveCurrent();
+    await vi.waitFor(() => expect(client.executeRequestHandle).toHaveBeenCalledTimes(2));
+
+    handle.resolveCurrent();
+
+    await expect(firstRefresh).resolves.toBe(1);
+    await expect(secondRefresh).resolves.toBe(1);
   });
 });
 
@@ -574,7 +623,46 @@ function createMemoryRepository() {
 
       return projectEntity(note, select, ["id", "body", "title"]);
     },
+
+    getAffectedLists() {
+      return [{ root: "notes" }];
+    },
   };
 
   return repository;
+}
+
+function createRefreshHandle() {
+  let current: Promise<void> | null = null;
+  let resolve: (() => void) | null = null;
+
+  return {
+    descriptor: {
+      items: [
+        {
+          argsPayload: {},
+          kind: "list",
+          name: "notes",
+        },
+      ],
+    },
+    resolveCurrent() {
+      resolve?.();
+    },
+    start() {
+      current = new Promise<void>((nextResolve) => {
+        resolve = nextResolve;
+      });
+    },
+    then(onFulfilled: () => unknown, onRejected?: (error: unknown) => unknown) {
+      if (!current) {
+        return Promise.reject(new Error("Refresh handle was not started")).then(
+          onFulfilled,
+          onRejected,
+        );
+      }
+
+      return current.then(onFulfilled, onRejected);
+    },
+  };
 }

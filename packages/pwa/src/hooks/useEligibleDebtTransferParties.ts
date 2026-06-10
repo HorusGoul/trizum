@@ -1,7 +1,14 @@
+import {
+  ParticipantView,
+  PartySettingsView,
+  type ParticipantEntity,
+  type PartyEntity,
+} from "@trizum/data";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { fatePartiesCache, useFateCache } from "#src/lib/data/fateAppData.ts";
-import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { toParty } from "#src/lib/data/fateAppData.ts";
+import { useFateLiveListView, useFateLiveViews, useFateRequest } from "#src/lib/data/fateReact.ts";
+import { PARTICIPANT_CONNECTION_VIEW } from "#src/lib/data/trizumFateViews.ts";
 import { useCurrentParty } from "./useParty";
 import { usePartyList } from "./usePartyList";
 
@@ -42,7 +49,6 @@ export function getEligibleDebtTransferParticipants(
 }
 
 export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
-  const { client } = useTrizumData();
   const { party: originParty } = useCurrentParty();
   const { partyList } = usePartyList();
   const { activePartyIds } = getOrderedPartySections(partyList);
@@ -61,21 +67,34 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
       },
     ];
   });
-
-  const parties = useFateCache(
-    fatePartiesCache,
-    client,
-    joinedActiveParties.map(({ partyId }) => partyId),
+  const destinationPartyIds = joinedActiveParties.map(({ partyId }) => partyId);
+  const { participants, parties: partyRefs } = useFateRequest({
+    participants: {
+      list: PARTICIPANT_CONNECTION_VIEW,
+    },
+    parties: {
+      ids: destinationPartyIds,
+      view: PartySettingsView,
+    },
+  });
+  const partyEntities = useFateLiveViews(PartySettingsView, partyRefs);
+  const participantRefs = useFateLiveListView<ParticipantEntity>(
+    PARTICIPANT_CONNECTION_VIEW,
+    participants,
+  ).items.map(({ node }) => node);
+  const participantEntities = useFateLiveViews(ParticipantView, participantRefs);
+  const participantsByPartyId = groupParticipantsByPartyId(participantEntities);
+  const partiesById = new Map<Party["id"], Party>(
+    partyEntities.map((partyEntity: PartyEntity) => [
+      partyEntity.id,
+      toParty(partyEntity, participantsByPartyId.get(partyEntity.id) ?? []),
+    ]),
   );
 
-  return parties.flatMap((party, index) => {
+  return joinedActiveParties.flatMap((joinedActiveParty) => {
+    const party = partiesById.get(joinedActiveParty.partyId);
+
     if (!party || !originParty || party.currency !== originParty.currency) {
-      return [];
-    }
-
-    const joinedActiveParty = joinedActiveParties[index];
-
-    if (!joinedActiveParty) {
       return [];
     }
 
@@ -95,4 +114,16 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
       },
     ];
   });
+}
+
+function groupParticipantsByPartyId(participants: readonly ParticipantEntity[]) {
+  const groups = new Map<Party["id"], ParticipantEntity[]>();
+
+  for (const participant of participants) {
+    const partyParticipants = groups.get(participant.partyId) ?? [];
+    partyParticipants.push(participant);
+    groups.set(participant.partyId, partyParticipants);
+  }
+
+  return groups;
 }

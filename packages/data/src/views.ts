@@ -116,6 +116,7 @@ export const JoinedPartyView = view<JoinedPartyEntity>()({
 export const ParticipantView = view<ParticipantEntity>()({
   id: true,
   partyId: true,
+  localId: true,
   name: true,
   phone: true,
   avatarId: true,

@@ -15,7 +15,7 @@ import { use, useState } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
-import { fatePartyListCache } from "#src/lib/data/fateAppData.ts";
+import { readPartyList } from "#src/lib/data/fateAppData.ts";
 
 let hasRedirectedThisSession = false;
 
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
       return;
     }
 
-    const partyList = await fatePartyListCache.readAsync(context.data.client, context.data.userId);
+    const partyList = await readPartyList(context.data.client, context.data.userId);
     const { openLastPartyOnLaunch, lastOpenedPartyId, parties } = partyList;
 
     if (

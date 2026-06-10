@@ -1,22 +1,26 @@
 import { useParams } from "@tanstack/react-router";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import {
-  cacheParty,
   createExpenseInFate,
   deleteExpenseInFate,
-  fatePartyCache,
   readParty,
-  refreshParty,
-  refreshPartyExpenses,
+  toParty,
   upsertExpenseInFate,
   upsertParticipant,
   upsertParty,
-  useFateCache,
 } from "#src/lib/data/fateAppData.ts";
+import {
+  useFateLiveListView,
+  useFateLiveView,
+  useFateLiveViews,
+  useFateRequest,
+} from "#src/lib/data/fateReact.ts";
+import { PARTICIPANT_CONNECTION_VIEW } from "#src/lib/data/trizumFateViews.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { getLogger } from "#src/lib/log.ts";
 import type { Expense } from "#src/models/expense.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
+import { ParticipantView, PartySettingsView, type ParticipantEntity } from "@trizum/data";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -26,7 +30,23 @@ export function useParty(partyId: string) {
   }
 
   const { client, userId } = useTrizumData();
-  const party = useFateCache(fatePartyCache, client, partyId);
+  const { participants, party: partyRef } = useFateRequest({
+    participants: {
+      args: { partyId },
+      list: PARTICIPANT_CONNECTION_VIEW,
+    },
+    party: {
+      id: partyId,
+      view: PartySettingsView,
+    },
+  });
+  const partyEntity = useFateLiveView(PartySettingsView, partyRef);
+  const participantRefs = useFateLiveListView<ParticipantEntity>(
+    PARTICIPANT_CONNECTION_VIEW,
+    participants,
+  ).items.map(({ node }) => node);
+  const participantEntities = useFateLiveViews(ParticipantView, participantRefs);
+  const party = toParty(partyEntity, participantEntities);
 
   if (!party) {
     throw new Error("Party not found");
@@ -124,9 +144,6 @@ export function getPartyHelpers({
         upsertParticipant(client, nextParty.id, participant),
       ),
     );
-
-    cacheParty(client, nextParty);
-    await refreshParty(client, nextParty.id);
   }
 
   async function setParticipantDetails(
@@ -145,33 +162,20 @@ export function getPartyHelpers({
       ...participant,
       ...details,
     };
-    const nextParty: Party = {
-      ...party,
-      participants: {
-        ...party.participants,
-        [participantId]: nextParticipant,
-      },
-    };
 
     await upsertParticipant(client, party.id, nextParticipant);
-    cacheParty(client, nextParty);
   }
 
   async function addExpenseToParty(expense: Omit<Expense, "__hash" | "id">): Promise<Expense> {
-    const created = await createExpenseInFate(client, partyId, expense);
-    await refreshPartyExpenses(client, partyId);
-
-    return created;
+    return createExpenseInFate(client, partyId, expense);
   }
 
   async function updateExpense(expense: Expense) {
     await upsertExpenseInFate(client, partyId, expense);
-    await refreshPartyExpenses(client, partyId);
   }
 
   async function removeExpense(expenseId: Expense["id"]) {
     await deleteExpenseInFate(client, partyId, expenseId);
-    await refreshPartyExpenses(client, partyId);
 
     return true;
   }
@@ -247,10 +251,6 @@ export function getPartyHelpers({
 
     try {
       const createdOriginExpense = await createExpenseInFate(client, originParty.id, originExpense);
-      await Promise.all([
-        refreshPartyExpenses(client, originParty.id),
-        refreshPartyExpenses(client, destinationPartyId),
-      ]);
 
       return {
         originExpense: createdOriginExpense,

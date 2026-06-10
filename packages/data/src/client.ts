@@ -2,9 +2,15 @@ import { clientRoot, createClient } from "@nkzw/fate";
 import {
   createJazzFateDb,
   createJazzFateTransport,
+  refreshJazzFateCache,
+  subscribeToJazzFateCacheUpdates,
   type CreateJazzFateDbOptions,
   type JazzFateAuth,
 } from "fate-jazz";
+import {
+  canUseBrowserFallbackPersistence,
+  createBrowserFallbackPersistentDb,
+} from "./browserFallbackPersistence.js";
 import { createTrizumJazzRepository, type TrizumDataRepository } from "./repository.js";
 import { trizumFateMutations } from "./views.js";
 import type {
@@ -41,10 +47,18 @@ export type CreateTrizumFateClientOptions = {
 };
 
 export function createTrizumFateClient({ repository }: CreateTrizumFateClientOptions) {
-  return createClient<[typeof trizumFateRoots, typeof trizumFateMutations]>({
+  let client: ReturnType<typeof createClient<[typeof trizumFateRoots, typeof trizumFateMutations]>>;
+
+  const transport = createJazzFateTransport(repository, {
+    async onMutation({ affectedLists }) {
+      await refreshJazzFateCache(client, affectedLists);
+    },
+  });
+
+  client = createClient<[typeof trizumFateRoots, typeof trizumFateMutations]>({
     mutations: trizumFateMutations,
     roots: trizumFateRoots,
-    transport: createJazzFateTransport(repository),
+    transport,
     types: [
       { type: "User" },
       { type: "Party" },
@@ -55,6 +69,8 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
       { type: "Expense" },
     ],
   });
+
+  return client;
 }
 
 export type CreateLocalFirstTrizumDataClientOptions = Omit<CreateJazzFateDbOptions, "appId"> & {
@@ -69,23 +85,32 @@ export async function createLocalFirstTrizumDataClient(
     appId,
     auth: options.auth,
     dbName: options.dbName,
+    disableBrowserWorker: options.disableBrowserWorker,
     driver: options.driver,
     env: options.env,
     serverUrl: options.serverUrl,
     userBranch: options.userBranch,
   });
   const userId = getAuthenticatedUserId(db.getAuthState());
+  const repositoryDb = await createRepositoryDb(db, {
+    appId,
+    dbName: options.dbName,
+    disableBrowserWorker: options.disableBrowserWorker,
+    driver: options.driver,
+  });
+  const repository = createTrizumJazzRepository(repositoryDb);
+
+  await ensureLocalFirstUser(repository, userId);
 
   return {
-    client: createTrizumFateClient({
-      repository: createTrizumJazzRepository(db),
-    }),
+    client: createTrizumFateClient({ repository }),
     db,
     userId,
   };
 }
 
 export type { JazzFateAuth };
+export { subscribeToJazzFateCacheUpdates };
 
 function getAuthenticatedUserId(authState: {
   session: {
@@ -99,4 +124,56 @@ function getAuthenticatedUserId(authState: {
   }
 
   return userId;
+}
+
+async function ensureLocalFirstUser(repository: TrizumDataRepository, userId: string) {
+  const [user] = await repository.fetchEntities("User", [userId], ["id"]);
+
+  if (user) {
+    return;
+  }
+
+  await repository.mutate?.(
+    "user.upsert",
+    {
+      authMode: "localFirst",
+      autoOpenCalculator: false,
+      id: userId,
+      openLastPartyOnLaunch: false,
+    },
+    ["id", "authMode", "autoOpenCalculator", "openLastPartyOnLaunch"],
+  );
+}
+
+async function createRepositoryDb(
+  db: Awaited<ReturnType<typeof createJazzFateDb>>,
+  options: Pick<
+    CreateLocalFirstTrizumDataClientOptions,
+    "dbName" | "disableBrowserWorker" | "driver"
+  > & {
+    appId: string;
+  },
+) {
+  if (
+    options.disableBrowserWorker !== true ||
+    options.driver?.type === "memory" ||
+    !canUseBrowserFallbackPersistence()
+  ) {
+    return db;
+  }
+
+  return createBrowserFallbackPersistentDb({
+    db,
+    namespace: getBrowserFallbackNamespace(options),
+  });
+}
+
+function getBrowserFallbackNamespace({
+  appId,
+  dbName,
+  driver,
+}: Pick<CreateLocalFirstTrizumDataClientOptions, "dbName" | "driver"> & {
+  appId: string;
+}) {
+  return driver?.type === "persistent" ? (driver.dbName ?? dbName ?? appId) : (dbName ?? appId);
 }

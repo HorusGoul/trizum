@@ -1,23 +1,45 @@
 import { useEffect } from "react";
 import {
-  fatePartyListCache,
   readParty,
-  refreshPartyList,
+  toPartyList,
   upsertJoinedParty,
   upsertParticipant,
   upsertPartyMember,
   upsertUserSettings,
-  useFateCache,
 } from "#src/lib/data/fateAppData.ts";
+import {
+  useFateLiveListView,
+  useFateLiveView,
+  useFateLiveViews,
+  useFateRequest,
+} from "#src/lib/data/fateReact.ts";
+import { JOINED_PARTY_CONNECTION_VIEW } from "#src/lib/data/trizumFateViews.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
+import { JoinedPartyView, UserSettingsView, type JoinedPartyEntity } from "@trizum/data";
 
 export function usePartyList() {
   const { client, userId } = useTrizumData();
-  const partyList = useFateCache(fatePartyListCache, client, userId);
+  const { joinedParties, user } = useFateRequest({
+    joinedParties: {
+      args: { userId },
+      list: JOINED_PARTY_CONNECTION_VIEW,
+    },
+    user: {
+      id: userId,
+      view: UserSettingsView,
+    },
+  });
+  const userSettings = useFateLiveView(UserSettingsView, user);
+  const joinedPartyRefs = useFateLiveListView<JoinedPartyEntity>(
+    JOINED_PARTY_CONNECTION_VIEW,
+    joinedParties,
+  ).items.map(({ node }) => node);
+  const joinedPartyEntities = useFateLiveViews(JoinedPartyView, joinedPartyRefs);
+  const partyList = toPartyList(userId, userSettings, joinedPartyEntities);
 
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());
@@ -36,7 +58,6 @@ export function usePartyList() {
       lastUsedAt: new Date(),
       participantId,
     });
-    await refreshPartyList(client, userId);
   }
 
   async function removeParty(partyId: Party["id"]) {
@@ -52,8 +73,6 @@ export function usePartyList() {
         lastOpenedPartyId: null,
       });
     }
-
-    await refreshPartyList(client, userId);
   }
 
   async function setLastOpenedPartyId(partyId: Party["id"] | null) {
@@ -69,8 +88,6 @@ export function usePartyList() {
         participantId: partyList.participantInParties[partyId],
       });
     }
-
-    await refreshPartyList(client, userId);
   }
 
   async function setPartyPinned(partyId: Party["id"], pinned: boolean) {
@@ -84,7 +101,6 @@ export function usePartyList() {
       lastUsedAt: toDate(partyList.lastUsedAt?.[partyId]) ?? new Date(),
       participantId: partyList.participantInParties[partyId],
     });
-    await refreshPartyList(client, userId);
   }
 
   async function setPartyArchived(partyId: Party["id"], archived: boolean) {
@@ -100,8 +116,6 @@ export function usePartyList() {
         lastOpenedPartyId: null,
       });
     }
-
-    await refreshPartyList(client, userId);
   }
 
   async function updateSettings(
@@ -135,15 +149,12 @@ export function usePartyList() {
         });
       }),
     );
-
-    await refreshPartyList(client, userId);
   }
 
   async function setAutoOpenCalculator(value: boolean) {
     await upsertUserSettings(client, userId, {
       autoOpenCalculator: value,
     });
-    await refreshPartyList(client, userId);
   }
 
   return {

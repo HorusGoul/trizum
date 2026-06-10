@@ -16,8 +16,9 @@ import { useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { fateExpenseCache, useFateCache } from "#src/lib/data/fateAppData.ts";
-import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { readExpenseById, toExpense } from "#src/lib/data/fateAppData.ts";
+import { useFateLiveView, useFateRequest } from "#src/lib/data/fateReact.ts";
+import { ExpenseListItemView } from "@trizum/data";
 
 interface EditExpenseSearchParams {
   media?: number;
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
 
   async loader({ location, context, params: { expenseId, partyId } }) {
     await guardParticipatingInParty(partyId, context, location);
-    await fateExpenseCache.readAsync(context.data.client, expenseId);
+    await readExpenseById(context.data.client, expenseId);
   },
 });
 
@@ -144,9 +145,15 @@ function EditExpense() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const { client } = useTrizumData();
   const { updateExpense } = useCurrentParty();
-  const expense = useFateCache(fateExpenseCache, client, expenseId);
+  const { expense: expenseRef } = useFateRequest({
+    expense: {
+      id: expenseId,
+      view: ExpenseListItemView,
+    },
+  });
+  const expenseEntity = useFateLiveView(ExpenseListItemView, expenseRef);
+  const expense = toExpense(expenseEntity);
 
   function onUpdateExpense(expense: Expense) {
     return updateExpense(expense);

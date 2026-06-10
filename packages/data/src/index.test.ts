@@ -47,9 +47,14 @@ describe("Jazz alpha schema", () => {
     expect(trizumJazzWasmSchema.mediaFiles?.policies?.select?.using).toMatchObject({
       type: "Or",
     });
-    expect(trizumJazzWasmSchema.joinedParties?.policies?.select?.using).toMatchObject({
-      column: "userId",
+    expect(trizumJazzWasmSchema.joinedParties?.policies?.select?.using).toStrictEqual({
+      column: "$createdBy",
+      op: "Eq",
       type: "Cmp",
+      value: {
+        path: ["userId"],
+        type: "SessionRef",
+      },
     });
     expect(trizumJazzWasmSchema.expenses?.policies?.select?.using).toStrictEqual({
       operation: "Select",
@@ -372,8 +377,9 @@ function createMemoryRepository() {
       __typename: "Participant",
       avatarId: null,
       balancesSortedBy: "name",
-      id: "participant-1",
+      id: "participant-row-1",
       isArchived: false,
+      localId: "participant-1",
       name: "Alice",
       partyId: "party-1",
       personalMode: false,
@@ -522,6 +528,7 @@ function createMemoryRepository() {
             balancesSortedBy: participantInput.balancesSortedBy ?? "name",
             id: nextId("participant", participants.length),
             isArchived: participantInput.isArchived ?? false,
+            localId: participantInput.localId,
             personalMode: participantInput.personalMode ?? false,
             phone: participantInput.phone ?? null,
           };

@@ -1,11 +1,6 @@
 import type { TrizumFateClient } from "@trizum/data";
 import type { SupportedLocale } from "#src/lib/i18n.js";
-import {
-  fatePartyListCache,
-  refreshPartyList,
-  upsertJoinedParty,
-  upsertUserSettings,
-} from "#src/lib/data/fateAppData.ts";
+import { readPartyList, upsertJoinedParty, upsertUserSettings } from "#src/lib/data/fateAppData.ts";
 import type { PartyList } from "#src/models/partyList.js";
 
 export interface InternalPartyListSeed {
@@ -74,8 +69,6 @@ export async function seedPartyListState({
     }),
   );
 
-  await refreshPartyList(client, userId);
-
   return {
     partyListId: userId,
   };
@@ -88,7 +81,7 @@ export async function readPartyListState({
   client: TrizumFateClient;
   userId: string;
 }): Promise<InternalPartyListSnapshot> {
-  const partyList = await fatePartyListCache.readAsync(client, userId);
+  const partyList = await readPartyList(client, userId);
 
   return {
     partyListId: userId,

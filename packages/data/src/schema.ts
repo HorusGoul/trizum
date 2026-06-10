@@ -39,7 +39,7 @@ export const trizumJazzSchema = s.defineSchema({
     .table({
       partyId: s.ref("parties"),
       userId: s.string(),
-      participantId: s.ref("participants").optional(),
+      participantId: s.string().optional(),
       role: s.enum("owner", "editor", "viewer").default("editor"),
     })
     .indexOnly(["partyId", "userId"]),
@@ -47,7 +47,7 @@ export const trizumJazzSchema = s.defineSchema({
     .table({
       userId: s.string(),
       partyId: s.ref("parties"),
-      participantId: s.ref("participants").optional(),
+      participantId: s.string().optional(),
       isPinned: s.boolean().default(false),
       isArchived: s.boolean().default(false),
       joinedAt: s.timestamp().optional(),
@@ -57,6 +57,7 @@ export const trizumJazzSchema = s.defineSchema({
   participants: s
     .table({
       partyId: s.ref("parties"),
+      localId: s.string(),
       name: s.string(),
       phone: s.string().optional(),
       avatarId: s.string().optional(),
@@ -64,7 +65,7 @@ export const trizumJazzSchema = s.defineSchema({
       personalMode: s.boolean().default(false),
       balancesSortedBy: s.enum("name", "balance-ascending", "balance-descending").default("name"),
     })
-    .indexOnly(["partyId"]),
+    .indexOnly(["partyId", "localId"]),
   mediaFiles: s
     .table({
       ownerUserId: s.string(),
@@ -143,12 +144,12 @@ export const trizumJazzPermissions = definePermissions(
       .whereNew(allowedTo.update("partyId")),
     policy.partyMembers.allowDelete.where(allowedTo.update("partyId")),
 
-    policy.joinedParties.allowRead.where({ userId: session.userId }),
-    policy.joinedParties.allowInsert.where({ userId: session.userId }),
+    policy.joinedParties.allowRead.where({ $createdBy: session.userId }),
+    policy.joinedParties.allowInsert.where({ $createdBy: session.userId }),
     policy.joinedParties.allowUpdate
-      .whereOld({ userId: session.userId })
-      .whereNew({ userId: session.userId }),
-    policy.joinedParties.allowDelete.where({ userId: session.userId }),
+      .whereOld({ $createdBy: session.userId })
+      .whereNew({ $createdBy: session.userId }),
+    policy.joinedParties.allowDelete.where({ $createdBy: session.userId }),
 
     policy.participants.allowRead.where(allowedTo.read("partyId")),
     policy.participants.allowInsert.where(allowedTo.update("partyId")),

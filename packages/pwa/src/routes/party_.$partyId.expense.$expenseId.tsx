@@ -20,8 +20,9 @@ import { Fragment, Suspense } from "react";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { fateExpenseCache, useFateCache } from "#src/lib/data/fateAppData.ts";
-import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { readExpenseById, toExpense } from "#src/lib/data/fateAppData.ts";
+import { useFateLiveView, useFateRequest } from "#src/lib/data/fateReact.ts";
+import { ExpenseListItemView } from "@trizum/data";
 
 interface ExpenseSearchParams {
   media?: number;
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
-    await fateExpenseCache.readAsync(context.data.client, expenseId);
+    await readExpenseById(context.data.client, expenseId);
   },
 });
 
@@ -134,9 +135,15 @@ function ExpenseById() {
 function useExpense() {
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
-  const { client } = useTrizumData();
   const { removeExpense } = useCurrentParty();
-  const expense = useFateCache(fateExpenseCache, client, expenseId);
+  const { expense: expenseRef } = useFateRequest({
+    expense: {
+      id: expenseId,
+      view: ExpenseListItemView,
+    },
+  });
+  const expenseEntity = useFateLiveView(ExpenseListItemView, expenseRef);
+  const expense = toExpense(expenseEntity);
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;

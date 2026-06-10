@@ -95,10 +95,12 @@ declare module "react-aria-components" {
 }
 
 const JAZZ_SERVER_URL = import.meta.env.VITE_APP_JAZZ_SERVER_URL?.trim() || undefined;
+const INTERNAL_DB_NAME = initialUrl.searchParams.get("__internal_db_name")?.trim() || undefined;
 const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
 
 const trizumData = await createLocalFirstTrizumDataClient({
-  dbName: "trizum-jazz-fate-pwa",
+  dbName: INTERNAL_DB_NAME ?? "trizum-jazz-fate-pwa",
+  disableBrowserWorker: isWebKitBrowser(),
   serverUrl: isOfflineOnly ? undefined : JAZZ_SERVER_URL,
 });
 
@@ -202,6 +204,13 @@ if (!rootElement.innerHTML) {
 function AriaProviders({ children }: { children: React.ReactNode }) {
   const { i18n } = useLingui();
   return <AriaI18nProvider locale={i18n.locale}>{children}</AriaI18nProvider>;
+}
+
+function isWebKitBrowser() {
+  return (
+    /AppleWebKit/i.test(navigator.userAgent) &&
+    !/Chrome|Chromium|Edg|OPR/i.test(navigator.userAgent)
+  );
 }
 
 function InnerWrap({ children }: { children: React.ReactNode }) {

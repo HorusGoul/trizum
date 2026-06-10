@@ -2,6 +2,7 @@ import {
   createJazzDbRepository,
   projectEntity,
   type JazzFateDb,
+  type JazzFateAffectedList,
   type JazzFateEntityDefinition,
   type JazzFateListDefinition,
   type JazzFateListResult,
@@ -169,6 +170,7 @@ export const trizumEntityDefinitions = [
     columns: [
       "id",
       "partyId",
+      "localId",
       "name",
       "phone",
       "avatarId",
@@ -222,7 +224,7 @@ export const trizumListDefinitions = [
   {
     root: "joinedParties",
     type: "JoinedParty",
-    where: userOrPartyScopedWhere,
+    where: joinedPartyScopedWhere,
   },
   {
     root: "participants",
@@ -248,89 +250,105 @@ export const trizumListDefinitions = [
 
 export const trizumMutationDefinitions = [
   {
+    affectedLists: affectedUserLists,
     proc: "user.create",
     table: trizumJazzApp.users,
     type: "User",
   },
   {
+    affectedLists: affectedUserLists,
     operation: "upsert",
     proc: "user.upsert",
     table: trizumJazzApp.users,
     type: "User",
   },
   {
+    affectedLists: affectedPartyLists,
     proc: "party.create",
     table: trizumJazzApp.parties,
     type: "Party",
   },
   {
+    affectedLists: affectedPartyLists,
     operation: "upsert",
     proc: "party.upsert",
     table: trizumJazzApp.parties,
     type: "Party",
   },
   {
+    affectedLists: affectedPartyMemberLists,
     proc: "partyMember.create",
     table: trizumJazzApp.partyMembers,
     type: "PartyMember",
   },
   {
+    affectedLists: affectedPartyMemberLists,
     operation: "upsert",
     proc: "partyMember.upsert",
     table: trizumJazzApp.partyMembers,
     type: "PartyMember",
   },
   {
+    affectedLists: affectedJoinedPartyLists,
     proc: "joinedParty.create",
     table: trizumJazzApp.joinedParties,
     type: "JoinedParty",
   },
   {
+    affectedLists: affectedJoinedPartyLists,
     operation: "upsert",
     proc: "joinedParty.upsert",
     table: trizumJazzApp.joinedParties,
     type: "JoinedParty",
   },
   {
+    affectedLists: affectedParticipantLists,
     proc: "participant.create",
     table: trizumJazzApp.participants,
     type: "Participant",
   },
   {
+    affectedLists: affectedParticipantLists,
     operation: "upsert",
     proc: "participant.upsert",
     table: trizumJazzApp.participants,
     type: "Participant",
   },
   {
+    affectedLists: affectedMediaFileLists,
     proc: "mediaFile.create",
     table: trizumJazzApp.mediaFiles,
     type: "MediaFile",
   },
   {
+    affectedLists: affectedMediaFileLists,
     operation: "upsert",
     proc: "mediaFile.upsert",
     table: trizumJazzApp.mediaFiles,
     type: "MediaFile",
   },
   {
+    affectedLists: affectedMediaFileLists,
     operation: "delete",
     proc: "mediaFile.delete",
     table: trizumJazzApp.mediaFiles,
     type: "MediaFile",
   },
   {
+    affectedLists: affectedExpenseLists,
     proc: "expense.create",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },
   {
+    affectedLists: affectedExpenseLists,
     operation: "upsert",
     proc: "expense.upsert",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },
   {
+    affectedLists: affectedExpenseLists,
     operation: "delete",
     proc: "expense.delete",
     table: trizumJazzApp.expenses,
@@ -394,4 +412,108 @@ function userOrPartyScopedWhere(args?: Record<string, unknown>) {
   }
 
   return undefined;
+}
+
+function joinedPartyScopedWhere(args?: Record<string, unknown>) {
+  if (typeof args?.partyId === "string") {
+    return {
+      partyId: args.partyId,
+    };
+  }
+
+  if (typeof args?.userId === "string") {
+    return {
+      $createdBy: args.userId,
+    };
+  }
+
+  return undefined;
+}
+
+function affectedUserLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  return output.__typename === "User" ? [{ root: "users" }] : [];
+}
+
+function affectedPartyLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  return output.__typename === "Party" ? [{ root: "parties" }] : [];
+}
+
+function affectedPartyMemberLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  if (output.__typename !== "PartyMember") {
+    return [];
+  }
+
+  return [
+    { root: "partyMembers" },
+    { args: { partyId: output.partyId }, root: "partyMembers" },
+    { args: { userId: output.userId }, root: "partyMembers" },
+  ];
+}
+
+function affectedJoinedPartyLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  if (output.__typename !== "JoinedParty") {
+    return [];
+  }
+
+  return [
+    { root: "joinedParties" },
+    { args: { partyId: output.partyId }, root: "joinedParties" },
+    { args: { userId: output.userId }, root: "joinedParties" },
+  ];
+}
+
+function affectedParticipantLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  if (output.__typename !== "Participant") {
+    return [];
+  }
+
+  return [{ root: "participants" }, { args: { partyId: output.partyId }, root: "participants" }];
+}
+
+function affectedMediaFileLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  if (output.__typename !== "MediaFile") {
+    return [];
+  }
+
+  return [
+    { root: "mediaFiles" },
+    { args: { ownerUserId: output.ownerUserId }, root: "mediaFiles" },
+    ...(output.partyId ? [{ args: { partyId: output.partyId }, root: "mediaFiles" }] : []),
+  ];
+}
+
+function affectedExpenseLists({
+  output,
+}: {
+  output: TrizumFateEntity;
+}): readonly JazzFateAffectedList[] {
+  if (output.__typename !== "Expense") {
+    return [];
+  }
+
+  return [{ root: "expenses" }, { args: { partyId: output.partyId }, root: "expenses" }];
 }

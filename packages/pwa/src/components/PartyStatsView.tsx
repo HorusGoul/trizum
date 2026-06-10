@@ -1,3 +1,4 @@
+import { ExpenseListItemView, type ExpenseEntity } from "@trizum/data";
 import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
@@ -8,8 +9,9 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
-import { fateAllPartyExpensesCache, useFateCache } from "#src/lib/data/fateAppData.ts";
-import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { toExpense } from "#src/lib/data/fateAppData.ts";
+import { useFateLiveListView, useFateLiveViews, useFateRequest } from "#src/lib/data/fateReact.ts";
+import { ALL_EXPENSES_CONNECTION_VIEW } from "#src/lib/data/trizumFateViews.ts";
 import {
   calculatePartyStats,
   getPartyStatsAvailablePastYears,
@@ -158,11 +160,24 @@ export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
 }
 
 function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
-  const { client } = useTrizumData();
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
-  const expenses = useFateCache(fateAllPartyExpensesCache, client, party.id);
+  const { expenses: expensesConnection } = useFateRequest({
+    expenses: {
+      args: { partyId: party.id },
+      list: ALL_EXPENSES_CONNECTION_VIEW,
+    },
+  });
+  const liveExpenses = useFateLiveListView<ExpenseEntity>(
+    ALL_EXPENSES_CONNECTION_VIEW,
+    expensesConnection,
+  );
+  const expenseEntities = useFateLiveViews(
+    ExpenseListItemView,
+    liveExpenses.items.map(({ node }) => node),
+  );
+  const expenses = expenseEntities.map(toExpense);
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
   const [timeframeKey, setTimeframeKey] = useState<PartyStatsTimeframeKey>("all-time");

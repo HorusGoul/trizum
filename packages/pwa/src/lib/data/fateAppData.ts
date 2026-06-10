@@ -2,7 +2,6 @@ import {
   ExpenseListItemView,
   JoinedPartyView,
   MediaFileBlobView,
-  MediaFileMetadataView,
   ParticipantView,
   PartyMemberView,
   PartySettingsView,
@@ -16,24 +15,12 @@ import {
   type UserEntity,
 } from "@trizum/data";
 import { md5 } from "@takker/md5";
-import { useSyncExternalStore } from "react";
-import { createCache, type Cache } from "suspense";
 import type { Currency } from "dinero.js";
 import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.js";
 import type { MediaFile } from "#src/models/media.js";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 import type { SupportedLocale } from "#src/lib/i18n.js";
-
-const EXPENSE_PAGE_SIZE = 50;
-const ALL_EXPENSES_LIMIT = 10_000;
-
-export interface FatePaginatedExpensesSnapshot {
-  expenses: Expense[];
-  hasNext: boolean;
-  isLoadingNext: boolean;
-  nextOffset: number;
-}
 
 export interface CreatePartyValues {
   currency: Currency;
@@ -48,152 +35,6 @@ type MutationResult<T> = {
   error?: unknown;
   result?: T;
 };
-
-export const fatePartyListCache = createCache<[TrizumFateClient, string], PartyList>({
-  async load([client, userId]) {
-    const user =
-      (await readUserSettings(client, userId)) ?? (await upsertDefaultUser(client, userId));
-    const joinedParties = await readJoinedParties(client, userId);
-
-    return toPartyList(userId, user, joinedParties);
-  },
-  getKey: ([_, userId]) => userId,
-});
-
-export const fatePartyCache = createCache<[TrizumFateClient, string], Party | undefined>({
-  async load([client, partyId]) {
-    return readParty(client, partyId);
-  },
-  getKey: ([_, partyId]) => partyId,
-});
-
-export const fatePartiesCache = createCache<
-  [TrizumFateClient, readonly string[]],
-  Array<Party | undefined>
->({
-  async load([client, partyIds]) {
-    return Promise.all(partyIds.map((partyId) => readParty(client, partyId)));
-  },
-  getKey: ([_, partyIds]) => partyIds.join(","),
-});
-
-export const fatePartyExpensesCache = createCache<
-  [TrizumFateClient, string],
-  FatePaginatedExpensesSnapshot
->({
-  async load([client, partyId]) {
-    const page = await readExpensePage(client, partyId, 0);
-
-    return {
-      expenses: page.expenses,
-      hasNext: page.hasNext,
-      isLoadingNext: false,
-      nextOffset: page.nextOffset,
-    };
-  },
-  getKey: ([_, partyId]) => partyId,
-});
-
-export const fateAllPartyExpensesCache = createCache<[TrizumFateClient, string], Expense[]>({
-  async load([client, partyId]) {
-    return readExpenses(client, partyId, {
-      first: ALL_EXPENSES_LIMIT,
-      offset: 0,
-    });
-  },
-  getKey: ([_, partyId]) => partyId,
-});
-
-export const fateExpenseCache = createCache<[TrizumFateClient, string], Expense | undefined>({
-  async load([client, expenseId]) {
-    return readExpenseById(client, expenseId);
-  },
-  getKey: ([_, expenseId]) => expenseId,
-});
-
-export const fateMediaFileCache = createCache<[TrizumFateClient, string], MediaFile | undefined>({
-  async load([client, mediaFileId]) {
-    const mediaFile = await readMediaFile(client, mediaFileId);
-
-    return mediaFile ? toMediaFile(mediaFile) : undefined;
-  },
-  getKey: ([_, mediaFileId]) => mediaFileId,
-});
-
-export function useFateCache<Params extends unknown[], Value>(
-  cache: Cache<Params, Value>,
-  ...params: Params
-): Value {
-  const value = cache.read(...params);
-
-  return useSyncExternalStore(
-    (change) => cache.subscribe(change, ...params),
-    () => (cache.getValueIfCached(...params) ?? value) as Value,
-  );
-}
-
-export async function refreshPartyList(client: TrizumFateClient, userId: string) {
-  fatePartyListCache.evict(client, userId);
-  return fatePartyListCache.readAsync(client, userId);
-}
-
-export async function refreshParty(client: TrizumFateClient, partyId: string) {
-  fatePartyCache.evict(client, partyId);
-  return fatePartyCache.readAsync(client, partyId);
-}
-
-export async function refreshPartyExpenses(client: TrizumFateClient, partyId: string) {
-  fatePartyExpensesCache.evict(client, partyId);
-  fateAllPartyExpensesCache.evict(client, partyId);
-  return fatePartyExpensesCache.readAsync(client, partyId);
-}
-
-export async function loadNextPartyExpenses(client: TrizumFateClient, partyId: string) {
-  const current = fatePartyExpensesCache.getValueIfCached(client, partyId);
-
-  if (!current || current.isLoadingNext || !current.hasNext) {
-    return;
-  }
-
-  fatePartyExpensesCache.cache(
-    {
-      ...current,
-      isLoadingNext: true,
-    },
-    client,
-    partyId,
-  );
-
-  try {
-    const nextPage = await readExpensePage(client, partyId, current.nextOffset);
-    const knownIds = new Set(current.expenses.map((expense) => expense.id));
-    const expenses = [
-      ...current.expenses,
-      ...nextPage.expenses.filter((expense) => !knownIds.has(expense.id)),
-    ];
-
-    fatePartyExpensesCache.cache(
-      {
-        expenses,
-        hasNext: nextPage.hasNext,
-        isLoadingNext: false,
-        nextOffset: nextPage.nextOffset,
-      },
-      client,
-      partyId,
-    );
-  } catch (error) {
-    fatePartyExpensesCache.cache(
-      {
-        ...current,
-        isLoadingNext: false,
-      },
-      client,
-      partyId,
-    );
-    throw error;
-  }
-}
 
 export async function createPartyInFate({
   client,
@@ -216,26 +57,11 @@ export async function createPartyInFate({
     symbol: values.symbol,
     type: "party",
   };
-  const currentParticipant = values.participants[0];
 
   await upsertParty(client, userId, party);
   await Promise.all(
     values.participants.map((participant) => upsertParticipant(client, partyId, participant)),
   );
-
-  if (currentParticipant) {
-    await upsertPartyMember(client, userId, partyId, currentParticipant.id, "owner");
-    await upsertJoinedParty(client, userId, partyId, {
-      isArchived: false,
-      isPinned: false,
-      joinedAt: new Date(),
-      lastUsedAt: new Date(),
-      participantId: currentParticipant.id,
-    });
-  }
-
-  cacheParty(client, party);
-  await refreshPartyList(client, userId);
 
   return party;
 }
@@ -257,9 +83,7 @@ export async function upsertParty(
     view: PartySettingsView,
   });
 
-  throwMutationError(result.error);
-
-  return result.result;
+  return expectMutationResult(result, "party.upsert did not return a result");
 }
 
 export async function upsertParticipant(
@@ -271,8 +95,9 @@ export async function upsertParticipant(
     input: {
       avatarId: participant.avatarId ?? undefined,
       balancesSortedBy: participant.balancesSortedBy ?? "name",
-      id: participant.id,
+      id: getParticipantEntityId(partyId, participant.id),
       isArchived: participant.isArchived ?? false,
+      localId: participant.id,
       name: participant.name,
       partyId,
       personalMode: participant.personalMode ?? false,
@@ -281,9 +106,7 @@ export async function upsertParticipant(
     view: ParticipantView,
   });
 
-  throwMutationError(result.error);
-
-  return result.result;
+  return expectMutationResult(result, "participant.upsert did not return a result");
 }
 
 export async function upsertPartyMember(
@@ -335,10 +158,7 @@ export async function upsertJoinedParty(
     view: JoinedPartyView,
   });
 
-  const joinedParty = expectMutationResult(result, "joinedParty.upsert did not return a result");
-  cacheJoinedParty(client, userId, joinedParty);
-
-  return joinedParty;
+  return expectMutationResult(result, "joinedParty.upsert did not return a result");
 }
 
 export async function upsertUserSettings(
@@ -358,13 +178,13 @@ export async function upsertUserSettings(
     >
   >,
 ) {
-  const current = fatePartyListCache.getValueIfCached(client, userId);
+  const current = await readUserSettings(client, userId);
   const result = await client.mutations.user.upsert({
     input: {
       authMode: "localFirst",
       autoOpenCalculator: values.autoOpenCalculator ?? current?.autoOpenCalculator ?? false,
       avatarId: values.avatarId ?? current?.avatarId ?? undefined,
-      displayName: values.username ?? current?.username ?? undefined,
+      displayName: values.username ?? current?.displayName ?? undefined,
       hue: values.hue ?? current?.hue,
       id: userId,
       lastOpenedPartyId: values.lastOpenedPartyId ?? current?.lastOpenedPartyId ?? undefined,
@@ -376,13 +196,7 @@ export async function upsertUserSettings(
     view: UserSettingsView,
   });
 
-  const user = expectMutationResult(result, "user.upsert did not return a result");
-
-  const joinedParties = await readJoinedParties(client, userId);
-  const partyList = toPartyList(userId, user, joinedParties);
-  fatePartyListCache.cache(partyList, client, userId);
-
-  return user;
+  return expectMutationResult(result, "user.upsert did not return a result");
 }
 
 export async function createExpenseInFate(
@@ -400,16 +214,10 @@ export async function createExpenseInFate(
   const result = await client.mutations.expense.create({
     input: expenseToMutationInput(partyId, expenseWithId),
     insert: "before",
-    optimistic: expenseToOptimisticEntity(partyId, expenseWithId),
     view: ExpenseListItemView,
   });
 
-  const createdEntity = expectMutationResult(result, "expense.create did not return a result");
-
-  const created = toExpense(createdEntity);
-  cacheExpense(client, partyId, created);
-
-  return created;
+  return toExpense(expectMutationResult(result, "expense.create did not return a result"));
 }
 
 export async function upsertExpenseInFate(
@@ -427,17 +235,12 @@ export async function upsertExpenseInFate(
     view: ExpenseListItemView,
   });
 
-  const updatedEntity = expectMutationResult(result, "expense.upsert did not return a result");
-
-  const updated = toExpense(updatedEntity);
-  cacheExpense(client, partyId, updated);
-
-  return updated;
+  return toExpense(expectMutationResult(result, "expense.upsert did not return a result"));
 }
 
 export async function deleteExpenseInFate(
   client: TrizumFateClient,
-  partyId: string,
+  _partyId: string,
   expenseId: string,
 ) {
   const result = await client.mutations.expense.delete({
@@ -449,7 +252,6 @@ export async function deleteExpenseInFate(
   });
 
   throwMutationError(result.error);
-  removeCachedExpense(client, partyId, expenseId);
 
   return true;
 }
@@ -473,12 +275,7 @@ export async function createMediaFileInFate(
     view: MediaFileBlobView,
   });
 
-  const mediaFileEntity = expectMutationResult(result, "mediaFile.create did not return a result");
-
-  const mediaFile = toMediaFile(mediaFileEntity);
-  fateMediaFileCache.cache(mediaFile, client, mediaFile.id);
-
-  return mediaFile;
+  return toMediaFile(expectMutationResult(result, "mediaFile.create did not return a result"));
 }
 
 export async function readParty(
@@ -496,34 +293,11 @@ export async function readParty(
   return toParty(party, participants);
 }
 
-export async function readExpenses(
-  client: TrizumFateClient,
-  partyId: string,
-  args: {
-    first: number;
-    offset: number;
-  },
-) {
-  const { expenses } = await client.request({
-    expenses: {
-      args: {
-        first: args.first,
-        offset: args.offset,
-        partyId,
-      },
-      list: ExpenseListItemView,
-    },
-  });
+export async function readPartyList(client: TrizumFateClient, userId: string): Promise<PartyList> {
+  const user = await readUserSettings(client, userId);
+  const joinedParties = await readJoinedParties(client, userId);
 
-  const entities = await Promise.all(
-    expenses.map(async (expense) => {
-      const snapshot = await client.readView(ExpenseListItemView, expense);
-
-      return snapshot.data as unknown as ExpenseEntity;
-    }),
-  );
-
-  return entities.map(toExpense);
+  return toPartyList(userId, user, joinedParties);
 }
 
 export async function readExpenseById(client: TrizumFateClient, expenseId: string) {
@@ -540,94 +314,6 @@ export async function readExpenseById(client: TrizumFateClient, expenseId: strin
   } catch {
     return undefined;
   }
-}
-
-export function cacheParty(client: TrizumFateClient, party: Party) {
-  fatePartyCache.cache(party, client, party.id);
-}
-
-function cacheExpense(client: TrizumFateClient, partyId: string, expense: Expense) {
-  fateExpenseCache.cache(expense, client, expense.id);
-
-  const currentPage = fatePartyExpensesCache.getValueIfCached(client, partyId);
-
-  if (currentPage) {
-    const expenses = upsertExpenseInList(currentPage.expenses, expense).sort(compareExpenses);
-    fatePartyExpensesCache.cache(
-      {
-        ...currentPage,
-        expenses,
-      },
-      client,
-      partyId,
-    );
-  }
-
-  const allExpenses = fateAllPartyExpensesCache.getValueIfCached(client, partyId);
-
-  if (allExpenses) {
-    fateAllPartyExpensesCache.cache(
-      upsertExpenseInList(allExpenses, expense).sort(compareExpenses),
-      client,
-      partyId,
-    );
-  }
-}
-
-function removeCachedExpense(client: TrizumFateClient, partyId: string, expenseId: string) {
-  fateExpenseCache.cache(undefined, client, expenseId);
-
-  const currentPage = fatePartyExpensesCache.getValueIfCached(client, partyId);
-
-  if (currentPage) {
-    fatePartyExpensesCache.cache(
-      {
-        ...currentPage,
-        expenses: currentPage.expenses.filter((expense) => expense.id !== expenseId),
-      },
-      client,
-      partyId,
-    );
-  }
-
-  const allExpenses = fateAllPartyExpensesCache.getValueIfCached(client, partyId);
-
-  if (allExpenses) {
-    fateAllPartyExpensesCache.cache(
-      allExpenses.filter((expense) => expense.id !== expenseId),
-      client,
-      partyId,
-    );
-  }
-}
-
-function cacheJoinedParty(
-  client: TrizumFateClient,
-  userId: string,
-  joinedParty: JoinedPartyEntity,
-) {
-  const current = fatePartyListCache.getValueIfCached(client, userId);
-
-  if (!current) {
-    return;
-  }
-
-  const next = toPartyList(userId, undefined, [joinedParty], current);
-  fatePartyListCache.cache(next, client, userId);
-}
-
-async function readExpensePage(client: TrizumFateClient, partyId: string, offset: number) {
-  const expenses = await readExpenses(client, partyId, {
-    first: EXPENSE_PAGE_SIZE + 1,
-    offset,
-  });
-  const visibleExpenses = expenses.slice(0, EXPENSE_PAGE_SIZE);
-
-  return {
-    expenses: visibleExpenses,
-    hasNext: expenses.length > EXPENSE_PAGE_SIZE,
-    nextOffset: offset + visibleExpenses.length,
-  };
 }
 
 async function readUserSettings(client: TrizumFateClient, userId: string) {
@@ -696,39 +382,7 @@ async function readParticipants(client: TrizumFateClient, partyId: string) {
   );
 }
 
-async function readMediaFile(client: TrizumFateClient, mediaFileId: string) {
-  try {
-    const { mediaFile } = await client.request({
-      mediaFile: {
-        id: mediaFileId,
-        view: MediaFileBlobView,
-      },
-    });
-    const snapshot = await client.readView(MediaFileBlobView, mediaFile);
-
-    return snapshot.data as unknown as MediaFileEntity;
-  } catch {
-    return undefined;
-  }
-}
-
-async function upsertDefaultUser(client: TrizumFateClient, userId: string) {
-  const result = await client.mutations.user.upsert({
-    input: {
-      authMode: "localFirst",
-      autoOpenCalculator: false,
-      id: userId,
-      openLastPartyOnLaunch: false,
-    },
-    view: UserSettingsView,
-  });
-
-  const user = expectMutationResult(result, "user.upsert did not return a result");
-
-  return user;
-}
-
-function toPartyList(
+export function toPartyList(
   userId: string,
   user: UserEntity | undefined,
   joinedParties: readonly JoinedPartyEntity[],
@@ -784,19 +438,13 @@ function toPartyList(
   return next;
 }
 
-function toParty(party: PartyEntity, participants: readonly ParticipantEntity[]): Party {
+export function toParty(party: PartyEntity, participants: readonly ParticipantEntity[]): Party {
   const partyParticipants: Party["participants"] = {};
 
   for (const participant of participants) {
-    partyParticipants[participant.id] = {
-      avatarId: participant.avatarId ?? undefined,
-      balancesSortedBy: participant.balancesSortedBy,
-      id: participant.id,
-      isArchived: participant.isArchived,
-      name: participant.name,
-      personalMode: participant.personalMode,
-      phone: participant.phone ?? undefined,
-    };
+    const partyParticipant = toPartyParticipant(participant);
+
+    partyParticipants[partyParticipant.id] = partyParticipant;
   }
 
   return {
@@ -810,7 +458,19 @@ function toParty(party: PartyEntity, participants: readonly ParticipantEntity[])
   };
 }
 
-function toExpense(entity: ExpenseEntity): Expense {
+export function toPartyParticipant(participant: ParticipantEntity): PartyParticipant {
+  return {
+    avatarId: participant.avatarId ?? undefined,
+    balancesSortedBy: participant.balancesSortedBy,
+    id: participant.localId,
+    isArchived: participant.isArchived,
+    name: participant.name,
+    personalMode: participant.personalMode,
+    phone: participant.phone ?? undefined,
+  };
+}
+
+export function toExpense(entity: ExpenseEntity): Expense {
   const expense: Expense = {
     __editCopy: entity.editCopy as unknown as Expense["__editCopy"],
     __editCopyLastUpdatedAt: toDate(entity.editCopyLastUpdatedAt),
@@ -831,7 +491,7 @@ function toExpense(entity: ExpenseEntity): Expense {
   return expense;
 }
 
-function toMediaFile(entity: MediaFileEntity): MediaFile {
+export function toMediaFile(entity: MediaFileEntity): MediaFile {
   return {
     encodedBlob: entity.encodedBlob,
     id: entity.id,
@@ -864,22 +524,6 @@ function expenseToOptimisticEntity(partyId: string, expense: Expense): ExpenseEn
   } as ExpenseEntity;
 }
 
-function upsertExpenseInList(expenses: Expense[], expense: Expense) {
-  const index = expenses.findIndex((candidate) => candidate.id === expense.id);
-
-  if (index === -1) {
-    return [expense, ...expenses];
-  }
-
-  const next = [...expenses];
-  next[index] = expense;
-  return next;
-}
-
-function compareExpenses(left: Expense, right: Expense) {
-  return right.paidAt.getTime() - left.paidAt.getTime() || right.id.localeCompare(left.id);
-}
-
 function createPartyId() {
   return crypto.randomUUID();
 }
@@ -894,6 +538,10 @@ function getJoinedPartyId(userId: string, partyId: string) {
 
 function getPartyMemberId(userId: string, partyId: string) {
   return createDeterministicEntityId(`partyMember:${userId}:${partyId}`);
+}
+
+function getParticipantEntityId(partyId: string, participantId: string) {
+  return createDeterministicEntityId(`participant:${partyId}:${participantId}`);
 }
 
 function createDeterministicEntityId(input: string) {
