@@ -117,6 +117,7 @@ export const ParticipantView = view<ParticipantEntity>()({
   id: true,
   partyId: true,
   name: true,
+  phone: true,
   avatarId: true,
   isArchived: true,
   personalMode: true,
@@ -170,6 +171,15 @@ export type UpsertJoinedPartyMutationInput = CreateJoinedPartyInput & {
 export type UpsertParticipantMutationInput = CreateParticipantInput & {
   id: string;
 };
+export type UpsertMediaFileMutationInput = CreateMediaFileInput & {
+  id: string;
+};
+export type UpsertExpenseMutationInput = CreateExpenseInput & {
+  id: string;
+};
+export type DeleteEntityMutationInput = {
+  id: string;
+};
 
 export const trizumFateMutations = {
   "user.create": mutation<UserEntity, CreateUserMutationInput, UserEntity>("User"),
@@ -209,5 +219,13 @@ export const trizumFateMutations = {
   "mediaFile.create": mutation<MediaFileEntity, CreateMediaFileMutationInput, MediaFileEntity>(
     "MediaFile",
   ),
+  "mediaFile.upsert": mutation<MediaFileEntity, UpsertMediaFileMutationInput, MediaFileEntity>(
+    "MediaFile",
+  ),
+  "mediaFile.delete": mutation<MediaFileEntity, DeleteEntityMutationInput, MediaFileEntity>(
+    "MediaFile",
+  ),
   "expense.create": mutation<ExpenseEntity, CreateExpenseMutationInput, ExpenseEntity>("Expense"),
+  "expense.upsert": mutation<ExpenseEntity, UpsertExpenseMutationInput, ExpenseEntity>("Expense"),
+  "expense.delete": mutation<ExpenseEntity, DeleteEntityMutationInput, ExpenseEntity>("Expense"),
 };

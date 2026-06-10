@@ -1,39 +1,39 @@
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import { patchMutate } from "#src/lib/patchMutate.ts";
-import {
-  createExpenseId,
-  calculateExpenseHash,
-  type Expense,
-  calculateBalancesByParticipant,
-  decodeExpenseId,
-  applyExpenseDiff,
-} from "#src/models/expense.js";
-import type {
-  Party,
-  PartyExpenseChunk,
-  PartyExpenseChunkBalances,
-  PartyExpenseChunkRef,
-  PartyParticipant,
-} from "#src/models/party.js";
-import { diff } from "@opentf/obj-diff";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import type { DocHandle, Repo, DocumentId } from "@automerge/automerge-repo/slim";
-import { deleteAt, insertAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
-import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
+import {
+  cacheParty,
+  createExpenseInFate,
+  deleteExpenseInFate,
+  fatePartyCache,
+  readParty,
+  refreshParty,
+  refreshPartyExpenses,
+  upsertExpenseInFate,
+  upsertParticipant,
+  upsertParty,
+  useFateCache,
+} from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { getLogger } from "#src/lib/log.ts";
+import type { Expense } from "#src/models/expense.js";
+import type { Party, PartyParticipant } from "#src/models/party.js";
 
 const logger = getLogger("hooks", "useParty");
 
 export function useParty(partyId: string) {
-  if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
-  const [party, handle] = useSuspenseDocument<Party>(partyId, {
-    required: true,
-  });
-  const repo = useRepo();
+  if (!partyId) {
+    throw new Error("Malformed Party ID");
+  }
 
-  const helpers = getPartyHelpers(repo, handle);
+  const { client, userId } = useTrizumData();
+  const party = useFateCache(fatePartyCache, client, partyId);
+
+  if (!party) {
+    throw new Error("Party not found");
+  }
+
+  const currentParty = party;
+  const helpers = getPartyHelpers({ client, party: currentParty, partyId, userId });
 
   async function __dev_createTestExpenses() {
     const promptAnswer = window.prompt("How many test expenses to create?");
@@ -47,7 +47,7 @@ export function useParty(partyId: string) {
 
     logger.debug("Creating test expenses", { amount });
 
-    const participants = Object.keys(party.participants);
+    const participants = Object.keys(currentParty.participants);
 
     for (let i = 0; i < amount; i++) {
       logger.debug("Creating test expense {index}", { index: i + 1 });
@@ -73,9 +73,9 @@ export function useParty(partyId: string) {
   }
 
   return {
-    party,
+    party: currentParty,
     partyId,
-    isLoading: handle.inState(["loading"]),
+    isLoading: false,
     ...helpers,
     dev: {
       createTestExpenses: __dev_createTestExpenses,
@@ -96,272 +96,82 @@ export function useCurrentParty() {
   return useParty(partyId);
 }
 
-export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
-  function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
-    handle.change((doc) => {
-      doc.name = values.name;
-      doc.symbol = values.symbol;
-      doc.description = values.description;
-      doc.participants = values.participants;
-    });
+export function getPartyHelpers({
+  client,
+  party,
+  partyId,
+  userId,
+}: {
+  client: ReturnType<typeof useTrizumData>["client"];
+  party: Party;
+  partyId: string;
+  userId: string;
+}) {
+  async function updateSettings(
+    values: Pick<Party, "description" | "name" | "participants" | "symbol">,
+  ) {
+    const nextParty: Party = {
+      ...party,
+      description: values.description,
+      name: values.name,
+      participants: values.participants,
+      symbol: values.symbol,
+    };
+
+    await upsertParty(client, userId, nextParty);
+    await Promise.all(
+      Object.values(nextParty.participants).map((participant) =>
+        upsertParticipant(client, nextParty.id, participant),
+      ),
+    );
+
+    cacheParty(client, nextParty);
+    await refreshParty(client, nextParty.id);
   }
 
-  function setParticipantDetails(
+  async function setParticipantDetails(
     participantId: PartyParticipant["id"],
     details: Partial<
-      Pick<PartyParticipant, "phone" | "personalMode" | "avatarId" | "balancesSortedBy">
+      Pick<PartyParticipant, "avatarId" | "balancesSortedBy" | "personalMode" | "phone">
     >,
   ) {
-    handle.change((doc) => {
-      const participant = doc.participants[participantId];
+    const participant = party.participants[participantId];
 
-      if (!participant) {
-        return;
-      }
+    if (!participant) {
+      return;
+    }
 
-      for (const key in details) {
-        const value = details[key as keyof typeof details];
+    const nextParticipant: PartyParticipant = {
+      ...participant,
+      ...details,
+    };
+    const nextParty: Party = {
+      ...party,
+      participants: {
+        ...party.participants,
+        [participantId]: nextParticipant,
+      },
+    };
 
-        if (value === undefined) {
-          delete participant[key as keyof typeof participant];
-        } else {
-          // @ts-expect-error -- idk tbh
-          participant[key] = value;
-        }
-      }
-    });
+    await upsertParticipant(client, party.id, nextParticipant);
+    cacheParty(client, nextParty);
   }
 
-  function createChunk() {
-    const party = handle.doc();
-    const chunkHandle = repo.create<PartyExpenseChunk>({
-      id: "" as DocumentId,
-      type: "expenseChunk",
-      createdAt: new Date(),
-      expenses: [],
-      maxSize: 500,
-      partyId: party.id,
-    });
+  async function addExpenseToParty(expense: Omit<Expense, "__hash" | "id">): Promise<Expense> {
+    const created = await createExpenseInFate(client, partyId, expense);
+    await refreshPartyExpenses(client, partyId);
 
-    chunkHandle.change((doc) => (doc.id = chunkHandle.documentId));
-
-    const balancesHandle = repo.create<PartyExpenseChunkBalances>({
-      id: "" as DocumentId,
-      type: "expenseChunkBalances",
-      balances: {},
-      partyId: party.id,
-    });
-    balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
-
-    const chunkRef: PartyExpenseChunkRef = {
-      chunkId: chunkHandle.documentId,
-      createdAt: new Date(),
-      balancesId: balancesHandle.documentId,
-    };
-
-    return [chunkRef, chunkHandle] as const;
-  }
-
-  async function addExpenseToParty(expense: Omit<Expense, "id" | "__hash">): Promise<Expense> {
-    const party = handle.doc();
-
-    if (!party) {
-      throw new Error("Party not found, this should not happen");
-    }
-
-    // Last chunk is the most recent one, so should be indexed at 0
-    let lastChunkRef = party.chunkRefs.at(0);
-
-    if (!lastChunkRef) {
-      // Create a new chunk if there is none
-      const [chunkRef] = createChunk();
-      lastChunkRef = chunkRef;
-    }
-
-    let lastChunkHandle = await repo.find<PartyExpenseChunk>(lastChunkRef.chunkId);
-    let lastChunk = lastChunkHandle.doc();
-
-    if (!lastChunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    if (lastChunk.expenses.length >= lastChunk.maxSize) {
-      // Create a new chunk if the last one is full
-      const [chunkRef, handle] = createChunk();
-      lastChunkRef = chunkRef;
-      lastChunkHandle = handle;
-      lastChunk = lastChunkHandle.doc();
-
-      if (!lastChunk) {
-        throw new Error("Chunk not found, this should not happen");
-      }
-    }
-
-    const expenseWithId = {
-      ...expense,
-      id: createExpenseId(lastChunkRef.chunkId),
-    };
-    const expenseWithHash = {
-      ...expenseWithId,
-      __hash: calculateExpenseHash({
-        ...expenseWithId,
-        __hash: "",
-      }),
-    };
-
-    lastChunkHandle.change((doc) => {
-      insertAt(doc.expenses, 0, expenseWithHash);
-    });
-    lastChunk = lastChunkHandle.doc();
-
-    if (!lastChunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    handle.change((party) => {
-      let existingLastChunkRef = party.chunkRefs.find(
-        (chunkRef) => chunkRef.chunkId === lastChunk.id,
-      );
-
-      if (!existingLastChunkRef) {
-        existingLastChunkRef = lastChunkRef;
-        insertAt(party.chunkRefs, 0, existingLastChunkRef);
-      }
-    });
-
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      lastChunkRef.balancesId,
-    );
-    const lastChunkBalances = lastChunkBalancesHandle.doc();
-
-    if (!lastChunkBalances) {
-      throw new Error("Chunk balances not found, this should not happen");
-    }
-
-    const balancesByParticipant = calculateBalancesByParticipant(
-      lastChunk.expenses,
-      party.participants,
-    );
-
-    lastChunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
-    });
-
-    return expenseWithHash;
+    return created;
   }
 
   async function updateExpense(expense: Expense) {
-    const party = handle.doc();
-
-    if (!party) {
-      throw new Error("Party not found, this should not happen");
-    }
-
-    const { chunkId } = decodeExpenseId(expense.id);
-
-    const chunkRef = party.chunkRefs.find((chunk) => chunk.chunkId === chunkId);
-
-    if (!chunkRef) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    let chunk = chunkHandle.doc();
-
-    if (!chunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    chunkHandle.change((doc) => {
-      const expenseEntry = doc.expenses.find((e) => e.id === expense.id);
-
-      if (!expenseEntry) {
-        throw new Error("Expense not found, this should not happen");
-      }
-
-      applyExpenseDiff(expenseEntry, expense);
-
-      delete expenseEntry.__editCopy;
-      delete expenseEntry.__editCopyLastUpdatedAt;
-    });
-
-    chunk = chunkHandle.doc();
-
-    if (!chunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
-    const lastChunkBalances = lastChunkBalancesHandle.doc();
-
-    if (!lastChunkBalances) {
-      throw new Error("Chunk balances not found, this should not happen");
-    }
-
-    const balancesByParticipant = calculateBalancesByParticipant(
-      chunk.expenses,
-      party.participants,
-    );
-
-    lastChunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
-    });
+    await upsertExpenseInFate(client, partyId, expense);
+    await refreshPartyExpenses(client, partyId);
   }
 
   async function removeExpense(expenseId: Expense["id"]) {
-    const party = handle.doc();
-
-    if (!party) {
-      throw new Error("Party not found, this should not happen");
-    }
-
-    const { chunkId } = decodeExpenseId(expenseId);
-
-    const chunkRef = party.chunkRefs.find((chunk) => chunk.chunkId === chunkId);
-
-    if (!chunkRef) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    let chunk = chunkHandle.doc();
-
-    if (!chunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    chunkHandle.change((doc) => {
-      const expenseIndex = doc.expenses.findIndex((e) => e.id === expenseId);
-
-      if (expenseIndex === -1) {
-        throw new Error("Expense not found, this should not happen");
-      }
-
-      deleteAt(doc.expenses, expenseIndex);
-    });
-
-    chunk = chunkHandle.doc();
-
-    if (!chunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
-    const lastChunkBalances = lastChunkBalancesHandle.doc();
-
-    if (!lastChunkBalances) {
-      throw new Error("Chunk balances not found, this should not happen");
-    }
-
-    const balancesByParticipant = calculateBalancesByParticipant(
-      chunk.expenses,
-      party.participants,
-    );
-
-    lastChunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
-    });
-    lastChunkBalancesHandle.doc();
+    await deleteExpenseInFate(client, partyId, expenseId);
+    await refreshPartyExpenses(client, partyId);
 
     return true;
   }
@@ -377,21 +187,17 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     originExpenseName,
     destinationExpenseName,
   }: {
-    destinationPartyId: Party["id"];
-    originDebtorId: PartyParticipant["id"];
-    originCreditorId: PartyParticipant["id"];
-    destinationDebtorId: PartyParticipant["id"];
-    destinationCreditorId: PartyParticipant["id"];
     amount: number;
-    paidAt: Date;
+    destinationCreditorId: PartyParticipant["id"];
+    destinationDebtorId: PartyParticipant["id"];
+    destinationPartyId: Party["id"];
+    originCreditorId: PartyParticipant["id"];
+    originDebtorId: PartyParticipant["id"];
     originExpenseName: string;
+    paidAt: Date;
     destinationExpenseName: string;
   }) {
-    const originParty = handle.doc();
-
-    if (!originParty) {
-      throw new Error("Party not found, this should not happen");
-    }
+    const originParty = party;
 
     if (destinationPartyId === originParty.id) {
       throw new Error("Cannot transfer debt to the same party");
@@ -405,8 +211,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Origin creditor not found");
     }
 
-    const destinationHandle = await repo.find<Party>(destinationPartyId);
-    const destinationParty = destinationHandle.doc();
+    const destinationParty = await readParty(client, destinationPartyId);
 
     if (!destinationParty) {
       throw new Error("Destination party not found");
@@ -424,7 +229,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       throw new Error("Destination creditor not found");
     }
 
-    const destinationHelpers = getPartyHelpers(repo, destinationHandle);
     const { originExpense, destinationExpense } = createDebtTransferExpenses({
       amount,
       originDebtorId,
@@ -435,12 +239,18 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       originExpenseName,
       destinationExpenseName,
     });
-
-    const createdDestinationExpense =
-      await destinationHelpers.addExpenseToParty(destinationExpense);
+    const createdDestinationExpense = await createExpenseInFate(
+      client,
+      destinationPartyId,
+      destinationExpense,
+    );
 
     try {
-      const createdOriginExpense = await addExpenseToParty(originExpense);
+      const createdOriginExpense = await createExpenseInFate(client, originParty.id, originExpense);
+      await Promise.all([
+        refreshPartyExpenses(client, originParty.id),
+        refreshPartyExpenses(client, destinationPartyId),
+      ]);
 
       return {
         originExpense: createdOriginExpense,
@@ -448,7 +258,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       };
     } catch (error) {
       try {
-        await destinationHelpers.removeExpense(createdDestinationExpense.id);
+        await deleteExpenseInFate(client, destinationPartyId, createdDestinationExpense.id);
       } catch (rollbackError) {
         logger.error("Failed to rollback destination debt transfer expense", {
           rollbackError,
@@ -462,40 +272,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   }
 
   async function recalculateBalances() {
-    const party = handle.doc();
-
-    if (!party) {
-      throw new Error("Party not found, this should not happen");
-    }
-
-    const chunkRefs = party.chunkRefs;
-
-    for (const chunkRef of chunkRefs) {
-      const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-      const chunk = chunkHandle.doc();
-
-      if (!chunk) {
-        throw new Error("Chunk not found, this should not happen");
-      }
-
-      const balancesByParticipant = calculateBalancesByParticipant(
-        chunk.expenses,
-        party.participants,
-      );
-
-      const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
-      const chunkBalances = chunkBalancesHandle.doc();
-
-      if (!chunkBalances) {
-        throw new Error("Chunk balances not found, this should not happen");
-      }
-
-      chunkBalancesHandle.change((doc) => {
-        patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
-      });
-      chunkBalancesHandle.doc();
-    }
-
     return true;
   }
 

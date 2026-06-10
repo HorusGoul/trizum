@@ -1,9 +1,6 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
-import { Repo } from "@automerge/automerge-repo"; // inits automerge
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
   RouterProvider,
   createRouter,
@@ -21,7 +18,6 @@ import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
-import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
@@ -31,7 +27,6 @@ import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { createLocalFirstTrizumDataClient } from "@trizum/data";
-import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging } from "./lib/log.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import { TrizumDataContext } from "./lib/data/TrizumDataContext.ts";
@@ -99,15 +94,9 @@ declare module "react-aria-components" {
   }
 }
 
-const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
 const JAZZ_SERVER_URL = import.meta.env.VITE_APP_JAZZ_SERVER_URL?.trim() || undefined;
 const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
 
-// Create automerge repository
-const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
-  network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
-});
 const trizumData = await createLocalFirstTrizumDataClient({
   dbName: "trizum-jazz-fate-pwa",
   serverUrl: isOfflineOnly ? undefined : JAZZ_SERVER_URL,
@@ -126,29 +115,32 @@ declare global {
 // For internal use only, like UI testing or screenshots
 window.__internal_createPartyFromMigrationData = async (data: MigrationData) => {
   return createPartyFromMigrationData({
-    repo,
+    client: trizumData.client,
     data,
     importAttachments: false,
+    userId: trizumData.userId,
   });
 };
 
 window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {
   return seedPartyListState({
-    repo,
+    client: trizumData.client,
     seed,
+    userId: trizumData.userId,
   });
 };
 
 window.__internal_readPartyListState = async () => {
   return readPartyListState({
-    repo,
+    client: trizumData.client,
+    userId: trizumData.userId,
   });
 };
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: { data: trizumData, repo },
+  context: { data: trizumData },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
@@ -195,14 +187,12 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <UpdateControllerComponent>
         <AriaProviders>
-          <RepoContext value={repo}>
-            <TrizumDataContext value={trizumData}>
-              <MediaGalleryController>
-                <RouterProvider router={router} InnerWrap={InnerWrap} />
-                <Toaster />
-              </MediaGalleryController>
-            </TrizumDataContext>
-          </RepoContext>
+          <TrizumDataContext value={trizumData}>
+            <MediaGalleryController>
+              <RouterProvider router={router} InnerWrap={InnerWrap} />
+              <Toaster />
+            </MediaGalleryController>
+          </TrizumDataContext>
         </AriaProviders>
       </UpdateControllerComponent>
     </I18nProvider>,

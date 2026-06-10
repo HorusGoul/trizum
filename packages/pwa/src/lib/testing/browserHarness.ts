@@ -1,16 +1,22 @@
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
+import type { TrizumFateClient } from "@trizum/data";
 import type { SupportedLocale } from "#src/lib/i18n.js";
-import { getPartyListHandle, type PartyList } from "#src/models/partyList.js";
+import {
+  fatePartyListCache,
+  refreshPartyList,
+  upsertJoinedParty,
+  upsertUserSettings,
+} from "#src/lib/data/fateAppData.ts";
+import type { PartyList } from "#src/models/partyList.js";
 
 export interface InternalPartyListSeed {
   username?: string;
   phone?: string;
-  avatarId?: DocumentId | null;
+  avatarId?: string | null;
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
   autoOpenCalculator?: boolean;
   hue?: number;
-  lastOpenedPartyId?: DocumentId | null;
+  lastOpenedPartyId?: string | null;
   parties?: PartyList["parties"];
   pinnedParties?: NonNullable<PartyList["pinnedParties"]>;
   archivedParties?: NonNullable<PartyList["archivedParties"]>;
@@ -19,12 +25,12 @@ export interface InternalPartyListSeed {
 }
 
 export interface InternalPartyListSeedResult {
-  partyListId: DocumentId;
+  partyListId: string;
 }
 
 export interface InternalPartyListSnapshot {
-  partyListId: DocumentId;
-  lastOpenedPartyId: DocumentId | null;
+  partyListId: string;
+  lastOpenedPartyId: string | null;
   parties: PartyList["parties"];
   pinnedParties: NonNullable<PartyList["pinnedParties"]>;
   archivedParties: NonNullable<PartyList["archivedParties"]>;
@@ -33,83 +39,70 @@ export interface InternalPartyListSnapshot {
 }
 
 export async function seedPartyListState({
-  repo,
+  client,
   seed,
+  userId,
 }: {
-  repo: Repo;
+  client: TrizumFateClient;
   seed: InternalPartyListSeed;
+  userId: string;
 }): Promise<InternalPartyListSeedResult> {
-  const partyListHandle = await getPartyListHandle(repo);
-  const partyListId = partyListHandle.documentId;
-
-  partyListHandle.change((partyList) => {
-    partyList.username = seed.username ?? "";
-    partyList.phone = seed.phone ?? "";
-    partyList.parties = seed.parties ?? {};
-    partyList.pinnedParties = seed.pinnedParties ?? {};
-    partyList.archivedParties = seed.archivedParties ?? {};
-    partyList.lastUsedAt = seed.lastUsedAt ?? {};
-    partyList.participantInParties = seed.participantInParties ?? {};
-
-    if (seed.avatarId === undefined) {
-      delete partyList["avatarId"];
-    } else {
-      partyList.avatarId = seed.avatarId;
-    }
-
-    if (seed.locale === undefined) {
-      delete partyList["locale"];
-    } else {
-      partyList.locale = seed.locale;
-    }
-
-    if (seed.openLastPartyOnLaunch === undefined) {
-      delete partyList["openLastPartyOnLaunch"];
-    } else {
-      partyList.openLastPartyOnLaunch = seed.openLastPartyOnLaunch;
-    }
-
-    if (seed.autoOpenCalculator === undefined) {
-      delete partyList["autoOpenCalculator"];
-    } else {
-      partyList.autoOpenCalculator = seed.autoOpenCalculator;
-    }
-
-    if (seed.hue === undefined) {
-      delete partyList["hue"];
-    } else {
-      partyList.hue = seed.hue;
-    }
-
-    if (seed.lastOpenedPartyId === undefined) {
-      delete partyList["lastOpenedPartyId"];
-    } else {
-      partyList.lastOpenedPartyId = seed.lastOpenedPartyId;
-    }
+  await upsertUserSettings(client, userId, {
+    autoOpenCalculator: seed.autoOpenCalculator ?? false,
+    avatarId: seed.avatarId,
+    hue: seed.hue,
+    lastOpenedPartyId: seed.lastOpenedPartyId ?? null,
+    locale: seed.locale,
+    openLastPartyOnLaunch: seed.openLastPartyOnLaunch ?? false,
+    phone: seed.phone ?? "",
+    username: seed.username ?? "",
   });
 
+  await Promise.all(
+    Object.keys(seed.parties ?? {}).map(async (partyId) => {
+      if (seed.parties?.[partyId] !== true) {
+        return;
+      }
+
+      await upsertJoinedParty(client, userId, partyId, {
+        isArchived: seed.archivedParties?.[partyId] === true,
+        isPinned: seed.pinnedParties?.[partyId] === true,
+        joinedAt: toDate(seed.lastUsedAt?.[partyId]) ?? new Date(),
+        lastUsedAt: toDate(seed.lastUsedAt?.[partyId]) ?? new Date(),
+        participantId: seed.participantInParties?.[partyId],
+      });
+    }),
+  );
+
+  await refreshPartyList(client, userId);
+
   return {
-    partyListId,
+    partyListId: userId,
   };
 }
 
 export async function readPartyListState({
-  repo,
+  client,
+  userId,
 }: {
-  repo: Repo;
+  client: TrizumFateClient;
+  userId: string;
 }): Promise<InternalPartyListSnapshot> {
-  const partyListHandle = await getPartyListHandle(repo);
-  const partyList = partyListHandle.doc();
+  const partyList = await fatePartyListCache.readAsync(client, userId);
 
   return {
-    partyListId: partyListHandle.documentId,
-    lastOpenedPartyId: partyList?.lastOpenedPartyId ?? null,
-    parties: { ...(partyList?.parties ?? {}) },
-    pinnedParties: { ...(partyList?.pinnedParties ?? {}) },
-    archivedParties: { ...(partyList?.archivedParties ?? {}) },
-    lastUsedAt: { ...(partyList?.lastUsedAt ?? {}) },
+    partyListId: userId,
+    lastOpenedPartyId: partyList.lastOpenedPartyId ?? null,
+    parties: { ...partyList.parties },
+    pinnedParties: { ...(partyList.pinnedParties ?? {}) },
+    archivedParties: { ...(partyList.archivedParties ?? {}) },
+    lastUsedAt: { ...(partyList.lastUsedAt ?? {}) },
     participantInParties: {
-      ...(partyList?.participantInParties ?? {}),
+      ...partyList.participantInParties,
     },
   };
+}
+
+function toDate(value: number | undefined) {
+  return typeof value === "number" ? new Date(value) : undefined;
 }

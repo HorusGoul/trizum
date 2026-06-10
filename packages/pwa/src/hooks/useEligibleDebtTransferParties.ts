@@ -1,6 +1,7 @@
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { fatePartiesCache, useFateCache } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { useCurrentParty } from "./useParty";
 import { usePartyList } from "./usePartyList";
 
@@ -41,6 +42,7 @@ export function getEligibleDebtTransferParticipants(
 }
 
 export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
+  const { client } = useTrizumData();
   const { party: originParty } = useCurrentParty();
   const { partyList } = usePartyList();
   const { activePartyIds } = getOrderedPartySections(partyList);
@@ -60,12 +62,14 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     ];
   });
 
-  const partyEntries = useMultipleSuspenseDocument<Party>(
+  const parties = useFateCache(
+    fatePartiesCache,
+    client,
     joinedActiveParties.map(({ partyId }) => partyId),
   );
 
-  return partyEntries.flatMap(({ doc }, index) => {
-    if (!doc || doc.currency !== originParty.currency) {
+  return parties.flatMap((party, index) => {
+    if (!party || !originParty || party.currency !== originParty.currency) {
       return [];
     }
 
@@ -76,7 +80,7 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
     }
 
     const currentParticipantId = joinedActiveParty.currentParticipantId;
-    const eligibleParticipants = getEligibleDebtTransferParticipants(doc, currentParticipantId);
+    const eligibleParticipants = getEligibleDebtTransferParticipants(party, currentParticipantId);
 
     if (!eligibleParticipants) {
       return [];
@@ -84,7 +88,7 @@ export function useEligibleDebtTransferParties(): EligibleDebtTransferParty[] {
 
     return [
       {
-        party: doc,
+        party,
         currentParticipantId,
         currentParticipant: eligibleParticipants.currentParticipant,
         otherParticipants: eligibleParticipants.otherParticipants,

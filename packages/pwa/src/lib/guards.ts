@@ -1,19 +1,16 @@
-import type { Party } from "#src/models/party.js";
 import {
   redirect,
   type ParsedLocation,
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { documentCache } from "./automerge/suspense-hooks";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import { readParty } from "#src/lib/data/fateAppData.ts";
+import { fatePartyListCache } from "#src/lib/data/fateAppData.ts";
 
-export async function guardPartyExists(
-  partyId: string,
-  { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
-) {
-  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as Party | undefined;
+type RouterContext = RouterContextOptions<RegisteredRouter["routeTree"]>["context"];
+
+export async function guardPartyExists(partyId: string, { data }: RouterContext) {
+  const party = await readParty(data.client, partyId);
 
   if (!party) {
     throw redirect({ to: "/" });
@@ -22,11 +19,8 @@ export async function guardPartyExists(
   return party;
 }
 
-export async function guardPartyListExists({
-  repo,
-}: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
-  const partyListId = getPartyListId(repo);
-  const partyList = (await documentCache.readAsync(repo, partyListId)) as PartyList | undefined;
+export async function guardPartyListExists({ data }: RouterContext) {
+  const partyList = await fatePartyListCache.readAsync(data.client, data.userId);
 
   if (!partyList) {
     throw redirect({ to: "/" });
@@ -37,7 +31,7 @@ export async function guardPartyListExists({
 
 export async function guardParticipatingInParty(
   partyId: string,
-  context: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+  context: RouterContext,
   location: ParsedLocation,
 ) {
   const [party, partyList] = await Promise.all([

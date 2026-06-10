@@ -112,10 +112,12 @@ export type CreateExpenseInput = InsertOf<typeof trizumJazzApp.expenses>;
 export const trizumJazzPermissions = definePermissions(
   trizumJazzApp,
   ({ allowedTo, anyOf, policy, session }) => [
-    policy.users.allowRead.where({ id: session.userId }),
-    policy.users.allowInsert.where({ id: session.userId }),
-    policy.users.allowUpdate.whereOld({ id: session.userId }).whereNew({ id: session.userId }),
-    policy.users.allowDelete.where({ id: session.userId }),
+    policy.users.allowRead.where({ $createdBy: session.userId }),
+    policy.users.allowInsert.where({ $createdBy: session.userId }),
+    policy.users.allowUpdate
+      .whereOld({ $createdBy: session.userId })
+      .whereNew({ $createdBy: session.userId }),
+    policy.users.allowDelete.where({ $createdBy: session.userId }),
 
     policy.parties.allowRead.where((party) =>
       anyOf([

@@ -17,7 +17,7 @@ export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSorte
       : defaultBalancesSortedBy;
 
   function setter(sortedBy: BalancesSortedBy) {
-    setParticipantDetails(participant.id, {
+    void setParticipantDetails(participant.id, {
       balancesSortedBy: sortedBy,
     });
   }

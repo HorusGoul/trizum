@@ -62,7 +62,7 @@ export interface JazzFateRepository<
   ): Promise<TMutationMap[K]["output"]>;
 }
 
-export type JazzFateDb = Pick<Db, "all" | "insert" | "one" | "update" | "upsert">;
+export type JazzFateDb = Pick<Db, "all" | "delete" | "insert" | "one" | "update" | "upsert">;
 
 export type JazzFateEntityDefinition<TEntity extends JazzFateEntity = JazzFateEntity> = {
   columns: readonly string[];
@@ -83,7 +83,7 @@ export type JazzFateListDefinition<TEntity extends JazzFateEntity = JazzFateEnti
 
 export type JazzFateMutationDefinition<TEntity extends JazzFateEntity = JazzFateEntity> = {
   id?: (input: unknown) => string | number | undefined;
-  operation?: "insert" | "update" | "upsert";
+  operation?: "delete" | "insert" | "update" | "upsert";
   proc: string;
   table: unknown;
   type: TEntity["__typename"];
@@ -196,10 +196,25 @@ export function createJazzDbRepository<
 
       const id = getMutationId(mutation, input);
 
+      if (operation === "delete") {
+        const row = await db.one(
+          selectColumns(where(mutation.table, { id: String(id) }), entity, select),
+          queryOptions,
+        );
+
+        if (!row) {
+          throw new Error(`Fate mutation ${String(proc)} could not find row ${String(id)}`);
+        }
+
+        await deleteRow(db, mutation.table, id, queryOptions);
+
+        return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
+      }
+
       if (operation === "update") {
-        updateRow(db, mutation.table, id, input);
+        await updateRow(db, mutation.table, id, input, queryOptions);
       } else {
-        upsertRow(db, mutation.table, id, input);
+        await upsertRow(db, mutation.table, id, input, queryOptions);
       }
 
       const row = await db.one(
@@ -521,8 +536,14 @@ function insertRow(db: JazzFateDb, table: unknown, input: unknown): { value: unk
   )(table, stripInputId(input), id === undefined ? undefined : { id: String(id) });
 }
 
-function updateRow(db: JazzFateDb, table: unknown, id: string | number, input: unknown): void {
-  (
+async function updateRow(
+  db: JazzFateDb,
+  table: unknown,
+  id: string | number,
+  input: unknown,
+  queryOptions: QueryOptions,
+): Promise<void> {
+  const result = (
     db.update as (
       table: unknown,
       id: string,
@@ -531,10 +552,18 @@ function updateRow(db: JazzFateDb, table: unknown, id: string | number, input: u
       wait?: unknown;
     }
   )(table, String(id), stripInputId(input));
+
+  await waitForWrite(result, queryOptions);
 }
 
-function upsertRow(db: JazzFateDb, table: unknown, id: string | number, input: unknown): void {
-  (
+async function upsertRow(
+  db: JazzFateDb,
+  table: unknown,
+  id: string | number,
+  input: unknown,
+  queryOptions: QueryOptions,
+): Promise<void> {
+  const result = (
     db.upsert as (
       table: unknown,
       input: unknown,
@@ -545,6 +574,26 @@ function upsertRow(db: JazzFateDb, table: unknown, id: string | number, input: u
       wait?: unknown;
     }
   )(table, stripInputId(input), { id: String(id) });
+
+  await waitForWrite(result, queryOptions);
+}
+
+async function deleteRow(
+  db: JazzFateDb,
+  table: unknown,
+  id: string | number,
+  queryOptions: QueryOptions,
+): Promise<void> {
+  const result = (
+    db.delete as (
+      table: unknown,
+      id: string,
+    ) => {
+      wait?: unknown;
+    }
+  )(table, String(id));
+
+  await waitForWrite(result, queryOptions);
 }
 
 function getMutationId(definition: JazzFateMutationDefinition, input: unknown): string | number {
@@ -575,6 +624,16 @@ function stripInputId(input: unknown): unknown {
   const { id: _id, ...withoutId } = input as Record<string, unknown>;
 
   return withoutId;
+}
+
+async function waitForWrite(result: { wait?: unknown }, queryOptions: QueryOptions) {
+  if (typeof result.wait !== "function") {
+    return;
+  }
+
+  await (result.wait as (options: Pick<QueryOptions, "tier">) => Promise<unknown>)({
+    tier: queryOptions.tier,
+  });
 }
 
 function normalizeArgs(args: unknown): Record<string, unknown> | undefined {

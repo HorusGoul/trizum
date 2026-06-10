@@ -51,14 +51,14 @@ function Who() {
       partyList.participantInParties?.[party.id] === undefined,
   );
 
-  function onSaveSettings(values: WhoFormValues) {
+  async function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
     const participantName = participant.name;
 
-    addPartyToList(party.id, participant.id);
+    await addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
-      setParticipantDetails(participant.id, {
+      await setParticipantDetails(participant.id, {
         phone: partyList.phone,
         avatarId: partyList.avatarId,
       });
@@ -81,7 +81,7 @@ function Who() {
       participantId: partyList.participantInParties?.[party.id] ?? "",
     },
     onSubmit: ({ value }) => {
-      onSaveSettings(value);
+      return onSaveSettings(value);
     },
   });
 

@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "@nkzw/fate": "1.2.0",
+    "@trpc/client": "11.17.0",
+    "@trpc/server": "11.17.0",
     "jazz-tools": "2.0.0-alpha.50"
   },
   "devDependencies": {

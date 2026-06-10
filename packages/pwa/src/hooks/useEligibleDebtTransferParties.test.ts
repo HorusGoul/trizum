@@ -51,6 +51,5 @@ function createParty(participants: Party["participants"]): Party {
     description: "",
     currency: "EUR",
     participants,
-    chunkRefs: [],
   };
 }

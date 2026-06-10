@@ -4,20 +4,13 @@ import { useRef } from "react";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { PartyStatsView } from "#src/components/PartyStatsView.tsx";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 
 export const Route = createFileRoute("/party_/$partyId/stats")({
   component: PartyStatsRoute,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
-    const { party } = await guardParticipatingInParty(partyId, context, location);
-
-    for (const chunkRef of party.chunkRefs) {
-      await documentCache.readAsync(context.repo, chunkRef.chunkId);
-    }
-
-    return;
+    await guardParticipatingInParty(partyId, context, location);
   },
 });
 

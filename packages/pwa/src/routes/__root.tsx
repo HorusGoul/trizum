@@ -1,4 +1,3 @@
-import type { Repo } from "@automerge/automerge-repo/slim";
 import type { TrizumDataContextValue } from "#src/lib/data/TrizumDataContext.js";
 import { createRootRouteWithContext, Outlet, useRouter } from "@tanstack/react-router";
 import * as React from "react";
@@ -15,7 +14,6 @@ const TanStackRouterDevtools = import.meta.env.PROD
 
 interface RouterContext {
   data: TrizumDataContextValue;
-  repo: Repo;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({

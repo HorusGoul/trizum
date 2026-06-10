@@ -414,7 +414,7 @@ function createExpense(
   timestamp?: number,
 ): Expense {
   return {
-    id: createExpenseId("test", timestamp),
+    id: createExpenseId(timestamp),
     name: "",
     paidAt: new Date(),
     paidBy,

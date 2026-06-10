@@ -8,14 +8,15 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { fateAllPartyExpensesCache, useFateCache } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import {
   calculatePartyStats,
   getPartyStatsAvailablePastYears,
   type PartyStatsParticipantStat,
   type PartyStatsTimeframe,
 } from "#src/lib/partyStats.ts";
-import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.js";
+import type { PartyParticipant } from "#src/models/party.js";
 import { Avatar } from "#src/ui/Avatar.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import {
@@ -157,14 +158,11 @@ export function PartyStatsView({ scrollElementRef }: PartyStatsViewProps) {
 }
 
 function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
+  const { client } = useTrizumData();
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
-  const chunkDocuments = useMultipleSuspenseDocument<PartyExpenseChunk>(
-    party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
-    { required: true },
-  );
-  const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
+  const expenses = useFateCache(fateAllPartyExpensesCache, client, party.id);
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
   const [timeframeKey, setTimeframeKey] = useState<PartyStatsTimeframeKey>("all-time");

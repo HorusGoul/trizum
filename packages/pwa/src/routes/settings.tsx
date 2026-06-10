@@ -47,8 +47,8 @@ function Settings() {
     { id: "es", name: t`Español` },
   ];
 
-  function onSaveSettings(values: SettingsFormValues) {
-    updateSettings({
+  async function onSaveSettings(values: SettingsFormValues) {
+    await updateSettings({
       username: values.username,
       phone: values.phone,
       avatarId: values.avatarId,
@@ -73,7 +73,7 @@ function Settings() {
       hue: partyList.hue ?? defaultThemeHue,
     },
     onSubmit: ({ value }) => {
-      onSaveSettings(value);
+      return onSaveSettings(value);
     },
   });
 

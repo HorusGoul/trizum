@@ -26,7 +26,9 @@ import type {
   TrizumFateEntity,
   TrizumFateTypename,
   UserEntity,
+  UpsertExpenseMutationInput,
   UpsertJoinedPartyMutationInput,
+  UpsertMediaFileMutationInput,
   UpsertParticipantMutationInput,
   UpsertPartyMemberMutationInput,
   UpsertPartyMutationInput,
@@ -87,8 +89,24 @@ export type TrizumFateMutationMap = {
     input: CreateMediaFileMutationInput;
     output: MediaFileEntity;
   };
+  "mediaFile.upsert": {
+    input: UpsertMediaFileMutationInput;
+    output: MediaFileEntity;
+  };
+  "mediaFile.delete": {
+    input: { id: string };
+    output: MediaFileEntity;
+  };
   "expense.create": {
     input: CreateExpenseMutationInput;
+    output: ExpenseEntity;
+  };
+  "expense.upsert": {
+    input: UpsertExpenseMutationInput;
+    output: ExpenseEntity;
+  };
+  "expense.delete": {
+    input: { id: string };
     output: ExpenseEntity;
   };
 };
@@ -290,7 +308,31 @@ export const trizumMutationDefinitions = [
     type: "MediaFile",
   },
   {
+    operation: "upsert",
+    proc: "mediaFile.upsert",
+    table: trizumJazzApp.mediaFiles,
+    type: "MediaFile",
+  },
+  {
+    operation: "delete",
+    proc: "mediaFile.delete",
+    table: trizumJazzApp.mediaFiles,
+    type: "MediaFile",
+  },
+  {
     proc: "expense.create",
+    table: trizumJazzApp.expenses,
+    type: "Expense",
+  },
+  {
+    operation: "upsert",
+    proc: "expense.upsert",
+    table: trizumJazzApp.expenses,
+    type: "Expense",
+  },
+  {
+    operation: "delete",
+    proc: "expense.delete",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },

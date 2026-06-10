@@ -33,7 +33,7 @@ import {
 describe("Jazz alpha schema", () => {
   test("compiles privacy-aware row policies into the Jazz wasm schema", () => {
     expect(trizumJazzWasmSchema.users?.policies?.select?.using).toStrictEqual({
-      column: "id",
+      column: "$createdBy",
       op: "Eq",
       type: "Cmp",
       value: {

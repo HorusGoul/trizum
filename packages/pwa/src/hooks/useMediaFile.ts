@@ -1,21 +1,24 @@
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
-import { decodeBlob, type MediaFile } from "#src/models/media.ts";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { fateMediaFileCache, useFateCache } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { decodeBlob } from "#src/models/media.ts";
 import { useEffect, useMemo } from "react";
 
 export function useMediaFile(mediaFileId: string) {
-  if (!isValidDocumentId(mediaFileId)) {
+  if (!mediaFileId) {
     throw new Error("Malformed MediaFile ID");
   }
 
-  const [mediaFile] = useSuspenseDocument<MediaFile>(mediaFileId, {
-    required: true,
-  });
+  const { client } = useTrizumData();
+  const mediaFile = useFateCache(fateMediaFileCache, client, mediaFileId);
+
+  if (!mediaFile) {
+    throw new Error("MediaFile not found");
+  }
 
   const url = useMemo(() => {
     const mimeType =
       typeof mediaFile.metadata.mimeType === "string" ? mediaFile.metadata.mimeType : undefined;
-    const blob = decodeBlob(mediaFile.encodedBlob.val, mimeType);
+    const blob = decodeBlob(mediaFile.encodedBlob, mimeType);
     return URL.createObjectURL(blob);
   }, [mediaFile.encodedBlob, mediaFile.metadata.mimeType]);
 

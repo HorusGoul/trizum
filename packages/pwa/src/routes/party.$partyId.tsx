@@ -35,7 +35,6 @@ import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { requestIdleCallback, cancelIdleCallback } from "#src/lib/requestIdleCallback.ts";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
-import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
@@ -45,14 +44,7 @@ export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
-    const { party } = await guardParticipatingInParty(partyId, context, location);
-
-    await loadVisiblePartyExpenseChunks(
-      context.repo,
-      party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
-    );
-
-    return;
+    await guardParticipatingInParty(partyId, context, location);
   },
   validateSearch: (search): PartyByIdSearchParams => {
     const tab = search.tab === "balances" ? "balances" : "expenses";
@@ -107,13 +99,13 @@ function PartyById() {
     }
 
     lastRecordedPartyIdRef.current = partyId;
-    setLastOpenedPartyId(partyId);
+    void setLastOpenedPartyId(partyId);
   }, [partyId, setLastOpenedPartyId]);
 
   async function onLeaveParty() {
     if (!partyId) return;
+    await removeParty(partyId);
     await navigate({ to: "/", replace: true });
-    removeParty(partyId);
     toast.success(t`You left the party!`);
   }
 
@@ -132,7 +124,7 @@ function PartyById() {
   const participantName = participant.name;
 
   function onTogglePersonalMode() {
-    setParticipantDetails(participant.id, {
+    void setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
     });
   }

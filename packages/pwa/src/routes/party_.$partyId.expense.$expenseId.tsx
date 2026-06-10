@@ -1,21 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import {
-  decodeExpenseId,
-  findExpenseById,
-  getExpenseTotalAmount,
-  getExpenseUnitShares,
-  type Expense,
-} from "#src/models/expense.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { getExpenseTotalAmount, getExpenseUnitShares, type Expense } from "#src/models/expense.js";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon } from "#src/ui/Icon.js";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
@@ -29,6 +20,8 @@ import { Fragment, Suspense } from "react";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+import { fateExpenseCache, useFateCache } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 
 interface ExpenseSearchParams {
   media?: number;
@@ -47,9 +40,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
-
-    const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await fateExpenseCache.readAsync(context.data.client, expenseId);
   },
 });
 
@@ -143,17 +134,9 @@ function ExpenseById() {
 function useExpense() {
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
-
-  if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
-
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
+  const { client } = useTrizumData();
   const { removeExpense } = useCurrentParty();
-
-  const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const expense = useFateCache(fateExpenseCache, client, expenseId);
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;
@@ -169,7 +152,7 @@ function useExpense() {
     onDeleteExpense,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
+    isLoading: false,
   };
 }
 
