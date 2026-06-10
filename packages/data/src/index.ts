@@ -20,9 +20,7 @@ export {
 } from "./repository.js";
 export {
   trizumJazzApp,
-  trizumJazzPermissions,
   trizumJazzSchema,
-  trizumJazzWasmSchema,
   type CreateExpenseInput,
   type CreateJoinedPartyInput,
   type CreateMediaFileInput,
@@ -38,6 +36,8 @@ export {
   type PartyRow,
   type UserRow,
 } from "./schema.js";
+export { permissions, trizumJazzPermissions } from "./permissions.js";
+export { trizumJazzWasmSchema } from "./wasmSchema.js";
 export {
   ExpenseListItemView,
   JoinedPartyView,

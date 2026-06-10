@@ -1,11 +1,4 @@
-import {
-  definePermissions,
-  schema,
-  type CompiledPermissions,
-  type InsertOf,
-  type RowOf,
-} from "jazz-tools";
-import type { WasmSchema } from "jazz-tools";
+import { schema, type InsertOf, type RowOf } from "jazz-tools";
 
 const s = schema;
 
@@ -93,6 +86,8 @@ export const trizumJazzSchema = s.defineSchema({
 });
 
 export const trizumJazzApp = s.defineApp(trizumJazzSchema);
+export const app = trizumJazzApp;
+export default trizumJazzApp;
 
 export type UserRow = RowOf<typeof trizumJazzApp.users>;
 export type PartyRow = RowOf<typeof trizumJazzApp.parties>;
@@ -109,85 +104,3 @@ export type CreateJoinedPartyInput = InsertOf<typeof trizumJazzApp.joinedParties
 export type CreateParticipantInput = InsertOf<typeof trizumJazzApp.participants>;
 export type CreateMediaFileInput = InsertOf<typeof trizumJazzApp.mediaFiles>;
 export type CreateExpenseInput = InsertOf<typeof trizumJazzApp.expenses>;
-
-export const trizumJazzPermissions = definePermissions(
-  trizumJazzApp,
-  ({ allowedTo, anyOf, policy, session }) => [
-    policy.users.allowRead.where({ $createdBy: session.userId }),
-    policy.users.allowInsert.where({ $createdBy: session.userId }),
-    policy.users.allowUpdate
-      .whereOld({ $createdBy: session.userId })
-      .whereNew({ $createdBy: session.userId }),
-    policy.users.allowDelete.where({ $createdBy: session.userId }),
-
-    policy.parties.allowRead.where((party) =>
-      anyOf([
-        { ownerUserId: session.userId },
-        policy.partyMembers.exists.where({
-          partyId: party.id,
-          userId: session.userId,
-        }),
-      ]),
-    ),
-    policy.parties.allowInsert.where({ ownerUserId: session.userId }),
-    policy.parties.allowUpdate
-      .whereOld({ ownerUserId: session.userId })
-      .whereNew({ ownerUserId: session.userId }),
-    policy.parties.allowDelete.where({ ownerUserId: session.userId }),
-
-    policy.partyMembers.allowRead.where(
-      anyOf([{ userId: session.userId }, allowedTo.update("partyId")]),
-    ),
-    policy.partyMembers.allowInsert.where(allowedTo.update("partyId")),
-    policy.partyMembers.allowUpdate
-      .whereOld(allowedTo.update("partyId"))
-      .whereNew(allowedTo.update("partyId")),
-    policy.partyMembers.allowDelete.where(allowedTo.update("partyId")),
-
-    policy.joinedParties.allowRead.where({ $createdBy: session.userId }),
-    policy.joinedParties.allowInsert.where({ $createdBy: session.userId }),
-    policy.joinedParties.allowUpdate
-      .whereOld({ $createdBy: session.userId })
-      .whereNew({ $createdBy: session.userId }),
-    policy.joinedParties.allowDelete.where({ $createdBy: session.userId }),
-
-    policy.participants.allowRead.where(allowedTo.read("partyId")),
-    policy.participants.allowInsert.where(allowedTo.update("partyId")),
-    policy.participants.allowUpdate
-      .whereOld(allowedTo.update("partyId"))
-      .whereNew(allowedTo.update("partyId")),
-    policy.participants.allowDelete.where(allowedTo.update("partyId")),
-
-    policy.mediaFiles.allowRead.where(
-      anyOf([{ ownerUserId: session.userId }, allowedTo.read("partyId")]),
-    ),
-    policy.mediaFiles.allowInsert.where({ ownerUserId: session.userId }),
-    policy.mediaFiles.allowUpdate
-      .whereOld({ ownerUserId: session.userId })
-      .whereNew({ ownerUserId: session.userId }),
-    policy.mediaFiles.allowDelete.where({ ownerUserId: session.userId }),
-
-    policy.expenses.allowRead.where(allowedTo.read("partyId")),
-    policy.expenses.allowInsert.where(allowedTo.update("partyId")),
-    policy.expenses.allowUpdate
-      .whereOld(allowedTo.update("partyId"))
-      .whereNew(allowedTo.update("partyId")),
-    policy.expenses.allowDelete.where(allowedTo.update("partyId")),
-  ],
-);
-
-export const trizumJazzWasmSchema = applyPermissionsToWasmSchema(
-  trizumJazzApp.wasmSchema,
-  trizumJazzPermissions,
-);
-
-function applyPermissionsToWasmSchema(
-  wasmSchema: WasmSchema,
-  permissions: CompiledPermissions,
-): WasmSchema {
-  for (const [tableName, tableSchema] of Object.entries(wasmSchema)) {
-    tableSchema.policies = permissions[tableName] as typeof tableSchema.policies;
-  }
-
-  return wasmSchema;
-}
