@@ -33,8 +33,18 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
+      - name: Deploy Jazz schema and permissions
+        run: vp run --filter @trizum/data jazz:deploy
+        env:
+          JAZZ_ADMIN_SECRET: ${{ secrets.JAZZ_ADMIN_SECRET }}
+          JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
       - name: Build PWA
         run: vp run --filter @trizum/pwa build
+        env:
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Deploy PWA preview to Cloudflare
         id: deploy

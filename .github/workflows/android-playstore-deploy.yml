@@ -22,6 +22,11 @@ on:
           - draft
           - completed
           - halted
+      deploy_jazz:
+        description: "Deploy Jazz schema and permissions before building"
+        required: false
+        default: true
+        type: boolean
   workflow_call:
     inputs:
       track:
@@ -32,6 +37,11 @@ on:
         description: "Release status"
         required: true
         type: string
+      deploy_jazz:
+        description: "Deploy Jazz schema and permissions before building"
+        required: false
+        default: true
+        type: boolean
 
 concurrency:
   group: android-playstore-deploy
@@ -77,11 +87,22 @@ jobs:
           cache-version: android-0
           working-directory: packages/mobile/android
 
+      - name: Deploy Jazz schema and permissions
+        if: inputs.deploy_jazz
+        timeout-minutes: 5
+        run: vp run --filter @trizum/data jazz:deploy
+        env:
+          JAZZ_ADMIN_SECRET: ${{ secrets.JAZZ_ADMIN_SECRET }}
+          JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
       - name: Build mobile web assets
         timeout-minutes: 5
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Download screenshots artifact
         timeout-minutes: 2

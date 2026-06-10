@@ -32,6 +32,14 @@ jobs:
         run: vp run ${{ matrix.script }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
+      - name: Validate Jazz schema
+        if: matrix.script == 'check'
+        run: |
+          vp run --filter @trizum/data jazz:validate
+          vp run --filter @trizum/data jazz:schema:hash
 
   e2e:
     name: E2E
@@ -51,6 +59,9 @@ jobs:
 
       - name: Run Playwright E2E
         run: vp run --filter @trizum/pwa test:e2e
+        env:
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Upload Playwright Report
         if: failure()

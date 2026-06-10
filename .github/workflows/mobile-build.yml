@@ -94,6 +94,8 @@ jobs:
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Decode Android keystore
         if: ${{ inputs.build_type == 'release' }}
@@ -175,6 +177,8 @@ jobs:
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Build iOS Debug
         if: ${{ inputs.build_type == 'debug' }}

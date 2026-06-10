@@ -81,3 +81,12 @@ the production `JAZZ_APP_ID` or `VITE_JAZZ_APP_ID`. For preview CI, run the same
 task against the preview Jazz app. If preview environments become truly
 per-branch, provision one Jazz app per preview branch and set that branch's app
 ID/admin secret in the deployment environment.
+
+GitHub Actions expects `JAZZ_APP_ID` and `JAZZ_ADMIN_SECRET` secrets. Production
+releases use a dedicated Jazz deploy job before starting either the PWA or mobile
+release flow. Other deploy workflows publish Jazz before building the client
+bundle they ship; manually dispatched store deploy workflows keep that behavior
+enabled by default. The workflows pass `JAZZ_APP_ID` to Jazz deploy commands and
+expose the same value as `VITE_JAZZ_APP_ID` only for client builds. The sync
+server URL is public and is set to `https://v2.sync.jazz.tools/` in the
+workflows.

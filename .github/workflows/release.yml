@@ -49,8 +49,42 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
 
+  deploy-jazz-production:
+    name: Deploy Jazz Production
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'release' &&
+      !github.event.release.prerelease &&
+      (
+        startsWith(github.event.release.tag_name, '@trizum/pwa@') ||
+        startsWith(github.event.release.tag_name, '@trizum/mobile@')
+      )
+    permissions:
+      contents: read
+    concurrency:
+      group: jazz-production
+      cancel-in-progress: false
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Deploy Jazz schema and permissions
+        run: vp run --filter @trizum/data jazz:deploy
+        env:
+          JAZZ_ADMIN_SECRET: ${{ secrets.JAZZ_ADMIN_SECRET }}
+          JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
   deploy-pwa-production:
     name: Deploy PWA Production
+    needs: [deploy-jazz-production]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/pwa@') && !github.event.release.prerelease
     permissions:
@@ -77,6 +111,8 @@ jobs:
         run: vp run --filter @trizum/pwa build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Deploy PWA to Cloudflare
         id: deploy
@@ -94,6 +130,7 @@ jobs:
 
   build-mobile-android-release-apk:
     name: Build Mobile Android Release APK
+    needs: [deploy-jazz-production]
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
     permissions:
       contents: read
@@ -106,6 +143,7 @@ jobs:
 
   deploy-mobile-android-production:
     name: Deploy Mobile Android Production
+    needs: [deploy-jazz-production]
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
     permissions:
       contents: read
@@ -113,10 +151,12 @@ jobs:
     with:
       track: production
       release_status: completed
+      deploy_jazz: false
     secrets: inherit
 
   deploy-mobile-ios-production:
     name: Deploy Mobile iOS Production
+    needs: [deploy-jazz-production]
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
     permissions:
       contents: read
@@ -124,6 +164,7 @@ jobs:
     with:
       submit_for_review: true
       automatic_release: true
+      deploy_jazz: false
     secrets: inherit
 
   attach-mobile-android-release-assets:
