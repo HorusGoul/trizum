@@ -10,6 +10,14 @@
 #     https://docs.fastlane.tools/plugins/available-plugins
 #
 
+require "fastlane_core/build_watcher"
+require "spaceship/connect_api"
+
+IOS_APP_IDENTIFIER = "app.trizum.capacitor"
+IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
+IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
+IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
+
 default_platform(:ios)
 
 platform :ios do
@@ -113,7 +121,7 @@ platform :ios do
     export_options = {}
     if ENV["PROVISIONING_PROFILE_NAME"]
       export_options[:provisioningProfiles] = {
-        "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"]
+        IOS_APP_IDENTIFIER => ENV["PROVISIONING_PROFILE_NAME"]
       }
     end
 
@@ -154,7 +162,7 @@ platform :ios do
     export_options = {}
     if ENV["PROVISIONING_PROFILE_NAME"]
       export_options[:provisioningProfiles] = {
-        "app.trizum.capacitor" => ENV["PROVISIONING_PROFILE_NAME"]
+        IOS_APP_IDENTIFIER => ENV["PROVISIONING_PROFILE_NAME"]
       }
     end
 
@@ -196,8 +204,10 @@ platform :ios do
     )
     build_release(build_number: build_number)
     upload_to_testflight(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_waiting_for_build_processing: false,
+      wait_processing_interval: 30,
+      wait_processing_timeout_duration: IOS_BUILD_PROCESSING_TIMEOUT_SECONDS,
       uses_non_exempt_encryption: false
     )
   end
@@ -206,10 +216,13 @@ platform :ios do
   lane :deploy_appstore do |options|
     build_release(build_number: options[:build_number])
     upload_to_app_store(
+      app_identifier: IOS_APP_IDENTIFIER,
       submit_for_review: false,
       automatic_release: false,
       skip_screenshots: true,
-      skip_metadata: true
+      skip_metadata: true,
+      screenshot_processing_timeout: IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS,
+      version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT
     )
   end
 
@@ -221,7 +234,7 @@ platform :ios do
   lane :download_metadata do
     load_api_key
     deliver(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_binary_upload: true,
       skip_screenshots: false,
       force: true,
@@ -233,12 +246,13 @@ platform :ios do
   lane :upload_metadata do
     load_api_key
     deliver(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_binary_upload: true,
       skip_screenshots: true,
       force: true,
       run_precheck_before_submit: true,
-      precheck_include_in_app_purchases: false
+      precheck_include_in_app_purchases: false,
+      version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT
     )
   end
 
@@ -246,12 +260,13 @@ platform :ios do
   lane :upload_screenshots do
     load_api_key
     deliver(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_binary_upload: true,
       skip_metadata: true,
       skip_screenshots: false,
       force: true,
-      overwrite_screenshots: true
+      overwrite_screenshots: true,
+      screenshot_processing_timeout: IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS
     )
   end
 
@@ -262,27 +277,30 @@ platform :ios do
   desc "Full App Store deployment with metadata"
   desc "Options: build_number, skip_screenshots (default: true), submit_for_review (default: false), automatic_release (default: false)"
   lane :deploy_appstore_full do |options|
+    submit_for_review = options[:submit_for_review] || false
+    automatic_release = options[:automatic_release] || false
+
     build_release(build_number: options[:build_number])
 
     deliver(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_screenshots: options[:skip_screenshots].nil? ? true : options[:skip_screenshots],
       skip_metadata: false,
       force: true,
-      submit_for_review: options[:submit_for_review] || false,
-      automatic_release: options[:automatic_release] || false,
+      submit_for_review: false,
+      automatic_release: false,
       phased_release: true,
-      run_precheck_before_submit: true,
+      run_precheck_before_submit: !submit_for_review,
       precheck_include_in_app_purchases: false,
       overwrite_screenshots: true,
-      submission_information: {
-        add_id_info_uses_idfa: false,
-        export_compliance_uses_encryption: false,
-        export_compliance_is_exempt: true,
-        content_rights_contains_third_party_content: false,
-        content_rights_has_rights: true
-      }
+      screenshot_processing_timeout: IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS,
+      version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT,
+      submission_information: app_store_submission_information
     )
+
+    if submit_for_review
+      submit_processed_build_for_review(automatic_release: automatic_release)
+    end
   end
 
   desc "Deploy to TestFlight with metadata update"
@@ -291,17 +309,20 @@ platform :ios do
 
     # Upload to TestFlight
     upload_to_testflight(
-      skip_waiting_for_build_processing: options[:wait_for_processing] ? false : true
+      skip_waiting_for_build_processing: options[:wait_for_processing] ? false : true,
+      wait_processing_interval: 30,
+      wait_processing_timeout_duration: IOS_BUILD_PROCESSING_TIMEOUT_SECONDS
     )
 
     # Also update App Store metadata (won't affect TestFlight)
     deliver(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_binary_upload: true,
       skip_screenshots: true,
       skip_metadata: false,
       force: true,
-      run_precheck_before_submit: false
+      run_precheck_before_submit: false,
+      version_check_wait_retry_limit: IOS_VERSION_CHECK_WAIT_RETRY_LIMIT
     )
   end
 
@@ -309,22 +330,32 @@ platform :ios do
   desc "Use this after uploading a build to submit it for review"
   lane :submit_review do |options|
     load_api_key
+    build_number = options[:build_number]
+    app_version = options[:app_version]
+
+    if build_number.nil? || build_number == "latest"
+      build = wait_for_app_store_build_processing(
+        app_version: app_version,
+        build_number: build_number
+      )
+      build_number = build.version
+      app_version = build.app_version
+    end
+
     deliver(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       skip_binary_upload: true,
       skip_screenshots: true,
       skip_metadata: true,
+      force: true,
+      build_number: build_number,
+      app_version: app_version,
       submit_for_review: true,
       automatic_release: options[:automatic_release] || false,
       phased_release: true,
       run_precheck_before_submit: true,
-      submission_information: {
-        add_id_info_uses_idfa: false,
-        export_compliance_uses_encryption: false,
-        export_compliance_is_exempt: true,
-        content_rights_contains_third_party_content: false,
-        content_rights_has_rights: true
-      }
+      precheck_include_in_app_purchases: false,
+      submission_information: app_store_submission_information
     )
   end
 
@@ -361,6 +392,62 @@ platform :ios do
     UI.success("Current version: #{version} (#{build})")
   end
 
+  private_lane :submit_processed_build_for_review do |options|
+    options ||= {}
+
+    build = wait_for_app_store_build_processing(
+      timeout: options[:build_processing_timeout]
+    )
+
+    deliver(
+      app_identifier: IOS_APP_IDENTIFIER,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      skip_metadata: true,
+      force: true,
+      build_number: build.version,
+      app_version: build.app_version,
+      submit_for_review: true,
+      automatic_release: options[:automatic_release] || false,
+      phased_release: true,
+      run_precheck_before_submit: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: app_store_submission_information
+    )
+  end
+
+  private_lane :wait_for_app_store_build_processing do |options|
+    options ||= {}
+    load_api_key
+
+    app = Spaceship::ConnectAPI::App.find(IOS_APP_IDENTIFIER)
+    unless app
+      UI.user_error!("Unable to find App Store Connect app #{IOS_APP_IDENTIFIER}")
+    end
+
+    app_version = options[:app_version] || get_version_number(xcodeproj: "App.xcodeproj")
+    build_number = options[:build_number]
+    build_number = get_build_number(xcodeproj: "App.xcodeproj") if build_number.nil? || build_number == "latest"
+    timeout = options[:timeout] || IOS_BUILD_PROCESSING_TIMEOUT_SECONDS
+
+    UI.message(
+      "Waiting up to #{timeout / 60} minutes for App Store Connect " \
+      "to process build #{app_version} (#{build_number})"
+    )
+
+    FastlaneCore::BuildWatcher.wait_for_build_processing_to_be_complete(
+      app_id: app.id,
+      platform: "ios",
+      app_version: app_version,
+      build_version: build_number.to_s,
+      poll_interval: 30,
+      timeout_duration: timeout,
+      return_when_build_appears: false,
+      return_spaceship_testflight_build: false,
+      select_latest: false
+    )
+  end
+
   private_lane :next_pr_testflight_version do
     release_version = get_version_number(xcodeproj: "App.xcodeproj")
     major, minor, patch = version_segments(release_version)
@@ -374,7 +461,7 @@ platform :ios do
     base_build_number = build_number_base_for_version(version: version)
     next_release_build_number = base_build_number + 100
     latest_testflight_build = latest_testflight_build_number(
-      app_identifier: "app.trizum.capacitor",
+      app_identifier: IOS_APP_IDENTIFIER,
       version: version,
       initial_build_number: base_build_number
     ).to_i
@@ -408,5 +495,15 @@ platform :ios do
     end
 
     segments.map(&:to_i)
+  end
+
+  def app_store_submission_information
+    {
+      add_id_info_uses_idfa: false,
+      export_compliance_uses_encryption: false,
+      export_compliance_is_exempt: true,
+      content_rights_contains_third_party_content: false,
+      content_rights_has_rights: true
+    }
   end
 end
