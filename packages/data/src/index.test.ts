@@ -1,50 +1,22 @@
-import { describe, expect, test, vi } from "vite-plus/test";
-import type { AuthSecretStore } from "jazz-tools";
+import { describe, expect, test } from "vite-plus/test";
 import {
   createTrizumFateClient,
   ExpenseListItemView,
   PartySummaryView,
-  projectEntity,
-  resolveJazzFateAuthConfig,
+  projectTrizumEntity,
   trizumJazzWasmSchema,
+  type CreateExpenseMutationInput,
+  type CreateParticipantMutationInput,
+  type CreatePartyMutationInput,
   type ExpenseEntity,
-  type JazzFateRepository,
-  type JazzFateRepositoryListResult,
   type ParticipantEntity,
   type PartyEntity,
+  type TrizumDataRepository,
+  type TrizumDataRepositoryListResult,
   type TrizumFateEntity,
   type TrizumFateListRoot,
   type TrizumFateTypename,
-} from "./index";
-
-describe("Jazz Fate auth", () => {
-  test("defaults product-local users to Jazz local-first auth", async () => {
-    const secretStore = {
-      clearSecret: vi.fn<() => Promise<void>>(async () => {}),
-      getOrCreateSecret: vi.fn<() => Promise<string>>(async () => "local-first-secret"),
-      loadSecret: vi.fn<() => Promise<string | null>>(async () => null),
-      saveSecret: vi.fn<(secret: string) => Promise<void>>(async (_secret) => {}),
-    } satisfies AuthSecretStore;
-
-    await expect(
-      resolveJazzFateAuthConfig("trizum-test", {
-        secretStore,
-      }),
-    ).resolves.toStrictEqual({
-      secret: "local-first-secret",
-    });
-
-    expect(secretStore.getOrCreateSecret).toHaveBeenCalledTimes(1);
-  });
-
-  test("keeps Jazz anonymous mode explicit for guest/read-limited sessions", async () => {
-    await expect(
-      resolveJazzFateAuthConfig("trizum-test", {
-        mode: "anonymousGuest",
-      }),
-    ).resolves.toStrictEqual({});
-  });
-});
+} from "./index.js";
 
 describe("Jazz alpha schema", () => {
   test("compiles privacy-aware row policies into the Jazz wasm schema", () => {
@@ -64,7 +36,7 @@ describe("Jazz alpha schema", () => {
   });
 });
 
-describe("Fate masking over Jazz entities", () => {
+describe("Fate masking over Trizum Jazz entities", () => {
   test("uses the exact Fate request and view API to mask sensitive fields", async () => {
     const repository = createMemoryRepository();
     const client = createTrizumFateClient({ repository });
@@ -198,7 +170,7 @@ function createMemoryRepository() {
     },
   ];
 
-  const repository: JazzFateRepository & {
+  const repository: TrizumDataRepository & {
     expenses: ExpenseEntity[];
     fetches: Array<{
       args?: Record<string, unknown>;
@@ -212,22 +184,25 @@ function createMemoryRepository() {
       select: string[];
     }>;
   } = {
+    entityTypes: new Set(["Party", "Participant", "Expense"]),
     expenses,
     fetches: [],
+    listRoots: new Set(["parties", "participants", "expenses"]),
     lists: [],
 
     async fetchEntities(type, ids, select, args) {
       repository.fetches.push({ args, ids, select: [...select], type });
       return ids.map((id) => {
         const entity = tableFor(type).find((candidate) => candidate.id === String(id));
-        return entity ? projectEntity(entity, select) : null;
+        return entity ? projectTrizumEntity(entity, select) : null;
       });
     },
 
     async fetchList(root, select, args) {
-      repository.lists.push({ args, root, select: [...select] });
+      const trizumRoot = root as TrizumFateListRoot;
+      repository.lists.push({ args, root: trizumRoot, select: [...select] });
 
-      const type = typeForRoot(root);
+      const type = typeForRoot(trizumRoot);
       const rows = tableFor(type).filter(
         (entity) =>
           typeof args?.partyId !== "string" ||
@@ -237,10 +212,10 @@ function createMemoryRepository() {
 
       return {
         items: rows.map((entity) => {
-          const node = projectEntity(entity, select);
+          const node = projectTrizumEntity(entity, select);
 
           return {
-            cursor: node.id,
+            cursor: String(node.id),
             node,
           };
         }),
@@ -248,50 +223,55 @@ function createMemoryRepository() {
           hasNext: false,
           hasPrevious: false,
         },
-      } satisfies JazzFateRepositoryListResult;
+      } satisfies TrizumDataRepositoryListResult;
     },
 
-    async createParty(input, select) {
-      const party: PartyEntity = {
-        __typename: "Party",
-        ...input,
-        currency: input.currency ?? "EUR",
-        description: input.description ?? "",
-        id: nextId("party", parties.length),
-        localOnlyInviteSecret: input.localOnlyInviteSecret ?? null,
-        symbol: input.symbol ?? null,
-      };
-      parties.push(party);
-      return projectEntity(party, select);
-    },
-
-    async createParticipant(input, select) {
-      const participant: ParticipantEntity = {
-        __typename: "Participant",
-        ...input,
-        avatarId: input.avatarId ?? null,
-        id: nextId("participant", participants.length),
-        isArchived: input.isArchived ?? false,
-        personalMode: input.personalMode ?? false,
-        phone: input.phone ?? null,
-      };
-      participants.push(participant);
-      return projectEntity(participant, select);
-    },
-
-    async createExpense(input, select) {
-      const expense: ExpenseEntity = {
-        __typename: "Expense",
-        ...input,
-        id: nextId("expense", expenses.length),
-        internalMemo: input.internalMemo ?? null,
-        isTransfer: input.isTransfer ?? false,
-        paidBy: input.paidBy ?? {},
-        photos: input.photos ?? [],
-        shares: input.shares ?? {},
-      };
-      expenses.push(expense);
-      return projectEntity(expense, select);
+    async mutate(proc, input, select) {
+      switch (proc) {
+        case "party.create": {
+          const partyInput = input as CreatePartyMutationInput;
+          const party: PartyEntity = {
+            __typename: "Party",
+            ...partyInput,
+            currency: partyInput.currency ?? "EUR",
+            description: partyInput.description ?? "",
+            id: nextId("party", parties.length),
+            localOnlyInviteSecret: partyInput.localOnlyInviteSecret ?? null,
+            symbol: partyInput.symbol ?? null,
+          };
+          parties.push(party);
+          return projectTrizumEntity(party, select);
+        }
+        case "participant.create": {
+          const participantInput = input as CreateParticipantMutationInput;
+          const participant: ParticipantEntity = {
+            __typename: "Participant",
+            ...participantInput,
+            avatarId: participantInput.avatarId ?? null,
+            id: nextId("participant", participants.length),
+            isArchived: participantInput.isArchived ?? false,
+            personalMode: participantInput.personalMode ?? false,
+            phone: participantInput.phone ?? null,
+          };
+          participants.push(participant);
+          return projectTrizumEntity(participant, select);
+        }
+        case "expense.create": {
+          const expenseInput = input as CreateExpenseMutationInput;
+          const expense: ExpenseEntity = {
+            __typename: "Expense",
+            ...expenseInput,
+            id: nextId("expense", expenses.length),
+            internalMemo: expenseInput.internalMemo ?? null,
+            isTransfer: expenseInput.isTransfer ?? false,
+            paidBy: expenseInput.paidBy ?? {},
+            photos: expenseInput.photos ?? [],
+            shares: expenseInput.shares ?? {},
+          };
+          expenses.push(expense);
+          return projectTrizumEntity(expense, select);
+        }
+      }
     },
   };
 

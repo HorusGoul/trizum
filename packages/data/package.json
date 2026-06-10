@@ -1,0 +1,41 @@
+{
+  "name": "@trizum/data",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Trizum local-first Jazz data model and Fate client bindings.",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@nkzw/fate": "1.2.0",
+    "fate-jazz": "workspace:*",
+    "jazz-tools": "2.0.0-alpha.50"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "typescript": "5.9.2",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

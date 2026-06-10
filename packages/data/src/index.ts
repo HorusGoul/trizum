@@ -1,20 +1,23 @@
 export {
-  createLocalFirstJazzFateClient,
+  createLocalFirstTrizumDataClient,
   createTrizumFateClient,
-  resolveJazzFateAuthConfig,
   trizumFateRoots,
-  type CreateLocalFirstJazzFateClientOptions,
+  type CreateLocalFirstTrizumDataClientOptions,
   type CreateTrizumFateClientOptions,
   type JazzFateAuth,
   type TrizumFateClient,
-} from "./client";
+} from "./client.js";
 export {
-  createJazzDbRepository,
-  projectEntity,
-  type JazzFateRepository,
-  type JazzFateRepositoryListResult,
+  createTrizumJazzRepository,
+  projectTrizumEntity,
+  trizumEntityDefinitions,
+  trizumListDefinitions,
+  trizumMutationDefinitions,
+  type TrizumDataRepository,
+  type TrizumDataRepositoryListResult,
   type TrizumFateListRoot,
-} from "./repository";
+  type TrizumFateMutationMap,
+} from "./repository.js";
 export {
   trizumJazzApp,
   trizumJazzPermissions,
@@ -28,8 +31,7 @@ export {
   type ParticipantRow,
   type PartyMemberRow,
   type PartyRow,
-} from "./schema";
-export { createJazzFateTransport, type TrizumFateMutationMap } from "./transport";
+} from "./schema.js";
 export {
   ExpenseListItemView,
   ParticipantView,
@@ -44,4 +46,18 @@ export {
   type PartyEntity,
   type TrizumFateEntity,
   type TrizumFateTypename,
-} from "./views";
+} from "./views.js";
+export {
+  createJazzFateDb,
+  createJazzFateTransport,
+  projectEntity,
+  resolveJazzFateAuthConfig,
+  type AnonymousGuestAuth,
+  type CookieAccountAuth,
+  type CreateJazzFateDbOptions,
+  type ExternalAccountAuth,
+  type JazzFateEntity,
+  type JazzFateListResult,
+  type JazzFateRepository,
+  type LocalFirstUserAuth,
+} from "fate-jazz";

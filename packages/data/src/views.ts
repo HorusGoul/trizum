@@ -6,7 +6,7 @@ import type {
   ExpenseRow,
   ParticipantRow,
   PartyRow,
-} from "./schema";
+} from "./schema.js";
 
 export type PartyEntity = WithTypename<
   "Party",

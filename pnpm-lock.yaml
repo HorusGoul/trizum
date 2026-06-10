@@ -64,6 +64,53 @@ importers:
         specifier: 'catalog:'
         version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))(yaml@2.4.5)
 
+  packages/data:
+    dependencies:
+      '@nkzw/fate':
+        specifier: 1.2.0
+        version: 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
+      fate-jazz:
+        specifier: workspace:*
+        version: link:../fate-jazz
+      jazz-tools:
+        specifier: 2.0.0-alpha.50
+        version: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
+    devDependencies:
+      '@trizum/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))(yaml@2.4.5)
+      vitest:
+        specifier: npm:@voidzero-dev/vite-plus-test@latest
+        version: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))(yaml@2.4.5)'
+
+  packages/fate-jazz:
+    dependencies:
+      '@nkzw/fate':
+        specifier: 1.2.0
+        version: 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
+      jazz-tools:
+        specifier: 2.0.0-alpha.50
+        version: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
+    devDependencies:
+      '@trizum/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))(yaml@2.4.5)
+      vitest:
+        specifier: npm:@voidzero-dev/vite-plus-test@latest
+        version: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))(yaml@2.4.5)'
+
   packages/icon-sprite:
     dependencies:
       svgo:
@@ -136,7 +183,7 @@ importers:
         version: link:../logging
       '@trizum/pwa':
         specifier: workspace:*
-        version: file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(@logtape/logtape@1.2.2)(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(babel-plugin-macros@3.1.0)(vite@8.0.0(@types/node@24.10.1)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
+        version: file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(@logtape/logtape@1.2.2)(babel-plugin-macros@3.1.0)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
       capacitor-plugin-safe-area:
         specifier: 5.0.0
         version: 5.0.0(@capacitor/core@8.0.1)
@@ -219,9 +266,6 @@ importers:
       '@logtape/sentry':
         specifier: 1.2.2
         version: 1.2.2(@logtape/logtape@1.2.2)
-      '@nkzw/fate':
-        specifier: 1.2.0
-        version: 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))
       '@opentf/obj-diff':
         specifier: jsr:0.11.0
         version: '@jsr/opentf__obj-diff@0.11.0'
@@ -243,6 +287,9 @@ importers:
       '@tanstack/react-router':
         specifier: 1.167.3
         version: 1.167.3(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      '@trizum/data':
+        specifier: workspace:*
+        version: file:packages/data(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))(react@0.0.0-experimental-d025ddd3-20240722)
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -282,9 +329,6 @@ importers:
       hono:
         specifier: 4.10.6
         version: 4.10.6
-      jazz-tools:
-        specifier: 2.0.0-alpha.50
-        version: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
       mathjs:
         specifier: 15.1.0
         version: 15.1.0
@@ -4409,6 +4453,9 @@ packages:
   '@trapezedev/project@7.1.3':
     resolution: {integrity: sha512-GANh8Ey73MechZrryfJoILY9hBnWqzS6AdB53zuWBCBbaiImyblXT41fWdN6pB2f5+cNI2FAUxGfVhl+LeEVbQ==}
 
+  '@trizum/data@file:packages/data':
+    resolution: {directory: packages/data, type: directory}
+
   '@trizum/logging@file:packages/logging':
     resolution: {directory: packages/logging, type: directory}
 
@@ -6182,6 +6229,9 @@ packages:
 
   fastq@1.17.1:
     resolution: {integrity: sha512-sRVD3lWVIXWg6By68ZN7vho9a1pQcN/WBFaAAsDDFzlJjvoGx0P8z7V1t72grFJfJhu3YPZBuu25f7Kaw2jN1w==}
+
+  fate-jazz@file:packages/fate-jazz:
+    resolution: {directory: packages/fate-jazz, type: directory}
 
   fd-slicer@1.1.0:
     resolution: {integrity: sha512-cE1qsB/VwyQozZ+q1dGxR8LBYNZeofhEdUNGSMbQD3Gw2lAzX9Zb3uIU6Ebc/Fmyjo9AWWfnn0AUCHqtevs/8g==}
@@ -11832,13 +11882,13 @@ snapshots:
     optionalDependencies:
       vite: '@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5)'
 
-  '@nkzw/fate@1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.1)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))':
+  '@nkzw/fate@1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))':
     dependencies:
       '@trpc/client': 11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2)
       superjson: 2.2.6
       zod: 4.4.3
     optionalDependencies:
-      vite: 8.0.0(@types/node@24.10.1)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5)
+      vite: 8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5)
 
   '@noble/hashes@1.8.0': {}
 
@@ -11858,7 +11908,7 @@ snapshots:
 
   '@opentelemetry/api-logs@0.208.0':
     dependencies:
-      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/api': 1.9.1
 
   '@opentelemetry/api-logs@0.216.0':
     dependencies:
@@ -11873,6 +11923,11 @@ snapshots:
       '@opentelemetry/api': 1.9.0
 
   '@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0)':
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/semantic-conventions': 1.38.0
+
+  '@opentelemetry/core@2.7.1(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.38.0
@@ -12158,7 +12213,7 @@ snapshots:
   '@opentelemetry/sql-common@0.41.2(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/core': 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 2.7.1(@opentelemetry/api@1.9.0)
 
   '@oxc-project/runtime@0.115.0': {}
 
@@ -13741,7 +13796,7 @@ snapshots:
 
   '@sentry/core@9.47.1': {}
 
-  '@sentry/node-core@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.38.0)':
+  '@sentry/node-core@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.1))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.38.0)':
     dependencies:
       '@apm-js-collab/tracing-hooks': 0.3.1
       '@opentelemetry/api': 1.9.0
@@ -13752,7 +13807,7 @@ snapshots:
       '@opentelemetry/sdk-trace-base': 2.2.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.38.0
       '@sentry/core': 10.29.0
-      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.38.0)
+      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.38.0)
       import-in-the-middle: 2.0.0
     transitivePeerDependencies:
       - supports-color
@@ -13790,14 +13845,14 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.38.0
       '@prisma/instrumentation': 6.19.0(@opentelemetry/api@1.9.0)
       '@sentry/core': 10.29.0
-      '@sentry/node-core': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.0))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.38.0)
-      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.38.0)
+      '@sentry/node-core': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.208.0(@opentelemetry/api@1.9.1))(@opentelemetry/resources@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.38.0)
+      '@sentry/opentelemetry': 10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.38.0)
       import-in-the-middle: 2.0.0
       minimatch: 9.0.5
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/opentelemetry@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.38.0)':
+  '@sentry/opentelemetry@10.29.0(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.1))(@opentelemetry/semantic-conventions@1.38.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 2.2.0(@opentelemetry/api@1.9.0)
@@ -14101,11 +14156,53 @@ snapshots:
       - supports-color
       - typescript
 
+  '@trizum/data@file:packages/data(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))(react@0.0.0-experimental-d025ddd3-20240722)':
+    dependencies:
+      '@nkzw/fate': 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))
+      fate-jazz: file:packages/fate-jazz(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))(react@0.0.0-experimental-d025ddd3-20240722)
+      jazz-tools: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
+    transitivePeerDependencies:
+      - '@trpc/client'
+      - better-auth
+      - drizzle-orm
+      - expo
+      - expo-crypto
+      - expo-secure-store
+      - graphql
+      - graphql-sse
+      - jazz-rn
+      - react
+      - react-native
+      - svelte
+      - vite
+      - vue
+
+  '@trizum/data@file:packages/data(react@0.0.0-experimental-d025ddd3-20240722)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))':
+    dependencies:
+      '@nkzw/fate': 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
+      fate-jazz: file:packages/fate-jazz(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(react@0.0.0-experimental-d025ddd3-20240722)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
+      jazz-tools: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
+    transitivePeerDependencies:
+      - '@trpc/client'
+      - better-auth
+      - drizzle-orm
+      - expo
+      - expo-crypto
+      - expo-secure-store
+      - graphql
+      - graphql-sse
+      - jazz-rn
+      - react
+      - react-native
+      - svelte
+      - vite
+      - vue
+
   '@trizum/logging@file:packages/logging':
     dependencies:
       '@logtape/logtape': 1.2.2
 
-  '@trizum/pwa@file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(@logtape/logtape@1.2.2)(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(babel-plugin-macros@3.1.0)(vite@8.0.0(@types/node@24.10.1)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))':
+  '@trizum/pwa@file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(@logtape/logtape@1.2.2)(babel-plugin-macros@3.1.0)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))':
     dependencies:
       '@automerge/automerge': 3.2.4
       '@automerge/automerge-repo': 2.5.3
@@ -14124,7 +14221,6 @@ snapshots:
       '@lingui/core': 5.9.3(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)
       '@lingui/react': 5.9.3(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(babel-plugin-macros@3.1.0)(react@0.0.0-experimental-d025ddd3-20240722)
       '@logtape/sentry': 1.2.2(@logtape/logtape@1.2.2)
-      '@nkzw/fate': 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.1)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
       '@sentry/react': 10.29.0(react@0.0.0-experimental-d025ddd3-20240722)
@@ -14132,6 +14228,7 @@ snapshots:
       '@takker/md5': '@jsr/takker__md5@0.1.0'
       '@tanstack/react-form': 1.27.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       '@tanstack/react-router': 1.167.3(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
+      '@trizum/data': file:packages/data(react@0.0.0-experimental-d025ddd3-20240722)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
       '@trizum/logging': file:packages/logging
       '@use-gesture/react': 10.3.1(react@0.0.0-experimental-d025ddd3-20240722)
       barcode-detector: 3.0.8(@types/emscripten@1.41.5)
@@ -14145,7 +14242,6 @@ snapshots:
       exifr: 7.1.3
       heic-to: 1.4.2
       hono: 4.10.6
-      jazz-tools: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
       mathjs: 15.1.0
       motion: 12.38.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       qr-code-styling: 1.9.2
@@ -16224,6 +16320,46 @@ snapshots:
   fastq@1.17.1:
     dependencies:
       reusify: 1.0.4
+
+  fate-jazz@file:packages/fate-jazz(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))(react@0.0.0-experimental-d025ddd3-20240722):
+    dependencies:
+      '@nkzw/fate': 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.4.5))
+      jazz-tools: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
+    transitivePeerDependencies:
+      - '@trpc/client'
+      - better-auth
+      - drizzle-orm
+      - expo
+      - expo-crypto
+      - expo-secure-store
+      - graphql
+      - graphql-sse
+      - jazz-rn
+      - react
+      - react-native
+      - svelte
+      - vite
+      - vue
+
+  fate-jazz@file:packages/fate-jazz(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(react@0.0.0-experimental-d025ddd3-20240722)(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5)):
+    dependencies:
+      '@nkzw/fate': 1.2.0(@trpc/client@11.17.0(@trpc/server@11.17.0(typescript@5.9.2))(typescript@5.9.2))(vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5))
+      jazz-tools: 2.0.0-alpha.50(react@0.0.0-experimental-d025ddd3-20240722)
+    transitivePeerDependencies:
+      - '@trpc/client'
+      - better-auth
+      - drizzle-orm
+      - expo
+      - expo-crypto
+      - expo-secure-store
+      - graphql
+      - graphql-sse
+      - jazz-rn
+      - react
+      - react-native
+      - svelte
+      - vite
+      - vue
 
   fd-slicer@1.1.0:
     dependencies:
@@ -20057,24 +20193,6 @@ snapshots:
       - utf-8-validate
       - vite
       - yaml
-
-  vite@8.0.0(@types/node@24.10.1)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5):
-    dependencies:
-      '@oxc-project/runtime': 0.115.0
-      lightningcss: 1.32.0
-      picomatch: 4.0.3
-      postcss: 8.5.8
-      rolldown: 1.0.0-rc.9
-      tinyglobby: 0.2.15
-    optionalDependencies:
-      '@types/node': 24.10.1
-      esbuild: 0.27.3
-      fsevents: 2.3.3
-      jiti: 2.6.0
-      terser: 5.44.1
-      tsx: 4.20.4
-      yaml: 2.4.5
-    optional: true
 
   vite@8.0.0(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.6.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.4.5):
     dependencies:
