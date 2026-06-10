@@ -7,12 +7,40 @@ import {
 } from "fate-jazz";
 import { createTrizumJazzRepository, type TrizumDataRepository } from "./repository.js";
 import { trizumFateMutations } from "./views.js";
-import type { ExpenseEntity, ParticipantEntity, PartyEntity } from "./views.js";
+import type {
+  ExpenseChunkBalancesEntity,
+  ExpenseChunkEntity,
+  ExpenseEntity,
+  MediaFileEntity,
+  ParticipantEntity,
+  PartyEntity,
+  PartyMemberEntity,
+  UserEntity,
+  UserPartyStateEntity,
+} from "./views.js";
 
 export const trizumFateRoots = {
+  user: clientRoot<UserEntity, "User">("User"),
+  users: clientRoot<UserEntity, "User">("User"),
   party: clientRoot<PartyEntity, "Party">("Party"),
   parties: clientRoot<PartyEntity, "Party">("Party"),
+  partyMember: clientRoot<PartyMemberEntity, "PartyMember">("PartyMember"),
+  partyMembers: clientRoot<PartyMemberEntity, "PartyMember">("PartyMember"),
+  userPartyState: clientRoot<UserPartyStateEntity, "UserPartyState">("UserPartyState"),
+  userPartyStates: clientRoot<UserPartyStateEntity, "UserPartyState">("UserPartyState"),
+  participant: clientRoot<ParticipantEntity, "Participant">("Participant"),
   participants: clientRoot<ParticipantEntity, "Participant">("Participant"),
+  mediaFile: clientRoot<MediaFileEntity, "MediaFile">("MediaFile"),
+  mediaFiles: clientRoot<MediaFileEntity, "MediaFile">("MediaFile"),
+  expenseChunk: clientRoot<ExpenseChunkEntity, "ExpenseChunk">("ExpenseChunk"),
+  expenseChunks: clientRoot<ExpenseChunkEntity, "ExpenseChunk">("ExpenseChunk"),
+  expenseChunkBalance: clientRoot<ExpenseChunkBalancesEntity, "ExpenseChunkBalances">(
+    "ExpenseChunkBalances",
+  ),
+  expenseChunkBalances: clientRoot<ExpenseChunkBalancesEntity, "ExpenseChunkBalances">(
+    "ExpenseChunkBalances",
+  ),
+  expense: clientRoot<ExpenseEntity, "Expense">("Expense"),
   expenses: clientRoot<ExpenseEntity, "Expense">("Expense"),
 };
 
@@ -27,7 +55,17 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
     mutations: trizumFateMutations,
     roots: trizumFateRoots,
     transport: createJazzFateTransport(repository),
-    types: [{ type: "Party" }, { type: "Participant" }, { type: "Expense" }],
+    types: [
+      { type: "User" },
+      { type: "Party" },
+      { type: "PartyMember" },
+      { type: "UserPartyState" },
+      { type: "Participant" },
+      { type: "MediaFile" },
+      { type: "ExpenseChunk" },
+      { type: "ExpenseChunkBalances" },
+      { type: "Expense" },
+    ],
   });
 }
 
