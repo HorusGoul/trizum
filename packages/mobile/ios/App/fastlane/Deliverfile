@@ -11,8 +11,8 @@ screenshots_path "./fastlane/screenshots"
 # App Rating configuration
 app_rating_config_path "./fastlane/rating_config.json"
 
-# Phased release (gradual rollout over 7 days)
-phased_release true
+# Immediate release (no phased rollout)
+phased_release false
 
 # Precheck settings (validates before upload)
 precheck_include_in_app_purchases false
