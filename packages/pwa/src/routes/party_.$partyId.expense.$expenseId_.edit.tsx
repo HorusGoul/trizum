@@ -6,6 +6,7 @@ import {
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { usePartyExpense } from "#src/hooks/usePartyExpense.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.ts";
@@ -15,9 +16,6 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { toExpense } from "#src/lib/data/fateAppData.ts";
-import { useFateLiveView, useFateRequest } from "#src/lib/data/fateReact.ts";
-import { ExpenseListItemView } from "@trizum/data";
 
 interface EditExpenseSearchParams {
   media?: number;
@@ -37,7 +35,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
 const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
-  const { expenseId, partyId, expense, onUpdateExpense } = useExpense();
+  const { expenseId, partyId, expense, isLoading, onUpdateExpense } = useExpense();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
@@ -154,6 +152,10 @@ function EditExpense() {
     return clearScheduledDraftUpdate;
   }, []);
 
+  if (isLoading) {
+    return null;
+  }
+
   if (!expense || !formValues) {
     throw new Error("Expense not found");
   }
@@ -185,14 +187,7 @@ function EditExpense() {
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
   const { updateExpense } = useCurrentParty();
-  const { expense: expenseRef } = useFateRequest({
-    expense: {
-      id: expenseId,
-      view: ExpenseListItemView,
-    },
-  });
-  const expenseEntity = useFateLiveView(ExpenseListItemView, expenseRef);
-  const expense = toExpense(expenseEntity);
+  const { expense, isLoading } = usePartyExpense(partyId, expenseId);
 
   function onUpdateExpense(expense: Expense) {
     return updateExpense(expense);
@@ -202,6 +197,7 @@ function useExpense() {
     partyId,
     expense,
     expenseId,
+    isLoading,
     onUpdateExpense,
   };
 }
