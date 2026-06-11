@@ -150,6 +150,7 @@ export const ExpenseListItemView = view<ExpenseEntity>()({
   isTransfer: true,
   editCopy: true,
   editCopyLastUpdatedAt: true,
+  hash: true,
   updatedAt: true,
 });
 

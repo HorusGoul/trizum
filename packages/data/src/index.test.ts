@@ -30,6 +30,7 @@ import {
   type TrizumFateEntity,
   type TrizumFateListRoot,
   type TrizumFateTypename,
+  type UpsertExpenseMutationInput,
   type UpsertJoinedPartyMutationInput,
   type UpsertUserMutationInput,
   type UserEntity,
@@ -642,6 +643,57 @@ describe("Fate masking over Trizum Jazz entities", () => {
     });
     expect(Object.hasOwn(snapshot.data, "internalMemo")).toBe(false);
   });
+
+  test("keeps fresher cached expenses when an unversioned list fetch is stale", async () => {
+    const repository = createMemoryRepository();
+    const client = createTrizumFateClient({ repository });
+    const staleUpdatedAt = null;
+
+    await client.mutations.expense.upsert({
+      input: {
+        amount: 12_50,
+        hash: "fresh-expense-hash",
+        id: "expense-1",
+        isTransfer: false,
+        name: "Coffee with Bob",
+        paidAt: new Date("2026-06-10T09:15:00.000Z"),
+        paidBy: { alice: 12_50 },
+        partyId: "party-1",
+        photos: [],
+        shares: { alice: { type: "divide", value: 1 } },
+        updatedAt: staleUpdatedAt,
+      },
+      view: ExpenseListItemView,
+    });
+
+    repository.expenses[0] = {
+      ...repository.expenses[0]!,
+      hash: "stale-expense-hash",
+      name: "Coffee",
+      updatedAt: staleUpdatedAt,
+    };
+
+    const { expenses } = await client.request(
+      {
+        expenses: {
+          args: { partyId: "party-1" },
+          list: ExpenseListItemView,
+        },
+      },
+      { mode: "network-only" },
+    );
+    const [expenseRef] = expenses;
+    expect(expenseRef).toBeDefined();
+
+    const snapshot = await client.readView(ExpenseListItemView, expenseRef!);
+
+    expect(snapshot.data).toMatchObject({
+      __typename: "Expense",
+      hash: "fresh-expense-hash",
+      id: "expense-1",
+      name: "Coffee with Bob",
+    });
+  });
 });
 
 function createMemoryRepository() {
@@ -937,6 +989,23 @@ function createMemoryRepository() {
             updatedAt: expenseInput.updatedAt ?? null,
           };
           expenses.push(expense);
+          return projectTrizumEntity(expense, select);
+        }
+        case "expense.upsert": {
+          const expenseInput = input as UpsertExpenseMutationInput;
+          const expense = upsertEntity(expenses, expenseInput.id, {
+            __typename: "Expense",
+            ...expenseInput,
+            editCopy: expenseInput.editCopy ?? null,
+            editCopyLastUpdatedAt: expenseInput.editCopyLastUpdatedAt ?? null,
+            hash: expenseInput.hash ?? null,
+            internalMemo: expenseInput.internalMemo ?? null,
+            isTransfer: expenseInput.isTransfer ?? false,
+            paidBy: expenseInput.paidBy ?? {},
+            photos: expenseInput.photos ?? [],
+            shares: expenseInput.shares ?? {},
+            updatedAt: expenseInput.updatedAt ?? null,
+          });
           return projectTrizumEntity(expense, select);
         }
         default:

@@ -205,20 +205,49 @@ function preferFreshCachedEntity(client: object, entity: JazzFateEntity): JazzFa
   const cachedUpdatedAt = toTimestampMs(cached.updatedAt);
   const fetchedUpdatedAt = toTimestampMs((entity as Record<string, unknown>).updatedAt);
 
-  if (cachedUpdatedAt === undefined) {
+  if (cachedUpdatedAt !== undefined) {
+    if (fetchedUpdatedAt !== undefined && fetchedUpdatedAt >= cachedUpdatedAt) {
+      return entity;
+    }
+
+    return mergeCachedEntity(entity, cached);
+  }
+
+  if (fetchedUpdatedAt !== undefined) {
     return entity;
   }
 
-  if (fetchedUpdatedAt !== undefined && fetchedUpdatedAt >= cachedUpdatedAt) {
+  if (!hasDifferentKnownHash(cached, entity)) {
     return entity;
   }
 
+  // Legacy or locally stale Jazz rows may not have updatedAt. If the row is
+  // unversioned and its content hash differs, keep the current local-first cache
+  // instead of letting a revalidation downgrade a live view.
+  return mergeCachedEntity(entity, cached);
+}
+
+function mergeCachedEntity(
+  entity: JazzFateEntity,
+  cached: Record<string, unknown>,
+): JazzFateEntity {
   return {
     ...entity,
     ...cached,
     __typename: entity.__typename,
     id: entity.id,
   };
+}
+
+function hasDifferentKnownHash(cached: Record<string, unknown>, entity: JazzFateEntity): boolean {
+  const cachedHash = getKnownHash(cached.hash);
+  const fetchedHash = getKnownHash((entity as Record<string, unknown>).hash);
+
+  return cachedHash !== undefined && fetchedHash !== undefined && cachedHash !== fetchedHash;
+}
+
+function getKnownHash(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
 function toTimestampMs(value: unknown): number | undefined {
