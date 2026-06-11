@@ -86,9 +86,25 @@ export interface JazzFateRepository<
   getMutationOperation?<K extends Extract<keyof TMutationMap, string>>(
     proc: K,
   ): JazzFateMutationOperation;
+  subscribeEntities?(
+    type: TEntity["__typename"],
+    ids: Array<string | number>,
+    select: Iterable<string>,
+    args: Record<string, unknown> | undefined,
+    onChange: () => void,
+  ): () => void;
+  subscribeList?(
+    root: string,
+    select: Iterable<string>,
+    args: Record<string, unknown> | undefined,
+    onChange: () => void,
+  ): () => void;
 }
 
-export type JazzFateDb = Pick<Db, "all" | "delete" | "insert" | "one" | "update" | "upsert">;
+export type JazzFateDb = Pick<
+  Db,
+  "all" | "delete" | "insert" | "one" | "subscribeAll" | "update" | "upsert"
+>;
 
 export type JazzFateEntityDefinition<TEntity extends JazzFateEntity = JazzFateEntity> = {
   columns: readonly string[];
@@ -163,6 +179,7 @@ type JazzFateLiveConnectionSubscription = {
   args?: Record<string, unknown>;
   handlers: JazzFateLiveConnectionHandlers;
   procedure: string;
+  select: readonly string[];
 };
 type NotifyJazzFateLiveSubscribersOptions<
   TMutationMap extends JazzFateMutationMap,
@@ -191,10 +208,7 @@ export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzF
 
 type RowLike = Record<string, unknown> & { id: string };
 
-const defaultQueryOptions = {
-  propagation: "local-only",
-  tier: "local",
-} satisfies QueryOptions;
+const defaultQueryOptions = {} satisfies QueryOptions;
 
 export function createJazzDbRepository<
   TEntity extends JazzFateEntity = JazzFateEntity,
@@ -347,6 +361,39 @@ export function createJazzDbRepository<
     getMutationOperation(proc) {
       return mutationByProc.get(proc)?.operation ?? "insert";
     },
+
+    subscribeEntities(type, ids, select, args, onChange) {
+      const entity = expectEntityDefinition(entityByType, type);
+      const unsubscribes = ids.map((id) =>
+        subscribeToQueryChanges(
+          db,
+          selectColumns(where(entity.table, { id: String(id) }), entity, select),
+          queryOptions,
+          onChange,
+        ),
+      );
+
+      return () => {
+        for (const unsubscribe of unsubscribes) {
+          unsubscribe();
+        }
+      };
+    },
+
+    subscribeList(root, select, args, onChange) {
+      const list = expectListDefinition(listByRoot, root);
+      const entity = expectEntityDefinition(entityByType, list.type);
+      const pagination = getOffsetPagination(args, list.pagination);
+      const selectForFetch = withOrderByColumn(select, list.orderBy?.column);
+      const baseQuery = selectColumns(
+        applyListDefinition(entity.table, list, args),
+        entity,
+        selectForFetch,
+      );
+      const query = list.orderBy ? baseQuery : applyOffsetPagination(baseQuery, pagination);
+
+      return subscribeToQueryChanges(db, query, queryOptions, onChange);
+    },
   };
 }
 
@@ -418,8 +465,35 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
         select: [...select],
       } satisfies JazzFateLiveViewSubscription;
       subscriptions.add(subscription);
+      const unsubscribeRemote =
+        repository.subscribeEntities?.(
+          type,
+          [id],
+          subscription.select,
+          subscription.args,
+          async () => {
+            try {
+              const [record] = await repository.fetchEntities(
+                type,
+                [id],
+                subscription.select,
+                subscription.args,
+              );
+
+              if (record) {
+                subscription.handlers.onData(record, subscription.select);
+              } else {
+                subscription.handlers.onDelete?.(id);
+              }
+            } catch (error) {
+              subscription.handlers.onError?.(error);
+            }
+          },
+        ) ?? (() => undefined);
 
       return () => {
+        unsubscribeRemote();
+
         const current = entitySubscriptions.get(key);
 
         if (!current) {
@@ -434,15 +508,27 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
       };
     },
 
-    subscribeConnection(procedure, _type, args, _select, _selectionArgs, handlers) {
+    subscribeConnection(procedure, _type, args, select, _selectionArgs, handlers) {
       const subscription = {
         args: normalizeArgs(args),
         handlers,
         procedure,
+        select: [...select],
       } satisfies JazzFateLiveConnectionSubscription;
       connectionSubscriptions.add(subscription);
+      const unsubscribeRemote =
+        repository.subscribeList?.(procedure, subscription.select, subscription.args, () => {
+          try {
+            subscription.handlers.onEvent({
+              type: "invalidate",
+            });
+          } catch (error) {
+            subscription.handlers.onError?.(error);
+          }
+        }) ?? (() => undefined);
 
       return () => {
+        unsubscribeRemote();
         connectionSubscriptions.delete(subscription);
       };
     },
@@ -865,6 +951,28 @@ function applyOffsetPagination(
   return nextQuery as QueryBuilder<RowLike>;
 }
 
+function subscribeToQueryChanges(
+  db: JazzFateDb,
+  query: QueryBuilder<RowLike>,
+  queryOptions: QueryOptions,
+  onChange: () => void,
+) {
+  let deliveredInitialSnapshot = false;
+
+  return db.subscribeAll(
+    query,
+    () => {
+      if (!deliveredInitialSnapshot) {
+        deliveredInitialSnapshot = true;
+        return;
+      }
+
+      onChange();
+    },
+    queryOptions,
+  );
+}
+
 function doesRequestMatchAffectedLists(
   handle: FateRequestHandle,
   affectedLists: readonly JazzFateAffectedList[],
@@ -1191,7 +1299,7 @@ async function waitForWrite(result: { wait?: unknown }, queryOptions: QueryOptio
   }
 
   await (result.wait as (options: Pick<QueryOptions, "tier">) => Promise<unknown>)({
-    tier: queryOptions.tier,
+    tier: queryOptions.tier ?? "local",
   });
 }
 

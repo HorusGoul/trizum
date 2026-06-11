@@ -8,5 +8,6 @@ Migrate the PWA data layer from Automerge documents to Fate views backed by Jazz
 
 - Adds entity-centric Fate models and mutations for parties, joined party state, participants, expenses, and media files.
 - Replaces Automerge document writes in the PWA with Fate-masked reads and Jazz-backed local-first mutations.
+- Keeps Fate live views and live list views in sync from Jazz subscriptions, including joined party links and realtime expense editor drafts.
 - Removes expense chunk persistence in favor of paginated expense list reads.
 - Existing Automerge client data is not preserved by this architecture change.

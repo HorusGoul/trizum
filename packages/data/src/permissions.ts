@@ -15,6 +15,7 @@ export const trizumJazzPermissions = definePermissions(
     policy.parties.allowRead.where((party) =>
       anyOf([
         { ownerUserId: session.userId },
+        { localOnlyInviteSecret: { isNull: false } },
         policy.partyMembers.exists.where({
           partyId: party.id,
           userId: session.userId,
@@ -30,7 +31,9 @@ export const trizumJazzPermissions = definePermissions(
     policy.partyMembers.allowRead.where(
       anyOf([{ userId: session.userId }, allowedTo.update("partyId")]),
     ),
-    policy.partyMembers.allowInsert.where(allowedTo.update("partyId")),
+    policy.partyMembers.allowInsert.where(
+      anyOf([allowedTo.update("partyId"), { role: "editor", userId: session.userId }]),
+    ),
     policy.partyMembers.allowUpdate
       .whereOld(allowedTo.update("partyId"))
       .whereNew(allowedTo.update("partyId")),

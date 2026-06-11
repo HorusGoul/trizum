@@ -98,13 +98,24 @@ export async function createLocalFirstTrizumDataClient(
     disableBrowserWorker: options.disableBrowserWorker,
     driver: options.driver,
   });
+  const hasRemoteSync = Boolean(options.serverUrl);
   const repository = createTrizumJazzRepository(repositoryDb);
+  const settledRepository = createTrizumJazzRepository(repositoryDb, {
+    queryOptions: hasRemoteSync
+      ? {
+          localUpdates: "immediate",
+          tier: "edge",
+        }
+      : undefined,
+  });
 
   await ensureLocalFirstUser(repository, userId);
 
   return {
     client: createTrizumFateClient({ repository }),
     db,
+    hasRemoteSync,
+    settledClient: createTrizumFateClient({ repository: settledRepository }),
     userId,
   };
 }

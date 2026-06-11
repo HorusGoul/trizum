@@ -9,6 +9,7 @@ import {
   type JazzFateMutationDefinition,
   type JazzFateRepository,
 } from "fate-jazz";
+import type { QueryOptions } from "jazz-tools";
 import { trizumJazzApp } from "./schema.js";
 import type {
   CreateExpenseMutationInput,
@@ -360,12 +361,18 @@ const columnsByType = new Map<TrizumFateTypename, readonly string[]>(
   trizumEntityDefinitions.map((definition) => [definition.type, definition.columns]),
 );
 
-export function createTrizumJazzRepository(db: JazzFateDb): TrizumDataRepository {
+export function createTrizumJazzRepository(
+  db: JazzFateDb,
+  options: {
+    queryOptions?: QueryOptions;
+  } = {},
+): TrizumDataRepository {
   return createJazzDbRepository<TrizumFateEntity, TrizumFateMutationMap>({
     db,
     entities: trizumEntityDefinitions,
     lists: trizumListDefinitions,
     mutations: trizumMutationDefinitions,
+    queryOptions: options.queryOptions,
   });
 }
 

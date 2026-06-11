@@ -4,18 +4,37 @@ import {
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { readParty, readPartyList } from "#src/lib/data/fateAppData.ts";
+import { readPartyList, readPartyResult } from "#src/lib/data/fateAppData.ts";
 
 type RouterContext = RouterContextOptions<RegisteredRouter["routeTree"]>["context"];
 
 export async function guardPartyExists(partyId: string, { data }: RouterContext) {
-  const party = await readParty(data.client, partyId);
+  const partyResult = await readPartyResultForGuard(partyId, data);
 
-  if (!party) {
+  if (partyResult.status === "notFound") {
     throw redirect({ to: "/" });
   }
 
-  return party;
+  if (partyResult.status === "error") {
+    throw partyResult.error;
+  }
+
+  return partyResult.value;
+}
+
+async function readPartyResultForGuard(partyId: string, data: RouterContext["data"]) {
+  const client = data.settledClient ?? data.client;
+  const retryUntil = Date.now() + 8_000;
+
+  while (true) {
+    const result = await readPartyResult(client, partyId);
+
+    if (result.status !== "notFound" || !data.hasRemoteSync || Date.now() >= retryUntil) {
+      return result;
+    }
+
+    await sleep(250);
+  }
 }
 
 export async function guardPartyListExists({ data }: RouterContext) {
@@ -53,4 +72,8 @@ export async function guardParticipatingInParty(
   }
 
   return { party, partyList };
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

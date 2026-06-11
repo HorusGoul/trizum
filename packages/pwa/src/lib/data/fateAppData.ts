@@ -35,6 +35,22 @@ type MutationResult<T> = {
   error?: unknown;
   result?: T;
 };
+export type DataReadResult<T> =
+  | {
+      status: "empty";
+      value: T;
+    }
+  | {
+      status: "error";
+      error: unknown;
+    }
+  | {
+      status: "found";
+      value: T;
+    }
+  | {
+      status: "notFound";
+    };
 
 export async function createPartyInFate({
   client,
@@ -58,7 +74,10 @@ export async function createPartyInFate({
     type: "party",
   };
 
-  await upsertParty(client, userId, party);
+  await upsertParty(client, userId, {
+    ...party,
+    localOnlyInviteSecret: createInviteSecret(),
+  });
   await Promise.all(
     values.participants.map((participant) => upsertParticipant(client, partyId, participant)),
   );
@@ -69,13 +88,16 @@ export async function createPartyInFate({
 export async function upsertParty(
   client: TrizumFateClient,
   userId: string,
-  party: Pick<Party, "currency" | "description" | "id" | "name" | "symbol">,
+  party: Pick<Party, "currency" | "description" | "id" | "name" | "symbol"> & {
+    localOnlyInviteSecret?: string;
+  },
 ) {
   const result = await client.mutations.party.upsert({
     input: {
       currency: party.currency,
       description: party.description,
       id: party.id,
+      localOnlyInviteSecret: party.localOnlyInviteSecret,
       name: party.name,
       ownerUserId: userId,
       symbol: party.symbol,
@@ -282,15 +304,31 @@ export async function readParty(
   client: TrizumFateClient,
   partyId: string,
 ): Promise<Party | undefined> {
-  const party = await readPartySettings(client, partyId);
+  const result = await readPartyResult(client, partyId);
 
-  if (!party) {
-    return undefined;
+  return result.status === "found" ? result.value : undefined;
+}
+
+export async function readPartyResult(
+  client: TrizumFateClient,
+  partyId: string,
+): Promise<DataReadResult<Party>> {
+  const party = await readPartySettingsResult(client, partyId);
+
+  if (party.status === "notFound" || party.status === "error") {
+    return party;
   }
 
-  const participants = await readParticipants(client, partyId);
+  const participants = await readParticipantsResult(client, partyId);
 
-  return toParty(party, participants);
+  if (participants.status === "error") {
+    return participants;
+  }
+
+  return {
+    status: "found",
+    value: toParty(party.value, participants.status === "notFound" ? [] : participants.value),
+  };
 }
 
 export async function readPartyList(client: TrizumFateClient, userId: string): Promise<PartyList> {
@@ -301,6 +339,15 @@ export async function readPartyList(client: TrizumFateClient, userId: string): P
 }
 
 export async function readExpenseById(client: TrizumFateClient, expenseId: string) {
+  const result = await readExpenseByIdResult(client, expenseId);
+
+  return result.status === "found" ? result.value : undefined;
+}
+
+export async function readExpenseByIdResult(
+  client: TrizumFateClient,
+  expenseId: string,
+): Promise<DataReadResult<Expense>> {
   try {
     const { expense } = await client.request({
       expense: {
@@ -310,9 +357,12 @@ export async function readExpenseById(client: TrizumFateClient, expenseId: strin
     });
     const snapshot = await client.readView(ExpenseListItemView, expense);
 
-    return toExpense(snapshot.data as unknown as ExpenseEntity);
-  } catch {
-    return undefined;
+    return {
+      status: "found",
+      value: toExpense(snapshot.data as unknown as ExpenseEntity),
+    };
+  } catch (error) {
+    return readErrorAsNotFound(error);
   }
 }
 
@@ -350,6 +400,15 @@ async function readJoinedParties(client: TrizumFateClient, userId: string) {
 }
 
 async function readPartySettings(client: TrizumFateClient, partyId: string) {
+  const result = await readPartySettingsResult(client, partyId);
+
+  return result.status === "found" ? result.value : undefined;
+}
+
+async function readPartySettingsResult(
+  client: TrizumFateClient,
+  partyId: string,
+): Promise<DataReadResult<PartyEntity>> {
   try {
     const { party } = await client.request({
       party: {
@@ -359,27 +418,51 @@ async function readPartySettings(client: TrizumFateClient, partyId: string) {
     });
     const snapshot = await client.readView(PartySettingsView, party);
 
-    return snapshot.data as unknown as PartyEntity;
-  } catch {
-    return undefined;
+    return {
+      status: "found",
+      value: snapshot.data as unknown as PartyEntity,
+    };
+  } catch (error) {
+    return readErrorAsNotFound(error);
   }
 }
 
 async function readParticipants(client: TrizumFateClient, partyId: string) {
-  const { participants } = await client.request({
-    participants: {
-      args: { partyId },
-      list: ParticipantView,
-    },
-  });
+  const result = await readParticipantsResult(client, partyId);
 
-  return Promise.all(
-    participants.map(async (participant) => {
-      const snapshot = await client.readView(ParticipantView, participant);
+  return result.status === "found" || result.status === "empty" ? result.value : [];
+}
 
-      return snapshot.data as unknown as ParticipantEntity;
-    }),
-  );
+async function readParticipantsResult(
+  client: TrizumFateClient,
+  partyId: string,
+): Promise<DataReadResult<ParticipantEntity[]>> {
+  try {
+    const { participants } = await client.request({
+      participants: {
+        args: { partyId },
+        list: ParticipantView,
+      },
+    });
+
+    const participantEntities = await Promise.all(
+      participants.map(async (participant) => {
+        const snapshot = await client.readView(ParticipantView, participant);
+
+        return snapshot.data as unknown as ParticipantEntity;
+      }),
+    );
+
+    return {
+      status: participantEntities.length === 0 ? "empty" : "found",
+      value: participantEntities,
+    };
+  } catch (error) {
+    return {
+      error,
+      status: "error",
+    };
+  }
 }
 
 export function toPartyList(
@@ -503,8 +586,8 @@ export function toMediaFile(entity: MediaFileEntity): MediaFile {
 function expenseToMutationInput(partyId: string, expense: Expense) {
   return {
     amount: getExpenseTotalAmount(expense),
-    editCopy: expense.__editCopy as JsonLike | undefined,
-    editCopyLastUpdatedAt: expense.__editCopyLastUpdatedAt,
+    editCopy: (expense.__editCopy ?? null) as JsonLike,
+    editCopyLastUpdatedAt: expense.__editCopyLastUpdatedAt ?? null,
     hash: calculateExpenseHash(expense),
     id: expense.id,
     isTransfer: expense.isTransfer ?? false,
@@ -529,6 +612,10 @@ function createPartyId() {
 }
 
 function createExpenseId() {
+  return crypto.randomUUID();
+}
+
+function createInviteSecret() {
   return crypto.randomUUID();
 }
 
@@ -592,4 +679,17 @@ function expectMutationResult<T>(result: MutationResult<T>, message: string): T 
   }
 
   return result.result;
+}
+
+function readErrorAsNotFound(error: unknown): DataReadResult<never> {
+  if (error instanceof Error) {
+    return {
+      status: "notFound",
+    };
+  }
+
+  return {
+    error,
+    status: "error",
+  };
 }

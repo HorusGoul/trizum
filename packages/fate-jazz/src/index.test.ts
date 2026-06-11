@@ -80,8 +80,10 @@ describe("Jazz DB repository", () => {
       createNoteRow("note-4", "project-1", "Overflow", 4),
       createNoteRow("note-5", "project-2", "Other project", 5),
     ]);
+    const queryOptions: unknown[] = [];
     const db = {
-      async all(query: unknown) {
+      async all(query: unknown, options: unknown) {
+        queryOptions.push(options);
         return (query as FakeNoteQuery).execute();
       },
       insert(_table: unknown, _input: unknown) {
@@ -150,6 +152,7 @@ describe("Jazz DB repository", () => {
         previousCursor: "0",
       },
     });
+    expect(queryOptions).toStrictEqual([{}]);
     expect(table.calls).toStrictEqual([
       {
         conditions: {
@@ -306,6 +309,83 @@ describe("Fate Jazz transport", () => {
 
     expect(events).toStrictEqual([{ type: "invalidate" }]);
     unsubscribe?.();
+  });
+
+  test("invalidates live list connections when Jazz subscriptions change", () => {
+    const repository = createMemoryRepository();
+    let emitRemoteChange: (() => void) | undefined;
+    const unsubscribeRemote = vi.fn<() => void>();
+    repository.subscribeList = vi.fn<NonNullable<typeof repository.subscribeList>>(
+      (_root, _select, _args, onChange) => {
+        emitRemoteChange = onChange;
+
+        return unsubscribeRemote;
+      },
+    );
+    const transport = createJazzFateTransport<MutationMap>(repository);
+    const events: unknown[] = [];
+    const unsubscribe = transport.subscribeConnection?.(
+      "notes",
+      "Note",
+      {},
+      new Set(["id", "title"]),
+      undefined,
+      {
+        onEvent(event) {
+          events.push(event);
+        },
+      },
+    );
+
+    emitRemoteChange?.();
+
+    expect(events).toStrictEqual([{ type: "invalidate" }]);
+
+    unsubscribe?.();
+
+    expect(unsubscribeRemote).toHaveBeenCalledTimes(1);
+  });
+
+  test("refreshes live entity views when Jazz subscriptions change", async () => {
+    const repository = createMemoryRepository();
+    let emitRemoteChange: (() => void) | undefined;
+    const unsubscribeRemote = vi.fn<() => void>();
+    repository.subscribeEntities = vi.fn<NonNullable<typeof repository.subscribeEntities>>(
+      (_type, _ids, _select, _args, onChange) => {
+        emitRemoteChange = onChange;
+
+        return unsubscribeRemote;
+      },
+    );
+    const transport = createJazzFateTransport<MutationMap>(repository);
+    const records: unknown[] = [];
+    const unsubscribe = transport.subscribeById?.(
+      "Note",
+      "note-1",
+      new Set(["id", "title"]),
+      {},
+      {
+        onData(record) {
+          records.push(record);
+        },
+      },
+    );
+
+    emitRemoteChange?.();
+
+    await vi.waitFor(() =>
+      expect(records).toStrictEqual([
+        {
+          __typename: "Note",
+          id: "note-1",
+          title: "Roadmap",
+        },
+      ]),
+    );
+
+    unsubscribe?.();
+
+    expect(unsubscribeRemote).toHaveBeenCalledTimes(1);
   });
 
   test("serializes retained Fate request refreshes for the same client", async () => {

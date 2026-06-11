@@ -112,6 +112,7 @@ class BrowserFallbackMirror {
         return withPersistedWait(result, () => this.putRow(table, result.value));
       },
       one: db.one.bind(db),
+      subscribeAll: db.subscribeAll.bind(db),
       update: (table: unknown, id: string, input: unknown) => {
         const result = updateRaw(db, table, id, input);
 

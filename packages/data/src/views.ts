@@ -148,6 +148,8 @@ export const ExpenseListItemView = view<ExpenseEntity>()({
   shares: true,
   photos: true,
   isTransfer: true,
+  editCopy: true,
+  editCopyLastUpdatedAt: true,
 });
 
 export type CreateUserMutationInput = CreateUserInput;

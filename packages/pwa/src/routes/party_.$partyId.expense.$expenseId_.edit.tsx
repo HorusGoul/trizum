@@ -12,7 +12,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.ts";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
@@ -48,8 +48,6 @@ function EditExpense() {
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
 
-  const photos = expense?.photos ?? [];
-
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
     navigate: (options) => void navigate(options),
@@ -61,33 +59,52 @@ function EditExpense() {
   }
 
   const editorRef = useRef<ExpenseEditorRef>(null);
+  const latestExpenseRef = useRef(expense);
+  const draftUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editableExpense = getEditableExpense(expense);
+  const photos = editableExpense.photos;
+
+  latestExpenseRef.current = expense;
+
+  function clearScheduledDraftUpdate() {
+    if (draftUpdateTimerRef.current) {
+      clearTimeout(draftUpdateTimerRef.current);
+      draftUpdateTimerRef.current = null;
+    }
+  }
+
+  function scheduleDraftUpdate(values: ExpenseEditorFormValues) {
+    clearScheduledDraftUpdate();
+
+    draftUpdateTimerRef.current = setTimeout(() => {
+      const baseExpense = latestExpenseRef.current;
+      const draft = getExpenseFromFormValues(expenseId, values, baseExpense);
+
+      void onUpdateExpense({
+        ...baseExpense,
+        __editCopy: draft,
+        __editCopyLastUpdatedAt: new Date(),
+      }).catch((error: unknown) => {
+        logger.error("Failed to update realtime expense draft", { error });
+      });
+    }, 250);
+  }
 
   async function onSubmit(values: ExpenseEditorFormValues) {
     try {
-      // Create shares based on the form values
-      const shares: Expense["shares"] = {};
-
-      // Use the shares directly from the form
-      Object.entries(values.shares).forEach(([participantId, share]) => {
-        shares[participantId] = share;
-      });
+      clearScheduledDraftUpdate();
 
       toast.loading(t`Updating expense...`, {
         id: "update-expense",
       });
 
-      const expense = {
-        id: expenseId,
-        name: values.name,
-        paidAt: values.paidAt,
-        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-        shares,
-        photos: values.photos,
-      };
+      const expense = getExpenseFromFormValues(expenseId, values, latestExpenseRef.current);
 
       await onUpdateExpense({
         ...expense,
         __hash: calculateExpenseHash(expense),
+        __editCopy: undefined,
+        __editCopyLastUpdatedAt: undefined,
       });
 
       await navigate({
@@ -117,8 +134,17 @@ function EditExpense() {
     }
   }
 
-  const formValues = getFormValues(expense);
+  const editCopyUpdatedAt = expense.__editCopyLastUpdatedAt?.getTime() ?? 0;
+  const formValues = getFormValues(editableExpense);
   const expenseName = formValues.name;
+
+  useEffect(() => {
+    editorRef.current?.setValues(getFormValues(getEditableExpense(latestExpenseRef.current)));
+  }, [expense.__hash, editCopyUpdatedAt]);
+
+  useEffect(() => {
+    return clearScheduledDraftUpdate;
+  }, []);
 
   return (
     <>
@@ -126,6 +152,7 @@ function EditExpense() {
       <ExpenseEditor
         title={t`Editing ${expenseName}`}
         onSubmit={onSubmit}
+        onChange={(_previousValues, currentValues) => scheduleDraftUpdate(currentValues)}
         defaultValues={formValues}
         ref={editorRef}
         // eslint-disable-next-line jsx-a11y/no-autofocus -- We don't want to auto focus the edit form
@@ -175,5 +202,37 @@ function getFormValues(expense: Expense): ExpenseEditorFormValues {
     paidBy: Object.keys(expense.paidBy)[0],
     shares: expense.shares,
     photos: expense.photos,
+  };
+}
+
+function getEditableExpense(expense: Expense): Expense {
+  return expense.__editCopy ?? expense;
+}
+
+function getExpenseFromFormValues(
+  expenseId: string,
+  values: ExpenseEditorFormValues,
+  baseExpense: Expense,
+): Expense {
+  const shares: Expense["shares"] = {};
+
+  Object.entries(values.shares).forEach(([participantId, share]) => {
+    shares[participantId] = share;
+  });
+
+  const expense: Expense = {
+    __hash: "",
+    id: expenseId,
+    isTransfer: baseExpense.isTransfer,
+    name: values.name,
+    paidAt: values.paidAt,
+    paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+    photos: values.photos,
+    shares,
+  };
+
+  return {
+    ...expense,
+    __hash: calculateExpenseHash(expense),
   };
 }
