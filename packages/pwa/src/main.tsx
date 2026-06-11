@@ -155,6 +155,7 @@ window.__internal_readExpenseState = async (
   return readExpenseState({
     client: mode === "settled" ? trizumData.settledClient : trizumData.client,
     expenseId,
+    mode,
   });
 };
 

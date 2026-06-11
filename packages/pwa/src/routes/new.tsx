@@ -52,9 +52,8 @@ function New() {
       ...participant,
       id: crypto.randomUUID(),
     }));
-    const writeClient = hasRemoteSync && settledClient ? settledClient : client;
     const party = await createPartyInFate({
-      client: writeClient,
+      client,
       userId,
       values: {
         currency: values.currency,

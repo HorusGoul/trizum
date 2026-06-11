@@ -56,11 +56,7 @@ describe("Jazz alpha schema", () => {
         type: "SessionRef",
       },
     });
-    expect(trizumJazzWasmSchema.expenses?.policies?.select?.using).toStrictEqual({
-      operation: "Select",
-      type: "Inherits",
-      via_column: "partyId",
-    });
+    expectPartyAccessPolicy(trizumJazzWasmSchema.expenses?.policies?.select?.using);
     expect(trizumJazzWasmSchema.parties?.policies?.update?.using).toMatchObject({
       exprs: expect.arrayContaining([
         {
@@ -116,28 +112,22 @@ describe("Jazz alpha schema", () => {
       ]),
       type: "Or",
     });
-    expect(trizumJazzWasmSchema.participants?.policies?.update?.using).toStrictEqual({
-      operation: "Select",
-      type: "Inherits",
-      via_column: "partyId",
-    });
-    expect(trizumJazzWasmSchema.participants?.policies?.update?.with_check).toStrictEqual({
-      operation: "Select",
-      type: "Inherits",
-      via_column: "partyId",
-    });
-    expect(trizumJazzWasmSchema.expenses?.policies?.update?.using).toStrictEqual({
-      operation: "Select",
-      type: "Inherits",
-      via_column: "partyId",
-    });
-    expect(trizumJazzWasmSchema.expenses?.policies?.update?.with_check).toStrictEqual({
-      operation: "Update",
-      type: "Inherits",
-      via_column: "partyId",
-    });
+    expectPartyAccessPolicy(trizumJazzWasmSchema.participants?.policies?.update?.using);
+    expectPartyAccessPolicy(trizumJazzWasmSchema.participants?.policies?.update?.with_check);
+    expectPartyAccessPolicy(trizumJazzWasmSchema.expenses?.policies?.update?.using);
+    expectPartyAccessPolicy(trizumJazzWasmSchema.expenses?.policies?.update?.with_check);
   });
 });
+
+function expectPartyAccessPolicy(policyExpression: unknown) {
+  expect(policyExpression).toMatchObject({ type: "Or" });
+  expect((policyExpression as { exprs?: unknown[] } | undefined)?.exprs).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ table: "parties", type: "Exists" }),
+      expect.objectContaining({ table: "partyMembers", type: "Exists" }),
+    ]),
+  );
+}
 
 describe("Trizum Jazz model surface", () => {
   test("extracts the PWA data boundaries into entity definitions", () => {

@@ -108,11 +108,18 @@ export async function createLocalFirstTrizumDataClient(
         tier: "edge" as const,
       }
     : undefined;
+  const remoteSettledQueryOptions = hasRemoteSync
+    ? {
+        localUpdates: "immediate" as const,
+        tier: "edge" as const,
+      }
+    : undefined;
   const repository = createTrizumJazzRepository(repositoryDb, {
     subscriptionQueryOptions: remoteLiveQueryOptions,
+    syncWritesToTier: hasRemoteSync ? "edge" : undefined,
   });
   const settledRepository = createTrizumJazzRepository(repositoryDb, {
-    queryOptions: remoteLiveQueryOptions,
+    queryOptions: remoteSettledQueryOptions,
   });
 
   await ensureLocalFirstUser(repository, userId);

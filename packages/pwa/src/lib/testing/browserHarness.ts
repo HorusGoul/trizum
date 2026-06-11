@@ -105,11 +105,19 @@ export async function readPartyListState({
 export async function readExpenseState({
   client,
   expenseId,
+  mode,
 }: {
   client: TrizumFateClient;
   expenseId: Expense["id"];
+  mode?: "cache" | "settled";
 }) {
-  return (await readExpenseById(client, expenseId)) ?? null;
+  return (
+    (await readExpenseById(
+      client,
+      expenseId,
+      mode === "settled" ? { mode: "network-only" } : undefined,
+    )) ?? null
+  );
 }
 
 function toDate(value: number | undefined) {

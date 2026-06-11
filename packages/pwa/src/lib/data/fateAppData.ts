@@ -13,6 +13,7 @@ import {
   type ParticipantEntity,
   type PartyEntity,
   type PartyMemberEntity,
+  type RequestOptions,
   type TrizumFateClient,
   type UserEntity,
 } from "@trizum/data";
@@ -393,7 +394,21 @@ export async function waitForPartyInFate(
   const retryUntil = Date.now() + (options.timeoutMs ?? 8_000);
 
   while (true) {
-    const result = await readPartyResult(client, partyId);
+    const remainingMs = retryUntil - Date.now();
+
+    if (remainingMs <= 0) {
+      return undefined;
+    }
+
+    const result = await withTimeout(
+      readPartyResult(client, partyId),
+      Math.min(2_000, remainingMs),
+    );
+
+    if (!result) {
+      await sleep(250);
+      continue;
+    }
 
     if (
       result.status === "found" &&
@@ -443,8 +458,12 @@ export async function readPartyList(client: TrizumFateClient, userId: string): P
   return toPartyList(userId, user, joinedParties);
 }
 
-export async function readExpenseById(client: TrizumFateClient, expenseId: string) {
-  const result = await readExpenseByIdResult(client, expenseId);
+export async function readExpenseById(
+  client: TrizumFateClient,
+  expenseId: string,
+  options?: RequestOptions,
+) {
+  const result = await readExpenseByIdResult(client, expenseId, options);
 
   return result.status === "found" ? result.value : undefined;
 }
@@ -452,14 +471,18 @@ export async function readExpenseById(client: TrizumFateClient, expenseId: strin
 export async function readExpenseByIdResult(
   client: TrizumFateClient,
   expenseId: string,
+  options?: RequestOptions,
 ): Promise<DataReadResult<Expense>> {
   try {
-    const { expense } = await client.request({
-      expense: {
-        id: expenseId,
-        view: ExpenseListItemView,
+    const { expense } = await client.request(
+      {
+        expense: {
+          id: expenseId,
+          view: ExpenseListItemView,
+        },
       },
-    });
+      options,
+    );
     const snapshot = await client.readView(ExpenseListItemView, expense);
     await notifyFateReadComplete(client);
 
@@ -813,6 +836,21 @@ function toTimestamp(value: Date | number | string | null | undefined) {
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | undefined> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  return Promise.race([
+    promise.finally(() => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }),
+    new Promise<undefined>((resolve) => {
+      timeoutId = setTimeout(() => resolve(undefined), timeoutMs);
+    }),
+  ]);
 }
 
 function throwMutationError(error: unknown) {

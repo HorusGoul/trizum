@@ -119,9 +119,7 @@ function Join() {
   }
 
   async function preparePartySelection(partyId: string) {
-    const writeClient = hasRemoteSync && settledClient ? settledClient : client;
-
-    await ensurePartyMemberForSelection(writeClient, userId, partyId);
+    await ensurePartyMemberForSelection(client, userId, partyId);
 
     const party =
       hasRemoteSync && settledClient

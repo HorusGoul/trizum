@@ -204,6 +204,7 @@ export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzF
   mutations?: readonly JazzFateMutationDefinition<TEntity>[];
   queryOptions?: QueryOptions;
   subscriptionQueryOptions?: QueryOptions;
+  syncWritesToTier?: QueryOptions["tier"];
 };
 
 type RowLike = Record<string, unknown> & { id: string };
@@ -220,6 +221,7 @@ export function createJazzDbRepository<
   mutations = [],
   queryOptions = defaultQueryOptions,
   subscriptionQueryOptions = queryOptions,
+  syncWritesToTier,
 }: CreateJazzDbRepositoryOptions<TEntity>): JazzFateRepository<TEntity, TMutationMap> {
   const entityByType = new Map(entities.map((entity) => [entity.type, entity]));
   const listByRoot = new Map(lists.map((list) => [list.root, list]));
@@ -315,6 +317,7 @@ export function createJazzDbRepository<
         const result = insertRow(db, mutation.table, input);
 
         await waitForWrite(result, queryOptions);
+        syncWriteInBackground(result, queryOptions, syncWritesToTier);
 
         return toEntity(
           entity,
@@ -335,15 +338,15 @@ export function createJazzDbRepository<
           throw new Error(`Fate mutation ${String(proc)} could not find row ${String(id)}`);
         }
 
-        await deleteRow(db, mutation.table, id, queryOptions);
+        await deleteRow(db, mutation.table, id, queryOptions, syncWritesToTier);
 
         return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
       }
 
       if (operation === "update") {
-        await updateRow(db, mutation.table, id, input, queryOptions);
+        await updateRow(db, mutation.table, id, input, queryOptions, syncWritesToTier);
       } else {
-        await upsertRow(db, mutation.table, id, input, queryOptions);
+        await upsertRow(db, mutation.table, id, input, queryOptions, syncWritesToTier);
       }
 
       const row = await db.one(
@@ -1206,6 +1209,7 @@ async function updateRow(
   id: string | number,
   input: unknown,
   queryOptions: QueryOptions,
+  syncWritesToTier: QueryOptions["tier"],
 ): Promise<void> {
   const result = (
     db.update as (
@@ -1218,6 +1222,7 @@ async function updateRow(
   )(table, String(id), stripInputId(input));
 
   await waitForWrite(result, queryOptions);
+  syncWriteInBackground(result, queryOptions, syncWritesToTier);
 }
 
 async function upsertRow(
@@ -1226,6 +1231,7 @@ async function upsertRow(
   id: string | number,
   input: unknown,
   queryOptions: QueryOptions,
+  syncWritesToTier: QueryOptions["tier"],
 ): Promise<void> {
   const result = (
     db.upsert as (
@@ -1240,6 +1246,7 @@ async function upsertRow(
   )(table, stripInputId(input), { id: String(id) });
 
   await waitForWrite(result, queryOptions);
+  syncWriteInBackground(result, queryOptions, syncWritesToTier);
 }
 
 async function deleteRow(
@@ -1247,6 +1254,7 @@ async function deleteRow(
   table: unknown,
   id: string | number,
   queryOptions: QueryOptions,
+  syncWritesToTier: QueryOptions["tier"],
 ): Promise<void> {
   const result = (
     db.delete as (
@@ -1258,6 +1266,7 @@ async function deleteRow(
   )(table, String(id));
 
   await waitForWrite(result, queryOptions);
+  syncWriteInBackground(result, queryOptions, syncWritesToTier);
 }
 
 function getMutationId<TEntity extends JazzFateEntity>(
@@ -1294,13 +1303,31 @@ function stripInputId(input: unknown): unknown {
 }
 
 async function waitForWrite(result: { wait?: unknown }, queryOptions: QueryOptions) {
+  await waitForWriteTier(result, queryOptions.tier ?? "local");
+}
+
+async function waitForWriteTier(result: { wait?: unknown }, tier: QueryOptions["tier"]) {
   if (typeof result.wait !== "function") {
     return;
   }
 
   await (result.wait as (options: Pick<QueryOptions, "tier">) => Promise<unknown>)({
-    tier: queryOptions.tier ?? "local",
+    tier,
   });
+}
+
+function syncWriteInBackground(
+  result: { wait?: unknown },
+  queryOptions: QueryOptions,
+  syncWritesToTier: QueryOptions["tier"],
+) {
+  const waitTier = queryOptions.tier ?? "local";
+
+  if (!syncWritesToTier || syncWritesToTier === waitTier || typeof result.wait !== "function") {
+    return;
+  }
+
+  void waitForWriteTier(result, syncWritesToTier).catch(() => undefined);
 }
 
 function normalizeArgs(args: unknown): Record<string, unknown> | undefined {

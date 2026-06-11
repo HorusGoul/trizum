@@ -366,6 +366,7 @@ export function createTrizumJazzRepository(
   options: {
     queryOptions?: QueryOptions;
     subscriptionQueryOptions?: QueryOptions;
+    syncWritesToTier?: QueryOptions["tier"];
   } = {},
 ): TrizumDataRepository {
   return createJazzDbRepository<TrizumFateEntity, TrizumFateMutationMap>({
@@ -375,6 +376,7 @@ export function createTrizumJazzRepository(
     mutations: trizumMutationDefinitions,
     queryOptions: options.queryOptions,
     subscriptionQueryOptions: options.subscriptionQueryOptions,
+    syncWritesToTier: options.syncWritesToTier,
   });
 }
 
