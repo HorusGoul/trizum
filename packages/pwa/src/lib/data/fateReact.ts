@@ -76,6 +76,15 @@ type FateListResult<NodeRef> = {
   loadPrevious: () => void;
 };
 
+type FateViewHandle<T extends { __typename: string }> = PromiseLike<ViewSnapshot<T, any>> & {
+  status?: "fulfilled" | "pending" | "rejected";
+  value?: ViewSnapshot<T, any>;
+};
+
+type FateViewSnapshotResult<T extends { __typename: string }> =
+  | { snapshot: ViewSnapshot<T, any> }
+  | { handle: FateViewHandle<T> };
+
 export function useFateRequest<R extends Request>(
   request: R,
   options?: RequestOptions,
@@ -84,16 +93,39 @@ export function useFateRequest<R extends Request>(
   const mode = options?.mode ?? "cache-first";
   const { promise, requestKey } = client.prepareRequestForRender(request, options);
   const requestHandle = promise as FateRequestHandle;
+  const previousRequestKeyRef = useRef<string | null>(null);
+  const previousResultRef = useRef<Awaited<
+    ReturnType<TrizumFateClient["requestForRender"]>
+  > | null>(null);
 
-  if (shouldSuspendForRequest(client, requestHandle, mode)) {
-    use(promise);
+  if (previousRequestKeyRef.current !== requestKey) {
+    previousRequestKeyRef.current = requestKey;
+    previousResultRef.current = null;
   }
+
+  const previousResult = previousResultRef.current;
+  const hasPreviousResult = previousResult !== null;
+  const hasCurrentData =
+    requestHandle.status === "fulfilled" || hasCachedRequestData(client, requestHandle);
+  const shouldSuspend = !hasPreviousResult && shouldSuspendForRequest(client, requestHandle, mode);
 
   useSubscriptionVersion((change) => subscribeToRequest(client, requestKey, mode, change));
 
-  return client.getRequestResult(request) as Awaited<
+  if (shouldSuspend) {
+    use(promise);
+  }
+
+  if (!hasCurrentData && hasPreviousResult) {
+    return previousResult;
+  }
+
+  const result = client.getRequestResult(request) as Awaited<
     ReturnType<TrizumFateClient["requestForRender"]>
   >;
+
+  previousResultRef.current = result;
+
+  return result;
 }
 
 function shouldSuspendForRequest(
@@ -142,10 +174,15 @@ export function useFateView<T extends { __typename: string }>(
   } = {},
 ): T {
   const { client } = useTrizumData();
-  const snapshot = use(client.readView(view, ref));
+  const previousSnapshotRef = useRef<ViewSnapshot<T, any> | null>(null);
   const subscriptionVersion = useSubscriptionVersion((change) =>
-    subscribeToView(client, view, ref, snapshot, options.live === true, change),
+    subscribeToView(client, view, ref, previousSnapshotRef.current, options.live === true, change),
   );
+  const snapshotResult = readViewSnapshotForRender(client, view, ref, previousSnapshotRef.current);
+  const snapshot =
+    "snapshot" in snapshotResult ? snapshotResult.snapshot : use(snapshotResult.handle);
+
+  previousSnapshotRef.current = snapshot;
 
   return readCachedViewData(client, view, ref, snapshot, subscriptionVersion);
 }
@@ -155,15 +192,24 @@ export function useFateLiveViews<T extends { __typename: string }>(
   refs: readonly ViewRef<T["__typename"]>[],
 ): T[] {
   const { client } = useTrizumData();
+  const previousSnapshotsRef = useRef(new Map<string, ViewSnapshot<T, any>>());
+  const subscriptionVersion = useSubscriptionVersion((change) =>
+    subscribeToViews(client, view, refs, previousSnapshotsRef.current, true, change),
+  );
   const snapshots: Array<ViewSnapshot<T, any>> = [];
 
   for (const ref of refs) {
-    snapshots.push(use(client.readView(view, ref)));
+    const snapshotResult = readViewSnapshotForRender(
+      client,
+      view,
+      ref,
+      previousSnapshotsRef.current.get(getViewSnapshotKey(ref)),
+    );
+    const snapshot =
+      "snapshot" in snapshotResult ? snapshotResult.snapshot : use(snapshotResult.handle);
+    snapshots.push(snapshot);
+    previousSnapshotsRef.current.set(getViewSnapshotKey(ref), snapshot);
   }
-
-  const subscriptionVersion = useSubscriptionVersion((change) =>
-    subscribeToViews(client, view, refs, snapshots, true, change),
-  );
 
   return refs.map((ref, index) =>
     readCachedViewData(client, view, ref, snapshots[index]!, subscriptionVersion),
@@ -270,14 +316,14 @@ function subscribeToView<T extends { __typename: string }>(
   client: TrizumFateClient,
   view: View<T, any>,
   ref: ViewRef<T["__typename"]>,
-  snapshot: ViewSnapshot<T, any>,
+  snapshot: ViewSnapshot<T, any> | null | undefined,
   live: boolean,
   change: () => void,
 ) {
   const store = getFateStore(client);
-  const unsubscribeRecords = snapshot.coverage.map(([id, paths]) =>
-    store.subscribe(id, new Set(paths), change),
-  );
+  const unsubscribeRecords = snapshot
+    ? snapshot.coverage.map(([id, paths]) => store.subscribe(id, new Set(paths), change))
+    : [store.subscribe(toEntityId(ref.__typename, ref.id), null, change)];
   const unsubscribeLive = live ? client.subscribeLiveView(view, ref) : undefined;
   const unsubscribeCacheUpdate = live ? subscribeToJazzFateCacheUpdates(client, change) : undefined;
 
@@ -295,12 +341,12 @@ function subscribeToViews<T extends { __typename: string }>(
   client: TrizumFateClient,
   view: View<T, any>,
   refs: readonly ViewRef<T["__typename"]>[],
-  snapshots: readonly ViewSnapshot<T, any>[],
+  snapshots: ReadonlyMap<string, ViewSnapshot<T, any>>,
   live: boolean,
   change: () => void,
 ) {
-  const unsubscribeItems = refs.map((ref, index) =>
-    subscribeToView(client, view, ref, snapshots[index]!, live, change),
+  const unsubscribeItems = refs.map((ref) =>
+    subscribeToView(client, view, ref, snapshots.get(getViewSnapshotKey(ref)), live, change),
   );
 
   return () => {
@@ -308,6 +354,29 @@ function subscribeToViews<T extends { __typename: string }>(
       unsubscribe();
     }
   };
+}
+
+function readViewSnapshotForRender<T extends { __typename: string }>(
+  client: TrizumFateClient,
+  view: View<T, any>,
+  ref: ViewRef<T["__typename"]>,
+  previousSnapshot: ViewSnapshot<T, any> | null | undefined,
+): FateViewSnapshotResult<T> {
+  const handle = client.readView(view, ref) as FateViewHandle<T>;
+
+  if (handle.status === "fulfilled" && handle.value) {
+    return { snapshot: handle.value };
+  }
+
+  if (previousSnapshot) {
+    return { snapshot: previousSnapshot };
+  }
+
+  return { handle };
+}
+
+function getViewSnapshotKey(ref: ViewRef<string>) {
+  return toEntityId(ref.__typename, ref.id);
 }
 
 function readCachedViewData<T extends { __typename: string }>(

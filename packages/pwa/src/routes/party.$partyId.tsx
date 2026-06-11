@@ -35,6 +35,7 @@ import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { requestIdleCallback, cancelIdleCallback } from "#src/lib/requestIdleCallback.ts";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
+import { readParty } from "#src/lib/data/fateAppData.ts";
 
 interface PartyByIdSearchParams {
   tab: "expenses" | "balances";
@@ -45,6 +46,7 @@ export const Route = createFileRoute("/party/$partyId")({
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId }, location }) => {
     await guardParticipatingInParty(partyId, context, location);
+    await readParty(context.data.client, partyId);
   },
   validateSearch: (search): PartyByIdSearchParams => {
     const tab = search.tab === "balances" ? "balances" : "expenses";

@@ -122,7 +122,7 @@ describe("Jazz alpha schema", () => {
       via_column: "partyId",
     });
     expect(trizumJazzWasmSchema.participants?.policies?.update?.with_check).toStrictEqual({
-      operation: "Update",
+      operation: "Select",
       type: "Inherits",
       via_column: "partyId",
     });

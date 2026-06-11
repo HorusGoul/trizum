@@ -50,8 +50,8 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
   let client: ReturnType<typeof createClient<[typeof trizumFateRoots, typeof trizumFateMutations]>>;
 
   const transport = createJazzFateTransport(repository, {
-    async onLiveData() {
-      await refreshJazzFateCache(client, []);
+    async onLiveData({ affectedLists }) {
+      await refreshJazzFateCache(client, affectedLists);
     },
     async onMutation({ affectedLists }) {
       await refreshJazzFateCache(client, affectedLists);

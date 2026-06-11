@@ -47,6 +47,9 @@ function EditExpense() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
+  const editorRef = useRef<ExpenseEditorRef>(null);
+  const latestExpenseRef = useRef<Expense | null>(expense);
+  const draftUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
@@ -54,17 +57,9 @@ function EditExpense() {
     goBack: () => history.back(),
   });
 
-  if (!expense) {
-    throw new Error("Expense not found");
+  if (expense) {
+    latestExpenseRef.current = expense;
   }
-
-  const editorRef = useRef<ExpenseEditorRef>(null);
-  const latestExpenseRef = useRef(expense);
-  const draftUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const editableExpense = getEditableExpense(expense);
-  const photos = editableExpense.photos;
-
-  latestExpenseRef.current = expense;
 
   function clearScheduledDraftUpdate() {
     if (draftUpdateTimerRef.current) {
@@ -78,6 +73,11 @@ function EditExpense() {
 
     draftUpdateTimerRef.current = setTimeout(() => {
       const baseExpense = latestExpenseRef.current;
+
+      if (!baseExpense) {
+        return;
+      }
+
       const draft = getExpenseFromFormValues(expenseId, values, baseExpense);
 
       void onUpdateExpense({
@@ -98,7 +98,13 @@ function EditExpense() {
         id: "update-expense",
       });
 
-      const expense = getExpenseFromFormValues(expenseId, values, latestExpenseRef.current);
+      const latestExpense = latestExpenseRef.current;
+
+      if (!latestExpense) {
+        throw new Error("Expense not found");
+      }
+
+      const expense = getExpenseFromFormValues(expenseId, values, latestExpense);
 
       await onUpdateExpense({
         ...expense,
@@ -134,17 +140,29 @@ function EditExpense() {
     }
   }
 
-  const editCopyUpdatedAt = expense.__editCopyLastUpdatedAt?.getTime() ?? 0;
-  const formValues = getFormValues(editableExpense);
-  const expenseName = formValues.name;
+  const editableExpense = expense ? getEditableExpense(expense) : null;
+  const photos = editableExpense?.photos ?? [];
+  const editCopyUpdatedAt = expense?.__editCopyLastUpdatedAt?.getTime() ?? 0;
+  const formValues = editableExpense ? getFormValues(editableExpense) : null;
+  const expenseName = formValues?.name ?? "";
 
   useEffect(() => {
-    editorRef.current?.setValues(getFormValues(getEditableExpense(latestExpenseRef.current)));
-  }, [expense.__hash, editCopyUpdatedAt]);
+    const latestExpense = latestExpenseRef.current;
+
+    if (!latestExpense) {
+      return;
+    }
+
+    editorRef.current?.setValues(getFormValues(getEditableExpense(latestExpense)));
+  }, [expense?.__hash, editCopyUpdatedAt]);
 
   useEffect(() => {
     return clearScheduledDraftUpdate;
   }, []);
+
+  if (!expense || !formValues) {
+    throw new Error("Expense not found");
+  }
 
   return (
     <>

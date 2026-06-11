@@ -132,8 +132,12 @@ export type JazzFateMutationDefinition<TEntity extends JazzFateEntity = JazzFate
   type: TEntity["__typename"];
 };
 
+export type JazzFateLiveDataEvent = {
+  affectedLists: readonly JazzFateAffectedList[];
+};
+
 export type CreateJazzFateTransportOptions<TMutationMap extends JazzFateMutationMap> = {
-  onLiveData?: () => Promise<void> | void;
+  onLiveData?: (event: JazzFateLiveDataEvent) => Promise<void> | void;
   onMutation?: <K extends Extract<keyof TMutationMap, string>>(
     event: JazzFateMutationEvent<TMutationMap, K>,
   ) => Promise<void> | void;
@@ -238,7 +242,15 @@ export function createJazzDbRepository<
         ),
       );
 
-      return rows.map((row) => (row ? toEntity(entity, row as RowLike, select) : null));
+      return rows.map((row, index) =>
+        row
+          ? ensureEntityId(
+              toEntity(entity, withRowId(row as RowLike, ids[index]), select),
+              `by-id ${type}:${String(ids[index])}`,
+              row as RowLike,
+            )
+          : null,
+      );
     },
 
     async fetchList(root, select, args) {
@@ -263,7 +275,11 @@ export function createJazzDbRepository<
 
       return {
         items: visibleRows.map((row) => {
-          const node = toEntity(entity, row as RowLike, select);
+          const node = ensureEntityId(
+            toEntity(entity, row as RowLike, select),
+            `list ${root}`,
+            row as RowLike,
+          );
 
           return {
             cursor: String(node.id),
@@ -409,7 +425,15 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
         throw new Error(`Unsupported Fate entity type: ${type}`);
       }
 
-      return repository.fetchEntities(type, ids, select, normalizeArgs(args));
+      return repository.fetchEntities(type, ids, select, normalizeArgs(args)).then((records) =>
+        records.map((record, index) => {
+          if (record) {
+            return record;
+          }
+
+          throw new Error(`fate-jazz: ${type}:${String(ids[index])} not found`);
+        }),
+      );
     },
 
     fetchList(root, select, args) {
@@ -486,7 +510,7 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
               } else {
                 subscription.handlers.onDelete?.(id);
               }
-              await options.onLiveData?.();
+              await options.onLiveData?.({ affectedLists: [] });
             } catch (error) {
               subscription.handlers.onError?.(error);
             }
@@ -519,10 +543,18 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
       } satisfies JazzFateLiveConnectionSubscription;
       connectionSubscriptions.add(subscription);
       const unsubscribeRemote =
-        repository.subscribeList?.(procedure, subscription.select, subscription.args, () => {
+        repository.subscribeList?.(procedure, subscription.select, subscription.args, async () => {
           try {
             subscription.handlers.onEvent({
               type: "invalidate",
+            });
+            await options.onLiveData?.({
+              affectedLists: [
+                {
+                  args: subscription.args,
+                  root: procedure,
+                },
+              ],
             });
           } catch (error) {
             subscription.handlers.onError?.(error);
@@ -754,6 +786,31 @@ function toEntity<TEntity extends JazzFateEntity>(
     } as TEntity,
     select,
     definition.columns,
+  );
+}
+
+function withRowId(row: RowLike, id: string | number): RowLike {
+  if (typeof row.id === "string" || typeof row.id === "number") {
+    return row;
+  }
+
+  return {
+    ...row,
+    id: String(id),
+  };
+}
+
+function ensureEntityId<TEntity extends JazzFateEntity>(
+  entity: TEntity,
+  source: string,
+  row: RowLike,
+): TEntity {
+  if (typeof entity.id === "string" || typeof entity.id === "number") {
+    return entity;
+  }
+
+  throw new Error(
+    `fate-jazz: Missing id while reading ${source}. Row keys: ${Object.keys(row).join(", ")}`,
   );
 }
 

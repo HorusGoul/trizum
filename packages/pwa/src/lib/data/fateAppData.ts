@@ -12,6 +12,7 @@ import {
   type MediaFileEntity,
   type ParticipantEntity,
   type PartyEntity,
+  type PartyMemberEntity,
   type TrizumFateClient,
   type UserEntity,
 } from "@trizum/data";
@@ -167,6 +168,31 @@ export async function upsertPartyMember(
   throwMutationError(result.error);
 
   return result.result;
+}
+
+export async function ensurePartyMemberForSelection(
+  client: TrizumFateClient,
+  userId: string,
+  partyId: string,
+) {
+  const existing = await readPartyMember(client, userId, partyId);
+
+  if (existing) {
+    return existing;
+  }
+
+  const input = {
+    id: getPartyMemberId(userId, partyId),
+    partyId,
+    role: "editor" as const,
+    userId,
+  };
+  const result = await client.mutations.partyMember.create({
+    input,
+    view: PartyMemberView,
+  });
+
+  return expectMutationResult(result, "partyMember.create did not return a result");
 }
 
 export async function upsertJoinedParty(
@@ -355,6 +381,39 @@ export async function readParty(
   return result.status === "found" ? result.value : undefined;
 }
 
+export async function waitForPartyInFate(
+  client: TrizumFateClient,
+  partyId: string,
+  options: {
+    minParticipants?: number;
+    timeoutMs?: number;
+  } = {},
+): Promise<Party | undefined> {
+  const minParticipants = options.minParticipants ?? 0;
+  const retryUntil = Date.now() + (options.timeoutMs ?? 8_000);
+
+  while (true) {
+    const result = await readPartyResult(client, partyId);
+
+    if (
+      result.status === "found" &&
+      Object.keys(result.value.participants).length >= minParticipants
+    ) {
+      return result.value;
+    }
+
+    if (result.status === "error") {
+      throw result.error;
+    }
+
+    if (Date.now() >= retryUntil) {
+      return result.status === "found" ? result.value : undefined;
+    }
+
+    await sleep(250);
+  }
+}
+
 export async function readPartyResult(
   client: TrizumFateClient,
   partyId: string,
@@ -448,6 +507,27 @@ async function readJoinedParties(client: TrizumFateClient, userId: string) {
   await notifyFateReadComplete(client);
 
   return joinedPartyEntities;
+}
+
+async function readPartyMember(
+  client: TrizumFateClient,
+  userId: string,
+  partyId: string,
+): Promise<PartyMemberEntity | undefined> {
+  try {
+    const { partyMember } = await client.request({
+      partyMember: {
+        id: getPartyMemberId(userId, partyId),
+        view: PartyMemberView,
+      },
+    });
+    const snapshot = await client.readView(PartyMemberView, partyMember);
+    await notifyFateReadComplete(client);
+
+    return snapshot.data as unknown as PartyMemberEntity;
+  } catch {
+    return undefined;
+  }
 }
 
 async function readPartySettings(client: TrizumFateClient, partyId: string) {
@@ -729,6 +809,10 @@ function toDate(value: Date | number | string | null | undefined) {
 
 function toTimestamp(value: Date | number | string | null | undefined) {
   return toDate(value)?.getTime();
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function throwMutationError(error: unknown) {

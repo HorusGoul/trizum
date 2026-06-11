@@ -236,6 +236,44 @@ describe("Jazz DB repository", () => {
       },
     ]);
   });
+
+  test("restores requested ids on by-id reads when Jazz omits id from the row", async () => {
+    const table = {
+      select: () => table,
+      where: () => table,
+    };
+    const repository = createJazzDbRepository<NoteEntity>({
+      db: {
+        async all() {
+          throw new Error("all is not used by this test");
+        },
+        insert() {
+          throw new Error("insert is not used by this test");
+        },
+        async one() {
+          return {
+            title: "Roadmap",
+          };
+        },
+      } as unknown as JazzFateDb,
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+    });
+
+    await expect(repository.fetchEntities("Note", ["note-1"], ["id", "title"])).resolves.toEqual([
+      {
+        __typename: "Note",
+        id: "note-1",
+        title: "Roadmap",
+      },
+    ]);
+  });
 });
 
 describe("Fate Jazz transport", () => {
@@ -352,7 +390,7 @@ describe("Fate Jazz transport", () => {
     unsubscribe?.();
   });
 
-  test("invalidates live list connections when Jazz subscriptions change", () => {
+  test("invalidates and refreshes live list connections when Jazz subscriptions change", async () => {
     const repository = createMemoryRepository();
     let emitRemoteChange: (() => void) | undefined;
     const unsubscribeRemote = vi.fn<() => void>();
@@ -363,12 +401,17 @@ describe("Fate Jazz transport", () => {
         return unsubscribeRemote;
       },
     );
-    const transport = createJazzFateTransport<MutationMap>(repository);
+    const liveDataEvents: unknown[] = [];
+    const transport = createJazzFateTransport<MutationMap>(repository, {
+      onLiveData(event) {
+        liveDataEvents.push(event);
+      },
+    });
     const events: unknown[] = [];
     const unsubscribe = transport.subscribeConnection?.(
       "notes",
       "Note",
-      {},
+      { projectId: "project-1" },
       new Set(["id", "title"]),
       undefined,
       {
@@ -381,6 +424,13 @@ describe("Fate Jazz transport", () => {
     emitRemoteChange?.();
 
     expect(events).toStrictEqual([{ type: "invalidate" }]);
+    await vi.waitFor(() =>
+      expect(liveDataEvents).toStrictEqual([
+        {
+          affectedLists: [{ args: { projectId: "project-1" }, root: "notes" }],
+        },
+      ]),
+    );
 
     unsubscribe?.();
 

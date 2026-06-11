@@ -71,14 +71,21 @@ export function usePartyList() {
   }, [partyList.hue]);
 
   async function addPartyToList(partyId: Party["id"], participantId: PartyParticipant["id"]) {
-    await upsertPartyMember(client, userId, partyId, participantId);
-    await saveJoinedParty(partyId, {
+    const joinedParty = saveJoinedParty(partyId, {
       isArchived: false,
       isPinned: partyList.pinnedParties?.[partyId] === true,
       joinedAt: new Date(),
       lastUsedAt: new Date(),
       participantId,
     });
+
+    try {
+      await upsertPartyMember(client, userId, partyId, participantId);
+      await joinedParty;
+    } catch (error) {
+      await joinedParty.catch(() => undefined);
+      throw error;
+    }
   }
 
   async function removeParty(partyId: Party["id"]) {

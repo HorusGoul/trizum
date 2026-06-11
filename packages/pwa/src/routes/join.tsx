@@ -12,6 +12,15 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
 import { toast } from "sonner";
+import {
+  ensurePartyMemberForSelection,
+  readParty,
+  waitForPartyInFate,
+} from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
+import { getLogger } from "#src/lib/log.ts";
+
+const logger = getLogger("routes", "Join");
 
 interface JoinSearchParams {
   scanning?: boolean;
@@ -29,6 +38,7 @@ interface JoinFormValues {
 }
 
 function Join() {
+  const { client, hasRemoteSync, settledClient, userId } = useTrizumData();
   const router = useRouter();
   const navigate = useNavigate({ from: Route.fullPath });
   const { scanning } = Route.useSearch();
@@ -55,12 +65,7 @@ function Join() {
     // At this point validation already passed, partyId should exist
     if (!partyId) return;
 
-    void navigate({
-      to: "/party/$partyId/who",
-      replace: true,
-      params: { partyId },
-      search: { redirectTo: `/party/${partyId}?tab=expenses` },
-    });
+    void navigateToPartySelection(partyId);
   }
 
   function validateId(id: string) {
@@ -73,7 +78,7 @@ function Join() {
     }
   }
 
-  function onJoinParty(value: JoinFormValues) {
+  async function onJoinParty(value: JoinFormValues) {
     let partyId: string;
 
     const isUrl = value.id.includes("/");
@@ -88,7 +93,20 @@ function Join() {
       toast.error(isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`);
       return;
     }
-    void navigate({
+
+    await navigateToPartySelection(partyId);
+  }
+
+  async function navigateToPartySelection(partyId: string) {
+    try {
+      await preparePartySelection(partyId);
+    } catch (error) {
+      logger.warning("Failed to prepare party selection", { error, partyId });
+      toast.error(t`Could not join that trizum. Check the code and try again.`);
+      return;
+    }
+
+    await navigate({
       to: "/party/$partyId/who",
       replace: true,
       params: {
@@ -100,12 +118,29 @@ function Join() {
     });
   }
 
+  async function preparePartySelection(partyId: string) {
+    const writeClient = hasRemoteSync && settledClient ? settledClient : client;
+
+    await ensurePartyMemberForSelection(writeClient, userId, partyId);
+
+    const party =
+      hasRemoteSync && settledClient
+        ? await waitForPartyInFate(settledClient, partyId, { timeoutMs: 15_000 })
+        : await readParty(client, partyId);
+
+    if (!party) {
+      throw new Error(`Party ${partyId} was not found`);
+    }
+
+    await readParty(client, partyId);
+  }
+
   const form = useForm({
     defaultValues: {
       id: "",
     },
     onSubmit: ({ value }) => {
-      onJoinParty(value);
+      return onJoinParty(value);
     },
   });
 
@@ -188,7 +223,7 @@ function Join() {
                 isDisabled={!canSubmit || isSubmitting}
                 className="gap-2"
               >
-                <Trans>Join</Trans>
+                {isSubmitting ? <Trans>Joining...</Trans> : <Trans>Join</Trans>}
               </Button>
             )}
           </form.Subscribe>

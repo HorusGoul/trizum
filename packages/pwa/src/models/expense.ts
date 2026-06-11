@@ -526,6 +526,10 @@ export function mergeBalancesByParticipant(
 }
 
 function calculateVisualRatioForBalances(balances: Balance[]) {
+  if (balances.length === 0) {
+    return balances;
+  }
+
   const biggestAbsoluteBalance = balances.reduce((prev, next) => {
     const prevAbs = Math.abs(prev.stats.balance);
     const nextAbs = Math.abs(next.stats.balance);
@@ -535,6 +539,14 @@ function calculateVisualRatioForBalances(balances: Balance[]) {
 
   // Biggest absolute balance should be considered as the reference point (1)
   const referenceBalance = biggestAbsoluteBalance.stats.balance;
+
+  if (referenceBalance === 0) {
+    for (const balance of balances) {
+      balance.visualRatio = 0;
+    }
+
+    return balances;
+  }
 
   // Use the reference balance to calculate the visual ratio of each balance
   for (const balance of balances) {

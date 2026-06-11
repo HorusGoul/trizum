@@ -19,7 +19,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
-import { createPartyInFate } from "#src/lib/data/fateAppData.ts";
+import { createPartyInFate, readParty, waitForPartyInFate } from "#src/lib/data/fateAppData.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 
 export const Route = createFileRoute("/new")({
@@ -41,7 +41,7 @@ interface NewPartyFormValues {
 }
 
 function New() {
-  const { client, userId } = useTrizumData();
+  const { client, hasRemoteSync, settledClient, userId } = useTrizumData();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
 
@@ -52,8 +52,9 @@ function New() {
       ...participant,
       id: crypto.randomUUID(),
     }));
+    const writeClient = hasRemoteSync && settledClient ? settledClient : client;
     const party = await createPartyInFate({
-      client,
+      client: writeClient,
       userId,
       values: {
         currency: values.currency,
@@ -63,6 +64,15 @@ function New() {
         symbol: values.symbol,
       },
     });
+    await readParty(client, party.id);
+
+    if (hasRemoteSync && settledClient) {
+      await waitForPartyInFate(settledClient, party.id, {
+        minParticipants: participants.length,
+        timeoutMs: 15_000,
+      });
+    }
+
     await navigate({
       to: "/party/$partyId/who",
       params: { partyId: party.id },

@@ -72,7 +72,7 @@ export const trizumJazzPermissions = definePermissions(
       policy.participants.allowInsert.where(allowedTo.update("partyId")),
       policy.participants.allowUpdate
         .whereOld(allowedTo.read("partyId"))
-        .whereNew(allowedTo.update("partyId")),
+        .whereNew(allowedTo.read("partyId")),
       policy.participants.allowDelete.where(allowedTo.update("partyId")),
 
       policy.mediaFiles.allowRead.where(
