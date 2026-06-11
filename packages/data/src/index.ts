@@ -79,6 +79,7 @@ export {
   createJazzFateDb,
   createJazzFateTransport,
   projectEntity,
+  refreshJazzFateCache,
   resolveJazzFateAuthConfig,
   subscribeToJazzFateCacheUpdates,
   type AnonymousGuestAuth,

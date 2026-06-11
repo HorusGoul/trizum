@@ -5,6 +5,7 @@ import { useParty } from "#src/hooks/useParty.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { usePartyParticipants } from "#src/hooks/usePartyParticipants.js";
 import { guardPartyExists } from "#src/lib/guards.js";
+import { getLogger } from "#src/lib/log.ts";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
@@ -14,6 +15,8 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Suspense, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
+
+const logger = getLogger("routes", "Who");
 
 interface WhoSearchParams {
   redirectTo?: string;
@@ -58,10 +61,14 @@ function Who() {
     await addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
-      await setParticipantDetails(participant.id, {
-        phone: partyList.phone,
-        avatarId: partyList.avatarId,
-      });
+      try {
+        await setParticipantDetails(participant.id, {
+          phone: partyList.phone,
+          avatarId: partyList.avatarId,
+        });
+      } catch (error) {
+        logger.warning("Failed to copy user profile details to joined participant", { error });
+      }
 
       toast.success(t`Welcome to the party, ${participantName}!`);
     } else {

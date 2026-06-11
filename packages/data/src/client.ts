@@ -50,6 +50,9 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
   let client: ReturnType<typeof createClient<[typeof trizumFateRoots, typeof trizumFateMutations]>>;
 
   const transport = createJazzFateTransport(repository, {
+    async onLiveData() {
+      await refreshJazzFateCache(client, []);
+    },
     async onMutation({ affectedLists }) {
       await refreshJazzFateCache(client, affectedLists);
     },
@@ -99,14 +102,17 @@ export async function createLocalFirstTrizumDataClient(
     driver: options.driver,
   });
   const hasRemoteSync = Boolean(options.serverUrl);
-  const repository = createTrizumJazzRepository(repositoryDb);
+  const remoteLiveQueryOptions = hasRemoteSync
+    ? {
+        localUpdates: "immediate" as const,
+        tier: "edge" as const,
+      }
+    : undefined;
+  const repository = createTrizumJazzRepository(repositoryDb, {
+    subscriptionQueryOptions: remoteLiveQueryOptions,
+  });
   const settledRepository = createTrizumJazzRepository(repositoryDb, {
-    queryOptions: hasRemoteSync
-      ? {
-          localUpdates: "immediate",
-          tier: "edge",
-        }
-      : undefined,
+    queryOptions: remoteLiveQueryOptions,
   });
 
   await ensureLocalFirstUser(repository, userId);
@@ -121,7 +127,7 @@ export async function createLocalFirstTrizumDataClient(
 }
 
 export type { JazzFateAuth };
-export { subscribeToJazzFateCacheUpdates };
+export { refreshJazzFateCache, subscribeToJazzFateCacheUpdates };
 
 function getAuthenticatedUserId(authState: {
   session: {

@@ -5,6 +5,7 @@ import {
   ParticipantView,
   PartyMemberView,
   PartySettingsView,
+  refreshJazzFateCache,
   UserSettingsView,
   type ExpenseEntity,
   type JoinedPartyEntity,
@@ -138,13 +139,27 @@ export async function upsertPartyMember(
   participantId: string,
   role: "editor" | "owner" | "viewer" = "editor",
 ) {
+  const input = {
+    id: getPartyMemberId(userId, partyId),
+    participantId,
+    partyId,
+    role,
+    userId,
+  };
+  const created = await tryCreateMutation(() =>
+    client.mutations.partyMember.create({
+      input,
+      view: PartyMemberView,
+    }),
+  );
+
+  if (created) {
+    return created;
+  }
+
   const result = await client.mutations.partyMember.upsert({
     input: {
-      id: getPartyMemberId(userId, partyId),
-      participantId,
-      partyId,
-      role,
-      userId,
+      ...input,
     },
     view: PartyMemberView,
   });
@@ -166,17 +181,29 @@ export async function upsertJoinedParty(
     participantId?: string;
   },
 ) {
+  const input = {
+    id: getJoinedPartyId(userId, partyId),
+    isArchived: values.isArchived,
+    isPinned: values.isArchived ? false : values.isPinned,
+    joinedAt: values.joinedAt,
+    lastUsedAt: values.lastUsedAt,
+    participantId: values.participantId,
+    partyId,
+    userId,
+  };
+  const created = await tryCreateMutation(() =>
+    client.mutations.joinedParty.create({
+      input,
+      view: JoinedPartyView,
+    }),
+  );
+
+  if (created) {
+    return created;
+  }
+
   const result = await client.mutations.joinedParty.upsert({
-    input: {
-      id: getJoinedPartyId(userId, partyId),
-      isArchived: values.isArchived,
-      isPinned: values.isArchived ? false : values.isPinned,
-      joinedAt: values.joinedAt,
-      lastUsedAt: values.lastUsedAt,
-      participantId: values.participantId,
-      partyId,
-      userId,
-    },
+    input,
     view: JoinedPartyView,
   });
 
@@ -356,6 +383,7 @@ export async function readExpenseByIdResult(
       },
     });
     const snapshot = await client.readView(ExpenseListItemView, expense);
+    await notifyFateReadComplete(client);
 
     return {
       status: "found",
@@ -375,6 +403,7 @@ async function readUserSettings(client: TrizumFateClient, userId: string) {
       },
     });
     const snapshot = await client.readView(UserSettingsView, user);
+    await notifyFateReadComplete(client);
 
     return snapshot.data as unknown as UserEntity;
   } catch {
@@ -390,13 +419,16 @@ async function readJoinedParties(client: TrizumFateClient, userId: string) {
     },
   });
 
-  return Promise.all(
+  const joinedPartyEntities = await Promise.all(
     joinedParties.map(async (joinedParty) => {
       const snapshot = await client.readView(JoinedPartyView, joinedParty);
 
       return snapshot.data as unknown as JoinedPartyEntity;
     }),
   );
+  await notifyFateReadComplete(client);
+
+  return joinedPartyEntities;
 }
 
 async function readPartySettings(client: TrizumFateClient, partyId: string) {
@@ -417,6 +449,7 @@ async function readPartySettingsResult(
       },
     });
     const snapshot = await client.readView(PartySettingsView, party);
+    await notifyFateReadComplete(client);
 
     return {
       status: "found",
@@ -452,6 +485,7 @@ async function readParticipantsResult(
         return snapshot.data as unknown as ParticipantEntity;
       }),
     );
+    await notifyFateReadComplete(client);
 
     return {
       status: participantEntities.length === 0 ? "empty" : "found",
@@ -555,7 +589,7 @@ export function toPartyParticipant(participant: ParticipantEntity): PartyPartici
 
 export function toExpense(entity: ExpenseEntity): Expense {
   const expense: Expense = {
-    __editCopy: entity.editCopy as unknown as Expense["__editCopy"],
+    __editCopy: toExpenseEditCopy(entity.editCopy),
     __editCopyLastUpdatedAt: toDate(entity.editCopyLastUpdatedAt),
     __hash: entity.hash ?? "",
     id: entity.id,
@@ -572,6 +606,19 @@ export function toExpense(entity: ExpenseEntity): Expense {
   }
 
   return expense;
+}
+
+function toExpenseEditCopy(value: ExpenseEntity["editCopy"]): Expense["__editCopy"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const editCopy = value as unknown as Omit<Expense, "__editCopy">;
+
+  return {
+    ...editCopy,
+    paidAt: toDate(editCopy.paidAt) ?? new Date(),
+  };
 }
 
 export function toMediaFile(entity: MediaFileEntity): MediaFile {
@@ -681,6 +728,16 @@ function expectMutationResult<T>(result: MutationResult<T>, message: string): T 
   return result.result;
 }
 
+async function tryCreateMutation<T>(create: () => Promise<MutationResult<T>>) {
+  try {
+    const result = await create();
+
+    return result.error ? undefined : result.result;
+  } catch {
+    return undefined;
+  }
+}
+
 function readErrorAsNotFound(error: unknown): DataReadResult<never> {
   if (error instanceof Error) {
     return {
@@ -692,4 +749,8 @@ function readErrorAsNotFound(error: unknown): DataReadResult<never> {
     error,
     status: "error",
   };
+}
+
+async function notifyFateReadComplete(client: TrizumFateClient) {
+  await refreshJazzFateCache(client, []);
 }

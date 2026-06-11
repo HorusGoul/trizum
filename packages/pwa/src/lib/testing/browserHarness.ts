@@ -1,6 +1,12 @@
 import type { TrizumFateClient } from "@trizum/data";
 import type { SupportedLocale } from "#src/lib/i18n.js";
-import { readPartyList, upsertJoinedParty, upsertUserSettings } from "#src/lib/data/fateAppData.ts";
+import {
+  readExpenseById,
+  readPartyList,
+  upsertJoinedParty,
+  upsertUserSettings,
+} from "#src/lib/data/fateAppData.ts";
+import type { Expense } from "#src/models/expense.js";
 import type { PartyList } from "#src/models/partyList.js";
 
 export interface InternalPartyListSeed {
@@ -94,6 +100,16 @@ export async function readPartyListState({
       ...partyList.participantInParties,
     },
   };
+}
+
+export async function readExpenseState({
+  client,
+  expenseId,
+}: {
+  client: TrizumFateClient;
+  expenseId: Expense["id"];
+}) {
+  return (await readExpenseById(client, expenseId)) ?? null;
 }
 
 function toDate(value: number | undefined) {

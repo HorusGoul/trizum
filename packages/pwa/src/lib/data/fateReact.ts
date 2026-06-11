@@ -1,6 +1,7 @@
 import {
   ConnectionTag,
   getListEntries,
+  subscribeToJazzFateCacheUpdates,
   toEntityId,
   type ConnectionMetadata,
   type List,
@@ -105,12 +106,11 @@ export function useFateView<T extends { __typename: string }>(
 ): T {
   const { client } = useTrizumData();
   const snapshot = use(client.readView(view, ref));
-
-  useSubscriptionVersion((change) =>
+  const subscriptionVersion = useSubscriptionVersion((change) =>
     subscribeToView(client, view, ref, snapshot, options.live === true, change),
   );
 
-  return readCachedViewData(client, view, ref, snapshot);
+  return readCachedViewData(client, view, ref, snapshot, subscriptionVersion);
 }
 
 export function useFateLiveViews<T extends { __typename: string }>(
@@ -124,9 +124,13 @@ export function useFateLiveViews<T extends { __typename: string }>(
     snapshots.push(use(client.readView(view, ref)));
   }
 
-  useSubscriptionVersion((change) => subscribeToViews(client, view, refs, snapshots, true, change));
+  const subscriptionVersion = useSubscriptionVersion((change) =>
+    subscribeToViews(client, view, refs, snapshots, true, change),
+  );
 
-  return refs.map((ref, index) => readCachedViewData(client, view, ref, snapshots[index]!));
+  return refs.map((ref, index) =>
+    readCachedViewData(client, view, ref, snapshots[index]!, subscriptionVersion),
+  );
 }
 
 export function useFateLiveListView<T extends { __typename: string }>(
@@ -141,8 +145,10 @@ export function useFateLiveListView<T extends { __typename: string }>(
   useSubscriptionVersion((change) => {
     const unsubscribeList = getFateStore(client).subscribeList(metadata.key, change);
     const unsubscribeLive = client.subscribeLiveListView(nodeView, metadata);
+    const unsubscribeCacheUpdate = subscribeToJazzFateCacheUpdates(client, change);
 
     return () => {
+      unsubscribeCacheUpdate();
       unsubscribeLive();
       unsubscribeList();
     };
@@ -191,6 +197,7 @@ function subscribeToRequest(
   const retain = client.retainRequestKey(requestKey, mode);
   const handle = internals.requests?.get(requestKey)?.get(mode ?? "cache-first");
   const store = getFateStore(client);
+  const unsubscribeCacheUpdate = subscribeToJazzFateCacheUpdates(client, change);
   const unsubscribe = (handle?.descriptor?.items ?? []).flatMap((item) => {
     if (item.kind === "list" && item.listKey) {
       return [store.subscribeList(item.listKey, change)];
@@ -212,6 +219,8 @@ function subscribeToRequest(
   });
 
   return () => {
+    unsubscribeCacheUpdate();
+
     for (const unsubscribeItem of unsubscribe ?? []) {
       unsubscribeItem();
     }
@@ -233,8 +242,10 @@ function subscribeToView<T extends { __typename: string }>(
     store.subscribe(id, new Set(paths), change),
   );
   const unsubscribeLive = live ? client.subscribeLiveView(view, ref) : undefined;
+  const unsubscribeCacheUpdate = live ? subscribeToJazzFateCacheUpdates(client, change) : undefined;
 
   return () => {
+    unsubscribeCacheUpdate?.();
     unsubscribeLive?.();
 
     for (const unsubscribe of unsubscribeRecords) {
@@ -267,10 +278,31 @@ function readCachedViewData<T extends { __typename: string }>(
   view: View<T, any>,
   ref: ViewRef<T["__typename"]>,
   fallback: ViewSnapshot<T, any>,
+  subscriptionVersion: number,
 ): T {
-  const snapshot = client.readView(view, ref);
+  const snapshot = client.readView(view, subscriptionVersion > 0 ? cloneViewRef(ref) : ref);
 
   return ("value" in snapshot ? snapshot.value.data : fallback.data) as T;
+}
+
+function cloneViewRef<TTypename extends string>(ref: ViewRef<TTypename>): ViewRef<TTypename> {
+  const clone = {
+    __typename: ref.__typename,
+    id: ref.id,
+  } as ViewRef<TTypename>;
+  const symbolSource = ref as Record<symbol, unknown>;
+
+  // Fate stores view names on a hidden symbol; copy it so a fresh ref still passes view validation.
+  for (const symbol of Object.getOwnPropertySymbols(ref)) {
+    Object.defineProperty(clone, symbol, {
+      configurable: false,
+      enumerable: false,
+      value: symbolSource[symbol],
+      writable: false,
+    });
+  }
+
+  return Object.freeze(clone);
 }
 
 function toListResult<T extends { __typename: string }>(

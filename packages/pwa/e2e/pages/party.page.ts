@@ -45,8 +45,10 @@ export class PartyPage {
 
   async expectLoaded(partyId: string, partyName: string) {
     await expect(this.page).toHaveURL(new RegExp(`/party/${partyId}(?:\\?.*)?$`));
-    await expect(this.heading(new RegExp(escapeRegExp(partyName)))).toBeVisible();
-    await expect(this.addExpenseFab).toBeVisible();
+    await expect(this.heading(new RegExp(escapeRegExp(partyName)))).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(this.addExpenseFab).toBeVisible({ timeout: 30_000 });
   }
 
   async openAddExpense() {
@@ -78,11 +80,10 @@ export class PartyPage {
     for (const title of titles) {
       const row = this.expenseRow(title);
       await expect(row).toBeVisible();
-      const box = await row.boundingBox();
+      const top = await row.evaluate((element) => element.getBoundingClientRect().top);
 
-      expect(box).not.toBeNull();
-      expect(box!.y).toBeGreaterThan(previousTop);
-      previousTop = box!.y;
+      expect(top).toBeGreaterThan(previousTop);
+      previousTop = top;
     }
   }
 

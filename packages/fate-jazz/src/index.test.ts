@@ -260,6 +260,47 @@ describe("Fate Jazz transport", () => {
     });
   });
 
+  test("forwards the first Jazz subscription snapshot", () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Initial", 1)]);
+    const unsubscribe = vi.fn<() => void>();
+    const db = {
+      ...createFakeNoteDb(table),
+      subscribeAll(query: unknown, callback: (delta: unknown) => void) {
+        callback({
+          all: (query as FakeNoteQuery).execute(),
+          delta: [],
+        });
+
+        return unsubscribe;
+      },
+    } as unknown as JazzFateDb;
+    const repository = createJazzDbRepository<NoteEntity>({
+      db,
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+    });
+    const onChange = vi.fn<() => void>();
+    const dispose = repository.subscribeEntities?.(
+      "Note",
+      ["note-1"],
+      ["id", "title"],
+      {},
+      onChange,
+    );
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+
+    dispose?.();
+
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
+  });
+
   test("projects mutation output to the Fate selection", async () => {
     const repository = createMemoryRepository();
     const transport = createJazzFateTransport<MutationMap>(repository);
@@ -431,6 +472,25 @@ describe("projectEntity", () => {
       ),
     ).toStrictEqual({
       __typename: "Note",
+      id: "note-1",
+      title: "Roadmap",
+    });
+  });
+
+  test("keeps selected optional fields covered when the source row omits them", () => {
+    expect(
+      projectEntity<NoteEntity>(
+        {
+          __typename: "Note",
+          id: "note-1",
+          title: "Roadmap",
+        },
+        ["id", "body", "privateMemo", "title"],
+        ["id", "body", "title"],
+      ),
+    ).toStrictEqual({
+      __typename: "Note",
+      body: undefined,
       id: "note-1",
       title: "Roadmap",
     });

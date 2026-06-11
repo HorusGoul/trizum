@@ -31,6 +31,7 @@ import { configurePwaLogging } from "./lib/log.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import { TrizumDataContext } from "./lib/data/TrizumDataContext.ts";
 import {
+  readExpenseState,
   readPartyListState,
   seedPartyListState,
   type InternalPartyListSeed,
@@ -115,6 +116,10 @@ declare global {
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
     __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
+    __internal_readExpenseState: (
+      expenseId: string,
+      mode?: "cache" | "settled",
+    ) => Promise<unknown>;
   }
 }
 
@@ -140,6 +145,16 @@ window.__internal_readPartyListState = async () => {
   return readPartyListState({
     client: trizumData.client,
     userId: trizumData.userId,
+  });
+};
+
+window.__internal_readExpenseState = async (
+  expenseId: string,
+  mode: "cache" | "settled" = "cache",
+) => {
+  return readExpenseState({
+    client: mode === "settled" ? trizumData.settledClient : trizumData.client,
+    expenseId,
   });
 };
 

@@ -91,7 +91,7 @@ export interface JazzFateRepository<
     ids: Array<string | number>,
     select: Iterable<string>,
     args: Record<string, unknown> | undefined,
-    onChange: () => void,
+    onChange: (records?: TEntity[]) => void,
   ): () => void;
   subscribeList?(
     root: string,
@@ -133,6 +133,7 @@ export type JazzFateMutationDefinition<TEntity extends JazzFateEntity = JazzFate
 };
 
 export type CreateJazzFateTransportOptions<TMutationMap extends JazzFateMutationMap> = {
+  onLiveData?: () => Promise<void> | void;
   onMutation?: <K extends Extract<keyof TMutationMap, string>>(
     event: JazzFateMutationEvent<TMutationMap, K>,
   ) => Promise<void> | void;
@@ -204,6 +205,7 @@ export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzF
   lists: readonly JazzFateListDefinition<TEntity>[];
   mutations?: readonly JazzFateMutationDefinition<TEntity>[];
   queryOptions?: QueryOptions;
+  subscriptionQueryOptions?: QueryOptions;
 };
 
 type RowLike = Record<string, unknown> & { id: string };
@@ -219,6 +221,7 @@ export function createJazzDbRepository<
   lists,
   mutations = [],
   queryOptions = defaultQueryOptions,
+  subscriptionQueryOptions = queryOptions,
 }: CreateJazzDbRepositoryOptions<TEntity>): JazzFateRepository<TEntity, TMutationMap> {
   const entityByType = new Map(entities.map((entity) => [entity.type, entity]));
   const listByRoot = new Map(lists.map((list) => [list.root, list]));
@@ -368,8 +371,10 @@ export function createJazzDbRepository<
         subscribeToQueryChanges(
           db,
           selectColumns(where(entity.table, { id: String(id) }), entity, select),
-          queryOptions,
-          onChange,
+          subscriptionQueryOptions,
+          (rows) => {
+            onChange(rows.map((row) => toEntity(entity, row, select)));
+          },
         ),
       );
 
@@ -392,7 +397,7 @@ export function createJazzDbRepository<
       );
       const query = list.orderBy ? baseQuery : applyOffsetPagination(baseQuery, pagination);
 
-      return subscribeToQueryChanges(db, query, queryOptions, onChange);
+      return subscribeToQueryChanges(db, query, subscriptionQueryOptions, onChange);
     },
   };
 }
@@ -471,20 +476,23 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
           [id],
           subscription.select,
           subscription.args,
-          async () => {
+          async (records) => {
             try {
-              const [record] = await repository.fetchEntities(
-                type,
-                [id],
-                subscription.select,
-                subscription.args,
-              );
+              const [record] =
+                records ??
+                (await repository.fetchEntities(
+                  type,
+                  [id],
+                  subscription.select,
+                  subscription.args,
+                ));
 
               if (record) {
                 subscription.handlers.onData(record, subscription.select);
               } else {
                 subscription.handlers.onDelete?.(id);
               }
+              await options.onLiveData?.();
             } catch (error) {
               subscription.handlers.onError?.(error);
             }
@@ -638,8 +646,8 @@ export function projectEntity<TEntity extends JazzFateEntity>(
   };
 
   for (const field of selected) {
-    if (field in entity && field !== "id" && field !== "__typename") {
-      projected[field] = entity[field];
+    if (field !== "id" && field !== "__typename") {
+      projected[field] = field in entity ? entity[field] : undefined;
     }
   }
 
@@ -955,19 +963,12 @@ function subscribeToQueryChanges(
   db: JazzFateDb,
   query: QueryBuilder<RowLike>,
   queryOptions: QueryOptions,
-  onChange: () => void,
+  onChange: (rows: RowLike[]) => void,
 ) {
-  let deliveredInitialSnapshot = false;
-
   return db.subscribeAll(
     query,
-    () => {
-      if (!deliveredInitialSnapshot) {
-        deliveredInitialSnapshot = true;
-        return;
-      }
-
-      onChange();
+    (delta) => {
+      onChange(delta.all as RowLike[]);
     },
     queryOptions,
   );
