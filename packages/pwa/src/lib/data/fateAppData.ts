@@ -426,6 +426,24 @@ export async function upsertExpenseInFate(
   return toExpense(expectMutationResult(result, "expense.upsert did not return a result"));
 }
 
+export async function updateExpenseDraftInFate(
+  client: TrizumFateClient,
+  _partyId: string,
+  expense: Expense,
+) {
+  const result = await client.mutations.expense.updateDraft({
+    input: {
+      editCopy: (expense.__editCopy ?? null) as JsonLike,
+      editCopyLastUpdatedAt: expense.__editCopyLastUpdatedAt ?? null,
+      id: expense.id,
+      updatedAt: new Date(),
+    },
+    view: ExpenseListItemView,
+  });
+
+  return toExpense(expectMutationResult(result, "expense.updateDraft did not return a result"));
+}
+
 export async function deleteExpenseInFate(
   client: TrizumFateClient,
   _partyId: string,

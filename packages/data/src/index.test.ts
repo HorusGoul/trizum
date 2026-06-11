@@ -30,6 +30,7 @@ import {
   type TrizumFateEntity,
   type TrizumFateListRoot,
   type TrizumFateTypename,
+  type UpdateExpenseDraftMutationInput,
   type UpsertExpenseMutationInput,
   type UpsertJoinedPartyMutationInput,
   type UpsertUserMutationInput,
@@ -694,6 +695,64 @@ describe("Fate masking over Trizum Jazz entities", () => {
       name: "Coffee with Bob",
     });
   });
+
+  test("updates realtime expense drafts without overwriting committed fields", async () => {
+    const repository = createMemoryRepository();
+    const client = createTrizumFateClient({ repository });
+
+    await client.mutations.expense.upsert({
+      input: {
+        amount: 12_50,
+        hash: "committed-hash",
+        id: "expense-1",
+        isTransfer: false,
+        name: "Committed coffee",
+        paidAt: new Date("2026-06-10T09:15:00.000Z"),
+        paidBy: { alice: 12_50 },
+        partyId: "party-1",
+        photos: [],
+        shares: { alice: { type: "divide", value: 1 } },
+        updatedAt: new Date("2026-06-10T10:00:00.000Z"),
+      },
+      view: ExpenseListItemView,
+    });
+
+    const draftUpdate = await client.mutations.expense.updateDraft({
+      input: {
+        editCopy: {
+          id: "expense-1",
+          isTransfer: false,
+          name: "Draft coffee",
+          paidAt: "2026-06-10T09:15:00.000Z",
+          paidBy: { alice: 12_50 },
+          photos: [],
+          shares: { alice: { type: "divide", value: 1 } },
+        },
+        editCopyLastUpdatedAt: new Date("2026-06-10T10:01:00.000Z"),
+        id: "expense-1",
+        updatedAt: new Date("2026-06-10T10:01:00.000Z"),
+      },
+      view: ExpenseListItemView,
+    });
+
+    if (draftUpdate.error) {
+      throw draftUpdate.error;
+    }
+
+    expect(draftUpdate.result).toMatchObject({
+      __typename: "Expense",
+      hash: "committed-hash",
+      id: "expense-1",
+      name: "Committed coffee",
+    });
+    expect(draftUpdate.result?.editCopy).toMatchObject({
+      name: "Draft coffee",
+    });
+    expect(repository.expenses[0]).toMatchObject({
+      hash: "committed-hash",
+      name: "Committed coffee",
+    });
+  });
 });
 
 function createMemoryRepository() {
@@ -1007,6 +1066,23 @@ function createMemoryRepository() {
             updatedAt: expenseInput.updatedAt ?? null,
           });
           return projectTrizumEntity(expense, select);
+        }
+        case "expense.updateDraft": {
+          const expenseInput = input as UpdateExpenseDraftMutationInput;
+          const index = expenses.findIndex((expense) => expense.id === expenseInput.id);
+
+          if (index === -1) {
+            throw new Error(`Expense not found: ${expenseInput.id}`);
+          }
+
+          expenses[index] = {
+            ...expenses[index]!,
+            editCopy: expenseInput.editCopy,
+            editCopyLastUpdatedAt: expenseInput.editCopyLastUpdatedAt,
+            updatedAt: expenseInput.updatedAt ?? null,
+          };
+
+          return projectTrizumEntity(expenses[index]!, select);
         }
         default:
           throw new Error(`Unsupported mutation in test: ${String(proc)}`);

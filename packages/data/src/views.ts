@@ -186,6 +186,12 @@ export type UpsertMediaFileMutationInput = CreateMediaFileInput & {
 export type UpsertExpenseMutationInput = CreateExpenseInput & {
   id: string;
 };
+export type UpdateExpenseDraftMutationInput = {
+  editCopy: ExpenseRow["editCopy"] | null;
+  editCopyLastUpdatedAt: ExpenseRow["editCopyLastUpdatedAt"] | null;
+  id: string;
+  updatedAt?: Date | null;
+};
 export type DeleteEntityMutationInput = {
   id: string;
 };
@@ -241,5 +247,8 @@ export const trizumFateMutations = {
   ),
   "expense.create": mutation<ExpenseEntity, CreateExpenseMutationInput, ExpenseEntity>("Expense"),
   "expense.upsert": mutation<ExpenseEntity, UpsertExpenseMutationInput, ExpenseEntity>("Expense"),
+  "expense.updateDraft": mutation<ExpenseEntity, UpdateExpenseDraftMutationInput, ExpenseEntity>(
+    "Expense",
+  ),
   "expense.delete": mutation<ExpenseEntity, DeleteEntityMutationInput, ExpenseEntity>("Expense"),
 };

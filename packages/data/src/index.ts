@@ -68,6 +68,7 @@ export {
   type PartyEntity,
   type TrizumFateEntity,
   type TrizumFateTypename,
+  type UpdateExpenseDraftMutationInput,
   type UpsertExpenseMutationInput,
   type UpsertJoinedPartyMutationInput,
   type UpsertMediaFileMutationInput,

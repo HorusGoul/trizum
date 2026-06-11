@@ -276,6 +276,53 @@ describe("Jazz DB repository", () => {
     ]);
   });
 
+  test("rereads updated rows through the Fate selection when Jazz returns partial values", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table, {
+        updateValue: {
+          id: "note-1",
+          title: "Updated",
+        },
+      }),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "update",
+          proc: "note.update",
+          table,
+          type: "Note",
+        },
+      ],
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.update",
+        {
+          body: "Updated body",
+          createdAt: 2,
+          id: "note-1",
+          projectId: "project-1",
+          title: "Updated",
+        },
+        ["id", "title", "body"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      body: "Updated body",
+      id: "note-1",
+      title: "Updated",
+    });
+  });
+
   test("keeps background writes local when reads target the edge", async () => {
     const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
     const waits: unknown[] = [];
@@ -1392,6 +1439,7 @@ function createNoteRow(id: string, projectId: string, title: string, createdAt: 
 function createFakeNoteDb(
   table: FakeNoteQuery,
   dbOptions: {
+    updateValue?: unknown;
     wait?: (options: { tier: "edge" | "local" }) => Promise<void>;
   } = {},
 ): JazzFateDb {
@@ -1416,6 +1464,7 @@ function createFakeNoteDb(
       table.update(_id, _input as Partial<NoteRow>);
 
       return {
+        value: dbOptions.updateValue,
         wait: dbOptions.wait ?? (async () => {}),
       };
     },

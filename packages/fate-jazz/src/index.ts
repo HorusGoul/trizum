@@ -503,7 +503,7 @@ export function createJazzDbRepository<
         table: mutation.table,
       } satisfies RejectedWriteRollback;
 
-      if (isRowLike(writtenRow.value)) {
+      if (operation !== "update" && isRowLike(writtenRow.value)) {
         const output = toEntity(
           entity,
           withRowId(writtenRow.value, id),

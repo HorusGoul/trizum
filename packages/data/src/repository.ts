@@ -29,6 +29,7 @@ import type {
   PartyEntity,
   TrizumFateEntity,
   TrizumFateTypename,
+  UpdateExpenseDraftMutationInput,
   UserEntity,
   UpsertExpenseMutationInput,
   UpsertJoinedPartyMutationInput,
@@ -111,6 +112,10 @@ export type TrizumFateMutationMap = {
   };
   "expense.upsert": {
     input: UpsertExpenseMutationInput;
+    output: ExpenseEntity;
+  };
+  "expense.updateDraft": {
+    input: UpdateExpenseDraftMutationInput;
     output: ExpenseEntity;
   };
   "expense.delete": {
@@ -373,6 +378,13 @@ export const trizumMutationDefinitions = [
     affectedLists: affectedExpenseLists,
     operation: "upsert",
     proc: "expense.upsert",
+    table: trizumJazzApp.expenses,
+    type: "Expense",
+  },
+  {
+    affectedLists: affectedExpenseLists,
+    operation: "update",
+    proc: "expense.updateDraft",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },

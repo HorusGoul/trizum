@@ -6,7 +6,7 @@ import {
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { usePartyExpense } from "#src/hooks/usePartyExpense.ts";
-import { upsertExpenseInFate } from "#src/lib/data/fateAppData.ts";
+import { updateExpenseDraftInFate, upsertExpenseInFate } from "#src/lib/data/fateAppData.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { getLogger } from "#src/lib/log.ts";
@@ -43,7 +43,8 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
 const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
-  const { expenseId, partyId, expense, isLoading, onUpdateExpense } = useExpense();
+  const { expenseId, partyId, expense, isLoading, onUpdateExpense, onUpdateExpenseDraft } =
+    useExpense();
   const { party } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -81,7 +82,7 @@ function EditExpense() {
 
       const draft = getExpenseFromFormValues(expenseId, values, baseExpense);
 
-      void onUpdateExpense({
+      void onUpdateExpenseDraft({
         ...baseExpense,
         __editCopy: draft,
         __editCopyLastUpdatedAt: new Date(),
@@ -203,12 +204,17 @@ function useExpense() {
     return upsertExpenseInFate(client, partyId, expense);
   }
 
+  function onUpdateExpenseDraft(expense: Expense) {
+    return updateExpenseDraftInFate(client, partyId, expense);
+  }
+
   return {
     partyId,
     expense,
     expenseId,
     isLoading,
     onUpdateExpense,
+    onUpdateExpenseDraft,
   };
 }
 
