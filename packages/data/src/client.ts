@@ -1,6 +1,7 @@
 import { clientRoot, createClient } from "@nkzw/fate";
 import {
   applyJazzFateMutationToCache,
+  applyJazzFateSyncRejectionToCache,
   createJazzFateDb,
   createJazzFateTransport,
   refreshJazzFateCache,
@@ -56,6 +57,9 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
     },
     onMutation(event) {
       applyJazzFateMutationToCache(client, event);
+    },
+    onSyncRejected(event) {
+      applyJazzFateSyncRejectionToCache(client, event);
     },
   });
 
@@ -124,11 +128,6 @@ export async function createLocalFirstTrizumDataClient(
     subscriptionQueryOptions: remoteLiveQueryOptions,
     syncWritesToTier: hasRemoteSync ? "edge" : undefined,
   });
-  const edgeWriteRepository = createTrizumJazzRepository(repositoryDb, {
-    defaultMutationSync: "foreground",
-    queryOptions: remoteSettledQueryOptions,
-    syncWritesToTier: hasRemoteSync ? "edge" : undefined,
-  });
   const settledRepository = createTrizumJazzRepository(repositoryDb, {
     queryOptions: remoteSettledQueryOptions,
   });
@@ -138,7 +137,6 @@ export async function createLocalFirstTrizumDataClient(
   return {
     client: createTrizumFateClient({ repository }),
     db,
-    edgeWriteClient: createTrizumFateClient({ repository: edgeWriteRepository }),
     hasRemoteSync,
     settledClient: createTrizumFateClient({ repository: settledRepository }),
     userId,

@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from "vite-plus/test";
 import type { AuthSecretStore } from "jazz-tools";
 import {
   applyJazzFateMutationToCache,
+  applyJazzFateSyncRejectionToCache,
   createJazzDbRepository,
   createJazzFateTransport,
   projectEntity,
@@ -216,6 +217,26 @@ describe("Jazz DB repository", () => {
     });
     expect(table.calls).toStrictEqual([
       {
+        conditions: {
+          id: "note-2",
+        },
+        method: "where",
+      },
+      {
+        columns: ["id", "body", "createdAt", "projectId", "title"],
+        method: "select",
+      },
+      {
+        conditions: {
+          id: "note-2",
+        },
+        method: "where",
+      },
+      {
+        columns: ["id", "title"],
+        method: "select",
+      },
+      {
         data: {
           body: "Visible details",
           createdAt: 2,
@@ -291,6 +312,135 @@ describe("Jazz DB repository", () => {
     });
 
     expect(waits).toStrictEqual([{ tier: "local" }, { tier: "edge" }]);
+  });
+
+  test("compensates local rows when background edge sync rejects", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table, {
+        wait: async (options) => {
+          if (options.tier === "edge") {
+            throw new Error("server denied write");
+          }
+        },
+      }),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "upsert",
+          proc: "note.upsert",
+          table,
+          type: "Note",
+        },
+      ],
+      syncWritesToTier: "edge",
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.upsert",
+        {
+          body: "Visible details",
+          createdAt: 2,
+          id: "note-2",
+          projectId: "project-1",
+          title: "Draft",
+        },
+        ["id", "title"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-2",
+      title: "Draft",
+    });
+
+    await vi.waitFor(() => expect(table.find("note-2")).toBeUndefined());
+  });
+
+  test("emits sync rejection events with masked rollback data", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const onSyncRejected = vi.fn<(event: unknown) => void>();
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table, {
+        wait: async (options) => {
+          if (options.tier === "edge") {
+            throw new Error("server denied write");
+          }
+        },
+      }),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "upsert",
+          proc: "note.upsert",
+          table,
+          type: "Note",
+        },
+      ],
+      syncWritesToTier: "edge",
+    });
+    const transport = createJazzFateTransport(repository, {
+      onSyncRejected,
+    });
+
+    await expect(
+      transport.mutate?.(
+        "note.upsert",
+        {
+          body: "Updated body",
+          createdAt: 3,
+          id: "note-1",
+          privateMemo: "still hidden",
+          projectId: "project-1",
+          title: "Updated",
+        },
+        new Set(["id", "title", "privateMemo"]),
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-1",
+      title: "Updated",
+    });
+
+    await vi.waitFor(() => expect(onSyncRejected).toHaveBeenCalledTimes(1));
+    expect(onSyncRejected).toHaveBeenCalledWith({
+      affectedLists: [],
+      error: expect.any(Error),
+      input: {
+        body: "Updated body",
+        createdAt: 3,
+        id: "note-1",
+        privateMemo: "still hidden",
+        projectId: "project-1",
+        title: "Updated",
+      },
+      operation: "upsert",
+      output: {
+        __typename: "Note",
+        id: "note-1",
+        title: "Updated",
+      },
+      proc: "note.upsert",
+      rollbackOutput: {
+        __typename: "Note",
+        id: "note-1",
+        title: "Oldest",
+      },
+    });
   });
 
   test("uses returned upsert rows when immediate rereads are unavailable", async () => {
@@ -793,6 +943,55 @@ describe("Fate Jazz transport", () => {
 
     unsubscribe();
   });
+
+  test("removes rejected inserted entities from Fate cache lists", () => {
+    const output = {
+      __typename: "Note",
+      id: "note-1",
+      projectId: "project-1",
+      title: "Draft",
+    } satisfies NoteEntity;
+    const handle = {
+      descriptor: {
+        items: [
+          {
+            argsPayload: { projectId: "project-1" },
+            kind: "list",
+            listKey: "scoped-notes",
+            name: "notes",
+            type: "Note",
+          },
+        ],
+      },
+    };
+    const store = {
+      deleteRecord: vi.fn<(id: string) => void>(),
+      getListState: vi.fn<(key: string) => { cursors: string[]; ids: string[] }>(() => ({
+        cursors: ["note-1"],
+        ids: ["Note:note-1"],
+      })),
+      setList: vi.fn<(key: string, state: { cursors?: string[]; ids: string[] }) => void>(),
+    };
+    const client = {
+      requests: new Map([["notes", new Map([["cache-first", handle]])]]),
+      store,
+    };
+
+    expect(
+      applyJazzFateSyncRejectionToCache(client, {
+        affectedLists: [{ args: { projectId: "project-1" }, root: "notes" }],
+        operation: "insert",
+        output,
+        rollbackOutput: null,
+      }),
+    ).toBe(1);
+
+    expect(store.deleteRecord).toHaveBeenCalledWith("Note:note-1");
+    expect(store.setList).toHaveBeenCalledWith("scoped-notes", {
+      cursors: [],
+      ids: [],
+    });
+  });
 });
 
 describe("projectEntity", () => {
@@ -846,6 +1045,10 @@ type NoteRow = {
 };
 
 type FakeNoteQueryCall =
+  | {
+      id: string;
+      method: "delete";
+    }
   | {
       conditions: Record<string, unknown>;
       method: "where";
@@ -961,6 +1164,23 @@ class FakeNoteQuery {
     return row;
   }
 
+  delete(id: string) {
+    const index = this.rows.findIndex((row) => row.id === id);
+
+    if (index >= 0) {
+      this.rows.splice(index, 1);
+    }
+
+    this.calls.push({
+      id,
+      method: "delete",
+    });
+  }
+
+  find(id: string) {
+    return this.rows.find((row) => row.id === id);
+  }
+
   execute() {
     let rows = this.rows.filter((row) => {
       if (!this.conditions) {
@@ -1033,6 +1253,13 @@ function createFakeNoteDb(
     },
     async one(query: unknown) {
       return (query as FakeNoteQuery).execute().at(0) ?? null;
+    },
+    delete(_table: unknown, id: string) {
+      table.delete(id);
+
+      return {
+        wait: dbOptions.wait ?? (async () => {}),
+      };
     },
     update(_table: unknown, _id: string, _input: unknown) {
       throw new Error("update is not used by this test");

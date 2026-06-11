@@ -30,6 +30,12 @@ type TableProxy = {
 type WriteHandleLike<T = unknown> = T & {
   wait?: (options: Pick<QueryOptions, "tier">) => Promise<unknown>;
 };
+type BatchOperation = {
+  id: string;
+  input: unknown;
+  table: unknown;
+  type: "insert" | "upsert";
+};
 
 const fallbackDbName = "trizum-jazz-browser-fallback";
 const snapshotsStoreName = "snapshots";
@@ -93,6 +99,114 @@ class BrowserFallbackMirror {
   wrap(db: JazzFateDb): JazzFateDb {
     const wrapped = {
       all: db.all.bind(db),
+      batch:
+        typeof (db as { batch?: unknown }).batch === "function"
+          ? <T>(
+              callback: (batch: {
+                insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+                upsert(table: unknown, data: unknown, options: { id: string }): void;
+              }) => T,
+            ) => {
+              const operations: BatchOperation[] = [];
+              const result = (
+                db as unknown as {
+                  batch<T>(
+                    callback: (batch: {
+                      insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+                      upsert(table: unknown, data: unknown, options: { id: string }): void;
+                    }) => T,
+                  ): WriteHandleLike<{ value: T }>;
+                }
+              ).batch((batch) =>
+                callback({
+                  insert: (table, data, options) => {
+                    const row = batch.insert(table, data, options);
+                    const id = isRowLike(row) ? row.id : options?.id;
+
+                    if (id) {
+                      operations.push({
+                        id,
+                        input: data,
+                        table,
+                        type: "insert",
+                      });
+                    }
+
+                    return row;
+                  },
+                  upsert: (table, data, options) => {
+                    operations.push({
+                      id: options.id,
+                      input: data,
+                      table,
+                      type: "upsert",
+                    });
+                    batch.upsert(table, data, options);
+                  },
+                }),
+              );
+
+              return withPersistedWait(result, async () => {
+                for (const operation of operations) {
+                  await this.mergeRow(operation.table, operation.id, operation.input);
+                }
+              });
+            }
+          : undefined,
+      transaction:
+        typeof (db as { transaction?: unknown }).transaction === "function"
+          ? <T>(
+              callback: (transaction: {
+                insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+                upsert(table: unknown, data: unknown, options: { id: string }): void;
+              }) => T,
+            ) => {
+              const operations: BatchOperation[] = [];
+              const result = (
+                db as unknown as {
+                  transaction<T>(
+                    callback: (transaction: {
+                      insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+                      upsert(table: unknown, data: unknown, options: { id: string }): void;
+                    }) => T,
+                  ): WriteHandleLike<{ value: T }>;
+                }
+              ).transaction((transaction) =>
+                callback({
+                  insert: (table, data, options) => {
+                    const row = transaction.insert(table, data, options);
+                    const id = isRowLike(row) ? row.id : options?.id;
+
+                    if (id) {
+                      operations.push({
+                        id,
+                        input: data,
+                        table,
+                        type: "insert",
+                      });
+                    }
+
+                    return row;
+                  },
+                  upsert: (table, data, options) => {
+                    operations.push({
+                      id: options.id,
+                      input: data,
+                      table,
+                      type: "upsert",
+                    });
+                    transaction.upsert(table, data, options);
+                  },
+                }),
+              );
+
+              return withPersistedWait(result, async () => {
+                for (const operation of operations) {
+                  await this.mergeRow(operation.table, operation.id, operation.input);
+                }
+              });
+            }
+          : undefined,
       delete: (table: unknown, id: string) => {
         const result = deleteRaw(db, table, id);
 

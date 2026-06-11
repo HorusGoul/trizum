@@ -56,6 +56,14 @@ export type JazzFateMutationEvent<
   proc: TProc;
 };
 
+export type JazzFateSyncRejectedEvent<
+  TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
+  TProc extends Extract<keyof TMutationMap, string> = Extract<keyof TMutationMap, string>,
+> = JazzFateMutationEvent<TMutationMap, TProc> & {
+  error: unknown;
+  rollbackOutput: JazzFateEntity | null;
+};
+
 export interface JazzFateRepository<
   TEntity extends JazzFateEntity = JazzFateEntity,
   TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
@@ -142,6 +150,9 @@ export type CreateJazzFateTransportOptions<TMutationMap extends JazzFateMutation
   onMutation?: <K extends Extract<keyof TMutationMap, string>>(
     event: JazzFateMutationEvent<TMutationMap, K>,
   ) => Promise<void> | void;
+  onSyncRejected?: <K extends Extract<keyof TMutationMap, string>>(
+    event: JazzFateSyncRejectedEvent<TMutationMap, K>,
+  ) => Promise<void> | void;
 };
 
 export type JazzFateCacheUpdateEvent = {
@@ -175,11 +186,16 @@ type FateCacheListState = {
 };
 
 type FateCacheStore = {
+  deleteRecord?(id: string): void;
   getListState(key: string): FateCacheListState | undefined;
+  restore?(id: string, snapshot: unknown): void;
+  restoreList?(key: string, list?: FateCacheListState): void;
   setList(key: string, state: FateCacheListState): void;
+  snapshot?(id: string): unknown;
 };
 
 type FateCacheSyncTarget = {
+  deleteRecord?: (type: string, id: string | number) => void;
   executeRequestHandle?: (handle: FateRequestHandle, mode: string) => void;
   requests?: FateRequestMap;
   store?: FateCacheStore;
@@ -193,6 +209,11 @@ type FateCacheSyncTarget = {
     blockedMask?: unknown,
     insert?: string,
   ) => void;
+};
+
+type JazzFateBackgroundSync<TEntity extends JazzFateEntity = JazzFateEntity> = {
+  promise: Promise<unknown>;
+  rollbackOutput: TEntity | null;
 };
 
 type JazzFateLiveViewHandlers = Parameters<NonNullable<Transport["subscribeById"]>>[4];
@@ -224,6 +245,7 @@ type NotifyJazzFateLiveSubscribersOptions<
 
 const cacheUpdateListeners = new WeakMap<object, Set<JazzFateCacheUpdateListener>>();
 const cacheRefreshQueues = new WeakMap<object, Promise<unknown>>();
+const backgroundSyncByOutput = new WeakMap<object, JazzFateBackgroundSync>();
 
 export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzFateEntity> = {
   db: JazzFateDb;
@@ -237,6 +259,11 @@ export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzF
 };
 
 type RowLike = Record<string, unknown> & { id: string };
+type RejectedWriteRollback = {
+  operation: JazzFateMutationOperation;
+  previousRow: RowLike | null;
+  table: unknown;
+};
 
 const defaultQueryOptions = {} satisfies QueryOptions;
 
@@ -345,34 +372,60 @@ export function createJazzDbRepository<
 
       if (operation === "insert") {
         const result = insertRow(db, mutation.table, input);
-
-        await waitForWrite(
+        const { backgroundSync } = await waitForWrite(
           result,
           queryOptions,
           syncWritesToTier,
           mutation.sync ?? defaultMutationSync,
         );
-
-        return toEntity(
+        const output = toEntity(
           entity,
           result.value as RowLike,
           select,
         ) as TMutationMap[typeof proc]["output"];
+        const outputEntity = output as JazzFateEntity;
+
+        setBackgroundSync(
+          output,
+          withLocalRollbackOnSyncRejection(db, outputEntity.id, backgroundSync, {
+            operation,
+            previousRow: null,
+            table: mutation.table,
+          }),
+          null,
+        );
+
+        return output;
       }
 
       const id = getMutationId(mutation, input);
 
       if (operation === "delete") {
-        const row = await db.one(
-          selectColumns(where(mutation.table, { id: String(id) }), entity, select),
-          queryOptions,
-        );
+        const [row, fullRow] = await Promise.all([
+          db.one(
+            selectColumns(where(mutation.table, { id: String(id) }), entity, select),
+            queryOptions,
+          ),
+          db.one(
+            selectColumns(
+              where(mutation.table, { id: String(id) }),
+              entity,
+              selectedColumns(entity, entity.columns),
+            ),
+            queryOptions,
+          ),
+        ]);
 
-        if (!row) {
+        if (!row || !fullRow) {
           throw new Error(`Fate mutation ${String(proc)} could not find row ${String(id)}`);
         }
 
-        await deleteRow(
+        const output = toEntity(
+          entity,
+          row as RowLike,
+          select,
+        ) as TMutationMap[typeof proc]["output"];
+        const { backgroundSync } = await deleteRow(
           db,
           mutation.table,
           id,
@@ -381,8 +434,36 @@ export function createJazzDbRepository<
           mutation.sync ?? defaultMutationSync,
         );
 
-        return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
+        setBackgroundSync(
+          output,
+          withLocalRollbackOnSyncRejection(db, id, backgroundSync, {
+            operation,
+            previousRow: fullRow as RowLike,
+            table: mutation.table,
+          }),
+          output as JazzFateEntity,
+        );
+
+        return output;
       }
+
+      const [rollbackRow, rollbackSelectedRow] = await Promise.all([
+        db.one(
+          selectColumns(
+            where(mutation.table, { id: String(id) }),
+            entity,
+            selectedColumns(entity, entity.columns),
+          ),
+          queryOptions,
+        ),
+        db.one(
+          selectColumns(where(mutation.table, { id: String(id) }), entity, select),
+          queryOptions,
+        ),
+      ]);
+      const rollbackOutput = rollbackSelectedRow
+        ? toEntity(entity, rollbackSelectedRow as RowLike, select)
+        : null;
 
       const writtenRow =
         operation === "update"
@@ -404,13 +485,26 @@ export function createJazzDbRepository<
               syncWritesToTier,
               mutation.sync ?? defaultMutationSync,
             );
+      const syncRollback = {
+        operation,
+        previousRow: rollbackRow as RowLike | null,
+        table: mutation.table,
+      } satisfies RejectedWriteRollback;
 
-      if (isRowLike(writtenRow)) {
-        return toEntity(
+      if (isRowLike(writtenRow.value)) {
+        const output = toEntity(
           entity,
-          withRowId(writtenRow, id),
+          withRowId(writtenRow.value, id),
           select,
         ) as TMutationMap[typeof proc]["output"];
+
+        setBackgroundSync(
+          output,
+          withLocalRollbackOnSyncRejection(db, id, writtenRow.backgroundSync, syncRollback),
+          rollbackOutput,
+        );
+
+        return output;
       }
 
       const row = await db.one(
@@ -419,18 +513,38 @@ export function createJazzDbRepository<
       );
 
       if (!row && operation === "upsert" && isRowLike(input)) {
-        return toEntity(
+        const output = toEntity(
           entity,
           withRowId(input, id),
           select,
         ) as TMutationMap[typeof proc]["output"];
+
+        setBackgroundSync(
+          output,
+          withLocalRollbackOnSyncRejection(db, id, writtenRow.backgroundSync, syncRollback),
+          rollbackOutput,
+        );
+
+        return output;
       }
 
       if (!row) {
         throw new Error(`Fate mutation ${String(proc)} did not return row ${String(id)}`);
       }
 
-      return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
+      const output = toEntity(
+        entity,
+        row as RowLike,
+        select,
+      ) as TMutationMap[typeof proc]["output"];
+
+      setBackgroundSync(
+        output,
+        withLocalRollbackOnSyncRejection(db, id, writtenRow.backgroundSync, syncRollback),
+        rollbackOutput,
+      );
+
+      return output;
     },
 
     getAffectedLists(proc, input, output) {
@@ -531,6 +645,7 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
       const output = await repository.mutate(proc, input, select);
       const affectedLists = repository.getAffectedLists?.(proc, input, output) ?? [];
       const operation = repository.getMutationOperation?.(proc) ?? "insert";
+      const backgroundSync = getBackgroundSync(output);
       await notifyJazzFateLiveSubscribers({
         affectedLists,
         connectionSubscriptions,
@@ -548,6 +663,20 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
         output,
         proc,
       });
+
+      if (backgroundSync) {
+        void backgroundSync.promise.catch(async (error: unknown) => {
+          await options.onSyncRejected?.({
+            affectedLists,
+            error,
+            input,
+            operation,
+            output,
+            proc,
+            rollbackOutput: backgroundSync.rollbackOutput,
+          });
+        });
+      }
 
       return output;
     },
@@ -755,6 +884,62 @@ export function applyJazzFateMutationToCache(
   emitJazzFateCacheUpdate(client, { affectedLists: event.affectedLists });
 
   return updatedLists;
+}
+
+export function applyJazzFateSyncRejectionToCache(
+  client: object,
+  event: Pick<
+    JazzFateSyncRejectedEvent,
+    "affectedLists" | "operation" | "output" | "rollbackOutput"
+  >,
+) {
+  if (!isJazzFateEntity(event.output)) {
+    emitJazzFateCacheUpdate(client, { affectedLists: event.affectedLists });
+    return 0;
+  }
+
+  const syncTarget = client as FateCacheSyncTarget;
+  const output = event.output;
+  const rollbackOutput = event.rollbackOutput;
+  const entityId = toEntityId(output.__typename, output.id);
+  let updatedLists = 0;
+
+  if (event.operation === "delete") {
+    writeEntityToFateCache(syncTarget, rollbackOutput ?? output);
+    updatedLists += updateCacheListsForRejectedDelete(
+      client,
+      {
+        affectedLists: event.affectedLists,
+        output,
+        rollbackOutput,
+      },
+      entityId,
+    );
+  } else if (rollbackOutput) {
+    writeEntityToFateCache(syncTarget, rollbackOutput);
+  } else {
+    deleteEntityFromFateCache(syncTarget, output);
+    updatedLists += removeEntityFromAffectedCacheLists(
+      client,
+      {
+        affectedLists: event.affectedLists,
+        output,
+      },
+      entityId,
+    );
+  }
+
+  emitJazzFateCacheUpdate(client, { affectedLists: event.affectedLists });
+
+  return updatedLists;
+}
+
+export function attachJazzFateBackgroundSync(
+  output: JazzFateEntity,
+  promise: Promise<unknown> | undefined,
+  rollbackOutput: JazzFateEntity | null = null,
+) {
+  setBackgroundSync(output, promise, rollbackOutput);
 }
 
 export async function refreshJazzFateCache(
@@ -1238,6 +1423,122 @@ function writeEntityToFateCache(syncTarget: FateCacheSyncTarget, output: JazzFat
   );
 }
 
+function deleteEntityFromFateCache(syncTarget: FateCacheSyncTarget, output: JazzFateEntity) {
+  const deleteRecord = syncTarget.deleteRecord?.bind(syncTarget);
+  const storeDeleteRecord = syncTarget.store?.deleteRecord?.bind(syncTarget.store);
+  const entityId = toEntityId(output.__typename, output.id);
+
+  if (deleteRecord) {
+    deleteRecord(output.__typename, output.id);
+    return;
+  }
+
+  storeDeleteRecord?.(entityId);
+}
+
+function updateCacheListsForRejectedDelete(
+  client: object,
+  event: {
+    affectedLists: readonly JazzFateAffectedList[];
+    output: JazzFateEntity;
+    rollbackOutput: JazzFateEntity | null;
+  },
+  entityId: string,
+) {
+  const output = event.rollbackOutput ?? event.output;
+  const syncTarget = client as FateCacheSyncTarget;
+  const requests = syncTarget.requests;
+  const store = syncTarget.store;
+
+  if (!requests || !store) {
+    return 0;
+  }
+
+  let updatedLists = 0;
+
+  for (const requestModes of requests.values()) {
+    for (const handle of requestModes.values()) {
+      for (const item of handle.descriptor?.items ?? []) {
+        if (
+          item.kind !== "list" ||
+          !item.listKey ||
+          item.type !== output.__typename ||
+          !event.affectedLists.some((affectedList) =>
+            doesAffectedListMatchRequestItem(affectedList, item.name, item.argsPayload),
+          )
+        ) {
+          continue;
+        }
+
+        const current = store.getListState(item.listKey);
+        const next = insertEntityIntoCacheList(current ?? { ids: [] }, entityId, String(output.id));
+
+        if (next === current) {
+          continue;
+        }
+
+        store.setList(item.listKey, next);
+        updatedLists += 1;
+      }
+    }
+  }
+
+  return updatedLists;
+}
+
+function removeEntityFromAffectedCacheLists(
+  client: object,
+  event: {
+    affectedLists: readonly JazzFateAffectedList[];
+    output: JazzFateEntity;
+  },
+  entityId: string,
+) {
+  const syncTarget = client as FateCacheSyncTarget;
+  const requests = syncTarget.requests;
+  const store = syncTarget.store;
+
+  if (!requests || !store) {
+    return 0;
+  }
+
+  let updatedLists = 0;
+
+  for (const requestModes of requests.values()) {
+    for (const handle of requestModes.values()) {
+      for (const item of handle.descriptor?.items ?? []) {
+        if (
+          item.kind !== "list" ||
+          !item.listKey ||
+          item.type !== event.output.__typename ||
+          !event.affectedLists.some((affectedList) =>
+            doesAffectedListMatchRequestItem(affectedList, item.name, item.argsPayload),
+          )
+        ) {
+          continue;
+        }
+
+        const current = store.getListState(item.listKey);
+
+        if (!current) {
+          continue;
+        }
+
+        const next = removeEntityFromCacheList(current, entityId);
+
+        if (next === current) {
+          continue;
+        }
+
+        store.setList(item.listKey, next);
+        updatedLists += 1;
+      }
+    }
+  }
+
+  return updatedLists;
+}
+
 function insertEntityIntoCacheList(
   listState: FateCacheListState,
   entityId: string,
@@ -1447,7 +1748,7 @@ async function updateRow(
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
   syncMode: JazzFateMutationDefinition["sync"],
-): Promise<unknown> {
+): Promise<{ backgroundSync?: Promise<unknown>; value: unknown }> {
   const result = (
     db.update as (
       table: unknown,
@@ -1458,10 +1759,12 @@ async function updateRow(
       wait?: unknown;
     }
   )(table, String(id), stripInputId(input));
+  const { backgroundSync } = await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
 
-  await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
-
-  return result.value;
+  return {
+    backgroundSync,
+    value: result.value,
+  };
 }
 
 async function upsertRow(
@@ -1472,7 +1775,7 @@ async function upsertRow(
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
   syncMode: JazzFateMutationDefinition["sync"],
-): Promise<unknown> {
+): Promise<{ backgroundSync?: Promise<unknown>; value: unknown }> {
   const result = (
     db.upsert as (
       table: unknown,
@@ -1485,10 +1788,12 @@ async function upsertRow(
       wait?: unknown;
     }
   )(table, stripInputId(input), { id: String(id) });
+  const { backgroundSync } = await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
 
-  await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
-
-  return result.value;
+  return {
+    backgroundSync,
+    value: result.value,
+  };
 }
 
 async function deleteRow(
@@ -1498,7 +1803,7 @@ async function deleteRow(
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
   syncMode: JazzFateMutationDefinition["sync"],
-): Promise<void> {
+): Promise<{ backgroundSync?: Promise<unknown> }> {
   const result = (
     db.delete as (
       table: unknown,
@@ -1507,8 +1812,9 @@ async function deleteRow(
       wait?: unknown;
     }
   )(table, String(id));
+  const { backgroundSync } = await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
 
-  await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
+  return { backgroundSync };
 }
 
 function getMutationId<TEntity extends JazzFateEntity>(
@@ -1548,25 +1854,109 @@ function isRowLike(value: unknown): value is RowLike {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
+function setBackgroundSync(
+  output: unknown,
+  promise: Promise<unknown> | undefined,
+  rollbackOutput: JazzFateEntity | null,
+) {
+  if (!promise || !isJazzFateEntity(output)) {
+    return;
+  }
+
+  backgroundSyncByOutput.set(output, {
+    promise,
+    rollbackOutput,
+  });
+}
+
+function getBackgroundSync(output: unknown): JazzFateBackgroundSync | undefined {
+  if (!output || typeof output !== "object") {
+    return undefined;
+  }
+
+  const backgroundSync = backgroundSyncByOutput.get(output);
+
+  if (backgroundSync) {
+    backgroundSyncByOutput.delete(output);
+  }
+
+  return backgroundSync;
+}
+
 async function waitForWrite(
   result: { wait?: unknown },
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
   syncMode: JazzFateMutationDefinition["sync"],
-) {
+): Promise<{ backgroundSync?: Promise<unknown> }> {
   if (syncMode !== "foreground") {
     await waitForWriteTier(result, "local");
 
     if (syncWritesToTier && syncWritesToTier !== "local") {
-      void waitForWriteTier(result, syncWritesToTier).catch(() => undefined);
+      const backgroundSync = waitForWriteTier(result, syncWritesToTier);
+
+      void backgroundSync.catch(() => undefined);
+
+      return { backgroundSync };
     }
 
-    return;
+    return {};
   }
 
   const waitTier = syncWritesToTier ?? queryOptions.tier ?? "local";
 
   await waitForWriteTier(result, waitTier);
+
+  return {};
+}
+
+function withLocalRollbackOnSyncRejection(
+  db: JazzFateDb,
+  id: string | number,
+  backgroundSync: Promise<unknown> | undefined,
+  rollback: RejectedWriteRollback,
+) {
+  if (!backgroundSync) {
+    return undefined;
+  }
+
+  const syncWithRollback = backgroundSync.catch(async (error: unknown) => {
+    await rollbackRejectedLocalWrite(db, id, rollback);
+    throw error;
+  });
+
+  void syncWithRollback.catch(() => undefined);
+
+  return syncWithRollback;
+}
+
+async function rollbackRejectedLocalWrite(
+  db: JazzFateDb,
+  id: string | number,
+  { operation, previousRow, table }: RejectedWriteRollback,
+) {
+  try {
+    const rollbackResult = previousRow
+      ? (
+          db.upsert as (
+            table: unknown,
+            input: unknown,
+            options: { id: string },
+          ) => { wait?: unknown }
+        )(table, stripInputId(previousRow), { id: String(id) })
+      : operation === "delete"
+        ? undefined
+        : (db.delete as (table: unknown, id: string) => { wait?: unknown })(table, String(id));
+
+    if (!rollbackResult) {
+      return;
+    }
+
+    await waitForWriteTier(rollbackResult, "local");
+  } catch {
+    // Best effort: the Fate cache rollback still runs even if Jazz cannot
+    // compensate its local row immediately.
+  }
 }
 
 async function waitForWriteTier(result: { wait?: unknown }, tier: QueryOptions["tier"]) {

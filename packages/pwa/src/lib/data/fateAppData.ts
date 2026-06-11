@@ -19,6 +19,7 @@ import {
   type PartyMemberEntity,
   type RequestOptions,
   type TrizumFateClient,
+  type UpsertParticipantMutationInput,
   type UserEntity,
 } from "@trizum/data";
 import { md5 } from "@takker/md5";
@@ -82,18 +83,15 @@ export type DataReadResult<T> =
 
 export async function createPartyInFate({
   client,
-  durableClient,
   userId,
   values,
 }: {
   client: TrizumFateClient;
-  durableClient?: TrizumFateClient;
   userId: string;
   values: CreatePartyValues;
 }) {
   const partyId = createPartyId();
   const localOnlyInviteSecret = createInviteSecret();
-  const writeClient = durableClient ?? client;
   const party: Party = {
     currency: values.currency,
     description: values.description,
@@ -105,15 +103,36 @@ export async function createPartyInFate({
     symbol: values.symbol,
     type: "party",
   };
-
-  const partyEntity = await upsertParty(writeClient, userId, {
-    ...party,
+  const partyInput = {
+    currency: party.currency,
+    description: party.description,
+    id: party.id,
     localOnlyInviteSecret,
-  });
-  const participantListKey = await primeParticipantList(client, partyId);
-  const participantEntities = await Promise.all(
-    values.participants.map((participant) => upsertParticipant(writeClient, partyId, participant)),
+    name: party.name,
+    ownerUserId: userId,
+    symbol: party.symbol,
+  };
+  const participantEntities = values.participants.map((participant) =>
+    createParticipantEntity(partyId, participant),
   );
+  const participantInputs = participantEntities.map(({ __typename: _typename, ...input }) => input);
+
+  const result = await client.mutations.party.createWithParticipants({
+    input: {
+      participants: participantInputs,
+      party: partyInput,
+    },
+    optimistic: {
+      __typename: "Party",
+      ...partyInput,
+    } as PartyEntity,
+    view: PartySettingsView,
+  });
+  const partyEntity = expectMutationResult(
+    result,
+    "party.createWithParticipants did not return a result",
+  );
+  const participantListKey = await primeParticipantList(client, partyId);
   writePartyEntitiesToFateCache(client, {
     participants: participantEntities,
     party: partyEntity,
@@ -156,17 +175,7 @@ export async function upsertParticipant(
   partyId: string,
   participant: PartyParticipant,
 ) {
-  const input = {
-    avatarId: participant.avatarId ?? undefined,
-    balancesSortedBy: participant.balancesSortedBy ?? "name",
-    id: getParticipantEntityId(partyId, participant.id),
-    isArchived: participant.isArchived ?? false,
-    localId: participant.id,
-    name: participant.name,
-    partyId,
-    personalMode: participant.personalMode ?? false,
-    phone: participant.phone,
-  };
+  const { __typename: _typename, ...input } = createParticipantEntity(partyId, participant);
   const result = await client.mutations.participant.upsert({
     input,
     optimistic: {
@@ -177,6 +186,24 @@ export async function upsertParticipant(
   });
 
   return expectMutationResult(result, "participant.upsert did not return a result");
+}
+
+function createParticipantEntity(
+  partyId: string,
+  participant: PartyParticipant,
+): ParticipantEntity & UpsertParticipantMutationInput {
+  return {
+    __typename: "Participant",
+    avatarId: participant.avatarId ?? null,
+    balancesSortedBy: participant.balancesSortedBy ?? "name",
+    id: getParticipantEntityId(partyId, participant.id),
+    isArchived: participant.isArchived ?? false,
+    localId: participant.id,
+    name: participant.name,
+    partyId,
+    personalMode: participant.personalMode ?? false,
+    phone: participant.phone ?? null,
+  };
 }
 
 export async function upsertPartyMember(

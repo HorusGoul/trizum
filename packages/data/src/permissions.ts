@@ -11,7 +11,7 @@ type PermissionValue = PermissionRowRef | string;
 
 export const trizumJazzPermissions = definePermissions(
   trizumJazzApp,
-  ({ allowedTo, anyOf, policy, session }) => {
+  ({ allowedTo, anyOf, isCreator, policy, session }) => {
     const partyReader = (partyId: PermissionValue) =>
       anyOf([
         policy.exists(
@@ -106,7 +106,9 @@ export const trizumJazzPermissions = definePermissions(
       policy.joinedParties.allowDelete.where({ $createdBy: session.user_id }),
 
       policy.participants.allowRead.where((participant) => partyInviteReader(participant.partyId)),
-      policy.participants.allowInsert.where(allowedTo.update("partyId")),
+      policy.participants.allowInsert.where(
+        anyOf([isCreator, allowedTo.insert("partyId"), allowedTo.update("partyId")]),
+      ),
       policy.participants.allowUpdate
         .whereOld(allowedTo.update("partyId"))
         .whereNew(allowedTo.update("partyId")),

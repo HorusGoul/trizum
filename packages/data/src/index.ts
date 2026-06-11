@@ -55,6 +55,7 @@ export {
   type CreateMediaFileMutationInput,
   type CreatePartyMemberMutationInput,
   type CreateParticipantMutationInput,
+  type CreatePartyWithParticipantsMutationInput,
   type CreatePartyMutationInput,
   type CreateUserMutationInput,
   type DeleteEntityMutationInput,

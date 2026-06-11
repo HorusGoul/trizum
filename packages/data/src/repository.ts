@@ -1,4 +1,5 @@
 import {
+  attachJazzFateBackgroundSync,
   createJazzDbRepository,
   projectEntity,
   type JazzFateDb,
@@ -17,6 +18,7 @@ import type {
   CreateMediaFileMutationInput,
   CreatePartyMemberMutationInput,
   CreateParticipantMutationInput,
+  CreatePartyWithParticipantsMutationInput,
   CreatePartyMutationInput,
   CreateUserMutationInput,
   ExpenseEntity,
@@ -57,6 +59,10 @@ export type TrizumFateMutationMap = {
   };
   "party.create": {
     input: CreatePartyMutationInput;
+    output: PartyEntity;
+  };
+  "party.createWithParticipants": {
+    input: CreatePartyWithParticipantsMutationInput;
     output: PartyEntity;
   };
   "party.upsert": {
@@ -116,6 +122,27 @@ export type TrizumFateMutationMap = {
 export type TrizumDataRepository = JazzFateRepository<TrizumFateEntity, TrizumFateMutationMap>;
 
 export type TrizumDataRepositoryListResult = JazzFateListResult<TrizumFateEntity>;
+
+type JazzFateGroupedWriteDb = JazzFateDb & {
+  batch?<T>(
+    callback: (batch: {
+      insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+      upsert(table: unknown, data: unknown, options: { id: string }): void;
+    }) => T,
+  ): {
+    value: T;
+    wait?: unknown;
+  };
+  transaction?<T>(
+    callback: (transaction: {
+      insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+      upsert(table: unknown, data: unknown, options: { id: string }): void;
+    }) => T,
+  ): {
+    value: T;
+    wait?: unknown;
+  };
+};
 
 export const trizumEntityDefinitions = [
   {
@@ -338,7 +365,6 @@ export const trizumMutationDefinitions = [
   {
     affectedLists: affectedExpenseLists,
     proc: "expense.create",
-    sync: "foreground",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },
@@ -346,7 +372,6 @@ export const trizumMutationDefinitions = [
     affectedLists: affectedExpenseLists,
     operation: "upsert",
     proc: "expense.upsert",
-    sync: "foreground",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },
@@ -372,7 +397,7 @@ export function createTrizumJazzRepository(
     syncWritesToTier?: QueryOptions["tier"];
   } = {},
 ): TrizumDataRepository {
-  return createJazzDbRepository<TrizumFateEntity, TrizumFateMutationMap>({
+  const baseRepository = createJazzDbRepository<TrizumFateEntity, TrizumFateMutationMap>({
     db,
     defaultMutationSync: options.defaultMutationSync,
     entities: trizumEntityDefinitions,
@@ -381,6 +406,118 @@ export function createTrizumJazzRepository(
     queryOptions: options.queryOptions,
     subscriptionQueryOptions: options.subscriptionQueryOptions,
     syncWritesToTier: options.syncWritesToTier,
+  });
+
+  return {
+    ...baseRepository,
+
+    async mutate(proc, input, select) {
+      if (proc === "party.createWithParticipants") {
+        return (await createPartyWithParticipants(
+          db,
+          input as CreatePartyWithParticipantsMutationInput,
+          select,
+          options.syncWritesToTier,
+        )) as TrizumFateMutationMap[typeof proc]["output"];
+      }
+
+      if (!baseRepository.mutate) {
+        throw new Error(`Unsupported Fate mutation: ${String(proc)}`);
+      }
+
+      return baseRepository.mutate(proc, input, select);
+    },
+
+    getAffectedLists(proc, input, output) {
+      if (proc === "party.createWithParticipants") {
+        return [
+          ...affectedPartyLists({ output }),
+          {
+            args: { partyId: (output as PartyEntity).id },
+            root: "participants",
+          },
+        ];
+      }
+
+      return baseRepository.getAffectedLists?.(proc, input, output) ?? [];
+    },
+
+    getMutationOperation(proc) {
+      if (proc === "party.createWithParticipants") {
+        return "insert";
+      }
+
+      return baseRepository.getMutationOperation?.(proc) ?? "insert";
+    },
+  };
+}
+
+async function createPartyWithParticipants(
+  db: JazzFateDb,
+  input: CreatePartyWithParticipantsMutationInput,
+  select: Iterable<string>,
+  syncWritesToTier: QueryOptions["tier"],
+) {
+  const party = toPartyEntity(input.party);
+  const groupedWriteDb = db as JazzFateGroupedWriteDb;
+
+  if (!groupedWriteDb.transaction && !groupedWriteDb.batch) {
+    throw new Error("party.createWithParticipants requires Jazz grouped write support");
+  }
+
+  const write = (scope: {
+    insert(table: unknown, data: unknown, options?: { id?: string }): unknown;
+  }) => {
+    scope.insert(trizumJazzApp.parties, withoutId(input.party), { id: input.party.id });
+
+    for (const participant of input.participants) {
+      scope.insert(trizumJazzApp.participants, withoutId(participant), { id: participant.id });
+    }
+
+    return party;
+  };
+  const result = groupedWriteDb.transaction
+    ? groupedWriteDb.transaction(write)
+    : groupedWriteDb.batch!(write);
+
+  await waitForWriteTier(result, "local");
+
+  const output = projectTrizumEntity(party, select);
+
+  if (syncWritesToTier && syncWritesToTier !== "local") {
+    const backgroundSync = waitForWriteTier(result, syncWritesToTier);
+
+    void backgroundSync.catch(() => undefined);
+    attachJazzFateBackgroundSync(output, backgroundSync);
+  }
+
+  return output;
+}
+
+function toPartyEntity(input: UpsertPartyMutationInput): PartyEntity {
+  return {
+    __typename: "Party",
+    ...input,
+    currency: input.currency ?? "EUR",
+    description: input.description ?? "",
+    localOnlyInviteSecret: input.localOnlyInviteSecret ?? null,
+    symbol: input.symbol ?? null,
+  };
+}
+
+function withoutId<T extends { id: string }>(input: T): Omit<T, "id"> {
+  const { id: _id, ...rest } = input;
+
+  return rest;
+}
+
+async function waitForWriteTier(result: { wait?: unknown }, tier: QueryOptions["tier"]) {
+  if (typeof result.wait !== "function") {
+    return;
+  }
+
+  await (result.wait as (options: Pick<QueryOptions, "tier">) => Promise<unknown>)({
+    tier,
   });
 }
 

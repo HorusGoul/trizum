@@ -5,6 +5,7 @@ import {
   ExpenseListItemView,
   JoinedPartyView,
   MediaFileMetadataView,
+  PartySettingsView,
   PartySummaryView,
   projectTrizumEntity,
   trizumEntityDefinitions,
@@ -16,6 +17,7 @@ import {
   type CreateExpenseMutationInput,
   type CreateJoinedPartyMutationInput,
   type CreateParticipantMutationInput,
+  type CreatePartyWithParticipantsMutationInput,
   type CreatePartyMutationInput,
   type ExpenseEntity,
   type JoinedPartyEntity,
@@ -83,9 +85,7 @@ describe("Jazz alpha schema", () => {
     expect(JSON.stringify(trizumJazzWasmSchema.parties?.policies?.update?.using)).toContain(
       '"Literal":"editor"',
     );
-    expectInheritedPartyUpdatePolicy(
-      trizumJazzWasmSchema.participants?.policies?.insert?.with_check,
-    );
+    expectParticipantInsertPolicy(trizumJazzWasmSchema.participants?.policies?.insert?.with_check);
     expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.participants?.policies?.update?.using);
     expectInheritedPartyUpdatePolicy(
       trizumJazzWasmSchema.participants?.policies?.update?.with_check,
@@ -103,13 +103,22 @@ describe("Jazz alpha schema", () => {
     try {
       const partyId = "11111111-1111-5111-8111-111111111111";
       const participantId = "22222222-2222-5222-8222-222222222222";
+      const aliceParticipantId = "22222222-2222-5222-8222-222222222223";
       const bobMemberId = "33333333-3333-5333-8333-333333333333";
       const expenseId = "44444444-4444-5444-8444-444444444444";
+      const createdPartyId = "77777777-7777-5777-8777-777777777777";
+      const createdParticipantId = "88888888-8888-5888-8888-888888888888";
+      const aliceSession = {
+        authMode: "local-first" as const,
+        claims: {},
+        user_id: "alice-local-first",
+      };
       const bobSession = {
         authMode: "local-first" as const,
         claims: {},
         user_id: "bob-local-first",
       };
+      const alice = testApp.as(aliceSession);
       const bob = testApp.as(bobSession);
       const charlie = testApp.as({
         authMode: "local-first" as const,
@@ -144,6 +153,50 @@ describe("Jazz alpha schema", () => {
         );
       });
 
+      await alice
+        .transaction((tx) => {
+          tx.insert(
+            trizumJazzApp.parties,
+            {
+              currency: "EUR",
+              description: "Owner-created trip",
+              localOnlyInviteSecret: "owner-invite-secret",
+              name: "Barcelona",
+              ownerUserId: aliceSession.user_id,
+              symbol: "BCN",
+            },
+            { id: createdPartyId },
+          );
+          tx.insert(
+            trizumJazzApp.participants,
+            {
+              balancesSortedBy: "name",
+              isArchived: false,
+              localId: "alice",
+              name: "Alice",
+              partyId: createdPartyId,
+              personalMode: false,
+            },
+            { id: aliceParticipantId },
+          );
+          tx.insert(
+            trizumJazzApp.participants,
+            {
+              balancesSortedBy: "name",
+              isArchived: false,
+              localId: "bob",
+              name: "Bob",
+              partyId: createdPartyId,
+              personalMode: false,
+            },
+            { id: createdParticipantId },
+          );
+        })
+        .wait({ tier: "edge" });
+
+      await expect(
+        bob.all(trizumJazzApp.participants.where({ partyId: createdPartyId })),
+      ).resolves.toHaveLength(2);
       await expect(bob.all(trizumJazzApp.participants.where({ partyId }))).resolves.toHaveLength(1);
       bob.expectDenied((db) =>
         db.insert(
@@ -244,6 +297,33 @@ function expectInheritedPartyUpdatePolicy(policyExpression: unknown) {
     operation: "Update",
     type: "Inherits",
     via_column: "partyId",
+  });
+}
+
+function expectParticipantInsertPolicy(policyExpression: unknown) {
+  expect(policyExpression).toMatchObject({
+    exprs: expect.arrayContaining([
+      {
+        column: "$createdBy",
+        op: "Eq",
+        type: "Cmp",
+        value: {
+          path: ["user_id"],
+          type: "SessionRef",
+        },
+      },
+      {
+        operation: "Insert",
+        type: "Inherits",
+        via_column: "partyId",
+      },
+      {
+        operation: "Update",
+        type: "Inherits",
+        via_column: "partyId",
+      },
+    ]),
+    type: "Or",
   });
 }
 
@@ -411,6 +491,69 @@ describe("Fate masking over Trizum Jazz entities", () => {
       partyId: "party-1",
     });
     expect(Object.hasOwn(created.result, "internalMemo")).toBe(false);
+  });
+
+  test("creates a party and participants through a composite Fate mutation", async () => {
+    const repository = createMemoryRepository();
+    const client = createTrizumFateClient({ repository });
+
+    const created = await client.mutations.party.createWithParticipants({
+      input: {
+        participants: [
+          {
+            id: "participant-party-3-alice",
+            localId: "alice",
+            name: "Alice",
+            partyId: "party-3",
+          },
+          {
+            id: "participant-party-3-bob",
+            localId: "bob",
+            name: "Bob",
+            partyId: "party-3",
+          },
+        ],
+        party: {
+          currency: "EUR",
+          description: "Shared weekend",
+          id: "party-3",
+          localOnlyInviteSecret: "invite-secret",
+          name: "Weekend",
+          ownerUserId: "alice-local-first",
+          symbol: "WK",
+        },
+      },
+      optimistic: {
+        __typename: "Party",
+        currency: "EUR",
+        description: "Shared weekend",
+        id: "party-3",
+        localOnlyInviteSecret: "invite-secret",
+        name: "Weekend",
+        ownerUserId: "alice-local-first",
+        symbol: "WK",
+      },
+      view: PartySettingsView,
+    });
+
+    if (created.error) {
+      throw created.error;
+    }
+
+    expect(created.result).toMatchObject({
+      __typename: "Party",
+      id: "party-3",
+      name: "Weekend",
+    });
+    expect(repository.parties.find((party) => party.id === "party-3")).toMatchObject({
+      localOnlyInviteSecret: "invite-secret",
+      name: "Weekend",
+    });
+    expect(
+      repository.participants
+        .filter((participant) => participant.partyId === "party-3")
+        .map((participant) => participant.name),
+    ).toStrictEqual(["Alice", "Bob"]);
   });
 
   test("upserts user settings and joined party state through Fate", async () => {
@@ -608,6 +751,8 @@ function createMemoryRepository() {
       root: TrizumFateListRoot;
       select: string[];
     }>;
+    participants: ParticipantEntity[];
+    parties: PartyEntity[];
   } = {
     entityTypes: new Set([
       "User",
@@ -630,6 +775,8 @@ function createMemoryRepository() {
       "expenses",
     ]),
     lists: [],
+    participants,
+    parties,
 
     async fetchEntities(type, ids, select, args) {
       repository.fetches.push({ args, ids, select: [...select], type });
@@ -695,6 +842,33 @@ function createMemoryRepository() {
             symbol: partyInput.symbol ?? null,
           };
           parties.push(party);
+          return projectTrizumEntity(party, select);
+        }
+        case "party.createWithParticipants": {
+          const { participants: participantInputs, party: partyInput } =
+            input as CreatePartyWithParticipantsMutationInput;
+          const party: PartyEntity = {
+            __typename: "Party",
+            ...partyInput,
+            currency: partyInput.currency ?? "EUR",
+            description: partyInput.description ?? "",
+            localOnlyInviteSecret: partyInput.localOnlyInviteSecret ?? null,
+            symbol: partyInput.symbol ?? null,
+          };
+          parties.push(party);
+
+          for (const participantInput of participantInputs) {
+            participants.push({
+              __typename: "Participant",
+              ...participantInput,
+              avatarId: participantInput.avatarId ?? null,
+              balancesSortedBy: participantInput.balancesSortedBy ?? "name",
+              isArchived: participantInput.isArchived ?? false,
+              personalMode: participantInput.personalMode ?? false,
+              phone: participantInput.phone ?? null,
+            });
+          }
+
           return projectTrizumEntity(party, select);
         }
         case "participant.create": {

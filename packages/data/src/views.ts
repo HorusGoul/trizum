@@ -165,6 +165,10 @@ export type UpsertUserMutationInput = Partial<CreateUserInput> & {
 export type UpsertPartyMutationInput = CreatePartyInput & {
   id: string;
 };
+export type CreatePartyWithParticipantsMutationInput = {
+  participants: UpsertParticipantMutationInput[];
+  party: UpsertPartyMutationInput;
+};
 export type UpsertPartyMemberMutationInput = CreatePartyMemberInput & {
   id: string;
 };
@@ -188,6 +192,11 @@ export const trizumFateMutations = {
   "user.create": mutation<UserEntity, CreateUserMutationInput, UserEntity>("User"),
   "user.upsert": mutation<UserEntity, UpsertUserMutationInput, UserEntity>("User"),
   "party.create": mutation<PartyEntity, CreatePartyMutationInput, PartyEntity>("Party"),
+  "party.createWithParticipants": mutation<
+    PartyEntity,
+    CreatePartyWithParticipantsMutationInput,
+    PartyEntity
+  >("Party"),
   "party.upsert": mutation<PartyEntity, UpsertPartyMutationInput, PartyEntity>("Party"),
   "partyMember.create": mutation<
     PartyMemberEntity,
