@@ -12,8 +12,8 @@ export class WhoAreYouPage {
   }
 
   async expectLoaded() {
-    await expect(this.page).toHaveURL(/\/party\/[^/]+\/who(?:\?.*)?$/);
-    await expect(this.heading).toBeVisible();
+    await expect(this.page).toHaveURL(/\/party\/[^/]+\/who(?:\?.*)?$/, { timeout: 30_000 });
+    await expect(this.heading).toBeVisible({ timeout: 30_000 });
   }
 
   participantOption(name: string) {

@@ -1,24 +1,19 @@
 import { beforeAll, describe, expect, test } from "vite-plus/test";
-import {
-  generateAutomergeUrl,
-  parseAutomergeUrl,
-  type DocumentId,
-} from "@automerge/automerge-repo/slim";
 import type { PartyList } from "#src/models/partyList.js";
 import { getOrderedPartySections } from "./partyListOrdering";
 
-let PARTY_LIST_ID!: DocumentId;
-let PARTY_A_ID!: DocumentId;
-let PARTY_B_ID!: DocumentId;
-let PARTY_C_ID!: DocumentId;
-let PARTY_D_ID!: DocumentId;
+let PARTY_LIST_ID!: string;
+let PARTY_A_ID!: string;
+let PARTY_B_ID!: string;
+let PARTY_C_ID!: string;
+let PARTY_D_ID!: string;
 
 beforeAll(() => {
-  PARTY_LIST_ID = createDocumentId();
-  PARTY_A_ID = createDocumentId();
-  PARTY_B_ID = createDocumentId();
-  PARTY_C_ID = createDocumentId();
-  PARTY_D_ID = createDocumentId();
+  PARTY_LIST_ID = createPartyId();
+  PARTY_A_ID = createPartyId();
+  PARTY_B_ID = createPartyId();
+  PARTY_C_ID = createPartyId();
+  PARTY_D_ID = createPartyId();
 });
 
 describe("getOrderedPartySections", () => {
@@ -85,17 +80,17 @@ function createPartyList(overrides: Partial<PartyList>): PartyList {
   };
 }
 
-function createDocumentId(): DocumentId {
-  return parseAutomergeUrl(generateAutomergeUrl()).documentId;
+function createPartyId(): string {
+  return crypto.randomUUID();
 }
 
-function createFlagMap(...partyIds: DocumentId[]) {
+function createFlagMap(...partyIds: string[]) {
   return Object.fromEntries(partyIds.map((partyId) => [partyId, true as const])) as Record<
-    DocumentId,
+    string,
     true
   >;
 }
 
-function createLastUsedAtMap(...entries: [DocumentId, number][]) {
-  return Object.fromEntries(entries) as Record<DocumentId, number>;
+function createLastUsedAtMap(...entries: [string, number][]) {
+  return Object.fromEntries(entries) as Record<string, number>;
 }

@@ -1,9 +1,6 @@
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
-import { Repo } from "@automerge/automerge-repo"; // inits automerge
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
   RouterProvider,
   createRouter,
@@ -21,21 +18,24 @@ import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
-import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
-import { isNonNull } from "./lib/isNonNull.ts";
+import { createLocalFirstTrizumDataClient } from "@trizum/data";
 import { configurePwaLogging } from "./lib/log.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
+import { TrizumDataContext } from "./lib/data/TrizumDataContext.ts";
 import {
+  readExpenseState,
+  readPartyState,
   readPartyListState,
   seedPartyListState,
+  waitForDataSync,
   type InternalPartyListSeed,
   type InternalPartyListSnapshot,
   type InternalPartyListSeedResult,
@@ -97,13 +97,18 @@ declare module "react-aria-components" {
   }
 }
 
-const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
+const JAZZ_APP_ID =
+  import.meta.env.VITE_JAZZ_APP_ID?.trim() || "f3c88cf5-97c1-41fc-a6ba-ebb209719a61";
+const JAZZ_SERVER_URL =
+  import.meta.env.VITE_JAZZ_SERVER_URL?.trim() || "https://v2.sync.jazz.tools/";
+const INTERNAL_DB_NAME = initialUrl.searchParams.get("__internal_db_name")?.trim() || undefined;
 const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
 
-// Create automerge repository
-const repo = new Repo({
-  storage: new IndexedDBStorageAdapter("trizum"),
-  network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
+const trizumData = await createLocalFirstTrizumDataClient({
+  appId: JAZZ_APP_ID,
+  dbName: INTERNAL_DB_NAME ?? "trizum-jazz-fate-pwa",
+  disableBrowserWorker: true,
+  serverUrl: isOfflineOnly ? undefined : JAZZ_SERVER_URL,
 });
 
 declare global {
@@ -113,35 +118,69 @@ declare global {
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
     __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
+    __internal_readExpenseState: (
+      expenseId: string,
+      mode?: "cache" | "settled",
+    ) => Promise<unknown>;
+    __internal_readPartyState: (partyId: string, mode?: "cache" | "settled") => Promise<unknown>;
+    __internal_waitForDataSync: () => Promise<void>;
   }
 }
 
 // For internal use only, like UI testing or screenshots
 window.__internal_createPartyFromMigrationData = async (data: MigrationData) => {
   return createPartyFromMigrationData({
-    repo,
+    client: trizumData.client,
     data,
     importAttachments: false,
+    userId: trizumData.userId,
   });
 };
 
 window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {
   return seedPartyListState({
-    repo,
+    client: trizumData.client,
     seed,
+    userId: trizumData.userId,
   });
 };
 
 window.__internal_readPartyListState = async () => {
   return readPartyListState({
-    repo,
+    client: trizumData.client,
+    userId: trizumData.userId,
+  });
+};
+
+window.__internal_readExpenseState = async (
+  expenseId: string,
+  mode: "cache" | "settled" = "cache",
+) => {
+  return readExpenseState({
+    client: mode === "settled" ? trizumData.settledClient : trizumData.client,
+    expenseId,
+    mode,
+  });
+};
+
+window.__internal_readPartyState = async (partyId: string, mode: "cache" | "settled" = "cache") => {
+  return readPartyState({
+    client: mode === "settled" ? trizumData.settledClient : trizumData.client,
+    mode,
+    partyId,
+  });
+};
+
+window.__internal_waitForDataSync = async () => {
+  await waitForDataSync({
+    client: trizumData.client,
   });
 };
 
 // Create a new router instance
 const router = createRouter({
   routeTree,
-  context: { repo },
+  context: { data: trizumData },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
 });
@@ -188,12 +227,12 @@ if (!rootElement.innerHTML) {
     <I18nProvider i18n={i18n}>
       <UpdateControllerComponent>
         <AriaProviders>
-          <RepoContext value={repo}>
+          <TrizumDataContext value={trizumData}>
             <MediaGalleryController>
               <RouterProvider router={router} InnerWrap={InnerWrap} />
               <Toaster />
             </MediaGalleryController>
-          </RepoContext>
+          </TrizumDataContext>
         </AriaProviders>
       </UpdateControllerComponent>
     </I18nProvider>,
@@ -206,15 +245,25 @@ function AriaProviders({ children }: { children: React.ReactNode }) {
 }
 
 function InnerWrap({ children }: { children: React.ReactNode }) {
-  // Initialize the party list to set the locale and other
-  // settings on bootstrap.
-  usePartyList();
-
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       void SplashScreen.hide();
     }
   }, []);
 
-  return <>{children}</>;
+  return (
+    <>
+      <Suspense fallback={null}>
+        <PartyListBootstrap />
+      </Suspense>
+      {children}
+    </>
+  );
+}
+
+function PartyListBootstrap() {
+  // Initialize the party list to set the locale and other settings on bootstrap.
+  usePartyList();
+
+  return null;
 }

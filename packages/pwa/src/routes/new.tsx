@@ -5,8 +5,6 @@ import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/mo
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";
@@ -21,6 +19,8 @@ import { BackButton } from "#src/components/BackButton.js";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
+import { createPartyInFate } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 
 export const Route = createFileRoute("/new")({
   component: New,
@@ -41,47 +41,38 @@ interface NewPartyFormValues {
 }
 
 function New() {
-  const repo = useRepo();
+  const { client, userId } = useTrizumData();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
 
   const currencyOptions = getCurrencyOptions();
 
-  function onCreateParty(values: NewPartyFormValues) {
+  async function onCreateParty(values: NewPartyFormValues) {
     const participants = values.participants.map((participant) => ({
       ...participant,
       id: crypto.randomUUID(),
     }));
-
-    const handle = repo.create<Party>({
-      id: "" as DocumentId,
-      type: "party",
-      name: values.name,
-      symbol: values.symbol,
-      description: values.description,
-      currency: values.currency,
-      participants: participants.reduce<Party["participants"]>((result, next) => {
-        result[next.id] = {
-          id: next.id,
-          name: next.name,
-        };
-        return result;
-      }, {}),
-      chunkRefs: [],
-    });
-    handle.change((doc) => (doc.id = handle.documentId));
-    void navigate({
-      to: "/party/$partyId",
-      params: { partyId: handle.documentId },
-      search: {
-        tab: "expenses",
+    const party = await createPartyInFate({
+      client,
+      userId,
+      values: {
+        currency: values.currency,
+        description: values.description,
+        name: values.name,
+        participants,
+        symbol: values.symbol,
       },
+    });
+
+    await navigate({
+      to: "/party/$partyId/who",
+      params: { partyId: party.id },
       replace: true,
     });
 
     toast.success(t`Party created`);
 
-    return handle.documentId;
+    return party.id;
   }
 
   const form = useForm({
@@ -97,7 +88,7 @@ function New() {
       ],
     },
     onSubmit: ({ value }) => {
-      onCreateParty(value);
+      return onCreateParty(value);
     },
   });
 

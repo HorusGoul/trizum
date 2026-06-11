@@ -51,11 +51,21 @@ jobs:
           cache-version: android-0
           working-directory: packages/mobile/android
 
+      - name: Deploy Jazz schema and permissions
+        timeout-minutes: 5
+        run: vp run --filter @trizum/data jazz:deploy
+        env:
+          JAZZ_ADMIN_SECRET: ${{ secrets.JAZZ_ADMIN_SECRET }}
+          JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
       - name: Build mobile web assets
         timeout-minutes: 8
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Decode Android keystore
         timeout-minutes: 2

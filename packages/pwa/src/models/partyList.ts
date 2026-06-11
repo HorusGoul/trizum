@@ -1,66 +1,20 @@
-import { isValidDocumentId, type Repo, type DocumentId } from "@automerge/automerge-repo/slim";
 import type { SupportedLocale } from "#src/lib/i18n.js";
 import type { Party, PartyParticipant } from "./party";
 
 export interface PartyList {
-  id: DocumentId;
+  id: string;
   type: "partyList";
   username: string;
   phone: string;
-  avatarId?: DocumentId | null;
+  avatarId?: string | null;
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
   autoOpenCalculator?: boolean;
   hue?: number;
-  lastOpenedPartyId?: DocumentId | null;
+  lastOpenedPartyId?: string | null;
   parties: Record<Party["id"], true | undefined>;
   pinnedParties?: Record<Party["id"], true | undefined>;
   archivedParties?: Record<Party["id"], true | undefined>;
   lastUsedAt?: Record<Party["id"], number | undefined>;
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;
-}
-
-function createPartyListHandle(repo: Repo) {
-  // Can't explicity set `locale: undefined` because of automerge...
-  const handle = repo.create<PartyList>({
-    id: "" as DocumentId,
-    type: "partyList",
-    username: "",
-    phone: "",
-    parties: {},
-    pinnedParties: {},
-    archivedParties: {},
-    lastUsedAt: {},
-    participantInParties: {},
-  });
-
-  handle.change((doc) => (doc.id = handle.documentId));
-
-  localStorage.setItem("partyListId", handle.documentId);
-  return handle;
-}
-
-export async function getPartyListHandle(repo: Repo) {
-  const id = localStorage.getItem("partyListId");
-
-  if (id && isValidDocumentId(id)) {
-    try {
-      return await repo.find<PartyList>(id);
-    } catch {
-      // Fall back to a fresh party list if the existing handle cannot be
-      // recovered from local storage.
-    }
-  }
-
-  return createPartyListHandle(repo);
-}
-
-export function getPartyListId(repo: Repo) {
-  const id = localStorage.getItem("partyListId");
-
-  if (id && isValidDocumentId(id)) {
-    return id;
-  }
-
-  return createPartyListHandle(repo).documentId;
 }

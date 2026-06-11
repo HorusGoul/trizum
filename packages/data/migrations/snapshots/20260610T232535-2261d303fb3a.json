@@ -1,0 +1,477 @@
+{
+  "users": {
+    "columns": [
+      {
+        "name": "displayName",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "phone",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "avatarId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "locale",
+        "column_type": {
+          "type": "Enum",
+          "variants": ["en", "es"]
+        },
+        "nullable": true
+      },
+      {
+        "name": "hue",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": true
+      },
+      {
+        "name": "openLastPartyOnLaunch",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "autoOpenCalculator",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "lastOpenedPartyId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "authMode",
+        "column_type": {
+          "type": "Enum",
+          "variants": ["cookieAccount", "externalAccount", "localFirst"]
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "localFirst"
+        }
+      },
+      {
+        "name": "fullAccountUserId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "accountProvider",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      }
+    ],
+    "indexed_columns": ["fullAccountUserId", "authMode"]
+  },
+  "parties": {
+    "columns": [
+      {
+        "name": "name",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "symbol",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "description",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": ""
+        }
+      },
+      {
+        "name": "currency",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "EUR"
+        }
+      },
+      {
+        "name": "ownerUserId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "localOnlyInviteSecret",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      }
+    ],
+    "indexed_columns": ["ownerUserId"]
+  },
+  "partyMembers": {
+    "columns": [
+      {
+        "name": "partyId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": false,
+        "references": "parties"
+      },
+      {
+        "name": "userId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "participantId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "role",
+        "column_type": {
+          "type": "Enum",
+          "variants": ["editor", "owner", "viewer"]
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "editor"
+        }
+      }
+    ],
+    "indexed_columns": ["partyId", "userId"]
+  },
+  "joinedParties": {
+    "columns": [
+      {
+        "name": "userId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "partyId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": false,
+        "references": "parties"
+      },
+      {
+        "name": "participantId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "isPinned",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "isArchived",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "joinedAt",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": true
+      },
+      {
+        "name": "lastUsedAt",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": true
+      }
+    ],
+    "indexed_columns": ["userId", "partyId", "isArchived"]
+  },
+  "participants": {
+    "columns": [
+      {
+        "name": "partyId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": false,
+        "references": "parties"
+      },
+      {
+        "name": "localId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "name",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "phone",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "avatarId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "isArchived",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "personalMode",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "balancesSortedBy",
+        "column_type": {
+          "type": "Enum",
+          "variants": ["balance-ascending", "balance-descending", "name"]
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "name"
+        }
+      }
+    ],
+    "indexed_columns": ["partyId", "localId"]
+  },
+  "mediaFiles": {
+    "columns": [
+      {
+        "name": "ownerUserId",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "partyId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": true,
+        "references": "parties"
+      },
+      {
+        "name": "encodedBlob",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "metadata",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "{}"
+        }
+      }
+    ],
+    "indexed_columns": ["ownerUserId", "partyId"]
+  },
+  "expenses": {
+    "columns": [
+      {
+        "name": "partyId",
+        "column_type": {
+          "type": "Uuid"
+        },
+        "nullable": false,
+        "references": "parties"
+      },
+      {
+        "name": "name",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": false
+      },
+      {
+        "name": "paidAt",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": false
+      },
+      {
+        "name": "amount",
+        "column_type": {
+          "type": "Integer"
+        },
+        "nullable": false
+      },
+      {
+        "name": "paidBy",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "{}"
+        }
+      },
+      {
+        "name": "shares",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Text",
+          "value": "{}"
+        }
+      },
+      {
+        "name": "photos",
+        "column_type": {
+          "type": "Array",
+          "element": {
+            "type": "Text"
+          }
+        },
+        "nullable": false,
+        "default": {
+          "type": "Array",
+          "value": []
+        }
+      },
+      {
+        "name": "isTransfer",
+        "column_type": {
+          "type": "Boolean"
+        },
+        "nullable": false,
+        "default": {
+          "type": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "name": "internalMemo",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "hash",
+        "column_type": {
+          "type": "Text"
+        },
+        "nullable": true
+      },
+      {
+        "name": "editCopy",
+        "column_type": {
+          "type": "Json"
+        },
+        "nullable": true
+      },
+      {
+        "name": "editCopyLastUpdatedAt",
+        "column_type": {
+          "type": "Timestamp"
+        },
+        "nullable": true
+      }
+    ],
+    "indexed_columns": ["partyId", "paidAt"]
+  }
+}

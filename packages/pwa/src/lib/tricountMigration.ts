@@ -204,7 +204,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
   }
 
   // Create party
-  const party: Omit<Party, "id" | "chunkRefs"> = {
+  const party: Omit<Party, "id"> = {
     type: "party",
     name: registry.title,
     description: registry.description || "",

@@ -1,23 +1,23 @@
 import { t } from "@lingui/core/macro";
-import { encodeBlob, type MediaFile } from "#src/models/media.ts";
+import { createMediaFileInFate } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import {
   ImageProcessingError,
-  processImage,
-  type ImageCompressionOptions,
   compressionPresets,
   isHeicImageFile,
   isSupportedImageFile,
+  processImage,
+  type ImageCompressionOptions,
 } from "#src/lib/imageCompression.ts";
-import { type Repo, RawString, type DocumentId } from "@automerge/automerge-repo";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getLogger } from "#src/lib/log.ts";
+import { encodeBlob } from "#src/models/media.ts";
 
 const logger = getLogger("hooks", "useMediaFileActions");
 
 export function useMediaFileActions() {
-  const repo = useRepo();
+  const { client, userId } = useTrizumData();
 
-  return getMediaFileHelpers(repo);
+  return getMediaFileHelpers({ client, userId });
 }
 
 export function getImageUploadErrorMessage(error: unknown): string | null {
@@ -35,7 +35,13 @@ function omitUndefinedMetadataValues(metadata: Record<string, unknown>) {
   return Object.fromEntries(Object.entries(metadata).filter(([, value]) => value !== undefined));
 }
 
-export function getMediaFileHelpers(repo: Repo) {
+export function getMediaFileHelpers({
+  client,
+  userId,
+}: {
+  client: ReturnType<typeof useTrizumData>["client"];
+  userId: string;
+}) {
   async function createMediaFile(
     blob: Blob,
     metadata: Record<string, unknown>,
@@ -44,19 +50,16 @@ export function getMediaFileHelpers(repo: Repo) {
     let processedBlob = blob;
     let compressionMetadata = {};
 
-    // Check if the blob is an image file or a HEIC/HEIF upload.
     if (isSupportedImageFile(blob)) {
       const file = blob instanceof File ? blob : new File([blob], "image", { type: blob.type });
 
       try {
-        // Process the image with compression
         const processed = await processImage(
           file,
           compressionOptions || compressionPresets.balanced,
         );
         processedBlob = processed.blob;
 
-        // Add compression metadata
         compressionMetadata = omitUndefinedMetadataValues({
           mimeType: processed.outputMimeType || processedBlob.type,
           originalMimeType: processed.originalMimeType,
@@ -78,7 +81,6 @@ export function getMediaFileHelpers(repo: Repo) {
             : new ImageProcessingError("heic_conversion_failed", error);
         }
 
-        // If compression fails for non-HEIC images, use the original blob
         compressionMetadata = omitUndefinedMetadataValues({
           mimeType: file.type || blob.type,
           originalMimeType: file.type || blob.type,
@@ -90,21 +92,16 @@ export function getMediaFileHelpers(repo: Repo) {
       }
     }
 
-    const handle = repo.create<MediaFile>({
-      id: "id" as DocumentId,
-      type: "mediaFile",
-      encodedBlob: new RawString(await encodeBlob(processedBlob)),
+    const mediaFile = await createMediaFileInFate(client, userId, {
+      encodedBlob: await encodeBlob(processedBlob),
       metadata: omitUndefinedMetadataValues({
         ...metadata,
         ...compressionMetadata,
       }),
+      partyId: typeof metadata.partyId === "string" ? metadata.partyId : undefined,
     });
 
-    handle.change((doc) => {
-      doc.id = handle.documentId;
-    });
-
-    return [handle.documentId, handle] as const;
+    return [mediaFile.id, mediaFile] as const;
   }
 
   return {

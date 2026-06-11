@@ -45,8 +45,10 @@ export class PartyPage {
 
   async expectLoaded(partyId: string, partyName: string) {
     await expect(this.page).toHaveURL(new RegExp(`/party/${partyId}(?:\\?.*)?$`));
-    await expect(this.heading(new RegExp(escapeRegExp(partyName)))).toBeVisible();
-    await expect(this.addExpenseFab).toBeVisible();
+    await expect(this.heading(new RegExp(escapeRegExp(partyName)))).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(this.addExpenseFab).toBeVisible({ timeout: 30_000 });
   }
 
   async openAddExpense() {
@@ -64,7 +66,7 @@ export class PartyPage {
   async expectExpenseInLog(title: string, amountText: string) {
     const row = this.expenseRow(title);
 
-    await expect(row).toBeVisible();
+    await expect(row).toBeVisible({ timeout: 30_000 });
     await expect(row).toContainText(amountText);
   }
 
@@ -73,40 +75,61 @@ export class PartyPage {
   }
 
   async expectVisibleExpensesInOrder(titles: string[]) {
-    let previousTop = Number.NEGATIVE_INFINITY;
+    await expect(async () => {
+      let previousTop = Number.NEGATIVE_INFINITY;
 
-    for (const title of titles) {
-      const row = this.expenseRow(title);
-      await expect(row).toBeVisible();
-      const box = await row.boundingBox();
+      for (const title of titles) {
+        const row = this.expenseRow(title);
+        await expect(row).toBeVisible({ timeout: 5_000 });
+        const top = await row.evaluate((element) => element.getBoundingClientRect().top);
 
-      expect(box).not.toBeNull();
-      expect(box!.y).toBeGreaterThan(previousTop);
-      previousTop = box!.y;
-    }
+        expect(top).toBeGreaterThan(previousTop);
+        previousTop = top;
+      }
+    }).toPass({ timeout: 30_000 });
   }
 
-  async scrollExpenseLogUntilVisible(title: string, maxAttempts = 6) {
+  async scrollExpenseLogUntilVisible(title: string, timeoutMs = 120_000) {
     const row = this.expenseRow(title);
+    const deadline = Date.now() + timeoutMs;
 
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    await expect(this.expenseLogList).toBeVisible({ timeout: 30_000 });
+
+    while (Date.now() < deadline) {
       if (await row.isVisible()) {
         return;
       }
+
+      const previousScrollHeight = await this.expenseLogList.evaluate((list) => list.scrollHeight);
 
       await this.expenseLogList.evaluate((list) => {
         list.scrollTop = list.scrollHeight;
       });
 
       try {
-        await expect(row).toBeVisible({ timeout: 1_500 });
-        return;
+        await expect
+          .poll(
+            async () => {
+              if (await row.isVisible()) {
+                return "target";
+              }
+
+              const scrollHeight = await this.expenseLogList.evaluate((list) => list.scrollHeight);
+
+              return scrollHeight > previousScrollHeight ? "advanced" : "waiting";
+            },
+            {
+              intervals: [250, 500, 1_000],
+              timeout: Math.max(1_000, Math.min(10_000, deadline - Date.now())),
+            },
+          )
+          .not.toBe("waiting");
       } catch {
         continue;
       }
     }
 
-    await expect(row).toBeVisible();
+    await expect(row).toBeVisible({ timeout: 1_000 });
   }
 
   async openBalances() {

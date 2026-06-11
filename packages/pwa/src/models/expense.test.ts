@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vite-plus/test";
 import {
+  calculateBalancesByParticipant,
   createExpenseId,
   exportIntoInput,
   findExpenseById,
@@ -403,6 +404,30 @@ describe("getImpactOnBalanceForUser", () => {
   });
 });
 
+describe("calculateBalancesByParticipant", () => {
+  test("handles an empty participant snapshot", () => {
+    expect(calculateBalancesByParticipant([], {})).toStrictEqual({});
+  });
+
+  test("uses zero visual ratios when balances are settled", () => {
+    const balances = calculateBalancesByParticipant([], {
+      user1: {
+        id: "user1",
+        name: "User 1",
+        isArchived: false,
+      },
+      user2: {
+        id: "user2",
+        name: "User 2",
+        isArchived: false,
+      },
+    });
+
+    expect(balances.user1.visualRatio).toBe(0);
+    expect(balances.user2.visualRatio).toBe(0);
+  });
+});
+
 function createExpense(
   {
     paidBy,
@@ -414,7 +439,7 @@ function createExpense(
   timestamp?: number,
 ): Expense {
   return {
-    id: createExpenseId("test", timestamp),
+    id: createExpenseId(timestamp),
     name: "",
     paidAt: new Date(),
     paidBy,

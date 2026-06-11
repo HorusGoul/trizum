@@ -32,6 +32,14 @@ jobs:
         run: vp run ${{ matrix.script }}
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
+      - name: Validate Jazz schema
+        if: matrix.script == 'check'
+        run: |
+          vp run --filter @trizum/data jazz:validate
+          vp run --filter @trizum/data jazz:schema:hash
 
   e2e:
     name: E2E
@@ -45,12 +53,22 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
+      - name: Deploy Jazz schema and permissions
+        run: vp run --filter @trizum/data jazz:deploy
+        env:
+          JAZZ_ADMIN_SECRET: ${{ secrets.JAZZ_ADMIN_SECRET }}
+          JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
+
       - name: Install Playwright Browsers
         timeout-minutes: 5
         run: vp run --filter @trizum/pwa test:e2e:install:ci
 
       - name: Run Playwright E2E
         run: vp run --filter @trizum/pwa test:e2e
+        env:
+          VITE_JAZZ_APP_ID: ${{ secrets.JAZZ_APP_ID }}
+          VITE_JAZZ_SERVER_URL: https://v2.sync.jazz.tools/
 
       - name: Upload Playwright Report
         if: failure()

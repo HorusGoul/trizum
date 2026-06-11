@@ -1,24 +1,16 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import {
-  decodeExpenseId,
-  findExpenseById,
-  getExpenseTotalAmount,
-  getExpenseUnitShares,
-  type Expense,
-} from "#src/models/expense.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { getExpenseTotalAmount, getExpenseUnitShares, type Expense } from "#src/models/expense.js";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon } from "#src/ui/Icon.js";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import type { PartyExpenseChunk } from "#src/models/party.js";
 import { toast } from "sonner";
-import { guardParticipatingInParty } from "#src/lib/guards.js";
+import { guardExpenseExists, guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
+import { usePartyExpense } from "#src/hooks/usePartyExpense.ts";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
@@ -47,9 +39,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
-
-    const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
+    await guardExpenseExists(expenseId, context);
   },
 });
 
@@ -143,17 +133,8 @@ function ExpenseById() {
 function useExpense() {
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
-
-  if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
-
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
   const { removeExpense } = useCurrentParty();
-
-  const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
+  const { expense, isLoading } = usePartyExpense(partyId, expenseId);
 
   async function onDeleteExpense() {
     if (expenseId === undefined) return;
@@ -169,7 +150,7 @@ function useExpense() {
     onDeleteExpense,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
+    isLoading,
   };
 }
 

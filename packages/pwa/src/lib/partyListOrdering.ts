@@ -1,4 +1,3 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import type { Party } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 
@@ -13,7 +12,9 @@ interface OrderedPartySections {
 }
 
 export function getOrderedPartySections(partyList: PartyList): OrderedPartySections {
-  const partyIds = Object.keys(partyList.parties).filter(isValidDocumentId);
+  const partyIds = Object.keys(partyList.parties).filter(
+    (partyId) => partyList.parties[partyId] === true,
+  );
   const insertionOrder = new Map(partyIds.map((partyId, index) => [partyId, index]));
 
   const activePartyIds: PartyId[] = [];

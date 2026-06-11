@@ -2,13 +2,12 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
 import { CardButton } from "#src/components/CardButton.js";
-import { parseQRCodeForPartyId } from "#src/lib/qr.js";
+import { isPartyId, parseQRCodeForPartyId } from "#src/lib/qr.js";
 import { RouteQRScanner } from "#src/components/RouteQRScanner.js";
 import { useRouteQRScanner } from "#src/components/useRouteQRScanner.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
@@ -56,25 +55,20 @@ function Join() {
     // At this point validation already passed, partyId should exist
     if (!partyId) return;
 
-    void navigate({
-      to: "/party/$partyId",
-      replace: true,
-      params: { partyId },
-      search: { tab: "expenses" },
-    });
+    void navigateToPartySelection(partyId);
   }
 
   function validateId(id: string) {
     const isUrl = id.includes("/");
     const partyId = isUrl ? id.split("/party/")[1].split("/")[0] : id;
-    const valid = isValidDocumentId(partyId);
+    const valid = isPartyId(partyId);
 
     if (!valid) {
       return isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`;
     }
   }
 
-  function onJoinParty(value: JoinFormValues) {
+  async function onJoinParty(value: JoinFormValues) {
     let partyId: string;
 
     const isUrl = value.id.includes("/");
@@ -85,18 +79,23 @@ function Join() {
       partyId = value.id;
     }
 
-    if (!isValidDocumentId(partyId)) {
+    if (!isPartyId(partyId)) {
       toast.error(isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`);
       return;
     }
-    void navigate({
-      to: "/party/$partyId",
+
+    await navigateToPartySelection(partyId);
+  }
+
+  async function navigateToPartySelection(partyId: string) {
+    await navigate({
+      to: "/party/$partyId/who",
       replace: true,
       params: {
         partyId,
       },
       search: {
-        tab: "expenses",
+        redirectTo: `/party/${partyId}?tab=expenses`,
       },
     });
   }
@@ -106,7 +105,7 @@ function Join() {
       id: "",
     },
     onSubmit: ({ value }) => {
-      onJoinParty(value);
+      return onJoinParty(value);
     },
   });
 
@@ -189,7 +188,7 @@ function Join() {
                 isDisabled={!canSubmit || isSubmitting}
                 className="gap-2"
               >
-                <Trans>Join</Trans>
+                {isSubmitting ? <Trans>Joining...</Trans> : <Trans>Join</Trans>}
               </Button>
             )}
           </form.Subscribe>

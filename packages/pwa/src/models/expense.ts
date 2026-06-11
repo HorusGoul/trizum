@@ -1,6 +1,4 @@
 import { calculateLogStatsOfUser, type ExpenseInput, type ExpenseUser } from "#src/lib/expenses.js";
-import type { DocumentId } from "@automerge/automerge-repo";
-import { ulid } from "ulidx";
 import Dinero from "dinero.js";
 import type { MediaFile } from "./media";
 import { diff } from "@opentf/obj-diff";
@@ -145,16 +143,20 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
   });
 }
 
-export function createExpenseId(chunkId: string, timestamp?: number): string {
-  return `${ulid(timestamp)}:${chunkId}`;
+export function createExpenseId(timestamp?: number): string {
+  void timestamp;
+  return crypto.randomUUID();
 }
 
 export function decodeExpenseId(expenseId: string): {
-  chunkId: DocumentId;
   expenseId: string;
 } {
-  const [id, chunkId] = expenseId.split(":");
-  return { chunkId: chunkId as DocumentId, expenseId: id };
+  if (expenseId.startsWith("expense:")) {
+    return { expenseId };
+  }
+
+  const [id] = expenseId.split(":");
+  return { expenseId: id };
 }
 
 /**
@@ -163,8 +165,6 @@ export function decodeExpenseId(expenseId: string): {
  * This function uses a binary search to find the expense with the given ID
  * within the given array of expenses.
  *
- * This is the best way to find expenses within chunks.
- *
  * @param expenses The array of expenses to search in, must be sorted in descending order.
  * @param encodedId The encoded ID of the expense to find.
  */
@@ -172,6 +172,12 @@ export function findExpenseById(
   expenses: Expense[],
   encodedId: string,
 ): [Expense | undefined, index: number] {
+  const directIndex = expenses.findIndex((expense) => expense.id === encodedId);
+
+  if (directIndex !== -1) {
+    return [expenses[directIndex], directIndex];
+  }
+
   const { expenseId } = decodeExpenseId(encodedId);
 
   let start = 0;
@@ -520,6 +526,10 @@ export function mergeBalancesByParticipant(
 }
 
 function calculateVisualRatioForBalances(balances: Balance[]) {
+  if (balances.length === 0) {
+    return balances;
+  }
+
   const biggestAbsoluteBalance = balances.reduce((prev, next) => {
     const prevAbs = Math.abs(prev.stats.balance);
     const nextAbs = Math.abs(next.stats.balance);
@@ -529,6 +539,14 @@ function calculateVisualRatioForBalances(balances: Balance[]) {
 
   // Biggest absolute balance should be considered as the reference point (1)
   const referenceBalance = biggestAbsoluteBalance.stats.balance;
+
+  if (referenceBalance === 0) {
+    for (const balance of balances) {
+      balance.visualRatio = 0;
+    }
+
+    return balances;
+  }
 
   // Use the reference balance to calculate the visual ratio of each balance
   for (const balance of balances) {

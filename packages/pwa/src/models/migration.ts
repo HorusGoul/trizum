@@ -1,17 +1,21 @@
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import type { Expense } from "./expense";
 import type { Party } from "./party";
-import { getPartyHelpers } from "#src/hooks/useParty.ts";
 import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
+import {
+  createExpenseInFate,
+  createPartyInFate,
+  type CreatePartyValues,
+} from "#src/lib/data/fateAppData.ts";
+import type { TrizumFateClient } from "@trizum/data";
 
 const logger = getLogger("models", "migration");
 
 export interface MigrationData {
-  party: Omit<Party, "id" | "chunkRefs">;
+  party: Omit<Party, "id">;
   expenses: (Omit<Expense, "id" | "__hash" | "paidAt" | "photos"> & {
     paidAt: string;
     photos: string[];
@@ -20,37 +24,38 @@ export interface MigrationData {
 }
 
 interface CreatePartyFromMigrationDataParams {
-  repo: Repo;
+  client: TrizumFateClient;
   data: MigrationData;
   importAttachments?: boolean;
   onProgress?: ({ name, progress }: { name: string; progress: number }) => void;
+  userId: string;
 }
 
 export async function createPartyFromMigrationData({
-  repo,
+  client,
   data,
   importAttachments = false,
   onProgress,
+  userId,
 }: CreatePartyFromMigrationDataParams) {
-  const { createMediaFile } = getMediaFileHelpers(repo);
-
-  const party: Party = {
-    id: "" as DocumentId,
-    type: "party",
+  const { createMediaFile } = getMediaFileHelpers({ client, userId });
+  const partyValues: CreatePartyValues = {
     name: data.party.name,
     description: data.party.description,
     currency: data.party.currency,
-    participants: data.party.participants,
-    chunkRefs: [],
+    participants: Object.values(data.party.participants),
   };
 
   if (typeof data.party.symbol === "string") {
-    party.symbol = data.party.symbol;
+    partyValues.symbol = data.party.symbol;
   }
 
-  const handle = repo.create<Party>(party);
-  handle.change((doc) => (doc.id = handle.documentId));
-  const partyId = handle.documentId;
+  const party = await createPartyInFate({
+    client,
+    userId,
+    values: partyValues,
+  });
+  const partyId = party.id;
 
   // Import photos
   const photoMap = new Map<string, MediaFile["id"]>();
@@ -82,8 +87,6 @@ export async function createPartyFromMigrationData({
     }
   }
 
-  const helpers = getPartyHelpers(repo, handle);
-
   // Expenses from oldest to newest
   data.expenses.sort((a, b) => new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime());
 
@@ -99,25 +102,23 @@ export async function createPartyFromMigrationData({
     const expense = data.expenses[i];
 
     await waitIdleCallback(async () => {
-      await helpers
-        .addExpenseToParty({
-          name: expense.name,
-          paidAt: new Date(expense.paidAt),
-          shares: expense.shares,
-          paidBy: expense.paidBy,
-          photos: expense.photos
-            .map((photoId) => photoMap.get(photoId))
-            .filter((photoId): photoId is MediaFile["id"] => !!photoId),
-        })
-        .catch((error) => {
-          logger.error("Failed to import migrated expense", {
-            error,
-            expenseName: expense.name,
-          });
-          throw new Error(
-            `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
-          );
+      await createExpenseInFate(client, partyId, {
+        name: expense.name,
+        paidAt: new Date(expense.paidAt),
+        shares: expense.shares,
+        paidBy: expense.paidBy,
+        photos: expense.photos
+          .map((photoId) => photoMap.get(photoId))
+          .filter((photoId): photoId is MediaFile["id"] => !!photoId),
+      }).catch((error) => {
+        logger.error("Failed to import migrated expense", {
+          error,
+          expenseName: expense.name,
         });
+        throw new Error(
+          `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+      });
     });
 
     onProgress?.({

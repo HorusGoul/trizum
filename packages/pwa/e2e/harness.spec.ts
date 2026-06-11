@@ -16,6 +16,7 @@ import {
   expenseEntryJourney,
 } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
+import type { Page } from "@playwright/test";
 
 function formatAmountText(amount: number) {
   return amount.toFixed(2).replace(".", ",");
@@ -25,7 +26,7 @@ test.describe("Browser harness", () => {
   test("starts every journey from a fresh offline home screen", async ({ harness, page }) => {
     await harness.gotoHome();
 
-    await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
+    await expectOfflineHome(page);
     await expect(page.getByRole("heading", { name: "Welcome to trizum" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Create a new Party" })).toBeVisible();
   });
@@ -40,7 +41,7 @@ test.describe("Browser harness", () => {
     await test.step("load the home screen with persisted membership", async () => {
       await harness.gotoHome();
 
-      await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
+      await expectOfflineHome(page);
       await homePage.expectPartyVisible(/Weekend trip/);
     });
 
@@ -274,3 +275,20 @@ test.describe("Browser harness", () => {
     });
   });
 });
+
+async function expectOfflineHome(page: Page) {
+  await expect
+    .poll(async () =>
+      page.evaluate(() => {
+        const search = new URLSearchParams(window.location.search);
+        return {
+          offlineOnly: search.get("__internal_offline_only"),
+          pathname: window.location.pathname,
+        };
+      }),
+    )
+    .toEqual({
+      offlineOnly: "true",
+      pathname: "/",
+    });
+}

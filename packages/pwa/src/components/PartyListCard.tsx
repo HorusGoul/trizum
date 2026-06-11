@@ -1,6 +1,5 @@
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
-import type { AnyDocumentId } from "@automerge/automerge-repo/slim";
 import { useNavigate } from "@tanstack/react-router";
 import {
   mergeProps,
@@ -13,8 +12,8 @@ import {
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { type ComponentProps, type ReactNode, useState } from "react";
 import { useMediaQuery } from "#src/hooks/useMediaQuery.js";
+import { useParty } from "#src/hooks/useParty.ts";
 import type { Party, PartyParticipant } from "#src/models/party.js";
-import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -40,7 +39,7 @@ export interface PartyListCardAction {
 
 interface PartyListCardProps {
   actions?: PartyListCardAction[];
-  partyId: AnyDocumentId;
+  partyId: string;
   isArchived?: boolean;
   isPinned?: boolean;
   currentParticipantId?: PartyParticipant["id"] | null;
@@ -55,7 +54,7 @@ export function PartyListCard({
 }: PartyListCardProps) {
   const navigate = useNavigate();
   const isLargeScreen = useMediaQuery("(min-width: 768px)");
-  const [party, handle] = useSuspenseDocument<Party>(partyId);
+  const { party } = useParty(partyId);
   const [isFocusWithin, setIsFocusWithin] = useState(false);
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
@@ -96,7 +95,7 @@ export function PartyListCard({
     },
   });
 
-  if (!party || !handle) {
+  if (!party) {
     return null;
   }
 

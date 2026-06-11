@@ -1,4 +1,3 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { BarcodeDetector, prepareZXingModule } from "barcode-detector/ponyfill";
 
 // Configure zxing-wasm to use local WASM file instead of CDN
@@ -15,6 +14,8 @@ prepareZXingModule({
 
 // Re-export configured BarcodeDetector
 export { BarcodeDetector };
+
+const PARTY_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Parses a QR code value to extract a party ID.
@@ -51,10 +52,13 @@ export function parseQRCodeForPartyId(value: string): string | null {
     partyId = trimmed;
   }
 
-  // Validate the extracted party ID
-  if (!isValidDocumentId(partyId)) {
+  if (!isPartyId(partyId)) {
     return null;
   }
 
   return partyId;
+}
+
+export function isPartyId(value: string): boolean {
+  return PARTY_ID_PATTERN.test(value);
 }

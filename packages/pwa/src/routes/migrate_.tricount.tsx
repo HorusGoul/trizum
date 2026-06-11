@@ -6,12 +6,12 @@ import { AppTextField } from "#src/ui/fields/TextField.js";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId, useState } from "react";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { createPartyFromMigrationData, type MigrationData } from "#src/models/migration.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import { getAppLink } from "#src/lib/link.ts";
 import { extractTricountId } from "#src/lib/tricount.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 
 export const Route = createFileRoute("/migrate_/tricount")({
   component: RouteComponent,
@@ -70,7 +70,7 @@ interface MigrateParams {
 
 function useMigrateTricount() {
   const [state, setState] = useState<MigrationState>({ type: "idle" });
-  const repo = useRepo();
+  const { client, userId } = useTrizumData();
 
   async function migrate({ key, importAttachments }: MigrateParams) {
     setState({
@@ -92,7 +92,7 @@ function useMigrateTricount() {
       }
 
       const partyId = await createPartyFromMigrationData({
-        repo,
+        client,
         data: data as MigrationData,
         importAttachments,
         onProgress: (progress) => {
@@ -102,6 +102,7 @@ function useMigrateTricount() {
             progress: progress.progress,
           });
         },
+        userId,
       });
 
       setState({ type: "success", partyId });

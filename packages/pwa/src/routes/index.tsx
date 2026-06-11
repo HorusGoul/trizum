@@ -8,46 +8,30 @@ import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { cn } from "#src/ui/utils.js";
-import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Link, MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { use, useState } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
+import { readPartyList } from "#src/lib/data/fateAppData.ts";
 
 let hasRedirectedThisSession = false;
 
 export const Route = createFileRoute("/")({
   component: Index,
   beforeLoad: async ({ context }) => {
-    // Only redirect once per session (on app launch)
     if (hasRedirectedThisSession) {
       return;
     }
 
-    const partyListId = localStorage.getItem("partyListId");
-    if (!partyListId || !isValidDocumentId(partyListId)) {
-      return;
-    }
-
-    const partyList = (await documentCache.readAsync(context.repo, partyListId)) as
-      | PartyList
-      | undefined;
-
-    if (!partyList) {
-      return;
-    }
-
+    const partyList = await readPartyList(context.data.client, context.data.userId);
     const { openLastPartyOnLaunch, lastOpenedPartyId, parties } = partyList;
 
     if (
       openLastPartyOnLaunch &&
       lastOpenedPartyId &&
-      isValidDocumentId(lastOpenedPartyId) &&
       parties[lastOpenedPartyId] &&
       partyList.archivedParties?.[lastOpenedPartyId] !== true
     ) {
@@ -241,14 +225,7 @@ function Index() {
 }
 
 function usePartySections(partyList: PartyList) {
-  const repo = useRepo();
-  const sections = getOrderedPartySections(partyList);
-
-  for (const partyId of [...sections.activePartyIds, ...sections.archivedPartyIds]) {
-    documentCache.prefetch(repo, partyId);
-  }
-
-  return sections;
+  return getOrderedPartySections(partyList);
 }
 
 function createPartyActions({
@@ -282,7 +259,7 @@ function togglePartyPinned(
   setPartyPinned: ReturnType<typeof usePartyList>["setPartyPinned"],
 ) {
   const currentlyPinned = isPartyPinned(partyList, partyId);
-  setPartyPinned(partyId, !currentlyPinned);
+  void setPartyPinned(partyId, !currentlyPinned);
   toast.success(currentlyPinned ? t`Party unpinned` : t`Party pinned`);
 }
 
@@ -290,7 +267,7 @@ function archiveParty(
   partyId: Party["id"],
   setPartyArchived: ReturnType<typeof usePartyList>["setPartyArchived"],
 ) {
-  setPartyArchived(partyId, true);
+  void setPartyArchived(partyId, true);
   toast.success(t`Party archived`);
 }
 

@@ -5,26 +5,26 @@ import { JoinTrizumPage } from "./pages/join-trizum.page";
 import { NewTrizumPage } from "./pages/new-trizum.page";
 
 test.describe("Home smoke @smoke", () => {
-  test("shows the empty-state actions on the home screen", async ({ page }) => {
+  test("shows the empty-state actions on the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
 
-    await page.goto("/?__internal_offline_only=true");
+    await harness.gotoHome();
     await homePage.expectLoaded();
   });
 
-  test("navigates to create and join flows from the home screen", async ({ page }) => {
+  test("navigates to create and join flows from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
     const newTrizumPage = new NewTrizumPage(page);
     const joinTrizumPage = new JoinTrizumPage(page);
 
     await test.step("open the create flow from the home screen", async () => {
-      await page.goto("/?__internal_offline_only=true");
+      await harness.gotoHome();
       await homePage.openCreateParty();
       await newTrizumPage.expectLoaded();
     });
 
     await test.step("open the join flow from the home screen", async () => {
-      await page.goto("/?__internal_offline_only=true");
+      await harness.gotoHome();
       await homePage.openJoinParty();
       await joinTrizumPage.expectLoaded();
     });
@@ -40,7 +40,20 @@ test.describe("Home smoke @smoke", () => {
     await test.step("render persisted party membership on home", async () => {
       await harness.gotoHome();
 
-      await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
+      await expect
+        .poll(async () =>
+          page.evaluate(() => {
+            const search = new URLSearchParams(window.location.search);
+            return {
+              offlineOnly: search.get("__internal_offline_only"),
+              pathname: window.location.pathname,
+            };
+          }),
+        )
+        .toEqual({
+          offlineOnly: "true",
+          pathname: "/",
+        });
       await homePage.expectPartyVisible(/Weekend trip/);
     });
 

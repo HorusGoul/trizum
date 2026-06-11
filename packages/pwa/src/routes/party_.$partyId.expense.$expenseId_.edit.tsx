@@ -5,29 +5,19 @@ import {
   type ExpenseEditorRef,
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
-import { documentCache, useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import { usePartyExpense } from "#src/hooks/usePartyExpense.ts";
+import { updateExpenseDraftInFate, upsertExpenseInFate } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
-import { guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { patchMutate } from "#src/lib/patchMutate.ts";
-import {
-  decodeExpenseId,
-  findExpenseById,
-  calculateExpenseHash,
-  getExpenseTotalAmount,
-  type Expense,
-} from "#src/models/expense.ts";
-import type { PartyExpenseChunk } from "#src/models/party.ts";
-import { type DocHandleChangePayload } from "@automerge/automerge-repo";
-import { diff, type DiffResult } from "@opentf/obj-diff";
-import { clone } from "@opentf/std";
+import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.ts";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+import { guardExpenseExists, guardParticipatingInParty } from "#src/lib/guards.ts";
 
 interface EditExpenseSearchParams {
   media?: number;
@@ -36,38 +26,32 @@ interface EditExpenseSearchParams {
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit")({
   component: EditExpense,
   pendingComponent: PartyPendingComponent,
+  loader: async ({ context, params: { expenseId, partyId }, location }) => {
+    const { party } = await guardParticipatingInParty(partyId, context, location);
+    await guardExpenseExists(expenseId, context);
+
+    return { party };
+  },
 
   validateSearch: (search): EditExpenseSearchParams => {
     return {
       media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
     };
   },
-
-  async loader({ location, context, params: { expenseId, partyId } }) {
-    await guardParticipatingInParty(partyId, context, location);
-
-    const { chunkId } = decodeExpenseId(expenseId);
-    await documentCache.readAsync(context.repo, chunkId);
-  },
 });
 
-const TIME_TO_DISCARD_EDIT_COPY = 1000 * 60 * 5; // 5 minutes
 const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
-  const {
-    expenseId,
-    partyId,
-    expense,
-    onUpdateExpense,
-    onChangeExpense,
-    subscribeToExpenseChanges,
-  } = useExpense();
+  const { expenseId, partyId, expense, isLoading, onUpdateExpense, onUpdateExpenseDraft } =
+    useExpense();
+  const { party } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
-
-  const photos = expense?.photos ?? [];
+  const editorRef = useRef<ExpenseEditorRef>(null);
+  const latestExpenseRef = useRef<Expense | null>(expense);
+  const draftUpdateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
@@ -75,67 +59,60 @@ function EditExpense() {
     goBack: () => history.back(),
   });
 
-  if (!expense) {
-    throw new Error("Expense not found");
+  if (expense) {
+    latestExpenseRef.current = expense;
   }
 
-  const editorRef = useRef<ExpenseEditorRef>(null);
-  const currentHashRef = useRef<string>(getExpenseHash(expense));
+  function clearScheduledDraftUpdate() {
+    if (draftUpdateTimerRef.current) {
+      clearTimeout(draftUpdateTimerRef.current);
+      draftUpdateTimerRef.current = null;
+    }
+  }
 
-  const onChange = useCallback(
-    (previousValues: ExpenseEditorFormValues, currentValues: ExpenseEditorFormValues) => {
-      function createExpense(values: ExpenseEditorFormValues) {
-        return {
-          id: expenseId,
-          name: values.name,
-          paidAt: values.paidAt,
-          paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-          shares: values.shares,
-          photos: values.photos,
-        };
-      }
+  function scheduleDraftUpdate(values: ExpenseEditorFormValues) {
+    clearScheduledDraftUpdate();
 
-      const expense = createExpense(currentValues);
-      const hash = calculateExpenseHash(expense);
+    draftUpdateTimerRef.current = setTimeout(() => {
+      const baseExpense = latestExpenseRef.current;
 
-      if (hash === currentHashRef.current) {
+      if (!baseExpense) {
         return;
       }
 
-      currentHashRef.current = hash;
+      const draft = getExpenseFromFormValues(expenseId, values, baseExpense);
 
-      const patches = diff(createExpense(previousValues), expense);
-      onChangeExpense(patches);
-    },
-    [onChangeExpense, expenseId],
-  );
+      void onUpdateExpenseDraft({
+        ...baseExpense,
+        __editCopy: draft,
+        __editCopyLastUpdatedAt: new Date(),
+      }).catch((error: unknown) => {
+        logger.error("Failed to update realtime expense draft", { error });
+      });
+    }, 250);
+  }
 
   async function onSubmit(values: ExpenseEditorFormValues) {
     try {
-      // Create shares based on the form values
-      const shares: Expense["shares"] = {};
-
-      // Use the shares directly from the form
-      Object.entries(values.shares).forEach(([participantId, share]) => {
-        shares[participantId] = share;
-      });
+      clearScheduledDraftUpdate();
 
       toast.loading(t`Updating expense...`, {
         id: "update-expense",
       });
 
-      const expense = {
-        id: expenseId,
-        name: values.name,
-        paidAt: values.paidAt,
-        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-        shares,
-        photos: values.photos,
-      };
+      const latestExpense = latestExpenseRef.current;
+
+      if (!latestExpense) {
+        throw new Error("Expense not found");
+      }
+
+      const expense = getExpenseFromFormValues(expenseId, values, latestExpense);
 
       await onUpdateExpense({
         ...expense,
         __hash: calculateExpenseHash(expense),
+        __editCopy: undefined,
+        __editCopyLastUpdatedAt: undefined,
       });
 
       await navigate({
@@ -165,19 +142,33 @@ function EditExpense() {
     }
   }
 
+  const editableExpense = expense ? getEditableExpense(expense) : null;
+  const photos = editableExpense?.photos ?? [];
+  const editCopyUpdatedAt = expense?.__editCopyLastUpdatedAt?.getTime() ?? 0;
+  const formValues = editableExpense ? getFormValues(editableExpense) : null;
+  const expenseName = formValues?.name ?? "";
+
   useEffect(() => {
-    return subscribeToExpenseChanges((updatedExpense) => {
-      const raw = clone(updatedExpense);
+    const latestExpense = latestExpenseRef.current;
 
-      const currentHash = getExpenseHash(raw);
-      currentHashRef.current = currentHash;
+    if (!latestExpense) {
+      return;
+    }
 
-      editorRef.current?.setValues(getFormValues(raw));
-    });
-  }, [onChange, subscribeToExpenseChanges]);
+    editorRef.current?.setValues(getFormValues(getEditableExpense(latestExpense)));
+  }, [expense?.__hash, editCopyUpdatedAt]);
 
-  const formValues = getFormValues(expense);
-  const expenseName = formValues.name;
+  useEffect(() => {
+    return clearScheduledDraftUpdate;
+  }, []);
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!expense || !formValues) {
+    throw new Error("Expense not found");
+  }
 
   return (
     <>
@@ -185,8 +176,9 @@ function EditExpense() {
       <ExpenseEditor
         title={t`Editing ${expenseName}`}
         onSubmit={onSubmit}
+        onChange={(_previousValues, currentValues) => scheduleDraftUpdate(currentValues)}
         defaultValues={formValues}
-        onChange={onChange}
+        party={party}
         ref={editorRef}
         // eslint-disable-next-line jsx-a11y/no-autofocus -- We don't want to auto focus the edit form
         autoFocus={false}
@@ -205,89 +197,28 @@ function EditExpense() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const { updateExpense } = useCurrentParty();
-
-  const { chunkId } = decodeExpenseId(expenseId);
-
-  const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
-    required: true,
-  });
-
-  const [expense] = findExpenseById(chunk.expenses, expenseId);
+  const { client } = useTrizumData();
+  const { expense, isLoading } = usePartyExpense(partyId, expenseId);
 
   function onUpdateExpense(expense: Expense) {
-    return updateExpense(expense);
+    return upsertExpenseInFate(client, partyId, expense);
   }
 
-  function onChangeExpense(patches: DiffResult[]) {
-    handle.change((chunk) => {
-      const entry = chunk.expenses.find((e) => e.id === expenseId);
-
-      if (!entry) {
-        return;
-      }
-
-      if (!entry.__editCopy) {
-        entry.__editCopy = clone(entry);
-      }
-
-      patchMutate(entry.__editCopy, patches);
-      entry.__editCopy.__hash = calculateExpenseHash(entry.__editCopy);
-      entry.__editCopyLastUpdatedAt = new Date();
-    });
-  }
-
-  function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
-    let prevHash = expense ? getExpenseHash(expense) : "";
-
-    const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
-      const [expense] = findExpenseById(payload.doc.expenses, expenseId);
-
-      if (!expense) {
-        return;
-      }
-
-      const currentHash = getExpenseHash(expense);
-
-      if (currentHash === prevHash) {
-        return;
-      }
-
-      prevHash = currentHash;
-
-      callback(expense);
-    };
-
-    handle.on("change", handler);
-
-    return () => {
-      handle.off("change", handler);
-    };
+  function onUpdateExpenseDraft(expense: Expense) {
+    return updateExpenseDraftInFate(client, partyId, expense);
   }
 
   return {
     partyId,
     expense,
     expenseId,
-    isLoading: handle.inState(["loading"]),
-    onChangeExpense,
+    isLoading,
     onUpdateExpense,
-    subscribeToExpenseChanges,
+    onUpdateExpenseDraft,
   };
 }
 
 function getFormValues(expense: Expense): ExpenseEditorFormValues {
-  if (shouldUseEditCopy(expense)) {
-    return {
-      name: expense.__editCopy.name,
-      paidAt: expense.__editCopy.paidAt,
-      shares: expense.__editCopy.shares,
-      photos: expense.__editCopy.photos,
-      amount: getExpenseTotalAmount(expense.__editCopy) / 100,
-      paidBy: Object.keys(expense.__editCopy.paidBy)[0],
-    };
-  }
-
   return {
     name: expense.name,
     amount: getExpenseTotalAmount(expense) / 100,
@@ -298,22 +229,34 @@ function getFormValues(expense: Expense): ExpenseEditorFormValues {
   };
 }
 
-function getExpenseHash(expense: Expense) {
-  if (shouldUseEditCopy(expense)) {
-    return expense.__editCopy.__hash;
-  }
-
-  return expense.__hash;
+function getEditableExpense(expense: Expense): Expense {
+  return expense.__editCopy ?? expense;
 }
 
-function shouldUseEditCopy(expense: Expense): expense is Expense & { __editCopy: Expense } {
-  if (!expense.__editCopy) {
-    return false;
-  }
+function getExpenseFromFormValues(
+  expenseId: string,
+  values: ExpenseEditorFormValues,
+  baseExpense: Expense,
+): Expense {
+  const shares: Expense["shares"] = {};
 
-  if (!expense.__editCopyLastUpdatedAt) {
-    return false;
-  }
+  Object.entries(values.shares).forEach(([participantId, share]) => {
+    shares[participantId] = share;
+  });
 
-  return expense.__editCopyLastUpdatedAt.getTime() + TIME_TO_DISCARD_EDIT_COPY > Date.now();
+  const expense: Expense = {
+    __hash: "",
+    id: expenseId,
+    isTransfer: baseExpense.isTransfer,
+    name: values.name,
+    paidAt: values.paidAt,
+    paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+    photos: values.photos,
+    shares,
+  };
+
+  return {
+    ...expense,
+    __hash: calculateExpenseHash(expense),
+  };
 }

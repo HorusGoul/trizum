@@ -1,20 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import EMOJI_REGEX from "emojibase-regex/emoji";
-
-export function validateDocumentId(id: string) {
-  id = id.trim();
-
-  if (!id) {
-    return t`ID is required`;
-  }
-
-  if (!isValidDocumentId(id)) {
-    return t`This isn't a valid ID`;
-  }
-
-  return null;
-}
 
 export function validatePartyTitle(title: string) {
   title = title.trim();

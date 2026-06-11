@@ -1,30 +1,28 @@
-import type { Party, PartyExpenseChunkBalances } from "#src/models/party.ts";
-import {
-  useMultipleSuspenseDocument,
-  useSuspenseDocument,
-} from "#src/lib/automerge/suspense-hooks.ts";
-import {
-  calculateBalancesByParticipant,
-  mergeBalancesByParticipant,
-  type BalancesByParticipant,
-} from "#src/models/expense.ts";
+import { calculateBalancesByParticipant, type BalancesByParticipant } from "#src/models/expense.ts";
+import type { Party } from "#src/models/party.ts";
+import { toExpense } from "#src/lib/data/fateAppData.ts";
+import { useFateLiveListView, useFateLiveViews, useFateRequest } from "#src/lib/data/fateReact.ts";
+import { ALL_EXPENSES_CONNECTION_VIEW } from "#src/lib/data/trizumFateViews.ts";
+import { useParty } from "./useParty";
+import { ExpenseListItemView, type ExpenseEntity } from "@trizum/data";
 
 export function usePartyBalances(partyId: Party["id"]): BalancesByParticipant {
-  const [party] = useSuspenseDocument<Party>(partyId, {
-    required: true,
-  });
-
-  const results = useMultipleSuspenseDocument<PartyExpenseChunkBalances>(
-    party.chunkRefs.map((chunkRef) => chunkRef.balancesId),
-    {
-      required: true,
+  const { party } = useParty(partyId);
+  const { expenses } = useFateRequest({
+    expenses: {
+      args: { partyId },
+      list: ALL_EXPENSES_CONNECTION_VIEW,
     },
+  });
+  const liveExpenses = useFateLiveListView<ExpenseEntity>(ALL_EXPENSES_CONNECTION_VIEW, expenses);
+  const expenseEntities = useFateLiveViews(
+    ExpenseListItemView,
+    liveExpenses.items.map(({ node }) => node),
   );
 
-  // Needed for the assumption that there's always at least a balance for each participant
-  // But chunks can be created without expenses, or might have an old balance that doesn't include
-  // all participants that exist when running this hook
-  const baseBalance = calculateBalancesByParticipant([], party.participants);
+  if (!party) {
+    return {};
+  }
 
-  return mergeBalancesByParticipant(baseBalance, ...results.map(({ doc }) => doc.balances));
+  return calculateBalancesByParticipant(expenseEntities.map(toExpense), party.participants);
 }

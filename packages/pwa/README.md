@@ -13,6 +13,8 @@ then use this document to decide where to work inside the PWA.
 - [`src/components`](./src/components) contains app-specific UI.
 - [`src/lib`](./src/lib) and [`src/models`](./src/models) contain business logic
   and domain models.
+- [`src/lib/data`](./src/lib/data) contains the app-facing Fate/Jazz data
+  client context and PWA view-model data helpers.
 - [`e2e/README.md`](./e2e/README.md) defines the shared Playwright browser
   harness and deterministic journey setup strategy.
 - [`locale/AGENTS.md`](./locale/AGENTS.md) contains translation terminology and
@@ -20,7 +22,7 @@ then use this document to decide where to work inside the PWA.
 
 ## Package Notes
 
-- The app is offline-first and uses Automerge for shared, persisted data.
+- The app is local-first and uses Fate over Jazz alpha for shared, persisted data.
 - User-facing copy must use Lingui macros, then run `vp run lingui:extract`.
 - `src/routeTree.gen.ts` is generated. Do not edit it manually.
 - `src/generated/iconSprite.gen.ts` and `src/generated/iconSprite.svg` are

@@ -1,14 +1,11 @@
 import { describe, test, expect, beforeAll } from "vite-plus/test";
 import { parseQRCodeForPartyId } from "./qr";
-import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
 
 describe("parseQRCodeForPartyId", () => {
-  // Generate a valid Automerge document ID for testing
   let VALID_DOCUMENT_ID: string;
 
   beforeAll(() => {
-    const url = generateAutomergeUrl();
-    VALID_DOCUMENT_ID = parseAutomergeUrl(url).documentId;
+    VALID_DOCUMENT_ID = crypto.randomUUID();
   });
 
   test("should return null for empty string", () => {

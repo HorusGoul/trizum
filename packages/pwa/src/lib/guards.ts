@@ -1,32 +1,139 @@
-import type { Party } from "#src/models/party.js";
 import {
   redirect,
   type ParsedLocation,
   type RegisteredRouter,
   type RouterContextOptions,
 } from "@tanstack/react-router";
-import { documentCache } from "./automerge/suspense-hooks";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
-import type { DocumentId } from "@automerge/automerge-repo";
+import {
+  readPartyList,
+  readPartyResult,
+  toParty,
+  waitForExpenseEntityInFate,
+  waitForPartyEntitiesInFate,
+  writeExpenseEntityToFateCache,
+  writePartyEntitiesToFateCache,
+  type DataReadResult,
+} from "#src/lib/data/fateAppData.ts";
+import type { Party } from "#src/models/party.ts";
 
-export async function guardPartyExists(
-  partyId: string,
-  { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
-) {
-  const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as Party | undefined;
+type RouterContext = RouterContextOptions<RegisteredRouter["routeTree"]>["context"];
 
-  if (!party) {
+export async function guardPartyExists(partyId: string, { data }: RouterContext) {
+  const partyResult = await readPartyResultForGuard(partyId, data);
+
+  if (partyResult.status === "notFound") {
     throw redirect({ to: "/" });
   }
 
-  return party;
+  if (partyResult.status === "error") {
+    throw partyResult.error;
+  }
+
+  return partyResult.value;
 }
 
-export async function guardPartyListExists({
-  repo,
-}: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
-  const partyListId = getPartyListId(repo);
-  const partyList = (await documentCache.readAsync(repo, partyListId)) as PartyList | undefined;
+export async function guardExpenseExists(expenseId: string, { data }: RouterContext) {
+  const localExpense = await waitForExpenseEntityInFate(data.client, expenseId, {
+    timeoutMs: data.hasRemoteSync ? 2_000 : 8_000,
+  });
+
+  if (localExpense) {
+    return localExpense;
+  }
+
+  if (!data.hasRemoteSync || !data.settledClient) {
+    throw new Error(`Expense ${expenseId} not found`);
+  }
+
+  const settledExpense = await waitForExpenseEntityInFate(data.settledClient, expenseId, {
+    requestOptions: { mode: "network-only" },
+    timeoutMs: 60_000,
+  });
+
+  if (!settledExpense) {
+    throw new Error(`Expense ${expenseId} not found`);
+  }
+
+  writeExpenseEntityToFateCache(data.client, settledExpense);
+
+  return settledExpense;
+}
+
+async function readPartyResultForGuard(
+  partyId: string,
+  data: RouterContext["data"],
+): Promise<DataReadResult<Party>> {
+  let localResult: DataReadResult<Party>;
+
+  try {
+    const localRead = await withGuardTimeout(
+      readPartyResult(data.client, partyId),
+      data.hasRemoteSync ? 2_000 : 8_000,
+    );
+
+    if (!localRead) {
+      localResult = {
+        status: "notFound",
+      };
+    } else {
+      localResult = localRead;
+    }
+  } catch (error) {
+    if (!data.hasRemoteSync || !data.settledClient) {
+      return {
+        error,
+        status: "error",
+      };
+    }
+
+    localResult = {
+      status: "notFound",
+    };
+  }
+
+  if (localResult.status === "found" || !data.hasRemoteSync || !data.settledClient) {
+    return localResult;
+  }
+
+  try {
+    const partySnapshot = await waitForPartyEntitiesInFate(data.settledClient, partyId, {
+      requestOptions: { mode: "network-only" },
+      timeoutMs: 60_000,
+    });
+
+    if (partySnapshot) {
+      writePartyEntitiesToFateCache(data.client, partySnapshot);
+
+      return {
+        status: "found",
+        value: toParty(partySnapshot.party, partySnapshot.participants),
+      };
+    }
+  } catch (error) {
+    if (localResult.status === "error") {
+      return localResult;
+    }
+
+    return {
+      error,
+      status: "error",
+    };
+  }
+
+  if (localResult.status === "error") {
+    return localResult;
+  }
+
+  return {
+    status: "notFound",
+  };
+}
+
+export async function guardPartyListExists({ data }: RouterContext) {
+  const partyList = await withGuardTimeout(
+    readPartyList(data.client, data.userId),
+    data.hasRemoteSync ? 2_000 : 8_000,
+  );
 
   if (!partyList) {
     throw redirect({ to: "/" });
@@ -37,7 +144,7 @@ export async function guardPartyListExists({
 
 export async function guardParticipatingInParty(
   partyId: string,
-  context: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
+  context: RouterContext,
   location: ParsedLocation,
 ) {
   const [party, partyList] = await Promise.all([
@@ -60,4 +167,19 @@ export async function guardParticipatingInParty(
   }
 
   return { party, partyList };
+}
+
+function withGuardTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | undefined> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  return Promise.race([
+    promise.finally(() => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }),
+    new Promise<undefined>((resolve) => {
+      timeoutId = setTimeout(() => resolve(undefined), timeoutMs);
+    }),
+  ]);
 }

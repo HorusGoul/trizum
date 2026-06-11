@@ -1,4 +1,4 @@
-import { expect, test as base, type Page } from "@playwright/test";
+import { expect, test as base, type Page, type TestInfo } from "@playwright/test";
 
 export interface InternalHarnessWindow extends Window {
   __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
@@ -88,9 +88,14 @@ export interface BrowserHarness {
   selectParticipantIdentity(participantName: string): Promise<void>;
 }
 
-function createOfflinePath(pathname = "/") {
+function createOfflinePath(pathname = "/", dbName?: string) {
   const url = new URL(pathname, "http://trizum.local");
   url.searchParams.set("__internal_offline_only", "true");
+
+  if (dbName) {
+    url.searchParams.set("__internal_db_name", dbName);
+  }
+
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
@@ -98,7 +103,7 @@ function isSentryUrl(url: URL) {
   return url.hostname === "sentry.io" || url.hostname.endsWith(".sentry.io");
 }
 
-function createBrowserHarness(page: Page): BrowserHarness {
+function createBrowserHarness(page: Page, dbName: string): BrowserHarness {
   async function hasInternalHooks() {
     return page
       .evaluate(() => {
@@ -113,12 +118,13 @@ function createBrowserHarness(page: Page): BrowserHarness {
   }
 
   async function goto(path = "/") {
-    await page.goto(createOfflinePath(path));
+    await page.goto(createOfflinePath(path, dbName));
   }
 
   async function navigate(path: string) {
-    const nextUrl = new URL(createOfflinePath(path), "http://trizum.local");
+    const nextUrl = new URL(createOfflinePath(path, dbName), "http://trizum.local");
     nextUrl.searchParams.delete("__internal_offline_only");
+    nextUrl.searchParams.delete("__internal_db_name");
     const nextPath = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 
     await page.evaluate((targetPath) => {
@@ -256,6 +262,9 @@ function createBrowserHarness(page: Page): BrowserHarness {
       force: true,
     });
     await page.getByRole("button", { name: /save|guardar/i }).click();
+    await expect
+      .poll(async () => page.evaluate(() => window.location.pathname.endsWith("/who")))
+      .toBe(false);
   }
 
   async function createParty(fixture: unknown) {
@@ -298,8 +307,8 @@ export const test = base.extend<{
 
     await applyContext(context);
   },
-  harness: async ({ page }, applyHarness) => {
-    await applyHarness(createBrowserHarness(page));
+  harness: async ({ page }, applyHarness, testInfo) => {
+    await applyHarness(createBrowserHarness(page, createHarnessDbName(testInfo)));
   },
 });
 
@@ -308,3 +317,9 @@ test.use({
 });
 
 export { expect };
+
+function createHarnessDbName(testInfo: TestInfo) {
+  const testSlug = testInfo.testId.replace(/[^a-z0-9_-]+/gi, "-").slice(0, 120);
+
+  return `trizum-e2e-${testInfo.project.name}-${testInfo.workerIndex}-${testInfo.retry}-${testSlug}`;
+}

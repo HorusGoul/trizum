@@ -1,3 +1,4 @@
+import { ExpenseListItemView, type ExpenseEntity } from "@trizum/data";
 import { endOfWeek, getLocalTimeZone, startOfWeek, today } from "@internationalized/date";
 import type { CalendarDate } from "@internationalized/date";
 import { t } from "@lingui/core/macro";
@@ -8,14 +9,16 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
+import { toExpense } from "#src/lib/data/fateAppData.ts";
+import { useFateLiveListView, useFateLiveViews, useFateRequest } from "#src/lib/data/fateReact.ts";
+import { ALL_EXPENSES_CONNECTION_VIEW } from "#src/lib/data/trizumFateViews.ts";
 import {
   calculatePartyStats,
   getPartyStatsAvailablePastYears,
   type PartyStatsParticipantStat,
   type PartyStatsTimeframe,
 } from "#src/lib/partyStats.ts";
-import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.js";
+import type { PartyParticipant } from "#src/models/party.js";
 import { Avatar } from "#src/ui/Avatar.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import {
@@ -160,11 +163,21 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
-  const chunkDocuments = useMultipleSuspenseDocument<PartyExpenseChunk>(
-    party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
-    { required: true },
+  const { expenses: expensesConnection } = useFateRequest({
+    expenses: {
+      args: { partyId: party.id },
+      list: ALL_EXPENSES_CONNECTION_VIEW,
+    },
+  });
+  const liveExpenses = useFateLiveListView<ExpenseEntity>(
+    ALL_EXPENSES_CONNECTION_VIEW,
+    expensesConnection,
   );
-  const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
+  const expenseEntities = useFateLiveViews(
+    ExpenseListItemView,
+    liveExpenses.items.map(({ node }) => node),
+  );
+  const expenses = expenseEntities.map(toExpense);
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
   const [timeframeKey, setTimeframeKey] = useState<PartyStatsTimeframeKey>("all-time");

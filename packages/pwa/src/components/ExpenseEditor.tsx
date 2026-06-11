@@ -12,10 +12,8 @@ import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
 import Dinero from "dinero.js";
-import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
-import type { PartyParticipant } from "#src/models/party.ts";
+import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 import { AppDatePicker } from "#src/ui/DatePicker.tsx";
@@ -27,7 +25,7 @@ import { MenuTrigger, Popover } from "react-aria-components";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { usePartyList } from "#src/hooks/usePartyList.ts";
-import { getExpenseUnitShares } from "#src/models/expense.ts";
+import { getExpenseUnitShares, type Expense } from "#src/models/expense.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
@@ -68,6 +66,7 @@ interface ExpenseEditorProps {
     currentValues: ExpenseEditorFormValues,
   ) => void;
   defaultValues: ExpenseEditorFormValues;
+  party: Pick<Party, "currency" | "participants">;
   ref?: React.RefObject<ExpenseEditorRef | null>;
   autoFocus?: boolean;
   goBackFallbackOptions: React.ComponentProps<typeof BackButton>["fallbackOptions"];
@@ -80,6 +79,7 @@ export function ExpenseEditor({
   onSubmit,
   defaultValues,
   onChange,
+  party,
   ref,
   autoFocus = true,
   goBackFallbackOptions,
@@ -89,12 +89,15 @@ export function ExpenseEditor({
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
-  const unsortedParticipants = useExpenseParticipants({
-    paidBy: {
-      [defaultValues.paidBy]: 1,
+  const unsortedParticipants = getExpenseParticipants(
+    {
+      paidBy: {
+        [defaultValues.paidBy]: 1,
+      },
+      shares: defaultValues.shares,
     },
-    shares: defaultValues.shares,
-  });
+    party,
+  );
   const participants = [...unsortedParticipants].sort((a, b) =>
     a.name.localeCompare(b.name, i18n.locale),
   );
@@ -209,24 +212,30 @@ export function ExpenseEditor({
     () => ({
       setValues: (values) => {
         isReceivingUpdatesRef.current = true;
-        const currentFocusedField = focusedFieldRef.current;
+        try {
+          const currentFocusedField = focusedFieldRef.current;
 
-        for (const key in values) {
-          const isFocused = key === currentFocusedField;
+          for (const key in values) {
+            const isFocused = key === currentFocusedField;
 
-          if (isFocused) {
-            // If the field is focused, we don't want to update the value
-            continue;
+            if (isFocused) {
+              // If the field is focused, we don't want to update the value
+              continue;
+            }
+
+            form.setFieldValue(
+              key as keyof ExpenseEditorFormValues,
+              values[key as keyof ExpenseEditorFormValues],
+              {
+                dontRunListeners: true,
+                dontUpdateMeta: true,
+                dontValidate: true,
+              },
+            );
           }
-
-          form.setFieldValue(
-            key as keyof ExpenseEditorFormValues,
-            values[key as keyof ExpenseEditorFormValues],
-          );
-          void form.validateField(key as keyof ExpenseEditorFormValues, "server");
+        } finally {
+          isReceivingUpdatesRef.current = false;
         }
-
-        isReceivingUpdatesRef.current = false;
       },
     }),
     [form],
@@ -460,7 +469,7 @@ export function ExpenseEditor({
             ))}
           </div>
 
-          <SharesWarning amount={amount} shares={shares} />
+          <SharesWarning amount={amount} currency={party.currency} shares={shares} />
         </div>
 
         <div className="h-16 flex-shrink-0" />
@@ -719,6 +728,31 @@ function ParticipantSplitAmountField({
   );
 }
 
+function getExpenseParticipants(
+  expense: Pick<Expense, "paidBy" | "shares">,
+  party: Pick<Party, "participants">,
+) {
+  const participants = new Set<string>();
+
+  for (const participant of Object.values(party.participants)) {
+    if (!participant.isArchived) {
+      participants.add(participant.id);
+    }
+  }
+
+  for (const userId in expense.paidBy) {
+    participants.add(userId);
+  }
+
+  for (const userId in expense.shares) {
+    participants.add(userId);
+  }
+
+  return [...participants]
+    .map((userId) => party.participants[userId])
+    .filter((participant): participant is PartyParticipant => Boolean(participant));
+}
+
 function calculateParticipantUnitAmounts(
   amount: number,
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
@@ -733,11 +767,11 @@ function calculateParticipantUnitAmounts(
 
 interface SharesWarningProps {
   amount: number;
+  currency: Party["currency"];
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
 }
 
-function SharesWarning({ amount, shares }: SharesWarningProps) {
-  const { party } = useCurrentParty();
+function SharesWarning({ amount, currency, shares }: SharesWarningProps) {
   const activeParticipants = Object.keys(shares);
 
   if (activeParticipants.length === 0) {
@@ -747,7 +781,6 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
   const unitAmounts = calculateParticipantUnitAmounts(amount, shares);
   const totalUnitAmount = Object.values(unitAmounts).reduce((sum, amount) => sum + amount, 0);
   const showWarning = totalUnitAmount - convertToUnits(amount) !== 0;
-  const currency = party.currency;
   const totalAmount = totalUnitAmount / 100;
   const expenseAmount = amount;
 
