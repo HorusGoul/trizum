@@ -72,8 +72,10 @@ export const trizumJazzPermissions = definePermissions(
         anyOf([allowedTo.update("partyId"), { role: "editor", userId: session.user_id }]),
       ),
       policy.partyMembers.allowUpdate
-        .whereOld(allowedTo.update("partyId"))
-        .whereNew(allowedTo.update("partyId")),
+        .whereOld(anyOf([allowedTo.update("partyId"), { role: "editor", userId: session.user_id }]))
+        .whereNew(
+          anyOf([allowedTo.update("partyId"), { role: "editor", userId: session.user_id }]),
+        ),
       policy.partyMembers.allowDelete.where(allowedTo.update("partyId")),
 
       policy.joinedParties.allowRead.where({ $createdBy: session.user_id }),

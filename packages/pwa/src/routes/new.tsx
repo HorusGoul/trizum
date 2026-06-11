@@ -41,7 +41,7 @@ interface NewPartyFormValues {
 }
 
 function New() {
-  const { client, userId } = useTrizumData();
+  const { client, edgeWriteClient, userId } = useTrizumData();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
 
@@ -54,6 +54,7 @@ function New() {
     }));
     const party = await createPartyInFate({
       client,
+      durableClient: edgeWriteClient,
       userId,
       values: {
         currency: values.currency,

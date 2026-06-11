@@ -82,14 +82,17 @@ export type DataReadResult<T> =
 
 export async function createPartyInFate({
   client,
+  durableClient,
   userId,
   values,
 }: {
   client: TrizumFateClient;
+  durableClient?: TrizumFateClient;
   userId: string;
   values: CreatePartyValues;
 }) {
   const partyId = createPartyId();
+  const localOnlyInviteSecret = createInviteSecret();
   const party: Party = {
     currency: values.currency,
     description: values.description,
@@ -104,13 +107,25 @@ export async function createPartyInFate({
 
   await upsertParty(client, userId, {
     ...party,
-    localOnlyInviteSecret: createInviteSecret(),
+    localOnlyInviteSecret,
   });
   const participantListKey = await primeParticipantList(client, partyId);
   const participantEntities = await Promise.all(
     values.participants.map((participant) => upsertParticipant(client, partyId, participant)),
   );
   seedParticipantList(client, participantListKey, participantEntities);
+
+  if (durableClient && durableClient !== client) {
+    await upsertParty(durableClient, userId, {
+      ...party,
+      localOnlyInviteSecret,
+    });
+    await Promise.all(
+      values.participants.map((participant) =>
+        upsertParticipant(durableClient, partyId, participant),
+      ),
+    );
+  }
 
   return party;
 }

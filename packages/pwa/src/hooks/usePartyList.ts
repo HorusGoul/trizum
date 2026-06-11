@@ -27,7 +27,7 @@ const pendingJoinedPartyListeners = new Set<() => void>();
 let pendingJoinedPartyVersion = 0;
 
 export function usePartyList() {
-  const { client, userId } = useTrizumData();
+  const { client, edgeWriteClient, userId } = useTrizumData();
   const { joinedParties, user } = useFateRequest({
     joinedParties: {
       args: { userId },
@@ -80,7 +80,7 @@ export function usePartyList() {
     });
 
     try {
-      await upsertPartyMember(client, userId, partyId, participantId);
+      await upsertPartyMember(edgeWriteClient, userId, partyId, participantId);
       await joinedParty;
     } catch (error) {
       await joinedParty.catch(() => undefined);

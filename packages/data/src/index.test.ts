@@ -198,13 +198,17 @@ describe("Jazz alpha schema", () => {
         .insert(
           trizumJazzApp.partyMembers,
           {
-            participantId: "bob",
             partyId,
             role: "editor",
             userId: bobSession.user_id,
           },
           { id: bobMemberId },
         )
+        .wait({ tier: "edge" });
+      await bob
+        .update(trizumJazzApp.partyMembers, bobMemberId, {
+          participantId: "bob",
+        })
         .wait({ tier: "edge" });
 
       await expect(
