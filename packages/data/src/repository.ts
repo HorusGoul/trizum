@@ -501,10 +501,49 @@ async function createPartyWithParticipants(
     const backgroundSync = waitForWriteTier(result, syncWritesToTier);
 
     void backgroundSync.catch(() => undefined);
-    attachJazzFateBackgroundSync(output, backgroundSync);
+    attachJazzFateBackgroundSync(
+      output,
+      withPartyCreateRollbackOnSyncRejection(db, backgroundSync, input),
+    );
   }
 
   return output;
+}
+
+function withPartyCreateRollbackOnSyncRejection(
+  db: JazzFateDb,
+  backgroundSync: Promise<unknown>,
+  input: CreatePartyWithParticipantsMutationInput,
+) {
+  const syncWithRollback = backgroundSync.catch(async (error: unknown) => {
+    await rollbackCreatedPartyWithParticipants(db, input);
+    throw error;
+  });
+
+  void syncWithRollback.catch(() => undefined);
+
+  return syncWithRollback;
+}
+
+async function rollbackCreatedPartyWithParticipants(
+  db: JazzFateDb,
+  input: CreatePartyWithParticipantsMutationInput,
+) {
+  try {
+    for (const participant of input.participants) {
+      await deleteLocalRow(db, trizumJazzApp.participants, participant.id);
+    }
+
+    await deleteLocalRow(db, trizumJazzApp.parties, input.party.id);
+  } catch {
+    // Best effort: Fate cache rollback still runs even if local Jazz compensation fails.
+  }
+}
+
+async function deleteLocalRow(db: JazzFateDb, table: unknown, id: string) {
+  const result = (db.delete as (table: unknown, id: string) => { wait?: unknown })(table, id);
+
+  await waitForWriteTier(result, "local");
 }
 
 function toPartyEntity(input: UpsertPartyMutationInput): PartyEntity {

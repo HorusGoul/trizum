@@ -17,6 +17,7 @@ import {
 import { createTrizumJazzRepository, type TrizumDataRepository } from "./repository.js";
 import { trizumFateMutations } from "./views.js";
 import type {
+  CreatePartyWithParticipantsMutationInput,
   ExpenseEntity,
   JoinedPartyEntity,
   MediaFileEntity,
@@ -69,6 +70,7 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
     },
     onSyncRejected(event) {
       applyJazzFateSyncRejectionToCache(client, event);
+      applyCompositePartyCreateRejectionToCache(client, event);
     },
   });
 
@@ -88,6 +90,58 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
   });
 
   return client;
+}
+
+function applyCompositePartyCreateRejectionToCache(
+  client: object,
+  event: {
+    input: unknown;
+    proc: string;
+  },
+) {
+  if (
+    event.proc !== "party.createWithParticipants" ||
+    !isPartyCreateWithParticipantsInput(event.input)
+  ) {
+    return;
+  }
+
+  for (const participant of event.input.participants) {
+    applyJazzFateSyncRejectionToCache(client, {
+      affectedLists: [
+        { root: "participants" },
+        { args: { partyId: participant.partyId }, root: "participants" },
+      ],
+      operation: "insert",
+      output: {
+        __typename: "Participant",
+        ...participant,
+      },
+      rollbackOutput: null,
+    });
+  }
+}
+
+function isPartyCreateWithParticipantsInput(
+  value: unknown,
+): value is CreatePartyWithParticipantsMutationInput {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const input = value as Partial<CreatePartyWithParticipantsMutationInput>;
+
+  return (
+    !!input.party &&
+    typeof input.party.id === "string" &&
+    Array.isArray(input.participants) &&
+    input.participants.every(
+      (participant) =>
+        !!participant &&
+        typeof participant.id === "string" &&
+        typeof participant.partyId === "string",
+    )
+  );
 }
 
 export type CreateLocalFirstTrizumDataClientOptions = Omit<CreateJazzFateDbOptions, "appId"> & {

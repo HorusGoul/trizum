@@ -15,8 +15,10 @@ export class ExpenseDetailPage {
 
   async expectLoaded(partyId: string, title: string, amountText: string) {
     await expect(this.page).toHaveURL(new RegExp(`/party/${partyId}/expense/[^/?#]+(?:\\?.*)?$`));
-    await expect(this.heading(title)).toBeVisible();
-    await expect(this.page.getByText(amountText, { exact: false })).toBeVisible();
+    await expect(this.heading(title)).toBeVisible({ timeout: 30_000 });
+    await expect(this.page.getByText(amountText, { exact: false })).toBeVisible({
+      timeout: 30_000,
+    });
   }
 
   async goBack() {

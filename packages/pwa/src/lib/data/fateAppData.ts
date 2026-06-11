@@ -115,33 +115,27 @@ export async function createPartyInFate({
   const participantEntities = values.participants.map((participant) =>
     createParticipantEntity(partyId, participant),
   );
-  const result = await client.mutations.party.create({
-    input: partyInput,
+  const result = await client.mutations.party.createWithParticipants({
+    input: {
+      participants: participantEntities.map(({ __typename: _typename, ...input }) => input),
+      party: partyInput,
+    },
     optimistic: {
       __typename: "Party",
       ...partyInput,
     } as PartyEntity,
     view: PartySettingsView,
   });
-  const partyEntity = expectMutationResult(result, "party.create did not return a result");
-  const createdParticipantEntities = await Promise.all(
-    participantEntities.map(async (participantEntity) => {
-      const { __typename: _typename, ...input } = participantEntity;
-      const participantResult = await client.mutations.participant.create({
-        input,
-        optimistic: participantEntity,
-        view: ParticipantView,
-      });
-
-      return expectMutationResult(participantResult, "participant.create did not return a result");
-    }),
+  const partyEntity = expectMutationResult(
+    result,
+    "party.createWithParticipants did not return a result",
   );
   const participantListKey = await primeParticipantList(client, partyId);
   writePartyEntitiesToFateCache(client, {
-    participants: createdParticipantEntities,
+    participants: participantEntities,
     party: partyEntity,
   });
-  seedParticipantList(client, participantListKey, createdParticipantEntities);
+  seedParticipantList(client, participantListKey, participantEntities);
 
   return party;
 }

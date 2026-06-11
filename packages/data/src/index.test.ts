@@ -2,6 +2,7 @@ import { describe, expect, test } from "vite-plus/test";
 import { createPolicyTestApp } from "jazz-tools/testing";
 import {
   createTrizumFateClient,
+  createTrizumJazzRepository,
   ExpenseListItemView,
   JoinedPartyView,
   MediaFileMetadataView,
@@ -35,7 +36,9 @@ import {
   type UpsertJoinedPartyMutationInput,
   type UpsertUserMutationInput,
   type UserEntity,
+  waitForTrizumFateSync,
 } from "./index.js";
+import type { JazzFateDb } from "fate-jazz";
 
 describe("Jazz alpha schema", () => {
   test("compiles privacy-aware row policies into the Jazz wasm schema", () => {
@@ -560,6 +563,65 @@ describe("Fate masking over Trizum Jazz entities", () => {
         .filter((participant) => participant.partyId === "party-3")
         .map((participant) => participant.name),
     ).toStrictEqual(["Alice", "Bob"]);
+  });
+
+  test("rolls back local composite party creation when edge sync rejects", async () => {
+    const db = createRejectingCompositeCreateDb();
+    const repository = createTrizumJazzRepository(db, {
+      syncWritesToTier: "edge",
+    });
+    const client = createTrizumFateClient({ repository });
+    const input: CreatePartyWithParticipantsMutationInput = {
+      participants: [
+        {
+          id: "participant-party-4-alice",
+          localId: "alice",
+          name: "Alice",
+          partyId: "party-4",
+        },
+        {
+          id: "participant-party-4-bob",
+          localId: "bob",
+          name: "Bob",
+          partyId: "party-4",
+        },
+      ],
+      party: {
+        currency: "EUR",
+        description: "Rejected weekend",
+        id: "party-4",
+        localOnlyInviteSecret: "invite-secret",
+        name: "Rejected",
+        ownerUserId: "alice-local-first",
+        symbol: "RJ",
+      },
+    };
+
+    const created = await client.mutations.party.createWithParticipants({
+      input,
+      optimistic: {
+        __typename: "Party",
+        ...input.party,
+      },
+      view: PartySettingsView,
+    });
+
+    if (created.error) {
+      throw created.error;
+    }
+
+    expect(db.rows.parties.has("party-4")).toBe(true);
+    expect(db.rows.participants.has("participant-party-4-alice")).toBe(true);
+
+    const pendingSync = waitForTrizumFateSync(client);
+
+    db.rejectEdgeSync();
+
+    await expect(pendingSync).rejects.toThrow("server denied write");
+
+    expect(db.rows.parties.has("party-4")).toBe(false);
+    expect(db.rows.participants.has("participant-party-4-alice")).toBe(false);
+    expect(db.rows.participants.has("participant-party-4-bob")).toBe(false);
   });
 
   test("upserts user settings and joined party state through Fate", async () => {
@@ -1110,6 +1172,81 @@ function createMemoryRepository() {
   }
 
   return repository;
+}
+
+type RejectingCompositeCreateDb = JazzFateDb & {
+  rejectEdgeSync: () => void;
+  rows: {
+    participants: Map<string, unknown>;
+    parties: Map<string, unknown>;
+  };
+};
+type FakeGroupedInsert = (table: unknown, data: unknown, options?: { id?: string }) => void;
+
+function createRejectingCompositeCreateDb(): RejectingCompositeCreateDb {
+  let rejectEdgeSync: () => void = () => {};
+  const edgeSync = new Promise<never>((_resolve, reject) => {
+    rejectEdgeSync = () => reject(new Error("server denied write"));
+  });
+  const rows = {
+    participants: new Map<string, unknown>(),
+    parties: new Map<string, unknown>(),
+  };
+  const tableRows = (table: unknown) => {
+    if (table === trizumJazzApp.parties) {
+      return rows.parties;
+    }
+
+    if (table === trizumJazzApp.participants) {
+      return rows.participants;
+    }
+
+    throw new Error("Unexpected table in composite rollback test");
+  };
+  const unsupported = () => {
+    throw new Error("Unsupported fake DB operation");
+  };
+
+  return {
+    rejectEdgeSync,
+    rows,
+    all: unsupported,
+    batch: undefined,
+    delete(table: unknown, id: string) {
+      tableRows(table).delete(id);
+
+      return {
+        wait: async () => {},
+      };
+    },
+    insert: unsupported,
+    one: unsupported,
+    transaction(write: (scope: { insert: FakeGroupedInsert }) => unknown) {
+      const insert: FakeGroupedInsert = (table, data, options) => {
+        if (!options?.id || !data || typeof data !== "object") {
+          throw new Error("Composite rollback test inserts require row ids");
+        }
+
+        tableRows(table).set(options.id, {
+          id: options.id,
+          ...data,
+        });
+      };
+
+      const value = write({ insert });
+
+      return {
+        value,
+        wait: async ({ tier }: { tier: "edge" | "local" }) => {
+          if (tier === "edge") {
+            await edgeSync;
+          }
+        },
+      };
+    },
+    update: unsupported,
+    upsert: unsupported,
+  } as unknown as RejectingCompositeCreateDb;
 }
 
 function upsertEntity<TEntity extends TrizumFateEntity>(

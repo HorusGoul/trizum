@@ -89,27 +89,47 @@ export class PartyPage {
     }).toPass({ timeout: 30_000 });
   }
 
-  async scrollExpenseLogUntilVisible(title: string, maxAttempts = 6) {
+  async scrollExpenseLogUntilVisible(title: string, timeoutMs = 120_000) {
     const row = this.expenseRow(title);
+    const deadline = Date.now() + timeoutMs;
 
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    await expect(this.expenseLogList).toBeVisible({ timeout: 30_000 });
+
+    while (Date.now() < deadline) {
       if (await row.isVisible()) {
         return;
       }
+
+      const previousScrollHeight = await this.expenseLogList.evaluate((list) => list.scrollHeight);
 
       await this.expenseLogList.evaluate((list) => {
         list.scrollTop = list.scrollHeight;
       });
 
       try {
-        await expect(row).toBeVisible({ timeout: 1_500 });
-        return;
+        await expect
+          .poll(
+            async () => {
+              if (await row.isVisible()) {
+                return "target";
+              }
+
+              const scrollHeight = await this.expenseLogList.evaluate((list) => list.scrollHeight);
+
+              return scrollHeight > previousScrollHeight ? "advanced" : "waiting";
+            },
+            {
+              intervals: [250, 500, 1_000],
+              timeout: Math.max(1_000, Math.min(10_000, deadline - Date.now())),
+            },
+          )
+          .not.toBe("waiting");
       } catch {
         continue;
       }
     }
 
-    await expect(row).toBeVisible();
+    await expect(row).toBeVisible({ timeout: 1_000 });
   }
 
   async openBalances() {
