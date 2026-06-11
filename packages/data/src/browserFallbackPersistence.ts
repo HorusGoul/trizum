@@ -38,6 +38,7 @@ type BatchOperation = {
 };
 type MergeRowOptions = {
   protectAgainstStale?: boolean;
+  requireExistingRow?: boolean;
 };
 
 const fallbackDbName = "trizum-jazz-browser-fallback";
@@ -309,6 +310,7 @@ class BrowserFallbackMirror {
       if (isRowLike(row)) {
         await this.mergeRow(definition.table, row.id, row, {
           protectAgainstStale: true,
+          requireExistingRow: true,
         });
       }
     }
@@ -322,7 +324,13 @@ class BrowserFallbackMirror {
     const definition = getDefinitionForTable(table);
     const tableName = getTableName(table);
     const tableRows = (this.snapshot.tables[tableName] ??= {});
-    const current = tableRows[id] ?? { id };
+    const persistedRow = tableRows[id];
+
+    if (options.requireExistingRow && !persistedRow) {
+      return Promise.resolve();
+    }
+
+    const current = persistedRow ?? { id };
     const next = serializeRow(definition, {
       ...current,
       ...input,

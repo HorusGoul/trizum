@@ -191,6 +191,99 @@ describe("Jazz DB repository", () => {
     ]);
   });
 
+  test("applies ordered offset pagination to Jazz-backed live lists", () => {
+    const table = new FakeNoteQuery([]);
+    const unsubscribe = vi.fn<() => void>();
+    const db = {
+      ...createFakeNoteDb(table),
+      subscribeAll(query: unknown, callback: (delta: unknown) => void) {
+        callback({
+          all: [
+            createNoteRow("note-4", "project-1", "Overflow", 4),
+            createNoteRow("note-2", "project-1", "Middle", 2),
+            createNoteRow("note-1", "project-1", "Oldest", 1),
+            createNoteRow("note-3", "project-1", "Newest", 3),
+          ],
+          delta: [],
+        });
+
+        expect((query as FakeNoteQuery).calls).toStrictEqual([
+          {
+            conditions: {
+              projectId: "project-1",
+            },
+            method: "where",
+          },
+          {
+            column: "createdAt",
+            direction: "asc",
+            method: "orderBy",
+          },
+          {
+            columns: ["id", "title", "createdAt"],
+            method: "select",
+          },
+        ]);
+
+        return unsubscribe;
+      },
+    } as unknown as JazzFateDb;
+    const repository = createJazzDbRepository<NoteEntity>({
+      db,
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [
+        {
+          orderBy: {
+            column: "createdAt",
+            direction: "asc",
+          },
+          pagination: "offset",
+          root: "notes",
+          type: "Note",
+          where(args) {
+            return {
+              projectId: args?.projectId,
+            };
+          },
+        },
+      ],
+    });
+    const onChange = vi.fn<(records?: NoteEntity[]) => void>();
+    const dispose = repository.subscribeList?.(
+      "notes",
+      ["id", "title", "privateMemo"],
+      {
+        after: "1",
+        first: 2,
+        projectId: "project-1",
+      },
+      onChange,
+    );
+
+    expect(onChange).toHaveBeenCalledWith([
+      {
+        __typename: "Note",
+        id: "note-2",
+        title: "Middle",
+      },
+      {
+        __typename: "Note",
+        id: "note-3",
+        title: "Newest",
+      },
+    ]);
+
+    dispose?.();
+
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
+  });
+
   test("rereads upserted rows through the Fate selection", async () => {
     const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
     const repository = createJazzDbRepository<NoteEntity, MutationMap>({

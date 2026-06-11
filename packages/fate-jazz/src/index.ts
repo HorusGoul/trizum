@@ -336,13 +336,7 @@ export function createJazzDbRepository<
       );
       const query = list.orderBy ? baseQuery : applyOffsetPagination(baseQuery, pagination);
       const rows = await db.all(query, queryOptions);
-      const sortedRows = list.orderBy ? sortRows(rows as RowLike[], list.orderBy) : rows;
-      const paginatedRows = list.orderBy
-        ? sortedRows.slice(pagination.offset)
-        : (sortedRows as RowLike[]);
-      const visibleRows =
-        pagination.limit === undefined ? paginatedRows : paginatedRows.slice(0, pagination.limit);
-      const hasNext = pagination.limit !== undefined && paginatedRows.length > pagination.limit;
+      const { hasNext, visibleRows } = pageListRows(rows as RowLike[], pagination, list.orderBy);
 
       return {
         items: visibleRows.map((row) => {
@@ -609,8 +603,12 @@ export function createJazzDbRepository<
       const query = list.orderBy ? baseQuery : applyOffsetPagination(baseQuery, pagination);
 
       return subscribeToQueryChanges(db, query, subscriptionQueryOptions, (rows) => {
+        const { visibleRows } = pageListRows(rows, pagination, list.orderBy);
+
         onChange(
-          rows.map((row) => ensureEntityId(toEntity(entity, row, select), `list ${root}`, row)),
+          visibleRows.map((row) =>
+            ensureEntityId(toEntity(entity, row, select), `list ${root}`, row),
+          ),
         );
       });
     },
@@ -1275,6 +1273,23 @@ function sortRows(rows: readonly RowLike[], order: NonNullable<JazzFateListDefin
 
     return comparison * multiplier;
   });
+}
+
+function pageListRows(
+  rows: readonly RowLike[],
+  pagination: ReturnType<typeof getOffsetPagination>,
+  orderBy: JazzFateListDefinition["orderBy"],
+) {
+  const orderedRows = orderBy ? sortRows(rows, orderBy) : rows;
+  const paginatedRows = orderBy ? orderedRows.slice(pagination.offset) : orderedRows;
+  const visibleRows =
+    pagination.limit === undefined ? paginatedRows : paginatedRows.slice(0, pagination.limit);
+  const hasNext = pagination.limit !== undefined && paginatedRows.length > pagination.limit;
+
+  return {
+    hasNext,
+    visibleRows,
+  };
 }
 
 function compareSortValues(left: unknown, right: unknown) {

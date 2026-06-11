@@ -75,16 +75,18 @@ export class PartyPage {
   }
 
   async expectVisibleExpensesInOrder(titles: string[]) {
-    let previousTop = Number.NEGATIVE_INFINITY;
+    await expect(async () => {
+      let previousTop = Number.NEGATIVE_INFINITY;
 
-    for (const title of titles) {
-      const row = this.expenseRow(title);
-      await expect(row).toBeVisible({ timeout: 30_000 });
-      const top = await row.evaluate((element) => element.getBoundingClientRect().top);
+      for (const title of titles) {
+        const row = this.expenseRow(title);
+        await expect(row).toBeVisible({ timeout: 5_000 });
+        const top = await row.evaluate((element) => element.getBoundingClientRect().top);
 
-      expect(top).toBeGreaterThan(previousTop);
-      previousTop = top;
-    }
+        expect(top).toBeGreaterThan(previousTop);
+        previousTop = top;
+      }
+    }).toPass({ timeout: 30_000 });
   }
 
   async scrollExpenseLogUntilVisible(title: string, maxAttempts = 6) {
