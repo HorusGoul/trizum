@@ -5,6 +5,7 @@ import {
   readParty,
   readPartyList,
   upsertJoinedParty,
+  upsertPartyMember,
   upsertUserSettings,
 } from "#src/lib/data/fateAppData.ts";
 import type { Expense } from "#src/models/expense.js";
@@ -67,12 +68,18 @@ export async function seedPartyListState({
         return;
       }
 
+      const participantId = seed.participantInParties?.[partyId];
+
+      if (participantId) {
+        await upsertPartyMember(client, userId, partyId, participantId);
+      }
+
       await upsertJoinedParty(client, userId, partyId, {
         isArchived: seed.archivedParties?.[partyId] === true,
         isPinned: seed.pinnedParties?.[partyId] === true,
         joinedAt: toDate(seed.lastUsedAt?.[partyId]) ?? new Date(),
         lastUsedAt: toDate(seed.lastUsedAt?.[partyId]) ?? new Date(),
-        participantId: seed.participantInParties?.[partyId],
+        participantId,
       });
     }),
   );

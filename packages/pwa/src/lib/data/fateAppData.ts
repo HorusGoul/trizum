@@ -481,6 +481,7 @@ export async function waitForPartyInFate(
   partyId: string,
   options: {
     minParticipants?: number;
+    requestOptions?: RequestOptions;
     timeoutMs?: number;
   } = {},
 ): Promise<Party | undefined> {
@@ -495,7 +496,7 @@ export async function waitForPartyInFate(
     }
 
     const result = await withTimeout(
-      readPartyResult(client, partyId),
+      readPartyResult(client, partyId, options.requestOptions),
       Math.min(2_000, remainingMs),
     );
 
@@ -528,6 +529,7 @@ export async function waitForPartyEntitiesInFate(
   partyId: string,
   options: {
     minParticipants?: number;
+    requestOptions?: RequestOptions;
     timeoutMs?: number;
   } = {},
 ): Promise<PartyEntitySnapshot | undefined> {
@@ -542,7 +544,7 @@ export async function waitForPartyEntitiesInFate(
     }
 
     const result = await withTimeout(
-      readPartyEntitiesResult(client, partyId),
+      readPartyEntitiesResult(client, partyId, options.requestOptions),
       Math.min(2_000, remainingMs),
     );
 
@@ -661,6 +663,7 @@ export async function waitForExpenseEntityInFate(
   client: TrizumFateClient,
   expenseId: string,
   options: {
+    requestOptions?: RequestOptions;
     timeoutMs?: number;
   } = {},
 ): Promise<ExpenseEntity | undefined> {
@@ -674,7 +677,7 @@ export async function waitForExpenseEntityInFate(
     }
 
     const result = await withTimeout(
-      readExpenseEntityByIdResult(client, expenseId),
+      readExpenseEntityByIdResult(client, expenseId, options.requestOptions),
       Math.min(2_000, remainingMs),
     );
 

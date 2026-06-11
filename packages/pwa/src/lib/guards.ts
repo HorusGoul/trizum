@@ -46,7 +46,8 @@ export async function guardExpenseExists(expenseId: string, { data }: RouterCont
   }
 
   const settledExpense = await waitForExpenseEntityInFate(data.settledClient, expenseId, {
-    timeoutMs: 30_000,
+    requestOptions: { mode: "network-only" },
+    timeoutMs: 60_000,
   });
 
   if (!settledExpense) {
@@ -65,7 +66,18 @@ async function readPartyResultForGuard(
   let localResult: DataReadResult<Party>;
 
   try {
-    localResult = await readPartyResult(data.client, partyId);
+    const localRead = await withGuardTimeout(
+      readPartyResult(data.client, partyId),
+      data.hasRemoteSync ? 2_000 : 8_000,
+    );
+
+    if (!localRead) {
+      localResult = {
+        status: "notFound",
+      };
+    } else {
+      localResult = localRead;
+    }
   } catch (error) {
     if (!data.hasRemoteSync || !data.settledClient) {
       return {
@@ -79,12 +91,15 @@ async function readPartyResultForGuard(
     };
   }
 
-  if (localResult.status !== "notFound" || !data.hasRemoteSync || !data.settledClient) {
+  if (localResult.status === "found" || !data.hasRemoteSync || !data.settledClient) {
     return localResult;
   }
 
   try {
-    const partySnapshot = await waitForPartyEntitiesInFate(data.settledClient, partyId);
+    const partySnapshot = await waitForPartyEntitiesInFate(data.settledClient, partyId, {
+      requestOptions: { mode: "network-only" },
+      timeoutMs: 60_000,
+    });
 
     if (partySnapshot) {
       writePartyEntitiesToFateCache(data.client, partySnapshot);
@@ -95,10 +110,18 @@ async function readPartyResultForGuard(
       };
     }
   } catch (error) {
+    if (localResult.status === "error") {
+      return localResult;
+    }
+
     return {
       error,
       status: "error",
     };
+  }
+
+  if (localResult.status === "error") {
+    return localResult;
   }
 
   return {
@@ -107,7 +130,10 @@ async function readPartyResultForGuard(
 }
 
 export async function guardPartyListExists({ data }: RouterContext) {
-  const partyList = await readPartyList(data.client, data.userId);
+  const partyList = await withGuardTimeout(
+    readPartyList(data.client, data.userId),
+    data.hasRemoteSync ? 2_000 : 8_000,
+  );
 
   if (!partyList) {
     throw redirect({ to: "/" });
@@ -141,4 +167,19 @@ export async function guardParticipatingInParty(
   }
 
   return { party, partyList };
+}
+
+function withGuardTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | undefined> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  return Promise.race([
+    promise.finally(() => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }),
+    new Promise<undefined>((resolve) => {
+      timeoutId = setTimeout(() => resolve(undefined), timeoutMs);
+    }),
+  ]);
 }

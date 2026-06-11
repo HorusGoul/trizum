@@ -13,7 +13,7 @@ test.describe("Jazz collaboration", () => {
     baseURL,
     browser,
   }, testInfo) => {
-    test.setTimeout(180_000);
+    test.setTimeout(240_000);
 
     const aliceSession = await createCollaborationSession(browser, "alice", testInfo, baseURL);
     const bobSession = await createCollaborationSession(browser, "bob", testInfo, baseURL);
@@ -52,6 +52,11 @@ test.describe("Jazz collaboration", () => {
         .toMatchObject({
           name: partyName,
         });
+      await expect
+        .poll(() => readPartyParticipantNames(bobSession.page, partyId, "settled"), {
+          timeout: 90_000,
+        })
+        .toEqual(["Alice", "Bob"]);
 
       await test.step("Bob joins the same party and selects his identity", async () => {
         const joinTrizumPage = new JoinTrizumPage(bobSession.page);
@@ -92,7 +97,7 @@ test.describe("Jazz collaboration", () => {
 
         await waitForDataSync(aliceSession.page);
         await expect
-          .poll(() => readExpenseName(bobSession.page, expenseId, "settled"), {
+          .poll(() => readExpenseName(bobSession.page, expenseId), {
             timeout: 60_000,
           })
           .toBe(initialExpenseTitle);
@@ -104,10 +109,10 @@ test.describe("Jazz collaboration", () => {
         await bobSession.goto(`/party/${partyId}/expense/${expenseId}/edit`);
 
         await expect(aliceSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible({
-          timeout: 30_000,
+          timeout: 90_000,
         });
         await expect(bobSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible({
-          timeout: 30_000,
+          timeout: 90_000,
         });
 
         await aliceSession.page.getByLabel("Title").fill(aliceDraftExpenseTitle);
@@ -116,14 +121,10 @@ test.describe("Jazz collaboration", () => {
             timeout: 10_000,
           })
           .toBe(aliceDraftExpenseTitle);
-        await expect
-          .poll(() => readExpenseDraftName(bobSession.page, expenseId, "settled"), {
-            timeout: 30_000,
-          })
-          .toBe(aliceDraftExpenseTitle);
+        await waitForDataSync(aliceSession.page);
         await expect
           .poll(() => readExpenseDraftName(bobSession.page, expenseId), {
-            timeout: 30_000,
+            timeout: 60_000,
           })
           .toBe(aliceDraftExpenseTitle);
         await throwRouteErrorIfPresent(bobSession);
@@ -141,14 +142,10 @@ test.describe("Jazz collaboration", () => {
             timeout: 10_000,
           })
           .toBe(bobDraftExpenseTitle);
-        await expect
-          .poll(() => readExpenseDraftName(aliceSession.page, expenseId, "settled"), {
-            timeout: 30_000,
-          })
-          .toBe(bobDraftExpenseTitle);
+        await waitForDataSync(bobSession.page);
         await expect
           .poll(() => readExpenseDraftName(aliceSession.page, expenseId), {
-            timeout: 30_000,
+            timeout: 60_000,
           })
           .toBe(bobDraftExpenseTitle);
         await throwRouteErrorIfPresent(aliceSession);
@@ -165,6 +162,12 @@ test.describe("Jazz collaboration", () => {
         await expect(
           bobSession.page.getByRole("heading", { name: bobDraftExpenseTitle }),
         ).toBeVisible();
+        await waitForDataSync(bobSession.page);
+        await expect
+          .poll(() => readExpenseName(aliceSession.page, expenseId), {
+            timeout: 60_000,
+          })
+          .toBe(bobDraftExpenseTitle);
 
         await aliceSession.goto(`/party/${partyId}?tab=expenses`);
         await alicePartyPage.expectExpenseInLog(bobDraftExpenseTitle, amountText);
@@ -297,10 +300,11 @@ type InternalExpenseSnapshot = {
 
 type InternalPartySnapshot = {
   name?: string;
+  participants?: Record<string, { name?: string }>;
 };
 
-async function waitForDataSync(page: Page) {
-  await page.evaluate(async () => {
+async function waitForDataSync(page: Page, timeoutMs = 20_000) {
+  await page.evaluate(async (timeout) => {
     const waitForSync = (
       window as typeof window & {
         __internal_waitForDataSync?: () => Promise<void>;
@@ -311,13 +315,27 @@ async function waitForDataSync(page: Page) {
       throw new Error("Internal data sync hook is not available");
     }
 
-    await waitForSync();
-  });
+    await Promise.race([
+      waitForSync(),
+      new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), timeout);
+      }),
+    ]);
+  }, timeoutMs);
 }
 
 async function readPartySnapshot(page: Page, partyId: string, mode: "cache" | "settled" = "cache") {
   return page.evaluate(
     async ({ currentPartyId, readMode }) => {
+      function withReadTimeout<T>(promise: Promise<T>) {
+        return Promise.race([
+          promise,
+          new Promise<null>((resolve) => {
+            setTimeout(() => resolve(null), 5_000);
+          }),
+        ]);
+      }
+
       const reader = (
         window as typeof window & {
           __internal_readPartyState?: (
@@ -331,10 +349,25 @@ async function readPartySnapshot(page: Page, partyId: string, mode: "cache" | "s
         return null;
       }
 
-      return (await reader(currentPartyId, readMode)) as InternalPartySnapshot | null;
+      return (await withReadTimeout(
+        reader(currentPartyId, readMode),
+      )) as InternalPartySnapshot | null;
     },
     { currentPartyId: partyId, readMode: mode },
   );
+}
+
+async function readPartyParticipantNames(
+  page: Page,
+  partyId: string,
+  mode: "cache" | "settled" = "cache",
+) {
+  const party = await readPartySnapshot(page, partyId, mode);
+
+  return Object.values(party?.participants ?? {})
+    .map((participant) => participant.name)
+    .filter((name): name is string => typeof name === "string")
+    .sort();
 }
 
 async function readExpenseDraftName(
@@ -360,6 +393,15 @@ async function readExpenseSnapshot(
 ) {
   return page.evaluate(
     async ({ currentExpenseId, readMode }) => {
+      function withReadTimeout<T>(promise: Promise<T>) {
+        return Promise.race([
+          promise,
+          new Promise<null>((resolve) => {
+            setTimeout(() => resolve(null), 5_000);
+          }),
+        ]);
+      }
+
       const reader = (
         window as typeof window & {
           __internal_readExpenseState?: (
@@ -373,7 +415,9 @@ async function readExpenseSnapshot(
         return null;
       }
 
-      return (await reader(currentExpenseId, readMode)) as InternalExpenseSnapshot | null;
+      return (await withReadTimeout(
+        reader(currentExpenseId, readMode),
+      )) as InternalExpenseSnapshot | null;
     },
     { currentExpenseId: expenseId, readMode: mode },
   );

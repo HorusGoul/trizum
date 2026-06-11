@@ -151,7 +151,8 @@ async function primeWhoPartyCache(data: ReturnType<typeof useTrizumData>, partyI
 
   const settledParty = await waitForPartyEntitiesInFate(data.settledClient, partyId, {
     minParticipants: 1,
-    timeoutMs: 30_000,
+    requestOptions: { mode: "network-only" },
+    timeoutMs: 60_000,
   });
 
   if (!settledParty) {

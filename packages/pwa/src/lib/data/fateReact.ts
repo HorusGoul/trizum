@@ -171,15 +171,20 @@ export function useFateLiveView<T extends { __typename: string }>(
 export function useFateCachedView<T extends { __typename: string }>(
   view: View<T, any>,
   ref: ViewRef<T["__typename"]>,
+  options: {
+    live?: boolean;
+  } = {},
 ): T | null {
   const { client } = useTrizumData();
   const entityId = toEntityId(ref.__typename, ref.id);
   const subscriptionVersion = useSubscriptionVersion((change) => {
     const unsubscribeRecord = getFateStore(client).subscribe(entityId, null, change);
+    const unsubscribeLive = options.live ? client.subscribeLiveView(view, ref) : undefined;
     const unsubscribeCacheUpdate = subscribeToJazzFateCacheUpdates(client, change);
 
     return () => {
       unsubscribeCacheUpdate();
+      unsubscribeLive?.();
       unsubscribeRecord();
     };
   });
