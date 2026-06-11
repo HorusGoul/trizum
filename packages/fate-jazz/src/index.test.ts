@@ -43,6 +43,22 @@ type MutationMap = {
     };
     output: NoteEntity;
   };
+  "note.update": {
+    input: {
+      body: string;
+      createdAt: number;
+      id: string;
+      projectId: string;
+      title: string;
+    };
+    output: NoteEntity;
+  };
+  "note.delete": {
+    input: {
+      id: string;
+    };
+    output: NoteEntity;
+  };
 };
 
 describe("Jazz Fate auth", () => {
@@ -362,6 +378,97 @@ describe("Jazz DB repository", () => {
     });
 
     await vi.waitFor(() => expect(table.find("note-2")).toBeUndefined());
+  });
+
+  test("restores updated local rows when background edge sync rejects", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table, {
+        wait: async (options) => {
+          if (options.tier === "edge") {
+            throw new Error("server denied write");
+          }
+        },
+      }),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "update",
+          proc: "note.update",
+          table,
+          type: "Note",
+        },
+      ],
+      syncWritesToTier: "edge",
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.update",
+        {
+          body: "Updated body",
+          createdAt: 2,
+          id: "note-1",
+          projectId: "project-1",
+          title: "Updated",
+        },
+        ["id", "title"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-1",
+      title: "Updated",
+    });
+
+    await vi.waitFor(() => expect(table.find("note-1")?.title).toBe("Oldest"));
+  });
+
+  test("restores deleted local rows when background edge sync rejects", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table, {
+        wait: async (options) => {
+          if (options.tier === "edge") {
+            throw new Error("server denied write");
+          }
+        },
+      }),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "delete",
+          proc: "note.delete",
+          table,
+          type: "Note",
+        },
+      ],
+      syncWritesToTier: "edge",
+    });
+
+    await expect(
+      repository.mutate?.("note.delete", { id: "note-1" }, ["id", "title"]),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-1",
+      title: "Oldest",
+    });
+
+    await vi.waitFor(() => expect(table.find("note-1")?.title).toBe("Oldest"));
+    expect(table.calls.some((call) => call.method === "delete" && call.id === "note-1")).toBe(true);
   });
 
   test("emits sync rejection events with masked rollback data", async () => {
@@ -1069,7 +1176,7 @@ type FakeNoteQueryCall =
   | {
       data: Partial<NoteRow>;
       id: string;
-      method: "upsert";
+      method: "update" | "upsert";
     };
 
 class FakeNoteQuery {
@@ -1160,6 +1267,17 @@ class FakeNoteQuery {
       id,
       method: "upsert",
     });
+
+    return row;
+  }
+
+  update(id: string, data: Partial<NoteRow>) {
+    const row = this.upsert(id, data);
+    const lastCall = this.calls.at(-1);
+
+    if (lastCall?.method === "upsert") {
+      lastCall.method = "update";
+    }
 
     return row;
   }
@@ -1262,7 +1380,11 @@ function createFakeNoteDb(
       };
     },
     update(_table: unknown, _id: string, _input: unknown) {
-      throw new Error("update is not used by this test");
+      table.update(_id, _input as Partial<NoteRow>);
+
+      return {
+        wait: dbOptions.wait ?? (async () => {}),
+      };
     },
     upsert(_table: unknown, input: unknown, options: { id: string }) {
       table.upsert(options.id, input as Partial<NoteRow>);
