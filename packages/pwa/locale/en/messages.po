@@ -1817,7 +1817,7 @@ msgstr "Saudi Riyal"
 #: src/routes/migrate_.tricount.tsx:161
 #: src/routes/new.tsx:139
 #: src/routes/party_.$partyId.settings.tsx:127
-#: src/routes/party_.$partyId.who.tsx:285
+#: src/routes/party_.$partyId.who.tsx:286
 #: src/routes/settings.tsx:99
 msgid "Save"
 msgstr "Save"
@@ -1988,7 +1988,7 @@ msgstr "Submit a Request"
 #: src/routes/migrate_.tricount.tsx:161
 #: src/routes/new.tsx:139
 #: src/routes/party_.$partyId.settings.tsx:127
-#: src/routes/party_.$partyId.who.tsx:285
+#: src/routes/party_.$partyId.who.tsx:286
 #: src/routes/settings.tsx:99
 msgid "Submitting..."
 msgstr "Submitting..."
@@ -2161,7 +2161,7 @@ msgstr "Title must be less than 50 characters"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.who.tsx:227
+#: src/routes/party_.$partyId.who.tsx:228
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
@@ -2281,7 +2281,7 @@ msgstr "Update failed. Please try again."
 msgid "Update is no longer available."
 msgstr "Update is no longer available."
 
-#: src/routes/party_.$partyId.who.tsx:232
+#: src/routes/party_.$partyId.who.tsx:233
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
@@ -2402,7 +2402,7 @@ msgstr "Warning: Split amounts don't match total expense"
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
-#: src/routes/party_.$partyId.who.tsx:188
+#: src/routes/party_.$partyId.who.tsx:189
 msgid "Welcome to the party, {participantName}!"
 msgstr "Welcome to the party, {participantName}!"
 
@@ -2479,7 +2479,7 @@ msgstr "You're debt free!"
 msgid "You're now seeing the party as {0}"
 msgstr "You're now seeing the party as {0}"
 
-#: src/routes/party_.$partyId.who.tsx:190
+#: src/routes/party_.$partyId.who.tsx:191
 msgid "You're now seeing the party as {participantName}"
 msgstr "You're now seeing the party as {participantName}"
 
