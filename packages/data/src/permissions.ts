@@ -12,11 +12,6 @@ type PermissionValue = PermissionRowRef | string;
 export const trizumJazzPermissions = definePermissions(
   trizumJazzApp,
   ({ allowedTo, allOf, anyOf, policy, session }) => {
-    const partyOwner = (partyId: PermissionValue) =>
-      policy.parties.exists.where({
-        id: partyId,
-        ownerUserId: session.userId,
-      });
     const partyEditor = (partyId: PermissionValue) =>
       anyOf([
         policy.partyMembers.exists.where({
@@ -30,15 +25,6 @@ export const trizumJazzPermissions = definePermissions(
           userId: session.userId,
         }),
       ]);
-    const partyWriter = (partyId: PermissionValue) =>
-      anyOf([partyOwner(partyId), partyEditor(partyId)]);
-
-    function partyWriterOfRow(column: "partyId") {
-      return partyWriter({
-        __jazzPermissionKind: "row-ref",
-        column,
-      });
-    }
 
     return [
       policy.users.allowRead.where({ $createdBy: session.userId }),
@@ -65,18 +51,18 @@ export const trizumJazzPermissions = definePermissions(
       policy.parties.allowDelete.where({ ownerUserId: session.userId }),
 
       policy.partyMembers.allowRead.where(
-        anyOf([{ userId: session.userId }, partyWriterOfRow("partyId")]),
+        anyOf([{ userId: session.userId }, allowedTo.update("partyId")]),
       ),
       policy.partyMembers.allowInsert.where(
         anyOf([
-          partyWriterOfRow("partyId"),
+          allowedTo.update("partyId"),
           allOf([allowedTo.read("partyId"), { role: "editor", userId: session.userId }]),
         ]),
       ),
       policy.partyMembers.allowUpdate
-        .whereOld((member) => partyWriter(member.partyId))
-        .whereNew((member) => partyWriter(member.partyId)),
-      policy.partyMembers.allowDelete.where((member) => partyWriter(member.partyId)),
+        .whereOld(allowedTo.update("partyId"))
+        .whereNew(allowedTo.update("partyId")),
+      policy.partyMembers.allowDelete.where(allowedTo.update("partyId")),
 
       policy.joinedParties.allowRead.where({ $createdBy: session.userId }),
       policy.joinedParties.allowInsert.where({ $createdBy: session.userId }),
@@ -86,11 +72,11 @@ export const trizumJazzPermissions = definePermissions(
       policy.joinedParties.allowDelete.where({ $createdBy: session.userId }),
 
       policy.participants.allowRead.where(allowedTo.read("partyId")),
-      policy.participants.allowInsert.where((participant) => partyWriter(participant.partyId)),
+      policy.participants.allowInsert.where(allowedTo.update("partyId")),
       policy.participants.allowUpdate
-        .whereOld((participant) => partyWriter(participant.partyId))
-        .whereNew((participant) => partyWriter(participant.partyId)),
-      policy.participants.allowDelete.where((participant) => partyWriter(participant.partyId)),
+        .whereOld(allowedTo.update("partyId"))
+        .whereNew(allowedTo.update("partyId")),
+      policy.participants.allowDelete.where(allowedTo.update("partyId")),
 
       policy.mediaFiles.allowRead.where(
         anyOf([{ ownerUserId: session.userId }, allowedTo.read("partyId")]),
@@ -102,11 +88,11 @@ export const trizumJazzPermissions = definePermissions(
       policy.mediaFiles.allowDelete.where({ ownerUserId: session.userId }),
 
       policy.expenses.allowRead.where(allowedTo.read("partyId")),
-      policy.expenses.allowInsert.where((expense) => partyWriter(expense.partyId)),
+      policy.expenses.allowInsert.where(allowedTo.update("partyId")),
       policy.expenses.allowUpdate
-        .whereOld((expense) => partyWriter(expense.partyId))
-        .whereNew((expense) => partyWriter(expense.partyId)),
-      policy.expenses.allowDelete.where((expense) => partyWriter(expense.partyId)),
+        .whereOld(allowedTo.update("partyId"))
+        .whereNew(allowedTo.update("partyId")),
+      policy.expenses.allowDelete.where(allowedTo.update("partyId")),
     ];
   },
 );
