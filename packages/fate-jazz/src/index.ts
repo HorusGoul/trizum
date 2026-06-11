@@ -1,4 +1,4 @@
-import type { Transport } from "@nkzw/fate";
+import { toEntityId, type Transport } from "@nkzw/fate";
 import {
   BrowserAuthSecretStore,
   createDb,
@@ -97,7 +97,7 @@ export interface JazzFateRepository<
     root: string,
     select: Iterable<string>,
     args: Record<string, unknown> | undefined,
-    onChange: () => void,
+    onChange: (records?: TEntity[]) => void,
   ): () => void;
 }
 
@@ -128,6 +128,7 @@ export type JazzFateMutationDefinition<TEntity extends JazzFateEntity = JazzFate
   id?: (input: unknown) => string | number | undefined;
   operation?: JazzFateMutationOperation;
   proc: string;
+  sync?: "background" | "foreground";
   table: unknown;
   type: TEntity["__typename"];
 };
@@ -156,15 +157,42 @@ type FateRequestHandle = PromiseLike<unknown> & {
       kind?: string;
       listKey?: string;
       name?: string;
+      type?: string;
     }>;
   };
 };
 
 type FateRequestMap = Map<string, Map<string, FateRequestHandle>>;
 
+type FateCacheListState = {
+  cursors?: Array<string | undefined>;
+  ids: string[];
+  liveAfterIds?: string[];
+  liveBeforeIds?: string[];
+  pendingAfterIds?: string[];
+  pendingBeforeIds?: string[];
+  [key: string]: unknown;
+};
+
+type FateCacheStore = {
+  getListState(key: string): FateCacheListState | undefined;
+  setList(key: string, state: FateCacheListState): void;
+};
+
 type FateCacheSyncTarget = {
   executeRequestHandle?: (handle: FateRequestHandle, mode: string) => void;
   requests?: FateRequestMap;
+  store?: FateCacheStore;
+  write?: (
+    type: string,
+    data: JazzFateEntity,
+    select: ReadonlySet<string>,
+    snapshots?: unknown,
+    plan?: unknown,
+    pathPrefix?: unknown,
+    blockedMask?: unknown,
+    insert?: string,
+  ) => void;
 };
 
 type JazzFateLiveViewHandlers = Parameters<NonNullable<Transport["subscribeById"]>>[4];
@@ -316,8 +344,7 @@ export function createJazzDbRepository<
       if (operation === "insert") {
         const result = insertRow(db, mutation.table, input);
 
-        await waitForWrite(result, queryOptions);
-        syncWriteInBackground(result, queryOptions, syncWritesToTier);
+        await waitForWrite(result, queryOptions, syncWritesToTier, mutation.sync);
 
         return toEntity(
           entity,
@@ -338,21 +365,52 @@ export function createJazzDbRepository<
           throw new Error(`Fate mutation ${String(proc)} could not find row ${String(id)}`);
         }
 
-        await deleteRow(db, mutation.table, id, queryOptions, syncWritesToTier);
+        await deleteRow(db, mutation.table, id, queryOptions, syncWritesToTier, mutation.sync);
 
         return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
       }
 
-      if (operation === "update") {
-        await updateRow(db, mutation.table, id, input, queryOptions, syncWritesToTier);
-      } else {
-        await upsertRow(db, mutation.table, id, input, queryOptions, syncWritesToTier);
+      const writtenRow =
+        operation === "update"
+          ? await updateRow(
+              db,
+              mutation.table,
+              id,
+              input,
+              queryOptions,
+              syncWritesToTier,
+              mutation.sync,
+            )
+          : await upsertRow(
+              db,
+              mutation.table,
+              id,
+              input,
+              queryOptions,
+              syncWritesToTier,
+              mutation.sync,
+            );
+
+      if (isRowLike(writtenRow)) {
+        return toEntity(
+          entity,
+          withRowId(writtenRow, id),
+          select,
+        ) as TMutationMap[typeof proc]["output"];
       }
 
       const row = await db.one(
         selectColumns(where(mutation.table, { id: String(id) }), entity, select),
         queryOptions,
       );
+
+      if (!row && operation === "upsert" && isRowLike(input)) {
+        return toEntity(
+          entity,
+          withRowId(input, id),
+          select,
+        ) as TMutationMap[typeof proc]["output"];
+      }
 
       if (!row) {
         throw new Error(`Fate mutation ${String(proc)} did not return row ${String(id)}`);
@@ -410,7 +468,11 @@ export function createJazzDbRepository<
       );
       const query = list.orderBy ? baseQuery : applyOffsetPagination(baseQuery, pagination);
 
-      return subscribeToQueryChanges(db, query, subscriptionQueryOptions, onChange);
+      return subscribeToQueryChanges(db, query, subscriptionQueryOptions, (rows) => {
+        onChange(
+          rows.map((row) => ensureEntityId(toEntity(entity, row, select), `list ${root}`, row)),
+        );
+      });
     },
   };
 }
@@ -546,23 +608,41 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
       } satisfies JazzFateLiveConnectionSubscription;
       connectionSubscriptions.add(subscription);
       const unsubscribeRemote =
-        repository.subscribeList?.(procedure, subscription.select, subscription.args, async () => {
-          try {
-            subscription.handlers.onEvent({
-              type: "invalidate",
-            });
-            await options.onLiveData?.({
-              affectedLists: [
-                {
-                  args: subscription.args,
-                  root: procedure,
-                },
-              ],
-            });
-          } catch (error) {
-            subscription.handlers.onError?.(error);
-          }
-        }) ?? (() => undefined);
+        repository.subscribeList?.(
+          procedure,
+          subscription.select,
+          subscription.args,
+          async (records) => {
+            try {
+              if (records?.length) {
+                for (const record of records) {
+                  subscription.handlers.onEvent({
+                    edge: {
+                      cursor: String(record.id),
+                      node: record,
+                    },
+                    nodeType: record.__typename,
+                    type: "prependNode",
+                  });
+                }
+              } else {
+                subscription.handlers.onEvent({
+                  type: "invalidate",
+                });
+              }
+              await options.onLiveData?.({
+                affectedLists: [
+                  {
+                    args: subscription.args,
+                    root: procedure,
+                  },
+                ],
+              });
+            } catch (error) {
+              subscription.handlers.onError?.(error);
+            }
+          },
+        ) ?? (() => undefined);
 
       return () => {
         unsubscribeRemote();
@@ -598,6 +678,69 @@ export function subscribeToJazzFateCacheUpdates(
       cacheUpdateListeners.delete(client);
     }
   };
+}
+
+export function applyJazzFateMutationToCache(
+  client: object,
+  event: Pick<JazzFateMutationEvent, "affectedLists" | "operation" | "output">,
+) {
+  if (!isJazzFateEntity(event.output)) {
+    emitJazzFateCacheUpdate(client, { affectedLists: event.affectedLists });
+    return 0;
+  }
+
+  const syncTarget = client as FateCacheSyncTarget;
+  const requests = syncTarget.requests;
+  const store = syncTarget.store;
+
+  writeEntityToFateCache(syncTarget, event.output);
+
+  if (!requests || !store) {
+    emitJazzFateCacheUpdate(client, { affectedLists: event.affectedLists });
+    return 0;
+  }
+
+  let updatedLists = 0;
+  const entityId = toEntityId(event.output.__typename, event.output.id);
+
+  for (const requestModes of requests.values()) {
+    for (const handle of requestModes.values()) {
+      for (const item of handle.descriptor?.items ?? []) {
+        if (
+          item.kind !== "list" ||
+          !item.listKey ||
+          item.type !== event.output.__typename ||
+          !event.affectedLists.some((affectedList) =>
+            doesAffectedListMatchRequestItem(affectedList, item.name, item.argsPayload),
+          )
+        ) {
+          continue;
+        }
+
+        const current = store.getListState(item.listKey);
+
+        if (!current && event.operation === "delete") {
+          continue;
+        }
+
+        const next =
+          event.operation === "delete"
+            ? removeEntityFromCacheList(current!, entityId)
+            : insertEntityIntoCacheList(current ?? { ids: [] }, entityId, String(event.output.id));
+
+        if (next === current) {
+          continue;
+        }
+
+        store.setList(item.listKey, next);
+        updatedLists += 1;
+      }
+    }
+  }
+
+  emitJazzFateCacheUpdate(client, { affectedLists: event.affectedLists });
+
+  return updatedLists;
 }
 
 export async function refreshJazzFateCache(
@@ -1062,6 +1205,80 @@ function doesAffectedListMatchRequestItem(
   return true;
 }
 
+function writeEntityToFateCache(syncTarget: FateCacheSyncTarget, output: JazzFateEntity) {
+  const write = syncTarget.write?.bind(syncTarget);
+
+  if (!write) {
+    return;
+  }
+
+  write(
+    output.__typename,
+    output,
+    new Set(Object.keys(output).filter((key) => key !== "__typename")),
+    undefined,
+    undefined,
+    null,
+    null,
+    "none",
+  );
+}
+
+function insertEntityIntoCacheList(
+  listState: FateCacheListState,
+  entityId: string,
+  cursor: string | undefined,
+) {
+  if (hasEntityInCacheList(listState, entityId)) {
+    return listState;
+  }
+
+  return {
+    ...listState,
+    cursors: listState.cursors ? [...listState.cursors, cursor] : listState.cursors,
+    ids: [...listState.ids, entityId],
+  };
+}
+
+function removeEntityFromCacheList(listState: FateCacheListState, entityId: string) {
+  if (!hasEntityInCacheList(listState, entityId)) {
+    return listState;
+  }
+
+  const visibleIndex = listState.ids.indexOf(entityId);
+
+  return {
+    ...listState,
+    cursors:
+      listState.cursors && visibleIndex >= 0
+        ? listState.cursors.filter((_, index) => index !== visibleIndex)
+        : listState.cursors,
+    ids: removeCacheListId(listState.ids, entityId) ?? [],
+    liveAfterIds: removeCacheListId(listState.liveAfterIds, entityId),
+    liveBeforeIds: removeCacheListId(listState.liveBeforeIds, entityId),
+    pendingAfterIds: removeCacheListId(listState.pendingAfterIds, entityId),
+    pendingBeforeIds: removeCacheListId(listState.pendingBeforeIds, entityId),
+  };
+}
+
+function hasEntityInCacheList(listState: FateCacheListState, entityId: string) {
+  return (
+    listState.ids.includes(entityId) ||
+    listState.liveAfterIds?.includes(entityId) === true ||
+    listState.liveBeforeIds?.includes(entityId) === true ||
+    listState.pendingAfterIds?.includes(entityId) === true ||
+    listState.pendingBeforeIds?.includes(entityId) === true
+  );
+}
+
+function removeCacheListId(ids: string[] | undefined, entityId: string) {
+  if (!ids?.includes(entityId)) {
+    return ids;
+  }
+
+  return ids.filter((id) => id !== entityId);
+}
+
 async function notifyJazzFateLiveSubscribers<
   TMutationMap extends JazzFateMutationMap,
   TProc extends Extract<keyof TMutationMap, string>,
@@ -1122,7 +1339,12 @@ async function notifyJazzFateLiveSubscribers<
         });
       } else {
         subscription.handlers.onEvent({
-          type: "invalidate",
+          edge: {
+            cursor: String(output.id),
+            node: output,
+          },
+          nodeType: output.__typename,
+          type: "prependNode",
         });
       }
     }
@@ -1210,19 +1432,22 @@ async function updateRow(
   input: unknown,
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
-): Promise<void> {
+  syncMode: JazzFateMutationDefinition["sync"],
+): Promise<unknown> {
   const result = (
     db.update as (
       table: unknown,
       id: string,
       input: unknown,
     ) => {
+      value?: unknown;
       wait?: unknown;
     }
   )(table, String(id), stripInputId(input));
 
-  await waitForWrite(result, queryOptions);
-  syncWriteInBackground(result, queryOptions, syncWritesToTier);
+  await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
+
+  return result.value;
 }
 
 async function upsertRow(
@@ -1232,7 +1457,8 @@ async function upsertRow(
   input: unknown,
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
-): Promise<void> {
+  syncMode: JazzFateMutationDefinition["sync"],
+): Promise<unknown> {
   const result = (
     db.upsert as (
       table: unknown,
@@ -1241,12 +1467,14 @@ async function upsertRow(
         id: string;
       },
     ) => {
+      value?: unknown;
       wait?: unknown;
     }
   )(table, stripInputId(input), { id: String(id) });
 
-  await waitForWrite(result, queryOptions);
-  syncWriteInBackground(result, queryOptions, syncWritesToTier);
+  await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
+
+  return result.value;
 }
 
 async function deleteRow(
@@ -1255,6 +1483,7 @@ async function deleteRow(
   id: string | number,
   queryOptions: QueryOptions,
   syncWritesToTier: QueryOptions["tier"],
+  syncMode: JazzFateMutationDefinition["sync"],
 ): Promise<void> {
   const result = (
     db.delete as (
@@ -1265,8 +1494,7 @@ async function deleteRow(
     }
   )(table, String(id));
 
-  await waitForWrite(result, queryOptions);
-  syncWriteInBackground(result, queryOptions, syncWritesToTier);
+  await waitForWrite(result, queryOptions, syncWritesToTier, syncMode);
 }
 
 function getMutationId<TEntity extends JazzFateEntity>(
@@ -1302,8 +1530,28 @@ function stripInputId(input: unknown): unknown {
   return withoutId;
 }
 
-async function waitForWrite(result: { wait?: unknown }, queryOptions: QueryOptions) {
-  await waitForWriteTier(result, queryOptions.tier ?? "local");
+function isRowLike(value: unknown): value is RowLike {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+async function waitForWrite(
+  result: { wait?: unknown },
+  queryOptions: QueryOptions,
+  syncWritesToTier: QueryOptions["tier"],
+  syncMode: JazzFateMutationDefinition["sync"],
+) {
+  const waitTier = queryOptions.tier ?? "local";
+
+  if (syncWritesToTier && syncWritesToTier !== waitTier) {
+    if (syncMode === "foreground") {
+      await waitForWriteTier(result, syncWritesToTier);
+    } else {
+      void waitForWriteTier(result, syncWritesToTier).catch(() => undefined);
+    }
+    return;
+  }
+
+  await waitForWriteTier(result, waitTier);
 }
 
 async function waitForWriteTier(result: { wait?: unknown }, tier: QueryOptions["tier"]) {
@@ -1314,20 +1562,6 @@ async function waitForWriteTier(result: { wait?: unknown }, tier: QueryOptions["
   await (result.wait as (options: Pick<QueryOptions, "tier">) => Promise<unknown>)({
     tier,
   });
-}
-
-function syncWriteInBackground(
-  result: { wait?: unknown },
-  queryOptions: QueryOptions,
-  syncWritesToTier: QueryOptions["tier"],
-) {
-  const waitTier = queryOptions.tier ?? "local";
-
-  if (!syncWritesToTier || syncWritesToTier === waitTier || typeof result.wait !== "function") {
-    return;
-  }
-
-  void waitForWriteTier(result, syncWritesToTier).catch(() => undefined);
 }
 
 function normalizeArgs(args: unknown): Record<string, unknown> | undefined {

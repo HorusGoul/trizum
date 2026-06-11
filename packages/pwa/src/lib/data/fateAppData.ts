@@ -1,3 +1,4 @@
+import { PARTICIPANT_CONNECTION_VIEW } from "./trizumFateViews.ts";
 import {
   ExpenseListItemView,
   JoinedPartyView,
@@ -5,7 +6,9 @@ import {
   ParticipantView,
   PartyMemberView,
   PartySettingsView,
+  ConnectionTag,
   refreshJazzFateCache,
+  toEntityId,
   UserSettingsView,
   type ExpenseEntity,
   type JoinedPartyEntity,
@@ -37,6 +40,23 @@ type JsonLike = boolean | number | string | null | JsonLike[] | { [key: string]:
 type MutationResult<T> = {
   error?: unknown;
   result?: T;
+};
+type FateConnectionMetadata = {
+  key: string;
+};
+type FateConnectionWithMetadata = {
+  [ConnectionTag]?: FateConnectionMetadata;
+};
+type FateListState = {
+  cursors?: Array<string | undefined>;
+  ids: string[];
+  [key: string]: unknown;
+};
+type FateStoreTarget = {
+  store?: {
+    getListState(key: string): FateListState | undefined;
+    setList(key: string, state: FateListState): void;
+  };
 };
 export type DataReadResult<T> =
   | {
@@ -81,9 +101,11 @@ export async function createPartyInFate({
     ...party,
     localOnlyInviteSecret: createInviteSecret(),
   });
-  await Promise.all(
+  const participantListKey = await primeParticipantList(client, partyId);
+  const participantEntities = await Promise.all(
     values.participants.map((participant) => upsertParticipant(client, partyId, participant)),
   );
+  seedParticipantList(client, participantListKey, participantEntities);
 
   return party;
 }
@@ -95,16 +117,21 @@ export async function upsertParty(
     localOnlyInviteSecret?: string;
   },
 ) {
+  const input = {
+    currency: party.currency,
+    description: party.description,
+    id: party.id,
+    localOnlyInviteSecret: party.localOnlyInviteSecret,
+    name: party.name,
+    ownerUserId: userId,
+    symbol: party.symbol,
+  };
   const result = await client.mutations.party.upsert({
-    input: {
-      currency: party.currency,
-      description: party.description,
-      id: party.id,
-      localOnlyInviteSecret: party.localOnlyInviteSecret,
-      name: party.name,
-      ownerUserId: userId,
-      symbol: party.symbol,
-    },
+    input,
+    optimistic: {
+      __typename: "Party",
+      ...input,
+    } as PartyEntity,
     view: PartySettingsView,
   });
 
@@ -116,18 +143,23 @@ export async function upsertParticipant(
   partyId: string,
   participant: PartyParticipant,
 ) {
+  const input = {
+    avatarId: participant.avatarId ?? undefined,
+    balancesSortedBy: participant.balancesSortedBy ?? "name",
+    id: getParticipantEntityId(partyId, participant.id),
+    isArchived: participant.isArchived ?? false,
+    localId: participant.id,
+    name: participant.name,
+    partyId,
+    personalMode: participant.personalMode ?? false,
+    phone: participant.phone,
+  };
   const result = await client.mutations.participant.upsert({
-    input: {
-      avatarId: participant.avatarId ?? undefined,
-      balancesSortedBy: participant.balancesSortedBy ?? "name",
-      id: getParticipantEntityId(partyId, participant.id),
-      isArchived: participant.isArchived ?? false,
-      localId: participant.id,
-      name: participant.name,
-      partyId,
-      personalMode: participant.personalMode ?? false,
-      phone: participant.phone,
-    },
+    input,
+    optimistic: {
+      __typename: "Participant",
+      ...input,
+    } as ParticipantEntity,
     view: ParticipantView,
   });
 
@@ -151,6 +183,10 @@ export async function upsertPartyMember(
   const created = await tryCreateMutation(() =>
     client.mutations.partyMember.create({
       input,
+      optimistic: {
+        __typename: "PartyMember",
+        ...input,
+      } as PartyMemberEntity,
       view: PartyMemberView,
     }),
   );
@@ -163,6 +199,10 @@ export async function upsertPartyMember(
     input: {
       ...input,
     },
+    optimistic: {
+      __typename: "PartyMember",
+      ...input,
+    } as PartyMemberEntity,
     view: PartyMemberView,
   });
 
@@ -190,6 +230,10 @@ export async function ensurePartyMemberForSelection(
   };
   const result = await client.mutations.partyMember.create({
     input,
+    optimistic: {
+      __typename: "PartyMember",
+      ...input,
+    } as PartyMemberEntity,
     view: PartyMemberView,
   });
 
@@ -274,20 +318,24 @@ export async function upsertUserSettings(
   >,
 ) {
   const current = await readUserSettings(client, userId);
+  const input = {
+    authMode: "localFirst" as const,
+    autoOpenCalculator: values.autoOpenCalculator ?? current?.autoOpenCalculator ?? false,
+    avatarId: values.avatarId ?? current?.avatarId ?? undefined,
+    displayName: values.username ?? current?.displayName ?? undefined,
+    hue: values.hue ?? current?.hue,
+    id: userId,
+    lastOpenedPartyId: values.lastOpenedPartyId ?? current?.lastOpenedPartyId ?? undefined,
+    locale: values.locale ?? current?.locale,
+    openLastPartyOnLaunch: values.openLastPartyOnLaunch ?? current?.openLastPartyOnLaunch ?? false,
+    phone: values.phone ?? current?.phone ?? undefined,
+  };
   const result = await client.mutations.user.upsert({
-    input: {
-      authMode: "localFirst",
-      autoOpenCalculator: values.autoOpenCalculator ?? current?.autoOpenCalculator ?? false,
-      avatarId: values.avatarId ?? current?.avatarId ?? undefined,
-      displayName: values.username ?? current?.displayName ?? undefined,
-      hue: values.hue ?? current?.hue,
-      id: userId,
-      lastOpenedPartyId: values.lastOpenedPartyId ?? current?.lastOpenedPartyId ?? undefined,
-      locale: values.locale ?? current?.locale,
-      openLastPartyOnLaunch:
-        values.openLastPartyOnLaunch ?? current?.openLastPartyOnLaunch ?? false,
-      phone: values.phone ?? current?.phone ?? undefined,
-    },
+    input,
+    optimistic: {
+      __typename: "User",
+      ...input,
+    } as UserEntity,
     view: UserSettingsView,
   });
 
@@ -309,6 +357,7 @@ export async function createExpenseInFate(
   const result = await client.mutations.expense.create({
     input: expenseToMutationInput(partyId, expenseWithId),
     insert: "before",
+    optimistic: expenseToOptimisticEntity(partyId, expenseWithId),
     view: ExpenseListItemView,
   });
 
@@ -894,4 +943,36 @@ function readErrorAsNotFound(error: unknown): DataReadResult<never> {
 
 async function notifyFateReadComplete(client: TrizumFateClient) {
   await refreshJazzFateCache(client, []);
+}
+
+async function primeParticipantList(client: TrizumFateClient, partyId: string) {
+  const { participants } = await client.request({
+    participants: {
+      args: { partyId },
+      list: PARTICIPANT_CONNECTION_VIEW,
+    },
+  });
+
+  return (participants as FateConnectionWithMetadata)[ConnectionTag]?.key;
+}
+
+function seedParticipantList(
+  client: TrizumFateClient,
+  listKey: string | undefined,
+  participants: readonly ParticipantEntity[],
+) {
+  const store = (client as unknown as FateStoreTarget).store;
+
+  if (!listKey || !store) {
+    return;
+  }
+
+  const current = store.getListState(listKey);
+  const ids = participants.map((participant) => toEntityId("Participant", participant.id));
+
+  store.setList(listKey, {
+    ...current,
+    cursors: participants.map((participant) => String(participant.id)),
+    ids,
+  });
 }

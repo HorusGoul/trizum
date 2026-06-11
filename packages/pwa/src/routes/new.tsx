@@ -19,7 +19,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
-import { createPartyInFate, waitForPartyInFate } from "#src/lib/data/fateAppData.ts";
+import { createPartyInFate } from "#src/lib/data/fateAppData.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 
 export const Route = createFileRoute("/new")({
@@ -41,7 +41,7 @@ interface NewPartyFormValues {
 }
 
 function New() {
-  const { client, hasRemoteSync, settledClient, userId } = useTrizumData();
+  const { client, userId } = useTrizumData();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
 
@@ -63,13 +63,6 @@ function New() {
         symbol: values.symbol,
       },
     });
-
-    if (hasRemoteSync && settledClient) {
-      await waitForPartyInFate(settledClient, party.id, {
-        minParticipants: participants.length,
-        timeoutMs: 15_000,
-      });
-    }
 
     await navigate({
       to: "/party/$partyId/who",

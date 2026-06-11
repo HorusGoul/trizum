@@ -76,6 +76,7 @@ export {
   type UserEntity,
 } from "./views.js";
 export {
+  applyJazzFateMutationToCache,
   createJazzFateDb,
   createJazzFateTransport,
   projectEntity,

@@ -1,5 +1,6 @@
 import { clientRoot, createClient } from "@nkzw/fate";
 import {
+  applyJazzFateMutationToCache,
   createJazzFateDb,
   createJazzFateTransport,
   refreshJazzFateCache,
@@ -53,8 +54,8 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
     async onLiveData({ affectedLists }) {
       await refreshJazzFateCache(client, affectedLists);
     },
-    async onMutation({ affectedLists }) {
-      await refreshJazzFateCache(client, affectedLists);
+    onMutation(event) {
+      applyJazzFateMutationToCache(client, event);
     },
   });
 

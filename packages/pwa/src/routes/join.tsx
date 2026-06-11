@@ -12,11 +12,7 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
 import { toast } from "sonner";
-import {
-  ensurePartyMemberForSelection,
-  readParty,
-  waitForPartyInFate,
-} from "#src/lib/data/fateAppData.ts";
+import { ensurePartyMemberForSelection } from "#src/lib/data/fateAppData.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { getLogger } from "#src/lib/log.ts";
 
@@ -38,7 +34,7 @@ interface JoinFormValues {
 }
 
 function Join() {
-  const { client, hasRemoteSync, settledClient, userId } = useTrizumData();
+  const { client, userId } = useTrizumData();
   const router = useRouter();
   const navigate = useNavigate({ from: Route.fullPath });
   const { scanning } = Route.useSearch();
@@ -120,15 +116,6 @@ function Join() {
 
   async function preparePartySelection(partyId: string) {
     await ensurePartyMemberForSelection(client, userId, partyId);
-
-    const party =
-      hasRemoteSync && settledClient
-        ? await waitForPartyInFate(settledClient, partyId, { timeoutMs: 15_000 })
-        : await readParty(client, partyId);
-
-    if (!party) {
-      throw new Error(`Party ${partyId} was not found`);
-    }
   }
 
   const form = useForm({

@@ -338,6 +338,7 @@ export const trizumMutationDefinitions = [
   {
     affectedLists: affectedExpenseLists,
     proc: "expense.create",
+    sync: "foreground",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },
@@ -345,6 +346,7 @@ export const trizumMutationDefinitions = [
     affectedLists: affectedExpenseLists,
     operation: "upsert",
     proc: "expense.upsert",
+    sync: "foreground",
     table: trizumJazzApp.expenses,
     type: "Expense",
   },

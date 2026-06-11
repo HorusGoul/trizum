@@ -1,11 +1,13 @@
 import { describe, expect, test, vi } from "vite-plus/test";
 import type { AuthSecretStore } from "jazz-tools";
 import {
+  applyJazzFateMutationToCache,
   createJazzDbRepository,
   createJazzFateTransport,
   projectEntity,
   refreshJazzFateCache,
   resolveJazzFateAuthConfig,
+  subscribeToJazzFateCacheUpdates,
   type JazzFateEntity,
   type JazzFateDb,
   type JazzFateRepository,
@@ -237,6 +239,131 @@ describe("Jazz DB repository", () => {
     ]);
   });
 
+  test("uses returned upsert rows when immediate rereads are unavailable", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: {
+        async all() {
+          throw new Error("all is not used by this test");
+        },
+        insert() {
+          throw new Error("insert is not used by this test");
+        },
+        async one() {
+          return null;
+        },
+        update() {
+          throw new Error("update is not used by this test");
+        },
+        upsert(_table: unknown, input: unknown, options: { id: string }) {
+          const row = table.upsert(options.id, input as Partial<NoteRow>);
+
+          return {
+            value: row,
+            wait: async () => {},
+          };
+        },
+      } as unknown as JazzFateDb,
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "upsert",
+          proc: "note.upsert",
+          table,
+          type: "Note",
+        },
+      ],
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.upsert",
+        {
+          body: "Visible details",
+          createdAt: 2,
+          id: "note-2",
+          privateMemo: "hidden",
+          projectId: "project-1",
+          title: "Draft",
+        },
+        ["id", "title", "privateMemo"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-2",
+      title: "Draft",
+    });
+  });
+
+  test("uses upsert inputs when Jazz cannot immediately reread the row", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: {
+        async all() {
+          throw new Error("all is not used by this test");
+        },
+        insert() {
+          throw new Error("insert is not used by this test");
+        },
+        async one() {
+          return null;
+        },
+        update() {
+          throw new Error("update is not used by this test");
+        },
+        upsert(_table: unknown, input: unknown, options: { id: string }) {
+          table.upsert(options.id, input as Partial<NoteRow>);
+
+          return {
+            wait: async () => {},
+          };
+        },
+      } as unknown as JazzFateDb,
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "upsert",
+          proc: "note.upsert",
+          table,
+          type: "Note",
+        },
+      ],
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.upsert",
+        {
+          body: "Visible details",
+          createdAt: 2,
+          id: "note-2",
+          privateMemo: "hidden",
+          projectId: "project-1",
+          title: "Draft",
+        },
+        ["id", "title", "privateMemo"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-2",
+      title: "Draft",
+    });
+  });
+
   test("restores requested ids on by-id reads when Jazz omits id from the row", async () => {
     const table = {
       select: () => table,
@@ -360,7 +487,7 @@ describe("Fate Jazz transport", () => {
     });
   });
 
-  test("invalidates affected live list connections after mutations", async () => {
+  test("emits affected live list nodes after mutations", async () => {
     const repository = createMemoryRepository();
     const transport = createJazzFateTransport<MutationMap>(repository);
     const events: unknown[] = [];
@@ -386,7 +513,20 @@ describe("Fate Jazz transport", () => {
       new Set(["id", "title"]),
     );
 
-    expect(events).toStrictEqual([{ type: "invalidate" }]);
+    expect(events).toStrictEqual([
+      {
+        edge: {
+          cursor: "note-2",
+          node: {
+            __typename: "Note",
+            id: "note-2",
+            title: "Roadmap",
+          },
+        },
+        nodeType: "Note",
+        type: "prependNode",
+      },
+    ]);
     unsubscribe?.();
   });
 
@@ -529,6 +669,75 @@ describe("Fate Jazz transport", () => {
 
     await expect(refresh).resolves.toBe(1);
     expect(store.restoreList).not.toHaveBeenCalled();
+  });
+
+  test("updates retained scoped Fate lists after local mutations", () => {
+    const output = {
+      __typename: "Note",
+      id: "note-1",
+      projectId: "project-1",
+      title: "Draft",
+    } satisfies NoteEntity;
+    const handle = {
+      descriptor: {
+        items: [
+          {
+            argsPayload: { projectId: "project-1" },
+            kind: "list",
+            listKey: "scoped-notes",
+            name: "notes",
+            type: "Note",
+          },
+        ],
+      },
+    };
+    const store = {
+      getListState: vi.fn<(key: string) => { cursors: string[]; ids: string[] }>(() => ({
+        cursors: [],
+        ids: [],
+      })),
+      setList: vi.fn<(key: string, state: { cursors?: string[]; ids: string[] }) => void>(),
+    };
+    const write = vi.fn<() => void>();
+    const client = {
+      requests: new Map([["notes", new Map([["cache-first", handle]])]]),
+      store,
+      write,
+    };
+    const cacheUpdates: unknown[] = [];
+    const unsubscribe = subscribeToJazzFateCacheUpdates(client, (event) => {
+      cacheUpdates.push(event);
+    });
+
+    expect(
+      applyJazzFateMutationToCache(client, {
+        affectedLists: [{ args: { projectId: "project-1" }, root: "notes" }],
+        operation: "upsert",
+        output,
+      }),
+    ).toBe(1);
+
+    expect(write).toHaveBeenCalledWith(
+      "Note",
+      output,
+      new Set(["id", "projectId", "title"]),
+      undefined,
+      undefined,
+      null,
+      null,
+      "none",
+    );
+    expect(store.setList).toHaveBeenCalledWith("scoped-notes", {
+      cursors: ["note-1"],
+      ids: ["Note:note-1"],
+    });
+    expect(cacheUpdates).toStrictEqual([
+      {
+        affectedLists: [{ args: { projectId: "project-1" }, root: "notes" }],
+      },
+    ]);
+
+    unsubscribe();
   });
 });
 
@@ -694,6 +903,8 @@ class FakeNoteQuery {
       id,
       method: "upsert",
     });
+
+    return row;
   }
 
   execute() {
