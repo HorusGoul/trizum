@@ -181,19 +181,13 @@ export async function upsertJoinedParty(
     participantId?: string;
   },
 ) {
-  const input = {
-    id: getJoinedPartyId(userId, partyId),
-    isArchived: values.isArchived,
-    isPinned: values.isArchived ? false : values.isPinned,
-    joinedAt: values.joinedAt,
-    lastUsedAt: values.lastUsedAt,
-    participantId: values.participantId,
-    partyId,
-    userId,
-  };
+  const optimistic = createJoinedPartyEntity(userId, partyId, values);
+  const { __typename: _typename, ...input } = optimistic;
   const created = await tryCreateMutation(() =>
     client.mutations.joinedParty.create({
       input,
+      insert: "before",
+      optimistic,
       view: JoinedPartyView,
     }),
   );
@@ -204,10 +198,35 @@ export async function upsertJoinedParty(
 
   const result = await client.mutations.joinedParty.upsert({
     input,
+    optimistic,
     view: JoinedPartyView,
   });
 
   return expectMutationResult(result, "joinedParty.upsert did not return a result");
+}
+
+export function createJoinedPartyEntity(
+  userId: string,
+  partyId: string,
+  values: {
+    isArchived: boolean;
+    isPinned: boolean;
+    joinedAt?: Date;
+    lastUsedAt?: Date;
+    participantId?: string;
+  },
+): JoinedPartyEntity {
+  return {
+    __typename: "JoinedParty",
+    id: getJoinedPartyId(userId, partyId),
+    isArchived: values.isArchived,
+    isPinned: values.isArchived ? false : values.isPinned,
+    joinedAt: values.joinedAt,
+    lastUsedAt: values.lastUsedAt,
+    participantId: values.participantId,
+    partyId,
+    userId,
+  } as JoinedPartyEntity;
 }
 
 export async function upsertUserSettings(

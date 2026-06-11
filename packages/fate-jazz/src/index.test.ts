@@ -454,6 +454,32 @@ describe("Fate Jazz transport", () => {
     await expect(firstRefresh).resolves.toBe(1);
     await expect(secondRefresh).resolves.toBe(1);
   });
+
+  test("keeps retained Fate list state while revalidating", async () => {
+    const handle = createRefreshHandle();
+    const store = {
+      getListState: vi.fn<(key: string) => { items: string[] }>(() => ({ items: ["cached-note"] })),
+      restoreList: vi.fn<(key: string, list?: unknown) => void>(),
+    };
+    const client = {
+      executeRequestHandle: vi.fn<(requestHandle: typeof handle) => void>((requestHandle) => {
+        requestHandle.start();
+      }),
+      requests: new Map([["notes", new Map([["cache-first", handle]])]]),
+      store,
+    };
+
+    const refresh = refreshJazzFateCache(client, [{ root: "notes" }]);
+    await vi.waitFor(() => expect(client.executeRequestHandle).toHaveBeenCalledTimes(1));
+
+    expect(store.getListState).not.toHaveBeenCalled();
+    expect(store.restoreList).not.toHaveBeenCalled();
+
+    handle.resolveCurrent();
+
+    await expect(refresh).resolves.toBe(1);
+    expect(store.restoreList).not.toHaveBeenCalled();
+  });
 });
 
 describe("projectEntity", () => {

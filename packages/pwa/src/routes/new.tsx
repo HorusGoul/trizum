@@ -64,11 +64,8 @@ function New() {
       },
     });
     await navigate({
-      to: "/party/$partyId",
+      to: "/party/$partyId/who",
       params: { partyId: party.id },
-      search: {
-        tab: "expenses",
-      },
       replace: true,
     });
 

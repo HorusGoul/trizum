@@ -209,24 +209,30 @@ export function ExpenseEditor({
     () => ({
       setValues: (values) => {
         isReceivingUpdatesRef.current = true;
-        const currentFocusedField = focusedFieldRef.current;
+        try {
+          const currentFocusedField = focusedFieldRef.current;
 
-        for (const key in values) {
-          const isFocused = key === currentFocusedField;
+          for (const key in values) {
+            const isFocused = key === currentFocusedField;
 
-          if (isFocused) {
-            // If the field is focused, we don't want to update the value
-            continue;
+            if (isFocused) {
+              // If the field is focused, we don't want to update the value
+              continue;
+            }
+
+            form.setFieldValue(
+              key as keyof ExpenseEditorFormValues,
+              values[key as keyof ExpenseEditorFormValues],
+              {
+                dontRunListeners: true,
+                dontUpdateMeta: true,
+                dontValidate: true,
+              },
+            );
           }
-
-          form.setFieldValue(
-            key as keyof ExpenseEditorFormValues,
-            values[key as keyof ExpenseEditorFormValues],
-          );
-          void form.validateField(key as keyof ExpenseEditorFormValues, "server");
+        } finally {
+          isReceivingUpdatesRef.current = false;
         }
-
-        isReceivingUpdatesRef.current = false;
       },
     }),
     [form],

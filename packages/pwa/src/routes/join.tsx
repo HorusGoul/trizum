@@ -56,10 +56,10 @@ function Join() {
     if (!partyId) return;
 
     void navigate({
-      to: "/party/$partyId",
+      to: "/party/$partyId/who",
       replace: true,
       params: { partyId },
-      search: { tab: "expenses" },
+      search: { redirectTo: `/party/${partyId}?tab=expenses` },
     });
   }
 
@@ -89,13 +89,13 @@ function Join() {
       return;
     }
     void navigate({
-      to: "/party/$partyId",
+      to: "/party/$partyId/who",
       replace: true,
       params: {
         partyId,
       },
       search: {
-        tab: "expenses",
+        redirectTo: `/party/${partyId}?tab=expenses`,
       },
     });
   }

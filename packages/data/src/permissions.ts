@@ -71,7 +71,7 @@ export const trizumJazzPermissions = definePermissions(
       policy.participants.allowRead.where(allowedTo.read("partyId")),
       policy.participants.allowInsert.where(allowedTo.update("partyId")),
       policy.participants.allowUpdate
-        .whereOld(allowedTo.update("partyId"))
+        .whereOld(allowedTo.read("partyId"))
         .whereNew(allowedTo.update("partyId")),
       policy.participants.allowDelete.where(allowedTo.update("partyId")),
 
@@ -87,7 +87,7 @@ export const trizumJazzPermissions = definePermissions(
       policy.expenses.allowRead.where(allowedTo.read("partyId")),
       policy.expenses.allowInsert.where(allowedTo.update("partyId")),
       policy.expenses.allowUpdate
-        .whereOld(allowedTo.update("partyId"))
+        .whereOld(allowedTo.read("partyId"))
         .whereNew(allowedTo.update("partyId")),
       policy.expenses.allowDelete.where(allowedTo.update("partyId")),
     ];

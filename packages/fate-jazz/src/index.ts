@@ -158,15 +158,9 @@ type FateRequestHandle = PromiseLike<unknown> & {
 
 type FateRequestMap = Map<string, Map<string, FateRequestHandle>>;
 
-type FateCacheSyncStore = {
-  getListState?: (key: string) => unknown;
-  restoreList?: (key: string, list: unknown) => void;
-};
-
 type FateCacheSyncTarget = {
   executeRequestHandle?: (handle: FateRequestHandle, mode: string) => void;
   requests?: FateRequestMap;
-  store?: FateCacheSyncStore;
 };
 
 type JazzFateLiveViewHandlers = Parameters<NonNullable<Transport["subscribeById"]>>[4];
@@ -615,19 +609,12 @@ async function refreshJazzFateCacheNow(
     }
   }
 
-  const listSnapshots = resetAffectedListStates(syncTarget.store, handles, affectedLists);
-
-  try {
-    await Promise.all(
-      [...handles].map(async (handle) => {
-        executeRequestHandle(handle, "network-only");
-        await handle;
-      }),
-    );
-  } catch (error) {
-    restoreListStates(syncTarget.store, listSnapshots);
-    throw error;
-  }
+  await Promise.all(
+    [...handles].map(async (handle) => {
+      executeRequestHandle(handle, "network-only");
+      await handle;
+    }),
+  );
 
   emitJazzFateCacheUpdate(client, { affectedLists });
 
@@ -991,51 +978,6 @@ function doesRequestMatchAffectedLists(
         ),
     ) === true
   );
-}
-
-function resetAffectedListStates(
-  store: FateCacheSyncStore | undefined,
-  handles: ReadonlySet<FateRequestHandle>,
-  affectedLists: readonly JazzFateAffectedList[],
-) {
-  const listSnapshots = new Map<string, unknown>();
-
-  if (!store?.getListState || !store.restoreList) {
-    return listSnapshots;
-  }
-
-  for (const handle of handles) {
-    for (const item of handle.descriptor?.items ?? []) {
-      if (
-        item.kind !== "list" ||
-        !item.listKey ||
-        !affectedLists.some((affectedList) =>
-          doesAffectedListMatchRequestItem(affectedList, item.name, item.argsPayload),
-        ) ||
-        listSnapshots.has(item.listKey)
-      ) {
-        continue;
-      }
-
-      listSnapshots.set(item.listKey, store.getListState(item.listKey));
-      store.restoreList(item.listKey, undefined);
-    }
-  }
-
-  return listSnapshots;
-}
-
-function restoreListStates(
-  store: FateCacheSyncStore | undefined,
-  listSnapshots: ReadonlyMap<string, unknown>,
-) {
-  if (!store?.restoreList) {
-    return;
-  }
-
-  for (const [key, list] of listSnapshots) {
-    store.restoreList(key, list);
-  }
 }
 
 function doesAffectedListMatchRequestItem(

@@ -116,7 +116,22 @@ describe("Jazz alpha schema", () => {
       ]),
       type: "Or",
     });
+    expect(trizumJazzWasmSchema.participants?.policies?.update?.using).toStrictEqual({
+      operation: "Select",
+      type: "Inherits",
+      via_column: "partyId",
+    });
+    expect(trizumJazzWasmSchema.participants?.policies?.update?.with_check).toStrictEqual({
+      operation: "Update",
+      type: "Inherits",
+      via_column: "partyId",
+    });
     expect(trizumJazzWasmSchema.expenses?.policies?.update?.using).toStrictEqual({
+      operation: "Select",
+      type: "Inherits",
+      via_column: "partyId",
+    });
+    expect(trizumJazzWasmSchema.expenses?.policies?.update?.with_check).toStrictEqual({
       operation: "Update",
       type: "Inherits",
       via_column: "partyId",
