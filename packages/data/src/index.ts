@@ -95,6 +95,7 @@ export {
 } from "fate-jazz";
 export {
   ConnectionTag,
+  getSelectionPlan,
   getListEntries,
   toEntityId,
   type ConnectionMetadata,

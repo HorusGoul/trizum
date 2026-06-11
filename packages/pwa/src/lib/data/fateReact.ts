@@ -1,5 +1,6 @@
 import {
   ConnectionTag,
+  getSelectionPlan,
   getListEntries,
   subscribeToJazzFateCacheUpdates,
   toEntityId,
@@ -19,6 +20,7 @@ type Unsubscribe = () => void;
 
 type FateStore = {
   getListState(key: string): List | undefined;
+  missingForSelection(id: string, paths: ReadonlySet<string>): Set<string>;
   subscribe(id: string, selection: ReadonlySet<string> | null, fn: () => void): Unsubscribe;
   subscribeList(key: string, fn: () => void): Unsubscribe;
 };
@@ -164,6 +166,26 @@ export function useFateLiveView<T extends { __typename: string }>(
   ref: ViewRef<T["__typename"]>,
 ): T {
   return useFateView(view, ref, { live: true });
+}
+
+export function useFateCachedView<T extends { __typename: string }>(
+  view: View<T, any>,
+  ref: ViewRef<T["__typename"]>,
+): T | null {
+  const { client } = useTrizumData();
+  const entityId = toEntityId(ref.__typename, ref.id);
+  const subscriptionVersion = useSubscriptionVersion((change) => {
+    const unsubscribeRecord = getFateStore(client).subscribe(entityId, null, change);
+    const unsubscribeCacheUpdate = subscribeToJazzFateCacheUpdates(client, change);
+
+    return () => {
+      unsubscribeCacheUpdate();
+      unsubscribeRecord();
+    };
+  });
+  const snapshot = readCachedViewSnapshot(client, view, ref);
+
+  return snapshot ? readCachedViewData(client, view, ref, snapshot, subscriptionVersion) : null;
 }
 
 export function useFateView<T extends { __typename: string }>(
@@ -373,6 +395,23 @@ function readViewSnapshotForRender<T extends { __typename: string }>(
   }
 
   return { handle };
+}
+
+function readCachedViewSnapshot<T extends { __typename: string }>(
+  client: TrizumFateClient,
+  view: View<T, any>,
+  ref: ViewRef<T["__typename"]>,
+): ViewSnapshot<T, any> | null {
+  const entityId = toEntityId(ref.__typename, ref.id);
+  const plan = getSelectionPlan(view, ref);
+
+  if (getFateStore(client).missingForSelection(entityId, plan.paths).size > 0) {
+    return null;
+  }
+
+  const handle = client.readView(view, ref) as FateViewHandle<T>;
+
+  return handle.status === "fulfilled" && handle.value ? handle.value : null;
 }
 
 function getViewSnapshotKey(ref: ViewRef<string>) {
