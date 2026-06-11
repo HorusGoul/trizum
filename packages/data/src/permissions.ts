@@ -12,6 +12,11 @@ type PermissionValue = PermissionRowRef | string;
 export const trizumJazzPermissions = definePermissions(
   trizumJazzApp,
   ({ allowedTo, allOf, anyOf, policy, session }) => {
+    const partyOwner = (partyId: PermissionValue) =>
+      policy.parties.exists.where({
+        id: partyId,
+        ownerUserId: session.userId,
+      });
     const partyEditor = (partyId: PermissionValue) =>
       anyOf([
         policy.partyMembers.exists.where({
@@ -25,9 +30,11 @@ export const trizumJazzPermissions = definePermissions(
           userId: session.userId,
         }),
       ]);
+    const partyWriter = (partyId: PermissionValue) =>
+      anyOf([partyOwner(partyId), partyEditor(partyId)]);
 
-    function partyEditorOfRow(column: "partyId") {
-      return partyEditor({
+    function partyWriterOfRow(column: "partyId") {
+      return partyWriter({
         __jazzPermissionKind: "row-ref",
         column,
       });
@@ -58,18 +65,18 @@ export const trizumJazzPermissions = definePermissions(
       policy.parties.allowDelete.where({ ownerUserId: session.userId }),
 
       policy.partyMembers.allowRead.where(
-        anyOf([{ userId: session.userId }, partyEditorOfRow("partyId")]),
+        anyOf([{ userId: session.userId }, partyWriterOfRow("partyId")]),
       ),
       policy.partyMembers.allowInsert.where(
         anyOf([
-          partyEditorOfRow("partyId"),
+          partyWriterOfRow("partyId"),
           allOf([allowedTo.read("partyId"), { role: "editor", userId: session.userId }]),
         ]),
       ),
       policy.partyMembers.allowUpdate
-        .whereOld((member) => partyEditor(member.partyId))
-        .whereNew((member) => partyEditor(member.partyId)),
-      policy.partyMembers.allowDelete.where((member) => partyEditor(member.partyId)),
+        .whereOld((member) => partyWriter(member.partyId))
+        .whereNew((member) => partyWriter(member.partyId)),
+      policy.partyMembers.allowDelete.where((member) => partyWriter(member.partyId)),
 
       policy.joinedParties.allowRead.where({ $createdBy: session.userId }),
       policy.joinedParties.allowInsert.where({ $createdBy: session.userId }),
@@ -79,11 +86,11 @@ export const trizumJazzPermissions = definePermissions(
       policy.joinedParties.allowDelete.where({ $createdBy: session.userId }),
 
       policy.participants.allowRead.where(allowedTo.read("partyId")),
-      policy.participants.allowInsert.where((participant) => partyEditor(participant.partyId)),
+      policy.participants.allowInsert.where((participant) => partyWriter(participant.partyId)),
       policy.participants.allowUpdate
-        .whereOld((participant) => partyEditor(participant.partyId))
-        .whereNew((participant) => partyEditor(participant.partyId)),
-      policy.participants.allowDelete.where((participant) => partyEditor(participant.partyId)),
+        .whereOld((participant) => partyWriter(participant.partyId))
+        .whereNew((participant) => partyWriter(participant.partyId)),
+      policy.participants.allowDelete.where((participant) => partyWriter(participant.partyId)),
 
       policy.mediaFiles.allowRead.where(
         anyOf([{ ownerUserId: session.userId }, allowedTo.read("partyId")]),
@@ -95,11 +102,11 @@ export const trizumJazzPermissions = definePermissions(
       policy.mediaFiles.allowDelete.where({ ownerUserId: session.userId }),
 
       policy.expenses.allowRead.where(allowedTo.read("partyId")),
-      policy.expenses.allowInsert.where((expense) => partyEditor(expense.partyId)),
+      policy.expenses.allowInsert.where((expense) => partyWriter(expense.partyId)),
       policy.expenses.allowUpdate
-        .whereOld((expense) => partyEditor(expense.partyId))
-        .whereNew((expense) => partyEditor(expense.partyId)),
-      policy.expenses.allowDelete.where((expense) => partyEditor(expense.partyId)),
+        .whereOld((expense) => partyWriter(expense.partyId))
+        .whereNew((expense) => partyWriter(expense.partyId)),
+      policy.expenses.allowDelete.where((expense) => partyWriter(expense.partyId)),
     ];
   },
 );

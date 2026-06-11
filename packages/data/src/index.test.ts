@@ -62,44 +62,67 @@ describe("Jazz alpha schema", () => {
       via_column: "partyId",
     });
     expect(trizumJazzWasmSchema.expenses?.policies?.update?.using).toMatchObject({
-      exprs: [
+      exprs: expect.arrayContaining([
         {
           condition: {
             exprs: expect.arrayContaining([
               {
-                column: "role",
+                column: "ownerUserId",
                 op: "Eq",
                 type: "Cmp",
                 value: {
-                  type: "Literal",
-                  value: "owner",
+                  path: ["userId"],
+                  type: "SessionRef",
                 },
               },
             ]),
             type: "And",
           },
-          table: "partyMembers",
+          table: "parties",
           type: "Exists",
         },
         {
-          condition: {
-            exprs: expect.arrayContaining([
-              {
-                column: "role",
-                op: "Eq",
-                type: "Cmp",
-                value: {
-                  type: "Literal",
-                  value: "editor",
-                },
+          exprs: expect.arrayContaining([
+            {
+              condition: {
+                exprs: expect.arrayContaining([
+                  {
+                    column: "role",
+                    op: "Eq",
+                    type: "Cmp",
+                    value: {
+                      type: "Literal",
+                      value: "owner",
+                    },
+                  },
+                ]),
+                type: "And",
               },
-            ]),
-            type: "And",
-          },
-          table: "partyMembers",
-          type: "Exists",
+              table: "partyMembers",
+              type: "Exists",
+            },
+            {
+              condition: {
+                exprs: expect.arrayContaining([
+                  {
+                    column: "role",
+                    op: "Eq",
+                    type: "Cmp",
+                    value: {
+                      type: "Literal",
+                      value: "editor",
+                    },
+                  },
+                ]),
+                type: "And",
+              },
+              table: "partyMembers",
+              type: "Exists",
+            },
+          ]),
+          type: "Or",
         },
-      ],
+      ]),
       type: "Or",
     });
   });
