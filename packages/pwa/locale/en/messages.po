@@ -219,7 +219,7 @@ msgstr "At least one participant is required"
 msgid "Attach photos of receipts to your expenses"
 msgstr "Attach photos of receipts to your expenses"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:250
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:240
 msgid "Attachments"
 msgstr "Attachments"
 
@@ -632,7 +632,7 @@ msgstr "Debt transferred"
 msgid "Decimal point"
 msgstr "Decimal point"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:106
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:103
 msgid "Delete"
 msgstr "Delete"
 
@@ -669,7 +669,7 @@ msgstr "Dominican Peso"
 msgid "East Caribbean Dollar"
 msgstr "East Caribbean Dollar"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:100
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:97
 msgid "Edit"
 msgstr "Edit"
 
@@ -677,7 +677,7 @@ msgstr "Edit"
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:165
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:167
 msgid "Editing {expenseName}"
 msgstr "Editing {expenseName}"
 
@@ -767,7 +767,7 @@ msgstr "Expense amounts don't match total. Please check your split configuration
 msgid "Expense Split Mode"
 msgstr "Expense Split Mode"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:119
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:117
 msgid "Expense updated"
 msgstr "Expense updated"
 
@@ -817,7 +817,7 @@ msgstr "Failed to mark expense as paid"
 msgid "Failed to transfer debt"
 msgstr "Failed to transfer debt"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:124
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:122
 msgid "Failed to update expense"
 msgstr "Failed to update expense"
 
@@ -1230,14 +1230,14 @@ msgstr "Mauritian Rupee"
 
 #: src/components/PartyStatsView.tsx:620
 #: src/components/PartyStatsView.tsx:707
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:186
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:321
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:176
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:311
 msgid "Me"
 msgstr "Me"
 
 #: src/components/ExpenseEditor.tsx:264
 #: src/routes/index.tsx:96
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:84
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:81
 #: src/routes/party.$partyId.tsx:200
 msgid "Menu"
 msgstr "Menu"
@@ -1506,12 +1506,12 @@ msgstr "owes"
 msgid "Paid as {currentParticipantName}"
 msgstr "Paid as {currentParticipantName}"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:227
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:217
 msgid "Paid at"
 msgstr "Paid at"
 
 #: src/components/ExpenseEditor.tsx:398
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:211
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:201
 msgid "Paid by"
 msgstr "Paid by"
 
@@ -1883,7 +1883,7 @@ msgstr "Share party"
 msgid "Share the party link so others can join."
 msgstr "Share the party link so others can join."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:299
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:289
 msgid "Shares"
 msgstr "Shares"
 
@@ -2285,7 +2285,7 @@ msgstr "Update is no longer available."
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:91
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:89
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
@@ -2378,7 +2378,7 @@ msgid "View party"
 msgstr "View party"
 
 #: src/components/ExpenseEditor.tsx:972
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:275
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:265
 msgid "View photo"
 msgstr "View photo"
 

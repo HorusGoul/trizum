@@ -207,7 +207,7 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:250
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:240
 msgid "Attachments"
 msgstr "Adjuntos"
 
@@ -604,7 +604,7 @@ msgstr "Deuda transferida"
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:106
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:103
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -641,7 +641,7 @@ msgstr "Peso Dominicano"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:100
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:97
 msgid "Edit"
 msgstr "Editar"
 
@@ -649,7 +649,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:165
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:167
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -727,7 +727,7 @@ msgstr "Gasto añadido"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:119
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:117
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -773,7 +773,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:124
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:122
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -1178,14 +1178,14 @@ msgstr "Rupia de Mauricio"
 
 #: src/components/PartyStatsView.tsx:620
 #: src/components/PartyStatsView.tsx:707
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:186
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:321
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:176
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:311
 msgid "Me"
 msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:264
 #: src/routes/index.tsx:96
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:84
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:81
 #: src/routes/party.$partyId.tsx:200
 msgid "Menu"
 msgstr "Menú"
@@ -1446,12 +1446,12 @@ msgstr "le debe"
 msgid "Paid as {currentParticipantName}"
 msgstr "Pagado por {currentParticipantName}"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:227
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:217
 msgid "Paid at"
 msgstr "Pagado el"
 
 #: src/components/ExpenseEditor.tsx:398
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:211
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:201
 msgid "Paid by"
 msgstr "Pagado por"
 
@@ -1811,7 +1811,7 @@ msgstr "Compartir grupo"
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:299
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:289
 msgid "Shares"
 msgstr "Partes"
 
@@ -2197,7 +2197,7 @@ msgstr "La actualización ya no está disponible."
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:91
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:89
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
@@ -2281,7 +2281,7 @@ msgid "View party"
 msgstr "Ver grupo"
 
 #: src/components/ExpenseEditor.tsx:972
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:275
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:265
 msgid "View photo"
 msgstr "Ver foto"
 
