@@ -36,6 +36,9 @@ type BatchOperation = {
   table: unknown;
   type: "insert" | "upsert";
 };
+type MergeRowOptions = {
+  protectAgainstStale?: boolean;
+};
 
 const fallbackDbName = "trizum-jazz-browser-fallback";
 const snapshotsStoreName = "snapshots";
@@ -98,7 +101,15 @@ class BrowserFallbackMirror {
 
   wrap(db: JazzFateDb): JazzFateDb {
     const wrapped = {
-      all: db.all.bind(db),
+      all: async (query: unknown, options?: QueryOptions) => {
+        const rows = await (
+          db.all as (query: unknown, options?: QueryOptions) => Promise<unknown[]>
+        )(query, options);
+
+        await this.persistQueryRows(query, rows);
+
+        return rows;
+      },
       batch:
         typeof (db as { batch?: unknown }).batch === "function"
           ? <T>(
@@ -225,8 +236,37 @@ class BrowserFallbackMirror {
 
         return withPersistedWait(result, () => this.putRow(table, result.value));
       },
-      one: db.one.bind(db),
-      subscribeAll: db.subscribeAll.bind(db),
+      one: async (query: unknown, options?: QueryOptions) => {
+        const row = await (db.one as (query: unknown, options?: QueryOptions) => Promise<unknown>)(
+          query,
+          options,
+        );
+
+        await this.persistQueryRows(query, row);
+
+        return row;
+      },
+      subscribeAll: (
+        query: unknown,
+        callback: (delta: { all?: unknown[] }) => void,
+        options?: QueryOptions,
+      ) => {
+        return (
+          db.subscribeAll as (
+            query: unknown,
+            callback: (delta: { all?: unknown[] }) => void,
+            options?: QueryOptions,
+          ) => unknown
+        )(
+          query,
+          (delta) => {
+            void this.persistQueryRows(query, delta.all ?? [])
+              .catch(() => undefined)
+              .then(() => callback(delta));
+          },
+          options,
+        );
+      },
       update: (table: unknown, id: string, input: unknown) => {
         const result = updateRaw(db, table, id, input);
 
@@ -253,15 +293,28 @@ class BrowserFallbackMirror {
       return Promise.resolve();
     }
 
-    const definition = getDefinitionForTable(table);
-    const tableName = getTableName(table);
-    const tableRows = (this.snapshot.tables[tableName] ??= {});
-    tableRows[row.id] = serializeRow(definition, row);
-
-    return this.enqueueSave();
+    return this.mergeRow(table, row.id, row);
   }
 
-  private mergeRow(table: unknown, id: string, input: unknown) {
+  private async persistQueryRows(query: unknown, rows: unknown) {
+    const definition = getDefinitionForQuery(query);
+
+    if (!definition) {
+      return;
+    }
+
+    const rowList = Array.isArray(rows) ? rows : [rows];
+
+    for (const row of rowList) {
+      if (isRowLike(row)) {
+        await this.mergeRow(definition.table, row.id, row, {
+          protectAgainstStale: true,
+        });
+      }
+    }
+  }
+
+  private mergeRow(table: unknown, id: string, input: unknown, options: MergeRowOptions = {}) {
     if (!isObjectRecord(input)) {
       return Promise.resolve();
     }
@@ -270,11 +323,17 @@ class BrowserFallbackMirror {
     const tableName = getTableName(table);
     const tableRows = (this.snapshot.tables[tableName] ??= {});
     const current = tableRows[id] ?? { id };
-    tableRows[id] = serializeRow(definition, {
+    const next = serializeRow(definition, {
       ...current,
       ...input,
       id,
     });
+
+    if (options.protectAgainstStale && shouldKeepCurrentPersistedRow(current, next)) {
+      return Promise.resolve();
+    }
+
+    tableRows[id] = next;
 
     return this.enqueueSave();
   }
@@ -450,6 +509,14 @@ function getDefinitionForTable(table: unknown) {
   return definition;
 }
 
+function getDefinitionForQuery(query: unknown) {
+  try {
+    return getDefinitionForTable(query);
+  } catch {
+    return undefined;
+  }
+}
+
 function getTableName(table: unknown) {
   const tableName = (table as TableProxy)._table;
 
@@ -466,6 +533,50 @@ function isRowLike(value: unknown): value is Record<string, unknown> & { id: str
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function shouldKeepCurrentPersistedRow(current: PersistedRow, next: PersistedRow) {
+  const currentUpdatedAt = toTimestampMs(current.updatedAt);
+  const nextUpdatedAt = toTimestampMs(next.updatedAt);
+
+  if (currentUpdatedAt !== undefined) {
+    if (nextUpdatedAt !== undefined && nextUpdatedAt >= currentUpdatedAt) {
+      return false;
+    }
+
+    return true;
+  }
+
+  if (nextUpdatedAt !== undefined) {
+    return false;
+  }
+
+  const currentHash = getKnownHash(current.hash);
+  const nextHash = getKnownHash(next.hash);
+
+  return currentHash !== undefined && nextHash !== undefined && currentHash !== nextHash;
+}
+
+function getKnownHash(value: unknown) {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function toTimestampMs(value: unknown) {
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  if (typeof value === "string") {
+    const time = Date.parse(value);
+
+    return Number.isFinite(time) ? time : undefined;
+  }
+
+  return undefined;
 }
 
 function insertRaw(
