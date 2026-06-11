@@ -12,11 +12,6 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
 import { toast } from "sonner";
-import { ensurePartyMemberForSelection } from "#src/lib/data/fateAppData.ts";
-import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
-import { getLogger } from "#src/lib/log.ts";
-
-const logger = getLogger("routes", "Join");
 
 interface JoinSearchParams {
   scanning?: boolean;
@@ -34,7 +29,6 @@ interface JoinFormValues {
 }
 
 function Join() {
-  const { client, userId } = useTrizumData();
   const router = useRouter();
   const navigate = useNavigate({ from: Route.fullPath });
   const { scanning } = Route.useSearch();
@@ -94,14 +88,6 @@ function Join() {
   }
 
   async function navigateToPartySelection(partyId: string) {
-    try {
-      await preparePartySelection(partyId);
-    } catch (error) {
-      logger.warning("Failed to prepare party selection", { error, partyId });
-      toast.error(t`Could not join that trizum. Check the code and try again.`);
-      return;
-    }
-
     await navigate({
       to: "/party/$partyId/who",
       replace: true,
@@ -112,10 +98,6 @@ function Join() {
         redirectTo: `/party/${partyId}?tab=expenses`,
       },
     });
-  }
-
-  async function preparePartySelection(partyId: string) {
-    await ensurePartyMemberForSelection(client, userId, partyId);
   }
 
   const form = useForm({

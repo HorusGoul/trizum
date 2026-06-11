@@ -22,7 +22,7 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
@@ -105,7 +105,7 @@ const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") ===
 const trizumData = await createLocalFirstTrizumDataClient({
   appId: JAZZ_APP_ID,
   dbName: INTERNAL_DB_NAME ?? "trizum-jazz-fate-pwa",
-  disableBrowserWorker: isWebKitBrowser(),
+  disableBrowserWorker: true,
   serverUrl: isOfflineOnly ? undefined : JAZZ_SERVER_URL,
 });
 
@@ -226,23 +226,26 @@ function AriaProviders({ children }: { children: React.ReactNode }) {
   return <AriaI18nProvider locale={i18n.locale}>{children}</AriaI18nProvider>;
 }
 
-function isWebKitBrowser() {
-  return (
-    /AppleWebKit/i.test(navigator.userAgent) &&
-    !/Chrome|Chromium|Edg|OPR/i.test(navigator.userAgent)
-  );
-}
-
 function InnerWrap({ children }: { children: React.ReactNode }) {
-  // Initialize the party list to set the locale and other
-  // settings on bootstrap.
-  usePartyList();
-
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       void SplashScreen.hide();
     }
   }, []);
 
-  return <>{children}</>;
+  return (
+    <>
+      <Suspense fallback={null}>
+        <PartyListBootstrap />
+      </Suspense>
+      {children}
+    </>
+  );
+}
+
+function PartyListBootstrap() {
+  // Initialize the party list to set the locale and other settings on bootstrap.
+  usePartyList();
+
+  return null;
 }

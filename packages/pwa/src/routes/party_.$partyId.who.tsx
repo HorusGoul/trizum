@@ -4,7 +4,6 @@ import { BackButton } from "#src/components/BackButton.js";
 import { useParty } from "#src/hooks/useParty.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import {
-  ensurePartyMemberForSelection,
   waitForPartyEntitiesInFate,
   writePartyEntitiesToFateCache,
 } from "#src/lib/data/fateAppData.ts";
@@ -33,11 +32,6 @@ interface WhoSearchParams {
 export const Route = createFileRoute("/party_/$partyId/who")({
   component: Who,
   pendingComponent: PartyPendingComponent,
-  loader: async ({ context, params: { partyId } }) => {
-    const { client, userId } = context.data;
-
-    await ensurePartyMemberForSelection(client, userId, partyId);
-  },
   validateSearch: (search): WhoSearchParams => {
     // Save redirectTo path search param if it exists
     return {

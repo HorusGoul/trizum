@@ -71,50 +71,18 @@ describe("Jazz alpha schema", () => {
             type: "SessionRef",
           },
         },
-        {
-          exprs: expect.arrayContaining([
-            {
-              condition: {
-                exprs: expect.arrayContaining([
-                  {
-                    column: "role",
-                    op: "Eq",
-                    type: "Cmp",
-                    value: {
-                      type: "Literal",
-                      value: "owner",
-                    },
-                  },
-                ]),
-                type: "And",
-              },
-              table: "partyMembers",
-              type: "Exists",
-            },
-            {
-              condition: {
-                exprs: expect.arrayContaining([
-                  {
-                    column: "role",
-                    op: "Eq",
-                    type: "Cmp",
-                    value: {
-                      type: "Literal",
-                      value: "editor",
-                    },
-                  },
-                ]),
-                type: "And",
-              },
-              table: "partyMembers",
-              type: "Exists",
-            },
-          ]),
-          type: "Or",
-        },
       ]),
       type: "Or",
     });
+    expect(JSON.stringify(trizumJazzWasmSchema.parties?.policies?.update?.using)).toContain(
+      '"table":"partyMembers"',
+    );
+    expect(JSON.stringify(trizumJazzWasmSchema.parties?.policies?.update?.using)).toContain(
+      '"Literal":"owner"',
+    );
+    expect(JSON.stringify(trizumJazzWasmSchema.parties?.policies?.update?.using)).toContain(
+      '"Literal":"editor"',
+    );
     expectInheritedPartyUpdatePolicy(
       trizumJazzWasmSchema.participants?.policies?.insert?.with_check,
     );
@@ -264,12 +232,11 @@ describe("Jazz alpha schema", () => {
 
 function expectPartyAccessPolicy(policyExpression: unknown) {
   expect(policyExpression).toMatchObject({ type: "Or" });
-  expect((policyExpression as { exprs?: unknown[] } | undefined)?.exprs).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({ table: "parties", type: "Exists" }),
-      expect.objectContaining({ table: "partyMembers", type: "Exists" }),
-    ]),
-  );
+  const exprs = (policyExpression as { exprs?: unknown[] } | undefined)?.exprs;
+
+  expect(exprs).toEqual(expect.arrayContaining([expect.objectContaining({ type: "ExistsRel" })]));
+  expect(JSON.stringify(exprs)).toContain('"table":"parties"');
+  expect(JSON.stringify(exprs)).toContain('"table":"partyMembers"');
 }
 
 function expectInheritedPartyUpdatePolicy(policyExpression: unknown) {

@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+import { guardExpenseExists, guardParticipatingInParty } from "#src/lib/guards.ts";
 
 interface EditExpenseSearchParams {
   media?: number;
@@ -24,6 +25,10 @@ interface EditExpenseSearchParams {
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit")({
   component: EditExpense,
   pendingComponent: PartyPendingComponent,
+  loader: async ({ context, params: { expenseId, partyId }, location }) => {
+    await guardParticipatingInParty(partyId, context, location);
+    await guardExpenseExists(expenseId, context);
+  },
 
   validateSearch: (search): EditExpenseSearchParams => {
     return {

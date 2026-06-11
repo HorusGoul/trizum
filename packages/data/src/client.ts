@@ -103,6 +103,10 @@ export async function createLocalFirstTrizumDataClient(
     driver: options.driver,
   });
   const hasRemoteSync = Boolean(options.serverUrl);
+  const localQueryOptions = {
+    localUpdates: "immediate" as const,
+    tier: "local" as const,
+  };
   const remoteLiveQueryOptions = hasRemoteSync
     ? {
         localUpdates: "immediate" as const,
@@ -116,6 +120,7 @@ export async function createLocalFirstTrizumDataClient(
       }
     : undefined;
   const repository = createTrizumJazzRepository(repositoryDb, {
+    queryOptions: localQueryOptions,
     subscriptionQueryOptions: remoteLiveQueryOptions,
     syncWritesToTier: hasRemoteSync ? "edge" : undefined,
   });

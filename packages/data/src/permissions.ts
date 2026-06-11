@@ -14,31 +14,51 @@ export const trizumJazzPermissions = definePermissions(
   ({ allowedTo, anyOf, policy, session }) => {
     const partyReader = (partyId: PermissionValue) =>
       anyOf([
-        policy.parties.exists.where({
-          id: partyId,
-          ownerUserId: session.user_id,
-        }),
-        policy.partyMembers.exists.where({
-          partyId,
-          userId: session.user_id,
-        }),
+        policy.exists(
+          policy.parties.where({
+            id: partyId,
+            ownerUserId: session.user_id,
+          }),
+        ),
+        policy.exists(
+          policy.partyMembers.where({
+            partyId,
+            userId: session.user_id,
+          }),
+        ),
+      ]);
+    const partyInviteReader = (partyId: PermissionValue) =>
+      anyOf([
+        partyReader(partyId),
+        policy.exists(
+          policy.parties.where({
+            id: partyId,
+            localOnlyInviteSecret: { ne: null },
+          }),
+        ),
       ]);
     const partyEditor = (partyId: PermissionValue) =>
       anyOf([
-        policy.parties.exists.where({
-          id: partyId,
-          ownerUserId: session.user_id,
-        }),
-        policy.partyMembers.exists.where({
-          partyId,
-          role: "owner",
-          userId: session.user_id,
-        }),
-        policy.partyMembers.exists.where({
-          partyId,
-          role: "editor",
-          userId: session.user_id,
-        }),
+        policy.exists(
+          policy.parties.where({
+            id: partyId,
+            ownerUserId: session.user_id,
+          }),
+        ),
+        policy.exists(
+          policy.partyMembers.where({
+            partyId,
+            role: "owner",
+            userId: session.user_id,
+          }),
+        ),
+        policy.exists(
+          policy.partyMembers.where({
+            partyId,
+            role: "editor",
+            userId: session.user_id,
+          }),
+        ),
       ]);
 
     return [
@@ -85,7 +105,7 @@ export const trizumJazzPermissions = definePermissions(
         .whereNew({ $createdBy: session.user_id }),
       policy.joinedParties.allowDelete.where({ $createdBy: session.user_id }),
 
-      policy.participants.allowRead.where(allowedTo.read("partyId")),
+      policy.participants.allowRead.where((participant) => partyInviteReader(participant.partyId)),
       policy.participants.allowInsert.where(allowedTo.update("partyId")),
       policy.participants.allowUpdate
         .whereOld(allowedTo.update("partyId"))

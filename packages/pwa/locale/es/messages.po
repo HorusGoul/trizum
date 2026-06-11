@@ -207,7 +207,7 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:240
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:241
 msgid "Attachments"
 msgstr "Adjuntos"
 
@@ -604,7 +604,7 @@ msgstr "Deuda transferida"
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:103
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:104
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -641,7 +641,7 @@ msgstr "Peso Dominicano"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:97
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:98
 msgid "Edit"
 msgstr "Editar"
 
@@ -649,7 +649,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:167
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:172
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -679,7 +679,7 @@ msgstr "Inglés"
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
-#: src/routes/join.tsx:189
+#: src/routes/join.tsx:171
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
@@ -727,7 +727,7 @@ msgstr "Gasto añadido"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:117
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:122
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -773,7 +773,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:122
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:127
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -987,13 +987,13 @@ msgstr "Código QR no válido. No parece ser un código de grupo de trizum."
 msgid "Invalid tricount URL or key"
 msgstr "URL o clave de Tricount no válida"
 
-#: src/routes/join.tsx:73
-#: src/routes/join.tsx:89
+#: src/routes/join.tsx:67
+#: src/routes/join.tsx:83
 msgid "Invalid trizum party code"
 msgstr "Código de grupo de trizum no válido"
 
-#: src/routes/join.tsx:73
-#: src/routes/join.tsx:89
+#: src/routes/join.tsx:67
+#: src/routes/join.tsx:83
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
@@ -1021,7 +1021,7 @@ msgstr "Dólar Jamaicano"
 msgid "Japanese Yen"
 msgstr "Yen Japonés"
 
-#: src/routes/join.tsx:209
+#: src/routes/join.tsx:191
 msgid "Join"
 msgstr "Unirse"
 
@@ -1038,11 +1038,11 @@ msgstr "¡Únete a {partyName} en trizum!"
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
-#: src/routes/join.tsx:138
+#: src/routes/join.tsx:120
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
 
-#: src/routes/join.tsx:209
+#: src/routes/join.tsx:191
 msgid "Joining..."
 msgstr "Uniéndote..."
 
@@ -1110,7 +1110,7 @@ msgstr "Dinar Libio"
 msgid "License"
 msgstr "Licencia"
 
-#: src/routes/join.tsx:188
+#: src/routes/join.tsx:170
 msgid "Link or code"
 msgstr "Enlace o código"
 
@@ -1178,14 +1178,14 @@ msgstr "Rupia de Mauricio"
 
 #: src/components/PartyStatsView.tsx:620
 #: src/components/PartyStatsView.tsx:707
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:176
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:311
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:177
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:312
 msgid "Me"
 msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:264
 #: src/routes/index.tsx:96
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:81
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:82
 #: src/routes/party.$partyId.tsx:200
 msgid "Menu"
 msgstr "Menú"
@@ -1377,7 +1377,7 @@ msgstr "Won Norcoreano"
 msgid "Norwegian Krone"
 msgstr "Corona Noruega"
 
-#: src/routes/join.tsx:53
+#: src/routes/join.tsx:47
 msgid "Not a valid trizum party code"
 msgstr "No es un código de grupo de trizum válido"
 
@@ -1429,7 +1429,7 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/routes/join.tsx:166
+#: src/routes/join.tsx:148
 msgid "or enter code"
 msgstr "o introduce código"
 
@@ -1446,12 +1446,12 @@ msgstr "le debe"
 msgid "Paid as {currentParticipantName}"
 msgstr "Pagado por {currentParticipantName}"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:217
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:218
 msgid "Paid at"
 msgstr "Pagado el"
 
 #: src/components/ExpenseEditor.tsx:398
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:201
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:202
 msgid "Paid by"
 msgstr "Pagado por"
 
@@ -1745,13 +1745,13 @@ msgstr "Riyal Saudí"
 #: src/routes/migrate_.tricount.tsx:161
 #: src/routes/new.tsx:140
 #: src/routes/party_.$partyId.settings.tsx:127
-#: src/routes/party_.$partyId.who.tsx:315
+#: src/routes/party_.$partyId.who.tsx:309
 #: src/routes/settings.tsx:99
 msgid "Save"
 msgstr "Guardar"
 
 #: src/components/RouteQRScanner.tsx:66
-#: src/routes/join.tsx:153
+#: src/routes/join.tsx:135
 msgid "Scan QR code"
 msgstr "Escanear código QR"
 
@@ -1811,7 +1811,7 @@ msgstr "Compartir grupo"
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:289
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:290
 msgid "Shares"
 msgstr "Partes"
 
@@ -1912,7 +1912,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/migrate_.tricount.tsx:161
 #: src/routes/new.tsx:140
 #: src/routes/party_.$partyId.settings.tsx:127
-#: src/routes/party_.$partyId.who.tsx:315
+#: src/routes/party_.$partyId.who.tsx:309
 #: src/routes/settings.tsx:99
 msgid "Submitting..."
 msgstr "Enviando..."
@@ -2085,7 +2085,7 @@ msgstr "El título debe tener menos de 50 caracteres"
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.who.tsx:257
+#: src/routes/party_.$partyId.who.tsx:251
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{partyName}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
@@ -2193,11 +2193,11 @@ msgstr "No se ha podido actualizar. Inténtalo de nuevo."
 msgid "Update is no longer available."
 msgstr "La actualización ya no está disponible."
 
-#: src/routes/party_.$partyId.who.tsx:262
+#: src/routes/party_.$partyId.who.tsx:256
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:89
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:94
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
@@ -2244,7 +2244,7 @@ msgstr "Dólar Estadounidense (Día siguiente)"
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
 
-#: src/routes/join.tsx:156
+#: src/routes/join.tsx:138
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
@@ -2281,7 +2281,7 @@ msgid "View party"
 msgstr "Ver grupo"
 
 #: src/components/ExpenseEditor.tsx:972
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:265
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:266
 msgid "View photo"
 msgstr "Ver foto"
 
@@ -2301,7 +2301,7 @@ msgstr "Viendo como {participantName}"
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/party_.$partyId.who.tsx:218
+#: src/routes/party_.$partyId.who.tsx:212
 msgid "Welcome to the party, {participantName}!"
 msgstr "¡Bienvenido al grupo, {participantName}!"
 
@@ -2318,7 +2318,7 @@ msgstr "¿De qué trata este grupo?"
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
-#: src/routes/party_.$partyId.who.tsx:63
+#: src/routes/party_.$partyId.who.tsx:57
 msgid "Who are you?"
 msgstr "¿Quién eres?"
 
@@ -2378,7 +2378,7 @@ msgstr "¡Estás libre de deudas!"
 msgid "You're now seeing the party as {0}"
 msgstr "Ahora estás viendo el grupo como {0}"
 
-#: src/routes/party_.$partyId.who.tsx:220
+#: src/routes/party_.$partyId.who.tsx:214
 msgid "You're now seeing the party as {participantName}"
 msgstr "Ahora estás viendo el grupo como {participantName}"
 

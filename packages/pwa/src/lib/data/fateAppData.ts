@@ -93,6 +93,7 @@ export async function createPartyInFate({
 }) {
   const partyId = createPartyId();
   const localOnlyInviteSecret = createInviteSecret();
+  const writeClient = durableClient ?? client;
   const party: Party = {
     currency: values.currency,
     description: values.description,
@@ -105,27 +106,19 @@ export async function createPartyInFate({
     type: "party",
   };
 
-  await upsertParty(client, userId, {
+  const partyEntity = await upsertParty(writeClient, userId, {
     ...party,
     localOnlyInviteSecret,
   });
   const participantListKey = await primeParticipantList(client, partyId);
   const participantEntities = await Promise.all(
-    values.participants.map((participant) => upsertParticipant(client, partyId, participant)),
+    values.participants.map((participant) => upsertParticipant(writeClient, partyId, participant)),
   );
+  writePartyEntitiesToFateCache(client, {
+    participants: participantEntities,
+    party: partyEntity,
+  });
   seedParticipantList(client, participantListKey, participantEntities);
-
-  if (durableClient && durableClient !== client) {
-    await upsertParty(durableClient, userId, {
-      ...party,
-      localOnlyInviteSecret,
-    });
-    await Promise.all(
-      values.participants.map((participant) =>
-        upsertParticipant(durableClient, partyId, participant),
-      ),
-    );
-  }
 
   return party;
 }

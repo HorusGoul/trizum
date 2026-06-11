@@ -8,7 +8,7 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon } from "#src/ui/Icon.js";
 import { toast } from "sonner";
-import { guardParticipatingInParty } from "#src/lib/guards.js";
+import { guardExpenseExists, guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { usePartyExpense } from "#src/hooks/usePartyExpense.ts";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
@@ -37,8 +37,9 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
     };
   },
 
-  async loader({ context, params: { partyId }, location }) {
+  async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
+    await guardExpenseExists(expenseId, context);
   },
 });
 
