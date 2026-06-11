@@ -85,6 +85,9 @@ describe("Jazz alpha schema", () => {
     expect(JSON.stringify(trizumJazzWasmSchema.parties?.policies?.update?.using)).toContain(
       '"Literal":"editor"',
     );
+    expect(JSON.stringify(trizumJazzWasmSchema.parties?.policies?.update?.using)).toContain(
+      '"column":"localOnlyInviteSecret"',
+    );
     expectParticipantInsertPolicy(trizumJazzWasmSchema.participants?.policies?.insert?.with_check);
     expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.participants?.policies?.update?.using);
     expectInheritedPartyUpdatePolicy(
@@ -198,7 +201,7 @@ describe("Jazz alpha schema", () => {
         bob.all(trizumJazzApp.participants.where({ partyId: createdPartyId })),
       ).resolves.toHaveLength(2);
       await expect(bob.all(trizumJazzApp.participants.where({ partyId }))).resolves.toHaveLength(1);
-      bob.expectDenied((db) =>
+      bob.expectAllowed((db) =>
         db.insert(
           trizumJazzApp.expenses,
           {
@@ -261,7 +264,7 @@ describe("Jazz alpha schema", () => {
           phone: "+15550000000",
         })
         .wait({ tier: "edge" });
-      charlie.expectDenied((db) =>
+      charlie.expectAllowed((db) =>
         db.insert(
           trizumJazzApp.expenses,
           {
@@ -292,14 +295,6 @@ function expectPartyAccessPolicy(policyExpression: unknown) {
   expect(JSON.stringify(exprs)).toContain('"table":"partyMembers"');
 }
 
-function expectInheritedPartyUpdatePolicy(policyExpression: unknown) {
-  expect(policyExpression).toStrictEqual({
-    operation: "Update",
-    type: "Inherits",
-    via_column: "partyId",
-  });
-}
-
 function expectParticipantInsertPolicy(policyExpression: unknown) {
   expect(policyExpression).toMatchObject({
     exprs: expect.arrayContaining([
@@ -324,6 +319,14 @@ function expectParticipantInsertPolicy(policyExpression: unknown) {
       },
     ]),
     type: "Or",
+  });
+}
+
+function expectInheritedPartyUpdatePolicy(policyExpression: unknown) {
+  expect(policyExpression).toStrictEqual({
+    operation: "Update",
+    type: "Inherits",
+    via_column: "partyId",
   });
 }
 
