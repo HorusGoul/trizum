@@ -39,9 +39,11 @@ type FateRequestHandle = PromiseLike<unknown> & {
   descriptor?: {
     items?: FateRequestItem[];
   };
+  status?: "fulfilled" | "pending" | "rejected";
 };
 
 type FateClientInternals = {
+  hasRequestData?: (descriptor: NonNullable<FateRequestHandle["descriptor"]>) => boolean;
   requests?: Map<string, Map<string, FateRequestHandle>>;
   rootRequests?: Map<string, string | null>;
   store: FateStore;
@@ -80,14 +82,49 @@ export function useFateRequest<R extends Request>(
 ): Awaited<ReturnType<TrizumFateClient["requestForRender"]>> {
   const { client } = useTrizumData();
   const mode = options?.mode ?? "cache-first";
-  const requestKey = client.getRequestKey(request);
-  use(client.requestForRender(request, options));
+  const { promise, requestKey } = client.prepareRequestForRender(request, options);
+  const requestHandle = promise as FateRequestHandle;
+
+  if (shouldSuspendForRequest(client, requestHandle, mode)) {
+    use(promise);
+  }
 
   useSubscriptionVersion((change) => subscribeToRequest(client, requestKey, mode, change));
 
   return client.getRequestResult(request) as Awaited<
     ReturnType<TrizumFateClient["requestForRender"]>
   >;
+}
+
+function shouldSuspendForRequest(
+  client: TrizumFateClient,
+  request: FateRequestHandle,
+  mode: RequestOptions["mode"],
+) {
+  if (request.status === "fulfilled") {
+    return false;
+  }
+
+  if (mode !== "network-only" && hasCachedRequestData(client, request)) {
+    return false;
+  }
+
+  return true;
+}
+
+function hasCachedRequestData(client: TrizumFateClient, request: FateRequestHandle) {
+  const descriptor = request.descriptor;
+  const hasRequestData = (client as unknown as FateClientInternals).hasRequestData;
+
+  if (!descriptor || typeof hasRequestData !== "function") {
+    return false;
+  }
+
+  try {
+    return hasRequestData.call(client, descriptor) === true;
+  } catch {
+    return false;
+  }
 }
 
 export function useFateLiveView<T extends { __typename: string }>(

@@ -61,10 +61,46 @@ describe("Jazz alpha schema", () => {
       type: "Inherits",
       via_column: "partyId",
     });
-    expect(trizumJazzWasmSchema.expenses?.policies?.update?.using).toStrictEqual({
-      operation: "Update",
-      type: "Inherits",
-      via_column: "partyId",
+    expect(trizumJazzWasmSchema.expenses?.policies?.update?.using).toMatchObject({
+      exprs: [
+        {
+          condition: {
+            exprs: expect.arrayContaining([
+              {
+                column: "role",
+                op: "Eq",
+                type: "Cmp",
+                value: {
+                  type: "Literal",
+                  value: "owner",
+                },
+              },
+            ]),
+            type: "And",
+          },
+          table: "partyMembers",
+          type: "Exists",
+        },
+        {
+          condition: {
+            exprs: expect.arrayContaining([
+              {
+                column: "role",
+                op: "Eq",
+                type: "Cmp",
+                value: {
+                  type: "Literal",
+                  value: "editor",
+                },
+              },
+            ]),
+            type: "And",
+          },
+          table: "partyMembers",
+          type: "Exists",
+        },
+      ],
+      type: "Or",
     });
   });
 });

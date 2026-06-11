@@ -22,7 +22,8 @@ test.describe("Jazz collaboration", () => {
     try {
       const partyName = `Jazz collaboration ${Date.now()}`;
       const initialExpenseTitle = `Shared lunch ${Date.now()}`;
-      const updatedExpenseTitle = `${initialExpenseTitle} updated`;
+      const aliceDraftExpenseTitle = `${initialExpenseTitle} alice draft`;
+      const bobDraftExpenseTitle = `${initialExpenseTitle} bob draft`;
       const amount = 42.5;
       const amountText = formatAmountText(amount);
 
@@ -89,39 +90,64 @@ test.describe("Jazz collaboration", () => {
         await expect(aliceSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible();
         await expect(bobSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible();
 
-        await aliceSession.page.getByLabel("Title").fill(updatedExpenseTitle);
+        await aliceSession.page.getByLabel("Title").fill(aliceDraftExpenseTitle);
         await expect
           .poll(() => readExpenseDraftName(aliceSession.page, expenseId), {
             timeout: 10_000,
           })
-          .toBe(updatedExpenseTitle);
+          .toBe(aliceDraftExpenseTitle);
         await expect
           .poll(() => readExpenseDraftName(bobSession.page, expenseId, "settled"), {
             timeout: 30_000,
           })
-          .toBe(updatedExpenseTitle);
+          .toBe(aliceDraftExpenseTitle);
         await expect
           .poll(() => readExpenseDraftName(bobSession.page, expenseId), {
             timeout: 30_000,
           })
-          .toBe(updatedExpenseTitle);
+          .toBe(aliceDraftExpenseTitle);
         await throwRouteErrorIfPresent(bobSession);
 
-        await expect(bobSession.page.getByLabel("Title")).toHaveValue(updatedExpenseTitle, {
+        await expect(bobSession.page.getByLabel("Title")).toHaveValue(aliceDraftExpenseTitle, {
           timeout: 30_000,
         });
       });
 
-      await test.step("Alice saves the edit and Bob sees the committed expense", async () => {
-        const bobPartyPage = new PartyPage(bobSession.page);
+      await test.step("Bob's edit draft updates Alice's editor in realtime", async () => {
+        await aliceSession.page.getByLabel("Title").blur();
+        await bobSession.page.getByLabel("Title").fill(bobDraftExpenseTitle);
+        await expect
+          .poll(() => readExpenseDraftName(bobSession.page, expenseId), {
+            timeout: 10_000,
+          })
+          .toBe(bobDraftExpenseTitle);
+        await expect
+          .poll(() => readExpenseDraftName(aliceSession.page, expenseId, "settled"), {
+            timeout: 30_000,
+          })
+          .toBe(bobDraftExpenseTitle);
+        await expect
+          .poll(() => readExpenseDraftName(aliceSession.page, expenseId), {
+            timeout: 30_000,
+          })
+          .toBe(bobDraftExpenseTitle);
+        await throwRouteErrorIfPresent(aliceSession);
 
-        await aliceSession.page.getByRole("button", { name: "Save" }).click();
+        await expect(aliceSession.page.getByLabel("Title")).toHaveValue(bobDraftExpenseTitle, {
+          timeout: 30_000,
+        });
+      });
+
+      await test.step("Bob saves the edit and Alice sees the committed expense", async () => {
+        const alicePartyPage = new PartyPage(aliceSession.page);
+
+        await bobSession.page.getByRole("button", { name: "Save" }).click();
         await expect(
-          aliceSession.page.getByRole("heading", { name: updatedExpenseTitle }),
+          bobSession.page.getByRole("heading", { name: bobDraftExpenseTitle }),
         ).toBeVisible();
 
-        await bobSession.goto(`/party/${partyId}?tab=expenses`);
-        await bobPartyPage.expectExpenseInLog(updatedExpenseTitle, amountText);
+        await aliceSession.goto(`/party/${partyId}?tab=expenses`);
+        await alicePartyPage.expectExpenseInLog(bobDraftExpenseTitle, amountText);
       });
     } finally {
       await attachDiagnostics(testInfo, aliceSession);

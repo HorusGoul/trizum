@@ -23,7 +23,13 @@ export async function guardPartyExists(partyId: string, { data }: RouterContext)
 }
 
 async function readPartyResultForGuard(partyId: string, data: RouterContext["data"]) {
-  const client = data.settledClient ?? data.client;
+  const localResult = await readPartyResult(data.client, partyId);
+
+  if (localResult.status !== "notFound" || !data.hasRemoteSync || !data.settledClient) {
+    return localResult;
+  }
+
+  const client = data.settledClient;
   const retryUntil = Date.now() + 8_000;
 
   while (true) {
