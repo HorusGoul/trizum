@@ -19,7 +19,7 @@ import { BackButton } from "#src/components/BackButton.js";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
-import { createPartyInFate, readParty, waitForPartyInFate } from "#src/lib/data/fateAppData.ts";
+import { createPartyInFate, waitForPartyInFate } from "#src/lib/data/fateAppData.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 
 export const Route = createFileRoute("/new")({
@@ -63,7 +63,6 @@ function New() {
         symbol: values.symbol,
       },
     });
-    await readParty(client, party.id);
 
     if (hasRemoteSync && settledClient) {
       await waitForPartyInFate(settledClient, party.id, {

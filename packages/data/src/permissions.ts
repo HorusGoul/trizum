@@ -84,11 +84,11 @@ export const trizumJazzPermissions = definePermissions(
       policy.joinedParties.allowDelete.where({ $createdBy: session.userId }),
 
       policy.participants.allowRead.where((participant) => partyReader(participant.partyId)),
-      policy.participants.allowInsert.where((participant) => partyEditor(participant.partyId)),
+      policy.participants.allowInsert.where(allowedTo.update("partyId")),
       policy.participants.allowUpdate
-        .whereOld((participant) => partyReader(participant.partyId))
-        .whereNew((participant) => partyReader(participant.partyId)),
-      policy.participants.allowDelete.where((participant) => partyEditor(participant.partyId)),
+        .whereOld(allowedTo.update("partyId"))
+        .whereNew(allowedTo.update("partyId")),
+      policy.participants.allowDelete.where(allowedTo.update("partyId")),
 
       policy.mediaFiles.allowRead.where((mediaFile) =>
         anyOf([{ ownerUserId: session.userId }, partyReader(mediaFile.partyId)]),
@@ -100,11 +100,11 @@ export const trizumJazzPermissions = definePermissions(
       policy.mediaFiles.allowDelete.where({ ownerUserId: session.userId }),
 
       policy.expenses.allowRead.where((expense) => partyReader(expense.partyId)),
-      policy.expenses.allowInsert.where((expense) => partyEditor(expense.partyId)),
+      policy.expenses.allowInsert.where(allowedTo.update("partyId")),
       policy.expenses.allowUpdate
-        .whereOld((expense) => partyReader(expense.partyId))
-        .whereNew((expense) => partyEditor(expense.partyId)),
-      policy.expenses.allowDelete.where((expense) => partyEditor(expense.partyId)),
+        .whereOld(allowedTo.update("partyId"))
+        .whereNew(allowedTo.update("partyId")),
+      policy.expenses.allowDelete.where(allowedTo.update("partyId")),
     ];
   },
 );

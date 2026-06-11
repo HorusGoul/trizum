@@ -112,10 +112,18 @@ describe("Jazz alpha schema", () => {
       ]),
       type: "Or",
     });
-    expectPartyAccessPolicy(trizumJazzWasmSchema.participants?.policies?.update?.using);
-    expectPartyAccessPolicy(trizumJazzWasmSchema.participants?.policies?.update?.with_check);
-    expectPartyAccessPolicy(trizumJazzWasmSchema.expenses?.policies?.update?.using);
-    expectPartyAccessPolicy(trizumJazzWasmSchema.expenses?.policies?.update?.with_check);
+    expectInheritedPartyUpdatePolicy(
+      trizumJazzWasmSchema.participants?.policies?.insert?.with_check,
+    );
+    expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.participants?.policies?.update?.using);
+    expectInheritedPartyUpdatePolicy(
+      trizumJazzWasmSchema.participants?.policies?.update?.with_check,
+    );
+    expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.participants?.policies?.delete?.using);
+    expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.insert?.with_check);
+    expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.update?.using);
+    expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.update?.with_check);
+    expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.delete?.using);
   });
 });
 
@@ -127,6 +135,14 @@ function expectPartyAccessPolicy(policyExpression: unknown) {
       expect.objectContaining({ table: "partyMembers", type: "Exists" }),
     ]),
   );
+}
+
+function expectInheritedPartyUpdatePolicy(policyExpression: unknown) {
+  expect(policyExpression).toStrictEqual({
+    operation: "Update",
+    type: "Inherits",
+    via_column: "partyId",
+  });
 }
 
 describe("Trizum Jazz model surface", () => {

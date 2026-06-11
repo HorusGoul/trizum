@@ -129,8 +129,6 @@ function Join() {
     if (!party) {
       throw new Error(`Party ${partyId} was not found`);
     }
-
-    await readParty(client, partyId);
   }
 
   const form = useForm({
