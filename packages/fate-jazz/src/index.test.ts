@@ -736,6 +736,39 @@ describe("Fate Jazz transport", () => {
     });
   });
 
+  test("resolves fetched entities before Fate normalizes them", async () => {
+    const repository = createMemoryRepository();
+    const transport = createJazzFateTransport<MutationMap>(repository, {
+      resolveFetchedEntity(entity) {
+        return entity.__typename === "Note"
+          ? {
+              ...entity,
+              title: "Fresh cached title",
+            }
+          : entity;
+      },
+    });
+
+    await expect(transport.fetchById("Note", ["note-1"], ["id", "title"])).resolves.toStrictEqual([
+      {
+        __typename: "Note",
+        id: "note-1",
+        title: "Fresh cached title",
+      },
+    ]);
+    await expect(transport.fetchList?.("notes", ["id", "title"])).resolves.toMatchObject({
+      items: [
+        {
+          node: {
+            __typename: "Note",
+            id: "note-1",
+            title: "Fresh cached title",
+          },
+        },
+      ],
+    });
+  });
+
   test("forwards the first Jazz subscription snapshot", () => {
     const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Initial", 1)]);
     const unsubscribe = vi.fn<() => void>();

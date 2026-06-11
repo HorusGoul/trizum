@@ -478,6 +478,7 @@ describe("Fate masking over Trizum Jazz entities", () => {
         partyId: "party-1",
         photos: [],
         shares: { alice: { type: "divide", value: 1 } },
+        updatedAt: null,
       },
       view: ExpenseListItemView,
     });
@@ -738,6 +739,7 @@ function createMemoryRepository() {
       partyId: "party-1",
       photos: [],
       shares: { alice: { type: "divide", value: 1 } },
+      updatedAt: null,
     },
   ];
 
@@ -932,6 +934,7 @@ function createMemoryRepository() {
             paidBy: expenseInput.paidBy ?? {},
             photos: expenseInput.photos ?? [],
             shares: expenseInput.shares ?? {},
+            updatedAt: expenseInput.updatedAt ?? null,
           };
           expenses.push(expense);
           return projectTrizumEntity(expense, select);

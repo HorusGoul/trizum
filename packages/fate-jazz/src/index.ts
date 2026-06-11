@@ -164,6 +164,7 @@ export type CreateJazzFateTransportOptions<TMutationMap extends JazzFateMutation
   onSyncRejected?: <K extends Extract<keyof TMutationMap, string>>(
     event: JazzFateSyncRejectedEvent<TMutationMap, K>,
   ) => Promise<void> | void;
+  resolveFetchedEntity?: (entity: JazzFateEntity) => JazzFateEntity;
 };
 
 export type JazzFateCacheUpdateEvent = {
@@ -622,6 +623,8 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
 ): Transport<TMutationMap> {
   const entitySubscriptions = new Map<string, Set<JazzFateLiveViewSubscription>>();
   const connectionSubscriptions = new Set<JazzFateLiveConnectionSubscription>();
+  const resolveFetchedEntity = (entity: JazzFateEntity) =>
+    options.resolveFetchedEntity?.(entity) ?? entity;
 
   return {
     fetchById(type, ids, select, args) {
@@ -632,7 +635,7 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
       return repository.fetchEntities(type, ids, select, normalizeArgs(args)).then((records) =>
         records.map((record, index) => {
           if (record) {
-            return record;
+            return resolveFetchedEntity(record);
           }
 
           throw new Error(`fate-jazz: ${type}:${String(ids[index])} not found`);
@@ -645,7 +648,13 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
         throw new Error(`Unsupported Fate list root: ${root}`);
       }
 
-      return repository.fetchList(root, select, normalizeArgs(args));
+      return repository.fetchList(root, select, normalizeArgs(args)).then((result) => ({
+        ...result,
+        items: result.items.map((item) => ({
+          ...item,
+          node: resolveFetchedEntity(item.node),
+        })),
+      }));
     },
 
     async mutate(proc, input, select) {
@@ -735,7 +744,7 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
                 ));
 
               if (record) {
-                subscription.handlers.onData(record, subscription.select);
+                subscription.handlers.onData(resolveFetchedEntity(record), subscription.select);
               } else {
                 subscription.handlers.onDelete?.(id);
               }
@@ -780,12 +789,13 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
             try {
               if (records?.length) {
                 for (const record of records) {
+                  const resolvedRecord = resolveFetchedEntity(record);
                   subscription.handlers.onEvent({
                     edge: {
-                      cursor: String(record.id),
-                      node: record,
+                      cursor: String(resolvedRecord.id),
+                      node: resolvedRecord,
                     },
-                    nodeType: record.__typename,
+                    nodeType: resolvedRecord.__typename,
                     type: "prependNode",
                   });
                 }

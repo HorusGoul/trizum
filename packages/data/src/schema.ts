@@ -81,6 +81,7 @@ export const trizumJazzSchema = s.defineSchema({
       hash: s.string().optional(),
       editCopy: s.json().optional(),
       editCopyLastUpdatedAt: s.timestamp().optional(),
+      updatedAt: s.timestamp().optional(),
     })
     .indexOnly(["partyId", "paidAt"]),
 });

@@ -229,6 +229,7 @@ export const trizumEntityDefinitions = [
       "hash",
       "editCopy",
       "editCopyLastUpdatedAt",
+      "updatedAt",
     ],
     table: trizumJazzApp.expenses,
     type: "Expense",

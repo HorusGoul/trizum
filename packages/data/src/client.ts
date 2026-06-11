@@ -1,4 +1,4 @@
-import { clientRoot, createClient } from "@nkzw/fate";
+import { clientRoot, createClient, toEntityId } from "@nkzw/fate";
 import {
   applyJazzFateMutationToCache,
   applyJazzFateSyncRejectionToCache,
@@ -8,6 +8,7 @@ import {
   subscribeToJazzFateCacheUpdates,
   type CreateJazzFateDbOptions,
   type JazzFateAuth,
+  type JazzFateEntity,
 } from "fate-jazz";
 import {
   canUseBrowserFallbackPersistence,
@@ -59,6 +60,9 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
     },
     onMutation(event) {
       applyJazzFateMutationToCache(client, event);
+    },
+    resolveFetchedEntity(entity) {
+      return preferFreshCachedEntity(client, entity);
     },
     onSyncPending(event) {
       trackTrizumFateSync(client, event.promise);
@@ -177,6 +181,62 @@ function trackTrizumFateSync(client: TrizumFateClient, promise: Promise<unknown>
 
   pendingSyncs.add(tracked);
   void tracked.catch(() => undefined);
+}
+
+type FateCacheReadableClient = {
+  store?: {
+    read?: (id: string) => Record<string, unknown> | undefined;
+  };
+};
+
+function preferFreshCachedEntity(client: object, entity: JazzFateEntity): JazzFateEntity {
+  if (entity.__typename !== "Expense") {
+    return entity;
+  }
+
+  const cached = (client as FateCacheReadableClient).store?.read?.(
+    toEntityId(entity.__typename, entity.id),
+  );
+
+  if (!cached || cached.__typename !== "Expense") {
+    return entity;
+  }
+
+  const cachedUpdatedAt = toTimestampMs(cached.updatedAt);
+  const fetchedUpdatedAt = toTimestampMs((entity as Record<string, unknown>).updatedAt);
+
+  if (cachedUpdatedAt === undefined) {
+    return entity;
+  }
+
+  if (fetchedUpdatedAt !== undefined && fetchedUpdatedAt >= cachedUpdatedAt) {
+    return entity;
+  }
+
+  return {
+    ...entity,
+    ...cached,
+    __typename: entity.__typename,
+    id: entity.id,
+  };
+}
+
+function toTimestampMs(value: unknown): number | undefined {
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  if (typeof value === "string") {
+    const time = Date.parse(value);
+
+    return Number.isFinite(time) ? time : undefined;
+  }
+
+  return undefined;
 }
 
 function getAuthenticatedUserId(authState: {

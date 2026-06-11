@@ -1038,6 +1038,7 @@ function expenseToMutationInput(partyId: string, expense: Expense) {
     partyId,
     photos: expense.photos,
     shares: expense.shares as unknown as JsonLike,
+    updatedAt: new Date(),
   };
 }
 
