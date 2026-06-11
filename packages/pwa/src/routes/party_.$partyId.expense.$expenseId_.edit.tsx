@@ -7,7 +7,6 @@ import {
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
-import { guardExpenseExists } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.ts";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
@@ -32,10 +31,6 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
     return {
       media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
     };
-  },
-
-  async loader({ context, params: { expenseId } }) {
-    await guardExpenseExists(expenseId, context);
   },
 });
 
