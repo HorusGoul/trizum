@@ -239,6 +239,60 @@ describe("Jazz DB repository", () => {
     ]);
   });
 
+  test("keeps background writes local when reads target the edge", async () => {
+    const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
+    const waits: unknown[] = [];
+    const repository = createJazzDbRepository<NoteEntity, MutationMap>({
+      db: createFakeNoteDb(table, {
+        wait: async (options) => {
+          waits.push(options);
+
+          if (options.tier === "edge") {
+            await new Promise(() => {});
+          }
+        },
+      }),
+      entities: [
+        {
+          columns: ["id", "body", "createdAt", "projectId", "title"],
+          table,
+          type: "Note",
+        },
+      ],
+      lists: [],
+      mutations: [
+        {
+          operation: "upsert",
+          proc: "note.upsert",
+          table,
+          type: "Note",
+        },
+      ],
+      queryOptions: { tier: "edge" },
+      syncWritesToTier: "edge",
+    });
+
+    await expect(
+      repository.mutate?.(
+        "note.upsert",
+        {
+          body: "Visible details",
+          createdAt: 2,
+          id: "note-2",
+          projectId: "project-1",
+          title: "Draft",
+        },
+        ["id", "title"],
+      ),
+    ).resolves.toStrictEqual({
+      __typename: "Note",
+      id: "note-2",
+      title: "Draft",
+    });
+
+    expect(waits).toStrictEqual([{ tier: "local" }, { tier: "edge" }]);
+  });
+
   test("uses returned upsert rows when immediate rereads are unavailable", async () => {
     const table = new FakeNoteQuery([createNoteRow("note-1", "project-1", "Oldest", 1)]);
     const repository = createJazzDbRepository<NoteEntity, MutationMap>({
@@ -964,7 +1018,12 @@ function createNoteRow(id: string, projectId: string, title: string, createdAt: 
   };
 }
 
-function createFakeNoteDb(table: FakeNoteQuery): JazzFateDb {
+function createFakeNoteDb(
+  table: FakeNoteQuery,
+  dbOptions: {
+    wait?: (options: { tier: "edge" | "local" }) => Promise<void>;
+  } = {},
+): JazzFateDb {
   return {
     async all(query: unknown) {
       return (query as FakeNoteQuery).execute();
@@ -982,7 +1041,7 @@ function createFakeNoteDb(table: FakeNoteQuery): JazzFateDb {
       table.upsert(options.id, input as Partial<NoteRow>);
 
       return {
-        wait: async () => {},
+        wait: dbOptions.wait ?? (async () => {}),
       };
     },
   } as unknown as JazzFateDb;

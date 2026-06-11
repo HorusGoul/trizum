@@ -366,6 +366,7 @@ const columnsByType = new Map<TrizumFateTypename, readonly string[]>(
 export function createTrizumJazzRepository(
   db: JazzFateDb,
   options: {
+    defaultMutationSync?: JazzFateMutationDefinition<TrizumFateEntity>["sync"];
     queryOptions?: QueryOptions;
     subscriptionQueryOptions?: QueryOptions;
     syncWritesToTier?: QueryOptions["tier"];
@@ -373,6 +374,7 @@ export function createTrizumJazzRepository(
 ): TrizumDataRepository {
   return createJazzDbRepository<TrizumFateEntity, TrizumFateMutationMap>({
     db,
+    defaultMutationSync: options.defaultMutationSync,
     entities: trizumEntityDefinitions,
     lists: trizumListDefinitions,
     mutations: trizumMutationDefinitions,

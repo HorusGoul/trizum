@@ -7,7 +7,7 @@ import {
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
-import { guardParticipatingInParty } from "#src/lib/guards.ts";
+import { guardExpenseExists, guardParticipatingInParty } from "#src/lib/guards.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.ts";
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
@@ -16,7 +16,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { readExpenseById, toExpense } from "#src/lib/data/fateAppData.ts";
+import { toExpense } from "#src/lib/data/fateAppData.ts";
 import { useFateLiveView, useFateRequest } from "#src/lib/data/fateReact.ts";
 import { ExpenseListItemView } from "@trizum/data";
 
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
 
   async loader({ location, context, params: { expenseId, partyId } }) {
     await guardParticipatingInParty(partyId, context, location);
-    await readExpenseById(context.data.client, expenseId);
+    await guardExpenseExists(expenseId, context);
   },
 });
 

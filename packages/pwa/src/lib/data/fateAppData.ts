@@ -7,6 +7,7 @@ import {
   PartyMemberView,
   PartySettingsView,
   ConnectionTag,
+  applyJazzFateMutationToCache,
   refreshJazzFateCache,
   toEntityId,
   UserSettingsView,
@@ -522,6 +523,29 @@ export async function readExpenseByIdResult(
   expenseId: string,
   options?: RequestOptions,
 ): Promise<DataReadResult<Expense>> {
+  const result = await readExpenseEntityByIdResult(client, expenseId, options);
+
+  if (result.status === "found") {
+    return {
+      status: "found",
+      value: toExpense(result.value),
+    };
+  }
+
+  if (result.status === "error") {
+    return result;
+  }
+
+  return {
+    status: "notFound",
+  };
+}
+
+export async function readExpenseEntityByIdResult(
+  client: TrizumFateClient,
+  expenseId: string,
+  options?: RequestOptions,
+): Promise<DataReadResult<ExpenseEntity>> {
   try {
     const { expense } = await client.request(
       {
@@ -537,11 +561,57 @@ export async function readExpenseByIdResult(
 
     return {
       status: "found",
-      value: toExpense(snapshot.data as unknown as ExpenseEntity),
+      value: snapshot.data as unknown as ExpenseEntity,
     };
   } catch (error) {
     return readErrorAsNotFound(error);
   }
+}
+
+export async function waitForExpenseEntityInFate(
+  client: TrizumFateClient,
+  expenseId: string,
+  options: {
+    timeoutMs?: number;
+  } = {},
+): Promise<ExpenseEntity | undefined> {
+  const retryUntil = Date.now() + (options.timeoutMs ?? 8_000);
+
+  while (true) {
+    const remainingMs = retryUntil - Date.now();
+
+    if (remainingMs <= 0) {
+      return undefined;
+    }
+
+    const result = await withTimeout(
+      readExpenseEntityByIdResult(client, expenseId),
+      Math.min(2_000, remainingMs),
+    );
+
+    if (!result) {
+      await sleep(250);
+      continue;
+    }
+
+    if (result.status === "found") {
+      return result.value;
+    }
+
+    if (result.status === "error") {
+      throw result.error;
+    }
+
+    await sleep(250);
+  }
+}
+
+export function writeExpenseEntityToFateCache(client: TrizumFateClient, expense: ExpenseEntity) {
+  applyJazzFateMutationToCache(client, {
+    affectedLists: [{ args: { partyId: expense.partyId }, root: "expenses" }],
+    operation: "upsert",
+    output: expense,
+  });
 }
 
 async function readUserSettings(client: TrizumFateClient, userId: string) {

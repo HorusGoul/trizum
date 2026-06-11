@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vite-plus/test";
+import { createPolicyTestApp } from "jazz-tools/testing";
 import {
   createTrizumFateClient,
   ExpenseListItemView,
@@ -7,6 +8,8 @@ import {
   PartySummaryView,
   projectTrizumEntity,
   trizumEntityDefinitions,
+  trizumJazzApp,
+  trizumJazzPermissions,
   trizumJazzWasmSchema,
   trizumListDefinitions,
   UserSettingsView,
@@ -37,7 +40,7 @@ describe("Jazz alpha schema", () => {
       op: "Eq",
       type: "Cmp",
       value: {
-        path: ["userId"],
+        path: ["user_id"],
         type: "SessionRef",
       },
     });
@@ -52,7 +55,7 @@ describe("Jazz alpha schema", () => {
       op: "Eq",
       type: "Cmp",
       value: {
-        path: ["userId"],
+        path: ["user_id"],
         type: "SessionRef",
       },
     });
@@ -64,7 +67,7 @@ describe("Jazz alpha schema", () => {
           op: "Eq",
           type: "Cmp",
           value: {
-            path: ["userId"],
+            path: ["user_id"],
             type: "SessionRef",
           },
         },
@@ -124,6 +127,116 @@ describe("Jazz alpha schema", () => {
     expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.update?.using);
     expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.update?.with_check);
     expectInheritedPartyUpdatePolicy(trizumJazzWasmSchema.expenses?.policies?.delete?.using);
+  });
+
+  test("allows a local-first user to join an invited party and write party-scoped data", async () => {
+    const testApp = await createPolicyTestApp(trizumJazzApp, trizumJazzPermissions, expect);
+
+    try {
+      const partyId = "11111111-1111-5111-8111-111111111111";
+      const participantId = "22222222-2222-5222-8222-222222222222";
+      const bobMemberId = "33333333-3333-5333-8333-333333333333";
+      const expenseId = "44444444-4444-5444-8444-444444444444";
+      const bobSession = {
+        authMode: "local-first" as const,
+        claims: {},
+        user_id: "bob-local-first",
+      };
+      const bob = testApp.as(bobSession);
+      const charlie = testApp.as({
+        authMode: "local-first" as const,
+        claims: {},
+        user_id: "charlie-local-first",
+      });
+
+      testApp.seed((db) => {
+        db.insert(
+          trizumJazzApp.parties,
+          {
+            currency: "EUR",
+            description: "Shared trip",
+            localOnlyInviteSecret: "invite-secret",
+            name: "Madrid",
+            ownerUserId: "alice-local-first",
+            symbol: "MAD",
+          },
+          { id: partyId },
+        );
+        db.insert(
+          trizumJazzApp.participants,
+          {
+            balancesSortedBy: "name",
+            isArchived: false,
+            localId: "bob",
+            name: "Bob",
+            partyId,
+            personalMode: false,
+          },
+          { id: participantId },
+        );
+      });
+
+      await bob
+        .insert(
+          trizumJazzApp.partyMembers,
+          {
+            participantId: "bob",
+            partyId,
+            role: "editor",
+            userId: bobSession.user_id,
+          },
+          { id: bobMemberId },
+        )
+        .wait({ tier: "edge" });
+
+      await expect(
+        bob.all(trizumJazzApp.partyMembers.where({ partyId, userId: bobSession.user_id })),
+      ).resolves.toHaveLength(1);
+      await bob
+        .insert(
+          trizumJazzApp.expenses,
+          {
+            amount: 2_400,
+            isTransfer: false,
+            name: "Lunch",
+            paidAt: new Date("2026-06-11T12:00:00.000Z"),
+            paidBy: { bob: 2_400 },
+            partyId,
+            photos: [],
+            shares: { bob: { type: "divide", value: 1 } },
+          },
+          { id: expenseId },
+        )
+        .wait({ tier: "edge" });
+      await bob
+        .update(trizumJazzApp.expenses, expenseId, {
+          name: "Updated lunch",
+        })
+        .wait({ tier: "edge" });
+      await bob
+        .update(trizumJazzApp.participants, participantId, {
+          phone: "+15550000000",
+        })
+        .wait({ tier: "edge" });
+      charlie.expectDenied((db) =>
+        db.insert(
+          trizumJazzApp.expenses,
+          {
+            amount: 1_200,
+            isTransfer: false,
+            name: "Coffee",
+            paidAt: new Date("2026-06-11T13:00:00.000Z"),
+            paidBy: { charlie: 1_200 },
+            partyId,
+            photos: [],
+            shares: { charlie: { type: "divide", value: 1 } },
+          },
+          { id: "55555555-5555-5555-8555-555555555555" },
+        ),
+      );
+    } finally {
+      await testApp.shutdown();
+    }
   });
 });
 

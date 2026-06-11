@@ -119,6 +119,11 @@ export async function createLocalFirstTrizumDataClient(
     subscriptionQueryOptions: remoteLiveQueryOptions,
     syncWritesToTier: hasRemoteSync ? "edge" : undefined,
   });
+  const edgeWriteRepository = createTrizumJazzRepository(repositoryDb, {
+    defaultMutationSync: "foreground",
+    queryOptions: remoteSettledQueryOptions,
+    syncWritesToTier: hasRemoteSync ? "edge" : undefined,
+  });
   const settledRepository = createTrizumJazzRepository(repositoryDb, {
     queryOptions: remoteSettledQueryOptions,
   });
@@ -128,6 +133,7 @@ export async function createLocalFirstTrizumDataClient(
   return {
     client: createTrizumFateClient({ repository }),
     db,
+    edgeWriteClient: createTrizumFateClient({ repository: edgeWriteRepository }),
     hasRemoteSync,
     settledClient: createTrizumFateClient({ repository: settledRepository }),
     userId,

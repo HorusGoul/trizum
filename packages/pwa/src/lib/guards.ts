@@ -7,7 +7,9 @@ import {
 import {
   readPartyList,
   readPartyResult,
+  waitForExpenseEntityInFate,
   waitForPartyInFate,
+  writeExpenseEntityToFateCache,
   type DataReadResult,
 } from "#src/lib/data/fateAppData.ts";
 import type { Party } from "#src/models/party.ts";
@@ -26,6 +28,32 @@ export async function guardPartyExists(partyId: string, { data }: RouterContext)
   }
 
   return partyResult.value;
+}
+
+export async function guardExpenseExists(expenseId: string, { data }: RouterContext) {
+  const localExpense = await waitForExpenseEntityInFate(data.client, expenseId, {
+    timeoutMs: data.hasRemoteSync ? 2_000 : 8_000,
+  });
+
+  if (localExpense) {
+    return localExpense;
+  }
+
+  if (!data.hasRemoteSync || !data.settledClient) {
+    throw new Error(`Expense ${expenseId} not found`);
+  }
+
+  const settledExpense = await waitForExpenseEntityInFate(data.settledClient, expenseId, {
+    timeoutMs: 30_000,
+  });
+
+  if (!settledExpense) {
+    throw new Error(`Expense ${expenseId} not found`);
+  }
+
+  writeExpenseEntityToFateCache(data.client, settledExpense);
+
+  return settledExpense;
 }
 
 async function readPartyResultForGuard(

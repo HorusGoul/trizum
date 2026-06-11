@@ -3,9 +3,11 @@ import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
 import { useParty } from "#src/hooks/useParty.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
+import { ensurePartyMemberForSelection, waitForPartyInFate } from "#src/lib/data/fateAppData.ts";
 import { getLogger } from "#src/lib/log.ts";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
+import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 import { useForm } from "@tanstack/react-form";
@@ -23,6 +25,41 @@ interface WhoSearchParams {
 
 export const Route = createFileRoute("/party_/$partyId/who")({
   component: Who,
+  pendingComponent: PartyPendingComponent,
+  loader: async ({ context, params: { partyId } }) => {
+    const { client, edgeWriteClient, hasRemoteSync, settledClient, userId } = context.data;
+
+    await ensurePartyMemberForSelection(client, userId, partyId);
+
+    const localParty = await waitForPartyInFate(client, partyId, {
+      minParticipants: 1,
+      timeoutMs: 250,
+    });
+
+    if (localParty) {
+      return;
+    }
+
+    if (!hasRemoteSync) {
+      return;
+    }
+
+    await ensurePartyMemberForSelection(edgeWriteClient, userId, partyId);
+
+    const settledParty = await waitForPartyInFate(settledClient, partyId, {
+      minParticipants: 1,
+      timeoutMs: 30_000,
+    });
+
+    if (!settledParty) {
+      throw new Error(`Party ${partyId} was not available after joining`);
+    }
+
+    await waitForPartyInFate(client, partyId, {
+      minParticipants: 1,
+      timeoutMs: 8_000,
+    });
+  },
   validateSearch: (search): WhoSearchParams => {
     // Save redirectTo path search param if it exists
     return {

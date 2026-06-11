@@ -227,6 +227,7 @@ const cacheRefreshQueues = new WeakMap<object, Promise<unknown>>();
 
 export type CreateJazzDbRepositoryOptions<TEntity extends JazzFateEntity = JazzFateEntity> = {
   db: JazzFateDb;
+  defaultMutationSync?: JazzFateMutationDefinition<TEntity>["sync"];
   entities: readonly JazzFateEntityDefinition<TEntity>[];
   lists: readonly JazzFateListDefinition<TEntity>[];
   mutations?: readonly JazzFateMutationDefinition<TEntity>[];
@@ -244,6 +245,7 @@ export function createJazzDbRepository<
   TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
 >({
   db,
+  defaultMutationSync,
   entities,
   lists,
   mutations = [],
@@ -344,7 +346,12 @@ export function createJazzDbRepository<
       if (operation === "insert") {
         const result = insertRow(db, mutation.table, input);
 
-        await waitForWrite(result, queryOptions, syncWritesToTier, mutation.sync);
+        await waitForWrite(
+          result,
+          queryOptions,
+          syncWritesToTier,
+          mutation.sync ?? defaultMutationSync,
+        );
 
         return toEntity(
           entity,
@@ -365,7 +372,14 @@ export function createJazzDbRepository<
           throw new Error(`Fate mutation ${String(proc)} could not find row ${String(id)}`);
         }
 
-        await deleteRow(db, mutation.table, id, queryOptions, syncWritesToTier, mutation.sync);
+        await deleteRow(
+          db,
+          mutation.table,
+          id,
+          queryOptions,
+          syncWritesToTier,
+          mutation.sync ?? defaultMutationSync,
+        );
 
         return toEntity(entity, row as RowLike, select) as TMutationMap[typeof proc]["output"];
       }
@@ -379,7 +393,7 @@ export function createJazzDbRepository<
               input,
               queryOptions,
               syncWritesToTier,
-              mutation.sync,
+              mutation.sync ?? defaultMutationSync,
             )
           : await upsertRow(
               db,
@@ -388,7 +402,7 @@ export function createJazzDbRepository<
               input,
               queryOptions,
               syncWritesToTier,
-              mutation.sync,
+              mutation.sync ?? defaultMutationSync,
             );
 
       if (isRowLike(writtenRow)) {
@@ -1540,16 +1554,17 @@ async function waitForWrite(
   syncWritesToTier: QueryOptions["tier"],
   syncMode: JazzFateMutationDefinition["sync"],
 ) {
-  const waitTier = queryOptions.tier ?? "local";
+  if (syncMode !== "foreground") {
+    await waitForWriteTier(result, "local");
 
-  if (syncWritesToTier && syncWritesToTier !== waitTier) {
-    if (syncMode === "foreground") {
-      await waitForWriteTier(result, syncWritesToTier);
-    } else {
+    if (syncWritesToTier && syncWritesToTier !== "local") {
       void waitForWriteTier(result, syncWritesToTier).catch(() => undefined);
     }
+
     return;
   }
+
+  const waitTier = syncWritesToTier ?? queryOptions.tier ?? "local";
 
   await waitForWriteTier(result, waitTier);
 }

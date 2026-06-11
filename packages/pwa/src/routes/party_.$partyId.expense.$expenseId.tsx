@@ -8,7 +8,7 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Icon } from "#src/ui/Icon.js";
 import { toast } from "sonner";
-import { guardParticipatingInParty } from "#src/lib/guards.js";
+import { guardExpenseExists, guardParticipatingInParty } from "#src/lib/guards.js";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
@@ -20,7 +20,7 @@ import { Fragment, Suspense } from "react";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { readExpenseById, toExpense } from "#src/lib/data/fateAppData.ts";
+import { toExpense } from "#src/lib/data/fateAppData.ts";
 import { useFateLiveView, useFateRequest } from "#src/lib/data/fateReact.ts";
 import { ExpenseListItemView } from "@trizum/data";
 
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 
   async loader({ context, params: { expenseId, partyId }, location }) {
     await guardParticipatingInParty(partyId, context, location);
-    await readExpenseById(context.data.client, expenseId);
+    await guardExpenseExists(expenseId, context);
   },
 });
 
