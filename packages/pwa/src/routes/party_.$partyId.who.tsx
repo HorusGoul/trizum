@@ -3,7 +3,12 @@ import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
 import { useParty } from "#src/hooks/useParty.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { ensurePartyMemberForSelection, waitForPartyInFate } from "#src/lib/data/fateAppData.ts";
+import {
+  ensurePartyMemberForSelection,
+  waitForPartyEntitiesInFate,
+  writePartyEntitiesToFateCache,
+} from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { getLogger } from "#src/lib/log.ts";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
@@ -12,12 +17,14 @@ import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Suspense, useId, useState } from "react";
+import { Suspense, useEffect, useId, useState } from "react";
 import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
 import { Button } from "#src/ui/Button.tsx";
 
 const logger = getLogger("routes", "Who");
+const whoPartyPrimePromises = new WeakMap<object, Map<string, Promise<void>>>();
+type PrimeState = { status: "error"; error: unknown } | { status: "pending" } | { status: "ready" };
 
 interface WhoSearchParams {
   redirectTo?: string;
@@ -27,38 +34,9 @@ export const Route = createFileRoute("/party_/$partyId/who")({
   component: Who,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { partyId } }) => {
-    const { client, edgeWriteClient, hasRemoteSync, settledClient, userId } = context.data;
+    const { client, userId } = context.data;
 
     await ensurePartyMemberForSelection(client, userId, partyId);
-
-    const localParty = await waitForPartyInFate(client, partyId, {
-      minParticipants: 1,
-      timeoutMs: 250,
-    });
-
-    if (localParty) {
-      return;
-    }
-
-    if (!hasRemoteSync) {
-      return;
-    }
-
-    await ensurePartyMemberForSelection(edgeWriteClient, userId, partyId);
-
-    const settledParty = await waitForPartyInFate(settledClient, partyId, {
-      minParticipants: 1,
-      timeoutMs: 30_000,
-    });
-
-    if (!settledParty) {
-      throw new Error(`Party ${partyId} was not available after joining`);
-    }
-
-    await waitForPartyInFate(client, partyId, {
-      minParticipants: 1,
-      timeoutMs: 8_000,
-    });
   },
   validateSearch: (search): WhoSearchParams => {
     // Save redirectTo path search param if it exists
@@ -87,12 +65,49 @@ function Who() {
       </div>
 
       <Suspense fallback={null}>
-        <WhoData partyId={params.partyId} search={search} />
+        <WhoDataGate partyId={params.partyId} search={search} />
       </Suspense>
 
       <div className="h-16 flex-shrink-0" />
     </div>
   );
+}
+
+function WhoDataGate({ partyId, search }: { partyId: Party["id"]; search: WhoSearchParams }) {
+  const data = useTrizumData();
+  const [primeState, setPrimeState] = useState<PrimeState>({ status: "pending" });
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    setPrimeState({ status: "pending" });
+    getWhoPartyPrimePromise(data, partyId).then(
+      () => {
+        if (isCurrent) {
+          setPrimeState({ status: "ready" });
+        }
+      },
+      (error: unknown) => {
+        if (isCurrent) {
+          setPrimeState({ error, status: "error" });
+        }
+      },
+    );
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [data, partyId]);
+
+  if (primeState.status === "error") {
+    throw primeState.error;
+  }
+
+  if (primeState.status === "pending") {
+    return null;
+  }
+
+  return <WhoData partyId={partyId} search={search} />;
 }
 
 function WhoData({ partyId, search }: { partyId: Party["id"]; search: WhoSearchParams }) {
@@ -108,6 +123,56 @@ function WhoData({ partyId, search }: { partyId: Party["id"]; search: WhoSearchP
       setParticipantDetails={setParticipantDetails}
     />
   );
+}
+
+function getWhoPartyPrimePromise(data: ReturnType<typeof useTrizumData>, partyId: Party["id"]) {
+  let promises = whoPartyPrimePromises.get(data.client);
+
+  if (!promises) {
+    promises = new Map();
+    whoPartyPrimePromises.set(data.client, promises);
+  }
+
+  const existing = promises.get(partyId);
+
+  if (existing) {
+    return existing;
+  }
+
+  const promise = primeWhoPartyCache(data, partyId).catch((error: unknown) => {
+    promises.delete(partyId);
+    throw error;
+  });
+
+  promises.set(partyId, promise);
+
+  return promise;
+}
+
+async function primeWhoPartyCache(data: ReturnType<typeof useTrizumData>, partyId: Party["id"]) {
+  const localParty = await waitForPartyEntitiesInFate(data.client, partyId, {
+    minParticipants: 1,
+    timeoutMs: data.hasRemoteSync ? 250 : 8_000,
+  });
+
+  if (localParty) {
+    return;
+  }
+
+  if (!data.hasRemoteSync || !data.settledClient) {
+    return;
+  }
+
+  const settledParty = await waitForPartyEntitiesInFate(data.settledClient, partyId, {
+    minParticipants: 1,
+    timeoutMs: 30_000,
+  });
+
+  if (!settledParty) {
+    throw new Error(`Party ${partyId} was not available after joining`);
+  }
+
+  writePartyEntitiesToFateCache(data.client, settledParty);
 }
 
 interface WhoFormProps {

@@ -7,9 +7,11 @@ import {
 import {
   readPartyList,
   readPartyResult,
+  toParty,
   waitForExpenseEntityInFate,
-  waitForPartyInFate,
+  waitForPartyEntitiesInFate,
   writeExpenseEntityToFateCache,
+  writePartyEntitiesToFateCache,
   type DataReadResult,
 } from "#src/lib/data/fateAppData.ts";
 import type { Party } from "#src/models/party.ts";
@@ -67,12 +69,14 @@ async function readPartyResultForGuard(
   }
 
   try {
-    const party = await waitForPartyInFate(data.settledClient, partyId);
+    const partySnapshot = await waitForPartyEntitiesInFate(data.settledClient, partyId);
 
-    if (party) {
+    if (partySnapshot) {
+      writePartyEntitiesToFateCache(data.client, partySnapshot);
+
       return {
         status: "found",
-        value: party,
+        value: toParty(partySnapshot.party, partySnapshot.participants),
       };
     }
   } catch (error) {

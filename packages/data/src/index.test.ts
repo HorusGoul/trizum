@@ -176,6 +176,24 @@ describe("Jazz alpha schema", () => {
         );
       });
 
+      await expect(bob.all(trizumJazzApp.participants.where({ partyId }))).resolves.toHaveLength(1);
+      bob.expectDenied((db) =>
+        db.insert(
+          trizumJazzApp.expenses,
+          {
+            amount: 1_200,
+            isTransfer: false,
+            name: "Coffee",
+            paidAt: new Date("2026-06-11T13:00:00.000Z"),
+            paidBy: { bob: 1_200 },
+            partyId,
+            photos: [],
+            shares: { bob: { type: "divide", value: 1 } },
+          },
+          { id: "55555555-5555-5555-8555-555555555555" },
+        ),
+      );
+
       await bob
         .insert(
           trizumJazzApp.partyMembers,
@@ -231,7 +249,7 @@ describe("Jazz alpha schema", () => {
             photos: [],
             shares: { charlie: { type: "divide", value: 1 } },
           },
-          { id: "55555555-5555-5555-8555-555555555555" },
+          { id: "66666666-6666-5666-8666-666666666666" },
         ),
       );
     } finally {
