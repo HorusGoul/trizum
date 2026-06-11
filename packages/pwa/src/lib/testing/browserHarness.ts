@@ -1,12 +1,14 @@
-import type { TrizumFateClient } from "@trizum/data";
+import { waitForTrizumFateSync, type TrizumFateClient } from "@trizum/data";
 import type { SupportedLocale } from "#src/lib/i18n.js";
 import {
   readExpenseById,
+  readParty,
   readPartyList,
   upsertJoinedParty,
   upsertUserSettings,
 } from "#src/lib/data/fateAppData.ts";
 import type { Expense } from "#src/models/expense.js";
+import type { Party } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 
 export interface InternalPartyListSeed {
@@ -118,6 +120,25 @@ export async function readExpenseState({
       mode === "settled" ? { mode: "network-only" } : undefined,
     )) ?? null
   );
+}
+
+export async function readPartyState({
+  client,
+  mode,
+  partyId,
+}: {
+  client: TrizumFateClient;
+  mode?: "cache" | "settled";
+  partyId: Party["id"];
+}) {
+  return (
+    (await readParty(client, partyId, mode === "settled" ? { mode: "network-only" } : undefined)) ??
+    null
+  );
+}
+
+export async function waitForDataSync({ client }: { client: TrizumFateClient }) {
+  await waitForTrizumFateSync(client);
 }
 
 function toDate(value: number | undefined) {

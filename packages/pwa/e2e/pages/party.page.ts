@@ -66,7 +66,7 @@ export class PartyPage {
   async expectExpenseInLog(title: string, amountText: string) {
     const row = this.expenseRow(title);
 
-    await expect(row).toBeVisible();
+    await expect(row).toBeVisible({ timeout: 30_000 });
     await expect(row).toContainText(amountText);
   }
 
@@ -79,7 +79,7 @@ export class PartyPage {
 
     for (const title of titles) {
       const row = this.expenseRow(title);
-      await expect(row).toBeVisible();
+      await expect(row).toBeVisible({ timeout: 30_000 });
       const top = await row.evaluate((element) => element.getBoundingClientRect().top);
 
       expect(top).toBeGreaterThan(previousTop);

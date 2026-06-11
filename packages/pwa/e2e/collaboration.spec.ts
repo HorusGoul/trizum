@@ -5,7 +5,6 @@ import { PartyPage } from "./pages/party.page";
 import { WhoAreYouPage } from "./pages/who-are-you.page";
 import { expect, test } from "./harness/trizum.fixture";
 import type { Browser, BrowserContext, Page, TestInfo } from "@playwright/test";
-import { randomUUID } from "node:crypto";
 
 test.describe("Jazz collaboration", () => {
   test.skip(({ browserName }) => browserName !== "chromium", "Jazz Cloud collaboration runs once.");
@@ -14,7 +13,7 @@ test.describe("Jazz collaboration", () => {
     baseURL,
     browser,
   }, testInfo) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
 
     const aliceSession = await createCollaborationSession(browser, "alice", testInfo, baseURL);
     const bobSession = await createCollaborationSession(browser, "bob", testInfo, baseURL);
@@ -44,6 +43,16 @@ test.describe("Jazz collaboration", () => {
 
       const partyId = getPartyIdFromUrl(aliceSession.page);
 
+      await waitForDataSync(aliceSession.page);
+      await bobSession.goto("/");
+      await expect
+        .poll(() => readPartySnapshot(bobSession.page, partyId, "settled"), {
+          timeout: 60_000,
+        })
+        .toMatchObject({
+          name: partyName,
+        });
+
       await test.step("Bob joins the same party and selects his identity", async () => {
         const joinTrizumPage = new JoinTrizumPage(bobSession.page);
         const whoAreYouPage = new WhoAreYouPage(bobSession.page);
@@ -55,6 +64,7 @@ test.describe("Jazz collaboration", () => {
         await whoAreYouPage.expectLoaded();
         await selectParticipantIdentity(bobSession.page, "Bob");
         await bobPartyPage.expectLoaded(partyId, partyName);
+        await waitForDataSync(bobSession.page);
       });
 
       let expenseId = "";
@@ -80,6 +90,12 @@ test.describe("Jazz collaboration", () => {
 
         expenseId = getExpenseIdFromUrl(aliceSession.page);
 
+        await waitForDataSync(aliceSession.page);
+        await expect
+          .poll(() => readExpenseName(bobSession.page, expenseId, "settled"), {
+            timeout: 60_000,
+          })
+          .toBe(initialExpenseTitle);
         await bobPartyPage.expectExpenseInLog(initialExpenseTitle, amountText);
       });
 
@@ -87,8 +103,12 @@ test.describe("Jazz collaboration", () => {
         await aliceSession.goto(`/party/${partyId}/expense/${expenseId}/edit`);
         await bobSession.goto(`/party/${partyId}/expense/${expenseId}/edit`);
 
-        await expect(aliceSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible();
-        await expect(bobSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible();
+        await expect(aliceSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible({
+          timeout: 30_000,
+        });
+        await expect(bobSession.page.getByRole("heading", { name: /Editing/ })).toBeVisible({
+          timeout: 30_000,
+        });
 
         await aliceSession.page.getByLabel("Title").fill(aliceDraftExpenseTitle);
         await expect
@@ -248,7 +268,7 @@ function createOnlinePath(pathname: string, dbName: string) {
 function createCollaborationDbName(testInfo: TestInfo, label: string) {
   const testSlug = testInfo.testId.replace(/[^a-z0-9_-]+/gi, "-").slice(0, 100);
 
-  return `trizum-e2e-collab-${testInfo.project.name}-${testInfo.workerIndex}-${testInfo.retry}-${testSlug}-${randomUUID()}-${label}`;
+  return `trizum-e2e-collab-${testInfo.project.name}-${testInfo.workerIndex}-${testInfo.retry}-${testSlug}-${crypto.randomUUID()}-${label}`;
 }
 
 function formatAmountText(amount: number) {
@@ -269,12 +289,71 @@ async function selectParticipantIdentity(page: Page, participantName: string) {
 }
 
 type InternalExpenseSnapshot = {
+  name?: string;
   __editCopy?: {
     name?: string;
   } | null;
 };
 
+type InternalPartySnapshot = {
+  name?: string;
+};
+
+async function waitForDataSync(page: Page) {
+  await page.evaluate(async () => {
+    const waitForSync = (
+      window as typeof window & {
+        __internal_waitForDataSync?: () => Promise<void>;
+      }
+    ).__internal_waitForDataSync;
+
+    if (!waitForSync) {
+      throw new Error("Internal data sync hook is not available");
+    }
+
+    await waitForSync();
+  });
+}
+
+async function readPartySnapshot(page: Page, partyId: string, mode: "cache" | "settled" = "cache") {
+  return page.evaluate(
+    async ({ currentPartyId, readMode }) => {
+      const reader = (
+        window as typeof window & {
+          __internal_readPartyState?: (
+            partyId: string,
+            mode?: "cache" | "settled",
+          ) => Promise<unknown>;
+        }
+      ).__internal_readPartyState;
+
+      if (!reader) {
+        return null;
+      }
+
+      return (await reader(currentPartyId, readMode)) as InternalPartySnapshot | null;
+    },
+    { currentPartyId: partyId, readMode: mode },
+  );
+}
+
 async function readExpenseDraftName(
+  page: Page,
+  expenseId: string,
+  mode: "cache" | "settled" = "cache",
+) {
+  const expense = await readExpenseSnapshot(page, expenseId, mode);
+
+  return expense?.__editCopy?.name ?? null;
+}
+
+async function readExpenseName(page: Page, expenseId: string, mode: "cache" | "settled" = "cache") {
+  const expense = await readExpenseSnapshot(page, expenseId, mode);
+
+  return expense?.name ?? null;
+}
+
+async function readExpenseSnapshot(
   page: Page,
   expenseId: string,
   mode: "cache" | "settled" = "cache",
@@ -294,9 +373,7 @@ async function readExpenseDraftName(
         return null;
       }
 
-      const expense = (await reader(currentExpenseId, readMode)) as InternalExpenseSnapshot | null;
-
-      return expense?.__editCopy?.name ?? null;
+      return (await reader(currentExpenseId, readMode)) as InternalExpenseSnapshot | null;
     },
     { currentExpenseId: expenseId, readMode: mode },
   );

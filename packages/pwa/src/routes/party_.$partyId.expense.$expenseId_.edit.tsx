@@ -5,8 +5,9 @@ import {
   type ExpenseEditorRef,
 } from "#src/components/ExpenseEditor.tsx";
 import { RealtimeExpenseEditorPresence } from "#src/components/RealtimeExpenseEditorPresence.tsx";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { usePartyExpense } from "#src/hooks/usePartyExpense.ts";
+import { upsertExpenseInFate } from "#src/lib/data/fateAppData.ts";
+import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { calculateExpenseHash, getExpenseTotalAmount, type Expense } from "#src/models/expense.ts";
@@ -26,8 +27,10 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
   component: EditExpense,
   pendingComponent: PartyPendingComponent,
   loader: async ({ context, params: { expenseId, partyId }, location }) => {
-    await guardParticipatingInParty(partyId, context, location);
+    const { party } = await guardParticipatingInParty(partyId, context, location);
     await guardExpenseExists(expenseId, context);
+
+    return { party };
   },
 
   validateSearch: (search): EditExpenseSearchParams => {
@@ -41,6 +44,7 @@ const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
   const { expenseId, partyId, expense, isLoading, onUpdateExpense } = useExpense();
+  const { party } = Route.useLoaderData();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
@@ -173,6 +177,7 @@ function EditExpense() {
         onSubmit={onSubmit}
         onChange={(_previousValues, currentValues) => scheduleDraftUpdate(currentValues)}
         defaultValues={formValues}
+        party={party}
         ref={editorRef}
         // eslint-disable-next-line jsx-a11y/no-autofocus -- We don't want to auto focus the edit form
         autoFocus={false}
@@ -191,11 +196,11 @@ function EditExpense() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const { updateExpense } = useCurrentParty();
+  const { client } = useTrizumData();
   const { expense, isLoading } = usePartyExpense(partyId, expenseId);
 
   function onUpdateExpense(expense: Expense) {
-    return updateExpense(expense);
+    return upsertExpenseInFate(client, partyId, expense);
   }
 
   return {

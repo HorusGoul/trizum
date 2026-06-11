@@ -2,6 +2,7 @@ export {
   createLocalFirstTrizumDataClient,
   createTrizumFateClient,
   trizumFateRoots,
+  waitForTrizumFateSync,
   type CreateLocalFirstTrizumDataClientOptions,
   type CreateTrizumFateClientOptions,
   type JazzFateAuth,

@@ -32,8 +32,10 @@ import { createPartyFromMigrationData, type MigrationData } from "./models/migra
 import { TrizumDataContext } from "./lib/data/TrizumDataContext.ts";
 import {
   readExpenseState,
+  readPartyState,
   readPartyListState,
   seedPartyListState,
+  waitForDataSync,
   type InternalPartyListSeed,
   type InternalPartyListSnapshot,
   type InternalPartyListSeedResult,
@@ -120,6 +122,8 @@ declare global {
       expenseId: string,
       mode?: "cache" | "settled",
     ) => Promise<unknown>;
+    __internal_readPartyState: (partyId: string, mode?: "cache" | "settled") => Promise<unknown>;
+    __internal_waitForDataSync: () => Promise<void>;
   }
 }
 
@@ -156,6 +160,20 @@ window.__internal_readExpenseState = async (
     client: mode === "settled" ? trizumData.settledClient : trizumData.client,
     expenseId,
     mode,
+  });
+};
+
+window.__internal_readPartyState = async (partyId: string, mode: "cache" | "settled" = "cache") => {
+  return readPartyState({
+    client: mode === "settled" ? trizumData.settledClient : trizumData.client,
+    mode,
+    partyId,
+  });
+};
+
+window.__internal_waitForDataSync = async () => {
+  await waitForDataSync({
+    client: trizumData.client,
   });
 };
 

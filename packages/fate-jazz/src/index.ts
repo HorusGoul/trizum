@@ -64,6 +64,14 @@ export type JazzFateSyncRejectedEvent<
   rollbackOutput: JazzFateEntity | null;
 };
 
+export type JazzFateSyncPendingEvent<
+  TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
+  TProc extends Extract<keyof TMutationMap, string> = Extract<keyof TMutationMap, string>,
+> = JazzFateMutationEvent<TMutationMap, TProc> & {
+  promise: Promise<unknown>;
+  rollbackOutput: JazzFateEntity | null;
+};
+
 export interface JazzFateRepository<
   TEntity extends JazzFateEntity = JazzFateEntity,
   TMutationMap extends JazzFateMutationMap = JazzFateMutationMap,
@@ -149,6 +157,9 @@ export type CreateJazzFateTransportOptions<TMutationMap extends JazzFateMutation
   onLiveData?: (event: JazzFateLiveDataEvent) => Promise<void> | void;
   onMutation?: <K extends Extract<keyof TMutationMap, string>>(
     event: JazzFateMutationEvent<TMutationMap, K>,
+  ) => Promise<void> | void;
+  onSyncPending?: <K extends Extract<keyof TMutationMap, string>>(
+    event: JazzFateSyncPendingEvent<TMutationMap, K>,
   ) => Promise<void> | void;
   onSyncRejected?: <K extends Extract<keyof TMutationMap, string>>(
     event: JazzFateSyncRejectedEvent<TMutationMap, K>,
@@ -665,6 +676,16 @@ export function createJazzFateTransport<TMutationMap extends JazzFateMutationMap
       });
 
       if (backgroundSync) {
+        await options.onSyncPending?.({
+          affectedLists,
+          input,
+          operation,
+          output,
+          proc,
+          promise: backgroundSync.promise,
+          rollbackOutput: backgroundSync.rollbackOutput,
+        });
+
         void backgroundSync.promise.catch(async (error: unknown) => {
           await options.onSyncRejected?.({
             affectedLists,

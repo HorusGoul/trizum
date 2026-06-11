@@ -115,29 +115,33 @@ export async function createPartyInFate({
   const participantEntities = values.participants.map((participant) =>
     createParticipantEntity(partyId, participant),
   );
-  const participantInputs = participantEntities.map(({ __typename: _typename, ...input }) => input);
-
-  const result = await client.mutations.party.createWithParticipants({
-    input: {
-      participants: participantInputs,
-      party: partyInput,
-    },
+  const result = await client.mutations.party.create({
+    input: partyInput,
     optimistic: {
       __typename: "Party",
       ...partyInput,
     } as PartyEntity,
     view: PartySettingsView,
   });
-  const partyEntity = expectMutationResult(
-    result,
-    "party.createWithParticipants did not return a result",
+  const partyEntity = expectMutationResult(result, "party.create did not return a result");
+  const createdParticipantEntities = await Promise.all(
+    participantEntities.map(async (participantEntity) => {
+      const { __typename: _typename, ...input } = participantEntity;
+      const participantResult = await client.mutations.participant.create({
+        input,
+        optimistic: participantEntity,
+        view: ParticipantView,
+      });
+
+      return expectMutationResult(participantResult, "participant.create did not return a result");
+    }),
   );
   const participantListKey = await primeParticipantList(client, partyId);
   writePartyEntitiesToFateCache(client, {
-    participants: participantEntities,
+    participants: createdParticipantEntities,
     party: partyEntity,
   });
-  seedParticipantList(client, participantListKey, participantEntities);
+  seedParticipantList(client, participantListKey, createdParticipantEntities);
 
   return party;
 }
@@ -465,8 +469,9 @@ export async function createMediaFileInFate(
 export async function readParty(
   client: TrizumFateClient,
   partyId: string,
+  options?: RequestOptions,
 ): Promise<Party | undefined> {
-  const result = await readPartyResult(client, partyId);
+  const result = await readPartyResult(client, partyId, options);
 
   return result.status === "found" ? result.value : undefined;
 }
@@ -565,8 +570,9 @@ export async function waitForPartyEntitiesInFate(
 export async function readPartyResult(
   client: TrizumFateClient,
   partyId: string,
+  options?: RequestOptions,
 ): Promise<DataReadResult<Party>> {
-  const result = await readPartyEntitiesResult(client, partyId);
+  const result = await readPartyEntitiesResult(client, partyId, options);
 
   if (result.status === "error" || result.status === "notFound") {
     return result;
@@ -774,8 +780,12 @@ async function readPartyMember(
   }
 }
 
-async function readPartySettings(client: TrizumFateClient, partyId: string) {
-  const result = await readPartySettingsResult(client, partyId);
+async function readPartySettings(
+  client: TrizumFateClient,
+  partyId: string,
+  options?: RequestOptions,
+) {
+  const result = await readPartySettingsResult(client, partyId, options);
 
   return result.status === "found" ? result.value : undefined;
 }
@@ -783,14 +793,18 @@ async function readPartySettings(client: TrizumFateClient, partyId: string) {
 async function readPartySettingsResult(
   client: TrizumFateClient,
   partyId: string,
+  options?: RequestOptions,
 ): Promise<DataReadResult<PartyEntity>> {
   try {
-    const { party } = await client.request({
-      party: {
-        id: partyId,
-        view: PartySettingsView,
+    const { party } = await client.request(
+      {
+        party: {
+          id: partyId,
+          view: PartySettingsView,
+        },
       },
-    });
+      options,
+    );
     const snapshot = await client.readView(PartySettingsView, party);
     await notifyFateReadComplete(client);
 
@@ -806,14 +820,15 @@ async function readPartySettingsResult(
 async function readPartyEntitiesResult(
   client: TrizumFateClient,
   partyId: string,
+  options?: RequestOptions,
 ): Promise<DataReadResult<PartyEntitySnapshot>> {
-  const party = await readPartySettingsResult(client, partyId);
+  const party = await readPartySettingsResult(client, partyId, options);
 
   if (party.status === "notFound" || party.status === "error") {
     return party;
   }
 
-  const participants = await readParticipantsResult(client, partyId);
+  const participants = await readParticipantsResult(client, partyId, options);
 
   if (participants.status === "error") {
     return participants;
@@ -828,8 +843,12 @@ async function readPartyEntitiesResult(
   };
 }
 
-async function readParticipants(client: TrizumFateClient, partyId: string) {
-  const result = await readParticipantsResult(client, partyId);
+async function readParticipants(
+  client: TrizumFateClient,
+  partyId: string,
+  options?: RequestOptions,
+) {
+  const result = await readParticipantsResult(client, partyId, options);
 
   return result.status === "found" || result.status === "empty" ? result.value : [];
 }
@@ -837,14 +856,18 @@ async function readParticipants(client: TrizumFateClient, partyId: string) {
 async function readParticipantsResult(
   client: TrizumFateClient,
   partyId: string,
+  options?: RequestOptions,
 ): Promise<DataReadResult<ParticipantEntity[]>> {
   try {
-    const { participants } = await client.request({
-      participants: {
-        args: { partyId },
-        list: ParticipantView,
+    const { participants } = await client.request(
+      {
+        participants: {
+          args: { partyId },
+          list: ParticipantView,
+        },
       },
-    });
+      options,
+    );
 
     const participantEntities = await Promise.all(
       participants.map(async (participant) => {

@@ -37,7 +37,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { partyId, addExpenseToParty } = useCurrentParty();
+  const { party, partyId, addExpenseToParty } = useCurrentParty();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { history } = useRouter();
@@ -107,6 +107,7 @@ function AddExpense() {
         title={t`New expense`}
         onSubmit={onCreateExpense}
         onChange={(_prev, current) => setPhotos(current.photos)}
+        party={party}
         defaultValues={{
           name: "",
           amount: 0,

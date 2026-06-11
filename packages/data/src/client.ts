@@ -48,6 +48,8 @@ export type CreateTrizumFateClientOptions = {
   repository: TrizumDataRepository;
 };
 
+const pendingSyncByClient = new WeakMap<object, Set<Promise<unknown>>>();
+
 export function createTrizumFateClient({ repository }: CreateTrizumFateClientOptions) {
   let client: ReturnType<typeof createClient<[typeof trizumFateRoots, typeof trizumFateMutations]>>;
 
@@ -57,6 +59,9 @@ export function createTrizumFateClient({ repository }: CreateTrizumFateClientOpt
     },
     onMutation(event) {
       applyJazzFateMutationToCache(client, event);
+    },
+    onSyncPending(event) {
+      trackTrizumFateSync(client, event.promise);
     },
     onSyncRejected(event) {
       applyJazzFateSyncRejectionToCache(client, event);
@@ -145,6 +150,34 @@ export async function createLocalFirstTrizumDataClient(
 
 export type { JazzFateAuth };
 export { refreshJazzFateCache, subscribeToJazzFateCacheUpdates };
+
+export async function waitForTrizumFateSync(client: TrizumFateClient) {
+  while (true) {
+    const pendingSyncs = pendingSyncByClient.get(client);
+
+    if (!pendingSyncs || pendingSyncs.size === 0) {
+      return;
+    }
+
+    await Promise.all([...pendingSyncs]);
+  }
+}
+
+function trackTrizumFateSync(client: TrizumFateClient, promise: Promise<unknown>) {
+  let pendingSyncs = pendingSyncByClient.get(client);
+
+  if (!pendingSyncs) {
+    pendingSyncs = new Set();
+    pendingSyncByClient.set(client, pendingSyncs);
+  }
+
+  const tracked = promise.finally(() => {
+    pendingSyncs?.delete(tracked);
+  });
+
+  pendingSyncs.add(tracked);
+  void tracked.catch(() => undefined);
+}
 
 function getAuthenticatedUserId(authState: {
   session: {

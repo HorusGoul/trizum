@@ -62,7 +62,22 @@ async function readPartyResultForGuard(
   partyId: string,
   data: RouterContext["data"],
 ): Promise<DataReadResult<Party>> {
-  const localResult = await readPartyResult(data.client, partyId);
+  let localResult: DataReadResult<Party>;
+
+  try {
+    localResult = await readPartyResult(data.client, partyId);
+  } catch (error) {
+    if (!data.hasRemoteSync || !data.settledClient) {
+      return {
+        error,
+        status: "error",
+      };
+    }
+
+    localResult = {
+      status: "notFound",
+    };
+  }
 
   if (localResult.status !== "notFound" || !data.hasRemoteSync || !data.settledClient) {
     return localResult;

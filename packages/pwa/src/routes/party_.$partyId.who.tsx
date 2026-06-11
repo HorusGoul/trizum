@@ -8,7 +8,6 @@ import {
   writePartyEntitiesToFateCache,
 } from "#src/lib/data/fateAppData.ts";
 import { useTrizumData } from "#src/lib/data/TrizumDataContext.ts";
-import { getLogger } from "#src/lib/log.ts";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
@@ -21,7 +20,6 @@ import { Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
 import { Button } from "#src/ui/Button.tsx";
 
-const logger = getLogger("routes", "Who");
 const whoPartyPrimePromises = new WeakMap<object, Map<string, Promise<void>>>();
 type PrimeState = { status: "error"; error: unknown } | { status: "pending" } | { status: "ready" };
 
@@ -105,17 +103,11 @@ function WhoDataGate({ partyId, search }: { partyId: Party["id"]; search: WhoSea
 }
 
 function WhoData({ partyId, search }: { partyId: Party["id"]; search: WhoSearchParams }) {
-  const { party, setParticipantDetails } = useParty(partyId);
+  const { party } = useParty(partyId);
   const { partyList, addPartyToList } = usePartyList();
 
   return (
-    <WhoForm
-      addPartyToList={addPartyToList}
-      party={party}
-      partyList={partyList}
-      search={search}
-      setParticipantDetails={setParticipantDetails}
-    />
+    <WhoForm addPartyToList={addPartyToList} party={party} partyList={partyList} search={search} />
   );
 }
 
@@ -174,16 +166,9 @@ interface WhoFormProps {
   party: Party;
   partyList: PartyList;
   search: WhoSearchParams;
-  setParticipantDetails: ReturnType<typeof useParty>["setParticipantDetails"];
 }
 
-function WhoForm({
-  addPartyToList,
-  party,
-  partyList,
-  search,
-  setParticipantDetails,
-}: WhoFormProps) {
+function WhoForm({ addPartyToList, party, partyList, search }: WhoFormProps) {
   const navigate = useNavigate();
   const partyName = party.name;
 
@@ -200,15 +185,6 @@ function WhoForm({
     await addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
-      try {
-        await setParticipantDetails(participant.id, {
-          phone: partyList.phone,
-          avatarId: partyList.avatarId,
-        });
-      } catch (error) {
-        logger.warning("Failed to copy user profile details to joined participant", { error });
-      }
-
       toast.success(t`Welcome to the party, ${participantName}!`);
     } else {
       toast.success(t`You're now seeing the party as ${participantName}`);
