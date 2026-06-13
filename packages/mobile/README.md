@@ -330,8 +330,8 @@ Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
 trigger the shared release workflow. That path reuses the mobile build and
 store deployment workflows to generate store screenshots, publish Android to the
 Play Store production track with `release_status` `completed`, submit iOS to
-App Store review with `automatic_release` enabled, and attach the signed Android
-APK and AAB to the GitHub release.
+App Store review with immediate rollout and `automatic_release` enabled, and
+attach the signed Android APK and AAB to the GitHub release.
 
 ### Required Secrets
 

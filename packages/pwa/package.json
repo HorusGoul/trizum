@@ -15,10 +15,10 @@
     "generate:assets": "vp exec pwa-assets-generator"
   },
   "dependencies": {
-    "@automerge/automerge": "3.2.4",
-    "@automerge/automerge-repo": "2.5.3",
-    "@automerge/automerge-repo-network-websocket": "2.5.3",
-    "@automerge/automerge-repo-storage-indexeddb": "2.5.3",
+    "@automerge/automerge": "3.2.6",
+    "@automerge/automerge-repo": "2.5.6",
+    "@automerge/automerge-repo-network-websocket": "2.5.6",
+    "@automerge/automerge-repo-storage-indexeddb": "2.5.6",
     "@capacitor/app": "8.0.0",
     "@capacitor/camera": "8.2.0",
     "@capacitor/core": "8.0.1",

@@ -169,17 +169,17 @@ importers:
   packages/pwa:
     dependencies:
       '@automerge/automerge':
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: 3.2.6
+        version: 3.2.6
       '@automerge/automerge-repo':
-        specifier: 2.5.3
-        version: 2.5.3
+        specifier: 2.5.6
+        version: 2.5.6
       '@automerge/automerge-repo-network-websocket':
-        specifier: 2.5.3
-        version: 2.5.3
+        specifier: 2.5.6
+        version: 2.5.6
       '@automerge/automerge-repo-storage-indexeddb':
-        specifier: 2.5.3
-        version: 2.5.3
+        specifier: 2.5.6
+        version: 2.5.6
       '@capacitor/app':
         specifier: 8.0.0
         version: 8.0.0(@capacitor/core@8.0.1)
@@ -459,14 +459,14 @@ importers:
   packages/server:
     dependencies:
       '@automerge/automerge':
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: 3.2.6
+        version: 3.2.6
       '@automerge/automerge-repo':
-        specifier: 2.5.3
-        version: 2.5.3
+        specifier: 2.5.6
+        version: 2.5.6
       '@automerge/automerge-repo-network-websocket':
-        specifier: 2.5.3
-        version: 2.5.3
+        specifier: 2.5.6
+        version: 2.5.6
       '@hono/node-server':
         specifier: 1.19.6
         version: 1.19.6(hono@4.10.6)
@@ -556,17 +556,17 @@ packages:
   '@apm-js-collab/tracing-hooks@0.3.1':
     resolution: {integrity: sha512-Vu1CbmPURlN5fTboVuKMoJjbO5qcq9fA5YXpskx3dXe/zTBvjODFoerw+69rVBlRLrJpwPqSDqEuJDEKIrTldw==}
 
-  '@automerge/automerge-repo-network-websocket@2.5.3':
-    resolution: {integrity: sha512-p6K1YLo34cyGxJ6oMWqeBbWX9rGvEPGyPdX2eq8S/iWNDjYf8lbjKSOhOD8DX87uAMZN/y1XOY/RckwS8lPJbQ==}
+  '@automerge/automerge-repo-network-websocket@2.5.6':
+    resolution: {integrity: sha512-xs/xzOCTf5ZuqhDUtBO1VQ3QOnunEobjtgEqGNu7UcoD2uYWET1ANHVfS+ZzSV8IOA1O9jFAPXxzc4FXoSL0hQ==}
 
-  '@automerge/automerge-repo-storage-indexeddb@2.5.3':
-    resolution: {integrity: sha512-i4tSzY7sC8ZqurHm4Sd9H1lFL2Don9v9yaSoq0FXi4T+4Wg8eus/mtMlUCmS5XwYQL8GX+epbplrlBaBe+fYiw==}
+  '@automerge/automerge-repo-storage-indexeddb@2.5.6':
+    resolution: {integrity: sha512-3349orECq2Mj3mo9q6f9ZeXwDkP3lAm6KaivP5+znUpv6Ze+IraE36DdL5GVdzIm+cXej0yWSOCQOalnTMPcQg==}
 
-  '@automerge/automerge-repo@2.5.3':
-    resolution: {integrity: sha512-5ppzsUlzCs6PY+GeFlquaYLnVnYPz/hWzedep37zjb15tqZju1ukPPkBzT7KGEhEAnA99l4vfhfqSVC+1GktJg==}
+  '@automerge/automerge-repo@2.5.6':
+    resolution: {integrity: sha512-ZXM6TOAwm192g3+zIxYvlB+Z3O00NP+psErOwvbSype8fFO+dhc8tB/jPwfZJqmn1ULUz5w7gssKEynwcYFRSA==}
 
-  '@automerge/automerge@3.2.4':
-    resolution: {integrity: sha512-/IAShHSxme5d4ZK0Vs4A0P+tGaR/bSz6KtIJSCIPfwilCxsIqfRHAoNjmsXip6TGouadmbuw3WfLop6cal8pPQ==}
+  '@automerge/automerge@3.2.6':
+    resolution: {integrity: sha512-9/GXXfYYWNVGpnbRrGQzTNU4fWZ3XaEMeEg0OrpK4pvlQSpkmUBoirEb/4TMK6BwMysZGV5Yeneq3wwc7RNGfg==}
 
   '@babel/code-frame@7.24.7':
     resolution: {integrity: sha512-BcYH1CVJBO9tvyIZ2jVeXgSIMvGZ2FDRvDdOIVQyuklNKSsx+eppDEBq/g47Ayw+RqNFE+URvOShmf+f/qwAlA==}
@@ -9044,10 +9044,12 @@ packages:
 
   uuid@7.0.3:
     resolution: {integrity: sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uzip@0.20201231.0:
@@ -9507,9 +9509,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@automerge/automerge-repo-network-websocket@2.5.3':
+  '@automerge/automerge-repo-network-websocket@2.5.6':
     dependencies:
-      '@automerge/automerge-repo': 2.5.3
+      '@automerge/automerge-repo': 2.5.6
       cbor-x: 1.6.4
       debug: 4.4.3
       eventemitter3: 5.0.4
@@ -9520,15 +9522,15 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@automerge/automerge-repo-storage-indexeddb@2.5.3':
+  '@automerge/automerge-repo-storage-indexeddb@2.5.6':
     dependencies:
-      '@automerge/automerge-repo': 2.5.3
+      '@automerge/automerge-repo': 2.5.6
     transitivePeerDependencies:
       - supports-color
 
-  '@automerge/automerge-repo@2.5.3':
+  '@automerge/automerge-repo@2.5.6':
     dependencies:
-      '@automerge/automerge': 3.2.4
+      '@automerge/automerge': 3.2.6
       bs58check: 3.0.1
       cbor-x: 1.6.4
       debug: 4.4.3
@@ -9539,7 +9541,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@automerge/automerge@3.2.4': {}
+  '@automerge/automerge@3.2.6': {}
 
   '@babel/code-frame@7.24.7':
     dependencies:
@@ -13736,11 +13738,12 @@ snapshots:
 
   '@trizum/pwa@file:packages/pwa(@lingui/babel-plugin-lingui-macro@5.9.3(babel-plugin-macros@3.1.0)(typescript@5.9.2))(@logtape/logtape@1.2.2)(babel-plugin-macros@3.1.0)':
     dependencies:
-      '@automerge/automerge': 3.2.4
-      '@automerge/automerge-repo': 2.5.3
-      '@automerge/automerge-repo-network-websocket': 2.5.3
-      '@automerge/automerge-repo-storage-indexeddb': 2.5.3
+      '@automerge/automerge': 3.2.6
+      '@automerge/automerge-repo': 2.5.6
+      '@automerge/automerge-repo-network-websocket': 2.5.6
+      '@automerge/automerge-repo-storage-indexeddb': 2.5.6
       '@capacitor/app': 8.0.0(@capacitor/core@8.0.1)
+      '@capacitor/camera': 8.2.0(@capacitor/core@8.0.1)
       '@capacitor/core': 8.0.1
       '@capacitor/share': 8.0.0(@capacitor/core@8.0.1)
       '@capacitor/splash-screen': 8.0.0(@capacitor/core@8.0.1)
