@@ -1,6 +1,6 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
-import type { Party } from "./party";
+import type { Party, PartyActivityLog } from "./party";
 import type { Expense } from "./expense";
 
 const addExpenseToPartyMock =
@@ -50,13 +50,21 @@ function assertNoUndefinedValues(value: unknown, path: string) {
 
 function createMockRepo() {
   let nextId = 0;
-  let lastCreatedHandle:
-    | {
-        doc: Party;
-        documentId: string;
-        change: (changeFn: (nextDoc: Party) => void) => void;
-      }
-    | undefined;
+  const createdHandles: {
+    doc: Party | PartyActivityLog;
+    documentId: string;
+    change: (changeFn: (nextDoc: Party | PartyActivityLog) => void) => void;
+  }[] = [];
+
+  function getCreatedHandle(type: Party["type"] | PartyActivityLog["type"]) {
+    const handle = createdHandles.find((handle) => handle.doc.type === type);
+
+    if (!handle) {
+      throw new Error(`Expected a created ${type} handle`);
+    }
+
+    return handle;
+  }
 
   return {
     repo: {
@@ -71,18 +79,23 @@ function createMockRepo() {
           },
         };
 
-        lastCreatedHandle = handle as unknown as typeof lastCreatedHandle;
+        createdHandles.push(handle as unknown as (typeof createdHandles)[number]);
 
         return handle;
       },
     } as unknown as Repo,
-    getLastCreatedHandle: () => {
-      if (!lastCreatedHandle) {
-        throw new Error("Expected a created party handle");
-      }
-
-      return lastCreatedHandle;
-    },
+    getCreatedPartyHandle: () =>
+      getCreatedHandle("party") as {
+        doc: Party;
+        documentId: string;
+        change: (changeFn: (nextDoc: Party) => void) => void;
+      },
+    getCreatedActivityLogHandle: () =>
+      getCreatedHandle("partyActivityLog") as {
+        doc: PartyActivityLog;
+        documentId: string;
+        change: (changeFn: (nextDoc: PartyActivityLog) => void) => void;
+      },
   };
 }
 
@@ -116,7 +129,7 @@ describe("createPartyFromMigrationData", () => {
       }),
     ).resolves.toBe("mock-doc-1");
 
-    expect(mockRepo.getLastCreatedHandle().doc).not.toHaveProperty("symbol");
+    expect(mockRepo.getCreatedPartyHandle().doc).not.toHaveProperty("symbol");
   });
 
   test("preserves the party symbol when migration data includes one", async () => {
@@ -129,8 +142,32 @@ describe("createPartyFromMigrationData", () => {
       }),
     });
 
-    expect(mockRepo.getLastCreatedHandle().doc).toMatchObject({
+    expect(mockRepo.getCreatedPartyHandle().doc).toMatchObject({
       symbol: "🏕️",
+    });
+  });
+
+  test("creates a separate activity log document for the imported party", async () => {
+    const mockRepo = createMockRepo();
+
+    await createPartyFromMigrationData({
+      repo: mockRepo.repo,
+      data: createMigrationData(),
+    });
+
+    const partyHandle = mockRepo.getCreatedPartyHandle();
+    const activityLogHandle = mockRepo.getCreatedActivityLogHandle();
+
+    expect(partyHandle.doc.activityLogId).toBe(activityLogHandle.documentId);
+    expect(activityLogHandle.doc).toMatchObject({
+      type: "partyActivityLog",
+      partyId: partyHandle.documentId,
+      entries: [
+        {
+          type: "party-created",
+          partyName: "Andalusian Point",
+        },
+      ],
     });
   });
 });

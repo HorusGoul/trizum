@@ -7,6 +7,7 @@ import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
+import { createPartyActivityLog } from "./partyActivity";
 
 const logger = getLogger("models", "migration");
 
@@ -49,8 +50,17 @@ export async function createPartyFromMigrationData({
   }
 
   const handle = repo.create<Party>(party);
-  handle.change((doc) => (doc.id = handle.documentId));
   const partyId = handle.documentId;
+  const activityLogHandle = createPartyActivityLog(repo, partyId, [
+    {
+      type: "party-created",
+      partyName: data.party.name,
+    },
+  ]);
+  handle.change((doc) => {
+    doc.id = partyId;
+    doc.activityLogId = activityLogHandle.documentId;
+  });
 
   // Import photos
   const photoMap = new Map<string, MediaFile["id"]>();

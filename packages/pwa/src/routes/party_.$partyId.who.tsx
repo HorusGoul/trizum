@@ -58,7 +58,7 @@ function Who() {
     addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
-      setParticipantDetails(participant.id, {
+      void setParticipantDetails(participant.id, {
         phone: partyList.phone,
         avatarId: partyList.avatarId,
       });

@@ -77,7 +77,7 @@ function PartyById() {
     void navigate({
       to: "/party/$partyId",
       params: { partyId },
-      search: { tab: tab as "expenses" | "balances" },
+      search: { tab: tab as PartyByIdSearchParams["tab"] },
       replace: true,
     });
   }
@@ -132,7 +132,7 @@ function PartyById() {
   const participantName = participant.name;
 
   function onTogglePersonalMode() {
-    setParticipantDetails(participant.id, {
+    void setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
     });
   }
@@ -270,6 +270,18 @@ function PartyById() {
                     <Trans>See spending totals and rankings</Trans>
                   </span>
                 </div>
+              </MenuItem>
+
+              <MenuItem
+                href={{
+                  to: "/party/$partyId/log",
+                  params: { partyId },
+                }}
+              >
+                <Icon icon="lucide.history" width={20} height={20} className="mr-3" />
+                <span className="h-3.5 leading-none">
+                  <Trans>Log</Trans>
+                </span>
               </MenuItem>
 
               <MenuItem
