@@ -104,7 +104,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: server-production
-      url: https://trizum-server.fly.dev
+      url: https://server.trizum.app
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
