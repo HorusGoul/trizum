@@ -29,3 +29,29 @@ and [`package.json`](./package.json):
 
 - `vp run check`
 - `vp run dev` or `vp run start` when validating runtime behavior
+
+## Deployment
+
+Production deploys are managed by the repo `Release` GitHub Actions workflow.
+When Changesets publishes a non-prerelease `@trizum/server@...` GitHub release,
+the workflow deploys the tagged server revision to Fly.io. Backend preview
+environments are intentionally unsupported.
+
+The workflow requires one GitHub repository or `server-production` environment
+secret:
+
+- `FLY_API_TOKEN`: a Fly app-scoped deploy token for the `trizum-server` app.
+  Create it with `fly tokens create deploy --app trizum-server --name "GitHub Actions server production" --expiry <duration>`.
+
+The Fly app also needs runtime secrets configured with `fly secrets set --app
+trizum-server`:
+
+- `BUCKET_NAME`
+- `AWS_ENDPOINT_URL_S3`
+- `AWS_REGION`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `SENTRY_DSN` when Sentry should be enabled in production
+
+`DB_FILE_NAME`, `PORT`, and the persistent volume mount are configured in
+[`fly.toml`](./fly.toml).

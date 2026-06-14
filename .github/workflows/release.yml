@@ -92,6 +92,32 @@ jobs:
           packageManager: npm
           workingDirectory: packages/pwa
 
+  deploy-server-production:
+    name: Deploy Server Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/server@') && !github.event.release.prerelease
+    permissions:
+      contents: read
+      deployments: write
+    concurrency:
+      group: server-production
+      cancel-in-progress: false
+    environment:
+      name: server-production
+      url: https://server.trizum.app
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: superfly/flyctl-actions/setup-flyctl@v1
+
+      - name: Deploy Server to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: ./packages/server/deploy.sh
+
   build-mobile-android-release-apk:
     name: Build Mobile Android Release APK
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, '@trizum/mobile@') && !github.event.release.prerelease
