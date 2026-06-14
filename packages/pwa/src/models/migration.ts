@@ -1,5 +1,4 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import type { Expense } from "./expense";
 import type { Party } from "./party";
 import { getPartyHelpers } from "#src/hooks/useParty.ts";
 import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
@@ -7,17 +6,11 @@ import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
+import type { MigrationData } from "./migrationData";
+
+export type { MigrationData } from "./migrationData";
 
 const logger = getLogger("models", "migration");
-
-export interface MigrationData {
-  party: Omit<Party, "id" | "chunkRefs">;
-  expenses: (Omit<Expense, "id" | "__hash" | "paidAt" | "photos"> & {
-    paidAt: string;
-    photos: string[];
-  })[];
-  photos: { id: string; url: string }[];
-}
 
 interface CreatePartyFromMigrationDataParams {
   repo: Repo;
@@ -40,7 +33,7 @@ export async function createPartyFromMigrationData({
     name: data.party.name,
     description: data.party.description,
     currency: data.party.currency,
-    participants: data.party.participants,
+    participants: data.party.participants as Party["participants"],
     chunkRefs: [],
   };
 

@@ -12,6 +12,8 @@ export interface PartyList {
   openLastPartyOnLaunch?: boolean;
   autoOpenCalculator?: boolean;
   hue?: number;
+  cloudSyncEnabled?: boolean;
+  cloudSettingsSyncedAt?: number;
   lastOpenedPartyId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;
   pinnedParties?: Record<Party["id"], true | undefined>;

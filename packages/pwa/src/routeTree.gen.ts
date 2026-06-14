@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as JoinRouteImport } from './routes/join'
@@ -38,6 +39,11 @@ const SupportRoute = SupportRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/new'
     | '/privacy-policy'
+    | '/reset-password'
     | '/settings'
     | '/support'
     | '/about/third-party-licenses'
@@ -232,6 +242,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/new'
     | '/privacy-policy'
+    | '/reset-password'
     | '/settings'
     | '/support'
     | '/about/third-party-licenses'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/new'
     | '/privacy-policy'
+    | '/reset-password'
     | '/settings'
     | '/support'
     | '/about_/third-party-licenses'
@@ -277,6 +289,7 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   NewRoute: typeof NewRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   NewRoute: NewRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,

@@ -72,6 +72,8 @@ export default defineConfig(({ mode }) => {
 
   process.env.VITE_APP_WSS_URL =
     mode === "production" ? "wss://server.trizum.app/sync" : "wss://dev-sync.trizum.app";
+  process.env.VITE_APP_AUTH_URL =
+    process.env.VITE_APP_AUTH_URL ?? (mode === "production" ? "https://trizum.app" : "");
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
   process.env.VITE_APP_FULL_VERSION = fullVersion;

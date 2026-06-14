@@ -71,9 +71,13 @@ msgstr "About"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 
-#: src/routes/settings.tsx:225
+#: src/routes/settings.tsx:244
 msgid "Accent color"
 msgstr "Accent color"
+
+#: src/routes/settings.tsx:397
+msgid "Account created"
+msgstr "Account created"
 
 #: src/components/PartyStatsView.tsx:304
 msgid "Across the selected timeframe"
@@ -162,6 +166,14 @@ msgstr "Amount must be greater than 0"
 msgid "Angolan Kwanza"
 msgstr "Angolan Kwanza"
 
+#: src/routes/settings.tsx:818
+msgid "Apple"
+msgstr "Apple"
+
+#: src/routes/settings.tsx:602
+msgid "Apple connected"
+msgstr "Apple connected"
+
 #: src/routes/party_.$partyId.settings.tsx:302
 msgid "Archive"
 msgstr "Archive"
@@ -227,16 +239,23 @@ msgstr "Attachments"
 msgid "Australian Dollar"
 msgstr "Australian Dollar"
 
+#: src/routes/settings.tsx:391
+#: src/routes/settings.tsx:404
+#: src/routes/settings.tsx:419
+#: src/routes/settings.tsx:426
+msgid "Authentication failed"
+msgstr "Authentication failed"
+
 #: src/components/ExpenseEditor.tsx:267
-#: src/routes/settings.tsx:212
+#: src/routes/settings.tsx:231
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
 
-#: src/routes/settings.tsx:214
+#: src/routes/settings.tsx:233
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Automatically open the calculator when focusing amount fields"
 
-#: src/routes/settings.tsx:201
+#: src/routes/settings.tsx:220
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
@@ -255,6 +274,14 @@ msgstr "Azerbaijani Manat"
 #: src/routes/archived.tsx:108
 msgid "Back to home"
 msgstr "Back to home"
+
+#: src/routes/reset-password.tsx:102
+msgid "Back to settings"
+msgstr "Back to settings"
+
+#: src/routes/settings.tsx:709
+msgid "Back to sign in"
+msgstr "Back to sign in"
 
 #: src/components/CalculatorToolbar.tsx:543
 msgid "Backspace"
@@ -420,6 +447,10 @@ msgstr "Changes sync automatically across all your devices"
 msgid "Check for updates"
 msgstr "Check for updates"
 
+#: src/routes/settings.tsx:460
+msgid "Check your email for the password link"
+msgstr "Check your email for the password link"
+
 #: src/routes/index.tsx:82
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
@@ -473,6 +504,18 @@ msgstr "Close calculator"
 msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
+#: src/routes/settings.tsx:533
+msgid "Cloud settings applied"
+msgstr "Cloud settings applied"
+
+#: src/routes/settings.tsx:500
+msgid "Cloud settings saved"
+msgstr "Cloud settings saved"
+
+#: src/routes/settings.tsx:545
+msgid "Cloud sync"
+msgstr "Cloud sync"
+
 #: src/routes/new.tsx:572
 msgid "Code for testing"
 msgstr "Code for testing"
@@ -519,9 +562,33 @@ msgstr "Confirming..."
 msgid "Congolese Franc"
 msgstr "Congolese Franc"
 
+#: src/routes/settings.tsx:604
+msgid "Connect Apple"
+msgstr "Connect Apple"
+
+#: src/routes/settings.tsx:588
+msgid "Connect Google"
+msgstr "Connect Google"
+
+#: src/routes/settings.tsx:565
+msgid "Connect Google, Apple, or a password to the same account."
+msgstr "Connect Google, Apple, or a password to the same account."
+
+#: src/routes/settings.tsx:571
+msgid "Connected: {linkedProviderLabels}"
+msgstr "Connected: {linkedProviderLabels}"
+
 #: src/routes/support.tsx:42
 msgid "Contact Us"
 msgstr "Contact Us"
+
+#: src/routes/settings.tsx:803
+msgid "Continue with Apple"
+msgstr "Continue with Apple"
+
+#: src/routes/settings.tsx:791
+msgid "Continue with Google"
+msgstr "Continue with Google"
 
 #: src/routes/about.tsx:117
 msgid "Contributors"
@@ -539,10 +606,47 @@ msgstr "Copy the phone number and pay through Bizum using your bank app."
 msgid "Costa Rican Colón"
 msgstr "Costa Rican Colón"
 
+#: src/routes/settings.tsx:535
+msgid "Could not apply cloud settings"
+msgstr "Could not apply cloud settings"
+
+#: src/routes/settings.tsx:447
+msgid "Could not connect sign-in method"
+msgstr "Could not connect sign-in method"
+
+#: src/routes/settings.tsx:328
+msgid "Could not load cloud settings"
+msgstr "Could not load cloud settings"
+
+#: src/routes/settings.tsx:352
+msgid "Could not load sign-in methods"
+msgstr "Could not load sign-in methods"
+
+#: src/routes/reset-password.tsx:57
+msgid "Could not reset password"
+msgstr "Could not reset password"
+
+#: src/routes/settings.tsx:502
+msgid "Could not save cloud settings"
+msgstr "Could not save cloud settings"
+
+#: src/routes/settings.tsx:463
+msgid "Could not send password email"
+msgstr "Could not send password email"
+
+#: src/routes/settings.tsx:484
+msgid "Could not sign out"
+msgstr "Could not sign out"
+
 #: src/routes/index.tsx:221
 #: src/routes/index.tsx:369
 msgid "Create a new Party"
 msgstr "Create a new Party"
+
+#: src/routes/settings.tsx:725
+#: src/routes/settings.tsx:775
+msgid "Create account"
+msgstr "Create account"
 
 #: src/routes/about.tsx:110
 msgid "Created with ❤️ by the open source community. Special thanks to all contributors who made this project possible."
@@ -681,6 +785,19 @@ msgstr "Editing {expenseName}"
 msgid "Egyptian Pound"
 msgstr "Egyptian Pound"
 
+#: src/routes/settings.tsx:683
+#: src/routes/settings.tsx:742
+msgid "Email"
+msgstr "Email"
+
+#: src/routes/settings.tsx:620
+msgid "Email password reset link"
+msgstr "Email password reset link"
+
+#: src/routes/settings.tsx:622
+msgid "Email password setup link"
+msgstr "Email password setup link"
+
 #: src/routes/support.tsx:48
 msgid "Email Support"
 msgstr "Email Support"
@@ -695,7 +812,7 @@ msgstr "Emoji list"
 msgid "End date"
 msgstr "End date"
 
-#: src/routes/settings.tsx:46
+#: src/routes/settings.tsx:65
 msgid "English"
 msgstr "English"
 
@@ -715,7 +832,7 @@ msgstr "Enter the link or code of the trizum party you want to join"
 msgid "Eritrean Nakfa"
 msgstr "Eritrean Nakfa"
 
-#: src/routes/settings.tsx:47
+#: src/routes/settings.tsx:66
 msgid "Español"
 msgstr "Español"
 
@@ -845,9 +962,13 @@ msgstr "Fijian Dollar"
 msgid "Filter totals and rankings"
 msgstr "Filter totals and rankings"
 
-#: src/routes/settings.tsx:163
+#: src/routes/settings.tsx:182
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
+
+#: src/routes/settings.tsx:765
+msgid "Forgot password?"
+msgstr "Forgot password?"
 
 #: src/routes/support.tsx:67
 msgid "Found a bug? Let us know on GitHub and we'll fix it."
@@ -897,6 +1018,14 @@ msgstr "Go back to home"
 #: src/routes/new.tsx:560
 msgid "Gold (troy ounce)"
 msgstr "Gold (troy ounce)"
+
+#: src/routes/settings.tsx:822
+msgid "Google"
+msgstr "Google"
+
+#: src/routes/settings.tsx:586
+msgid "Google connected"
+msgstr "Google connected"
 
 #: src/routes/about.tsx:38
 msgid "Group expense sharing made simple. Track, split and settle shared costs effortlessly."
@@ -1102,6 +1231,10 @@ msgstr "Jump back into the groups you use most"
 msgid "Kazakhstani Tenge"
 msgstr "Kazakhstani Tenge"
 
+#: src/routes/settings.tsx:548
+msgid "Keep your profile settings available on your signed-in devices."
+msgstr "Keep your profile settings available on your signed-in devices."
+
 #: src/routes/new.tsx:486
 msgid "Kenyan Shilling"
 msgstr "Kenyan Shilling"
@@ -1114,13 +1247,17 @@ msgstr "Kuwaiti Dinar"
 msgid "Kyrgystani Som"
 msgstr "Kyrgystani Som"
 
-#: src/routes/settings.tsx:178
+#: src/routes/settings.tsx:197
 msgid "Language"
 msgstr "Language"
 
 #: src/routes/new.tsx:494
 msgid "Laotian Kip"
 msgstr "Laotian Kip"
+
+#: src/routes/settings.tsx:666
+msgid "Last synced {lastSyncedAt}"
+msgstr "Last synced {lastSyncedAt}"
 
 #: src/components/PartyListCard.tsx:132
 msgid "Last used"
@@ -1304,6 +1441,7 @@ msgstr "Myanma Kyat"
 #: src/routes/new.tsx:176
 #: src/routes/party_.$partyId.settings.tsx:155
 #: src/routes/party.$partyId.tsx:160
+#: src/routes/settings.tsx:733
 msgid "Name"
 msgstr "Name"
 
@@ -1335,6 +1473,10 @@ msgstr "New expense"
 #: src/routes/party_.$partyId.settings.tsx:336
 msgid "New participant name"
 msgstr "New participant name"
+
+#: src/routes/reset-password.tsx:125
+msgid "New password"
+msgstr "New password"
 
 #: src/routes/new.tsx:545
 msgid "New Taiwan Dollar"
@@ -1371,6 +1513,10 @@ msgstr "No archived parties"
 #: src/components/QRCodeScanner.tsx:103
 msgid "No camera found on this device"
 msgstr "No camera found on this device"
+
+#: src/routes/settings.tsx:515
+msgid "No cloud settings saved yet"
+msgstr "No cloud settings saved yet"
 
 #: src/routes/new.tsx:574
 msgid "No currency"
@@ -1469,7 +1615,7 @@ msgstr "Open calculator when focusing amount fields"
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
 
-#: src/routes/settings.tsx:199
+#: src/routes/settings.tsx:218
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
@@ -1611,6 +1757,31 @@ msgstr "Party stats"
 msgid "Party unpinned"
 msgstr "Party unpinned"
 
+#: src/routes/settings.tsx:749
+#: src/routes/settings.tsx:820
+msgid "Password"
+msgstr "Password"
+
+#: src/routes/settings.tsx:461
+msgid "Password email sent"
+msgstr "Password email sent"
+
+#: src/routes/reset-password.tsx:119
+msgid "Password must be at least 8 characters"
+msgstr "Password must be at least 8 characters"
+
+#: src/routes/reset-password.tsx:43
+msgid "Password reset link is invalid or expired"
+msgstr "Password reset link is invalid or expired"
+
+#: src/routes/reset-password.tsx:92
+msgid "Password reset link is invalid or expired."
+msgstr "Password reset link is invalid or expired."
+
+#: src/routes/reset-password.tsx:54
+msgid "Password updated"
+msgstr "Password updated"
+
 #: src/routes/migrate_.tricount.tsx:185
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
@@ -1636,7 +1807,7 @@ msgstr "Peruvian Sol"
 msgid "Philippine Peso"
 msgstr "Philippine Peso"
 
-#: src/routes/settings.tsx:162
+#: src/routes/settings.tsx:181
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -1761,6 +1932,10 @@ msgstr "Report an Issue"
 msgid "Report Issues"
 msgstr "Report Issues"
 
+#: src/routes/reset-password.tsx:70
+msgid "Reset password"
+msgstr "Reset password"
+
 #: src/routes/party_.$partyId.settings.tsx:422
 msgid "Restore"
 msgstr "Restore"
@@ -1810,9 +1985,14 @@ msgstr "Saudi Riyal"
 #: src/routes/new.tsx:148
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
-#: src/routes/settings.tsx:99
+#: src/routes/reset-password.tsx:79
+#: src/routes/settings.tsx:118
 msgid "Save"
 msgstr "Save"
+
+#: src/routes/settings.tsx:653
+msgid "Save to cloud"
+msgstr "Save to cloud"
 
 #: src/components/RouteQRScanner.tsx:66
 #: src/routes/join.tsx:136
@@ -1835,6 +2015,10 @@ msgstr "See spending totals and rankings"
 msgid "Select emoji"
 msgstr "Select emoji"
 
+#: src/routes/settings.tsx:697
+msgid "Send password link"
+msgstr "Send password link"
+
 #: src/routes/support.tsx:50
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Send us an email and we'll get back to you as soon as possible."
@@ -1849,11 +2033,11 @@ msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/index.tsx:123
 #: src/routes/party.$partyId.tsx:295
-#: src/routes/settings.tsx:88
+#: src/routes/settings.tsx:107
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:61
+#: src/routes/settings.tsx:80
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -1898,6 +2082,36 @@ msgstr "Shares sum up to <0>{totalAmount} {currency}</0> while the expense amoun
 #: src/routes/new.tsx:532
 msgid "Sierra Leonean Leone"
 msgstr "Sierra Leonean Leone"
+
+#: src/routes/settings.tsx:719
+#: src/routes/settings.tsx:773
+msgid "Sign in"
+msgstr "Sign in"
+
+#: src/routes/settings.tsx:673
+msgid "Sign out"
+msgstr "Sign out"
+
+#: src/routes/settings.tsx:445
+msgid "Sign-in method connected"
+msgstr "Sign-in method connected"
+
+#: src/routes/settings.tsx:401
+msgid "Sign-in method is not configured"
+msgstr "Sign-in method is not configured"
+
+#: src/routes/settings.tsx:562
+msgid "Sign-in methods"
+msgstr "Sign-in methods"
+
+#: src/routes/settings.tsx:397
+#: src/routes/settings.tsx:424
+msgid "Signed in"
+msgstr "Signed in"
+
+#: src/routes/settings.tsx:482
+msgid "Signed out"
+msgstr "Signed out"
 
 #: src/routes/new.tsx:559
 msgid "Silver (troy ounce)"
@@ -1981,7 +2195,8 @@ msgstr "Submit a Request"
 #: src/routes/new.tsx:148
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
-#: src/routes/settings.tsx:99
+#: src/routes/reset-password.tsx:79
+#: src/routes/settings.tsx:118
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -2043,6 +2258,10 @@ msgstr "Symbol must be only one emoji"
 msgid "Symbol must contain only emojis"
 msgstr "Symbol must contain only emojis"
 
+#: src/routes/settings.tsx:633
+msgid "Sync profile settings"
+msgstr "Sync profile settings"
+
 #: src/components/PartyPendingComponent.tsx:77
 msgid "Syncing party information..."
 msgstr "Syncing party information..."
@@ -2051,7 +2270,7 @@ msgstr "Syncing party information..."
 msgid "Syrian Pound"
 msgstr "Syrian Pound"
 
-#: src/routes/settings.tsx:45
+#: src/routes/settings.tsx:64
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 
@@ -2273,6 +2492,10 @@ msgstr "Update failed. Please try again."
 msgid "Update is no longer available."
 msgstr "Update is no longer available."
 
+#: src/routes/reset-password.tsx:140
+msgid "Update password"
+msgstr "Update password"
+
 #: src/routes/party_.$partyId.who.tsx:135
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
@@ -2329,6 +2552,10 @@ msgstr "US Dollar"
 msgid "US Dollar (Next day)"
 msgstr "US Dollar (Next day)"
 
+#: src/routes/settings.tsx:659
+msgid "Use cloud settings"
+msgstr "Use cloud settings"
+
 #: src/components/PartyPendingComponent.tsx:13
 msgid "Use personal mode to filter only your expenses."
 msgstr "Use personal mode to filter only your expenses."
@@ -2337,9 +2564,13 @@ msgstr "Use personal mode to filter only your expenses."
 msgid "Use your camera to scan a trizum invite"
 msgstr "Use your camera to scan a trizum invite"
 
-#: src/routes/settings.tsx:140
+#: src/routes/settings.tsx:159
 msgid "Username"
 msgstr "Username"
+
+#: src/routes/settings.tsx:635
+msgid "Username, phone, language, launch behavior, and accent color"
+msgstr "Username, phone, language, launch behavior, and accent color"
 
 #: src/routes/new.tsx:553
 msgid "Uzbekistan Som"
@@ -2407,7 +2638,7 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:141
+#: src/routes/settings.tsx:160
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 

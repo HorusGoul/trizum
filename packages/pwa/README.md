@@ -13,6 +13,10 @@ then use this document to decide where to work inside the PWA.
 - [`src/components`](./src/components) contains app-specific UI.
 - [`src/lib`](./src/lib) and [`src/models`](./src/models) contain business logic
   and domain models.
+- [`docs/cloudflare.md`](./docs/cloudflare.md) documents Worker account, D1,
+  Email, secrets, migrations, and observability setup.
+- [`docs/oauth.md`](./docs/oauth.md) documents Google/Apple OAuth, account
+  linking, and native callback setup.
 - [`e2e/README.md`](./e2e/README.md) defines the shared Playwright browser
   harness and deterministic journey setup strategy.
 - [`locale/AGENTS.md`](./locale/AGENTS.md) contains translation terminology and

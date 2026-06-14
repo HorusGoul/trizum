@@ -1,12 +1,8 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { configurePwaLogging, getLogger } from "../../src/lib/log.ts";
-import { parseTricountData, type TricountResponse } from "../../src/lib/tricountMigration.ts";
-
-configurePwaLogging({
-  lowestLevel: "info",
-});
+import { getLogger } from "../../src/lib/log.js";
+import { parseTricountData, type TricountResponse } from "../../src/lib/tricountMigration.js";
 
 const logger = getLogger("api", "migrate");
 
@@ -80,7 +76,7 @@ class TricountAPIClient {
   }
 
   async initializeKeys(): Promise<void> {
-    const keyPair = await crypto.subtle.generateKey(
+    const keyPair = (await crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
         modulusLength: 2048,
@@ -89,16 +85,22 @@ class TricountAPIClient {
       },
       true,
       ["encrypt", "decrypt"],
-    );
+    )) as CryptoKeyPair;
 
     // Export public key in PEM format
-    const publicKeyBuffer = await crypto.subtle.exportKey("spki", keyPair.publicKey);
+    const publicKeyBuffer = (await crypto.subtle.exportKey(
+      "spki",
+      keyPair.publicKey,
+    )) as ArrayBuffer;
     const publicKeyArray = new Uint8Array(publicKeyBuffer);
     const publicKeyBase64 = btoa(String.fromCharCode(...publicKeyArray));
     this.public_key = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`;
 
     // Export private key in PEM format
-    const privateKeyBuffer = await crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+    const privateKeyBuffer = (await crypto.subtle.exportKey(
+      "pkcs8",
+      keyPair.privateKey,
+    )) as ArrayBuffer;
     const privateKeyArray = new Uint8Array(privateKeyBuffer);
     const privateKeyBase64 = btoa(String.fromCharCode(...privateKeyArray));
     this.private_key = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`;
