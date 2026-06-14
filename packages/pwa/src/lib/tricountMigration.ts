@@ -1,7 +1,9 @@
-import { getLogger } from "#src/lib/log.ts";
-import type { Expense, ExpenseShare } from "#src/models/expense.js";
-import type { MigrationData } from "#src/models/migration.ts";
-import type { Party, PartyParticipant } from "#src/models/party.ts";
+import { getLogger } from "#src/lib/log.js";
+import type {
+  MigrationData,
+  MigrationExpenseShare,
+  MigrationParticipant,
+} from "#src/models/migrationData.js";
 
 const logger = getLogger("lib", "tricountMigration");
 
@@ -93,7 +95,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
   }
 
   // Create participants mapping
-  const participants: Record<string, PartyParticipant> = {};
+  const participants: Record<string, MigrationParticipant> = {};
   for (const membership of registry.memberships) {
     const member = membership.RegistryMembershipNonUser;
     const participantId = crypto.randomUUID();
@@ -138,7 +140,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     paidBy[paidById] = totalAmountInCents;
 
     // Create shares record
-    const shares: Record<string, ExpenseShare> = {};
+    const shares: Record<string, MigrationExpenseShare> = {};
 
     for (const allocation of transaction.allocations) {
       const participantName = allocation.membership.RegistryMembershipNonUser.alias.display_name;
@@ -186,10 +188,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     // Parse date
     const paidAt = new Date(transaction.date);
 
-    const expense: Omit<Expense, "id" | "__hash" | "paidAt" | "photos"> & {
-      paidAt: string;
-      photos: string[];
-    } = {
+    const expense: MigrationData["expenses"][number] = {
       name: transaction.description,
       paidAt: paidAt.toISOString(),
       paidBy,
@@ -204,11 +203,11 @@ export function parseTricountData(data: TricountResponse): MigrationData {
   }
 
   // Create party
-  const party: Omit<Party, "id" | "chunkRefs"> = {
+  const party: MigrationData["party"] = {
     type: "party",
     name: registry.title,
     description: registry.description || "",
-    currency: registry.currency as Party["currency"], // Assuming currency string is valid
+    currency: registry.currency as MigrationData["party"]["currency"],
     participants,
   };
 

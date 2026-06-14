@@ -8,7 +8,7 @@ const alertVariants = cva({
     variant: {
       default: "bg-white text-accent-950 dark:bg-accent-900 dark:text-accent-50",
       destructive:
-        "text-danger-500 bg-white dark:bg-accent-900 [&>svg]:text-current *:data-[slot=alert-description]:text-danger-500/90",
+        "border-danger-500 bg-danger-50 text-danger-700 dark:border-danger-700 dark:bg-danger-950/40 dark:text-danger-200 [&>svg]:text-current [&_[data-slot=alert-description]]:text-danger-700 dark:[&_[data-slot=alert-description]]:text-danger-200",
     },
   },
   defaultVariants: {

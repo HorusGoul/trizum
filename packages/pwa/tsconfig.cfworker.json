@@ -7,5 +7,12 @@
     "composite": true,
     "skipLibCheck": true
   },
-  "include": ["./src/api/**/*.ts"]
+  "include": [
+    "./api/**/*.ts",
+    "./api/types.d.ts",
+    "./src/lib/authConfig.ts",
+    "./src/lib/log.ts",
+    "./src/lib/tricountMigration.ts",
+    "./src/models/migrationData.ts"
+  ]
 }
