@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.9.2
+
+### Patch Changes
+
+- [#186](https://github.com/HorusGoul/trizum/pull/186) [`7426462`](https://github.com/HorusGoul/trizum/commit/7426462ad902cd6fe7edb2c66fd027ddb2aade0d) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Update Automerge runtime dependencies to the latest published patch releases.
+
 ## 1.9.1
 
 ## 1.9.0

@@ -1,5 +1,14 @@
 # @trizum/mobile
 
+## 1.9.2
+
+### Patch Changes
+
+- [#184](https://github.com/HorusGoul/trizum/pull/184) [`c5df2d0`](https://github.com/HorusGoul/trizum/commit/c5df2d03ea3eabf44da9f716dacc76bbcda2d2ab) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Configure iOS App Store releases to roll out immediately instead of using phased release.
+
+- Updated dependencies [[`7426462`](https://github.com/HorusGoul/trizum/commit/7426462ad902cd6fe7edb2c66fd027ddb2aade0d)]:
+  - @trizum/pwa@1.9.2
+
 ## 1.9.1
 
 ### Patch Changes
