@@ -1,5 +1,11 @@
 # @trizum/server
 
+## 1.0.2
+
+### Patch Changes
+
+- [#188](https://github.com/HorusGoul/trizum/pull/188) [`96d0a3e`](https://github.com/HorusGoul/trizum/commit/96d0a3e1cf81af575e7e236e466baab0c5524499) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix the server Docker image build so releases can install workspace dependencies before packaging the runtime.
+
 ## 1.0.1
 
 ### Patch Changes
