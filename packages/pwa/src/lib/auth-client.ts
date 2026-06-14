@@ -49,12 +49,23 @@ export function getAuthBaseURL() {
   return window.location.origin;
 }
 
-export function getAuthSettingsCallbackURL() {
-  if (Capacitor.isNativePlatform()) {
-    return new URL("/settings/cloud-sync", getAuthBaseURL()).toString();
+export function getAuthSettingsCallbackURL(searchParams?: Record<string, string | undefined>) {
+  const url = new URL(
+    "/settings/cloud-sync",
+    Capacitor.isNativePlatform() ? getAuthBaseURL() : window.location.origin,
+  );
+
+  for (const [key, value] of Object.entries(searchParams ?? {})) {
+    if (value) {
+      url.searchParams.set(key, value);
+    }
   }
 
-  return "/settings/cloud-sync";
+  if (Capacitor.isNativePlatform()) {
+    return url.toString();
+  }
+
+  return `${url.pathname}${url.search}`;
 }
 
 export function getAuthResetPasswordCallbackURL() {
@@ -88,7 +99,7 @@ export async function signInWithSocialAuthAccount(provider: SocialAuthProvider) 
   }
 
   return authClient.signIn.social({
-    callbackURL: getAuthSettingsCallbackURL(),
+    callbackURL: getAuthSettingsCallbackURL({ auth: "success" }),
     errorCallbackURL: getAuthSettingsCallbackURL(),
     provider,
   });
@@ -228,11 +239,11 @@ export async function requestPasswordResetEmail(email: string) {
 
 export async function requestMagicLinkEmail({ email, name }: { email: string; name: string }) {
   const result = await authClient.signIn.magicLink({
-    callbackURL: getAuthSettingsCallbackURL(),
+    callbackURL: getAuthSettingsCallbackURL({ auth: "success" }),
     email,
     errorCallbackURL: getAuthSettingsCallbackURL(),
     name,
-    newUserCallbackURL: getAuthSettingsCallbackURL(),
+    newUserCallbackURL: getAuthSettingsCallbackURL({ auth: "success" }),
   });
 
   if (result.error) {

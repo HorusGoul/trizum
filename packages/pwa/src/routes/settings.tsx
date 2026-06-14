@@ -41,7 +41,7 @@ interface LocaleOption {
   name: string;
 }
 
-function Settings() {
+export function Settings() {
   const { partyList, updateSettings } = usePartyList();
   const navigate = useNavigate();
   const session = authClient.useSession();
