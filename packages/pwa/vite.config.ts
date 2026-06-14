@@ -158,6 +158,7 @@ export default defineConfig(({ mode }) => {
           globPatterns: ["**/*.{js,wasm,css,html,svg}"],
           maximumFileSizeToCacheInBytes: 5242880,
           additionalManifestEntries: [{ url: "/THIRD-PARTY-LICENSES.txt", revision: null }],
+          navigateFallbackDenylist: [/^\/api(?:\/|$)/],
         },
         outDir: "dist/client",
         manifest: {

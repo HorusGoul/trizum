@@ -158,11 +158,11 @@ msgstr "La cantidad debe ser mayor que 0"
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/routes/settings_.cloud-sync.tsx:883
+#: src/routes/settings_.cloud-sync.tsx:938
 msgid "Apple"
 msgstr "Apple"
 
-#: src/routes/settings_.cloud-sync.tsx:615
+#: src/routes/settings_.cloud-sync.tsx:631
 msgid "Apple connected"
 msgstr "Apple conectado"
 
@@ -227,11 +227,11 @@ msgstr "Adjuntos"
 msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
-#: src/routes/settings_.cloud-sync.tsx:208
-#: src/routes/settings_.cloud-sync.tsx:222
-#: src/routes/settings_.cloud-sync.tsx:239
-#: src/routes/settings_.cloud-sync.tsx:247
-#: src/routes/settings_.cloud-sync.tsx:898
+#: src/routes/settings_.cloud-sync.tsx:210
+#: src/routes/settings_.cloud-sync.tsx:224
+#: src/routes/settings_.cloud-sync.tsx:241
+#: src/routes/settings_.cloud-sync.tsx:249
+#: src/routes/settings_.cloud-sync.tsx:953
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
@@ -265,11 +265,11 @@ msgid "Back to home"
 msgstr "Volver al inicio"
 
 #: src/routes/reset-password.tsx:102
-#: src/routes/settings_.cloud-sync.tsx:778
+#: src/routes/settings_.cloud-sync.tsx:794
 msgid "Back to settings"
 msgstr "Volver a configuración"
 
-#: src/routes/settings_.cloud-sync.tsx:427
+#: src/routes/settings_.cloud-sync.tsx:429
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
@@ -429,11 +429,11 @@ msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
-#: src/routes/settings_.cloud-sync.tsx:282
+#: src/routes/settings_.cloud-sync.tsx:284
 msgid "Check your email for the password link"
 msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:183
+#: src/routes/settings_.cloud-sync.tsx:185
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
@@ -498,9 +498,8 @@ msgstr "Configuración en la nube aplicada"
 msgid "Cloud settings saved"
 msgstr "Configuración en la nube guardada"
 
-#: src/routes/settings_.cloud-sync.tsx:566
-#: src/routes/settings_.cloud-sync.tsx:648
-#: src/routes/settings_.cloud-sync.tsx:786
+#: src/routes/settings_.cloud-sync.tsx:582
+#: src/routes/settings_.cloud-sync.tsx:664
 #: src/routes/settings.tsx:164
 msgid "Cloud sync"
 msgstr "Sincronización en la nube"
@@ -509,33 +508,33 @@ msgstr "Sincronización en la nube"
 msgid "Cloud sync available"
 msgstr "Sincronización en la nube disponible"
 
-#: src/routes/settings_.cloud-sync.tsx:342
-#: src/routes/settings_.cloud-sync.tsx:364
+#: src/routes/settings_.cloud-sync.tsx:344
+#: src/routes/settings_.cloud-sync.tsx:366
 msgid "Cloud sync data is invalid"
 msgstr "Los datos de sincronización en la nube no son válidos"
 
-#: src/routes/settings_.cloud-sync.tsx:353
+#: src/routes/settings_.cloud-sync.tsx:355
 msgid "Cloud sync enabled on this device"
 msgstr "Sincronización en la nube activada en este dispositivo"
 
-#: src/routes/settings_.cloud-sync.tsx:317
+#: src/routes/settings_.cloud-sync.tsx:319
 msgid "Cloud sync is already set up for this account"
 msgstr "La sincronización en la nube ya está configurada para esta cuenta"
 
-#: src/routes/settings_.cloud-sync.tsx:663
+#: src/routes/settings_.cloud-sync.tsx:679
 msgid "Cloud sync is already set up for this account."
 msgstr "La sincronización en la nube ya está configurada para esta cuenta."
 
-#: src/routes/settings_.cloud-sync.tsx:337
-#: src/routes/settings_.cloud-sync.tsx:359
+#: src/routes/settings_.cloud-sync.tsx:339
+#: src/routes/settings_.cloud-sync.tsx:361
 msgid "Cloud sync is not set up yet"
 msgstr "La sincronización en la nube todavía no está configurada"
 
-#: src/routes/settings_.cloud-sync.tsx:654
+#: src/routes/settings_.cloud-sync.tsx:670
 msgid "Cloud sync is not set up yet."
 msgstr "La sincronización en la nube todavía no está configurada."
 
-#: src/routes/settings_.cloud-sync.tsx:327
+#: src/routes/settings_.cloud-sync.tsx:329
 msgid "Cloud sync updated"
 msgstr "Sincronización en la nube actualizada"
 
@@ -585,11 +584,11 @@ msgstr "Confirmando..."
 msgid "Congolese Franc"
 msgstr "Franco Congoleño"
 
-#: src/routes/settings_.cloud-sync.tsx:617
+#: src/routes/settings_.cloud-sync.tsx:633
 msgid "Connect Apple"
 msgstr "Conectar Apple"
 
-#: src/routes/settings_.cloud-sync.tsx:601
+#: src/routes/settings_.cloud-sync.tsx:617
 msgid "Connect Google"
 msgstr "Conectar Google"
 
@@ -597,7 +596,7 @@ msgstr "Conectar Google"
 msgid "Connect Google, Apple, or a password to the same account."
 msgstr "Conecta Google, Apple o una contraseña a la misma cuenta."
 
-#: src/routes/settings_.cloud-sync.tsx:584
+#: src/routes/settings_.cloud-sync.tsx:600
 msgid "Connected: {linkedProviderLabels}"
 msgstr "Conectado: {linkedProviderLabels}"
 
@@ -605,11 +604,11 @@ msgstr "Conectado: {linkedProviderLabels}"
 msgid "Contact Us"
 msgstr "Contacto"
 
-#: src/routes/settings_.cloud-sync.tsx:442
+#: src/routes/settings_.cloud-sync.tsx:455
 msgid "Continue with Apple"
 msgstr "Continuar con Apple"
 
-#: src/routes/settings_.cloud-sync.tsx:454
+#: src/routes/settings_.cloud-sync.tsx:467
 msgid "Continue with Google"
 msgstr "Continuar con Google"
 
@@ -633,7 +632,7 @@ msgstr "Colón Costarricense"
 msgid "Could not apply cloud settings"
 msgstr "No se pudo aplicar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:268
+#: src/routes/settings_.cloud-sync.tsx:270
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
@@ -641,7 +640,7 @@ msgstr "No se pudo conectar el método de inicio de sesión"
 msgid "Could not load cloud settings"
 msgstr "No se pudo cargar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:99
+#: src/routes/settings_.cloud-sync.tsx:101
 #: src/routes/settings.tsx:334
 msgid "Could not load cloud sync state"
 msgstr "No se pudo cargar el estado de la sincronización en la nube"
@@ -658,19 +657,19 @@ msgstr "No se pudo restablecer la contraseña"
 msgid "Could not save cloud settings"
 msgstr "No se pudo guardar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:285
+#: src/routes/settings_.cloud-sync.tsx:287
 msgid "Could not send password email"
 msgstr "No se pudo enviar el correo de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:186
+#: src/routes/settings_.cloud-sync.tsx:188
 msgid "Could not send sign-in link"
 msgstr "No se pudo enviar el enlace de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:306
+#: src/routes/settings_.cloud-sync.tsx:308
 msgid "Could not sign out"
 msgstr "No se pudo cerrar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:329
+#: src/routes/settings_.cloud-sync.tsx:331
 msgid "Could not update cloud sync"
 msgstr "No se pudo actualizar la sincronización en la nube"
 
@@ -817,21 +816,21 @@ msgstr "Editando {expenseName}"
 msgid "Egyptian Pound"
 msgstr "Libra Egipcia"
 
-#: src/routes/settings_.cloud-sync.tsx:399
-#: src/routes/settings_.cloud-sync.tsx:469
-#: src/routes/settings_.cloud-sync.tsx:521
+#: src/routes/settings_.cloud-sync.tsx:401
+#: src/routes/settings_.cloud-sync.tsx:482
+#: src/routes/settings_.cloud-sync.tsx:541
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: src/routes/settings_.cloud-sync.tsx:535
+#: src/routes/settings_.cloud-sync.tsx:550
 msgid "Email me a sign-in link"
 msgstr "Enviarme un enlace de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:633
+#: src/routes/settings_.cloud-sync.tsx:649
 msgid "Email password reset link"
 msgstr "Enviar enlace para restablecer contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:635
+#: src/routes/settings_.cloud-sync.tsx:651
 msgid "Email password setup link"
 msgstr "Enviar enlace para crear contraseña"
 
@@ -987,7 +986,7 @@ msgstr "Filtra totales y rankings"
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
-#: src/routes/settings_.cloud-sync.tsx:514
+#: src/routes/settings_.cloud-sync.tsx:534
 msgid "Forgot password?"
 msgstr "¿Olvidaste tu contraseña?"
 
@@ -1040,11 +1039,11 @@ msgstr "Volver al inicio"
 msgid "Gold (troy ounce)"
 msgstr "Oro (onza troy)"
 
-#: src/routes/settings_.cloud-sync.tsx:887
+#: src/routes/settings_.cloud-sync.tsx:942
 msgid "Google"
 msgstr "Google"
 
-#: src/routes/settings_.cloud-sync.tsx:599
+#: src/routes/settings_.cloud-sync.tsx:615
 msgid "Google connected"
 msgstr "Google conectado"
 
@@ -1248,7 +1247,7 @@ msgstr "Vuelve a los grupos que más usas"
 msgid "Kazakhstani Tenge"
 msgstr "Tenge Kazajo"
 
-#: src/routes/settings_.cloud-sync.tsx:729
+#: src/routes/settings_.cloud-sync.tsx:745
 msgid "Keep local data"
 msgstr "Mantener datos locales"
 
@@ -1280,7 +1279,7 @@ msgstr "Kip Laosiano"
 msgid "Last synced {lastSyncedAt}"
 msgstr "Última sincronización: {lastSyncedAt}"
 
-#: src/routes/settings_.cloud-sync.tsx:672
+#: src/routes/settings_.cloud-sync.tsx:688
 msgid "Last updated {cloudUpdatedAt}"
 msgstr "Última actualización: {cloudUpdatedAt}"
 
@@ -1655,7 +1654,7 @@ msgstr "Abrir paréntesis"
 msgid "or enter code"
 msgstr "o introduce código"
 
-#: src/routes/settings_.cloud-sync.tsx:461
+#: src/routes/settings_.cloud-sync.tsx:474
 msgid "or use email"
 msgstr "o usa el correo"
 
@@ -1777,12 +1776,12 @@ msgstr "Estadísticas del grupo"
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
-#: src/routes/settings_.cloud-sync.tsx:477
-#: src/routes/settings_.cloud-sync.tsx:885
+#: src/routes/settings_.cloud-sync.tsx:490
+#: src/routes/settings_.cloud-sync.tsx:940
 msgid "Password"
 msgstr "Contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:283
+#: src/routes/settings_.cloud-sync.tsx:285
 msgid "Password email sent"
 msgstr "Correo de contraseña enviado"
 
@@ -1798,7 +1797,7 @@ msgstr "El enlace para restablecer la contraseña no es válido o ha caducado"
 msgid "Password reset link is invalid or expired."
 msgstr "El enlace para restablecer la contraseña no es válido o ha caducado."
 
-#: src/routes/settings_.cloud-sync.tsx:475
+#: src/routes/settings_.cloud-sync.tsx:488
 msgid "Password sign in only works after you add a password to your account."
 msgstr "El inicio de sesión con contraseña solo funciona después de añadir una contraseña a tu cuenta."
 
@@ -2035,7 +2034,7 @@ msgstr "Ver totales y clasificación de gasto"
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
-#: src/routes/settings_.cloud-sync.tsx:413
+#: src/routes/settings_.cloud-sync.tsx:415
 msgid "Send password link"
 msgstr "Enviar enlace de contraseña"
 
@@ -2047,7 +2046,7 @@ msgstr "Envíanos un email y te responderemos lo antes posible."
 msgid "Serbian Dinar"
 msgstr "Dinar Serbio"
 
-#: src/routes/settings_.cloud-sync.tsx:681
+#: src/routes/settings_.cloud-sync.tsx:697
 msgid "Set up cloud sync"
 msgstr "Configurar sincronización en la nube"
 
@@ -2107,46 +2106,50 @@ msgstr "Las partes suman <0>{totalAmount} {currency}</0> mientras que la cantida
 msgid "Sierra Leonean Leone"
 msgstr "Leone de Sierra Leona"
 
-#: src/routes/settings_.cloud-sync.tsx:774
+#: src/routes/settings_.cloud-sync.tsx:790
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:500
+#: src/routes/settings_.cloud-sync.tsx:809
+msgid "Sign in to trizum cloud"
+msgstr "Iniciar sesión en trizum cloud"
+
+#: src/routes/settings_.cloud-sync.tsx:505
 msgid "Sign in with password"
 msgstr "Iniciar sesión con contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:696
+#: src/routes/settings_.cloud-sync.tsx:712
 msgid "Sign out"
 msgstr "Cerrar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:896
+#: src/routes/settings_.cloud-sync.tsx:951
 msgid "Sign-in link is invalid or expired"
 msgstr "El enlace de inicio de sesión no es válido o ha caducado"
 
-#: src/routes/settings_.cloud-sync.tsx:184
+#: src/routes/settings_.cloud-sync.tsx:186
 msgid "Sign-in link sent"
 msgstr "Enlace de inicio de sesión enviado"
 
-#: src/routes/settings_.cloud-sync.tsx:266
+#: src/routes/settings_.cloud-sync.tsx:268
 msgid "Sign-in method connected"
 msgstr "Método de inicio de sesión conectado"
 
-#: src/routes/settings_.cloud-sync.tsx:219
+#: src/routes/settings_.cloud-sync.tsx:221
 msgid "Sign-in method is not configured"
 msgstr "El método de inicio de sesión no está configurado"
 
-#: src/routes/settings_.cloud-sync.tsx:579
+#: src/routes/settings_.cloud-sync.tsx:595
 msgid "Sign-in methods"
 msgstr "Métodos de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:213
-#: src/routes/settings_.cloud-sync.tsx:243
-#: src/routes/settings_.cloud-sync.tsx:820
-#: src/routes/settings_.cloud-sync.tsx:853
+#: src/routes/settings_.cloud-sync.tsx:215
+#: src/routes/settings_.cloud-sync.tsx:245
+#: src/routes/settings_.cloud-sync.tsx:875
+#: src/routes/settings_.cloud-sync.tsx:908
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/settings_.cloud-sync.tsx:304
+#: src/routes/settings_.cloud-sync.tsx:306
 msgid "Signed out"
 msgstr "Sesión cerrada"
 
@@ -2368,13 +2371,13 @@ msgstr "Esta aplicación utiliza las siguientes bibliotecas y herramientas de c�
 msgid "This debt is no longer available"
 msgstr "Esta deuda ya no está disponible"
 
-#: src/routes/settings_.cloud-sync.tsx:711
+#: src/routes/settings_.cloud-sync.tsx:727
 msgid "This device already has local trizum data. Using cloud sync here will switch this device to your cloud data, and the local list on this device will stop being used."
 msgstr "Este dispositivo ya tiene datos locales de trizum. Si usas la sincronización en la nube aquí, este dispositivo cambiará a tus datos en la nube y dejará de usar la lista local de este dispositivo."
 
-#: src/routes/settings_.cloud-sync.tsx:316
-#: src/routes/settings_.cloud-sync.tsx:347
-#: src/routes/settings_.cloud-sync.tsx:369
+#: src/routes/settings_.cloud-sync.tsx:318
+#: src/routes/settings_.cloud-sync.tsx:349
+#: src/routes/settings_.cloud-sync.tsx:371
 msgid "This device is already using cloud sync"
 msgstr "Este dispositivo ya usa la sincronización en la nube"
 
@@ -2382,7 +2385,7 @@ msgstr "Este dispositivo ya usa la sincronización en la nube"
 msgid "This device is synced"
 msgstr "Este dispositivo está sincronizado"
 
-#: src/routes/settings_.cloud-sync.tsx:658
+#: src/routes/settings_.cloud-sync.tsx:674
 msgid "This device is using cloud sync."
 msgstr "Este dispositivo usa la sincronización en la nube."
 
@@ -2473,6 +2476,10 @@ msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando est
 #: src/components/QRCodeScanner.tsx:204
 msgid "Try again"
 msgstr "Reintentar"
+
+#: src/routes/settings_.cloud-sync.tsx:847
+msgid "Try another email"
+msgstr "Probar con otro email"
 
 #: src/components/PartyStatsView.tsx:848
 msgid "Try another timeframe to compare a different period of your party."
@@ -2582,7 +2589,7 @@ msgstr "Dólar Estadounidense"
 msgid "US Dollar (Next day)"
 msgstr "Dólar Estadounidense (Día siguiente)"
 
-#: src/routes/settings_.cloud-sync.tsx:721
+#: src/routes/settings_.cloud-sync.tsx:737
 msgid "Use cloud data"
 msgstr "Usar datos en la nube"
 
@@ -2590,23 +2597,23 @@ msgstr "Usar datos en la nube"
 msgid "Use cloud settings"
 msgstr "Usar configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:688
+#: src/routes/settings_.cloud-sync.tsx:704
 msgid "Use cloud sync on this device"
 msgstr "Usar sincronización en la nube en este dispositivo"
 
-#: src/routes/settings_.cloud-sync.tsx:708
+#: src/routes/settings_.cloud-sync.tsx:724
 msgid "Use cloud sync on this device?"
 msgstr "¿Usar la sincronización en la nube en este dispositivo?"
 
-#: src/routes/settings_.cloud-sync.tsx:666
+#: src/routes/settings_.cloud-sync.tsx:682
 msgid "Use it on this device to continue with your cloud data."
 msgstr "Úsala en este dispositivo para continuar con tus datos en la nube."
 
-#: src/routes/settings_.cloud-sync.tsx:494
+#: src/routes/settings_.cloud-sync.tsx:520
 msgid "Use magic link instead"
 msgstr "Usar enlace mágico"
 
-#: src/routes/settings_.cloud-sync.tsx:549
+#: src/routes/settings_.cloud-sync.tsx:565
 msgid "Use password instead"
 msgstr "Usar contraseña"
 
@@ -2674,6 +2681,10 @@ msgstr "Viendo como {0}"
 #: src/routes/party.$partyId.tsx:225
 msgid "Viewing as {participantName}"
 msgstr "Viendo como {participantName}"
+
+#: src/routes/settings_.cloud-sync.tsx:838
+msgid "We sent a sign-in link to {email}. Open it to finish signing in."
+msgstr "Hemos enviado un enlace de inicio de sesión a {email}. Ábrelo para terminar de iniciar sesión."
 
 #: src/routes/party_.$partyId.who.tsx:64
 msgid "Welcome to the party, {0}!"

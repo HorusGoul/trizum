@@ -51,6 +51,8 @@ export const Route = createFileRoute("/settings_/cloud-sync")({
 });
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
+const AUTH_SECONDARY_BUTTON_CLASS_NAME =
+  "h-9 text-sm font-medium text-accent-700 dark:text-accent-50";
 
 interface CloudSyncSearchParams {
   auth?: "success";
@@ -427,6 +429,17 @@ function CloudSyncSettings() {
                 <Trans>Back to sign in</Trans>
               </Button>
             </form>
+          ) : magicLinkMessage ? (
+            <MagicLinkSentState
+              email={authEmail}
+              message={magicLinkMessage}
+              onTryAgain={() => {
+                setAuthError(null);
+                setMagicLinkMessage(null);
+                setPasswordResetMessage(null);
+                setIsPasswordLoginMode(false);
+              }}
+            />
           ) : (
             <>
               <div className="flex flex-col gap-3">
@@ -480,7 +493,20 @@ function CloudSyncSettings() {
                     type="password"
                     value={authPassword}
                   />
+                  {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
                   <Button
+                    className="font-semibold"
+                    color="accent"
+                    isDisabled={isAuthPending}
+                    type="submit"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.log-in" width={18} height={18} />
+                      <Trans>Sign in with password</Trans>
+                    </span>
+                  </Button>
+                  <Button
+                    className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
                     color="transparent"
                     isDisabled={isAuthPending}
                     onPress={() => {
@@ -493,14 +519,8 @@ function CloudSyncSettings() {
                   >
                     <Trans>Use magic link instead</Trans>
                   </Button>
-                  {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
-                  <Button color="input-like" isDisabled={isAuthPending} type="submit">
-                    <span className="flex items-center gap-2">
-                      <Icon icon="lucide.log-in" width={18} height={18} />
-                      <Trans>Sign in with password</Trans>
-                    </span>
-                  </Button>
                   <Button
+                    className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
                     color="transparent"
                     isDisabled={isAuthPending}
                     onPress={() => {
@@ -524,11 +544,6 @@ function CloudSyncSettings() {
                     value={authEmail}
                   />
                   {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
-                  {magicLinkMessage ? (
-                    <p className="text-sm text-accent-700 dark:text-accent-50">
-                      {magicLinkMessage}
-                    </p>
-                  ) : null}
                   <Button color="accent" isDisabled={isAuthPending} type="submit">
                     <span className="flex items-center gap-2">
                       <Icon icon="lucide.mail" width={18} height={18} />
@@ -536,6 +551,7 @@ function CloudSyncSettings() {
                     </span>
                   </Button>
                   <Button
+                    className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
                     color="transparent"
                     isDisabled={isAuthPending}
                     onPress={() => {
@@ -781,9 +797,16 @@ function CloudSyncSignInDialog({
             onPress={onOpenChange}
           />
           <div className="flex flex-col gap-5 overflow-y-auto p-5 pt-14 sm:p-6 sm:pt-14">
-            <div className="flex flex-col items-center text-center">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <img
+                alt=""
+                className="size-12 rounded-xl"
+                height={48}
+                src="/pwa-64x64.png"
+                width={48}
+              />
               <h2 className="text-lg font-medium">
-                <Trans>Cloud sync</Trans>
+                <Trans>Sign in to trizum cloud</Trans>
               </h2>
             </div>
 
@@ -792,6 +815,38 @@ function CloudSyncSignInDialog({
         </Dialog>
       </Modal>
     </ModalOverlay>
+  );
+}
+
+function MagicLinkSentState({
+  email,
+  message,
+  onTryAgain,
+}: {
+  email: string;
+  message: string;
+  onTryAgain: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-5 text-center">
+      <span className="flex size-14 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-950/60 dark:text-success-200">
+        <Icon icon="lucide.mail-check" width={28} height={28} />
+      </span>
+      <div className="flex flex-col gap-2">
+        <h3 className="text-base font-medium">{message}</h3>
+        <p className="text-sm text-accent-700 dark:text-accent-50">
+          <Trans>We sent a sign-in link to {email}. Open it to finish signing in.</Trans>
+        </p>
+      </div>
+      <Button
+        className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
+        color="transparent"
+        onPress={onTryAgain}
+        type="button"
+      >
+        <Trans>Try another email</Trans>
+      </Button>
+    </div>
   );
 }
 
