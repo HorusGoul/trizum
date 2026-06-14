@@ -71,7 +71,7 @@ msgstr "About"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 
-#: src/routes/settings.tsx:267
+#: src/routes/settings.tsx:290
 msgid "Accent color"
 msgstr "Accent color"
 
@@ -247,15 +247,15 @@ msgid "Authentication failed"
 msgstr "Authentication failed"
 
 #: src/components/ExpenseEditor.tsx:267
-#: src/routes/settings.tsx:254
+#: src/routes/settings.tsx:277
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
 
-#: src/routes/settings.tsx:256
+#: src/routes/settings.tsx:279
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Automatically open the calculator when focusing amount fields"
 
-#: src/routes/settings.tsx:243
+#: src/routes/settings.tsx:266
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
@@ -518,7 +518,7 @@ msgstr "Cloud settings saved"
 
 #: src/routes/settings_.cloud-sync.tsx:305
 #: src/routes/settings_.cloud-sync.tsx:391
-#: src/routes/settings.tsx:300
+#: src/routes/settings.tsx:164
 msgid "Cloud sync"
 msgstr "Cloud sync"
 
@@ -1011,7 +1011,7 @@ msgstr "Fijian Dollar"
 msgid "Filter totals and rankings"
 msgstr "Filter totals and rankings"
 
-#: src/routes/settings.tsx:205
+#: src/routes/settings.tsx:228
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -1300,7 +1300,7 @@ msgstr "Kuwaiti Dinar"
 msgid "Kyrgystani Som"
 msgstr "Kyrgystani Som"
 
-#: src/routes/settings.tsx:220
+#: src/routes/settings.tsx:243
 msgid "Language"
 msgstr "Language"
 
@@ -1680,7 +1680,7 @@ msgstr "Open calculator when focusing amount fields"
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
 
-#: src/routes/settings.tsx:241
+#: src/routes/settings.tsx:264
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
@@ -1872,7 +1872,7 @@ msgstr "Peruvian Sol"
 msgid "Philippine Peso"
 msgstr "Philippine Peso"
 
-#: src/routes/settings.tsx:204
+#: src/routes/settings.tsx:227
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -2671,7 +2671,7 @@ msgstr "Use this device for cloud sync"
 msgid "Use your camera to scan a trizum invite"
 msgstr "Use your camera to scan a trizum invite"
 
-#: src/routes/settings.tsx:182
+#: src/routes/settings.tsx:205
 msgid "Username"
 msgstr "Username"
 
@@ -2745,7 +2745,7 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:183
+#: src/routes/settings.tsx:206
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
