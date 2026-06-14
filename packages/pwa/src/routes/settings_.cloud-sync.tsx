@@ -48,7 +48,6 @@ function CloudSyncSettings() {
   const user = session.data?.user;
   const userId = user?.id;
   const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
-  const [authName, setAuthName] = useState(partyList.username ?? "");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
@@ -124,7 +123,7 @@ function CloudSyncSettings() {
           : await authClient.signUp.email({
               callbackURL: getAuthSettingsCallbackURL(),
               email: authEmail,
-              name: authName || partyList.username || authEmail,
+              name: partyList.username.trim() || authEmail,
               password: authPassword,
             });
 
@@ -335,7 +334,7 @@ function CloudSyncSettings() {
                     }}
                   >
                     <span className="flex items-center gap-2">
-                      <Icon icon="lucide.log-in" width={18} height={18} />
+                      <Icon icon="brand.google" width={18} height={18} />
                       {linkedProviderIds.has("google") ? (
                         <Trans>Google connected</Trans>
                       ) : (
@@ -351,7 +350,7 @@ function CloudSyncSettings() {
                     }}
                   >
                     <span className="flex items-center gap-2">
-                      <Icon icon="lucide.apple" width={18} height={18} />
+                      <Icon icon="brand.apple" width={18} height={18} />
                       {linkedProviderIds.has("apple") ? (
                         <Trans>Apple connected</Trans>
                       ) : (
@@ -478,6 +477,39 @@ function CloudSyncSettings() {
               </form>
             ) : (
               <>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Button
+                    color="input-like"
+                    isDisabled={isAuthPending}
+                    onPress={() => {
+                      void onSocialSignIn("apple");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="brand.apple" width={18} height={18} />
+                      <Trans>Continue with Apple</Trans>
+                    </span>
+                  </Button>
+                  <Button
+                    color="input-like"
+                    isDisabled={isAuthPending}
+                    onPress={() => {
+                      void onSocialSignIn("google");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="brand.google" width={18} height={18} />
+                      <Trans>Continue with Google</Trans>
+                    </span>
+                  </Button>
+                </div>
+
+                <div className="flex items-center gap-3 text-xs font-medium uppercase text-accent-600 dark:text-accent-300">
+                  <span className="h-px flex-1 bg-accent-200 dark:bg-accent-700" />
+                  <Trans>or use email</Trans>
+                  <span className="h-px flex-1 bg-accent-200 dark:bg-accent-700" />
+                </div>
+
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     color={authMode === "sign-in" ? "accent" : "input-like"}
@@ -494,16 +526,6 @@ function CloudSyncSettings() {
                 </div>
 
                 <form className="flex flex-col gap-4" onSubmit={onAuthSubmit}>
-                  {authMode === "sign-up" ? (
-                    <AppTextField
-                      isDisabled={isAuthPending}
-                      label={t`Name`}
-                      maxLength={50}
-                      minLength={1}
-                      onChange={setAuthName}
-                      value={authName}
-                    />
-                  ) : null}
                   <AppTextField
                     isDisabled={isAuthPending}
                     label={t`Email`}
@@ -544,33 +566,6 @@ function CloudSyncSettings() {
                     </span>
                   </Button>
                 </form>
-
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <Button
-                    color="input-like"
-                    isDisabled={isAuthPending}
-                    onPress={() => {
-                      void onSocialSignIn("google");
-                    }}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Icon icon="lucide.log-in" width={18} height={18} />
-                      <Trans>Continue with Google</Trans>
-                    </span>
-                  </Button>
-                  <Button
-                    color="input-like"
-                    isDisabled={isAuthPending}
-                    onPress={() => {
-                      void onSocialSignIn("apple");
-                    }}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Icon icon="lucide.apple" width={18} height={18} />
-                      <Trans>Continue with Apple</Trans>
-                    </span>
-                  </Button>
-                </div>
               </>
             )}
           </section>
