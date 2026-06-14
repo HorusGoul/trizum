@@ -18,6 +18,7 @@ import { Route as JoinRouteImport } from './routes/join'
 import { Route as ArchivedRouteImport } from './routes/archived'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsCloudSyncRouteImport } from './routes/settings_.cloud-sync'
 import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
 import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
@@ -74,6 +75,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsCloudSyncRoute = SettingsCloudSyncRouteImport.update({
+  id: '/settings_/cloud-sync',
+  path: '/settings/cloud-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartyPartyIdRoute = PartyPartyIdRouteImport.update({
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
+  '/settings/cloud-sync': typeof SettingsCloudSyncRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
+  '/settings/cloud-sync': typeof SettingsCloudSyncRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate_/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
+  '/settings_/cloud-sync': typeof SettingsCloudSyncRoute
   '/party_/$partyId/add': typeof PartyPartyIdAddRoute
   '/party_/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/about/third-party-licenses'
     | '/migrate/tricount'
     | '/party/$partyId'
+    | '/settings/cloud-sync'
     | '/party/$partyId/add'
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/about/third-party-licenses'
     | '/migrate/tricount'
     | '/party/$partyId'
+    | '/settings/cloud-sync'
     | '/party/$partyId/add'
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/about_/third-party-licenses'
     | '/migrate_/tricount'
     | '/party/$partyId'
+    | '/settings_/cloud-sync'
     | '/party_/$partyId/add'
     | '/party_/$partyId/pay'
     | '/party_/$partyId/settings'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
   MigrateTricountRoute: typeof MigrateTricountRoute
   PartyPartyIdRoute: typeof PartyPartyIdRoute
+  SettingsCloudSyncRoute: typeof SettingsCloudSyncRoute
   PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
   PartyPartyIdPayRoute: typeof PartyPartyIdPayRoute
   PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
@@ -369,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings_/cloud-sync': {
+      id: '/settings_/cloud-sync'
+      path: '/settings/cloud-sync'
+      fullPath: '/settings/cloud-sync'
+      preLoaderRoute: typeof SettingsCloudSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/party/$partyId': {
@@ -471,6 +491,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,
   MigrateTricountRoute: MigrateTricountRoute,
   PartyPartyIdRoute: PartyPartyIdRoute,
+  SettingsCloudSyncRoute: SettingsCloudSyncRoute,
   PartyPartyIdAddRoute: PartyPartyIdAddRoute,
   PartyPartyIdPayRoute: PartyPartyIdPayRoute,
   PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,

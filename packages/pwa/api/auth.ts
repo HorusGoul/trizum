@@ -1,6 +1,8 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { EmailMessage } from "cloudflare:email";
 import { importPKCS8, SignJWT } from "jose";
+import { getApiDb, schema } from "./db/client";
 import type { ApiEnv } from "./env";
 import { createBetterAuthLogger } from "./log";
 import { AUTH_PROVIDER_CONFIG } from "../src/lib/authConfig.js";
@@ -46,7 +48,11 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
 
   return betterAuth({
     appName: "trizum",
-    database: env.DB,
+    database: drizzleAdapter(getApiDb(env.DB), {
+      camelCase: true,
+      provider: "sqlite",
+      schema,
+    }),
     secret,
     baseURL: {
       allowedHosts: getAllowedHosts(env),

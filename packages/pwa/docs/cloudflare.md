@@ -1,60 +1,40 @@
 # Cloudflare Setup
 
-This document records the Cloudflare resources used by the PWA Worker.
-
-## Account
-
-- Account name: Horus Lugo
-- Account ID: `0386b05d89cdce85a2ff1f9439795ac2`
-- Worker name: `trizum`
-- Production domain: `https://trizum.app`
-
-The account ID is checked into `wrangler.jsonc` so local commands, preview
-deploys, and production deploys all target the same account.
+This document records how the PWA Worker Cloudflare resources are wired. The
+source of truth for account, route, binding, public OAuth identifier, and
+observability values is [`../wrangler.jsonc`](../wrangler.jsonc).
 
 ## D1
 
-The PWA Worker uses Cloudflare D1 for Better Auth data and cloud profile
-settings.
+The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party
+list document pointer.
 
-- Binding: `DB`
-- Database name: `trizum`
-- Database ID: `4eaaa4f5-e23a-4f06-9654-29b25aee9bb8`
-- Region: `WEUR`
-- Migrations directory: `packages/pwa/migrations`
-
-The database was created with:
+Create the database with Wrangler, then copy the generated database name and ID
+into `wrangler.jsonc`:
 
 ```bash
-CLOUDFLARE_ACCOUNT_ID=0386b05d89cdce85a2ff1f9439795ac2 vp exec wrangler d1 create trizum
+vp exec wrangler d1 create <database-name>
 ```
 
-Run local migration validation with:
+Validate migrations locally with the package check task:
 
 ```bash
-vp exec wrangler d1 migrations apply DB --local
+vp run check
 ```
 
-Apply migrations to the remote production database with:
+Apply migrations to the remote database with:
 
 ```bash
-CLOUDFLARE_ACCOUNT_ID=0386b05d89cdce85a2ff1f9439795ac2 vp exec wrangler d1 migrations apply DB --remote
+vp exec wrangler d1 migrations apply DB --remote
 ```
 
-CI validates migrations against local D1. Production releases apply remote D1
-migrations before deploying the Worker.
+CI validates migrations as part of `@trizum/pwa#check`. Production releases
+apply remote D1 migrations before deploying the Worker.
 
 ## Email
 
-The Worker uses the Cloudflare Send Email binding named `EMAIL`.
-
-Auth email defaults to:
-
-```text
-trizum <noreply@trizum.app>
-```
-
-Change `AUTH_EMAIL_FROM` in `wrangler.jsonc` if the sending address changes.
+The Worker uses the Cloudflare Send Email binding configured in
+`wrangler.jsonc`. Change `AUTH_EMAIL_FROM` there if the sending address changes.
 
 ## Secrets
 
@@ -68,16 +48,6 @@ vp exec wrangler secret put APPLE_KEY_ID
 vp exec wrangler secret put APPLE_PRIVATE_KEY
 ```
 
-Public OAuth identifiers live in
-`packages/pwa/src/lib/authConfig.ts`. This includes the Google web client ID,
-Google iOS client ID, both Android client IDs, Apple Services ID, and Apple app
-bundle identifier. The same public IDs are mirrored in `wrangler.jsonc` vars so
-the Worker deploy configuration is self-contained.
-
-If older `GOOGLE_CLIENT_ID` or `APPLE_CLIENT_ID` secrets exist in Cloudflare,
-they can be deleted. Those values are public OAuth identifiers now tracked in
-code and `wrangler.jsonc`, not secret runtime configuration.
-
 Google and Apple setup details live in [`oauth.md`](./oauth.md).
 
 GitHub Actions still need these repository or environment secrets:
@@ -88,6 +58,6 @@ GitHub Actions still need these repository or environment secrets:
 
 ## Observability
 
-Worker Logs and Traces are enabled in `wrangler.jsonc`. The Worker also routes
-request, auth, and cloud-sync logs through Logtape so local development and
-Cloudflare logs use the same logging categories.
+Worker Logs and Traces are configured in `wrangler.jsonc`. The Worker also
+routes request, auth, and cloud-sync logs through Logtape so local development
+and Cloudflare logs use the same logging categories.

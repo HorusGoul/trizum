@@ -210,19 +210,6 @@ export function usePartyList() {
     });
   }
 
-  function setCloudSyncState(values: {
-    cloudSettingsSyncedAt?: number;
-    cloudSyncEnabled: boolean;
-  }) {
-    partyListHandle.change((list) => {
-      list.cloudSyncEnabled = values.cloudSyncEnabled;
-
-      if (values.cloudSettingsSyncedAt) {
-        list.cloudSettingsSyncedAt = values.cloudSettingsSyncedAt;
-      }
-    });
-  }
-
   return {
     partyList,
     addPartyToList,
@@ -232,6 +219,5 @@ export function usePartyList() {
     setPartyPinned,
     setPartyArchived,
     setAutoOpenCalculator,
-    setCloudSyncState,
   };
 }

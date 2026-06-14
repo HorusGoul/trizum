@@ -88,7 +88,7 @@ export default defineConfig(({ mode }) => {
           output: ["dist/**"],
         },
         check: {
-          command: "vp check .",
+          command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
         deploy: {

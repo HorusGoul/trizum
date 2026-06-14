@@ -49,6 +49,7 @@
     "capacitor-plugin-safe-area": "5.0.0",
     "clsx": "2.1.1",
     "dinero.js": "1.9.1",
+    "drizzle-orm": "0.45.2",
     "emojibase": "17.0.0",
     "emojibase-data": "17.0.0",
     "emojibase-regex": "17.0.0",

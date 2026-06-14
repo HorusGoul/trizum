@@ -1,0 +1,646 @@
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
+import { toast } from "sonner";
+import { BackButton } from "#src/components/BackButton.js";
+import {
+  authClient,
+  fetchLinkedAuthAccounts,
+  getAuthSettingsCallbackURL,
+  linkSocialAuthAccount,
+  requestPasswordResetEmail,
+  signInWithSocialAuthAccount,
+  type LinkedAuthAccount,
+  type SocialAuthProvider,
+} from "#src/lib/auth-client.ts";
+import {
+  fetchCloudUserSettings,
+  getCloudUserSettingsInput,
+  saveCloudUserSettings,
+  type CloudUserSettings,
+} from "#src/lib/cloudSyncSettings.ts";
+import { Button } from "#src/ui/Button.tsx";
+import { Icon } from "#src/ui/Icon.tsx";
+import {
+  ModalSheet,
+  ModalSheetAction,
+  ModalSheetActions,
+  ModalSheetContent,
+  ModalSheetDescription,
+  ModalSheetHeader,
+  ModalSheetSection,
+  ModalSheetTitle,
+} from "#src/ui/ModalSheet.js";
+import { AppTextField } from "#src/ui/fields/TextField.js";
+import { usePartyList } from "#src/hooks/usePartyList.js";
+import type { PartyList } from "#src/models/partyList.js";
+
+export const Route = createFileRoute("/settings_/cloud-sync")({
+  component: CloudSyncSettings,
+});
+
+function CloudSyncSettings() {
+  const { partyList } = usePartyList();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const session = authClient.useSession();
+  const user = session.data?.user;
+  const userId = user?.id;
+  const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
+  const [authName, setAuthName] = useState(partyList.username ?? "");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
+  const [passwordResetMessage, setPasswordResetMessage] = useState<string | null>(null);
+  const [linkedAccounts, setLinkedAccounts] = useState<LinkedAuthAccount[]>([]);
+  const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
+  const [isAuthPending, setIsAuthPending] = useState(false);
+  const [isCloudPending, setIsCloudPending] = useState(false);
+  const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
+  const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
+  const linkedProviderLabels = linkedAccounts
+    .map((account) => getProviderLabel(account.providerId))
+    .join(", ");
+  const hasPasswordAccount = linkedProviderIds.has("credential");
+  const cloudUpdatedAt = cloudSettings ? new Date(cloudSettings.updatedAt).toLocaleString() : null;
+  const isCurrentDocumentSynced = cloudSettings?.partyListDocumentId === partyList.id;
+
+  useEffect(() => {
+    if (!userId) {
+      setLinkedAccounts([]);
+      setCloudSettings(null);
+      return;
+    }
+
+    let isCancelled = false;
+
+    void loadAccountState().catch(() => {
+      if (!isCancelled) {
+        toast.error(t`Could not load cloud sync state`);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+
+    async function loadAccountState() {
+      setIsCloudPending(true);
+
+      try {
+        const [accounts, { settings }] = await Promise.all([
+          fetchLinkedAuthAccounts(),
+          fetchCloudUserSettings(),
+        ]);
+
+        if (!isCancelled) {
+          setLinkedAccounts(accounts);
+          setCloudSettings(settings);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsCloudPending(false);
+        }
+      }
+    }
+  }, [userId]);
+
+  async function onAuthSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthError(null);
+    setPasswordResetMessage(null);
+    setIsAuthPending(true);
+
+    try {
+      const result =
+        authMode === "sign-in"
+          ? await authClient.signIn.email({
+              email: authEmail,
+              password: authPassword,
+              rememberMe: true,
+            })
+          : await authClient.signUp.email({
+              callbackURL: getAuthSettingsCallbackURL(),
+              email: authEmail,
+              name: authName || partyList.username || authEmail,
+              password: authPassword,
+            });
+
+      if (result.error) {
+        setAuthError(result.error.message ?? t`Authentication failed`);
+        return;
+      }
+
+      setAuthPassword("");
+      await session.refetch();
+      toast.success(authMode === "sign-in" ? t`Signed in` : t`Account created`);
+    } catch (error) {
+      setAuthError(
+        error instanceof Error && error.message.endsWith("sign-in is not configured.")
+          ? t`Sign-in method is not configured`
+          : error instanceof Error
+            ? error.message
+            : t`Authentication failed`,
+      );
+    } finally {
+      setIsAuthPending(false);
+    }
+  }
+
+  async function onSocialSignIn(provider: SocialAuthProvider) {
+    setAuthError(null);
+    setIsAuthPending(true);
+
+    try {
+      const result = await signInWithSocialAuthAccount(provider);
+
+      if (result?.error) {
+        setAuthError(result.error.message ?? t`Authentication failed`);
+        return;
+      }
+
+      await session.refetch();
+      toast.success(t`Signed in`);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : t`Authentication failed`);
+    } finally {
+      setIsAuthPending(false);
+    }
+  }
+
+  async function onLinkSocialAccount(provider: SocialAuthProvider) {
+    setAuthError(null);
+    setIsAuthPending(true);
+
+    try {
+      const result = await linkSocialAuthAccount(provider);
+
+      if (result.url) {
+        window.location.href = result.url;
+        return;
+      }
+
+      setLinkedAccounts(await fetchLinkedAuthAccounts());
+      toast.success(t`Sign-in method connected`);
+    } catch {
+      toast.error(t`Could not connect sign-in method`);
+    } finally {
+      setIsAuthPending(false);
+    }
+  }
+
+  async function onRequestPasswordReset(email: string) {
+    setAuthError(null);
+    setPasswordResetMessage(null);
+    setIsAuthPending(true);
+
+    try {
+      await requestPasswordResetEmail(email);
+      setPasswordResetMessage(t`Check your email for the password link`);
+      toast.success(t`Password email sent`);
+    } catch {
+      setAuthError(t`Could not send password email`);
+    } finally {
+      setIsAuthPending(false);
+    }
+  }
+
+  async function onPasswordResetSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await onRequestPasswordReset(authEmail);
+  }
+
+  async function onSignOut() {
+    setIsAuthPending(true);
+
+    try {
+      await authClient.signOut();
+      setCloudSettings(null);
+      await session.refetch();
+      toast.success(t`Signed out`);
+    } catch {
+      toast.error(t`Could not sign out`);
+    } finally {
+      setIsAuthPending(false);
+    }
+  }
+
+  async function onSaveCloudSettings() {
+    if (cloudSettings) {
+      toast.message(
+        isCurrentDocumentSynced
+          ? t`This device is already using cloud sync`
+          : t`Cloud sync is already set up for this account`,
+      );
+      return;
+    }
+
+    setIsCloudPending(true);
+
+    try {
+      const { settings } = await saveCloudUserSettings(getCloudUserSettingsInput(partyList));
+      setCloudSettings(settings);
+      toast.success(t`Cloud sync updated`);
+    } catch {
+      toast.error(t`Could not update cloud sync`);
+    } finally {
+      setIsCloudPending(false);
+    }
+  }
+
+  function activateCloudSyncOnDevice() {
+    if (!cloudSettings) {
+      toast.message(t`Cloud sync is not set up yet`);
+      return;
+    }
+
+    if (!isValidDocumentId(cloudSettings.partyListDocumentId)) {
+      toast.error(t`Cloud sync data is invalid`);
+      return;
+    }
+
+    if (cloudSettings.partyListDocumentId === partyList.id) {
+      toast.message(t`This device is already using cloud sync`);
+      return;
+    }
+
+    localStorage.setItem("partyListId", cloudSettings.partyListDocumentId);
+    setIsCloudSyncSwitchOpen(false);
+    toast.success(t`Cloud sync enabled on this device`);
+    void navigate({ to: "/", replace: true });
+  }
+
+  function onUseCloudSync() {
+    if (!cloudSettings) {
+      toast.message(t`Cloud sync is not set up yet`);
+      return;
+    }
+
+    if (!isValidDocumentId(cloudSettings.partyListDocumentId)) {
+      toast.error(t`Cloud sync data is invalid`);
+      return;
+    }
+
+    if (cloudSettings.partyListDocumentId === partyList.id) {
+      toast.message(t`This device is already using cloud sync`);
+      return;
+    }
+
+    if (hasLocalPartyListData(partyList)) {
+      setIsCloudSyncSwitchOpen(true);
+      return;
+    }
+
+    activateCloudSyncOnDevice();
+  }
+
+  return (
+    <div className="flex min-h-full flex-col">
+      <div className="container flex h-16 items-center px-2 mt-safe">
+        <BackButton fallbackOptions={{ to: "/settings" }} />
+
+        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
+          <Trans>Cloud sync</Trans>
+        </h1>
+      </div>
+
+      <div className="container mt-4 flex flex-col gap-6 px-4 pb-8 pb-safe">
+        {user ? (
+          <>
+            <section className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1 text-sm">
+                <span className="font-medium">{user.name || user.email}</span>
+                <span className="text-accent-700 dark:text-accent-50">{user.email}</span>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <h2 className="text-base font-medium">
+                  <Trans>Sign-in methods</Trans>
+                </h2>
+
+                {linkedAccounts.length > 0 ? (
+                  <p className="text-sm text-accent-700 dark:text-accent-50">
+                    <Trans>Connected: {linkedProviderLabels}</Trans>
+                  </p>
+                ) : null}
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Button
+                    color="input-like"
+                    isDisabled={isAuthPending || linkedProviderIds.has("google")}
+                    onPress={() => {
+                      void onLinkSocialAccount("google");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.log-in" width={18} height={18} />
+                      {linkedProviderIds.has("google") ? (
+                        <Trans>Google connected</Trans>
+                      ) : (
+                        <Trans>Connect Google</Trans>
+                      )}
+                    </span>
+                  </Button>
+                  <Button
+                    color="input-like"
+                    isDisabled={isAuthPending || linkedProviderIds.has("apple")}
+                    onPress={() => {
+                      void onLinkSocialAccount("apple");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.apple" width={18} height={18} />
+                      {linkedProviderIds.has("apple") ? (
+                        <Trans>Apple connected</Trans>
+                      ) : (
+                        <Trans>Connect Apple</Trans>
+                      )}
+                    </span>
+                  </Button>
+                </div>
+
+                <Button
+                  color="transparent"
+                  isDisabled={isAuthPending}
+                  onPress={() => {
+                    void onRequestPasswordReset(user.email);
+                  }}
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon icon="lucide.mail" width={18} height={18} />
+                    {hasPasswordAccount ? (
+                      <Trans>Email password reset link</Trans>
+                    ) : (
+                      <Trans>Email password setup link</Trans>
+                    )}
+                  </span>
+                </Button>
+
+                {passwordResetMessage ? (
+                  <p className="text-sm text-accent-700 dark:text-accent-50">
+                    {passwordResetMessage}
+                  </p>
+                ) : null}
+              </div>
+            </section>
+
+            <section className="flex flex-col gap-4 border-t border-accent-200 pt-6 dark:border-accent-700">
+              <h2 className="text-base font-medium">
+                <Trans>Cloud sync</Trans>
+              </h2>
+
+              <div className="flex flex-col gap-2 text-sm text-accent-700 dark:text-accent-50">
+                {!cloudSettings ? (
+                  <p>
+                    <Trans>Cloud sync is not set up yet.</Trans>
+                  </p>
+                ) : isCurrentDocumentSynced ? (
+                  <p>
+                    <Trans>This device is using cloud sync.</Trans>
+                  </p>
+                ) : (
+                  <>
+                    <p>
+                      <Trans>Cloud sync is already set up for this account.</Trans>
+                    </p>
+                    <p>
+                      <Trans>Use it on this device to continue with your cloud data.</Trans>
+                    </p>
+                  </>
+                )}
+                {cloudUpdatedAt ? (
+                  <p>
+                    <Trans>Last updated {cloudUpdatedAt}</Trans>
+                  </p>
+                ) : null}
+              </div>
+
+              {!cloudSettings ? (
+                <Button color="accent" isDisabled={isCloudPending} onPress={onSaveCloudSettings}>
+                  <span className="flex items-center gap-2">
+                    <Icon icon="lucide.cloud-upload" width={18} height={18} />
+                    <Trans>Set up cloud sync</Trans>
+                  </span>
+                </Button>
+              ) : !isCurrentDocumentSynced ? (
+                <Button color="accent" isDisabled={isCloudPending} onPress={onUseCloudSync}>
+                  <span className="flex items-center gap-2">
+                    <Icon icon="lucide.cloud-download" width={18} height={18} />
+                    <Trans>Use cloud sync on this device</Trans>
+                  </span>
+                </Button>
+              ) : null}
+
+              <Button color="transparent" isDisabled={isAuthPending} onPress={onSignOut}>
+                <span className="flex items-center gap-2">
+                  <Icon icon="lucide.log-out" width={18} height={18} />
+                  <Trans>Sign out</Trans>
+                </span>
+              </Button>
+            </section>
+          </>
+        ) : (
+          <section className="flex flex-col gap-4">
+            {isPasswordResetMode ? (
+              <form className="flex flex-col gap-4" onSubmit={onPasswordResetSubmit}>
+                <AppTextField
+                  isDisabled={isAuthPending}
+                  label={t`Email`}
+                  onChange={setAuthEmail}
+                  type="email"
+                  value={authEmail}
+                />
+                {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
+                {passwordResetMessage ? (
+                  <p className="text-sm text-accent-700 dark:text-accent-50">
+                    {passwordResetMessage}
+                  </p>
+                ) : null}
+                <Button color="accent" isDisabled={isAuthPending} type="submit">
+                  <span className="flex items-center gap-2">
+                    <Icon icon="lucide.mail" width={18} height={18} />
+                    <Trans>Send password link</Trans>
+                  </span>
+                </Button>
+                <Button
+                  color="transparent"
+                  isDisabled={isAuthPending}
+                  onPress={() => {
+                    setIsPasswordResetMode(false);
+                    setAuthError(null);
+                    setPasswordResetMessage(null);
+                  }}
+                >
+                  <Trans>Back to sign in</Trans>
+                </Button>
+              </form>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    color={authMode === "sign-in" ? "accent" : "input-like"}
+                    onPress={() => setAuthMode("sign-in")}
+                  >
+                    <Trans>Sign in</Trans>
+                  </Button>
+                  <Button
+                    color={authMode === "sign-up" ? "accent" : "input-like"}
+                    onPress={() => setAuthMode("sign-up")}
+                  >
+                    <Trans>Create account</Trans>
+                  </Button>
+                </div>
+
+                <form className="flex flex-col gap-4" onSubmit={onAuthSubmit}>
+                  {authMode === "sign-up" ? (
+                    <AppTextField
+                      isDisabled={isAuthPending}
+                      label={t`Name`}
+                      maxLength={50}
+                      minLength={1}
+                      onChange={setAuthName}
+                      value={authName}
+                    />
+                  ) : null}
+                  <AppTextField
+                    isDisabled={isAuthPending}
+                    label={t`Email`}
+                    onChange={setAuthEmail}
+                    type="email"
+                    value={authEmail}
+                  />
+                  <AppTextField
+                    isDisabled={isAuthPending}
+                    label={t`Password`}
+                    minLength={8}
+                    onChange={setAuthPassword}
+                    type="password"
+                    value={authPassword}
+                  />
+                  {authMode === "sign-in" ? (
+                    <Button
+                      color="transparent"
+                      isDisabled={isAuthPending}
+                      onPress={() => {
+                        setIsPasswordResetMode(true);
+                        setAuthError(null);
+                        setPasswordResetMessage(null);
+                      }}
+                    >
+                      <Trans>Forgot password?</Trans>
+                    </Button>
+                  ) : null}
+                  {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
+                  <Button color="accent" isDisabled={isAuthPending} type="submit">
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.log-in" width={18} height={18} />
+                      {authMode === "sign-in" ? (
+                        <Trans>Sign in</Trans>
+                      ) : (
+                        <Trans>Create account</Trans>
+                      )}
+                    </span>
+                  </Button>
+                </form>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Button
+                    color="input-like"
+                    isDisabled={isAuthPending}
+                    onPress={() => {
+                      void onSocialSignIn("google");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.log-in" width={18} height={18} />
+                      <Trans>Continue with Google</Trans>
+                    </span>
+                  </Button>
+                  <Button
+                    color="input-like"
+                    isDisabled={isAuthPending}
+                    onPress={() => {
+                      void onSocialSignIn("apple");
+                    }}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.apple" width={18} height={18} />
+                      <Trans>Continue with Apple</Trans>
+                    </span>
+                  </Button>
+                </div>
+              </>
+            )}
+          </section>
+        )}
+      </div>
+
+      <ModalSheet isOpen={isCloudSyncSwitchOpen} onOpenChange={setIsCloudSyncSwitchOpen}>
+        <ModalSheetHeader>
+          <ModalSheetSection className="flex flex-col gap-2">
+            <ModalSheetTitle>
+              <Trans>Use cloud sync on this device?</Trans>
+            </ModalSheetTitle>
+            <ModalSheetDescription>
+              <Trans>
+                This device already has local trizum data. Using cloud sync here will switch this
+                device to your cloud data, and the local list on this device will stop being used.
+              </Trans>
+            </ModalSheetDescription>
+          </ModalSheetSection>
+        </ModalSheetHeader>
+        <ModalSheetContent>
+          <ModalSheetActions>
+            <ModalSheetAction icon="lucide.cloud-download" onPress={activateCloudSyncOnDevice}>
+              <Trans>Use cloud data</Trans>
+            </ModalSheetAction>
+            <ModalSheetAction
+              icon="lucide.x"
+              onPress={() => {
+                setIsCloudSyncSwitchOpen(false);
+              }}
+            >
+              <Trans>Keep local data</Trans>
+            </ModalSheetAction>
+          </ModalSheetActions>
+        </ModalSheetContent>
+      </ModalSheet>
+    </div>
+  );
+}
+
+function hasLocalPartyListData(partyList: PartyList) {
+  return (
+    hasRecordData(partyList.parties) ||
+    hasRecordData(partyList.pinnedParties) ||
+    hasRecordData(partyList.archivedParties) ||
+    hasRecordData(partyList.lastUsedAt) ||
+    Boolean(partyList.lastOpenedPartyId) ||
+    Boolean(partyList.username.trim()) ||
+    Boolean(partyList.phone.trim()) ||
+    Boolean(partyList.avatarId) ||
+    Boolean(partyList.locale) ||
+    partyList.openLastPartyOnLaunch === true ||
+    partyList.autoOpenCalculator === true ||
+    partyList.hue !== undefined
+  );
+}
+
+function hasRecordData(record: Record<string, unknown> | undefined) {
+  return Object.values(record ?? {}).some(Boolean);
+}
+
+function getProviderLabel(providerId: string) {
+  switch (providerId) {
+    case "apple":
+      return t`Apple`;
+    case "credential":
+      return t`Password`;
+    case "google":
+      return t`Google`;
+    default:
+      return providerId;
+  }
+}

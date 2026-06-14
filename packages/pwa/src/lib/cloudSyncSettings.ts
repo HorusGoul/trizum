@@ -1,34 +1,19 @@
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { PartyList } from "#src/models/partyList.js";
 import { getAuthBaseURL } from "./auth-client";
-import { defaultThemeHue } from "#src/ui/theme.ts";
 
 export interface CloudUserSettings {
-  autoOpenCalculator: boolean;
-  hue: number;
-  locale: "en" | "es" | null;
-  openLastPartyOnLaunch: boolean;
-  phone: string;
+  partyListDocumentId: DocumentId;
   updatedAt: number;
-  username: string;
 }
 
 export interface CloudUserSettingsInput {
-  autoOpenCalculator: boolean;
-  hue: number;
-  locale: "en" | "es" | null;
-  openLastPartyOnLaunch: boolean;
-  phone: string;
-  username: string;
+  partyListDocumentId: DocumentId;
 }
 
 export function getCloudUserSettingsInput(partyList: PartyList): CloudUserSettingsInput {
   return {
-    autoOpenCalculator: partyList.autoOpenCalculator ?? false,
-    hue: partyList.hue ?? defaultThemeHue,
-    locale: partyList.locale ?? null,
-    openLastPartyOnLaunch: partyList.openLastPartyOnLaunch ?? false,
-    phone: partyList.phone ?? "",
-    username: partyList.username ?? "",
+    partyListDocumentId: partyList.id,
   };
 }
 

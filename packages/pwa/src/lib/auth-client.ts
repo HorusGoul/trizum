@@ -49,10 +49,10 @@ export function getAuthBaseURL() {
 
 export function getAuthSettingsCallbackURL() {
   if (Capacitor.isNativePlatform()) {
-    return new URL("/settings", getAuthBaseURL()).toString();
+    return new URL("/settings/cloud-sync", getAuthBaseURL()).toString();
   }
 
-  return "/settings";
+  return "/settings/cloud-sync";
 }
 
 export function getAuthResetPasswordCallbackURL() {
@@ -163,6 +163,8 @@ async function getNativeSocialIdToken(provider: SocialAuthProvider): Promise<Nat
 async function getNativeGoogleIdToken(): Promise<NativeSocialIdToken> {
   const { GoogleSignIn } = await import("@capawesome/capacitor-google-sign-in");
 
+  // The Capawesome plugin requires the web client ID on Android and iOS.
+  // Platform-specific IDs are accepted by the Worker when verifying ID tokens.
   await GoogleSignIn.initialize({
     clientId: AUTH_PROVIDER_CONFIG.google.webClientId,
   });

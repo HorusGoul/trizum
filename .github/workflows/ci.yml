@@ -62,21 +62,6 @@ jobs:
             packages/pwa/test-results
           if-no-files-found: ignore
 
-  pwa-d1-migrations:
-    name: PWA D1 Migrations
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-      - uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version-file: ".node-version"
-          cache: true
-
-      - name: Validate local D1 migrations
-        working-directory: packages/pwa
-        run: vp exec wrangler d1 migrations apply DB --local
-
   autofix:
     name: Autofix & Extract Messages
     runs-on: ubuntu-latest

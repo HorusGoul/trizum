@@ -1,29 +1,16 @@
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { createAuth } from "../auth";
+import { getApiDb, schema } from "../db/client";
 import type { ApiHonoEnv } from "../env";
 import { getLogger } from "../../src/lib/log.js";
 
 export interface CloudUserSettings {
-  autoOpenCalculator: boolean;
-  hue: number;
-  locale: "en" | "es" | null;
-  openLastPartyOnLaunch: boolean;
-  phone: string;
+  partyListDocumentId: string;
   updatedAt: number;
-  username: string;
 }
 
-interface CloudUserSettingsRow {
-  autoOpenCalculator: number;
-  hue: number;
-  locale: string | null;
-  openLastPartyOnLaunch: number;
-  phone: string;
-  updatedAt: number;
-  username: string;
-}
-
-const supportedLocales = new Set(["en", "es"]);
 const logger = getLogger("api", "cloudSync");
 
 export const cloudSyncRoute = new Hono<ApiHonoEnv>();
@@ -46,16 +33,18 @@ cloudSyncRoute.use("*", async (c, next) => {
 
 cloudSyncRoute.get("/settings", async (c) => {
   const user = c.get("user");
-  const row = await c.env.DB.prepare(
-    `select username, phone, locale, openLastPartyOnLaunch, autoOpenCalculator, hue, updatedAt
-      from cloud_user_settings
-      where userId = ?`,
-  )
-    .bind(user.id)
-    .first<CloudUserSettingsRow>();
+  const db = getApiDb(c.env.DB);
+  const [settings] = await db
+    .select({
+      partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
+      updatedAt: schema.cloudUserSettings.updatedAt,
+    })
+    .from(schema.cloudUserSettings)
+    .where(eq(schema.cloudUserSettings.userId, user.id))
+    .limit(1);
 
   return c.json({
-    settings: row ? serializeCloudUserSettings(row) : null,
+    settings: settings ?? null,
   });
 });
 
@@ -72,59 +61,75 @@ cloudSyncRoute.put("/settings", async (c) => {
     ...parsedSettings.value,
     updatedAt: Date.now(),
   };
+  const db = getApiDb(c.env.DB);
+  const [existingSettings] = await db
+    .select({
+      partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
+      updatedAt: schema.cloudUserSettings.updatedAt,
+    })
+    .from(schema.cloudUserSettings)
+    .where(eq(schema.cloudUserSettings.userId, user.id))
+    .limit(1);
 
-  await c.env.DB.prepare(
-    `insert into cloud_user_settings (
-        userId,
-        username,
-        phone,
-        locale,
-        openLastPartyOnLaunch,
-        autoOpenCalculator,
-        hue,
-        updatedAt
-      ) values (?, ?, ?, ?, ?, ?, ?, ?)
-      on conflict(userId) do update set
-        username = excluded.username,
-        phone = excluded.phone,
-        locale = excluded.locale,
-        openLastPartyOnLaunch = excluded.openLastPartyOnLaunch,
-        autoOpenCalculator = excluded.autoOpenCalculator,
-        hue = excluded.hue,
-        updatedAt = excluded.updatedAt`,
-  )
-    .bind(
-      user.id,
-      settings.username,
-      settings.phone,
-      settings.locale,
-      settings.openLastPartyOnLaunch ? 1 : 0,
-      settings.autoOpenCalculator ? 1 : 0,
-      settings.hue,
-      settings.updatedAt,
-    )
-    .run();
+  if (existingSettings) {
+    if (existingSettings.partyListDocumentId !== settings.partyListDocumentId) {
+      logger.warning("Rejected cloud user settings document change", {
+        userId: user.id,
+      });
+
+      return c.json({ error: "Cloud sync is already set up for this account." }, 409);
+    }
+
+    return c.json({
+      settings: existingSettings,
+    });
+  }
+
+  await db
+    .insert(schema.cloudUserSettings)
+    .values({
+      partyListDocumentId: settings.partyListDocumentId,
+      updatedAt: settings.updatedAt,
+      userId: user.id,
+    })
+    .onConflictDoNothing({
+      target: schema.cloudUserSettings.userId,
+    });
+
+  const [storedSettings] = await db
+    .select({
+      partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
+      updatedAt: schema.cloudUserSettings.updatedAt,
+    })
+    .from(schema.cloudUserSettings)
+    .where(eq(schema.cloudUserSettings.userId, user.id))
+    .limit(1);
+
+  if (!storedSettings) {
+    logger.error("Could not read cloud user settings after insert", {
+      userId: user.id,
+    });
+
+    return c.json({ error: "Could not save cloud sync settings." }, 500);
+  }
+
+  if (storedSettings.partyListDocumentId !== settings.partyListDocumentId) {
+    logger.warning("Rejected cloud user settings document change", {
+      userId: user.id,
+    });
+
+    return c.json({ error: "Cloud sync is already set up for this account." }, 409);
+  }
 
   logger.info("Saved cloud user settings", {
+    partyListDocumentId: storedSettings.partyListDocumentId,
     userId: user.id,
   });
 
   return c.json({
-    settings,
+    settings: storedSettings,
   });
 });
-
-function serializeCloudUserSettings(row: CloudUserSettingsRow): CloudUserSettings {
-  return {
-    autoOpenCalculator: row.autoOpenCalculator === 1,
-    hue: row.hue,
-    locale: row.locale === "en" || row.locale === "es" ? row.locale : null,
-    openLastPartyOnLaunch: row.openLastPartyOnLaunch === 1,
-    phone: row.phone,
-    updatedAt: row.updatedAt,
-    username: row.username,
-  };
-}
 
 function parseCloudUserSettingsInput(value: unknown):
   | {
@@ -141,48 +146,17 @@ function parseCloudUserSettingsInput(value: unknown):
 
   const candidate = value as Record<string, unknown>;
 
-  if (typeof candidate.username !== "string") {
-    return { error: "Username must be a string.", ok: false };
-  }
-
-  if (typeof candidate.phone !== "string") {
-    return { error: "Phone must be a string.", ok: false };
-  }
-
   if (
-    candidate.locale !== null &&
-    candidate.locale !== undefined &&
-    (typeof candidate.locale !== "string" || !supportedLocales.has(candidate.locale))
+    typeof candidate.partyListDocumentId !== "string" ||
+    !isValidDocumentId(candidate.partyListDocumentId)
   ) {
-    return { error: "Locale is not supported.", ok: false };
-  }
-
-  if (typeof candidate.openLastPartyOnLaunch !== "boolean") {
-    return { error: "Open last party on launch must be a boolean.", ok: false };
-  }
-
-  if (typeof candidate.autoOpenCalculator !== "boolean") {
-    return { error: "Auto-open calculator must be a boolean.", ok: false };
-  }
-
-  if (
-    typeof candidate.hue !== "number" ||
-    !Number.isFinite(candidate.hue) ||
-    candidate.hue < 0 ||
-    candidate.hue > 360
-  ) {
-    return { error: "Accent color hue is invalid.", ok: false };
+    return { error: "Party list document ID is invalid.", ok: false };
   }
 
   return {
     ok: true,
     value: {
-      autoOpenCalculator: candidate.autoOpenCalculator,
-      hue: candidate.hue,
-      locale: candidate.locale ? (candidate.locale as "en" | "es") : null,
-      openLastPartyOnLaunch: candidate.openLastPartyOnLaunch,
-      phone: candidate.phone,
-      username: candidate.username,
+      partyListDocumentId: candidate.partyListDocumentId,
     },
   };
 }
