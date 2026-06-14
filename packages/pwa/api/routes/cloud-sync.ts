@@ -77,7 +77,7 @@ cloudSyncRoute.put("/settings", async (c) => {
         userId: user.id,
       });
 
-      return c.json({ error: "Cloud sync is already set up for this account." }, 409);
+      return c.json({ error: "trizum cloud is already set up for this account." }, 409);
     }
 
     return c.json({
@@ -110,7 +110,7 @@ cloudSyncRoute.put("/settings", async (c) => {
       userId: user.id,
     });
 
-    return c.json({ error: "Could not save cloud sync settings." }, 500);
+    return c.json({ error: "Could not save trizum cloud settings." }, 500);
   }
 
   if (storedSettings.partyListDocumentId !== settings.partyListDocumentId) {
@@ -118,7 +118,7 @@ cloudSyncRoute.put("/settings", async (c) => {
       userId: user.id,
     });
 
-    return c.json({ error: "Cloud sync is already set up for this account." }, 409);
+    return c.json({ error: "trizum cloud is already set up for this account." }, 409);
   }
 
   logger.info("Saved cloud user settings", {

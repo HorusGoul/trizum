@@ -133,7 +133,7 @@ function PrivacyPolicy() {
 
           <div className="flex flex-col gap-3">
             <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
-              3.2 Cloud Synchronization
+              3.2 trizum cloud
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
               To enable synchronization across your devices and collaboration with others, your data

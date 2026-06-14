@@ -4,7 +4,7 @@ import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import {
@@ -19,9 +19,11 @@ import {
   type SocialAuthProvider,
 } from "#src/lib/auth-client.ts";
 import {
+  clearCachedCloudUserSettings,
   fetchCloudUserSettings,
   getCloudUserSettingsInput,
   saveCloudUserSettings,
+  writeCachedCloudUserSettings,
   type CloudUserSettings,
 } from "#src/lib/cloudSyncSettings.ts";
 import { Button } from "#src/ui/Button.tsx";
@@ -53,6 +55,8 @@ export const Route = createFileRoute("/settings_/cloud-sync")({
 });
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
+const SIGN_IN_SUCCESS_EXIT_ANIMATION_MS = 180;
+const DIALOG_EXIT_ANIMATION_MS = 180;
 const PASSWORD_SIGN_IN_ENABLE_DELAY_MS = 250;
 const DELETE_ACCOUNT_CONFIRMATION_TEXT = "delete account";
 const AUTH_SECONDARY_BUTTON_CLASS_NAME =
@@ -92,6 +96,7 @@ function CloudSyncSettings() {
   const [linkedAccounts, setLinkedAccounts] = useState<LinkedAuthAccount[]>([]);
   const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
   const [authPendingAction, setAuthPendingAction] = useState<AuthPendingAction | null>(null);
+  const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(true);
   const [isCloudPending, setIsCloudPending] = useState(false);
   const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
@@ -117,6 +122,12 @@ function CloudSyncSettings() {
   }, [isSignInSuccessVisible]);
 
   useEffect(() => {
+    if (!user) {
+      setIsSignInDialogOpen(true);
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (!userId) {
       setLinkedAccounts([]);
       setCloudSettings(null);
@@ -125,10 +136,11 @@ function CloudSyncSettings() {
     }
 
     let isCancelled = false;
+    const currentUserId = userId;
 
     void loadAccountState().catch(() => {
       if (!isCancelled) {
-        toast.error(t`Could not load cloud sync state`);
+        toast.error(t`Could not load trizum cloud state`);
       }
     });
 
@@ -164,17 +176,18 @@ function CloudSyncSettings() {
           }
 
           activeSettings = savedSettings;
-          toast.success(t`Cloud sync started`);
+          toast.success(t`trizum cloud started`);
         }
 
         setCloudSettings(activeSettings);
+        writeCachedCloudUserSettings(currentUserId, activeSettings);
 
         if (!activeSettings) {
           return;
         }
 
         if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
-          toast.error(t`Cloud sync data is invalid`);
+          toast.error(t`trizum cloud data is invalid`);
           return;
         }
 
@@ -190,12 +203,13 @@ function CloudSyncSettings() {
         localStorage.setItem("partyListId", activeSettings.partyListDocumentId);
         setCloudSettings(activeSettings);
         setIsCloudSyncSwitchOpen(false);
-        toast.success(t`Cloud sync enabled on this device`);
+        writeCachedCloudUserSettings(currentUserId, activeSettings);
+        toast.success(t`trizum cloud enabled on this device`);
 
         if (isSignInSuccessVisibleRef.current) {
           window.setTimeout(() => {
             void navigate({ to: "/", replace: true });
-          }, SIGN_IN_SUCCESS_ANIMATION_MS);
+          }, SIGN_IN_SUCCESS_ANIMATION_MS + SIGN_IN_SUCCESS_EXIT_ANIMATION_MS);
           return;
         }
 
@@ -457,29 +471,32 @@ function CloudSyncSettings() {
 
   function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
     if (!settings) {
-      toast.message(t`Cloud sync is not set up yet`);
+      toast.message(t`trizum cloud is not set up yet`);
       return;
     }
 
     if (!isValidDocumentId(settings.partyListDocumentId)) {
-      toast.error(t`Cloud sync data is invalid`);
+      toast.error(t`trizum cloud data is invalid`);
       return;
     }
 
     if (settings.partyListDocumentId === partyList.id) {
-      toast.message(t`This device is already using cloud sync`);
+      toast.message(t`This device is already using trizum cloud`);
       return;
     }
 
     localStorage.setItem("partyListId", settings.partyListDocumentId);
     setCloudSettings(settings);
     setIsCloudSyncSwitchOpen(false);
-    toast.success(t`Cloud sync enabled on this device`);
+    if (userId) {
+      writeCachedCloudUserSettings(userId, settings);
+    }
+    toast.success(t`trizum cloud enabled on this device`);
 
     if (isSignInSuccessVisible) {
       window.setTimeout(() => {
         void navigate({ to: "/", replace: true });
-      }, SIGN_IN_SUCCESS_ANIMATION_MS);
+      }, SIGN_IN_SUCCESS_ANIMATION_MS + SIGN_IN_SUCCESS_EXIT_ANIMATION_MS);
       return;
     }
 
@@ -504,6 +521,9 @@ function CloudSyncSettings() {
 
     try {
       await deleteAuthUserAccount();
+      if (userId) {
+        clearCachedCloudUserSettings(userId);
+      }
       setCloudSettings(null);
       setLinkedAccounts([]);
       setIsCloudSyncSwitchOpen(false);
@@ -524,7 +544,10 @@ function CloudSyncSettings() {
   }
 
   function closeSignInDialog() {
-    void navigate({ to: "/settings", replace: true });
+    setIsSignInDialogOpen(false);
+    window.setTimeout(() => {
+      void navigate({ to: "/settings", replace: true });
+    }, DIALOG_EXIT_ANIMATION_MS);
   }
 
   if (!user) {
@@ -535,7 +558,7 @@ function CloudSyncSettings() {
         </div>
 
         <CloudSyncSignInDialog
-          isOpen
+          isOpen={isSignInDialogOpen}
           onOpenChange={closeSignInDialog}
           showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
         >
@@ -677,7 +700,7 @@ function CloudSyncSettings() {
                   >
                     <span className="flex items-center gap-2">
                       <Icon icon="lucide.mail" width={18} height={18} />
-                      <Trans>Use magic link</Trans>
+                      <Trans>Sign in with magic link</Trans>
                     </span>
                   </Button>
                   <Button
@@ -716,8 +739,7 @@ function CloudSyncSettings() {
                     </span>
                   </Button>
                   <Button
-                    className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
-                    color="transparent"
+                    color="input-like"
                     isDisabled={isAuthPending}
                     onPress={() => {
                       setIsPasswordLoginMode(true);
@@ -726,7 +748,10 @@ function CloudSyncSettings() {
                     }}
                     type="button"
                   >
-                    <Trans>Use password</Trans>
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.key-round" width={18} height={18} />
+                      <Trans>Sign in with password</Trans>
+                    </span>
                   </Button>
                 </form>
               )}
@@ -743,17 +768,11 @@ function CloudSyncSettings() {
         <BackButton fallbackOptions={{ to: "/settings" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-          <Trans>Cloud sync</Trans>
+          <Trans>trizum cloud</Trans>
         </h1>
       </div>
 
       <div className="container mt-4 flex flex-col gap-5 px-4 pb-8 pb-safe">
-        {isSignInSuccessVisible ? (
-          <div className="rounded-lg border border-success-200 bg-success-50 dark:border-success-900 dark:bg-success-950/40">
-            <SignInSuccessAnimation />
-          </div>
-        ) : null}
-
         <section className="flex flex-col divide-y divide-accent-200 border-y border-accent-200 dark:divide-accent-800 dark:border-accent-800">
           <CloudSettingsItem icon="lucide.mail" title={t`Email`} description={user.email} />
           <CloudSettingsItem
@@ -800,7 +819,7 @@ function CloudSyncSettings() {
           <div className="flex items-center gap-3">
             <Icon icon={isCurrentDocumentSynced ? "lucide.cloud-check" : "lucide.cloud-sync"} />
             <span className="font-medium text-accent-950 dark:text-accent-50">
-              <Trans>Cloud sync</Trans>
+              <Trans>trizum cloud</Trans>
             </span>
           </div>
           <p>
@@ -825,7 +844,7 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="lucide.log-out"
             title={t`Sign out`}
-            description={t`Stop cloud sync on this device`}
+            description={t`Stop trizum cloud on this device`}
             isDisabled={isAuthPending}
             onPress={() => {
               void onSignOut();
@@ -855,6 +874,8 @@ function CloudSyncSettings() {
         onSubmit={onDeleteAccountSubmit}
       />
 
+      <AnimatePresence>{isSignInSuccessVisible ? <SignInSuccessOverlay /> : null}</AnimatePresence>
+
       <ModalSheet
         isDismissable={false}
         isOpen={isCloudSyncSwitchOpen}
@@ -863,11 +884,11 @@ function CloudSyncSettings() {
         <ModalSheetHeader>
           <ModalSheetSection className="flex flex-col gap-2">
             <ModalSheetTitle>
-              <Trans>Use cloud sync on this device?</Trans>
+              <Trans>Use trizum cloud on this device?</Trans>
             </ModalSheetTitle>
             <ModalSheetDescription>
               <Trans>
-                This device already has local trizum data. Using cloud sync here will switch this
+                This device already has local trizum data. Using trizum cloud here will switch this
                 device to your cloud data, and the local list on this device will stop being used.
               </Trans>
             </ModalSheetDescription>
@@ -1073,6 +1094,28 @@ function SignInSuccessAnimation() {
   );
 }
 
+function SignInSuccessOverlay() {
+  return (
+    <motion.div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md py-safe-offset-6 px-safe-or-4 dark:bg-accent-950/90"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: SIGN_IN_SUCCESS_EXIT_ANIMATION_MS / 1000, ease: "easeOut" }}
+    >
+      <motion.div
+        className="w-full max-w-[420px]"
+        initial={{ opacity: 0, y: 12, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -8, scale: 0.98 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      >
+        <SignInSuccessAnimation />
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function CloudSettingsItem({
   description,
   icon,
@@ -1191,7 +1234,7 @@ function DeleteAccountDialog({
               <p className="text-sm text-accent-700 dark:text-accent-50">
                 <Trans>
                   This permanently deletes your trizum cloud account, sign-in methods, and cloud
-                  sync settings. Your local data on this device will remain.
+                  settings. Your local data on this device will remain.
                 </Trans>
               </p>
             </div>
@@ -1267,15 +1310,15 @@ function getCloudSyncStatusLabel({
   isCurrentDocumentSynced: boolean;
 }) {
   if (isCloudPending) {
-    return t`Starting cloud sync`;
+    return t`Starting trizum cloud`;
   }
 
   if (!cloudSettings) {
-    return t`Cloud sync starts automatically after sign-in.`;
+    return t`trizum cloud starts automatically after sign-in.`;
   }
 
   if (isCurrentDocumentSynced) {
-    return t`This device is using cloud sync.`;
+    return t`This device is using trizum cloud.`;
   }
 
   return t`This device needs to switch to your cloud data.`;
