@@ -63,6 +63,14 @@ interface CloudSyncSearchParams {
   error?: string;
 }
 
+type AuthPendingAction =
+  | "apple"
+  | "google"
+  | "magic-link"
+  | "password"
+  | "password-reset"
+  | "sign-out";
+
 function CloudSyncSettings() {
   const { partyList } = usePartyList();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -83,7 +91,7 @@ function CloudSyncSettings() {
   const [passwordResetMessage, setPasswordResetMessage] = useState<string | null>(null);
   const [linkedAccounts, setLinkedAccounts] = useState<LinkedAuthAccount[]>([]);
   const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
-  const [isAuthPending, setIsAuthPending] = useState(false);
+  const [authPendingAction, setAuthPendingAction] = useState<AuthPendingAction | null>(null);
   const [isCloudPending, setIsCloudPending] = useState(false);
   const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
@@ -93,6 +101,7 @@ function CloudSyncSettings() {
   const partyListRef = useRef(partyList);
   const isSignInSuccessVisibleRef = useRef(isSignInSuccessVisible);
   const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
+  const isAuthPending = authPendingAction !== null;
   const hasPasswordAccount = linkedProviderIds.has("credential");
   const cloudUpdatedAt = cloudSettings ? new Date(cloudSettings.updatedAt).toLocaleString() : null;
   const isCurrentDocumentSynced = cloudSettings?.partyListDocumentId === partyList.id;
@@ -303,7 +312,7 @@ function CloudSyncSettings() {
     setMagicLinkMessage(null);
     setPasswordResetMessage(null);
     setIsSignInSuccessVisible(false);
-    setIsAuthPending(true);
+    setAuthPendingAction("magic-link");
 
     try {
       await requestMagicLinkEmail({
@@ -315,7 +324,7 @@ function CloudSyncSettings() {
     } catch (error) {
       setAuthFailure(error, t`Could not send sign-in link`);
     } finally {
-      setIsAuthPending(false);
+      setAuthPendingAction(null);
     }
   }
 
@@ -330,7 +339,7 @@ function CloudSyncSettings() {
     setMagicLinkMessage(null);
     setPasswordResetMessage(null);
     setIsSignInSuccessVisible(false);
-    setIsAuthPending(true);
+    setAuthPendingAction("password");
 
     try {
       const result = await authClient.signIn.email({
@@ -357,7 +366,7 @@ function CloudSyncSettings() {
             : t`Authentication failed`,
       );
     } finally {
-      setIsAuthPending(false);
+      setAuthPendingAction(null);
     }
   }
 
@@ -365,7 +374,7 @@ function CloudSyncSettings() {
     clearAuthErrors();
     setMagicLinkMessage(null);
     setIsSignInSuccessVisible(false);
-    setIsAuthPending(true);
+    setAuthPendingAction(provider);
 
     try {
       const result = await signInWithSocialAuthAccount(provider);
@@ -381,13 +390,13 @@ function CloudSyncSettings() {
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t`Authentication failed`);
     } finally {
-      setIsAuthPending(false);
+      setAuthPendingAction(null);
     }
   }
 
   async function onLinkSocialAccount(provider: SocialAuthProvider) {
     clearAuthErrors();
-    setIsAuthPending(true);
+    setAuthPendingAction(provider);
 
     try {
       const result = await linkSocialAuthAccount(provider);
@@ -402,7 +411,7 @@ function CloudSyncSettings() {
     } catch {
       toast.error(t`Could not connect sign-in method`);
     } finally {
-      setIsAuthPending(false);
+      setAuthPendingAction(null);
     }
   }
 
@@ -410,7 +419,7 @@ function CloudSyncSettings() {
     clearAuthErrors();
     setPasswordResetMessage(null);
     setIsSignInSuccessVisible(false);
-    setIsAuthPending(true);
+    setAuthPendingAction("password-reset");
 
     try {
       await requestPasswordResetEmail(email);
@@ -419,7 +428,7 @@ function CloudSyncSettings() {
     } catch (error) {
       setAuthFailure(error, t`Could not send password email`);
     } finally {
-      setIsAuthPending(false);
+      setAuthPendingAction(null);
     }
   }
 
@@ -431,7 +440,7 @@ function CloudSyncSettings() {
   async function onSignOut() {
     setIsSignInSuccessVisible(false);
     setIsCloudSyncSwitchOpen(false);
-    setIsAuthPending(true);
+    setAuthPendingAction("sign-out");
 
     try {
       await authClient.signOut();
@@ -442,7 +451,7 @@ function CloudSyncSettings() {
     } catch {
       toast.error(t`Could not sign out`);
     } finally {
-      setIsAuthPending(false);
+      setAuthPendingAction(null);
     }
   }
 
@@ -552,7 +561,10 @@ function CloudSyncSettings() {
               ) : null}
               <Button color="accent" isDisabled={isAuthPending} type="submit">
                 <span className="flex items-center gap-2">
-                  <Icon icon="lucide.mail" width={18} height={18} />
+                  <AuthButtonIcon
+                    icon="lucide.mail"
+                    isPending={authPendingAction === "password-reset"}
+                  />
                   <Trans>Send password link</Trans>
                 </span>
               </Button>
@@ -588,7 +600,7 @@ function CloudSyncSettings() {
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <Icon icon="brand.apple" width={18} height={18} />
+                    <AuthButtonIcon icon="brand.apple" isPending={authPendingAction === "apple"} />
                     <Trans>Continue with Apple</Trans>
                   </span>
                 </Button>
@@ -600,7 +612,10 @@ function CloudSyncSettings() {
                   }}
                 >
                   <span className="flex items-center gap-2">
-                    <Icon icon="brand.google" width={18} height={18} />
+                    <AuthButtonIcon
+                      icon="brand.google"
+                      isPending={authPendingAction === "google"}
+                    />
                     <Trans>Continue with Google</Trans>
                   </span>
                 </Button>
@@ -643,7 +658,10 @@ function CloudSyncSettings() {
                     type="submit"
                   >
                     <span className="flex items-center gap-2">
-                      <Icon icon="lucide.log-in" width={18} height={18} />
+                      <AuthButtonIcon
+                        icon="lucide.log-in"
+                        isPending={authPendingAction === "password"}
+                      />
                       <Trans>Sign in with password</Trans>
                     </span>
                   </Button>
@@ -690,7 +708,10 @@ function CloudSyncSettings() {
                   />
                   <Button color="accent" isDisabled={isAuthPending} type="submit">
                     <span className="flex items-center gap-2">
-                      <Icon icon="lucide.mail" width={18} height={18} />
+                      <AuthButtonIcon
+                        icon="lucide.mail"
+                        isPending={authPendingAction === "magic-link"}
+                      />
                       <Trans>Email me a sign-in link</Trans>
                     </span>
                   </Button>
@@ -949,6 +970,17 @@ function AuthErrorAlert({ message }: { message: string }) {
       <Icon icon="lucide.circle-alert" />
       <AlertDescription>{message}</AlertDescription>
     </Alert>
+  );
+}
+
+function AuthButtonIcon({ icon, isPending }: { icon: IconProps["icon"]; isPending: boolean }) {
+  return (
+    <Icon
+      className={cn(isPending && "animate-spin")}
+      icon={isPending ? "lucide.loader-circle" : icon}
+      width={18}
+      height={18}
+    />
   );
 }
 
