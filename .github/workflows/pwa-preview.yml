@@ -35,6 +35,15 @@ jobs:
 
       - name: Build PWA
         run: vp run --filter @trizum/pwa build
+        env:
+          VITE_APP_AUTH_URL: ""
+
+      - name: Apply PWA D1 migrations
+        working-directory: packages/pwa
+        run: vp exec wrangler d1 migrations apply DB --remote
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: Deploy PWA preview to Cloudflare
         id: deploy

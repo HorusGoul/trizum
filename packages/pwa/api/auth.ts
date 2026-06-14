@@ -12,6 +12,7 @@ const LOCAL_DEVELOPMENT_SECRET = "local-development-only-secret-change-before-pr
 const DEFAULT_ALLOWED_HOSTS = [
   "trizum.app",
   "*.workers.dev",
+  "*.pages.dev",
   "localhost:5173",
   "localhost:8787",
   "127.0.0.1:5173",
@@ -19,6 +20,8 @@ const DEFAULT_ALLOWED_HOSTS = [
 ] as const;
 const DEFAULT_TRUSTED_ORIGINS = [
   "https://trizum.app",
+  "https://*.workers.dev",
+  "https://*.pages.dev",
   "capacitor://localhost",
   "ionic://localhost",
   "http://localhost",
@@ -134,7 +137,13 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
 }
 
 export function getTrustedOrigins(env: ApiEnv) {
-  return [...DEFAULT_TRUSTED_ORIGINS, ...splitList(env.BETTER_AUTH_TRUSTED_ORIGINS)];
+  return [
+    ...new Set([
+      ...DEFAULT_TRUSTED_ORIGINS,
+      ...getAllowedHosts(env).flatMap(getTrustedOriginsForAllowedHost),
+      ...splitList(env.BETTER_AUTH_TRUSTED_ORIGINS),
+    ]),
+  ];
 }
 
 export function isTrustedOrigin(origin: string, env: ApiEnv) {
@@ -143,6 +152,17 @@ export function isTrustedOrigin(origin: string, env: ApiEnv) {
 
 function getAllowedHosts(env: ApiEnv) {
   return [...DEFAULT_ALLOWED_HOSTS, ...splitList(env.BETTER_AUTH_ALLOWED_HOSTS)];
+}
+
+function getTrustedOriginsForAllowedHost(host: string) {
+  if (host.includes("://")) {
+    return [host];
+  }
+
+  const hostname = host.split(":")[0];
+  const isLocalAllowedHost = hostname ? isLocalhost(hostname) : false;
+
+  return [`${isLocalAllowedHost ? "http" : "https"}://${host}`];
 }
 
 function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["socialProviders"]> {

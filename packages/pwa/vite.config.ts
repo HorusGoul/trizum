@@ -84,7 +84,7 @@ export default defineConfig(({ mode }) => {
         build: {
           command: "vp build",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
-          env: ["SENTRY_AUTH_TOKEN"],
+          env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
           output: ["dist/**"],
         },
         check: {
