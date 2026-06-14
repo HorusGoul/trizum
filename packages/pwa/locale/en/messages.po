@@ -247,7 +247,7 @@ msgstr "Australian Dollar"
 #: src/routes/settings_.cloud-sync.tsx:366
 #: src/routes/settings_.cloud-sync.tsx:383
 #: src/routes/settings_.cloud-sync.tsx:391
-#: src/routes/settings_.cloud-sync.tsx:1309
+#: src/routes/settings_.cloud-sync.tsx:1297
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
@@ -421,7 +421,7 @@ msgstr "Can't add an expense to a party that doesn't exist"
 msgid "Canadian Dollar"
 msgstr "Canadian Dollar"
 
-#: src/routes/settings_.cloud-sync.tsx:1241
+#: src/routes/settings_.cloud-sync.tsx:1229
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -570,7 +570,7 @@ msgstr "Cloud sync is not set up yet."
 msgid "Cloud sync started"
 msgstr "Cloud sync started"
 
-#: src/routes/settings_.cloud-sync.tsx:1286
+#: src/routes/settings_.cloud-sync.tsx:1274
 msgid "Cloud sync starts automatically after sign-in."
 msgstr "Cloud sync starts automatically after sign-in."
 
@@ -616,7 +616,7 @@ msgstr "Configure Profile"
 msgid "Confirm transfer"
 msgstr "Confirm transfer"
 
-#: src/routes/settings_.cloud-sync.tsx:1216
+#: src/routes/settings_.cloud-sync.tsx:1204
 msgid "Confirmation"
 msgstr "Confirmation"
 
@@ -825,12 +825,12 @@ msgid "Delete"
 msgstr "Delete"
 
 #: src/routes/settings_.cloud-sync.tsx:819
-#: src/routes/settings_.cloud-sync.tsx:1195
-#: src/routes/settings_.cloud-sync.tsx:1230
+#: src/routes/settings_.cloud-sync.tsx:1183
+#: src/routes/settings_.cloud-sync.tsx:1218
 msgid "Delete account"
 msgstr "Delete account"
 
-#: src/routes/settings_.cloud-sync.tsx:1201
+#: src/routes/settings_.cloud-sync.tsx:1189
 msgid "Delete account?"
 msgstr "Delete account?"
 
@@ -2244,7 +2244,7 @@ msgstr "Sierra Leonean Leone"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/routes/settings_.cloud-sync.tsx:1298
+#: src/routes/settings_.cloud-sync.tsx:1286
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
@@ -2261,7 +2261,7 @@ msgstr "Sign in with password"
 msgid "Sign out"
 msgstr "Sign out"
 
-#: src/routes/settings_.cloud-sync.tsx:1307
+#: src/routes/settings_.cloud-sync.tsx:1295
 msgid "Sign-in link is invalid or expired"
 msgstr "Sign-in link is invalid or expired"
 
@@ -2360,7 +2360,7 @@ msgstr "Start date"
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
-#: src/routes/settings_.cloud-sync.tsx:1282
+#: src/routes/settings_.cloud-sync.tsx:1270
 msgid "Starting cloud sync"
 msgstr "Starting cloud sync"
 
@@ -2533,11 +2533,11 @@ msgstr "This device is already using cloud sync"
 msgid "This device is synced"
 msgstr "This device is synced"
 
-#: src/routes/settings_.cloud-sync.tsx:1290
+#: src/routes/settings_.cloud-sync.tsx:1278
 msgid "This device is using cloud sync."
 msgstr "This device is using cloud sync."
 
-#: src/routes/settings_.cloud-sync.tsx:1293
+#: src/routes/settings_.cloud-sync.tsx:1281
 msgid "This device needs to switch to your cloud data."
 msgstr "This device needs to switch to your cloud data."
 
@@ -2553,7 +2553,7 @@ msgstr "This isn't a valid ID"
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "This party needs another active participant besides you to receive the transferred debt."
 
-#: src/routes/settings_.cloud-sync.tsx:1204
+#: src/routes/settings_.cloud-sync.tsx:1192
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud sync settings. Your local data on this device will remain."
 msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud sync settings. Your local data on this device will remain."
 
@@ -2669,7 +2669,7 @@ msgstr "Turkish Lira"
 msgid "Turkmenistani Manat"
 msgstr "Turkmenistani Manat"
 
-#: src/routes/settings_.cloud-sync.tsx:1214
+#: src/routes/settings_.cloud-sync.tsx:1202
 msgid "Type \"delete account\" to confirm."
 msgstr "Type \"delete account\" to confirm."
 

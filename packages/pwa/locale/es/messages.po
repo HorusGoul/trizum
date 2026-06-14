@@ -235,7 +235,7 @@ msgstr "Dólar Australiano"
 #: src/routes/settings_.cloud-sync.tsx:366
 #: src/routes/settings_.cloud-sync.tsx:383
 #: src/routes/settings_.cloud-sync.tsx:391
-#: src/routes/settings_.cloud-sync.tsx:1309
+#: src/routes/settings_.cloud-sync.tsx:1297
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
@@ -401,7 +401,7 @@ msgstr "¿Puedo usar trizum sin una cuenta?"
 msgid "Canadian Dollar"
 msgstr "Dólar Canadiense"
 
-#: src/routes/settings_.cloud-sync.tsx:1241
+#: src/routes/settings_.cloud-sync.tsx:1229
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -546,7 +546,7 @@ msgstr "La sincronización en la nube todavía no está configurada."
 msgid "Cloud sync started"
 msgstr "Sincronización en la nube iniciada"
 
-#: src/routes/settings_.cloud-sync.tsx:1286
+#: src/routes/settings_.cloud-sync.tsx:1274
 msgid "Cloud sync starts automatically after sign-in."
 msgstr "La sincronización en la nube empieza automáticamente después de iniciar sesión."
 
@@ -592,7 +592,7 @@ msgstr "Configurar perfil"
 msgid "Confirm transfer"
 msgstr "Confirmar transferencia"
 
-#: src/routes/settings_.cloud-sync.tsx:1216
+#: src/routes/settings_.cloud-sync.tsx:1204
 msgid "Confirmation"
 msgstr "Confirmación"
 
@@ -797,12 +797,12 @@ msgid "Delete"
 msgstr "Eliminar"
 
 #: src/routes/settings_.cloud-sync.tsx:819
-#: src/routes/settings_.cloud-sync.tsx:1195
-#: src/routes/settings_.cloud-sync.tsx:1230
+#: src/routes/settings_.cloud-sync.tsx:1183
+#: src/routes/settings_.cloud-sync.tsx:1218
 msgid "Delete account"
 msgstr "Eliminar cuenta"
 
-#: src/routes/settings_.cloud-sync.tsx:1201
+#: src/routes/settings_.cloud-sync.tsx:1189
 msgid "Delete account?"
 msgstr "¿Eliminar cuenta?"
 
@@ -2172,7 +2172,7 @@ msgstr "Leone de Sierra Leona"
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:1298
+#: src/routes/settings_.cloud-sync.tsx:1286
 msgid "Sign in again before deleting your account"
 msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 
@@ -2189,7 +2189,7 @@ msgstr "Iniciar sesión con contraseña"
 msgid "Sign out"
 msgstr "Cerrar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:1307
+#: src/routes/settings_.cloud-sync.tsx:1295
 msgid "Sign-in link is invalid or expired"
 msgstr "El enlace de inicio de sesión no es válido o ha caducado"
 
@@ -2284,7 +2284,7 @@ msgstr "Fecha de inicio"
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
-#: src/routes/settings_.cloud-sync.tsx:1282
+#: src/routes/settings_.cloud-sync.tsx:1270
 msgid "Starting cloud sync"
 msgstr "Iniciando la sincronización en la nube"
 
@@ -2457,11 +2457,11 @@ msgstr "Este dispositivo ya usa la sincronización en la nube"
 msgid "This device is synced"
 msgstr "Este dispositivo está sincronizado"
 
-#: src/routes/settings_.cloud-sync.tsx:1290
+#: src/routes/settings_.cloud-sync.tsx:1278
 msgid "This device is using cloud sync."
 msgstr "Este dispositivo usa la sincronización en la nube."
 
-#: src/routes/settings_.cloud-sync.tsx:1293
+#: src/routes/settings_.cloud-sync.tsx:1281
 msgid "This device needs to switch to your cloud data."
 msgstr "Este dispositivo tiene que cambiar a tus datos en la nube."
 
@@ -2477,7 +2477,7 @@ msgstr "Este no es un ID válido"
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "Este grupo necesita otro participante activo además de ti para recibir la deuda transferida."
 
-#: src/routes/settings_.cloud-sync.tsx:1204
+#: src/routes/settings_.cloud-sync.tsx:1192
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud sync settings. Your local data on this device will remain."
 msgstr "Esto elimina permanentemente tu cuenta de trizum cloud, los métodos de inicio de sesión y la configuración de sincronización en la nube. Tus datos locales en este dispositivo se conservarán."
 
@@ -2581,7 +2581,7 @@ msgstr "Lira Turca"
 msgid "Turkmenistani Manat"
 msgstr "Manat Turkmeno"
 
-#: src/routes/settings_.cloud-sync.tsx:1214
+#: src/routes/settings_.cloud-sync.tsx:1202
 msgid "Type \"delete account\" to confirm."
 msgstr "Escribe \"delete account\" para confirmar."
 

@@ -754,7 +754,7 @@ function CloudSyncSettings() {
           </div>
         ) : null}
 
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col divide-y divide-accent-200 border-y border-accent-200 dark:divide-accent-800 dark:border-accent-800">
           <CloudSettingsItem icon="lucide.mail" title={t`Email`} description={user.email} />
           <CloudSettingsItem
             icon="brand.google"
@@ -796,7 +796,7 @@ function CloudSyncSettings() {
           />
         </section>
 
-        <section className="flex flex-col gap-2 rounded-lg border border-accent-200 bg-white px-4 py-3 text-sm text-accent-700 dark:border-accent-800 dark:bg-accent-900 dark:text-accent-50">
+        <section className="flex flex-col gap-2 border-y border-accent-200 py-4 text-sm text-accent-700 dark:border-accent-800 dark:text-accent-50">
           <div className="flex items-center gap-3">
             <Icon icon={isCurrentDocumentSynced ? "lucide.cloud-check" : "lucide.cloud-sync"} />
             <span className="font-medium text-accent-950 dark:text-accent-50">
@@ -813,7 +813,7 @@ function CloudSyncSettings() {
           ) : null}
         </section>
 
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col divide-y divide-accent-200 border-y border-accent-200 dark:divide-accent-800 dark:border-accent-800">
           <CloudSettingsItem
             icon="lucide.trash-2"
             title={t`Delete account`}
@@ -1119,15 +1119,12 @@ function CloudSettingsItem({
       {onPress ? <Icon icon="lucide.chevron-right" width={20} height={20} /> : null}
     </span>
   );
-  const className = cn(
-    "h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left",
-    tone === "danger" && "border-danger-500 dark:border-danger-700",
-  );
+  const className = "h-auto min-h-14 justify-start rounded-none px-0 py-4 text-left";
 
   if (onPress) {
     return (
       <Button
-        color="input-like"
+        color="transparent"
         className={className}
         isDisabled={isDisabled}
         onPress={onPress}
@@ -1138,16 +1135,7 @@ function CloudSettingsItem({
     );
   }
 
-  return (
-    <div
-      className={cn(
-        "flex min-h-16 w-full items-center rounded-lg border border-accent-500 bg-white px-4 py-3 text-left dark:border-accent-700 dark:bg-accent-900",
-        tone === "danger" && "border-danger-500 dark:border-danger-700",
-      )}
-    >
-      {content}
-    </div>
-  );
+  return <div className="flex min-h-14 w-full items-center px-0 py-4 text-left">{content}</div>;
 }
 
 function DeleteAccountDialog({
