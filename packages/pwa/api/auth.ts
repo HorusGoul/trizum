@@ -2,10 +2,11 @@ import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink } from "better-auth/plugins";
 import { EmailMessage } from "cloudflare:email";
+import { eq } from "drizzle-orm";
 import { importPKCS8, SignJWT } from "jose";
 import { getApiDb, schema } from "./db/client";
 import type { ApiEnv } from "./env";
-import { createBetterAuthLogger } from "./log";
+import { authLogger, createBetterAuthLogger } from "./log";
 import { AUTH_PROVIDER_CONFIG } from "../src/lib/authConfig.js";
 
 const LOCAL_DEVELOPMENT_SECRET = "local-development-only-secret-change-before-production";
@@ -45,6 +46,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
   const socialProviders = createSocialProviders(env);
   const trustedOrigins = getTrustedOrigins(env);
   const requireEmailVerification = shouldRequireEmailVerification(env);
+  const db = getApiDb(env.DB);
 
   if (socialProviders.apple) {
     trustedOrigins.push("https://appleid.apple.com");
@@ -52,7 +54,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
 
   return betterAuth({
     appName: "trizum",
-    database: drizzleAdapter(getApiDb(env.DB), {
+    database: drizzleAdapter(db, {
       camelCase: true,
       provider: "sqlite",
       schema,
@@ -101,6 +103,21 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
           )}">Verify email</a></p>`,
           to: user.email,
         });
+      },
+    },
+    user: {
+      deleteUser: {
+        enabled: true,
+        beforeDelete: async (user) => {
+          authLogger.info("Deleting user account", { userId: user.id });
+
+          await db
+            .delete(schema.cloudUserSettings)
+            .where(eq(schema.cloudUserSettings.userId, user.id));
+        },
+        afterDelete: async (user) => {
+          authLogger.info("Deleted user account", { userId: user.id });
+        },
       },
     },
     plugins: [

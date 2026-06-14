@@ -2,13 +2,14 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import {
   authClient,
+  deleteAuthUserAccount,
   fetchLinkedAuthAccounts,
   linkSocialAuthAccount,
   requestMagicLinkEmail,
@@ -24,7 +25,7 @@ import {
   type CloudUserSettings,
 } from "#src/lib/cloudSyncSettings.ts";
 import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Icon, type IconProps } from "#src/ui/Icon.tsx";
 import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
 import {
   ModalSheet,
@@ -53,6 +54,7 @@ export const Route = createFileRoute("/settings_/cloud-sync")({
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
 const PASSWORD_SIGN_IN_ENABLE_DELAY_MS = 250;
+const DELETE_ACCOUNT_CONFIRMATION_TEXT = "delete account";
 const AUTH_SECONDARY_BUTTON_CLASS_NAME =
   "h-9 text-sm font-medium text-accent-700 dark:text-accent-50";
 
@@ -84,18 +86,32 @@ function CloudSyncSettings() {
   const [isAuthPending, setIsAuthPending] = useState(false);
   const [isCloudPending, setIsCloudPending] = useState(false);
   const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
+  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
+  const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState("");
+  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+  const [isDeleteAccountPending, setIsDeleteAccountPending] = useState(false);
+  const partyListRef = useRef(partyList);
+  const isSignInSuccessVisibleRef = useRef(isSignInSuccessVisible);
   const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
-  const linkedProviderLabels = linkedAccounts
-    .map((account) => getProviderLabel(account.providerId))
-    .join(", ");
   const hasPasswordAccount = linkedProviderIds.has("credential");
   const cloudUpdatedAt = cloudSettings ? new Date(cloudSettings.updatedAt).toLocaleString() : null;
   const isCurrentDocumentSynced = cloudSettings?.partyListDocumentId === partyList.id;
+  const canDeleteAccount =
+    deleteAccountConfirmation.trim().toLowerCase() === DELETE_ACCOUNT_CONFIRMATION_TEXT;
+
+  useEffect(() => {
+    partyListRef.current = partyList;
+  }, [partyList]);
+
+  useEffect(() => {
+    isSignInSuccessVisibleRef.current = isSignInSuccessVisible;
+  }, [isSignInSuccessVisible]);
 
   useEffect(() => {
     if (!userId) {
       setLinkedAccounts([]);
       setCloudSettings(null);
+      setIsCloudSyncSwitchOpen(false);
       return;
     }
 
@@ -115,22 +131,73 @@ function CloudSyncSettings() {
       setIsCloudPending(true);
 
       try {
+        const currentPartyList = partyListRef.current;
         const [accounts, { settings }] = await Promise.all([
           fetchLinkedAuthAccounts(),
           fetchCloudUserSettings(),
         ]);
 
-        if (!isCancelled) {
-          setLinkedAccounts(accounts);
-          setCloudSettings(settings);
+        if (isCancelled) {
+          return;
         }
+
+        setLinkedAccounts(accounts);
+
+        let activeSettings = settings;
+
+        if (!activeSettings) {
+          const { settings: savedSettings } = await saveCloudUserSettings(
+            getCloudUserSettingsInput(currentPartyList),
+          );
+
+          if (isCancelled) {
+            return;
+          }
+
+          activeSettings = savedSettings;
+          toast.success(t`Cloud sync started`);
+        }
+
+        setCloudSettings(activeSettings);
+
+        if (!activeSettings) {
+          return;
+        }
+
+        if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
+          toast.error(t`Cloud sync data is invalid`);
+          return;
+        }
+
+        if (activeSettings.partyListDocumentId === currentPartyList.id) {
+          return;
+        }
+
+        if (hasLocalPartyListData(currentPartyList)) {
+          setIsCloudSyncSwitchOpen(true);
+          return;
+        }
+
+        localStorage.setItem("partyListId", activeSettings.partyListDocumentId);
+        setCloudSettings(activeSettings);
+        setIsCloudSyncSwitchOpen(false);
+        toast.success(t`Cloud sync enabled on this device`);
+
+        if (isSignInSuccessVisibleRef.current) {
+          window.setTimeout(() => {
+            void navigate({ to: "/", replace: true });
+          }, SIGN_IN_SUCCESS_ANIMATION_MS);
+          return;
+        }
+
+        void navigate({ to: "/", replace: true });
       } finally {
         if (!isCancelled) {
           setIsCloudPending(false);
         }
       }
     }
-  }, [userId]);
+  }, [navigate, userId]);
 
   useEffect(() => {
     if (auth === "success") {
@@ -139,26 +206,27 @@ function CloudSyncSettings() {
   }, [auth]);
 
   useEffect(() => {
-    if (auth !== "success" || !userId) {
+    if (!isSignInSuccessVisible || !userId) {
       return;
     }
 
     const timeoutId = window.setTimeout(() => {
       setIsSignInSuccessVisible(false);
-      void navigate({ to: "/settings/cloud-sync", replace: true });
+
+      if (auth === "success") {
+        void navigate({ to: "/settings/cloud-sync", replace: true });
+      }
     }, SIGN_IN_SUCCESS_ANIMATION_MS);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [auth, navigate, userId]);
+  }, [auth, isSignInSuccessVisible, navigate, userId]);
 
   useEffect(() => {
-    if (userId || auth === "success") {
-      return;
+    if (!userId && auth !== "success") {
+      setIsSignInSuccessVisible(false);
     }
-
-    setIsSignInSuccessVisible(false);
   }, [auth, userId]);
 
   useEffect(() => {
@@ -229,11 +297,6 @@ function CloudSyncSettings() {
     setAuthPasswordError(null);
   }
 
-  async function showSignInSuccess() {
-    setIsSignInSuccessVisible(true);
-    await new Promise((resolve) => window.setTimeout(resolve, SIGN_IN_SUCCESS_ANIMATION_MS));
-  }
-
   async function onMagicLinkSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     clearAuthErrors();
@@ -283,8 +346,8 @@ function CloudSyncSettings() {
 
       setAuthPassword("");
       toast.success(t`Signed in`);
-      await Promise.all([showSignInSuccess(), session.refetch()]);
-      setIsSignInSuccessVisible(false);
+      setIsSignInSuccessVisible(true);
+      await session.refetch();
     } catch (error) {
       setAuthFailureMessage(
         error instanceof Error && error.message.endsWith("sign-in is not configured.")
@@ -313,8 +376,8 @@ function CloudSyncSettings() {
       }
 
       toast.success(t`Signed in`);
-      await Promise.all([showSignInSuccess(), session.refetch()]);
-      setIsSignInSuccessVisible(false);
+      setIsSignInSuccessVisible(true);
+      await session.refetch();
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t`Authentication failed`);
     } finally {
@@ -367,11 +430,13 @@ function CloudSyncSettings() {
 
   async function onSignOut() {
     setIsSignInSuccessVisible(false);
+    setIsCloudSyncSwitchOpen(false);
     setIsAuthPending(true);
 
     try {
       await authClient.signOut();
       setCloudSettings(null);
+      setLinkedAccounts([]);
       await session.refetch();
       toast.success(t`Signed out`);
     } catch {
@@ -381,73 +446,72 @@ function CloudSyncSettings() {
     }
   }
 
-  async function onSaveCloudSettings() {
-    if (cloudSettings) {
-      toast.message(
-        isCurrentDocumentSynced
-          ? t`This device is already using cloud sync`
-          : t`Cloud sync is already set up for this account`,
-      );
-      return;
-    }
-
-    setIsCloudPending(true);
-
-    try {
-      const { settings } = await saveCloudUserSettings(getCloudUserSettingsInput(partyList));
-      setCloudSettings(settings);
-      toast.success(t`Cloud sync updated`);
-    } catch {
-      toast.error(t`Could not update cloud sync`);
-    } finally {
-      setIsCloudPending(false);
-    }
-  }
-
-  function activateCloudSyncOnDevice() {
-    if (!cloudSettings) {
+  function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
+    if (!settings) {
       toast.message(t`Cloud sync is not set up yet`);
       return;
     }
 
-    if (!isValidDocumentId(cloudSettings.partyListDocumentId)) {
+    if (!isValidDocumentId(settings.partyListDocumentId)) {
       toast.error(t`Cloud sync data is invalid`);
       return;
     }
 
-    if (cloudSettings.partyListDocumentId === partyList.id) {
+    if (settings.partyListDocumentId === partyList.id) {
       toast.message(t`This device is already using cloud sync`);
       return;
     }
 
-    localStorage.setItem("partyListId", cloudSettings.partyListDocumentId);
+    localStorage.setItem("partyListId", settings.partyListDocumentId);
+    setCloudSettings(settings);
     setIsCloudSyncSwitchOpen(false);
     toast.success(t`Cloud sync enabled on this device`);
+
+    if (isSignInSuccessVisible) {
+      window.setTimeout(() => {
+        void navigate({ to: "/", replace: true });
+      }, SIGN_IN_SUCCESS_ANIMATION_MS);
+      return;
+    }
+
     void navigate({ to: "/", replace: true });
   }
 
-  function onUseCloudSync() {
-    if (!cloudSettings) {
-      toast.message(t`Cloud sync is not set up yet`);
+  function openDeleteAccountDialog() {
+    setDeleteAccountConfirmation("");
+    setDeleteAccountError(null);
+    setIsDeleteAccountDialogOpen(true);
+  }
+
+  async function onDeleteAccountSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!canDeleteAccount) {
       return;
     }
 
-    if (!isValidDocumentId(cloudSettings.partyListDocumentId)) {
-      toast.error(t`Cloud sync data is invalid`);
-      return;
-    }
+    setDeleteAccountError(null);
+    setIsDeleteAccountPending(true);
 
-    if (cloudSettings.partyListDocumentId === partyList.id) {
-      toast.message(t`This device is already using cloud sync`);
-      return;
+    try {
+      await deleteAuthUserAccount();
+      setCloudSettings(null);
+      setLinkedAccounts([]);
+      setIsCloudSyncSwitchOpen(false);
+      setIsDeleteAccountDialogOpen(false);
+      setDeleteAccountConfirmation("");
+      await session.refetch();
+      toast.success(t`Account deleted`);
+      void navigate({ to: "/settings", replace: true });
+    } catch (error) {
+      setDeleteAccountError(
+        error instanceof Error
+          ? getDeleteAccountErrorMessage(error.message)
+          : t`Could not delete account`,
+      );
+    } finally {
+      setIsDeleteAccountPending(false);
     }
-
-    if (hasLocalPartyListData(partyList)) {
-      setIsCloudSyncSwitchOpen(true);
-      return;
-    }
-
-    activateCloudSyncOnDevice();
   }
 
   function closeSignInDialog() {
@@ -464,10 +528,10 @@ function CloudSyncSettings() {
         <CloudSyncSignInDialog
           isOpen
           onOpenChange={closeSignInDialog}
-          showHeader={!magicLinkMessage}
+          showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
         >
-          {isSignInSuccessVisible ? (
-            <SignInSuccessAnimation />
+          {auth === "success" || isSignInSuccessVisible ? (
+            <CloudAuthLoadingState />
           ) : isPasswordResetMode ? (
             <form className="flex flex-col gap-4" onSubmit={onPasswordResetSubmit}>
               {authError ? <AuthErrorAlert message={authError} /> : null}
@@ -662,141 +726,119 @@ function CloudSyncSettings() {
         </h1>
       </div>
 
-      <div className="container mt-4 flex flex-col gap-6 px-4 pb-8 pb-safe">
-        <section className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">{user.name || user.email}</span>
-            <span className="text-accent-700 dark:text-accent-50">{user.email}</span>
+      <div className="container mt-4 flex flex-col gap-5 px-4 pb-8 pb-safe">
+        {isSignInSuccessVisible ? (
+          <div className="rounded-lg border border-success-200 bg-success-50 dark:border-success-900 dark:bg-success-950/40">
+            <SignInSuccessAnimation />
           </div>
+        ) : null}
 
-          <div className="flex flex-col gap-3">
-            <h2 className="text-base font-medium">
-              <Trans>Sign-in methods</Trans>
-            </h2>
-
-            {linkedAccounts.length > 0 ? (
-              <p className="text-sm text-accent-700 dark:text-accent-50">
-                <Trans>Connected: {linkedProviderLabels}</Trans>
-              </p>
-            ) : null}
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Button
-                color="input-like"
-                isDisabled={isAuthPending || linkedProviderIds.has("google")}
-                onPress={() => {
-                  void onLinkSocialAccount("google");
-                }}
-              >
-                <span className="flex items-center gap-2">
-                  <Icon icon="brand.google" width={18} height={18} />
-                  {linkedProviderIds.has("google") ? (
-                    <Trans>Google connected</Trans>
-                  ) : (
-                    <Trans>Connect Google</Trans>
-                  )}
-                </span>
-              </Button>
-              <Button
-                color="input-like"
-                isDisabled={isAuthPending || linkedProviderIds.has("apple")}
-                onPress={() => {
-                  void onLinkSocialAccount("apple");
-                }}
-              >
-                <span className="flex items-center gap-2">
-                  <Icon icon="brand.apple" width={18} height={18} />
-                  {linkedProviderIds.has("apple") ? (
-                    <Trans>Apple connected</Trans>
-                  ) : (
-                    <Trans>Connect Apple</Trans>
-                  )}
-                </span>
-              </Button>
-            </div>
-
-            <Button
-              color="transparent"
-              isDisabled={isAuthPending}
-              onPress={() => {
-                void onRequestPasswordReset(user.email);
-              }}
-            >
-              <span className="flex items-center gap-2">
-                <Icon icon="lucide.mail" width={18} height={18} />
-                {hasPasswordAccount ? (
-                  <Trans>Email password reset link</Trans>
-                ) : (
-                  <Trans>Email password setup link</Trans>
-                )}
-              </span>
-            </Button>
-
-            {passwordResetMessage ? (
-              <p className="text-sm text-accent-700 dark:text-accent-50">{passwordResetMessage}</p>
-            ) : null}
-          </div>
+        <section className="flex flex-col gap-3">
+          <CloudSettingsItem icon="lucide.mail" title={t`Email`} description={user.email} />
+          <CloudSettingsItem
+            icon="brand.google"
+            title={t`Google`}
+            description={linkedProviderIds.has("google") ? t`Connected` : t`Not connected`}
+            isDisabled={isAuthPending || linkedProviderIds.has("google")}
+            onPress={
+              linkedProviderIds.has("google")
+                ? undefined
+                : () => {
+                    void onLinkSocialAccount("google");
+                  }
+            }
+          />
+          <CloudSettingsItem
+            icon="brand.apple"
+            title={t`Apple`}
+            description={linkedProviderIds.has("apple") ? t`Connected` : t`Not connected`}
+            isDisabled={isAuthPending || linkedProviderIds.has("apple")}
+            onPress={
+              linkedProviderIds.has("apple")
+                ? undefined
+                : () => {
+                    void onLinkSocialAccount("apple");
+                  }
+            }
+          />
+          <CloudSettingsItem
+            icon="lucide.key-round"
+            title={t`Password`}
+            description={
+              passwordResetMessage ??
+              (hasPasswordAccount ? t`Password enabled` : t`Email a password setup link`)
+            }
+            isDisabled={isAuthPending}
+            onPress={() => {
+              void onRequestPasswordReset(user.email);
+            }}
+          />
         </section>
 
-        <section className="flex flex-col gap-4 border-t border-accent-200 pt-6 dark:border-accent-700">
-          <h2 className="text-base font-medium">
-            <Trans>Cloud sync</Trans>
-          </h2>
-
-          <div className="flex flex-col gap-2 text-sm text-accent-700 dark:text-accent-50">
-            {!cloudSettings ? (
-              <p>
-                <Trans>Cloud sync is not set up yet.</Trans>
-              </p>
-            ) : isCurrentDocumentSynced ? (
-              <p>
-                <Trans>This device is using cloud sync.</Trans>
-              </p>
-            ) : (
-              <>
-                <p>
-                  <Trans>Cloud sync is already set up for this account.</Trans>
-                </p>
-                <p>
-                  <Trans>Use it on this device to continue with your cloud data.</Trans>
-                </p>
-              </>
-            )}
-            {cloudUpdatedAt ? (
-              <p>
-                <Trans>Last updated {cloudUpdatedAt}</Trans>
-              </p>
-            ) : null}
-          </div>
-
-          {!cloudSettings ? (
-            <Button color="accent" isDisabled={isCloudPending} onPress={onSaveCloudSettings}>
-              <span className="flex items-center gap-2">
-                <Icon icon="lucide.cloud-upload" width={18} height={18} />
-                <Trans>Set up cloud sync</Trans>
-              </span>
-            </Button>
-          ) : !isCurrentDocumentSynced ? (
-            <Button color="accent" isDisabled={isCloudPending} onPress={onUseCloudSync}>
-              <span className="flex items-center gap-2">
-                <Icon icon="lucide.cloud-download" width={18} height={18} />
-                <Trans>Use cloud sync on this device</Trans>
-              </span>
-            </Button>
-          ) : null}
-
-          <Button color="transparent" isDisabled={isAuthPending} onPress={onSignOut}>
-            <span className="flex items-center gap-2">
-              <Icon icon="lucide.log-out" width={18} height={18} />
-              <Trans>Sign out</Trans>
+        <section className="flex flex-col gap-2 rounded-lg border border-accent-200 bg-white px-4 py-3 text-sm text-accent-700 dark:border-accent-800 dark:bg-accent-900 dark:text-accent-50">
+          <div className="flex items-center gap-3">
+            <Icon icon={isCurrentDocumentSynced ? "lucide.cloud-check" : "lucide.cloud-sync"} />
+            <span className="font-medium text-accent-950 dark:text-accent-50">
+              <Trans>Cloud sync</Trans>
             </span>
-          </Button>
+          </div>
+          <p>
+            {getCloudSyncStatusLabel({ cloudSettings, isCloudPending, isCurrentDocumentSynced })}
+          </p>
+          {cloudUpdatedAt ? (
+            <p>
+              <Trans>Last updated {cloudUpdatedAt}</Trans>
+            </p>
+          ) : null}
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <CloudSettingsItem
+            icon="lucide.trash-2"
+            title={t`Delete account`}
+            description={t`Permanently delete your trizum cloud account`}
+            isDisabled={isDeleteAccountPending}
+            onPress={openDeleteAccountDialog}
+            tone="danger"
+          />
+          <CloudSettingsItem
+            icon="lucide.log-out"
+            title={t`Sign out`}
+            description={t`Stop cloud sync on this device`}
+            isDisabled={isAuthPending}
+            onPress={() => {
+              void onSignOut();
+            }}
+          />
         </section>
       </div>
 
-      {isSignInSuccessVisible ? <SignInSuccessModal /> : null}
+      <DeleteAccountDialog
+        canSubmit={canDeleteAccount}
+        confirmation={deleteAccountConfirmation}
+        errorMessage={deleteAccountError}
+        isOpen={isDeleteAccountDialogOpen}
+        isPending={isDeleteAccountPending}
+        onConfirmationChange={(value) => {
+          setDeleteAccountConfirmation(value);
+          setDeleteAccountError(null);
+        }}
+        onOpenChange={(isOpen) => {
+          setIsDeleteAccountDialogOpen(isOpen);
 
-      <ModalSheet isOpen={isCloudSyncSwitchOpen} onOpenChange={setIsCloudSyncSwitchOpen}>
+          if (!isOpen) {
+            setDeleteAccountConfirmation("");
+            setDeleteAccountError(null);
+          }
+        }}
+        onSubmit={onDeleteAccountSubmit}
+      />
+
+      <ModalSheet
+        isDismissable={false}
+        isOpen={isCloudSyncSwitchOpen}
+        onOpenChange={setIsCloudSyncSwitchOpen}
+      >
         <ModalSheetHeader>
           <ModalSheetSection className="flex flex-col gap-2">
             <ModalSheetTitle>
@@ -812,16 +854,16 @@ function CloudSyncSettings() {
         </ModalSheetHeader>
         <ModalSheetContent>
           <ModalSheetActions>
-            <ModalSheetAction icon="lucide.cloud-download" onPress={activateCloudSyncOnDevice}>
-              <Trans>Use cloud data</Trans>
-            </ModalSheetAction>
             <ModalSheetAction
-              icon="lucide.x"
+              icon="lucide.cloud-download"
               onPress={() => {
-                setIsCloudSyncSwitchOpen(false);
+                activateCloudSyncOnDevice();
               }}
             >
-              <Trans>Keep local data</Trans>
+              <Trans>Use cloud data</Trans>
+            </ModalSheetAction>
+            <ModalSheetAction icon="lucide.log-out" onPress={onSignOut} tone="danger">
+              <Trans>Sign out</Trans>
             </ModalSheetAction>
           </ModalSheetActions>
         </ModalSheetContent>
@@ -910,6 +952,26 @@ function AuthErrorAlert({ message }: { message: string }) {
   );
 }
 
+function CloudAuthLoadingState() {
+  return (
+    <output
+      aria-label={t`Finishing sign in`}
+      className="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center"
+    >
+      <motion.span
+        animate={{ rotate: 360 }}
+        className="flex size-12 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50"
+        transition={{ duration: 0.9, ease: "linear", repeat: Infinity }}
+      >
+        <Icon icon="lucide.loader-circle" width={24} height={24} />
+      </motion.span>
+      <p className="text-sm font-medium text-accent-700 dark:text-accent-50">
+        <Trans>Finishing sign in</Trans>
+      </p>
+    </output>
+  );
+}
+
 function MagicLinkSentState({
   email,
   message,
@@ -950,38 +1012,6 @@ function MagicLinkSentState({
   );
 }
 
-function SignInSuccessModal() {
-  return (
-    <ModalOverlay
-      isOpen
-      className={({ isEntering, isExiting }) =>
-        cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/35 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
-          isEntering && "duration-200 ease-out animate-in fade-in",
-          isExiting && "duration-150 ease-in animate-out fade-out",
-        )
-      }
-    >
-      <Modal
-        className={({ isEntering, isExiting }) =>
-          cn(
-            "w-full max-w-[420px] outline-none",
-            isEntering && "duration-200 ease-out animate-in fade-in zoom-in-95",
-            isExiting && "duration-150 ease-in animate-out fade-out zoom-out-95",
-          )
-        }
-      >
-        <Dialog
-          aria-label={t`Signed in`}
-          className="rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
-        >
-          <SignInSuccessAnimation />
-        </Dialog>
-      </Modal>
-    </ModalOverlay>
-  );
-}
-
 function SignInSuccessAnimation() {
   return (
     <motion.div
@@ -1011,6 +1041,181 @@ function SignInSuccessAnimation() {
   );
 }
 
+function CloudSettingsItem({
+  description,
+  icon,
+  isDisabled,
+  onPress,
+  title,
+  tone = "default",
+}: {
+  description?: ReactNode;
+  icon: IconProps["icon"];
+  isDisabled?: boolean;
+  onPress?: () => void;
+  title: string;
+  tone?: "default" | "danger";
+}) {
+  const content = (
+    <span className="flex w-full items-center gap-3">
+      <Icon
+        className={cn(tone === "danger" && "text-danger-500")}
+        icon={icon}
+        width={20}
+        height={20}
+      />
+      <span className="flex min-w-0 flex-1 flex-col gap-1">
+        <span
+          className={cn(
+            "font-medium leading-none",
+            tone === "danger" && "text-danger-500 dark:text-danger-300",
+          )}
+        >
+          {title}
+        </span>
+        {description ? (
+          <span
+            className={cn(
+              "truncate text-sm text-accent-700 dark:text-accent-50",
+              tone === "danger" && "text-danger-700 dark:text-danger-300",
+            )}
+          >
+            {description}
+          </span>
+        ) : null}
+      </span>
+      {onPress ? <Icon icon="lucide.chevron-right" width={20} height={20} /> : null}
+    </span>
+  );
+  const className = cn(
+    "h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left",
+    tone === "danger" && "border-danger-500 dark:border-danger-700",
+  );
+
+  if (onPress) {
+    return (
+      <Button
+        color="input-like"
+        className={className}
+        isDisabled={isDisabled}
+        onPress={onPress}
+        type="button"
+      >
+        {content}
+      </Button>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex min-h-16 w-full items-center rounded-lg border border-accent-500 bg-white px-4 py-3 text-left dark:border-accent-700 dark:bg-accent-900",
+        tone === "danger" && "border-danger-500 dark:border-danger-700",
+      )}
+    >
+      {content}
+    </div>
+  );
+}
+
+function DeleteAccountDialog({
+  canSubmit,
+  confirmation,
+  errorMessage,
+  isOpen,
+  isPending,
+  onConfirmationChange,
+  onOpenChange,
+  onSubmit,
+}: {
+  canSubmit: boolean;
+  confirmation: string;
+  errorMessage: string | null;
+  isOpen: boolean;
+  isPending: boolean;
+  onConfirmationChange: (value: string) => void;
+  onOpenChange: (isOpen: boolean) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <ModalOverlay
+      isDismissable={!isPending}
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      className={({ isEntering, isExiting }) =>
+        cn(
+          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          isEntering && "duration-200 ease-out animate-in fade-in",
+          isExiting && "duration-150 ease-in animate-out fade-out",
+        )
+      }
+    >
+      <Modal
+        className={({ isEntering, isExiting }) =>
+          cn(
+            "w-full max-w-[420px] outline-none",
+            isEntering && "duration-200 ease-out animate-in fade-in zoom-in-95",
+            isExiting && "duration-150 ease-in animate-out fade-out zoom-out-95",
+          )
+        }
+      >
+        <Dialog
+          aria-label={t`Delete account`}
+          className="rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
+        >
+          <form className="flex flex-col gap-5 p-5 sm:p-6" onSubmit={onSubmit}>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-lg font-medium">
+                <Trans>Delete account?</Trans>
+              </h2>
+              <p className="text-sm text-accent-700 dark:text-accent-50">
+                <Trans>
+                  This permanently deletes your trizum cloud account, sign-in methods, and cloud
+                  sync settings. Your local data on this device will remain.
+                </Trans>
+              </p>
+            </div>
+
+            {errorMessage ? <AuthErrorAlert message={errorMessage} /> : null}
+
+            <AppTextField
+              description={t`Type "delete account" to confirm.`}
+              isDisabled={isPending}
+              label={t`Confirmation`}
+              onChange={onConfirmationChange}
+              value={confirmation}
+            />
+
+            <div className="flex flex-col gap-3">
+              <Button
+                className="bg-danger-500 text-danger-50 dark:bg-danger-500"
+                color="accent"
+                isDisabled={!canSubmit || isPending}
+                type="submit"
+              >
+                <span className="flex items-center gap-2">
+                  <Icon icon="lucide.trash-2" width={18} height={18} />
+                  <Trans>Delete account</Trans>
+                </span>
+              </Button>
+              <Button
+                color="input-like"
+                isDisabled={isPending}
+                onPress={() => {
+                  onOpenChange(false);
+                }}
+                type="button"
+              >
+                <Trans>Cancel</Trans>
+              </Button>
+            </div>
+          </form>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
+  );
+}
+
 function hasLocalPartyListData(partyList: PartyList) {
   return (
     hasRecordData(partyList.parties) ||
@@ -1032,17 +1237,36 @@ function hasRecordData(record: Record<string, unknown> | undefined) {
   return Object.values(record ?? {}).some(Boolean);
 }
 
-function getProviderLabel(providerId: string) {
-  switch (providerId) {
-    case "apple":
-      return t`Apple`;
-    case "credential":
-      return t`Password`;
-    case "google":
-      return t`Google`;
-    default:
-      return providerId;
+function getCloudSyncStatusLabel({
+  cloudSettings,
+  isCloudPending,
+  isCurrentDocumentSynced,
+}: {
+  cloudSettings: CloudUserSettings | null;
+  isCloudPending: boolean;
+  isCurrentDocumentSynced: boolean;
+}) {
+  if (isCloudPending) {
+    return t`Starting cloud sync`;
   }
+
+  if (!cloudSettings) {
+    return t`Cloud sync starts automatically after sign-in.`;
+  }
+
+  if (isCurrentDocumentSynced) {
+    return t`This device is using cloud sync.`;
+  }
+
+  return t`This device needs to switch to your cloud data.`;
+}
+
+function getDeleteAccountErrorMessage(message: string) {
+  if (message.toLowerCase().includes("session")) {
+    return t`Sign in again before deleting your account`;
+  }
+
+  return message;
 }
 
 function getAuthCallbackErrorMessage(error: string) {

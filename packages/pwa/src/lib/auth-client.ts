@@ -275,6 +275,23 @@ export async function resetPasswordWithToken({
   }
 }
 
+export async function deleteAuthUserAccount() {
+  const response = await fetch(getAuthEndpointURL("/delete-user"), {
+    body: JSON.stringify({
+      callbackURL: getAuthSettingsCallbackURL(),
+    }),
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error(await getAuthErrorMessage(response, "Could not delete account."));
+  }
+}
+
 function getAuthEndpointURL(path: string) {
   return new URL(`/api/auth${path}`, getAuthBaseURL()).toString();
 }
