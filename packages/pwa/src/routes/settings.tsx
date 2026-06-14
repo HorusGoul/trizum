@@ -149,13 +149,36 @@ function Settings() {
         </form.Subscribe>
       </div>
 
+      <div className="container mt-4 px-4">
+        <Button
+          color="input-like"
+          className="h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left"
+          onPress={() => {
+            void navigate({ to: "/settings/cloud-sync" });
+          }}
+        >
+          <span className="flex w-full items-center gap-3">
+            <Icon icon="lucide.cloud" width={20} height={20} />
+            <span className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="font-medium leading-none">
+                <Trans>Cloud sync</Trans>
+              </span>
+              <span className="truncate text-sm text-accent-700 dark:text-accent-50">
+                {cloudSyncLabel}
+              </span>
+            </span>
+            <Icon icon="lucide.chevron-right" width={20} height={20} />
+          </span>
+        </Button>
+      </div>
+
       <form
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
           void form.handleSubmit();
         }}
-        className="container mt-4 flex flex-col gap-6 px-4"
+        className="container mt-6 flex flex-col gap-6 px-4 pb-8 pb-safe"
       >
         <form.Field name="avatarId">
           {(field) => (
@@ -284,29 +307,6 @@ function Settings() {
           )}
         </form.Field>
       </form>
-
-      <div className="container mt-8 px-4 pb-8 pb-safe">
-        <Button
-          color="input-like"
-          className="h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left"
-          onPress={() => {
-            void navigate({ to: "/settings/cloud-sync" });
-          }}
-        >
-          <span className="flex w-full items-center gap-3">
-            <Icon icon="lucide.cloud" width={20} height={20} />
-            <span className="flex min-w-0 flex-1 flex-col gap-1">
-              <span className="font-medium leading-none">
-                <Trans>Cloud sync</Trans>
-              </span>
-              <span className="truncate text-sm text-accent-700 dark:text-accent-50">
-                {cloudSyncLabel}
-              </span>
-            </span>
-            <Icon icon="lucide.chevron-right" width={20} height={20} />
-          </span>
-        </Button>
-      </div>
     </div>
   );
 }
