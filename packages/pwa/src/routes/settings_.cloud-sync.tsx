@@ -25,6 +25,7 @@ import {
 } from "#src/lib/cloudSyncSettings.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
+import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
 import {
   ModalSheet,
   ModalSheetAction,
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/settings_/cloud-sync")({
 });
 
 const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
+const PASSWORD_SIGN_IN_ENABLE_DELAY_MS = 250;
 const AUTH_SECONDARY_BUTTON_CLASS_NAME =
   "h-9 text-sm font-medium text-accent-700 dark:text-accent-50";
 
@@ -69,8 +71,11 @@ function CloudSyncSettings() {
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authEmailError, setAuthEmailError] = useState<string | null>(null);
+  const [authPasswordError, setAuthPasswordError] = useState<string | null>(null);
   const [isPasswordLoginMode, setIsPasswordLoginMode] = useState(false);
   const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
+  const [isPasswordSignInEnabled, setIsPasswordSignInEnabled] = useState(true);
   const [isSignInSuccessVisible, setIsSignInSuccessVisible] = useState(auth === "success");
   const [magicLinkMessage, setMagicLinkMessage] = useState<string | null>(null);
   const [passwordResetMessage, setPasswordResetMessage] = useState<string | null>(null);
@@ -164,6 +169,66 @@ function CloudSyncSettings() {
     setAuthError(getAuthCallbackErrorMessage(authCallbackError));
   }, [authCallbackError, userId]);
 
+  useEffect(() => {
+    if (!isPasswordLoginMode) {
+      setIsPasswordSignInEnabled(true);
+      return;
+    }
+
+    if (isPasswordSignInEnabled) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setIsPasswordSignInEnabled(true);
+    }, PASSWORD_SIGN_IN_ENABLE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isPasswordLoginMode, isPasswordSignInEnabled]);
+
+  function clearAuthErrors() {
+    setAuthError(null);
+    setAuthEmailError(null);
+    setAuthPasswordError(null);
+  }
+
+  function clearAuthFeedback() {
+    clearAuthErrors();
+    setMagicLinkMessage(null);
+    setPasswordResetMessage(null);
+  }
+
+  function setAuthFailureMessage(message: string) {
+    if (isEmailFieldErrorMessage(message)) {
+      setAuthEmailError(message);
+      return;
+    }
+
+    if (isPasswordFieldErrorMessage(message)) {
+      setAuthPasswordError(message);
+      return;
+    }
+
+    setAuthError(message);
+  }
+
+  function setAuthFailure(error: unknown, fallbackMessage: string) {
+    setAuthFailureMessage(error instanceof Error ? error.message : fallbackMessage);
+  }
+
+  function onAuthEmailChange(value: string) {
+    setAuthEmail(value);
+    clearAuthErrors();
+  }
+
+  function onAuthPasswordChange(value: string) {
+    setAuthPassword(value);
+    setAuthError(null);
+    setAuthPasswordError(null);
+  }
+
   async function showSignInSuccess() {
     setIsSignInSuccessVisible(true);
     await new Promise((resolve) => window.setTimeout(resolve, SIGN_IN_SUCCESS_ANIMATION_MS));
@@ -171,7 +236,7 @@ function CloudSyncSettings() {
 
   async function onMagicLinkSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setAuthError(null);
+    clearAuthErrors();
     setMagicLinkMessage(null);
     setPasswordResetMessage(null);
     setIsSignInSuccessVisible(false);
@@ -185,7 +250,7 @@ function CloudSyncSettings() {
       setMagicLinkMessage(t`Check your email for the sign-in link`);
       toast.success(t`Sign-in link sent`);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t`Could not send sign-in link`);
+      setAuthFailure(error, t`Could not send sign-in link`);
     } finally {
       setIsAuthPending(false);
     }
@@ -193,7 +258,12 @@ function CloudSyncSettings() {
 
   async function onPasswordSignInSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setAuthError(null);
+
+    if (!isPasswordSignInEnabled) {
+      return;
+    }
+
+    clearAuthErrors();
     setMagicLinkMessage(null);
     setPasswordResetMessage(null);
     setIsSignInSuccessVisible(false);
@@ -207,7 +277,7 @@ function CloudSyncSettings() {
       });
 
       if (result.error) {
-        setAuthError(result.error.message ?? t`Authentication failed`);
+        setAuthFailureMessage(result.error.message ?? t`Authentication failed`);
         return;
       }
 
@@ -216,7 +286,7 @@ function CloudSyncSettings() {
       await Promise.all([showSignInSuccess(), session.refetch()]);
       setIsSignInSuccessVisible(false);
     } catch (error) {
-      setAuthError(
+      setAuthFailureMessage(
         error instanceof Error && error.message.endsWith("sign-in is not configured.")
           ? t`Sign-in method is not configured`
           : error instanceof Error
@@ -229,7 +299,7 @@ function CloudSyncSettings() {
   }
 
   async function onSocialSignIn(provider: SocialAuthProvider) {
-    setAuthError(null);
+    clearAuthErrors();
     setMagicLinkMessage(null);
     setIsSignInSuccessVisible(false);
     setIsAuthPending(true);
@@ -253,7 +323,7 @@ function CloudSyncSettings() {
   }
 
   async function onLinkSocialAccount(provider: SocialAuthProvider) {
-    setAuthError(null);
+    clearAuthErrors();
     setIsAuthPending(true);
 
     try {
@@ -274,7 +344,7 @@ function CloudSyncSettings() {
   }
 
   async function onRequestPasswordReset(email: string) {
-    setAuthError(null);
+    clearAuthErrors();
     setPasswordResetMessage(null);
     setIsSignInSuccessVisible(false);
     setIsAuthPending(true);
@@ -283,8 +353,8 @@ function CloudSyncSettings() {
       await requestPasswordResetEmail(email);
       setPasswordResetMessage(t`Check your email for the password link`);
       toast.success(t`Password email sent`);
-    } catch {
-      setAuthError(t`Could not send password email`);
+    } catch (error) {
+      setAuthFailure(error, t`Could not send password email`);
     } finally {
       setIsAuthPending(false);
     }
@@ -391,19 +461,26 @@ function CloudSyncSettings() {
           <Settings />
         </div>
 
-        <CloudSyncSignInDialog isOpen onOpenChange={closeSignInDialog}>
+        <CloudSyncSignInDialog
+          isOpen
+          onOpenChange={closeSignInDialog}
+          showHeader={!magicLinkMessage}
+        >
           {isSignInSuccessVisible ? (
             <SignInSuccessAnimation />
           ) : isPasswordResetMode ? (
             <form className="flex flex-col gap-4" onSubmit={onPasswordResetSubmit}>
+              {authError ? <AuthErrorAlert message={authError} /> : null}
               <AppTextField
+                errorMessage={authEmailError ?? undefined}
                 isDisabled={isAuthPending}
+                isInvalid={Boolean(authEmailError)}
+                isRequired
                 label={t`Email`}
-                onChange={setAuthEmail}
+                onChange={onAuthEmailChange}
                 type="email"
                 value={authEmail}
               />
-              {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
               {passwordResetMessage ? (
                 <p className="text-sm text-accent-700 dark:text-accent-50">
                   {passwordResetMessage}
@@ -420,9 +497,7 @@ function CloudSyncSettings() {
                 isDisabled={isAuthPending}
                 onPress={() => {
                   setIsPasswordResetMode(false);
-                  setAuthError(null);
-                  setMagicLinkMessage(null);
-                  setPasswordResetMessage(null);
+                  clearAuthFeedback();
                 }}
                 type="button"
               >
@@ -434,9 +509,7 @@ function CloudSyncSettings() {
               email={authEmail}
               message={magicLinkMessage}
               onTryAgain={() => {
-                setAuthError(null);
-                setMagicLinkMessage(null);
-                setPasswordResetMessage(null);
+                clearAuthFeedback();
                 setIsPasswordLoginMode(false);
               }}
             />
@@ -477,27 +550,32 @@ function CloudSyncSettings() {
 
               {isPasswordLoginMode ? (
                 <form className="flex flex-col gap-4" onSubmit={onPasswordSignInSubmit}>
+                  {authError ? <AuthErrorAlert message={authError} /> : null}
                   <AppTextField
+                    errorMessage={authEmailError ?? undefined}
                     isDisabled={isAuthPending}
+                    isInvalid={Boolean(authEmailError)}
+                    isRequired
                     label={t`Email`}
-                    onChange={setAuthEmail}
+                    onChange={onAuthEmailChange}
                     type="email"
                     value={authEmail}
                   />
                   <AppTextField
-                    description={t`Password sign in only works after you add a password to your account.`}
+                    errorMessage={authPasswordError ?? undefined}
                     isDisabled={isAuthPending}
+                    isInvalid={Boolean(authPasswordError)}
+                    isRequired
                     label={t`Password`}
                     minLength={8}
-                    onChange={setAuthPassword}
+                    onChange={onAuthPasswordChange}
                     type="password"
                     value={authPassword}
                   />
-                  {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
                   <Button
                     className="font-semibold"
                     color="accent"
-                    isDisabled={isAuthPending}
+                    isDisabled={isAuthPending || !isPasswordSignInEnabled}
                     type="submit"
                   >
                     <span className="flex items-center gap-2">
@@ -506,18 +584,19 @@ function CloudSyncSettings() {
                     </span>
                   </Button>
                   <Button
-                    className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
-                    color="transparent"
+                    color="input-like"
                     isDisabled={isAuthPending}
                     onPress={() => {
                       setIsPasswordLoginMode(false);
-                      setAuthError(null);
-                      setMagicLinkMessage(null);
-                      setPasswordResetMessage(null);
+                      setIsPasswordSignInEnabled(true);
+                      clearAuthFeedback();
                     }}
                     type="button"
                   >
-                    <Trans>Use magic link instead</Trans>
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.mail" width={18} height={18} />
+                      <Trans>Use magic link</Trans>
+                    </span>
                   </Button>
                   <Button
                     className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
@@ -525,9 +604,7 @@ function CloudSyncSettings() {
                     isDisabled={isAuthPending}
                     onPress={() => {
                       setIsPasswordResetMode(true);
-                      setAuthError(null);
-                      setMagicLinkMessage(null);
-                      setPasswordResetMessage(null);
+                      clearAuthFeedback();
                     }}
                     type="button"
                   >
@@ -536,14 +613,17 @@ function CloudSyncSettings() {
                 </form>
               ) : (
                 <form className="flex flex-col gap-4" onSubmit={onMagicLinkSubmit}>
+                  {authError ? <AuthErrorAlert message={authError} /> : null}
                   <AppTextField
+                    errorMessage={authEmailError ?? undefined}
                     isDisabled={isAuthPending}
+                    isInvalid={Boolean(authEmailError)}
+                    isRequired
                     label={t`Email`}
-                    onChange={setAuthEmail}
+                    onChange={onAuthEmailChange}
                     type="email"
                     value={authEmail}
                   />
-                  {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
                   <Button color="accent" isDisabled={isAuthPending} type="submit">
                     <span className="flex items-center gap-2">
                       <Icon icon="lucide.mail" width={18} height={18} />
@@ -556,13 +636,12 @@ function CloudSyncSettings() {
                     isDisabled={isAuthPending}
                     onPress={() => {
                       setIsPasswordLoginMode(true);
-                      setAuthError(null);
-                      setMagicLinkMessage(null);
-                      setPasswordResetMessage(null);
+                      setIsPasswordSignInEnabled(false);
+                      clearAuthFeedback();
                     }}
                     type="button"
                   >
-                    <Trans>Use password instead</Trans>
+                    <Trans>Use password</Trans>
                   </Button>
                 </form>
               )}
@@ -755,10 +834,12 @@ function CloudSyncSignInDialog({
   children,
   isOpen,
   onOpenChange,
+  showHeader,
 }: {
   children: ReactNode;
   isOpen: boolean;
   onOpenChange: () => void;
+  showHeader: boolean;
 }) {
   return (
     <ModalOverlay
@@ -771,7 +852,7 @@ function CloudSyncSignInDialog({
       }}
       className={({ isEntering, isExiting }) =>
         cn(
-          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/35 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          "fixed inset-0 z-50 flex items-stretch justify-center bg-accent-950/35 p-0 backdrop-blur-md sm:items-center sm:px-safe-or-4 sm:py-safe-offset-6",
           isEntering && "duration-200 ease-out animate-in fade-in",
           isExiting && "duration-150 ease-in animate-out fade-out",
         )
@@ -780,7 +861,7 @@ function CloudSyncSignInDialog({
       <Modal
         className={({ isEntering, isExiting }) =>
           cn(
-            "w-full max-w-[420px] outline-none",
+            "h-full w-full outline-none sm:h-auto sm:max-w-[420px]",
             isEntering && "duration-200 ease-out animate-in fade-in zoom-in-95",
             isExiting && "duration-150 ease-in animate-out fade-out zoom-out-95",
           )
@@ -788,7 +869,7 @@ function CloudSyncSignInDialog({
       >
         <Dialog
           aria-label={t`Sign in`}
-          className="relative max-h-[calc(100dvh-2rem)] overflow-hidden rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
+          className="relative flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-white shadow-2xl outline-none sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg sm:border sm:border-accent-200 dark:bg-accent-950 dark:sm:border-accent-800"
         >
           <IconButton
             aria-label={t`Back to settings`}
@@ -796,25 +877,36 @@ function CloudSyncSignInDialog({
             icon="lucide.x"
             onPress={onOpenChange}
           />
-          <div className="flex flex-col gap-5 overflow-y-auto p-5 pt-14 sm:p-6 sm:pt-14">
-            <div className="flex flex-col items-center gap-3 text-center">
-              <img
-                alt=""
-                className="size-12 rounded-xl"
-                height={48}
-                src="/pwa-64x64.png"
-                width={48}
-              />
-              <h2 className="text-lg font-medium">
-                <Trans>Sign in to trizum cloud</Trans>
-              </h2>
-            </div>
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 pt-14 sm:p-6 sm:pt-14">
+            {showHeader ? (
+              <div className="flex flex-col items-center gap-3 text-center">
+                <img
+                  alt=""
+                  className="size-12 rounded-xl"
+                  height={48}
+                  src="/pwa-64x64.png"
+                  width={48}
+                />
+                <h2 className="text-lg font-medium">
+                  <Trans>Sign in to trizum cloud</Trans>
+                </h2>
+              </div>
+            ) : null}
 
             {children}
           </div>
         </Dialog>
       </Modal>
     </ModalOverlay>
+  );
+}
+
+function AuthErrorAlert({ message }: { message: string }) {
+  return (
+    <Alert variant="destructive">
+      <Icon icon="lucide.circle-alert" />
+      <AlertDescription>{message}</AlertDescription>
+    </Alert>
   );
 }
 
@@ -828,25 +920,33 @@ function MagicLinkSentState({
   onTryAgain: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-5 text-center">
-      <span className="flex size-14 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-950/60 dark:text-success-200">
+    <motion.div
+      className="flex flex-1 flex-col items-center justify-center gap-5 py-8 text-center"
+      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+    >
+      <motion.span
+        className="flex size-16 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-950/60 dark:text-success-200"
+        initial={{ scale: 0.72 }}
+        animate={{ scale: [0.72, 1.08, 1] }}
+        transition={{ delay: 0.04, duration: 0.38, ease: "easeOut" }}
+      >
         <Icon icon="lucide.mail-check" width={28} height={28} />
-      </span>
+      </motion.span>
       <div className="flex flex-col gap-2">
         <h3 className="text-base font-medium">{message}</h3>
         <p className="text-sm text-accent-700 dark:text-accent-50">
           <Trans>We sent a sign-in link to {email}. Open it to finish signing in.</Trans>
         </p>
       </div>
-      <Button
-        className={AUTH_SECONDARY_BUTTON_CLASS_NAME}
-        color="transparent"
-        onPress={onTryAgain}
-        type="button"
-      >
-        <Trans>Try another email</Trans>
+      <Button color="input-like" onPress={onTryAgain} type="button">
+        <span className="flex items-center gap-2">
+          <Icon icon="lucide.refresh-cw" width={18} height={18} />
+          <Trans>Try another email</Trans>
+        </span>
       </Button>
-    </div>
+    </motion.div>
   );
 }
 
@@ -952,4 +1052,29 @@ function getAuthCallbackErrorMessage(error: string) {
     default:
       return t`Authentication failed`;
   }
+}
+
+function isEmailFieldErrorMessage(message: string) {
+  const normalizedMessage = message.toLowerCase();
+
+  return (
+    normalizedMessage.includes("email") &&
+    !normalizedMessage.includes("password") &&
+    (normalizedMessage.includes("invalid") ||
+      normalizedMessage.includes("valid") ||
+      normalizedMessage.includes("required"))
+  );
+}
+
+function isPasswordFieldErrorMessage(message: string) {
+  const normalizedMessage = message.toLowerCase();
+
+  return (
+    normalizedMessage.includes("password") &&
+    !normalizedMessage.includes("email") &&
+    (normalizedMessage.includes("invalid") ||
+      normalizedMessage.includes("required") ||
+      normalizedMessage.includes("short") ||
+      normalizedMessage.includes("least"))
+  );
 }
