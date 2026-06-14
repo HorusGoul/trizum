@@ -8,8 +8,8 @@ import { BackButton } from "#src/components/BackButton.js";
 import {
   authClient,
   fetchLinkedAuthAccounts,
-  getAuthSettingsCallbackURL,
   linkSocialAuthAccount,
+  requestMagicLinkEmail,
   requestPasswordResetEmail,
   signInWithSocialAuthAccount,
   type LinkedAuthAccount,
@@ -47,11 +47,12 @@ function CloudSyncSettings() {
   const session = authClient.useSession();
   const user = session.data?.user;
   const userId = user?.id;
-  const [authMode, setAuthMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isPasswordLoginMode, setIsPasswordLoginMode] = useState(false);
   const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
+  const [magicLinkMessage, setMagicLinkMessage] = useState<string | null>(null);
   const [passwordResetMessage, setPasswordResetMessage] = useState<string | null>(null);
   const [linkedAccounts, setLinkedAccounts] = useState<LinkedAuthAccount[]>([]);
   const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
@@ -106,26 +107,40 @@ function CloudSyncSettings() {
     }
   }, [userId]);
 
-  async function onAuthSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onMagicLinkSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setAuthError(null);
+    setMagicLinkMessage(null);
     setPasswordResetMessage(null);
     setIsAuthPending(true);
 
     try {
-      const result =
-        authMode === "sign-in"
-          ? await authClient.signIn.email({
-              email: authEmail,
-              password: authPassword,
-              rememberMe: true,
-            })
-          : await authClient.signUp.email({
-              callbackURL: getAuthSettingsCallbackURL(),
-              email: authEmail,
-              name: partyList.username.trim() || authEmail,
-              password: authPassword,
-            });
+      await requestMagicLinkEmail({
+        email: authEmail,
+        name: partyList.username.trim() || authEmail,
+      });
+      setMagicLinkMessage(t`Check your email for the sign-in link`);
+      toast.success(t`Sign-in link sent`);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : t`Could not send sign-in link`);
+    } finally {
+      setIsAuthPending(false);
+    }
+  }
+
+  async function onPasswordSignInSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthError(null);
+    setMagicLinkMessage(null);
+    setPasswordResetMessage(null);
+    setIsAuthPending(true);
+
+    try {
+      const result = await authClient.signIn.email({
+        email: authEmail,
+        password: authPassword,
+        rememberMe: true,
+      });
 
       if (result.error) {
         setAuthError(result.error.message ?? t`Authentication failed`);
@@ -134,7 +149,7 @@ function CloudSyncSettings() {
 
       setAuthPassword("");
       await session.refetch();
-      toast.success(authMode === "sign-in" ? t`Signed in` : t`Account created`);
+      toast.success(t`Signed in`);
     } catch (error) {
       setAuthError(
         error instanceof Error && error.message.endsWith("sign-in is not configured.")
@@ -150,6 +165,7 @@ function CloudSyncSettings() {
 
   async function onSocialSignIn(provider: SocialAuthProvider) {
     setAuthError(null);
+    setMagicLinkMessage(null);
     setIsAuthPending(true);
 
     try {
@@ -469,6 +485,7 @@ function CloudSyncSettings() {
                   onPress={() => {
                     setIsPasswordResetMode(false);
                     setAuthError(null);
+                    setMagicLinkMessage(null);
                     setPasswordResetMessage(null);
                   }}
                 >
@@ -510,22 +527,7 @@ function CloudSyncSettings() {
                   <span className="h-px flex-1 bg-accent-200 dark:bg-accent-700" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    color={authMode === "sign-in" ? "accent" : "input-like"}
-                    onPress={() => setAuthMode("sign-in")}
-                  >
-                    <Trans>Sign in</Trans>
-                  </Button>
-                  <Button
-                    color={authMode === "sign-up" ? "accent" : "input-like"}
-                    onPress={() => setAuthMode("sign-up")}
-                  >
-                    <Trans>Create account</Trans>
-                  </Button>
-                </div>
-
-                <form className="flex flex-col gap-4" onSubmit={onAuthSubmit}>
+                <form className="flex flex-col gap-4" onSubmit={onMagicLinkSubmit}>
                   <AppTextField
                     isDisabled={isAuthPending}
                     label={t`Email`}
@@ -533,39 +535,75 @@ function CloudSyncSettings() {
                     type="email"
                     value={authEmail}
                   />
-                  <AppTextField
-                    isDisabled={isAuthPending}
-                    label={t`Password`}
-                    minLength={8}
-                    onChange={setAuthPassword}
-                    type="password"
-                    value={authPassword}
-                  />
-                  {authMode === "sign-in" ? (
+                  {authError && !isPasswordLoginMode ? (
+                    <p className="text-sm text-danger-500">{authError}</p>
+                  ) : null}
+                  {magicLinkMessage ? (
+                    <p className="text-sm text-accent-700 dark:text-accent-50">
+                      {magicLinkMessage}
+                    </p>
+                  ) : null}
+                  <Button color="accent" isDisabled={isAuthPending} type="submit">
+                    <span className="flex items-center gap-2">
+                      <Icon icon="lucide.mail" width={18} height={18} />
+                      <Trans>Email me a sign-in link</Trans>
+                    </span>
+                  </Button>
+                </form>
+
+                <Button
+                  color="transparent"
+                  isDisabled={isAuthPending}
+                  onPress={() => {
+                    setIsPasswordLoginMode((isOpen) => !isOpen);
+                    setAuthError(null);
+                    setMagicLinkMessage(null);
+                    setPasswordResetMessage(null);
+                  }}
+                >
+                  {isPasswordLoginMode ? (
+                    <Trans>Hide password sign in</Trans>
+                  ) : (
+                    <Trans>Use password instead</Trans>
+                  )}
+                </Button>
+
+                {isPasswordLoginMode ? (
+                  <form className="flex flex-col gap-4" onSubmit={onPasswordSignInSubmit}>
+                    <p className="text-sm text-accent-700 dark:text-accent-50">
+                      <Trans>
+                        Password sign in only works after you add a password to your account.
+                      </Trans>
+                    </p>
+                    <AppTextField
+                      isDisabled={isAuthPending}
+                      label={t`Password`}
+                      minLength={8}
+                      onChange={setAuthPassword}
+                      type="password"
+                      value={authPassword}
+                    />
                     <Button
                       color="transparent"
                       isDisabled={isAuthPending}
                       onPress={() => {
                         setIsPasswordResetMode(true);
                         setAuthError(null);
+                        setMagicLinkMessage(null);
                         setPasswordResetMessage(null);
                       }}
                     >
                       <Trans>Forgot password?</Trans>
                     </Button>
-                  ) : null}
-                  {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
-                  <Button color="accent" isDisabled={isAuthPending} type="submit">
-                    <span className="flex items-center gap-2">
-                      <Icon icon="lucide.log-in" width={18} height={18} />
-                      {authMode === "sign-in" ? (
-                        <Trans>Sign in</Trans>
-                      ) : (
-                        <Trans>Create account</Trans>
-                      )}
-                    </span>
-                  </Button>
-                </form>
+                    {authError ? <p className="text-sm text-danger-500">{authError}</p> : null}
+                    <Button color="input-like" isDisabled={isAuthPending} type="submit">
+                      <span className="flex items-center gap-2">
+                        <Icon icon="lucide.log-in" width={18} height={18} />
+                        <Trans>Sign in with password</Trans>
+                      </span>
+                    </Button>
+                  </form>
+                ) : null}
               </>
             )}
           </section>

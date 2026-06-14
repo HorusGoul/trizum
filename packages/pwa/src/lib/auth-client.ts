@@ -1,4 +1,5 @@
 import { Capacitor } from "@capacitor/core";
+import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { AUTH_PROVIDER_CONFIG } from "./authConfig";
 
@@ -33,6 +34,7 @@ export const authClient = createAuthClient({
   fetchOptions: {
     credentials: "include",
   },
+  plugins: [magicLinkClient()],
 });
 
 export function getAuthBaseURL() {
@@ -221,6 +223,20 @@ export async function requestPasswordResetEmail(email: string) {
 
   if (!response.ok) {
     throw new Error(await getAuthErrorMessage(response, "Could not send password email."));
+  }
+}
+
+export async function requestMagicLinkEmail({ email, name }: { email: string; name: string }) {
+  const result = await authClient.signIn.magicLink({
+    callbackURL: getAuthSettingsCallbackURL(),
+    email,
+    errorCallbackURL: getAuthSettingsCallbackURL(),
+    name,
+    newUserCallbackURL: getAuthSettingsCallbackURL(),
+  });
+
+  if (result.error) {
+    throw new Error(result.error.message ?? "Could not send magic link.");
   }
 }
 

@@ -1,5 +1,6 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { magicLink } from "better-auth/plugins";
 import { EmailMessage } from "cloudflare:email";
 import { importPKCS8, SignJWT } from "jose";
 import { getApiDb, schema } from "./db/client";
@@ -99,6 +100,20 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
         });
       },
     },
+    plugins: [
+      magicLink({
+        sendMagicLink: async ({ email, url }) => {
+          await sendAuthEmail(env, {
+            subject: "Sign in to trizum",
+            text: `Use this link to sign in to trizum: ${url}`,
+            html: `<p>Use this link to sign in to trizum:</p><p><a href="${escapeHtml(
+              url,
+            )}">Sign in to trizum</a></p>`,
+            to: email,
+          });
+        },
+      }),
+    ],
     logger: createBetterAuthLogger(),
     socialProviders,
     advanced: {
