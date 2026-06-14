@@ -22,6 +22,8 @@ WORKDIR /app
 
 # Copy workspace configuration files from monorepo root
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY AGENTS.md ./
+COPY scripts/apply-vite-plus-agent-overrides.mjs ./scripts/apply-vite-plus-agent-overrides.mjs
 
 # Copy workspace manifests before sources so dependency install stays cached.
 COPY packages/icon-sprite/package.json ./packages/icon-sprite/package.json
