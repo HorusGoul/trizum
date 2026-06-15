@@ -1310,7 +1310,7 @@ function CloudSettingsItem({
     </span>
   );
   const className = cn(
-    "-mx-3 h-auto min-h-16 justify-start rounded-xl px-3 py-3 text-left",
+    "-mx-3 h-auto min-h-16 w-[calc(100%+1.5rem)] justify-start rounded-xl px-3 py-3 text-left",
     "hover:bg-accent-100/70 dark:hover:bg-accent-900/70",
     tone === "danger" && "hover:bg-danger-50 dark:hover:bg-danger-950/40",
   );
@@ -1330,7 +1330,7 @@ function CloudSettingsItem({
   }
 
   return (
-    <div className="-mx-3 flex min-h-16 w-full items-center rounded-xl px-3 py-3 text-left">
+    <div className="-mx-3 flex min-h-16 w-[calc(100%+1.5rem)] items-center rounded-xl px-3 py-3 text-left">
       {content}
     </div>
   );
