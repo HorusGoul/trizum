@@ -916,18 +916,13 @@ function CloudSyncSettings() {
           />
         </CloudSettingsSection>
 
-        <CloudSettingsSection
-          icon="lucide.triangle-alert"
-          title={t`Destructive actions`}
-          tone="danger"
-        >
+        <CloudSettingsSection icon="lucide.triangle-alert" title={t`Destructive actions`}>
           <CloudSettingsItem
             icon="lucide.trash-2"
             title={t`Delete account`}
             description={t`Permanently delete your trizum cloud account`}
             isDisabled={isDeleteAccountPending}
             onPress={openDeleteAccountDialog}
-            tone="danger"
           />
         </CloudSettingsSection>
       </div>
@@ -1277,7 +1272,7 @@ function CloudSettingsItem({
         {description ? (
           <span
             className={cn(
-              "truncate text-sm text-accent-700 dark:text-accent-200",
+              "whitespace-normal break-words text-sm leading-snug text-accent-700 dark:text-accent-200",
               tone === "danger" && "text-danger-700 dark:text-danger-300",
             )}
           >
