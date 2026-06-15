@@ -77,7 +77,7 @@ type AuthPendingAction =
   | "password-reset"
   | "sign-out";
 
-type CloudActionDialogType = "connect-apple" | "connect-google" | "password-link";
+type CloudActionDialogType = "connect-apple" | "connect-google" | "password-link" | "sign-out";
 
 interface CachedCloudAccountState {
   cachedAt: number;
@@ -510,6 +510,9 @@ function CloudSyncSettings() {
       case "password-link":
         await onRequestPasswordReset(user.email);
         return;
+      case "sign-out":
+        await onSignOut();
+        return;
     }
   }
 
@@ -909,7 +912,7 @@ function CloudSyncSettings() {
             description={t`Stop trizum cloud on this device`}
             isDisabled={isAuthPending}
             onPress={() => {
-              void onSignOut();
+              setCloudActionDialog("sign-out");
             }}
           />
         </CloudSettingsSection>
@@ -1488,6 +1491,17 @@ function getCloudActionDialogConfig({
         ),
         icon: "lucide.key-round",
         title: hasPasswordAccount ? t`Email password link?` : t`Set up password?`,
+      };
+    case "sign-out":
+      return {
+        actionLabel: t`Sign out`,
+        description: (
+          <Trans>
+            This stops trizum cloud on this device. Your local data stays on this device.
+          </Trans>
+        ),
+        icon: "lucide.log-out",
+        title: t`Sign out?`,
       };
   }
 }
