@@ -843,42 +843,18 @@ function CloudSyncSettings() {
         </h1>
       </div>
 
-      <div className="container mt-4 flex flex-col gap-6 px-4 pb-8 pb-safe">
-        <section className="flex flex-col gap-1">
-          <CloudSettingsItem
-            icon="lucide.mail"
-            title={t`Email`}
-            description={user.email}
-            isConnected
-          />
-          <CloudSettingsItem
-            icon="brand.google"
-            title={t`Google`}
-            actionLabel={linkedProviderIds.has("google") ? undefined : t`Connect`}
-            description={
-              linkedProviderIds.has("google")
-                ? t`Connected to this account`
-                : t`Add Google as a sign-in method`
-            }
-            isConnected={linkedProviderIds.has("google")}
-            isDisabled={isAuthPending || linkedProviderIds.has("google")}
-            onPress={
-              linkedProviderIds.has("google")
-                ? undefined
-                : () => {
-                    setCloudActionDialog("connect-google");
-                  }
-            }
-          />
+      <div className="container mt-4 flex flex-col gap-8 px-4 pb-8 pb-safe">
+        <CloudSettingsSection icon="lucide.link" title={t`Connections`}>
           <CloudSettingsItem
             icon="brand.apple"
             title={t`Apple`}
             actionLabel={linkedProviderIds.has("apple") ? undefined : t`Connect`}
             description={
               linkedProviderIds.has("apple")
-                ? t`Connected to this account`
+                ? t`Apple is connected to this account`
                 : t`Add Apple as a sign-in method`
             }
+            statusLabel={linkedProviderIds.has("apple") ? t`Connected` : undefined}
             isConnected={linkedProviderIds.has("apple")}
             isDisabled={isAuthPending || linkedProviderIds.has("apple")}
             onPress={
@@ -890,29 +866,47 @@ function CloudSyncSettings() {
             }
           />
           <CloudSettingsItem
+            icon="brand.google"
+            title={t`Google`}
+            actionLabel={linkedProviderIds.has("google") ? undefined : t`Connect`}
+            description={
+              linkedProviderIds.has("google")
+                ? t`Google is connected to this account`
+                : t`Add Google as a sign-in method`
+            }
+            statusLabel={linkedProviderIds.has("google") ? t`Connected` : undefined}
+            isConnected={linkedProviderIds.has("google")}
+            isDisabled={isAuthPending || linkedProviderIds.has("google")}
+            onPress={
+              linkedProviderIds.has("google")
+                ? undefined
+                : () => {
+                    setCloudActionDialog("connect-google");
+                  }
+            }
+          />
+        </CloudSettingsSection>
+
+        <CloudSettingsSection icon="lucide.shield-check" title={t`Security`}>
+          <CloudSettingsItem
+            icon="lucide.mail"
+            title={t`Email`}
+            description={user.email}
+            statusLabel={t`Signed in`}
+            isConnected
+          />
+          <CloudSettingsItem
             icon="lucide.key-round"
             title={t`Password`}
             actionLabel={hasPasswordAccount ? t`Email link` : t`Set up`}
             description={
               passwordResetMessage ??
-              (hasPasswordAccount ? t`Password enabled` : t`Add password sign-in`)
+              (hasPasswordAccount ? t`Password sign-in is enabled` : t`Add password sign-in`)
             }
             isDisabled={isAuthPending}
             onPress={() => {
               setCloudActionDialog("password-link");
             }}
-          />
-        </section>
-
-        <section className="flex flex-col gap-1">
-          <CloudSettingsItem
-            icon="lucide.trash-2"
-            title={t`Delete account`}
-            actionLabel={t`Delete`}
-            description={t`Permanently delete your trizum cloud account`}
-            isDisabled={isDeleteAccountPending}
-            onPress={openDeleteAccountDialog}
-            tone="danger"
           />
           <CloudSettingsItem
             icon="lucide.log-out"
@@ -924,7 +918,23 @@ function CloudSyncSettings() {
               setCloudActionDialog("sign-out");
             }}
           />
-        </section>
+        </CloudSettingsSection>
+
+        <CloudSettingsSection
+          icon="lucide.triangle-alert"
+          title={t`Destructive actions`}
+          tone="danger"
+        >
+          <CloudSettingsItem
+            icon="lucide.trash-2"
+            title={t`Delete account`}
+            actionLabel={t`Delete`}
+            description={t`Permanently delete your trizum cloud account`}
+            isDisabled={isDeleteAccountPending}
+            onPress={openDeleteAccountDialog}
+            tone="danger"
+          />
+        </CloudSettingsSection>
       </div>
 
       <CloudActionConfirmationDialog
@@ -1203,6 +1213,33 @@ function SignInSuccessOverlay() {
   );
 }
 
+function CloudSettingsSection({
+  children,
+  icon,
+  title,
+  tone = "default",
+}: {
+  children: ReactNode;
+  icon: IconProps["icon"];
+  title: string;
+  tone?: "default" | "danger";
+}) {
+  return (
+    <section className="flex flex-col gap-2">
+      <div
+        className={cn(
+          "flex items-center gap-2 px-1 text-sm font-semibold text-accent-700 dark:text-accent-200",
+          tone === "danger" && "text-danger-600 dark:text-danger-300",
+        )}
+      >
+        <Icon icon={icon} width={16} height={16} />
+        <h2>{title}</h2>
+      </div>
+      <div className="flex flex-col gap-1">{children}</div>
+    </section>
+  );
+}
+
 function CloudSettingsItem({
   actionLabel,
   description,
@@ -1210,6 +1247,7 @@ function CloudSettingsItem({
   isConnected,
   isDisabled,
   onPress,
+  statusLabel,
   title,
   tone = "default",
 }: {
@@ -1219,6 +1257,7 @@ function CloudSettingsItem({
   isConnected?: boolean;
   isDisabled?: boolean;
   onPress?: () => void;
+  statusLabel?: ReactNode;
   title: string;
   tone?: "default" | "danger";
 }) {
@@ -1226,8 +1265,9 @@ function CloudSettingsItem({
     <span className="flex w-full items-center gap-3">
       <span
         className={cn(
-          "flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50",
-          tone === "danger" && "bg-danger-50 text-danger-500 dark:bg-danger-950/50",
+          "flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50",
+          tone === "danger" &&
+            "bg-danger-50 text-danger-600 dark:bg-danger-950/50 dark:text-danger-300",
         )}
       >
         <Icon icon={icon} width={20} height={20} />
@@ -1235,8 +1275,8 @@ function CloudSettingsItem({
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span
           className={cn(
-            "font-medium leading-none",
-            tone === "danger" && "text-danger-500 dark:text-danger-300",
+            "font-medium leading-tight",
+            tone === "danger" && "text-danger-600 dark:text-danger-300",
           )}
         >
           {title}
@@ -1244,7 +1284,7 @@ function CloudSettingsItem({
         {description ? (
           <span
             className={cn(
-              "truncate text-sm text-accent-700 dark:text-accent-50",
+              "truncate text-sm text-accent-700 dark:text-accent-200",
               tone === "danger" && "text-danger-700 dark:text-danger-300",
             )}
           >
@@ -1255,12 +1295,31 @@ function CloudSettingsItem({
       {onPress ? (
         <span
           className={cn(
-            "ml-2 flex shrink-0 items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-50",
+            "ml-2 flex shrink-0 items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-100",
             tone === "danger" && "text-danger-600 dark:text-danger-300",
           )}
         >
-          {actionLabel ? <span>{actionLabel}</span> : null}
+          {actionLabel ? (
+            <span
+              className={cn(
+                "rounded-full bg-accent-100 px-2.5 py-1 dark:bg-accent-900",
+                tone === "danger" && "bg-danger-50 dark:bg-danger-950/50",
+              )}
+            >
+              {actionLabel}
+            </span>
+          ) : null}
           <Icon icon="lucide.chevron-right" width={18} height={18} />
+        </span>
+      ) : statusLabel ? (
+        <span
+          className={cn(
+            "ml-2 shrink-0 rounded-full bg-accent-100 px-2.5 py-1 text-xs font-medium text-accent-700 dark:bg-accent-900 dark:text-accent-100",
+            tone === "danger" &&
+              "bg-danger-50 text-danger-700 dark:bg-danger-950/50 dark:text-danger-300",
+          )}
+        >
+          {statusLabel}
         </span>
       ) : isConnected ? (
         <Icon
@@ -1272,7 +1331,11 @@ function CloudSettingsItem({
       ) : null}
     </span>
   );
-  const className = "h-auto min-h-14 justify-start rounded-lg px-4 py-3 text-left";
+  const className = cn(
+    "h-auto min-h-16 justify-start rounded-xl px-3 py-3 text-left",
+    "hover:bg-accent-100/70 dark:hover:bg-accent-900/70",
+    tone === "danger" && "hover:bg-danger-50 dark:hover:bg-danger-950/40",
+  );
 
   if (onPress) {
     return (
@@ -1289,7 +1352,7 @@ function CloudSettingsItem({
   }
 
   return (
-    <div className="flex min-h-14 w-full items-center rounded-lg px-4 py-3 text-left">
+    <div className="flex min-h-16 w-full items-center rounded-xl px-3 py-3 text-left">
       {content}
     </div>
   );
