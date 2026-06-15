@@ -3,6 +3,7 @@ import type { PartyList } from "#src/models/partyList.js";
 import { getAuthBaseURL } from "./auth-client";
 
 const CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX = "trizumCloudUserSettings:";
+const LAST_CLOUD_USER_SETTINGS_CACHE_KEY = "trizumCloudUserSettings:last";
 
 export interface CloudUserSettings {
   partyListDocumentId: DocumentId;
@@ -85,15 +86,35 @@ export function readCachedCloudUserSettings(userId: string) {
   }
 }
 
-export function writeCachedCloudUserSettings(userId: string, settings: CloudUserSettings | null) {
+export function readLastCachedCloudUserSettings() {
   try {
-    localStorage.setItem(
-      getCloudUserSettingsCacheKey(userId),
-      JSON.stringify({
-        cachedAt: Date.now(),
-        settings,
-      } satisfies CachedCloudUserSettings),
-    );
+    const value = localStorage.getItem(LAST_CLOUD_USER_SETTINGS_CACHE_KEY);
+
+    if (!value) {
+      return null;
+    }
+
+    const cachedValue = JSON.parse(value) as Partial<CachedCloudUserSettings> | null;
+
+    if (!isCachedCloudUserSettings(cachedValue)) {
+      return null;
+    }
+
+    return cachedValue;
+  } catch {
+    return null;
+  }
+}
+
+export function writeCachedCloudUserSettings(userId: string, settings: CloudUserSettings | null) {
+  const cachedSettings = {
+    cachedAt: Date.now(),
+    settings,
+  } satisfies CachedCloudUserSettings;
+
+  try {
+    localStorage.setItem(getCloudUserSettingsCacheKey(userId), JSON.stringify(cachedSettings));
+    localStorage.setItem(LAST_CLOUD_USER_SETTINGS_CACHE_KEY, JSON.stringify(cachedSettings));
   } catch {
     // localStorage can be unavailable in restricted browser contexts.
   }
@@ -102,6 +123,7 @@ export function writeCachedCloudUserSettings(userId: string, settings: CloudUser
 export function clearCachedCloudUserSettings(userId: string) {
   try {
     localStorage.removeItem(getCloudUserSettingsCacheKey(userId));
+    localStorage.removeItem(LAST_CLOUD_USER_SETTINGS_CACHE_KEY);
   } catch {
     // localStorage can be unavailable in restricted browser contexts.
   }

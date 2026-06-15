@@ -11,6 +11,7 @@ import { authClient } from "#src/lib/auth-client.ts";
 import {
   fetchCloudUserSettings,
   readCachedCloudUserSettings,
+  readLastCachedCloudUserSettings,
   writeCachedCloudUserSettings,
   type CloudUserSettings,
 } from "#src/lib/cloudSyncSettings.ts";
@@ -51,8 +52,17 @@ export function Settings() {
   const navigate = useNavigate();
   const session = authClient.useSession();
   const userId = session.data?.user?.id;
-  const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
-  const [trizumCloudStatus, setTrizumCloudStatus] = useState<TrizumCloudStatus>("idle");
+  const isSessionPending = session.isPending;
+  const [initialCachedCloudSettings] = useState(readLastCachedCloudUserSettings);
+  const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(
+    initialCachedCloudSettings?.settings ?? null,
+  );
+  const [hasCachedCloudSettings, setHasCachedCloudSettings] = useState(
+    Boolean(initialCachedCloudSettings),
+  );
+  const [trizumCloudStatus, setTrizumCloudStatus] = useState<TrizumCloudStatus>(
+    initialCachedCloudSettings ? "idle" : "loading",
+  );
 
   const LOCALE_OPTIONS: LocaleOption[] = [
     { id: "system", name: t`System (fallbacks to ${DEFAULT_LOCALE})` },
@@ -62,7 +72,13 @@ export function Settings() {
 
   useEffect(() => {
     if (!userId) {
+      if (isSessionPending) {
+        setTrizumCloudStatus(initialCachedCloudSettings ? "idle" : "loading");
+        return;
+      }
+
       setCloudSettings(null);
+      setHasCachedCloudSettings(false);
       setTrizumCloudStatus("idle");
       return;
     }
@@ -72,9 +88,11 @@ export function Settings() {
 
     if (cachedCloudSettings) {
       setCloudSettings(cachedCloudSettings.settings);
+      setHasCachedCloudSettings(true);
       setTrizumCloudStatus("idle");
     } else {
       setCloudSettings(null);
+      setHasCachedCloudSettings(false);
       setTrizumCloudStatus("loading");
     }
 
@@ -83,6 +101,7 @@ export function Settings() {
         if (!isCancelled) {
           setCloudSettings(settings);
           writeCachedCloudUserSettings(userId, settings);
+          setHasCachedCloudSettings(true);
           setTrizumCloudStatus("idle");
         }
       })
@@ -95,7 +114,7 @@ export function Settings() {
     return () => {
       isCancelled = true;
     };
-  }, [userId]);
+  }, [initialCachedCloudSettings, isSessionPending, userId]);
 
   function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
@@ -131,11 +150,12 @@ export function Settings() {
   const trizumCloudLabel = getTrizumCloudLabel({
     cloudSettings,
     currentPartyListId: partyList.id,
-    isSignedIn: Boolean(userId),
+    isSignedIn: Boolean(userId) || isSessionPending,
     status: trizumCloudStatus,
   });
   const isTrizumCloudActive =
-    Boolean(userId) && cloudSettings?.partyListDocumentId === partyList.id;
+    (Boolean(userId) || (isSessionPending && hasCachedCloudSettings)) &&
+    cloudSettings?.partyListDocumentId === partyList.id;
 
   return (
     <div className="flex min-h-full flex-col">

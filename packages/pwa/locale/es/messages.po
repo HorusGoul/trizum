@@ -67,7 +67,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:322
+#: src/routes/settings.tsx:342
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -87,7 +87,7 @@ msgstr "En el período seleccionado"
 msgid "Active"
 msgstr "Activos"
 
-#: src/routes/settings.tsx:376
+#: src/routes/settings.tsx:396
 msgid "Active on this device"
 msgstr "Activo en este dispositivo"
 
@@ -256,15 +256,15 @@ msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
 #: src/components/ExpenseEditor.tsx:267
-#: src/routes/settings.tsx:309
+#: src/routes/settings.tsx:329
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
-#: src/routes/settings.tsx:311
+#: src/routes/settings.tsx:331
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:298
+#: src/routes/settings.tsx:318
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -462,7 +462,7 @@ msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
-#: src/routes/settings.tsx:364
+#: src/routes/settings.tsx:384
 msgid "Checking..."
 msgstr "Comprobando..."
 
@@ -665,7 +665,7 @@ msgid "Could not load sign-in methods"
 msgstr "No se pudieron cargar los métodos de inicio de sesión"
 
 #: src/routes/settings_.cloud-sync.tsx:254
-#: src/routes/settings.tsx:368
+#: src/routes/settings.tsx:388
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
@@ -892,7 +892,7 @@ msgstr "Lista de emojis"
 msgid "End date"
 msgstr "Fecha de fin"
 
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:69
 msgid "English"
 msgstr "Inglés"
 
@@ -908,7 +908,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
-#: src/routes/settings.tsx:60
+#: src/routes/settings.tsx:70
 msgid "Español"
 msgstr "Español"
 
@@ -1031,7 +1031,7 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
-#: src/routes/settings.tsx:260
+#: src/routes/settings.tsx:280
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -1316,7 +1316,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:275
+#: src/routes/settings.tsx:295
 msgid "Language"
 msgstr "Idioma"
 
@@ -1644,11 +1644,11 @@ msgstr "No es un código de grupo de trizum válido"
 msgid "Not connected"
 msgstr "No conectado"
 
-#: src/routes/settings.tsx:372
+#: src/routes/settings.tsx:392
 msgid "Not set up"
 msgstr "No configurada"
 
-#: src/routes/settings.tsx:360
+#: src/routes/settings.tsx:380
 msgid "Not signed in"
 msgstr "No has iniciado sesión"
 
@@ -1692,7 +1692,7 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:296
+#: src/routes/settings.tsx:316
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -1888,7 +1888,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:259
+#: src/routes/settings.tsx:279
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -1976,7 +1976,7 @@ msgstr "Captura de fotograma del código QR"
 msgid "Ranking based on how much each participant paid in the selected timeframe."
 msgstr "Clasificación según cuánto ha pagado cada participante en el período seleccionado."
 
-#: src/routes/settings.tsx:379
+#: src/routes/settings.tsx:399
 msgid "Ready on another device"
 msgstr "Listo en otro dispositivo"
 
@@ -2067,7 +2067,7 @@ msgstr "Riyal Saudí"
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:157
+#: src/routes/settings.tsx:177
 msgid "Save"
 msgstr "Guardar"
 
@@ -2122,11 +2122,11 @@ msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index.tsx:123
 #: src/routes/party.$partyId.tsx:295
-#: src/routes/settings.tsx:146
+#: src/routes/settings.tsx:166
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:111
+#: src/routes/settings.tsx:130
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -2317,7 +2317,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:157
+#: src/routes/settings.tsx:177
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -2391,7 +2391,7 @@ msgstr "Sincronizando información del grupo..."
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
-#: src/routes/settings.tsx:58
+#: src/routes/settings.tsx:68
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
@@ -2556,7 +2556,7 @@ msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
 #: src/routes/settings_.cloud-sync.tsx:842
-#: src/routes/settings.tsx:196
+#: src/routes/settings.tsx:216
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -2735,7 +2735,7 @@ msgstr "¿Usar trizum cloud en este dispositivo?"
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
-#: src/routes/settings.tsx:237
+#: src/routes/settings.tsx:257
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -2817,7 +2817,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:238
+#: src/routes/settings.tsx:258
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 

@@ -71,7 +71,7 @@ msgstr "About"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 
-#: src/routes/settings.tsx:322
+#: src/routes/settings.tsx:342
 msgid "Accent color"
 msgstr "Accent color"
 
@@ -91,7 +91,7 @@ msgstr "Across the selected timeframe"
 msgid "Active"
 msgstr "Active"
 
-#: src/routes/settings.tsx:376
+#: src/routes/settings.tsx:396
 msgid "Active on this device"
 msgstr "Active on this device"
 
@@ -268,15 +268,15 @@ msgid "Authentication failed"
 msgstr "Authentication failed"
 
 #: src/components/ExpenseEditor.tsx:267
-#: src/routes/settings.tsx:309
+#: src/routes/settings.tsx:329
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
 
-#: src/routes/settings.tsx:311
+#: src/routes/settings.tsx:331
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Automatically open the calculator when focusing amount fields"
 
-#: src/routes/settings.tsx:298
+#: src/routes/settings.tsx:318
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
@@ -486,7 +486,7 @@ msgstr "Check your email for the sign-in link"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
-#: src/routes/settings.tsx:364
+#: src/routes/settings.tsx:384
 msgid "Checking..."
 msgstr "Checking..."
 
@@ -689,7 +689,7 @@ msgid "Could not load sign-in methods"
 msgstr "Could not load sign-in methods"
 
 #: src/routes/settings_.cloud-sync.tsx:254
-#: src/routes/settings.tsx:368
+#: src/routes/settings.tsx:388
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
@@ -920,7 +920,7 @@ msgstr "Emoji list"
 msgid "End date"
 msgstr "End date"
 
-#: src/routes/settings.tsx:59
+#: src/routes/settings.tsx:69
 msgid "English"
 msgstr "English"
 
@@ -940,7 +940,7 @@ msgstr "Enter the link or code of the trizum party you want to join"
 msgid "Eritrean Nakfa"
 msgstr "Eritrean Nakfa"
 
-#: src/routes/settings.tsx:60
+#: src/routes/settings.tsx:70
 msgid "Español"
 msgstr "Español"
 
@@ -1075,7 +1075,7 @@ msgstr "Filter totals and rankings"
 msgid "Finishing sign in"
 msgstr "Finishing sign in"
 
-#: src/routes/settings.tsx:260
+#: src/routes/settings.tsx:280
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -1368,7 +1368,7 @@ msgstr "Kuwaiti Dinar"
 msgid "Kyrgystani Som"
 msgstr "Kyrgystani Som"
 
-#: src/routes/settings.tsx:275
+#: src/routes/settings.tsx:295
 msgid "Language"
 msgstr "Language"
 
@@ -1700,11 +1700,11 @@ msgstr "Not a valid trizum party code"
 msgid "Not connected"
 msgstr "Not connected"
 
-#: src/routes/settings.tsx:372
+#: src/routes/settings.tsx:392
 msgid "Not set up"
 msgstr "Not set up"
 
-#: src/routes/settings.tsx:360
+#: src/routes/settings.tsx:380
 msgid "Not signed in"
 msgstr "Not signed in"
 
@@ -1748,7 +1748,7 @@ msgstr "Open calculator when focusing amount fields"
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
 
-#: src/routes/settings.tsx:296
+#: src/routes/settings.tsx:316
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
@@ -1956,7 +1956,7 @@ msgstr "Peruvian Sol"
 msgid "Philippine Peso"
 msgstr "Philippine Peso"
 
-#: src/routes/settings.tsx:259
+#: src/routes/settings.tsx:279
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -2044,7 +2044,7 @@ msgstr "QR code frame capture"
 msgid "Ranking based on how much each participant paid in the selected timeframe."
 msgstr "Ranking based on how much each participant paid in the selected timeframe."
 
-#: src/routes/settings.tsx:379
+#: src/routes/settings.tsx:399
 msgid "Ready on another device"
 msgstr "Ready on another device"
 
@@ -2139,7 +2139,7 @@ msgstr "Saudi Riyal"
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:157
+#: src/routes/settings.tsx:177
 msgid "Save"
 msgstr "Save"
 
@@ -2194,11 +2194,11 @@ msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/index.tsx:123
 #: src/routes/party.$partyId.tsx:295
-#: src/routes/settings.tsx:146
+#: src/routes/settings.tsx:166
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:111
+#: src/routes/settings.tsx:130
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -2393,7 +2393,7 @@ msgstr "Submit a Request"
 #: src/routes/party_.$partyId.settings.tsx:127
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:157
+#: src/routes/settings.tsx:177
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -2467,7 +2467,7 @@ msgstr "Syncing party information..."
 msgid "Syrian Pound"
 msgstr "Syrian Pound"
 
-#: src/routes/settings.tsx:58
+#: src/routes/settings.tsx:68
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 
@@ -2644,7 +2644,7 @@ msgid "Trinidad and Tobago Dollar"
 msgstr "Trinidad and Tobago Dollar"
 
 #: src/routes/settings_.cloud-sync.tsx:842
-#: src/routes/settings.tsx:196
+#: src/routes/settings.tsx:216
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -2832,7 +2832,7 @@ msgstr "Use trizum cloud on this device?"
 msgid "Use your camera to scan a trizum invite"
 msgstr "Use your camera to scan a trizum invite"
 
-#: src/routes/settings.tsx:237
+#: src/routes/settings.tsx:257
 msgid "Username"
 msgstr "Username"
 
@@ -2918,7 +2918,7 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:238
+#: src/routes/settings.tsx:258
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
