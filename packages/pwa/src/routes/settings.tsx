@@ -25,7 +25,6 @@ import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Label } from "#src/ui/fields/Field.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
-import { cn } from "#src/ui/utils.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 
 export const Route = createFileRoute("/settings")({
@@ -169,28 +168,21 @@ export function Settings() {
       <div className="container mt-4 px-4">
         <Button
           color="input-like"
-          className={cn(
-            "relative h-auto min-h-16 overflow-hidden justify-start rounded-lg px-4 py-3 text-left",
-            isTrizumCloudActive &&
-              "border-success-400 bg-gradient-to-r from-success-50 via-white to-accent-50 text-success-950 dark:border-success-700 dark:from-success-950/60 dark:via-accent-900 dark:to-accent-950 dark:text-success-50",
-          )}
+          className="relative h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left"
           onPress={() => {
             void navigate({ to: "/settings/cloud-sync" });
           }}
         >
           <span className="flex w-full items-center gap-3">
-            <span
-              className={cn(
-                "relative flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50",
-                isTrizumCloudActive &&
-                  "bg-success-100 text-success-700 dark:bg-success-950 dark:text-success-200",
-              )}
-            >
+            <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50">
               {isTrizumCloudActive ? (
                 <span
                   aria-hidden="true"
-                  className="absolute inset-0 animate-ping rounded-full bg-success-400/25"
-                />
+                  className="absolute -right-0.5 -top-0.5 flex size-3 items-center justify-center"
+                >
+                  <span className="absolute size-3 animate-pulse rounded-full bg-accent-500/25" />
+                  <span className="relative size-2 rounded-full bg-accent-500 ring-2 ring-white dark:ring-accent-900" />
+                </span>
               ) : null}
               <Icon
                 className="relative"
@@ -203,12 +195,7 @@ export function Settings() {
               <span className="font-medium leading-none">
                 <Trans>trizum cloud</Trans>
               </span>
-              <span
-                className={cn(
-                  "truncate text-sm text-accent-700 dark:text-accent-50",
-                  isTrizumCloudActive && "text-success-700 dark:text-success-200",
-                )}
-              >
+              <span className="truncate text-sm text-accent-700 dark:text-accent-50">
                 {trizumCloudLabel}
               </span>
             </span>

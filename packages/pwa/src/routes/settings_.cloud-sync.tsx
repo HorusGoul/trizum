@@ -58,6 +58,8 @@ const SIGN_IN_SUCCESS_ANIMATION_MS = 1200;
 const SIGN_IN_SUCCESS_EXIT_ANIMATION_MS = 180;
 const DIALOG_EXIT_ANIMATION_MS = 180;
 const PASSWORD_SIGN_IN_ENABLE_DELAY_MS = 250;
+const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
+const CLOUD_ACCOUNT_STATE_CACHE_KEY_PREFIX = "trizumCloudAccountState:";
 const DELETE_ACCOUNT_CONFIRMATION_TEXT = "delete account";
 const AUTH_SECONDARY_BUTTON_CLASS_NAME =
   "h-9 text-sm font-medium text-accent-700 dark:text-accent-50";
@@ -74,6 +76,14 @@ type AuthPendingAction =
   | "password"
   | "password-reset"
   | "sign-out";
+
+type CloudActionDialogType = "connect-apple" | "connect-google" | "password-link" | "sign-out";
+
+interface CachedCloudAccountState {
+  cachedAt: number;
+  cloudSettings: CloudUserSettings | null;
+  linkedAccounts: LinkedAuthAccount[];
+}
 
 function CloudSyncSettings() {
   const { partyList } = usePartyList();
@@ -97,8 +107,8 @@ function CloudSyncSettings() {
   const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
   const [authPendingAction, setAuthPendingAction] = useState<AuthPendingAction | null>(null);
   const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(true);
-  const [isCloudPending, setIsCloudPending] = useState(false);
   const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
+  const [cloudActionDialog, setCloudActionDialog] = useState<CloudActionDialogType | null>(null);
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
   const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState("");
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
@@ -108,8 +118,6 @@ function CloudSyncSettings() {
   const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
   const isAuthPending = authPendingAction !== null;
   const hasPasswordAccount = linkedProviderIds.has("credential");
-  const cloudUpdatedAt = cloudSettings ? new Date(cloudSettings.updatedAt).toLocaleString() : null;
-  const isCurrentDocumentSynced = cloudSettings?.partyListDocumentId === partyList.id;
   const canDeleteAccount =
     deleteAccountConfirmation.trim().toLowerCase() === DELETE_ACCOUNT_CONFIRMATION_TEXT;
 
@@ -132,25 +140,43 @@ function CloudSyncSettings() {
       setLinkedAccounts([]);
       setCloudSettings(null);
       setIsCloudSyncSwitchOpen(false);
+      setCloudActionDialog(null);
       return;
     }
 
     let isCancelled = false;
     const currentUserId = userId;
+    const cachedAccountState = readCachedCloudAccountState(currentUserId);
 
-    void loadAccountState().catch(() => {
-      if (!isCancelled) {
-        toast.error(t`Could not load trizum cloud state`);
-      }
+    if (cachedAccountState) {
+      setLinkedAccounts(cachedAccountState.linkedAccounts);
+      setCloudSettings(cachedAccountState.cloudSettings);
+    } else {
+      setLinkedAccounts([]);
+      setCloudSettings(null);
+    }
+
+    void loadAccountState({
+      showErrorToast: !cachedAccountState,
+      showStartToast: true,
     });
+
+    const intervalId = window.setInterval(() => {
+      void loadAccountState({ showErrorToast: false, showStartToast: false });
+    }, CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS);
 
     return () => {
       isCancelled = true;
+      window.clearInterval(intervalId);
     };
 
-    async function loadAccountState() {
-      setIsCloudPending(true);
-
+    async function loadAccountState({
+      showErrorToast,
+      showStartToast,
+    }: {
+      showErrorToast: boolean;
+      showStartToast: boolean;
+    }) {
       try {
         const currentPartyList = partyListRef.current;
         const [accounts, { settings }] = await Promise.all([
@@ -161,8 +187,6 @@ function CloudSyncSettings() {
         if (isCancelled) {
           return;
         }
-
-        setLinkedAccounts(accounts);
 
         let activeSettings = settings;
 
@@ -176,11 +200,18 @@ function CloudSyncSettings() {
           }
 
           activeSettings = savedSettings;
-          toast.success(t`trizum cloud started`);
+          if (showStartToast) {
+            toast.success(t`trizum cloud started`);
+          }
         }
 
+        setLinkedAccounts(accounts);
         setCloudSettings(activeSettings);
         writeCachedCloudUserSettings(currentUserId, activeSettings);
+        writeCachedCloudAccountState(currentUserId, {
+          cloudSettings: activeSettings,
+          linkedAccounts: accounts,
+        });
 
         if (!activeSettings) {
           return;
@@ -204,6 +235,10 @@ function CloudSyncSettings() {
         setCloudSettings(activeSettings);
         setIsCloudSyncSwitchOpen(false);
         writeCachedCloudUserSettings(currentUserId, activeSettings);
+        writeCachedCloudAccountState(currentUserId, {
+          cloudSettings: activeSettings,
+          linkedAccounts: accounts,
+        });
         toast.success(t`trizum cloud enabled on this device`);
 
         if (isSignInSuccessVisibleRef.current) {
@@ -214,9 +249,9 @@ function CloudSyncSettings() {
         }
 
         void navigate({ to: "/", replace: true });
-      } finally {
-        if (!isCancelled) {
-          setIsCloudPending(false);
+      } catch {
+        if (!isCancelled && showErrorToast) {
+          toast.error(t`Could not load trizum cloud state`);
         }
       }
     }
@@ -420,7 +455,14 @@ function CloudSyncSettings() {
         return;
       }
 
-      setLinkedAccounts(await fetchLinkedAuthAccounts());
+      const accounts = await fetchLinkedAuthAccounts();
+      setLinkedAccounts(accounts);
+      if (userId) {
+        writeCachedCloudAccountState(userId, {
+          cloudSettings,
+          linkedAccounts: accounts,
+        });
+      }
       toast.success(t`Sign-in method connected`);
     } catch {
       toast.error(t`Could not connect sign-in method`);
@@ -451,9 +493,33 @@ function CloudSyncSettings() {
     await onRequestPasswordReset(authEmail);
   }
 
+  async function onConfirmCloudAction(action: CloudActionDialogType) {
+    if (!user) {
+      return;
+    }
+
+    setCloudActionDialog(null);
+
+    switch (action) {
+      case "connect-apple":
+        await onLinkSocialAccount("apple");
+        return;
+      case "connect-google":
+        await onLinkSocialAccount("google");
+        return;
+      case "password-link":
+        await onRequestPasswordReset(user.email);
+        return;
+      case "sign-out":
+        await onSignOut();
+        return;
+    }
+  }
+
   async function onSignOut() {
     setIsSignInSuccessVisible(false);
     setIsCloudSyncSwitchOpen(false);
+    setCloudActionDialog(null);
     setAuthPendingAction("sign-out");
 
     try {
@@ -490,6 +556,10 @@ function CloudSyncSettings() {
     setIsCloudSyncSwitchOpen(false);
     if (userId) {
       writeCachedCloudUserSettings(userId, settings);
+      writeCachedCloudAccountState(userId, {
+        cloudSettings: settings,
+        linkedAccounts,
+      });
     }
     toast.success(t`trizum cloud enabled on this device`);
 
@@ -523,6 +593,7 @@ function CloudSyncSettings() {
       await deleteAuthUserAccount();
       if (userId) {
         clearCachedCloudUserSettings(userId);
+        clearCachedCloudAccountState(userId);
       }
       setCloudSettings(null);
       setLinkedAccounts([]);
@@ -772,70 +843,72 @@ function CloudSyncSettings() {
         </h1>
       </div>
 
-      <div className="container mt-4 flex flex-col gap-5 px-4 pb-8 pb-safe">
-        <section className="flex flex-col divide-y divide-accent-200 border-y border-accent-200 dark:divide-accent-800 dark:border-accent-800">
-          <CloudSettingsItem icon="lucide.mail" title={t`Email`} description={user.email} />
+      <div className="container mt-4 flex flex-col gap-6 px-4 pb-8 pb-safe">
+        <section className="flex flex-col gap-1">
+          <CloudSettingsItem
+            icon="lucide.mail"
+            title={t`Email`}
+            description={user.email}
+            isConnected
+          />
           <CloudSettingsItem
             icon="brand.google"
             title={t`Google`}
-            description={linkedProviderIds.has("google") ? t`Connected` : t`Not connected`}
+            actionLabel={linkedProviderIds.has("google") ? undefined : t`Connect`}
+            description={
+              linkedProviderIds.has("google")
+                ? t`Connected to this account`
+                : t`Add Google as a sign-in method`
+            }
+            isConnected={linkedProviderIds.has("google")}
             isDisabled={isAuthPending || linkedProviderIds.has("google")}
             onPress={
               linkedProviderIds.has("google")
                 ? undefined
                 : () => {
-                    void onLinkSocialAccount("google");
+                    setCloudActionDialog("connect-google");
                   }
             }
           />
           <CloudSettingsItem
             icon="brand.apple"
             title={t`Apple`}
-            description={linkedProviderIds.has("apple") ? t`Connected` : t`Not connected`}
+            actionLabel={linkedProviderIds.has("apple") ? undefined : t`Connect`}
+            description={
+              linkedProviderIds.has("apple")
+                ? t`Connected to this account`
+                : t`Add Apple as a sign-in method`
+            }
+            isConnected={linkedProviderIds.has("apple")}
             isDisabled={isAuthPending || linkedProviderIds.has("apple")}
             onPress={
               linkedProviderIds.has("apple")
                 ? undefined
                 : () => {
-                    void onLinkSocialAccount("apple");
+                    setCloudActionDialog("connect-apple");
                   }
             }
           />
           <CloudSettingsItem
             icon="lucide.key-round"
             title={t`Password`}
+            actionLabel={hasPasswordAccount ? t`Email link` : t`Set up`}
             description={
               passwordResetMessage ??
-              (hasPasswordAccount ? t`Password enabled` : t`Email a password setup link`)
+              (hasPasswordAccount ? t`Password enabled` : t`Add password sign-in`)
             }
             isDisabled={isAuthPending}
             onPress={() => {
-              void onRequestPasswordReset(user.email);
+              setCloudActionDialog("password-link");
             }}
           />
         </section>
 
-        <section className="flex flex-col gap-2 border-y border-accent-200 py-4 text-sm text-accent-700 dark:border-accent-800 dark:text-accent-50">
-          <div className="flex items-center gap-3">
-            <Icon icon={isCurrentDocumentSynced ? "lucide.cloud-check" : "lucide.cloud-sync"} />
-            <span className="font-medium text-accent-950 dark:text-accent-50">
-              <Trans>trizum cloud</Trans>
-            </span>
-          </div>
-          <p>
-            {getCloudSyncStatusLabel({ cloudSettings, isCloudPending, isCurrentDocumentSynced })}
-          </p>
-          {cloudUpdatedAt ? (
-            <p>
-              <Trans>Last updated {cloudUpdatedAt}</Trans>
-            </p>
-          ) : null}
-        </section>
-
-        <section className="flex flex-col divide-y divide-accent-200 border-y border-accent-200 dark:divide-accent-800 dark:border-accent-800">
+        <section className="flex flex-col gap-1">
           <CloudSettingsItem
             icon="lucide.trash-2"
             title={t`Delete account`}
+            actionLabel={t`Delete`}
             description={t`Permanently delete your trizum cloud account`}
             isDisabled={isDeleteAccountPending}
             onPress={openDeleteAccountDialog}
@@ -844,14 +917,28 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="lucide.log-out"
             title={t`Sign out`}
+            actionLabel={t`Sign out`}
             description={t`Stop trizum cloud on this device`}
             isDisabled={isAuthPending}
             onPress={() => {
-              void onSignOut();
+              setCloudActionDialog("sign-out");
             }}
           />
         </section>
       </div>
+
+      <CloudActionConfirmationDialog
+        action={cloudActionDialog}
+        email={user.email}
+        hasPasswordAccount={hasPasswordAccount}
+        isPending={isAuthPending}
+        onConfirm={onConfirmCloudAction}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
+            setCloudActionDialog(null);
+          }
+        }}
+      />
 
       <DeleteAccountDialog
         canSubmit={canDeleteAccount}
@@ -1117,15 +1204,19 @@ function SignInSuccessOverlay() {
 }
 
 function CloudSettingsItem({
+  actionLabel,
   description,
   icon,
+  isConnected,
   isDisabled,
   onPress,
   title,
   tone = "default",
 }: {
+  actionLabel?: ReactNode;
   description?: ReactNode;
   icon: IconProps["icon"];
+  isConnected?: boolean;
   isDisabled?: boolean;
   onPress?: () => void;
   title: string;
@@ -1133,12 +1224,14 @@ function CloudSettingsItem({
 }) {
   const content = (
     <span className="flex w-full items-center gap-3">
-      <Icon
-        className={cn(tone === "danger" && "text-danger-500")}
-        icon={icon}
-        width={20}
-        height={20}
-      />
+      <span
+        className={cn(
+          "flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50",
+          tone === "danger" && "bg-danger-50 text-danger-500 dark:bg-danger-950/50",
+        )}
+      >
+        <Icon icon={icon} width={20} height={20} />
+      </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span
           className={cn(
@@ -1159,10 +1252,27 @@ function CloudSettingsItem({
           </span>
         ) : null}
       </span>
-      {onPress ? <Icon icon="lucide.chevron-right" width={20} height={20} /> : null}
+      {onPress ? (
+        <span
+          className={cn(
+            "ml-2 flex shrink-0 items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-50",
+            tone === "danger" && "text-danger-600 dark:text-danger-300",
+          )}
+        >
+          {actionLabel ? <span>{actionLabel}</span> : null}
+          <Icon icon="lucide.chevron-right" width={18} height={18} />
+        </span>
+      ) : isConnected ? (
+        <Icon
+          className="text-accent-600 dark:text-accent-200"
+          icon="lucide.check"
+          width={18}
+          height={18}
+        />
+      ) : null}
     </span>
   );
-  const className = "h-auto min-h-14 justify-start rounded-none px-0 py-4 text-left";
+  const className = "h-auto min-h-14 justify-start rounded-lg px-4 py-3 text-left";
 
   if (onPress) {
     return (
@@ -1178,7 +1288,180 @@ function CloudSettingsItem({
     );
   }
 
-  return <div className="flex min-h-14 w-full items-center px-0 py-4 text-left">{content}</div>;
+  return (
+    <div className="flex min-h-14 w-full items-center rounded-lg px-4 py-3 text-left">
+      {content}
+    </div>
+  );
+}
+
+function CloudActionConfirmationDialog({
+  action,
+  email,
+  hasPasswordAccount,
+  isPending,
+  onConfirm,
+  onOpenChange,
+}: {
+  action: CloudActionDialogType | null;
+  email: string;
+  hasPasswordAccount: boolean;
+  isPending: boolean;
+  onConfirm: (action: CloudActionDialogType) => Promise<void>;
+  onOpenChange: (isOpen: boolean) => void;
+}) {
+  const config = action ? getCloudActionDialogConfig({ action, email, hasPasswordAccount }) : null;
+
+  return (
+    <ModalOverlay
+      isDismissable={!isPending}
+      isOpen={Boolean(action)}
+      onOpenChange={onOpenChange}
+      className={({ isEntering, isExiting }) =>
+        cn(
+          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          isEntering && "duration-200 ease-out animate-in fade-in",
+          isExiting && "duration-150 ease-in animate-out fade-out",
+        )
+      }
+    >
+      <Modal
+        className={({ isEntering, isExiting }) =>
+          cn(
+            "w-full max-w-[420px] outline-none",
+            isEntering && "duration-200 ease-out animate-in fade-in zoom-in-95",
+            isExiting && "duration-150 ease-in animate-out fade-out zoom-out-95",
+          )
+        }
+      >
+        <Dialog
+          aria-label={config?.title ?? t`Confirm action`}
+          className="rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
+        >
+          {config && action ? (
+            <div className="flex flex-col gap-5 p-5 sm:p-6">
+              <div className="flex flex-col gap-3">
+                <span
+                  className={cn(
+                    "flex size-10 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50",
+                    config.tone === "danger" &&
+                      "bg-danger-50 text-danger-500 dark:bg-danger-950/50 dark:text-danger-300",
+                  )}
+                >
+                  <Icon icon={config.icon} width={20} height={20} />
+                </span>
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-lg font-medium">{config.title}</h2>
+                  <p className="text-sm text-accent-700 dark:text-accent-50">
+                    {config.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Button
+                  className={cn(
+                    "font-semibold",
+                    config.tone === "danger" && "bg-danger-500 text-danger-50 dark:bg-danger-500",
+                  )}
+                  color="accent"
+                  isDisabled={isPending}
+                  onPress={() => {
+                    void onConfirm(action);
+                  }}
+                  type="button"
+                >
+                  <span className="flex items-center gap-2">
+                    <AuthButtonIcon icon={config.icon} isPending={isPending} />
+                    {config.actionLabel}
+                  </span>
+                </Button>
+                <Button
+                  color="input-like"
+                  isDisabled={isPending}
+                  onPress={() => {
+                    onOpenChange(false);
+                  }}
+                  type="button"
+                >
+                  <Trans>Cancel</Trans>
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
+  );
+}
+
+function getCloudActionDialogConfig({
+  action,
+  email,
+  hasPasswordAccount,
+}: {
+  action: CloudActionDialogType;
+  email: string;
+  hasPasswordAccount: boolean;
+}): {
+  actionLabel: string;
+  description: ReactNode;
+  icon: IconProps["icon"];
+  title: string;
+  tone?: "danger";
+} {
+  switch (action) {
+    case "connect-apple":
+      return {
+        actionLabel: t`Connect Apple`,
+        description: (
+          <Trans>
+            trizum will open Apple so you can add it as a sign-in method for this account.
+          </Trans>
+        ),
+        icon: "brand.apple",
+        title: t`Connect Apple?`,
+      };
+    case "connect-google":
+      return {
+        actionLabel: t`Connect Google`,
+        description: (
+          <Trans>
+            trizum will open Google so you can add it as a sign-in method for this account.
+          </Trans>
+        ),
+        icon: "brand.google",
+        title: t`Connect Google?`,
+      };
+    case "password-link":
+      return {
+        actionLabel: t`Email password link`,
+        description: hasPasswordAccount ? (
+          <Trans>
+            We will email a password link to {email}. Your current password keeps working until you
+            change it.
+          </Trans>
+        ) : (
+          <Trans>
+            We will email a password setup link to {email}. Password sign-in starts working after
+            you add one.
+          </Trans>
+        ),
+        icon: "lucide.key-round",
+        title: hasPasswordAccount ? t`Email password link?` : t`Set up password?`,
+      };
+    case "sign-out":
+      return {
+        actionLabel: t`Sign out`,
+        description: (
+          <Trans>
+            This stops trizum cloud on this device. Your local data stays on this device.
+          </Trans>
+        ),
+        icon: "lucide.log-out",
+        title: t`Sign out?`,
+      };
+  }
 }
 
 function DeleteAccountDialog({
@@ -1300,30 +1583,6 @@ function hasRecordData(record: Record<string, unknown> | undefined) {
   return Object.values(record ?? {}).some(Boolean);
 }
 
-function getCloudSyncStatusLabel({
-  cloudSettings,
-  isCloudPending,
-  isCurrentDocumentSynced,
-}: {
-  cloudSettings: CloudUserSettings | null;
-  isCloudPending: boolean;
-  isCurrentDocumentSynced: boolean;
-}) {
-  if (isCloudPending) {
-    return t`Starting trizum cloud`;
-  }
-
-  if (!cloudSettings) {
-    return t`trizum cloud starts automatically after sign-in.`;
-  }
-
-  if (isCurrentDocumentSynced) {
-    return t`This device is using trizum cloud.`;
-  }
-
-  return t`This device needs to switch to your cloud data.`;
-}
-
 function getDeleteAccountErrorMessage(message: string) {
   if (message.toLowerCase().includes("session")) {
     return t`Sign in again before deleting your account`;
@@ -1363,5 +1622,87 @@ function isPasswordFieldErrorMessage(message: string) {
       normalizedMessage.includes("required") ||
       normalizedMessage.includes("short") ||
       normalizedMessage.includes("least"))
+  );
+}
+
+function readCachedCloudAccountState(userId: string) {
+  try {
+    const value = localStorage.getItem(getCloudAccountStateCacheKey(userId));
+
+    if (!value) {
+      return null;
+    }
+
+    const cachedValue = JSON.parse(value) as Partial<CachedCloudAccountState> | null;
+
+    if (!isCachedCloudAccountState(cachedValue)) {
+      return null;
+    }
+
+    return cachedValue;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedCloudAccountState(
+  userId: string,
+  state: Omit<CachedCloudAccountState, "cachedAt">,
+) {
+  try {
+    localStorage.setItem(
+      getCloudAccountStateCacheKey(userId),
+      JSON.stringify({
+        ...state,
+        cachedAt: Date.now(),
+      } satisfies CachedCloudAccountState),
+    );
+  } catch {
+    // localStorage can be unavailable in restricted browser contexts.
+  }
+}
+
+function clearCachedCloudAccountState(userId: string) {
+  try {
+    localStorage.removeItem(getCloudAccountStateCacheKey(userId));
+  } catch {
+    // localStorage can be unavailable in restricted browser contexts.
+  }
+}
+
+function getCloudAccountStateCacheKey(userId: string) {
+  return `${CLOUD_ACCOUNT_STATE_CACHE_KEY_PREFIX}${userId}`;
+}
+
+function isCachedCloudAccountState(
+  value: Partial<CachedCloudAccountState> | null,
+): value is CachedCloudAccountState {
+  if (!value || typeof value.cachedAt !== "number") {
+    return false;
+  }
+
+  return (
+    (value.cloudSettings === null ||
+      (typeof value.cloudSettings === "object" &&
+        typeof value.cloudSettings.updatedAt === "number" &&
+        typeof value.cloudSettings.partyListDocumentId === "string" &&
+        isValidDocumentId(value.cloudSettings.partyListDocumentId))) &&
+    Array.isArray(value.linkedAccounts) &&
+    value.linkedAccounts.every(isLinkedAuthAccount)
+  );
+}
+
+function isLinkedAuthAccount(value: unknown): value is LinkedAuthAccount {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const account = value as Partial<LinkedAuthAccount>;
+
+  return (
+    typeof account.accountId === "string" &&
+    typeof account.id === "string" &&
+    typeof account.providerId === "string" &&
+    typeof account.userId === "string"
   );
 }
