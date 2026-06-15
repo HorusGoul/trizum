@@ -848,7 +848,6 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="brand.apple"
             title={t`Apple`}
-            actionLabel={linkedProviderIds.has("apple") ? undefined : t`Connect`}
             description={
               linkedProviderIds.has("apple")
                 ? t`Apple is connected to this account`
@@ -868,7 +867,6 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="brand.google"
             title={t`Google`}
-            actionLabel={linkedProviderIds.has("google") ? undefined : t`Connect`}
             description={
               linkedProviderIds.has("google")
                 ? t`Google is connected to this account`
@@ -898,10 +896,9 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="lucide.key-round"
             title={t`Password`}
-            actionLabel={hasPasswordAccount ? t`Email link` : t`Set up`}
             description={
               passwordResetMessage ??
-              (hasPasswordAccount ? t`Password sign-in is enabled` : t`Add password sign-in`)
+              (hasPasswordAccount ? t`Email a password reset link` : t`Set up password sign-in`)
             }
             isDisabled={isAuthPending}
             onPress={() => {
@@ -911,7 +908,6 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="lucide.log-out"
             title={t`Sign out`}
-            actionLabel={t`Sign out`}
             description={t`Stop trizum cloud on this device`}
             isDisabled={isAuthPending}
             onPress={() => {
@@ -928,7 +924,6 @@ function CloudSyncSettings() {
           <CloudSettingsItem
             icon="lucide.trash-2"
             title={t`Delete account`}
-            actionLabel={t`Delete`}
             description={t`Permanently delete your trizum cloud account`}
             isDisabled={isDeleteAccountPending}
             onPress={openDeleteAccountDialog}
@@ -1241,7 +1236,6 @@ function CloudSettingsSection({
 }
 
 function CloudSettingsItem({
-  actionLabel,
   description,
   icon,
   isConnected,
@@ -1251,7 +1245,6 @@ function CloudSettingsItem({
   title,
   tone = "default",
 }: {
-  actionLabel?: ReactNode;
   description?: ReactNode;
   icon: IconProps["icon"];
   isConnected?: boolean;
@@ -1299,16 +1292,6 @@ function CloudSettingsItem({
             tone === "danger" && "text-danger-600 dark:text-danger-300",
           )}
         >
-          {actionLabel ? (
-            <span
-              className={cn(
-                "rounded-full bg-accent-100 px-2.5 py-1 dark:bg-accent-900",
-                tone === "danger" && "bg-danger-50 dark:bg-danger-950/50",
-              )}
-            >
-              {actionLabel}
-            </span>
-          ) : null}
           <Icon icon="lucide.chevron-right" width={18} height={18} />
         </span>
       ) : statusLabel ? (
