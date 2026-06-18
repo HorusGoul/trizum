@@ -7,28 +7,12 @@ import { importPKCS8, SignJWT } from "jose";
 import { getApiDb, schema } from "./db/client";
 import type { ApiEnv } from "./env";
 import { authLogger, createBetterAuthLogger } from "./log";
+import { getAllowedHosts, getTrustedOrigins, isLocalhost, splitList } from "./auth-origins";
 import { AUTH_PROVIDER_CONFIG } from "../src/lib/authConfig.js";
 
 const LOCAL_DEVELOPMENT_SECRET = "local-development-only-secret-change-before-production";
-const DEFAULT_ALLOWED_HOSTS = [
-  "trizum.app",
-  "*.workers.dev",
-  "*.pages.dev",
-  "localhost:5173",
-  "localhost:8787",
-  "127.0.0.1:5173",
-  "127.0.0.1:8787",
-] as const;
-const DEFAULT_TRUSTED_ORIGINS = [
-  "https://trizum.app",
-  "https://*.workers.dev",
-  "https://*.pages.dev",
-  "capacitor://localhost",
-  "ionic://localhost",
-  "http://localhost",
-  "http://localhost:5173",
-  "http://localhost:8787",
-] as const;
+
+export { isTrustedOrigin } from "./auth-origins";
 
 interface BackgroundTaskContext {
   waitUntil(promise: Promise<unknown>): void;
@@ -151,35 +135,6 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
           },
     },
   });
-}
-
-export function getTrustedOrigins(env: ApiEnv) {
-  return [
-    ...new Set([
-      ...DEFAULT_TRUSTED_ORIGINS,
-      ...getAllowedHosts(env).flatMap(getTrustedOriginsForAllowedHost),
-      ...splitList(env.BETTER_AUTH_TRUSTED_ORIGINS),
-    ]),
-  ];
-}
-
-export function isTrustedOrigin(origin: string, env: ApiEnv) {
-  return getTrustedOrigins(env).some((trustedOrigin) => matchesPattern(origin, trustedOrigin));
-}
-
-function getAllowedHosts(env: ApiEnv) {
-  return [...DEFAULT_ALLOWED_HOSTS, ...splitList(env.BETTER_AUTH_ALLOWED_HOSTS)];
-}
-
-function getTrustedOriginsForAllowedHost(host: string) {
-  if (host.includes("://")) {
-    return [host];
-  }
-
-  const hostname = host.split(":")[0];
-  const isLocalAllowedHost = hostname ? isLocalhost(hostname) : false;
-
-  return [`${isLocalAllowedHost ? "http" : "https"}://${host}`];
 }
 
 function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["socialProviders"]> {
@@ -335,33 +290,6 @@ function sanitizeHeaderValue(value: string) {
 
 function shouldRequireEmailVerification(env: ApiEnv) {
   return env.AUTH_REQUIRE_EMAIL_VERIFICATION === "true";
-}
-
-function splitList(value: string | undefined) {
-  return (
-    value
-      ?.split(",")
-      .map((entry) => entry.trim())
-      .filter((entry) => entry.length > 0) ?? []
-  );
-}
-
-function matchesPattern(value: string, pattern: string) {
-  if (value === pattern) {
-    return true;
-  }
-
-  if (!pattern.includes("*")) {
-    return false;
-  }
-
-  const escapedPattern = pattern.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*");
-
-  return new RegExp(`^${escapedPattern}$`).test(value);
-}
-
-function isLocalhost(hostname: string) {
-  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
 }
 
 function escapeHtml(value: string) {
