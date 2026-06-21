@@ -1,22 +1,32 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { BackButton } from "#src/components/BackButton.js";
-import { AvatarPicker } from "#src/components/AvatarPicker.js";
-import { usePartyList } from "#src/hooks/usePartyList.js";
-import { validatePartyParticipantName, validatePhoneNumber } from "#src/lib/validation.js";
-import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/fields/TextField.js";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Suspense, useId } from "react";
+import { Suspense, useEffect, useId, useState } from "react";
 import { toast } from "sonner";
-import type { MediaFile } from "#src/models/media.ts";
-import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
+import { BackButton } from "#src/components/BackButton.js";
+import { AvatarPicker } from "#src/components/AvatarPicker.js";
 import { SwitchField } from "#src/components/SwitchField.tsx";
+import { authClient } from "#src/lib/auth-client.ts";
+import {
+  fetchCloudUserSettings,
+  readCachedCloudUserSettings,
+  readLastCachedCloudUserSettings,
+  writeCachedCloudUserSettings,
+  type CloudUserSettings,
+} from "#src/lib/cloudSyncSettings.ts";
+import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
+import { validatePartyParticipantName, validatePhoneNumber } from "#src/lib/validation.js";
+import type { MediaFile } from "#src/models/media.ts";
+import { Button } from "#src/ui/Button.tsx";
 import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
+import { Icon } from "#src/ui/Icon.tsx";
+import { IconButton } from "#src/ui/IconButton.js";
+import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Label } from "#src/ui/fields/Field.js";
+import { AppTextField } from "#src/ui/fields/TextField.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
+import { usePartyList } from "#src/hooks/usePartyList.js";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -37,15 +47,74 @@ interface LocaleOption {
   name: string;
 }
 
-function Settings() {
+export function Settings() {
   const { partyList, updateSettings } = usePartyList();
   const navigate = useNavigate();
+  const session = authClient.useSession();
+  const userId = session.data?.user?.id;
+  const isSessionPending = session.isPending;
+  const [initialCachedCloudSettings] = useState(readLastCachedCloudUserSettings);
+  const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(
+    initialCachedCloudSettings?.settings ?? null,
+  );
+  const [hasCachedCloudSettings, setHasCachedCloudSettings] = useState(
+    Boolean(initialCachedCloudSettings),
+  );
+  const [trizumCloudStatus, setTrizumCloudStatus] = useState<TrizumCloudStatus>(
+    initialCachedCloudSettings ? "idle" : "loading",
+  );
 
   const LOCALE_OPTIONS: LocaleOption[] = [
     { id: "system", name: t`System (fallbacks to ${DEFAULT_LOCALE})` },
     { id: "en", name: t`English` },
     { id: "es", name: t`Español` },
   ];
+
+  useEffect(() => {
+    if (!userId) {
+      if (isSessionPending) {
+        setTrizumCloudStatus(initialCachedCloudSettings ? "idle" : "loading");
+        return;
+      }
+
+      setCloudSettings(null);
+      setHasCachedCloudSettings(false);
+      setTrizumCloudStatus("idle");
+      return;
+    }
+
+    let isCancelled = false;
+    const cachedCloudSettings = readCachedCloudUserSettings(userId);
+
+    if (cachedCloudSettings) {
+      setCloudSettings(cachedCloudSettings.settings);
+      setHasCachedCloudSettings(true);
+      setTrizumCloudStatus("idle");
+    } else {
+      setCloudSettings(null);
+      setHasCachedCloudSettings(false);
+      setTrizumCloudStatus("loading");
+    }
+
+    void fetchCloudUserSettings()
+      .then(({ settings }) => {
+        if (!isCancelled) {
+          setCloudSettings(settings);
+          writeCachedCloudUserSettings(userId, settings);
+          setHasCachedCloudSettings(true);
+          setTrizumCloudStatus("idle");
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setTrizumCloudStatus(cachedCloudSettings ? "idle" : "error");
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [initialCachedCloudSettings, isSessionPending, userId]);
 
   function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
@@ -78,6 +147,15 @@ function Settings() {
   });
 
   const formId = useId();
+  const trizumCloudLabel = getTrizumCloudLabel({
+    cloudSettings,
+    currentPartyListId: partyList.id,
+    isSignedIn: Boolean(userId) || isSessionPending,
+    status: trizumCloudStatus,
+  });
+  const isTrizumCloudActive =
+    (Boolean(userId) || (isSessionPending && hasCachedCloudSettings)) &&
+    cloudSettings?.partyListDocumentId === partyList.id;
 
   return (
     <div className="flex min-h-full flex-col">
@@ -107,13 +185,52 @@ function Settings() {
         </form.Subscribe>
       </div>
 
+      <div className="container mt-4 px-4">
+        <Button
+          color="input-like"
+          className="relative h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left"
+          onPress={() => {
+            void navigate({ to: "/settings/cloud-sync" });
+          }}
+        >
+          <span className="flex w-full items-center gap-3">
+            <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50">
+              {isTrizumCloudActive ? (
+                <span
+                  aria-hidden="true"
+                  className="absolute -right-0.5 -top-0.5 flex size-3 items-center justify-center"
+                >
+                  <span className="absolute size-3 animate-pulse rounded-full bg-accent-500/25" />
+                  <span className="relative size-2 rounded-full bg-accent-500 ring-2 ring-white dark:ring-accent-900" />
+                </span>
+              ) : null}
+              <Icon
+                className="relative"
+                icon={isTrizumCloudActive ? "lucide.cloud-check" : "lucide.cloud"}
+                width={20}
+                height={20}
+              />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="font-medium leading-none">
+                <Trans>trizum cloud</Trans>
+              </span>
+              <span className="truncate text-sm text-accent-700 dark:text-accent-50">
+                {trizumCloudLabel}
+              </span>
+            </span>
+            <Icon icon="lucide.chevron-right" width={20} height={20} />
+          </span>
+        </Button>
+      </div>
+
       <form
         id={formId}
         onSubmit={(e) => {
           e.preventDefault();
           void form.handleSubmit();
         }}
-        className="container mt-4 flex flex-col gap-6 px-4"
+        className="container mt-6 flex flex-col gap-6 px-4 pb-8 pb-safe"
       >
         <form.Field name="avatarId">
           {(field) => (
@@ -180,7 +297,7 @@ function Settings() {
               selectedKey={field.state.value}
               onSelectionChange={(value) => {
                 if (value) {
-                  field.handleChange(value as SupportedLocale);
+                  field.handleChange(value as SupportedLocale | "system");
                 }
               }}
             >
@@ -244,4 +361,40 @@ function Settings() {
       </form>
     </div>
   );
+}
+
+type TrizumCloudStatus = "idle" | "loading" | "error";
+
+function getTrizumCloudLabel({
+  cloudSettings,
+  currentPartyListId,
+  isSignedIn,
+  status,
+}: {
+  cloudSettings: CloudUserSettings | null;
+  currentPartyListId: string;
+  isSignedIn: boolean;
+  status: TrizumCloudStatus;
+}) {
+  if (!isSignedIn) {
+    return t`Not signed in`;
+  }
+
+  if (status === "loading") {
+    return t`Checking...`;
+  }
+
+  if (status === "error") {
+    return t`Could not load trizum cloud state`;
+  }
+
+  if (!cloudSettings) {
+    return t`Not set up`;
+  }
+
+  if (cloudSettings.partyListDocumentId === currentPartyListId) {
+    return t`Active on this device`;
+  }
+
+  return t`Ready on another device`;
 }

@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ArchivedRouteImport } from './routes/archived'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsCloudSyncRouteImport } from './routes/settings_.cloud-sync'
 import { Route as PartyPartyIdRouteImport } from './routes/party.$partyId'
 import { Route as MigrateTricountRouteImport } from './routes/migrate_.tricount'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
@@ -38,6 +40,11 @@ const SupportRoute = SupportRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -68,6 +75,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsCloudSyncRoute = SettingsCloudSyncRouteImport.update({
+  id: '/settings_/cloud-sync',
+  path: '/settings/cloud-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartyPartyIdRoute = PartyPartyIdRouteImport.update({
@@ -141,11 +153,13 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
+  '/settings/cloud-sync': typeof SettingsCloudSyncRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
@@ -163,11 +177,13 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
+  '/settings/cloud-sync': typeof SettingsCloudSyncRoute
   '/party/$partyId/add': typeof PartyPartyIdAddRoute
   '/party/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsRoute
@@ -186,11 +202,13 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/new': typeof NewRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/about_/third-party-licenses': typeof AboutThirdPartyLicensesRoute
   '/migrate_/tricount': typeof MigrateTricountRoute
   '/party/$partyId': typeof PartyPartyIdRoute
+  '/settings_/cloud-sync': typeof SettingsCloudSyncRoute
   '/party_/$partyId/add': typeof PartyPartyIdAddRoute
   '/party_/$partyId/pay': typeof PartyPartyIdPayRoute
   '/party_/$partyId/settings': typeof PartyPartyIdSettingsRoute
@@ -210,11 +228,13 @@ export interface FileRouteTypes {
     | '/join'
     | '/new'
     | '/privacy-policy'
+    | '/reset-password'
     | '/settings'
     | '/support'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
     | '/party/$partyId'
+    | '/settings/cloud-sync'
     | '/party/$partyId/add'
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
@@ -232,11 +252,13 @@ export interface FileRouteTypes {
     | '/join'
     | '/new'
     | '/privacy-policy'
+    | '/reset-password'
     | '/settings'
     | '/support'
     | '/about/third-party-licenses'
     | '/migrate/tricount'
     | '/party/$partyId'
+    | '/settings/cloud-sync'
     | '/party/$partyId/add'
     | '/party/$partyId/pay'
     | '/party/$partyId/settings'
@@ -254,11 +276,13 @@ export interface FileRouteTypes {
     | '/join'
     | '/new'
     | '/privacy-policy'
+    | '/reset-password'
     | '/settings'
     | '/support'
     | '/about_/third-party-licenses'
     | '/migrate_/tricount'
     | '/party/$partyId'
+    | '/settings_/cloud-sync'
     | '/party_/$partyId/add'
     | '/party_/$partyId/pay'
     | '/party_/$partyId/settings'
@@ -277,11 +301,13 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   NewRoute: typeof NewRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   AboutThirdPartyLicensesRoute: typeof AboutThirdPartyLicensesRoute
   MigrateTricountRoute: typeof MigrateTricountRoute
   PartyPartyIdRoute: typeof PartyPartyIdRoute
+  SettingsCloudSyncRoute: typeof SettingsCloudSyncRoute
   PartyPartyIdAddRoute: typeof PartyPartyIdAddRoute
   PartyPartyIdPayRoute: typeof PartyPartyIdPayRoute
   PartyPartyIdSettingsRoute: typeof PartyPartyIdSettingsRoute
@@ -307,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -349,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings_/cloud-sync': {
+      id: '/settings_/cloud-sync'
+      path: '/settings/cloud-sync'
+      fullPath: '/settings/cloud-sync'
+      preLoaderRoute: typeof SettingsCloudSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/party/$partyId': {
@@ -445,11 +485,13 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   NewRoute: NewRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   AboutThirdPartyLicensesRoute: AboutThirdPartyLicensesRoute,
   MigrateTricountRoute: MigrateTricountRoute,
   PartyPartyIdRoute: PartyPartyIdRoute,
+  SettingsCloudSyncRoute: SettingsCloudSyncRoute,
   PartyPartyIdAddRoute: PartyPartyIdAddRoute,
   PartyPartyIdPayRoute: PartyPartyIdPayRoute,
   PartyPartyIdSettingsRoute: PartyPartyIdSettingsRoute,

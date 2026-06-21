@@ -72,6 +72,8 @@ export default defineConfig(({ mode }) => {
 
   process.env.VITE_APP_WSS_URL =
     mode === "production" ? "wss://server.trizum.app/sync" : "wss://dev-sync.trizum.app";
+  process.env.VITE_APP_AUTH_URL =
+    process.env.VITE_APP_AUTH_URL ?? (mode === "production" ? "https://trizum.app" : "");
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
   process.env.VITE_APP_FULL_VERSION = fullVersion;
@@ -82,11 +84,11 @@ export default defineConfig(({ mode }) => {
         build: {
           command: "vp build",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
-          env: ["SENTRY_AUTH_TOKEN"],
+          env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
           output: ["dist/**"],
         },
         check: {
-          command: "vp check .",
+          command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
         },
         deploy: {
@@ -131,7 +133,7 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
-      include: ["src/**/*.test.ts"],
+      include: ["api/**/*.test.ts", "src/**/*.test.ts"],
       name: "pwa",
     },
     plugins: [
@@ -156,6 +158,7 @@ export default defineConfig(({ mode }) => {
           globPatterns: ["**/*.{js,wasm,css,html,svg}"],
           maximumFileSizeToCacheInBytes: 5242880,
           additionalManifestEntries: [{ url: "/THIRD-PARTY-LICENSES.txt", revision: null }],
+          navigateFallbackDenylist: [/^\/api(?:\/|$)/],
         },
         outDir: "dist/client",
         manifest: {

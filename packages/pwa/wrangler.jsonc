@@ -1,13 +1,48 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "trizum",
+  "account_id": "0386b05d89cdce85a2ff1f9439795ac2",
   "compatibility_date": "2025-11-18",
+  "compatibility_flags": ["nodejs_als", "nodejs_compat"],
   "main": "api/worker.ts",
   "assets": {
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"],
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+      "head_sampling_rate": 1,
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+    },
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "trizum",
+      "database_id": "4eaaa4f5-e23a-4f06-9654-29b25aee9bb8",
+      "migrations_dir": "./migrations",
+    },
+  ],
+  "send_email": [{ "name": "EMAIL" }],
+  "vars": {
+    "APPLE_APP_BUNDLE_IDENTIFIER": "app.trizum.capacitor",
+    "APPLE_SERVICE_ID": "app.trizum.capacitor.si",
+    "AUTH_EMAIL_FROM": "trizum <noreply@trizum.app>",
+    "BETTER_AUTH_ALLOWED_HOSTS": "trizum.app,*.horusdev.workers.dev,localhost:5173,localhost:8787,127.0.0.1:5173,127.0.0.1:8787",
+    "BETTER_AUTH_TRUSTED_ORIGINS": "https://trizum.app,https://*.horusdev.workers.dev,capacitor://localhost,ionic://localhost,http://localhost,http://localhost:5173,http://localhost:8787",
+    "BETTER_AUTH_URL": "https://trizum.app",
+    "GOOGLE_ANDROID_APK_CLIENT_ID": "554871818976-9el2tt5b2fj1quodn14be8jncpefij7v.apps.googleusercontent.com",
+    "GOOGLE_ANDROID_GOOGLE_PLAY_CLIENT_ID": "554871818976-bps9ha7q5qhop0i8nt8jfa2l2mu48a6a.apps.googleusercontent.com",
+    "GOOGLE_IOS_CLIENT_ID": "554871818976-adac4tobqolhrgp7e64siieslsc2jf84.apps.googleusercontent.com",
+    "GOOGLE_WEB_CLIENT_ID": "554871818976-e3p8ou802d8746n0se8dv20ba3gnfi0g.apps.googleusercontent.com",
   },
   "routes": [
     {
