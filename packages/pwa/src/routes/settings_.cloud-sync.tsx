@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
 import { AnimatePresence, motion } from "motion/react";
@@ -37,6 +37,7 @@ import { cn } from "#src/ui/utils.js";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { PartyList } from "#src/models/partyList.js";
 import { Settings } from "#src/routes/settings.tsx";
+import { closeRouteState } from "#src/lib/navigationHistory.ts";
 
 export const Route = createFileRoute("/settings_/cloud-sync")({
   validateSearch: (search: Record<string, unknown>): CloudSyncSearchParams => ({
@@ -81,6 +82,8 @@ interface CachedCloudAccountState {
 
 function CloudSyncSettings() {
   const { partyList } = usePartyList();
+  const router = useRouter();
+  const currentLocation = useLocation();
   const navigate = useNavigate({ from: Route.fullPath });
   const { auth, error: authCallbackError } = Route.useSearch();
   const session = authClient.useSession();
@@ -481,7 +484,7 @@ function CloudSyncSettings() {
       const redirectUrl = getAuthRedirectUrl(result.data);
 
       if (redirectUrl) {
-        window.location.href = redirectUrl;
+        window.location.replace(redirectUrl);
         return;
       }
 
@@ -501,7 +504,7 @@ function CloudSyncSettings() {
       const result = await linkSocialAuthAccount(provider);
 
       if (result.url) {
-        window.location.href = result.url;
+        window.location.replace(result.url);
         return;
       }
 
@@ -669,7 +672,9 @@ function CloudSyncSettings() {
   function closeSignInDialog() {
     setIsSignInDialogOpen(false);
     window.setTimeout(() => {
-      void navigate({ to: "/settings", replace: true });
+      closeRouteState(currentLocation, router.history, () => {
+        void navigate({ to: "/settings", replace: true });
+      });
     }, DIALOG_EXIT_ANIMATION_MS);
   }
 

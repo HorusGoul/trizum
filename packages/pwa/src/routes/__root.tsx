@@ -2,6 +2,7 @@ import type { Repo } from "@automerge/automerge-repo/slim";
 import { createRootRouteWithContext, Outlet, useRouter } from "@tanstack/react-router";
 import * as React from "react";
 import { RouterProvider } from "react-aria-components";
+import { shouldReplaceNavigation } from "#src/lib/navigationHistory.ts";
 
 const TanStackRouterDevtools = import.meta.env.PROD
   ? () => null // Render nothing in production
@@ -27,13 +28,28 @@ function Root() {
     <RouterProvider
       navigate={(to, options) => {
         if (typeof to === "string") {
-          void router.navigate({ to, ...options });
+          const nextLocation = router.buildLocation({ to });
+          void router.navigate({
+            to,
+            ...options,
+            replace:
+              options?.replace ??
+              shouldReplaceNavigation(router.state.location.href, nextLocation.href),
+          });
           return;
         }
 
-        void router.navigate({
+        const navigationOptions = {
           ...to,
           ...options,
+        };
+        const nextLocation = router.buildLocation(navigationOptions);
+
+        void router.navigate({
+          ...navigationOptions,
+          replace:
+            navigationOptions.replace ??
+            shouldReplaceNavigation(router.state.location.href, nextLocation.href),
         });
       }}
       useHref={(to) => {

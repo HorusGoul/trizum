@@ -8,7 +8,7 @@ import {
   type Expense,
 } from "#src/models/expense.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { BackButton } from "#src/components/BackButton.js";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "#src/ui/IconButton.js";
@@ -29,6 +29,7 @@ import { Fragment, Suspense } from "react";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+import { closeRouteState } from "#src/lib/navigationHistory.ts";
 
 interface ExpenseSearchParams {
   media?: number;
@@ -57,14 +58,17 @@ function ExpenseById() {
   const { expenseId, partyId, expense, onDeleteExpense, isLoading } = useExpense();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const { history } = useRouter();
+  const router = useRouter();
+  const currentLocation = useLocation();
 
   const photos = expense?.photos ?? [];
 
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
+    currentLocation,
+    buildLocation: (options) => router.buildLocation({ ...options, from: Route.fullPath }),
     navigate: (options) => void navigate(options),
-    goBack: () => history.back(),
+    history: router.history,
   });
 
   if (expenseId === undefined) {
@@ -143,6 +147,8 @@ function ExpenseById() {
 function useExpense() {
   const { history } = useRouter();
   const { partyId, expenseId } = Route.useParams();
+  const currentLocation = useLocation();
+  const navigate = useNavigate();
 
   if (!isValidDocumentId(partyId)) throw new Error(t`Malformed Party ID`);
 
@@ -160,7 +166,12 @@ function useExpense() {
 
     await removeExpense(expenseId);
 
-    history.back();
+    closeRouteState(currentLocation, history, () => {
+      void navigate({
+        href: `/party/${partyId}`,
+        replace: true,
+      });
+    });
     toast.success("Expense deleted");
   }
 

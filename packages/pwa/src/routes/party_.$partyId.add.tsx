@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 
 import { type Expense } from "#src/models/expense.js";
@@ -40,13 +40,16 @@ function AddExpense() {
   const { partyId, addExpenseToParty } = useCurrentParty();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const { history } = useRouter();
+  const router = useRouter();
+  const currentLocation = useLocation();
   const participant = useCurrentParticipant();
 
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
+    currentLocation,
+    buildLocation: (options) => router.buildLocation({ ...options, from: Route.fullPath }),
     navigate: (options) => void navigate(options),
-    goBack: () => history.back(),
+    history: router.history,
   });
 
   // Track photos for gallery - updates when form changes

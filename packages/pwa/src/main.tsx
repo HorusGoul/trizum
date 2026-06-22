@@ -6,6 +6,7 @@ import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
   RouterProvider,
+  createBrowserHistory,
   createRouter,
   type NavigateOptions,
   type ToOptions,
@@ -33,6 +34,10 @@ import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging } from "./lib/log.ts";
 import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
+import {
+  preventDuplicateHistoryEntries,
+  pushHistoryWithoutDuplicateEntry,
+} from "./lib/navigationHistory.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import {
   readPartyListState,
@@ -140,8 +145,10 @@ window.__internal_readPartyListState = async () => {
 };
 
 // Create a new router instance
+const history = preventDuplicateHistoryEntries(createBrowserHistory());
 const router = createRouter({
   routeTree,
+  history,
   context: { repo },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
@@ -163,7 +170,7 @@ if (Capacitor.isNativePlatform()) {
 
     void resolveNativeDeepLink(rawUrl).then(({ href }) => {
       if (href) {
-        router.history.push(href);
+        pushHistoryWithoutDuplicateEntry(router.history, href);
       }
     });
   }

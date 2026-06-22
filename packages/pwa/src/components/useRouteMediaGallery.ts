@@ -1,12 +1,18 @@
 import { useCallback } from "react";
+import { closeRouteState, navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
+import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
 
 export interface UseRouteMediaGalleryOptions {
   /** Current media index from route search params */
   mediaIndex: number | undefined;
+  currentLocation: Pick<ParsedLocation, "href" | "state">;
+  buildLocation: (options: {
+    search: { media?: number };
+    replace?: boolean;
+  }) => Pick<ParsedLocation, "href">;
   /** Navigate function from useNavigate({ from: Route.fullPath }) */
-  navigate: (options: { search: { media: number }; replace?: boolean }) => void;
-  /** Function to navigate back (e.g., history.back) */
-  goBack: () => void;
+  navigate: (options: { search: { media?: number }; replace?: boolean }) => void;
+  history: Pick<RouterHistory, "go">;
 }
 
 export interface UseRouteMediaGalleryReturn {
@@ -28,22 +34,31 @@ export interface UseRouteMediaGalleryReturn {
  */
 export function useRouteMediaGallery({
   mediaIndex,
+  currentLocation,
+  buildLocation,
   navigate,
-  goBack,
+  history,
 }: UseRouteMediaGalleryOptions): UseRouteMediaGalleryReturn {
   const galleryIndex = mediaIndex;
   const isOpen = galleryIndex !== undefined && galleryIndex >= 0;
 
   const openGallery = useCallback(
     (index: number) => {
-      navigate({ search: { media: index } });
+      navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
+        search: { media: index },
+      });
     },
-    [navigate],
+    [buildLocation, currentLocation, navigate],
   );
 
   const closeGallery = useCallback(() => {
-    goBack();
-  }, [goBack]);
+    closeRouteState(currentLocation, history, () => {
+      navigate({
+        search: { media: undefined },
+        replace: true,
+      });
+    });
+  }, [currentLocation, history, navigate]);
 
   const onIndexChange = useCallback(
     (index: number) => {
