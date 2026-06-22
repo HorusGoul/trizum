@@ -18,6 +18,7 @@ describe("auth origin trust", () => {
 
   test("keeps local app origins available for development", () => {
     expect(isTrustedOrigin("http://localhost", {})).toBe(true);
+    expect(isTrustedOrigin("https://localhost", {})).toBe(true);
     expect(isTrustedOrigin("http://localhost:5173", {})).toBe(true);
     expect(isTrustedOrigin("http://localhost:8787", {})).toBe(true);
     expect(isTrustedOrigin("ionic://localhost", {})).toBe(true);
