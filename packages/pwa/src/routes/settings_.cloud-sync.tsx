@@ -30,16 +30,6 @@ import {
 import { Button } from "#src/ui/Button.tsx";
 import { Icon, type IconProps } from "#src/ui/Icon.tsx";
 import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
-import {
-  ModalSheet,
-  ModalSheetAction,
-  ModalSheetActions,
-  ModalSheetContent,
-  ModalSheetDescription,
-  ModalSheetHeader,
-  ModalSheetSection,
-  ModalSheetTitle,
-} from "#src/ui/ModalSheet.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
@@ -1039,41 +1029,92 @@ function CloudSyncSettings() {
 
       <AnimatePresence>{isSignInSuccessVisible ? <SignInSuccessOverlay /> : null}</AnimatePresence>
 
-      <ModalSheet
-        isDismissable={false}
+      <CloudSyncSwitchDialog
         isOpen={isCloudSyncSwitchOpen}
-        onOpenChange={setIsCloudSyncSwitchOpen}
-      >
-        <ModalSheetHeader>
-          <ModalSheetSection className="flex flex-col gap-2">
-            <ModalSheetTitle>
-              <Trans>Use trizum cloud on this device?</Trans>
-            </ModalSheetTitle>
-            <ModalSheetDescription>
-              <Trans>
-                This device already has local trizum data. Using trizum cloud here will switch this
-                device to your cloud data, and the local list on this device will stop being used.
-              </Trans>
-            </ModalSheetDescription>
-          </ModalSheetSection>
-        </ModalSheetHeader>
-        <ModalSheetContent>
-          <ModalSheetActions>
-            <ModalSheetAction
-              icon="lucide.cloud-download"
-              onPress={() => {
-                activateCloudSyncOnDevice();
-              }}
-            >
-              <Trans>Use cloud data</Trans>
-            </ModalSheetAction>
-            <ModalSheetAction icon="lucide.log-out" onPress={onSignOut} tone="danger">
-              <Trans>Sign out</Trans>
-            </ModalSheetAction>
-          </ModalSheetActions>
-        </ModalSheetContent>
-      </ModalSheet>
+        onSignOut={onSignOut}
+        onUseCloudData={() => {
+          activateCloudSyncOnDevice();
+        }}
+      />
     </div>
+  );
+}
+
+function CloudSyncSwitchDialog({
+  isOpen,
+  onSignOut,
+  onUseCloudData,
+}: {
+  isOpen: boolean;
+  onSignOut: () => void;
+  onUseCloudData: () => void;
+}) {
+  return (
+    <ModalOverlay
+      isDismissable={false}
+      isKeyboardDismissDisabled
+      isOpen={isOpen}
+      className={({ isEntering, isExiting }) =>
+        cn(
+          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          isEntering && "duration-200 ease-out animate-in fade-in",
+          isExiting && "duration-150 ease-in animate-out fade-out",
+        )
+      }
+    >
+      <Modal
+        className={({ isEntering, isExiting }) =>
+          cn(
+            "w-full max-w-[420px] outline-none",
+            isEntering && "duration-200 ease-out animate-in fade-in zoom-in-95",
+            isExiting && "duration-150 ease-in animate-out fade-out zoom-out-95",
+          )
+        }
+      >
+        <Dialog
+          aria-label={t`Use trizum cloud on this device?`}
+          className="rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
+        >
+          <div className="flex flex-col gap-5 p-5 sm:p-6">
+            <div className="flex flex-col gap-3">
+              <span className="flex size-10 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50">
+                <Icon icon="lucide.cloud-download" width={20} height={20} />
+              </span>
+              <div className="flex flex-col gap-2">
+                <h2 className="text-lg font-medium">
+                  <Trans>Use trizum cloud on this device?</Trans>
+                </h2>
+                <p className="text-sm text-accent-700 dark:text-accent-50">
+                  <Trans>
+                    This device already has local data. Using trizum cloud here will switch this
+                    device to your cloud data. Your local data on this device will stop being used.
+                  </Trans>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Button className="font-semibold" color="accent" onPress={onUseCloudData}>
+                <span className="flex items-center gap-2">
+                  <Icon icon="lucide.cloud-download" width={18} height={18} />
+                  <Trans>Use cloud data</Trans>
+                </span>
+              </Button>
+              <Button
+                className="font-semibold text-danger-700 dark:text-danger-300"
+                color="input-like"
+                onPress={onSignOut}
+              >
+                <span className="flex items-center gap-2">
+                  <Icon icon="lucide.log-out" width={18} height={18} />
+                  <Trans>Sign out</Trans>
+                </span>
+              </Button>
+            </div>
+          </div>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   );
 }
 
@@ -1189,11 +1230,11 @@ function CloudSyncSignInDialog({
         >
           <IconButton
             aria-label={t`Back to settings`}
-            className="absolute right-2 top-2"
+            className="absolute right-safe-offset-2 top-safe-offset-2 sm:right-2 sm:top-2"
             icon="lucide.x"
             onPress={onOpenChange}
           />
-          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 pt-14 sm:p-6 sm:pt-14">
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-safe-offset-5 pt-safe-offset-14 px-safe-or-5 sm:p-6 sm:pt-14">
             {showHeader ? (
               <div className="flex flex-col items-center gap-3 text-center">
                 <img

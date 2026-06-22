@@ -11,12 +11,15 @@
 #
 
 require "fastlane_core/build_watcher"
+require "plist"
 require "spaceship/connect_api"
 
 IOS_APP_IDENTIFIER = "app.trizum.capacitor"
+IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
 IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
+IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
 
 default_platform(:ios)
 
@@ -65,19 +68,13 @@ platform :ios do
         )
       end
 
-      # Install provisioning profile
-      if ENV["IOS_PROVISIONING_PROFILE_BASE64"]
+      if refresh_provisioning_profile?(options[:type])
+        refresh_provisioning_profile
+      elsif ENV["IOS_PROVISIONING_PROFILE_BASE64"]
         profile_path = "#{Dir.tmpdir}/profile.mobileprovision"
         File.write(profile_path, Base64.decode64(ENV["IOS_PROVISIONING_PROFILE_BASE64"]))
 
-        install_provisioning_profile(path: profile_path)
-
-        # Extract profile name for later use
-        profile_info = `security cms -D -i "#{profile_path}" 2>/dev/null`
-        if profile_info.include?("<key>Name</key>")
-          profile_name = profile_info.match(/<key>Name<\/key>\s*<string>([^<]+)<\/string>/)[1]
-          ENV["PROVISIONING_PROFILE_NAME"] = profile_name
-        end
+        install_ci_provisioning_profile(path: profile_path)
       end
     end
   end
@@ -486,6 +483,97 @@ platform :ios do
   private_lane :build_number_base_for_version do |options|
     major, minor, patch = version_segments(options[:version])
     major * 10_000_000 + minor * 10_000 + patch * 100
+  end
+
+  def refresh_provisioning_profile?(type)
+    type.to_s == "appstore" && ENV["IOS_REFRESH_PROVISIONING_PROFILE"] == "true"
+  end
+
+  def refresh_provisioning_profile
+    api_key = Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+    unless api_key
+      UI.user_error!(
+        "IOS_REFRESH_PROVISIONING_PROFILE=true requires App Store Connect API key environment variables."
+      )
+    end
+
+    get_provisioning_profile(
+      app_identifier: IOS_APP_IDENTIFIER,
+      api_key: api_key,
+      force: true,
+      filename: "appstore.mobileprovision",
+      output_path: Dir.tmpdir,
+      platform: "ios",
+      provisioning_name: ENV["IOS_APPSTORE_PROVISIONING_PROFILE_NAME"] || IOS_APPSTORE_PROFILE_NAME,
+      skip_install: false
+    )
+
+    profile_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
+    install_ci_provisioning_profile(path: profile_path)
+  end
+
+  def install_ci_provisioning_profile(path:)
+    install_provisioning_profile(path: path)
+
+    profile = parse_provisioning_profile(path)
+    ENV["PROVISIONING_PROFILE_NAME"] = profile.fetch("Name")
+    validate_profile_entitlements(profile)
+  end
+
+  def parse_provisioning_profile(path)
+    profile_info = `security cms -D -i "#{path}" 2>/dev/null`
+    UI.user_error!("Unable to read provisioning profile at #{path}") if profile_info.empty?
+
+    Plist.parse_xml(profile_info)
+  end
+
+  def validate_profile_entitlements(profile)
+    required_entitlements = Plist.parse_xml(IOS_ENTITLEMENTS_PATH)
+    if required_entitlements.nil?
+      UI.user_error!("Unable to read app entitlements at #{IOS_ENTITLEMENTS_PATH}")
+    end
+
+    profile_entitlements = profile["Entitlements"] || {}
+    missing_entitlements = []
+
+    required_entitlements.each do |key, expected_value|
+      actual_value = profile_entitlements[key]
+
+      if actual_value.nil?
+        missing_entitlements << key
+      elsif expected_value.is_a?(Array)
+        missing_values = missing_profile_entitlement_values(expected_value, actual_value)
+        missing_entitlements << "#{key} (#{missing_values.join(", ")})" unless missing_values.empty?
+      elsif actual_value != expected_value
+        missing_entitlements << key
+      end
+    end
+
+    return if missing_entitlements.empty?
+
+    UI.user_error!(
+      "Provisioning profile #{profile.fetch("Name")} is missing required app entitlements: " \
+      "#{missing_entitlements.join(", ")}. Regenerate the App Store profile after enabling " \
+      "Sign in with Apple and Associated Domains for #{IOS_APP_IDENTIFIER}."
+    )
+  end
+
+  def missing_profile_entitlement_values(expected_values, profile_value)
+    expected_values.reject do |expected_value|
+      Array(profile_value).any? do |allowed_value|
+        profile_entitlement_value_matches?(allowed_value, expected_value)
+      end
+    end
+  end
+
+  def profile_entitlement_value_matches?(allowed_value, expected_value)
+    return true if allowed_value == expected_value
+
+    allowed_string = allowed_value.to_s
+    expected_string = expected_value.to_s
+    return true if allowed_string == "*"
+
+    allowed_string.end_with?("*") && expected_string.start_with?(allowed_string.delete_suffix("*"))
   end
 
   def version_segments(version)
