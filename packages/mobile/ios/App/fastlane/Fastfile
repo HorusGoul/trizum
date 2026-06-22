@@ -20,6 +20,9 @@ IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
 IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
+IOS_REQUIRED_BUNDLE_ID_CAPABILITIES = [
+  Spaceship::ConnectAPI::BundleIdCapability::Type::ASSOCIATED_DOMAINS
+].freeze
 
 default_platform(:ios)
 
@@ -497,6 +500,8 @@ platform :ios do
       )
     end
 
+    ensure_app_store_bundle_id_capabilities
+
     get_provisioning_profile(
       app_identifier: IOS_APP_IDENTIFIER,
       api_key: api_key,
@@ -510,6 +515,18 @@ platform :ios do
 
     profile_path = Actions.lane_context[SharedValues::SIGH_PROFILE_PATH]
     install_ci_provisioning_profile(path: profile_path)
+  end
+
+  def ensure_app_store_bundle_id_capabilities
+    bundle_id = Spaceship::ConnectAPI::BundleId.find(IOS_APP_IDENTIFIER)
+    unless bundle_id
+      UI.user_error!("Unable to find App Store Connect bundle ID #{IOS_APP_IDENTIFIER}.")
+    end
+
+    IOS_REQUIRED_BUNDLE_ID_CAPABILITIES.each do |capability_type|
+      UI.message("Ensuring Bundle ID capability #{capability_type} for #{IOS_APP_IDENTIFIER}")
+      bundle_id.update_capability(capability_type, enabled: true)
+    end
   end
 
   def install_ci_provisioning_profile(path:)
