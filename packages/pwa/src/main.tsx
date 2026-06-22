@@ -32,6 +32,7 @@ import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging } from "./lib/log.ts";
+import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import {
   readPartyListState,
@@ -150,6 +151,22 @@ let UpdateControllerComponent = UpdateController;
 
 if (Capacitor.isNativePlatform()) {
   UpdateControllerComponent = UpdateControllerNative;
+  const handledNativeOpenUrls = new Set<string>();
+
+  function handleNativeOpenUrl(rawUrl: string) {
+    if (handledNativeOpenUrls.has(rawUrl)) {
+      return;
+    }
+
+    handledNativeOpenUrls.add(rawUrl);
+    window.setTimeout(() => handledNativeOpenUrls.delete(rawUrl), 1_000);
+
+    void resolveNativeDeepLink(rawUrl).then(({ href }) => {
+      if (href) {
+        router.history.push(href);
+      }
+    });
+  }
 
   void SafeArea.getSafeAreaInsets().then(({ insets }) => {
     for (const [key, value] of Object.entries(insets)) {
@@ -172,11 +189,13 @@ if (Capacitor.isNativePlatform()) {
   });
 
   void App.addListener("appUrlOpen", (event) => {
-    const url = new URL(event.url);
+    handleNativeOpenUrl(event.url);
+  });
 
-    const pathnameAndSearch = url.pathname + url.search;
-
-    router.history.push(pathnameAndSearch);
+  void App.getLaunchUrl().then((launchUrl) => {
+    if (launchUrl?.url) {
+      handleNativeOpenUrl(launchUrl.url);
+    }
   });
 }
 

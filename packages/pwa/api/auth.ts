@@ -1,6 +1,6 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink } from "better-auth/plugins";
+import { bearer, magicLink } from "better-auth/plugins";
 import { EmailMessage } from "cloudflare:email";
 import { eq } from "drizzle-orm";
 import { importPKCS8, SignJWT } from "jose";
@@ -105,6 +105,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
       },
     },
     plugins: [
+      bearer(),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
           await sendAuthEmail(env, {

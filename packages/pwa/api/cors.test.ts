@@ -13,7 +13,7 @@ describe("api CORS configuration", () => {
       "/api/auth/sign-in/social",
       {
         headers: {
-          "Access-Control-Request-Headers": "content-type, x-native-client",
+          "Access-Control-Request-Headers": "authorization, content-type, x-native-client",
           "Access-Control-Request-Method": "POST",
           Origin: "capacitor://localhost",
         },
@@ -26,7 +26,7 @@ describe("api CORS configuration", () => {
     expect(response.headers.get("Access-Control-Allow-Origin")).toBe("capacitor://localhost");
     expect(response.headers.get("Access-Control-Allow-Credentials")).toBe("true");
     expect(response.headers.get("Access-Control-Allow-Headers")).toBe(
-      "content-type,x-native-client",
+      "authorization,content-type,x-native-client",
     );
   });
 });

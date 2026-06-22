@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
+import { clearNativeAuthToken } from "#src/lib/nativeAuthSession.ts";
 import {
   authClient,
   deleteAuthUserAccount,
@@ -69,6 +70,8 @@ type AuthPendingAction =
   | "sign-out";
 
 type CloudActionDialogType = "connect-apple" | "connect-google" | "password-link" | "sign-out";
+type AuthSession = ReturnType<typeof authClient.useSession>;
+type AuthSessionUser = NonNullable<NonNullable<AuthSession["data"]>["user"]>;
 
 interface CachedCloudAccountState {
   cachedAt: number;
@@ -81,7 +84,9 @@ function CloudSyncSettings() {
   const navigate = useNavigate({ from: Route.fullPath });
   const { auth, error: authCallbackError } = Route.useSearch();
   const session = authClient.useSession();
-  const user = session.data?.user;
+  const sessionUser = session.data?.user;
+  const [optimisticAuthUser, setOptimisticAuthUser] = useState<AuthSessionUser | null>(null);
+  const user = sessionUser ?? optimisticAuthUser;
   const userId = user?.id;
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
@@ -126,6 +131,12 @@ function CloudSyncSettings() {
       setIsSignInDialogOpen(true);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (sessionUser) {
+      setOptimisticAuthUser(null);
+    }
+  }, [sessionUser]);
 
   useEffect(() => {
     if (!userId) {
@@ -344,6 +355,42 @@ function CloudSyncSettings() {
     setAuthFailureMessage(error instanceof Error ? error.message : fallbackMessage);
   }
 
+  function handleSignInSuccess(user: AuthSessionUser | undefined) {
+    if (user) {
+      setOptimisticAuthUser(user);
+    }
+
+    toast.success(t`Signed in`);
+    setIsSignInSuccessVisible(true);
+    void session.refetch();
+  }
+
+  function getAuthResultUser(data: unknown): AuthSessionUser | undefined {
+    if (!data || typeof data !== "object" || !("user" in data)) {
+      return undefined;
+    }
+
+    const user = data.user;
+
+    if (!user || typeof user !== "object" || !("id" in user) || !("email" in user)) {
+      return undefined;
+    }
+
+    if (typeof user.id !== "string" || typeof user.email !== "string") {
+      return undefined;
+    }
+
+    return user as AuthSessionUser;
+  }
+
+  function getAuthRedirectUrl(data: unknown): string | undefined {
+    if (!data || typeof data !== "object" || !("url" in data)) {
+      return undefined;
+    }
+
+    return typeof data.url === "string" ? data.url : undefined;
+  }
+
   function onAuthEmailChange(value: string) {
     setAuthEmail(value);
     clearAuthErrors();
@@ -403,9 +450,7 @@ function CloudSyncSettings() {
       }
 
       setAuthPassword("");
-      toast.success(t`Signed in`);
-      setIsSignInSuccessVisible(true);
-      await session.refetch();
+      handleSignInSuccess(getAuthResultUser(result.data));
     } catch (error) {
       setAuthFailureMessage(
         error instanceof Error && error.message.endsWith("sign-in is not configured.")
@@ -433,9 +478,14 @@ function CloudSyncSettings() {
         return;
       }
 
-      toast.success(t`Signed in`);
-      setIsSignInSuccessVisible(true);
-      await session.refetch();
+      const redirectUrl = getAuthRedirectUrl(result.data);
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+        return;
+      }
+
+      handleSignInSuccess(getAuthResultUser(result.data));
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t`Authentication failed`);
     } finally {
@@ -524,6 +574,7 @@ function CloudSyncSettings() {
 
     try {
       await authClient.signOut();
+      clearNativeAuthToken();
       setCloudSettings(null);
       setLinkedAccounts([]);
       await session.refetch();
