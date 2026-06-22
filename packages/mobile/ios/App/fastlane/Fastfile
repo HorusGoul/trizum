@@ -69,7 +69,7 @@ platform :ios do
       end
 
       if refresh_provisioning_profile?(options[:type])
-        refresh_provisioning_profile(type: options[:type])
+        refresh_provisioning_profile
       elsif ENV["IOS_PROVISIONING_PROFILE_BASE64"]
         profile_path = "#{Dir.tmpdir}/profile.mobileprovision"
         File.write(profile_path, Base64.decode64(ENV["IOS_PROVISIONING_PROFILE_BASE64"]))
@@ -489,7 +489,7 @@ platform :ios do
     type.to_s == "appstore" && ENV["IOS_REFRESH_PROVISIONING_PROFILE"] == "true"
   end
 
-  def refresh_provisioning_profile(type:)
+  def refresh_provisioning_profile
     api_key = Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
     unless api_key
       UI.user_error!(
@@ -500,8 +500,6 @@ platform :ios do
     get_provisioning_profile(
       app_identifier: IOS_APP_IDENTIFIER,
       api_key: api_key,
-      adhoc: type.to_s == "adhoc",
-      development: false,
       force: true,
       filename: "appstore.mobileprovision",
       output_path: Dir.tmpdir,
