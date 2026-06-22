@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "1c42991a47eb5faf803be1e3e2ae6f3b95ec2931baeb3137a4a1aa02f4036f2b"
     },
+    "deslop": {
+      "source": "cursor/plugins",
+      "sourceType": "github",
+      "computedHash": "8883a7d459c07a0b2ee06972e79baa634009aa3bab969a6650acbefac394ad41"
+    },
     "enhanced-message-context": {
       "source": "lingui/skills",
       "sourceType": "github",
@@ -35,6 +40,11 @@
       "source": "lingui/skills",
       "sourceType": "github",
       "computedHash": "4579c7fc20e7963697991e329567161a3a4cfa66ec41c8363bd606bbadfd4049"
+    },
+    "thermo-nuclear-code-quality-review": {
+      "source": "cursor/plugins",
+      "sourceType": "github",
+      "computedHash": "9052b01b46b1d8dbf94c45f9313ec1983443f9a460e83d49cdc7fe0f640ca476"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",
