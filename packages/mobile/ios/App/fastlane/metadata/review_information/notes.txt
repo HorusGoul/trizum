@@ -1,2 +1,1 @@
-trizum is an offline-first app that works without user accounts. No login is required to use the app. Simply create a group and start adding expenses.
-
+trizum is an offline-first app that still works without user accounts for local groups. No login is required to create a group and start adding expenses. trizum cloud sign-in is optional and is used to load a cloud party list across devices.

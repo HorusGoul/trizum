@@ -14,7 +14,7 @@ trizum hace que dividir gastos con amigos y familiares sea muy fácil. Ya sea qu
 
 • <b>Sugerencias de liquidación</b>: Obtén sugerencias optimizadas para saldar deudas con el menor número de transacciones.
 
-• <b>Enfocado en la privacidad</b>: Tus datos permanecen en tus dispositivos. No se requieren cuentas para comenzar.
+• <b>Enfocado en la privacidad</b>: Tus datos se guardan en tus dispositivos de forma predeterminada. No necesitas una cuenta para comenzar; inicia sesión solo si quieres usar trizum cloud en varios dispositivos.
 
 <b>PERFECTO PARA</b>
 
@@ -25,4 +25,3 @@ trizum hace que dividir gastos con amigos y familiares sea muy fácil. Ya sea qu
 • Organizadores de eventos controlando costes
 
 trizum es gratis. ¡Empieza a dividir gastos de forma inteligente hoy!
-

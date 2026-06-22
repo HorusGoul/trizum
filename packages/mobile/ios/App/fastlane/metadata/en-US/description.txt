@@ -14,7 +14,7 @@ KEY FEATURES
 
 • Settlement Suggestions: Get optimized suggestions to settle debts with the fewest transactions.
 
-• Privacy Focused: Your data stays on your devices. No accounts required to get started.
+• Privacy Focused: Your data is stored on your devices by default. No account is required to get started; sign in only if you choose to use trizum cloud across devices.
 
 PERFECT FOR
 

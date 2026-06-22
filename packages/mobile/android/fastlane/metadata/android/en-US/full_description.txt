@@ -14,7 +14,7 @@ trizum makes splitting bills with friends and family effortless. Whether you're 
 
 • <b>Settlement Suggestions</b>: Get optimized suggestions to settle debts with the fewest transactions.
 
-• <b>Privacy Focused</b>: Your data stays on your devices. No accounts required to get started.
+• <b>Privacy Focused</b>: Your data is stored on your devices by default. No account is required to get started; sign in only if you choose to use trizum cloud across devices.
 
 <b>PERFECT FOR</b>
 
@@ -25,4 +25,3 @@ trizum makes splitting bills with friends and family effortless. Whether you're 
 • Event organizers tracking costs
 
 trizum is free to use. Start splitting bills the smart way today!
-
