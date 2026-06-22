@@ -238,6 +238,7 @@ export default defineConfig(({ mode }) => {
                 name: fullVersion,
                 setCommits: {
                   auto: true,
+                  ignoreMissing: true,
                 },
                 inject: true,
               },
