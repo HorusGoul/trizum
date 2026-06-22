@@ -1,12 +1,18 @@
 import { useCallback } from "react";
+import { closeRouteState, navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
+import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
 
 export interface UseRouteQRScannerOptions {
   /** Whether scanner is active from route search params */
   scanning: boolean | undefined;
+  currentLocation: Pick<ParsedLocation, "href" | "state">;
+  buildLocation: (options: {
+    search: { scanning?: boolean };
+    replace?: boolean;
+  }) => Pick<ParsedLocation, "href">;
   /** Navigate function to update search params */
   navigate: (options: { search: { scanning?: boolean }; replace?: boolean }) => void;
-  /** Function to navigate back (e.g., history.back) */
-  goBack: () => void;
+  history: Pick<RouterHistory, "go">;
 }
 
 export interface UseRouteQRScannerReturn {
@@ -24,18 +30,27 @@ export interface UseRouteQRScannerReturn {
  */
 export function useRouteQRScanner({
   scanning,
+  currentLocation,
+  buildLocation,
   navigate,
-  goBack,
+  history,
 }: UseRouteQRScannerOptions): UseRouteQRScannerReturn {
   const isOpen = scanning === true;
 
   const openScanner = useCallback(() => {
-    navigate({ search: { scanning: true } });
-  }, [navigate]);
+    navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
+      search: { scanning: true },
+    });
+  }, [buildLocation, currentLocation, navigate]);
 
   const closeScanner = useCallback(() => {
-    goBack();
-  }, [goBack]);
+    closeRouteState(currentLocation, history, () => {
+      navigate({
+        search: { scanning: undefined },
+        replace: true,
+      });
+    });
+  }, [currentLocation, history, navigate]);
 
   return {
     isOpen,

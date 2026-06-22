@@ -10,7 +10,7 @@ import { Icon } from "#src/ui/Icon.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
 import { toast } from "sonner";
 
@@ -31,15 +31,18 @@ interface JoinFormValues {
 
 function Join() {
   const router = useRouter();
+  const currentLocation = useLocation();
   const navigate = useNavigate({ from: Route.fullPath });
   const { scanning } = Route.useSearch();
 
   const { isOpen, openScanner, closeScanner } = useRouteQRScanner({
     scanning,
+    currentLocation,
+    buildLocation: (options) => router.buildLocation({ ...options, from: Route.fullPath }),
     navigate: ({ search, replace }) => {
       void navigate({ search: (prev) => ({ ...prev, ...search }), replace });
     },
-    goBack: () => router.history.back(),
+    history: router.history,
   });
 
   function validateQRCode(value: string) {

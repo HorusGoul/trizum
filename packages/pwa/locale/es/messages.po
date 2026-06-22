@@ -75,7 +75,7 @@ msgstr "Color de acento"
 msgid "Account created"
 msgstr "Cuenta creada"
 
-#: src/routes/settings_.cloud-sync.tsx:656
+#: src/routes/settings_.cloud-sync.tsx:659
 msgid "Account deleted"
 msgstr "Cuenta eliminada"
 
@@ -104,7 +104,7 @@ msgstr "Sumar"
 msgid "Add an expense"
 msgstr "Añadir un gasto"
 
-#: src/routes/settings_.cloud-sync.tsx:906
+#: src/routes/settings_.cloud-sync.tsx:911
 msgid "Add Apple as a sign-in method"
 msgstr "Añadir Apple como método de inicio de sesión"
 
@@ -112,7 +112,7 @@ msgstr "Añadir Apple como método de inicio de sesión"
 msgid "Add expenses to this party to unlock totals, rankings, and individual spend."
 msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto individual."
 
-#: src/routes/settings_.cloud-sync.tsx:925
+#: src/routes/settings_.cloud-sync.tsx:930
 msgid "Add Google as a sign-in method"
 msgstr "Añadir Google como método de inicio de sesión"
 
@@ -134,7 +134,7 @@ msgstr "Añadir inicio de sesión con contraseña"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
-#: src/routes/party_.$partyId.add.tsx:65
+#: src/routes/party_.$partyId.add.tsx:68
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
 
@@ -178,7 +178,7 @@ msgstr "La cantidad debe ser mayor que 0"
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/routes/settings_.cloud-sync.tsx:902
+#: src/routes/settings_.cloud-sync.tsx:907
 msgid "Apple"
 msgstr "Apple"
 
@@ -186,7 +186,7 @@ msgstr "Apple"
 msgid "Apple connected"
 msgstr "Apple conectado"
 
-#: src/routes/settings_.cloud-sync.tsx:905
+#: src/routes/settings_.cloud-sync.tsx:910
 msgid "Apple is connected to this account"
 msgstr "Apple está conectado a esta cuenta"
 
@@ -243,7 +243,7 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:260
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:271
 msgid "Attachments"
 msgstr "Adjuntos"
 
@@ -251,14 +251,14 @@ msgstr "Adjuntos"
 msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
-#: src/routes/settings_.cloud-sync.tsx:1157
+#: src/routes/settings_.cloud-sync.tsx:1162
 msgid "Authentication error"
 msgstr "Error de autenticación"
 
-#: src/routes/settings_.cloud-sync.tsx:448
-#: src/routes/settings_.cloud-sync.tsx:460
-#: src/routes/settings_.cloud-sync.tsx:477
-#: src/routes/settings_.cloud-sync.tsx:490
+#: src/routes/settings_.cloud-sync.tsx:451
+#: src/routes/settings_.cloud-sync.tsx:463
+#: src/routes/settings_.cloud-sync.tsx:480
+#: src/routes/settings_.cloud-sync.tsx:493
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
@@ -292,11 +292,11 @@ msgid "Back to home"
 msgstr "Volver al inicio"
 
 #: src/routes/reset-password.tsx:102
-#: src/routes/settings_.cloud-sync.tsx:1234
+#: src/routes/settings_.cloud-sync.tsx:1239
 msgid "Back to settings"
 msgstr "Volver a configuración"
 
-#: src/routes/settings_.cloud-sync.tsx:726
+#: src/routes/settings_.cloud-sync.tsx:731
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
@@ -424,8 +424,8 @@ msgstr "¿Puedo usar trizum sin una cuenta?"
 msgid "Canadian Dollar"
 msgstr "Dólar Canadiense"
 
-#: src/routes/settings_.cloud-sync.tsx:1616
-#: src/routes/settings_.cloud-sync.tsx:1784
+#: src/routes/settings_.cloud-sync.tsx:1621
+#: src/routes/settings_.cloud-sync.tsx:1789
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -461,11 +461,11 @@ msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
-#: src/routes/settings_.cloud-sync.tsx:532
+#: src/routes/settings_.cloud-sync.tsx:535
 msgid "Check your email for the password link"
 msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:418
+#: src/routes/settings_.cloud-sync.tsx:421
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
@@ -562,7 +562,7 @@ msgstr "Completa tu perfil"
 msgid "Configure Profile"
 msgstr "Configurar perfil"
 
-#: src/routes/settings_.cloud-sync.tsx:1567
+#: src/routes/settings_.cloud-sync.tsx:1572
 msgid "Confirm action"
 msgstr "Confirmar acción"
 
@@ -572,7 +572,7 @@ msgstr "Confirmar acción"
 msgid "Confirm transfer"
 msgstr "Confirmar transferencia"
 
-#: src/routes/settings_.cloud-sync.tsx:1759
+#: src/routes/settings_.cloud-sync.tsx:1764
 msgid "Confirmation"
 msgstr "Confirmación"
 
@@ -589,15 +589,15 @@ msgstr "Franco Congoleño"
 msgid "Connect"
 msgstr "Conectar"
 
-#: src/routes/settings_.cloud-sync.tsx:1645
+#: src/routes/settings_.cloud-sync.tsx:1650
 msgid "Connect Apple"
 msgstr "Conectar Apple"
 
-#: src/routes/settings_.cloud-sync.tsx:1652
+#: src/routes/settings_.cloud-sync.tsx:1657
 msgid "Connect Apple?"
 msgstr "¿Conectar Apple?"
 
-#: src/routes/settings_.cloud-sync.tsx:1656
+#: src/routes/settings_.cloud-sync.tsx:1661
 msgid "Connect Google"
 msgstr "Conectar Google"
 
@@ -605,12 +605,12 @@ msgstr "Conectar Google"
 msgid "Connect Google, Apple, or a password to the same account."
 msgstr "Conecta Google, Apple o una contraseña a la misma cuenta."
 
-#: src/routes/settings_.cloud-sync.tsx:1663
+#: src/routes/settings_.cloud-sync.tsx:1668
 msgid "Connect Google?"
 msgstr "¿Conectar Google?"
 
-#: src/routes/settings_.cloud-sync.tsx:908
-#: src/routes/settings_.cloud-sync.tsx:927
+#: src/routes/settings_.cloud-sync.tsx:913
+#: src/routes/settings_.cloud-sync.tsx:932
 msgid "Connected"
 msgstr "Conectado"
 
@@ -623,7 +623,7 @@ msgstr "Conectado a esta cuenta"
 msgid "Connected: {linkedProviderLabels}"
 msgstr "Conectado: {linkedProviderLabels}"
 
-#: src/routes/settings_.cloud-sync.tsx:899
+#: src/routes/settings_.cloud-sync.tsx:904
 msgid "Connections"
 msgstr "Conexiones"
 
@@ -631,11 +631,11 @@ msgstr "Conexiones"
 msgid "Contact Us"
 msgstr "Contacto"
 
-#: src/routes/settings_.cloud-sync.tsx:750
+#: src/routes/settings_.cloud-sync.tsx:755
 msgid "Continue with Apple"
 msgstr "Continuar con Apple"
 
-#: src/routes/settings_.cloud-sync.tsx:765
+#: src/routes/settings_.cloud-sync.tsx:770
 msgid "Continue with Google"
 msgstr "Continuar con Google"
 
@@ -659,11 +659,11 @@ msgstr "Colón Costarricense"
 msgid "Could not apply cloud settings"
 msgstr "No se pudo aplicar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:518
+#: src/routes/settings_.cloud-sync.tsx:521
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:662
+#: src/routes/settings_.cloud-sync.tsx:665
 msgid "Could not delete account"
 msgstr "No se pudo eliminar la cuenta"
 
@@ -675,7 +675,7 @@ msgstr "No se pudo cargar la configuración en la nube"
 msgid "Could not load sign-in methods"
 msgstr "No se pudieron cargar los métodos de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:257
+#: src/routes/settings_.cloud-sync.tsx:260
 #: src/routes/settings.tsx:388
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
@@ -688,15 +688,15 @@ msgstr "No se pudo restablecer la contraseña"
 msgid "Could not save cloud settings"
 msgstr "No se pudo guardar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:535
+#: src/routes/settings_.cloud-sync.tsx:538
 msgid "Could not send password email"
 msgstr "No se pudo enviar el correo de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:421
+#: src/routes/settings_.cloud-sync.tsx:424
 msgid "Could not send sign-in link"
 msgstr "No se pudo enviar el enlace de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:584
+#: src/routes/settings_.cloud-sync.tsx:587
 msgid "Could not sign out"
 msgstr "No se pudo cerrar sesión"
 
@@ -794,17 +794,17 @@ msgstr "Deuda transferida"
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:114
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:118
 msgid "Delete"
 msgstr "Eliminar"
 
-#: src/routes/settings_.cloud-sync.tsx:974
-#: src/routes/settings_.cloud-sync.tsx:1738
-#: src/routes/settings_.cloud-sync.tsx:1773
+#: src/routes/settings_.cloud-sync.tsx:979
+#: src/routes/settings_.cloud-sync.tsx:1743
+#: src/routes/settings_.cloud-sync.tsx:1778
 msgid "Delete account"
 msgstr "Eliminar cuenta"
 
-#: src/routes/settings_.cloud-sync.tsx:1744
+#: src/routes/settings_.cloud-sync.tsx:1749
 msgid "Delete account?"
 msgstr "¿Eliminar cuenta?"
 
@@ -821,7 +821,7 @@ msgstr "La descripción debe tener menos de 500 caracteres"
 msgid "Destination party"
 msgstr "Grupo de destino"
 
-#: src/routes/settings_.cloud-sync.tsx:971
+#: src/routes/settings_.cloud-sync.tsx:976
 msgid "Destructive actions"
 msgstr "Acciones destructivas"
 
@@ -845,7 +845,7 @@ msgstr "Peso Dominicano"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:108
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:112
 msgid "Edit"
 msgstr "Editar"
 
@@ -853,7 +853,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:186
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:189
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -861,14 +861,14 @@ msgstr "Editando {expenseName}"
 msgid "Egyptian Pound"
 msgstr "Libra Egipcia"
 
-#: src/routes/settings_.cloud-sync.tsx:698
-#: src/routes/settings_.cloud-sync.tsx:784
-#: src/routes/settings_.cloud-sync.tsx:850
-#: src/routes/settings_.cloud-sync.tsx:943
+#: src/routes/settings_.cloud-sync.tsx:703
+#: src/routes/settings_.cloud-sync.tsx:789
+#: src/routes/settings_.cloud-sync.tsx:855
+#: src/routes/settings_.cloud-sync.tsx:948
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: src/routes/settings_.cloud-sync.tsx:953
+#: src/routes/settings_.cloud-sync.tsx:958
 msgid "Email a password reset link"
 msgstr "Enviar un enlace para restablecer la contraseña"
 
@@ -884,15 +884,15 @@ msgstr "Los correos no coinciden"
 msgid "Email link"
 msgstr "Enviar enlace"
 
-#: src/routes/settings_.cloud-sync.tsx:861
+#: src/routes/settings_.cloud-sync.tsx:866
 msgid "Email me a sign-in link"
 msgstr "Enviarme un enlace de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:1667
+#: src/routes/settings_.cloud-sync.tsx:1672
 msgid "Email password link"
 msgstr "Enviar enlace de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:1680
+#: src/routes/settings_.cloud-sync.tsx:1685
 msgid "Email password link?"
 msgstr "¿Enviar enlace de contraseña?"
 
@@ -926,7 +926,7 @@ msgstr "Inglés"
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
-#: src/routes/join.tsx:172
+#: src/routes/join.tsx:175
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
@@ -966,7 +966,7 @@ msgstr "Unidad de Cuenta Europea 9"
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
 msgstr "Por ahora todo está archivado. Puedes reabrir cualquier grupo desde la pantalla de archivados cuando lo necesites."
 
-#: src/routes/party_.$partyId.add.tsx:86
+#: src/routes/party_.$partyId.add.tsx:89
 msgid "Expense added"
 msgstr "Gasto añadido"
 
@@ -974,7 +974,7 @@ msgstr "Gasto añadido"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:150
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:153
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -992,7 +992,7 @@ msgstr "Gastos contabilizados"
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
 
-#: src/routes/party_.$partyId.add.tsx:91
+#: src/routes/party_.$partyId.add.tsx:94
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
@@ -1020,7 +1020,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:155
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:158
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -1052,8 +1052,8 @@ msgstr "Dólar Fiyiano"
 msgid "Filter totals and rankings"
 msgstr "Filtra totales y rankings"
 
-#: src/routes/settings_.cloud-sync.tsx:1286
-#: src/routes/settings_.cloud-sync.tsx:1297
+#: src/routes/settings_.cloud-sync.tsx:1291
+#: src/routes/settings_.cloud-sync.tsx:1302
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
@@ -1061,7 +1061,7 @@ msgstr "Terminando el inicio de sesión"
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
-#: src/routes/settings_.cloud-sync.tsx:839
+#: src/routes/settings_.cloud-sync.tsx:844
 msgid "Forgot password?"
 msgstr "¿Olvidaste tu contraseña?"
 
@@ -1114,7 +1114,7 @@ msgstr "Volver al inicio"
 msgid "Gold (troy ounce)"
 msgstr "Oro (onza troy)"
 
-#: src/routes/settings_.cloud-sync.tsx:921
+#: src/routes/settings_.cloud-sync.tsx:926
 msgid "Google"
 msgstr "Google"
 
@@ -1122,11 +1122,11 @@ msgstr "Google"
 msgid "Google connected"
 msgstr "Google conectado"
 
-#: src/routes/settings_.cloud-sync.tsx:924
+#: src/routes/settings_.cloud-sync.tsx:929
 msgid "Google is connected to this account"
 msgstr "Google está conectado a esta cuenta"
 
-#: src/routes/settings_.cloud-sync.tsx:1182
+#: src/routes/settings_.cloud-sync.tsx:1187
 msgid "Got it"
 msgstr "Entendido"
 
@@ -1263,13 +1263,13 @@ msgstr "Código QR no válido. No parece ser un código de grupo de trizum."
 msgid "Invalid tricount URL or key"
 msgstr "URL o clave de Tricount no válida"
 
-#: src/routes/join.tsx:73
-#: src/routes/join.tsx:89
+#: src/routes/join.tsx:76
+#: src/routes/join.tsx:92
 msgid "Invalid trizum party code"
 msgstr "Código de grupo de trizum no válido"
 
-#: src/routes/join.tsx:73
-#: src/routes/join.tsx:89
+#: src/routes/join.tsx:76
+#: src/routes/join.tsx:92
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
@@ -1297,7 +1297,7 @@ msgstr "Dólar Jamaicano"
 msgid "Japanese Yen"
 msgstr "Yen Japonés"
 
-#: src/routes/join.tsx:192
+#: src/routes/join.tsx:195
 msgid "Join"
 msgstr "Unirse"
 
@@ -1314,7 +1314,7 @@ msgstr "¡Únete a {partyName} en trizum!"
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
-#: src/routes/join.tsx:121
+#: src/routes/join.tsx:124
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
 
@@ -1394,7 +1394,7 @@ msgstr "Dinar Libio"
 msgid "License"
 msgstr "Licencia"
 
-#: src/routes/join.tsx:171
+#: src/routes/join.tsx:174
 msgid "Link or code"
 msgstr "Enlace o código"
 
@@ -1434,7 +1434,7 @@ msgstr "Ringgit Malasio"
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:147
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:153
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
@@ -1462,14 +1462,14 @@ msgstr "Rupia de Mauricio"
 
 #: src/components/PartyStatsView.tsx:607
 #: src/components/PartyStatsView.tsx:694
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:196
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:331
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:207
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:342
 msgid "Me"
 msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:258
 #: src/routes/index.tsx:112
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:92
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:96
 #: src/routes/party.$partyId.tsx:206
 msgid "Menu"
 msgstr "Menú"
@@ -1567,7 +1567,7 @@ msgstr "Rupia Nepalí"
 msgid "Netherlands Antillean Guilder"
 msgstr "Florín de las Antillas Neerlandesas"
 
-#: src/routes/party_.$partyId.add.tsx:107
+#: src/routes/party_.$partyId.add.tsx:110
 msgid "New expense"
 msgstr "Nuevo gasto"
 
@@ -1669,7 +1669,7 @@ msgstr "Won Norcoreano"
 msgid "Norwegian Krone"
 msgstr "Corona Noruega"
 
-#: src/routes/join.tsx:48
+#: src/routes/join.tsx:51
 msgid "Not a valid trizum party code"
 msgstr "No es un código de grupo de trizum válido"
 
@@ -1734,11 +1734,11 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/routes/join.tsx:149
+#: src/routes/join.tsx:152
 msgid "or enter code"
 msgstr "o introduce código"
 
-#: src/routes/settings_.cloud-sync.tsx:772
+#: src/routes/settings_.cloud-sync.tsx:777
 msgid "or use email"
 msgstr "o usa el correo"
 
@@ -1755,12 +1755,12 @@ msgstr "le debe"
 msgid "Paid as {currentParticipantName}"
 msgstr "Pagado por {currentParticipantName}"
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:237
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:248
 msgid "Paid at"
 msgstr "Pagado el"
 
 #: src/components/ExpenseEditor.tsx:392
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:221
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:232
 msgid "Paid by"
 msgstr "Pagado por"
 
@@ -1860,12 +1860,12 @@ msgstr "Estadísticas del grupo"
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
-#: src/routes/settings_.cloud-sync.tsx:794
-#: src/routes/settings_.cloud-sync.tsx:950
+#: src/routes/settings_.cloud-sync.tsx:799
+#: src/routes/settings_.cloud-sync.tsx:955
 msgid "Password"
 msgstr "Contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:533
+#: src/routes/settings_.cloud-sync.tsx:536
 msgid "Password email sent"
 msgstr "Correo de contraseña enviado"
 
@@ -1910,7 +1910,7 @@ msgstr "Pagar"
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
-#: src/routes/settings_.cloud-sync.tsx:975
+#: src/routes/settings_.cloud-sync.tsx:980
 msgid "Permanently delete your trizum cloud account"
 msgstr "Eliminar permanentemente tu cuenta de trizum cloud"
 
@@ -2114,7 +2114,7 @@ msgid "Save to cloud"
 msgstr "Guardar en la nube"
 
 #: src/components/RouteQRScanner.tsx:66
-#: src/routes/join.tsx:136
+#: src/routes/join.tsx:139
 msgid "Scan QR code"
 msgstr "Escanear código QR"
 
@@ -2126,7 +2126,7 @@ msgstr "Buscar emoji"
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
 
-#: src/routes/settings_.cloud-sync.tsx:940
+#: src/routes/settings_.cloud-sync.tsx:945
 msgid "Security"
 msgstr "Seguridad"
 
@@ -2138,7 +2138,7 @@ msgstr "Ver totales y clasificación de gasto"
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
-#: src/routes/settings_.cloud-sync.tsx:714
+#: src/routes/settings_.cloud-sync.tsx:719
 msgid "Send password link"
 msgstr "Enviar enlace de contraseña"
 
@@ -2154,11 +2154,11 @@ msgstr "Dinar Serbio"
 msgid "Set up"
 msgstr "Configurar"
 
-#: src/routes/settings_.cloud-sync.tsx:953
+#: src/routes/settings_.cloud-sync.tsx:958
 msgid "Set up password sign-in"
 msgstr "Configurar inicio de sesión con contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:1680
+#: src/routes/settings_.cloud-sync.tsx:1685
 msgid "Set up password?"
 msgstr "¿Configurar contraseña?"
 
@@ -2194,7 +2194,7 @@ msgstr "Compartir grupo"
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:309
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:320
 msgid "Shares"
 msgstr "Partes"
 
@@ -2218,34 +2218,34 @@ msgstr "Las partes suman <0>{totalAmount} {currency}</0> mientras que la cantida
 msgid "Sierra Leonean Leone"
 msgstr "Leone de Sierra Leona"
 
-#: src/routes/settings_.cloud-sync.tsx:1230
+#: src/routes/settings_.cloud-sync.tsx:1235
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:1817
+#: src/routes/settings_.cloud-sync.tsx:1822
 msgid "Sign in again before deleting your account"
 msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 
-#: src/routes/settings_.cloud-sync.tsx:1250
+#: src/routes/settings_.cloud-sync.tsx:1255
 msgid "Sign in to trizum cloud"
 msgstr "Iniciar sesión en trizum cloud"
 
-#: src/routes/settings_.cloud-sync.tsx:826
+#: src/routes/settings_.cloud-sync.tsx:831
 msgid "Sign in with magic link"
 msgstr "Iniciar sesión con enlace mágico"
 
-#: src/routes/settings_.cloud-sync.tsx:811
-#: src/routes/settings_.cloud-sync.tsx:876
+#: src/routes/settings_.cloud-sync.tsx:816
+#: src/routes/settings_.cloud-sync.tsx:881
 msgid "Sign in with password"
 msgstr "Iniciar sesión con contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:962
-#: src/routes/settings_.cloud-sync.tsx:1112
-#: src/routes/settings_.cloud-sync.tsx:1684
+#: src/routes/settings_.cloud-sync.tsx:967
+#: src/routes/settings_.cloud-sync.tsx:1117
+#: src/routes/settings_.cloud-sync.tsx:1689
 msgid "Sign out"
 msgstr "Cerrar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:1691
+#: src/routes/settings_.cloud-sync.tsx:1696
 msgid "Sign out?"
 msgstr "¿Cerrar sesión?"
 
@@ -2257,15 +2257,15 @@ msgstr "El enlace de inicio de sesión ha caducado"
 msgid "Sign-in link is invalid or expired"
 msgstr "El enlace de inicio de sesión no es válido o ha caducado"
 
-#: src/routes/settings_.cloud-sync.tsx:419
+#: src/routes/settings_.cloud-sync.tsx:422
 msgid "Sign-in link sent"
 msgstr "Enlace de inicio de sesión enviado"
 
-#: src/routes/settings_.cloud-sync.tsx:516
+#: src/routes/settings_.cloud-sync.tsx:519
 msgid "Sign-in method connected"
 msgstr "Método de inicio de sesión conectado"
 
-#: src/routes/settings_.cloud-sync.tsx:457
+#: src/routes/settings_.cloud-sync.tsx:460
 msgid "Sign-in method is not configured"
 msgstr "El método de inicio de sesión no está configurado"
 
@@ -2273,13 +2273,13 @@ msgstr "El método de inicio de sesión no está configurado"
 msgid "Sign-in methods"
 msgstr "Métodos de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:363
-#: src/routes/settings_.cloud-sync.tsx:945
-#: src/routes/settings_.cloud-sync.tsx:1366
+#: src/routes/settings_.cloud-sync.tsx:366
+#: src/routes/settings_.cloud-sync.tsx:950
+#: src/routes/settings_.cloud-sync.tsx:1371
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/settings_.cloud-sync.tsx:581
+#: src/routes/settings_.cloud-sync.tsx:584
 msgid "Signed out"
 msgstr "Sesión cerrada"
 
@@ -2352,7 +2352,7 @@ msgstr "Comienza a registrar gastos con tu grupo"
 msgid "Stats"
 msgstr "Estadísticas"
 
-#: src/routes/settings_.cloud-sync.tsx:963
+#: src/routes/settings_.cloud-sync.tsx:968
 msgid "Stop trizum cloud on this device"
 msgstr "Detener trizum cloud en este dispositivo"
 
@@ -2505,11 +2505,11 @@ msgstr "Esta aplicación utiliza las siguientes bibliotecas y herramientas de c�
 msgid "This debt is no longer available"
 msgstr "Esta deuda ya no está disponible"
 
-#: src/routes/settings_.cloud-sync.tsx:1090
+#: src/routes/settings_.cloud-sync.tsx:1095
 msgid "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 msgstr "Este dispositivo ya tiene datos locales. Si usas trizum cloud aquí, este dispositivo cambiará a tus datos en la nube. Los datos locales de este dispositivo dejarán de usarse."
 
-#: src/routes/settings_.cloud-sync.tsx:602
+#: src/routes/settings_.cloud-sync.tsx:605
 msgid "This device is already using trizum cloud"
 msgstr "Este dispositivo ya usa trizum cloud"
 
@@ -2529,7 +2529,7 @@ msgstr "Este no es un ID válido"
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "Este grupo necesita otro participante activo además de ti para recibir la deuda transferida."
 
-#: src/routes/settings_.cloud-sync.tsx:1747
+#: src/routes/settings_.cloud-sync.tsx:1752
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 msgstr "Esto elimina permanentemente tu cuenta de trizum cloud, los métodos de inicio de sesión y la configuración en la nube. Tus datos locales en este dispositivo se conservarán."
 
@@ -2541,7 +2541,7 @@ msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abier
 msgid "This sign-in link is invalid or expired. Request a new link and try again."
 msgstr "Este enlace de inicio de sesión no es válido o ha caducado. Solicita un enlace nuevo e inténtalo de nuevo."
 
-#: src/routes/settings_.cloud-sync.tsx:1686
+#: src/routes/settings_.cloud-sync.tsx:1691
 msgid "This stops trizum cloud on this device. Your local data stays on this device."
 msgstr "Esto detiene trizum cloud en este dispositivo. Tus datos locales se quedan en este dispositivo."
 
@@ -2612,26 +2612,26 @@ msgstr "URL o clave de Tricount"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
-#: src/routes/settings_.cloud-sync.tsx:894
+#: src/routes/settings_.cloud-sync.tsx:899
 #: src/routes/settings.tsx:216
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/routes/settings_.cloud-sync.tsx:224
-#: src/routes/settings_.cloud-sync.tsx:597
+#: src/routes/settings_.cloud-sync.tsx:227
+#: src/routes/settings_.cloud-sync.tsx:600
 msgid "trizum cloud data is invalid"
 msgstr "Los datos de trizum cloud no son válidos"
 
-#: src/routes/settings_.cloud-sync.tsx:245
-#: src/routes/settings_.cloud-sync.tsx:616
+#: src/routes/settings_.cloud-sync.tsx:248
+#: src/routes/settings_.cloud-sync.tsx:619
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud activado en este dispositivo"
 
-#: src/routes/settings_.cloud-sync.tsx:592
+#: src/routes/settings_.cloud-sync.tsx:595
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud todavía no está configurado"
 
-#: src/routes/settings_.cloud-sync.tsx:207
+#: src/routes/settings_.cloud-sync.tsx:210
 msgid "trizum cloud started"
 msgstr "trizum cloud iniciado"
 
@@ -2643,11 +2643,11 @@ msgstr "trizum no pudo terminar de conectar ese método de inicio de sesión. In
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando estás conectado y compartes un grupo con otros, los cambios se sincronizan automáticamente en todos los dispositivos en tiempo real."
 
-#: src/routes/settings_.cloud-sync.tsx:1647
+#: src/routes/settings_.cloud-sync.tsx:1652
 msgid "trizum will open Apple so you can add it as a sign-in method for this account."
 msgstr "trizum abrirá Apple para que puedas añadirlo como método de inicio de sesión para esta cuenta."
 
-#: src/routes/settings_.cloud-sync.tsx:1658
+#: src/routes/settings_.cloud-sync.tsx:1663
 msgid "trizum will open Google so you can add it as a sign-in method for this account."
 msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio de sesión para esta cuenta."
 
@@ -2656,7 +2656,7 @@ msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio d
 msgid "Try again"
 msgstr "Reintentar"
 
-#: src/routes/settings_.cloud-sync.tsx:1336
+#: src/routes/settings_.cloud-sync.tsx:1341
 msgid "Try another email"
 msgstr "Probar con otro email"
 
@@ -2680,7 +2680,7 @@ msgstr "Lira Turca"
 msgid "Turkmenistani Manat"
 msgstr "Manat Turkmeno"
 
-#: src/routes/settings_.cloud-sync.tsx:1757
+#: src/routes/settings_.cloud-sync.tsx:1762
 msgid "Type \"delete account\" to confirm."
 msgstr "Escribe \"delete account\" para confirmar."
 
@@ -2729,7 +2729,7 @@ msgstr "Actualizar contraseña"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:123
+#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:126
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
@@ -2772,7 +2772,7 @@ msgstr "Dólar Estadounidense"
 msgid "US Dollar (Next day)"
 msgstr "Dólar Estadounidense (Día siguiente)"
 
-#: src/routes/settings_.cloud-sync.tsx:1102
+#: src/routes/settings_.cloud-sync.tsx:1107
 msgid "Use cloud data"
 msgstr "Usar datos en la nube"
 
@@ -2788,12 +2788,12 @@ msgstr "Úsala en este dispositivo para continuar con tus datos en la nube."
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
 
-#: src/routes/settings_.cloud-sync.tsx:1077
-#: src/routes/settings_.cloud-sync.tsx:1087
+#: src/routes/settings_.cloud-sync.tsx:1082
+#: src/routes/settings_.cloud-sync.tsx:1092
 msgid "Use trizum cloud on this device?"
 msgstr "¿Usar trizum cloud en este dispositivo?"
 
-#: src/routes/join.tsx:139
+#: src/routes/join.tsx:142
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
@@ -2834,7 +2834,7 @@ msgid "View party"
 msgstr "Ver grupo"
 
 #: src/components/ExpenseEditor.tsx:966
-#: src/routes/party_.$partyId.expense.$expenseId.tsx:285
+#: src/routes/party_.$partyId.expense.$expenseId.tsx:296
 msgid "View photo"
 msgstr "Ver foto"
 
@@ -2850,15 +2850,15 @@ msgstr "Viendo como {0}"
 msgid "Viewing as {participantName}"
 msgstr "Viendo como {participantName}"
 
-#: src/routes/settings_.cloud-sync.tsx:1330
+#: src/routes/settings_.cloud-sync.tsx:1335
 msgid "We sent a sign-in link to {email}. Open it to finish signing in."
 msgstr "Hemos enviado un enlace de inicio de sesión a {email}. Ábrelo para terminar de iniciar sesión."
 
-#: src/routes/settings_.cloud-sync.tsx:1669
+#: src/routes/settings_.cloud-sync.tsx:1674
 msgid "We will email a password link to {email}. Your current password keeps working until you change it."
 msgstr "Enviaremos un enlace de contraseña a {email}. Tu contraseña actual seguirá funcionando hasta que la cambies."
 
-#: src/routes/settings_.cloud-sync.tsx:1674
+#: src/routes/settings_.cloud-sync.tsx:1679
 msgid "We will email a password setup link to {email}. Password sign-in starts working after you add one."
 msgstr "Enviaremos un enlace para configurar la contraseña a {email}. El inicio de sesión con contraseña empezará a funcionar cuando añadas una."
 
