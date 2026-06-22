@@ -4,7 +4,7 @@ import { createApiCorsMiddleware } from "./cors";
 import type { ApiHonoEnv } from "./env";
 
 describe("api CORS configuration", () => {
-  test("echoes requested headers from trusted origins", async () => {
+  test("allows native auth request headers from trusted origins", async () => {
     const app = new Hono<ApiHonoEnv>();
 
     app.use("/api/*", createApiCorsMiddleware());
@@ -13,7 +13,7 @@ describe("api CORS configuration", () => {
       "/api/auth/sign-in/social",
       {
         headers: {
-          "Access-Control-Request-Headers": "content-type, x-native-client",
+          "Access-Control-Request-Headers": "authorization, content-type",
           "Access-Control-Request-Method": "POST",
           Origin: "capacitor://localhost",
         },
@@ -25,8 +25,6 @@ describe("api CORS configuration", () => {
     expect(response.status).toBe(204);
     expect(response.headers.get("Access-Control-Allow-Origin")).toBe("capacitor://localhost");
     expect(response.headers.get("Access-Control-Allow-Credentials")).toBe("true");
-    expect(response.headers.get("Access-Control-Allow-Headers")).toBe(
-      "content-type,x-native-client",
-    );
+    expect(response.headers.get("Access-Control-Allow-Headers")).toBe("Authorization,Content-Type");
   });
 });

@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
+import { clearNativeAuthToken } from "#src/lib/nativeAuthSession.ts";
 import {
   authClient,
   deleteAuthUserAccount,
@@ -573,6 +574,7 @@ function CloudSyncSettings() {
 
     try {
       await authClient.signOut();
+      clearNativeAuthToken();
       setCloudSettings(null);
       setLinkedAccounts([]);
       await session.refetch();

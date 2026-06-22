@@ -2,6 +2,13 @@ import { Capacitor } from "@capacitor/core";
 import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { AUTH_PROVIDER_CONFIG } from "./authConfig";
+import {
+  clearNativeAuthToken,
+  fetchWithNativeAuth,
+  getNativeAuthHeaders,
+  setNativeAuthToken,
+  setNativeAuthTokenFromResponse,
+} from "./nativeAuthSession";
 
 export interface LinkedAuthAccount {
   accountId: string;
@@ -33,6 +40,15 @@ export const authClient = createAuthClient({
   baseURL: getAuthBaseURL(),
   fetchOptions: {
     credentials: "include",
+    onRequest(context) {
+      return {
+        ...context,
+        headers: getNativeAuthHeaders(context.headers),
+      };
+    },
+    onResponse(context) {
+      setNativeAuthTokenFromResponse(context.response);
+    },
   },
   plugins: [magicLinkClient()],
 });
@@ -77,9 +93,7 @@ export function getAuthResetPasswordCallbackURL() {
 }
 
 export async function fetchLinkedAuthAccounts() {
-  const response = await fetch(getAuthEndpointURL("/list-accounts"), {
-    credentials: "include",
-  });
+  const response = await fetchWithNativeAuth(getAuthEndpointURL("/list-accounts"));
 
   if (!response.ok) {
     throw new Error(await getAuthErrorMessage(response, "Could not load sign-in methods."));
@@ -90,12 +104,18 @@ export async function fetchLinkedAuthAccounts() {
 
 export async function signInWithSocialAuthAccount(provider: SocialAuthProvider) {
   if (Capacitor.isNativePlatform()) {
+    clearNativeAuthToken();
+
     const idToken = await getNativeSocialIdToken(provider);
 
-    return authClient.signIn.social({
+    const result = await authClient.signIn.social({
       idToken,
       provider,
     });
+
+    setNativeAuthToken(getAuthResultToken(result.data));
+
+    return result;
   }
 
   return authClient.signIn.social({
@@ -141,7 +161,7 @@ async function linkSocialAuthAccountWithIdToken(
   provider: SocialAuthProvider,
   idToken: NativeSocialIdToken,
 ) {
-  const response = await fetch(getAuthEndpointURL("/link-social"), {
+  const response = await fetchWithNativeAuth(getAuthEndpointURL("/link-social"), {
     body: JSON.stringify({
       idToken,
       provider,
@@ -220,7 +240,7 @@ async function getNativeAppleIdToken(): Promise<NativeSocialIdToken> {
 }
 
 export async function requestPasswordResetEmail(email: string) {
-  const response = await fetch(getAuthEndpointURL("/request-password-reset"), {
+  const response = await fetchWithNativeAuth(getAuthEndpointURL("/request-password-reset"), {
     body: JSON.stringify({
       email,
       redirectTo: getAuthResetPasswordCallbackURL(),
@@ -258,7 +278,7 @@ export async function resetPasswordWithToken({
   newPassword: string;
   token: string;
 }) {
-  const response = await fetch(getAuthEndpointURL("/reset-password"), {
+  const response = await fetchWithNativeAuth(getAuthEndpointURL("/reset-password"), {
     body: JSON.stringify({
       newPassword,
       token,
@@ -276,7 +296,7 @@ export async function resetPasswordWithToken({
 }
 
 export async function deleteAuthUserAccount() {
-  const response = await fetch(getAuthEndpointURL("/delete-user"), {
+  const response = await fetchWithNativeAuth(getAuthEndpointURL("/delete-user"), {
     body: JSON.stringify({
       callbackURL: getAuthSettingsCallbackURL(),
     }),
@@ -290,10 +310,20 @@ export async function deleteAuthUserAccount() {
   if (!response.ok) {
     throw new Error(await getAuthErrorMessage(response, "Could not delete account."));
   }
+
+  clearNativeAuthToken();
 }
 
 function getAuthEndpointURL(path: string) {
   return new URL(`/api/auth${path}`, getAuthBaseURL()).toString();
+}
+
+function getAuthResultToken(data: unknown) {
+  if (!data || typeof data !== "object" || !("token" in data)) {
+    return undefined;
+  }
+
+  return typeof data.token === "string" ? data.token : undefined;
 }
 
 async function getAuthErrorMessage(response: Response, fallback: string) {

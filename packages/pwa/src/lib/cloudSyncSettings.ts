@@ -1,6 +1,7 @@
 import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo/slim";
 import type { PartyList } from "#src/models/partyList.js";
 import { getAuthBaseURL } from "./auth-client";
+import { fetchWithNativeAuth } from "./nativeAuthSession";
 
 const CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX = "trizumCloudUserSettings:";
 const LAST_CLOUD_USER_SETTINGS_CACHE_KEY = "trizumCloudUserSettings:last";
@@ -26,9 +27,7 @@ export function getCloudUserSettingsInput(partyList: PartyList): CloudUserSettin
 }
 
 export async function fetchCloudUserSettings() {
-  const response = await fetch(getCloudSyncSettingsURL(), {
-    credentials: "include",
-  });
+  const response = await fetchWithNativeAuth(getCloudSyncSettingsURL());
 
   if (response.status === 401) {
     return { settings: null, status: "unauthenticated" as const };
@@ -44,7 +43,7 @@ export async function fetchCloudUserSettings() {
 }
 
 export async function saveCloudUserSettings(settings: CloudUserSettingsInput) {
-  const response = await fetch(getCloudSyncSettingsURL(), {
+  const response = await fetchWithNativeAuth(getCloudSyncSettingsURL(), {
     body: JSON.stringify(settings),
     credentials: "include",
     headers: {

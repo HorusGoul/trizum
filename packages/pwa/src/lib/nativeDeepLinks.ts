@@ -1,4 +1,5 @@
 import { getLogger } from "./log.ts";
+import { fetchWithNativeAuth } from "./nativeAuthSession.ts";
 
 const logger = getLogger("lib", "nativeDeepLinks");
 
@@ -76,8 +77,7 @@ async function resolveNativeMagicLink(url: URL): Promise<string> {
   const verificationUrl = getAuthVerificationUrl(url);
 
   try {
-    const response = await fetch(verificationUrl, {
-      credentials: "include",
+    const response = await fetchWithNativeAuth(verificationUrl, {
       headers: {
         Accept: "application/json",
       },
@@ -103,8 +103,7 @@ async function resolveNativeEmailVerification(url: URL): Promise<string> {
   const verificationUrl = getAuthVerificationUrl(url);
 
   try {
-    const response = await fetch(verificationUrl, {
-      credentials: "include",
+    const response = await fetchWithNativeAuth(verificationUrl, {
       headers: {
         Accept: "application/json",
       },

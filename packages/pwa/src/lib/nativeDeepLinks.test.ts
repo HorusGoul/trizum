@@ -52,15 +52,10 @@ describe("native deep links", () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      "https://trizum.app/api/auth/magic-link/verify?token=secret-token",
-      {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      },
-    );
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe("https://trizum.app/api/auth/magic-link/verify?token=secret-token");
+    expect(init?.credentials).toBe("include");
+    expect(new Headers(init?.headers).get("accept")).toBe("application/json");
   });
 
   test("routes failed magic links to the auth error callback", async () => {
