@@ -29,10 +29,6 @@ interface NativeSocialIdToken {
   token: string;
   user?: {
     email?: string;
-    name?: {
-      firstName?: string;
-      lastName?: string;
-    };
   };
 }
 
@@ -223,7 +219,7 @@ async function getNativeAppleIdToken(): Promise<NativeSocialIdToken> {
   const result = await AppleSignIn.signIn({
     nonce,
     redirectUrl: getAuthSettingsCallbackURL(),
-    scopes: [SignInScope.Email, SignInScope.FullName],
+    scopes: [SignInScope.Email],
   });
 
   return {
@@ -231,10 +227,6 @@ async function getNativeAppleIdToken(): Promise<NativeSocialIdToken> {
     token: result.idToken,
     user: {
       email: result.email ?? undefined,
-      name: {
-        firstName: result.givenName ?? undefined,
-        lastName: result.familyName ?? undefined,
-      },
     },
   };
 }
