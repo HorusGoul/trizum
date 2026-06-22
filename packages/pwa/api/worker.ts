@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { apiMigrateRoute } from "./routes/migrate";
-import { cors } from "hono/cors";
-import { createAuth, isTrustedOrigin } from "./auth";
+import { createAuth } from "./auth";
 import { cloudSyncRoute } from "./routes/cloud-sync";
 import type { ApiHonoEnv } from "./env";
 import { getRedactedPath, workerLogger } from "./log";
+import { createApiCorsMiddleware } from "./cors";
 
 const app = new Hono<ApiHonoEnv>();
 
@@ -31,22 +31,7 @@ app.use("*", async (c, next) => {
   }
 });
 
-app.use(
-  "/api/*",
-  cors({
-    allowHeaders: ["Content-Type", "Authorization"],
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-    maxAge: 600,
-    origin: (origin, c) => {
-      if (!origin) {
-        return undefined;
-      }
-
-      return isTrustedOrigin(origin, c.env) ? origin : undefined;
-    },
-  }),
-);
+app.use("/api/*", createApiCorsMiddleware());
 
 app.get("/api/health", (c) => c.json({ ok: true }));
 app.on(["GET", "POST"], "/api/auth/*", (c) =>

@@ -1181,11 +1181,11 @@ function CloudSyncSignInDialog({
         >
           <IconButton
             aria-label={t`Back to settings`}
-            className="absolute right-2 top-2"
+            className="absolute right-safe-offset-2 top-safe-offset-2 sm:right-2 sm:top-2"
             icon="lucide.x"
             onPress={onOpenChange}
           />
-          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 pt-14 sm:p-6 sm:pt-14">
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto pb-safe-offset-5 pt-safe-offset-14 px-safe-or-5 sm:p-6 sm:pt-14">
             {showHeader ? (
               <div className="flex flex-col items-center gap-3 text-center">
                 <img
