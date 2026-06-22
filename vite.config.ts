@@ -1,3 +1,4 @@
+import { RECOMMENDED_RULES as RECOMMENDED_REACT_DOCTOR_RULES } from "oxlint-plugin-react-doctor";
 import { defineConfig, type UserConfig } from "vite-plus";
 
 const rootAppCommandMessage = [
@@ -100,8 +101,7 @@ const toolingConfig = {
       "lingui/t-call-in-function": "error",
       "no-console": "error",
       "no-unused-vars": "off",
-      "react-doctor/no-derived-state-effect": "warn",
-      "react-doctor/no-fetch-in-effect": "warn",
+      ...RECOMMENDED_REACT_DOCTOR_RULES,
       "react/exhaustive-deps": "error",
       "react/only-export-components": "warn",
       "react/react-in-jsx-scope": "off",
