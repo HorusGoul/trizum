@@ -19,7 +19,7 @@ IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
 IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
-IOS_ENTITLEMENTS_PATH = "App/App.entitlements"
+IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
 
 default_platform(:ios)
 
@@ -529,6 +529,10 @@ platform :ios do
 
   def validate_profile_entitlements(profile)
     required_entitlements = Plist.parse_xml(IOS_ENTITLEMENTS_PATH)
+    if required_entitlements.nil?
+      UI.user_error!("Unable to read app entitlements at #{IOS_ENTITLEMENTS_PATH}")
+    end
+
     profile_entitlements = profile["Entitlements"] || {}
     missing_entitlements = []
 
@@ -538,7 +542,7 @@ platform :ios do
       if actual_value.nil?
         missing_entitlements << key
       elsif expected_value.is_a?(Array)
-        missing_values = expected_value - Array(actual_value)
+        missing_values = missing_profile_entitlement_values(expected_value, actual_value)
         missing_entitlements << "#{key} (#{missing_values.join(", ")})" unless missing_values.empty?
       elsif actual_value != expected_value
         missing_entitlements << key
@@ -552,6 +556,24 @@ platform :ios do
       "#{missing_entitlements.join(", ")}. Regenerate the App Store profile after enabling " \
       "Sign in with Apple and Associated Domains for #{IOS_APP_IDENTIFIER}."
     )
+  end
+
+  def missing_profile_entitlement_values(expected_values, profile_value)
+    expected_values.reject do |expected_value|
+      Array(profile_value).any? do |allowed_value|
+        profile_entitlement_value_matches?(allowed_value, expected_value)
+      end
+    end
+  end
+
+  def profile_entitlement_value_matches?(allowed_value, expected_value)
+    return true if allowed_value == expected_value
+
+    allowed_string = allowed_value.to_s
+    expected_string = expected_value.to_s
+    return true if allowed_string == "*"
+
+    allowed_string.end_with?("*") && expected_string.start_with?(allowed_string.delete_suffix("*"))
   end
 
   def version_segments(version)
