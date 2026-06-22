@@ -19,7 +19,7 @@ IOS_APPSTORE_PROFILE_NAME = "App Store Profile"
 IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
-IOS_ENTITLEMENTS_PATH = "App/App.entitlements"
+IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
 
 default_platform(:ios)
 
@@ -529,6 +529,10 @@ platform :ios do
 
   def validate_profile_entitlements(profile)
     required_entitlements = Plist.parse_xml(IOS_ENTITLEMENTS_PATH)
+    if required_entitlements.nil?
+      UI.user_error!("Unable to read app entitlements at #{IOS_ENTITLEMENTS_PATH}")
+    end
+
     profile_entitlements = profile["Entitlements"] || {}
     missing_entitlements = []
 
