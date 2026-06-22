@@ -49,6 +49,10 @@ export const authClient = createAuthClient({
   plugins: [magicLinkClient()],
 });
 
+type AuthSession = ReturnType<typeof authClient.useSession>;
+
+export type AuthSessionUser = NonNullable<NonNullable<AuthSession["data"]>["user"]>;
+
 export function getAuthBaseURL() {
   if (import.meta.env.VITE_APP_AUTH_URL) {
     return import.meta.env.VITE_APP_AUTH_URL;
@@ -308,6 +312,32 @@ export async function deleteAuthUserAccount() {
 
 function getAuthEndpointURL(path: string) {
   return new URL(`/api/auth${path}`, getAuthBaseURL()).toString();
+}
+
+export function getAuthResultUser(data: unknown): AuthSessionUser | undefined {
+  if (!data || typeof data !== "object" || !("user" in data)) {
+    return undefined;
+  }
+
+  const user = data.user;
+
+  if (!user || typeof user !== "object" || !("id" in user) || !("email" in user)) {
+    return undefined;
+  }
+
+  if (typeof user.id !== "string" || typeof user.email !== "string") {
+    return undefined;
+  }
+
+  return user as AuthSessionUser;
+}
+
+export function getAuthRedirectUrl(data: unknown): string | undefined {
+  if (!data || typeof data !== "object" || !("url" in data)) {
+    return undefined;
+  }
+
+  return typeof data.url === "string" ? data.url : undefined;
 }
 
 function getAuthResultToken(data: unknown) {
