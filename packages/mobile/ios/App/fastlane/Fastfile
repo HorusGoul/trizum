@@ -523,9 +523,15 @@ platform :ios do
       UI.user_error!("Unable to find App Store Connect bundle ID #{IOS_APP_IDENTIFIER}.")
     end
 
+    existing_capabilities = bundle_id.get_capabilities
     IOS_REQUIRED_BUNDLE_ID_CAPABILITIES.each do |capability_type|
+      if existing_capabilities.any? { |capability| capability.is_type?(capability_type) }
+        UI.message("Bundle ID capability #{capability_type} is enabled for #{IOS_APP_IDENTIFIER}")
+        next
+      end
+
       UI.message("Ensuring Bundle ID capability #{capability_type} for #{IOS_APP_IDENTIFIER}")
-      bundle_id.update_capability(capability_type, enabled: true)
+      bundle_id.create_capability(capability_type)
     end
   end
 
