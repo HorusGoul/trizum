@@ -14,6 +14,7 @@ const DEFAULT_TRUSTED_ORIGINS = [
   `https://${WORKERS_DEV_HOST_PATTERN}`,
   "capacitor://localhost",
   "ionic://localhost",
+  "https://localhost",
   "http://localhost",
   "http://localhost:5173",
   "http://localhost:8787",
