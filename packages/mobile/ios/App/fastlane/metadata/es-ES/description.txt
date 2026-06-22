@@ -14,7 +14,7 @@ CARACTERÍSTICAS PRINCIPALES
 
 • Sugerencias de liquidación: Obtén sugerencias optimizadas para saldar deudas con el menor número de transacciones.
 
-• Enfocado en la privacidad: Tus datos permanecen en tus dispositivos. No se requieren cuentas para comenzar.
+• Enfocado en la privacidad: Tus datos se guardan en tus dispositivos de forma predeterminada. No necesitas una cuenta para comenzar; inicia sesión solo si quieres usar trizum cloud en varios dispositivos.
 
 PERFECTO PARA
 
@@ -25,4 +25,3 @@ PERFECTO PARA
 • Organizadores de eventos controlando costes
 
 trizum es gratis. ¡Empieza a dividir gastos de forma inteligente hoy!
-
