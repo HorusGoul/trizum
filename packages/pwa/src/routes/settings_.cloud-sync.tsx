@@ -7,6 +7,7 @@ import { Dialog, Modal, ModalOverlay } from "react-aria-components";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
+import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
 import {
   authClient,
   deleteAuthUserAccount,
@@ -109,6 +110,7 @@ function CloudSyncSettings() {
   const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(true);
   const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
   const [cloudActionDialog, setCloudActionDialog] = useState<CloudActionDialogType | null>(null);
+  const [authCallbackDialogError, setAuthCallbackDialogError] = useState<string | null>(null);
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
   const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState("");
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
@@ -292,7 +294,15 @@ function CloudSyncSettings() {
       return;
     }
 
-    setAuthError(getAuthCallbackErrorMessage(authCallbackError));
+    setAuthError(getAuthCallbackErrorContent(authCallbackError).description);
+  }, [authCallbackError, userId]);
+
+  useEffect(() => {
+    if (!authCallbackError || !userId) {
+      return;
+    }
+
+    setAuthCallbackDialogError(authCallbackError);
   }, [authCallbackError, userId]);
 
   useEffect(() => {
@@ -962,6 +972,22 @@ function CloudSyncSettings() {
         onSubmit={onDeleteAccountSubmit}
       />
 
+      <AuthCallbackErrorDialog
+        error={authCallbackDialogError}
+        isOpen={Boolean(authCallbackDialogError)}
+        onOpenChange={(isOpen) => {
+          if (isOpen) {
+            return;
+          }
+
+          setAuthCallbackDialogError(null);
+
+          if (authCallbackError) {
+            void navigate({ to: "/settings/cloud-sync", replace: true });
+          }
+        }}
+      />
+
       <AnimatePresence>{isSignInSuccessVisible ? <SignInSuccessOverlay /> : null}</AnimatePresence>
 
       <ModalSheet
@@ -999,6 +1025,75 @@ function CloudSyncSettings() {
         </ModalSheetContent>
       </ModalSheet>
     </div>
+  );
+}
+
+function AuthCallbackErrorDialog({
+  error,
+  isOpen,
+  onOpenChange,
+}: {
+  error: string | null;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+}) {
+  const content = error ? getAuthCallbackErrorContent(error) : null;
+
+  return (
+    <ModalOverlay
+      isDismissable
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      className={({ isEntering, isExiting }) =>
+        cn(
+          "fixed inset-0 z-50 flex items-center justify-center bg-accent-950/45 px-safe-or-4 py-safe-offset-6 backdrop-blur-md",
+          isEntering && "duration-200 ease-out animate-in fade-in",
+          isExiting && "duration-150 ease-in animate-out fade-out",
+        )
+      }
+    >
+      <Modal
+        className={({ isEntering, isExiting }) =>
+          cn(
+            "w-full max-w-[420px] outline-none",
+            isEntering && "duration-200 ease-out animate-in fade-in zoom-in-95",
+            isExiting && "duration-150 ease-in animate-out fade-out zoom-out-95",
+          )
+        }
+      >
+        <Dialog
+          aria-label={content?.title ?? t`Authentication error`}
+          className="rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
+        >
+          {content ? (
+            <div className="flex flex-col gap-5 p-5 sm:p-6">
+              <div className="flex flex-col gap-3">
+                <span className="flex size-10 items-center justify-center rounded-full bg-danger-50 text-danger-600 dark:bg-danger-950/50 dark:text-danger-300">
+                  <Icon icon="lucide.circle-alert" width={20} height={20} />
+                </span>
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-lg font-medium">{content.title}</h2>
+                  <p className="text-sm text-accent-700 dark:text-accent-50">
+                    {content.description}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                className="font-semibold"
+                color="accent"
+                onPress={() => {
+                  onOpenChange(false);
+                }}
+                type="button"
+              >
+                <Trans>Got it</Trans>
+              </Button>
+            </div>
+          ) : null}
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
   );
 }
 
@@ -1631,15 +1726,6 @@ function getDeleteAccountErrorMessage(message: string) {
   }
 
   return message;
-}
-
-function getAuthCallbackErrorMessage(error: string) {
-  switch (error) {
-    case "INVALID_TOKEN":
-      return t`Sign-in link is invalid or expired`;
-    default:
-      return t`Authentication failed`;
-  }
 }
 
 function isEmailFieldErrorMessage(message: string) {
