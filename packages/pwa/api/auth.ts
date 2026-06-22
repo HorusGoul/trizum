@@ -146,7 +146,10 @@ function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["soci
     providers.google = {
       clientId: googleClientId,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
+      disableDefaultScope: true,
+      mapProfileToUser: mapEmailOnlySocialProfileToUser,
       prompt: "select_account",
+      scope: ["openid", "email"],
     };
   }
 
@@ -158,8 +161,11 @@ function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["soci
     providers.apple = async () => ({
       clientId: appleClientId,
       clientSecret: env.APPLE_CLIENT_SECRET ?? (await generateAppleClientSecret(env)),
+      disableDefaultScope: true,
       appBundleIdentifier: appleAppBundleIdentifier,
       audience: [appleClientId, appleAppBundleIdentifier],
+      mapProfileToUser: mapEmailOnlySocialProfileToUser,
+      scope: ["email"],
     });
   }
 
@@ -200,6 +206,12 @@ function hasAppleClientSecretConfig(env: ApiEnv) {
   return Boolean(
     env.APPLE_CLIENT_SECRET || (env.APPLE_TEAM_ID && env.APPLE_KEY_ID && env.APPLE_PRIVATE_KEY),
   );
+}
+
+function mapEmailOnlySocialProfileToUser(profile: { email?: string | null }) {
+  return {
+    name: profile.email ?? "",
+  };
 }
 
 async function generateAppleClientSecret(env: ApiEnv) {
