@@ -80,6 +80,10 @@ const toolingConfig = {
         name: "lingui",
         specifier: "eslint-plugin-lingui",
       },
+      {
+        name: "react-doctor",
+        specifier: "oxlint-plugin-react-doctor",
+      },
     ],
     options: {
       typeAware: true,
@@ -96,6 +100,8 @@ const toolingConfig = {
       "lingui/t-call-in-function": "error",
       "no-console": "error",
       "no-unused-vars": "off",
+      "react-doctor/no-derived-state-effect": "warn",
+      "react-doctor/no-fetch-in-effect": "warn",
       "react/exhaustive-deps": "error",
       "react/only-export-components": "warn",
       "react/react-in-jsx-scope": "off",
