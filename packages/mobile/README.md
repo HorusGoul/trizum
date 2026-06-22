@@ -294,7 +294,8 @@ Run `bundle exec fastlane upload_screenshots` to upload.
 | --------------------------------------- | ---------------------------------------------- |
 | `IOS_DISTRIBUTION_CERTIFICATE_BASE64`   | Base64-encoded distribution certificate (.p12) |
 | `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password for the .p12 certificate              |
-| `IOS_PROVISIONING_PROFILE_BASE64`       | Base64-encoded provisioning profile            |
+| `IOS_PROVISIONING_PROFILE_BASE64`       | Optional base64-encoded provisioning profile   |
+| `IOS_REFRESH_PROVISIONING_PROFILE`      | Set to `true` to refresh the App Store profile |
 | `APP_STORE_CONNECT_API_KEY_ID`          | App Store Connect API Key ID                   |
 | `APP_STORE_CONNECT_API_ISSUER_ID`       | App Store Connect API Issuer ID                |
 | `APP_STORE_CONNECT_API_KEY_CONTENT`     | Base64-encoded App Store Connect API Key (.p8) |
@@ -360,7 +361,7 @@ base64 -i your-release.keystore | tr -d '\n'
 | ------------------------------------------ | ----------------------------------------------------- |
 | `IOS_DISTRIBUTION_CERTIFICATE_BASE64`      | Base64-encoded distribution certificate (.p12)        |
 | `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`    | Password used when exporting the .p12                 |
-| `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64` | Base64-encoded App Store provisioning profile         |
+| `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64` | Optional fallback App Store provisioning profile      |
 | `IOS_ADHOC_PROVISIONING_PROFILE_BASE64`    | Base64-encoded Ad Hoc provisioning profile (optional) |
 | `APP_STORE_CONNECT_API_KEY_ID`             | App Store Connect API Key ID                          |
 | `APP_STORE_CONNECT_API_ISSUER_ID`          | App Store Connect API Issuer ID                       |
@@ -385,12 +386,17 @@ base64 -i Certificates.p12 | tr -d '\n'
 
 > **Note:** If you don't have a distribution certificate, create one in [Apple Developer Portal → Certificates](https://developer.apple.com/account/resources/certificates/list).
 
-#### 2. Download Provisioning Profile
+#### 2. Provisioning Profiles
 
 Provisioning profiles link your app ID, certificate, and (for Ad Hoc) device UDIDs.
+The App Store and TestFlight workflows refresh the App Store provisioning
+profile in CI with the App Store Connect API key so the profile stays aligned
+with native entitlements such as Associated Domains and Sign in with Apple.
 
 1. Go to [Apple Developer Portal → Profiles](https://developer.apple.com/account/resources/profiles/list)
-2. Find (or create) your **App Store** provisioning profile for `app.trizum.capacitor`
+2. Find (or create) your **Ad Hoc** provisioning profile, or an **App Store**
+   profile only when using `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64` as a
+   manual fallback
 3. Click **Download** to get the `.mobileprovision` file
 4. Encode the profile:
 
