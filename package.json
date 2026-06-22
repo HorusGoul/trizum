@@ -18,7 +18,8 @@
     "syncpack:fix": "vp exec syncpack fix-mismatches && vp exec syncpack format",
     "typecheck": "vp check --no-fmt --no-lint",
     "generate:ts-template": "vp exec turbo gen workspace --copy @trizum/ts-template --type package",
-    "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs"
+    "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs",
+    "doctor": "vpx react-doctor"
   },
   "dependencies": {
     "@changesets/cli": "2.29.8",
@@ -36,6 +37,7 @@
     "eslint": "9.39.1",
     "eslint-plugin-lingui": "0.11.0",
     "oxlint-plugin-react-doctor": "0.5.8",
+    "react-doctor": "0.5.8",
     "vite-plus": "catalog:"
   },
   "engines": {
