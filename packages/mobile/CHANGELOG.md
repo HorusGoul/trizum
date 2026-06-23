@@ -1,5 +1,14 @@
 # @trizum/mobile
 
+## 1.10.1
+
+### Patch Changes
+
+- [`c137bce`](https://github.com/HorusGoul/trizum/commit/c137bceecfa75593a7a60c4821fffd84f17f5e9a) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Release patch updates for the PWA and mobile packages.
+
+- Updated dependencies [[`c137bce`](https://github.com/HorusGoul/trizum/commit/c137bceecfa75593a7a60c4821fffd84f17f5e9a)]:
+  - @trizum/pwa@1.10.1
+
 ## 1.10.0
 
 ### Patch Changes
