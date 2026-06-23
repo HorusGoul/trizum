@@ -116,7 +116,6 @@ function useMigrateTricount() {
   return [state, migrate] as const;
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function IdleState({
   onSubmit,
 }: {
@@ -213,7 +212,6 @@ function IdleState({
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function InProgressState({ name, progress }: { name: string; progress: number }) {
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
@@ -232,7 +230,6 @@ function InProgressState({ name, progress }: { name: string; progress: number })
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function Progress({ value }: { value: number }) {
   return (
     <div className="relative w-full">
@@ -245,7 +242,6 @@ function Progress({ value }: { value: number }) {
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function SuccessState({ partyId }: { partyId: string }) {
   const navigate = useNavigate();
   return (
@@ -269,7 +265,6 @@ function SuccessState({ partyId }: { partyId: string }) {
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ErrorState({ message }: { message: string }) {
   const navigate = useNavigate();
   return (

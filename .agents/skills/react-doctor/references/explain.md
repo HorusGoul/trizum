@@ -13,7 +13,7 @@ Triggers: "why did this rule fire", "I disagree with this rule", "turn this rule
 2. Explain it before changing anything:
 
 ```bash
-npx react-doctor@latest rules explain react-doctor/no-array-index-as-key
+vp exec react-doctor rules explain react-doctor/no-array-index-as-key
 ```
 
 3. Pick the narrowest control that matches the user's intent (see decision guide).
@@ -21,22 +21,22 @@ npx react-doctor@latest rules explain react-doctor/no-array-index-as-key
 5. Validate the change did what they wanted:
 
 ```bash
-npx react-doctor@latest --verbose --diff
+vp exec react-doctor --verbose --diff
 ```
 
 ## Commands
 
 ```bash
-npx react-doctor@latest rules list                         # every rule + its effective severity
-npx react-doctor@latest rules list --configured            # only what your config changed
-npx react-doctor@latest rules list --category Performance   # filter by category
-npx react-doctor@latest rules explain <rule>               # why it matters + how to configure
-npx react-doctor@latest rules disable <rule>               # rule never runs
-npx react-doctor@latest rules enable <rule>                # turn back on at its recommended severity
-npx react-doctor@latest rules set <rule> warn              # off | warn | error
-npx react-doctor@latest rules category "React Native" off   # whole category
-npx react-doctor@latest rules ignore-tag design            # skip a rule family (design, test-noise, …)
-npx react-doctor@latest rules unignore-tag design
+vp exec react-doctor rules list                         # every rule + its effective severity
+vp exec react-doctor rules list --configured            # only what your config changed
+vp exec react-doctor rules list --category Performance  # filter by category
+vp exec react-doctor rules explain <rule>               # why it matters + how to configure
+vp exec react-doctor rules disable <rule>               # rule never runs
+vp exec react-doctor rules enable <rule>                # turn back on at its recommended severity
+vp exec react-doctor rules set <rule> warn              # off | warn | error
+vp exec react-doctor rules category "React Native" off  # whole category
+vp exec react-doctor rules ignore-tag design            # skip a rule family (design, test-noise, ...)
+vp exec react-doctor rules unignore-tag design
 ```
 
 Rule references accept the full key (`react-doctor/no-danger`), the bare id (`no-danger`), or a legacy key (`react/no-danger`).

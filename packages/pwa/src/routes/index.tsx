@@ -294,7 +294,6 @@ function archiveParty(
   toast.success(t`Party archived`);
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function NoActivePartiesCard() {
   return (
     <section className="flex flex-col items-center justify-center gap-5 px-4 py-12 text-center">
@@ -331,7 +330,6 @@ function NoActivePartiesCard() {
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function EmptyState() {
   return (
     <div className="container flex flex-1 flex-col items-center justify-center gap-8 px-4">
@@ -464,7 +462,6 @@ function EmptyState() {
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ProfileSetupCard() {
   return (
     <Link

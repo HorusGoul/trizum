@@ -337,7 +337,6 @@ function PartyById() {
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ExpenseLog() {
   const { party, dev } = useCurrentParty();
   const { expenses, hasNext, isLoadingNext, loadNext } = usePartyPaginatedExpenses(party.id);
@@ -446,7 +445,6 @@ interface ExpenseListRowProps {
   spacerIndex: number;
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ExpenseListRow({
   ariaAttributes,
   expenses,
@@ -478,7 +476,6 @@ function ExpenseListRow({
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function VirtualizedExpenseList({
   expenses,
   partyId,
@@ -568,7 +565,6 @@ function VirtualizedExpenseList({
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
   const { party } = useParty(partyId);
 
@@ -618,7 +614,6 @@ function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function Balances({
   panelRef,
   sortedBy,
@@ -815,7 +810,6 @@ interface BalanceItemProps {
   visualRatio: number;
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
   const { party } = useCurrentParty();
 
@@ -876,7 +870,6 @@ interface BalanceActionItemProps {
   canTransferDebt?: boolean;
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function BalanceActionItem({
   fromId,
   toId,

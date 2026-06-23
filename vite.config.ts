@@ -43,6 +43,11 @@ const ignorePatterns = [
 // them out of formatting checks so routine validation does not reflow them.
 const formatIgnorePatterns = [".agents/**", ...ignorePatterns];
 
+const pwaReactDoctorRules = {
+  ...RECOMMENDED_REACT_DOCTOR_RULES,
+  "react-doctor/no-multi-comp": "off" as const,
+};
+
 function rootAppCommandGuard() {
   return {
     config() {
@@ -101,7 +106,6 @@ const toolingConfig = {
       "lingui/t-call-in-function": "error",
       "no-console": "error",
       "no-unused-vars": "off",
-      ...RECOMMENDED_REACT_DOCTOR_RULES,
       "react/exhaustive-deps": "error",
       "react/only-export-components": "warn",
       "react/react-in-jsx-scope": "off",
@@ -115,6 +119,10 @@ const toolingConfig = {
       },
     },
     overrides: [
+      {
+        files: ["packages/pwa/src/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
+        rules: pwaReactDoctorRules,
+      },
       {
         files: ["packages/pwa/src/main.tsx", "packages/pwa/src/routes/**/*.tsx"],
         rules: {

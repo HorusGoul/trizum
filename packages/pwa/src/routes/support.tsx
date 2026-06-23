@@ -139,7 +139,6 @@ interface SupportLinkProps {
   isExternal?: boolean;
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function SupportLink({ href, icon, title, description, linkText, isExternal }: SupportLinkProps) {
   const linkProps = isExternal ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
 
@@ -178,7 +177,6 @@ interface FAQItemProps {
   answer: React.ReactNode;
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function FAQItem({ question, answer }: FAQItemProps) {
   return (
     <div className="rounded-lg bg-accent-50 p-4 dark:bg-accent-900">

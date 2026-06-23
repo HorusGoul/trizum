@@ -31,7 +31,6 @@ function Alert({
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -42,7 +41,6 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function AlertDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
