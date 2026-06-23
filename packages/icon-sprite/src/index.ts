@@ -173,6 +173,7 @@ function collectSourceIcons(source: IconSource, rootDir: string): IconCatalogEnt
     return [];
   }
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   return walkFiles(sourceDirectory)
     .filter((filePath) => filePath.endsWith(".svg"))
     .flatMap((filePath) => {

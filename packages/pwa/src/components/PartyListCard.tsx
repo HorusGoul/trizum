@@ -47,6 +47,7 @@ interface PartyListCardProps {
 }
 
 export function PartyListCard({
+  // oxlint-disable-next-line react-doctor/rerender-memo-with-default-value -- FIXME: address existing React Doctor diagnostics.
   actions = [],
   partyId,
   isArchived = false,
@@ -121,6 +122,7 @@ export function PartyListCard({
           label: <Trans>Pinned</Trans>,
         }
       : null;
+  // oxlint-disable-next-line react-doctor/prefer-module-scope-static-value -- FIXME: address existing React Doctor diagnostics.
   const suppressNativeLongPress = {
     WebkitTouchCallout: "none",
     WebkitUserSelect: "none",
@@ -329,6 +331,7 @@ function ParticipantPreviewText({
 }
 
 function getParticipantPreview(party: Party, currentParticipantId: PartyParticipant["id"] | null) {
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const visibleParticipantNames = Object.values(party.participants)
     .filter(
       (participant) =>

@@ -58,6 +58,7 @@ interface QRCodeProps {
 
 export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
+  // oxlint-disable-next-line react-doctor/rerender-state-only-in-handlers -- FIXME: address existing React Doctor diagnostics.
   const [qrCode, setQrCode] = useState<QRCodeStyling | null>(null);
 
   useEffect(() => {
@@ -72,10 +73,12 @@ export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) 
     });
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- TODO: We probably need to update how this QRCode component works
+    // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
     setQrCode(qrCode);
     qrCode.append(ref.current);
   }, [options, size, value]);
 
+  // oxlint-disable-next-line react-doctor/no-effect-chain -- FIXME: address existing React Doctor diagnostics.
   useEffect(() => {
     if (!qrCode) return;
 

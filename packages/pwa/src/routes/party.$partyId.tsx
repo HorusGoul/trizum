@@ -337,6 +337,7 @@ function PartyById() {
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ExpenseLog() {
   const { party, dev } = useCurrentParty();
   const { expenses, hasNext, isLoadingNext, loadNext } = usePartyPaginatedExpenses(party.id);
@@ -445,6 +446,7 @@ interface ExpenseListRowProps {
   spacerIndex: number;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ExpenseListRow({
   ariaAttributes,
   expenses,
@@ -476,6 +478,7 @@ function ExpenseListRow({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function VirtualizedExpenseList({
   expenses,
   partyId,
@@ -497,6 +500,7 @@ function VirtualizedExpenseList({
   const requestedNextPageRef = useRef(false);
 
   useEffect(() => {
+    // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
     if (!isLoadingNext) {
       requestedNextPageRef.current = false;
     }
@@ -564,6 +568,7 @@ function VirtualizedExpenseList({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
   const { party } = useParty(partyId);
 
@@ -613,6 +618,7 @@ function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function Balances({
   panelRef,
   sortedBy,
@@ -629,6 +635,7 @@ function Balances({
     scrollElementRef: panelRef,
   });
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const sortedBalancesByParticipant = Object.values(balances)
     .map((balance) => {
       return {
@@ -654,6 +661,7 @@ function Balances({
   const simplifiedTransactions = simplifyBalanceTransactions(balances);
 
   // Filter transactions relevant to the current user
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const userOwesMap = simplifiedTransactions
     .filter((tx) => tx.fromId === participant.id)
     .map((tx) => ({
@@ -661,6 +669,7 @@ function Balances({
       amount: tx.amount,
     }));
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const owedToUserMap = simplifiedTransactions
     .filter((tx) => tx.toId === participant.id)
     .map((tx) => ({
@@ -673,6 +682,7 @@ function Balances({
   const canTransferDebt = eligibleTransferParties.length > 0;
 
   // Show other transactions not involving the current user
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const allOtherDiffs = simplifiedTransactions
     .filter((tx) => tx.fromId !== participant.id && tx.toId !== participant.id)
     .map((tx) => ({
@@ -805,6 +815,7 @@ interface BalanceItemProps {
   visualRatio: number;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function BalanceItem({ participant, stats, visualRatio }: BalanceItemProps) {
   const { party } = useCurrentParty();
 
@@ -865,6 +876,7 @@ interface BalanceActionItemProps {
   canTransferDebt?: boolean;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function BalanceActionItem({
   fromId,
   toId,

@@ -16,6 +16,7 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Suspense, useId } from "react";
+// oxlint-disable-next-line react-doctor/no-flush-sync -- FIXME: address existing React Doctor diagnostics.
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
@@ -35,6 +36,7 @@ interface PartySettingsFormValues {
   participants: (PartyParticipant | (PartyParticipant & { __isNew: true }))[];
 }
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 function PartySettings() {
   const params = Route.useParams();
   const { party, updateSettings } = useParty(params.partyId);
@@ -135,6 +137,7 @@ function PartySettings() {
         </form.Subscribe>
       </div>
 
+      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
         onSubmit={(e) => {

@@ -37,12 +37,14 @@ export function useRouteQRScanner({
 }: UseRouteQRScannerOptions): UseRouteQRScannerReturn {
   const isOpen = scanning === true;
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const openScanner = useCallback(() => {
     navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
       search: { scanning: true },
     });
   }, [buildLocation, currentLocation, navigate]);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const closeScanner = useCallback(() => {
     closeRouteState(currentLocation, history, () => {
       navigate({

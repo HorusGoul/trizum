@@ -109,6 +109,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
         // Sort participants by their current amount to distribute rounding errors
         // to those with the smallest amounts first (for positive error) or
         // to those with the largest amounts first (for negative error)
+        // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
         const sortedDivideUsers = [...divideUsers].sort((a, b) => {
           if (roundingError > 0) {
             return divideAmounts[a] - divideAmounts[b];
@@ -283,6 +284,7 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
         // Sort participants by their current amount to distribute remaining cents
         // to those with the smallest amounts first (for positive remaining) or
         // to those with the largest amounts first (for negative remaining)
+        // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
         const sortedParticipants = [...divideParticipants].sort((a, b) => {
           if (remainingCents > 0) {
             return proportionalAmounts[a] - proportionalAmounts[b];

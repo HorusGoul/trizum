@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
+// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import { AnimatePresence, motion } from "motion/react";
 import { BarcodeDetector } from "#src/lib/qr.js";
 import { getLogger } from "#src/lib/log.ts";
@@ -265,6 +266,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
               {state.status === "success" && (
                 <motion.div
                   key="success"
+                  // oxlint-disable-next-line react-doctor/no-scale-from-zero -- FIXME: address existing React Doctor diagnostics.
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ type: "spring", duration: 0.5, bounce: 0.4 }}
@@ -286,6 +288,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                   className="absolute inset-0 flex flex-col items-center justify-center gap-3"
                 >
                   <motion.div
+                    // oxlint-disable-next-line react-doctor/no-scale-from-zero -- FIXME: address existing React Doctor diagnostics.
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}

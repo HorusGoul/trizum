@@ -45,6 +45,7 @@ function Join() {
     history: router.history,
   });
 
+  // oxlint-disable-next-line react-doctor/prefer-module-scope-pure-function -- FIXME: address existing React Doctor diagnostics.
   function validateQRCode(value: string) {
     const partyId = parseQRCodeForPartyId(value);
     if (!partyId) {
@@ -67,6 +68,7 @@ function Join() {
     });
   }
 
+  // oxlint-disable-next-line react-doctor/prefer-module-scope-pure-function -- FIXME: address existing React Doctor diagnostics.
   function validateId(id: string) {
     const isUrl = id.includes("/");
     const partyId = isUrl ? id.split("/party/")[1].split("/")[0] : id;
@@ -155,6 +157,7 @@ function Join() {
         </div>
 
         {/* Secondary action: Manual entry */}
+        {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
         <form
           id={formId}
           onSubmit={(e) => {

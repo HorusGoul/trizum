@@ -115,6 +115,7 @@ function AddExpense() {
           amount: 0,
           paidBy: participant.id,
           shares: {},
+          // oxlint-disable-next-line react-doctor/rendering-hydration-mismatch-time -- FIXME: address existing React Doctor diagnostics.
           paidAt: new Date(),
           photos: [],
         }}

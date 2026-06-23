@@ -28,6 +28,7 @@ export function RouteMediaGallery({
 
   // Track drag progress for background opacity animation
   const [dragProgress, setDragProgress] = useState(0);
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const handleDragProgress = useCallback((progress: number) => {
     setDragProgress(progress);
   }, []);
@@ -130,6 +131,7 @@ function PhotoUrlResolver({ photoId, onResolved }: PhotoUrlResolverProps) {
   const { url } = useMediaFile(photoId);
 
   useEffect(() => {
+    // oxlint-disable-next-line react-doctor/no-pass-data-to-parent, react-doctor/no-prop-callback-in-effect -- FIXME: address existing React Doctor diagnostics.
     onResolved(url);
   }, [url, onResolved]);
 

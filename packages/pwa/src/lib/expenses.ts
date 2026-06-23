@@ -74,6 +74,7 @@ export function calculateLogStatsOfUser(
 
   const zero = Dinero({ amount: 0 });
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const userOwes = Object.values(diffs)
     .filter((diff) => diff.diffUnsplitted.lessThan(zero))
     .map((diff) => diff.diffUnsplitted)
@@ -82,6 +83,7 @@ export function calculateLogStatsOfUser(
       Dinero({ amount: 0 }),
     );
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const owedToUser = Object.values(diffs)
     .filter((diff) => diff.diffUnsplitted.greaterThan(zero))
     .map((diff) => diff.diffUnsplitted)

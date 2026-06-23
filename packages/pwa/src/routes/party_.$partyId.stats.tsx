@@ -14,6 +14,7 @@ export const Route = createFileRoute("/party_/$partyId/stats")({
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
     for (const chunkRef of party.chunkRefs) {
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       await documentCache.readAsync(context.repo, chunkRef.chunkId);
     }
 

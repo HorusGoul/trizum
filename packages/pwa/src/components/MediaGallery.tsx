@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { cn, type ClassName } from "#src/ui/utils.ts";
 import { use, useCallback, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
+// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import { motion, useMotionValue, animate } from "motion/react";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
@@ -30,6 +31,7 @@ export default function MediaGallery({
   const dataSource = useAsyncMediaGalleryItems(items);
   const maxIndex = dataSource.length - 1;
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const goToPrevious = useCallback(() => {
     let nextIndex = index - 1;
 
@@ -40,6 +42,7 @@ export default function MediaGallery({
     onChange(nextIndex);
   }, [onChange, index, maxIndex]);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const goToNext = useCallback(() => {
     let nextIndex = index + 1;
 
@@ -158,6 +161,7 @@ export default function MediaGallery({
     x.set(0);
     y.set(0);
     scale.set(1);
+    // oxlint-disable-next-line react-doctor/no-prop-callback-in-effect -- FIXME: address existing React Doctor diagnostics.
     onDragProgress?.(0);
   }, [index, x, y, scale, onDragProgress]);
 

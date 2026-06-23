@@ -23,6 +23,7 @@ interface CalculatorToolbarProps {
   currency?: string;
 }
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 export function CalculatorToolbar({
   expression,
   cursorPosition,
@@ -44,6 +45,7 @@ export function CalculatorToolbar({
   const expressionContentRef = useRef<HTMLSpanElement>(null);
   const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(null);
+  // oxlint-disable-next-line react-doctor/rerender-state-only-in-handlers -- FIXME: address existing React Doctor diagnostics.
   const [dragAccumulator, setDragAccumulator] = useState(0);
   const scrollOffsetRef = useRef(0);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -140,6 +142,7 @@ export function CalculatorToolbar({
   }, [cursorPosition, expression]);
 
   // Handle pointer gestures on expression display for cursor movement
+  // oxlint-disable-next-line react-doctor/no-cascading-set-state -- FIXME: address existing React Doctor diagnostics.
   useEffect(() => {
     const expressionEl = expressionRef.current;
     if (!expressionEl) return;
@@ -229,6 +232,7 @@ export function CalculatorToolbar({
       expressionEl.removeEventListener("pointerup", handlePointerUp);
       expressionEl.removeEventListener("pointercancel", handlePointerCancel);
     };
+    // oxlint-disable-next-line react-doctor/prefer-use-effect-event -- FIXME: address existing React Doctor diagnostics.
   }, [dragAccumulator, expression, onMoveCursor, onSetCursorPosition]);
 
   useEffect(() => {
@@ -259,6 +263,7 @@ export function CalculatorToolbar({
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("pointerup", handlePointerUp);
     };
+    // oxlint-disable-next-line react-doctor/prefer-use-effect-event -- FIXME: address existing React Doctor diagnostics.
   }, [onDismiss, fieldContainerRef]);
 
   // Handle keyboard input
@@ -321,6 +326,7 @@ export function CalculatorToolbar({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
+    // oxlint-disable-next-line react-doctor/prefer-use-effect-event -- FIXME: address existing React Doctor diagnostics.
   }, [onInsert, onBackspace, onClear, onCommit, onDismiss, onMoveCursor]);
 
   // Callback ref setter for character spans
@@ -335,6 +341,7 @@ export function CalculatorToolbar({
     }
 
     try {
+      // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
       const formatter = new Intl.NumberFormat(undefined, {
         style: "currency",
         currency,
@@ -403,6 +410,7 @@ export function CalculatorToolbar({
             ) : (
               <span ref={expressionContentRef} className="relative inline-flex">
                 {expression.split("").map((char, index) => (
+                  // oxlint-disable-next-line react-doctor/no-array-index-as-key -- FIXME: address existing React Doctor diagnostics.
                   <span key={index} ref={setCharRef(index)} className="relative">
                     {index === cursorPosition && (
                       <span className="absolute left-0 top-0 h-full w-0 animate-blink">

@@ -46,10 +46,14 @@ export function useCloudSyncAccountState({
     onCloudDataActivatedRef.current = onCloudDataActivated;
   }, [onCloudDataActivated]);
 
+  // oxlint-disable-next-line react-doctor/no-cascading-set-state -- FIXME: address existing React Doctor diagnostics.
   useEffect(() => {
     if (!userId) {
+      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
       setLinkedAccounts([]);
+      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
       setCloudSettings(null);
+      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
       setIsCloudSyncSwitchOpen(false);
       return;
     }
@@ -62,7 +66,9 @@ export function useCloudSyncAccountState({
       setLinkedAccounts(cachedAccountState.linkedAccounts);
       setCloudSettings(cachedAccountState.cloudSettings);
     } else {
+      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
       setLinkedAccounts([]);
+      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
       setCloudSettings(null);
     }
 

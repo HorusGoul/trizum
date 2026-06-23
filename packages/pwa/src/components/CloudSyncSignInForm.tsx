@@ -23,6 +23,7 @@ export type AuthPendingAction =
   | "password-reset"
   | "sign-out";
 
+// oxlint-disable-next-line react-doctor/no-many-boolean-props -- FIXME: address existing React Doctor diagnostics.
 export function CloudSyncSignInForm({
   auth,
   authEmail,

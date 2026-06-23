@@ -144,6 +144,7 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
 
     // Get all devices for this locale
     const localeDir = path.join(SCREENSHOTS_DIR, locale);
+    // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
@@ -160,6 +161,7 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
         continue;
       }
 
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       const files = await getScreenshotFiles(locale, device);
       if (files.length === 0) {
         logger.warning("No screenshots found for {locale}/{device}", {
@@ -211,6 +213,7 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
 
     // Get all devices for this locale
     const localeDir = path.join(SCREENSHOTS_DIR, locale);
+    // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
@@ -227,6 +230,7 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
         continue;
       }
 
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       const files = await getScreenshotFiles(locale, device);
       if (files.length === 0) {
         logger.warning("No screenshots found for {locale}/{device}", {

@@ -133,6 +133,7 @@ function AccessibleSheetContainer({
 
   return (
     <ModalSheetContext
+      // oxlint-disable-next-line react-doctor/jsx-no-constructed-context-values -- FIXME: address existing React Doctor diagnostics.
       value={{
         descriptionId,
         setHasDescription,

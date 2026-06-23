@@ -42,6 +42,7 @@ export function useRouteMediaGallery({
   const galleryIndex = mediaIndex;
   const isOpen = galleryIndex !== undefined && galleryIndex >= 0;
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const openGallery = useCallback(
     (index: number) => {
       navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
@@ -51,6 +52,7 @@ export function useRouteMediaGallery({
     [buildLocation, currentLocation, navigate],
   );
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const closeGallery = useCallback(() => {
     closeRouteState(currentLocation, history, () => {
       navigate({
@@ -60,6 +62,7 @@ export function useRouteMediaGallery({
     });
   }, [currentLocation, history, navigate]);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const onIndexChange = useCallback(
     (index: number) => {
       navigate({ search: { media: index }, replace: true });

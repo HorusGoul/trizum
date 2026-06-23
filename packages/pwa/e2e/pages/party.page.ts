@@ -77,6 +77,7 @@ export class PartyPage {
 
     for (const title of titles) {
       const row = this.expenseRow(title);
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       await expect(row).toBeVisible();
       const box = await row.boundingBox();
 
@@ -90,6 +91,7 @@ export class PartyPage {
     const row = this.expenseRow(title);
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       if (await row.isVisible()) {
         return;
       }
@@ -164,6 +166,7 @@ export class PartyPage {
   }
 
   private settlementActionCard(action: SettlementAction) {
+    // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
     return this.page
       .locator("div.rounded-xl")
       .filter({ hasText: action.fromLabel })

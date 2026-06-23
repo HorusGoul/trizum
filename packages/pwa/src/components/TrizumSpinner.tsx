@@ -15,6 +15,7 @@ export function TrizumSpinner({ size = 48, className }: TrizumSpinnerProps) {
       xmlns="http://www.w3.org/2000/svg"
       className={cn("text-current", className)}
       style={{
+        // oxlint-disable-next-line react-doctor/no-long-transition-duration -- FIXME: address existing React Doctor diagnostics.
         animation: "swing-rotate 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
       }}
     >

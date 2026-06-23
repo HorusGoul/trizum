@@ -39,6 +39,7 @@ const ListBoxItem = <T extends object>({
 }: AriaListBoxItemProps<T>) => {
   return (
     <AriaListBoxItem
+      // oxlint-disable-next-line react-doctor/no-polymorphic-children -- FIXME: address existing React Doctor diagnostics.
       textValue={props.textValue || (typeof children === "string" ? children : undefined)}
       className={composeRenderProps(className, (className) =>
         cn(

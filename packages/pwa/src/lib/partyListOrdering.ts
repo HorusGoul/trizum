@@ -29,6 +29,7 @@ export function getOrderedPartySections(partyList: PartyList): OrderedPartySecti
   }
 
   const sortPartyIds = (ids: PartyId[], includePinned: boolean) =>
+    // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
     [...ids].sort((leftPartyId: PartyId, rightPartyId: PartyId) => {
       if (includePinned) {
         const leftPinned = Number(isPartyPinned(partyList, leftPartyId));

@@ -150,6 +150,7 @@ function RouteComponent() {
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function BizumItem({ phoneNumber }: { phoneNumber: string }) {
   return (
     <div className="flex flex-col gap-2 rounded-xl bg-white p-4 dark:bg-accent-900">
@@ -181,6 +182,7 @@ function BizumItem({ phoneNumber }: { phoneNumber: string }) {
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function CashItem() {
   return (
     <div className="flex flex-col gap-2 rounded-xl bg-white p-4 dark:bg-accent-900">

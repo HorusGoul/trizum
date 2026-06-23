@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Currency } from "dinero.js";
+// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import { AnimatePresence, motion } from "motion/react";
 import { Suspense, useMemo, useReducer } from "react";
 import { toast } from "sonner";
@@ -212,6 +213,7 @@ export const Route = createFileRoute("/party_/$partyId/transfer-debt")({
   },
 });
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
   const { party, transferDebtToParty } = useCurrentParty();
@@ -223,6 +225,7 @@ function RouteComponent() {
   const to = party.participants[toId];
   const isSupportedTransfer = fromId === currentParticipant.id;
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const destinationPartyOptions = useMemo<DestinationPartyOption[]>(() => {
     return eligibleDestinationParties.map((entry) => {
       const otherParticipants = entry.otherParticipants;
@@ -545,6 +548,7 @@ function RouteComponent() {
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function TransferDebtLayout({
   title,
   children,
@@ -581,6 +585,7 @@ function TransferDebtLayout({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function SectionIntro({
   eyebrow,
   title,
@@ -602,6 +607,7 @@ function SectionIntro({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function DestinationPartyCard({
   option,
   onPress,
@@ -660,6 +666,7 @@ function DestinationPartyCard({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ParticipantPreviewText({
   preview,
 }: {
@@ -682,6 +689,7 @@ function ParticipantPreviewText({
 }
 
 function getParticipantPreview(participants: PartyParticipant[]) {
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const visibleParticipantNames = participants
     .filter((participant) => !participant.isArchived && participant.name.trim() !== "")
     .map((participant) => participant.name.trim());
@@ -705,6 +713,7 @@ function getParticipantPreviewVariant(visibleParticipantNames: string[], maxName
   };
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function DestinationParticipantCard({
   participant,
   isRecommended,
@@ -745,6 +754,7 @@ function DestinationParticipantCard({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function TransferReviewCard({
   amount,
   currency,
@@ -818,6 +828,7 @@ function TransferReviewCard({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ReviewPartyRow({
   caption,
   party,
@@ -850,6 +861,7 @@ function ReviewPartyRow({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function ReviewParticipantInline({
   participant,
   children,
@@ -868,6 +880,7 @@ function ReviewParticipantInline({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function TransferSuccessState({
   destinationPartyName,
   destinationCounterpartyName,
@@ -917,6 +930,7 @@ function TransferSuccessState({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function TransferParticipantAvatar({
   participant,
   className,
@@ -939,6 +953,7 @@ function TransferParticipantAvatar({
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function TransferParticipantAvatarImage({
   avatarId,
   name,
@@ -953,6 +968,7 @@ function TransferParticipantAvatarImage({
   return <Avatar className={className} name={name} url={url} />;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function PartySymbolBadge({ party, className }: { party: Party; className?: string }) {
   const symbol = party.symbol || party.name.charAt(0).toUpperCase();
 
@@ -968,6 +984,7 @@ function PartySymbolBadge({ party, className }: { party: Party; className?: stri
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function InlineAlert({ title, description }: { title: string; description: string }) {
   return (
     <div className="container px-4 pt-4">

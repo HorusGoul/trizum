@@ -51,6 +51,7 @@ export async function createPartyFromMigrationData({
     try {
       for (let i = 0; i < data.photos.length; i++) {
         const photo = data.photos[i];
+        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
         const response = await fetch(photo.url);
         const blob = await response.blob();
         const [mediaFileId] = await createMediaFile(
@@ -91,6 +92,7 @@ export async function createPartyFromMigrationData({
   for (let i = 0; i < data.expenses.length; i++) {
     const expense = data.expenses[i];
 
+    // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
     await waitIdleCallback(async () => {
       await helpers
         .addExpenseToParty({

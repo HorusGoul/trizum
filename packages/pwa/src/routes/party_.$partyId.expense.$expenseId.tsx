@@ -184,12 +184,14 @@ function useExpense() {
   };
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function Amount({ amount }: { amount: number }) {
   const { party } = useCurrentParty();
 
   return <CurrencyText amount={amount} currency={party.currency} className="text-4xl font-bold" />;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
@@ -239,6 +241,7 @@ function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function PaidAt({ paidAt }: Pick<Expense, "paidAt">) {
   const { i18n } = useLingui();
 
@@ -256,6 +259,7 @@ interface PhotosProps extends Partial<Pick<Expense, "photos">> {
   onOpenGallery: (index: number) => void;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp, react-doctor/rerender-memo-with-default-value -- FIXME: address existing React Doctor diagnostics.
 function Photos({ photos = [], onOpenGallery }: PhotosProps) {
   const hasMultiple = photos.length > 1;
 
@@ -287,6 +291,7 @@ interface PhotoItemByIdProps {
   onPress: () => void;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function PhotoItemById({ photoId, onPress }: PhotoItemByIdProps) {
   const { url } = useMediaFile(photoId);
 
@@ -307,6 +312,7 @@ function PhotoItemById({ photoId, onPress }: PhotoItemByIdProps) {
   );
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
   const { i18n } = useLingui();
   const unitAmounts = getExpenseUnitShares(expense);

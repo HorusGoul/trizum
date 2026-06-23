@@ -17,6 +17,7 @@ import {
   composeRenderProps,
   useLocale,
 } from "react-aria-components";
+// oxlint-disable-next-line react-doctor/no-react19-deprecated-apis -- FIXME: address existing React Doctor diagnostics.
 import { useContext } from "react";
 import { cn } from "./utils";
 import { IconButton } from "./IconButton";

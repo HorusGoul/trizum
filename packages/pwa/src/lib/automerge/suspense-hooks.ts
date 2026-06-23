@@ -101,6 +101,7 @@ export async function retryWithExponentialBackoff<T>(
       signal?.addEventListener("abort", abortHandler, { once: true });
 
       try {
+        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
         return await fn({ signal: attemptController.signal });
       } finally {
         clearTimeout(timeoutId);

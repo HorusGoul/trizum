@@ -194,6 +194,7 @@ async function getNativeSocialIdToken(provider: SocialAuthProvider): Promise<Nat
 }
 
 async function getNativeGoogleIdToken(): Promise<NativeSocialIdToken> {
+  // oxlint-disable-next-line react-doctor/async-parallel -- FIXME: address existing React Doctor diagnostics.
   const { GoogleSignIn } = await import("@capawesome/capacitor-google-sign-in");
 
   // The Capawesome plugin requires the web client ID on Android and iOS.

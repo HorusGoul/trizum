@@ -103,6 +103,7 @@ async function main() {
           screenshotsFolder,
         });
 
+        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
         await mkdir(screenshotsFolder, { recursive: true });
 
         const context = await browser.newContext({
@@ -123,6 +124,7 @@ async function main() {
               device: selectedDevice.folder,
             });
 
+            // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
             const page = await context.newPage();
             const screenshotTarget = `${language}/${selectedDevice.folder}/${screenshotName}`;
 

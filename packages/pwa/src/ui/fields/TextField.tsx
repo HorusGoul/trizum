@@ -102,6 +102,7 @@ export interface AppNumberFieldProps extends AriaNumberFieldProps {
   inputMode?: "decimal" | "numeric";
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function AppNumberField({
   label,
   description,
@@ -140,6 +141,7 @@ interface AppCurrencyFieldProps extends Omit<AriaTextFieldProps, "value" | "onCh
   currency?: string;
 }
 
+// oxlint-disable-next-line react-doctor/no-multi-comp -- FIXME: address existing React Doctor diagnostics.
 function AppCurrencyField({
   label,
   description,
@@ -161,6 +163,7 @@ function AppCurrencyField({
   }
 
   const decimalPrecision =
+    // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
     new Intl.NumberFormat(undefined, {
       style: "currency",
       currency,

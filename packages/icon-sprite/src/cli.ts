@@ -16,6 +16,7 @@ async function main() {
 
   const resolvedConfigPath = path.resolve(process.cwd(), configPath);
   const moduleUrl = pathToFileURL(resolvedConfigPath).href;
+  // oxlint-disable-next-line react-doctor/no-dynamic-import-path -- FIXME: address existing React Doctor diagnostics.
   const importedModule = (await import(moduleUrl)) as IconSpriteConfigModule;
   const config = importedModule.default ?? importedModule.iconSpriteConfig;
 

@@ -42,6 +42,7 @@ export class NewTrizumPage {
     await this.participantNames.first().fill(creatorName);
 
     for (const participant of otherParticipants) {
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       const participantCount = await this.participantNames.count();
 
       await this.newParticipantNameField.fill(participant);

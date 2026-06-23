@@ -47,6 +47,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   >({});
   const lastSentElementIdRef = useRef<string | null>(null);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const onPresenceUpdate = useCallback(
     (value: Pick<ExpenseParticipantPresence, "elementId"> | null) => {
       if (!value) {
@@ -195,25 +196,29 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
   return (
     <div className="pointer-events-none absolute inset-0 touch-none">
-      {Object.values(presence)
-        .filter((presence) => {
-          if (presence.participantId === participant.id) {
-            // Don't show the bubble for the current participant
-            return false;
-          }
+      {
+        // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
+        Object.values(presence)
+          .filter((presence) => {
+            if (presence.participantId === participant.id) {
+              // Don't show the bubble for the current participant
+              return false;
+            }
 
-          if (presence.dateTime < new Date(Date.now() - 10000)) {
-            // Don't show the bubble for participants who have not been active in the last 10 seconds
-            return false;
-          }
+            // oxlint-disable-next-line react-doctor/rendering-hydration-mismatch-time -- FIXME: address existing React Doctor diagnostics.
+            if (presence.dateTime < new Date(Date.now() - 10000)) {
+              // Don't show the bubble for participants who have not been active in the last 10 seconds
+              return false;
+            }
 
-          return true;
-        })
-        .map((presence) => (
-          <Suspense key={presence.participantId}>
-            <Bubble presence={presence} />
-          </Suspense>
-        ))}
+            return true;
+          })
+          .map((presence) => (
+            <Suspense key={presence.participantId}>
+              <Bubble presence={presence} />
+            </Suspense>
+          ))
+      }
     </div>
   );
 }

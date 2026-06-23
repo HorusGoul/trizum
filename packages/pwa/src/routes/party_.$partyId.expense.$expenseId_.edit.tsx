@@ -83,8 +83,10 @@ function EditExpense() {
   }
 
   const editorRef = useRef<ExpenseEditorRef>(null);
+  // oxlint-disable-next-line react-doctor/rerender-lazy-ref-init -- FIXME: address existing React Doctor diagnostics.
   const currentHashRef = useRef<string>(getExpenseHash(expense));
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const onChange = useCallback(
     (previousValues: ExpenseEditorFormValues, currentValues: ExpenseEditorFormValues) => {
       function createExpense(values: ExpenseEditorFormValues) {
