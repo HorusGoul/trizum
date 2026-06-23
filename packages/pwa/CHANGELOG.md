@@ -1,5 +1,31 @@
 # @trizum/pwa
 
+## 1.10.0
+
+### Minor Changes
+
+- [#190](https://github.com/HorusGoul/trizum/pull/190) [`503a037`](https://github.com/HorusGoul/trizum/commit/503a0371f9a22a5124fd23442fe171e5932ad66b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add Cloudflare-backed account authentication and cloud profile settings sync.
+
+### Patch Changes
+
+- [#200](https://github.com/HorusGoul/trizum/pull/200) [`e3f4451`](https://github.com/HorusGoul/trizum/commit/e3f4451466920b4a49476b01b3073b4bc1df6584) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow the Capacitor Android `https://localhost` origin to sign in to trizum cloud.
+
+- [#197](https://github.com/HorusGoul/trizum/pull/197) [`a65cdd3`](https://github.com/HorusGoul/trizum/commit/a65cdd322ed7d98492ffaf97cdd17976a46dc2e8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Show the cloud data switch prompt as a centered, non-dismissable modal with a blocking backdrop.
+
+- [#196](https://github.com/HorusGoul/trizum/pull/196) [`94d64e8`](https://github.com/HorusGoul/trizum/commit/94d64e8c3128a21af5e2a2649a6672aadafa63e3) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Show trizum cloud account-linking errors in a dialog, including OAuth email mismatch errors.
+
+- [#203](https://github.com/HorusGoul/trizum/pull/203) [`368110c`](https://github.com/HorusGoul/trizum/commit/368110c46d733cf419261d2ac0332589f86aa77f) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix native iOS auth flows so cold-start email auth links route correctly, native Apple/Google sign-in persists the returned session token for cloud API calls, and sign-in does not stay stuck in the loading state after success.
+
+- [#198](https://github.com/HorusGoul/trizum/pull/198) [`54e5652`](https://github.com/HorusGoul/trizum/commit/54e565296b2959659e0968ee1b016fbb8f74ced8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix mobile trizum cloud sign-in CORS preflights and add native safe-area spacing to the full-screen sign-in dialog.
+
+- [#206](https://github.com/HorusGoul/trizum/pull/206) [`a303a7a`](https://github.com/HorusGoul/trizum/commit/a303a7a6d5d51b467577e27066fe22a2a2c5074c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Update privacy and store metadata disclosures for trizum cloud accounts.
+  - Covers account sign-in, linked Google and Apple providers, Cloudflare-backed storage, authentication emails, sessions, and cloud account deletion.
+  - Keeps store metadata clear that accounts are optional for getting started and only needed for trizum cloud sync across devices.
+
+- [#204](https://github.com/HorusGoul/trizum/pull/204) [`cbb3260`](https://github.com/HorusGoul/trizum/commit/cbb32606eb4c26e527f62d902094d0fdb57c9575) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Stop requesting name/profile data during Apple and Google sign-in.
+
+- [#205](https://github.com/HorusGoul/trizum/pull/205) [`da7aec0`](https://github.com/HorusGoul/trizum/commit/da7aec0cc03a737077602e4cdb5f0ea1f0af752b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent duplicate app history entries so back and close buttons return to the expected screen.
+
 ## 1.9.2
 
 ### Patch Changes
