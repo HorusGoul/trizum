@@ -1,5 +1,16 @@
 # @trizum/mobile
 
+## 1.10.0
+
+### Patch Changes
+
+- [#206](https://github.com/HorusGoul/trizum/pull/206) [`a303a7a`](https://github.com/HorusGoul/trizum/commit/a303a7a6d5d51b467577e27066fe22a2a2c5074c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Update privacy and store metadata disclosures for trizum cloud accounts.
+  - Covers account sign-in, linked Google and Apple providers, Cloudflare-backed storage, authentication emails, sessions, and cloud account deletion.
+  - Keeps store metadata clear that accounts are optional for getting started and only needed for trizum cloud sync across devices.
+
+- Updated dependencies [[`e3f4451`](https://github.com/HorusGoul/trizum/commit/e3f4451466920b4a49476b01b3073b4bc1df6584), [`a65cdd3`](https://github.com/HorusGoul/trizum/commit/a65cdd322ed7d98492ffaf97cdd17976a46dc2e8), [`94d64e8`](https://github.com/HorusGoul/trizum/commit/94d64e8c3128a21af5e2a2649a6672aadafa63e3), [`503a037`](https://github.com/HorusGoul/trizum/commit/503a0371f9a22a5124fd23442fe171e5932ad66b), [`368110c`](https://github.com/HorusGoul/trizum/commit/368110c46d733cf419261d2ac0332589f86aa77f), [`54e5652`](https://github.com/HorusGoul/trizum/commit/54e565296b2959659e0968ee1b016fbb8f74ced8), [`a303a7a`](https://github.com/HorusGoul/trizum/commit/a303a7a6d5d51b467577e27066fe22a2a2c5074c), [`cbb3260`](https://github.com/HorusGoul/trizum/commit/cbb32606eb4c26e527f62d902094d0fdb57c9575), [`da7aec0`](https://github.com/HorusGoul/trizum/commit/da7aec0cc03a737077602e4cdb5f0ea1f0af752b)]:
+  - @trizum/pwa@1.10.0
+
 ## 1.9.2
 
 ### Patch Changes
