@@ -85,11 +85,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
-          OPENAI_API_KEY: ${{ secrets.LILITH_OPENAI_API_KEY }}
+          CODEX_ACCESS_TOKEN: ${{ secrets.CODEX_ACCESS_TOKEN }}
         run: |
           set -euo pipefail
-          if [[ -z "${OPENAI_API_KEY:-}" ]]; then
-            echo "::error::LILITH_OPENAI_API_KEY is required for Codex agent review."
+          if [[ -z "${CODEX_ACCESS_TOKEN:-}" ]]; then
+            echo "::error::CODEX_ACCESS_TOKEN is required for Codex subscription-based agent review."
             exit 1
           fi
 

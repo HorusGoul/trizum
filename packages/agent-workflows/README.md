@@ -44,6 +44,8 @@ run. Superseding fixes use the branch that becomes the replacement PR.
 
 Environment overrides:
 
+- `CODEX_ACCESS_TOKEN`, optional Codex access token for ChatGPT-managed Codex
+  subscription or workspace access in trusted automation
 - `TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL`, optional Sandcastle Codex model; defaults
   to `gpt-5`
 - `TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT`, optional Sandcastle Codex effort:

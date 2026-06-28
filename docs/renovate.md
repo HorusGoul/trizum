@@ -51,5 +51,5 @@ vp run --filter @trizum/agent-workflows renovate-pr-review -- \
 ```
 
 The workflow uses `BOT_GITHUB_SECRET` for checkout and GitHub CLI write actions,
-configures commits as `lilith[bot]`, and uses `LILITH_OPENAI_API_KEY` for the
-Codex CLI invoked through Sandcastle.
+configures commits as `lilith[bot]`, and passes the `CODEX_ACCESS_TOKEN` secret
+to the Codex CLI invoked through Sandcastle.
