@@ -8,9 +8,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
-  statuses: write
 
 concurrency:
   group: react-doctor-${{ github.event.pull_request.number || github.ref }}
@@ -20,7 +17,18 @@ jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: millionco/react-doctor@v2
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Run React Doctor
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            vp exec react-doctor packages/pwa/src --scope changed --base "origin/${{ github.base_ref }}" --no-color --verbose --no-score
+          else
+            vp exec react-doctor packages/pwa/src --no-color --verbose --no-score
+          fi
