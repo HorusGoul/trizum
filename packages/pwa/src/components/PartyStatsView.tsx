@@ -900,6 +900,7 @@ function formatPercent(value: number) {
 }
 
 function formatRangeLabel(range: StatsCustomRange) {
+  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
   const formatter = new Intl.DateTimeFormat(undefined, {
     day: "numeric",
     month: "short",
@@ -909,6 +910,7 @@ function formatRangeLabel(range: StatsCustomRange) {
   const startDate = new Date(range.start.year, range.start.month - 1, range.start.day);
   const endDate = new Date(range.end.year, range.end.month - 1, range.end.day);
   const startLabel = formatter.format(startDate);
+  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
   const endFormatter = new Intl.DateTimeFormat(undefined, {
     day: "numeric",
     month: "short",
@@ -920,10 +922,12 @@ function formatRangeLabel(range: StatsCustomRange) {
     return `${startLabel} - ${endLabel}`;
   }
 
+  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
   return `${new Intl.DateTimeFormat(undefined, {
     day: "numeric",
     month: "short",
     year: "numeric",
+    // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
   }).format(startDate)} - ${new Intl.DateTimeFormat(undefined, {
     day: "numeric",
     month: "short",

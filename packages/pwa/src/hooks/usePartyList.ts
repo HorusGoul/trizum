@@ -171,6 +171,7 @@ export function usePartyList() {
       }
 
       for (const partyId in partyList.participantInParties) {
+        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
         const party = await documentCache.readAsync(repo, partyId as DocumentId);
 
         if (!party) {

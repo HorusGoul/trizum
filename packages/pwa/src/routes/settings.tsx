@@ -47,6 +47,7 @@ interface LocaleOption {
   name: string;
 }
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 export function Settings() {
   const { partyList, updateSettings } = usePartyList();
   const navigate = useNavigate();
@@ -64,12 +65,14 @@ export function Settings() {
     initialCachedCloudSettings ? "idle" : "loading",
   );
 
+  // oxlint-disable-next-line react-doctor/prefer-module-scope-static-value -- FIXME: address existing React Doctor diagnostics.
   const LOCALE_OPTIONS: LocaleOption[] = [
     { id: "system", name: t`System (fallbacks to ${DEFAULT_LOCALE})` },
     { id: "en", name: t`English` },
     { id: "es", name: t`Español` },
   ];
 
+  // oxlint-disable-next-line react-doctor/no-cascading-set-state -- FIXME: address existing React Doctor diagnostics.
   useEffect(() => {
     if (!userId) {
       if (isSessionPending) {
@@ -224,6 +227,7 @@ export function Settings() {
         </Button>
       </div>
 
+      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
         onSubmit={(e) => {

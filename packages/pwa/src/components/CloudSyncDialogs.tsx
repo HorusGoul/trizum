@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type FormEvent, type ReactNode } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
+// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import { motion } from "motion/react";
 import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
 import { Alert, AlertDescription } from "#src/ui/Alert.tsx";

@@ -256,6 +256,7 @@ interface PhotosProps extends Partial<Pick<Expense, "photos">> {
   onOpenGallery: (index: number) => void;
 }
 
+// oxlint-disable-next-line react-doctor/rerender-memo-with-default-value -- FIXME: address existing React Doctor diagnostics.
 function Photos({ photos = [], onOpenGallery }: PhotosProps) {
   const hasMultiple = photos.length > 1;
 

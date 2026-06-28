@@ -56,6 +56,7 @@ export async function getPartyListHandle(repo: Repo) {
 }
 
 export function getPartyListId(repo: Repo) {
+  // oxlint-disable-next-line react-doctor/js-cache-storage -- FIXME: address existing React Doctor diagnostics.
   const id = localStorage.getItem("partyListId");
 
   if (id && isValidDocumentId(id)) {

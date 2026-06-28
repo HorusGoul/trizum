@@ -161,6 +161,7 @@ function AppCurrencyField({
   }
 
   const decimalPrecision =
+    // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
     new Intl.NumberFormat(undefined, {
       style: "currency",
       currency,

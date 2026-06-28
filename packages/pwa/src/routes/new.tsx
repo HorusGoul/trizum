@@ -10,6 +10,7 @@ import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";
+// oxlint-disable-next-line react-doctor/no-flush-sync -- FIXME: address existing React Doctor diagnostics.
 import { flushSync } from "react-dom";
 import {
   validatePartyDescription,
@@ -40,6 +41,7 @@ interface NewPartyFormValues {
   participants: Pick<PartyParticipant, "name">[];
 }
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 function New() {
   const repo = useRepo();
   const { partyList } = usePartyList();
@@ -156,6 +158,7 @@ function New() {
         </form.Subscribe>
       </div>
 
+      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
         onSubmit={(e) => {
@@ -280,7 +283,11 @@ function New() {
                 )}
 
                 {field.state.value.map((_, index) => (
-                  <div key={index} className="flex w-full gap-2">
+                  <div
+                    // oxlint-disable-next-line react-doctor/no-array-index-as-key -- FIXME: address existing React Doctor diagnostics.
+                    key={index}
+                    className="flex w-full gap-2"
+                  >
                     <form.Field
                       name={`participants[${index}].name`}
                       validators={{

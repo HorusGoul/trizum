@@ -95,6 +95,7 @@ export function calculatePartyStats({
     }
   }
 
+  // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
   const participantStats = [...Object.values(participantStatsById)].sort(compareParticipantStats);
   const ranking = participantStats.filter((participant) => participant.totalSpent > 0);
 
@@ -128,6 +129,7 @@ export function getPartyStatsAvailablePastYears({
     }
   }
 
+  // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
   return [...years].sort((left, right) => right - left);
 }
 

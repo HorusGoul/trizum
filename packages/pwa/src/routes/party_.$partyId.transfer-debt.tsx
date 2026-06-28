@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import type { Currency } from "dinero.js";
+// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import { AnimatePresence, motion } from "motion/react";
 import { Suspense, useMemo, useReducer } from "react";
 import { toast } from "sonner";
@@ -212,6 +213,7 @@ export const Route = createFileRoute("/party_/$partyId/transfer-debt")({
   },
 });
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
   const { party, transferDebtToParty } = useCurrentParty();
@@ -223,6 +225,7 @@ function RouteComponent() {
   const to = party.participants[toId];
   const isSupportedTransfer = fromId === currentParticipant.id;
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const destinationPartyOptions = useMemo<DestinationPartyOption[]>(() => {
     return eligibleDestinationParties.map((entry) => {
       const otherParticipants = entry.otherParticipants;
@@ -682,6 +685,7 @@ function ParticipantPreviewText({
 }
 
 function getParticipantPreview(participants: PartyParticipant[]) {
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const visibleParticipantNames = participants
     .filter((participant) => !participant.isArchived && participant.name.trim() !== "")
     .map((participant) => participant.name.trim());

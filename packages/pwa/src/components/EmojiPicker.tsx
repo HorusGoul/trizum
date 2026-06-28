@@ -84,6 +84,7 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
     );
 
     // Get ordered list of groups that have emojis
+    // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
     const orderedGroups = messages.groups
       .filter((g) => g.order !== 2 && groupedEmojis[g.order]?.length > 0)
       .map((g) => g.order);

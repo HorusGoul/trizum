@@ -39,6 +39,7 @@ export function validatePartySymbol(symbol: string) {
     return t`Symbol must contain only emojis`;
   }
 
+  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
   const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
   const segments = Array.from(segmenter.segment(symbol));
 

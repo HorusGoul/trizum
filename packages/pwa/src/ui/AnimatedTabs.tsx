@@ -1,4 +1,5 @@
 import { Collection, Tab, TabList, TabPanel, Tabs, type Key } from "react-aria-components";
+// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import {
   animate,
   motion,
@@ -43,8 +44,10 @@ export function AnimatedTabs({
   useEffect(() => {
     const tabList = tabListRef.current;
 
+    // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
     if (tabElements.length === 0 && tabList) {
       const tabs = tabList.querySelectorAll<HTMLElement>("[role=tab]");
+      // oxlint-disable-next-line react-doctor/no-chain-state-updates -- FIXME: address existing React Doctor diagnostics.
       setTabElements([...tabs]);
     }
   }, [tabElements]);
@@ -69,6 +72,7 @@ export function AnimatedTabs({
 
   // This function determines which tab should be selected
   // based on the scroll position.
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const getIndex = useCallback(
     (x: number) => Math.max(0, Math.floor((tabElements.length - 1) * x)),
     [tabElements],

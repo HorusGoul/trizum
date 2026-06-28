@@ -10,17 +10,20 @@ import { useCallback, useEffect, useState } from "react";
 export function UpdateControllerNative({ children }: { children: React.ReactNode }) {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const checkForUpdate = useCallback(async () => {
     const result = await getNativeAppUpdateState();
     setIsUpdateAvailable(result.isUpdateAvailable);
   }, []);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const update = useCallback(async () => {
     const result = await performNativeAppUpdate();
     await checkForUpdate();
     return result;
   }, [checkForUpdate]);
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const resumeUpdate = useCallback(async () => {
     const result = await resumeNativeAppUpdate();
     if (result.status === "started") {

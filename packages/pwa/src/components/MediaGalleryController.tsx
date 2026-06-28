@@ -29,6 +29,7 @@ export function MediaGalleryController({ children }: MediaGalleryControllerProps
     setDragProgress(0);
   }
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const handleDragProgress = useCallback((progress: number) => {
     setDragProgress(progress);
   }, []);

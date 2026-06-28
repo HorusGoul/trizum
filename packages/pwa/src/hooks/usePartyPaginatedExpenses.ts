@@ -81,5 +81,6 @@ function areSnapshotsEqual(
     return false;
   }
 
+  // oxlint-disable-next-line react-doctor/js-length-check-first -- FIXME: address existing React Doctor diagnostics.
   return previous.expenses.every((expense, index) => expense === next.expenses[index]);
 }

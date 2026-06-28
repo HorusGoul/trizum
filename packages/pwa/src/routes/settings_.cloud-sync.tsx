@@ -64,6 +64,7 @@ interface CloudSyncSearchParams {
   error?: string;
 }
 
+// oxlint-disable-next-line react-doctor/no-giant-component, react-doctor/prefer-useReducer -- FIXME: address existing React Doctor diagnostics.
 function CloudSyncSettings() {
   const { partyList } = usePartyList();
   const router = useRouter();
@@ -72,27 +73,48 @@ function CloudSyncSettings() {
   const { auth, error: authCallbackError } = Route.useSearch();
   const session = authClient.useSession();
   const sessionUser = session.data?.user;
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [optimisticAuthUser, setOptimisticAuthUser] = useState<AuthSessionUser | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const user = sessionUser ?? optimisticAuthUser;
   const userId = user?.id;
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authEmail, setAuthEmail] = useState("");
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authPassword, setAuthPassword] = useState("");
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authError, setAuthError] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authEmailError, setAuthEmailError] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authPasswordError, setAuthPasswordError] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isPasswordLoginMode, setIsPasswordLoginMode] = useState(false);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isPasswordSignInEnabled, setIsPasswordSignInEnabled] = useState(true);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isSignInSuccessVisible, setIsSignInSuccessVisible] = useState(auth === "success");
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [magicLinkMessage, setMagicLinkMessage] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [passwordResetMessage, setPasswordResetMessage] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authPendingAction, setAuthPendingAction] = useState<AuthPendingAction | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(true);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [cloudActionDialog, setCloudActionDialog] = useState<CloudActionDialogType | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [authCallbackDialogError, setAuthCallbackDialogError] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState("");
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
+  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
   const [isDeleteAccountPending, setIsDeleteAccountPending] = useState(false);
   const isSignInSuccessVisibleRef = useRef(isSignInSuccessVisible);
   const isAuthPending = authPendingAction !== null;
@@ -119,6 +141,7 @@ function CloudSyncSettings() {
 
   useEffect(() => {
     if (!user) {
+      // oxlint-disable-next-line react-doctor/no-chain-state-updates -- FIXME: address existing React Doctor diagnostics.
       setIsSignInDialogOpen(true);
     }
   }, [user]);
@@ -131,12 +154,14 @@ function CloudSyncSettings() {
 
   useEffect(() => {
     if (!userId) {
+      // oxlint-disable-next-line react-doctor/no-chain-state-updates -- FIXME: address existing React Doctor diagnostics.
       setCloudActionDialog(null);
     }
   }, [userId]);
 
   useEffect(() => {
     if (auth === "success") {
+      // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
       setIsSignInSuccessVisible(true);
     }
   }, [auth]);
@@ -161,6 +186,7 @@ function CloudSyncSettings() {
 
   useEffect(() => {
     if (!userId && auth !== "success") {
+      // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
       setIsSignInSuccessVisible(false);
     }
   }, [auth, userId]);
@@ -170,6 +196,7 @@ function CloudSyncSettings() {
       return;
     }
 
+    // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
     setAuthError(getAuthCallbackErrorContent(authCallbackError).description);
   }, [authCallbackError, userId]);
 
@@ -178,6 +205,7 @@ function CloudSyncSettings() {
       return;
     }
 
+    // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
     setAuthCallbackDialogError(authCallbackError);
   }, [authCallbackError, userId]);
 

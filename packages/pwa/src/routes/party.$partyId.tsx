@@ -497,6 +497,7 @@ function VirtualizedExpenseList({
   const requestedNextPageRef = useRef(false);
 
   useEffect(() => {
+    // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
     if (!isLoadingNext) {
       requestedNextPageRef.current = false;
     }
@@ -629,6 +630,7 @@ function Balances({
     scrollElementRef: panelRef,
   });
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const sortedBalancesByParticipant = Object.values(balances)
     .map((balance) => {
       return {
@@ -654,6 +656,7 @@ function Balances({
   const simplifiedTransactions = simplifyBalanceTransactions(balances);
 
   // Filter transactions relevant to the current user
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const userOwesMap = simplifiedTransactions
     .filter((tx) => tx.fromId === participant.id)
     .map((tx) => ({
@@ -661,6 +664,7 @@ function Balances({
       amount: tx.amount,
     }));
 
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const owedToUserMap = simplifiedTransactions
     .filter((tx) => tx.toId === participant.id)
     .map((tx) => ({
@@ -673,6 +677,7 @@ function Balances({
   const canTransferDebt = eligibleTransferParties.length > 0;
 
   // Show other transactions not involving the current user
+  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
   const allOtherDiffs = simplifiedTransactions
     .filter((tx) => tx.fromId !== participant.id && tx.toId !== participant.id)
     .map((tx) => ({

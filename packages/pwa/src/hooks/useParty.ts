@@ -51,6 +51,7 @@ export function useParty(partyId: string) {
 
     for (let i = 0; i < amount; i++) {
       logger.debug("Creating test expense {index}", { index: i + 1 });
+      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
       await helpers.addExpenseToParty({
         name: `Test Expense ${i + 1}`,
         paidAt: new Date(),
@@ -471,6 +472,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     const chunkRefs = party.chunkRefs;
 
     for (const chunkRef of chunkRefs) {
+      // oxlint-disable-next-line react-doctor/async-await-in-loop, react-doctor/js-index-maps -- FIXME: address existing React Doctor diagnostics.
       const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
       const chunk = chunkHandle.doc();
 
@@ -483,6 +485,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         party.participants,
       );
 
+      // oxlint-disable-next-line react-doctor/js-index-maps -- FIXME: address existing React Doctor diagnostics.
       const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
       const chunkBalances = chunkBalancesHandle.doc();
 

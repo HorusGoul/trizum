@@ -12,6 +12,7 @@ function getCurrencyDecimals(currency: string | undefined): number | null {
   if (!currency) return null;
 
   try {
+    // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
     const formatter = new Intl.NumberFormat(undefined, {
       style: "currency",
       currency,

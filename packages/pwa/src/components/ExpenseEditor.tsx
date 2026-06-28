@@ -75,6 +75,7 @@ interface ExpenseEditorProps {
   onViewPhoto?: (index: number) => void;
 }
 
+// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 export function ExpenseEditor({
   title,
   onSubmit,
@@ -95,6 +96,7 @@ export function ExpenseEditor({
     },
     shares: defaultValues.shares,
   });
+  // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
   const participants = [...unsortedParticipants].sort((a, b) =>
     a.name.localeCompare(b.name, i18n.locale),
   );
@@ -297,6 +299,7 @@ export function ExpenseEditor({
         </form.Subscribe>
       </div>
 
+      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
         onSubmit={(e) => {

@@ -61,6 +61,7 @@ export function PartyPendingComponent() {
     void navigate({ to: "/", replace: true });
   }
 
+  // oxlint-disable-next-line react-doctor/prefer-module-scope-pure-function -- FIXME: address existing React Doctor diagnostics.
   function handleReload() {
     window.location.reload();
   }
@@ -157,6 +158,7 @@ export function PartyPendingComponent() {
                     <ul className="space-y-2">
                       {troubleshootingReasons.map((reason, i) => (
                         <li
+                          // oxlint-disable-next-line react-doctor/no-array-index-as-key -- FIXME: address existing React Doctor diagnostics.
                           key={i}
                           className="flex items-start gap-2.5 text-sm text-accent-600 dark:text-accent-400"
                         >

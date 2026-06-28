@@ -1,3 +1,4 @@
+import { RECOMMENDED_RULES as RECOMMENDED_REACT_DOCTOR_RULES } from "oxlint-plugin-react-doctor";
 import { defineConfig, type UserConfig } from "vite-plus";
 
 const rootAppCommandMessage = [
@@ -42,6 +43,11 @@ const ignorePatterns = [
 // them out of formatting checks so routine validation does not reflow them.
 const formatIgnorePatterns = [".agents/**", ...ignorePatterns];
 
+const pwaReactDoctorRules = {
+  ...RECOMMENDED_REACT_DOCTOR_RULES,
+  "react-doctor/no-multi-comp": "off" as const,
+};
+
 function rootAppCommandGuard() {
   return {
     config() {
@@ -80,6 +86,10 @@ const toolingConfig = {
         name: "lingui",
         specifier: "eslint-plugin-lingui",
       },
+      {
+        name: "react-doctor",
+        specifier: "oxlint-plugin-react-doctor",
+      },
     ],
     options: {
       typeAware: true,
@@ -109,6 +119,10 @@ const toolingConfig = {
       },
     },
     overrides: [
+      {
+        files: ["packages/pwa/src/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
+        rules: pwaReactDoctorRules,
+      },
       {
         files: ["packages/pwa/src/main.tsx", "packages/pwa/src/routes/**/*.tsx"],
         rules: {

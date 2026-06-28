@@ -12,6 +12,7 @@ export function useMediaFile(mediaFileId: string) {
     required: true,
   });
 
+  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
   const url = useMemo(() => {
     const mimeType =
       typeof mediaFile.metadata.mimeType === "string" ? mediaFile.metadata.mimeType : undefined;
