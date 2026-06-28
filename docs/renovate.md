@@ -38,44 +38,14 @@ its lockfile commit.
 
 The
 [`Renovate Agent Review`](../.github/workflows/renovate-agent-review.yml)
-workflow runs after the `CI` workflow succeeds on a `renovate/**` branch. It
-finds the open non-draft Renovate PR for that branch and runs:
-
-```sh
-vp run --filter @trizum/agent-workflows renovate-pr-review -- \
-  --pr "$PR_NUMBER" \
-  --repo "$GITHUB_REPOSITORY" \
-  --write \
-  --comment \
-  --codex required
-```
+workflow runs after the `CI` workflow completes on a `renovate/**` branch. It
+finds the open non-draft Renovate PR for that branch.
 
 The workflow uses `BOT_GITHUB_TOKEN` for checkout and GitHub CLI write actions,
 configures commits as `lilith[bot]`, restores Codex account auth from Bitwarden
 Secrets Manager, invokes Codex through Sandcastle, and writes the refreshed
 Codex auth cache back to Bitwarden after the run.
 
-Required GitHub configuration:
-
-- `BW_ACCESS_TOKEN`, a secret containing a Bitwarden Secrets Manager
-  machine-account access token with read/write access to the Codex auth secret
-- `BITWARDEN_CODEX_AUTH_JSON_SECRET_ID`, a variable containing the Bitwarden
-  secret ID for the compact `~/.codex/auth.json` value
-
-To seed or refresh that Bitwarden value, sign in locally with file-based Codex
-credential storage, then run:
-
-```sh
-export BWS_ACCESS_TOKEN="..."
-export BITWARDEN_PROJECT_ID="..."
-
-# First-time creation.
-bws secret create trizum-codex-auth-json \
-  "$(jq -c . ~/.codex/auth.json)" \
-  "$BITWARDEN_PROJECT_ID"
-
-# Later refreshes.
-export BITWARDEN_CODEX_AUTH_JSON_SECRET_ID="..."
-bws secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
-  --value "$(jq -c . ~/.codex/auth.json)"
-```
+When checks pass and the agent finds no blockers, it adds the
+`ready for human review` label. When checks fail, the agent can create a
+replacement PR with the same dependency-update purpose.

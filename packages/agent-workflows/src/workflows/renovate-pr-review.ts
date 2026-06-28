@@ -347,6 +347,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
   const options = getWorkflowOptionsFromEnv();
   const dryRun = options.mode === "dry-run";
   const report = renderReviewReport(decision);
+  const comment = renderReviewComment(decision);
 
   if (dryRun || decision.action === "dry-run") {
     return {
@@ -361,7 +362,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
     await ensureReadyLabel(options);
     await addLabelToIssue(options, context.pr.number, options.readyForHumanReviewLabel);
     if (options.postReviewComment) {
-      await commentOnPullRequest(options, context.pr.number, report);
+      await commentOnPullRequest(options, context.pr.number, comment);
     }
     return {
       decision,
@@ -384,7 +385,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
   }
 
   if (options.postReviewComment) {
-    await commentOnPullRequest(options, context.pr.number, report);
+    await commentOnPullRequest(options, context.pr.number, comment);
   }
 
   return {
@@ -826,6 +827,38 @@ function renderReviewReport(decision: ReviewDecision): string {
   ].join("\n");
 }
 
+function renderReviewComment(decision: ReviewDecision): string {
+  const combined = mergeReviewResults(decision.review.deterministic, decision.review.codex);
+  const context = decision.review.context;
+  const updates =
+    context.dependencyUpdates.length === 0
+      ? "No parsed dependency update."
+      : context.dependencyUpdates
+          .map(
+            (update) => `${update.name} ${update.from ?? "unknown"} -> ${update.to ?? "unknown"}`,
+          )
+          .join(", ");
+
+  return [
+    "## Agent Renovate Review",
+    "",
+    `**Decision:** ${decision.summary}`,
+    `**Checks:** ${context.pr.status.summary}`,
+    `**Updates:** ${updates}`,
+    "",
+    `**Summary:** ${truncateText(firstParagraph(combined.summary), 700)}`,
+    "",
+    "**Findings:**",
+    renderBriefFindings(combined.findings),
+    "",
+    "**Suggested validation:**",
+    renderBriefList(combined.automatedTestSuggestions, 3),
+    "",
+    "**Manual smoke test:**",
+    renderBriefList(combined.manualTestPlan, 3),
+  ].join("\n");
+}
+
 function renderSupersedingPullRequestBody(
   context: PullRequestContext,
   report: string,
@@ -880,10 +913,49 @@ function renderFindings(findings: readonly ReviewFinding[]): string {
     .join("\n");
 }
 
+function renderBriefFindings(findings: readonly ReviewFinding[]): string {
+  if (findings.length === 0) {
+    return "- No findings.";
+  }
+
+  return findings
+    .slice(0, 3)
+    .map((finding) => {
+      const file = finding.file == null ? "" : ` (${finding.file})`;
+      return `- [${finding.severity}] ${finding.title}${file}`;
+    })
+    .concat(
+      findings.length > 3
+        ? [`- ${findings.length - 3} more finding(s) in the full run output.`]
+        : [],
+    )
+    .join("\n");
+}
+
 function renderList(values: readonly string[]): string {
   if (values.length === 0) {
     return "- None.";
   }
 
   return values.map((value) => `- ${value}`).join("\n");
+}
+
+function renderBriefList(values: readonly string[], limit: number): string {
+  if (values.length === 0) {
+    return "- None.";
+  }
+
+  return values
+    .slice(0, limit)
+    .map((value) => `- ${truncateText(value, 220)}`)
+    .concat(
+      values.length > limit
+        ? [`- ${values.length - limit} more item(s) in the full run output.`]
+        : [],
+    )
+    .join("\n");
+}
+
+function firstParagraph(value: string): string {
+  return value.split(/\n\s*\n/)[0]?.trim() || value.trim();
 }

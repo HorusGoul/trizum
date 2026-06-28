@@ -11,7 +11,6 @@ import {
 import { runCommand, truncateText } from "./exec.js";
 
 const CODEX_COMPLETION_SIGNAL = "<trizum-agent-workflows>DONE</trizum-agent-workflows>";
-const CODEX_DEFAULT_MODEL_SENTINEL = "__trizum_codex_default__";
 const REVIEW_OUTPUT_TAG = "trizum-review";
 
 type CodexEffort = "low" | "medium" | "high" | "xhigh";
@@ -128,13 +127,13 @@ export async function runSandcastleCodexFix(
   };
 }
 
-function resolveCodexModel(): string | undefined {
-  return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || undefined;
+function resolveCodexModel(): string {
+  return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || "gpt-5.5";
 }
 
 function createCodexAgent(): AgentProvider {
   const model = resolveCodexModel();
-  const agent = codex(model ?? CODEX_DEFAULT_MODEL_SENTINEL, {
+  const agent = codex(model, {
     effort: resolveCodexEffort(),
   });
 
@@ -142,17 +141,12 @@ function createCodexAgent(): AgentProvider {
     ...agent,
     buildPrintCommand(options) {
       const command = agent.buildPrintCommand(options);
-      const modelCommand = model == null ? removeCodexModelFlag(command.command) : command.command;
       return {
         ...command,
-        command: addCodexExecFlags(modelCommand, ["--ignore-user-config"]),
+        command: addCodexExecFlags(command.command, ["--ignore-user-config"]),
       };
     },
   };
-}
-
-function removeCodexModelFlag(command: string): string {
-  return command.replace(/ -m \S+/, "");
 }
 
 function addCodexExecFlags(command: string, flags: readonly string[]): string {
@@ -174,7 +168,7 @@ function resolveCodexEffort(): CodexEffort | undefined {
     return effort;
   }
 
-  return undefined;
+  return "high";
 }
 
 function buildSandcastleReviewPrompt(context: PullRequestContext): string {

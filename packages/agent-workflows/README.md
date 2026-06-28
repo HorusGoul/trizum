@@ -44,13 +44,6 @@ run. Superseding fixes use the branch that becomes the replacement PR. The
 workflow passes `--ignore-user-config` to `codex exec` so automation uses Codex
 auth from `CODEX_HOME` without inheriting personal MCP, hook, or local config.
 
-Environment overrides:
-
-- `TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL`, optional Codex model override. Leave
-  unset to use the account-compatible Codex default.
-- `TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT`, optional Sandcastle Codex effort:
-  `low`, `medium`, `high`, or `xhigh`
-
 Use `--no-codex` or `--codex off` to run only the deterministic review.
 Use `--codex required` to treat a failed Codex review as a blocker.
 
@@ -58,34 +51,6 @@ The Renovate GitHub Actions workflow uses Bitwarden Secrets Manager to restore
 a copied Codex ChatGPT login cache at `~/.codex/auth.json` before Sandcastle
 invokes Codex. After Codex runs, the workflow writes the refreshed auth cache
 back to the same Bitwarden secret so token refreshes survive ephemeral runners.
-
-GitHub must provide:
-
-- `BW_ACCESS_TOKEN`, a GitHub secret containing a Bitwarden Secrets Manager
-  machine-account access token with read/write access to the Codex auth secret
-- `BITWARDEN_CODEX_AUTH_JSON_SECRET_ID`, a GitHub Actions variable containing
-  the Bitwarden secret ID for the compact `auth.json` value
-
-To create or refresh the Bitwarden value locally:
-
-```sh
-mkdir -p ~/.codex
-printf 'cli_auth_credentials_store = "file"\n' >> ~/.codex/config.toml
-codex login
-
-export BWS_ACCESS_TOKEN="..."
-export BITWARDEN_PROJECT_ID="..."
-
-# First-time creation.
-bws secret create trizum-codex-auth-json \
-  "$(jq -c . ~/.codex/auth.json)" \
-  "$BITWARDEN_PROJECT_ID"
-
-# Later refreshes.
-export BITWARDEN_CODEX_AUTH_JSON_SECRET_ID="..."
-bws secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
-  --value "$(jq -c . ~/.codex/auth.json)"
-```
 
 Treat `auth.json` like a password. It contains Codex account tokens.
 
