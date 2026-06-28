@@ -19,7 +19,7 @@ import { deleteAt, insertAt, isValidDocumentId } from "@automerge/automerge-repo
 import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
-import { recalculatePartyBalancesInWorker } from "#src/lib/appWorker/client.ts";
+import { appWorker } from "#src/lib/appWorker/client.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -33,7 +33,7 @@ export function useParty(partyId: string) {
   const helpers = getPartyHelpers(repo, handle);
 
   async function recalculateBalances() {
-    return recalculatePartyBalancesInWorker(handle.documentId);
+    return appWorker.recalculateBalances(handle.documentId);
   }
 
   async function __dev_createTestExpenses() {

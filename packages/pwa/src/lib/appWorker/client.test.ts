@@ -69,7 +69,7 @@ describe("app worker client", () => {
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
-    const { initializeAppWorker, recalculatePartyBalancesInWorker } = await import("./client.ts");
+    const { appWorker, initializeAppWorker } = await import("./client.ts");
 
     await initializeAppWorker({
       repo,
@@ -77,7 +77,7 @@ describe("app worker client", () => {
       isOfflineOnly: false,
     });
 
-    await expect(recalculatePartyBalancesInWorker(partyId)).resolves.toBe(true);
+    await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(secondApi.initialize).toHaveBeenCalledWith(
@@ -102,7 +102,7 @@ describe("app worker client", () => {
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
-    const { initializeAppWorker, recalculatePartyBalancesInWorker } = await import("./client.ts");
+    const { appWorker, initializeAppWorker } = await import("./client.ts");
 
     await expect(
       initializeAppWorker({
@@ -112,7 +112,7 @@ describe("app worker client", () => {
       }),
     ).rejects.toThrow("worker init failed");
 
-    await expect(recalculatePartyBalancesInWorker(partyId)).resolves.toBe(true);
+    await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).not.toHaveBeenCalled();
     expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(TestWorker.instances).toHaveLength(2);

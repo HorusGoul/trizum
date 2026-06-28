@@ -1,7 +1,6 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 import { getLogger } from "#src/lib/log.ts";
-import type { Party } from "#src/models/party.ts";
 import { WorkerAdapter } from "./WorkerAdapter.ts";
 import { injectAppWorker, type AppWorkerApi } from "./proxy.ts";
 
@@ -20,19 +19,37 @@ interface AppWorkerClient {
   worker: Worker;
 }
 
+type AppWorkerClientApi = Omit<AppWorkerApi, "initialize">;
+
 const logger = getLogger("appWorker", "client");
 let appWorkerClient: AppWorkerClient | null = null;
 let appWorkerOptions: InitializeAppWorkerOptions | null = null;
+
+export const appWorker = new Proxy({} as AppWorkerClientApi, {
+  get(_target, property) {
+    if (typeof property !== "string" || property === "then") {
+      return undefined;
+    }
+
+    return (...args: unknown[]) => {
+      return callAppWorker((api) => {
+        const method = api[property as keyof AppWorkerClientApi];
+
+        if (typeof method !== "function") {
+          throw new Error(`App worker method ${property} is not available`);
+        }
+
+        return (method as (...args: unknown[]) => Promise<unknown>).apply(api, args);
+      });
+    };
+  },
+});
 
 export function initializeAppWorker(options: InitializeAppWorkerOptions) {
   appWorkerOptions = options;
   const client = getAppWorkerClient(options);
 
   return client.initializePromise;
-}
-
-export async function recalculatePartyBalancesInWorker(partyId: Party["id"]) {
-  return callAppWorker((api) => api.recalculateBalances(partyId));
 }
 
 function getAppWorkerClient({ repo, wssUrl, isOfflineOnly }: InitializeAppWorkerOptions) {
