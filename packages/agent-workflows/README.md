@@ -40,12 +40,14 @@ checks are failing.
 
 Codex runs through `@ai-hero/sandcastle` for both review and superseding PR
 fixes. Review runs use a disposable Sandcastle branch that is removed after the
-run. Superseding fixes use the branch that becomes the replacement PR.
+run. Superseding fixes use the branch that becomes the replacement PR. The
+workflow passes `--ignore-user-config` to `codex exec` so automation uses Codex
+auth from `CODEX_HOME` without inheriting personal MCP, hook, or local config.
 
 Environment overrides:
 
-- `TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL`, optional Sandcastle Codex model; defaults
-  to `gpt-5`
+- `TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL`, optional Codex model override. Leave
+  unset to use the account-compatible Codex default.
 - `TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT`, optional Sandcastle Codex effort:
   `low`, `medium`, `high`, or `xhigh`
 

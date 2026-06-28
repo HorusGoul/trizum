@@ -1,5 +1,5 @@
 import { rm } from "node:fs/promises";
-import { codex, Output, run } from "@ai-hero/sandcastle";
+import { codex, Output, run, type AgentProvider } from "@ai-hero/sandcastle";
 import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
 import {
   reviewResultSchema,
@@ -11,6 +11,7 @@ import {
 import { runCommand, truncateText } from "./exec.js";
 
 const CODEX_COMPLETION_SIGNAL = "<trizum-agent-workflows>DONE</trizum-agent-workflows>";
+const CODEX_DEFAULT_MODEL_SENTINEL = "__trizum_codex_default__";
 const REVIEW_OUTPUT_TAG = "trizum-review";
 
 type CodexEffort = "low" | "medium" | "high" | "xhigh";
@@ -31,9 +32,7 @@ export async function runSandcastleCodexReview(
 
   try {
     const result = await run({
-      agent: codex(resolveCodexModel(), {
-        effort: resolveCodexEffort(),
-      }),
+      agent: createCodexAgent(),
       branchStrategy: {
         branch: branchName,
         type: "branch",
@@ -88,9 +87,7 @@ export async function runSandcastleCodexFix(
   branchName: string,
 ): Promise<SandcastleFixRun> {
   const result = await run({
-    agent: codex(resolveCodexModel(), {
-      effort: resolveCodexEffort(),
-    }),
+    agent: createCodexAgent(),
     branchStrategy: {
       branch: branchName,
       type: "branch",
@@ -131,8 +128,44 @@ export async function runSandcastleCodexFix(
   };
 }
 
-function resolveCodexModel(): string {
-  return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || "gpt-5";
+function resolveCodexModel(): string | undefined {
+  return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || undefined;
+}
+
+function createCodexAgent(): AgentProvider {
+  const model = resolveCodexModel();
+  const agent = codex(model ?? CODEX_DEFAULT_MODEL_SENTINEL, {
+    effort: resolveCodexEffort(),
+  });
+
+  return {
+    ...agent,
+    buildPrintCommand(options) {
+      const command = agent.buildPrintCommand(options);
+      const modelCommand = model == null ? removeCodexModelFlag(command.command) : command.command;
+      return {
+        ...command,
+        command: addCodexExecFlags(modelCommand, ["--ignore-user-config"]),
+      };
+    },
+  };
+}
+
+function removeCodexModelFlag(command: string): string {
+  return command.replace(/ -m \S+/, "");
+}
+
+function addCodexExecFlags(command: string, flags: readonly string[]): string {
+  if (!command.startsWith("codex exec ")) {
+    return command;
+  }
+
+  const missingFlags = flags.filter((flag) => !command.includes(` ${flag}`));
+  if (missingFlags.length === 0) {
+    return command;
+  }
+
+  return command.replace("codex exec ", `codex exec ${missingFlags.join(" ")} `);
 }
 
 function resolveCodexEffort(): CodexEffort | undefined {

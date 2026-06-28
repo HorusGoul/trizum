@@ -12,7 +12,8 @@ import type {
 
 const manifestFilePattern = /(^|\/)(package\.json|pnpm-workspace\.yaml)$/;
 const versionLinePattern = /^[+-]\s{2,}"(?<name>[^"]+)":\s*"(?<version>[^"]+)"[,]?$/;
-const yamlVersionLinePattern = /^[+-]\s{2}(?<name>(?:@?[\w.-]+\/)?[\w.-]+):\s*(?<version>.+)$/;
+const yamlVersionLinePattern =
+  /^[+-]\s+(?<name>["']?(?:@?[\w.-]+\/)?[\w.-]+["']?):\s*(?<version>.+)$/;
 const ignoredManifestKeys = new Set([
   "author",
   "description",
@@ -282,7 +283,7 @@ function parseVersionLine(
   }
 
   return {
-    name: yamlMatch.groups.name,
+    name: yamlMatch.groups.name.replace(/^["']|["']$/g, ""),
     version,
   };
 }

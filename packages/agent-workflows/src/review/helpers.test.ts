@@ -79,6 +79,8 @@ diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
 @@
 -  vite: 6.0.0
 +  vite: 7.0.0
+-    "@vitejs/plugin-react": 6.0.1
++    "@vitejs/plugin-react": 6.0.3
 `);
 
     expect(updates).toEqual([
@@ -93,6 +95,12 @@ diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
         from: "6.0.0",
         name: "vite",
         to: "7.0.0",
+      },
+      {
+        file: "pnpm-workspace.yaml",
+        from: "6.0.1",
+        name: "@vitejs/plugin-react",
+        to: "6.0.3",
       },
     ]);
   });
