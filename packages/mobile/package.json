@@ -37,28 +37,28 @@
     "version:update": "vp exec capver set $(node -p \"require('./package.json').version\")"
   },
   "dependencies": {
-    "@capacitor/android": "8.0.1",
-    "@capacitor/app": "8.0.0",
-    "@capacitor/camera": "8.2.0",
-    "@capacitor/core": "8.0.1",
-    "@capacitor/ios": "8.0.1",
-    "@capacitor/share": "8.0.0",
-    "@capacitor/splash-screen": "8.0.0",
-    "@capawesome/capacitor-app-update": "8.0.3",
-    "@capawesome/capacitor-apple-sign-in": "0.1.0",
-    "@capawesome/capacitor-google-sign-in": "0.1.2",
+    "@capacitor/android": "catalog:",
+    "@capacitor/app": "catalog:",
+    "@capacitor/camera": "catalog:",
+    "@capacitor/core": "catalog:",
+    "@capacitor/ios": "catalog:",
+    "@capacitor/share": "catalog:",
+    "@capacitor/splash-screen": "catalog:",
+    "@capawesome/capacitor-app-update": "catalog:",
+    "@capawesome/capacitor-apple-sign-in": "catalog:",
+    "@capawesome/capacitor-google-sign-in": "catalog:",
     "@trizum/logging": "workspace:*",
     "@trizum/pwa": "workspace:*",
-    "capacitor-plugin-safe-area": "5.0.0"
+    "capacitor-plugin-safe-area": "catalog:"
   },
   "devDependencies": {
-    "@capacitor/assets": "3.0.5",
-    "@capacitor/cli": "8.0.1",
-    "@capawesome/capver": "0.1.0",
+    "@capacitor/assets": "catalog:",
+    "@capacitor/cli": "catalog:",
+    "@capawesome/capver": "catalog:",
     "@trizum/tsconfig": "workspace:*",
-    "@types/node": "^24.10.1",
-    "sharp": "0.32.6",
-    "svgexport": "0.4.2",
-    "typescript": "5.9.2"
+    "@types/node": "catalog:",
+    "sharp": "catalog:",
+    "svgexport": "catalog:",
+    "typescript": "catalog:"
   }
 }

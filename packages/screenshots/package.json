@@ -31,11 +31,11 @@
   },
   "dependencies": {
     "@trizum/logging": "workspace:*",
-    "playwright": "1.60.0"
+    "playwright": "catalog:"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
-    "@types/node": "24.10.2",
-    "typescript": "5.9.2"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }

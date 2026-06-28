@@ -32,26 +32,26 @@
     "deploy": "./deploy.sh"
   },
   "dependencies": {
-    "@automerge/automerge": "3.2.6",
-    "@automerge/automerge-repo": "2.5.6",
-    "@automerge/automerge-repo-network-websocket": "2.5.6",
-    "@hono/node-server": "1.19.6",
-    "@hono/node-ws": "1.2.0",
-    "@kubiks/otel-drizzle": "2.1.0",
-    "@libsql/client": "0.15.15",
-    "@logtape/logtape": "1.2.2",
-    "@logtape/sentry": "1.2.2",
-    "@sentry/node": "10.29.0",
-    "@sentry/profiling-node": "10.29.0",
+    "@automerge/automerge": "catalog:",
+    "@automerge/automerge-repo": "catalog:",
+    "@automerge/automerge-repo-network-websocket": "catalog:",
+    "@hono/node-server": "catalog:",
+    "@hono/node-ws": "catalog:",
+    "@kubiks/otel-drizzle": "catalog:",
+    "@libsql/client": "catalog:",
+    "@logtape/logtape": "catalog:",
+    "@logtape/sentry": "catalog:",
+    "@sentry/node": "catalog:",
+    "@sentry/profiling-node": "catalog:",
     "@trizum/logging": "workspace:*",
-    "drizzle-kit": "0.31.7",
-    "drizzle-orm": "0.45.2",
-    "hono": "4.10.6",
-    "zod": "4.1.12"
+    "drizzle-kit": "catalog:",
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
-    "@types/node": "24.10.1",
-    "typescript": "5.9.2"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }
