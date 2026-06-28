@@ -1,114 +1,72 @@
-name: Fix Renovate Lockfile
+name: Renovate Lockfiles
+
+# Renovate does not use Vite+ to refresh pnpm-lock.yaml. Instead, Renovate
+# updates manifests and this workflow regenerates the lockfile on every
+# Renovate branch push. Renovate ignores this workflow's lockfile commits via
+# gitIgnoredAuthors in renovate.json.
+
+permissions: {}
 
 on:
   push:
     branches:
-      - "renovate/**"
-    paths:
-      - "pnpm-lock.yaml"
+      - renovate/**
 
-permissions:
-  contents: write
-  pull-requests: read
-
+# Queue instead of cancel so a newer Renovate branch push does not stop an
+# in-flight lockfile refresh while it may be about to commit.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  refresh-lockfile:
-    name: Refresh Lockfile
+  update-lockfile:
+    name: Update Lockfile
+    if: github.event.repository.fork == false && github.event.head_commit.author.email != 'renovate-lockfile@trizum.app'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.ref_name }}
           fetch-depth: 0
-          token: ${{ secrets.BOT_GITHUB_TOKEN || github.token }}
-
-      - name: Detect Renovate PR
-        id: renovate-pr
-        env:
-          BRANCH_NAME: ${{ github.ref_name }}
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-          REPOSITORY_OWNER: ${{ github.repository_owner }}
-        run: |
-          set -euo pipefail
-
-          pr_number=""
-          for attempt in 1 2 3 4 5 6; do
-            pr_number="$(
-              gh api \
-                -X GET "repos/${REPOSITORY}/pulls" \
-                -f state=open \
-                -f head="${REPOSITORY_OWNER}:${BRANCH_NAME}" \
-                --jq '.[0].number // empty'
-            )"
-
-            if [ -n "$pr_number" ]; then
-              break
-            fi
-
-            sleep 10
-          done
-
-          if [ -z "$pr_number" ]; then
-            echo "No open PR found for ${BRANCH_NAME}; skipping lockfile refresh."
-            echo "should_fix=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          author="$(
-            gh pr view "$pr_number" \
-              --repo "$REPOSITORY" \
-              --json author \
-              --jq '.author.login'
-          )"
-
-          case "$author" in
-            app/renovate | renovate | renovate-bot | "renovate[bot]")
-              ;;
-            *)
-              echo "PR #${pr_number} author is ${author}, not Renovate; skipping lockfile refresh."
-              echo "should_fix=false" >> "$GITHUB_OUTPUT"
-              exit 0
-              ;;
-          esac
-
-          if ! gh pr view "$pr_number" --repo "$REPOSITORY" --json files --jq '.files[].path' | grep -Fxq "pnpm-lock.yaml"; then
-            echo "PR #${pr_number} does not change pnpm-lock.yaml; skipping lockfile refresh."
-            echo "should_fix=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "Renovate PR #${pr_number} changes pnpm-lock.yaml; refreshing with Vite+."
-          echo "pr_number=${pr_number}" >> "$GITHUB_OUTPUT"
-          echo "should_fix=true" >> "$GITHUB_OUTPUT"
+          persist-credentials: false
 
       - uses: voidzero-dev/setup-vp@v1
-        if: steps.renovate-pr.outputs.should_fix == 'true'
         with:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Refresh pnpm lockfile
-        if: steps.renovate-pr.outputs.should_fix == 'true'
-        run: vp install --lockfile-only
+      - name: Update pnpm lockfile
+        env:
+          # Resolution does not need lifecycle scripts; keep dependency scripts
+          # from running in a workflow that later pushes with a write token.
+          npm_config_ignore_scripts: "true"
+        run: |
+          vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
+
+      - name: Detect lockfile changes
+        id: diff
+        run: |
+          git diff --stat -- pnpm-lock.yaml
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Commit lockfile refresh
-        if: steps.renovate-pr.outputs.should_fix == 'true'
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          BRANCH: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
-          if git diff --quiet -- pnpm-lock.yaml; then
-            echo "pnpm-lock.yaml is already up to date."
-            exit 0
-          fi
-
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
+          # Identity must stay in sync with gitIgnoredAuthors in renovate.json
+          # so Renovate keeps managing the branch.
+          git config user.name "trizum-renovate-lockfile[bot]"
+          git config user.email "renovate-lockfile@trizum.app"
           git add pnpm-lock.yaml
-          git commit --signoff -m "chore(deps): refresh pnpm lockfile with Vite+"
-          git push
+          git commit -m "chore(deps): refresh pnpm lockfile with Vite+"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
