@@ -1,0 +1,69 @@
+name: Renovate Lockfiles
+
+# Renovate does not use Vite+ to refresh pnpm-lock.yaml. Instead, Renovate
+# updates manifests and this workflow regenerates the lockfile on every
+# Renovate branch push. Renovate ignores this workflow's lockfile commits via
+# gitIgnoredAuthors in renovate.json.
+
+permissions: {}
+
+on:
+  push:
+    branches:
+      - renovate/**
+
+# Queue instead of cancel so a newer Renovate branch push does not stop an
+# in-flight lockfile refresh while it may be about to commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update-lockfile:
+    name: Update Lockfile
+    if: github.event.repository.fork == false && github.event.head_commit.author.email != 'trizum-agent@trizum.app'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Update pnpm lockfile
+        env:
+          # Resolution does not need lifecycle scripts; keep dependency scripts
+          # from running in a workflow that later pushes with a write token.
+          npm_config_ignore_scripts: "true"
+        run: |
+          vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
+
+      - name: Detect lockfile changes
+        id: diff
+        run: |
+          git diff --stat -- pnpm-lock.yaml
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit lockfile refresh
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+
+          # Identity must stay in sync with gitIgnoredAuthors in renovate.json
+          # so Renovate keeps managing the branch.
+          git config user.name "trizum-agent[bot]"
+          git config user.email "trizum-agent@trizum.app"
+          git add pnpm-lock.yaml
+          git commit -m "chore(deps): refresh pnpm lockfile with Vite+"
+          git push
