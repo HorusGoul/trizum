@@ -81,7 +81,7 @@ catalog:
   autoprefixer: 10.4.27
   babel-plugin-react-compiler: 1.0.0
   barcode-detector: ^3.0.8
-  better-auth: 1.6.18
+  better-auth: 1.6.22
   browser-image-compression: 2.0.2
   capacitor-plugin-safe-area: 5.0.0
   clsx: 2.1.1
