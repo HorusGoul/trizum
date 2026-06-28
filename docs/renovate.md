@@ -27,8 +27,8 @@ vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
 
 - and pushes `pnpm-lock.yaml` back to the same Renovate branch when it changes.
 
-The workflow uses the built-in `GITHUB_TOKEN` through `actions/checkout` with
-job-scoped `contents: write` permission for the follow-up push.
+The workflow uses `BOT_GITHUB_TOKEN` through `actions/checkout` for the
+follow-up push.
 
 `renovate.json` lists `trizum-agent@trizum.app` in `gitIgnoredAuthors` so
 Renovate keeps managing branches after the workflow adds its lockfile commit.
