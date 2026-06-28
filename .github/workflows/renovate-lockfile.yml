@@ -21,7 +21,7 @@ concurrency:
 jobs:
   update-lockfile:
     name: Update Lockfile
-    if: github.event.repository.fork == false && github.event.head_commit.author.email != 'trizum-agent@trizum.app'
+    if: github.event.repository.fork == false && github.event.head_commit.author.email != '259750894+PUNK-02@users.noreply.github.com'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -67,8 +67,8 @@ jobs:
 
           # Identity must stay in sync with gitIgnoredAuthors in renovate.json
           # so Renovate keeps managing the branch.
-          git config user.name "trizum-agent[bot]"
-          git config user.email "trizum-agent@trizum.app"
+          git config user.name "lilith[bot]"
+          git config user.email "259750894+PUNK-02@users.noreply.github.com"
           git add pnpm-lock.yaml
           git commit -m "chore(deps): refresh pnpm lockfile with Vite+"
           git push

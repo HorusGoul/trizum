@@ -101,8 +101,11 @@ jobs:
           commit: --signoff
           add: --all
           message: "style: apply automatic fixes"
-          committer_name: GitHub Actions
-          committer_email: actions@github.com
+          author_name: lilith[bot]
+          author_email: 259750894+PUNK-02@users.noreply.github.com
+          committer_name: lilith[bot]
+          committer_email: 259750894+PUNK-02@users.noreply.github.com
+          github_token: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - name: Check if autofix and extract messages were successful
         if: ${{ steps.autofix.outcome != 'success' || steps.extract-messages.outcome != 'success' }}
