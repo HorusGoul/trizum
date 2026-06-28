@@ -58,9 +58,8 @@ export function AppWorkerRecoveryDialog() {
                 </h2>
                 <p className="text-sm text-accent-700 dark:text-accent-50">
                   <Trans>
-                    Background work stopped responding, so balances may stop updating. Restart
-                    trizum to recover. If this keeps happening, check for updates or contact
-                    support.
+                    Something is not working properly. Restart trizum to recover. If this keeps
+                    happening, check for updates or contact support.
                   </Trans>
                 </p>
               </div>

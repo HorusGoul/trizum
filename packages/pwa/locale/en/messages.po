@@ -312,10 +312,6 @@ msgstr "Back to settings"
 msgid "Back to sign in"
 msgstr "Back to sign in"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:60
-msgid "Background work stopped responding, so balances may stop updating. Restart trizum to recover. If this keeps happening, check for updates or contact support."
-msgstr "Background work stopped responding, so balances may stop updating. Restart trizum to recover. If this keeps happening, check for updates or contact support."
-
 #: src/components/CalculatorToolbar.tsx:703
 msgid "Backspace"
 msgstr "Backspace"
@@ -2130,7 +2126,7 @@ msgstr "Report Issues"
 msgid "Reset password"
 msgstr "Reset password"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:77
+#: src/components/AppWorkerRecoveryDialog.tsx:76
 msgid "Restart app"
 msgstr "Restart app"
 
@@ -2386,6 +2382,10 @@ msgstr "Solomon Islands Dollar"
 #: src/routes/new/route.tsx:296
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
+
+#: src/components/AppWorkerRecoveryDialog.tsx:60
+msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
+msgstr "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 
 #: src/routes/migrate_.tricount/-components/FinishedStates.tsx:34
 msgid "Something went wrong"
