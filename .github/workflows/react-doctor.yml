@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   issues: write
+  pull-requests: write
 
 concurrency:
   group: react-doctor-${{ github.event.pull_request.number || github.ref }}
