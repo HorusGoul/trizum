@@ -62,7 +62,11 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
 
   process.stdout.write(`${result.report}\n`);
   if (result.supersedingPullRequest?.prUrl != null) {
-    process.stdout.write(`\nSuperseding PR: ${result.supersedingPullRequest.prUrl}\n`);
+    const label =
+      result.supersedingPullRequest.updatedOriginalPr === true
+        ? "Updated original PR"
+        : "Superseding PR";
+    process.stdout.write(`\n${label}: ${result.supersedingPullRequest.prUrl}\n`);
   }
   if (result.labelAppliedTo != null) {
     process.stdout.write(
