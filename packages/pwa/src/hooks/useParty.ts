@@ -215,11 +215,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     lastChunkHandle.change((doc) => {
       insertAt(doc.expenses, 0, expenseWithHash);
     });
-    lastChunk = lastChunkHandle.doc();
-
-    if (!lastChunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
 
     handle.change((party) => {
       let existingLastChunkRef = party.chunkRefs.find(
@@ -230,24 +225,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         existingLastChunkRef = lastChunkRef;
         insertAt(party.chunkRefs, 0, existingLastChunkRef);
       }
-    });
-
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(
-      lastChunkRef.balancesId,
-    );
-    const lastChunkBalances = lastChunkBalancesHandle.doc();
-
-    if (!lastChunkBalances) {
-      throw new Error("Chunk balances not found, this should not happen");
-    }
-
-    const balancesByParticipant = calculateBalancesByParticipant(
-      lastChunk.expenses,
-      party.participants,
-    );
-
-    lastChunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
 
     return expenseWithHash;
@@ -269,7 +246,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    let chunk = chunkHandle.doc();
+    const chunk = chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -286,28 +263,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
       delete expenseEntry.__editCopy;
       delete expenseEntry.__editCopyLastUpdatedAt;
-    });
-
-    chunk = chunkHandle.doc();
-
-    if (!chunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
-    const lastChunkBalances = lastChunkBalancesHandle.doc();
-
-    if (!lastChunkBalances) {
-      throw new Error("Chunk balances not found, this should not happen");
-    }
-
-    const balancesByParticipant = calculateBalancesByParticipant(
-      chunk.expenses,
-      party.participants,
-    );
-
-    lastChunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
     });
   }
 
@@ -327,7 +282,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-    let chunk = chunkHandle.doc();
+    const chunk = chunkHandle.doc();
 
     if (!chunk) {
       throw new Error("Chunk not found, this should not happen");
@@ -342,29 +297,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
       deleteAt(doc.expenses, expenseIndex);
     });
-
-    chunk = chunkHandle.doc();
-
-    if (!chunk) {
-      throw new Error("Chunk not found, this should not happen");
-    }
-
-    const lastChunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
-    const lastChunkBalances = lastChunkBalancesHandle.doc();
-
-    if (!lastChunkBalances) {
-      throw new Error("Chunk balances not found, this should not happen");
-    }
-
-    const balancesByParticipant = calculateBalancesByParticipant(
-      chunk.expenses,
-      party.participants,
-    );
-
-    lastChunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
-    });
-    lastChunkBalancesHandle.doc();
 
     return true;
   }

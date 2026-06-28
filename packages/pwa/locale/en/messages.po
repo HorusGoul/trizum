@@ -324,15 +324,15 @@ msgstr "Bahamian Dollar"
 msgid "Bahraini Dinar"
 msgstr "Bahraini Dinar"
 
-#: src/routes/party.$partyId/route.tsx:177
+#: src/routes/party.$partyId/route.tsx:186
 msgid "Balance, Highest First"
 msgstr "Balance, Highest First"
 
-#: src/routes/party.$partyId/route.tsx:161
+#: src/routes/party.$partyId/route.tsx:170
 msgid "Balance, Lowest First"
 msgstr "Balance, Lowest First"
 
-#: src/routes/party.$partyId/route.tsx:309
+#: src/routes/party.$partyId/route.tsx:318
 msgid "Balances"
 msgstr "Balances"
 
@@ -1018,7 +1018,7 @@ msgstr "Expense Split Mode"
 msgid "Expense updated"
 msgstr "Expense updated"
 
-#: src/routes/party.$partyId/route.tsx:303
+#: src/routes/party.$partyId/route.tsx:312
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -1422,7 +1422,7 @@ msgstr "Last used"
 msgid "Last year"
 msgstr "Last year"
 
-#: src/routes/party.$partyId/route.tsx:287
+#: src/routes/party.$partyId/route.tsx:296
 msgid "Leave party"
 msgstr "Leave party"
 
@@ -1522,7 +1522,7 @@ msgstr "Me"
 #: src/components/ExpenseEditor.tsx:341
 #: src/routes/index/route.tsx:115
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:88
-#: src/routes/party.$partyId/route.tsx:191
+#: src/routes/party.$partyId/route.tsx:200
 msgid "Menu"
 msgstr "Menu"
 
@@ -1595,7 +1595,7 @@ msgstr "Myanma Kyat"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:28
-#: src/routes/party.$partyId/route.tsx:145
+#: src/routes/party.$partyId/route.tsx:154
 msgid "Name"
 msgstr "Name"
 
@@ -1758,7 +1758,7 @@ msgstr "Older parties stay tucked away, not gone"
 msgid "Omani Rial"
 msgstr "Omani Rial"
 
-#: src/routes/party.$partyId/route.tsx:232
+#: src/routes/party.$partyId/route.tsx:241
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
@@ -1981,7 +1981,7 @@ msgstr "People that owe you money"
 msgid "Permanently delete your trizum cloud account"
 msgstr "Permanently delete your trizum cloud account"
 
-#: src/routes/party.$partyId/route.tsx:228
+#: src/routes/party.$partyId/route.tsx:237
 msgid "Personal mode"
 msgstr "Personal mode"
 
@@ -2201,7 +2201,7 @@ msgstr "Search emoji..."
 msgid "Security"
 msgstr "Security"
 
-#: src/routes/party.$partyId/route.tsx:255
+#: src/routes/party.$partyId/route.tsx:264
 msgid "See spending totals and rankings"
 msgstr "See spending totals and rankings"
 
@@ -2238,7 +2238,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/index/route.tsx:126
-#: src/routes/party.$partyId/route.tsx:280
+#: src/routes/party.$partyId/route.tsx:289
 #: src/routes/settings.tsx:263
 msgid "Settings"
 msgstr "Settings"
@@ -2257,7 +2257,7 @@ msgstr "Seychellois Rupee"
 
 #: src/routes/party_.$partyId.share.tsx:55
 #: src/routes/party_.$partyId.share.tsx:90
-#: src/routes/party.$partyId/route.tsx:268
+#: src/routes/party.$partyId/route.tsx:277
 msgid "Share party"
 msgstr "Share party"
 
@@ -2378,7 +2378,7 @@ msgstr "Somali Shilling"
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: src/routes/party.$partyId/route.tsx:137
+#: src/routes/party.$partyId/route.tsx:146
 msgid "Sort balances"
 msgstr "Sort balances"
 
@@ -2423,7 +2423,7 @@ msgstr "Start date"
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
-#: src/routes/party.$partyId/route.tsx:251
+#: src/routes/party.$partyId/route.tsx:260
 msgid "Stats"
 msgstr "Stats"
 
@@ -2534,7 +2534,7 @@ msgstr "Take photo"
 msgid "Tanzanian Shilling"
 msgstr "Tanzanian Shilling"
 
-#: src/routes/party.$partyId/route.tsx:214
+#: src/routes/party.$partyId/route.tsx:223
 msgid "Tap to change"
 msgstr "Tap to change"
 
@@ -2942,7 +2942,7 @@ msgstr "View Third-Party Licenses"
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
-#: src/routes/party.$partyId/route.tsx:210
+#: src/routes/party.$partyId/route.tsx:219
 msgid "Viewing as {participantName}"
 msgstr "Viewing as {participantName}"
 
@@ -3023,7 +3023,7 @@ msgstr "You can add photos to your expenses for better tracking."
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "You can only transfer debt from actions where you are the one who owes the money."
 
-#: src/routes/party.$partyId/route.tsx:102
+#: src/routes/party.$partyId/route.tsx:111
 msgid "You left the party!"
 msgstr "You left the party!"
 

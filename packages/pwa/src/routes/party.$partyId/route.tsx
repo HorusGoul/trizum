@@ -67,24 +67,33 @@ function PartyById() {
     });
   }
 
-  const didRecalculateBalances = useRef(false);
+  const lastRecalculatedBalancesPartyIdRef = useRef<string | null>(null);
   const { setLastOpenedPartyId } = usePartyList();
   const lastRecordedPartyIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (selectedTab !== "balances" || didRecalculateBalances.current) {
+    if (selectedTab !== "balances") {
+      lastRecalculatedBalancesPartyIdRef.current = null;
+      return;
+    }
+
+    if (lastRecalculatedBalancesPartyIdRef.current === partyId) {
       return;
     }
 
     const idleCallback = requestIdleCallback(() => {
-      didRecalculateBalances.current = true;
-      recalculateBalances().catch(() => null);
+      lastRecalculatedBalancesPartyIdRef.current = partyId;
+      recalculateBalances().catch(() => {
+        if (lastRecalculatedBalancesPartyIdRef.current === partyId) {
+          lastRecalculatedBalancesPartyIdRef.current = null;
+        }
+      });
     });
 
     return () => {
       cancelIdleCallback(idleCallback);
     };
-  }, [selectedTab, recalculateBalances]);
+  }, [partyId, selectedTab, recalculateBalances]);
 
   useEffect(() => {
     if (!partyId || lastRecordedPartyIdRef.current === partyId) {
