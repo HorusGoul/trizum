@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "gitIgnoredAuthors": ["renovate-lockfile@trizum.app"],
+  "gitIgnoredAuthors": ["trizum-agent@trizum.app"],
   "packageRules": [
     {
       "description": "Skip Renovate's native npm lockfile artifact updates; the Renovate Lockfiles workflow refreshes pnpm-lock.yaml with Vite+.",
