@@ -17,6 +17,8 @@ The workflow:
 - queues runs instead of canceling in progress so a newer Renovate branch push
   does not stop an in-flight lockfile refresh while it may be about to commit,
 - skips commits authored by `trizum-agent@trizum.app`,
+- disables setup-vp's automatic install because Renovate's initial lockfile can
+  be out of sync with the updated manifests,
 - runs:
 
 ```sh
