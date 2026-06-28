@@ -1,2 +1,5 @@
 /*
   Document-Policy: js-profiling
+
+/party/*
+  X-Robots-Tag: noindex, nofollow
