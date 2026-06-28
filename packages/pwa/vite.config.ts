@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { getConfig as getLinguiConfig } from "@lingui/conf";
 import type { Plugin } from "vite-plus";
-import { configDefaults, defineConfig } from "vite-plus";
+import { configDefaults, defineConfig, perEnvironmentPlugin } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import babel from "@rolldown/plugin-babel";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
@@ -146,7 +146,7 @@ export default defineConfig(({ mode }) => {
         presets: [reactCompilerPreset],
       }),
       wasm() as Plugin,
-      topLevelAwait(),
+      clientTopLevelAwaitPlugin(),
       lingui({
         cwd: packageRoot,
         configPath: linguiConfigPath,
@@ -274,6 +274,12 @@ function appendSourceMappingURLPlugin(): Plugin {
       }
     },
   };
+}
+
+function clientTopLevelAwaitPlugin(): Plugin {
+  return perEnvironmentPlugin("trizum-client-top-level-await", (environment) =>
+    environment.config.consumer === "client" ? topLevelAwait() : false,
+  );
 }
 
 function sentrySourcemapsPlugin(): Plugin {
