@@ -312,15 +312,15 @@ msgstr "Dólar Bahameño"
 msgid "Bahraini Dinar"
 msgstr "Dinar Bareiní"
 
-#: src/routes/party.$partyId/route.tsx:177
+#: src/routes/party.$partyId/route.tsx:186
 msgid "Balance, Highest First"
 msgstr "Balance, Mayor Primero"
 
-#: src/routes/party.$partyId/route.tsx:161
+#: src/routes/party.$partyId/route.tsx:170
 msgid "Balance, Lowest First"
 msgstr "Balance, Menor Primero"
 
-#: src/routes/party.$partyId/route.tsx:309
+#: src/routes/party.$partyId/route.tsx:318
 msgid "Balances"
 msgstr "Balance"
 
@@ -978,7 +978,7 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
-#: src/routes/party.$partyId/route.tsx:303
+#: src/routes/party.$partyId/route.tsx:312
 msgid "Expenses"
 msgstr "Gastos"
 
@@ -1370,7 +1370,7 @@ msgstr "Último uso"
 msgid "Last year"
 msgstr "Año pasado"
 
-#: src/routes/party.$partyId/route.tsx:287
+#: src/routes/party.$partyId/route.tsx:296
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
@@ -1470,7 +1470,7 @@ msgstr "Yo"
 #: src/components/ExpenseEditor.tsx:341
 #: src/routes/index/route.tsx:115
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:88
-#: src/routes/party.$partyId/route.tsx:191
+#: src/routes/party.$partyId/route.tsx:200
 msgid "Menu"
 msgstr "Menú"
 
@@ -1543,7 +1543,7 @@ msgstr "Kyat Birmano"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:28
-#: src/routes/party.$partyId/route.tsx:145
+#: src/routes/party.$partyId/route.tsx:154
 msgid "Name"
 msgstr "Nombre"
 
@@ -1702,7 +1702,7 @@ msgstr "Los grupos antiguos quedan apartados, no desaparecen"
 msgid "Omani Rial"
 msgstr "Rial Omaní"
 
-#: src/routes/party.$partyId/route.tsx:232
+#: src/routes/party.$partyId/route.tsx:241
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
@@ -1913,7 +1913,7 @@ msgstr "Personas que te deben dinero"
 msgid "Permanently delete your trizum cloud account"
 msgstr "Eliminar permanentemente tu cuenta de trizum cloud"
 
-#: src/routes/party.$partyId/route.tsx:228
+#: src/routes/party.$partyId/route.tsx:237
 msgid "Personal mode"
 msgstr "Modo personal"
 
@@ -2129,7 +2129,7 @@ msgstr "Buscar emoji..."
 msgid "Security"
 msgstr "Seguridad"
 
-#: src/routes/party.$partyId/route.tsx:255
+#: src/routes/party.$partyId/route.tsx:264
 msgid "See spending totals and rankings"
 msgstr "Ver totales y clasificación de gasto"
 
@@ -2166,7 +2166,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/index/route.tsx:126
-#: src/routes/party.$partyId/route.tsx:280
+#: src/routes/party.$partyId/route.tsx:289
 #: src/routes/settings.tsx:263
 msgid "Settings"
 msgstr "Configuración"
@@ -2185,7 +2185,7 @@ msgstr "Rupia de Seychelles"
 
 #: src/routes/party_.$partyId.share.tsx:55
 #: src/routes/party_.$partyId.share.tsx:90
-#: src/routes/party.$partyId/route.tsx:268
+#: src/routes/party.$partyId/route.tsx:277
 msgid "Share party"
 msgstr "Compartir grupo"
 
@@ -2302,7 +2302,7 @@ msgstr "Chelín Somalí"
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/party.$partyId/route.tsx:137
+#: src/routes/party.$partyId/route.tsx:146
 msgid "Sort balances"
 msgstr "Ordenar balances"
 
@@ -2347,7 +2347,7 @@ msgstr "Fecha de inicio"
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
 
-#: src/routes/party.$partyId/route.tsx:251
+#: src/routes/party.$partyId/route.tsx:260
 msgid "Stats"
 msgstr "Estadísticas"
 
@@ -2458,7 +2458,7 @@ msgstr "Hacer foto"
 msgid "Tanzanian Shilling"
 msgstr "Chelín Tanzano"
 
-#: src/routes/party.$partyId/route.tsx:214
+#: src/routes/party.$partyId/route.tsx:223
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
@@ -2845,7 +2845,7 @@ msgstr "Ver Licencias de Terceros"
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
-#: src/routes/party.$partyId/route.tsx:210
+#: src/routes/party.$partyId/route.tsx:219
 msgid "Viewing as {participantName}"
 msgstr "Viendo como {participantName}"
 
@@ -2922,7 +2922,7 @@ msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe el dinero."
 
-#: src/routes/party.$partyId/route.tsx:102
+#: src/routes/party.$partyId/route.tsx:111
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
