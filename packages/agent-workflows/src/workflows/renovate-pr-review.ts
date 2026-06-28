@@ -60,6 +60,8 @@ const MAX_DIFF_BYTES = 180_000;
 const MAX_LOG_BYTES = 40_000;
 const MAX_USAGE_MATCHES = 200;
 const MAX_DEPENDENCY_METADATA = 12;
+const BOT_COMMIT_CO_AUTHOR = "Horus Lugo <horusgoul@gmail.com>";
+const BOT_COMMIT_CO_AUTHOR_TRAILER = `Co-authored-by: ${BOT_COMMIT_CO_AUTHOR}`;
 
 interface LocalValidationResult {
   output: string;
@@ -342,11 +344,13 @@ function decideReview(bundle: ReviewBundle): ReviewDecision {
 
   if (foundIssues) {
     return {
-      action: "needs-human",
+      action: bundle.context.pr.isDraft ? "needs-human" : "supersede-original",
       blockingFindings,
       foundIssues,
       review: bundle,
-      summary: "The review found blocking issues that need attention.",
+      summary: bundle.context.pr.isDraft
+        ? "The review found blocking issues that need attention."
+        : "The review found blocking issues and should be superseded if write mode is enabled.",
     };
   }
 
@@ -430,16 +434,35 @@ async function ghJson<T>(options: WorkflowOptions, ...args: string[]): Promise<T
 async function gh(
   options: WorkflowOptions,
   args: readonly string[],
-  commandOptions: { allowFailure?: boolean; cwd?: string } = {},
+  commandOptions: { allowFailure?: boolean; cwd?: string; input?: string } = {},
 ) {
-  return runCommand("gh", withRepoArgs(options, args), {
+  return runCommand("gh", withRepoArgsForCommand(options, args), {
     allowFailure: commandOptions.allowFailure,
     cwd: commandOptions.cwd ?? options.repoRoot,
+    input: commandOptions.input,
   });
 }
 
-function withRepoArgs(options: WorkflowOptions, args: readonly string[]): string[] {
+function withRepoArgsForCommand(options: WorkflowOptions, args: readonly string[]): string[] {
+  if (args[0] === "api") {
+    return [...args];
+  }
+
   return options.repository == null ? [...args] : [...args, "--repo", options.repository];
+}
+
+function repositoryApiPath(options: WorkflowOptions, path: string): string {
+  const normalizedPath = path.replace(/^\/+/, "");
+  if (options.repository == null) {
+    return `repos/:owner/:repo/${normalizedPath}`;
+  }
+
+  const [owner, repo, ...extra] = options.repository.split("/");
+  if (!owner || !repo || extra.length > 0) {
+    throw new Error(`Expected repository in owner/name format, received: ${options.repository}`);
+  }
+
+  return `repos/${owner}/${repo}/${normalizedPath}`;
 }
 
 async function readPrCheckStatus(options: WorkflowOptions, prNumber?: number) {
@@ -609,16 +632,38 @@ function stringFromUnknown(value: unknown): string | undefined {
 }
 
 async function ensureReadyLabel(options: WorkflowOptions): Promise<void> {
-  await gh(options, [
-    "label",
-    "create",
-    options.readyForHumanReviewLabel,
-    "--description",
-    "Ready for a human reviewer after agent workflow review.",
-    "--color",
-    "0E8A16",
-    "--force",
-  ]);
+  const body = JSON.stringify({
+    color: "0E8A16",
+    description: "Ready for a human reviewer after agent workflow review.",
+    name: options.readyForHumanReviewLabel,
+  });
+  const createResult = await gh(
+    options,
+    ["api", "--method", "POST", repositoryApiPath(options, "labels"), "--input", "-"],
+    {
+      allowFailure: true,
+      input: body,
+    },
+  );
+
+  if (createResult.exitCode === 0) {
+    return;
+  }
+
+  await gh(
+    options,
+    [
+      "api",
+      "--method",
+      "PATCH",
+      repositoryApiPath(options, `labels/${encodeURIComponent(options.readyForHumanReviewLabel)}`),
+      "--input",
+      "-",
+    ],
+    {
+      input: body,
+    },
+  );
 }
 
 async function addLabelToIssue(
@@ -626,7 +671,22 @@ async function addLabelToIssue(
   issueNumber: number,
   label: string,
 ): Promise<void> {
-  await gh(options, ["issue", "edit", String(issueNumber), "--add-label", label]);
+  await gh(
+    options,
+    [
+      "api",
+      "--method",
+      "POST",
+      repositoryApiPath(options, `issues/${issueNumber}/labels`),
+      "--input",
+      "-",
+    ],
+    {
+      input: JSON.stringify({
+        labels: [label],
+      }),
+    },
+  );
 }
 
 async function commentOnPullRequest(
@@ -634,7 +694,22 @@ async function commentOnPullRequest(
   prNumber: number,
   body: string,
 ): Promise<void> {
-  await gh(options, ["pr", "comment", String(prNumber), "--body", body]);
+  await gh(
+    options,
+    [
+      "api",
+      "--method",
+      "POST",
+      repositoryApiPath(options, `issues/${prNumber}/comments`),
+      "--input",
+      "-",
+    ],
+    {
+      input: JSON.stringify({
+        body,
+      }),
+    },
+  );
 }
 
 async function createSupersedingPullRequest(
@@ -652,11 +727,21 @@ async function createSupersedingPullRequest(
       ["fetch", "origin", context.pr.headRefName],
       options.repoRoot,
     );
+    const originalPrHead = (
+      await runCommand("git", ["rev-parse", "FETCH_HEAD"], {
+        cwd: options.repoRoot,
+      })
+    ).stdout.trim();
     await runCommand("git", ["branch", branchName, "FETCH_HEAD"], {
       cwd: options.repoRoot,
     });
 
-    const sandcastleRun = await runSandcastleCodexFix(context, options.repoRoot, branchName);
+    const sandcastleRun = await runSandcastleCodexFix(
+      context,
+      options.repoRoot,
+      branchName,
+      report,
+    );
     worktreeRoot = sandcastleRun.preservedWorktreePath;
     if (worktreeRoot == null) {
       worktreeRoot = await mkdtemp(path.join(tmpdir(), "trizum-renovate-"));
@@ -673,7 +758,12 @@ async function createSupersedingPullRequest(
         };
 
     const fallbackCommitCreated = await commitPendingAgentChanges(worktreeRoot, context);
-    const sandcastleSummary = renderSandcastleSummary(sandcastleRun, fallbackCommitCreated);
+    const agentCommits = await ensureCoAuthorOnSupersedingCommits(worktreeRoot, originalPrHead);
+    const sandcastleSummary = renderSandcastleSummary(
+      sandcastleRun,
+      fallbackCommitCreated,
+      agentCommits,
+    );
 
     await runGitWithOptionalCredentials(["push", "-u", "origin", branchName], worktreeRoot);
 
@@ -685,7 +775,6 @@ async function createSupersedingPullRequest(
       localValidation,
     );
     await writeFile(bodyPath, body, "utf8");
-    const labelArgs = localValidation.passed ? ["--label", options.readyForHumanReviewLabel] : [];
     const createResult = await gh(
       options,
       [
@@ -699,20 +788,21 @@ async function createSupersedingPullRequest(
         context.pr.title,
         "--body-file",
         bodyPath,
-        ...labelArgs,
+        "--label",
+        options.readyForHumanReviewLabel,
       ],
       { cwd: worktreeRoot },
     );
 
     const prUrl = createResult.stdout.trim();
     const supersedingPrNumber = await readPullRequestNumberFromUrl(options, prUrl, worktreeRoot);
-    if (localValidation.passed && supersedingPrNumber != null) {
+    if (supersedingPrNumber != null) {
       await addLabelToIssue(options, supersedingPrNumber, options.readyForHumanReviewLabel);
     }
 
     return {
       branchName,
-      agentCommits: sandcastleRun.commits,
+      agentCommits,
       agentLogPath: sandcastleRun.logFilePath,
       localValidationOutput: localValidation.output,
       localValidationPassed: localValidation.passed,
@@ -777,6 +867,7 @@ async function runGitWithOptionalCredentials(
 async function runLocalValidation(worktreeRoot: string): Promise<LocalValidationResult> {
   const codexAuthCache = await hideCodexAuthCache();
   const commands = [
+    ["vp", "install", "--frozen-lockfile", "--ignore-scripts", "--prefer-offline"],
     ["vp", "run", "check"],
     ["vp", "run", "test"],
     ["vp", "run", "build"],
@@ -880,13 +971,86 @@ async function commitPendingAgentChanges(
   await runCommand("git", ["add", "-A"], {
     cwd: worktreeRoot,
   });
-  await runCommand(
-    "git",
-    ["commit", "-m", `chore(deps): complete Renovate PR #${context.pr.number}`],
-    {
-      cwd: worktreeRoot,
-    },
+  await runCommand("git", ["commit", "-m", buildFallbackCommitMessage(context.pr.number)], {
+    cwd: worktreeRoot,
+  });
+  return true;
+}
+
+function buildFallbackCommitMessage(prNumber: number): string {
+  return [`chore(deps): complete Renovate PR #${prNumber}`, "", BOT_COMMIT_CO_AUTHOR_TRAILER].join(
+    "\n",
   );
+}
+
+async function ensureCoAuthorOnSupersedingCommits(
+  worktreeRoot: string,
+  originalPrHead: string,
+): Promise<string[]> {
+  const commitsBefore = await listCommitsAfter(worktreeRoot, originalPrHead);
+  if (commitsBefore.length === 0) {
+    return [];
+  }
+
+  if (await allCommitsHaveCoAuthor(worktreeRoot, commitsBefore)) {
+    return commitsBefore;
+  }
+
+  const scriptRoot = await mkdtemp(path.join(tmpdir(), "trizum-coauthor-"));
+  const scriptPath = path.join(scriptRoot, "coauthor.sh");
+
+  try {
+    await writeFile(
+      scriptPath,
+      [
+        "#!/bin/sh",
+        "set -eu",
+        `trailer='${BOT_COMMIT_CO_AUTHOR_TRAILER}'`,
+        'if git log -1 --format=%B | grep -Fqx "$trailer"; then',
+        "  exit 0",
+        "fi",
+        'git commit --amend --no-edit --trailer "$trailer"',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    await chmod(scriptPath, 0o700);
+    await runCommand("git", ["rebase", "--exec", scriptPath, originalPrHead], {
+      cwd: worktreeRoot,
+    });
+  } catch (error) {
+    await runCommand("git", ["rebase", "--abort"], {
+      allowFailure: true,
+      cwd: worktreeRoot,
+    });
+    throw error;
+  } finally {
+    await rm(scriptRoot, { force: true, recursive: true });
+  }
+
+  return listCommitsAfter(worktreeRoot, originalPrHead);
+}
+
+async function listCommitsAfter(worktreeRoot: string, baseCommit: string): Promise<string[]> {
+  const result = await runCommand("git", ["rev-list", "--reverse", `${baseCommit}..HEAD`], {
+    cwd: worktreeRoot,
+  });
+  return splitLines(result.stdout);
+}
+
+async function allCommitsHaveCoAuthor(
+  worktreeRoot: string,
+  commits: readonly string[],
+): Promise<boolean> {
+  for (const commit of commits) {
+    const result = await runCommand("git", ["log", "-1", "--format=%B", commit], {
+      cwd: worktreeRoot,
+    });
+    if (!splitLines(result.stdout).includes(BOT_COMMIT_CO_AUTHOR_TRAILER)) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -982,39 +1146,92 @@ function renderSupersedingPullRequestBody(
   agentSummary: string,
   localValidation: LocalValidationResult,
 ): string {
+  const reviewSummary = firstParagraph(extractMarkdownSection(report, "Summary"));
+  const findings = extractMarkdownListItems(report, "Findings", 2);
+
   return redactSecrets(
     [
       `Supersedes #${context.pr.number}.`,
       "",
-      "This PR keeps the original Renovate update purpose and includes agent-applied fixes needed to make the update reviewable.",
+      "## Summary",
+      `- Purpose: ${renderDependencyUpdateSummary(context)}.`,
+      `- Agent fix: ${truncateText(firstParagraph(agentSummary), 700)}`,
       "",
-      "## Sandcastle Codex Summary",
-      truncateText(agentSummary, 12_000),
+      "## Review",
+      reviewSummary || "See the workflow logs for the full agent review.",
+      findings.length === 0 ? "" : findings.map((finding) => `- ${finding}`).join("\n"),
       "",
       "## Local Validation",
-      `Status: ${localValidation.passed ? "passed" : "failed"}`,
-      "",
-      "```text",
-      truncateText(localValidation.output, 30_000),
-      "```",
-      "",
-      report,
-    ].join("\n"),
+      `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
+      renderValidationCommandBullets(localValidation.output),
+      "- CI on this PR is the source of truth for merge readiness.",
+    ]
+      .filter(Boolean)
+      .join("\n"),
   );
+}
+
+function renderDependencyUpdateSummary(context: PullRequestContext): string {
+  if (context.dependencyUpdates.length === 0) {
+    return context.pr.title;
+  }
+
+  return context.dependencyUpdates
+    .slice(0, 4)
+    .map((update) => `${update.name} ${update.from ?? "unknown"} -> ${update.to ?? "unknown"}`)
+    .join(", ");
+}
+
+function renderValidationCommandBullets(output: string): string {
+  const commands = splitLines(output)
+    .filter((line) => line.startsWith("$ "))
+    .map((line) => line.slice(2))
+    .slice(0, 6);
+
+  if (commands.length === 0) {
+    return "- No local validation commands were reported.";
+  }
+
+  return commands.map((command) => `- \`${command}\``).join("\n");
+}
+
+function extractMarkdownSection(markdown: string, heading: string): string {
+  const lines = splitLines(markdown);
+  const startIndex = lines.findIndex((line) => line.trim() === `### ${heading}`);
+  if (startIndex === -1) {
+    return "";
+  }
+
+  const sectionLines: string[] = [];
+  for (const line of lines.slice(startIndex + 1)) {
+    if (line.startsWith("### ")) {
+      break;
+    }
+    sectionLines.push(line);
+  }
+
+  return sectionLines.join("\n").trim();
+}
+
+function extractMarkdownListItems(markdown: string, heading: string, maxItems: number): string[] {
+  return splitLines(extractMarkdownSection(markdown, heading))
+    .filter((line) => line.startsWith("- "))
+    .map((line) => line.slice(2))
+    .filter((line) => line !== "No findings.")
+    .slice(0, maxItems);
 }
 
 function renderSandcastleSummary(
   sandcastleRun: SandcastleFixRun,
   fallbackCommitCreated: boolean,
+  agentCommits: readonly string[] = sandcastleRun.commits,
 ): string {
   return redactSecrets(
     [
       sandcastleRun.summary || "Sandcastle Codex run completed without a text summary.",
       "",
       `Branch: ${sandcastleRun.branchName}`,
-      `Commits reported by Sandcastle: ${
-        sandcastleRun.commits.length === 0 ? "none" : sandcastleRun.commits.join(", ")
-      }`,
+      `Superseding branch commits: ${agentCommits.length === 0 ? "none" : agentCommits.join(", ")}`,
       fallbackCommitCreated ? "A fallback workflow commit captured uncommitted agent changes." : "",
       sandcastleRun.logFilePath == null ? "" : `Sandcastle log: ${sandcastleRun.logFilePath}`,
     ]

@@ -38,6 +38,7 @@ export async function runCommand(
   const displayCommand = [command, ...args].join(" ");
 
   const result = await new Promise<CommandResult>((resolve, reject) => {
+    let settled = false;
     const child = spawn(command, args, {
       cwd: options.cwd,
       env: resolveCommandEnvironment(options),
@@ -62,7 +63,28 @@ export async function runCommand(
       stderrChunks.push(chunk);
     });
 
+    const settle = (result: CommandResult) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      if (timeout != null) {
+        clearTimeout(timeout);
+      }
+      resolve(result);
+    };
+
     child.on("error", (error) => {
+      if (options.allowFailure === true) {
+        settle({
+          command: displayCommand,
+          exitCode: 127,
+          stderr: error instanceof Error ? error.message : String(error),
+          stdout: "",
+        });
+        return;
+      }
+
       if (timeout != null) {
         clearTimeout(timeout);
       }
@@ -70,12 +92,8 @@ export async function runCommand(
     });
 
     child.on("close", (code, signal) => {
-      if (timeout != null) {
-        clearTimeout(timeout);
-      }
-
       const exitCode = code ?? (signal == null ? 1 : 128);
-      resolve({
+      settle({
         command: displayCommand,
         exitCode,
         stderr: Buffer.concat(stderrChunks).toString("utf8"),
