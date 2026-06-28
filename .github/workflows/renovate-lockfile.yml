@@ -31,6 +31,7 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - uses: voidzero-dev/setup-vp@v1
         with:
