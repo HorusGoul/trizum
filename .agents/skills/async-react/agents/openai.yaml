@@ -1,0 +1,4 @@
+interface:
+  display_name: "Async React"
+  short_description: "Build action-prop async React UI"
+  default_prompt: "Use $async-react to design an interaction with action props, transitions, and optimistic UI."

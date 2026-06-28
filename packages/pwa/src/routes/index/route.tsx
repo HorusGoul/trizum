@@ -7,14 +7,13 @@ import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrderi
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { cn } from "#src/ui/utils.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
-import { use, useState } from "react";
+import { use } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
@@ -69,7 +68,6 @@ function Index() {
   const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;
   const needsProfileSetup = !partyList.username || partyList.username.trim() === "";
@@ -91,23 +89,14 @@ function Index() {
 
           {isUpdateAvailable ? (
             <IconButton
-              icon={isUpdating ? "lucide.refresh-cw" : "lucide.circle-arrow-down"}
+              icon="lucide.circle-arrow-down"
               aria-label={t`Update available`}
-              onPress={async () => {
-                setIsUpdating(true);
-                try {
-                  const result = await update();
-                  showUpdateResultFeedback(result);
-                } finally {
-                  setIsUpdating(false);
-                }
+              pressAction={async () => {
+                const result = await update();
+                showUpdateResultFeedback(result);
               }}
               className="mr-2"
-              iconClassName={cn(
-                "duration-1000 ease-in-out",
-                isUpdating ? "animate-spin" : "animate-pulse",
-              )}
-              isDisabled={isUpdating}
+              iconClassName="animate-pulse duration-1000 ease-in-out"
             />
           ) : null}
 

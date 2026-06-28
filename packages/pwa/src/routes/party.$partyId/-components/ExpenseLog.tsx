@@ -58,7 +58,7 @@ export function ExpenseLog() {
               <Popover placement="top end" offset={16}>
                 <Menu className="min-w-60">
                   {import.meta.env.DEV ? (
-                    <MenuItem onAction={() => void dev.createTestExpenses()}>
+                    <MenuItem menuAction={dev.createTestExpenses}>
                       <Icon
                         icon="lucide.test-tube-diagonal"
                         width={20}

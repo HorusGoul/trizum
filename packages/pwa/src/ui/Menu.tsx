@@ -1,5 +1,6 @@
 import type { MenuProps, MenuItemProps } from "react-aria-components";
 import { Menu as AriaMenu, MenuItem as AriaMenuItem } from "react-aria-components";
+import { useActionProp, type AsyncAction } from "./useActionProp";
 import { cn } from "./utils";
 
 export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
@@ -14,7 +15,18 @@ export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
   );
 }
 
-export function MenuItem<T extends object>({ className, ...props }: MenuItemProps<T>) {
+export function MenuItem<T extends object>({
+  className,
+  isDisabled,
+  menuAction,
+  onAction,
+  ...props
+}: MenuItemProps<T> & { menuAction?: AsyncAction }) {
+  const { isPending, runAction } = useActionProp({
+    action: menuAction,
+    onAction,
+  });
+
   return (
     <AriaMenuItem
       className={({ defaultClassName, isPressed, isHovered, isFocusVisible }) =>
@@ -23,9 +35,12 @@ export function MenuItem<T extends object>({ className, ...props }: MenuItemProp
           className,
           "flex items-center bg-accent-900 bg-opacity-0 px-4 py-4 outline-none transition-all dark:bg-accent-50 dark:bg-opacity-0",
           (isFocusVisible || isHovered) && "bg-opacity-5 dark:bg-opacity-5",
-          isPressed && "bg-opacity-10 dark:bg-opacity-10",
+          isPressed && !isPending && "bg-opacity-10 dark:bg-opacity-10",
+          "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         )
       }
+      isDisabled={isDisabled || isPending}
+      onAction={runAction}
       {...props}
     />
   );

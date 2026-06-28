@@ -104,7 +104,7 @@ function ExpenseById() {
                     <Trans>Edit</Trans>
                   </span>
                 </MenuItem>
-                <MenuItem onAction={() => void onDeleteExpense()}>
+                <MenuItem menuAction={onDeleteExpense}>
                   <Icon icon="lucide.trash" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Delete</Trans>
