@@ -34,7 +34,7 @@ Options:
   --help                     Show this help.
 
 Environment:
-  CODEX_ACCESS_TOKEN                     Optional Codex access token for subscription/workspace auth.
+  Codex auth is read from the Codex CLI environment, such as ~/.codex/auth.json.
   TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL     Optional Sandcastle Codex model. Defaults to gpt-5.
   TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT    Optional Sandcastle Codex effort: low, medium, high, xhigh.
 `;

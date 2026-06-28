@@ -80,16 +80,49 @@ jobs:
           git config user.name "lilith[bot]"
           git config user.email "259750894+PUNK-02@users.noreply.github.com"
 
+      - name: Load Codex auth from Bitwarden
+        if: steps.pr.outputs.found == 'true'
+        uses: bitwarden/sm-action@v3
+        with:
+          access_token: ${{ secrets.BW_ACCESS_TOKEN }}
+          secrets: |
+            ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }} > CODEX_AUTH_JSON
+
+      - name: Restore Codex auth cache
+        if: steps.pr.outputs.found == 'true'
+        run: |
+          set -euo pipefail
+          if [[ -z "${CODEX_AUTH_JSON:-}" ]]; then
+            echo "::error::Bitwarden secret CODEX_AUTH_JSON is required for Codex account auth."
+            exit 1
+          fi
+
+          codex_home="${CODEX_HOME:-$HOME/.codex}"
+          auth_file="$codex_home/auth.json"
+
+          mkdir -p "$codex_home"
+          chmod 700 "$codex_home"
+          printf '%s' "$CODEX_AUTH_JSON" > "$auth_file"
+          chmod 600 "$auth_file"
+          jq -e 'type == "object"' "$auth_file" > /dev/null
+
+          auth_mode="$(jq -r '.auth_mode // empty' "$auth_file")"
+          if [[ -n "$auth_mode" && "$auth_mode" != "chatgpt" ]]; then
+            echo "::warning::Codex auth.json auth_mode is '$auth_mode', not 'chatgpt'."
+          fi
+
+          echo "CODEX_AUTH_JSON=" >> "$GITHUB_ENV"
+
       - name: Run Renovate agent review
         if: steps.pr.outputs.found == 'true'
         env:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
-          CODEX_ACCESS_TOKEN: ${{ secrets.CODEX_ACCESS_TOKEN }}
         run: |
           set -euo pipefail
-          if [[ -z "${CODEX_ACCESS_TOKEN:-}" ]]; then
-            echo "::error::CODEX_ACCESS_TOKEN is required for Codex subscription-based agent review."
+          auth_file="${CODEX_HOME:-$HOME/.codex}/auth.json"
+          if [[ ! -s "$auth_file" ]]; then
+            echo "::error::Codex auth cache is missing at $auth_file."
             exit 1
           fi
 
@@ -102,3 +135,30 @@ jobs:
             --write \
             --comment \
             --codex required
+
+      - name: Save refreshed Codex auth to Bitwarden
+        if: always() && steps.pr.outputs.found == 'true'
+        env:
+          BWS_ACCESS_TOKEN: ${{ secrets.BW_ACCESS_TOKEN }}
+          BITWARDEN_CODEX_AUTH_JSON_SECRET_ID: ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }}
+        run: |
+          set -euo pipefail
+
+          auth_file="${CODEX_HOME:-$HOME/.codex}/auth.json"
+          if [[ ! -s "$auth_file" ]]; then
+            echo "::warning::Codex auth cache is missing at $auth_file; skipping Bitwarden refresh."
+            exit 0
+          fi
+
+          if [[ -z "${BITWARDEN_CODEX_AUTH_JSON_SECRET_ID:-}" ]]; then
+            echo "::error::BITWARDEN_CODEX_AUTH_JSON_SECRET_ID is required to refresh Codex auth in Bitwarden."
+            exit 1
+          fi
+
+          compact_auth="$(jq -c . "$auth_file")"
+          docker run --rm \
+            -e BWS_ACCESS_TOKEN \
+            ghcr.io/bitwarden/bws \
+            secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
+            --value "$compact_auth" \
+            --output none

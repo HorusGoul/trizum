@@ -51,5 +51,31 @@ vp run --filter @trizum/agent-workflows renovate-pr-review -- \
 ```
 
 The workflow uses `BOT_GITHUB_SECRET` for checkout and GitHub CLI write actions,
-configures commits as `lilith[bot]`, and passes the `CODEX_ACCESS_TOKEN` secret
-to the Codex CLI invoked through Sandcastle.
+configures commits as `lilith[bot]`, restores Codex account auth from Bitwarden
+Secrets Manager, invokes Codex through Sandcastle, and writes the refreshed
+Codex auth cache back to Bitwarden after the run.
+
+Required GitHub configuration:
+
+- `BW_ACCESS_TOKEN`, a secret containing a Bitwarden Secrets Manager
+  machine-account access token with read/write access to the Codex auth secret
+- `BITWARDEN_CODEX_AUTH_JSON_SECRET_ID`, a variable containing the Bitwarden
+  secret ID for the compact `~/.codex/auth.json` value
+
+To seed or refresh that Bitwarden value, sign in locally with file-based Codex
+credential storage, then run:
+
+```sh
+export BWS_ACCESS_TOKEN="..."
+export BITWARDEN_PROJECT_ID="..."
+
+# First-time creation.
+bws secret create trizum-codex-auth-json \
+  "$(jq -c . ~/.codex/auth.json)" \
+  "$BITWARDEN_PROJECT_ID"
+
+# Later refreshes.
+export BITWARDEN_CODEX_AUTH_JSON_SECRET_ID="..."
+bws secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
+  --value "$(jq -c . ~/.codex/auth.json)"
+```
