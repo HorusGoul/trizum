@@ -432,14 +432,18 @@ async function gh(
   args: readonly string[],
   commandOptions: { allowFailure?: boolean; cwd?: string; input?: string } = {},
 ) {
-  return runCommand("gh", withRepoArgs(options, args), {
+  return runCommand("gh", withRepoArgsForCommand(options, args), {
     allowFailure: commandOptions.allowFailure,
     cwd: commandOptions.cwd ?? options.repoRoot,
     input: commandOptions.input,
   });
 }
 
-function withRepoArgs(options: WorkflowOptions, args: readonly string[]): string[] {
+function withRepoArgsForCommand(options: WorkflowOptions, args: readonly string[]): string[] {
+  if (args[0] === "api") {
+    return [...args];
+  }
+
   return options.repository == null ? [...args] : [...args, "--repo", options.repository];
 }
 
