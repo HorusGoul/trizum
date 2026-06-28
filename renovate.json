@@ -1,4 +1,261 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"]
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "description": "Keep non-major PWA runtime dependency updates together.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["packages/pwa/package.json"],
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "PWA app dependencies"
+    },
+    {
+      "description": "Keep non-major PWA build, test, and deployment tooling updates together.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["packages/pwa/package.json"],
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "PWA tooling dependencies"
+    },
+    {
+      "description": "Keep non-major sync server dependency updates together.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["packages/server/package.json"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "server dependencies"
+    },
+    {
+      "description": "Keep non-major mobile package dependency updates together.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["packages/mobile/package.json"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "mobile JS dependencies"
+    },
+    {
+      "description": "Keep non-major workspace and internal tooling dependency updates together.",
+      "matchManagers": ["npm"],
+      "matchFileNames": [
+        "package.json",
+        "packages/icon-sprite/package.json",
+        "packages/logging/package.json",
+        "packages/screenshots/package.json",
+        "packages/ts-template/package.json",
+        "packages/tsconfig/package.json"
+      ],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "workspace JS tooling dependencies"
+    },
+    {
+      "description": "Keep non-major Android build dependency updates together.",
+      "matchManagers": ["gradle", "gradle-wrapper"],
+      "matchFileNames": ["packages/mobile/android/**"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Android build dependencies"
+    },
+    {
+      "description": "Keep non-major native mobile Ruby and CocoaPods dependency updates together.",
+      "matchManagers": ["bundler", "cocoapods"],
+      "matchFileNames": ["packages/mobile/android/**", "packages/mobile/ios/**"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "mobile native dependencies"
+    },
+    {
+      "description": "Keep non-major GitHub Actions updates together.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "Keep non-major runtime and package-manager updates together.",
+      "matchManagers": ["dockerfile", "mise", "nodenv", "npm"],
+      "matchPackageNames": ["node", "ruby", "pnpm", "@types/node"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "platform runtimes and package manager"
+    },
+    {
+      "description": "Keep tightly coupled React non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "types-react",
+        "types-react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "babel-plugin-react-compiler"
+      ],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "React dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Capacitor non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@capacitor/*", "@capawesome/*", "capacitor-plugin-safe-area"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Capacitor dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Automerge non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@automerge/*"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Automerge dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Hono non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["hono", "@hono/*"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Hono dependencies"
+    },
+    {
+      "description": "Keep tightly coupled database non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["drizzle-kit", "drizzle-orm", "@libsql/client"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "database dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Lingui non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@lingui/*", "eslint-plugin-lingui"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Lingui dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Sentry and logging non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@sentry/*", "@logtape/*"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Sentry and logging dependencies"
+    },
+    {
+      "description": "Keep tightly coupled TanStack non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@tanstack/*"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "TanStack dependencies"
+    },
+    {
+      "description": "Keep tightly coupled React Spectrum and React Aria non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@internationalized/*",
+        "react-aria",
+        "react-aria-components",
+        "tailwindcss-react-aria-components"
+      ],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "React Spectrum dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Playwright non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@playwright/*", "playwright"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Playwright dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Tailwind and PostCSS non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "autoprefixer",
+        "postcss",
+        "tailwind-merge",
+        "tailwindcss",
+        "tailwindcss-animate",
+        "tailwindcss-safe-area-capacitor"
+      ],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Tailwind and PostCSS dependencies"
+    },
+    {
+      "description": "Keep tightly coupled Workbox non-major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["workbox-*"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Workbox dependencies"
+    },
+    {
+      "description": "Keep tightly coupled React major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "types-react",
+        "types-react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "babel-plugin-react-compiler"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "React major updates"
+    },
+    {
+      "description": "Keep tightly coupled Capacitor major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@capacitor/*", "@capawesome/*", "capacitor-plugin-safe-area"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Capacitor major updates"
+    },
+    {
+      "description": "Keep tightly coupled Lingui major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@lingui/*", "eslint-plugin-lingui"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Lingui major updates"
+    },
+    {
+      "description": "Keep tightly coupled TanStack major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@tanstack/*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "TanStack major updates"
+    },
+    {
+      "description": "Keep tightly coupled React Spectrum and React Aria major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@internationalized/*",
+        "react-aria",
+        "react-aria-components",
+        "tailwindcss-react-aria-components"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "React Spectrum major updates"
+    },
+    {
+      "description": "Keep tightly coupled Sentry and logging major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@sentry/*", "@logtape/*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Sentry and logging major updates"
+    },
+    {
+      "description": "Keep tightly coupled server framework major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["hono", "@hono/*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Hono major updates"
+    },
+    {
+      "description": "Keep tightly coupled Android and Gradle major updates together.",
+      "matchManagers": ["gradle", "gradle-wrapper"],
+      "matchPackageNames": [
+        "gradle",
+        "com.android.tools.build:gradle",
+        "androidx.*:*",
+        "com.google.*:*"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Android and Gradle major updates"
+    },
+    {
+      "description": "Keep GitHub Actions major updates together.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "GitHub Actions major updates"
+    }
+  ]
 }
