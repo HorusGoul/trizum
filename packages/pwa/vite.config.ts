@@ -131,6 +131,10 @@ export default defineConfig(({ mode }) => {
       sourcemap: true,
       minify: true,
     },
+    worker: {
+      format: "es",
+      plugins: () => [wasm() as Plugin, topLevelAwait() as Plugin],
+    },
     resolve: {
       alias: [
         {

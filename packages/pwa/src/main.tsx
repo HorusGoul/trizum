@@ -33,6 +33,7 @@ import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging } from "./lib/log.ts";
+import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "./lib/automerge/syncConfig.ts";
 import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
 import {
   preventDuplicateHistoryEntries,
@@ -103,8 +104,8 @@ declare module "react-aria-components" {
   }
 }
 
-const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
-const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
+const WSS_URL = getAutomergeWssUrl();
+const isOfflineOnly = getIsAutomergeOfflineOnly(initialUrl.href);
 
 // Create automerge repository
 const repo = new Repo({

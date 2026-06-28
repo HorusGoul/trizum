@@ -13,6 +13,9 @@ catalogs:
     '@automerge/automerge-repo':
       specifier: 2.5.6
       version: 2.5.6
+    '@automerge/automerge-repo-network-messagechannel':
+      specifier: 2.5.6
+      version: 2.5.6
     '@automerge/automerge-repo-network-websocket':
       specifier: 2.5.6
       version: 2.5.6
@@ -199,6 +202,9 @@ catalogs:
     clsx:
       specifier: 2.1.1
       version: 2.1.1
+    comctx:
+      specifier: 1.7.5
+      version: 1.7.5
     dinero.js:
       specifier: 1.9.1
       version: 1.9.1
@@ -513,6 +519,9 @@ importers:
       '@automerge/automerge-repo':
         specifier: 'catalog:'
         version: 2.5.6
+      '@automerge/automerge-repo-network-messagechannel':
+        specifier: 'catalog:'
+        version: 2.5.6
       '@automerge/automerge-repo-network-websocket':
         specifier: 'catalog:'
         version: 2.5.6
@@ -606,6 +615,9 @@ importers:
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
+      comctx:
+        specifier: 'catalog:'
+        version: 1.7.5
       dinero.js:
         specifier: 'catalog:'
         version: 1.9.1
@@ -920,6 +932,9 @@ packages:
 
   '@apm-js-collab/tracing-hooks@0.3.1':
     resolution: {integrity: sha512-Vu1CbmPURlN5fTboVuKMoJjbO5qcq9fA5YXpskx3dXe/zTBvjODFoerw+69rVBlRLrJpwPqSDqEuJDEKIrTldw==}
+
+  '@automerge/automerge-repo-network-messagechannel@2.5.6':
+    resolution: {integrity: sha512-0xd8UMD3hMS3XnC5Rl40pAGqpkaW06Ox/GgEabKGkJM2d8bcVe2w1eklzOr7zJUIhDGrzPwFdCDNq1iNUHo5VA==}
 
   '@automerge/automerge-repo-network-websocket@2.5.6':
     resolution: {integrity: sha512-xs/xzOCTf5ZuqhDUtBO1VQ3QOnunEobjtgEqGNu7UcoD2uYWET1ANHVfS+ZzSV8IOA1O9jFAPXxzc4FXoSL0hQ==}
@@ -6148,6 +6163,9 @@ packages:
     resolution: {integrity: sha512-pFGrxThWcWQ2MsAz6RtgeWe4NK2kUE1WfsrvvlctdII745EW9I0yflqhe7++M5LEc7bV2c/9/5zc8sFcpL0Drw==}
     engines: {node: '>=0.1.90'}
 
+  comctx@1.7.5:
+    resolution: {integrity: sha512-0fsxsxr1Hg2T99wOIteUbsJOX6jMmnhAJepcVRqNRMWpcbxRhbm2+0R8qEuQEaE4gWjfdXaKeAGYAn0yeElylQ==}
+
   commander@10.0.1:
     resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
     engines: {node: '>=14'}
@@ -10113,6 +10131,14 @@ snapshots:
       '@apm-js-collab/code-transformer': 0.8.2
       debug: 4.4.3
       module-details-from-path: 1.0.4
+    transitivePeerDependencies:
+      - supports-color
+
+  '@automerge/automerge-repo-network-messagechannel@2.5.6':
+    dependencies:
+      '@automerge/automerge-repo': 2.5.6
+      debug: 4.4.3
+      eventemitter3: 5.0.4
     transitivePeerDependencies:
       - supports-color
 
@@ -14664,6 +14690,7 @@ snapshots:
     dependencies:
       '@automerge/automerge': 3.2.6
       '@automerge/automerge-repo': 2.5.6
+      '@automerge/automerge-repo-network-messagechannel': 2.5.6
       '@automerge/automerge-repo-network-websocket': 2.5.6
       '@automerge/automerge-repo-storage-indexeddb': 2.5.6
       '@capacitor/app': 8.0.0(@capacitor/core@8.0.1)
@@ -14695,6 +14722,7 @@ snapshots:
       browser-image-compression: 2.0.2
       capacitor-plugin-safe-area: 5.0.0(@capacitor/core@8.0.1)
       clsx: 2.1.1
+      comctx: 1.7.5
       dinero.js: 1.9.1
       drizzle-orm: 0.45.2(@libsql/client@0.15.15)(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(kysely@0.29.2)
       emojibase: 17.0.0
@@ -14990,7 +15018,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(@voidzero-dev/vite-plus-core@0.1.24(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.7.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.9.0))(esbuild@0.27.3)(jiti@2.7.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(yaml@2.9.0)'
+      vitest: '@voidzero-dev/vite-plus-test@0.1.24(@opentelemetry/api@1.9.1)(@types/node@24.10.2)(@vitest/coverage-v8@4.1.8(@voidzero-dev/vite-plus-test@0.1.24))(esbuild@0.27.3)(jiti@2.7.0)(terser@5.44.1)(tsx@4.20.4)(typescript@5.9.2)(vite@8.0.0(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)(@types/node@24.10.2)(esbuild@0.27.3)(jiti@2.7.0)(terser@5.44.1)(tsx@4.20.4)(yaml@2.9.0))(yaml@2.9.0)'
     optional: true
 
   '@vitest/coverage-v8@4.1.8(vitest@4.1.8)':
@@ -15848,6 +15876,8 @@ snapshots:
   colorette@2.0.20: {}
 
   colors@1.0.3: {}
+
+  comctx@1.7.5: {}
 
   commander@10.0.1: {}
 

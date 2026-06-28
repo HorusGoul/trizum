@@ -1,10 +1,8 @@
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.js";
-import { patchMutate } from "#src/lib/patchMutate.ts";
 import {
   createExpenseId,
   calculateExpenseHash,
   type Expense,
-  calculateBalancesByParticipant,
   decodeExpenseId,
   applyExpenseDiff,
 } from "#src/models/expense.js";
@@ -15,14 +13,13 @@ import type {
   PartyExpenseChunkRef,
   PartyParticipant,
 } from "#src/models/party.js";
-import { diff } from "@opentf/obj-diff";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import type { DocHandle, Repo, DocumentId } from "@automerge/automerge-repo/slim";
 import { deleteAt, insertAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { clone } from "@opentf/std";
 import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
+import { recalculatePartyBalancesInWorker } from "#src/lib/appWorker/client.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -34,6 +31,10 @@ export function useParty(partyId: string) {
   const repo = useRepo();
 
   const helpers = getPartyHelpers(repo, handle);
+
+  async function recalculateBalances() {
+    return recalculatePartyBalancesInWorker(repo, handle.documentId);
+  }
 
   async function __dev_createTestExpenses() {
     const promptAnswer = window.prompt("How many test expenses to create?");
@@ -80,6 +81,7 @@ export function useParty(partyId: string) {
     partyId,
     isLoading: handle.inState(["loading"]),
     ...helpers,
+    recalculateBalances,
     dev: {
       createTestExpenses: __dev_createTestExpenses,
     },
@@ -396,56 +398,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
   }
 
-  async function recalculateBalances() {
-    const party = handle.doc();
-
-    if (!party) {
-      throw new Error("Party not found, this should not happen");
-    }
-
-    const chunkRefs = party.chunkRefs;
-
-    const chunkEntries = await Promise.all(
-      chunkRefs.map(async (chunkRef) => {
-        const [chunkHandle, chunkBalancesHandle] = await Promise.all([
-          repo.find<PartyExpenseChunk>(chunkRef.chunkId),
-          repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId),
-        ]);
-
-        const chunk = chunkHandle.doc();
-
-        if (!chunk) {
-          throw new Error("Chunk not found, this should not happen");
-        }
-
-        const balancesByParticipant = calculateBalancesByParticipant(
-          chunk.expenses,
-          party.participants,
-        );
-
-        const chunkBalances = chunkBalancesHandle.doc();
-
-        if (!chunkBalances) {
-          throw new Error("Chunk balances not found, this should not happen");
-        }
-
-        return {
-          balancesByParticipant,
-          chunkBalancesHandle,
-        };
-      }),
-    );
-
-    for (const { balancesByParticipant, chunkBalancesHandle } of chunkEntries) {
-      chunkBalancesHandle.change((doc) => {
-        patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
-      });
-      chunkBalancesHandle.doc();
-    }
-
-    return true;
-  }
-
   return {
     updateSettings,
     setParticipantDetails,
@@ -453,6 +405,5 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     transferDebtToParty,
     updateExpense,
     removeExpense,
-    recalculateBalances,
   };
 }
