@@ -16,7 +16,7 @@ on:
       - completed
 
 concurrency:
-  group: ${{ github.workflow }}-codex-auth
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && format('pr-{0}', inputs.pr) || format('branch-{0}', github.event.workflow_run.head_branch) }}
   cancel-in-progress: false
 
 jobs:
