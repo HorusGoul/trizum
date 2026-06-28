@@ -60,6 +60,8 @@ const MAX_DIFF_BYTES = 180_000;
 const MAX_LOG_BYTES = 40_000;
 const MAX_USAGE_MATCHES = 200;
 const MAX_DEPENDENCY_METADATA = 12;
+const BOT_COMMIT_CO_AUTHOR = "Horus Lugo <horusgoul@gmail.com>";
+const BOT_COMMIT_CO_AUTHOR_TRAILER = `Co-authored-by: ${BOT_COMMIT_CO_AUTHOR}`;
 
 interface LocalValidationResult {
   output: string;
@@ -725,6 +727,11 @@ async function createSupersedingPullRequest(
       ["fetch", "origin", context.pr.headRefName],
       options.repoRoot,
     );
+    const originalPrHead = (
+      await runCommand("git", ["rev-parse", "FETCH_HEAD"], {
+        cwd: options.repoRoot,
+      })
+    ).stdout.trim();
     await runCommand("git", ["branch", branchName, "FETCH_HEAD"], {
       cwd: options.repoRoot,
     });
@@ -751,7 +758,12 @@ async function createSupersedingPullRequest(
         };
 
     const fallbackCommitCreated = await commitPendingAgentChanges(worktreeRoot, context);
-    const sandcastleSummary = renderSandcastleSummary(sandcastleRun, fallbackCommitCreated);
+    const agentCommits = await ensureCoAuthorOnSupersedingCommits(worktreeRoot, originalPrHead);
+    const sandcastleSummary = renderSandcastleSummary(
+      sandcastleRun,
+      fallbackCommitCreated,
+      agentCommits,
+    );
 
     await runGitWithOptionalCredentials(["push", "-u", "origin", branchName], worktreeRoot);
 
@@ -790,7 +802,7 @@ async function createSupersedingPullRequest(
 
     return {
       branchName,
-      agentCommits: sandcastleRun.commits,
+      agentCommits,
       agentLogPath: sandcastleRun.logFilePath,
       localValidationOutput: localValidation.output,
       localValidationPassed: localValidation.passed,
@@ -959,13 +971,86 @@ async function commitPendingAgentChanges(
   await runCommand("git", ["add", "-A"], {
     cwd: worktreeRoot,
   });
-  await runCommand(
-    "git",
-    ["commit", "-m", `chore(deps): complete Renovate PR #${context.pr.number}`],
-    {
-      cwd: worktreeRoot,
-    },
+  await runCommand("git", ["commit", "-m", buildFallbackCommitMessage(context.pr.number)], {
+    cwd: worktreeRoot,
+  });
+  return true;
+}
+
+function buildFallbackCommitMessage(prNumber: number): string {
+  return [`chore(deps): complete Renovate PR #${prNumber}`, "", BOT_COMMIT_CO_AUTHOR_TRAILER].join(
+    "\n",
   );
+}
+
+async function ensureCoAuthorOnSupersedingCommits(
+  worktreeRoot: string,
+  originalPrHead: string,
+): Promise<string[]> {
+  const commitsBefore = await listCommitsAfter(worktreeRoot, originalPrHead);
+  if (commitsBefore.length === 0) {
+    return [];
+  }
+
+  if (await allCommitsHaveCoAuthor(worktreeRoot, commitsBefore)) {
+    return commitsBefore;
+  }
+
+  const scriptRoot = await mkdtemp(path.join(tmpdir(), "trizum-coauthor-"));
+  const scriptPath = path.join(scriptRoot, "coauthor.sh");
+
+  try {
+    await writeFile(
+      scriptPath,
+      [
+        "#!/bin/sh",
+        "set -eu",
+        `trailer='${BOT_COMMIT_CO_AUTHOR_TRAILER}'`,
+        'if git log -1 --format=%B | grep -Fqx "$trailer"; then',
+        "  exit 0",
+        "fi",
+        'git commit --amend --no-edit --trailer "$trailer"',
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    await chmod(scriptPath, 0o700);
+    await runCommand("git", ["rebase", "--exec", scriptPath, originalPrHead], {
+      cwd: worktreeRoot,
+    });
+  } catch (error) {
+    await runCommand("git", ["rebase", "--abort"], {
+      allowFailure: true,
+      cwd: worktreeRoot,
+    });
+    throw error;
+  } finally {
+    await rm(scriptRoot, { force: true, recursive: true });
+  }
+
+  return listCommitsAfter(worktreeRoot, originalPrHead);
+}
+
+async function listCommitsAfter(worktreeRoot: string, baseCommit: string): Promise<string[]> {
+  const result = await runCommand("git", ["rev-list", "--reverse", `${baseCommit}..HEAD`], {
+    cwd: worktreeRoot,
+  });
+  return splitLines(result.stdout);
+}
+
+async function allCommitsHaveCoAuthor(
+  worktreeRoot: string,
+  commits: readonly string[],
+): Promise<boolean> {
+  for (const commit of commits) {
+    const result = await runCommand("git", ["log", "-1", "--format=%B", commit], {
+      cwd: worktreeRoot,
+    });
+    if (!splitLines(result.stdout).includes(BOT_COMMIT_CO_AUTHOR_TRAILER)) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -1061,39 +1146,92 @@ function renderSupersedingPullRequestBody(
   agentSummary: string,
   localValidation: LocalValidationResult,
 ): string {
+  const reviewSummary = firstParagraph(extractMarkdownSection(report, "Summary"));
+  const findings = extractMarkdownListItems(report, "Findings", 2);
+
   return redactSecrets(
     [
       `Supersedes #${context.pr.number}.`,
       "",
-      "This PR keeps the original Renovate update purpose and includes agent-applied fixes needed to make the update reviewable.",
+      "## Summary",
+      `- Purpose: ${renderDependencyUpdateSummary(context)}.`,
+      `- Agent fix: ${truncateText(firstParagraph(agentSummary), 700)}`,
       "",
-      "## Sandcastle Codex Summary",
-      truncateText(agentSummary, 12_000),
+      "## Review",
+      reviewSummary || "See the workflow logs for the full agent review.",
+      findings.length === 0 ? "" : findings.map((finding) => `- ${finding}`).join("\n"),
       "",
       "## Local Validation",
-      `Status: ${localValidation.passed ? "passed" : "failed"}`,
-      "",
-      "```text",
-      truncateText(localValidation.output, 30_000),
-      "```",
-      "",
-      report,
-    ].join("\n"),
+      `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
+      renderValidationCommandBullets(localValidation.output),
+      "- CI on this PR is the source of truth for merge readiness.",
+    ]
+      .filter(Boolean)
+      .join("\n"),
   );
+}
+
+function renderDependencyUpdateSummary(context: PullRequestContext): string {
+  if (context.dependencyUpdates.length === 0) {
+    return context.pr.title;
+  }
+
+  return context.dependencyUpdates
+    .slice(0, 4)
+    .map((update) => `${update.name} ${update.from ?? "unknown"} -> ${update.to ?? "unknown"}`)
+    .join(", ");
+}
+
+function renderValidationCommandBullets(output: string): string {
+  const commands = splitLines(output)
+    .filter((line) => line.startsWith("$ "))
+    .map((line) => line.slice(2))
+    .slice(0, 6);
+
+  if (commands.length === 0) {
+    return "- No local validation commands were reported.";
+  }
+
+  return commands.map((command) => `- \`${command}\``).join("\n");
+}
+
+function extractMarkdownSection(markdown: string, heading: string): string {
+  const lines = splitLines(markdown);
+  const startIndex = lines.findIndex((line) => line.trim() === `### ${heading}`);
+  if (startIndex === -1) {
+    return "";
+  }
+
+  const sectionLines: string[] = [];
+  for (const line of lines.slice(startIndex + 1)) {
+    if (line.startsWith("### ")) {
+      break;
+    }
+    sectionLines.push(line);
+  }
+
+  return sectionLines.join("\n").trim();
+}
+
+function extractMarkdownListItems(markdown: string, heading: string, maxItems: number): string[] {
+  return splitLines(extractMarkdownSection(markdown, heading))
+    .filter((line) => line.startsWith("- "))
+    .map((line) => line.slice(2))
+    .filter((line) => line !== "No findings.")
+    .slice(0, maxItems);
 }
 
 function renderSandcastleSummary(
   sandcastleRun: SandcastleFixRun,
   fallbackCommitCreated: boolean,
+  agentCommits: readonly string[] = sandcastleRun.commits,
 ): string {
   return redactSecrets(
     [
       sandcastleRun.summary || "Sandcastle Codex run completed without a text summary.",
       "",
       `Branch: ${sandcastleRun.branchName}`,
-      `Commits reported by Sandcastle: ${
-        sandcastleRun.commits.length === 0 ? "none" : sandcastleRun.commits.join(", ")
-      }`,
+      `Superseding branch commits: ${agentCommits.length === 0 ? "none" : agentCommits.join(", ")}`,
       fallbackCommitCreated ? "A fallback workflow commit captured uncommitted agent changes." : "",
       sandcastleRun.logFilePath == null ? "" : `Sandcastle log: ${sandcastleRun.logFilePath}`,
     ]
