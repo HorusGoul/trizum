@@ -34,6 +34,9 @@ follow-up push.
 `gitIgnoredAuthors` so Renovate keeps managing branches after the workflow adds
 its lockfile commit.
 
+Renovate groups non-major Vite+, Vite, and Vitest updates because the coverage
+providers and test runner use exact peer versions and must move together.
+
 ## Agent Review
 
 The
