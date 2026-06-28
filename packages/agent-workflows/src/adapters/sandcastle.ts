@@ -227,6 +227,7 @@ function buildSandcastleFixPrompt(context: PullRequestContext, reviewReport?: st
     "- Do not push, label, create a PR, merge, delete branches, or edit the original Renovate PR.",
     "- Preserve the original dependency-upgrade purpose.",
     "- Fix only issues needed to make the upgrade reviewable.",
+    "- Keep the superseding PR minimal; do not add or edit documentation unless missing documentation is the blocker.",
     "- If blocker findings point to Renovate grouping or configuration, update the Renovate configuration instead of forcing unrelated dependency changes.",
     "- Prefer the repo's existing patterns and Vite+ commands.",
     "- If no file changes are needed, explain why and do not create unrelated changes.",

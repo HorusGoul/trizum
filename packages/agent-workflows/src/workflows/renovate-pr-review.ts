@@ -763,7 +763,6 @@ async function createSupersedingPullRequest(
       localValidation,
     );
     await writeFile(bodyPath, body, "utf8");
-    const labelArgs = localValidation.passed ? ["--label", options.readyForHumanReviewLabel] : [];
     const createResult = await gh(
       options,
       [
@@ -777,14 +776,15 @@ async function createSupersedingPullRequest(
         context.pr.title,
         "--body-file",
         bodyPath,
-        ...labelArgs,
+        "--label",
+        options.readyForHumanReviewLabel,
       ],
       { cwd: worktreeRoot },
     );
 
     const prUrl = createResult.stdout.trim();
     const supersedingPrNumber = await readPullRequestNumberFromUrl(options, prUrl, worktreeRoot);
-    if (localValidation.passed && supersedingPrNumber != null) {
+    if (supersedingPrNumber != null) {
       await addLabelToIssue(options, supersedingPrNumber, options.readyForHumanReviewLabel);
     }
 
@@ -855,6 +855,7 @@ async function runGitWithOptionalCredentials(
 async function runLocalValidation(worktreeRoot: string): Promise<LocalValidationResult> {
   const codexAuthCache = await hideCodexAuthCache();
   const commands = [
+    ["vp", "install", "--frozen-lockfile", "--ignore-scripts", "--prefer-offline"],
     ["vp", "run", "check"],
     ["vp", "run", "test"],
     ["vp", "run", "build"],
