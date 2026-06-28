@@ -21,7 +21,6 @@ const ignorePatterns = [
   "**/dist/**",
   "**/node_modules/**",
   "**/coverage/**",
-  "**/.turbo/**",
   "**/.tanstack/**",
   "**/.wrangler/**",
   "android/**",

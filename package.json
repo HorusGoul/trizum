@@ -17,19 +17,16 @@
     "update-version": "vp exec changeset version && cd packages/mobile && vp run version:update",
     "syncpack:fix": "vp exec syncpack fix-mismatches && vp exec syncpack format",
     "typecheck": "vp check --no-fmt --no-lint",
-    "generate:ts-template": "vp exec turbo gen workspace --copy @trizum/ts-template --type package",
     "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs",
     "doctor": "vp exec react-doctor"
   },
   "dependencies": {
     "@changesets/cli": "2.29.8",
     "@sentry/cli": "3.1.0",
-    "@turbo/gen": "2.5.6",
     "agent-browser": "0.20.13",
     "all-contributors-cli": "6.26.1",
     "skills": "1.4.5",
-    "syncpack": "12.3.3",
-    "turbo": "2.5.6"
+    "syncpack": "12.3.3"
   },
   "devDependencies": {
     "@changesets/changelog-github": "0.7.0",

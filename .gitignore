@@ -119,9 +119,6 @@ dist
 # Local Netlify folder
 .netlify
 
-# Turbo cache
-.turbo
-
 # TanStack Router cache
 .tanstack
 

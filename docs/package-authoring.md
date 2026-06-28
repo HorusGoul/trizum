@@ -5,14 +5,16 @@ template.
 
 ## Start Point
 
-Start from the workspace template:
+Start from the workspace template package:
 
 ```bash
-vp run generate:ts-template
+cp -R packages/ts-template packages/<new-package>
 ```
 
-That gives new packages the default `package.json`, README, TypeScript config,
-logging facade, Vite+ lint script, and Vitest setup that the repo expects.
+Then update the copied package name, README, logging scope, and any package
+metadata for the new workspace package. The template gives new packages the
+default `package.json`, README, TypeScript config, logging facade, Vite+ lint
+script, and Vitest setup that the repo expects.
 
 ## Default Shape
 
