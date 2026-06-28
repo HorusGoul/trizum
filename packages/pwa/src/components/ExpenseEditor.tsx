@@ -45,6 +45,11 @@ import {
 import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
+import {
+  convertExpenseEditorAmountToUnits,
+  expenseEditorAmountMinValue,
+  normalizeExpenseEditorAmount,
+} from "#src/lib/expenseEditorAmounts.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -443,12 +448,13 @@ function ExpenseDetailsFields({
             label={t`Amount`}
             value={field.state.value}
             onChange={(value) => {
-              field.handleChange(value || 0);
+              field.handleChange(normalizeExpenseEditorAmount(value));
             }}
             onBlur={createFieldFocusHandlers(field).onBlur}
             errorMessage={field.state.meta.errors?.join(", ")}
             isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             className="col-span-2"
+            minValue={expenseEditorAmountMinValue}
             onFocus={(event) => {
               const input = event.target as HTMLInputElement;
               input.select();
@@ -660,7 +666,7 @@ function ParticipantItem({
     };
     newShares[participant.id] = {
       type: "exact",
-      value: convertToUnits(value || 0),
+      value: convertExpenseEditorAmountToUnits(value),
     };
     updateShares(newShares);
   }
@@ -791,10 +797,11 @@ function ParticipantSplitAmountField({
       calculator
       autoOpenCalculator={autoOpenCalculator}
       calculatorButtonClassName="absolute bottom-0.5 -left-8 h-6 w-6"
-      value={participantAmount / 100}
+      value={normalizeExpenseEditorAmount(participantAmount / 100)}
       onChange={onChange}
       className="w-20"
       inputClassName="h-7 px-0 text-right border-t-0 border-x-0 rounded-none border-b"
+      minValue={expenseEditorAmountMinValue}
       onFocus={(event) => {
         // Select all text
         const input = event.target as HTMLInputElement;
@@ -810,7 +817,7 @@ function calculateParticipantUnitAmounts(
   amount: number,
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
 ) {
-  const amountInUnits = convertToUnits(amount);
+  const amountInUnits = convertExpenseEditorAmountToUnits(amount);
 
   return getExpenseUnitShares({
     shares,
@@ -833,7 +840,7 @@ function SharesWarning({ amount, shares }: SharesWarningProps) {
 
   const unitAmounts = calculateParticipantUnitAmounts(amount, shares);
   const totalUnitAmount = Object.values(unitAmounts).reduce((sum, amount) => sum + amount, 0);
-  const showWarning = totalUnitAmount - convertToUnits(amount) !== 0;
+  const showWarning = totalUnitAmount - convertExpenseEditorAmountToUnits(amount) !== 0;
   const currency = party.currency;
   const totalAmount = totalUnitAmount / 100;
   const expenseAmount = amount;

@@ -1,5 +1,6 @@
 import { t } from "@lingui/core/macro";
-import { AppCurrencyField } from "#src/ui/fields/TextField.js";
+import { AppCurrencyField } from "#src/ui/fields/AppCurrencyField.js";
+import { clampCurrencyFieldValue } from "#src/ui/fields/currencyFieldValues.js";
 import React, { use, useRef } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
@@ -48,11 +49,15 @@ function CurrencyFieldWithCalculator({
   ];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const [state, actions] = useCalculatorMode({
-    value: props.value ?? 0,
-    onChange: (value) => props.onChange?.(value),
+    value: clampCurrencyFieldValue(props.value ?? 0, props.minValue),
+    onChange: (value) => props.onChange?.(clampCurrencyFieldValue(value, props.minValue)),
     fieldContainerRef,
     currency: props.currency,
   });
+  const previewValue =
+    state.previewValue === null
+      ? null
+      : clampCurrencyFieldValue(state.previewValue, props.minValue);
 
   function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
     props.onFocus?.(event);
@@ -97,7 +102,7 @@ function CurrencyFieldWithCalculator({
           onDismiss={actions.deactivate}
           fieldContainerRef={fieldContainerRef}
           presenceElementId={presenceElementId}
-          previewValue={state.previewValue}
+          previewValue={previewValue}
           currency={props.currency}
         />
       )}
