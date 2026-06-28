@@ -67,11 +67,15 @@ jobs:
               --jq '.author.login'
           )"
 
-          if [ "$author" != "renovate[bot]" ] && [ "$author" != "renovate-bot" ] && [ "$author" != "renovate" ]; then
-            echo "PR #${pr_number} author is ${author}, not Renovate; skipping lockfile refresh."
-            echo "should_fix=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+          case "$author" in
+            app/renovate | renovate | renovate-bot | "renovate[bot]")
+              ;;
+            *)
+              echo "PR #${pr_number} author is ${author}, not Renovate; skipping lockfile refresh."
+              echo "should_fix=false" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
 
           if ! gh pr view "$pr_number" --repo "$REPOSITORY" --json files --jq '.files[].path' | grep -Fxq "pnpm-lock.yaml"; then
             echo "PR #${pr_number} does not change pnpm-lock.yaml; skipping lockfile refresh."

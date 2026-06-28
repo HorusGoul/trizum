@@ -15,7 +15,7 @@ The workflow only proceeds when:
 
 - the pushed branch matches `renovate/**`,
 - an open pull request exists for that branch,
-- the pull request author is Renovate,
+- the pull request author is Renovate, including the `app/renovate` GitHub App,
 - and the pull request changes `pnpm-lock.yaml`.
 
 When those checks pass, the workflow runs:
