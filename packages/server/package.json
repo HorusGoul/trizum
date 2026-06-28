@@ -47,11 +47,11 @@
     "drizzle-kit": "0.31.7",
     "drizzle-orm": "0.45.2",
     "hono": "4.10.6",
-    "zod": "4.1.12"
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "24.10.1",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   }
 }
