@@ -6,23 +6,27 @@ as local development and CI.
 
 ## Vite+ Lockfile Updates
 
-Renovate's built-in artifact update still creates the initial dependency branch.
-After Renovate pushes a `renovate/**` branch that changes `pnpm-lock.yaml`, the
-[`Fix Renovate Lockfile`](../.github/workflows/renovate-lockfile.yml) workflow
-checks the associated pull request.
+Renovate's native npm artifact updates are disabled because they do not refresh
+`pnpm-lock.yaml` through Vite+. Renovate still creates the initial dependency
+branch, and the
+[`Renovate Lockfiles`](../.github/workflows/renovate-lockfile.yml) workflow
+regenerates the lockfile on every `renovate/**` branch push.
 
-The workflow only proceeds when:
+The workflow:
 
-- the pushed branch matches `renovate/**`,
-- an open pull request exists for that branch,
-- the pull request author is Renovate, including the `app/renovate` GitHub App,
-- and the pull request changes `pnpm-lock.yaml`.
-
-When those checks pass, the workflow runs:
+- queues runs instead of canceling in progress so a newer Renovate branch push
+  does not stop an in-flight lockfile refresh while it may be about to commit,
+- skips commits authored by `trizum-agent@trizum.app`,
+- runs:
 
 ```sh
-vp install --lockfile-only
+vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
 ```
 
-If the Vite+ refresh changes `pnpm-lock.yaml`, the workflow commits and pushes a
-follow-up commit to the same Renovate branch.
+- and pushes `pnpm-lock.yaml` back to the same Renovate branch when it changes.
+
+The workflow uses the built-in `GITHUB_TOKEN` through `actions/checkout` with
+job-scoped `contents: write` permission for the follow-up push.
+
+`renovate.json` lists `trizum-agent@trizum.app` in `gitIgnoredAuthors` so
+Renovate keeps managing branches after the workflow adds its lockfile commit.
