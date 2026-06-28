@@ -74,20 +74,16 @@ export function calculateLogStatsOfUser(
 
   const zero = Dinero({ amount: 0 });
 
-  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
-  const userOwes = Object.values(diffs)
-    .filter((diff) => diff.diffUnsplitted.lessThan(zero))
-    .map((diff) => diff.diffUnsplitted)
-    .reduce(
-      (prev, next) => prev.add(Dinero({ amount: Math.abs(next.getAmount()) })),
-      Dinero({ amount: 0 }),
-    );
+  let userOwes = Dinero({ amount: 0 });
+  let owedToUser = Dinero({ amount: 0 });
 
-  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
-  const owedToUser = Object.values(diffs)
-    .filter((diff) => diff.diffUnsplitted.greaterThan(zero))
-    .map((diff) => diff.diffUnsplitted)
-    .reduce((prev, next) => prev.add(next), Dinero({ amount: 0 }));
+  for (const diff of Object.values(diffs)) {
+    if (diff.diffUnsplitted.lessThan(zero)) {
+      userOwes = userOwes.add(Dinero({ amount: Math.abs(diff.diffUnsplitted.getAmount()) }));
+    } else if (diff.diffUnsplitted.greaterThan(zero)) {
+      owedToUser = owedToUser.add(diff.diffUnsplitted);
+    }
+  }
 
   return {
     userOwes,

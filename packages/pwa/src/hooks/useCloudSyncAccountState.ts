@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useReducer, useRef, type RefObject } from "react";
 import { toast } from "sonner";
 import { fetchLinkedAuthAccounts, type LinkedAuthAccount } from "#src/lib/auth-client.ts";
 import {
@@ -19,6 +19,65 @@ import type { PartyList } from "#src/models/partyList.js";
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
 
+interface CloudSyncAccountState {
+  cloudSettings: CloudUserSettings | null;
+  isCloudSyncSwitchOpen: boolean;
+  linkedAccounts: LinkedAuthAccount[];
+}
+
+type CloudSyncAccountStateAction =
+  | { type: "cleared" }
+  | {
+      type: "accountDataLoaded";
+      cloudSettings: CloudUserSettings | null;
+      linkedAccounts: LinkedAuthAccount[];
+    }
+  | { type: "cloudSettingsActivated"; cloudSettings: CloudUserSettings }
+  | { type: "linkedAccountsSaved"; linkedAccounts: LinkedAuthAccount[] }
+  | { type: "switchOpenChanged"; isOpen: boolean };
+
+const initialCloudSyncAccountState: CloudSyncAccountState = {
+  cloudSettings: null,
+  isCloudSyncSwitchOpen: false,
+  linkedAccounts: [],
+};
+
+function cloudSyncAccountStateReducer(
+  state: CloudSyncAccountState,
+  action: CloudSyncAccountStateAction,
+): CloudSyncAccountState {
+  switch (action.type) {
+    case "cleared":
+      return initialCloudSyncAccountState;
+
+    case "accountDataLoaded":
+      return {
+        ...state,
+        cloudSettings: action.cloudSettings,
+        linkedAccounts: action.linkedAccounts,
+      };
+
+    case "cloudSettingsActivated":
+      return {
+        ...state,
+        cloudSettings: action.cloudSettings,
+        isCloudSyncSwitchOpen: false,
+      };
+
+    case "linkedAccountsSaved":
+      return {
+        ...state,
+        linkedAccounts: action.linkedAccounts,
+      };
+
+    case "switchOpenChanged":
+      return {
+        ...state,
+        isCloudSyncSwitchOpen: action.isOpen,
+      };
+  }
+}
+
 export function useCloudSyncAccountState({
   isSignInSuccessVisibleRef,
   onCloudDataActivated,
@@ -30,9 +89,8 @@ export function useCloudSyncAccountState({
   partyList: PartyList;
   userId: string | undefined;
 }) {
-  const [linkedAccounts, setLinkedAccounts] = useState<LinkedAuthAccount[]>([]);
-  const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(null);
-  const [isCloudSyncSwitchOpen, setIsCloudSyncSwitchOpen] = useState(false);
+  const [state, dispatch] = useReducer(cloudSyncAccountStateReducer, initialCloudSyncAccountState);
+  const { cloudSettings, isCloudSyncSwitchOpen, linkedAccounts } = state;
   const partyListRef = useRef(partyList);
   const onCloudDataActivatedRef = useRef(onCloudDataActivated);
   const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
@@ -46,15 +104,9 @@ export function useCloudSyncAccountState({
     onCloudDataActivatedRef.current = onCloudDataActivated;
   }, [onCloudDataActivated]);
 
-  // oxlint-disable-next-line react-doctor/no-cascading-set-state -- FIXME: address existing React Doctor diagnostics.
   useEffect(() => {
     if (!userId) {
-      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
-      setLinkedAccounts([]);
-      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
-      setCloudSettings(null);
-      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
-      setIsCloudSyncSwitchOpen(false);
+      dispatch({ type: "cleared" });
       return;
     }
 
@@ -63,13 +115,17 @@ export function useCloudSyncAccountState({
     const cachedAccountState = readCachedCloudAccountState(currentUserId);
 
     if (cachedAccountState) {
-      setLinkedAccounts(cachedAccountState.linkedAccounts);
-      setCloudSettings(cachedAccountState.cloudSettings);
+      dispatch({
+        type: "accountDataLoaded",
+        linkedAccounts: cachedAccountState.linkedAccounts,
+        cloudSettings: cachedAccountState.cloudSettings,
+      });
     } else {
-      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
-      setLinkedAccounts([]);
-      // oxlint-disable-next-line react-doctor/no-adjust-state-on-prop-change -- FIXME: address existing React Doctor diagnostics.
-      setCloudSettings(null);
+      dispatch({
+        type: "accountDataLoaded",
+        linkedAccounts: [],
+        cloudSettings: null,
+      });
     }
 
     void loadAccountState({
@@ -121,8 +177,11 @@ export function useCloudSyncAccountState({
           }
         }
 
-        setLinkedAccounts(accounts);
-        setCloudSettings(activeSettings);
+        dispatch({
+          type: "accountDataLoaded",
+          cloudSettings: activeSettings,
+          linkedAccounts: accounts,
+        });
         writeCachedCloudUserSettings(currentUserId, activeSettings);
         writeCachedCloudAccountState(currentUserId, {
           cloudSettings: activeSettings,
@@ -143,13 +202,12 @@ export function useCloudSyncAccountState({
         }
 
         if (hasLocalPartyListData(currentPartyList)) {
-          setIsCloudSyncSwitchOpen(true);
+          dispatch({ type: "switchOpenChanged", isOpen: true });
           return;
         }
 
         localStorage.setItem("partyListId", activeSettings.partyListDocumentId);
-        setCloudSettings(activeSettings);
-        setIsCloudSyncSwitchOpen(false);
+        dispatch({ type: "cloudSettingsActivated", cloudSettings: activeSettings });
         writeCachedCloudUserSettings(currentUserId, activeSettings);
         writeCachedCloudAccountState(currentUserId, {
           cloudSettings: activeSettings,
@@ -166,7 +224,7 @@ export function useCloudSyncAccountState({
   }, [isSignInSuccessVisibleRef, userId]);
 
   function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
-    setLinkedAccounts(accounts);
+    dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
 
     if (userId) {
       writeCachedCloudAccountState(userId, {
@@ -177,9 +235,7 @@ export function useCloudSyncAccountState({
   }
 
   function clearCloudSyncState() {
-    setCloudSettings(null);
-    setLinkedAccounts([]);
-    setIsCloudSyncSwitchOpen(false);
+    dispatch({ type: "cleared" });
   }
 
   function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
@@ -201,16 +257,14 @@ export function useCloudSyncAccountState({
     localStorage.setItem("partyListId", settings.partyListDocumentId);
 
     if (userId) {
-      setCloudSettings(settings);
-      setIsCloudSyncSwitchOpen(false);
+      dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
       writeCachedCloudUserSettings(userId, settings);
       writeCachedCloudAccountState(userId, {
         cloudSettings: settings,
         linkedAccounts,
       });
     } else {
-      setCloudSettings(settings);
-      setIsCloudSyncSwitchOpen(false);
+      dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
     }
 
     toast.success(t`trizum cloud enabled on this device`);
@@ -224,6 +278,6 @@ export function useCloudSyncAccountState({
     isCloudSyncSwitchOpen,
     linkedProviderIds,
     saveLinkedAccounts,
-    setIsCloudSyncSwitchOpen,
+    setIsCloudSyncSwitchOpen: (isOpen: boolean) => dispatch({ type: "switchOpenChanged", isOpen }),
   };
 }

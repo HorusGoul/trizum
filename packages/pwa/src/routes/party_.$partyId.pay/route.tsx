@@ -9,6 +9,8 @@ import { Icon } from "#src/ui/Icon.tsx";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";
+import { BizumItem } from "./-components/BizumItem.js";
+import { CashItem } from "./-components/CashItem.js";
 
 interface PaySearchParams {
   fromId: string;
@@ -146,53 +148,6 @@ function RouteComponent() {
       </div>
 
       <div className="h-16 flex-shrink-0" />
-    </div>
-  );
-}
-
-function BizumItem({ phoneNumber }: { phoneNumber: string }) {
-  return (
-    <div className="flex flex-col gap-2 rounded-xl bg-white p-4 dark:bg-accent-900">
-      <h3 className="text-lg font-semibold">Bizum</h3>
-      <p className="text-accent-700 dark:text-accent-300">
-        <Trans>Copy the phone number and pay through Bizum using your bank app.</Trans>
-      </p>
-      <Button
-        color="input-like"
-        className="rounded-lg font-semibold"
-        onPress={() => {
-          navigator.clipboard
-            .writeText(phoneNumber)
-            .then(() => {
-              toast.success(t`Phone number copied to clipboard!`);
-            })
-            .catch(() => {
-              prompt(
-                t`Failed to copy phone number to clipboard, please copy it manually`,
-                phoneNumber,
-              );
-            });
-        }}
-      >
-        <Icon icon="lucide.copy" width={20} height={20} />
-        <span className="ml-2">{phoneNumber}</span>
-      </Button>
-    </div>
-  );
-}
-
-function CashItem() {
-  return (
-    <div className="flex flex-col gap-2 rounded-xl bg-white p-4 dark:bg-accent-900">
-      <h3 className="text-lg font-semibold">
-        <Trans>Cash or other ways</Trans>
-      </h3>
-      <p className="text-accent-700 dark:text-accent-300">
-        <Trans>
-          Get in touch with the person to make the payment in cash or a different way outside of the
-          ones described above.
-        </Trans>
-      </p>
     </div>
   );
 }

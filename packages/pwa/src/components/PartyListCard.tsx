@@ -46,9 +46,15 @@ interface PartyListCardProps {
   currentParticipantId?: PartyParticipant["id"] | null;
 }
 
+const EMPTY_PARTY_LIST_CARD_ACTIONS: PartyListCardAction[] = [];
+const suppressNativeLongPress = {
+  WebkitTouchCallout: "none",
+  WebkitUserSelect: "none",
+  userSelect: "none",
+} as const;
+
 export function PartyListCard({
-  // oxlint-disable-next-line react-doctor/rerender-memo-with-default-value -- FIXME: address existing React Doctor diagnostics.
-  actions = [],
+  actions = EMPTY_PARTY_LIST_CARD_ACTIONS,
   partyId,
   isArchived = false,
   isPinned = false,
@@ -122,13 +128,6 @@ export function PartyListCard({
           label: <Trans>Pinned</Trans>,
         }
       : null;
-  // oxlint-disable-next-line react-doctor/prefer-module-scope-static-value -- FIXME: address existing React Doctor diagnostics.
-  const suppressNativeLongPress = {
-    WebkitTouchCallout: "none",
-    WebkitUserSelect: "none",
-    userSelect: "none",
-  } as const;
-
   return (
     <div
       data-testid="party-list-card"
@@ -331,15 +330,19 @@ function ParticipantPreviewText({
 }
 
 function getParticipantPreview(party: Party, currentParticipantId: PartyParticipant["id"] | null) {
-  // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
-  const visibleParticipantNames = Object.values(party.participants)
-    .filter(
-      (participant) =>
-        !participant.isArchived &&
-        participant.id !== currentParticipantId &&
-        participant.name.trim() !== "",
-    )
-    .map((participant) => participant.name.trim());
+  const visibleParticipantNames: string[] = [];
+
+  for (const participant of Object.values(party.participants)) {
+    const participantName = participant.name.trim();
+
+    if (
+      !participant.isArchived &&
+      participant.id !== currentParticipantId &&
+      participantName !== ""
+    ) {
+      visibleParticipantNames.push(participantName);
+    }
+  }
 
   if (visibleParticipantNames.length === 0) {
     return null;

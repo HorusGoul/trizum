@@ -1,8 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useEffect, useRef, useState } from "react";
-// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m as motion } from "motion/react";
 import { BarcodeDetector } from "#src/lib/qr.js";
 import { getLogger } from "#src/lib/log.ts";
 import { TrizumSpinner } from "./TrizumSpinner.js";
@@ -196,140 +195,140 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
   }, [onResult, validate]);
 
   return (
-    <motion.div
-      className="relative flex flex-1 flex-col items-center justify-center bg-black"
-      animate={state.status === "error" ? { x: [0, -8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut", delay: 0.2 }}
-    >
-      {/* Hidden canvas for frame capture */}
-      <canvas ref={canvasRef} className="hidden" aria-label={t`QR code frame capture`} />
+    <LazyMotion features={domAnimation}>
+      <motion.div
+        className="relative flex flex-1 flex-col items-center justify-center bg-black"
+        animate={state.status === "error" ? { x: [0, -8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut", delay: 0.2 }}
+      >
+        {/* Hidden canvas for frame capture */}
+        <canvas ref={canvasRef} className="hidden" aria-label={t`QR code frame capture`} />
 
-      {/* Video element showing camera feed */}
-      <video
-        ref={videoRef}
-        className="h-full w-full object-cover"
-        playsInline
-        muted
-        autoPlay
-        aria-label={t`Camera preview`}
-      />
+        {/* Video element showing camera feed */}
+        <video
+          ref={videoRef}
+          className="h-full w-full object-cover"
+          playsInline
+          muted
+          autoPlay
+          aria-label={t`Camera preview`}
+        />
 
-      {/* Viewfinder overlay with darkened edges */}
-      <div className="pointer-events-none absolute inset-0">
-        {/* Semi-transparent overlay */}
-        <div className="absolute inset-0 bg-black/40" />
+        {/* Viewfinder overlay with darkened edges */}
+        <div className="pointer-events-none absolute inset-0">
+          {/* Semi-transparent overlay */}
+          <div className="absolute inset-0 bg-black/40" />
 
-        {/* Clear center area */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative size-56">
-            {/* Cut out the center */}
-            <div
-              className="absolute inset-0 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"
-              style={{ background: "transparent" }}
-            />
+          {/* Clear center area */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative size-56">
+              {/* Cut out the center */}
+              <div
+                className="absolute inset-0 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"
+                style={{ background: "transparent" }}
+              />
 
-            {/* Corner handles */}
-            <QRCodeFrameHandle className="absolute left-0 top-0" />
-            <QRCodeFrameHandle className="absolute right-0 top-0 rotate-90" />
-            <QRCodeFrameHandle className="absolute bottom-0 right-0 rotate-180" />
-            <QRCodeFrameHandle className="absolute bottom-0 left-0 -rotate-90" />
+              {/* Corner handles */}
+              <QRCodeFrameHandle className="absolute left-0 top-0" />
+              <QRCodeFrameHandle className="absolute right-0 top-0 rotate-90" />
+              <QRCodeFrameHandle className="absolute bottom-0 right-0 rotate-180" />
+              <QRCodeFrameHandle className="absolute bottom-0 left-0 -rotate-90" />
 
-            {/* Status indicator */}
-            <AnimatePresence mode="wait">
-              {state.status === "initializing" && (
-                <motion.div
-                  key="initializing"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <TrizumSpinner size={48} className="text-white" />
-                </motion.div>
-              )}
-
-              {state.status === "scanning" && (
-                <motion.div
-                  key="scanning"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ type: "spring", duration: 0.4 }}
-                  className="absolute inset-x-0 bottom-4 flex justify-center"
-                >
-                  <span className="rounded-full bg-black/60 px-3 py-1 text-xs text-white">
-                    <Trans>Align QR code here</Trans>
-                  </span>
-                </motion.div>
-              )}
-
-              {state.status === "success" && (
-                <motion.div
-                  key="success"
-                  // oxlint-disable-next-line react-doctor/no-scale-from-zero -- FIXME: address existing React Doctor diagnostics.
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ type: "spring", duration: 0.5, bounce: 0.4 }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <div className="flex size-16 items-center justify-center rounded-full bg-success-500">
-                    <Icon icon="lucide.check" width={40} height={40} className="text-white" />
-                  </div>
-                </motion.div>
-              )}
-
-              {state.status === "error" && (
-                <motion.div
-                  key="error"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ type: "spring", duration: 0.25, bounce: 0.2 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                >
+              {/* Status indicator */}
+              <AnimatePresence mode="wait">
+                {state.status === "initializing" && (
                   <motion.div
-                    // oxlint-disable-next-line react-doctor/no-scale-from-zero -- FIXME: address existing React Doctor diagnostics.
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}
-                    className="flex size-16 items-center justify-center rounded-full bg-danger-500"
+                    key="initializing"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex items-center justify-center"
                   >
-                    <Icon icon="lucide.x" width={40} height={40} className="text-white" />
+                    <TrizumSpinner size={48} className="text-white" />
                   </motion.div>
-                  <motion.span
-                    initial={{ opacity: 0, y: 5 }}
+                )}
+
+                {state.status === "scanning" && (
+                  <motion.div
+                    key="scanning"
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="max-w-48 rounded-lg bg-black/60 px-3 py-1.5 text-center text-xs text-white"
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ type: "spring", duration: 0.4 }}
+                    className="absolute inset-x-0 bottom-4 flex justify-center"
                   >
-                    {state.message}
-                  </motion.span>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <span className="rounded-full bg-black/60 px-3 py-1 text-xs text-white">
+                      <Trans>Align QR code here</Trans>
+                    </span>
+                  </motion.div>
+                )}
+
+                {state.status === "success" && (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ type: "spring", duration: 0.5, bounce: 0.4 }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <div className="flex size-16 items-center justify-center rounded-full bg-success-500">
+                      <Icon icon="lucide.check" width={40} height={40} className="text-white" />
+                    </div>
+                  </motion.div>
+                )}
+
+                {state.status === "error" && (
+                  <motion.div
+                    key="error"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ type: "spring", duration: 0.25, bounce: 0.2 }}
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}
+                      className="flex size-16 items-center justify-center rounded-full bg-danger-500"
+                    >
+                      <Icon icon="lucide.x" width={40} height={40} className="text-white" />
+                    </motion.div>
+                    <motion.span
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="max-w-48 rounded-lg bg-black/60 px-3 py-1.5 text-center text-xs text-white"
+                    >
+                      {state.message}
+                    </motion.span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Instructions with gradient background */}
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pb-safe">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={state.status === "error" ? "error" : "default"}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.2 }}
-            className="pb-8 pt-12 text-center text-sm text-white"
-          >
-            {state.status === "error" ? (
-              <Trans>Try scanning another code</Trans>
-            ) : (
-              <Trans>Point your camera at a trizum QR code</Trans>
-            )}
-          </motion.p>
-        </AnimatePresence>
-      </div>
-    </motion.div>
+        {/* Instructions with gradient background */}
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pb-safe">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={state.status === "error" ? "error" : "default"}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.2 }}
+              className="pb-8 pt-12 text-center text-sm text-white"
+            >
+              {state.status === "error" ? (
+                <Trans>Try scanning another code</Trans>
+              ) : (
+                <Trans>Point your camera at a trizum QR code</Trans>
+              )}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </LazyMotion>
   );
 }

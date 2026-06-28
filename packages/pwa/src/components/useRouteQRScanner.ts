@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { closeRouteState, navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
 import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
 
@@ -37,22 +36,20 @@ export function useRouteQRScanner({
 }: UseRouteQRScannerOptions): UseRouteQRScannerReturn {
   const isOpen = scanning === true;
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const openScanner = useCallback(() => {
+  function openScanner() {
     navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
       search: { scanning: true },
     });
-  }, [buildLocation, currentLocation, navigate]);
+  }
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const closeScanner = useCallback(() => {
+  function closeScanner() {
     closeRouteState(currentLocation, history, () => {
       navigate({
         search: { scanning: undefined },
         replace: true,
       });
     });
-  }, [currentLocation, history, navigate]);
+  }
 
   return {
     isOpen,

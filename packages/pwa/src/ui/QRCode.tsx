@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import QRCodeStyling, { type Options as QRCodeStylingOptions } from "qr-code-styling";
 import { cn } from "./utils.ts";
 
@@ -58,11 +58,11 @@ interface QRCodeProps {
 
 export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  // oxlint-disable-next-line react-doctor/rerender-state-only-in-handlers -- FIXME: address existing React Doctor diagnostics.
-  const [qrCode, setQrCode] = useState<QRCodeStyling | null>(null);
+  const qrCodeRef = useRef<QRCodeStyling | null>(null);
 
   useEffect(() => {
-    if (!ref.current) return;
+    const element = ref.current;
+    if (!element) return;
 
     const qrCode = new QRCodeStyling({
       width: styles[size].qr.width,
@@ -72,18 +72,17 @@ export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) 
       ...options,
     });
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- TODO: We probably need to update how this QRCode component works
-    // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
-    setQrCode(qrCode);
-    qrCode.append(ref.current);
+    qrCodeRef.current = qrCode;
+    element.replaceChildren();
+    qrCode.append(element);
+
+    return () => {
+      if (qrCodeRef.current === qrCode) {
+        qrCodeRef.current = null;
+      }
+      element.replaceChildren();
+    };
   }, [options, size, value]);
-
-  // oxlint-disable-next-line react-doctor/no-effect-chain -- FIXME: address existing React Doctor diagnostics.
-  useEffect(() => {
-    if (!qrCode) return;
-
-    qrCode.update(options);
-  }, [qrCode, value, options]);
 
   return (
     <div className={cn("relative flex items-center justify-center", styles[size].root, className)}>

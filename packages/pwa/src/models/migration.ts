@@ -49,25 +49,28 @@ export async function createPartyFromMigrationData({
   const photoMap = new Map<string, MediaFile["id"]>();
   if (importAttachments) {
     try {
-      for (let i = 0; i < data.photos.length; i++) {
-        const photo = data.photos[i];
-        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
-        const response = await fetch(photo.url);
-        const blob = await response.blob();
-        const [mediaFileId] = await createMediaFile(
-          blob,
-          {
-            partyId,
-          },
-          compressionPresets.balanced,
-        );
-        photoMap.set(photo.id, mediaFileId);
+      let importedPhotoCount = 0;
 
-        onProgress?.({
-          name: `Importing attachments (${i + 1} of ${data.photos.length})`,
-          progress: (i + 1) / data.photos.length,
-        });
-      }
+      await Promise.all(
+        data.photos.map(async (photo) => {
+          const response = await fetch(photo.url);
+          const blob = await response.blob();
+          const [mediaFileId] = await createMediaFile(
+            blob,
+            {
+              partyId,
+            },
+            compressionPresets.balanced,
+          );
+          photoMap.set(photo.id, mediaFileId);
+          importedPhotoCount += 1;
+
+          onProgress?.({
+            name: `Importing attachments (${importedPhotoCount} of ${data.photos.length})`,
+            progress: importedPhotoCount / data.photos.length,
+          });
+        }),
+      );
     } catch (error) {
       logger.error("Failed to import photos during migration", { error });
       throw new Error(
@@ -89,36 +92,41 @@ export async function createPartyFromMigrationData({
     });
   }
 
-  for (let i = 0; i < data.expenses.length; i++) {
-    const expense = data.expenses[i];
+  await importExpenseAtIndex(0);
 
-    // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
+  async function importExpenseAtIndex(index: number): Promise<void> {
+    const expense = data.expenses[index];
+
+    if (!expense) {
+      return;
+    }
+
     await waitIdleCallback(async () => {
-      await helpers
-        .addExpenseToParty({
-          name: expense.name,
-          paidAt: new Date(expense.paidAt),
-          shares: expense.shares,
-          paidBy: expense.paidBy,
-          photos: expense.photos
-            .map((photoId) => photoMap.get(photoId))
-            .filter((photoId): photoId is MediaFile["id"] => !!photoId),
-        })
-        .catch((error) => {
-          logger.error("Failed to import migrated expense", {
-            error,
-            expenseName: expense.name,
-          });
-          throw new Error(
-            `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
-          );
-        });
+      await helpers.addExpenseToParty({
+        name: expense.name,
+        paidAt: new Date(expense.paidAt),
+        shares: expense.shares,
+        paidBy: expense.paidBy,
+        photos: expense.photos
+          .map((photoId) => photoMap.get(photoId))
+          .filter((photoId): photoId is MediaFile["id"] => !!photoId),
+      });
+    }).catch((error) => {
+      logger.error("Failed to import migrated expense", {
+        error,
+        expenseName: expense.name,
+      });
+      throw new Error(
+        `Error importing expense ${expense.name}: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     });
 
     onProgress?.({
-      name: `Imported ${expense.name} (${i + 1} of ${data.expenses.length})`,
-      progress: (i + 1) / data.expenses.length,
+      name: `Imported ${expense.name} (${index + 1} of ${data.expenses.length})`,
+      progress: (index + 1) / data.expenses.length,
     });
+
+    await importExpenseAtIndex(index + 1);
   }
 
   return partyId;

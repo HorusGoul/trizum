@@ -1,0 +1,50 @@
+import { Icon, type IconProps } from "#src/ui/Icon.js";
+
+interface SupportLinkProps {
+  href: string;
+  icon: IconProps["icon"];
+  title: string;
+  description: string;
+  linkText: string;
+  isExternal?: boolean;
+}
+
+export function SupportLink({
+  href,
+  icon,
+  title,
+  description,
+  linkText,
+  isExternal,
+}: SupportLinkProps) {
+  const linkProps = isExternal ? { target: "_blank" as const, rel: "noopener noreferrer" } : {};
+
+  return (
+    <a
+      href={href}
+      {...linkProps}
+      className="flex gap-4 rounded-lg bg-accent-50 p-4 outline-none transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:hover:bg-accent-800"
+    >
+      <div className="flex-shrink-0">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-200 dark:bg-accent-700">
+          <Icon
+            icon={icon}
+            width={24}
+            height={24}
+            className="text-accent-700 dark:text-accent-300"
+          />
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col gap-1">
+        <h3 className="font-semibold text-accent-900 dark:text-accent-100">{title}</h3>
+        <p className="text-sm text-accent-600 dark:text-accent-400">{description}</p>
+        <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-300">
+          {linkText}
+          {isExternal && (
+            <Icon icon="lucide.external-link" width={14} height={14} className="text-accent-500" />
+          )}
+        </span>
+      </div>
+    </a>
+  );
+}

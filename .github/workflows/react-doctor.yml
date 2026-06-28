@@ -8,9 +8,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
   issues: write
-  statuses: write
 
 concurrency:
   group: react-doctor-${{ github.event.pull_request.number || github.ref }}
@@ -20,7 +18,98 @@ jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: millionco/react-doctor@v2
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Run React Doctor
+        id: react-doctor
+        run: |
+          set +e
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            vp exec react-doctor packages/pwa/src --scope changed --base "origin/${{ github.base_ref }}" --no-color --verbose --json > react-doctor-report.json
+          else
+            vp exec react-doctor packages/pwa/src --no-color --verbose --json > react-doctor-report.json
+          fi
+
+          exit_code="$?"
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+          cat react-doctor-report.json
+          exit 0
+
+      - name: Comment React Doctor summary
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const report = JSON.parse(fs.readFileSync("react-doctor-report.json", "utf8"));
+          const diagnostics = Array.isArray(report.diagnostics) ? report.diagnostics : [];
+          const summary = report.summary ?? {};
+          const baseline = report.baseline ?? {};
+          const score = summary.score ?? null;
+          const scoreLabel = summary.scoreLabel ? ` (${summary.scoreLabel})` : "";
+          const scoreText = score === null ? "unavailable" : `${score} / 100${scoreLabel}`;
+          const total = summary.totalDiagnosticCount ?? diagnostics.length;
+          const errors = summary.errorCount ?? diagnostics.filter((diagnostic) => diagnostic.severity === "error").length;
+          const warnings = summary.warningCount ?? diagnostics.filter((diagnostic) => diagnostic.severity === "warning").length;
+          const affectedFiles = summary.affectedFileCount ?? new Set(diagnostics.map((diagnostic) => diagnostic.file)).size;
+          const fixed = baseline.fixedCount ?? 0;
+          const version = report.version ? `\`react-doctor@${report.version}\`` : "local React Doctor";
+
+          const lines = [
+            "<!-- react-doctor:summary -->",
+            "",
+            `**React Doctor** (${version}) found **${total} new issue${total === 1 ? "" : "s"}** in ${affectedFiles} file${affectedFiles === 1 ? "" : "s"} · ${errors} error${errors === 1 ? "" : "s"} · ${warnings} warning${warnings === 1 ? "" : "s"} · score ${scoreText} · ${fixed} fixed · vs \`${report.diff?.baseBranch ?? "base"}\``,
+          ];
+
+          if (total > 0) {
+            lines.push("", "**Issues**", "");
+
+            for (const diagnostic of diagnostics.slice(0, 20)) {
+              const location = diagnostic.file && diagnostic.line ? `${diagnostic.file}:${diagnostic.line}` : diagnostic.file ?? "unknown location";
+              const severity = diagnostic.severity === "error" ? "❌" : "⚠️";
+              lines.push(`- ${severity} \`${location}\` **${diagnostic.title ?? diagnostic.message ?? diagnostic.rule ?? "React Doctor issue"}** \`${diagnostic.rule ?? "unknown-rule"}\``);
+            }
+
+            if (diagnostics.length > 20) {
+              lines.push(`- …and ${diagnostics.length - 20} more`);
+            }
+          } else {
+            lines.push("", "No new React Doctor issues found.");
+          }
+
+          if (score === null) {
+            lines.push("", "_Score unavailable: the score API did not return a score for this run._");
+          }
+
+          lines.push("", `<sub>Reviewed with the repo-pinned local React Doctor for commit \`${process.env.GITHUB_SHA?.slice(0, 7) ?? "unknown"}\`.</sub>`);
+          fs.writeFileSync("react-doctor-comment.md", `${lines.join("\n")}\n`);
+          NODE
+
+          marker="<!-- react-doctor:summary -->"
+          body="$(cat react-doctor-comment.md)"
+          comment_id="$(
+            gh api "repos/${REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate \
+              --jq ".[] | select(.user.type == \"Bot\" and (.body | contains(\"${marker}\"))) | .id" |
+              tail -n 1
+          )"
+
+          if [ -n "$comment_id" ]; then
+            gh api --method PATCH "repos/${REPOSITORY}/issues/comments/${comment_id}" -f body="$body" >/dev/null
+          else
+            gh api --method POST "repos/${REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="$body" >/dev/null
+          fi
+
+      - name: Fail on React Doctor issues
+        if: steps.react-doctor.outputs.exit_code != '0'
+        run: exit "${{ steps.react-doctor.outputs.exit_code }}"

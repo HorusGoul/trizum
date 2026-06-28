@@ -28,9 +28,10 @@ export function getOrderedPartySections(partyList: PartyList): OrderedPartySecti
     activePartyIds.push(partyId);
   }
 
-  const sortPartyIds = (ids: PartyId[], includePinned: boolean) =>
-    // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
-    [...ids].sort((leftPartyId: PartyId, rightPartyId: PartyId) => {
+  const sortPartyIds = (ids: PartyId[], includePinned: boolean) => {
+    const sortedIds = ids.slice();
+
+    sortedIds.sort((leftPartyId: PartyId, rightPartyId: PartyId) => {
       if (includePinned) {
         const leftPinned = Number(isPartyPinned(partyList, leftPartyId));
         const rightPinned = Number(isPartyPinned(partyList, rightPartyId));
@@ -49,6 +50,9 @@ export function getOrderedPartySections(partyList: PartyList): OrderedPartySecti
 
       return (insertionOrder.get(leftPartyId) ?? 0) - (insertionOrder.get(rightPartyId) ?? 0);
     });
+
+    return sortedIds;
+  };
 
   const orderedActivePartyIds = sortPartyIds(activePartyIds, true);
   const orderedArchivedPartyIds = sortPartyIds(archivedPartyIds, false);

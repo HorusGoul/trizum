@@ -73,14 +73,19 @@ function areSnapshotsEqual(
   previous: PartyPaginatedExpensesSnapshot,
   next: PartyPaginatedExpensesSnapshot,
 ): boolean {
-  if (
-    previous.hasNext !== next.hasNext ||
-    previous.isLoadingNext !== next.isLoadingNext ||
-    previous.expenses.length !== next.expenses.length
-  ) {
+  if (previous.hasNext !== next.hasNext || previous.isLoadingNext !== next.isLoadingNext) {
     return false;
   }
 
-  // oxlint-disable-next-line react-doctor/js-length-check-first -- FIXME: address existing React Doctor diagnostics.
-  return previous.expenses.every((expense, index) => expense === next.expenses[index]);
+  if (previous.expenses.length !== next.expenses.length) {
+    return false;
+  }
+
+  for (let index = 0; index < previous.expenses.length; index++) {
+    if (previous.expenses[index] !== next.expenses[index]) {
+      return false;
+    }
+  }
+
+  return true;
 }

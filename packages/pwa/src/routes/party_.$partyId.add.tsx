@@ -54,6 +54,7 @@ function AddExpense() {
 
   // Track photos for gallery - updates when form changes
   const [photos, setPhotos] = useState<string[]>([]);
+  const [paidAt] = useState(() => new Date());
 
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
@@ -115,8 +116,7 @@ function AddExpense() {
           amount: 0,
           paidBy: participant.id,
           shares: {},
-          // oxlint-disable-next-line react-doctor/rendering-hydration-mismatch-time -- FIXME: address existing React Doctor diagnostics.
-          paidAt: new Date(),
+          paidAt,
           photos: [],
         }}
         goBackFallbackOptions={{ to: "/party/$partyId" }}

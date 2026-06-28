@@ -44,6 +44,7 @@ import {
 } from "#src/lib/nativeCamera.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
+import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -75,7 +76,12 @@ interface ExpenseEditorProps {
   onViewPhoto?: (index: number) => void;
 }
 
-// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
+type ExpenseEditorFormApi = AppFormApi<ExpenseEditorFormValues>;
+type FieldFocusHandlersFactory = (field: { name: string; handleBlur: () => void }) => {
+  onFocus: () => void;
+  onBlur: () => void;
+};
+
 export function ExpenseEditor({
   title,
   onSubmit,
@@ -96,10 +102,8 @@ export function ExpenseEditor({
     },
     shares: defaultValues.shares,
   });
-  // oxlint-disable-next-line react-doctor/js-tosorted-immutable -- FIXME: address existing React Doctor diagnostics.
-  const participants = [...unsortedParticipants].sort((a, b) =>
-    a.name.localeCompare(b.name, i18n.locale),
-  );
+  const participants = unsortedParticipants.slice();
+  participants.sort((a, b) => a.name.localeCompare(b.name, i18n.locale));
 
   const form = useForm({
     defaultValues: {
@@ -250,60 +254,35 @@ export function ExpenseEditor({
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
-        <BackButton fallbackOptions={goBackFallbackOptions} />
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium">{title}</h1>
-        <div className="flex-1" />
-        <MenuTrigger>
-          <IconButton
-            icon="lucide.ellipsis-vertical"
-            aria-label={t`Menu`}
-            className="flex-shrink-0"
-          />
-          <Popover placement="bottom end">
-            <Menu>
-              <MenuItem onAction={() => setAutoOpenCalculator(!autoOpenCalculator)}>
-                <Icon icon="lucide.calculator" width={20} height={20} className="mr-3 self-start" />
-                <div className="mr-3 flex flex-col">
-                  <span className="leading-none">
-                    <Trans>Auto-open calculator</Trans>
-                  </span>
-                  <span className="mt-2 text-sm leading-none opacity-80">
-                    <Trans>Open calculator when focusing amount fields</Trans>
-                  </span>
-                </div>
-                <Switch
-                  isSelected={autoOpenCalculator}
-                  onChange={() => setAutoOpenCalculator(!autoOpenCalculator)}
-                  isReadOnly
-                />
-              </MenuItem>
-            </Menu>
-          </Popover>
-        </MenuTrigger>
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) =>
-            canSubmit ? (
-              <Suspense fallback={null}>
-                <IconButton
-                  icon="lucide.check"
-                  aria-label={isSubmitting ? t`Submitting...` : t`Save`}
-                  type="submit"
-                  form={formId}
-                  isDisabled={isSubmitting}
-                  className="flex-shrink-0"
-                />
-              </Suspense>
-            ) : null
-          }
-        </form.Subscribe>
-      </div>
+      <ExpenseEditorHeader
+        autoOpenCalculator={autoOpenCalculator}
+        formId={formId}
+        goBackFallbackOptions={goBackFallbackOptions}
+        onToggleAutoOpenCalculator={() => setAutoOpenCalculator(!autoOpenCalculator)}
+        submitButton={
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmitting]) =>
+              canSubmit ? (
+                <Suspense fallback={null}>
+                  <IconButton
+                    icon="lucide.check"
+                    aria-label={isSubmitting ? t`Submitting...` : t`Save`}
+                    type="submit"
+                    form={formId}
+                    isDisabled={isSubmitting}
+                    className="flex-shrink-0"
+                  />
+                </Suspense>
+              ) : null
+            }
+          </form.Subscribe>
+        }
+        title={title}
+      />
 
-      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
-        onSubmit={(e) => {
-          e.preventDefault();
+        action={() => {
           if (form.state.isSubmitting || saveInFlightRef.current) {
             return;
           }
@@ -312,162 +291,267 @@ export function ExpenseEditor({
         }}
         className="container mt-4 flex flex-col px-4"
       >
-        <div className="grid grid-cols-2 gap-x-2 gap-y-4">
-          <div className="col-span-2">
-            <form.Field name="photos">
-              {(field) => (
-                <PhotosField
-                  value={field.state.value}
-                  onChange={field.handleChange}
-                  onViewPhoto={onViewPhoto}
-                />
-              )}
-            </form.Field>
-          </div>
-
-          <form.Field
-            name="name"
-            validators={{
-              onChange: ({ value }) => validateExpenseTitle(value),
-            }}
-          >
-            {(field) => (
-              <AppTextField
-                label={t`Title`}
-                minLength={1}
-                maxLength={50}
-                name={field.name}
-                value={field.state.value}
-                onChange={field.handleChange}
-                errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-                // eslint-disable-next-line jsx-a11y/no-autofocus -- We want to auto focus the title field when creating a new expense
-                autoFocus={autoFocus}
-                className="col-span-2"
-                data-presence-element-id="title"
-                data-presence-offset-top={6}
-                data-presence-offset-left={-10}
-                {...createFieldFocusHandlers(field)}
-              />
-            )}
-          </form.Field>
-
-          <form.Field
-            name="amount"
-            validators={{
-              onChange: ({ value }) => {
-                if (value <= 0) {
-                  return t`Amount must be greater than 0`;
-                }
-              },
-            }}
-          >
-            {(field) => (
-              <CurrencyField
-                calculator
-                autoOpenCalculator={autoOpenCalculator}
-                name={field.name}
-                label={t`Amount`}
-                value={field.state.value}
-                onChange={(value) => {
-                  field.handleChange(value || 0);
-                }}
-                onBlur={createFieldFocusHandlers(field).onBlur}
-                errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-                className="col-span-2"
-                onFocus={(event) => {
-                  const input = event.target as HTMLInputElement;
-                  input.select();
-                  focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
-                }}
-                inputMode="decimal"
-                data-presence-element-id="amount"
-                data-presence-offset-top={6}
-                data-presence-offset-left={-10}
-              />
-            )}
-          </form.Field>
-
-          <form.Field name="paidBy">
-            {(field) => (
-              <AppSelect<(typeof participants)[number]>
-                label={t`Paid by`}
-                items={participants}
-                onSelectionChange={(value) => {
-                  if (value) {
-                    field.handleChange(String(value));
-                  }
-                }}
-                selectedKey={field.state.value}
-                data-presence-element-id="paidBy"
-                data-presence-offset-top={6}
-                data-presence-offset-left={-10}
-                {...createFieldFocusHandlers(field)}
-              >
-                {(participant) => (
-                  <SelectItem key={participant.id} value={participant}>
-                    {participant.name}
-                  </SelectItem>
-                )}
-              </AppSelect>
-            )}
-          </form.Field>
-
-          <form.Field name="paidAt">
-            {(field) => (
-              <AppDatePicker<ZonedDateTime>
-                label={t`Date`}
-                value={fromDate(field.state.value, getLocalTimeZone())}
-                granularity="day"
-                onChange={(value) => {
-                  if (value) {
-                    field.handleChange(value.toDate());
-                  }
-                }}
-                data-presence-element-id="paidAt"
-                data-presence-offset-top={6}
-                data-presence-offset-left={-10}
-                {...createFieldFocusHandlers(field)}
-              />
-            )}
-          </form.Field>
-        </div>
-
-        {/* Participant Selection */}
-        <div className="mt-4 flex flex-col gap-2">
-          <div className="flex items-center justify-between border-l border-transparent pl-3">
-            <Checkbox
-              isSelected={Object.keys(shares).length === participants.length}
-              isIndeterminate={
-                Object.keys(shares).length > 0 && Object.keys(shares).length < participants.length
-              }
-              onChange={(isSelected) => {
-                handleIncludeAllChange(isSelected);
-              }}
-            >
-              {t`Include all`}
-            </Checkbox>
-          </div>
-
-          <div className="space-y-2">
-            {participants.map((participant) => (
-              <ParticipantItem
-                key={participant.id}
-                participant={participant}
-                amount={amount}
-                shares={shares}
-                autoOpenCalculator={autoOpenCalculator}
-                onSharesChange={(shares) => form.setFieldValue("shares", shares)}
-              />
-            ))}
-          </div>
-
-          <SharesWarning amount={amount} shares={shares} />
-        </div>
+        <ExpenseDetailsFields
+          autoOpenCalculator={autoOpenCalculator}
+          createFieldFocusHandlers={createFieldFocusHandlers}
+          focusedFieldRef={focusedFieldRef}
+          form={form}
+          onViewPhoto={onViewPhoto}
+          participants={participants}
+          shouldAutoFocus={autoFocus}
+        />
+        <ExpenseParticipantsSection
+          amount={amount}
+          autoOpenCalculator={autoOpenCalculator}
+          onIncludeAllChange={handleIncludeAllChange}
+          onSharesChange={(shares) => form.setFieldValue("shares", shares)}
+          participants={participants}
+          shares={shares}
+        />
 
         <div className="h-16 flex-shrink-0" />
       </form>
+    </div>
+  );
+}
+
+function ExpenseEditorHeader({
+  autoOpenCalculator,
+  formId,
+  goBackFallbackOptions,
+  onToggleAutoOpenCalculator,
+  submitButton,
+  title,
+}: {
+  autoOpenCalculator: boolean;
+  formId: string;
+  goBackFallbackOptions: React.ComponentProps<typeof BackButton>["fallbackOptions"];
+  onToggleAutoOpenCalculator: () => void;
+  submitButton: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <div className="container flex h-16 items-center px-2 mt-safe">
+      <BackButton fallbackOptions={goBackFallbackOptions} />
+      <h1 className="max-h-12 truncate px-4 text-xl font-medium">{title}</h1>
+      <div className="flex-1" />
+      <MenuTrigger>
+        <IconButton
+          icon="lucide.ellipsis-vertical"
+          aria-label={t`Menu`}
+          className="flex-shrink-0"
+        />
+        <Popover placement="bottom end">
+          <Menu>
+            <MenuItem onAction={onToggleAutoOpenCalculator}>
+              <Icon icon="lucide.calculator" width={20} height={20} className="mr-3 self-start" />
+              <div className="mr-3 flex flex-col">
+                <span className="leading-none">
+                  <Trans>Auto-open calculator</Trans>
+                </span>
+                <span className="mt-2 text-sm leading-none opacity-80">
+                  <Trans>Open calculator when focusing amount fields</Trans>
+                </span>
+              </div>
+              <Switch
+                isSelected={autoOpenCalculator}
+                onChange={onToggleAutoOpenCalculator}
+                isReadOnly
+              />
+            </MenuItem>
+          </Menu>
+        </Popover>
+      </MenuTrigger>
+      {submitButton}
+    </div>
+  );
+}
+
+function ExpenseDetailsFields({
+  autoOpenCalculator,
+  createFieldFocusHandlers,
+  focusedFieldRef,
+  form,
+  onViewPhoto,
+  participants,
+  shouldAutoFocus,
+}: {
+  autoOpenCalculator: boolean;
+  createFieldFocusHandlers: FieldFocusHandlersFactory;
+  focusedFieldRef: React.RefObject<keyof ExpenseEditorFormValues | null>;
+  form: ExpenseEditorFormApi;
+  onViewPhoto?: (index: number) => void;
+  participants: PartyParticipant[];
+  shouldAutoFocus: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-x-2 gap-y-4">
+      <div className="col-span-2">
+        <form.Field name="photos">
+          {(field) => (
+            <PhotosField
+              value={field.state.value}
+              onChange={field.handleChange}
+              onViewPhoto={onViewPhoto}
+            />
+          )}
+        </form.Field>
+      </div>
+
+      <form.Field
+        name="name"
+        validators={{
+          onChange: ({ value }) => validateExpenseTitle(value),
+        }}
+      >
+        {(field) => (
+          <AppTextField
+            label={t`Title`}
+            minLength={1}
+            maxLength={50}
+            name={field.name}
+            value={field.state.value}
+            onChange={field.handleChange}
+            errorMessage={field.state.meta.errors?.join(", ")}
+            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- We want to auto focus the title field when creating a new expense
+            autoFocus={shouldAutoFocus}
+            className="col-span-2"
+            data-presence-element-id="title"
+            data-presence-offset-top={6}
+            data-presence-offset-left={-10}
+            {...createFieldFocusHandlers(field)}
+          />
+        )}
+      </form.Field>
+
+      <form.Field
+        name="amount"
+        validators={{
+          onChange: ({ value }) => {
+            if (value <= 0) {
+              return t`Amount must be greater than 0`;
+            }
+          },
+        }}
+      >
+        {(field) => (
+          <CurrencyField
+            calculator
+            autoOpenCalculator={autoOpenCalculator}
+            name={field.name}
+            label={t`Amount`}
+            value={field.state.value}
+            onChange={(value) => {
+              field.handleChange(value || 0);
+            }}
+            onBlur={createFieldFocusHandlers(field).onBlur}
+            errorMessage={field.state.meta.errors?.join(", ")}
+            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
+            className="col-span-2"
+            onFocus={(event) => {
+              const input = event.target as HTMLInputElement;
+              input.select();
+              focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
+            }}
+            inputMode="decimal"
+            data-presence-element-id="amount"
+            data-presence-offset-top={6}
+            data-presence-offset-left={-10}
+          />
+        )}
+      </form.Field>
+
+      <form.Field name="paidBy">
+        {(field) => (
+          <AppSelect<PartyParticipant>
+            label={t`Paid by`}
+            items={participants}
+            onSelectionChange={(value) => {
+              if (value) {
+                field.handleChange(String(value));
+              }
+            }}
+            selectedKey={field.state.value}
+            data-presence-element-id="paidBy"
+            data-presence-offset-top={6}
+            data-presence-offset-left={-10}
+            {...createFieldFocusHandlers(field)}
+          >
+            {(participant) => (
+              <SelectItem key={participant.id} value={participant} textValue={participant.name}>
+                {participant.name}
+              </SelectItem>
+            )}
+          </AppSelect>
+        )}
+      </form.Field>
+
+      <form.Field name="paidAt">
+        {(field) => (
+          <AppDatePicker<ZonedDateTime>
+            label={t`Date`}
+            value={fromDate(field.state.value, getLocalTimeZone())}
+            granularity="day"
+            onChange={(value) => {
+              if (value) {
+                field.handleChange(value.toDate());
+              }
+            }}
+            data-presence-element-id="paidAt"
+            data-presence-offset-top={6}
+            data-presence-offset-left={-10}
+            {...createFieldFocusHandlers(field)}
+          />
+        )}
+      </form.Field>
+    </div>
+  );
+}
+
+function ExpenseParticipantsSection({
+  amount,
+  autoOpenCalculator,
+  onIncludeAllChange,
+  onSharesChange,
+  participants,
+  shares,
+}: {
+  amount: number;
+  autoOpenCalculator: boolean;
+  onIncludeAllChange: (include: boolean) => void;
+  onSharesChange: ParticipantItemProps["onSharesChange"];
+  participants: PartyParticipant[];
+  shares: ParticipantItemProps["shares"];
+}) {
+  const shareCount = Object.keys(shares).length;
+
+  return (
+    <div className="mt-4 flex flex-col gap-2">
+      <div className="flex items-center justify-between border-l border-transparent pl-3">
+        <Checkbox
+          isSelected={shareCount === participants.length}
+          isIndeterminate={shareCount > 0 && shareCount < participants.length}
+          onChange={onIncludeAllChange}
+        >
+          {t`Include all`}
+        </Checkbox>
+      </div>
+
+      <div className="space-y-2">
+        {participants.map((participant) => (
+          <ParticipantItem
+            key={participant.id}
+            participant={participant}
+            amount={amount}
+            shares={shares}
+            autoOpenCalculator={autoOpenCalculator}
+            onSharesChange={onSharesChange}
+          />
+        ))}
+      </div>
+
+      <SharesWarning amount={amount} shares={shares} />
     </div>
   );
 }

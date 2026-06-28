@@ -170,38 +170,39 @@ export function usePartyList() {
         return;
       }
 
-      for (const partyId in partyList.participantInParties) {
-        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
-        const party = await documentCache.readAsync(repo, partyId as DocumentId);
+      await Promise.all(
+        Object.keys(partyList.participantInParties).map(async (partyId) => {
+          const party = await documentCache.readAsync(repo, partyId as DocumentId);
 
-        if (!party) {
-          continue;
-        }
-
-        const partyHandle = handleCache.read(repo, partyId as DocumentId) as DocHandle<Party>;
-
-        partyHandle.change((doc) => {
-          const participantId = partyList.participantInParties[partyId as DocumentId];
-          const participant = doc.participants[participantId];
-
-          if (!participant) {
+          if (!party) {
             return;
           }
 
-          // Only update participant-relevant fields, not user-local settings
-          const participantFields = ["phone", "avatarId"] as const;
-          for (const key of participantFields) {
-            const value = values[key];
+          const partyHandle = handleCache.read(repo, partyId as DocumentId) as DocHandle<Party>;
 
-            if (value === undefined) {
-              delete participant[key as keyof typeof participant];
-            } else {
-              // @ts-expect-error -- idk tbh
-              participant[key] = value;
+          partyHandle.change((doc) => {
+            const participantId = partyList.participantInParties[partyId as DocumentId];
+            const participant = doc.participants[participantId];
+
+            if (!participant) {
+              return;
             }
-          }
-        });
-      }
+
+            // Only update participant-relevant fields, not user-local settings
+            const participantFields = ["phone", "avatarId"] as const;
+            for (const key of participantFields) {
+              const value = values[key];
+
+              if (value === undefined) {
+                delete participant[key as keyof typeof participant];
+              } else {
+                // @ts-expect-error -- idk tbh
+                participant[key] = value;
+              }
+            }
+          });
+        }),
+      );
     }
   }
 

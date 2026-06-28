@@ -17,8 +17,7 @@ import {
   composeRenderProps,
   useLocale,
 } from "react-aria-components";
-// oxlint-disable-next-line react-doctor/no-react19-deprecated-apis -- FIXME: address existing React Doctor diagnostics.
-import { useContext } from "react";
+import { use } from "react";
 import { cn } from "./utils";
 import { IconButton } from "./IconButton";
 
@@ -76,7 +75,7 @@ const CalendarGridBody = ({ className, ...props }: AriaCalendarGridBodyProps) =>
 );
 
 const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
-  const isRange = Boolean(useContext(AriaRangeCalendarStateContext));
+  const isRange = Boolean(use(AriaRangeCalendarStateContext));
   return (
     <AriaCalendarCell
       className={composeRenderProps(className, (className, renderProps) =>

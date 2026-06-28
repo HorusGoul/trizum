@@ -118,6 +118,12 @@ function AccessibleSheetContainer({
   const descriptionId = useId();
   const [hasDescription, setHasDescription] = useState(false);
   const [hasTitle, setHasTitle] = useState(false);
+  const [contextValue] = useState<ModalSheetContextValue>(() => ({
+    descriptionId,
+    setHasDescription,
+    setHasTitle,
+    titleId,
+  }));
 
   const { overlayProps } = useOverlay(
     {
@@ -132,15 +138,7 @@ function AccessibleSheetContainer({
   const { dialogProps } = useDialog({}, containerRef);
 
   return (
-    <ModalSheetContext
-      // oxlint-disable-next-line react-doctor/jsx-no-constructed-context-values -- FIXME: address existing React Doctor diagnostics.
-      value={{
-        descriptionId,
-        setHasDescription,
-        setHasTitle,
-        titleId,
-      }}
-    >
+    <ModalSheetContext value={contextValue}>
       <Sheet.Container
         className={cn(
           "mt-12 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border border-accent-200/80 bg-gradient-to-b from-white via-white to-accent-50/95 shadow-[0_-10px_40px_rgba(15,23,42,0.24)] sm:mt-0 sm:rounded-[1.75rem] dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 dark:shadow-none",

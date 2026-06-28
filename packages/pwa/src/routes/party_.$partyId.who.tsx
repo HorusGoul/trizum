@@ -117,11 +117,9 @@ function Who() {
         </form.Subscribe>
       </div>
 
-      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
-        onSubmit={(e) => {
-          e.preventDefault();
+        action={() => {
           void form.handleSubmit();
         }}
         className="container mt-2 flex flex-col gap-4 px-2"

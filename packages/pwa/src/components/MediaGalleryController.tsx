@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 import type { MediaGalleryItem } from "./MediaGallery";
 import { Modal, ModalOverlay } from "react-aria-components";
@@ -29,10 +29,9 @@ export function MediaGalleryController({ children }: MediaGalleryControllerProps
     setDragProgress(0);
   }
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const handleDragProgress = useCallback((progress: number) => {
+  function handleDragProgress(progress: number) {
     setDragProgress(progress);
-  }, []);
+  }
 
   // Calculate background opacity: starts at 0.25 (25% black), fades to 0 as drag progresses
   const backgroundOpacity = 0.25 * (1 - dragProgress);
@@ -59,7 +58,10 @@ export function MediaGalleryController({ children }: MediaGalleryControllerProps
             <MediaGallery
               index={state.index}
               items={state.items}
-              onChange={(index) => setState((current) => ({ ...current, index }))}
+              onChange={(index) => {
+                setDragProgress(0);
+                setState((current) => ({ ...current, index }));
+              }}
               onClose={close}
               onDragProgress={handleDragProgress}
             />

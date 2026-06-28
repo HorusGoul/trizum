@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Suspense, useEffect, useId, useState } from "react";
+import { Suspense, useEffect, useId, useReducer } from "react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
 import { AvatarPicker } from "#src/components/AvatarPicker.js";
@@ -27,6 +27,7 @@ import { Label } from "#src/ui/fields/Field.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
+import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -47,42 +48,101 @@ interface LocaleOption {
   name: string;
 }
 
-// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
+type TrizumCloudStatus = "idle" | "loading" | "error";
+
+interface TrizumCloudState {
+  cloudSettings: CloudUserSettings | null;
+  hasCachedCloudSettings: boolean;
+  status: TrizumCloudStatus;
+}
+
+type TrizumCloudAction =
+  | { type: "sessionPending" }
+  | { type: "signedOut" }
+  | { type: "cachedSettingsLoaded"; settings: CloudUserSettings | null }
+  | { type: "cachedSettingsMissing" }
+  | { type: "fetchSucceeded"; settings: CloudUserSettings | null }
+  | { type: "fetchFailed" };
+
+function getInitialTrizumCloudState(): TrizumCloudState {
+  const cachedCloudSettings = readLastCachedCloudUserSettings();
+
+  return {
+    cloudSettings: cachedCloudSettings?.settings ?? null,
+    hasCachedCloudSettings: Boolean(cachedCloudSettings),
+    status: cachedCloudSettings ? "idle" : "loading",
+  };
+}
+
+function trizumCloudReducer(state: TrizumCloudState, action: TrizumCloudAction): TrizumCloudState {
+  switch (action.type) {
+    case "sessionPending":
+      return {
+        ...state,
+        status: state.hasCachedCloudSettings ? "idle" : "loading",
+      };
+    case "signedOut":
+      return {
+        cloudSettings: null,
+        hasCachedCloudSettings: false,
+        status: "idle",
+      };
+    case "cachedSettingsLoaded":
+      return {
+        cloudSettings: action.settings,
+        hasCachedCloudSettings: true,
+        status: "idle",
+      };
+    case "cachedSettingsMissing":
+      return {
+        cloudSettings: null,
+        hasCachedCloudSettings: false,
+        status: "loading",
+      };
+    case "fetchSucceeded":
+      return {
+        cloudSettings: action.settings,
+        hasCachedCloudSettings: true,
+        status: "idle",
+      };
+    case "fetchFailed":
+      return {
+        ...state,
+        status: state.hasCachedCloudSettings ? "idle" : "error",
+      };
+  }
+}
+
+function getLocaleOptions(): LocaleOption[] {
+  return [
+    { id: "system", name: t`System (fallbacks to ${DEFAULT_LOCALE})` },
+    { id: "en", name: t`English` },
+    { id: "es", name: t`Español` },
+  ];
+}
+
 export function Settings() {
   const { partyList, updateSettings } = usePartyList();
   const navigate = useNavigate();
   const session = authClient.useSession();
   const userId = session.data?.user?.id;
   const isSessionPending = session.isPending;
-  const [initialCachedCloudSettings] = useState(readLastCachedCloudUserSettings);
-  const [cloudSettings, setCloudSettings] = useState<CloudUserSettings | null>(
-    initialCachedCloudSettings?.settings ?? null,
+  const [trizumCloudState, dispatchTrizumCloud] = useReducer(
+    trizumCloudReducer,
+    undefined,
+    getInitialTrizumCloudState,
   );
-  const [hasCachedCloudSettings, setHasCachedCloudSettings] = useState(
-    Boolean(initialCachedCloudSettings),
-  );
-  const [trizumCloudStatus, setTrizumCloudStatus] = useState<TrizumCloudStatus>(
-    initialCachedCloudSettings ? "idle" : "loading",
-  );
+  const { cloudSettings, hasCachedCloudSettings, status: trizumCloudStatus } = trizumCloudState;
+  const localeOptions = getLocaleOptions();
 
-  // oxlint-disable-next-line react-doctor/prefer-module-scope-static-value -- FIXME: address existing React Doctor diagnostics.
-  const LOCALE_OPTIONS: LocaleOption[] = [
-    { id: "system", name: t`System (fallbacks to ${DEFAULT_LOCALE})` },
-    { id: "en", name: t`English` },
-    { id: "es", name: t`Español` },
-  ];
-
-  // oxlint-disable-next-line react-doctor/no-cascading-set-state -- FIXME: address existing React Doctor diagnostics.
   useEffect(() => {
     if (!userId) {
       if (isSessionPending) {
-        setTrizumCloudStatus(initialCachedCloudSettings ? "idle" : "loading");
+        dispatchTrizumCloud({ type: "sessionPending" });
         return;
       }
 
-      setCloudSettings(null);
-      setHasCachedCloudSettings(false);
-      setTrizumCloudStatus("idle");
+      dispatchTrizumCloud({ type: "signedOut" });
       return;
     }
 
@@ -90,34 +150,31 @@ export function Settings() {
     const cachedCloudSettings = readCachedCloudUserSettings(userId);
 
     if (cachedCloudSettings) {
-      setCloudSettings(cachedCloudSettings.settings);
-      setHasCachedCloudSettings(true);
-      setTrizumCloudStatus("idle");
+      dispatchTrizumCloud({
+        type: "cachedSettingsLoaded",
+        settings: cachedCloudSettings.settings,
+      });
     } else {
-      setCloudSettings(null);
-      setHasCachedCloudSettings(false);
-      setTrizumCloudStatus("loading");
+      dispatchTrizumCloud({ type: "cachedSettingsMissing" });
     }
 
     void fetchCloudUserSettings()
       .then(({ settings }) => {
         if (!isCancelled) {
-          setCloudSettings(settings);
           writeCachedCloudUserSettings(userId, settings);
-          setHasCachedCloudSettings(true);
-          setTrizumCloudStatus("idle");
+          dispatchTrizumCloud({ type: "fetchSucceeded", settings });
         }
       })
       .catch(() => {
         if (!isCancelled) {
-          setTrizumCloudStatus(cachedCloudSettings ? "idle" : "error");
+          dispatchTrizumCloud({ type: "fetchFailed" });
         }
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [initialCachedCloudSettings, isSessionPending, userId]);
+  }, [isSessionPending, userId]);
 
   function onSaveSettings(values: SettingsFormValues) {
     updateSettings({
@@ -162,212 +219,249 @@ export function Settings() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
-        <BackButton fallbackOptions={{ to: "/" }} />
+      <SettingsHeader
+        submitButton={
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}
+          >
+            {([canSubmit, isSubmitting, isDirty]) =>
+              canSubmit && isDirty ? (
+                <Suspense fallback={null}>
+                  <IconButton
+                    icon="lucide.check"
+                    aria-label={isSubmitting ? t`Submitting...` : t`Save`}
+                    type="submit"
+                    form={formId}
+                    isDisabled={isSubmitting}
+                  />
+                </Suspense>
+              ) : null
+            }
+          </form.Subscribe>
+        }
+      />
 
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-          <Trans>Settings</Trans>
-        </h1>
-
-        <div className="flex-1" />
-
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}>
-          {([canSubmit, isSubmitting, isDirty]) =>
-            canSubmit && isDirty ? (
-              <Suspense fallback={null}>
-                <IconButton
-                  icon="lucide.check"
-                  aria-label={isSubmitting ? t`Submitting...` : t`Save`}
-                  type="submit"
-                  form={formId}
-                  isDisabled={isSubmitting}
-                />
-              </Suspense>
-            ) : null
-          }
-        </form.Subscribe>
-      </div>
-
-      <div className="container mt-4 px-4">
-        <Button
-          color="input-like"
-          className="relative h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left"
-          onPress={() => {
-            void navigate({ to: "/settings/cloud-sync" });
-          }}
-        >
-          <span className="flex w-full items-center gap-3">
-            <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50">
-              {isTrizumCloudActive ? (
-                <span
-                  aria-hidden="true"
-                  className="absolute -right-0.5 -top-0.5 flex size-3 items-center justify-center"
-                >
-                  <span className="absolute size-3 animate-pulse rounded-full bg-accent-500/25" />
-                  <span className="relative size-2 rounded-full bg-accent-500 ring-2 ring-white dark:ring-accent-900" />
-                </span>
-              ) : null}
-              <Icon
-                className="relative"
-                icon={isTrizumCloudActive ? "lucide.cloud-check" : "lucide.cloud"}
-                width={20}
-                height={20}
-              />
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col gap-1">
-              <span className="font-medium leading-none">
-                <Trans>trizum cloud</Trans>
-              </span>
-              <span className="truncate text-sm text-accent-700 dark:text-accent-50">
-                {trizumCloudLabel}
-              </span>
-            </span>
-            <Icon icon="lucide.chevron-right" width={20} height={20} />
-          </span>
-        </Button>
-      </div>
-
-      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
-      <form
-        id={formId}
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
+      <CloudSyncSettingsButton
+        isActive={isTrizumCloudActive}
+        label={trizumCloudLabel}
+        onPress={() => {
+          void navigate({ to: "/settings/cloud-sync" });
         }}
-        className="container mt-6 flex flex-col gap-6 px-4 pb-8 pb-safe"
-      >
-        <form.Field name="avatarId">
-          {(field) => (
-            <form.Subscribe selector={(state) => state.values.username}>
-              {([username]) => (
-                <AvatarPicker
-                  value={field.state.value}
-                  name={username}
-                  onChange={field.handleChange}
-                />
-              )}
-            </form.Subscribe>
-          )}
-        </form.Field>
+      />
 
-        <form.Field
-          name="username"
-          validators={{
-            onChange: ({ value }) => validatePartyParticipantName(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Username`}
-              description={t`What's your preferred way to be addressed?`}
-              minLength={1}
-              maxLength={50}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-            />
-          )}
-        </form.Field>
-
-        <form.Field
-          name="phone"
-          validators={{
-            onChange: ({ value }) => validatePhoneNumber(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Phone number`}
-              description={t`For payments through Bizum or similar services`}
-              maxLength={20}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="locale">
-          {(field) => (
-            <AppSelect<LocaleOption>
-              label={t`Language`}
-              items={LOCALE_OPTIONS}
-              selectedKey={field.state.value}
-              onSelectionChange={(value) => {
-                if (value) {
-                  field.handleChange(value as SupportedLocale | "system");
-                }
-              }}
-            >
-              {(locale) => (
-                <SelectItem key={locale.id} value={locale}>
-                  {locale.name}
-                </SelectItem>
-              )}
-            </AppSelect>
-          )}
-        </form.Field>
-
-        <form.Field name="openLastPartyOnLaunch">
-          {(field) => (
-            <SwitchField
-              label={<Trans>Open last party on launch</Trans>}
-              description={
-                <Trans>Automatically open the last visited party when you open the app</Trans>
-              }
-              isSelected={field.state.value}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="autoOpenCalculator">
-          {(field) => (
-            <SwitchField
-              label={<Trans>Auto-open calculator</Trans>}
-              description={
-                <Trans>Automatically open the calculator when focusing amount fields</Trans>
-              }
-              isSelected={field.state.value}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="hue">
-          {(field) => (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={field.name}>{t`Accent color`}</Label>
-              <ColorSlider
-                id={field.name}
-                value={`hsl(${field.state.value}, 100%, 50%)`}
-                onChange={(value) => {
-                  const hue = value.getChannelValue("hue");
-                  field.setValue(hue);
-                  setThemeHue(hue);
-                }}
-                channel="hue"
-                className="w-full"
-              >
-                <SliderTrack className="w-full">
-                  <ColorThumb className="top-1/2" />
-                </SliderTrack>
-              </ColorSlider>
-            </div>
-          )}
-        </form.Field>
-      </form>
+      <SettingsFormFields form={form} formId={formId} localeOptions={localeOptions} />
     </div>
   );
 }
 
-type TrizumCloudStatus = "idle" | "loading" | "error";
+function SettingsHeader({ submitButton }: { submitButton: React.ReactNode }) {
+  return (
+    <div className="container flex h-16 items-center px-2 mt-safe">
+      <BackButton fallbackOptions={{ to: "/" }} />
+
+      <h1 className="max-h-12 truncate px-4 text-xl font-medium">
+        <Trans>Settings</Trans>
+      </h1>
+
+      <div className="flex-1" />
+      {submitButton}
+    </div>
+  );
+}
+
+function CloudSyncSettingsButton({
+  isActive,
+  label,
+  onPress,
+}: {
+  isActive: boolean;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <div className="container mt-4 px-4">
+      <Button
+        color="input-like"
+        className="relative h-auto min-h-16 justify-start rounded-lg px-4 py-3 text-left"
+        onPress={onPress}
+      >
+        <span className="flex w-full items-center gap-3">
+          <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50">
+            {isActive ? (
+              <span
+                aria-hidden="true"
+                className="absolute -right-0.5 -top-0.5 flex size-3 items-center justify-center"
+              >
+                <span className="absolute size-3 animate-pulse rounded-full bg-accent-500/25" />
+                <span className="relative size-2 rounded-full bg-accent-500 ring-2 ring-white dark:ring-accent-900" />
+              </span>
+            ) : null}
+            <Icon
+              className="relative"
+              icon={isActive ? "lucide.cloud-check" : "lucide.cloud"}
+              width={20}
+              height={20}
+            />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col gap-1">
+            <span className="font-medium leading-none">
+              <Trans>trizum cloud</Trans>
+            </span>
+            <span className="truncate text-sm text-accent-700 dark:text-accent-50">{label}</span>
+          </span>
+          <Icon icon="lucide.chevron-right" width={20} height={20} />
+        </span>
+      </Button>
+    </div>
+  );
+}
+
+function SettingsFormFields({
+  form,
+  formId,
+  localeOptions,
+}: {
+  form: AppFormApi<SettingsFormValues>;
+  formId: string;
+  localeOptions: LocaleOption[];
+}) {
+  return (
+    <form
+      id={formId}
+      action={() => {
+        void form.handleSubmit();
+      }}
+      className="container mt-6 flex flex-col gap-6 px-4 pb-8 pb-safe"
+    >
+      <form.Field name="avatarId">
+        {(field) => (
+          <form.Subscribe selector={(state) => state.values.username}>
+            {([username]) => (
+              <AvatarPicker
+                value={field.state.value}
+                name={username}
+                onChange={field.handleChange}
+              />
+            )}
+          </form.Subscribe>
+        )}
+      </form.Field>
+
+      <form.Field
+        name="username"
+        validators={{
+          onChange: ({ value }) => validatePartyParticipantName(value),
+        }}
+      >
+        {(field) => (
+          <AppTextField
+            label={t`Username`}
+            description={t`What's your preferred way to be addressed?`}
+            minLength={1}
+            maxLength={50}
+            name={field.name}
+            value={field.state.value}
+            onChange={field.handleChange}
+            onBlur={field.handleBlur}
+            errorMessage={field.state.meta.errors?.join(", ")}
+            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
+          />
+        )}
+      </form.Field>
+
+      <form.Field
+        name="phone"
+        validators={{
+          onChange: ({ value }) => validatePhoneNumber(value),
+        }}
+      >
+        {(field) => (
+          <AppTextField
+            label={t`Phone number`}
+            description={t`For payments through Bizum or similar services`}
+            maxLength={20}
+            name={field.name}
+            value={field.state.value}
+            onChange={field.handleChange}
+            onBlur={field.handleBlur}
+            errorMessage={field.state.meta.errors?.join(", ")}
+            isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
+          />
+        )}
+      </form.Field>
+
+      <form.Field name="locale">
+        {(field) => (
+          <AppSelect<LocaleOption>
+            label={t`Language`}
+            items={localeOptions}
+            selectedKey={field.state.value}
+            onSelectionChange={(value) => {
+              if (value) {
+                field.handleChange(value as SupportedLocale | "system");
+              }
+            }}
+          >
+            {(locale) => (
+              <SelectItem key={locale.id} value={locale} textValue={locale.name}>
+                {locale.name}
+              </SelectItem>
+            )}
+          </AppSelect>
+        )}
+      </form.Field>
+
+      <form.Field name="openLastPartyOnLaunch">
+        {(field) => (
+          <SwitchField
+            label={<Trans>Open last party on launch</Trans>}
+            description={
+              <Trans>Automatically open the last visited party when you open the app</Trans>
+            }
+            isSelected={field.state.value}
+            onChange={field.handleChange}
+          />
+        )}
+      </form.Field>
+
+      <form.Field name="autoOpenCalculator">
+        {(field) => (
+          <SwitchField
+            label={<Trans>Auto-open calculator</Trans>}
+            description={
+              <Trans>Automatically open the calculator when focusing amount fields</Trans>
+            }
+            isSelected={field.state.value}
+            onChange={field.handleChange}
+          />
+        )}
+      </form.Field>
+
+      <form.Field name="hue">
+        {(field) => (
+          <div className="flex flex-col gap-2">
+            <Label htmlFor={field.name}>{t`Accent color`}</Label>
+            <ColorSlider
+              id={field.name}
+              value={`hsl(${field.state.value}, 100%, 50%)`}
+              onChange={(value) => {
+                const hue = value.getChannelValue("hue");
+                field.setValue(hue);
+                setThemeHue(hue);
+              }}
+              channel="hue"
+              className="w-full"
+            >
+              <SliderTrack className="w-full">
+                <ColorThumb className="top-1/2" />
+              </SliderTrack>
+            </ColorSlider>
+          </div>
+        )}
+      </form.Field>
+    </form>
+  );
+}
 
 function getTrizumCloudLabel({
   cloudSettings,
