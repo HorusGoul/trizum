@@ -16,7 +16,7 @@ The workflow:
 
 - queues runs instead of canceling in progress so a newer Renovate branch push
   does not stop an in-flight lockfile refresh while it may be about to commit,
-- skips commits authored by `trizum-agent@trizum.app`,
+- skips commits authored by `259750894+PUNK-02@users.noreply.github.com`,
 - disables setup-vp's automatic install because Renovate's initial lockfile can
   be out of sync with the updated manifests,
 - runs:
@@ -30,5 +30,6 @@ vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
 The workflow uses `BOT_GITHUB_TOKEN` through `actions/checkout` for the
 follow-up push.
 
-`renovate.json` lists `trizum-agent@trizum.app` in `gitIgnoredAuthors` so
-Renovate keeps managing branches after the workflow adds its lockfile commit.
+`renovate.json` lists `259750894+PUNK-02@users.noreply.github.com` in
+`gitIgnoredAuthors` so Renovate keeps managing branches after the workflow adds
+its lockfile commit.
