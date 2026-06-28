@@ -68,6 +68,8 @@ interface LocalValidationResult {
   passed: boolean;
 }
 
+const ORIGINAL_PR_DIRECT_UPDATE_FILES = new Set(["pnpm-lock.yaml", "pnpm-workspace.yaml"]);
+
 export const listRenovatePullRequests = createHandler(
   {
     inputValidator: workflowOptionsSchema,
@@ -759,11 +761,49 @@ async function createSupersedingPullRequest(
 
     const fallbackCommitCreated = await commitPendingAgentChanges(worktreeRoot, context);
     const agentCommits = await ensureCoAuthorOnSupersedingCommits(worktreeRoot, originalPrHead);
+    const changedFiles = await listChangedFilesAfter(worktreeRoot, originalPrHead);
     const sandcastleSummary = renderSandcastleSummary(
       sandcastleRun,
       fallbackCommitCreated,
       agentCommits,
     );
+
+    if (canUpdateOriginalRenovatePr(changedFiles)) {
+      await runGitWithOptionalCredentials(
+        ["push", "origin", `HEAD:${context.pr.headRefName}`],
+        worktreeRoot,
+      );
+      await addLabelToIssue(options, context.pr.number, options.readyForHumanReviewLabel);
+      if (options.postReviewComment) {
+        await commentOnPullRequest(
+          options,
+          context.pr.number,
+          renderOriginalPullRequestUpdatedComment(
+            context,
+            report,
+            sandcastleSummary,
+            localValidation,
+          ),
+        );
+      }
+
+      return {
+        branchName: context.pr.headRefName,
+        agentCommits,
+        agentLogPath: sandcastleRun.logFilePath,
+        localValidationOutput: localValidation.output,
+        localValidationPassed: localValidation.passed,
+        prUrl: context.pr.url,
+        summary: truncateText(
+          [
+            "Updated the original Renovate PR because the agent fix only changed lockfile/workspace metadata.",
+            sandcastleSummary,
+          ].join("\n\n"),
+          12_000,
+        ),
+        updatedOriginalPr: true,
+      };
+    }
 
     await runGitWithOptionalCredentials(["push", "-u", "origin", branchName], worktreeRoot);
 
@@ -1038,6 +1078,20 @@ async function listCommitsAfter(worktreeRoot: string, baseCommit: string): Promi
   return splitLines(result.stdout);
 }
 
+async function listChangedFilesAfter(worktreeRoot: string, baseCommit: string): Promise<string[]> {
+  const result = await runCommand("git", ["diff", "--name-only", `${baseCommit}..HEAD`], {
+    cwd: worktreeRoot,
+  });
+  return splitLines(result.stdout);
+}
+
+export function canUpdateOriginalRenovatePr(changedFiles: readonly string[]): boolean {
+  return (
+    changedFiles.length > 0 &&
+    changedFiles.every((file) => ORIGINAL_PR_DIRECT_UPDATE_FILES.has(file))
+  );
+}
+
 async function allCommitsHaveCoAuthor(
   worktreeRoot: string,
   commits: readonly string[],
@@ -1162,6 +1216,38 @@ function renderSupersedingPullRequestBody(
       findings.length === 0 ? "" : findings.map((finding) => `- ${finding}`).join("\n"),
       "",
       "## Local Validation",
+      `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
+      renderValidationCommandBullets(localValidation.output),
+      "- CI on this PR is the source of truth for merge readiness.",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  );
+}
+
+function renderOriginalPullRequestUpdatedComment(
+  context: PullRequestContext,
+  report: string,
+  agentSummary: string,
+  localValidation: LocalValidationResult,
+): string {
+  const reviewSummary = firstParagraph(extractMarkdownSection(report, "Summary"));
+  const findings = extractMarkdownListItems(report, "Findings", 2);
+
+  return redactSecrets(
+    [
+      "## Agent Renovate Review",
+      "",
+      "Updated this Renovate PR because the required fix only touched lockfile/workspace metadata.",
+      "",
+      `**Purpose:** ${renderDependencyUpdateSummary(context)}.`,
+      `**Agent fix:** ${truncateText(firstParagraph(agentSummary), 700)}`,
+      "",
+      "**Review:**",
+      reviewSummary || "See the workflow logs for the full agent review.",
+      findings.length === 0 ? "" : findings.map((finding) => `- ${finding}`).join("\n"),
+      "",
+      "**Local validation:**",
       `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
       renderValidationCommandBullets(localValidation.output),
       "- CI on this PR is the source of truth for merge readiness.",

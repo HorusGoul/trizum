@@ -169,6 +169,7 @@ export const supersedingPullRequestSchema = z.object({
   localValidationOutput: z.string().optional(),
   prUrl: z.string().optional(),
   summary: z.string(),
+  updatedOriginalPr: z.boolean().optional(),
 });
 export type SupersedingPullRequest = z.infer<typeof supersedingPullRequestSchema>;
 
