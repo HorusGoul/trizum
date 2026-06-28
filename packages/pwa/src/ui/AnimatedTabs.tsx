@@ -4,16 +4,17 @@ import {
   animate,
   domAnimation,
   m as motion,
+  useMotionValue,
   useMotionValueEvent,
   useScroll,
-  useTransform,
   type AnimationPlaybackControls,
 } from "motion/react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { cn } from "./utils";
 import { Icon, type IconProps } from "./Icon";
 
 const activeTabPanelAnimations = new WeakMap<HTMLDivElement, AnimationPlaybackControls>();
+type IndicatorProperty = "offsetLeft" | "offsetWidth";
 
 interface AnimatedTabsProps {
   tabs: {
@@ -26,6 +27,36 @@ interface AnimatedTabsProps {
   tabListClassName?: string;
   selectedTab: Key;
   onSelectedTabChange: (tab: Key) => void;
+}
+
+function getIndex(tabCount: number, scrollProgress: number) {
+  return Math.max(0, Math.floor((tabCount - 1) * scrollProgress));
+}
+
+function getIndicatorValue(
+  tabElements: HTMLElement[],
+  scrollProgress: number,
+  property: IndicatorProperty,
+) {
+  if (!tabElements.length) {
+    return 0;
+  }
+
+  const index = getIndex(tabElements.length, scrollProgress);
+  const currentTab = tabElements[index];
+  const nextTab = tabElements[index + 1];
+  const difference = nextTab ? nextTab[property] - currentTab[property] : currentTab.offsetWidth;
+  const percent = (tabElements.length - 1) * scrollProgress - index;
+  const value = currentTab[property] + difference * percent;
+
+  // iOS scrolls weird when translateX is 0 for some reason.
+  return value || 0.1;
+}
+
+function getSelectedProgress(tabs: AnimatedTabsProps["tabs"], selectedTab: Key) {
+  const selectedIndex = tabs.findIndex((tab) => tab.id === selectedTab);
+
+  return selectedIndex >= 0 && tabs.length > 1 ? selectedIndex / (tabs.length - 1) : 0;
 }
 
 export function AnimatedTabs({
@@ -43,14 +74,30 @@ export function AnimatedTabs({
   });
 
   // Find all the tab elements so we can use their dimensions.
-  const [tabElements, setTabElements] = useState<HTMLElement[]>([]);
+  const tabElementsRef = useRef<HTMLElement[]>([]);
+  const x = useMotionValue(0.1);
+  const width = useMotionValue(0);
+
   useLayoutEffect(() => {
     const tabList = tabListRef.current;
 
-    if (tabList) {
-      setTabElements(Array.from(tabList.querySelectorAll<HTMLElement>("[role=tab]")));
+    if (!tabList) {
+      return;
     }
-  }, [tabs.length]);
+
+    const frame = requestAnimationFrame(() => {
+      const tabElements = Array.from(tabList.querySelectorAll<HTMLElement>("[role=tab]"));
+      const selectedProgress = getSelectedProgress(tabs, selectedTab);
+
+      tabElementsRef.current = tabElements;
+      x.set(getIndicatorValue(tabElements, selectedProgress, "offsetLeft"));
+      width.set(getIndicatorValue(tabElements, selectedProgress, "offsetWidth"));
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [selectedTab, tabs, x, width]);
 
   const initialSelectedTab = useRef(selectedTab);
   const initialTabs = useRef(tabs);
@@ -70,47 +117,25 @@ export function AnimatedTabs({
     }
   }, []);
 
-  // This function determines which tab should be selected
-  // based on the scroll position.
-  function getIndex(x: number) {
-    return Math.max(0, Math.floor((tabElements.length - 1) * x));
-  }
-
-  // This function transforms the scroll position into the X position
-  // or width of the selected tab indicator.
-  const transform = (x: number, property: "offsetLeft" | "offsetWidth") => {
-    if (!tabElements.length) return 0;
-
-    // Find the tab index for the scroll X position.
-    const index = getIndex(x);
-
-    // Get the difference between this tab and the next one.
-    const difference =
-      index < tabElements.length - 1
-        ? tabElements[index + 1][property] - tabElements[index][property]
-        : tabElements[index].offsetWidth;
-
-    // Get the percentage between tabs.
-    // This is the difference between the integer index and fractional one.
-    const percent = (tabElements.length - 1) * x - index;
-
-    // Linearly interpolate to calculate the position of the selection indicator.
-    const value = tabElements[index][property] + difference * percent;
-
-    // iOS scrolls weird when translateX is 0 for some reason. 🤷‍♂️
-    return value || 0.1;
-  };
-
-  const x = useTransform(scrollXProgress, (x) => transform(x, "offsetLeft"));
-  const width = useTransform(scrollXProgress, (x) => transform(x, "offsetWidth"));
-
   // When the user scrolls, update the selected key
   // so that the correct tab panel becomes interactive.
-  useMotionValueEvent(scrollXProgress, "change", (x) => {
+  useMotionValueEvent(scrollXProgress, "change", (scrollProgress) => {
+    const tabElements = tabElementsRef.current;
+
+    x.set(getIndicatorValue(tabElements, scrollProgress, "offsetLeft"));
+    width.set(getIndicatorValue(tabElements, scrollProgress, "offsetWidth"));
+
     const tabPanel = tabPanelsRef.current;
 
-    if (!tabPanel || activeTabPanelAnimations.has(tabPanel) || !tabElements.length) return;
-    onSelectedTabChange?.(tabs[getIndex(x)].id);
+    if (!tabPanel || activeTabPanelAnimations.has(tabPanel) || !tabElements.length) {
+      return;
+    }
+
+    const nextTab = tabs[getIndex(tabElements.length, scrollProgress)];
+
+    if (nextTab) {
+      onSelectedTabChange?.(nextTab.id);
+    }
   });
 
   // When the user clicks on a tab perform an animation of
