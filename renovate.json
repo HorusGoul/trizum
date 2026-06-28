@@ -1,16 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "gitIgnoredAuthors": ["trizum-agent@trizum.app"],
   "packageRules": [
     {
-      "description": "Regenerate the pnpm lockfile through Vite+ for JavaScript dependency updates.",
+      "description": "Skip Renovate's native npm lockfile artifact updates; the Renovate Lockfiles workflow refreshes pnpm-lock.yaml with Vite+.",
       "matchManagers": ["npm"],
-      "skipArtifactsUpdate": true,
-      "postUpgradeTasks": {
-        "commands": ["node scripts/renovate-vp-lockfile.mjs"],
-        "executionMode": "branch",
-        "fileFilters": ["pnpm-lock.yaml"]
-      }
+      "skipArtifactsUpdate": true
     },
     {
       "description": "Keep non-major PWA runtime dependency updates together.",

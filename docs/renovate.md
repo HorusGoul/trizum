@@ -6,31 +6,27 @@ as local development and CI.
 
 ## Vite+ Lockfile Updates
 
-The repository config runs this post-upgrade command for JavaScript dependency
-updates:
+Renovate's native npm artifact updates are disabled because they do not refresh
+`pnpm-lock.yaml` through Vite+. Renovate still creates the initial dependency
+branch, and the
+[`Renovate Lockfiles`](../.github/workflows/renovate-lockfile.yml) workflow
+regenerates the lockfile on every `renovate/**` branch push.
+
+The workflow:
+
+- queues runs instead of canceling in progress so a newer Renovate branch push
+  does not stop an in-flight lockfile refresh while it may be about to commit,
+- skips commits authored by `trizum-agent@trizum.app`,
+- runs:
 
 ```sh
-node scripts/renovate-vp-lockfile.mjs
+vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
 ```
 
-That script checks whether `vp` is available. If it is missing, it installs the
-Vite+ CLI with the official macOS/Linux or Windows installer, refreshes the
-current process `PATH`, and then runs:
+- and pushes `pnpm-lock.yaml` back to the same Renovate branch when it changes.
 
-```sh
-vp install --lockfile-only
-```
+The workflow uses the built-in `GITHUB_TOKEN` through `actions/checkout` with
+job-scoped `contents: write` permission for the follow-up push.
 
-## Runner Global Config
-
-Renovate's `allowedCommands` option is global-only, so it cannot live in this
-repo's `renovate.json`. Configure the Renovate runner with this allowlist:
-
-```json
-{
-  "allowedCommands": ["^node scripts/renovate-vp-lockfile\\.mjs$"]
-}
-```
-
-Without that global setting, Renovate will update package files but skip the
-post-upgrade task that regenerates `pnpm-lock.yaml` through Vite+.
+`renovate.json` lists `trizum-agent@trizum.app` in `gitIgnoredAuthors` so
+Renovate keeps managing branches after the workflow adds its lockfile commit.
