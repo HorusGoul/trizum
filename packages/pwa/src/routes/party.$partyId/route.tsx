@@ -58,8 +58,8 @@ function PartyById() {
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
   const [balancesSortedBy, setBalancesSortedBy] = useBalancesSortedBy();
 
-  function onSelectedTabChange(tab: Key) {
-    void navigate({
+  function selectedTabChangeAction(tab: Key) {
+    return navigate({
       to: "/party/$partyId",
       params: { partyId },
       search: { tab: tab as "expenses" | "balances" },
@@ -290,7 +290,7 @@ function PartyById() {
                 </span>
               </MenuItem>
 
-              <MenuItem onAction={() => void onLeaveParty()}>
+              <MenuItem menuAction={onLeaveParty}>
                 <Icon icon="lucide.log-out" width={20} height={20} className="mr-3" />
                 <span className="h-3.5 leading-none">
                   <Trans>Leave party</Trans>
@@ -305,7 +305,7 @@ function PartyById() {
         <AnimatedTabs
           tabListClassName="px-4 container"
           selectedTab={selectedTab}
-          onSelectedTabChange={onSelectedTabChange}
+          selectionChangeAction={selectedTabChangeAction}
           tabs={[
             {
               id: "expenses",

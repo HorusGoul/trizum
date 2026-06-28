@@ -6,12 +6,14 @@ export type UpdateResult = {
 
 interface UpdateContextType {
   isUpdateAvailable: boolean;
+  isUpdating: boolean;
   update: () => Promise<UpdateResult>;
   checkForUpdate: () => void;
 }
 
 export const UpdateContext = createContext<UpdateContextType>({
   isUpdateAvailable: false,
+  isUpdating: false,
   update: () => Promise.resolve({ status: "unavailable" }),
   checkForUpdate: () => {},
 });

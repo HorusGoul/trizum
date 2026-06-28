@@ -16,7 +16,7 @@ export function SwitchField({ label, description, className, ...props }: SwitchF
     <AriaSwitch
       className={composeRenderProps(className, (className) =>
         cn(
-          "group flex cursor-pointer items-center justify-between gap-4",
+          "group flex cursor-pointer select-none items-center justify-between gap-4",
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70",
           className,
         ),

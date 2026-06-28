@@ -9,9 +9,10 @@ import {
   useScroll,
   type AnimationPlaybackControls,
 } from "motion/react";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useOptimistic, useRef } from "react";
 import { cn } from "./utils";
 import { Icon, type IconProps } from "./Icon";
+import { useActionProp, type AsyncAction } from "./useActionProp";
 
 const activeTabPanelAnimations = new WeakMap<HTMLDivElement, AnimationPlaybackControls>();
 type IndicatorProperty = "offsetLeft" | "offsetWidth";
@@ -26,7 +27,8 @@ interface AnimatedTabsProps {
   }[];
   tabListClassName?: string;
   selectedTab: Key;
-  onSelectedTabChange: (tab: Key) => void;
+  onSelectedTabChange?: (tab: Key) => void;
+  selectionChangeAction?: AsyncAction<[Key]>;
 }
 
 function getIndex(tabCount: number, scrollProgress: number) {
@@ -64,9 +66,20 @@ export function AnimatedTabs({
   tabListClassName,
   selectedTab,
   onSelectedTabChange,
+  selectionChangeAction,
 }: AnimatedTabsProps) {
   const tabListRef = useRef<HTMLDivElement>(null);
   const tabPanelsRef = useRef<HTMLDivElement>(null);
+  const [optimisticSelectedTab, setOptimisticSelectedTab] = useOptimistic(selectedTab);
+  const [isSelectionPending, runSelectionChangeAction] = useActionProp<[Key]>({
+    action: selectionChangeAction
+      ? (tab) => {
+          setOptimisticSelectedTab(tab);
+          return selectionChangeAction(tab);
+        }
+      : undefined,
+    onAction: onSelectedTabChange,
+  });
 
   // Track the scroll position of the tab panel container.
   const { scrollXProgress } = useScroll({
@@ -87,7 +100,7 @@ export function AnimatedTabs({
 
     const frame = requestAnimationFrame(() => {
       const tabElements = Array.from(tabList.querySelectorAll<HTMLElement>("[role=tab]"));
-      const selectedProgress = getSelectedProgress(tabs, selectedTab);
+      const selectedProgress = getSelectedProgress(tabs, optimisticSelectedTab);
 
       tabElementsRef.current = tabElements;
       x.set(getIndicatorValue(tabElements, selectedProgress, "offsetLeft"));
@@ -97,10 +110,18 @@ export function AnimatedTabs({
     return () => {
       cancelAnimationFrame(frame);
     };
-  }, [selectedTab, tabs, x, width]);
+  }, [optimisticSelectedTab, tabs, x, width]);
 
-  const initialSelectedTab = useRef(selectedTab);
+  const initialSelectedTab = useRef(optimisticSelectedTab);
   const initialTabs = useRef(tabs);
+
+  function runSelectionChange(tab: Key) {
+    if (tab === optimisticSelectedTab) {
+      return;
+    }
+
+    runSelectionChangeAction?.(tab);
+  }
 
   // Initialize scroll position to match selectedTab on mount
   useLayoutEffect(() => {
@@ -134,14 +155,14 @@ export function AnimatedTabs({
     const nextTab = tabs[getIndex(tabElements.length, scrollProgress)];
 
     if (nextTab) {
-      onSelectedTabChange?.(nextTab.id);
+      runSelectionChange(nextTab.id);
     }
   });
 
   // When the user clicks on a tab perform an animation of
   // the scroll position to the newly selected tab panel.
   const onSelectionChange = (selectedKey: Key) => {
-    onSelectedTabChange?.(selectedKey);
+    runSelectionChange(selectedKey);
     const tabPanel = tabPanelsRef.current;
     const existingAnimation = tabPanel ? activeTabPanelAnimations.get(tabPanel) : null;
 
@@ -185,7 +206,8 @@ export function AnimatedTabs({
     <LazyMotion features={domAnimation}>
       <Tabs
         className="flex h-full flex-1 flex-col"
-        selectedKey={selectedTab}
+        data-pending={isSelectionPending || undefined}
+        selectedKey={optimisticSelectedTab}
         onSelectionChange={onSelectionChange}
       >
         <div className="relative">
@@ -195,7 +217,7 @@ export function AnimatedTabs({
             items={tabs}
           >
             {(tab) => (
-              <Tab className="flex flex-1 cursor-default touch-none items-center justify-center px-4 py-2.5 outline-none transition">
+              <Tab className="flex flex-1 cursor-pointer touch-none select-none items-center justify-center px-4 py-2.5 outline-none transition">
                 {({ isSelected, isFocusVisible }) => (
                   <>
                     <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
@@ -215,7 +237,10 @@ export function AnimatedTabs({
           </TabList>
           {/* Selection indicator. */}
           <motion.span
-            className="absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500"
+            className={cn(
+              "absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500",
+              isSelectionPending && "animate-pulse",
+            )}
             style={{ x, width }}
           />
         </div>

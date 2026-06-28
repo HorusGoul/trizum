@@ -29,6 +29,14 @@ async function resumeNativeUpdateAndRefresh(setIsUpdateAvailable: SetUpdateAvail
 
 export function UpdateControllerNative({ children }: { children: React.ReactNode }) {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  function update() {
+    setIsUpdating(true);
+    return performNativeUpdateAndRefresh(setIsUpdateAvailable).finally(() => {
+      setIsUpdating(false);
+    });
+  }
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- This is intentional
@@ -52,7 +60,8 @@ export function UpdateControllerNative({ children }: { children: React.ReactNode
     <UpdateContext
       value={{
         isUpdateAvailable,
-        update: () => performNativeUpdateAndRefresh(setIsUpdateAvailable),
+        isUpdating,
+        update,
         checkForUpdate: () => void checkForNativeUpdate(setIsUpdateAvailable),
       }}
     >
