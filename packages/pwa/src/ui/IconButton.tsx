@@ -47,11 +47,10 @@ export function IconButton({
   pressAction?: AsyncAction<IconButtonPressArgs>;
 }) {
   const colorStyles = colorSchemes[color];
-  const { isPending: isActionPending, runAction: onPressWithAction } =
-    useActionProp<IconButtonPressArgs>({
-      action: pressAction,
-      onAction: onPress,
-    });
+  const [isActionPending, onPressWithAction] = useActionProp<IconButtonPressArgs>({
+    action: pressAction,
+    onAction: onPress,
+  });
   const isButtonPending = isPending || isActionPending;
 
   return (

@@ -22,7 +22,7 @@ export function MenuItem<T extends object>({
   onAction,
   ...props
 }: MenuItemProps<T> & { menuAction?: AsyncAction }) {
-  const { isPending, runAction } = useActionProp({
+  const [isPending, runAction] = useActionProp({
     action: menuAction,
     onAction,
   });

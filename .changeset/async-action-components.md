@@ -1,5 +1,5 @@
 ---
-"@trizum/pwa": minor
+"@trizum/pwa": patch
 ---
 
 Add Async React action props to shared UI components so buttons, menu items,

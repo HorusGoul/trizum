@@ -12,19 +12,16 @@ export function useActionProp<Args extends unknown[]>({
   const [isPending, startTransition] = useTransition();
 
   if (!action) {
-    return {
-      isPending: false,
-      runAction: onAction,
-    };
+    return [false, onAction] as const;
   }
 
-  return {
+  return [
     isPending,
-    runAction: (...args: Args) => {
+    (...args: Args) => {
       onAction?.(...args);
       startTransition(async () => {
         await action(...args);
       });
     },
-  };
+  ] as const;
 }

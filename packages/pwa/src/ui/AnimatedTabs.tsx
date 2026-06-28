@@ -71,9 +71,7 @@ export function AnimatedTabs({
   const tabListRef = useRef<HTMLDivElement>(null);
   const tabPanelsRef = useRef<HTMLDivElement>(null);
   const [optimisticSelectedTab, setOptimisticSelectedTab] = useOptimistic(selectedTab);
-  const { isPending: isSelectionPending, runAction: runSelectionChangeAction } = useActionProp<
-    [Key]
-  >({
+  const [isSelectionPending, runSelectionChangeAction] = useActionProp<[Key]>({
     action: selectionChangeAction
       ? (tab) => {
           setOptimisticSelectedTab(tab);

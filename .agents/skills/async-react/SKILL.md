@@ -50,17 +50,21 @@ function Component({ value, onChange, changeAction }) {
 }
 ```
 
-In this repo, prefer the shared PWA UI helper when it fits the interaction:
+If the codebase already has a small helper for action props, prefer that helper
+over reimplementing the transition wiring in every component. If it does not,
+introduce one near the design-system layer:
 
 ```tsx
-const { isPending, runAction } = useActionProp({
+const [isPending, runAction] = useActionProp({
   action: pressAction,
   onAction: onPress,
 });
 ```
 
-Use `runAction` for the underlying React Aria event prop, and pass `isPending`
-into the component's visual and accessibility state.
+Use `runAction` for the underlying component event prop, and pass `isPending`
+into the component's visual and accessibility state. Keep repository-specific
+commands, naming conventions, and validation rules in a separate project-local
+skill or agent guide.
 
 ## Optimistic State
 
@@ -99,8 +103,3 @@ outside the originating component.
   handle them deliberately with existing product feedback such as toasts.
 - Do not use action props for simple synchronous callbacks that have no async
   work, no Suspense risk, and no need for pending UI.
-
-## Validation
-
-For PWA changes, run `vp run --filter @trizum/pwa check` after refactoring. If
-user-facing copy changes, run `vp run lingui:extract`.

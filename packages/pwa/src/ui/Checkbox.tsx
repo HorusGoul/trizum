@@ -28,7 +28,7 @@ const Checkbox = ({
   ...props
 }: AriaCheckboxProps & { changeAction?: AsyncAction<[boolean]> }) => {
   const [optimisticSelected, setOptimisticSelected] = useOptimistic(isSelected);
-  const { isPending, runAction: onChangeWithAction } = useActionProp<[boolean]>({
+  const [isPending, onChangeWithAction] = useActionProp<[boolean]>({
     action: changeAction
       ? (nextSelected) => {
           if (isSelected !== undefined) {

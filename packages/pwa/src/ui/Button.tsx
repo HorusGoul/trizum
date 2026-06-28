@@ -48,11 +48,10 @@ export function Button({
   pressAction?: AsyncAction<ButtonPressArgs>;
 }) {
   const colorStyles = colorSchemes[color];
-  const { isPending: isActionPending, runAction: onPressWithAction } =
-    useActionProp<ButtonPressArgs>({
-      action: pressAction,
-      onAction: onPress,
-    });
+  const [isActionPending, onPressWithAction] = useActionProp<ButtonPressArgs>({
+    action: pressAction,
+    onAction: onPress,
+  });
   const isButtonPending = isPending || isActionPending;
 
   return (
