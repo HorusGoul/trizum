@@ -2054,12 +2054,12 @@ msgstr "Reportar problemas"
 msgid "Reset password"
 msgstr "Restablecer contraseña"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:76
+#: src/components/AppRecoveryDialog.tsx:76
 msgid "Restart app"
 msgstr "Reiniciar app"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:47
-#: src/components/AppWorkerRecoveryDialog.tsx:57
+#: src/components/AppRecoveryDialog.tsx:47
+#: src/components/AppRecoveryDialog.tsx:57
 msgid "Restart trizum"
 msgstr "Reiniciar trizum"
 
@@ -2307,7 +2307,7 @@ msgstr "Dólar de las Islas Salomón"
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:60
+#: src/components/AppRecoveryDialog.tsx:60
 msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 msgstr "Algo no está funcionando correctamente. Reinicia trizum para recuperarlo. Si sigue ocurriendo, comprueba si hay actualizaciones o contacta con soporte."
 

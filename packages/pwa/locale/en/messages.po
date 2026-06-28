@@ -2126,12 +2126,12 @@ msgstr "Report Issues"
 msgid "Reset password"
 msgstr "Reset password"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:76
+#: src/components/AppRecoveryDialog.tsx:76
 msgid "Restart app"
 msgstr "Restart app"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:47
-#: src/components/AppWorkerRecoveryDialog.tsx:57
+#: src/components/AppRecoveryDialog.tsx:47
+#: src/components/AppRecoveryDialog.tsx:57
 msgid "Restart trizum"
 msgstr "Restart trizum"
 
@@ -2383,7 +2383,7 @@ msgstr "Solomon Islands Dollar"
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
 
-#: src/components/AppWorkerRecoveryDialog.tsx:60
+#: src/components/AppRecoveryDialog.tsx:60
 msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 msgstr "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 

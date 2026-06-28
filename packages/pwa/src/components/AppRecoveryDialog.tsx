@@ -7,7 +7,7 @@ import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { cn } from "#src/ui/utils.ts";
 
-export function AppWorkerRecoveryDialog() {
+export function AppRecoveryDialog() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {

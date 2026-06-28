@@ -27,7 +27,7 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
-import { AppWorkerRecoveryDialog } from "./components/AppWorkerRecoveryDialog.tsx";
+import { AppRecoveryDialog } from "./components/AppRecoveryDialog.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
@@ -229,7 +229,7 @@ if (!rootElement.innerHTML) {
           <RepoContext value={repo}>
             <MediaGalleryController>
               <RouterProvider router={router} InnerWrap={InnerWrap} />
-              <AppWorkerRecoveryDialog />
+              <AppRecoveryDialog />
               <Toaster />
             </MediaGalleryController>
           </RepoContext>
