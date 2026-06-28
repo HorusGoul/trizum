@@ -109,7 +109,6 @@
     "vite-plugin-top-level-await": "catalog:",
     "vite-plugin-wasm": "catalog:",
     "vite-plus": "catalog:",
-    "vitest": "catalog:",
     "wrangler": "catalog:"
   }
 }
