@@ -45,7 +45,7 @@ type PaymentMethod =
 
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
-  const { party, addExpenseToParty } = useCurrentParty();
+  const { party, addExpenseToParty, recalculateBalances } = useCurrentParty();
   const me = useCurrentParticipant();
   const from = party.participants[fromId];
   const to = party.participants[toId];
@@ -76,6 +76,8 @@ function RouteComponent() {
     });
 
     void expensePromise.then((expense) => {
+      void recalculateBalances();
+
       return navigate({
         to: "/party/$partyId/expense/$expenseId",
         params: {

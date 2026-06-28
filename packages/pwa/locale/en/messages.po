@@ -13,8 +13,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party_.$partyId.pay/route.tsx:103
-#: src/routes/party_.$partyId.pay/route.tsx:109
+#: src/routes/party_.$partyId.pay/route.tsx:105
+#: src/routes/party_.$partyId.pay/route.tsx:111
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:36
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:42
 msgid "(me)"
@@ -311,6 +311,10 @@ msgstr "Back to settings"
 #: src/components/CloudSyncSignInForm.tsx:115
 msgid "Back to sign in"
 msgstr "Back to sign in"
+
+#: src/components/AppWorkerRecoveryDialog.tsx:60
+msgid "Background work stopped responding, so balances may stop updating. Restart trizum to recover. If this keeps happening, check for updates or contact support."
+msgstr "Background work stopped responding, so balances may stop updating. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 
 #: src/components/CalculatorToolbar.tsx:703
 msgid "Backspace"
@@ -1002,7 +1006,7 @@ msgstr "Everything is archived for now. You can reopen any party from the archiv
 msgid "Exact"
 msgstr "Exact"
 
-#: src/routes/party_.$partyId.add.tsx:90
+#: src/routes/party_.$partyId.add.tsx:92
 msgid "Expense added"
 msgstr "Expense added"
 
@@ -1032,7 +1036,7 @@ msgstr "Expenses counted"
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
 
-#: src/routes/party_.$partyId.add.tsx:95
+#: src/routes/party_.$partyId.add.tsx:97
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
@@ -1206,7 +1210,7 @@ msgstr "Heads up!"
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
-#: src/routes/party_.$partyId.pay/route.tsx:128
+#: src/routes/party_.$partyId.pay/route.tsx:130
 msgid "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 msgstr "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 
@@ -1243,7 +1247,7 @@ msgstr "How does offline sync work?"
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
-#: src/routes/party_.$partyId.pay/route.tsx:124
+#: src/routes/party_.$partyId.pay/route.tsx:126
 msgid "How to pay?"
 msgstr "How to pay?"
 
@@ -1494,8 +1498,8 @@ msgstr "Malformed Party ID"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
-#: src/routes/party_.$partyId.pay/route.tsx:95
-#: src/routes/party_.$partyId.pay/route.tsx:120
+#: src/routes/party_.$partyId.pay/route.tsx:97
+#: src/routes/party_.$partyId.pay/route.tsx:122
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Mark as paid"
 msgstr "Mark as paid"
@@ -1619,7 +1623,7 @@ msgstr "Nepalese Rupee"
 msgid "Netherlands Antillean Guilder"
 msgstr "Netherlands Antillean Guilder"
 
-#: src/routes/party_.$partyId.add.tsx:111
+#: src/routes/party_.$partyId.add.tsx:113
 msgid "New expense"
 msgstr "New expense"
 
@@ -1806,7 +1810,7 @@ msgstr "or use email"
 msgid "Other operations"
 msgstr "Other operations"
 
-#: src/routes/party_.$partyId.pay/route.tsx:106
+#: src/routes/party_.$partyId.pay/route.tsx:108
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
 msgid "owes"
 msgstr "owes"
@@ -1968,7 +1972,7 @@ msgstr "Password updated"
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 
-#: src/routes/party_.$partyId.pay/route.tsx:95
+#: src/routes/party_.$partyId.pay/route.tsx:97
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pay"
@@ -2125,6 +2129,15 @@ msgstr "Report Issues"
 #: src/routes/reset-password.tsx:70
 msgid "Reset password"
 msgstr "Reset password"
+
+#: src/components/AppWorkerRecoveryDialog.tsx:77
+msgid "Restart app"
+msgstr "Restart app"
+
+#: src/components/AppWorkerRecoveryDialog.tsx:47
+#: src/components/AppWorkerRecoveryDialog.tsx:57
+msgid "Restart trizum"
+msgstr "Restart trizum"
 
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:56
 msgid "Restore"

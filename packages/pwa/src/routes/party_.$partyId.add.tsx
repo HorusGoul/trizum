@@ -37,7 +37,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { partyId, addExpenseToParty } = useCurrentParty();
+  const { partyId, addExpenseToParty, recalculateBalances } = useCurrentParty();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
@@ -77,6 +77,8 @@ function AddExpense() {
         shares,
         photos: values.photos,
       });
+
+      void recalculateBalances();
 
       await navigate({
         to: "/party/$partyId/expense/$expenseId",
