@@ -33,7 +33,7 @@ export function useParty(partyId: string) {
   const helpers = getPartyHelpers(repo, handle);
 
   async function recalculateBalances() {
-    return recalculatePartyBalancesInWorker(repo, handle.documentId);
+    return recalculatePartyBalancesInWorker(handle.documentId);
   }
 
   async function __dev_createTestExpenses() {

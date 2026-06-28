@@ -1,9 +1,14 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
-import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "#src/lib/automerge/syncConfig.ts";
 import type { Party } from "#src/models/party.ts";
 import { WorkerAdapter } from "./WorkerAdapter.ts";
 import { injectAppWorker, type AppWorkerApi } from "./proxy.ts";
+
+export interface InitializeAppWorkerOptions {
+  repo: Repo;
+  wssUrl: string;
+  isOfflineOnly: boolean;
+}
 
 interface AppWorkerClient {
   api: AppWorkerApi;
@@ -11,27 +16,32 @@ interface AppWorkerClient {
   worker: Worker;
 }
 
-const clientsByRepo = new WeakMap<Repo, AppWorkerClient>();
+let appWorkerClient: AppWorkerClient | null = null;
 
-export async function recalculatePartyBalancesInWorker(repo: Repo, partyId: Party["id"]) {
-  const client = getAppWorkerClient(repo);
+export function initializeAppWorker(options: InitializeAppWorkerOptions) {
+  const client = getAppWorkerClient(options);
+
+  return client.initializePromise;
+}
+
+export async function recalculatePartyBalancesInWorker(partyId: Party["id"]) {
+  const client = requireAppWorkerClient();
+
   await client.initializePromise;
 
   return client.api.recalculateBalances(partyId);
 }
 
-function getAppWorkerClient(repo: Repo): AppWorkerClient {
-  const existingClient = clientsByRepo.get(repo);
-
-  if (existingClient) {
-    return existingClient;
+function getAppWorkerClient({ repo, wssUrl, isOfflineOnly }: InitializeAppWorkerOptions) {
+  if (appWorkerClient) {
+    return appWorkerClient;
   }
 
   if (typeof Worker === "undefined") {
     throw new Error("App worker is not available in this environment");
   }
 
-  const worker = new Worker(new URL("./worker.ts", import.meta.url), {
+  const worker = new Worker(new URL("./appWorker.entrypoint.ts", import.meta.url), {
     type: "module",
   });
   const api = injectAppWorker(new WorkerAdapter(worker, "app-worker-injector"));
@@ -42,16 +52,23 @@ function getAppWorkerClient(repo: Repo): AppWorkerClient {
 
   const initializePromise = api.initialize({
     repoPort: repoChannel.port2,
-    wssUrl: getAutomergeWssUrl(),
-    isOfflineOnly: getIsAutomergeOfflineOnly(),
+    wssUrl,
+    isOfflineOnly,
   });
 
-  const client = {
+  appWorkerClient = {
     api,
     initializePromise,
     worker,
   };
-  clientsByRepo.set(repo, client);
 
-  return client;
+  return appWorkerClient;
+}
+
+function requireAppWorkerClient() {
+  if (!appWorkerClient) {
+    throw new Error("App worker has not been initialized");
+  }
+
+  return appWorkerClient;
 }

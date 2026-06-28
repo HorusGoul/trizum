@@ -32,8 +32,9 @@ import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
-import { configurePwaLogging } from "./lib/log.ts";
-import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "./lib/automerge/syncConfig.ts";
+import { configurePwaLogging, getLogger } from "./lib/log.ts";
+import { initializeAppWorker } from "./lib/appWorker/client.ts";
+import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "./lib/automergeSyncConfig.ts";
 import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
 import {
   preventDuplicateHistoryEntries,
@@ -106,11 +107,20 @@ declare module "react-aria-components" {
 
 const WSS_URL = getAutomergeWssUrl();
 const isOfflineOnly = getIsAutomergeOfflineOnly(initialUrl.href);
+const logger = getLogger("main");
 
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
+});
+
+void initializeAppWorker({
+  repo,
+  wssUrl: WSS_URL,
+  isOfflineOnly,
+}).catch((error) => {
+  logger.error("Failed to initialize app worker", { error });
 });
 
 declare global {
