@@ -32,10 +32,6 @@ export function useParty(partyId: string) {
 
   const helpers = getPartyHelpers(repo, handle);
 
-  async function recalculateBalances() {
-    return appWorker.recalculateBalances(handle.documentId);
-  }
-
   async function __dev_createTestExpenses() {
     const promptAnswer = window.prompt("How many test expenses to create?");
 
@@ -81,7 +77,6 @@ export function useParty(partyId: string) {
     partyId,
     isLoading: handle.inState(["loading"]),
     ...helpers,
-    recalculateBalances,
     dev: {
       createTestExpenses: __dev_createTestExpenses,
     },
@@ -102,6 +97,38 @@ export function useCurrentParty() {
 }
 
 export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
+  let isRecalculatingBalances = false;
+  let shouldRecalculateBalancesAgain = false;
+
+  async function recalculateBalances() {
+    return appWorker.recalculateBalances(handle.documentId);
+  }
+
+  function scheduleRecalculateBalances() {
+    if (isRecalculatingBalances) {
+      shouldRecalculateBalancesAgain = true;
+      return;
+    }
+
+    isRecalculatingBalances = true;
+    void runScheduledBalanceRecalculations();
+  }
+
+  async function runScheduledBalanceRecalculations() {
+    try {
+      shouldRecalculateBalancesAgain = false;
+      await recalculateBalances();
+
+      if (shouldRecalculateBalancesAgain) {
+        await runScheduledBalanceRecalculations();
+      }
+    } catch {
+      shouldRecalculateBalancesAgain = false;
+    } finally {
+      isRecalculatingBalances = false;
+    }
+  }
+
   function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
     handle.change((doc) => {
       doc.name = values.name;
@@ -229,6 +256,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       }
     });
 
+    scheduleRecalculateBalances();
+
     return expenseWithHash;
   }
 
@@ -266,6 +295,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       delete expenseEntry.__editCopy;
       delete expenseEntry.__editCopyLastUpdatedAt;
     });
+
+    scheduleRecalculateBalances();
   }
 
   async function removeExpense(expenseId: Expense["id"]) {
@@ -299,6 +330,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
       deleteAt(doc.expenses, expenseIndex);
     });
+
+    scheduleRecalculateBalances();
 
     return true;
   }
@@ -405,5 +438,6 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     transferDebtToParty,
     updateExpense,
     removeExpense,
+    recalculateBalances,
   };
 }

@@ -13,8 +13,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party_.$partyId.pay/route.tsx:105
-#: src/routes/party_.$partyId.pay/route.tsx:111
+#: src/routes/party_.$partyId.pay/route.tsx:103
+#: src/routes/party_.$partyId.pay/route.tsx:109
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:36
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:42
 msgid "(me)"
@@ -966,7 +966,7 @@ msgstr "Unidad de Cuenta Europea 9"
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
 msgstr "Por ahora todo está archivado. Puedes reabrir cualquier grupo desde la pantalla de archivados cuando lo necesites."
 
-#: src/routes/party_.$partyId.add.tsx:92
+#: src/routes/party_.$partyId.add.tsx:90
 msgid "Expense added"
 msgstr "Gasto añadido"
 
@@ -992,7 +992,7 @@ msgstr "Gastos contabilizados"
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
 
-#: src/routes/party_.$partyId.add.tsx:97
+#: src/routes/party_.$partyId.add.tsx:95
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
@@ -1158,7 +1158,7 @@ msgstr "¡Atención!"
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo podéis hacer para equilibrar vuestra posición."
 
-#: src/routes/party_.$partyId.pay/route.tsx:130
+#: src/routes/party_.$partyId.pay/route.tsx:128
 msgid "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 msgstr "Aquí tienes una lista de formas en las que puedes pagar, una vez hecho, pulsa el botón de arriba para marcar el gasto como pagado en este grupo de trizum."
 
@@ -1191,7 +1191,7 @@ msgstr "¿Cómo funciona la sincronización sin conexión?"
 msgid "How should I balance?"
 msgstr "¿Cómo debería equilibrar?"
 
-#: src/routes/party_.$partyId.pay/route.tsx:126
+#: src/routes/party_.$partyId.pay/route.tsx:124
 msgid "How to pay?"
 msgstr "¿Cómo pagar?"
 
@@ -1442,8 +1442,8 @@ msgstr "ID de grupo mal formado"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden ser archivados."
 
-#: src/routes/party_.$partyId.pay/route.tsx:97
-#: src/routes/party_.$partyId.pay/route.tsx:122
+#: src/routes/party_.$partyId.pay/route.tsx:95
+#: src/routes/party_.$partyId.pay/route.tsx:120
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Mark as paid"
 msgstr "Marcar como pagado"
@@ -1567,7 +1567,7 @@ msgstr "Rupia Nepalí"
 msgid "Netherlands Antillean Guilder"
 msgstr "Florín de las Antillas Neerlandesas"
 
-#: src/routes/party_.$partyId.add.tsx:113
+#: src/routes/party_.$partyId.add.tsx:111
 msgid "New expense"
 msgstr "Nuevo gasto"
 
@@ -1746,7 +1746,7 @@ msgstr "o usa el correo"
 msgid "Other operations"
 msgstr "Otras operaciones"
 
-#: src/routes/party_.$partyId.pay/route.tsx:108
+#: src/routes/party_.$partyId.pay/route.tsx:106
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
 msgid "owes"
 msgstr "le debe"
@@ -1900,7 +1900,7 @@ msgstr "Contraseña actualizada"
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
-#: src/routes/party_.$partyId.pay/route.tsx:97
+#: src/routes/party_.$partyId.pay/route.tsx:95
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pagar"

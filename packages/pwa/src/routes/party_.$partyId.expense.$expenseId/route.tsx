@@ -149,7 +149,7 @@ function useExpense() {
   const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
     required: true,
   });
-  const { removeExpense, recalculateBalances } = useCurrentParty();
+  const { removeExpense } = useCurrentParty();
 
   const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
 
@@ -157,7 +157,6 @@ function useExpense() {
     if (expenseId === undefined) return;
 
     await removeExpense(expenseId);
-    void recalculateBalances();
 
     closeRouteState(currentLocation, history, () => {
       void navigate({

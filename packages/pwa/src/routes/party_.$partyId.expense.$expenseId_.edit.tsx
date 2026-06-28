@@ -211,7 +211,7 @@ function EditExpense() {
 
 function useExpense() {
   const { partyId, expenseId } = Route.useParams();
-  const { updateExpense, recalculateBalances } = useCurrentParty();
+  const { updateExpense } = useCurrentParty();
 
   const { chunkId } = decodeExpenseId(expenseId);
 
@@ -221,9 +221,8 @@ function useExpense() {
 
   const [expense] = findExpenseById(chunk.expenses, expenseId);
 
-  async function onUpdateExpense(expense: Expense) {
-    await updateExpense(expense);
-    void recalculateBalances();
+  function onUpdateExpense(expense: Expense) {
+    return updateExpense(expense);
   }
 
   function onChangeExpense(patches: DiffResult[]) {
