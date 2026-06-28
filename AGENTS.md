@@ -57,6 +57,8 @@ Canonical examples:
 - [`packages/screenshots/README.md`](./packages/screenshots/README.md) is a
   specialist doc and should not be part of the default read path for normal app
   work.
+- [`packages/agent-workflows/README.md`](./packages/agent-workflows/README.md)
+  is the specialist entry point for Barnum-based agent workflow automation.
 
 ## Repo-Wide Rules
 
