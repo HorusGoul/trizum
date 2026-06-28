@@ -4,6 +4,7 @@ export interface RunCommandOptions {
   allowFailure?: boolean;
   cwd: string;
   env?: NodeJS.ProcessEnv;
+  envMode?: "merge" | "replace";
   input?: string;
   timeoutMs?: number;
 }
@@ -39,10 +40,7 @@ export async function runCommand(
   const result = await new Promise<CommandResult>((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
-      env: {
-        ...process.env,
-        ...options.env,
-      },
+      env: resolveCommandEnvironment(options),
       stdio: ["pipe", "pipe", "pipe"],
     });
 
@@ -97,6 +95,95 @@ export async function runCommand(
   }
 
   return result;
+}
+
+export function createSecretScrubEnvironmentOverrides(
+  options: { preserveCodexHome?: boolean } = {},
+): NodeJS.ProcessEnv {
+  const overrides: NodeJS.ProcessEnv = {};
+
+  for (const key of Object.keys(process.env)) {
+    if (shouldScrubEnvironmentKey(key, options)) {
+      overrides[key] = "";
+    }
+  }
+
+  for (const key of credentialEnvironmentKeys(options)) {
+    overrides[key] = "";
+  }
+
+  return overrides;
+}
+
+export function createSanitizedEnvironment(
+  options: { preserveCodexHome?: boolean } = {},
+): NodeJS.ProcessEnv {
+  const environment = { ...process.env };
+
+  for (const key of Object.keys(environment)) {
+    if (shouldScrubEnvironmentKey(key, options)) {
+      delete environment[key];
+    }
+  }
+
+  return environment;
+}
+
+export function redactSecrets(text: string): string {
+  let redacted = text;
+
+  for (const key of credentialEnvironmentKeys({ preserveCodexHome: true })) {
+    const value = process.env[key];
+    if (value != null && value.length >= 8) {
+      redacted = redacted.replaceAll(value, "[redacted]");
+    }
+  }
+
+  return redacted
+    .replace(/github_pat_[A-Za-z0-9_]{20,}/g, "[redacted]")
+    .replace(/gh[opsu]_[A-Za-z0-9_]{20,}/g, "[redacted]")
+    .replace(/sk-[A-Za-z0-9_-]{20,}/g, "[redacted]")
+    .replace(/"((?:access|refresh|id)_token|token)"\s*:\s*"[^"]+"/gi, '"$1":"[redacted]"');
+}
+
+function resolveCommandEnvironment(options: RunCommandOptions): NodeJS.ProcessEnv {
+  if (options.envMode === "replace") {
+    return options.env ?? {};
+  }
+
+  return {
+    ...process.env,
+    ...options.env,
+  };
+}
+
+function credentialEnvironmentKeys(options: { preserveCodexHome?: boolean }): string[] {
+  return [
+    "BOT_GITHUB_TOKEN",
+    "BW_ACCESS_TOKEN",
+    "BWS_ACCESS_TOKEN",
+    "CODEX_ACCESS_TOKEN",
+    "CODEX_AUTH_JSON",
+    ...(options.preserveCodexHome === true ? [] : ["CODEX_HOME"]),
+    "GH_TOKEN",
+    "GITHUB_TOKEN",
+    "OPENAI_API_KEY",
+    "TRIZUM_AGENT_WORKFLOWS_GIT_PUSH_TOKEN",
+    "TRIZUM_AGENT_WORKFLOWS_GITHUB_TOKEN",
+  ];
+}
+
+function shouldScrubEnvironmentKey(key: string, options: { preserveCodexHome?: boolean }): boolean {
+  if (credentialEnvironmentKeys(options).includes(key)) {
+    return true;
+  }
+
+  return (
+    key.startsWith("ACTIONS_ID_TOKEN_") ||
+    key.startsWith("BITWARDEN_") ||
+    key.startsWith("BWS_") ||
+    key.startsWith("BW_")
+  );
 }
 
 export function truncateText(text: string, maxLength: number): string {

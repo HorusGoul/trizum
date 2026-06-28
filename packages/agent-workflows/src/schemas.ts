@@ -165,6 +165,7 @@ export const supersedingPullRequestSchema = z.object({
   agentCommits: z.array(z.string()).optional(),
   agentLogPath: z.string().optional(),
   branchName: z.string().optional(),
+  localValidationPassed: z.boolean().optional(),
   localValidationOutput: z.string().optional(),
   prUrl: z.string().optional(),
   summary: z.string(),

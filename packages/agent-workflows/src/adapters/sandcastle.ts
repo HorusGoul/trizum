@@ -8,7 +8,12 @@ import {
   type ReviewFinding,
   type ReviewResult,
 } from "../schemas.js";
-import { runCommand, truncateText } from "./exec.js";
+import {
+  createSecretScrubEnvironmentOverrides,
+  redactSecrets,
+  runCommand,
+  truncateText,
+} from "./exec.js";
 
 const CODEX_COMPLETION_SIGNAL = "<trizum-agent-workflows>DONE</trizum-agent-workflows>";
 const REVIEW_OUTPUT_TAG = "trizum-review";
@@ -57,7 +62,7 @@ export async function runSandcastleCodexReview(
 
     return {
       ...withReviewRunWarnings(result.output, result.commits),
-      rawOutput: result.stdout,
+      rawOutput: redactSecrets(result.stdout),
       ran: true,
     };
   } catch (error) {
@@ -98,7 +103,7 @@ export async function runSandcastleCodexFix(
       host: {
         onWorktreeReady: [
           {
-            command: "vp install --lockfile-only --no-frozen-lockfile --ignore-scripts || true",
+            command: `${buildCredentialEnvUnsetPrefix()} vp install --lockfile-only --no-frozen-lockfile --ignore-scripts || true`,
             timeoutMs: 10 * 60 * 1000,
           },
         ],
@@ -134,6 +139,9 @@ function resolveCodexModel(): string {
 function createCodexAgent(): AgentProvider {
   const model = resolveCodexModel();
   const agent = codex(model, {
+    env: createSecretScrubEnvironmentOverrides({
+      preserveCodexHome: true,
+    }) as Record<string, string>,
     effort: resolveCodexEffort(),
   });
 
@@ -202,7 +210,9 @@ function buildSandcastleReviewPrompt(context: PullRequestContext): string {
     "",
     "Diff:",
     truncateText(context.diff, 120_000),
-  ].join("\n");
+  ]
+    .map(redactSecrets)
+    .join("\n");
 }
 
 function buildSandcastleFixPrompt(context: PullRequestContext): string {
@@ -237,11 +247,30 @@ function buildSandcastleFixPrompt(context: PullRequestContext): string {
     "",
     "Diff:",
     truncateText(context.diff, 120_000),
-  ].join("\n");
+  ]
+    .map(redactSecrets)
+    .join("\n");
 }
 
 function summarizeSandcastleOutput(output: string): string {
-  return truncateText(output.replace(CODEX_COMPLETION_SIGNAL, "").trim(), 12_000);
+  return truncateText(redactSecrets(output).replace(CODEX_COMPLETION_SIGNAL, "").trim(), 12_000);
+}
+
+function buildCredentialEnvUnsetPrefix(): string {
+  return [
+    "env",
+    "-u BOT_GITHUB_TOKEN",
+    "-u BW_ACCESS_TOKEN",
+    "-u BWS_ACCESS_TOKEN",
+    "-u CODEX_ACCESS_TOKEN",
+    "-u CODEX_AUTH_JSON",
+    "-u CODEX_HOME",
+    "-u GH_TOKEN",
+    "-u GITHUB_TOKEN",
+    "-u OPENAI_API_KEY",
+    "-u TRIZUM_AGENT_WORKFLOWS_GIT_PUSH_TOKEN",
+    "-u TRIZUM_AGENT_WORKFLOWS_GITHUB_TOKEN",
+  ].join(" ");
 }
 
 function withReviewRunWarnings(

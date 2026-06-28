@@ -1,4 +1,4 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { runPipeline } from "@barnum/barnum/pipeline";
@@ -27,7 +27,13 @@ import {
   type WorkflowOptions,
   type WorkflowResult,
 } from "../schemas.js";
-import { runCommand, splitLines, truncateText } from "../adapters/exec.js";
+import {
+  createSanitizedEnvironment,
+  redactSecrets,
+  runCommand,
+  splitLines,
+  truncateText,
+} from "../adapters/exec.js";
 import {
   runSandcastleCodexFix,
   runSandcastleCodexReview,
@@ -54,6 +60,11 @@ const MAX_DIFF_BYTES = 180_000;
 const MAX_LOG_BYTES = 40_000;
 const MAX_USAGE_MATCHES = 200;
 const MAX_DEPENDENCY_METADATA = 12;
+
+interface LocalValidationResult {
+  output: string;
+  passed: boolean;
+}
 
 export const listRenovatePullRequests = createHandler(
   {
@@ -131,9 +142,9 @@ export const gatherPullRequestContext = createHandler(
         gh(value.options, ["pr", "diff", String(value.pr.number), "--name-only"]),
       ]);
 
-      const diff = truncateText(diffResult.stdout, MAX_DIFF_BYTES);
+      const diff = truncateText(redactSecrets(diffResult.stdout), MAX_DIFF_BYTES);
       const files = splitLines(nameResult.stdout);
-      const body = view.body ?? "";
+      const body = redactSecrets(view.body ?? "");
       const dependencyUpdates = mergeDependencyUpdates([
         ...parseDependencyUpdatesFromDiff(diff),
         ...parseDependencyUpdatesFromRenovateBody(body),
@@ -550,7 +561,7 @@ async function gatherFailedCheckLogs(
     });
     logs.push({
       checkName: check.name,
-      log: truncateText(result.stdout || result.stderr, MAX_LOG_BYTES),
+      log: truncateText(redactSecrets(result.stdout || result.stderr), MAX_LOG_BYTES),
       runId,
     });
   }
@@ -637,9 +648,10 @@ async function createSupersedingPullRequest(
   let worktreeRoot: string | undefined;
 
   try {
-    await runCommand("git", ["fetch", "origin", context.pr.headRefName], {
-      cwd: options.repoRoot,
-    });
+    await runGitWithOptionalCredentials(
+      ["fetch", "origin", context.pr.headRefName],
+      options.repoRoot,
+    );
     await runCommand("git", ["branch", branchName, "FETCH_HEAD"], {
       cwd: options.repoRoot,
     });
@@ -653,25 +665,27 @@ async function createSupersedingPullRequest(
       });
     }
 
-    const localValidationOutput = options.runLocalValidation
+    const localValidation = options.runLocalValidation
       ? await runLocalValidation(worktreeRoot)
-      : "Local validation skipped by workflow option.";
+      : {
+          output: "Local validation skipped by workflow option.",
+          passed: true,
+        };
 
     const fallbackCommitCreated = await commitPendingAgentChanges(worktreeRoot, context);
     const sandcastleSummary = renderSandcastleSummary(sandcastleRun, fallbackCommitCreated);
 
-    await runCommand("git", ["push", "-u", "origin", branchName], {
-      cwd: worktreeRoot,
-    });
+    await runGitWithOptionalCredentials(["push", "-u", "origin", branchName], worktreeRoot);
 
     const bodyPath = path.join(worktreeRoot, ".trizum-superseding-pr-body.md");
     const body = renderSupersedingPullRequestBody(
       context,
       report,
       sandcastleSummary,
-      localValidationOutput,
+      localValidation,
     );
     await writeFile(bodyPath, body, "utf8");
+    const labelArgs = localValidation.passed ? ["--label", options.readyForHumanReviewLabel] : [];
     const createResult = await gh(
       options,
       [
@@ -685,15 +699,14 @@ async function createSupersedingPullRequest(
         context.pr.title,
         "--body-file",
         bodyPath,
-        "--label",
-        options.readyForHumanReviewLabel,
+        ...labelArgs,
       ],
       { cwd: worktreeRoot },
     );
 
     const prUrl = createResult.stdout.trim();
     const supersedingPrNumber = await readPullRequestNumberFromUrl(options, prUrl, worktreeRoot);
-    if (supersedingPrNumber != null) {
+    if (localValidation.passed && supersedingPrNumber != null) {
       await addLabelToIssue(options, supersedingPrNumber, options.readyForHumanReviewLabel);
     }
 
@@ -701,7 +714,8 @@ async function createSupersedingPullRequest(
       branchName,
       agentCommits: sandcastleRun.commits,
       agentLogPath: sandcastleRun.logFilePath,
-      localValidationOutput,
+      localValidationOutput: localValidation.output,
+      localValidationPassed: localValidation.passed,
       prUrl,
       summary: truncateText(sandcastleSummary, 12_000),
     };
@@ -716,36 +730,140 @@ async function createSupersedingPullRequest(
   }
 }
 
-async function runLocalValidation(worktreeRoot: string): Promise<string> {
+async function runGitWithOptionalCredentials(
+  args: readonly string[],
+  cwd: string,
+): Promise<Awaited<ReturnType<typeof runCommand>>> {
+  const token =
+    process.env.TRIZUM_AGENT_WORKFLOWS_GIT_PUSH_TOKEN?.trim() ||
+    process.env.GH_TOKEN?.trim() ||
+    process.env.GITHUB_TOKEN?.trim();
+
+  if (!token) {
+    return runCommand("git", args, { cwd });
+  }
+
+  const authRoot = await mkdtemp(path.join(tmpdir(), "trizum-git-auth-"));
+  const askpassPath = path.join(authRoot, "askpass.sh");
+
+  try {
+    await writeFile(
+      askpassPath,
+      [
+        "#!/bin/sh",
+        'case "$1" in',
+        '*Username*) printf "%s\\n" "x-access-token" ;;',
+        '*) printf "%s\\n" "$TRIZUM_AGENT_WORKFLOWS_GIT_PUSH_TOKEN" ;;',
+        "esac",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+    await chmod(askpassPath, 0o700);
+
+    return await runCommand("git", args, {
+      cwd,
+      env: {
+        GIT_ASKPASS: askpassPath,
+        GIT_TERMINAL_PROMPT: "0",
+        TRIZUM_AGENT_WORKFLOWS_GIT_PUSH_TOKEN: token,
+      },
+    });
+  } finally {
+    await rm(authRoot, { force: true, recursive: true });
+  }
+}
+
+async function runLocalValidation(worktreeRoot: string): Promise<LocalValidationResult> {
+  const codexAuthCache = await hideCodexAuthCache();
   const commands = [
     ["vp", "run", "check"],
     ["vp", "run", "test"],
     ["vp", "run", "build"],
   ] as const;
 
+  const environment = {
+    ...createSanitizedEnvironment(),
+    GIT_TERMINAL_PROMPT: "0",
+  };
   const output: string[] = [];
-  for (const [command, ...args] of commands) {
-    const result = await runCommand(command, args, {
-      allowFailure: true,
-      cwd: worktreeRoot,
-      timeoutMs: 30 * 60 * 1000,
-    });
-    output.push(
-      [
-        `$ ${result.command}`,
-        `exitCode: ${result.exitCode}`,
-        truncateText(result.stdout, 20_000),
-        truncateText(result.stderr, 20_000),
-      ]
-        .filter(Boolean)
-        .join("\n"),
-    );
-    if (result.exitCode !== 0) {
-      break;
+  let passed = true;
+
+  try {
+    for (const [command, ...args] of commands) {
+      const result = await runCommand(command, args, {
+        allowFailure: true,
+        cwd: worktreeRoot,
+        env: environment,
+        envMode: "replace",
+        timeoutMs: 30 * 60 * 1000,
+      });
+      output.push(
+        [
+          `$ ${result.command}`,
+          `exitCode: ${result.exitCode}`,
+          truncateText(redactSecrets(result.stdout), 20_000),
+          truncateText(redactSecrets(result.stderr), 20_000),
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      );
+      if (result.exitCode !== 0) {
+        passed = false;
+        break;
+      }
     }
+  } finally {
+    await codexAuthCache.restore();
   }
 
-  return output.join("\n\n");
+  return {
+    output: output.join("\n\n"),
+    passed,
+  };
+}
+
+async function hideCodexAuthCache(): Promise<{ restore: () => Promise<void> }> {
+  const codexHome = process.env.CODEX_HOME?.trim();
+  if (!codexHome) {
+    return {
+      restore: async () => {},
+    };
+  }
+
+  const authFile = path.join(codexHome, "auth.json");
+  const backupRoot = await mkdtemp(path.join(tmpdir(), "trizum-codex-auth-"));
+  const backupFile = path.join(backupRoot, "auth.json");
+  let moved = false;
+
+  try {
+    await rename(authFile, backupFile);
+    moved = true;
+  } catch (error) {
+    await rm(backupRoot, { force: true, recursive: true });
+    if (isNodeError(error) && error.code === "ENOENT") {
+      return {
+        restore: async () => {},
+      };
+    }
+    throw error;
+  }
+
+  return {
+    restore: async () => {
+      try {
+        if (moved) {
+          await rename(backupFile, authFile);
+        }
+      } finally {
+        await rm(backupRoot, { force: true, recursive: true });
+      }
+    },
+  };
+}
+
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error && "code" in error;
 }
 
 async function commitPendingAgentChanges(
@@ -797,29 +915,31 @@ function renderReviewReport(decision: ReviewDecision): string {
   const combined = mergeReviewResults(decision.review.deterministic, decision.review.codex);
   const findings = renderFindings(combined.findings);
 
-  return [
-    "## Agent Renovate Review",
-    "",
-    `Decision: ${decision.summary}`,
-    "",
-    `Original PR: #${decision.review.context.pr.number} ${decision.review.context.pr.title}`,
-    `Checks: ${decision.review.context.pr.status.summary}`,
-    "",
-    "### Summary",
-    combined.summary,
-    "",
-    "### Findings",
-    findings,
-    "",
-    "### Changelog Notes",
-    renderList(combined.changelogNotes),
-    "",
-    "### Automated Validation",
-    renderList(combined.automatedTestSuggestions),
-    "",
-    "### Manual Test Plan",
-    renderList(combined.manualTestPlan),
-  ].join("\n");
+  return redactSecrets(
+    [
+      "## Agent Renovate Review",
+      "",
+      `Decision: ${decision.summary}`,
+      "",
+      `Original PR: #${decision.review.context.pr.number} ${decision.review.context.pr.title}`,
+      `Checks: ${decision.review.context.pr.status.summary}`,
+      "",
+      "### Summary",
+      combined.summary,
+      "",
+      "### Findings",
+      findings,
+      "",
+      "### Changelog Notes",
+      renderList(combined.changelogNotes),
+      "",
+      "### Automated Validation",
+      renderList(combined.automatedTestSuggestions),
+      "",
+      "### Manual Test Plan",
+      renderList(combined.manualTestPlan),
+    ].join("\n"),
+  );
 }
 
 function renderReviewComment(decision: ReviewDecision): string {
@@ -834,65 +954,73 @@ function renderReviewComment(decision: ReviewDecision): string {
           )
           .join(", ");
 
-  return [
-    "## Agent Renovate Review",
-    "",
-    `**Decision:** ${decision.summary}`,
-    `**Checks:** ${context.pr.status.summary}`,
-    `**Updates:** ${updates}`,
-    "",
-    `**Summary:** ${truncateText(firstParagraph(combined.summary), 700)}`,
-    "",
-    "**Findings:**",
-    renderBriefFindings(combined.findings),
-    "",
-    "**Suggested validation:**",
-    renderBriefList(combined.automatedTestSuggestions, 3),
-    "",
-    "**Manual smoke test:**",
-    renderBriefList(combined.manualTestPlan, 3),
-  ].join("\n");
+  return redactSecrets(
+    [
+      "## Agent Renovate Review",
+      "",
+      `**Decision:** ${decision.summary}`,
+      `**Checks:** ${context.pr.status.summary}`,
+      `**Updates:** ${updates}`,
+      "",
+      `**Summary:** ${truncateText(firstParagraph(combined.summary), 700)}`,
+      "",
+      "**Findings:**",
+      renderBriefFindings(combined.findings),
+      "",
+      "**Suggested validation:**",
+      renderBriefList(combined.automatedTestSuggestions, 3),
+      "",
+      "**Manual smoke test:**",
+      renderBriefList(combined.manualTestPlan, 3),
+    ].join("\n"),
+  );
 }
 
 function renderSupersedingPullRequestBody(
   context: PullRequestContext,
   report: string,
   agentSummary: string,
-  localValidationOutput: string,
+  localValidation: LocalValidationResult,
 ): string {
-  return [
-    `Supersedes #${context.pr.number}.`,
-    "",
-    "This PR keeps the original Renovate update purpose and includes agent-applied fixes needed to make the update reviewable.",
-    "",
-    "## Sandcastle Codex Summary",
-    truncateText(agentSummary, 12_000),
-    "",
-    "## Local Validation",
-    "```text",
-    truncateText(localValidationOutput, 30_000),
-    "```",
-    "",
-    report,
-  ].join("\n");
+  return redactSecrets(
+    [
+      `Supersedes #${context.pr.number}.`,
+      "",
+      "This PR keeps the original Renovate update purpose and includes agent-applied fixes needed to make the update reviewable.",
+      "",
+      "## Sandcastle Codex Summary",
+      truncateText(agentSummary, 12_000),
+      "",
+      "## Local Validation",
+      `Status: ${localValidation.passed ? "passed" : "failed"}`,
+      "",
+      "```text",
+      truncateText(localValidation.output, 30_000),
+      "```",
+      "",
+      report,
+    ].join("\n"),
+  );
 }
 
 function renderSandcastleSummary(
   sandcastleRun: SandcastleFixRun,
   fallbackCommitCreated: boolean,
 ): string {
-  return [
-    sandcastleRun.summary || "Sandcastle Codex run completed without a text summary.",
-    "",
-    `Branch: ${sandcastleRun.branchName}`,
-    `Commits reported by Sandcastle: ${
-      sandcastleRun.commits.length === 0 ? "none" : sandcastleRun.commits.join(", ")
-    }`,
-    fallbackCommitCreated ? "A fallback workflow commit captured uncommitted agent changes." : "",
-    sandcastleRun.logFilePath == null ? "" : `Sandcastle log: ${sandcastleRun.logFilePath}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  return redactSecrets(
+    [
+      sandcastleRun.summary || "Sandcastle Codex run completed without a text summary.",
+      "",
+      `Branch: ${sandcastleRun.branchName}`,
+      `Commits reported by Sandcastle: ${
+        sandcastleRun.commits.length === 0 ? "none" : sandcastleRun.commits.join(", ")
+      }`,
+      fallbackCommitCreated ? "A fallback workflow commit captured uncommitted agent changes." : "",
+      sandcastleRun.logFilePath == null ? "" : `Sandcastle log: ${sandcastleRun.logFilePath}`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  );
 }
 
 function renderFindings(findings: readonly ReviewFinding[]): string {

@@ -16,7 +16,7 @@ on:
       - completed
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && inputs.pr || github.event.workflow_run.head_branch }}
+  group: ${{ github.workflow }}-codex-auth
   cancel-in-progress: false
 
 jobs:
@@ -26,6 +26,8 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (
         github.event.repository.fork == false &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
         startsWith(github.event.workflow_run.head_branch, 'renovate/')
       )
     runs-on: ubuntu-latest
@@ -34,6 +36,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - uses: voidzero-dev/setup-vp@v1
@@ -47,28 +50,49 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           WORKFLOW_BRANCH: ${{ github.event.workflow_run.head_branch }}
           WORKFLOW_DISPATCH_PR: ${{ inputs.pr }}
+          WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
 
           if [[ -n "${WORKFLOW_DISPATCH_PR:-}" ]]; then
-            pr_number="$WORKFLOW_DISPATCH_PR"
+            pr_json="$(gh pr view "$WORKFLOW_DISPATCH_PR" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json author,headRefName,headRefOid,headRepository,isDraft,number)"
           else
             pr_json="$(gh pr list \
               --repo "$GITHUB_REPOSITORY" \
               --state open \
               --head "$WORKFLOW_BRANCH" \
-              --json author,headRefName,isDraft,number \
-              | jq --arg branch "$WORKFLOW_BRANCH" 'map(select(.isDraft == false and .headRefName == $branch and (.author.login | ascii_downcase | contains("renovate")))) | first // empty')"
+              --json author,headRefName,headRefOid,headRepository,isDraft,number \
+              | jq --arg branch "$WORKFLOW_BRANCH" 'map(select(.isDraft == false and .headRefName == $branch)) | first // empty')"
 
             if [[ -z "$pr_json" ]]; then
               echo "No open non-draft Renovate PR found for $WORKFLOW_BRANCH."
               echo "found=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-
-            pr_number="$(jq -r '.number' <<< "$pr_json")"
           fi
 
+          trusted="$(jq -r \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg branch "${WORKFLOW_BRANCH:-}" \
+            --arg sha "${WORKFLOW_HEAD_SHA:-}" \
+            '
+              (.author.login == "app/renovate" or .author.login == "renovate[bot]") and
+              (.isDraft == false) and
+              (.headRepository.nameWithOwner == $repo) and
+              (.headRefName | startswith("renovate/")) and
+              (($branch == "") or (.headRefName == $branch)) and
+              (($sha == "") or (.headRefOid == $sha))
+            ' <<< "$pr_json")"
+
+          if [[ "$trusted" != "true" ]]; then
+            echo "No trusted same-repository Renovate PR matched the workflow run."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          pr_number="$(jq -r '.number' <<< "$pr_json")"
           echo "Found Renovate PR #$pr_number."
           echo "found=true" >> "$GITHUB_OUTPUT"
           echo "number=$pr_number" >> "$GITHUB_OUTPUT"
@@ -89,6 +113,8 @@ jobs:
 
       - name: Restore Codex auth cache
         if: steps.pr.outputs.found == 'true'
+        env:
+          CODEX_HOME: ${{ runner.temp }}/codex
         run: |
           set -euo pipefail
           if [[ -z "${CODEX_AUTH_JSON:-}" ]]; then
@@ -106,8 +132,9 @@ jobs:
           jq -e 'type == "object"' "$auth_file" > /dev/null
 
           auth_mode="$(jq -r '.auth_mode // empty' "$auth_file")"
-          if [[ -n "$auth_mode" && "$auth_mode" != "chatgpt" ]]; then
-            echo "::warning::Codex auth.json auth_mode is '$auth_mode', not 'chatgpt'."
+          if [[ "$auth_mode" != "chatgpt" ]]; then
+            echo "::error::Codex auth.json auth_mode must be 'chatgpt'."
+            exit 1
           fi
 
           echo "CODEX_AUTH_JSON=" >> "$GITHUB_ENV"
@@ -115,8 +142,9 @@ jobs:
       - name: Run Renovate agent review
         if: steps.pr.outputs.found == 'true'
         env:
+          CODEX_HOME: ${{ runner.temp }}/codex
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          TRIZUM_AGENT_WORKFLOWS_GIT_PUSH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL: gpt-5.5
           TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT: xhigh
         run: |
@@ -139,10 +167,11 @@ jobs:
             --codex required
 
       - name: Save refreshed Codex auth to Bitwarden
-        if: always() && steps.pr.outputs.found == 'true'
+        if: success() && steps.pr.outputs.found == 'true'
         env:
           BWS_ACCESS_TOKEN: ${{ secrets.BW_ACCESS_TOKEN }}
           BITWARDEN_CODEX_AUTH_JSON_SECRET_ID: ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }}
+          CODEX_HOME: ${{ runner.temp }}/codex
         run: |
           set -euo pipefail
 
@@ -157,10 +186,28 @@ jobs:
             exit 1
           fi
 
+          jq -e '
+            type == "object" and
+            .auth_mode == "chatgpt" and
+            (
+              (.tokens | type == "object") or
+              (.access_token | type == "string") or
+              (.refresh_token | type == "string") or
+              ([.. | objects | has("access_token") or has("refresh_token")] | any)
+            )
+          ' "$auth_file" > /dev/null
+
           compact_auth="$(jq -c . "$auth_file")"
+          echo "::add-mask::$compact_auth"
           docker run --rm \
             -e BWS_ACCESS_TOKEN \
-            ghcr.io/bitwarden/bws \
+            ghcr.io/bitwarden/bws@sha256:3927158c53ac5a17d6cbe59fc3e1353e426f168bf246dbfe3668f6de5eaa107f \
             secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
             --value "$compact_auth" \
             --output none
+
+      - name: Remove Codex auth cache
+        if: always()
+        env:
+          CODEX_HOME: ${{ runner.temp }}/codex
+        run: rm -rf "$CODEX_HOME"
