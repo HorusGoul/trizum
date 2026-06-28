@@ -430,16 +430,31 @@ async function ghJson<T>(options: WorkflowOptions, ...args: string[]): Promise<T
 async function gh(
   options: WorkflowOptions,
   args: readonly string[],
-  commandOptions: { allowFailure?: boolean; cwd?: string } = {},
+  commandOptions: { allowFailure?: boolean; cwd?: string; input?: string } = {},
 ) {
   return runCommand("gh", withRepoArgs(options, args), {
     allowFailure: commandOptions.allowFailure,
     cwd: commandOptions.cwd ?? options.repoRoot,
+    input: commandOptions.input,
   });
 }
 
 function withRepoArgs(options: WorkflowOptions, args: readonly string[]): string[] {
   return options.repository == null ? [...args] : [...args, "--repo", options.repository];
+}
+
+function repositoryApiPath(options: WorkflowOptions, path: string): string {
+  const normalizedPath = path.replace(/^\/+/, "");
+  if (options.repository == null) {
+    return `repos/:owner/:repo/${normalizedPath}`;
+  }
+
+  const [owner, repo, ...extra] = options.repository.split("/");
+  if (!owner || !repo || extra.length > 0) {
+    throw new Error(`Expected repository in owner/name format, received: ${options.repository}`);
+  }
+
+  return `repos/${owner}/${repo}/${normalizedPath}`;
 }
 
 async function readPrCheckStatus(options: WorkflowOptions, prNumber?: number) {
@@ -609,16 +624,38 @@ function stringFromUnknown(value: unknown): string | undefined {
 }
 
 async function ensureReadyLabel(options: WorkflowOptions): Promise<void> {
-  await gh(options, [
-    "label",
-    "create",
-    options.readyForHumanReviewLabel,
-    "--description",
-    "Ready for a human reviewer after agent workflow review.",
-    "--color",
-    "0E8A16",
-    "--force",
-  ]);
+  const body = JSON.stringify({
+    color: "0E8A16",
+    description: "Ready for a human reviewer after agent workflow review.",
+    name: options.readyForHumanReviewLabel,
+  });
+  const createResult = await gh(
+    options,
+    ["api", "--method", "POST", repositoryApiPath(options, "labels"), "--input", "-"],
+    {
+      allowFailure: true,
+      input: body,
+    },
+  );
+
+  if (createResult.exitCode === 0) {
+    return;
+  }
+
+  await gh(
+    options,
+    [
+      "api",
+      "--method",
+      "PATCH",
+      repositoryApiPath(options, `labels/${encodeURIComponent(options.readyForHumanReviewLabel)}`),
+      "--input",
+      "-",
+    ],
+    {
+      input: body,
+    },
+  );
 }
 
 async function addLabelToIssue(
@@ -626,7 +663,22 @@ async function addLabelToIssue(
   issueNumber: number,
   label: string,
 ): Promise<void> {
-  await gh(options, ["issue", "edit", String(issueNumber), "--add-label", label]);
+  await gh(
+    options,
+    [
+      "api",
+      "--method",
+      "POST",
+      repositoryApiPath(options, `issues/${issueNumber}/labels`),
+      "--input",
+      "-",
+    ],
+    {
+      input: JSON.stringify({
+        labels: [label],
+      }),
+    },
+  );
 }
 
 async function commentOnPullRequest(
@@ -634,7 +686,22 @@ async function commentOnPullRequest(
   prNumber: number,
   body: string,
 ): Promise<void> {
-  await gh(options, ["pr", "comment", String(prNumber), "--body", body]);
+  await gh(
+    options,
+    [
+      "api",
+      "--method",
+      "POST",
+      repositoryApiPath(options, `issues/${prNumber}/comments`),
+      "--input",
+      "-",
+    ],
+    {
+      input: JSON.stringify({
+        body,
+      }),
+    },
+  );
 }
 
 async function createSupersedingPullRequest(
