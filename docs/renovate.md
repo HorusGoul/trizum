@@ -33,3 +33,23 @@ follow-up push.
 `renovate.json` lists `259750894+PUNK-02@users.noreply.github.com` in
 `gitIgnoredAuthors` so Renovate keeps managing branches after the workflow adds
 its lockfile commit.
+
+## Agent Review
+
+The
+[`Renovate Agent Review`](../.github/workflows/renovate-agent-review.yml)
+workflow runs after the `CI` workflow succeeds on a `renovate/**` branch. It
+finds the open non-draft Renovate PR for that branch and runs:
+
+```sh
+vp run --filter @trizum/agent-workflows renovate-pr-review -- \
+  --pr "$PR_NUMBER" \
+  --repo "$GITHUB_REPOSITORY" \
+  --write \
+  --comment \
+  --codex required
+```
+
+The workflow uses `BOT_GITHUB_SECRET` for checkout and GitHub CLI write actions,
+configures commits as `lilith[bot]`, and uses `LILITH_OPENAI_API_KEY` for the
+Codex CLI invoked through Sandcastle.

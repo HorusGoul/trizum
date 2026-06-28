@@ -1,0 +1,104 @@
+name: Renovate Agent Review
+
+permissions: {}
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Renovate PR number to review.
+        required: true
+        type: number
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && inputs.pr || github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    name: Review Renovate PR
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.repository.fork == false &&
+        github.event.workflow_run.conclusion == 'success' &&
+        startsWith(github.event.workflow_run.head_branch, 'renovate/')
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.BOT_GITHUB_SECRET }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Resolve Renovate PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
+          WORKFLOW_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WORKFLOW_DISPATCH_PR: ${{ inputs.pr }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${WORKFLOW_DISPATCH_PR:-}" ]]; then
+            pr_number="$WORKFLOW_DISPATCH_PR"
+          else
+            pr_json="$(gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --state open \
+              --head "$WORKFLOW_BRANCH" \
+              --json author,isDraft,number \
+              --jq 'map(select(.isDraft == false and (.author.login | ascii_downcase | contains("renovate")))) | first // empty')"
+
+            if [[ -z "$pr_json" ]]; then
+              echo "No open non-draft Renovate PR found for $WORKFLOW_BRANCH."
+              echo "found=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            pr_number="$(jq -r '.number' <<< "$pr_json")"
+          fi
+
+          echo "Found Renovate PR #$pr_number."
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Lilith git identity
+        if: steps.pr.outputs.found == 'true'
+        run: |
+          git config user.name "lilith[bot]"
+          git config user.email "259750894+PUNK-02@users.noreply.github.com"
+
+      - name: Run Renovate agent review
+        if: steps.pr.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
+          OPENAI_API_KEY: ${{ secrets.LILITH_OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${OPENAI_API_KEY:-}" ]]; then
+            echo "::error::LILITH_OPENAI_API_KEY is required for Codex agent review."
+            exit 1
+          fi
+
+          export PATH="$PWD/packages/agent-workflows/node_modules/.bin:$PATH"
+          codex --version
+
+          vp run --filter @trizum/agent-workflows renovate-pr-review -- \
+            --pr "${{ steps.pr.outputs.number }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --write \
+            --comment \
+            --codex required
