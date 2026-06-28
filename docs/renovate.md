@@ -37,6 +37,23 @@ its lockfile commit.
 Renovate groups non-major Vite+, Vite, and Vitest updates because the coverage
 providers and test runner use exact peer versions and must move together.
 
+## Automerge
+
+`renovate.json` is the source of truth for automerge eligibility. Keep package,
+version, and update-type matchers there instead of duplicating them in this
+document.
+
+The repo intentionally uses Renovate-managed PR automerge instead of
+platform-native automerge because `main` is not protected with required status
+checks. Renovate's platform-native automerge can merge immediately when the
+platform has no required checks configured. With Renovate-managed automerge,
+Renovate waits until it sees passing branch status checks before merging.
+
+This also keeps the behavior compatible with the lockfile repair workflow:
+Renovate opens the branch, the `Renovate Lockfiles` workflow commits the
+Vite+-generated `pnpm-lock.yaml`, and Renovate can then merge the PR after the
+updated branch passes checks.
+
 ## Agent Review
 
 The
