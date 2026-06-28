@@ -1,0 +1,110 @@
+name: Fix Renovate Lockfile
+
+on:
+  push:
+    branches:
+      - "renovate/**"
+    paths:
+      - "pnpm-lock.yaml"
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  refresh-lockfile:
+    name: Refresh Lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          token: ${{ secrets.BOT_GITHUB_TOKEN || github.token }}
+
+      - name: Detect Renovate PR
+        id: renovate-pr
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          pr_number=""
+          for attempt in 1 2 3 4 5 6; do
+            pr_number="$(
+              gh api \
+                -X GET "repos/${REPOSITORY}/pulls" \
+                -f state=open \
+                -f head="${REPOSITORY_OWNER}:${BRANCH_NAME}" \
+                --jq '.[0].number // empty'
+            )"
+
+            if [ -n "$pr_number" ]; then
+              break
+            fi
+
+            sleep 10
+          done
+
+          if [ -z "$pr_number" ]; then
+            echo "No open PR found for ${BRANCH_NAME}; skipping lockfile refresh."
+            echo "should_fix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          author="$(
+            gh pr view "$pr_number" \
+              --repo "$REPOSITORY" \
+              --json author \
+              --jq '.author.login'
+          )"
+
+          if [ "$author" != "renovate[bot]" ] && [ "$author" != "renovate-bot" ] && [ "$author" != "renovate" ]; then
+            echo "PR #${pr_number} author is ${author}, not Renovate; skipping lockfile refresh."
+            echo "should_fix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! gh pr view "$pr_number" --repo "$REPOSITORY" --json files --jq '.files[].path' | grep -Fxq "pnpm-lock.yaml"; then
+            echo "PR #${pr_number} does not change pnpm-lock.yaml; skipping lockfile refresh."
+            echo "should_fix=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Renovate PR #${pr_number} changes pnpm-lock.yaml; refreshing with Vite+."
+          echo "pr_number=${pr_number}" >> "$GITHUB_OUTPUT"
+          echo "should_fix=true" >> "$GITHUB_OUTPUT"
+
+      - uses: voidzero-dev/setup-vp@v1
+        if: steps.renovate-pr.outputs.should_fix == 'true'
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Refresh pnpm lockfile
+        if: steps.renovate-pr.outputs.should_fix == 'true'
+        run: vp install --lockfile-only
+
+      - name: Commit lockfile refresh
+        if: steps.renovate-pr.outputs.should_fix == 'true'
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- pnpm-lock.yaml; then
+            echo "pnpm-lock.yaml is already up to date."
+            exit 0
+          fi
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add pnpm-lock.yaml
+          git commit --signoff -m "chore(deps): refresh pnpm lockfile with Vite+"
+          git push
