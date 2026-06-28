@@ -131,6 +131,15 @@ export default defineConfig(({ mode }) => {
       sourcemap: true,
       minify: true,
     },
+    resolve: {
+      alias: [
+        {
+          // Cloudflare Worker validation does not expose CommonJS require.
+          find: /^debug$/,
+          replacement: "debug/src/browser.js",
+        },
+      ],
+    },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
       include: ["api/**/*.test.ts", "src/**/*.test.ts"],
