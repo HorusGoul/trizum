@@ -57,8 +57,8 @@ jobs:
               --repo "$GITHUB_REPOSITORY" \
               --state open \
               --head "$WORKFLOW_BRANCH" \
-              --json author,isDraft,number \
-              --jq 'map(select(.isDraft == false and (.author.login | ascii_downcase | contains("renovate")))) | first // empty')"
+              --json author,headRefName,isDraft,number \
+              | jq --arg branch "$WORKFLOW_BRANCH" 'map(select(.isDraft == false and .headRefName == $branch and (.author.login | ascii_downcase | contains("renovate")))) | first // empty')"
 
             if [[ -z "$pr_json" ]]; then
               echo "No open non-draft Renovate PR found for $WORKFLOW_BRANCH."
@@ -118,7 +118,7 @@ jobs:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL: gpt-5.5
-          TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT: high
+          TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT: xhigh
         run: |
           set -euo pipefail
           auth_file="${CODEX_HOME:-$HOME/.codex}/auth.json"

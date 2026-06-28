@@ -36,7 +36,7 @@ Options:
 Environment:
   Codex auth is read from the Codex CLI environment, such as ~/.codex/auth.json.
   TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL     Optional Codex model override. Defaults to gpt-5.5.
-  TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT    Optional Sandcastle Codex effort. Defaults to high.
+  TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT    Optional Sandcastle Codex effort. Defaults to xhigh.
 `;
 
 export async function main(argv = process.argv.slice(2)): Promise<number> {

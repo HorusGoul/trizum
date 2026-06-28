@@ -168,7 +168,7 @@ function resolveCodexEffort(): CodexEffort | undefined {
     return effort;
   }
 
-  return "high";
+  return "xhigh";
 }
 
 function buildSandcastleReviewPrompt(context: PullRequestContext): string {

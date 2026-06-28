@@ -27,7 +27,7 @@ import {
   type WorkflowOptions,
   type WorkflowResult,
 } from "../schemas.js";
-import { CommandFailedError, runCommand, splitLines, truncateText } from "../adapters/exec.js";
+import { runCommand, splitLines, truncateText } from "../adapters/exec.js";
 import {
   runSandcastleCodexFix,
   runSandcastleCodexReview,
@@ -127,12 +127,8 @@ export const gatherPullRequestContext = createHandler(
           "--json",
           "body",
         ),
-        gh(value.options, ["pr", "diff", String(value.pr.number), "--patch"], {
-          allowFailure: true,
-        }),
-        gh(value.options, ["pr", "diff", String(value.pr.number), "--name-only"], {
-          allowFailure: true,
-        }),
+        gh(value.options, ["pr", "diff", String(value.pr.number), "--patch"]),
+        gh(value.options, ["pr", "diff", String(value.pr.number), "--name-only"]),
       ]);
 
       const diff = truncateText(diffResult.stdout, MAX_DIFF_BYTES);
@@ -320,6 +316,16 @@ function decideReview(bundle: ReviewBundle): ReviewDecision {
       foundIssues,
       review: bundle,
       summary: "The Renovate PR still has pending checks.",
+    };
+  }
+
+  if (checkConclusion === "unknown") {
+    return {
+      action: "needs-human",
+      blockingFindings,
+      foundIssues: true,
+      review: bundle,
+      summary: "The Renovate PR check status could not be verified.",
     };
   }
 
@@ -698,17 +704,6 @@ async function createSupersedingPullRequest(
       localValidationOutput,
       prUrl,
       summary: truncateText(sandcastleSummary, 12_000),
-    };
-  } catch (error) {
-    if (error instanceof CommandFailedError) {
-      return {
-        branchName,
-        summary: error.message,
-      };
-    }
-    return {
-      branchName,
-      summary: error instanceof Error ? error.message : String(error),
     };
   } finally {
     if (worktreeRoot != null) {
