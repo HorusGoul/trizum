@@ -3,16 +3,6 @@
   "extends": ["config:recommended"],
   "packageRules": [
     {
-      "description": "Regenerate the pnpm lockfile through Vite+ for JavaScript dependency updates.",
-      "matchManagers": ["npm"],
-      "skipArtifactsUpdate": true,
-      "postUpgradeTasks": {
-        "commands": ["node scripts/renovate-vp-lockfile.mjs"],
-        "executionMode": "branch",
-        "fileFilters": ["pnpm-lock.yaml"]
-      }
-    },
-    {
       "description": "Keep non-major PWA runtime dependency updates together.",
       "matchManagers": ["npm"],
       "matchFileNames": ["packages/pwa/package.json"],
