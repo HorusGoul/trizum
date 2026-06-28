@@ -36,6 +36,10 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: true
+          # Renovate's initial branch can contain a stale pnpm-lock.yaml. Do
+          # not let setup-vp run the default frozen install before this
+          # workflow repairs the lockfile below.
+          run-install: false
 
       - name: Update pnpm lockfile
         env:
