@@ -342,11 +342,13 @@ function decideReview(bundle: ReviewBundle): ReviewDecision {
 
   if (foundIssues) {
     return {
-      action: "needs-human",
+      action: bundle.context.pr.isDraft ? "needs-human" : "supersede-original",
       blockingFindings,
       foundIssues,
       review: bundle,
-      summary: "The review found blocking issues that need attention.",
+      summary: bundle.context.pr.isDraft
+        ? "The review found blocking issues that need attention."
+        : "The review found blocking issues and should be superseded if write mode is enabled.",
     };
   }
 
@@ -727,7 +729,12 @@ async function createSupersedingPullRequest(
       cwd: options.repoRoot,
     });
 
-    const sandcastleRun = await runSandcastleCodexFix(context, options.repoRoot, branchName);
+    const sandcastleRun = await runSandcastleCodexFix(
+      context,
+      options.repoRoot,
+      branchName,
+      report,
+    );
     worktreeRoot = sandcastleRun.preservedWorktreePath;
     if (worktreeRoot == null) {
       worktreeRoot = await mkdtemp(path.join(tmpdir(), "trizum-renovate-"));
