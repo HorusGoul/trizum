@@ -50,7 +50,7 @@ vp run --filter @trizum/agent-workflows renovate-pr-review -- \
   --codex required
 ```
 
-The workflow uses `BOT_GITHUB_SECRET` for checkout and GitHub CLI write actions,
+The workflow uses `BOT_GITHUB_TOKEN` for checkout and GitHub CLI write actions,
 configures commits as `lilith[bot]`, restores Codex account auth from Bitwarden
 Secrets Manager, invokes Codex through Sandcastle, and writes the refreshed
 Codex auth cache back to Bitwarden after the run.

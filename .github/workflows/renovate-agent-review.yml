@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.BOT_GITHUB_SECRET }}
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
 
       - uses: voidzero-dev/setup-vp@v1
         with:
@@ -45,7 +45,7 @@ jobs:
       - name: Resolve Renovate PR
         id: pr
         env:
-          GH_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           WORKFLOW_BRANCH: ${{ github.event.workflow_run.head_branch }}
           WORKFLOW_DISPATCH_PR: ${{ inputs.pr }}
         run: |
@@ -116,8 +116,8 @@ jobs:
       - name: Run Renovate agent review
         if: steps.pr.outputs.found == 'true'
         env:
-          GH_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
-          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_SECRET }}
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           auth_file="${CODEX_HOME:-$HOME/.codex}/auth.json"
