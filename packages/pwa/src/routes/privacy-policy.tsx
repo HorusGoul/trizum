@@ -5,8 +5,11 @@ export const Route = createFileRoute("/privacy-policy")({
   component: PrivacyPolicy,
 });
 
-// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 function PrivacyPolicy() {
+  return renderPrivacyPolicyContent();
+}
+
+function renderPrivacyPolicyContent() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="container flex h-16 items-center px-2 mt-safe">

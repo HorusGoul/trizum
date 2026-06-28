@@ -104,11 +104,9 @@ function ResetPassword() {
             </Button>
           </div>
         ) : (
-          // oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics.
           <form
             id={formId}
-            onSubmit={(event) => {
-              event.preventDefault();
+            action={() => {
               void form.handleSubmit();
             }}
             className="flex flex-col gap-4"

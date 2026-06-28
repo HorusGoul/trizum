@@ -29,6 +29,29 @@ interface JoinFormValues {
   id: string;
 }
 
+function validateQRCode(value: string) {
+  const partyId = parseQRCodeForPartyId(value);
+  if (!partyId) {
+    return t`Not a valid trizum party code`;
+  }
+  return true as const;
+}
+
+function getPartyIdFromLinkOrCode(id: string) {
+  const isUrl = id.includes("/");
+  return isUrl ? id.split("/party/")[1].split("/")[0] : id;
+}
+
+function validateId(id: string) {
+  const isUrl = id.includes("/");
+  const partyId = getPartyIdFromLinkOrCode(id);
+  const valid = isValidDocumentId(partyId);
+
+  if (!valid) {
+    return isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`;
+  }
+}
+
 function Join() {
   const router = useRouter();
   const currentLocation = useLocation();
@@ -45,15 +68,6 @@ function Join() {
     history: router.history,
   });
 
-  // oxlint-disable-next-line react-doctor/prefer-module-scope-pure-function -- FIXME: address existing React Doctor diagnostics.
-  function validateQRCode(value: string) {
-    const partyId = parseQRCodeForPartyId(value);
-    if (!partyId) {
-      return t`Not a valid trizum party code`;
-    }
-    return true as const;
-  }
-
   function handleScan(value: string) {
     const partyId = parseQRCodeForPartyId(value);
 
@@ -68,27 +82,9 @@ function Join() {
     });
   }
 
-  // oxlint-disable-next-line react-doctor/prefer-module-scope-pure-function -- FIXME: address existing React Doctor diagnostics.
-  function validateId(id: string) {
-    const isUrl = id.includes("/");
-    const partyId = isUrl ? id.split("/party/")[1].split("/")[0] : id;
-    const valid = isValidDocumentId(partyId);
-
-    if (!valid) {
-      return isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`;
-    }
-  }
-
   function onJoinParty(value: JoinFormValues) {
-    let partyId: string;
-
     const isUrl = value.id.includes("/");
-
-    if (isUrl) {
-      partyId = value.id.split("/party/")[1].split("/")[0];
-    } else {
-      partyId = value.id;
-    }
+    const partyId = getPartyIdFromLinkOrCode(value.id);
 
     if (!isValidDocumentId(partyId)) {
       toast.error(isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`);
@@ -157,11 +153,9 @@ function Join() {
         </div>
 
         {/* Secondary action: Manual entry */}
-        {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
         <form
           id={formId}
-          onSubmit={(e) => {
-            e.preventDefault();
+          action={() => {
             void form.handleSubmit();
           }}
           className="container mt-6 flex flex-col gap-4 px-4"

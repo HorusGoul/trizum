@@ -266,7 +266,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
           }}
         >
           {(option) => (
-            <SelectItem key={option.id} value={option}>
+            <SelectItem key={option.id} value={option} textValue={option.label}>
               {option.label}
             </SelectItem>
           )}
@@ -899,38 +899,26 @@ function formatPercent(value: number) {
   return `${Math.round(value * 100)}%`;
 }
 
-function formatRangeLabel(range: StatsCustomRange) {
-  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-  const formatter = new Intl.DateTimeFormat(undefined, {
-    day: "numeric",
-    month: "short",
-  });
+const shortDateFormatter = new Intl.DateTimeFormat(undefined, {
+  day: "numeric",
+  month: "short",
+});
+const shortDateWithYearFormatter = new Intl.DateTimeFormat(undefined, {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
+function formatRangeLabel(range: StatsCustomRange) {
   const sameYear = range.start.year === range.end.year;
   const startDate = new Date(range.start.year, range.start.month - 1, range.start.day);
   const endDate = new Date(range.end.year, range.end.month - 1, range.end.day);
-  const startLabel = formatter.format(startDate);
-  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-  const endFormatter = new Intl.DateTimeFormat(undefined, {
-    day: "numeric",
-    month: "short",
-    ...(sameYear ? { year: "numeric" as const } : {}),
-  });
-  const endLabel = endFormatter.format(endDate);
 
   if (sameYear) {
+    const startLabel = shortDateFormatter.format(startDate);
+    const endLabel = shortDateWithYearFormatter.format(endDate);
     return `${startLabel} - ${endLabel}`;
   }
 
-  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-  return `${new Intl.DateTimeFormat(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-  }).format(startDate)} - ${new Intl.DateTimeFormat(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(endDate)}`;
+  return `${shortDateWithYearFormatter.format(startDate)} - ${shortDateWithYearFormatter.format(endDate)}`;
 }

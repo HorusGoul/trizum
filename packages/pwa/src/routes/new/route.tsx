@@ -1,59 +1,44 @@
-import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/fields/TextField.js";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
-import { Suspense, useId } from "react";
-// oxlint-disable-next-line react-doctor/no-flush-sync -- FIXME: address existing React Doctor diagnostics.
-import { flushSync } from "react-dom";
-import {
-  validatePartyDescription,
-  validatePartyParticipantName,
-  validatePartySymbol,
-  validatePartyTitle,
-} from "#src/lib/validation.js";
-import { BackButton } from "#src/components/BackButton.js";
+import { Suspense, useId, useState } from "react";
 import { toast } from "sonner";
 import type { Currency } from "dinero.js";
-import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
+import { NewPartyDetailsFields } from "./-components/NewPartyDetailsFields.js";
+import { NewPartyHeader } from "./-components/NewPartyHeader.js";
+import { NewPartyParticipantsField } from "./-components/NewPartyParticipantsField.js";
+import type {
+  AddParticipantFormValues,
+  CurrencyOption,
+  NewPartyFormValues,
+} from "./-components/types.js";
 
 export const Route = createFileRoute("/new")({
   component: New,
 });
 
-interface CurrencyOption {
-  id: Currency;
-  name: string;
-  symbol: string;
+function createDraftParticipant(name: string): Pick<PartyParticipant, "id" | "name"> {
+  return {
+    id: crypto.randomUUID(),
+    name,
+  };
 }
 
-interface NewPartyFormValues {
-  name: string;
-  symbol: string;
-  description: string;
-  currency: Currency;
-  participants: Pick<PartyParticipant, "name">[];
-}
-
-// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
 function New() {
   const repo = useRepo();
   const { partyList } = usePartyList();
   const navigate = useNavigate();
+  const [initialParticipant] = useState(() => createDraftParticipant(partyList.username));
 
   const currencyOptions = getCurrencyOptions();
 
   function onCreateParty(values: NewPartyFormValues) {
-    const participants = values.participants.map((participant) => ({
-      ...participant,
-      id: crypto.randomUUID(),
-    }));
+    const participants = values.participants.map(({ id, name }) => ({ id, name }));
 
     const handle = repo.create<Party>({
       id: "" as DocumentId,
@@ -92,11 +77,7 @@ function New() {
       symbol: DEFAULT_PARTY_SYMBOL,
       description: "",
       currency: "EUR" as Currency,
-      participants: [
-        {
-          name: partyList.username,
-        },
-      ],
+      participants: [initialParticipant],
     },
     onSubmit: ({ value }) => {
       onCreateParty(value);
@@ -108,7 +89,7 @@ function New() {
   const addParticipantForm = useForm({
     defaultValues: {
       newParticipantName: "",
-    },
+    } satisfies AddParticipantFormValues,
   });
 
   function addNewParticipant() {
@@ -124,7 +105,7 @@ function New() {
     const newParticipantName = addParticipantForm.getFieldValue("newParticipantName");
 
     form.pushFieldValue("participants", {
-      name: newParticipantName,
+      ...createDraftParticipant(newParticipantName),
     });
 
     addParticipantForm.setFieldValue("newParticipantName", "");
@@ -132,264 +113,39 @@ function New() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
-        <BackButton fallbackOptions={{ to: "/" }} />
+      <NewPartyHeader
+        submitButton={
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmitting]) =>
+              canSubmit ? (
+                <Suspense fallback={null}>
+                  <IconButton
+                    icon="lucide.check"
+                    aria-label={isSubmitting ? t`Submitting...` : t`Save`}
+                    type="submit"
+                    form={formId}
+                    isDisabled={isSubmitting}
+                  />
+                </Suspense>
+              ) : null
+            }
+          </form.Subscribe>
+        }
+      />
 
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-          <Trans>New trizum</Trans>
-        </h1>
-
-        <div className="flex-1" />
-
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) =>
-            canSubmit ? (
-              <Suspense fallback={null}>
-                <IconButton
-                  icon="lucide.check"
-                  aria-label={isSubmitting ? t`Submitting...` : t`Save`}
-                  type="submit"
-                  form={formId}
-                  isDisabled={isSubmitting}
-                />
-              </Suspense>
-            ) : null
-          }
-        </form.Subscribe>
-      </div>
-
-      {/* oxlint-disable-next-line react-doctor/no-prevent-default -- FIXME: address existing React Doctor diagnostics. */}
       <form
         id={formId}
-        onSubmit={(e) => {
-          e.preventDefault();
+        action={() => {
           void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <div className="flex items-start gap-2">
-          <form.Field
-            name="name"
-            validators={{
-              onChange: ({ value }) => validatePartyTitle(value),
-            }}
-          >
-            {(field) => (
-              <AppTextField
-                label={t`Name`}
-                description={t`How do you want to call this party?`}
-                minLength={1}
-                maxLength={50}
-                name={field.name}
-                value={field.state.value}
-                onChange={field.handleChange}
-                onBlur={field.handleBlur}
-                errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-                className="flex-1"
-              />
-            )}
-          </form.Field>
-
-          <form.Field
-            name="symbol"
-            validators={{
-              onChange: ({ value }) => validatePartySymbol(value),
-            }}
-          >
-            {(field) => (
-              <AppEmojiField
-                label={t`Symbol`}
-                visuallyHideLabel
-                value={field.state.value}
-                onChange={field.handleChange}
-                errorMessage={field.state.meta.errors?.join(", ")}
-                isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-              />
-            )}
-          </form.Field>
-        </div>
-
-        <form.Field
-          name="description"
-          validators={{
-            onChange: ({ value }) => validatePartyDescription(value),
-          }}
-        >
-          {(field) => (
-            <AppTextField
-              label={t`Description`}
-              description={t`What is this party about?`}
-              maxLength={500}
-              textArea={true}
-              name={field.name}
-              value={field.state.value}
-              onChange={field.handleChange}
-              onBlur={field.handleBlur}
-              errorMessage={field.state.meta.errors?.join(", ")}
-              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="currency">
-          {(field) => (
-            <AppSelect<CurrencyOption>
-              label={t`Currency`}
-              description={t`Choose the currency for expenses in this party`}
-              items={currencyOptions}
-              selectedKey={field.state.value}
-              onSelectionChange={(value) => {
-                if (value) {
-                  field.handleChange(value as Currency);
-                }
-              }}
-            >
-              {(currency) => (
-                <SelectItem key={currency.id} value={currency}>
-                  {currency.symbol} - {currency.name}
-                </SelectItem>
-              )}
-            </AppSelect>
-          )}
-        </form.Field>
-
-        <div>
-          <h2 className="text-lg font-medium">
-            <Trans>Participants</Trans>
-          </h2>
-
-          <p className="mt-2">
-            <Trans>Who is invited to this party? You can add more participants later.</Trans>
-          </p>
-
-          <form.Field
-            name="participants"
-            mode="array"
-            validators={{
-              onChange: ({ value }) => {
-                if (value.length === 0) {
-                  return t`At least one participant is required`;
-                }
-              },
-            }}
-          >
-            {(field) => (
-              <div className="mt-4 flex flex-col gap-4">
-                {field.state.meta.errors?.length > 0 && (
-                  <span className="text-sm font-medium text-danger-500">
-                    {field.state.meta.errors.join(", ")}
-                  </span>
-                )}
-
-                {field.state.value.map((_, index) => (
-                  <div
-                    // oxlint-disable-next-line react-doctor/no-array-index-as-key -- FIXME: address existing React Doctor diagnostics.
-                    key={index}
-                    className="flex w-full gap-2"
-                  >
-                    <form.Field
-                      name={`participants[${index}].name`}
-                      validators={{
-                        onChange: ({ value }) => validatePartyParticipantName(value),
-                      }}
-                    >
-                      {(field) => (
-                        <AppTextField
-                          name={field.name}
-                          value={field.state.value}
-                          onChange={field.handleChange}
-                          onBlur={field.handleBlur}
-                          aria-label={t`Participant name`}
-                          className="w-full"
-                          errorMessage={field.state.meta.errors?.join(", ")}
-                          isInvalid={
-                            field.state.meta.isTouched && field.state.meta.errors?.length > 0
-                          }
-                        />
-                      )}
-                    </form.Field>
-
-                    <IconButton
-                      icon="lucide.trash"
-                      aria-label={t`Remove`}
-                      onPress={() => field.removeValue(index)}
-                      className="flex-shrink-0"
-                    />
-                  </div>
-                ))}
-
-                <div className="flex w-full gap-2">
-                  <addParticipantForm.Field
-                    name="newParticipantName"
-                    validators={{
-                      onSubmit: ({ value }) => validatePartyParticipantName(value),
-                    }}
-                  >
-                    {(field) => (
-                      <AppTextField
-                        name={field.name}
-                        value={field.state.value}
-                        onChange={field.handleChange}
-                        onBlur={field.handleBlur}
-                        aria-label={t`New participant name`}
-                        className="w-full"
-                        errorMessage={field.state.meta.errors?.join(", ")}
-                        isInvalid={
-                          field.state.meta.isTouched && field.state.meta.errors?.length > 0
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            flushSync(() => {
-                              addNewParticipant();
-                            });
-
-                            e.preventDefault();
-
-                            const target = e.target as HTMLInputElement;
-                            target.focus();
-
-                            // Check if fully in view with a little margin
-                            const rect = target.getBoundingClientRect();
-                            const margin = 10;
-
-                            if (
-                              rect.top >= margin &&
-                              rect.left >= margin &&
-                              rect.right <= window.innerWidth - margin &&
-                              rect.bottom <= window.innerHeight - margin
-                            ) {
-                              return;
-                            }
-
-                            const newScrollTop = window.scrollY + rect.top;
-                            const newScrollLeft = window.scrollX + rect.left;
-
-                            window.scrollTo({
-                              behavior: "smooth",
-                              top: newScrollTop,
-                              left: newScrollLeft,
-                            });
-                          }
-                        }}
-                      />
-                    )}
-                  </addParticipantForm.Field>
-
-                  <IconButton
-                    icon="lucide.plus"
-                    aria-label={t`Add participant`}
-                    className="flex-shrink-0"
-                    color="accent"
-                    onPress={addNewParticipant}
-                  />
-                </div>
-              </div>
-            )}
-          </form.Field>
-
-          <div className="h-16 flex-shrink-0" />
-        </div>
+        <NewPartyDetailsFields form={form} currencyOptions={currencyOptions} />
+        <NewPartyParticipantsField
+          addNewParticipant={addNewParticipant}
+          addParticipantForm={addParticipantForm}
+          form={form}
+        />
       </form>
     </div>
   );

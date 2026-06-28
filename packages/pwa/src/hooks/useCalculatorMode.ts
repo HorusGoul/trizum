@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { evaluateExpression } from "#src/lib/evaluateExpression.ts";
 
+const currencyDecimalsCache = new Map<string, number | null>();
+
 interface UseCalculatorModeOptions {
   value: number;
   onChange: (value: number) => void;
@@ -11,17 +13,23 @@ interface UseCalculatorModeOptions {
 function getCurrencyDecimals(currency: string | undefined): number | null {
   if (!currency) return null;
 
+  if (currencyDecimalsCache.has(currency)) {
+    return currencyDecimalsCache.get(currency) ?? null;
+  }
+
   try {
-    // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-    const formatter = new Intl.NumberFormat(undefined, {
+    const formatter = Intl.NumberFormat(undefined, {
       style: "currency",
       currency,
       currencyDisplay: "code",
     });
     const parts = formatter.formatToParts(1.23456789);
     const fractionPart = parts.find((part) => part.type === "fraction");
-    return fractionPart?.value.length ?? 2;
+    const decimals = fractionPart?.value.length ?? 2;
+    currencyDecimalsCache.set(currency, decimals);
+    return decimals;
   } catch {
+    currencyDecimalsCache.set(currency, null);
     return null;
   }
 }

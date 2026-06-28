@@ -84,9 +84,7 @@ export async function retryWithExponentialBackoff<T>(
     signal,
   } = options;
 
-  let lastError: unknown;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+  async function runAttempt(attempt: number): Promise<T> {
     if (signal?.aborted) {
       throw new RetryAbortedError();
     }
@@ -101,15 +99,12 @@ export async function retryWithExponentialBackoff<T>(
       signal?.addEventListener("abort", abortHandler, { once: true });
 
       try {
-        // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
         return await fn({ signal: attemptController.signal });
       } finally {
         clearTimeout(timeoutId);
         signal?.removeEventListener("abort", abortHandler);
       }
     } catch (error) {
-      lastError = error;
-
       // Don't retry if parent signal was aborted
       if (signal?.aborted) {
         throw new RetryAbortedError();
@@ -117,16 +112,17 @@ export async function retryWithExponentialBackoff<T>(
 
       // If this was the last attempt, throw
       if (attempt === maxAttempts - 1) {
-        break;
+        throw new MaxRetriesExceededError(maxAttempts, error);
       }
 
       // Wait before retrying
       const backoffDelay = calculateBackoffDelay(attempt, baseDelay, maxDelay, jitter);
       await delay(backoffDelay, signal);
+      return runAttempt(attempt + 1);
     }
   }
 
-  throw new MaxRetriesExceededError(maxAttempts, lastError);
+  return runAttempt(0);
 }
 
 export const handleCache = createCache<[Repo, AnyDocumentId], DocHandle<unknown> | undefined>({

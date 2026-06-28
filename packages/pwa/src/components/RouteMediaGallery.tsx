@@ -1,7 +1,9 @@
 import { Modal, ModalOverlay } from "react-aria-components";
-import { Suspense, useCallback, useEffect, useState } from "react";
-import { useMediaFile } from "#src/hooks/useMediaFile.ts";
+import { Suspense, useState } from "react";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
+import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import type { MediaFile } from "#src/models/media.ts";
 
 export interface RouteMediaGalleryProps {
   /** List of photo IDs to display in the gallery */
@@ -28,10 +30,10 @@ export function RouteMediaGallery({
 
   // Track drag progress for background opacity animation
   const [dragProgress, setDragProgress] = useState(0);
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const handleDragProgress = useCallback((progress: number) => {
+
+  function handleDragProgress(progress: number) {
     setDragProgress(progress);
-  }, []);
+  }
 
   // Calculate background opacity and blur based on drag progress
   const backgroundOpacity = 0.25 * (1 - dragProgress);
@@ -82,58 +84,22 @@ function GalleryItemsResolver({
   onClose,
   onDragProgress,
 }: GalleryItemsResolverProps) {
-  // Build items by rendering hidden resolver components
-  const [resolvedUrls, setResolvedUrls] = useState<string[]>([]);
+  const mediaFileIds = photoIds as MediaFile["id"][];
+  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(mediaFileIds, {
+    required: true as const,
+  }).map(({ doc }) => doc);
+  const urls = useMediaFileObjectUrls(mediaFiles);
+  const galleryItems: MediaGalleryItem[] = urls.map((url) => ({
+    src: url,
+  }));
 
-  // When all URLs are resolved, render the gallery
-  if (resolvedUrls.length === photoIds.length) {
-    const galleryItems: MediaGalleryItem[] = resolvedUrls.map((url) => ({
-      src: url,
-    }));
-
-    return (
-      <MediaGallery
-        index={index}
-        items={galleryItems}
-        onChange={onChange}
-        onClose={onClose}
-        onDragProgress={onDragProgress}
-      />
-    );
-  }
-
-  // Render resolvers for each photo
   return (
-    <>
-      {photoIds.map((photoId, idx) => (
-        <PhotoUrlResolver
-          key={photoId}
-          photoId={photoId}
-          onResolved={(url) => {
-            setResolvedUrls((prev) => {
-              const next = [...prev];
-              next[idx] = url;
-              return next;
-            });
-          }}
-        />
-      ))}
-    </>
+    <MediaGallery
+      index={index}
+      items={galleryItems}
+      onChange={onChange}
+      onClose={onClose}
+      onDragProgress={onDragProgress}
+    />
   );
-}
-
-interface PhotoUrlResolverProps {
-  photoId: string;
-  onResolved: (url: string) => void;
-}
-
-function PhotoUrlResolver({ photoId, onResolved }: PhotoUrlResolverProps) {
-  const { url } = useMediaFile(photoId);
-
-  useEffect(() => {
-    // oxlint-disable-next-line react-doctor/no-pass-data-to-parent, react-doctor/no-prop-callback-in-effect -- FIXME: address existing React Doctor diagnostics.
-    onResolved(url);
-  }, [url, onResolved]);
-
-  return null;
 }

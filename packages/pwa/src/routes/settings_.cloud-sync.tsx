@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useReducer, useRef, type FormEvent } from "react";
 import { AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
@@ -64,8 +64,173 @@ interface CloudSyncSearchParams {
   error?: string;
 }
 
-// oxlint-disable-next-line react-doctor/no-giant-component, react-doctor/prefer-useReducer -- FIXME: address existing React Doctor diagnostics.
+interface CloudSyncRouteState {
+  optimisticAuthUser: AuthSessionUser | null;
+  authEmail: string;
+  authPassword: string;
+  authError: string | null;
+  authEmailError: string | null;
+  authPasswordError: string | null;
+  isPasswordLoginMode: boolean;
+  isPasswordResetMode: boolean;
+  isPasswordSignInEnabled: boolean;
+  isSignInSuccessVisible: boolean;
+  magicLinkMessage: string | null;
+  passwordResetMessage: string | null;
+  authPendingAction: AuthPendingAction | null;
+  isSignInDialogOpen: boolean;
+  cloudActionDialog: CloudActionDialogType | null;
+  authCallbackDialogError: string | null;
+  isDeleteAccountDialogOpen: boolean;
+  deleteAccountConfirmation: string;
+  deleteAccountError: string | null;
+  isDeleteAccountPending: boolean;
+}
+
+type CloudSyncRouteAction =
+  | { type: "patch"; values: Partial<CloudSyncRouteState> }
+  | { type: "authEmailChanged"; value: string }
+  | { type: "authPasswordChanged"; value: string }
+  | { type: "authFailureMessage"; message: string }
+  | { type: "clearAuthErrors" }
+  | { type: "clearAuthFeedback" }
+  | { type: "sessionUserResolved" }
+  | { type: "signInSucceeded"; user: AuthSessionUser | undefined }
+  | { type: "deleteAccountDialogOpened" }
+  | { type: "deleteAccountDialogOpenChanged"; isOpen: boolean }
+  | { type: "deleteAccountConfirmationChanged"; value: string };
+
+function createInitialCloudSyncRouteState({
+  auth,
+  error,
+}: CloudSyncSearchParams): CloudSyncRouteState {
+  return {
+    optimisticAuthUser: null,
+    authEmail: "",
+    authPassword: "",
+    authError: error ? getAuthCallbackErrorContent(error).description : null,
+    authEmailError: null,
+    authPasswordError: null,
+    isPasswordLoginMode: false,
+    isPasswordResetMode: false,
+    isPasswordSignInEnabled: true,
+    isSignInSuccessVisible: auth === "success",
+    magicLinkMessage: null,
+    passwordResetMessage: null,
+    authPendingAction: null,
+    isSignInDialogOpen: true,
+    cloudActionDialog: null,
+    authCallbackDialogError: error ?? null,
+    isDeleteAccountDialogOpen: false,
+    deleteAccountConfirmation: "",
+    deleteAccountError: null,
+    isDeleteAccountPending: false,
+  };
+}
+
+function cloudSyncRouteReducer(
+  state: CloudSyncRouteState,
+  action: CloudSyncRouteAction,
+): CloudSyncRouteState {
+  switch (action.type) {
+    case "patch":
+      return { ...state, ...action.values };
+    case "authEmailChanged":
+      return {
+        ...state,
+        authEmail: action.value,
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+      };
+    case "authPasswordChanged":
+      return {
+        ...state,
+        authPassword: action.value,
+        authError: null,
+        authPasswordError: null,
+      };
+    case "authFailureMessage":
+      if (isEmailFieldErrorMessage(action.message)) {
+        return {
+          ...state,
+          authEmailError: action.message,
+        };
+      }
+
+      if (isPasswordFieldErrorMessage(action.message)) {
+        return {
+          ...state,
+          authPasswordError: action.message,
+        };
+      }
+
+      return {
+        ...state,
+        authError: action.message,
+      };
+    case "clearAuthErrors":
+      return {
+        ...state,
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+      };
+    case "clearAuthFeedback":
+      return {
+        ...state,
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+        magicLinkMessage: null,
+        passwordResetMessage: null,
+      };
+    case "sessionUserResolved":
+      return {
+        ...state,
+        optimisticAuthUser: null,
+      };
+    case "signInSucceeded":
+      return {
+        ...state,
+        optimisticAuthUser: action.user ?? state.optimisticAuthUser,
+        isSignInSuccessVisible: true,
+      };
+    case "deleteAccountDialogOpened":
+      return {
+        ...state,
+        deleteAccountConfirmation: "",
+        deleteAccountError: null,
+        isDeleteAccountDialogOpen: true,
+      };
+    case "deleteAccountDialogOpenChanged":
+      if (action.isOpen) {
+        return {
+          ...state,
+          isDeleteAccountDialogOpen: true,
+        };
+      }
+
+      return {
+        ...state,
+        deleteAccountConfirmation: "",
+        deleteAccountError: null,
+        isDeleteAccountDialogOpen: false,
+      };
+    case "deleteAccountConfirmationChanged":
+      return {
+        ...state,
+        deleteAccountConfirmation: action.value,
+        deleteAccountError: null,
+      };
+  }
+}
+
 function CloudSyncSettings() {
+  return useCloudSyncSettingsView();
+}
+
+function useCloudSyncSettingsView() {
   const { partyList } = usePartyList();
   const router = useRouter();
   const currentLocation = useLocation();
@@ -73,51 +238,43 @@ function CloudSyncSettings() {
   const { auth, error: authCallbackError } = Route.useSearch();
   const session = authClient.useSession();
   const sessionUser = session.data?.user;
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [optimisticAuthUser, setOptimisticAuthUser] = useState<AuthSessionUser | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
+  const [routeState, dispatchRouteState] = useReducer(
+    cloudSyncRouteReducer,
+    { auth, error: authCallbackError },
+    createInitialCloudSyncRouteState,
+  );
+  const {
+    optimisticAuthUser,
+    authEmail,
+    authPassword,
+    authError,
+    authEmailError,
+    authPasswordError,
+    isPasswordLoginMode,
+    isPasswordResetMode,
+    isPasswordSignInEnabled,
+    magicLinkMessage,
+    passwordResetMessage,
+    authPendingAction,
+    isSignInDialogOpen,
+    cloudActionDialog,
+    authCallbackDialogError,
+    isDeleteAccountDialogOpen,
+    deleteAccountConfirmation,
+    deleteAccountError,
+    isDeleteAccountPending,
+  } = routeState;
   const user = sessionUser ?? optimisticAuthUser;
   const userId = user?.id;
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authEmail, setAuthEmail] = useState("");
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authPassword, setAuthPassword] = useState("");
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authError, setAuthError] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authEmailError, setAuthEmailError] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authPasswordError, setAuthPasswordError] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isPasswordLoginMode, setIsPasswordLoginMode] = useState(false);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isPasswordSignInEnabled, setIsPasswordSignInEnabled] = useState(true);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isSignInSuccessVisible, setIsSignInSuccessVisible] = useState(auth === "success");
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [magicLinkMessage, setMagicLinkMessage] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [passwordResetMessage, setPasswordResetMessage] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authPendingAction, setAuthPendingAction] = useState<AuthPendingAction | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(true);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [cloudActionDialog, setCloudActionDialog] = useState<CloudActionDialogType | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [authCallbackDialogError, setAuthCallbackDialogError] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [deleteAccountConfirmation, setDeleteAccountConfirmation] = useState("");
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [deleteAccountError, setDeleteAccountError] = useState<string | null>(null);
-  // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-  const [isDeleteAccountPending, setIsDeleteAccountPending] = useState(false);
+  const isSignInSuccessVisible =
+    userId || auth === "success" ? routeState.isSignInSuccessVisible || auth === "success" : false;
   const isSignInSuccessVisibleRef = useRef(isSignInSuccessVisible);
   const isAuthPending = authPendingAction !== null;
+  const signInFormMode = isPasswordResetMode
+    ? "password-reset"
+    : isPasswordLoginMode
+      ? "password"
+      : "magic-link";
   const canDeleteAccount =
     deleteAccountConfirmation.trim().toLowerCase() === DELETE_ACCOUNT_CONFIRMATION_TEXT;
   const {
@@ -140,31 +297,10 @@ function CloudSyncSettings() {
   }, [isSignInSuccessVisible]);
 
   useEffect(() => {
-    if (!user) {
-      // oxlint-disable-next-line react-doctor/no-chain-state-updates -- FIXME: address existing React Doctor diagnostics.
-      setIsSignInDialogOpen(true);
-    }
-  }, [user]);
-
-  useEffect(() => {
     if (sessionUser) {
-      setOptimisticAuthUser(null);
+      dispatchRouteState({ type: "sessionUserResolved" });
     }
   }, [sessionUser]);
-
-  useEffect(() => {
-    if (!userId) {
-      // oxlint-disable-next-line react-doctor/no-chain-state-updates -- FIXME: address existing React Doctor diagnostics.
-      setCloudActionDialog(null);
-    }
-  }, [userId]);
-
-  useEffect(() => {
-    if (auth === "success") {
-      // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
-      setIsSignInSuccessVisible(true);
-    }
-  }, [auth]);
 
   useEffect(() => {
     if (!isSignInSuccessVisible || !userId) {
@@ -172,7 +308,12 @@ function CloudSyncSettings() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      setIsSignInSuccessVisible(false);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          isSignInSuccessVisible: false,
+        },
+      });
 
       if (auth === "success") {
         void navigate({ to: "/settings/cloud-sync", replace: true });
@@ -185,33 +326,13 @@ function CloudSyncSettings() {
   }, [auth, isSignInSuccessVisible, navigate, userId]);
 
   useEffect(() => {
-    if (!userId && auth !== "success") {
-      // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
-      setIsSignInSuccessVisible(false);
-    }
-  }, [auth, userId]);
-
-  useEffect(() => {
-    if (!authCallbackError || userId) {
-      return;
-    }
-
-    // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
-    setAuthError(getAuthCallbackErrorContent(authCallbackError).description);
-  }, [authCallbackError, userId]);
-
-  useEffect(() => {
-    if (!authCallbackError || !userId) {
-      return;
-    }
-
-    // oxlint-disable-next-line react-doctor/no-derived-state -- FIXME: address existing React Doctor diagnostics.
-    setAuthCallbackDialogError(authCallbackError);
-  }, [authCallbackError, userId]);
-
-  useEffect(() => {
     if (!isPasswordLoginMode) {
-      setIsPasswordSignInEnabled(true);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          isPasswordSignInEnabled: true,
+        },
+      });
       return;
     }
 
@@ -220,7 +341,12 @@ function CloudSyncSettings() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      setIsPasswordSignInEnabled(true);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          isPasswordSignInEnabled: true,
+        },
+      });
     }, PASSWORD_SIGN_IN_ENABLE_DELAY_MS);
 
     return () => {
@@ -229,29 +355,15 @@ function CloudSyncSettings() {
   }, [isPasswordLoginMode, isPasswordSignInEnabled]);
 
   function clearAuthErrors() {
-    setAuthError(null);
-    setAuthEmailError(null);
-    setAuthPasswordError(null);
+    dispatchRouteState({ type: "clearAuthErrors" });
   }
 
   function clearAuthFeedback() {
-    clearAuthErrors();
-    setMagicLinkMessage(null);
-    setPasswordResetMessage(null);
+    dispatchRouteState({ type: "clearAuthFeedback" });
   }
 
   function setAuthFailureMessage(message: string) {
-    if (isEmailFieldErrorMessage(message)) {
-      setAuthEmailError(message);
-      return;
-    }
-
-    if (isPasswordFieldErrorMessage(message)) {
-      setAuthPasswordError(message);
-      return;
-    }
-
-    setAuthError(message);
+    dispatchRouteState({ type: "authFailureMessage", message });
   }
 
   function setAuthFailure(error: unknown, fallbackMessage: string) {
@@ -259,45 +371,55 @@ function CloudSyncSettings() {
   }
 
   function handleSignInSuccess(user: AuthSessionUser | undefined) {
-    if (user) {
-      setOptimisticAuthUser(user);
-    }
-
     toast.success(t`Signed in`);
-    setIsSignInSuccessVisible(true);
+    dispatchRouteState({ type: "signInSucceeded", user });
     void session.refetch();
   }
 
   function onAuthEmailChange(value: string) {
-    setAuthEmail(value);
-    clearAuthErrors();
+    dispatchRouteState({ type: "authEmailChanged", value });
   }
 
   function onAuthPasswordChange(value: string) {
-    setAuthPassword(value);
-    setAuthError(null);
-    setAuthPasswordError(null);
+    dispatchRouteState({ type: "authPasswordChanged", value });
   }
 
   async function onMagicLinkSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    clearAuthErrors();
-    setMagicLinkMessage(null);
-    setPasswordResetMessage(null);
-    setIsSignInSuccessVisible(false);
-    setAuthPendingAction("magic-link");
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+        magicLinkMessage: null,
+        passwordResetMessage: null,
+        isSignInSuccessVisible: false,
+        authPendingAction: "magic-link",
+      },
+    });
 
     try {
       await requestMagicLinkEmail({
         email: authEmail,
         name: partyList.username.trim() || authEmail,
       });
-      setMagicLinkMessage(t`Check your email for the sign-in link`);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          magicLinkMessage: t`Check your email for the sign-in link`,
+        },
+      });
       toast.success(t`Sign-in link sent`);
     } catch (error) {
       setAuthFailure(error, t`Could not send sign-in link`);
     } finally {
-      setAuthPendingAction(null);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPendingAction: null,
+        },
+      });
     }
   }
 
@@ -308,11 +430,18 @@ function CloudSyncSettings() {
       return;
     }
 
-    clearAuthErrors();
-    setMagicLinkMessage(null);
-    setPasswordResetMessage(null);
-    setIsSignInSuccessVisible(false);
-    setAuthPendingAction("password");
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+        magicLinkMessage: null,
+        passwordResetMessage: null,
+        isSignInSuccessVisible: false,
+        authPendingAction: "password",
+      },
+    });
 
     try {
       const result = await authClient.signIn.email({
@@ -326,7 +455,12 @@ function CloudSyncSettings() {
         return;
       }
 
-      setAuthPassword("");
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPassword: "",
+        },
+      });
       handleSignInSuccess(getAuthResultUser(result.data));
     } catch (error) {
       setAuthFailureMessage(
@@ -337,21 +471,33 @@ function CloudSyncSettings() {
             : t`Authentication failed`,
       );
     } finally {
-      setAuthPendingAction(null);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPendingAction: null,
+        },
+      });
     }
   }
 
   async function onSocialSignIn(provider: SocialAuthProvider) {
-    clearAuthErrors();
-    setMagicLinkMessage(null);
-    setIsSignInSuccessVisible(false);
-    setAuthPendingAction(provider);
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+        magicLinkMessage: null,
+        isSignInSuccessVisible: false,
+        authPendingAction: provider,
+      },
+    });
 
     try {
       const result = await signInWithSocialAuthAccount(provider);
 
       if (result?.error) {
-        setAuthError(result.error.message ?? t`Authentication failed`);
+        setAuthFailureMessage(result.error.message ?? t`Authentication failed`);
         return;
       }
 
@@ -364,15 +510,25 @@ function CloudSyncSettings() {
 
       handleSignInSuccess(getAuthResultUser(result.data));
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t`Authentication failed`);
+      setAuthFailureMessage(error instanceof Error ? error.message : t`Authentication failed`);
     } finally {
-      setAuthPendingAction(null);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPendingAction: null,
+        },
+      });
     }
   }
 
   async function onLinkSocialAccount(provider: SocialAuthProvider) {
     clearAuthErrors();
-    setAuthPendingAction(provider);
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authPendingAction: provider,
+      },
+    });
 
     try {
       const result = await linkSocialAuthAccount(provider);
@@ -388,24 +544,46 @@ function CloudSyncSettings() {
     } catch {
       toast.error(t`Could not connect sign-in method`);
     } finally {
-      setAuthPendingAction(null);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPendingAction: null,
+        },
+      });
     }
   }
 
   async function onRequestPasswordReset(email: string) {
-    clearAuthErrors();
-    setPasswordResetMessage(null);
-    setIsSignInSuccessVisible(false);
-    setAuthPendingAction("password-reset");
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authError: null,
+        authEmailError: null,
+        authPasswordError: null,
+        passwordResetMessage: null,
+        isSignInSuccessVisible: false,
+        authPendingAction: "password-reset",
+      },
+    });
 
     try {
       await requestPasswordResetEmail(email);
-      setPasswordResetMessage(t`Check your email for the password link`);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          passwordResetMessage: t`Check your email for the password link`,
+        },
+      });
       toast.success(t`Password email sent`);
     } catch (error) {
       setAuthFailure(error, t`Could not send password email`);
     } finally {
-      setAuthPendingAction(null);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPendingAction: null,
+        },
+      });
     }
   }
 
@@ -419,7 +597,12 @@ function CloudSyncSettings() {
       return;
     }
 
-    setCloudActionDialog(null);
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        cloudActionDialog: null,
+      },
+    });
 
     switch (action) {
       case "connect-apple":
@@ -438,10 +621,16 @@ function CloudSyncSettings() {
   }
 
   async function onSignOut() {
-    setIsSignInSuccessVisible(false);
     setIsCloudSyncSwitchOpen(false);
-    setCloudActionDialog(null);
-    setAuthPendingAction("sign-out");
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authPendingAction: "sign-out",
+        cloudActionDialog: null,
+        isSignInSuccessVisible: false,
+        optimisticAuthUser: null,
+      },
+    });
 
     try {
       await authClient.signOut();
@@ -453,14 +642,17 @@ function CloudSyncSettings() {
     } catch {
       toast.error(t`Could not sign out`);
     } finally {
-      setAuthPendingAction(null);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          authPendingAction: null,
+        },
+      });
     }
   }
 
   function openDeleteAccountDialog() {
-    setDeleteAccountConfirmation("");
-    setDeleteAccountError(null);
-    setIsDeleteAccountDialogOpen(true);
+    dispatchRouteState({ type: "deleteAccountDialogOpened" });
   }
 
   async function onDeleteAccountSubmit(event: FormEvent<HTMLFormElement>) {
@@ -470,8 +662,13 @@ function CloudSyncSettings() {
       return;
     }
 
-    setDeleteAccountError(null);
-    setIsDeleteAccountPending(true);
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        deleteAccountError: null,
+        isDeleteAccountPending: true,
+      },
+    });
 
     try {
       await deleteAuthUserAccount();
@@ -480,24 +677,44 @@ function CloudSyncSettings() {
         clearCachedCloudAccountState(userId);
       }
       clearCloudSyncState();
-      setIsDeleteAccountDialogOpen(false);
-      setDeleteAccountConfirmation("");
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          deleteAccountConfirmation: "",
+          isDeleteAccountDialogOpen: false,
+          optimisticAuthUser: null,
+        },
+      });
       await session.refetch();
       toast.success(t`Account deleted`);
       void navigate({ to: "/settings", replace: true });
     } catch (error) {
-      setDeleteAccountError(
-        error instanceof Error
-          ? getDeleteAccountErrorMessage(error.message)
-          : t`Could not delete account`,
-      );
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          deleteAccountError:
+            error instanceof Error
+              ? getDeleteAccountErrorMessage(error.message)
+              : t`Could not delete account`,
+        },
+      });
     } finally {
-      setIsDeleteAccountPending(false);
+      dispatchRouteState({
+        type: "patch",
+        values: {
+          isDeleteAccountPending: false,
+        },
+      });
     }
   }
 
   function closeSignInDialog() {
-    setIsSignInDialogOpen(false);
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        isSignInDialogOpen: false,
+      },
+    });
     window.setTimeout(() => {
       closeRouteState(currentLocation, router.history, () => {
         void navigate({ to: "/settings", replace: true });
@@ -529,28 +746,45 @@ function CloudSyncSettings() {
           showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
         >
           <CloudSyncSignInForm
-            auth={auth}
-            authEmail={authEmail}
-            authEmailError={authEmailError}
-            authError={authError}
-            authPassword={authPassword}
-            authPasswordError={authPasswordError}
-            authPendingAction={authPendingAction}
-            isAuthPending={isAuthPending}
-            isPasswordLoginMode={isPasswordLoginMode}
-            isPasswordResetMode={isPasswordResetMode}
-            isPasswordSignInEnabled={isPasswordSignInEnabled}
-            isSignInSuccessVisible={isSignInSuccessVisible}
-            magicLinkMessage={magicLinkMessage}
+            authState={{
+              auth,
+              email: authEmail,
+              emailError: authEmailError,
+              error: authError,
+              magicLinkMessage,
+              password: authPassword,
+              passwordError: authPasswordError,
+              passwordResetMessage,
+              pendingAction: authPendingAction,
+            }}
+            mode={signInFormMode}
             onAuthEmailChange={onAuthEmailChange}
             onAuthPasswordChange={onAuthPasswordChange}
             onBackToSignIn={() => {
-              setIsPasswordResetMode(false);
-              clearAuthFeedback();
+              dispatchRouteState({
+                type: "patch",
+                values: {
+                  authError: null,
+                  authEmailError: null,
+                  authPasswordError: null,
+                  isPasswordResetMode: false,
+                  magicLinkMessage: null,
+                  passwordResetMessage: null,
+                },
+              });
             }}
             onForgotPassword={() => {
-              setIsPasswordResetMode(true);
-              clearAuthFeedback();
+              dispatchRouteState({
+                type: "patch",
+                values: {
+                  authError: null,
+                  authEmailError: null,
+                  authPasswordError: null,
+                  isPasswordResetMode: true,
+                  magicLinkMessage: null,
+                  passwordResetMessage: null,
+                },
+              });
             }}
             onMagicLinkSubmit={onMagicLinkSubmit}
             onPasswordResetSubmit={onPasswordResetSubmit}
@@ -559,20 +793,51 @@ function CloudSyncSettings() {
               void onSocialSignIn(provider);
             }}
             onTryAnotherEmail={() => {
-              clearAuthFeedback();
-              setIsPasswordLoginMode(false);
+              dispatchRouteState({
+                type: "patch",
+                values: {
+                  authError: null,
+                  authEmailError: null,
+                  authPasswordError: null,
+                  isPasswordLoginMode: false,
+                  magicLinkMessage: null,
+                  passwordResetMessage: null,
+                },
+              });
             }}
             onUseMagicLink={() => {
-              setIsPasswordLoginMode(false);
-              setIsPasswordSignInEnabled(true);
-              clearAuthFeedback();
+              dispatchRouteState({
+                type: "patch",
+                values: {
+                  authError: null,
+                  authEmailError: null,
+                  authPasswordError: null,
+                  isPasswordLoginMode: false,
+                  isPasswordSignInEnabled: true,
+                  magicLinkMessage: null,
+                  passwordResetMessage: null,
+                },
+              });
             }}
             onUsePassword={() => {
-              setIsPasswordLoginMode(true);
-              setIsPasswordSignInEnabled(false);
-              clearAuthFeedback();
+              dispatchRouteState({
+                type: "patch",
+                values: {
+                  authError: null,
+                  authEmailError: null,
+                  authPasswordError: null,
+                  isPasswordLoginMode: true,
+                  isPasswordSignInEnabled: false,
+                  magicLinkMessage: null,
+                  passwordResetMessage: null,
+                },
+              });
             }}
-            passwordResetMessage={passwordResetMessage}
+            status={{
+              isPending: isAuthPending,
+              isPasswordSignInEnabled,
+              isSignInSuccessVisible,
+            }}
           />
         </CloudSyncSignInDialog>
       </div>
@@ -596,17 +861,37 @@ function CloudSyncSettings() {
         isDeleteAccountPending={isDeleteAccountPending}
         linkedProviderIds={linkedProviderIds}
         onConnectApple={() => {
-          setCloudActionDialog("connect-apple");
+          dispatchRouteState({
+            type: "patch",
+            values: {
+              cloudActionDialog: "connect-apple",
+            },
+          });
         }}
         onConnectGoogle={() => {
-          setCloudActionDialog("connect-google");
+          dispatchRouteState({
+            type: "patch",
+            values: {
+              cloudActionDialog: "connect-google",
+            },
+          });
         }}
         onDeleteAccount={openDeleteAccountDialog}
         onPasswordLink={() => {
-          setCloudActionDialog("password-link");
+          dispatchRouteState({
+            type: "patch",
+            values: {
+              cloudActionDialog: "password-link",
+            },
+          });
         }}
         onSignOut={() => {
-          setCloudActionDialog("sign-out");
+          dispatchRouteState({
+            type: "patch",
+            values: {
+              cloudActionDialog: "sign-out",
+            },
+          });
         }}
         passwordResetMessage={passwordResetMessage}
       />
@@ -619,7 +904,12 @@ function CloudSyncSettings() {
         onConfirm={onConfirmCloudAction}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
-            setCloudActionDialog(null);
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                cloudActionDialog: null,
+              },
+            });
           }
         }}
       />
@@ -631,16 +921,16 @@ function CloudSyncSettings() {
         isOpen={isDeleteAccountDialogOpen}
         isPending={isDeleteAccountPending}
         onConfirmationChange={(value) => {
-          setDeleteAccountConfirmation(value);
-          setDeleteAccountError(null);
+          dispatchRouteState({
+            type: "deleteAccountConfirmationChanged",
+            value,
+          });
         }}
         onOpenChange={(isOpen) => {
-          setIsDeleteAccountDialogOpen(isOpen);
-
-          if (!isOpen) {
-            setDeleteAccountConfirmation("");
-            setDeleteAccountError(null);
-          }
+          dispatchRouteState({
+            type: "deleteAccountDialogOpenChanged",
+            isOpen,
+          });
         }}
         onSubmit={onDeleteAccountSubmit}
       />
@@ -653,7 +943,12 @@ function CloudSyncSettings() {
             return;
           }
 
-          setAuthCallbackDialogError(null);
+          dispatchRouteState({
+            type: "patch",
+            values: {
+              authCallbackDialogError: null,
+            },
+          });
 
           if (authCallbackError) {
             void navigate({ to: "/settings/cloud-sync", replace: true });

@@ -1,16 +1,19 @@
 import { Collection, Tab, TabList, TabPanel, Tabs, type Key } from "react-aria-components";
-// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
 import {
+  LazyMotion,
   animate,
-  motion,
+  domAnimation,
+  m as motion,
   useMotionValueEvent,
   useScroll,
   useTransform,
   type AnimationPlaybackControls,
 } from "motion/react";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { cn } from "./utils";
 import { Icon, type IconProps } from "./Icon";
+
+const activeTabPanelAnimations = new WeakMap<HTMLDivElement, AnimationPlaybackControls>();
 
 interface AnimatedTabsProps {
   tabs: {
@@ -41,16 +44,13 @@ export function AnimatedTabs({
 
   // Find all the tab elements so we can use their dimensions.
   const [tabElements, setTabElements] = useState<HTMLElement[]>([]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const tabList = tabListRef.current;
 
-    // oxlint-disable-next-line react-doctor/no-event-handler -- FIXME: address existing React Doctor diagnostics.
-    if (tabElements.length === 0 && tabList) {
-      const tabs = tabList.querySelectorAll<HTMLElement>("[role=tab]");
-      // oxlint-disable-next-line react-doctor/no-chain-state-updates -- FIXME: address existing React Doctor diagnostics.
-      setTabElements([...tabs]);
+    if (tabList) {
+      setTabElements(Array.from(tabList.querySelectorAll<HTMLElement>("[role=tab]")));
     }
-  }, [tabElements]);
+  }, [tabs.length]);
 
   const initialSelectedTab = useRef(selectedTab);
   const initialTabs = useRef(tabs);
@@ -72,11 +72,9 @@ export function AnimatedTabs({
 
   // This function determines which tab should be selected
   // based on the scroll position.
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const getIndex = useCallback(
-    (x: number) => Math.max(0, Math.floor((tabElements.length - 1) * x)),
-    [tabElements],
-  );
+  function getIndex(x: number) {
+    return Math.max(0, Math.floor((tabElements.length - 1) * x));
+  }
 
   // This function transforms the scroll position into the X position
   // or width of the selected tab indicator.
@@ -109,32 +107,33 @@ export function AnimatedTabs({
   // When the user scrolls, update the selected key
   // so that the correct tab panel becomes interactive.
   useMotionValueEvent(scrollXProgress, "change", (x) => {
-    if (animationRef.current || !tabElements.length) return;
+    const tabPanel = tabPanelsRef.current;
+
+    if (!tabPanel || activeTabPanelAnimations.has(tabPanel) || !tabElements.length) return;
     onSelectedTabChange?.(tabs[getIndex(x)].id);
   });
 
   // When the user clicks on a tab perform an animation of
   // the scroll position to the newly selected tab panel.
-  const animationRef = useRef<AnimationPlaybackControls>(null);
   const onSelectionChange = (selectedKey: Key) => {
     onSelectedTabChange?.(selectedKey);
+    const tabPanel = tabPanelsRef.current;
+    const existingAnimation = tabPanel ? activeTabPanelAnimations.get(tabPanel) : null;
 
     // If the scroll position is already moving but we aren't animating
     // then the key changed as a result of a user scrolling. Ignore.
-    if (scrollXProgress.getVelocity() && !animationRef.current) {
+    if (scrollXProgress.getVelocity() && !existingAnimation) {
       return;
     }
 
-    const tabPanel = tabPanelsRef.current;
     const index = tabs.findIndex((tab) => tab.id === selectedKey);
-    animationRef.current?.stop();
+    existingAnimation?.stop();
 
     if (!tabPanel) {
       return;
     }
 
-    // eslint-disable-next-line react-hooks/immutability -- What we're doing here is safe
-    animationRef.current = animate(
+    const nextAnimation = animate(
       tabPanel.scrollLeft,
       tabPanel.scrollWidth * (index / tabs.length),
       {
@@ -150,65 +149,68 @@ export function AnimatedTabs({
         },
         onComplete: () => {
           tabPanel.style.scrollSnapType = "";
-          animationRef.current = null;
+          activeTabPanelAnimations.delete(tabPanel);
         },
       },
     );
+    activeTabPanelAnimations.set(tabPanel, nextAnimation);
   };
 
   return (
-    <Tabs
-      className="flex h-full flex-1 flex-col"
-      selectedKey={selectedTab}
-      onSelectionChange={onSelectionChange}
-    >
-      <div className="relative">
-        <TabList
-          ref={tabListRef}
-          className={cn("flex w-full gap-2", tabListClassName)}
-          items={tabs}
-        >
-          {(tab) => (
-            <Tab className="flex flex-1 cursor-default touch-none items-center justify-center px-4 py-2.5 outline-none transition">
-              {({ isSelected, isFocusVisible }) => (
-                <>
-                  <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
-                  <span className="h-4.5 text-lg leading-none">{tab.label}</span>
-                  {isFocusVisible &&
-                    isSelected && (
-                      // Focus ring.
-                      <motion.span
-                        className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
-                        style={{ x, width }}
-                      />
-                    )}
-                </>
-              )}
-            </Tab>
-          )}
-        </TabList>
-        {/* Selection indicator. */}
-        <motion.span
-          className="absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500"
-          style={{ x, width }}
-        />
-      </div>
-      <div
-        ref={tabPanelsRef}
-        className="no-scrollbar mt-2.5 flex h-full flex-1 snap-x snap-mandatory overflow-x-auto"
+    <LazyMotion features={domAnimation}>
+      <Tabs
+        className="flex h-full flex-1 flex-col"
+        selectedKey={selectedTab}
+        onSelectionChange={onSelectionChange}
       >
-        <Collection items={tabs}>
-          {(tab) => (
-            <TabPanel
-              shouldForceMount
-              className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto rounded outline-none -outline-offset-2 focus-visible:outline-black"
-              ref={tab.panelRef}
-            >
-              {tab.node}
-            </TabPanel>
-          )}
-        </Collection>
-      </div>
-    </Tabs>
+        <div className="relative">
+          <TabList
+            ref={tabListRef}
+            className={cn("flex w-full gap-2", tabListClassName)}
+            items={tabs}
+          >
+            {(tab) => (
+              <Tab className="flex flex-1 cursor-default touch-none items-center justify-center px-4 py-2.5 outline-none transition">
+                {({ isSelected, isFocusVisible }) => (
+                  <>
+                    <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
+                    <span className="h-4.5 text-lg leading-none">{tab.label}</span>
+                    {isFocusVisible &&
+                      isSelected && (
+                        // Focus ring.
+                        <motion.span
+                          className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
+                          style={{ x, width }}
+                        />
+                      )}
+                  </>
+                )}
+              </Tab>
+            )}
+          </TabList>
+          {/* Selection indicator. */}
+          <motion.span
+            className="absolute -bottom-2 z-10 h-0.5 rounded-full bg-accent-500"
+            style={{ x, width }}
+          />
+        </div>
+        <div
+          ref={tabPanelsRef}
+          className="no-scrollbar mt-2.5 flex h-full flex-1 snap-x snap-mandatory overflow-x-auto"
+        >
+          <Collection items={tabs}>
+            {(tab) => (
+              <TabPanel
+                shouldForceMount
+                className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto rounded outline-none -outline-offset-2 focus-visible:outline-black"
+                ref={tab.panelRef}
+              >
+                {tab.node}
+              </TabPanel>
+            )}
+          </Collection>
+        </div>
+      </Tabs>
+    </LazyMotion>
   );
 }

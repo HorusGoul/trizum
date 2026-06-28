@@ -11,8 +11,8 @@ import type { MediaFile } from "#src/models/media.ts";
 import type { PartyExpenseChunk, PartyParticipant } from "#src/models/party.ts";
 import { Avatar } from "#src/ui/Avatar.tsx";
 import { getLogger } from "#src/lib/log.ts";
-import type { DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
@@ -35,6 +35,47 @@ type ExpensePresenceDeletePayload = {
   };
 };
 
+function broadcastPresenceUpdate({
+  expenseId,
+  handle,
+  lastSentElementIdRef,
+  participantId,
+  value,
+}: {
+  expenseId: Expense["id"];
+  handle: DocHandle<PartyExpenseChunk>;
+  lastSentElementIdRef: React.RefObject<string | null>;
+  participantId: PartyParticipant["id"];
+  value: Pick<ExpenseParticipantPresence, "elementId"> | null;
+}) {
+  if (!value) {
+    lastSentElementIdRef.current = null;
+    const payload: ExpensePresenceDeletePayload = {
+      type: "expense-presence-delete",
+      data: {
+        participantId,
+        expenseId,
+      },
+    };
+
+    handle.broadcast(payload);
+    return;
+  }
+
+  lastSentElementIdRef.current = value.elementId;
+  const payload: ExpensePresenceUpdatePayload = {
+    type: "expense-presence-update",
+    data: {
+      elementId: value.elementId,
+      participantId,
+      dateTime: new Date(),
+      expenseId,
+    },
+  };
+
+  handle.broadcast(payload);
+}
+
 export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
   const { chunkId } = decodeExpenseId(expenseId);
   const [, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
@@ -42,55 +83,36 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   });
   const participant = useCurrentParticipant();
   const presenceElementIdRef = useRef<string | null>(null);
-  const [presence, setPresence] = useState<
-    Record<PartyParticipant["id"], ExpenseParticipantPresence>
-  >({});
+  const [visiblePresence, setVisiblePresence] = useState<ExpenseParticipantPresence[]>([]);
   const lastSentElementIdRef = useRef<string | null>(null);
-
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const onPresenceUpdate = useCallback(
-    (value: Pick<ExpenseParticipantPresence, "elementId"> | null) => {
-      if (!value) {
-        lastSentElementIdRef.current = null;
-        const payload: ExpensePresenceDeletePayload = {
-          type: "expense-presence-delete",
-          data: {
-            participantId: participant.id,
-            expenseId,
-          },
-        };
-
-        handle.broadcast(payload);
-        return;
-      }
-
-      lastSentElementIdRef.current = value.elementId;
-      const payload: ExpensePresenceUpdatePayload = {
-        type: "expense-presence-update",
-        data: {
-          elementId: value.elementId,
-          participantId: participant.id,
-          dateTime: new Date(),
-          expenseId,
-        },
-      };
-
-      handle.broadcast(payload);
-    },
-    [expenseId, handle, participant.id],
-  );
 
   useEffect(() => {
     const interval = setInterval(() => {
+      const stalePresenceCutoff = new Date(Date.now() - 10000);
+
+      setVisiblePresence((currentPresence) =>
+        currentPresence.filter(
+          (participantPresence) =>
+            participantPresence.participantId !== participant.id &&
+            participantPresence.dateTime >= stalePresenceCutoff,
+        ),
+      );
+
       if (lastSentElementIdRef.current) {
-        onPresenceUpdate({ elementId: lastSentElementIdRef.current });
+        broadcastPresenceUpdate({
+          expenseId,
+          handle,
+          lastSentElementIdRef,
+          participantId: participant.id,
+          value: { elementId: lastSentElementIdRef.current },
+        });
       }
     }, 5000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [onPresenceUpdate]);
+  }, [expenseId, handle, participant.id]);
 
   useEffect(() => {
     const listener = ({ message }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
@@ -103,16 +125,25 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
         switch (payload.type) {
           case "expense-presence-delete":
-            setPresence((prev) => {
-              const { [payload.data.participantId]: _, ...rest } = prev;
-              return rest;
-            });
+            setVisiblePresence((currentPresence) =>
+              currentPresence.filter(
+                (participantPresence) =>
+                  participantPresence.participantId !== payload.data.participantId,
+              ),
+            );
             break;
           case "expense-presence-update":
-            setPresence((prev) => ({
-              ...prev,
-              [payload.data.participantId]: payload.data,
-            }));
+            if (payload.data.participantId === participant.id) {
+              return;
+            }
+
+            setVisiblePresence((currentPresence) => [
+              ...currentPresence.filter(
+                (participantPresence) =>
+                  participantPresence.participantId !== payload.data.participantId,
+              ),
+              payload.data,
+            ]);
             break;
         }
       } catch {
@@ -126,7 +157,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     return () => {
       handle.off("ephemeral-message", listener);
     };
-  }, [handle, expenseId]);
+  }, [handle, expenseId, participant.id]);
 
   useEffect(() => {
     function onClick(event: MouseEvent) {
@@ -136,7 +167,13 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       const presenceElementId = findPresenceElementFromTarget(target);
 
       if (presenceElementId) {
-        onPresenceUpdate({ elementId: presenceElementId });
+        broadcastPresenceUpdate({
+          expenseId,
+          handle,
+          lastSentElementIdRef,
+          participantId: participant.id,
+          value: { elementId: presenceElementId },
+        });
         presenceElementIdRef.current = presenceElementId;
         return;
       }
@@ -145,7 +182,13 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
         return;
       }
 
-      onPresenceUpdate(null);
+      broadcastPresenceUpdate({
+        expenseId,
+        handle,
+        lastSentElementIdRef,
+        participantId: participant.id,
+        value: null,
+      });
       presenceElementIdRef.current = null;
     }
 
@@ -154,7 +197,13 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     // visibility change listener
     function onVisibilityChange() {
       if (document.visibilityState === "hidden") {
-        onPresenceUpdate(null);
+        broadcastPresenceUpdate({
+          expenseId,
+          handle,
+          lastSentElementIdRef,
+          participantId: participant.id,
+          value: null,
+        });
         presenceElementIdRef.current = null;
       }
     }
@@ -162,7 +211,13 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     function onWindowBlur() {
-      onPresenceUpdate(null);
+      broadcastPresenceUpdate({
+        expenseId,
+        handle,
+        lastSentElementIdRef,
+        participantId: participant.id,
+        value: null,
+      });
       presenceElementIdRef.current = null;
     }
 
@@ -172,7 +227,13 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       const presenceElementId = findPresenceElementFromTarget(element);
 
       if (presenceElementId) {
-        onPresenceUpdate({ elementId: presenceElementId });
+        broadcastPresenceUpdate({
+          expenseId,
+          handle,
+          lastSentElementIdRef,
+          participantId: participant.id,
+          value: { elementId: presenceElementId },
+        });
         presenceElementIdRef.current = presenceElementId;
       }
     }
@@ -182,7 +243,13 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
     const interval = setInterval(() => {
       if (presenceElementIdRef.current) {
-        onPresenceUpdate({ elementId: presenceElementIdRef.current });
+        broadcastPresenceUpdate({
+          expenseId,
+          handle,
+          lastSentElementIdRef,
+          participantId: participant.id,
+          value: { elementId: presenceElementIdRef.current },
+        });
       }
     }, 5000);
 
@@ -192,33 +259,15 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       window.removeEventListener("blur", onWindowBlur);
       clearInterval(interval);
     };
-  }, [onPresenceUpdate]);
+  }, [expenseId, handle, participant.id]);
 
   return (
     <div className="pointer-events-none absolute inset-0 touch-none">
-      {
-        // oxlint-disable-next-line react-doctor/js-combine-iterations -- FIXME: address existing React Doctor diagnostics.
-        Object.values(presence)
-          .filter((presence) => {
-            if (presence.participantId === participant.id) {
-              // Don't show the bubble for the current participant
-              return false;
-            }
-
-            // oxlint-disable-next-line react-doctor/rendering-hydration-mismatch-time -- FIXME: address existing React Doctor diagnostics.
-            if (presence.dateTime < new Date(Date.now() - 10000)) {
-              // Don't show the bubble for participants who have not been active in the last 10 seconds
-              return false;
-            }
-
-            return true;
-          })
-          .map((presence) => (
-            <Suspense key={presence.participantId}>
-              <Bubble presence={presence} />
-            </Suspense>
-          ))
-      }
+      {visiblePresence.map((presence) => (
+        <Suspense key={presence.participantId}>
+          <Bubble presence={presence} />
+        </Suspense>
+      ))}
     </div>
   );
 }

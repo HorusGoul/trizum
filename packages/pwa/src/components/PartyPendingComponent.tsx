@@ -18,10 +18,22 @@ const tips = [
 ];
 
 const troubleshootingReasons = [
-  () => t`The party may have been deleted by another member.`,
-  () => t`Your internet connection might be too slow.`,
-  () => t`The party data hasn't synced to the sync server yet.`,
-  () => t`The party link may be invalid or expired.`,
+  {
+    id: "party-deleted",
+    label: () => t`The party may have been deleted by another member.`,
+  },
+  {
+    id: "slow-connection",
+    label: () => t`Your internet connection might be too slow.`,
+  },
+  {
+    id: "sync-pending",
+    label: () => t`The party data hasn't synced to the sync server yet.`,
+  },
+  {
+    id: "invalid-link",
+    label: () => t`The party link may be invalid or expired.`,
+  },
 ];
 
 /**
@@ -30,6 +42,10 @@ const troubleshootingReasons = [
  */
 const SHOW_TROUBLESHOOTING_DELAY = 10000;
 const TIP_ROTATION_INTERVAL = 5000;
+
+function handleReload() {
+  window.location.reload();
+}
 
 export function PartyPendingComponent() {
   const navigate = useNavigate();
@@ -59,11 +75,6 @@ export function PartyPendingComponent() {
 
   function handleGoHome() {
     void navigate({ to: "/", replace: true });
-  }
-
-  // oxlint-disable-next-line react-doctor/prefer-module-scope-pure-function -- FIXME: address existing React Doctor diagnostics.
-  function handleReload() {
-    window.location.reload();
   }
 
   return (
@@ -156,14 +167,13 @@ export function PartyPendingComponent() {
                 <DisclosurePanel className="overflow-hidden">
                   <div className="px-4 pb-4">
                     <ul className="space-y-2">
-                      {troubleshootingReasons.map((reason, i) => (
+                      {troubleshootingReasons.map((reason) => (
                         <li
-                          // oxlint-disable-next-line react-doctor/no-array-index-as-key -- FIXME: address existing React Doctor diagnostics.
-                          key={i}
+                          key={reason.id}
                           className="flex items-start gap-2.5 text-sm text-accent-600 dark:text-accent-400"
                         >
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-400 dark:bg-accent-600" />
-                          <span>{reason()}</span>
+                          <span>{reason.label()}</span>
                         </li>
                       ))}
                     </ul>

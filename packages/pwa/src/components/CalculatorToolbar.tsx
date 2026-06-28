@@ -6,6 +6,28 @@ import { Icon } from "#src/ui/Icon.tsx";
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
+const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
+
+function getCurrencyPreviewFormatter(currency: string) {
+  const cachedFormatter = currencyPreviewFormatterCache.get(currency);
+
+  if (cachedFormatter) {
+    return cachedFormatter;
+  }
+
+  const formatter = Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+    currencyDisplay: "code",
+  });
+
+  currencyPreviewFormatterCache.set(currency, formatter);
+  return formatter;
+}
+
+function getExpressionCharacterKey(expression: string, index: number) {
+  return expression.slice(0, index + 1);
+}
 
 interface CalculatorToolbarProps {
   expression: string;
@@ -23,31 +45,28 @@ interface CalculatorToolbarProps {
   currency?: string;
 }
 
-// oxlint-disable-next-line react-doctor/no-giant-component -- FIXME: address existing React Doctor diagnostics.
-export function CalculatorToolbar({
-  expression,
-  cursorPosition,
-  onInsert,
-  onBackspace,
-  onMoveCursor,
-  onSetCursorPosition,
-  onCommit,
-  onClear,
-  onDismiss,
-  fieldContainerRef,
-  presenceElementId,
-  previewValue,
-  currency,
-}: CalculatorToolbarProps) {
-  const toolbarRef = useRef<HTMLDivElement>(null);
-  const expressionRef = useRef<HTMLDivElement>(null);
-  const expressionScrollRef = useRef<HTMLSpanElement>(null);
-  const expressionContentRef = useRef<HTMLSpanElement>(null);
-  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
-  const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(null);
-  // oxlint-disable-next-line react-doctor/rerender-state-only-in-handlers -- FIXME: address existing React Doctor diagnostics.
-  const [dragAccumulator, setDragAccumulator] = useState(0);
-  const scrollOffsetRef = useRef(0);
+type CalculatorCallbacks = Pick<
+  CalculatorToolbarProps,
+  | "onInsert"
+  | "onBackspace"
+  | "onMoveCursor"
+  | "onSetCursorPosition"
+  | "onCommit"
+  | "onClear"
+  | "onDismiss"
+>;
+
+function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
+  const callbacksRef = useRef(callbacks);
+
+  useLayoutEffect(() => {
+    callbacksRef.current = callbacks;
+  });
+
+  return callbacksRef;
+}
+
+function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDivElement | null>) {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [popoverPosition, setPopoverPosition] = useState<{
     top: number;
@@ -55,7 +74,6 @@ export function CalculatorToolbar({
     width: number;
   } | null>(null);
 
-  // Detect large screen and calculate popover position
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
 
@@ -86,7 +104,24 @@ export function CalculatorToolbar({
     };
   }, [fieldContainerRef]);
 
-  // Scroll cursor into view when cursor position changes
+  return { isLargeScreen, popoverPosition };
+}
+
+function useExpressionCursorScroll({
+  charRefs,
+  cursorPosition,
+  expression,
+  expressionContentRef,
+  expressionScrollRef,
+  scrollOffsetRef,
+}: {
+  charRefs: React.RefObject<(HTMLSpanElement | null)[]>;
+  cursorPosition: number;
+  expression: string;
+  expressionContentRef: React.RefObject<HTMLSpanElement | null>;
+  expressionScrollRef: React.RefObject<HTMLSpanElement | null>;
+  scrollOffsetRef: React.RefObject<number>;
+}) {
   useLayoutEffect(() => {
     const scrollContainer = expressionScrollRef.current;
     const contentEl = expressionContentRef.current;
@@ -98,7 +133,6 @@ export function CalculatorToolbar({
       return;
     }
 
-    // Get cursor position relative to content
     let cursorX: number;
     if (cursorPosition === 0 && charRefs.current[0]) {
       cursorX = charRefs.current[0].offsetLeft;
@@ -116,19 +150,16 @@ export function CalculatorToolbar({
     const padding = 20;
     const scrollOffset = scrollOffsetRef.current;
 
-    // No need to scroll if content fits
     if (contentWidth <= containerWidth) {
       scrollOffsetRef.current = 0;
       contentEl.style.transform = "translateX(0px)";
       return;
     }
 
-    // Calculate visible range with current offset
     const visibleStart = scrollOffset;
     const visibleEnd = scrollOffset + containerWidth;
-
-    // Scroll if cursor is outside visible area
     let newOffset = scrollOffset;
+
     if (cursorX < visibleStart + padding) {
       newOffset = Math.max(0, cursorX - padding);
     } else if (cursorX > visibleEnd - padding) {
@@ -139,17 +170,38 @@ export function CalculatorToolbar({
       scrollOffsetRef.current = newOffset;
       contentEl.style.transform = `translateX(-${newOffset}px)`;
     }
-  }, [cursorPosition, expression]);
+  }, [
+    charRefs,
+    cursorPosition,
+    expression,
+    expressionContentRef,
+    expressionScrollRef,
+    scrollOffsetRef,
+  ]);
+}
 
-  // Handle pointer gestures on expression display for cursor movement
-  // oxlint-disable-next-line react-doctor/no-cascading-set-state -- FIXME: address existing React Doctor diagnostics.
+function useExpressionPointerGestures({
+  callbacksRef,
+  charRefs,
+  dragAccumulatorRef,
+  expression,
+  expressionRef,
+  pointerStartRef,
+}: {
+  callbacksRef: React.RefObject<CalculatorCallbacks>;
+  charRefs: React.RefObject<(HTMLSpanElement | null)[]>;
+  dragAccumulatorRef: React.RefObject<number>;
+  expression: string;
+  expressionRef: React.RefObject<HTMLDivElement | null>;
+  pointerStartRef: React.RefObject<{ x: number; totalMovement: number } | null>;
+}) {
   useEffect(() => {
     const expressionEl = expressionRef.current;
     if (!expressionEl) return;
 
     function handlePointerDown(e: PointerEvent) {
       pointerStartRef.current = { x: e.clientX, totalMovement: 0 };
-      setDragAccumulator(0);
+      dragAccumulatorRef.current = 0;
       expressionEl!.setPointerCapture(e.pointerId);
     }
 
@@ -158,39 +210,32 @@ export function CalculatorToolbar({
 
       const deltaX = e.clientX - pointerStartRef.current.x;
       pointerStartRef.current.totalMovement += Math.abs(deltaX);
-      const newAccumulator = dragAccumulator + deltaX;
+      const newAccumulator = dragAccumulatorRef.current + deltaX;
 
-      // Check if we've accumulated enough movement to trigger a cursor move
       if (Math.abs(newAccumulator) >= DRAG_THRESHOLD) {
         const direction = newAccumulator > 0 ? "right" : "left";
-        onMoveCursor(direction);
-        setDragAccumulator(0);
+        callbacksRef.current.onMoveCursor(direction);
+        dragAccumulatorRef.current = 0;
       } else {
-        setDragAccumulator(newAccumulator);
+        dragAccumulatorRef.current = newAccumulator;
       }
       pointerStartRef.current.x = e.clientX;
     }
 
     function handlePointerUp(e: PointerEvent) {
-      // Check if this was a tap (minimal movement)
       if (pointerStartRef.current && pointerStartRef.current.totalMovement < TAP_THRESHOLD) {
-        // Find the closest character position based on click location
         const clickX = e.clientX;
         let bestPosition = 0;
         let bestDistance = Infinity;
 
-        // Check position before each character and after the last one
         for (let i = 0; i <= expression.length; i++) {
           let posX: number;
 
           if (i === 0 && charRefs.current[0]) {
-            // Position before first character
             posX = charRefs.current[0].getBoundingClientRect().left;
           } else if (i === expression.length && charRefs.current[i - 1]) {
-            // Position after last character
             posX = charRefs.current[i - 1]!.getBoundingClientRect().right;
           } else if (charRefs.current[i]) {
-            // Position before character i (which is left edge of char i)
             posX = charRefs.current[i]!.getBoundingClientRect().left;
           } else {
             continue;
@@ -203,11 +248,11 @@ export function CalculatorToolbar({
           }
         }
 
-        onSetCursorPosition(bestPosition);
+        callbacksRef.current.onSetCursorPosition(bestPosition);
       }
 
       pointerStartRef.current = null;
-      setDragAccumulator(0);
+      dragAccumulatorRef.current = 0;
       if (expressionEl!.hasPointerCapture(e.pointerId)) {
         expressionEl!.releasePointerCapture(e.pointerId);
       }
@@ -215,7 +260,7 @@ export function CalculatorToolbar({
 
     function handlePointerCancel(e: PointerEvent) {
       pointerStartRef.current = null;
-      setDragAccumulator(0);
+      dragAccumulatorRef.current = 0;
       if (expressionEl!.hasPointerCapture(e.pointerId)) {
         expressionEl!.releasePointerCapture(e.pointerId);
       }
@@ -232,9 +277,18 @@ export function CalculatorToolbar({
       expressionEl.removeEventListener("pointerup", handlePointerUp);
       expressionEl.removeEventListener("pointercancel", handlePointerCancel);
     };
-    // oxlint-disable-next-line react-doctor/prefer-use-effect-event -- FIXME: address existing React Doctor diagnostics.
-  }, [dragAccumulator, expression, onMoveCursor, onSetCursorPosition]);
+  }, [callbacksRef, charRefs, dragAccumulatorRef, expression, expressionRef, pointerStartRef]);
+}
 
+function useCalculatorDismiss({
+  callbacksRef,
+  fieldContainerRef,
+  toolbarRef,
+}: {
+  callbacksRef: React.RefObject<CalculatorCallbacks>;
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+}) {
   useEffect(() => {
     function isOutside(target: Node | null) {
       if (!target) return false;
@@ -247,13 +301,13 @@ export function CalculatorToolbar({
 
     function handleFocusIn(e: FocusEvent) {
       if (isOutside(e.target as Node | null)) {
-        onDismiss();
+        callbacksRef.current.onDismiss();
       }
     }
 
     function handlePointerUp(e: PointerEvent) {
       if (isOutside(e.target as Node | null)) {
-        onDismiss();
+        callbacksRef.current.onDismiss();
       }
     }
 
@@ -263,26 +317,23 @@ export function CalculatorToolbar({
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("pointerup", handlePointerUp);
     };
-    // oxlint-disable-next-line react-doctor/prefer-use-effect-event -- FIXME: address existing React Doctor diagnostics.
-  }, [onDismiss, fieldContainerRef]);
+  }, [callbacksRef, fieldContainerRef, toolbarRef]);
+}
 
-  // Handle keyboard input
+function useCalculatorKeyboard(callbacksRef: React.RefObject<CalculatorCallbacks>) {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      // Don't capture if user is typing in another input
       const target = e.target as HTMLElement;
       if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 
-      // Number keys
       if (/^[0-9]$/.test(e.key)) {
         e.preventDefault();
-        onInsert(e.key);
+        callbacksRef.current.onInsert(e.key);
         return;
       }
 
-      // Operators and symbols
       switch (e.key) {
         case "+":
         case "-":
@@ -292,32 +343,32 @@ export function CalculatorToolbar({
         case "(":
         case ")":
           e.preventDefault();
-          onInsert(e.key);
+          callbacksRef.current.onInsert(e.key);
           break;
         case "Backspace":
           e.preventDefault();
-          onBackspace();
+          callbacksRef.current.onBackspace();
           break;
         case "Delete":
           e.preventDefault();
-          onClear();
+          callbacksRef.current.onClear();
           break;
         case "Enter":
         case "=":
           e.preventDefault();
-          onCommit();
+          callbacksRef.current.onCommit();
           break;
         case "Escape":
           e.preventDefault();
-          onDismiss();
+          callbacksRef.current.onDismiss();
           break;
         case "ArrowLeft":
           e.preventDefault();
-          onMoveCursor("left");
+          callbacksRef.current.onMoveCursor("left");
           break;
         case "ArrowRight":
           e.preventDefault();
-          onMoveCursor("right");
+          callbacksRef.current.onMoveCursor("right");
           break;
       }
     }
@@ -326,38 +377,78 @@ export function CalculatorToolbar({
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-    // oxlint-disable-next-line react-doctor/prefer-use-effect-event -- FIXME: address existing React Doctor diagnostics.
-  }, [onInsert, onBackspace, onClear, onCommit, onDismiss, onMoveCursor]);
+  }, [callbacksRef]);
+}
 
-  // Callback ref setter for character spans
-  const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
-    charRefs.current[index] = el;
-  };
-
-  // Format preview value based on currency decimals
-  function formatPreviewValue(value: number): string {
-    if (!currency) {
-      return value.toString();
-    }
-
-    try {
-      // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-      const formatter = new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency,
-        currencyDisplay: "code",
-      });
-
-      // Get decimal precision from currency
-      const parts = formatter.formatToParts(1.23456789);
-      const fractionPart = parts.find((part) => part.type === "fraction");
-      const decimals = fractionPart?.value.length ?? 2;
-
-      return value.toFixed(decimals);
-    } catch {
-      return value.toString();
-    }
+function formatCalculatorPreviewValue(value: number, currency?: string): string {
+  if (!currency) {
+    return value.toString();
   }
+
+  try {
+    const formatter = getCurrencyPreviewFormatter(currency);
+    const parts = formatter.formatToParts(1.23456789);
+    const fractionPart = parts.find((part) => part.type === "fraction");
+    const decimals = fractionPart?.value.length ?? 2;
+
+    return value.toFixed(decimals);
+  } catch {
+    return value.toString();
+  }
+}
+
+export function CalculatorToolbar({
+  expression,
+  cursorPosition,
+  onInsert,
+  onBackspace,
+  onMoveCursor,
+  onSetCursorPosition,
+  onCommit,
+  onClear,
+  onDismiss,
+  fieldContainerRef,
+  presenceElementId,
+  previewValue,
+  currency,
+}: CalculatorToolbarProps) {
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const expressionRef = useRef<HTMLDivElement>(null);
+  const expressionScrollRef = useRef<HTMLSpanElement>(null);
+  const expressionContentRef = useRef<HTMLSpanElement>(null);
+  const charRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(null);
+  const dragAccumulatorRef = useRef(0);
+  const scrollOffsetRef = useRef(0);
+  const callbacksRef = useCalculatorCallbacks({
+    onInsert,
+    onBackspace,
+    onMoveCursor,
+    onSetCursorPosition,
+    onCommit,
+    onClear,
+    onDismiss,
+  });
+  const { isLargeScreen, popoverPosition } = useCalculatorPopoverPosition(fieldContainerRef);
+
+  useExpressionCursorScroll({
+    charRefs,
+    cursorPosition,
+    expression,
+    expressionContentRef,
+    expressionScrollRef,
+    scrollOffsetRef,
+  });
+  useExpressionPointerGestures({
+    callbacksRef,
+    charRefs,
+    dragAccumulatorRef,
+    expression,
+    expressionRef,
+    pointerStartRef,
+  });
+  useCalculatorDismiss({ callbacksRef, fieldContainerRef, toolbarRef });
+  useCalculatorKeyboard(callbacksRef);
 
   return createPortal(
     <div
@@ -385,186 +476,244 @@ export function CalculatorToolbar({
       }}
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
-        {/* Preview value on its own line to avoid layout shifts */}
-        <div className="flex h-5 items-center justify-end px-1">
-          {previewValue !== null && expression && (
-            <span className="text-sm font-medium text-accent-600 dark:text-accent-400">
-              = {formatPreviewValue(previewValue)}
-            </span>
-          )}
-        </div>
-
-        {/* Expression display with cursor - tap to position, drag to move cursor */}
-        <div
-          ref={expressionRef}
-          className="flex cursor-text touch-none select-none items-center overflow-hidden rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
-        >
-          <span
-            ref={expressionScrollRef}
-            className="min-w-0 flex-1 whitespace-nowrap text-right font-mono text-xl font-medium"
-            aria-live="polite"
-            aria-label={t`Calculator expression`}
-          >
-            {!expression ? (
-              <span className="animate-blink">|</span>
-            ) : (
-              <span ref={expressionContentRef} className="relative inline-flex">
-                {expression.split("").map((char, index) => (
-                  // oxlint-disable-next-line react-doctor/no-array-index-as-key -- FIXME: address existing React Doctor diagnostics.
-                  <span key={index} ref={setCharRef(index)} className="relative">
-                    {index === cursorPosition && (
-                      <span className="absolute left-0 top-0 h-full w-0 animate-blink">
-                        <span className="absolute -translate-x-1/2">|</span>
-                      </span>
-                    )}
-                    {char}
-                  </span>
-                ))}
-                {cursorPosition === expression.length && (
-                  <span className="absolute right-0 top-0 h-full w-0 animate-blink">
-                    <span className="absolute -translate-x-1/2">|</span>
-                  </span>
-                )}
-              </span>
-            )}
-          </span>
-        </div>
-
-        {/* iOS-style calculator buttons grid - 4 columns */}
-        <div className="grid grid-cols-4 gap-1.5">
-          {/* Row 1: AC ( ) ÷ */}
-          <Button
-            color="input-like"
-            aria-label={t`Clear all`}
-            onPress={onClear}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            AC
-          </Button>
-          <Button
-            color="input-like"
-            aria-label={t`Open parenthesis`}
-            onPress={() => onInsert("(")}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            (
-          </Button>
-          <Button
-            color="input-like"
-            aria-label={t`Close parenthesis`}
-            onPress={() => onInsert(")")}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            )
-          </Button>
-          <Button
-            color="accent"
-            aria-label={t`Divide`}
-            onPress={() => onInsert("/")}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            ÷
-          </Button>
-
-          {/* Row 2: 7 8 9 × */}
-          {["7", "8", "9"].map((digit) => (
-            <Button
-              key={digit}
-              color="input-like"
-              aria-label={digit}
-              onPress={() => onInsert(digit)}
-              className="h-12 rounded-xl text-xl font-medium"
-            >
-              {digit}
-            </Button>
-          ))}
-          <Button
-            color="accent"
-            aria-label={t`Multiply`}
-            onPress={() => onInsert("*")}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            ×
-          </Button>
-
-          {/* Row 3: 4 5 6 − */}
-          {["4", "5", "6"].map((digit) => (
-            <Button
-              key={digit}
-              color="input-like"
-              aria-label={digit}
-              onPress={() => onInsert(digit)}
-              className="h-12 rounded-xl text-xl font-medium"
-            >
-              {digit}
-            </Button>
-          ))}
-          <Button
-            color="accent"
-            aria-label={t`Subtract`}
-            onPress={() => onInsert("-")}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            −
-          </Button>
-
-          {/* Row 4: 1 2 3 + */}
-          {["1", "2", "3"].map((digit) => (
-            <Button
-              key={digit}
-              color="input-like"
-              aria-label={digit}
-              onPress={() => onInsert(digit)}
-              className="h-12 rounded-xl text-xl font-medium"
-            >
-              {digit}
-            </Button>
-          ))}
-          <Button
-            color="accent"
-            aria-label={t`Add`}
-            onPress={() => onInsert("+")}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            +
-          </Button>
-
-          {/* Row 5: 0 . ⌫ = */}
-          <Button
-            color="input-like"
-            aria-label="0"
-            onPress={() => onInsert("0")}
-            className="h-12 rounded-xl text-xl font-medium"
-          >
-            0
-          </Button>
-          <Button
-            color="input-like"
-            aria-label={t`Decimal point`}
-            onPress={() => onInsert(".")}
-            className="h-12 rounded-xl text-xl font-medium"
-          >
-            .
-          </Button>
-          <Button
-            color="input-like"
-            aria-label={t`Backspace`}
-            onPress={onBackspace}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            <Icon icon="lucide.delete" className="size-5" />
-          </Button>
-          <Button
-            color="accent"
-            aria-label={t`Calculate result`}
-            onPress={onCommit}
-            className="h-12 rounded-xl text-lg font-medium"
-          >
-            =
-          </Button>
-        </div>
+        <CalculatorPreview
+          currency={currency}
+          expression={expression}
+          previewValue={previewValue}
+        />
+        <CalculatorExpressionDisplay
+          charRefs={charRefs}
+          cursorPosition={cursorPosition}
+          expression={expression}
+          expressionContentRef={expressionContentRef}
+          expressionRef={expressionRef}
+          expressionScrollRef={expressionScrollRef}
+        />
+        <CalculatorKeypad
+          onBackspace={onBackspace}
+          onClear={onClear}
+          onCommit={onCommit}
+          onInsert={onInsert}
+        />
       </div>
     </div>,
     document.body,
+  );
+}
+
+function CalculatorPreview({
+  currency,
+  expression,
+  previewValue,
+}: {
+  currency?: string;
+  expression: string;
+  previewValue: number | null;
+}) {
+  return (
+    <div className="flex h-5 items-center justify-end px-1">
+      {previewValue !== null && expression ? (
+        <span className="text-sm font-medium text-accent-600 dark:text-accent-400">
+          = {formatCalculatorPreviewValue(previewValue, currency)}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function CalculatorExpressionDisplay({
+  charRefs,
+  cursorPosition,
+  expression,
+  expressionContentRef,
+  expressionRef,
+  expressionScrollRef,
+}: {
+  charRefs: React.RefObject<(HTMLSpanElement | null)[]>;
+  cursorPosition: number;
+  expression: string;
+  expressionContentRef: React.RefObject<HTMLSpanElement | null>;
+  expressionRef: React.RefObject<HTMLDivElement | null>;
+  expressionScrollRef: React.RefObject<HTMLSpanElement | null>;
+}) {
+  const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
+    charRefs.current[index] = el;
+  };
+
+  return (
+    <div
+      ref={expressionRef}
+      className="flex cursor-text touch-none select-none items-center overflow-hidden rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
+    >
+      <span
+        ref={expressionScrollRef}
+        className="min-w-0 flex-1 whitespace-nowrap text-right font-mono text-xl font-medium"
+        aria-live="polite"
+        aria-label={t`Calculator expression`}
+      >
+        {!expression ? (
+          <span className="animate-blink">|</span>
+        ) : (
+          <span ref={expressionContentRef} className="relative inline-flex">
+            {expression.split("").map((char, index) => (
+              <span
+                key={getExpressionCharacterKey(expression, index)}
+                ref={setCharRef(index)}
+                className="relative"
+              >
+                {index === cursorPosition ? (
+                  <span className="absolute left-0 top-0 h-full w-0 animate-blink">
+                    <span className="absolute -translate-x-1/2">|</span>
+                  </span>
+                ) : null}
+                {char}
+              </span>
+            ))}
+            {cursorPosition === expression.length ? (
+              <span className="absolute right-0 top-0 h-full w-0 animate-blink">
+                <span className="absolute -translate-x-1/2">|</span>
+              </span>
+            ) : null}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+}
+
+function CalculatorKeypad({
+  onBackspace,
+  onClear,
+  onCommit,
+  onInsert,
+}: Pick<CalculatorToolbarProps, "onBackspace" | "onClear" | "onCommit" | "onInsert">) {
+  return (
+    <div className="grid grid-cols-4 gap-1.5">
+      <Button
+        color="input-like"
+        aria-label={t`Clear all`}
+        onPress={onClear}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        AC
+      </Button>
+      <Button
+        color="input-like"
+        aria-label={t`Open parenthesis`}
+        onPress={() => onInsert("(")}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        (
+      </Button>
+      <Button
+        color="input-like"
+        aria-label={t`Close parenthesis`}
+        onPress={() => onInsert(")")}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        )
+      </Button>
+      <Button
+        color="accent"
+        aria-label={t`Divide`}
+        onPress={() => onInsert("/")}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        ÷
+      </Button>
+
+      {["7", "8", "9"].map((digit) => (
+        <Button
+          key={digit}
+          color="input-like"
+          aria-label={digit}
+          onPress={() => onInsert(digit)}
+          className="h-12 rounded-xl text-xl font-medium"
+        >
+          {digit}
+        </Button>
+      ))}
+      <Button
+        color="accent"
+        aria-label={t`Multiply`}
+        onPress={() => onInsert("*")}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        ×
+      </Button>
+
+      {["4", "5", "6"].map((digit) => (
+        <Button
+          key={digit}
+          color="input-like"
+          aria-label={digit}
+          onPress={() => onInsert(digit)}
+          className="h-12 rounded-xl text-xl font-medium"
+        >
+          {digit}
+        </Button>
+      ))}
+      <Button
+        color="accent"
+        aria-label={t`Subtract`}
+        onPress={() => onInsert("-")}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        −
+      </Button>
+
+      {["1", "2", "3"].map((digit) => (
+        <Button
+          key={digit}
+          color="input-like"
+          aria-label={digit}
+          onPress={() => onInsert(digit)}
+          className="h-12 rounded-xl text-xl font-medium"
+        >
+          {digit}
+        </Button>
+      ))}
+      <Button
+        color="accent"
+        aria-label={t`Add`}
+        onPress={() => onInsert("+")}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        +
+      </Button>
+
+      <Button
+        color="input-like"
+        aria-label="0"
+        onPress={() => onInsert("0")}
+        className="h-12 rounded-xl text-xl font-medium"
+      >
+        0
+      </Button>
+      <Button
+        color="input-like"
+        aria-label={t`Decimal point`}
+        onPress={() => onInsert(".")}
+        className="h-12 rounded-xl text-xl font-medium"
+      >
+        .
+      </Button>
+      <Button
+        color="input-like"
+        aria-label={t`Backspace`}
+        onPress={onBackspace}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        <Icon icon="lucide.delete" className="size-5" />
+      </Button>
+      <Button
+        color="accent"
+        aria-label={t`Calculate result`}
+        onPress={onCommit}
+        className="h-12 rounded-xl text-lg font-medium"
+      >
+        =
+      </Button>
+    </div>
   );
 }

@@ -23,21 +23,29 @@ export type AuthPendingAction =
   | "password-reset"
   | "sign-out";
 
-// oxlint-disable-next-line react-doctor/no-many-boolean-props -- FIXME: address existing React Doctor diagnostics.
+interface CloudSyncSignInFormAuthState {
+  auth?: "success";
+  email: string;
+  emailError: string | null;
+  error: string | null;
+  magicLinkMessage: string | null;
+  password: string;
+  passwordError: string | null;
+  passwordResetMessage: string | null;
+  pendingAction: AuthPendingAction | null;
+}
+
+interface CloudSyncSignInFormStatus {
+  isPending: boolean;
+  isPasswordSignInEnabled: boolean;
+  isSignInSuccessVisible: boolean;
+}
+
+type CloudSyncSignInFormMode = "magic-link" | "password" | "password-reset";
+
 export function CloudSyncSignInForm({
-  auth,
-  authEmail,
-  authEmailError,
-  authError,
-  authPassword,
-  authPasswordError,
-  authPendingAction,
-  isAuthPending,
-  isPasswordLoginMode,
-  isPasswordResetMode,
-  isPasswordSignInEnabled,
-  isSignInSuccessVisible,
-  magicLinkMessage,
+  authState,
+  mode,
   onAuthEmailChange,
   onAuthPasswordChange,
   onBackToSignIn,
@@ -49,21 +57,10 @@ export function CloudSyncSignInForm({
   onTryAnotherEmail,
   onUseMagicLink,
   onUsePassword,
-  passwordResetMessage,
+  status,
 }: {
-  auth?: "success";
-  authEmail: string;
-  authEmailError: string | null;
-  authError: string | null;
-  authPassword: string;
-  authPasswordError: string | null;
-  authPendingAction: AuthPendingAction | null;
-  isAuthPending: boolean;
-  isPasswordLoginMode: boolean;
-  isPasswordResetMode: boolean;
-  isPasswordSignInEnabled: boolean;
-  isSignInSuccessVisible: boolean;
-  magicLinkMessage: string | null;
+  authState: CloudSyncSignInFormAuthState;
+  mode: CloudSyncSignInFormMode;
   onAuthEmailChange: (value: string) => void;
   onAuthPasswordChange: (value: string) => void;
   onBackToSignIn: () => void;
@@ -75,38 +72,43 @@ export function CloudSyncSignInForm({
   onTryAnotherEmail: () => void;
   onUseMagicLink: () => void;
   onUsePassword: () => void;
-  passwordResetMessage: string | null;
+  status: CloudSyncSignInFormStatus;
 }) {
-  if (auth === "success" || isSignInSuccessVisible) {
+  if (authState.auth === "success" || status.isSignInSuccessVisible) {
     return <CloudAuthLoadingState />;
   }
 
-  if (isPasswordResetMode) {
+  if (mode === "password-reset") {
     return (
       <form className="flex flex-col gap-4" onSubmit={onPasswordResetSubmit}>
-        {authError ? <AuthErrorAlert message={authError} /> : null}
+        {authState.error ? <AuthErrorAlert message={authState.error} /> : null}
         <AppTextField
-          errorMessage={authEmailError ?? undefined}
-          isDisabled={isAuthPending}
-          isInvalid={Boolean(authEmailError)}
+          errorMessage={authState.emailError ?? undefined}
+          isDisabled={status.isPending}
+          isInvalid={Boolean(authState.emailError)}
           isRequired
           label={t`Email`}
           onChange={onAuthEmailChange}
           type="email"
-          value={authEmail}
+          value={authState.email}
         />
-        {passwordResetMessage ? (
-          <p className="text-sm text-accent-700 dark:text-accent-50">{passwordResetMessage}</p>
+        {authState.passwordResetMessage ? (
+          <p className="text-sm text-accent-700 dark:text-accent-50">
+            {authState.passwordResetMessage}
+          </p>
         ) : null}
-        <Button color="accent" isDisabled={isAuthPending} type="submit">
+        <Button color="accent" isDisabled={status.isPending} type="submit">
           <span className="flex items-center gap-2">
-            <AuthButtonIcon icon="lucide.mail" isPending={authPendingAction === "password-reset"} />
+            <AuthButtonIcon
+              icon="lucide.mail"
+              isPending={authState.pendingAction === "password-reset"}
+            />
             <Trans>Send password link</Trans>
           </span>
         </Button>
         <Button
           color="transparent"
-          isDisabled={isAuthPending}
+          isDisabled={status.isPending}
           onPress={onBackToSignIn}
           type="button"
         >
@@ -116,11 +118,11 @@ export function CloudSyncSignInForm({
     );
   }
 
-  if (magicLinkMessage) {
+  if (authState.magicLinkMessage) {
     return (
       <MagicLinkSentState
-        email={authEmail}
-        message={magicLinkMessage}
+        email={authState.email}
+        message={authState.magicLinkMessage}
         onTryAgain={onTryAnotherEmail}
       />
     );
@@ -131,25 +133,25 @@ export function CloudSyncSignInForm({
       <div className="flex flex-col gap-3">
         <Button
           color="input-like"
-          isDisabled={isAuthPending}
+          isDisabled={status.isPending}
           onPress={() => {
             onSocialSignIn("apple");
           }}
         >
           <span className="flex items-center gap-2">
-            <AuthButtonIcon icon="brand.apple" isPending={authPendingAction === "apple"} />
+            <AuthButtonIcon icon="brand.apple" isPending={authState.pendingAction === "apple"} />
             <Trans>Continue with Apple</Trans>
           </span>
         </Button>
         <Button
           color="input-like"
-          isDisabled={isAuthPending}
+          isDisabled={status.isPending}
           onPress={() => {
             onSocialSignIn("google");
           }}
         >
           <span className="flex items-center gap-2">
-            <AuthButtonIcon icon="brand.google" isPending={authPendingAction === "google"} />
+            <AuthButtonIcon icon="brand.google" isPending={authState.pendingAction === "google"} />
             <Trans>Continue with Google</Trans>
           </span>
         </Button>
@@ -161,16 +163,16 @@ export function CloudSyncSignInForm({
         <span className="h-px flex-1 bg-accent-200 dark:bg-accent-700" />
       </div>
 
-      {isPasswordLoginMode ? (
+      {mode === "password" ? (
         <PasswordSignInForm
-          authEmail={authEmail}
-          authEmailError={authEmailError}
-          authError={authError}
-          authPassword={authPassword}
-          authPasswordError={authPasswordError}
-          authPendingAction={authPendingAction}
-          isAuthPending={isAuthPending}
-          isPasswordSignInEnabled={isPasswordSignInEnabled}
+          authEmail={authState.email}
+          authEmailError={authState.emailError}
+          authError={authState.error}
+          authPassword={authState.password}
+          authPasswordError={authState.passwordError}
+          authPendingAction={authState.pendingAction}
+          isAuthPending={status.isPending}
+          isPasswordSignInEnabled={status.isPasswordSignInEnabled}
           onAuthEmailChange={onAuthEmailChange}
           onAuthPasswordChange={onAuthPasswordChange}
           onForgotPassword={onForgotPassword}
@@ -179,11 +181,11 @@ export function CloudSyncSignInForm({
         />
       ) : (
         <MagicLinkSignInForm
-          authEmail={authEmail}
-          authEmailError={authEmailError}
-          authError={authError}
-          authPendingAction={authPendingAction}
-          isAuthPending={isAuthPending}
+          authEmail={authState.email}
+          authEmailError={authState.emailError}
+          authError={authState.error}
+          authPendingAction={authState.pendingAction}
+          isAuthPending={status.isPending}
           onAuthEmailChange={onAuthEmailChange}
           onSubmit={onMagicLinkSubmit}
           onUsePassword={onUsePassword}

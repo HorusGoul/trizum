@@ -1,7 +1,9 @@
 import { Trans } from "@lingui/react/macro";
 import { BackButton } from "#src/components/BackButton.js";
-import { Icon, type IconProps } from "#src/ui/Icon.js";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { AboutLink } from "./-components/AboutLink.js";
+import { Contributor } from "./-components/Contributor.js";
+import { FeatureItem } from "./-components/FeatureItem.js";
 
 export const Route = createFileRoute("/about")({
   component: About,
@@ -146,100 +148,5 @@ function About() {
         </section>
       </div>
     </div>
-  );
-}
-
-interface FeatureItemProps {
-  icon: IconProps["icon"];
-  title: React.ReactNode;
-  description: React.ReactNode;
-}
-
-function FeatureItem({ icon, title, description }: FeatureItemProps) {
-  return (
-    <li className="flex gap-3">
-      <div className="flex-shrink-0">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
-          <Icon
-            icon={icon}
-            width={20}
-            height={20}
-            className="text-accent-700 dark:text-accent-300"
-          />
-        </div>
-      </div>
-      <div className="flex flex-col gap-1">
-        <h4 className="font-semibold text-accent-900 dark:text-accent-100">{title}</h4>
-        <p className="text-sm text-accent-600 dark:text-accent-400">{description}</p>
-      </div>
-    </li>
-  );
-}
-
-interface ContributorProps {
-  username: string;
-  website?: string;
-}
-
-function Contributor({ username, website }: ContributorProps) {
-  const href = website || `https://github.com/${username}`;
-  const avatarUrl = `https://github.com/${username}.png`;
-
-  return (
-    <AboutLink
-      href={href}
-      label={
-        <div className="flex items-center gap-3">
-          <img
-            src={avatarUrl}
-            alt={`@${username}`}
-            className="h-8 w-8 rounded-full"
-            loading="lazy"
-          />
-          <span>@{username}</span>
-        </div>
-      }
-    />
-  );
-}
-
-interface AboutLinkProps {
-  href: string;
-  icon?: IconProps["icon"];
-  label: React.ReactNode;
-  isInternal?: boolean;
-}
-
-function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
-  const className =
-    "flex items-center gap-3 rounded-lg bg-accent-50 px-4 py-3 text-accent-900 outline-none transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:text-accent-100 dark:hover:bg-accent-800";
-
-  const content = (
-    <>
-      {icon && <Icon icon={icon} width={20} height={20} />}
-      <span className="flex-1">{label}</span>
-      {!isInternal && (
-        <Icon
-          icon="lucide.external-link"
-          width={16}
-          height={16}
-          className="text-accent-600 dark:text-accent-400"
-        />
-      )}
-    </>
-  );
-
-  if (isInternal) {
-    return (
-      <Link to={href} className={className}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
-      {content}
-    </a>
   );
 }

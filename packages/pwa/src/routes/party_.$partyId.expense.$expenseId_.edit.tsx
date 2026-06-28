@@ -24,7 +24,7 @@ import { diff, type DiffResult } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
@@ -83,37 +83,38 @@ function EditExpense() {
   }
 
   const editorRef = useRef<ExpenseEditorRef>(null);
-  // oxlint-disable-next-line react-doctor/rerender-lazy-ref-init -- FIXME: address existing React Doctor diagnostics.
-  const currentHashRef = useRef<string>(getExpenseHash(expense));
+  const currentHashRef = useRef<string | null>(null);
+  if (currentHashRef.current === null) {
+    currentHashRef.current = getExpenseHash(expense);
+  }
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const onChange = useCallback(
-    (previousValues: ExpenseEditorFormValues, currentValues: ExpenseEditorFormValues) => {
-      function createExpense(values: ExpenseEditorFormValues) {
-        return {
-          id: expenseId,
-          name: values.name,
-          paidAt: values.paidAt,
-          paidBy: { [values.paidBy]: convertToUnits(values.amount) },
-          shares: values.shares,
-          photos: values.photos,
-        };
-      }
+  const onChange = (
+    previousValues: ExpenseEditorFormValues,
+    currentValues: ExpenseEditorFormValues,
+  ) => {
+    function createExpense(values: ExpenseEditorFormValues) {
+      return {
+        id: expenseId,
+        name: values.name,
+        paidAt: values.paidAt,
+        paidBy: { [values.paidBy]: convertToUnits(values.amount) },
+        shares: values.shares,
+        photos: values.photos,
+      };
+    }
 
-      const expense = createExpense(currentValues);
-      const hash = calculateExpenseHash(expense);
+    const expense = createExpense(currentValues);
+    const hash = calculateExpenseHash(expense);
 
-      if (hash === currentHashRef.current) {
-        return;
-      }
+    if (hash === currentHashRef.current) {
+      return;
+    }
 
-      currentHashRef.current = hash;
+    currentHashRef.current = hash;
 
-      const patches = diff(createExpense(previousValues), expense);
-      onChangeExpense(patches);
-    },
-    [onChangeExpense, expenseId],
-  );
+    const patches = diff(createExpense(previousValues), expense);
+    onChangeExpense(patches);
+  };
 
   async function onSubmit(values: ExpenseEditorFormValues) {
     try {
@@ -179,7 +180,7 @@ function EditExpense() {
 
       editorRef.current?.setValues(getFormValues(raw));
     });
-  }, [onChange, subscribeToExpenseChanges]);
+  }, [subscribeToExpenseChanges]);
 
   const formValues = getFormValues(expense);
   const expenseName = formValues.name;

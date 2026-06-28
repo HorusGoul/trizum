@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { closeRouteState, navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
 import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
 
@@ -42,33 +41,24 @@ export function useRouteMediaGallery({
   const galleryIndex = mediaIndex;
   const isOpen = galleryIndex !== undefined && galleryIndex >= 0;
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const openGallery = useCallback(
-    (index: number) => {
-      navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
-        search: { media: index },
-      });
-    },
-    [buildLocation, currentLocation, navigate],
-  );
+  function openGallery(index: number) {
+    navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
+      search: { media: index },
+    });
+  }
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const closeGallery = useCallback(() => {
+  function closeGallery() {
     closeRouteState(currentLocation, history, () => {
       navigate({
         search: { media: undefined },
         replace: true,
       });
     });
-  }, [currentLocation, history, navigate]);
+  }
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const onIndexChange = useCallback(
-    (index: number) => {
-      navigate({ search: { media: index }, replace: true });
-    },
-    [navigate],
-  );
+  function onIndexChange(index: number) {
+    navigate({ search: { media: index }, replace: true });
+  }
 
   return {
     galleryIndex,

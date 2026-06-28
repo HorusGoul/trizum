@@ -2,8 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type FormEvent, type ReactNode } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
-// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
-import { motion } from "motion/react";
+import { LazyMotion, domAnimation, m as motion } from "motion/react";
 import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
 import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
 import { Button } from "#src/ui/Button.tsx";
@@ -264,21 +263,23 @@ export function AuthButtonIcon({
 
 export function CloudAuthLoadingState() {
   return (
-    <output
-      aria-label={t`Finishing sign in`}
-      className="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center"
-    >
-      <motion.span
-        animate={{ rotate: 360 }}
-        className="flex size-12 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50"
-        transition={{ duration: 0.9, ease: "linear", repeat: Infinity }}
+    <LazyMotion features={domAnimation}>
+      <output
+        aria-label={t`Finishing sign in`}
+        className="flex flex-1 flex-col items-center justify-center gap-4 py-8 text-center"
       >
-        <Icon icon="lucide.loader-circle" width={24} height={24} />
-      </motion.span>
-      <p className="text-sm font-medium text-accent-700 dark:text-accent-50">
-        <Trans>Finishing sign in</Trans>
-      </p>
-    </output>
+        <motion.span
+          animate={{ rotate: 360 }}
+          className="flex size-12 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50"
+          transition={{ duration: 0.9, ease: "linear", repeat: Infinity }}
+        >
+          <Icon icon="lucide.loader-circle" width={24} height={24} />
+        </motion.span>
+        <p className="text-sm font-medium text-accent-700 dark:text-accent-50">
+          <Trans>Finishing sign in</Trans>
+        </p>
+      </output>
+    </LazyMotion>
   );
 }
 
@@ -292,55 +293,59 @@ export function MagicLinkSentState({
   onTryAgain: () => void;
 }) {
   return (
-    <motion.div
-      className="flex flex-1 flex-col items-center justify-center gap-5 py-8 text-center"
-      initial={{ opacity: 0, y: 12, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-    >
-      <motion.span
-        className="flex size-16 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-950/60 dark:text-success-200"
-        initial={{ scale: 0.72 }}
-        animate={{ scale: [0.72, 1.08, 1] }}
-        transition={{ delay: 0.04, duration: 0.38, ease: "easeOut" }}
+    <LazyMotion features={domAnimation}>
+      <motion.div
+        className="flex flex-1 flex-col items-center justify-center gap-5 py-8 text-center"
+        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
-        <Icon icon="lucide.mail-check" width={28} height={28} />
-      </motion.span>
-      <div className="flex flex-col gap-2">
-        <h3 className="text-base font-medium">{message}</h3>
-        <p className="text-sm text-accent-700 dark:text-accent-50">
-          <Trans>We sent a sign-in link to {email}. Open it to finish signing in.</Trans>
-        </p>
-      </div>
-      <Button color="input-like" onPress={onTryAgain} type="button">
-        <span className="flex items-center gap-2">
-          <Icon icon="lucide.refresh-cw" width={18} height={18} />
-          <Trans>Try another email</Trans>
-        </span>
-      </Button>
-    </motion.div>
+        <motion.span
+          className="flex size-16 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-950/60 dark:text-success-200"
+          initial={{ scale: 0.72 }}
+          animate={{ scale: [0.72, 1.08, 1] }}
+          transition={{ delay: 0.04, duration: 0.38, ease: "easeOut" }}
+        >
+          <Icon icon="lucide.mail-check" width={28} height={28} />
+        </motion.span>
+        <div className="flex flex-col gap-2">
+          <h3 className="text-base font-medium">{message}</h3>
+          <p className="text-sm text-accent-700 dark:text-accent-50">
+            <Trans>We sent a sign-in link to {email}. Open it to finish signing in.</Trans>
+          </p>
+        </div>
+        <Button color="input-like" onPress={onTryAgain} type="button">
+          <span className="flex items-center gap-2">
+            <Icon icon="lucide.refresh-cw" width={18} height={18} />
+            <Trans>Try another email</Trans>
+          </span>
+        </Button>
+      </motion.div>
+    </LazyMotion>
   );
 }
 
 export function SignInSuccessOverlay({ exitAnimationMs }: { exitAnimationMs: number }) {
   return (
-    <motion.div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md py-safe-offset-6 px-safe-or-4 dark:bg-accent-950/90"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: exitAnimationMs / 1000, ease: "easeOut" }}
-    >
+    <LazyMotion features={domAnimation}>
       <motion.div
-        className="w-full max-w-[420px]"
-        initial={{ opacity: 0, y: 12, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -8, scale: 0.98 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-white/90 backdrop-blur-md py-safe-offset-6 px-safe-or-4 dark:bg-accent-950/90"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: exitAnimationMs / 1000, ease: "easeOut" }}
       >
-        <SignInSuccessAnimation />
+        <motion.div
+          className="w-full max-w-[420px]"
+          initial={{ opacity: 0, y: 12, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -8, scale: 0.98 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          <SignInSuccessAnimation />
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </LazyMotion>
   );
 }
 

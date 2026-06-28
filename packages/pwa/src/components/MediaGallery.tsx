@@ -1,9 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { cn, type ClassName } from "#src/ui/utils.ts";
-import { use, useCallback, useEffect, useRef } from "react";
+import { use, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
-// oxlint-disable-next-line react-doctor/use-lazy-motion -- FIXME: address existing React Doctor diagnostics.
-import { motion, useMotionValue, animate } from "motion/react";
+import { LazyMotion, animate, domAnimation, m, useMotionValue } from "motion/react";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 
@@ -31,27 +30,27 @@ export default function MediaGallery({
   const dataSource = useAsyncMediaGalleryItems(items);
   const maxIndex = dataSource.length - 1;
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const goToPrevious = useCallback(() => {
+  function goToPrevious() {
     let nextIndex = index - 1;
 
     if (nextIndex < 0) {
       nextIndex = maxIndex;
     }
 
+    onDragProgress?.(0);
     onChange(nextIndex);
-  }, [onChange, index, maxIndex]);
+  }
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const goToNext = useCallback(() => {
+  function goToNext() {
     let nextIndex = index + 1;
 
     if (nextIndex > maxIndex) {
       nextIndex = 0;
     }
 
+    onDragProgress?.(0);
     onChange(nextIndex);
-  }, [onChange, index, maxIndex]);
+  }
 
   const showNavigation = items.length > 1;
 
@@ -161,48 +160,48 @@ export default function MediaGallery({
     x.set(0);
     y.set(0);
     scale.set(1);
-    // oxlint-disable-next-line react-doctor/no-prop-callback-in-effect -- FIXME: address existing React Doctor diagnostics.
-    onDragProgress?.(0);
-  }, [index, x, y, scale, onDragProgress]);
+  }, [index, x, y, scale]);
 
   return (
-    <div ref={viewportRef} className="relative h-full w-full touch-none overflow-hidden">
-      <div className="flex h-full w-full select-none items-center justify-center [-webkit-user-drag:_none]">
-        <motion.div ref={ref} className="relative" style={{ x, y, scale }}>
-          <div className="absolute inset-0" />
-          <img
-            src={currentItem.src}
-            alt=""
-            className="pointer-events-none select-none [-webkit-user-drag:_none]"
-          />
-        </motion.div>
+    <LazyMotion features={domAnimation}>
+      <div ref={viewportRef} className="relative h-full w-full touch-none overflow-hidden">
+        <div className="flex h-full w-full select-none items-center justify-center [-webkit-user-drag:_none]">
+          <m.div ref={ref} className="relative" style={{ x, y, scale }}>
+            <div className="absolute inset-0" />
+            <img
+              src={currentItem.src}
+              alt=""
+              className="pointer-events-none select-none [-webkit-user-drag:_none]"
+            />
+          </m.div>
+        </div>
+
+        <GalleryButton
+          className="right-safe-offset-4 top-safe-offset-4"
+          label={t`Close`}
+          icon="lucide.x"
+          onClick={onClose}
+        />
+
+        {showNavigation && (
+          <>
+            <GalleryButton
+              className="top-1/2 -translate-y-1/2 transform left-safe-offset-4"
+              label={t`Previous`}
+              icon="lucide.arrow-left"
+              onClick={goToPrevious}
+            />
+
+            <GalleryButton
+              className="top-1/2 -translate-y-1/2 transform right-safe-offset-4"
+              label={t`Next`}
+              icon="lucide.arrow-right"
+              onClick={goToNext}
+            />
+          </>
+        )}
       </div>
-
-      <GalleryButton
-        className="right-safe-offset-4 top-safe-offset-4"
-        label={t`Close`}
-        icon="lucide.x"
-        onClick={onClose}
-      />
-
-      {showNavigation && (
-        <>
-          <GalleryButton
-            className="top-1/2 -translate-y-1/2 transform left-safe-offset-4"
-            label={t`Previous`}
-            icon="lucide.arrow-left"
-            onClick={goToPrevious}
-          />
-
-          <GalleryButton
-            className="top-1/2 -translate-y-1/2 transform right-safe-offset-4"
-            label={t`Next`}
-            icon="lucide.arrow-right"
-            onClick={goToNext}
-          />
-        </>
-      )}
-    </div>
+    </LazyMotion>
   );
 }
 

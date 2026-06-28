@@ -49,28 +49,30 @@ export function useParty(partyId: string) {
 
     const participants = Object.keys(party.participants);
 
-    for (let i = 0; i < amount; i++) {
-      logger.debug("Creating test expense {index}", { index: i + 1 });
-      // oxlint-disable-next-line react-doctor/async-await-in-loop -- FIXME: address existing React Doctor diagnostics.
-      await helpers.addExpenseToParty({
-        name: `Test Expense ${i + 1}`,
-        paidAt: new Date(),
-        shares: {
-          [participants.at(0)!]: {
-            type: "divide",
-            value: 1,
+    await Promise.all(
+      Array.from({ length: amount }, (_, index) => {
+        const expenseNumber = index + 1;
+        logger.debug("Creating test expense {index}", { index: expenseNumber });
+        return helpers.addExpenseToParty({
+          name: `Test Expense ${expenseNumber}`,
+          paidAt: new Date(),
+          shares: {
+            [participants.at(0)!]: {
+              type: "divide",
+              value: 1,
+            },
+            [participants.at(1)!]: {
+              type: "divide",
+              value: 1,
+            },
           },
-          [participants.at(1)!]: {
-            type: "divide",
-            value: 1,
+          photos: [],
+          paidBy: {
+            [participants.at(0)!]: 100,
           },
-        },
-        photos: [],
-        paidBy: {
-          [participants.at(0)!]: 100,
-        },
-      });
-    }
+        });
+      }),
+    );
   }
 
   return {
@@ -471,28 +473,38 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
     const chunkRefs = party.chunkRefs;
 
-    for (const chunkRef of chunkRefs) {
-      // oxlint-disable-next-line react-doctor/async-await-in-loop, react-doctor/js-index-maps -- FIXME: address existing React Doctor diagnostics.
-      const chunkHandle = await repo.find<PartyExpenseChunk>(chunkRef.chunkId);
-      const chunk = chunkHandle.doc();
+    const chunkEntries = await Promise.all(
+      chunkRefs.map(async (chunkRef) => {
+        const [chunkHandle, chunkBalancesHandle] = await Promise.all([
+          repo.find<PartyExpenseChunk>(chunkRef.chunkId),
+          repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId),
+        ]);
 
-      if (!chunk) {
-        throw new Error("Chunk not found, this should not happen");
-      }
+        const chunk = chunkHandle.doc();
 
-      const balancesByParticipant = calculateBalancesByParticipant(
-        chunk.expenses,
-        party.participants,
-      );
+        if (!chunk) {
+          throw new Error("Chunk not found, this should not happen");
+        }
 
-      // oxlint-disable-next-line react-doctor/js-index-maps -- FIXME: address existing React Doctor diagnostics.
-      const chunkBalancesHandle = await repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId);
-      const chunkBalances = chunkBalancesHandle.doc();
+        const balancesByParticipant = calculateBalancesByParticipant(
+          chunk.expenses,
+          party.participants,
+        );
 
-      if (!chunkBalances) {
-        throw new Error("Chunk balances not found, this should not happen");
-      }
+        const chunkBalances = chunkBalancesHandle.doc();
 
+        if (!chunkBalances) {
+          throw new Error("Chunk balances not found, this should not happen");
+        }
+
+        return {
+          balancesByParticipant,
+          chunkBalancesHandle,
+        };
+      }),
+    );
+
+    for (const { balancesByParticipant, chunkBalancesHandle } of chunkEntries) {
       chunkBalancesHandle.change((doc) => {
         patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
       });

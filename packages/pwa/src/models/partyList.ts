@@ -2,6 +2,8 @@ import { isValidDocumentId, type Repo, type DocumentId } from "@automerge/autome
 import type { SupportedLocale } from "#src/lib/i18n.js";
 import type { Party, PartyParticipant } from "./party";
 
+const PARTY_LIST_ID_STORAGE_KEY = "partyListId";
+
 export interface PartyList {
   id: DocumentId;
   type: "partyList";
@@ -36,12 +38,12 @@ function createPartyListHandle(repo: Repo) {
 
   handle.change((doc) => (doc.id = handle.documentId));
 
-  localStorage.setItem("partyListId", handle.documentId);
+  localStorage.setItem(PARTY_LIST_ID_STORAGE_KEY, handle.documentId);
   return handle;
 }
 
 export async function getPartyListHandle(repo: Repo) {
-  const id = localStorage.getItem("partyListId");
+  const id = localStorage.getItem(PARTY_LIST_ID_STORAGE_KEY);
 
   if (id && isValidDocumentId(id)) {
     try {
@@ -56,8 +58,7 @@ export async function getPartyListHandle(repo: Repo) {
 }
 
 export function getPartyListId(repo: Repo) {
-  // oxlint-disable-next-line react-doctor/js-cache-storage -- FIXME: address existing React Doctor diagnostics.
-  const id = localStorage.getItem("partyListId");
+  const id = localStorage.getItem(PARTY_LIST_ID_STORAGE_KEY);
 
   if (id && isValidDocumentId(id)) {
     return id;

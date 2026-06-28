@@ -2,6 +2,8 @@ import { t } from "@lingui/core/macro";
 import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import EMOJI_REGEX from "emojibase-regex/emoji";
 
+const symbolSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
 export function validateDocumentId(id: string) {
   id = id.trim();
 
@@ -39,9 +41,7 @@ export function validatePartySymbol(symbol: string) {
     return t`Symbol must contain only emojis`;
   }
 
-  // oxlint-disable-next-line react-doctor/js-hoist-intl -- FIXME: address existing React Doctor diagnostics.
-  const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
-  const segments = Array.from(segmenter.segment(symbol));
+  const segments = Array.from(symbolSegmenter.segment(symbol));
 
   if (segments.length > 1) {
     return t`Symbol must be only one emoji`;

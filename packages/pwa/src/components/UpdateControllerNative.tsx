@@ -5,56 +5,55 @@ import {
   resumeNativeAppUpdate,
 } from "#src/lib/nativeAppUpdate.ts";
 import { App } from "@capacitor/app";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+
+type SetUpdateAvailable = Dispatch<SetStateAction<boolean>>;
+
+async function checkForNativeUpdate(setIsUpdateAvailable: SetUpdateAvailable) {
+  const result = await getNativeAppUpdateState();
+  setIsUpdateAvailable(result.isUpdateAvailable);
+}
+
+async function performNativeUpdateAndRefresh(setIsUpdateAvailable: SetUpdateAvailable) {
+  const result = await performNativeAppUpdate();
+  await checkForNativeUpdate(setIsUpdateAvailable);
+  return result;
+}
+
+async function resumeNativeUpdateAndRefresh(setIsUpdateAvailable: SetUpdateAvailable) {
+  const result = await resumeNativeAppUpdate();
+  if (result.status === "started") {
+    await checkForNativeUpdate(setIsUpdateAvailable);
+  }
+}
 
 export function UpdateControllerNative({ children }: { children: React.ReactNode }) {
   const [isUpdateAvailable, setIsUpdateAvailable] = useState(false);
 
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const checkForUpdate = useCallback(async () => {
-    const result = await getNativeAppUpdateState();
-    setIsUpdateAvailable(result.isUpdateAvailable);
-  }, []);
-
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const update = useCallback(async () => {
-    const result = await performNativeAppUpdate();
-    await checkForUpdate();
-    return result;
-  }, [checkForUpdate]);
-
-  // oxlint-disable-next-line react-doctor/react-compiler-no-manual-memoization -- FIXME: address existing React Doctor diagnostics.
-  const resumeUpdate = useCallback(async () => {
-    const result = await resumeNativeAppUpdate();
-    if (result.status === "started") {
-      await checkForUpdate();
-    }
-  }, [checkForUpdate]);
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- This is intentional
-    void checkForUpdate();
-  }, [checkForUpdate]);
+    void checkForNativeUpdate(setIsUpdateAvailable);
+  }, []);
 
   useEffect(() => {
-    void resumeUpdate();
+    void resumeNativeUpdateAndRefresh(setIsUpdateAvailable);
     const listener = App.addListener("appStateChange", ({ isActive }) => {
       if (isActive) {
-        void resumeUpdate();
+        void resumeNativeUpdateAndRefresh(setIsUpdateAvailable);
       }
     });
 
     return () => {
       void listener.then((handle) => handle.remove());
     };
-  }, [resumeUpdate]);
+  }, []);
 
   return (
     <UpdateContext
       value={{
         isUpdateAvailable,
-        update,
-        checkForUpdate: () => void checkForUpdate(),
+        update: () => performNativeUpdateAndRefresh(setIsUpdateAvailable),
+        checkForUpdate: () => void checkForNativeUpdate(setIsUpdateAvailable),
       }}
     >
       {children}
