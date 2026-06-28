@@ -59,10 +59,11 @@ export function Button({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName, ...state }) =>
         cn(
           defaultClassName,
-          "relative flex h-10 w-full scale-100 items-center justify-center rounded-full outline-none transition-all duration-200 ease-in-out",
+          "relative flex h-10 w-full scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-none transition-all duration-200 ease-in-out",
           colorStyles.base,
           (isHovered || isFocusVisible) && colorStyles.focus,
           isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
+          "data-[disabled]:cursor-not-allowed",
           typeof className === "function"
             ? className({
                 isPressed,
@@ -80,14 +81,7 @@ export function Button({
     >
       {composeRenderProps(children, (children, renderProps) => (
         <>
-          <span
-            className={cn(
-              "flex w-full items-center justify-center",
-              renderProps.isPending && "opacity-0",
-            )}
-          >
-            {children}
-          </span>
+          <span className={cn("contents", renderProps.isPending && "invisible")}>{children}</span>
           {renderProps.isPending ? (
             <span aria-hidden className="absolute inset-0 flex items-center justify-center">
               <Icon icon="lucide.loader-circle" className="size-4 animate-spin" />

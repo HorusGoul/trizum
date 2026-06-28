@@ -217,7 +217,7 @@ export function AnimatedTabs({
             items={tabs}
           >
             {(tab) => (
-              <Tab className="flex flex-1 cursor-default touch-none items-center justify-center px-4 py-2.5 outline-none transition">
+              <Tab className="flex flex-1 cursor-pointer touch-none select-none items-center justify-center px-4 py-2.5 outline-none transition">
                 {({ isSelected, isFocusVisible }) => (
                   <>
                     <Icon icon={tab.icon} width={20} height={20} className="mr-3" />

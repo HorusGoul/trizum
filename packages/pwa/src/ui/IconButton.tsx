@@ -58,10 +58,11 @@ export function IconButton({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName, ...state }) =>
         cn(
           defaultClassName,
-          "flex h-10 w-10 scale-100 items-center justify-center rounded-full outline-none transition-all duration-200 ease-in-out",
+          "flex h-10 w-10 scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-none transition-all duration-200 ease-in-out",
           colorStyles.base,
           (isHovered || isFocusVisible) && colorStyles.focus,
           isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
+          "data-[disabled]:cursor-not-allowed",
           typeof className === "function"
             ? className({
                 isPressed,

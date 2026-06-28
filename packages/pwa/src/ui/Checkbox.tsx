@@ -44,7 +44,7 @@ const Checkbox = ({
     <AriaCheckbox
       className={composeRenderProps(className, (className) =>
         cn(
-          "group/checkbox flex items-center gap-x-2",
+          "group/checkbox flex cursor-pointer select-none items-center gap-x-2",
           /* Disabled */
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-70 data-[pending]:opacity-70",
           labelVariants,

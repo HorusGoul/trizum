@@ -33,7 +33,7 @@ export function MenuItem<T extends object>({
         cn(
           defaultClassName,
           className,
-          "flex items-center bg-accent-900 bg-opacity-0 px-4 py-4 outline-none transition-all dark:bg-accent-50 dark:bg-opacity-0",
+          "flex cursor-pointer select-none items-center bg-accent-900 bg-opacity-0 px-4 py-4 outline-none transition-all dark:bg-accent-50 dark:bg-opacity-0",
           (isFocusVisible || isHovered) && "bg-opacity-5 dark:bg-opacity-5",
           isPressed && !isPending && "bg-opacity-10 dark:bg-opacity-10",
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",

@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
 import { type UpdateResult, UpdateContext } from "./UpdateContext";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 const UPDATE_TOAST_ID = "update-toast";
@@ -10,6 +10,7 @@ const UPDATE_TOAST_ID = "update-toast";
 export function UpdateController({ children }: { children: React.ReactNode }) {
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const didCheckForUpdateRef = useRef(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
@@ -35,6 +36,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
   });
 
   async function update(): Promise<UpdateResult> {
+    setIsUpdating(true);
     toast.loading(t`Updating trizum...`, {
       id: UPDATE_TOAST_ID,
     });
@@ -43,6 +45,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
       return { status: "started" };
     } catch {
       toast.dismiss(UPDATE_TOAST_ID);
+      setIsUpdating(false);
       return { status: "failed" };
     }
   }
@@ -51,6 +54,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
     <UpdateContext
       value={{
         isUpdateAvailable: needRefresh,
+        isUpdating,
         update,
         checkForUpdate: () => {
           didCheckForUpdateRef.current = true;

@@ -67,7 +67,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
-  const { update, isUpdateAvailable, checkForUpdate } = use(UpdateContext);
+  const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;
   const needsProfileSetup = !partyList.username || partyList.username.trim() === "";
@@ -95,6 +95,7 @@ function Index() {
                 const result = await update();
                 showUpdateResultFeedback(result);
               }}
+              isPending={isUpdating}
               className="mr-2"
               iconClassName="animate-pulse duration-1000 ease-in-out"
             />
