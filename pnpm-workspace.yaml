@@ -20,7 +20,9 @@ catalog:
   "@automerge/automerge-repo": 2.5.6
   "@automerge/automerge-repo-network-websocket": 2.5.6
   "@automerge/automerge-repo-storage-indexeddb": 2.5.6
+  "@ai-hero/sandcastle": 0.10.0
   "@babel/core": 7.29.0
+  "@barnum/barnum": 0.4.0
   "@capacitor/android": 8.0.1
   "@capacitor/app": 8.0.0
   "@capacitor/assets": 3.0.5
@@ -54,6 +56,7 @@ catalog:
   "@lingui/vite-plugin": 5.9.3
   "@logtape/logtape": 1.2.2
   "@logtape/sentry": 1.2.2
+  "@openai/codex": 0.142.3
   "@playwright/test": 1.60.0
   "@rolldown/plugin-babel": 0.2.1
   "@sentry/cli": 3.1.0
@@ -128,9 +131,10 @@ catalog:
   vite-plugin-pwa: 1.2.0
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
-  vite-plus: latest
+  vite-plus: 0.1.24
   vitest: npm:@voidzero-dev/vite-plus-test@latest
   workbox-build: 7.4.0
   workbox-window: 7.4.0
   wrangler: 4.74.0
-  zod: 4.1.12
+  tsx: 4.22.4
+  zod: 4.4.3

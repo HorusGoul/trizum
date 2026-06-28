@@ -33,3 +33,19 @@ follow-up push.
 `renovate.json` lists `259750894+PUNK-02@users.noreply.github.com` in
 `gitIgnoredAuthors` so Renovate keeps managing branches after the workflow adds
 its lockfile commit.
+
+## Agent Review
+
+The
+[`Renovate Agent Review`](../.github/workflows/renovate-agent-review.yml)
+workflow runs after the `CI` workflow completes on a `renovate/**` branch. It
+finds the open non-draft Renovate PR for that branch.
+
+The workflow uses `BOT_GITHUB_TOKEN` for checkout and GitHub CLI write actions,
+configures commits as `lilith[bot]`, restores Codex account auth from Bitwarden
+Secrets Manager, invokes Codex through Sandcastle, and writes the refreshed
+Codex auth cache back to Bitwarden after the run.
+
+When checks pass and the agent finds no blockers, it adds the
+`ready for human review` label. When checks fail, the agent can create a
+replacement PR with the same dependency-update purpose.

@@ -1,0 +1,64 @@
+{
+  "name": "@trizum/agent-workflows",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agentic maintenance workflows for the trizum workspace.",
+  "keywords": [
+    "agents",
+    "automation",
+    "barnum",
+    "renovate"
+  ],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "bin": {
+    "trizum-agent-workflows": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js",
+      "default": "./dist/cli.js"
+    },
+    "./workflows/renovate-pr-review": {
+      "types": "./dist/workflows/renovate-pr-review.d.ts",
+      "import": "./dist/workflows/renovate-pr-review.js",
+      "default": "./dist/workflows/renovate-pr-review.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch",
+    "renovate-pr-review": "tsx src/cli.ts renovate-pr-review"
+  },
+  "dependencies": {
+    "@ai-hero/sandcastle": "catalog:",
+    "@barnum/barnum": "catalog:",
+    "@openai/codex": "catalog:",
+    "@trizum/logging": "workspace:*",
+    "tsx": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}
