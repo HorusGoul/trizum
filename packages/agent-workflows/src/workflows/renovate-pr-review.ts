@@ -1,4 +1,4 @@
-import { chmod, mkdtemp, rename, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { runPipeline } from "@barnum/barnum/pipeline";
@@ -896,12 +896,16 @@ function hasSupersedesMarker(body: string, originalPrNumber: number): boolean {
 function renderExistingSupersedingPullRequestSummary(
   context: PullRequestContext,
   existingPullRequest: SupersedingPullRequestCandidate,
+  changedFiles: readonly string[] = [],
 ): string {
   return [
     `Reused existing superseding PR #${existingPullRequest.number} for Renovate PR #${context.pr.number}.`,
     `Existing PR: ${existingPullRequest.url}`,
-    "Skipped creating another agent branch for the same original PR.",
-  ].join("\n");
+    "Refreshed its body with current local validation.",
+    changedFiles.length === 0 ? "" : `Changed files: ${changedFiles.join(", ")}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 async function createSupersedingPullRequest(
@@ -918,11 +922,23 @@ async function createSupersedingPullRequest(
       existingSupersedingPullRequest.number,
       options.readyForHumanReviewLabel,
     );
+    const refresh = await refreshExistingSupersedingPullRequest(
+      options,
+      context,
+      report,
+      existingSupersedingPullRequest,
+    );
 
     return {
       branchName: existingSupersedingPullRequest.headRefName,
+      localValidationOutput: refresh.localValidation.output,
+      localValidationPassed: refresh.localValidation.passed,
       prUrl: existingSupersedingPullRequest.url,
-      summary: renderExistingSupersedingPullRequestSummary(context, existingSupersedingPullRequest),
+      summary: renderExistingSupersedingPullRequestSummary(
+        context,
+        existingSupersedingPullRequest,
+        refresh.changedFiles,
+      ),
     };
   }
 
@@ -1068,6 +1084,70 @@ async function createSupersedingPullRequest(
   }
 }
 
+async function refreshExistingSupersedingPullRequest(
+  options: WorkflowOptions,
+  context: PullRequestContext,
+  report: string,
+  existingPullRequest: SupersedingPullRequestCandidate,
+): Promise<{ changedFiles: string[]; localValidation: LocalValidationResult }> {
+  let worktreeRoot: string | undefined;
+
+  try {
+    await runGitWithOptionalCredentials(
+      ["fetch", "origin", context.pr.headRefName],
+      options.repoRoot,
+    );
+    const originalPrHead = (
+      await runCommand("git", ["rev-parse", "FETCH_HEAD"], {
+        cwd: options.repoRoot,
+      })
+    ).stdout.trim();
+
+    await runGitWithOptionalCredentials(
+      ["fetch", "origin", existingPullRequest.headRefName],
+      options.repoRoot,
+    );
+    worktreeRoot = await mkdtemp(path.join(tmpdir(), "trizum-renovate-existing-"));
+    await runCommand("git", ["worktree", "add", "--detach", worktreeRoot, "FETCH_HEAD"], {
+      cwd: options.repoRoot,
+    });
+
+    const localValidation = options.runLocalValidation
+      ? await runLocalValidation(worktreeRoot)
+      : {
+          commands: [],
+          output: "Local validation skipped by workflow option.",
+          passed: true,
+        };
+    const changedFiles = await listChangedFilesAfter(worktreeRoot, originalPrHead);
+    const bodyPath = path.join(worktreeRoot, ".trizum-superseding-pr-body.md");
+    const body = renderSupersedingPullRequestBody(
+      context,
+      report,
+      "Reused the existing superseding PR and refreshed local validation.",
+      localValidation,
+      changedFiles,
+    );
+    await writeFile(bodyPath, body, "utf8");
+    await gh(options, ["pr", "edit", String(existingPullRequest.number), "--body-file", bodyPath], {
+      cwd: worktreeRoot,
+    });
+
+    return {
+      changedFiles,
+      localValidation,
+    };
+  } finally {
+    if (worktreeRoot != null) {
+      await runCommand("git", ["worktree", "remove", "--force", worktreeRoot], {
+        allowFailure: true,
+        cwd: options.repoRoot,
+      });
+      await rm(worktreeRoot, { force: true, recursive: true });
+    }
+  }
+}
+
 async function runGitWithOptionalCredentials(
   args: readonly string[],
   cwd: string,
@@ -1115,10 +1195,10 @@ async function runGitWithOptionalCredentials(
 async function runLocalValidation(worktreeRoot: string): Promise<LocalValidationResult> {
   const codexAuthCache = await hideCodexAuthCache();
   const commands = [
-    ["vp", "install", "--frozen-lockfile", "--ignore-scripts", "--prefer-offline"],
-    ["vp", "run", "check"],
-    ["vp", "run", "test"],
-    ["vp", "run", "build"],
+    ["vp", "install", "--frozen-lockfile"],
+    ["vp", "run", "--no-cache", "check"],
+    ["vp", "run", "--no-cache", "test"],
+    ["vp", "run", "--no-cache", "build"],
   ] as const;
 
   const environment = {
@@ -1133,6 +1213,7 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
   let passed = true;
 
   try {
+    await removeWorkspaceNodeModules(worktreeRoot);
     for (const [command, ...args] of commands) {
       const result = await runCommand(command, args, {
         allowFailure: true,
@@ -1177,6 +1258,33 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
   };
 }
 
+async function removeWorkspaceNodeModules(worktreeRoot: string): Promise<void> {
+  const packageRoot = path.join(worktreeRoot, "packages");
+  const nodeModulesPaths = [path.join(worktreeRoot, "node_modules")];
+
+  try {
+    const packageEntries = await readdir(packageRoot, { withFileTypes: true });
+    for (const entry of packageEntries) {
+      if (entry.isDirectory()) {
+        nodeModulesPaths.push(path.join(packageRoot, entry.name, "node_modules"));
+      }
+    }
+  } catch (error) {
+    if (!isNodeError(error) || error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+
+  await Promise.all(
+    nodeModulesPaths.map((nodeModulesPath) =>
+      rm(nodeModulesPath, {
+        force: true,
+        recursive: true,
+      }),
+    ),
+  );
+}
+
 function summarizeCommandFailure(result: CommandResult): string {
   const combinedOutput = stripAnsiCodes(redactSecrets([result.stderr, result.stdout].join("\n")));
   const lines = splitLines(combinedOutput)
@@ -1185,7 +1293,7 @@ function summarizeCommandFailure(result: CommandResult): string {
   const errorLines = lines.filter((line) =>
     /error|failed|could not|not found|missing|exception/i.test(line),
   );
-  const summaryLines = (errorLines.length === 0 ? lines.slice(-12) : errorLines.slice(-12)).map(
+  const summaryLines = (errorLines.length === 0 ? lines.slice(-6) : errorLines.slice(-6)).map(
     (line) => truncateText(line, 500),
   );
 
@@ -1193,7 +1301,7 @@ function summarizeCommandFailure(result: CommandResult): string {
     return `Command exited with status ${result.exitCode} without producing output.`;
   }
 
-  return truncateText(summaryLines.join("\n"), 1_400);
+  return truncateText(summaryLines.join("\n"), 900);
 }
 
 function stripAnsiCodes(value: string): string {
@@ -1424,19 +1532,14 @@ function renderReviewComment(decision: ReviewDecision): string {
       "## Agent Renovate Review",
       "",
       `**Decision:** ${decision.summary}`,
+      "",
+      `**Why:** ${truncateText(firstParagraph(combined.summary), 500)}`,
+      `**What:** ${updates}`,
       `**Checks:** ${context.pr.status.summary}`,
-      `**Updates:** ${updates}`,
       "",
-      `**Summary:** ${truncateText(firstParagraph(combined.summary), 700)}`,
-      "",
-      "**Findings:**",
+      "**How:**",
       renderBriefFindings(combined.findings),
-      "",
-      "**Suggested validation:**",
-      renderBriefList(combined.automatedTestSuggestions, 3),
-      "",
-      "**Manual smoke test:**",
-      renderBriefList(combined.manualTestPlan, 3),
+      renderReviewCommentValidation(combined.automatedTestSuggestions, combined.manualTestPlan),
     ].join("\n"),
   );
 }
@@ -1455,19 +1558,17 @@ export function renderSupersedingPullRequestBody(
     [
       `Supersedes #${context.pr.number}.`,
       "",
-      "## Why This PR Exists",
+      "## Why",
       truncateText(reviewSummary, 900) || "See the workflow logs for the full agent review.",
       renderFindingBullets(findings),
       "",
-      "## What Changed",
-      `- Dependency update: ${renderDependencyUpdateSummary(context)}.`,
-      `- Agent fix: ${renderAgentFixSummary(agentSummary)}`,
+      "## What",
+      `- Updates: ${renderDependencyUpdateSummary(context)}.`,
+      `- Fix: ${renderAgentFixSummary(agentSummary)}`,
+      `- Files: ${renderChangedFilesInline(changedFiles)}`,
       "",
-      "Changed files:",
-      renderChangedFiles(changedFiles),
-      "",
-      "## Local Validation",
-      `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
+      "## How",
+      `- Local validation: ${localValidation.passed ? "passed" : "failed"}.`,
       renderValidationCommandBullets(localValidation),
       renderValidationFailure(localValidation),
       "- CI on this PR is the source of truth for merge readiness.",
@@ -1493,19 +1594,17 @@ function renderOriginalPullRequestUpdatedComment(
       "",
       "Updated this Renovate PR because the required fix only touched lockfile/workspace metadata.",
       "",
-      "**Why this update was needed:**",
+      "**Why:**",
       truncateText(reviewSummary, 700) || "See the workflow logs for the full agent review.",
       renderFindingBullets(findings),
       "",
-      "**What changed:**",
-      `- Dependency update: ${renderDependencyUpdateSummary(context)}.`,
-      `- Agent fix: ${renderAgentFixSummary(agentSummary)}`,
+      "**What:**",
+      `- Updates: ${renderDependencyUpdateSummary(context)}.`,
+      `- Fix: ${renderAgentFixSummary(agentSummary)}`,
+      `- Files: ${renderChangedFilesInline(changedFiles)}`,
       "",
-      "Changed files:",
-      renderChangedFiles(changedFiles),
-      "",
-      "**Local validation:**",
-      `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
+      "**How:**",
+      `- Local validation: ${localValidation.passed ? "passed" : "failed"}.`,
       renderValidationCommandBullets(localValidation),
       renderValidationFailure(localValidation),
       "- CI on this PR is the source of truth for merge readiness.",
@@ -1545,19 +1644,17 @@ function renderAgentFixSummary(agentSummary: string): string {
   return truncateText(summary, 500);
 }
 
-function renderChangedFiles(changedFiles: readonly string[]): string {
+function renderChangedFilesInline(changedFiles: readonly string[]): string {
   if (changedFiles.length === 0) {
-    return "- No changed files were reported.";
+    return "No changed files were reported.";
   }
 
-  const visibleFiles = changedFiles.slice(0, 8).map((file) => `- \`${file}\``);
+  const visibleFiles = changedFiles.slice(0, 5).map((file) => `\`${file}\``);
   if (changedFiles.length <= visibleFiles.length) {
-    return visibleFiles.join("\n");
+    return visibleFiles.join(", ");
   }
 
-  return [...visibleFiles, `- ${changedFiles.length - visibleFiles.length} more file(s).`].join(
-    "\n",
-  );
+  return `${visibleFiles.join(", ")}, and ${changedFiles.length - visibleFiles.length} more`;
 }
 
 function renderFindingBullets(findings: readonly string[]): string {
@@ -1685,28 +1782,30 @@ function renderBriefFindings(findings: readonly ReviewFinding[]): string {
     .join("\n");
 }
 
+function renderReviewCommentValidation(
+  automatedTestSuggestions: readonly string[],
+  manualTestPlan: readonly string[],
+): string {
+  const lines: string[] = [];
+  const automated = automatedTestSuggestions.slice(0, 2).map((value) => truncateText(value, 180));
+  const manual = manualTestPlan.slice(0, 1).map((value) => truncateText(value, 180));
+
+  if (automated.length > 0) {
+    lines.push(`- Validate: ${automated.join("; ")}`);
+  }
+  if (manual.length > 0) {
+    lines.push(`- Smoke test: ${manual.join("; ")}`);
+  }
+
+  return lines.length === 0 ? "- No extra validation suggested." : lines.join("\n");
+}
+
 function renderList(values: readonly string[]): string {
   if (values.length === 0) {
     return "- None.";
   }
 
   return values.map((value) => `- ${value}`).join("\n");
-}
-
-function renderBriefList(values: readonly string[], limit: number): string {
-  if (values.length === 0) {
-    return "- None.";
-  }
-
-  return values
-    .slice(0, limit)
-    .map((value) => `- ${truncateText(value, 220)}`)
-    .concat(
-      values.length > limit
-        ? [`- ${values.length - limit} more item(s) in the full run output.`]
-        : [],
-    )
-    .join("\n");
 }
 
 function firstParagraph(value: string): string {
