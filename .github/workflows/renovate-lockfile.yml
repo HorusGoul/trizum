@@ -42,13 +42,14 @@ jobs:
           # workflow repairs the lockfile below.
           run-install: false
 
-      - name: Update pnpm lockfile
+      - name: Update and dedupe pnpm lockfile
         env:
           # Resolution does not need lifecycle scripts; keep dependency scripts
           # from running in a workflow that later pushes with a write token.
           npm_config_ignore_scripts: "true"
         run: |
           vp install --lockfile-only --no-frozen-lockfile --ignore-scripts
+          vp exec pnpm dedupe --lockfile-only
 
       - name: Detect lockfile changes
         id: diff

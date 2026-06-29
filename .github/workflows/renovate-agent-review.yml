@@ -96,15 +96,77 @@ jobs:
           echo "Found Renovate PR #$pr_number."
           echo "found=true" >> "$GITHUB_OUTPUT"
           echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "head_ref_name=$(jq -r '.headRefName' <<< "$pr_json")" >> "$GITHUB_OUTPUT"
+          echo "head_ref_oid=$(jq -r '.headRefOid' <<< "$pr_json")" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for Renovate lockfile refresh
+        id: lockfile
+        if: steps.pr.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          RENOVATE_HEAD_BRANCH: ${{ steps.pr.outputs.head_ref_name }}
+          RENOVATE_HEAD_SHA: ${{ steps.pr.outputs.head_ref_oid }}
+          RENOVATE_PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          set -euo pipefail
+
+          deadline=$((SECONDS + 12 * 60))
+          while true; do
+            current_head="$(gh pr view "$RENOVATE_PR_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json headRefOid \
+              --jq .headRefOid)"
+
+            if [[ "$current_head" != "$RENOVATE_HEAD_SHA" ]]; then
+              echo "Renovate PR #$RENOVATE_PR_NUMBER moved from $RENOVATE_HEAD_SHA to $current_head; skipping this stale agent run."
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            lockfile_run_status="$(gh run list \
+              --repo "$GITHUB_REPOSITORY" \
+              --workflow "Renovate Lockfiles" \
+              --branch "$RENOVATE_HEAD_BRANCH" \
+              --limit 50 \
+              --json headSha,status \
+              --jq '[.[] | select(.headSha == env.RENOVATE_HEAD_SHA)] | first | .status // empty')"
+
+            active_lockfile_runs="$(gh run list \
+              --repo "$GITHUB_REPOSITORY" \
+              --workflow "Renovate Lockfiles" \
+              --branch "$RENOVATE_HEAD_BRANCH" \
+              --limit 50 \
+              --json status \
+              --jq '[.[] | select(.status != "completed")] | length')"
+
+            if [[ "$lockfile_run_status" == "completed" ]] && (( active_lockfile_runs == 0 )); then
+              break
+            fi
+
+            if (( SECONDS >= deadline )); then
+              echo "::notice::Renovate lockfile refresh is not finished for $RENOVATE_HEAD_BRANCH at $RENOVATE_HEAD_SHA; skipping this agent run."
+              echo "ready=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            if [[ -z "$lockfile_run_status" ]]; then
+              echo "Waiting for the Renovate lockfile refresh run for $RENOVATE_HEAD_SHA to appear."
+            else
+              echo "Waiting for Renovate lockfile refresh on $RENOVATE_HEAD_BRANCH; current status is $lockfile_run_status with $active_lockfile_runs active run(s)."
+            fi
+            sleep 15
+          done
+
+          echo "ready=true" >> "$GITHUB_OUTPUT"
 
       - name: Configure Lilith git identity
-        if: steps.pr.outputs.found == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
         run: |
           git config user.name "lilith[bot]"
           git config user.email "259750894+PUNK-02@users.noreply.github.com"
 
       - name: Load Codex auth from Bitwarden
-        if: steps.pr.outputs.found == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
         uses: bitwarden/sm-action@v3.0.0
         with:
           access_token: ${{ secrets.BW_ACCESS_TOKEN }}
@@ -112,7 +174,7 @@ jobs:
             ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }} > CODEX_AUTH_JSON
 
       - name: Restore Codex auth cache
-        if: steps.pr.outputs.found == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           CODEX_HOME: ${{ runner.temp }}/codex
         run: |
@@ -140,7 +202,7 @@ jobs:
           echo "CODEX_AUTH_JSON=" >> "$GITHUB_ENV"
 
       - name: Run Renovate agent review
-        if: steps.pr.outputs.found == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           CODEX_HOME: ${{ runner.temp }}/codex
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -167,7 +229,7 @@ jobs:
             --codex required
 
       - name: Save refreshed Codex auth to Bitwarden
-        if: success() && steps.pr.outputs.found == 'true'
+        if: success() && steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           BWS_ACCESS_TOKEN: ${{ secrets.BW_ACCESS_TOKEN }}
           BITWARDEN_CODEX_AUTH_JSON_SECRET_ID: ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }}
