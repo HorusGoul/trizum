@@ -87,7 +87,15 @@ export interface SupersedingPullRequestCandidate {
   url: string;
 }
 
+export interface PullRequestReviewCommentCandidate {
+  body: string;
+  createdAt?: string;
+  id: number;
+}
+
 const ORIGINAL_PR_DIRECT_UPDATE_FILES = new Set(["pnpm-lock.yaml", "pnpm-workspace.yaml"]);
+const AGENT_REVIEW_COMMENT_HEADING = "## Agent Renovate Review";
+const AGENT_REVIEW_COMMENT_MARKER_PREFIX = "<!-- trizum-renovate-agent-review:";
 
 export const listRenovatePullRequests = createHandler(
   {
@@ -404,7 +412,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
     await ensureReadyLabel(options);
     await addLabelToIssue(options, context.pr.number, options.readyForHumanReviewLabel);
     if (options.postReviewComment) {
-      await commentOnPullRequest(options, context.pr.number, comment);
+      await upsertPullRequestReviewComment(options, context.pr.number, comment);
     }
     return {
       decision,
@@ -427,7 +435,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
   }
 
   if (options.postReviewComment) {
-    await commentOnPullRequest(options, context.pr.number, comment);
+    await upsertPullRequestReviewComment(options, context.pr.number, comment);
   }
 
   return {
@@ -710,11 +718,40 @@ async function addLabelToIssue(
   );
 }
 
-async function commentOnPullRequest(
+interface RawIssueComment {
+  body?: string;
+  created_at?: string;
+  id: number;
+}
+
+async function upsertPullRequestReviewComment(
   options: WorkflowOptions,
   prNumber: number,
   body: string,
 ): Promise<void> {
+  const markedBody = ensureReviewCommentMarker(prNumber, body);
+  const existingComment = await findExistingPullRequestReviewComment(options, prNumber);
+
+  if (existingComment != null) {
+    await gh(
+      options,
+      [
+        "api",
+        "--method",
+        "PATCH",
+        repositoryApiPath(options, `issues/comments/${existingComment.id}`),
+        "--input",
+        "-",
+      ],
+      {
+        input: JSON.stringify({
+          body: markedBody,
+        }),
+      },
+    );
+    return;
+  }
+
   await gh(
     options,
     [
@@ -727,10 +764,87 @@ async function commentOnPullRequest(
     ],
     {
       input: JSON.stringify({
-        body,
+        body: markedBody,
       }),
     },
   );
+}
+
+async function findExistingPullRequestReviewComment(
+  options: WorkflowOptions,
+  prNumber: number,
+): Promise<PullRequestReviewCommentCandidate | undefined> {
+  const rawComments = await ghJson<RawIssueComment[]>(
+    options,
+    "api",
+    repositoryApiPath(options, `issues/${prNumber}/comments?per_page=100`),
+  );
+  const comments = rawComments.map((comment) => ({
+    body: comment.body ?? "",
+    ...(comment.created_at == null ? {} : { createdAt: comment.created_at }),
+    id: comment.id,
+  }));
+
+  return selectExistingPullRequestReviewComment(comments, prNumber);
+}
+
+export function selectExistingPullRequestReviewComment(
+  comments: readonly PullRequestReviewCommentCandidate[],
+  prNumber: number,
+): PullRequestReviewCommentCandidate | undefined {
+  const markedComments = comments.filter((comment) =>
+    hasReviewCommentMarker(comment.body, prNumber),
+  );
+  if (markedComments.length > 0) {
+    return newestPullRequestComment(markedComments);
+  }
+
+  return newestPullRequestComment(
+    comments.filter((comment) => isLegacyAgentReviewComment(comment.body)),
+  );
+}
+
+function ensureReviewCommentMarker(prNumber: number, body: string): string {
+  const marker = renderReviewCommentMarker(prNumber);
+  if (body.includes(marker)) {
+    return body;
+  }
+
+  return [marker, "", body].join("\n");
+}
+
+function renderReviewCommentMarker(prNumber: number): string {
+  return `${AGENT_REVIEW_COMMENT_MARKER_PREFIX}${prNumber} -->`;
+}
+
+function hasReviewCommentMarker(body: string, prNumber: number): boolean {
+  return body.includes(renderReviewCommentMarker(prNumber));
+}
+
+function isLegacyAgentReviewComment(body: string): boolean {
+  return splitLines(body).some((line) => line.trim() === AGENT_REVIEW_COMMENT_HEADING);
+}
+
+function newestPullRequestComment(
+  comments: readonly PullRequestReviewCommentCandidate[],
+): PullRequestReviewCommentCandidate | undefined {
+  return [...comments].sort((left, right) => {
+    const createdAtDiff = readCommentTimestamp(left) - readCommentTimestamp(right);
+    if (createdAtDiff !== 0) {
+      return createdAtDiff;
+    }
+
+    return left.id - right.id;
+  })[comments.length - 1];
+}
+
+function readCommentTimestamp(comment: PullRequestReviewCommentCandidate): number {
+  if (comment.createdAt == null) {
+    return 0;
+  }
+
+  const timestamp = Date.parse(comment.createdAt);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
 async function findExistingSupersedingPullRequest(
@@ -867,7 +981,7 @@ async function createSupersedingPullRequest(
       );
       await addLabelToIssue(options, context.pr.number, options.readyForHumanReviewLabel);
       if (options.postReviewComment) {
-        await commentOnPullRequest(
+        await upsertPullRequestReviewComment(
           options,
           context.pr.number,
           renderOriginalPullRequestUpdatedComment(

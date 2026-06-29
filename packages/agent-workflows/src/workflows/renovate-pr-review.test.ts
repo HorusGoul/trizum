@@ -3,8 +3,10 @@ import type { PullRequestContext } from "../schemas.js";
 import {
   canUpdateOriginalRenovatePr,
   renderSupersedingPullRequestBody,
+  selectExistingPullRequestReviewComment,
   selectExistingSupersedingPullRequest,
   type LocalValidationResult,
+  type PullRequestReviewCommentCandidate,
   type SupersedingPullRequestCandidate,
 } from "./renovate-pr-review.js";
 
@@ -62,6 +64,54 @@ describe("Renovate PR review workflow", () => {
     expect(selectExistingSupersedingPullRequest(candidates, 237, "main")).toMatchObject({
       number: 263,
       url: "https://github.com/HorusGoul/trizum/pull/263",
+    });
+  });
+
+  test("selects an existing marked review comment for the reviewed PR", () => {
+    const comments = [
+      {
+        body: "<!-- trizum-renovate-agent-review:23 -->\n\n## Agent Renovate Review",
+        createdAt: "2026-06-29T00:40:00Z",
+        id: 10,
+      },
+      {
+        body: "<!-- trizum-renovate-agent-review:237 -->\n\n## Agent Renovate Review",
+        createdAt: "2026-06-29T00:41:00Z",
+        id: 11,
+      },
+      {
+        body: "<!-- trizum-renovate-agent-review:237 -->\n\n## Agent Renovate Review",
+        createdAt: "2026-06-29T00:42:00Z",
+        id: 12,
+      },
+    ] satisfies PullRequestReviewCommentCandidate[];
+
+    expect(selectExistingPullRequestReviewComment(comments, 237)).toMatchObject({
+      id: 12,
+    });
+  });
+
+  test("falls back to a legacy review comment without a marker", () => {
+    const comments = [
+      {
+        body: "## Agent Renovate Review\n\n**Decision:** older",
+        createdAt: "2026-06-29T00:40:00Z",
+        id: 10,
+      },
+      {
+        body: "## Agent Renovate Review\n\n**Decision:** newer",
+        createdAt: "2026-06-29T00:41:00Z",
+        id: 11,
+      },
+      {
+        body: "A human comment mentioning Agent Renovate Review inline.",
+        createdAt: "2026-06-29T00:42:00Z",
+        id: 12,
+      },
+    ] satisfies PullRequestReviewCommentCandidate[];
+
+    expect(selectExistingPullRequestReviewComment(comments, 237)).toMatchObject({
+      id: 11,
     });
   });
 
