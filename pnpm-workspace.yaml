@@ -20,19 +20,19 @@ catalog:
   "@ai-hero/sandcastle": 0.10.0
   "@babel/core": 7.29.6
   "@barnum/barnum": 0.4.0
-  "@capacitor/android": 8.0.1
-  "@capacitor/app": 8.0.0
+  "@capacitor/android": 8.4.1
+  "@capacitor/app": 8.1.0
   "@capacitor/assets": 3.0.5
   "@capacitor/camera": 8.2.0
-  "@capacitor/cli": 8.0.1
-  "@capacitor/core": 8.0.1
-  "@capacitor/ios": 8.0.1
-  "@capacitor/share": 8.0.0
-  "@capacitor/splash-screen": 8.0.0
+  "@capacitor/cli": 8.4.1
+  "@capacitor/core": 8.4.1
+  "@capacitor/ios": 8.4.1
+  "@capacitor/share": 8.0.1
+  "@capacitor/splash-screen": 8.0.1
   "@capawesome/capacitor-app-update": 8.0.3
-  "@capawesome/capacitor-apple-sign-in": 0.1.0
+  "@capawesome/capacitor-apple-sign-in": 0.1.1
   "@capawesome/capacitor-google-sign-in": 0.1.2
-  "@capawesome/capver": 0.1.0
+  "@capawesome/capver": 0.1.4
   "@changesets/changelog-github": 0.7.0
   "@changesets/cli": 2.29.8
   "@cloudflare/vite-plugin": 1.29.0
