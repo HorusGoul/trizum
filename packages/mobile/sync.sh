@@ -16,7 +16,9 @@ run_cap_sync() {
 
 # On macOS, sync both platforms. On other systems (Linux), only sync Android.
 # This avoids Capacitor trying to run pod install on non-macOS systems.
-if [[ "$(uname)" == "Darwin" ]]; then
+if [[ "$#" -gt 0 ]]; then
+  run_cap_sync "$@"
+elif [[ "$(uname)" == "Darwin" ]]; then
   run_cap_sync
 else
   run_cap_sync android
