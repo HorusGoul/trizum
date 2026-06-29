@@ -248,8 +248,8 @@ catalogs:
       specifier: 1.22.0
       version: 1.22.0
     mathjs:
-      specifier: 15.1.0
-      version: 15.1.0
+      specifier: 15.2.0
+      version: 15.2.0
     motion:
       specifier: 12.38.0
       version: 12.38.0
@@ -680,7 +680,7 @@ importers:
         version: 6.2.3
       mathjs:
         specifier: 'catalog:'
-        version: 15.1.0
+        version: 15.2.0
       motion:
         specifier: 'catalog:'
         version: 12.38.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
@@ -8148,8 +8148,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mathjs@15.1.0:
-    resolution: {integrity: sha512-HfnAcScQm9drGryodlDqeS3WAl4gUTYGDcOtcqL/8s23MZ28Ib1i8XnYK3ZdjNuaW/L4BAp9lIp8vxAMrcuu1w==}
+  mathjs@15.2.0:
+    resolution: {integrity: sha512-UAQzSVob9rNLdGpqcFMYmSu9dkuLYy7Lr2hBEQS5SHQdknA9VppJz3cy2KkpMzTODunad6V6cNv+5kOLsePLow==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -15099,7 +15099,7 @@ snapshots:
       heic-to: 1.5.2
       hono: 4.12.27
       jose: 6.2.3
-      mathjs: 15.1.0
+      mathjs: 15.2.0
       motion: 12.38.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       qr-code-styling: 1.9.2
       react: 0.0.0-experimental-d025ddd3-20240722
@@ -17959,7 +17959,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mathjs@15.1.0:
+  mathjs@15.2.0:
     dependencies:
       '@babel/runtime': 7.29.2
       complex.js: 2.4.3
