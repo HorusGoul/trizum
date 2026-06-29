@@ -1,12 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "platformAutomerge": false,
   "gitIgnoredAuthors": ["259750894+PUNK-02@users.noreply.github.com"],
   "packageRules": [
     {
       "description": "Skip Renovate's native npm lockfile artifact updates; the Renovate Lockfiles workflow refreshes pnpm-lock.yaml with Vite+.",
       "matchManagers": ["npm"],
       "skipArtifactsUpdate": true
+    },
+    {
+      "description": "Automerge non-major dependency updates after status checks pass, excluding 0.x current versions and TypeScript.",
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchPackageNames": ["!typescript"],
+      "matchCurrentVersion": "!/^0\\./",
+      "automerge": true
     },
     {
       "description": "Keep non-major PWA runtime dependency updates together.",
