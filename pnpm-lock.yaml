@@ -131,8 +131,8 @@ catalogs:
       specifier: 1.2.2
       version: 1.2.2
     '@openai/codex':
-      specifier: 0.142.3
-      version: 0.142.3
+      specifier: 0.142.4
+      version: 0.142.4
     '@playwright/test':
       specifier: 1.60.0
       version: 1.60.0
@@ -431,7 +431,7 @@ importers:
         version: 0.4.0(zod@4.4.3)
       '@openai/codex':
         specifier: 'catalog:'
-        version: 0.142.3
+        version: 0.142.4
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -2650,43 +2650,43 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@openai/codex@0.142.3':
-    resolution: {integrity: sha512-uOS7gTFHtN6cQGILd18hc+mMSqf9tXEZpKV4n4SqyEmPlomNtUpKFpTvYtzIqnRLG1hrZROP2Z8sL+o+PNJrxg==}
+  '@openai/codex@0.142.4':
+    resolution: {integrity: sha512-BW9+3Cs7tChgkc0QhUsZIDm6XgpSDSeJkljRSHhJZqDwlaxDnNVhRP/sZwhgrTn3f2jPn3jc4WTKfLOTk+g5pA==}
     engines: {node: '>=16'}
     hasBin: true
 
-  '@openai/codex@0.142.3-darwin-arm64':
-    resolution: {integrity: sha512-/ctHm6s2vpUuFY0D212BbzretO0hi1FqUioD1eUoK/qcfG4nhVl3710m5GdtadYQLJbNmdXFfAWrBIQbG/aB0A==}
+  '@openai/codex@0.142.4-darwin-arm64':
+    resolution: {integrity: sha512-CfXp5jilBOxD8zLuG6Nk7w5ZPP3roE3s1rsr60za9PQKI7kaJ/5G+oP3Z0N1CoB4mpy+5JHkMLTZAZZPGFlSgQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
 
-  '@openai/codex@0.142.3-darwin-x64':
-    resolution: {integrity: sha512-TVBDgkcAmQtTM2atJYeJpGjOOCerczZcwFOUF9aOQVTmMxgz4E0tuR2jqcR648FAtE81r5iNh2EGFN+Fte8ayA==}
+  '@openai/codex@0.142.4-darwin-x64':
+    resolution: {integrity: sha512-H9ia31pkJFtBk+UrREAfJiTUfcvgactKbG4W4SF2LFfJOTRsrsJZGtscHQ8/lLGeKEfOk/psrbSOPDyrZnxvnQ==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [darwin]
 
-  '@openai/codex@0.142.3-linux-arm64':
-    resolution: {integrity: sha512-eB4gtmnwMJSt07YP1Xl19U0zqH4aDcZNC3w9dkzMxbn0NJrkAmH8uB8KLSmVez7C/28QP8E9aaNy+EeZQfaxVA==}
+  '@openai/codex@0.142.4-linux-arm64':
+    resolution: {integrity: sha512-/bBcEm+OKmlGHH0c88jrVgYMRyaNC/hGOW/znP/PiHQEeIf4UdsUGQ7x4FAZm648140cgaeKYIBoRBbHizS+5w==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
-  '@openai/codex@0.142.3-linux-x64':
-    resolution: {integrity: sha512-EQ5svml7q8lVm9vyCGYyR83OgkF995xSrlLq5IwgIT1t+TGhmLajo0mHjmQTahIW8gSmGMsRZTTI+p5FjRPrVA==}
+  '@openai/codex@0.142.4-linux-x64':
+    resolution: {integrity: sha512-t3tNOkDdiO5/gRqkTmuMcAj5JjCbeWotOJzxV7pPkD2u2KvzVRrk7jPAjuy+85wPc12lsIupYgxHlK7CkVLOjA==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [linux]
 
-  '@openai/codex@0.142.3-win32-arm64':
-    resolution: {integrity: sha512-An0/fDUanbMFXRWD27gKgLM0aYIztrlHdNrLX6SDWXOkoj8dxOCfW1Y/6ToZNI7TxxLQMN2CYXLKW3y+hI9MIQ==}
+  '@openai/codex@0.142.4-win32-arm64':
+    resolution: {integrity: sha512-QBGeoYk3pmVscVIxeW21cvPJIjsnmD5dOTqMAzypXGik5soNIKHbps2Kj1LBKOjVbbx5qoDEbTwDfYmnjfqgdQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [win32]
 
-  '@openai/codex@0.142.3-win32-x64':
-    resolution: {integrity: sha512-Oj9QroSPpvHG5sD84alPBd3J/MLtnumm/01n+xbglXtph24pLLyONLp2SAB4tARJzROlZ1Vf3WsrNpcU1iGXWA==}
+  '@openai/codex@0.142.4-win32-x64':
+    resolution: {integrity: sha512-W0rSPT0t7FnKlJYNu9/HpHzaSOutuSSYjIVunKorYmrScXk9pQxBEhEuyn16JOtywc/2nX8nHEmWsuj2sd8suw==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -5078,9 +5078,6 @@ packages:
 
   '@types/esrecurse@4.3.1':
     resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
-
-  '@types/estree@1.0.8':
-    resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
@@ -9918,7 +9915,7 @@ snapshots:
 
   '@apm-js-collab/code-transformer@0.15.0':
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       astring: 1.9.0
       esquery: 1.7.0
       meriyah: 6.1.4
@@ -11907,31 +11904,31 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@openai/codex@0.142.3':
+  '@openai/codex@0.142.4':
     optionalDependencies:
-      '@openai/codex-darwin-arm64': '@openai/codex@0.142.3-darwin-arm64'
-      '@openai/codex-darwin-x64': '@openai/codex@0.142.3-darwin-x64'
-      '@openai/codex-linux-arm64': '@openai/codex@0.142.3-linux-arm64'
-      '@openai/codex-linux-x64': '@openai/codex@0.142.3-linux-x64'
-      '@openai/codex-win32-arm64': '@openai/codex@0.142.3-win32-arm64'
-      '@openai/codex-win32-x64': '@openai/codex@0.142.3-win32-x64'
+      '@openai/codex-darwin-arm64': '@openai/codex@0.142.4-darwin-arm64'
+      '@openai/codex-darwin-x64': '@openai/codex@0.142.4-darwin-x64'
+      '@openai/codex-linux-arm64': '@openai/codex@0.142.4-linux-arm64'
+      '@openai/codex-linux-x64': '@openai/codex@0.142.4-linux-x64'
+      '@openai/codex-win32-arm64': '@openai/codex@0.142.4-win32-arm64'
+      '@openai/codex-win32-x64': '@openai/codex@0.142.4-win32-x64'
 
-  '@openai/codex@0.142.3-darwin-arm64':
+  '@openai/codex@0.142.4-darwin-arm64':
     optional: true
 
-  '@openai/codex@0.142.3-darwin-x64':
+  '@openai/codex@0.142.4-darwin-x64':
     optional: true
 
-  '@openai/codex@0.142.3-linux-arm64':
+  '@openai/codex@0.142.4-linux-arm64':
     optional: true
 
-  '@openai/codex@0.142.3-linux-x64':
+  '@openai/codex@0.142.4-linux-x64':
     optional: true
 
-  '@openai/codex@0.142.3-win32-arm64':
+  '@openai/codex@0.142.4-win32-arm64':
     optional: true
 
-  '@openai/codex@0.142.3-win32-x64':
+  '@openai/codex@0.142.4-win32-x64':
     optional: true
 
   '@opentelemetry/api-logs@0.208.0':
@@ -13763,7 +13760,7 @@ snapshots:
 
   '@rollup/pluginutils@5.3.0(rollup@4.62.2)':
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       estree-walker: 2.0.2
       picomatch: 4.0.4
     optionalDependencies:
@@ -14575,8 +14572,6 @@ snapshots:
   '@types/emscripten@1.41.5': {}
 
   '@types/esrecurse@4.3.1': {}
-
-  '@types/estree@1.0.8': {}
 
   '@types/estree@1.0.9': {}
 
@@ -16157,7 +16152,7 @@ snapshots:
   eslint-scope@9.1.2:
     dependencies:
       '@types/esrecurse': 4.3.1
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       esrecurse: 4.3.0
       estraverse: 5.3.0
 
@@ -16180,7 +16175,7 @@ snapshots:
       '@humanfs/node': 0.16.7
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.3
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       ajv: 6.15.0
       chalk: 4.1.2
       cross-spawn: 7.0.6
@@ -16233,7 +16228,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
 
   esutils@2.0.3: {}
 
