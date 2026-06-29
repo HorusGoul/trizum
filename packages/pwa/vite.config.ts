@@ -4,10 +4,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { getConfig as getLinguiConfig } from "@lingui/conf";
+import type { PluginItem } from "@babel/core";
 import type { Plugin } from "vite-plus";
 import { configDefaults, defineConfig, perEnvironmentPlugin } from "vite-plus";
 import react from "@vitejs/plugin-react";
-import babel from "@rolldown/plugin-babel";
+import babel, { defineRolldownBabelPreset } from "@rolldown/plugin-babel";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
@@ -34,9 +35,13 @@ const linguiConfig = getLinguiConfig({
 });
 const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
 const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
-const reactCompilerPreset = {
+const reactCompilerBabelPluginItem = [
+  reactCompilerBabelPlugin,
+  ReactCompilerConfig,
+] satisfies PluginItem;
+const reactCompilerPreset = defineRolldownBabelPreset({
   preset: () => ({
-    plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
+    plugins: [reactCompilerBabelPluginItem],
   }),
   rolldown: {
     filter: { code: /\b[A-Z]|\buse/ },
@@ -46,7 +51,7 @@ const reactCompilerPreset = {
       include: ["react/compiler-runtime"],
     },
   },
-};
+});
 
 // Read package.json version
 const packageJson = JSON.parse(
