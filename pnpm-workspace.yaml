@@ -45,7 +45,7 @@ catalog:
   "@horus.dev/tw-dynamic-themes": 0.0.3
   "@internationalized/date": 3.10.0
   "@kubiks/otel-drizzle": 2.1.0
-  "@libsql/client": 0.15.15
+  "@libsql/client": 0.17.4
   "@lingui/babel-plugin-lingui-macro": 5.9.5
   "@lingui/cli": 5.9.5
   "@lingui/conf": 5.9.5
@@ -86,7 +86,7 @@ catalog:
   clsx: 2.1.1
   comctx: 1.7.5
   dinero.js: 1.9.1
-  drizzle-kit: 0.31.7
+  drizzle-kit: 0.31.10
   drizzle-orm: 0.45.2
   emojibase: 17.0.0
   emojibase-data: 17.0.0
