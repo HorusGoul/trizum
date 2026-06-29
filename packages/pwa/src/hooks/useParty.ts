@@ -23,6 +23,13 @@ import { appWorker } from "#src/lib/appWorker/client.ts";
 
 const logger = getLogger("hooks", "useParty");
 
+interface PartyBalanceRecalculationState {
+  promise?: Promise<boolean>;
+  shouldRecalculateAgain: boolean;
+}
+
+const partyBalanceRecalculationStates = new Map<Party["id"], PartyBalanceRecalculationState>();
+
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
   const [party, handle] = useSuspenseDocument<Party>(partyId, {
@@ -97,36 +104,12 @@ export function useCurrentParty() {
 }
 
 export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
-  let isRecalculatingBalances = false;
-  let shouldRecalculateBalancesAgain = false;
-
   async function recalculateBalances() {
-    return appWorker.recalculateBalances(handle.documentId);
+    return recalculatePartyBalances(handle.documentId);
   }
 
   function scheduleRecalculateBalances() {
-    if (isRecalculatingBalances) {
-      shouldRecalculateBalancesAgain = true;
-      return;
-    }
-
-    isRecalculatingBalances = true;
-    void runScheduledBalanceRecalculations();
-  }
-
-  async function runScheduledBalanceRecalculations() {
-    try {
-      shouldRecalculateBalancesAgain = false;
-      await recalculateBalances();
-
-      if (shouldRecalculateBalancesAgain) {
-        await runScheduledBalanceRecalculations();
-      }
-    } catch {
-      shouldRecalculateBalancesAgain = false;
-    } finally {
-      isRecalculatingBalances = false;
-    }
+    void recalculateBalances();
   }
 
   function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
@@ -440,4 +423,57 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     removeExpense,
     recalculateBalances,
   };
+}
+
+function recalculatePartyBalances(partyId: Party["id"]) {
+  const state = getPartyBalanceRecalculationState(partyId);
+  state.shouldRecalculateAgain = true;
+  state.promise ??= runQueuedPartyBalanceRecalculations(partyId, state);
+
+  return state.promise;
+}
+
+function getPartyBalanceRecalculationState(partyId: Party["id"]) {
+  let state = partyBalanceRecalculationStates.get(partyId);
+
+  if (!state) {
+    state = {
+      shouldRecalculateAgain: false,
+    };
+    partyBalanceRecalculationStates.set(partyId, state);
+  }
+
+  return state;
+}
+
+function runQueuedPartyBalanceRecalculations(
+  partyId: Party["id"],
+  state: PartyBalanceRecalculationState,
+) {
+  return runNextPartyBalanceRecalculation(partyId, state)
+    .catch(() => {
+      state.shouldRecalculateAgain = false;
+      return false;
+    })
+    .finally(() => {
+      state.promise = undefined;
+
+      if (!state.shouldRecalculateAgain) {
+        partyBalanceRecalculationStates.delete(partyId);
+      }
+    });
+}
+
+async function runNextPartyBalanceRecalculation(
+  partyId: Party["id"],
+  state: PartyBalanceRecalculationState,
+): Promise<boolean> {
+  if (!state.shouldRecalculateAgain) {
+    return true;
+  }
+
+  state.shouldRecalculateAgain = false;
+  await appWorker.recalculateBalances(partyId);
+
+  return runNextPartyBalanceRecalculation(partyId, state);
 }

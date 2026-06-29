@@ -46,6 +46,34 @@ describe("getPartyHelpers", () => {
     expect(appWorkerMock.recalculateBalances).toHaveBeenCalledTimes(2);
     expect(appWorkerMock.recalculateBalances).toHaveBeenLastCalledWith(partyHandle.documentId);
   });
+
+  test("shares scheduled balance recalculation state between helper instances", async () => {
+    const firstRecalculation = createDeferred<boolean>();
+    const { helpers, partyHandle, repo } = createPartyHelpers();
+    const secondHelpers = getPartyHelpers(repo, partyHandle);
+
+    appWorkerMock.recalculateBalances
+      .mockReturnValueOnce(firstRecalculation.promise)
+      .mockResolvedValue(true);
+
+    const expense = await helpers.addExpenseToParty(createExpenseInput());
+
+    expect(appWorkerMock.recalculateBalances).toHaveBeenCalledOnce();
+    expect(appWorkerMock.recalculateBalances).toHaveBeenCalledWith(partyHandle.documentId);
+
+    await secondHelpers.updateExpense({
+      ...expense,
+      name: "Updated from another helper",
+    });
+
+    expect(appWorkerMock.recalculateBalances).toHaveBeenCalledOnce();
+
+    firstRecalculation.resolve(true);
+    await flushPromises();
+
+    expect(appWorkerMock.recalculateBalances).toHaveBeenCalledTimes(2);
+    expect(appWorkerMock.recalculateBalances).toHaveBeenLastCalledWith(partyHandle.documentId);
+  });
 });
 
 function createPartyHelpers() {
@@ -61,6 +89,7 @@ function createPartyHelpers() {
   return {
     helpers: getPartyHelpers(repo, partyHandle),
     partyHandle,
+    repo,
   };
 }
 
