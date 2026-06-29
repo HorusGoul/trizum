@@ -4,7 +4,7 @@ import { ExpensePage } from "./pages/expense.page";
 import { HomePage } from "./pages/home.page";
 import { JoinTrizumPage } from "./pages/join-trizum.page";
 import { NewTrizumPage } from "./pages/new-trizum.page";
-import { PartyPage } from "./pages/party.page";
+import { PartyPage, balanceCalculationTimeout } from "./pages/party.page";
 import { PayPage } from "./pages/pay.page";
 import { WhoAreYouPage } from "./pages/who-are-you.page";
 import {
@@ -222,9 +222,15 @@ test.describe("Browser harness", () => {
 
     await page.getByRole("tab", { name: "Balances" }).click();
 
-    await expect(page.getByRole("heading", { name: "How should I balance?" })).toBeVisible();
-    await expect(page.getByText("You owe money to people")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Pay" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "How should I balance?" })).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
+    await expect(page.getByText("You owe money to people")).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
+    await expect(page.getByRole("button", { name: "Pay" })).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
   });
 
   test("can settle a balance from the balances tab", async ({ harness, page }) => {
