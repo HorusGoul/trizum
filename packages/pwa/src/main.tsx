@@ -34,7 +34,7 @@ import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
 import { configurePwaLogging, getLogger } from "./lib/log.ts";
-import { initializeAppWorker } from "./lib/appWorker/client.ts";
+import { appWorker, initializeAppWorker } from "./lib/appWorker/client.ts";
 import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "./lib/automergeSyncConfig.ts";
 import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
 import {
@@ -42,6 +42,7 @@ import {
   pushHistoryWithoutDuplicateEntry,
 } from "./lib/navigationHistory.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
+import type { Party } from "./models/party.ts";
 import {
   readPartyListState,
   seedPartyListState,
@@ -131,6 +132,7 @@ declare global {
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
     __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
+    __internal_recalculatePartyBalances: (partyId: Party["id"]) => Promise<boolean>;
   }
 }
 
@@ -154,6 +156,10 @@ window.__internal_readPartyListState = async () => {
   return readPartyListState({
     repo,
   });
+};
+
+window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
+  return appWorker.recalculateBalances(partyId);
 };
 
 // Create a new router instance

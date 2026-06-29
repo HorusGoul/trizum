@@ -87,11 +87,13 @@ test.describe("Debt transfer", () => {
       await expect(page).toHaveURL(
         new RegExp(`/party/${originParty.partyId}\\?tab=balances(?:&.*)?$`),
       );
+      await harness.recalculatePartyBalances(originParty.partyId);
       await originPartyPage.expectSettlementActionRemoved(originAction);
       await originPartyPage.expectFullySettled();
     });
 
     await test.step("show the transferred debt as a new balance action in the destination party", async () => {
+      await harness.recalculatePartyBalances(destinationParty.partyId);
       await harness.navigate(`/party/${destinationParty.partyId}?tab=balances`);
       await destinationPartyPage.expectLoaded(
         destinationParty.partyId,

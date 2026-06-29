@@ -269,6 +269,7 @@ test.describe("Browser harness", () => {
       await expect(page).toHaveURL(
         new RegExp(`/party/${seededParty.partyId}\\?tab=balances(?:&.*)?$`),
       );
+      await harness.recalculatePartyBalances(seededParty.partyId);
       await partyPage.expectSettlementActionRemoved(action);
       await partyPage.expectFullySettled();
     });
