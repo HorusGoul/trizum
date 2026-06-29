@@ -245,8 +245,8 @@ catalogs:
       specifier: 6.2.3
       version: 6.2.3
     lucide-static:
-      specifier: 1.8.0
-      version: 1.8.0
+      specifier: 1.22.0
+      version: 1.22.0
     mathjs:
       specifier: 15.1.0
       version: 15.1.0
@@ -789,7 +789,7 @@ importers:
         version: 1.0.0
       lucide-static:
         specifier: 'catalog:'
-        version: 1.8.0
+        version: 1.22.0
       postcss:
         specifier: 'catalog:'
         version: 8.5.6
@@ -8116,8 +8116,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  lucide-static@1.8.0:
-    resolution: {integrity: sha512-eQJCJuDg3tyQrjP0PwD5eIA4ePd5CMdxkrfyqk3iUQA4VOtsJ0v5T6IBJ5UyR3SYHzUn8HOAEL+I+SLVnOJNIA==}
+  lucide-static@1.22.0:
+    resolution: {integrity: sha512-xJ1V0cJLZtgnyoD7Cqvj8B48se3JI/YcC2XyNQ9sVoK7eb74JdYL9rHuWJiPGYo6dcj8K/Yrx74XrjJAA3t/Dw==}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -17933,7 +17933,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lucide-static@1.8.0: {}
+  lucide-static@1.22.0: {}
 
   lz-string@1.5.0: {}
 
