@@ -98,8 +98,8 @@ catalog:
   hono: 4.12.27
   jose: 6.2.3
   lucide-static: 1.22.0
-  mathjs: 15.1.0
-  motion: 12.38.0
+  mathjs: 15.2.0
+  motion: 12.42.0
   oxlint-plugin-react-doctor: 0.5.8
   playwright: 1.60.0
   postcss: 8.5.6
