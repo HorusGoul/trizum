@@ -34,7 +34,7 @@ catalog:
   "@capawesome/capacitor-google-sign-in": 0.1.2
   "@capawesome/capver": 0.1.4
   "@changesets/changelog-github": 0.7.0
-  "@changesets/cli": 2.29.8
+  "@changesets/cli": 2.31.0
   "@cloudflare/vite-plugin": 1.29.0
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
