@@ -1,5 +1,4 @@
 import { defineProxy } from "comctx";
-import type { PartyBalanceHeadsResult } from "#src/lib/partyBalanceHeads.ts";
 import type { Party } from "#src/models/party.ts";
 
 export interface AppWorkerInitializeOptions {
@@ -10,7 +9,7 @@ export interface AppWorkerInitializeOptions {
 
 export interface AppWorkerApi {
   initialize(options: AppWorkerInitializeOptions): Promise<void>;
-  recalculateBalances(partyId: Party["id"]): Promise<PartyBalanceHeadsResult>;
+  recalculateBalances(partyId: Party["id"]): Promise<boolean>;
 }
 
 const proxyOptions = {

@@ -1,16 +1,11 @@
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { Repo } from "@automerge/automerge-repo";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
-import type { PartyBalanceHeadsResult } from "#src/lib/partyBalanceHeads.ts";
 import type { Expense } from "#src/models/expense.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 
-const recalculationResult: PartyBalanceHeadsResult = {
-  balanceHeadsById: {},
-};
-
 const appWorkerMock = vi.hoisted(() => ({
-  recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<PartyBalanceHeadsResult>>(),
+  recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<boolean>>(),
 }));
 
 vi.mock("#src/lib/appWorker/client.ts", () => ({
@@ -25,12 +20,12 @@ describe("getPartyHelpers", () => {
   });
 
   test("schedules balance recalculation after expense mutations", async () => {
-    const firstRecalculation = createDeferred<PartyBalanceHeadsResult>();
+    const firstRecalculation = createDeferred<boolean>();
     const { helpers, partyHandle } = createPartyHelpers();
 
     appWorkerMock.recalculateBalances
       .mockReturnValueOnce(firstRecalculation.promise)
-      .mockResolvedValue(recalculationResult);
+      .mockResolvedValue(true);
 
     const expense = await helpers.addExpenseToParty(createExpenseInput());
 
@@ -45,7 +40,7 @@ describe("getPartyHelpers", () => {
 
     expect(appWorkerMock.recalculateBalances).toHaveBeenCalledOnce();
 
-    firstRecalculation.resolve(recalculationResult);
+    firstRecalculation.resolve(true);
     await flushPromises();
 
     expect(appWorkerMock.recalculateBalances).toHaveBeenCalledTimes(2);

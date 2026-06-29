@@ -1,5 +1,4 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
-import { readPartyBalanceHeads } from "#src/lib/partyBalanceHeads.ts";
 import { recalculatePartyBalances } from "#src/lib/recalculatePartyBalances.ts";
 import type { Party } from "#src/models/party.ts";
 import { createAppWorkerRepo } from "./createAppWorkerRepo.ts";
@@ -23,9 +22,7 @@ export class AppWorkerService implements AppWorkerApi {
 
     await repo.networkSubsystem.whenReady();
 
-    await recalculatePartyBalances(repo, partyId);
-
-    return readPartyBalanceHeads(repo, partyId);
+    return recalculatePartyBalances(repo, partyId);
   }
 
   private requireRepo() {

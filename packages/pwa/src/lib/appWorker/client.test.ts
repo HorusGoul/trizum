@@ -1,16 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Repo } from "@automerge/automerge-repo/slim";
-import type { PartyBalanceHeadsResult } from "#src/lib/partyBalanceHeads.ts";
 import type { Party } from "#src/models/party.ts";
 import type { AppWorkerInitializeOptions } from "./proxy.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
-type RecalculateBalances = (partyId: Party["id"]) => Promise<PartyBalanceHeadsResult>;
+type RecalculateBalances = (partyId: Party["id"]) => Promise<boolean>;
 type DispatchEvent = (event: Event) => boolean;
-
-const recalculationResult: PartyBalanceHeadsResult = {
-  balanceHeadsById: {},
-};
 
 const proxyMock = vi.hoisted(() => {
   const workerApis: unknown[] = [];
@@ -96,7 +91,7 @@ describe("app worker client", () => {
       isOfflineOnly: false,
     });
 
-    await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(recalculationResult);
+    await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(secondApi.initialize).toHaveBeenCalledWith(
@@ -148,7 +143,7 @@ describe("app worker client", () => {
       }),
     ).rejects.toThrow("worker init failed");
 
-    await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(recalculationResult);
+    await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).not.toHaveBeenCalled();
     expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(TestWorker.instances).toHaveLength(2);
@@ -208,7 +203,7 @@ describe("app worker client", () => {
 
 function createWorkerApiMock({
   initialize = () => Promise.resolve(),
-  recalculateBalances = () => Promise.resolve(recalculationResult),
+  recalculateBalances = () => Promise.resolve(true),
 }: {
   initialize?: InitializeWorker;
   recalculateBalances?: RecalculateBalances;
