@@ -159,12 +159,12 @@ describe("Renovate PR review workflow", () => {
     ].join("\n");
     const localValidation = {
       commands: [
-        { command: "vp install --frozen-lockfile --ignore-scripts --prefer-offline", exitCode: 0 },
-        { command: "vp run check", exitCode: 0 },
-        { command: "vp run test", exitCode: 0 },
-        { command: "vp run build", exitCode: 1 },
+        { command: "vp install --frozen-lockfile", exitCode: 0 },
+        { command: "vp run --no-cache check", exitCode: 0 },
+        { command: "vp run --no-cache test", exitCode: 0 },
+        { command: "vp run --no-cache build", exitCode: 1 },
       ],
-      failedCommand: "vp run build",
+      failedCommand: "vp run --no-cache build",
       failedExitCode: 1,
       failureSummary:
         "Could not find 'bundler' (2.7.2) required by packages/mobile/ios/App/Gemfile.lock.",
@@ -185,18 +185,19 @@ describe("Renovate PR review workflow", () => {
       ],
     );
 
-    expect(body).toContain("## Why This PR Exists");
+    expect(body).toContain("## Why");
     expect(body).toContain(
       "tracked Capacitor native files still reference removed pnpm package paths",
     );
     expect(body).toContain("iOS Podfile and Podfile.lock still pin old Capacitor package paths");
-    expect(body).toContain("## What Changed");
-    expect(body).toContain("- Dependency update: @capacitor/android 8.0.1 -> 8.4.1");
+    expect(body).toContain("## What");
+    expect(body).toContain("- Updates: @capacitor/android 8.0.1 -> 8.4.1");
     expect(body).toContain("and 1 more");
-    expect(body).toContain("- Agent fix: Applied the agent-generated fix");
+    expect(body).toContain("- Fix: Applied the agent-generated fix");
     expect(body).toContain("`packages/mobile/ios/App/Podfile.lock`");
-    expect(body).toContain("- [fail] `vp run build` (exit 1)");
-    expect(body).toContain("- Failed command: `vp run build` (exit 1).");
+    expect(body).toContain("## How");
+    expect(body).toContain("- [fail] `vp run --no-cache build` (exit 1)");
+    expect(body).toContain("- Failed command: `vp run --no-cache build` (exit 1).");
     expect(body).toContain("Could not find 'bundler' (2.7.2)");
   });
 });
