@@ -20,15 +20,14 @@ import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
+import { createKeyedCoalescedQueue } from "#src/lib/coalescedQueue.ts";
 
 const logger = getLogger("hooks", "useParty");
 
-interface PartyBalanceRecalculationState {
-  promise?: Promise<boolean>;
-  shouldRecalculateAgain: boolean;
-}
-
-const partyBalanceRecalculationStates = new Map<Party["id"], PartyBalanceRecalculationState>();
+const recalculatePartyBalances = createKeyedCoalescedQueue<Party["id"], boolean>({
+  run: (partyId) => appWorker.recalculateBalances(partyId),
+  recover: () => false,
+});
 
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
@@ -423,57 +422,4 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     removeExpense,
     recalculateBalances,
   };
-}
-
-function recalculatePartyBalances(partyId: Party["id"]) {
-  const state = getPartyBalanceRecalculationState(partyId);
-  state.shouldRecalculateAgain = true;
-  state.promise ??= runQueuedPartyBalanceRecalculations(partyId, state);
-
-  return state.promise;
-}
-
-function getPartyBalanceRecalculationState(partyId: Party["id"]) {
-  let state = partyBalanceRecalculationStates.get(partyId);
-
-  if (!state) {
-    state = {
-      shouldRecalculateAgain: false,
-    };
-    partyBalanceRecalculationStates.set(partyId, state);
-  }
-
-  return state;
-}
-
-function runQueuedPartyBalanceRecalculations(
-  partyId: Party["id"],
-  state: PartyBalanceRecalculationState,
-) {
-  return runNextPartyBalanceRecalculation(partyId, state)
-    .catch(() => {
-      state.shouldRecalculateAgain = false;
-      return false;
-    })
-    .finally(() => {
-      state.promise = undefined;
-
-      if (!state.shouldRecalculateAgain) {
-        partyBalanceRecalculationStates.delete(partyId);
-      }
-    });
-}
-
-async function runNextPartyBalanceRecalculation(
-  partyId: Party["id"],
-  state: PartyBalanceRecalculationState,
-): Promise<boolean> {
-  if (!state.shouldRecalculateAgain) {
-    return true;
-  }
-
-  state.shouldRecalculateAgain = false;
-  await appWorker.recalculateBalances(partyId);
-
-  return runNextPartyBalanceRecalculation(partyId, state);
 }
