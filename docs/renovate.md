@@ -34,11 +34,15 @@ follow-up push.
 `gitIgnoredAuthors` so Renovate keeps managing branches after the workflow adds
 its lockfile commit.
 
-Renovate groups patch and minor dependency updates into one PR to keep update
-volume manageable. Most major updates stay independent, but tightly coupled
-dependency families still have major grouping rules so packages that need to
-move together are reviewed together. `react` and `react-dom` updates are
-disabled because the app uses experimental builds that are managed manually.
+Renovate groups automergeable patch and minor dependency updates into one PR to
+keep update volume manageable. TypeScript and current 0.x patch/minor updates
+are grouped separately for manual review so they do not block automerge for
+unrelated dependencies.
+
+Most major updates stay independent, but tightly coupled dependency families
+still have major grouping rules so packages that need to move together are
+reviewed together. `react` and `react-dom` updates are disabled because the app
+uses experimental builds that are managed manually.
 
 ## Automerge
 
