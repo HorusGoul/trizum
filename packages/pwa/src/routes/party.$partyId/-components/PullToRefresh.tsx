@@ -166,6 +166,10 @@ export function PullToRefresh({
       return;
     }
 
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
     setPullDistance(Math.min(yDistance * 0.55, maxPullDistance));
   }
 
@@ -195,7 +199,8 @@ export function PullToRefresh({
     }
 
     root.addEventListener("touchstart", onTouchStart, { passive: true });
-    root.addEventListener("touchmove", onTouchMove, { passive: true });
+    // eslint-disable-next-line react-doctor/client-passive-event-listeners -- Pull-to-refresh must cancel top-edge rubber-band overscroll after the vertical pull gesture is recognized.
+    root.addEventListener("touchmove", onTouchMove, { passive: false });
     root.addEventListener("touchend", onTouchEnd, { passive: true });
     root.addEventListener("touchcancel", onTouchCancel, { passive: true });
 
