@@ -20,6 +20,7 @@ import { useParams } from "@tanstack/react-router";
 import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
+import { waitForPartyBalanceHeads } from "#src/lib/partyBalanceHeads.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -101,7 +102,10 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   let shouldRecalculateBalancesAgain = false;
 
   async function recalculateBalances() {
-    return appWorker.recalculateBalances(handle.documentId);
+    const result = await appWorker.recalculateBalances(handle.documentId);
+    await waitForPartyBalanceHeads(repo, result.balanceHeadsById);
+
+    return true;
   }
 
   function scheduleRecalculateBalances() {

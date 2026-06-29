@@ -37,6 +37,7 @@ import { configurePwaLogging, getLogger } from "./lib/log.ts";
 import { appWorker, initializeAppWorker } from "./lib/appWorker/client.ts";
 import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "./lib/automergeSyncConfig.ts";
 import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
+import { waitForPartyBalanceHeads } from "./lib/partyBalanceHeads.ts";
 import {
   preventDuplicateHistoryEntries,
   pushHistoryWithoutDuplicateEntry,
@@ -159,7 +160,10 @@ window.__internal_readPartyListState = async () => {
 };
 
 window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
-  return appWorker.recalculateBalances(partyId);
+  const result = await appWorker.recalculateBalances(partyId);
+  await waitForPartyBalanceHeads(repo, result.balanceHeadsById);
+
+  return true;
 };
 
 // Create a new router instance
