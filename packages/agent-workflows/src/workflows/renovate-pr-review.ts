@@ -33,6 +33,7 @@ import {
   runCommand,
   splitLines,
   truncateText,
+  type CommandResult,
 } from "../adapters/exec.js";
 import {
   runSandcastleCodexFix,
@@ -63,9 +64,27 @@ const MAX_DEPENDENCY_METADATA = 12;
 const BOT_COMMIT_CO_AUTHOR = "Horus Lugo <horusgoul@gmail.com>";
 const BOT_COMMIT_CO_AUTHOR_TRAILER = `Co-authored-by: ${BOT_COMMIT_CO_AUTHOR}`;
 
-interface LocalValidationResult {
+export interface LocalValidationCommandResult {
+  command: string;
+  exitCode: number;
+}
+
+export interface LocalValidationResult {
+  commands: LocalValidationCommandResult[];
+  failedCommand?: string;
+  failedExitCode?: number;
+  failureSummary?: string;
   output: string;
   passed: boolean;
+}
+
+export interface SupersedingPullRequestCandidate {
+  baseRefName: string;
+  body: string;
+  headRefName: string;
+  number: number;
+  title: string;
+  url: string;
 }
 
 const ORIGINAL_PR_DIRECT_UPDATE_FILES = new Set(["pnpm-lock.yaml", "pnpm-workspace.yaml"]);
@@ -714,12 +733,84 @@ async function commentOnPullRequest(
   );
 }
 
+async function findExistingSupersedingPullRequest(
+  options: WorkflowOptions,
+  context: PullRequestContext,
+): Promise<SupersedingPullRequestCandidate | undefined> {
+  const candidates = await ghJson<SupersedingPullRequestCandidate[]>(
+    options,
+    "pr",
+    "list",
+    "--state",
+    "open",
+    "--limit",
+    "100",
+    "--json",
+    "baseRefName,body,headRefName,number,title,url",
+  );
+
+  return selectExistingSupersedingPullRequest(
+    candidates,
+    context.pr.number,
+    context.pr.baseRefName,
+  );
+}
+
+export function selectExistingSupersedingPullRequest(
+  candidates: readonly SupersedingPullRequestCandidate[],
+  originalPrNumber: number,
+  baseRefName: string,
+): SupersedingPullRequestCandidate | undefined {
+  const matches = candidates.filter(
+    (candidate) =>
+      candidate.number !== originalPrNumber &&
+      candidate.baseRefName === baseRefName &&
+      hasSupersedesMarker(candidate.body, originalPrNumber),
+  );
+
+  return matches.sort((left, right) => left.number - right.number)[0];
+}
+
+function hasSupersedesMarker(body: string, originalPrNumber: number): boolean {
+  const marker = `Supersedes #${originalPrNumber}`;
+  return splitLines(body).some((line) => {
+    const normalizedLine = line.trim().replace(/\.$/, "");
+    return normalizedLine === marker;
+  });
+}
+
+function renderExistingSupersedingPullRequestSummary(
+  context: PullRequestContext,
+  existingPullRequest: SupersedingPullRequestCandidate,
+): string {
+  return [
+    `Reused existing superseding PR #${existingPullRequest.number} for Renovate PR #${context.pr.number}.`,
+    `Existing PR: ${existingPullRequest.url}`,
+    "Skipped creating another agent branch for the same original PR.",
+  ].join("\n");
+}
+
 async function createSupersedingPullRequest(
   options: WorkflowOptions,
   context: PullRequestContext,
   report: string,
 ): Promise<SupersedingPullRequest> {
   await ensureReadyLabel(options);
+
+  const existingSupersedingPullRequest = await findExistingSupersedingPullRequest(options, context);
+  if (existingSupersedingPullRequest != null) {
+    await addLabelToIssue(
+      options,
+      existingSupersedingPullRequest.number,
+      options.readyForHumanReviewLabel,
+    );
+
+    return {
+      branchName: existingSupersedingPullRequest.headRefName,
+      prUrl: existingSupersedingPullRequest.url,
+      summary: renderExistingSupersedingPullRequestSummary(context, existingSupersedingPullRequest),
+    };
+  }
 
   const branchName = `agent/renovate-pr-${context.pr.number}-${Date.now()}`;
   let worktreeRoot: string | undefined;
@@ -755,6 +846,7 @@ async function createSupersedingPullRequest(
     const localValidation = options.runLocalValidation
       ? await runLocalValidation(worktreeRoot)
       : {
+          commands: [],
           output: "Local validation skipped by workflow option.",
           passed: true,
         };
@@ -783,6 +875,7 @@ async function createSupersedingPullRequest(
             report,
             sandcastleSummary,
             localValidation,
+            changedFiles,
           ),
         );
       }
@@ -813,6 +906,7 @@ async function createSupersedingPullRequest(
       report,
       sandcastleSummary,
       localValidation,
+      changedFiles,
     );
     await writeFile(bodyPath, body, "utf8");
     const createResult = await gh(
@@ -918,6 +1012,10 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
     GIT_TERMINAL_PROMPT: "0",
   };
   const output: string[] = [];
+  const commandResults: LocalValidationCommandResult[] = [];
+  let failedCommand: string | undefined;
+  let failedExitCode: number | undefined;
+  let failureSummary: string | undefined;
   let passed = true;
 
   try {
@@ -939,8 +1037,15 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
           .filter(Boolean)
           .join("\n"),
       );
+      commandResults.push({
+        command: result.command,
+        exitCode: result.exitCode,
+      });
       if (result.exitCode !== 0) {
         passed = false;
+        failedCommand = result.command;
+        failedExitCode = result.exitCode;
+        failureSummary = summarizeCommandFailure(result);
         break;
       }
     }
@@ -949,9 +1054,37 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
   }
 
   return {
+    commands: commandResults,
+    ...(failedCommand == null ? {} : { failedCommand }),
+    ...(failedExitCode == null ? {} : { failedExitCode }),
+    ...(failureSummary == null ? {} : { failureSummary }),
     output: output.join("\n\n"),
     passed,
   };
+}
+
+function summarizeCommandFailure(result: CommandResult): string {
+  const combinedOutput = stripAnsiCodes(redactSecrets([result.stderr, result.stdout].join("\n")));
+  const lines = splitLines(combinedOutput)
+    .map((line) => line.trimEnd())
+    .filter((line) => line.trim().length > 0);
+  const errorLines = lines.filter((line) =>
+    /error|failed|could not|not found|missing|exception/i.test(line),
+  );
+  const summaryLines = (errorLines.length === 0 ? lines.slice(-12) : errorLines.slice(-12)).map(
+    (line) => truncateText(line, 500),
+  );
+
+  if (summaryLines.length === 0) {
+    return `Command exited with status ${result.exitCode} without producing output.`;
+  }
+
+  return truncateText(summaryLines.join("\n"), 1_400);
+}
+
+function stripAnsiCodes(value: string): string {
+  const escape = String.fromCharCode(27);
+  return value.replace(new RegExp(`${escape}\\[[0-?]*[ -/]*[@-~]`, "g"), "");
 }
 
 async function hideCodexAuthCache(): Promise<{ restore: () => Promise<void> }> {
@@ -1194,11 +1327,12 @@ function renderReviewComment(decision: ReviewDecision): string {
   );
 }
 
-function renderSupersedingPullRequestBody(
+export function renderSupersedingPullRequestBody(
   context: PullRequestContext,
   report: string,
   agentSummary: string,
   localValidation: LocalValidationResult,
+  changedFiles: readonly string[],
 ): string {
   const reviewSummary = firstParagraph(extractMarkdownSection(report, "Summary"));
   const findings = extractMarkdownListItems(report, "Findings", 2);
@@ -1207,17 +1341,21 @@ function renderSupersedingPullRequestBody(
     [
       `Supersedes #${context.pr.number}.`,
       "",
-      "## Summary",
-      `- Purpose: ${renderDependencyUpdateSummary(context)}.`,
-      `- Agent fix: ${truncateText(firstParagraph(agentSummary), 700)}`,
+      "## Why This PR Exists",
+      truncateText(reviewSummary, 900) || "See the workflow logs for the full agent review.",
+      renderFindingBullets(findings),
       "",
-      "## Review",
-      reviewSummary || "See the workflow logs for the full agent review.",
-      findings.length === 0 ? "" : findings.map((finding) => `- ${finding}`).join("\n"),
+      "## What Changed",
+      `- Dependency update: ${renderDependencyUpdateSummary(context)}.`,
+      `- Agent fix: ${renderAgentFixSummary(agentSummary)}`,
+      "",
+      "Changed files:",
+      renderChangedFiles(changedFiles),
       "",
       "## Local Validation",
       `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
-      renderValidationCommandBullets(localValidation.output),
+      renderValidationCommandBullets(localValidation),
+      renderValidationFailure(localValidation),
       "- CI on this PR is the source of truth for merge readiness.",
     ]
       .filter(Boolean)
@@ -1230,6 +1368,7 @@ function renderOriginalPullRequestUpdatedComment(
   report: string,
   agentSummary: string,
   localValidation: LocalValidationResult,
+  changedFiles: readonly string[],
 ): string {
   const reviewSummary = firstParagraph(extractMarkdownSection(report, "Summary"));
   const findings = extractMarkdownListItems(report, "Findings", 2);
@@ -1240,16 +1379,21 @@ function renderOriginalPullRequestUpdatedComment(
       "",
       "Updated this Renovate PR because the required fix only touched lockfile/workspace metadata.",
       "",
-      `**Purpose:** ${renderDependencyUpdateSummary(context)}.`,
-      `**Agent fix:** ${truncateText(firstParagraph(agentSummary), 700)}`,
+      "**Why this update was needed:**",
+      truncateText(reviewSummary, 700) || "See the workflow logs for the full agent review.",
+      renderFindingBullets(findings),
       "",
-      "**Review:**",
-      reviewSummary || "See the workflow logs for the full agent review.",
-      findings.length === 0 ? "" : findings.map((finding) => `- ${finding}`).join("\n"),
+      "**What changed:**",
+      `- Dependency update: ${renderDependencyUpdateSummary(context)}.`,
+      `- Agent fix: ${renderAgentFixSummary(agentSummary)}`,
+      "",
+      "Changed files:",
+      renderChangedFiles(changedFiles),
       "",
       "**Local validation:**",
       `- Status: ${localValidation.passed ? "passed" : "failed"}.`,
-      renderValidationCommandBullets(localValidation.output),
+      renderValidationCommandBullets(localValidation),
+      renderValidationFailure(localValidation),
       "- CI on this PR is the source of truth for merge readiness.",
     ]
       .filter(Boolean)
@@ -1262,23 +1406,92 @@ function renderDependencyUpdateSummary(context: PullRequestContext): string {
     return context.pr.title;
   }
 
-  return context.dependencyUpdates
+  const renderedUpdates = context.dependencyUpdates
     .slice(0, 4)
     .map((update) => `${update.name} ${update.from ?? "unknown"} -> ${update.to ?? "unknown"}`)
     .join(", ");
+
+  if (context.dependencyUpdates.length <= 4) {
+    return renderedUpdates;
+  }
+
+  return `${renderedUpdates}, and ${context.dependencyUpdates.length - 4} more`;
 }
 
-function renderValidationCommandBullets(output: string): string {
-  const commands = splitLines(output)
-    .filter((line) => line.startsWith("$ "))
-    .map((line) => line.slice(2))
-    .slice(0, 6);
+function renderAgentFixSummary(agentSummary: string): string {
+  const summary = firstParagraph(agentSummary);
+  if (
+    !summary ||
+    /^completed and committed\b/i.test(summary) ||
+    /^sandcastle codex run completed\b/i.test(summary)
+  ) {
+    return "Applied the agent-generated fix for the review findings.";
+  }
 
-  if (commands.length === 0) {
+  return truncateText(summary, 500);
+}
+
+function renderChangedFiles(changedFiles: readonly string[]): string {
+  if (changedFiles.length === 0) {
+    return "- No changed files were reported.";
+  }
+
+  const visibleFiles = changedFiles.slice(0, 8).map((file) => `- \`${file}\``);
+  if (changedFiles.length <= visibleFiles.length) {
+    return visibleFiles.join("\n");
+  }
+
+  return [...visibleFiles, `- ${changedFiles.length - visibleFiles.length} more file(s).`].join(
+    "\n",
+  );
+}
+
+function renderFindingBullets(findings: readonly string[]): string {
+  if (findings.length === 0) {
+    return "";
+  }
+
+  return findings.map((finding) => `- ${truncateText(finding, 450)}`).join("\n");
+}
+
+function renderValidationCommandBullets(localValidation: LocalValidationResult): string {
+  if (localValidation.commands.length === 0) {
     return "- No local validation commands were reported.";
   }
 
-  return commands.map((command) => `- \`${command}\``).join("\n");
+  return localValidation.commands
+    .map((command) => {
+      const status = command.exitCode === 0 ? "pass" : "fail";
+      const exitCode = command.exitCode === 0 ? "" : ` (exit ${command.exitCode})`;
+      return `- [${status}] \`${command.command}\`${exitCode}`;
+    })
+    .join("\n");
+}
+
+function renderValidationFailure(localValidation: LocalValidationResult): string {
+  if (localValidation.passed) {
+    return "";
+  }
+
+  const failedCommand = localValidation.failedCommand ?? "unknown command";
+  const exitCode =
+    localValidation.failedExitCode == null ? "" : ` (exit ${localValidation.failedExitCode})`;
+  const failureSummary = localValidation.failureSummary?.trim();
+
+  return [
+    `- Failed command: \`${failedCommand}\`${exitCode}.`,
+    failureSummary == null || failureSummary.length === 0
+      ? ""
+      : ["- Failure output:", "```text", sanitizeMarkdownCodeBlock(failureSummary), "```"].join(
+          "\n",
+        ),
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function sanitizeMarkdownCodeBlock(value: string): string {
+  return value.replace(/```/g, "'''");
 }
 
 function extractMarkdownSection(markdown: string, heading: string): string {

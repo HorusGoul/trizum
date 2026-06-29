@@ -12,6 +12,21 @@ export default defineConfig({
         command: "vp check .",
         dependsOn: ["@trizum/pwa#build", "@trizum/logging#build"],
       },
+      "sync:check": {
+        command: "./check-sync-clean.sh",
+        cache: false,
+        dependsOn: ["@trizum/pwa#build"],
+      },
+      "sync:check:android": {
+        command: "./check-sync-clean.sh android",
+        cache: false,
+        dependsOn: ["@trizum/pwa#build"],
+      },
+      "sync:check:ios": {
+        command: "./check-sync-clean.sh ios",
+        cache: false,
+        dependsOn: ["@trizum/pwa#build"],
+      },
     },
   },
 });

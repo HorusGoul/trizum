@@ -107,17 +107,18 @@ packages/mobile/
 
 ## Scripts
 
-| Script            | Description                                |
-| ----------------- | ------------------------------------------ |
-| `build`           | Copy PWA assets and sync Capacitor         |
-| `check`           | Run package validation                     |
-| `open:android`    | Open Android project in Android Studio     |
-| `open:ios`        | Open iOS project in Xcode                  |
-| `run:android`     | Build and run on Android device/emulator   |
-| `run:ios`         | Build and run on iOS device/simulator      |
-| `dev:android`     | Run in dev mode with live reload (Android) |
-| `dev:ios`         | Run in dev mode with live reload (iOS)     |
-| `assets:generate` | Generate app icons and splash screens      |
+| Script            | Description                                 |
+| ----------------- | ------------------------------------------- |
+| `build`           | Copy PWA assets and sync Capacitor          |
+| `check`           | Run package validation                      |
+| `open:android`    | Open Android project in Android Studio      |
+| `open:ios`        | Open iOS project in Xcode                   |
+| `run:android`     | Build and run on Android device/emulator    |
+| `run:ios`         | Build and run on iOS device/simulator       |
+| `dev:android`     | Run in dev mode with live reload (Android)  |
+| `dev:ios`         | Run in dev mode with live reload (iOS)      |
+| `assets:generate` | Generate app icons and splash screens       |
+| `sync:check`      | Fail if Capacitor sync changes mobile files |
 
 ## Fastlane
 
