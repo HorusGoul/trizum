@@ -114,7 +114,7 @@ catalog:
   rollup: 4.62.2
   rollup-plugin-license: 3.7.1
   sharp: 0.32.6
-  skills: 1.4.5
+  skills: 1.5.13
   sonner: 2.0.7
   suspense: 0.1.0
   svgexport: 0.4.2
