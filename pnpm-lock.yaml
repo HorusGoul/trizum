@@ -290,8 +290,8 @@ catalogs:
       specifier: 4.62.2
       version: 4.62.2
     rollup-plugin-license:
-      specifier: 3.6.0
-      version: 3.6.0
+      specifier: 3.7.1
+      version: 3.7.1
     sharp:
       specifier: 0.32.6
       version: 0.32.6
@@ -811,7 +811,7 @@ importers:
         version: 4.62.2
       rollup-plugin-license:
         specifier: 'catalog:'
-        version: 3.6.0(picomatch@4.0.4)(rollup@4.62.2)
+        version: 3.7.1(picomatch@4.0.4)(rollup@4.62.2)
       tailwindcss:
         specifier: 'catalog:'
         version: 3.4.5(ts-node@10.9.2(@swc/core@1.13.3(@swc/helpers@0.5.17))(@swc/wasm@1.13.3)(@types/node@24.10.2)(typescript@5.9.3))
@@ -8642,8 +8642,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  rollup-plugin-license@3.6.0:
-    resolution: {integrity: sha512-1ieLxTCaigI5xokIfszVDRoy6c/Wmlot1fDEnea7Q/WXSR8AqOjYljHDLObAx7nFxHC2mbxT3QnTSPhaic2IYw==}
+  rollup-plugin-license@3.7.1:
+    resolution: {integrity: sha512-FcGXUbAmPvRSLxjVdjp/r/MUtKBlttVQd+ApUyvKfREnsoAfAZA6Ic2fE1Tz4RL0f9XqEQU9UIRNUMdtQtliDw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
@@ -18469,7 +18469,7 @@ snapshots:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  rollup-plugin-license@3.6.0(picomatch@4.0.4)(rollup@4.62.2):
+  rollup-plugin-license@3.7.1(picomatch@4.0.4)(rollup@4.62.2):
     dependencies:
       commenting: 1.1.0
       fdir: 6.5.0(picomatch@4.0.4)
