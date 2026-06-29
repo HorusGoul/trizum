@@ -55,7 +55,7 @@ catalog:
   "@logtape/sentry": 1.2.2
   "@openai/codex": 0.142.3
   "@playwright/test": 1.60.0
-  "@rolldown/plugin-babel": 0.2.1
+  "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.1.0
   "@sentry/node": 10.29.0
   "@sentry/profiling-node": 10.29.0
