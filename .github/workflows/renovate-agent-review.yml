@@ -33,17 +33,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-          token: ${{ secrets.BOT_GITHUB_TOKEN }}
-
-      - uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version-file: ".node-version"
-          cache: true
-
       - name: Resolve Renovate PR
         id: pr
         env:
@@ -99,9 +88,84 @@ jobs:
           echo "head_ref_name=$(jq -r '.headRefName' <<< "$pr_json")" >> "$GITHUB_OUTPUT"
           echo "head_ref_oid=$(jq -r '.headRefOid' <<< "$pr_json")" >> "$GITHUB_OUTPUT"
 
+      - name: Decide whether agent review is needed
+        id: review_gate
+        if: steps.pr.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          RENOVATE_PR_NUMBER: ${{ steps.pr.outputs.number }}
+          WORKFLOW_EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+
+          should_run=false
+          reason=""
+
+          if [[ "$WORKFLOW_EVENT_NAME" == "workflow_dispatch" ]]; then
+            should_run=true
+            reason="manual dispatch"
+          elif [[ "$WORKFLOW_RUN_CONCLUSION" != "success" ]]; then
+            should_run=true
+            reason="CI concluded $WORKFLOW_RUN_CONCLUSION"
+          else
+            pr_body_file="$(mktemp)"
+            gh pr view "$RENOVATE_PR_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --json body \
+              --jq .body > "$pr_body_file"
+
+            is_major_update="$(node - "$pr_body_file" <<'NODE'
+          const fs = require("node:fs");
+
+          const body = fs.readFileSync(process.argv[2], "utf8");
+          const updateSummary = body.split(/\n---\n/u)[0] ?? "";
+          const tableLines = updateSummary
+            .split(/\r?\n/u)
+            .filter((line) => line.trimStart().startsWith("|"));
+
+          const explicitMajor = tableLines.some((line) =>
+            line
+              .split("|")
+              .map((cell) => cell.trim().toLowerCase())
+              .includes("major"),
+          );
+
+          const semverMajor = tableLines.some((line) => {
+            const versionRanges = line.matchAll(
+              /`[^`]*?([0-9]+)(?:\.[0-9]+)?(?:\.[0-9]+)?[^`]*`\s*→\s*`[^`]*?([0-9]+)(?:\.[0-9]+)?(?:\.[0-9]+)?[^`]*`/gu,
+            );
+
+            return Array.from(versionRanges).some(([, fromMajor, toMajor]) => {
+              return Number(toMajor) > Number(fromMajor);
+            });
+          });
+
+          process.stdout.write(explicitMajor || semverMajor ? "true" : "false");
+          NODE
+            )"
+            rm -f "$pr_body_file"
+
+            if [[ "$is_major_update" == "true" ]]; then
+              should_run=true
+              reason="major Renovate update"
+            else
+              reason="green non-major Renovate update"
+            fi
+          fi
+
+          echo "should_run=$should_run" >> "$GITHUB_OUTPUT"
+          echo "reason=$reason" >> "$GITHUB_OUTPUT"
+
+          if [[ "$should_run" == "true" ]]; then
+            echo "Renovate agent review will run: $reason."
+          else
+            echo "Renovate agent review skipped: $reason."
+          fi
+
       - name: Wait for Renovate lockfile refresh
         id: lockfile
-        if: steps.pr.outputs.found == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true'
         env:
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
           RENOVATE_HEAD_BRANCH: ${{ steps.pr.outputs.head_ref_name }}
@@ -159,14 +223,27 @@ jobs:
 
           echo "ready=true" >> "$GITHUB_OUTPUT"
 
+      - uses: actions/checkout@v6
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
+
+      - uses: voidzero-dev/setup-vp@v1
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
       - name: Configure Lilith git identity
-        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         run: |
           git config user.name "lilith[bot]"
           git config user.email "259750894+PUNK-02@users.noreply.github.com"
 
       - name: Load Codex auth from Bitwarden
-        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         uses: bitwarden/sm-action@v3.0.0
         with:
           access_token: ${{ secrets.BW_ACCESS_TOKEN }}
@@ -174,7 +251,7 @@ jobs:
             ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }} > CODEX_AUTH_JSON
 
       - name: Restore Codex auth cache
-        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           CODEX_HOME: ${{ runner.temp }}/codex
         run: |
@@ -202,7 +279,7 @@ jobs:
           echo "CODEX_AUTH_JSON=" >> "$GITHUB_ENV"
 
       - name: Run Renovate agent review
-        if: steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
+        if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           CODEX_HOME: ${{ runner.temp }}/codex
           GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -229,7 +306,7 @@ jobs:
             --codex required
 
       - name: Save refreshed Codex auth to Bitwarden
-        if: success() && steps.pr.outputs.found == 'true' && steps.lockfile.outputs.ready == 'true'
+        if: success() && steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           BWS_ACCESS_TOKEN: ${{ secrets.BW_ACCESS_TOKEN }}
           BITWARDEN_CODEX_AUTH_JSON_SECRET_ID: ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }}

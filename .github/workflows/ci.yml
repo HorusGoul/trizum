@@ -64,6 +64,44 @@ jobs:
             packages/pwa/test-results
           if-no-files-found: ignore
 
+  mobile-sync:
+    name: Mobile Sync (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu-latest
+            task: sync:check:android
+          - platform: ios
+            os: macos-26
+            task: sync:check:ios
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Setup Ruby
+        if: matrix.platform == 'ios'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler: "2.7.2"
+          bundler-cache: true
+          cache-version: ios-0
+          working-directory: packages/mobile/ios/App
+
+      - name: Check Capacitor sync
+        run: vp run --filter @trizum/mobile ${{ matrix.task }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
   autofix:
     name: Autofix & Extract Messages
     runs-on: ubuntu-latest

@@ -18,7 +18,7 @@ catalog:
   "@automerge/automerge-repo-network-websocket": 2.5.6
   "@automerge/automerge-repo-storage-indexeddb": 2.5.6
   "@ai-hero/sandcastle": 0.10.0
-  "@babel/core": 7.29.6
+  "@babel/core": 7.29.7
   "@barnum/barnum": 0.4.0
   "@capacitor/android": 8.4.1
   "@capacitor/app": 8.1.0
@@ -38,8 +38,8 @@ catalog:
   "@cloudflare/vite-plugin": 1.29.0
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
-  "@hono/node-server": 1.19.6
-  "@hono/node-ws": 1.2.0
+  "@hono/node-server": 1.19.14
+  "@hono/node-ws": 1.3.1
   "@horus.dev/tw-dynamic-themes": 0.0.3
   "@internationalized/date": 3.10.0
   "@kubiks/otel-drizzle": 2.1.0
@@ -92,7 +92,7 @@ catalog:
   eslint-plugin-lingui: 0.11.0
   exifr: 7.1.3
   heic-to: 1.4.2
-  hono: 4.10.6
+  hono: 4.12.27
   jose: 6.2.3
   lucide-static: 1.8.0
   mathjs: 15.1.0
@@ -130,8 +130,8 @@ catalog:
   vite-plugin-wasm: 3.6.0
   vite-plus: 0.2.1
   vitest: 4.1.9
-  workbox-build: 7.4.0
-  workbox-window: 7.4.0
+  workbox-build: 7.4.1
+  workbox-window: 7.4.1
   wrangler: 4.74.0
   tsx: 4.22.4
   zod: 4.4.3
