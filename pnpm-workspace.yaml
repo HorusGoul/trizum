@@ -35,7 +35,7 @@ catalog:
   "@capawesome/capver": 0.1.4
   "@changesets/changelog-github": 0.7.0
   "@changesets/cli": 2.31.0
-  "@cloudflare/vite-plugin": 1.29.0
+  "@cloudflare/vite-plugin": 1.42.3
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
   "@hono/node-server": 1.19.14
@@ -132,6 +132,6 @@ catalog:
   vitest: 4.1.9
   workbox-build: 7.4.1
   workbox-window: 7.4.1
-  wrangler: 4.74.0
+  wrangler: 4.105.0
   tsx: 4.22.4
   zod: 4.4.3
