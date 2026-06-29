@@ -1,10 +1,4 @@
-import {
-  useRef,
-  useState,
-  type ReactNode,
-  type RefObject,
-  type TouchEvent as ReactTouchEvent,
-} from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   LazyMotion,
   animate,
@@ -36,6 +30,8 @@ export function PullToRefresh({
   refreshAction: () => Promise<unknown>;
   scrollElementRef: RefObject<HTMLDivElement | null>;
 }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const refreshActionRef = useRef(refreshAction);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const pullAnimationRef = useRef<AnimationPlaybackControls | null>(null);
   const finishRefreshIdleCallbackRef = useRef<number | null>(null);
@@ -52,6 +48,8 @@ export function PullToRefresh({
     clamp: true,
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  refreshActionRef.current = refreshAction;
 
   function stopPullAnimation() {
     pullAnimationRef.current?.stop();
@@ -93,7 +91,7 @@ export function PullToRefresh({
     animatePullDistance(refreshingIndicatorHeight);
 
     try {
-      await refreshAction();
+      await refreshActionRef.current();
     } finally {
       scheduleRefreshFinish();
     }
@@ -126,7 +124,7 @@ export function PullToRefresh({
     });
   }
 
-  function onTouchStart(event: ReactTouchEvent<HTMLDivElement>) {
+  function onTouchStart(event: TouchEvent) {
     if (isRefreshingRef.current || !isScrolledToTop()) {
       return;
     }
@@ -140,7 +138,7 @@ export function PullToRefresh({
     touchStartRef.current = { x: touch.clientX, y: touch.clientY };
   }
 
-  function onTouchMove(event: ReactTouchEvent<HTMLDivElement>) {
+  function onTouchMove(event: TouchEvent) {
     const start = touchStartRef.current;
     const touch = event.touches[0];
 
@@ -168,7 +166,6 @@ export function PullToRefresh({
       return;
     }
 
-    event.preventDefault();
     setPullDistance(Math.min(yDistance * 0.55, maxPullDistance));
   }
 
@@ -190,15 +187,29 @@ export function PullToRefresh({
     animatePullDistance(0);
   }
 
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) {
+      return;
+    }
+
+    root.addEventListener("touchstart", onTouchStart, { passive: true });
+    root.addEventListener("touchmove", onTouchMove, { passive: true });
+    root.addEventListener("touchend", onTouchEnd, { passive: true });
+    root.addEventListener("touchcancel", onTouchCancel, { passive: true });
+
+    return () => {
+      root.removeEventListener("touchstart", onTouchStart);
+      root.removeEventListener("touchmove", onTouchMove);
+      root.removeEventListener("touchend", onTouchEnd);
+      root.removeEventListener("touchcancel", onTouchCancel);
+    };
+  });
+
   return (
     <LazyMotion features={domAnimation}>
-      <motion.div
-        className="flex min-h-full flex-col"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        onTouchCancel={onTouchCancel}
-      >
+      <motion.div ref={rootRef} className="flex min-h-full flex-col">
         <motion.div
           aria-hidden={true}
           className="flex flex-shrink-0 items-end justify-center overflow-hidden"
