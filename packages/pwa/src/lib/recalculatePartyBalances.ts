@@ -37,21 +37,33 @@ export async function recalculatePartyBalances(repo: Repo, partyId: Party["id"])
         throw new Error("Chunk balances not found, this should not happen");
       }
 
+      const patches = diff(clone(chunkBalances.balances), clone(balancesByParticipant));
+
       return {
-        balancesByParticipant,
+        balancesId: chunkRef.balancesId,
+        patches,
         chunkBalancesHandle,
       };
     }),
   );
 
-  for (const { balancesByParticipant, chunkBalancesHandle } of chunkEntries) {
+  const changedBalancesIds: PartyExpenseChunkBalances["id"][] = [];
+
+  for (const { balancesId, patches, chunkBalancesHandle } of chunkEntries) {
+    if (patches.length === 0) {
+      continue;
+    }
+
     chunkBalancesHandle.change((doc) => {
-      patchMutate(doc.balances, diff(clone(doc.balances), clone(balancesByParticipant)));
+      patchMutate(doc.balances, patches);
     });
     chunkBalancesHandle.doc();
+    changedBalancesIds.push(balancesId);
   }
 
-  await repo.flush(party.chunkRefs.map((chunkRef) => chunkRef.balancesId));
+  if (changedBalancesIds.length > 0) {
+    await repo.flush(changedBalancesIds);
+  }
 
   return true;
 }
