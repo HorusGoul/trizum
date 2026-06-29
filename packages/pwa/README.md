@@ -49,8 +49,8 @@ connected repository builds.
 
 - Production deploys run after a changeset release updates the PWA version or
   changelog on `main`.
-- Pull requests get Cloudflare preview deployments from the
-  `PWA Preview` workflow, and the workflow updates a PR comment with the latest
-  preview URL.
+- Same-repository pull requests get Cloudflare preview deployments from the
+  `PWA Preview` workflow, including PRs with merge conflicts, and the workflow
+  updates a PR comment with the latest preview URL.
 - The workflows require `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
   repository secrets.

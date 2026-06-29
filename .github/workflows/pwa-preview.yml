@@ -1,7 +1,7 @@
 name: PWA Preview
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - reopened
@@ -11,7 +11,6 @@ permissions:
   contents: read
   deployments: write
   issues: write
-  pull-requests: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -21,17 +20,21 @@ jobs:
   preview:
     name: Deploy Preview
     runs-on: ubuntu-latest
+    # `pull_request` workflows are suppressed while a PR has merge conflicts.
+    # `pull_request_target` still runs, so keep previews available, but only
+    # build and deploy same-repository PR code.
     if: github.event.pull_request.head.repo.full_name == github.repository
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version-file: ".node-version"
-          cache: true
+          cache: false
 
       - name: Build PWA
         run: vp run --filter @trizum/pwa build
