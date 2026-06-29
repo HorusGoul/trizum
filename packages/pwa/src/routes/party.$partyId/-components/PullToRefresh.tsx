@@ -5,11 +5,26 @@ import {
   type RefObject,
   type TouchEvent as ReactTouchEvent,
 } from "react";
+import {
+  LazyMotion,
+  animate,
+  domAnimation,
+  m as motion,
+  useMotionValue,
+  useTransform,
+  type AnimationPlaybackControls,
+} from "motion/react";
 import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
 
 const refreshThreshold = 72;
 const maxPullDistance = 96;
+const refreshingIndicatorHeight = 56;
+const indicatorSpring = {
+  type: "spring",
+  stiffness: 420,
+  damping: 36,
+} as const;
 
 export function PullToRefresh({
   children,
@@ -21,13 +36,33 @@ export function PullToRefresh({
   scrollElementRef: RefObject<HTMLDivElement | null>;
 }) {
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const pullDistanceRef = useRef(0);
-  const [pullDistance, setPullDistanceState] = useState(0);
+  const pullAnimationRef = useRef<AnimationPlaybackControls | null>(null);
+  const isRefreshingRef = useRef(false);
+  const pullDistance = useMotionValue(0);
+  const indicatorScale = useTransform(pullDistance, [0, refreshThreshold], [0.85, 1], {
+    clamp: true,
+  });
+  const indicatorOpacity = useTransform(pullDistance, [0, 1], [0, 1], {
+    clamp: true,
+  });
+  const iconRotate = useTransform(pullDistance, [0, refreshThreshold], [0, 180], {
+    clamp: true,
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  function stopPullAnimation() {
+    pullAnimationRef.current?.stop();
+    pullAnimationRef.current = null;
+  }
+
   function setPullDistance(value: number) {
-    pullDistanceRef.current = value;
-    setPullDistanceState(value);
+    stopPullAnimation();
+    pullDistance.set(value);
+  }
+
+  function animatePullDistance(value: number) {
+    stopPullAnimation();
+    pullAnimationRef.current = animate(pullDistance, value, indicatorSpring);
   }
 
   function isScrolledToTop() {
@@ -35,21 +70,25 @@ export function PullToRefresh({
   }
 
   async function refresh() {
-    if (isRefreshing) {
+    if (isRefreshingRef.current) {
       return;
     }
 
+    isRefreshingRef.current = true;
     setIsRefreshing(true);
+    animatePullDistance(refreshingIndicatorHeight);
 
     try {
       await refreshAction();
     } finally {
+      isRefreshingRef.current = false;
       setIsRefreshing(false);
+      animatePullDistance(0);
     }
   }
 
   function onTouchStart(event: ReactTouchEvent<HTMLDivElement>) {
-    if (isRefreshing || !isScrolledToTop()) {
+    if (isRefreshingRef.current || !isScrolledToTop()) {
       return;
     }
 
@@ -74,7 +113,8 @@ export function PullToRefresh({
     const yDistance = touch.clientY - start.y;
 
     if (Math.abs(xDistance) > Math.abs(yDistance)) {
-      setPullDistance(0);
+      touchStartRef.current = null;
+      animatePullDistance(0);
       return;
     }
 
@@ -94,54 +134,57 @@ export function PullToRefresh({
   }
 
   function onTouchEnd() {
-    const shouldRefresh = pullDistanceRef.current >= refreshThreshold;
+    const shouldRefresh = pullDistance.get() >= refreshThreshold;
 
     touchStartRef.current = null;
-    setPullDistance(0);
 
     if (shouldRefresh) {
       void refresh().catch(() => undefined);
+      return;
     }
+
+    animatePullDistance(0);
   }
 
   function onTouchCancel() {
     touchStartRef.current = null;
-    setPullDistance(0);
+    animatePullDistance(0);
   }
 
-  const indicatorProgress = isRefreshing ? 1 : Math.min(pullDistance / refreshThreshold, 1);
-  const indicatorHeight = isRefreshing ? 56 : pullDistance;
-
   return (
-    <div
-      className="flex min-h-full flex-col"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-      onTouchCancel={onTouchCancel}
-    >
-      <div
-        aria-hidden={true}
-        className="flex flex-shrink-0 items-end justify-center overflow-hidden transition-all duration-150 ease-out"
-        style={{ height: indicatorHeight }}
+    <LazyMotion features={domAnimation}>
+      <motion.div
+        className="flex min-h-full flex-col"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchCancel}
       >
-        <div
-          className={cn(
-            "mb-3 flex size-10 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-600 shadow-sm transition-all dark:border-accent-700 dark:bg-accent-900 dark:text-accent-200",
-            indicatorHeight > 0 ? "opacity-100" : "opacity-0",
-          )}
-          style={{ transform: `scale(${0.85 + indicatorProgress * 0.15})` }}
+        <motion.div
+          aria-hidden={true}
+          className="flex flex-shrink-0 items-end justify-center overflow-hidden"
+          style={{ height: pullDistance }}
         >
-          <Icon
-            icon={isRefreshing ? "lucide.loader-circle" : "lucide.refresh-cw"}
-            width={20}
-            height={20}
-            className={cn(isRefreshing && "animate-spin")}
-          />
-        </div>
-      </div>
+          <motion.div
+            className="mb-3 flex size-10 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-600 shadow-sm dark:border-accent-700 dark:bg-accent-900 dark:text-accent-200"
+            style={{
+              opacity: indicatorOpacity,
+              scale: indicatorScale,
+            }}
+          >
+            <motion.span className="flex" style={{ rotate: isRefreshing ? 0 : iconRotate }}>
+              <Icon
+                icon={isRefreshing ? "lucide.loader-circle" : "lucide.refresh-cw"}
+                width={20}
+                height={20}
+                className={cn(isRefreshing && "animate-spin")}
+              />
+            </motion.span>
+          </motion.div>
+        </motion.div>
 
-      {children}
-    </div>
+        {children}
+      </motion.div>
+    </LazyMotion>
   );
 }
