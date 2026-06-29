@@ -3,6 +3,7 @@ packages:
 injectWorkspacePackages: true
 overrides:
   vite: "catalog:"
+  esbuild: 0.27.3
   react: 0.0.0-experimental-d025ddd3-20240722
   react-dom: 0.0.0-experimental-d025ddd3-20240722
   "@types/react": npm:types-react@rc
@@ -15,6 +16,7 @@ peerDependencyRules:
 catalog:
   "@automerge/automerge": 3.2.6
   "@automerge/automerge-repo": 2.5.6
+  "@automerge/automerge-repo-network-messagechannel": 2.5.6
   "@automerge/automerge-repo-network-websocket": 2.5.6
   "@automerge/automerge-repo-storage-indexeddb": 2.5.6
   "@ai-hero/sandcastle": 0.10.0
@@ -82,6 +84,7 @@ catalog:
   browser-image-compression: 2.0.2
   capacitor-plugin-safe-area: 5.0.0
   clsx: 2.1.1
+  comctx: 1.7.5
   dinero.js: 1.9.1
   drizzle-kit: 0.31.7
   drizzle-orm: 0.45.2

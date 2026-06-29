@@ -252,7 +252,7 @@ export function AnimatedTabs({
             {(tab) => (
               <TabPanel
                 shouldForceMount
-                className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto rounded outline-none -outline-offset-2 focus-visible:outline-black"
+                className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto overscroll-y-contain rounded outline-none -outline-offset-2 focus-visible:outline-black"
                 ref={tab.panelRef}
               >
                 {tab.node}

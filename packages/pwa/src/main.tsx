@@ -27,18 +27,22 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
+import { AppRecoveryDialog } from "./components/AppRecoveryDialog.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
 import { getSentrySink } from "@logtape/sentry";
 import { isNonNull } from "./lib/isNonNull.ts";
-import { configurePwaLogging } from "./lib/log.ts";
+import { configurePwaLogging, getLogger } from "./lib/log.ts";
+import { appWorker, initializeAppWorker } from "./lib/appWorker/client.ts";
+import { getAutomergeWssUrl, getIsAutomergeOfflineOnly } from "./lib/automergeSyncConfig.ts";
 import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
 import {
   preventDuplicateHistoryEntries,
   pushHistoryWithoutDuplicateEntry,
 } from "./lib/navigationHistory.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
+import type { Party } from "./models/party.ts";
 import {
   readPartyListState,
   seedPartyListState,
@@ -103,13 +107,22 @@ declare module "react-aria-components" {
   }
 }
 
-const WSS_URL = import.meta.env.VITE_APP_WSS_URL ?? "wss://dev-sync.trizum.app";
-const isOfflineOnly = initialUrl.searchParams.get("__internal_offline_only") === "true";
+const WSS_URL = getAutomergeWssUrl();
+const isOfflineOnly = getIsAutomergeOfflineOnly(initialUrl.href);
+const logger = getLogger("main");
 
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
+});
+
+void initializeAppWorker({
+  repo,
+  wssUrl: WSS_URL,
+  isOfflineOnly,
+}).catch((error) => {
+  logger.error("Failed to initialize app worker", { error });
 });
 
 declare global {
@@ -119,6 +132,7 @@ declare global {
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
     __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
+    __internal_recalculatePartyBalances: (partyId: Party["id"]) => Promise<boolean>;
   }
 }
 
@@ -142,6 +156,10 @@ window.__internal_readPartyListState = async () => {
   return readPartyListState({
     repo,
   });
+};
+
+window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
+  return appWorker.recalculateBalances(partyId);
 };
 
 // Create a new router instance
@@ -217,6 +235,7 @@ if (!rootElement.innerHTML) {
           <RepoContext value={repo}>
             <MediaGalleryController>
               <RouterProvider router={router} InnerWrap={InnerWrap} />
+              <AppRecoveryDialog />
               <Toaster />
             </MediaGalleryController>
           </RepoContext>

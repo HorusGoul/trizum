@@ -324,15 +324,15 @@ msgstr "Bahamian Dollar"
 msgid "Bahraini Dinar"
 msgstr "Bahraini Dinar"
 
-#: src/routes/party.$partyId/route.tsx:186
+#: src/routes/party.$partyId/route.tsx:160
 msgid "Balance, Highest First"
 msgstr "Balance, Highest First"
 
-#: src/routes/party.$partyId/route.tsx:170
+#: src/routes/party.$partyId/route.tsx:144
 msgid "Balance, Lowest First"
 msgstr "Balance, Lowest First"
 
-#: src/routes/party.$partyId/route.tsx:318
+#: src/routes/party.$partyId/route.tsx:292
 msgid "Balances"
 msgstr "Balances"
 
@@ -1018,7 +1018,7 @@ msgstr "Expense Split Mode"
 msgid "Expense updated"
 msgstr "Expense updated"
 
-#: src/routes/party.$partyId/route.tsx:312
+#: src/routes/party.$partyId/route.tsx:286
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -1202,7 +1202,7 @@ msgstr "Have an idea to improve trizum? We'd love to hear it."
 msgid "Heads up!"
 msgstr "Heads up!"
 
-#: src/routes/party.$partyId/-components/Balances.tsx:112
+#: src/routes/party.$partyId/-components/Balances.tsx:115
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Here is a list of operations you and other party members can do to balance your position."
 
@@ -1239,7 +1239,7 @@ msgstr "How do you want to call this party?"
 msgid "How does offline sync work?"
 msgstr "How does offline sync work?"
 
-#: src/routes/party.$partyId/-components/Balances.tsx:108
+#: src/routes/party.$partyId/-components/Balances.tsx:111
 msgid "How should I balance?"
 msgstr "How should I balance?"
 
@@ -1422,7 +1422,7 @@ msgstr "Last used"
 msgid "Last year"
 msgstr "Last year"
 
-#: src/routes/party.$partyId/route.tsx:296
+#: src/routes/party.$partyId/route.tsx:270
 msgid "Leave party"
 msgstr "Leave party"
 
@@ -1522,7 +1522,7 @@ msgstr "Me"
 #: src/components/ExpenseEditor.tsx:341
 #: src/routes/index/route.tsx:105
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:88
-#: src/routes/party.$partyId/route.tsx:200
+#: src/routes/party.$partyId/route.tsx:174
 msgid "Menu"
 msgstr "Menu"
 
@@ -1595,7 +1595,7 @@ msgstr "Myanma Kyat"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:28
-#: src/routes/party.$partyId/route.tsx:154
+#: src/routes/party.$partyId/route.tsx:128
 msgid "Name"
 msgstr "Name"
 
@@ -1705,7 +1705,7 @@ msgstr "No updates available"
 msgid "Nobody else is available in this party"
 msgstr "Nobody else is available in this party"
 
-#: src/routes/party.$partyId/-components/Balances.tsx:175
+#: src/routes/party.$partyId/-components/Balances.tsx:178
 msgid "Nobody owes you money!"
 msgstr "Nobody owes you money!"
 
@@ -1758,7 +1758,7 @@ msgstr "Older parties stay tucked away, not gone"
 msgid "Omani Rial"
 msgstr "Omani Rial"
 
-#: src/routes/party.$partyId/route.tsx:241
+#: src/routes/party.$partyId/route.tsx:215
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
@@ -1802,7 +1802,7 @@ msgstr "or enter code"
 msgid "or use email"
 msgstr "or use email"
 
-#: src/routes/party.$partyId/-components/Balances.tsx:186
+#: src/routes/party.$partyId/-components/Balances.tsx:189
 msgid "Other operations"
 msgstr "Other operations"
 
@@ -1973,7 +1973,7 @@ msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc1
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party.$partyId/-components/Balances.tsx:157
+#: src/routes/party.$partyId/-components/Balances.tsx:160
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
@@ -1981,7 +1981,7 @@ msgstr "People that owe you money"
 msgid "Permanently delete your trizum cloud account"
 msgstr "Permanently delete your trizum cloud account"
 
-#: src/routes/party.$partyId/route.tsx:237
+#: src/routes/party.$partyId/route.tsx:211
 msgid "Personal mode"
 msgstr "Personal mode"
 
@@ -2126,6 +2126,15 @@ msgstr "Report Issues"
 msgid "Reset password"
 msgstr "Reset password"
 
+#: src/components/AppRecoveryDialog.tsx:76
+msgid "Restart app"
+msgstr "Restart app"
+
+#: src/components/AppRecoveryDialog.tsx:47
+#: src/components/AppRecoveryDialog.tsx:57
+msgid "Restart trizum"
+msgstr "Restart trizum"
+
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:56
 msgid "Restore"
 msgstr "Restore"
@@ -2201,7 +2210,7 @@ msgstr "Search emoji..."
 msgid "Security"
 msgstr "Security"
 
-#: src/routes/party.$partyId/route.tsx:264
+#: src/routes/party.$partyId/route.tsx:238
 msgid "See spending totals and rankings"
 msgstr "See spending totals and rankings"
 
@@ -2238,7 +2247,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/index/route.tsx:116
-#: src/routes/party.$partyId/route.tsx:289
+#: src/routes/party.$partyId/route.tsx:263
 #: src/routes/settings.tsx:263
 msgid "Settings"
 msgstr "Settings"
@@ -2257,7 +2266,7 @@ msgstr "Seychellois Rupee"
 
 #: src/routes/party_.$partyId.share.tsx:55
 #: src/routes/party_.$partyId.share.tsx:90
-#: src/routes/party.$partyId/route.tsx:277
+#: src/routes/party.$partyId/route.tsx:251
 msgid "Share party"
 msgstr "Share party"
 
@@ -2374,11 +2383,15 @@ msgstr "Solomon Islands Dollar"
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
 
+#: src/components/AppRecoveryDialog.tsx:60
+msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
+msgstr "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
+
 #: src/routes/migrate_.tricount/-components/FinishedStates.tsx:34
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: src/routes/party.$partyId/route.tsx:146
+#: src/routes/party.$partyId/route.tsx:120
 msgid "Sort balances"
 msgstr "Sort balances"
 
@@ -2423,7 +2436,7 @@ msgstr "Start date"
 msgid "Start tracking expenses with your group"
 msgstr "Start tracking expenses with your group"
 
-#: src/routes/party.$partyId/route.tsx:260
+#: src/routes/party.$partyId/route.tsx:234
 msgid "Stats"
 msgstr "Stats"
 
@@ -2534,7 +2547,7 @@ msgstr "Take photo"
 msgid "Tanzanian Shilling"
 msgstr "Tanzanian Shilling"
 
-#: src/routes/party.$partyId/route.tsx:223
+#: src/routes/party.$partyId/route.tsx:197
 msgid "Tap to change"
 msgstr "Tap to change"
 
@@ -2942,7 +2955,7 @@ msgstr "View Third-Party Licenses"
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
-#: src/routes/party.$partyId/route.tsx:219
+#: src/routes/party.$partyId/route.tsx:193
 msgid "Viewing as {participantName}"
 msgstr "Viewing as {participantName}"
 
@@ -3023,7 +3036,7 @@ msgstr "You can add photos to your expenses for better tracking."
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "You can only transfer debt from actions where you are the one who owes the money."
 
-#: src/routes/party.$partyId/route.tsx:111
+#: src/routes/party.$partyId/route.tsx:85
 msgid "You left the party!"
 msgstr "You left the party!"
 
@@ -3031,11 +3044,11 @@ msgstr "You left the party!"
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr "You need another active party with the same currency to transfer this debt."
 
-#: src/routes/party.$partyId/-components/Balances.tsx:127
+#: src/routes/party.$partyId/-components/Balances.tsx:130
 msgid "You owe money to people"
 msgstr "You owe money to people"
 
-#: src/routes/party.$partyId/-components/Balances.tsx:146
+#: src/routes/party.$partyId/-components/Balances.tsx:149
 msgid "You're debt free!"
 msgstr "You're debt free!"
 

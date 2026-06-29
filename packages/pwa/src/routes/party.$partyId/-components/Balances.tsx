@@ -9,13 +9,16 @@ import type { BalancesSortedBy } from "#src/models/party.js";
 import { Icon } from "#src/ui/Icon.js";
 import { BalanceActionItem } from "./BalanceActionItem.js";
 import { BalanceItem } from "./BalanceItem.js";
+import { PullToRefresh } from "./PullToRefresh.js";
 
 export function Balances({
   panelRef,
   sortedBy,
+  onRefresh,
 }: {
   panelRef: React.RefObject<HTMLDivElement | null>;
   sortedBy: BalancesSortedBy;
+  onRefresh: () => Promise<unknown>;
 }) {
   const { party } = useCurrentParty();
   const participant = useCurrentParticipant();
@@ -81,7 +84,7 @@ export function Balances({
   const canTransferDebt = eligibleTransferParties.length > 0;
 
   return (
-    <>
+    <PullToRefresh scrollElementRef={panelRef} refreshAction={onRefresh}>
       {hasSortedBalances ? (
         <>
           <div className="h-8 flex-shrink-0" />
@@ -194,6 +197,6 @@ export function Balances({
         ) : null}
       </div>
       <div className="h-8 flex-shrink-0" />
-    </>
+    </PullToRefresh>
   );
 }

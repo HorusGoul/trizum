@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
+export const balanceCalculationTimeout = 15_000;
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -117,9 +119,15 @@ export class PartyPage {
   async expectSettlementActionVisible(action: SettlementAction) {
     const actionCard = this.settlementActionCard(action);
 
-    await expect(this.balanceGuidanceHeading).toBeVisible();
-    await expect(actionCard).toBeVisible();
-    await expect(actionCard.getByRole("button", { name: action.actionLabel })).toBeVisible();
+    await expect(this.balanceGuidanceHeading).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
+    await expect(actionCard).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
+    await expect(actionCard.getByRole("button", { name: action.actionLabel })).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
   }
 
   async expectSettlementActionButtonVisible(action: SettlementAction, buttonName: string) {
@@ -127,7 +135,9 @@ export class PartyPage {
       this.settlementActionCard(action).getByRole("button", {
         name: buttonName,
       }),
-    ).toBeVisible();
+    ).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
   }
 
   async expectSettlementActionButtonHidden(action: SettlementAction, buttonName: string) {
@@ -135,7 +145,9 @@ export class PartyPage {
       this.settlementActionCard(action).getByRole("button", {
         name: buttonName,
       }),
-    ).toHaveCount(0);
+    ).toHaveCount(0, {
+      timeout: balanceCalculationTimeout,
+    });
   }
 
   async openSettlementAction(action: SettlementAction) {
@@ -149,18 +161,28 @@ export class PartyPage {
   }
 
   async expectSettlementActionRemoved(action: SettlementAction) {
-    await expect(this.settlementActionCard(action)).toHaveCount(0);
+    await expect(this.settlementActionCard(action)).toHaveCount(0, {
+      timeout: balanceCalculationTimeout,
+    });
   }
 
   async expectFullySettled() {
-    await expect(this.balanceGuidanceHeading).toHaveCount(0);
-    await expect(this.debtFreeMessage).toBeVisible();
-    await expect(this.nobodyOwesYouMessage).toBeVisible();
+    await expect(this.balanceGuidanceHeading).toHaveCount(0, {
+      timeout: balanceCalculationTimeout,
+    });
+    await expect(this.debtFreeMessage).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
+    await expect(this.nobodyOwesYouMessage).toBeVisible({
+      timeout: balanceCalculationTimeout,
+    });
     await expect(
       this.page.getByRole("button", {
         name: /^(Pay|Mark as paid|Transfer to another party)$/,
       }),
-    ).toHaveCount(0);
+    ).toHaveCount(0, {
+      timeout: balanceCalculationTimeout,
+    });
   }
 
   private settlementActionCard(action: SettlementAction) {

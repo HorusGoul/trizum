@@ -14,6 +14,7 @@ export interface InternalHarnessWindow extends Window {
     lastUsedAt: Record<string, number | undefined>;
     participantInParties: Record<string, string>;
   }>;
+  __internal_recalculatePartyBalances: (partyId: string) => Promise<boolean>;
 }
 
 interface PartyListSeed {
@@ -84,6 +85,7 @@ export interface BrowserHarness {
     joinUrl: string;
     partyId: string;
   }>;
+  recalculatePartyBalances(partyId: string): Promise<void>;
   readPartyList(): Promise<PartyListSnapshot>;
   selectParticipantIdentity(participantName: string): Promise<void>;
 }
@@ -106,7 +108,8 @@ function createBrowserHarness(page: Page): BrowserHarness {
         return (
           typeof internalWindow.__internal_createPartyFromMigrationData === "function" &&
           typeof internalWindow.__internal_seedPartyListState === "function" &&
-          typeof internalWindow.__internal_readPartyListState === "function"
+          typeof internalWindow.__internal_readPartyListState === "function" &&
+          typeof internalWindow.__internal_recalculatePartyBalances === "function"
         );
       })
       .catch(() => false);
@@ -167,10 +170,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   async function seedParty(fixture: unknown) {
     await bootstrapForSeeding();
 
-    const partyId = await page.evaluate(async (data) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
-      return internalWindow.__internal_createPartyFromMigrationData(data);
-    }, fixture);
+    const partyId = await createPartyWithRecalculatedBalances(fixture);
 
     return buildPartySeedResult(partyId);
   }
@@ -178,16 +178,11 @@ function createBrowserHarness(page: Page): BrowserHarness {
   async function seedParties(fixtures: unknown[]) {
     await bootstrapForSeeding();
 
-    const partyIds = await page.evaluate(async (partyFixtures) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
-      const nextPartyIds: string[] = [];
+    const partyIds: string[] = [];
 
-      for (const fixture of partyFixtures) {
-        nextPartyIds.push(await internalWindow.__internal_createPartyFromMigrationData(fixture));
-      }
-
-      return nextPartyIds;
-    }, fixtures);
+    for (const fixture of fixtures) {
+      partyIds.push(await createPartyWithRecalculatedBalances(fixture));
+    }
 
     return partyIds.map(buildPartySeedResult);
   }
@@ -209,6 +204,18 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await page.getByRole("button", { name: "Join" }).click();
     await expect(page.getByRole("heading", { name: "Who are you?" })).toBeVisible();
     await selectParticipantIdentity(participantName);
+    await expect
+      .poll(async () => page.evaluate(() => window.location.pathname))
+      .toBe(`/party/${seededParty.partyId}`);
+    await expect
+      .poll(async () => page.evaluate(() => new URLSearchParams(window.location.search).get("tab")))
+      .toBe("expenses");
+    await expect
+      .poll(async () => {
+        const partyList = await readPartyList();
+        return partyList.parties[seededParty.partyId];
+      })
+      .toBe(true);
 
     return seededParty;
   }
@@ -220,7 +227,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   }: JoinedPartySeed) {
     await bootstrapForSeeding();
 
-    const partyId = await createParty(fixture);
+    const partyId = await createPartyWithRecalculatedBalances(fixture);
 
     await writePartyList({
       username: "Harness User",
@@ -265,6 +272,22 @@ function createBrowserHarness(page: Page): BrowserHarness {
     }, fixture);
   }
 
+  async function createPartyWithRecalculatedBalances(fixture: unknown) {
+    const partyId = await createParty(fixture);
+    await recalculatePartyBalances(partyId);
+
+    return partyId;
+  }
+
+  async function recalculatePartyBalances(partyId: string) {
+    await waitForInternalHooks();
+
+    await page.evaluate(async (nextPartyId) => {
+      const internalWindow = window as unknown as InternalHarnessWindow;
+      await internalWindow.__internal_recalculatePartyBalances(nextPartyId);
+    }, partyId);
+  }
+
   async function writePartyList(seed: PartyListSeed) {
     return page.evaluate(async (nextSeed) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
@@ -283,6 +306,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     seedJoinableParty,
     joinSeededParty,
     seedJoinedParty,
+    recalculatePartyBalances,
     readPartyList,
     selectParticipantIdentity,
   };
