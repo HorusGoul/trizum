@@ -16,7 +16,6 @@ import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { AnimatedTabs } from "#src/ui/AnimatedTabs.js";
 import { Suspense, useEffect, useRef, type Key } from "react";
 import { Switch } from "#src/ui/Switch.tsx";
-import { requestIdleCallback, cancelIdleCallback } from "#src/lib/requestIdleCallback.ts";
 import { useBalancesSortedBy } from "#src/hooks/useBalancesSortBy.ts";
 import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.ts";
 import { Balances } from "./-components/Balances.js";
@@ -67,33 +66,8 @@ function PartyById() {
     });
   }
 
-  const lastRecalculatedBalancesPartyIdRef = useRef<string | null>(null);
   const { setLastOpenedPartyId } = usePartyList();
   const lastRecordedPartyIdRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (selectedTab !== "balances") {
-      lastRecalculatedBalancesPartyIdRef.current = null;
-      return;
-    }
-
-    if (lastRecalculatedBalancesPartyIdRef.current === partyId) {
-      return;
-    }
-
-    const idleCallback = requestIdleCallback(() => {
-      lastRecalculatedBalancesPartyIdRef.current = partyId;
-      recalculateBalances().catch(() => {
-        if (lastRecalculatedBalancesPartyIdRef.current === partyId) {
-          lastRecalculatedBalancesPartyIdRef.current = null;
-        }
-      });
-    });
-
-    return () => {
-      cancelIdleCallback(idleCallback);
-    };
-  }, [partyId, selectedTab, recalculateBalances]);
 
   useEffect(() => {
     if (!partyId || lastRecordedPartyIdRef.current === partyId) {
@@ -318,7 +292,11 @@ function PartyById() {
               label: t`Balances`,
               node: (
                 <Suspense fallback={null}>
-                  <Balances panelRef={balancesTabPanelRef} sortedBy={balancesSortedBy} />
+                  <Balances
+                    panelRef={balancesTabPanelRef}
+                    sortedBy={balancesSortedBy}
+                    onRefresh={recalculateBalances}
+                  />
                 </Suspense>
               ),
               panelRef: balancesTabPanelRef,
