@@ -55,7 +55,7 @@ catalog:
   "@lingui/vite-plugin": 5.9.5
   "@logtape/logtape": 1.2.2
   "@logtape/sentry": 1.2.2
-  "@openai/codex": 0.142.3
+  "@openai/codex": 0.142.4
   "@playwright/test": 1.60.0
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.1.0
