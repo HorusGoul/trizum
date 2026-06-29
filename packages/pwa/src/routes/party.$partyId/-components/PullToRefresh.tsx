@@ -14,7 +14,7 @@ import { cancelIdleCallback, requestIdleCallback } from "#src/lib/requestIdleCal
 
 const refreshThreshold = 72;
 const maxPullDistance = 96;
-const refreshingIndicatorHeight = 56;
+const refreshingIndicatorHeight = 64;
 const indicatorSpring = {
   type: "spring",
   stiffness: 420,
