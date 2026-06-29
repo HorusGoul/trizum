@@ -34,8 +34,11 @@ follow-up push.
 `gitIgnoredAuthors` so Renovate keeps managing branches after the workflow adds
 its lockfile commit.
 
-Renovate groups non-major Vite+, Vite, and Vitest updates because the coverage
-providers and test runner use exact peer versions and must move together.
+Renovate groups patch and minor dependency updates into one PR to keep update
+volume manageable. Most major updates stay independent, but tightly coupled
+dependency families still have major grouping rules so packages that need to
+move together are reviewed together. `react` and `react-dom` updates are
+disabled because the app uses experimental builds that are managed manually.
 
 ## Automerge
 
