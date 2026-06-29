@@ -16,6 +16,7 @@ import {
 } from "motion/react";
 import { Icon } from "#src/ui/Icon.js";
 import { cn } from "#src/ui/utils.js";
+import { cancelIdleCallback, requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
 
 const refreshThreshold = 72;
 const maxPullDistance = 96;
@@ -37,6 +38,8 @@ export function PullToRefresh({
 }) {
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const pullAnimationRef = useRef<AnimationPlaybackControls | null>(null);
+  const finishRefreshIdleCallbackRef = useRef<number | null>(null);
+  const finishRefreshFrameRef = useRef<number | null>(null);
   const isRefreshingRef = useRef(false);
   const pullDistance = useMotionValue(0);
   const indicatorScale = useTransform(pullDistance, [0, refreshThreshold], [0.85, 1], {
@@ -60,9 +63,20 @@ export function PullToRefresh({
     pullDistance.set(value);
   }
 
-  function animatePullDistance(value: number) {
+  function animatePullDistance(value: number, onComplete?: () => void) {
     stopPullAnimation();
-    pullAnimationRef.current = animate(pullDistance, value, indicatorSpring);
+    const animation = animate(pullDistance, value, {
+      ...indicatorSpring,
+      onComplete: () => {
+        if (pullAnimationRef.current === animation) {
+          pullAnimationRef.current = null;
+        }
+
+        onComplete?.();
+      },
+    });
+
+    pullAnimationRef.current = animation;
   }
 
   function isScrolledToTop() {
@@ -81,10 +95,35 @@ export function PullToRefresh({
     try {
       await refreshAction();
     } finally {
-      isRefreshingRef.current = false;
-      setIsRefreshing(false);
-      animatePullDistance(0);
+      scheduleRefreshFinish();
     }
+  }
+
+  function clearScheduledRefreshFinish() {
+    if (finishRefreshIdleCallbackRef.current !== null) {
+      cancelIdleCallback(finishRefreshIdleCallbackRef.current);
+      finishRefreshIdleCallbackRef.current = null;
+    }
+
+    if (finishRefreshFrameRef.current !== null) {
+      cancelAnimationFrame(finishRefreshFrameRef.current);
+      finishRefreshFrameRef.current = null;
+    }
+  }
+
+  function scheduleRefreshFinish() {
+    clearScheduledRefreshFinish();
+
+    finishRefreshIdleCallbackRef.current = requestIdleCallback(() => {
+      finishRefreshIdleCallbackRef.current = null;
+      finishRefreshFrameRef.current = requestAnimationFrame(() => {
+        finishRefreshFrameRef.current = null;
+        animatePullDistance(0, () => {
+          isRefreshingRef.current = false;
+          setIsRefreshing(false);
+        });
+      });
+    });
   }
 
   function onTouchStart(event: ReactTouchEvent<HTMLDivElement>) {
