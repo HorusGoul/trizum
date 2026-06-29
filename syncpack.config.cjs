@@ -65,7 +65,7 @@ const config = {
     {
       label: "Use workspace protocol when developing local packages",
       dependencies: ["$LOCAL"],
-      dependencyTypes: ["dev"],
+      dependencyTypes: ["dev", "prod"],
       pinVersion: "workspace:*",
     },
   ],
