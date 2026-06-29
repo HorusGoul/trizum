@@ -19,10 +19,26 @@
       "automerge": true
     },
     {
-      "description": "Keep patch and minor dependency updates together to reduce Renovate PR volume.",
+      "description": "Keep automergeable patch and minor dependency updates together to reduce Renovate PR volume.",
       "matchUpdateTypes": ["patch", "minor"],
+      "matchPackageNames": ["!typescript"],
+      "matchCurrentVersion": "!/^0\\./",
       "groupName": "non-major dependencies",
       "groupSlug": "non-major-dependencies"
+    },
+    {
+      "description": "Keep TypeScript patch and minor updates in a manual-review non-major group.",
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchPackageNames": ["typescript"],
+      "groupName": "manual non-major dependencies",
+      "groupSlug": "manual-non-major-dependencies"
+    },
+    {
+      "description": "Keep current 0.x patch and minor updates in a manual-review non-major group.",
+      "matchUpdateTypes": ["patch", "minor"],
+      "matchCurrentVersion": "/^0\\./",
+      "groupName": "manual non-major dependencies",
+      "groupSlug": "manual-non-major-dependencies"
     },
     {
       "description": "Do not update experimental React runtime packages; they are managed manually.",
