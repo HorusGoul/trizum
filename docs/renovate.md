@@ -35,9 +35,10 @@ follow-up push.
 its lockfile commit.
 
 Renovate groups patch and minor dependency updates into one PR to keep update
-volume manageable. Major updates are intentionally not grouped so they can be
-reviewed independently. `react` and `react-dom` updates are disabled because
-the app uses experimental builds that are managed manually.
+volume manageable. Most major updates stay independent, but tightly coupled
+dependency families still have major grouping rules so packages that need to
+move together are reviewed together. `react` and `react-dom` updates are
+disabled because the app uses experimental builds that are managed manually.
 
 ## Automerge
 

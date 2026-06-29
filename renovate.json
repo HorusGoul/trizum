@@ -29,6 +29,84 @@
       "matchManagers": ["npm"],
       "matchPackageNames": ["react", "react-dom"],
       "enabled": false
+    },
+    {
+      "description": "Keep tightly coupled React support major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "types-react",
+        "types-react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "babel-plugin-react-compiler"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "React support major updates"
+    },
+    {
+      "description": "Keep tightly coupled Capacitor major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@capacitor/*", "@capawesome/*", "capacitor-plugin-safe-area"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Capacitor major updates"
+    },
+    {
+      "description": "Keep tightly coupled Lingui major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@lingui/*", "eslint-plugin-lingui"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Lingui major updates"
+    },
+    {
+      "description": "Keep tightly coupled TanStack major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@tanstack/*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "TanStack major updates"
+    },
+    {
+      "description": "Keep tightly coupled React Spectrum and React Aria major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@internationalized/*",
+        "react-aria",
+        "react-aria-components",
+        "tailwindcss-react-aria-components"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "React Spectrum major updates"
+    },
+    {
+      "description": "Keep tightly coupled Sentry and logging major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["@sentry/*", "@logtape/*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Sentry and logging major updates"
+    },
+    {
+      "description": "Keep tightly coupled server framework major updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["hono", "@hono/*"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Hono major updates"
+    },
+    {
+      "description": "Keep tightly coupled Android and Gradle major updates together.",
+      "matchManagers": ["gradle", "gradle-wrapper"],
+      "matchPackageNames": [
+        "gradle",
+        "com.android.tools.build:gradle",
+        "androidx.*:*",
+        "com.google.*:*"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Android and Gradle major updates"
+    },
+    {
+      "description": "Keep GitHub Actions major updates together.",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "GitHub Actions major updates"
     }
   ]
 }
