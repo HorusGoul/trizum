@@ -3,7 +3,6 @@ packages:
 injectWorkspacePackages: true
 overrides:
   vite: "catalog:"
-  vitest: "catalog:"
   esbuild: 0.27.3
   react: 0.0.0-experimental-d025ddd3-20240722
   react-dom: 0.0.0-experimental-d025ddd3-20240722
@@ -12,10 +11,8 @@ overrides:
 peerDependencyRules:
   allowAny:
     - vite
-    - vitest
   allowedVersions:
     vite: "*"
-    vitest: "*"
 catalog:
   "@automerge/automerge": 3.2.6
   "@automerge/automerge-repo": 2.5.6
@@ -23,7 +20,7 @@ catalog:
   "@automerge/automerge-repo-network-websocket": 2.5.6
   "@automerge/automerge-repo-storage-indexeddb": 2.5.6
   "@ai-hero/sandcastle": 0.10.0
-  "@babel/core": 7.29.0
+  "@babel/core": 7.29.6
   "@barnum/barnum": 0.4.0
   "@capacitor/android": 8.0.1
   "@capacitor/app": 8.0.0
@@ -43,8 +40,8 @@ catalog:
   "@cloudflare/vite-plugin": 1.29.0
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
-  "@hono/node-server": 1.19.6
-  "@hono/node-ws": 1.2.0
+  "@hono/node-server": 1.19.14
+  "@hono/node-ws": 1.3.1
   "@horus.dev/tw-dynamic-themes": 0.0.3
   "@internationalized/date": 3.10.0
   "@kubiks/otel-drizzle": 2.1.0
@@ -77,13 +74,13 @@ catalog:
   "@use-gesture/react": 10.3.1
   "@vite-pwa/assets-generator": 1.0.2
   "@vitejs/plugin-react": 6.0.1
-  "@vitest/coverage-v8": 4.1.8
+  "@vitest/coverage-v8": 4.1.9
   agent-browser: 0.20.13
   all-contributors-cli: 6.26.1
   autoprefixer: 10.4.27
   babel-plugin-react-compiler: 1.0.0
   barcode-detector: ^3.0.8
-  better-auth: 1.6.18
+  better-auth: 1.6.22
   browser-image-compression: 2.0.2
   capacitor-plugin-safe-area: 5.0.0
   clsx: 2.1.1
@@ -98,7 +95,7 @@ catalog:
   eslint-plugin-lingui: 0.11.0
   exifr: 7.1.3
   heic-to: 1.4.2
-  hono: 4.10.6
+  hono: 4.12.27
   jose: 6.2.3
   lucide-static: 1.8.0
   mathjs: 15.1.0
@@ -130,14 +127,14 @@ catalog:
   tailwindcss-safe-area-capacitor: 0.5.1
   typescript: 5.9.2
   ulidx: 2.4.1
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.1
   vite-plugin-pwa: 1.2.0
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
-  vite-plus: 0.1.24
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
-  workbox-build: 7.4.0
-  workbox-window: 7.4.0
+  vite-plus: 0.2.1
+  vitest: 4.1.9
+  workbox-build: 7.4.1
+  workbox-window: 7.4.1
   wrangler: 4.74.0
   tsx: 4.22.4
   zod: 4.4.3

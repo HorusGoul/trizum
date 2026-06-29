@@ -89,6 +89,7 @@ export async function runSandcastleCodexFix(
   context: PullRequestContext,
   repoRoot: string,
   branchName: string,
+  reviewReport?: string,
 ): Promise<SandcastleFixRun> {
   const result = await run({
     agent: createCodexAgent(),
@@ -111,7 +112,7 @@ export async function runSandcastleCodexFix(
     },
     idleTimeoutSeconds: 20 * 60,
     name: `renovate-pr-${context.pr.number}`,
-    prompt: buildSandcastleFixPrompt(context),
+    prompt: buildSandcastleFixPrompt(context, reviewReport),
     sandbox: noSandbox({
       maxOutputTailChars: 256_000,
     }),
@@ -215,17 +216,21 @@ function buildSandcastleReviewPrompt(context: PullRequestContext): string {
     .join("\n");
 }
 
-function buildSandcastleFixPrompt(context: PullRequestContext): string {
+function buildSandcastleFixPrompt(context: PullRequestContext, reviewReport?: string): string {
   return [
-    "You are completing a superseding pull request for a failing Renovate dependency-update PR in the trizum repository.",
+    "You are completing a superseding pull request for a failing or blocked Renovate dependency-update PR in the trizum repository.",
     "",
     "Rules:",
     "- You may edit files in this Sandcastle-managed worktree.",
     "- Commit all file changes before finishing.",
     `- Use this commit message unless a narrower conventional commit is clearly better: chore(deps): complete Renovate PR #${context.pr.number}`,
+    "- Include this trailer on every commit you create: Co-authored-by: Horus Lugo <horusgoul@gmail.com>",
     "- Do not push, label, create a PR, merge, delete branches, or edit the original Renovate PR.",
     "- Preserve the original dependency-upgrade purpose.",
     "- Fix only issues needed to make the upgrade reviewable.",
+    "- Keep the superseding PR minimal; do not add or edit documentation unless missing documentation is the blocker.",
+    "- If blocker findings point to Renovate grouping or configuration, update the Renovate configuration instead of forcing unrelated dependency changes.",
+    "- Before finishing, read .agents/skills/deslop/SKILL.md and apply it to your diff so unnecessary docs, comments, defensive churn, and verbose summaries are removed.",
     "- Prefer the repo's existing patterns and Vite+ commands.",
     "- If no file changes are needed, explain why and do not create unrelated changes.",
     `- End your final response with this exact line: ${CODEX_COMPLETION_SIGNAL}`,
@@ -244,6 +249,9 @@ function buildSandcastleFixPrompt(context: PullRequestContext): string {
       null,
       2,
     ),
+    "",
+    "Review report:",
+    truncateText(reviewReport ?? "No review report was provided.", 40_000),
     "",
     "Diff:",
     truncateText(context.diff, 120_000),

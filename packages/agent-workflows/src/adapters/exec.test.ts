@@ -3,6 +3,7 @@ import {
   createSanitizedEnvironment,
   createSecretScrubEnvironmentOverrides,
   redactSecrets,
+  runCommand,
 } from "./exec.js";
 
 type TestEnvironment = Record<string, string | undefined>;
@@ -48,6 +49,16 @@ describe("command environment helpers", () => {
         'token ghp_123456789012345678901234567890123456 {"access_token":"secret-value"} sk-testsecretvalue1234567890',
       ),
     ).toBe('token [redacted] {"access_token":"[redacted]"} [redacted]');
+  });
+
+  test("returns missing commands as failures when failure is allowed", async () => {
+    const result = await runCommand("trizum-command-that-does-not-exist", [], {
+      allowFailure: true,
+      cwd: ".",
+    });
+
+    expect(result.exitCode).toBe(127);
+    expect(result.stderr).toContain("trizum-command-that-does-not-exist");
   });
 });
 
