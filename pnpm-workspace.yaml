@@ -94,7 +94,7 @@ catalog:
   heic-to: 1.5.2
   hono: 4.12.27
   jose: 6.2.3
-  lucide-static: 1.8.0
+  lucide-static: 1.22.0
   mathjs: 15.1.0
   motion: 12.38.0
   oxlint-plugin-react-doctor: 0.5.8
