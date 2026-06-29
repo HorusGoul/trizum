@@ -17,7 +17,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && format('pr-{0}', inputs.pr) || format('branch-{0}', github.event.workflow_run.head_branch) }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   review:

@@ -68,6 +68,9 @@ The
 workflow runs after the `CI` workflow completes on a `renovate/**` branch. It
 finds the open non-draft Renovate PR for that branch.
 
+The workflow cancels older in-progress review runs for the same manual PR input
+or Renovate branch so only the newest review continues.
+
 The workflow uses `BOT_GITHUB_TOKEN` for checkout and GitHub CLI write actions,
 configures commits as `lilith[bot]`, restores Codex account auth from Bitwarden
 Secrets Manager, invokes Codex through Sandcastle, and writes the refreshed
