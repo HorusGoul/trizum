@@ -113,7 +113,7 @@ catalog:
   react-window: 2.2.7
   rollup: 4.62.2
   rollup-plugin-license: 3.7.1
-  sharp: 0.32.6
+  sharp: 0.35.2
   skills: 1.4.5
   sonner: 2.0.7
   suspense: 0.1.0
