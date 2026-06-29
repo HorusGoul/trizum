@@ -3,7 +3,9 @@ import type { PullRequestContext } from "../schemas.js";
 import {
   canUpdateOriginalRenovatePr,
   renderSupersedingPullRequestBody,
+  selectExistingSupersedingPullRequest,
   type LocalValidationResult,
+  type SupersedingPullRequestCandidate,
 } from "./renovate-pr-review.js";
 
 describe("Renovate PR review workflow", () => {
@@ -19,6 +21,48 @@ describe("Renovate PR review workflow", () => {
     expect(canUpdateOriginalRenovatePr(["pnpm-lock.yaml", "packages/pwa/package.json"])).toBe(
       false,
     );
+  });
+
+  test("selects an existing superseding PR instead of creating a duplicate", () => {
+    const candidates = [
+      {
+        baseRefName: "main",
+        body: "Supersedes #237.\n\n## Summary\nDuplicate created later.",
+        headRefName: "agent/renovate-pr-237-later",
+        number: 267,
+        title: "chore(deps): update dependency ruby to v3.4.9",
+        url: "https://github.com/HorusGoul/trizum/pull/267",
+      },
+      {
+        baseRefName: "main",
+        body: "Supersedes #237.\n\n## Summary\nFirst superseding PR.",
+        headRefName: "agent/renovate-pr-237-first",
+        number: 263,
+        title: "chore(deps): update dependency ruby to v3.4.9",
+        url: "https://github.com/HorusGoul/trizum/pull/263",
+      },
+      {
+        baseRefName: "release",
+        body: "Supersedes #237.",
+        headRefName: "agent/renovate-pr-237-release",
+        number: 260,
+        title: "chore(deps): update dependency ruby to v3.4.9",
+        url: "https://github.com/HorusGoul/trizum/pull/260",
+      },
+      {
+        baseRefName: "main",
+        body: "Supersedes #23.",
+        headRefName: "agent/renovate-pr-23",
+        number: 261,
+        title: "chore(deps): update dependency ruby",
+        url: "https://github.com/HorusGoul/trizum/pull/261",
+      },
+    ] satisfies SupersedingPullRequestCandidate[];
+
+    expect(selectExistingSupersedingPullRequest(candidates, 237, "main")).toMatchObject({
+      number: 263,
+      url: "https://github.com/HorusGoul/trizum/pull/263",
+    });
   });
 
   test("explains why superseding PRs exist and reports the failed local command", () => {

@@ -78,6 +78,15 @@ export interface LocalValidationResult {
   passed: boolean;
 }
 
+export interface SupersedingPullRequestCandidate {
+  baseRefName: string;
+  body: string;
+  headRefName: string;
+  number: number;
+  title: string;
+  url: string;
+}
+
 const ORIGINAL_PR_DIRECT_UPDATE_FILES = new Set(["pnpm-lock.yaml", "pnpm-workspace.yaml"]);
 
 export const listRenovatePullRequests = createHandler(
@@ -724,12 +733,84 @@ async function commentOnPullRequest(
   );
 }
 
+async function findExistingSupersedingPullRequest(
+  options: WorkflowOptions,
+  context: PullRequestContext,
+): Promise<SupersedingPullRequestCandidate | undefined> {
+  const candidates = await ghJson<SupersedingPullRequestCandidate[]>(
+    options,
+    "pr",
+    "list",
+    "--state",
+    "open",
+    "--limit",
+    "100",
+    "--json",
+    "baseRefName,body,headRefName,number,title,url",
+  );
+
+  return selectExistingSupersedingPullRequest(
+    candidates,
+    context.pr.number,
+    context.pr.baseRefName,
+  );
+}
+
+export function selectExistingSupersedingPullRequest(
+  candidates: readonly SupersedingPullRequestCandidate[],
+  originalPrNumber: number,
+  baseRefName: string,
+): SupersedingPullRequestCandidate | undefined {
+  const matches = candidates.filter(
+    (candidate) =>
+      candidate.number !== originalPrNumber &&
+      candidate.baseRefName === baseRefName &&
+      hasSupersedesMarker(candidate.body, originalPrNumber),
+  );
+
+  return matches.sort((left, right) => left.number - right.number)[0];
+}
+
+function hasSupersedesMarker(body: string, originalPrNumber: number): boolean {
+  const marker = `Supersedes #${originalPrNumber}`;
+  return splitLines(body).some((line) => {
+    const normalizedLine = line.trim().replace(/\.$/, "");
+    return normalizedLine === marker;
+  });
+}
+
+function renderExistingSupersedingPullRequestSummary(
+  context: PullRequestContext,
+  existingPullRequest: SupersedingPullRequestCandidate,
+): string {
+  return [
+    `Reused existing superseding PR #${existingPullRequest.number} for Renovate PR #${context.pr.number}.`,
+    `Existing PR: ${existingPullRequest.url}`,
+    "Skipped creating another agent branch for the same original PR.",
+  ].join("\n");
+}
+
 async function createSupersedingPullRequest(
   options: WorkflowOptions,
   context: PullRequestContext,
   report: string,
 ): Promise<SupersedingPullRequest> {
   await ensureReadyLabel(options);
+
+  const existingSupersedingPullRequest = await findExistingSupersedingPullRequest(options, context);
+  if (existingSupersedingPullRequest != null) {
+    await addLabelToIssue(
+      options,
+      existingSupersedingPullRequest.number,
+      options.readyForHumanReviewLabel,
+    );
+
+    return {
+      branchName: existingSupersedingPullRequest.headRefName,
+      prUrl: existingSupersedingPullRequest.url,
+      summary: renderExistingSupersedingPullRequestSummary(context, existingSupersedingPullRequest),
+    };
+  }
 
   const branchName = `agent/renovate-pr-${context.pr.number}-${Date.now()}`;
   let worktreeRoot: string | undefined;
