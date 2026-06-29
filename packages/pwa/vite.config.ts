@@ -22,6 +22,7 @@ import iconSpriteConfig from "./iconSprite.config.mjs";
 const ReactCompilerConfig = {};
 const sentryOrg = "horusdev";
 const sentryProject = "trizum-pwa";
+const buildTarget = ["edge88", "firefox78", "chrome87", "safari14.1"];
 
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
@@ -128,6 +129,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      target: buildTarget,
       sourcemap: true,
       minify: true,
     },
