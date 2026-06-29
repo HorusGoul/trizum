@@ -338,8 +338,8 @@ catalogs:
       specifier: 2.4.1
       version: 2.4.1
     vite-plugin-pwa:
-      specifier: 1.2.0
-      version: 1.2.0
+      specifier: 1.3.0
+      version: 1.3.0
     vite-plugin-top-level-await:
       specifier: 1.6.0
       version: 1.6.0
@@ -832,7 +832,7 @@ importers:
         version: '@voidzero-dev/vite-plus-core@0.2.1(@types/node@24.10.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0)'
       vite-plugin-pwa:
         specifier: 'catalog:'
-        version: 1.2.0(@vite-pwa/assets-generator@1.0.2)(@voidzero-dev/vite-plus-core@0.2.1(@types/node@24.10.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1)
+        version: 1.3.0(@vite-pwa/assets-generator@1.0.2)(@voidzero-dev/vite-plus-core@0.2.1(@types/node@24.10.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1)
       vite-plugin-top-level-await:
         specifier: 'catalog:'
         version: 1.6.0(@swc/helpers@0.5.17)(@voidzero-dev/vite-plus-core@0.2.1(@types/node@24.10.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0))(rollup@4.62.2)
@@ -5078,9 +5078,6 @@ packages:
 
   '@types/esrecurse@4.3.1':
     resolution: {integrity: sha512-xJBAbDifo5hpffDBuHl0Y8ywswbiAp/Wi7Y/GtAgSlZyIABppyurxVueOPE8LUQOxdlgi6Zqce7uoEpqNTeiUw==}
-
-  '@types/estree@1.0.8':
-    resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
@@ -9469,14 +9466,14 @@ packages:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  vite-plugin-pwa@1.2.0:
-    resolution: {integrity: sha512-a2xld+SJshT9Lgcv8Ji4+srFJL4k/1bVbd1x06JIkvecpQkwkvCncD1+gSzcdm3s+owWLpMJerG3aN5jupJEVw==}
+  vite-plugin-pwa@1.3.0:
+    resolution: {integrity: sha512-c5kMgN+ITrOtHXp8PAtk2uOIEea6XjP/unCGxOWWBzQ6qa65qj/awHg0wf+QF9E/2u9vh86LqxPwzEPNbM2r5A==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       '@vite-pwa/assets-generator': ^1.0.0
-      vite: ^3.1.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
-      workbox-build: ^7.4.0
-      workbox-window: ^7.4.0
+      vite: ^3.1.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+      workbox-build: ^7.4.1
+      workbox-window: ^7.4.1
     peerDependenciesMeta:
       '@vite-pwa/assets-generator':
         optional: true
@@ -9918,7 +9915,7 @@ snapshots:
 
   '@apm-js-collab/code-transformer@0.15.0':
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       astring: 1.9.0
       esquery: 1.7.0
       meriyah: 6.1.4
@@ -13763,7 +13760,7 @@ snapshots:
 
   '@rollup/pluginutils@5.3.0(rollup@4.62.2)':
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       estree-walker: 2.0.2
       picomatch: 4.0.4
     optionalDependencies:
@@ -14575,8 +14572,6 @@ snapshots:
   '@types/emscripten@1.41.5': {}
 
   '@types/esrecurse@4.3.1': {}
-
-  '@types/estree@1.0.8': {}
 
   '@types/estree@1.0.9': {}
 
@@ -16157,7 +16152,7 @@ snapshots:
   eslint-scope@9.1.2:
     dependencies:
       '@types/esrecurse': 4.3.1
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       esrecurse: 4.3.0
       estraverse: 5.3.0
 
@@ -16180,7 +16175,7 @@ snapshots:
       '@humanfs/node': 0.16.7
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.3
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
       ajv: 6.15.0
       chalk: 4.1.2
       cross-spawn: 7.0.6
@@ -16233,7 +16228,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.8
+      '@types/estree': 1.0.9
 
   esutils@2.0.3: {}
 
@@ -19463,7 +19458,7 @@ snapshots:
 
   validate-npm-package-name@5.0.1: {}
 
-  vite-plugin-pwa@1.2.0(@vite-pwa/assets-generator@1.0.2)(@voidzero-dev/vite-plus-core@0.2.1(@types/node@24.10.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1):
+  vite-plugin-pwa@1.3.0(@vite-pwa/assets-generator@1.0.2)(@voidzero-dev/vite-plus-core@0.2.1(@types/node@24.10.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.22.4)(typescript@5.9.3)(yaml@2.9.0))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
