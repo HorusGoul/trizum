@@ -197,6 +197,7 @@ export function ExpenseEditor({
 
   const isReceivingUpdatesRef = useRef(false);
   const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);
+  const previousValuesRef = useRef(form.store.state.values);
 
   function createFieldFocusHandlers(field: { name: string; handleBlur: () => void }) {
     return {
@@ -243,13 +244,20 @@ export function ExpenseEditor({
       return;
     }
 
-    return form.store.subscribe(({ currentVal, prevVal }) => {
+    previousValuesRef.current = form.store.state.values;
+
+    const subscription = form.store.subscribe((currentState) => {
+      const previousValues = previousValuesRef.current;
+      previousValuesRef.current = currentState.values;
+
       if (isReceivingUpdatesRef.current) {
         return;
       }
 
-      onChange(prevVal.values, currentVal.values);
+      onChange(previousValues, currentState.values);
     });
+
+    return () => subscription.unsubscribe();
   }, [form.store, onChange]);
 
   return (
@@ -1052,14 +1060,10 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
         color="transparent"
         aria-label={t`View photo`}
         className="h-auto w-auto p-0"
+        onContextMenu={(e) => e.preventDefault()}
         onPress={handleViewPhoto}
       >
-        <img
-          src={url}
-          className="block h-32 w-32 rounded-xl object-cover"
-          alt=""
-          onContextMenu={(e) => e.preventDefault()}
-        />
+        <img src={url} className="block h-32 w-32 rounded-xl object-cover" alt="" />
       </Button>
       <Button
         color="input-like"
