@@ -96,8 +96,8 @@
       "groupName": "GitHub Actions"
     },
     {
-      "description": "Keep non-major runtime and package-manager updates together.",
-      "matchManagers": ["dockerfile", "mise", "nodenv", "npm"],
+      "description": "Keep non-major platform runtime and package-manager updates together.",
+      "matchManagers": ["dockerfile", "github-actions", "mise", "nodenv", "npm"],
       "matchPackageNames": ["node", "ruby", "pnpm", "@types/node"],
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "platform runtimes and package manager"
