@@ -296,8 +296,8 @@ catalogs:
       specifier: 0.32.6
       version: 0.32.6
     skills:
-      specifier: 1.5.13
-      version: 1.5.13
+      specifier: 1.5.14
+      version: 1.5.14
     sonner:
       specifier: 2.0.7
       version: 2.0.7
@@ -391,7 +391,7 @@ importers:
         version: 6.26.1
       skills:
         specifier: 'catalog:'
-        version: 1.5.13
+        version: 1.5.14
       syncpack:
         specifier: 'catalog:'
         version: 12.4.0(typescript@6.0.3)
@@ -8141,8 +8141,8 @@ packages:
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
-  skills@1.5.13:
-    resolution: {integrity: sha512-eKYnMYCV4zlmXSikluxctEsn46i9ci18vb2d8b45yb4zTIvj3nFqMV3IrzF7VxqoXPF2AQnEZqVDu9tbPB2Atw==}
+  skills@1.5.14:
+    resolution: {integrity: sha512-oA0Wv2cfUnLaFHeDU+IwHfrbfyP42H1UTjjEZYnOtgujkMGL6uXKzmmIx8/6jPhqJiK1v7HbvRPBmhowg9N2lA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -16865,7 +16865,7 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
-  skills@1.5.13:
+  skills@1.5.14:
     dependencies:
       yaml: 2.9.0
 
