@@ -1,5 +1,21 @@
 # @trizum/pwa
 
+## 1.10.2
+
+### Patch Changes
+
+- [#244](https://github.com/HorusGoul/trizum/pull/244) [`ab7ad9c`](https://github.com/HorusGoul/trizum/commit/ab7ad9c1626ce5da06cffd59f0ef5a2d02c17bca) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Move party balance recalculation to the app worker so large parties do not block the UI thread, and let users refresh balances manually with a pull-down gesture.
+
+- [#229](https://github.com/HorusGoul/trizum/pull/229) [`f4ca302`](https://github.com/HorusGoul/trizum/commit/f4ca302cdb50ca87323d9f61bfbcb7a6ff656d72) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add Async React action props to shared UI components so buttons, menu items,
+  tabs, switches, and checkboxes can own transitions, optimistic state, and local
+  pending feedback.
+
+- [#214](https://github.com/HorusGoul/trizum/pull/214) [`cc62b54`](https://github.com/HorusGoul/trizum/commit/cc62b54324c73b20c1497398c8f63d72b1019993) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent crawlers from indexing party routes by sending a noindex robots header for `/party/*` responses.
+
+- [#216](https://github.com/HorusGoul/trizum/pull/216) [`7ca387f`](https://github.com/HorusGoul/trizum/commit/7ca387fddfde6470b32c2d046f1871c9367a8d51) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Skip immediate party balance recalculation when adding, updating, or removing expenses.
+
+- [#213](https://github.com/HorusGoul/trizum/pull/213) [`2a686d4`](https://github.com/HorusGoul/trizum/commit/2a686d4b994a38bd9421d26376ce67a5e46bfcf9) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix Cloudflare Worker deploy preview builds by preserving the Worker handler export and using the browser-safe `debug` entry during upload validation.
+
 ## 1.10.1
 
 ### Patch Changes
@@ -25,6 +41,7 @@
 - [#198](https://github.com/HorusGoul/trizum/pull/198) [`54e5652`](https://github.com/HorusGoul/trizum/commit/54e565296b2959659e0968ee1b016fbb8f74ced8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix mobile trizum cloud sign-in CORS preflights and add native safe-area spacing to the full-screen sign-in dialog.
 
 - [#206](https://github.com/HorusGoul/trizum/pull/206) [`a303a7a`](https://github.com/HorusGoul/trizum/commit/a303a7a6d5d51b467577e27066fe22a2a2c5074c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Update privacy and store metadata disclosures for trizum cloud accounts.
+
   - Covers account sign-in, linked Google and Apple providers, Cloudflare-backed storage, authentication emails, sessions, and cloud account deletion.
   - Keeps store metadata clear that accounts are optional for getting started and only needed for trizum cloud sync across devices.
 
@@ -69,6 +86,7 @@
 ### Patch Changes
 
 - 09ef7ba: Replace the PWA icon loader with a generated SVG sprite pipeline.
+
   - generate a minimal sprite from the icons actually referenced in the app
   - add typed sprite IDs for Lucide static icons and custom SVG icon sets
   - remove the old Lucide lazy-loading and preload generation setup
@@ -82,6 +100,7 @@
 ### Minor Changes
 
 - 750a8f6: Refresh the home screen party list with a new card-based layout and party management controls.
+
   - order parties by pinned status and most recent use
   - let users pin and archive parties from the home screen
   - add a dedicated archived parties screen with restore actions
@@ -94,6 +113,7 @@
 ### Patch Changes
 
 - 9116b2b: Standardize several loading states on the shared Trizum spinner component.
+
   - replace the party pending screen's inline spinner SVG with `TrizumSpinner`
   - use `TrizumSpinner` for avatar uploads and the emoji picker loading state
 
@@ -116,6 +136,7 @@
 ### Minor Changes
 
 - 9d73432: Add calculator toolbar for currency fields
+
   - Full iOS-style calculator UI with number pad
   - Cursor positioning via tap and drag gestures
   - Keyboard support (numbers, operators, backspace, enter, escape, arrow keys)
@@ -147,6 +168,7 @@
 ### Patch Changes
 
 - 25b1d73: Upgrade Capacitor to v8
+
   - @capacitor/core: 7.4.4 → 8.0.1
   - @capacitor/android: 7.4.4 → 8.0.1
   - @capacitor/ios: 7.4.4 → 8.0.1
@@ -157,6 +179,7 @@
   - capacitor-plugin-safe-area: 4.0.3 → 5.0.0
 
   Android:
+
   - minSdkVersion: 23 → 24
   - compileSdkVersion: 35 → 36
   - targetSdkVersion: 35 → 36
@@ -165,9 +188,11 @@
   - Added density to configChanges
 
   iOS:
+
   - Minimum platform: 14.0 → 15.0
 
   CI:
+
   - Updated iOS workflows to use macos-26 for Xcode 26 SDK
 
 ## 1.4.1
