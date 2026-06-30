@@ -91,7 +91,7 @@ jobs:
         if: matrix.platform == 'ios'
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4.9"
+          ruby-version: "3.4.10"
           bundler: "2.7.2"
           bundler-cache: true
           cache-version: ios-0

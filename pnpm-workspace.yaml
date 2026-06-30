@@ -37,7 +37,7 @@ catalog:
   "@capawesome/capver": 0.1.4
   "@changesets/changelog-github": 0.7.0
   "@changesets/cli": 2.31.0
-  "@cloudflare/vite-plugin": 1.42.3
+  "@cloudflare/vite-plugin": 1.42.4
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
   "@hono/node-server": 2.0.6
@@ -99,7 +99,7 @@ catalog:
   jose: 6.2.3
   lucide-static: 1.22.0
   mathjs: 15.2.0
-  motion: 12.42.0
+  motion: 12.42.2
   oxlint-plugin-react-doctor: 0.5.8
   playwright: 1.61.1
   postcss: 8.5.16
@@ -135,6 +135,6 @@ catalog:
   vitest: 4.1.9
   workbox-build: 7.4.1
   workbox-window: 7.4.1
-  wrangler: 4.105.0
+  wrangler: 4.106.0
   tsx: 4.22.4
   zod: 4.4.3
