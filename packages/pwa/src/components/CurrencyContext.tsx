@@ -1,4 +1,4 @@
-import type { Currency } from "dinero.js";
+import type { CurrencyCode } from "#src/lib/money.ts";
 import { createContext } from "react";
 
-export const CurrencyContext = createContext<Currency>("EUR");
+export const CurrencyContext = createContext<CurrencyCode>("EUR");

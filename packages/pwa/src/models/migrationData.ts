@@ -1,8 +1,8 @@
-import type { Currency } from "dinero.js";
+import type { CurrencyCode } from "#src/lib/money.ts";
 
 export interface MigrationData {
   party: {
-    currency: Currency;
+    currency: CurrencyCode;
     description: string;
     name: string;
     participants: Record<string, MigrationParticipant>;
