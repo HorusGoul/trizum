@@ -1,6 +1,7 @@
 packages:
   - packages/*
 injectWorkspacePackages: true
+minimumReleaseAge: 1440
 overrides:
   vite: "catalog:"
   esbuild: 0.28.1

@@ -4,6 +4,7 @@
   "automergeType": "pr",
   "automergeStrategy": "squash",
   "platformAutomerge": false,
+  "minimumReleaseAge": "1 day",
   "gitIgnoredAuthors": ["259750894+PUNK-02@users.noreply.github.com"],
   "packageRules": [
     {
