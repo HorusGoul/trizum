@@ -82,14 +82,16 @@
       "groupName": "TanStack major updates"
     },
     {
+      "description": "Keep Tailwind CSS major updates with plugins that require the same Tailwind major.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["tailwindcss", "tailwindcss-react-aria-components"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "Tailwind CSS major updates"
+    },
+    {
       "description": "Keep tightly coupled React Spectrum and React Aria major updates together.",
       "matchManagers": ["npm"],
-      "matchPackageNames": [
-        "@internationalized/*",
-        "react-aria",
-        "react-aria-components",
-        "tailwindcss-react-aria-components"
-      ],
+      "matchPackageNames": ["@internationalized/*", "react-aria", "react-aria-components"],
       "matchUpdateTypes": ["major"],
       "groupName": "React Spectrum major updates"
     },
