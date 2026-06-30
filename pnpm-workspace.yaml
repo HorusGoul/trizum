@@ -121,7 +121,7 @@ catalog:
   svgexport: 0.4.2
   svgo: 4.0.1
   syncpack: 15.3.2
-  tailwind-merge: 2.6.1
+  tailwind-merge: 3.6.0
   tailwindcss: 3.4.19
   tailwindcss-animate: 1.0.7
   tailwindcss-react-aria-components: 1.2.0
