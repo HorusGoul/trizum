@@ -49,7 +49,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: voidzero-dev/setup-vp@v1
@@ -60,7 +60,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4.10"
+          ruby-version: "4.0.5"
           bundler: "2.7.2"
           bundler-cache: true
           cache-version: ios-0
@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload IPA artifact
         timeout-minutes: 2
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-appstore-ipa
           path: packages/mobile/ios/App/*.ipa
@@ -114,7 +114,7 @@ jobs:
 
       - name: Upload dSYM artifact
         timeout-minutes: 2
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-dsym
           path: packages/mobile/ios/App/*.dSYM.zip

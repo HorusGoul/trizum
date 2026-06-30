@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: voidzero-dev/setup-vp@v1
@@ -85,7 +85,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4.10"
+          ruby-version: "4.0.5"
           bundler: "2.7.2"
           bundler-cache: true
           cache-version: android-0
@@ -136,7 +136,7 @@ jobs:
       - name: Upload Android APK artifact
         if: ${{ inputs.android_artifact == 'apk' }}
         timeout-minutes: 2
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-${{ inputs.build_type }}-apk
           path: packages/mobile/android/app/build/outputs/apk/**/*.apk
@@ -145,7 +145,7 @@ jobs:
       - name: Upload Android AAB artifact
         if: ${{ inputs.build_type == 'release' && inputs.android_artifact == 'aab' }}
         timeout-minutes: 2
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-release-aab
           path: packages/mobile/android/app/build/outputs/bundle/**/*.aab
@@ -157,7 +157,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: voidzero-dev/setup-vp@v1
@@ -168,7 +168,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.4.10"
+          ruby-version: "4.0.5"
           bundler: "2.7.2"
           bundler-cache: true
           cache-version: ios-0
@@ -215,7 +215,7 @@ jobs:
       - name: Upload iOS IPA artifact
         if: ${{ inputs.build_type == 'release' }}
         timeout-minutes: 2
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-${{ inputs.ios_export_method }}-ipa
           path: packages/mobile/ios/App/*.ipa
@@ -224,7 +224,7 @@ jobs:
       - name: Upload iOS dSYM artifact
         if: ${{ inputs.build_type == 'release' }}
         timeout-minutes: 2
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-dsym
           path: packages/mobile/ios/App/*.dSYM.zip

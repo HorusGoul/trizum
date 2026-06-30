@@ -223,7 +223,7 @@ jobs:
 
           echo "ready=true" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         with:
           fetch-depth: 0
