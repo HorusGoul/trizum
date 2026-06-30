@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import type { Currency } from "dinero.js";
+import type { Currency } from "#src/lib/money.js";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {

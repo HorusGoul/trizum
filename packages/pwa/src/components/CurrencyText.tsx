@@ -1,5 +1,5 @@
 import { cn } from "#src/ui/utils.js";
-import Dinero, { type Currency } from "dinero.js";
+import { formatMoney, type Currency } from "#src/lib/money.js";
 
 export interface CurrencyTextProps extends React.HTMLAttributes<HTMLSpanElement> {
   amount: number;
@@ -34,7 +34,7 @@ export function CurrencyText({
 
   return (
     <span className={cn(color, className)} {...props}>
-      {Dinero({ amount, currency }).setLocale("es-ES").toFormat(format)}
+      {formatMoney({ amount, currency, format, locale: "es-ES" })}
     </span>
   );
 }

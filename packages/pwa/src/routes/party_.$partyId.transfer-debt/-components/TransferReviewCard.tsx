@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import type { Currency } from "dinero.js";
+import type { Currency } from "#src/lib/money.js";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import { ReviewParticipantInline, ReviewPartyRow } from "./ReviewPartyRow.js";

@@ -1,4 +1,4 @@
-import type { Currency } from "dinero.js";
+import type { Currency } from "#src/lib/money.js";
 import type { PartyParticipant } from "#src/models/party.js";
 
 export interface CurrencyOption {
