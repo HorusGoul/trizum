@@ -1,5 +1,12 @@
 # @trizum/mobile
 
+## 1.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`ab7ad9c`](https://github.com/HorusGoul/trizum/commit/ab7ad9c1626ce5da06cffd59f0ef5a2d02c17bca), [`f4ca302`](https://github.com/HorusGoul/trizum/commit/f4ca302cdb50ca87323d9f61bfbcb7a6ff656d72), [`cc62b54`](https://github.com/HorusGoul/trizum/commit/cc62b54324c73b20c1497398c8f63d72b1019993), [`7ca387f`](https://github.com/HorusGoul/trizum/commit/7ca387fddfde6470b32c2d046f1871c9367a8d51), [`2a686d4`](https://github.com/HorusGoul/trizum/commit/2a686d4b994a38bd9421d26376ce67a5e46bfcf9)]:
+  - @trizum/pwa@1.10.2
+
 ## 1.10.1
 
 ### Patch Changes
@@ -14,6 +21,7 @@
 ### Patch Changes
 
 - [#206](https://github.com/HorusGoul/trizum/pull/206) [`a303a7a`](https://github.com/HorusGoul/trizum/commit/a303a7a6d5d51b467577e27066fe22a2a2c5074c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Update privacy and store metadata disclosures for trizum cloud accounts.
+
   - Covers account sign-in, linked Google and Apple providers, Cloudflare-backed storage, authentication emails, sessions, and cloud account deletion.
   - Keeps store metadata clear that accounts are optional for getting started and only needed for trizum cloud sync across devices.
 
@@ -103,6 +111,7 @@
 ### Patch Changes
 
 - 25b1d73: Upgrade Capacitor to v8
+
   - @capacitor/core: 7.4.4 → 8.0.1
   - @capacitor/android: 7.4.4 → 8.0.1
   - @capacitor/ios: 7.4.4 → 8.0.1
@@ -113,6 +122,7 @@
   - capacitor-plugin-safe-area: 4.0.3 → 5.0.0
 
   Android:
+
   - minSdkVersion: 23 → 24
   - compileSdkVersion: 35 → 36
   - targetSdkVersion: 35 → 36
@@ -121,9 +131,11 @@
   - Added density to configChanges
 
   iOS:
+
   - Minimum platform: 14.0 → 15.0
 
   CI:
+
   - Updated iOS workflows to use macos-26 for Xcode 26 SDK
 
 - Updated dependencies [1b3e4f5]
