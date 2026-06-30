@@ -13,6 +13,7 @@ import type {
   PartyExpenseChunkRef,
   PartyParticipant,
 } from "#src/models/party.js";
+import { normalizePartyExpenseRules } from "#src/models/party.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import type { DocHandle, Repo, DocumentId } from "@automerge/automerge-repo/slim";
 import { deleteAt, insertAt, isValidDocumentId } from "@automerge/automerge-repo/slim";
@@ -111,11 +112,14 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     void recalculateBalances();
   }
 
-  function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
+  function updateSettings(
+    values: Pick<Party, "name" | "symbol" | "description" | "participants" | "expenseRules">,
+  ) {
     handle.change((doc) => {
       doc.name = values.name;
       doc.symbol = values.symbol;
       doc.description = values.description;
+      doc.expenseRules = normalizePartyExpenseRules(values.expenseRules);
       doc.participants = values.participants;
     });
   }

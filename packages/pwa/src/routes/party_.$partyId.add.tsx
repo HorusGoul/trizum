@@ -118,6 +118,7 @@ function AddExpense() {
           shares: {},
           paidAt,
           photos: [],
+          receiptRuleOverrideAcknowledged: false,
         }}
         goBackFallbackOptions={{ to: "/party/$partyId" }}
         onViewPhoto={openGallery}

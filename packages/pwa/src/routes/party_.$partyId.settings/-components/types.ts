@@ -1,9 +1,10 @@
-import type { PartyParticipant } from "#src/models/party.js";
+import type { PartyExpenseRules, PartyParticipant } from "#src/models/party.js";
 
 export interface PartySettingsFormValues {
   name: string;
   symbol: string;
   description: string;
+  expenseRules: PartyExpenseRules;
   participants: (PartyParticipant | (PartyParticipant & { __isNew: true }))[];
 }
 

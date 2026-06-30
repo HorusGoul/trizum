@@ -1,7 +1,12 @@
 import { t } from "@lingui/core/macro";
 import { useParty } from "#src/hooks/useParty.js";
 import { guardParticipatingInParty } from "#src/lib/guards.js";
-import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
+import {
+  DEFAULT_PARTY_SYMBOL,
+  normalizePartyExpenseRules,
+  type Party,
+  type PartyParticipant,
+} from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
@@ -9,6 +14,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { Suspense, useId } from "react";
 import { toast } from "sonner";
 import { PartyParticipantsField } from "./-components/PartyParticipantsField.js";
+import { PartyExpenseRulesField } from "./-components/PartyExpenseRulesField.js";
 import { PartySettingsDetailsFields } from "./-components/PartySettingsDetailsFields.js";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 import type {
@@ -49,6 +55,7 @@ function PartySettings() {
       name: values.name,
       symbol: values.symbol,
       description: values.description,
+      expenseRules: values.expenseRules,
       participants,
     });
 
@@ -60,6 +67,7 @@ function PartySettings() {
       name: party.name,
       symbol: party.symbol || DEFAULT_PARTY_SYMBOL,
       description: party.description,
+      expenseRules: normalizePartyExpenseRules(party.expenseRules),
       participants: Object.values(party.participants),
     } as PartySettingsFormValues,
     onSubmit: ({ value }) => {
@@ -128,6 +136,18 @@ function PartySettings() {
         className="container mt-4 flex flex-col gap-6 px-4"
       >
         <PartySettingsDetailsFields form={form} />
+        <form.Field name="expenseRules">
+          {(field) => (
+            <PartyExpenseRulesField
+              currency={party.currency}
+              value={field.state.value}
+              onChange={field.handleChange}
+              onBlur={field.handleBlur}
+              errorMessage={field.state.meta.errors?.join(", ")}
+              isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
+            />
+          )}
+        </form.Field>
         <PartyParticipantsField
           addNewParticipant={addNewParticipant}
           addParticipantForm={addParticipantForm}
