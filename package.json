@@ -15,7 +15,7 @@
     "publish-packages": "vp exec changeset publish",
     "test:e2e": "vp run --filter @trizum/pwa test:e2e",
     "update-version": "vp exec changeset version && cd packages/mobile && vp run version:update",
-    "syncpack:fix": "vp exec syncpack fix-mismatches && vp exec syncpack format",
+    "syncpack:fix": "vp exec syncpack fix && vp exec syncpack format",
     "typecheck": "vp check --no-fmt --no-lint",
     "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs",
     "doctor": "vp exec react-doctor"
