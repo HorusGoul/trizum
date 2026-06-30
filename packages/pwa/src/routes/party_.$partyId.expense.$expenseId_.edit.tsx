@@ -291,6 +291,7 @@ function getFormValues(expense: Expense): ExpenseEditorFormValues {
       photos: expense.__editCopy.photos,
       amount: getExpenseTotalAmount(expense.__editCopy) / 100,
       paidBy: Object.keys(expense.__editCopy.paidBy)[0],
+      receiptRuleOverrideAcknowledged: false,
     };
   }
 
@@ -301,6 +302,7 @@ function getFormValues(expense: Expense): ExpenseEditorFormValues {
     paidBy: Object.keys(expense.paidBy)[0],
     shares: expense.shares,
     photos: expense.photos,
+    receiptRuleOverrideAcknowledged: false,
   };
 }
 

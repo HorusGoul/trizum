@@ -15,7 +15,11 @@ import Dinero from "dinero.js";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
-import type { PartyParticipant } from "#src/models/party.ts";
+import {
+  getExpenseReceiptRuleViolation,
+  type Party,
+  type PartyParticipant,
+} from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 import { AppDatePicker } from "#src/ui/DatePicker.tsx";
@@ -53,6 +57,7 @@ export interface ExpenseEditorFormValues {
   paidBy: ExpenseUser;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   photos: MediaFile["id"][];
+  receiptRuleOverrideAcknowledged: boolean;
 }
 
 export interface ExpenseEditorRef {
@@ -93,6 +98,7 @@ export function ExpenseEditor({
   onViewPhoto,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
+  const { party } = useCurrentParty();
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
@@ -163,6 +169,18 @@ export function ExpenseEditor({
         return;
       }
 
+      const receiptRuleViolation = getExpenseReceiptRuleViolation({
+        amount: totalAmount.getAmount(),
+        photoCount: value.photos.length,
+        rules: party.expenseRules,
+        title: value.name,
+      });
+
+      if (receiptRuleViolation && !value.receiptRuleOverrideAcknowledged) {
+        toast.error(t`Add a receipt or acknowledge the receipt rule override before saving.`);
+        return;
+      }
+
       saveInFlightRef.current = true;
 
       try {
@@ -194,6 +212,8 @@ export function ExpenseEditor({
 
   const shares = useStore(form.store, (state) => state.values.shares);
   const amount = useStore(form.store, (state) => state.values.amount);
+  const name = useStore(form.store, (state) => state.values.name);
+  const photos = useStore(form.store, (state) => state.values.photos);
 
   const isReceivingUpdatesRef = useRef(false);
   const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);
@@ -307,6 +327,13 @@ export function ExpenseEditor({
           onViewPhoto={onViewPhoto}
           participants={participants}
           shouldAutoFocus={autoFocus}
+        />
+        <ReceiptRuleOverrideField
+          amount={amount}
+          form={form}
+          photos={photos}
+          rules={party.expenseRules}
+          title={name}
         />
         <ExpenseParticipantsSection
           amount={amount}
@@ -514,6 +541,62 @@ function ExpenseDetailsFields({
         )}
       </form.Field>
     </div>
+  );
+}
+
+function ReceiptRuleOverrideField({
+  amount,
+  form,
+  photos,
+  rules,
+  title,
+}: {
+  amount: number;
+  form: ExpenseEditorFormApi;
+  photos: MediaFile["id"][];
+  rules: Party["expenseRules"];
+  title: string;
+}) {
+  const violation = getExpenseReceiptRuleViolation({
+    amount: convertToUnits(amount),
+    photoCount: photos.length,
+    rules,
+    title,
+  });
+
+  if (!violation) {
+    return null;
+  }
+
+  return (
+    <Alert className="mt-4" variant="default">
+      <Icon icon="lucide.receipt-text" />
+
+      <AlertTitle>{t`Receipt rule`}</AlertTitle>
+
+      <AlertDescription>
+        <p>
+          <Trans>This expense matches a rule that requires a receipt.</Trans>
+        </p>
+
+        <p>
+          <Trans>Add a receipt or acknowledge the override before saving.</Trans>
+        </p>
+
+        <form.Field name="receiptRuleOverrideAcknowledged">
+          {(field) => (
+            <Checkbox
+              className="mt-1"
+              isSelected={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={field.handleChange}
+            >
+              <Trans>I acknowledge this expense does not include a receipt.</Trans>
+            </Checkbox>
+          )}
+        </form.Field>
+      </AlertDescription>
+    </Alert>
   );
 }
 
