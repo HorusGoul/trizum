@@ -1,7 +1,7 @@
 import { calculateLogStatsOfUser, type ExpenseInput, type ExpenseUser } from "#src/lib/expenses.js";
+import { createMoney as Dinero } from "#src/lib/money.js";
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
-import Dinero from "dinero.js";
 import type { MediaFile } from "./media";
 import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";

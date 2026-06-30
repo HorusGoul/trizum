@@ -11,7 +11,7 @@ import { AppNumberField, AppTextField } from "#src/ui/fields/TextField.js";
 import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
-import Dinero from "dinero.js";
+import { createMoney as Dinero } from "#src/lib/money.js";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";

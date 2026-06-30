@@ -1,4 +1,4 @@
-import Dinero from "dinero.js";
+import { createMoney as Dinero } from "#src/lib/money.js";
 
 export type ExpenseUser = string;
 

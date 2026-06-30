@@ -67,7 +67,6 @@ catalog:
   "@tanstack/react-router": 1.170.16
   "@tanstack/router-devtools": 1.167.0
   "@tanstack/router-plugin": 1.168.18
-  "@types/dinero.js": 2.0.0
   "@types/node": 24.13.2
   "@types/react": npm:types-react@rc
   "@types/react-dom": npm:types-react-dom@rc

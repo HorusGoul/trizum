@@ -166,9 +166,6 @@ catalogs:
     '@tanstack/router-plugin':
       specifier: 1.168.18
       version: 1.168.18
-    '@types/dinero.js':
-      specifier: 2.0.0
-      version: 2.0.0
     '@types/node':
       specifier: 24.13.2
       version: 24.13.2
@@ -776,9 +773,6 @@ importers:
       '@trizum/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
-      '@types/dinero.js':
-        specifier: 'catalog:'
-        version: 2.0.0
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.2
@@ -4555,10 +4549,6 @@ packages:
 
   '@types/deep-equal@1.0.4':
     resolution: {integrity: sha512-tqdiS4otQP4KmY0PR3u6KbZ5EWvhNdUoS/jc93UuK23C220lOZ/9TvjfxdPcKvqwwDVtmtSCrnr0p/2dirAxkA==}
-
-  '@types/dinero.js@2.0.0':
-    resolution: {integrity: sha512-hurUZwUL8hlk9U1GsJeCk8+vQsRfU1ISU3osm0Pn1cJMfYC1cVQZ1gzNKz54CnucWQzAcUCHKsFAsJFCvMYnpw==}
-    deprecated: This is a stub types definition. dinero.js provides its own type definitions, so you do not need this installed.
 
   '@types/emscripten@1.41.5':
     resolution: {integrity: sha512-cMQm7pxu6BxtHyqJ7mQZ2kXWV5SLmugybFdHCBbJ5eHzOo6VhBckEgAT3//rP5FwPHNPeEiq4SmQ5ucBwsOo4Q==}
@@ -12856,10 +12846,6 @@ snapshots:
   '@types/deep-eql@4.0.2': {}
 
   '@types/deep-equal@1.0.4': {}
-
-  '@types/dinero.js@2.0.0':
-    dependencies:
-      dinero.js: 2.0.2
 
   '@types/emscripten@1.41.5': {}
 

@@ -8,7 +8,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
 import { toast } from "sonner";
-import type { Currency } from "dinero.js";
+import type { Currency } from "#src/lib/money.js";
 import { NewPartyDetailsFields } from "./-components/NewPartyDetailsFields.js";
 import { NewPartyHeader } from "./-components/NewPartyHeader.js";
 import { NewPartyParticipantsField } from "./-components/NewPartyParticipantsField.js";
