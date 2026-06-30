@@ -314,8 +314,8 @@ catalogs:
       specifier: 12.4.0
       version: 12.4.0
     tailwind-merge:
-      specifier: 2.6.1
-      version: 2.6.1
+      specifier: 3.6.0
+      version: 3.6.0
     tailwindcss:
       specifier: 3.4.19
       version: 3.4.19
@@ -726,7 +726,7 @@ importers:
         version: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       tailwind-merge:
         specifier: 'catalog:'
-        version: 2.6.1
+        version: 3.6.0
       ulidx:
         specifier: 'catalog:'
         version: 2.4.1
@@ -8511,8 +8511,8 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tailwind-merge@2.6.1:
-    resolution: {integrity: sha512-Oo6tHdpZsGpkKG88HJ8RR1rg/RdnEkQEfMoEk2x1XRI3F1AxeU+ijRXpiVUF4UbLfcxxRGw6TbUINKYdWVsQTQ==}
+  tailwind-merge@3.6.0:
+    resolution: {integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==}
 
   tailwindcss-animate@1.0.7:
     resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
@@ -12749,7 +12749,7 @@ snapshots:
       react-window: 2.2.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       sonner: 2.0.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       suspense: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
-      tailwind-merge: 2.6.1
+      tailwind-merge: 3.6.0
       ulidx: 2.4.1
       workbox-build: 7.4.1(@types/babel__core@7.20.5)
       workbox-window: 7.4.1
@@ -17429,7 +17429,7 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  tailwind-merge@2.6.1: {}
+  tailwind-merge@3.6.0: {}
 
   tailwindcss-animate@1.0.7(tailwindcss@3.4.19(ts-node@10.9.2(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.2)(typescript@5.9.3))):
     dependencies:
