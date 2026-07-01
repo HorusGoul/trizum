@@ -125,11 +125,11 @@ catalogs:
       specifier: 5.9.5
       version: 5.9.5
     '@logtape/logtape':
-      specifier: 1.3.11
-      version: 1.3.11
+      specifier: 2.2.2
+      version: 2.2.2
     '@logtape/sentry':
-      specifier: 1.3.11
-      version: 1.3.11
+      specifier: 2.2.2
+      version: 2.2.2
     '@openai/codex':
       specifier: 0.142.4
       version: 0.142.4
@@ -478,7 +478,7 @@ importers:
     dependencies:
       '@logtape/logtape':
         specifier: 'catalog:'
-        version: 1.3.11
+        version: 2.2.2
     devDependencies:
       '@trizum/tsconfig':
         specifier: workspace:*
@@ -527,7 +527,7 @@ importers:
         version: link:../logging
       '@trizum/pwa':
         specifier: workspace:*
-        version: file:packages/pwa(@libsql/client@0.17.4)(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(@logtape/logtape@1.3.11)(@opentelemetry/api@1.9.1)(@sentry/core@10.62.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)
+        version: file:packages/pwa(@libsql/client@0.17.4)(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(@logtape/logtape@2.2.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.62.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)
       capacitor-plugin-safe-area:
         specifier: 'catalog:'
         version: 5.0.0(@capacitor/core@8.4.1)
@@ -618,7 +618,7 @@ importers:
         version: 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(babel-plugin-macros@3.1.0)(react@0.0.0-experimental-d025ddd3-20240722)
       '@logtape/sentry':
         specifier: 'catalog:'
-        version: 1.3.11(@logtape/logtape@1.3.11)(@sentry/core@10.62.0)
+        version: 2.2.2(@logtape/logtape@2.2.2)(@sentry/core@10.62.0)
       '@opentf/obj-diff':
         specifier: jsr:0.11.0
         version: '@jsr/opentf__obj-diff@0.11.0'
@@ -890,10 +890,10 @@ importers:
         version: 0.17.4
       '@logtape/logtape':
         specifier: 'catalog:'
-        version: 1.3.11
+        version: 2.2.2
       '@logtape/sentry':
         specifier: 'catalog:'
-        version: 1.3.11(@logtape/logtape@1.3.11)(@sentry/core@10.62.0)
+        version: 2.2.2(@logtape/logtape@2.2.2)(@sentry/core@10.62.0)
       '@sentry/node':
         specifier: 'catalog:'
         version: 10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))
@@ -2791,13 +2791,13 @@ packages:
     peerDependencies:
       vite: ^3 || ^4 || ^5.0.9 || ^6 || ^7 || ^8
 
-  '@logtape/logtape@1.3.11':
-    resolution: {integrity: sha512-mxkQOyySbjNGweavPudypBf0qZJxLOTXl2NAXYnsZF/ds5dQpTLA7YMSJbc8uFWlTkG+YjAnVL8tQWivIVPOJg==}
+  '@logtape/logtape@2.2.2':
+    resolution: {integrity: sha512-4BOSQDaWWWqINO/mcFhZxtJDcnK97I+JxLlcd1Nfjbv74o2JLGeRRnLd62Tz1+Qf9rZ3sGNa5cTBhTWPq6XFzQ==}
 
-  '@logtape/sentry@1.3.11':
-    resolution: {integrity: sha512-HEe+6fIhd+iSoCv5/B/SQ3RfbzYhZObyTxNaC32phqefpU7FScZxptrU9LOaN6UkaKSyYrF2F9Eneuo9DGFF+Q==}
+  '@logtape/sentry@2.2.2':
+    resolution: {integrity: sha512-Lbf7N7iRNV5K54V7pTHoTr6B13EqsCVE7JRpLPKeyXj00A0rADrB4OiKpSS2Tn2F/XQ3n1GwpkWbYWJLAxvX2Q==}
     peerDependencies:
-      '@logtape/logtape': ^1.3.11
+      '@logtape/logtape': ^2.2.2
       '@sentry/core': '>=8.0.0'
 
   '@manypkg/find-root@1.1.0':
@@ -11308,11 +11308,11 @@ snapshots:
       - supports-color
       - typescript
 
-  '@logtape/logtape@1.3.11': {}
+  '@logtape/logtape@2.2.2': {}
 
-  '@logtape/sentry@1.3.11(@logtape/logtape@1.3.11)(@sentry/core@10.62.0)':
+  '@logtape/sentry@2.2.2(@logtape/logtape@2.2.2)(@sentry/core@10.62.0)':
     dependencies:
-      '@logtape/logtape': 1.3.11
+      '@logtape/logtape': 2.2.2
       '@sentry/core': 10.62.0
 
   '@manypkg/find-root@1.1.0':
@@ -12542,9 +12542,9 @@ snapshots:
 
   '@trizum/logging@file:packages/logging':
     dependencies:
-      '@logtape/logtape': 1.3.11
+      '@logtape/logtape': 2.2.2
 
-  '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(@logtape/logtape@1.3.11)(@opentelemetry/api@1.9.1)(@sentry/core@10.62.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)':
+  '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(@logtape/logtape@2.2.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.62.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)':
     dependencies:
       '@automerge/automerge': 3.2.6
       '@automerge/automerge-repo': 2.5.6
@@ -12565,7 +12565,7 @@ snapshots:
       '@internationalized/date': 3.12.2
       '@lingui/core': 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(babel-plugin-macros@3.1.0)
       '@lingui/react': 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5(babel-plugin-macros@3.1.0)(typescript@6.0.3))(babel-plugin-macros@3.1.0)(react@0.0.0-experimental-d025ddd3-20240722)
-      '@logtape/sentry': 1.3.11(@logtape/logtape@1.3.11)(@sentry/core@10.62.0)
+      '@logtape/sentry': 2.2.2(@logtape/logtape@2.2.2)(@sentry/core@10.62.0)
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
       '@sentry/react': 10.62.0(react@0.0.0-experimental-d025ddd3-20240722)

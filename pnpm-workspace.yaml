@@ -54,8 +54,8 @@ catalog:
   "@lingui/format-po": 5.9.5
   "@lingui/react": 5.9.5
   "@lingui/vite-plugin": 5.9.5
-  "@logtape/logtape": 1.3.11
-  "@logtape/sentry": 1.3.11
+  "@logtape/logtape": 2.2.2
+  "@logtape/sentry": 2.2.2
   "@openai/codex": 0.142.4
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
