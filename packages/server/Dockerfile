@@ -1,9 +1,10 @@
 # syntax = docker/dockerfile:1
 
-ARG NODE_VERSION=24.11.1
+# Keep the variant suffix in this ARG so Renovate can update the shared image tag.
+ARG NODE_IMAGE_TAG=24.18.0-slim
 ARG LITESTREAM_VERSION=0.5.2
 ARG VITE_PLUS_VERSION=0.1.24
-FROM node:${NODE_VERSION}-slim AS build
+FROM node:${NODE_IMAGE_TAG} AS build
 ARG TARGETARCH
 ARG VITE_PLUS_VERSION
 
@@ -64,7 +65,7 @@ RUN set -eux; \
     cp -a "$libsql_dir" "/app/runtime-node-modules/@libsql/linux-${libsql_arch}-gnu"
 
 # Runtime base - Node.js without pnpm or Vite+
-FROM node:${NODE_VERSION}-slim AS runtime-base
+FROM node:${NODE_IMAGE_TAG} AS runtime-base
 
 ENV NODE_ENV="production"
 
