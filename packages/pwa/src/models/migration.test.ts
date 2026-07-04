@@ -1,10 +1,9 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
-import type { Expense } from "./expense";
 
 const addExpenseToPartyMock =
-  vi.fn<(expense: Omit<Expense, "id" | "__hash">) => Promise<Expense>>();
+  vi.fn<(expense: MigrationData["expenses"][number]) => Promise<unknown>>();
 
 vi.mock("#src/hooks/useParty.ts", () => ({
   getPartyHelpers: () => ({
@@ -52,7 +51,7 @@ function createMockRepo() {
   let nextId = 0;
   let lastCreatedHandle:
     | {
-        doc: Party;
+        doc: () => Party;
         documentId: string;
         change: (changeFn: (nextDoc: Party) => void) => void;
       }
@@ -64,10 +63,10 @@ function createMockRepo() {
         assertNoUndefinedValues(doc, "");
 
         const handle = {
-          doc,
+          doc: () => doc,
           documentId: `mock-doc-${++nextId}`,
           change(changeFn: (nextDoc: T) => void) {
-            changeFn(handle.doc);
+            changeFn(doc);
           },
         };
 
@@ -86,7 +85,10 @@ function createMockRepo() {
   };
 }
 
-function createMigrationData(partyOverrides: Partial<MigrationData["party"]> = {}): MigrationData {
+function createMigrationData(
+  partyOverrides: Partial<MigrationData["party"]> = {},
+  dataOverrides: Partial<Pick<MigrationData, "expenses" | "photos">> = {},
+): MigrationData {
   return {
     party: {
       type: "party",
@@ -96,8 +98,8 @@ function createMigrationData(partyOverrides: Partial<MigrationData["party"]> = {
       participants: {},
       ...partyOverrides,
     },
-    expenses: [],
-    photos: [],
+    expenses: dataOverrides.expenses ?? [],
+    photos: dataOverrides.photos ?? [],
   };
 }
 
@@ -116,7 +118,7 @@ describe("createPartyFromMigrationData", () => {
       }),
     ).resolves.toBe("mock-doc-1");
 
-    expect(mockRepo.getLastCreatedHandle().doc).not.toHaveProperty("symbol");
+    expect(mockRepo.getLastCreatedHandle().doc()).not.toHaveProperty("symbol");
   });
 
   test("preserves the party symbol when migration data includes one", async () => {
@@ -129,7 +131,7 @@ describe("createPartyFromMigrationData", () => {
       }),
     });
 
-    expect(mockRepo.getLastCreatedHandle().doc).toMatchObject({
+    expect(mockRepo.getLastCreatedHandle().doc()).toMatchObject({
       symbol: "🏕️",
     });
   });
