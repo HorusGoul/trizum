@@ -40,7 +40,7 @@ Read these sources in order:
 
 Canonical examples:
 
-- [`.node-version`](./.node-version), [`.mise.toml`](./.mise.toml),
+- [`.node-version`](./.node-version), [`mise.toml`](./mise.toml),
   [`package.json`](./package.json), and [`vite.config.ts`](./vite.config.ts)
   are the source of truth for Node, native-tooling Ruby, the package manager,
   and Vite+ workspace commands.

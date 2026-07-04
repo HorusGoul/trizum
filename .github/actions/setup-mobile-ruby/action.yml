@@ -1,5 +1,5 @@
 name: Setup mobile Ruby
-description: Install the repo Ruby from .mise.toml and bundle a mobile Gemfile.
+description: Install the repo Ruby from mise.toml and bundle a mobile Gemfile.
 
 inputs:
   working-directory:
@@ -11,29 +11,30 @@ inputs:
 
 outputs:
   ruby-version:
-    description: Ruby version read from .mise.toml.
+    description: Ruby version read from mise.toml.
     value: ${{ steps.ruby-version.outputs.version }}
 
 runs:
   using: composite
   steps:
-    # ruby/setup-ruby can read mise.toml directly, but trizum's canonical file
-    # is .mise.toml and the action working directory points at mobile Gemfiles.
+    # ruby/setup-ruby can read mise.toml when its working directory is the repo
+    # root. This action points at mobile Gemfiles so bundler-cache installs the
+    # right bundle, so pass the root Ruby version explicitly.
     - name: Read Ruby version
       id: ruby-version
       shell: bash
       run: |
         ruby_version="$(
-          sed -nE 's/^[[:space:]]*ruby[[:space:]]*=[[:space:]]*"([^"]+)".*$/\1/p' "${GITHUB_WORKSPACE}/.mise.toml" | head -n 1
+          sed -nE 's/^[[:space:]]*ruby[[:space:]]*=[[:space:]]*"([^"]+)".*$/\1/p' "${GITHUB_WORKSPACE}/mise.toml" | head -n 1
         )"
 
         if [ -z "$ruby_version" ]; then
-          echo "::error::Unable to read Ruby version from ${GITHUB_WORKSPACE}/.mise.toml"
+          echo "::error::Unable to read Ruby version from ${GITHUB_WORKSPACE}/mise.toml"
           exit 1
         fi
 
         echo "version=$ruby_version" >> "$GITHUB_OUTPUT"
-        echo "Using Ruby $ruby_version from .mise.toml"
+        echo "Using Ruby $ruby_version from mise.toml"
 
     - uses: ruby/setup-ruby@v1
       with:
