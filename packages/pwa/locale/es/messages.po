@@ -67,7 +67,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:443
+#: src/routes/settings.tsx:441
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -87,7 +87,7 @@ msgstr "En el período seleccionado"
 msgid "Active"
 msgstr "Activos"
 
-#: src/routes/settings.tsx:494
+#: src/routes/settings.tsx:492
 msgid "Active on this device"
 msgstr "Activo en este dispositivo"
 
@@ -263,15 +263,15 @@ msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
 #: src/components/ExpenseEditor.tsx:356
-#: src/routes/settings.tsx:430
+#: src/routes/settings.tsx:428
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
-#: src/routes/settings.tsx:432
+#: src/routes/settings.tsx:430
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:419
+#: src/routes/settings.tsx:417
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -469,7 +469,7 @@ msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
-#: src/routes/settings.tsx:482
+#: src/routes/settings.tsx:480
 msgid "Checking..."
 msgstr "Comprobando..."
 
@@ -676,7 +676,7 @@ msgid "Could not load sign-in methods"
 msgstr "No se pudieron cargar los métodos de inicio de sesión"
 
 #: src/hooks/useCloudSyncAccountState.ts:220
-#: src/routes/settings.tsx:486
+#: src/routes/settings.tsx:484
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
@@ -1057,7 +1057,7 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
-#: src/routes/settings.tsx:381
+#: src/routes/settings.tsx:379
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -1350,7 +1350,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:396
+#: src/routes/settings.tsx:394
 msgid "Language"
 msgstr "Idioma"
 
@@ -1678,11 +1678,11 @@ msgstr "No es un código de grupo de trizum válido"
 msgid "Not connected"
 msgstr "No conectado"
 
-#: src/routes/settings.tsx:490
+#: src/routes/settings.tsx:488
 msgid "Not set up"
 msgstr "No configurada"
 
-#: src/routes/settings.tsx:478
+#: src/routes/settings.tsx:476
 msgid "Not signed in"
 msgstr "No has iniciado sesión"
 
@@ -1726,7 +1726,7 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:417
+#: src/routes/settings.tsx:415
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -1843,7 +1843,7 @@ msgstr "Grupo restaurado al inicio"
 msgid "Party Settings"
 msgstr "Configuración del Grupo"
 
-#: src/routes/party_.$partyId.settings/route.tsx:55
+#: src/routes/party_.$partyId.settings/route.tsx:63
 msgid "Party settings saved!"
 msgstr "¡Configuración del grupo guardada!"
 
@@ -1925,7 +1925,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:380
+#: src/routes/settings.tsx:378
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -2013,7 +2013,7 @@ msgstr "Captura de fotograma del código QR"
 msgid "Ranking based on how much each participant paid in the selected timeframe."
 msgstr "Clasificación según cuánto ha pagado cada participante en el período seleccionado."
 
-#: src/routes/settings.tsx:497
+#: src/routes/settings.tsx:495
 msgid "Ready on another device"
 msgstr "Listo en otro dispositivo"
 
@@ -2110,7 +2110,7 @@ msgstr "Riyal Saudí"
 #: src/components/ExpenseEditor.tsx:275
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:124
-#: src/routes/party_.$partyId.settings/route.tsx:111
+#: src/routes/party_.$partyId.settings/route.tsx:120
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
 #: src/routes/settings.tsx:232
@@ -2375,7 +2375,7 @@ msgstr "Enviar sugerencia"
 #: src/components/ExpenseEditor.tsx:275
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:124
-#: src/routes/party_.$partyId.settings/route.tsx:111
+#: src/routes/party_.$partyId.settings/route.tsx:120
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
 #: src/routes/settings.tsx:232
@@ -2809,7 +2809,7 @@ msgstr "¿Usar trizum cloud en este dispositivo?"
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
-#: src/routes/settings.tsx:358
+#: src/routes/settings.tsx:356
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -2891,7 +2891,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:359
+#: src/routes/settings.tsx:357
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 

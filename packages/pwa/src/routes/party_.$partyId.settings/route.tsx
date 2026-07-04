@@ -4,7 +4,7 @@ import { guardParticipatingInParty } from "#src/lib/guards.js";
 import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { Suspense, useId } from "react";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/party_/$partyId/settings")({
 function PartySettings() {
   const params = Route.useParams();
   const { party, updateSettings } = useParty(params.partyId);
+  const navigate = useNavigate();
 
   function onSaveSettings(values: PartySettingsFormValues) {
     const participants = values.participants
@@ -44,15 +45,23 @@ function PartySettings() {
         result[next.id] = next;
         return result;
       }, {});
-
-    updateSettings({
+    const savedValues = {
       name: values.name,
       symbol: values.symbol,
       description: values.description,
+      participants: Object.values(participants),
+    } as PartySettingsFormValues;
+
+    updateSettings({
+      name: savedValues.name,
+      symbol: savedValues.symbol,
+      description: savedValues.description,
       participants,
     });
 
+    form.reset(savedValues);
     toast.success(t`Party settings saved!`);
+    void navigate({ to: "..", replace: true });
   }
 
   const form = useForm({
@@ -120,9 +129,12 @@ function PartySettings() {
         }
       />
 
+      {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form to stale defaults after saving settings. */}
       <form
         id={formId}
-        action={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
           void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
