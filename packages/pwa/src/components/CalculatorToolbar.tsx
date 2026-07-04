@@ -56,6 +56,15 @@ type CalculatorCallbacks = Pick<
   | "onDismiss"
 >;
 
+type CalculatorLayout = {
+  isLargeScreen: boolean;
+  popoverPosition: {
+    top: number;
+    left: number;
+    width: number;
+  } | null;
+};
+
 function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
   const callbacksRef = useRef(callbacks);
 
@@ -67,14 +76,7 @@ function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
 }
 
 function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDivElement | null>) {
-  const [layout, setLayout] = useState<{
-    isLargeScreen: boolean;
-    popoverPosition: {
-      top: number;
-      left: number;
-      width: number;
-    } | null;
-  }>({
+  const [layout, setLayout] = useState<CalculatorLayout>({
     isLargeScreen: false,
     popoverPosition: null,
   });
@@ -85,18 +87,42 @@ function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDiv
     function updatePosition() {
       if (mediaQuery.matches && fieldContainerRef.current) {
         const rect = fieldContainerRef.current.getBoundingClientRect();
-        setLayout({
-          isLargeScreen: true,
-          popoverPosition: {
+        setLayout((currentLayout) => {
+          const currentPosition = currentLayout.popoverPosition;
+          const popoverPosition = {
             top: rect.bottom + 8,
             left: rect.left,
             width: Math.max(rect.width, 280),
-          },
+          };
+
+          if (
+            currentLayout.isLargeScreen &&
+            currentPosition &&
+            currentPosition.top === popoverPosition.top &&
+            currentPosition.left === popoverPosition.left &&
+            currentPosition.width === popoverPosition.width
+          ) {
+            return currentLayout;
+          }
+
+          return {
+            isLargeScreen: true,
+            popoverPosition,
+          };
         });
       } else {
-        setLayout({
-          isLargeScreen: mediaQuery.matches,
-          popoverPosition: null,
+        setLayout((currentLayout) => {
+          if (
+            currentLayout.isLargeScreen === mediaQuery.matches &&
+            currentLayout.popoverPosition === null
+          ) {
+            return currentLayout;
+          }
+
+          return {
+            isLargeScreen: mediaQuery.matches,
+            popoverPosition: null,
+          };
         });
       }
     }
