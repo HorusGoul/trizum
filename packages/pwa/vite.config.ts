@@ -22,7 +22,9 @@ import iconSpriteConfig from "./iconSprite.config.mjs";
 const ReactCompilerConfig = {};
 const sentryOrg = "horusdev";
 const sentryProject = "trizum-pwa";
-const buildTarget = ["edge88", "firefox78", "chrome87", "safari14.1"];
+// Resolve Vite's Baseline target because vite-plugin-top-level-await forwards
+// build.target to esbuild, which does not accept Vite's special target string.
+const buildTarget = ["chrome111", "edge111", "firefox114", "safari16.4", "ios16.4"];
 
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
