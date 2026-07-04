@@ -7,6 +7,25 @@ import type {
 
 const logger = getLogger("lib", "tricountMigration");
 
+interface TricountMembership {
+  id: number;
+  alias: {
+    display_name: string;
+  };
+}
+
+interface TricountMembershipReference {
+  id?: number;
+  alias: {
+    display_name: string;
+  };
+}
+
+type TricountRegistry = TricountResponse["Response"][number]["Registry"];
+type TricountRegistryMembership = TricountRegistry["memberships"][number];
+type TricountRegistryEntry = TricountRegistry["all_registry_entry"][number];
+type TricountAllocation = TricountRegistryEntry["RegistryEntry"]["allocations"][number];
+
 export interface TricountResponse {
   Response: Array<{
     Registry: {
@@ -15,12 +34,7 @@ export interface TricountResponse {
       description: string | null;
       currency: string;
       memberships: Array<{
-        RegistryMembershipNonUser: {
-          id: number;
-          alias: {
-            display_name: string;
-          };
-        };
+        RegistryMembershipNonUser: TricountMembership;
       }>;
       all_registry_entry: Array<{
         RegistryEntry: {
@@ -33,11 +47,7 @@ export interface TricountResponse {
           date: string;
           type_transaction: string;
           membership_owned: {
-            RegistryMembershipNonUser: {
-              alias: {
-                display_name: string;
-              };
-            };
+            RegistryMembershipNonUser: TricountMembershipReference;
           };
           allocations: Array<{
             amount: {
@@ -45,11 +55,7 @@ export interface TricountResponse {
               value: string;
             };
             membership: {
-              RegistryMembershipNonUser: {
-                alias: {
-                  display_name: string;
-                };
-              };
+              RegistryMembershipNonUser: TricountMembershipReference;
             };
             type: string;
             share_ratio?: number;
@@ -74,19 +80,20 @@ export interface TricountResponse {
 
 export function parseTricountData(data: TricountResponse): MigrationData {
   const registry = data.Response[0].Registry;
+  const registryEntries = registry.all_registry_entry.slice().sort(compareRegistryEntries);
 
   // Create photo mapping with temporary IDs
   const photoMap = new Map<string, string>();
   const photos: { id: string; url: string }[] = [];
 
   // Extract all photos from transactions
-  for (const entry of registry.all_registry_entry) {
+  for (const entry of registryEntries) {
     const transaction = entry.RegistryEntry;
     for (const attachment of transaction.attachment) {
       if (attachment.urls && attachment.urls.length > 0) {
         const url = attachment.urls[0].url;
         if (!photoMap.has(url)) {
-          const tempId = crypto.randomUUID();
+          const tempId = `tricount-photo-${photoMap.size + 1}`;
           photoMap.set(url, tempId);
           photos.push({ id: tempId, url });
         }
@@ -96,19 +103,24 @@ export function parseTricountData(data: TricountResponse): MigrationData {
 
   // Create participants mapping
   const participants: Record<string, MigrationParticipant> = {};
-  for (const membership of registry.memberships) {
+  const participantIdByMembershipId = new Map<number, string>();
+  const participantIdByName = new Map<string, string>();
+  const memberships = registry.memberships.slice().sort(compareMembershipEntries);
+
+  for (const membership of memberships) {
     const member = membership.RegistryMembershipNonUser;
-    const participantId = crypto.randomUUID();
+    const memberName = member.alias.display_name;
+    const participantId = createParticipantId(member.id);
     participants[participantId] = {
       id: participantId,
-      name: member.alias.display_name,
+      name: memberName,
     };
-  }
 
-  // Create name to participant ID mapping
-  const nameToIdMap = new Map<string, string>();
-  for (const [participantId, participant] of Object.entries(participants)) {
-    nameToIdMap.set(participant.name, participantId);
+    participantIdByMembershipId.set(member.id, participantId);
+
+    if (!participantIdByName.has(memberName)) {
+      participantIdByName.set(memberName, participantId);
+    }
   }
 
   // Transform expenses
@@ -117,13 +129,18 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     photos: string[];
   })[] = [];
 
-  for (const entry of registry.all_registry_entry) {
+  for (const entry of registryEntries) {
     const transaction = entry.RegistryEntry;
 
     const totalAmount = Math.abs(parseFloat(transaction.amount.value));
     const totalAmountInCents = Math.round(totalAmount * 100);
-    const paidByName = transaction.membership_owned.RegistryMembershipNonUser.alias.display_name;
-    const paidById = nameToIdMap.get(paidByName);
+    const paidByMember = transaction.membership_owned.RegistryMembershipNonUser;
+    const paidByName = paidByMember.alias.display_name;
+    const paidById = getParticipantId(
+      paidByMember,
+      participantIdByMembershipId,
+      participantIdByName,
+    );
 
     if (!paidById) {
       logger.warning("Could not find participant ID for payer {paidByName}", {
@@ -142,9 +159,14 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     // Create shares record
     const shares: Record<string, MigrationExpenseShare> = {};
 
-    for (const allocation of transaction.allocations) {
-      const participantName = allocation.membership.RegistryMembershipNonUser.alias.display_name;
-      const participantId = nameToIdMap.get(participantName);
+    for (const allocation of transaction.allocations.slice().sort(compareAllocations)) {
+      const participantMember = allocation.membership.RegistryMembershipNonUser;
+      const participantName = participantMember.alias.display_name;
+      const participantId = getParticipantId(
+        participantMember,
+        participantIdByMembershipId,
+        participantIdByName,
+      );
 
       if (!participantId) {
         logger.warning("Could not find participant ID for participant {participantName}", {
@@ -216,4 +238,65 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     expenses,
     photos,
   };
+}
+
+function createParticipantId(membershipId: number) {
+  return `tricount-membership-${membershipId}`;
+}
+
+function getParticipantId(
+  member: TricountMembershipReference,
+  participantIdByMembershipId: Map<number, string>,
+  participantIdByName: Map<string, string>,
+) {
+  if (typeof member.id === "number") {
+    return participantIdByMembershipId.get(member.id);
+  }
+
+  return participantIdByName.get(member.alias.display_name);
+}
+
+function compareMembershipEntries(
+  left: TricountRegistryMembership,
+  right: TricountRegistryMembership,
+) {
+  return compareMemberships(left.RegistryMembershipNonUser, right.RegistryMembershipNonUser);
+}
+
+function compareAllocations(left: TricountAllocation, right: TricountAllocation) {
+  return compareMemberships(
+    left.membership.RegistryMembershipNonUser,
+    right.membership.RegistryMembershipNonUser,
+  );
+}
+
+function compareMemberships(left: TricountMembershipReference, right: TricountMembershipReference) {
+  const idDifference = (left.id ?? Number.MAX_SAFE_INTEGER) - (right.id ?? Number.MAX_SAFE_INTEGER);
+
+  if (idDifference !== 0) {
+    return idDifference;
+  }
+
+  return left.alias.display_name.localeCompare(right.alias.display_name);
+}
+
+function compareRegistryEntries(left: TricountRegistryEntry, right: TricountRegistryEntry) {
+  const leftEntry = left.RegistryEntry;
+  const rightEntry = right.RegistryEntry;
+  const dateDifference = getDateTimestamp(leftEntry.date) - getDateTimestamp(rightEntry.date);
+
+  if (dateDifference !== 0) {
+    return dateDifference;
+  }
+
+  if (leftEntry.id !== rightEntry.id) {
+    return leftEntry.id - rightEntry.id;
+  }
+
+  return leftEntry.description.localeCompare(rightEntry.description);
+}
+
+function getDateTimestamp(date: string) {
+  const timestamp = Date.parse(date);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 }

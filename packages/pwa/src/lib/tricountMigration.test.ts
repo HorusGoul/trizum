@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { getExpenseUnitShares } from "#src/models/expense.ts";
+import {
+  calculateBalancesByParticipant,
+  getExpenseUnitShares,
+  type Expense,
+} from "#src/models/expense.ts";
+import type { Party } from "#src/models/party.ts";
 import { parseTricountData, type TricountResponse } from "./tricountMigration.ts";
 
 const warningRecords = vi.hoisted(
@@ -233,6 +238,48 @@ describe("parseTricountData", () => {
     expect(secondExpense!.photos).toStrictEqual([sharedPhoto!.id, secondPhoto!.id]);
   });
 
+  test("keeps balances stable when Tricount returns allocations in a different order", () => {
+    const memberships = [createMembership(1, "Alice"), createMembership(2, "Bob")];
+    const data = createTricountResponse({
+      memberships,
+      entries: [
+        createEntry({
+          id: 109,
+          amount: "0.05",
+          description: "rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Alice", "0.03"),
+            createRatioAllocation("Bob", "0.02"),
+          ],
+        }),
+      ],
+    });
+    const dataWithReversedAllocations = createTricountResponse({
+      memberships: memberships.slice().reverse(),
+      entries: [
+        createEntry({
+          id: 109,
+          amount: "0.05",
+          description: "rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Bob", "0.02"),
+            createRatioAllocation("Alice", "0.03"),
+          ],
+        }),
+      ],
+    });
+
+    expect(getBalancesByParticipantName(data)).toStrictEqual({
+      Alice: 3,
+      Bob: -3,
+    });
+    expect(getBalancesByParticipantName(dataWithReversedAllocations)).toStrictEqual(
+      getBalancesByParticipantName(data),
+    );
+  });
+
   test("warns and skips entries with missing payer or allocation participants", () => {
     const data = createTricountResponse({
       memberships: [createMembership(1, "Alice"), createMembership(2, "Bob")],
@@ -277,6 +324,36 @@ describe("parseTricountData", () => {
     ]);
   });
 });
+
+function getBalancesByParticipantName(data: TricountResponse): Record<string, number> {
+  const migrationData = parseTricountData(data);
+  const expenses: Expense[] = migrationData.expenses.map((expense, index) => ({
+    id: `expense-${index}`,
+    name: expense.name,
+    paidAt: new Date(expense.paidAt),
+    paidBy: expense.paidBy,
+    shares: expense.shares,
+    photos: [],
+    isTransfer: expense.isTransfer,
+    __hash: "",
+  }));
+  const balances = calculateBalancesByParticipant(
+    expenses,
+    migrationData.party.participants as Party["participants"],
+  );
+
+  return Object.fromEntries(
+    Object.values(balances).map((balance) => {
+      const participant = migrationData.party.participants[balance.participantId];
+
+      if (!participant) {
+        throw new Error(`Expected participant ${balance.participantId} to exist`);
+      }
+
+      return [participant.name, balance.stats.balance];
+    }),
+  );
+}
 
 function getParticipantIdByName(
   participants: TricountResponseMigrationParticipants,
