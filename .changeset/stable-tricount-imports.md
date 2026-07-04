@@ -7,4 +7,4 @@ Make Tricount imports deterministic by normalizing remote response order before 
 
 - Sorts imported memberships, registry entries, and allocations before building party data.
 - Keeps repeated imports from assigning rounding cents to different participants.
-- Flushes imported party documents before recalculating balances at the end of migration.
+- Recalculates balances before opening the migrated party.

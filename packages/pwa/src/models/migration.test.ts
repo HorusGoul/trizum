@@ -1,16 +1,13 @@
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
+import type { Repo } from "@automerge/automerge-repo/slim";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
-import type { Expense } from "./expense";
 
 const addExpenseToPartyMock =
-  vi.fn<(expense: Omit<Expense, "id" | "__hash">) => Promise<Expense>>();
-const recalculateBalancesMock = vi.fn<() => Promise<boolean>>();
+  vi.fn<(expense: MigrationData["expenses"][number]) => Promise<unknown>>();
 
 vi.mock("#src/hooks/useParty.ts", () => ({
   getPartyHelpers: () => ({
     addExpenseToParty: addExpenseToPartyMock,
-    recalculateBalances: recalculateBalancesMock,
   }),
 }));
 
@@ -24,19 +21,6 @@ vi.mock("#src/hooks/useMediaFileActions.ts", () => ({
         ) => Promise<readonly [mediaFileId: string, handle: unknown]>
       >(),
   }),
-}));
-
-vi.mock("#src/lib/requestIdleCallback.ts", () => ({
-  requestIdleCallback: (
-    callback: (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void,
-  ) => {
-    callback({
-      didTimeout: false,
-      timeRemaining: () => 50,
-    });
-
-    return 0;
-  },
 }));
 
 import { createPartyFromMigrationData, type MigrationData } from "./migration";
@@ -65,7 +49,6 @@ function assertNoUndefinedValues(value: unknown, path: string) {
 
 function createMockRepo() {
   let nextId = 0;
-  const flush = vi.fn<(documents?: DocumentId[]) => Promise<void>>(() => Promise.resolve());
   let lastCreatedHandle:
     | {
         doc: () => Party;
@@ -91,9 +74,7 @@ function createMockRepo() {
 
         return handle;
       },
-      flush,
     } as unknown as Repo,
-    flush,
     getLastCreatedHandle: () => {
       if (!lastCreatedHandle) {
         throw new Error("Expected a created party handle");
@@ -125,8 +106,6 @@ function createMigrationData(
 describe("createPartyFromMigrationData", () => {
   beforeEach(() => {
     addExpenseToPartyMock.mockReset();
-    recalculateBalancesMock.mockReset();
-    recalculateBalancesMock.mockResolvedValue(true);
   });
 
   test("omits an undefined party symbol before creating the Automerge document", async () => {
@@ -156,122 +135,4 @@ describe("createPartyFromMigrationData", () => {
       symbol: "🏕️",
     });
   });
-
-  test("flushes imported party documents before waiting for balance recalculation", async () => {
-    const mockRepo = createMockRepo();
-    const balanceRecalculation = createDeferred<boolean>();
-
-    addExpenseToPartyMock.mockImplementation(async () => {
-      mockRepo
-        .getLastCreatedHandle()
-        .doc()
-        .chunkRefs.push({
-          chunkId: "chunk-1" as DocumentId,
-          createdAt: new Date("2024-01-01T00:00:00.000Z"),
-          balancesId: "balances-1" as DocumentId,
-        });
-
-      return createExpense();
-    });
-    recalculateBalancesMock.mockReturnValueOnce(balanceRecalculation.promise);
-
-    const migrationPromise = createPartyFromMigrationData({
-      repo: mockRepo.repo,
-      data: createMigrationData(
-        {
-          participants: {
-            alice: { id: "alice", name: "Alice" },
-            bob: { id: "bob", name: "Bob" },
-          },
-        },
-        {
-          expenses: [createMigrationExpense()],
-        },
-      ),
-    });
-
-    await vi.waitFor(() => {
-      expect(mockRepo.flush).toHaveBeenCalledWith(["mock-doc-1", "chunk-1", "balances-1"]);
-    });
-
-    expect(recalculateBalancesMock).toHaveBeenCalledOnce();
-    expect(mockRepo.flush.mock.invocationCallOrder[0]).toBeLessThan(
-      recalculateBalancesMock.mock.invocationCallOrder[0]!,
-    );
-
-    let resolved = false;
-    void migrationPromise.then(() => {
-      resolved = true;
-    });
-
-    await flushPromises();
-    expect(resolved).toBe(false);
-
-    balanceRecalculation.resolve(true);
-
-    await expect(migrationPromise).resolves.toBe("mock-doc-1");
-    expect(resolved).toBe(true);
-  });
 });
-
-function createMigrationExpense(): MigrationData["expenses"][number] {
-  return {
-    name: "Lunch",
-    paidAt: "2024-01-01T12:00:00.000Z",
-    paidBy: {
-      alice: 1000,
-    },
-    shares: {
-      alice: {
-        type: "divide",
-        value: 1,
-      },
-      bob: {
-        type: "divide",
-        value: 1,
-      },
-    },
-    photos: [],
-  };
-}
-
-function createExpense(): Expense {
-  return {
-    id: "expense-1",
-    name: "Lunch",
-    paidAt: new Date("2024-01-01T12:00:00.000Z"),
-    paidBy: {
-      alice: 1000,
-    },
-    shares: {
-      alice: {
-        type: "divide",
-        value: 1,
-      },
-      bob: {
-        type: "divide",
-        value: 1,
-      },
-    },
-    photos: [],
-    __hash: "hash",
-  };
-}
-
-function createDeferred<T>() {
-  let resolve: (value: T) => void;
-  const promise = new Promise<T>((promiseResolve) => {
-    resolve = promiseResolve;
-  });
-
-  return {
-    promise,
-    resolve: resolve!,
-  };
-}
-
-async function flushPromises() {
-  await Promise.resolve();
-  await Promise.resolve();
-  await Promise.resolve();
-}
