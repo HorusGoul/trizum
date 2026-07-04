@@ -93,6 +93,7 @@ describe("parseTricountData", () => {
     const bobId = getParticipantIdByName(migrationData.party.participants, "Bob");
     const coraId = getParticipantIdByName(migrationData.party.participants, "Cora");
 
+    expect([aliceId, bobId, coraId]).toStrictEqual(["TCM_1", "TCM_2", "TCM_3"]);
     expect(expense.shares).toStrictEqual({
       [aliceId]: { type: "divide", value: 1 },
       [bobId]: { type: "divide", value: 1 },
@@ -232,6 +233,7 @@ describe("parseTricountData", () => {
     const secondPhoto = migrationData.photos.find((photo) => photo.url === secondUrl);
 
     expect(migrationData.photos).toHaveLength(2);
+    expect(migrationData.photos.map((photo) => photo.id)).toStrictEqual(["TCA_1", "TCA_2"]);
     expect(sharedPhoto).toBeDefined();
     expect(secondPhoto).toBeDefined();
     expect(firstExpense!.photos).toStrictEqual([sharedPhoto!.id]);
@@ -272,8 +274,8 @@ describe("parseTricountData", () => {
     });
 
     expect(getBalancesByParticipantName(data)).toStrictEqual({
-      Alice: 3,
-      Bob: -3,
+      Alice: 2,
+      Bob: -2,
     });
     expect(getBalancesByParticipantName(dataWithReversedAllocations)).toStrictEqual(
       getBalancesByParticipantName(data),

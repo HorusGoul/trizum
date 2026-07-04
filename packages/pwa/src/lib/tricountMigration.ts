@@ -24,7 +24,14 @@ interface TricountMembershipReference {
 type TricountRegistry = TricountResponse["Response"][number]["Registry"];
 type TricountRegistryMembership = TricountRegistry["memberships"][number];
 type TricountRegistryEntry = TricountRegistry["all_registry_entry"][number];
+type TricountEntry = TricountRegistryEntry["RegistryEntry"];
 type TricountAllocation = TricountRegistryEntry["RegistryEntry"]["allocations"][number];
+
+interface RatioAllocationSortMetadata {
+  preliminaryAmountByAllocation: Map<TricountAllocation, number>;
+  roundingError: number;
+  sourceAmountByAllocation: Map<TricountAllocation, number>;
+}
 
 export interface TricountResponse {
   Response: Array<{
@@ -93,7 +100,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
       if (attachment.urls && attachment.urls.length > 0) {
         const url = attachment.urls[0].url;
         if (!photoMap.has(url)) {
-          const tempId = `tricount-photo-${photoMap.size + 1}`;
+          const tempId = `TCA_${photoMap.size + 1}`;
           photoMap.set(url, tempId);
           photos.push({ id: tempId, url });
         }
@@ -132,8 +139,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
   for (const entry of registryEntries) {
     const transaction = entry.RegistryEntry;
 
-    const totalAmount = Math.abs(parseFloat(transaction.amount.value));
-    const totalAmountInCents = Math.round(totalAmount * 100);
+    const totalAmountInCents = parseAmountInCents(transaction.amount.value);
     const paidByMember = transaction.membership_owned.RegistryMembershipNonUser;
     const paidByName = paidByMember.alias.display_name;
     const paidById = getParticipantId(
@@ -159,7 +165,9 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     // Create shares record
     const shares: Record<string, MigrationExpenseShare> = {};
 
-    for (const allocation of transaction.allocations.slice().sort(compareAllocations)) {
+    for (const allocation of transaction.allocations
+      .slice()
+      .sort(createAllocationComparator(transaction))) {
       const participantMember = allocation.membership.RegistryMembershipNonUser;
       const participantName = participantMember.alias.display_name;
       const participantId = getParticipantId(
@@ -175,8 +183,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
         continue;
       }
 
-      const amount = Math.abs(parseFloat(allocation.amount.value));
-      const amountInCents = Math.round(amount * 100);
+      const amountInCents = parseAmountInCents(allocation.amount.value);
 
       if (allocation.type === "AMOUNT") {
         if (amountInCents === 0) {
@@ -241,7 +248,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
 }
 
 function createParticipantId(membershipId: number) {
-  return `tricount-membership-${membershipId}`;
+  return `TCM_${membershipId}`;
 }
 
 function getParticipantId(
@@ -263,11 +270,91 @@ function compareMembershipEntries(
   return compareMemberships(left.RegistryMembershipNonUser, right.RegistryMembershipNonUser);
 }
 
-function compareAllocations(left: TricountAllocation, right: TricountAllocation) {
+function createAllocationComparator(transaction: TricountEntry) {
+  const ratioMetadata = getRatioAllocationSortMetadata(transaction);
+
+  return (left: TricountAllocation, right: TricountAllocation) => {
+    return compareAllocations(left, right, ratioMetadata);
+  };
+}
+
+function compareAllocations(
+  left: TricountAllocation,
+  right: TricountAllocation,
+  ratioMetadata: RatioAllocationSortMetadata,
+) {
+  if (left.type === "RATIO" && right.type === "RATIO" && ratioMetadata.roundingError !== 0) {
+    const leftPreliminaryAmount = ratioMetadata.preliminaryAmountByAllocation.get(left);
+    const rightPreliminaryAmount = ratioMetadata.preliminaryAmountByAllocation.get(right);
+
+    if (
+      leftPreliminaryAmount !== undefined &&
+      rightPreliminaryAmount !== undefined &&
+      leftPreliminaryAmount === rightPreliminaryAmount
+    ) {
+      const leftSourceAmount = ratioMetadata.sourceAmountByAllocation.get(left) ?? 0;
+      const rightSourceAmount = ratioMetadata.sourceAmountByAllocation.get(right) ?? 0;
+      const sourceAmountDifference =
+        ratioMetadata.roundingError > 0
+          ? rightSourceAmount - leftSourceAmount
+          : leftSourceAmount - rightSourceAmount;
+
+      if (sourceAmountDifference !== 0) {
+        return sourceAmountDifference;
+      }
+    }
+  }
+
   return compareMemberships(
     left.membership.RegistryMembershipNonUser,
     right.membership.RegistryMembershipNonUser,
   );
+}
+
+function getRatioAllocationSortMetadata(transaction: TricountEntry): RatioAllocationSortMetadata {
+  const preliminaryAmountByAllocation = new Map<TricountAllocation, number>();
+  const sourceAmountByAllocation = new Map<TricountAllocation, number>();
+  const ratioAllocations = transaction.allocations.filter(
+    (allocation) => allocation.type === "RATIO",
+  );
+  const totalRatio = ratioAllocations.reduce(
+    (total, allocation) => total + (allocation.share_ratio ?? 1),
+    0,
+  );
+
+  if (totalRatio <= 0) {
+    return {
+      preliminaryAmountByAllocation,
+      roundingError: 0,
+      sourceAmountByAllocation,
+    };
+  }
+
+  const exactAmountInCents = transaction.allocations.reduce((total, allocation) => {
+    if (allocation.type !== "AMOUNT") {
+      return total;
+    }
+
+    return total + parseAmountInCents(allocation.amount.value);
+  }, 0);
+  const amountLeftForRatioAllocations =
+    parseAmountInCents(transaction.amount.value) - exactAmountInCents;
+  let preliminaryTotal = 0;
+
+  for (const allocation of ratioAllocations) {
+    const preliminaryAmount = Math.round(
+      amountLeftForRatioAllocations * ((allocation.share_ratio ?? 1) / totalRatio),
+    );
+    preliminaryAmountByAllocation.set(allocation, preliminaryAmount);
+    sourceAmountByAllocation.set(allocation, parseAmountInCents(allocation.amount.value));
+    preliminaryTotal += preliminaryAmount;
+  }
+
+  return {
+    preliminaryAmountByAllocation,
+    roundingError: amountLeftForRatioAllocations - preliminaryTotal,
+    sourceAmountByAllocation,
+  };
 }
 
 function compareMemberships(left: TricountMembershipReference, right: TricountMembershipReference) {
@@ -299,4 +386,8 @@ function compareRegistryEntries(left: TricountRegistryEntry, right: TricountRegi
 function getDateTimestamp(date: string) {
   const timestamp = Date.parse(date);
   return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function parseAmountInCents(value: string) {
+  return Math.round(Math.abs(parseFloat(value)) * 100);
 }
