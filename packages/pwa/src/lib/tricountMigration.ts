@@ -283,6 +283,12 @@ function compareAllocations(
   right: TricountAllocation,
   ratioMetadata: RatioAllocationSortMetadata,
 ) {
+  const typeDifference = getAllocationTypeSortRank(left) - getAllocationTypeSortRank(right);
+
+  if (typeDifference !== 0) {
+    return typeDifference;
+  }
+
   if (left.type === "RATIO" && right.type === "RATIO" && ratioMetadata.roundingError !== 0) {
     const leftPreliminaryAmount = ratioMetadata.preliminaryAmountByAllocation.get(left);
     const rightPreliminaryAmount = ratioMetadata.preliminaryAmountByAllocation.get(right);
@@ -314,6 +320,10 @@ function compareAllocations(
     left.membership.RegistryMembershipNonUser,
     right.membership.RegistryMembershipNonUser,
   );
+}
+
+function getAllocationTypeSortRank(allocation: TricountAllocation) {
+  return allocation.type === "AMOUNT" ? 0 : 1;
 }
 
 function getRatioAllocationSortMetadata(transaction: TricountEntry): RatioAllocationSortMetadata {

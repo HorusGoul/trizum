@@ -319,6 +319,55 @@ describe("parseTricountData", () => {
     });
   });
 
+  test("keeps mixed exact and ratio allocation ordering transitive", () => {
+    const memberships = [
+      createMembership(1, "Alice"),
+      createMembership(2, "Bob"),
+      createMembership(3, "Cora"),
+    ];
+    const data = createTricountResponse({
+      memberships,
+      entries: [
+        createEntry({
+          id: 111,
+          amount: "0.06",
+          description: "mixed rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Cora", "0.02"),
+            createAmountAllocation("Bob", "0.01"),
+            createRatioAllocation("Alice", "0.03"),
+          ],
+        }),
+      ],
+    });
+    const dataWithReversedAllocations = createTricountResponse({
+      memberships: memberships.slice().reverse(),
+      entries: [
+        createEntry({
+          id: 111,
+          amount: "0.06",
+          description: "mixed rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Alice", "0.03"),
+            createAmountAllocation("Bob", "0.01"),
+            createRatioAllocation("Cora", "0.02"),
+          ],
+        }),
+      ],
+    });
+
+    expect(getBalancesByParticipantName(data)).toStrictEqual({
+      Alice: 3,
+      Bob: -1,
+      Cora: -2,
+    });
+    expect(getBalancesByParticipantName(dataWithReversedAllocations)).toStrictEqual(
+      getBalancesByParticipantName(data),
+    );
+  });
+
   test("warns and skips entries with missing payer or allocation participants", () => {
     const data = createTricountResponse({
       memberships: [createMembership(1, "Alice"), createMembership(2, "Bob")],
