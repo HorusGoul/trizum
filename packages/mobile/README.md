@@ -48,6 +48,10 @@ cd packages/mobile
 vp run build
 ```
 
+The Android and iOS Gemfile directories contain `mise.toml` symlinks to the
+workspace root config so CI `ruby/setup-ruby` resolves the same Ruby version
+while installing package-local bundles.
+
 ### Development
 
 For live development with hot reload:
