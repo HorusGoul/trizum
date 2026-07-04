@@ -1150,7 +1150,7 @@ msgstr "Go Back"
 msgid "Go back and try again from the balances list."
 msgstr "Go back and try again from the balances list."
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:44
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:48
 msgid "Go back to home"
 msgstr "Go back to home"
 
@@ -1283,7 +1283,7 @@ msgstr "Imported {0} ({1} of {2})"
 msgid "Importing attachments ({0} of {1})"
 msgstr "Importing attachments ({0} of {1})"
 
-#: src/routes/migrate_.tricount/route.tsx:56
+#: src/routes/migrate_.tricount/route.tsx:57
 msgid "Importing Tricount data..."
 msgstr "Importing Tricount data..."
 
@@ -1544,7 +1544,7 @@ msgstr "Migrate from Tricount"
 msgid "Migration in progress"
 msgstr "Migration in progress"
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:11
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:14
 msgid "Migration successful"
 msgstr "Migration successful"
 
@@ -2387,7 +2387,7 @@ msgstr "Somali Shilling"
 msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 msgstr "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:34
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:38
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
@@ -2938,7 +2938,7 @@ msgstr "Vietnamese Dong"
 msgid "View on GitHub"
 msgstr "View on GitHub"
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:21
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:25
 msgid "View party"
 msgstr "View party"
 
