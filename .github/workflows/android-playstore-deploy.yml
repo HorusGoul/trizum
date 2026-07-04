@@ -71,11 +71,8 @@ jobs:
           java-version: "21"
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ./.github/actions/setup-mobile-ruby
         with:
-          ruby-version: "3.4.10"
-          bundler: "2.7.2"
-          bundler-cache: true
           cache-version: android-0
           working-directory: packages/mobile/android
 

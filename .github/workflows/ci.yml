@@ -64,6 +64,42 @@ jobs:
             packages/pwa/test-results
           if-no-files-found: ignore
 
+  mobile-ruby:
+    name: Mobile Ruby (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu-latest
+            bundle-directory: packages/mobile/android
+            cache-version: android-ruby-pipeline-0
+            task: ruby:check:android
+          - platform: ios
+            os: macos-26
+            bundle-directory: packages/mobile/ios/App
+            cache-version: ios-ruby-pipeline-0
+            task: ruby:check:ios
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Setup Ruby
+        uses: ./.github/actions/setup-mobile-ruby
+        with:
+          working-directory: ${{ matrix.bundle-directory }}
+          cache-version: ${{ matrix.cache-version }}
+
+      - name: Check Ruby pipeline dry run
+        run: vp run --filter @trizum/mobile ${{ matrix.task }}
+
   mobile-sync:
     name: Mobile Sync (${{ matrix.platform }})
     runs-on: ${{ matrix.os }}
@@ -89,11 +125,8 @@ jobs:
 
       - name: Setup Ruby
         if: matrix.platform == 'ios'
-        uses: ruby/setup-ruby@v1
+        uses: ./.github/actions/setup-mobile-ruby
         with:
-          ruby-version: "3.4.10"
-          bundler: "2.7.2"
-          bundler-cache: true
           cache-version: ios-0
           working-directory: packages/mobile/ios/App
 
