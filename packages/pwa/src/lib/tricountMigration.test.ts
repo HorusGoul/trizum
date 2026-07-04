@@ -282,6 +282,43 @@ describe("parseTricountData", () => {
     );
   });
 
+  test("uses a total source-aware order for ratio allocation rounding", () => {
+    const memberships = [
+      createMembership(1, "Alice"),
+      createMembership(2, "Bob"),
+      createMembership(3, "Cora"),
+    ];
+    const data = createTricountResponse({
+      memberships: memberships.slice().reverse(),
+      entries: [
+        createEntry({
+          id: 110,
+          amount: "0.02",
+          description: "transitive rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Cora", "0.01", 3),
+            createRatioAllocation("Bob", "0.00", 1),
+            createRatioAllocation("Alice", "0.01", 1),
+          ],
+        }),
+      ],
+    });
+
+    const migrationData = parseTricountData(data);
+    const expense = migrationData.expenses[0]!;
+    const aliceId = getParticipantIdByName(migrationData.party.participants, "Alice");
+    const bobId = getParticipantIdByName(migrationData.party.participants, "Bob");
+    const coraId = getParticipantIdByName(migrationData.party.participants, "Cora");
+
+    expect(Object.keys(expense.shares)).toStrictEqual([aliceId, bobId, coraId]);
+    expect(getExpenseUnitShares(expense)).toStrictEqual({
+      [aliceId]: 1,
+      [bobId]: 0,
+      [coraId]: 1,
+    });
+  });
+
   test("warns and skips entries with missing payer or allocation participants", () => {
     const data = createTricountResponse({
       memberships: [createMembership(1, "Alice"), createMembership(2, "Bob")],

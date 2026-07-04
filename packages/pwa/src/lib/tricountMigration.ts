@@ -287,11 +287,16 @@ function compareAllocations(
     const leftPreliminaryAmount = ratioMetadata.preliminaryAmountByAllocation.get(left);
     const rightPreliminaryAmount = ratioMetadata.preliminaryAmountByAllocation.get(right);
 
-    if (
-      leftPreliminaryAmount !== undefined &&
-      rightPreliminaryAmount !== undefined &&
-      leftPreliminaryAmount === rightPreliminaryAmount
-    ) {
+    if (leftPreliminaryAmount !== undefined && rightPreliminaryAmount !== undefined) {
+      const preliminaryAmountDifference =
+        ratioMetadata.roundingError > 0
+          ? leftPreliminaryAmount - rightPreliminaryAmount
+          : rightPreliminaryAmount - leftPreliminaryAmount;
+
+      if (preliminaryAmountDifference !== 0) {
+        return preliminaryAmountDifference;
+      }
+
       const leftSourceAmount = ratioMetadata.sourceAmountByAllocation.get(left) ?? 0;
       const rightSourceAmount = ratioMetadata.sourceAmountByAllocation.get(right) ?? 0;
       const sourceAmountDifference =
