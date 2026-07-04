@@ -11,6 +11,92 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  mobile-changes:
+    name: Mobile Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      android: ${{ steps.detect.outputs.android }}
+      ios: ${{ steps.detect.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect mobile changes
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          before="${{ github.event.before }}"
+          after="${{ github.sha }}"
+          default_branch="${{ github.event.repository.default_branch }}"
+
+          if [[ -z "$before" || "$before" =~ ^0+$ ]]; then
+            git fetch --no-tags origin "$default_branch"
+            before="$(git merge-base "origin/$default_branch" "$after")"
+          elif ! git cat-file -e "$before^{commit}" 2>/dev/null; then
+            git fetch --no-tags origin "$default_branch"
+            before="$(git merge-base "origin/$default_branch" "$after")"
+          fi
+
+          changed_files="$(git diff --name-only "$before" "$after")"
+
+          matches_any() {
+            local pattern
+            for pattern in "$@"; do
+              if grep -Eq "$pattern" <<< "$changed_files"; then
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          shared_mobile_patterns=(
+            '^\.github/workflows/ci\.yml$'
+            '^\.github/actions/setup-mobile-ruby/'
+            '^mise\.toml$'
+            '^package\.json$'
+            '^pnpm-lock\.yaml$'
+            '^pnpm-workspace\.yaml$'
+            '^vite\.config\.ts$'
+            '^packages/icon-sprite/'
+            '^packages/logging/'
+            '^packages/mobile/(assets|dist|src)/'
+            '^packages/mobile/(capacitor\.config\.ts|capacitor\.log\.ts|check-ruby-pipelines\.sh|check-sync-clean\.sh|copy-client\.sh|generate-icons\.sh|package\.json|sync\.sh|tsconfig(\.capacitor)?\.json|vite\.config\.ts)$'
+            '^packages/pwa/(iconSprite\.config\.d\.mts|iconSprite\.config\.mjs|index\.html|lingui\.config\.ts|package\.json|postcss\.config\.js|pwa-assets\.config\.ts|tailwind\.config\.js|tsconfig(\.[^.]+)?\.json|vite\.config\.ts)$'
+            '^packages/pwa/(locale|public|src)/'
+          )
+          android_patterns=(
+            '^packages/mobile/android/'
+            '^packages/mobile/check-android\.sh$'
+          )
+          ios_patterns=(
+            '^packages/mobile/ios/'
+          )
+
+          android=false
+          ios=false
+
+          if matches_any "${shared_mobile_patterns[@]}" "${android_patterns[@]}"; then
+            android=true
+          fi
+
+          if matches_any "${shared_mobile_patterns[@]}" "${ios_patterns[@]}"; then
+            ios=true
+          fi
+
+          {
+            echo "android=$android"
+            echo "ios=$ios"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Changed files:"
+          printf '%s\n' "$changed_files"
+          echo "android=$android"
+          echo "ios=$ios"
+
   check:
     name: Check
     runs-on: ubuntu-latest
@@ -64,20 +150,12 @@ jobs:
             packages/pwa/test-results
           if-no-files-found: ignore
 
-  mobile-sync:
-    name: Mobile Sync (${{ matrix.platform }})
-    runs-on: ${{ matrix.os }}
+  mobile-ruby-android:
+    name: Mobile Ruby (android)
+    runs-on: ubuntu-latest
+    needs: [mobile-changes]
+    if: needs.mobile-changes.outputs.android == 'true'
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: android
-            os: ubuntu-latest
-            task: sync:check:android
-          - platform: ios
-            os: macos-26
-            task: sync:check:ios
     steps:
       - uses: actions/checkout@v6
         with:
@@ -88,17 +166,108 @@ jobs:
           cache: true
 
       - name: Setup Ruby
-        if: matrix.platform == 'ios'
-        uses: ruby/setup-ruby@v1
+        uses: ./.github/actions/setup-mobile-ruby
         with:
-          ruby-version: "3.4.10"
-          bundler: "2.7.2"
-          bundler-cache: true
+          working-directory: packages/mobile/android
+          cache-version: android-ruby-pipeline-0
+
+      - name: Check Ruby pipeline dry run
+        run: vp run --filter @trizum/mobile ruby:check:android
+
+  mobile-ruby-ios:
+    name: Mobile Ruby (ios)
+    runs-on: macos-26
+    needs: [mobile-changes]
+    if: needs.mobile-changes.outputs.ios == 'true'
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Setup Ruby
+        uses: ./.github/actions/setup-mobile-ruby
+        with:
+          working-directory: packages/mobile/ios/App
+          cache-version: ios-ruby-pipeline-0
+
+      - name: Check Ruby pipeline dry run
+        run: vp run --filter @trizum/mobile ruby:check:ios
+
+  check-android:
+    name: Check Android
+    runs-on: ubuntu-latest
+    needs: [check, mobile-changes]
+    if: needs.mobile-changes.outputs.android == 'true'
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Check Android
+        timeout-minutes: 20
+        run: vp run --filter @trizum/mobile check:android
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  mobile-sync-android:
+    name: Mobile Sync (android)
+    runs-on: ubuntu-latest
+    needs: [mobile-changes]
+    if: needs.mobile-changes.outputs.android == 'true'
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Check Capacitor sync
+        run: vp run --filter @trizum/mobile sync:check:android
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  mobile-sync-ios:
+    name: Mobile Sync (ios)
+    runs-on: macos-26
+    needs: [mobile-changes]
+    if: needs.mobile-changes.outputs.ios == 'true'
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Setup Ruby
+        uses: ./.github/actions/setup-mobile-ruby
+        with:
           cache-version: ios-0
           working-directory: packages/mobile/ios/App
 
       - name: Check Capacitor sync
-        run: vp run --filter @trizum/mobile ${{ matrix.task }}
+        run: vp run --filter @trizum/mobile sync:check:ios
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 

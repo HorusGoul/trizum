@@ -27,6 +27,23 @@ export default defineConfig({
         cache: false,
         dependsOn: ["@trizum/pwa#build"],
       },
+      "check:android": {
+        command: "./check-android.sh",
+        cache: false,
+        dependsOn: ["@trizum/pwa#build"],
+      },
+      "ruby:check": {
+        command: "./check-ruby-pipelines.sh",
+        cache: false,
+      },
+      "ruby:check:android": {
+        command: "./check-ruby-pipelines.sh android",
+        cache: false,
+      },
+      "ruby:check:ios": {
+        command: "./check-ruby-pipelines.sh ios",
+        cache: false,
+      },
     },
   },
 });

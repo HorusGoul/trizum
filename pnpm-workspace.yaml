@@ -55,10 +55,10 @@ catalog:
   "@capawesome/capver": 0.1.4
   "@changesets/changelog-github": 0.7.0
   "@changesets/cli": 2.31.0
-  "@cloudflare/vite-plugin": 1.42.4
+  "@cloudflare/vite-plugin": 1.43.0
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
-  "@hono/node-server": 2.0.6
+  "@hono/node-server": 2.0.8
   "@hono/node-ws": 1.3.1
   "@horus.dev/tw-dynamic-themes": 0.0.3
   "@internationalized/date": 3.12.2
@@ -71,20 +71,20 @@ catalog:
   "@lingui/format-po": 6.4.0
   "@lingui/react": 6.4.0
   "@lingui/vite-plugin": 6.4.0
-  "@logtape/logtape": 1.3.11
-  "@logtape/sentry": 1.3.11
+  "@logtape/logtape": 2.2.3
+  "@logtape/sentry": 2.2.3
   "@openai/codex": 0.142.5
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
-  "@sentry/node": 10.62.0
-  "@sentry/profiling-node": 10.62.0
-  "@sentry/react": 10.62.0
+  "@sentry/node": 10.63.0
+  "@sentry/profiling-node": 10.63.0
+  "@sentry/react": 10.63.0
   "@sentry/vite-plugin": 5.3.0
   "@tanstack/react-form": 1.33.0
-  "@tanstack/react-router": 1.170.16
+  "@tanstack/react-router": 1.170.17
   "@tanstack/router-devtools": 1.167.0
-  "@tanstack/router-plugin": 1.168.18
+  "@tanstack/router-plugin": 1.168.19
   "@types/node": 24.13.2
   "@types/react": npm:types-react@rc
   "@types/react-dom": npm:types-react-dom@rc
@@ -114,7 +114,7 @@ catalog:
   heic-to: 1.5.2
   hono: 4.12.27
   jose: 6.2.3
-  lucide-static: 1.22.0
+  lucide-static: 1.23.0
   mathjs: 15.2.0
   motion: 12.42.2
   oxlint-plugin-react-doctor: 0.6.2
@@ -152,6 +152,6 @@ catalog:
   vitest: 4.1.9
   workbox-build: 7.4.1
   workbox-window: 7.4.1
-  wrangler: 4.106.0
-  tsx: 4.22.4
+  wrangler: 4.107.0
+  tsx: 4.23.0
   zod: 4.4.3

@@ -48,6 +48,10 @@ cd packages/mobile
 vp run build
 ```
 
+The Android and iOS Gemfile directories contain `mise.toml` symlinks to the
+workspace root config so CI `ruby/setup-ruby` resolves the same Ruby version
+while installing package-local bundles.
+
 ### Development
 
 For live development with hot reload:
@@ -107,18 +111,20 @@ packages/mobile/
 
 ## Scripts
 
-| Script            | Description                                 |
-| ----------------- | ------------------------------------------- |
-| `build`           | Copy PWA assets and sync Capacitor          |
-| `check`           | Run package validation                      |
-| `open:android`    | Open Android project in Android Studio      |
-| `open:ios`        | Open iOS project in Xcode                   |
-| `run:android`     | Build and run on Android device/emulator    |
-| `run:ios`         | Build and run on iOS device/simulator       |
-| `dev:android`     | Run in dev mode with live reload (Android)  |
-| `dev:ios`         | Run in dev mode with live reload (iOS)      |
-| `assets:generate` | Generate app icons and splash screens       |
-| `sync:check`      | Fail if Capacitor sync changes mobile files |
+| Script            | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| `build`           | Copy PWA assets and sync Capacitor                     |
+| `check`           | Run package validation                                 |
+| `open:android`    | Open Android project in Android Studio                 |
+| `open:ios`        | Open iOS project in Xcode                              |
+| `run:android`     | Build and run on Android device/emulator               |
+| `run:ios`         | Build and run on iOS device/simulator                  |
+| `dev:android`     | Run in dev mode with live reload (Android)             |
+| `dev:ios`         | Run in dev mode with live reload (iOS)                 |
+| `assets:generate` | Generate app icons and splash screens                  |
+| `sync:check`      | Fail if Capacitor sync changes mobile files            |
+| `check:android`   | Validate Android sync, lint, tests, APK, and AAB build |
+| `ruby:check`      | Dry-run Ruby bundles used by mobile CI                 |
 
 ## Fastlane
 
@@ -153,6 +159,13 @@ bundle install
 cd packages/mobile/android
 bundle exec fastlane build_debug
 bundle exec fastlane build_release
+```
+
+Dry-run the Android Ruby pipeline without building or uploading:
+
+```bash
+cd packages/mobile
+vp run ruby:check:android
 ```
 
 #### iOS (`packages/mobile/ios/App`)
@@ -215,6 +228,13 @@ bundle exec fastlane upload_metadata
 
 # Download existing metadata from App Store Connect
 bundle exec fastlane download_metadata
+```
+
+Dry-run the iOS Ruby pipeline without signing, building, or uploading:
+
+```bash
+cd packages/mobile
+vp run ruby:check:ios
 ```
 
 ### App Store Metadata (iOS)
@@ -302,6 +322,12 @@ Run `bundle exec fastlane upload_screenshots` to upload.
 | `APP_STORE_CONNECT_API_KEY_CONTENT`     | Base64-encoded App Store Connect API Key (.p8) |
 
 ## GitHub Actions
+
+The `CI` workflow includes a `Check Android` job that performs an Android
+Capacitor sync check, then runs Gradle lint, unit tests, debug APK assembly, and
+release AAB bundling without Play Store or release signing credentials. Use
+this as the required dry-run for Gradle, Android Gradle Plugin, SDK, or native
+Android project changes.
 
 A `workflow_dispatch` workflow is available for building mobile apps in CI. Navigate to **Actions > Mobile Build** in GitHub and select:
 
