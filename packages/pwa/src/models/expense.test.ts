@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vite-plus/test";
 import {
+  calculateBalancesByParticipant,
   createExpenseId,
   exportIntoInput,
   findExpenseById,
@@ -270,7 +271,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
     expect(totalPaidFor).toBe(1000);
   });
 
-  test("preserves Dinero v1 half-even tie rounding before distributing remainders", () => {
+  test("preserves main rounding for party balance divide shares", () => {
     const expense = createExpense({
       paidBy: {
         user1: 5,
@@ -286,12 +287,25 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         version: 1,
         paidBy: "user1",
         paidFor: {
-          user1: 3,
-          user2: 2,
+          user1: 2,
+          user2: 3,
         },
         expense: 5,
       },
     ]);
+  });
+
+  test("preserves Dinero v1 half-even tie rounding for calculated unit shares", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 5,
+      },
+      shares: {
+        user1: { type: "divide", value: 1 },
+        user2: { type: "divide", value: 1 },
+      },
+    });
+
     expect(getExpenseUnitShares(expense)).toStrictEqual({
       user1: 3,
       user2: 2,
@@ -429,6 +443,30 @@ describe("getImpactOnBalanceForUser", () => {
 
     // user3 is not involved in this expense, so impact should be 0
     expect(impact).toBe(0);
+  });
+});
+
+describe("calculateBalancesByParticipant", () => {
+  test("preserves main rounding for party balances", () => {
+    const expense = createExpense({
+      paidBy: {
+        alice: 5,
+      },
+      shares: {
+        alice: { type: "divide", value: 1 },
+        bob: { type: "divide", value: 1 },
+      },
+    });
+
+    const balances = calculateBalancesByParticipant([expense], {
+      alice: { id: "alice", name: "Alice" },
+      bob: { id: "bob", name: "Bob" },
+    });
+
+    expect(balances.alice.stats.balance).toBe(3);
+    expect(balances.bob.stats.balance).toBe(-3);
+    expect(balances.alice.stats.diffs.bob.diffUnsplitted).toBe(3);
+    expect(balances.bob.stats.diffs.alice.diffUnsplitted).toBe(-3);
   });
 });
 

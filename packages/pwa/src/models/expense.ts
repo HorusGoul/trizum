@@ -87,6 +87,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       const divideAmounts = allocateMinorUnitsByNearest(
         totalLeftForDivides,
         divideUsers.map((divide) => divides[divide].value),
+        Math.round,
       );
 
       // Apply the calculated amounts
@@ -199,6 +200,7 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
         const share = shares[participantId];
         return share?.type === "divide" ? share.value : 0;
       }),
+      roundHalfEven,
     );
 
     // First pass: calculate proportional amounts
@@ -226,14 +228,18 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
   return participantAmounts;
 }
 
-function allocateMinorUnitsByNearest(amount: number, ratios: number[]) {
+function allocateMinorUnitsByNearest(
+  amount: number,
+  ratios: number[],
+  roundAmount: (value: number) => number,
+) {
   const totalRatio = ratios.reduce((total, ratio) => total + ratio, 0);
 
   if (totalRatio <= 0) {
     return ratios.map(() => 0);
   }
 
-  const amounts = ratios.map((ratio) => roundHalfEven(amount * (ratio / totalRatio)));
+  const amounts = ratios.map((ratio) => roundAmount(amount * (ratio / totalRatio)));
   const distributedTotal = amounts.reduce((total, next) => total + next, 0);
   const roundingError = amount - distributedTotal;
 
