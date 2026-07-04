@@ -27,6 +27,10 @@ export default defineConfig({
         cache: false,
         dependsOn: ["@trizum/pwa#build"],
       },
+      "check:android": {
+        command: "./check-android.sh",
+        cache: false,
+      },
     },
   },
 });
