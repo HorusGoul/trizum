@@ -131,8 +131,8 @@ Use Tailwind CSS with the project's color system:
 All user-facing strings must use Lingui:
 
 ```tsx
-import { Trans } from "@lingui/macro";
-import { t } from "@lingui/macro";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 
 // JSX content
 <Trans>Hello, world!</Trans>;
