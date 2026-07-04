@@ -37,6 +37,7 @@ check_fastlane_bundle() {
   start_group "$label Ruby bundle"
   set +e
   (
+    set -e
     cd "$directory"
 
     bundle check
@@ -57,6 +58,7 @@ check_ios_podfile() {
   start_group "iOS CocoaPods Podfile"
   set +e
   (
+    set -e
     cd "$SCRIPT_DIR/ios/App"
     bundle exec pod ipc podfile Podfile >/dev/null
   )
