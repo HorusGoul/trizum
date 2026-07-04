@@ -78,33 +78,33 @@ export function PartyPendingComponent() {
   }
 
   return (
-    <div className="flex min-h-full flex-col items-center px-6 pt-safe-offset-24">
+    <div className="pt-safe-offset-24 flex min-h-full flex-col items-center px-6">
       {/* Animated Logo - swing rotation */}
       <div className="relative mb-8">
         <TrizumSpinner size={80} className="text-accent-600 dark:text-accent-400" />
       </div>
 
       {/* Main title */}
-      <h2 className="text-center text-xl font-semibold text-accent-800 dark:text-accent-200">
+      <h2 className="text-accent-800 dark:text-accent-200 text-center text-xl font-semibold">
         <Trans>Syncing party information...</Trans>
       </h2>
 
       {/* Subtitle */}
-      <p className="mt-2 text-center text-sm text-accent-600 dark:text-accent-400">
+      <p className="text-accent-600 dark:text-accent-400 mt-2 text-center text-sm">
         <Trans>Please wait while we fetch the latest data</Trans>
       </p>
 
       {/* Tips section - visible immediately */}
       <div className="mt-8 w-full max-w-sm">
-        <div className="relative overflow-hidden rounded-2xl border border-accent-200 bg-gradient-to-br from-accent-50 to-accent-100 p-5 dark:border-accent-800 dark:from-accent-900/80 dark:to-accent-900/40">
-          <div className="absolute right-3 top-3 text-accent-300 dark:text-accent-700">
+        <div className="border-accent-200 from-accent-50 to-accent-100 dark:border-accent-800 dark:from-accent-900/80 dark:to-accent-900/40 relative overflow-hidden rounded-2xl border bg-gradient-to-br p-5">
+          <div className="text-accent-300 dark:text-accent-700 absolute top-3 right-3">
             <Icon icon="lucide.lightbulb" width={20} height={20} />
           </div>
-          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-accent-500 dark:text-accent-400">
+          <span className="text-accent-500 dark:text-accent-400 mb-2 block text-xs font-semibold tracking-wider uppercase">
             <Trans>Did you know?</Trans>
           </span>
           <p
-            className="h-10 pr-6 text-sm leading-relaxed text-accent-700 dark:text-accent-300"
+            className="text-accent-700 dark:text-accent-300 h-10 pr-6 text-sm leading-relaxed"
             key={currentTipIndex}
             style={{
               animation: "fade-in-up 0.4s ease-out",
@@ -145,10 +145,10 @@ export function PartyPendingComponent() {
           {/* Collapsible insights */}
           <Disclosure>
             {({ isExpanded }) => (
-              <div className="rounded-xl border border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900/50">
+              <div className="border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900/50 rounded-xl border">
                 <AriaButton
                   slot="trigger"
-                  className="flex w-full items-center justify-between gap-2 p-4 text-accent-600 outline-none dark:text-accent-400"
+                  className="text-accent-600 dark:text-accent-400 flex w-full items-center justify-between gap-2 p-4 outline-none"
                 >
                   <div className="flex items-center gap-2">
                     <Icon icon="lucide.circle-help" width={18} height={18} />
@@ -170,9 +170,9 @@ export function PartyPendingComponent() {
                       {troubleshootingReasons.map((reason) => (
                         <li
                           key={reason.id}
-                          className="flex items-start gap-2.5 text-sm text-accent-600 dark:text-accent-400"
+                          className="text-accent-600 dark:text-accent-400 flex items-start gap-2.5 text-sm"
                         >
-                          <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent-400 dark:bg-accent-600" />
+                          <span className="bg-accent-400 dark:bg-accent-600 mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" />
                           <span>{reason.label()}</span>
                         </li>
                       ))}

@@ -25,7 +25,7 @@ export function SwitchField({ label, description, className, ...props }: SwitchF
     >
       <div className="flex flex-col">
         <span className="text-sm font-medium">{label}</span>
-        {description && <span className="text-sm text-accent-500">{description}</span>}
+        {description && <span className="text-accent-500 text-sm">{description}</span>}
       </div>
       <div
         className={cn(

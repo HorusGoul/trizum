@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@config "../tailwind.config.js";
+@plugin "tailwindcss-react-aria-components";
 
 :root {
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
@@ -26,7 +27,7 @@ body {
   margin: 0;
   padding: 0;
 
-  @apply bg-accent-50 font-sans text-accent-950 dark:bg-accent-950 dark:text-accent-50;
+  @apply bg-accent-50 text-accent-950 dark:bg-accent-950 dark:text-accent-50 font-sans;
 }
 
 #root {

@@ -6,7 +6,7 @@ import { Icon } from "#src/ui/Icon.tsx";
 
 export function BizumItem({ phoneNumber }: { phoneNumber: string }) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl bg-white p-4 dark:bg-accent-900">
+    <div className="dark:bg-accent-900 flex flex-col gap-2 rounded-xl bg-white p-4">
       <h3 className="text-lg font-semibold">Bizum</h3>
       <p className="text-accent-700 dark:text-accent-300">
         <Trans>Copy the phone number and pay through Bizum using your bank app.</Trans>

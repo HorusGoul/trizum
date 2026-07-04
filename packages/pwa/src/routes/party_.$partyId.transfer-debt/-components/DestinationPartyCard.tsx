@@ -30,17 +30,17 @@ export function DestinationPartyCard({
         <PartySymbolBadge party={option.entry.party} className="mt-1 h-12 w-12 text-xl shadow-sm" />
 
         <div className="min-w-0 flex-1">
-          <div className="text-lg font-semibold tracking-tight text-accent-950 dark:text-accent-50">
+          <div className="text-accent-950 dark:text-accent-50 text-lg font-semibold tracking-tight">
             {option.entry.party.name}
           </div>
           {participantPreview ? (
-            <p className="mt-1 flex min-w-0 items-start gap-2 text-sm leading-6 text-accent-900/80 dark:text-accent-200">
+            <p className="text-accent-900/80 dark:text-accent-200 mt-1 flex min-w-0 items-start gap-2 text-sm leading-6">
               <Icon
                 icon="lucide.users"
                 width={16}
                 height={16}
                 aria-hidden="true"
-                className="mt-1 flex-shrink-0 opacity-90"
+                className="mt-1 shrink-0 opacity-90"
               />
               <span className="min-w-0 flex-1">
                 <span className="line-clamp-2 block sm:hidden">
@@ -53,7 +53,7 @@ export function DestinationPartyCard({
             </p>
           ) : null}
           {hasDescription ? (
-            <p className="mt-1 line-clamp-2 text-sm italic leading-6 text-accent-900 dark:text-accent-100/80">
+            <p className="text-accent-900 dark:text-accent-100/80 mt-1 line-clamp-2 text-sm leading-6 italic">
               {description}
             </p>
           ) : null}

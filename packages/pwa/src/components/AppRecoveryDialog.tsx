@@ -45,18 +45,18 @@ export function AppRecoveryDialog() {
       >
         <Dialog
           aria-label={t`Restart trizum`}
-          className="rounded-lg border border-accent-200 bg-white shadow-2xl outline-none dark:border-accent-800 dark:bg-accent-950"
+          className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 rounded-lg border bg-white shadow-2xl outline-none"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
             <div className="flex flex-col gap-3">
-              <span className="flex size-10 items-center justify-center rounded-full bg-danger-50 text-danger-600 dark:bg-danger-950/50 dark:text-danger-300">
+              <span className="bg-danger-50 text-danger-600 dark:bg-danger-950/50 dark:text-danger-300 flex size-10 items-center justify-center rounded-full">
                 <Icon icon="lucide.circle-alert" width={20} height={20} />
               </span>
               <div className="flex flex-col gap-2">
                 <h2 className="text-lg font-medium">
                   <Trans>Restart trizum</Trans>
                 </h2>
-                <p className="text-sm text-accent-700 dark:text-accent-50">
+                <p className="text-accent-700 dark:text-accent-50 text-sm">
                   <Trans>
                     Something is not working properly. Restart trizum to recover. If this keeps
                     happening, check for updates or contact support.

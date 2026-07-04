@@ -177,7 +177,7 @@ export function ModalSheetHeader({
           <div className="flex justify-center">
             <span
               aria-hidden="true"
-              className="h-1.5 w-12 rounded-full bg-accent-200 dark:bg-accent-700"
+              className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
             />
           </div>
         )}
@@ -295,13 +295,13 @@ export function ModalSheetAction({
         width={20}
         height={20}
         className={cn(
-          "col-start-1 row-start-1 flex-shrink-0",
+          "col-start-1 row-start-1 shrink-0",
           tone === "danger"
             ? "text-rose-600 dark:text-rose-300"
             : "text-accent-700 dark:text-accent-200",
         )}
       />
-      <span className="col-start-2 row-start-1 min-w-0 text-base font-medium leading-tight">
+      <span className="col-start-2 row-start-1 min-w-0 text-base leading-tight font-medium">
         {children}
       </span>
     </AriaButton>

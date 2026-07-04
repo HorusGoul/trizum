@@ -256,7 +256,7 @@ export function Settings() {
 
 function SettingsHeader({ submitButton }: { submitButton: React.ReactNode }) {
   return (
-    <div className="container flex h-16 items-center px-2 mt-safe">
+    <div className="mt-safe container flex h-16 items-center px-2">
       <BackButton fallbackOptions={{ to: "/" }} />
 
       <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -286,14 +286,14 @@ function CloudSyncSettingsButton({
         onPress={onPress}
       >
         <span className="flex w-full items-center gap-3">
-          <span className="relative flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50">
+          <span className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-50 relative flex size-9 shrink-0 items-center justify-center rounded-full">
             {isActive ? (
               <span
                 aria-hidden="true"
-                className="absolute -right-0.5 -top-0.5 flex size-3 items-center justify-center"
+                className="absolute -top-0.5 -right-0.5 flex size-3 items-center justify-center"
               >
-                <span className="absolute size-3 animate-pulse rounded-full bg-accent-500/25" />
-                <span className="relative size-2 rounded-full bg-accent-500 ring-2 ring-white dark:ring-accent-900" />
+                <span className="bg-accent-500/25 absolute size-3 animate-pulse rounded-full" />
+                <span className="bg-accent-500 dark:ring-accent-900 relative size-2 rounded-full ring-2 ring-white" />
               </span>
             ) : null}
             <Icon
@@ -304,10 +304,10 @@ function CloudSyncSettingsButton({
             />
           </span>
           <span className="flex min-w-0 flex-1 flex-col gap-1">
-            <span className="font-medium leading-none">
+            <span className="leading-none font-medium">
               <Trans>trizum cloud</Trans>
             </span>
-            <span className="truncate text-sm text-accent-700 dark:text-accent-50">{label}</span>
+            <span className="text-accent-700 dark:text-accent-50 truncate text-sm">{label}</span>
           </span>
           <Icon icon="lucide.chevron-right" width={20} height={20} />
         </span>
@@ -329,7 +329,7 @@ function SettingsFormFields({
     <form
       id={formId}
       action={() => form.handleSubmit()}
-      className="container mt-6 flex flex-col gap-6 px-4 pb-8 pb-safe"
+      className="pb-safe container mt-6 flex flex-col gap-6 px-4 pb-8"
     >
       <form.Field name="avatarId">
         {(field) => (

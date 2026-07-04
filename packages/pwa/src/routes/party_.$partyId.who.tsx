@@ -91,7 +91,7 @@ function Who() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -124,7 +124,7 @@ function Who() {
         }}
         className="container mt-2 flex flex-col gap-4 px-2"
       >
-        <p className="whitespace-pre-wrap px-2">
+        <p className="px-2 whitespace-pre-wrap">
           {needsToJoin ? (
             <Trans>
               To join the <span className="font-medium">{partyName}</span>, please select who you
@@ -179,7 +179,7 @@ function Who() {
         </form.Field>
       </form>
 
-      <div className="h-16 flex-shrink-0" />
+      <div className="h-16 shrink-0" />
     </div>
   );
 }

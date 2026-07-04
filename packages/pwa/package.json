@@ -85,6 +85,7 @@
     "@lingui/vite-plugin": "catalog:",
     "@playwright/test": "catalog:",
     "@rolldown/plugin-babel": "catalog:",
+    "@tailwindcss/postcss": "catalog:",
     "@tanstack/router-devtools": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@trizum/icon-sprite": "workspace:*",

@@ -23,7 +23,7 @@ function ArchivedParties() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -31,7 +31,7 @@ function ArchivedParties() {
         </h1>
       </div>
 
-      <div className="container mt-4 flex flex-1 flex-col gap-4 px-2 pb-safe-offset-8">
+      <div className="pb-safe-offset-8 container mt-4 flex flex-1 flex-col gap-4 px-2">
         {archivedPartyIds.length > 0 ? (
           archivedPartyIds.map((partyId) => {
             const actions: PartyListCardAction[] = [
@@ -77,16 +77,16 @@ function useArchivedPartyIds(partyList: PartyList) {
 
 function ArchivedEmptyState() {
   return (
-    <div className="rounded-xl border border-dashed border-accent-300 bg-white/80 p-6 text-center shadow-sm dark:border-accent-700 dark:bg-accent-950/70 dark:shadow-none">
+    <div className="border-accent-300 dark:border-accent-700 dark:bg-accent-950/70 rounded-xl border border-dashed bg-white/80 p-6 text-center shadow-sm dark:shadow-none">
       <div className="mx-auto flex max-w-md flex-col items-center gap-4">
-        <div className="rounded-full bg-accent-100 p-4 text-accent-700 dark:bg-accent-800 dark:text-accent-200">
+        <div className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200 rounded-full p-4">
           <Icon icon="lucide.archive-restore" width={22} height={22} />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-accent-950 dark:text-accent-50">
+          <h2 className="text-accent-950 dark:text-accent-50 text-xl font-semibold">
             <Trans>No archived parties</Trans>
           </h2>
-          <p className="mt-2 text-sm text-accent-700 dark:text-accent-300">
+          <p className="text-accent-700 dark:text-accent-300 mt-2 text-sm">
             <Trans>
               Archive a party from the home screen when you want to clear some space without losing
               it.

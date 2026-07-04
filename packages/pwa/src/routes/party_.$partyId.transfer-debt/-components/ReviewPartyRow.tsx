@@ -13,20 +13,20 @@ export function ReviewPartyRow({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <PartySymbolBadge party={party} className="mt-0.5 h-10 w-10 flex-shrink-0 text-base" />
+      <PartySymbolBadge party={party} className="mt-0.5 h-10 w-10 shrink-0 text-base" />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-accent-500 dark:text-accent-400">
+          <div className="text-accent-500 dark:text-accent-400 text-xs font-semibold tracking-[0.16em] uppercase">
             {caption}
           </div>
-          <div className="h-px min-w-4 flex-1 bg-accent-200/80 dark:bg-accent-800" />
+          <div className="bg-accent-200/80 dark:bg-accent-800 h-px min-w-4 flex-1" />
         </div>
-        <div className="mt-1 truncate text-base font-semibold text-accent-950 dark:text-accent-50">
+        <div className="text-accent-950 dark:text-accent-50 mt-1 truncate text-base font-semibold">
           {party.name}
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5 text-accent-700 dark:text-accent-300">
+        <div className="text-accent-700 dark:text-accent-300 mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-5">
           {children}
         </div>
       </div>
@@ -42,12 +42,12 @@ export function ReviewParticipantInline({
   children: React.ReactNode;
 }) {
   return (
-    <span className="inline-flex max-w-full items-center gap-1.5 leading-5 text-accent-950 dark:text-accent-50">
+    <span className="text-accent-950 dark:text-accent-50 inline-flex max-w-full items-center gap-1.5 leading-5">
       <TransferParticipantAvatar
         participant={participant}
-        className="h-5 w-5 flex-shrink-0 text-[0.5rem]"
+        className="h-5 w-5 shrink-0 text-[0.5rem]"
       />
-      <span className="truncate font-medium leading-5">{children}</span>
+      <span className="truncate leading-5 font-medium">{children}</span>
     </span>
   );
 }

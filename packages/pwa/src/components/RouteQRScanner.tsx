@@ -47,18 +47,18 @@ export function RouteQRScanner({ isOpen, onScan, onClose, validate }: RouteQRSca
         if (!open) onClose();
       }}
       className={({ isEntering, isExiting }) =>
-        `fixed inset-0 z-50 bg-black ${isEntering ? "duration-200 ease-out animate-in fade-in" : ""} ${isExiting ? "duration-150 ease-in animate-out fade-out" : ""}`
+        `fixed inset-0 z-50 bg-black ${isEntering ? "animate-in fade-in duration-200 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-150 ease-in" : ""}`
       }
     >
       <Modal className="h-full w-full">
         <div className="flex h-full flex-col">
           {/* Gradient overlay for header visibility */}
-          <div className="absolute inset-x-0 top-0 z-10 h-32 bg-gradient-to-b from-black/70 to-transparent pt-safe">
+          <div className="pt-safe absolute inset-x-0 top-0 z-10 h-32 bg-gradient-to-b from-black/70 to-transparent">
             <div className="container flex h-16 items-center px-2">
               <IconButton
                 icon="lucide.x"
                 aria-label={t`Close`}
-                className="flex-shrink-0 text-white"
+                className="shrink-0 text-white"
                 onPress={onClose}
               />
 

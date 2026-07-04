@@ -116,7 +116,7 @@ function Join() {
   return (
     <>
       <div className="flex min-h-full flex-col">
-        <div className="container flex h-16 items-center px-2 mt-safe">
+        <div className="mt-safe container flex h-16 items-center px-2">
           <BackButton fallbackOptions={{ to: "/" }} />
           <h1 className="max-h-12 truncate px-4 text-xl font-medium">
             <Trans>Join a trizum</Trans>
@@ -133,10 +133,10 @@ function Join() {
               className="text-accent-600 dark:text-accent-400"
             />
             <div className="flex flex-1 flex-col">
-              <span className="text-lg font-semibold text-accent-950 dark:text-accent-50">
+              <span className="text-accent-950 dark:text-accent-50 text-lg font-semibold">
                 <Trans>Scan QR code</Trans>
               </span>
-              <span className="text-sm text-accent-600 dark:text-accent-400">
+              <span className="text-accent-600 dark:text-accent-400 text-sm">
                 <Trans>Use your camera to scan a trizum invite</Trans>
               </span>
             </div>
@@ -145,11 +145,11 @@ function Join() {
 
         {/* Divider */}
         <div className="container mt-6 flex items-center gap-4 px-4">
-          <div className="h-px flex-1 bg-accent-200 dark:bg-accent-800" />
-          <span className="text-sm text-accent-500">
+          <div className="bg-accent-200 dark:bg-accent-800 h-px flex-1" />
+          <span className="text-accent-500 text-sm">
             <Trans>or enter code</Trans>
           </span>
-          <div className="h-px flex-1 bg-accent-200 dark:bg-accent-800" />
+          <div className="bg-accent-200 dark:bg-accent-800 h-px flex-1" />
         </div>
 
         {/* Secondary action: Manual entry */}

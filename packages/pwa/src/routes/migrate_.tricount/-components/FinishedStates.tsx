@@ -37,7 +37,7 @@ export function ErrorState({ message }: { message: string }) {
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Something went wrong</Trans>
         </h1>
-        <p className="my-4 text-sm font-semibold text-accent-700 dark:text-accent-200">{message}</p>
+        <p className="text-accent-700 dark:text-accent-200 my-4 text-sm font-semibold">{message}</p>
         <Button
           color="input-like"
           onClick={() => {

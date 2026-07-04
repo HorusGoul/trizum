@@ -22,7 +22,7 @@ export function DestinationParticipantCard({
       )}
       onClick={onPress}
     >
-      <div className="relative flex-shrink-0">
+      <div className="relative shrink-0">
         <TransferParticipantAvatar
           participant={participant}
           className="h-9 w-9 text-xs shadow-sm"
@@ -30,14 +30,14 @@ export function DestinationParticipantCard({
         {isRecommended ? (
           <span
             aria-label={t`Recommended match`}
-            className="absolute -right-1 -top-1 inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-accent-500 text-accent-50 shadow-sm dark:border-accent-900 dark:bg-accent-400 dark:text-accent-950"
+            className="bg-accent-500 text-accent-50 dark:border-accent-900 dark:bg-accent-400 dark:text-accent-950 absolute -top-1 -right-1 inline-flex h-4 w-4 items-center justify-center rounded-full border-2 border-white shadow-sm"
           >
             <Icon icon="lucide.sparkles" width={9} height={9} />
           </span>
         ) : null}
       </div>
 
-      <span className="min-w-0 flex-1 truncate text-base font-medium text-accent-950 dark:text-accent-50">
+      <span className="text-accent-950 dark:text-accent-50 min-w-0 flex-1 truncate text-base font-medium">
         {participant.name}
       </span>
     </button>

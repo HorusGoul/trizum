@@ -15,9 +15,9 @@ const colorSchemes: Record<
   }
 > = {
   transparent: {
-    base: "bg-accent-950 bg-opacity-0 dark:bg-accent-50 dark:bg-opacity-0",
-    focus: "bg-opacity-5 dark:bg-opacity-5",
-    pressed: "bg-opacity-10 dark:bg-opacity-10",
+    base: "bg-accent-950/0 dark:bg-accent-50/0",
+    focus: "bg-accent-950/5 dark:bg-accent-50/5",
+    pressed: "bg-accent-950/10 dark:bg-accent-50/10",
   },
   accent: {
     base: "text-accent-50 bg-accent-500 dark:bg-accent-500",

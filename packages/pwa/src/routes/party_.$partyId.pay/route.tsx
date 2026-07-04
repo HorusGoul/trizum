@@ -89,7 +89,7 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           {isFromMe ? <Trans>Pay</Trans> : <Trans>Mark as paid</Trans>}
@@ -97,20 +97,20 @@ function RouteComponent() {
       </div>
 
       <div className="container flex flex-col gap-4 px-4 pt-4">
-        <div className="flex rounded-xl bg-white p-4 dark:bg-accent-900">
+        <div className="dark:bg-accent-900 flex rounded-xl bg-white p-4">
           <div className="flex flex-1 flex-col">
-            <span className="text-lg text-accent-400">
+            <span className="text-accent-400 text-lg">
               {from.name} {fromId === me.id ? t`(me)` : ""}
             </span>
-            <span className="text-sm text-accent-700 dark:text-accent-300">
+            <span className="text-accent-700 dark:text-accent-300 text-sm">
               <Trans>owes</Trans>
             </span>
-            <span className="text-lg text-accent-400">
+            <span className="text-accent-400 text-lg">
               {to.name} {toId === me.id ? t`(me)` : ""}
             </span>
           </div>
 
-          <div className="flex flex-shrink-0 items-center">
+          <div className="flex shrink-0 items-center">
             <CurrencyText currency={party.currency} amount={Math.abs(amount)} className="text-xl" />
           </div>
         </div>
@@ -147,7 +147,7 @@ function RouteComponent() {
         })}
       </div>
 
-      <div className="h-16 flex-shrink-0" />
+      <div className="h-16 shrink-0" />
     </div>
   );
 }

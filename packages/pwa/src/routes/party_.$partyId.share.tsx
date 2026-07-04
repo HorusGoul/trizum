@@ -48,7 +48,7 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -61,7 +61,7 @@ function RouteComponent() {
           <QRCode
             value={shareUrl}
             size="xl"
-            className="rounded-lg text-accent-50"
+            className="text-accent-50 rounded-lg"
             options={{
               image: getQRCodeImage(),
               imageOptions: {

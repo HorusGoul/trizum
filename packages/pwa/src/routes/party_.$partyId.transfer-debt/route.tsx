@@ -471,7 +471,7 @@ function useTransferDebtRouteView() {
             >
               <section
                 aria-labelledby="transfer-debt-participant-title"
-                className="container flex flex-col gap-4 px-4 pb-24 pt-4"
+                className="container flex flex-col gap-4 px-4 pt-4 pb-24"
               >
                 <SectionIntro
                   eyebrow={t`Creditor`}
@@ -485,7 +485,7 @@ function useTransferDebtRouteView() {
                     description={t`This party needs another active participant besides you to receive the transferred debt.`}
                   />
                 ) : (
-                  <div className="divide-y divide-accent-200/80 overflow-hidden rounded-xl border border-accent-200/80 bg-white shadow-sm dark:divide-accent-800 dark:border-accent-800 dark:bg-accent-900 dark:shadow-none">
+                  <div className="divide-accent-200/80 border-accent-200/80 dark:divide-accent-800 dark:border-accent-800 dark:bg-accent-900 divide-y overflow-hidden rounded-xl border bg-white shadow-sm dark:shadow-none">
                     {orderedDestinationParticipants.map((participant) => (
                       <DestinationParticipantCard
                         key={participant.id}
@@ -551,7 +551,7 @@ function useTransferDebtRouteView() {
         </AnimatePresence>
       </LazyMotion>
 
-      {activeStep === "success" ? null : <div className="h-8 flex-shrink-0" />}
+      {activeStep === "success" ? null : <div className="h-8 shrink-0" />}
     </TransferDebtLayout>
   );
 }

@@ -117,7 +117,7 @@ function AppSelect<T extends object>({
         <SelectValue />
       </SelectTrigger>
       {description && (
-        <Text className="text-sm text-accent-950 dark:text-accent-50" slot="description">
+        <Text className="text-accent-950 dark:text-accent-50 text-sm" slot="description">
           {description}
         </Text>
       )}

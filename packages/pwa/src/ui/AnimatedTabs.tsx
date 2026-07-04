@@ -217,7 +217,7 @@ export function AnimatedTabs({
             items={tabs}
           >
             {(tab) => (
-              <Tab className="flex flex-1 cursor-pointer touch-none select-none items-center justify-center px-4 py-2.5 outline-none transition">
+              <Tab className="flex flex-1 cursor-pointer touch-none items-center justify-center px-4 py-2.5 transition outline-none select-none">
                 {({ isSelected, isFocusVisible }) => (
                   <>
                     <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
@@ -252,7 +252,7 @@ export function AnimatedTabs({
             {(tab) => (
               <TabPanel
                 shouldForceMount
-                className="no-scrollbar box-border flex w-full flex-shrink-0 snap-start flex-col overflow-y-auto overscroll-y-contain rounded outline-none -outline-offset-2 focus-visible:outline-black"
+                className="no-scrollbar box-border flex w-full shrink-0 snap-start flex-col overflow-y-auto overscroll-y-contain rounded -outline-offset-2 outline-none focus-visible:outline-black"
                 ref={tab.panelRef}
               >
                 {tab.node}
