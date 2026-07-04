@@ -186,7 +186,7 @@ export function Settings() {
       autoOpenCalculator: values.autoOpenCalculator,
       hue: values.hue,
     });
-    form.reset();
+    form.reset(values);
     toast.success(t`Settings saved`);
     void navigate({ to: "..", replace: true });
   }
@@ -328,9 +328,7 @@ function SettingsFormFields({
   return (
     <form
       id={formId}
-      action={() => {
-        void form.handleSubmit();
-      }}
+      action={() => form.handleSubmit()}
       className="container mt-6 flex flex-col gap-6 px-4 pb-8 pb-safe"
     >
       <form.Field name="avatarId">

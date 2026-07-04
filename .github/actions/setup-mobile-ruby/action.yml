@@ -1,0 +1,19 @@
+name: Setup mobile Ruby
+description: Install the repo Ruby from mise.toml and bundle a mobile Gemfile.
+
+inputs:
+  working-directory:
+    description: Directory containing the Gemfile to install.
+    required: true
+  cache-version:
+    description: Cache version passed through to ruby/setup-ruby.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+        cache-version: ${{ inputs.cache-version }}
+        working-directory: ${{ github.workspace }}/${{ inputs.working-directory }}

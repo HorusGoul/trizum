@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
-import { getExpenseUnitShares } from "#src/models/expense.ts";
+import {
+  calculateBalancesByParticipant,
+  getExpenseUnitShares,
+  type Expense,
+} from "#src/models/expense.ts";
+import type { Party } from "#src/models/party.ts";
 import { parseTricountData, type TricountResponse } from "./tricountMigration.ts";
 
 const warningRecords = vi.hoisted(
@@ -88,6 +93,7 @@ describe("parseTricountData", () => {
     const bobId = getParticipantIdByName(migrationData.party.participants, "Bob");
     const coraId = getParticipantIdByName(migrationData.party.participants, "Cora");
 
+    expect([aliceId, bobId, coraId]).toStrictEqual(["TCM_1", "TCM_2", "TCM_3"]);
     expect(expense.shares).toStrictEqual({
       [aliceId]: { type: "divide", value: 1 },
       [bobId]: { type: "divide", value: 1 },
@@ -227,10 +233,139 @@ describe("parseTricountData", () => {
     const secondPhoto = migrationData.photos.find((photo) => photo.url === secondUrl);
 
     expect(migrationData.photos).toHaveLength(2);
+    expect(migrationData.photos.map((photo) => photo.id)).toStrictEqual(["TCA_1", "TCA_2"]);
     expect(sharedPhoto).toBeDefined();
     expect(secondPhoto).toBeDefined();
     expect(firstExpense!.photos).toStrictEqual([sharedPhoto!.id]);
     expect(secondExpense!.photos).toStrictEqual([sharedPhoto!.id, secondPhoto!.id]);
+  });
+
+  test("keeps balances stable when Tricount returns allocations in a different order", () => {
+    const memberships = [createMembership(1, "Alice"), createMembership(2, "Bob")];
+    const data = createTricountResponse({
+      memberships,
+      entries: [
+        createEntry({
+          id: 109,
+          amount: "0.05",
+          description: "rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Alice", "0.03"),
+            createRatioAllocation("Bob", "0.02"),
+          ],
+        }),
+      ],
+    });
+    const dataWithReversedAllocations = createTricountResponse({
+      memberships: memberships.slice().reverse(),
+      entries: [
+        createEntry({
+          id: 109,
+          amount: "0.05",
+          description: "rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Bob", "0.02"),
+            createRatioAllocation("Alice", "0.03"),
+          ],
+        }),
+      ],
+    });
+
+    expect(getBalancesByParticipantName(data)).toStrictEqual({
+      Alice: 2,
+      Bob: -2,
+    });
+    expect(getBalancesByParticipantName(dataWithReversedAllocations)).toStrictEqual(
+      getBalancesByParticipantName(data),
+    );
+  });
+
+  test("uses a total source-aware order for ratio allocation rounding", () => {
+    const memberships = [
+      createMembership(1, "Alice"),
+      createMembership(2, "Bob"),
+      createMembership(3, "Cora"),
+    ];
+    const data = createTricountResponse({
+      memberships: memberships.slice().reverse(),
+      entries: [
+        createEntry({
+          id: 110,
+          amount: "0.02",
+          description: "transitive rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Cora", "0.01", 3),
+            createRatioAllocation("Bob", "0.00", 1),
+            createRatioAllocation("Alice", "0.01", 1),
+          ],
+        }),
+      ],
+    });
+
+    const migrationData = parseTricountData(data);
+    const expense = migrationData.expenses[0]!;
+    const aliceId = getParticipantIdByName(migrationData.party.participants, "Alice");
+    const bobId = getParticipantIdByName(migrationData.party.participants, "Bob");
+    const coraId = getParticipantIdByName(migrationData.party.participants, "Cora");
+
+    expect(Object.keys(expense.shares)).toStrictEqual([aliceId, bobId, coraId]);
+    expect(getExpenseUnitShares(expense)).toStrictEqual({
+      [aliceId]: 1,
+      [bobId]: 0,
+      [coraId]: 1,
+    });
+  });
+
+  test("keeps mixed exact and ratio allocation ordering transitive", () => {
+    const memberships = [
+      createMembership(1, "Alice"),
+      createMembership(2, "Bob"),
+      createMembership(3, "Cora"),
+    ];
+    const data = createTricountResponse({
+      memberships,
+      entries: [
+        createEntry({
+          id: 111,
+          amount: "0.06",
+          description: "mixed rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Cora", "0.02"),
+            createAmountAllocation("Bob", "0.01"),
+            createRatioAllocation("Alice", "0.03"),
+          ],
+        }),
+      ],
+    });
+    const dataWithReversedAllocations = createTricountResponse({
+      memberships: memberships.slice().reverse(),
+      entries: [
+        createEntry({
+          id: 111,
+          amount: "0.06",
+          description: "mixed rounding",
+          paidBy: "Alice",
+          allocations: [
+            createRatioAllocation("Alice", "0.03"),
+            createAmountAllocation("Bob", "0.01"),
+            createRatioAllocation("Cora", "0.02"),
+          ],
+        }),
+      ],
+    });
+
+    expect(getBalancesByParticipantName(data)).toStrictEqual({
+      Alice: 3,
+      Bob: -1,
+      Cora: -2,
+    });
+    expect(getBalancesByParticipantName(dataWithReversedAllocations)).toStrictEqual(
+      getBalancesByParticipantName(data),
+    );
   });
 
   test("warns and skips entries with missing payer or allocation participants", () => {
@@ -277,6 +412,36 @@ describe("parseTricountData", () => {
     ]);
   });
 });
+
+function getBalancesByParticipantName(data: TricountResponse): Record<string, number> {
+  const migrationData = parseTricountData(data);
+  const expenses: Expense[] = migrationData.expenses.map((expense, index) => ({
+    id: `expense-${index}`,
+    name: expense.name,
+    paidAt: new Date(expense.paidAt),
+    paidBy: expense.paidBy,
+    shares: expense.shares,
+    photos: [],
+    isTransfer: expense.isTransfer,
+    __hash: "",
+  }));
+  const balances = calculateBalancesByParticipant(
+    expenses,
+    migrationData.party.participants as Party["participants"],
+  );
+
+  return Object.fromEntries(
+    Object.values(balances).map((balance) => {
+      const participant = migrationData.party.participants[balance.participantId];
+
+      if (!participant) {
+        throw new Error(`Expected participant ${balance.participantId} to exist`);
+      }
+
+      return [participant.name, balance.stats.balance];
+    }),
+  );
+}
 
 function getParticipantIdByName(
   participants: TricountResponseMigrationParticipants,

@@ -1,7 +1,7 @@
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import type { BalancesByParticipant, Expense } from "./expense";
-import type { Currency } from "dinero.js";
+import type { CurrencyCode } from "#src/lib/money.ts";
 import type { MediaFile } from "./media";
 
 export interface Party {
@@ -10,7 +10,7 @@ export interface Party {
   name: string;
   symbol?: string;
   description: string;
-  currency: Currency;
+  currency: CurrencyCode;
   participants: Record<ExpenseUser, PartyParticipant>;
   chunkRefs: PartyExpenseChunkRef[];
 }
