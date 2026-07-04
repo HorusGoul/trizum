@@ -73,7 +73,7 @@ catalog:
   "@lingui/vite-plugin": 6.4.0
   "@logtape/logtape": 1.3.11
   "@logtape/sentry": 1.3.11
-  "@openai/codex": 0.142.4
+  "@openai/codex": 0.142.5
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
@@ -117,20 +117,20 @@ catalog:
   lucide-static: 1.22.0
   mathjs: 15.2.0
   motion: 12.42.2
-  oxlint-plugin-react-doctor: 0.5.8
+  oxlint-plugin-react-doctor: 0.6.2
   playwright: 1.61.1
   postcss: 8.5.16
   qr-code-styling: 1.9.2
   react: 0.0.0-experimental-8a8e9a7e-20250912
   react-aria: ^3.42.0
   react-aria-components: 1.19.0
-  react-doctor: 0.5.8
+  react-doctor: 0.6.2
   react-dom: 0.0.0-experimental-8a8e9a7e-20250912
   react-modal-sheet: 5.6.0
   react-window: 2.2.7
   rollup: 4.62.2
   rollup-plugin-license: 3.7.1
-  sharp: 0.35.2
+  sharp: 0.35.3
   skills: 1.5.14
   sonner: 2.0.7
   suspense: 0.1.0
@@ -144,11 +144,11 @@ catalog:
   tailwindcss-safe-area-capacitor: 0.5.1
   typescript: 6.0.3
   ulidx: 2.4.1
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.1
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.2
   vite-plugin-pwa: 1.3.0
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
-  vite-plus: 0.2.1
+  vite-plus: 0.2.2
   vitest: 4.1.9
   workbox-build: 7.4.1
   workbox-window: 7.4.1
