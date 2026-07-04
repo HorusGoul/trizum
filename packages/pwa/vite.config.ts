@@ -27,6 +27,7 @@ const buildTarget = ["edge88", "firefox78", "chrome87", "safari14.1"];
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
+const browserNodeUtilShim = path.resolve(packageRoot, "src/lib/browserNodeUtil.ts");
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
 const linguiConfig = getLinguiConfig({
   cwd: packageRoot,
@@ -85,7 +86,7 @@ export default defineConfig(({ mode }) => {
         build: {
           command: "vp build",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
-          env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
+          env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL", "VITE_APP_DISABLE_SENTRY"],
           output: ["dist/**"],
         },
         check: {
@@ -139,6 +140,14 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: [
+        {
+          find: /^node:util$/,
+          replacement: browserNodeUtilShim,
+        },
+        {
+          find: /^util$/,
+          replacement: browserNodeUtilShim,
+        },
         {
           // Cloudflare Worker validation does not expose CommonJS require.
           find: /^debug$/,
