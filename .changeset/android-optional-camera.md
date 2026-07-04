@@ -2,4 +2,4 @@
 "@trizum/mobile": patch
 ---
 
-Allow Android installs on devices without camera hardware by marking camera support as optional.
+Allow Android installs on devices without camera hardware by marking camera and autofocus support as optional.
