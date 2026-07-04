@@ -92,7 +92,23 @@ export async function createPartyFromMigrationData({
     });
   }
 
+  // eslint-disable-next-line react-doctor/async-parallel -- Import writes must finish before flushing them and rebalancing from the worker repo.
   await importExpenseAtIndex(0);
+  await flushPartyDocuments();
+  await helpers.recalculateBalances();
+
+  async function flushPartyDocuments() {
+    const migratedParty = handle.doc();
+
+    if (!migratedParty) {
+      throw new Error("Party not found after migration, this should not happen");
+    }
+
+    await repo.flush([
+      partyId,
+      ...migratedParty.chunkRefs.flatMap((chunkRef) => [chunkRef.chunkId, chunkRef.balancesId]),
+    ]);
+  }
 
   async function importExpenseAtIndex(index: number): Promise<void> {
     const expense = data.expenses[index];
