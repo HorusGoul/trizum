@@ -48,6 +48,10 @@ cd packages/mobile
 vp run build
 ```
 
+The Android and iOS Gemfile directories contain `mise.toml` symlinks to the
+workspace root config so CI `ruby/setup-ruby` resolves the same Ruby version
+while installing package-local bundles.
+
 ### Development
 
 For live development with hot reload:
@@ -119,6 +123,7 @@ packages/mobile/
 | `dev:ios`         | Run in dev mode with live reload (iOS)      |
 | `assets:generate` | Generate app icons and splash screens       |
 | `sync:check`      | Fail if Capacitor sync changes mobile files |
+| `ruby:check`      | Dry-run Ruby bundles used by mobile CI      |
 
 ## Fastlane
 
@@ -153,6 +158,13 @@ bundle install
 cd packages/mobile/android
 bundle exec fastlane build_debug
 bundle exec fastlane build_release
+```
+
+Dry-run the Android Ruby pipeline without building or uploading:
+
+```bash
+cd packages/mobile
+vp run ruby:check:android
 ```
 
 #### iOS (`packages/mobile/ios/App`)
@@ -215,6 +227,13 @@ bundle exec fastlane upload_metadata
 
 # Download existing metadata from App Store Connect
 bundle exec fastlane download_metadata
+```
+
+Dry-run the iOS Ruby pipeline without signing, building, or uploading:
+
+```bash
+cd packages/mobile
+vp run ruby:check:ios
 ```
 
 ### App Store Metadata (iOS)
