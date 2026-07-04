@@ -8,7 +8,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
 import { toast } from "sonner";
-import type { Currency } from "dinero.js";
+import type { CurrencyCode } from "#src/lib/money.ts";
 import { NewPartyDetailsFields } from "./-components/NewPartyDetailsFields.js";
 import { NewPartyHeader } from "./-components/NewPartyHeader.js";
 import { NewPartyParticipantsField } from "./-components/NewPartyParticipantsField.js";
@@ -76,7 +76,7 @@ function New() {
       name: "",
       symbol: DEFAULT_PARTY_SYMBOL,
       description: "",
-      currency: "EUR" as Currency,
+      currency: "EUR" as CurrencyCode,
       participants: [initialParticipant],
     },
     onSubmit: ({ value }) => {
@@ -152,7 +152,7 @@ function New() {
 }
 
 /**
- * Returns all ISO 4217 currencies supported by dinero.js.
+ * Returns the currencies users can choose for a party.
  * Common currencies are listed first for convenience.
  */
 function getCurrencyOptions(): CurrencyOption[] {

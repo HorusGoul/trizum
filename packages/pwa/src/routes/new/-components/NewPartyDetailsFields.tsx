@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import type { Currency } from "dinero.js";
+import type { CurrencyCode } from "#src/lib/money.ts";
 import { AppEmojiField } from "#src/components/AppEmojiField.tsx";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
@@ -94,7 +94,7 @@ export function NewPartyDetailsFields({
             selectedKey={field.state.value}
             onSelectionChange={(value) => {
               if (value) {
-                field.handleChange(value as Currency);
+                field.handleChange(value as CurrencyCode);
               }
             }}
           >

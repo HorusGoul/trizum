@@ -89,7 +89,6 @@
     "@tanstack/router-plugin": "catalog:",
     "@trizum/icon-sprite": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
-    "@types/dinero.js": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

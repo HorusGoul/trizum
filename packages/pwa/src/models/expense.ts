@@ -1,7 +1,7 @@
 import { calculateLogStatsOfUser, type ExpenseInput, type ExpenseUser } from "#src/lib/expenses.js";
 import type { DocumentId } from "@automerge/automerge-repo";
 import { ulid } from "ulidx";
-import Dinero from "dinero.js";
+import { add, subtract } from "dinero.js";
 import type { MediaFile } from "./media";
 import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
@@ -10,6 +10,7 @@ import { md5 } from "@takker/md5";
 import type { Party, PartyParticipant } from "./party";
 import { assertNever } from "#src/lib/assertNever.ts";
 import { getLogger } from "#src/lib/log.ts";
+import { createMoney, getMoneyAmount } from "#src/lib/money.ts";
 
 const logger = getLogger("models", "expense");
 
@@ -51,16 +52,12 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     return [];
   }
 
-  const total = Object.values(expense.paidBy).reduce(
-    (acc, curr) => acc.add(Dinero({ amount: curr })),
-    Dinero({ amount: 0 }),
-  );
+  const total = getExpenseTotalAmount(expense);
 
   return Object.keys(expense.paidBy).map((user): ExpenseInput => {
     const partial = expense.paidBy[user];
-    const factor = partial / total.getAmount();
     const paidFor: Record<ExpenseUser, number> = {};
-    let amountLeft = Dinero({ amount: partial });
+    let amountLeft = createMoney(partial);
 
     const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(expense.shares)
       .filter((share) => expense.shares[share].type === "exact")
@@ -71,12 +68,12 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
 
     for (const exact of Object.keys(exacts)) {
-      const amount = Dinero({ amount: exacts[exact].value }).multiply(factor);
-      paidFor[exact] = amount.getAmount();
-      amountLeft = amountLeft.subtract(amount);
+      const amount = createMoney(roundHalfEven((exacts[exact].value * partial) / total));
+      paidFor[exact] = getMoneyAmount(amount);
+      amountLeft = subtract(amountLeft, amount);
     }
 
-    if (amountLeft.getAmount() < 0) {
+    if (getMoneyAmount(amountLeft) < 0) {
       logger.error("Negative amounts left while exporting expense input", {
         expenseId: expense.id,
       });
@@ -85,55 +82,19 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     const totalDivides = Object.values(divides).reduce((acc, curr) => acc + curr.value, 0);
 
     if (totalDivides > 0) {
-      const totalLeftForDivides = amountLeft.getAmount();
+      const totalLeftForDivides = getMoneyAmount(amountLeft);
       const divideUsers = Object.keys(divides);
-
-      // Calculate divide shares with proper rounding
-      let distributedTotal = 0;
-      const divideAmounts: Record<ExpenseUser, number> = {};
-
-      // First pass: calculate initial amounts
-      for (const divide of divideUsers) {
-        const dFactor = divides[divide].value / totalDivides;
-        const amount = Math.round(totalLeftForDivides * dFactor);
-        divideAmounts[divide] = amount;
-        distributedTotal += amount;
-      }
-
-      // Second pass: adjust for rounding errors
-      const roundingError = totalLeftForDivides - distributedTotal;
-      if (roundingError !== 0 && divideUsers.length > 0) {
-        // Distribute rounding error more fairly among divide participants
-        const absRoundingError = Math.abs(roundingError);
-
-        // Sort participants by their current amount to distribute rounding errors
-        // to those with the smallest amounts first (for positive error) or
-        // to those with the largest amounts first (for negative error)
-        const sortedDivideUsers = divideUsers.slice();
-        sortedDivideUsers.sort((a, b) => {
-          if (roundingError > 0) {
-            return divideAmounts[a] - divideAmounts[b];
-          } else {
-            return divideAmounts[b] - divideAmounts[a];
-          }
-        });
-
-        // Distribute rounding error one by one to divide participants
-        for (let i = 0; i < absRoundingError; i++) {
-          const participantIndex = i % sortedDivideUsers.length;
-          const participantId = sortedDivideUsers[participantIndex];
-          if (roundingError > 0) {
-            divideAmounts[participantId] += 1;
-          } else {
-            divideAmounts[participantId] -= 1;
-          }
-        }
-      }
+      const divideAmounts = allocateMinorUnitsByNearest(
+        totalLeftForDivides,
+        divideUsers.map((divide) => divides[divide].value),
+        Math.round,
+      );
 
       // Apply the calculated amounts
-      for (const divide of divideUsers) {
-        paidFor[divide] = divideAmounts[divide];
-        amountLeft = amountLeft.subtract(Dinero({ amount: divideAmounts[divide] }));
+      for (const [index, divide] of divideUsers.entries()) {
+        const divideAmount = divideAmounts[index];
+        paidFor[divide] = divideAmount;
+        amountLeft = subtract(amountLeft, createMoney(divideAmount));
       }
     }
 
@@ -207,40 +168,40 @@ export function getImpactOnBalanceForUser(expense: Expense, userId: string) {
 
   const { userOwes, owedToUser } = calculateLogStatsOfUser(userId, expenseParticipantsIds, input);
 
-  return owedToUser.subtract(userOwes).getAmount();
+  return getMoneyAmount(subtract(owedToUser, userOwes));
 }
 
 export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" | "paidBy">) {
   const amountInUnits = getExpenseTotalAmount({ paidBy });
   const activeParticipants = Object.keys(shares);
 
-  // Calculate total shares for divide participants (this is just a count, not money)
-  const totalShares = activeParticipants.reduce((total, participantId) => {
-    const share = shares[participantId];
-    if (share?.type === "divide") {
-      return total + share.value;
-    }
-    return total;
-  }, 0);
-
   const participantAmounts = (() => {
-    const totalAmount = Dinero({ amount: amountInUnits });
+    const totalAmount = createMoney(amountInUnits);
 
     // First, calculate the total amount taken by exact shares using Dinero.js
-    const exactTotal = activeParticipants.reduce(
-      (total, participantId) => {
-        const share = shares[participantId];
-        if (share?.type === "exact") {
-          // Use Math.round to handle any floating point precision issues
-          return total.add(Dinero({ amount: Math.round(share.value) }));
-        }
-        return total;
-      },
-      Dinero({ amount: 0 }),
-    );
+    const exactTotal = activeParticipants.reduce((total, participantId) => {
+      const share = shares[participantId];
+      if (share?.type === "exact") {
+        // Use Math.round to handle any floating point precision issues
+        return add(total, createMoney(Math.round(share.value)));
+      }
+      return total;
+    }, createMoney(0));
 
     // Remaining amount to be split among divide shares using Dinero.js
-    const remainingAmount = totalAmount.subtract(exactTotal);
+    const remainingAmount = subtract(totalAmount, exactTotal);
+    const divideParticipants = activeParticipants.filter((participantId) => {
+      const share = shares[participantId];
+      return share?.type === "divide";
+    });
+    const divideAmounts = allocateMinorUnitsByNearest(
+      getMoneyAmount(remainingAmount),
+      divideParticipants.map((participantId) => {
+        const share = shares[participantId];
+        return share?.type === "divide" ? share.value : 0;
+      }),
+      roundHalfEven,
+    );
 
     // First pass: calculate proportional amounts
     const proportionalAmounts = activeParticipants.reduce(
@@ -249,12 +210,7 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
         let participantAmount = 0;
 
         if (share?.type === "divide") {
-          // Calculate using Dinero.js for precise division
-          if (totalShares > 0) {
-            const shareRatio = share.value / totalShares;
-            const amountInUnits = remainingAmount.multiply(shareRatio);
-            participantAmount = amountInUnits.getAmount();
-          }
+          participantAmount = divideAmounts[divideParticipants.indexOf(participantId)] ?? 0;
         } else if (share?.type === "exact") {
           // Exact shares are already in units
           participantAmount = share.value;
@@ -266,51 +222,59 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
       {} as Record<string, number>,
     );
 
-    // Second pass: distribute remaining cents to ensure total adds up exactly
-    const totalCalculated = Object.values(proportionalAmounts).reduce(
-      (sum, amount) => sum + amount,
-      0,
-    );
-    const remainingCents = amountInUnits - totalCalculated;
-
-    if (remainingCents !== 0) {
-      // Find divide participants to distribute remaining cents
-      const divideParticipants = activeParticipants.filter((participantId) => {
-        const share = shares[participantId];
-        return share?.type === "divide";
-      });
-
-      if (divideParticipants.length > 0) {
-        // Sort participants by their current amount to distribute remaining cents
-        // to those with the smallest amounts first (for positive remaining) or
-        // to those with the largest amounts first (for negative remaining)
-        const sortedParticipants = divideParticipants.slice();
-        sortedParticipants.sort((a, b) => {
-          if (remainingCents > 0) {
-            return proportionalAmounts[a] - proportionalAmounts[b];
-          } else {
-            return proportionalAmounts[b] - proportionalAmounts[a];
-          }
-        });
-
-        // Distribute remaining cents one by one to divide participants
-        const absRemainingCents = Math.abs(remainingCents);
-        for (let i = 0; i < absRemainingCents; i++) {
-          const participantIndex = i % sortedParticipants.length;
-          const participantId = sortedParticipants[participantIndex];
-          if (remainingCents > 0) {
-            proportionalAmounts[participantId] += 1;
-          } else {
-            proportionalAmounts[participantId] -= 1;
-          }
-        }
-      }
-    }
-
     return proportionalAmounts;
   })();
 
   return participantAmounts;
+}
+
+function allocateMinorUnitsByNearest(
+  amount: number,
+  ratios: number[],
+  roundAmount: (value: number) => number,
+) {
+  const totalRatio = ratios.reduce((total, ratio) => total + ratio, 0);
+
+  if (totalRatio <= 0) {
+    return ratios.map(() => 0);
+  }
+
+  const amounts = ratios.map((ratio) => roundAmount(amount * (ratio / totalRatio)));
+  const distributedTotal = amounts.reduce((total, next) => total + next, 0);
+  const roundingError = amount - distributedTotal;
+
+  if (roundingError === 0 || amounts.length === 0) {
+    return amounts;
+  }
+
+  const sortedIndexes = amounts.map((_, index) => index);
+  sortedIndexes.sort((a, b) => {
+    if (roundingError > 0) {
+      return amounts[a] - amounts[b];
+    }
+
+    return amounts[b] - amounts[a];
+  });
+
+  for (let i = 0; i < Math.abs(roundingError); i++) {
+    const participantIndex = sortedIndexes[i % sortedIndexes.length];
+    amounts[participantIndex] += roundingError > 0 ? 1 : -1;
+  }
+
+  return amounts;
+}
+
+function roundHalfEven(value: number) {
+  const sign = value < 0 ? -1 : 1;
+  const absoluteValue = Math.abs(value);
+  const floor = Math.floor(absoluteValue);
+  const fraction = absoluteValue - floor;
+
+  if (Math.abs(fraction - 0.5) < 1e-10) {
+    return sign * (floor % 2 === 0 ? floor : floor + 1);
+  }
+
+  return sign * Math.round(absoluteValue);
 }
 
 export function getExpenseDiff(base: Expense, updated: Expense) {
@@ -463,17 +427,17 @@ export function calculateBalancesByParticipant(
     return {
       participantId,
       stats: {
-        userOwes: dineroStats.userOwes.getAmount(),
-        owedToUser: dineroStats.owedToUser.getAmount(),
+        userOwes: getMoneyAmount(dineroStats.userOwes),
+        owedToUser: getMoneyAmount(dineroStats.owedToUser),
         diffs: Object.fromEntries(
           Object.entries(dineroStats.diffs).map(([participantId, diff]) => [
             participantId,
             {
-              diffUnsplitted: diff.diffUnsplitted.getAmount(),
+              diffUnsplitted: getMoneyAmount(diff.diffUnsplitted),
             },
           ]),
         ),
-        balance: dineroStats.balance.getAmount(),
+        balance: getMoneyAmount(dineroStats.balance),
       },
       visualRatio: 0,
     };
