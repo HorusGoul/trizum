@@ -41,20 +41,5 @@
   "engines": {
     "node": "^24"
   },
-  "packageManager": "pnpm@11.9.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "agent-browser",
-      "@sentry-internal/node-cpu-profiler",
-      "@sentry/cli",
-      "@swc/core",
-      "cbor-extract",
-      "core-js-pure",
-      "esbuild",
-      "puppeteer",
-      "sharp",
-      "unrs-resolver",
-      "workerd"
-    ]
-  }
+  "packageManager": "pnpm@11.9.0"
 }
