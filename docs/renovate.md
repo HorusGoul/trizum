@@ -44,21 +44,6 @@ still have major grouping rules so packages that need to move together are
 reviewed together. `react` and `react-dom` updates are disabled because the app
 uses experimental builds that are managed manually.
 
-## Docker Image Updates
-
-Keep the root `.node-version` pinned to the exact Node patch release so
-Renovate's nodenv manager can open patch and minor runtime updates. A floating
-major version such as `24` only gives Renovate a future major-version boundary
-to change.
-
-The server Dockerfile keeps the same Node patch release plus the `-slim` image
-variant in `NODE_IMAGE_TAG`. Keep the variant inside the `ARG` value instead of
-appending it in `FROM` lines. Renovate expands Dockerfile `ARG` values when
-extracting image dependencies, but it can only update strings that actually
-exist in the file. A partial version such as `ARG NODE_VERSION=24.18.0` paired
-with `FROM node:${NODE_VERSION}-slim` is detected as `node:24.18.0-slim` but
-does not give Renovate a writable replacement string.
-
 ## Automerge
 
 `renovate.json` is the source of truth for automerge eligibility. Keep package,
