@@ -67,28 +67,37 @@ function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
 }
 
 function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDivElement | null>) {
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
-  const [popoverPosition, setPopoverPosition] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  } | null>(null);
+  const [layout, setLayout] = useState<{
+    isLargeScreen: boolean;
+    popoverPosition: {
+      top: number;
+      left: number;
+      width: number;
+    } | null;
+  }>({
+    isLargeScreen: false,
+    popoverPosition: null,
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
 
     function updatePosition() {
-      setIsLargeScreen(mediaQuery.matches);
-
       if (mediaQuery.matches && fieldContainerRef.current) {
         const rect = fieldContainerRef.current.getBoundingClientRect();
-        setPopoverPosition({
-          top: rect.bottom + 8,
-          left: rect.left,
-          width: Math.max(rect.width, 280),
+        setLayout({
+          isLargeScreen: true,
+          popoverPosition: {
+            top: rect.bottom + 8,
+            left: rect.left,
+            width: Math.max(rect.width, 280),
+          },
         });
       } else {
-        setPopoverPosition(null);
+        setLayout({
+          isLargeScreen: mediaQuery.matches,
+          popoverPosition: null,
+        });
       }
     }
 
@@ -104,7 +113,7 @@ function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDiv
     };
   }, [fieldContainerRef]);
 
-  return { isLargeScreen, popoverPosition };
+  return layout;
 }
 
 function useExpressionCursorScroll({
