@@ -16,6 +16,24 @@
       "sourceType": "github",
       "computedHash": "8883a7d459c07a0b2ee06972e79baa634009aa3bab969a6650acbefac394ad41"
     },
+    "dinero-best-practices": {
+      "source": "dinerojs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dinero-best-practices/SKILL.md",
+      "computedHash": "5782a3167685788e8dbd61cc594af9132e5adf29145d9f796193627093e9ce6c"
+    },
+    "dinero-currency-patterns": {
+      "source": "dinerojs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dinero-currency-patterns/SKILL.md",
+      "computedHash": "50b60a4c1523f89d64717ca10c8156a7f0e2c28667f1a6d337c31eae3902f48d"
+    },
+    "dinero-formatting": {
+      "source": "dinerojs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dinero-formatting/SKILL.md",
+      "computedHash": "8f176bd8c9cc2a9b0d587fbbed1f3adf2fb9a66597c75a0bed9721dcaf763594"
+    },
     "enhanced-message-context": {
       "source": "lingui/skills",
       "sourceType": "github",

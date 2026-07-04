@@ -1,9 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
+import { appWorker } from "#src/lib/appWorker/client.ts";
 import { Button } from "#src/ui/Button.tsx";
+import type { Party } from "#src/models/party.ts";
 
-export function SuccessState({ partyId }: { partyId: string }) {
+export function SuccessState({ partyId }: { partyId: Party["id"] }) {
   const navigate = useNavigate();
+
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm p-4 text-center">
@@ -13,8 +16,9 @@ export function SuccessState({ partyId }: { partyId: string }) {
 
         <Button
           color="input-like"
-          onClick={() => {
-            void navigate({ to: `/party/${partyId}`, replace: true });
+          pressAction={async () => {
+            await appWorker.recalculateBalances(partyId);
+            await navigate({ to: `/party/${partyId}`, replace: true });
           }}
           className="font-bold"
         >

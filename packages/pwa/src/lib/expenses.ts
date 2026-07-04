@@ -1,4 +1,5 @@
-import Dinero from "dinero.js";
+import { add, greaterThan, lessThan, subtract } from "dinero.js";
+import { createMoney, getMoneyAmount } from "./money.ts";
 
 export type ExpenseUser = string;
 
@@ -52,7 +53,7 @@ export function calculateLogStatsBetweenTwoUsers(
    */
   const whatU1HasToPayToU2 = getSplitTotal(otherUserExpenses, userUid);
 
-  const diff = whatU2HasToPayToU1.subtract(whatU1HasToPayToU2);
+  const diff = subtract(whatU2HasToPayToU1, whatU1HasToPayToU2);
 
   return {
     diffUnsplitted: diff,
@@ -72,16 +73,16 @@ export function calculateLogStatsOfUser(
     diffs[otherUserUid] = calculateLogStatsBetweenTwoUsers(userUid, otherUserUid, expenses);
   }
 
-  const zero = Dinero({ amount: 0 });
+  const zero = createMoney(0);
 
-  let userOwes = Dinero({ amount: 0 });
-  let owedToUser = Dinero({ amount: 0 });
+  let userOwes = createMoney(0);
+  let owedToUser = createMoney(0);
 
   for (const diff of Object.values(diffs)) {
-    if (diff.diffUnsplitted.lessThan(zero)) {
-      userOwes = userOwes.add(Dinero({ amount: Math.abs(diff.diffUnsplitted.getAmount()) }));
-    } else if (diff.diffUnsplitted.greaterThan(zero)) {
-      owedToUser = owedToUser.add(diff.diffUnsplitted);
+    if (lessThan(diff.diffUnsplitted, zero)) {
+      userOwes = add(userOwes, createMoney(Math.abs(getMoneyAmount(diff.diffUnsplitted))));
+    } else if (greaterThan(diff.diffUnsplitted, zero)) {
+      owedToUser = add(owedToUser, diff.diffUnsplitted);
     }
   }
 
@@ -89,25 +90,16 @@ export function calculateLogStatsOfUser(
     userOwes,
     owedToUser,
     diffs,
-    balance: owedToUser.subtract(userOwes),
+    balance: subtract(owedToUser, userOwes),
   };
 }
 
-function getSplitTotal(expenses: ExpenseInput[], uid: ExpenseUser, reverse = false) {
-  return expenses.reduce(
-    (prev, next) => {
-      let amount = Dinero({
-        amount: next.expense,
-      });
+function getSplitTotal(expenses: ExpenseInput[], uid: ExpenseUser) {
+  return expenses.reduce((prev, next) => {
+    const amount = createMoney(next.paidFor[uid]);
 
-      amount = reverse
-        ? Dinero({ amount: next.expense }).subtract(Dinero({ amount: next.paidFor[uid] }))
-        : Dinero({ amount: next.paidFor[uid] });
-
-      return prev.add(amount);
-    },
-    Dinero({ amount: 0 }),
-  );
+    return add(prev, amount);
+  }, createMoney(0));
 }
 
 export function convertToUnits(amount: number) {

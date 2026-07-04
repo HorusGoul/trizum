@@ -11,7 +11,7 @@ import { AppNumberField, AppTextField } from "#src/ui/fields/TextField.js";
 import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
-import Dinero from "dinero.js";
+import { add, equal, subtract } from "dinero.js";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
@@ -32,6 +32,7 @@ import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
+import { createMoney } from "#src/lib/money.ts";
 import {
   compressionPresets,
   imageCaptureAccept,
@@ -125,7 +126,7 @@ export function ExpenseEditor({
 
       // Validate that amounts add up correctly using Dinero.js for precise calculations
       const activeParticipants = Object.keys(value.shares);
-      const totalAmount = Dinero({ amount: convertToUnits(value.amount) });
+      const totalAmount = createMoney(convertToUnits(value.amount));
 
       // Calculate total shares for divide participants
       const totalShares = activeParticipants.reduce((total, participantId) => {
@@ -137,28 +138,25 @@ export function ExpenseEditor({
       }, 0);
 
       // Calculate total amount taken by exact shares using Dinero.js
-      const exactTotal = activeParticipants.reduce(
-        (total, participantId) => {
-          const share = value.shares[participantId];
-          if (share?.type === "exact") {
-            // Use Math.round to handle any floating point precision issues
-            return total.add(Dinero({ amount: Math.round(share.value) }));
-          }
-          return total;
-        },
-        Dinero({ amount: 0 }),
-      );
+      const exactTotal = activeParticipants.reduce((total, participantId) => {
+        const share = value.shares[participantId];
+        if (share?.type === "exact") {
+          // Use Math.round to handle any floating point precision issues
+          return add(total, createMoney(Math.round(share.value)));
+        }
+        return total;
+      }, createMoney(0));
 
       // Calculate total split amount using Dinero.js
       let totalSplit = exactTotal;
       if (totalShares > 0) {
         // Calculate remaining amount for divide participants
-        const remainingAmount = totalAmount.subtract(exactTotal);
-        totalSplit = exactTotal.add(remainingAmount);
+        const remainingAmount = subtract(totalAmount, exactTotal);
+        totalSplit = add(exactTotal, remainingAmount);
       }
 
       // Compare using Dinero.js equality
-      if (!totalSplit.equalsTo(totalAmount)) {
+      if (!equal(totalSplit, totalAmount)) {
         toast.error(t`Expense amounts don't match total. Please check your split configuration.`);
         return;
       }
