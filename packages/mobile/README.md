@@ -323,8 +323,7 @@ Run `bundle exec fastlane upload_screenshots` to upload.
 
 ## GitHub Actions
 
-A path-filtered `Check Android` workflow runs automatically on pull requests
-that touch Android, Gradle, or mobile wrapper inputs. It performs an Android
+The `CI` workflow includes a `Check Android` job that performs an Android
 Capacitor sync check, then runs Gradle lint, unit tests, debug APK assembly, and
 release AAB bundling without Play Store or release signing credentials. Use
 this as the required dry-run for Gradle, Android Gradle Plugin, SDK, or native
