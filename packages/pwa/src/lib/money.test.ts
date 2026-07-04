@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vite-plus/test";
-import { createMoney, getDineroCurrency, getMoneyAmount, isCurrencyCode } from "./money.ts";
+import {
+  createMoney,
+  getDineroCurrency,
+  getDisplayDineroCurrency,
+  getMoneyAmount,
+  isCurrencyCode,
+} from "./money.ts";
 
 describe("money", () => {
   test("creates app money values in minor units", () => {
@@ -19,5 +25,13 @@ describe("money", () => {
     expect(isCurrencyCode("EUR")).toBe(true);
     expect(isCurrencyCode("HRK")).toBe(true);
     expect(isCurrencyCode("missing")).toBe(false);
+  });
+
+  test("resolves display currencies as decimal app amounts", () => {
+    expect(getDisplayDineroCurrency("MGA")).toStrictEqual({
+      code: "MGA",
+      base: 10,
+      exponent: 2,
+    });
   });
 });

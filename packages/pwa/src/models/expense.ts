@@ -68,7 +68,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
       .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
 
     for (const exact of Object.keys(exacts)) {
-      const amount = createMoney(Math.round((exacts[exact].value * partial) / total));
+      const amount = createMoney(roundHalfEven((exacts[exact].value * partial) / total));
       paidFor[exact] = getMoneyAmount(amount);
       amountLeft = subtract(amountLeft, amount);
     }
@@ -233,7 +233,7 @@ function allocateMinorUnitsByNearest(amount: number, ratios: number[]) {
     return ratios.map(() => 0);
   }
 
-  const amounts = ratios.map((ratio) => Math.round(amount * (ratio / totalRatio)));
+  const amounts = ratios.map((ratio) => roundHalfEven(amount * (ratio / totalRatio)));
   const distributedTotal = amounts.reduce((total, next) => total + next, 0);
   const roundingError = amount - distributedTotal;
 
@@ -256,6 +256,19 @@ function allocateMinorUnitsByNearest(amount: number, ratios: number[]) {
   }
 
   return amounts;
+}
+
+function roundHalfEven(value: number) {
+  const sign = value < 0 ? -1 : 1;
+  const absoluteValue = Math.abs(value);
+  const floor = Math.floor(absoluteValue);
+  const fraction = absoluteValue - floor;
+
+  if (Math.abs(fraction - 0.5) < 1e-10) {
+    return sign * (floor % 2 === 0 ? floor : floor + 1);
+  }
+
+  return sign * Math.round(absoluteValue);
 }
 
 export function getExpenseDiff(base: Expense, updated: Expense) {

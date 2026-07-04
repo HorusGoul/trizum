@@ -17,4 +17,11 @@ describe("CurrencyText", () => {
     expect(markup).toContain("12,34");
     expect(markup).not.toContain("€");
   });
+
+  test("formats currencies with non-decimal Dinero metadata as app decimal amounts", () => {
+    const markup = renderToStaticMarkup(<CurrencyText amount={1234} currency="MGA" />);
+
+    expect(markup).toContain("12,34");
+    expect(markup).toContain("MGA");
+  });
 });

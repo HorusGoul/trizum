@@ -46,3 +46,11 @@ export function isCurrencyCode(currency: string): currency is CurrencyCode {
 export function getDineroCurrency(currency: CurrencyCode): DineroCurrency<number, CurrencyCode> {
   return appCurrencies[currency];
 }
+
+export function getDisplayDineroCurrency(currency: CurrencyCode): DineroCurrency<number> {
+  return {
+    code: currency,
+    base: 10,
+    exponent: 2,
+  };
+}

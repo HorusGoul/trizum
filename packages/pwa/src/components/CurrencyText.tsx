@@ -1,6 +1,6 @@
 import { cn } from "#src/ui/utils.js";
 import { dinero, toDecimal } from "dinero.js";
-import { getDineroCurrency, type CurrencyCode } from "#src/lib/money.ts";
+import { getDisplayDineroCurrency, type CurrencyCode } from "#src/lib/money.ts";
 
 export interface CurrencyTextProps extends React.HTMLAttributes<HTMLSpanElement> {
   amount: number;
@@ -45,7 +45,7 @@ function formatCurrencyAmount(
   currency: CurrencyCode,
   format: NonNullable<CurrencyTextProps["format"]>,
 ) {
-  const money = dinero({ amount, currency: getDineroCurrency(currency), scale: 2 });
+  const money = dinero({ amount, currency: getDisplayDineroCurrency(currency), scale: 2 });
 
   return toDecimal(money, ({ value, currency }) => {
     const numericValue = Number(value);

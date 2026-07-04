@@ -4,6 +4,7 @@ import {
   exportIntoInput,
   findExpenseById,
   getImpactOnBalanceForUser,
+  getExpenseUnitShares,
   type Expense,
   type ExpenseShare,
 } from "./expense";
@@ -267,6 +268,34 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
     // Verify the total adds up exactly
     const totalPaidFor = Object.values(result[0].paidFor).reduce((sum, amount) => sum + amount, 0);
     expect(totalPaidFor).toBe(1000);
+  });
+
+  test("preserves Dinero v1 half-even tie rounding before distributing remainders", () => {
+    const expense = createExpense({
+      paidBy: {
+        user1: 5,
+      },
+      shares: {
+        user1: { type: "divide", value: 1 },
+        user2: { type: "divide", value: 1 },
+      },
+    });
+
+    expect(exportIntoInput(expense)).toStrictEqual([
+      {
+        version: 1,
+        paidBy: "user1",
+        paidFor: {
+          user1: 3,
+          user2: 2,
+        },
+        expense: 5,
+      },
+    ]);
+    expect(getExpenseUnitShares(expense)).toStrictEqual({
+      user1: 3,
+      user2: 2,
+    });
   });
 });
 
