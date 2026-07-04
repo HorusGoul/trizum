@@ -463,7 +463,7 @@ For local development, just open the project in Xcode and ensure **"Automaticall
 | Property           | Value                  |
 | ------------------ | ---------------------- |
 | App ID             | `app.trizum.capacitor` |
-| iOS Deployment     | iOS 14.0+              |
+| iOS Deployment     | iOS 16.4+              |
 | Android Min SDK    | 23 (Android 6.0)       |
 | Android Target SDK | 35 (Android 15)        |
 

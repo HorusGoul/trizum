@@ -191,7 +191,7 @@ export function Balances({
             </h2>
 
             {allOtherDiffs.map((diff) => (
-              <BalanceActionItem {...diff} key={diff.fromId + diff.toId} />
+              <BalanceActionItem key={diff.fromId + diff.toId} {...diff} />
             ))}
           </>
         ) : null}
