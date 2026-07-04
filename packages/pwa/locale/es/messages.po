@@ -1106,7 +1106,7 @@ msgstr "Volver"
 msgid "Go back and try again from the balances list."
 msgstr "Vuelve atrás e inténtalo de nuevo desde la lista de saldos."
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:44
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:48
 msgid "Go back to home"
 msgstr "Volver al inicio"
 
@@ -1235,7 +1235,7 @@ msgstr "Importado {0} ({1} de {2})"
 msgid "Importing attachments ({0} of {1})"
 msgstr "Importando adjuntos ({0} de {1})"
 
-#: src/routes/migrate_.tricount/route.tsx:56
+#: src/routes/migrate_.tricount/route.tsx:57
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
@@ -1492,7 +1492,7 @@ msgstr "Migrar desde Tricount"
 msgid "Migration in progress"
 msgstr "Migración en progreso"
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:11
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:14
 msgid "Migration successful"
 msgstr "Migración exitosa"
 
@@ -2311,7 +2311,7 @@ msgstr "Chelín Somalí"
 msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 msgstr "Algo no está funcionando correctamente. Reinicia trizum para recuperarlo. Si sigue ocurriendo, comprueba si hay actualizaciones o contacta con soporte."
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:34
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:38
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
@@ -2841,7 +2841,7 @@ msgstr "Dong Vietnamita"
 msgid "View on GitHub"
 msgstr "Ver en GitHub"
 
-#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:21
+#: src/routes/migrate_.tricount/-components/FinishedStates.tsx:25
 msgid "View party"
 msgstr "Ver grupo"
 

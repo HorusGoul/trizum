@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createPartyFromMigrationData, type MigrationData } from "#src/models/migration.ts";
 import { getAppLink } from "#src/lib/link.ts";
+import type { Party } from "#src/models/party.ts";
 import { ErrorState, SuccessState } from "./-components/FinishedStates.js";
 import { IdleState } from "./-components/IdleState.js";
 import { InProgressState } from "./-components/InProgressState.js";
@@ -39,7 +40,7 @@ type MigrationState =
     }
   | {
       type: "success";
-      partyId: string;
+      partyId: Party["id"];
     }
   | {
       type: "error";
