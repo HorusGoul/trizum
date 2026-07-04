@@ -82,9 +82,9 @@
       "groupName": "TanStack major updates"
     },
     {
-      "description": "Keep Tailwind CSS major updates with plugins that require the same Tailwind major.",
+      "description": "Keep Tailwind CSS major updates with companion packages that require the same Tailwind major.",
       "matchManagers": ["npm"],
-      "matchPackageNames": ["tailwindcss", "tailwindcss-react-aria-components"],
+      "matchPackageNames": ["tailwind-merge", "tailwindcss", "tailwindcss-react-aria-components"],
       "matchUpdateTypes": ["major"],
       "groupName": "Tailwind CSS major updates"
     },
