@@ -27,6 +27,10 @@ const buildTarget = ["edge88", "firefox78", "chrome87", "safari14.1"];
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
+const logtapeSentryBrowserUtil = path.resolve(
+  path.dirname(packageRequire.resolve("@logtape/sentry/package.json")),
+  "dist/util.js",
+);
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
 const linguiConfig = getLinguiConfig({
   cwd: packageRoot,
@@ -139,6 +143,12 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: [
+        {
+          // @logtape/sentry declares a browser branch for its private #util import,
+          // but Vite+ 0.2.2/Rolldown resolves it through the Node branch in client builds.
+          find: /^#util$/,
+          replacement: logtapeSentryBrowserUtil,
+        },
         {
           // Cloudflare Worker validation does not expose CommonJS require.
           find: /^debug$/,
