@@ -288,7 +288,9 @@ export function ExpenseEditor({
 
       <form
         id={formId}
-        action={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
+
           if (form.state.isSubmitting || saveInFlightRef.current) {
             return;
           }

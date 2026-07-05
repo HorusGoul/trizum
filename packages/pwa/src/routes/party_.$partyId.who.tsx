@@ -119,7 +119,8 @@ function Who() {
 
       <form
         id={formId}
-        action={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
           void form.handleSubmit();
         }}
         className="container mt-2 flex flex-col gap-4 px-2"

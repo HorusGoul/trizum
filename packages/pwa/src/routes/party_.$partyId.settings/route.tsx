@@ -129,12 +129,10 @@ function PartySettings() {
         }
       />
 
-      {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form to stale defaults after saving settings. */}
       <form
         id={formId}
         onSubmit={(event) => {
           event.preventDefault();
-          event.stopPropagation();
           void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"

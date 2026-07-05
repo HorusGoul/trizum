@@ -24,6 +24,28 @@ test.describe("Settings forms", () => {
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue(updatedPartyName);
   });
 
+  test("keeps party settings draft values when validation fails", async ({ harness, page }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+    const draftDescription = "Keep this description after a failed save";
+
+    await harness.navigate(`/party/${seededParty.partyId}/settings`);
+    await expect(page.getByRole("heading", { name: "Party Settings" })).toBeVisible();
+
+    const nameField = page.getByLabel("Name", { exact: true });
+    const descriptionField = page.getByLabel("Description");
+
+    await descriptionField.fill(draftDescription);
+    await nameField.fill("");
+    await nameField.evaluate((input: HTMLInputElement) => input.form?.requestSubmit());
+
+    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
+    await expect(descriptionField).toHaveValue(draftDescription);
+    await expect(page.getByText("Title is required")).toBeVisible();
+  });
+
   test("returns from user settings after saving", async ({ harness, page }) => {
     const updatedUsername = "Saved Harness User";
 
@@ -44,5 +66,27 @@ test.describe("Settings forms", () => {
 
     await harness.navigate("/settings");
     await expect(page.getByLabel("Username")).toHaveValue(updatedUsername);
+  });
+
+  test("keeps user settings draft values when validation fails", async ({ harness, page }) => {
+    const draftPhoneNumber = "612345678";
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+    });
+    await harness.navigate("/settings");
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+
+    const usernameField = page.getByLabel("Username");
+    const phoneField = page.getByLabel("Phone number");
+
+    await phoneField.fill(draftPhoneNumber);
+    await usernameField.fill("");
+    await usernameField.evaluate((input: HTMLInputElement) => input.form?.requestSubmit());
+
+    await expect(page).toHaveURL(/\/settings(?:\?.*)?$/);
+    await expect(phoneField).toHaveValue(draftPhoneNumber);
+    await expect(page.getByText("A name for the participant is required")).toBeVisible();
   });
 });

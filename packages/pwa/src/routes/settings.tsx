@@ -328,7 +328,10 @@ function SettingsFormFields({
   return (
     <form
       id={formId}
-      action={() => form.handleSubmit()}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void form.handleSubmit();
+      }}
       className="pb-safe container mt-6 flex flex-col gap-6 px-4 pb-8"
     >
       <form.Field name="avatarId">

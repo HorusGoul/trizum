@@ -100,4 +100,27 @@ test.describe("Expense log", () => {
       await partyPage.expectExpenseInLog(expenseLogJourney.newExpenseTitle, expectedAmountText);
     });
   });
+
+  test("keeps expense draft values when validation fails", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const draftAmount = 12.34;
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}?tab=expenses`);
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await partyPage.openAddExpense();
+
+    await expenseEditorPage.expectLoaded();
+    await expenseEditorPage.fillAmount(draftAmount);
+    await expenseEditorPage.save();
+
+    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/add(?:\\?.*)?$`));
+    await expect(expenseEditorPage.amountField).toHaveValue(draftAmount.toFixed(2));
+    await expect(page.getByText("Title is required")).toBeVisible();
+  });
 });

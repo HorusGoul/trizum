@@ -62,7 +62,8 @@ export function IdleState({ onSubmit }: { onSubmit: (values: MigrateParams) => v
 
       <form
         id={formId}
-        action={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
           void form.handleSubmit();
         }}
         className="container mt-4 flex flex-col gap-6 px-4"

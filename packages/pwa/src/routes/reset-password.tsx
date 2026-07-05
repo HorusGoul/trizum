@@ -106,7 +106,8 @@ function ResetPassword() {
         ) : (
           <form
             id={formId}
-            action={() => {
+            onSubmit={(event) => {
+              event.preventDefault();
               void form.handleSubmit();
             }}
             className="flex flex-col gap-4"

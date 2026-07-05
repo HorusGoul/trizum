@@ -45,6 +45,8 @@ const formatIgnorePatterns = [".agents/**", ...ignorePatterns];
 const pwaReactDoctorRules = {
   ...RECOMMENDED_REACT_DOCTOR_RULES,
   "react-doctor/no-multi-comp": "off" as const,
+  // TanStack Form handles submission in JS and requires cancelling the native browser submit.
+  "react-doctor/no-prevent-default": "off" as const,
 };
 
 function rootAppCommandGuard() {

@@ -155,7 +155,8 @@ function Join() {
         {/* Secondary action: Manual entry */}
         <form
           id={formId}
-          action={() => {
+          onSubmit={(event) => {
+            event.preventDefault();
             void form.handleSubmit();
           }}
           className="container mt-6 flex flex-col gap-4 px-4"
