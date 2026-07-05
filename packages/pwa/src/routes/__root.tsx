@@ -1,17 +1,7 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { createRootRouteWithContext, Outlet, useRouter } from "@tanstack/react-router";
-import * as React from "react";
 import { RouterProvider } from "react-aria-components";
 import { shouldReplaceNavigation } from "#src/lib/navigationHistory.ts";
-
-const TanStackRouterDevtools = import.meta.env.PROD
-  ? () => null // Render nothing in production
-  : React.lazy(() =>
-      // Lazy load in development
-      import("@tanstack/router-devtools").then((res) => ({
-        default: res.TanStackRouterDevtools,
-      })),
-    );
 
 interface RouterContext {
   repo: Repo;
@@ -61,9 +51,6 @@ function Root() {
       }}
     >
       <Outlet />
-      <React.Suspense fallback={null}>
-        <TanStackRouterDevtools />
-      </React.Suspense>
     </RouterProvider>
   );
 }

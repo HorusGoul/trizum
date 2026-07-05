@@ -85,7 +85,6 @@
     "@lingui/vite-plugin": "catalog:",
     "@playwright/test": "catalog:",
     "@rolldown/plugin-babel": "catalog:",
-    "@tanstack/router-devtools": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@trizum/icon-sprite": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
