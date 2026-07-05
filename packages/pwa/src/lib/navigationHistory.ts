@@ -64,3 +64,13 @@ export function closeRouteState(
 
   replaceFallback();
 }
+
+export function shouldNavigateToPartyListOnNativeBack({
+  canGoBack,
+  pathname,
+}: {
+  canGoBack: boolean;
+  pathname: string;
+}) {
+  return !canGoBack && (pathname === "/party" || pathname.startsWith("/party/"));
+}
