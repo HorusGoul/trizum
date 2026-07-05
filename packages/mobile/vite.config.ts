@@ -4,7 +4,7 @@ export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: "./copy-client.sh && ./sync.sh",
+        command: "NODE_ENV=production sh -c './copy-client.sh && ./sync.sh'",
         cache: false,
         dependsOn: ["@trizum/pwa#build"],
       },

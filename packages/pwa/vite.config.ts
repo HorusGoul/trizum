@@ -85,7 +85,7 @@ export default defineConfig(({ mode }) => {
     run: {
       tasks: {
         build: {
-          command: "vp build",
+          command: "NODE_ENV=production vp build",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
           env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
           output: ["dist/**"],
@@ -168,6 +168,7 @@ export default defineConfig(({ mode }) => {
         cwd: packageRoot,
         configPath: linguiConfigPath,
       }),
+      automergeRepoImportMethodPlugin(),
       createIconSpritePlugin(iconSpriteConfig),
       VitePWA({
         registerType: "prompt",
@@ -297,6 +298,37 @@ function clientTopLevelAwaitPlugin(): Plugin {
   return perEnvironmentPlugin("trizum-client-top-level-await", (environment) =>
     environment.config.consumer === "client" ? topLevelAwait() : false,
   );
+}
+
+function automergeRepoImportMethodPlugin(): Plugin {
+  return {
+    name: "trizum-automerge-repo-import-method",
+    apply: "serve",
+    enforce: "pre",
+    transform(code, id) {
+      const normalizedId = id.split("?")[0];
+      const isAutomergeRepoSourceFile = normalizedId.endsWith(
+        "/node_modules/@automerge/automerge-repo/dist/Repo.js",
+      );
+      const isAutomergeRepoOptimizedChunk =
+        normalizedId.includes("/node_modules/.vite/deps/") &&
+        code.includes("node_modules/.pnpm/@automerge+automerge-repo@");
+
+      if (
+        (!isAutomergeRepoSourceFile && !isAutomergeRepoOptimizedChunk) ||
+        !code.includes("import(binary, args)")
+      ) {
+        return null;
+      }
+
+      // Vite dev import analysis can mistake Automerge Repo#import for a dynamic import.
+      // Remove this shim when Vite no longer rewrites class methods named `import`.
+      return code.replace(
+        /\n(\s*)import\(binary,\s*args\)\s*\{/g,
+        '\n$1["import"](binary, args) {',
+      );
+    },
+  };
 }
 
 function sentrySourcemapsPlugin(): Plugin {

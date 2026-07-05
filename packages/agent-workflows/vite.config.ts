@@ -4,7 +4,7 @@ export default defineConfig({
   run: {
     tasks: {
       build: {
-        command: "tsc -b tsconfig.json --force",
+        command: "NODE_ENV=production tsc -b tsconfig.json --force",
         dependsOn: ["@trizum/logging#build"],
         output: ["dist/**"],
       },
