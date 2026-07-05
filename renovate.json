@@ -68,6 +68,13 @@
       "groupSlug": "vite-plus-toolchain"
     },
     {
+      "description": "Keep React Doctor package updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["react-doctor", "oxlint-plugin-react-doctor"],
+      "groupName": "React Doctor updates",
+      "groupSlug": "react-doctor"
+    },
+    {
       "description": "Do not update experimental React runtime packages; they are managed manually.",
       "matchManagers": ["npm"],
       "matchPackageNames": ["react", "react-dom"],
