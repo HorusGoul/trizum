@@ -17,7 +17,7 @@
     "update-version": "vp exec changeset version && cd packages/mobile && vp run version:update",
     "syncpack:fix": "vp exec syncpack fix && vp exec syncpack format",
     "typecheck": "vp check --no-fmt --no-lint",
-    "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs",
+    "prepare": "vp config && node scripts/apply-vite-plus-agent-overrides.mjs && skills-npm",
     "doctor": "vp exec react-doctor"
   },
   "dependencies": {
@@ -35,6 +35,7 @@
     "eslint-plugin-lingui": "catalog:",
     "oxlint-plugin-react-doctor": "catalog:",
     "react-doctor": "catalog:",
+    "skills-npm": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
