@@ -6,6 +6,7 @@ import {
   preventDuplicateHistoryEntries,
   pushHistoryWithoutDuplicateEntry,
   shouldReplaceNavigation,
+  shouldNavigateToPartyListOnNativeBack,
 } from "./navigationHistory.ts";
 
 describe("navigationHistory", () => {
@@ -100,5 +101,53 @@ describe("navigationHistory", () => {
 
     expect(history.go).not.toHaveBeenCalled();
     expect(replaceFallback).toHaveBeenCalledOnce();
+  });
+
+  test("uses the party list as the native back fallback inside a party", () => {
+    expect(
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack: false,
+        pathname: "/party/abc123",
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack: false,
+        pathname: "/party/abc123/settings",
+      }),
+    ).toBe(true);
+  });
+
+  test("does not use the party list native back fallback when history is available", () => {
+    expect(
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack: true,
+        pathname: "/party/abc123",
+      }),
+    ).toBe(false);
+  });
+
+  test("does not use the party list native back fallback outside a party", () => {
+    expect(
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack: false,
+        pathname: "/",
+      }),
+    ).toBe(false);
+
+    expect(
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack: false,
+        pathname: "/settings",
+      }),
+    ).toBe(false);
+
+    expect(
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack: false,
+        pathname: "/party-settings",
+      }),
+    ).toBe(false);
   });
 });

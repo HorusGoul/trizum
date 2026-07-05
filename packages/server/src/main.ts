@@ -7,12 +7,12 @@ import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket
 import * as os from "node:os";
 import path from "node:path";
 import { Hono } from "hono";
-import { serve, type ServerType } from "@hono/node-server";
-import { createNodeWebSocket } from "@hono/node-ws";
+import { serve, type ServerType, upgradeWebSocket } from "@hono/node-server";
 import { configureServerLogging, rootLogger as logger } from "./log.ts";
 import { withContext } from "@logtape/logtape";
 import { cors } from "hono/cors";
 import { fileURLToPath } from "node:url";
+import WebSocket from "isomorphic-ws";
 
 configureServerLogging();
 
@@ -28,17 +28,12 @@ export async function startServer() {
   await initializeAutomerge();
 
   const app = new Hono({});
-  const webSockets = createNodeWebSocket({
-    app,
-  });
+  const webSocketServer = new WebSocket.Server({ noServer: true });
 
   const hostname = os.hostname();
   const repo = new Repo({
     storage: new DrizzleSqliteStorageAdapter(db),
-    network: [
-      // @ts-expect-error - This is fine
-      new NodeWSServerAdapter(webSockets.wss),
-    ],
+    network: [new NodeWSServerAdapter(webSocketServer)],
 
     // TODO: supporting multiple servers or processes isn't supported yet
     peerId: `server:${hostname}` as PeerId,
@@ -107,7 +102,7 @@ export async function startServer() {
 
   app.get(
     "/sync",
-    webSockets.upgradeWebSocket(() => ({
+    upgradeWebSocket(() => ({
       onOpen: () => {
         logger.info("WebSocket connection opened");
       },
@@ -157,12 +152,12 @@ export async function startServer() {
     const server = serve(
       {
         fetch: app.fetch,
+        websocket: { server: webSocketServer },
         port,
         hostname: "0.0.0.0",
       },
       () => resolve(server),
     );
-    webSockets.injectWebSocket(server);
 
     process.on("SIGINT", () => {
       logger.info("SIGINT received, server is shutting down...");

@@ -794,7 +794,7 @@ msgstr "Deuda transferida"
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:106
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:108
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -845,7 +845,7 @@ msgstr "Peso Dominicano"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:100
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:102
 msgid "Edit"
 msgstr "Editar"
 
@@ -853,7 +853,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:192
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:197
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -974,7 +974,7 @@ msgstr "Gasto añadido"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:156
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:161
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -1020,7 +1020,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:161
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:166
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -1434,7 +1434,7 @@ msgstr "Ringgit Malasio"
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:141
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:143
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
@@ -1469,7 +1469,7 @@ msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:347
 #: src/routes/index/route.tsx:105
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:86
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:87
 #: src/routes/party.$partyId/route.tsx:172
 msgid "Menu"
 msgstr "Menú"
@@ -2741,7 +2741,7 @@ msgstr "Actualizar contraseña"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit.tsx:129
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:130
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
