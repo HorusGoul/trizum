@@ -1,5 +1,4 @@
 import {
-  // @ts-expect-error Old typings for this module
   toGamut as _toGamut,
   type Color,
   type Oklch,
