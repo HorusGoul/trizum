@@ -28,7 +28,7 @@ const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
 const browserNodeUtilShim = path.resolve(packageRoot, "src/lib/browserNodeUtil.ts");
-const objectInspectUtilShim = path.resolve(packageRoot, "src/lib/objectInspectUtil.ts");
+const browserOptionalModuleShim = path.resolve(packageRoot, "src/lib/browserOptionalModule.ts");
 const logtapeSentryBrowserUtil = path.resolve(
   path.dirname(packageRequire.resolve("@logtape/sentry/package.json")),
   "dist/util.js",
@@ -173,7 +173,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       ...(isTest ? [] : [cloudflare()]),
-      objectInspectUtilPlugin(),
+      browserOptionalModulesPlugin(),
       tanstackRouter(),
       react(),
       babel({
@@ -318,15 +318,27 @@ function clientTopLevelAwaitPlugin(): Plugin {
   );
 }
 
-function objectInspectUtilPlugin(): Plugin {
+function browserOptionalModulesPlugin(): Plugin {
+  const optionalModules = [
+    { importer: "/object-inspect/index.js", source: "./util.inspect" },
+    { importer: "/seedrandom/seedrandom.js", source: "crypto" },
+  ];
+
   return {
-    name: "trizum-object-inspect-browser-util",
+    name: "trizum-browser-optional-modules",
     enforce: "pre",
     resolveId(source, importer) {
-      const normalizedImporter = importer?.replaceAll(path.sep, "/");
+      const normalizedImporter = importer?.replaceAll("\\", "/");
 
-      if (source === "./util.inspect" && normalizedImporter?.includes("/object-inspect/index.js")) {
-        return objectInspectUtilShim;
+      if (
+        normalizedImporter &&
+        optionalModules.some(
+          (optionalModule) =>
+            source === optionalModule.source &&
+            normalizedImporter.includes(optionalModule.importer),
+        )
+      ) {
+        return browserOptionalModuleShim;
       }
     },
   };
