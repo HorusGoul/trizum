@@ -321,7 +321,7 @@ describe("createCache", () => {
     expect(resolvedSubscriber).toHaveBeenCalledTimes(4);
   });
 
-  test("supports evictAll with non-Map cache implementations", () => {
+  test("supports evictAll with non-Map cache implementations", async () => {
     let backingCache: BasicCacheMap<string, Record<string>> | undefined;
     const cache = createCache<[string], string>({
       config: {
@@ -334,12 +334,16 @@ describe("createCache", () => {
       load: () => new Promise<string>(() => {}),
     });
 
-    void cache.readAsync("a");
+    const pending = cache.readAsync("a");
 
     expect(backingCache?.has("a")).toBe(true);
 
     cache.evictAll();
 
+    await expect(pending).rejects.toMatchObject({
+      message: "Cache entry was evicted",
+      name: "AbortError",
+    });
     expect(backingCache?.has("a")).toBe(false);
     expect(cache.getStatus("a")).toBe(STATUS_NOT_FOUND);
   });
@@ -460,6 +464,10 @@ class BasicCacheMap<Key, Value> implements CacheMap<Key, Value> {
   set(key: Key, value: Value): this {
     this.map.set(key, value);
     return this;
+  }
+
+  values(): Iterable<Value> {
+    return this.map.values();
   }
 }
 

@@ -133,6 +133,7 @@ export interface CacheMap<Key, Value> {
   get(key: Key): Value | undefined;
   has(key: Key): boolean;
   set(key: Key, value: Value): this;
+  values(): Iterable<Value>;
 }
 
 export interface Cache<Params extends Array<any>, Value> {

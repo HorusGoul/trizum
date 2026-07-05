@@ -23,12 +23,13 @@ describe("cache map helpers", () => {
     expect(getCacheMapValues(cacheMap)).toEqual([record]);
   });
 
-  test("returns an empty value list for cache maps without value iteration", () => {
+  test("reads values from custom cache maps", () => {
     const cacheMap = new BasicCacheMap<string, Record<string>>();
+    const record = createResolvedRecord("value");
 
-    cacheMap.set("a", createResolvedRecord("value"));
+    cacheMap.set("a", record);
 
-    expect(getCacheMapValues(cacheMap)).toEqual([]);
+    expect(getCacheMapValues(cacheMap)).toEqual([record]);
   });
 });
 
@@ -54,5 +55,9 @@ class BasicCacheMap<Key, Value> implements CacheMap<Key, Value> {
   set(key: Key, value: Value): this {
     this.map.set(key, value);
     return this;
+  }
+
+  values(): Iterable<Value> {
+    return this.map.values();
   }
 }

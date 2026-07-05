@@ -7,9 +7,5 @@ export function createDefaultCacheMap<Value>(): CacheMap<string, Record<Value>> 
 export function getCacheMapValues<Value>(
   cacheMap: CacheMap<string, Record<Value>>,
 ): Record<Value>[] {
-  if (cacheMap instanceof Map) {
-    return Array.from(cacheMap.values());
-  }
-
-  return [];
+  return Array.from(cacheMap.values());
 }
