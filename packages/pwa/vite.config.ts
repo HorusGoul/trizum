@@ -87,13 +87,21 @@ export default defineConfig(({ mode }) => {
       tasks: {
         build: {
           command: "NODE_ENV=production vp build",
-          dependsOn: ["@trizum/logging#build", "codegen"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
           env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
           output: ["dist/**"],
         },
         check: {
           command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
-          dependsOn: ["@trizum/logging#build", "codegen"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         codegen: {
           command: ["vp run icons:generate", "vp run theme:generate"],
@@ -107,7 +115,11 @@ export default defineConfig(({ mode }) => {
         dev: {
           command: "vp dev",
           cache: false,
-          dependsOn: ["@trizum/logging#build", "codegen"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "icons:generate": {
           command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
@@ -121,17 +133,29 @@ export default defineConfig(({ mode }) => {
         },
         test: {
           command: "vp test .",
-          dependsOn: ["@trizum/logging#build", "codegen"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "test:e2e": {
           command: "vp exec playwright test",
           cache: false,
-          dependsOn: ["@trizum/logging#build", "codegen"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "test:e2e:headed": {
           command: "vp exec playwright test --headed",
           cache: false,
-          dependsOn: ["@trizum/logging#build", "codegen"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "theme:generate": {
           command: "vp exec twdt accent 250 src/generated/tw-dynamic-themes.css",

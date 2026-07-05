@@ -13,8 +13,15 @@ if (!colorName || !hue || !outputPath) {
   process.exit(1);
 }
 
+const hueValue = Number(hue);
+
+if (!Number.isFinite(hueValue)) {
+  process.stderr.write("Hue must be a finite number.\n");
+  process.exit(1);
+}
+
 // Create CSS content
-const cssContent = generateCssVariables(colorName, Number.parseInt(hue, 10));
+const cssContent = generateCssVariables(colorName, hueValue);
 
 // Write to file
 try {

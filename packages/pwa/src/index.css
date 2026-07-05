@@ -3,7 +3,7 @@
 
 @plugin "tailwindcss-react-aria-components";
 @plugin "tailwindcss-animate";
-@plugin "tailwindcss-safe-area-capacitor";
+@plugin "@trizum/tailwindcss-safe-area-capacitor";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

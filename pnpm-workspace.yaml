@@ -143,7 +143,6 @@ catalog:
   tailwindcss: 4.3.2
   tailwindcss-animate: 1.0.7
   tailwindcss-react-aria-components: 2.2.0
-  tailwindcss-safe-area-capacitor: 0.5.1
   typescript: 6.0.3
   ulidx: 2.4.1
   vite: npm:@voidzero-dev/vite-plus-core@0.2.2

@@ -1,0 +1,46 @@
+{
+  "name": "@trizum/tailwindcss-safe-area-capacitor",
+  "version": "0.5.1",
+  "private": true,
+  "description": "Tailwind CSS safe area helpers for capacitor-plugin-safe-area.",
+  "keywords": [
+    "capacitor",
+    "pwa",
+    "safe-area-inset",
+    "tailwindcss",
+    "tailwindcss-plugin"
+  ],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  }
+}
