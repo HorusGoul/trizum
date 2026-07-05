@@ -89,7 +89,7 @@ export default defineConfig(({ mode }) => {
     run: {
       tasks: {
         build: {
-          command: "vp build",
+          command: "NODE_ENV=production vp build",
           dependsOn: ["@trizum/logging#build", "icons:generate"],
           env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL", "VITE_APP_DISABLE_SENTRY"],
           output: ["dist/**"],

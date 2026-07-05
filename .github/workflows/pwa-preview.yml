@@ -36,6 +36,7 @@ jobs:
       - name: Build PWA
         run: vp run --filter @trizum/pwa build
         env:
+          NODE_ENV: production
           VITE_APP_AUTH_URL: ""
 
       - name: Deploy PWA preview to Cloudflare
