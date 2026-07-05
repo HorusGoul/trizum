@@ -104,12 +104,10 @@ function ResetPassword() {
             </Button>
           </div>
         ) : (
-          /* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form fields after validation failures. */
           <form
             id={formId}
             onSubmit={(event) => {
               event.preventDefault();
-              event.stopPropagation();
               void form.handleSubmit();
             }}
             className="flex flex-col gap-4"

@@ -153,12 +153,10 @@ function Join() {
         </div>
 
         {/* Secondary action: Manual entry */}
-        {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form fields after validation failures. */}
         <form
           id={formId}
           onSubmit={(event) => {
             event.preventDefault();
-            event.stopPropagation();
             void form.handleSubmit();
           }}
           className="container mt-6 flex flex-col gap-4 px-4"

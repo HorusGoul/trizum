@@ -326,12 +326,10 @@ function SettingsFormFields({
   localeOptions: LocaleOption[];
 }) {
   return (
-    /* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form fields after validation failures. */
     <form
       id={formId}
       onSubmit={(event) => {
         event.preventDefault();
-        event.stopPropagation();
         void form.handleSubmit();
       }}
       className="pb-safe container mt-6 flex flex-col gap-6 px-4 pb-8"
