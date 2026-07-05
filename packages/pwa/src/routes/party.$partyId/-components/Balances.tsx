@@ -87,7 +87,7 @@ export function Balances({
     <PullToRefresh scrollElementRef={panelRef} refreshAction={onRefresh}>
       {hasSortedBalances ? (
         <>
-          <div className="h-8 flex-shrink-0" />
+          <div className="h-8 shrink-0" />
 
           <div className="container flex flex-col gap-4 px-4">
             {sortedBalancesByParticipant.map(({ participant, stats, visualRatio }) => (
@@ -99,14 +99,14 @@ export function Balances({
               />
             ))}
           </div>
-          <div className="h-8 flex-shrink-0" />
+          <div className="h-8 shrink-0" />
         </>
       ) : (
-        <div className="h-5 flex-shrink-0" />
+        <div className="h-5 shrink-0" />
       )}
 
       {isFullyBalanced ? null : (
-        <div className="container mb-4 mt-4 flex flex-col gap-4 px-4">
+        <div className="container mt-4 mb-4 flex flex-col gap-4 px-4">
           <h2 className="px-2 text-xl font-semibold">
             <Trans>How should I balance?</Trans>
           </h2>
@@ -123,7 +123,7 @@ export function Balances({
       <div className="container flex flex-col gap-4 px-2">
         {userOwesMap.length > 0 ? (
           <>
-            <h3 className="flex items-center px-4 text-warning-500">
+            <h3 className="text-warning-500 flex items-center px-4">
               <Icon icon="lucide.circle-alert" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
@@ -142,7 +142,7 @@ export function Balances({
             ))}
           </>
         ) : (
-          <div className="flex items-center px-4 text-success-500">
+          <div className="text-success-500 flex items-center px-4">
             <Icon icon="lucide.circle-check" width={24} height={24} className="mr-3" />
 
             <span className="text-xl font-semibold">
@@ -153,7 +153,7 @@ export function Balances({
 
         {owedToUserMap.length > 0 ? (
           <>
-            <h3 className="flex items-center px-4 text-warning-500">
+            <h3 className="text-warning-500 flex items-center px-4">
               <Icon icon="lucide.circle-alert" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
@@ -171,7 +171,7 @@ export function Balances({
             ))}
           </>
         ) : (
-          <div className="flex items-center px-4 text-success-500">
+          <div className="text-success-500 flex items-center px-4">
             <Icon icon="lucide.circle-check" width={24} height={24} className="mr-3" />
 
             <span className="text-xl font-semibold">
@@ -182,7 +182,7 @@ export function Balances({
 
         {allOtherDiffs.length > 0 ? (
           <>
-            <h2 className="flex items-center px-4 text-accent-400">
+            <h2 className="text-accent-400 flex items-center px-4">
               <Icon icon="lucide.circle-help" width={24} height={24} className="mr-3" />
 
               <span className="text-xl font-semibold">
@@ -196,7 +196,7 @@ export function Balances({
           </>
         ) : null}
       </div>
-      <div className="h-8 flex-shrink-0" />
+      <div className="h-8 shrink-0" />
     </PullToRefresh>
   );
 }

@@ -9,6 +9,7 @@ import { configDefaults, defineConfig, perEnvironmentPlugin } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import babel, { defineRolldownBabelPreset } from "@rolldown/plugin-babel";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import tailwindcss from "@tailwindcss/vite";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import { lingui } from "@lingui/vite-plugin";
@@ -86,13 +87,25 @@ export default defineConfig(({ mode }) => {
       tasks: {
         build: {
           command: "NODE_ENV=production vp build",
-          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
           env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
           output: ["dist/**"],
         },
         check: {
           command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
-          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
+        },
+        codegen: {
+          command: ["vp run icons:generate", "vp run theme:generate"],
+          cache: false,
         },
         deploy: {
           command: "vp exec wrangler deploy",
@@ -102,7 +115,11 @@ export default defineConfig(({ mode }) => {
         dev: {
           command: "vp dev",
           cache: false,
-          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "icons:generate": {
           command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
@@ -116,17 +133,35 @@ export default defineConfig(({ mode }) => {
         },
         test: {
           command: "vp test .",
-          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "test:e2e": {
           command: "vp exec playwright test",
           cache: false,
-          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
         },
         "test:e2e:headed": {
           command: "vp exec playwright test --headed",
           cache: false,
-          dependsOn: ["@trizum/logging#build", "icons:generate"],
+          dependsOn: [
+            "@trizum/logging#build",
+            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "codegen",
+          ],
+        },
+        "theme:generate": {
+          command: "vp exec twdt accent 250 src/generated/tw-dynamic-themes.css",
+          dependsOn: ["@trizum/tw-dynamic-themes#build"],
+          input: ["../tw-dynamic-themes/src/**"],
+          output: ["src/generated/tw-dynamic-themes.css"],
         },
       },
     },
@@ -156,6 +191,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       ...(isTest ? [] : [cloudflare()]),
       tanstackRouter(),
+      tailwindcss(),
       react(),
       babel({
         include: /\/src\/.*\.[cm]?[jt]sx?$/,

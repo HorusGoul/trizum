@@ -32,7 +32,7 @@ export function CloudSyncAccountSettings({
   passwordResetMessage: string | null;
 }) {
   return (
-    <div className="container mt-4 flex flex-col gap-8 px-4 pb-8 pb-safe">
+    <div className="pb-safe container mt-4 flex flex-col gap-8 px-4 pb-8">
       <CloudSettingsSection icon="lucide.link" title={t`Connections`}>
         <CloudSettingsItem
           icon="brand.apple"

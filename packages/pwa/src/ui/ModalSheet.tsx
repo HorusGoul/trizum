@@ -150,7 +150,7 @@ function AccessibleSheetContainer({
           ref={containerRef}
           aria-describedby={hasDescription ? descriptionId : undefined}
           aria-labelledby={hasTitle ? titleId : undefined}
-          className="flex min-h-0 flex-1 flex-col outline-none"
+          className="flex min-h-0 flex-1 flex-col outline-hidden"
         >
           {isDismissable ? <DismissButton onDismiss={close} /> : null}
           {children}
@@ -177,7 +177,7 @@ export function ModalSheetHeader({
           <div className="flex justify-center">
             <span
               aria-hidden="true"
-              className="h-1.5 w-12 rounded-full bg-accent-200 dark:bg-accent-700"
+              className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
             />
           </div>
         )}
@@ -269,7 +269,7 @@ export function ModalSheetAction({
       className={({ defaultClassName, isFocusVisible, isHovered, isPressed }) =>
         cn(
           defaultClassName,
-          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-[1.35rem] py-4 text-left outline-none transition-all duration-200 ease-in-out px-safe-or-4 sm:px-safe-or-5",
+          "grid min-h-14 w-full grid-cols-[1.25rem_minmax(0,1fr)] items-center gap-x-4 rounded-[1.35rem] py-4 text-left outline-hidden transition-all duration-200 ease-in-out px-safe-or-4 sm:px-safe-or-5",
           tone === "danger"
             ? "text-rose-700 dark:text-rose-300"
             : "text-accent-950 dark:text-accent-50",
@@ -295,13 +295,13 @@ export function ModalSheetAction({
         width={20}
         height={20}
         className={cn(
-          "col-start-1 row-start-1 flex-shrink-0",
+          "col-start-1 row-start-1 shrink-0",
           tone === "danger"
             ? "text-rose-600 dark:text-rose-300"
             : "text-accent-700 dark:text-accent-200",
         )}
       />
-      <span className="col-start-2 row-start-1 min-w-0 text-base font-medium leading-tight">
+      <span className="col-start-2 row-start-1 min-w-0 text-base leading-tight font-medium">
         {children}
       </span>
     </AriaButton>

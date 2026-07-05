@@ -107,7 +107,7 @@ function PartyById() {
 
   return (
     <div className="flex h-full max-h-full flex-col">
-      <div className="container flex h-16 flex-shrink-0 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 shrink-0 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           {[party.symbol, party.name].filter((v) => !!v).join(" ")}
@@ -118,7 +118,7 @@ function PartyById() {
             <IconButton
               icon="lucide.arrow-up-down"
               aria-label={t`Sort balances`}
-              className="flex-shrink-0"
+              className="shrink-0"
             />
             <Popover placement="bottom end">
               <Menu className="min-w-60">
@@ -169,11 +169,7 @@ function PartyById() {
           </MenuTrigger>
         ) : null}
         <MenuTrigger>
-          <IconButton
-            icon="lucide.ellipsis-vertical"
-            aria-label={t`Menu`}
-            className="flex-shrink-0"
-          />
+          <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Menu`} className="shrink-0" />
           <Popover placement="bottom end">
             <Menu className="min-w-60">
               <MenuItem

@@ -28,9 +28,11 @@ then use this document to decide where to work inside the PWA.
 - User-facing copy must use Lingui macros, then run `vp run lingui:extract`.
 - `src/routeTree.gen.ts` is generated. Do not edit it manually.
 - `src/generated/iconSprite.gen.ts` and `src/generated/iconSprite.svg` are
-  generated from the available icon catalog and current icon usage. They are
-  intentionally untracked; regenerate them with `vp run icons:generate` or let
-  the package scripts do it automatically instead of hand-editing them.
+  generated from the available icon catalog and current icon usage.
+  `src/generated/tw-dynamic-themes.css` is generated from the default dynamic
+  theme hue. These files are intentionally untracked; regenerate them with
+  `vp run codegen`, or let the package scripts do it automatically instead of
+  hand-editing them.
 
 ## Validation
 

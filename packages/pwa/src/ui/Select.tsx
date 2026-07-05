@@ -52,9 +52,9 @@ const SelectTrigger = ({ className, children, ...props }: AriaButtonProps) => (
         /* Disabled */
         "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         /* Focused */
-        "data-[focus-visible]:ring-ring data-[focus-visible]:outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2",
+        "data-[focus-visible]:ring-ring data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-offset-2",
         /* Resets */
-        "focus-visible:outline-none",
+        "focus-visible:outline-hidden",
         className,
       ),
     )}
@@ -80,7 +80,7 @@ const SelectListBox = <T extends object>({ className, ...props }: AriaListBoxPro
   <AriaListBox
     className={composeRenderProps(className, (className) =>
       cn(
-        "max-h-[inherit] overflow-auto p-1 outline-none [clip-path:inset(0_0_0_0_round_calc(var(--radius)-2px))]",
+        "max-h-[inherit] overflow-auto p-1 outline-hidden [clip-path:inset(0_0_0_0_round_calc(var(--radius)-2px))]",
         className,
       ),
     )}
@@ -117,7 +117,7 @@ function AppSelect<T extends object>({
         <SelectValue />
       </SelectTrigger>
       {description && (
-        <Text className="text-sm text-accent-950 dark:text-accent-50" slot="description">
+        <Text className="text-accent-950 dark:text-accent-50 text-sm" slot="description">
           {description}
         </Text>
       )}

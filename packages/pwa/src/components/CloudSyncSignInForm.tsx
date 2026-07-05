@@ -93,7 +93,7 @@ export function CloudSyncSignInForm({
           value={authState.email}
         />
         {authState.passwordResetMessage ? (
-          <p className="text-sm text-accent-700 dark:text-accent-50">
+          <p className="text-accent-700 dark:text-accent-50 text-sm">
             {authState.passwordResetMessage}
           </p>
         ) : null}
@@ -157,10 +157,10 @@ export function CloudSyncSignInForm({
         </Button>
       </div>
 
-      <div className="flex items-center gap-3 text-xs font-medium uppercase text-accent-600 dark:text-accent-300">
-        <span className="h-px flex-1 bg-accent-200 dark:bg-accent-700" />
+      <div className="text-accent-600 dark:text-accent-300 flex items-center gap-3 text-xs font-medium uppercase">
+        <span className="bg-accent-200 dark:bg-accent-700 h-px flex-1" />
         <Trans>or use email</Trans>
-        <span className="h-px flex-1 bg-accent-200 dark:bg-accent-700" />
+        <span className="bg-accent-200 dark:bg-accent-700 h-px flex-1" />
       </div>
 
       {mode === "password" ? (

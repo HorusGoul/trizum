@@ -29,21 +29,21 @@ export function BalanceActionItem({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl bg-white p-4 dark:bg-accent-900">
+    <div className="dark:bg-accent-900 flex flex-col gap-4 rounded-xl bg-white p-4">
       <div className="flex">
         <div className="flex flex-1 flex-col">
-          <span className="text-lg text-accent-400">
+          <span className="text-accent-400 text-lg">
             {from.name} {fromId === me.id ? t`(me)` : ""}
           </span>
-          <span className="text-sm text-accent-700 dark:text-accent-300">
+          <span className="text-accent-700 dark:text-accent-300 text-sm">
             <Trans>owes</Trans>
           </span>
-          <span className="text-lg text-accent-400">
+          <span className="text-accent-400 text-lg">
             {to.name} {toId === me.id ? t`(me)` : ""}
           </span>
         </div>
 
-        <div className="flex flex-shrink-0 items-center">
+        <div className="flex shrink-0 items-center">
           <CurrencyText currency={party.currency} amount={Math.abs(amount)} className="text-xl" />
         </div>
       </div>
@@ -72,7 +72,7 @@ export function BalanceActionItem({
         {isFromMe && canTransferDebt ? (
           <Button
             color="transparent"
-            className="h-8 rounded-lg px-3 text-sm font-medium text-accent-500 hover:text-accent-400 dark:text-accent-300 dark:hover:text-accent-200"
+            className="text-accent-500 hover:text-accent-400 dark:text-accent-300 dark:hover:text-accent-200 h-8 rounded-lg px-3 text-sm font-medium"
             onPress={() =>
               void navigate({
                 to: "/party/$partyId/transfer-debt",
@@ -91,7 +91,7 @@ export function BalanceActionItem({
               icon="lucide.corner-down-right"
               width={16}
               height={16}
-              className="mr-2 flex-shrink-0"
+              className="mr-2 shrink-0"
             />
             <Trans>Transfer to another party</Trans>
           </Button>

@@ -109,7 +109,7 @@ function ColorSwatchPickerItem({ className, ...props }: AriaColorSwatchPickerIte
           /* Disabled */
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           /* Focus Visible */
-          "data-[focus-visible]:ring-ring data-[focus-visible]:outline-none data-[focus-visible]:ring-2",
+          "data-[focus-visible]:ring-ring data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2",
           className,
         ),
       )}

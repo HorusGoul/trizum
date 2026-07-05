@@ -276,7 +276,7 @@ export function ExpenseEditor({
                     type="submit"
                     form={formId}
                     isDisabled={isSubmitting}
-                    className="flex-shrink-0"
+                    className="shrink-0"
                   />
                 </Suspense>
               ) : null
@@ -315,7 +315,7 @@ export function ExpenseEditor({
           shares={shares}
         />
 
-        <div className="h-16 flex-shrink-0" />
+        <div className="h-16 shrink-0" />
       </form>
     </div>
   );
@@ -337,16 +337,12 @@ function ExpenseEditorHeader({
   title: string;
 }) {
   return (
-    <div className="container flex h-16 items-center px-2 mt-safe">
+    <div className="mt-safe container flex h-16 items-center px-2">
       <BackButton fallbackOptions={goBackFallbackOptions} />
       <h1 className="max-h-12 truncate px-4 text-xl font-medium">{title}</h1>
       <div className="flex-1" />
       <MenuTrigger>
-        <IconButton
-          icon="lucide.ellipsis-vertical"
-          aria-label={t`Menu`}
-          className="flex-shrink-0"
-        />
+        <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Menu`} className="shrink-0" />
         <Popover placement="bottom end">
           <Menu>
             <MenuItem onAction={onToggleAutoOpenCalculator}>
@@ -677,7 +673,7 @@ function ParticipantItem({
   return (
     <div
       data-presence-element-id={`participant-${participant.id}`}
-      className="grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border border-accent-500 bg-white pr-3 dark:border-accent-700 dark:bg-accent-900"
+      className="border-accent-500 dark:border-accent-700 dark:bg-accent-900 grid h-10 grid-cols-[4fr_6fr] items-center justify-between rounded-lg border bg-white pr-3"
     >
       <div className="flex h-full items-center gap-3">
         <Checkbox
@@ -702,7 +698,7 @@ function ParticipantItem({
                   color="input-like"
                 />
                 <AppNumberField
-                  className="h-7 w-7 flex-shrink-0"
+                  className="h-7 w-7 shrink-0"
                   inputClassName="h-7 px-0 text-center"
                   value={participantShare.value}
                   maxValue={99}
@@ -893,7 +889,7 @@ function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
       }}
     >
       {value.length === 0 ? (
-        <div className="flex h-32 w-32 flex-col items-center justify-center rounded-xl bg-accent-50 p-4 dark:bg-accent-900 dark:text-accent-500">
+        <div className="bg-accent-50 dark:bg-accent-900 dark:text-accent-500 flex h-32 w-32 flex-col items-center justify-center rounded-xl p-4">
           <span className="text-center text-sm">
             <Trans>Upload or capture an image of your receipt</Trans>
           </span>
@@ -988,7 +984,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   }
 
   return (
-    <div className="flex h-32 w-max flex-shrink-0 flex-col gap-2">
+    <div className="flex h-32 w-max shrink-0 flex-col gap-2">
       <Button
         onPress={() => void openCamera()}
         color="input-like"
@@ -1053,7 +1049,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
   }
 
   return (
-    <div className="relative flex-shrink-0">
+    <div className="relative shrink-0">
       <Button
         color="transparent"
         aria-label={t`View photo`}
@@ -1065,7 +1061,7 @@ function CurrentPhoto({ photoId, onRemove, onViewPhoto }: CurrentPhotoProps) {
       </Button>
       <Button
         color="input-like"
-        className="absolute -right-2 -top-2 h-auto w-auto rounded-full p-1"
+        className="absolute -top-2 -right-2 h-auto w-auto rounded-full p-1"
         onPress={onRemove}
         aria-label={t`Remove photo`}
       >

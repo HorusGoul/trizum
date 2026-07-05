@@ -1,6 +1,53 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "./generated/tw-dynamic-themes.css";
+
+@plugin "tailwindcss-react-aria-components";
+@plugin "tailwindcss-animate";
+@plugin "@trizum/tailwindcss-safe-area-capacitor";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter Variable", sans-serif;
+  --font-mono: "Fira Code Variable", monospace;
+  --animate-blink: blink 1s step-end infinite;
+
+  --color-danger-50: var(--color-red-50);
+  --color-danger-100: var(--color-red-100);
+  --color-danger-200: var(--color-red-200);
+  --color-danger-300: var(--color-red-300);
+  --color-danger-400: var(--color-red-400);
+  --color-danger-500: var(--color-red-500);
+  --color-danger-600: var(--color-red-600);
+  --color-danger-700: var(--color-red-700);
+  --color-danger-800: var(--color-red-800);
+  --color-danger-900: var(--color-red-900);
+  --color-danger-950: var(--color-red-950);
+
+  --color-success-50: var(--color-green-50);
+  --color-success-100: var(--color-green-100);
+  --color-success-200: var(--color-green-200);
+  --color-success-300: var(--color-green-300);
+  --color-success-400: var(--color-green-400);
+  --color-success-500: var(--color-green-500);
+  --color-success-600: var(--color-green-600);
+  --color-success-700: var(--color-green-700);
+  --color-success-800: var(--color-green-800);
+  --color-success-900: var(--color-green-900);
+  --color-success-950: var(--color-green-950);
+
+  --color-warning-50: var(--color-yellow-50);
+  --color-warning-100: var(--color-yellow-100);
+  --color-warning-200: var(--color-yellow-200);
+  --color-warning-300: var(--color-yellow-300);
+  --color-warning-400: var(--color-yellow-400);
+  --color-warning-500: var(--color-yellow-500);
+  --color-warning-600: var(--color-yellow-600);
+  --color-warning-700: var(--color-yellow-700);
+  --color-warning-800: var(--color-yellow-800);
+  --color-warning-900: var(--color-yellow-900);
+  --color-warning-950: var(--color-yellow-950);
+}
 
 :root {
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
@@ -9,11 +56,13 @@
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
 }
 
-@layer components {
-  .container {
-    @apply mx-auto max-w-2xl;
-  }
+@utility container {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 42rem;
+}
 
+@layer components {
   .no-scrollbar {
     scrollbar-width: none;
   }
@@ -26,7 +75,7 @@ body {
   margin: 0;
   padding: 0;
 
-  @apply bg-accent-50 font-sans text-accent-950 dark:bg-accent-950 dark:text-accent-50;
+  @apply bg-accent-50 text-accent-950 dark:bg-accent-950 dark:text-accent-50 font-sans;
 }
 
 #root {
@@ -52,6 +101,16 @@ a {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
   }
 }
 

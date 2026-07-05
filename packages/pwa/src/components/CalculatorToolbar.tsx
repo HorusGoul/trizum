@@ -493,8 +493,8 @@ export function CalculatorToolbar({
       data-presence-element-id={presenceElementId}
       className={
         isLargeScreen && popoverPosition
-          ? "fixed z-50 rounded-lg border border-accent-300 bg-white shadow-lg dark:border-accent-700 dark:bg-accent-900"
-          : "fixed left-0 right-0 z-50 border-t border-accent-300 bg-white pb-safe dark:border-accent-700 dark:bg-accent-900"
+          ? "border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 rounded-lg border bg-white shadow-lg"
+          : "border-accent-300 pb-safe dark:border-accent-700 dark:bg-accent-900 fixed right-0 left-0 z-50 border-t bg-white"
       }
       style={
         isLargeScreen && popoverPosition
@@ -548,7 +548,7 @@ function CalculatorPreview({
   return (
     <div className="flex h-5 items-center justify-end px-1">
       {previewValue !== null && expression ? (
-        <span className="text-sm font-medium text-accent-600 dark:text-accent-400">
+        <span className="text-accent-600 dark:text-accent-400 text-sm font-medium">
           = {formatCalculatorPreviewValue(previewValue, currency)}
         </span>
       ) : null}
@@ -578,11 +578,11 @@ function CalculatorExpressionDisplay({
   return (
     <div
       ref={expressionRef}
-      className="flex cursor-text touch-none select-none items-center overflow-hidden rounded-md border border-accent-400 bg-accent-50 px-3 py-2 dark:border-accent-600 dark:bg-accent-800"
+      className="border-accent-400 bg-accent-50 dark:border-accent-600 dark:bg-accent-800 flex cursor-text touch-none items-center overflow-hidden rounded-md border px-3 py-2 select-none"
     >
       <span
         ref={expressionScrollRef}
-        className="min-w-0 flex-1 whitespace-nowrap text-right font-mono text-xl font-medium"
+        className="min-w-0 flex-1 text-right font-mono text-xl font-medium whitespace-nowrap"
         aria-live="polite"
         aria-label={t`Calculator expression`}
       >
@@ -597,7 +597,7 @@ function CalculatorExpressionDisplay({
                 className="relative"
               >
                 {index === cursorPosition ? (
-                  <span className="absolute left-0 top-0 h-full w-0 animate-blink">
+                  <span className="animate-blink absolute top-0 left-0 h-full w-0">
                     <span className="absolute -translate-x-1/2">|</span>
                   </span>
                 ) : null}
@@ -605,7 +605,7 @@ function CalculatorExpressionDisplay({
               </span>
             ))}
             {cursorPosition === expression.length ? (
-              <span className="absolute right-0 top-0 h-full w-0 animate-blink">
+              <span className="animate-blink absolute top-0 right-0 h-full w-0">
                 <span className="absolute -translate-x-1/2">|</span>
               </span>
             ) : null}

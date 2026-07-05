@@ -46,7 +46,7 @@ export function NewPartyParticipantInput({
       <IconButton
         icon="lucide.plus"
         aria-label={t`Add participant`}
-        className="flex-shrink-0"
+        className="shrink-0"
         color="accent"
         onPress={addNewParticipant}
       />

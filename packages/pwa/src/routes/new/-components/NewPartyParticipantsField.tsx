@@ -40,7 +40,7 @@ export function NewPartyParticipantsField({
         {(field) => (
           <div className="mt-4 flex flex-col gap-4">
             {field.state.meta.errors?.length > 0 ? (
-              <span className="text-sm font-medium text-danger-500">
+              <span className="text-danger-500 text-sm font-medium">
                 {field.state.meta.errors.join(", ")}
               </span>
             ) : null}
@@ -71,7 +71,7 @@ export function NewPartyParticipantsField({
                   icon="lucide.trash"
                   aria-label={t`Remove`}
                   onPress={() => field.removeValue(index)}
-                  className="flex-shrink-0"
+                  className="shrink-0"
                 />
               </div>
             ))}
@@ -108,7 +108,7 @@ export function NewPartyParticipantsField({
               <IconButton
                 icon="lucide.plus"
                 aria-label={t`Add participant`}
-                className="flex-shrink-0"
+                className="shrink-0"
                 color="accent"
                 onPress={addNewParticipant}
               />
@@ -117,7 +117,7 @@ export function NewPartyParticipantsField({
         )}
       </form.Field>
 
-      <div className="h-16 flex-shrink-0" />
+      <div className="h-16 shrink-0" />
     </div>
   );
 }

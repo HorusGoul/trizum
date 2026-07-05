@@ -25,13 +25,13 @@ export function SwitchField({ label, description, className, ...props }: SwitchF
     >
       <div className="flex flex-col">
         <span className="text-sm font-medium">{label}</span>
-        {description && <span className="text-sm text-accent-500">{description}</span>}
+        {description && <span className="text-accent-500 text-sm">{description}</span>}
       </div>
       <div
         className={cn(
           "inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors",
           /* Focus Visible */
-          "group-data-[focus-visible]:ring-ring group-data-[focus-visible]:outline-none group-data-[focus-visible]:ring-2 group-data-[focus-visible]:ring-offset-2 group-data-[focus-visible]:ring-offset-accent-50",
+          "group-data-[focus-visible]:ring-ring group-data-[focus-visible]:outline-hidden group-data-[focus-visible]:ring-2 group-data-[focus-visible]:ring-offset-2 group-data-[focus-visible]:ring-offset-accent-50",
           /* Disabled */
           "group-data-[disabled]:cursor-not-allowed group-data-[disabled]:opacity-50",
           /* Selected */
@@ -39,7 +39,7 @@ export function SwitchField({ label, description, className, ...props }: SwitchF
           /* Readonly */
           "group-data-[readonly]:cursor-default",
           /* Resets */
-          "focus-visible:outline-none",
+          "focus-visible:outline-hidden",
         )}
       >
         <div

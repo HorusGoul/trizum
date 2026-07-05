@@ -21,7 +21,7 @@ function DateSegment({ className, ...props }: AriaDateSegmentProps) {
     <AriaDateSegment
       className={composeRenderProps(className, (className) =>
         cn(
-          "inline rounded p-0.5 caret-transparent outline outline-0 type-literal:px-0",
+          "inline rounded-sm p-0.5 caret-transparent outline outline-0 type-literal:px-0",
           /* Placeholder */
           "data-[placeholder]:text-accent-700 dark:data-[placeholder]:text-accent-50",
           /* Disabled */

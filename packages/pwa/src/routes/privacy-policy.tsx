@@ -12,16 +12,16 @@ function PrivacyPolicy() {
 function renderPrivacyPolicyContent() {
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/about" }} />
 
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium text-accent-900 dark:text-accent-100">
+        <h1 className="text-accent-900 dark:text-accent-100 max-h-12 truncate px-4 text-xl font-medium">
           Privacy Policy
         </h1>
       </div>
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
-        <p className="text-sm text-accent-600 dark:text-accent-400">Last updated: June 23, 2026</p>
+        <p className="text-accent-600 dark:text-accent-400 text-sm">Last updated: June 23, 2026</p>
 
         <p className="text-accent-700 dark:text-accent-300">
           This Privacy Policy describes how trizum (&quot;we&quot;, &quot;our&quot;, or
@@ -30,46 +30,46 @@ function renderPrivacyPolicyContent() {
         </p>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             1. Information We Collect
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               1.1 Information You Provide
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
               When you use trizum, you may provide the following information:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+            <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Party Information:
                 </strong>{" "}
                 Names of parties/groups, descriptions, and currency preferences
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Participant Information:
                 </strong>{" "}
                 Names of participants in your expense groups, and optionally phone numbers (if you
                 choose to share them in your settings) and profile pictures
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Expense Data:
                 </strong>{" "}
                 Details about expenses including amounts, dates, descriptions, who paid, and how
                 expenses are split
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Media Files:
                 </strong>{" "}
                 Photos and receipts you attach to expenses
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Account and Sign-In Information:
                 </strong>{" "}
                 If you use trizum cloud, we collect information needed to create and manage your
@@ -78,7 +78,7 @@ function renderPrivacyPolicyContent() {
                 requests
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Cloud Account Settings:
                 </strong>{" "}
                 If you use trizum cloud, we store the document pointer that connects your account to
@@ -88,31 +88,31 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               1.2 Automatically Collected Information
             </h3>
-            <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+            <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Technical Data:
                 </strong>{" "}
                 Device information, browser type, operating system, and usage patterns
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Error Reports:
                 </strong>{" "}
                 When errors occur, we may collect diagnostic information through Sentry to help
                 improve the Service
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Sync Data:
                 </strong>{" "}
                 Information about data synchronization between your devices
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Authentication Data:
                 </strong>{" "}
                 Session identifiers, cookies or native app bearer tokens, IP address, user agent,
@@ -124,13 +124,13 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             2. How We Use Your Information
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
             We use the information we collect to:
           </p>
-          <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+          <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
             <li>Provide and maintain the Service</li>
             <li>Create, authenticate, secure, and manage trizum cloud accounts</li>
             <li>Send sign-in links, email verification links, and password reset emails</li>
@@ -145,12 +145,12 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             3. Data Storage and Synchronization
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               3.1 Local Storage
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -162,14 +162,14 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               3.2 trizum cloud
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
               To enable synchronization across your devices and collaboration with others, your data
               is synchronized via WebSocket connections to our servers. This synchronization allows:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+            <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
               <li>Real-time updates when multiple users access the same expense group</li>
               <li>Access to your data from multiple devices</li>
               <li>Automatic conflict resolution when changes occur simultaneously</li>
@@ -183,7 +183,7 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               3.3 Data Encryption
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -197,7 +197,7 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               3.4 Access Model
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -212,12 +212,12 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             4. Data Sharing and Access
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               4.1 Sharing with Other Users
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -229,7 +229,7 @@ function renderPrivacyPolicyContent() {
               you trust.
             </p>
             <p className="text-accent-700 dark:text-accent-300">
-              <strong className="font-semibold text-accent-900 dark:text-accent-100">
+              <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                 Important:
               </strong>{" "}
               You can use trizum without creating an account. Accounts are used for trizum cloud
@@ -240,15 +240,15 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               4.2 Third-Party Services
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
               We use the following third-party services:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+            <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Cloudflare:
                 </strong>{" "}
                 We use Cloudflare Workers, D1, Send Email, logs, and related infrastructure to host
@@ -256,7 +256,7 @@ function renderPrivacyPolicyContent() {
                 and operate trizum cloud.
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Google:
                 </strong>{" "}
                 If you choose to continue with Google or link Google as a sign-in method, Google
@@ -264,7 +264,7 @@ function renderPrivacyPolicyContent() {
                 identifier.
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Apple:
                 </strong>{" "}
                 If you choose to continue with Apple or link Apple as a sign-in method, Apple
@@ -272,7 +272,7 @@ function renderPrivacyPolicyContent() {
                 identifier.
               </li>
               <li>
-                <strong className="font-semibold text-accent-900 dark:text-accent-100">
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                   Sentry:
                 </strong>{" "}
                 We use Sentry for error tracking and performance monitoring. Sentry may collect
@@ -281,7 +281,7 @@ function renderPrivacyPolicyContent() {
                   href="https://sentry.io/privacy/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-accent-600 underline hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
                 >
                   Sentry&apos;s Privacy Policy
                 </a>
@@ -291,7 +291,7 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               4.3 Legal Requirements
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -302,19 +302,19 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             5. Your Rights and Choices
           </h2>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               5.1 Access and Deletion
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
               You can access, modify, or delete your data at any time through the Service. To delete
               your data:
             </p>
-            <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+            <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
               <li>Delete individual expenses or participants within the app</li>
               <li>Delete entire expense groups</li>
               <li>Clear your local data by clearing your browser&apos;s IndexedDB storage</li>
@@ -330,7 +330,7 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               5.2 Data Portability
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -340,7 +340,7 @@ function renderPrivacyPolicyContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               5.3 Error Reporting and Operational Logs
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
@@ -354,7 +354,7 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             6. Data Retention
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
@@ -379,7 +379,7 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             7. Children&apos;s Privacy
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
@@ -390,7 +390,7 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             8. International Data Transfers
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
@@ -402,13 +402,13 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             9. Security
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
             We implement reasonable security measures to protect your data, including:
           </p>
-          <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+          <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
             <li>Encrypted data transmission (HTTPS and WSS)</li>
             <li>Secure cookies for web sign-in where supported</li>
             <li>Bearer token handling for native app sign-in</li>
@@ -423,7 +423,7 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             10. Changes to This Privacy Policy
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
@@ -435,15 +435,15 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             11. Contact Us
           </h2>
-          <div className="rounded-lg bg-accent-50 p-4 dark:bg-accent-900">
-            <p className="mb-2 text-accent-700 dark:text-accent-300">
+          <div className="bg-accent-50 dark:bg-accent-900 rounded-lg p-4">
+            <p className="text-accent-700 dark:text-accent-300 mb-2">
               If you have any questions about this Privacy Policy, please contact us:
             </p>
             <p className="text-accent-700 dark:text-accent-300">
-              <strong className="font-semibold text-accent-900 dark:text-accent-100">
+              <strong className="text-accent-900 dark:text-accent-100 font-semibold">
                 Horus Lugo López
               </strong>
               <br />
@@ -454,7 +454,7 @@ function renderPrivacyPolicyContent() {
               Email:{" "}
               <a
                 href="mailto:hola@horus.dev"
-                className="text-accent-600 underline hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300"
+                className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
               >
                 hola@horus.dev
               </a>
@@ -463,7 +463,7 @@ function renderPrivacyPolicyContent() {
         </section>
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-2xl font-semibold">
             12. Jurisdiction and Governing Law
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
@@ -472,7 +472,7 @@ function renderPrivacyPolicyContent() {
             Spanish data protection laws. If you are located in the European Economic Area (EEA),
             you have certain rights under GDPR, including:
           </p>
-          <ul className="ml-6 list-disc space-y-2 text-accent-700 dark:text-accent-300">
+          <ul className="text-accent-700 dark:text-accent-300 ml-6 list-disc space-y-2">
             <li>The right to access your personal data</li>
             <li>The right to rectification of inaccurate data</li>
             <li>The right to erasure (&quot;right to be forgotten&quot;)</li>

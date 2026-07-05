@@ -42,7 +42,7 @@ const DatePickerContent = ({
   >
     <AriaDialog
       className={cn(
-        "flex w-full flex-col space-y-4 outline-none sm:flex-row sm:space-x-4 sm:space-y-0",
+        "flex w-full flex-col space-y-4 outline-hidden sm:flex-row sm:space-x-4 sm:space-y-0",
         className,
       )}
       {...props}
@@ -81,7 +81,7 @@ function AppDatePicker<T extends AriaDateValue>({
         />
       </FieldGroup>
       {description && (
-        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
+        <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
           {description}
         </Text>
       )}

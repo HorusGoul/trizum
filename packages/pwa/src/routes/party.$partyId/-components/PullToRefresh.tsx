@@ -217,11 +217,11 @@ export function PullToRefresh({
       <motion.div ref={rootRef} className="flex min-h-full flex-col">
         <motion.div
           aria-hidden={true}
-          className="flex flex-shrink-0 items-end justify-center overflow-hidden"
+          className="flex shrink-0 items-end justify-center overflow-hidden"
           style={{ height: pullDistance }}
         >
           <motion.div
-            className="mb-3 flex size-10 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-600 shadow-sm dark:border-accent-700 dark:bg-accent-900 dark:text-accent-200"
+            className="border-accent-200 text-accent-600 dark:border-accent-700 dark:bg-accent-900 dark:text-accent-200 mb-3 flex size-10 items-center justify-center rounded-full border bg-white shadow-xs"
             style={{
               opacity: indicatorOpacity,
               scale: indicatorScale,

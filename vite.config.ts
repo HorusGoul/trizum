@@ -142,7 +142,7 @@ const toolingConfig = {
     tasks: {
       check: {
         command: "vp run --filter @trizum/pwa check && vp check",
-        dependsOn: ["@trizum/logging#build", "@trizum/pwa#icons:generate"],
+        dependsOn: ["@trizum/logging#build", "@trizum/pwa#codegen"],
       },
       dev: {
         command: "vp run @trizum/pwa#dev",

@@ -10,7 +10,7 @@ export function EmptyState() {
         <h1 className="text-3xl font-bold">
           <Trans>Welcome to trizum</Trans>
         </h1>
-        <p className="text-lg text-accent-700 dark:text-accent-300">
+        <p className="text-accent-700 dark:text-accent-300 text-lg">
           <Trans>
             Split bills with friends and family. Track expenses, calculate balances, and settle up
             together.
@@ -65,17 +65,17 @@ function EmptyStateLink({
       className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
         cn(
           defaultClassName,
-          "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-none transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
+          "flex scale-100 items-start gap-4 rounded-xl border border-accent-200 bg-white p-4 text-start outline-hidden transition-all duration-200 ease-in-out dark:border-accent-800 dark:bg-accent-900",
           (isHovered || isFocusVisible) &&
             "shadow-md dark:border-accent-700 dark:bg-accent-800 dark:shadow-none",
-          isPressed && "scale-95 bg-opacity-90 shadow-lg dark:bg-accent-700 dark:shadow-none",
+          isPressed && "scale-95 bg-white/90 shadow-lg dark:bg-accent-700/90 dark:shadow-none",
         )
       }
     >
       <Icon icon={icon} width={24} height={24} className="text-accent-600 dark:text-accent-400" />
       <div className="flex flex-1 flex-col">
-        <span className="text-lg font-semibold text-accent-950 dark:text-accent-50">{title}</span>
-        <span className="text-sm text-accent-600 dark:text-accent-400">{description}</span>
+        <span className="text-accent-950 dark:text-accent-50 text-lg font-semibold">{title}</span>
+        <span className="text-accent-600 dark:text-accent-400 text-sm">{description}</span>
       </div>
     </Link>
   );

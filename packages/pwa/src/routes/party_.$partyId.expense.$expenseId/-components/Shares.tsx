@@ -31,13 +31,13 @@ export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
               return (
                 <li
                   key={userId}
-                  className="flex justify-between bg-accent-50 p-2 px-3 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60"
+                  className="bg-accent-50 even:bg-accent-50/80 dark:bg-accent-900 dark:even:bg-accent-900/60 flex justify-between p-2 px-3"
                 >
                   <span className="flex items-center gap-1 font-medium">
                     {party.participants[userId].name}
 
                     {isMe ? (
-                      <span className="h-4 rounded-sm bg-accent-500 px-1 text-xs font-semibold uppercase text-accent-50">
+                      <span className="bg-accent-500 text-accent-50 h-4 rounded-xs px-1 text-xs font-semibold uppercase">
                         {t`Me`}
                       </span>
                     ) : null}

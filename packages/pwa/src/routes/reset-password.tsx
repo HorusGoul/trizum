@@ -63,7 +63,7 @@ function ResetPassword() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/settings" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -85,10 +85,10 @@ function ResetPassword() {
         ) : null}
       </div>
 
-      <div className="container mt-4 flex flex-col gap-6 px-4 pb-8 pb-safe">
+      <div className="pb-safe container mt-4 flex flex-col gap-6 px-4 pb-8">
         {error || !token ? (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-accent-700 dark:text-accent-50">
+            <p className="text-accent-700 dark:text-accent-50 text-sm">
               <Trans>Password reset link is invalid or expired.</Trans>
             </p>
             <Button

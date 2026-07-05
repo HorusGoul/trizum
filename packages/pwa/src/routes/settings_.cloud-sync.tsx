@@ -846,7 +846,7 @@ function useCloudSyncSettingsView() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/settings" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">

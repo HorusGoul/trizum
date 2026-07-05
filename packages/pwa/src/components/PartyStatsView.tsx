@@ -245,14 +245,14 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   });
 
   return (
-    <div className="container flex min-h-full flex-col gap-5 px-4 pb-24 pt-3">
+    <div className="container flex min-h-full flex-col gap-5 px-4 pt-3 pb-24">
       <section className="flex flex-wrap items-center justify-end gap-2">
         <AppSelect<StatsTimeframeOption>
           aria-label={t({
             comment: "Label for the timeframe filter on the party stats screen",
             message: "Timeframe",
           })}
-          className="w-full gap-0 sm:w-auto [&>button]:h-9 [&>button]:w-full [&>button]:rounded-full [&>button]:border-accent-300 [&>button]:bg-accent-50 [&>button]:px-3 sm:[&>button]:w-auto sm:[&>button]:min-w-44 dark:[&>button]:border-accent-700 dark:[&>button]:bg-accent-900"
+          className="[&>button]:border-accent-300 [&>button]:bg-accent-50 dark:[&>button]:border-accent-700 dark:[&>button]:bg-accent-900 w-full gap-0 sm:w-auto [&>button]:h-9 [&>button]:w-full [&>button]:rounded-full [&>button]:px-3 sm:[&>button]:w-auto sm:[&>button]:min-w-44"
           items={timeframeOptions}
           selectedKey={selectedTimeframeKey}
           onSelectionChange={(nextTimeframe) => {
@@ -284,10 +284,10 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         ) : null}
       </section>
 
-      <section className="rounded-[1.9rem] border border-accent-300/80 bg-gradient-to-br from-accent-500 via-accent-600 to-accent-700 p-5 text-accent-50 shadow-sm lg:p-6 dark:border-accent-500/60 dark:from-accent-700 dark:via-accent-800 dark:to-accent-950 dark:shadow-none">
+      <section className="border-accent-300/80 from-accent-500 via-accent-600 to-accent-700 text-accent-50 dark:border-accent-500/60 dark:from-accent-700 dark:via-accent-800 dark:to-accent-950 rounded-[1.9rem] border bg-gradient-to-br p-5 shadow-xs lg:p-6 dark:shadow-none">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-accent-50/75">
+            <div className="text-accent-50/75 text-[11px] font-semibold tracking-[0.24em] uppercase">
               <Trans>Total spent</Trans>
             </div>
 
@@ -300,7 +300,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
               />
             </div>
 
-            <p className="mt-2 text-sm text-accent-50/80">
+            <p className="text-accent-50/80 mt-2 text-sm">
               <Trans>Across the selected timeframe</Trans>
             </p>
           </div>
@@ -323,11 +323,11 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         stats.totalExpenseCount > 0 ? (
           <section className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-xl font-semibold text-accent-950 dark:text-accent-50">
+              <h2 className="text-accent-950 dark:text-accent-50 text-xl font-semibold">
                 <Trans>Participants</Trans>
               </h2>
 
-              <div className="text-sm text-accent-700 dark:text-accent-300">
+              <div className="text-accent-700 dark:text-accent-300 text-sm">
                 {leaderboard.length} <Trans>participants</Trans>
               </div>
             </div>
@@ -365,7 +365,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         <StatsEmptyState hasAnyTrackedExpense={false} />
       )}
 
-      <div aria-hidden="true" className="h-16 flex-shrink-0" />
+      <div aria-hidden="true" className="h-16 shrink-0" />
     </div>
   );
 }
@@ -380,18 +380,18 @@ function StatsSummaryCard({
 }: StatsSummaryCardProps) {
   if (compact) {
     return (
-      <div className="inline-flex max-w-full items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3 py-2 text-accent-50 shadow-sm backdrop-blur-sm sm:self-start dark:bg-accent-950/30 dark:shadow-none">
-        <span className="bg-white/12 rounded-full p-1.5 text-accent-50">
+      <div className="text-accent-50 dark:bg-accent-950/30 inline-flex max-w-full items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3 py-2 shadow-xs backdrop-blur-xs sm:self-start dark:shadow-none">
+        <span className="text-accent-50 rounded-full bg-white/12 p-1.5">
           <Icon icon={icon} width={14} height={14} />
         </span>
 
         <span className="text-base font-semibold tracking-tight">{value}</span>
-        <span className="text-accent-50/72 text-[11px] font-semibold uppercase tracking-[0.18em]">
+        <span className="text-accent-50/72 text-[11px] font-semibold tracking-[0.18em] uppercase">
           {label}
         </span>
 
         {badge !== undefined && badge !== null ? (
-          <span className="bg-white/12 inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold text-accent-50">
+          <span className="text-accent-50 inline-flex items-center rounded-full bg-white/12 px-2 py-1 text-[10px] font-semibold">
             {badge}
           </span>
         ) : null}
@@ -404,7 +404,7 @@ function StatsSummaryCard({
   return (
     <div
       className={cn(
-        "w-full rounded-[1.35rem] border border-white/15 bg-white/10 shadow-sm backdrop-blur-sm sm:w-52 dark:bg-accent-950/30 dark:shadow-none",
+        "w-full rounded-[1.35rem] border border-white/15 bg-white/10 shadow-xs backdrop-blur-xs sm:w-52 dark:bg-accent-950/30 dark:shadow-none",
         "p-4",
       )}
     >
@@ -415,18 +415,18 @@ function StatsSummaryCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-50/70">
+            <div className="text-accent-50/70 text-[11px] font-semibold tracking-[0.18em] uppercase">
               {label}
             </div>
 
             {badge !== undefined && badge !== null ? (
-              <div className="bg-white/12 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold text-accent-50">
+              <div className="text-accent-50 inline-flex items-center rounded-full bg-white/12 px-2.5 py-1 text-[11px] font-semibold">
                 {badge}
               </div>
             ) : null}
           </div>
 
-          <div className="mt-3 text-accent-50">{value}</div>
+          <div className="text-accent-50 mt-3">{value}</div>
           <div className={cn("text-accent-50/70", "mt-2 text-sm")}>{description}</div>
         </div>
       </div>
@@ -436,7 +436,7 @@ function StatsSummaryCard({
 
 function StatsPodium({ currency, currentParticipantId, first, second, third }: StatsPodiumProps) {
   return (
-    <div className="rounded-[1.75rem] border border-accent-200/80 bg-accent-50/80 p-4 shadow-sm dark:border-accent-800 dark:bg-accent-950/70 dark:shadow-none">
+    <div className="border-accent-200/80 bg-accent-50/80 dark:border-accent-800 dark:bg-accent-950/70 rounded-[1.75rem] border p-4 shadow-xs dark:shadow-none">
       <div className="grid grid-cols-3 items-end gap-3">
         {second ? (
           <SecondPlacePodiumColumn
@@ -623,14 +623,14 @@ function StatsPodiumColumnShell({
           </span>
         </div>
 
-        <div className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-accent-700 dark:text-accent-300">
+        <div className="text-accent-700 dark:text-accent-300 mt-1 text-[11px] font-medium tracking-[0.18em] uppercase">
           {formatPercent(shareOfTotal)}
         </div>
       </div>
 
       <div
         className={cn(
-          "mt-4 flex w-full flex-col items-center justify-end rounded-t-[1.75rem] border border-b-0 px-3 pb-4 pt-5 text-center shadow-sm dark:shadow-none",
+          "mt-4 flex w-full flex-col items-center justify-end rounded-t-[1.75rem] border border-b-0 px-3 pb-4 pt-5 text-center shadow-xs dark:shadow-none",
           pedestalClassName,
         )}
       >
@@ -662,7 +662,7 @@ function StatsParticipantRow({
   return (
     <div
       className={cn(
-        "rounded-[1.5rem] border p-4 shadow-sm dark:shadow-none",
+        "rounded-[1.5rem] border p-4 shadow-xs dark:shadow-none",
         isCurrentParticipant
           ? "border-accent-300 bg-accent-50/80 dark:border-accent-600 dark:bg-accent-900"
           : "border-accent-200/80 bg-white/80 dark:border-accent-800 dark:bg-accent-950/70",
@@ -672,7 +672,7 @@ function StatsParticipantRow({
         <StatsParticipantAvatar
           avatarId={avatarId}
           badge={<StatsAvatarBadge>#{rank}</StatsAvatarBadge>}
-          className="h-10 w-10 flex-shrink-0 text-xs ring-2 ring-inset ring-accent-200 dark:ring-accent-700"
+          className="ring-accent-200 dark:ring-accent-700 h-10 w-10 shrink-0 text-xs ring-2 ring-inset"
           name={participant.name}
         />
 
@@ -690,14 +690,14 @@ function StatsParticipantRow({
                 </span>
 
                 {isCurrentParticipant ? (
-                  <span className="rounded-full bg-accent-500 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent-50">
+                  <span className="bg-accent-500 text-accent-50 rounded-full px-2 py-1 text-[11px] font-semibold tracking-wide uppercase">
                     {t`Me`}
                   </span>
                 ) : null}
               </div>
 
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium text-accent-700 dark:text-accent-300">
-                <span className="rounded-full bg-accent-100 px-2 py-1 dark:bg-accent-800">
+              <div className="text-accent-700 dark:text-accent-300 mt-2 flex flex-wrap items-center gap-2 text-xs font-medium">
+                <span className="bg-accent-100 dark:bg-accent-800 rounded-full px-2 py-1">
                   {formatPercent(totalSpent > 0 ? participant.totalSpent / totalSpent : 0)}
                 </span>
                 <span>
@@ -743,9 +743,9 @@ function StatsParticipantAvatar({
   }
 
   return (
-    <div className="relative inline-flex flex-shrink-0">
+    <div className="relative inline-flex shrink-0">
       {avatar}
-      <div className="absolute -bottom-1 -right-1 z-20">{badge}</div>
+      <div className="absolute -right-1 -bottom-1 z-20">{badge}</div>
     </div>
   );
 }
@@ -774,7 +774,7 @@ function StatsAvatarBadge({
   return (
     <span
       className={cn(
-        "inline-flex min-h-5 min-w-5 items-center justify-center rounded-full border px-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] shadow-sm",
+        "inline-flex min-h-5 min-w-5 items-center justify-center rounded-full border px-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] shadow-xs",
         tone === "accent"
           ? "border-accent-200 bg-accent-500 text-accent-50 dark:border-accent-700"
           : "border-white bg-accent-950 text-accent-50 dark:border-accent-700 dark:bg-accent-100 dark:text-accent-950",
@@ -794,7 +794,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
       >
         <Icon
           icon="lucide.calendar"
-          className="size-4 shrink-0 text-accent-600 dark:text-accent-300"
+          className="text-accent-600 dark:text-accent-300 size-4 shrink-0"
         />
         <span className="truncate">{formatRangeLabel(value)}</span>
       </Button>
@@ -834,7 +834,7 @@ function CompactRangePicker({ value, onChange }: CompactRangePickerProps) {
 
 function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
   return (
-    <div className="rounded-2xl border border-dashed border-accent-300 bg-white p-6 text-center shadow-sm dark:border-accent-700 dark:bg-accent-900 dark:shadow-none">
+    <div className="border-accent-300 dark:border-accent-700 dark:bg-accent-900 rounded-2xl border border-dashed bg-white p-6 text-center shadow-xs dark:shadow-none">
       <h2 className="text-xl font-semibold">
         {hasAnyTrackedExpense ? (
           <Trans>No spending stats for this timeframe</Trans>
@@ -843,7 +843,7 @@ function StatsEmptyState({ hasAnyTrackedExpense }: StatsEmptyStateProps) {
         )}
       </h2>
 
-      <p className="mt-2 text-sm text-accent-700 dark:text-accent-200">
+      <p className="text-accent-700 dark:text-accent-200 mt-2 text-sm">
         {hasAnyTrackedExpense ? (
           <Trans>Try another timeframe to compare a different period of your party.</Trans>
         ) : (

@@ -156,7 +156,7 @@ export function EmojiPicker({
           cn(
             "flex h-10 w-10 items-center justify-center rounded-md border border-accent-500 bg-white text-2xl ring-offset-white transition-all dark:border-accent-700 dark:bg-accent-900 dark:ring-offset-accent-900",
             "data-[hovered]:bg-accent-100 dark:data-[hovered]:bg-accent-800",
-            "data-[focus-visible]:outline-none data-[focus-visible]:ring-2 data-[focus-visible]:ring-accent-500 data-[focus-visible]:ring-offset-2",
+            "data-[focus-visible]:outline-hidden data-[focus-visible]:ring-2 data-[focus-visible]:ring-accent-500 data-[focus-visible]:ring-offset-2",
             "data-[pressed]:scale-95",
             className,
           ),
@@ -165,31 +165,31 @@ export function EmojiPicker({
         {selectedEmoji}
       </AriaButton>
       <Popover placement="bottom end" className="overflow-hidden">
-        <Dialog className="outline-none">
+        <Dialog className="outline-hidden">
           <div className="flex flex-col" style={{ width: GRID_WIDTH }}>
             <SearchField
               aria-label={t`Search emoji`}
               value={searchQuery}
               onChange={setSearchQuery}
-              className="border-b border-accent-200 p-2 dark:border-accent-700"
+              className="border-accent-200 dark:border-accent-700 border-b p-2"
             >
               <div className="relative">
                 <Icon
                   icon="lucide.search"
-                  className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-accent-500 dark:text-accent-400"
+                  className="text-accent-500 dark:text-accent-400 absolute top-1/2 left-3 size-4 -translate-y-1/2"
                 />
                 <Input
                   placeholder={t`Search emoji...`}
                   className={cn(
                     "flex h-9 w-full rounded-md border border-accent-300 bg-accent-50 py-2 pl-9 text-sm placeholder:text-accent-500 dark:border-accent-600 dark:bg-accent-800 dark:placeholder:text-accent-400",
-                    "focus:border-accent-500 focus:outline-none focus:ring-1 focus:ring-accent-500 dark:focus:border-accent-400 dark:focus:ring-accent-400",
+                    "focus:border-accent-500 focus:outline-hidden focus:ring-1 focus:ring-accent-500 dark:focus:border-accent-400 dark:focus:ring-accent-400",
                     searchQuery ? "pr-9" : "pr-3",
                   )}
                 />
                 {searchQuery && (
                   <ClearButton
                     aria-label={t`Clear search`}
-                    className="absolute right-2 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full text-accent-500 outline-none hover:bg-accent-200 hover:text-accent-700 dark:text-accent-400 dark:hover:bg-accent-700 dark:hover:text-accent-200"
+                    className="text-accent-500 hover:bg-accent-200 hover:text-accent-700 dark:text-accent-400 dark:hover:bg-accent-700 dark:hover:text-accent-200 absolute top-1/2 right-2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full outline-hidden"
                     slot={null}
                     onPress={() => setSearchQuery("")}
                   >
@@ -263,7 +263,7 @@ function EmojiButton({ emoji, onSelect }: { emoji: Emoji; onSelect: (emoji: stri
       title={emoji.label}
       onClick={() => onSelect(emoji.emoji)}
       className={cn(
-        "flex size-9 cursor-pointer items-center justify-center rounded-md text-2xl outline-none transition-colors",
+        "flex size-9 cursor-pointer items-center justify-center rounded-md text-2xl outline-hidden transition-colors",
         "hover:bg-accent-100 dark:hover:bg-accent-800",
         "focus-visible:bg-accent-200 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500 dark:focus-visible:bg-accent-700",
         "active:bg-accent-500 active:text-white",
@@ -319,7 +319,7 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
 
   if (emojis.length === 0) {
     return (
-      <div className="flex h-[200px] items-center justify-center text-sm text-accent-500 dark:text-accent-400">
+      <div className="text-accent-500 dark:text-accent-400 flex h-[200px] items-center justify-center text-sm">
         <Trans>No emoji found</Trans>
       </div>
     );
@@ -328,7 +328,7 @@ function EmojiGrid({ emojis, onSelect }: EmojiGridProps) {
   return (
     <List
       aria-label={t`Emoji list`}
-      className="h-[280px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="h-[280px] [scrollbar-width:none] overflow-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       overscanCount={5}
       rowComponent={EmojiGridRow}
       rowCount={rowCount}
@@ -428,7 +428,7 @@ function CategorizedEmojiRow({
           boxSizing: "border-box",
           paddingInline: GRID_PADDING,
         }}
-        className="flex items-center text-xs font-medium capitalize text-accent-600 dark:text-accent-400"
+        className="text-accent-600 dark:text-accent-400 flex items-center text-xs font-medium capitalize"
       >
         {groupLabels[row.group]}
       </div>
@@ -489,7 +489,7 @@ function CategorizedEmojiGrid({
     <div className="flex flex-col">
       {/* Category tabs */}
       <div
-        className="flex justify-between border-b border-accent-200 px-1 dark:border-accent-700"
+        className="border-accent-200 dark:border-accent-700 flex justify-between border-b px-1"
         style={{ height: CATEGORY_TAB_HEIGHT }}
       >
         {orderedGroups.map((group) => (
@@ -502,7 +502,7 @@ function CategorizedEmojiGrid({
             className={cn(
               "flex flex-1 items-center justify-center text-lg transition-colors",
               "hover:bg-accent-100 dark:hover:bg-accent-800",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500",
+              "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent-500",
               activeGroup === group && "bg-accent-100 dark:bg-accent-800",
             )}
           >
@@ -513,7 +513,7 @@ function CategorizedEmojiGrid({
 
       <List
         aria-label={t`Emoji list`}
-        className="h-[244px] overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="h-[244px] [scrollbar-width:none] overflow-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         listRef={listRef}
         onRowsRendered={(visibleRows) => {
           const currentGroup = getGroupForRowIndex(
