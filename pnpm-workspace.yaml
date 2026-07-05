@@ -22,10 +22,6 @@ allowBuilds:
 overrides:
   vite: "catalog:"
   esbuild: 0.28.1
-  react: 0.0.0-experimental-d025ddd3-20240722
-  react-dom: 0.0.0-experimental-d025ddd3-20240722
-  "@types/react": npm:types-react@rc
-  "@types/react-dom": npm:types-react-dom@rc
   vitest: "catalog:"
 peerDependencyRules:
   allowAny:
@@ -89,8 +85,8 @@ catalog:
   "@tailwindcss/vite": 4.3.2
   "@types/culori": 4.0.1
   "@types/node": 24.13.2
-  "@types/react": npm:types-react@rc
-  "@types/react-dom": npm:types-react-dom@rc
+  "@types/react": 19.2.17
+  "@types/react-dom": 19.2.3
   "@use-gesture/react": 10.3.1
   "@vite-pwa/assets-generator": 1.0.2
   "@vitejs/plugin-react": 6.0.3
@@ -123,11 +119,11 @@ catalog:
   oxlint-plugin-react-doctor: 0.7.1
   playwright: 1.61.1
   qr-code-styling: 1.9.2
-  react: 0.0.0-experimental-8a8e9a7e-20250912
+  react: 19.2.7
   react-aria: ^3.42.0
   react-aria-components: 1.19.0
   react-doctor: 0.7.1
-  react-dom: 0.0.0-experimental-8a8e9a7e-20250912
+  react-dom: 19.2.7
   react-modal-sheet: 5.6.0
   react-window: 2.2.7
   rollup: 4.62.2
@@ -135,7 +131,6 @@ catalog:
   sharp: 0.35.3
   skills: 1.5.14
   sonner: 2.0.7
-  suspense: 0.1.0
   svgexport: 0.4.2
   svgo: 4.0.1
   syncpack: 15.3.2

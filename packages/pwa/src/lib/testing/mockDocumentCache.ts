@@ -1,5 +1,5 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import { STATUS_RESOLVED } from "suspense";
+import { STATUS_RESOLVED } from "@trizum/react-suspense-cache";
 import { vi } from "vite-plus/test";
 
 type DocumentCacheMock<TDocument> = {

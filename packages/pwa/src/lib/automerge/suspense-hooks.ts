@@ -1,8 +1,7 @@
 import type { AnyDocumentId, Doc, DocHandle, Repo } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { useSyncExternalStore } from "react";
-
-import { createCache, type Cache } from "suspense";
+import { createCache, useCacheValue, type Cache } from "@trizum/react-suspense-cache";
 
 // TODO: These retry and delay stuff should be moved to the trizum SDK in the future, suspense hooks
 // should be simpler
@@ -273,7 +272,7 @@ export const multipleDocumentCache = withLiveSubscription<
 export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> | undefined {
   const repo = useRepo();
 
-  return handleCache.read(repo, id) as DocHandle<T> | undefined;
+  return useCacheValue(handleCache, repo, id) as DocHandle<T> | undefined;
 }
 
 interface UseSuspenseDocumentOptions<IsRequired extends boolean = false> {
@@ -298,8 +297,8 @@ export function useSuspenseDocument<
   const repo = useRepo();
   const handle = useSuspenseHandle<T>(id);
 
-  // Suspense cache read to ensure the document is loaded
-  documentCache.read(repo, id);
+  // Suspense cache read to ensure the document is loaded.
+  useCacheValue(documentCache, repo, id);
 
   const doc = useSyncExternalStore(
     (change) => {
@@ -334,7 +333,7 @@ export function useMultipleSuspenseDocument<
 >(ids: AnyDocumentId[], options?: Options): { doc: Doc<T> | undefined; handle: DocHandle<T> }[] {
   const repo = useRepo();
 
-  multipleDocumentCache.read(repo, ids);
+  useCacheValue(multipleDocumentCache, repo, ids);
 
   const docs = useSyncExternalStore(
     (change) => {
@@ -351,6 +350,6 @@ export function useMultipleSuspenseDocument<
 
   return (docs ?? []).map((doc, index) => ({
     doc: doc as Doc<T> | undefined,
-    handle: handleCache.read(repo, ids[index]) as DocHandle<T>,
+    handle: handleCache.getValueIfCached(repo, ids[index]) as DocHandle<T>,
   }));
 }
