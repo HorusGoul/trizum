@@ -28,7 +28,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { hasExpenseEditOpenedFromDetailState } from "./party_.$partyId.expense.$expenseId/-expenseEditRouteState.ts";
+import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 
 interface EditExpenseSearchParams {
   media?: number;
