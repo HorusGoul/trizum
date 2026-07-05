@@ -191,8 +191,8 @@ catalogs:
       specifier: 1.0.0
       version: 1.0.0
     barcode-detector:
-      specifier: ^3.0.8
-      version: 3.2.0
+      specifier: 3.0.8
+      version: 3.0.8
     better-auth:
       specifier: 1.6.23
       version: 1.6.23
@@ -525,7 +525,7 @@ importers:
         version: link:../logging
       '@trizum/pwa':
         specifier: workspace:*
-        version: file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.2.3)(@opentelemetry/api@1.9.1)(@sentry/core@10.63.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)
+        version: file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.2.3)(@opentelemetry/api@1.9.1)(@sentry/core@10.63.0)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)
       capacitor-plugin-safe-area:
         specifier: 'catalog:'
         version: 5.0.0(@capacitor/core@8.4.1)
@@ -646,7 +646,7 @@ importers:
         version: 10.3.1(react@0.0.0-experimental-d025ddd3-20240722)
       barcode-detector:
         specifier: 'catalog:'
-        version: 3.2.0(@types/emscripten@1.41.5)
+        version: 3.0.8(@types/emscripten@1.41.5)
       better-auth:
         specifier: 'catalog:'
         version: 1.6.23(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@libsql/client@0.17.4)(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(kysely@0.29.2))(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)(vitest@4.1.9)
@@ -5143,8 +5143,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  barcode-detector@3.2.0:
-    resolution: {integrity: sha512-MrT5TT058ptG5YB157pHLfXKVpp0BKEfQBOb8QvzTbatzmLDu85JJ0Gd/sCYwbwdwStJvxsYflrSN6D6E4Ndyw==}
+  barcode-detector@3.0.8:
+    resolution: {integrity: sha512-Z9jzzE8ngEDyN9EU7lWdGgV07mcnEQnrX8W9WecXDqD2v+5CcVjt9+a134a5zb+kICvpsrDx6NYA6ay4LGFs8A==}
 
   bare-events@2.8.2:
     resolution: {integrity: sha512-riJjyv1/mHLIPX4RwiK+oW9/4c3TEUeORHKefKAKnZ5kyslbN+HXowtbaVEqt4IMUB7OXlfixcs6gsFeo/jhiQ==}
@@ -9132,8 +9132,8 @@ packages:
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
-  zxing-wasm@3.1.0:
-    resolution: {integrity: sha512-5+3V1wPRx4gvbeLH2jB7n2cKrYJ1q4i3QgjnBUtrDPeqxJSi6BdzKJg4y6aF6bgW8zfntnYJyrkqFMevDhL2NA==}
+  zxing-wasm@2.2.4:
+    resolution: {integrity: sha512-1gq5zs4wuNTs5umWLypzNNeuJoluFvwmvjiiT3L9z/TMlVveeJRWy7h90xyUqCe+Qq0zL0w7o5zkdDMWDr9aZA==}
     peerDependencies:
       '@types/emscripten': '>=1.39.6'
 
@@ -12456,7 +12456,7 @@ snapshots:
     dependencies:
       '@logtape/logtape': 2.2.3
 
-  '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.2.3)(@opentelemetry/api@1.9.1)(@sentry/core@10.63.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)':
+  '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.2.3)(@opentelemetry/api@1.9.1)(@sentry/core@10.63.0)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.9)':
     dependencies:
       '@automerge/automerge': 3.2.6
       '@automerge/automerge-repo': 2.5.6
@@ -12487,7 +12487,7 @@ snapshots:
       '@trizum/logging': file:packages/logging
       '@trizum/tw-dynamic-themes': file:packages/tw-dynamic-themes
       '@use-gesture/react': 10.3.1(react@0.0.0-experimental-d025ddd3-20240722)
-      barcode-detector: 3.2.0(@types/emscripten@1.41.5)
+      barcode-detector: 3.0.8(@types/emscripten@1.41.5)
       better-auth: 1.6.23(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@libsql/client@0.17.4)(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(kysely@0.29.2))(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)(vitest@4.1.9)
       browser-image-compression: 2.0.2
       capacitor-plugin-safe-area: 5.0.0(@capacitor/core@8.4.1)
@@ -13172,9 +13172,9 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  barcode-detector@3.2.0(@types/emscripten@1.41.5):
+  barcode-detector@3.0.8(@types/emscripten@1.41.5):
     dependencies:
-      zxing-wasm: 3.1.0(@types/emscripten@1.41.5)
+      zxing-wasm: 2.2.4(@types/emscripten@1.41.5)
     transitivePeerDependencies:
       - '@types/emscripten'
 
@@ -17641,7 +17641,7 @@ snapshots:
 
   zod@4.4.3: {}
 
-  zxing-wasm@3.1.0(@types/emscripten@1.41.5):
+  zxing-wasm@2.2.4(@types/emscripten@1.41.5):
     dependencies:
       '@types/emscripten': 1.41.5
       type-fest: 5.7.0

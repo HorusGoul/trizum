@@ -98,7 +98,7 @@ catalog:
   agent-browser: 0.31.1
   all-contributors-cli: 6.26.1
   babel-plugin-react-compiler: 1.0.0
-  barcode-detector: ^3.0.8
+  barcode-detector: 3.0.8
   better-auth: 1.6.23
   browser-image-compression: 2.0.2
   capacitor-plugin-safe-area: 5.0.0

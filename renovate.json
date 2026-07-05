@@ -81,6 +81,12 @@
       "enabled": false
     },
     {
+      "description": "Do not update barcode-detector; newer ZXing WASM releases break QR scanning on affected Android Chrome devices.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["barcode-detector"],
+      "enabled": false
+    },
+    {
       "description": "Keep tightly coupled React support major updates together.",
       "matchManagers": ["npm"],
       "matchPackageNames": [
