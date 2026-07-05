@@ -3,10 +3,14 @@ import { expect, type Locator, type Page } from "@playwright/test";
 export class ExpenseDetailPage {
   readonly page: Page;
   readonly backButton: Locator;
+  readonly menuButton: Locator;
+  readonly editMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.backButton = page.getByRole("button", { name: "Go Back" });
+    this.menuButton = page.getByRole("button", { name: "Menu" });
+    this.editMenuItem = page.getByRole("menuitem", { name: "Edit" });
   }
 
   heading(title: string) {
@@ -21,5 +25,10 @@ export class ExpenseDetailPage {
 
   async goBack() {
     await this.backButton.click();
+  }
+
+  async openEdit() {
+    await this.menuButton.click();
+    await this.editMenuItem.click();
   }
 }
