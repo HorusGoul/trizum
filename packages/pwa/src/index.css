@@ -57,7 +57,7 @@
 }
 
 @utility container {
-  width: auto;
+  width: 100%;
   margin-inline: auto;
   max-width: 42rem;
 }
