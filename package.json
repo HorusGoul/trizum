@@ -35,6 +35,7 @@
     "eslint-plugin-lingui": "catalog:",
     "oxlint-plugin-react-doctor": "catalog:",
     "react-doctor": "catalog:",
+    "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   },

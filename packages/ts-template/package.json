@@ -33,6 +33,7 @@
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vite-plus": "catalog:"
   }
 }
