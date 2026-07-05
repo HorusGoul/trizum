@@ -36,7 +36,6 @@
     "@automerge/automerge-repo": "catalog:",
     "@automerge/automerge-repo-network-websocket": "catalog:",
     "@hono/node-server": "catalog:",
-    "@hono/node-ws": "catalog:",
     "@kubiks/otel-drizzle": "catalog:",
     "@libsql/client": "catalog:",
     "@logtape/logtape": "catalog:",
@@ -47,11 +46,14 @@
     "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "hono": "catalog:",
+    "isomorphic-ws": "catalog:",
+    "ws": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@types/ws": "catalog:",
     "typescript": "catalog:"
   }
 }
