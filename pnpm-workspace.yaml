@@ -135,6 +135,7 @@ catalog:
   rollup-plugin-license: 3.7.1
   sharp: 0.35.3
   skills: 1.5.14
+  skills-npm: 1.2.0
   sonner: 2.0.7
   suspense: 0.1.0
   svgexport: 0.4.2

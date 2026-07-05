@@ -174,3 +174,6 @@ packages/server/build/
 .agents/*
 !.agents/skills/
 !.agents/skills/**
+
+# skills-npm generated agent skill symlinks
+**/skills/npm-*
