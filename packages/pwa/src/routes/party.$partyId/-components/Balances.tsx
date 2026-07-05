@@ -191,7 +191,8 @@ export function Balances({
             </h2>
 
             {allOtherDiffs.map((diff) => (
-              <BalanceActionItem key={diff.fromId + diff.toId} {...diff} />
+              // eslint-disable-next-line react-doctor/jsx-key -- Keep the explicit key after the spread so it wins if the diff shape ever changes.
+              <BalanceActionItem {...diff} key={diff.fromId + diff.toId} />
             ))}
           </>
         ) : null}
