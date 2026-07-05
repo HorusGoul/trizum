@@ -844,7 +844,14 @@ importers:
         version: 4.107.0
 
   packages/react-suspense-cache:
+    dependencies:
+      '@trizum/logging':
+        specifier: workspace:*
+        version: link:../logging
     devDependencies:
+      '@logtape/logtape':
+        specifier: 'catalog:'
+        version: 2.2.3
       '@trizum/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -12773,6 +12780,7 @@ snapshots:
 
   '@trizum/react-suspense-cache@file:packages/react-suspense-cache(react@19.2.7)':
     dependencies:
+      '@trizum/logging': file:packages/logging
       react: 19.2.7
 
   '@trizum/tw-dynamic-themes@file:packages/tw-dynamic-themes':

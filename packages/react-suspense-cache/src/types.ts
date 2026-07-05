@@ -110,8 +110,6 @@ export interface CacheMap<Key, Value> {
 export interface Cache<Params extends Array<any>, Value> {
   abort(...params: Params): boolean;
   cache(value: Value, ...params: Params): void;
-  disableDebugLogging(): void;
-  enableDebugLogging(): void;
   evict(...params: Params): boolean;
   evictAll(): void;
   getStatus(...params: Params): Status;
@@ -129,7 +127,6 @@ export type CreateCacheOptions<Params extends Array<any>, Value> = {
     immutable?: boolean;
   };
   debugLabel?: string;
-  debugLogging?: boolean;
   getKey?: (params: Params) => string;
   load: (params: Params, loadOptions: CacheLoadOptions) => PromiseLike<Value> | Value;
 };

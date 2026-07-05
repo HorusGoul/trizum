@@ -68,9 +68,6 @@ describe("createExternallyManagedCache", () => {
     });
     const subscriber = vi.fn<(data: unknown) => void>();
 
-    cache.enableDebugLogging();
-    cache.disableDebugLogging();
-
     cache.cacheValue("value:a", "a");
 
     expect(cache.read("a")).toBe("value:a");

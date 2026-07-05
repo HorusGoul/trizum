@@ -12,6 +12,9 @@ PWA, and adds React 19 hooks for consuming cache state through `use`,
 
 - [`src/createCache.ts`](./src/createCache.ts) implements the Suspense cache.
 - [`src/hooks.ts`](./src/hooks.ts) contains React cache-consumption hooks.
+- [`src/log.ts`](./src/log.ts) contains the package-local logging facade.
+- [`src/cacheKeys.ts`](./src/cacheKeys.ts), [`src/cacheMap.ts`](./src/cacheMap.ts),
+  and [`src/promise.ts`](./src/promise.ts) contain reusable cache utilities.
 - [`src/types.ts`](./src/types.ts) defines the compatibility types.
 - [`vite.config.ts`](./vite.config.ts) defines package-local Vite+ tasks.
 

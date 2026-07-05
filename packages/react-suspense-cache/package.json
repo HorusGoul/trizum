@@ -31,7 +31,11 @@
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch"
   },
+  "dependencies": {
+    "@trizum/logging": "workspace:*"
+  },
   "devDependencies": {
+    "@logtape/logtape": "catalog:",
     "@trizum/tsconfig": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

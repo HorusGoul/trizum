@@ -34,8 +34,6 @@ export function createExternallyManagedCache<Params extends Array<any>, Value>(
     decoratedCache as InternalCache<Params, Value>;
   const api: Omit<Cache<Params, Value>, "cache"> = {
     abort: (...params) => decoratedCache.abort(...params),
-    disableDebugLogging: () => decoratedCache.disableDebugLogging(),
-    enableDebugLogging: () => decoratedCache.enableDebugLogging(),
     evict: (...params) => decoratedCache.evict(...params),
     evictAll: () => decoratedCache.evictAll(),
     getStatus: (...params) => decoratedCache.getStatus(...params),

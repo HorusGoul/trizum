@@ -6,7 +6,11 @@ import {
   STATUS_REJECTED,
   STATUS_RESOLVED,
 } from "./constants.js";
+import { createDefaultCacheMap, getCacheMapValues } from "./cacheMap.js";
+import { getDefaultCacheKey } from "./cacheKeys.js";
 import { createDeferred } from "./deferred.js";
+import { getLogger } from "./log.js";
+import { isPromiseLike } from "./promise.js";
 import {
   createPendingRecord,
   createResolvedRecord,
@@ -18,46 +22,32 @@ import {
 } from "./records.js";
 import type {
   Cache,
-  CacheMap,
   CreateCacheOptions,
   InternalCache,
   PendingRecord,
-  Record,
+  Record as CacheRecord,
   Status,
   SubscriptionCallback,
   SubscriptionData,
   UnsubscribeCallback,
 } from "./types.js";
 
-function isPromiseLike<Type>(value: PromiseLike<Type> | Type): value is PromiseLike<Type> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "then" in value &&
-    typeof value.then === "function"
-  );
-}
-
-function defaultGetKey(params: Array<any>): string {
-  return params.map((param) => String(param)).join(",");
-}
-
-function defaultGetCache<Value>(): CacheMap<string, Record<Value>> {
-  return new Map<string, Record<Value>>();
-}
+const logger = getLogger("createCache");
 
 export function createCache<Params extends Array<any>, Value>(
   options: CreateCacheOptions<Params, Value>,
 ): Cache<Params, Value> {
-  let { config = {}, debugLogging = false, debugLabel, getKey = defaultGetKey, load } = options;
-  const { getCache = defaultGetCache } = config;
+  let { config = {}, debugLabel, getKey = getDefaultCacheKey, load } = options;
+  const { getCache = createDefaultCacheMap } = config;
   const recordMap = getCache(onExternalCacheEviction);
   const subscriberMap = new Map<string, Set<SubscriptionCallback<Value>>>();
 
-  function debugLog(_message: string, _params?: Params, ..._args: unknown[]) {
-    if (!debugLogging) {
-      return;
-    }
+  function debugLog(operation: string, properties: Record<string, unknown> = {}) {
+    logger.debug("React suspense cache {operation}", {
+      ...(debugLabel ? { cacheLabel: debugLabel } : {}),
+      operation,
+      ...properties,
+    });
   }
 
   function abort(...params: Params): boolean {
@@ -68,7 +58,7 @@ export function createCache<Params extends Array<any>, Value>(
       return false;
     }
 
-    debugLog("abort()", params);
+    debugLog("abort", { paramsCount: params.length });
     record.data.abortController.abort();
     recordMap.delete(cacheKey);
     notifySubscribers(params, { status: STATUS_ABORTED });
@@ -80,7 +70,10 @@ export function createCache<Params extends Array<any>, Value>(
     const cacheKey = getKey(params);
     const record = recordMap.get(cacheKey);
 
-    debugLog("cache()", params);
+    debugLog("cache", {
+      paramsCount: params.length,
+      previousStatus: record?.data.status ?? STATUS_NOT_FOUND,
+    });
 
     if (record && isPendingRecord(record)) {
       const { abortController, deferred } = record.data;
@@ -99,19 +92,14 @@ export function createCache<Params extends Array<any>, Value>(
     });
   }
 
-  function disableDebugLogging(): void {
-    debugLogging = false;
-  }
-
-  function enableDebugLogging(): void {
-    debugLogging = true;
-  }
-
   function evict(...params: Params): boolean {
     const cacheKey = getKey(params);
     const record = recordMap.get(cacheKey);
 
-    debugLog("evict()", params);
+    debugLog("evict", {
+      paramsCount: params.length,
+      previousStatus: record?.data.status ?? STATUS_NOT_FOUND,
+    });
 
     if (record && isPendingRecord(record)) {
       record.data.abortController.abort();
@@ -124,9 +112,9 @@ export function createCache<Params extends Array<any>, Value>(
   }
 
   function evictAll(): void {
-    debugLog("evictAll()");
+    debugLog("evictAll", { subscriberCount: subscriberMap.size });
 
-    for (const record of recordMapValues()) {
+    for (const record of getCacheMapValues(recordMap)) {
       if (isPendingRecord(record)) {
         record.data.abortController.abort();
       }
@@ -143,20 +131,23 @@ export function createCache<Params extends Array<any>, Value>(
     subscriberMap.clear();
   }
 
-  function getRecord(...params: Params): Record<Value> | undefined {
+  function getRecord(...params: Params): CacheRecord<Value> | undefined {
     return recordMap.get(getKey(params));
   }
 
-  function getOrCreateRecord(...params: Params): Record<Value> {
+  function getOrCreateRecord(...params: Params): CacheRecord<Value> {
     const cacheKey = getKey(params);
     let record = recordMap.get(cacheKey);
 
     if (record) {
-      debugLog("read() cache hit", params);
+      debugLog("read-hit", {
+        paramsCount: params.length,
+        status: record.data.status,
+      });
       return record;
     }
 
-    debugLog("read() cache miss", params);
+    debugLog("read-miss", { paramsCount: params.length });
 
     const abortController = new AbortController();
     const deferred = createDeferred<Value>(debugLabel ? `${debugLabel} ${cacheKey}` : cacheKey);
@@ -318,22 +309,32 @@ export function createCache<Params extends Array<any>, Value>(
       const value = isPromiseLike(valueOrPromise) ? await valueOrPromise : valueOrPromise;
 
       if (abortController.signal.aborted || getRecord(...params) !== record) {
+        debugLog("load-result-ignored", {
+          aborted: abortController.signal.aborted,
+          paramsCount: params.length,
+        });
         return;
       }
 
       updateRecordToResolved(record, value);
       deferred.resolve(value);
+      debugLog("load-resolved", { paramsCount: params.length });
       notifySubscribers(params, {
         status: STATUS_RESOLVED,
         value,
       });
     } catch (error) {
       if (abortController.signal.aborted || getRecord(...params) !== record) {
+        debugLog("load-error-ignored", {
+          aborted: abortController.signal.aborted,
+          paramsCount: params.length,
+        });
         return;
       }
 
       updateRecordToRejected(record, error);
       deferred.reject(error);
+      debugLog("load-rejected", { paramsCount: params.length });
       notifySubscribers(params, {
         error,
         status: STATUS_REJECTED,
@@ -345,20 +346,14 @@ export function createCache<Params extends Array<any>, Value>(
     const set = subscriberMap.get(key);
 
     if (!set) {
+      debugLog("external-eviction-ignored");
       return;
     }
 
+    debugLog("external-eviction", { subscriberCount: set.size });
     for (const callback of set) {
       callback({ status: STATUS_NOT_FOUND });
     }
-  }
-
-  function recordMapValues(): Record<Value>[] {
-    if (recordMap instanceof Map) {
-      return Array.from(recordMap.values());
-    }
-
-    return [];
   }
 
   const cacheApi: InternalCache<Params, Value> = {
@@ -368,8 +363,6 @@ export function createCache<Params extends Array<any>, Value>(
     __recordMap: recordMap,
     abort,
     cache,
-    disableDebugLogging,
-    enableDebugLogging,
     evict,
     evictAll,
     getStatus,

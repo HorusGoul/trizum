@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
+import { resetSync, type LogRecord, type Sink } from "@logtape/logtape";
+import { configureTrizumLogging } from "@trizum/logging";
 import {
   STATUS_ABORTED,
   STATUS_NOT_FOUND,
@@ -12,6 +14,11 @@ import type { CacheMap, Record } from "./types.js";
 describe("createCache", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetSync();
+  });
+
+  afterEach(() => {
+    resetSync();
   });
 
   test("loads values once per cache key", async () => {
@@ -43,6 +50,54 @@ describe("createCache", () => {
     expect(cache.readAsync(1, "a")).toBe("value:1:a");
     expect(cache.readAsync(1, "b")).toBe("value:1:b");
     expect(load).toHaveBeenCalledTimes(2);
+  });
+
+  test("writes debug logs through trizum logging", () => {
+    const logs = createRecordingSink();
+    const cache = createCache<[string], string>({
+      debugLabel: "test-cache",
+      getKey: ([id]) => `secret-key:${id}`,
+      load: ([id]) => `value:${id}`,
+    });
+
+    configureTrizumLogging({
+      extraSinks: { test: logs.sink },
+      lowestLevel: "debug",
+      reset: true,
+      surface: "react-suspense-cache",
+      surfaceSinks: ["test"],
+    });
+
+    cache.readAsync("a");
+    cache.evict("a");
+    cache.evict("missing");
+
+    expect(logs.records).toHaveLength(4);
+    expect(logs.records.map((record) => record.properties.operation)).toEqual([
+      "read-miss",
+      "load-resolved",
+      "evict",
+      "evict",
+    ]);
+    expect(logs.records[0]).toMatchObject({
+      category: ["trizum", "react-suspense-cache", "createCache"],
+      level: "debug",
+      properties: {
+        cacheLabel: "test-cache",
+        operation: "read-miss",
+        paramsCount: 1,
+      },
+    });
+    expect(logs.records.map((record) => record.properties)).not.toContainEqual(
+      expect.objectContaining({
+        cacheKey: expect.anything(),
+        params: expect.anything(),
+      }),
+    );
+    expect(JSON.stringify(logs.records.map((record) => record.properties))).not.toContain(
+      "secret-key:a",
+    );
+    expect(JSON.stringify(logs.records.map((record) => record.properties))).not.toContain('"a"');
   });
 
   test("read returns resolved values", async () => {
@@ -386,4 +441,13 @@ function createTestDeferred<Value>() {
       }
     },
   };
+}
+
+function createRecordingSink() {
+  const records: LogRecord[] = [];
+  const sink: Sink = (record) => {
+    records.push(record);
+  };
+
+  return { records, sink };
 }
