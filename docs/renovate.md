@@ -44,6 +44,9 @@ Vite core package, Vitest, Vite/Vitest plugins, and adjacent toolchain packages
 such as Rolldown, tsdown, Oxlint, Oxfmt, and Vite Task are reviewed together
 instead of being buried in the broad non-major dependency group.
 
+React Doctor dependencies are grouped together so the CLI and matching Oxlint
+plugin stay in sync.
+
 Most major updates stay independent, but tightly coupled dependency families
 still have major grouping rules so packages that need to move together are
 reviewed together. `react` and `react-dom` updates are disabled because the app
