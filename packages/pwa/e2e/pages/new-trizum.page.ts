@@ -9,6 +9,7 @@ export class NewTrizumPage {
   readonly page: Page;
   readonly heading: Locator;
   readonly nameField: Locator;
+  readonly descriptionField: Locator;
   readonly participantNames: Locator;
   readonly newParticipantNameField: Locator;
   readonly addParticipantButton: Locator;
@@ -18,6 +19,7 @@ export class NewTrizumPage {
     this.page = page;
     this.heading = page.getByRole("heading", { name: "New trizum" });
     this.nameField = page.getByRole("textbox", { name: /^Name$/ });
+    this.descriptionField = page.getByRole("textbox", { name: /^Description$/ });
     this.participantNames = page.getByRole("textbox", {
       name: /^Participant name$/,
     });
@@ -49,6 +51,10 @@ export class NewTrizumPage {
       await expect(this.participantNames).toHaveCount(participantCount + 1);
     }
 
+    await this.saveButton.click();
+  }
+
+  async save() {
     await this.saveButton.click();
   }
 }

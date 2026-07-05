@@ -129,7 +129,7 @@ function PartySettings() {
         }
       />
 
-      {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form to stale defaults after saving settings. */}
+      {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form fields after validation failures. */}
       <form
         id={formId}
         onSubmit={(event) => {

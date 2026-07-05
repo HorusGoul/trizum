@@ -117,9 +117,12 @@ function Who() {
         </form.Subscribe>
       </div>
 
+      {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form fields after validation failures. */}
       <form
         id={formId}
-        action={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
           void form.handleSubmit();
         }}
         className="container mt-2 flex flex-col gap-4 px-2"

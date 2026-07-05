@@ -286,9 +286,13 @@ export function ExpenseEditor({
         title={title}
       />
 
+      {/* eslint-disable-next-line react-doctor/no-prevent-default -- React form actions reset TanStack Form fields after validation failures. */}
       <form
         id={formId}
-        action={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
           if (form.state.isSubmitting || saveInFlightRef.current) {
             return;
           }
