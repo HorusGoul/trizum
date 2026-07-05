@@ -2,14 +2,14 @@ import { expect, type Locator, type Page } from "@playwright/test";
 
 export class ExpenseEditorPage {
   readonly page: Page;
-  readonly heading: Locator;
+  readonly addHeading: Locator;
   readonly titleField: Locator;
   readonly amountField: Locator;
   readonly saveButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.heading = page.getByRole("heading", { name: "New expense" });
+    this.addHeading = page.getByRole("heading", { name: "New expense" });
     this.titleField = page.getByLabel("Title");
     this.amountField = page.getByLabel("Amount");
     this.saveButton = page.getByRole("button", { name: "Save" });
@@ -21,7 +21,14 @@ export class ExpenseEditorPage {
 
   async expectLoaded() {
     await expect(this.page).toHaveURL(/\/party\/.+\/add(?:\?.*)?$/);
-    await expect(this.heading).toBeVisible();
+    await expect(this.addHeading).toBeVisible();
+  }
+
+  async expectEditLoaded(partyId: string, expenseTitle: string) {
+    await expect(this.page).toHaveURL(
+      new RegExp(`/party/${partyId}/expense/[^/?#]+/edit(?:\\?.*)?$`),
+    );
+    await expect(this.page.getByRole("heading", { name: `Editing ${expenseTitle}` })).toBeVisible();
   }
 
   async fillTitle(title: string) {

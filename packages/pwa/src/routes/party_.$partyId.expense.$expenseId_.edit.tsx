@@ -28,6 +28,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+import { hasExpenseEditOpenedFromDetailState } from "#src/lib/expenseEditRouteState.ts";
 
 interface EditExpenseSearchParams {
   media?: number;
@@ -144,14 +145,18 @@ function EditExpense() {
         __hash: calculateExpenseHash(expense),
       });
 
-      await navigate({
-        to: "/party/$partyId/expense/$expenseId",
-        replace: true,
-        params: {
-          partyId,
-          expenseId,
-        },
-      });
+      if (hasExpenseEditOpenedFromDetailState(currentLocation.state)) {
+        router.history.go(-1);
+      } else {
+        await navigate({
+          to: "/party/$partyId/expense/$expenseId",
+          replace: true,
+          params: {
+            partyId,
+            expenseId,
+          },
+        });
+      }
 
       toast.success(t`Expense updated`, {
         id: "update-expense",
