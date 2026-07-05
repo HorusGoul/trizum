@@ -33,6 +33,14 @@ import type {
 
 const logger = getLogger("createCache");
 
+function createInvalidatedPendingRecordError(operation: string): Error {
+  const error = new Error(`Cache entry was ${operation}`);
+
+  error.name = "AbortError";
+
+  return error;
+}
+
 export function createCache<Params extends Array<any>, Value>(
   options: CreateCacheOptions<Params, Value>,
 ): Cache<Params, Value> {
@@ -58,7 +66,7 @@ export function createCache<Params extends Array<any>, Value>(
     }
 
     debugLog("abort", { paramsCount: params.length });
-    record.data.abortController.abort();
+    rejectPendingRecord(record, createInvalidatedPendingRecordError("aborted"));
     recordMap.delete(cacheKey);
     notifySubscribers(params, { status: STATUS_ABORTED });
 
@@ -100,7 +108,7 @@ export function createCache<Params extends Array<any>, Value>(
     });
 
     if (record && isPendingRecord(record)) {
-      record.data.abortController.abort();
+      rejectPendingRecord(record, createInvalidatedPendingRecordError("evicted"));
     }
 
     const didDelete = recordMap.delete(cacheKey);
@@ -114,7 +122,7 @@ export function createCache<Params extends Array<any>, Value>(
 
     for (const record of getCacheMapValues(recordMap)) {
       if (isPendingRecord(record)) {
-        record.data.abortController.abort();
+        rejectPendingRecord(record, createInvalidatedPendingRecordError("evicted"));
       }
     }
 
@@ -277,6 +285,11 @@ export function createCache<Params extends Array<any>, Value>(
     for (const callback of set) {
       callback(subscriptionData);
     }
+  }
+
+  function rejectPendingRecord(record: PendingRecord<Value>, error: unknown): void {
+    record.data.abortController.abort();
+    updateRecordToRejected(record, error);
   }
 
   async function processPendingRecord(

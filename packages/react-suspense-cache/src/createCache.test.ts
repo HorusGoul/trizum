@@ -173,7 +173,7 @@ describe("createCache", () => {
     expect(cache.getValue("a")).toBe("manual:a");
   });
 
-  test("aborts pending records", () => {
+  test("aborts pending records and rejects pending read promises", async () => {
     let signal: AbortSignal | undefined;
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
@@ -185,10 +185,14 @@ describe("createCache", () => {
     const subscriber = vi.fn<(data: unknown) => void>();
 
     cache.subscribe(subscriber, "a");
-    void cache.readAsync("a");
+    const pending = cache.readAsync("a");
 
     expect(cache.abort("a")).toBe(true);
     expect(signal?.aborted).toBe(true);
+    await expect(pending).rejects.toMatchObject({
+      message: "Cache entry was aborted",
+      name: "AbortError",
+    });
     expect(cache.getStatus("a")).toBe(STATUS_NOT_FOUND);
     expect(subscriber).toHaveBeenLastCalledWith({ status: STATUS_ABORTED });
     expect(cache.abort("a")).toBe(false);
@@ -259,6 +263,27 @@ describe("createCache", () => {
     expect(cache.getStatus("a")).toBe(STATUS_NOT_FOUND);
   });
 
+  test("evicts pending records and rejects pending read promises", async () => {
+    let signal: AbortSignal | undefined;
+    const cache = createCache<[string], string>({
+      getKey: ([id]) => id,
+      load: (_params, loadOptions) => {
+        signal = loadOptions.signal;
+        return new Promise<string>(() => {});
+      },
+    });
+
+    const pending = cache.readAsync("a");
+
+    expect(cache.evict("a")).toBe(true);
+    expect(signal?.aborted).toBe(true);
+    await expect(pending).rejects.toMatchObject({
+      message: "Cache entry was evicted",
+      name: "AbortError",
+    });
+    expect(cache.getStatus("a")).toBe(STATUS_NOT_FOUND);
+  });
+
   test("evicts all records and clears subscribers", async () => {
     let signal: AbortSignal | undefined;
     const cache = createCache<[string], string>({
@@ -275,7 +300,7 @@ describe("createCache", () => {
     cache.subscribe(pendingSubscriber, "pending");
 
     void cache.readAsync("resolved");
-    void cache.readAsync("pending");
+    const pending = cache.readAsync("pending");
 
     expect(cache.getStatus("resolved")).toBe(STATUS_RESOLVED);
     expect(cache.getStatus("pending")).toBe(STATUS_PENDING);
@@ -283,6 +308,10 @@ describe("createCache", () => {
     cache.evictAll();
 
     expect(signal?.aborted).toBe(true);
+    await expect(pending).rejects.toMatchObject({
+      message: "Cache entry was evicted",
+      name: "AbortError",
+    });
     expect(cache.getStatus("resolved")).toBe(STATUS_NOT_FOUND);
     expect(cache.getStatus("pending")).toBe(STATUS_NOT_FOUND);
     expect(resolvedSubscriber).toHaveBeenLastCalledWith({ status: STATUS_NOT_FOUND });
