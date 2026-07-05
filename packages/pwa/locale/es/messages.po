@@ -1851,7 +1851,7 @@ msgstr "¡Configuración del grupo guardada!"
 msgid "Party shared!"
 msgstr "¡Grupo compartido!"
 
-#: src/routes/party_.$partyId.stats.tsx:44
+#: src/routes/party_.$partyId.stats.tsx:42
 msgid "Party stats"
 msgstr "Estadísticas del grupo"
 

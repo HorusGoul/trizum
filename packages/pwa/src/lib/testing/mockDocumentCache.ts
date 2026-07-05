@@ -1,11 +1,11 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import { STATUS_RESOLVED } from "@trizum/react-suspense-cache";
+import { STATUS_RESOLVED, type ReactUsePromise } from "@trizum/react-suspense-cache";
 import { vi } from "vite-plus/test";
 
 type DocumentCacheMock<TDocument> = {
   getStatus: (repo: Repo, documentId: DocumentId) => string;
   getValueIfCached: (repo: Repo, documentId: DocumentId) => TDocument | undefined;
-  readAsync: (repo: Repo, documentId: DocumentId) => TDocument | Promise<TDocument> | undefined;
+  readAsync: (repo: Repo, documentId: DocumentId) => ReactUsePromise<TDocument | undefined>;
   subscribe: (callback: () => void, repo: Repo, documentId: DocumentId) => () => void;
 };
 
@@ -60,19 +60,19 @@ export function createMockDocumentCacheCollection<
       const cachedDocument = cachedDocuments.get(documentId);
 
       if (cachedDocument) {
-        return cachedDocument;
+        return createFulfilledReadPromise(cachedDocument);
       }
 
       const availableDocument = availableDocuments.get(documentId);
 
       if (!availableDocument) {
-        return undefined;
+        return createFulfilledReadPromise(undefined);
       }
 
       cacheDocument(documentId);
       notifySubscribers(documentId);
 
-      return Promise.resolve(availableDocument);
+      return createFulfilledReadPromise(availableDocument);
     }),
     subscribe: vi.fn<DocumentCacheMock<TDocument>["subscribe"]>((callback, _: Repo, documentId) => {
       const callbacks = subscribers.get(documentId) ?? new Set<() => void>();
@@ -105,4 +105,13 @@ export function createMockDocumentCacheCollection<
       subscribers.clear();
     },
   };
+}
+
+function createFulfilledReadPromise<TValue>(value: TValue): ReactUsePromise<TValue> {
+  const promise = Promise.resolve(value) as ReactUsePromise<TValue>;
+
+  promise.status = "fulfilled";
+  promise.value = value;
+
+  return promise;
 }

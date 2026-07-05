@@ -176,9 +176,7 @@ async function loadPartyExpenseChunks(repo: Repo, chunkIds: readonly DocumentId[
     return;
   }
 
-  await Promise.all(
-    chunkIds.map((chunkId) => Promise.resolve(documentCache.readAsync(repo, chunkId))),
-  );
+  await Promise.all(chunkIds.map((chunkId) => documentCache.readAsync(repo, chunkId)));
 }
 
 function getExpensePaidAtTimestamp(expense: Expense): number {

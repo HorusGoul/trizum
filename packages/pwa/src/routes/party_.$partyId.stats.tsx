@@ -14,9 +14,7 @@ export const Route = createFileRoute("/party_/$partyId/stats")({
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
     await Promise.all(
-      party.chunkRefs.map((chunkRef) =>
-        Promise.resolve(documentCache.readAsync(context.repo, chunkRef.chunkId)),
-      ),
+      party.chunkRefs.map((chunkRef) => documentCache.readAsync(context.repo, chunkRef.chunkId)),
     );
 
     return;

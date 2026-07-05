@@ -1919,7 +1919,7 @@ msgstr "Party settings saved!"
 msgid "Party shared!"
 msgstr "Party shared!"
 
-#: src/routes/party_.$partyId.stats.tsx:44
+#: src/routes/party_.$partyId.stats.tsx:42
 msgid "Party stats"
 msgstr "Party stats"
 

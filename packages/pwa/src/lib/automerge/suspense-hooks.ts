@@ -245,9 +245,7 @@ export const multipleDocumentCache = withLiveSubscription<
     createCache({
       async load(params) {
         const [repo, ids] = params;
-        const docs = await Promise.all(
-          ids.map((id) => Promise.resolve(documentCache.readAsync(repo, id))),
-        );
+        const docs = await Promise.all(ids.map((id) => documentCache.readAsync(repo, id)));
 
         function onChange() {
           onUpdate(
