@@ -113,6 +113,7 @@ catalog:
   heic-to: 1.5.2
   hono: 4.12.27
   jose: 6.2.3
+  jsdom: 29.1.1
   lucide-static: 1.23.0
   mathjs: 15.2.0
   motion: 12.42.2
