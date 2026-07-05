@@ -27,6 +27,8 @@ const buildTarget = ["edge88", "firefox78", "chrome87", "safari14.1"];
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
+const browserNodeUtilShim = path.resolve(packageRoot, "src/lib/browserNodeUtil.ts");
+const objectInspectUtilShim = path.resolve(packageRoot, "src/lib/objectInspectUtil.ts");
 const logtapeSentryBrowserUtil = path.resolve(
   path.dirname(packageRequire.resolve("@logtape/sentry/package.json")),
   "dist/util.js",
@@ -150,6 +152,14 @@ export default defineConfig(({ mode }) => {
           replacement: logtapeSentryBrowserUtil,
         },
         {
+          find: /^node:util$/,
+          replacement: browserNodeUtilShim,
+        },
+        {
+          find: /^util$/,
+          replacement: browserNodeUtilShim,
+        },
+        {
           // Cloudflare Worker validation does not expose CommonJS require.
           find: /^debug$/,
           replacement: "debug/src/browser.js",
@@ -163,6 +173,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       ...(isTest ? [] : [cloudflare()]),
+      objectInspectUtilPlugin(),
       tanstackRouter(),
       react(),
       babel({
@@ -305,6 +316,20 @@ function clientTopLevelAwaitPlugin(): Plugin {
   return perEnvironmentPlugin("trizum-client-top-level-await", (environment) =>
     environment.config.consumer === "client" ? topLevelAwait() : false,
   );
+}
+
+function objectInspectUtilPlugin(): Plugin {
+  return {
+    name: "trizum-object-inspect-browser-util",
+    enforce: "pre",
+    resolveId(source, importer) {
+      const normalizedImporter = importer?.replaceAll(path.sep, "/");
+
+      if (source === "./util.inspect" && normalizedImporter?.includes("/object-inspect/index.js")) {
+        return objectInspectUtilShim;
+      }
+    },
+  };
 }
 
 function sentrySourcemapsPlugin(): Plugin {
