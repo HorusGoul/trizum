@@ -76,11 +76,10 @@ export function createCache<Params extends Array<any>, Value>(
     });
 
     if (record && isPendingRecord(record)) {
-      const { abortController, deferred } = record.data;
+      const { abortController } = record.data;
 
       abortController.abort();
       updateRecordToResolved(record, value);
-      deferred.resolve(value);
       recordMap.set(cacheKey, record);
     } else {
       recordMap.set(cacheKey, createResolvedRecord(value));
@@ -214,15 +213,7 @@ export function createCache<Params extends Array<any>, Value>(
   const read: Cache<Params, Value>["read"] = function useCacheRead(...params: Params): Value {
     const record = getOrCreateRecord(...params);
 
-    if (isPendingRecord(record)) {
-      return use(record.data.deferred.promise);
-    }
-
-    if (isResolvedRecord(record)) {
-      return record.data.value;
-    }
-
-    throw record.data.error;
+    return use(record.data.promise);
   };
 
   function readAsync(...params: Params): PromiseLike<Value> | Value {
@@ -302,8 +293,6 @@ export function createCache<Params extends Array<any>, Value>(
     record: PendingRecord<Value>,
     ...params: Params
   ): Promise<void> {
-    const { deferred } = record.data;
-
     try {
       const valueOrPromise = load(params, abortController);
       const value = isPromiseLike(valueOrPromise) ? await valueOrPromise : valueOrPromise;
@@ -317,7 +306,6 @@ export function createCache<Params extends Array<any>, Value>(
       }
 
       updateRecordToResolved(record, value);
-      deferred.resolve(value);
       debugLog("load-resolved", { paramsCount: params.length });
       notifySubscribers(params, {
         status: STATUS_RESOLVED,
@@ -333,7 +321,6 @@ export function createCache<Params extends Array<any>, Value>(
       }
 
       updateRecordToRejected(record, error);
-      deferred.reject(error);
       debugLog("load-rejected", { paramsCount: params.length });
       notifySubscribers(params, {
         error,

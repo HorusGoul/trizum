@@ -52,11 +52,10 @@ export function createExternallyManagedCache<Params extends Array<any>, Value>(
       const record = __getOrCreateRecord(...params);
 
       if (isPendingRecord(record)) {
-        const { abortController, deferred } = record.data;
+        const { abortController } = record.data;
 
         abortController.abort();
         updateRecordToRejected(record, error);
-        deferred.reject(error);
       } else {
         updateRecordToRejected(record as Record<Value>, error);
       }
@@ -69,11 +68,10 @@ export function createExternallyManagedCache<Params extends Array<any>, Value>(
       const record = __getOrCreateRecord(...params);
 
       if (isPendingRecord(record)) {
-        const { abortController, deferred } = record.data;
+        const { abortController } = record.data;
 
         abortController.abort();
         updateRecordToResolved(record, value);
-        deferred.resolve(value);
       } else {
         updateRecordToResolved(record as Record<Value>, value);
       }

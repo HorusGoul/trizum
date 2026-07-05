@@ -1,5 +1,6 @@
 import { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./constants.js";
 import { createDeferred } from "./deferred.js";
+import { createFulfilledReactPromise, createRejectedReactPromise } from "./promise.js";
 import type {
   Deferred,
   PendingRecord,
@@ -19,6 +20,7 @@ export function createPendingRecordData<Type>(
   return {
     abortController,
     deferred,
+    promise: deferred.promise,
     status: STATUS_PENDING,
   };
 }
@@ -26,17 +28,23 @@ export function createPendingRecordData<Type>(
 export function createResolvedRecordData<Type>(
   value: Type,
   metadata: unknown = null,
+  promise = createFulfilledReactPromise(value),
 ): ResolvedRecordData<Type> {
   return {
     metadata,
+    promise,
     status: STATUS_RESOLVED,
     value,
   };
 }
 
-export function createRejectedRecordData(error: unknown): RejectedRecordData {
+export function createRejectedRecordData<Type = never>(
+  error: unknown,
+  promise = createRejectedReactPromise<Type>(error),
+): RejectedRecordData<Type> {
   return {
     error,
+    promise,
     status: STATUS_REJECTED,
   };
 }
@@ -52,16 +60,22 @@ export function createResolvedRecord<Type>(value: Type): ResolvedRecord<Type> {
   return { data: createResolvedRecordData(value) };
 }
 
-export function createRejectedRecord(error: unknown): RejectedRecord {
+export function createRejectedRecord<Type = never>(error: unknown): RejectedRecord<Type> {
   return { data: createRejectedRecordData(error) };
 }
 
 export function updateRecordToResolved<Type>(record: Record<Type>, value: Type): void {
-  record.data = createResolvedRecordData(value);
+  const pendingData = isPendingRecord(record) ? record.data : undefined;
+
+  pendingData?.deferred.resolve(value);
+  record.data = createResolvedRecordData(value, null, pendingData?.promise);
 }
 
-export function updateRecordToRejected(record: Record<any>, error: unknown): void {
-  record.data = createRejectedRecordData(error);
+export function updateRecordToRejected<Type>(record: Record<Type>, error: unknown): void {
+  const pendingData = isPendingRecord(record) ? record.data : undefined;
+
+  pendingData?.deferred.reject(error);
+  record.data = createRejectedRecordData<Type>(error, pendingData?.promise);
 }
 
 export function isPendingRecord<Type>(record: Record<Type>): record is PendingRecord<Type> {
@@ -72,7 +86,7 @@ export function isResolvedRecord<Type>(record: Record<Type>): record is Resolved
   return record.data.status === STATUS_RESOLVED;
 }
 
-export function isRejectedRecord<Type>(record: Record<Type>): record is RejectedRecord {
+export function isRejectedRecord<Type>(record: Record<Type>): record is RejectedRecord<Type> {
   return record.data.status === STATUS_REJECTED;
 }
 
@@ -90,6 +104,6 @@ export function isResolvedRecordData<Type>(
 
 export function isRejectedRecordData<Type>(
   recordData: RecordData<Type>,
-): recordData is RejectedRecordData {
+): recordData is RejectedRecordData<Type> {
   return recordData.status === STATUS_REJECTED;
 }

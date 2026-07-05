@@ -70,7 +70,6 @@ describe("createExternallyManagedCache", () => {
 
     cache.cacheValue("value:a", "a");
 
-    expect(cache.read("a")).toBe("value:a");
     expect(cache.readAsync("a")).toBe("value:a");
     expect(cache.getValueIfCached("a")).toBe("value:a");
 

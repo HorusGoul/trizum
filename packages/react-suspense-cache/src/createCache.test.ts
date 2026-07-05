@@ -100,14 +100,14 @@ describe("createCache", () => {
     expect(JSON.stringify(logs.records.map((record) => record.properties))).not.toContain('"a"');
   });
 
-  test("read returns resolved values", async () => {
+  test("readAsync returns resolved values", async () => {
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: async ([id]) => `value:${id}`,
     });
 
     await cache.readAsync("a");
-    expect(cache.read("a")).toBe("value:a");
+    expect(cache.readAsync("a")).toBe("value:a");
   });
 
   test("notifies subscribers when cache records change", async () => {

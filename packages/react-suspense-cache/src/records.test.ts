@@ -29,8 +29,10 @@ describe("record helpers", () => {
     expect(data).toEqual({
       abortController,
       deferred,
+      promise: deferred.promise,
       status: STATUS_PENDING,
     });
+    expect(data.promise.status).toBe(STATUS_PENDING);
     expect(record.data).toEqual(data);
     expect(isPendingRecord(record)).toBe(true);
     expect(isResolvedRecord(record)).toBe(false);
@@ -46,15 +48,26 @@ describe("record helpers", () => {
 
     expect(resolvedData).toEqual({
       metadata: { source: "test" },
+      promise: resolvedData.promise,
       status: STATUS_RESOLVED,
       value: "value",
     });
     expect(rejectedData).toEqual({
       error,
+      promise: rejectedData.promise,
+      status: STATUS_REJECTED,
+    });
+    expect(resolvedData.promise).toMatchObject({
+      status: "fulfilled",
+      value: "value",
+    });
+    expect(rejectedData.promise).toMatchObject({
+      reason: error,
       status: STATUS_REJECTED,
     });
     expect(resolvedRecord.data).toEqual({
       metadata: null,
+      promise: resolvedRecord.data.promise,
       status: STATUS_RESOLVED,
       value: "value",
     });
@@ -66,12 +79,19 @@ describe("record helpers", () => {
   test("updates records between resolved and rejected states", () => {
     const error = new Error("failed");
     const record = createPendingRecord<string>();
+    const promise = record.data.promise;
 
     updateRecordToResolved(record, "value");
 
     expect(record.data).toEqual({
       metadata: null,
+      promise,
       status: STATUS_RESOLVED,
+      value: "value",
+    });
+    expect(record.data.promise).toBe(promise);
+    expect(record.data.promise).toMatchObject({
+      status: "fulfilled",
       value: "value",
     });
 
@@ -79,6 +99,12 @@ describe("record helpers", () => {
 
     expect(record.data).toEqual({
       error,
+      promise: record.data.promise,
+      status: STATUS_REJECTED,
+    });
+    expect(record.data.promise).not.toBe(promise);
+    expect(record.data.promise).toMatchObject({
+      reason: error,
       status: STATUS_REJECTED,
     });
   });

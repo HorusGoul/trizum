@@ -1,17 +1,24 @@
 import { STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./constants.js";
+import {
+  markReactPromiseFulfilled,
+  markReactPromisePending,
+  markReactPromiseRejected,
+} from "./promise.js";
 import type { Deferred, StatusPending, StatusRejected, StatusResolved } from "./types.js";
 
 export function createDeferred<Type>(debugLabel?: string): Deferred<Type> {
   let status: StatusPending | StatusRejected | StatusResolved = STATUS_PENDING;
   let rejectPromise: (error: unknown) => void = () => {};
-  let resolvePromise: (value: Type | PromiseLike<Type>) => void = () => {};
+  let resolvePromise: (value: Type) => void = () => {};
 
   const promise = new Promise<Type>((resolve, reject) => {
     rejectPromise = reject;
     resolvePromise = resolve;
   });
+  markReactPromisePending(promise);
+  const reactPromise = promise;
 
-  promise.catch(() => {
+  reactPromise.catch(() => {
     // Prevent unhandled rejections for records that are read imperatively.
   });
 
@@ -23,15 +30,17 @@ export function createDeferred<Type>(debugLabel?: string): Deferred<Type> {
 
   return {
     debugLabel,
-    promise,
+    promise: reactPromise,
     reject(error) {
       assertPending();
       status = STATUS_REJECTED;
+      markReactPromiseRejected(reactPromise, error);
       rejectPromise(error);
     },
     resolve(value) {
       assertPending();
       status = STATUS_RESOLVED;
+      markReactPromiseFulfilled(reactPromise, value);
       resolvePromise(value);
     },
     get status() {
