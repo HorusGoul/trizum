@@ -1,4 +1,4 @@
-import { getVariables, updateVariables } from "@horus.dev/tw-dynamic-themes/runtime";
+import { getVariables, updateVariables } from "@trizum/tw-dynamic-themes/runtime";
 
 export const defaultThemeHue = 250;
 

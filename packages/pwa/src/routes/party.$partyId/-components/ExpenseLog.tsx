@@ -34,9 +34,9 @@ export function ExpenseLog() {
 
   return (
     <>
-      <div className="h-2 flex-shrink-0" />
+      <div className="h-2 shrink-0" />
 
-      <div className="container relative flex min-h-0 flex-1 flex-col px-2">
+      <div className="relative container flex min-h-0 flex-1 flex-col px-2">
         <VirtualizedExpenseList
           expenses={filteredExpenses}
           partyId={party.id}
@@ -45,7 +45,7 @@ export function ExpenseLog() {
           loadNext={loadNext}
         />
 
-        <div className="pointer-events-none absolute inset-x-2 flex justify-end bottom-safe-offset-6">
+        <div className="bottom-safe-offset-6 pointer-events-none absolute inset-x-2 flex justify-end">
           {import.meta.env.DEV ? (
             <MenuTrigger>
               <IconButton

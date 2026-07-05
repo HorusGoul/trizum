@@ -79,7 +79,7 @@ function CurrencyFieldWithCalculator({
         icon={state.isActive ? "lucide.x" : "lucide.calculator"}
         aria-label={state.isActive ? t`Close calculator` : t`Open calculator`}
         color="transparent"
-        className={calculatorButtonClassName ?? "absolute bottom-1 right-1 h-8 w-8"}
+        className={calculatorButtonClassName ?? "absolute right-1 bottom-1 h-8 w-8"}
         iconClassName="size-4"
         onPress={state.isActive ? actions.deactivate : actions.activate}
       />

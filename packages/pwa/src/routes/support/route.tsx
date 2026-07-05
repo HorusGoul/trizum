@@ -13,10 +13,10 @@ export const Route = createFileRoute("/support")({
 function Support() {
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
 
-        <h1 className="max-h-12 truncate px-4 text-xl font-medium text-accent-900 dark:text-accent-100">
+        <h1 className="text-accent-900 dark:text-accent-100 max-h-12 truncate px-4 text-xl font-medium">
           <Trans>Support</Trans>
         </h1>
       </div>
@@ -25,7 +25,7 @@ function Support() {
         {/* Header Section */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
+            <div className="bg-accent-100 dark:bg-accent-800 flex h-16 w-16 items-center justify-center rounded-full">
               <Icon
                 icon="lucide.circle-help"
                 width={32}
@@ -33,7 +33,7 @@ function Support() {
                 className="text-accent-700 dark:text-accent-300"
               />
             </div>
-            <p className="text-lg text-accent-700 dark:text-accent-300">
+            <p className="text-accent-700 dark:text-accent-300 text-lg">
               <Trans>Need help with trizum? We&apos;re here to assist you.</Trans>
             </p>
           </div>
@@ -41,7 +41,7 @@ function Support() {
 
         {/* Contact Options */}
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Contact Us</Trans>
           </h2>
           <div className="flex flex-col gap-3">
@@ -57,7 +57,7 @@ function Support() {
 
         {/* Report Issues */}
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Report Issues</Trans>
           </h2>
           <div className="flex flex-col gap-3">
@@ -82,7 +82,7 @@ function Support() {
 
         {/* FAQ Section */}
         <section className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h2 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Frequently Asked Questions</Trans>
           </h2>
           <div className="flex flex-col gap-4">
@@ -102,7 +102,7 @@ function Support() {
         </section>
 
         {/* Footer */}
-        <section className="mt-8 border-t border-accent-200 pt-6 text-center text-sm text-accent-600 dark:border-accent-800 dark:text-accent-400">
+        <section className="border-accent-200 text-accent-600 dark:border-accent-800 dark:text-accent-400 mt-8 border-t pt-6 text-center text-sm">
           <p>
             <Trans>Thank you for using trizum. Your feedback helps us improve!</Trans>
           </p>

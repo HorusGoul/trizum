@@ -139,7 +139,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         {value && (
           <Button
             color="input-like"
-            className="absolute right-1 top-1 h-auto w-auto rounded-full p-1"
+            className="absolute top-1 right-1 h-auto w-auto rounded-full p-1"
             onPress={handleRemoveAvatar}
             isDisabled={isUploading}
             aria-label={t`Remove avatar`}
@@ -149,7 +149,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         )}
       </div>
 
-      <div className="flex h-32 w-max flex-shrink-0 flex-col gap-2">
+      <div className="flex h-32 w-max shrink-0 flex-col gap-2">
         <Button
           onPress={() => void openCamera()}
           color="input-like"

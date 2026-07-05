@@ -43,7 +43,7 @@ export function RouteMediaGallery({
     <ModalOverlay
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
-        `fixed inset-0 isolate z-50 ${isEntering ? "duration-300 ease-out animate-in fade-in" : ""} ${isExiting ? "duration-200 ease-in animate-out fade-out" : ""} `
+        `fixed inset-0 isolate z-50 ${isEntering ? "animate-in fade-in duration-300 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-200 ease-in" : ""} `
       }
       style={{
         backgroundColor: `rgba(0, 0, 0, ${backgroundOpacity})`,

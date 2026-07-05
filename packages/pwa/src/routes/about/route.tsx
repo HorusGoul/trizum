@@ -16,7 +16,7 @@ function About() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -28,8 +28,8 @@ function About() {
         {/* App Info Section */}
         <section className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-4xl font-bold text-accent-900 dark:text-accent-100">trizum</h2>
-            <div className="flex items-center justify-center gap-2 text-sm text-accent-600 dark:text-accent-400">
+            <h2 className="text-accent-900 dark:text-accent-100 text-4xl font-bold">trizum</h2>
+            <div className="text-accent-600 dark:text-accent-400 flex items-center justify-center gap-2 text-sm">
               <p>
                 <Trans>Version</Trans> {version}
               </p>
@@ -38,7 +38,7 @@ function About() {
                   href={`https://github.com/HorusGoul/trizum/commit/${commit}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded bg-accent-100 px-1 pt-1 font-mono leading-none text-accent-700 hover:bg-accent-200 hover:text-accent-900 dark:bg-accent-800 dark:text-accent-300 dark:hover:bg-accent-700 dark:hover:text-accent-100"
+                  className="bg-accent-100 text-accent-700 hover:bg-accent-200 hover:text-accent-900 dark:bg-accent-800 dark:text-accent-300 dark:hover:bg-accent-700 dark:hover:text-accent-100 rounded-sm px-1 pt-1 font-mono leading-none"
                 >
                   {commit}
                 </a>
@@ -46,7 +46,7 @@ function About() {
             </div>
           </div>
 
-          <p className="text-center text-lg text-accent-700 dark:text-accent-300">
+          <p className="text-accent-700 dark:text-accent-300 text-center text-lg">
             <Trans>
               Split bills with friends and family. Track, calculate, and settle expenses together.
             </Trans>
@@ -55,7 +55,7 @@ function About() {
 
         {/* Features Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Features</Trans>
           </h3>
           <ul className="flex flex-col gap-3">
@@ -79,7 +79,7 @@ function About() {
 
         {/* Links Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Links</Trans>
           </h3>
           <div className="flex flex-col gap-3">
@@ -115,7 +115,7 @@ function About() {
 
         {/* Contributors Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Contributors</Trans>
           </h3>
           <div className="flex flex-col gap-3">
@@ -126,7 +126,7 @@ function About() {
 
         {/* Credits Section */}
         <section className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-accent-900 dark:text-accent-100">
+          <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
             <Trans>Credits</Trans>
           </h3>
           <p className="text-accent-700 dark:text-accent-300">
@@ -141,7 +141,7 @@ function About() {
         </section>
 
         {/* Footer */}
-        <section className="mt-8 border-t border-accent-200 pt-6 text-center text-sm text-accent-600 dark:border-accent-800 dark:text-accent-400">
+        <section className="border-accent-200 text-accent-600 dark:border-accent-800 dark:text-accent-400 mt-8 border-t pt-6 text-center text-sm">
           <p>
             <Trans>© {currentYear} trizum</Trans>
           </p>

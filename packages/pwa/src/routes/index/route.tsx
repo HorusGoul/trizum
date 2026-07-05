@@ -75,12 +75,12 @@ function Index() {
   return (
     <>
       <div className="flex min-h-full flex-col">
-        <div className="container flex h-16 items-center pr-2 mt-safe">
+        <div className="mt-safe container flex h-16 items-center pr-2">
           <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
           <span
             aria-label="Beta"
-            className="mb-4 ml-0.5 font-mono text-xs font-semibold leading-none text-accent-600 dark:text-accent-400"
+            className="text-accent-600 dark:text-accent-400 mb-4 ml-0.5 font-mono text-xs leading-none font-semibold"
           >
             βeta
           </span>
@@ -189,9 +189,9 @@ function Index() {
               <NoActivePartiesCard />
             )}
 
-            <div className="flex-1 pb-safe-offset-12" />
+            <div className="pb-safe-offset-12 flex-1" />
 
-            <div className="sticky flex justify-end bottom-safe-offset-6">
+            <div className="bottom-safe-offset-6 sticky flex justify-end">
               <MenuTrigger>
                 <IconButton
                   aria-label={t`Add or create`}

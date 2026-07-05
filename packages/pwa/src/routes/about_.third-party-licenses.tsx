@@ -47,11 +47,11 @@ export const Route = createFileRoute("/about_/third-party-licenses")({
       </div>
 
       <div className="container flex flex-1 flex-col gap-4 px-4 py-6">
-        <p className="text-center text-danger-700 dark:text-danger-300">
+        <p className="text-danger-700 dark:text-danger-300 text-center">
           <Trans>Failed to load licenses. Please try again later.</Trans>
         </p>
         {error instanceof Error && (
-          <p className="text-center text-sm text-accent-600 dark:text-accent-400">
+          <p className="text-accent-600 dark:text-accent-400 text-center text-sm">
             {error.message}
           </p>
         )}
@@ -65,7 +65,7 @@ function ThirdPartyLicenses() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="container flex h-16 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/about" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
@@ -81,7 +81,7 @@ function ThirdPartyLicenses() {
           </Trans>
         </p>
 
-        <pre className="overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-accent-50 p-4 text-xs leading-relaxed text-accent-900 dark:bg-accent-900 dark:text-accent-100">
+        <pre className="bg-accent-50 text-accent-900 dark:bg-accent-900 dark:text-accent-100 overflow-x-auto rounded-lg p-4 text-xs leading-relaxed break-words whitespace-pre-wrap">
           {content}
         </pre>
       </div>

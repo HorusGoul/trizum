@@ -48,14 +48,14 @@ export function PartyParticipantRow({
           icon="lucide.trash"
           aria-label={t`Remove`}
           onPress={onRemove}
-          className="flex-shrink-0"
+          className="shrink-0"
         />
       ) : (
         <IconButton
           icon={isArchived ? "lucide.archive-restore" : "lucide.archive"}
           aria-label={isArchived ? t`Restore` : t`Archive`}
           onPress={onArchiveToggle}
-          className="flex-shrink-0"
+          className="shrink-0"
         />
       )}
     </div>

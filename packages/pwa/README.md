@@ -27,10 +27,11 @@ then use this document to decide where to work inside the PWA.
 - The app is offline-first and uses Automerge for shared, persisted data.
 - User-facing copy must use Lingui macros, then run `vp run lingui:extract`.
 - `src/routeTree.gen.ts` is generated. Do not edit it manually.
-- `src/generated/iconSprite.gen.ts` and `src/generated/iconSprite.svg` are
-  generated from the available icon catalog and current icon usage. They are
-  intentionally untracked; regenerate them with `vp run icons:generate` or let
-  the package scripts do it automatically instead of hand-editing them.
+- `src/generated/iconSprite.gen.ts`, `src/generated/iconSprite.svg`, and
+  `src/generated/tw-dynamic-themes.css` are generated from the available icon
+  catalog, current icon usage, and default dynamic theme hue. They are
+  intentionally untracked; regenerate them with `vp run codegen`, or let the
+  package scripts do it automatically instead of hand-editing them.
 
 ## Validation
 

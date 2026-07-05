@@ -165,7 +165,7 @@ export default function MediaGallery({
   return (
     <LazyMotion features={domAnimation}>
       <div ref={viewportRef} className="relative h-full w-full touch-none overflow-hidden">
-        <div className="flex h-full w-full select-none items-center justify-center [-webkit-user-drag:_none]">
+        <div className="flex h-full w-full items-center justify-center select-none [-webkit-user-drag:_none]">
           <m.div ref={ref} className="relative" style={{ x, y, scale }}>
             <div className="absolute inset-0" />
             <img
@@ -186,14 +186,14 @@ export default function MediaGallery({
         {showNavigation && (
           <>
             <GalleryButton
-              className="top-1/2 -translate-y-1/2 transform left-safe-offset-4"
+              className="left-safe-offset-4 top-1/2 -translate-y-1/2 transform"
               label={t`Previous`}
               icon="lucide.arrow-left"
               onClick={goToPrevious}
             />
 
             <GalleryButton
-              className="top-1/2 -translate-y-1/2 transform right-safe-offset-4"
+              className="right-safe-offset-4 top-1/2 -translate-y-1/2 transform"
               label={t`Next`}
               icon="lucide.arrow-right"
               onClick={goToNext}

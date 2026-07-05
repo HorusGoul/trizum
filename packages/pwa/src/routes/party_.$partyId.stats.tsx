@@ -32,7 +32,7 @@ function PartyStatsRoute() {
       ref={scrollElementRef}
       className="flex h-[100dvh] max-h-[100dvh] min-h-0 touch-pan-y flex-col overflow-y-auto overscroll-y-contain"
     >
-      <div className="container flex h-16 flex-shrink-0 items-center px-2 mt-safe">
+      <div className="mt-safe container flex h-16 shrink-0 items-center px-2">
         <BackButton
           fallbackOptions={{
             to: "/party/$partyId",

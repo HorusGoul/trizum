@@ -1,0 +1,45 @@
+{
+  "name": "@trizum/tw-dynamic-themes",
+  "version": "0.0.3",
+  "private": true,
+  "description": "Dynamic themes for Tailwind CSS",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "bin": {
+    "twdt": "./bin/twdt.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "dependencies": {
+    "culori": "catalog:"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "@types/culori": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

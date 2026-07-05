@@ -7,7 +7,7 @@ export function Menu<T extends object>({ className, ...props }: MenuProps<T>) {
   return (
     <AriaMenu
       className={cn(
-        "min-w-40 overflow-hidden rounded-xl bg-white shadow-lg focus-visible:outline-none dark:bg-accent-900 dark:shadow-none",
+        "min-w-40 overflow-hidden rounded-xl bg-white shadow-lg focus-visible:outline-hidden dark:bg-accent-900 dark:shadow-none",
         className,
       )}
       {...props}
@@ -33,9 +33,9 @@ export function MenuItem<T extends object>({
         cn(
           defaultClassName,
           className,
-          "flex cursor-pointer select-none items-center bg-accent-900 bg-opacity-0 px-4 py-4 outline-none transition-all dark:bg-accent-50 dark:bg-opacity-0",
-          (isFocusVisible || isHovered) && "bg-opacity-5 dark:bg-opacity-5",
-          isPressed && !isPending && "bg-opacity-10 dark:bg-opacity-10",
+          "flex cursor-pointer select-none items-center bg-accent-900/0 px-4 py-4 outline-hidden transition-all dark:bg-accent-50/0",
+          (isFocusVisible || isHovered) && "bg-accent-900/5 dark:bg-accent-50/5",
+          isPressed && !isPending && "bg-accent-900/10 dark:bg-accent-50/10",
           "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50",
         )
       }

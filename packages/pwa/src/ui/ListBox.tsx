@@ -22,7 +22,7 @@ function ListBox<T extends object>({ className, ...props }: AriaListBoxProps<T>)
       className={composeRenderProps(className, (className) =>
         cn(
           className,
-          "group overflow-auto rounded-md border bg-accent-900 p-1 text-accent-50 shadow-md outline-none",
+          "group overflow-auto rounded-md border bg-accent-900 p-1 text-accent-50 shadow-md outline-hidden",
           /* Empty */
           "data-[empty]:p-6 data-[empty]:text-center data-[empty]:text-sm",
         ),
@@ -41,7 +41,7 @@ const ListBoxItem = <T extends object>({
     <AriaListBoxItem
       className={composeRenderProps(className, (className) =>
         cn(
-          "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+          "relative flex w-full cursor-default select-none items-center rounded-xs px-2 py-1.5 text-sm outline-hidden",
           /* Disabled */
           "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           /* Focused */

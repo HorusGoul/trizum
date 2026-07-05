@@ -35,7 +35,7 @@ export function AppNumberField({
       {label ? <Label>{label}</Label> : null}
       <Input className={cn(inputClassName)} inputMode={inputMode} />
       {description && (
-        <Text className="text-sm text-accent-700 dark:text-accent-50" slot="description">
+        <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
           {description}
         </Text>
       )}

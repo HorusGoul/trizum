@@ -10,8 +10,8 @@ interface FeatureItemProps {
 export function FeatureItem({ icon, title, description }: FeatureItemProps) {
   return (
     <li className="flex gap-3">
-      <div className="flex-shrink-0">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-100 dark:bg-accent-800">
+      <div className="shrink-0">
+        <div className="bg-accent-100 dark:bg-accent-800 flex h-10 w-10 items-center justify-center rounded-full">
           <Icon
             icon={icon}
             width={20}
@@ -21,8 +21,8 @@ export function FeatureItem({ icon, title, description }: FeatureItemProps) {
         </div>
       </div>
       <div className="flex flex-col gap-1">
-        <h4 className="font-semibold text-accent-900 dark:text-accent-100">{title}</h4>
-        <p className="text-sm text-accent-600 dark:text-accent-400">{description}</p>
+        <h4 className="text-accent-900 dark:text-accent-100 font-semibold">{title}</h4>
+        <p className="text-accent-600 dark:text-accent-400 text-sm">{description}</p>
       </div>
     </li>
   );

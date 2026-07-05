@@ -133,7 +133,7 @@ export function PartyListCard({
       data-testid="party-list-card"
       {...mergeProps(hoverProps, focusProps, focusWithinProps)}
       className={cn(
-        "relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-sm transition-all duration-200 ease-in-out has-[>[data-party-card-surface][data-pressed]]:scale-[0.99] dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none",
+        "relative cursor-pointer rounded-xl border border-accent-200/80 bg-gradient-to-br from-white via-white to-accent-50/80 shadow-xs transition-all duration-200 ease-in-out has-[>[data-party-card-surface][data-pressed]]:scale-[0.99] dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900/70 dark:shadow-none",
         isHovered && "border-accent-300/90 shadow-md dark:border-accent-700 dark:shadow-none",
         isFocusWithin && "shadow-md dark:shadow-none",
         isFocusVisible && "border-accent-500 dark:border-accent-500 dark:shadow-none",
@@ -157,11 +157,11 @@ export function PartyListCard({
           hasSupportingCopy ? "items-start" : "items-center",
         )}
       >
-        <div className="relative mt-1 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border bg-accent-950 text-xl font-semibold text-white shadow-sm dark:border-accent-700/20 dark:bg-black/20 dark:text-accent-50 dark:shadow-none">
+        <div className="bg-accent-950 dark:border-accent-700/20 dark:text-accent-50 relative mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border text-xl font-semibold text-white shadow-xs dark:bg-black/20 dark:shadow-none">
           <span className="pt-0.5">{symbolOrFirstLetter}</span>
 
           {statusBadge ? (
-            <span className="absolute -bottom-0.5 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-accent-200 bg-white text-accent-700 shadow-sm dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200">
+            <span className="border-accent-200 text-accent-700 dark:border-accent-700 dark:bg-accent-950 dark:text-accent-200 absolute -right-1 -bottom-0.5 flex h-5 w-5 items-center justify-center rounded-full border bg-white shadow-xs">
               <Icon icon={statusBadge.icon} width={11} height={11} />
               <span className="sr-only">{statusBadge.label}</span>
             </span>
@@ -187,24 +187,24 @@ export function PartyListCard({
             className={({ defaultClassName }) =>
               cn(
                 defaultClassName,
-                "inline-flex max-w-full rounded-sm text-start outline-none transition-colors duration-200 ease-in-out",
+                "inline-flex max-w-full rounded-xs text-start outline-hidden transition-colors duration-200 ease-in-out",
                 isLargeScreen ? "pointer-events-auto" : "pointer-events-none",
               )
             }
           >
-            <span className="line-clamp-2 block text-lg font-semibold tracking-tight text-accent-950 sm:line-clamp-1 dark:text-accent-50">
+            <span className="text-accent-950 dark:text-accent-50 line-clamp-2 block text-lg font-semibold tracking-tight sm:line-clamp-1">
               {party.name}
             </span>
           </Link>
 
           {participantPreview ? (
-            <p className="mt-1 flex min-w-0 items-start gap-2 text-sm leading-6 text-accent-900/80 dark:text-accent-200">
+            <p className="text-accent-900/80 dark:text-accent-200 mt-1 flex min-w-0 items-start gap-2 text-sm leading-6">
               <Icon
                 icon="lucide.users"
                 width={16}
                 height={16}
                 aria-hidden="true"
-                className="mt-1 flex-shrink-0 opacity-90"
+                className="mt-1 shrink-0 opacity-90"
               />
               <span className="min-w-0 flex-1">
                 <span className="line-clamp-2 block sm:hidden">
@@ -218,7 +218,7 @@ export function PartyListCard({
           ) : null}
 
           {hasDescription ? (
-            <p className="mt-1 text-sm italic leading-6 text-accent-900 dark:text-accent-100/80">
+            <p className="text-accent-900 dark:text-accent-100/80 mt-1 text-sm leading-6 italic">
               {description}
             </p>
           ) : null}
@@ -228,7 +228,7 @@ export function PartyListCard({
           <div
             data-party-card-interactive=""
             className={cn(
-              "pointer-events-auto w-10 flex-shrink-0",
+              "pointer-events-auto w-10 shrink-0",
               hasDescription ? "pt-0.5" : undefined,
             )}
           >
@@ -239,9 +239,8 @@ export function PartyListCard({
                   aria-label={t`Party actions`}
                   color="transparent"
                   className={cn(
-                    "h-10 w-10 flex-shrink-0",
-                    isDesktopMenuOpen &&
-                      "bg-accent-950 bg-opacity-5 dark:bg-accent-50 dark:bg-opacity-5",
+                    "h-10 w-10 shrink-0",
+                    isDesktopMenuOpen && "bg-accent-950/5 dark:bg-accent-50/5",
                   )}
                 />
 

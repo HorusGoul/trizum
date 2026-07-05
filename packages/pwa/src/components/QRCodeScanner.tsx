@@ -229,9 +229,9 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
               />
 
               {/* Corner handles */}
-              <QRCodeFrameHandle className="absolute left-0 top-0" />
-              <QRCodeFrameHandle className="absolute right-0 top-0 rotate-90" />
-              <QRCodeFrameHandle className="absolute bottom-0 right-0 rotate-180" />
+              <QRCodeFrameHandle className="absolute top-0 left-0" />
+              <QRCodeFrameHandle className="absolute top-0 right-0 rotate-90" />
+              <QRCodeFrameHandle className="absolute right-0 bottom-0 rotate-180" />
               <QRCodeFrameHandle className="absolute bottom-0 left-0 -rotate-90" />
 
               {/* Status indicator */}
@@ -271,7 +271,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                     transition={{ type: "spring", duration: 0.5, bounce: 0.4 }}
                     className="absolute inset-0 flex items-center justify-center"
                   >
-                    <div className="flex size-16 items-center justify-center rounded-full bg-success-500">
+                    <div className="bg-success-500 flex size-16 items-center justify-center rounded-full">
                       <Icon icon="lucide.check" width={40} height={40} className="text-white" />
                     </div>
                   </motion.div>
@@ -290,7 +290,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}
-                      className="flex size-16 items-center justify-center rounded-full bg-danger-500"
+                      className="bg-danger-500 flex size-16 items-center justify-center rounded-full"
                     >
                       <Icon icon="lucide.x" width={40} height={40} className="text-white" />
                     </motion.div>
@@ -310,7 +310,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
         </div>
 
         {/* Instructions with gradient background */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent pb-safe">
+        <div className="pb-safe absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent">
           <AnimatePresence mode="wait">
             <motion.p
               key={state.status === "error" ? "error" : "default"}
@@ -318,7 +318,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
               transition={{ duration: 0.2 }}
-              className="pb-8 pt-12 text-center text-sm text-white"
+              className="pt-12 pb-8 text-center text-sm text-white"
             >
               {state.status === "error" ? (
                 <Trans>Try scanning another code</Trans>

@@ -11,7 +11,7 @@ interface AboutLinkProps {
 
 export function AboutLink({ href, icon, label, isInternal }: AboutLinkProps) {
   const className =
-    "flex items-center gap-3 rounded-lg bg-accent-50 px-4 py-3 text-accent-900 outline-none transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:text-accent-100 dark:hover:bg-accent-800";
+    "flex items-center gap-3 rounded-lg bg-accent-50 px-4 py-3 text-accent-900 outline-hidden transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:text-accent-100 dark:hover:bg-accent-800";
 
   const content = (
     <>

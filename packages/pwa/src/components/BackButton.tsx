@@ -10,7 +10,7 @@ export function BackButton({ fallbackOptions }: { fallbackOptions: Omit<ToOption
     <IconButton
       icon="lucide.arrow-left"
       aria-label={t`Go Back`}
-      className="flex-shrink-0"
+      className="shrink-0"
       onPress={() => {
         if (canGoBack) {
           history.go(-1);

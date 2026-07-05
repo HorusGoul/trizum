@@ -23,10 +23,10 @@ export function SupportLink({
     <a
       href={href}
       {...linkProps}
-      className="flex gap-4 rounded-lg bg-accent-50 p-4 outline-none transition-colors hover:bg-accent-100 focus-visible:ring-2 focus-visible:ring-accent-500 dark:bg-accent-900 dark:hover:bg-accent-800"
+      className="bg-accent-50 hover:bg-accent-100 focus-visible:ring-accent-500 dark:bg-accent-900 dark:hover:bg-accent-800 flex gap-4 rounded-lg p-4 outline-hidden transition-colors focus-visible:ring-2"
     >
-      <div className="flex-shrink-0">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-200 dark:bg-accent-700">
+      <div className="shrink-0">
+        <div className="bg-accent-200 dark:bg-accent-700 flex h-12 w-12 items-center justify-center rounded-full">
           <Icon
             icon={icon}
             width={24}
@@ -36,9 +36,9 @@ export function SupportLink({
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-1">
-        <h3 className="font-semibold text-accent-900 dark:text-accent-100">{title}</h3>
-        <p className="text-sm text-accent-600 dark:text-accent-400">{description}</p>
-        <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-accent-700 dark:text-accent-300">
+        <h3 className="text-accent-900 dark:text-accent-100 font-semibold">{title}</h3>
+        <p className="text-accent-600 dark:text-accent-400 text-sm">{description}</p>
+        <span className="text-accent-700 dark:text-accent-300 mt-1 inline-flex items-center gap-1 text-sm font-medium">
           {linkText}
           {isExternal && (
             <Icon icon="lucide.external-link" width={14} height={14} className="text-accent-500" />

@@ -33,7 +33,7 @@ export function TransferReviewCard({
     <div className="grid gap-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="text-sm font-medium text-accent-700 dark:text-accent-300">
+          <div className="text-accent-700 dark:text-accent-300 text-sm font-medium">
             <Trans>Debt being moved</Trans>
           </div>
           <div className="mt-1 text-xl font-semibold tracking-tight">
