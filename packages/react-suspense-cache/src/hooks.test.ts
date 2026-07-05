@@ -3,9 +3,9 @@
 import { act, createElement, Suspense, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
-import { STATUS_PENDING, STATUS_RESOLVED } from "./constants.js";
+import { STATUS_NOT_FOUND, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./constants.js";
 import { createCache } from "./createCache.js";
-import { useCacheStatus, useImperativeCacheValue } from "./hooks.js";
+import { useCacheStatus, useCacheValue, useImperativeCacheValue } from "./hooks.js";
 
 describe("react cache hooks", () => {
   const mountedRoots: TestRoot[] = [];
@@ -75,6 +75,22 @@ describe("react cache hooks", () => {
     expect(root.container.textContent).toBe("resolved");
   });
 
+  test("useCacheValue returns cached values", async () => {
+    const cache = createCache<[string], string>({
+      getKey: ([id]) => id,
+      load: async ([id]) => `value:${id}`,
+    });
+    const root = createTestRoot();
+    const ValueReader = createHookValueReader(cache);
+
+    mountedRoots.push(root);
+    cache.cache("value:a", "a");
+
+    await root.render(createElement(ValueReader, { id: "a" }));
+
+    expect(root.container.textContent).toBe("value:a");
+  });
+
   test("useImperativeCacheValue keeps the previous value while a refresh is pending", async () => {
     const deferred = createTestDeferred<string>();
     const cache = createCache<[string], string>({
@@ -97,6 +113,40 @@ describe("react cache hooks", () => {
     });
 
     expect(root.container.textContent).toBe("pending:old:a");
+  });
+
+  test("useImperativeCacheValue reports rejected values", async () => {
+    const error = new Error("load failed");
+    const cache = createCache<[string], string>({
+      getKey: ([id]) => id,
+      load: async () => {
+        throw error;
+      },
+    });
+    const root = createTestRoot();
+    const ImperativeReader = createImperativeReader(cache);
+
+    mountedRoots.push(root);
+
+    await expect(cache.readAsync("a")).rejects.toBe(error);
+    await root.render(createElement(ImperativeReader, { id: "a" }));
+
+    expect(root.container.textContent).toBe(`${STATUS_REJECTED}:load failed`);
+  });
+
+  test("useImperativeCacheValue reports missing values", async () => {
+    const cache = createCache<[string], string>({
+      getKey: ([id]) => id,
+      load: async ([id]) => `value:${id}`,
+    });
+    const root = createTestRoot();
+    const ImperativeReader = createImperativeReader(cache);
+
+    mountedRoots.push(root);
+
+    await root.render(createElement(ImperativeReader, { id: "a" }));
+
+    expect(root.container.textContent).toBe(`${STATUS_NOT_FOUND}:`);
   });
 });
 
@@ -136,6 +186,14 @@ function createCacheReader(cache: ReturnType<typeof createCache<[string], string
   return CacheReader;
 }
 
+function createHookValueReader(cache: ReturnType<typeof createCache<[string], string>>) {
+  function HookValueReader({ id }: { id: string }) {
+    return createElement("span", null, useCacheValue(cache, id));
+  }
+
+  return HookValueReader;
+}
+
 function createStatusReader(cache: ReturnType<typeof createCache<[string], string>>) {
   function StatusReader({ id }: { id: string }) {
     return createElement("span", null, useCacheStatus(cache, id));
@@ -147,8 +205,14 @@ function createStatusReader(cache: ReturnType<typeof createCache<[string], strin
 function createImperativeReader(cache: ReturnType<typeof createCache<[string], string>>) {
   function ImperativeReader({ id }: { id: string }) {
     const result = useImperativeCacheValue(cache, id);
+    const label =
+      result.status === STATUS_REJECTED
+        ? result.error instanceof Error
+          ? result.error.message
+          : String(result.error)
+        : (result.value ?? "");
 
-    return createElement("span", null, `${result.status}:${result.value ?? ""}`);
+    return createElement("span", null, `${result.status}:${label}`);
   }
 
   return ImperativeReader;
