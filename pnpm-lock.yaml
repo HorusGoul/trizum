@@ -164,8 +164,8 @@ catalogs:
       specifier: 1.168.19
       version: 1.168.19
     '@types/culori':
-      specifier: 2.0.4
-      version: 2.0.4
+      specifier: 2.1.1
+      version: 2.1.1
     '@types/node':
       specifier: 24.13.2
       version: 24.13.2
@@ -402,7 +402,7 @@ importers:
         version: 0.7.1
       react-doctor:
         specifier: 'catalog:'
-        version: 0.7.1(@emnapi/core@1.11.0)(eslint@10.6.0(jiti@2.7.0))(oxlint-tsgolint@0.24.0)
+        version: 0.7.1(eslint@10.6.0(jiti@2.7.0))(oxlint-tsgolint@0.24.0)
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@0.2.2
         version: '@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)'
@@ -965,7 +965,7 @@ importers:
         version: link:../tsconfig
       '@types/culori':
         specifier: 'catalog:'
-        version: 2.0.4
+        version: 2.1.1
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.2
@@ -4625,8 +4625,8 @@ packages:
   '@types/chai@5.2.2':
     resolution: {integrity: sha512-8kB30R7Hwqf40JPiKhVzodJs2Qc1ZJ5zuT3uzw5Hq/dhNCl3G3l83jfpdI1e20BP348+fV7VIL/+FxaXkqBmWg==}
 
-  '@types/culori@2.0.4':
-    resolution: {integrity: sha512-GeLW8+KBRkwqIgeGrU8EnNbBE2D7waYbQHkx2xnI5exlzSGTMpjWtDaHzLWK1PTYmyJN9u6dPvMYumFevDe+VA==}
+  '@types/culori@2.1.1':
+    resolution: {integrity: sha512-NzLYD0vNHLxTdPp8+RlvGbR2NfOZkwxcYGFwxNtm+WH2NuUNV8785zv1h0sulFQ5aFQ9n/jNDUuJeo3Bh7+oFA==}
 
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
@@ -8360,9 +8360,6 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  tailwind-merge@2.6.1:
-    resolution: {integrity: sha512-Oo6tHdpZsGpkKG88HJ8RR1rg/RdnEkQEfMoEk2x1XRI3F1AxeU+ijRXpiVUF4UbLfcxxRGw6TbUINKYdWVsQTQ==}
-
   tailwind-merge@3.6.0:
     resolution: {integrity: sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w==}
 
@@ -11515,12 +11512,11 @@ snapshots:
   '@oxc-resolver/binding-openharmony-arm64@11.21.3':
     optional: true
 
-  '@oxc-resolver/binding-wasm32-wasi@11.21.3(@emnapi/core@1.11.0)':
+  '@oxc-resolver/binding-wasm32-wasi@11.21.3':
     dependencies:
+      '@emnapi/core': 1.11.0
       '@emnapi/runtime': 1.11.0
       '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.0)(@emnapi/runtime@1.11.0)
-    transitivePeerDependencies:
-      - '@emnapi/core'
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@11.21.3':
@@ -12517,7 +12513,7 @@ snapshots:
       react-window: 2.2.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       sonner: 2.0.7(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
       suspense: 0.1.0(react-dom@0.0.0-experimental-d025ddd3-20240722(react@0.0.0-experimental-d025ddd3-20240722))(react@0.0.0-experimental-d025ddd3-20240722)
-      tailwind-merge: 2.6.1
+      tailwind-merge: 3.6.0
       ulidx: 2.4.1
       workbox-build: 7.4.1(@types/babel__core@7.20.5)
       workbox-window: 7.4.1
@@ -12622,7 +12618,7 @@ snapshots:
     dependencies:
       '@types/deep-eql': 4.0.2
 
-  '@types/culori@2.0.4': {}
+  '@types/culori@2.1.1': {}
 
   '@types/deep-eql@4.0.2': {}
 
@@ -13813,16 +13809,14 @@ snapshots:
 
   dequal@2.0.3: {}
 
-  deslop-js@0.7.1(@emnapi/core@1.11.0):
+  deslop-js@0.7.1:
     dependencies:
       '@oxc-project/types': 0.132.0
       fast-glob: 3.3.3
       minimatch: 10.2.5
       oxc-parser: 0.132.0
-      oxc-resolver: 11.21.3(@emnapi/core@1.11.0)
+      oxc-resolver: 11.21.3
       typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@emnapi/core'
 
   detect-indent@6.1.0: {}
 
@@ -15415,7 +15409,7 @@ snapshots:
       '@oxc-parser/binding-win32-ia32-msvc': 0.135.0
       '@oxc-parser/binding-win32-x64-msvc': 0.135.0
 
-  oxc-resolver@11.21.3(@emnapi/core@1.11.0):
+  oxc-resolver@11.21.3:
     optionalDependencies:
       '@oxc-resolver/binding-android-arm-eabi': 11.21.3
       '@oxc-resolver/binding-android-arm64': 11.21.3
@@ -15433,11 +15427,9 @@ snapshots:
       '@oxc-resolver/binding-linux-x64-gnu': 11.21.3
       '@oxc-resolver/binding-linux-x64-musl': 11.21.3
       '@oxc-resolver/binding-openharmony-arm64': 11.21.3
-      '@oxc-resolver/binding-wasm32-wasi': 11.21.3(@emnapi/core@1.11.0)
+      '@oxc-resolver/binding-wasm32-wasi': 11.21.3
       '@oxc-resolver/binding-win32-arm64-msvc': 11.21.3
       '@oxc-resolver/binding-win32-x64-msvc': 11.21.3
-    transitivePeerDependencies:
-      - '@emnapi/core'
 
   oxfmt@0.57.0(vite-plus@0.2.2(@opentelemetry/api@1.9.1)(@types/node@24.13.2)(@vitest/coverage-v8@4.1.9)(@voidzero-dev/vite-plus-core@0.2.2(@types/node@24.13.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0))(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)):
     dependencies:
@@ -15864,14 +15856,14 @@ snapshots:
       react-stately: 3.48.0(react@0.0.0-experimental-d025ddd3-20240722)
       use-sync-external-store: 1.6.0(react@0.0.0-experimental-d025ddd3-20240722)
 
-  react-doctor@0.7.1(@emnapi/core@1.11.0)(eslint@10.6.0(jiti@2.7.0))(oxlint-tsgolint@0.24.0):
+  react-doctor@0.7.1(eslint@10.6.0(jiti@2.7.0))(oxlint-tsgolint@0.24.0):
     dependencies:
       '@babel/code-frame': 7.29.7
       '@sentry/node': 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))
       agent-install: 0.0.5
       conf: 15.1.0
       confbox: 0.2.4
-      deslop-js: 0.7.1(@emnapi/core@1.11.0)
+      deslop-js: 0.7.1
       eslint-plugin-react-hooks: 7.1.1(eslint@10.6.0(jiti@2.7.0))
       jiti: 2.7.0
       magicast: 0.5.3
@@ -15884,7 +15876,6 @@ snapshots:
       vscode-uri: 3.1.0
       yaml: 2.9.0
     transitivePeerDependencies:
-      - '@emnapi/core'
       - '@opentelemetry/core'
       - '@opentelemetry/exporter-trace-otlp-http'
       - eslint
@@ -16702,8 +16693,6 @@ snapshots:
   systeminformation@5.31.3: {}
 
   tagged-tag@1.0.0: {}
-
-  tailwind-merge@2.6.1: {}
 
   tailwind-merge@3.6.0: {}
 
