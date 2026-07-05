@@ -40,6 +40,7 @@ import { resolveNativeDeepLink } from "./lib/nativeDeepLinks.ts";
 import {
   preventDuplicateHistoryEntries,
   pushHistoryWithoutDuplicateEntry,
+  shouldNavigateToPartyListOnNativeBack,
 } from "./lib/navigationHistory.ts";
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import type { Party } from "./models/party.ts";
@@ -208,6 +209,13 @@ if (Capacitor.isNativePlatform()) {
   void App.addListener("backButton", ({ canGoBack }) => {
     if (canGoBack) {
       router.history.go(-1);
+    } else if (
+      shouldNavigateToPartyListOnNativeBack({
+        canGoBack,
+        pathname: router.state.location.pathname,
+      })
+    ) {
+      void router.navigate({ to: "/", replace: true });
     } else {
       void App.exitApp();
     }
