@@ -145,7 +145,7 @@ export interface Cache<Params extends Array<any>, Value> {
   getValueIfCached(...params: Params): Value | undefined;
   prefetch(...params: Params): void;
   read(...params: Params): Value;
-  readAsync(...params: Params): PromiseLike<Value> | Value;
+  readAsync(...params: Params): ReactUsePromise<Value>;
   subscribe(callback: SubscriptionCallback<Value>, ...params: Params): UnsubscribeCallback;
 }
 
@@ -173,33 +173,3 @@ export type ExternallyManagedCache<Params extends Array<any>, Value> = Omit<
   cacheError(error: unknown, ...params: Params): void;
   cacheValue(value: Value, ...params: Params): void;
 };
-
-export type ImperativeNotFoundResponse = {
-  readonly error: undefined;
-  readonly status: StatusNotFound;
-  readonly value: undefined;
-};
-
-export type ImperativePendingResponse<Value> = {
-  readonly error: undefined;
-  readonly status: StatusPending;
-  readonly value: Value | undefined;
-};
-
-export type ImperativeErrorResponse = {
-  readonly error: unknown;
-  readonly status: StatusRejected;
-  readonly value: undefined;
-};
-
-export type ImperativeResolvedResponse<Value> = {
-  readonly error: undefined;
-  readonly status: StatusResolved;
-  readonly value: Value;
-};
-
-export type ImperativeCacheValue<Value> =
-  | ImperativeNotFoundResponse
-  | ImperativePendingResponse<Value>
-  | ImperativeErrorResponse
-  | ImperativeResolvedResponse<Value>;

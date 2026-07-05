@@ -4,14 +4,13 @@ React 19 compatible suspense cache utilities for trizum.
 
 This package replaces the external `suspense` dependency for cache-backed
 Suspense reads without relying on React or React DOM experimental builds. It
-keeps the `createCache`, `Cache`, and status constant API surface used by the
-PWA, and adds React 19 hooks for consuming cache state through `use`,
-`useSyncExternalStore`, and `useDeferredValue`.
+keeps the `createCache`, `Cache`, and status constant API surface used by the PWA.
+Use `cache.read()` for synchronous cached reads and `use(cache.readAsync(...))`
+when a React component should suspend.
 
 ## Key Files
 
 - [`src/createCache.ts`](./src/createCache.ts) implements the Suspense cache.
-- [`src/hooks.ts`](./src/hooks.ts) contains React cache-consumption hooks.
 - [`src/log.ts`](./src/log.ts) contains the package-local logging facade.
 - [`src/cacheKeys.ts`](./src/cacheKeys.ts), [`src/cacheMap.ts`](./src/cacheMap.ts),
   and [`src/promise.ts`](./src/promise.ts) contain reusable cache utilities.

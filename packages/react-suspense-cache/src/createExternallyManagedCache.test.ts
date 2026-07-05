@@ -62,7 +62,7 @@ describe("createExternallyManagedCache", () => {
     expect(() => cache.getValue("a")).toThrow(error);
   });
 
-  test("delegates the standard cache API", () => {
+  test("delegates the standard cache API", async () => {
     const cache = createExternallyManagedCache<[string], string>({
       getKey: ([id]) => id,
     });
@@ -70,7 +70,8 @@ describe("createExternallyManagedCache", () => {
 
     cache.cacheValue("value:a", "a");
 
-    expect(cache.readAsync("a")).toBe("value:a");
+    expect(cache.read("a")).toBe("value:a");
+    await expect(cache.readAsync("a")).resolves.toBe("value:a");
     expect(cache.getValueIfCached("a")).toBe("value:a");
 
     cache.subscribe(subscriber, "a");

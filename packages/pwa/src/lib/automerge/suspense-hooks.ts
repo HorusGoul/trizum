@@ -1,7 +1,7 @@
 import type { AnyDocumentId, Doc, DocHandle, Repo } from "@automerge/automerge-repo/slim";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { useSyncExternalStore } from "react";
-import { createCache, useCacheValue, type Cache } from "@trizum/react-suspense-cache";
+import { use, useSyncExternalStore } from "react";
+import { createCache, type Cache } from "@trizum/react-suspense-cache";
 
 // TODO: These retry and delay stuff should be moved to the trizum SDK in the future, suspense hooks
 // should be simpler
@@ -272,7 +272,7 @@ export const multipleDocumentCache = withLiveSubscription<
 export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> | undefined {
   const repo = useRepo();
 
-  return useCacheValue(handleCache, repo, id) as DocHandle<T> | undefined;
+  return use(handleCache.readAsync(repo, id)) as DocHandle<T> | undefined;
 }
 
 interface UseSuspenseDocumentOptions<IsRequired extends boolean = false> {
@@ -298,7 +298,7 @@ export function useSuspenseDocument<
   const handle = useSuspenseHandle<T>(id);
 
   // Suspense cache read to ensure the document is loaded.
-  useCacheValue(documentCache, repo, id);
+  use(documentCache.readAsync(repo, id));
 
   const doc = useSyncExternalStore(
     (change) => {
@@ -333,7 +333,7 @@ export function useMultipleSuspenseDocument<
 >(ids: AnyDocumentId[], options?: Options): { doc: Doc<T> | undefined; handle: DocHandle<T> }[] {
   const repo = useRepo();
 
-  useCacheValue(multipleDocumentCache, repo, ids);
+  use(multipleDocumentCache.readAsync(repo, ids));
 
   const docs = useSyncExternalStore(
     (change) => {

@@ -9,6 +9,7 @@ import {
   STATUS_RESOLVED,
 } from "./constants.js";
 import { createCache } from "./createCache.js";
+import { isPromiseLike } from "./promise.js";
 import type { CacheMap, Record } from "./types.js";
 
 describe("createCache", () => {
@@ -36,19 +37,21 @@ describe("createCache", () => {
     expect(load).toHaveBeenCalledTimes(1);
     await expect(pending).resolves.toBe("value:a");
     expect(cache.getStatus("a")).toBe(STATUS_RESOLVED);
-    expect(cache.readAsync("a")).toBe("value:a");
+    await expect(cache.readAsync("a")).resolves.toBe("value:a");
+    expect(cache.read("a")).toBe("value:a");
     expect(load).toHaveBeenCalledTimes(1);
   });
 
-  test("uses the default key and supports synchronous loads", () => {
+  test("uses the default key and supports synchronous loads", async () => {
     const load = vi.fn<(params: [number, string]) => string>(
       ([count, id]) => `value:${count}:${id}`,
     );
     const cache = createCache<[number, string], string>({ load });
 
-    expect(cache.readAsync(1, "a")).toBe("value:1:a");
-    expect(cache.readAsync(1, "a")).toBe("value:1:a");
-    expect(cache.readAsync(1, "b")).toBe("value:1:b");
+    await expect(cache.readAsync(1, "a")).resolves.toBe("value:1:a");
+    expect(cache.read(1, "a")).toBe("value:1:a");
+    await expect(cache.readAsync(1, "a")).resolves.toBe("value:1:a");
+    await expect(cache.readAsync(1, "b")).resolves.toBe("value:1:b");
     expect(load).toHaveBeenCalledTimes(2);
   });
 
@@ -68,7 +71,7 @@ describe("createCache", () => {
       surfaceSinks: ["test"],
     });
 
-    cache.readAsync("a");
+    void cache.readAsync("a");
     cache.evict("a");
     cache.evict("missing");
 
@@ -100,14 +103,21 @@ describe("createCache", () => {
     expect(JSON.stringify(logs.records.map((record) => record.properties))).not.toContain('"a"');
   });
 
-  test("readAsync returns resolved values", async () => {
+  test("readAsync returns resolved promises for cached values", async () => {
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: async ([id]) => `value:${id}`,
     });
 
     await cache.readAsync("a");
-    expect(cache.readAsync("a")).toBe("value:a");
+    const promise = cache.readAsync("a");
+
+    expect(promise).toMatchObject({
+      status: "fulfilled",
+      value: "value:a",
+    });
+    await expect(promise).resolves.toBe("value:a");
+    expect(cache.read("a")).toBe("value:a");
   });
 
   test("notifies subscribers when cache records change", async () => {
@@ -175,7 +185,7 @@ describe("createCache", () => {
     const subscriber = vi.fn<(data: unknown) => void>();
 
     cache.subscribe(subscriber, "a");
-    cache.readAsync("a");
+    void cache.readAsync("a");
 
     expect(cache.abort("a")).toBe(true);
     expect(signal?.aborted).toBe(true);
@@ -213,7 +223,7 @@ describe("createCache", () => {
     expect(() => cache.getValue("a")).toThrow(thrown);
   });
 
-  test("throws clear errors when reading missing or pending values imperatively", () => {
+  test("read throws non-thenable errors for pending values", () => {
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: () => new Promise<string>(() => {}),
@@ -222,8 +232,16 @@ describe("createCache", () => {
     expect(cache.getValueIfCached("a")).toBeUndefined();
     expect(() => cache.getValue("a")).toThrow("No record found");
 
-    cache.readAsync("a");
+    let thrown: unknown;
+    try {
+      cache.read("a");
+    } catch (error) {
+      thrown = error;
+    }
 
+    expect(isPromiseLike(thrown)).toBe(false);
+    expect(thrown).toBeInstanceOf(Error);
+    expect((thrown as Error).message).toBe('Record found with status "pending"');
     expect(cache.getValueIfCached("a")).toBeUndefined();
     expect(() => cache.getValue("a")).toThrow('Record found with status "pending"');
   });
@@ -256,8 +274,8 @@ describe("createCache", () => {
     cache.subscribe(resolvedSubscriber, "resolved");
     cache.subscribe(pendingSubscriber, "pending");
 
-    cache.readAsync("resolved");
-    cache.readAsync("pending");
+    void cache.readAsync("resolved");
+    void cache.readAsync("pending");
 
     expect(cache.getStatus("resolved")).toBe(STATUS_RESOLVED);
     expect(cache.getStatus("pending")).toBe(STATUS_PENDING);
@@ -287,7 +305,7 @@ describe("createCache", () => {
       load: () => new Promise<string>(() => {}),
     });
 
-    cache.readAsync("a");
+    void cache.readAsync("a");
 
     expect(backingCache?.has("a")).toBe(true);
 
@@ -367,7 +385,7 @@ describe("createCache", () => {
       load: () => deferred.promise,
     });
 
-    cache.readAsync("a");
+    void cache.readAsync("a");
     cache.evict("a");
     await deferred.settle(error, true);
 

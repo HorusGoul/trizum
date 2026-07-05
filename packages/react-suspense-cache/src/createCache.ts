@@ -1,4 +1,3 @@
-import { use } from "react";
 import {
   STATUS_ABORTED,
   STATUS_NOT_FOUND,
@@ -196,38 +195,30 @@ export function createCache<Params extends Array<any>, Value>(
   }
 
   function prefetch(...params: Params): void {
-    try {
-      const promiseOrValue = readAsync(...params);
-
-      if (isPromiseLike(promiseOrValue)) {
-        promiseOrValue.then(
-          () => {},
-          () => {},
-        );
-      }
-    } catch {
-      // Already-cached errors are surfaced by read/getValue.
-    }
+    readAsync(...params).then(
+      () => {},
+      () => {},
+    );
   }
 
-  const read: Cache<Params, Value>["read"] = function useCacheRead(...params: Params): Value {
+  function read(...params: Params): Value {
     const record = getOrCreateRecord(...params);
-
-    return use(record.data.promise);
-  };
-
-  function readAsync(...params: Params): PromiseLike<Value> | Value {
-    const record = getOrCreateRecord(...params);
-
-    if (isPendingRecord(record)) {
-      return record.data.deferred.promise;
-    }
 
     if (isResolvedRecord(record)) {
       return record.data.value;
     }
 
-    throw record.data.error;
+    if (isRejectedRecord(record)) {
+      throw record.data.error;
+    }
+
+    throw new Error(`Record found with status "${record.data.status}"`);
+  }
+
+  function readAsync(...params: Params) {
+    const record = getOrCreateRecord(...params);
+
+    return record.data.promise;
   }
 
   function subscribe(
