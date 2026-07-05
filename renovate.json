@@ -42,6 +42,32 @@
       "groupSlug": "manual-non-major-dependencies"
     },
     {
+      "description": "Keep Vite+ toolchain and Vite/Vitest ecosystem updates together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@cloudflare/vite-plugin",
+        "@lingui/vite-plugin",
+        "@rolldown/*",
+        "@sentry/vite-plugin",
+        "@vite-pwa/*",
+        "@vitejs/*",
+        "@vitest/*",
+        "@voidzero-dev/vite-plus-core",
+        "oxfmt",
+        "oxlint",
+        "oxlint-*",
+        "rolldown",
+        "tsdown",
+        "vite",
+        "vite-*",
+        "vite-plus",
+        "vite-task",
+        "vitest"
+      ],
+      "groupName": "Vite+ toolchain updates",
+      "groupSlug": "vite-plus-toolchain"
+    },
+    {
       "description": "Do not update experimental React runtime packages; they are managed manually.",
       "matchManagers": ["npm"],
       "matchPackageNames": ["react", "react-dom"],

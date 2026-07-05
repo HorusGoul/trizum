@@ -39,6 +39,11 @@ keep update volume manageable. TypeScript and current 0.x patch/minor updates
 are grouped separately for manual review so they do not block automerge for
 unrelated dependencies.
 
+Vite+ toolchain updates have their own group so changes to Vite+, the aliased
+Vite core package, Vitest, Vite/Vitest plugins, and adjacent toolchain packages
+such as Rolldown, tsdown, Oxlint, Oxfmt, and Vite Task are reviewed together
+instead of being buried in the broad non-major dependency group.
+
 Most major updates stay independent, but tightly coupled dependency families
 still have major grouping rules so packages that need to move together are
 reviewed together. `react` and `react-dom` updates are disabled because the app
