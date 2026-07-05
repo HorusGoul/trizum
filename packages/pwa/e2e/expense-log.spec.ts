@@ -139,6 +139,29 @@ test.describe("Expense log", () => {
     });
   });
 
+  test("returns to expense detail when backing out of edit", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const title = "Cabin groceries";
+    const seededAmountText = formatAmountText(90);
+
+    const seededParty = await harness.joinSeededParty({
+      fixture: createImbalancedPartyFixture(),
+      participantName: defaultParticipants.blair.name,
+    });
+
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await partyPage.openExpenseInLog(title);
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+
+    await expenseDetailPage.openEdit();
+    await expenseEditorPage.expectEditLoaded(seededParty.partyId, title);
+    await expenseEditorPage.goBack();
+
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+  });
+
   test("keeps expense draft values when validation fails", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
     const expenseEditorPage = new ExpenseEditorPage(page);

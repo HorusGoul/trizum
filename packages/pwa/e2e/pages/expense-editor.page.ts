@@ -6,6 +6,7 @@ export class ExpenseEditorPage {
   readonly titleField: Locator;
   readonly amountField: Locator;
   readonly saveButton: Locator;
+  readonly backButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,6 +14,7 @@ export class ExpenseEditorPage {
     this.titleField = page.getByLabel("Title");
     this.amountField = page.getByLabel("Amount");
     this.saveButton = page.getByRole("button", { name: "Save" });
+    this.backButton = page.getByRole("button", { name: "Go Back" });
   }
 
   participantCheckbox(name: string) {
@@ -57,5 +59,9 @@ export class ExpenseEditorPage {
 
   async save() {
     await this.saveButton.click();
+  }
+
+  async goBack() {
+    await this.backButton.click();
   }
 }
