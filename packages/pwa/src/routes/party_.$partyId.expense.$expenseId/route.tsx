@@ -17,7 +17,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
-import { markExpenseEditOpenedFromDetailState } from "#src/lib/expenseEditRouteState.ts";
+import { markExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 import { Amount } from "./-components/Amount.js";
 import { PaidAt } from "./-components/PaidAt.js";
 import { PaidBy } from "./-components/PaidBy.js";
