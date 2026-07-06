@@ -2,7 +2,7 @@ import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
 import type { Expense } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import { STATUS_PENDING } from "suspense";
+import { STATUS_PENDING } from "@trizum/react-suspense-cache";
 
 const DEFAULT_PAGE_SIZE = 1;
 
@@ -176,9 +176,7 @@ async function loadPartyExpenseChunks(repo: Repo, chunkIds: readonly DocumentId[
     return;
   }
 
-  await Promise.all(
-    chunkIds.map((chunkId) => Promise.resolve(documentCache.readAsync(repo, chunkId))),
-  );
+  await Promise.all(chunkIds.map((chunkId) => documentCache.readAsync(repo, chunkId)));
 }
 
 function getExpensePaidAtTimestamp(expense: Expense): number {

@@ -178,7 +178,13 @@ export function usePartyList() {
             return;
           }
 
-          const partyHandle = handleCache.read(repo, partyId as DocumentId) as DocHandle<Party>;
+          const partyHandle = (await handleCache.readAsync(repo, partyId as DocumentId)) as
+            | DocHandle<Party>
+            | undefined;
+
+          if (!partyHandle) {
+            return;
+          }
 
           partyHandle.change((doc) => {
             const participantId = partyList.participantInParties[partyId as DocumentId];

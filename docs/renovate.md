@@ -47,14 +47,17 @@ instead of being buried in the broad non-major dependency group.
 React Doctor dependencies are grouped together so the CLI and matching Oxlint
 plugin stay in sync.
 
+React runtime and type package updates are grouped together now that the app uses
+stable React builds. Keep `react`, `react-dom`, and their type packages moving in
+the same Renovate PR so runtime and TypeScript surfaces stay aligned.
+
 `barcode-detector` updates are disabled because newer ZXing WASM releases have
 regressed QR scanning on affected Android Chrome devices. Keep the catalog pin
 and Renovate package rule in sync when this is revisited.
 
 Most major updates stay independent, but tightly coupled dependency families
 still have major grouping rules so packages that need to move together are
-reviewed together. `react` and `react-dom` updates are disabled because the app
-uses experimental builds that are managed manually.
+reviewed together.
 
 ## Automerge
 

@@ -1,0 +1,52 @@
+{
+  "name": "@trizum/react-suspense-cache",
+  "version": "0.0.0",
+  "private": true,
+  "description": "React 19 compatible suspense cache utilities.",
+  "keywords": [
+    "cache",
+    "react",
+    "suspense"
+  ],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@trizum/logging": "workspace:*"
+  },
+  "devDependencies": {
+    "@logtape/logtape": "catalog:",
+    "@trizum/tsconfig": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "jsdom": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  }
+}

@@ -89,6 +89,7 @@ export default defineConfig(({ mode }) => {
           command: "NODE_ENV=production vp build",
           dependsOn: [
             "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -99,6 +100,7 @@ export default defineConfig(({ mode }) => {
           command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
           dependsOn: [
             "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -117,6 +119,7 @@ export default defineConfig(({ mode }) => {
           cache: false,
           dependsOn: [
             "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -135,6 +138,7 @@ export default defineConfig(({ mode }) => {
           command: "vp test .",
           dependsOn: [
             "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -144,6 +148,7 @@ export default defineConfig(({ mode }) => {
           cache: false,
           dependsOn: [
             "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -153,6 +158,7 @@ export default defineConfig(({ mode }) => {
           cache: false,
           dependsOn: [
             "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],

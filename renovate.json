@@ -75,10 +75,18 @@
       "groupSlug": "react-doctor"
     },
     {
-      "description": "Do not update experimental React runtime packages; they are managed manually.",
+      "description": "Keep stable React runtime and type package updates together.",
       "matchManagers": ["npm"],
-      "matchPackageNames": ["react", "react-dom"],
-      "enabled": false
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "types-react",
+        "types-react-dom"
+      ],
+      "groupName": "React runtime and types updates",
+      "groupSlug": "react-runtime-types"
     },
     {
       "description": "Do not update barcode-detector; newer ZXing WASM releases break QR scanning on affected Android Chrome devices.",
@@ -87,15 +95,9 @@
       "enabled": false
     },
     {
-      "description": "Keep tightly coupled React support major updates together.",
+      "description": "Keep React compiler major updates in the React support review lane.",
       "matchManagers": ["npm"],
-      "matchPackageNames": [
-        "types-react",
-        "types-react-dom",
-        "@types/react",
-        "@types/react-dom",
-        "babel-plugin-react-compiler"
-      ],
+      "matchPackageNames": ["babel-plugin-react-compiler"],
       "matchUpdateTypes": ["major"],
       "groupName": "React support major updates"
     },

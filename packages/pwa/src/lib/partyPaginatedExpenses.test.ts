@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { createMockDocumentCacheCollection } from "#src/lib/testing/mockDocumentCache.ts";
 import type { Expense } from "#src/models/expense.ts";
-import { STATUS_PENDING } from "suspense";
+import { STATUS_PENDING } from "@trizum/react-suspense-cache";
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
 
 type MockChunk = {
