@@ -17,7 +17,6 @@ const logger = getLogger("api", "partySharePreview");
 
 const DEFAULT_AUTOMERGE_WSS_URL = "wss://server.trizum.app/sync";
 const DEFAULT_PREVIEW_TIMEOUT_MS = 5_000;
-const PREVIEW_SYNC_RETRY_INTERVAL_MS = 0;
 const PREVIEW_CACHE_SUCCESS_TTL_MS = 60_000;
 const PREVIEW_CACHE_FALLBACK_TTL_MS = 5_000;
 const MAX_DESCRIPTION_LENGTH = 180;
@@ -403,12 +402,7 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
 
     repo = new Repo({
       isEphemeral: true,
-      network: [
-        new BrowserWebSocketClientAdapter(
-          getAutomergeWssUrl(env, request),
-          PREVIEW_SYNC_RETRY_INTERVAL_MS,
-        ),
-      ],
+      network: [new BrowserWebSocketClientAdapter(getAutomergeWssUrl(env, request))],
       peerId: `party-share-preview:${crypto.randomUUID()}` as PeerId,
       shareConfig: {
         access: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
