@@ -69,23 +69,23 @@ export const toastClassNames = {
 export const toastIcons = {
   success: createElement(Icon, {
     icon: "lucide.circle-check",
-    className: "size-[18px] stroke-[1.75]",
+    className: "size-[18px]",
   }),
   info: createElement(Icon, {
     icon: "lucide.info",
-    className: "size-[18px] stroke-[1.75]",
+    className: "size-[18px]",
   }),
   warning: createElement(Icon, {
     icon: "lucide.triangle-alert",
-    className: "size-[18px] stroke-[1.75]",
+    className: "size-[18px]",
   }),
   error: createElement(Icon, {
     icon: "lucide.circle-alert",
-    className: "size-[18px] stroke-[1.75]",
+    className: "size-[18px]",
   }),
   loading: createElement(Icon, {
     icon: "lucide.loader-circle",
-    className: "size-[18px] animate-spin stroke-[1.75]",
+    className: "size-[18px] animate-spin",
   }),
-  close: createElement(Icon, { icon: "lucide.x", className: "size-3.5 stroke-[1.75]" }),
+  close: createElement(Icon, { icon: "lucide.x", className: "size-3.5" }),
 } satisfies NonNullable<ToasterProps["icons"]>;

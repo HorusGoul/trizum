@@ -46,7 +46,7 @@ describe("Toaster", () => {
     expect(toastClassNames.warning).not.toContain("bg-warning-50");
   });
 
-  test("uses the app icon sprite for toast states", () => {
+  test("uses the app icon sprite without toast-specific stroke overrides", () => {
     const markup = renderToStaticMarkup(
       createElement(
         Fragment,
@@ -64,6 +64,7 @@ describe("Toaster", () => {
     expect(markup).toContain("#lucide.triangle-alert");
     expect(markup).toContain("#lucide.circle-alert");
     expect(markup).toContain("#lucide.loader-circle");
-    expect(markup).toContain("stroke-[1.75]");
+    expect(markup).toContain("size-[18px]");
+    expect(markup).not.toContain("stroke-[");
   });
 });
