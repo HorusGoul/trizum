@@ -109,4 +109,41 @@ test.describe("Expense calculator", () => {
     await expect(page).toHaveURL(/\/add$/);
     await expect(calculator).not.toBeVisible();
   });
+
+  test("accepts supported physical keyboard input while open", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+
+    await page.keyboard.type("12+3*2");
+    await expect(amountField).toHaveValue("18");
+
+    await page.keyboard.press("Backspace");
+    await expect(amountField).toHaveValue("15");
+
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/add$/);
+  });
 });

@@ -447,9 +447,9 @@ function useCalculatorKeyboard({
       }
     }
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, { capture: true });
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, { capture: true });
     };
   }, [callbacksRef, fieldContainerRef, toolbarRef]);
 }
