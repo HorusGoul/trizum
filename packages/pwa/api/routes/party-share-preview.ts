@@ -392,6 +392,7 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
     return createFallbackPartySharePreview();
   }
 
+  const documentId = partyId as DocumentId;
   const timeoutMs = getPreviewTimeoutMs(env);
   const abortController = new AbortController();
   const timeoutId = setTimeout(() => abortController.abort(), timeoutMs);
@@ -409,10 +410,13 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
         ),
       ],
       peerId: `party-share-preview:${crypto.randomUUID()}` as PeerId,
-      sharePolicy: () => Promise.resolve(false),
+      shareConfig: {
+        access: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
+        announce: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
+      },
     });
 
-    const handle = await repo.find<PartyPreviewDocument>(partyId as DocumentId, {
+    const handle = await repo.find<PartyPreviewDocument>(documentId, {
       allowableStates: ["ready"],
       signal: abortController.signal,
     });
