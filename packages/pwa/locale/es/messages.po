@@ -515,7 +515,7 @@ msgid "Close"
 msgstr "Cerrar"
 
 #: src/components/CalculatorToolbar.tsx:569
-#: src/components/CurrencyField.tsx:128
+#: src/components/CurrencyField.tsx:141
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
@@ -988,7 +988,7 @@ msgid "Expenses counted"
 msgstr "Gastos contabilizados"
 
 #: src/components/AvatarPicker.tsx:112
-#: src/components/ExpenseEditor.tsx:1026
+#: src/components/ExpenseEditor.tsx:1027
 #: src/components/QRCodeScanner.tsx:111
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
@@ -1029,7 +1029,7 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:1001
+#: src/components/ExpenseEditor.tsx:1002
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
@@ -1151,7 +1151,7 @@ msgstr "Gourde Haitiano"
 msgid "Have an idea to improve trizum? We'd love to hear it."
 msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 
-#: src/components/ExpenseEditor.tsx:903
+#: src/components/ExpenseEditor.tsx:904
 msgid "Heads up!"
 msgstr "¡Atención!"
 
@@ -1715,7 +1715,7 @@ msgstr "Solo puedes transferir tus propias deudas"
 msgid "Open archived parties"
 msgstr "Abrir grupos archivados"
 
-#: src/components/CurrencyField.tsx:128
+#: src/components/CurrencyField.tsx:141
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
@@ -1966,7 +1966,7 @@ msgstr "Platino (onza troy)"
 msgid "Please allow camera access in your browser settings to scan QR codes."
 msgstr "Por favor, permite el acceso a la cámara en la configuración de tu navegador para escanear códigos QR."
 
-#: src/components/ExpenseEditor.tsx:921
+#: src/components/ExpenseEditor.tsx:922
 msgid "Please correct it before saving."
 msgstr "Por favor, corrígelo antes de guardar."
 
@@ -2039,7 +2039,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:1118
+#: src/components/ExpenseEditor.tsx:1119
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -2219,7 +2219,7 @@ msgstr "Partes para {participantName}"
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1>{amount} {2}</1>."
 
-#: src/components/ExpenseEditor.tsx:907
+#: src/components/ExpenseEditor.tsx:908
 msgid "Shares sum up to <0>{totalAmount} {currency}</0> while the expense amount is <1>{expenseAmount} {currency}</1>."
 msgstr "Las partes suman <0>{totalAmount} {currency}</0> mientras que la cantidad del gasto es <1>{expenseAmount} {currency}</1>."
 
@@ -2463,8 +2463,8 @@ msgstr "Somoni Tayiko"
 
 #: src/components/AvatarPicker.tsx:159
 #: src/components/AvatarPicker.tsx:174
-#: src/components/ExpenseEditor.tsx:1046
-#: src/components/ExpenseEditor.tsx:1060
+#: src/components/ExpenseEditor.tsx:1047
+#: src/components/ExpenseEditor.tsx:1061
 msgid "Take photo"
 msgstr "Hacer foto"
 
@@ -2750,14 +2750,14 @@ msgstr "Actualizando gasto..."
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
-#: src/components/ExpenseEditor.tsx:946
+#: src/components/ExpenseEditor.tsx:947
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:168
 #: src/components/AvatarPicker.tsx:186
-#: src/components/ExpenseEditor.tsx:1055
-#: src/components/ExpenseEditor.tsx:1072
+#: src/components/ExpenseEditor.tsx:1056
+#: src/components/ExpenseEditor.tsx:1073
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -2765,7 +2765,7 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:986
+#: src/components/ExpenseEditor.tsx:987
 msgid "Uploading..."
 msgstr "Subiendo..."
 
@@ -2846,7 +2846,7 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:1107
+#: src/components/ExpenseEditor.tsx:1108
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "Ver foto"

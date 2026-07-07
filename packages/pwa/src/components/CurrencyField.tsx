@@ -6,6 +6,7 @@ import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
 import { CalculatorToolbar } from "./CalculatorToolbar";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
+import { getPresenceElementIdFromTarget } from "./presencePosition.ts";
 
 export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> & {
   calculator?: boolean;
@@ -64,16 +65,17 @@ function CurrencyFieldWithCalculator({
   onCloseCalculator?: () => void;
 }) {
   /* eslint-disable react-doctor/no-event-handler -- Browser back/forward changes route calculator state outside press handlers. */
-  const presenceElementId = (props as { "data-presence-element-id"?: string })[
-    "data-presence-element-id"
-  ];
+  const configuredPresenceElementId =
+    (props as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
+    (props as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
+  const calculatorPresenceElementIdRef = useRef<string | null>(configuredPresenceElementId ?? null);
   const [state, actions] = useCalculatorMode({
     value: props.value ?? 0,
     onChange: (value) => props.onChange?.(value),
     currency: props.currency,
   });
-  const calculatorFieldId = calculatorId ?? presenceElementId ?? props.name ?? "currency";
+  const calculatorFieldId = calculatorId ?? configuredPresenceElementId ?? props.name ?? "currency";
   const isRouteControlled =
     activeCalculatorId !== undefined ||
     onOpenCalculator !== undefined ||
@@ -89,6 +91,8 @@ function CurrencyFieldWithCalculator({
     }
 
     if (activeCalculatorId === calculatorFieldId && !state.isActive) {
+      calculatorPresenceElementIdRef.current =
+        configuredPresenceElementId ?? getPresenceElementIdFromTarget(fieldContainerRef.current);
       actions.activate({ selectAll: true });
       return;
     }
@@ -96,10 +100,19 @@ function CurrencyFieldWithCalculator({
     if (activeCalculatorId !== calculatorFieldId && state.isActive) {
       actions.deactivate();
     }
-  }, [actions, activeCalculatorId, calculatorFieldId, isRouteControlled, state.isActive]);
+  }, [
+    actions,
+    activeCalculatorId,
+    calculatorFieldId,
+    configuredPresenceElementId,
+    isRouteControlled,
+    state.isActive,
+  ]);
   /* eslint-enable react-doctor/no-event-handler */
 
   function openCalculator() {
+    calculatorPresenceElementIdRef.current =
+      configuredPresenceElementId ?? getPresenceElementIdFromTarget(fieldContainerRef.current);
     actions.activate({ selectAll: true });
     onOpenCalculator?.(calculatorFieldId);
   }
@@ -127,6 +140,7 @@ function CurrencyFieldWithCalculator({
       icon={isCalculatorActive ? "lucide.x" : "lucide.calculator"}
       aria-label={isCalculatorActive ? t`Close calculator` : t`Open calculator`}
       color="transparent"
+      data-presence-proxy-element-id={configuredPresenceElementId}
       className={calculatorButtonClassName ?? "absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"}
       iconClassName="size-4"
       onPress={isCalculatorActive ? closeCalculator : openCalculator}
@@ -162,7 +176,7 @@ function CurrencyFieldWithCalculator({
           onClear={actions.clear}
           onDismiss={closeCalculator}
           fieldContainerRef={fieldContainerRef}
-          presenceElementId={presenceElementId}
+          presenceElementId={calculatorPresenceElementIdRef.current ?? configuredPresenceElementId}
           previewValue={state.previewValue}
           currency={props.currency}
           dismissOnOutsideInteraction={!isRouteControlled}

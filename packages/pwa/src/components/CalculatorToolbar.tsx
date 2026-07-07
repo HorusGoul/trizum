@@ -540,7 +540,7 @@ export function CalculatorToolbar({
       ref={toolbarRef}
       role="application"
       aria-label={t`Calculator`}
-      data-presence-element-id={presenceElementId}
+      data-presence-proxy-element-id={presenceElementId}
       className={
         isLargeScreen && popoverPosition
           ? "border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 overflow-y-auto rounded-lg border bg-white shadow-lg"
