@@ -1,13 +1,5 @@
-import { automergeWasmBase64 } from "@automerge/automerge/automerge.wasm.base64";
-import {
-  initializeBase64Wasm,
-  isValidDocumentId,
-  Repo,
-  type DocumentId,
-  type PeerId,
-} from "@automerge/automerge-repo/slim";
+import { isValidDocumentId, Repo, type DocumentId, type PeerId } from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
-import interFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
 import { Hono } from "hono";
 import type { ApiEnv, ApiHonoEnv } from "../env";
 import { getLogger } from "../../src/lib/log.js";
@@ -27,6 +19,11 @@ const MAX_IMAGE_MEMBER_NAMES = 8;
 const PARTY_SHARE_IMAGE_WIDTH = 1200;
 const PARTY_SHARE_IMAGE_HEIGHT = 630;
 const PARTY_SHARE_IMAGE_CACHE_CONTROL = "public, max-age=300, s-maxage=300";
+const INTER_FONT_FACES = [
+  { path: "/assets/inter/Inter-Regular.ttf", weight: 400 },
+  { path: "/assets/inter/Inter-Bold.ttf", weight: 700 },
+  { path: "/assets/inter/Inter-ExtraBold.ttf", weight: 800 },
+] as const;
 const TRIZUM_MARK_PATH = "/maskable.svg";
 
 const CRAWLER_USER_AGENT_PATTERNS = [
@@ -92,8 +89,12 @@ interface SocialMetaTag {
   value: string;
 }
 
-let automergeWasm: Promise<void> | undefined;
-let interFontData: Promise<ArrayBuffer> | undefined;
+interface InterFontData {
+  data: ArrayBuffer;
+  weight: (typeof INTER_FONT_FACES)[number]["weight"];
+}
+
+let interFontData: Promise<InterFontData[]> | undefined;
 const previewCache = new Map<string, CachedPartySharePreview>();
 
 export const partySharePreviewRoute = createPartySharePreviewRoute();
@@ -150,19 +151,17 @@ async function createWorkersOgImageResponse(
   { env, request }: PartyShareImageResponseContext,
 ) {
   const { ImageResponse } = await import("workers-og");
-  const interFont = await loadInterFontData(env, request);
+  const interFonts = await loadInterFontData(env, request);
 
   return new ImageResponse(html, {
     emoji: "twemoji",
     format: "png",
-    fonts: [
-      {
-        data: interFont,
-        name: "Inter",
-        style: "normal",
-        weight: 400,
-      },
-    ],
+    fonts: interFonts.map(({ data, weight }) => ({
+      data,
+      name: "Inter",
+      style: "normal" as const,
+      weight,
+    })),
     height: PARTY_SHARE_IMAGE_HEIGHT,
     headers: {
       "Cache-Control": PARTY_SHARE_IMAGE_CACHE_CONTROL,
@@ -181,14 +180,21 @@ async function loadInterFontData(env: ApiEnv, request: Request) {
 }
 
 async function fetchInterFontData(env: ApiEnv, request: Request) {
-  const fontUrl = new URL(interFontUrl, request.url);
-  const response = await env.ASSETS.fetch(new Request(fontUrl));
+  return await Promise.all(
+    INTER_FONT_FACES.map(async ({ path, weight }) => {
+      const fontUrl = new URL(path, request.url);
+      const response = await env.ASSETS.fetch(new Request(fontUrl));
 
-  if (!response.ok) {
-    throw new Error(`Could not load Inter font asset: ${response.status}`);
-  }
+      if (!response.ok) {
+        throw new Error(`Could not load Inter font asset ${path}: ${response.status}`);
+      }
 
-  return response.arrayBuffer();
+      return {
+        data: await response.arrayBuffer(),
+        weight,
+      };
+    }),
+  );
 }
 
 export function isPartyPreviewRequest(request: Request) {
@@ -287,7 +293,7 @@ export function renderPartyShareImageHtml(
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 34px 40px 0 40px;">
           <div style="display: flex; align-items: center;">
             <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="58" height="58" />
-            <div style="display: flex; margin-left: 16px; font-size: 30px; font-weight: 760; letter-spacing: 0;">trizum</div>
+            <div style="display: flex; margin-left: 16px; font-size: 30px; font-weight: 700; letter-spacing: 0;">trizum</div>
           </div>
           <div style="display: flex; font-size: 24px; color: #A7D8A2;">Party invite</div>
         </div>
@@ -299,7 +305,7 @@ export function renderPartyShareImageHtml(
                 preview.symbol,
               )}</div>
               <div style="display: flex; flex-direction: column; margin-left: 28px;">
-                <div style="display: flex; max-width: 840px; font-size: 72px; font-weight: 820; line-height: 0.98; letter-spacing: 0;">${escapeHtmlText(
+                <div style="display: flex; max-width: 840px; font-size: 72px; font-weight: 800; line-height: 0.98; letter-spacing: 0;">${escapeHtmlText(
                   preview.name,
                 )}</div>
               </div>
@@ -373,7 +379,10 @@ async function getPartySharePreview(partyId: string, env: ApiEnv, request: Reque
   }
 
   const preview = await loadPartySharePreviewFromAutomerge(partyId, env, request).catch((error) => {
-    logger.warning("Could not load party share preview", { error });
+    logger.warning("Could not load party share preview: {errorMessage}", {
+      error: getErrorDetails(error),
+      errorMessage: getErrorMessage(error),
+    });
     return createFallbackPartySharePreview();
   });
   const ttl = preview.isFallback ? PREVIEW_CACHE_FALLBACK_TTL_MS : PREVIEW_CACHE_SUCCESS_TTL_MS;
@@ -398,8 +407,6 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
   let repo: Repo | undefined;
 
   try {
-    const automergeReady = initializeAutomerge();
-
     repo = new Repo({
       isEphemeral: true,
       network: [new BrowserWebSocketClientAdapter(getAutomergeWssUrl(env, request))],
@@ -409,8 +416,6 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
         announce: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
       },
     });
-
-    await automergeReady;
 
     const handle = await repo.find<PartyPreviewDocument>(documentId, {
       allowableStates: ["ready"],
@@ -426,14 +431,12 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
   } finally {
     clearTimeout(timeoutId);
     await repo?.shutdown().catch((error) => {
-      logger.warning("Could not shut down party share preview repo", { error });
+      logger.warning("Could not shut down party share preview repo: {errorMessage}", {
+        error: getErrorDetails(error),
+        errorMessage: getErrorMessage(error),
+      });
     });
   }
-}
-
-function initializeAutomerge() {
-  automergeWasm ??= initializeBase64Wasm(automergeWasmBase64);
-  return automergeWasm;
 }
 
 function getAutomergeWssUrl(env: ApiEnv, request: Request) {
@@ -521,7 +524,7 @@ function memberPillStyle() {
 }
 
 function memberInitialStyle() {
-  return "display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-right: 10px; border-radius: 16px; background: #A7D8A2; color: #071007; font-size: 18px; font-weight: 760;";
+  return "display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-right: 10px; border-radius: 16px; background: #A7D8A2; color: #071007; font-size: 18px; font-weight: 700;";
 }
 
 function sanitizePlainText(value: unknown, maxLength: number) {
@@ -550,6 +553,26 @@ function createPreviewVersion(value: unknown) {
   }
 
   return (hash >>> 0).toString(36);
+}
+
+function getErrorDetails(error: unknown) {
+  if (error instanceof Error) {
+    return {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+    };
+  }
+
+  return { message: String(error) };
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`;
+  }
+
+  return String(error);
 }
 
 function escapeHtmlAttribute(value: string) {
