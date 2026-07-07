@@ -25,6 +25,32 @@ const INTER_FONT_FACES = [
   { path: "/assets/inter/Inter-ExtraBold.ttf", weight: 800 },
 ] as const;
 const TRIZUM_MARK_PATH = "/maskable.svg";
+const PARTY_SHARE_IMAGE_STYLES = {
+  brand: "display: flex; align-items: center;",
+  brandMark:
+    "display: flex; width: 74px; height: 74px; border-radius: 14px; overflow: hidden; background: #000000;",
+  brandName:
+    "display: flex; margin-left: 26px; font-size: 42px; font-weight: 800; letter-spacing: 0;",
+  canvas:
+    "display: flex; flex-direction: column; width: 1200px; height: 630px; padding: 64px 70px; font-family: Inter, sans-serif; color: #FFFFFF; background: linear-gradient(180deg, #090909 0%, #030303 100%);",
+  content: "display: flex; flex-direction: column; width: 100%; height: 100%;",
+  description:
+    "display: flex; max-width: 860px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7;",
+  hero: "display: flex; align-items: center; margin-top: 70px;",
+  memberInitial:
+    "display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-right: 20px; border-radius: 26px; background: #FFFFFF; color: #050505; font-size: 26px; font-weight: 800;",
+  memberPill:
+    "display: flex; align-items: center; height: 78px; padding: 0 28px; border-radius: 39px; background: rgba(0,0,0,0.15); border: 2px solid #2A2A2A;",
+  memberRow: "display: flex; flex-wrap: wrap; align-items: center; margin-top: 84px; gap: 18px;",
+  memberText: "font-size: 30px; color: #F4F4F4;",
+  partyCopy: "display: flex; flex-direction: column; margin-left: 50px;",
+  partyIcon:
+    "display: flex; align-items: center; justify-content: center; width: 92px; height: 92px; color: #FFFFFF; font-size: 78px; line-height: 1; filter: grayscale(1) brightness(2.35) contrast(1.8);",
+  partyIconTile:
+    "display: flex; align-items: center; justify-content: center; width: 150px; height: 150px; border-radius: 34px; background: linear-gradient(180deg, #161616 0%, #080808 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.03);",
+  title:
+    "display: flex; max-width: 860px; font-size: 78px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
+} as const;
 
 const CRAWLER_USER_AGENT_PATTERNS = [
   /applebot/i,
@@ -314,40 +340,33 @@ export function renderPartyShareImageHtml(
           ...memberNames.map((memberName) => renderMemberPill(memberName)),
           remainingMemberCount > 0 ? renderMoreMembersPill(remainingMemberCount) : "",
         ].join("")
-      : `<div style="${memberPillStyle()}"><span style="font-size: 24px; color: #C9D4C5;">Open invite</span></div>`;
+      : `<div style="${PARTY_SHARE_IMAGE_STYLES.memberPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.memberText}">Open invite</span></div>`;
 
   return `
-    <div style="display: flex; width: 1200px; height: 630px; padding: 54px; font-family: Inter, sans-serif; color: #F7F9F4; background: #050505;">
-      <div style="display: flex; flex-direction: column; width: 100%; height: 100%; border: 2px solid #263227; border-radius: 32px; background: #101410; overflow: hidden;">
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 34px 40px 0 40px;">
-          <div style="display: flex; align-items: center;">
-            <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="58" height="58" />
-            <div style="display: flex; margin-left: 16px; font-size: 30px; font-weight: 700; letter-spacing: 0;">trizum</div>
+    <div style="${PARTY_SHARE_IMAGE_STYLES.canvas}">
+      <div style="${PARTY_SHARE_IMAGE_STYLES.content}">
+        <div style="${PARTY_SHARE_IMAGE_STYLES.brand}">
+          <div style="${PARTY_SHARE_IMAGE_STYLES.brandMark}">
+            <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="74" height="74" />
           </div>
-          <div style="display: flex; font-size: 24px; color: #A7D8A2;">Party invite</div>
+          <div style="${PARTY_SHARE_IMAGE_STYLES.brandName}">trizum</div>
         </div>
 
-        <div style="display: flex; flex: 1; padding: 48px 56px 44px 56px;">
-          <div style="display: flex; flex-direction: column; flex: 1;">
-            <div style="display: flex; align-items: center;">
-              <div style="display: flex; align-items: center; justify-content: center; width: 98px; height: 98px; border-radius: 30px; background: #EAF7E8; color: #050505; font-size: 58px; line-height: 1;">${escapeHtmlText(
-                preview.symbol,
-              )}</div>
-              <div style="display: flex; flex-direction: column; margin-left: 28px;">
-                <div style="display: flex; max-width: 840px; font-size: 72px; font-weight: 800; line-height: 0.98; letter-spacing: 0;">${escapeHtmlText(
-                  preview.name,
-                )}</div>
-              </div>
-            </div>
+        <div style="${PARTY_SHARE_IMAGE_STYLES.hero}">
+          <div style="${PARTY_SHARE_IMAGE_STYLES.partyIconTile}">
+            <div style="${PARTY_SHARE_IMAGE_STYLES.partyIcon}">${escapeHtmlText(preview.symbol)}</div>
+          </div>
 
-            <div style="display: flex; max-width: 960px; margin-top: 34px; font-size: 34px; line-height: 1.28; color: #D8E2D4;">${escapeHtmlText(
+          <div style="${PARTY_SHARE_IMAGE_STYLES.partyCopy}">
+            <div style="${PARTY_SHARE_IMAGE_STYLES.title}">${escapeHtmlText(preview.name)}</div>
+            <div style="${PARTY_SHARE_IMAGE_STYLES.description}">${escapeHtmlText(
               description,
             )}</div>
-
-            <div style="display: flex; flex-wrap: wrap; align-items: center; margin-top: 38px; gap: 14px;">
-              ${members}
-            </div>
           </div>
+        </div>
+
+        <div style="${PARTY_SHARE_IMAGE_STYLES.memberRow}">
+          ${members}
         </div>
       </div>
     </div>
@@ -537,23 +556,15 @@ function renderSocialMetaTag(tag: SocialMetaTag) {
 function renderMemberPill(memberName: string) {
   const initial = memberName.trim().charAt(0).toUpperCase() || "?";
 
-  return `<div style="${memberPillStyle()}"><span style="${memberInitialStyle()}">${escapeHtmlText(
+  return `<div style="${PARTY_SHARE_IMAGE_STYLES.memberPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.memberInitial}">${escapeHtmlText(
     initial,
-  )}</span><span style="font-size: 24px; color: #F7F9F4;">${escapeHtmlText(
+  )}</span><span style="${PARTY_SHARE_IMAGE_STYLES.memberText}">${escapeHtmlText(
     memberName,
   )}</span></div>`;
 }
 
 function renderMoreMembersPill(memberCount: number) {
-  return `<div style="${memberPillStyle()}"><span style="font-size: 24px; color: #C9D4C5;">+${memberCount} more</span></div>`;
-}
-
-function memberPillStyle() {
-  return "display: flex; align-items: center; height: 54px; padding: 0 18px; border-radius: 27px; background: #1F271F; border: 1px solid #384638;";
-}
-
-function memberInitialStyle() {
-  return "display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-right: 10px; border-radius: 16px; background: #A7D8A2; color: #071007; font-size: 18px; font-weight: 700;";
+  return `<div style="${PARTY_SHARE_IMAGE_STYLES.memberPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.memberText}">+${memberCount} more</span></div>`;
 }
 
 function sanitizePlainText(value: unknown, maxLength: number) {
