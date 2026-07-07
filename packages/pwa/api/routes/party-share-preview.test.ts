@@ -170,7 +170,7 @@ describe("party share preview route", () => {
     );
 
     const response = await app.request(
-      `/api/og/party/${createDocumentId()}`,
+      `https://trizum.app/api/og/party/${createDocumentId()}`,
       {},
       createEnv(assetFetch),
     );
@@ -180,6 +180,7 @@ describe("party share preview route", () => {
     expect(response.headers.get("Content-Type")).toBe("text/html");
     expect(html).toContain("Cabin");
     expect(html).toContain("trizum");
+    expect(html).toContain('src="https://trizum.app/maskable.svg"');
   });
 });
 

@@ -27,6 +27,7 @@ const MAX_IMAGE_MEMBER_NAMES = 8;
 const PARTY_SHARE_IMAGE_WIDTH = 1200;
 const PARTY_SHARE_IMAGE_HEIGHT = 630;
 const PARTY_SHARE_IMAGE_CACHE_CONTROL = "public, max-age=300, s-maxage=300";
+const TRIZUM_MARK_PATH = "/maskable.svg";
 
 const CRAWLER_USER_AGENT_PATTERNS = [
   /applebot/i,
@@ -51,11 +52,6 @@ const CRAWLER_USER_AGENT_PATTERNS = [
   /whatsapp/i,
   /yahoo/i,
 ];
-
-const TRIZUM_MARK_SVG = `<svg width="128" height="128" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="104" fill="#050505"/><path d="M138.738 197.734H356.862C356.862 197.734 397.947 197.734 397.947 166.36C397.947 134.986 356.862 134.986 356.862 134.986C335.199 134.986 311.295 134.986 301.584 161.878M273.945 232.843C273.945 232.843 238.089 317.254 199.245 357.592C185.578 371.785 174.594 377.014 154.425 377.014C134.256 377.014 113.388 366.556 114.087 344.893C114.786 323.23 138.738 323.23 138.738 323.23H176.835M273.945 323.23H356.862" stroke="#FFFFFF" stroke-width="17.928" stroke-linecap="round"/></svg>`;
-const TRIZUM_MARK_DATA_URI = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-  TRIZUM_MARK_SVG,
-)}`;
 
 interface CachedPartySharePreview {
   expiresAt: number;
@@ -132,7 +128,9 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
   route.get("/api/og/party/:partyId", async (c) => {
     const partyId = c.req.param("partyId");
     const preview = await loadPreview(partyId, c.env, c.req.raw);
-    const html = renderPartyShareImageHtml(preview);
+    const html = renderPartyShareImageHtml(preview, {
+      trizumMarkUrl: getPublicAssetUrl(c.req.raw, TRIZUM_MARK_PATH),
+    });
 
     return await createImageResponse(html, c.env, c.req.raw);
   });
@@ -260,7 +258,11 @@ export function renderPartyShareMetaTags({
     .join("\n    ");
 }
 
-export function renderPartyShareImageHtml(preview: PartySharePreview) {
+export function renderPartyShareImageHtml(
+  preview: PartySharePreview,
+  options: { trizumMarkUrl?: string } = {},
+) {
+  const trizumMarkUrl = options.trizumMarkUrl ?? TRIZUM_MARK_PATH;
   const description = limitText(
     preview.description || getPartyShareDescription(preview),
     MAX_IMAGE_DESCRIPTION_LENGTH,
@@ -280,7 +282,7 @@ export function renderPartyShareImageHtml(preview: PartySharePreview) {
       <div style="display: flex; flex-direction: column; width: 100%; height: 100%; border: 2px solid #263227; border-radius: 32px; background: #101410; overflow: hidden;">
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 34px 40px 0 40px;">
           <div style="display: flex; align-items: center;">
-            <img src="${TRIZUM_MARK_DATA_URI}" width="58" height="58" />
+            <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="58" height="58" />
             <div style="display: flex; margin-left: 16px; font-size: 30px; font-weight: 760; letter-spacing: 0;">trizum</div>
           </div>
           <div style="display: flex; font-size: 24px; color: #A7D8A2;">Party invite</div>
@@ -449,6 +451,10 @@ function getPreviewTimeoutMs(env: ApiEnv) {
   }
 
   return DEFAULT_PREVIEW_TIMEOUT_MS;
+}
+
+function getPublicAssetUrl(request: Request, path: string) {
+  return new URL(path, request.url).toString();
 }
 
 function getPartyShareTitle(preview: PartySharePreview) {
