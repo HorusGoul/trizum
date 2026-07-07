@@ -2,6 +2,55 @@ import { createExpenseLogFixture, defaultParticipants } from "./harness/scenario
 import { expect, test } from "./harness/trizum.fixture";
 
 test.describe("Expense calculator", () => {
+  test("keeps the calculator button aligned when the amount is invalid", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 668, height: 250 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    await page.getByLabel("Title", { exact: true }).fill("Dinner");
+    await amountField.fill("0");
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByText("Amount must be greater than 0")).toBeVisible();
+
+    const calculatorButton = page.getByRole("button", {
+      name: "Open calculator",
+      exact: true,
+    });
+    await expect(calculatorButton).toBeVisible();
+
+    const amountBox = await amountField.boundingBox();
+    const buttonBox = await calculatorButton.boundingBox();
+
+    if (!amountBox || !buttonBox) {
+      throw new Error("Expected the amount input and calculator button to be visible");
+    }
+
+    const buttonCenterY = buttonBox.y + buttonBox.height / 2;
+
+    expect(buttonCenterY).toBeGreaterThanOrEqual(amountBox.y);
+    expect(buttonCenterY).toBeLessThanOrEqual(amountBox.y + amountBox.height);
+  });
+
   test("auto-opens without native input and replaces selected amounts", async ({
     harness,
     page,

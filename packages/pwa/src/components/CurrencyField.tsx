@@ -122,8 +122,19 @@ function CurrencyFieldWithCalculator({
     }
   }
 
+  const calculatorButton = (
+    <IconButton
+      icon={isCalculatorActive ? "lucide.x" : "lucide.calculator"}
+      aria-label={isCalculatorActive ? t`Close calculator` : t`Open calculator`}
+      color="transparent"
+      className={calculatorButtonClassName ?? "absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"}
+      iconClassName="size-4"
+      onPress={isCalculatorActive ? closeCalculator : openCalculator}
+    />
+  );
+
   return (
-    <div className="relative" ref={fieldContainerRef}>
+    <div ref={fieldContainerRef}>
       <AppCurrencyField
         {...props}
         value={props.value}
@@ -132,17 +143,10 @@ function CurrencyFieldWithCalculator({
         onFocus={handleFocus}
         inputClassName={cn(
           props.inputClassName,
+          !calculatorButtonClassName && "pr-12",
           isCalculatorActive && "ring-ring ring-2 ring-offset-2",
         )}
-      />
-
-      <IconButton
-        icon={isCalculatorActive ? "lucide.x" : "lucide.calculator"}
-        aria-label={isCalculatorActive ? t`Close calculator` : t`Open calculator`}
-        color="transparent"
-        className={calculatorButtonClassName ?? "absolute right-1 bottom-1 h-8 w-8"}
-        iconClassName="size-4"
-        onPress={isCalculatorActive ? closeCalculator : openCalculator}
+        inputEndAdornment={calculatorButton}
       />
 
       {isCalculatorActive && state.isActive && (
