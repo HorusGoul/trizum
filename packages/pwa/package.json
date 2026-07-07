@@ -73,7 +73,8 @@
     "tailwind-merge": "catalog:",
     "ulidx": "catalog:",
     "workbox-build": "catalog:",
-    "workbox-window": "catalog:"
+    "workbox-window": "catalog:",
+    "workers-og": "catalog:"
   },
   "devDependencies": {
     "@babel/core": "catalog:",
