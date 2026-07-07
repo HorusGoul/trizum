@@ -28,6 +28,7 @@ export function AppCurrencyField({
   value,
   onChange,
   inputClassName,
+  inputMode,
   currency,
   ...props
 }: AppCurrencyFieldProps) {
@@ -103,7 +104,7 @@ export function AppCurrencyField({
       {...props}
     >
       {label ? <Label>{label}</Label> : null}
-      <Input inputMode="decimal" className={cn(inputClassName)} />
+      <Input inputMode={inputMode ?? "decimal"} className={cn(inputClassName)} />
       {description && (
         <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
           {description}

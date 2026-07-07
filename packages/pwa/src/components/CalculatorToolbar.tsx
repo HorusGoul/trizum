@@ -2,10 +2,15 @@ import { t } from "@lingui/core/macro";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
+import { IconButton } from "#src/ui/IconButton.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
+import { cn } from "#src/ui/utils.ts";
+import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
+const DESKTOP_POPOVER_MARGIN = 8;
+const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
 function getCurrencyPreviewFormatter(currency: string) {
@@ -32,6 +37,7 @@ function getExpressionCharacterKey(expression: string, index: number) {
 interface CalculatorToolbarProps {
   expression: string;
   cursorPosition: number;
+  selectionRange: CalculatorSelectionRange | null;
   onInsert: (text: string) => void;
   onBackspace: () => void;
   onMoveCursor: (direction: "left" | "right") => void;
@@ -43,6 +49,7 @@ interface CalculatorToolbarProps {
   presenceElementId?: string;
   previewValue: number | null;
   currency?: string;
+  dismissOnOutsideInteraction?: boolean;
 }
 
 type CalculatorCallbacks = Pick<
@@ -65,6 +72,55 @@ type CalculatorLayout = {
   } | null;
 };
 
+function getCalculatorLayout(
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>,
+): CalculatorLayout {
+  if (typeof window === "undefined") {
+    return {
+      isLargeScreen: false,
+      popoverPosition: null,
+    };
+  }
+
+  const isLargeScreen = window.matchMedia("(min-width: 768px)").matches;
+
+  if (!isLargeScreen || !fieldContainerRef.current) {
+    return {
+      isLargeScreen,
+      popoverPosition: null,
+    };
+  }
+
+  const rect = fieldContainerRef.current.getBoundingClientRect();
+  const width = Math.max(rect.width, 280);
+  const maxTop = Math.max(
+    DESKTOP_POPOVER_MARGIN,
+    window.innerHeight - DESKTOP_POPOVER_ESTIMATED_HEIGHT - DESKTOP_POPOVER_MARGIN,
+  );
+  const maxLeft = Math.max(
+    DESKTOP_POPOVER_MARGIN,
+    window.innerWidth - width - DESKTOP_POPOVER_MARGIN,
+  );
+
+  return {
+    isLargeScreen: true,
+    popoverPosition: {
+      top: Math.max(DESKTOP_POPOVER_MARGIN, Math.min(rect.bottom + DESKTOP_POPOVER_MARGIN, maxTop)),
+      left: Math.max(DESKTOP_POPOVER_MARGIN, Math.min(rect.left, maxLeft)),
+      width,
+    },
+  };
+}
+
+function areCalculatorLayoutsEqual(previous: CalculatorLayout, next: CalculatorLayout) {
+  return (
+    previous.isLargeScreen === next.isLargeScreen &&
+    previous.popoverPosition?.top === next.popoverPosition?.top &&
+    previous.popoverPosition?.left === next.popoverPosition?.left &&
+    previous.popoverPosition?.width === next.popoverPosition?.width
+  );
+}
+
 function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
   const callbacksRef = useRef(callbacks);
 
@@ -76,55 +132,18 @@ function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
 }
 
 function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDivElement | null>) {
-  const [layout, setLayout] = useState<CalculatorLayout>({
-    isLargeScreen: false,
-    popoverPosition: null,
-  });
+  const [layout, setLayout] = useState<CalculatorLayout>(() =>
+    getCalculatorLayout(fieldContainerRef),
+  );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
 
     function updatePosition() {
-      if (mediaQuery.matches && fieldContainerRef.current) {
-        const rect = fieldContainerRef.current.getBoundingClientRect();
-        setLayout((currentLayout) => {
-          const currentPosition = currentLayout.popoverPosition;
-          const popoverPosition = {
-            top: rect.bottom + 8,
-            left: rect.left,
-            width: Math.max(rect.width, 280),
-          };
-
-          if (
-            currentLayout.isLargeScreen &&
-            currentPosition &&
-            currentPosition.top === popoverPosition.top &&
-            currentPosition.left === popoverPosition.left &&
-            currentPosition.width === popoverPosition.width
-          ) {
-            return currentLayout;
-          }
-
-          return {
-            isLargeScreen: true,
-            popoverPosition,
-          };
-        });
-      } else {
-        setLayout((currentLayout) => {
-          if (
-            currentLayout.isLargeScreen === mediaQuery.matches &&
-            currentLayout.popoverPosition === null
-          ) {
-            return currentLayout;
-          }
-
-          return {
-            isLargeScreen: mediaQuery.matches,
-            popoverPosition: null,
-          };
-        });
-      }
+      const nextLayout = getCalculatorLayout(fieldContainerRef);
+      setLayout((currentLayout) =>
+        areCalculatorLayoutsEqual(currentLayout, nextLayout) ? currentLayout : nextLayout,
+      );
     }
 
     updatePosition();
@@ -317,14 +336,20 @@ function useExpressionPointerGestures({
 
 function useCalculatorDismiss({
   callbacksRef,
+  enabled,
   fieldContainerRef,
   toolbarRef,
 }: {
   callbacksRef: React.RefObject<CalculatorCallbacks>;
+  enabled: boolean;
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   toolbarRef: React.RefObject<HTMLDivElement | null>;
 }) {
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     function isOutside(target: Node | null) {
       if (!target) return false;
 
@@ -352,14 +377,28 @@ function useCalculatorDismiss({
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [callbacksRef, fieldContainerRef, toolbarRef]);
+  }, [callbacksRef, enabled, fieldContainerRef, toolbarRef]);
 }
 
-function useCalculatorKeyboard(callbacksRef: React.RefObject<CalculatorCallbacks>) {
+function useCalculatorKeyboard({
+  callbacksRef,
+  fieldContainerRef,
+  toolbarRef,
+}: {
+  callbacksRef: React.RefObject<CalculatorCallbacks>;
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+}) {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      const target = e.target as HTMLElement;
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      const target = e.target as HTMLElement | null;
+      const isEditableTarget =
+        target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
+      const isCalculatorTarget =
+        target &&
+        (fieldContainerRef.current?.contains(target) || toolbarRef.current?.contains(target));
+
+      if (isEditableTarget && !isCalculatorTarget) {
         return;
       }
 
@@ -412,7 +451,7 @@ function useCalculatorKeyboard(callbacksRef: React.RefObject<CalculatorCallbacks
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [callbacksRef]);
+  }, [callbacksRef, fieldContainerRef, toolbarRef]);
 }
 
 function formatCalculatorPreviewValue(value: number, currency?: string): string {
@@ -435,6 +474,7 @@ function formatCalculatorPreviewValue(value: number, currency?: string): string 
 export function CalculatorToolbar({
   expression,
   cursorPosition,
+  selectionRange,
   onInsert,
   onBackspace,
   onMoveCursor,
@@ -446,6 +486,7 @@ export function CalculatorToolbar({
   presenceElementId,
   previewValue,
   currency,
+  dismissOnOutsideInteraction = true,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
@@ -482,8 +523,17 @@ export function CalculatorToolbar({
     expressionRef,
     pointerStartRef,
   });
-  useCalculatorDismiss({ callbacksRef, fieldContainerRef, toolbarRef });
-  useCalculatorKeyboard(callbacksRef);
+  useCalculatorDismiss({
+    callbacksRef,
+    enabled: dismissOnOutsideInteraction,
+    fieldContainerRef,
+    toolbarRef,
+  });
+  useCalculatorKeyboard({ callbacksRef, fieldContainerRef, toolbarRef });
+
+  if (isLargeScreen && !popoverPosition) {
+    return null;
+  }
 
   return createPortal(
     <div
@@ -493,7 +543,7 @@ export function CalculatorToolbar({
       data-presence-element-id={presenceElementId}
       className={
         isLargeScreen && popoverPosition
-          ? "border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 rounded-lg border bg-white shadow-lg"
+          ? "border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 overflow-y-auto rounded-lg border bg-white shadow-lg"
           : "border-accent-300 pb-safe dark:border-accent-700 dark:bg-accent-900 fixed right-0 left-0 z-50 border-t bg-white"
       }
       style={
@@ -502,20 +552,27 @@ export function CalculatorToolbar({
               top: popoverPosition.top,
               left: popoverPosition.left,
               width: popoverPosition.width,
+              maxHeight: `calc(100vh - ${DESKTOP_POPOVER_MARGIN * 2}px)`,
             }
           : { bottom: 0 }
       }
-      onPointerDown={(e) => {
-        // Prevent any focus changes that could interfere with the calculator
-        e.preventDefault();
-      }}
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
-        <CalculatorPreview
-          currency={currency}
-          expression={expression}
-          previewValue={previewValue}
-        />
+        <div className="flex items-center gap-2">
+          <CalculatorPreview
+            currency={currency}
+            expression={expression}
+            previewValue={previewValue}
+          />
+          <IconButton
+            icon="lucide.x"
+            aria-label={t`Close calculator`}
+            color="transparent"
+            onPress={onDismiss}
+            className="h-8 w-8 shrink-0"
+            iconClassName="size-4"
+          />
+        </div>
         <CalculatorExpressionDisplay
           charRefs={charRefs}
           cursorPosition={cursorPosition}
@@ -523,6 +580,7 @@ export function CalculatorToolbar({
           expressionContentRef={expressionContentRef}
           expressionRef={expressionRef}
           expressionScrollRef={expressionScrollRef}
+          selectionRange={selectionRange}
         />
         <CalculatorKeypad
           onBackspace={onBackspace}
@@ -546,7 +604,7 @@ function CalculatorPreview({
   previewValue: number | null;
 }) {
   return (
-    <div className="flex h-5 items-center justify-end px-1">
+    <div className="flex h-8 flex-1 items-center justify-end px-1">
       {previewValue !== null && expression ? (
         <span className="text-accent-600 dark:text-accent-400 text-sm font-medium">
           = {formatCalculatorPreviewValue(previewValue, currency)}
@@ -563,6 +621,7 @@ function CalculatorExpressionDisplay({
   expressionContentRef,
   expressionRef,
   expressionScrollRef,
+  selectionRange,
 }: {
   charRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   cursorPosition: number;
@@ -570,10 +629,21 @@ function CalculatorExpressionDisplay({
   expressionContentRef: React.RefObject<HTMLSpanElement | null>;
   expressionRef: React.RefObject<HTMLDivElement | null>;
   expressionScrollRef: React.RefObject<HTMLSpanElement | null>;
+  selectionRange: CalculatorSelectionRange | null;
 }) {
   const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
     charRefs.current[index] = el;
   };
+  const activeSelectionRange =
+    selectionRange && selectionRange.start !== selectionRange.end
+      ? {
+          start: Math.max(0, Math.min(selectionRange.start, selectionRange.end, expression.length)),
+          end: Math.max(
+            0,
+            Math.min(Math.max(selectionRange.start, selectionRange.end), expression.length),
+          ),
+        }
+      : null;
 
   return (
     <div
@@ -594,9 +664,15 @@ function CalculatorExpressionDisplay({
               <span
                 key={getExpressionCharacterKey(expression, index)}
                 ref={setCharRef(index)}
-                className="relative"
+                className={cn(
+                  "relative",
+                  activeSelectionRange &&
+                    index >= activeSelectionRange.start &&
+                    index < activeSelectionRange.end &&
+                    "bg-accent-300 text-accent-950 dark:bg-accent-700 dark:text-accent-50",
+                )}
               >
-                {index === cursorPosition ? (
+                {!activeSelectionRange && index === cursorPosition ? (
                   <span className="animate-blink absolute top-0 left-0 h-full w-0">
                     <span className="absolute -translate-x-1/2">|</span>
                   </span>
@@ -604,7 +680,7 @@ function CalculatorExpressionDisplay({
                 {char}
               </span>
             ))}
-            {cursorPosition === expression.length ? (
+            {!activeSelectionRange && cursorPosition === expression.length ? (
               <span className="animate-blink absolute top-0 right-0 h-full w-0">
                 <span className="absolute -translate-x-1/2">|</span>
               </span>
@@ -622,13 +698,16 @@ function CalculatorKeypad({
   onCommit,
   onInsert,
 }: Pick<CalculatorToolbarProps, "onBackspace" | "onClear" | "onCommit" | "onInsert">) {
+  const utilityButtonClassName = "h-12 touch-manipulation rounded-xl text-lg font-medium";
+  const digitButtonClassName = "h-12 touch-manipulation rounded-xl text-xl font-medium";
+
   return (
     <div className="grid grid-cols-4 gap-1.5">
       <Button
         color="input-like"
         aria-label={t`Clear all`}
         onPress={onClear}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         AC
       </Button>
@@ -636,7 +715,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Open parenthesis`}
         onPress={() => onInsert("(")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         (
       </Button>
@@ -644,7 +723,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Close parenthesis`}
         onPress={() => onInsert(")")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         )
       </Button>
@@ -652,7 +731,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Divide`}
         onPress={() => onInsert("/")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         ÷
       </Button>
@@ -663,7 +742,7 @@ function CalculatorKeypad({
           color="input-like"
           aria-label={digit}
           onPress={() => onInsert(digit)}
-          className="h-12 rounded-xl text-xl font-medium"
+          className={digitButtonClassName}
         >
           {digit}
         </Button>
@@ -672,7 +751,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Multiply`}
         onPress={() => onInsert("*")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         ×
       </Button>
@@ -683,7 +762,7 @@ function CalculatorKeypad({
           color="input-like"
           aria-label={digit}
           onPress={() => onInsert(digit)}
-          className="h-12 rounded-xl text-xl font-medium"
+          className={digitButtonClassName}
         >
           {digit}
         </Button>
@@ -692,7 +771,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Subtract`}
         onPress={() => onInsert("-")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         −
       </Button>
@@ -703,7 +782,7 @@ function CalculatorKeypad({
           color="input-like"
           aria-label={digit}
           onPress={() => onInsert(digit)}
-          className="h-12 rounded-xl text-xl font-medium"
+          className={digitButtonClassName}
         >
           {digit}
         </Button>
@@ -712,7 +791,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Add`}
         onPress={() => onInsert("+")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         +
       </Button>
@@ -721,7 +800,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label="0"
         onPress={() => onInsert("0")}
-        className="h-12 rounded-xl text-xl font-medium"
+        className={digitButtonClassName}
       >
         0
       </Button>
@@ -729,7 +808,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Decimal point`}
         onPress={() => onInsert(".")}
-        className="h-12 rounded-xl text-xl font-medium"
+        className={digitButtonClassName}
       >
         .
       </Button>
@@ -737,7 +816,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Backspace`}
         onPress={onBackspace}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         <Icon icon="lucide.delete" className="size-5" />
       </Button>
@@ -745,7 +824,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Calculate result`}
         onPress={onCommit}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         =
       </Button>

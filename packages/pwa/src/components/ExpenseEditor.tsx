@@ -75,6 +75,9 @@ interface ExpenseEditorProps {
   goBackFallbackOptions: React.ComponentProps<typeof BackButton>["fallbackOptions"];
   /** Optional callback to view a photo at a given index (for route-based gallery) */
   onViewPhoto?: (index: number) => void;
+  activeCalculatorId?: string;
+  onOpenCalculator?: (calculatorId: string) => void;
+  onCloseCalculator?: () => void;
 }
 
 type ExpenseEditorFormApi = AppFormApi<ExpenseEditorFormValues>;
@@ -92,6 +95,9 @@ export function ExpenseEditor({
   autoFocus = true,
   goBackFallbackOptions,
   onViewPhoto,
+  activeCalculatorId,
+  onOpenCalculator,
+  onCloseCalculator,
 }: ExpenseEditorProps) {
   const { i18n } = useLingui();
   const { partyList, setAutoOpenCalculator } = usePartyList();
@@ -300,18 +306,24 @@ export function ExpenseEditor({
         className="container mt-4 flex flex-col px-4"
       >
         <ExpenseDetailsFields
+          activeCalculatorId={activeCalculatorId}
           autoOpenCalculator={autoOpenCalculator}
           createFieldFocusHandlers={createFieldFocusHandlers}
           focusedFieldRef={focusedFieldRef}
           form={form}
+          onCloseCalculator={onCloseCalculator}
+          onOpenCalculator={onOpenCalculator}
           onViewPhoto={onViewPhoto}
           participants={participants}
           shouldAutoFocus={autoFocus}
         />
         <ExpenseParticipantsSection
+          activeCalculatorId={activeCalculatorId}
           amount={amount}
           autoOpenCalculator={autoOpenCalculator}
+          onCloseCalculator={onCloseCalculator}
           onIncludeAllChange={handleIncludeAllChange}
+          onOpenCalculator={onOpenCalculator}
           onSharesChange={(shares) => form.setFieldValue("shares", shares)}
           participants={participants}
           shares={shares}
@@ -372,18 +384,24 @@ function ExpenseEditorHeader({
 }
 
 function ExpenseDetailsFields({
+  activeCalculatorId,
   autoOpenCalculator,
   createFieldFocusHandlers,
   focusedFieldRef,
   form,
+  onCloseCalculator,
+  onOpenCalculator,
   onViewPhoto,
   participants,
   shouldAutoFocus,
 }: {
+  activeCalculatorId?: string;
   autoOpenCalculator: boolean;
   createFieldFocusHandlers: FieldFocusHandlersFactory;
   focusedFieldRef: React.RefObject<keyof ExpenseEditorFormValues | null>;
   form: ExpenseEditorFormApi;
+  onCloseCalculator?: () => void;
+  onOpenCalculator?: (calculatorId: string) => void;
   onViewPhoto?: (index: number) => void;
   participants: PartyParticipant[];
   shouldAutoFocus: boolean;
@@ -442,9 +460,13 @@ function ExpenseDetailsFields({
         {(field) => (
           <CurrencyField
             calculator
+            calculatorId="amount"
+            activeCalculatorId={activeCalculatorId}
             autoOpenCalculator={autoOpenCalculator}
             name={field.name}
             label={t`Amount`}
+            onCloseCalculator={onCloseCalculator}
+            onOpenCalculator={onOpenCalculator}
             value={field.state.value}
             onChange={(value) => {
               field.handleChange(value || 0);
@@ -514,16 +536,22 @@ function ExpenseDetailsFields({
 }
 
 function ExpenseParticipantsSection({
+  activeCalculatorId,
   amount,
   autoOpenCalculator,
+  onCloseCalculator,
   onIncludeAllChange,
+  onOpenCalculator,
   onSharesChange,
   participants,
   shares,
 }: {
+  activeCalculatorId?: string;
   amount: number;
   autoOpenCalculator: boolean;
+  onCloseCalculator?: () => void;
   onIncludeAllChange: (include: boolean) => void;
+  onOpenCalculator?: (calculatorId: string) => void;
   onSharesChange: ParticipantItemProps["onSharesChange"];
   participants: PartyParticipant[];
   shares: ParticipantItemProps["shares"];
@@ -549,7 +577,10 @@ function ExpenseParticipantsSection({
             participant={participant}
             amount={amount}
             shares={shares}
+            activeCalculatorId={activeCalculatorId}
             autoOpenCalculator={autoOpenCalculator}
+            onCloseCalculator={onCloseCalculator}
+            onOpenCalculator={onOpenCalculator}
             onSharesChange={onSharesChange}
           />
         ))}
@@ -564,7 +595,10 @@ interface ParticipantItemProps {
   amount: number;
   participant: PartyParticipant;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
+  activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
+  onCloseCalculator?: () => void;
+  onOpenCalculator?: (calculatorId: string) => void;
   onSharesChange: (
     shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
   ) => void;
@@ -574,7 +608,10 @@ function ParticipantItem({
   amount,
   shares,
   participant,
+  activeCalculatorId,
   autoOpenCalculator,
+  onCloseCalculator,
+  onOpenCalculator,
   onSharesChange,
 }: ParticipantItemProps) {
   const participantShare = shares[participant.id];
@@ -760,7 +797,10 @@ function ParticipantItem({
               amount={amount}
               shares={shares}
               participantId={participant.id}
+              activeCalculatorId={activeCalculatorId}
               autoOpenCalculator={autoOpenCalculator}
+              onCloseCalculator={onCloseCalculator}
+              onOpenCalculator={onOpenCalculator}
               onChange={onExactAmountChange}
               aria-label={t`Amount for ${participantName}`}
             />
@@ -774,7 +814,10 @@ interface ParticipantSplitAmountFieldProps {
   amount: number;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   participantId: ExpenseUser;
+  activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
+  onCloseCalculator?: () => void;
+  onOpenCalculator?: (calculatorId: string) => void;
   onChange: (value: number) => void;
   "aria-label"?: string;
 }
@@ -783,7 +826,10 @@ function ParticipantSplitAmountField({
   amount,
   shares,
   participantId,
+  activeCalculatorId,
   autoOpenCalculator,
+  onCloseCalculator,
+  onOpenCalculator,
   onChange,
   "aria-label": ariaLabel,
 }: ParticipantSplitAmountFieldProps) {
@@ -793,8 +839,12 @@ function ParticipantSplitAmountField({
   return (
     <CurrencyField
       calculator
+      calculatorId={`share-${participantId}`}
+      activeCalculatorId={activeCalculatorId}
       autoOpenCalculator={autoOpenCalculator}
       calculatorButtonClassName="absolute bottom-0.5 -left-8 h-6 w-6"
+      onCloseCalculator={onCloseCalculator}
+      onOpenCalculator={onOpenCalculator}
       value={participantAmount / 100}
       onChange={onChange}
       className="w-20"

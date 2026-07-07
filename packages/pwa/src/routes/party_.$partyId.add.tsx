@@ -12,10 +12,12 @@ import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import { ExpenseEditor, type ExpenseEditorFormValues } from "#src/components/ExpenseEditor.js";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
+import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
 
 interface AddExpenseSearchParams {
+  calculator?: string;
   media?: number;
 }
 
@@ -27,6 +29,10 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 
   validateSearch: (search): AddExpenseSearchParams => {
     return {
+      calculator:
+        typeof search.calculator === "string" && search.calculator.length > 0
+          ? search.calculator
+          : undefined,
       media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
     };
   },
@@ -44,11 +50,33 @@ function AddExpense() {
   const currentLocation = useLocation();
   const participant = useCurrentParticipant();
 
+  function mergeSearchOptions<TSearch extends Partial<AddExpenseSearchParams>>(options: {
+    search: TSearch;
+    replace?: boolean;
+  }) {
+    return {
+      ...options,
+      search: {
+        ...search,
+        ...options.search,
+      },
+    };
+  }
+
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
     currentLocation,
-    buildLocation: (options) => router.buildLocation({ ...options, from: Route.fullPath }),
-    navigate: (options) => void navigate(options),
+    buildLocation: (options) =>
+      router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
+    navigate: (options) => void navigate(mergeSearchOptions(options)),
+    history: router.history,
+  });
+  const { activeCalculatorId, openCalculator, closeCalculator } = useRouteCalculator({
+    calculatorId: search.calculator,
+    currentLocation,
+    buildLocation: (options) =>
+      router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
+    navigate: (options) => void navigate(mergeSearchOptions(options)),
     history: router.history,
   });
 
@@ -120,6 +148,9 @@ function AddExpense() {
           photos: [],
         }}
         goBackFallbackOptions={{ to: "/party/$partyId" }}
+        activeCalculatorId={activeCalculatorId}
+        onCloseCalculator={closeCalculator}
+        onOpenCalculator={openCalculator}
         onViewPhoto={openGallery}
       />
       <RouteMediaGallery
