@@ -28,14 +28,22 @@ describe("Toaster", () => {
     expect(toastStyle["--width"]).toBe("min(24rem, calc(100vw - 2rem))");
   });
 
-  test("uses PWA design-system classes for toast surfaces", () => {
+  test("uses restrained PWA design-system classes for toast surfaces", () => {
+    expect(toastClassNames.toast).toContain("items-center");
     expect(toastClassNames.toast).toContain("rounded-lg");
+    expect(toastClassNames.toast).toContain("border-accent-200/80");
     expect(toastClassNames.toast).toContain("bg-white");
     expect(toastClassNames.toast).toContain("dark:bg-accent-900");
-    expect(toastClassNames.actionButton).toContain("bg-accent-500");
-    expect(toastClassNames.success).toContain("bg-success-50");
-    expect(toastClassNames.error).toContain("bg-danger-50");
-    expect(toastClassNames.warning).toContain("bg-warning-50");
+    expect(toastClassNames.title).toContain("font-medium");
+    expect(toastClassNames.description).toContain("font-normal");
+    expect(toastClassNames.actionButton).toContain("font-medium");
+    expect(toastClassNames.success).toContain("[&_[data-icon]]:text-success-500");
+    expect(toastClassNames.success).toContain("dark:[&_[data-icon]]:text-success-400");
+    expect(toastClassNames.error).toContain("[&_[data-icon]]:text-danger-500");
+    expect(toastClassNames.warning).toContain("[&_[data-icon]]:text-warning-600");
+    expect(toastClassNames.success).not.toContain("bg-success-50");
+    expect(toastClassNames.error).not.toContain("bg-danger-50");
+    expect(toastClassNames.warning).not.toContain("bg-warning-50");
   });
 
   test("uses the app icon sprite for toast states", () => {
@@ -56,5 +64,6 @@ describe("Toaster", () => {
     expect(markup).toContain("#lucide.triangle-alert");
     expect(markup).toContain("#lucide.circle-alert");
     expect(markup).toContain("#lucide.loader-circle");
+    expect(markup).toContain("stroke-[1.75]");
   });
 });
