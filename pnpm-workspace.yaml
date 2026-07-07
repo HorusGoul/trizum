@@ -67,7 +67,7 @@ catalog:
   "@lingui/core": 6.5.0
   "@lingui/format-po": 6.5.0
   "@lingui/react": 6.5.0
-  "@lingui/vite-plugin": 6.4.0
+  "@lingui/vite-plugin": 6.5.0
   "@logtape/logtape": 2.2.3
   "@logtape/sentry": 2.2.3
   "@openai/codex": 0.142.5
@@ -90,7 +90,7 @@ catalog:
   "@use-gesture/react": 10.3.1
   "@vite-pwa/assets-generator": 1.0.2
   "@vitejs/plugin-react": 6.0.3
-  "@vitest/coverage-v8": 4.1.9
+  "@vitest/coverage-v8": 4.1.10
   agent-browser: 0.31.1
   all-contributors-cli: 6.26.1
   babel-plugin-react-compiler: 1.0.0
@@ -148,7 +148,7 @@ catalog:
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
   vite-plus: 0.2.2
-  vitest: 4.1.9
+  vitest: 4.1.10
   workbox-build: 7.4.1
   workbox-window: 7.4.1
   wrangler: 4.107.0
