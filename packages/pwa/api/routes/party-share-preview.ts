@@ -16,7 +16,7 @@ import { DEFAULT_PARTY_SYMBOL, type Party } from "../../src/models/party.js";
 const logger = getLogger("api", "partySharePreview");
 
 const DEFAULT_AUTOMERGE_WSS_URL = "wss://server.trizum.app/sync";
-const DEFAULT_PREVIEW_TIMEOUT_MS = 5_000;
+const DEFAULT_PREVIEW_TIMEOUT_MS = 10_000;
 const PREVIEW_CACHE_SUCCESS_TTL_MS = 60_000;
 const PREVIEW_CACHE_FALLBACK_TTL_MS = 5_000;
 const MAX_DESCRIPTION_LENGTH = 180;
@@ -398,7 +398,7 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
   let repo: Repo | undefined;
 
   try {
-    await initializeAutomerge();
+    const automergeReady = initializeAutomerge();
 
     repo = new Repo({
       isEphemeral: true,
@@ -409,6 +409,8 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
         announce: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
       },
     });
+
+    await automergeReady;
 
     const handle = await repo.find<PartyPreviewDocument>(documentId, {
       allowableStates: ["ready"],
