@@ -11,12 +11,13 @@ import interFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-norm
 import { Hono } from "hono";
 import type { ApiEnv, ApiHonoEnv } from "../env";
 import { getLogger } from "../../src/lib/log.js";
+import { DEFAULT_PARTY_SYMBOL, type Party } from "../../src/models/party.js";
 
 const logger = getLogger("api", "partySharePreview");
 
-const DEFAULT_PARTY_SYMBOL = "\uD83C\uDFDD\uFE0F";
 const DEFAULT_AUTOMERGE_WSS_URL = "wss://server.trizum.app/sync";
 const DEFAULT_PREVIEW_TIMEOUT_MS = 1800;
+const PREVIEW_SYNC_RETRY_INTERVAL_MS = 0;
 const PREVIEW_CACHE_SUCCESS_TTL_MS = 60_000;
 const PREVIEW_CACHE_FALLBACK_TTL_MS = 5_000;
 const MAX_DESCRIPTION_LENGTH = 180;
@@ -71,23 +72,25 @@ export interface PartySharePreview {
 interface PartySharePreviewRouteOptions {
   createImageResponse?: (
     html: string,
-    env: ApiEnv,
-    request: Request,
+    context: PartyShareImageResponseContext,
   ) => Promise<Response> | Response;
   loadPreview?: (partyId: string, env: ApiEnv, request: Request) => Promise<PartySharePreview>;
 }
 
-interface PartyPreviewDocument {
-  description?: unknown;
-  name?: unknown;
-  participants?: Record<string, PartyPreviewParticipant | undefined>;
-  symbol?: unknown;
-  type?: unknown;
+interface PartyShareImageResponseContext {
+  env: ApiEnv;
+  request: Request;
 }
 
-interface PartyPreviewParticipant {
-  isArchived?: boolean;
-  name?: unknown;
+type PartyPreviewDocument = Pick<
+  Party,
+  "description" | "name" | "participants" | "symbol" | "type"
+>;
+
+interface SocialMetaTag {
+  attribute: "name" | "property";
+  content: string;
+  value: string;
 }
 
 let automergeWasm: Promise<void> | undefined;
@@ -132,7 +135,10 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
       trizumMarkUrl: getPublicAssetUrl(c.req.raw, TRIZUM_MARK_PATH),
     });
 
-    return await createImageResponse(html, c.env, c.req.raw);
+    return await createImageResponse(html, {
+      env: c.env,
+      request: c.req.raw,
+    });
   });
 
   route.all("/party/*", (c) => c.env.ASSETS.fetch(c.req.raw));
@@ -140,7 +146,10 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
   return route;
 }
 
-async function createWorkersOgImageResponse(html: string, env: ApiEnv, request: Request) {
+async function createWorkersOgImageResponse(
+  html: string,
+  { env, request }: PartyShareImageResponseContext,
+) {
   const { ImageResponse } = await import("workers-og");
   const interFont = await loadInterFontData(env, request);
 
@@ -236,25 +245,21 @@ export function renderPartyShareMetaTags({
   const description = getPartyShareDescription(preview);
 
   return [
-    ["meta", "property", "og:type", "website"],
-    ["meta", "property", "og:site_name", "trizum"],
-    ["meta", "property", "og:title", title],
-    ["meta", "property", "og:description", description],
-    ["meta", "property", "og:url", pageUrl],
-    ["meta", "property", "og:image", imageUrl.toString()],
-    ["meta", "property", "og:image:width", String(PARTY_SHARE_IMAGE_WIDTH)],
-    ["meta", "property", "og:image:height", String(PARTY_SHARE_IMAGE_HEIGHT)],
-    ["meta", "property", "og:image:alt", `${title} preview`],
-    ["meta", "name", "twitter:card", "summary_large_image"],
-    ["meta", "name", "twitter:title", title],
-    ["meta", "name", "twitter:description", description],
-    ["meta", "name", "twitter:image", imageUrl.toString()],
+    propertyMeta("og:type", "website"),
+    propertyMeta("og:site_name", "trizum"),
+    propertyMeta("og:title", title),
+    propertyMeta("og:description", description),
+    propertyMeta("og:url", pageUrl),
+    propertyMeta("og:image", imageUrl.toString()),
+    propertyMeta("og:image:width", String(PARTY_SHARE_IMAGE_WIDTH)),
+    propertyMeta("og:image:height", String(PARTY_SHARE_IMAGE_HEIGHT)),
+    propertyMeta("og:image:alt", `${title} preview`),
+    nameMeta("twitter:card", "summary_large_image"),
+    nameMeta("twitter:title", title),
+    nameMeta("twitter:description", description),
+    nameMeta("twitter:image", imageUrl.toString()),
   ]
-    .map(([tag, keyName, keyValue, content]) => {
-      return `<${tag} ${keyName}="${escapeHtmlAttribute(keyValue)}" content="${escapeHtmlAttribute(
-        content,
-      )}" />`;
-    })
+    .map(renderSocialMetaTag)
     .join("\n    ");
 }
 
@@ -339,8 +344,8 @@ export function createPartySharePreviewFromParty(party: PartyPreviewDocument): P
 }
 
 function isActiveParticipant(
-  participant: PartyPreviewParticipant | undefined,
-): participant is PartyPreviewParticipant {
+  participant: PartyPreviewDocument["participants"][string] | undefined,
+): participant is PartyPreviewDocument["participants"][string] {
   return Boolean(participant && !participant.isArchived);
 }
 
@@ -397,7 +402,12 @@ async function loadPartySharePreviewFromAutomerge(partyId: string, env: ApiEnv, 
 
     repo = new Repo({
       isEphemeral: true,
-      network: [new BrowserWebSocketClientAdapter(getAutomergeWssUrl(env, request), 0)],
+      network: [
+        new BrowserWebSocketClientAdapter(
+          getAutomergeWssUrl(env, request),
+          PREVIEW_SYNC_RETRY_INTERVAL_MS,
+        ),
+      ],
       peerId: `party-share-preview:${crypto.randomUUID()}` as PeerId,
       sharePolicy: () => Promise.resolve(false),
     });
@@ -478,6 +488,18 @@ function formatMembersSummary(preview: PartySharePreview) {
   const summary = names.join(", ");
 
   return remainingCount > 0 ? `${summary}, +${remainingCount} more` : summary;
+}
+
+function propertyMeta(property: string, content: string): SocialMetaTag {
+  return { attribute: "property", content, value: property };
+}
+
+function nameMeta(name: string, content: string): SocialMetaTag {
+  return { attribute: "name", content, value: name };
+}
+
+function renderSocialMetaTag(tag: SocialMetaTag) {
+  return `<meta ${tag.attribute}="${escapeHtmlAttribute(tag.value)}" content="${escapeHtmlAttribute(tag.content)}" />`;
 }
 
 function renderMemberPill(memberName: string) {

@@ -78,9 +78,9 @@ describe("party share preview metadata", () => {
       description: "Beach house costs",
       name: "Summer Trip",
       participants: {
-        alice: { name: "Alice" },
-        archived: { isArchived: true, name: "Archived" },
-        bob: { name: "Bob" },
+        alice: { id: "alice", name: "Alice" },
+        archived: { id: "archived", isArchived: true, name: "Archived" },
+        bob: { id: "bob", name: "Bob" },
       },
       symbol: "S",
       type: "party",
