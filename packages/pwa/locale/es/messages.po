@@ -514,7 +514,7 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CurrencyField.tsx:80
+#: src/components/CurrencyField.tsx:91
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
@@ -1714,7 +1714,7 @@ msgstr "Solo puedes transferir tus propias deudas"
 msgid "Open archived parties"
 msgstr "Abrir grupos archivados"
 
-#: src/components/CurrencyField.tsx:80
+#: src/components/CurrencyField.tsx:91
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 

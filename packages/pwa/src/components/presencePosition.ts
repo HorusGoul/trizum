@@ -10,13 +10,13 @@ export function getPresenceBubblePosition(element: HTMLElement, overlayElement: 
   };
 }
 
-export function getPresenceElementIdFromTarget(target: HTMLElement | null): string | null {
+export function getPresenceElementIdFromTarget(target: Element | null): string | null {
   if (!target) {
     return null;
   }
 
-  const presenceElementId =
-    target.dataset?.presenceElementId ?? target.dataset?.presenceProxyElementId;
+  const dataset = "dataset" in target ? (target.dataset as DOMStringMap) : undefined;
+  const presenceElementId = dataset?.presenceElementId ?? dataset?.presenceProxyElementId;
 
   if (presenceElementId) {
     return presenceElementId;

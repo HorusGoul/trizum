@@ -162,9 +162,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   }, [handle, expenseId, participant.id]);
 
   useEffect(() => {
-    function onClick(event: MouseEvent) {
-      const target = event.target as HTMLElement;
-
+    function updatePresenceFromTarget(target: Element | null, { clearOnMiss = true } = {}) {
       const isWithinDialog = findPopoverFormElementFromTarget(target);
       const presenceElementId = getPresenceElementIdFromTarget(target);
 
@@ -180,7 +178,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
         return;
       }
 
-      if (isWithinDialog || presenceElementId) {
+      if (isWithinDialog || !clearOnMiss) {
         return;
       }
 
@@ -194,7 +192,25 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       presenceElementIdRef.current = null;
     }
 
+    function getElementFromEventTarget(target: EventTarget | null) {
+      return target instanceof Element ? target : null;
+    }
+
+    function onPointerDown(event: PointerEvent) {
+      updatePresenceFromTarget(getElementFromEventTarget(event.target));
+    }
+
+    function onClick(event: MouseEvent) {
+      updatePresenceFromTarget(getElementFromEventTarget(event.target));
+    }
+
+    function onFocusIn(event: FocusEvent) {
+      updatePresenceFromTarget(getElementFromEventTarget(event.target), { clearOnMiss: false });
+    }
+
+    window.addEventListener("pointerdown", onPointerDown, { capture: true });
     window.addEventListener("click", onClick, { capture: true });
+    window.addEventListener("focusin", onFocusIn, { capture: true });
 
     // visibility change listener
     function onVisibilityChange() {
@@ -256,7 +272,9 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     }, 5000);
 
     return () => {
+      window.removeEventListener("pointerdown", onPointerDown, { capture: true });
       window.removeEventListener("click", onClick, { capture: true });
+      window.removeEventListener("focusin", onFocusIn, { capture: true });
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("blur", onWindowBlur);
       clearInterval(interval);
@@ -382,7 +400,7 @@ function AvatarWrapper({
   );
 }
 
-function findPopoverFormElementFromTarget(target: HTMLElement): HTMLElement | null {
+function findPopoverFormElementFromTarget(target: Element | null): Element | null {
   if (!target) {
     return null;
   }

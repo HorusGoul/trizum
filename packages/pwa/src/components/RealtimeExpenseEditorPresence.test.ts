@@ -66,6 +66,16 @@ describe("getPresenceElementIdFromTarget", () => {
     expect(getPresenceElementIdFromTarget(button)).toBe("participant-alice");
   });
 
+  test("walks from icon targets to a parent proxy presence id", () => {
+    const toolbar = createPresenceTarget({
+      dataset: { presenceProxyElementId: "participant-alice" },
+    });
+    const button = createPresenceTarget({ parentElement: toolbar });
+    const icon = { parentElement: button } as Element;
+
+    expect(getPresenceElementIdFromTarget(icon)).toBe("participant-alice");
+  });
+
   test("finds the nearest parent presence id when the target has none", () => {
     const row = createPresenceTarget({
       dataset: { presenceElementId: "participant-alice" },
