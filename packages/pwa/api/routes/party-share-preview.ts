@@ -16,7 +16,7 @@ import { DEFAULT_PARTY_SYMBOL, type Party } from "../../src/models/party.js";
 const logger = getLogger("api", "partySharePreview");
 
 const DEFAULT_AUTOMERGE_WSS_URL = "wss://server.trizum.app/sync";
-const DEFAULT_PREVIEW_TIMEOUT_MS = 1800;
+const DEFAULT_PREVIEW_TIMEOUT_MS = 5_000;
 const PREVIEW_SYNC_RETRY_INTERVAL_MS = 0;
 const PREVIEW_CACHE_SUCCESS_TTL_MS = 60_000;
 const PREVIEW_CACHE_FALLBACK_TTL_MS = 5_000;
