@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vite-plus/test";
-import { getPresenceBubblePosition, getPresenceElementIdFromTarget } from "./presencePosition.ts";
+import {
+  arePresenceBubblePositionsEqual,
+  getPresenceBubblePosition,
+  getPresenceElementIdFromTarget,
+} from "./presencePosition.ts";
 
 function createElement({
   dataset,
@@ -53,6 +57,48 @@ describe("getPresenceBubblePosition", () => {
       left: 310,
       top: 166,
     });
+  });
+
+  test("reflects anchor position changes without relying on element size changes", () => {
+    const overlay = createElement({ left: 40, right: 440, top: 100 });
+    let anchorTop = 260;
+    let anchorRight = 360;
+    const amountField = {
+      dataset: {
+        presenceOffsetLeft: "-10",
+        presenceOffsetTop: "6",
+      },
+      getBoundingClientRect: () =>
+        ({
+          right: anchorRight,
+          top: anchorTop,
+        }) as DOMRectReadOnly,
+    } as unknown as HTMLElement;
+
+    expect(getPresenceBubblePosition(amountField, overlay)).toEqual({
+      left: 310,
+      top: 166,
+    });
+
+    anchorTop = 300;
+    anchorRight = 380;
+
+    expect(getPresenceBubblePosition(amountField, overlay)).toEqual({
+      left: 330,
+      top: 206,
+    });
+  });
+});
+
+describe("arePresenceBubblePositionsEqual", () => {
+  test("detects unchanged and changed bubble positions", () => {
+    expect(arePresenceBubblePositionsEqual({ left: 10, top: 20 }, { left: 10, top: 20 })).toBe(
+      true,
+    );
+    expect(arePresenceBubblePositionsEqual({ left: 10, top: 20 }, { left: 10, top: 21 })).toBe(
+      false,
+    );
+    expect(arePresenceBubblePositionsEqual(null, { left: 10, top: 20 })).toBe(false);
   });
 });
 

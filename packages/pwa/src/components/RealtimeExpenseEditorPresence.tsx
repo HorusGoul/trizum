@@ -13,7 +13,12 @@ import { Avatar } from "#src/ui/Avatar.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getPresenceBubblePosition, getPresenceElementIdFromTarget } from "./presencePosition.ts";
+import {
+  arePresenceBubblePositionsEqual,
+  getPresenceBubblePosition,
+  getPresenceElementIdFromTarget,
+  type PresenceBubblePosition,
+} from "./presencePosition.ts";
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
@@ -307,35 +312,43 @@ function Bubble({
   } | null>(null);
 
   useLayoutEffect(() => {
-    const element = document.querySelector<HTMLElement>(
-      `[data-presence-element-id="${presence.elementId}"]`,
-    );
-    const overlayElement = overlayRef.current;
+    const selector = `[data-presence-element-id="${presence.elementId}"]`;
+    let currentPosition: PresenceBubblePosition | null = null;
+    let frameId: number | null = null;
 
-    if (!element || !overlayElement) {
-      return;
+    function setNextPosition(nextPosition: PresenceBubblePosition | null) {
+      if (arePresenceBubblePositionsEqual(currentPosition, nextPosition)) {
+        return;
+      }
+
+      currentPosition = nextPosition;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Presence bubbles need committed DOM measurements.
+      setPosition(nextPosition);
     }
-
-    const targetElement = element;
-    const targetOverlayElement = overlayElement;
 
     function updatePosition() {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Presence bubbles need committed DOM measurements.
-      setPosition(getPresenceBubblePosition(targetElement, targetOverlayElement));
+      const element = document.querySelector<HTMLElement>(selector);
+      const overlayElement = overlayRef.current;
+
+      if (!element || !overlayElement) {
+        setNextPosition(null);
+        return;
+      }
+
+      setNextPosition(getPresenceBubblePosition(element, overlayElement));
     }
 
-    updatePosition();
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    function updatePositionOnAnimationFrame() {
+      updatePosition();
+      frameId = window.requestAnimationFrame(updatePositionOnAnimationFrame);
+    }
 
-    const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(updatePosition) : null;
-    resizeObserver?.observe(targetElement);
-    resizeObserver?.observe(targetOverlayElement);
+    updatePositionOnAnimationFrame();
 
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
-      resizeObserver?.disconnect();
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
     };
   }, [overlayRef, presence.elementId]);
 
