@@ -13,6 +13,7 @@ import { Avatar } from "#src/ui/Avatar.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { getPresenceBubblePosition } from "./presencePosition.ts";
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
@@ -82,6 +83,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     required: true,
   });
   const participant = useCurrentParticipant();
+  const overlayRef = useRef<HTMLDivElement>(null);
   const presenceElementIdRef = useRef<string | null>(null);
   const [visiblePresence, setVisiblePresence] = useState<ExpenseParticipantPresence[]>([]);
   const lastSentElementIdRef = useRef<string | null>(null);
@@ -262,17 +264,23 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   }, [expenseId, handle, participant.id]);
 
   return (
-    <div className="pointer-events-none absolute inset-0 touch-none">
+    <div ref={overlayRef} className="pointer-events-none absolute inset-0 touch-none">
       {visiblePresence.map((presence) => (
         <Suspense key={presence.participantId}>
-          <Bubble presence={presence} />
+          <Bubble presence={presence} overlayRef={overlayRef} />
         </Suspense>
       ))}
     </div>
   );
 }
 
-function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
+function Bubble({
+  presence,
+  overlayRef,
+}: {
+  presence: ExpenseParticipantPresence;
+  overlayRef: React.RefObject<HTMLDivElement | null>;
+}) {
   const { party } = useCurrentParty();
   const participant = party.participants[presence.participantId];
   const [position, setPosition] = useState<{
@@ -281,25 +289,37 @@ function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
   } | null>(null);
 
   useLayoutEffect(() => {
-    const element = document.querySelector(
+    const element = document.querySelector<HTMLElement>(
       `[data-presence-element-id="${presence.elementId}"]`,
-    ) as HTMLElement;
+    );
+    const overlayElement = overlayRef.current;
 
-    if (!element) {
+    if (!element || !overlayElement) {
       return;
     }
 
-    const width = element.offsetWidth;
+    const targetElement = element;
+    const targetOverlayElement = overlayElement;
 
-    const offsetTop = Number(element.dataset?.presenceOffsetTop ?? 0);
-    const offsetLeft = Number(element.dataset?.presenceOffsetLeft ?? 0);
+    function updatePosition() {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Presence bubbles need committed DOM measurements.
+      setPosition(getPresenceBubblePosition(targetElement, targetOverlayElement));
+    }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- This is fine for now
-    setPosition({
-      top: element.offsetTop + offsetTop,
-      left: element.offsetLeft + width + offsetLeft,
-    });
-  }, [presence.elementId]);
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+
+    const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(updatePosition) : null;
+    resizeObserver?.observe(targetElement);
+    resizeObserver?.observe(targetOverlayElement);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+      resizeObserver?.disconnect();
+    };
+  }, [overlayRef, presence.elementId]);
 
   if (!position) {
     return null;
@@ -368,7 +388,8 @@ function findPresenceElementFromTarget(target: HTMLElement): string | null {
   }
 
   // Check if the target has a data-presence-element-id attribute
-  const presenceElementId = target.dataset?.presenceElementId;
+  const presenceElementId =
+    target.dataset?.presenceElementId ?? target.dataset?.presenceProxyElementId;
 
   if (presenceElementId) {
     return presenceElementId;
