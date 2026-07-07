@@ -103,6 +103,14 @@ describe("arePresenceBubblePositionsEqual", () => {
 });
 
 describe("getPresenceElementIdFromTarget", () => {
+  test("uses a proxy presence id directly on a calculator opener", () => {
+    const button = createPresenceTarget({
+      dataset: { presenceProxyElementId: "amount" },
+    });
+
+    expect(getPresenceElementIdFromTarget(button)).toBe("amount");
+  });
+
   test("uses a proxy presence id when a portaled control represents another anchor", () => {
     const toolbar = createPresenceTarget({
       dataset: { presenceProxyElementId: "participant-alice" },
