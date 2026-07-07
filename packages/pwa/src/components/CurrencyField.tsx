@@ -43,9 +43,9 @@ function CurrencyFieldWithCalculator({
   calculatorButtonClassName?: string;
   autoOpenCalculator?: boolean;
 }) {
-  const presenceElementId = (props as { "data-presence-element-id"?: string })[
-    "data-presence-element-id"
-  ];
+  const presenceElementId =
+    (props as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
+    (props as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const [state, actions] = useCalculatorMode({
     value: props.value ?? 0,

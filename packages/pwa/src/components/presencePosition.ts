@@ -9,3 +9,18 @@ export function getPresenceBubblePosition(element: HTMLElement, overlayElement: 
     left: elementRect.right - overlayRect.left + offsetLeft,
   };
 }
+
+export function getPresenceElementIdFromTarget(target: HTMLElement | null): string | null {
+  if (!target) {
+    return null;
+  }
+
+  const presenceElementId =
+    target.dataset?.presenceElementId ?? target.dataset?.presenceProxyElementId;
+
+  if (presenceElementId) {
+    return presenceElementId;
+  }
+
+  return getPresenceElementIdFromTarget(target.parentElement);
+}

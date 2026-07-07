@@ -13,7 +13,7 @@ import { Avatar } from "#src/ui/Avatar.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getPresenceBubblePosition } from "./presencePosition.ts";
+import { getPresenceBubblePosition, getPresenceElementIdFromTarget } from "./presencePosition.ts";
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
@@ -166,7 +166,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       const target = event.target as HTMLElement;
 
       const isWithinDialog = findPopoverFormElementFromTarget(target);
-      const presenceElementId = findPresenceElementFromTarget(target);
+      const presenceElementId = getPresenceElementIdFromTarget(target);
 
       if (presenceElementId) {
         broadcastPresenceUpdate({
@@ -226,7 +226,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     function onWindowFocus() {
       // Grab element in focus
       const element = document.activeElement as HTMLElement;
-      const presenceElementId = findPresenceElementFromTarget(element);
+      const presenceElementId = getPresenceElementIdFromTarget(element);
 
       if (presenceElementId) {
         broadcastPresenceUpdate({
@@ -380,26 +380,6 @@ function AvatarWrapper({
       }}
     />
   );
-}
-
-function findPresenceElementFromTarget(target: HTMLElement): string | null {
-  if (!target) {
-    return null;
-  }
-
-  // Check if the target has a data-presence-element-id attribute
-  const presenceElementId =
-    target.dataset?.presenceElementId ?? target.dataset?.presenceProxyElementId;
-
-  if (presenceElementId) {
-    return presenceElementId;
-  }
-
-  if (target.parentElement) {
-    return findPresenceElementFromTarget(target.parentElement);
-  }
-
-  return null;
 }
 
 function findPopoverFormElementFromTarget(target: HTMLElement): HTMLElement | null {
