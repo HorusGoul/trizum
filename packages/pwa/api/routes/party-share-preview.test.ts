@@ -180,7 +180,7 @@ describe("party share preview route", () => {
     expect(response.headers.get("Content-Type")).toBe("text/html");
     expect(html).toContain("Cabin");
     expect(html).toContain("trizum");
-    expect(html).toContain('src="https://trizum.app/maskable.svg"');
+    expect(html).toContain('src="data:image/svg+xml;charset=utf-8,asset"');
   });
 });
 

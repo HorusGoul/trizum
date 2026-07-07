@@ -95,6 +95,7 @@ interface InterFontData {
 }
 
 let interFontData: Promise<InterFontData[]> | undefined;
+let trizumMarkDataUrl: Promise<string> | undefined;
 const previewCache = new Map<string, CachedPartySharePreview>();
 
 export const partySharePreviewRoute = createPartySharePreviewRoute();
@@ -131,8 +132,16 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
   route.get("/api/og/party/:partyId", async (c) => {
     const partyId = c.req.param("partyId");
     const preview = await loadPreview(partyId, c.env, c.req.raw);
+    const trizumMarkUrl = await loadTrizumMarkDataUrl(c.env, c.req.raw).catch((error) => {
+      logger.warning("Could not load trizum mark for party share preview: {errorMessage}", {
+        error: getErrorDetails(error),
+        errorMessage: getErrorMessage(error),
+      });
+
+      return getPublicAssetUrl(c.req.raw, TRIZUM_MARK_PATH);
+    });
     const html = renderPartyShareImageHtml(preview, {
-      trizumMarkUrl: getPublicAssetUrl(c.req.raw, TRIZUM_MARK_PATH),
+      trizumMarkUrl,
     });
 
     return await createImageResponse(html, {
@@ -195,6 +204,26 @@ async function fetchInterFontData(env: ApiEnv, request: Request) {
       };
     }),
   );
+}
+
+async function loadTrizumMarkDataUrl(env: ApiEnv, request: Request) {
+  trizumMarkDataUrl ??= fetchTrizumMarkDataUrl(env, request);
+
+  return trizumMarkDataUrl.catch((error) => {
+    trizumMarkDataUrl = undefined;
+    throw error;
+  });
+}
+
+async function fetchTrizumMarkDataUrl(env: ApiEnv, request: Request) {
+  const markUrl = new URL(TRIZUM_MARK_PATH, request.url);
+  const response = await env.ASSETS.fetch(new Request(markUrl));
+
+  if (!response.ok) {
+    throw new Error(`Could not load trizum mark asset: ${response.status}`);
+  }
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(await response.text())}`;
 }
 
 export function isPartyPreviewRequest(request: Request) {
