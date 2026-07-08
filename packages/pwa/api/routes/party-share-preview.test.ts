@@ -7,6 +7,7 @@ import {
   createPartySharePreviewRoute,
   injectPartyShareHeadTags,
   isPartyPreviewRequest,
+  renderPartyShareImageHtml,
   renderPartyShareHeadTags,
   type PartySharePreview,
 } from "./party-share-preview";
@@ -91,6 +92,26 @@ describe("party share preview metadata", () => {
       name: "Summer Trip",
       symbol: "S",
     });
+  });
+});
+
+describe("party share preview image", () => {
+  test("renders invite-focused action copy without participants", () => {
+    const html = renderPartyShareImageHtml(
+      createPreview({
+        description:
+          "This description is intentionally long enough to be truncated inside the generated image preview without moving the footer action row around.",
+        name: "This is an intentionally long party title that should be bounded inside one line",
+      }),
+      { trizumMarkUrl: "/maskable.svg" },
+    );
+
+    expect(html).toContain("Join party");
+    expect(html).toContain("via");
+    expect(html).toContain("trizum");
+    expect(html).toContain("...");
+    expect(html).not.toContain("Shared expense invite");
+    expect(html).not.toContain("Open in trizum");
   });
 });
 

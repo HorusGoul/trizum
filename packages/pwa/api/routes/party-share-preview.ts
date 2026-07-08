@@ -16,6 +16,11 @@ const MAX_IMAGE_DESCRIPTION_LENGTH = 210;
 const PARTY_SHARE_IMAGE_WIDTH = 1200;
 const PARTY_SHARE_IMAGE_HEIGHT = 630;
 const PARTY_SHARE_IMAGE_CACHE_CONTROL = "public, max-age=300, s-maxage=300";
+const PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH = 820;
+const PARTY_SHARE_IMAGE_TITLE_MAX_FONT_SIZE = 78;
+const PARTY_SHARE_IMAGE_TITLE_MIN_FONT_SIZE = 48;
+const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH = 740;
+const PARTY_SHARE_IMAGE_DESCRIPTION_FONT_SIZE = 34;
 const PARTY_SHARE_PURPOSE = "Open this party to split expenses and settle up together on trizum.";
 const PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION = "Split expenses and settle up together on trizum.";
 const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
@@ -26,28 +31,29 @@ const INTER_FONT_FACES = [
 ] as const;
 const TRIZUM_MARK_PATH = "/maskable.svg";
 const PARTY_SHARE_IMAGE_STYLES = {
-  brand: "display: flex; align-items: center;",
-  brandMark:
-    "display: flex; width: 74px; height: 74px; border-radius: 14px; overflow: hidden; background: #000000;",
-  brandName:
-    "display: flex; margin-left: 26px; font-size: 42px; font-weight: 800; letter-spacing: 0;",
   canvas:
-    "display: flex; flex-direction: column; width: 1200px; height: 630px; padding: 64px 70px; font-family: Inter, sans-serif; color: #FFFFFF; background: linear-gradient(180deg, #090909 0%, #030303 100%);",
+    "display: flex; flex-direction: column; width: 1200px; height: 630px; padding: 0 88px; font-family: Inter, sans-serif; color: #FFFFFF; background: linear-gradient(180deg, #050505 0%, #000000 100%);",
   content: "display: flex; flex-direction: column; width: 100%; height: 100%;",
+  ctaArrow: "display: flex; margin-left: 34px; font-size: 52px; font-weight: 400; line-height: 1;",
+  ctaButton:
+    "display: flex; align-items: center; height: 78px; padding: 0 36px; border: 3px solid #FFFFFF; border-radius: 39px; background: rgba(0,0,0,0.18);",
+  ctaText: "display: flex; font-size: 34px; font-weight: 800; color: #FFFFFF; line-height: 1;",
   description:
-    "display: flex; max-width: 860px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7;",
-  footer: "display: flex; flex-wrap: wrap; align-items: center; margin-top: 84px; gap: 18px;",
-  footerPill:
-    "display: flex; align-items: center; height: 78px; padding: 0 30px; border-radius: 39px; background: rgba(0,0,0,0.15); border: 2px solid #2A2A2A;",
-  footerText: "font-size: 30px; color: #F4F4F4;",
-  hero: "display: flex; align-items: center; margin-top: 70px;",
-  partyCopy: "display: flex; flex-direction: column; margin-left: 50px;",
+    "display: flex; max-width: 800px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7; white-space: nowrap; overflow: hidden;",
+  footer: "display: flex; align-items: center; margin-top: 40px;",
+  footerBrand: "display: flex; align-items: center; margin-left: 42px;",
+  footerBrandMark:
+    "display: flex; width: 52px; height: 52px; margin-left: 22px; overflow: hidden; background: #000000;",
+  footerBrandName:
+    "display: flex; margin-left: 18px; font-size: 34px; font-weight: 800; color: #FFFFFF;",
+  hero: "display: flex; align-items: center; margin-top: 182px;",
+  partyCopy: "display: flex; flex-direction: column; margin-left: 48px;",
   partyIcon:
-    "display: flex; align-items: center; justify-content: center; width: 92px; height: 92px; color: #FFFFFF; font-size: 78px; line-height: 1; filter: grayscale(1) brightness(2.35) contrast(1.8);",
+    "display: flex; align-items: center; justify-content: center; width: 124px; height: 124px; color: #FFFFFF; font-size: 108px; line-height: 1; filter: grayscale(1) brightness(2.35) contrast(1.8);",
   partyIconTile:
-    "display: flex; align-items: center; justify-content: center; width: 150px; height: 150px; border-radius: 34px; background: linear-gradient(180deg, #161616 0%, #080808 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.03);",
-  title:
-    "display: flex; max-width: 860px; font-size: 78px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
+    "display: flex; align-items: center; justify-content: center; width: 196px; height: 196px; border-radius: 40px; background: linear-gradient(180deg, #171717 0%, #050505 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.03);",
+  title: "display: flex; max-width: 820px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
+  viaText: "display: flex; font-size: 34px; color: #9A9A9A;",
 } as const;
 
 const CRAWLER_USER_AGENT_PATTERNS = [
@@ -323,28 +329,26 @@ export function renderPartyShareImageHtml(
   options: { trizumMarkUrl?: string } = {},
 ) {
   const trizumMarkUrl = options.trizumMarkUrl ?? TRIZUM_MARK_PATH;
-  const description = limitText(
+  const title = formatImageTitle(preview.name);
+  const description = truncateTextForWidth(
     preview.description || PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION,
-    MAX_IMAGE_DESCRIPTION_LENGTH,
+    PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH,
+    PARTY_SHARE_IMAGE_DESCRIPTION_FONT_SIZE,
+    {
+      maxLength: MAX_IMAGE_DESCRIPTION_LENGTH,
+    },
   );
 
   return `
     <div style="${PARTY_SHARE_IMAGE_STYLES.canvas}">
       <div style="${PARTY_SHARE_IMAGE_STYLES.content}">
-        <div style="${PARTY_SHARE_IMAGE_STYLES.brand}">
-          <div style="${PARTY_SHARE_IMAGE_STYLES.brandMark}">
-            <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="74" height="74" />
-          </div>
-          <div style="${PARTY_SHARE_IMAGE_STYLES.brandName}">trizum</div>
-        </div>
-
         <div style="${PARTY_SHARE_IMAGE_STYLES.hero}">
           <div style="${PARTY_SHARE_IMAGE_STYLES.partyIconTile}">
             <div style="${PARTY_SHARE_IMAGE_STYLES.partyIcon}">${escapeHtmlText(preview.symbol)}</div>
           </div>
 
           <div style="${PARTY_SHARE_IMAGE_STYLES.partyCopy}">
-            <div style="${PARTY_SHARE_IMAGE_STYLES.title}">${escapeHtmlText(preview.name)}</div>
+            <div style="${imageTitleStyle(title.fontSize)}">${escapeHtmlText(title.text)}</div>
             <div style="${PARTY_SHARE_IMAGE_STYLES.description}">${escapeHtmlText(
               description,
             )}</div>
@@ -352,8 +356,14 @@ export function renderPartyShareImageHtml(
         </div>
 
         <div style="${PARTY_SHARE_IMAGE_STYLES.footer}">
-          ${renderFooterPill("Shared expense invite")}
-          ${renderFooterPill("Open in trizum")}
+          ${renderJoinPartyButton()}
+          <div style="${PARTY_SHARE_IMAGE_STYLES.footerBrand}">
+            <div style="${PARTY_SHARE_IMAGE_STYLES.viaText}">via</div>
+            <div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandMark}">
+              <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="52" height="52" />
+            </div>
+            <div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandName}">trizum</div>
+          </div>
         </div>
       </div>
     </div>
@@ -511,8 +521,112 @@ function renderSocialMetaTag(tag: SocialMetaTag) {
   return `<meta ${tag.attribute}="${escapeHtmlAttribute(tag.value)}" content="${escapeHtmlAttribute(tag.content)}" />`;
 }
 
-function renderFooterPill(label: string) {
-  return `<div style="${PARTY_SHARE_IMAGE_STYLES.footerPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.footerText}">${escapeHtmlText(label)}</span></div>`;
+function imageTitleStyle(fontSize: number) {
+  return `${PARTY_SHARE_IMAGE_STYLES.title} font-size: ${fontSize}px; white-space: nowrap;`;
+}
+
+function formatImageTitle(value: string) {
+  const text = normalizePreviewText(value) || "Shared expenses";
+  const fontSize = getFittingFontSize(
+    text,
+    PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH,
+    PARTY_SHARE_IMAGE_TITLE_MAX_FONT_SIZE,
+    PARTY_SHARE_IMAGE_TITLE_MIN_FONT_SIZE,
+  );
+
+  return {
+    fontSize,
+    text: truncateTextForWidth(text, PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH, fontSize),
+  };
+}
+
+function getFittingFontSize(
+  value: string,
+  maxWidth: number,
+  maxFontSize: number,
+  minFontSize: number,
+) {
+  const units = getVisualTextUnits(value);
+
+  if (units === 0) {
+    return maxFontSize;
+  }
+
+  return Math.max(minFontSize, Math.min(maxFontSize, Math.floor(maxWidth / units)));
+}
+
+function truncateTextForWidth(
+  value: string,
+  maxWidth: number,
+  fontSize: number,
+  options: { maxLength?: number } = {},
+) {
+  const text = limitText(
+    normalizePreviewText(value),
+    options.maxLength ?? Number.POSITIVE_INFINITY,
+  );
+  const maxUnits = maxWidth / fontSize;
+
+  if (getVisualTextUnits(text) <= maxUnits) {
+    return text;
+  }
+
+  const ellipsis = "...";
+  const ellipsisUnits = getVisualTextUnits(ellipsis);
+  const targetUnits = Math.max(0, maxUnits - ellipsisUnits);
+  let nextUnits = 0;
+  let nextText = "";
+
+  for (const character of text) {
+    const characterUnits = getVisualCharacterUnits(character);
+
+    if (nextUnits + characterUnits > targetUnits) {
+      break;
+    }
+
+    nextText += character;
+    nextUnits += characterUnits;
+  }
+
+  return `${nextText.trimEnd()}${ellipsis}`;
+}
+
+function getVisualTextUnits(value: string) {
+  let units = 0;
+
+  for (const character of value) {
+    units += getVisualCharacterUnits(character);
+  }
+
+  return units;
+}
+
+function getVisualCharacterUnits(character: string) {
+  if (/\s/u.test(character)) {
+    return 0.28;
+  }
+
+  if (/[ilI.,:;!'|]/u.test(character)) {
+    return 0.26;
+  }
+
+  if (/[mwMW@#%&]/u.test(character)) {
+    return 0.78;
+  }
+
+  if (/[A-Z0-9]/u.test(character)) {
+    return 0.62;
+  }
+
+  if (character.codePointAt(0)! > 0xffff) {
+    return 1;
+  }
+
+  return 0.47;
+}
+
+function renderJoinPartyButton() {
+  return `<div style="${PARTY_SHARE_IMAGE_STYLES.ctaButton}"><span style="${PARTY_SHARE_IMAGE_STYLES.ctaText}">Join party</span><span style="${PARTY_SHARE_IMAGE_STYLES.ctaArrow}">→</span></div>`;
 }
 
 function sanitizePlainText(value: unknown, maxLength: number) {
@@ -520,7 +634,11 @@ function sanitizePlainText(value: unknown, maxLength: number) {
     return "";
   }
 
-  return limitText(value.replace(/\s+/g, " ").trim(), maxLength);
+  return limitText(normalizePreviewText(value), maxLength);
+}
+
+function normalizePreviewText(value: string) {
+  return value.replace(/\s+/g, " ").trim();
 }
 
 function limitText(value: string, maxLength: number) {
