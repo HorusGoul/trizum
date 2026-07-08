@@ -18,6 +18,12 @@ export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> &
   onCloseCalculator?: () => void;
 };
 
+function getCalculatorFieldLabel(props: React.ComponentProps<typeof AppCurrencyField>) {
+  const ariaLabel = (props as { "aria-label"?: unknown })["aria-label"];
+
+  return props.label || (typeof ariaLabel === "string" ? ariaLabel : undefined);
+}
+
 export function CurrencyField({
   calculator = false,
   calculatorButtonClassName,
@@ -84,6 +90,7 @@ function CurrencyFieldWithCalculator({
     ? activeCalculatorId === calculatorFieldId
     : state.isActive;
   const shouldPreventNativeKeyboard = autoOpenCalculator || isCalculatorActive;
+  const fieldLabel = getCalculatorFieldLabel(props);
 
   useEffect(() => {
     if (!isRouteControlled) {
@@ -180,6 +187,7 @@ function CurrencyFieldWithCalculator({
           previewValue={state.previewValue}
           currency={props.currency}
           dismissOnOutsideInteraction={!isRouteControlled}
+          fieldLabel={fieldLabel}
         />
       )}
     </div>

@@ -95,7 +95,7 @@ msgstr "Activo en este dispositivo"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:792
+#: src/components/CalculatorToolbar.tsx:795
 msgid "Add"
 msgstr "Sumar"
 
@@ -300,7 +300,7 @@ msgstr "Volver a configuración"
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
-#: src/components/CalculatorToolbar.tsx:817
+#: src/components/CalculatorToolbar.tsx:820
 msgid "Backspace"
 msgstr "Retroceso"
 
@@ -392,15 +392,15 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/components/CalculatorToolbar.tsx:825
+#: src/components/CalculatorToolbar.tsx:828
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:542
+#: src/components/CalculatorToolbar.tsx:543
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:657
+#: src/components/CalculatorToolbar.tsx:660
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
@@ -497,7 +497,7 @@ msgstr "Elige la moneda para los gastos de este grupo"
 msgid "Choose who receives it"
 msgstr "Elige quién la recibe"
 
-#: src/components/CalculatorToolbar.tsx:708
+#: src/components/CalculatorToolbar.tsx:711
 msgid "Clear all"
 msgstr "Borrar todo"
 
@@ -514,12 +514,11 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:569
-#: src/components/CurrencyField.tsx:141
+#: src/components/CurrencyField.tsx:148
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
-#: src/components/CalculatorToolbar.tsx:724
+#: src/components/CalculatorToolbar.tsx:727
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
 
@@ -791,7 +790,7 @@ msgstr "Transferencia de deuda a otro grupo"
 msgid "Debt transferred"
 msgstr "Deuda transferida"
 
-#: src/components/CalculatorToolbar.tsx:809
+#: src/components/CalculatorToolbar.tsx:812
 msgid "Decimal point"
 msgstr "Punto decimal"
 
@@ -830,7 +829,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/CalculatorToolbar.tsx:732
+#: src/components/CalculatorToolbar.tsx:735
 msgid "Divide"
 msgstr "Dividir"
 
@@ -1534,7 +1533,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:752
+#: src/components/CalculatorToolbar.tsx:755
 msgid "Multiply"
 msgstr "Multiplicar"
 
@@ -1715,7 +1714,7 @@ msgstr "Solo puedes transferir tus propias deudas"
 msgid "Open archived parties"
 msgstr "Abrir grupos archivados"
 
-#: src/components/CurrencyField.tsx:141
+#: src/components/CurrencyField.tsx:148
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
@@ -1731,7 +1730,7 @@ msgstr "Abrir GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
-#: src/components/CalculatorToolbar.tsx:716
+#: src/components/CalculatorToolbar.tsx:719
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
@@ -2383,7 +2382,7 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:772
+#: src/components/CalculatorToolbar.tsx:775
 msgid "Subtract"
 msgstr "Restar"
 

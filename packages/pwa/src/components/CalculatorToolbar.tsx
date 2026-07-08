@@ -2,7 +2,6 @@ import { t } from "@lingui/core/macro";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "#src/ui/Button.tsx";
-import { IconButton } from "#src/ui/IconButton.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { cn } from "#src/ui/utils.ts";
 import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
@@ -50,6 +49,7 @@ interface CalculatorToolbarProps {
   previewValue: number | null;
   currency?: string;
   dismissOnOutsideInteraction?: boolean;
+  fieldLabel?: string;
 }
 
 type CalculatorCallbacks = Pick<
@@ -487,6 +487,7 @@ export function CalculatorToolbar({
   previewValue,
   currency,
   dismissOnOutsideInteraction = true,
+  fieldLabel,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
@@ -558,19 +559,21 @@ export function CalculatorToolbar({
       }
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
-        <div className="flex items-center gap-2">
+        <div className="flex min-h-8 items-center gap-2 px-1">
+          {fieldLabel ? (
+            <span
+              className="text-accent-700 dark:text-accent-200 min-w-0 flex-1 truncate text-sm font-medium"
+              title={fieldLabel}
+            >
+              {fieldLabel}
+            </span>
+          ) : (
+            <span className="flex-1" />
+          )}
           <CalculatorPreview
             currency={currency}
             expression={expression}
             previewValue={previewValue}
-          />
-          <IconButton
-            icon="lucide.x"
-            aria-label={t`Close calculator`}
-            color="transparent"
-            onPress={onDismiss}
-            className="h-8 w-8 shrink-0"
-            iconClassName="size-4"
           />
         </div>
         <CalculatorExpressionDisplay
@@ -604,7 +607,7 @@ function CalculatorPreview({
   previewValue: number | null;
 }) {
   return (
-    <div className="flex h-8 flex-1 items-center justify-end px-1">
+    <div className="flex h-8 min-w-0 shrink-0 items-center justify-end">
       {previewValue !== null && expression ? (
         <span className="text-accent-600 dark:text-accent-400 text-sm font-medium">
           = {formatCalculatorPreviewValue(previewValue, currency)}

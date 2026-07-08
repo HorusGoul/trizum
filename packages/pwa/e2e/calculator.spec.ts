@@ -83,6 +83,7 @@ test.describe("Expense calculator", () => {
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
     await expect(amountField).toHaveAttribute("inputmode", "none");
     await expect(amountField).toHaveJSProperty("readOnly", true);
+    await expect(calculator.getByText("Amount", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "2", exact: true }).click();
@@ -105,9 +106,59 @@ test.describe("Expense calculator", () => {
 
     await amountField.click();
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
-    await calculator.getByRole("button", { name: "Close calculator", exact: true }).click();
+    await expect(
+      calculator.getByRole("button", { name: "Close calculator", exact: true }),
+    ).toHaveCount(0);
+    await page.keyboard.press("Escape");
     await expect(page).toHaveURL(/\/add$/);
     await expect(calculator).not.toBeVisible();
+  });
+
+  test("shows the active amount field label while editing", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await page.getByLabel("Amount", { exact: true }).click();
+    await expect(calculator.getByText("Amount", { exact: true })).toBeVisible();
+
+    await page.goBack();
+    await expect(calculator).not.toBeVisible();
+
+    const blairCheckbox = page.getByRole("checkbox", {
+      name: defaultParticipants.blair.name,
+      exact: true,
+    });
+    await blairCheckbox.setChecked(true, { force: true });
+    await expect(blairCheckbox).toBeChecked();
+    const participantAmountField = page.getByLabel(`Amount for ${defaultParticipants.blair.name}`, {
+      exact: true,
+    });
+
+    await participantAmountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=share-participant-blair$/);
+    await expect(
+      calculator.getByText(`Amount for ${defaultParticipants.blair.name}`, { exact: true }),
+    ).toBeVisible();
   });
 
   test("accepts supported physical keyboard input while open", async ({ harness, page }) => {
