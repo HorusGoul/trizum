@@ -33,15 +33,16 @@ export const toastStyle: CssVariableStyles = {
 
 export const toastClassNames = {
   toast: cn(
-    "pointer-events-auto flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-sm",
+    "pointer-events-auto relative flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-sm",
     "border-accent-200/80 bg-white text-accent-950 shadow-lg shadow-accent-950/10 backdrop-blur-sm",
     "outline-hidden ring-offset-white",
+    "before:absolute before:inset-y-3 before:left-2 before:w-1 before:rounded-full before:bg-accent-400 before:content-['']",
     "dark:border-accent-700/80 dark:bg-accent-900 dark:text-accent-50 dark:shadow-none dark:ring-offset-accent-950",
   ),
   title: "text-sm leading-5 font-medium",
   description: "text-accent-700 dark:text-accent-200 mt-0.5 text-sm leading-5 font-normal",
   content: "flex min-w-0 flex-1 flex-col justify-center",
-  icon: "flex size-5 shrink-0 items-center justify-center text-accent-500 dark:text-accent-300",
+  icon: "flex size-5 shrink-0 items-center justify-center text-accent-900 dark:text-accent-50",
   loader: "text-accent-600 dark:text-accent-300",
   closeButton: cn(
     "absolute -top-2 -left-2 flex size-6 items-center justify-center rounded-full border",
@@ -59,11 +60,11 @@ export const toastClassNames = {
     "bg-accent-100 text-accent-700 hover:bg-accent-200 focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2",
     "dark:bg-accent-800 dark:text-accent-50 dark:hover:bg-accent-700 dark:focus-visible:ring-accent-400",
   ),
-  success: "[&_[data-icon]]:text-success-500 dark:[&_[data-icon]]:text-success-400",
-  error: "[&_[data-icon]]:text-danger-500 dark:[&_[data-icon]]:text-danger-400",
-  info: "[&_[data-icon]]:text-accent-500 dark:[&_[data-icon]]:text-accent-400",
-  warning: "[&_[data-icon]]:text-warning-600 dark:[&_[data-icon]]:text-warning-400",
-  loading: "[&_[data-icon]]:text-accent-500 dark:[&_[data-icon]]:text-accent-400",
+  success: "before:bg-success-500 dark:before:bg-success-400",
+  error: "before:bg-danger-500 dark:before:bg-danger-400",
+  info: "before:bg-accent-500 dark:before:bg-accent-400",
+  warning: "before:bg-warning-500 dark:before:bg-warning-400",
+  loading: "before:bg-accent-500 dark:before:bg-accent-400",
 } satisfies ToastClassnames;
 
 export const toastIcons = {

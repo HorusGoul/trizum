@@ -29,21 +29,30 @@ describe("Toaster", () => {
   });
 
   test("uses restrained PWA design-system classes for toast surfaces", () => {
+    expect(toastClassNames.toast).toContain("relative");
     expect(toastClassNames.toast).toContain("items-center");
     expect(toastClassNames.toast).toContain("rounded-lg");
     expect(toastClassNames.toast).toContain("border-accent-200/80");
     expect(toastClassNames.toast).toContain("bg-white");
+    expect(toastClassNames.toast).toContain("before:w-1");
     expect(toastClassNames.toast).toContain("dark:bg-accent-900");
     expect(toastClassNames.title).toContain("font-medium");
     expect(toastClassNames.description).toContain("font-normal");
     expect(toastClassNames.actionButton).toContain("font-medium");
-    expect(toastClassNames.success).toContain("[&_[data-icon]]:text-success-500");
-    expect(toastClassNames.success).toContain("dark:[&_[data-icon]]:text-success-400");
-    expect(toastClassNames.error).toContain("[&_[data-icon]]:text-danger-500");
-    expect(toastClassNames.warning).toContain("[&_[data-icon]]:text-warning-600");
-    expect(toastClassNames.success).not.toContain("bg-success-50");
-    expect(toastClassNames.error).not.toContain("bg-danger-50");
-    expect(toastClassNames.warning).not.toContain("bg-warning-50");
+    expect(toastClassNames.icon).toContain("text-accent-900");
+    expect(toastClassNames.icon).toContain("dark:text-accent-50");
+    expect(toastClassNames.success).toContain("before:bg-success-500");
+    expect(toastClassNames.error).toContain("before:bg-danger-500");
+    expect(toastClassNames.warning).toContain("before:bg-warning-500");
+
+    const classNames = Object.values(toastClassNames).join(" ");
+    const classNameTokens = classNames.split(/\s+/);
+    expect(classNames).not.toContain("text-success");
+    expect(classNames).not.toContain("text-danger");
+    expect(classNames).not.toContain("text-warning");
+    expect(classNameTokens).not.toContain("bg-success-50");
+    expect(classNameTokens).not.toContain("bg-danger-50");
+    expect(classNameTokens).not.toContain("bg-warning-50");
   });
 
   test("uses the app icon sprite without toast-specific stroke overrides", () => {
