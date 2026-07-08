@@ -28,31 +28,40 @@ describe("Toaster", () => {
     expect(toastStyle["--width"]).toBe("min(24rem, calc(100vw - 2rem))");
   });
 
-  test("uses restrained PWA design-system classes for toast surfaces", () => {
-    expect(toastClassNames.toast).toContain("relative");
+  test("uses black toast surfaces with semantic icon color", () => {
     expect(toastClassNames.toast).toContain("items-center");
     expect(toastClassNames.toast).toContain("rounded-lg");
-    expect(toastClassNames.toast).toContain("border-accent-200/80");
-    expect(toastClassNames.toast).toContain("bg-white");
-    expect(toastClassNames.toast).toContain("before:w-1");
-    expect(toastClassNames.toast).toContain("dark:bg-accent-900");
+    expect(toastClassNames.toast).toContain("border-accent-900");
+    expect(toastClassNames.toast).toContain("bg-accent-950");
+    expect(toastClassNames.toast).toContain("text-accent-50");
+    expect(toastClassNames.toast).toContain("dark:bg-accent-950");
     expect(toastClassNames.title).toContain("font-medium");
     expect(toastClassNames.description).toContain("font-normal");
-    expect(toastClassNames.actionButton).toContain("font-medium");
-    expect(toastClassNames.icon).toContain("text-accent-900");
-    expect(toastClassNames.icon).toContain("dark:text-accent-50");
-    expect(toastClassNames.success).toContain("before:bg-success-500");
-    expect(toastClassNames.error).toContain("before:bg-danger-500");
-    expect(toastClassNames.warning).toContain("before:bg-warning-500");
+    expect(toastClassNames.description).toContain("text-accent-200");
+    expect(toastClassNames.icon).toContain("text-accent-300");
+    expect(toastClassNames.success).toContain("[&_[data-icon]]:text-success-400");
+    expect(toastClassNames.error).toContain("[&_[data-icon]]:text-danger-400");
+    expect(toastClassNames.warning).toContain("[&_[data-icon]]:text-warning-400");
+    expect(toastClassNames.info).toContain("[&_[data-icon]]:text-accent-300");
+    expect(toastClassNames.loading).toContain("[&_[data-icon]]:text-accent-300");
 
     const classNames = Object.values(toastClassNames).join(" ");
     const classNameTokens = classNames.split(/\s+/);
-    expect(classNames).not.toContain("text-success");
-    expect(classNames).not.toContain("text-danger");
-    expect(classNames).not.toContain("text-warning");
+    expect(classNames).not.toContain("before:");
     expect(classNameTokens).not.toContain("bg-success-50");
     expect(classNameTokens).not.toContain("bg-danger-50");
     expect(classNameTokens).not.toContain("bg-warning-50");
+  });
+
+  test("keeps loading and action toasts legible on the black surface", () => {
+    expect(toastClassNames.loader).toContain("text-accent-300");
+    expect(toastClassNames.actionButton).toContain("font-medium");
+    expect(toastClassNames.actionButton).toContain("bg-accent-50");
+    expect(toastClassNames.actionButton).toContain("text-accent-950");
+    expect(toastClassNames.actionButton).toContain("focus-visible:ring-offset-accent-950");
+    expect(toastClassNames.cancelButton).toContain("bg-white/10");
+    expect(toastClassNames.cancelButton).toContain("text-accent-50");
+    expect(toastClassNames.cancelButton).toContain("focus-visible:ring-offset-accent-950");
   });
 
   test("uses the app icon sprite without toast-specific stroke overrides", () => {
