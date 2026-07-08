@@ -5,9 +5,9 @@ import type { ApiEnv, ApiHonoEnv } from "../env";
 import {
   createPartySharePreviewFromParty,
   createPartySharePreviewRoute,
-  injectPartyShareMetaTags,
+  injectPartyShareHeadTags,
   isPartyPreviewRequest,
-  renderPartyShareMetaTags,
+  renderPartyShareHeadTags,
   type PartySharePreview,
 } from "./party-share-preview";
 
@@ -51,45 +51,43 @@ describe("party share preview crawler detection", () => {
 });
 
 describe("party share preview metadata", () => {
-  test("injects escaped social metadata before the head closes", () => {
+  test("injects escaped share metadata before the head closes", () => {
     const preview = createPreview({
       description: "Dinner < drinks",
-      memberNames: ["Alice", "Bob"],
       name: "Lisbon & Porto",
       symbol: "<>",
     });
-    const tags = renderPartyShareMetaTags({
+    const tags = renderPartyShareHeadTags({
       partyId: createDocumentId(),
       preview,
       requestUrl: new URL("https://trizum.app/party/example?preview=1"),
     });
-    const html = injectPartyShareMetaTags("<html><head><title>trizum</title></head></html>", tags);
+    const html = injectPartyShareHeadTags("<html><head><title>trizum</title></head></html>", tags);
 
+    expect(html).toContain("<title>Join Lisbon &amp; Porto on trizum</title>");
+    expect(html).not.toContain("<title>trizum</title>");
+    expect(html).toContain(
+      'name="description" content="Dinner &lt; drinks Open this party to split expenses and settle up together on trizum."',
+    );
     expect(html).toContain('property="og:title" content="Join Lisbon &amp; Porto on trizum"');
     expect(html).toContain(
-      'property="og:description" content="Dinner &lt; drinks Members: Alice, Bob."',
+      'property="og:description" content="Dinner &lt; drinks Open this party to split expenses and settle up together on trizum."',
     );
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
+    expect(html).not.toContain("Alice");
     expect(html.indexOf('property="og:title"')).toBeLessThan(html.indexOf("</head>"));
   });
 
-  test("builds preview data from public party fields only", () => {
+  test("builds preview data from shareable party fields only", () => {
     const preview = createPartySharePreviewFromParty({
       description: "Beach house costs",
       name: "Summer Trip",
-      participants: {
-        alice: { id: "alice", name: "Alice" },
-        archived: { id: "archived", isArchived: true, name: "Archived" },
-        bob: { id: "bob", name: "Bob" },
-      },
       symbol: "S",
       type: "party",
     });
 
     expect(preview).toMatchObject({
       description: "Beach house costs",
-      memberCount: 2,
-      memberNames: ["Alice", "Bob"],
       name: "Summer Trip",
       symbol: "S",
     });
@@ -128,7 +126,6 @@ describe("party share preview route", () => {
     const loadPreview = vi.fn<LoadPreview>(async () =>
       createPreview({
         description: "Weekend costs",
-        memberNames: ["Alice", "Bob"],
         name: "Cabin",
         symbol: "C",
       }),
@@ -149,6 +146,9 @@ describe("party share preview route", () => {
 
     expect(response.status).toBe(200);
     expect(html).toContain('property="og:title" content="Join Cabin on trizum"');
+    expect(html).toContain(
+      'property="og:description" content="Weekend costs Open this party to split expenses and settle up together on trizum."',
+    );
     expect(html).toContain('property="og:image" content="https://trizum.app/api/og/party/');
     expect(loadPreview).toHaveBeenCalledTimes(1);
   });
@@ -212,8 +212,6 @@ function createPreview(overrides: Partial<PartySharePreview> = {}): PartySharePr
   return {
     description: "Split expenses together.",
     isFallback: false,
-    memberCount: overrides.memberNames?.length ?? 0,
-    memberNames: [],
     name: "Shared expenses",
     symbol: "S",
     version: "test-version",

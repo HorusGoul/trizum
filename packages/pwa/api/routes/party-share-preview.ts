@@ -13,12 +13,12 @@ const PREVIEW_CACHE_SUCCESS_TTL_MS = 60_000;
 const PREVIEW_CACHE_FALLBACK_TTL_MS = 5_000;
 const MAX_DESCRIPTION_LENGTH = 180;
 const MAX_IMAGE_DESCRIPTION_LENGTH = 210;
-const MAX_MEMBER_NAME_LENGTH = 34;
-const MAX_MEMBER_NAMES = 12;
-const MAX_IMAGE_MEMBER_NAMES = 8;
 const PARTY_SHARE_IMAGE_WIDTH = 1200;
 const PARTY_SHARE_IMAGE_HEIGHT = 630;
 const PARTY_SHARE_IMAGE_CACHE_CONTROL = "public, max-age=300, s-maxage=300";
+const PARTY_SHARE_PURPOSE = "Open this party to split expenses and settle up together on trizum.";
+const PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION = "Split expenses and settle up together on trizum.";
+const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
 const INTER_FONT_FACES = [
   { path: "/assets/inter/Inter-Regular.ttf", weight: 400 },
   { path: "/assets/inter/Inter-Bold.ttf", weight: 700 },
@@ -36,13 +36,11 @@ const PARTY_SHARE_IMAGE_STYLES = {
   content: "display: flex; flex-direction: column; width: 100%; height: 100%;",
   description:
     "display: flex; max-width: 860px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7;",
+  footer: "display: flex; flex-wrap: wrap; align-items: center; margin-top: 84px; gap: 18px;",
+  footerPill:
+    "display: flex; align-items: center; height: 78px; padding: 0 30px; border-radius: 39px; background: rgba(0,0,0,0.15); border: 2px solid #2A2A2A;",
+  footerText: "font-size: 30px; color: #F4F4F4;",
   hero: "display: flex; align-items: center; margin-top: 70px;",
-  memberInitial:
-    "display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-right: 20px; border-radius: 26px; background: #FFFFFF; color: #050505; font-size: 26px; font-weight: 800;",
-  memberPill:
-    "display: flex; align-items: center; height: 78px; padding: 0 28px; border-radius: 39px; background: rgba(0,0,0,0.15); border: 2px solid #2A2A2A;",
-  memberRow: "display: flex; flex-wrap: wrap; align-items: center; margin-top: 84px; gap: 18px;",
-  memberText: "font-size: 30px; color: #F4F4F4;",
   partyCopy: "display: flex; flex-direction: column; margin-left: 50px;",
   partyIcon:
     "display: flex; align-items: center; justify-content: center; width: 92px; height: 92px; color: #FFFFFF; font-size: 78px; line-height: 1; filter: grayscale(1) brightness(2.35) contrast(1.8);",
@@ -84,8 +82,6 @@ interface CachedPartySharePreview {
 export interface PartySharePreview {
   description: string;
   isFallback: boolean;
-  memberCount: number;
-  memberNames: string[];
   name: string;
   symbol: string;
   version: string;
@@ -104,10 +100,7 @@ interface PartyShareImageResponseContext {
   request: Request;
 }
 
-type PartyPreviewDocument = Pick<
-  Party,
-  "description" | "name" | "participants" | "symbol" | "type"
->;
+type PartyPreviewDocument = Pick<Party, "description" | "name" | "symbol" | "type">;
 
 interface SocialMetaTag {
   attribute: "name" | "property";
@@ -142,13 +135,13 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const assetResponse = await c.env.ASSETS.fetch(request);
     const html = await assetResponse.text();
     const preview = await loadPreview(partyId, c.env, request);
-    const metaTags = renderPartyShareMetaTags({
+    const headTags = renderPartyShareHeadTags({
       partyId,
       preview,
       requestUrl: new URL(request.url),
     });
 
-    return new Response(injectPartyShareMetaTags(html, metaTags), {
+    return new Response(injectPartyShareHeadTags(html, headTags), {
       headers: withHeader(assetResponse.headers, "Content-Type", "text/html; charset=utf-8"),
       status: assetResponse.status,
       statusText: assetResponse.statusText,
@@ -279,15 +272,17 @@ export function isPartyPreviewRequest(request: Request) {
   return CRAWLER_USER_AGENT_PATTERNS.some((pattern) => pattern.test(userAgent));
 }
 
-export function injectPartyShareMetaTags(html: string, metaTags: string) {
-  if (html.includes("</head>")) {
-    return html.replace("</head>", `${metaTags}\n  </head>`);
+export function injectPartyShareHeadTags(html: string, headTags: string) {
+  const htmlWithoutDefaultTitle = html.replace(TITLE_TAG_PATTERN, "");
+
+  if (htmlWithoutDefaultTitle.includes("</head>")) {
+    return htmlWithoutDefaultTitle.replace("</head>", `${headTags}\n  </head>`);
   }
 
-  return `${metaTags}\n${html}`;
+  return `${headTags}\n${htmlWithoutDefaultTitle}`;
 }
 
-export function renderPartyShareMetaTags({
+export function renderPartyShareHeadTags({
   partyId,
   preview,
   requestUrl,
@@ -305,22 +300,22 @@ export function renderPartyShareMetaTags({
   const description = getPartyShareDescription(preview);
 
   return [
-    propertyMeta("og:type", "website"),
-    propertyMeta("og:site_name", "trizum"),
-    propertyMeta("og:title", title),
-    propertyMeta("og:description", description),
-    propertyMeta("og:url", pageUrl),
-    propertyMeta("og:image", imageUrl.toString()),
-    propertyMeta("og:image:width", String(PARTY_SHARE_IMAGE_WIDTH)),
-    propertyMeta("og:image:height", String(PARTY_SHARE_IMAGE_HEIGHT)),
-    propertyMeta("og:image:alt", `${title} preview`),
-    nameMeta("twitter:card", "summary_large_image"),
-    nameMeta("twitter:title", title),
-    nameMeta("twitter:description", description),
-    nameMeta("twitter:image", imageUrl.toString()),
-  ]
-    .map(renderSocialMetaTag)
-    .join("\n    ");
+    `<title>${escapeHtmlText(title)}</title>`,
+    renderSocialMetaTag(nameMeta("description", description)),
+    renderSocialMetaTag(propertyMeta("og:type", "website")),
+    renderSocialMetaTag(propertyMeta("og:site_name", "trizum")),
+    renderSocialMetaTag(propertyMeta("og:title", title)),
+    renderSocialMetaTag(propertyMeta("og:description", description)),
+    renderSocialMetaTag(propertyMeta("og:url", pageUrl)),
+    renderSocialMetaTag(propertyMeta("og:image", imageUrl.toString())),
+    renderSocialMetaTag(propertyMeta("og:image:width", String(PARTY_SHARE_IMAGE_WIDTH))),
+    renderSocialMetaTag(propertyMeta("og:image:height", String(PARTY_SHARE_IMAGE_HEIGHT))),
+    renderSocialMetaTag(propertyMeta("og:image:alt", `${title} preview`)),
+    renderSocialMetaTag(nameMeta("twitter:card", "summary_large_image")),
+    renderSocialMetaTag(nameMeta("twitter:title", title)),
+    renderSocialMetaTag(nameMeta("twitter:description", description)),
+    renderSocialMetaTag(nameMeta("twitter:image", imageUrl.toString())),
+  ].join("\n    ");
 }
 
 export function renderPartyShareImageHtml(
@@ -329,18 +324,9 @@ export function renderPartyShareImageHtml(
 ) {
   const trizumMarkUrl = options.trizumMarkUrl ?? TRIZUM_MARK_PATH;
   const description = limitText(
-    preview.description || getPartyShareDescription(preview),
+    preview.description || PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION,
     MAX_IMAGE_DESCRIPTION_LENGTH,
   );
-  const memberNames = preview.memberNames.slice(0, MAX_IMAGE_MEMBER_NAMES);
-  const remainingMemberCount = Math.max(preview.memberCount - memberNames.length, 0);
-  const members =
-    memberNames.length > 0
-      ? [
-          ...memberNames.map((memberName) => renderMemberPill(memberName)),
-          remainingMemberCount > 0 ? renderMoreMembersPill(remainingMemberCount) : "",
-        ].join("")
-      : `<div style="${PARTY_SHARE_IMAGE_STYLES.memberPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.memberText}">Open invite</span></div>`;
 
   return `
     <div style="${PARTY_SHARE_IMAGE_STYLES.canvas}">
@@ -365,8 +351,9 @@ export function renderPartyShareImageHtml(
           </div>
         </div>
 
-        <div style="${PARTY_SHARE_IMAGE_STYLES.memberRow}">
-          ${members}
+        <div style="${PARTY_SHARE_IMAGE_STYLES.footer}">
+          ${renderFooterPill("Shared expense invite")}
+          ${renderFooterPill("Open in trizum")}
         </div>
       </div>
     </div>
@@ -374,13 +361,6 @@ export function renderPartyShareImageHtml(
 }
 
 export function createPartySharePreviewFromParty(party: PartyPreviewDocument): PartySharePreview {
-  const activeParticipants = Object.values(party.participants ?? {}).filter(isActiveParticipant);
-  const memberNames = activeParticipants
-    .map((participant) => sanitizePlainText(participant.name, MAX_MEMBER_NAME_LENGTH))
-    .filter((name) => name.length > 0)
-    .sort((a, b) => a.localeCompare(b))
-    .slice(0, MAX_MEMBER_NAMES);
-  const memberCount = activeParticipants.length;
   const name = sanitizePlainText(party.name, 72) || "Shared expenses";
   const description = sanitizePlainText(party.description, MAX_DESCRIPTION_LENGTH);
   const symbol = sanitizePlainText(party.symbol, 8) || DEFAULT_PARTY_SYMBOL;
@@ -388,26 +368,16 @@ export function createPartySharePreviewFromParty(party: PartyPreviewDocument): P
   return {
     description,
     isFallback: false,
-    memberCount,
-    memberNames,
     name,
     symbol,
-    version: createPreviewVersion({ description, memberCount, memberNames, name, symbol }),
+    version: createPreviewVersion({ description, name, symbol }),
   };
-}
-
-function isActiveParticipant(
-  participant: PartyPreviewDocument["participants"][string] | undefined,
-): participant is PartyPreviewDocument["participants"][string] {
-  return Boolean(participant && !participant.isArchived);
 }
 
 export function createFallbackPartySharePreview(): PartySharePreview {
   const preview = {
     description: "Split bills with friends, family, and roommates.",
     isFallback: true,
-    memberCount: 0,
-    memberNames: [],
     name: "Shared expenses",
     symbol: DEFAULT_PARTY_SYMBOL,
   };
@@ -523,22 +493,10 @@ function getPartyShareTitle(preview: PartySharePreview) {
 }
 
 function getPartyShareDescription(preview: PartySharePreview) {
-  const description = preview.description || "Split expenses and settle up together.";
-  const members = formatMembersSummary(preview);
-
-  return limitText(members ? `${description} Members: ${members}.` : description, 240);
-}
-
-function formatMembersSummary(preview: PartySharePreview) {
-  if (preview.memberNames.length === 0) {
-    return "";
-  }
-
-  const names = preview.memberNames.slice(0, 4);
-  const remainingCount = Math.max(preview.memberCount - names.length, 0);
-  const summary = names.join(", ");
-
-  return remainingCount > 0 ? `${summary}, +${remainingCount} more` : summary;
+  return limitText(
+    preview.description ? `${preview.description} ${PARTY_SHARE_PURPOSE}` : PARTY_SHARE_PURPOSE,
+    240,
+  );
 }
 
 function propertyMeta(property: string, content: string): SocialMetaTag {
@@ -553,18 +511,8 @@ function renderSocialMetaTag(tag: SocialMetaTag) {
   return `<meta ${tag.attribute}="${escapeHtmlAttribute(tag.value)}" content="${escapeHtmlAttribute(tag.content)}" />`;
 }
 
-function renderMemberPill(memberName: string) {
-  const initial = memberName.trim().charAt(0).toUpperCase() || "?";
-
-  return `<div style="${PARTY_SHARE_IMAGE_STYLES.memberPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.memberInitial}">${escapeHtmlText(
-    initial,
-  )}</span><span style="${PARTY_SHARE_IMAGE_STYLES.memberText}">${escapeHtmlText(
-    memberName,
-  )}</span></div>`;
-}
-
-function renderMoreMembersPill(memberCount: number) {
-  return `<div style="${PARTY_SHARE_IMAGE_STYLES.memberPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.memberText}">+${memberCount} more</span></div>`;
+function renderFooterPill(label: string) {
+  return `<div style="${PARTY_SHARE_IMAGE_STYLES.footerPill}"><span style="${PARTY_SHARE_IMAGE_STYLES.footerText}">${escapeHtmlText(label)}</span></div>`;
 }
 
 function sanitizePlainText(value: unknown, maxLength: number) {
