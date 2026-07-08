@@ -22,6 +22,7 @@ const PARTY_SHARE_IMAGE_TITLE_MIN_FONT_SIZE = 48;
 const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH = 780;
 const PARTY_SHARE_IMAGE_DESCRIPTION_FONT_SIZE = 34;
 const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_LINES = 2;
+const PARTY_SHARE_IMAGE_BRAND_MARK_SIZE = 62;
 const PARTY_SHARE_PURPOSE = "Open this party to split expenses and settle up together on trizum.";
 const PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION = "Split expenses and settle up together on trizum.";
 const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
@@ -44,10 +45,9 @@ const PARTY_SHARE_IMAGE_STYLES = {
   descriptionLine: "display: flex; width: 780px; overflow: hidden; white-space: nowrap;",
   footer: "display: flex; align-items: center; margin-top: 40px;",
   footerBrand: "display: flex; align-items: center; margin-left: 42px;",
-  footerBrandMark:
-    "display: flex; width: 52px; height: 52px; margin-left: 22px; overflow: hidden; background: #000000;",
+  footerBrandMark: `display: flex; width: ${PARTY_SHARE_IMAGE_BRAND_MARK_SIZE}px; height: ${PARTY_SHARE_IMAGE_BRAND_MARK_SIZE}px; margin-left: 22px; overflow: hidden; background: #000000;`,
   footerBrandName:
-    "display: flex; margin-left: 18px; font-size: 34px; font-weight: 800; color: #FFFFFF;",
+    "display: flex; margin-left: 18px; font-size: 34px; font-weight: 700; color: #FFFFFF;",
   hero: "display: flex; align-items: center; margin-top: 182px;",
   partyCopy: "display: flex; flex-direction: column; margin-left: 48px;",
   partyIcon:
@@ -358,13 +358,7 @@ export function renderPartyShareImageHtml(
 
         <div style="${PARTY_SHARE_IMAGE_STYLES.footer}">
           ${renderJoinPartyButton()}
-          <div style="${PARTY_SHARE_IMAGE_STYLES.footerBrand}">
-            <div style="${PARTY_SHARE_IMAGE_STYLES.viaText}">via</div>
-            <div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandMark}">
-              <img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="52" height="52" />
-            </div>
-            <div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandName}">trizum</div>
-          </div>
+          ${renderFooterBrand(trizumMarkUrl)}
         </div>
       </div>
     </div>
@@ -692,6 +686,20 @@ function getVisualCharacterUnits(character: string) {
 
 function renderJoinPartyButton() {
   return `<div style="${PARTY_SHARE_IMAGE_STYLES.ctaButton}"><span style="${PARTY_SHARE_IMAGE_STYLES.ctaText}">Join party</span><span style="${PARTY_SHARE_IMAGE_STYLES.ctaArrow}">→</span></div>`;
+}
+
+function renderFooterBrand(trizumMarkUrl: string) {
+  const markSize = String(PARTY_SHARE_IMAGE_BRAND_MARK_SIZE);
+
+  return [
+    `<div style="${PARTY_SHARE_IMAGE_STYLES.footerBrand}">`,
+    `<div style="${PARTY_SHARE_IMAGE_STYLES.viaText}">via</div>`,
+    `<div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandMark}">`,
+    `<img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="${markSize}" height="${markSize}" />`,
+    "</div>",
+    `<div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandName}">trizum</div>`,
+    "</div>",
+  ].join("");
 }
 
 function sanitizePlainText(value: unknown, maxLength: number) {
