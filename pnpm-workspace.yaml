@@ -68,15 +68,15 @@ catalog:
   "@lingui/format-po": 6.5.0
   "@lingui/react": 6.5.0
   "@lingui/vite-plugin": 6.5.0
-  "@logtape/logtape": 2.2.3
-  "@logtape/sentry": 2.2.3
+  "@logtape/logtape": 2.2.4
+  "@logtape/sentry": 2.2.4
   "@openai/codex": 0.142.5
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
-  "@sentry/node": 10.63.0
-  "@sentry/profiling-node": 10.63.0
-  "@sentry/react": 10.63.0
+  "@sentry/node": 10.64.0
+  "@sentry/profiling-node": 10.64.0
+  "@sentry/react": 10.64.0
   "@sentry/vite-plugin": 5.3.0
   "@tanstack/react-form": 1.33.0
   "@tanstack/react-router": 1.170.17
@@ -151,7 +151,7 @@ catalog:
   vitest: 4.1.10
   workbox-build: 7.4.1
   workbox-window: 7.4.1
-  wrangler: 4.107.0
+  wrangler: 4.107.1
   ws: 8.21.0
   tsx: 4.23.0
   zod: 4.4.3
