@@ -7,8 +7,13 @@ export interface UseRouteCalculatorOptions {
   buildLocation: (options: {
     search: { calculator?: string };
     replace?: boolean;
+    resetScroll?: boolean;
   }) => Pick<ParsedLocation, "href">;
-  navigate: (options: { search: { calculator?: string }; replace?: boolean }) => void;
+  navigate: (options: {
+    search: { calculator?: string };
+    replace?: boolean;
+    resetScroll?: boolean;
+  }) => void;
   history: Pick<RouterHistory, "go">;
 }
 
@@ -28,6 +33,7 @@ export function useRouteCalculator({
   function openCalculator(nextCalculatorId: string) {
     navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
       search: { calculator: nextCalculatorId },
+      resetScroll: false,
     });
   }
 
@@ -36,6 +42,7 @@ export function useRouteCalculator({
       navigate({
         search: { calculator: undefined },
         replace: true,
+        resetScroll: false,
       });
     });
   }

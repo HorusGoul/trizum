@@ -1,5 +1,40 @@
-import { createExpenseLogFixture, defaultParticipants } from "./harness/scenarios";
+import {
+  createExpenseLogFixture,
+  createPartyFixture,
+  defaultParticipants,
+} from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
+
+const scrollTargetParticipant = {
+  id: "participant-traveler-24",
+  name: "Traveler 24",
+} as const;
+
+function createScrollableParticipantFixture() {
+  const fixture = createPartyFixture();
+  const extraParticipants = Object.fromEntries(
+    Array.from({ length: 24 }, (_, index) => {
+      const participantNumber = index + 1;
+      const participant = {
+        id: `participant-traveler-${participantNumber}`,
+        name: `Traveler ${participantNumber}`,
+      };
+
+      return [participant.id, participant];
+    }),
+  );
+
+  return {
+    ...fixture,
+    party: {
+      ...fixture.party,
+      participants: {
+        ...fixture.party.participants,
+        ...extraParticipants,
+      },
+    },
+  };
+}
 
 test.describe("Expense calculator", () => {
   test("keeps the calculator button aligned when the amount is invalid", async ({
@@ -159,6 +194,79 @@ test.describe("Expense calculator", () => {
     await expect(
       calculator.getByText(`Amount for ${defaultParticipants.blair.name}`, { exact: true }),
     ).toBeVisible();
+  });
+
+  test("keeps scroll position when opening a participant calculator on mobile", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 520 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createScrollableParticipantFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const targetCheckbox = page.getByRole("checkbox", {
+      name: scrollTargetParticipant.name,
+      exact: true,
+    });
+    await targetCheckbox.scrollIntoViewIfNeeded();
+    await targetCheckbox.setChecked(true, { force: true });
+    await expect(targetCheckbox).toBeChecked();
+
+    const participantAmountField = page.getByLabel(`Amount for ${scrollTargetParticipant.name}`, {
+      exact: true,
+    });
+    await participantAmountField.scrollIntoViewIfNeeded();
+
+    const scrollYBefore = await page.evaluate(() => window.scrollY);
+    expect(scrollYBefore).toBeGreaterThan(100);
+
+    await participantAmountField.click();
+    await expect
+      .poll(async () =>
+        page.evaluate(() => new URLSearchParams(window.location.search).get("calculator")),
+      )
+      .toBe(`share-${scrollTargetParticipant.id}`);
+    await expect
+      .poll(async () => Math.round(await page.evaluate(() => window.scrollY)))
+      .toBeGreaterThan(Math.round(scrollYBefore) - 8);
+
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    await expect(calculator).toBeVisible();
+
+    const dragHandle = calculator.locator("[data-calculator-sheet-drag-handle]");
+    await expect(dragHandle).toBeVisible();
+
+    const dragHandleBox = await dragHandle.boundingBox();
+    if (!dragHandleBox) {
+      throw new Error("Expected the calculator sheet drag handle to be visible");
+    }
+
+    const startX = dragHandleBox.x + dragHandleBox.width / 2;
+    const startY = dragHandleBox.y + dragHandleBox.height / 2;
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX, startY + 130, { steps: 8 });
+    await page.mouse.up();
+
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
   });
 
   test("accepts supported physical keyboard input while open", async ({ harness, page }) => {

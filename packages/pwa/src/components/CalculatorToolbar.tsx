@@ -10,6 +10,9 @@ const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
 const DESKTOP_POPOVER_MARGIN = 8;
 const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
+const MOBILE_SHEET_CLOSE_DRAG_DISTANCE = 88;
+const MOBILE_SHEET_CLOSE_DRAG_VELOCITY = 0.5;
+const MOBILE_SHEET_RETURN_TRANSITION_MS = 160;
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
 function getCurrencyPreviewFormatter(currency: string) {
@@ -454,6 +457,156 @@ function useCalculatorKeyboard({
   }, [callbacksRef, fieldContainerRef, toolbarRef]);
 }
 
+function useMobileSheetDragDismiss({
+  callbacksRef,
+  dragHandleRef,
+  enabled,
+  toolbarRef,
+}: {
+  callbacksRef: React.RefObject<CalculatorCallbacks>;
+  dragHandleRef: React.RefObject<HTMLDivElement | null>;
+  enabled: boolean;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const dragStateRef = useRef<{
+    currentY: number;
+    pointerId: number;
+    startTime: number;
+    startY: number;
+  } | null>(null);
+  const resetTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const dragHandleEl = dragHandleRef.current;
+    const toolbarEl = toolbarRef.current;
+
+    if (!enabled || !dragHandleEl || !toolbarEl) {
+      return;
+    }
+
+    function clearResetTimeout() {
+      if (resetTimeoutRef.current === null) {
+        return;
+      }
+
+      window.clearTimeout(resetTimeoutRef.current);
+      resetTimeoutRef.current = null;
+    }
+
+    function clearSheetTransform() {
+      toolbarEl!.style.transform = "";
+      toolbarEl!.style.transition = "";
+      toolbarEl!.style.willChange = "";
+    }
+
+    function releasePointer(pointerId: number) {
+      if (dragHandleEl!.hasPointerCapture(pointerId)) {
+        dragHandleEl!.releasePointerCapture(pointerId);
+      }
+    }
+
+    function resetSheetPosition() {
+      toolbarEl!.style.transition = `transform ${MOBILE_SHEET_RETURN_TRANSITION_MS}ms ease-out`;
+      toolbarEl!.style.transform = "translateY(0)";
+
+      resetTimeoutRef.current = window.setTimeout(() => {
+        resetTimeoutRef.current = null;
+        clearSheetTransform();
+      }, MOBILE_SHEET_RETURN_TRANSITION_MS);
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (event.pointerType === "mouse" && event.button !== 0) {
+        return;
+      }
+
+      clearResetTimeout();
+      dragStateRef.current = {
+        currentY: event.clientY,
+        pointerId: event.pointerId,
+        startTime: performance.now(),
+        startY: event.clientY,
+      };
+      toolbarEl!.style.transition = "none";
+      toolbarEl!.style.willChange = "transform";
+      dragHandleEl!.setPointerCapture(event.pointerId);
+    }
+
+    function handlePointerMove(event: PointerEvent) {
+      const dragState = dragStateRef.current;
+
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      dragState.currentY = event.clientY;
+      const dragDistance = Math.max(0, event.clientY - dragState.startY);
+      if (dragDistance <= 0) {
+        toolbarEl!.style.transform = "translateY(0)";
+        return;
+      }
+
+      event.preventDefault();
+      toolbarEl!.style.transform = `translateY(${dragDistance}px)`;
+    }
+
+    function finishDrag(event: PointerEvent, shouldDismiss: boolean) {
+      const dragState = dragStateRef.current;
+
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      dragStateRef.current = null;
+      releasePointer(event.pointerId);
+
+      if (shouldDismiss) {
+        callbacksRef.current.onDismiss();
+        return;
+      }
+
+      resetSheetPosition();
+    }
+
+    function handlePointerUp(event: PointerEvent) {
+      const dragState = dragStateRef.current;
+
+      if (!dragState || dragState.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const dragDistance = Math.max(0, event.clientY - dragState.startY);
+      const elapsed = Math.max(1, performance.now() - dragState.startTime);
+      const velocity = dragDistance / elapsed;
+
+      finishDrag(
+        event,
+        dragDistance >= MOBILE_SHEET_CLOSE_DRAG_DISTANCE ||
+          velocity >= MOBILE_SHEET_CLOSE_DRAG_VELOCITY,
+      );
+    }
+
+    function handlePointerCancel(event: PointerEvent) {
+      finishDrag(event, false);
+    }
+
+    dragHandleEl.addEventListener("pointerdown", handlePointerDown);
+    dragHandleEl.addEventListener("pointermove", handlePointerMove);
+    dragHandleEl.addEventListener("pointerup", handlePointerUp);
+    dragHandleEl.addEventListener("pointercancel", handlePointerCancel);
+
+    return () => {
+      clearResetTimeout();
+      dragStateRef.current = null;
+      clearSheetTransform();
+      dragHandleEl.removeEventListener("pointerdown", handlePointerDown);
+      dragHandleEl.removeEventListener("pointermove", handlePointerMove);
+      dragHandleEl.removeEventListener("pointerup", handlePointerUp);
+      dragHandleEl.removeEventListener("pointercancel", handlePointerCancel);
+    };
+  }, [callbacksRef, dragHandleRef, enabled, toolbarRef]);
+}
+
 function formatCalculatorPreviewValue(value: number, currency?: string): string {
   if (!currency) {
     return value.toString();
@@ -490,6 +643,7 @@ export function CalculatorToolbar({
   fieldLabel,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const mobileSheetDragHandleRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
   const expressionScrollRef = useRef<HTMLSpanElement>(null);
   const expressionContentRef = useRef<HTMLSpanElement>(null);
@@ -531,6 +685,12 @@ export function CalculatorToolbar({
     toolbarRef,
   });
   useCalculatorKeyboard({ callbacksRef, fieldContainerRef, toolbarRef });
+  useMobileSheetDragDismiss({
+    callbacksRef,
+    dragHandleRef: mobileSheetDragHandleRef,
+    enabled: !isLargeScreen,
+    toolbarRef,
+  });
 
   if (isLargeScreen && !popoverPosition) {
     return null;
@@ -545,7 +705,7 @@ export function CalculatorToolbar({
       className={
         isLargeScreen && popoverPosition
           ? "border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 overflow-y-auto rounded-lg border bg-white shadow-lg"
-          : "border-accent-300 pb-safe dark:border-accent-700 dark:bg-accent-900 fixed right-0 left-0 z-50 border-t bg-white"
+          : "border-accent-300 pb-safe dark:border-accent-700 dark:bg-accent-900 animate-in slide-in-from-bottom-5 fixed right-0 left-0 z-50 rounded-t-lg border-t bg-white shadow-[0_-12px_32px_rgba(15,23,42,0.18)] duration-200 ease-out dark:shadow-none"
       }
       style={
         isLargeScreen && popoverPosition
@@ -559,22 +719,37 @@ export function CalculatorToolbar({
       }
     >
       <div className="flex flex-col gap-1.5 px-2 py-2">
-        <div className="flex min-h-8 items-center gap-2 px-1">
-          {fieldLabel ? (
-            <span
-              className="text-accent-700 dark:text-accent-200 min-w-0 flex-1 truncate text-sm font-medium"
-              title={fieldLabel}
-            >
-              {fieldLabel}
-            </span>
-          ) : (
-            <span className="flex-1" />
-          )}
-          <CalculatorPreview
-            currency={currency}
-            expression={expression}
-            previewValue={previewValue}
-          />
+        <div
+          ref={mobileSheetDragHandleRef}
+          data-calculator-sheet-drag-handle=""
+          className={cn(!isLargeScreen && "touch-none cursor-grab active:cursor-grabbing")}
+        >
+          {!isLargeScreen ? (
+            <div className="flex justify-center pt-0.5 pb-1">
+              <span
+                aria-hidden="true"
+                className="bg-accent-300 dark:bg-accent-600 h-1.5 w-11 rounded-full"
+              />
+            </div>
+          ) : null}
+
+          <div className="flex min-h-8 items-center gap-2 px-1">
+            {fieldLabel ? (
+              <span
+                className="text-accent-700 dark:text-accent-200 min-w-0 flex-1 truncate text-sm font-medium"
+                title={fieldLabel}
+              >
+                {fieldLabel}
+              </span>
+            ) : (
+              <span className="flex-1" />
+            )}
+            <CalculatorPreview
+              currency={currency}
+              expression={expression}
+              previewValue={previewValue}
+            />
+          </div>
         </div>
         <CalculatorExpressionDisplay
           charRefs={charRefs}
