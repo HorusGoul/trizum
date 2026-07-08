@@ -16,11 +16,12 @@ const MAX_IMAGE_DESCRIPTION_LENGTH = 210;
 const PARTY_SHARE_IMAGE_WIDTH = 1200;
 const PARTY_SHARE_IMAGE_HEIGHT = 630;
 const PARTY_SHARE_IMAGE_CACHE_CONTROL = "public, max-age=300, s-maxage=300";
-const PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH = 820;
+const PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH = 780;
 const PARTY_SHARE_IMAGE_TITLE_MAX_FONT_SIZE = 78;
 const PARTY_SHARE_IMAGE_TITLE_MIN_FONT_SIZE = 48;
-const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH = 740;
+const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH = 780;
 const PARTY_SHARE_IMAGE_DESCRIPTION_FONT_SIZE = 34;
+const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_LINES = 2;
 const PARTY_SHARE_PURPOSE = "Open this party to split expenses and settle up together on trizum.";
 const PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION = "Split expenses and settle up together on trizum.";
 const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
@@ -39,7 +40,8 @@ const PARTY_SHARE_IMAGE_STYLES = {
     "display: flex; align-items: center; height: 78px; padding: 0 36px; border: 3px solid #FFFFFF; border-radius: 39px; background: rgba(0,0,0,0.18);",
   ctaText: "display: flex; font-size: 34px; font-weight: 800; color: #FFFFFF; line-height: 1;",
   description:
-    "display: flex; max-width: 800px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7; white-space: nowrap; overflow: hidden;",
+    "display: flex; flex-direction: column; width: 780px; height: 82px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7; overflow: hidden;",
+  descriptionLine: "display: flex; width: 780px; overflow: hidden; white-space: nowrap;",
   footer: "display: flex; align-items: center; margin-top: 40px;",
   footerBrand: "display: flex; align-items: center; margin-left: 42px;",
   footerBrandMark:
@@ -52,7 +54,7 @@ const PARTY_SHARE_IMAGE_STYLES = {
     "display: flex; align-items: center; justify-content: center; width: 124px; height: 124px; color: #FFFFFF; font-size: 108px; line-height: 1; filter: grayscale(1) brightness(2.35) contrast(1.8);",
   partyIconTile:
     "display: flex; align-items: center; justify-content: center; width: 196px; height: 196px; border-radius: 40px; background: linear-gradient(180deg, #171717 0%, #050505 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.03);",
-  title: "display: flex; max-width: 820px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
+  title: "display: flex; max-width: 780px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
   viaText: "display: flex; font-size: 34px; color: #9A9A9A;",
 } as const;
 
@@ -330,10 +332,11 @@ export function renderPartyShareImageHtml(
 ) {
   const trizumMarkUrl = options.trizumMarkUrl ?? TRIZUM_MARK_PATH;
   const title = formatImageTitle(preview.name);
-  const description = truncateTextForWidth(
+  const descriptionLines = wrapTextForLines(
     preview.description || PARTY_SHARE_IMAGE_FALLBACK_DESCRIPTION,
     PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH,
     PARTY_SHARE_IMAGE_DESCRIPTION_FONT_SIZE,
+    PARTY_SHARE_IMAGE_DESCRIPTION_MAX_LINES,
     {
       maxLength: MAX_IMAGE_DESCRIPTION_LENGTH,
     },
@@ -349,9 +352,7 @@ export function renderPartyShareImageHtml(
 
           <div style="${PARTY_SHARE_IMAGE_STYLES.partyCopy}">
             <div style="${imageTitleStyle(title.fontSize)}">${escapeHtmlText(title.text)}</div>
-            <div style="${PARTY_SHARE_IMAGE_STYLES.description}">${escapeHtmlText(
-              description,
-            )}</div>
+            <div style="${PARTY_SHARE_IMAGE_STYLES.description}">${renderDescriptionLines(descriptionLines)}</div>
           </div>
         </div>
 
@@ -525,6 +526,15 @@ function imageTitleStyle(fontSize: number) {
   return `${PARTY_SHARE_IMAGE_STYLES.title} font-size: ${fontSize}px; white-space: nowrap;`;
 }
 
+function renderDescriptionLines(lines: string[]) {
+  return lines
+    .map(
+      (line) =>
+        `<div style="${PARTY_SHARE_IMAGE_STYLES.descriptionLine}">${escapeHtmlText(line)}</div>`,
+    )
+    .join("");
+}
+
 function formatImageTitle(value: string) {
   const text = normalizePreviewText(value) || "Shared expenses";
   const fontSize = getFittingFontSize(
@@ -565,22 +575,77 @@ function truncateTextForWidth(
     normalizePreviewText(value),
     options.maxLength ?? Number.POSITIVE_INFINITY,
   );
-  const maxUnits = maxWidth / fontSize;
 
-  if (getVisualTextUnits(text) <= maxUnits) {
-    return text;
+  return truncateTextForUnits(text, maxWidth / fontSize);
+}
+
+function wrapTextForLines(
+  value: string,
+  maxWidth: number,
+  fontSize: number,
+  maxLines: number,
+  options: { maxLength?: number } = {},
+) {
+  const text = limitText(
+    normalizePreviewText(value),
+    options.maxLength ?? Number.POSITIVE_INFINITY,
+  );
+  const maxUnitsPerLine = maxWidth / fontSize;
+  const lines: string[] = [];
+  let remainingText = text;
+
+  while (remainingText.length > 0 && lines.length < maxLines) {
+    remainingText = remainingText.trimStart();
+
+    if (getVisualTextUnits(remainingText) <= maxUnitsPerLine) {
+      lines.push(remainingText);
+      break;
+    }
+
+    if (lines.length === maxLines - 1) {
+      lines.push(truncateTextForUnits(remainingText, maxUnitsPerLine));
+      break;
+    }
+
+    const line = getWrappedLine(remainingText, maxUnitsPerLine);
+    lines.push(line);
+    remainingText = remainingText.slice(line.length);
+  }
+
+  return lines.length > 0 ? lines : [""];
+}
+
+function getWrappedLine(value: string, maxUnits: number) {
+  const textThatFits = takeTextForUnits(value, maxUnits);
+  const lastSpaceIndex = textThatFits.lastIndexOf(" ");
+
+  if (lastSpaceIndex > 0) {
+    return textThatFits.slice(0, lastSpaceIndex);
+  }
+
+  return textThatFits;
+}
+
+function truncateTextForUnits(value: string, maxUnits: number) {
+  if (getVisualTextUnits(value) <= maxUnits) {
+    return value;
   }
 
   const ellipsis = "...";
   const ellipsisUnits = getVisualTextUnits(ellipsis);
   const targetUnits = Math.max(0, maxUnits - ellipsisUnits);
+
+  return `${takeTextForUnits(value, targetUnits).trimEnd()}${ellipsis}`;
+}
+
+function takeTextForUnits(value: string, maxUnits: number) {
   let nextUnits = 0;
   let nextText = "";
 
-  for (const character of text) {
+  for (const character of value) {
     const characterUnits = getVisualCharacterUnits(character);
 
-    if (nextUnits + characterUnits > targetUnits) {
+    if (nextUnits + characterUnits > maxUnits) {
       break;
     }
 
@@ -588,7 +653,7 @@ function truncateTextForWidth(
     nextUnits += characterUnits;
   }
 
-  return `${nextText.trimEnd()}${ellipsis}`;
+  return nextText.trimEnd();
 }
 
 function getVisualTextUnits(value: string) {
@@ -603,26 +668,26 @@ function getVisualTextUnits(value: string) {
 
 function getVisualCharacterUnits(character: string) {
   if (/\s/u.test(character)) {
-    return 0.28;
+    return 0.3;
   }
 
   if (/[ilI.,:;!'|]/u.test(character)) {
-    return 0.26;
+    return 0.28;
   }
 
   if (/[mwMW@#%&]/u.test(character)) {
-    return 0.78;
+    return 0.84;
   }
 
   if (/[A-Z0-9]/u.test(character)) {
-    return 0.62;
+    return 0.66;
   }
 
   if (character.codePointAt(0)! > 0xffff) {
     return 1;
   }
 
-  return 0.47;
+  return 0.53;
 }
 
 function renderJoinPartyButton() {

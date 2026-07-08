@@ -109,6 +109,8 @@ describe("party share preview image", () => {
     expect(html).toContain("Join party");
     expect(html).toContain("via");
     expect(html).toContain("trizum");
+    expect(html).toContain("This description is intentionally long enough to");
+    expect(html).toContain("be truncated inside the generated image previ...");
     expect(html).toContain("...");
     expect(html).not.toContain("Shared expense invite");
     expect(html).not.toContain("Open in trizum");
