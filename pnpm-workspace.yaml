@@ -61,22 +61,22 @@ catalog:
   "@internationalized/date": 3.12.2
   "@kubiks/otel-drizzle": 2.1.0
   "@libsql/client": 0.17.4
-  "@lingui/babel-plugin-lingui-macro": 6.4.0
-  "@lingui/cli": 6.4.0
-  "@lingui/conf": 6.4.0
-  "@lingui/core": 6.4.0
-  "@lingui/format-po": 6.4.0
-  "@lingui/react": 6.4.0
-  "@lingui/vite-plugin": 6.4.0
-  "@logtape/logtape": 2.2.3
-  "@logtape/sentry": 2.2.3
+  "@lingui/babel-plugin-lingui-macro": 6.5.0
+  "@lingui/cli": 6.5.0
+  "@lingui/conf": 6.5.0
+  "@lingui/core": 6.5.0
+  "@lingui/format-po": 6.5.0
+  "@lingui/react": 6.5.0
+  "@lingui/vite-plugin": 6.5.0
+  "@logtape/logtape": 2.2.4
+  "@logtape/sentry": 2.2.4
   "@openai/codex": 0.142.5
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
-  "@sentry/node": 10.63.0
-  "@sentry/profiling-node": 10.63.0
-  "@sentry/react": 10.63.0
+  "@sentry/node": 10.64.0
+  "@sentry/profiling-node": 10.64.0
+  "@sentry/react": 10.64.0
   "@sentry/vite-plugin": 5.3.0
   "@tanstack/react-form": 1.33.0
   "@tanstack/react-router": 1.170.17
@@ -90,7 +90,7 @@ catalog:
   "@use-gesture/react": 10.3.1
   "@vite-pwa/assets-generator": 1.0.2
   "@vitejs/plugin-react": 6.0.3
-  "@vitest/coverage-v8": 4.1.9
+  "@vitest/coverage-v8": 4.1.10
   agent-browser: 0.31.1
   all-contributors-cli: 6.26.1
   babel-plugin-react-compiler: 1.0.0
@@ -111,7 +111,7 @@ catalog:
   eslint-plugin-lingui: 0.14.0
   exifr: 7.1.3
   heic-to: 1.5.2
-  hono: 4.12.27
+  hono: 4.12.28
   isomorphic-ws: 5.0.0
   jose: 6.2.3
   jsdom: 29.1.1
@@ -131,7 +131,7 @@ catalog:
   rollup: 4.62.2
   rollup-plugin-license: 3.7.1
   sharp: 0.35.3
-  skills: 1.5.14
+  skills: 1.5.15
   skills-npm: 1.2.0
   sonner: 2.0.7
   svgexport: 0.4.2
@@ -148,10 +148,10 @@ catalog:
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
   vite-plus: 0.2.2
-  vitest: 4.1.9
+  vitest: 4.1.10
   workbox-build: 7.4.1
   workbox-window: 7.4.1
-  wrangler: 4.107.0
+  wrangler: 4.107.1
   ws: 8.21.0
   tsx: 4.23.0
   zod: 4.4.3
