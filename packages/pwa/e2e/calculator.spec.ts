@@ -440,7 +440,10 @@ test.describe("Expense calculator", () => {
     await expect(calculator).not.toBeVisible();
   });
 
-  test("animates browser back close and restores scroll on mobile", async ({ harness, page }) => {
+  test("animates browser back close without resetting scroll on mobile", async ({
+    harness,
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 520 });
 
     const seededParty = await harness.seedJoinedParty({
@@ -502,6 +505,29 @@ test.describe("Expense calculator", () => {
         return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
       })
       .toBeLessThanOrEqual(0);
+    await expect
+      .poll(async () => Math.round(await page.evaluate(() => window.scrollY)))
+      .toBeGreaterThanOrEqual(Math.round(scrollYBefore) - 8);
+
+    await page.evaluate(() => {
+      const testWindow = window as typeof window & {
+        __calculatorBackScrollSamples?: number[];
+        __stopCalculatorBackScrollSamples?: () => void;
+      };
+
+      testWindow.__calculatorBackScrollSamples = [];
+
+      let animationFrameId = 0;
+      function sampleScroll() {
+        testWindow.__calculatorBackScrollSamples?.push(window.scrollY);
+        animationFrameId = window.requestAnimationFrame(sampleScroll);
+      }
+
+      sampleScroll();
+      testWindow.__stopCalculatorBackScrollSamples = () => {
+        window.cancelAnimationFrame(animationFrameId);
+      };
+    });
 
     await page.goBack();
     await expect(page).toHaveURL(/\/add$/);
@@ -519,6 +545,21 @@ test.describe("Expense calculator", () => {
         return Math.abs(scrollYAfterClose - Math.round(scrollYBefore));
       })
       .toBeLessThanOrEqual(8);
+
+    const scrollSamplesDuringBackClose = await page.evaluate(() => {
+      const testWindow = window as typeof window & {
+        __calculatorBackScrollSamples?: number[];
+        __stopCalculatorBackScrollSamples?: () => void;
+      };
+
+      testWindow.__stopCalculatorBackScrollSamples?.();
+
+      return testWindow.__calculatorBackScrollSamples ?? [];
+    });
+
+    expect(scrollSamplesDuringBackClose.length).toBeGreaterThan(0);
+    const minScrollYDuringBackClose = Math.min(...scrollSamplesDuringBackClose);
+    expect(minScrollYDuringBackClose).toBeGreaterThanOrEqual(Math.round(scrollYBefore) - 8);
   });
 
   test("accepts supported physical keyboard input while open", async ({ harness, page }) => {

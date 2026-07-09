@@ -9,6 +9,7 @@ import {
   createBrowserHistory,
   createRouter,
   type NavigateOptions,
+  type ParsedLocation,
   type ToOptions,
   type RegisteredRouter,
 } from "@tanstack/react-router";
@@ -112,6 +113,38 @@ const WSS_URL = getAutomergeWssUrl();
 const isOfflineOnly = getIsAutomergeOfflineOnly(initialUrl.href);
 const logger = getLogger("main");
 
+type RouterWithScrollReset = {
+  _scroll?: {
+    next: boolean;
+  };
+};
+
+type CalculatorSearchLocation = Pick<ParsedLocation<Record<string, unknown>>, "search">;
+
+function hasCalculatorSearch(location: CalculatorSearchLocation | undefined) {
+  const calculator = location?.search.calculator;
+
+  return typeof calculator === "string" && calculator.length > 0;
+}
+
+function shouldPreserveCalculatorSearchScroll({
+  fromLocation,
+  hashChanged,
+  pathChanged,
+  toLocation,
+}: {
+  fromLocation?: ParsedLocation;
+  hashChanged: boolean;
+  pathChanged: boolean;
+  toLocation: ParsedLocation;
+}) {
+  return (
+    !pathChanged &&
+    !hashChanged &&
+    (hasCalculatorSearch(fromLocation) || hasCalculatorSearch(toLocation))
+  );
+}
+
 // Create automerge repository
 const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
@@ -171,6 +204,16 @@ const router = createRouter({
   context: { repo },
   defaultGcTime: 0,
   defaultStaleTime: Infinity,
+});
+
+router.subscribe("onBeforeNavigate", (event) => {
+  if (shouldPreserveCalculatorSearchScroll(event)) {
+    // Browser back/forward does not carry the calculator's resetScroll: false option.
+    const scrollState = (router as RouterWithScrollReset)._scroll;
+    if (scrollState) {
+      scrollState.next = false;
+    }
+  }
 });
 
 let UpdateControllerComponent = UpdateController;
