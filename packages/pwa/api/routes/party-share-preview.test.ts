@@ -202,6 +202,7 @@ describe("party share preview route", () => {
     );
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("Vary")).toBe("Accept, Accept-Language, User-Agent");
     expect(await response.text()).toBe("<html><head></head><body>app</body></html>");
     expect(assetFetch).toHaveBeenCalledTimes(1);
     expect(loadPreview).not.toHaveBeenCalled();
@@ -233,6 +234,7 @@ describe("party share preview route", () => {
     const html = await response.text();
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("Vary")).toBe("Accept, Accept-Language, User-Agent");
     expect(html).toContain('property="og:title" content="Join Cabin on trizum"');
     expect(html).toContain(
       'property="og:description" content="Weekend costs Open this party to split expenses and settle up together on trizum."',

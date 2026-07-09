@@ -41,6 +41,7 @@ const PARTY_SHARE_IMAGE_DESCRIPTION_MAX_LINES = 2;
 const PARTY_SHARE_IMAGE_BRAND_MARK_SIZE = 72;
 const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
 const PARTY_SHARE_LOCALE_PARAM = "lang";
+const PARTY_SHARE_HTML_VARY_HEADERS = ["Accept", "Accept-Language", "User-Agent"] as const;
 const INTER_FONT_FACES = [
   { path: interRegularFontUrl, weight: 400 },
   { path: interBoldFontUrl, weight: 700 },
@@ -160,7 +161,13 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const request = c.req.raw;
 
     if (!isPartyPreviewRequest(request)) {
-      return c.env.ASSETS.fetch(request);
+      const assetResponse = await c.env.ASSETS.fetch(request);
+
+      return new Response(assetResponse.body, {
+        headers: withPartyShareHtmlVaryHeaders(assetResponse.headers),
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+      });
     }
 
     const partyId = c.req.param("partyId");
@@ -183,9 +190,8 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     });
 
     return new Response(injectPartyShareHeadTags(html, headTags), {
-      headers: withVaryHeader(
+      headers: withPartyShareHtmlVaryHeaders(
         withHeader(assetResponse.headers, "Content-Type", "text/html; charset=utf-8"),
-        "Accept-Language",
       ),
       status: assetResponse.status,
       statusText: assetResponse.statusText,
@@ -832,6 +838,13 @@ function withHeader(headers: Headers, name: string, value: string) {
   nextHeaders.set(name, value);
 
   return nextHeaders;
+}
+
+function withPartyShareHtmlVaryHeaders(headers: Headers) {
+  return PARTY_SHARE_HTML_VARY_HEADERS.reduce(
+    (nextHeaders, headerName) => withVaryHeader(nextHeaders, headerName),
+    headers,
+  );
 }
 
 function withVaryHeader(headers: Headers, value: string) {
