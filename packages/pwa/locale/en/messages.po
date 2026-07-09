@@ -99,7 +99,7 @@ msgstr "Active on this device"
 msgid "ADB Unit of Account"
 msgstr "ADB Unit of Account"
 
-#: src/components/CalculatorToolbar.tsx:1397
+#: src/components/CalculatorToolbar.tsx:1477
 msgid "Add"
 msgstr "Add"
 
@@ -138,7 +138,7 @@ msgstr "Add password sign-in"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Add your name so others know who you are and how to pay you"
 
-#: src/routes/party_.$partyId.add.tsx:97
+#: src/routes/party_.$partyId.add.tsx:96
 msgid "Adding expense..."
 msgstr "Adding expense..."
 
@@ -255,11 +255,11 @@ msgstr "At least one participant is required"
 msgid "Attach photos of receipts to your expenses"
 msgstr "Attach photos of receipts to your expenses"
 
-#: src/components/CalculatorToolbar.tsx:1069
+#: src/components/CalculatorToolbar.tsx:1111
 msgid "Attachment preview"
 msgstr "Attachment preview"
 
-#: src/components/CalculatorToolbar.tsx:1029
+#: src/components/CalculatorToolbar.tsx:1079
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Attachments"
@@ -317,7 +317,7 @@ msgstr "Back to settings"
 msgid "Back to sign in"
 msgstr "Back to sign in"
 
-#: src/components/CalculatorToolbar.tsx:1422
+#: src/components/CalculatorToolbar.tsx:1502
 msgid "Backspace"
 msgstr "Backspace"
 
@@ -413,16 +413,16 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/components/CalculatorToolbar.tsx:1430
+#: src/components/CalculatorToolbar.tsx:1510
 msgid "Calculate result"
 msgstr "Calculate result"
 
-#: src/components/CalculatorToolbar.tsx:919
-#: src/components/CalculatorToolbar.tsx:939
+#: src/components/CalculatorToolbar.tsx:969
+#: src/components/CalculatorToolbar.tsx:989
 msgid "Calculator"
 msgstr "Calculator"
 
-#: src/components/CalculatorToolbar.tsx:1262
+#: src/components/CalculatorToolbar.tsx:1342
 msgid "Calculator expression"
 msgstr "Calculator expression"
 
@@ -527,7 +527,7 @@ msgstr "Choose the currency for expenses in this party"
 msgid "Choose who receives it"
 msgstr "Choose who receives it"
 
-#: src/components/CalculatorToolbar.tsx:1313
+#: src/components/CalculatorToolbar.tsx:1393
 msgid "Clear all"
 msgstr "Clear all"
 
@@ -544,15 +544,15 @@ msgstr "Clear search"
 msgid "Close"
 msgstr "Close"
 
-#: src/components/CalculatorToolbar.tsx:1057
+#: src/components/CalculatorToolbar.tsx:1099
 msgid "Close attachment preview"
 msgstr "Close attachment preview"
 
-#: src/components/CurrencyField.tsx:246
+#: src/components/CurrencyField.tsx:354
 msgid "Close calculator"
 msgstr "Close calculator"
 
-#: src/components/CalculatorToolbar.tsx:1329
+#: src/components/CalculatorToolbar.tsx:1409
 msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
@@ -828,7 +828,7 @@ msgstr "Debt transfer to another party"
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
-#: src/components/CalculatorToolbar.tsx:1414
+#: src/components/CalculatorToolbar.tsx:1494
 msgid "Decimal point"
 msgstr "Decimal point"
 
@@ -867,7 +867,7 @@ msgstr "Destructive actions"
 msgid "Did you know?"
 msgstr "Did you know?"
 
-#: src/components/CalculatorToolbar.tsx:1337
+#: src/components/CalculatorToolbar.tsx:1417
 msgid "Divide"
 msgstr "Divide"
 
@@ -891,7 +891,7 @@ msgstr "Edit"
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:225
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:224
 msgid "Editing {expenseName}"
 msgstr "Editing {expenseName}"
 
@@ -1012,7 +1012,7 @@ msgstr "Everything is archived for now. You can reopen any party from the archiv
 msgid "Exact"
 msgstr "Exact"
 
-#: src/routes/party_.$partyId.add.tsx:118
+#: src/routes/party_.$partyId.add.tsx:117
 msgid "Expense added"
 msgstr "Expense added"
 
@@ -1024,7 +1024,7 @@ msgstr "Expense amounts don't match total. Please check your split configuration
 msgid "Expense Split Mode"
 msgstr "Expense Split Mode"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:189
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:188
 msgid "Expense updated"
 msgstr "Expense updated"
 
@@ -1042,7 +1042,7 @@ msgstr "Expenses counted"
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
 
-#: src/routes/party_.$partyId.add.tsx:123
+#: src/routes/party_.$partyId.add.tsx:122
 msgid "Failed to add expense"
 msgstr "Failed to add expense"
 
@@ -1074,7 +1074,7 @@ msgstr "Failed to mark expense as paid"
 msgid "Failed to transfer debt"
 msgstr "Failed to transfer debt"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:194
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:193
 msgid "Failed to update expense"
 msgstr "Failed to update expense"
 
@@ -1595,7 +1595,7 @@ msgstr "Mozambican Metical"
 msgid "Multi-Party Splitting"
 msgstr "Multi-Party Splitting"
 
-#: src/components/CalculatorToolbar.tsx:1357
+#: src/components/CalculatorToolbar.tsx:1437
 msgid "Multiply"
 msgstr "Multiply"
 
@@ -1629,7 +1629,7 @@ msgstr "Nepalese Rupee"
 msgid "Netherlands Antillean Guilder"
 msgstr "Netherlands Antillean Guilder"
 
-#: src/routes/party_.$partyId.add.tsx:139
+#: src/routes/party_.$partyId.add.tsx:138
 msgid "New expense"
 msgstr "New expense"
 
@@ -1780,7 +1780,7 @@ msgstr "Only your own debt can be transferred"
 msgid "Open archived parties"
 msgstr "Open archived parties"
 
-#: src/components/CurrencyField.tsx:246
+#: src/components/CurrencyField.tsx:354
 msgid "Open calculator"
 msgstr "Open calculator"
 
@@ -1796,7 +1796,7 @@ msgstr "Open GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
-#: src/components/CalculatorToolbar.tsx:1321
+#: src/components/CalculatorToolbar.tsx:1401
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
@@ -2468,7 +2468,7 @@ msgstr "Submit a Request"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/CalculatorToolbar.tsx:1377
+#: src/components/CalculatorToolbar.tsx:1457
 msgid "Subtract"
 msgstr "Subtract"
 
@@ -2839,7 +2839,7 @@ msgstr "Update password"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:158
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:157
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
@@ -2944,9 +2944,29 @@ msgstr "Version"
 msgid "Vietnamese Dong"
 msgstr "Vietnamese Dong"
 
+#. js-lingui-explicit-id
+#: src/components/CalculatorToolbar.tsx:1159
+msgid "View attachment"
+msgstr "View attachment"
+
 #: src/components/CalculatorToolbar.tsx:1041
 msgid "View attachment {attachmentNumber}"
 msgstr "View attachment {attachmentNumber}"
+
+#. js-lingui-explicit-id
+#: src/components/CalculatorToolbar.tsx:1154
+msgid "View attachment 1"
+msgstr "View attachment 1"
+
+#. js-lingui-explicit-id
+#: src/components/CalculatorToolbar.tsx:1156
+msgid "View attachment 2"
+msgstr "View attachment 2"
+
+#. js-lingui-explicit-id
+#: src/components/CalculatorToolbar.tsx:1158
+msgid "View attachment 3"
+msgstr "View attachment 3"
 
 #: src/routes/about/route.tsx:89
 msgid "View on GitHub"

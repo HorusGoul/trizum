@@ -77,7 +77,6 @@ function AddExpense() {
     buildLocation: (options) =>
       router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
     navigate: (options) => void navigate(mergeSearchOptions(options)),
-    history: router.history,
   });
 
   // Track photos for gallery - updates when form changes

@@ -332,7 +332,7 @@ export function ExpenseEditor({
           shares={shares}
         />
 
-        <div className="h-16 shrink-0" />
+        <div className="h-[calc(4rem+var(--calculator-mobile-scroll-allowance,0px))] shrink-0 transition-[height] duration-200 ease-out md:h-16" />
       </form>
     </div>
   );

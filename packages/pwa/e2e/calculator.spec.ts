@@ -9,6 +9,10 @@ const scrollTargetParticipant = {
   id: "participant-traveler-24",
   name: "Traveler 24",
 } as const;
+const bottomScrollTargetParticipant = {
+  id: "participant-zed-last",
+  name: "ZZZ Last Traveler",
+} as const;
 const receiptImagePath = "public/pwa-64x64.png";
 
 function createScrollableParticipantFixture() {
@@ -32,6 +36,7 @@ function createScrollableParticipantFixture() {
       participants: {
         ...fixture.party.participants,
         ...extraParticipants,
+        [bottomScrollTargetParticipant.id]: bottomScrollTargetParticipant,
       },
     },
   };
@@ -264,6 +269,84 @@ test.describe("Expense calculator", () => {
       .toBeLessThanOrEqual(0);
   });
 
+  test("adds mobile scroll allowance for the last participant field", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 390, height: 520 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createScrollableParticipantFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const targetCheckbox = page.getByRole("checkbox", {
+      name: bottomScrollTargetParticipant.name,
+      exact: true,
+    });
+    await targetCheckbox.scrollIntoViewIfNeeded();
+    await targetCheckbox.setChecked(true, { force: true });
+    await expect(targetCheckbox).toBeChecked();
+
+    const participantAmountField = page.getByLabel(
+      `Amount for ${bottomScrollTargetParticipant.name}`,
+      { exact: true },
+    );
+    await participantAmountField.scrollIntoViewIfNeeded();
+    await participantAmountField.evaluate((element) => {
+      element.scrollIntoView({ block: "end", inline: "nearest" });
+    });
+
+    const scrollHeightBefore = await page.evaluate(() => document.documentElement.scrollHeight);
+
+    await participantAmountField.click();
+    await expect
+      .poll(async () =>
+        page.evaluate(() => new URLSearchParams(window.location.search).get("calculator")),
+      )
+      .toBe(`share-${bottomScrollTargetParticipant.id}`);
+
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    await expect(calculator).toBeVisible();
+    await expect
+      .poll(async () =>
+        page.evaluate(() =>
+          Number.parseFloat(
+            window
+              .getComputedStyle(document.documentElement)
+              .getPropertyValue("--calculator-mobile-scroll-allowance"),
+          ),
+        ),
+      )
+      .toBeGreaterThan(0);
+    await expect
+      .poll(async () => page.evaluate(() => document.documentElement.scrollHeight))
+      .toBeGreaterThan(scrollHeightBefore);
+    await expect
+      .poll(async () => {
+        const fieldBox = await participantAmountField.boundingBox();
+        const calculatorBox = await calculator.boundingBox();
+
+        if (!fieldBox || !calculatorBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
+      })
+      .toBeLessThanOrEqual(0);
+  });
+
   test("shows mobile attachments while the calculator is open", async ({ harness, page }) => {
     await page.setViewportSize({ width: 390, height: 520 });
 
@@ -312,6 +395,47 @@ test.describe("Expense calculator", () => {
     await expect(attachmentPreview).not.toBeVisible();
 
     await page.mouse.click(10, 120);
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
+  });
+
+  test("closes from outside taps without focusing another field", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 390, height: 520 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const titleField = page.getByLabel("Title", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+
+    await titleField.click();
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
+    await expect(amountField).not.toBeFocused();
+    await expect(titleField).not.toBeFocused();
+
+    await page.waitForTimeout(1600);
     await expect(page).toHaveURL(/\/add$/);
     await expect(calculator).not.toBeVisible();
   });
@@ -385,6 +509,9 @@ test.describe("Expense calculator", () => {
 
     await expect(calculator).not.toBeVisible();
     await expect(participantAmountField).not.toBeFocused();
+    await page.waitForTimeout(1600);
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
     await expect
       .poll(async () => {
         const scrollYAfterClose = Math.round(await page.evaluate(() => window.scrollY));

@@ -1,5 +1,5 @@
-import { closeRouteState, navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
-import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
+import { navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
+import type { ParsedLocation } from "@tanstack/react-router";
 
 export interface UseRouteCalculatorOptions {
   calculatorId: string | undefined;
@@ -14,7 +14,6 @@ export interface UseRouteCalculatorOptions {
     replace?: boolean;
     resetScroll?: boolean;
   }) => void;
-  history: Pick<RouterHistory, "go">;
 }
 
 export interface UseRouteCalculatorReturn {
@@ -45,7 +44,6 @@ export function useRouteCalculator({
   currentLocation,
   buildLocation,
   navigate,
-  history,
 }: UseRouteCalculatorOptions): UseRouteCalculatorReturn {
   function openCalculator(nextCalculatorId: string) {
     navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
@@ -57,12 +55,10 @@ export function useRouteCalculator({
   function closeCalculator() {
     const restoreScroll = captureWindowScrollRestoration();
 
-    closeRouteState(currentLocation, history, () => {
-      navigate({
-        search: { calculator: undefined },
-        replace: true,
-        resetScroll: false,
-      });
+    navigate({
+      search: { calculator: undefined },
+      replace: true,
+      resetScroll: false,
     });
     restoreScroll();
   }

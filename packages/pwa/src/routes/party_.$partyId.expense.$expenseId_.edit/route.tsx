@@ -104,7 +104,6 @@ function EditExpense() {
     buildLocation: (options) =>
       router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
     navigate: (options) => void navigate(mergeSearchOptions(options)),
-    history: router.history,
   });
 
   if (!expense) {

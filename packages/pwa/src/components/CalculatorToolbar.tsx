@@ -10,6 +10,7 @@ import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { cn } from "#src/ui/utils.ts";
+import { suppressCalculatorAutoOpen } from "./calculatorAutoOpenSuppression.ts";
 import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
 import type { MediaFile } from "#src/models/media.ts";
 
@@ -23,6 +24,7 @@ const MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS = MOBILE_SHEET_TWEEN_CONFIG.duration 
 const MOBILE_SCROLL_RESTORE_TIMEOUT_MS = 650;
 const MOBILE_SCROLL_RESTORE_TOLERANCE = 2;
 const MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE = "calc(var(--safe-area-inset-top, 0px) + 4rem)";
+const MOBILE_SCROLL_ALLOWANCE_PROPERTY = "--calculator-mobile-scroll-allowance";
 const EMPTY_ATTACHMENT_PHOTO_IDS: MediaFile["id"][] = [];
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
@@ -92,6 +94,23 @@ type WindowScrollPosition = {
   left: number;
   top: number;
 };
+
+function blurActiveElement() {
+  const activeElement = document.activeElement;
+
+  if (activeElement instanceof HTMLElement && activeElement !== document.body) {
+    activeElement.blur();
+  }
+}
+
+function blurCalculatorFocus() {
+  blurActiveElement();
+  window.requestAnimationFrame(blurActiveElement);
+}
+
+function removeMobileScrollAllowance() {
+  document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
+}
 
 function getCurrentWindowScrollPosition(): WindowScrollPosition | null {
   if (typeof window === "undefined") {
@@ -379,6 +398,8 @@ function useCalculatorDismiss({
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   toolbarRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const suppressNextDocumentClickRef = useRef(false);
+
   useEffect(() => {
     if (!enabled) {
       return;
@@ -394,23 +415,36 @@ function useCalculatorDismiss({
       return !inToolbar && !inField && !inAdditionalElement;
     }
 
-    function handleFocusIn(e: FocusEvent) {
+    function handlePointerDown(e: PointerEvent) {
       if (isOutside(e.target as Node | null)) {
+        suppressNextDocumentClickRef.current = true;
+        suppressCalculatorAutoOpen();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+        blurActiveElement();
         callbacksRef.current.onDismiss();
       }
     }
 
-    function handlePointerUp(e: PointerEvent) {
-      if (isOutside(e.target as Node | null)) {
-        callbacksRef.current.onDismiss();
+    function handleClick(e: MouseEvent) {
+      if (!suppressNextDocumentClickRef.current) {
+        return;
       }
+
+      suppressNextDocumentClickRef.current = false;
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      e.stopPropagation();
     }
 
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointerdown", handlePointerDown, { capture: true });
+    document.addEventListener("click", handleClick, { capture: true });
     return () => {
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("pointerup", handlePointerUp);
+      document.removeEventListener("pointerdown", handlePointerDown, { capture: true });
+      document.removeEventListener("click", handleClick, { capture: true });
     };
   }, [additionalInsideRef, callbacksRef, enabled, fieldContainerRef, toolbarRef]);
 }
@@ -498,12 +532,32 @@ function useMobileCalculatorScroll({
   isLargeScreen: boolean;
   toolbarRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const initialWindowScrollRef = useRef<WindowScrollPosition | null>(null);
-  const scrollAllowanceElementRef = useRef<HTMLDivElement | null>(null);
-  if (!initialWindowScrollRef.current) {
-    initialWindowScrollRef.current = getCurrentWindowScrollPosition();
+  const [initialWindowScroll] = useState(() => getCurrentWindowScrollPosition());
+  const initialWindowScrollRef = useRef<WindowScrollPosition | null>(initialWindowScroll);
+  const scrollFieldAboveMobileSheetRef = useRef<
+    (behavior: ScrollBehavior, attempts?: number) => void
+  >(() => {});
+
+  function setMobileScrollAllowance(height: number, options?: { animate?: boolean }) {
+    if (typeof document === "undefined" || isLargeScreen) {
+      return;
+    }
+
+    const allowanceHeight = Math.max(0, height);
+    const root = document.documentElement;
+
+    if (options?.animate && !root.style.getPropertyValue(MOBILE_SCROLL_ALLOWANCE_PROPERTY)) {
+      root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
+    }
+
+    if (options?.animate) {
+      window.requestAnimationFrame(() => {
+        root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
+      });
+    } else {
+      root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
+    }
   }
-  const initialWindowScroll = initialWindowScrollRef.current;
 
   function scrollFieldAboveMobileSheet(behavior: ScrollBehavior, attempts = 0) {
     if (typeof window === "undefined" || isLargeScreen) {
@@ -514,7 +568,9 @@ function useMobileCalculatorScroll({
     const sheetElement = toolbarRef.current;
     if (!fieldElement || !sheetElement) {
       if (attempts < 2) {
-        window.requestAnimationFrame(() => scrollFieldAboveMobileSheet(behavior, attempts + 1));
+        window.requestAnimationFrame(() =>
+          scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
+        );
       }
       return;
     }
@@ -522,7 +578,9 @@ function useMobileCalculatorScroll({
     const sheetHeight = sheetElement.offsetHeight;
     if (sheetHeight <= 0) {
       if (attempts < 2) {
-        window.requestAnimationFrame(() => scrollFieldAboveMobileSheet(behavior, attempts + 1));
+        window.requestAnimationFrame(() =>
+          scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
+        );
       }
       return;
     }
@@ -543,54 +601,22 @@ function useMobileCalculatorScroll({
 
     if (attempts < 4) {
       window.setTimeout(
-        () => scrollFieldAboveMobileSheet(behavior, attempts + 1),
+        () => scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
         MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS / 4,
       );
     }
   }
 
-  function setMobileScrollAllowance(height: number, options?: { animate?: boolean }) {
-    if (typeof document === "undefined" || isLargeScreen) {
-      return;
-    }
-
-    const allowanceHeight = Math.max(0, height);
-    let scrollAllowanceElement = scrollAllowanceElementRef.current;
-
-    if (!scrollAllowanceElement) {
-      scrollAllowanceElement = document.createElement("div");
-      scrollAllowanceElement.setAttribute("aria-hidden", "true");
-      scrollAllowanceElement.style.pointerEvents = "none";
-      scrollAllowanceElement.style.flexShrink = "0";
-      scrollAllowanceElement.style.transition = `height ${MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS}ms ease-out`;
-      scrollAllowanceElement.style.height = options?.animate ? "0px" : `${allowanceHeight}px`;
-      document.body.append(scrollAllowanceElement);
-      scrollAllowanceElementRef.current = scrollAllowanceElement;
-    }
-
-    if (options?.animate) {
-      window.requestAnimationFrame(() => {
-        scrollAllowanceElement.style.height = `${allowanceHeight}px`;
-      });
-    } else {
-      scrollAllowanceElement.style.height = `${allowanceHeight}px`;
-    }
-  }
+  useLayoutEffect(() => {
+    scrollFieldAboveMobileSheetRef.current = scrollFieldAboveMobileSheet;
+  });
 
   function collapseMobileScrollAllowance() {
     if (isLargeScreen) {
       return;
     }
 
-    const scrollAllowanceElement = scrollAllowanceElementRef.current;
-    if (scrollAllowanceElement) {
-      scrollAllowanceElement.style.height = "0px";
-    }
-  }
-
-  function removeMobileScrollAllowance() {
-    scrollAllowanceElementRef.current?.remove();
-    scrollAllowanceElementRef.current = null;
+    document.documentElement.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
   }
 
   function restoreInitialWindowScroll(behavior: ScrollBehavior) {
@@ -641,21 +667,21 @@ function useMobileCalculatorScroll({
 
   useEffect(() => {
     return () => {
-      const scrollAllowanceElement = scrollAllowanceElementRef.current;
-      scrollAllowanceElementRef.current = null;
-
-      if (scrollAllowanceElement && typeof window !== "undefined" && initialWindowScroll) {
-        scrollAllowanceElement.style.height = "0px";
+      if (typeof window !== "undefined" && initialWindowScroll) {
+        document.documentElement.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
         window.scrollTo({
           left: initialWindowScroll.left,
           top: initialWindowScroll.top,
           behavior: "smooth",
         });
-        window.setTimeout(() => scrollAllowanceElement.remove(), MOBILE_SCROLL_RESTORE_TIMEOUT_MS);
+        window.setTimeout(
+          () => document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY),
+          MOBILE_SCROLL_RESTORE_TIMEOUT_MS,
+        );
         return;
       }
 
-      scrollAllowanceElement?.remove();
+      document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
     };
   }, [initialWindowScroll]);
 
@@ -664,8 +690,7 @@ function useMobileCalculatorScroll({
       return;
     }
 
-    scrollAllowanceElementRef.current?.remove();
-    scrollAllowanceElementRef.current = null;
+    document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
   }, [isLargeScreen]);
 
   return {
@@ -681,7 +706,6 @@ function useElementHeight(ref: React.RefObject<HTMLElement | null>, enabled: boo
 
   useLayoutEffect(() => {
     if (!enabled) {
-      setHeight(0);
       return;
     }
 
@@ -708,7 +732,7 @@ function useElementHeight(ref: React.RefObject<HTMLElement | null>, enabled: boo
     return () => observer.disconnect();
   }, [enabled, ref]);
 
-  return height;
+  return enabled ? height : 0;
 }
 
 function formatCalculatorPreviewValue(value: number, currency?: string): string {
@@ -746,7 +770,7 @@ export function CalculatorToolbar({
   currency,
   dismissOnOutsideInteraction = true,
   fieldLabel,
-  closeRequestId,
+  closeRequestId = 0,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const attachmentLayerRef = useRef<HTMLDivElement>(null);
@@ -757,8 +781,10 @@ export function CalculatorToolbar({
   const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(null);
   const dragAccumulatorRef = useRef(0);
   const scrollOffsetRef = useRef(0);
-  const closeRequestIdRef = useRef(closeRequestId);
+  const closeRequestIdRef = useRef<number | undefined>(undefined);
   const pendingMobileCloseActionRef = useRef<"commit" | "dismiss" | null>(null);
+  const mobileCloseFallbackTimeoutRef = useRef<number | null>(null);
+  const finishMobileCloseRef = useRef<() => Promise<void> | void>(() => {});
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(true);
   const callbacksRef = useCalculatorCallbacks({
     onInsert,
@@ -782,19 +808,6 @@ export function CalculatorToolbar({
     toolbarRef,
   });
 
-  function blurCalculatorFocus() {
-    const activeElement = document.activeElement;
-
-    if (
-      activeElement instanceof HTMLElement &&
-      (fieldContainerRef.current?.contains(activeElement) ||
-        toolbarRef.current?.contains(activeElement) ||
-        attachmentLayerRef.current?.contains(activeElement))
-    ) {
-      activeElement.blur();
-    }
-  }
-
   function finishClose(action: "commit" | "dismiss") {
     if (action === "commit") {
       callbacksRef.current.onCommit();
@@ -804,12 +817,34 @@ export function CalculatorToolbar({
     callbacksRef.current.onDismiss();
   }
 
+  function clearMobileCloseFallback() {
+    if (mobileCloseFallbackTimeoutRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(mobileCloseFallbackTimeoutRef.current);
+    mobileCloseFallbackTimeoutRef.current = null;
+  }
+
+  function scheduleMobileCloseFallback() {
+    clearMobileCloseFallback();
+    mobileCloseFallbackTimeoutRef.current = window.setTimeout(() => {
+      void finishMobileCloseRef.current();
+    }, MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS + 100);
+  }
+
   function requestClose(action: "commit" | "dismiss") {
+    if (action === "dismiss" && !isLargeScreen) {
+      suppressCalculatorAutoOpen();
+    }
     blurCalculatorFocus();
 
     if (!isLargeScreen) {
-      pendingMobileCloseActionRef.current ??= action;
+      if (!pendingMobileCloseActionRef.current) {
+        pendingMobileCloseActionRef.current = action;
+      }
       setIsMobileSheetOpen(false);
+      scheduleMobileCloseFallback();
       return;
     }
 
@@ -817,12 +852,21 @@ export function CalculatorToolbar({
   }
 
   async function finishMobileClose() {
-    const action = pendingMobileCloseActionRef.current ?? "dismiss";
+    const action = pendingMobileCloseActionRef.current;
+    if (!action) {
+      return;
+    }
+
+    clearMobileCloseFallback();
     pendingMobileCloseActionRef.current = null;
     await finishInitialWindowScrollRestore();
     removeMobileScrollAllowance();
     finishClose(action);
   }
+
+  useLayoutEffect(() => {
+    finishMobileCloseRef.current = finishMobileClose;
+  });
 
   const interactionCallbacksRef = useCalculatorCallbacks({
     onInsert,
@@ -859,12 +903,18 @@ export function CalculatorToolbar({
   });
   useCalculatorKeyboard({ callbacksRef: interactionCallbacksRef, fieldContainerRef, toolbarRef });
 
+  useEffect(() => clearMobileCloseFallback, []);
+
+  /* eslint-disable react-doctor/no-event-handler, react-doctor/no-pass-live-state-to-parent -- Route/back closes arrive as state after render, and the sheet needs to animate before the field route is finalized. */
   useEffect(() => {
-    if (closeRequestId !== closeRequestIdRef.current) {
-      closeRequestIdRef.current = closeRequestId;
+    const previousCloseRequestId = closeRequestIdRef.current;
+    closeRequestIdRef.current = closeRequestId;
+
+    if (closeRequestId !== previousCloseRequestId && previousCloseRequestId !== undefined) {
       requestClose("dismiss");
     }
   });
+  /* eslint-enable react-doctor/no-event-handler, react-doctor/no-pass-live-state-to-parent */
 
   if (isLargeScreen && !popoverPosition) {
     return null;
@@ -1029,26 +1079,18 @@ function CalculatorMobileAttachmentContent({
           aria-label={t`Attachments`}
           className="border-accent-200/80 px-safe-or-4 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
         >
-          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
-            {photoIds.map((photoId, index) => {
-              const url = urls[index];
-              const attachmentNumber = index + 1;
-
-              return (
-                <Button
-                  key={photoId}
-                  color="transparent"
-                  aria-label={t`View attachment ${attachmentNumber}`}
-                  onPress={() => setSelectedIndex(index)}
-                  className={cn(
-                    "border-accent-200 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
-                    activeIndex === index && "ring-accent-500 dark:ring-accent-400 ring-2",
-                  )}
-                >
-                  <img src={url} alt="" className="h-full w-full object-cover" />
-                </Button>
-              );
-            })}
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 py-2">
+            <span aria-hidden className="w-px shrink-0" />
+            {photoIds.map((photoId, index) => (
+              <CalculatorMobileAttachmentButton
+                key={photoId}
+                index={index}
+                isActive={activeIndex === index}
+                onSelect={setSelectedIndex}
+                url={urls[index]}
+              />
+            ))}
+            <span aria-hidden className="w-px shrink-0" />
           </div>
 
           {activeIndex !== null ? (
@@ -1088,6 +1130,44 @@ function CalculatorMobileAttachmentContent({
         ) : null}
       </AnimatePresence>
     </>
+  );
+}
+
+function CalculatorMobileAttachmentButton({
+  index,
+  isActive,
+  onSelect,
+  url,
+}: {
+  index: number;
+  isActive: boolean;
+  onSelect: React.Dispatch<React.SetStateAction<number | null>>;
+  url: string;
+}) {
+  const attachmentNumber = index + 1;
+
+  return (
+    <Button
+      color="transparent"
+      aria-label={
+        attachmentNumber === 1
+          ? t({ id: "View attachment 1", message: "View attachment 1" })
+          : attachmentNumber === 2
+            ? t({ id: "View attachment 2", message: "View attachment 2" })
+            : attachmentNumber === 3
+              ? t({ id: "View attachment 3", message: "View attachment 3" })
+              : t({ id: "View attachment", message: "View attachment" })
+      }
+      onPress={() => onSelect(index)}
+      className={cn(
+        "border-accent-200 h-12 w-12 shrink-0 rounded-lg border p-0 dark:border-accent-700",
+        isActive && "ring-accent-500 dark:ring-accent-400 ring-2",
+      )}
+    >
+      <span className="block h-full w-full overflow-hidden rounded-[inherit]">
+        <img src={url} alt="" className="h-full w-full object-cover" />
+      </span>
+    </Button>
   );
 }
 
