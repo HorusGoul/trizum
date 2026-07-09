@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { AppCurrencyField } from "#src/ui/fields/TextField.js";
-import React, { use, useEffect, useRef } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
 import { CalculatorToolbar } from "./CalculatorToolbar";
@@ -76,6 +76,7 @@ function CurrencyFieldWithCalculator({
     (props as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const calculatorPresenceElementIdRef = useRef<string | null>(configuredPresenceElementId ?? null);
+  const [calculatorCloseRequestId, setCalculatorCloseRequestId] = useState(0);
   const [state, actions] = useCalculatorMode({
     value: props.value ?? 0,
     onChange: (value) => props.onChange?.(value),
@@ -105,6 +106,7 @@ function CurrencyFieldWithCalculator({
     }
 
     if (activeCalculatorId !== calculatorFieldId && state.isActive) {
+      blurFocusedCalculatorField();
       actions.deactivate();
     }
   }, [
@@ -124,14 +126,30 @@ function CurrencyFieldWithCalculator({
     onOpenCalculator?.(calculatorFieldId);
   }
 
+  function blurFocusedCalculatorField() {
+    const activeElement = document.activeElement;
+
+    if (
+      activeElement instanceof HTMLElement &&
+      fieldContainerRef.current?.contains(activeElement)
+    ) {
+      activeElement.blur();
+    }
+  }
+
+  function requestCloseCalculator() {
+    setCalculatorCloseRequestId((currentId) => currentId + 1);
+  }
+
   function closeCalculator() {
+    blurFocusedCalculatorField();
     actions.deactivate();
     onCloseCalculator?.();
   }
 
   function commitCalculator() {
     actions.commit();
-    onCloseCalculator?.();
+    closeCalculator();
   }
 
   function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
@@ -150,7 +168,7 @@ function CurrencyFieldWithCalculator({
       data-presence-proxy-element-id={configuredPresenceElementId}
       className={calculatorButtonClassName ?? "absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"}
       iconClassName="size-4"
-      onPress={isCalculatorActive ? closeCalculator : openCalculator}
+      onPress={isCalculatorActive ? requestCloseCalculator : openCalculator}
     />
   );
 
@@ -182,6 +200,7 @@ function CurrencyFieldWithCalculator({
           onCommit={commitCalculator}
           onClear={actions.clear}
           onDismiss={closeCalculator}
+          closeRequestId={calculatorCloseRequestId}
           fieldContainerRef={fieldContainerRef}
           presenceElementId={calculatorPresenceElementIdRef.current ?? configuredPresenceElementId}
           previewValue={state.previewValue}

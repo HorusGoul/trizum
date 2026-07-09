@@ -262,11 +262,19 @@ test.describe("Expense calculator", () => {
     const startY = dragHandleBox.y + dragHandleBox.height / 2;
     await page.mouse.move(startX, startY);
     await page.mouse.down();
-    await page.mouse.move(startX, startY + 130, { steps: 8 });
+    await page.mouse.move(startX, startY + 320, { steps: 12 });
     await page.mouse.up();
+
+    expect(
+      await page.evaluate(() => new URLSearchParams(window.location.search).get("calculator")),
+    ).toBe(`share-${scrollTargetParticipant.id}`);
 
     await expect(page).toHaveURL(/\/add$/);
     await expect(calculator).not.toBeVisible();
+    await expect(participantAmountField).not.toBeFocused();
+    await expect
+      .poll(async () => Math.round(await page.evaluate(() => window.scrollY)))
+      .toBeGreaterThan(Math.round(scrollYBefore) - 8);
   });
 
   test("accepts supported physical keyboard input while open", async ({ harness, page }) => {

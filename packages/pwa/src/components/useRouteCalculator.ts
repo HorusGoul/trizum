@@ -23,6 +23,23 @@ export interface UseRouteCalculatorReturn {
   closeCalculator: () => void;
 }
 
+function captureWindowScrollRestoration() {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+
+  return () => {
+    window.requestAnimationFrame(() => {
+      window.scrollTo(scrollX, scrollY);
+      window.requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
+    });
+    window.setTimeout(() => window.scrollTo(scrollX, scrollY), 50);
+  };
+}
+
 export function useRouteCalculator({
   calculatorId,
   currentLocation,
@@ -38,6 +55,8 @@ export function useRouteCalculator({
   }
 
   function closeCalculator() {
+    const restoreScroll = captureWindowScrollRestoration();
+
     closeRouteState(currentLocation, history, () => {
       navigate({
         search: { calculator: undefined },
@@ -45,6 +64,7 @@ export function useRouteCalculator({
         resetScroll: false,
       });
     });
+    restoreScroll();
   }
 
   return {
