@@ -47,7 +47,7 @@ const PARTY_SHARE_IMAGE_STYLES = {
   footerBrand: "display: flex; align-items: center; margin-left: 42px;",
   footerBrandMark: `display: flex; width: ${PARTY_SHARE_IMAGE_BRAND_MARK_SIZE}px; height: ${PARTY_SHARE_IMAGE_BRAND_MARK_SIZE}px; margin-left: 22px; overflow: hidden; background: #000000;`,
   footerBrandName:
-    "display: flex; margin-left: 18px; font-size: 34px; font-weight: 700; color: #FFFFFF;",
+    "display: flex; margin-left: 18px; font-size: 34px; font-weight: 400; color: #FFFFFF;",
   hero: "display: flex; align-items: center; margin-top: 182px;",
   partyCopy: "display: flex; flex-direction: column; margin-left: 48px;",
   partyIcon:
