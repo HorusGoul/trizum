@@ -1,13 +1,24 @@
 import { isValidDocumentId, Repo, type DocumentId, type PeerId } from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
+import type { I18n } from "@lingui/core";
 import { Hono } from "hono";
+import interBoldFontUrl from "../assets/inter/Inter-Bold.ttf?url";
+import interExtraBoldFontUrl from "../assets/inter/Inter-ExtraBold.ttf?url";
+import interRegularFontUrl from "../assets/inter/Inter-Regular.ttf?url";
 import type { ApiEnv, ApiHonoEnv } from "../env";
-import {
-  DEFAULT_LOCALE,
-  normalizeSupportedLocale,
-  type SupportedLocale,
-} from "../../src/lib/locales.js";
+import { createApiI18n } from "../i18n";
+import { DEFAULT_LOCALE, type SupportedLocale } from "../../src/lib/locales.js";
 import { getLogger } from "../../src/lib/log.js";
+import {
+  partyShareFallbackDescriptionMessage,
+  partyShareFallbackNameMessage,
+  partyShareImageFallbackDescriptionMessage,
+  partyShareJoinPartyMessage,
+  partyShareMetadataPurposeMessage,
+  partySharePreviewAltMessage,
+  partyShareTitleMessage,
+  partyShareViaMessage,
+} from "../../src/lib/partySharePreviewMessages.js";
 import { DEFAULT_PARTY_SYMBOL, type Party } from "../../src/models/party.js";
 
 const logger = getLogger("api", "partySharePreview");
@@ -21,7 +32,6 @@ const MAX_IMAGE_DESCRIPTION_LENGTH = 210;
 const PARTY_SHARE_IMAGE_WIDTH = 1200;
 const PARTY_SHARE_IMAGE_HEIGHT = 630;
 const PARTY_SHARE_IMAGE_CACHE_CONTROL = "public, max-age=300, s-maxage=300";
-const PARTY_SHARE_LEGACY_LOCALE_PARAM = "locale";
 const PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH = 780;
 const PARTY_SHARE_IMAGE_TITLE_MAX_FONT_SIZE = 78;
 const PARTY_SHARE_IMAGE_TITLE_MIN_FONT_SIZE = 48;
@@ -32,9 +42,9 @@ const PARTY_SHARE_IMAGE_BRAND_MARK_SIZE = 72;
 const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
 const PARTY_SHARE_LOCALE_PARAM = "lang";
 const INTER_FONT_FACES = [
-  { path: "/assets/inter/Inter-Regular.ttf", weight: 400 },
-  { path: "/assets/inter/Inter-Bold.ttf", weight: 700 },
-  { path: "/assets/inter/Inter-ExtraBold.ttf", weight: 800 },
+  { path: interRegularFontUrl, weight: 400 },
+  { path: interBoldFontUrl, weight: 700 },
+  { path: interExtraBoldFontUrl, weight: 800 },
 ] as const;
 const TRIZUM_MARK_PATH = "/maskable.svg";
 const PARTY_SHARE_IMAGE_STYLES = {
@@ -61,43 +71,6 @@ const PARTY_SHARE_IMAGE_STYLES = {
   title: "display: flex; max-width: 780px; font-weight: 800; line-height: 0.98; letter-spacing: 0;",
   viaText: "display: flex; font-size: 34px; color: #9A9A9A;",
 } as const;
-
-const PARTY_SHARE_COPY = {
-  en: {
-    fallbackDescription: "Split bills with friends, family, and roommates.",
-    fallbackName: "Shared expenses",
-    imageFallbackDescription: "Split expenses and settle up together on trizum.",
-    joinParty: "Join party",
-    metadataPurpose: "Open this party to split expenses and settle up together on trizum.",
-    previewAlt: (title: string) => `${title} preview`,
-    title: (partyName: string) => `Join ${partyName} on trizum`,
-    via: "via",
-  },
-  es: {
-    fallbackDescription: "Divide gastos con amigos, familiares y compañeros de piso.",
-    fallbackName: "Gastos compartidos",
-    imageFallbackDescription: "Divide gastos y salda cuentas juntos en trizum.",
-    joinParty: "Unirse",
-    metadataPurpose: "Abre este grupo para dividir gastos y saldar cuentas juntos en trizum.",
-    previewAlt: (title: string) => `Vista previa de ${title}`,
-    title: (partyName: string) => `Únete a ${partyName} en trizum`,
-    via: "vía",
-  },
-} satisfies Record<
-  SupportedLocale,
-  {
-    fallbackDescription: string;
-    fallbackName: string;
-    imageFallbackDescription: string;
-    joinParty: string;
-    metadataPurpose: string;
-    previewAlt: (title: string) => string;
-    title: (partyName: string) => string;
-    via: string;
-  }
->;
-
-type PartyShareCopy = (typeof PARTY_SHARE_COPY)[SupportedLocale];
 
 const CRAWLER_USER_AGENT_PATTERNS = [
   /applebot/i,
@@ -141,11 +114,21 @@ interface PartySharePreviewRouteOptions {
     html: string,
     context: PartyShareImageResponseContext,
   ) => Promise<Response> | Response;
-  loadPreview?: (partyId: string, env: ApiEnv, request: Request) => Promise<PartySharePreview>;
+  loadPreview?: (
+    partyId: string,
+    context: PartySharePreviewLoadContext,
+  ) => Promise<PartySharePreview>;
 }
 
 interface PartyShareImageResponseContext {
   env: ApiEnv;
+  request: Request;
+}
+
+export interface PartySharePreviewLoadContext {
+  env: ApiEnv;
+  i18n: I18n;
+  locale: SupportedLocale;
   request: Request;
 }
 
@@ -183,9 +166,16 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const partyId = c.req.param("partyId");
     const assetResponse = await c.env.ASSETS.fetch(request);
     const html = await assetResponse.text();
-    const locale = resolvePartyShareLocale(request);
-    const preview = await loadPreview(partyId, c.env, request);
+    const i18n = c.get("i18n");
+    const locale = c.get("locale");
+    const preview = await loadPreview(partyId, {
+      env: c.env,
+      i18n,
+      locale,
+      request,
+    });
     const headTags = renderPartyShareHeadTags({
+      i18n,
       locale,
       partyId,
       preview,
@@ -204,8 +194,14 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
 
   route.get("/api/og/party/:partyId", async (c) => {
     const partyId = c.req.param("partyId");
-    const locale = resolvePartyShareLocale(c.req.raw);
-    const preview = await loadPreview(partyId, c.env, c.req.raw);
+    const i18n = c.get("i18n");
+    const locale = c.get("locale");
+    const preview = await loadPreview(partyId, {
+      env: c.env,
+      i18n,
+      locale,
+      request: c.req.raw,
+    });
     const trizumMarkUrl = await loadTrizumMarkDataUrl(c.env, c.req.raw).catch((error) => {
       logger.warning("Could not load trizum mark for party share preview: {errorMessage}", {
         error: getErrorDetails(error),
@@ -215,7 +211,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
       return getPublicAssetUrl(c.req.raw, TRIZUM_MARK_PATH);
     });
     const html = renderPartyShareImageHtml(preview, {
-      locale,
+      i18n,
       trizumMarkUrl,
     });
 
@@ -329,71 +325,6 @@ export function isPartyPreviewRequest(request: Request) {
   return CRAWLER_USER_AGENT_PATTERNS.some((pattern) => pattern.test(userAgent));
 }
 
-export function resolvePartyShareLocale(request: Request) {
-  const requestUrl = new URL(request.url);
-
-  return (
-    resolveLocaleSearchParam(requestUrl.searchParams) ??
-    resolveAcceptLanguageLocale(request.headers.get("Accept-Language")) ??
-    DEFAULT_LOCALE
-  );
-}
-
-function resolveLocaleSearchParam(searchParams: URLSearchParams) {
-  return (
-    normalizeSupportedLocale(searchParams.get(PARTY_SHARE_LOCALE_PARAM)) ??
-    normalizeSupportedLocale(searchParams.get(PARTY_SHARE_LEGACY_LOCALE_PARAM))
-  );
-}
-
-function resolveAcceptLanguageLocale(value: string | null) {
-  if (!value) {
-    return null;
-  }
-
-  const languageRanges = value
-    .split(",")
-    .map((range, index) => {
-      const [languageTag, ...parameters] = range.trim().split(";");
-
-      return {
-        index,
-        languageTag: languageTag?.trim(),
-        quality: getAcceptLanguageQuality(parameters),
-      };
-    })
-    .filter((range) => range.languageTag && range.quality > 0)
-    .sort((left, right) => right.quality - left.quality || left.index - right.index);
-
-  for (const range of languageRanges) {
-    const locale = normalizeSupportedLocale(range.languageTag);
-
-    if (locale) {
-      return locale;
-    }
-  }
-
-  return null;
-}
-
-function getAcceptLanguageQuality(parameters: string[]) {
-  const qualityParameter = parameters.find((parameter) =>
-    parameter.trim().toLowerCase().startsWith("q="),
-  );
-
-  if (!qualityParameter) {
-    return 1;
-  }
-
-  const quality = Number.parseFloat(qualityParameter.trim().slice(2));
-
-  if (!Number.isFinite(quality)) {
-    return 0;
-  }
-
-  return Math.min(1, Math.max(0, quality));
-}
-
 export function injectPartyShareHeadTags(html: string, headTags: string) {
   const htmlWithoutDefaultTitle = html.replace(TITLE_TAG_PATTERN, "");
 
@@ -405,17 +336,18 @@ export function injectPartyShareHeadTags(html: string, headTags: string) {
 }
 
 export function renderPartyShareHeadTags({
+  i18n = createApiI18n(DEFAULT_LOCALE),
   locale = DEFAULT_LOCALE,
   partyId,
   preview,
   requestUrl,
 }: {
+  i18n?: I18n;
   locale?: SupportedLocale;
   partyId: string;
   preview: PartySharePreview;
   requestUrl: URL;
 }) {
-  const copy = getPartyShareCopy(locale);
   const pageUrl = new URL(`/party/${encodeURIComponent(partyId)}`, requestUrl.origin);
   const imageUrl = new URL(`/api/og/party/${encodeURIComponent(partyId)}`, requestUrl.origin);
 
@@ -423,8 +355,8 @@ export function renderPartyShareHeadTags({
   imageUrl.searchParams.set("v", preview.version);
   imageUrl.searchParams.set(PARTY_SHARE_LOCALE_PARAM, locale);
 
-  const title = getPartyShareTitle(preview, copy);
-  const description = getPartyShareDescription(preview, copy);
+  const title = getPartyShareTitle(preview, i18n);
+  const description = getPartyShareDescription(preview, i18n);
 
   return [
     `<title>${escapeHtmlText(title)}</title>`,
@@ -437,7 +369,7 @@ export function renderPartyShareHeadTags({
     renderSocialMetaTag(propertyMeta("og:image", imageUrl.toString())),
     renderSocialMetaTag(propertyMeta("og:image:width", String(PARTY_SHARE_IMAGE_WIDTH))),
     renderSocialMetaTag(propertyMeta("og:image:height", String(PARTY_SHARE_IMAGE_HEIGHT))),
-    renderSocialMetaTag(propertyMeta("og:image:alt", copy.previewAlt(title))),
+    renderSocialMetaTag(propertyMeta("og:image:alt", i18n._(partySharePreviewAltMessage(title)))),
     renderSocialMetaTag(nameMeta("twitter:card", "summary_large_image")),
     renderSocialMetaTag(nameMeta("twitter:title", title)),
     renderSocialMetaTag(nameMeta("twitter:description", description)),
@@ -447,13 +379,13 @@ export function renderPartyShareHeadTags({
 
 export function renderPartyShareImageHtml(
   preview: PartySharePreview,
-  options: { locale?: SupportedLocale; trizumMarkUrl?: string } = {},
+  options: { i18n?: I18n; trizumMarkUrl?: string } = {},
 ) {
-  const copy = getPartyShareCopy(options.locale ?? DEFAULT_LOCALE);
+  const i18n = options.i18n ?? createApiI18n(DEFAULT_LOCALE);
   const trizumMarkUrl = options.trizumMarkUrl ?? TRIZUM_MARK_PATH;
-  const title = formatImageTitle(preview.name, copy);
+  const title = formatImageTitle(preview.name, i18n);
   const descriptionLines = wrapTextForLines(
-    preview.description || copy.imageFallbackDescription,
+    preview.description || i18n._(partyShareImageFallbackDescriptionMessage),
     PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH,
     PARTY_SHARE_IMAGE_DESCRIPTION_FONT_SIZE,
     PARTY_SHARE_IMAGE_DESCRIPTION_MAX_LINES,
@@ -477,8 +409,8 @@ export function renderPartyShareImageHtml(
         </div>
 
         <div style="${PARTY_SHARE_IMAGE_STYLES.footer}">
-          ${renderJoinPartyButton(copy)}
-          ${renderFooterBrand(trizumMarkUrl, copy)}
+          ${renderJoinPartyButton(i18n)}
+          ${renderFooterBrand(trizumMarkUrl, i18n)}
         </div>
       </div>
     </div>
@@ -487,10 +419,9 @@ export function renderPartyShareImageHtml(
 
 export function createPartySharePreviewFromParty(
   party: PartyPreviewDocument,
-  locale: SupportedLocale = DEFAULT_LOCALE,
+  i18n: I18n = createApiI18n(DEFAULT_LOCALE),
 ): PartySharePreview {
-  const copy = getPartyShareCopy(locale);
-  const name = sanitizePlainText(party.name, 72) || copy.fallbackName;
+  const name = sanitizePlainText(party.name, 72) || i18n._(partyShareFallbackNameMessage);
   const description = sanitizePlainText(party.description, MAX_DESCRIPTION_LENGTH);
   const symbol = sanitizePlainText(party.symbol, 8) || DEFAULT_PARTY_SYMBOL;
 
@@ -504,13 +435,12 @@ export function createPartySharePreviewFromParty(
 }
 
 export function createFallbackPartySharePreview(
-  locale: SupportedLocale = DEFAULT_LOCALE,
+  i18n: I18n = createApiI18n(DEFAULT_LOCALE),
 ): PartySharePreview {
-  const copy = getPartyShareCopy(locale);
   const preview = {
-    description: copy.fallbackDescription,
+    description: i18n._(partyShareFallbackDescriptionMessage),
     isFallback: true,
-    name: copy.fallbackName,
+    name: i18n._(partyShareFallbackNameMessage),
     symbol: DEFAULT_PARTY_SYMBOL,
   };
 
@@ -520,8 +450,8 @@ export function createFallbackPartySharePreview(
   };
 }
 
-async function getPartySharePreview(partyId: string, env: ApiEnv, request: Request) {
-  const locale = resolvePartyShareLocale(request);
+async function getPartySharePreview(partyId: string, context: PartySharePreviewLoadContext) {
+  const { env, i18n, locale, request } = context;
   const cacheKey = `${getAutomergeWssUrl(env, request)}:${partyId}:${locale}`;
   const cachedPreview = previewCache.get(cacheKey);
 
@@ -529,13 +459,13 @@ async function getPartySharePreview(partyId: string, env: ApiEnv, request: Reque
     return cachedPreview.preview;
   }
 
-  const preview = await loadPartySharePreviewFromAutomerge(partyId, env, request, locale).catch(
+  const preview = await loadPartySharePreviewFromAutomerge(partyId, env, request, i18n).catch(
     (error) => {
       logger.warning("Could not load party share preview: {errorMessage}", {
         error: getErrorDetails(error),
         errorMessage: getErrorMessage(error),
       });
-      return createFallbackPartySharePreview(locale);
+      return createFallbackPartySharePreview(i18n);
     },
   );
   const ttl = preview.isFallback ? PREVIEW_CACHE_FALLBACK_TTL_MS : PREVIEW_CACHE_SUCCESS_TTL_MS;
@@ -552,10 +482,10 @@ async function loadPartySharePreviewFromAutomerge(
   partyId: string,
   env: ApiEnv,
   request: Request,
-  locale: SupportedLocale,
+  i18n: I18n,
 ) {
   if (!isValidDocumentId(partyId)) {
-    return createFallbackPartySharePreview(locale);
+    return createFallbackPartySharePreview(i18n);
   }
 
   const documentId = partyId as DocumentId;
@@ -582,10 +512,10 @@ async function loadPartySharePreviewFromAutomerge(
     const party = handle.doc();
 
     if (!party || party.type !== "party") {
-      return createFallbackPartySharePreview(locale);
+      return createFallbackPartySharePreview(i18n);
     }
 
-    return createPartySharePreviewFromParty(party, locale);
+    return createPartySharePreviewFromParty(party, i18n);
   } finally {
     clearTimeout(timeoutId);
     await repo?.shutdown().catch((error) => {
@@ -628,19 +558,14 @@ function getPublicAssetUrl(request: Request, path: string) {
   return new URL(path, request.url).toString();
 }
 
-function getPartyShareCopy(locale: SupportedLocale) {
-  return PARTY_SHARE_COPY[locale];
+function getPartyShareTitle(preview: PartySharePreview, i18n: I18n) {
+  return i18n._(partyShareTitleMessage(preview.name));
 }
 
-function getPartyShareTitle(preview: PartySharePreview, copy: PartyShareCopy) {
-  return copy.title(preview.name);
-}
+function getPartyShareDescription(preview: PartySharePreview, i18n: I18n) {
+  const purpose = i18n._(partyShareMetadataPurposeMessage);
 
-function getPartyShareDescription(preview: PartySharePreview, copy: PartyShareCopy) {
-  return limitText(
-    preview.description ? `${preview.description} ${copy.metadataPurpose}` : copy.metadataPurpose,
-    240,
-  );
+  return limitText(preview.description ? `${preview.description} ${purpose}` : purpose, 240);
 }
 
 function propertyMeta(property: string, content: string): SocialMetaTag {
@@ -668,8 +593,8 @@ function renderDescriptionLines(lines: string[]) {
     .join("");
 }
 
-function formatImageTitle(value: string, copy: PartyShareCopy) {
-  const text = normalizePreviewText(value) || copy.fallbackName;
+function formatImageTitle(value: string, i18n: I18n) {
+  const text = normalizePreviewText(value) || i18n._(partyShareFallbackNameMessage);
   const fontSize = getFittingFontSize(
     text,
     PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH,
@@ -823,16 +748,16 @@ function getVisualCharacterUnits(character: string) {
   return 0.53;
 }
 
-function renderJoinPartyButton(copy: PartyShareCopy) {
-  return `<div style="${PARTY_SHARE_IMAGE_STYLES.ctaButton}"><span style="${PARTY_SHARE_IMAGE_STYLES.ctaText}">${escapeHtmlText(copy.joinParty)}</span></div>`;
+function renderJoinPartyButton(i18n: I18n) {
+  return `<div style="${PARTY_SHARE_IMAGE_STYLES.ctaButton}"><span style="${PARTY_SHARE_IMAGE_STYLES.ctaText}">${escapeHtmlText(i18n._(partyShareJoinPartyMessage))}</span></div>`;
 }
 
-function renderFooterBrand(trizumMarkUrl: string, copy: PartyShareCopy) {
+function renderFooterBrand(trizumMarkUrl: string, i18n: I18n) {
   const markSize = String(PARTY_SHARE_IMAGE_BRAND_MARK_SIZE);
 
   return [
     `<div style="${PARTY_SHARE_IMAGE_STYLES.footerBrand}">`,
-    `<div style="${PARTY_SHARE_IMAGE_STYLES.viaText}">${escapeHtmlText(copy.via)}</div>`,
+    `<div style="${PARTY_SHARE_IMAGE_STYLES.viaText}">${escapeHtmlText(i18n._(partyShareViaMessage))}</div>`,
     `<div style="${PARTY_SHARE_IMAGE_STYLES.footerBrandMark}">`,
     `<img src="${escapeHtmlAttribute(trizumMarkUrl)}" width="${markSize}" height="${markSize}" />`,
     "</div>",

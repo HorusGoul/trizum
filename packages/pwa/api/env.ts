@@ -1,3 +1,6 @@
+import type { I18n } from "@lingui/core";
+import type { SupportedLocale } from "../src/lib/locales.js";
+
 export interface ApiEnv {
   ASSETS: Fetcher;
   DB: D1Database;
@@ -29,6 +32,8 @@ export interface ApiEnv {
 export interface ApiHonoEnv {
   Bindings: ApiEnv;
   Variables: {
+    i18n: I18n;
+    locale: SupportedLocale;
     session: unknown;
     user: {
       email: string;

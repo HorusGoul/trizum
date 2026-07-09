@@ -13,6 +13,7 @@
     "./src/lib/authConfig.ts",
     "./src/lib/locales.ts",
     "./src/lib/log.ts",
+    "./src/lib/partySharePreviewMessages.ts",
     "./src/lib/tricountMigration.ts",
     "./src/models/migrationData.ts",
     "./src/models/party.ts"

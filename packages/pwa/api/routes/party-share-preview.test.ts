@@ -2,6 +2,7 @@ import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-re
 import { Hono } from "hono";
 import { describe, expect, test, vi } from "vite-plus/test";
 import type { ApiEnv, ApiHonoEnv } from "../env";
+import { createApiI18n, createApiI18nMiddleware, resolveRequestLocale } from "../i18n";
 import {
   createPartySharePreviewFromParty,
   createPartySharePreviewRoute,
@@ -9,12 +10,15 @@ import {
   isPartyPreviewRequest,
   renderPartyShareImageHtml,
   renderPartyShareHeadTags,
-  resolvePartyShareLocale,
   type PartySharePreview,
+  type PartySharePreviewLoadContext,
 } from "./party-share-preview";
 
 type AssetFetch = (request: Request) => Promise<Response>;
-type LoadPreview = (partyId: string, env: ApiEnv, request: Request) => Promise<PartySharePreview>;
+type LoadPreview = (
+  partyId: string,
+  context: PartySharePreviewLoadContext,
+) => Promise<PartySharePreview>;
 
 describe("party share preview crawler detection", () => {
   test("detects known preview crawlers requesting HTML", () => {
@@ -88,6 +92,7 @@ describe("party share preview metadata", () => {
       name: "Viaje a Lisboa",
     });
     const tags = renderPartyShareHeadTags({
+      i18n: createApiI18n("es"),
       locale: "es",
       partyId: createDocumentId(),
       preview,
@@ -143,7 +148,7 @@ describe("party share preview image", () => {
 
   test("renders Spanish image copy", () => {
     const html = renderPartyShareImageHtml(createPreview({ description: "" }), {
-      locale: "es",
+      i18n: createApiI18n("es"),
       trizumMarkUrl: "/maskable.svg",
     });
 
@@ -163,7 +168,7 @@ describe("party share preview locale resolution", () => {
       },
     });
 
-    expect(resolvePartyShareLocale(request)).toBe("es");
+    expect(resolveRequestLocale(request)).toBe("es");
   });
 
   test("falls back to the best supported Accept-Language locale", () => {
@@ -173,7 +178,7 @@ describe("party share preview locale resolution", () => {
       },
     });
 
-    expect(resolvePartyShareLocale(request)).toBe("es");
+    expect(resolveRequestLocale(request)).toBe("es");
   });
 });
 
@@ -276,6 +281,7 @@ describe("party share preview route", () => {
     const loadPreview = vi.fn<LoadPreview>(async () => createPreview({ name: "Cabin" }));
     const app = new Hono<ApiHonoEnv>();
 
+    app.use("*", createApiI18nMiddleware());
     app.route(
       "/",
       createPartySharePreviewRoute({
@@ -305,6 +311,7 @@ describe("party share preview route", () => {
 function createTestApp(assetFetch: AssetFetch, loadPreview: LoadPreview) {
   const app = new Hono<ApiHonoEnv>();
 
+  app.use("*", createApiI18nMiddleware());
   app.route("/", createPartySharePreviewRoute({ loadPreview }));
 
   return app;

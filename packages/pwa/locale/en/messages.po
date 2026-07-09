@@ -38,6 +38,10 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
+#: src/lib/partySharePreviewMessages.ts:15
+msgid "{title} preview"
+msgstr "{title} preview"
+
 #: src/routes/about.tsx:158
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
@@ -1353,6 +1357,10 @@ msgstr "Join"
 msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
+#: src/lib/partySharePreviewMessages.ts:11
+msgid "Join {partyName} on trizum"
+msgstr "Join {partyName} on trizum"
+
 #: src/routes/party_.$partyId.share.tsx:36
 msgid "Join {partyName} on trizum!"
 msgstr "Join {partyName} on trizum!"
@@ -1365,6 +1373,10 @@ msgstr "Join a Party"
 #: src/routes/join.tsx:122
 msgid "Join a trizum"
 msgstr "Join a trizum"
+
+#: src/lib/partySharePreviewMessages.ts:6
+msgid "Join party"
+msgstr "Join party"
 
 #: src/routes/party.$partyId.tsx:66
 msgid "Joined {0}!"
@@ -1789,6 +1801,10 @@ msgstr "Open last party on launch"
 #: src/components/CalculatorToolbar.tsx:637
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
+
+#: src/lib/partySharePreviewMessages.ts:7
+msgid "Open this party to split expenses and settle up together on trizum."
+msgstr "Open this party to split expenses and settle up together on trizum."
 
 #: src/components/ExpenseEditor.tsx:201
 msgid "Optional description for this expense"
@@ -2274,6 +2290,10 @@ msgstr "Share party"
 msgid "Share the party link so others can join."
 msgstr "Share the party link so others can join."
 
+#: src/lib/partySharePreviewMessages.ts:4
+msgid "Shared expenses"
+msgstr "Shared expenses"
+
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:19
 msgid "Shares"
 msgstr "Shares"
@@ -2418,6 +2438,14 @@ msgstr "Split bills with friends and family. Track expenses, calculate balances,
 #: src/routes/about/route.tsx:50
 msgid "Split bills with friends and family. Track, calculate, and settle expenses together."
 msgstr "Split bills with friends and family. Track, calculate, and settle expenses together."
+
+#: src/lib/partySharePreviewMessages.ts:3
+msgid "Split bills with friends, family, and roommates."
+msgstr "Split bills with friends, family, and roommates."
+
+#: src/lib/partySharePreviewMessages.ts:5
+msgid "Split expenses and settle up together on trizum."
+msgstr "Split expenses and settle up together on trizum."
 
 #: src/routes/about/route.tsx:75
 msgid "Split expenses fairly among multiple participants"
@@ -2929,6 +2957,10 @@ msgstr "Venezuelan Bolívar Soberano"
 #: src/routes/about/route.tsx:34
 msgid "Version"
 msgstr "Version"
+
+#: src/lib/partySharePreviewMessages.ts:8
+msgid "via"
+msgstr "via"
 
 #: src/routes/new/route.tsx:319
 msgid "Vietnamese Dong"
