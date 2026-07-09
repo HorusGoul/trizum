@@ -155,6 +155,55 @@ test.describe("Expense calculator", () => {
     await expect(calculator).not.toBeVisible();
   });
 
+  test("closes without growing duplicate calculator history entries", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+    await expect(page).toHaveURL(/\/add$/);
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    const initialHistoryLength = await page.evaluate(() => window.history.length);
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await calculator.getByRole("button", { name: "7", exact: true }).click();
+    await calculator.getByRole("button", { name: "Calculate result", exact: true }).click();
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
+
+    const historyLengthAfterFirstClose = await page.evaluate(() => window.history.length);
+    expect(historyLengthAfterFirstClose).toBe(initialHistoryLength + 1);
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await calculator.getByRole("button", { name: "8", exact: true }).click();
+    await calculator.getByRole("button", { name: "Calculate result", exact: true }).click();
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
+
+    const historyLengthAfterSecondClose = await page.evaluate(() => window.history.length);
+    expect(historyLengthAfterSecondClose).toBe(historyLengthAfterFirstClose);
+  });
+
   test("shows the active amount field label while editing", async ({ harness, page }) => {
     await page.setViewportSize({ width: 1280, height: 633 });
 
@@ -379,6 +428,7 @@ test.describe("Expense calculator", () => {
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
     await expect(calculator).toBeVisible();
 
+    const attachmentsToolbarShell = page.locator("[data-calculator-attachment-toolbar]");
     const attachmentsToolbar = page.getByRole("toolbar", { name: "Attachments" });
     await expect(attachmentsToolbar).toBeVisible();
     await expect(page.getByRole("region", { name: "Attachment preview" })).toHaveCount(0);
@@ -386,6 +436,18 @@ test.describe("Expense calculator", () => {
     await attachmentsToolbar.getByRole("button", { name: "View attachment 1" }).click();
     const attachmentPreview = page.getByRole("region", { name: "Attachment preview" });
     await expect(attachmentPreview).toBeVisible();
+    await expect
+      .poll(async () => {
+        const toolbarBox = await attachmentsToolbarShell.boundingBox();
+        const previewBox = await attachmentPreview.boundingBox();
+
+        if (!toolbarBox || !previewBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.abs(Math.round(previewBox.y - (toolbarBox.y + toolbarBox.height)));
+      })
+      .toBeLessThanOrEqual(8);
     await expect
       .poll(async () => {
         const previewBox = await attachmentPreview.boundingBox();

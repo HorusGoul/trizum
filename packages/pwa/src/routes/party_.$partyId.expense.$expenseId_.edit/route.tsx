@@ -77,10 +77,9 @@ function EditExpense() {
 
   const photos = expense?.photos ?? [];
 
-  function mergeSearchOptions<TSearch extends Partial<EditExpenseSearchParams>>(options: {
-    search: TSearch;
-    replace?: boolean;
-  }) {
+  function mergeSearchOptions<TOptions extends { search: Partial<EditExpenseSearchParams> }>(
+    options: TOptions,
+  ) {
     return {
       ...options,
       search: {
@@ -104,6 +103,7 @@ function EditExpense() {
     buildLocation: (options) =>
       router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
     navigate: (options) => void navigate(mergeSearchOptions(options)),
+    history: router.history,
   });
 
   if (!expense) {

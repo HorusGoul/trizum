@@ -1064,11 +1064,12 @@ function CalculatorMobileAttachmentContent({
   return (
     <>
       <m.div
-        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950/95 pointer-events-auto absolute inset-x-0 top-0 bg-white/95 shadow-sm backdrop-blur-md"
+        data-calculator-attachment-toolbar=""
+        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950/95 pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white/95 shadow-sm backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        style={{ y: toolbarY }}
+        style={{ height: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE, y: toolbarY }}
         transition={MOBILE_SHEET_TWEEN_CONFIG}
       >
         <div

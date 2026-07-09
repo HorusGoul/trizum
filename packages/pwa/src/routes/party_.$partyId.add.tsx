@@ -50,10 +50,9 @@ function AddExpense() {
   const currentLocation = useLocation();
   const participant = useCurrentParticipant();
 
-  function mergeSearchOptions<TSearch extends Partial<AddExpenseSearchParams>>(options: {
-    search: TSearch;
-    replace?: boolean;
-  }) {
+  function mergeSearchOptions<TOptions extends { search: Partial<AddExpenseSearchParams> }>(
+    options: TOptions,
+  ) {
     return {
       ...options,
       search: {
@@ -77,6 +76,7 @@ function AddExpense() {
     buildLocation: (options) =>
       router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
     navigate: (options) => void navigate(mergeSearchOptions(options)),
+    history: router.history,
   });
 
   // Track photos for gallery - updates when form changes
