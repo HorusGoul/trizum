@@ -2025,7 +2025,8 @@ msgstr "Sincronización en Tiempo Real"
 msgid "Recommended match"
 msgstr "Coincidencia recomendada"
 
-#: src/components/UpdateController.tsx:30
+#: src/components/UpdateController.tsx:29
+#: src/lib/updateToastPreview.ts:16
 msgid "Reload"
 msgstr "Recargar"
 
@@ -2716,7 +2717,8 @@ msgstr "Unidad Previsional"
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
-#: src/components/UpdateController.tsx:28
+#: src/components/UpdateController.tsx:27
+#: src/lib/updateToastPreview.ts:14
 #: src/routes/index/route.tsx:93
 msgid "Update available"
 msgstr "Actualización disponible"
@@ -2745,7 +2747,7 @@ msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gasto
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
-#: src/components/UpdateController.tsx:40
+#: src/lib/updateToastPreview.ts:31
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
