@@ -31,6 +31,8 @@ export const toastStyle: CssVariableStyles = {
   "--width": "min(24rem, calc(100vw - 2rem))",
 };
 
+export const toastTheme = "dark" satisfies NonNullable<ToasterProps["theme"]>;
+
 export const toastClassNames = {
   toast: cn(
     "pointer-events-auto flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-sm",

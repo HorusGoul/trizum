@@ -5,13 +5,14 @@ import {
   toastMobileOffset,
   toastOffset,
   toastStyle,
+  toastTheme,
 } from "./Toaster.config";
 
 export function Toaster() {
   return (
     <SonnerToaster
       position="bottom-center"
-      theme="system"
+      theme={toastTheme}
       richColors={false}
       gap={8}
       offset={toastOffset}

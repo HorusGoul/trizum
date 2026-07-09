@@ -7,9 +7,14 @@ import {
   toastMobileOffset,
   toastOffset,
   toastStyle,
+  toastTheme,
 } from "./Toaster.config";
 
 describe("Toaster", () => {
+  test("uses the app's dark-only theme", () => {
+    expect(toastTheme).toBe("dark");
+  });
+
   test("keeps toasts outside viewport safe areas", () => {
     expect(toastOffset).toEqual({
       top: "calc(var(--safe-area-inset-top) + 1.5rem)",
