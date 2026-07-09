@@ -51,12 +51,12 @@ export const toastClassNames = {
     "dark:border-white/10 dark:bg-black dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white dark:focus-visible:ring-white dark:focus-visible:ring-offset-black",
   ),
   actionButton: cn(
-    "inline-flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-sm font-medium outline-hidden transition-all duration-200 ease-in-out",
+    "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-md px-2.5 text-xs font-medium outline-hidden transition-all duration-200 ease-in-out",
     "bg-white text-black hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black active:scale-95",
     "dark:bg-white dark:text-black dark:hover:bg-white/90 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black",
   ),
   cancelButton: cn(
-    "inline-flex h-8 shrink-0 items-center justify-center whitespace-nowrap rounded-full px-3 text-sm font-medium outline-hidden transition-colors",
+    "inline-flex h-6 shrink-0 items-center justify-center whitespace-nowrap rounded-md px-2.5 text-xs font-medium outline-hidden transition-colors",
     "bg-white/10 text-white hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black",
     "dark:bg-white/10 dark:text-white dark:hover:bg-white/15 dark:focus-visible:ring-white dark:focus-visible:ring-offset-black",
   ),

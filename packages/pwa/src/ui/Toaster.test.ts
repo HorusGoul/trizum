@@ -62,10 +62,16 @@ describe("Toaster", () => {
     expect(toastClassNames.loader).toContain("!transform-none");
     expect(toastClassNames.loader).toContain("items-center");
     expect(toastClassNames.loader).toContain("text-white/80");
+    expect(toastClassNames.actionButton).toContain("h-6");
+    expect(toastClassNames.actionButton).toContain("rounded-md");
+    expect(toastClassNames.actionButton).toContain("text-xs");
     expect(toastClassNames.actionButton).toContain("font-medium");
     expect(toastClassNames.actionButton).toContain("bg-white");
     expect(toastClassNames.actionButton).toContain("text-black");
     expect(toastClassNames.actionButton).toContain("focus-visible:ring-offset-black");
+    expect(toastClassNames.cancelButton).toContain("h-6");
+    expect(toastClassNames.cancelButton).toContain("rounded-md");
+    expect(toastClassNames.cancelButton).toContain("text-xs");
     expect(toastClassNames.cancelButton).toContain("bg-white/10");
     expect(toastClassNames.cancelButton).toContain("text-white");
     expect(toastClassNames.cancelButton).toContain("focus-visible:ring-offset-black");
