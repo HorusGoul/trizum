@@ -57,6 +57,9 @@ describe("Toaster", () => {
   test("keeps loading and action toasts legible on the black surface", () => {
     expect(toastClassNames.loader).toContain("flex");
     expect(toastClassNames.loader).toContain("size-5");
+    expect(toastClassNames.loader).toContain("shrink-0");
+    expect(toastClassNames.loader).toContain("!static");
+    expect(toastClassNames.loader).toContain("!transform-none");
     expect(toastClassNames.loader).toContain("items-center");
     expect(toastClassNames.loader).toContain("text-white/80");
     expect(toastClassNames.actionButton).toContain("font-medium");

@@ -38,6 +38,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
   async function update(): Promise<UpdateResult> {
     setIsUpdating(true);
     toast.loading(t`Updating trizum...`, {
+      action: null,
       id: UPDATE_TOAST_ID,
     });
     try {
