@@ -36,9 +36,8 @@ const PARTY_SHARE_IMAGE_STYLES = {
   canvas:
     "display: flex; flex-direction: column; width: 1200px; height: 630px; padding: 0 88px; font-family: Inter, sans-serif; color: #FFFFFF; background: linear-gradient(180deg, #050505 0%, #000000 100%);",
   content: "display: flex; flex-direction: column; width: 100%; height: 100%;",
-  ctaArrow: "display: flex; margin-left: 34px; font-size: 52px; font-weight: 400; line-height: 1;",
   ctaButton:
-    "display: flex; align-items: center; height: 78px; padding: 0 36px; border: 3px solid #FFFFFF; border-radius: 39px; background: rgba(0,0,0,0.18);",
+    "display: flex; align-items: center; justify-content: center; width: 300px; height: 78px; padding: 0 36px; border: 3px solid #FFFFFF; border-radius: 39px; background: rgba(0,0,0,0.18);",
   ctaText: "display: flex; font-size: 34px; font-weight: 800; color: #FFFFFF; line-height: 1;",
   description:
     "display: flex; flex-direction: column; width: 780px; height: 82px; margin-top: 26px; font-size: 34px; line-height: 1.18; color: #B7B7B7; overflow: hidden;",
@@ -685,7 +684,7 @@ function getVisualCharacterUnits(character: string) {
 }
 
 function renderJoinPartyButton() {
-  return `<div style="${PARTY_SHARE_IMAGE_STYLES.ctaButton}"><span style="${PARTY_SHARE_IMAGE_STYLES.ctaText}">Join party</span><span style="${PARTY_SHARE_IMAGE_STYLES.ctaArrow}">→</span></div>`;
+  return `<div style="${PARTY_SHARE_IMAGE_STYLES.ctaButton}"><span style="${PARTY_SHARE_IMAGE_STYLES.ctaText}">Join party</span></div>`;
 }
 
 function renderFooterBrand(trizumMarkUrl: string) {
