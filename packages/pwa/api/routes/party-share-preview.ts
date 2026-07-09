@@ -161,7 +161,13 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const request = c.req.raw;
 
     if (!isPartyPreviewRequest(request)) {
-      return c.env.ASSETS.fetch(request);
+      const assetResponse = await c.env.ASSETS.fetch(request);
+
+      return new Response(assetResponse.body, {
+        headers: withPartyShareHtmlVaryHeaders(assetResponse.headers),
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+      });
     }
 
     const partyId = c.req.param("partyId");

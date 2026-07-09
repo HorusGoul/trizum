@@ -208,7 +208,7 @@ describe("party share preview route", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("public, max-age=0, must-revalidate");
-    expect(response.headers.has("Vary")).toBe(false);
+    expect(response.headers.get("Vary")).toBe("Accept, Accept-Language, User-Agent");
     expect(await response.text()).toBe("<html><head></head><body>app</body></html>");
     expect(assetFetch).toHaveBeenCalledTimes(1);
     expect(loadPreview).not.toHaveBeenCalled();
