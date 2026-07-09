@@ -15,7 +15,7 @@ import {
   writeCachedCloudUserSettings,
   type CloudUserSettings,
 } from "#src/lib/cloudSyncSettings.ts";
-import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
+import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/locales.js";
 import { validatePartyParticipantName, validatePhoneNumber } from "#src/lib/validation.js";
 import type { MediaFile } from "#src/models/media.ts";
 import { Button } from "#src/ui/Button.tsx";

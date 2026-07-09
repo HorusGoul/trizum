@@ -11,6 +11,7 @@
     "./api/**/*.ts",
     "./api/types.d.ts",
     "./src/lib/authConfig.ts",
+    "./src/lib/locales.ts",
     "./src/lib/log.ts",
     "./src/lib/tricountMigration.ts",
     "./src/models/migrationData.ts",

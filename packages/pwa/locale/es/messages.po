@@ -643,7 +643,7 @@ msgstr "Continuar con Google"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/routes/party_.$partyId.share.tsx:95
+#: src/routes/party_.$partyId.share.tsx:98
 msgid "Copy party link"
 msgstr "Copiar enlace del grupo"
 
@@ -996,7 +996,7 @@ msgstr "Error al acceder a la cámara"
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
-#: src/routes/party_.$partyId.share.tsx:45
+#: src/routes/party_.$partyId.share.tsx:48
 msgid "Failed to copy party link to clipboard, please copy it manually"
 msgstr "Error al copiar el enlace del grupo al portapapeles, por favor cópialo manualmente"
 
@@ -1305,7 +1305,7 @@ msgstr "Unirse"
 msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
-#: src/routes/party_.$partyId.share.tsx:33
+#: src/routes/party_.$partyId.share.tsx:36
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
@@ -1827,7 +1827,7 @@ msgstr "Grupo creado"
 msgid "Party leaderboard"
 msgstr "Clasificación del grupo"
 
-#: src/routes/party_.$partyId.share.tsx:43
+#: src/routes/party_.$partyId.share.tsx:46
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
@@ -1847,7 +1847,7 @@ msgstr "Configuración del Grupo"
 msgid "Party settings saved!"
 msgstr "¡Configuración del grupo guardada!"
 
-#: src/routes/party_.$partyId.share.tsx:37
+#: src/routes/party_.$partyId.share.tsx:40
 msgid "Party shared!"
 msgstr "¡Grupo compartido!"
 
@@ -2192,8 +2192,8 @@ msgstr "Saldada en"
 msgid "Seychellois Rupee"
 msgstr "Rupia de Seychelles"
 
-#: src/routes/party_.$partyId.share.tsx:55
-#: src/routes/party_.$partyId.share.tsx:90
+#: src/routes/party_.$partyId.share.tsx:58
+#: src/routes/party_.$partyId.share.tsx:93
 #: src/routes/party.$partyId/route.tsx:247
 msgid "Share party"
 msgstr "Compartir grupo"

@@ -667,7 +667,7 @@ msgstr "Continue with Google"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/party_.$partyId.share.tsx:95
+#: src/routes/party_.$partyId.share.tsx:98
 msgid "Copy party link"
 msgstr "Copy party link"
 
@@ -1040,7 +1040,7 @@ msgstr "Failed to add expense"
 msgid "Failed to check for updates"
 msgstr "Failed to check for updates"
 
-#: src/routes/party_.$partyId.share.tsx:45
+#: src/routes/party_.$partyId.share.tsx:48
 msgid "Failed to copy party link to clipboard, please copy it manually"
 msgstr "Failed to copy party link to clipboard, please copy it manually"
 
@@ -1353,7 +1353,7 @@ msgstr "Join"
 msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
-#: src/routes/party_.$partyId.share.tsx:33
+#: src/routes/party_.$partyId.share.tsx:36
 msgid "Join {partyName} on trizum!"
 msgstr "Join {partyName} on trizum!"
 
@@ -1895,7 +1895,7 @@ msgstr "Party is completely balanced!"
 msgid "Party leaderboard"
 msgstr "Party leaderboard"
 
-#: src/routes/party_.$partyId.share.tsx:43
+#: src/routes/party_.$partyId.share.tsx:46
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
 
@@ -1915,7 +1915,7 @@ msgstr "Party Settings"
 msgid "Party settings saved!"
 msgstr "Party settings saved!"
 
-#: src/routes/party_.$partyId.share.tsx:37
+#: src/routes/party_.$partyId.share.tsx:40
 msgid "Party shared!"
 msgstr "Party shared!"
 
@@ -2264,8 +2264,8 @@ msgstr "Settled in"
 msgid "Seychellois Rupee"
 msgstr "Seychellois Rupee"
 
-#: src/routes/party_.$partyId.share.tsx:55
-#: src/routes/party_.$partyId.share.tsx:90
+#: src/routes/party_.$partyId.share.tsx:58
+#: src/routes/party_.$partyId.share.tsx:93
 #: src/routes/party.$partyId/route.tsx:247
 msgid "Share party"
 msgstr "Share party"

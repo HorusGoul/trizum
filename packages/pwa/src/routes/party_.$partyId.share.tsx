@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
@@ -10,6 +11,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { toast } from "sonner";
 import { Share } from "@capacitor/share";
 import { getAppLink } from "#src/lib/link.ts";
+import { getSupportedLocale, type SupportedLocale } from "#src/lib/locales.js";
 
 export const Route = createFileRoute("/party_/$partyId/share")({
   component: RouteComponent,
@@ -23,7 +25,8 @@ export const Route = createFileRoute("/party_/$partyId/share")({
 
 function RouteComponent() {
   const { partyId, party } = useCurrentParty();
-  const shareUrl = getAppLink(`/party/${partyId}`);
+  const { i18n } = useLingui();
+  const shareUrl = getPartyShareUrl(partyId, getSupportedLocale(i18n.locale));
   const { canShare } = Route.useLoaderData();
   const partyName = party.name;
 
@@ -99,6 +102,14 @@ function RouteComponent() {
       </div>
     </div>
   );
+}
+
+function getPartyShareUrl(partyId: string, locale: SupportedLocale) {
+  const shareUrl = new URL(getAppLink(`/party/${partyId}`));
+
+  shareUrl.searchParams.set("lang", locale);
+
+  return shareUrl.toString();
 }
 
 function getQRCodeImage() {
