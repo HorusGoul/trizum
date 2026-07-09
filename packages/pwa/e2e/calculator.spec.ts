@@ -9,6 +9,7 @@ const scrollTargetParticipant = {
   id: "participant-traveler-24",
   name: "Traveler 24",
 } as const;
+const receiptImagePath = "public/pwa-64x64.png";
 
 function createScrollableParticipantFixture() {
   const fixture = createPartyFixture();
@@ -261,6 +262,58 @@ test.describe("Expense calculator", () => {
         return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
       })
       .toBeLessThanOrEqual(0);
+  });
+
+  test("shows mobile attachments while the calculator is open", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 390, height: 520 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    await page.locator('input[aria-label="Upload photo"]').setInputFiles(receiptImagePath);
+    await expect(page.getByRole("button", { name: "View photo" })).toBeVisible();
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+
+    const attachmentsToolbar = page.getByRole("toolbar", { name: "Attachments" });
+    await expect(attachmentsToolbar).toBeVisible();
+    await expect(page.getByRole("region", { name: "Attachment preview" })).toHaveCount(0);
+
+    await attachmentsToolbar.getByRole("button", { name: "View attachment 1" }).click();
+    const attachmentPreview = page.getByRole("region", { name: "Attachment preview" });
+    await expect(attachmentPreview).toBeVisible();
+
+    await attachmentPreview.click({ position: { x: 20, y: 20 } });
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+
+    await page.getByRole("button", { name: "Close attachment preview" }).click();
+    await expect(attachmentPreview).not.toBeVisible();
+
+    await page.mouse.click(10, 120);
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
   });
 
   test("animates browser back close and restores scroll on mobile", async ({ harness, page }) => {

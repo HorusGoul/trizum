@@ -1,11 +1,17 @@
 import { t } from "@lingui/core/macro";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
+import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
+import { IconButton } from "#src/ui/IconButton.tsx";
 import { cn } from "#src/ui/utils.ts";
 import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
+import type { MediaFile } from "#src/models/media.ts";
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
@@ -13,8 +19,11 @@ const DESKTOP_POPOVER_MARGIN = 8;
 const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
 const MOBILE_SHEET_TWEEN_CONFIG = { duration: 0.2, ease: "easeOut" } as const;
 const MOBILE_FIELD_VISIBILITY_MARGIN = 12;
+const MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS = MOBILE_SHEET_TWEEN_CONFIG.duration * 1000;
 const MOBILE_SCROLL_RESTORE_TIMEOUT_MS = 650;
 const MOBILE_SCROLL_RESTORE_TOLERANCE = 2;
+const MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE = "calc(var(--safe-area-inset-top, 0px) + 4rem)";
+const EMPTY_ATTACHMENT_PHOTO_IDS: MediaFile["id"][] = [];
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
 function getCurrencyPreviewFormatter(currency: string) {
@@ -49,6 +58,7 @@ interface CalculatorToolbarProps {
   onCommit: () => void;
   onClear: () => void;
   onDismiss: () => void;
+  attachmentPhotoIds?: MediaFile["id"][];
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   presenceElementId?: string;
   previewValue: number | null;
@@ -357,11 +367,13 @@ function useExpressionPointerGestures({
 }
 
 function useCalculatorDismiss({
+  additionalInsideRef,
   callbacksRef,
   enabled,
   fieldContainerRef,
   toolbarRef,
 }: {
+  additionalInsideRef?: React.RefObject<HTMLElement | null>;
   callbacksRef: React.RefObject<CalculatorCallbacks>;
   enabled: boolean;
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -377,8 +389,9 @@ function useCalculatorDismiss({
 
       const inToolbar = toolbarRef.current?.contains(target);
       const inField = fieldContainerRef.current?.contains(target);
+      const inAdditionalElement = additionalInsideRef?.current?.contains(target);
 
-      return !inToolbar && !inField;
+      return !inToolbar && !inField && !inAdditionalElement;
     }
 
     function handleFocusIn(e: FocusEvent) {
@@ -399,7 +412,7 @@ function useCalculatorDismiss({
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("pointerup", handlePointerUp);
     };
-  }, [callbacksRef, enabled, fieldContainerRef, toolbarRef]);
+  }, [additionalInsideRef, callbacksRef, enabled, fieldContainerRef, toolbarRef]);
 }
 
 function useCalculatorKeyboard({
@@ -493,7 +506,7 @@ function useMobileCalculatorScroll({
   const initialWindowScroll = initialWindowScrollRef.current;
 
   function scrollFieldAboveMobileSheet(behavior: ScrollBehavior, attempts = 0) {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || isLargeScreen) {
       return;
     }
 
@@ -514,25 +527,30 @@ function useMobileCalculatorScroll({
       return;
     }
 
-    setMobileScrollAllowance(sheetHeight);
+    setMobileScrollAllowance(sheetHeight, { animate: attempts === 0 });
 
     const fieldRect = fieldElement.getBoundingClientRect();
     const sheetTop = window.innerHeight - sheetHeight;
     const targetFieldBottom = sheetTop - MOBILE_FIELD_VISIBILITY_MARGIN;
 
-    if (fieldRect.bottom <= targetFieldBottom) {
-      return;
+    if (fieldRect.bottom > targetFieldBottom) {
+      window.scrollTo({
+        left: window.scrollX,
+        top: window.scrollY + fieldRect.bottom - targetFieldBottom,
+        behavior,
+      });
     }
 
-    window.scrollTo({
-      left: window.scrollX,
-      top: window.scrollY + fieldRect.bottom - targetFieldBottom,
-      behavior,
-    });
+    if (attempts < 4) {
+      window.setTimeout(
+        () => scrollFieldAboveMobileSheet(behavior, attempts + 1),
+        MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS / 4,
+      );
+    }
   }
 
-  function setMobileScrollAllowance(height: number) {
-    if (typeof document === "undefined") {
+  function setMobileScrollAllowance(height: number, options?: { animate?: boolean }) {
+    if (typeof document === "undefined" || isLargeScreen) {
       return;
     }
 
@@ -544,11 +562,30 @@ function useMobileCalculatorScroll({
       scrollAllowanceElement.setAttribute("aria-hidden", "true");
       scrollAllowanceElement.style.pointerEvents = "none";
       scrollAllowanceElement.style.flexShrink = "0";
+      scrollAllowanceElement.style.transition = `height ${MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS}ms ease-out`;
+      scrollAllowanceElement.style.height = options?.animate ? "0px" : `${allowanceHeight}px`;
       document.body.append(scrollAllowanceElement);
       scrollAllowanceElementRef.current = scrollAllowanceElement;
     }
 
-    scrollAllowanceElement.style.height = `${allowanceHeight}px`;
+    if (options?.animate) {
+      window.requestAnimationFrame(() => {
+        scrollAllowanceElement.style.height = `${allowanceHeight}px`;
+      });
+    } else {
+      scrollAllowanceElement.style.height = `${allowanceHeight}px`;
+    }
+  }
+
+  function collapseMobileScrollAllowance() {
+    if (isLargeScreen) {
+      return;
+    }
+
+    const scrollAllowanceElement = scrollAllowanceElementRef.current;
+    if (scrollAllowanceElement) {
+      scrollAllowanceElement.style.height = "0px";
+    }
   }
 
   function removeMobileScrollAllowance() {
@@ -558,10 +595,11 @@ function useMobileCalculatorScroll({
 
   function restoreInitialWindowScroll(behavior: ScrollBehavior) {
     const scrollPosition = initialWindowScrollRef.current;
-    if (typeof window === "undefined" || !scrollPosition) {
+    if (typeof window === "undefined" || !scrollPosition || isLargeScreen) {
       return;
     }
 
+    collapseMobileScrollAllowance();
     window.scrollTo({
       left: scrollPosition.left,
       top: scrollPosition.top,
@@ -607,6 +645,7 @@ function useMobileCalculatorScroll({
       scrollAllowanceElementRef.current = null;
 
       if (scrollAllowanceElement && typeof window !== "undefined" && initialWindowScroll) {
+        scrollAllowanceElement.style.height = "0px";
         window.scrollTo({
           left: initialWindowScroll.left,
           top: initialWindowScroll.top,
@@ -637,6 +676,41 @@ function useMobileCalculatorScroll({
   };
 }
 
+function useElementHeight(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!enabled) {
+      setHeight(0);
+      return;
+    }
+
+    const maybeElement = ref.current;
+    if (!maybeElement) {
+      return;
+    }
+    const element = maybeElement;
+
+    function updateHeight() {
+      setHeight(element.offsetHeight);
+    }
+
+    updateHeight();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateHeight);
+      return () => window.removeEventListener("resize", updateHeight);
+    }
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [enabled, ref]);
+
+  return height;
+}
+
 function formatCalculatorPreviewValue(value: number, currency?: string): string {
   if (!currency) {
     return value.toString();
@@ -665,6 +739,7 @@ export function CalculatorToolbar({
   onCommit,
   onClear,
   onDismiss,
+  attachmentPhotoIds = EMPTY_ATTACHMENT_PHOTO_IDS,
   fieldContainerRef,
   presenceElementId,
   previewValue,
@@ -674,6 +749,7 @@ export function CalculatorToolbar({
   closeRequestId,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const attachmentLayerRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
   const expressionScrollRef = useRef<HTMLSpanElement>(null);
   const expressionContentRef = useRef<HTMLSpanElement>(null);
@@ -694,6 +770,7 @@ export function CalculatorToolbar({
     onDismiss,
   });
   const { isLargeScreen, popoverPosition } = useCalculatorPopoverPosition(fieldContainerRef);
+  const mobileSheetHeight = useElementHeight(toolbarRef, !isLargeScreen);
   const {
     finishInitialWindowScrollRestore,
     removeMobileScrollAllowance,
@@ -711,7 +788,8 @@ export function CalculatorToolbar({
     if (
       activeElement instanceof HTMLElement &&
       (fieldContainerRef.current?.contains(activeElement) ||
-        toolbarRef.current?.contains(activeElement))
+        toolbarRef.current?.contains(activeElement) ||
+        attachmentLayerRef.current?.contains(activeElement))
     ) {
       activeElement.blur();
     }
@@ -773,6 +851,7 @@ export function CalculatorToolbar({
     pointerStartRef,
   });
   useCalculatorDismiss({
+    additionalInsideRef: attachmentLayerRef,
     callbacksRef: interactionCallbacksRef,
     enabled: dismissOnOutsideInteraction,
     fieldContainerRef,
@@ -813,30 +892,38 @@ export function CalculatorToolbar({
 
   if (!isLargeScreen) {
     return (
-      <Sheet
-        detent="content"
-        disableScrollLocking
-        isOpen={isMobileSheetOpen}
-        onClose={() => requestClose("dismiss")}
-        onCloseStart={() => restoreInitialWindowScroll("smooth")}
-        onCloseEnd={() => {
-          void finishMobileClose();
-        }}
-        onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
-        style={{ zIndex: 50 }}
-        tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}
-        unstyled
-      >
-        <Sheet.Container
-          ref={toolbarRef}
-          role="application"
-          aria-label={t`Calculator`}
-          data-presence-proxy-element-id={presenceElementId}
-          className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
+      <>
+        <CalculatorMobileAttachmentLayer
+          isOpen={isMobileSheetOpen}
+          layerRef={attachmentLayerRef}
+          photoIds={attachmentPhotoIds}
+          sheetHeight={mobileSheetHeight}
+        />
+        <Sheet
+          detent="content"
+          disableScrollLocking
+          isOpen={isMobileSheetOpen}
+          onClose={() => requestClose("dismiss")}
+          onCloseStart={() => restoreInitialWindowScroll("smooth")}
+          onCloseEnd={() => {
+            void finishMobileClose();
+          }}
+          onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
+          style={{ zIndex: 50 }}
+          tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}
+          unstyled
         >
-          {calculatorContent}
-        </Sheet.Container>
-      </Sheet>
+          <Sheet.Container
+            ref={toolbarRef}
+            role="application"
+            aria-label={t`Calculator`}
+            data-presence-proxy-element-id={presenceElementId}
+            className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
+          >
+            {calculatorContent}
+          </Sheet.Container>
+        </Sheet>
+      </>
     );
   }
 
@@ -862,6 +949,145 @@ export function CalculatorToolbar({
       {calculatorContent}
     </div>,
     document.body,
+  );
+}
+
+function CalculatorMobileAttachmentLayer({
+  isOpen,
+  layerRef,
+  photoIds,
+  sheetHeight,
+}: {
+  isOpen: boolean;
+  layerRef: React.RefObject<HTMLDivElement | null>;
+  photoIds: MediaFile["id"][];
+  sheetHeight: number;
+}) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  if (photoIds.length === 0) {
+    return null;
+  }
+
+  return (
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        {isOpen ? (
+          <m.div
+            ref={layerRef}
+            className="pointer-events-none fixed inset-0 z-50 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={MOBILE_SHEET_TWEEN_CONFIG}
+          >
+            <Suspense fallback={null}>
+              <CalculatorMobileAttachmentContent
+                photoIds={photoIds}
+                selectedIndex={selectedIndex}
+                setSelectedIndex={setSelectedIndex}
+                sheetHeight={sheetHeight}
+              />
+            </Suspense>
+          </m.div>
+        ) : null}
+      </AnimatePresence>
+    </LazyMotion>
+  );
+}
+
+function CalculatorMobileAttachmentContent({
+  photoIds,
+  selectedIndex,
+  setSelectedIndex,
+  sheetHeight,
+}: {
+  photoIds: MediaFile["id"][];
+  selectedIndex: number | null;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  sheetHeight: number;
+}) {
+  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
+    required: true as const,
+  }).map(({ doc }) => doc);
+  const urls = useMediaFileObjectUrls(mediaFiles);
+  const galleryItems: MediaGalleryItem[] = urls.map((url) => ({ src: url }));
+  const activeIndex =
+    selectedIndex !== null && selectedIndex < galleryItems.length ? selectedIndex : null;
+
+  return (
+    <>
+      <m.div
+        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950/95 pointer-events-auto absolute inset-x-0 top-0 bg-white/95 shadow-sm backdrop-blur-md"
+        initial={{ y: -24, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -24, opacity: 0 }}
+        transition={MOBILE_SHEET_TWEEN_CONFIG}
+      >
+        <div
+          role="toolbar"
+          aria-label={t`Attachments`}
+          className="border-accent-200/80 px-safe-or-4 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
+        >
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
+            {photoIds.map((photoId, index) => {
+              const url = urls[index];
+              const attachmentNumber = index + 1;
+
+              return (
+                <Button
+                  key={photoId}
+                  color="transparent"
+                  aria-label={t`View attachment ${attachmentNumber}`}
+                  onPress={() => setSelectedIndex(index)}
+                  className={cn(
+                    "border-accent-200 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
+                    activeIndex === index && "ring-accent-500 dark:ring-accent-400 ring-2",
+                  )}
+                >
+                  <img src={url} alt="" className="h-full w-full object-cover" />
+                </Button>
+              );
+            })}
+          </div>
+
+          {activeIndex !== null ? (
+            <IconButton
+              icon="lucide.x"
+              aria-label={t`Close attachment preview`}
+              className="h-10 w-10 shrink-0"
+              iconClassName="size-5"
+              onPress={() => setSelectedIndex(null)}
+            />
+          ) : null}
+        </div>
+      </m.div>
+
+      <AnimatePresence>
+        {activeIndex !== null ? (
+          <m.section
+            aria-label={t`Attachment preview`}
+            className="bg-accent-950/85 pointer-events-auto absolute inset-x-0 z-0 overflow-hidden backdrop-blur-sm"
+            style={{
+              top: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE,
+              bottom: Math.max(0, sheetHeight),
+            }}
+            initial={{ y: -18, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -18, opacity: 0 }}
+            transition={MOBILE_SHEET_TWEEN_CONFIG}
+          >
+            <MediaGallery
+              index={activeIndex}
+              items={galleryItems}
+              onChange={setSelectedIndex}
+              onClose={() => setSelectedIndex(null)}
+              showCloseButton={false}
+            />
+          </m.section>
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }
 

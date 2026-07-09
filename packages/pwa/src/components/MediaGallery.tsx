@@ -16,6 +16,7 @@ export interface MediaGalleryProps {
   onChange: (index: number) => void;
   onClose: () => void;
   onDragProgress?: (progress: number) => void;
+  showCloseButton?: boolean;
 }
 
 const CLOSE_THRESHOLD = 150;
@@ -26,6 +27,7 @@ export default function MediaGallery({
   onClose,
   onChange,
   onDragProgress,
+  showCloseButton = true,
 }: MediaGalleryProps) {
   const dataSource = useAsyncMediaGalleryItems(items);
   const maxIndex = dataSource.length - 1;
@@ -176,12 +178,14 @@ export default function MediaGallery({
           </m.div>
         </div>
 
-        <GalleryButton
-          className="right-safe-offset-4 top-safe-offset-4"
-          label={t`Close`}
-          icon="lucide.x"
-          onClick={onClose}
-        />
+        {showCloseButton ? (
+          <GalleryButton
+            className="right-safe-offset-4 top-safe-offset-4"
+            label={t`Close`}
+            icon="lucide.x"
+            onClick={onClose}
+          />
+        ) : null}
 
         {showNavigation && (
           <>

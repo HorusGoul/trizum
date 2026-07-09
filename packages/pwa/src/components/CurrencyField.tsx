@@ -7,10 +7,12 @@ import { CalculatorToolbar } from "./CalculatorToolbar";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
 import { getPresenceElementIdFromTarget } from "./presencePosition.ts";
+import type { MediaFile } from "#src/models/media.ts";
 
 export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> & {
   calculator?: boolean;
   calculatorButtonClassName?: string;
+  calculatorAttachmentPhotoIds?: MediaFile["id"][];
   autoOpenCalculator?: boolean;
   calculatorId?: string;
   activeCalculatorId?: string;
@@ -27,6 +29,7 @@ function getCalculatorFieldLabel(props: React.ComponentProps<typeof AppCurrencyF
 export function CurrencyField({
   calculator = false,
   calculatorButtonClassName,
+  calculatorAttachmentPhotoIds,
   autoOpenCalculator = false,
   calculatorId,
   activeCalculatorId,
@@ -45,6 +48,7 @@ export function CurrencyField({
       {...props}
       currency={currency}
       calculatorButtonClassName={calculatorButtonClassName}
+      calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
       autoOpenCalculator={autoOpenCalculator}
       calculatorId={calculatorId}
       activeCalculatorId={activeCalculatorId}
@@ -56,6 +60,7 @@ export function CurrencyField({
 
 function CurrencyFieldWithCalculator({
   calculatorButtonClassName,
+  calculatorAttachmentPhotoIds,
   autoOpenCalculator = false,
   calculatorId,
   activeCalculatorId,
@@ -64,6 +69,7 @@ function CurrencyFieldWithCalculator({
   ...props
 }: React.ComponentProps<typeof AppCurrencyField> & {
   calculatorButtonClassName?: string;
+  calculatorAttachmentPhotoIds?: MediaFile["id"][];
   autoOpenCalculator?: boolean;
   calculatorId?: string;
   activeCalculatorId?: string;
@@ -275,11 +281,12 @@ function CurrencyFieldWithCalculator({
           onClear={actions.clear}
           onDismiss={closeCalculator}
           closeRequestId={requestId}
+          attachmentPhotoIds={calculatorAttachmentPhotoIds}
           fieldContainerRef={fieldContainerRef}
           presenceElementId={calculatorPresenceElementIdRef.current ?? configuredPresenceElementId}
           previewValue={state.previewValue}
           currency={props.currency}
-          dismissOnOutsideInteraction={!isRouteControlled}
+          dismissOnOutsideInteraction
           fieldLabel={fieldLabel}
         />
       )}

@@ -198,6 +198,7 @@ export function ExpenseEditor({
 
   const shares = useStore(form.store, (state) => state.values.shares);
   const amount = useStore(form.store, (state) => state.values.amount);
+  const photos = useStore(form.store, (state) => state.values.photos);
 
   const isReceivingUpdatesRef = useRef(false);
   const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);
@@ -315,12 +316,14 @@ export function ExpenseEditor({
           onOpenCalculator={onOpenCalculator}
           onViewPhoto={onViewPhoto}
           participants={participants}
+          photos={photos}
           shouldAutoFocus={autoFocus}
         />
         <ExpenseParticipantsSection
           activeCalculatorId={activeCalculatorId}
           amount={amount}
           autoOpenCalculator={autoOpenCalculator}
+          calculatorAttachmentPhotoIds={photos}
           onCloseCalculator={onCloseCalculator}
           onIncludeAllChange={handleIncludeAllChange}
           onOpenCalculator={onOpenCalculator}
@@ -393,6 +396,7 @@ function ExpenseDetailsFields({
   onOpenCalculator,
   onViewPhoto,
   participants,
+  photos,
   shouldAutoFocus,
 }: {
   activeCalculatorId?: string;
@@ -404,6 +408,7 @@ function ExpenseDetailsFields({
   onOpenCalculator?: (calculatorId: string) => void;
   onViewPhoto?: (index: number) => void;
   participants: PartyParticipant[];
+  photos: MediaFile["id"][];
   shouldAutoFocus: boolean;
 }) {
   return (
@@ -461,6 +466,7 @@ function ExpenseDetailsFields({
           <CurrencyField
             calculator
             calculatorId="amount"
+            calculatorAttachmentPhotoIds={photos}
             activeCalculatorId={activeCalculatorId}
             autoOpenCalculator={autoOpenCalculator}
             name={field.name}
@@ -539,6 +545,7 @@ function ExpenseParticipantsSection({
   activeCalculatorId,
   amount,
   autoOpenCalculator,
+  calculatorAttachmentPhotoIds,
   onCloseCalculator,
   onIncludeAllChange,
   onOpenCalculator,
@@ -549,6 +556,7 @@ function ExpenseParticipantsSection({
   activeCalculatorId?: string;
   amount: number;
   autoOpenCalculator: boolean;
+  calculatorAttachmentPhotoIds: MediaFile["id"][];
   onCloseCalculator?: () => void;
   onIncludeAllChange: (include: boolean) => void;
   onOpenCalculator?: (calculatorId: string) => void;
@@ -579,6 +587,7 @@ function ExpenseParticipantsSection({
             shares={shares}
             activeCalculatorId={activeCalculatorId}
             autoOpenCalculator={autoOpenCalculator}
+            calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
             onCloseCalculator={onCloseCalculator}
             onOpenCalculator={onOpenCalculator}
             onSharesChange={onSharesChange}
@@ -597,6 +606,7 @@ interface ParticipantItemProps {
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
+  calculatorAttachmentPhotoIds: MediaFile["id"][];
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
   onSharesChange: (
@@ -610,6 +620,7 @@ function ParticipantItem({
   participant,
   activeCalculatorId,
   autoOpenCalculator,
+  calculatorAttachmentPhotoIds,
   onCloseCalculator,
   onOpenCalculator,
   onSharesChange,
@@ -799,6 +810,7 @@ function ParticipantItem({
               participantId={participant.id}
               activeCalculatorId={activeCalculatorId}
               autoOpenCalculator={autoOpenCalculator}
+              calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
               onCloseCalculator={onCloseCalculator}
               onOpenCalculator={onOpenCalculator}
               onChange={onExactAmountChange}
@@ -816,6 +828,7 @@ interface ParticipantSplitAmountFieldProps {
   participantId: ExpenseUser;
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
+  calculatorAttachmentPhotoIds: MediaFile["id"][];
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
   onChange: (value: number) => void;
@@ -828,6 +841,7 @@ function ParticipantSplitAmountField({
   participantId,
   activeCalculatorId,
   autoOpenCalculator,
+  calculatorAttachmentPhotoIds,
   onCloseCalculator,
   onOpenCalculator,
   onChange,
@@ -840,6 +854,7 @@ function ParticipantSplitAmountField({
     <CurrencyField
       calculator
       calculatorId={`share-${participantId}`}
+      calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
       activeCalculatorId={activeCalculatorId}
       autoOpenCalculator={autoOpenCalculator}
       calculatorButtonClassName="absolute bottom-0.5 -left-8 h-6 w-6"
