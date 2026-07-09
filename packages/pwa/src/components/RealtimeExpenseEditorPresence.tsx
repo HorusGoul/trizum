@@ -13,6 +13,12 @@ import { Avatar } from "#src/ui/Avatar.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { DocHandle, DocHandleEphemeralMessagePayload } from "@automerge/automerge-repo";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  arePresenceBubblePositionsEqual,
+  getPresenceBubblePosition,
+  getPresenceElementIdFromTarget,
+  type PresenceBubblePosition,
+} from "./presencePosition.ts";
 
 const logger = getLogger("components", "RealtimeExpenseEditorPresence");
 
@@ -82,6 +88,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     required: true,
   });
   const participant = useCurrentParticipant();
+  const overlayRef = useRef<HTMLDivElement>(null);
   const presenceElementIdRef = useRef<string | null>(null);
   const [visiblePresence, setVisiblePresence] = useState<ExpenseParticipantPresence[]>([]);
   const lastSentElementIdRef = useRef<string | null>(null);
@@ -160,11 +167,9 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   }, [handle, expenseId, participant.id]);
 
   useEffect(() => {
-    function onClick(event: MouseEvent) {
-      const target = event.target as HTMLElement;
-
+    function updatePresenceFromTarget(target: Element | null, { clearOnMiss = true } = {}) {
       const isWithinDialog = findPopoverFormElementFromTarget(target);
-      const presenceElementId = findPresenceElementFromTarget(target);
+      const presenceElementId = getPresenceElementIdFromTarget(target);
 
       if (presenceElementId) {
         broadcastPresenceUpdate({
@@ -178,7 +183,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
         return;
       }
 
-      if (isWithinDialog || presenceElementId) {
+      if (isWithinDialog || !clearOnMiss) {
         return;
       }
 
@@ -192,7 +197,25 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       presenceElementIdRef.current = null;
     }
 
+    function getElementFromEventTarget(target: EventTarget | null) {
+      return target instanceof Element ? target : null;
+    }
+
+    function onPointerDown(event: PointerEvent) {
+      updatePresenceFromTarget(getElementFromEventTarget(event.target));
+    }
+
+    function onClick(event: MouseEvent) {
+      updatePresenceFromTarget(getElementFromEventTarget(event.target));
+    }
+
+    function onFocusIn(event: FocusEvent) {
+      updatePresenceFromTarget(getElementFromEventTarget(event.target), { clearOnMiss: false });
+    }
+
+    window.addEventListener("pointerdown", onPointerDown, { capture: true });
     window.addEventListener("click", onClick, { capture: true });
+    window.addEventListener("focusin", onFocusIn, { capture: true });
 
     // visibility change listener
     function onVisibilityChange() {
@@ -224,7 +247,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     function onWindowFocus() {
       // Grab element in focus
       const element = document.activeElement as HTMLElement;
-      const presenceElementId = findPresenceElementFromTarget(element);
+      const presenceElementId = getPresenceElementIdFromTarget(element);
 
       if (presenceElementId) {
         broadcastPresenceUpdate({
@@ -254,7 +277,9 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
     }, 5000);
 
     return () => {
+      window.removeEventListener("pointerdown", onPointerDown, { capture: true });
       window.removeEventListener("click", onClick, { capture: true });
+      window.removeEventListener("focusin", onFocusIn, { capture: true });
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("blur", onWindowBlur);
       clearInterval(interval);
@@ -262,17 +287,23 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
   }, [expenseId, handle, participant.id]);
 
   return (
-    <div className="pointer-events-none absolute inset-0 touch-none">
+    <div ref={overlayRef} className="pointer-events-none absolute inset-0 touch-none">
       {visiblePresence.map((presence) => (
         <Suspense key={presence.participantId}>
-          <Bubble presence={presence} />
+          <Bubble presence={presence} overlayRef={overlayRef} />
         </Suspense>
       ))}
     </div>
   );
 }
 
-function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
+function Bubble({
+  presence,
+  overlayRef,
+}: {
+  presence: ExpenseParticipantPresence;
+  overlayRef: React.RefObject<HTMLDivElement | null>;
+}) {
   const { party } = useCurrentParty();
   const participant = party.participants[presence.participantId];
   const [position, setPosition] = useState<{
@@ -281,25 +312,45 @@ function Bubble({ presence }: { presence: ExpenseParticipantPresence }) {
   } | null>(null);
 
   useLayoutEffect(() => {
-    const element = document.querySelector(
-      `[data-presence-element-id="${presence.elementId}"]`,
-    ) as HTMLElement;
+    const selector = `[data-presence-element-id="${presence.elementId}"]`;
+    let currentPosition: PresenceBubblePosition | null = null;
+    let frameId: number | null = null;
 
-    if (!element) {
-      return;
+    function setNextPosition(nextPosition: PresenceBubblePosition | null) {
+      if (arePresenceBubblePositionsEqual(currentPosition, nextPosition)) {
+        return;
+      }
+
+      currentPosition = nextPosition;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Presence bubbles need committed DOM measurements.
+      setPosition(nextPosition);
     }
 
-    const width = element.offsetWidth;
+    function updatePosition() {
+      const element = document.querySelector<HTMLElement>(selector);
+      const overlayElement = overlayRef.current;
 
-    const offsetTop = Number(element.dataset?.presenceOffsetTop ?? 0);
-    const offsetLeft = Number(element.dataset?.presenceOffsetLeft ?? 0);
+      if (!element || !overlayElement) {
+        setNextPosition(null);
+        return;
+      }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- This is fine for now
-    setPosition({
-      top: element.offsetTop + offsetTop,
-      left: element.offsetLeft + width + offsetLeft,
-    });
-  }, [presence.elementId]);
+      setNextPosition(getPresenceBubblePosition(element, overlayElement));
+    }
+
+    function updatePositionOnAnimationFrame() {
+      updatePosition();
+      frameId = window.requestAnimationFrame(updatePositionOnAnimationFrame);
+    }
+
+    updatePositionOnAnimationFrame();
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+  }, [overlayRef, presence.elementId]);
 
   if (!position) {
     return null;
@@ -362,26 +413,7 @@ function AvatarWrapper({
   );
 }
 
-function findPresenceElementFromTarget(target: HTMLElement): string | null {
-  if (!target) {
-    return null;
-  }
-
-  // Check if the target has a data-presence-element-id attribute
-  const presenceElementId = target.dataset?.presenceElementId;
-
-  if (presenceElementId) {
-    return presenceElementId;
-  }
-
-  if (target.parentElement) {
-    return findPresenceElementFromTarget(target.parentElement);
-  }
-
-  return null;
-}
-
-function findPopoverFormElementFromTarget(target: HTMLElement): HTMLElement | null {
+function findPopoverFormElementFromTarget(target: Element | null): Element | null {
   if (!target) {
     return null;
   }

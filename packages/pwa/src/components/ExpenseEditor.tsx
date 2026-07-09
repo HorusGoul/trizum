@@ -806,6 +806,7 @@ function ParticipantSplitAmountField({
       }}
       inputMode="decimal"
       aria-label={ariaLabel}
+      data-presence-proxy-element-id={`participant-${participantId}`}
     />
   );
 }

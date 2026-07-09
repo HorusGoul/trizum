@@ -1,11 +1,12 @@
 import { t } from "@lingui/core/macro";
 import { AppCurrencyField } from "#src/ui/fields/TextField.js";
-import React, { use, useRef } from "react";
+import React, { use, useRef, useState } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
 import { CalculatorToolbar } from "./CalculatorToolbar";
 import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
+import { getPresenceElementIdFromTarget } from "./presencePosition.ts";
 
 export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> & {
   calculator?: boolean;
@@ -43,10 +44,13 @@ function CurrencyFieldWithCalculator({
   calculatorButtonClassName?: string;
   autoOpenCalculator?: boolean;
 }) {
-  const presenceElementId = (props as { "data-presence-element-id"?: string })[
-    "data-presence-element-id"
-  ];
+  const configuredPresenceElementId =
+    (props as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
+    (props as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
+  const [calculatorPresenceElementId, setCalculatorPresenceElementId] = useState<string | null>(
+    configuredPresenceElementId ?? null,
+  );
   const [state, actions] = useCalculatorMode({
     value: props.value ?? 0,
     onChange: (value) => props.onChange?.(value),
@@ -54,11 +58,18 @@ function CurrencyFieldWithCalculator({
     currency: props.currency,
   });
 
+  function activateCalculator() {
+    setCalculatorPresenceElementId(
+      configuredPresenceElementId ?? getPresenceElementIdFromTarget(fieldContainerRef.current),
+    );
+    actions.activate();
+  }
+
   function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
     props.onFocus?.(event);
 
     if (autoOpenCalculator && !state.isActive) {
-      actions.activate();
+      activateCalculator();
     }
   }
 
@@ -79,9 +90,10 @@ function CurrencyFieldWithCalculator({
         icon={state.isActive ? "lucide.x" : "lucide.calculator"}
         aria-label={state.isActive ? t`Close calculator` : t`Open calculator`}
         color="transparent"
+        data-presence-proxy-element-id={configuredPresenceElementId}
         className={calculatorButtonClassName ?? "absolute right-1 bottom-1 h-8 w-8"}
         iconClassName="size-4"
-        onPress={state.isActive ? actions.deactivate : actions.activate}
+        onPress={state.isActive ? actions.deactivate : activateCalculator}
       />
 
       {state.isActive && (
@@ -96,7 +108,7 @@ function CurrencyFieldWithCalculator({
           onClear={actions.clear}
           onDismiss={actions.deactivate}
           fieldContainerRef={fieldContainerRef}
-          presenceElementId={presenceElementId}
+          presenceElementId={calculatorPresenceElementId ?? configuredPresenceElementId}
           previewValue={state.previewValue}
           currency={props.currency}
         />
