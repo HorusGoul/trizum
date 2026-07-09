@@ -2,7 +2,8 @@ import { t } from "@lingui/core/macro";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
-import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m, useTransform } from "motion/react";
+import type { MotionValue } from "motion/react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
@@ -942,38 +943,35 @@ export function CalculatorToolbar({
 
   if (!isLargeScreen) {
     return (
-      <>
+      <Sheet
+        detent="content"
+        disableScrollLocking
+        isOpen={isMobileSheetOpen}
+        onClose={() => requestClose("dismiss")}
+        onCloseStart={() => restoreInitialWindowScroll("smooth")}
+        onCloseEnd={() => {
+          void finishMobileClose();
+        }}
+        onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
+        style={{ zIndex: 50 }}
+        tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}
+        unstyled
+      >
         <CalculatorMobileAttachmentLayer
-          isOpen={isMobileSheetOpen}
           layerRef={attachmentLayerRef}
           photoIds={attachmentPhotoIds}
           sheetHeight={mobileSheetHeight}
         />
-        <Sheet
-          detent="content"
-          disableScrollLocking
-          isOpen={isMobileSheetOpen}
-          onClose={() => requestClose("dismiss")}
-          onCloseStart={() => restoreInitialWindowScroll("smooth")}
-          onCloseEnd={() => {
-            void finishMobileClose();
-          }}
-          onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
-          style={{ zIndex: 50 }}
-          tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}
-          unstyled
+        <Sheet.Container
+          ref={toolbarRef}
+          role="application"
+          aria-label={t`Calculator`}
+          data-presence-proxy-element-id={presenceElementId}
+          className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
         >
-          <Sheet.Container
-            ref={toolbarRef}
-            role="application"
-            aria-label={t`Calculator`}
-            data-presence-proxy-element-id={presenceElementId}
-            className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
-          >
-            {calculatorContent}
-          </Sheet.Container>
-        </Sheet>
-      </>
+          {calculatorContent}
+        </Sheet.Container>
+      </Sheet>
     );
   }
 
@@ -1003,17 +1001,16 @@ export function CalculatorToolbar({
 }
 
 function CalculatorMobileAttachmentLayer({
-  isOpen,
   layerRef,
   photoIds,
   sheetHeight,
 }: {
-  isOpen: boolean;
   layerRef: React.RefObject<HTMLDivElement | null>;
   photoIds: MediaFile["id"][];
   sheetHeight: number;
 }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const { yProgress } = Sheet.useContext();
 
   if (photoIds.length === 0) {
     return null;
@@ -1021,27 +1018,22 @@ function CalculatorMobileAttachmentLayer({
 
   return (
     <LazyMotion features={domAnimation}>
-      <AnimatePresence>
-        {isOpen ? (
-          <m.div
-            ref={layerRef}
-            className="pointer-events-none fixed inset-0 z-50 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={MOBILE_SHEET_TWEEN_CONFIG}
-          >
-            <Suspense fallback={null}>
-              <CalculatorMobileAttachmentContent
-                photoIds={photoIds}
-                selectedIndex={selectedIndex}
-                setSelectedIndex={setSelectedIndex}
-                sheetHeight={sheetHeight}
-              />
-            </Suspense>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
+      <m.div
+        ref={layerRef}
+        data-calculator-attachment-layer
+        className="pointer-events-none fixed inset-0 z-[1] md:hidden"
+        style={{ opacity: yProgress }}
+      >
+        <Suspense fallback={null}>
+          <CalculatorMobileAttachmentContent
+            photoIds={photoIds}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            sheetHeight={sheetHeight}
+            sheetProgress={yProgress}
+          />
+        </Suspense>
+      </m.div>
     </LazyMotion>
   );
 }
@@ -1051,12 +1043,16 @@ function CalculatorMobileAttachmentContent({
   selectedIndex,
   setSelectedIndex,
   sheetHeight,
+  sheetProgress,
 }: {
   photoIds: MediaFile["id"][];
   selectedIndex: number | null;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   sheetHeight: number;
+  sheetProgress: MotionValue<number>;
 }) {
+  const toolbarY = useTransform(sheetProgress, [0, 1], [-24, 0]);
+  const previewY = useTransform(sheetProgress, [0, 1], [-18, 0]);
   const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
     required: true as const,
   }).map(({ doc }) => doc);
@@ -1069,9 +1065,10 @@ function CalculatorMobileAttachmentContent({
     <>
       <m.div
         className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950/95 pointer-events-auto absolute inset-x-0 top-0 bg-white/95 shadow-sm backdrop-blur-md"
-        initial={{ y: -24, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -24, opacity: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{ y: toolbarY }}
         transition={MOBILE_SHEET_TWEEN_CONFIG}
       >
         <div
@@ -1112,20 +1109,26 @@ function CalculatorMobileAttachmentContent({
             className="bg-accent-950/85 pointer-events-auto absolute inset-x-0 z-0 overflow-hidden backdrop-blur-sm"
             style={{
               top: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE,
-              bottom: Math.max(0, sheetHeight),
+              bottom: 0,
+              y: previewY,
             }}
-            initial={{ y: -18, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -18, opacity: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={MOBILE_SHEET_TWEEN_CONFIG}
           >
-            <MediaGallery
-              index={activeIndex}
-              items={galleryItems}
-              onChange={setSelectedIndex}
-              onClose={() => setSelectedIndex(null)}
-              showCloseButton={false}
-            />
+            <div
+              className="absolute inset-x-0 top-0 overflow-hidden"
+              style={{ bottom: Math.max(0, sheetHeight) }}
+            >
+              <MediaGallery
+                index={activeIndex}
+                items={galleryItems}
+                onChange={setSelectedIndex}
+                onClose={() => setSelectedIndex(null)}
+                showCloseButton={false}
+              />
+            </div>
           </m.section>
         ) : null}
       </AnimatePresence>

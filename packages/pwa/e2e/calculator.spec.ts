@@ -386,6 +386,18 @@ test.describe("Expense calculator", () => {
     await attachmentsToolbar.getByRole("button", { name: "View attachment 1" }).click();
     const attachmentPreview = page.getByRole("region", { name: "Attachment preview" });
     await expect(attachmentPreview).toBeVisible();
+    await expect
+      .poll(async () => {
+        const previewBox = await attachmentPreview.boundingBox();
+        const viewport = page.viewportSize();
+
+        if (!previewBox || !viewport) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.round(viewport.height - (previewBox.y + previewBox.height));
+      })
+      .toBeLessThanOrEqual(1);
 
     await attachmentPreview.click({ position: { x: 20, y: 20 } });
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
