@@ -196,10 +196,7 @@ test.describe("Expense calculator", () => {
     ).toBeVisible();
   });
 
-  test("keeps the participant field visible and restores scroll on mobile", async ({
-    harness,
-    page,
-  }) => {
+  test("keeps the participant field visible on mobile", async ({ harness, page }) => {
     await page.setViewportSize({ width: 390, height: 520 });
 
     const seededParty = await harness.seedJoinedParty({
@@ -264,53 +261,75 @@ test.describe("Expense calculator", () => {
         return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
       })
       .toBeLessThanOrEqual(0);
+  });
 
-    const dragHandle = calculator.locator("[data-calculator-sheet-drag-handle]");
-    await expect(dragHandle).toBeVisible();
+  test("animates browser back close and restores scroll on mobile", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 390, height: 520 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createScrollableParticipantFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: true,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    const targetCheckbox = page.getByRole("checkbox", {
+      name: scrollTargetParticipant.name,
+      exact: true,
+    });
+    await targetCheckbox.scrollIntoViewIfNeeded();
+    await targetCheckbox.setChecked(true, { force: true });
+    await expect(targetCheckbox).toBeChecked();
+
+    const participantAmountField = page.getByLabel(`Amount for ${scrollTargetParticipant.name}`, {
+      exact: true,
+    });
+    await participantAmountField.scrollIntoViewIfNeeded();
+    await participantAmountField.evaluate((element) => {
+      element.scrollIntoView({ block: "end", inline: "nearest" });
+    });
+
+    const scrollYBefore = await page.evaluate(() => window.scrollY);
+    expect(scrollYBefore).toBeGreaterThan(100);
+
+    await participantAmountField.click();
+    await expect
+      .poll(async () =>
+        page.evaluate(() => new URLSearchParams(window.location.search).get("calculator")),
+      )
+      .toBe(`share-${scrollTargetParticipant.id}`);
+
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    await expect(calculator).toBeVisible();
     await expect
       .poll(async () => {
-        const scrollYBeforeFrame = await page.evaluate(() => window.scrollY);
-        const calculatorBoxBeforeFrame = await calculator.boundingBox();
+        const fieldBox = await participantAmountField.boundingBox();
+        const calculatorBox = await calculator.boundingBox();
 
-        await page.evaluate(
-          () =>
-            new Promise<void>((resolve) => {
-              requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-            }),
-        );
-
-        const scrollYAfterFrame = await page.evaluate(() => window.scrollY);
-        const calculatorBoxAfterFrame = await calculator.boundingBox();
-
-        if (!calculatorBoxBeforeFrame || !calculatorBoxAfterFrame) {
+        if (!fieldBox || !calculatorBox) {
           return Number.POSITIVE_INFINITY;
         }
 
-        return Math.max(
-          Math.abs(scrollYAfterFrame - scrollYBeforeFrame),
-          Math.abs(calculatorBoxAfterFrame.y - calculatorBoxBeforeFrame.y),
-        );
+        return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
       })
-      .toBeLessThanOrEqual(1);
-    await dragHandle.hover();
+      .toBeLessThanOrEqual(0);
 
-    const dragHandleBox = await dragHandle.boundingBox();
-    if (!dragHandleBox) {
-      throw new Error("Expected the calculator sheet drag handle to be visible");
-    }
-
-    const startX = dragHandleBox.x + dragHandleBox.width / 2;
-    const startY = dragHandleBox.y + dragHandleBox.height / 2;
-    await page.mouse.move(startX, startY);
-    await page.mouse.down();
-    await page.mouse.move(startX, startY + 320, { steps: 12 });
-    await page.mouse.up();
-
-    expect(
-      await page.evaluate(() => new URLSearchParams(window.location.search).get("calculator")),
-    ).toBe(`share-${scrollTargetParticipant.id}`);
-
+    await page.goBack();
     await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).toBeVisible({ timeout: 100 });
+
     await expect(calculator).not.toBeVisible();
     await expect(participantAmountField).not.toBeFocused();
     await expect

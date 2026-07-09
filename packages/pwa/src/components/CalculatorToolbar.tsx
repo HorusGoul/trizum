@@ -13,6 +13,8 @@ const DESKTOP_POPOVER_MARGIN = 8;
 const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
 const MOBILE_SHEET_TWEEN_CONFIG = { duration: 0.2, ease: "easeOut" } as const;
 const MOBILE_FIELD_VISIBILITY_MARGIN = 12;
+const MOBILE_SCROLL_RESTORE_TIMEOUT_MS = 650;
+const MOBILE_SCROLL_RESTORE_TOLERANCE = 2;
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
 function getCurrencyPreviewFormatter(currency: string) {
@@ -567,18 +569,54 @@ function useMobileCalculatorScroll({
     });
   }
 
-  useEffect(() => {
-    return () => {
-      if (
-        scrollAllowanceElementRef.current &&
-        typeof window !== "undefined" &&
-        initialWindowScroll
-      ) {
-        window.scrollTo(initialWindowScroll.left, initialWindowScroll.top);
+  function waitForInitialWindowScroll() {
+    const targetScrollPosition = initialWindowScrollRef.current;
+    if (typeof window === "undefined" || !targetScrollPosition) {
+      return Promise.resolve();
+    }
+    const { left, top } = targetScrollPosition;
+
+    return new Promise<void>((resolve) => {
+      const deadline = performance.now() + MOBILE_SCROLL_RESTORE_TIMEOUT_MS;
+
+      function checkScrollPosition() {
+        const isRestored =
+          Math.abs(window.scrollX - left) <= MOBILE_SCROLL_RESTORE_TOLERANCE &&
+          Math.abs(window.scrollY - top) <= MOBILE_SCROLL_RESTORE_TOLERANCE;
+
+        if (isRestored || performance.now() >= deadline) {
+          resolve();
+          return;
+        }
+
+        window.requestAnimationFrame(checkScrollPosition);
       }
 
-      scrollAllowanceElementRef.current?.remove();
+      checkScrollPosition();
+    });
+  }
+
+  async function finishInitialWindowScrollRestore() {
+    restoreInitialWindowScroll("smooth");
+    await waitForInitialWindowScroll();
+  }
+
+  useEffect(() => {
+    return () => {
+      const scrollAllowanceElement = scrollAllowanceElementRef.current;
       scrollAllowanceElementRef.current = null;
+
+      if (scrollAllowanceElement && typeof window !== "undefined" && initialWindowScroll) {
+        window.scrollTo({
+          left: initialWindowScroll.left,
+          top: initialWindowScroll.top,
+          behavior: "smooth",
+        });
+        window.setTimeout(() => scrollAllowanceElement.remove(), MOBILE_SCROLL_RESTORE_TIMEOUT_MS);
+        return;
+      }
+
+      scrollAllowanceElement?.remove();
     };
   }, [initialWindowScroll]);
 
@@ -592,6 +630,7 @@ function useMobileCalculatorScroll({
   }, [isLargeScreen]);
 
   return {
+    finishInitialWindowScrollRestore,
     removeMobileScrollAllowance,
     restoreInitialWindowScroll,
     scrollFieldAboveMobileSheet,
@@ -655,12 +694,16 @@ export function CalculatorToolbar({
     onDismiss,
   });
   const { isLargeScreen, popoverPosition } = useCalculatorPopoverPosition(fieldContainerRef);
-  const { removeMobileScrollAllowance, restoreInitialWindowScroll, scrollFieldAboveMobileSheet } =
-    useMobileCalculatorScroll({
-      fieldContainerRef,
-      isLargeScreen,
-      toolbarRef,
-    });
+  const {
+    finishInitialWindowScrollRestore,
+    removeMobileScrollAllowance,
+    restoreInitialWindowScroll,
+    scrollFieldAboveMobileSheet,
+  } = useMobileCalculatorScroll({
+    fieldContainerRef,
+    isLargeScreen,
+    toolbarRef,
+  });
 
   function blurCalculatorFocus() {
     const activeElement = document.activeElement;
@@ -695,10 +738,10 @@ export function CalculatorToolbar({
     finishClose(action);
   }
 
-  function finishMobileClose() {
+  async function finishMobileClose() {
     const action = pendingMobileCloseActionRef.current ?? "dismiss";
     pendingMobileCloseActionRef.current = null;
-    restoreInitialWindowScroll("auto");
+    await finishInitialWindowScrollRestore();
     removeMobileScrollAllowance();
     finishClose(action);
   }
@@ -738,12 +781,10 @@ export function CalculatorToolbar({
   useCalculatorKeyboard({ callbacksRef: interactionCallbacksRef, fieldContainerRef, toolbarRef });
 
   useEffect(() => {
-    if (closeRequestId === closeRequestIdRef.current) {
-      return;
+    if (closeRequestId !== closeRequestIdRef.current) {
+      closeRequestIdRef.current = closeRequestId;
+      requestClose("dismiss");
     }
-
-    closeRequestIdRef.current = closeRequestId;
-    requestClose("dismiss");
   });
 
   if (isLargeScreen && !popoverPosition) {
@@ -778,7 +819,9 @@ export function CalculatorToolbar({
         isOpen={isMobileSheetOpen}
         onClose={() => requestClose("dismiss")}
         onCloseStart={() => restoreInitialWindowScroll("smooth")}
-        onCloseEnd={finishMobileClose}
+        onCloseEnd={() => {
+          void finishMobileClose();
+        }}
         onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
         style={{ zIndex: 50 }}
         tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}

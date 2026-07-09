@@ -70,13 +70,19 @@ function CurrencyFieldWithCalculator({
   onOpenCalculator?: (calculatorId: string) => void;
   onCloseCalculator?: () => void;
 }) {
-  /* eslint-disable react-doctor/no-event-handler -- Browser back/forward changes route calculator state outside press handlers. */
+  /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler -- Browser back/forward changes route calculator state outside press handlers. */
   const configuredPresenceElementId =
     (props as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
     (props as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const calculatorPresenceElementIdRef = useRef<string | null>(configuredPresenceElementId ?? null);
-  const [calculatorCloseRequestId, setCalculatorCloseRequestId] = useState(0);
+  const isClosingFromCalculatorRef = useRef(false);
+  const [calculatorCloseState, setCalculatorCloseState] = useState({
+    requestId: 0,
+    isClosedFromCalculator: false,
+    isClosingFromRouteChange: false,
+  });
+  const { requestId, isClosedFromCalculator, isClosingFromRouteChange } = calculatorCloseState;
   const [state, actions] = useCalculatorMode({
     value: props.value ?? 0,
     onChange: (value) => props.onChange?.(value),
@@ -87,8 +93,21 @@ function CurrencyFieldWithCalculator({
     activeCalculatorId !== undefined ||
     onOpenCalculator !== undefined ||
     onCloseCalculator !== undefined;
+  const isCalculatorRouteActive = isRouteControlled && activeCalculatorId === calculatorFieldId;
+  const isRouteClosePending =
+    isRouteControlled &&
+    activeCalculatorId === undefined &&
+    state.isActive &&
+    !isClosedFromCalculator &&
+    !isClosingFromCalculatorRef.current;
+  const shouldRenderCalculator = isRouteControlled
+    ? state.isActive &&
+      !isClosedFromCalculator &&
+      (isCalculatorRouteActive || isClosingFromRouteChange || isRouteClosePending)
+    : state.isActive;
   const isCalculatorActive = isRouteControlled
-    ? activeCalculatorId === calculatorFieldId
+    ? !isClosedFromCalculator &&
+      (isCalculatorRouteActive || isClosingFromRouteChange || isRouteClosePending)
     : state.isActive;
   const shouldPreventNativeKeyboard = autoOpenCalculator || isCalculatorActive;
   const fieldLabel = getCalculatorFieldLabel(props);
@@ -98,7 +117,17 @@ function CurrencyFieldWithCalculator({
       return;
     }
 
-    if (activeCalculatorId === calculatorFieldId && !state.isActive) {
+    if (activeCalculatorId === calculatorFieldId) {
+      if (state.isActive) {
+        return;
+      }
+
+      isClosingFromCalculatorRef.current = false;
+      setCalculatorCloseState((currentState) => ({
+        ...currentState,
+        isClosedFromCalculator: false,
+        isClosingFromRouteChange: false,
+      }));
       calculatorPresenceElementIdRef.current =
         configuredPresenceElementId ?? getPresenceElementIdFromTarget(fieldContainerRef.current);
       actions.activate({ selectAll: true });
@@ -106,6 +135,30 @@ function CurrencyFieldWithCalculator({
     }
 
     if (activeCalculatorId !== calculatorFieldId && state.isActive) {
+      if (activeCalculatorId === undefined) {
+        if (isClosingFromCalculatorRef.current) {
+          blurFocusedCalculatorField();
+          actions.deactivate();
+          setCalculatorCloseState((currentState) => ({
+            ...currentState,
+            isClosedFromCalculator: true,
+            isClosingFromRouteChange: false,
+          }));
+        } else if (!isClosingFromRouteChange) {
+          setCalculatorCloseState((currentState) => ({
+            requestId: currentState.requestId + 1,
+            isClosedFromCalculator: false,
+            isClosingFromRouteChange: true,
+          }));
+        }
+        return;
+      }
+
+      setCalculatorCloseState((currentState) => ({
+        ...currentState,
+        isClosedFromCalculator: false,
+        isClosingFromRouteChange: false,
+      }));
       blurFocusedCalculatorField();
       actions.deactivate();
     }
@@ -114,14 +167,21 @@ function CurrencyFieldWithCalculator({
     activeCalculatorId,
     calculatorFieldId,
     configuredPresenceElementId,
+    isClosingFromRouteChange,
     isRouteControlled,
     state.isActive,
   ]);
-  /* eslint-enable react-doctor/no-event-handler */
+  /* eslint-enable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler */
 
   function openCalculator() {
     calculatorPresenceElementIdRef.current =
       configuredPresenceElementId ?? getPresenceElementIdFromTarget(fieldContainerRef.current);
+    isClosingFromCalculatorRef.current = false;
+    setCalculatorCloseState((currentState) => ({
+      ...currentState,
+      isClosedFromCalculator: false,
+      isClosingFromRouteChange: false,
+    }));
     actions.activate({ selectAll: true });
     onOpenCalculator?.(calculatorFieldId);
   }
@@ -138,13 +198,27 @@ function CurrencyFieldWithCalculator({
   }
 
   function requestCloseCalculator() {
-    setCalculatorCloseRequestId((currentId) => currentId + 1);
+    setCalculatorCloseState((currentState) => ({
+      ...currentState,
+      requestId: currentState.requestId + 1,
+    }));
   }
 
   function closeCalculator() {
+    const shouldCloseRoute = !isClosingFromRouteChange;
+    if (shouldCloseRoute) {
+      isClosingFromCalculatorRef.current = true;
+    }
+    setCalculatorCloseState((currentState) => ({
+      ...currentState,
+      isClosedFromCalculator: shouldCloseRoute || currentState.isClosedFromCalculator,
+      isClosingFromRouteChange: false,
+    }));
     blurFocusedCalculatorField();
     actions.deactivate();
-    onCloseCalculator?.();
+    if (shouldCloseRoute) {
+      onCloseCalculator?.();
+    }
   }
 
   function commitCalculator() {
@@ -188,7 +262,7 @@ function CurrencyFieldWithCalculator({
         inputEndAdornment={calculatorButton}
       />
 
-      {isCalculatorActive && state.isActive && (
+      {shouldRenderCalculator && (
         <CalculatorToolbar
           expression={state.expression}
           cursorPosition={state.cursorPosition}
@@ -200,7 +274,7 @@ function CurrencyFieldWithCalculator({
           onCommit={commitCalculator}
           onClear={actions.clear}
           onDismiss={closeCalculator}
-          closeRequestId={calculatorCloseRequestId}
+          closeRequestId={requestId}
           fieldContainerRef={fieldContainerRef}
           presenceElementId={calculatorPresenceElementIdRef.current ?? configuredPresenceElementId}
           previewValue={state.previewValue}
