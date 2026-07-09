@@ -42,7 +42,7 @@ export const toastClassNames = {
   description: "mt-0.5 text-sm leading-5 font-normal text-white/75 dark:text-white/75",
   content: "flex min-w-0 flex-1 flex-col justify-center",
   icon: "flex size-5 shrink-0 items-center justify-center text-accent-300 dark:text-accent-300",
-  loader: "text-accent-300 dark:text-accent-300",
+  loader: "flex size-5 items-center justify-center text-white/80 dark:text-white/80",
   closeButton: cn(
     "absolute -top-2 -left-2 flex size-6 items-center justify-center rounded-full border",
     "border-white/10 bg-black text-white/70 shadow-xs outline-hidden transition-colors",
@@ -63,7 +63,7 @@ export const toastClassNames = {
   error: "[&_[data-icon]]:text-danger-400 dark:[&_[data-icon]]:text-danger-400",
   info: "[&_[data-icon]]:text-accent-300 dark:[&_[data-icon]]:text-accent-300",
   warning: "[&_[data-icon]]:text-warning-400 dark:[&_[data-icon]]:text-warning-400",
-  loading: "[&_[data-icon]]:text-accent-300 dark:[&_[data-icon]]:text-accent-300",
+  loading: "[&_[data-icon]]:text-white/80 dark:[&_[data-icon]]:text-white/80",
 } satisfies ToastClassnames;
 
 export const toastIcons = {

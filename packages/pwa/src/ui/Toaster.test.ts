@@ -44,7 +44,7 @@ describe("Toaster", () => {
     expect(toastClassNames.error).toContain("[&_[data-icon]]:text-danger-400");
     expect(toastClassNames.warning).toContain("[&_[data-icon]]:text-warning-400");
     expect(toastClassNames.info).toContain("[&_[data-icon]]:text-accent-300");
-    expect(toastClassNames.loading).toContain("[&_[data-icon]]:text-accent-300");
+    expect(toastClassNames.loading).toContain("[&_[data-icon]]:text-white/80");
 
     const classNames = Object.values(toastClassNames).join(" ");
     const classNameTokens = classNames.split(/\s+/);
@@ -55,7 +55,10 @@ describe("Toaster", () => {
   });
 
   test("keeps loading and action toasts legible on the black surface", () => {
-    expect(toastClassNames.loader).toContain("text-accent-300");
+    expect(toastClassNames.loader).toContain("flex");
+    expect(toastClassNames.loader).toContain("size-5");
+    expect(toastClassNames.loader).toContain("items-center");
+    expect(toastClassNames.loader).toContain("text-white/80");
     expect(toastClassNames.actionButton).toContain("font-medium");
     expect(toastClassNames.actionButton).toContain("bg-white");
     expect(toastClassNames.actionButton).toContain("text-black");
