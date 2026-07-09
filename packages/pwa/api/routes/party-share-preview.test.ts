@@ -185,7 +185,12 @@ describe("party share preview locale resolution", () => {
 describe("party share preview route", () => {
   test("delegates normal party navigations to static assets without loading preview data", async () => {
     const assetFetch = vi.fn<AssetFetch>(
-      async () => new Response("<html><head></head><body>app</body></html>"),
+      async () =>
+        new Response("<html><head></head><body>app</body></html>", {
+          headers: {
+            "Cache-Control": "public, max-age=0, must-revalidate",
+          },
+        }),
     );
     const loadPreview = vi.fn<LoadPreview>(async () => createPreview());
     const app = createTestApp(assetFetch, loadPreview);
@@ -202,7 +207,8 @@ describe("party share preview route", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("Vary")).toBe("Accept, Accept-Language, User-Agent");
+    expect(response.headers.get("Cache-Control")).toBe("public, max-age=0, must-revalidate");
+    expect(response.headers.has("Vary")).toBe(false);
     expect(await response.text()).toBe("<html><head></head><body>app</body></html>");
     expect(assetFetch).toHaveBeenCalledTimes(1);
     expect(loadPreview).not.toHaveBeenCalled();
