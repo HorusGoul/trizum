@@ -12,6 +12,7 @@ const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
 const DESKTOP_POPOVER_MARGIN = 8;
 const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
 const MOBILE_SHEET_TWEEN_CONFIG = { duration: 0.2, ease: "easeOut" } as const;
+const MOBILE_FIELD_VISIBILITY_MARGIN = 12;
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
 function getCurrencyPreviewFormatter(currency: string) {
@@ -74,6 +75,22 @@ type CalculatorLayout = {
     width: number;
   } | null;
 };
+
+type WindowScrollPosition = {
+  left: number;
+  top: number;
+};
+
+function getCurrentWindowScrollPosition(): WindowScrollPosition | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return {
+    left: window.scrollX,
+    top: window.scrollY,
+  };
+}
 
 function getCalculatorLayout(
   fieldContainerRef: React.RefObject<HTMLDivElement | null>,
@@ -457,6 +474,130 @@ function useCalculatorKeyboard({
   }, [callbacksRef, fieldContainerRef, toolbarRef]);
 }
 
+function useMobileCalculatorScroll({
+  fieldContainerRef,
+  isLargeScreen,
+  toolbarRef,
+}: {
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  isLargeScreen: boolean;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const initialWindowScrollRef = useRef<WindowScrollPosition | null>(null);
+  const scrollAllowanceElementRef = useRef<HTMLDivElement | null>(null);
+  if (!initialWindowScrollRef.current) {
+    initialWindowScrollRef.current = getCurrentWindowScrollPosition();
+  }
+  const initialWindowScroll = initialWindowScrollRef.current;
+
+  function scrollFieldAboveMobileSheet(behavior: ScrollBehavior, attempts = 0) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const fieldElement = fieldContainerRef.current;
+    const sheetElement = toolbarRef.current;
+    if (!fieldElement || !sheetElement) {
+      if (attempts < 2) {
+        window.requestAnimationFrame(() => scrollFieldAboveMobileSheet(behavior, attempts + 1));
+      }
+      return;
+    }
+
+    const sheetHeight = sheetElement.offsetHeight;
+    if (sheetHeight <= 0) {
+      if (attempts < 2) {
+        window.requestAnimationFrame(() => scrollFieldAboveMobileSheet(behavior, attempts + 1));
+      }
+      return;
+    }
+
+    setMobileScrollAllowance(sheetHeight);
+
+    const fieldRect = fieldElement.getBoundingClientRect();
+    const sheetTop = window.innerHeight - sheetHeight;
+    const targetFieldBottom = sheetTop - MOBILE_FIELD_VISIBILITY_MARGIN;
+
+    if (fieldRect.bottom <= targetFieldBottom) {
+      return;
+    }
+
+    window.scrollTo({
+      left: window.scrollX,
+      top: window.scrollY + fieldRect.bottom - targetFieldBottom,
+      behavior,
+    });
+  }
+
+  function setMobileScrollAllowance(height: number) {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const allowanceHeight = Math.max(0, height);
+    let scrollAllowanceElement = scrollAllowanceElementRef.current;
+
+    if (!scrollAllowanceElement) {
+      scrollAllowanceElement = document.createElement("div");
+      scrollAllowanceElement.setAttribute("aria-hidden", "true");
+      scrollAllowanceElement.style.pointerEvents = "none";
+      scrollAllowanceElement.style.flexShrink = "0";
+      document.body.append(scrollAllowanceElement);
+      scrollAllowanceElementRef.current = scrollAllowanceElement;
+    }
+
+    scrollAllowanceElement.style.height = `${allowanceHeight}px`;
+  }
+
+  function removeMobileScrollAllowance() {
+    scrollAllowanceElementRef.current?.remove();
+    scrollAllowanceElementRef.current = null;
+  }
+
+  function restoreInitialWindowScroll(behavior: ScrollBehavior) {
+    const scrollPosition = initialWindowScrollRef.current;
+    if (typeof window === "undefined" || !scrollPosition) {
+      return;
+    }
+
+    window.scrollTo({
+      left: scrollPosition.left,
+      top: scrollPosition.top,
+      behavior,
+    });
+  }
+
+  useEffect(() => {
+    return () => {
+      if (
+        scrollAllowanceElementRef.current &&
+        typeof window !== "undefined" &&
+        initialWindowScroll
+      ) {
+        window.scrollTo(initialWindowScroll.left, initialWindowScroll.top);
+      }
+
+      scrollAllowanceElementRef.current?.remove();
+      scrollAllowanceElementRef.current = null;
+    };
+  }, [initialWindowScroll]);
+
+  useEffect(() => {
+    if (!isLargeScreen) {
+      return;
+    }
+
+    scrollAllowanceElementRef.current?.remove();
+    scrollAllowanceElementRef.current = null;
+  }, [isLargeScreen]);
+
+  return {
+    removeMobileScrollAllowance,
+    restoreInitialWindowScroll,
+    scrollFieldAboveMobileSheet,
+  };
+}
+
 function formatCalculatorPreviewValue(value: number, currency?: string): string {
   if (!currency) {
     return value.toString();
@@ -514,6 +655,12 @@ export function CalculatorToolbar({
     onDismiss,
   });
   const { isLargeScreen, popoverPosition } = useCalculatorPopoverPosition(fieldContainerRef);
+  const { removeMobileScrollAllowance, restoreInitialWindowScroll, scrollFieldAboveMobileSheet } =
+    useMobileCalculatorScroll({
+      fieldContainerRef,
+      isLargeScreen,
+      toolbarRef,
+    });
 
   function blurCalculatorFocus() {
     const activeElement = document.activeElement;
@@ -551,6 +698,8 @@ export function CalculatorToolbar({
   function finishMobileClose() {
     const action = pendingMobileCloseActionRef.current ?? "dismiss";
     pendingMobileCloseActionRef.current = null;
+    restoreInitialWindowScroll("auto");
+    removeMobileScrollAllowance();
     finishClose(action);
   }
 
@@ -628,7 +777,9 @@ export function CalculatorToolbar({
         disableScrollLocking
         isOpen={isMobileSheetOpen}
         onClose={() => requestClose("dismiss")}
+        onCloseStart={() => restoreInitialWindowScroll("smooth")}
         onCloseEnd={finishMobileClose}
+        onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
         style={{ zIndex: 50 }}
         tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}
         unstyled

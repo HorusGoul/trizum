@@ -196,7 +196,7 @@ test.describe("Expense calculator", () => {
     ).toBeVisible();
   });
 
-  test("keeps scroll position when opening a participant calculator on mobile", async ({
+  test("keeps the participant field visible and restores scroll on mobile", async ({
     harness,
     page,
   }) => {
@@ -233,6 +233,9 @@ test.describe("Expense calculator", () => {
       exact: true,
     });
     await participantAmountField.scrollIntoViewIfNeeded();
+    await participantAmountField.evaluate((element) => {
+      element.scrollIntoView({ block: "end", inline: "nearest" });
+    });
 
     const scrollYBefore = await page.evaluate(() => window.scrollY);
     expect(scrollYBefore).toBeGreaterThan(100);
@@ -249,9 +252,47 @@ test.describe("Expense calculator", () => {
 
     const calculator = page.getByRole("application", { name: "Calculator" });
     await expect(calculator).toBeVisible();
+    await expect
+      .poll(async () => {
+        const fieldBox = await participantAmountField.boundingBox();
+        const calculatorBox = await calculator.boundingBox();
+
+        if (!fieldBox || !calculatorBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
+      })
+      .toBeLessThanOrEqual(0);
 
     const dragHandle = calculator.locator("[data-calculator-sheet-drag-handle]");
     await expect(dragHandle).toBeVisible();
+    await expect
+      .poll(async () => {
+        const scrollYBeforeFrame = await page.evaluate(() => window.scrollY);
+        const calculatorBoxBeforeFrame = await calculator.boundingBox();
+
+        await page.evaluate(
+          () =>
+            new Promise<void>((resolve) => {
+              requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+            }),
+        );
+
+        const scrollYAfterFrame = await page.evaluate(() => window.scrollY);
+        const calculatorBoxAfterFrame = await calculator.boundingBox();
+
+        if (!calculatorBoxBeforeFrame || !calculatorBoxAfterFrame) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.max(
+          Math.abs(scrollYAfterFrame - scrollYBeforeFrame),
+          Math.abs(calculatorBoxAfterFrame.y - calculatorBoxBeforeFrame.y),
+        );
+      })
+      .toBeLessThanOrEqual(1);
+    await dragHandle.hover();
 
     const dragHandleBox = await dragHandle.boundingBox();
     if (!dragHandleBox) {
@@ -273,8 +314,12 @@ test.describe("Expense calculator", () => {
     await expect(calculator).not.toBeVisible();
     await expect(participantAmountField).not.toBeFocused();
     await expect
-      .poll(async () => Math.round(await page.evaluate(() => window.scrollY)))
-      .toBeGreaterThan(Math.round(scrollYBefore) - 8);
+      .poll(async () => {
+        const scrollYAfterClose = Math.round(await page.evaluate(() => window.scrollY));
+
+        return Math.abs(scrollYAfterClose - Math.round(scrollYBefore));
+      })
+      .toBeLessThanOrEqual(8);
   });
 
   test("accepts supported physical keyboard input while open", async ({ harness, page }) => {

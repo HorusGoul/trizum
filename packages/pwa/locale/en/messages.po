@@ -99,7 +99,7 @@ msgstr "Active on this device"
 msgid "ADB Unit of Account"
 msgstr "ADB Unit of Account"
 
-#: src/components/CalculatorToolbar.tsx:977
+#: src/components/CalculatorToolbar.tsx:1128
 msgid "Add"
 msgstr "Add"
 
@@ -312,7 +312,7 @@ msgstr "Back to settings"
 msgid "Back to sign in"
 msgstr "Back to sign in"
 
-#: src/components/CalculatorToolbar.tsx:1002
+#: src/components/CalculatorToolbar.tsx:1153
 msgid "Backspace"
 msgstr "Backspace"
 
@@ -408,16 +408,16 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/components/CalculatorToolbar.tsx:1010
+#: src/components/CalculatorToolbar.tsx:1161
 msgid "Calculate result"
 msgstr "Calculate result"
 
-#: src/components/CalculatorToolbar.tsx:639
-#: src/components/CalculatorToolbar.tsx:658
+#: src/components/CalculatorToolbar.tsx:790
+#: src/components/CalculatorToolbar.tsx:809
 msgid "Calculator"
 msgstr "Calculator"
 
-#: src/components/CalculatorToolbar.tsx:842
+#: src/components/CalculatorToolbar.tsx:993
 msgid "Calculator expression"
 msgstr "Calculator expression"
 
@@ -522,7 +522,7 @@ msgstr "Choose the currency for expenses in this party"
 msgid "Choose who receives it"
 msgstr "Choose who receives it"
 
-#: src/components/CalculatorToolbar.tsx:893
+#: src/components/CalculatorToolbar.tsx:1044
 msgid "Clear all"
 msgstr "Clear all"
 
@@ -543,7 +543,7 @@ msgstr "Close"
 msgid "Close calculator"
 msgstr "Close calculator"
 
-#: src/components/CalculatorToolbar.tsx:909
+#: src/components/CalculatorToolbar.tsx:1060
 msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
@@ -819,7 +819,7 @@ msgstr "Debt transfer to another party"
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
-#: src/components/CalculatorToolbar.tsx:994
+#: src/components/CalculatorToolbar.tsx:1145
 msgid "Decimal point"
 msgstr "Decimal point"
 
@@ -858,7 +858,7 @@ msgstr "Destructive actions"
 msgid "Did you know?"
 msgstr "Did you know?"
 
-#: src/components/CalculatorToolbar.tsx:917
+#: src/components/CalculatorToolbar.tsx:1068
 msgid "Divide"
 msgstr "Divide"
 
@@ -1586,7 +1586,7 @@ msgstr "Mozambican Metical"
 msgid "Multi-Party Splitting"
 msgstr "Multi-Party Splitting"
 
-#: src/components/CalculatorToolbar.tsx:937
+#: src/components/CalculatorToolbar.tsx:1088
 msgid "Multiply"
 msgstr "Multiply"
 
@@ -1787,7 +1787,7 @@ msgstr "Open GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
-#: src/components/CalculatorToolbar.tsx:901
+#: src/components/CalculatorToolbar.tsx:1052
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
@@ -2459,7 +2459,7 @@ msgstr "Submit a Request"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/CalculatorToolbar.tsx:957
+#: src/components/CalculatorToolbar.tsx:1108
 msgid "Subtract"
 msgstr "Subtract"
 
