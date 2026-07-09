@@ -19,10 +19,6 @@ import { Toaster } from "./ui/Toaster.js";
 import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
-import {
-  previewUpdateToastTransition,
-  UPDATE_TOAST_PREVIEW_SEARCH_PARAM,
-} from "./lib/updateToastPreview.ts";
 import { UpdateController } from "./components/UpdateController.tsx";
 import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
 import { usePartyList } from "./hooks/usePartyList.ts";
@@ -138,7 +134,6 @@ declare global {
     ) => Promise<InternalPartyListSeedResult>;
     __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
     __internal_recalculatePartyBalances: (partyId: Party["id"]) => Promise<boolean>;
-    __internal_previewUpdateToast: typeof previewUpdateToastTransition;
   }
 }
 
@@ -167,14 +162,6 @@ window.__internal_readPartyListState = async () => {
 window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
   return appWorker.recalculateBalances(partyId);
 };
-
-window.__internal_previewUpdateToast = previewUpdateToastTransition;
-
-if (shouldPreviewUpdateToast(initialUrl)) {
-  window.setTimeout(() => {
-    previewUpdateToastTransition();
-  }, 1_000);
-}
 
 // Create a new router instance
 const history = preventDuplicateHistoryEntries(createBrowserHistory());
@@ -283,12 +270,4 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
   }, []);
 
   return <>{children}</>;
-}
-
-function shouldPreviewUpdateToast(url: URL) {
-  if (!url.searchParams.has(UPDATE_TOAST_PREVIEW_SEARCH_PARAM)) {
-    return false;
-  }
-
-  return import.meta.env.DEV || !["trizum.app", "www.trizum.app"].includes(url.hostname);
 }

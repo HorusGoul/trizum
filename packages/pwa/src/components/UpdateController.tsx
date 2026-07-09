@@ -4,7 +4,8 @@ import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
 import { type UpdateResult, UpdateContext } from "./UpdateContext";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { showUpdatingToast, UPDATE_TOAST_ID } from "#src/lib/updateToastPreview.ts";
+
+const UPDATE_TOAST_ID = "update-toast";
 
 export function UpdateController({ children }: { children: React.ReactNode }) {
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
@@ -62,4 +63,11 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
       {children}
     </UpdateContext>
   );
+}
+
+function showUpdatingToast() {
+  toast.loading(t`Updating trizum...`, {
+    action: null,
+    id: UPDATE_TOAST_ID,
+  });
 }

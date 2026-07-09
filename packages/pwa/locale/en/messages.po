@@ -2097,8 +2097,7 @@ msgstr "Receipt Attachments"
 msgid "Recommended match"
 msgstr "Recommended match"
 
-#: src/components/UpdateController.tsx:29
-#: src/lib/updateToastPreview.ts:16
+#: src/components/UpdateController.tsx:30
 msgid "Reload"
 msgstr "Reload"
 
@@ -2805,8 +2804,7 @@ msgstr "Unidad Previsional"
 msgid "Unpin party"
 msgstr "Unpin party"
 
-#: src/components/UpdateController.tsx:27
-#: src/lib/updateToastPreview.ts:14
+#: src/components/UpdateController.tsx:28
 #: src/routes/index/route.tsx:93
 msgid "Update available"
 msgstr "Update available"
@@ -2835,7 +2833,7 @@ msgstr "Update who you are in this party so that we can show you the expenses an
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
-#: src/lib/updateToastPreview.ts:31
+#: src/components/UpdateController.tsx:69
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
