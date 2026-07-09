@@ -31,13 +31,14 @@ describe("Toaster", () => {
   test("uses black toast surfaces with semantic icon color", () => {
     expect(toastClassNames.toast).toContain("items-center");
     expect(toastClassNames.toast).toContain("rounded-lg");
-    expect(toastClassNames.toast).toContain("border-accent-900");
-    expect(toastClassNames.toast).toContain("bg-accent-950");
-    expect(toastClassNames.toast).toContain("text-accent-50");
-    expect(toastClassNames.toast).toContain("dark:bg-accent-950");
+    expect(toastClassNames.toast).toContain("border-white/10");
+    expect(toastClassNames.toast).toContain("bg-black");
+    expect(toastClassNames.toast).toContain("text-white");
+    expect(toastClassNames.toast).toContain("ring-offset-black");
+    expect(toastClassNames.toast).toContain("dark:bg-black");
     expect(toastClassNames.title).toContain("font-medium");
     expect(toastClassNames.description).toContain("font-normal");
-    expect(toastClassNames.description).toContain("text-accent-200");
+    expect(toastClassNames.description).toContain("text-white/75");
     expect(toastClassNames.icon).toContain("text-accent-300");
     expect(toastClassNames.success).toContain("[&_[data-icon]]:text-success-400");
     expect(toastClassNames.error).toContain("[&_[data-icon]]:text-danger-400");
@@ -56,12 +57,12 @@ describe("Toaster", () => {
   test("keeps loading and action toasts legible on the black surface", () => {
     expect(toastClassNames.loader).toContain("text-accent-300");
     expect(toastClassNames.actionButton).toContain("font-medium");
-    expect(toastClassNames.actionButton).toContain("bg-accent-50");
-    expect(toastClassNames.actionButton).toContain("text-accent-950");
-    expect(toastClassNames.actionButton).toContain("focus-visible:ring-offset-accent-950");
+    expect(toastClassNames.actionButton).toContain("bg-white");
+    expect(toastClassNames.actionButton).toContain("text-black");
+    expect(toastClassNames.actionButton).toContain("focus-visible:ring-offset-black");
     expect(toastClassNames.cancelButton).toContain("bg-white/10");
-    expect(toastClassNames.cancelButton).toContain("text-accent-50");
-    expect(toastClassNames.cancelButton).toContain("focus-visible:ring-offset-accent-950");
+    expect(toastClassNames.cancelButton).toContain("text-white");
+    expect(toastClassNames.cancelButton).toContain("focus-visible:ring-offset-black");
   });
 
   test("uses the app icon sprite without toast-specific stroke overrides", () => {
