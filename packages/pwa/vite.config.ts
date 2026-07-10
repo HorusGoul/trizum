@@ -187,6 +187,12 @@ export default defineConfig(({ mode }) => {
           find: /^debug$/,
           replacement: "debug/src/browser.js",
         },
+        {
+          // The PWA Worker uses the WebSocket client adapter and should bind to
+          // the runtime WebSocket global instead of the Node ws package.
+          find: /^isomorphic-ws$/,
+          replacement: "isomorphic-ws/browser.js",
+        },
       ],
     },
     test: {

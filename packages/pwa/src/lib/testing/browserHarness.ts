@@ -1,5 +1,5 @@
 import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
-import type { SupportedLocale } from "#src/lib/i18n.js";
+import type { SupportedLocale } from "#src/lib/locales.js";
 import { getPartyListHandle, type PartyList } from "#src/models/partyList.js";
 
 export interface InternalPartyListSeed {

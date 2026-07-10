@@ -38,6 +38,10 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
+#: src/lib/partySharePreviewMessages.ts:15
+msgid "{title} preview"
+msgstr "Vista previa de {title}"
+
 #: src/routes/about.tsx:158
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
@@ -643,7 +647,7 @@ msgstr "Continuar con Google"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/routes/party_.$partyId.share.tsx:95
+#: src/routes/party_.$partyId.share.tsx:98
 msgid "Copy party link"
 msgstr "Copiar enlace del grupo"
 
@@ -996,7 +1000,7 @@ msgstr "Error al acceder a la cámara"
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
-#: src/routes/party_.$partyId.share.tsx:45
+#: src/routes/party_.$partyId.share.tsx:48
 msgid "Failed to copy party link to clipboard, please copy it manually"
 msgstr "Error al copiar el enlace del grupo al portapapeles, por favor cópialo manualmente"
 
@@ -1305,7 +1309,11 @@ msgstr "Unirse"
 msgid "Join {0} on trizum!"
 msgstr "¡Únete a {0} en trizum!"
 
-#: src/routes/party_.$partyId.share.tsx:33
+#: src/lib/partySharePreviewMessages.ts:11
+msgid "Join {partyName} on trizum"
+msgstr "Únete a {partyName} en trizum"
+
+#: src/routes/party_.$partyId.share.tsx:36
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
@@ -1317,6 +1325,10 @@ msgstr "Unirse a un Grupo"
 #: src/routes/join.tsx:122
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
+
+#: src/lib/partySharePreviewMessages.ts:6
+msgid "Join party"
+msgstr "Unirse"
 
 #: src/routes/new/route.tsx:249
 msgid "Jordanian Dinar"
@@ -1734,6 +1746,10 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
+#: src/lib/partySharePreviewMessages.ts:7
+msgid "Open this party to split expenses and settle up together on trizum."
+msgstr "Abre este grupo para dividir gastos y saldar cuentas juntos en trizum."
+
 #: src/routes/join.tsx:150
 msgid "or enter code"
 msgstr "o introduce código"
@@ -1827,7 +1843,7 @@ msgstr "Grupo creado"
 msgid "Party leaderboard"
 msgstr "Clasificación del grupo"
 
-#: src/routes/party_.$partyId.share.tsx:43
+#: src/routes/party_.$partyId.share.tsx:46
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
@@ -1847,7 +1863,7 @@ msgstr "Configuración del Grupo"
 msgid "Party settings saved!"
 msgstr "¡Configuración del grupo guardada!"
 
-#: src/routes/party_.$partyId.share.tsx:37
+#: src/routes/party_.$partyId.share.tsx:40
 msgid "Party shared!"
 msgstr "¡Grupo compartido!"
 
@@ -2192,8 +2208,8 @@ msgstr "Saldada en"
 msgid "Seychellois Rupee"
 msgstr "Rupia de Seychelles"
 
-#: src/routes/party_.$partyId.share.tsx:55
-#: src/routes/party_.$partyId.share.tsx:90
+#: src/routes/party_.$partyId.share.tsx:58
+#: src/routes/party_.$partyId.share.tsx:93
 #: src/routes/party.$partyId/route.tsx:247
 msgid "Share party"
 msgstr "Compartir grupo"
@@ -2201,6 +2217,10 @@ msgstr "Compartir grupo"
 #: src/components/PartyPendingComponent.tsx:14
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
+
+#: src/lib/partySharePreviewMessages.ts:4
+msgid "Shared expenses"
+msgstr "Gastos compartidos"
 
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:19
 msgid "Shares"
@@ -2342,6 +2362,14 @@ msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos j
 #: src/routes/about/route.tsx:50
 msgid "Split bills with friends and family. Track, calculate, and settle expenses together."
 msgstr "Divide facturas con amigos y familia. Registra, calcula y salda gastos juntos."
+
+#: src/lib/partySharePreviewMessages.ts:3
+msgid "Split bills with friends, family, and roommates."
+msgstr "Divide gastos con amigos, familiares y compañeros de piso."
+
+#: src/lib/partySharePreviewMessages.ts:5
+msgid "Split expenses and settle up together on trizum."
+msgstr "Divide gastos y salda cuentas juntos en trizum."
 
 #: src/routes/about/route.tsx:75
 msgid "Split expenses fairly among multiple participants"
@@ -2832,6 +2860,10 @@ msgstr "Bolívar Soberano Venezolano"
 #: src/routes/about/route.tsx:34
 msgid "Version"
 msgstr "Versión"
+
+#: src/lib/partySharePreviewMessages.ts:8
+msgid "via"
+msgstr "vía"
 
 #: src/routes/new/route.tsx:319
 msgid "Vietnamese Dong"

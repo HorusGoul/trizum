@@ -1,3 +1,6 @@
+import type { I18n } from "@lingui/core";
+import type { SupportedLocale } from "../src/lib/locales.js";
+
 export interface ApiEnv {
   ASSETS: Fetcher;
   DB: D1Database;
@@ -8,6 +11,7 @@ export interface ApiEnv {
   APPLE_PRIVATE_KEY?: string;
   APPLE_SERVICE_ID?: string;
   APPLE_TEAM_ID?: string;
+  AUTOMERGE_WSS_URL?: string;
   AUTH_EMAIL_FROM?: string;
   AUTH_REQUIRE_EMAIL_VERIFICATION?: string;
   BETTER_AUTH_ALLOWED_HOSTS?: string;
@@ -22,11 +26,14 @@ export interface ApiEnv {
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_IOS_CLIENT_ID?: string;
   GOOGLE_WEB_CLIENT_ID?: string;
+  PARTY_SHARE_PREVIEW_TIMEOUT_MS?: string;
 }
 
 export interface ApiHonoEnv {
   Bindings: ApiEnv;
   Variables: {
+    i18n: I18n;
+    locale: SupportedLocale;
     session: unknown;
     user: {
       email: string;
