@@ -37,9 +37,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
 
   async function update(): Promise<UpdateResult> {
     setIsUpdating(true);
-    toast.loading(t`Updating trizum...`, {
-      id: UPDATE_TOAST_ID,
-    });
+    showUpdatingToast();
     try {
       await updateServiceWorker(true);
       return { status: "started" };
@@ -65,4 +63,11 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
       {children}
     </UpdateContext>
   );
+}
+
+function showUpdatingToast() {
+  toast.loading(t`Updating trizum...`, {
+    action: null,
+    id: UPDATE_TOAST_ID,
+  });
 }

@@ -2773,7 +2773,7 @@ msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gasto
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
-#: src/components/UpdateController.tsx:40
+#: src/components/UpdateController.tsx:69
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
