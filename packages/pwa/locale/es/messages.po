@@ -95,7 +95,7 @@ msgstr "Activo en este dispositivo"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:1481
+#: src/components/CalculatorToolbar.tsx:1474
 msgid "Add"
 msgstr "Sumar"
 
@@ -243,11 +243,11 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/components/CalculatorToolbar.tsx:1109
+#: src/components/CalculatorToolbar.tsx:1103
 msgid "Attachment preview"
 msgstr "Vista previa del adjunto"
 
-#: src/components/CalculatorToolbar.tsx:1077
+#: src/components/CalculatorToolbar.tsx:1071
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Adjuntos"
@@ -305,7 +305,7 @@ msgstr "Volver a configuración"
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
-#: src/components/CalculatorToolbar.tsx:1506
+#: src/components/CalculatorToolbar.tsx:1499
 msgid "Backspace"
 msgstr "Retroceso"
 
@@ -397,16 +397,16 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/components/CalculatorToolbar.tsx:1514
+#: src/components/CalculatorToolbar.tsx:1507
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:968
-#: src/components/CalculatorToolbar.tsx:987
+#: src/components/CalculatorToolbar.tsx:967
+#: src/components/CalculatorToolbar.tsx:986
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1346
+#: src/components/CalculatorToolbar.tsx:1339
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
@@ -503,7 +503,7 @@ msgstr "Elige la moneda para los gastos de este grupo"
 msgid "Choose who receives it"
 msgstr "Elige quién la recibe"
 
-#: src/components/CalculatorToolbar.tsx:1397
+#: src/components/CalculatorToolbar.tsx:1390
 msgid "Clear all"
 msgstr "Borrar todo"
 
@@ -520,7 +520,7 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:1097
+#: src/components/CalculatorToolbar.tsx:1091
 msgid "Close attachment preview"
 msgstr "Cerrar vista previa del adjunto"
 
@@ -528,7 +528,7 @@ msgstr "Cerrar vista previa del adjunto"
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1413
+#: src/components/CalculatorToolbar.tsx:1406
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
 
@@ -800,7 +800,7 @@ msgstr "Transferencia de deuda a otro grupo"
 msgid "Debt transferred"
 msgstr "Deuda transferida"
 
-#: src/components/CalculatorToolbar.tsx:1498
+#: src/components/CalculatorToolbar.tsx:1491
 msgid "Decimal point"
 msgstr "Punto decimal"
 
@@ -839,7 +839,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/CalculatorToolbar.tsx:1421
+#: src/components/CalculatorToolbar.tsx:1414
 msgid "Divide"
 msgstr "Dividir"
 
@@ -1543,7 +1543,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:1441
+#: src/components/CalculatorToolbar.tsx:1434
 msgid "Multiply"
 msgstr "Multiplicar"
 
@@ -1740,7 +1740,7 @@ msgstr "Abrir GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
-#: src/components/CalculatorToolbar.tsx:1405
+#: src/components/CalculatorToolbar.tsx:1398
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
@@ -2392,7 +2392,7 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:1461
+#: src/components/CalculatorToolbar.tsx:1454
 msgid "Subtract"
 msgstr "Restar"
 
@@ -2848,7 +2848,7 @@ msgid "Vietnamese Dong"
 msgstr "Dong Vietnamita"
 
 #. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1163
+#: src/components/CalculatorToolbar.tsx:1156
 msgid "View attachment"
 msgstr "Ver adjunto"
 
@@ -2857,17 +2857,17 @@ msgid "View attachment {attachmentNumber}"
 msgstr "Ver adjunto {attachmentNumber}"
 
 #. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1158
+#: src/components/CalculatorToolbar.tsx:1151
 msgid "View attachment 1"
 msgstr "Ver adjunto 1"
 
 #. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1160
+#: src/components/CalculatorToolbar.tsx:1153
 msgid "View attachment 2"
 msgstr "Ver adjunto 2"
 
 #. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1162
+#: src/components/CalculatorToolbar.tsx:1155
 msgid "View attachment 3"
 msgstr "Ver adjunto 3"
 

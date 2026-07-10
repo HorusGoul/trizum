@@ -2,8 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
-import { AnimatePresence, LazyMotion, domAnimation, m, useTransform } from "motion/react";
-import type { MotionValue } from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
@@ -1030,7 +1029,6 @@ function CalculatorMobileAttachmentLayer({
             selectedIndex={selectedIndex}
             setSelectedIndex={setSelectedIndex}
             sheetHeight={sheetHeight}
-            sheetProgress={yProgress}
           />
         </Suspense>
       </m.div>
@@ -1043,16 +1041,12 @@ function CalculatorMobileAttachmentContent({
   selectedIndex,
   setSelectedIndex,
   sheetHeight,
-  sheetProgress,
 }: {
   photoIds: MediaFile["id"][];
   selectedIndex: number | null;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   sheetHeight: number;
-  sheetProgress: MotionValue<number>;
 }) {
-  const toolbarY = useTransform(sheetProgress, [0, 1], [-24, 0]);
-  const previewY = useTransform(sheetProgress, [0, 1], [-18, 0]);
   const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
     required: true as const,
   }).map(({ doc }) => doc);
@@ -1069,7 +1063,7 @@ function CalculatorMobileAttachmentContent({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        style={{ height: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE, y: toolbarY }}
+        style={{ height: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE }}
         transition={MOBILE_SHEET_TWEEN_CONFIG}
       >
         <div
@@ -1111,7 +1105,6 @@ function CalculatorMobileAttachmentContent({
             style={{
               top: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE,
               bottom: 0,
-              y: previewY,
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

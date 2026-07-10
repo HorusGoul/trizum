@@ -431,6 +431,17 @@ test.describe("Expense calculator", () => {
     const attachmentsToolbarShell = page.locator("[data-calculator-attachment-toolbar]");
     const attachmentsToolbar = page.getByRole("toolbar", { name: "Attachments" });
     await expect(attachmentsToolbar).toBeVisible();
+    await expect
+      .poll(async () => {
+        const toolbarBox = await attachmentsToolbarShell.boundingBox();
+
+        if (!toolbarBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.round(toolbarBox.y);
+      })
+      .toBe(0);
     await expect(page.getByRole("region", { name: "Attachment preview" })).toHaveCount(0);
 
     await attachmentsToolbar.getByRole("button", { name: "View attachment 1" }).click();
@@ -447,7 +458,7 @@ test.describe("Expense calculator", () => {
 
         return Math.abs(Math.round(previewBox.y - (toolbarBox.y + toolbarBox.height)));
       })
-      .toBeLessThanOrEqual(8);
+      .toBeLessThanOrEqual(1);
     await expect
       .poll(async () => {
         const previewBox = await attachmentPreview.boundingBox();
