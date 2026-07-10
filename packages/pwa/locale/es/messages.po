@@ -515,7 +515,7 @@ msgstr "Borrar expresión"
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
-#: src/components/MediaGallery.tsx:184
+#: src/components/MediaGallery.tsx:218
 #: src/components/RouteQRScanner.tsx:60
 msgid "Close"
 msgstr "Cerrar"
@@ -1602,7 +1602,7 @@ msgstr "Nuevo trizum"
 msgid "New Zealand Dollar"
 msgstr "Dólar Neozelandés"
 
-#: src/components/MediaGallery.tsx:201
+#: src/components/MediaGallery.tsx:235
 msgid "Next"
 msgstr "Siguiente"
 
@@ -2003,7 +2003,7 @@ msgstr "Apunta tu cámara a un código QR de trizum"
 msgid "Polish Zloty"
 msgstr "Zloty Polaco"
 
-#: src/components/MediaGallery.tsx:194
+#: src/components/MediaGallery.tsx:228
 msgid "Previous"
 msgstr "Anterior"
 

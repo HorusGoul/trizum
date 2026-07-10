@@ -68,6 +68,31 @@ export default function MediaGallery({
   // Track if we're in a "closing drag" gesture (dragging up at scale=1)
   const isClosingDragRef = useRef(false);
 
+  function zoomAroundOrigin(nextScale: number, [originX, originY]: [number, number]) {
+    const viewport = viewportRef.current;
+    const currentScale = scale.get();
+
+    if (!viewport || currentScale <= 0) {
+      scale.set(nextScale);
+      return;
+    }
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const localOriginX = originX - viewportRect.left - viewportRect.width / 2;
+    const localOriginY = originY - viewportRect.top - viewportRect.height / 2;
+
+    if (!Number.isFinite(localOriginX) || !Number.isFinite(localOriginY)) {
+      scale.set(nextScale);
+      return;
+    }
+
+    const scaleRatio = nextScale / currentScale;
+
+    x.set(localOriginX - (localOriginX - x.get()) * scaleRatio);
+    y.set(localOriginY - (localOriginY - y.get()) * scaleRatio);
+    scale.set(nextScale);
+  }
+
   useGesture(
     {
       onDragStart: () => {
@@ -106,15 +131,24 @@ export default function MediaGallery({
         }
         isClosingDragRef.current = false;
       },
-      onPinch: ({ offset: [s] }) => {
-        scale.set(s);
-
-        // TODO: when zooming, the image should be centered on the pinch point
+      onPinchStart: () => {
+        isClosingDragRef.current = false;
+        onDragProgress?.(0);
+      },
+      onPinch: ({ offset: [s], origin }) => {
+        zoomAroundOrigin(s, origin);
+      },
+      onPinchEnd: ({ offset: [s] }) => {
+        if (s <= 1) {
+          void animate(x, 0, { type: "spring", stiffness: 400, damping: 30 });
+          void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
+        }
       },
     },
     {
       target: ref,
       pinch: {
+        from: () => [scale.get(), 0],
         scaleBounds: { min: 0.5, max: 4 },
         rubberband: true,
       },
