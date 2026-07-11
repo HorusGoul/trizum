@@ -25,6 +25,22 @@ export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> &
   onCloseCalculator?: () => void;
 };
 
+type CurrencyFieldWithCalculatorProps = React.ComponentProps<typeof AppCurrencyField> & {
+  calculatorButtonClassName?: string;
+  calculatorAttachmentPhotoIds?: MediaFile["id"][];
+  autoOpenCalculator?: boolean;
+  calculatorId?: string;
+  activeCalculatorId?: string;
+  onOpenCalculator?: (calculatorId: string) => void;
+  onCloseCalculator?: () => void;
+};
+
+type CurrencyFieldCalculatorState = {
+  requestId: number;
+  isClosedFromCalculator: boolean;
+  isClosingFromRouteChange: boolean;
+};
+
 function getCalculatorFieldLabel(props: React.ComponentProps<typeof AppCurrencyField>) {
   const ariaLabel = (props as { "aria-label"?: unknown })["aria-label"];
 
@@ -71,31 +87,31 @@ export function CurrencyField({
   );
 }
 
-function CurrencyFieldWithCalculator({
-  calculatorButtonClassName,
-  calculatorAttachmentPhotoIds,
-  autoOpenCalculator = false,
-  calculatorId,
+/* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler -- Browser back/forward changes route calculator state outside press handlers. */
+function useCurrencyFieldCalculator({
   activeCalculatorId,
-  onOpenCalculator,
-  onCloseCalculator,
-  onPointerDownCapture,
-  onMouseDownCapture,
+  autoOpenCalculator,
+  calculatorId,
+  fieldProps,
   onClickCapture,
-  ...props
-}: React.ComponentProps<typeof AppCurrencyField> & {
-  calculatorButtonClassName?: string;
-  calculatorAttachmentPhotoIds?: MediaFile["id"][];
-  autoOpenCalculator?: boolean;
-  calculatorId?: string;
+  onCloseCalculator,
+  onMouseDownCapture,
+  onOpenCalculator,
+  onPointerDownCapture,
+}: {
   activeCalculatorId?: string;
-  onOpenCalculator?: (calculatorId: string) => void;
+  autoOpenCalculator: boolean;
+  calculatorId?: string;
+  fieldProps: React.ComponentProps<typeof AppCurrencyField>;
+  onClickCapture?: React.MouseEventHandler<HTMLDivElement>;
   onCloseCalculator?: () => void;
+  onMouseDownCapture?: React.MouseEventHandler<HTMLDivElement>;
+  onOpenCalculator?: (calculatorId: string) => void;
+  onPointerDownCapture?: React.PointerEventHandler<HTMLDivElement>;
 }) {
-  /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler -- Browser back/forward changes route calculator state outside press handlers. */
   const configuredPresenceElementId =
-    (props as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
-    (props as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
+    (fieldProps as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
+    (fieldProps as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const isClosingFromCalculatorRef = useRef(false);
   const pendingRouteOpenCalculatorIdRef = useRef<string | null>(null);
@@ -103,18 +119,19 @@ function CurrencyFieldWithCalculator({
   const [calculatorPresenceElementId, setCalculatorPresenceElementId] = useState(
     configuredPresenceElementId ?? null,
   );
-  const [calculatorCloseState, setCalculatorCloseState] = useState({
+  const [calculatorCloseState, setCalculatorCloseState] = useState<CurrencyFieldCalculatorState>({
     requestId: 0,
     isClosedFromCalculator: false,
     isClosingFromRouteChange: false,
   });
   const { requestId, isClosedFromCalculator, isClosingFromRouteChange } = calculatorCloseState;
   const [state, actions] = useCalculatorMode({
-    value: props.value ?? 0,
-    onChange: (value) => props.onChange?.(value),
-    currency: props.currency,
+    value: fieldProps.value ?? 0,
+    onChange: (value) => fieldProps.onChange?.(value),
+    currency: fieldProps.currency,
   });
-  const calculatorFieldId = calculatorId ?? configuredPresenceElementId ?? props.name ?? "currency";
+  const calculatorFieldId =
+    calculatorId ?? configuredPresenceElementId ?? fieldProps.name ?? "currency";
   const isRouteControlled =
     activeCalculatorId !== undefined ||
     onOpenCalculator !== undefined ||
@@ -135,7 +152,7 @@ function CurrencyFieldWithCalculator({
       (isCalculatorRouteActive || isClosingFromRouteChange || isRouteClosePending)
     : state.isActive;
   const shouldPreventNativeKeyboard = autoOpenCalculator || isCalculatorActive;
-  const fieldLabel = getCalculatorFieldLabel(props);
+  const fieldLabel = getCalculatorFieldLabel(fieldProps);
 
   useEffect(() => {
     if (!isRouteControlled) {
@@ -202,7 +219,15 @@ function CurrencyFieldWithCalculator({
     isRouteControlled,
     state.isActive,
   ]);
-  /* eslint-enable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler */
+
+  function clearScheduledOpenCalculator() {
+    if (scheduledOpenTimeoutRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(scheduledOpenTimeoutRef.current);
+    scheduledOpenTimeoutRef.current = null;
+  }
 
   function openCalculator() {
     clearScheduledOpenCalculator();
@@ -255,8 +280,12 @@ function CurrencyFieldWithCalculator({
     closeCalculator({ suppressAutoOpen: true });
   }
 
+  function dismissCalculator() {
+    closeCalculator({ suppressAutoOpen: true });
+  }
+
   function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
-    props.onFocus?.(event);
+    fieldProps.onFocus?.(event);
 
     if (autoOpenCalculator && !isCalculatorActive && !isCalculatorAutoOpenSuppressed()) {
       openCalculator();
@@ -287,15 +316,6 @@ function CurrencyFieldWithCalculator({
     } else if (!isRouteControlled && !isCalculatorActive && !isCalculatorAutoOpenSuppressed()) {
       openCalculator();
     }
-  }
-
-  function clearScheduledOpenCalculator() {
-    if (scheduledOpenTimeoutRef.current === null) {
-      return;
-    }
-
-    window.clearTimeout(scheduledOpenTimeoutRef.current);
-    scheduledOpenTimeoutRef.current = null;
   }
 
   function scheduleOpenCalculatorFromUserInteraction() {
@@ -348,17 +368,98 @@ function CurrencyFieldWithCalculator({
 
   useEffect(() => clearScheduledOpenCalculator, []);
 
-  const calculatorButton = (
+  return {
+    actions,
+    calculatorPresenceElementId,
+    commitCalculator,
+    configuredPresenceElementId,
+    dismissCalculator,
+    fieldContainerRef,
+    fieldLabel,
+    handleClickCapture,
+    handleFocus,
+    handleMouseDownCapture,
+    handlePointerDownCapture,
+    isCalculatorActive,
+    openCalculator,
+    requestCloseCalculator,
+    requestId,
+    shouldPreventNativeKeyboard,
+    shouldRenderCalculator,
+    state,
+  };
+}
+/* eslint-enable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler */
+
+function CalculatorFieldButton({
+  configuredPresenceElementId,
+  isCalculatorActive,
+  onOpenCalculator,
+  onRequestCloseCalculator,
+  className,
+}: {
+  configuredPresenceElementId?: string;
+  isCalculatorActive: boolean;
+  onOpenCalculator: () => void;
+  onRequestCloseCalculator: () => void;
+  className?: string;
+}) {
+  return (
     <IconButton
       icon={isCalculatorActive ? "lucide.x" : "lucide.calculator"}
       aria-label={isCalculatorActive ? t`Close calculator` : t`Open calculator`}
       color="transparent"
       data-presence-proxy-element-id={configuredPresenceElementId}
-      className={calculatorButtonClassName ?? "absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"}
+      className={className ?? "absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"}
       iconClassName="size-4"
-      onPress={isCalculatorActive ? requestCloseCalculator : openCalculator}
+      onPress={isCalculatorActive ? onRequestCloseCalculator : onOpenCalculator}
     />
   );
+}
+
+function CurrencyFieldWithCalculator({
+  calculatorButtonClassName,
+  calculatorAttachmentPhotoIds,
+  autoOpenCalculator = false,
+  calculatorId,
+  activeCalculatorId,
+  onOpenCalculator,
+  onCloseCalculator,
+  onPointerDownCapture,
+  onMouseDownCapture,
+  onClickCapture,
+  ...props
+}: CurrencyFieldWithCalculatorProps) {
+  const {
+    actions,
+    calculatorPresenceElementId,
+    commitCalculator,
+    configuredPresenceElementId,
+    dismissCalculator,
+    fieldContainerRef,
+    fieldLabel,
+    handleClickCapture,
+    handleFocus,
+    handleMouseDownCapture,
+    handlePointerDownCapture,
+    isCalculatorActive,
+    openCalculator,
+    requestCloseCalculator,
+    requestId,
+    shouldPreventNativeKeyboard,
+    shouldRenderCalculator,
+    state,
+  } = useCurrencyFieldCalculator({
+    activeCalculatorId,
+    autoOpenCalculator,
+    calculatorId,
+    fieldProps: props,
+    onClickCapture,
+    onCloseCalculator,
+    onMouseDownCapture,
+    onOpenCalculator,
+    onPointerDownCapture,
+  });
 
   return (
     <div
@@ -378,7 +479,15 @@ function CurrencyFieldWithCalculator({
           !calculatorButtonClassName && "pr-12",
           isCalculatorActive && "ring-ring ring-2 ring-offset-2",
         )}
-        inputEndAdornment={calculatorButton}
+        inputEndAdornment={
+          <CalculatorFieldButton
+            configuredPresenceElementId={configuredPresenceElementId}
+            isCalculatorActive={isCalculatorActive}
+            onOpenCalculator={openCalculator}
+            onRequestCloseCalculator={requestCloseCalculator}
+            className={calculatorButtonClassName}
+          />
+        }
       />
 
       {shouldRenderCalculator && (
@@ -392,7 +501,7 @@ function CurrencyFieldWithCalculator({
           onSetCursorPosition={actions.setCursorPosition}
           onCommit={commitCalculator}
           onClear={actions.clear}
-          onDismiss={() => closeCalculator({ suppressAutoOpen: true })}
+          onDismiss={dismissCalculator}
           closeRequestId={requestId}
           attachmentPhotoIds={calculatorAttachmentPhotoIds}
           fieldContainerRef={fieldContainerRef}

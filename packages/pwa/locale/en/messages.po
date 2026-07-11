@@ -548,7 +548,7 @@ msgstr "Close"
 msgid "Close attachment preview"
 msgstr "Close attachment preview"
 
-#: src/components/CurrencyField.tsx:354
+#: src/components/CurrencyField.tsx:410
 msgid "Close calculator"
 msgstr "Close calculator"
 
@@ -1780,7 +1780,7 @@ msgstr "Only your own debt can be transferred"
 msgid "Open archived parties"
 msgstr "Open archived parties"
 
-#: src/components/CurrencyField.tsx:354
+#: src/components/CurrencyField.tsx:410
 msgid "Open calculator"
 msgstr "Open calculator"
 
