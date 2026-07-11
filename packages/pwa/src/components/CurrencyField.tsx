@@ -93,7 +93,6 @@ function useCurrencyFieldCalculator({
   autoOpenCalculator,
   calculatorId,
   fieldProps,
-  onClickCapture,
   onCloseCalculator,
   onMouseDownCapture,
   onOpenCalculator,
@@ -103,7 +102,6 @@ function useCurrencyFieldCalculator({
   autoOpenCalculator: boolean;
   calculatorId?: string;
   fieldProps: React.ComponentProps<typeof AppCurrencyField>;
-  onClickCapture?: React.MouseEventHandler<HTMLDivElement>;
   onCloseCalculator?: () => void;
   onMouseDownCapture?: React.MouseEventHandler<HTMLDivElement>;
   onOpenCalculator?: (calculatorId: string) => void;
@@ -341,10 +339,6 @@ function useCurrencyFieldCalculator({
     onMouseDownCapture?.(event);
   }
 
-  function handleClickCapture(event: React.MouseEvent<HTMLDivElement>) {
-    onClickCapture?.(event);
-  }
-
   useEffect(() => {
     const fieldContainer = fieldContainerRef.current;
     if (!fieldContainer) {
@@ -376,7 +370,6 @@ function useCurrencyFieldCalculator({
     dismissCalculator,
     fieldContainerRef,
     fieldLabel,
-    handleClickCapture,
     handleFocus,
     handleMouseDownCapture,
     handlePointerDownCapture,
@@ -427,7 +420,6 @@ function CurrencyFieldWithCalculator({
   onCloseCalculator,
   onPointerDownCapture,
   onMouseDownCapture,
-  onClickCapture,
   ...props
 }: CurrencyFieldWithCalculatorProps) {
   const {
@@ -438,7 +430,6 @@ function CurrencyFieldWithCalculator({
     dismissCalculator,
     fieldContainerRef,
     fieldLabel,
-    handleClickCapture,
     handleFocus,
     handleMouseDownCapture,
     handlePointerDownCapture,
@@ -454,7 +445,6 @@ function CurrencyFieldWithCalculator({
     autoOpenCalculator,
     calculatorId,
     fieldProps: props,
-    onClickCapture,
     onCloseCalculator,
     onMouseDownCapture,
     onOpenCalculator,
@@ -466,7 +456,6 @@ function CurrencyFieldWithCalculator({
       ref={fieldContainerRef}
       onPointerDownCapture={handlePointerDownCapture}
       onMouseDownCapture={handleMouseDownCapture}
-      onClickCapture={handleClickCapture}
     >
       <AppCurrencyField
         {...props}

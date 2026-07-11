@@ -528,7 +528,7 @@ msgstr "Cerrar"
 msgid "Close attachment preview"
 msgstr "Cerrar vista previa del adjunto"
 
-#: src/components/CurrencyField.tsx:410
+#: src/components/CurrencyField.tsx:403
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
@@ -1736,7 +1736,7 @@ msgstr "Solo puedes transferir tus propias deudas"
 msgid "Open archived parties"
 msgstr "Abrir grupos archivados"
 
-#: src/components/CurrencyField.tsx:410
+#: src/components/CurrencyField.tsx:403
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
