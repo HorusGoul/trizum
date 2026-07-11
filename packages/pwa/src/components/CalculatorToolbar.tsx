@@ -1069,7 +1069,7 @@ function CalculatorMobileAttachmentContent({
         <div
           role="toolbar"
           aria-label={t`Attachments`}
-          className="border-accent-200/80 px-safe-or-2 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
+          className="border-accent-200/80 px-safe-or-4 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
         >
           <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
             {photoIds.map((photoId, index) => (

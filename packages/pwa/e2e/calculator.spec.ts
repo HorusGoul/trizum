@@ -473,7 +473,7 @@ test.describe("Expense calculator", () => {
 
         return Math.round(buttonBox.x - toolbarBox.x);
       })
-      .toBe(8);
+      .toBe(16);
     await expect
       .poll(async () => {
         const buttonBox = await firstAttachmentButton.boundingBox();
@@ -511,7 +511,7 @@ test.describe("Expense calculator", () => {
           toolbarBox.x + toolbarBox.width - (closeButtonBox.x + closeButtonBox.width),
         );
       })
-      .toBe(8);
+      .toBe(16);
     await expect
       .poll(async () => {
         const toolbarBox = await attachmentsToolbarShell.boundingBox();
