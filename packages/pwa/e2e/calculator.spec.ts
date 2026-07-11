@@ -155,6 +155,48 @@ test.describe("Expense calculator", () => {
     await expect(calculator).not.toBeVisible();
   });
 
+  test.describe("mobile touch", () => {
+    test.use({
+      hasTouch: true,
+      isMobile: true,
+      viewport: { width: 390, height: 844 },
+    });
+
+    test("amount calculator button does not toggle closed when auto-open is enabled", async ({
+      harness,
+      page,
+    }) => {
+      const seededParty = await harness.seedJoinedParty({
+        fixture: createExpenseLogFixture(1),
+        memberParticipantId: defaultParticipants.blair.id,
+      });
+
+      await harness.seedPartyList({
+        username: "Harness User",
+        phone: "",
+        autoOpenCalculator: true,
+        lastOpenedPartyId: seededParty.partyId,
+        parties: {
+          [seededParty.partyId]: true,
+        },
+        participantInParties: {
+          [seededParty.partyId]: defaultParticipants.blair.id,
+        },
+      });
+      await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+      const calculator = page.getByRole("application", { name: "Calculator" });
+
+      await page.locator("[data-calculator-field-button]").first().tap();
+      await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+      await expect(calculator.getByText("Amount", { exact: true })).toBeVisible();
+
+      await page.waitForTimeout(500);
+      await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+      await expect(calculator).toBeVisible();
+    });
+  });
+
   test("closes without growing duplicate calculator history entries", async ({ harness, page }) => {
     await page.setViewportSize({ width: 1280, height: 633 });
 

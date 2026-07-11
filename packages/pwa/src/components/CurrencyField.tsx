@@ -41,6 +41,9 @@ type CurrencyFieldCalculatorState = {
   isClosingFromRouteChange: boolean;
 };
 
+const CALCULATOR_FIELD_BUTTON_ATTRIBUTE = "data-calculator-field-button";
+const CALCULATOR_BUTTON_FOCUS_IGNORE_MS = 750;
+
 function getCalculatorFieldLabel(props: React.ComponentProps<typeof AppCurrencyField>) {
   const ariaLabel = (props as { "aria-label"?: unknown })["aria-label"];
 
@@ -53,6 +56,12 @@ function blurFocusedCalculatorField() {
   if (activeElement instanceof HTMLElement && activeElement !== document.body) {
     activeElement.blur();
   }
+}
+
+function isCalculatorFieldButtonTarget(target: EventTarget | null) {
+  return (
+    target instanceof Element && target.closest(`[${CALCULATOR_FIELD_BUTTON_ATTRIBUTE}]`) !== null
+  );
 }
 
 export function CurrencyField({
@@ -112,6 +121,7 @@ function useCurrencyFieldCalculator({
     (fieldProps as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const isClosingFromCalculatorRef = useRef(false);
+  const lastCalculatorButtonInteractionTimeRef = useRef<number | null>(null);
   const pendingRouteOpenCalculatorIdRef = useRef<string | null>(null);
   const scheduledOpenTimeoutRef = useRef<number | null>(null);
   const [calculatorPresenceElementId, setCalculatorPresenceElementId] = useState(
@@ -285,7 +295,12 @@ function useCurrencyFieldCalculator({
   function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
     fieldProps.onFocus?.(event);
 
-    if (autoOpenCalculator && !isCalculatorActive && !isCalculatorAutoOpenSuppressed()) {
+    if (
+      autoOpenCalculator &&
+      !isCalculatorActive &&
+      !wasRecentCalculatorButtonInteraction() &&
+      !isCalculatorAutoOpenSuppressed()
+    ) {
       openCalculator();
     }
   }
@@ -325,7 +340,32 @@ function useCurrencyFieldCalculator({
     }, 0);
   }
 
+  function wasRecentCalculatorButtonInteraction() {
+    const lastInteractionTime = lastCalculatorButtonInteractionTimeRef.current;
+
+    if (lastInteractionTime === null) {
+      return false;
+    }
+
+    return performance.now() - lastInteractionTime < CALCULATOR_BUTTON_FOCUS_IGNORE_MS;
+  }
+
+  function shouldIgnoreAutoOpenFromTarget(target: EventTarget | null) {
+    if (!isCalculatorFieldButtonTarget(target)) {
+      return false;
+    }
+
+    lastCalculatorButtonInteractionTimeRef.current = performance.now();
+    clearScheduledOpenCalculator();
+    return true;
+  }
+
   function handlePointerDownCapture(event: React.PointerEvent<HTMLDivElement>) {
+    if (shouldIgnoreAutoOpenFromTarget(event.target)) {
+      onPointerDownCapture?.(event);
+      return;
+    }
+
     if (fieldContainerRef.current?.contains(event.target as Node)) {
       scheduleOpenCalculatorFromUserInteraction();
     }
@@ -333,6 +373,11 @@ function useCurrencyFieldCalculator({
   }
 
   function handleMouseDownCapture(event: React.MouseEvent<HTMLDivElement>) {
+    if (shouldIgnoreAutoOpenFromTarget(event.target)) {
+      onMouseDownCapture?.(event);
+      return;
+    }
+
     if (fieldContainerRef.current?.contains(event.target as Node)) {
       scheduleOpenCalculatorFromUserInteraction();
     }
@@ -345,7 +390,11 @@ function useCurrencyFieldCalculator({
       return;
     }
 
-    function handleNativePointerStart() {
+    function handleNativePointerStart(event: PointerEvent | MouseEvent) {
+      if (shouldIgnoreAutoOpenFromTarget(event.target)) {
+        return;
+      }
+
       scheduleOpenCalculatorFromUserInteraction();
     }
 
@@ -402,6 +451,7 @@ function CalculatorFieldButton({
       icon={isCalculatorActive ? "lucide.x" : "lucide.calculator"}
       aria-label={isCalculatorActive ? t`Close calculator` : t`Open calculator`}
       color="transparent"
+      data-calculator-field-button=""
       data-presence-proxy-element-id={configuredPresenceElementId}
       className={className ?? "absolute top-1/2 right-1 h-8 w-8 -translate-y-1/2"}
       iconClassName="size-4"
