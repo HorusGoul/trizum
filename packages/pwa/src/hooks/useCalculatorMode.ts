@@ -43,6 +43,21 @@ function roundToDecimals(value: number, decimals: number | null): number {
   return (sign * Math.round(Math.abs(value) * factor + 1e-10)) / factor;
 }
 
+export function getChangedCalculatorValue({
+  currentValue,
+  decimals,
+  nextValue,
+}: {
+  currentValue: number;
+  decimals: number | null;
+  nextValue: number;
+}) {
+  const roundedCurrentValue = roundToDecimals(currentValue, decimals);
+  const roundedNextValue = roundToDecimals(nextValue, decimals);
+
+  return roundedCurrentValue === roundedNextValue ? null : roundedNextValue;
+}
+
 export interface CalculatorState {
   isActive: boolean;
   expression: string;
@@ -157,7 +172,15 @@ export function useCalculatorMode({
   const previewValue = rawPreviewValue !== null ? roundToDecimals(rawPreviewValue, decimals) : null;
 
   function applyValue(val: number) {
-    onChange(roundToDecimals(val, decimals));
+    const nextValue = getChangedCalculatorValue({
+      currentValue: value,
+      decimals,
+      nextValue: val,
+    });
+
+    if (nextValue !== null) {
+      onChange(nextValue);
+    }
   }
 
   function activate({ selectAll = true }: { selectAll?: boolean } = {}) {

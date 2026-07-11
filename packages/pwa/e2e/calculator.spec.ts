@@ -293,6 +293,63 @@ test.describe("Expense calculator", () => {
     ).toBeVisible();
   });
 
+  test("keeps fractional participant split when closing an unchanged amount calculator", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.seedPartyList({
+      username: "Harness User",
+      phone: "",
+      autoOpenCalculator: false,
+      lastOpenedPartyId: seededParty.partyId,
+      parties: {
+        [seededParty.partyId]: true,
+      },
+      participantInParties: {
+        [seededParty.partyId]: defaultParticipants.blair.id,
+      },
+    });
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+    await page.getByLabel("Amount", { exact: true }).fill("90");
+
+    const blairCheckbox = page.getByRole("checkbox", {
+      name: defaultParticipants.blair.name,
+      exact: true,
+    });
+    await blairCheckbox.setChecked(true, { force: true });
+    await expect(blairCheckbox).toBeChecked();
+
+    const blairSharesField = page.getByLabel(`Shares for ${defaultParticipants.blair.name}`, {
+      exact: true,
+    });
+    const blairAmountField = page.getByLabel(`Amount for ${defaultParticipants.blair.name}`, {
+      exact: true,
+    });
+
+    await expect(blairSharesField).toBeVisible();
+    await expect(blairAmountField).toHaveValue("90");
+
+    await page
+      .locator(
+        `[data-calculator-field-button][data-presence-proxy-element-id="participant-${defaultParticipants.blair.id}"]`,
+      )
+      .click();
+    await expect(page).toHaveURL(/\/add\?calculator=share-participant-blair$/);
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/add$/);
+
+    await expect(blairSharesField).toBeVisible();
+    await expect(blairAmountField).toHaveValue("90");
+  });
+
   test("keeps the participant field visible on mobile", async ({ harness, page }) => {
     await page.setViewportSize({ width: 390, height: 520 });
 

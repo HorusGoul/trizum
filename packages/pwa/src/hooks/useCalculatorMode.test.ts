@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vite-plus/test";
-import { deleteCalculatorText, insertCalculatorText } from "./useCalculatorMode.ts";
+import {
+  deleteCalculatorText,
+  getChangedCalculatorValue,
+  insertCalculatorText,
+} from "./useCalculatorMode.ts";
 
 describe("calculator text editing", () => {
   test("replaces selected expression text on insert", () => {
@@ -52,5 +56,35 @@ describe("calculator text editing", () => {
       expression: "4",
       cursorPosition: 0,
     });
+  });
+});
+
+describe("calculator value changes", () => {
+  test("ignores values that do not change after rounding", () => {
+    expect(
+      getChangedCalculatorValue({
+        currentValue: 50,
+        decimals: 2,
+        nextValue: 50,
+      }),
+    ).toBeNull();
+
+    expect(
+      getChangedCalculatorValue({
+        currentValue: 50,
+        decimals: 2,
+        nextValue: 50.004,
+      }),
+    ).toBeNull();
+  });
+
+  test("returns the rounded value when it changes", () => {
+    expect(
+      getChangedCalculatorValue({
+        currentValue: 50,
+        decimals: 2,
+        nextValue: 50.005,
+      }),
+    ).toBe(50.01);
   });
 });
