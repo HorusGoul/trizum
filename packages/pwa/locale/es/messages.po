@@ -247,11 +247,11 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/components/CalculatorToolbar.tsx:1101
+#: src/components/CalculatorToolbar.tsx:1105
 msgid "Attachment preview"
 msgstr "Vista previa del adjunto"
 
-#: src/components/CalculatorToolbar.tsx:1071
+#: src/components/CalculatorToolbar.tsx:1075
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Adjuntos"
@@ -405,8 +405,8 @@ msgstr "Franco Burundés"
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:967
-#: src/components/CalculatorToolbar.tsx:986
+#: src/components/CalculatorToolbar.tsx:971
+#: src/components/CalculatorToolbar.tsx:990
 msgid "Calculator"
 msgstr "Calculadora"
 
@@ -524,7 +524,7 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:1089
+#: src/components/CalculatorToolbar.tsx:1093
 msgid "Close attachment preview"
 msgstr "Cerrar vista previa del adjunto"
 
@@ -2879,29 +2879,9 @@ msgstr "vía"
 msgid "Vietnamese Dong"
 msgstr "Dong Vietnamita"
 
-#. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1154
-msgid "View attachment"
-msgstr "Ver adjunto"
-
-#: src/components/CalculatorToolbar.tsx:1041
+#: src/components/CalculatorToolbar.tsx:30
 msgid "View attachment {attachmentNumber}"
 msgstr "Ver adjunto {attachmentNumber}"
-
-#. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1149
-msgid "View attachment 1"
-msgstr "Ver adjunto 1"
-
-#. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1151
-msgid "View attachment 2"
-msgstr "Ver adjunto 2"
-
-#. js-lingui-explicit-id
-#: src/components/CalculatorToolbar.tsx:1153
-msgid "View attachment 3"
-msgstr "Ver adjunto 3"
 
 #: src/routes/about/route.tsx:89
 msgid "View on GitHub"

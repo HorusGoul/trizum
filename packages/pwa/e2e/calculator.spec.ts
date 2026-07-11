@@ -517,8 +517,10 @@ test.describe("Expense calculator", () => {
     });
     await harness.navigate(`/party/${seededParty.partyId}/add`);
 
-    await page.locator('input[aria-label="Upload photo"]').setInputFiles(receiptImagePath);
-    await expect(page.getByRole("button", { name: "View photo" })).toBeVisible();
+    await page
+      .locator('input[aria-label="Upload photo"]')
+      .setInputFiles(Array.from({ length: 4 }, () => receiptImagePath));
+    await expect(page.getByRole("button", { name: "View photo" })).toHaveCount(4);
 
     const amountField = page.getByLabel("Amount", { exact: true });
     const calculator = page.getByRole("application", { name: "Calculator" });
@@ -533,6 +535,14 @@ test.describe("Expense calculator", () => {
       name: "View attachment 1",
     });
     await expect(attachmentsToolbar).toBeVisible();
+    for (let attachmentNumber = 1; attachmentNumber <= 4; attachmentNumber++) {
+      await expect(
+        attachmentsToolbar.getByRole("button", {
+          name: `View attachment ${attachmentNumber}`,
+          exact: true,
+        }),
+      ).toBeVisible();
+    }
     await expect
       .poll(async () => {
         const toolbarBox = await attachmentsToolbarShell.boundingBox();

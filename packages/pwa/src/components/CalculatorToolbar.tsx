@@ -1,4 +1,5 @@
-import { t } from "@lingui/core/macro";
+import { msg, t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
@@ -26,6 +27,9 @@ const MOBILE_SCROLL_RESTORE_TOLERANCE = 2;
 const MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE = "calc(var(--safe-area-inset-top, 0px) + 4rem)";
 const MOBILE_SCROLL_ALLOWANCE_PROPERTY = "--calculator-mobile-scroll-allowance";
 const EMPTY_ATTACHMENT_PHOTO_IDS: MediaFile["id"][] = [];
+const viewAttachmentMessage = msg({
+  message: "View attachment {attachmentNumber}",
+});
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 
 function getCurrencyPreviewFormatter(currency: string) {
@@ -1139,20 +1143,16 @@ function CalculatorMobileAttachmentButton({
   onSelect: React.Dispatch<React.SetStateAction<number | null>>;
   url: string;
 }) {
+  const { i18n } = useLingui();
   const attachmentNumber = index + 1;
 
   return (
     <Button
       color="transparent"
-      aria-label={
-        attachmentNumber === 1
-          ? t({ id: "View attachment 1", message: "View attachment 1" })
-          : attachmentNumber === 2
-            ? t({ id: "View attachment 2", message: "View attachment 2" })
-            : attachmentNumber === 3
-              ? t({ id: "View attachment 3", message: "View attachment 3" })
-              : t({ id: "View attachment", message: "View attachment" })
-      }
+      aria-label={i18n._({
+        ...viewAttachmentMessage,
+        values: { attachmentNumber },
+      })}
       onPress={() => onSelect(index)}
       className={cn(
         "border-accent-200 bg-accent-50 dark:bg-accent-900 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
