@@ -167,6 +167,20 @@ function useCurrencyFieldCalculator({
       return;
     }
 
+    if (
+      activeCalculatorId === undefined &&
+      !state.isActive &&
+      isClosedFromCalculator &&
+      isClosingFromCalculatorRef.current
+    ) {
+      isClosingFromCalculatorRef.current = false;
+      setCalculatorCloseState((currentState) => ({
+        ...currentState,
+        isClosedFromCalculator: false,
+      }));
+      return;
+    }
+
     if (activeCalculatorId === calculatorFieldId) {
       pendingRouteOpenCalculatorIdRef.current = null;
       if (state.isActive || isClosedFromCalculator || isClosingFromCalculatorRef.current) {
