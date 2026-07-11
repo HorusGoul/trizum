@@ -430,6 +430,9 @@ test.describe("Expense calculator", () => {
 
     const attachmentsToolbarShell = page.locator("[data-calculator-attachment-toolbar]");
     const attachmentsToolbar = page.getByRole("toolbar", { name: "Attachments" });
+    const firstAttachmentButton = attachmentsToolbar.getByRole("button", {
+      name: "View attachment 1",
+    });
     await expect(attachmentsToolbar).toBeVisible();
     await expect
       .poll(async () => {
@@ -442,11 +445,73 @@ test.describe("Expense calculator", () => {
         return Math.round(toolbarBox.y);
       })
       .toBe(0);
+    await expect
+      .poll(async () =>
+        attachmentsToolbarShell.evaluate((element) => {
+          const style = window.getComputedStyle(element);
+          const backgroundColor = style.backgroundColor;
+
+          return {
+            backdropFilter: style.backdropFilter,
+            hasTransparentBackground:
+              backgroundColor.startsWith("rgba(") || backgroundColor.includes("/"),
+          };
+        }),
+      )
+      .toEqual({
+        backdropFilter: "none",
+        hasTransparentBackground: false,
+      });
+    await expect
+      .poll(async () => {
+        const toolbarBox = await attachmentsToolbar.boundingBox();
+        const buttonBox = await firstAttachmentButton.boundingBox();
+
+        if (!toolbarBox || !buttonBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.round(buttonBox.x - toolbarBox.x);
+      })
+      .toBe(8);
+    await expect
+      .poll(async () => {
+        const buttonBox = await firstAttachmentButton.boundingBox();
+        const imageBox = await firstAttachmentButton.locator("img").boundingBox();
+
+        if (!buttonBox || !imageBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.min(
+          Math.round(imageBox.x - buttonBox.x),
+          Math.round(imageBox.y - buttonBox.y),
+          Math.round(buttonBox.x + buttonBox.width - (imageBox.x + imageBox.width)),
+          Math.round(buttonBox.y + buttonBox.height - (imageBox.y + imageBox.height)),
+        );
+      })
+      .toBeGreaterThanOrEqual(1);
     await expect(page.getByRole("region", { name: "Attachment preview" })).toHaveCount(0);
 
-    await attachmentsToolbar.getByRole("button", { name: "View attachment 1" }).click();
+    await firstAttachmentButton.click();
     const attachmentPreview = page.getByRole("region", { name: "Attachment preview" });
     await expect(attachmentPreview).toBeVisible();
+    await expect
+      .poll(async () => {
+        const toolbarBox = await attachmentsToolbar.boundingBox();
+        const closeButtonBox = await page
+          .getByRole("button", { name: "Close attachment preview" })
+          .boundingBox();
+
+        if (!toolbarBox || !closeButtonBox) {
+          return Number.POSITIVE_INFINITY;
+        }
+
+        return Math.round(
+          toolbarBox.x + toolbarBox.width - (closeButtonBox.x + closeButtonBox.width),
+        );
+      })
+      .toBe(8);
     await expect
       .poll(async () => {
         const toolbarBox = await attachmentsToolbarShell.boundingBox();

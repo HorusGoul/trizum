@@ -1059,7 +1059,7 @@ function CalculatorMobileAttachmentContent({
     <>
       <m.div
         data-calculator-attachment-toolbar=""
-        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950/95 pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white/95 shadow-sm backdrop-blur-md"
+        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950 pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white shadow-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -1071,8 +1071,7 @@ function CalculatorMobileAttachmentContent({
           aria-label={t`Attachments`}
           className="border-accent-200/80 px-safe-or-2 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
         >
-          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto px-0.5 py-2">
-            <span aria-hidden className="w-px shrink-0" />
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
             {photoIds.map((photoId, index) => (
               <CalculatorMobileAttachmentButton
                 key={photoId}
@@ -1082,7 +1081,6 @@ function CalculatorMobileAttachmentContent({
                 url={urls[index]}
               />
             ))}
-            <span aria-hidden className="w-px shrink-0" />
           </div>
 
           {activeIndex !== null ? (
@@ -1157,12 +1155,17 @@ function CalculatorMobileAttachmentButton({
       }
       onPress={() => onSelect(index)}
       className={cn(
-        "border-accent-200 h-12 w-12 shrink-0 rounded-lg border p-0 dark:border-accent-700",
-        isActive && "ring-accent-500 dark:ring-accent-400 ring-2",
+        "border-accent-200 bg-accent-50 dark:bg-accent-900 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
+        isActive && "ring-accent-500 dark:ring-accent-400 ring-2 ring-inset",
       )}
     >
-      <span className="block h-full w-full overflow-hidden rounded-[inherit]">
-        <img src={url} alt="" className="h-full w-full object-cover" />
+      <span
+        className={cn(
+          "pointer-events-none absolute overflow-hidden",
+          isActive ? "inset-[3px] rounded-[0.35rem]" : "inset-px rounded-[0.45rem]",
+        )}
+      >
+        <img src={url} alt="" className="block h-full w-full object-cover" />
       </span>
     </Button>
   );
