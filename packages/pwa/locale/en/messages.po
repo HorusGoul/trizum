@@ -38,6 +38,10 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
+#: src/lib/partySharePreviewMessages.ts:15
+msgid "{title} preview"
+msgstr "{title} preview"
+
 #: src/routes/about.tsx:158
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
@@ -677,7 +681,7 @@ msgstr "Continue with Google"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/routes/party_.$partyId.share.tsx:95
+#: src/routes/party_.$partyId.share.tsx:98
 msgid "Copy party link"
 msgstr "Copy party link"
 
@@ -1050,7 +1054,7 @@ msgstr "Failed to add expense"
 msgid "Failed to check for updates"
 msgstr "Failed to check for updates"
 
-#: src/routes/party_.$partyId.share.tsx:45
+#: src/routes/party_.$partyId.share.tsx:48
 msgid "Failed to copy party link to clipboard, please copy it manually"
 msgstr "Failed to copy party link to clipboard, please copy it manually"
 
@@ -1363,7 +1367,11 @@ msgstr "Join"
 msgid "Join {0} on trizum!"
 msgstr "Join {0} on trizum!"
 
-#: src/routes/party_.$partyId.share.tsx:33
+#: src/lib/partySharePreviewMessages.ts:11
+msgid "Join {partyName} on trizum"
+msgstr "Join {partyName} on trizum"
+
+#: src/routes/party_.$partyId.share.tsx:36
 msgid "Join {partyName} on trizum!"
 msgstr "Join {partyName} on trizum!"
 
@@ -1375,6 +1383,10 @@ msgstr "Join a Party"
 #: src/routes/join.tsx:122
 msgid "Join a trizum"
 msgstr "Join a trizum"
+
+#: src/lib/partySharePreviewMessages.ts:6
+msgid "Join party"
+msgstr "Join party"
 
 #: src/routes/party.$partyId.tsx:66
 msgid "Joined {0}!"
@@ -1800,6 +1812,10 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
+#: src/lib/partySharePreviewMessages.ts:7
+msgid "Open this party to split expenses and settle up together on trizum."
+msgstr "Open this party to split expenses and settle up together on trizum."
+
 #: src/components/ExpenseEditor.tsx:201
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
@@ -1905,7 +1921,7 @@ msgstr "Party is completely balanced!"
 msgid "Party leaderboard"
 msgstr "Party leaderboard"
 
-#: src/routes/party_.$partyId.share.tsx:43
+#: src/routes/party_.$partyId.share.tsx:46
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
 
@@ -1925,7 +1941,7 @@ msgstr "Party Settings"
 msgid "Party settings saved!"
 msgstr "Party settings saved!"
 
-#: src/routes/party_.$partyId.share.tsx:37
+#: src/routes/party_.$partyId.share.tsx:40
 msgid "Party shared!"
 msgstr "Party shared!"
 
@@ -2274,8 +2290,8 @@ msgstr "Settled in"
 msgid "Seychellois Rupee"
 msgstr "Seychellois Rupee"
 
-#: src/routes/party_.$partyId.share.tsx:55
-#: src/routes/party_.$partyId.share.tsx:90
+#: src/routes/party_.$partyId.share.tsx:58
+#: src/routes/party_.$partyId.share.tsx:93
 #: src/routes/party.$partyId/route.tsx:247
 msgid "Share party"
 msgstr "Share party"
@@ -2283,6 +2299,10 @@ msgstr "Share party"
 #: src/components/PartyPendingComponent.tsx:14
 msgid "Share the party link so others can join."
 msgstr "Share the party link so others can join."
+
+#: src/lib/partySharePreviewMessages.ts:4
+msgid "Shared expenses"
+msgstr "Shared expenses"
 
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:19
 msgid "Shares"
@@ -2428,6 +2448,14 @@ msgstr "Split bills with friends and family. Track expenses, calculate balances,
 #: src/routes/about/route.tsx:50
 msgid "Split bills with friends and family. Track, calculate, and settle expenses together."
 msgstr "Split bills with friends and family. Track, calculate, and settle expenses together."
+
+#: src/lib/partySharePreviewMessages.ts:3
+msgid "Split bills with friends, family, and roommates."
+msgstr "Split bills with friends, family, and roommates."
+
+#: src/lib/partySharePreviewMessages.ts:5
+msgid "Split expenses and settle up together on trizum."
+msgstr "Split expenses and settle up together on trizum."
 
 #: src/routes/about/route.tsx:75
 msgid "Split expenses fairly among multiple participants"
@@ -2843,7 +2871,7 @@ msgstr "Update who you are in this party so that we can show you the expenses an
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
-#: src/components/UpdateController.tsx:40
+#: src/components/UpdateController.tsx:69
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
@@ -2939,6 +2967,10 @@ msgstr "Venezuelan Bolívar Soberano"
 #: src/routes/about/route.tsx:34
 msgid "Version"
 msgstr "Version"
+
+#: src/lib/partySharePreviewMessages.ts:8
+msgid "via"
+msgstr "via"
 
 #: src/routes/new/route.tsx:319
 msgid "Vietnamese Dong"

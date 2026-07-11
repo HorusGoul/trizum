@@ -5,6 +5,8 @@ import { cloudSyncRoute } from "./routes/cloud-sync";
 import type { ApiHonoEnv } from "./env";
 import { getRedactedPath, workerLogger } from "./log";
 import { createApiCorsMiddleware } from "./cors";
+import { partySharePreviewRoute } from "./routes/party-share-preview";
+import { createApiI18nMiddleware } from "./i18n";
 
 const app = new Hono<ApiHonoEnv>();
 
@@ -31,9 +33,11 @@ app.use("*", async (c, next) => {
   }
 });
 
+app.use("*", createApiI18nMiddleware());
 app.use("/api/*", createApiCorsMiddleware());
 
 app.get("/api/health", (c) => c.json({ ok: true }));
+app.route("/", partySharePreviewRoute);
 app.on(["GET", "POST"], "/api/auth/*", (c) =>
   createAuth(c.env, c.executionCtx, c.req.raw).handler(c.req.raw),
 );

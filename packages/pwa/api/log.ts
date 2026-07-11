@@ -38,5 +38,19 @@ export function getRedactedPath(request: Request) {
     return "/api/auth/reset-password/:token";
   }
 
+  if (pathname.startsWith("/api/og/party/")) {
+    return "/api/og/party/:partyId";
+  }
+
+  if (pathname.startsWith("/party/")) {
+    const segments = pathname.split("/");
+
+    if (segments[2]) {
+      segments[2] = ":partyId";
+    }
+
+    return segments.join("/");
+  }
+
   return pathname;
 }

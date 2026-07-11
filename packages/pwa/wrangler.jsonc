@@ -9,7 +9,7 @@
     "directory": "./dist/client",
     "not_found_handling": "single-page-application",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"],
+    "run_worker_first": ["/api/*", "/party/*"],
   },
   "observability": {
     "enabled": true,
@@ -35,6 +35,8 @@
   "vars": {
     "APPLE_APP_BUNDLE_IDENTIFIER": "app.trizum.capacitor",
     "APPLE_SERVICE_ID": "app.trizum.capacitor.si",
+    "AUTOMERGE_WSS_URL": "wss://server.trizum.app/sync",
+    "PARTY_SHARE_PREVIEW_TIMEOUT_MS": "10000",
     "AUTH_EMAIL_FROM": "trizum <noreply@trizum.app>",
     "BETTER_AUTH_ALLOWED_HOSTS": "trizum.app,*.horusdev.workers.dev,localhost:5173,localhost:8787,127.0.0.1:5173,127.0.0.1:8787",
     "BETTER_AUTH_TRUSTED_ORIGINS": "https://trizum.app,https://*.horusdev.workers.dev,capacitor://localhost,ionic://localhost,https://localhost,http://localhost,http://localhost:5173,http://localhost:8787",

@@ -17,7 +17,7 @@ import { Popover } from "#src/ui/Popover.js";
 import { cn } from "#src/ui/utils.js";
 import { Icon } from "#src/ui/Icon.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.ts";
-import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/i18n.js";
+import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/locales.js";
 import { TrizumSpinner } from "./TrizumSpinner.js";
 
 interface EmojiData {

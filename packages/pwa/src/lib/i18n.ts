@@ -1,18 +1,7 @@
 import { i18n } from "@lingui/core";
 import * as catalogEn from "#locale/en/messages.po";
 import * as catalogEs from "#locale/es/messages.po";
-
-/**
- * Supported locales in the application
- */
-export const SUPPORTED_LOCALES = ["en", "es"] as const;
-
-/**
- * Default fallback locale
- */
-export const DEFAULT_LOCALE = "en" as const;
-
-export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
+import { getSupportedLocale, type SupportedLocale } from "./locales.js";
 
 /**
  * Retrieves the browser locale or returns the default locale.
@@ -23,18 +12,7 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export function getBrowserLocale(): SupportedLocale {
   // Try to get locale from browser
   const browserLocale = navigator.language ?? navigator.languages?.[0];
-
-  if (browserLocale) {
-    // Extract base locale (e.g., "en-US" -> "en")
-    const baseLocale = browserLocale.split("-")[0]?.toLowerCase();
-
-    // Check if it's a supported locale
-    if (baseLocale && SUPPORTED_LOCALES.includes(baseLocale as SupportedLocale)) {
-      return baseLocale as SupportedLocale;
-    }
-  }
-
-  return DEFAULT_LOCALE;
+  return getSupportedLocale(browserLocale);
 }
 
 /**
