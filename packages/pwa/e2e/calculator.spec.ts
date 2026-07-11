@@ -313,6 +313,20 @@ test.describe("Expense calculator", () => {
         )
         .toBeGreaterThan(0);
 
+      await expect(calculator).toHaveCSS("transform", "none");
+      await expect
+        .poll(async () => {
+          const fieldBox = await participantAmountField.boundingBox();
+          const calculatorBox = await calculator.boundingBox();
+
+          if (!fieldBox || !calculatorBox) {
+            return Number.POSITIVE_INFINITY;
+          }
+
+          return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
+        })
+        .toBeLessThanOrEqual(0);
+
       await page.clock.runFor(700);
       await page.clock.resume();
 
@@ -1083,7 +1097,10 @@ test.describe("Expense calculator", () => {
     await expect(page).toHaveURL(/\/add$/);
   });
 
-  test("lets Enter activate a focused calculator keypad button", async ({ harness, page }) => {
+  test("lets Enter and Space activate a focused calculator keypad button", async ({
+    harness,
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 633 });
     await navigateToAddExpense({ autoOpenCalculator: true, harness });
 
@@ -1100,6 +1117,13 @@ test.describe("Expense calculator", () => {
     await page.keyboard.press("Enter");
 
     await expect(amountField).toHaveValue("7");
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+    await expect(sevenButton).toBeFocused();
+
+    await page.keyboard.press("Space");
+
+    await expect(amountField).toHaveValue("77");
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
     await expect(calculator).toBeVisible();
     await expect(sevenButton).toBeFocused();
