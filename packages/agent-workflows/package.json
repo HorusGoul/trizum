@@ -57,7 +57,7 @@
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "typescript": "catalog:",
+    "@typescript/native": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   }

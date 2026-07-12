@@ -54,6 +54,6 @@
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/ws": "catalog:",
-    "typescript": "catalog:"
+    "@typescript/native": "catalog:"
   }
 }

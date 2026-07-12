@@ -57,6 +57,7 @@
     "@capawesome/capver": "catalog:",
     "@trizum/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "sharp": "catalog:",
     "svgexport": "catalog:",
     "typescript": "catalog:"

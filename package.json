@@ -36,6 +36,7 @@
     "oxlint-plugin-react-doctor": "catalog:",
     "react-doctor": "catalog:",
     "skills-npm": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
