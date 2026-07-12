@@ -134,7 +134,7 @@ export async function runSandcastleCodexFix(
 }
 
 function resolveCodexModel(): string {
-  return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || "gpt-5.5";
+  return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || "gpt-5.6-sol";
 }
 
 function createCodexAgent(): AgentProvider {
@@ -177,7 +177,7 @@ function resolveCodexEffort(): CodexEffort | undefined {
     return effort;
   }
 
-  return "xhigh";
+  return "high";
 }
 
 function buildSandcastleReviewPrompt(context: PullRequestContext): string {

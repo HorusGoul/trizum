@@ -43,6 +43,9 @@ fixes. Review runs use a disposable Sandcastle branch that is removed after the
 run. Superseding fixes use the branch that becomes the replacement PR. The
 workflow passes `--ignore-user-config` to `codex exec` so automation uses Codex
 auth from `CODEX_HOME` without inheriting personal MCP, hook, or local config.
+By default, Codex uses `gpt-5.6-sol` with `high` reasoning effort. Set
+`TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL` or
+`TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT` to override either setting.
 
 Use `--no-codex` or `--codex off` to run only the deterministic review.
 Use `--codex required` to treat a failed Codex review as a blocker.
