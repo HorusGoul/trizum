@@ -1,6 +1,6 @@
 {
   "extends": "@trizum/tsconfig/base.json",
-  "include": ["capacitor.config.ts", "capacitor.log.ts"],
+  "include": ["capacitor.log.ts"],
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "types": ["node"],
