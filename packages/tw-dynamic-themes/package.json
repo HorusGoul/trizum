@@ -38,7 +38,7 @@
     "@trizum/tsconfig": "workspace:*",
     "@types/culori": "catalog:",
     "@types/node": "catalog:",
-    "typescript": "catalog:",
+    "@typescript/native": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   }
