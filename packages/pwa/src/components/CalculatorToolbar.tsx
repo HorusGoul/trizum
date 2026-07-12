@@ -1,6 +1,6 @@
 import { msg, t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
-import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Sheet } from "react-modal-sheet";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
@@ -31,6 +31,7 @@ const viewAttachmentMessage = msg({
   message: "View attachment {attachmentNumber}",
 });
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
+let mobileScrollAllowanceOwner: symbol | null = null;
 
 function getCurrencyPreviewFormatter(currency: string) {
   const cachedFormatter = currencyPreviewFormatterCache.get(currency);
@@ -112,8 +113,17 @@ function blurCalculatorFocus() {
   window.requestAnimationFrame(blurActiveElement);
 }
 
-function removeMobileScrollAllowance() {
+function claimMobileScrollAllowance(owner: symbol) {
+  mobileScrollAllowanceOwner = owner;
+}
+
+function releaseMobileScrollAllowance(owner: symbol) {
+  if (mobileScrollAllowanceOwner !== owner || typeof document === "undefined") {
+    return;
+  }
+
   document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
+  mobileScrollAllowanceOwner = null;
 }
 
 function getCurrentWindowScrollPosition(): WindowScrollPosition | null {
@@ -464,14 +474,17 @@ function useCalculatorKeyboard({
 }) {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      const target = e.target as HTMLElement | null;
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      const isButtonActivation =
+        (e.key === "Enter" || e.key === " " || e.key === "Spacebar") &&
+        Boolean(target?.closest('button, [role="button"]'));
       const isEditableTarget =
         target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
       const isCalculatorTarget =
         target &&
         (fieldContainerRef.current?.contains(target) || toolbarRef.current?.contains(target));
 
-      if (isEditableTarget && !isCalculatorTarget) {
+      if (isButtonActivation || (isEditableTarget && !isCalculatorTarget)) {
         return;
       }
 
@@ -487,10 +500,11 @@ function useCalculatorKeyboard({
         case "*":
         case "/":
         case ".":
+        case ",":
         case "(":
         case ")":
           e.preventDefault();
-          callbacksRef.current.onInsert(e.key);
+          callbacksRef.current.onInsert(e.key === "," ? "." : e.key);
           break;
         case "Backspace":
           e.preventDefault();
@@ -537,6 +551,8 @@ function useMobileCalculatorScroll({
   toolbarRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [initialWindowScroll] = useState(() => getCurrentWindowScrollPosition());
+  const [scrollAllowanceOwner] = useState(() => Symbol("calculator-mobile-scroll-allowance"));
+  const finalFieldVisibilityCheckTimeoutRef = useRef<number | null>(null);
   const initialWindowScrollRef = useRef<WindowScrollPosition | null>(initialWindowScroll);
   const scrollFieldAboveMobileSheetRef = useRef<
     (behavior: ScrollBehavior, attempts?: number) => void
@@ -549,6 +565,7 @@ function useMobileCalculatorScroll({
 
     const allowanceHeight = Math.max(0, height);
     const root = document.documentElement;
+    claimMobileScrollAllowance(scrollAllowanceOwner);
 
     if (options?.animate && !root.style.getPropertyValue(MOBILE_SCROLL_ALLOWANCE_PROPERTY)) {
       root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
@@ -556,7 +573,9 @@ function useMobileCalculatorScroll({
 
     if (options?.animate) {
       window.requestAnimationFrame(() => {
-        root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
+        if (mobileScrollAllowanceOwner === scrollAllowanceOwner) {
+          root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
+        }
       });
     } else {
       root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
@@ -566,6 +585,17 @@ function useMobileCalculatorScroll({
   function scrollFieldAboveMobileSheet(behavior: ScrollBehavior, attempts = 0) {
     if (typeof window === "undefined" || isLargeScreen) {
       return;
+    }
+
+    if (attempts === 0) {
+      // A previous calculator may still be restoring its scroll position even
+      // after it has released the shared allowance. Stop that animation before
+      // the new owner calculates its own target.
+      window.scrollTo({
+        left: window.scrollX,
+        top: window.scrollY,
+        behavior: "auto",
+      });
     }
 
     const fieldElement = fieldContainerRef.current;
@@ -609,6 +639,19 @@ function useMobileCalculatorScroll({
         MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS / 4,
       );
     }
+
+    if (attempts === 0) {
+      if (finalFieldVisibilityCheckTimeoutRef.current !== null) {
+        window.clearTimeout(finalFieldVisibilityCheckTimeoutRef.current);
+      }
+
+      finalFieldVisibilityCheckTimeoutRef.current = window.setTimeout(() => {
+        finalFieldVisibilityCheckTimeoutRef.current = null;
+        if (mobileScrollAllowanceOwner === scrollAllowanceOwner) {
+          scrollFieldAboveMobileSheetRef.current("auto", 4);
+        }
+      }, MOBILE_SCROLL_RESTORE_TIMEOUT_MS);
+    }
   }
 
   useLayoutEffect(() => {
@@ -616,7 +659,7 @@ function useMobileCalculatorScroll({
   });
 
   function collapseMobileScrollAllowance() {
-    if (isLargeScreen) {
+    if (isLargeScreen || mobileScrollAllowanceOwner !== scrollAllowanceOwner) {
       return;
     }
 
@@ -669,9 +712,22 @@ function useMobileCalculatorScroll({
     await waitForInitialWindowScroll();
   }
 
+  function removeMobileScrollAllowance() {
+    releaseMobileScrollAllowance(scrollAllowanceOwner);
+  }
+
   useEffect(() => {
     return () => {
-      if (typeof window !== "undefined" && initialWindowScroll) {
+      if (finalFieldVisibilityCheckTimeoutRef.current !== null) {
+        window.clearTimeout(finalFieldVisibilityCheckTimeoutRef.current);
+        finalFieldVisibilityCheckTimeoutRef.current = null;
+      }
+
+      if (
+        typeof window !== "undefined" &&
+        initialWindowScroll &&
+        mobileScrollAllowanceOwner === scrollAllowanceOwner
+      ) {
         document.documentElement.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
         window.scrollTo({
           left: initialWindowScroll.left,
@@ -679,23 +735,23 @@ function useMobileCalculatorScroll({
           behavior: "smooth",
         });
         window.setTimeout(
-          () => document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY),
+          () => releaseMobileScrollAllowance(scrollAllowanceOwner),
           MOBILE_SCROLL_RESTORE_TIMEOUT_MS,
         );
         return;
       }
 
-      document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
+      releaseMobileScrollAllowance(scrollAllowanceOwner);
     };
-  }, [initialWindowScroll]);
+  }, [initialWindowScroll, scrollAllowanceOwner]);
 
   useEffect(() => {
     if (!isLargeScreen) {
       return;
     }
 
-    document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
-  }, [isLargeScreen]);
+    releaseMobileScrollAllowance(scrollAllowanceOwner);
+  }, [isLargeScreen, scrollAllowanceOwner]);
 
   return {
     finishInitialWindowScrollRestore,
@@ -1051,6 +1107,8 @@ function CalculatorMobileAttachmentContent({
   setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
   sheetHeight: number;
 }) {
+  const attachmentButtonIdPrefix = useId();
+  const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
   const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
     required: true as const,
   }).map(({ doc }) => doc);
@@ -1058,6 +1116,29 @@ function CalculatorMobileAttachmentContent({
   const galleryItems: MediaGalleryItem[] = urls.map((url) => ({ src: url }));
   const activeIndex =
     selectedIndex !== null && selectedIndex < galleryItems.length ? selectedIndex : null;
+
+  function getAttachmentButtonId(index: number) {
+    return `${attachmentButtonIdPrefix}-${index}`;
+  }
+
+  function closeAttachmentPreview() {
+    pendingAttachmentFocusIndexRef.current = activeIndex;
+    setSelectedIndex(null);
+  }
+
+  useEffect(() => {
+    const indexToFocus = pendingAttachmentFocusIndexRef.current;
+    if (activeIndex !== null || indexToFocus === null) {
+      return;
+    }
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      pendingAttachmentFocusIndexRef.current = null;
+      document.getElementById(`${attachmentButtonIdPrefix}-${indexToFocus}`)?.focus();
+    });
+
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [activeIndex, attachmentButtonIdPrefix]);
 
   return (
     <>
@@ -1079,6 +1160,7 @@ function CalculatorMobileAttachmentContent({
             {photoIds.map((photoId, index) => (
               <CalculatorMobileAttachmentButton
                 key={photoId}
+                buttonId={getAttachmentButtonId(index)}
                 index={index}
                 isActive={activeIndex === index}
                 onSelect={setSelectedIndex}
@@ -1093,7 +1175,7 @@ function CalculatorMobileAttachmentContent({
               aria-label={t`Close attachment preview`}
               className="h-10 w-10 shrink-0"
               iconClassName="size-5"
-              onPress={() => setSelectedIndex(null)}
+              onPress={closeAttachmentPreview}
             />
           ) : null}
         </div>
@@ -1121,7 +1203,7 @@ function CalculatorMobileAttachmentContent({
                 index={activeIndex}
                 items={galleryItems}
                 onChange={setSelectedIndex}
-                onClose={() => setSelectedIndex(null)}
+                onClose={closeAttachmentPreview}
                 showCloseButton={false}
               />
             </div>
@@ -1133,11 +1215,13 @@ function CalculatorMobileAttachmentContent({
 }
 
 function CalculatorMobileAttachmentButton({
+  buttonId,
   index,
   isActive,
   onSelect,
   url,
 }: {
+  buttonId: string;
   index: number;
   isActive: boolean;
   onSelect: React.Dispatch<React.SetStateAction<number | null>>;
@@ -1148,7 +1232,9 @@ function CalculatorMobileAttachmentButton({
 
   return (
     <Button
+      id={buttonId}
       color="transparent"
+      aria-pressed={isActive}
       aria-label={i18n._({
         ...viewAttachmentMessage,
         values: { attachmentNumber },

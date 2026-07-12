@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vite-plus/test";
+import { evaluateExpression } from "#src/lib/evaluateExpression.ts";
 import {
   deleteCalculatorText,
   getChangedCalculatorValue,
@@ -18,6 +19,32 @@ describe("calculator text editing", () => {
       expression: "7",
       cursorPosition: 1,
     });
+  });
+
+  test("preserves a selected existing amount when inserting a binary operator", () => {
+    let edit = insertCalculatorText({
+      expression: "50",
+      cursorPosition: 2,
+      selectionRange: { start: 0, end: 2 },
+      text: "+",
+    });
+
+    edit = insertCalculatorText({
+      ...edit,
+      selectionRange: null,
+      text: "1",
+    });
+    edit = insertCalculatorText({
+      ...edit,
+      selectionRange: null,
+      text: "0",
+    });
+
+    expect(edit).toEqual({
+      expression: "50+10",
+      cursorPosition: 5,
+    });
+    expect(evaluateExpression(edit.expression)).toBe(60);
   });
 
   test("inserts at the cursor when there is no active selection", () => {

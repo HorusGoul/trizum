@@ -3,7 +3,6 @@ const CALCULATOR_AUTO_OPEN_POINTER_ALLOWANCE_MS = 500;
 
 let suppressCalculatorAutoOpenUntil = 0;
 let allowCalculatorAutoOpenUntil = 0;
-let blockCalculatorAutoOpenUntilUserInteraction = false;
 
 export function suppressCalculatorAutoOpen() {
   if (typeof performance === "undefined") {
@@ -11,7 +10,6 @@ export function suppressCalculatorAutoOpen() {
   }
 
   allowCalculatorAutoOpenUntil = 0;
-  blockCalculatorAutoOpenUntilUserInteraction = true;
   suppressCalculatorAutoOpenUntil = performance.now() + CALCULATOR_AUTO_OPEN_SUPPRESSION_MS;
 }
 
@@ -21,10 +19,7 @@ export function isCalculatorAutoOpenSuppressed() {
   }
 
   const now = performance.now();
-  return (
-    now >= allowCalculatorAutoOpenUntil &&
-    (blockCalculatorAutoOpenUntilUserInteraction || now < suppressCalculatorAutoOpenUntil)
-  );
+  return now >= allowCalculatorAutoOpenUntil && now < suppressCalculatorAutoOpenUntil;
 }
 
 export function allowCalculatorAutoOpenForUserInteraction() {
@@ -33,5 +28,4 @@ export function allowCalculatorAutoOpenForUserInteraction() {
   }
 
   allowCalculatorAutoOpenUntil = performance.now() + CALCULATOR_AUTO_OPEN_POINTER_ALLOWANCE_MS;
-  blockCalculatorAutoOpenUntilUserInteraction = false;
 }

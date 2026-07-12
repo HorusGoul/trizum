@@ -99,7 +99,7 @@ msgstr "Activo en este dispositivo"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:1477
+#: src/components/CalculatorToolbar.tsx:1563
 msgid "Add"
 msgstr "Sumar"
 
@@ -247,11 +247,11 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/components/CalculatorToolbar.tsx:1105
+#: src/components/CalculatorToolbar.tsx:1187
 msgid "Attachment preview"
 msgstr "Vista previa del adjunto"
 
-#: src/components/CalculatorToolbar.tsx:1075
+#: src/components/CalculatorToolbar.tsx:1156
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Adjuntos"
@@ -309,7 +309,7 @@ msgstr "Volver a configuración"
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
-#: src/components/CalculatorToolbar.tsx:1502
+#: src/components/CalculatorToolbar.tsx:1588
 msgid "Backspace"
 msgstr "Retroceso"
 
@@ -401,16 +401,16 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/components/CalculatorToolbar.tsx:1510
+#: src/components/CalculatorToolbar.tsx:1596
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:971
-#: src/components/CalculatorToolbar.tsx:990
+#: src/components/CalculatorToolbar.tsx:1027
+#: src/components/CalculatorToolbar.tsx:1046
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1342
+#: src/components/CalculatorToolbar.tsx:1428
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
@@ -507,7 +507,7 @@ msgstr "Elige la moneda para los gastos de este grupo"
 msgid "Choose who receives it"
 msgstr "Elige quién la recibe"
 
-#: src/components/CalculatorToolbar.tsx:1393
+#: src/components/CalculatorToolbar.tsx:1479
 msgid "Clear all"
 msgstr "Borrar todo"
 
@@ -519,20 +519,20 @@ msgstr "Borrar expresión"
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
-#: src/components/MediaGallery.tsx:218
+#: src/components/MediaGallery.tsx:243
 #: src/components/RouteQRScanner.tsx:60
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:1093
+#: src/components/CalculatorToolbar.tsx:1175
 msgid "Close attachment preview"
 msgstr "Cerrar vista previa del adjunto"
 
-#: src/components/CurrencyField.tsx:452
+#: src/components/CurrencyField.tsx:466
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1409
+#: src/components/CalculatorToolbar.tsx:1495
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
 
@@ -804,7 +804,7 @@ msgstr "Transferencia de deuda a otro grupo"
 msgid "Debt transferred"
 msgstr "Deuda transferida"
 
-#: src/components/CalculatorToolbar.tsx:1494
+#: src/components/CalculatorToolbar.tsx:1580
 msgid "Decimal point"
 msgstr "Punto decimal"
 
@@ -843,7 +843,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/components/CalculatorToolbar.tsx:1417
+#: src/components/CalculatorToolbar.tsx:1503
 msgid "Divide"
 msgstr "Dividir"
 
@@ -1555,7 +1555,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:1437
+#: src/components/CalculatorToolbar.tsx:1523
 msgid "Multiply"
 msgstr "Multiplicar"
 
@@ -1614,7 +1614,7 @@ msgstr "Nuevo trizum"
 msgid "New Zealand Dollar"
 msgstr "Dólar Neozelandés"
 
-#: src/components/MediaGallery.tsx:235
+#: src/components/MediaGallery.tsx:260
 msgid "Next"
 msgstr "Siguiente"
 
@@ -1736,7 +1736,7 @@ msgstr "Solo puedes transferir tus propias deudas"
 msgid "Open archived parties"
 msgstr "Abrir grupos archivados"
 
-#: src/components/CurrencyField.tsx:452
+#: src/components/CurrencyField.tsx:466
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
@@ -1752,7 +1752,7 @@ msgstr "Abrir GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
-#: src/components/CalculatorToolbar.tsx:1401
+#: src/components/CalculatorToolbar.tsx:1487
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
@@ -2019,7 +2019,7 @@ msgstr "Apunta tu cámara a un código QR de trizum"
 msgid "Polish Zloty"
 msgstr "Zloty Polaco"
 
-#: src/components/MediaGallery.tsx:228
+#: src/components/MediaGallery.tsx:253
 msgid "Previous"
 msgstr "Anterior"
 
@@ -2420,7 +2420,7 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:1457
+#: src/components/CalculatorToolbar.tsx:1543
 msgid "Subtract"
 msgstr "Restar"
 

@@ -121,8 +121,16 @@ export function insertCalculatorText({
   text,
 }: CalculatorTextEditOptions & { text: string }): CalculatorTextEditResult {
   const activeSelectionRange = getActiveSelectionRange({ expression, selectionRange });
-  const start = activeSelectionRange?.start ?? cursorPosition;
-  const end = activeSelectionRange?.end ?? cursorPosition;
+  const shouldAppendBinaryOperator =
+    activeSelectionRange?.start === 0 &&
+    activeSelectionRange.end === expression.length &&
+    /^[+\-*/]$/.test(text);
+  const start = shouldAppendBinaryOperator
+    ? activeSelectionRange.end
+    : (activeSelectionRange?.start ?? cursorPosition);
+  const end = shouldAppendBinaryOperator
+    ? activeSelectionRange.end
+    : (activeSelectionRange?.end ?? cursorPosition);
   const nextExpression = expression.slice(0, start) + text + expression.slice(end);
 
   return {

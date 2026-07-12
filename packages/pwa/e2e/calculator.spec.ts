@@ -3,7 +3,7 @@ import {
   createPartyFixture,
   defaultParticipants,
 } from "./harness/scenarios";
-import { expect, test } from "./harness/trizum.fixture";
+import { expect, test, type BrowserHarness } from "./harness/trizum.fixture";
 
 const scrollTargetParticipant = {
   id: "participant-traveler-24",
@@ -40,6 +40,37 @@ function createScrollableParticipantFixture() {
       },
     },
   };
+}
+
+async function navigateToAddExpense({
+  autoOpenCalculator,
+  fixture = createExpenseLogFixture(1),
+  harness,
+}: {
+  autoOpenCalculator: boolean;
+  fixture?: unknown;
+  harness: BrowserHarness;
+}) {
+  const seededParty = await harness.seedJoinedParty({
+    fixture,
+    memberParticipantId: defaultParticipants.blair.id,
+  });
+
+  await harness.seedPartyList({
+    username: "Harness User",
+    phone: "",
+    autoOpenCalculator,
+    lastOpenedPartyId: seededParty.partyId,
+    parties: {
+      [seededParty.partyId]: true,
+    },
+    participantInParties: {
+      [seededParty.partyId]: defaultParticipants.blair.id,
+    },
+  });
+  await harness.navigate(`/party/${seededParty.partyId}/add`);
+
+  return seededParty;
 }
 
 test.describe("Expense calculator", () => {
@@ -155,6 +186,24 @@ test.describe("Expense calculator", () => {
     await expect(calculator).not.toBeVisible();
   });
 
+  test("applies an operator to a selected existing amount", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+    await navigateToAddExpense({ autoOpenCalculator: false, harness });
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await amountField.fill("12");
+    await page.getByRole("button", { name: "Open calculator", exact: true }).click();
+    await expect(calculator).toBeVisible();
+
+    await calculator.getByRole("button", { name: "Add", exact: true }).click();
+    await calculator.getByRole("button", { name: "3", exact: true }).click();
+
+    await expect(amountField).toHaveValue("15");
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+  });
+
   test.describe("mobile touch", () => {
     test.use({
       hasTouch: true,
@@ -194,6 +243,116 @@ test.describe("Expense calculator", () => {
       await page.waitForTimeout(500);
       await expect(page).toHaveURL(/\/add\?calculator=amount$/);
       await expect(calculator).toBeVisible();
+    });
+
+    test("preserves the mobile scroll allowance through a rapid close and reopen", async ({
+      harness,
+      page,
+    }) => {
+      await page.setViewportSize({ width: 390, height: 520 });
+      await page.clock.install();
+      await navigateToAddExpense({
+        autoOpenCalculator: true,
+        fixture: createScrollableParticipantFixture(),
+        harness,
+      });
+
+      const targetCheckbox = page.getByRole("checkbox", {
+        name: bottomScrollTargetParticipant.name,
+        exact: true,
+      });
+      await targetCheckbox.scrollIntoViewIfNeeded();
+      await targetCheckbox.setChecked(true, { force: true });
+      await expect(targetCheckbox).toBeChecked();
+
+      const participantAmountField = page.getByLabel(
+        `Amount for ${bottomScrollTargetParticipant.name}`,
+        { exact: true },
+      );
+      await participantAmountField.scrollIntoViewIfNeeded();
+      await participantAmountField.evaluate((element) => {
+        element.scrollIntoView({ block: "end", inline: "nearest" });
+      });
+
+      const calculator = page.getByRole("application", { name: "Calculator" });
+      await participantAmountField.click();
+      await expect(page).toHaveURL(
+        new RegExp(`/add\\?calculator=share-${bottomScrollTargetParticipant.id}$`),
+      );
+      await expect(calculator).toBeVisible();
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            Number.parseFloat(
+              window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue("--calculator-mobile-scroll-allowance"),
+            ),
+          ),
+        )
+        .toBeGreaterThan(0);
+
+      await page.keyboard.press("Escape");
+      await expect(page).toHaveURL(/\/add$/);
+      await expect(calculator).not.toBeVisible();
+
+      await participantAmountField.click();
+      await expect(page).toHaveURL(
+        new RegExp(`/add\\?calculator=share-${bottomScrollTargetParticipant.id}$`),
+      );
+      await expect(calculator).toBeVisible();
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            Number.parseFloat(
+              window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue("--calculator-mobile-scroll-allowance"),
+            ),
+          ),
+        )
+        .toBeGreaterThan(0);
+
+      await expect(calculator).toHaveCSS("transform", "none");
+      await expect
+        .poll(async () => {
+          const fieldBox = await participantAmountField.boundingBox();
+          const calculatorBox = await calculator.boundingBox();
+
+          if (!fieldBox || !calculatorBox) {
+            return Number.POSITIVE_INFINITY;
+          }
+
+          return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
+        })
+        .toBeLessThanOrEqual(0);
+
+      await page.clock.runFor(700);
+      await page.clock.resume();
+
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            Number.parseFloat(
+              window
+                .getComputedStyle(document.documentElement)
+                .getPropertyValue("--calculator-mobile-scroll-allowance"),
+            ),
+          ),
+        )
+        .toBeGreaterThan(0);
+      await expect
+        .poll(async () => {
+          const fieldBox = await participantAmountField.boundingBox();
+          const calculatorBox = await calculator.boundingBox();
+
+          if (!fieldBox || !calculatorBox) {
+            return Number.POSITIVE_INFINITY;
+          }
+
+          return Math.round(fieldBox.y + fieldBox.height - calculatorBox.y);
+        })
+        .toBeLessThanOrEqual(0);
     });
   });
 
@@ -244,6 +403,30 @@ test.describe("Expense calculator", () => {
 
     const historyLengthAfterSecondClose = await page.evaluate(() => window.history.length);
     expect(historyLengthAfterSecondClose).toBe(historyLengthAfterFirstClose);
+  });
+
+  test("reopens from browser Forward after a calculator-initiated close", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+    await navigateToAddExpense({ autoOpenCalculator: true, harness });
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
+
+    await page.goForward();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+    await expect(calculator.getByText("Amount", { exact: true })).toBeVisible();
   });
 
   test("shows the active amount field label while editing", async ({ harness, page }) => {
@@ -533,15 +716,20 @@ test.describe("Expense calculator", () => {
     const attachmentsToolbar = page.getByRole("toolbar", { name: "Attachments" });
     const firstAttachmentButton = attachmentsToolbar.getByRole("button", {
       name: "View attachment 1",
+      exact: true,
+    });
+    const fourthAttachmentButton = attachmentsToolbar.getByRole("button", {
+      name: "View attachment 4",
+      exact: true,
     });
     await expect(attachmentsToolbar).toBeVisible();
     for (let attachmentNumber = 1; attachmentNumber <= 4; attachmentNumber++) {
-      await expect(
-        attachmentsToolbar.getByRole("button", {
-          name: `View attachment ${attachmentNumber}`,
-          exact: true,
-        }),
-      ).toBeVisible();
+      const attachmentButton = attachmentsToolbar.getByRole("button", {
+        name: `View attachment ${attachmentNumber}`,
+        exact: true,
+      });
+      await expect(attachmentButton).toBeVisible();
+      await expect(attachmentButton).toHaveAttribute("aria-pressed", "false");
     }
     await expect
       .poll(async () => {
@@ -604,13 +792,22 @@ test.describe("Expense calculator", () => {
 
     await firstAttachmentButton.click();
     const attachmentPreview = page.getByRole("region", { name: "Attachment preview" });
+    const closeAttachmentPreviewButton = page.getByRole("button", {
+      name: "Close attachment preview",
+      exact: true,
+    });
     await expect(attachmentPreview).toBeVisible();
+    await expect(firstAttachmentButton).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      attachmentsToolbar.getByRole("button", {
+        name: "View attachment 2",
+        exact: true,
+      }),
+    ).toHaveAttribute("aria-pressed", "false");
     await expect
       .poll(async () => {
         const toolbarBox = await attachmentsToolbar.boundingBox();
-        const closeButtonBox = await page
-          .getByRole("button", { name: "Close attachment preview" })
-          .boundingBox();
+        const closeButtonBox = await closeAttachmentPreviewButton.boundingBox();
 
         if (!toolbarBox || !closeButtonBox) {
           return Number.POSITIVE_INFINITY;
@@ -646,12 +843,16 @@ test.describe("Expense calculator", () => {
       })
       .toBeLessThanOrEqual(1);
 
-    await attachmentPreview.click({ position: { x: 20, y: 20 } });
+    await attachmentPreview.getByRole("button", { name: "Previous", exact: true }).click();
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
     await expect(calculator).toBeVisible();
+    await expect(firstAttachmentButton).toHaveAttribute("aria-pressed", "false");
+    await expect(fourthAttachmentButton).toHaveAttribute("aria-pressed", "true");
 
-    await page.getByRole("button", { name: "Close attachment preview" }).click();
+    await closeAttachmentPreviewButton.click();
     await expect(attachmentPreview).not.toBeVisible();
+    await expect(fourthAttachmentButton).toHaveAttribute("aria-pressed", "false");
+    await expect(fourthAttachmentButton).toBeFocused();
 
     await page.mouse.click(10, 120);
     await expect(page).toHaveURL(/\/add$/);
@@ -697,6 +898,35 @@ test.describe("Expense calculator", () => {
     await page.waitForTimeout(1600);
     await expect(page).toHaveURL(/\/add$/);
     await expect(calculator).not.toBeVisible();
+  });
+
+  test("reopens from keyboard focus after close suppression expires", async ({ harness, page }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+    await page.clock.install();
+    await navigateToAddExpense({ autoOpenCalculator: true, harness });
+
+    const titleField = page.getByLabel("Title", { exact: true });
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/add$/);
+    await expect(calculator).not.toBeVisible();
+
+    await page.clock.fastForward(1600);
+    await page.clock.resume();
+
+    await titleField.focus();
+    await expect(titleField).toBeFocused();
+    await page.keyboard.press("Tab");
+
+    await expect(amountField).toBeFocused();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
   });
 
   test("animates browser back close without resetting scroll on mobile", async ({
@@ -848,6 +1078,15 @@ test.describe("Expense calculator", () => {
     await amountField.click();
     await expect(page).toHaveURL(/\/add\?calculator=amount$/);
 
+    await page.keyboard.type("12,5");
+    await expect(amountField).toHaveValue("12.5");
+
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/add$/);
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+
     await page.keyboard.type("12+3*2");
     await expect(amountField).toHaveValue("18");
 
@@ -856,5 +1095,37 @@ test.describe("Expense calculator", () => {
 
     await page.keyboard.press("Escape");
     await expect(page).toHaveURL(/\/add$/);
+  });
+
+  test("lets Enter and Space activate a focused calculator keypad button", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 633 });
+    await navigateToAddExpense({ autoOpenCalculator: true, harness });
+
+    const amountField = page.getByLabel("Amount", { exact: true });
+    const calculator = page.getByRole("application", { name: "Calculator" });
+
+    await amountField.click();
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+
+    const sevenButton = calculator.getByRole("button", { name: "7", exact: true });
+    await sevenButton.focus();
+    await expect(sevenButton).toBeFocused();
+    await page.keyboard.press("Enter");
+
+    await expect(amountField).toHaveValue("7");
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+    await expect(sevenButton).toBeFocused();
+
+    await page.keyboard.press("Space");
+
+    await expect(amountField).toHaveValue("77");
+    await expect(page).toHaveURL(/\/add\?calculator=amount$/);
+    await expect(calculator).toBeVisible();
+    await expect(sevenButton).toBeFocused();
   });
 });
