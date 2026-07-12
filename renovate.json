@@ -45,7 +45,6 @@
       "description": "Keep Vite+ toolchain and Vite/Vitest ecosystem updates together.",
       "matchManagers": ["npm"],
       "matchPackageNames": [
-        "@cloudflare/vite-plugin",
         "@lingui/vite-plugin",
         "@rolldown/*",
         "@sentry/vite-plugin",
@@ -66,6 +65,13 @@
       ],
       "groupName": "Vite+ toolchain updates",
       "groupSlug": "vite-plus-toolchain"
+    },
+    {
+      "description": "Keep Wrangler and the Cloudflare Vite plugin updates together because they are codependent.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["wrangler", "@cloudflare/vite-plugin"],
+      "groupName": "Cloudflare tooling updates",
+      "groupSlug": "cloudflare-tooling"
     },
     {
       "description": "Keep React Doctor package updates together.",
