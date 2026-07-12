@@ -204,7 +204,7 @@ function escapeHtml(value: string): string {
 
 function brandMark(): string {
   return `<svg aria-hidden="true" viewBox="0 0 512 512">
-    <path d="M138.738 197.734H356.862C356.862 197.734 397.947 197.734 397.947 166.36C397.947 134.986 356.862 134.986 356.862 134.986C335.199 134.986 311.295 134.986 301.584 161.878M273.945 232.843C273.945 232.843 238.089 317.254 199.245 357.592C185.578 371.785 174.594 377.014 154.425 377.014C134.256 377.014 113.388 366.556 114.087 344.893C114.786 323.23 138.738 323.23 138.738 323.23H176.835M273.945 323.23H356.862" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="17.928" />
+    <path d="M138.738 197.734H356.862C356.862 197.734 397.947 197.734 397.947 166.36C397.947 134.986 356.862 134.986 356.862 134.986C335.199 134.986 311.295 134.986 301.584 161.878M273.945 232.843C273.945 232.843 238.089 317.254 199.245 357.592C185.578 371.785 174.594 377.014 154.425 377.014C134.256 377.014 113.388 366.556 114.087 344.893C114.786 323.23 138.738 323.23 138.738 323.23H176.835M273.945 323.23H356.862" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="26" />
   </svg>`;
 }
 
@@ -267,8 +267,8 @@ export async function composeStoreScreenshot({
           box-shadow: 0 0 0 ${Math.round(width * 0.09)}px ${scene.accent}12, 0 0 0 ${Math.round(width * 0.2)}px ${scene.accent}08;
         }
         .header { position: absolute; z-index: 2; top: ${isGooglePlay ? 58 : 78}px; left: ${sidePadding}px; right: ${sidePadding}px; }
-        .brand { display: flex; align-items: center; gap: 16px; margin-bottom: ${isGooglePlay ? 30 : 42}px; color: ${scene.accentSoft}; font-size: ${isGooglePlay ? 23 : 30}px; font-weight: 700; letter-spacing: .13em; }
-        .brand svg { width: ${isGooglePlay ? 38 : 48}px; height: ${isGooglePlay ? 38 : 48}px; }
+        .brand { display: flex; align-items: center; gap: ${isGooglePlay ? 20 : 24}px; margin-bottom: ${isGooglePlay ? 30 : 42}px; color: ${scene.accentSoft}; font-size: ${isGooglePlay ? 34 : 46}px; font-weight: 700; letter-spacing: .04em; }
+        .brand svg { width: ${isGooglePlay ? 64 : 84}px; height: ${isGooglePlay ? 64 : 84}px; }
         .eyebrow { margin-bottom: ${isGooglePlay ? 15 : 20}px; color: ${scene.accentSoft}; font-size: ${isGooglePlay ? 21 : 28}px; font-weight: 700; letter-spacing: .1em; }
         h1 { max-width: ${isTablet ? 1500 : 1080}px; margin: 0; font-size: ${headlineSize}px; font-weight: 800; letter-spacing: -.055em; line-height: .94; white-space: pre-line; }
         p { max-width: ${isTablet ? 1250 : 980}px; margin: ${isGooglePlay ? 22 : 30}px 0 0; color: #d4d4d8; font-size: ${isTablet ? 36 : isGooglePlay ? 26 : 34}px; line-height: 1.28; }
@@ -292,7 +292,7 @@ export async function composeStoreScreenshot({
       <body>
         <div class="orb"></div>
         <header class="header">
-          ${scene.name === "expense-log" ? `<div class="brand">${brandMark()}<span>TRIZUM</span></div>` : ""}
+          ${scene.name === "expense-log" ? `<div class="brand">${brandMark()}<span>trizum</span></div>` : ""}
           <div class="eyebrow">${escapeHtml(copy.eyebrow)}</div>
           <h1>${escapeHtml(copy.title)}</h1>
           <p>${escapeHtml(copy.subtitle)}</p>
