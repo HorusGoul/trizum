@@ -75,21 +75,19 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
       toast.error(
         getImageUploadErrorMessage(error) ?? t`Failed to upload avatar. Please try again.`,
       );
-    } finally {
-      setIsUploading(false);
     }
+
+    setIsUploading(false);
   }
 
   async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    try {
-      await updateAvatarFromFile(file);
-    } finally {
+    await updateAvatarFromFile(file).finally(() => {
       // Reset the input value to allow selecting the same file again
       event.target.value = "";
-    }
+    });
   }
 
   function handleRemoveAvatar() {

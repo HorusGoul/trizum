@@ -169,11 +169,11 @@ export function ExpenseEditor({
 
       saveInFlightRef.current = true;
 
-      try {
-        await onSubmit(value);
-      } finally {
-        saveInFlightRef.current = false;
-      }
+      await Promise.resolve()
+        .then(() => onSubmit(value))
+        .finally(() => {
+          saveInFlightRef.current = false;
+        });
     },
   });
 
@@ -772,7 +772,7 @@ function ParticipantItem({
 
                     updateShares(newShares);
                   }}
-                  aria-label={t`Shares for ${participantName}`}
+                  aria-label={t({ message: `Shares for ${participantName}` })}
                 />
                 <IconButton
                   icon="lucide.plus"
@@ -814,7 +814,7 @@ function ParticipantItem({
               onCloseCalculator={onCloseCalculator}
               onOpenCalculator={onOpenCalculator}
               onChange={onExactAmountChange}
-              aria-label={t`Amount for ${participantName}`}
+              aria-label={t({ message: `Amount for ${participantName}` })}
             />
           </div>
         </div>

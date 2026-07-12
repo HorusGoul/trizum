@@ -362,6 +362,15 @@ function useCloudSyncSettingsView() {
     dispatchRouteState({ type: "clearAuthFeedback" });
   }
 
+  function clearAuthPendingAction() {
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authPendingAction: null,
+      },
+    });
+  }
+
   function setAuthFailureMessage(message: string) {
     dispatchRouteState({ type: "authFailureMessage", message });
   }
@@ -413,14 +422,9 @@ function useCloudSyncSettingsView() {
       toast.success(t`Sign-in link sent`);
     } catch (error) {
       setAuthFailure(error, t`Could not send sign-in link`);
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPendingAction: null,
-        },
-      });
     }
+
+    clearAuthPendingAction();
   }
 
   async function onPasswordSignInSubmit(event: FormEvent<HTMLFormElement>) {
@@ -452,16 +456,15 @@ function useCloudSyncSettingsView() {
 
       if (result.error) {
         setAuthFailureMessage(result.error.message ?? t`Authentication failed`);
-        return;
+      } else {
+        dispatchRouteState({
+          type: "patch",
+          values: {
+            authPassword: "",
+          },
+        });
+        handleSignInSuccess(getAuthResultUser(result.data));
       }
-
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPassword: "",
-        },
-      });
-      handleSignInSuccess(getAuthResultUser(result.data));
     } catch (error) {
       setAuthFailureMessage(
         error instanceof Error && error.message.endsWith("sign-in is not configured.")
@@ -470,14 +473,9 @@ function useCloudSyncSettingsView() {
             ? error.message
             : t`Authentication failed`,
       );
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPendingAction: null,
-        },
-      });
     }
+
+    clearAuthPendingAction();
   }
 
   async function onSocialSignIn(provider: SocialAuthProvider) {
@@ -498,27 +496,20 @@ function useCloudSyncSettingsView() {
 
       if (result?.error) {
         setAuthFailureMessage(result.error.message ?? t`Authentication failed`);
-        return;
+      } else {
+        const redirectUrl = getAuthRedirectUrl(result.data);
+
+        if (redirectUrl) {
+          window.location.replace(redirectUrl);
+        } else {
+          handleSignInSuccess(getAuthResultUser(result.data));
+        }
       }
-
-      const redirectUrl = getAuthRedirectUrl(result.data);
-
-      if (redirectUrl) {
-        window.location.replace(redirectUrl);
-        return;
-      }
-
-      handleSignInSuccess(getAuthResultUser(result.data));
     } catch (error) {
       setAuthFailureMessage(error instanceof Error ? error.message : t`Authentication failed`);
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPendingAction: null,
-        },
-      });
     }
+
+    clearAuthPendingAction();
   }
 
   async function onLinkSocialAccount(provider: SocialAuthProvider) {
@@ -535,22 +526,16 @@ function useCloudSyncSettingsView() {
 
       if (result.url) {
         window.location.replace(result.url);
-        return;
+      } else {
+        const accounts = await fetchLinkedAuthAccounts();
+        saveLinkedAccounts(accounts);
+        toast.success(t`Sign-in method connected`);
       }
-
-      const accounts = await fetchLinkedAuthAccounts();
-      saveLinkedAccounts(accounts);
-      toast.success(t`Sign-in method connected`);
     } catch {
       toast.error(t`Could not connect sign-in method`);
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPendingAction: null,
-        },
-      });
     }
+
+    clearAuthPendingAction();
   }
 
   async function onRequestPasswordReset(email: string) {
@@ -577,19 +562,40 @@ function useCloudSyncSettingsView() {
       toast.success(t`Password email sent`);
     } catch (error) {
       setAuthFailure(error, t`Could not send password email`);
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPendingAction: null,
-        },
-      });
     }
+
+    clearAuthPendingAction();
   }
 
   async function onPasswordResetSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     await onRequestPasswordReset(authEmail);
+  }
+
+  async function onSignOut() {
+    setIsCloudSyncSwitchOpen(false);
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        authPendingAction: "sign-out",
+        cloudActionDialog: null,
+        isSignInSuccessVisible: false,
+        optimisticAuthUser: null,
+      },
+    });
+
+    try {
+      await authClient.signOut();
+      clearNativeAuthToken();
+      clearCloudSyncState();
+      await session.refetch();
+      toast.success(t`Signed out`);
+      void navigate({ to: "/settings", replace: true });
+    } catch {
+      toast.error(t`Could not sign out`);
+    }
+
+    clearAuthPendingAction();
   }
 
   async function onConfirmCloudAction(action: CloudActionDialogType) {
@@ -617,37 +623,6 @@ function useCloudSyncSettingsView() {
       case "sign-out":
         await onSignOut();
         return;
-    }
-  }
-
-  async function onSignOut() {
-    setIsCloudSyncSwitchOpen(false);
-    dispatchRouteState({
-      type: "patch",
-      values: {
-        authPendingAction: "sign-out",
-        cloudActionDialog: null,
-        isSignInSuccessVisible: false,
-        optimisticAuthUser: null,
-      },
-    });
-
-    try {
-      await authClient.signOut();
-      clearNativeAuthToken();
-      clearCloudSyncState();
-      await session.refetch();
-      toast.success(t`Signed out`);
-      void navigate({ to: "/settings", replace: true });
-    } catch {
-      toast.error(t`Could not sign out`);
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          authPendingAction: null,
-        },
-      });
     }
   }
 
@@ -698,14 +673,14 @@ function useCloudSyncSettingsView() {
               : t`Could not delete account`,
         },
       });
-    } finally {
-      dispatchRouteState({
-        type: "patch",
-        values: {
-          isDeleteAccountPending: false,
-        },
-      });
     }
+
+    dispatchRouteState({
+      type: "patch",
+      values: {
+        isDeleteAccountPending: false,
+      },
+    });
   }
 
   function closeSignInDialog() {

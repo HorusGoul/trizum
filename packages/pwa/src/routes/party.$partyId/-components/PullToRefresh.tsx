@@ -49,7 +49,9 @@ export function PullToRefresh({
   });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  refreshActionRef.current = refreshAction;
+  useEffect(() => {
+    refreshActionRef.current = refreshAction;
+  }, [refreshAction]);
 
   function stopPullAnimation() {
     pullAnimationRef.current?.stop();
@@ -90,11 +92,9 @@ export function PullToRefresh({
     setIsRefreshing(true);
     animatePullDistance(refreshingIndicatorHeight);
 
-    try {
-      await refreshActionRef.current();
-    } finally {
-      scheduleRefreshFinish();
-    }
+    await Promise.resolve()
+      .then(() => refreshActionRef.current())
+      .finally(scheduleRefreshFinish);
   }
 
   function clearScheduledRefreshFinish() {

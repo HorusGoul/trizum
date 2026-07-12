@@ -33,12 +33,10 @@ jobs:
           set +e
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="origin/${{ github.base_ref }}"
+            vp exec react-doctor packages/pwa/src --scope changed --base "origin/${{ github.base_ref }}" --no-color --verbose --json > react-doctor-report.json
           else
-            base="${{ github.event.before }}"
+            vp exec react-doctor packages/pwa/src --no-color --verbose --json > react-doctor-report.json
           fi
-
-          vp exec react-doctor packages/pwa/src --scope changed --base "$base" --no-color --verbose --json > react-doctor-report.json
 
           exit_code="$?"
           echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"

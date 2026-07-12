@@ -147,9 +147,9 @@ function getParticipantMatchScore({
     return 100;
   }
 
-  const participantTokens = tokenizeParticipantName(normalizedParticipantName);
+  const participantTokens = new Set(tokenizeParticipantName(normalizedParticipantName));
   const sharedTokens = normalizedSourceTokens.filter((token) =>
-    participantTokens.includes(token),
+    participantTokens.has(token),
   ).length;
   const hasContainedName =
     normalizedParticipantName.includes(normalizedSourceName) ||

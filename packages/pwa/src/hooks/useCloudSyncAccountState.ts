@@ -114,34 +114,6 @@ export function useCloudSyncAccountState({
     const currentUserId = userId;
     const cachedAccountState = readCachedCloudAccountState(currentUserId);
 
-    if (cachedAccountState) {
-      dispatch({
-        type: "accountDataLoaded",
-        linkedAccounts: cachedAccountState.linkedAccounts,
-        cloudSettings: cachedAccountState.cloudSettings,
-      });
-    } else {
-      dispatch({
-        type: "accountDataLoaded",
-        linkedAccounts: [],
-        cloudSettings: null,
-      });
-    }
-
-    void loadAccountState({
-      showErrorToast: !cachedAccountState,
-      showStartToast: true,
-    });
-
-    const intervalId = window.setInterval(() => {
-      void loadAccountState({ showErrorToast: false, showStartToast: false });
-    }, CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS);
-
-    return () => {
-      isCancelled = true;
-      window.clearInterval(intervalId);
-    };
-
     async function loadAccountState({
       showErrorToast,
       showStartToast,
@@ -221,6 +193,34 @@ export function useCloudSyncAccountState({
         }
       }
     }
+
+    if (cachedAccountState) {
+      dispatch({
+        type: "accountDataLoaded",
+        linkedAccounts: cachedAccountState.linkedAccounts,
+        cloudSettings: cachedAccountState.cloudSettings,
+      });
+    } else {
+      dispatch({
+        type: "accountDataLoaded",
+        linkedAccounts: [],
+        cloudSettings: null,
+      });
+    }
+
+    void loadAccountState({
+      showErrorToast: !cachedAccountState,
+      showStartToast: true,
+    });
+
+    const intervalId = window.setInterval(() => {
+      void loadAccountState({ showErrorToast: false, showStartToast: false });
+    }, CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS);
+
+    return () => {
+      isCancelled = true;
+      window.clearInterval(intervalId);
+    };
   }, [isSignInSuccessVisibleRef, userId]);
 
   function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {

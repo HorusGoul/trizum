@@ -55,9 +55,9 @@ function ResetPassword() {
         void navigate({ to: "/settings", replace: true });
       } catch {
         toast.error(t`Could not reset password`);
-      } finally {
-        setIsSubmitting(false);
       }
+
+      setIsSubmitting(false);
     },
   });
 
