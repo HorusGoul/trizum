@@ -70,7 +70,7 @@ catalog:
   "@lingui/vite-plugin": 6.5.0
   "@logtape/logtape": 2.2.4
   "@logtape/sentry": 2.2.4
-  "@openai/codex": 0.142.5
+  "@openai/codex": 0.144.1
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
