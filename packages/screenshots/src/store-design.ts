@@ -52,14 +52,14 @@ export const STORE_SCENES: readonly StoreScene[] = [
     tilt: -1.5,
     copy: {
       en: {
-        eyebrow: "TRIPS WITHOUT THE SPREADSHEET",
-        title: "One trip.\nZero awkward math.",
-        subtitle: "Keep every shared expense in one calm, clear place.",
+        eyebrow: "SHARED EXPENSES",
+        title: "Keep trip expenses\ntogether.",
+        subtitle: "Everyone can add costs and see the same totals.",
       },
       es: {
-        eyebrow: "VIAJES SIN HOJAS DE CÁLCULO",
-        title: "Un viaje.\nCero cuentas incómodas.",
-        subtitle: "Todos los gastos compartidos, claros y en un solo lugar.",
+        eyebrow: "GASTOS COMPARTIDOS",
+        title: "Todos los gastos\ndel viaje, juntos.",
+        subtitle: "Cualquiera puede añadir gastos y ver los mismos totales.",
       },
     },
   },
@@ -70,14 +70,14 @@ export const STORE_SCENES: readonly StoreScene[] = [
     tilt: 1.25,
     copy: {
       en: {
-        eyebrow: "NO MORE GUESSING",
-        title: "Know who owes what.\nInstantly.",
-        subtitle: "Balances stay up to date for everyone in the group.",
+        eyebrow: "BALANCES",
+        title: "See who owes what.",
+        subtitle: "Balances update as expenses are added.",
       },
       es: {
-        eyebrow: "SIN HACER CÁBALAS",
-        title: "Quién debe qué,\nal instante.",
-        subtitle: "Los saldos se actualizan para todo el grupo.",
+        eyebrow: "SALDOS",
+        title: "Mira quién debe qué.",
+        subtitle: "Los saldos se actualizan con cada gasto.",
       },
     },
   },
@@ -88,14 +88,14 @@ export const STORE_SCENES: readonly StoreScene[] = [
     tilt: -1,
     copy: {
       en: {
-        eyebrow: "FAST BY DEFAULT",
-        title: "Update any expense\nin seconds.",
-        subtitle: "Change who paid, adjust the split, and get back to the fun.",
+        eyebrow: "EDIT EXPENSES",
+        title: "Fix a split\nin seconds.",
+        subtitle: "Change the payer, amount, date, or shares.",
       },
       es: {
-        eyebrow: "RÁPIDO DE VERDAD",
-        title: "Actualiza cualquier gasto\nen segundos.",
-        subtitle: "Cambia quién pagó, ajusta el reparto y sigue disfrutando.",
+        eyebrow: "EDITAR GASTOS",
+        title: "Corrige un reparto\nen segundos.",
+        subtitle: "Cambia quién pagó, el importe, la fecha o el reparto.",
       },
     },
   },
@@ -106,14 +106,14 @@ export const STORE_SCENES: readonly StoreScene[] = [
     tilt: 1.4,
     copy: {
       en: {
-        eyebrow: "CLEAR DOWN TO THE CENT",
-        title: "Every expense has\na clear story.",
-        subtitle: "See the payer, date, amount, and exact split at a glance.",
+        eyebrow: "EXPENSE DETAILS",
+        title: "See exactly how\nit was split.",
+        subtitle: "Payer, date, amount, and each person’s share.",
       },
       es: {
-        eyebrow: "CLARO HASTA EL ÚLTIMO CÉNTIMO",
-        title: "Cada gasto tiene\nuna historia clara.",
-        subtitle: "Pagador, fecha, importe y reparto exacto de un vistazo.",
+        eyebrow: "DETALLES DEL GASTO",
+        title: "Mira exactamente\ncómo se repartió.",
+        subtitle: "Pagador, fecha, importe y parte de cada persona.",
       },
     },
   },
@@ -124,14 +124,14 @@ export const STORE_SCENES: readonly StoreScene[] = [
     tilt: -1.2,
     copy: {
       en: {
-        eyebrow: "THE BIG PICTURE",
-        title: "See where the\nmoney went.",
-        subtitle: "Turn the whole trip into useful totals and friendly rankings.",
+        eyebrow: "STATS",
+        title: "See what the\ngroup spent.",
+        subtitle: "Compare totals and spending by person.",
       },
       es: {
-        eyebrow: "LA VISIÓN COMPLETA",
-        title: "Descubre adónde\nfue el dinero.",
-        subtitle: "Convierte el viaje en totales útiles y clasificaciones amistosas.",
+        eyebrow: "ESTADÍSTICAS",
+        title: "Mira cuánto gastó\nel grupo.",
+        subtitle: "Compara el total y el gasto de cada persona.",
       },
     },
   },
@@ -142,14 +142,14 @@ export const STORE_SCENES: readonly StoreScene[] = [
     tilt: 1,
     copy: {
       en: {
-        eyebrow: "YOUR PEOPLE, YOUR RULES",
-        title: "Made for every\nkind of group.",
-        subtitle: "Friends, flatmates, families, festivals—bring everyone along.",
+        eyebrow: "GROUPS",
+        title: "Choose who\nyou are.",
+        subtitle: "Each member sees the expenses and balances that matter to them.",
       },
       es: {
-        eyebrow: "TU GENTE, TUS REGLAS",
-        title: "Para cualquier\ntipo de grupo.",
-        subtitle: "Amigos, compañeros de piso o familia: aquí cabe todo el mundo.",
+        eyebrow: "GRUPOS",
+        title: "Elige quién eres.",
+        subtitle: "Cada persona ve los gastos y saldos que le corresponden.",
       },
     },
   },
@@ -288,23 +288,11 @@ export async function composeStoreScreenshot({
           transform-origin: 50% 15%;
         }
         .device img { display: block; width: 100%; border-radius: ${frameRadius - framePadding}px; }
-        .device::before {
-          content: "";
-          position: absolute;
-          z-index: 2;
-          top: ${framePadding + 14}px;
-          left: 50%;
-          width: ${isTablet ? 130 : 170}px;
-          height: ${isTablet ? 12 : 34}px;
-          border-radius: 999px;
-          background: #050505;
-          transform: translateX(-50%);
-        }
       </style></head>
       <body>
         <div class="orb"></div>
         <header class="header">
-          <div class="brand">${brandMark()}<span>TRIZUM</span></div>
+          ${scene.name === "expense-log" ? `<div class="brand">${brandMark()}<span>TRIZUM</span></div>` : ""}
           <div class="eyebrow">${escapeHtml(copy.eyebrow)}</div>
           <h1>${escapeHtml(copy.title)}</h1>
           <p>${escapeHtml(copy.subtitle)}</p>

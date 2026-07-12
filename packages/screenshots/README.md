@@ -35,12 +35,12 @@ Both stores receive the same six-frame product story. The order is encoded once
 in `STORE_SCREENSHOT_ORDER` and reused by the compositor, previews, and Fastlane
 organization:
 
-1. Expense log — lead with the emotional promise: one trip without awkward math.
-2. Balances — prove the core job: everyone knows who owes what.
-3. Expense editor — show that changes are quick and flexible.
-4. Expense detail — establish trust with a transparent split.
-5. Stats — add insight and a little personality.
-6. Group members — close on breadth: friends, families, and flatmates.
+1. Expense log — show the shared list and totals.
+2. Balances — show who owes what.
+3. Expense editor — show what can be changed.
+4. Expense detail — show the exact split.
+5. Stats — show group and participant totals.
+6. Group members — show how a person selects their identity.
 
 The output uses high-contrast localized copy, a restrained per-scene accent,
 embedded Inter fonts, and a lightweight device treatment that keeps the real app

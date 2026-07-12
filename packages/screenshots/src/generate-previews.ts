@@ -41,10 +41,9 @@ async function main(): Promise<void> {
 
     for (const preview of previewSets) {
       const cards = await Promise.all(
-        STORE_SCREENSHOT_ORDER.map(async (name, index) => {
-          const suffix = preview.device === "android" ? "portrait" : "portrait";
+        STORE_SCREENSHOT_ORDER.map(async (name) => {
           const screenshot = await readFile(
-            path.resolve(SCREENSHOTS_DIR, preview.locale, preview.device, `${name}.${suffix}.png`),
+            path.resolve(SCREENSHOTS_DIR, preview.locale, preview.device, `${name}.portrait.png`),
           );
           const scene = STORE_SCENES.find((candidate) => candidate.name === name);
 
@@ -52,10 +51,7 @@ async function main(): Promise<void> {
             throw new Error(`Missing scene for ${name}`);
           }
 
-          return `<article>
-            <div class="order">${String(index + 1).padStart(2, "0")}</div>
-            <img alt="${escapeHtml(scene.copy[preview.locale].title.replaceAll("\n", " "))}" src="data:image/png;base64,${screenshot.toString("base64")}">
-          </article>`;
+          return `<article><img alt="${escapeHtml(scene.copy[preview.locale].title.replaceAll("\n", " "))}" src="data:image/png;base64,${screenshot.toString("base64")}"></article>`;
         }),
       );
       const page = await browser.newPage({ viewport: { width: 2820, height: 1120 } });
@@ -71,11 +67,10 @@ async function main(): Promise<void> {
           h1 { margin: 0; font-size: 54px; letter-spacing: -.04em; }
           p { margin: 0 0 5px; color: #a1a1aa; font-size: 24px; }
           main { display: grid; grid-template-columns: repeat(6, 1fr); gap: 26px; }
-          article { position: relative; overflow: hidden; border: 1px solid #27272a; border-radius: 28px; background: #18181b; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+          article { overflow: hidden; border: 1px solid #27272a; border-radius: 28px; background: #18181b; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
           img { display: block; width: 100%; }
-          .order { position: absolute; z-index: 2; top: 14px; left: 14px; display: grid; width: 46px; height: 46px; place-items: center; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; color: #fff; font-size: 18px; font-weight: 700; background: rgba(0,0,0,.68); }
         </style></head><body>
-          <header><h1>${preview.platform} · ${preview.locale === "en" ? "English" : "Español"}</h1><p>Proposed store order · generated from the same upload-ready assets</p></header>
+          <header><h1>${preview.platform} · ${preview.locale === "en" ? "English" : "Español"}</h1><p>Upload-ready assets in store order</p></header>
           <main>${cards.join("")}</main>
         </body></html>`);
         await page.evaluate(async () => await document.fonts.ready);
