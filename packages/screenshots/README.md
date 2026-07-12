@@ -9,18 +9,65 @@ Fastlane screenshot handoff.
 
 - [`vite.config.ts`](./vite.config.ts) and [`package.json`](./package.json)
   are the source of truth for package tasks and scripts.
-- [`src/main.ts`](./src/main.ts) captures screenshots across locales and device
-  profiles.
+- [`src/main.ts`](./src/main.ts) captures deterministic app states across
+  locales and device profiles.
+- [`src/store-design.ts`](./src/store-design.ts) is the source of truth for
+  store order, localized marketing copy, color direction, and composition.
+- [`src/generate-previews.ts`](./src/generate-previews.ts) produces reviewable
+  contact sheets showing the final store order.
 - [`src/organize-for-fastlane.ts`](./src/organize-for-fastlane.ts) reshapes the
   generated assets for App Store and Play Store upload flows.
 
 ## Package Notes
 
-- Generated screenshots are written under `screenshots/<locale>/<device>/`.
-- The package currently targets `en` and `es` locales and captures Android,
-  iPhone, iPad, and desktop variants.
+- Upload-ready screenshots are written under
+  `screenshots/<locale>/<device>/`; uncomposed captures are temporary files in
+  `.captures/`.
+- The package targets English and Spanish across Google Play phone and tablet
+  sizes, the current App Store 6.9-inch iPhone size, and the required 13-inch
+  iPad size.
 - This package should stay specialist and avoid becoming a generic harness entry
   point.
+
+## Store Story And Order
+
+Both stores receive the same six-frame product story. The order is encoded once
+in `STORE_SCREENSHOT_ORDER` and reused by the compositor, previews, and Fastlane
+organization:
+
+1. Expense log — lead with the emotional promise: one trip without awkward math.
+2. Balances — prove the core job: everyone knows who owes what.
+3. Expense editor — show that changes are quick and flexible.
+4. Expense detail — establish trust with a transparent split.
+5. Stats — add insight and a little personality.
+6. Group members — close on breadth: friends, families, and flatmates.
+
+The output uses high-contrast localized copy, a restrained per-scene accent,
+embedded Inter fonts, and a lightweight device treatment that keeps the real app
+UI as the focal point. Store previews are generated under `previews/`.
+
+## Determinism
+
+The generator fixes the browser clock (`2025-03-12T12:00:00Z`), timezone (UTC),
+locale, color scheme, viewport, device scale factor, reduced-motion preference,
+seed data, local marketing font files, and all composition assets. Before each
+capture it finishes finite browser animations, waits for two paint frames and
+font readiness, hides notifications and the caret, and disables CSS motion.
+No random IDs or network images are visible in the final scenes.
+
+By default the app is captured from `https://trizum.app`. Set
+`SCREENSHOTS_BASE_URL` to capture a locally served build or a release candidate.
+For quicker development runs, comma-separated `SCREENSHOTS_LOCALES`,
+`SCREENSHOTS_DEVICES`, and `SCREENSHOTS_SCENES` filters select a subset. For
+example. Set `SCREENSHOTS_CLEAN=false` only when deliberately assembling several
+filtered development runs; full and CI runs always clean first.
+
+```sh
+SCREENSHOTS_LOCALES=en \
+SCREENSHOTS_DEVICES=android \
+SCREENSHOTS_SCENES=expense-log,balances \
+vp run start
+```
 
 ## Validation
 
@@ -31,5 +78,9 @@ and [`package.json`](./package.json):
 - `vp run setup` on first use to install Playwright browser dependencies with
   the smaller Chromium headless shell
 - `vp run start` to capture screenshots
+- `vp run compose` to reapply the store design to existing `.captures/` without
+  opening the app again
+- `vp run preview` to generate App Store and Google Play contact sheets after a
+  full capture
 - `vp run organize:fastlane --platform <ios|android> --output <path>` to prepare
   store-upload assets

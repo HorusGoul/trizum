@@ -19,6 +19,7 @@ import { copyFile, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { configureScreenshotsLogging, getLogger } from "./log.ts";
+import { STORE_SCREENSHOT_ORDER } from "./store-design.ts";
 
 const ROOT_DIR = path.resolve(import.meta.dirname, "..");
 const SCREENSHOTS_DIR = path.resolve(ROOT_DIR, "screenshots");
@@ -45,13 +46,13 @@ const ANDROID_LOCALE_MAPPING: Record<string, string[]> = {
 // Based on: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 // Fastlane uses human-readable names in screenshot filenames
 const IOS_DEVICE_FRAME_MAPPING: Record<string, string | null> = {
-  // iPhone 6.5" Display (1284×2778) - Required if app runs on iPhone
-  "iphone-6.5": 'iPhone 6.5" Display',
+  // iPhone 6.9" Display (1320×2868)
+  "iphone-6.9": 'iPhone 6.9" Display',
   // iPad 13" Display (2064×2752) - Required if app runs on iPad
   "ipad-13": 'iPad 13" Display',
   // Skip android and desktop for iOS fastlane
   android: null,
-  desktop: null,
+  "android-tablet": null,
 };
 
 // Map from our device folders to Android screenshot types
@@ -63,14 +64,11 @@ const IOS_DEVICE_FRAME_MAPPING: Record<string, string | null> = {
 // - wearScreenshots: Wear OS screenshots
 const ANDROID_DEVICE_MAPPING: Record<string, string[] | null> = {
   android: ["phoneScreenshots"],
-  desktop: ["sevenInchScreenshots", "tenInchScreenshots"], // Use desktop screenshots for tablets
+  "android-tablet": ["sevenInchScreenshots", "tenInchScreenshots"],
   // Skip iOS-specific devices
-  "iphone-6.5": null,
+  "iphone-6.9": null,
   "ipad-13": null,
 };
-
-// Order of screenshots (determines the index in filename)
-const SCREENSHOT_ORDER = ["balances", "expense-log", "expense-details", "expense-editor"];
 
 interface Options {
   platform: Platform;
@@ -130,7 +128,7 @@ async function getScreenshotFiles(locale: string, device: string): Promise<strin
 function getScreenshotIndex(filename: string): number {
   // Extract the name from filename (e.g., "expense-log.portrait.png" -> "expense-log")
   const name = filename.split(".")[0];
-  const index = SCREENSHOT_ORDER.indexOf(name);
+  const index = STORE_SCREENSHOT_ORDER.indexOf(name as (typeof STORE_SCREENSHOT_ORDER)[number]);
   return index === -1 ? 999 : index;
 }
 
@@ -170,7 +168,7 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
       }
 
       // Sort files by screenshot order
-      files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b));
+      files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b) || a.localeCompare(b));
 
       // Copy files to each App Store locale
       for (const appStoreLocale of appStoreLocales) {
@@ -237,7 +235,7 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
       }
 
       // Sort files by screenshot order
-      files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b));
+      files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b) || a.localeCompare(b));
 
       // Copy files to each Play Store locale and screenshot type
       for (const playStoreLocale of playStoreLocales) {

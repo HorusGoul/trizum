@@ -24,9 +24,11 @@
     }
   },
   "scripts": {
-    "cleanup": "rm -rf screenshots",
+    "cleanup": "rm -rf .captures screenshots",
+    "compose": "node --experimental-transform-types src/compose-existing.ts",
     "start": "node --experimental-transform-types src/main.ts",
     "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",
+    "preview": "node --experimental-transform-types src/generate-previews.ts",
     "setup": "vp exec playwright install --with-deps --only-shell chromium"
   },
   "dependencies": {

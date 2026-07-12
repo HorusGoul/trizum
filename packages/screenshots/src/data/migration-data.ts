@@ -405,3 +405,41 @@ export const migrationData: MigrationData = {
   ],
   photos: [],
 };
+
+const spanishExpenseNames: Record<string, string> = {
+  Pizza: "Pizza",
+  "Beers at La Bodega": "Cervezas en La Bodega",
+  "Gas - Seville to Cádiz": "Gasolina - Sevilla a Cádiz",
+  "Supermarket groceries": "Compra en el supermercado",
+  "Craft beer tasting": "Cata de cerveza artesana",
+  "Tapas dinner": "Cena de tapas",
+  "Gas - Cádiz to Málaga": "Gasolina - Cádiz a Málaga",
+  "Breakfast pastries": "Bollería para desayunar",
+  "Beers at the beach bar": "Cervezas en el chiringuito",
+  "Seafood paella": "Paella de marisco",
+  "Gas station snacks": "Picoteo en la gasolinera",
+  "Gas - Málaga to Granada": "Gasolina - Málaga a Granada",
+  "Cervecería rounds": "Rondas en la cervecería",
+  "Grilled meat dinner": "Cena de carne a la brasa",
+  "Late night beers": "Cervezas de madrugada",
+  "Breakfast churros": "Churros para desayunar",
+  "Gas - Granada return": "Gasolina - vuelta de Granada",
+  "Highway snacks & drinks": "Picoteo y bebidas para el camino",
+  "Final beers at the airport": "Últimas cervezas en el aeropuerto",
+  "Sandwiches for the road": "Bocadillos para el camino",
+};
+
+export function getMigrationData(locale: "en" | "es"): MigrationData {
+  const data = structuredClone(migrationData);
+
+  if (locale === "es") {
+    data.party.name = "Ruta por Andalucía";
+    data.party.description = "Un viaje con la mejor compañía";
+    data.expenses = data.expenses.map((expense) => ({
+      ...expense,
+      name: spanishExpenseNames[expense.name] ?? expense.name,
+    }));
+  }
+
+  return data;
+}

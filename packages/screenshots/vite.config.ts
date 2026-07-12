@@ -7,6 +7,9 @@ export default defineConfig({
         command: "vp check .",
         dependsOn: ["@trizum/logging#build"],
       },
+      test: {
+        command: "vp test .",
+      },
     },
   },
 });

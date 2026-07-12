@@ -8,8 +8,7 @@ screenshot("balances", async ({ page, takeScreenshot, setupParty }) => {
       hasText: /balances|balance/i,
     })
     .click();
-
-  await page.waitForTimeout(1000);
+  await page.getByText(/how should i balance|cómo debería equilibrar/i).waitFor();
 
   await takeScreenshot();
 });
@@ -25,13 +24,13 @@ screenshot("expense-details", async ({ page, takeScreenshot, setupParty }) => {
 
   await page
     .getByRole("link", {
-      name: "Breakfast churros",
+      name: /breakfast churros|churros para desayunar/i,
     })
     .click();
 
   await page
     .getByRole("heading", {
-      name: "Breakfast churros",
+      name: /breakfast churros|churros para desayunar/i,
     })
     .waitFor({
       state: "visible",
@@ -45,29 +44,34 @@ screenshot("expense-editor", async ({ page, takeScreenshot, setupParty }) => {
 
   await page
     .getByRole("link", {
-      name: "Breakfast churros",
+      name: /breakfast churros|churros para desayunar/i,
     })
     .click();
+  await page.locator("h1").waitFor();
 
-  await page
-    .getByRole("heading", {
-      name: "Breakfast churros",
-    })
-    .waitFor({
-      state: "visible",
-    });
+  const expenseUrl = new URL(page.url());
+  await page.goto(`${expenseUrl.pathname}/edit`);
+  await page.locator('input[name="name"]').waitFor();
 
-  const url = page.url();
+  await takeScreenshot();
+});
 
-  await page.goto(`${url}/edit`);
+screenshot("stats", async ({ page, takeScreenshot, setupParty }) => {
+  await setupParty();
 
-  await page
-    .getByRole("heading", {
-      name: /editing|editando/i,
-    })
-    .waitFor({
-      state: "visible",
-    });
+  const partyUrl = new URL(page.url());
+  await page.goto(`${partyUrl.pathname}/stats`);
+  await page.getByText(/total spent|total gastado/i).waitFor();
+
+  await takeScreenshot();
+});
+
+screenshot("group-members", async ({ page, takeScreenshot, setupParty }) => {
+  await setupParty();
+
+  const partyUrl = new URL(page.url());
+  await page.goto(`${partyUrl.pathname}/who`);
+  await page.getByRole("radio", { name: "Modest" }).waitFor();
 
   await takeScreenshot();
 });
