@@ -1,12 +1,37 @@
-import { t } from "@lingui/core/macro";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { msg, t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Suspense, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Sheet } from "react-modal-sheet";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
+import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
+import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
+import { IconButton } from "#src/ui/IconButton.tsx";
+import { cn } from "#src/ui/utils.ts";
+import { suppressCalculatorAutoOpen } from "./calculatorAutoOpenSuppression.ts";
+import type { CalculatorSelectionRange } from "#src/hooks/useCalculatorMode.ts";
+import type { MediaFile } from "#src/models/media.ts";
 
 const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
+const DESKTOP_POPOVER_MARGIN = 8;
+const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
+const MOBILE_SHEET_TWEEN_CONFIG = { duration: 0.2, ease: "easeOut" } as const;
+const MOBILE_FIELD_VISIBILITY_MARGIN = 12;
+const MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS = MOBILE_SHEET_TWEEN_CONFIG.duration * 1000;
+const MOBILE_SCROLL_RESTORE_TIMEOUT_MS = 650;
+const MOBILE_SCROLL_RESTORE_TOLERANCE = 2;
+const MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE = "calc(var(--safe-area-inset-top, 0px) + 4rem)";
+const MOBILE_SCROLL_ALLOWANCE_PROPERTY = "--calculator-mobile-scroll-allowance";
+const EMPTY_ATTACHMENT_PHOTO_IDS: MediaFile["id"][] = [];
+const viewAttachmentMessage = msg({
+  message: "View attachment {attachmentNumber}",
+});
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
+let mobileScrollAllowanceOwner: symbol | null = null;
 
 function getCurrencyPreviewFormatter(currency: string) {
   const cachedFormatter = currencyPreviewFormatterCache.get(currency);
@@ -32,6 +57,7 @@ function getExpressionCharacterKey(expression: string, index: number) {
 interface CalculatorToolbarProps {
   expression: string;
   cursorPosition: number;
+  selectionRange: CalculatorSelectionRange | null;
   onInsert: (text: string) => void;
   onBackspace: () => void;
   onMoveCursor: (direction: "left" | "right") => void;
@@ -39,10 +65,14 @@ interface CalculatorToolbarProps {
   onCommit: () => void;
   onClear: () => void;
   onDismiss: () => void;
+  attachmentPhotoIds?: MediaFile["id"][];
   fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   presenceElementId?: string;
   previewValue: number | null;
   currency?: string;
+  dismissOnOutsideInteraction?: boolean;
+  fieldLabel?: string;
+  closeRequestId?: number;
 }
 
 type CalculatorCallbacks = Pick<
@@ -65,6 +95,97 @@ type CalculatorLayout = {
   } | null;
 };
 
+type WindowScrollPosition = {
+  left: number;
+  top: number;
+};
+
+function blurActiveElement() {
+  const activeElement = document.activeElement;
+
+  if (activeElement instanceof HTMLElement && activeElement !== document.body) {
+    activeElement.blur();
+  }
+}
+
+function blurCalculatorFocus() {
+  blurActiveElement();
+  window.requestAnimationFrame(blurActiveElement);
+}
+
+function claimMobileScrollAllowance(owner: symbol) {
+  mobileScrollAllowanceOwner = owner;
+}
+
+function releaseMobileScrollAllowance(owner: symbol) {
+  if (mobileScrollAllowanceOwner !== owner || typeof document === "undefined") {
+    return;
+  }
+
+  document.documentElement.style.removeProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY);
+  mobileScrollAllowanceOwner = null;
+}
+
+function getCurrentWindowScrollPosition(): WindowScrollPosition | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return {
+    left: window.scrollX,
+    top: window.scrollY,
+  };
+}
+
+function getCalculatorLayout(
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>,
+): CalculatorLayout {
+  if (typeof window === "undefined") {
+    return {
+      isLargeScreen: false,
+      popoverPosition: null,
+    };
+  }
+
+  const isLargeScreen = window.matchMedia("(min-width: 768px)").matches;
+
+  if (!isLargeScreen || !fieldContainerRef.current) {
+    return {
+      isLargeScreen,
+      popoverPosition: null,
+    };
+  }
+
+  const rect = fieldContainerRef.current.getBoundingClientRect();
+  const width = Math.max(rect.width, 280);
+  const maxTop = Math.max(
+    DESKTOP_POPOVER_MARGIN,
+    window.innerHeight - DESKTOP_POPOVER_ESTIMATED_HEIGHT - DESKTOP_POPOVER_MARGIN,
+  );
+  const maxLeft = Math.max(
+    DESKTOP_POPOVER_MARGIN,
+    window.innerWidth - width - DESKTOP_POPOVER_MARGIN,
+  );
+
+  return {
+    isLargeScreen: true,
+    popoverPosition: {
+      top: Math.max(DESKTOP_POPOVER_MARGIN, Math.min(rect.bottom + DESKTOP_POPOVER_MARGIN, maxTop)),
+      left: Math.max(DESKTOP_POPOVER_MARGIN, Math.min(rect.left, maxLeft)),
+      width,
+    },
+  };
+}
+
+function areCalculatorLayoutsEqual(previous: CalculatorLayout, next: CalculatorLayout) {
+  return (
+    previous.isLargeScreen === next.isLargeScreen &&
+    previous.popoverPosition?.top === next.popoverPosition?.top &&
+    previous.popoverPosition?.left === next.popoverPosition?.left &&
+    previous.popoverPosition?.width === next.popoverPosition?.width
+  );
+}
+
 function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
   const callbacksRef = useRef(callbacks);
 
@@ -76,55 +197,18 @@ function useCalculatorCallbacks(callbacks: CalculatorCallbacks) {
 }
 
 function useCalculatorPopoverPosition(fieldContainerRef: React.RefObject<HTMLDivElement | null>) {
-  const [layout, setLayout] = useState<CalculatorLayout>({
-    isLargeScreen: false,
-    popoverPosition: null,
-  });
+  const [layout, setLayout] = useState<CalculatorLayout>(() =>
+    getCalculatorLayout(fieldContainerRef),
+  );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
 
     function updatePosition() {
-      if (mediaQuery.matches && fieldContainerRef.current) {
-        const rect = fieldContainerRef.current.getBoundingClientRect();
-        setLayout((currentLayout) => {
-          const currentPosition = currentLayout.popoverPosition;
-          const popoverPosition = {
-            top: rect.bottom + 8,
-            left: rect.left,
-            width: Math.max(rect.width, 280),
-          };
-
-          if (
-            currentLayout.isLargeScreen &&
-            currentPosition &&
-            currentPosition.top === popoverPosition.top &&
-            currentPosition.left === popoverPosition.left &&
-            currentPosition.width === popoverPosition.width
-          ) {
-            return currentLayout;
-          }
-
-          return {
-            isLargeScreen: true,
-            popoverPosition,
-          };
-        });
-      } else {
-        setLayout((currentLayout) => {
-          if (
-            currentLayout.isLargeScreen === mediaQuery.matches &&
-            currentLayout.popoverPosition === null
-          ) {
-            return currentLayout;
-          }
-
-          return {
-            isLargeScreen: mediaQuery.matches,
-            popoverPosition: null,
-          };
-        });
-      }
+      const nextLayout = getCalculatorLayout(fieldContainerRef);
+      setLayout((currentLayout) =>
+        areCalculatorLayoutsEqual(currentLayout, nextLayout) ? currentLayout : nextLayout,
+      );
     }
 
     updatePosition();
@@ -316,6 +400,70 @@ function useExpressionPointerGestures({
 }
 
 function useCalculatorDismiss({
+  additionalInsideRef,
+  callbacksRef,
+  enabled,
+  fieldContainerRef,
+  toolbarRef,
+}: {
+  additionalInsideRef?: React.RefObject<HTMLElement | null>;
+  callbacksRef: React.RefObject<CalculatorCallbacks>;
+  enabled: boolean;
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const suppressNextDocumentClickRef = useRef(false);
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    function isOutside(target: Node | null) {
+      if (!target) return false;
+
+      const inToolbar = toolbarRef.current?.contains(target);
+      const inField = fieldContainerRef.current?.contains(target);
+      const inAdditionalElement = additionalInsideRef?.current?.contains(target);
+
+      return !inToolbar && !inField && !inAdditionalElement;
+    }
+
+    function handlePointerDown(e: PointerEvent) {
+      if (isOutside(e.target as Node | null)) {
+        suppressNextDocumentClickRef.current = true;
+        suppressCalculatorAutoOpen();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+        e.stopPropagation();
+        blurActiveElement();
+        callbacksRef.current.onDismiss();
+      }
+    }
+
+    function handleClick(e: MouseEvent) {
+      if (!suppressNextDocumentClickRef.current) {
+        return;
+      }
+
+      suppressNextDocumentClickRef.current = false;
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      e.stopPropagation();
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown, { capture: true });
+    document.addEventListener("click", handleClick, { capture: true });
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown, { capture: true });
+      document.removeEventListener("click", handleClick, { capture: true });
+    };
+  }, [additionalInsideRef, callbacksRef, enabled, fieldContainerRef, toolbarRef]);
+}
+
+function useCalculatorKeyboard({
   callbacksRef,
   fieldContainerRef,
   toolbarRef,
@@ -325,41 +473,18 @@ function useCalculatorDismiss({
   toolbarRef: React.RefObject<HTMLDivElement | null>;
 }) {
   useEffect(() => {
-    function isOutside(target: Node | null) {
-      if (!target) return false;
-
-      const inToolbar = toolbarRef.current?.contains(target);
-      const inField = fieldContainerRef.current?.contains(target);
-
-      return !inToolbar && !inField;
-    }
-
-    function handleFocusIn(e: FocusEvent) {
-      if (isOutside(e.target as Node | null)) {
-        callbacksRef.current.onDismiss();
-      }
-    }
-
-    function handlePointerUp(e: PointerEvent) {
-      if (isOutside(e.target as Node | null)) {
-        callbacksRef.current.onDismiss();
-      }
-    }
-
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("pointerup", handlePointerUp);
-    return () => {
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("pointerup", handlePointerUp);
-    };
-  }, [callbacksRef, fieldContainerRef, toolbarRef]);
-}
-
-function useCalculatorKeyboard(callbacksRef: React.RefObject<CalculatorCallbacks>) {
-  useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      const target = e.target as HTMLElement;
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      const isButtonActivation =
+        (e.key === "Enter" || e.key === " " || e.key === "Spacebar") &&
+        Boolean(target?.closest('button, [role="button"]'));
+      const isEditableTarget =
+        target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
+      const isCalculatorTarget =
+        target &&
+        (fieldContainerRef.current?.contains(target) || toolbarRef.current?.contains(target));
+
+      if (isButtonActivation || (isEditableTarget && !isCalculatorTarget)) {
         return;
       }
 
@@ -375,10 +500,11 @@ function useCalculatorKeyboard(callbacksRef: React.RefObject<CalculatorCallbacks
         case "*":
         case "/":
         case ".":
+        case ",":
         case "(":
         case ")":
           e.preventDefault();
-          callbacksRef.current.onInsert(e.key);
+          callbacksRef.current.onInsert(e.key === "," ? "." : e.key);
           break;
         case "Backspace":
           e.preventDefault();
@@ -408,11 +534,265 @@ function useCalculatorKeyboard(callbacksRef: React.RefObject<CalculatorCallbacks
       }
     }
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, { capture: true });
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, { capture: true });
     };
-  }, [callbacksRef]);
+  }, [callbacksRef, fieldContainerRef, toolbarRef]);
+}
+
+function useMobileCalculatorScroll({
+  fieldContainerRef,
+  isLargeScreen,
+  toolbarRef,
+}: {
+  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
+  isLargeScreen: boolean;
+  toolbarRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const [initialWindowScroll] = useState(() => getCurrentWindowScrollPosition());
+  const [scrollAllowanceOwner] = useState(() => Symbol("calculator-mobile-scroll-allowance"));
+  const finalFieldVisibilityCheckTimeoutRef = useRef<number | null>(null);
+  const initialWindowScrollRef = useRef<WindowScrollPosition | null>(initialWindowScroll);
+  const scrollFieldAboveMobileSheetRef = useRef<
+    (behavior: ScrollBehavior, attempts?: number) => void
+  >(() => {});
+
+  function setMobileScrollAllowance(height: number, options?: { animate?: boolean }) {
+    if (typeof document === "undefined" || isLargeScreen) {
+      return;
+    }
+
+    const allowanceHeight = Math.max(0, height);
+    const root = document.documentElement;
+    claimMobileScrollAllowance(scrollAllowanceOwner);
+
+    if (options?.animate && !root.style.getPropertyValue(MOBILE_SCROLL_ALLOWANCE_PROPERTY)) {
+      root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
+    }
+
+    if (options?.animate) {
+      window.requestAnimationFrame(() => {
+        if (mobileScrollAllowanceOwner === scrollAllowanceOwner) {
+          root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
+        }
+      });
+    } else {
+      root.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, `${allowanceHeight}px`);
+    }
+  }
+
+  function scrollFieldAboveMobileSheet(behavior: ScrollBehavior, attempts = 0) {
+    if (typeof window === "undefined" || isLargeScreen) {
+      return;
+    }
+
+    if (attempts === 0) {
+      // A previous calculator may still be restoring its scroll position even
+      // after it has released the shared allowance. Stop that animation before
+      // the new owner calculates its own target.
+      window.scrollTo({
+        left: window.scrollX,
+        top: window.scrollY,
+        behavior: "auto",
+      });
+    }
+
+    const fieldElement = fieldContainerRef.current;
+    const sheetElement = toolbarRef.current;
+    if (!fieldElement || !sheetElement) {
+      if (attempts < 2) {
+        window.requestAnimationFrame(() =>
+          scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
+        );
+      }
+      return;
+    }
+
+    const sheetHeight = sheetElement.offsetHeight;
+    if (sheetHeight <= 0) {
+      if (attempts < 2) {
+        window.requestAnimationFrame(() =>
+          scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
+        );
+      }
+      return;
+    }
+
+    setMobileScrollAllowance(sheetHeight, { animate: attempts === 0 });
+
+    const fieldRect = fieldElement.getBoundingClientRect();
+    const sheetTop = window.innerHeight - sheetHeight;
+    const targetFieldBottom = sheetTop - MOBILE_FIELD_VISIBILITY_MARGIN;
+
+    if (fieldRect.bottom > targetFieldBottom) {
+      window.scrollTo({
+        left: window.scrollX,
+        top: window.scrollY + fieldRect.bottom - targetFieldBottom,
+        behavior,
+      });
+    }
+
+    if (attempts < 4) {
+      window.setTimeout(
+        () => scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
+        MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS / 4,
+      );
+    }
+
+    if (attempts === 0) {
+      if (finalFieldVisibilityCheckTimeoutRef.current !== null) {
+        window.clearTimeout(finalFieldVisibilityCheckTimeoutRef.current);
+      }
+
+      finalFieldVisibilityCheckTimeoutRef.current = window.setTimeout(() => {
+        finalFieldVisibilityCheckTimeoutRef.current = null;
+        if (mobileScrollAllowanceOwner === scrollAllowanceOwner) {
+          scrollFieldAboveMobileSheetRef.current("auto", 4);
+        }
+      }, MOBILE_SCROLL_RESTORE_TIMEOUT_MS);
+    }
+  }
+
+  useLayoutEffect(() => {
+    scrollFieldAboveMobileSheetRef.current = scrollFieldAboveMobileSheet;
+  });
+
+  function collapseMobileScrollAllowance() {
+    if (isLargeScreen || mobileScrollAllowanceOwner !== scrollAllowanceOwner) {
+      return;
+    }
+
+    document.documentElement.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
+  }
+
+  function restoreInitialWindowScroll(behavior: ScrollBehavior) {
+    const scrollPosition = initialWindowScrollRef.current;
+    if (typeof window === "undefined" || !scrollPosition || isLargeScreen) {
+      return;
+    }
+
+    collapseMobileScrollAllowance();
+    window.scrollTo({
+      left: scrollPosition.left,
+      top: scrollPosition.top,
+      behavior,
+    });
+  }
+
+  function waitForInitialWindowScroll() {
+    const targetScrollPosition = initialWindowScrollRef.current;
+    if (typeof window === "undefined" || !targetScrollPosition) {
+      return Promise.resolve();
+    }
+    const { left, top } = targetScrollPosition;
+
+    return new Promise<void>((resolve) => {
+      const deadline = performance.now() + MOBILE_SCROLL_RESTORE_TIMEOUT_MS;
+
+      function checkScrollPosition() {
+        const isRestored =
+          Math.abs(window.scrollX - left) <= MOBILE_SCROLL_RESTORE_TOLERANCE &&
+          Math.abs(window.scrollY - top) <= MOBILE_SCROLL_RESTORE_TOLERANCE;
+
+        if (isRestored || performance.now() >= deadline) {
+          resolve();
+          return;
+        }
+
+        window.requestAnimationFrame(checkScrollPosition);
+      }
+
+      checkScrollPosition();
+    });
+  }
+
+  async function finishInitialWindowScrollRestore() {
+    restoreInitialWindowScroll("smooth");
+    await waitForInitialWindowScroll();
+  }
+
+  function removeMobileScrollAllowance() {
+    releaseMobileScrollAllowance(scrollAllowanceOwner);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (finalFieldVisibilityCheckTimeoutRef.current !== null) {
+        window.clearTimeout(finalFieldVisibilityCheckTimeoutRef.current);
+        finalFieldVisibilityCheckTimeoutRef.current = null;
+      }
+
+      if (
+        typeof window !== "undefined" &&
+        initialWindowScroll &&
+        mobileScrollAllowanceOwner === scrollAllowanceOwner
+      ) {
+        document.documentElement.style.setProperty(MOBILE_SCROLL_ALLOWANCE_PROPERTY, "0px");
+        window.scrollTo({
+          left: initialWindowScroll.left,
+          top: initialWindowScroll.top,
+          behavior: "smooth",
+        });
+        window.setTimeout(
+          () => releaseMobileScrollAllowance(scrollAllowanceOwner),
+          MOBILE_SCROLL_RESTORE_TIMEOUT_MS,
+        );
+        return;
+      }
+
+      releaseMobileScrollAllowance(scrollAllowanceOwner);
+    };
+  }, [initialWindowScroll, scrollAllowanceOwner]);
+
+  useEffect(() => {
+    if (!isLargeScreen) {
+      return;
+    }
+
+    releaseMobileScrollAllowance(scrollAllowanceOwner);
+  }, [isLargeScreen, scrollAllowanceOwner]);
+
+  return {
+    finishInitialWindowScrollRestore,
+    removeMobileScrollAllowance,
+    restoreInitialWindowScroll,
+    scrollFieldAboveMobileSheet,
+  };
+}
+
+function useElementHeight(ref: React.RefObject<HTMLElement | null>, enabled: boolean) {
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    const maybeElement = ref.current;
+    if (!maybeElement) {
+      return;
+    }
+    const element = maybeElement;
+
+    function updateHeight() {
+      setHeight(element.offsetHeight);
+    }
+
+    updateHeight();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateHeight);
+      return () => window.removeEventListener("resize", updateHeight);
+    }
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [enabled, ref]);
+
+  return enabled ? height : 0;
 }
 
 function formatCalculatorPreviewValue(value: number, currency?: string): string {
@@ -435,6 +815,7 @@ function formatCalculatorPreviewValue(value: number, currency?: string): string 
 export function CalculatorToolbar({
   expression,
   cursorPosition,
+  selectionRange,
   onInsert,
   onBackspace,
   onMoveCursor,
@@ -442,12 +823,17 @@ export function CalculatorToolbar({
   onCommit,
   onClear,
   onDismiss,
+  attachmentPhotoIds = EMPTY_ATTACHMENT_PHOTO_IDS,
   fieldContainerRef,
   presenceElementId,
   previewValue,
   currency,
+  dismissOnOutsideInteraction = true,
+  fieldLabel,
+  closeRequestId = 0,
 }: CalculatorToolbarProps) {
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const attachmentLayerRef = useRef<HTMLDivElement>(null);
   const expressionRef = useRef<HTMLDivElement>(null);
   const expressionScrollRef = useRef<HTMLSpanElement>(null);
   const expressionContentRef = useRef<HTMLSpanElement>(null);
@@ -455,6 +841,11 @@ export function CalculatorToolbar({
   const pointerStartRef = useRef<{ x: number; totalMovement: number } | null>(null);
   const dragAccumulatorRef = useRef(0);
   const scrollOffsetRef = useRef(0);
+  const closeRequestIdRef = useRef<number | undefined>(undefined);
+  const pendingMobileCloseActionRef = useRef<"commit" | "dismiss" | null>(null);
+  const mobileCloseFallbackTimeoutRef = useRef<number | null>(null);
+  const finishMobileCloseRef = useRef<() => Promise<void> | void>(() => {});
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(true);
   const callbacksRef = useCalculatorCallbacks({
     onInsert,
     onBackspace,
@@ -465,6 +856,87 @@ export function CalculatorToolbar({
     onDismiss,
   });
   const { isLargeScreen, popoverPosition } = useCalculatorPopoverPosition(fieldContainerRef);
+  const mobileSheetHeight = useElementHeight(toolbarRef, !isLargeScreen);
+  const {
+    finishInitialWindowScrollRestore,
+    removeMobileScrollAllowance,
+    restoreInitialWindowScroll,
+    scrollFieldAboveMobileSheet,
+  } = useMobileCalculatorScroll({
+    fieldContainerRef,
+    isLargeScreen,
+    toolbarRef,
+  });
+
+  function finishClose(action: "commit" | "dismiss") {
+    if (action === "commit") {
+      callbacksRef.current.onCommit();
+      return;
+    }
+
+    callbacksRef.current.onDismiss();
+  }
+
+  function clearMobileCloseFallback() {
+    if (mobileCloseFallbackTimeoutRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(mobileCloseFallbackTimeoutRef.current);
+    mobileCloseFallbackTimeoutRef.current = null;
+  }
+
+  function scheduleMobileCloseFallback() {
+    clearMobileCloseFallback();
+    mobileCloseFallbackTimeoutRef.current = window.setTimeout(() => {
+      void finishMobileCloseRef.current();
+    }, MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS + 100);
+  }
+
+  function requestClose(action: "commit" | "dismiss") {
+    if (action === "dismiss" && !isLargeScreen) {
+      suppressCalculatorAutoOpen();
+    }
+    blurCalculatorFocus();
+
+    if (!isLargeScreen) {
+      if (!pendingMobileCloseActionRef.current) {
+        pendingMobileCloseActionRef.current = action;
+      }
+      setIsMobileSheetOpen(false);
+      scheduleMobileCloseFallback();
+      return;
+    }
+
+    finishClose(action);
+  }
+
+  async function finishMobileClose() {
+    const action = pendingMobileCloseActionRef.current;
+    if (!action) {
+      return;
+    }
+
+    clearMobileCloseFallback();
+    pendingMobileCloseActionRef.current = null;
+    await finishInitialWindowScrollRestore();
+    removeMobileScrollAllowance();
+    finishClose(action);
+  }
+
+  useLayoutEffect(() => {
+    finishMobileCloseRef.current = finishMobileClose;
+  });
+
+  const interactionCallbacksRef = useCalculatorCallbacks({
+    onInsert,
+    onBackspace,
+    onMoveCursor,
+    onSetCursorPosition,
+    onCommit: () => requestClose("commit"),
+    onClear,
+    onDismiss: () => requestClose("dismiss"),
+  });
 
   useExpressionCursorScroll({
     charRefs,
@@ -475,15 +947,97 @@ export function CalculatorToolbar({
     scrollOffsetRef,
   });
   useExpressionPointerGestures({
-    callbacksRef,
+    callbacksRef: interactionCallbacksRef,
     charRefs,
     dragAccumulatorRef,
     expression,
     expressionRef,
     pointerStartRef,
   });
-  useCalculatorDismiss({ callbacksRef, fieldContainerRef, toolbarRef });
-  useCalculatorKeyboard(callbacksRef);
+  useCalculatorDismiss({
+    additionalInsideRef: attachmentLayerRef,
+    callbacksRef: interactionCallbacksRef,
+    enabled: dismissOnOutsideInteraction,
+    fieldContainerRef,
+    toolbarRef,
+  });
+  useCalculatorKeyboard({ callbacksRef: interactionCallbacksRef, fieldContainerRef, toolbarRef });
+
+  useEffect(() => clearMobileCloseFallback, []);
+
+  /* eslint-disable react-doctor/no-event-handler, react-doctor/no-pass-live-state-to-parent -- Route/back closes arrive as state after render, and the sheet needs to animate before the field route is finalized. */
+  useEffect(() => {
+    const previousCloseRequestId = closeRequestIdRef.current;
+    closeRequestIdRef.current = closeRequestId;
+
+    if (closeRequestId !== previousCloseRequestId && previousCloseRequestId !== undefined) {
+      requestClose("dismiss");
+    }
+  });
+  /* eslint-enable react-doctor/no-event-handler, react-doctor/no-pass-live-state-to-parent */
+
+  if (isLargeScreen && !popoverPosition) {
+    return null;
+  }
+
+  const calculatorContent = (
+    <CalculatorContent
+      charRefs={charRefs}
+      currency={currency}
+      cursorPosition={cursorPosition}
+      expression={expression}
+      expressionContentRef={expressionContentRef}
+      expressionRef={expressionRef}
+      expressionScrollRef={expressionScrollRef}
+      fieldLabel={fieldLabel}
+      isLargeScreen={isLargeScreen}
+      onBackspace={onBackspace}
+      onClear={onClear}
+      onCommit={() => requestClose("commit")}
+      onInsert={onInsert}
+      previewValue={previewValue}
+      selectionRange={selectionRange}
+    />
+  );
+
+  if (!isLargeScreen) {
+    return (
+      <Sheet
+        detent="content"
+        disableScrollLocking
+        isOpen={isMobileSheetOpen}
+        onClose={() => requestClose("dismiss")}
+        onCloseStart={() => restoreInitialWindowScroll("smooth")}
+        onCloseEnd={() => {
+          void finishMobileClose();
+        }}
+        onOpenStart={() => scrollFieldAboveMobileSheet("smooth")}
+        style={{ zIndex: 50 }}
+        tweenConfig={MOBILE_SHEET_TWEEN_CONFIG}
+        unstyled
+      >
+        <CalculatorMobileAttachmentLayer
+          layerRef={attachmentLayerRef}
+          photoIds={attachmentPhotoIds}
+          sheetHeight={mobileSheetHeight}
+        />
+        <Sheet.Container
+          ref={toolbarRef}
+          role="application"
+          aria-label={t`Calculator`}
+          data-presence-proxy-element-id={presenceElementId}
+          className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
+        >
+          {calculatorContent}
+        </Sheet.Container>
+      </Sheet>
+    );
+  }
+
+  const desktopPopoverPosition = popoverPosition;
+  if (!desktopPopoverPosition) {
+    return null;
+  }
 
   return createPortal(
     <div
@@ -491,48 +1045,323 @@ export function CalculatorToolbar({
       role="application"
       aria-label={t`Calculator`}
       data-presence-proxy-element-id={presenceElementId}
-      className={
-        isLargeScreen && popoverPosition
-          ? "border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 rounded-lg border bg-white shadow-lg"
-          : "border-accent-300 pb-safe dark:border-accent-700 dark:bg-accent-900 fixed right-0 left-0 z-50 border-t bg-white"
-      }
-      style={
-        isLargeScreen && popoverPosition
-          ? {
-              top: popoverPosition.top,
-              left: popoverPosition.left,
-              width: popoverPosition.width,
-            }
-          : { bottom: 0 }
-      }
-      onPointerDown={(e) => {
-        // Prevent any focus changes that could interfere with the calculator
-        e.preventDefault();
+      className="border-accent-300 dark:border-accent-700 dark:bg-accent-900 fixed z-50 overflow-y-auto rounded-lg border bg-white shadow-lg"
+      style={{
+        top: desktopPopoverPosition.top,
+        left: desktopPopoverPosition.left,
+        width: desktopPopoverPosition.width,
+        maxHeight: `calc(100vh - ${DESKTOP_POPOVER_MARGIN * 2}px)`,
       }}
     >
-      <div className="flex flex-col gap-1.5 px-2 py-2">
+      {calculatorContent}
+    </div>,
+    document.body,
+  );
+}
+
+function CalculatorMobileAttachmentLayer({
+  layerRef,
+  photoIds,
+  sheetHeight,
+}: {
+  layerRef: React.RefObject<HTMLDivElement | null>;
+  photoIds: MediaFile["id"][];
+  sheetHeight: number;
+}) {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const { yProgress } = Sheet.useContext();
+
+  if (photoIds.length === 0) {
+    return null;
+  }
+
+  return (
+    <LazyMotion features={domAnimation}>
+      <m.div
+        ref={layerRef}
+        data-calculator-attachment-layer
+        className="pointer-events-none fixed inset-0 z-[1] md:hidden"
+        style={{ opacity: yProgress }}
+      >
+        <Suspense fallback={null}>
+          <CalculatorMobileAttachmentContent
+            photoIds={photoIds}
+            selectedIndex={selectedIndex}
+            setSelectedIndex={setSelectedIndex}
+            sheetHeight={sheetHeight}
+          />
+        </Suspense>
+      </m.div>
+    </LazyMotion>
+  );
+}
+
+function CalculatorMobileAttachmentContent({
+  photoIds,
+  selectedIndex,
+  setSelectedIndex,
+  sheetHeight,
+}: {
+  photoIds: MediaFile["id"][];
+  selectedIndex: number | null;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  sheetHeight: number;
+}) {
+  const attachmentButtonIdPrefix = useId();
+  const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
+  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
+    required: true as const,
+  }).map(({ doc }) => doc);
+  const urls = useMediaFileObjectUrls(mediaFiles);
+  const galleryItems: MediaGalleryItem[] = urls.map((url) => ({ src: url }));
+  const activeIndex =
+    selectedIndex !== null && selectedIndex < galleryItems.length ? selectedIndex : null;
+
+  function getAttachmentButtonId(index: number) {
+    return `${attachmentButtonIdPrefix}-${index}`;
+  }
+
+  function closeAttachmentPreview() {
+    pendingAttachmentFocusIndexRef.current = activeIndex;
+    setSelectedIndex(null);
+  }
+
+  useEffect(() => {
+    const indexToFocus = pendingAttachmentFocusIndexRef.current;
+    if (activeIndex !== null || indexToFocus === null) {
+      return;
+    }
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      pendingAttachmentFocusIndexRef.current = null;
+      document.getElementById(`${attachmentButtonIdPrefix}-${indexToFocus}`)?.focus();
+    });
+
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [activeIndex, attachmentButtonIdPrefix]);
+
+  return (
+    <>
+      <m.div
+        data-calculator-attachment-toolbar=""
+        className="pt-safe border-accent-200/80 dark:border-accent-800 dark:bg-accent-950 pointer-events-auto absolute inset-x-0 top-0 z-10 bg-white shadow-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        style={{ height: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE }}
+        transition={MOBILE_SHEET_TWEEN_CONFIG}
+      >
+        <div
+          role="toolbar"
+          aria-label={t`Attachments`}
+          className="border-accent-200/80 px-safe-or-4 dark:border-accent-800 flex h-16 items-center gap-2 border-b"
+        >
+          <div className="no-scrollbar flex min-w-0 flex-1 gap-2 overflow-x-auto py-2">
+            {photoIds.map((photoId, index) => (
+              <CalculatorMobileAttachmentButton
+                key={photoId}
+                buttonId={getAttachmentButtonId(index)}
+                index={index}
+                isActive={activeIndex === index}
+                onSelect={setSelectedIndex}
+                url={urls[index]}
+              />
+            ))}
+          </div>
+
+          {activeIndex !== null ? (
+            <IconButton
+              icon="lucide.x"
+              aria-label={t`Close attachment preview`}
+              className="h-10 w-10 shrink-0"
+              iconClassName="size-5"
+              onPress={closeAttachmentPreview}
+            />
+          ) : null}
+        </div>
+      </m.div>
+
+      <AnimatePresence>
+        {activeIndex !== null ? (
+          <m.section
+            aria-label={t`Attachment preview`}
+            className="bg-accent-950/85 pointer-events-auto absolute inset-x-0 z-0 overflow-hidden backdrop-blur-sm"
+            style={{
+              top: MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE,
+              bottom: 0,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={MOBILE_SHEET_TWEEN_CONFIG}
+          >
+            <div
+              className="absolute inset-x-0 top-0 overflow-hidden"
+              style={{ bottom: Math.max(0, sheetHeight) }}
+            >
+              <MediaGallery
+                index={activeIndex}
+                items={galleryItems}
+                onChange={setSelectedIndex}
+                onClose={closeAttachmentPreview}
+                showCloseButton={false}
+              />
+            </div>
+          </m.section>
+        ) : null}
+      </AnimatePresence>
+    </>
+  );
+}
+
+function CalculatorMobileAttachmentButton({
+  buttonId,
+  index,
+  isActive,
+  onSelect,
+  url,
+}: {
+  buttonId: string;
+  index: number;
+  isActive: boolean;
+  onSelect: React.Dispatch<React.SetStateAction<number | null>>;
+  url: string;
+}) {
+  const { i18n } = useLingui();
+  const attachmentNumber = index + 1;
+
+  return (
+    <Button
+      id={buttonId}
+      color="transparent"
+      aria-pressed={isActive}
+      aria-label={i18n._({
+        ...viewAttachmentMessage,
+        values: { attachmentNumber },
+      })}
+      onPress={() => onSelect(index)}
+      className={cn(
+        "border-accent-200 bg-accent-50 dark:bg-accent-900 h-12 w-12 shrink-0 overflow-hidden rounded-lg border p-0 dark:border-accent-700",
+        isActive && "ring-accent-500 dark:ring-accent-400 ring-2 ring-inset",
+      )}
+    >
+      <span
+        className={cn(
+          "pointer-events-none absolute overflow-hidden",
+          isActive ? "inset-[3px] rounded-[0.35rem]" : "inset-px rounded-[0.45rem]",
+        )}
+      >
+        <img src={url} alt="" className="block h-full w-full object-cover" />
+      </span>
+    </Button>
+  );
+}
+
+function CalculatorContent({
+  charRefs,
+  currency,
+  cursorPosition,
+  expression,
+  expressionContentRef,
+  expressionRef,
+  expressionScrollRef,
+  fieldLabel,
+  isLargeScreen,
+  onBackspace,
+  onClear,
+  onCommit,
+  onInsert,
+  previewValue,
+  selectionRange,
+}: Pick<
+  CalculatorToolbarProps,
+  | "currency"
+  | "cursorPosition"
+  | "expression"
+  | "fieldLabel"
+  | "onBackspace"
+  | "onClear"
+  | "onCommit"
+  | "onInsert"
+  | "previewValue"
+  | "selectionRange"
+> & {
+  charRefs: React.RefObject<(HTMLSpanElement | null)[]>;
+  expressionContentRef: React.RefObject<HTMLSpanElement | null>;
+  expressionRef: React.RefObject<HTMLDivElement | null>;
+  expressionScrollRef: React.RefObject<HTMLSpanElement | null>;
+  isLargeScreen: boolean;
+}) {
+  const header = (
+    <>
+      {!isLargeScreen ? (
+        <div className="flex justify-center">
+          <span
+            aria-hidden="true"
+            className="bg-accent-200 dark:bg-accent-700 h-1.5 w-12 rounded-full"
+          />
+        </div>
+      ) : null}
+
+      <div className="flex min-h-8 items-center gap-2 px-1">
+        {fieldLabel ? (
+          <span
+            className="text-accent-700 dark:text-accent-200 min-w-0 flex-1 truncate text-sm font-medium"
+            title={fieldLabel}
+          >
+            {fieldLabel}
+          </span>
+        ) : (
+          <span className="flex-1" />
+        )}
         <CalculatorPreview
           currency={currency}
           expression={expression}
           previewValue={previewValue}
         />
-        <CalculatorExpressionDisplay
-          charRefs={charRefs}
-          cursorPosition={cursorPosition}
-          expression={expression}
-          expressionContentRef={expressionContentRef}
-          expressionRef={expressionRef}
-          expressionScrollRef={expressionScrollRef}
-        />
+      </div>
+    </>
+  );
+
+  return (
+    <div className="flex flex-col gap-1.5 px-2 py-2">
+      {isLargeScreen ? (
+        <div>{header}</div>
+      ) : (
+        <Sheet.Header
+          data-calculator-sheet-drag-handle=""
+          className="cursor-grab touch-none active:cursor-grabbing"
+        >
+          <div className="flex flex-col gap-3 pt-1 pb-1">{header}</div>
+        </Sheet.Header>
+      )}
+      <CalculatorExpressionDisplay
+        charRefs={charRefs}
+        cursorPosition={cursorPosition}
+        expression={expression}
+        expressionContentRef={expressionContentRef}
+        expressionRef={expressionRef}
+        expressionScrollRef={expressionScrollRef}
+        selectionRange={selectionRange}
+      />
+      {isLargeScreen ? (
         <CalculatorKeypad
           onBackspace={onBackspace}
           onClear={onClear}
           onCommit={onCommit}
           onInsert={onInsert}
         />
-      </div>
-    </div>,
-    document.body,
+      ) : (
+        <Sheet.Content disableDrag disableScroll>
+          <CalculatorKeypad
+            onBackspace={onBackspace}
+            onClear={onClear}
+            onCommit={onCommit}
+            onInsert={onInsert}
+          />
+        </Sheet.Content>
+      )}
+    </div>
   );
 }
 
@@ -546,7 +1375,7 @@ function CalculatorPreview({
   previewValue: number | null;
 }) {
   return (
-    <div className="flex h-5 items-center justify-end px-1">
+    <div className="flex h-8 min-w-0 shrink-0 items-center justify-end">
       {previewValue !== null && expression ? (
         <span className="text-accent-600 dark:text-accent-400 text-sm font-medium">
           = {formatCalculatorPreviewValue(previewValue, currency)}
@@ -563,6 +1392,7 @@ function CalculatorExpressionDisplay({
   expressionContentRef,
   expressionRef,
   expressionScrollRef,
+  selectionRange,
 }: {
   charRefs: React.RefObject<(HTMLSpanElement | null)[]>;
   cursorPosition: number;
@@ -570,10 +1400,21 @@ function CalculatorExpressionDisplay({
   expressionContentRef: React.RefObject<HTMLSpanElement | null>;
   expressionRef: React.RefObject<HTMLDivElement | null>;
   expressionScrollRef: React.RefObject<HTMLSpanElement | null>;
+  selectionRange: CalculatorSelectionRange | null;
 }) {
   const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
     charRefs.current[index] = el;
   };
+  const activeSelectionRange =
+    selectionRange && selectionRange.start !== selectionRange.end
+      ? {
+          start: Math.max(0, Math.min(selectionRange.start, selectionRange.end, expression.length)),
+          end: Math.max(
+            0,
+            Math.min(Math.max(selectionRange.start, selectionRange.end), expression.length),
+          ),
+        }
+      : null;
 
   return (
     <div
@@ -594,9 +1435,15 @@ function CalculatorExpressionDisplay({
               <span
                 key={getExpressionCharacterKey(expression, index)}
                 ref={setCharRef(index)}
-                className="relative"
+                className={cn(
+                  "relative",
+                  activeSelectionRange &&
+                    index >= activeSelectionRange.start &&
+                    index < activeSelectionRange.end &&
+                    "bg-accent-300 text-accent-950 dark:bg-accent-700 dark:text-accent-50",
+                )}
               >
-                {index === cursorPosition ? (
+                {!activeSelectionRange && index === cursorPosition ? (
                   <span className="animate-blink absolute top-0 left-0 h-full w-0">
                     <span className="absolute -translate-x-1/2">|</span>
                   </span>
@@ -604,7 +1451,7 @@ function CalculatorExpressionDisplay({
                 {char}
               </span>
             ))}
-            {cursorPosition === expression.length ? (
+            {!activeSelectionRange && cursorPosition === expression.length ? (
               <span className="animate-blink absolute top-0 right-0 h-full w-0">
                 <span className="absolute -translate-x-1/2">|</span>
               </span>
@@ -622,13 +1469,16 @@ function CalculatorKeypad({
   onCommit,
   onInsert,
 }: Pick<CalculatorToolbarProps, "onBackspace" | "onClear" | "onCommit" | "onInsert">) {
+  const utilityButtonClassName = "h-12 touch-manipulation rounded-xl text-lg font-medium";
+  const digitButtonClassName = "h-12 touch-manipulation rounded-xl text-xl font-medium";
+
   return (
     <div className="grid grid-cols-4 gap-1.5">
       <Button
         color="input-like"
         aria-label={t`Clear all`}
         onPress={onClear}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         AC
       </Button>
@@ -636,7 +1486,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Open parenthesis`}
         onPress={() => onInsert("(")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         (
       </Button>
@@ -644,7 +1494,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Close parenthesis`}
         onPress={() => onInsert(")")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         )
       </Button>
@@ -652,7 +1502,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Divide`}
         onPress={() => onInsert("/")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         ÷
       </Button>
@@ -663,7 +1513,7 @@ function CalculatorKeypad({
           color="input-like"
           aria-label={digit}
           onPress={() => onInsert(digit)}
-          className="h-12 rounded-xl text-xl font-medium"
+          className={digitButtonClassName}
         >
           {digit}
         </Button>
@@ -672,7 +1522,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Multiply`}
         onPress={() => onInsert("*")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         ×
       </Button>
@@ -683,7 +1533,7 @@ function CalculatorKeypad({
           color="input-like"
           aria-label={digit}
           onPress={() => onInsert(digit)}
-          className="h-12 rounded-xl text-xl font-medium"
+          className={digitButtonClassName}
         >
           {digit}
         </Button>
@@ -692,7 +1542,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Subtract`}
         onPress={() => onInsert("-")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         −
       </Button>
@@ -703,7 +1553,7 @@ function CalculatorKeypad({
           color="input-like"
           aria-label={digit}
           onPress={() => onInsert(digit)}
-          className="h-12 rounded-xl text-xl font-medium"
+          className={digitButtonClassName}
         >
           {digit}
         </Button>
@@ -712,7 +1562,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Add`}
         onPress={() => onInsert("+")}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         +
       </Button>
@@ -721,7 +1571,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label="0"
         onPress={() => onInsert("0")}
-        className="h-12 rounded-xl text-xl font-medium"
+        className={digitButtonClassName}
       >
         0
       </Button>
@@ -729,7 +1579,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Decimal point`}
         onPress={() => onInsert(".")}
-        className="h-12 rounded-xl text-xl font-medium"
+        className={digitButtonClassName}
       >
         .
       </Button>
@@ -737,7 +1587,7 @@ function CalculatorKeypad({
         color="input-like"
         aria-label={t`Backspace`}
         onPress={onBackspace}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         <Icon icon="lucide.delete" className="size-5" />
       </Button>
@@ -745,7 +1595,7 @@ function CalculatorKeypad({
         color="accent"
         aria-label={t`Calculate result`}
         onPress={onCommit}
-        className="h-12 rounded-xl text-lg font-medium"
+        className={utilityButtonClassName}
       >
         =
       </Button>

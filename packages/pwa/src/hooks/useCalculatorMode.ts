@@ -6,7 +6,6 @@ const currencyDecimalsCache = new Map<string, number | null>();
 interface UseCalculatorModeOptions {
   value: number;
   onChange: (value: number) => void;
-  fieldContainerRef: React.RefObject<HTMLDivElement | null>;
   currency?: string;
 }
 
@@ -44,15 +43,36 @@ function roundToDecimals(value: number, decimals: number | null): number {
   return (sign * Math.round(Math.abs(value) * factor + 1e-10)) / factor;
 }
 
+export function getChangedCalculatorValue({
+  currentValue,
+  decimals,
+  nextValue,
+}: {
+  currentValue: number;
+  decimals: number | null;
+  nextValue: number;
+}) {
+  const roundedCurrentValue = roundToDecimals(currentValue, decimals);
+  const roundedNextValue = roundToDecimals(nextValue, decimals);
+
+  return roundedCurrentValue === roundedNextValue ? null : roundedNextValue;
+}
+
 export interface CalculatorState {
   isActive: boolean;
   expression: string;
   cursorPosition: number;
+  selectionRange: CalculatorSelectionRange | null;
   previewValue: number | null;
 }
 
+export interface CalculatorSelectionRange {
+  start: number;
+  end: number;
+}
+
 export interface CalculatorActions {
-  activate: () => void;
+  activate: (options?: { selectAll?: boolean }) => void;
   deactivate: () => void;
   insertAtCursor: (text: string) => void;
   backspace: () => void;
@@ -62,35 +82,122 @@ export interface CalculatorActions {
   clear: () => void;
 }
 
+interface CalculatorTextEditOptions {
+  expression: string;
+  cursorPosition: number;
+  selectionRange: CalculatorSelectionRange | null;
+}
+
+interface CalculatorTextEditResult {
+  expression: string;
+  cursorPosition: number;
+}
+
+function getActiveSelectionRange({
+  expression,
+  selectionRange,
+}: Pick<CalculatorTextEditOptions, "expression" | "selectionRange">) {
+  if (!selectionRange || selectionRange.start === selectionRange.end) {
+    return null;
+  }
+
+  const start = Math.max(0, Math.min(selectionRange.start, selectionRange.end, expression.length));
+  const end = Math.max(
+    0,
+    Math.min(Math.max(selectionRange.start, selectionRange.end), expression.length),
+  );
+
+  if (start === end) {
+    return null;
+  }
+
+  return { start, end };
+}
+
+export function insertCalculatorText({
+  expression,
+  cursorPosition,
+  selectionRange,
+  text,
+}: CalculatorTextEditOptions & { text: string }): CalculatorTextEditResult {
+  const activeSelectionRange = getActiveSelectionRange({ expression, selectionRange });
+  const shouldAppendBinaryOperator =
+    activeSelectionRange?.start === 0 &&
+    activeSelectionRange.end === expression.length &&
+    /^[+\-*/]$/.test(text);
+  const start = shouldAppendBinaryOperator
+    ? activeSelectionRange.end
+    : (activeSelectionRange?.start ?? cursorPosition);
+  const end = shouldAppendBinaryOperator
+    ? activeSelectionRange.end
+    : (activeSelectionRange?.end ?? cursorPosition);
+  const nextExpression = expression.slice(0, start) + text + expression.slice(end);
+
+  return {
+    expression: nextExpression,
+    cursorPosition: start + text.length,
+  };
+}
+
+export function deleteCalculatorText({
+  expression,
+  cursorPosition,
+  selectionRange,
+}: CalculatorTextEditOptions): CalculatorTextEditResult | null {
+  const activeSelectionRange = getActiveSelectionRange({ expression, selectionRange });
+
+  if (activeSelectionRange) {
+    return {
+      expression:
+        expression.slice(0, activeSelectionRange.start) +
+        expression.slice(activeSelectionRange.end),
+      cursorPosition: activeSelectionRange.start,
+    };
+  }
+
+  if (cursorPosition <= 0) {
+    return null;
+  }
+
+  return {
+    expression: expression.slice(0, cursorPosition - 1) + expression.slice(cursorPosition),
+    cursorPosition: cursorPosition - 1,
+  };
+}
+
 export function useCalculatorMode({
   value,
   onChange,
-  fieldContainerRef,
   currency,
 }: UseCalculatorModeOptions): [CalculatorState, CalculatorActions] {
   const [isActive, setIsActive] = useState(false);
   const [expression, setExpressionRaw] = useState("");
   const [cursorPosition, setCursorPositionRaw] = useState(0);
+  const [selectionRange, setSelectionRangeRaw] = useState<CalculatorSelectionRange | null>(null);
 
   const decimals = getCurrencyDecimals(currency);
   const rawPreviewValue = evaluateExpression(expression);
   const previewValue = rawPreviewValue !== null ? roundToDecimals(rawPreviewValue, decimals) : null;
 
   function applyValue(val: number) {
-    onChange(roundToDecimals(val, decimals));
-  }
-
-  function focusField() {
-    requestAnimationFrame(() => {
-      const input = fieldContainerRef.current?.querySelector("input");
-      input?.focus();
+    const nextValue = getChangedCalculatorValue({
+      currentValue: value,
+      decimals,
+      nextValue: val,
     });
+
+    if (nextValue !== null) {
+      onChange(nextValue);
+    }
   }
 
-  function activate() {
+  function activate({ selectAll = true }: { selectAll?: boolean } = {}) {
     const initialExpr = value === 0 ? "" : String(value);
     setExpressionRaw(initialExpr);
     setCursorPositionRaw(initialExpr.length);
+    setSelectionRangeRaw(
+      selectAll && initialExpr.length > 0 ? { start: 0, end: initialExpr.length } : null,
+    );
     setIsActive(true);
   }
 
@@ -102,50 +209,63 @@ export function useCalculatorMode({
     setIsActive(false);
     setExpressionRaw("");
     setCursorPositionRaw(0);
-    focusField();
+    setSelectionRangeRaw(null);
   }
 
   function insertAtCursor(text: string) {
-    const before = expression.slice(0, cursorPosition);
-    const after = expression.slice(cursorPosition);
-    const newExpr = before + text + after;
-    setExpressionRaw(newExpr);
-    setCursorPositionRaw(cursorPosition + text.length);
+    const edit = insertCalculatorText({
+      expression,
+      cursorPosition,
+      selectionRange,
+      text,
+    });
+    setExpressionRaw(edit.expression);
+    setCursorPositionRaw(edit.cursorPosition);
+    setSelectionRangeRaw(null);
 
-    const result = evaluateExpression(newExpr);
+    const result = evaluateExpression(edit.expression);
     if (result !== null) {
       applyValue(result);
     }
   }
 
   function backspace() {
-    if (cursorPosition > 0) {
-      const before = expression.slice(0, cursorPosition - 1);
-      const after = expression.slice(cursorPosition);
-      const newExpr = before + after;
-      setExpressionRaw(newExpr);
-      setCursorPositionRaw(cursorPosition - 1);
+    const edit = deleteCalculatorText({
+      expression,
+      cursorPosition,
+      selectionRange,
+    });
 
-      const result = evaluateExpression(newExpr);
-      if (result !== null) {
-        applyValue(result);
-      } else if (newExpr === "") {
-        applyValue(0);
-      }
+    if (!edit) {
+      return;
+    }
+
+    setExpressionRaw(edit.expression);
+    setCursorPositionRaw(edit.cursorPosition);
+    setSelectionRangeRaw(null);
+
+    const result = evaluateExpression(edit.expression);
+    if (result !== null) {
+      applyValue(result);
+    } else if (edit.expression === "") {
+      applyValue(0);
     }
   }
 
   function moveCursor(direction: "left" | "right") {
     if (direction === "left" && cursorPosition > 0) {
       setCursorPositionRaw(cursorPosition - 1);
+      setSelectionRangeRaw(null);
     } else if (direction === "right" && cursorPosition < expression.length) {
       setCursorPositionRaw(cursorPosition + 1);
+      setSelectionRangeRaw(null);
     }
   }
 
   function setCursorPosition(position: number) {
     const clampedPosition = Math.max(0, Math.min(position, expression.length));
     setCursorPositionRaw(clampedPosition);
+    setSelectionRangeRaw(null);
   }
 
   function commit() {
@@ -156,16 +276,18 @@ export function useCalculatorMode({
     setIsActive(false);
     setExpressionRaw("");
     setCursorPositionRaw(0);
+    setSelectionRangeRaw(null);
   }
 
   function clear() {
     setExpressionRaw("");
     setCursorPositionRaw(0);
+    setSelectionRangeRaw(null);
     applyValue(0);
   }
 
   return [
-    { isActive, expression, cursorPosition, previewValue },
+    { isActive, expression, cursorPosition, selectionRange, previewValue },
     {
       activate,
       deactivate,

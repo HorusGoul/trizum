@@ -5,6 +5,10 @@ import { useGesture } from "@use-gesture/react";
 import { LazyMotion, animate, domAnimation, m, useMotionValue } from "motion/react";
 import type { IconProps } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
+import {
+  calculateMediaGalleryPinchTransform,
+  type MediaGalleryPoint,
+} from "./mediaGalleryPinch.ts";
 
 export type MediaGalleryItem = {
   src: string;
@@ -16,6 +20,7 @@ export interface MediaGalleryProps {
   onChange: (index: number) => void;
   onClose: () => void;
   onDragProgress?: (progress: number) => void;
+  showCloseButton?: boolean;
 }
 
 const CLOSE_THRESHOLD = 150;
@@ -26,6 +31,7 @@ export default function MediaGallery({
   onClose,
   onChange,
   onDragProgress,
+  showCloseButton = true,
 }: MediaGalleryProps) {
   const dataSource = useAsyncMediaGalleryItems(items);
   const maxIndex = dataSource.length - 1;
@@ -62,9 +68,52 @@ export default function MediaGallery({
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const previousPinchOriginRef = useRef<MediaGalleryPoint | null>(null);
 
   // Track if we're in a "closing drag" gesture (dragging up at scale=1)
   const isClosingDragRef = useRef(false);
+
+  function getLocalPinchOrigin([originX, originY]: MediaGalleryPoint) {
+    const viewport = viewportRef.current;
+
+    if (!viewport) {
+      return null;
+    }
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const localOriginX = originX - viewportRect.left - viewportRect.width / 2;
+    const localOriginY = originY - viewportRect.top - viewportRect.height / 2;
+
+    if (!Number.isFinite(localOriginX) || !Number.isFinite(localOriginY)) {
+      return null;
+    }
+
+    return [localOriginX, localOriginY] as const;
+  }
+
+  function zoomAroundOrigin(nextScale: number, origin: MediaGalleryPoint) {
+    const currentScale = scale.get();
+    const nextOrigin = getLocalPinchOrigin(origin);
+
+    if (!nextOrigin || currentScale <= 0) {
+      scale.set(nextScale);
+      previousPinchOriginRef.current = nextOrigin;
+      return;
+    }
+
+    const transform = calculateMediaGalleryPinchTransform({
+      currentPosition: [x.get(), y.get()],
+      currentScale,
+      previousOrigin: previousPinchOriginRef.current ?? nextOrigin,
+      nextOrigin,
+      nextScale,
+    });
+
+    x.set(transform.x);
+    y.set(transform.y);
+    scale.set(transform.scale);
+    previousPinchOriginRef.current = nextOrigin;
+  }
 
   useGesture(
     {
@@ -104,15 +153,26 @@ export default function MediaGallery({
         }
         isClosingDragRef.current = false;
       },
-      onPinch: ({ offset: [s] }) => {
-        scale.set(s);
-
-        // TODO: when zooming, the image should be centered on the pinch point
+      onPinchStart: ({ origin }) => {
+        isClosingDragRef.current = false;
+        previousPinchOriginRef.current = getLocalPinchOrigin(origin);
+        onDragProgress?.(0);
+      },
+      onPinch: ({ offset: [s], origin }) => {
+        zoomAroundOrigin(s, origin);
+      },
+      onPinchEnd: ({ offset: [s] }) => {
+        previousPinchOriginRef.current = null;
+        if (s <= 1) {
+          void animate(x, 0, { type: "spring", stiffness: 400, damping: 30 });
+          void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
+        }
       },
     },
     {
       target: ref,
       pinch: {
+        from: () => [scale.get(), 0],
         scaleBounds: { min: 0.5, max: 4 },
         rubberband: true,
       },
@@ -160,6 +220,7 @@ export default function MediaGallery({
     x.set(0);
     y.set(0);
     scale.set(1);
+    previousPinchOriginRef.current = null;
   }, [index, x, y, scale]);
 
   return (
@@ -176,12 +237,14 @@ export default function MediaGallery({
           </m.div>
         </div>
 
-        <GalleryButton
-          className="right-safe-offset-4 top-safe-offset-4"
-          label={t`Close`}
-          icon="lucide.x"
-          onClick={onClose}
-        />
+        {showCloseButton ? (
+          <GalleryButton
+            className="right-safe-offset-4 top-safe-offset-4"
+            label={t`Close`}
+            icon="lucide.x"
+            onClick={onClose}
+          />
+        ) : null}
 
         {showNavigation && (
           <>

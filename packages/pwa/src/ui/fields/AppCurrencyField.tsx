@@ -17,6 +17,7 @@ interface AppCurrencyFieldProps extends Omit<AriaTextFieldProps, "value" | "onCh
   value?: number;
   onChange?: (value: number) => void;
   inputClassName?: ClassName;
+  inputEndAdornment?: React.ReactNode;
   currency?: string;
 }
 
@@ -28,6 +29,8 @@ export function AppCurrencyField({
   value,
   onChange,
   inputClassName,
+  inputEndAdornment,
+  inputMode,
   currency,
   ...props
 }: AppCurrencyFieldProps) {
@@ -103,7 +106,14 @@ export function AppCurrencyField({
       {...props}
     >
       {label ? <Label>{label}</Label> : null}
-      <Input inputMode="decimal" className={cn(inputClassName)} />
+      {inputEndAdornment ? (
+        <div className="relative">
+          <Input inputMode={inputMode ?? "decimal"} className={cn(inputClassName)} />
+          {inputEndAdornment}
+        </div>
+      ) : (
+        <Input inputMode={inputMode ?? "decimal"} className={cn(inputClassName)} />
+      )}
       {description && (
         <Text className="text-accent-700 dark:text-accent-50 text-sm" slot="description">
           {description}

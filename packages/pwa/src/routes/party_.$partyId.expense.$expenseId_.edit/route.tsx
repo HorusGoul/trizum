@@ -27,10 +27,12 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
+import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 
 interface EditExpenseSearchParams {
+  calculator?: string;
   media?: number;
 }
 
@@ -40,6 +42,10 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
 
   validateSearch: (search): EditExpenseSearchParams => {
     return {
+      calculator:
+        typeof search.calculator === "string" && search.calculator.length > 0
+          ? search.calculator
+          : undefined,
       media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
     };
   },
@@ -71,11 +77,32 @@ function EditExpense() {
 
   const photos = expense?.photos ?? [];
 
+  function mergeSearchOptions<TOptions extends { search: Partial<EditExpenseSearchParams> }>(
+    options: TOptions,
+  ) {
+    return {
+      ...options,
+      search: {
+        ...search,
+        ...options.search,
+      },
+    };
+  }
+
   const { galleryIndex, openGallery, closeGallery, onIndexChange } = useRouteMediaGallery({
     mediaIndex: search.media,
     currentLocation,
-    buildLocation: (options) => router.buildLocation({ ...options, from: Route.fullPath }),
-    navigate: (options) => void navigate(options),
+    buildLocation: (options) =>
+      router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
+    navigate: (options) => void navigate(mergeSearchOptions(options)),
+    history: router.history,
+  });
+  const { activeCalculatorId, openCalculator, closeCalculator } = useRouteCalculator({
+    calculatorId: search.calculator,
+    currentLocation,
+    buildLocation: (options) =>
+      router.buildLocation({ ...mergeSearchOptions(options), from: Route.fullPath }),
+    navigate: (options) => void navigate(mergeSearchOptions(options)),
     history: router.history,
   });
 
@@ -202,6 +229,9 @@ function EditExpense() {
         // eslint-disable-next-line jsx-a11y/no-autofocus -- We don't want to auto focus the edit form
         autoFocus={false}
         goBackFallbackOptions={{ to: "/party/$partyId/expense/$expenseId" }}
+        activeCalculatorId={activeCalculatorId}
+        onCloseCalculator={closeCalculator}
+        onOpenCalculator={openCalculator}
         onViewPhoto={openGallery}
       />
       <RouteMediaGallery

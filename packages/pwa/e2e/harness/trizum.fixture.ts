@@ -20,6 +20,7 @@ export interface InternalHarnessWindow extends Window {
 interface PartyListSeed {
   username?: string;
   phone?: string;
+  autoOpenCalculator?: boolean;
   openLastPartyOnLaunch?: boolean;
   lastOpenedPartyId?: string | null;
   parties?: Record<string, true>;
