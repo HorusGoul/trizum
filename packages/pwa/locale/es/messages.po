@@ -63,7 +63,7 @@ msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
 #: src/routes/about/route.tsx:23
-#: src/routes/index/route.tsx:149
+#: src/routes/index/route.tsx:164
 msgid "About"
 msgstr "Acerca de"
 
@@ -71,7 +71,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:444
+#: src/routes/settings.tsx:255
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -120,7 +120,7 @@ msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto in
 msgid "Add Google as a sign-in method"
 msgstr "Añadir Google como método de inicio de sesión"
 
-#: src/routes/index/route.tsx:197
+#: src/routes/index/route.tsx:212
 #: src/routes/party.$partyId/-components/ExpenseLog.tsx:52
 msgid "Add or create"
 msgstr "Añadir o crear"
@@ -206,7 +206,7 @@ msgstr "Archiva un grupo desde la pantalla de inicio cuando quieras despejar esp
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/index/route.tsx:266
+#: src/routes/index/route.tsx:281
 msgid "Archive party"
 msgstr "Archivar grupo"
 
@@ -218,7 +218,7 @@ msgstr "Archivado"
 msgid "Archived participants"
 msgstr "Participantes archivados"
 
-#: src/routes/index/route.tsx:127
+#: src/routes/index/route.tsx:142
 msgid "Archived parties"
 msgstr "Grupos archivados"
 
@@ -272,15 +272,15 @@ msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
 #: src/components/ExpenseEditor.tsx:369
-#: src/routes/settings.tsx:431
+#: src/routes/settings.tsx:242
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
-#: src/routes/settings.tsx:433
+#: src/routes/settings.tsx:244
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:420
+#: src/routes/settings.tsx:231
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -300,7 +300,6 @@ msgstr "Manat Azerbaiyano"
 msgid "Back to home"
 msgstr "Volver al inicio"
 
-#: src/components/CloudSyncDialogs.tsx:209
 #: src/routes/reset-password.tsx:102
 msgid "Back to settings"
 msgstr "Volver a configuración"
@@ -467,7 +466,7 @@ msgstr "Franco CFP"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/index/route.tsx:138
+#: src/routes/index/route.tsx:153
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
@@ -535,6 +534,10 @@ msgstr "Cerrar calculadora"
 #: src/components/CalculatorToolbar.tsx:1495
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
+
+#: src/components/CloudSyncDialogs.tsx:209
+msgid "Close sign-in"
+msgstr "Cerrar inicio de sesión"
 
 #: src/routes/settings.tsx:533
 msgid "Cloud settings applied"
@@ -690,7 +693,6 @@ msgid "Could not load sign-in methods"
 msgstr "No se pudieron cargar los métodos de inicio de sesión"
 
 #: src/hooks/useCloudSyncAccountState.ts:192
-#: src/routes/settings.tsx:487
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
@@ -718,10 +720,17 @@ msgstr "No se pudo cerrar sesión"
 msgid "Couldn't connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/routes/index/-components/EmptyState.tsx:25
-#: src/routes/index/route.tsx:214
+#: src/routes/index/route.tsx:229
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
+
+#: src/routes/index/-components/EmptyState.tsx:34
+msgid "Create a Party"
+msgstr "Crear un Grupo"
+
+#: src/routes/index/-components/EmptyState.tsx:26
+msgid "Create a party in seconds, track who paid, and settle up without the awkward maths."
+msgstr "Crea un grupo en segundos, registra quién pagó y salda cuentas sin cálculos incómodos."
 
 #: src/routes/settings_.cloud-sync.tsx:524
 #: src/routes/settings_.cloud-sync.tsx:564
@@ -932,7 +941,7 @@ msgstr "Lista de emojis"
 msgid "End date"
 msgstr "Fecha de fin"
 
-#: src/routes/settings.tsx:119
+#: src/routes/settings.tsx:44
 msgid "English"
 msgstr "Inglés"
 
@@ -948,7 +957,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
-#: src/routes/settings.tsx:120
+#: src/routes/settings.tsx:45
 msgid "Español"
 msgstr "Español"
 
@@ -1071,7 +1080,7 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
-#: src/routes/settings.tsx:382
+#: src/routes/settings.tsx:193
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -1237,6 +1246,10 @@ msgstr "Impacto en mi balance: <0/>"
 msgid "Import attachments"
 msgstr "Importar adjuntos"
 
+#: src/routes/index/-components/EmptyState.tsx:89
+msgid "Import from Tricount"
+msgstr "Importar desde Tricount"
+
 #: src/routes/index/-components/EmptyState.tsx:38
 msgid "Import your existing Tricount data"
 msgstr "Importa tu grupo de Tricount"
@@ -1327,8 +1340,7 @@ msgstr "Únete a {partyName} en trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
-#: src/routes/index/-components/EmptyState.tsx:31
-#: src/routes/index/route.tsx:208
+#: src/routes/index/route.tsx:223
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -1339,6 +1351,10 @@ msgstr "Unirse a un trizum"
 #: src/lib/partySharePreviewMessages.ts:6
 msgid "Join party"
 msgstr "Unirse"
+
+#: src/routes/index/-components/EmptyState.tsx:37
+msgid "Join with a code"
+msgstr "Unirse con un código"
 
 #: src/routes/new/route.tsx:249
 msgid "Jordanian Dinar"
@@ -1351,6 +1367,10 @@ msgstr "Vuelve a los grupos que más usas"
 #: src/routes/new/route.tsx:257
 msgid "Kazakhstani Tenge"
 msgstr "Tenge Kazajo"
+
+#: src/routes/index/-components/EmptyState.tsx:62
+msgid "Keep every party in sync"
+msgstr "Mantén todos tus grupos sincronizados"
 
 #: src/routes/settings_.cloud-sync.tsx:824
 msgid "Keep local data"
@@ -1372,7 +1392,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:397
+#: src/routes/settings.tsx:208
 msgid "Language"
 msgstr "Idioma"
 
@@ -1460,9 +1480,17 @@ msgstr "Rufiyaa Maldiva"
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
+#: src/routes/index/-components/EmptyState.tsx:73
+msgid "Manage"
+msgstr "Gestionar"
+
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:26
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden ser archivados."
+
+#: src/routes/index/-components/EmptyState.tsx:66
+msgid "Manage your cloud account and synced data."
+msgstr "Gestiona tu cuenta en la nube y tus datos sincronizados."
 
 #: src/routes/party_.$partyId.pay/route.tsx:95
 #: src/routes/party_.$partyId.pay/route.tsx:120
@@ -1490,7 +1518,6 @@ msgid "Me"
 msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:362
-#: src/routes/index/route.tsx:105
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:87
 #: src/routes/party.$partyId/route.tsx:172
 msgid "Menu"
@@ -1504,8 +1531,7 @@ msgstr "Unidad de Inversión Mexicana"
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
-#: src/routes/index/-components/EmptyState.tsx:37
-#: src/routes/index/route.tsx:220
+#: src/routes/index/route.tsx:235
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:39
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -1748,7 +1774,7 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:418
+#: src/routes/settings.tsx:229
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -1841,7 +1867,7 @@ msgstr "Participantes"
 msgid "Party actions"
 msgstr "Acciones del grupo"
 
-#: src/routes/index/route.tsx:287
+#: src/routes/index/route.tsx:302
 msgid "Party archived"
 msgstr "Grupo archivado"
 
@@ -1857,7 +1883,7 @@ msgstr "Clasificación del grupo"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/index/route.tsx:279
+#: src/routes/index/route.tsx:294
 msgid "Party pinned"
 msgstr "Grupo fijado"
 
@@ -1881,7 +1907,7 @@ msgstr "¡Grupo compartido!"
 msgid "Party stats"
 msgstr "Estadísticas del grupo"
 
-#: src/routes/index/route.tsx:279
+#: src/routes/index/route.tsx:294
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
@@ -1951,7 +1977,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:381
+#: src/routes/settings.tsx:192
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -1967,7 +1993,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/index/route.tsx:260
+#: src/routes/index/route.tsx:275
 msgid "Pin party"
 msgstr "Fijar grupo"
 
@@ -2026,6 +2052,10 @@ msgstr "Anterior"
 #: src/routes/about/route.tsx:110
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
+
+#: src/routes/index/route.tsx:107
+msgid "Profile and app menu"
+msgstr "Menú de perfil y aplicación"
 
 #: src/routes/new/route.tsx:289
 msgid "Qatari Rial"
@@ -2139,7 +2169,7 @@ msgstr "Riyal Saudí"
 #: src/routes/party_.$partyId.settings/route.tsx:120
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:232
+#: src/routes/settings.tsx:98
 msgid "Save"
 msgstr "Guardar"
 
@@ -2159,6 +2189,10 @@ msgstr "Buscar emoji"
 #: src/components/EmojiPicker.tsx:182
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
+
+#: src/routes/index/-components/EmptyState.tsx:68
+msgid "Securely access your data on all your devices."
+msgstr "Accede de forma segura a tus datos en todos tus dispositivos."
 
 #: src/components/CloudSyncAccountSettings.tsx:65
 msgid "Security"
@@ -2200,13 +2234,13 @@ msgstr "¿Configurar contraseña?"
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/index/route.tsx:116
+#: src/routes/index/route.tsx:120
 #: src/routes/party.$partyId/route.tsx:259
-#: src/routes/settings.tsx:263
+#: src/routes/settings.tsx:121
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:190
+#: src/routes/settings.tsx:65
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -2257,10 +2291,11 @@ msgid "Sierra Leonean Leone"
 msgstr "Leone de Sierra Leona"
 
 #: src/components/CloudSyncDialogs.tsx:205
+#: src/routes/index/-components/EmptyState.tsx:73
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:953
+#: src/routes/settings_.cloud-sync.tsx:971
 msgid "Sign in again before deleting your account"
 msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 
@@ -2385,6 +2420,10 @@ msgstr "Divide gastos y salda cuentas juntos en trizum."
 msgid "Split expenses fairly among multiple participants"
 msgstr "Divide los gastos de forma justa entre múltiples participantes"
 
+#: src/routes/index/-components/EmptyState.tsx:23
+msgid "Split expenses, stay even."
+msgstr "Reparte gastos, mantén las cuentas claras."
+
 #: src/routes/new/route.tsx:260
 msgid "Sri Lankan Rupee"
 msgstr "Rupia de Sri Lanka"
@@ -2416,7 +2455,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/party_.$partyId.settings/route.tsx:120
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:232
+#: src/routes/settings.tsx:98
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -2490,7 +2529,7 @@ msgstr "Sincronizando información del grupo..."
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
-#: src/routes/settings.tsx:118
+#: src/routes/settings.tsx:43
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
@@ -2662,8 +2701,8 @@ msgstr "URL o clave de Tricount"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
+#: src/routes/index/route.tsx:131
 #: src/routes/settings_.cloud-sync.tsx:828
-#: src/routes/settings.tsx:308
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -2750,7 +2789,7 @@ msgstr "Grivna Ucraniana"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/index/route.tsx:260
+#: src/routes/index/route.tsx:275
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
@@ -2847,7 +2886,7 @@ msgstr "¿Usar trizum cloud en este dispositivo?"
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 
-#: src/routes/settings.tsx:359
+#: src/routes/settings.tsx:170
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -2937,7 +2976,7 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:360
+#: src/routes/settings.tsx:171
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 

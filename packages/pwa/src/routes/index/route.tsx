@@ -102,7 +102,11 @@ function Index() {
           ) : null}
 
           <MenuTrigger>
-            <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Menu`} />
+            <IconButton
+              icon="lucide.circle-user-round"
+              aria-label={t`Profile and app menu`}
+              className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-200"
+            />
 
             <Popover placement="bottom end">
               <Menu>
@@ -114,6 +118,17 @@ function Index() {
                   <Icon icon="lucide.settings" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Settings</Trans>
+                  </span>
+                </MenuItem>
+
+                <MenuItem
+                  href={{
+                    to: "/settings/cloud-sync",
+                  }}
+                >
+                  <Icon icon="lucide.cloud" width={20} height={20} className="mr-3" />
+                  <span className="h-3.5 leading-none">
+                    <Trans>trizum cloud</Trans>
                   </span>
                 </MenuItem>
 

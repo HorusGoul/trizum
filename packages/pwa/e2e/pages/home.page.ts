@@ -4,6 +4,7 @@ export class HomePage {
   readonly page: Page;
   readonly welcomeHeading: Locator;
   readonly createPartyLink: Locator;
+  readonly cloudSyncLink: Locator;
   readonly joinPartyLink: Locator;
   readonly migrateFromTricountLink: Locator;
   readonly menuButton: Locator;
@@ -12,19 +13,22 @@ export class HomePage {
   constructor(page: Page) {
     this.page = page;
     this.welcomeHeading = page.getByRole("heading", {
-      name: "Welcome to trizum",
+      name: "Split expenses, stay even.",
     });
     this.createPartyLink = page.getByRole("link", {
-      name: "Create a new Party",
+      name: "Create a Party",
+    });
+    this.cloudSyncLink = page.getByRole("link", {
+      name: /Keep every party in sync/,
     });
     this.joinPartyLink = page.getByRole("link", {
-      name: "Join a Party",
+      name: "Join with a code",
     });
     this.migrateFromTricountLink = page.getByRole("link", {
-      name: "Migrate from Tricount",
+      name: "Import from Tricount",
     });
     this.menuButton = page.getByRole("button", {
-      name: "Menu",
+      name: "Profile and app menu",
     });
     this.archivedPartiesMenuItem = page.getByRole("menuitem", {
       name: "Archived parties",
@@ -38,6 +42,7 @@ export class HomePage {
   async expectLoaded() {
     await expect(this.welcomeHeading).toBeVisible();
     await expect(this.createPartyLink).toBeVisible();
+    await expect(this.cloudSyncLink).toBeVisible();
     await expect(this.joinPartyLink).toBeVisible();
     await expect(this.migrateFromTricountLink).toBeVisible();
   }
@@ -48,6 +53,10 @@ export class HomePage {
 
   async openJoinParty() {
     await this.joinPartyLink.click();
+  }
+
+  async openCloudSync() {
+    await this.cloudSyncLink.click();
   }
 
   async openArchivedParties() {

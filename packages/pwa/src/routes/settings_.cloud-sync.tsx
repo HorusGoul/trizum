@@ -42,7 +42,7 @@ import {
 } from "#src/lib/cloudSyncRouteState.ts";
 import { useCloudSyncAccountState } from "#src/hooks/useCloudSyncAccountState.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { Settings } from "#src/routes/settings.tsx";
+import { EmptyState } from "#src/routes/index/-components/EmptyState.tsx";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
 
 export const Route = createFileRoute("/settings_/cloud-sync")({
@@ -590,7 +590,7 @@ function useCloudSyncSettingsView() {
       clearCloudSyncState();
       await session.refetch();
       toast.success(t`Signed out`);
-      void navigate({ to: "/settings", replace: true });
+      void navigate({ to: "/", replace: true });
     } catch {
       toast.error(t`Could not sign out`);
     }
@@ -662,7 +662,7 @@ function useCloudSyncSettingsView() {
       });
       await session.refetch();
       toast.success(t`Account deleted`);
-      void navigate({ to: "/settings", replace: true });
+      void navigate({ to: "/", replace: true });
     } catch (error) {
       dispatchRouteState({
         type: "patch",
@@ -692,7 +692,7 @@ function useCloudSyncSettingsView() {
     });
     window.setTimeout(() => {
       closeRouteState(currentLocation, router.history, () => {
-        void navigate({ to: "/settings", replace: true });
+        void navigate({ to: "/", replace: true });
       });
     }, DIALOG_EXIT_ANIMATION_MS);
   }
@@ -712,7 +712,7 @@ function useCloudSyncSettingsView() {
     return (
       <div className="relative min-h-full">
         <div aria-hidden="true" className="min-h-full blur-[2px]">
-          <Settings />
+          <CloudSyncHomeBackdrop />
         </div>
 
         <CloudSyncSignInDialog
@@ -822,7 +822,7 @@ function useCloudSyncSettingsView() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="mt-safe container flex h-16 items-center px-2">
-        <BackButton fallbackOptions={{ to: "/settings" }} />
+        <BackButton fallbackOptions={{ to: "/" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>trizum cloud</Trans>
@@ -944,6 +944,24 @@ function useCloudSyncSettingsView() {
           activateCloudSyncOnDevice();
         }}
       />
+    </div>
+  );
+}
+
+function CloudSyncHomeBackdrop() {
+  return (
+    <div className="flex min-h-full flex-col">
+      <div className="mt-safe container flex h-16 items-center px-4">
+        <h1 className="text-2xl font-bold">trizum</h1>
+        <span
+          aria-label="Beta"
+          className="text-accent-600 dark:text-accent-400 mb-4 ml-0.5 font-mono text-xs leading-none font-semibold"
+        >
+          βeta
+        </span>
+      </div>
+      <div className="h-2" />
+      <EmptyState />
     </div>
   );
 }

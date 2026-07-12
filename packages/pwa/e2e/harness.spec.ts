@@ -26,8 +26,23 @@ test.describe("Browser harness", () => {
     await harness.gotoHome();
 
     await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
-    await expect(page.getByRole("heading", { name: "Welcome to trizum" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Create a new Party" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Split expenses, stay even." })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Create a Party" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Keep every party in sync/ })).toBeVisible();
+  });
+
+  test("opens cloud sign-in from the home screen", async ({ harness, page }) => {
+    const homePage = new HomePage(page);
+
+    await harness.gotoHome();
+    await homePage.openCloudSync();
+
+    await expect(page).toHaveURL(/\/settings\/cloud-sync$/);
+    await expect(page.getByRole("dialog", { name: "Sign in" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in to trizum cloud" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Close sign-in" }).click();
+    await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
   });
 
   test("can reopen an existing persisted party from the home screen", async ({ harness, page }) => {

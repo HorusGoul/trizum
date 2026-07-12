@@ -206,7 +206,7 @@ export function CloudSyncSignInDialog({
           className="sm:border-accent-200 dark:bg-accent-950 dark:sm:border-accent-800 relative flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-white shadow-2xl outline-hidden sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg sm:border"
         >
           <IconButton
-            aria-label={t`Back to settings`}
+            aria-label={t`Close sign-in`}
             className="right-safe-offset-2 top-safe-offset-2 absolute sm:top-2 sm:right-2"
             icon="lucide.x"
             onPress={onOpenChange}
