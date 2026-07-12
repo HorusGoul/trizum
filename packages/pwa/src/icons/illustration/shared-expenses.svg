@@ -1,23 +1,64 @@
-<svg viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="160" cy="110" r="92" stroke="currentColor" stroke-width="3" stroke-dasharray="7 9" opacity=".35"/>
-  <rect x="112" y="48" width="96" height="124" rx="18" fill="currentColor" opacity=".12"/>
-  <rect x="112" y="48" width="96" height="124" rx="18" stroke="currentColor" stroke-width="3" opacity=".7"/>
-  <path d="M174 77c-3-4-7-6-12-6-9 0-16 8-16 19s7 19 16 19c5 0 9-2 12-6M142 85h24M142 96h22" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M132 128h56M132 143h38" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>
-  <circle cx="76" cy="72" r="28" fill="currentColor" opacity=".18"/>
-  <circle cx="76" cy="72" r="28" stroke="currentColor" stroke-width="3"/>
-  <circle cx="244" cy="72" r="28" fill="currentColor" opacity=".28"/>
-  <circle cx="244" cy="72" r="28" stroke="currentColor" stroke-width="3"/>
-  <circle cx="82" cy="162" r="28" fill="currentColor" opacity=".28"/>
-  <circle cx="82" cy="162" r="28" stroke="currentColor" stroke-width="3"/>
-  <circle cx="238" cy="162" r="28" fill="currentColor" opacity=".18"/>
-  <circle cx="238" cy="162" r="28" stroke="currentColor" stroke-width="3"/>
-  <g stroke="currentColor" stroke-width="3" stroke-linecap="round">
-    <circle cx="76" cy="67" r="7"/><path d="M63 84c2-7 7-10 13-10s11 3 13 10"/>
-    <circle cx="244" cy="67" r="7"/><path d="M231 84c2-7 7-10 13-10s11 3 13 10"/>
-    <circle cx="82" cy="157" r="7"/><path d="M69 174c2-7 7-10 13-10s11 3 13 10"/>
-    <circle cx="238" cy="157" r="7"/><path d="M225 174c2-7 7-10 13-10s11 3 13 10"/>
+<svg viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="180" cy="130" r="102" stroke="currentColor" stroke-width="3" stroke-dasharray="7 9" opacity=".55"/>
+
+  <circle cx="43" cy="122" r="4" fill="var(--color-success-500, #10b981)" opacity=".7"/>
+  <circle cx="314" cy="124" r="4" fill="currentColor" opacity=".55"/>
+  <circle cx="319" cy="166" r="3" fill="currentColor" opacity=".4"/>
+  <path d="M47 79h14M54 72v14" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  <path d="M304 85h14M311 78v14" stroke="var(--color-success-500, #10b981)" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+
+  <rect x="125" y="45" width="110" height="166" rx="18" fill="currentColor" opacity=".07"/>
+  <rect x="125" y="45" width="110" height="166" rx="18" stroke="currentColor" stroke-width="2.5" opacity=".65"/>
+
+  <path d="M194 69c-3-4-7-6-12-6-9 0-16 8-16 19s7 19 16 19c5 0 9-2 12-6M162 77h24M162 88h22" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="146" cy="121" r="5" fill="var(--color-success-500, #10b981)"/>
+  <circle cx="146" cy="140" r="5" fill="var(--color-blue-500, #3b82f6)"/>
+  <circle cx="146" cy="159" r="5" fill="var(--color-violet-500, #8b5cf6)"/>
+  <circle cx="146" cy="178" r="5" fill="var(--color-warning-400, #facc15)"/>
+  <path d="M158 121h31M158 140h31M158 159h31M158 178h31" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".42"/>
+  <g fill="currentColor" font-family="Inter, sans-serif" font-size="9" font-weight="500" text-anchor="end" opacity=".8">
+    <text x="219" y="124">28.40</text>
+    <text x="219" y="143">18.20</text>
+    <text x="219" y="162">14.60</text>
+    <text x="219" y="181">9.80</text>
   </g>
-  <circle cx="214" cy="128" r="16" fill="currentColor"/>
-  <path d="m207 128 5 5 9-11" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M143 190h74" stroke="currentColor" stroke-width="1.5" opacity=".4"/>
+  <text x="219" y="204" fill="currentColor" font-family="Inter, sans-serif" font-size="13" font-weight="700" text-anchor="end">71.00</text>
+
+  <g>
+    <circle cx="69" cy="57" r="31" fill="var(--color-success-500, #10b981)" opacity=".82"/>
+    <circle cx="69" cy="57" r="31" stroke="var(--color-success-400, #34d399)" stroke-width="2"/>
+    <circle cx="59" cy="47" r="19" fill="white" opacity=".08"/>
+    <circle cx="69" cy="51" r="7" stroke="white" stroke-width="2.5"/>
+    <path d="M56 72c1-8 6-12 13-12s12 4 13 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <g>
+    <circle cx="291" cy="58" r="31" fill="var(--color-blue-500, #3b82f6)" opacity=".82"/>
+    <circle cx="291" cy="58" r="31" stroke="var(--color-blue-400, #60a5fa)" stroke-width="2"/>
+    <circle cx="281" cy="48" r="19" fill="white" opacity=".08"/>
+    <circle cx="291" cy="52" r="7" stroke="white" stroke-width="2.5"/>
+    <path d="M278 73c1-8 6-12 13-12s12 4 13 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <g>
+    <circle cx="61" cy="204" r="31" fill="var(--color-violet-500, #8b5cf6)" opacity=".82"/>
+    <circle cx="61" cy="204" r="31" stroke="var(--color-violet-400, #a78bfa)" stroke-width="2"/>
+    <circle cx="51" cy="194" r="19" fill="white" opacity=".08"/>
+    <circle cx="61" cy="198" r="7" stroke="white" stroke-width="2.5"/>
+    <path d="M48 219c1-8 6-12 13-12s12 4 13 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <g>
+    <circle cx="299" cy="204" r="31" fill="var(--color-warning-400, #facc15)" opacity=".88"/>
+    <circle cx="299" cy="204" r="31" stroke="var(--color-warning-300, #fde047)" stroke-width="2"/>
+    <circle cx="289" cy="194" r="19" fill="white" opacity=".1"/>
+    <circle cx="299" cy="198" r="7" stroke="white" stroke-width="2.5"/>
+    <path d="M286 219c1-8 6-12 13-12s12 4 13 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <circle cx="238" cy="199" r="19" fill="var(--color-success-600, #059669)" opacity=".94"/>
+  <circle cx="238" cy="199" r="19" stroke="var(--color-success-400, #34d399)" stroke-width="2"/>
+  <path d="m229 199 6 6 12-14" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

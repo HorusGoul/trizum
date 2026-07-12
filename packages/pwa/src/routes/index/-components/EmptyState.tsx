@@ -13,9 +13,9 @@ export function EmptyState() {
       <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6">
         <Icon
           icon="illustration.shared-expenses"
-          className="text-accent-500 dark:text-accent-400 h-auto w-full max-w-72"
-          width={320}
-          height={220}
+          className="text-accent-600 dark:text-accent-400 h-auto w-full max-w-80"
+          width={360}
+          height={260}
         />
 
         <div className="flex flex-col items-center gap-3 text-center">
