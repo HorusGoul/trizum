@@ -6,7 +6,7 @@ include ':capacitor-app'
 project(':capacitor-app').projectDir = new File('../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.4.1/node_modules/@capacitor/app/android')
 
 include ':capacitor-camera'
-project(':capacitor-camera').projectDir = new File('../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.4.1/node_modules/@capacitor/camera/android')
+project(':capacitor-camera').projectDir = new File('../../../node_modules/.pnpm/@capacitor+camera@8.2.1_@capacitor+core@8.4.1/node_modules/@capacitor/camera/android')
 
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/share/android')
@@ -24,4 +24,4 @@ include ':capawesome-capacitor-google-sign-in'
 project(':capawesome-capacitor-google-sign-in').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in/android')
 
 include ':capacitor-plugin-safe-area'
-project(':capacitor-plugin-safe-area').projectDir = new File('../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area/android')
+project(':capacitor-plugin-safe-area').projectDir = new File('../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.1_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area/android')

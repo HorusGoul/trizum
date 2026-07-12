@@ -12,13 +12,13 @@ def capacitor_pods
   pod 'Capacitor', :path => '../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios'
   pod 'CapacitorApp', :path => '../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.4.1/node_modules/@capacitor/app'
-  pod 'CapacitorCamera', :path => '../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.4.1/node_modules/@capacitor/camera'
+  pod 'CapacitorCamera', :path => '../../../../node_modules/.pnpm/@capacitor+camera@8.2.1_@capacitor+core@8.4.1/node_modules/@capacitor/camera'
   pod 'CapacitorShare', :path => '../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/share'
   pod 'CapacitorSplashScreen', :path => '../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/splash-screen'
   pod 'CapawesomeCapacitorAppUpdate', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update'
   pod 'CapawesomeCapacitorAppleSignIn', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in'
   pod 'CapawesomeCapacitorGoogleSignIn', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in'
-  pod 'CapacitorPluginSafeArea', :path => '../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area'
+  pod 'CapacitorPluginSafeArea', :path => '../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.1_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area'
 end
 
 target 'App' do
