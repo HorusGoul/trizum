@@ -83,7 +83,7 @@ msgstr "Accent color"
 msgid "Account created"
 msgstr "Account created"
 
-#: src/routes/settings_.cloud-sync.tsx:689
+#: src/routes/settings_.cloud-sync.tsx:664
 msgid "Account deleted"
 msgstr "Account deleted"
 
@@ -276,10 +276,10 @@ msgstr "Australian Dollar"
 msgid "Authentication error"
 msgstr "Authentication error"
 
-#: src/routes/settings_.cloud-sync.tsx:454
-#: src/routes/settings_.cloud-sync.tsx:471
-#: src/routes/settings_.cloud-sync.tsx:500
-#: src/routes/settings_.cloud-sync.tsx:513
+#: src/routes/settings_.cloud-sync.tsx:458
+#: src/routes/settings_.cloud-sync.tsx:474
+#: src/routes/settings_.cloud-sync.tsx:498
+#: src/routes/settings_.cloud-sync.tsx:509
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
@@ -296,7 +296,7 @@ msgstr "Automatically open the calculator when focusing amount fields"
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
-#: src/components/AvatarPicker.tsx:97
+#: src/components/AvatarPicker.tsx:95
 msgid "Avatar removed"
 msgstr "Avatar removed"
 
@@ -491,11 +491,11 @@ msgstr "Changes sync automatically across all your devices"
 msgid "Check for updates"
 msgstr "Check for updates"
 
-#: src/routes/settings_.cloud-sync.tsx:574
+#: src/routes/settings_.cloud-sync.tsx:559
 msgid "Check your email for the password link"
 msgstr "Check your email for the password link"
 
-#: src/routes/settings_.cloud-sync.tsx:410
+#: src/routes/settings_.cloud-sync.tsx:419
 msgid "Check your email for the sign-in link"
 msgstr "Check your email for the sign-in link"
 
@@ -697,11 +697,11 @@ msgstr "Costa Rican Colón"
 msgid "Could not apply cloud settings"
 msgstr "Could not apply cloud settings"
 
-#: src/routes/settings_.cloud-sync.tsx:545
+#: src/routes/settings_.cloud-sync.tsx:535
 msgid "Could not connect sign-in method"
 msgstr "Could not connect sign-in method"
 
-#: src/routes/settings_.cloud-sync.tsx:698
+#: src/routes/settings_.cloud-sync.tsx:673
 msgid "Could not delete account"
 msgstr "Could not delete account"
 
@@ -713,7 +713,7 @@ msgstr "Could not load cloud settings"
 msgid "Could not load sign-in methods"
 msgstr "Could not load sign-in methods"
 
-#: src/hooks/useCloudSyncAccountState.ts:220
+#: src/hooks/useCloudSyncAccountState.ts:192
 #: src/routes/settings.tsx:487
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
@@ -726,15 +726,15 @@ msgstr "Could not reset password"
 msgid "Could not save cloud settings"
 msgstr "Could not save cloud settings"
 
-#: src/routes/settings_.cloud-sync.tsx:579
+#: src/routes/settings_.cloud-sync.tsx:564
 msgid "Could not send password email"
 msgstr "Could not send password email"
 
-#: src/routes/settings_.cloud-sync.tsx:415
+#: src/routes/settings_.cloud-sync.tsx:424
 msgid "Could not send sign-in link"
 msgstr "Could not send sign-in link"
 
-#: src/routes/settings_.cloud-sync.tsx:643
+#: src/routes/settings_.cloud-sync.tsx:595
 msgid "Could not sign out"
 msgstr "Could not sign out"
 
@@ -1040,7 +1040,7 @@ msgstr "Expenses"
 msgid "Expenses counted"
 msgstr "Expenses counted"
 
-#: src/components/AvatarPicker.tsx:112
+#: src/components/AvatarPicker.tsx:110
 #: src/components/ExpenseEditor.tsx:1042
 #: src/components/QRCodeScanner.tsx:111
 msgid "Failed to access camera"
@@ -1958,7 +1958,7 @@ msgstr "Party unpinned"
 msgid "Password"
 msgstr "Password"
 
-#: src/routes/settings_.cloud-sync.tsx:577
+#: src/routes/settings_.cloud-sync.tsx:562
 msgid "Password email sent"
 msgstr "Password email sent"
 
@@ -2132,7 +2132,7 @@ msgstr "Reload"
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/AvatarPicker.tsx:145
+#: src/components/AvatarPicker.tsx:143
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
@@ -2332,7 +2332,7 @@ msgstr "Sierra Leonean Leone"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/routes/settings_.cloud-sync.tsx:978
+#: src/routes/settings_.cloud-sync.tsx:953
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
@@ -2367,15 +2367,15 @@ msgstr "Sign-in link expired"
 msgid "Sign-in link is invalid or expired"
 msgstr "Sign-in link is invalid or expired"
 
-#: src/routes/settings_.cloud-sync.tsx:413
+#: src/routes/settings_.cloud-sync.tsx:422
 msgid "Sign-in link sent"
 msgstr "Sign-in link sent"
 
-#: src/routes/settings_.cloud-sync.tsx:543
+#: src/routes/settings_.cloud-sync.tsx:532
 msgid "Sign-in method connected"
 msgstr "Sign-in method connected"
 
-#: src/routes/settings_.cloud-sync.tsx:468
+#: src/routes/settings_.cloud-sync.tsx:471
 msgid "Sign-in method is not configured"
 msgstr "Sign-in method is not configured"
 
@@ -2385,11 +2385,11 @@ msgstr "Sign-in methods"
 
 #: src/components/CloudSyncAccountSettings.tsx:70
 #: src/components/CloudSyncDialogs.tsx:375
-#: src/routes/settings_.cloud-sync.tsx:374
+#: src/routes/settings_.cloud-sync.tsx:383
 msgid "Signed in"
 msgstr "Signed in"
 
-#: src/routes/settings_.cloud-sync.tsx:640
+#: src/routes/settings_.cloud-sync.tsx:592
 msgid "Signed out"
 msgstr "Signed out"
 
@@ -2574,8 +2574,8 @@ msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 msgid "Tajikistani Somoni"
 msgstr "Tajikistani Somoni"
 
-#: src/components/AvatarPicker.tsx:159
-#: src/components/AvatarPicker.tsx:174
+#: src/components/AvatarPicker.tsx:157
+#: src/components/AvatarPicker.tsx:172
 #: src/components/ExpenseEditor.tsx:1062
 #: src/components/ExpenseEditor.tsx:1076
 msgid "Take photo"
@@ -2750,17 +2750,17 @@ msgstr "Tricount URL or key"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Trinidad and Tobago Dollar"
 
-#: src/routes/settings_.cloud-sync.tsx:853
+#: src/routes/settings_.cloud-sync.tsx:828
 #: src/routes/settings.tsx:308
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/hooks/useCloudSyncAccountState.ts:196
+#: src/hooks/useCloudSyncAccountState.ts:168
 #: src/hooks/useCloudSyncAccountState.ts:248
 msgid "trizum cloud data is invalid"
 msgstr "trizum cloud data is invalid"
 
-#: src/hooks/useCloudSyncAccountState.ts:216
+#: src/hooks/useCloudSyncAccountState.ts:188
 #: src/hooks/useCloudSyncAccountState.ts:270
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud enabled on this device"
@@ -2769,7 +2769,7 @@ msgstr "trizum cloud enabled on this device"
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud is not set up yet"
 
-#: src/hooks/useCloudSyncAccountState.ts:176
+#: src/hooks/useCloudSyncAccountState.ts:148
 msgid "trizum cloud started"
 msgstr "trizum cloud started"
 
@@ -2879,8 +2879,8 @@ msgstr "Updating trizum..."
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
-#: src/components/AvatarPicker.tsx:168
-#: src/components/AvatarPicker.tsx:186
+#: src/components/AvatarPicker.tsx:166
+#: src/components/AvatarPicker.tsx:184
 #: src/components/ExpenseEditor.tsx:1071
 #: src/components/ExpenseEditor.tsx:1088
 msgid "Upload photo"

@@ -22,6 +22,7 @@ export function setNativeAuthToken(token: string | undefined) {
 
   try {
     if (token) {
+      // eslint-disable-next-line react-doctor/auth-token-in-web-storage -- Capacitor's native bridge cannot rely on browser HttpOnly cookies; native requests must persist and forward this bearer token.
       localStorage.setItem(NATIVE_AUTH_TOKEN_STORAGE_KEY, token);
     } else {
       localStorage.removeItem(NATIVE_AUTH_TOKEN_STORAGE_KEY);

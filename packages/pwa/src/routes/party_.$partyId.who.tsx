@@ -63,9 +63,9 @@ function Who() {
         avatarId: partyList.avatarId,
       });
 
-      toast.success(t`Welcome to the party, ${participantName}!`);
+      toast.success(t({ message: `Welcome to the party, ${participantName}!` }));
     } else {
-      toast.success(t`You're now seeing the party as ${participantName}`);
+      toast.success(t({ message: `You're now seeing the party as ${participantName}` }));
     }
 
     if (search.redirectTo) {

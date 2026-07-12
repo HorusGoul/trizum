@@ -67,7 +67,8 @@ function useMigrateTricount() {
           typeof data === "object" && data && "error" in data && typeof data.error === "string"
             ? data.error
             : response.statusText;
-        throw new Error(message);
+        setState({ type: "error", message });
+        return;
       }
 
       const partyId = await createPartyFromMigrationData({

@@ -61,7 +61,7 @@ function RouteComponent() {
 
   function onMarkAsPaid() {
     const expensePromise = addExpenseToParty({
-      name: t`Paid debt to ${toName}`,
+      name: t({ message: `Paid debt to ${toName}` }),
       paidAt: new Date(),
       paidBy: { [fromId]: amount },
       isTransfer: true,
@@ -71,7 +71,7 @@ function RouteComponent() {
 
     toast.promise(expensePromise, {
       loading: t`Marking expense as paid...`,
-      success: t`Debt settled between ${fromName} and ${toName}!`,
+      success: t({ message: `Debt settled between ${fromName} and ${toName}!` }),
       error: t`Failed to mark expense as paid`,
     });
 

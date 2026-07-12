@@ -33,7 +33,7 @@ function RouteComponent() {
   async function onShareParty() {
     if (canShare) {
       await Share.share({
-        title: t`Join ${partyName} on trizum!`,
+        title: t({ message: `Join ${partyName} on trizum!` }),
         url: shareUrl,
       });
 

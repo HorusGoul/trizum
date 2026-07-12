@@ -3,8 +3,8 @@ import type { PartyList } from "#src/models/partyList.js";
 import { getAuthBaseURL } from "./auth-client";
 import { fetchWithNativeAuth } from "./nativeAuthSession";
 
-const CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX = "trizumCloudUserSettings:";
-const LAST_CLOUD_USER_SETTINGS_CACHE_KEY = "trizumCloudUserSettings:last";
+const CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX = "trizumCloudUserSettings:v1:";
+const LAST_CLOUD_USER_SETTINGS_CACHE_KEY = "trizumCloudUserSettings:last:v1";
 
 export interface CloudUserSettings {
   partyListDocumentId: DocumentId;
