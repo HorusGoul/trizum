@@ -52,6 +52,7 @@ import {
   type InternalPartyListSnapshot,
   type InternalPartyListSeedResult,
 } from "./lib/testing/browserHarness.ts";
+import { recalculatePartyBalances } from "./lib/recalculatePartyBalances.ts";
 
 const initialUrl = new URL(window.location.href);
 const isProduction = import.meta.env.MODE === "production";
@@ -193,7 +194,8 @@ window.__internal_readPartyListState = async () => {
 };
 
 window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
-  return appWorker.recalculateBalances(partyId);
+  await appWorker.recalculateBalances(partyId);
+  return recalculatePartyBalances(repo, partyId);
 };
 
 // Create a new router instance
