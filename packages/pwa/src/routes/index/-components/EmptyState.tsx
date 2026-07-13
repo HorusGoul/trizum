@@ -9,27 +9,27 @@ export function EmptyState() {
   const isSignedIn = Boolean(session.data?.user);
 
   return (
-    <main className="pb-safe-offset-8 container flex flex-1 flex-col items-center px-4">
-      <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6">
+    <main className="pb-safe-offset-8 container flex flex-1 flex-col items-center px-4 [@media(max-height:600px)]:pb-0! [@media(max-height:720px)]:pb-2">
+      <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 [@media(max-height:600px)]:gap-2! [@media(max-height:720px)]:gap-3">
         <Icon
           icon="illustration.shared-expenses"
-          className="text-accent-600 dark:text-accent-400 h-auto w-full max-w-72 [--shared-expenses-surface:var(--color-accent-100)] dark:[--shared-expenses-surface:var(--color-accent-950)]"
+          className="text-accent-600 dark:text-accent-400 h-auto w-full max-w-72 [--shared-expenses-surface:var(--color-accent-100)] dark:[--shared-expenses-surface:var(--color-accent-950)] [@media(max-height:600px)]:max-w-40! [@media(max-height:720px)]:max-w-48"
           width={620}
           height={560}
         />
 
-        <div className="flex flex-col items-center gap-3 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">
+        <div className="flex flex-col items-center gap-3 text-center [@media(max-height:720px)]:gap-2">
+          <h2 className="text-3xl font-bold tracking-tight [@media(max-height:720px)]:text-2xl">
             <Trans>Split expenses, stay even.</Trans>
           </h2>
-          <p className="text-accent-700 dark:text-accent-300 max-w-sm text-base leading-relaxed">
+          <p className="text-accent-700 dark:text-accent-300 max-w-sm text-base leading-relaxed [@media(max-height:600px)]:hidden [@media(max-height:720px)]:text-sm [@media(max-height:720px)]:leading-snug">
             <Trans>
               Create a party in seconds, track who paid, and settle up without the awkward maths.
             </Trans>
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-3">
+        <div className="flex w-full flex-col gap-3 [@media(max-height:720px)]:gap-2">
           <ActionLink href={{ to: "/new" }} icon="lucide.list-plus" color="accent">
             <Trans>Create a Party</Trans>
           </ActionLink>
@@ -44,14 +44,14 @@ export function EmptyState() {
           className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,
-              "border-accent-200 bg-accent-100/60 dark:border-accent-800 dark:bg-accent-900 flex w-full scale-100 items-center gap-3 rounded-2xl border p-4 text-start outline-hidden transition-all duration-200",
+              "border-accent-200 bg-accent-100/60 dark:border-accent-800 dark:bg-accent-900 flex w-full scale-100 items-center gap-3 rounded-2xl border p-4 text-start outline-hidden transition-all duration-200 [@media(max-height:720px)]:gap-2 [@media(max-height:720px)]:p-3 [@media(max-height:600px)]:p-2!",
               (isHovered || isFocusVisible) &&
                 "border-accent-400 bg-accent-100 dark:border-accent-600 dark:bg-accent-800",
               isPressed && "scale-[0.98]",
             )
           }
         >
-          <span className="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200 flex size-11 shrink-0 items-center justify-center rounded-full">
+          <span className="bg-accent-200 text-accent-700 dark:bg-accent-800 dark:text-accent-200 flex size-11 shrink-0 items-center justify-center rounded-full [@media(max-height:720px)]:size-10">
             <Icon
               icon={isSignedIn ? "lucide.cloud-check" : "lucide.cloud"}
               width={22}
@@ -62,7 +62,7 @@ export function EmptyState() {
             <span className="font-semibold">
               <Trans>Keep every party in sync</Trans>
             </span>
-            <span className="text-accent-700 dark:text-accent-300 text-sm leading-snug">
+            <span className="text-accent-700 dark:text-accent-300 text-sm leading-snug [@media(max-height:600px)]:hidden">
               {isSignedIn ? (
                 <Trans>Manage your cloud account and synced data.</Trans>
               ) : (

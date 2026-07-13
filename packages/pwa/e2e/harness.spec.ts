@@ -39,6 +39,9 @@ test.describe("Browser harness", () => {
     const homeHeading = page.getByRole("heading", { name: "Split expenses, stay even." });
     await expect(homeHeading).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    await page.addStyleTag({
+      content: "body::after { content: ''; display: block; height: 240px; }",
+    });
     await page.evaluate(() => {
       window.scrollTo(0, document.documentElement.scrollHeight);
     });
