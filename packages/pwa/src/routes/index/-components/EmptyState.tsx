@@ -40,6 +40,7 @@ export function EmptyState() {
 
         <Link
           href={{ to: "/settings/cloud-sync" }}
+          routerOptions={{ resetScroll: false }}
           className={({ isPressed, isFocusVisible, isHovered, defaultClassName }) =>
             cn(
               defaultClassName,

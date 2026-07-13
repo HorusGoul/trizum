@@ -66,7 +66,7 @@ msgstr "<0>{fromName}</0> stops owing <1>{toName}</1>"
 msgid "A name for the participant is required"
 msgstr "A name for the participant is required"
 
-#: src/routes/_home/route.tsx:114
+#: src/routes/_home/route.tsx:117
 #: src/routes/about/route.tsx:23
 msgid "About"
 msgstr "About"
@@ -124,7 +124,7 @@ msgstr "Add expenses to this party to unlock totals, rankings, and individual sp
 msgid "Add Google as a sign-in method"
 msgstr "Add Google as a sign-in method"
 
-#: src/routes/_home/route.tsx:162
+#: src/routes/_home/route.tsx:165
 #: src/routes/party.$partyId/-components/ExpenseLog.tsx:52
 msgid "Add or create"
 msgstr "Add or create"
@@ -214,7 +214,7 @@ msgstr "Archive a party from the home screen when you want to clear some space w
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archive participants who left to keep balances clean."
 
-#: src/routes/_home/route.tsx:232
+#: src/routes/_home/route.tsx:235
 msgid "Archive party"
 msgstr "Archive party"
 
@@ -226,7 +226,7 @@ msgstr "Archived"
 msgid "Archived participants"
 msgstr "Archived participants"
 
-#: src/routes/_home/route.tsx:96
+#: src/routes/_home/route.tsx:99
 msgid "Archived parties"
 msgstr "Archived parties"
 
@@ -486,7 +486,7 @@ msgstr "CFP Franc"
 msgid "Changes sync automatically across all your devices"
 msgstr "Changes sync automatically across all your devices"
 
-#: src/routes/_home/route.tsx:107
+#: src/routes/_home/route.tsx:110
 msgid "Check for updates"
 msgstr "Check for updates"
 
@@ -744,7 +744,7 @@ msgstr "Could not sign out"
 msgid "Couldn't connect sign-in method"
 msgstr "Couldn't connect sign-in method"
 
-#: src/routes/_home/route.tsx:179
+#: src/routes/_home/route.tsx:182
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -1294,7 +1294,7 @@ msgstr "Impact on my balance: <0/>"
 msgid "Import attachments"
 msgstr "Import attachments"
 
-#: src/routes/index/-components/EmptyState.tsx:89
+#: src/routes/index/-components/EmptyState.tsx:90
 msgid "Import from Tricount"
 msgstr "Import from Tricount"
 
@@ -1388,7 +1388,7 @@ msgstr "Join {partyName} on trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "Join {partyName} on trizum!"
 
-#: src/routes/_home/route.tsx:173
+#: src/routes/_home/route.tsx:176
 msgid "Join a Party"
 msgstr "Join a Party"
 
@@ -1420,7 +1420,7 @@ msgstr "Jump back into the groups you use most"
 msgid "Kazakhstani Tenge"
 msgstr "Kazakhstani Tenge"
 
-#: src/routes/index/-components/EmptyState.tsx:62
+#: src/routes/index/-components/EmptyState.tsx:63
 msgid "Keep every party in sync"
 msgstr "Keep every party in sync"
 
@@ -1532,7 +1532,7 @@ msgstr "Maldivian Rufiyaa"
 msgid "Malformed Party ID"
 msgstr "Malformed Party ID"
 
-#: src/routes/index/-components/EmptyState.tsx:73
+#: src/routes/index/-components/EmptyState.tsx:74
 msgid "Manage"
 msgstr "Manage"
 
@@ -1540,7 +1540,7 @@ msgstr "Manage"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
-#: src/routes/index/-components/EmptyState.tsx:66
+#: src/routes/index/-components/EmptyState.tsx:67
 msgid "Manage your cloud account and synced data."
 msgstr "Manage your cloud account and synced data."
 
@@ -1583,7 +1583,7 @@ msgstr "Mexican Investment Unit"
 msgid "Mexican Peso"
 msgstr "Mexican Peso"
 
-#: src/routes/_home/route.tsx:185
+#: src/routes/_home/route.tsx:188
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:39
 msgid "Migrate from Tricount"
 msgstr "Migrate from Tricount"
@@ -1927,7 +1927,7 @@ msgstr "Participants"
 msgid "Party actions"
 msgstr "Party actions"
 
-#: src/routes/_home/route.tsx:253
+#: src/routes/_home/route.tsx:256
 msgid "Party archived"
 msgstr "Party archived"
 
@@ -1951,7 +1951,7 @@ msgstr "Party leaderboard"
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
 
-#: src/routes/_home/route.tsx:245
+#: src/routes/_home/route.tsx:248
 msgid "Party pinned"
 msgstr "Party pinned"
 
@@ -1975,7 +1975,7 @@ msgstr "Party shared!"
 msgid "Party stats"
 msgstr "Party stats"
 
-#: src/routes/_home/route.tsx:245
+#: src/routes/_home/route.tsx:248
 msgid "Party unpinned"
 msgstr "Party unpinned"
 
@@ -2061,7 +2061,7 @@ msgstr "Phone number is required"
 msgid "Phone number must be less than 20 characters"
 msgstr "Phone number must be less than 20 characters"
 
-#: src/routes/_home/route.tsx:226
+#: src/routes/_home/route.tsx:229
 msgid "Pin party"
 msgstr "Pin party"
 
@@ -2262,7 +2262,7 @@ msgstr "Search emoji"
 msgid "Search emoji..."
 msgstr "Search emoji..."
 
-#: src/routes/index/-components/EmptyState.tsx:68
+#: src/routes/index/-components/EmptyState.tsx:69
 msgid "Securely access your data on all your devices."
 msgstr "Securely access your data on all your devices."
 
@@ -2363,7 +2363,7 @@ msgid "Sierra Leonean Leone"
 msgstr "Sierra Leonean Leone"
 
 #: src/components/CloudSyncDialogs.tsx:205
-#: src/routes/index/-components/EmptyState.tsx:73
+#: src/routes/index/-components/EmptyState.tsx:74
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -2789,7 +2789,7 @@ msgstr "Tricount URL or key"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Trinidad and Tobago Dollar"
 
-#: src/routes/_home/route.tsx:89
+#: src/routes/_home/route.tsx:92
 #: src/routes/_home/settings_.cloud-sync.tsx:821
 msgid "trizum cloud"
 msgstr "trizum cloud"
@@ -2877,7 +2877,7 @@ msgstr "Ukrainian Hryvnia"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/_home/route.tsx:226
+#: src/routes/_home/route.tsx:229
 msgid "Unpin party"
 msgstr "Unpin party"
 

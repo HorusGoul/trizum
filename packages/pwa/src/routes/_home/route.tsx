@@ -83,7 +83,10 @@ function Home() {
                   </span>
                 </MenuItem>
 
-                <MenuItem href={{ to: "/settings/cloud-sync" }}>
+                <MenuItem
+                  href={{ to: "/settings/cloud-sync" }}
+                  routerOptions={{ resetScroll: false }}
+                >
                   <Icon icon="lucide.cloud" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>trizum cloud</Trans>

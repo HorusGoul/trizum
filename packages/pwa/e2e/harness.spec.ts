@@ -34,8 +34,17 @@ test.describe("Browser harness", () => {
   test("opens cloud sign-in from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
 
+    await page.setViewportSize({ width: 390, height: 700 });
     await harness.gotoHome();
     const homeHeading = page.getByRole("heading", { name: "Split expenses, stay even." });
+    await expect(homeHeading).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(() => {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    const scrollYBeforeSignIn = await page.evaluate(() => window.scrollY);
+    expect(scrollYBeforeSignIn).toBeGreaterThan(0);
+
     const headingBeforeSignIn = await homeHeading.boundingBox();
     const homeHeadingElement = await homeHeading.elementHandle();
     if (!homeHeadingElement) {
@@ -49,6 +58,7 @@ test.describe("Browser harness", () => {
     await expect(page.getByRole("heading", { name: "Sign in to trizum cloud" })).toBeVisible();
     await expect(page.locator('button[aria-label="Profile and app menu"]')).toHaveCount(1);
     await expect(page.locator("html")).toHaveCSS("scrollbar-gutter", "stable");
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollYBeforeSignIn);
 
     const headingBehindSignIn = await page.locator("main h2").boundingBox();
     expect(headingBehindSignIn).toEqual(headingBeforeSignIn);
