@@ -42,10 +42,9 @@ import {
 } from "#src/lib/cloudSyncRouteState.ts";
 import { useCloudSyncAccountState } from "#src/hooks/useCloudSyncAccountState.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { EmptyState } from "#src/routes/index/-components/EmptyState.tsx";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
 
-export const Route = createFileRoute("/settings_/cloud-sync")({
+export const Route = createFileRoute("/_home/settings_/cloud-sync")({
   validateSearch: (search: Record<string, unknown>): CloudSyncSearchParams => ({
     auth: search.auth === "success" ? "success" : undefined,
     error: typeof search.error === "string" ? search.error : undefined,
@@ -710,117 +709,111 @@ function useCloudSyncSettingsView() {
 
   if (!user) {
     return (
-      <div className="relative min-h-full">
-        <div aria-hidden="true" className="min-h-full blur-[2px]">
-          <CloudSyncHomeBackdrop />
-        </div>
-
-        <CloudSyncSignInDialog
-          isOpen={isSignInDialogOpen}
-          onOpenChange={closeSignInDialog}
-          showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
-        >
-          <CloudSyncSignInForm
-            authState={{
-              auth,
-              email: authEmail,
-              emailError: authEmailError,
-              error: authError,
-              magicLinkMessage,
-              password: authPassword,
-              passwordError: authPasswordError,
-              passwordResetMessage,
-              pendingAction: authPendingAction,
-            }}
-            mode={signInFormMode}
-            onAuthEmailChange={onAuthEmailChange}
-            onAuthPasswordChange={onAuthPasswordChange}
-            onBackToSignIn={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordResetMode: false,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onForgotPassword={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordResetMode: true,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onMagicLinkSubmit={onMagicLinkSubmit}
-            onPasswordResetSubmit={onPasswordResetSubmit}
-            onPasswordSignInSubmit={onPasswordSignInSubmit}
-            onSocialSignIn={(provider) => {
-              void onSocialSignIn(provider);
-            }}
-            onTryAnotherEmail={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordLoginMode: false,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onUseMagicLink={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordLoginMode: false,
-                  isPasswordSignInEnabled: true,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onUsePassword={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordLoginMode: true,
-                  isPasswordSignInEnabled: false,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            status={{
-              isPending: isAuthPending,
-              isPasswordSignInEnabled,
-              isSignInSuccessVisible,
-            }}
-          />
-        </CloudSyncSignInDialog>
-      </div>
+      <CloudSyncSignInDialog
+        isOpen={isSignInDialogOpen}
+        onOpenChange={closeSignInDialog}
+        showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
+      >
+        <CloudSyncSignInForm
+          authState={{
+            auth,
+            email: authEmail,
+            emailError: authEmailError,
+            error: authError,
+            magicLinkMessage,
+            password: authPassword,
+            passwordError: authPasswordError,
+            passwordResetMessage,
+            pendingAction: authPendingAction,
+          }}
+          mode={signInFormMode}
+          onAuthEmailChange={onAuthEmailChange}
+          onAuthPasswordChange={onAuthPasswordChange}
+          onBackToSignIn={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordResetMode: false,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onForgotPassword={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordResetMode: true,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onMagicLinkSubmit={onMagicLinkSubmit}
+          onPasswordResetSubmit={onPasswordResetSubmit}
+          onPasswordSignInSubmit={onPasswordSignInSubmit}
+          onSocialSignIn={(provider) => {
+            void onSocialSignIn(provider);
+          }}
+          onTryAnotherEmail={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordLoginMode: false,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onUseMagicLink={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordLoginMode: false,
+                isPasswordSignInEnabled: true,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onUsePassword={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordLoginMode: true,
+                isPasswordSignInEnabled: false,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          status={{
+            isPending: isAuthPending,
+            isPasswordSignInEnabled,
+            isSignInSuccessVisible,
+          }}
+        />
+      </CloudSyncSignInDialog>
     );
   }
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="bg-accent-50 dark:bg-accent-950 fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto">
       <div className="mt-safe container flex h-16 items-center px-2">
         <BackButton fallbackOptions={{ to: "/" }} />
 
@@ -944,24 +937,6 @@ function useCloudSyncSettingsView() {
           activateCloudSyncOnDevice();
         }}
       />
-    </div>
-  );
-}
-
-function CloudSyncHomeBackdrop() {
-  return (
-    <div className="flex min-h-full flex-col">
-      <div className="mt-safe container flex h-16 items-center px-4">
-        <h1 className="text-2xl font-bold">trizum</h1>
-        <span
-          aria-label="Beta"
-          className="text-accent-600 dark:text-accent-400 mb-4 ml-0.5 font-mono text-xs leading-none font-semibold"
-        >
-          βeta
-        </span>
-      </div>
-      <div className="h-2" />
-      <EmptyState />
     </div>
   );
 }

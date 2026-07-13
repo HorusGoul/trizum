@@ -35,11 +35,26 @@ test.describe("Browser harness", () => {
     const homePage = new HomePage(page);
 
     await harness.gotoHome();
+    const homeHeading = page.getByRole("heading", { name: "Split expenses, stay even." });
+    const headingBeforeSignIn = await homeHeading.boundingBox();
+    const homeHeadingElement = await homeHeading.elementHandle();
+    if (!homeHeadingElement) {
+      throw new Error("Expected the home heading to be mounted before opening sign-in");
+    }
+
     await homePage.openCloudSync();
 
     await expect(page).toHaveURL(/\/settings\/cloud-sync$/);
     await expect(page.getByRole("dialog", { name: "Sign in" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Sign in to trizum cloud" })).toBeVisible();
+    await expect(page.locator('button[aria-label="Profile and app menu"]')).toHaveCount(1);
+    await expect(page.locator("html")).toHaveCSS("scrollbar-gutter", "stable");
+
+    const headingBehindSignIn = await page.locator("main h2").boundingBox();
+    expect(headingBehindSignIn).toEqual(headingBeforeSignIn);
+    await expect(
+      homeHeadingElement.evaluate((element) => element === document.querySelector("main h2")),
+    ).resolves.toBe(true);
 
     await page.getByRole("button", { name: "Close sign-in" }).click();
     await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);

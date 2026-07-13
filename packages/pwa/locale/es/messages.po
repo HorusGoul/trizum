@@ -62,8 +62,8 @@ msgstr "<0>{fromName}</0> deja de deber dinero a <1>{toName}</1>"
 msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
+#: src/routes/_home/route.tsx:114
 #: src/routes/about/route.tsx:23
-#: src/routes/index/route.tsx:164
 msgid "About"
 msgstr "Acerca de"
 
@@ -79,7 +79,7 @@ msgstr "Color de acento"
 msgid "Account created"
 msgstr "Cuenta creada"
 
-#: src/routes/settings_.cloud-sync.tsx:664
+#: src/routes/_home/settings_.cloud-sync.tsx:663
 msgid "Account deleted"
 msgstr "Cuenta eliminada"
 
@@ -120,7 +120,7 @@ msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto in
 msgid "Add Google as a sign-in method"
 msgstr "Añadir Google como método de inicio de sesión"
 
-#: src/routes/index/route.tsx:212
+#: src/routes/_home/route.tsx:162
 #: src/routes/party.$partyId/-components/ExpenseLog.tsx:52
 msgid "Add or create"
 msgstr "Añadir o crear"
@@ -206,7 +206,7 @@ msgstr "Archiva un grupo desde la pantalla de inicio cuando quieras despejar esp
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/index/route.tsx:281
+#: src/routes/_home/route.tsx:232
 msgid "Archive party"
 msgstr "Archivar grupo"
 
@@ -218,7 +218,7 @@ msgstr "Archivado"
 msgid "Archived participants"
 msgstr "Participantes archivados"
 
-#: src/routes/index/route.tsx:142
+#: src/routes/_home/route.tsx:96
 msgid "Archived parties"
 msgstr "Grupos archivados"
 
@@ -264,10 +264,10 @@ msgstr "Dólar Australiano"
 msgid "Authentication error"
 msgstr "Error de autenticación"
 
-#: src/routes/settings_.cloud-sync.tsx:458
-#: src/routes/settings_.cloud-sync.tsx:474
-#: src/routes/settings_.cloud-sync.tsx:498
-#: src/routes/settings_.cloud-sync.tsx:509
+#: src/routes/_home/settings_.cloud-sync.tsx:457
+#: src/routes/_home/settings_.cloud-sync.tsx:473
+#: src/routes/_home/settings_.cloud-sync.tsx:497
+#: src/routes/_home/settings_.cloud-sync.tsx:508
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
@@ -466,15 +466,15 @@ msgstr "Franco CFP"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/index/route.tsx:153
+#: src/routes/_home/route.tsx:107
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
-#: src/routes/settings_.cloud-sync.tsx:559
+#: src/routes/_home/settings_.cloud-sync.tsx:558
 msgid "Check your email for the password link"
 msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:419
+#: src/routes/_home/settings_.cloud-sync.tsx:418
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
@@ -676,11 +676,11 @@ msgstr "Colón Costarricense"
 msgid "Could not apply cloud settings"
 msgstr "No se pudo aplicar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:535
+#: src/routes/_home/settings_.cloud-sync.tsx:534
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:673
+#: src/routes/_home/settings_.cloud-sync.tsx:672
 msgid "Could not delete account"
 msgstr "No se pudo eliminar la cuenta"
 
@@ -704,15 +704,15 @@ msgstr "No se pudo restablecer la contraseña"
 msgid "Could not save cloud settings"
 msgstr "No se pudo guardar la configuración en la nube"
 
-#: src/routes/settings_.cloud-sync.tsx:564
+#: src/routes/_home/settings_.cloud-sync.tsx:563
 msgid "Could not send password email"
 msgstr "No se pudo enviar el correo de contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:424
+#: src/routes/_home/settings_.cloud-sync.tsx:423
 msgid "Could not send sign-in link"
 msgstr "No se pudo enviar el enlace de inicio de sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:595
+#: src/routes/_home/settings_.cloud-sync.tsx:594
 msgid "Could not sign out"
 msgstr "No se pudo cerrar sesión"
 
@@ -720,7 +720,7 @@ msgstr "No se pudo cerrar sesión"
 msgid "Couldn't connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/routes/index/route.tsx:229
+#: src/routes/_home/route.tsx:179
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -1340,7 +1340,7 @@ msgstr "Únete a {partyName} en trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
-#: src/routes/index/route.tsx:223
+#: src/routes/_home/route.tsx:173
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -1531,7 +1531,7 @@ msgstr "Unidad de Inversión Mexicana"
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
-#: src/routes/index/route.tsx:235
+#: src/routes/_home/route.tsx:185
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:39
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -1867,7 +1867,7 @@ msgstr "Participantes"
 msgid "Party actions"
 msgstr "Acciones del grupo"
 
-#: src/routes/index/route.tsx:302
+#: src/routes/_home/route.tsx:253
 msgid "Party archived"
 msgstr "Grupo archivado"
 
@@ -1883,7 +1883,7 @@ msgstr "Clasificación del grupo"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/index/route.tsx:294
+#: src/routes/_home/route.tsx:245
 msgid "Party pinned"
 msgstr "Grupo fijado"
 
@@ -1907,7 +1907,7 @@ msgstr "¡Grupo compartido!"
 msgid "Party stats"
 msgstr "Estadísticas del grupo"
 
-#: src/routes/index/route.tsx:294
+#: src/routes/_home/route.tsx:245
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
@@ -1916,7 +1916,7 @@ msgstr "Grupo desfijado"
 msgid "Password"
 msgstr "Contraseña"
 
-#: src/routes/settings_.cloud-sync.tsx:562
+#: src/routes/_home/settings_.cloud-sync.tsx:561
 msgid "Password email sent"
 msgstr "Correo de contraseña enviado"
 
@@ -1993,7 +1993,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/index/route.tsx:275
+#: src/routes/_home/route.tsx:226
 msgid "Pin party"
 msgstr "Fijar grupo"
 
@@ -2053,7 +2053,7 @@ msgstr "Anterior"
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
 
-#: src/routes/index/route.tsx:107
+#: src/routes/_home/route.tsx:73
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
@@ -2234,7 +2234,7 @@ msgstr "¿Configurar contraseña?"
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/index/route.tsx:120
+#: src/routes/_home/route.tsx:82
 #: src/routes/party.$partyId/route.tsx:259
 #: src/routes/settings.tsx:121
 msgid "Settings"
@@ -2295,7 +2295,7 @@ msgstr "Leone de Sierra Leona"
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: src/routes/settings_.cloud-sync.tsx:971
+#: src/routes/_home/settings_.cloud-sync.tsx:946
 msgid "Sign in again before deleting your account"
 msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 
@@ -2330,15 +2330,15 @@ msgstr "El enlace de inicio de sesión ha caducado"
 msgid "Sign-in link is invalid or expired"
 msgstr "El enlace de inicio de sesión no es válido o ha caducado"
 
-#: src/routes/settings_.cloud-sync.tsx:422
+#: src/routes/_home/settings_.cloud-sync.tsx:421
 msgid "Sign-in link sent"
 msgstr "Enlace de inicio de sesión enviado"
 
-#: src/routes/settings_.cloud-sync.tsx:532
+#: src/routes/_home/settings_.cloud-sync.tsx:531
 msgid "Sign-in method connected"
 msgstr "Método de inicio de sesión conectado"
 
-#: src/routes/settings_.cloud-sync.tsx:471
+#: src/routes/_home/settings_.cloud-sync.tsx:470
 msgid "Sign-in method is not configured"
 msgstr "El método de inicio de sesión no está configurado"
 
@@ -2348,11 +2348,11 @@ msgstr "Métodos de inicio de sesión"
 
 #: src/components/CloudSyncAccountSettings.tsx:70
 #: src/components/CloudSyncDialogs.tsx:375
-#: src/routes/settings_.cloud-sync.tsx:383
+#: src/routes/_home/settings_.cloud-sync.tsx:382
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/settings_.cloud-sync.tsx:592
+#: src/routes/_home/settings_.cloud-sync.tsx:591
 msgid "Signed out"
 msgstr "Sesión cerrada"
 
@@ -2701,8 +2701,8 @@ msgstr "URL o clave de Tricount"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
-#: src/routes/index/route.tsx:131
-#: src/routes/settings_.cloud-sync.tsx:828
+#: src/routes/_home/route.tsx:89
+#: src/routes/_home/settings_.cloud-sync.tsx:821
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -2789,12 +2789,12 @@ msgstr "Grivna Ucraniana"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/index/route.tsx:275
+#: src/routes/_home/route.tsx:226
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
 #: src/components/UpdateController.tsx:28
-#: src/routes/index/route.tsx:93
+#: src/routes/_home/route.tsx:59
 msgid "Update available"
 msgstr "Actualización disponible"
 
