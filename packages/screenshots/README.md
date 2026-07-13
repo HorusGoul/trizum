@@ -17,8 +17,6 @@ Fastlane screenshot handoff.
   contact sheets showing the final store order.
 - [`src/feature-graphic.ts`](./src/feature-graphic.ts) generates localized
   Google Play feature graphics from the same deterministic captures.
-- [`src/icon-concepts.ts`](./src/icon-concepts.ts) defines the deterministic
-  default, dark, light, and monochrome icon-system study.
 - [`src/organize-for-fastlane.ts`](./src/organize-for-fastlane.ts) reshapes the
   generated assets for App Store and Play Store upload flows.
 
@@ -88,8 +86,6 @@ and [`package.json`](./package.json):
   opening the app again; this also regenerates feature graphics
 - `vp run feature-graphic` to regenerate only the feature graphics from existing
   Android captures
-- `vp run icon-concepts` to render the icon concepts and their cross-platform
-  review sheet
 - `vp run preview` to generate App Store and Google Play contact sheets after a
   full capture
 - `vp run organize:fastlane --platform <ios|android> --output <path>` to prepare
