@@ -15,6 +15,17 @@ export type StoreScreenshotName = (typeof STORE_SCREENSHOT_ORDER)[number];
 export type StoreLocale = "en" | "es";
 export type StorePlatform = "app-store" | "google-play" | "marketing";
 
+export const STORE_COLOR_SYSTEM = {
+  background: "#020617",
+  backgroundHighlight: "#172554",
+  backgroundRaised: "#0f172a",
+  emerald: "#10b981",
+  emeraldBright: "#34d399",
+  sky: "#0ea5e9",
+  skyBright: "#38bdf8",
+  skySoft: "#7dd3fc",
+} as const;
+
 export const STORE_DEVICE_OUTPUTS = {
   android: { width: 1080, height: 1920, platform: "google-play", suffix: "portrait" },
   "android-tablet": {
@@ -47,8 +58,8 @@ interface StoreScene {
 export const STORE_SCENES: readonly StoreScene[] = [
   {
     name: "expense-log",
-    accent: "#f97316",
-    accentSoft: "#fb923c",
+    accent: STORE_COLOR_SYSTEM.sky,
+    accentSoft: STORE_COLOR_SYSTEM.skyBright,
     tilt: -1.5,
     copy: {
       en: {
@@ -65,8 +76,8 @@ export const STORE_SCENES: readonly StoreScene[] = [
   },
   {
     name: "balances",
-    accent: "#22c55e",
-    accentSoft: "#4ade80",
+    accent: STORE_COLOR_SYSTEM.emerald,
+    accentSoft: STORE_COLOR_SYSTEM.emeraldBright,
     tilt: 1.25,
     copy: {
       en: {
@@ -83,8 +94,8 @@ export const STORE_SCENES: readonly StoreScene[] = [
   },
   {
     name: "expense-editor",
-    accent: "#38bdf8",
-    accentSoft: "#7dd3fc",
+    accent: "#6366f1",
+    accentSoft: "#818cf8",
     tilt: -1,
     copy: {
       en: {
@@ -101,8 +112,8 @@ export const STORE_SCENES: readonly StoreScene[] = [
   },
   {
     name: "expense-details",
-    accent: "#a78bfa",
-    accentSoft: "#c4b5fd",
+    accent: "#06b6d4",
+    accentSoft: "#22d3ee",
     tilt: 1.4,
     copy: {
       en: {
@@ -119,8 +130,8 @@ export const STORE_SCENES: readonly StoreScene[] = [
   },
   {
     name: "stats",
-    accent: "#facc15",
-    accentSoft: "#fde047",
+    accent: "#14b8a6",
+    accentSoft: "#2dd4bf",
     tilt: -1.2,
     copy: {
       en: {
@@ -137,8 +148,8 @@ export const STORE_SCENES: readonly StoreScene[] = [
   },
   {
     name: "group-members",
-    accent: "#fb7185",
-    accentSoft: "#fda4af",
+    accent: "#3b82f6",
+    accentSoft: "#60a5fa",
     tilt: 1,
     copy: {
       en: {
@@ -248,7 +259,7 @@ export async function composeStoreScreenshot({
           background:
             radial-gradient(circle at 12% 8%, ${scene.accent}66 0, transparent 34%),
             radial-gradient(circle at 92% 45%, ${scene.accentSoft}33 0, transparent 38%),
-            linear-gradient(150deg, #18181b 0%, #09090b 58%, #030303 100%);
+            linear-gradient(150deg, ${STORE_COLOR_SYSTEM.backgroundHighlight} 0%, ${STORE_COLOR_SYSTEM.backgroundRaised} 58%, ${STORE_COLOR_SYSTEM.background} 100%);
         }
         body::after {
           content: "";
@@ -285,7 +296,7 @@ export async function composeStoreScreenshot({
           overflow: hidden;
           border: 1px solid rgba(255,255,255,.18);
           border-radius: ${frameRadius}px;
-          background: #050505;
+          background: ${STORE_COLOR_SYSTEM.background};
           box-shadow: 0 60px 130px rgba(0,0,0,.56), 0 0 0 1px rgba(255,255,255,.06), 0 0 90px ${scene.accent}2f;
           transform: translateX(-50%) rotate(${scene.tilt}deg);
           transform-origin: 50% 15%;

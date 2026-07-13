@@ -1,7 +1,12 @@
 import type { Browser, Page } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import { getStoreFontFaces, renderBrandMark, type StoreLocale } from "./store-design.ts";
+import {
+  getStoreFontFaces,
+  renderBrandMark,
+  STORE_COLOR_SYSTEM,
+  type StoreLocale,
+} from "./store-design.ts";
 
 export const PLAY_FEATURE_GRAPHIC = { height: 500, width: 1024 } as const;
 
@@ -55,9 +60,9 @@ async function composeFeatureGraphic(
           color: #fafafa;
           font-family: "Store Inter", sans-serif;
           background:
-            radial-gradient(circle at 18% -18%, rgba(249,115,22,.5) 0, transparent 42%),
-            radial-gradient(circle at 88% 112%, rgba(34,197,94,.3) 0, transparent 42%),
-            linear-gradient(145deg, #27272a 0%, #111113 54%, #09090b 100%);
+            radial-gradient(circle at 18% -18%, ${STORE_COLOR_SYSTEM.sky}80 0, transparent 42%),
+            radial-gradient(circle at 88% 112%, ${STORE_COLOR_SYSTEM.emerald}4d 0, transparent 42%),
+            linear-gradient(145deg, ${STORE_COLOR_SYSTEM.backgroundHighlight} 0%, ${STORE_COLOR_SYSTEM.backgroundRaised} 54%, ${STORE_COLOR_SYSTEM.background} 100%);
         }
         body::after {
           content: "";
@@ -84,10 +89,10 @@ async function composeFeatureGraphic(
           font-weight: 700;
           letter-spacing: .035em;
         }
-        .brand svg { width: 48px; height: 48px; color: #fb923c; }
+        .brand svg { width: 48px; height: 48px; color: ${STORE_COLOR_SYSTEM.skyBright}; }
         .eyebrow {
           margin-bottom: 13px;
-          color: #fdba74;
+          color: ${STORE_COLOR_SYSTEM.skySoft};
           font-size: 15px;
           font-weight: 700;
           letter-spacing: .13em;
@@ -107,9 +112,9 @@ async function composeFeatureGraphic(
           left: 559px;
           width: 390px;
           height: 390px;
-          border: 1px solid rgba(251,146,60,.24);
+          border: 1px solid ${STORE_COLOR_SYSTEM.skyBright}3d;
           border-radius: 50%;
-          box-shadow: 0 0 0 62px rgba(249,115,22,.055), 0 0 0 126px rgba(34,197,94,.025);
+          box-shadow: 0 0 0 62px ${STORE_COLOR_SYSTEM.sky}0e, 0 0 0 126px ${STORE_COLOR_SYSTEM.emerald}06;
         }
         .surface {
           position: absolute;
@@ -117,8 +122,8 @@ async function composeFeatureGraphic(
           overflow: hidden;
           border: 1px solid rgba(255,255,255,.16);
           border-radius: 27px;
-          background: #09090b;
-          box-shadow: 0 28px 70px rgba(0,0,0,.52), 0 0 55px rgba(249,115,22,.09);
+          background: ${STORE_COLOR_SYSTEM.background};
+          box-shadow: 0 28px 70px rgba(0,0,0,.52), 0 0 55px ${STORE_COLOR_SYSTEM.sky}1c;
         }
         .surface img { display: block; width: 100%; }
         .expense-log {
@@ -132,8 +137,8 @@ async function composeFeatureGraphic(
           top: 118px;
           left: 826px;
           width: 274px;
-          border-color: rgba(74,222,128,.25);
-          box-shadow: 0 26px 68px rgba(0,0,0,.5), 0 0 55px rgba(34,197,94,.1);
+          border-color: ${STORE_COLOR_SYSTEM.emeraldBright}40;
+          box-shadow: 0 26px 68px rgba(0,0,0,.5), 0 0 55px ${STORE_COLOR_SYSTEM.emerald}1a;
           transform: rotate(4deg);
         }
       </style></head>

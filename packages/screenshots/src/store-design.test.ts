@@ -63,6 +63,17 @@ describe("store screenshot design", () => {
     }
   });
 
+  it("uses a consistent cool palette across the store set", () => {
+    expect(STORE_SCENES.map(({ accent, accentSoft }) => [accent, accentSoft])).toEqual([
+      ["#0ea5e9", "#38bdf8"],
+      ["#10b981", "#34d399"],
+      ["#6366f1", "#818cf8"],
+      ["#06b6d4", "#22d3ee"],
+      ["#14b8a6", "#2dd4bf"],
+      ["#3b82f6", "#60a5fa"],
+    ]);
+  });
+
   it("commits upload-ready feature graphics without an alpha channel", async () => {
     for (const locale of ["en", "es"] as const) {
       const png = await readFile(
