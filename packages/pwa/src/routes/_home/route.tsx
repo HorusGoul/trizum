@@ -68,11 +68,7 @@ function Home() {
           ) : null}
 
           <MenuTrigger>
-            <IconButton
-              icon="lucide.circle-user-round"
-              aria-label={t`Profile and app menu`}
-              className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-200"
-            />
+            <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Profile and app menu`} />
 
             <Popover placement="bottom end">
               <Menu>

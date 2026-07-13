@@ -62,7 +62,7 @@ msgstr "<0>{fromName}</0> deja de deber dinero a <1>{toName}</1>"
 msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
-#: src/routes/_home/route.tsx:117
+#: src/routes/_home/route.tsx:113
 #: src/routes/about/route.tsx:23
 msgid "About"
 msgstr "Acerca de"
@@ -120,7 +120,7 @@ msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto in
 msgid "Add Google as a sign-in method"
 msgstr "Añadir Google como método de inicio de sesión"
 
-#: src/routes/_home/route.tsx:165
+#: src/routes/_home/route.tsx:161
 #: src/routes/party.$partyId/-components/ExpenseLog.tsx:52
 msgid "Add or create"
 msgstr "Añadir o crear"
@@ -206,7 +206,7 @@ msgstr "Archiva un grupo desde la pantalla de inicio cuando quieras despejar esp
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/_home/route.tsx:235
+#: src/routes/_home/route.tsx:231
 msgid "Archive party"
 msgstr "Archivar grupo"
 
@@ -218,7 +218,7 @@ msgstr "Archivado"
 msgid "Archived participants"
 msgstr "Participantes archivados"
 
-#: src/routes/_home/route.tsx:99
+#: src/routes/_home/route.tsx:95
 msgid "Archived parties"
 msgstr "Grupos archivados"
 
@@ -466,7 +466,7 @@ msgstr "Franco CFP"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/_home/route.tsx:110
+#: src/routes/_home/route.tsx:106
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
@@ -720,7 +720,7 @@ msgstr "No se pudo cerrar sesión"
 msgid "Couldn't connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/routes/_home/route.tsx:182
+#: src/routes/_home/route.tsx:178
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -1340,7 +1340,7 @@ msgstr "Únete a {partyName} en trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
-#: src/routes/_home/route.tsx:176
+#: src/routes/_home/route.tsx:172
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -1531,7 +1531,7 @@ msgstr "Unidad de Inversión Mexicana"
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
-#: src/routes/_home/route.tsx:188
+#: src/routes/_home/route.tsx:184
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:39
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -1867,7 +1867,7 @@ msgstr "Participantes"
 msgid "Party actions"
 msgstr "Acciones del grupo"
 
-#: src/routes/_home/route.tsx:256
+#: src/routes/_home/route.tsx:252
 msgid "Party archived"
 msgstr "Grupo archivado"
 
@@ -1883,7 +1883,7 @@ msgstr "Clasificación del grupo"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/_home/route.tsx:248
+#: src/routes/_home/route.tsx:244
 msgid "Party pinned"
 msgstr "Grupo fijado"
 
@@ -1907,7 +1907,7 @@ msgstr "¡Grupo compartido!"
 msgid "Party stats"
 msgstr "Estadísticas del grupo"
 
-#: src/routes/_home/route.tsx:248
+#: src/routes/_home/route.tsx:244
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
@@ -1993,7 +1993,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/_home/route.tsx:229
+#: src/routes/_home/route.tsx:225
 msgid "Pin party"
 msgstr "Fijar grupo"
 
@@ -2053,7 +2053,7 @@ msgstr "Anterior"
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
 
-#: src/routes/_home/route.tsx:73
+#: src/routes/_home/route.tsx:71
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
@@ -2234,7 +2234,7 @@ msgstr "¿Configurar contraseña?"
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/_home/route.tsx:82
+#: src/routes/_home/route.tsx:78
 #: src/routes/party.$partyId/route.tsx:259
 #: src/routes/settings.tsx:121
 msgid "Settings"
@@ -2701,7 +2701,7 @@ msgstr "URL o clave de Tricount"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
-#: src/routes/_home/route.tsx:92
+#: src/routes/_home/route.tsx:88
 #: src/routes/_home/settings_.cloud-sync.tsx:821
 msgid "trizum cloud"
 msgstr "trizum cloud"
@@ -2789,7 +2789,7 @@ msgstr "Grivna Ucraniana"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/_home/route.tsx:229
+#: src/routes/_home/route.tsx:225
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
