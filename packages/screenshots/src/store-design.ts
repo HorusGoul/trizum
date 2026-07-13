@@ -172,7 +172,7 @@ const INTER_BOLD_PATH = path.resolve(ROOT_DIR, "../pwa/api/assets/inter/Inter-Bo
 
 let fontFacesPromise: Promise<string> | undefined;
 
-async function getFontFaces(): Promise<string> {
+export async function getStoreFontFaces(): Promise<string> {
   fontFacesPromise ??= Promise.all([readFile(INTER_REGULAR_PATH), readFile(INTER_BOLD_PATH)]).then(
     ([regular, bold]) => `
       @font-face {
@@ -202,7 +202,7 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#039;");
 }
 
-function brandMark(): string {
+export function renderBrandMark(): string {
   return `<svg aria-hidden="true" viewBox="0 0 512 512">
     <path d="M138.738 197.734H356.862C356.862 197.734 397.947 197.734 397.947 166.36C397.947 134.986 356.862 134.986 356.862 134.986C335.199 134.986 311.295 134.986 301.584 161.878M273.945 232.843C273.945 232.843 238.089 317.254 199.245 357.592C185.578 371.785 174.594 377.014 154.425 377.014C134.256 377.014 113.388 366.556 114.087 344.893C114.786 323.23 138.738 323.23 138.738 323.23H176.835M273.945 323.23H356.862" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="26" />
   </svg>`;
@@ -218,7 +218,10 @@ export async function composeStoreScreenshot({
   scene,
   width,
 }: ComposeStoreScreenshotOptions): Promise<void> {
-  const [fontFaces, screenshot] = await Promise.all([getFontFaces(), readFile(rawScreenshotPath)]);
+  const [fontFaces, screenshot] = await Promise.all([
+    getStoreFontFaces(),
+    readFile(rawScreenshotPath),
+  ]);
   const copy = scene.copy[locale];
   const isTablet = width / height > 0.6;
   const isGooglePlay = platform === "google-play";
@@ -292,7 +295,7 @@ export async function composeStoreScreenshot({
       <body>
         <div class="orb"></div>
         <header class="header">
-          ${scene.name === "expense-log" ? `<div class="brand">${brandMark()}<span>trizum</span></div>` : ""}
+          ${scene.name === "expense-log" ? `<div class="brand">${renderBrandMark()}<span>trizum</span></div>` : ""}
           <div class="eyebrow">${escapeHtml(copy.eyebrow)}</div>
           <h1>${escapeHtml(copy.title)}</h1>
           <p>${escapeHtml(copy.subtitle)}</p>

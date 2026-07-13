@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
+import { generateFeatureGraphics } from "./feature-graphic.ts";
 import {
   composeStoreScreenshot,
   STORE_DEVICE_OUTPUTS,
@@ -41,6 +42,8 @@ async function main(): Promise<void> {
     } finally {
       await page.close();
     }
+
+    await generateFeatureGraphics(browser, locales);
   } finally {
     await browser.close();
   }

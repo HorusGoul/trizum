@@ -24,8 +24,9 @@
     }
   },
   "scripts": {
-    "cleanup": "rm -rf .captures screenshots",
+    "cleanup": "rm -rf .captures feature-graphics screenshots",
     "compose": "node --experimental-transform-types src/compose-existing.ts",
+    "feature-graphic": "node --experimental-transform-types src/generate-feature-graphics.ts",
     "start": "node --experimental-transform-types src/main.ts",
     "organize:fastlane": "node --experimental-transform-types src/organize-for-fastlane.ts",
     "preview": "node --experimental-transform-types src/generate-previews.ts",

@@ -87,7 +87,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: android-screenshots
-          path: packages/screenshots/screenshots
+          path: packages/screenshots
 
       - name: Organize screenshots for fastlane
         timeout-minutes: 2

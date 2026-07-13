@@ -52,7 +52,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.artifact_name }}
-          path: packages/screenshots/screenshots
+          path: |
+            packages/screenshots/screenshots
+            packages/screenshots/feature-graphics
           retention-days: 7
 
       - name: Upload store-order previews

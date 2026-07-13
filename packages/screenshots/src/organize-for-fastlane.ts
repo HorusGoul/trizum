@@ -18,6 +18,7 @@
 import { copyFile, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { parseArgs } from "node:util";
+import { FEATURE_GRAPHICS_DIR } from "./feature-graphic.ts";
 import { configureScreenshotsLogging, getLogger } from "./log.ts";
 import { STORE_SCREENSHOT_ORDER } from "./store-design.ts";
 
@@ -207,6 +208,16 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
       continue;
     }
 
+    for (const playStoreLocale of playStoreLocales) {
+      const imagesOutputDir = path.join(outputDir, playStoreLocale, "images");
+      await mkdir(imagesOutputDir, { recursive: true });
+      await copyFile(
+        path.resolve(FEATURE_GRAPHICS_DIR, locale, "featureGraphic.png"),
+        path.join(imagesOutputDir, "featureGraphic.png"),
+      );
+      logger.info("Copied feature graphic to Android output", { locale, playStoreLocale });
+    }
+
     // Get all devices for this locale
     const localeDir = path.join(SCREENSHOTS_DIR, locale);
     const devices = await readdir(localeDir);
@@ -287,10 +298,23 @@ async function organizeScreenshots(options: Options): Promise<void> {
   // Clean output directory if requested
   if (options.clean) {
     logger.info("Cleaning output directory");
-    try {
+    if (options.platform === "ios") {
       await rm(outputDir, { recursive: true, force: true });
-    } catch {
-      // Directory might not exist
+    } else {
+      for (const playStoreLocales of Object.values(ANDROID_LOCALE_MAPPING)) {
+        for (const playStoreLocale of playStoreLocales) {
+          for (const screenshotType of [
+            "phoneScreenshots",
+            "sevenInchScreenshots",
+            "tenInchScreenshots",
+          ]) {
+            await rm(path.join(outputDir, playStoreLocale, "images", screenshotType), {
+              recursive: true,
+              force: true,
+            });
+          }
+        }
+      }
     }
   }
 

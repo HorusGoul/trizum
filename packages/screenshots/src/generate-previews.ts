@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 import { mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { FEATURE_GRAPHICS_DIR } from "./feature-graphic.ts";
 import { STORE_SCENES, STORE_SCREENSHOT_ORDER, type StoreLocale } from "./store-design.ts";
 
 const ROOT_DIR = path.resolve(import.meta.dirname, "..");
@@ -81,6 +82,46 @@ async function main(): Promise<void> {
       } finally {
         await page.close();
       }
+    }
+
+    const featureGraphics = await Promise.all(
+      (["en", "es"] as const).map(async (locale) => ({
+        image: await readFile(path.resolve(FEATURE_GRAPHICS_DIR, locale, "featureGraphic.png")),
+        label: locale === "en" ? "English" : "Español",
+      })),
+    );
+    const featureGraphicPage = await browser.newPage({ viewport: { width: 2280, height: 760 } });
+
+    try {
+      await featureGraphicPage.setContent(`<!doctype html><html><head><style>
+        @font-face { font-family: PreviewInter; font-weight: 400; src: url(data:font/ttf;base64,${regularFont.toString("base64")}); }
+        @font-face { font-family: PreviewInter; font-weight: 700; src: url(data:font/ttf;base64,${boldFont.toString("base64")}); }
+        * { box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; margin: 0; }
+        body { padding: 58px 74px; color: #fafafa; font-family: PreviewInter, sans-serif; background: #09090b; }
+        header { display: flex; align-items: end; justify-content: space-between; margin-bottom: 34px; }
+        h1 { margin: 0; font-size: 52px; letter-spacing: -.04em; }
+        header p { margin: 0 0 4px; color: #a1a1aa; font-size: 23px; }
+        main { display: grid; grid-template-columns: repeat(2, 1fr); gap: 34px; }
+        article { overflow: hidden; border: 1px solid #27272a; border-radius: 24px; background: #18181b; box-shadow: 0 18px 50px rgba(0,0,0,.34); }
+        article img { display: block; width: 100%; }
+        article p { margin: 0; padding: 14px 18px 16px; color: #d4d4d8; font-size: 20px; }
+      </style></head><body>
+        <header><h1>Google Play · Feature graphic</h1><p>1024 × 500 · localized</p></header>
+        <main>${featureGraphics
+          .map(
+            ({ image, label }) =>
+              `<article><img alt="" src="data:image/png;base64,${image.toString("base64")}"><p>${label}</p></article>`,
+          )
+          .join("")}</main>
+      </body></html>`);
+      await featureGraphicPage.evaluate(async () => await document.fonts.ready);
+      await featureGraphicPage.screenshot({
+        animations: "disabled",
+        path: path.resolve(PREVIEWS_DIR, "google-play-feature-graphics.png"),
+      });
+    } finally {
+      await featureGraphicPage.close();
     }
   } finally {
     await browser.close();

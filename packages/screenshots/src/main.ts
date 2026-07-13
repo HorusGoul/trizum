@@ -3,6 +3,7 @@ import { chromium, devices } from "playwright";
 import { mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { getMigrationData } from "./data/migration-data.ts";
+import { generateFeatureGraphics } from "./feature-graphic.ts";
 import { configureScreenshotsLogging, getLogger } from "./log.ts";
 import {
   composeStoreScreenshot,
@@ -315,6 +316,15 @@ async function main() {
           }
         }
       }
+    }
+
+    const hasFeatureGraphicCaptures =
+      selectedDevices.some(({ folder }) => folder === "android") &&
+      (!requestedScenes ||
+        (["expense-log", "balances"] as const).every((scene) => requestedScenes.has(scene)));
+
+    if (hasFeatureGraphicCaptures) {
+      await generateFeatureGraphics(browser, languages);
     }
   } finally {
     await browser?.close();

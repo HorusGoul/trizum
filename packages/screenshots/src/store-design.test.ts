@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { getMigrationData } from "./data/migration-data.ts";
+import { FEATURE_GRAPHIC_COPY, PLAY_FEATURE_GRAPHIC } from "./feature-graphic.ts";
 import { STORE_DEVICE_OUTPUTS, STORE_SCENES, STORE_SCREENSHOT_ORDER } from "./store-design.ts";
 
 describe("store screenshot design", () => {
@@ -48,5 +51,28 @@ describe("store screenshot design", () => {
         suffix: "portrait",
       },
     });
+    expect(PLAY_FEATURE_GRAPHIC).toEqual({ width: 1024, height: 500 });
+  });
+
+  it("keeps feature graphic copy localized and concise", () => {
+    expect(Object.keys(FEATURE_GRAPHIC_COPY)).toEqual(["en", "es"]);
+
+    for (const copy of Object.values(FEATURE_GRAPHIC_COPY)) {
+      expect(copy.eyebrow.length).toBeLessThan(24);
+      expect(copy.title.length).toBeLessThan(48);
+    }
+  });
+
+  it("commits upload-ready feature graphics without an alpha channel", async () => {
+    for (const locale of ["en", "es"] as const) {
+      const png = await readFile(
+        path.resolve(import.meta.dirname, "../feature-graphics", locale, "featureGraphic.png"),
+      );
+
+      expect(png.readUInt32BE(16)).toBe(PLAY_FEATURE_GRAPHIC.width);
+      expect(png.readUInt32BE(20)).toBe(PLAY_FEATURE_GRAPHIC.height);
+      expect(png[24]).toBe(8);
+      expect(png[25]).toBe(2);
+    }
   });
 });
