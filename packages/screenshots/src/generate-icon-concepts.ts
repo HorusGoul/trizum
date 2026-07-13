@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import {
   ICON_CONCEPTS,
@@ -15,6 +15,7 @@ const INTER_REGULAR_PATH = path.resolve(ROOT_DIR, "../pwa/api/assets/inter/Inter
 const INTER_BOLD_PATH = path.resolve(ROOT_DIR, "../pwa/api/assets/inter/Inter-Bold.ttf");
 
 async function main(): Promise<void> {
+  await rm(OUTPUT_DIR, { force: true, recursive: true });
   const [regularFont, boldFont] = await Promise.all([
     readFile(INTER_REGULAR_PATH),
     readFile(INTER_BOLD_PATH),
@@ -87,7 +88,7 @@ async function main(): Promise<void> {
         .theme-slate { color: #e2e8f0; background: #1e293b; }
         .description { margin: 25px 2px 0; color: #a1a1aa; font-size: 20px; line-height: 1.45; }
       </style></head><body>
-        <header><h1>trizum · icon concepts</h1><p>Store, launcher masks, small sizes, and monochrome themes</p></header>
+        <header><h1>trizum · refined icon system</h1><p>Original mark, flat color, launcher masks, and monochrome themes</p></header>
         <main>${conceptImages
           .map(
             (concept, index) => `<article>

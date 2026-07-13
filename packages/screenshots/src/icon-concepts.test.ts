@@ -4,11 +4,11 @@ import path from "node:path";
 import { ICON_CONCEPTS, ICON_CONCEPT_SIZE, renderIconConceptSvg } from "./icon-concepts.ts";
 
 describe("icon concepts", () => {
-  it("defines three distinct vector concepts", () => {
+  it("defines default, dark, and light variants of one icon system", () => {
     expect(ICON_CONCEPTS.map(({ id }) => id)).toEqual([
-      "midnight-flat",
-      "midnight-layered",
-      "balanced-split",
+      "refined-default",
+      "refined-dark",
+      "refined-light",
     ]);
 
     for (const concept of ICON_CONCEPTS) {
