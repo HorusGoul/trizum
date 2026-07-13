@@ -73,6 +73,7 @@ interface CloudSyncRouteState {
   isPasswordLoginMode: boolean;
   isPasswordResetMode: boolean;
   isPasswordSignInEnabled: boolean;
+  isSignInSuccessAnimationComplete: boolean;
   isSignInSuccessVisible: boolean;
   magicLinkMessage: string | null;
   passwordResetMessage: string | null;
@@ -113,6 +114,7 @@ function createInitialCloudSyncRouteState({
     isPasswordLoginMode: false,
     isPasswordResetMode: false,
     isPasswordSignInEnabled: true,
+    isSignInSuccessAnimationComplete: false,
     isSignInSuccessVisible: auth === "success",
     magicLinkMessage: null,
     passwordResetMessage: null,
@@ -193,6 +195,7 @@ function cloudSyncRouteReducer(
       return {
         ...state,
         optimisticAuthUser: action.user ?? state.optimisticAuthUser,
+        isSignInSuccessAnimationComplete: false,
         isSignInSuccessVisible: true,
       };
     case "deleteAccountDialogOpened":
@@ -252,6 +255,7 @@ function useCloudSyncSettingsView() {
     isPasswordLoginMode,
     isPasswordResetMode,
     isPasswordSignInEnabled,
+    isSignInSuccessAnimationComplete,
     magicLinkMessage,
     passwordResetMessage,
     authPendingAction,
@@ -280,6 +284,7 @@ function useCloudSyncSettingsView() {
     activateCloudSyncOnDevice,
     clearCloudSyncState,
     hasPasswordAccount,
+    isAccountStateResolved,
     isCloudSyncSwitchOpen,
     linkedProviderIds,
     saveLinkedAccounts,
@@ -310,19 +315,34 @@ function useCloudSyncSettingsView() {
       dispatchRouteState({
         type: "patch",
         values: {
-          isSignInSuccessVisible: false,
+          isSignInSuccessAnimationComplete: true,
         },
       });
-
-      if (auth === "success") {
-        void navigate({ to: "/settings/cloud-sync", replace: true });
-      }
     }, SIGN_IN_SUCCESS_ANIMATION_MS);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [auth, isSignInSuccessVisible, navigate, userId]);
+  }, [isSignInSuccessVisible, userId]);
+
+  useEffect(() => {
+    if (
+      !isSignInSuccessVisible ||
+      !isSignInSuccessAnimationComplete ||
+      !isAccountStateResolved ||
+      isCloudSyncSwitchOpen
+    ) {
+      return;
+    }
+
+    void navigate({ to: "/", replace: true });
+  }, [
+    isAccountStateResolved,
+    isCloudSyncSwitchOpen,
+    isSignInSuccessAnimationComplete,
+    isSignInSuccessVisible,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (!isPasswordLoginMode) {
@@ -698,9 +718,6 @@ function useCloudSyncSettingsView() {
 
   function onCloudDataActivated(shouldDelay: boolean) {
     if (shouldDelay) {
-      window.setTimeout(() => {
-        void navigate({ to: "/", replace: true });
-      }, SIGN_IN_SUCCESS_ANIMATION_MS + SIGN_IN_SUCCESS_EXIT_ANIMATION_MS);
       return;
     }
 
@@ -809,6 +826,28 @@ function useCloudSyncSettingsView() {
           }}
         />
       </CloudSyncSignInDialog>
+    );
+  }
+
+  if (isSignInSuccessVisible) {
+    return (
+      <>
+        <AnimatePresence>
+          {!isSignInSuccessAnimationComplete ||
+          !isAccountStateResolved ||
+          !isCloudSyncSwitchOpen ? (
+            <SignInSuccessOverlay exitAnimationMs={SIGN_IN_SUCCESS_EXIT_ANIMATION_MS} />
+          ) : null}
+        </AnimatePresence>
+
+        <CloudSyncSwitchDialog
+          isOpen={isCloudSyncSwitchOpen}
+          onSignOut={onSignOut}
+          onUseCloudData={() => {
+            activateCloudSyncOnDevice();
+          }}
+        />
+      </>
     );
   }
 

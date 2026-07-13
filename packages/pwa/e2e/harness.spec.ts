@@ -73,6 +73,97 @@ test.describe("Browser harness", () => {
     await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
   });
 
+  test("returns straight to home after signing in", async ({ harness, page }) => {
+    const homePage = new HomePage(page);
+    const user = {
+      createdAt: new Date().toISOString(),
+      email: "alex@example.com",
+      emailVerified: true,
+      id: "test-user",
+      image: null,
+      name: "Alex",
+      updatedAt: new Date().toISOString(),
+    };
+    let isSignedIn = false;
+    let partyListId = "";
+
+    await page.route("**/api/auth/**", async (route) => {
+      const pathname = new URL(route.request().url()).pathname;
+
+      if (pathname.endsWith("/get-session")) {
+        await route.fulfill({
+          json: isSignedIn
+            ? {
+                session: {
+                  createdAt: new Date().toISOString(),
+                  expiresAt: new Date(Date.now() + 60_000).toISOString(),
+                  id: "test-session",
+                  token: "test-token",
+                  updatedAt: new Date().toISOString(),
+                  userId: user.id,
+                },
+                user,
+              }
+            : null,
+        });
+        return;
+      }
+
+      if (pathname.endsWith("/sign-in/email")) {
+        isSignedIn = true;
+        await route.fulfill({ json: { redirect: false, token: "test-token", user } });
+        return;
+      }
+
+      if (pathname.endsWith("/list-accounts")) {
+        await route.fulfill({ json: [] });
+        return;
+      }
+
+      await route.fallback();
+    });
+    await page.route("**/api/cloud-sync/settings", async (route) => {
+      await route.fulfill({
+        json: {
+          settings: {
+            partyListDocumentId: partyListId,
+            updatedAt: Date.now(),
+          },
+        },
+      });
+    });
+
+    await harness.gotoHome();
+    partyListId = (await harness.readPartyList()).partyListId;
+    await homePage.openCloudSync();
+    await page.getByRole("button", { name: "Sign in with password" }).click();
+    await page.getByLabel("Email").fill(user.email);
+    await page.getByLabel("Password").fill("test-password");
+    await page.evaluate(() => {
+      const testWindow = window as Window & { __cloudSettingsRendered?: boolean };
+      testWindow.__cloudSettingsRendered = false;
+      new MutationObserver(() => {
+        const cloudSettingsHeading = [...document.querySelectorAll("h1")].some(
+          (heading) => heading.textContent?.trim() === "trizum cloud",
+        );
+        testWindow.__cloudSettingsRendered ||= cloudSettingsHeading;
+      }).observe(document.body, { childList: true, subtree: true });
+    });
+
+    await page.getByRole("button", { name: "Sign in with password" }).click();
+
+    await expect(page.locator("p").getByText("Signed in", { exact: true })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.location.pathname)).toBe("/");
+    await expect(homePage.welcomeHeading).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window as Window & { __cloudSettingsRendered?: boolean }).__cloudSettingsRendered,
+        ),
+      )
+      .toBe(false);
+  });
+
   test("can reopen an existing persisted party from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
     const seededParty = await harness.joinSeededParty({
