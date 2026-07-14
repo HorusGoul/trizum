@@ -135,6 +135,9 @@ test.describe("Browser harness", () => {
 
     await harness.gotoHome();
     partyListId = (await harness.readPartyList()).partyListId;
+    await homePage.menuButton.click();
+    await expect(page.getByRole("menuitem", { name: "Sign in to trizum cloud" })).toBeVisible();
+    await page.keyboard.press("Escape");
     await homePage.openCloudSync();
     await page.getByRole("button", { name: "Sign in with password" }).click();
     await page.getByLabel("Email").fill(user.email);
@@ -155,6 +158,8 @@ test.describe("Browser harness", () => {
     await expect(page.locator("p").getByText("Signed in", { exact: true })).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.location.pathname)).toBe("/");
     await expect(homePage.welcomeHeading).toBeVisible();
+    await homePage.menuButton.click();
+    await expect(page.getByRole("menuitem", { name: "Manage trizum cloud" })).toBeVisible();
     await expect
       .poll(() =>
         page.evaluate(
