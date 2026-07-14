@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { cn, type ClassName } from "#src/ui/utils.ts";
-import { use, useEffect, useRef } from "react";
+import { Suspense, use, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
 import { LazyMotion, animate, domAnimation, m, useMotionValue } from "motion/react";
 import type { IconProps } from "#src/ui/Icon.tsx";
@@ -13,8 +13,7 @@ import { mediaGalleryItemLoader, type MediaGalleryItem } from "./mediaGalleryIte
 
 export type { MediaGalleryItem } from "./mediaGalleryItemLoader.ts";
 
-export interface MediaGalleryProps {
-  items: MediaGalleryItem[];
+interface MediaGalleryCommonProps {
   index: number;
   onChange: (index: number) => void;
   onClose: () => void;
@@ -22,18 +21,29 @@ export interface MediaGalleryProps {
   showCloseButton?: boolean;
 }
 
+export type MediaGalleryProps = MediaGalleryCommonProps &
+  (
+    | {
+        items: MediaGalleryItem[];
+        itemCount?: never;
+        renderItem?: never;
+      }
+    | {
+        getItemKey: (index: number) => React.Key;
+        items?: never;
+        itemCount: number;
+        renderItem: (index: number) => React.ReactNode;
+      }
+  );
+
 const CLOSE_THRESHOLD = 150;
 
-export default function MediaGallery({
-  items,
-  index,
-  onClose,
-  onChange,
-  onDragProgress,
-  showCloseButton = true,
-}: MediaGalleryProps) {
-  const currentItem = use(mediaGalleryItemLoader.read(items, index));
-  const maxIndex = items.length - 1;
+export default function MediaGallery(props: MediaGalleryProps) {
+  const { index, onClose, onChange, onDragProgress, showCloseButton = true } = props;
+  const itemCount = props.items !== undefined ? props.items.length : props.itemCount;
+  const currentItemKey =
+    props.items !== undefined ? props.items[index]?.src : props.getItemKey(index);
+  const maxIndex = itemCount - 1;
 
   function goToPrevious() {
     let nextIndex = index - 1;
@@ -57,7 +67,7 @@ export default function MediaGallery({
     onChange(nextIndex);
   }
 
-  const showNavigation = items.length > 1;
+  const showNavigation = itemCount > 1;
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -226,12 +236,13 @@ export default function MediaGallery({
         <div className="flex h-full w-full items-center justify-center select-none [-webkit-user-drag:_none]">
           <m.div ref={ref} className="relative" style={{ x, y, scale }}>
             <div className="absolute inset-0" />
-            <img
-              data-media-gallery-image=""
-              src={currentItem.src}
-              alt=""
-              className="pointer-events-none select-none [-webkit-user-drag:_none]"
-            />
+            <Suspense key={currentItemKey} fallback={null}>
+              {props.items ? (
+                <MediaGalleryImage items={props.items} index={index} />
+              ) : (
+                props.renderItem(index)
+              )}
+            </Suspense>
           </m.div>
         </div>
 
@@ -263,6 +274,19 @@ export default function MediaGallery({
         )}
       </div>
     </LazyMotion>
+  );
+}
+
+export function MediaGalleryImage({ items, index }: { items: MediaGalleryItem[]; index: number }) {
+  const item = use(mediaGalleryItemLoader.read(items, index));
+
+  return (
+    <img
+      data-media-gallery-image=""
+      src={item.src}
+      alt=""
+      className="pointer-events-none select-none [-webkit-user-drag:_none]"
+    />
   );
 }
 

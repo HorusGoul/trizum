@@ -1,8 +1,8 @@
 import { Modal, ModalOverlay } from "react-aria-components";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import MediaGallery, { MediaGalleryImage } from "#src/components/MediaGallery.tsx";
+import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import type { MediaFile } from "#src/models/media.ts";
 
 export interface RouteMediaGalleryProps {
@@ -54,53 +54,26 @@ export function RouteMediaGallery({
     >
       <Modal className="h-full w-full">
         {isOpen && selectedPhotoId && (
-          <Suspense key={`${galleryIndex}:${selectedPhotoId}`} fallback={null}>
-            <GalleryItemsResolver
-              photoIds={photoIds}
-              index={galleryIndex}
-              onChange={onIndexChange}
-              onClose={onClose}
-              onDragProgress={handleDragProgress}
-            />
-          </Suspense>
+          <MediaGallery
+            getItemKey={(index) => photoIds[index]}
+            itemCount={photoIds.length}
+            index={galleryIndex}
+            renderItem={(index) => <RouteMediaGalleryImage photoId={photoIds[index]} />}
+            onChange={onIndexChange}
+            onClose={onClose}
+            onDragProgress={handleDragProgress}
+          />
         )}
       </Modal>
     </ModalOverlay>
   );
 }
 
-interface GalleryItemsResolverProps {
-  photoIds: string[];
-  index: number;
-  onChange: (index: number) => void;
-  onClose: () => void;
-  onDragProgress: (progress: number) => void;
-}
+function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
+  const [mediaFile] = useSuspenseDocument<MediaFile>(photoId as MediaFile["id"], {
+    required: true,
+  });
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
-// This component renders children for each photo to resolve URLs
-function GalleryItemsResolver({
-  photoIds,
-  index,
-  onChange,
-  onClose,
-  onDragProgress,
-}: GalleryItemsResolverProps) {
-  const mediaFileIds = photoIds as MediaFile["id"][];
-  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(mediaFileIds, {
-    required: true as const,
-  }).map(({ doc }) => doc);
-  const urls = useMediaFileObjectUrls(mediaFiles);
-  const galleryItems: MediaGalleryItem[] = urls.map((url) => ({
-    src: url,
-  }));
-
-  return (
-    <MediaGallery
-      index={index}
-      items={galleryItems}
-      onChange={onChange}
-      onClose={onClose}
-      onDragProgress={onDragProgress}
-    />
-  );
+  return <MediaGalleryImage items={[{ src: url }]} index={0} />;
 }

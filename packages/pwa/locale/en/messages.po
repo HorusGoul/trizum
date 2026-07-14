@@ -542,7 +542,7 @@ msgstr "Clear expression"
 msgid "Clear search"
 msgstr "Clear search"
 
-#: src/components/MediaGallery.tsx:241
+#: src/components/MediaGallery.tsx:252
 #: src/components/RouteQRScanner.tsx:60
 msgid "Close"
 msgstr "Close"
@@ -1697,7 +1697,7 @@ msgstr "New trizum"
 msgid "New Zealand Dollar"
 msgstr "New Zealand Dollar"
 
-#: src/components/MediaGallery.tsx:258
+#: src/components/MediaGallery.tsx:269
 msgid "Next"
 msgstr "Next"
 
@@ -2118,7 +2118,7 @@ msgstr "Point your camera at a trizum QR code"
 msgid "Polish Zloty"
 msgstr "Polish Zloty"
 
-#: src/components/MediaGallery.tsx:251
+#: src/components/MediaGallery.tsx:262
 msgid "Previous"
 msgstr "Previous"
 
