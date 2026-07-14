@@ -2,4 +2,4 @@
 "@trizum/pwa": patch
 ---
 
-Show newly added expense attachments in the gallery before the edited expense is saved.
+Show newly added expense attachments before saving and open the gallery on the selected attachment.

@@ -27,6 +27,7 @@ export function RouteMediaGallery({
   onClose,
 }: RouteMediaGalleryProps) {
   const isOpen = galleryIndex !== undefined && galleryIndex >= 0;
+  const selectedPhotoId = galleryIndex === undefined ? undefined : photoIds[galleryIndex];
 
   // Track drag progress for background opacity animation
   const [dragProgress, setDragProgress] = useState(0);
@@ -52,8 +53,8 @@ export function RouteMediaGallery({
       }}
     >
       <Modal className="h-full w-full">
-        {isOpen && photoIds.length > 0 && (
-          <Suspense fallback={null}>
+        {isOpen && selectedPhotoId && (
+          <Suspense key={`${galleryIndex}:${selectedPhotoId}`} fallback={null}>
             <GalleryItemsResolver
               photoIds={photoIds}
               index={galleryIndex}

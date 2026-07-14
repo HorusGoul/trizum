@@ -162,6 +162,35 @@ test.describe("Expense log", () => {
     await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
   });
 
+  test("opens the selected attachment on the first gallery render", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const title = "Cabin groceries";
+    const seededAmountText = formatAmountText(90);
+
+    const seededParty = await harness.joinSeededParty({
+      fixture: createImbalancedPartyFixture(),
+      participantName: defaultParticipants.blair.name,
+    });
+
+    await partyPage.openExpenseInLog(title);
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+    await expenseDetailPage.openEdit();
+    await expenseEditorPage.expectEditLoaded(seededParty.partyId, title);
+
+    await page
+      .locator('input[aria-label="Upload photo"]')
+      .setInputFiles(["public/pwa-64x64.png", "public/pwa-192x192.png"]);
+
+    const attachmentButtons = page.getByRole("button", { name: "View photo" });
+    await expect(attachmentButtons).toHaveCount(2);
+    await attachmentButtons.nth(1).click();
+
+    await expect(page).toHaveURL(/\?media=1$/);
+    await expect(page.locator("[data-media-gallery-image]")).toHaveJSProperty("naturalWidth", 192);
+  });
+
   test("keeps expense draft values when validation fails", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
     const expenseEditorPage = new ExpenseEditorPage(page);

@@ -230,6 +230,7 @@ export default function MediaGallery({
           <m.div ref={ref} className="relative" style={{ x, y, scale }}>
             <div className="absolute inset-0" />
             <img
+              data-media-gallery-image=""
               src={currentItem.src}
               alt=""
               className="pointer-events-none select-none [-webkit-user-drag:_none]"
