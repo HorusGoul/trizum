@@ -10,6 +10,8 @@ import {
   setNativeAuthTokenFromResponse,
 } from "./nativeAuthSession";
 
+const AUTH_SESSION_REFETCH_INTERVAL_SECONDS = 60 * 60;
+
 export interface LinkedAuthAccount {
   accountId: string;
   createdAt: string | Date;
@@ -47,6 +49,11 @@ export const authClient = createAuthClient({
     },
   },
   plugins: [magicLinkClient()],
+  sessionOptions: {
+    refetchInterval: AUTH_SESSION_REFETCH_INTERVAL_SECONDS,
+    refetchOnWindowFocus: true,
+    refetchWhenOffline: false,
+  },
 });
 
 type AuthSession = ReturnType<typeof authClient.useSession>;

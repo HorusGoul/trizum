@@ -26,8 +26,222 @@ test.describe("Browser harness", () => {
     await harness.gotoHome();
 
     await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
-    await expect(page.getByRole("heading", { name: "Welcome to trizum" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Create a new Party" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Split expenses, stay even." })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Create a Party" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Keep every party in sync/ })).toBeVisible();
+  });
+
+  test("opens cloud sign-in from the home screen", async ({ harness, page }) => {
+    const homePage = new HomePage(page);
+
+    await page.setViewportSize({ width: 390, height: 700 });
+    await harness.gotoHome();
+    const homeHeading = page.getByRole("heading", { name: "Split expenses, stay even." });
+    await expect(homeHeading).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await page.addStyleTag({
+      content: "body::after { content: ''; display: block; height: 240px; }",
+    });
+    await page.evaluate(() => {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    const scrollYBeforeSignIn = await page.evaluate(() => window.scrollY);
+    expect(scrollYBeforeSignIn).toBeGreaterThan(0);
+
+    const headingBeforeSignIn = await homeHeading.boundingBox();
+    const homeHeadingElement = await homeHeading.elementHandle();
+    if (!homeHeadingElement) {
+      throw new Error("Expected the home heading to be mounted before opening sign-in");
+    }
+
+    await homePage.openCloudSync();
+
+    await expect(page).toHaveURL(/\/settings\/cloud-sync$/);
+    await expect(page.getByRole("dialog", { name: "Sign in" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in to trizum cloud" })).toBeVisible();
+    await expect(page.locator('button[aria-label="Profile and app menu"]')).toHaveCount(1);
+    await expect(page.locator("html")).toHaveCSS("scrollbar-gutter", "stable");
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(scrollYBeforeSignIn);
+
+    const headingBehindSignIn = await page.locator("main h2").boundingBox();
+    expect(headingBehindSignIn).toEqual(headingBeforeSignIn);
+    await expect(
+      homeHeadingElement.evaluate((element) => element === document.querySelector("main h2")),
+    ).resolves.toBe(true);
+
+    await page.getByRole("button", { name: "Close sign-in" }).click();
+    await expect(page).toHaveURL(/\/\?__internal_offline_only=true$/);
+  });
+
+  test("returns straight to home after signing in", async ({ harness, page }) => {
+    const homePage = new HomePage(page);
+    const user = {
+      createdAt: new Date().toISOString(),
+      email: "alex@example.com",
+      emailVerified: true,
+      id: "test-user",
+      image: null,
+      name: "Alex",
+      updatedAt: new Date().toISOString(),
+    };
+    let isSignedIn = false;
+    let cloudPartyListId = "";
+
+    await page.route("**/api/auth/**", async (route) => {
+      const pathname = new URL(route.request().url()).pathname;
+
+      if (pathname.endsWith("/get-session")) {
+        await route.fulfill({
+          json: isSignedIn
+            ? {
+                session: {
+                  createdAt: new Date().toISOString(),
+                  expiresAt: new Date(Date.now() + 60_000).toISOString(),
+                  id: "test-session",
+                  token: "test-token",
+                  updatedAt: new Date().toISOString(),
+                  userId: user.id,
+                },
+                user,
+              }
+            : null,
+        });
+        return;
+      }
+
+      if (pathname.endsWith("/sign-in/email")) {
+        isSignedIn = true;
+        await route.fulfill({ json: { redirect: false, token: "test-token", user } });
+        return;
+      }
+
+      if (pathname.endsWith("/list-accounts")) {
+        await route.fulfill({ json: [] });
+        return;
+      }
+
+      await route.fallback();
+    });
+    await page.route("**/api/cloud-sync/settings", async (route) => {
+      await route.fulfill({
+        json: {
+          settings: {
+            partyListDocumentId: cloudPartyListId,
+            updatedAt: Date.now(),
+          },
+        },
+      });
+    });
+
+    const cloudParty = await harness.seedParty(createPartyFixture());
+    const localPartyListId = (await harness.readPartyList()).partyListId;
+    cloudPartyListId = (
+      await harness.createDeferredPartyList({
+        username: "Cloud User",
+        parties: { [cloudParty.partyId]: true },
+        participantInParties: {
+          [cloudParty.partyId]: defaultParticipants.blair.id,
+        },
+      })
+    ).partyListId;
+    expect(cloudPartyListId).not.toBe(localPartyListId);
+    await homePage.menuButton.click();
+    await expect(page.getByRole("menuitem", { name: "Sign in to trizum cloud" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await homePage.openCloudSync();
+    await page.getByRole("button", { name: "Sign in with password" }).click();
+    await page.getByLabel("Email").fill(user.email);
+    await page.getByLabel("Password").fill("test-password");
+    await page.evaluate(() => {
+      const testWindow = window as Window & { __cloudSettingsRendered?: boolean };
+      testWindow.__cloudSettingsRendered = false;
+      new MutationObserver(() => {
+        const cloudSettingsHeading = [...document.querySelectorAll("h1")].some(
+          (heading) => heading.textContent?.trim() === "trizum cloud",
+        );
+        testWindow.__cloudSettingsRendered ||= cloudSettingsHeading;
+      }).observe(document.body, { childList: true, subtree: true });
+    });
+
+    await page.getByRole("button", { name: "Sign in with password" }).click();
+
+    await expect(page.locator("p").getByText("Signed in", { exact: true })).toBeVisible();
+    await expect
+      .poll(() => harness.getDocumentState(cloudPartyListId))
+      .toMatch(/^(loading|requesting|unavailable)$/);
+    await expect(page).toHaveURL(/\/settings\/cloud-sync$/);
+    await expect(homePage.partyCard(/Weekend trip/)).toHaveCount(0);
+    expect(await page.evaluate(() => localStorage.getItem("partyListId"))).toBe(localPartyListId);
+
+    await harness.releaseDeferredPartyList(cloudPartyListId);
+
+    await expect.poll(() => page.evaluate(() => window.location.pathname)).toBe("/");
+    await homePage.expectPartyVisible(/Weekend trip/);
+    const cloudPartyCard = homePage.partyCard(/Weekend trip/);
+    await cloudPartyCard.hover();
+    await cloudPartyCard.getByRole("button", { name: "Party actions" }).click();
+    await page.getByRole("menuitem", { name: "Pin party" }).click();
+    await expect
+      .poll(async () => (await harness.readPartyList()).pinnedParties[cloudParty.partyId])
+      .toBe(true);
+    await homePage.menuButton.click();
+    await expect(page.getByRole("menuitem", { name: "Manage trizum cloud" })).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window as Window & { __cloudSettingsRendered?: boolean }).__cloudSettingsRendered,
+        ),
+      )
+      .toBe(false);
+  });
+
+  test("initializes the auth session on party routes", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    let sessionRequestCount = 0;
+
+    await page.route("**/api/auth/get-session", async (route) => {
+      sessionRequestCount += 1;
+      await route.fulfill({ json: null });
+    });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+    sessionRequestCount = 0;
+
+    await harness.gotoParty(seededParty.partyId);
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await expect.poll(() => sessionRequestCount).toBeGreaterThan(0);
+  });
+
+  test("keeps an open party bound to the list that admitted it", async ({
+    context,
+    harness,
+    page,
+  }) => {
+    const partyPage = new PartyPage(page);
+    const activeParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+    const replacementPartyList = await harness.createDeferredPartyList({
+      username: "Another tab",
+    });
+    await harness.releaseDeferredPartyList(replacementPartyList.partyListId);
+
+    await harness.gotoParty(activeParty.partyId);
+    await partyPage.expectLoaded(activeParty.partyId, "Weekend trip");
+
+    const otherPage = await context.newPage();
+    await otherPage.goto("/?__internal_offline_only=true");
+    await otherPage.evaluate((partyListId) => {
+      localStorage.setItem("partyListId", partyListId);
+    }, replacementPartyList.partyListId);
+    await otherPage.close();
+
+    await partyPage.openBalances();
+    await partyPage.expectLoaded(activeParty.partyId, "Weekend trip");
   });
 
   test("can reopen an existing persisted party from the home screen", async ({ harness, page }) => {

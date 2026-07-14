@@ -15,12 +15,15 @@ import {
   readCachedCloudAccountState,
   writeCachedCloudAccountState,
 } from "#src/lib/cloudSyncRouteState.ts";
-import type { PartyList } from "#src/models/partyList.js";
+import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
+import { setPartyListId, type PartyList } from "#src/models/partyList.js";
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
 
 interface CloudSyncAccountState {
   cloudSettings: CloudUserSettings | null;
+  isAccountStateResolved: boolean;
   isCloudSyncSwitchOpen: boolean;
   linkedAccounts: LinkedAuthAccount[];
 }
@@ -28,16 +31,23 @@ interface CloudSyncAccountState {
 type CloudSyncAccountStateAction =
   | { type: "cleared" }
   | {
+      type: "accountChanged";
+      cloudSettings: CloudUserSettings | null;
+      linkedAccounts: LinkedAuthAccount[];
+    }
+  | {
       type: "accountDataLoaded";
       cloudSettings: CloudUserSettings | null;
       linkedAccounts: LinkedAuthAccount[];
     }
+  | { type: "accountDataResolved" }
   | { type: "cloudSettingsActivated"; cloudSettings: CloudUserSettings }
   | { type: "linkedAccountsSaved"; linkedAccounts: LinkedAuthAccount[] }
   | { type: "switchOpenChanged"; isOpen: boolean };
 
 const initialCloudSyncAccountState: CloudSyncAccountState = {
   cloudSettings: null,
+  isAccountStateResolved: false,
   isCloudSyncSwitchOpen: false,
   linkedAccounts: [],
 };
@@ -50,11 +60,27 @@ function cloudSyncAccountStateReducer(
     case "cleared":
       return initialCloudSyncAccountState;
 
+    case "accountChanged":
+      return {
+        ...state,
+        cloudSettings: action.cloudSettings,
+        isAccountStateResolved: false,
+        isCloudSyncSwitchOpen: false,
+        linkedAccounts: action.linkedAccounts,
+      };
+
     case "accountDataLoaded":
       return {
         ...state,
         cloudSettings: action.cloudSettings,
+        isAccountStateResolved: true,
         linkedAccounts: action.linkedAccounts,
+      };
+
+    case "accountDataResolved":
+      return {
+        ...state,
+        isAccountStateResolved: true,
       };
 
     case "cloudSettingsActivated":
@@ -89,8 +115,9 @@ export function useCloudSyncAccountState({
   partyList: PartyList;
   userId: string | undefined;
 }) {
+  const repo = useRepo();
   const [state, dispatch] = useReducer(cloudSyncAccountStateReducer, initialCloudSyncAccountState);
-  const { cloudSettings, isCloudSyncSwitchOpen, linkedAccounts } = state;
+  const { cloudSettings, isAccountStateResolved, isCloudSyncSwitchOpen, linkedAccounts } = state;
   const partyListRef = useRef(partyList);
   const onCloudDataActivatedRef = useRef(onCloudDataActivated);
   const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
@@ -149,6 +176,25 @@ export function useCloudSyncAccountState({
           }
         }
 
+        if (
+          activeSettings &&
+          isValidDocumentId(activeSettings.partyListDocumentId) &&
+          activeSettings.partyListDocumentId !== currentPartyList.id
+        ) {
+          const cloudPartyList = await documentCache.readAsync(
+            repo,
+            activeSettings.partyListDocumentId,
+          );
+
+          if (isCancelled) {
+            return;
+          }
+
+          if (!cloudPartyList) {
+            throw new Error("Cloud party list is unavailable");
+          }
+        }
+
         dispatch({
           type: "accountDataLoaded",
           cloudSettings: activeSettings,
@@ -178,7 +224,7 @@ export function useCloudSyncAccountState({
           return;
         }
 
-        localStorage.setItem("partyListId", activeSettings.partyListDocumentId);
+        setPartyListId(activeSettings.partyListDocumentId);
         dispatch({ type: "cloudSettingsActivated", cloudSettings: activeSettings });
         writeCachedCloudUserSettings(currentUserId, activeSettings);
         writeCachedCloudAccountState(currentUserId, {
@@ -188,25 +234,20 @@ export function useCloudSyncAccountState({
         toast.success(t`trizum cloud enabled on this device`);
         onCloudDataActivatedRef.current(isSignInSuccessVisibleRef.current);
       } catch {
-        if (!isCancelled && showErrorToast) {
-          toast.error(t`Could not load trizum cloud state`);
+        if (!isCancelled) {
+          dispatch({ type: "accountDataResolved" });
+          if (showErrorToast) {
+            toast.error(t`Could not load trizum cloud state`);
+          }
         }
       }
     }
 
-    if (cachedAccountState) {
-      dispatch({
-        type: "accountDataLoaded",
-        linkedAccounts: cachedAccountState.linkedAccounts,
-        cloudSettings: cachedAccountState.cloudSettings,
-      });
-    } else {
-      dispatch({
-        type: "accountDataLoaded",
-        linkedAccounts: [],
-        cloudSettings: null,
-      });
-    }
+    dispatch({
+      type: "accountChanged",
+      linkedAccounts: cachedAccountState?.linkedAccounts ?? [],
+      cloudSettings: cachedAccountState?.cloudSettings ?? null,
+    });
 
     void loadAccountState({
       showErrorToast: !cachedAccountState,
@@ -221,7 +262,7 @@ export function useCloudSyncAccountState({
       isCancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [isSignInSuccessVisibleRef, userId]);
+  }, [isSignInSuccessVisibleRef, repo, userId]);
 
   function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
     dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
@@ -238,7 +279,7 @@ export function useCloudSyncAccountState({
     dispatch({ type: "cleared" });
   }
 
-  function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
+  async function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
     if (!settings) {
       toast.message(t`trizum cloud is not set up yet`);
       return;
@@ -254,7 +295,14 @@ export function useCloudSyncAccountState({
       return;
     }
 
-    localStorage.setItem("partyListId", settings.partyListDocumentId);
+    const cloudPartyList = await documentCache.readAsync(repo, settings.partyListDocumentId);
+
+    if (!cloudPartyList) {
+      toast.error(t`Could not load trizum cloud state`);
+      return;
+    }
+
+    setPartyListId(settings.partyListDocumentId);
 
     if (userId) {
       dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
@@ -275,6 +323,7 @@ export function useCloudSyncAccountState({
     activateCloudSyncOnDevice,
     clearCloudSyncState,
     hasPasswordAccount,
+    isAccountStateResolved,
     isCloudSyncSwitchOpen,
     linkedProviderIds,
     saveLinkedAccounts,

@@ -1,0 +1,111 @@
+<svg viewBox="0 0 620 560" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shared-expenses-green" x1="78" y1="68" x2="155" y2="157" gradientUnits="userSpaceOnUse">
+      <stop stop-color="var(--color-success-700, #047857)"/>
+      <stop offset=".52" stop-color="var(--color-success-500, #10b981)"/>
+      <stop offset="1" stop-color="var(--color-success-400, #34d399)"/>
+    </linearGradient>
+    <linearGradient id="shared-expenses-blue" x1="460" y1="66" x2="533" y2="157" gradientUnits="userSpaceOnUse">
+      <stop stop-color="var(--color-blue-700, #1d4ed8)"/>
+      <stop offset="1" stop-color="var(--color-blue-400, #60a5fa)"/>
+    </linearGradient>
+    <linearGradient id="shared-expenses-purple" x1="67" y1="372" x2="139" y2="454" gradientUnits="userSpaceOnUse">
+      <stop stop-color="var(--color-violet-700, #6d28d9)"/>
+      <stop offset="1" stop-color="var(--color-violet-400, #a78bfa)"/>
+    </linearGradient>
+    <linearGradient id="shared-expenses-yellow" x1="484" y1="370" x2="555" y2="456" gradientUnits="userSpaceOnUse">
+      <stop stop-color="var(--color-warning-600, #ca8a04)"/>
+      <stop offset="1" stop-color="var(--color-warning-300, #fde047)"/>
+    </linearGradient>
+    <linearGradient id="shared-expenses-check" x1="376" y1="417" x2="431" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="var(--color-success-700, #047857)"/>
+      <stop offset="1" stop-color="var(--color-success-500, #10b981)"/>
+    </linearGradient>
+    <filter id="shared-expenses-shadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#020c17" flood-opacity=".42"/>
+    </filter>
+    <filter id="shared-expenses-glow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="15"/>
+    </filter>
+  </defs>
+
+  <ellipse
+    cx="310"
+    cy="277"
+    rx="258"
+    ry="235"
+    stroke="currentColor"
+    stroke-width="4"
+    stroke-dasharray="9 8"
+    opacity=".58"
+  />
+
+  <circle cx="117" cy="111" r="56" fill="var(--color-success-500, #10b981)" opacity=".1" filter="url(#shared-expenses-glow)"/>
+  <circle cx="494" cy="111" r="56" fill="var(--color-blue-500, #3b82f6)" opacity=".1" filter="url(#shared-expenses-glow)"/>
+  <circle cx="102" cy="409" r="56" fill="var(--color-violet-500, #8b5cf6)" opacity=".1" filter="url(#shared-expenses-glow)"/>
+  <circle cx="519" cy="409" r="56" fill="var(--color-warning-400, #facc15)" opacity=".1" filter="url(#shared-expenses-glow)"/>
+
+  <g opacity=".75">
+    <circle cx="250" cy="83" r="5" stroke="currentColor" stroke-width="4"/>
+    <path d="M124 218h17M132.5 209.5v17" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="160" cy="284" r="6" fill="var(--color-success-500, #10b981)"/>
+    <circle cx="472" cy="218" r="5.5" fill="currentColor" opacity=".7"/>
+    <path d="M512 250h17M520.5 241.5v17" stroke="var(--color-success-400, #34d399)" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="451" cy="335" r="5" stroke="currentColor" stroke-width="4" opacity=".7"/>
+  </g>
+
+  <g filter="url(#shared-expenses-shadow)">
+    <rect x="196" y="122" width="220" height="316" rx="23" fill="var(--shared-expenses-surface, #09233a)"/>
+    <rect x="197.5" y="123.5" width="217" height="313" rx="21.5" stroke="currentColor" stroke-width="3" opacity=".42"/>
+
+    <path d="M322 154c-4-5-10-8-17-8-13 0-23 11-23 26s10 26 23 26c7 0 13-3 17-8M275 164h37M275 180h34" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <circle cx="230" cy="226" r="8" fill="var(--color-success-500, #10b981)"/>
+    <circle cx="230" cy="263" r="8" fill="var(--color-blue-400, #60a5fa)"/>
+    <circle cx="230" cy="299" r="8" fill="var(--color-violet-400, #a78bfa)"/>
+    <circle cx="230" cy="335" r="8" fill="var(--color-warning-400, #facc15)"/>
+    <path d="M255 226h65M255 263h65M255 299h65M255 335h65" stroke="currentColor" stroke-width="9" stroke-linecap="round" opacity=".36"/>
+    <g fill="currentColor" font-family="Inter, ui-sans-serif, sans-serif" font-size="16" font-weight="500" text-anchor="end" opacity=".88">
+      <text x="388" y="232">28.40</text>
+      <text x="388" y="269">18.20</text>
+      <text x="388" y="305">14.60</text>
+      <text x="388" y="341">9.80</text>
+    </g>
+    <path d="M215 366h180" stroke="currentColor" stroke-width="2.5" opacity=".35"/>
+    <text x="388" y="405" fill="currentColor" font-family="Inter, ui-sans-serif, sans-serif" font-size="24" font-weight="700" text-anchor="end">71.00</text>
+  </g>
+
+  <g filter="url(#shared-expenses-shadow)">
+    <circle cx="117" cy="111" r="49" fill="url(#shared-expenses-green)"/>
+    <circle cx="117" cy="111" r="48" stroke="var(--color-success-300, #6ee7b7)" stroke-width="2" opacity=".85"/>
+    <circle cx="117" cy="102" r="11" stroke="white" stroke-width="4"/>
+    <path d="M101 132c1-13 7-19 16-19s15 6 16 19" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#shared-expenses-shadow)">
+    <circle cx="494" cy="111" r="49" fill="url(#shared-expenses-blue)"/>
+    <circle cx="494" cy="111" r="48" stroke="var(--color-blue-300, #93c5fd)" stroke-width="2" opacity=".9"/>
+    <circle cx="494" cy="102" r="11" stroke="white" stroke-width="4"/>
+    <path d="M478 132c1-13 7-19 16-19s15 6 16 19" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#shared-expenses-shadow)">
+    <circle cx="102" cy="409" r="49" fill="url(#shared-expenses-purple)"/>
+    <circle cx="102" cy="409" r="48" stroke="var(--color-violet-300, #c4b5fd)" stroke-width="2" opacity=".88"/>
+    <circle cx="102" cy="400" r="11" stroke="white" stroke-width="4"/>
+    <path d="M86 430c1-13 7-19 16-19s15 6 16 19" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#shared-expenses-shadow)">
+    <circle cx="519" cy="409" r="49" fill="url(#shared-expenses-yellow)"/>
+    <circle cx="519" cy="409" r="48" stroke="var(--color-warning-300, #fde047)" stroke-width="2" opacity=".95"/>
+    <circle cx="519" cy="400" r="11" stroke="white" stroke-width="4"/>
+    <path d="M503 430c1-13 7-19 16-19s15 6 16 19" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#shared-expenses-shadow)">
+    <circle cx="402" cy="445" r="32" fill="url(#shared-expenses-check)"/>
+    <circle cx="402" cy="445" r="31" stroke="var(--color-success-400, #34d399)" stroke-width="2"/>
+    <path d="m387 445 10 10 20-23" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

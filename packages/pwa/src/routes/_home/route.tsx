@@ -1,15 +1,14 @@
-import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import type { PartyList } from "#src/models/partyList.js";
+import { Trans } from "@lingui/react/macro";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import type { Party } from "#src/models/party.js";
+import type { PartyList } from "#src/models/partyList.js";
 import { PartyListCard, type PartyListCardAction } from "#src/components/PartyListCard.tsx";
 import { getOrderedPartySections, isPartyPinned } from "#src/lib/partyListOrdering.ts";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
-import { createFileRoute, redirect } from "@tanstack/react-router";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
@@ -17,64 +16,34 @@ import { use } from "react";
 import { toast } from "sonner";
 import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
-import { EmptyState } from "./-components/EmptyState.js";
-import { NoActivePartiesCard } from "./-components/NoActivePartiesCard.js";
-import { ProfileSetupCard } from "./-components/ProfileSetupCard.js";
+import { EmptyState } from "#src/routes/index/-components/EmptyState.js";
+import { NoActivePartiesCard } from "#src/routes/index/-components/NoActivePartiesCard.js";
+import { ProfileSetupCard } from "#src/routes/index/-components/ProfileSetupCard.js";
+import { authClient } from "#src/lib/auth-client.ts";
 
-let hasRedirectedThisSession = false;
-
-export const Route = createFileRoute("/")({
-  component: Index,
-  beforeLoad: async ({ context }) => {
-    // Only redirect once per session (on app launch)
-    if (hasRedirectedThisSession) {
-      return;
-    }
-
-    const partyListId = localStorage.getItem("partyListId");
-    if (!partyListId || !isValidDocumentId(partyListId)) {
-      return;
-    }
-
-    const partyList = (await documentCache.readAsync(context.repo, partyListId)) as
-      | PartyList
-      | undefined;
-
-    if (!partyList) {
-      return;
-    }
-
-    const { openLastPartyOnLaunch, lastOpenedPartyId, parties } = partyList;
-
-    if (
-      openLastPartyOnLaunch &&
-      lastOpenedPartyId &&
-      isValidDocumentId(lastOpenedPartyId) &&
-      parties[lastOpenedPartyId] &&
-      partyList.archivedParties?.[lastOpenedPartyId] !== true
-    ) {
-      hasRedirectedThisSession = true;
-      throw redirect({
-        to: "/party/$partyId",
-        params: { partyId: lastOpenedPartyId },
-        search: { tab: "expenses" },
-        replace: true,
-      });
-    }
-  },
+export const Route = createFileRoute("/_home")({
+  component: Home,
 });
 
-function Index() {
+function Home() {
   const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
+  const session = authClient.useSession();
+  const location = useLocation();
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;
   const needsProfileSetup = !partyList.username || partyList.username.trim() === "";
+  const hasCloudSyncChild = location.pathname === "/settings/cloud-sync";
+  const isSignedIn = Boolean(session.data?.user);
 
   return (
     <>
-      <div className="flex min-h-full flex-col">
+      <div
+        aria-hidden={hasCloudSyncChild || undefined}
+        inert={hasCloudSyncChild || undefined}
+        className="flex min-h-full flex-col"
+      >
         <div className="mt-safe container flex h-16 items-center pr-2">
           <h1 className="pl-4 text-2xl font-bold">trizum</h1>
 
@@ -102,15 +71,11 @@ function Index() {
           ) : null}
 
           <MenuTrigger>
-            <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Menu`} />
+            <IconButton icon="lucide.ellipsis-vertical" aria-label={t`Profile and app menu`} />
 
             <Popover placement="bottom end">
               <Menu>
-                <MenuItem
-                  href={{
-                    to: "/settings",
-                  }}
-                >
+                <MenuItem href={{ to: "/settings" }}>
                   <Icon icon="lucide.settings" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Settings</Trans>
@@ -118,10 +83,25 @@ function Index() {
                 </MenuItem>
 
                 <MenuItem
-                  href={{
-                    to: "/archived",
-                  }}
+                  href={{ to: "/settings/cloud-sync" }}
+                  routerOptions={{ resetScroll: false }}
                 >
+                  <Icon
+                    icon={isSignedIn ? "lucide.cloud-cog" : "lucide.log-in"}
+                    width={20}
+                    height={20}
+                    className="mr-3"
+                  />
+                  <span className="h-3.5 leading-none">
+                    {isSignedIn ? (
+                      <Trans>Manage trizum cloud</Trans>
+                    ) : (
+                      <Trans>Sign in to trizum cloud</Trans>
+                    )}
+                  </span>
+                </MenuItem>
+
+                <MenuItem href={{ to: "/archived" }}>
                   <Icon icon="lucide.folder-archive" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Archived parties</Trans>
@@ -139,11 +119,7 @@ function Index() {
                   </span>
                 </MenuItem>
 
-                <MenuItem
-                  href={{
-                    to: "/about",
-                  }}
-                >
+                <MenuItem href={{ to: "/about" }}>
                   <Icon icon="lucide.info" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>About</Trans>
@@ -229,6 +205,7 @@ function Index() {
           <EmptyState />
         )}
       </div>
+      <Outlet />
     </>
   );
 }

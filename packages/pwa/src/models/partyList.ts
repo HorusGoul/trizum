@@ -3,6 +3,7 @@ import type { SupportedLocale } from "#src/lib/locales.js";
 import type { Party, PartyParticipant } from "./party";
 
 const PARTY_LIST_ID_STORAGE_KEY = "partyListId";
+const PARTY_LIST_ID_CHANGED_EVENT = "trizum:party-list-id-changed";
 
 export interface PartyList {
   id: DocumentId;
@@ -65,4 +66,21 @@ export function getPartyListId(repo: Repo) {
   }
 
   return createPartyListHandle(repo).documentId;
+}
+
+export function setPartyListId(id: DocumentId) {
+  localStorage.setItem(PARTY_LIST_ID_STORAGE_KEY, id);
+  window.dispatchEvent(new CustomEvent<DocumentId>(PARTY_LIST_ID_CHANGED_EVENT, { detail: id }));
+}
+
+export function subscribeToPartyListId(onPartyListIdChanged: (partyListId: DocumentId) => void) {
+  function handlePartyListIdChanged(event: Event) {
+    onPartyListIdChanged((event as CustomEvent<DocumentId>).detail);
+  }
+
+  window.addEventListener(PARTY_LIST_ID_CHANGED_EVENT, handlePartyListIdChanged);
+
+  return () => {
+    window.removeEventListener(PARTY_LIST_ID_CHANGED_EVENT, handlePartyListIdChanged);
+  };
 }

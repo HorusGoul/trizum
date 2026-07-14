@@ -42,10 +42,9 @@ import {
 } from "#src/lib/cloudSyncRouteState.ts";
 import { useCloudSyncAccountState } from "#src/hooks/useCloudSyncAccountState.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
-import { Settings } from "#src/routes/settings.tsx";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
 
-export const Route = createFileRoute("/settings_/cloud-sync")({
+export const Route = createFileRoute("/_home/settings_/cloud-sync")({
   validateSearch: (search: Record<string, unknown>): CloudSyncSearchParams => ({
     auth: search.auth === "success" ? "success" : undefined,
     error: typeof search.error === "string" ? search.error : undefined,
@@ -74,6 +73,7 @@ interface CloudSyncRouteState {
   isPasswordLoginMode: boolean;
   isPasswordResetMode: boolean;
   isPasswordSignInEnabled: boolean;
+  isSignInSuccessAnimationComplete: boolean;
   isSignInSuccessVisible: boolean;
   magicLinkMessage: string | null;
   passwordResetMessage: string | null;
@@ -114,6 +114,7 @@ function createInitialCloudSyncRouteState({
     isPasswordLoginMode: false,
     isPasswordResetMode: false,
     isPasswordSignInEnabled: true,
+    isSignInSuccessAnimationComplete: false,
     isSignInSuccessVisible: auth === "success",
     magicLinkMessage: null,
     passwordResetMessage: null,
@@ -194,6 +195,7 @@ function cloudSyncRouteReducer(
       return {
         ...state,
         optimisticAuthUser: action.user ?? state.optimisticAuthUser,
+        isSignInSuccessAnimationComplete: false,
         isSignInSuccessVisible: true,
       };
     case "deleteAccountDialogOpened":
@@ -253,6 +255,7 @@ function useCloudSyncSettingsView() {
     isPasswordLoginMode,
     isPasswordResetMode,
     isPasswordSignInEnabled,
+    isSignInSuccessAnimationComplete,
     magicLinkMessage,
     passwordResetMessage,
     authPendingAction,
@@ -281,6 +284,7 @@ function useCloudSyncSettingsView() {
     activateCloudSyncOnDevice,
     clearCloudSyncState,
     hasPasswordAccount,
+    isAccountStateResolved,
     isCloudSyncSwitchOpen,
     linkedProviderIds,
     saveLinkedAccounts,
@@ -311,19 +315,34 @@ function useCloudSyncSettingsView() {
       dispatchRouteState({
         type: "patch",
         values: {
-          isSignInSuccessVisible: false,
+          isSignInSuccessAnimationComplete: true,
         },
       });
-
-      if (auth === "success") {
-        void navigate({ to: "/settings/cloud-sync", replace: true });
-      }
     }, SIGN_IN_SUCCESS_ANIMATION_MS);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [auth, isSignInSuccessVisible, navigate, userId]);
+  }, [isSignInSuccessVisible, userId]);
+
+  useEffect(() => {
+    if (
+      !isSignInSuccessVisible ||
+      !isSignInSuccessAnimationComplete ||
+      !isAccountStateResolved ||
+      isCloudSyncSwitchOpen
+    ) {
+      return;
+    }
+
+    void navigate({ to: "/", replace: true });
+  }, [
+    isAccountStateResolved,
+    isCloudSyncSwitchOpen,
+    isSignInSuccessAnimationComplete,
+    isSignInSuccessVisible,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (!isPasswordLoginMode) {
@@ -590,7 +609,7 @@ function useCloudSyncSettingsView() {
       clearCloudSyncState();
       await session.refetch();
       toast.success(t`Signed out`);
-      void navigate({ to: "/settings", replace: true });
+      void navigate({ to: "/", replace: true });
     } catch {
       toast.error(t`Could not sign out`);
     }
@@ -662,7 +681,7 @@ function useCloudSyncSettingsView() {
       });
       await session.refetch();
       toast.success(t`Account deleted`);
-      void navigate({ to: "/settings", replace: true });
+      void navigate({ to: "/", replace: true });
     } catch (error) {
       dispatchRouteState({
         type: "patch",
@@ -692,16 +711,13 @@ function useCloudSyncSettingsView() {
     });
     window.setTimeout(() => {
       closeRouteState(currentLocation, router.history, () => {
-        void navigate({ to: "/settings", replace: true });
+        void navigate({ to: "/", replace: true });
       });
     }, DIALOG_EXIT_ANIMATION_MS);
   }
 
   function onCloudDataActivated(shouldDelay: boolean) {
     if (shouldDelay) {
-      window.setTimeout(() => {
-        void navigate({ to: "/", replace: true });
-      }, SIGN_IN_SUCCESS_ANIMATION_MS + SIGN_IN_SUCCESS_EXIT_ANIMATION_MS);
       return;
     }
 
@@ -710,119 +726,135 @@ function useCloudSyncSettingsView() {
 
   if (!user) {
     return (
-      <div className="relative min-h-full">
-        <div aria-hidden="true" className="min-h-full blur-[2px]">
-          <Settings />
-        </div>
+      <CloudSyncSignInDialog
+        isOpen={isSignInDialogOpen}
+        onOpenChange={closeSignInDialog}
+        showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
+      >
+        <CloudSyncSignInForm
+          authState={{
+            auth,
+            email: authEmail,
+            emailError: authEmailError,
+            error: authError,
+            magicLinkMessage,
+            password: authPassword,
+            passwordError: authPasswordError,
+            passwordResetMessage,
+            pendingAction: authPendingAction,
+          }}
+          mode={signInFormMode}
+          onAuthEmailChange={onAuthEmailChange}
+          onAuthPasswordChange={onAuthPasswordChange}
+          onBackToSignIn={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordResetMode: false,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onForgotPassword={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordResetMode: true,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onMagicLinkSubmit={onMagicLinkSubmit}
+          onPasswordResetSubmit={onPasswordResetSubmit}
+          onPasswordSignInSubmit={onPasswordSignInSubmit}
+          onSocialSignIn={(provider) => {
+            void onSocialSignIn(provider);
+          }}
+          onTryAnotherEmail={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordLoginMode: false,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onUseMagicLink={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordLoginMode: false,
+                isPasswordSignInEnabled: true,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          onUsePassword={() => {
+            dispatchRouteState({
+              type: "patch",
+              values: {
+                authError: null,
+                authEmailError: null,
+                authPasswordError: null,
+                isPasswordLoginMode: true,
+                isPasswordSignInEnabled: false,
+                magicLinkMessage: null,
+                passwordResetMessage: null,
+              },
+            });
+          }}
+          status={{
+            isPending: isAuthPending,
+            isPasswordSignInEnabled,
+            isSignInSuccessVisible,
+          }}
+        />
+      </CloudSyncSignInDialog>
+    );
+  }
 
-        <CloudSyncSignInDialog
-          isOpen={isSignInDialogOpen}
-          onOpenChange={closeSignInDialog}
-          showHeader={!magicLinkMessage && auth !== "success" && !isSignInSuccessVisible}
-        >
-          <CloudSyncSignInForm
-            authState={{
-              auth,
-              email: authEmail,
-              emailError: authEmailError,
-              error: authError,
-              magicLinkMessage,
-              password: authPassword,
-              passwordError: authPasswordError,
-              passwordResetMessage,
-              pendingAction: authPendingAction,
-            }}
-            mode={signInFormMode}
-            onAuthEmailChange={onAuthEmailChange}
-            onAuthPasswordChange={onAuthPasswordChange}
-            onBackToSignIn={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordResetMode: false,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onForgotPassword={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordResetMode: true,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onMagicLinkSubmit={onMagicLinkSubmit}
-            onPasswordResetSubmit={onPasswordResetSubmit}
-            onPasswordSignInSubmit={onPasswordSignInSubmit}
-            onSocialSignIn={(provider) => {
-              void onSocialSignIn(provider);
-            }}
-            onTryAnotherEmail={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordLoginMode: false,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onUseMagicLink={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordLoginMode: false,
-                  isPasswordSignInEnabled: true,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            onUsePassword={() => {
-              dispatchRouteState({
-                type: "patch",
-                values: {
-                  authError: null,
-                  authEmailError: null,
-                  authPasswordError: null,
-                  isPasswordLoginMode: true,
-                  isPasswordSignInEnabled: false,
-                  magicLinkMessage: null,
-                  passwordResetMessage: null,
-                },
-              });
-            }}
-            status={{
-              isPending: isAuthPending,
-              isPasswordSignInEnabled,
-              isSignInSuccessVisible,
-            }}
-          />
-        </CloudSyncSignInDialog>
-      </div>
+  if (isSignInSuccessVisible) {
+    return (
+      <>
+        <AnimatePresence>
+          {!isSignInSuccessAnimationComplete ||
+          !isAccountStateResolved ||
+          !isCloudSyncSwitchOpen ? (
+            <SignInSuccessOverlay exitAnimationMs={SIGN_IN_SUCCESS_EXIT_ANIMATION_MS} />
+          ) : null}
+        </AnimatePresence>
+
+        <CloudSyncSwitchDialog
+          isOpen={isCloudSyncSwitchOpen}
+          onSignOut={onSignOut}
+          onUseCloudData={() => {
+            void activateCloudSyncOnDevice();
+          }}
+        />
+      </>
     );
   }
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="bg-accent-50 dark:bg-accent-950 fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto">
       <div className="mt-safe container flex h-16 items-center px-2">
-        <BackButton fallbackOptions={{ to: "/settings" }} />
+        <BackButton fallbackOptions={{ to: "/" }} />
 
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>trizum cloud</Trans>
@@ -941,7 +973,7 @@ function useCloudSyncSettingsView() {
         isOpen={isCloudSyncSwitchOpen}
         onSignOut={onSignOut}
         onUseCloudData={() => {
-          activateCloudSyncOnDevice();
+          void activateCloudSyncOnDevice();
         }}
       />
     </div>

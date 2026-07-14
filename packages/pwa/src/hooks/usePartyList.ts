@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPartyListId, type PartyList } from "#src/models/partyList.js";
+import { getPartyListId, subscribeToPartyListId, type PartyList } from "#src/models/partyList.js";
 import type { DocHandle, DocumentId } from "@automerge/automerge-repo/slim";
 import type { Party, PartyParticipant } from "#src/models/party.js";
 import {
@@ -37,10 +37,14 @@ function ensureLastUsedAt(list: PartyList) {
 
 export function usePartyList() {
   const repo = useRepo();
-  const [partyListId] = useState<DocumentId>(() => getPartyListId(repo));
+  const [partyListId, setPartyListId] = useState<DocumentId>(() => getPartyListId(repo));
   const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(partyListId, {
     required: true,
   });
+
+  useEffect(() => {
+    return subscribeToPartyListId(setPartyListId);
+  }, []);
 
   useEffect(() => {
     setLocale(partyList.locale ?? getBrowserLocale());

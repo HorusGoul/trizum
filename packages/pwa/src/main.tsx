@@ -2,6 +2,7 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
@@ -29,6 +30,7 @@ import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
 import { AppRecoveryDialog } from "./components/AppRecoveryDialog.tsx";
+import { AuthSessionController } from "./components/AuthSessionController.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
@@ -46,6 +48,7 @@ import {
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import type { Party } from "./models/party.ts";
 import {
+  createInactivePartyListState,
   readPartyListState,
   seedPartyListState,
   type InternalPartyListSeed,
@@ -150,6 +153,7 @@ const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
+const deferredPartyListImports = new Map<DocumentId, Uint8Array>();
 
 void initializeAppWorker({
   repo,
@@ -162,6 +166,11 @@ void initializeAppWorker({
 declare global {
   interface Window {
     __internal_createPartyFromMigrationData: (data: MigrationData) => Promise<string>;
+    __internal_createDeferredPartyListState: (
+      seed: InternalPartyListSeed,
+    ) => Promise<InternalPartyListSeedResult>;
+    __internal_getDocumentState: (documentId: DocumentId) => string | undefined;
+    __internal_releaseDeferredPartyListState: (partyListId: DocumentId) => void;
     __internal_seedPartyListState: (
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
@@ -172,11 +181,43 @@ declare global {
 
 // For internal use only, like UI testing or screenshots
 window.__internal_createPartyFromMigrationData = async (data: MigrationData) => {
-  return createPartyFromMigrationData({
+  const partyId = await createPartyFromMigrationData({
     repo,
     data,
     importAttachments: false,
   });
+
+  await repo.flush();
+  return partyId;
+};
+
+window.__internal_createDeferredPartyListState = async (seed: InternalPartyListSeed) => {
+  const detachedRepo = new Repo({ network: [] });
+  const result = createInactivePartyListState({ repo: detachedRepo, seed });
+  const binary = await detachedRepo.export(result.partyListId);
+  await detachedRepo.shutdown();
+
+  if (!binary) {
+    throw new Error("Expected the deferred party list to be exportable");
+  }
+
+  deferredPartyListImports.set(result.partyListId, binary);
+  return result;
+};
+
+window.__internal_getDocumentState = (documentId: DocumentId) => {
+  return repo.handles[documentId]?.state;
+};
+
+window.__internal_releaseDeferredPartyListState = (partyListId: DocumentId) => {
+  const binary = deferredPartyListImports.get(partyListId);
+
+  if (!binary) {
+    throw new Error(`No deferred party list found for ${partyListId}`);
+  }
+
+  repo.import(binary, { docId: partyListId });
+  deferredPartyListImports.delete(partyListId);
 };
 
 window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {
@@ -285,6 +326,7 @@ if (!rootElement.innerHTML) {
         <AriaProviders>
           <RepoContext value={repo}>
             <MediaGalleryController>
+              <AuthSessionController />
               <RouterProvider router={router} InnerWrap={InnerWrap} />
               <AppRecoveryDialog />
               <Toaster />

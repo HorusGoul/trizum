@@ -12,6 +12,32 @@ test.describe("Home smoke @smoke", () => {
     await homePage.expectLoaded();
   });
 
+  test("fits the empty state in compact mobile viewports", async ({ page }) => {
+    const homePage = new HomePage(page);
+    const viewports = [
+      { width: 375, height: 667 },
+      { width: 320, height: 568 },
+    ];
+
+    await page.setViewportSize(viewports[0]);
+    await page.goto("/?__internal_offline_only=true");
+
+    for (const viewport of viewports) {
+      await test.step(`${viewport.width} × ${viewport.height}`, async () => {
+        await page.setViewportSize(viewport);
+        await homePage.expectLoaded();
+        await page.evaluate(() => document.fonts.ready);
+
+        const { scrollHeight, viewportHeight } = await page.evaluate(() => ({
+          scrollHeight: document.documentElement.scrollHeight,
+          viewportHeight: window.innerHeight,
+        }));
+
+        expect(scrollHeight).toBeLessThanOrEqual(viewportHeight);
+      });
+    }
+  });
+
   test("navigates to create and join flows from the home screen", async ({ page }) => {
     const homePage = new HomePage(page);
     const newTrizumPage = new NewTrizumPage(page);
