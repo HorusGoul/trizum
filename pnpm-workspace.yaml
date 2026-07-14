@@ -71,7 +71,7 @@ catalog:
   "@lingui/vite-plugin": 6.5.0
   "@logtape/logtape": 2.2.4
   "@logtape/sentry": 2.2.4
-  "@openai/codex": 0.144.1
+  "@openai/codex": 0.144.3
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
@@ -92,7 +92,7 @@ catalog:
   "@vite-pwa/assets-generator": 1.0.2
   "@vitejs/plugin-react": 6.0.3
   "@vitest/coverage-v8": 4.1.10
-  agent-browser: 0.31.1
+  agent-browser: 0.31.2
   all-contributors-cli: 6.26.1
   babel-plugin-react-compiler: 1.0.0
   barcode-detector: 3.0.8
