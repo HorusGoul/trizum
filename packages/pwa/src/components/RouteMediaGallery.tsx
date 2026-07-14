@@ -36,12 +36,18 @@ export function RouteMediaGallery({
     setDragProgress(progress);
   }
 
+  function handleClose() {
+    onClose();
+    setDragProgress(0);
+  }
+
   // Calculate background opacity and blur based on drag progress
   const backgroundOpacity = 0.25 * (1 - dragProgress);
   const backdropBlur = `blur(${(1 - dragProgress) * 8}px)`;
 
   return (
     <ModalOverlay
+      data-media-gallery-overlay=""
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
         `fixed inset-0 isolate z-50 ${isEntering ? "animate-in fade-in duration-300 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-200 ease-in" : ""} `
@@ -60,7 +66,7 @@ export function RouteMediaGallery({
             index={galleryIndex}
             renderItem={(index) => <RouteMediaGalleryImage photoId={photoIds[index]} />}
             onChange={onIndexChange}
-            onClose={onClose}
+            onClose={handleClose}
             onDragProgress={handleDragProgress}
           />
         )}
