@@ -844,7 +844,7 @@ function useCloudSyncSettingsView() {
           isOpen={isCloudSyncSwitchOpen}
           onSignOut={onSignOut}
           onUseCloudData={() => {
-            activateCloudSyncOnDevice();
+            void activateCloudSyncOnDevice();
           }}
         />
       </>
@@ -973,7 +973,7 @@ function useCloudSyncSettingsView() {
         isOpen={isCloudSyncSwitchOpen}
         onSignOut={onSignOut}
         onUseCloudData={() => {
-          activateCloudSyncOnDevice();
+          void activateCloudSyncOnDevice();
         }}
       />
     </div>

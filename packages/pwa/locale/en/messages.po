@@ -716,7 +716,8 @@ msgstr "Could not load cloud settings"
 msgid "Could not load sign-in methods"
 msgstr "Could not load sign-in methods"
 
-#: src/hooks/useCloudSyncAccountState.ts:218
+#: src/hooks/useCloudSyncAccountState.ts:240
+#: src/hooks/useCloudSyncAccountState.ts:301
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
@@ -2679,7 +2680,7 @@ msgstr "This debt is no longer available"
 msgid "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 msgstr "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 
-#: src/hooks/useCloudSyncAccountState.ts:272
+#: src/hooks/useCloudSyncAccountState.ts:294
 msgid "This device is already using trizum cloud"
 msgstr "This device is already using trizum cloud"
 
@@ -2798,21 +2799,21 @@ msgstr "Trinidad and Tobago Dollar"
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/hooks/useCloudSyncAccountState.ts:192
-#: src/hooks/useCloudSyncAccountState.ts:267
+#: src/hooks/useCloudSyncAccountState.ts:214
+#: src/hooks/useCloudSyncAccountState.ts:289
 msgid "trizum cloud data is invalid"
 msgstr "trizum cloud data is invalid"
 
-#: src/hooks/useCloudSyncAccountState.ts:212
-#: src/hooks/useCloudSyncAccountState.ts:289
+#: src/hooks/useCloudSyncAccountState.ts:234
+#: src/hooks/useCloudSyncAccountState.ts:318
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud enabled on this device"
 
-#: src/hooks/useCloudSyncAccountState.ts:262
+#: src/hooks/useCloudSyncAccountState.ts:284
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud is not set up yet"
 
-#: src/hooks/useCloudSyncAccountState.ts:172
+#: src/hooks/useCloudSyncAccountState.ts:175
 msgid "trizum cloud started"
 msgstr "trizum cloud started"
 

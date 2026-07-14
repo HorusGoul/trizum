@@ -15,6 +15,8 @@ import {
   readCachedCloudAccountState,
   writeCachedCloudAccountState,
 } from "#src/lib/cloudSyncRouteState.ts";
+import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
+import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.js";
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
@@ -113,6 +115,7 @@ export function useCloudSyncAccountState({
   partyList: PartyList;
   userId: string | undefined;
 }) {
+  const repo = useRepo();
   const [state, dispatch] = useReducer(cloudSyncAccountStateReducer, initialCloudSyncAccountState);
   const { cloudSettings, isAccountStateResolved, isCloudSyncSwitchOpen, linkedAccounts } = state;
   const partyListRef = useRef(partyList);
@@ -170,6 +173,25 @@ export function useCloudSyncAccountState({
           activeSettings = savedSettings;
           if (showStartToast) {
             toast.success(t`trizum cloud started`);
+          }
+        }
+
+        if (
+          activeSettings &&
+          isValidDocumentId(activeSettings.partyListDocumentId) &&
+          activeSettings.partyListDocumentId !== currentPartyList.id
+        ) {
+          const cloudPartyList = await documentCache.readAsync(
+            repo,
+            activeSettings.partyListDocumentId,
+          );
+
+          if (isCancelled) {
+            return;
+          }
+
+          if (!cloudPartyList) {
+            throw new Error("Cloud party list is unavailable");
           }
         }
 
@@ -240,7 +262,7 @@ export function useCloudSyncAccountState({
       isCancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [isSignInSuccessVisibleRef, userId]);
+  }, [isSignInSuccessVisibleRef, repo, userId]);
 
   function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
     dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
@@ -257,7 +279,7 @@ export function useCloudSyncAccountState({
     dispatch({ type: "cleared" });
   }
 
-  function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
+  async function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
     if (!settings) {
       toast.message(t`trizum cloud is not set up yet`);
       return;
@@ -270,6 +292,13 @@ export function useCloudSyncAccountState({
 
     if (settings.partyListDocumentId === partyList.id) {
       toast.message(t`This device is already using trizum cloud`);
+      return;
+    }
+
+    const cloudPartyList = await documentCache.readAsync(repo, settings.partyListDocumentId);
+
+    if (!cloudPartyList) {
+      toast.error(t`Could not load trizum cloud state`);
       return;
     }
 

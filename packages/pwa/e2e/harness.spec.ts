@@ -136,7 +136,7 @@ test.describe("Browser harness", () => {
     const cloudParty = await harness.seedParty(createPartyFixture());
     const localPartyListId = (await harness.readPartyList()).partyListId;
     cloudPartyListId = (
-      await harness.createInactivePartyList({
+      await harness.createDeferredPartyList({
         username: "Cloud User",
         parties: { [cloudParty.partyId]: true },
         participantInParties: {
@@ -166,6 +166,15 @@ test.describe("Browser harness", () => {
     await page.getByRole("button", { name: "Sign in with password" }).click();
 
     await expect(page.locator("p").getByText("Signed in", { exact: true })).toBeVisible();
+    await expect
+      .poll(() => harness.getDocumentState(cloudPartyListId))
+      .toMatch(/^(loading|requesting|unavailable)$/);
+    await expect(page).toHaveURL(/\/settings\/cloud-sync$/);
+    await expect(homePage.partyCard(/Weekend trip/)).toHaveCount(0);
+    expect(await page.evaluate(() => localStorage.getItem("partyListId"))).toBe(localPartyListId);
+
+    await harness.releaseDeferredPartyList(cloudPartyListId);
+
     await expect.poll(() => page.evaluate(() => window.location.pathname)).toBe("/");
     await homePage.expectPartyVisible(/Weekend trip/);
     const cloudPartyCard = homePage.partyCard(/Weekend trip/);
@@ -211,6 +220,35 @@ test.describe("Browser harness", () => {
     });
 
     await expect.poll(() => sessionRequestCount).toBeGreaterThan(requestsAfterRouteLoaded);
+  });
+
+  test("keeps an open party bound to the list that admitted it", async ({
+    context,
+    harness,
+    page,
+  }) => {
+    const partyPage = new PartyPage(page);
+    const activeParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+    const replacementPartyList = await harness.createDeferredPartyList({
+      username: "Another tab",
+    });
+    await harness.releaseDeferredPartyList(replacementPartyList.partyListId);
+
+    await harness.gotoParty(activeParty.partyId);
+    await partyPage.expectLoaded(activeParty.partyId, "Weekend trip");
+
+    const otherPage = await context.newPage();
+    await otherPage.goto("/?__internal_offline_only=true");
+    await otherPage.evaluate((partyListId) => {
+      localStorage.setItem("partyListId", partyListId);
+    }, replacementPartyList.partyListId);
+    await otherPage.close();
+
+    await partyPage.openBalances();
+    await partyPage.expectLoaded(activeParty.partyId, "Weekend trip");
   });
 
   test("can reopen an existing persisted party from the home screen", async ({ harness, page }) => {

@@ -2,6 +2,7 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
+import type { DocumentId } from "@automerge/automerge-repo/slim";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb";
 import {
@@ -152,6 +153,7 @@ const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
+const deferredPartyListImports = new Map<DocumentId, Uint8Array>();
 
 void initializeAppWorker({
   repo,
@@ -164,9 +166,11 @@ void initializeAppWorker({
 declare global {
   interface Window {
     __internal_createPartyFromMigrationData: (data: MigrationData) => Promise<string>;
-    __internal_createInactivePartyListState: (
+    __internal_createDeferredPartyListState: (
       seed: InternalPartyListSeed,
-    ) => InternalPartyListSeedResult;
+    ) => Promise<InternalPartyListSeedResult>;
+    __internal_getDocumentState: (documentId: DocumentId) => string | undefined;
+    __internal_releaseDeferredPartyListState: (partyListId: DocumentId) => void;
     __internal_seedPartyListState: (
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
@@ -184,8 +188,33 @@ window.__internal_createPartyFromMigrationData = async (data: MigrationData) => 
   });
 };
 
-window.__internal_createInactivePartyListState = (seed: InternalPartyListSeed) => {
-  return createInactivePartyListState({ repo, seed });
+window.__internal_createDeferredPartyListState = async (seed: InternalPartyListSeed) => {
+  const detachedRepo = new Repo({ network: [] });
+  const result = createInactivePartyListState({ repo: detachedRepo, seed });
+  const binary = await detachedRepo.export(result.partyListId);
+  await detachedRepo.shutdown();
+
+  if (!binary) {
+    throw new Error("Expected the deferred party list to be exportable");
+  }
+
+  deferredPartyListImports.set(result.partyListId, binary);
+  return result;
+};
+
+window.__internal_getDocumentState = (documentId: DocumentId) => {
+  return repo.handles[documentId]?.state;
+};
+
+window.__internal_releaseDeferredPartyListState = (partyListId: DocumentId) => {
+  const binary = deferredPartyListImports.get(partyListId);
+
+  if (!binary) {
+    throw new Error(`No deferred party list found for ${partyListId}`);
+  }
+
+  repo.import(binary, { docId: partyListId });
+  deferredPartyListImports.delete(partyListId);
 };
 
 window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {

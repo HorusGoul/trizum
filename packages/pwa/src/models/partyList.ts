@@ -78,21 +78,9 @@ export function subscribeToPartyListId(onPartyListIdChanged: (partyListId: Docum
     onPartyListIdChanged((event as CustomEvent<DocumentId>).detail);
   }
 
-  function handleStorage(event: StorageEvent) {
-    if (
-      event.key === PARTY_LIST_ID_STORAGE_KEY &&
-      event.newValue &&
-      isValidDocumentId(event.newValue)
-    ) {
-      onPartyListIdChanged(event.newValue);
-    }
-  }
-
   window.addEventListener(PARTY_LIST_ID_CHANGED_EVENT, handlePartyListIdChanged);
-  window.addEventListener("storage", handleStorage);
 
   return () => {
     window.removeEventListener(PARTY_LIST_ID_CHANGED_EVENT, handlePartyListIdChanged);
-    window.removeEventListener("storage", handleStorage);
   };
 }

@@ -2,9 +2,11 @@ import { expect, test as base, type Page } from "@playwright/test";
 
 export interface InternalHarnessWindow extends Window {
   __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
-  __internal_createInactivePartyListState: (seed: unknown) => {
+  __internal_createDeferredPartyListState: (seed: unknown) => Promise<{
     partyListId: string;
-  };
+  }>;
+  __internal_getDocumentState: (documentId: string) => string | undefined;
+  __internal_releaseDeferredPartyListState: (partyListId: string) => void;
   __internal_seedPartyListState: (seed: unknown) => Promise<{
     partyListId: string;
   }>;
@@ -74,9 +76,11 @@ export interface BrowserHarness {
   seedPartyList(seed: PartyListSeed): Promise<{
     partyListId: string;
   }>;
-  createInactivePartyList(seed: PartyListSeed): Promise<{
+  createDeferredPartyList(seed: PartyListSeed): Promise<{
     partyListId: string;
   }>;
+  getDocumentState(documentId: string): Promise<string | undefined>;
+  releaseDeferredPartyList(partyListId: string): Promise<void>;
   seedJoinableParty(fixture: unknown): Promise<{
     joinCode: string;
     joinUrl: string;
@@ -114,7 +118,9 @@ function createBrowserHarness(page: Page): BrowserHarness {
         const internalWindow = window as Partial<InternalHarnessWindow>;
         return (
           typeof internalWindow.__internal_createPartyFromMigrationData === "function" &&
-          typeof internalWindow.__internal_createInactivePartyListState === "function" &&
+          typeof internalWindow.__internal_createDeferredPartyListState === "function" &&
+          typeof internalWindow.__internal_getDocumentState === "function" &&
+          typeof internalWindow.__internal_releaseDeferredPartyListState === "function" &&
           typeof internalWindow.__internal_seedPartyListState === "function" &&
           typeof internalWindow.__internal_readPartyListState === "function" &&
           typeof internalWindow.__internal_recalculatePartyBalances === "function"
@@ -200,13 +206,31 @@ function createBrowserHarness(page: Page): BrowserHarness {
     return writePartyList(seed);
   }
 
-  async function createInactivePartyList(seed: PartyListSeed) {
+  async function createDeferredPartyList(seed: PartyListSeed) {
     await bootstrapForSeeding();
 
-    return page.evaluate((nextSeed) => {
+    return page.evaluate(async (nextSeed) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
-      return internalWindow.__internal_createInactivePartyListState(nextSeed);
+      return internalWindow.__internal_createDeferredPartyListState(nextSeed);
     }, seed);
+  }
+
+  async function getDocumentState(documentId: string) {
+    await waitForInternalHooks();
+
+    return page.evaluate((nextDocumentId) => {
+      const internalWindow = window as unknown as InternalHarnessWindow;
+      return internalWindow.__internal_getDocumentState(nextDocumentId);
+    }, documentId);
+  }
+
+  async function releaseDeferredPartyList(partyListId: string) {
+    await waitForInternalHooks();
+
+    await page.evaluate((nextPartyListId) => {
+      const internalWindow = window as unknown as InternalHarnessWindow;
+      internalWindow.__internal_releaseDeferredPartyListState(nextPartyListId);
+    }, partyListId);
   }
 
   async function seedJoinableParty(fixture: unknown) {
@@ -320,7 +344,9 @@ function createBrowserHarness(page: Page): BrowserHarness {
     seedParty,
     seedParties,
     seedPartyList,
-    createInactivePartyList,
+    createDeferredPartyList,
+    getDocumentState,
+    releaseDeferredPartyList,
     seedJoinableParty,
     joinSeededParty,
     seedJoinedParty,
