@@ -32,6 +32,81 @@ export interface InternalPartyListSnapshot {
   participantInParties: PartyList["participantInParties"];
 }
 
+function applyPartyListSeed(partyList: PartyList, seed: InternalPartyListSeed) {
+  partyList.username = seed.username ?? "";
+  partyList.phone = seed.phone ?? "";
+  partyList.parties = seed.parties ?? {};
+  partyList.pinnedParties = seed.pinnedParties ?? {};
+  partyList.archivedParties = seed.archivedParties ?? {};
+  partyList.lastUsedAt = seed.lastUsedAt ?? {};
+  partyList.participantInParties = seed.participantInParties ?? {};
+
+  if (seed.avatarId === undefined) {
+    delete partyList["avatarId"];
+  } else {
+    partyList.avatarId = seed.avatarId;
+  }
+
+  if (seed.locale === undefined) {
+    delete partyList["locale"];
+  } else {
+    partyList.locale = seed.locale;
+  }
+
+  if (seed.openLastPartyOnLaunch === undefined) {
+    delete partyList["openLastPartyOnLaunch"];
+  } else {
+    partyList.openLastPartyOnLaunch = seed.openLastPartyOnLaunch;
+  }
+
+  if (seed.autoOpenCalculator === undefined) {
+    delete partyList["autoOpenCalculator"];
+  } else {
+    partyList.autoOpenCalculator = seed.autoOpenCalculator;
+  }
+
+  if (seed.hue === undefined) {
+    delete partyList["hue"];
+  } else {
+    partyList.hue = seed.hue;
+  }
+
+  if (seed.lastOpenedPartyId === undefined) {
+    delete partyList["lastOpenedPartyId"];
+  } else {
+    partyList.lastOpenedPartyId = seed.lastOpenedPartyId;
+  }
+}
+
+export function createInactivePartyListState({
+  repo,
+  seed,
+}: {
+  repo: Repo;
+  seed: InternalPartyListSeed;
+}): InternalPartyListSeedResult {
+  const partyListHandle = repo.create<PartyList>({
+    id: "" as DocumentId,
+    type: "partyList",
+    username: "",
+    phone: "",
+    parties: {},
+    pinnedParties: {},
+    archivedParties: {},
+    lastUsedAt: {},
+    participantInParties: {},
+  });
+
+  partyListHandle.change((partyList) => {
+    partyList.id = partyListHandle.documentId;
+    applyPartyListSeed(partyList, seed);
+  });
+
+  return {
+    partyListId: partyListHandle.documentId,
+  };
+}
+
 export async function seedPartyListState({
   repo,
   seed,
@@ -43,49 +118,7 @@ export async function seedPartyListState({
   const partyListId = partyListHandle.documentId;
 
   partyListHandle.change((partyList) => {
-    partyList.username = seed.username ?? "";
-    partyList.phone = seed.phone ?? "";
-    partyList.parties = seed.parties ?? {};
-    partyList.pinnedParties = seed.pinnedParties ?? {};
-    partyList.archivedParties = seed.archivedParties ?? {};
-    partyList.lastUsedAt = seed.lastUsedAt ?? {};
-    partyList.participantInParties = seed.participantInParties ?? {};
-
-    if (seed.avatarId === undefined) {
-      delete partyList["avatarId"];
-    } else {
-      partyList.avatarId = seed.avatarId;
-    }
-
-    if (seed.locale === undefined) {
-      delete partyList["locale"];
-    } else {
-      partyList.locale = seed.locale;
-    }
-
-    if (seed.openLastPartyOnLaunch === undefined) {
-      delete partyList["openLastPartyOnLaunch"];
-    } else {
-      partyList.openLastPartyOnLaunch = seed.openLastPartyOnLaunch;
-    }
-
-    if (seed.autoOpenCalculator === undefined) {
-      delete partyList["autoOpenCalculator"];
-    } else {
-      partyList.autoOpenCalculator = seed.autoOpenCalculator;
-    }
-
-    if (seed.hue === undefined) {
-      delete partyList["hue"];
-    } else {
-      partyList.hue = seed.hue;
-    }
-
-    if (seed.lastOpenedPartyId === undefined) {
-      delete partyList["lastOpenedPartyId"];
-    } else {
-      partyList.lastOpenedPartyId = seed.lastOpenedPartyId;
-    }
+    applyPartyListSeed(partyList, seed);
   });
 
   return {

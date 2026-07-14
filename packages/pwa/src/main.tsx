@@ -47,6 +47,7 @@ import {
 import { createPartyFromMigrationData, type MigrationData } from "./models/migration.ts";
 import type { Party } from "./models/party.ts";
 import {
+  createInactivePartyListState,
   readPartyListState,
   seedPartyListState,
   type InternalPartyListSeed,
@@ -163,6 +164,9 @@ void initializeAppWorker({
 declare global {
   interface Window {
     __internal_createPartyFromMigrationData: (data: MigrationData) => Promise<string>;
+    __internal_createInactivePartyListState: (
+      seed: InternalPartyListSeed,
+    ) => InternalPartyListSeedResult;
     __internal_seedPartyListState: (
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
@@ -178,6 +182,10 @@ window.__internal_createPartyFromMigrationData = async (data: MigrationData) => 
     data,
     importAttachments: false,
   });
+};
+
+window.__internal_createInactivePartyListState = (seed: InternalPartyListSeed) => {
+  return createInactivePartyListState({ repo, seed });
 };
 
 window.__internal_seedPartyListState = async (seed: InternalPartyListSeed) => {

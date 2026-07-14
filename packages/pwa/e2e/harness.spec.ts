@@ -85,7 +85,7 @@ test.describe("Browser harness", () => {
       updatedAt: new Date().toISOString(),
     };
     let isSignedIn = false;
-    let partyListId = "";
+    let cloudPartyListId = "";
 
     await page.route("**/api/auth/**", async (route) => {
       const pathname = new URL(route.request().url()).pathname;
@@ -126,15 +126,25 @@ test.describe("Browser harness", () => {
       await route.fulfill({
         json: {
           settings: {
-            partyListDocumentId: partyListId,
+            partyListDocumentId: cloudPartyListId,
             updatedAt: Date.now(),
           },
         },
       });
     });
 
-    await harness.gotoHome();
-    partyListId = (await harness.readPartyList()).partyListId;
+    const cloudParty = await harness.seedParty(createPartyFixture());
+    const localPartyListId = (await harness.readPartyList()).partyListId;
+    cloudPartyListId = (
+      await harness.createInactivePartyList({
+        username: "Cloud User",
+        parties: { [cloudParty.partyId]: true },
+        participantInParties: {
+          [cloudParty.partyId]: defaultParticipants.blair.id,
+        },
+      })
+    ).partyListId;
+    expect(cloudPartyListId).not.toBe(localPartyListId);
     await homePage.menuButton.click();
     await expect(page.getByRole("menuitem", { name: "Sign in to trizum cloud" })).toBeVisible();
     await page.keyboard.press("Escape");
@@ -157,7 +167,14 @@ test.describe("Browser harness", () => {
 
     await expect(page.locator("p").getByText("Signed in", { exact: true })).toBeVisible();
     await expect.poll(() => page.evaluate(() => window.location.pathname)).toBe("/");
-    await expect(homePage.welcomeHeading).toBeVisible();
+    await homePage.expectPartyVisible(/Weekend trip/);
+    const cloudPartyCard = homePage.partyCard(/Weekend trip/);
+    await cloudPartyCard.hover();
+    await cloudPartyCard.getByRole("button", { name: "Party actions" }).click();
+    await page.getByRole("menuitem", { name: "Pin party" }).click();
+    await expect
+      .poll(async () => (await harness.readPartyList()).pinnedParties[cloudParty.partyId])
+      .toBe(true);
     await homePage.menuButton.click();
     await expect(page.getByRole("menuitem", { name: "Manage trizum cloud" })).toBeVisible();
     await expect

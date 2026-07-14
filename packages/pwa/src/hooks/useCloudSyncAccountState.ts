@@ -15,7 +15,7 @@ import {
   readCachedCloudAccountState,
   writeCachedCloudAccountState,
 } from "#src/lib/cloudSyncRouteState.ts";
-import type { PartyList } from "#src/models/partyList.js";
+import { setPartyListId, type PartyList } from "#src/models/partyList.js";
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
 
@@ -202,7 +202,7 @@ export function useCloudSyncAccountState({
           return;
         }
 
-        localStorage.setItem("partyListId", activeSettings.partyListDocumentId);
+        setPartyListId(activeSettings.partyListDocumentId);
         dispatch({ type: "cloudSettingsActivated", cloudSettings: activeSettings });
         writeCachedCloudUserSettings(currentUserId, activeSettings);
         writeCachedCloudAccountState(currentUserId, {
@@ -273,7 +273,7 @@ export function useCloudSyncAccountState({
       return;
     }
 
-    localStorage.setItem("partyListId", settings.partyListDocumentId);
+    setPartyListId(settings.partyListDocumentId);
 
     if (userId) {
       dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
