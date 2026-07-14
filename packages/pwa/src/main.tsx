@@ -29,6 +29,7 @@ import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
 import { AppRecoveryDialog } from "./components/AppRecoveryDialog.tsx";
+import { AuthSessionController } from "./components/AuthSessionController.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
 import * as Sentry from "@sentry/react";
@@ -285,6 +286,7 @@ if (!rootElement.innerHTML) {
         <AriaProviders>
           <RepoContext value={repo}>
             <MediaGalleryController>
+              <AuthSessionController />
               <RouterProvider router={router} InnerWrap={InnerWrap} />
               <AppRecoveryDialog />
               <Toaster />

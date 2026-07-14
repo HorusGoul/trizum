@@ -164,6 +164,33 @@ test.describe("Browser harness", () => {
       .toBe(false);
   });
 
+  test("keeps the auth session active on party routes", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    let sessionRequestCount = 0;
+
+    await page.route("**/api/auth/get-session", async (route) => {
+      sessionRequestCount += 1;
+      await route.fulfill({ json: null });
+    });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+    sessionRequestCount = 0;
+
+    await harness.gotoParty(seededParty.partyId);
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await expect.poll(() => sessionRequestCount).toBeGreaterThan(0);
+
+    const requestsAfterRouteLoaded = sessionRequestCount;
+    await page.evaluate(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    await expect.poll(() => sessionRequestCount).toBeGreaterThan(requestsAfterRouteLoaded);
+  });
+
   test("can reopen an existing persisted party from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
     const seededParty = await harness.joinSeededParty({
