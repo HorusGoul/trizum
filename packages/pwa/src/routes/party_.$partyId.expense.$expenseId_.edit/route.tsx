@@ -28,7 +28,11 @@ import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
-import { getExpenseEditHash, getExpenseEditValues } from "./-expenseEditValues.ts";
+import {
+  getExpenseEditHash,
+  getExpenseEditValues,
+  getOrCreateExpenseEditCopy,
+} from "./-expenseEditValues.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 
 interface EditExpenseSearchParams {
@@ -267,12 +271,9 @@ function useExpense() {
         return;
       }
 
-      if (!entry.__editCopy) {
-        entry.__editCopy = clone(entry);
-      }
-
-      patchMutate(entry.__editCopy, patches);
-      entry.__editCopy.__hash = calculateExpenseHash(entry.__editCopy);
+      const editCopy = getOrCreateExpenseEditCopy(entry);
+      patchMutate(editCopy, patches);
+      editCopy.__hash = calculateExpenseHash(editCopy);
       entry.__editCopyLastUpdatedAt = new Date();
     });
   }
