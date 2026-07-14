@@ -877,7 +877,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:224
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:223
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
