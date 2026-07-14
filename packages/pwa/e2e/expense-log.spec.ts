@@ -268,6 +268,13 @@ test.describe("Expense log", () => {
 
     const overlay = page.locator("[data-media-gallery-overlay]");
     const image = page.locator("[data-media-gallery-image]");
+    const slowExitAnimation = await page.addStyleTag({
+      content: `
+        [data-media-gallery-overlay][data-exiting] {
+          animation-duration: 1s !important;
+        }
+      `,
+    });
     await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
     await expect(image).toBeVisible();
 
@@ -284,7 +291,11 @@ test.describe("Expense log", () => {
     await page.mouse.up();
 
     await expect(page).not.toHaveURL(/[?&]media=/);
+    await expect(overlay).toHaveAttribute("data-exiting", "true");
+    await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+
     await expect(overlay).toBeHidden();
+    await slowExitAnimation.evaluate((element) => element.parentNode?.removeChild(element));
 
     await attachmentButton.click();
 
