@@ -121,6 +121,8 @@ export async function seedPartyListState({
     applyPartyListSeed(partyList, seed);
   });
 
+  await repo.flush([partyListId]);
+
   return {
     partyListId,
   };

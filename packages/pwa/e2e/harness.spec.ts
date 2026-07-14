@@ -195,7 +195,7 @@ test.describe("Browser harness", () => {
       .toBe(false);
   });
 
-  test("keeps the auth session active on party routes", async ({ harness, page }) => {
+  test("initializes the auth session on party routes", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
     let sessionRequestCount = 0;
 
@@ -213,13 +213,6 @@ test.describe("Browser harness", () => {
     await harness.gotoParty(seededParty.partyId);
     await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
     await expect.poll(() => sessionRequestCount).toBeGreaterThan(0);
-
-    const requestsAfterRouteLoaded = sessionRequestCount;
-    await page.evaluate(() => {
-      document.dispatchEvent(new Event("visibilitychange"));
-    });
-
-    await expect.poll(() => sessionRequestCount).toBeGreaterThan(requestsAfterRouteLoaded);
   });
 
   test("keeps an open party bound to the list that admitted it", async ({

@@ -14,14 +14,17 @@ test.describe("Home smoke @smoke", () => {
 
   test("fits the empty state in compact mobile viewports", async ({ page }) => {
     const homePage = new HomePage(page);
-
-    for (const viewport of [
+    const viewports = [
       { width: 375, height: 667 },
       { width: 320, height: 568 },
-    ]) {
+    ];
+
+    await page.setViewportSize(viewports[0]);
+    await page.goto("/?__internal_offline_only=true");
+
+    for (const viewport of viewports) {
       await test.step(`${viewport.width} × ${viewport.height}`, async () => {
         await page.setViewportSize(viewport);
-        await page.goto("/?__internal_offline_only=true");
         await homePage.expectLoaded();
         await page.evaluate(() => document.fonts.ready);
 

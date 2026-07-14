@@ -181,11 +181,14 @@ declare global {
 
 // For internal use only, like UI testing or screenshots
 window.__internal_createPartyFromMigrationData = async (data: MigrationData) => {
-  return createPartyFromMigrationData({
+  const partyId = await createPartyFromMigrationData({
     repo,
     data,
     importAttachments: false,
   });
+
+  await repo.flush();
+  return partyId;
 };
 
 window.__internal_createDeferredPartyListState = async (seed: InternalPartyListSeed) => {
