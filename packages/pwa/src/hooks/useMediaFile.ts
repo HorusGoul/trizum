@@ -56,8 +56,13 @@ function releaseMediaFileObjectUrl(key: string) {
   entry.refCount -= 1;
 
   if (entry.refCount <= 0) {
-    URL.revokeObjectURL(entry.url);
-    mediaFileObjectUrlCache.delete(key);
+    // Let replacement consumers retain a shared URL before revoking it.
+    queueMicrotask(() => {
+      if (mediaFileObjectUrlCache.get(key) === entry && entry.refCount <= 0) {
+        URL.revokeObjectURL(entry.url);
+        mediaFileObjectUrlCache.delete(key);
+      }
+    });
   }
 }
 

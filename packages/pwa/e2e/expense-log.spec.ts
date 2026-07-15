@@ -294,9 +294,14 @@ test.describe("Expense log", () => {
     await expect(overlay).toHaveAttribute("data-exiting", "true");
     await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
 
-    await expect(overlay).toBeHidden();
+    await attachmentButton.evaluate((element) => (element as HTMLElement).click());
+
+    await expect(page).toHaveURL(/\?media=0$/);
+    await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
     await slowExitAnimation.evaluate((element) => element.parentNode?.removeChild(element));
 
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(overlay).toBeHidden();
     await attachmentButton.click();
 
     await expect(page).toHaveURL(/\?media=0$/);

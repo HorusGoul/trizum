@@ -1,5 +1,5 @@
 import { Modal, ModalOverlay } from "react-aria-components";
-import { useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useState } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import MediaGallery, { MediaGalleryImage } from "#src/components/MediaGallery.tsx";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
@@ -31,35 +31,17 @@ export function RouteMediaGallery({
 
   // Track drag progress for background opacity animation
   const [dragProgress, setDragProgress] = useState(0);
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const [wasOpen, setWasOpen] = useState(isOpen);
 
-  useLayoutEffect(() => {
-    const overlay = overlayRef.current;
-
-    if (!overlay || isOpen) {
-      return;
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) {
+      setDragProgress(0);
     }
-
-    function handleAnimationEnd(event: AnimationEvent) {
-      if (event.target === overlay) {
-        setDragProgress(0);
-      }
-    }
-
-    // Reset before React Aria handles the same event and unmounts the exiting overlay.
-    overlay.addEventListener("animationend", handleAnimationEnd, { capture: true });
-
-    return () => {
-      overlay.removeEventListener("animationend", handleAnimationEnd, { capture: true });
-    };
-  }, [isOpen]);
+  }
 
   function handleDragProgress(progress: number) {
     setDragProgress(progress);
-  }
-
-  function handleClose() {
-    onClose();
   }
 
   // Calculate background opacity and blur based on drag progress
@@ -68,7 +50,6 @@ export function RouteMediaGallery({
 
   return (
     <ModalOverlay
-      ref={overlayRef}
       data-media-gallery-overlay=""
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
@@ -88,7 +69,7 @@ export function RouteMediaGallery({
             index={galleryIndex}
             renderItem={(index) => <RouteMediaGalleryImage photoId={photoIds[index]} />}
             onChange={onIndexChange}
-            onClose={handleClose}
+            onClose={onClose}
             onDragProgress={handleDragProgress}
           />
         )}
@@ -103,5 +84,9 @@ function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
   });
   const [url] = useMediaFileObjectUrls([mediaFile]);
 
-  return <MediaGalleryImage items={[{ src: url }]} index={0} />;
+  return (
+    <Suspense fallback={null}>
+      <MediaGalleryImage items={[{ src: url }]} index={0} />
+    </Suspense>
+  );
 }
