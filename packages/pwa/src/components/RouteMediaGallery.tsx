@@ -1,8 +1,8 @@
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import MediaGallery, { type MediaGalleryItem } from "#src/components/MediaGallery.tsx";
-import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
+import MediaGallery, { MediaGalleryImage } from "#src/components/MediaGallery.tsx";
+import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import type { MediaFile } from "#src/models/media.ts";
 
 export interface RouteMediaGalleryProps {
@@ -27,9 +27,18 @@ export function RouteMediaGallery({
   onClose,
 }: RouteMediaGalleryProps) {
   const isOpen = galleryIndex !== undefined && galleryIndex >= 0;
+  const selectedPhotoId = galleryIndex === undefined ? undefined : photoIds[galleryIndex];
 
   // Track drag progress for background opacity animation
   const [dragProgress, setDragProgress] = useState(0);
+  const [wasOpen, setWasOpen] = useState(isOpen);
+
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) {
+      setDragProgress(0);
+    }
+  }
 
   function handleDragProgress(progress: number) {
     setDragProgress(progress);
@@ -41,6 +50,7 @@ export function RouteMediaGallery({
 
   return (
     <ModalOverlay
+      data-media-gallery-overlay=""
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
         `fixed inset-0 isolate z-50 ${isEntering ? "animate-in fade-in duration-300 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-200 ease-in" : ""} `
@@ -52,54 +62,31 @@ export function RouteMediaGallery({
       }}
     >
       <Modal className="h-full w-full">
-        {isOpen && photoIds.length > 0 && (
-          <Suspense fallback={null}>
-            <GalleryItemsResolver
-              photoIds={photoIds}
-              index={galleryIndex}
-              onChange={onIndexChange}
-              onClose={onClose}
-              onDragProgress={handleDragProgress}
-            />
-          </Suspense>
+        {isOpen && selectedPhotoId && (
+          <MediaGallery
+            getItemKey={(index) => photoIds[index]}
+            itemCount={photoIds.length}
+            index={galleryIndex}
+            renderItem={(index) => <RouteMediaGalleryImage photoId={photoIds[index]} />}
+            onChange={onIndexChange}
+            onClose={onClose}
+            onDragProgress={handleDragProgress}
+          />
         )}
       </Modal>
     </ModalOverlay>
   );
 }
 
-interface GalleryItemsResolverProps {
-  photoIds: string[];
-  index: number;
-  onChange: (index: number) => void;
-  onClose: () => void;
-  onDragProgress: (progress: number) => void;
-}
-
-// This component renders children for each photo to resolve URLs
-function GalleryItemsResolver({
-  photoIds,
-  index,
-  onChange,
-  onClose,
-  onDragProgress,
-}: GalleryItemsResolverProps) {
-  const mediaFileIds = photoIds as MediaFile["id"][];
-  const mediaFiles = useMultipleSuspenseDocument<MediaFile>(mediaFileIds, {
-    required: true as const,
-  }).map(({ doc }) => doc);
-  const urls = useMediaFileObjectUrls(mediaFiles);
-  const galleryItems: MediaGalleryItem[] = urls.map((url) => ({
-    src: url,
-  }));
+function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
+  const [mediaFile] = useSuspenseDocument<MediaFile>(photoId as MediaFile["id"], {
+    required: true,
+  });
+  const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return (
-    <MediaGallery
-      index={index}
-      items={galleryItems}
-      onChange={onChange}
-      onClose={onClose}
-      onDragProgress={onDragProgress}
-    />
+    <Suspense fallback={null}>
+      <MediaGalleryImage items={[{ src: url }]} index={0} />
+    </Suspense>
   );
 }

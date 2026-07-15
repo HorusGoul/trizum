@@ -518,7 +518,7 @@ msgstr "Borrar expresión"
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
-#: src/components/MediaGallery.tsx:243
+#: src/components/MediaGallery.tsx:252
 #: src/components/RouteQRScanner.tsx:60
 msgid "Close"
 msgstr "Cerrar"
@@ -877,7 +877,7 @@ msgstr "Editar"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:224
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:227
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -998,7 +998,7 @@ msgstr "Gasto añadido"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:188
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:192
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -1044,7 +1044,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:193
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:197
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -1645,7 +1645,7 @@ msgstr "Nuevo trizum"
 msgid "New Zealand Dollar"
 msgstr "Dólar Neozelandés"
 
-#: src/components/MediaGallery.tsx:260
+#: src/components/MediaGallery.tsx:269
 msgid "Next"
 msgstr "Siguiente"
 
@@ -2050,7 +2050,7 @@ msgstr "Apunta tu cámara a un código QR de trizum"
 msgid "Polish Zloty"
 msgstr "Zloty Polaco"
 
-#: src/components/MediaGallery.tsx:253
+#: src/components/MediaGallery.tsx:262
 msgid "Previous"
 msgstr "Anterior"
 
@@ -2823,7 +2823,7 @@ msgstr "Actualizar contraseña"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:157
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:161
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 

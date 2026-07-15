@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { cn, type ClassName } from "#src/ui/utils.ts";
-import { use, useEffect, useRef } from "react";
+import { Suspense, use, useEffect, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
 import { LazyMotion, animate, domAnimation, m, useMotionValue } from "motion/react";
 import type { IconProps } from "#src/ui/Icon.tsx";
@@ -9,13 +9,11 @@ import {
   calculateMediaGalleryPinchTransform,
   type MediaGalleryPoint,
 } from "./mediaGalleryPinch.ts";
+import { mediaGalleryItemLoader, type MediaGalleryItem } from "./mediaGalleryItemLoader.ts";
 
-export type MediaGalleryItem = {
-  src: string;
-};
+export type { MediaGalleryItem } from "./mediaGalleryItemLoader.ts";
 
-export interface MediaGalleryProps {
-  items: MediaGalleryItem[];
+interface MediaGalleryCommonProps {
   index: number;
   onChange: (index: number) => void;
   onClose: () => void;
@@ -23,18 +21,29 @@ export interface MediaGalleryProps {
   showCloseButton?: boolean;
 }
 
+export type MediaGalleryProps = MediaGalleryCommonProps &
+  (
+    | {
+        items: MediaGalleryItem[];
+        itemCount?: never;
+        renderItem?: never;
+      }
+    | {
+        getItemKey: (index: number) => React.Key;
+        items?: never;
+        itemCount: number;
+        renderItem: (index: number) => React.ReactNode;
+      }
+  );
+
 const CLOSE_THRESHOLD = 150;
 
-export default function MediaGallery({
-  items,
-  index,
-  onClose,
-  onChange,
-  onDragProgress,
-  showCloseButton = true,
-}: MediaGalleryProps) {
-  const dataSource = useAsyncMediaGalleryItems(items);
-  const maxIndex = dataSource.length - 1;
+export default function MediaGallery(props: MediaGalleryProps) {
+  const { index, onClose, onChange, onDragProgress, showCloseButton = true } = props;
+  const itemCount = props.items !== undefined ? props.items.length : props.itemCount;
+  const currentItemKey =
+    props.items !== undefined ? props.items[index]?.src : props.getItemKey(index);
+  const maxIndex = itemCount - 1;
 
   function goToPrevious() {
     let nextIndex = index - 1;
@@ -58,9 +67,7 @@ export default function MediaGallery({
     onChange(nextIndex);
   }
 
-  const showNavigation = items.length > 1;
-
-  const currentItem = dataSource[index];
+  const showNavigation = itemCount > 1;
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -229,11 +236,13 @@ export default function MediaGallery({
         <div className="flex h-full w-full items-center justify-center select-none [-webkit-user-drag:_none]">
           <m.div ref={ref} className="relative" style={{ x, y, scale }}>
             <div className="absolute inset-0" />
-            <img
-              src={currentItem.src}
-              alt=""
-              className="pointer-events-none select-none [-webkit-user-drag:_none]"
-            />
+            <Suspense key={currentItemKey} fallback={null}>
+              {props.items ? (
+                <MediaGalleryImage items={props.items} index={index} />
+              ) : (
+                props.renderItem(index)
+              )}
+            </Suspense>
           </m.div>
         </div>
 
@@ -268,6 +277,19 @@ export default function MediaGallery({
   );
 }
 
+export function MediaGalleryImage({ items, index }: { items: MediaGalleryItem[]; index: number }) {
+  const item = use(mediaGalleryItemLoader.read(items, index));
+
+  return (
+    <img
+      data-media-gallery-image=""
+      src={item.src}
+      alt=""
+      className="pointer-events-none select-none [-webkit-user-drag:_none]"
+    />
+  );
+}
+
 interface GalleryButtonProps {
   className?: ClassName;
   label: string;
@@ -284,44 +306,4 @@ function GalleryButton({ className, label, onClick, icon }: GalleryButtonProps) 
       icon={icon}
     />
   );
-}
-
-const itemCacheBySrc = new Map<string, MediaGalleryItem>();
-const itemPromiseCacheBySrc = new Map<string, Promise<MediaGalleryItem>>();
-
-function useAsyncMediaGalleryItems(items: MediaGalleryItem[]) {
-  return items.map((originalItem: MediaGalleryItem) => {
-    const { src } = originalItem;
-
-    const cachedItem = itemCacheBySrc.get(src);
-
-    if (cachedItem) {
-      return cachedItem;
-    }
-
-    if (itemPromiseCacheBySrc.has(src)) {
-      return use(itemPromiseCacheBySrc.get(src) as Promise<MediaGalleryItem>);
-    }
-
-    const promise = new Promise<MediaGalleryItem>((resolve, reject) => {
-      const image = new Image();
-      image.src = src;
-      image.onload = () => {
-        const completeItem = {
-          ...originalItem,
-          width: image.width,
-          height: image.height,
-        };
-
-        itemCacheBySrc.set(src, completeItem);
-        resolve(completeItem);
-      };
-      image.onerror = () => {
-        reject(new Error(`Failed to load image ${src}`));
-      };
-    });
-
-    itemPromiseCacheBySrc.set(src, promise);
-    return use(promise);
-  });
 }

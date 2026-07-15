@@ -15,7 +15,6 @@ import {
   decodeExpenseId,
   findExpenseById,
   calculateExpenseHash,
-  getExpenseTotalAmount,
   type Expense,
 } from "#src/models/expense.ts";
 import type { PartyExpenseChunk } from "#src/models/party.ts";
@@ -29,6 +28,11 @@ import { toast } from "sonner";
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
+import {
+  getExpenseEditHash,
+  getExpenseEditValues,
+  getOrCreateExpenseEditCopy,
+} from "./-expenseEditValues.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
 
 interface EditExpenseSearchParams {
@@ -58,7 +62,6 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
   },
 });
 
-const TIME_TO_DISCARD_EDIT_COPY = 1000 * 60 * 5; // 5 minutes
 const logger = getLogger("routes", "EditExpense");
 
 function EditExpense() {
@@ -74,8 +77,6 @@ function EditExpense() {
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
   const currentLocation = useLocation();
-
-  const photos = expense?.photos ?? [];
 
   function mergeSearchOptions<TOptions extends { search: Partial<EditExpenseSearchParams> }>(
     options: TOptions,
@@ -110,10 +111,13 @@ function EditExpense() {
     throw new Error("Expense not found");
   }
 
+  const formValues = getExpenseEditValues(expense);
+  const photos = formValues.photos;
+
   const editorRef = useRef<ExpenseEditorRef>(null);
   const currentHashRef = useRef<string | null>(null);
   if (currentHashRef.current === null) {
-    currentHashRef.current = getExpenseHash(expense);
+    currentHashRef.current = getExpenseEditHash(expense);
   }
 
   const onChange = (
@@ -207,14 +211,13 @@ function EditExpense() {
     return subscribeToExpenseChanges((updatedExpense) => {
       const raw = clone(updatedExpense);
 
-      const currentHash = getExpenseHash(raw);
+      const currentHash = getExpenseEditHash(raw);
       currentHashRef.current = currentHash;
 
-      editorRef.current?.setValues(getFormValues(raw));
+      editorRef.current?.setValues(getExpenseEditValues(raw));
     });
   }, [subscribeToExpenseChanges]);
 
-  const formValues = getFormValues(expense);
   const expenseName = formValues.name;
 
   return (
@@ -268,18 +271,15 @@ function useExpense() {
         return;
       }
 
-      if (!entry.__editCopy) {
-        entry.__editCopy = clone(entry);
-      }
-
-      patchMutate(entry.__editCopy, patches);
-      entry.__editCopy.__hash = calculateExpenseHash(entry.__editCopy);
+      const editCopy = getOrCreateExpenseEditCopy(entry);
+      patchMutate(editCopy, patches);
+      editCopy.__hash = calculateExpenseHash(editCopy);
       entry.__editCopyLastUpdatedAt = new Date();
     });
   }
 
   function subscribeToExpenseChanges(callback: (expense: Expense) => void) {
-    let prevHash = expense ? getExpenseHash(expense) : "";
+    let prevHash = expense ? getExpenseEditHash(expense) : "";
 
     const handler = (payload: DocHandleChangePayload<PartyExpenseChunk>) => {
       const [expense] = findExpenseById(payload.doc.expenses, expenseId);
@@ -288,7 +288,7 @@ function useExpense() {
         return;
       }
 
-      const currentHash = getExpenseHash(expense);
+      const currentHash = getExpenseEditHash(expense);
 
       if (currentHash === prevHash) {
         return;
@@ -315,46 +315,4 @@ function useExpense() {
     onUpdateExpense,
     subscribeToExpenseChanges,
   };
-}
-
-function getFormValues(expense: Expense): ExpenseEditorFormValues {
-  if (shouldUseEditCopy(expense)) {
-    return {
-      name: expense.__editCopy.name,
-      paidAt: expense.__editCopy.paidAt,
-      shares: expense.__editCopy.shares,
-      photos: expense.__editCopy.photos,
-      amount: getExpenseTotalAmount(expense.__editCopy) / 100,
-      paidBy: Object.keys(expense.__editCopy.paidBy)[0],
-    };
-  }
-
-  return {
-    name: expense.name,
-    amount: getExpenseTotalAmount(expense) / 100,
-    paidAt: expense.paidAt,
-    paidBy: Object.keys(expense.paidBy)[0],
-    shares: expense.shares,
-    photos: expense.photos,
-  };
-}
-
-function getExpenseHash(expense: Expense) {
-  if (shouldUseEditCopy(expense)) {
-    return expense.__editCopy.__hash;
-  }
-
-  return expense.__hash;
-}
-
-function shouldUseEditCopy(expense: Expense): expense is Expense & { __editCopy: Expense } {
-  if (!expense.__editCopy) {
-    return false;
-  }
-
-  if (!expense.__editCopyLastUpdatedAt) {
-    return false;
-  }
-
-  return expense.__editCopyLastUpdatedAt.getTime() + TIME_TO_DISCARD_EDIT_COPY > Date.now();
 }

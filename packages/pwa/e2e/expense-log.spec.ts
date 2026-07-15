@@ -162,6 +162,152 @@ test.describe("Expense log", () => {
     await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
   });
 
+  test("opens the selected attachment on the first gallery render", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const title = "Cabin groceries";
+    const seededAmountText = formatAmountText(90);
+
+    const seededParty = await harness.joinSeededParty({
+      fixture: createImbalancedPartyFixture(),
+      participantName: defaultParticipants.blair.name,
+    });
+
+    await partyPage.openExpenseInLog(title);
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+    await expenseDetailPage.openEdit();
+    await expenseEditorPage.expectEditLoaded(seededParty.partyId, title);
+
+    await page
+      .locator('input[aria-label="Upload photo"]')
+      .setInputFiles(["public/pwa-64x64.png", "public/pwa-192x192.png"]);
+
+    const attachmentButtons = page.getByRole("button", { name: "View photo" });
+    await expect(attachmentButtons).toHaveCount(2);
+    await attachmentButtons.nth(1).click();
+
+    await expect(page).toHaveURL(/\?media=1$/);
+    await expect(page.locator("[data-media-gallery-image]")).toHaveJSProperty("naturalWidth", 192);
+  });
+
+  test("keeps gallery controls available while an attachment is loading", async ({
+    harness,
+    page,
+  }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const title = "Cabin groceries";
+    const seededAmountText = formatAmountText(90);
+
+    const seededParty = await harness.joinSeededParty({
+      fixture: createImbalancedPartyFixture(),
+      participantName: defaultParticipants.blair.name,
+    });
+
+    await partyPage.openExpenseInLog(title);
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+    await expenseDetailPage.openEdit();
+    await expenseEditorPage.expectEditLoaded(seededParty.partyId, title);
+
+    await page
+      .locator('input[aria-label="Upload photo"]')
+      .setInputFiles(["public/pwa-64x64.png", "public/pwa-192x192.png"]);
+    await expect(page.getByRole("button", { name: "View photo" })).toHaveCount(2);
+
+    await page.evaluate(() => {
+      window.Image = class PendingImage {
+        onerror: null = null;
+        onload: null = null;
+
+        set src(_src: string) {}
+      } as unknown as typeof Image;
+    });
+
+    await page.getByRole("button", { name: "View photo" }).nth(1).click();
+
+    await expect(page).toHaveURL(/\?media=1$/);
+    await expect(page.getByRole("button", { name: "Close" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Previous" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Next" })).toBeVisible();
+    await expect(page.locator("[data-media-gallery-image]")).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Previous" }).click();
+    await expect(page).toHaveURL(/\?media=0$/);
+    await page.getByRole("button", { name: "Next" }).click();
+    await expect(page).toHaveURL(/\?media=1$/);
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page).not.toHaveURL(/[?&]media=/);
+  });
+
+  test("restores the gallery backdrop after closing with a drag gesture", async ({
+    harness,
+    page,
+  }) => {
+    const partyPage = new PartyPage(page);
+    const expenseEditorPage = new ExpenseEditorPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const title = "Cabin groceries";
+    const seededAmountText = formatAmountText(90);
+
+    const seededParty = await harness.joinSeededParty({
+      fixture: createImbalancedPartyFixture(),
+      participantName: defaultParticipants.blair.name,
+    });
+
+    await partyPage.openExpenseInLog(title);
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+    await expenseDetailPage.openEdit();
+    await expenseEditorPage.expectEditLoaded(seededParty.partyId, title);
+
+    await page.locator('input[aria-label="Upload photo"]').setInputFiles("public/pwa-192x192.png");
+
+    const attachmentButton = page.getByRole("button", { name: "View photo" });
+    await attachmentButton.click();
+
+    const overlay = page.locator("[data-media-gallery-overlay]");
+    const image = page.locator("[data-media-gallery-image]");
+    const slowExitAnimation = await page.addStyleTag({
+      content: `
+        [data-media-gallery-overlay][data-exiting] {
+          animation-duration: 1s !important;
+        }
+      `,
+    });
+    await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
+    await expect(image).toBeVisible();
+
+    const imageBox = await image.boundingBox();
+    if (!imageBox) {
+      throw new Error("Expected the gallery image to have a bounding box");
+    }
+
+    const centerX = imageBox.x + imageBox.width / 2;
+    const centerY = imageBox.y + imageBox.height / 2;
+    await page.mouse.move(centerX, centerY);
+    await page.mouse.down();
+    await page.mouse.move(centerX, centerY + 200, { steps: 10 });
+    await page.mouse.up();
+
+    await expect(page).not.toHaveURL(/[?&]media=/);
+    await expect(overlay).toHaveAttribute("data-exiting", "true");
+    await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+
+    await attachmentButton.evaluate((element) => (element as HTMLElement).click());
+
+    await expect(page).toHaveURL(/\?media=0$/);
+    await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
+    await slowExitAnimation.evaluate((element) => element.parentNode?.removeChild(element));
+
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(overlay).toBeHidden();
+    await attachmentButton.click();
+
+    await expect(page).toHaveURL(/\?media=0$/);
+    await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
+  });
+
   test("keeps expense draft values when validation fails", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
     const expenseEditorPage = new ExpenseEditorPage(page);
