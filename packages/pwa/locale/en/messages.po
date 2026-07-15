@@ -1080,7 +1080,7 @@ msgid "Expense amounts don't match total. Please check your split configuration.
 msgstr "Expense amounts don't match total. Please check your split configuration."
 
 #: src/components/ExpenseEditorValidationStatus.tsx:193
-#: src/components/ExpenseEditorValidationStatus.tsx:203
+#: src/components/ExpenseEditorValidationStatus.tsx:202
 msgid "Expense checks"
 msgstr "Expense checks"
 
@@ -2291,7 +2291,7 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:222
+#: src/components/ExpenseEditorValidationStatus.tsx:213
 msgid "Review expense"
 msgstr "Review expense"
 
@@ -2443,7 +2443,7 @@ msgstr "Shares for {0}"
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:247
+#: src/components/ExpenseEditorValidationStatus.tsx:233
 msgid "Shares sum up to <0/>, while the expense amount is <1/>."
 msgstr "Shares sum up to <0/>, while the expense amount is <1/>."
 
@@ -2598,7 +2598,7 @@ msgstr "Split expenses fairly among multiple participants"
 msgid "Split expenses, stay even."
 msgstr "Split expenses, stay even."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:244
+#: src/components/ExpenseEditorValidationStatus.tsx:230
 msgid "Split total does not match"
 msgstr "Split total does not match"
 

@@ -1044,7 +1044,7 @@ msgid "Expense amounts don't match total. Please check your split configuration.
 msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revisa tu configuración de división."
 
 #: src/components/ExpenseEditorValidationStatus.tsx:193
-#: src/components/ExpenseEditorValidationStatus.tsx:203
+#: src/components/ExpenseEditorValidationStatus.tsx:202
 msgid "Expense checks"
 msgstr "Comprobaciones del gasto"
 
@@ -2219,7 +2219,7 @@ msgstr "Restaurar al inicio"
 msgid "Retry"
 msgstr "Reintentar"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:222
+#: src/components/ExpenseEditorValidationStatus.tsx:213
 msgid "Review expense"
 msgstr "Revisar gasto"
 
@@ -2371,7 +2371,7 @@ msgstr "Partes para {0}"
 msgid "Shares for {participantName}"
 msgstr "Partes para {participantName}"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:247
+#: src/components/ExpenseEditorValidationStatus.tsx:233
 msgid "Shares sum up to <0/>, while the expense amount is <1/>."
 msgstr "Las partes suman <0/>, mientras que el importe del gasto es <1/>."
 
@@ -2522,7 +2522,7 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 msgid "Split expenses, stay even."
 msgstr "Reparte gastos, mantén las cuentas claras."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:244
+#: src/components/ExpenseEditorValidationStatus.tsx:230
 msgid "Split total does not match"
 msgstr "El total de las partes no coincide"
 
