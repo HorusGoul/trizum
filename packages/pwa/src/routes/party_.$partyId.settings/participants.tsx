@@ -1,9 +1,10 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
 import { toast } from "sonner";
+import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
 import { useParty } from "#src/hooks/useParty.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { NewPartyParticipantInput } from "./-components/NewPartyParticipantInput.js";
@@ -22,7 +23,10 @@ export const Route = createFileRoute("/party_/$partyId/settings/participants")({
 function PartyParticipantSettings() {
   const { partyId } = Route.useParams();
   const { party, updateParticipants } = useParty(partyId);
-  const navigate = useNavigate();
+  const returnToSettings = useBackNavigation({
+    to: "/party/$partyId/settings",
+    params: { partyId },
+  });
   const formId = useId();
 
   const form = useForm({
@@ -35,11 +39,7 @@ function PartyParticipantSettings() {
       updateParticipants(participants);
       form.reset({ participants: Object.values(participants) });
       toast.success(t`Participants saved!`);
-      void navigate({
-        to: "/party/$partyId/settings",
-        params: { partyId },
-        replace: true,
-      });
+      returnToSettings();
     },
   });
 

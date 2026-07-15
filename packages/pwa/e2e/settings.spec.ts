@@ -9,7 +9,9 @@ test.describe("Settings forms", () => {
     });
     const updatedPartyName = "Updated weekend trip";
 
-    await harness.navigate(`/party/${seededParty.partyId}/settings`);
+    await harness.navigate(`/party/${seededParty.partyId}`);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("menuitem", { name: "Settings" }).click();
     await expect(page.getByRole("heading", { name: "Party Settings" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Party", level: 2 })).toBeVisible();
     await expect(page.getByRole("heading", { name: "People", level: 2 })).toBeVisible();
@@ -26,6 +28,11 @@ test.describe("Settings forms", () => {
     await expect(page.getByText("Party details saved!")).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
 
+    await page.getByRole("button", { name: "Go Back" }).click();
+    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}(?:\\?.*)?$`));
+
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("menuitem", { name: "Settings" }).click();
     await page.getByRole("link", { name: /Updated weekend trip/ }).click();
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue(updatedPartyName);
   });
@@ -63,7 +70,9 @@ test.describe("Settings forms", () => {
       memberParticipantId: defaultParticipants.blair.id,
     });
 
-    await harness.navigate(`/party/${seededParty.partyId}/settings`);
+    await harness.navigate(`/party/${seededParty.partyId}`);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("menuitem", { name: "Settings" }).click();
     await page
       .getByRole("link", { name: /Participants Add, edit, and archive participants/ })
       .click();
@@ -75,6 +84,12 @@ test.describe("Settings forms", () => {
 
     await expect(page.getByText("Participants saved!")).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
+
+    await page.getByRole("button", { name: "Go Back" }).click();
+    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}(?:\\?.*)?$`));
+
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("menuitem", { name: "Settings" }).click();
     await page
       .getByRole("link", { name: /Participants Add, edit, and archive participants/ })
       .click();
