@@ -1953,7 +1953,7 @@ msgstr "participants"
 msgid "Participants"
 msgstr "Participants"
 
-#: src/routes/party_.$partyId.settings/participants.tsx:37
+#: src/routes/party_.$partyId.settings/participants.tsx:41
 msgid "Participants saved!"
 msgstr "Participants saved!"
 
@@ -1981,7 +1981,7 @@ msgstr "Party deleted"
 msgid "Party details"
 msgstr "Party details"
 
-#: src/routes/party_.$partyId.settings/details.tsx:33
+#: src/routes/party_.$partyId.settings/details.tsx:37
 msgid "Party details saved!"
 msgstr "Party details saved!"
 

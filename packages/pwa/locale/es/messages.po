@@ -1893,7 +1893,7 @@ msgstr "participantes"
 msgid "Participants"
 msgstr "Participantes"
 
-#: src/routes/party_.$partyId.settings/participants.tsx:37
+#: src/routes/party_.$partyId.settings/participants.tsx:41
 msgid "Participants saved!"
 msgstr "¡Participantes guardados!"
 
@@ -1917,7 +1917,7 @@ msgstr "Grupo creado"
 msgid "Party details"
 msgstr "Detalles del grupo"
 
-#: src/routes/party_.$partyId.settings/details.tsx:33
+#: src/routes/party_.$partyId.settings/details.tsx:37
 msgid "Party details saved!"
 msgstr "¡Detalles del grupo guardados!"
 
