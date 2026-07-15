@@ -3,7 +3,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useParty } from "#src/hooks/useParty.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon, type IconProps } from "#src/ui/Icon.js";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 
 export const Route = createFileRoute("/party_/$partyId/settings/")({
@@ -19,7 +19,7 @@ function PartySettings() {
       <PartySettingsHeader title={<Trans>Party Settings</Trans>} />
 
       <main className="container mt-4 flex flex-col gap-6 px-4">
-        <PartySettingsSection title={<Trans>Party</Trans>}>
+        <PartySettingsSection icon="lucide.badge-info" title={<Trans>Party</Trans>}>
           <PartySettingsLink
             to="/party/$partyId/settings/details"
             partyId={partyId}
@@ -33,7 +33,7 @@ function PartySettings() {
           />
         </PartySettingsSection>
 
-        <PartySettingsSection title={<Trans>People</Trans>}>
+        <PartySettingsSection icon="lucide.users" title={<Trans>People</Trans>}>
           <PartySettingsLink
             to="/party/$partyId/settings/participants"
             partyId={partyId}
@@ -51,10 +51,21 @@ function PartySettings() {
   );
 }
 
-function PartySettingsSection({ children, title }: { children: ReactNode; title: ReactNode }) {
+function PartySettingsSection({
+  children,
+  icon,
+  title,
+}: {
+  children: ReactNode;
+  icon: IconProps["icon"];
+  title: ReactNode;
+}) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-accent-700 dark:text-accent-200 px-1 text-sm font-semibold">{title}</h2>
+      <div className="text-accent-700 dark:text-accent-200 flex items-center gap-2 px-1 text-sm font-semibold">
+        <Icon icon={icon} width={16} height={16} />
+        <h2>{title}</h2>
+      </div>
       {children}
     </section>
   );
