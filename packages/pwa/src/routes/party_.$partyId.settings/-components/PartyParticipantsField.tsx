@@ -2,27 +2,21 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import type { PartyParticipant } from "#src/models/party.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
-import { NewPartyParticipantInput } from "./NewPartyParticipantInput.js";
 import { PartyParticipantRow } from "./PartyParticipantRow.js";
 import { toggleParticipantArchived } from "./toggleParticipantArchived.js";
-import type { AddPartyParticipantFormValues, PartySettingsFormValues } from "./types.js";
+import type { PartyParticipantsFormValues } from "./types.js";
+import type { ReactNode } from "react";
 
 export function PartyParticipantsField({
-  addNewParticipant,
-  addParticipantForm,
+  children,
   form,
 }: {
-  addNewParticipant: () => void;
-  addParticipantForm: AppFormApi<AddPartyParticipantFormValues>;
-  form: AppFormApi<PartySettingsFormValues>;
+  children: ReactNode;
+  form: AppFormApi<PartyParticipantsFormValues>;
 }) {
   return (
     <div>
-      <h2 className="text-lg font-medium">
-        <Trans>Participants</Trans>
-      </h2>
-
-      <p className="mt-2">
+      <p>
         <Trans>Manage the participants list. Existing members can only be archived.</Trans>
       </p>
 
@@ -82,10 +76,7 @@ export function PartyParticipantsField({
                 />
               ))}
 
-              <NewPartyParticipantInput
-                addNewParticipant={addNewParticipant}
-                addParticipantForm={addParticipantForm}
-              />
+              {children}
 
               {archivedParticipants.length ? (
                 <h3 className="font-medium">

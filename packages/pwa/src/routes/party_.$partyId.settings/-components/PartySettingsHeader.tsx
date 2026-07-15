@@ -1,15 +1,21 @@
-import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { BackButton } from "#src/components/BackButton.js";
+import type { ToOptions } from "@tanstack/react-router";
 
-export function PartySettingsHeader({ submitButton }: { submitButton: ReactNode }) {
+export function PartySettingsHeader({
+  fallbackOptions = { to: "/party/$partyId" },
+  submitButton,
+  title,
+}: {
+  fallbackOptions?: Omit<ToOptions, "replace">;
+  submitButton?: ReactNode;
+  title: ReactNode;
+}) {
   return (
     <div className="mt-safe container flex h-16 items-center px-2">
-      <BackButton fallbackOptions={{ to: "/party/$partyId" }} />
+      <BackButton fallbackOptions={fallbackOptions} />
 
-      <h1 className="max-h-12 truncate px-4 text-xl font-medium">
-        <Trans>Party Settings</Trans>
-      </h1>
+      <h1 className="max-h-12 truncate px-4 text-xl font-medium">{title}</h1>
 
       <div className="flex-1" />
       {submitButton}

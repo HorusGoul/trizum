@@ -1,8 +1,8 @@
-import { defaultParticipants, createPartyFixture } from "./harness/scenarios";
+import { createPartyFixture, defaultParticipants } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
 
 test.describe("Settings forms", () => {
-  test("returns from party settings after saving", async ({ harness, page }) => {
+  test("saves party details from their own subsection", async ({ harness, page }) => {
     const seededParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
@@ -11,20 +11,22 @@ test.describe("Settings forms", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);
     await expect(page.getByRole("heading", { name: "Party Settings" })).toBeVisible();
+    await page.getByRole("link", { name: /Party details/ }).click();
+    await expect(page.getByRole("heading", { name: "Party details" })).toBeVisible();
 
     const nameField = page.getByLabel("Name", { exact: true });
 
     await nameField.fill(updatedPartyName);
     await page.getByRole("button", { name: "Save" }).click();
 
-    await expect(page.getByText("Party settings saved!")).toBeVisible();
-    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}(?:\\?.*)?$`));
+    await expect(page.getByText("Party details saved!")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
 
-    await harness.navigate(`/party/${seededParty.partyId}/settings`);
+    await page.getByRole("link", { name: /Party details/ }).click();
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue(updatedPartyName);
   });
 
-  test("keeps party settings draft values when validation fails", async ({ harness, page }) => {
+  test("keeps party details draft values when validation fails", async ({ harness, page }) => {
     const seededParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
@@ -33,6 +35,7 @@ test.describe("Settings forms", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);
     await expect(page.getByRole("heading", { name: "Party Settings" })).toBeVisible();
+    await page.getByRole("link", { name: /Party details/ }).click();
 
     const nameField = page.getByLabel("Name", { exact: true });
     const descriptionField = page.getByLabel("Description");
@@ -41,9 +44,31 @@ test.describe("Settings forms", () => {
     await nameField.fill("");
     await nameField.evaluate((input: HTMLInputElement) => input.form?.requestSubmit());
 
-    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
+    await expect(page).toHaveURL(
+      new RegExp(`/party/${seededParty.partyId}/settings/details(?:\\?.*)?$`),
+    );
     await expect(descriptionField).toHaveValue(draftDescription);
     await expect(page.getByText("Title is required")).toBeVisible();
+  });
+
+  test("saves participants from their own subsection", async ({ harness, page }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}/settings`);
+    await page.getByRole("link", { name: /Participants 3 active 0 archived/ }).click();
+    await expect(page.getByRole("heading", { name: "Participants" })).toBeVisible();
+
+    await page.getByLabel("New participant name").fill("Morgan");
+    await page.getByRole("button", { name: "Add participant" }).click();
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Participants saved!")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
+    await page.getByRole("link", { name: /Participants 4 active 0 archived/ }).click();
+    await expect(page.locator('input[value="Morgan"]')).toBeVisible();
   });
 
   test("returns from user settings after saving", async ({ harness, page }) => {

@@ -111,12 +111,17 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     void recalculateBalances();
   }
 
-  function updateSettings(values: Pick<Party, "name" | "symbol" | "description" | "participants">) {
+  function updateDetails(values: Pick<Party, "name" | "symbol" | "description">) {
     handle.change((doc) => {
       doc.name = values.name;
       doc.symbol = values.symbol;
       doc.description = values.description;
-      doc.participants = values.participants;
+    });
+  }
+
+  function updateParticipants(participants: Party["participants"]) {
+    handle.change((doc) => {
+      doc.participants = participants;
     });
   }
 
@@ -414,7 +419,8 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   }
 
   return {
-    updateSettings,
+    updateDetails,
+    updateParticipants,
     setParticipantDetails,
     addExpenseToParty,
     transferDebtToParty,

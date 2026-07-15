@@ -30,6 +30,22 @@ msgstr "[DEV] Create expenses"
 msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {and # other} other {and # others}}"
 
+#: src/routes/party_.$partyId.settings/index.tsx:57
+msgid "{activeParticipantCount, plural, one {# active} other {# active}}"
+msgstr "{activeParticipantCount, plural, one {# active} other {# active}}"
+
+#: src/routes/party_.$partyId.settings/index.tsx:53
+msgid "{activeParticipantCount} active"
+msgstr "{activeParticipantCount} active"
+
+#: src/routes/party_.$partyId.settings/index.tsx:59
+msgid "{archivedParticipantCount, plural, one {# archived} other {# archived}}"
+msgstr "{archivedParticipantCount, plural, one {# archived} other {# archived}}"
+
+#: src/routes/party_.$partyId.settings/index.tsx:55
+msgid "{archivedParticipantCount} archived"
+msgstr "{archivedParticipantCount} archived"
+
 #: src/routes/migrate_.tricount.tsx:377
 msgid "{message}"
 msgstr "{message}"
@@ -222,7 +238,7 @@ msgstr "Archive party"
 msgid "Archived"
 msgstr "Archived"
 
-#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:92
+#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:83
 msgid "Archived participants"
 msgstr "Archived participants"
 
@@ -251,7 +267,7 @@ msgid "Aruban Florin"
 msgstr "Aruban Florin"
 
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:35
-#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:43
+#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:37
 msgid "At least one participant is required"
 msgstr "At least one participant is required"
 
@@ -861,7 +877,7 @@ msgid "Delete account?"
 msgstr "Delete account?"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:74
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:70
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:66
 msgid "Description"
 msgstr "Description"
 
@@ -1255,7 +1271,7 @@ msgid "How do you want to call this expense ?"
 msgstr "How do you want to call this expense ?"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:33
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:29
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:25
 msgid "How do you want to call this party?"
 msgstr "How do you want to call this party?"
 
@@ -1537,7 +1553,7 @@ msgstr "Malformed Party ID"
 msgid "Manage"
 msgstr "Manage"
 
-#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:26
+#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:20
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
@@ -1647,7 +1663,7 @@ msgid "Myanma Kyat"
 msgstr "Myanma Kyat"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:28
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:24
 #: src/routes/party.$partyId/route.tsx:128
 msgid "Name"
 msgstr "Name"
@@ -1655,6 +1671,10 @@ msgstr "Name"
 #: src/lib/validation.ts:71
 msgid "Name must be less than 50 characters"
 msgstr "Name must be less than 50 characters"
+
+#: src/routes/party_.$partyId.settings/index.tsx:40
+msgid "Name, icon and description"
+msgstr "Name, icon and description"
 
 #: src/routes/new/route.tsx:278
 msgid "Namibian Dollar"
@@ -1924,9 +1944,14 @@ msgstr "participants"
 
 #: src/components/PartyStatsView.tsx:327
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:22
-#: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:22
+#: src/routes/party_.$partyId.settings/index.tsx:54
+#: src/routes/party_.$partyId.settings/participants.tsx:76
 msgid "Participants"
 msgstr "Participants"
+
+#: src/routes/party_.$partyId.settings/participants.tsx:37
+msgid "Participants saved!"
+msgstr "Participants saved!"
 
 #: src/components/PartyListCard.tsx:239
 msgid "Party actions"
@@ -1943,6 +1968,15 @@ msgstr "Party created"
 #: src/routes/party.$partyId.tsx:50
 msgid "Party deleted"
 msgstr "Party deleted"
+
+#: src/routes/party_.$partyId.settings/details.tsx:45
+#: src/routes/party_.$partyId.settings/index.tsx:35
+msgid "Party details"
+msgstr "Party details"
+
+#: src/routes/party_.$partyId.settings/details.tsx:33
+msgid "Party details saved!"
+msgstr "Party details saved!"
 
 #: src/routes/party.$partyId.tsx:485
 msgid "Party is completely balanced!"
@@ -1964,7 +1998,7 @@ msgstr "Party pinned"
 msgid "Party restored to home"
 msgstr "Party restored to home"
 
-#: src/routes/party_.$partyId.settings/-components/PartySettingsHeader.tsx:11
+#: src/routes/party_.$partyId.settings/index.tsx:24
 msgid "Party Settings"
 msgstr "Party Settings"
 
@@ -2243,7 +2277,8 @@ msgstr "Saudi Riyal"
 #: src/components/ExpenseEditor.tsx:282
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:124
-#: src/routes/party_.$partyId.settings/route.tsx:120
+#: src/routes/party_.$partyId.settings/details.tsx:59
+#: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
 #: src/routes/settings.tsx:98
@@ -2534,7 +2569,8 @@ msgstr "Submit a Request"
 #: src/components/ExpenseEditor.tsx:282
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:124
-#: src/routes/party_.$partyId.settings/route.tsx:120
+#: src/routes/party_.$partyId.settings/details.tsx:59
+#: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
 #: src/routes/settings.tsx:98
@@ -2587,7 +2623,7 @@ msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:55
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:51
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:47
 msgid "Symbol"
 msgstr "Symbol"
 
@@ -3078,7 +3114,7 @@ msgid "Welcome to trizum"
 msgstr "Welcome to trizum"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:75
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:71
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:67
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
