@@ -116,10 +116,14 @@ export function ExpenseEditorValidationStatus({
                         statusBarClassName,
                         appearance.className,
                         "justify-start rounded-lg",
-                        (isHovered || isFocusVisible) && "brightness-95 dark:brightness-110",
-                        isFocusVisible &&
+                        !isOpen &&
+                          (isHovered || isFocusVisible) &&
+                          "brightness-95 dark:brightness-110",
+                        !isOpen &&
+                          isFocusVisible &&
                           "ring-2 ring-current ring-offset-2 ring-offset-white dark:ring-offset-accent-950",
-                        isPressed && "brightness-90 dark:brightness-125",
+                        !isOpen && isPressed && "brightness-90 dark:brightness-125",
+                        isOpen && "scale-100 brightness-100 dark:brightness-100",
                       )
                     }
                     type="button"

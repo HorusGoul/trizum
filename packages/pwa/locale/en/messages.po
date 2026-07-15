@@ -46,11 +46,11 @@ msgstr "{archivedParticipantCount, plural, one {# archived} other {# archived}}"
 msgid "{archivedParticipantCount} archived"
 msgstr "{archivedParticipantCount} archived"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:158
+#: src/components/ExpenseEditorValidationStatus.tsx:162
 msgid "{issueCount, plural, one {# issue must be resolved} other {# issues must be resolved}}"
 msgstr "{issueCount, plural, one {# issue must be resolved} other {# issues must be resolved}}"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:155
+#: src/components/ExpenseEditorValidationStatus.tsx:159
 msgid "{issueCount, plural, one {# warning} other {# warnings}}"
 msgstr "{issueCount, plural, one {# warning} other {# warnings}}"
 
@@ -140,7 +140,7 @@ msgstr "Add an expense"
 msgid "Add Apple as a sign-in method"
 msgstr "Add Apple as a sign-in method"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:149
+#: src/components/ExpenseEditorValidationStatus.tsx:153
 msgid "Add expense details to get started"
 msgstr "Add expense details to get started"
 
@@ -198,7 +198,7 @@ msgstr "Algerian Dinar"
 msgid "Align QR code here"
 msgstr "Align QR code here"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:153
+#: src/components/ExpenseEditorValidationStatus.tsx:157
 msgid "All expense checks passed"
 msgstr "All expense checks passed"
 
@@ -631,7 +631,7 @@ msgstr "Comorian Franc"
 msgid "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
 msgstr "Compare how much everyone has paid across different timeframes. Settlement transfers are excluded from these totals."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:151
+#: src/components/ExpenseEditorValidationStatus.tsx:155
 msgid "Complete the required details"
 msgstr "Complete the required details"
 
@@ -1074,8 +1074,8 @@ msgstr "Expense added"
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Expense amounts don't match total. Please check your split configuration."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:189
-#: src/components/ExpenseEditorValidationStatus.tsx:199
+#: src/components/ExpenseEditorValidationStatus.tsx:193
+#: src/components/ExpenseEditorValidationStatus.tsx:203
 msgid "Expense checks"
 msgstr "Expense checks"
 
@@ -2261,7 +2261,7 @@ msgstr "Report Issues"
 msgid "Reset password"
 msgstr "Reset password"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:202
+#: src/components/ExpenseEditorValidationStatus.tsx:206
 msgid "Resolve these issues before saving the expense."
 msgstr "Resolve these issues before saving the expense."
 
@@ -2286,7 +2286,7 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:214
+#: src/components/ExpenseEditorValidationStatus.tsx:218
 msgid "Review expense"
 msgstr "Review expense"
 
@@ -2438,7 +2438,7 @@ msgstr "Shares for {0}"
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:234
+#: src/components/ExpenseEditorValidationStatus.tsx:238
 msgid "Shares sum up to <0/>, while the expense amount is <1/>."
 msgstr "Shares sum up to <0/>, while the expense amount is <1/>."
 
@@ -2593,7 +2593,7 @@ msgstr "Split expenses fairly among multiple participants"
 msgid "Split expenses, stay even."
 msgstr "Split expenses, stay even."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:231
+#: src/components/ExpenseEditorValidationStatus.tsx:235
 msgid "Split total does not match"
 msgstr "Split total does not match"
 
