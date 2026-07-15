@@ -24,7 +24,7 @@ function PartySettings() {
             to="/party/$partyId/settings/details"
             partyId={partyId}
             badge={
-              <span className="bg-accent-950 dark:border-accent-700/20 dark:text-accent-50 flex size-12 shrink-0 items-center justify-center rounded-full text-xl text-white shadow-xs dark:border dark:bg-black/20 dark:shadow-none">
+              <span className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50 flex size-12 shrink-0 items-center justify-center rounded-full text-xl">
                 {party.symbol || DEFAULT_PARTY_SYMBOL}
               </span>
             }
@@ -62,7 +62,7 @@ function PartySettingsSection({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <div className="text-accent-700 dark:text-accent-200 flex items-center gap-2 px-1 text-sm font-semibold">
+      <div className="text-accent-700 dark:text-accent-200 flex items-center gap-2 text-sm font-semibold">
         <Icon icon={icon} width={16} height={16} />
         <h2>{title}</h2>
       </div>
