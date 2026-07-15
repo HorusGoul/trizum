@@ -13,6 +13,7 @@ import { IconButton } from "#src/ui/IconButton.js";
 import { cn } from "#src/ui/utils.js";
 import { getPresenceElementIdFromTarget } from "./presencePosition.ts";
 import type { MediaFile } from "#src/models/media.ts";
+import { clampCurrencyValue } from "#src/ui/fields/currencyValue.ts";
 
 export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> & {
   calculator?: boolean;
@@ -134,8 +135,8 @@ function useCurrencyFieldCalculator({
   });
   const { requestId, isClosedFromCalculator, isClosingFromRouteChange } = calculatorCloseState;
   const [state, actions] = useCalculatorMode({
-    value: fieldProps.value ?? 0,
-    onChange: (value) => fieldProps.onChange?.(value),
+    value: clampCurrencyValue(fieldProps.value ?? 0, fieldProps.minValue),
+    onChange: (value) => fieldProps.onChange?.(clampCurrencyValue(value, fieldProps.minValue)),
     currency: fieldProps.currency,
   });
   const calculatorFieldId =

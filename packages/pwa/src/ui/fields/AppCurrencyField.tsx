@@ -8,6 +8,7 @@ import {
 import { cn, type ClassName } from "../utils";
 import { FieldError, Label } from "./Field";
 import { getCurrencyDecimalPrecision } from "./currencyPrecision.js";
+import { clampCurrencyValue } from "./currencyValue.js";
 import { Input, TextField } from "./TextFieldPrimitives.js";
 
 interface AppCurrencyFieldProps extends Omit<AriaTextFieldProps, "value" | "onChange"> {
@@ -19,6 +20,7 @@ interface AppCurrencyFieldProps extends Omit<AriaTextFieldProps, "value" | "onCh
   inputClassName?: ClassName;
   inputEndAdornment?: React.ReactNode;
   currency?: string;
+  minValue?: number;
 }
 
 export function AppCurrencyField({
@@ -32,12 +34,16 @@ export function AppCurrencyField({
   inputEndAdornment,
   inputMode,
   currency,
+  minValue,
   ...props
 }: AppCurrencyFieldProps) {
-  const [internalValue, setInternalValue] = React.useState(() => value?.toString() || "");
+  const constrainedValue = value === undefined ? undefined : clampCurrencyValue(value, minValue);
+  const [internalValue, setInternalValue] = React.useState(
+    () => constrainedValue?.toString() || "",
+  );
 
   const parsedInternalValue = parseFloat(internalValue || "0");
-  const parsedValue = parseFloat(value?.toString() || "0");
+  const parsedValue = parseFloat(constrainedValue?.toString() || "0");
 
   if (parsedInternalValue !== parsedValue) {
     setInternalValue(parsedValue.toString());
@@ -95,11 +101,11 @@ export function AppCurrencyField({
 
         const trimmedValue = value.trim();
         if (trimmedValue === "" || trimmedValue === ".") {
-          onChange?.(0);
+          onChange?.(clampCurrencyValue(0, minValue));
         } else {
           const parsed = parseFloat(trimmedValue);
           if (!isNaN(parsed)) {
-            onChange?.(parsed);
+            onChange?.(clampCurrencyValue(parsed, minValue));
           }
         }
       }}
