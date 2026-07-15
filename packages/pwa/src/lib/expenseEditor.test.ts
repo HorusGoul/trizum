@@ -1,5 +1,20 @@
 import { describe, expect, test } from "vite-plus/test";
-import { expenseEditorSharesMatchAmount, getExpenseEditorUnitShares } from "./expenseEditor.ts";
+import {
+  expenseEditorSharesMatchAmount,
+  getExpenseEditorUnitShares,
+  getExpenseEditorValidationIssues,
+  getExpenseEditorValidationResult,
+  type ExpenseEditorValidationValues,
+} from "./expenseEditor.ts";
+
+const completeExpense: ExpenseEditorValidationValues = {
+  name: "Dinner",
+  amount: 100,
+  paidBy: "payer",
+  shares: {
+    participant: { type: "divide", value: 1 },
+  },
+};
 
 describe("expense editor shares", () => {
   test("clamps a negative adjusted participant amount to zero", () => {
@@ -30,5 +45,81 @@ describe("expense editor shares", () => {
     };
 
     expect(expenseEditorSharesMatchAmount(100, shares)).toBe(true);
+  });
+
+  test("returns a form-wide error with minor-unit totals for an invalid split", () => {
+    const values: ExpenseEditorValidationValues = {
+      ...completeExpense,
+      shares: {
+        exact: { type: "exact", value: 15_000 },
+        adjusted: { type: "divide", value: 1 },
+      },
+    };
+
+    expect(getExpenseEditorValidationIssues(values)).toStrictEqual([
+      {
+        code: "shares-total-mismatch",
+        severity: "error",
+        expenseAmount: 10_000,
+        sharesTotal: 15_000,
+      },
+    ]);
+  });
+
+  test("does not report a split mismatch before participants are selected", () => {
+    expect(
+      getExpenseEditorValidationIssues({
+        ...completeExpense,
+        shares: {},
+      }),
+    ).toStrictEqual([]);
+  });
+});
+
+describe("expense editor validation status", () => {
+  test("starts pristine when a valid form has not changed", () => {
+    expect(getExpenseEditorValidationResult(completeExpense, false)).toMatchObject({
+      issues: [],
+      status: "pristine",
+    });
+  });
+
+  test("is incomplete when required values are missing", () => {
+    expect(
+      getExpenseEditorValidationResult(
+        {
+          ...completeExpense,
+          name: "",
+          amount: 0,
+          shares: {},
+        },
+        true,
+      ),
+    ).toMatchObject({ issues: [], status: "incomplete" });
+  });
+
+  test("is valid when required values and form-wide checks pass", () => {
+    expect(getExpenseEditorValidationResult(completeExpense, true)).toMatchObject({
+      issues: [],
+      status: "valid",
+    });
+  });
+
+  test("surfaces form-wide errors even before the form becomes dirty", () => {
+    expect(
+      getExpenseEditorValidationResult(
+        {
+          ...completeExpense,
+          shares: {
+            exact: { type: "exact", value: 15_000 },
+            adjusted: { type: "divide", value: 1 },
+          },
+        },
+        false,
+      ),
+    ).toMatchObject({
+      issues: [{ code: "shares-total-mismatch", severity: "error" }],
+      status: "error",
+    });
   });
 });
