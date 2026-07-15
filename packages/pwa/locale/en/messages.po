@@ -158,7 +158,7 @@ msgstr "Add password sign-in"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Add your name so others know who you are and how to pay you"
 
-#: src/routes/party_.$partyId.settings/index.tsx:46
+#: src/routes/party_.$partyId.settings/index.tsx:47
 msgid "Add, edit, and archive participants"
 msgstr "Add, edit, and archive participants"
 
@@ -1948,7 +1948,7 @@ msgstr "participants"
 
 #: src/components/PartyStatsView.tsx:327
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:22
-#: src/routes/party_.$partyId.settings/index.tsx:45
+#: src/routes/party_.$partyId.settings/index.tsx:46
 #: src/routes/party_.$partyId.settings/participants.tsx:76
 msgid "Participants"
 msgstr "Participants"
@@ -1957,7 +1957,7 @@ msgstr "Participants"
 msgid "Participants saved!"
 msgstr "Participants saved!"
 
-#: src/routes/party_.$partyId.settings/index.tsx:22
+#: src/routes/party_.$partyId.settings/index.tsx:23
 msgid "Party"
 msgstr "Party"
 
@@ -2005,7 +2005,7 @@ msgstr "Party pinned"
 msgid "Party restored to home"
 msgstr "Party restored to home"
 
-#: src/routes/party_.$partyId.settings/index.tsx:19
+#: src/routes/party_.$partyId.settings/index.tsx:20
 msgid "Party Settings"
 msgstr "Party Settings"
 
@@ -2021,7 +2021,7 @@ msgstr "Party shared!"
 msgid "Party stats"
 msgstr "Party stats"
 
-#: src/routes/party_.$partyId.settings/index.tsx:32
+#: src/routes/party_.$partyId.settings/index.tsx:33
 msgid "Party title, description and icon"
 msgstr "Party title, description and icon"
 
@@ -2075,7 +2075,7 @@ msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc1
 msgid "Pay"
 msgstr "Pay"
 
-#: src/routes/party_.$partyId.settings/index.tsx:36
+#: src/routes/party_.$partyId.settings/index.tsx:37
 msgid "People"
 msgstr "People"
 
