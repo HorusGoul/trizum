@@ -11,7 +11,11 @@ test.describe("Settings forms", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);
     await expect(page.getByRole("heading", { name: "Party Settings" })).toBeVisible();
-    await page.getByRole("link", { name: /Party details/ }).click();
+    await expect(page.getByRole("heading", { name: "Party", level: 2 })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "People", level: 2 })).toBeVisible();
+    await page
+      .getByRole("link", { name: /Weekend trip Party title, description and icon/ })
+      .click();
     await expect(page.getByRole("heading", { name: "Party details" })).toBeVisible();
 
     const nameField = page.getByLabel("Name", { exact: true });
@@ -22,7 +26,7 @@ test.describe("Settings forms", () => {
     await expect(page.getByText("Party details saved!")).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
 
-    await page.getByRole("link", { name: /Party details/ }).click();
+    await page.getByRole("link", { name: /Updated weekend trip/ }).click();
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue(updatedPartyName);
   });
 
@@ -35,7 +39,9 @@ test.describe("Settings forms", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);
     await expect(page.getByRole("heading", { name: "Party Settings" })).toBeVisible();
-    await page.getByRole("link", { name: /Party details/ }).click();
+    await page
+      .getByRole("link", { name: /Weekend trip Party title, description and icon/ })
+      .click();
 
     const nameField = page.getByLabel("Name", { exact: true });
     const descriptionField = page.getByLabel("Description");
@@ -58,7 +64,9 @@ test.describe("Settings forms", () => {
     });
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);
-    await page.getByRole("link", { name: /Participants 3 active 0 archived/ }).click();
+    await page
+      .getByRole("link", { name: /Participants Add, edit, and archive participants/ })
+      .click();
     await expect(page.getByRole("heading", { name: "Participants" })).toBeVisible();
 
     await page.getByLabel("New participant name").fill("Morgan");
@@ -67,7 +75,9 @@ test.describe("Settings forms", () => {
 
     await expect(page.getByText("Participants saved!")).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/party/${seededParty.partyId}/settings(?:\\?.*)?$`));
-    await page.getByRole("link", { name: /Participants 4 active 0 archived/ }).click();
+    await page
+      .getByRole("link", { name: /Participants Add, edit, and archive participants/ })
+      .click();
     await expect(page.locator('input[value="Morgan"]')).toBeVisible();
   });
 

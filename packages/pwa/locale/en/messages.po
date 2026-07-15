@@ -158,6 +158,10 @@ msgstr "Add password sign-in"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Add your name so others know who you are and how to pay you"
 
+#: src/routes/party_.$partyId.settings/index.tsx:46
+msgid "Add, edit, and archive participants"
+msgstr "Add, edit, and archive participants"
+
 #: src/routes/party_.$partyId.add.tsx:96
 msgid "Adding expense..."
 msgstr "Adding expense..."
@@ -1944,7 +1948,7 @@ msgstr "participants"
 
 #: src/components/PartyStatsView.tsx:327
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:22
-#: src/routes/party_.$partyId.settings/index.tsx:54
+#: src/routes/party_.$partyId.settings/index.tsx:45
 #: src/routes/party_.$partyId.settings/participants.tsx:76
 msgid "Participants"
 msgstr "Participants"
@@ -1952,6 +1956,10 @@ msgstr "Participants"
 #: src/routes/party_.$partyId.settings/participants.tsx:37
 msgid "Participants saved!"
 msgstr "Participants saved!"
+
+#: src/routes/party_.$partyId.settings/index.tsx:22
+msgid "Party"
+msgstr "Party"
 
 #: src/components/PartyListCard.tsx:239
 msgid "Party actions"
@@ -1970,7 +1978,6 @@ msgid "Party deleted"
 msgstr "Party deleted"
 
 #: src/routes/party_.$partyId.settings/details.tsx:45
-#: src/routes/party_.$partyId.settings/index.tsx:35
 msgid "Party details"
 msgstr "Party details"
 
@@ -1998,7 +2005,7 @@ msgstr "Party pinned"
 msgid "Party restored to home"
 msgstr "Party restored to home"
 
-#: src/routes/party_.$partyId.settings/index.tsx:24
+#: src/routes/party_.$partyId.settings/index.tsx:19
 msgid "Party Settings"
 msgstr "Party Settings"
 
@@ -2013,6 +2020,10 @@ msgstr "Party shared!"
 #: src/routes/party_.$partyId.stats.tsx:42
 msgid "Party stats"
 msgstr "Party stats"
+
+#: src/routes/party_.$partyId.settings/index.tsx:32
+msgid "Party title, description and icon"
+msgstr "Party title, description and icon"
 
 #: src/routes/_home/route.tsx:256
 msgid "Party unpinned"
@@ -2063,6 +2074,10 @@ msgstr "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc1
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pay"
+
+#: src/routes/party_.$partyId.settings/index.tsx:36
+msgid "People"
+msgstr "People"
 
 #: src/routes/party.$partyId/-components/Balances.tsx:160
 msgid "People that owe you money"

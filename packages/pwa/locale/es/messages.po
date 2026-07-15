@@ -154,6 +154,10 @@ msgstr "Añadir inicio de sesión con contraseña"
 msgid "Add your name so others know who you are and how to pay you"
 msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 
+#: src/routes/party_.$partyId.settings/index.tsx:46
+msgid "Add, edit, and archive participants"
+msgstr "Añadir, editar y archivar participantes"
+
 #: src/routes/party_.$partyId.add.tsx:96
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
@@ -1884,7 +1888,7 @@ msgstr "participantes"
 
 #: src/components/PartyStatsView.tsx:327
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:22
-#: src/routes/party_.$partyId.settings/index.tsx:54
+#: src/routes/party_.$partyId.settings/index.tsx:45
 #: src/routes/party_.$partyId.settings/participants.tsx:76
 msgid "Participants"
 msgstr "Participantes"
@@ -1892,6 +1896,10 @@ msgstr "Participantes"
 #: src/routes/party_.$partyId.settings/participants.tsx:37
 msgid "Participants saved!"
 msgstr "¡Participantes guardados!"
+
+#: src/routes/party_.$partyId.settings/index.tsx:22
+msgid "Party"
+msgstr "Grupo"
 
 #: src/components/PartyListCard.tsx:239
 msgid "Party actions"
@@ -1906,7 +1914,6 @@ msgid "Party created"
 msgstr "Grupo creado"
 
 #: src/routes/party_.$partyId.settings/details.tsx:45
-#: src/routes/party_.$partyId.settings/index.tsx:35
 msgid "Party details"
 msgstr "Detalles del grupo"
 
@@ -1930,7 +1937,7 @@ msgstr "Grupo fijado"
 msgid "Party restored to home"
 msgstr "Grupo restaurado al inicio"
 
-#: src/routes/party_.$partyId.settings/index.tsx:24
+#: src/routes/party_.$partyId.settings/index.tsx:19
 msgid "Party Settings"
 msgstr "Configuración del Grupo"
 
@@ -1945,6 +1952,10 @@ msgstr "¡Grupo compartido!"
 #: src/routes/party_.$partyId.stats.tsx:42
 msgid "Party stats"
 msgstr "Estadísticas del grupo"
+
+#: src/routes/party_.$partyId.settings/index.tsx:32
+msgid "Party title, description and icon"
+msgstr "Título, descripción e icono del grupo"
 
 #: src/routes/_home/route.tsx:256
 msgid "Party unpinned"
@@ -1995,6 +2006,10 @@ msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricou
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pagar"
+
+#: src/routes/party_.$partyId.settings/index.tsx:36
+msgid "People"
+msgstr "Personas"
 
 #: src/routes/party.$partyId/-components/Balances.tsx:160
 msgid "People that owe you money"
