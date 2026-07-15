@@ -7,13 +7,9 @@ import {
   validatePartyTitle,
 } from "#src/lib/validation.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
-import type { PartySettingsFormValues } from "./types.js";
+import type { PartyDetailsFormValues } from "./types.js";
 
-export function PartySettingsDetailsFields({
-  form,
-}: {
-  form: AppFormApi<PartySettingsFormValues>;
-}) {
+export function PartySettingsDetailsFields({ form }: { form: AppFormApi<PartyDetailsFormValues> }) {
   return (
     <>
       <div className="flex items-start gap-2">

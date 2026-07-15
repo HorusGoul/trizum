@@ -1,26 +1,17 @@
 import { t } from "@lingui/core/macro";
+import type { ToOptions } from "@tanstack/react-router";
+import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
 import { IconButton } from "#src/ui/IconButton.js";
-import { useCanGoBack, useRouter, type ToOptions } from "@tanstack/react-router";
 
 export function BackButton({ fallbackOptions }: { fallbackOptions: Omit<ToOptions, "replace"> }) {
-  const { history, navigate } = useRouter();
-  const canGoBack = useCanGoBack();
+  const goBack = useBackNavigation(fallbackOptions);
 
   return (
     <IconButton
       icon="lucide.arrow-left"
       aria-label={t`Go Back`}
       className="shrink-0"
-      onPress={() => {
-        if (canGoBack) {
-          history.go(-1);
-        } else {
-          void navigate({
-            ...fallbackOptions,
-            replace: true,
-          });
-        }
-      }}
+      onPress={goBack}
     />
   );
 }

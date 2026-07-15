@@ -1,8 +1,8 @@
 import type { PartyParticipant } from "#src/models/party.js";
-import type { PartySettingsFormValues } from "./types.js";
+import type { PartyParticipantsFormValues } from "./types.js";
 
 export function toggleParticipantArchived(
-  values: PartySettingsFormValues["participants"],
+  values: PartyParticipantsFormValues["participants"],
   participant: PartyParticipant,
 ) {
   return values.map((current) => {

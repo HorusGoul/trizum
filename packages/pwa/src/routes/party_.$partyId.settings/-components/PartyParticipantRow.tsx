@@ -3,7 +3,7 @@ import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { validatePartyParticipantName } from "#src/lib/validation.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
-import type { PartySettingsFormValues } from "./types.js";
+import type { PartyParticipantsFormValues } from "./types.js";
 
 export function PartyParticipantRow({
   form,
@@ -13,12 +13,12 @@ export function PartyParticipantRow({
   onRemove,
   participant,
 }: {
-  form: AppFormApi<PartySettingsFormValues>;
+  form: AppFormApi<PartyParticipantsFormValues>;
   index: number;
   isArchived?: boolean;
   onArchiveToggle: () => void;
   onRemove?: () => void;
-  participant: PartySettingsFormValues["participants"][number];
+  participant: PartyParticipantsFormValues["participants"][number];
 }) {
   return (
     <div className="flex w-full gap-2">

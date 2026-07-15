@@ -74,6 +74,43 @@ describe("getPartyHelpers", () => {
     expect(appWorkerMock.recalculateBalances).toHaveBeenCalledTimes(2);
     expect(appWorkerMock.recalculateBalances).toHaveBeenLastCalledWith(partyHandle.documentId);
   });
+
+  test("updates party details without replacing participants", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const originalParticipants = structuredClone(partyHandle.doc().participants);
+
+    helpers.updateDetails({
+      name: "Updated party",
+      symbol: "🏕️",
+      description: "Updated description",
+    });
+
+    expect(partyHandle.doc()).toMatchObject({
+      name: "Updated party",
+      symbol: "🏕️",
+      description: "Updated description",
+      participants: originalParticipants,
+    });
+  });
+
+  test("updates participants without replacing party details", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const originalDetails = {
+      name: partyHandle.doc().name,
+      symbol: partyHandle.doc().symbol,
+      description: partyHandle.doc().description,
+    };
+    const participants = {
+      charlie: createParticipant("charlie", "Charlie"),
+    };
+
+    helpers.updateParticipants(participants);
+
+    expect(partyHandle.doc()).toMatchObject({
+      ...originalDetails,
+      participants,
+    });
+  });
 });
 
 function createPartyHelpers() {
@@ -98,6 +135,7 @@ function createParty(): Party {
     id: "" as DocumentId,
     type: "party",
     name: "Test party",
+    symbol: "🧪",
     description: "",
     currency: "EUR",
     participants: {
