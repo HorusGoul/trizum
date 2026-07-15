@@ -170,7 +170,7 @@ msgstr "Align QR code here"
 msgid "All time"
 msgstr "All time"
 
-#: src/components/ExpenseEditor.tsx:473
+#: src/components/ExpenseEditor.tsx:442
 msgid "Amount"
 msgstr "Amount"
 
@@ -178,11 +178,11 @@ msgstr "Amount"
 msgid "Amount for {0}"
 msgstr "Amount for {0}"
 
-#: src/components/ExpenseEditor.tsx:817
+#: src/components/ExpenseEditor.tsx:787
 msgid "Amount for {participantName}"
 msgstr "Amount for {participantName}"
 
-#: src/components/ExpenseEditor.tsx:460
+#: src/components/ExpenseEditor.tsx:429
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
@@ -283,7 +283,7 @@ msgstr "Authentication error"
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
-#: src/components/ExpenseEditor.tsx:369
+#: src/components/ExpenseEditor.tsx:338
 #: src/routes/settings.tsx:242
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
@@ -551,7 +551,7 @@ msgstr "Close"
 msgid "Close attachment preview"
 msgstr "Close attachment preview"
 
-#: src/components/CurrencyField.tsx:466
+#: src/components/CurrencyField.tsx:467
 msgid "Close calculator"
 msgstr "Close calculator"
 
@@ -813,7 +813,7 @@ msgstr "Czech Koruna"
 msgid "Danish Krone"
 msgstr "Danish Krone"
 
-#: src/components/ExpenseEditor.tsx:525
+#: src/components/ExpenseEditor.tsx:495
 msgid "Date"
 msgstr "Date"
 
@@ -1030,7 +1030,7 @@ msgstr "Exact"
 msgid "Expense added"
 msgstr "Expense added"
 
-#: src/components/ExpenseEditor.tsx:166
+#: src/components/ExpenseEditor.tsx:135
 msgid "Expense amounts don't match total. Please check your split configuration."
 msgstr "Expense amounts don't match total. Please check your split configuration."
 
@@ -1051,7 +1051,7 @@ msgid "Expenses counted"
 msgstr "Expenses counted"
 
 #: src/components/AvatarPicker.tsx:110
-#: src/components/ExpenseEditor.tsx:1042
+#: src/components/ExpenseEditor.tsx:1008
 #: src/components/QRCodeScanner.tsx:111
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
@@ -1096,7 +1096,7 @@ msgstr "Failed to update expense"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Failed to upload avatar. Please try again."
 
-#: src/components/ExpenseEditor.tsx:1017
+#: src/components/ExpenseEditor.tsx:983
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -1222,7 +1222,7 @@ msgstr "Haitian Gourde"
 msgid "Have an idea to improve trizum? We'd love to hear it."
 msgstr "Have an idea to improve trizum? We'd love to hear it."
 
-#: src/components/ExpenseEditor.tsx:919
+#: src/components/ExpenseEditor.tsx:885
 msgid "Heads up!"
 msgstr "Heads up!"
 
@@ -1315,7 +1315,7 @@ msgstr "Importing attachments ({0} of {1})"
 msgid "Importing Tricount data..."
 msgstr "Importing Tricount data..."
 
-#: src/components/ExpenseEditor.tsx:577
+#: src/components/ExpenseEditor.tsx:547
 msgid "Include all"
 msgstr "Include all"
 
@@ -1574,7 +1574,7 @@ msgstr "Mauritian Rupee"
 msgid "Me"
 msgstr "Me"
 
-#: src/components/ExpenseEditor.tsx:362
+#: src/components/ExpenseEditor.tsx:331
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:87
 #: src/routes/party.$partyId/route.tsx:172
 msgid "Menu"
@@ -1823,11 +1823,11 @@ msgstr "Only your own debt can be transferred"
 msgid "Open archived parties"
 msgstr "Open archived parties"
 
-#: src/components/CurrencyField.tsx:466
+#: src/components/CurrencyField.tsx:467
 msgid "Open calculator"
 msgstr "Open calculator"
 
-#: src/components/ExpenseEditor.tsx:372
+#: src/components/ExpenseEditor.tsx:341
 msgid "Open calculator when focusing amount fields"
 msgstr "Open calculator when focusing amount fields"
 
@@ -1876,7 +1876,7 @@ msgstr "Paid as {currentParticipantName}"
 msgid "Paid at"
 msgstr "Paid at"
 
-#: src/components/ExpenseEditor.tsx:500
+#: src/components/ExpenseEditor.tsx:470
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:48
 msgid "Paid by"
 msgstr "Paid by"
@@ -2090,7 +2090,7 @@ msgstr "Platinum (troy ounce)"
 msgid "Please allow camera access in your browser settings to scan QR codes."
 msgstr "Please allow camera access in your browser settings to scan QR codes."
 
-#: src/components/ExpenseEditor.tsx:937
+#: src/components/ExpenseEditor.tsx:903
 msgid "Please correct it before saving."
 msgstr "Please correct it before saving."
 
@@ -2171,7 +2171,7 @@ msgstr "Remove"
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/ExpenseEditor.tsx:1134
+#: src/components/ExpenseEditor.tsx:1100
 msgid "Remove photo"
 msgstr "Remove photo"
 
@@ -2240,7 +2240,7 @@ msgstr "São Tomé and Príncipe Dobra"
 msgid "Saudi Riyal"
 msgstr "Saudi Riyal"
 
-#: src/components/ExpenseEditor.tsx:282
+#: src/components/ExpenseEditor.tsx:251
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:124
 #: src/routes/party_.$partyId.settings/route.tsx:120
@@ -2351,7 +2351,7 @@ msgstr "Shares"
 msgid "Shares for {0}"
 msgstr "Shares for {0}"
 
-#: src/components/ExpenseEditor.tsx:775
+#: src/components/ExpenseEditor.tsx:745
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
@@ -2359,7 +2359,7 @@ msgstr "Shares for {participantName}"
 msgid "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 msgstr "Shares sum up to <0>{0} {1}</0> while the expense amount is <1>{amount} {2}</1>."
 
-#: src/components/ExpenseEditor.tsx:923
+#: src/components/ExpenseEditor.tsx:889
 msgid "Shares sum up to <0>{totalAmount} {currency}</0> while the expense amount is <1>{expenseAmount} {currency}</1>."
 msgstr "Shares sum up to <0>{totalAmount} {currency}</0> while the expense amount is <1>{expenseAmount} {currency}</1>."
 
@@ -2531,7 +2531,7 @@ msgstr "Stop trizum cloud on this device"
 msgid "Submit a Request"
 msgstr "Submit a Request"
 
-#: src/components/ExpenseEditor.tsx:282
+#: src/components/ExpenseEditor.tsx:251
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:124
 #: src/routes/party_.$partyId.settings/route.tsx:120
@@ -2578,11 +2578,11 @@ msgstr "Swipe between expenses and balances tabs."
 msgid "Swiss Franc"
 msgstr "Swiss Franc"
 
-#: src/components/ExpenseEditor.tsx:799
+#: src/components/ExpenseEditor.tsx:769
 msgid "Switch to a set amount"
 msgstr "Switch to a set amount"
 
-#: src/components/ExpenseEditor.tsx:800
+#: src/components/ExpenseEditor.tsx:770
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
@@ -2621,8 +2621,8 @@ msgstr "Tajikistani Somoni"
 
 #: src/components/AvatarPicker.tsx:157
 #: src/components/AvatarPicker.tsx:172
-#: src/components/ExpenseEditor.tsx:1062
-#: src/components/ExpenseEditor.tsx:1076
+#: src/components/ExpenseEditor.tsx:1028
+#: src/components/ExpenseEditor.tsx:1042
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -2721,7 +2721,7 @@ msgstr "This stops trizum cloud on this device. Your local data stays on this de
 msgid "Timeframe"
 msgstr "Timeframe"
 
-#: src/components/ExpenseEditor.tsx:436
+#: src/components/ExpenseEditor.tsx:405
 msgid "Title"
 msgstr "Title"
 
@@ -2919,14 +2919,14 @@ msgstr "Updating expense..."
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
-#: src/components/ExpenseEditor.tsx:962
+#: src/components/ExpenseEditor.tsx:928
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
 #: src/components/AvatarPicker.tsx:166
 #: src/components/AvatarPicker.tsx:184
-#: src/components/ExpenseEditor.tsx:1071
-#: src/components/ExpenseEditor.tsx:1088
+#: src/components/ExpenseEditor.tsx:1037
+#: src/components/ExpenseEditor.tsx:1054
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -2939,7 +2939,7 @@ msgstr "Uploading avatar..."
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:1002
+#: src/components/ExpenseEditor.tsx:968
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -3032,7 +3032,7 @@ msgstr "View on GitHub"
 msgid "View party"
 msgstr "View party"
 
-#: src/components/ExpenseEditor.tsx:1123
+#: src/components/ExpenseEditor.tsx:1089
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "View photo"

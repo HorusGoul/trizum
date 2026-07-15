@@ -11,7 +11,6 @@ import { AppNumberField, AppTextField } from "#src/ui/fields/TextField.js";
 import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
-import { add, equal, subtract } from "dinero.js";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
@@ -27,12 +26,10 @@ import { MenuTrigger, Popover } from "react-aria-components";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
 import { Switch } from "#src/ui/Switch.tsx";
 import { usePartyList } from "#src/hooks/usePartyList.ts";
-import { getExpenseUnitShares } from "#src/models/expense.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
 import { Skeleton } from "#src/ui/Skeleton.tsx";
 import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
-import { createMoney } from "#src/lib/money.ts";
 import {
   compressionPresets,
   imageCaptureAccept,
@@ -46,6 +43,10 @@ import {
 import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
+import {
+  expenseEditorSharesMatchAmount,
+  getExpenseEditorUnitShares,
+} from "#src/lib/expenseEditor.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -130,39 +131,7 @@ export function ExpenseEditor({
         return;
       }
 
-      // Validate that amounts add up correctly using Dinero.js for precise calculations
-      const activeParticipants = Object.keys(value.shares);
-      const totalAmount = createMoney(convertToUnits(value.amount));
-
-      // Calculate total shares for divide participants
-      const totalShares = activeParticipants.reduce((total, participantId) => {
-        const share = value.shares[participantId];
-        if (share?.type === "divide") {
-          return total + share.value;
-        }
-        return total;
-      }, 0);
-
-      // Calculate total amount taken by exact shares using Dinero.js
-      const exactTotal = activeParticipants.reduce((total, participantId) => {
-        const share = value.shares[participantId];
-        if (share?.type === "exact") {
-          // Use Math.round to handle any floating point precision issues
-          return add(total, createMoney(Math.round(share.value)));
-        }
-        return total;
-      }, createMoney(0));
-
-      // Calculate total split amount using Dinero.js
-      let totalSplit = exactTotal;
-      if (totalShares > 0) {
-        // Calculate remaining amount for divide participants
-        const remainingAmount = subtract(totalAmount, exactTotal);
-        totalSplit = add(exactTotal, remainingAmount);
-      }
-
-      // Compare using Dinero.js equality
-      if (!equal(totalSplit, totalAmount)) {
+      if (!expenseEditorSharesMatchAmount(value.amount, value.shares)) {
         toast.error(t`Expense amounts don't match total. Please check your split configuration.`);
         return;
       }
@@ -474,6 +443,7 @@ function ExpenseDetailsFields({
             onCloseCalculator={onCloseCalculator}
             onOpenCalculator={onOpenCalculator}
             value={field.state.value}
+            minValue={0}
             onChange={(value) => {
               field.handleChange(value || 0);
             }}
@@ -861,6 +831,7 @@ function ParticipantSplitAmountField({
       onCloseCalculator={onCloseCalculator}
       onOpenCalculator={onOpenCalculator}
       value={participantAmount / 100}
+      minValue={0}
       onChange={onChange}
       className="w-20"
       inputClassName="h-7 px-0 text-right border-t-0 border-x-0 rounded-none border-b"
@@ -880,12 +851,7 @@ function calculateParticipantUnitAmounts(
   amount: number,
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
 ) {
-  const amountInUnits = convertToUnits(amount);
-
-  return getExpenseUnitShares({
-    shares,
-    paidBy: { noop: amountInUnits },
-  });
+  return getExpenseEditorUnitShares(amount, shares);
 }
 
 interface SharesWarningProps {
