@@ -24,6 +24,11 @@ msgstr "(me)"
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
+#. placeholder {0}: issues.length
+#: src/components/ExpenseEditorValidationStatus.tsx:206
+msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues must be resolved before saving.}}"
+msgstr "{0, plural, one {# issue must be resolved before saving.} other {# issues must be resolved before saving.}}"
+
 #. placeholder {0}: preview.remainingCount
 #: src/components/PartyListCard.tsx:324
 #: src/routes/party_.$partyId.transfer-debt/-components/DestinationPartyCard.tsx:80
@@ -2286,7 +2291,7 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:218
+#: src/components/ExpenseEditorValidationStatus.tsx:222
 msgid "Review expense"
 msgstr "Review expense"
 
@@ -2438,7 +2443,7 @@ msgstr "Shares for {0}"
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:238
+#: src/components/ExpenseEditorValidationStatus.tsx:247
 msgid "Shares sum up to <0/>, while the expense amount is <1/>."
 msgstr "Shares sum up to <0/>, while the expense amount is <1/>."
 
@@ -2593,7 +2598,7 @@ msgstr "Split expenses fairly among multiple participants"
 msgid "Split expenses, stay even."
 msgstr "Split expenses, stay even."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:235
+#: src/components/ExpenseEditorValidationStatus.tsx:244
 msgid "Split total does not match"
 msgstr "Split total does not match"
 

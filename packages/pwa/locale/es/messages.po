@@ -24,6 +24,11 @@ msgstr "(yo)"
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
+#. placeholder {0}: issues.length
+#: src/components/ExpenseEditorValidationStatus.tsx:206
+msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues must be resolved before saving.}}"
+msgstr "{0, plural, one {Se debe resolver # problema antes de guardar.} other {Se deben resolver # problemas antes de guardar.}}"
+
 #. placeholder {0}: preview.remainingCount
 #: src/components/PartyListCard.tsx:324
 #: src/routes/party_.$partyId.transfer-debt/-components/DestinationPartyCard.tsx:80
@@ -2214,7 +2219,7 @@ msgstr "Restaurar al inicio"
 msgid "Retry"
 msgstr "Reintentar"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:218
+#: src/components/ExpenseEditorValidationStatus.tsx:222
 msgid "Review expense"
 msgstr "Revisar gasto"
 
@@ -2366,7 +2371,7 @@ msgstr "Partes para {0}"
 msgid "Shares for {participantName}"
 msgstr "Partes para {participantName}"
 
-#: src/components/ExpenseEditorValidationStatus.tsx:238
+#: src/components/ExpenseEditorValidationStatus.tsx:247
 msgid "Shares sum up to <0/>, while the expense amount is <1/>."
 msgstr "Las partes suman <0/>, mientras que el importe del gasto es <1/>."
 
@@ -2517,7 +2522,7 @@ msgstr "Divide los gastos de forma justa entre múltiples participantes"
 msgid "Split expenses, stay even."
 msgstr "Reparte gastos, mantén las cuentas claras."
 
-#: src/components/ExpenseEditorValidationStatus.tsx:235
+#: src/components/ExpenseEditorValidationStatus.tsx:244
 msgid "Split total does not match"
 msgstr "El total de las partes no coincide"
 

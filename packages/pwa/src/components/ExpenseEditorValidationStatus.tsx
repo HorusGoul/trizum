@@ -194,21 +194,25 @@ function ExpenseEditorValidationDialog({ issues }: { issues: ExpenseEditorValida
           className="border-accent-200 dark:border-accent-800 dark:bg-accent-950 max-h-[inherit] overflow-y-auto rounded-lg border bg-white shadow-2xl outline-hidden"
         >
           <div className="flex flex-col gap-5 p-5 sm:p-6">
-            <div className="flex flex-col gap-3">
-              <span className="bg-danger-50 text-danger-600 dark:bg-danger-950/50 dark:text-danger-300 flex size-10 items-center justify-center rounded-full">
-                <Icon icon="lucide.circle-alert" className="size-5" />
+            <div className="flex items-start gap-3">
+              <span className="text-danger-600 dark:text-danger-300 flex size-9 shrink-0 items-center justify-center">
+                <Icon icon="lucide.circle-alert" className="size-6" />
               </span>
-              <div className="flex flex-col gap-2">
+              <div className="min-w-0 flex-1">
                 <h2 className="text-lg font-medium">
                   <Trans>Expense checks</Trans>
                 </h2>
-                <p className="text-accent-700 dark:text-accent-200 text-sm">
-                  <Trans>Resolve these issues before saving the expense.</Trans>
+                <p className="text-accent-700 dark:text-accent-200 mt-1 text-sm">
+                  <Plural
+                    value={issues.length}
+                    one="# issue must be resolved before saving."
+                    other="# issues must be resolved before saving."
+                  />
                 </p>
               </div>
             </div>
 
-            <ul className="flex flex-col gap-3">
+            <ul className="divide-accent-200 dark:divide-accent-800 flex flex-col divide-y">
               {issues.map((issue) => (
                 <ExpenseEditorValidationIssueItem issue={issue} key={issue.code} />
               ))}
@@ -230,29 +234,35 @@ function ExpenseEditorValidationIssueItem({ issue }: { issue: ExpenseEditorValid
   switch (issue.code) {
     case "shares-total-mismatch":
       return (
-        <li className="border-danger-200 bg-danger-50/60 dark:border-danger-900 dark:bg-danger-950/30 rounded-lg border p-4">
-          <h3 className="text-danger-800 dark:text-danger-200 font-medium">
-            <Trans>Split total does not match</Trans>
-          </h3>
-          <p className="text-danger-700 dark:text-danger-300 mt-1 text-sm">
-            <Trans>
-              Shares sum up to{" "}
-              <CurrencyText
-                amount={issue.sharesTotal}
-                currency={party.currency}
-                className="font-semibold"
-                variant="inherit"
-              />
-              , while the expense amount is{" "}
-              <CurrencyText
-                amount={issue.expenseAmount}
-                currency={party.currency}
-                className="font-semibold"
-                variant="inherit"
-              />
-              .
-            </Trans>
-          </p>
+        <li className="flex gap-3 py-4 first:pt-0 last:pb-0">
+          <Icon
+            icon="lucide.circle-alert"
+            className="text-danger-600 dark:text-danger-300 mt-0.5 size-5 shrink-0"
+          />
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium">
+              <Trans>Split total does not match</Trans>
+            </h3>
+            <p className="text-accent-700 dark:text-accent-200 mt-1 text-sm">
+              <Trans>
+                Shares sum up to{" "}
+                <CurrencyText
+                  amount={issue.sharesTotal}
+                  currency={party.currency}
+                  className="font-semibold"
+                  variant="inherit"
+                />
+                , while the expense amount is{" "}
+                <CurrencyText
+                  amount={issue.expenseAmount}
+                  currency={party.currency}
+                  className="font-semibold"
+                  variant="inherit"
+                />
+                .
+              </Trans>
+            </p>
+          </div>
         </li>
       );
   }
