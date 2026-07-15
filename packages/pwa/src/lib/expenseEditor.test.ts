@@ -121,6 +121,21 @@ describe("expense editor validation status", () => {
     ).toMatchObject({ issues: [], status: "incomplete" });
   });
 
+  test.each(["create", "edit"] as const)(
+    "blocks %s submission when no participants are selected",
+    (mode) => {
+      expect(
+        getExpenseEditorValidationResult(
+          {
+            ...completeExpense,
+            shares: {},
+          },
+          { isDirty: true, mode },
+        ),
+      ).toMatchObject({ issues: [], status: "incomplete" });
+    },
+  );
+
   test("is valid when required values and form-wide checks pass", () => {
     expect(
       getExpenseEditorValidationResult(completeExpense, { isDirty: true, mode: "create" }),

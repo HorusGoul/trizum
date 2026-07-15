@@ -43,7 +43,6 @@ import { MediaGalleryContext } from "./MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
   type ExpenseEditorMode,
-  getExpenseEditorValidationIssues,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
 } from "#src/lib/expenseEditor.ts";
@@ -135,12 +134,17 @@ export function ExpenseEditor({
         return;
       }
 
-      const blockingIssues = getExpenseEditorValidationIssues(value).filter(
-        (issue) => issue.severity === "error",
-      );
+      const submissionValidation = getExpenseEditorValidationResult(value, {
+        isDirty: true,
+        mode,
+      });
 
-      if (blockingIssues.length > 0) {
+      if (submissionValidation.status === "error") {
         setIsValidationDialogOpen(true);
+        return;
+      }
+
+      if (submissionValidation.status !== "valid" && submissionValidation.status !== "warning") {
         return;
       }
 
