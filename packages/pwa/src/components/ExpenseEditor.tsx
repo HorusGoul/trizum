@@ -42,6 +42,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
+  type ExpenseEditorMode,
   getExpenseEditorValidationIssues,
   getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
@@ -64,6 +65,7 @@ export interface ExpenseEditorRef {
 const logger = getLogger("components", "ExpenseEditor");
 
 interface ExpenseEditorProps {
+  mode: ExpenseEditorMode;
   title: string;
   onSubmit: (values: ExpenseEditorFormValues) => void | Promise<void>;
   onChange?: (
@@ -88,6 +90,7 @@ type FieldFocusHandlersFactory = (field: { name: string; handleBlur: () => void 
 };
 
 export function ExpenseEditor({
+  mode,
   title,
   onSubmit,
   defaultValues,
@@ -176,7 +179,10 @@ export function ExpenseEditor({
   const paidBy = useStore(form.store, (state) => state.values.paidBy);
   const photos = useStore(form.store, (state) => state.values.photos);
   const isDirty = useStore(form.store, (state) => state.isDirty);
-  const validation = getExpenseEditorValidationResult({ amount, name, paidBy, shares }, isDirty);
+  const validation = getExpenseEditorValidationResult(
+    { amount, name, paidBy, shares },
+    { isDirty, mode },
+  );
 
   const isReceivingUpdatesRef = useRef(false);
   const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);

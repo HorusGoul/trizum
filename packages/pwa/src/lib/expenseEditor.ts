@@ -32,6 +32,13 @@ export interface ExpenseEditorValidationResult {
   status: ExpenseEditorValidationStatus;
 }
 
+export type ExpenseEditorMode = "create" | "edit";
+
+export interface ExpenseEditorValidationOptions {
+  isDirty: boolean;
+  mode: ExpenseEditorMode;
+}
+
 type ExpenseEditorValidationRule = (
   values: ExpenseEditorValidationValues,
 ) => ExpenseEditorValidationIssue | null;
@@ -67,7 +74,7 @@ export function getExpenseEditorValidationIssues(values: ExpenseEditorValidation
 
 export function getExpenseEditorValidationResult(
   values: ExpenseEditorValidationValues,
-  isDirty: boolean,
+  { isDirty, mode }: ExpenseEditorValidationOptions,
 ): ExpenseEditorValidationResult {
   const issues = getExpenseEditorValidationIssues(values);
   const hasErrors = issues.some((issue) => issue.severity === "error");
@@ -81,7 +88,7 @@ export function getExpenseEditorValidationResult(
     return { issues, status: "warning" };
   }
 
-  if (!isDirty) {
+  if (!isDirty && mode === "create") {
     return { issues, status: "pristine" };
   }
 

@@ -1,5 +1,12 @@
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
+import {
+  AnimatePresence,
+  LazyMotion,
+  domAnimation,
+  m as motion,
+  useReducedMotion,
+} from "motion/react";
 import { Dialog, DialogTrigger, Modal, ModalOverlay } from "react-aria-components";
 import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
@@ -60,6 +67,7 @@ export function ExpenseEditorValidationStatus({
   validation,
 }: ExpenseEditorValidationStatusProps) {
   const appearance = statusAppearances[validation.status];
+  const shouldReduceMotion = useReducedMotion();
   const content = (
     <>
       <Icon icon={appearance.icon} className="size-5 shrink-0" />
@@ -77,23 +85,54 @@ export function ExpenseEditorValidationStatus({
 
   return (
     <div aria-live="polite" className="container px-4">
-      {validation.issues.length === 0 ? (
-        <output className={cn(statusBarClassName, appearance.className)}>{content}</output>
-      ) : (
-        <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
-          <Button
-            className={cn(
-              statusBarClassName,
-              appearance.className,
-              "justify-start rounded-lg transition-colors",
-            )}
-            type="button"
-          >
-            {content}
-          </Button>
-          <ExpenseEditorValidationDialog issues={validation.issues} />
-        </DialogTrigger>
-      )}
+      <LazyMotion features={domAnimation}>
+        <div className="relative h-12">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={validation.status}
+              animate={{ opacity: 1, transform: "translateY(0)" }}
+              className="absolute inset-0"
+              exit={{
+                opacity: 0,
+                transform: shouldReduceMotion ? "translateY(0)" : "translateY(-3px)",
+              }}
+              initial={{
+                opacity: 0,
+                transform: shouldReduceMotion ? "translateY(0)" : "translateY(3px)",
+              }}
+              transition={
+                shouldReduceMotion
+                  ? { duration: 0.1 }
+                  : { duration: 0.18, ease: [0.23, 1, 0.32, 1] }
+              }
+            >
+              {validation.issues.length === 0 ? (
+                <output className={cn(statusBarClassName, appearance.className)}>{content}</output>
+              ) : (
+                <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
+                  <Button
+                    className={({ isFocusVisible, isHovered, isPressed }) =>
+                      cn(
+                        statusBarClassName,
+                        appearance.className,
+                        "justify-start rounded-lg",
+                        (isHovered || isFocusVisible) && "brightness-95 dark:brightness-110",
+                        isFocusVisible &&
+                          "ring-2 ring-current ring-offset-2 ring-offset-white dark:ring-offset-accent-950",
+                        isPressed && "brightness-90 dark:brightness-125",
+                      )
+                    }
+                    type="button"
+                  >
+                    {content}
+                  </Button>
+                  <ExpenseEditorValidationDialog issues={validation.issues} />
+                </DialogTrigger>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </LazyMotion>
     </div>
   );
 }

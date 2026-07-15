@@ -135,6 +135,7 @@ function AddExpense() {
   return (
     <>
       <ExpenseEditor
+        mode="create"
         title={t`New expense`}
         onSubmit={onCreateExpense}
         onChange={(_prev, current) => setPhotos(current.photos)}

@@ -77,11 +77,34 @@ describe("expense editor shares", () => {
 });
 
 describe("expense editor validation status", () => {
-  test("starts pristine when a valid form has not changed", () => {
-    expect(getExpenseEditorValidationResult(completeExpense, false)).toMatchObject({
+  test("starts pristine when a valid create form has not changed", () => {
+    expect(
+      getExpenseEditorValidationResult(completeExpense, { isDirty: false, mode: "create" }),
+    ).toMatchObject({
       issues: [],
       status: "pristine",
     });
+  });
+
+  test("validates an existing expense before it changes", () => {
+    expect(
+      getExpenseEditorValidationResult(completeExpense, { isDirty: false, mode: "edit" }),
+    ).toMatchObject({
+      issues: [],
+      status: "valid",
+    });
+  });
+
+  test("reports an incomplete existing expense before it changes", () => {
+    expect(
+      getExpenseEditorValidationResult(
+        {
+          ...completeExpense,
+          name: "",
+        },
+        { isDirty: false, mode: "edit" },
+      ),
+    ).toMatchObject({ issues: [], status: "incomplete" });
   });
 
   test("is incomplete when required values are missing", () => {
@@ -93,16 +116,15 @@ describe("expense editor validation status", () => {
           amount: 0,
           shares: {},
         },
-        true,
+        { isDirty: true, mode: "create" },
       ),
     ).toMatchObject({ issues: [], status: "incomplete" });
   });
 
   test("is valid when required values and form-wide checks pass", () => {
-    expect(getExpenseEditorValidationResult(completeExpense, true)).toMatchObject({
-      issues: [],
-      status: "valid",
-    });
+    expect(
+      getExpenseEditorValidationResult(completeExpense, { isDirty: true, mode: "create" }),
+    ).toMatchObject({ issues: [], status: "valid" });
   });
 
   test("surfaces form-wide errors even before the form becomes dirty", () => {
@@ -115,7 +137,7 @@ describe("expense editor validation status", () => {
             adjusted: { type: "divide", value: 1 },
           },
         },
-        false,
+        { isDirty: false, mode: "create" },
       ),
     ).toMatchObject({
       issues: [{ code: "shares-total-mismatch", severity: "error" }],
