@@ -224,6 +224,7 @@ function EditExpense() {
     <>
       <RealtimeExpenseEditorPresence expenseId={expenseId} />
       <ExpenseEditor
+        mode="edit"
         title={t({ message: `Editing ${expenseName}` })}
         onSubmit={onSubmit}
         defaultValues={formValues}

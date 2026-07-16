@@ -3,7 +3,7 @@ import { t } from "@lingui/core/macro";
 import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
-import { Suspense, use, useEffect, useId, useImperativeHandle, useRef } from "react";
+import { Suspense, use, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
 import { IconButton } from "#src/ui/IconButton.js";
 import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
@@ -12,14 +12,12 @@ import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
-import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { Checkbox } from "#src/ui/Checkbox.tsx";
 import type { PartyParticipant } from "#src/models/party.ts";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
 import { AppDatePicker } from "#src/ui/DatePicker.tsx";
 import { fromDate, getLocalTimeZone, type ZonedDateTime } from "@internationalized/date";
-import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { Button } from "#src/ui/Button.tsx";
 import { MenuTrigger, Popover } from "react-aria-components";
@@ -44,9 +42,11 @@ import { getLogger } from "#src/lib/log.ts";
 import { MediaGalleryContext } from "./MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
-  expenseEditorSharesMatchAmount,
+  type ExpenseEditorMode,
+  getExpenseEditorValidationResult,
   getExpenseEditorUnitShares,
 } from "#src/lib/expenseEditor.ts";
+import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -64,6 +64,7 @@ export interface ExpenseEditorRef {
 const logger = getLogger("components", "ExpenseEditor");
 
 interface ExpenseEditorProps {
+  mode: ExpenseEditorMode;
   title: string;
   onSubmit: (values: ExpenseEditorFormValues) => void | Promise<void>;
   onChange?: (
@@ -88,6 +89,7 @@ type FieldFocusHandlersFactory = (field: { name: string; handleBlur: () => void 
 };
 
 export function ExpenseEditor({
+  mode,
   title,
   onSubmit,
   defaultValues,
@@ -104,6 +106,7 @@ export function ExpenseEditor({
   const { partyList, setAutoOpenCalculator } = usePartyList();
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
+  const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
   const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
@@ -131,8 +134,17 @@ export function ExpenseEditor({
         return;
       }
 
-      if (!expenseEditorSharesMatchAmount(value.amount, value.shares)) {
-        toast.error(t`Expense amounts don't match total. Please check your split configuration.`);
+      const submissionValidation = getExpenseEditorValidationResult(value, {
+        isDirty: true,
+        mode,
+      });
+
+      if (submissionValidation.status === "error") {
+        setIsValidationDialogOpen(true);
+        return;
+      }
+
+      if (submissionValidation.status !== "valid" && submissionValidation.status !== "warning") {
         return;
       }
 
@@ -167,7 +179,14 @@ export function ExpenseEditor({
 
   const shares = useStore(form.store, (state) => state.values.shares);
   const amount = useStore(form.store, (state) => state.values.amount);
+  const name = useStore(form.store, (state) => state.values.name);
+  const paidBy = useStore(form.store, (state) => state.values.paidBy);
   const photos = useStore(form.store, (state) => state.values.photos);
+  const isDirty = useStore(form.store, (state) => state.isDirty);
+  const validation = getExpenseEditorValidationResult(
+    { amount, name, paidBy, shares },
+    { isDirty, mode },
+  );
 
   const isReceivingUpdatesRef = useRef(false);
   const focusedFieldRef = useRef<keyof ExpenseEditorFormValues | null>(null);
@@ -214,17 +233,22 @@ export function ExpenseEditor({
   );
 
   useEffect(() => {
-    if (!onChange) {
-      return;
-    }
-
     previousValuesRef.current = form.store.state.values;
 
     const subscription = form.store.subscribe((currentState) => {
       const previousValues = previousValuesRef.current;
       previousValuesRef.current = currentState.values;
 
-      if (isReceivingUpdatesRef.current) {
+      if (
+        previousValues.amount !== currentState.values.amount ||
+        previousValues.name !== currentState.values.name ||
+        previousValues.paidBy !== currentState.values.paidBy ||
+        previousValues.shares !== currentState.values.shares
+      ) {
+        setIsValidationDialogOpen(false);
+      }
+
+      if (isReceivingUpdatesRef.current || !onChange) {
         return;
       }
 
@@ -260,6 +284,12 @@ export function ExpenseEditor({
           </form.Subscribe>
         }
         title={title}
+      />
+
+      <ExpenseEditorValidationStatus
+        isOpen={isValidationDialogOpen}
+        onOpenChange={setIsValidationDialogOpen}
+        validation={validation}
       />
 
       <form
@@ -564,8 +594,6 @@ function ExpenseParticipantsSection({
           />
         ))}
       </div>
-
-      <SharesWarning amount={amount} shares={shares} />
     </div>
   );
 }
@@ -852,59 +880,6 @@ function calculateParticipantUnitAmounts(
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
 ) {
   return getExpenseEditorUnitShares(amount, shares);
-}
-
-interface SharesWarningProps {
-  amount: number;
-  shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
-}
-
-function SharesWarning({ amount, shares }: SharesWarningProps) {
-  const { party } = useCurrentParty();
-  const activeParticipants = Object.keys(shares);
-
-  if (activeParticipants.length === 0) {
-    return null;
-  }
-
-  const unitAmounts = calculateParticipantUnitAmounts(amount, shares);
-  const totalUnitAmount = Object.values(unitAmounts).reduce((sum, amount) => sum + amount, 0);
-  const showWarning = totalUnitAmount - convertToUnits(amount) !== 0;
-  const currency = party.currency;
-  const totalAmount = totalUnitAmount / 100;
-  const expenseAmount = amount;
-
-  if (!showWarning) {
-    return null;
-  }
-
-  return (
-    <Alert variant="default">
-      <Icon icon="lucide.badge-info" />
-
-      <AlertTitle>{t`Heads up!`}</AlertTitle>
-
-      <AlertDescription>
-        <p>
-          <Trans>
-            Shares sum up to{" "}
-            <strong>
-              {totalAmount} {currency}
-            </strong>{" "}
-            while the expense amount is{" "}
-            <strong>
-              {expenseAmount} {currency}
-            </strong>
-            .
-          </Trans>
-        </p>
-
-        <p>
-          <Trans>Please correct it before saving.</Trans>
-        </p>
-      </AlertDescription>
-    </Alert>
-  );
 }
 
 interface PhotosFieldProps {
