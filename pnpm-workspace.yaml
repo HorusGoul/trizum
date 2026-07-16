@@ -50,9 +50,9 @@ catalog:
   "@capacitor/share": 8.0.1
   "@capacitor/splash-screen": 8.0.1
   "@capawesome/capacitor-app-update": 8.0.3
-  "@capawesome/capacitor-apple-sign-in": 0.1.1
+  "@capawesome/capacitor-apple-sign-in": 0.1.2
   "@capawesome/capacitor-google-sign-in": 0.1.2
-  "@capawesome/capver": 0.1.4
+  "@capawesome/capver": 0.1.5
   "@changesets/changelog-github": 0.7.0
   "@changesets/cli": 2.31.0
   "@cloudflare/vite-plugin": 1.45.0
@@ -71,7 +71,7 @@ catalog:
   "@lingui/vite-plugin": 6.5.0
   "@logtape/logtape": 2.2.4
   "@logtape/sentry": 2.2.4
-  "@openai/codex": 0.144.3
+  "@openai/codex": 0.144.4
   "@playwright/test": 1.61.1
   "@rolldown/plugin-babel": 0.2.3
   "@sentry/cli": 3.6.0
