@@ -1,5 +1,28 @@
 # @trizum/mobile
 
+## 1.11.0
+
+### Patch Changes
+
+- [#341](https://github.com/HorusGoul/trizum/pull/341) [`3cebbb3`](https://github.com/HorusGoul/trizum/commit/3cebbb384069813cd584f3e0c0252decaa5cf2ad) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow Android installs on devices without camera hardware by marking camera and autofocus support as optional.
+
+- [#328](https://github.com/HorusGoul/trizum/pull/328) [`342af5b`](https://github.com/HorusGoul/trizum/commit/342af5bf7e468d94eb80c42ea95b2210c5bbeafe) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Migrate app money calculations and formatting from Dinero.js v1 to Dinero.js v2.
+
+  - Updates the PWA to use Dinero v2 standalone functions and snapshots.
+  - Keeps Trizum's existing expense-share rounding behavior covered by tests.
+  - Adds formatting and currency-boundary tests for the migration.
+
+- [#332](https://github.com/HorusGoul/trizum/pull/332) [`be80f7d`](https://github.com/HorusGoul/trizum/commit/be80f7d9f3430ececaaf3e998eac25a01f235658) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Make Tricount imports deterministic by normalizing remote response order before creating expenses.
+
+  - Sorts imported memberships, registry entries, and allocations before building party data.
+  - Keeps repeated imports from assigning rounding cents to different participants.
+  - Recalculates balances before opening the migrated party.
+
+- [#345](https://github.com/HorusGoul/trizum/pull/345) [`e43b949`](https://github.com/HorusGoul/trizum/commit/e43b94965ed2e6dbb947474d066637155b2ea98d) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Align the PWA browser build target with Vite's Baseline browser set and require iOS 16.4 or newer for native iOS installs.
+
+- Updated dependencies [[`b0a3170`](https://github.com/HorusGoul/trizum/commit/b0a31705cd8e16bbdb9ee013856074cc872e3940), [`ab7ad9c`](https://github.com/HorusGoul/trizum/commit/ab7ad9c1626ce5da06cffd59f0ef5a2d02c17bca), [`f4ca302`](https://github.com/HorusGoul/trizum/commit/f4ca302cdb50ca87323d9f61bfbcb7a6ff656d72), [`f6d18a9`](https://github.com/HorusGoul/trizum/commit/f6d18a90f8fdd61d1c483a3308684f10aa247821), [`a062ef2`](https://github.com/HorusGoul/trizum/commit/a062ef2f454e58a2507dddad09f7344c503a8dd9), [`56c64ba`](https://github.com/HorusGoul/trizum/commit/56c64baf1903ccdc786a4edd7b4bbbe3556cf21a), [`4c0c4fe`](https://github.com/HorusGoul/trizum/commit/4c0c4fea288372e2744cb57b1d1609d2fd6e991b), [`20f7709`](https://github.com/HorusGoul/trizum/commit/20f77091cee2e41438996dbca976b852259f5987), [`4239bdc`](https://github.com/HorusGoul/trizum/commit/4239bdc4318f4e6e0b66b3104789e2ff845404cd), [`c646b64`](https://github.com/HorusGoul/trizum/commit/c646b641e114b4414ab9d0fb9eeb1b56292bc48f), [`cc62b54`](https://github.com/HorusGoul/trizum/commit/cc62b54324c73b20c1497398c8f63d72b1019993), [`342af5b`](https://github.com/HorusGoul/trizum/commit/342af5bf7e468d94eb80c42ea95b2210c5bbeafe), [`a3a0217`](https://github.com/HorusGoul/trizum/commit/a3a021704f646fc0dd6875225c89d79acdfb1f0c), [`ef40e39`](https://github.com/HorusGoul/trizum/commit/ef40e39d17658589d7c8807f2da8992b6b4531ff), [`f353391`](https://github.com/HorusGoul/trizum/commit/f35339188e3a079ba49962798d8ad0555356016b), [`b7b4ee9`](https://github.com/HorusGoul/trizum/commit/b7b4ee95a6c57fba7419a55e7aa81fe658cc6023), [`4a662be`](https://github.com/HorusGoul/trizum/commit/4a662bec48feaf5bdbb8db844eb906043097189d), [`d3d0207`](https://github.com/HorusGoul/trizum/commit/d3d02074bdbe12111e931733216e4b543dc95b8c), [`7ca387f`](https://github.com/HorusGoul/trizum/commit/7ca387fddfde6470b32c2d046f1871c9367a8d51), [`a5e6761`](https://github.com/HorusGoul/trizum/commit/a5e6761fef950891a9219afad41ebdd8a9b6e5a1), [`be80f7d`](https://github.com/HorusGoul/trizum/commit/be80f7d9f3430ececaaf3e998eac25a01f235658), [`d4942fc`](https://github.com/HorusGoul/trizum/commit/d4942fc71d8d9b88757e7ab048a8dfe7eb85f655), [`e43b949`](https://github.com/HorusGoul/trizum/commit/e43b94965ed2e6dbb947474d066637155b2ea98d), [`2a686d4`](https://github.com/HorusGoul/trizum/commit/2a686d4b994a38bd9421d26376ce67a5e46bfcf9), [`440d9e8`](https://github.com/HorusGoul/trizum/commit/440d9e8dfaa7f7f9e154eced2fcdd6ab74888e2e)]:
+  - @trizum/pwa@1.11.0
+
 ## 1.10.1
 
 ### Patch Changes
@@ -14,6 +37,7 @@
 ### Patch Changes
 
 - [#206](https://github.com/HorusGoul/trizum/pull/206) [`a303a7a`](https://github.com/HorusGoul/trizum/commit/a303a7a6d5d51b467577e27066fe22a2a2c5074c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Update privacy and store metadata disclosures for trizum cloud accounts.
+
   - Covers account sign-in, linked Google and Apple providers, Cloudflare-backed storage, authentication emails, sessions, and cloud account deletion.
   - Keeps store metadata clear that accounts are optional for getting started and only needed for trizum cloud sync across devices.
 
@@ -103,6 +127,7 @@
 ### Patch Changes
 
 - 25b1d73: Upgrade Capacitor to v8
+
   - @capacitor/core: 7.4.4 → 8.0.1
   - @capacitor/android: 7.4.4 → 8.0.1
   - @capacitor/ios: 7.4.4 → 8.0.1
@@ -113,6 +138,7 @@
   - capacitor-plugin-safe-area: 4.0.3 → 5.0.0
 
   Android:
+
   - minSdkVersion: 23 → 24
   - compileSdkVersion: 35 → 36
   - targetSdkVersion: 35 → 36
@@ -121,9 +147,11 @@
   - Added density to configChanges
 
   iOS:
+
   - Minimum platform: 14.0 → 15.0
 
   CI:
+
   - Updated iOS workflows to use macos-26 for Xcode 26 SDK
 
 - Updated dependencies [1b3e4f5]
