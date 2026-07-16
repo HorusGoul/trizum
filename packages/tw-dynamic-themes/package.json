@@ -1,6 +1,6 @@
 {
   "name": "@trizum/tw-dynamic-themes",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": true,
   "description": "Dynamic themes for Tailwind CSS",
   "keywords": [],
