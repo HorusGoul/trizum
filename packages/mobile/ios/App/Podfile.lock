@@ -25,7 +25,7 @@ PODS:
     - Capacitor
   - CapacitorSplashScreen (8.0.1):
     - Capacitor
-  - CapawesomeCapacitorAppleSignIn (0.1.1):
+  - CapawesomeCapacitorAppleSignIn (0.1.2):
     - Capacitor
   - CapawesomeCapacitorAppUpdate (8.0.3):
     - Capacitor
@@ -64,7 +64,7 @@ DEPENDENCIES:
   - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area`)"
   - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/splash-screen`)"
-  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in`)"
+  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in`)"
   - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update`)"
   - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in`)"
 
@@ -97,7 +97,7 @@ EXTERNAL SOURCES:
   CapacitorSplashScreen:
     :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/splash-screen"
   CapawesomeCapacitorAppleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in"
   CapawesomeCapacitorAppUpdate:
     :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update"
   CapawesomeCapacitorGoogleSignIn:
@@ -106,16 +106,16 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: 214137f5c378d1dec88a68425c467fe65aaff637
-  Capacitor: 35242afe195b1e53c58ca1b827d1b444c5e6602b
-  CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
-  CapacitorCamera: 8f6acf83664118321111e76acef86390211ccb08
+  Capacitor: 9c34c6eb2165694e51758f5b425d470cb00f5bea
+  CapacitorApp: a4d8d936cc4390859a3766f141048abe55d4076f
+  CapacitorCamera: a9b5f1a5d09e61b7a979e3510b87cdda99265d2f
   CapacitorCordova: eebe6bcf807b1b06f3f48237650f96bbcd0eef09
-  CapacitorPluginSafeArea: 9d0682951c011bf0b36e513a89103c5fbff7ac49
-  CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
-  CapacitorSplashScreen: 4b46c72298db552b3c57ce021ef028b6dc7f1fa7
-  CapawesomeCapacitorAppleSignIn: c793d6d2b2cb22d0a029d758dcf33484f385f382
-  CapawesomeCapacitorAppUpdate: 3a7537c6a6696837b51d06f26b2e909fd7b9226f
-  CapawesomeCapacitorGoogleSignIn: 7d9ecee5c88e500f7fd364b22cfbfd8386724534
+  CapacitorPluginSafeArea: 5c90e7423e8129641686afe8ae6084b65b20527e
+  CapacitorShare: 8a565649d321a05a1ae8b525b2a9b4f2d92c70ce
+  CapacitorSplashScreen: 1281f7df4d9b4a72bccab8d03e6b2bbd17dff122
+  CapawesomeCapacitorAppleSignIn: 7498b234c78f4740d37ddc477812e12a0c89de67
+  CapawesomeCapacitorAppUpdate: 4f528462dfa538ce5ab47136020eda033b3f1f5c
+  CapawesomeCapacitorGoogleSignIn: 094abd5aff6a9fc2ffec5b0a6313735bf9864896
   GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
   GoogleUtilities: 4f2618a4a1e762a1ee134a1e2323bba9843e06da
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
@@ -125,6 +125,6 @@ SPEC CHECKSUMS:
   PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
 
-PODFILE CHECKSUM: 966ebe3fb259762febd710a21b328171097c1d12
+PODFILE CHECKSUM: 3f8e8d6b1d972213ccbcda87302358c5750cd79d
 
 COCOAPODS: 1.17.0

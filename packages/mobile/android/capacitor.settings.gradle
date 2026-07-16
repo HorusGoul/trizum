@@ -18,7 +18,7 @@ include ':capawesome-capacitor-app-update'
 project(':capawesome-capacitor-app-update').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update/android')
 
 include ':capawesome-capacitor-apple-sign-in'
-project(':capawesome-capacitor-apple-sign-in').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in/android')
+project(':capawesome-capacitor-apple-sign-in').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in/android')
 
 include ':capawesome-capacitor-google-sign-in'
 project(':capawesome-capacitor-google-sign-in').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in/android')
