@@ -285,7 +285,7 @@ platform :ios do
       skip_metadata: false,
       force: true,
       submit_for_review: false,
-      automatic_release: false,
+      automatic_release: automatic_release,
       phased_release: false,
       run_precheck_before_submit: !submit_for_review,
       precheck_include_in_app_purchases: false,
