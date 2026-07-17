@@ -55,6 +55,7 @@ jobs:
           path: |
             packages/screenshots/screenshots
             packages/screenshots/feature-graphics
+          if-no-files-found: error
           retention-days: 7
 
       - name: Upload store-order previews
@@ -63,4 +64,5 @@ jobs:
         with:
           name: ${{ inputs.artifact_name }}-previews
           path: packages/screenshots/previews
+          if-no-files-found: error
           retention-days: 14

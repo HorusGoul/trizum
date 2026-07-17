@@ -3,4 +3,6 @@ node_modules/
 /playwright-report/
 /playwright/.cache/
 /.captures/
+/feature-graphics/
+/previews/
 /screenshots/

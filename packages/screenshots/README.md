@@ -27,6 +27,11 @@ Fastlane screenshot handoff.
   `.captures/`.
 - Google Play feature graphics are written under
   `feature-graphics/<locale>/featureGraphic.png` at 1024×500 pixels.
+- Screenshots, feature graphics, raw captures, and review previews are generated
+  outputs and are intentionally ignored by Git.
+- The screenshot workflow uploads screenshots and feature graphics in its main
+  artifact and uploads contact sheets separately as the `<artifact>-previews`
+  job artifact.
 - The package targets English and Spanish across Google Play phone and tablet
   sizes, the current App Store 6.9-inch iPhone size, and the required 13-inch
   iPad size.
@@ -48,7 +53,8 @@ organization:
 
 The output uses high-contrast localized copy, a restrained per-scene accent,
 embedded Inter fonts, and a lightweight device treatment that keeps the real app
-UI as the focal point. Store previews are generated under `previews/`.
+UI as the focal point. Store previews are generated under `previews/` for local
+review and CI artifact upload rather than source control.
 
 ## Determinism
 

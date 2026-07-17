@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { FEATURE_GRAPHICS_DIR } from "./feature-graphic.ts";
 import { STORE_SCENES, STORE_SCREENSHOT_ORDER, type StoreLocale } from "./store-design.ts";
@@ -31,6 +31,8 @@ function escapeHtml(value: string): string {
 }
 
 async function main(): Promise<void> {
+  await rm(PREVIEWS_DIR, { force: true, recursive: true });
+
   const [regularFont, boldFont] = await Promise.all([
     readFile(INTER_REGULAR_PATH),
     readFile(INTER_BOLD_PATH),
