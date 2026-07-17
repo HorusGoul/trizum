@@ -17,6 +17,7 @@
 
 import { copyFile, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { FEATURE_GRAPHICS_DIR } from "./feature-graphic.ts";
 import { configureScreenshotsLogging, getLogger } from "./log.ts";
@@ -71,13 +72,15 @@ const ANDROID_DEVICE_MAPPING: Record<string, string[] | null> = {
   "ipad-13": null,
 };
 
-interface Options {
+export interface OrganizeScreenshotsOptions {
   platform: Platform;
   output: string;
   clean: boolean;
+  featureGraphicsDirectory?: string;
+  screenshotsDirectory?: string;
 }
 
-function parseOptions(): Options {
+function parseOptions(): OrganizeScreenshotsOptions {
   const { values } = parseArgs({
     options: {
       platform: {
@@ -115,8 +118,12 @@ function parseOptions(): Options {
   };
 }
 
-async function getScreenshotFiles(locale: string, device: string): Promise<string[]> {
-  const deviceDir = path.join(SCREENSHOTS_DIR, locale, device);
+async function getScreenshotFiles(
+  screenshotsDirectory: string,
+  locale: string,
+  device: string,
+): Promise<string[]> {
+  const deviceDir = path.join(screenshotsDirectory, locale, device);
 
   try {
     const files = await readdir(deviceDir);
@@ -133,7 +140,16 @@ function getScreenshotIndex(filename: string): number {
   return index === -1 ? 999 : index;
 }
 
-async function organizeForIOS(outputDir: string, locales: string[]): Promise<void> {
+export function compareScreenshotFilenames(a: string, b: string): number {
+  const orderDifference = getScreenshotIndex(a) - getScreenshotIndex(b);
+  return orderDifference || (a < b ? -1 : a > b ? 1 : 0);
+}
+
+async function organizeForIOS(
+  screenshotsDirectory: string,
+  outputDir: string,
+  locales: string[],
+): Promise<void> {
   for (const locale of locales) {
     const appStoreLocales = IOS_LOCALE_MAPPING[locale];
     if (!appStoreLocales) {
@@ -142,7 +158,7 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
     }
 
     // Get all devices for this locale
-    const localeDir = path.join(SCREENSHOTS_DIR, locale);
+    const localeDir = path.join(screenshotsDirectory, locale);
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
@@ -159,7 +175,7 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
         continue;
       }
 
-      const files = await getScreenshotFiles(locale, device);
+      const files = await getScreenshotFiles(screenshotsDirectory, locale, device);
       if (files.length === 0) {
         logger.warning("No screenshots found for {locale}/{device}", {
           locale,
@@ -169,7 +185,7 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
       }
 
       // Sort files by screenshot order
-      files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b) || a.localeCompare(b));
+      files.sort(compareScreenshotFilenames);
 
       // Copy files to each App Store locale
       for (const appStoreLocale of appStoreLocales) {
@@ -181,9 +197,9 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
           const name = file.split(".")[0]; // "expense-log.portrait.png" -> "expense-log"
           const index = i + 1; // 1-based index
 
-          // Format: "iPhone 6.7" Display-1_expense-log.png"
+          // Format: "iPhone 6.9" Display-1_expense-log.png"
           const outputFilename = `${deviceFrame}-${index}_${name}.png`;
-          const inputPath = path.join(SCREENSHOTS_DIR, locale, device, file);
+          const inputPath = path.join(screenshotsDirectory, locale, device, file);
           const outputPath = path.join(localeOutputDir, outputFilename);
 
           await copyFile(inputPath, outputPath);
@@ -200,7 +216,12 @@ async function organizeForIOS(outputDir: string, locales: string[]): Promise<voi
   }
 }
 
-async function organizeForAndroid(outputDir: string, locales: string[]): Promise<void> {
+async function organizeForAndroid(
+  screenshotsDirectory: string,
+  featureGraphicsDirectory: string,
+  outputDir: string,
+  locales: string[],
+): Promise<void> {
   for (const locale of locales) {
     const playStoreLocales = ANDROID_LOCALE_MAPPING[locale];
     if (!playStoreLocales) {
@@ -212,14 +233,14 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
       const imagesOutputDir = path.join(outputDir, playStoreLocale, "images");
       await mkdir(imagesOutputDir, { recursive: true });
       await copyFile(
-        path.resolve(FEATURE_GRAPHICS_DIR, locale, "featureGraphic.png"),
+        path.resolve(featureGraphicsDirectory, locale, "featureGraphic.png"),
         path.join(imagesOutputDir, "featureGraphic.png"),
       );
       logger.info("Copied feature graphic to Android output", { locale, playStoreLocale });
     }
 
     // Get all devices for this locale
-    const localeDir = path.join(SCREENSHOTS_DIR, locale);
+    const localeDir = path.join(screenshotsDirectory, locale);
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
@@ -236,7 +257,7 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
         continue;
       }
 
-      const files = await getScreenshotFiles(locale, device);
+      const files = await getScreenshotFiles(screenshotsDirectory, locale, device);
       if (files.length === 0) {
         logger.warning("No screenshots found for {locale}/{device}", {
           locale,
@@ -246,7 +267,7 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
       }
 
       // Sort files by screenshot order
-      files.sort((a, b) => getScreenshotIndex(a) - getScreenshotIndex(b) || a.localeCompare(b));
+      files.sort(compareScreenshotFilenames);
 
       // Copy files to each Play Store locale and screenshot type
       for (const playStoreLocale of playStoreLocales) {
@@ -267,7 +288,7 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
 
             // Android format: "1_expense-log.png" (simple numbering)
             const outputFilename = `${index}_${name}.png`;
-            const inputPath = path.join(SCREENSHOTS_DIR, locale, device, file);
+            const inputPath = path.join(screenshotsDirectory, locale, device, file);
             const outputPath = path.join(screenshotsOutputDir, outputFilename);
 
             await copyFile(inputPath, outputPath);
@@ -286,12 +307,16 @@ async function organizeForAndroid(outputDir: string, locales: string[]): Promise
   }
 }
 
-async function organizeScreenshots(options: Options): Promise<void> {
+export async function organizeScreenshots(options: OrganizeScreenshotsOptions): Promise<void> {
   const outputDir = path.resolve(options.output);
+  const screenshotsDirectory = path.resolve(options.screenshotsDirectory ?? SCREENSHOTS_DIR);
+  const featureGraphicsDirectory = path.resolve(
+    options.featureGraphicsDirectory ?? FEATURE_GRAPHICS_DIR,
+  );
 
   logger.info("Organizing screenshots", {
     platform: options.platform,
-    inputDirectory: SCREENSHOTS_DIR,
+    inputDirectory: screenshotsDirectory,
     outputDirectory: outputDir,
   });
 
@@ -319,16 +344,18 @@ async function organizeScreenshots(options: Options): Promise<void> {
   }
 
   // Get all locales
-  const locales = await readdir(SCREENSHOTS_DIR);
+  const locales = await readdir(screenshotsDirectory);
 
   if (options.platform === "ios") {
-    await organizeForIOS(outputDir, locales);
+    await organizeForIOS(screenshotsDirectory, outputDir, locales);
   } else {
-    await organizeForAndroid(outputDir, locales);
+    await organizeForAndroid(screenshotsDirectory, featureGraphicsDirectory, outputDir, locales);
   }
 
   logger.info("Finished organizing screenshots");
 }
 
-const options = parseOptions();
-void organizeScreenshots(options);
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const options = parseOptions();
+  void organizeScreenshots(options);
+}

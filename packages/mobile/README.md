@@ -290,12 +290,17 @@ mkdir -p ios/App/fastlane/metadata/de-DE
 
 Add screenshots to `ios/App/fastlane/screenshots/en-US/` with naming convention:
 
-- `iPhone 6.7-Inch Display-1.png` (iPhone 15 Pro Max, etc.)
-- `iPhone 6.5-Inch Display-1.png` (iPhone 11 Pro Max, etc.)
-- `iPhone 5.5-Inch Display-1.png` (iPhone 8 Plus, etc.)
-- `iPad Pro 12.9-Inch Display-1.png`
+- `iPhone 6.9" Display-1_expense-log.png`
+- `iPad 13" Display-1_expense-log.png`
 
 Run `bundle exec fastlane upload_screenshots` to upload.
+
+The iOS lanes synchronize screenshots by locale, filename, and checksum. This
+makes reruns safe: screenshots missing locally are removed from App Store
+Connect, unchanged screenshots are not uploaded again, and each device set is
+reordered from the numeric filename prefix. The beta Fastlane synchronization
+path is wrapped with the same five-minute processing limit as the legacy
+uploader.
 
 ### Environment Variables
 

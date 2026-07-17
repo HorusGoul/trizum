@@ -1,5 +1,5 @@
 import type { Browser, Page } from "playwright";
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   getStoreFontFaces,
@@ -9,6 +9,29 @@ import {
 } from "./store-design.ts";
 
 export const PLAY_FEATURE_GRAPHIC = { height: 500, width: 1024 } as const;
+
+const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+export function validateFeatureGraphicPng(png: Buffer): void {
+  if (png.length < 26 || !png.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)) {
+    throw new Error("Feature graphic is not a valid PNG");
+  }
+
+  const width = png.readUInt32BE(16);
+  const height = png.readUInt32BE(20);
+  const bitDepth = png[24];
+  const colorType = png[25];
+
+  if (width !== PLAY_FEATURE_GRAPHIC.width || height !== PLAY_FEATURE_GRAPHIC.height) {
+    throw new Error(
+      `Feature graphic must be ${PLAY_FEATURE_GRAPHIC.width}x${PLAY_FEATURE_GRAPHIC.height}; received ${width}x${height}`,
+    );
+  }
+
+  if (bitDepth !== 8 || colorType !== 2) {
+    throw new Error("Feature graphic must be an 8-bit RGB PNG without alpha");
+  }
+}
 
 export const FEATURE_GRAPHIC_COPY = {
   en: {
@@ -169,7 +192,9 @@ async function composeFeatureGraphic(
       ),
     );
   });
-  await page.screenshot({ animations: "disabled", path: outputPath, scale: "css" });
+  const png = await page.screenshot({ animations: "disabled", scale: "css" });
+  validateFeatureGraphicPng(png);
+  await writeFile(outputPath, png);
 }
 
 export async function generateFeatureGraphics(

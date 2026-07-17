@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vite-plus/test";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { getMigrationData } from "./data/migration-data.ts";
-import { FEATURE_GRAPHIC_COPY, PLAY_FEATURE_GRAPHIC } from "./feature-graphic.ts";
+import {
+  FEATURE_GRAPHIC_COPY,
+  PLAY_FEATURE_GRAPHIC,
+  validateFeatureGraphicPng,
+} from "./feature-graphic.ts";
 import { STORE_DEVICE_OUTPUTS, STORE_SCENES, STORE_SCREENSHOT_ORDER } from "./store-design.ts";
 
 describe("store screenshot design", () => {
@@ -74,16 +76,17 @@ describe("store screenshot design", () => {
     ]);
   });
 
-  it("commits upload-ready feature graphics without an alpha channel", async () => {
-    for (const locale of ["en", "es"] as const) {
-      const png = await readFile(
-        path.resolve(import.meta.dirname, "../feature-graphics", locale, "featureGraphic.png"),
-      );
+  it("validates upload-ready feature graphics without reading generated files", () => {
+    const png = Buffer.alloc(26);
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(png);
+    png.writeUInt32BE(PLAY_FEATURE_GRAPHIC.width, 16);
+    png.writeUInt32BE(PLAY_FEATURE_GRAPHIC.height, 20);
+    png[24] = 8;
+    png[25] = 2;
 
-      expect(png.readUInt32BE(16)).toBe(PLAY_FEATURE_GRAPHIC.width);
-      expect(png.readUInt32BE(20)).toBe(PLAY_FEATURE_GRAPHIC.height);
-      expect(png[24]).toBe(8);
-      expect(png[25]).toBe(2);
-    }
+    expect(() => validateFeatureGraphicPng(png)).not.toThrow();
+
+    png[25] = 6;
+    expect(() => validateFeatureGraphicPng(png)).toThrow(/without alpha/);
   });
 });
