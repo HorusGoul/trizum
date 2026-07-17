@@ -297,6 +297,11 @@ Add screenshots to `ios/App/fastlane/screenshots/en-US/` with naming convention:
 
 Run `bundle exec fastlane upload_screenshots` to upload.
 
+The iOS lanes synchronize screenshots by locale, filename, and checksum. This
+makes reruns safe: screenshots missing locally are removed from App Store
+Connect, unchanged screenshots are not uploaded again, and each device set is
+reordered from the numeric filename prefix.
+
 ### Environment Variables
 
 #### Android
