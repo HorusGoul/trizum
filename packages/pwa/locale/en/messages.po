@@ -550,7 +550,7 @@ msgstr "Canadian Dollar"
 
 #: src/components/CloudSyncDialogs.tsx:470
 #: src/components/CloudSyncDialogs.tsx:638
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:226
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:227
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
 msgid "Cancel"
@@ -994,8 +994,8 @@ msgstr "Delete account"
 msgid "Delete account?"
 msgstr "Delete account?"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:185
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:215
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:186
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:216
 msgid "Delete expense"
 msgstr "Delete expense"
 
@@ -1003,7 +1003,7 @@ msgstr "Delete expense"
 msgid "Delete expense template?"
 msgstr "Delete expense template?"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:195
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:196
 msgid "Delete expense?"
 msgstr "Delete expense?"
 
@@ -1199,7 +1199,7 @@ msgstr "Expense checks"
 msgid "Expense defaults"
 msgstr "Expense defaults"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:270
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:271
 msgid "Expense deleted"
 msgstr "Expense deleted"
 
@@ -1275,7 +1275,7 @@ msgstr "Failed to copy party link to clipboard, please copy it manually"
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Failed to copy phone number to clipboard, please copy it manually"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:260
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:261
 msgid "Failed to delete expense. Please try again."
 msgstr "Failed to delete expense. Please try again."
 
@@ -1752,7 +1752,7 @@ msgstr "Malaysian Ringgit"
 msgid "Maldivian Rufiyaa"
 msgstr "Maldivian Rufiyaa"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:242
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:243
 msgid "Malformed Party ID"
 msgstr "Malformed Party ID"
 
@@ -3094,7 +3094,7 @@ msgstr "This device is already using trizum cloud"
 msgid "This device is synced"
 msgstr "This device is synced"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:198
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:199
 msgid "This expense will be permanently deleted. This action cannot be undone."
 msgstr "This expense will be permanently deleted. This action cannot be undone."
 

@@ -162,6 +162,7 @@ function ExpenseDeleteConfirmationDialog({
   return (
     <ModalOverlay
       isDismissable={!isPending}
+      isKeyboardDismissDisabled={isPending}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       className={({ isEntering, isExiting }) =>
