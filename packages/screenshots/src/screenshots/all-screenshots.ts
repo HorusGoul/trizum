@@ -1,4 +1,23 @@
 import { screenshot } from "#src/screenshot.ts";
+import type { Page } from "playwright";
+
+async function waitForSelectedTabPanel(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const selectedTab = document.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+    const panelId = selectedTab?.getAttribute("aria-controls");
+    const selectedPanel = panelId ? document.getElementById(panelId) : null;
+    const scroller = selectedPanel?.parentElement;
+
+    if (!selectedPanel || !scroller) {
+      return false;
+    }
+
+    return (
+      scroller.style.scrollSnapType !== "none" &&
+      Math.abs(scroller.scrollLeft - selectedPanel.offsetLeft) < 1
+    );
+  });
+}
 
 screenshot("balances", async ({ page, takeScreenshot, setupParty }) => {
   await setupParty();
@@ -8,8 +27,8 @@ screenshot("balances", async ({ page, takeScreenshot, setupParty }) => {
       hasText: /balances|balance/i,
     })
     .click();
-
-  await page.waitForTimeout(1000);
+  await page.getByText(/how should i balance|cómo debería equilibrar/i).waitFor();
+  await waitForSelectedTabPanel(page);
 
   await takeScreenshot();
 });
@@ -25,13 +44,13 @@ screenshot("expense-details", async ({ page, takeScreenshot, setupParty }) => {
 
   await page
     .getByRole("link", {
-      name: "Breakfast churros",
+      name: /breakfast churros|churros para desayunar/i,
     })
     .click();
 
   await page
     .getByRole("heading", {
-      name: "Breakfast churros",
+      name: /breakfast churros|churros para desayunar/i,
     })
     .waitFor({
       state: "visible",
@@ -45,29 +64,35 @@ screenshot("expense-editor", async ({ page, takeScreenshot, setupParty }) => {
 
   await page
     .getByRole("link", {
-      name: "Breakfast churros",
+      name: /breakfast churros|churros para desayunar/i,
     })
     .click();
+  await page.locator("h1").waitFor();
 
-  await page
-    .getByRole("heading", {
-      name: "Breakfast churros",
-    })
-    .waitFor({
-      state: "visible",
-    });
+  const expenseUrl = new URL(page.url());
+  await page.goto(`${expenseUrl.pathname}/edit`);
+  await page.locator('input[name="name"]').waitFor();
 
-  const url = page.url();
+  await takeScreenshot();
+});
 
-  await page.goto(`${url}/edit`);
+screenshot("stats", async ({ page, takeScreenshot, setupParty }) => {
+  await setupParty();
 
-  await page
-    .getByRole("heading", {
-      name: /editing|editando/i,
-    })
-    .waitFor({
-      state: "visible",
-    });
+  await page.getByRole("button", { name: /menu|menú/i }).click();
+  await page.getByRole("menuitem", { name: /stats|estadísticas/i }).click();
+  await page.getByRole("heading", { name: /party stats|estadísticas del grupo/i }).waitFor();
+  await page.getByText(/total spent|total gastado/i).waitFor();
+
+  await takeScreenshot();
+});
+
+screenshot("group-members", async ({ page, takeScreenshot, setupParty }) => {
+  await setupParty();
+
+  const partyUrl = new URL(page.url());
+  await page.goto(`${partyUrl.pathname}/who`);
+  await page.getByRole("radio", { name: "Modest" }).waitFor();
 
   await takeScreenshot();
 });

@@ -2,4 +2,7 @@ node_modules/
 /test-results/
 /playwright-report/
 /playwright/.cache/
+/.captures/
+/feature-graphics/
+/previews/
 /screenshots/

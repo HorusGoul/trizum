@@ -21,6 +21,13 @@ import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
 import { createKeyedCoalescedQueue } from "#src/lib/coalescedQueue.ts";
+import {
+  copyExpenseTemplate,
+  ExpenseTemplateLimitError,
+  getFirstExpenseTemplateId,
+  MAX_EXPENSE_TEMPLATES,
+  type ExpenseTemplate,
+} from "#src/models/expenseTemplate.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -128,7 +135,14 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function setParticipantDetails(
     participantId: PartyParticipant["id"],
     details: Partial<
-      Pick<PartyParticipant, "phone" | "personalMode" | "avatarId" | "balancesSortedBy">
+      Pick<
+        PartyParticipant,
+        | "phone"
+        | "personalMode"
+        | "avatarId"
+        | "balancesSortedBy"
+        | "alwaysUseDefaultExpenseTemplate"
+      >
     >,
   ) {
     handle.change((doc) => {
@@ -148,6 +162,105 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
           participant[key] = value;
         }
       }
+    });
+  }
+
+  function saveExpenseTemplate(template: ExpenseTemplate) {
+    handle.change((doc) => {
+      if (!doc.expenseTemplates) {
+        doc.expenseTemplates = {};
+      }
+
+      const isNewTemplate = !doc.expenseTemplates[template.id];
+
+      if (isNewTemplate && Object.keys(doc.expenseTemplates).length >= MAX_EXPENSE_TEMPLATES) {
+        throw new ExpenseTemplateLimitError();
+      }
+
+      doc.expenseTemplates[template.id] = copyExpenseTemplate(template);
+
+      if (doc.onlyUseCustomExpenseTemplates && !doc.defaultExpenseTemplateId) {
+        doc.defaultExpenseTemplateId = template.id;
+      }
+    });
+  }
+
+  function deleteExpenseTemplate(templateId: ExpenseTemplate["id"]) {
+    handle.change((doc) => {
+      if (!doc.expenseTemplates?.[templateId]) {
+        return;
+      }
+
+      delete doc.expenseTemplates[templateId];
+      const firstRemainingTemplateId = getFirstExpenseTemplateId(doc.expenseTemplates);
+
+      if (!firstRemainingTemplateId) {
+        delete doc.defaultExpenseTemplateId;
+        delete doc.onlyUseCustomExpenseTemplates;
+        return;
+      }
+
+      if (doc.defaultExpenseTemplateId === templateId) {
+        if (doc.onlyUseCustomExpenseTemplates) {
+          doc.defaultExpenseTemplateId = firstRemainingTemplateId;
+        } else {
+          delete doc.defaultExpenseTemplateId;
+        }
+      }
+    });
+  }
+
+  function setOnlyUseCustomExpenseTemplates(
+    onlyUseCustomTemplates: boolean,
+    fallbackTemplateId?: ExpenseTemplate["id"],
+  ) {
+    handle.change((doc) => {
+      if (!onlyUseCustomTemplates) {
+        delete doc.onlyUseCustomExpenseTemplates;
+        return;
+      }
+
+      const hasFallbackTemplate = Boolean(
+        fallbackTemplateId && doc.expenseTemplates?.[fallbackTemplateId],
+      );
+      const nextDefaultTemplateId =
+        doc.defaultExpenseTemplateId && doc.expenseTemplates?.[doc.defaultExpenseTemplateId]
+          ? doc.defaultExpenseTemplateId
+          : hasFallbackTemplate
+            ? fallbackTemplateId
+            : getFirstExpenseTemplateId(doc.expenseTemplates);
+
+      if (!nextDefaultTemplateId) {
+        delete doc.onlyUseCustomExpenseTemplates;
+        delete doc.defaultExpenseTemplateId;
+        return;
+      }
+
+      doc.onlyUseCustomExpenseTemplates = true;
+      doc.defaultExpenseTemplateId = nextDefaultTemplateId;
+    });
+  }
+
+  function setDefaultExpenseTemplate(templateId?: ExpenseTemplate["id"]) {
+    handle.change((doc) => {
+      if (!templateId) {
+        const firstTemplateId = doc.onlyUseCustomExpenseTemplates
+          ? getFirstExpenseTemplateId(doc.expenseTemplates)
+          : undefined;
+
+        if (firstTemplateId) {
+          doc.defaultExpenseTemplateId = firstTemplateId;
+        } else {
+          delete doc.defaultExpenseTemplateId;
+        }
+        return;
+      }
+
+      if (!doc.expenseTemplates?.[templateId]) {
+        return;
+      }
+
+      doc.defaultExpenseTemplateId = templateId;
     });
   }
 
@@ -422,6 +535,10 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     updateDetails,
     updateParticipants,
     setParticipantDetails,
+    saveExpenseTemplate,
+    deleteExpenseTemplate,
+    setOnlyUseCustomExpenseTemplates,
+    setDefaultExpenseTemplate,
     addExpenseToParty,
     transferDebtToParty,
     updateExpense,

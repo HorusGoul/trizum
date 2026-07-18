@@ -13,7 +13,10 @@ export function PartySettingsLink({
   description: ReactNode;
   partyId: string;
   title: ReactNode;
-  to: "/party/$partyId/settings/details" | "/party/$partyId/settings/participants";
+  to:
+    | "/party/$partyId/settings/details"
+    | "/party/$partyId/settings/participants"
+    | "/party/$partyId/settings/expense-templates";
 }) {
   return (
     <Link

@@ -44,6 +44,9 @@ export default defineConfig({
         command: "./check-ruby-pipelines.sh ios",
         cache: false,
       },
+      test: {
+        command: "vp test .",
+      },
     },
   },
 });
