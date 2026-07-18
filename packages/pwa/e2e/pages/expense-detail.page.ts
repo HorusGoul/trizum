@@ -5,12 +5,16 @@ export class ExpenseDetailPage {
   readonly backButton: Locator;
   readonly menuButton: Locator;
   readonly editMenuItem: Locator;
+  readonly deleteMenuItem: Locator;
+  readonly deleteDialog: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.backButton = page.getByRole("button", { name: "Go Back" });
     this.menuButton = page.getByRole("button", { name: "Menu" });
     this.editMenuItem = page.getByRole("menuitem", { name: "Edit" });
+    this.deleteMenuItem = page.getByRole("menuitem", { name: "Delete" });
+    this.deleteDialog = page.getByRole("dialog", { name: "Delete expense" });
   }
 
   heading(title: string) {
@@ -30,5 +34,20 @@ export class ExpenseDetailPage {
   async openEdit() {
     await this.menuButton.click();
     await this.editMenuItem.click();
+  }
+
+  async openDeleteConfirmation() {
+    await this.menuButton.click();
+    await this.deleteMenuItem.click();
+    await expect(this.deleteDialog).toBeVisible();
+  }
+
+  async cancelDelete() {
+    await this.deleteDialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(this.deleteDialog).toBeHidden();
+  }
+
+  async confirmDelete() {
+    await this.deleteDialog.getByRole("button", { name: "Delete expense" }).click();
   }
 }

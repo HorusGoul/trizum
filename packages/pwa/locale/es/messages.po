@@ -476,6 +476,7 @@ msgstr "Dólar Canadiense"
 
 #: src/components/CloudSyncDialogs.tsx:470
 #: src/components/CloudSyncDialogs.tsx:638
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:221
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -863,7 +864,7 @@ msgstr "Deuda transferida"
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:108
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:113
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -876,6 +877,15 @@ msgstr "Eliminar cuenta"
 #: src/components/CloudSyncDialogs.tsx:598
 msgid "Delete account?"
 msgstr "¿Eliminar cuenta?"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:182
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:212
+msgid "Delete expense"
+msgstr "Eliminar gasto"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:192
+msgid "Delete expense?"
+msgstr "¿Eliminar gasto?"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:66
@@ -914,7 +924,7 @@ msgstr "Peso Dominicano"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:102
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:107
 msgid "Edit"
 msgstr "Editar"
 
@@ -1047,6 +1057,10 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 #: src/components/ExpenseEditorValidationStatus.tsx:202
 msgid "Expense checks"
 msgstr "Comprobaciones del gasto"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:259
+msgid "Expense deleted"
+msgstr "Gasto eliminado"
 
 #: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:192
 msgid "Expense updated"
@@ -1527,7 +1541,7 @@ msgstr "Ringgit Malasio"
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:143
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:237
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
@@ -1573,7 +1587,7 @@ msgid "Me"
 msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:361
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:87
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:92
 #: src/routes/party.$partyId/route.tsx:172
 msgid "Menu"
 msgstr "Menú"
@@ -2708,6 +2722,10 @@ msgstr "Este dispositivo ya usa trizum cloud"
 #: src/routes/settings.tsx:342
 msgid "This device is synced"
 msgstr "Este dispositivo está sincronizado"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:195
+msgid "This expense will be permanently deleted. This action cannot be undone."
+msgstr "Este gasto se eliminará permanentemente. Esta acción no se puede deshacer."
 
 #: src/hooks/useMediaFileActions.ts:30
 msgid "This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG."
