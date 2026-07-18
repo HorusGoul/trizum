@@ -59,8 +59,9 @@ screenshot("expense-editor", async ({ page, takeScreenshot, setupParty }) => {
 screenshot("stats", async ({ page, takeScreenshot, setupParty }) => {
   await setupParty();
 
-  const partyUrl = new URL(page.url());
-  await page.goto(`${partyUrl.pathname}/stats`);
+  await page.getByRole("button", { name: /menu|menú/i }).click();
+  await page.getByRole("menuitem", { name: /stats|estadísticas/i }).click();
+  await page.getByRole("heading", { name: /party stats|estadísticas del grupo/i }).waitFor();
   await page.getByText(/total spent|total gastado/i).waitFor();
 
   await takeScreenshot();
