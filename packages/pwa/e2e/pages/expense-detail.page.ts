@@ -40,6 +40,7 @@ export class ExpenseDetailPage {
     await this.menuButton.click();
     await this.deleteMenuItem.click();
     await expect(this.deleteDialog).toBeVisible();
+    await expect(this.deleteDialog.getByRole("button", { name: "Cancel" })).toBeFocused();
   }
 
   async cancelDelete() {

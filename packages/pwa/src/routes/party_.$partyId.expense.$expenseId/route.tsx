@@ -17,6 +17,7 @@ import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx
 import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { closeRouteState } from "#src/lib/navigationHistory.ts";
+import { getLogger } from "#src/lib/log.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { useActionProp } from "#src/ui/useActionProp.ts";
 import { cn } from "#src/ui/utils.ts";
@@ -31,6 +32,8 @@ import { Shares } from "./-components/Shares.js";
 interface ExpenseSearchParams {
   media?: number;
 }
+
+const logger = getLogger("routes", "ExpenseDetail");
 
 export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
   component: ExpenseById,
@@ -213,6 +216,8 @@ function ExpenseDeleteConfirmationDialog({
                 </span>
               </Button>
               <Button
+                // eslint-disable-next-line jsx-a11y/no-autofocus -- Focus the safe action when this destructive dialog opens
+                autoFocus
                 color="input-like"
                 isDisabled={isPending}
                 onPress={() => onOpenChange(false)}
@@ -248,7 +253,13 @@ function useExpense() {
   async function onDeleteExpense() {
     if (expenseId === undefined) return;
 
-    await removeExpense(expenseId);
+    try {
+      await removeExpense(expenseId);
+    } catch (error) {
+      logger.error("Failed to delete expense", { error });
+      toast.error(t`Failed to delete expense. Please try again.`);
+      return;
+    }
 
     closeRouteState(currentLocation, history, () => {
       void navigate({
