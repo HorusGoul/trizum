@@ -19,7 +19,7 @@ on:
 jobs:
   screenshots:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
 
     steps:
       - uses: actions/checkout@v7
@@ -38,8 +38,13 @@ jobs:
         working-directory: packages/screenshots
 
       - name: Take screenshots
-        timeout-minutes: 4
+        timeout-minutes: 8
         run: vp run start
+        working-directory: packages/screenshots
+
+      - name: Make store-order previews
+        timeout-minutes: 2
+        run: vp run preview
         working-directory: packages/screenshots
 
       - name: Upload screenshots
@@ -47,5 +52,17 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.artifact_name }}
-          path: packages/screenshots/screenshots
+          path: |
+            packages/screenshots/screenshots
+            packages/screenshots/feature-graphics
+          if-no-files-found: error
           retention-days: 7
+
+      - name: Upload store-order previews
+        timeout-minutes: 2
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact_name }}-previews
+          path: packages/screenshots/previews
+          if-no-files-found: error
+          retention-days: 14
