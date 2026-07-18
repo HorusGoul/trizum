@@ -139,6 +139,37 @@ test.describe("Expense log", () => {
     });
   });
 
+  test("requires confirmation before deleting an expense", async ({ harness, page }) => {
+    const partyPage = new PartyPage(page);
+    const expenseDetailPage = new ExpenseDetailPage(page);
+    const title = createExpenseLogTitle(0);
+    const seededAmountText = formatAmountText(expenseLogJourney.seededExpenseAmountCents / 100);
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: expenseLogJourney.memberParticipantId,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}?tab=expenses`);
+    await partyPage.openExpenseInLog(title);
+    await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+
+    await test.step("keep the expense when deletion is canceled", async () => {
+      await expenseDetailPage.openDeleteConfirmation();
+      await expenseDetailPage.cancelDelete();
+      await expenseDetailPage.expectLoaded(seededParty.partyId, title, seededAmountText);
+    });
+
+    await test.step("delete the expense only after confirmation", async () => {
+      await expenseDetailPage.openDeleteConfirmation();
+      await expenseDetailPage.confirmDelete();
+
+      await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+      await expect(partyPage.expenseRow(title)).toHaveCount(0);
+      await expect(page.getByText("Expense deleted")).toBeVisible();
+    });
+  });
+
   test("returns to expense detail when backing out of edit", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
     const expenseEditorPage = new ExpenseEditorPage(page);

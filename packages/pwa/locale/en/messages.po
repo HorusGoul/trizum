@@ -550,6 +550,7 @@ msgstr "Canadian Dollar"
 
 #: src/components/CloudSyncDialogs.tsx:470
 #: src/components/CloudSyncDialogs.tsx:638
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:227
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
 msgid "Cancel"
@@ -979,7 +980,7 @@ msgstr "Default"
 msgid "Default template"
 msgstr "Default template"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:108
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:116
 msgid "Delete"
 msgstr "Delete"
 
@@ -993,9 +994,18 @@ msgstr "Delete account"
 msgid "Delete account?"
 msgstr "Delete account?"
 
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:186
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:216
+msgid "Delete expense"
+msgstr "Delete expense"
+
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:26
 msgid "Delete expense template?"
 msgstr "Delete expense template?"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:196
+msgid "Delete expense?"
+msgstr "Delete expense?"
 
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:38
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:378
@@ -1039,7 +1049,7 @@ msgstr "Dominican Peso"
 msgid "East Caribbean Dollar"
 msgstr "East Caribbean Dollar"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:102
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:110
 msgid "Edit"
 msgstr "Edit"
 
@@ -1189,6 +1199,10 @@ msgstr "Expense checks"
 msgid "Expense defaults"
 msgstr "Expense defaults"
 
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:271
+msgid "Expense deleted"
+msgstr "Expense deleted"
+
 #: src/components/ExpenseEditor.tsx:257
 msgid "Expense Split Mode"
 msgstr "Expense Split Mode"
@@ -1260,6 +1274,10 @@ msgstr "Failed to copy party link to clipboard, please copy it manually"
 #: src/routes/party_.$partyId.pay/-components/BizumItem.tsx:25
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Failed to copy phone number to clipboard, please copy it manually"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:261
+msgid "Failed to delete expense. Please try again."
+msgstr "Failed to delete expense. Please try again."
 
 #: src/routes/about_.third-party-licenses.tsx:10
 msgid "Failed to load licenses"
@@ -1734,7 +1752,7 @@ msgstr "Malaysian Ringgit"
 msgid "Maldivian Rufiyaa"
 msgstr "Maldivian Rufiyaa"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:143
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:243
 msgid "Malformed Party ID"
 msgstr "Malformed Party ID"
 
@@ -1784,7 +1802,7 @@ msgid "Me"
 msgstr "Me"
 
 #: src/components/ExpenseEditor.tsx:364
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:87
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:95
 #: src/routes/party.$partyId/route.tsx:172
 msgid "Menu"
 msgstr "Menu"
@@ -3075,6 +3093,10 @@ msgstr "This device is already using trizum cloud"
 #: src/routes/settings.tsx:342
 msgid "This device is synced"
 msgstr "This device is synced"
+
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:199
+msgid "This expense will be permanently deleted. This action cannot be undone."
+msgstr "This expense will be permanently deleted. This action cannot be undone."
 
 #: src/hooks/useMediaFileActions.ts:30
 msgid "This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG."
