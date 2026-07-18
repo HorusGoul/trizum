@@ -2,7 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm, useStore } from "@tanstack/react-form";
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { Suspense, useId, useState } from "react";
+import { useId, useState } from "react";
 import { toast } from "sonner";
 import { CurrencyField } from "#src/components/CurrencyField.tsx";
 import { EmojiPicker } from "#src/components/EmojiPicker.tsx";
@@ -10,28 +10,17 @@ import { ExpenseParticipantsSection } from "#src/components/ExpenseEditor.tsx";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.ts";
 import { useParty } from "#src/hooks/useParty.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
-import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
   getExpenseTemplateEditorValues,
   type ExpenseTemplate,
   type ExpenseTemplateEditorValues,
 } from "#src/models/expenseTemplate.ts";
-import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
-import { IconButton } from "#src/ui/IconButton.tsx";
-import {
-  ModalSheet,
-  ModalSheetAction,
-  ModalSheetActions,
-  ModalSheetContent,
-  ModalSheetHeader,
-  ModalSheetSection,
-  ModalSheetTitle,
-} from "#src/ui/ModalSheet.tsx";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { AppTextField } from "#src/ui/fields/TextField.tsx";
-import { PartySettingsHeader } from "./-components/PartySettingsHeader.tsx";
+import { ArchivedParticipantsAlert } from "./-components/ArchivedParticipantsAlert.tsx";
+import { DeleteExpenseTemplateSheet } from "./-components/DeleteExpenseTemplateSheet.tsx";
+import { ExpenseTemplateEditorHeader } from "./-components/ExpenseTemplateEditorHeader.tsx";
 
 export const Route = createFileRoute("/party_/$partyId/settings/expense-templates_/$templateId")({
   component: ExpenseTemplateEditor,
@@ -41,8 +30,6 @@ interface PayerOption {
   id: string;
   label: string;
 }
-
-type ExpenseTemplateFormApi = AppFormApi<ExpenseTemplateEditorValues>;
 
 function ExpenseTemplateEditor() {
   const { partyId, templateId } = Route.useParams();
@@ -71,7 +58,7 @@ function ExpenseTemplateEditor() {
       .map((participant) => ({
         id: participant.id,
         label: participant.isArchived
-          ? translate`${participant.name} (archived)`
+          ? translate({ message: `${participant.name} (archived)` })
           : participant.name,
       })),
   ];
@@ -143,7 +130,9 @@ function ExpenseTemplateEditor() {
 
     for (const participant of activeParticipants) {
       if (include) {
-        nextShares[participant.id] ??= { type: "divide", value: 1 };
+        if (!nextShares[participant.id]) {
+          nextShares[participant.id] = { type: "divide", value: 1 };
+        }
       } else {
         delete nextShares[participant.id];
       }
@@ -327,99 +316,5 @@ function ExpenseTemplateEditor() {
         onOpenChange={setIsDeleteSheetOpen}
       />
     </div>
-  );
-}
-
-function ExpenseTemplateEditorHeader({
-  form,
-  formId,
-  isNew,
-  partyId,
-}: {
-  form: ExpenseTemplateFormApi;
-  formId: string;
-  isNew: boolean;
-  partyId: string;
-}) {
-  return (
-    <PartySettingsHeader
-      title={isNew ? <Trans>New template</Trans> : <Trans>Edit template</Trans>}
-      fallbackOptions={{
-        to: "/party/$partyId/settings/expense-templates",
-        params: { partyId },
-      }}
-      submitButton={
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}>
-          {([canSubmit, isSubmitting, isDirty]) =>
-            canSubmit && (isNew || isDirty) ? (
-              <Suspense fallback={null}>
-                <IconButton
-                  icon="lucide.check"
-                  aria-label={isSubmitting ? t`Submitting...` : t`Save`}
-                  type="submit"
-                  form={formId}
-                  isDisabled={isSubmitting}
-                />
-              </Suspense>
-            ) : null
-          }
-        </form.Subscribe>
-      }
-    />
-  );
-}
-
-function ArchivedParticipantsAlert({ isVisible }: { isVisible: boolean }) {
-  if (!isVisible) {
-    return null;
-  }
-
-  return (
-    <Alert variant="default" className="mt-4">
-      <Icon icon="lucide.archive" />
-      <AlertTitle>
-        <Trans>Archived participants are still configured</Trans>
-      </AlertTitle>
-      <AlertDescription>
-        <Trans>They will be omitted from new expenses unless they are restored to the party.</Trans>
-      </AlertDescription>
-    </Alert>
-  );
-}
-
-function DeleteExpenseTemplateSheet({
-  isOpen,
-  onConfirm,
-  onOpenChange,
-}: {
-  isOpen: boolean;
-  onConfirm: () => void;
-  onOpenChange: (isOpen: boolean) => void;
-}) {
-  return (
-    <ModalSheet isOpen={isOpen} onOpenChange={onOpenChange}>
-      <ModalSheetHeader>
-        <ModalSheetSection>
-          <ModalSheetTitle>
-            <Trans>Delete expense template?</Trans>
-          </ModalSheetTitle>
-        </ModalSheetSection>
-      </ModalSheetHeader>
-      <ModalSheetContent>
-        <ModalSheetSection className="text-accent-700 dark:text-accent-200 pb-3 text-sm">
-          <Trans>
-            This removes the template for everyone in the party. Existing expenses are not affected.
-          </Trans>
-        </ModalSheetSection>
-        <ModalSheetActions>
-          <ModalSheetAction icon="lucide.trash-2" tone="danger" onPress={onConfirm}>
-            <Trans>Delete template</Trans>
-          </ModalSheetAction>
-          <ModalSheetAction icon="lucide.x" onPress={() => onOpenChange(false)}>
-            <Trans>Cancel</Trans>
-          </ModalSheetAction>
-        </ModalSheetActions>
-      </ModalSheetContent>
-    </ModalSheet>
   );
 }
