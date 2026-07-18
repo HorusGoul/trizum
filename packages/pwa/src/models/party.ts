@@ -16,6 +16,7 @@ export interface Party {
   chunkRefs: PartyExpenseChunkRef[];
   expenseTemplates?: Record<ExpenseTemplate["id"], ExpenseTemplate>;
   defaultExpenseTemplateId?: ExpenseTemplate["id"];
+  onlyUseCustomExpenseTemplates?: boolean;
 }
 
 export const DEFAULT_PARTY_SYMBOL = "🏝️";

@@ -2,7 +2,11 @@ import { describe, expect, test } from "vite-plus/test";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { Party } from "./party.ts";
 import type { ExpenseTemplate } from "./expenseTemplate.ts";
-import { resolveExpenseTemplateValues } from "./expenseTemplate.ts";
+import {
+  getExpenseTemplateEditorValues,
+  resolveExpenseTemplateValues,
+  shouldOpenExpenseTemplatePicker,
+} from "./expenseTemplate.ts";
 
 function createParty(template?: ExpenseTemplate): Party {
   return {
@@ -98,5 +102,107 @@ describe("resolveExpenseTemplateValues", () => {
       paidBy: "blair",
       shares: { alex: { type: "exact", value: 500 } },
     });
+  });
+
+  test("does not include future participants when every current participant was selected explicitly", () => {
+    const template: ExpenseTemplate = {
+      id: "roommates",
+      name: "Roommates",
+      symbol: "🏠",
+      paidBy: { type: "current-participant" },
+      participantSelection: "specific",
+      shares: {
+        alex: { type: "divide", value: 1 },
+        blair: { type: "divide", value: 1 },
+      },
+    };
+    const party = createParty(template);
+    party.participants.devon = { id: "devon", name: "Devon" };
+
+    expect(
+      resolveExpenseTemplateValues({
+        currentParticipantId: "alex",
+        now: new Date("2026-07-18T12:00:00Z"),
+        party,
+        templateId: template.id,
+      }).shares,
+    ).toEqual({
+      alex: { type: "divide", value: 1 },
+      blair: { type: "divide", value: 1 },
+    });
+  });
+});
+
+describe("getExpenseTemplateEditorValues", () => {
+  test("shows every active participant selected for an all-participants template", () => {
+    const template: ExpenseTemplate = {
+      id: "dinner",
+      name: "Dinner",
+      symbol: "🍝",
+      paidBy: { type: "current-participant" },
+      participantSelection: "all",
+      shares: {
+        alex: { type: "divide", value: 2 },
+      },
+    };
+
+    const editorValues = getExpenseTemplateEditorValues(template, ["alex", "blair"]);
+
+    expect(editorValues.shares).toEqual({
+      alex: { type: "divide", value: 2 },
+      blair: { type: "divide", value: 1 },
+    });
+    expect(template.shares).toEqual({
+      alex: { type: "divide", value: 2 },
+    });
+  });
+});
+
+describe("shouldOpenExpenseTemplatePicker", () => {
+  test("skips the picker when blank expense is the only option", () => {
+    expect(
+      shouldOpenExpenseTemplatePicker({
+        alwaysUseDefaultTemplate: false,
+        customTemplateCount: 0,
+      }),
+    ).toBe(false);
+  });
+
+  test("opens the picker when custom templates provide a choice", () => {
+    expect(
+      shouldOpenExpenseTemplatePicker({
+        alwaysUseDefaultTemplate: false,
+        customTemplateCount: 1,
+      }),
+    ).toBe(true);
+  });
+
+  test("skips the picker when one custom template is the only available option", () => {
+    expect(
+      shouldOpenExpenseTemplatePicker({
+        alwaysUseDefaultTemplate: false,
+        customTemplateCount: 1,
+        onlyUseCustomTemplates: true,
+      }),
+    ).toBe(false);
+  });
+
+  test("opens the picker when custom-only mode still provides a choice", () => {
+    expect(
+      shouldOpenExpenseTemplatePicker({
+        alwaysUseDefaultTemplate: false,
+        customTemplateCount: 2,
+        onlyUseCustomTemplates: true,
+      }),
+    ).toBe(true);
+  });
+
+  test("skips the picker when the personal default preference is enabled", () => {
+    expect(
+      shouldOpenExpenseTemplatePicker({
+        alwaysUseDefaultTemplate: true,
+        customTemplateCount: 1,
+      }),
+    ).toBe(false);
   });
 });

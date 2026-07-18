@@ -6,6 +6,10 @@ import { useState } from "react";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { usePartyPaginatedExpenses } from "#src/hooks/usePartyPaginatedExpenses.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
+import {
+  BLANK_EXPENSE_TEMPLATE_SYMBOL,
+  shouldOpenExpenseTemplatePicker,
+} from "#src/models/expenseTemplate.ts";
 import { Icon } from "#src/ui/Icon.js";
 import { IconButton } from "#src/ui/IconButton.js";
 import { Menu, MenuItem } from "#src/ui/Menu.js";
@@ -29,6 +33,9 @@ export function ExpenseLog() {
   const templates = Object.values(party.expenseTemplates ?? {}).sort((left, right) =>
     left.name.localeCompare(right.name),
   );
+  const onlyUseCustomTemplates = Boolean(
+    party.onlyUseCustomExpenseTemplates && templates.length > 0,
+  );
 
   function openExpenseEditor(templateId?: string) {
     setIsAddExpenseSheetOpen(false);
@@ -40,16 +47,25 @@ export function ExpenseLog() {
   }
 
   function onAddExpensePress() {
-    if (participant.alwaysUseDefaultExpenseTemplate) {
-      const defaultTemplateId = party.defaultExpenseTemplateId;
-      const hasDefaultTemplate = Boolean(
-        defaultTemplateId && party.expenseTemplates?.[defaultTemplateId],
-      );
-      openExpenseEditor(hasDefaultTemplate ? defaultTemplateId : undefined);
+    if (
+      shouldOpenExpenseTemplatePicker({
+        alwaysUseDefaultTemplate: participant.alwaysUseDefaultExpenseTemplate ?? false,
+        customTemplateCount: templates.length,
+        onlyUseCustomTemplates,
+      })
+    ) {
+      setIsAddExpenseSheetOpen(true);
       return;
     }
 
-    setIsAddExpenseSheetOpen(true);
+    const shouldUseDefaultTemplate =
+      participant.alwaysUseDefaultExpenseTemplate || onlyUseCustomTemplates;
+    const defaultTemplateId = shouldUseDefaultTemplate ? party.defaultExpenseTemplateId : undefined;
+    const hasDefaultTemplate = Boolean(
+      defaultTemplateId && party.expenseTemplates?.[defaultTemplateId],
+    );
+    const fallbackTemplateId = onlyUseCustomTemplates ? templates[0]?.id : undefined;
+    openExpenseEditor(hasDefaultTemplate ? defaultTemplateId : fallbackTemplateId);
   }
 
   function toggleAlwaysUseDefaultTemplate() {
@@ -173,13 +189,14 @@ export function ExpenseLog() {
 
         <ModalSheetContent>
           <ModalSheetActions className="pb-2">
-            <ExpenseTemplateSheetAction
-              symbol="➕"
-              name={t`Blank expense`}
-              description={t`Start with empty expense values`}
-              isDefault={!party.defaultExpenseTemplateId}
-              onPress={() => openExpenseEditor()}
-            />
+            {onlyUseCustomTemplates ? null : (
+              <ExpenseTemplateSheetAction
+                symbol={BLANK_EXPENSE_TEMPLATE_SYMBOL}
+                name={t`Blank`}
+                description={t`Start with empty expense values`}
+                onPress={() => openExpenseEditor()}
+              />
+            )}
 
             {templates.map((template) => (
               <ExpenseTemplateSheetAction
@@ -187,7 +204,6 @@ export function ExpenseLog() {
                 symbol={template.symbol}
                 name={template.name}
                 description={template.expenseName || t`Expense template`}
-                isDefault={party.defaultExpenseTemplateId === template.id}
                 onPress={() => openExpenseEditor(template.id)}
               />
             ))}
@@ -200,13 +216,11 @@ export function ExpenseLog() {
 
 function ExpenseTemplateSheetAction({
   description,
-  isDefault,
   name,
   onPress,
   symbol,
 }: {
   description: string;
-  isDefault: boolean;
   name: string;
   onPress: () => void;
   symbol: string;
@@ -216,7 +230,7 @@ function ExpenseTemplateSheetAction({
       onPress={onPress}
       className={({ isFocusVisible, isHovered, isPressed }) =>
         cn(
-          "grid min-h-16 w-full grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-x-3 rounded-[1.35rem] px-safe-or-4 py-3 text-left outline-hidden transition-all sm:px-safe-or-5",
+          "grid min-h-16 w-full grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-x-3 rounded-[1.35rem] px-safe-or-4 py-3 text-left outline-hidden transition-all sm:px-safe-or-5",
           (isHovered || isFocusVisible) && "bg-accent-100 dark:bg-accent-900",
           isFocusVisible && "ring-accent-300 dark:ring-accent-700 ring-2",
           isPressed && "bg-accent-200 dark:bg-accent-800 scale-[0.98]",
@@ -233,11 +247,6 @@ function ExpenseTemplateSheetAction({
         <span className="text-accent-950 dark:text-accent-50 truncate font-medium">{name}</span>
         <span className="text-accent-700 dark:text-accent-200 truncate text-sm">{description}</span>
       </span>
-      {isDefault ? (
-        <span className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-100 rounded-full px-2 py-1 text-xs font-medium">
-          <Trans>Default</Trans>
-        </span>
-      ) : null}
     </AriaButton>
   );
 }

@@ -113,6 +113,17 @@ describe("getPartyHelpers", () => {
     });
   });
 
+  test("stores the default-template shortcut as a per-participant preference", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+
+    helpers.setParticipantDetails("alice", {
+      alwaysUseDefaultExpenseTemplate: true,
+    });
+
+    expect(partyHandle.doc().participants.alice?.alwaysUseDefaultExpenseTemplate).toBe(true);
+    expect(partyHandle.doc().participants.bob?.alwaysUseDefaultExpenseTemplate).toBeUndefined();
+  });
+
   test("clears the default when deleting its expense template", () => {
     const { helpers, partyHandle } = createPartyHelpers();
     const template = createExpenseTemplate("groceries");
@@ -122,6 +133,55 @@ describe("getPartyHelpers", () => {
     helpers.deleteExpenseTemplate(template.id);
 
     expect(partyHandle.doc().expenseTemplates).toEqual({});
+    expect(partyHandle.doc().defaultExpenseTemplateId).toBeUndefined();
+  });
+
+  test("selects a custom default when blank templates are disabled", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const groceries = createExpenseTemplate("groceries");
+    const dinner = createExpenseTemplate("dinner");
+
+    helpers.saveExpenseTemplate(groceries);
+    helpers.saveExpenseTemplate(dinner);
+    helpers.setOnlyUseCustomExpenseTemplates(true, groceries.id);
+
+    expect(partyHandle.doc().onlyUseCustomExpenseTemplates).toBe(true);
+    expect(partyHandle.doc().defaultExpenseTemplateId).toBe(groceries.id);
+  });
+
+  test("selects the first remaining default when deleting the custom-only default", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const groceries = createExpenseTemplate("groceries");
+    const dinner = createExpenseTemplate("dinner");
+
+    helpers.saveExpenseTemplate(groceries);
+    helpers.saveExpenseTemplate(dinner);
+    helpers.setDefaultExpenseTemplate(groceries.id);
+    helpers.setOnlyUseCustomExpenseTemplates(true, dinner.id);
+    helpers.deleteExpenseTemplate(groceries.id);
+
+    expect(partyHandle.doc().onlyUseCustomExpenseTemplates).toBe(true);
+    expect(partyHandle.doc().defaultExpenseTemplateId).toBe(dinner.id);
+  });
+
+  test("restores blank expenses after deleting the final custom template", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const groceries = createExpenseTemplate("groceries");
+
+    helpers.saveExpenseTemplate(groceries);
+    helpers.setOnlyUseCustomExpenseTemplates(true, groceries.id);
+    helpers.deleteExpenseTemplate(groceries.id);
+
+    expect(partyHandle.doc().onlyUseCustomExpenseTemplates).toBeUndefined();
+    expect(partyHandle.doc().defaultExpenseTemplateId).toBeUndefined();
+  });
+
+  test("keeps blank expenses enabled when no custom template is available", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+
+    helpers.setOnlyUseCustomExpenseTemplates(true);
+
+    expect(partyHandle.doc().onlyUseCustomExpenseTemplates).toBeUndefined();
     expect(partyHandle.doc().defaultExpenseTemplateId).toBeUndefined();
   });
 

@@ -87,14 +87,15 @@ function AddExpense() {
 
   // Track photos for gallery - updates when form changes
   const [photos, setPhotos] = useState<string[]>([]);
-  const [defaultValues] = useState(() =>
-    resolveExpenseTemplateValues({
+  const [initialExpense] = useState(() => ({
+    defaultValues: resolveExpenseTemplateValues({
       currentParticipantId: participant.id,
       now: new Date(),
       party,
       templateId: search.template,
     }),
-  );
+    isPrefilled: Boolean(search.template && party.expenseTemplates?.[search.template]),
+  }));
 
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
@@ -149,10 +150,11 @@ function AddExpense() {
     <>
       <ExpenseEditor
         mode="create"
+        isPrefilled={initialExpense.isPrefilled}
         title={t`New expense`}
         onSubmit={onCreateExpense}
         onChange={(_prev, current) => setPhotos(current.photos)}
-        defaultValues={defaultValues}
+        defaultValues={initialExpense.defaultValues}
         goBackFallbackOptions={{ to: "/party/$partyId" }}
         activeCalculatorId={activeCalculatorId}
         onCloseCalculator={closeCalculator}

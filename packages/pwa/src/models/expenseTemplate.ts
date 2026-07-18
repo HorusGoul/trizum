@@ -3,6 +3,7 @@ import type { Expense } from "#src/models/expense.ts";
 import type { Party } from "#src/models/party.ts";
 
 export const MAX_EXPENSE_TEMPLATES = 4;
+export const BLANK_EXPENSE_TEMPLATE_SYMBOL = "📄";
 export const DEFAULT_EXPENSE_TEMPLATE_SYMBOL = "🧾";
 
 export type ExpenseTemplatePayer =
@@ -40,9 +41,39 @@ export interface ResolvedExpenseTemplateValues {
   photos: [];
 }
 
+export function shouldOpenExpenseTemplatePicker({
+  alwaysUseDefaultTemplate,
+  customTemplateCount,
+  onlyUseCustomTemplates = false,
+}: {
+  alwaysUseDefaultTemplate: boolean;
+  customTemplateCount: number;
+  onlyUseCustomTemplates?: boolean;
+}) {
+  const availableTemplateCount = customTemplateCount + (onlyUseCustomTemplates ? 0 : 1);
+  return !alwaysUseDefaultTemplate && availableTemplateCount > 1;
+}
+
+export function getFirstExpenseTemplateId(
+  templates: Record<ExpenseTemplate["id"], ExpenseTemplate> | undefined,
+) {
+  return Object.values(templates ?? {}).sort(
+    (left, right) => left.name.localeCompare(right.name) || left.id.localeCompare(right.id),
+  )[0]?.id;
+}
+
 export function getExpenseTemplateEditorValues(
   template?: ExpenseTemplate,
+  activeParticipantIds: ExpenseUser[] = [],
 ): ExpenseTemplateEditorValues {
+  const shares = { ...(template?.shares ?? {}) };
+
+  if (template?.participantSelection === "all") {
+    for (const participantId of activeParticipantIds) {
+      shares[participantId] ??= { type: "divide", value: 1 };
+    }
+  }
+
   return {
     name: template?.name ?? "",
     symbol: template?.symbol ?? DEFAULT_EXPENSE_TEMPLATE_SYMBOL,
@@ -53,7 +84,7 @@ export function getExpenseTemplateEditorValues(
         ? template.paidBy.participantId
         : "current-participant",
     participantSelection: template?.participantSelection ?? "specific",
-    shares: template?.shares ?? {},
+    shares,
   };
 }
 

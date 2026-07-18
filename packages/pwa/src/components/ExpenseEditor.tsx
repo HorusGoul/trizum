@@ -47,6 +47,7 @@ import {
   getExpenseEditorUnitShares,
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
+import { cn } from "#src/ui/utils.ts";
 
 export interface ExpenseEditorFormValues {
   name: string;
@@ -65,6 +66,7 @@ const logger = getLogger("components", "ExpenseEditor");
 
 interface ExpenseEditorProps {
   mode: ExpenseEditorMode;
+  isPrefilled?: boolean;
   title: string;
   onSubmit: (values: ExpenseEditorFormValues) => void | Promise<void>;
   onChange?: (
@@ -90,6 +92,7 @@ type FieldFocusHandlersFactory = (field: { name: string; handleBlur: () => void 
 
 export function ExpenseEditor({
   mode,
+  isPrefilled = false,
   title,
   onSubmit,
   defaultValues,
@@ -185,7 +188,7 @@ export function ExpenseEditor({
   const isDirty = useStore(form.store, (state) => state.isDirty);
   const validation = getExpenseEditorValidationResult(
     { amount, name, paidBy, shares },
-    { isDirty, mode },
+    { isDirty, isPrefilled, mode },
   );
 
   const isReceivingUpdatesRef = useRef(false);
@@ -546,6 +549,7 @@ export function ExpenseParticipantsSection({
   amount,
   autoOpenCalculator,
   calculatorAttachmentPhotoIds,
+  className,
   enableCalculator = true,
   onCloseCalculator,
   onIncludeAllChange,
@@ -558,9 +562,10 @@ export function ExpenseParticipantsSection({
   amount: number;
   autoOpenCalculator: boolean;
   calculatorAttachmentPhotoIds: MediaFile["id"][];
+  className?: string;
   enableCalculator?: boolean;
   onCloseCalculator?: () => void;
-  onIncludeAllChange: (include: boolean) => void;
+  onIncludeAllChange?: (include: boolean) => void;
   onOpenCalculator?: (calculatorId: string) => void;
   onSharesChange: ParticipantItemProps["onSharesChange"];
   participants: PartyParticipant[];
@@ -569,16 +574,18 @@ export function ExpenseParticipantsSection({
   const shareCount = Object.keys(shares).length;
 
   return (
-    <div className="mt-4 flex flex-col gap-2">
-      <div className="flex items-center justify-between border-l border-transparent pl-3">
-        <Checkbox
-          isSelected={shareCount === participants.length}
-          isIndeterminate={shareCount > 0 && shareCount < participants.length}
-          onChange={onIncludeAllChange}
-        >
-          {t`Include all`}
-        </Checkbox>
-      </div>
+    <div className={cn("mt-4 flex flex-col gap-2", className)}>
+      {onIncludeAllChange ? (
+        <div className="flex items-center justify-between border-l border-transparent pl-3">
+          <Checkbox
+            isSelected={shareCount === participants.length}
+            isIndeterminate={shareCount > 0 && shareCount < participants.length}
+            onChange={onIncludeAllChange}
+          >
+            {t`Include all`}
+          </Checkbox>
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         {participants.map((participant) => (

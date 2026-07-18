@@ -17,10 +17,12 @@ import {
 } from "#src/models/expenseTemplate.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
+import { Switch } from "#src/ui/Switch.tsx";
 import { AppTextField } from "#src/ui/fields/TextField.tsx";
 import { ArchivedParticipantsAlert } from "./-components/ArchivedParticipantsAlert.tsx";
 import { DeleteExpenseTemplateSheet } from "./-components/DeleteExpenseTemplateSheet.tsx";
 import { ExpenseTemplateEditorHeader } from "./-components/ExpenseTemplateEditorHeader.tsx";
+import { PartySettingsSection } from "./-components/PartySettingsSection.tsx";
 
 export const Route = createFileRoute("/party_/$partyId/settings/expense-templates_/$templateId")({
   component: ExpenseTemplateEditor,
@@ -30,6 +32,9 @@ interface PayerOption {
   id: string;
   label: string;
 }
+
+const ALWAYS_INCLUDE_EVERYONE_ID = "always-include-everyone";
+const ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID = `${ALWAYS_INCLUDE_EVERYONE_ID}-description`;
 
 function ExpenseTemplateEditor() {
   const { partyId, templateId } = Route.useParams();
@@ -63,21 +68,36 @@ function ExpenseTemplateEditor() {
       })),
   ];
 
+  function validateTemplateName(name: string) {
+    const normalizedName = name.trim();
+
+    if (!normalizedName) {
+      return t`Please give this template a name`;
+    }
+
+    if (normalizedName.length > 40) {
+      return t`Name is too long`;
+    }
+
+    const hasDuplicateName = Object.values(party.expenseTemplates ?? {}).some(
+      (existingTemplate) =>
+        existingTemplate.id !== template?.id &&
+        existingTemplate.name.trim().toLocaleLowerCase(i18n.locale) ===
+          normalizedName.toLocaleLowerCase(i18n.locale),
+    );
+
+    if (hasDuplicateName) {
+      return t`A template with this name already exists`;
+    }
+  }
+
   const form = useForm({
-    defaultValues: getExpenseTemplateEditorValues(template),
+    defaultValues: getExpenseTemplateEditorValues(
+      template,
+      activeParticipants.map((participant) => participant.id),
+    ),
     onSubmit: ({ value }) => {
       const normalizedName = value.name.trim();
-      const hasDuplicateName = Object.values(party.expenseTemplates ?? {}).some(
-        (existingTemplate) =>
-          existingTemplate.id !== template?.id &&
-          existingTemplate.name.trim().toLocaleLowerCase(i18n.locale) ===
-            normalizedName.toLocaleLowerCase(i18n.locale),
-      );
-
-      if (hasDuplicateName) {
-        toast.error(t`Template names must be unique`);
-        return;
-      }
 
       const savedTemplate: ExpenseTemplate = {
         id: template?.id ?? crypto.randomUUID(),
@@ -109,36 +129,27 @@ function ExpenseTemplateEditor() {
 
   function setShares(
     nextShares: ExpenseTemplateEditorValues["shares"],
-    nextSelection?: ExpenseTemplateEditorValues["participantSelection"],
+    nextSelection: ExpenseTemplateEditorValues["participantSelection"] = "specific",
   ) {
     form.setFieldValue("shares", nextShares);
-
-    if (nextSelection) {
-      form.setFieldValue("participantSelection", nextSelection);
-      return;
-    }
-
-    const includesEveryActiveParticipant = activeParticipants.every(
-      (participant) => nextShares[participant.id],
-    );
-
-    form.setFieldValue("participantSelection", includesEveryActiveParticipant ? "all" : "specific");
+    form.setFieldValue("participantSelection", nextSelection);
   }
 
   function includeAllParticipants(include: boolean) {
+    if (!include) {
+      form.setFieldValue("participantSelection", "specific");
+      return;
+    }
+
     const nextShares = { ...shares };
 
     for (const participant of activeParticipants) {
-      if (include) {
-        if (!nextShares[participant.id]) {
-          nextShares[participant.id] = { type: "divide", value: 1 };
-        }
-      } else {
-        delete nextShares[participant.id];
+      if (!nextShares[participant.id]) {
+        nextShares[participant.id] = { type: "divide", value: 1 };
       }
     }
 
-    setShares(nextShares, include ? "all" : "specific");
+    setShares(nextShares, "all");
   }
 
   function confirmDelete() {
@@ -164,26 +175,23 @@ function ExpenseTemplateEditor() {
         }}
         className="pb-safe-offset-6 container mt-4 flex flex-col gap-6 px-4"
       >
-        <section className="flex flex-col gap-4">
-          <div className="flex items-end gap-3">
+        <PartySettingsSection icon="lucide.layout-template" title={<Trans>Template</Trans>}>
+          <div className="flex items-start gap-3 py-2">
             <form.Field
               name="name"
               validators={{
-                onChange: ({ value }) => {
-                  const normalizedName = value.trim();
-                  if (!normalizedName) return t`Template name is required`;
-                  if (normalizedName.length > 40) return t`Template name is too long`;
-                },
+                onChange: ({ value }) => validateTemplateName(value),
               }}
             >
               {(field) => (
                 <AppTextField
-                  label={t`Template name`}
+                  label={t`Name`}
+                  name={field.name}
                   value={field.state.value}
                   onChange={field.handleChange}
                   onBlur={field.handleBlur}
+                  minLength={1}
                   maxLength={40}
-                  isRequired
                   isInvalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                   errorMessage={field.state.meta.errors.join(", ")}
                   className="min-w-0 flex-1"
@@ -193,8 +201,8 @@ function ExpenseTemplateEditor() {
 
             <form.Field name="symbol">
               {(field) => (
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium">
+                <div className="flex shrink-0 flex-col gap-2">
+                  <span aria-hidden="true" className="invisible text-sm leading-none font-medium">
                     <Trans>Icon</Trans>
                   </span>
                   <EmojiPicker
@@ -206,98 +214,102 @@ function ExpenseTemplateEditor() {
               )}
             </form.Field>
           </div>
-        </section>
+        </PartySettingsSection>
 
-        <section className="flex flex-col gap-4">
-          <div>
-            <h2 className="font-semibold">
-              <Trans>Expense defaults</Trans>
-            </h2>
-            <p className="text-accent-700 dark:text-accent-200 text-sm">
-              <Trans>These values prefill the new expense form and can still be edited.</Trans>
-            </p>
-          </div>
-
-          <form.Field
-            name="expenseName"
-            validators={{
-              onChange: ({ value }) => {
-                if (value.trim().length > 50) return t`Expense title is too long`;
-              },
-            }}
-          >
-            {(field) => (
-              <AppTextField
-                label={t`Expense title`}
-                description={t`Optional`}
-                value={field.state.value}
-                onChange={field.handleChange}
-                onBlur={field.handleBlur}
-                maxLength={50}
-                isInvalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
-                errorMessage={field.state.meta.errors.join(", ")}
-              />
-            )}
-          </form.Field>
-
-          <form.Field name="amount">
-            {(field) => (
-              <CurrencyField
-                label={t`Amount`}
-                description={t`Leave at zero for an empty amount`}
-                value={field.state.value}
-                minValue={0}
-                onChange={field.handleChange}
-                onBlur={field.handleBlur}
-              />
-            )}
-          </form.Field>
-
-          <form.Field name="paidBy">
-            {(field) => (
-              <AppSelect<PayerOption>
-                label={t`Paid by`}
-                items={payerOptions}
-                selectedKey={field.state.value}
-                onSelectionChange={(key) => field.handleChange(String(key))}
-              >
-                {(option) => (
-                  <SelectItem key={option.id} value={option} textValue={option.label}>
-                    {option.label}
-                  </SelectItem>
-                )}
-              </AppSelect>
-            )}
-          </form.Field>
-        </section>
-
-        <section>
-          <div>
-            <h2 className="font-semibold">
-              <Trans>Split defaults</Trans>
-            </h2>
-            <p className="text-accent-700 dark:text-accent-200 text-sm">
-              {participantSelection === "all" ? (
-                <Trans>All active participants, including people added in the future.</Trans>
-              ) : (
-                <Trans>Only the selected participants.</Trans>
+        <PartySettingsSection icon="lucide.receipt-text" title={<Trans>Expense defaults</Trans>}>
+          <div className="flex flex-col gap-4 py-2">
+            <form.Field
+              name="expenseName"
+              validators={{
+                onChange: ({ value }) => {
+                  if (value.trim().length > 50) return t`Title is too long`;
+                },
+              }}
+            >
+              {(field) => (
+                <AppTextField
+                  label={t`Title`}
+                  name={field.name}
+                  value={field.state.value}
+                  onChange={field.handleChange}
+                  onBlur={field.handleBlur}
+                  maxLength={50}
+                  isInvalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
+                  errorMessage={field.state.meta.errors.join(", ")}
+                />
               )}
-            </p>
+            </form.Field>
+
+            <form.Field name="amount">
+              {(field) => (
+                <CurrencyField
+                  label={t`Amount`}
+                  name={field.name}
+                  value={field.state.value}
+                  minValue={0}
+                  onChange={field.handleChange}
+                  onBlur={field.handleBlur}
+                />
+              )}
+            </form.Field>
+
+            <form.Field name="paidBy">
+              {(field) => (
+                <AppSelect<PayerOption>
+                  label={t`Paid by`}
+                  name={field.name}
+                  items={payerOptions}
+                  selectedKey={field.state.value}
+                  onSelectionChange={(key) => field.handleChange(String(key))}
+                >
+                  {(option) => (
+                    <SelectItem key={option.id} value={option} textValue={option.label}>
+                      {option.label}
+                    </SelectItem>
+                  )}
+                </AppSelect>
+              )}
+            </form.Field>
+
+            <div className="flex items-center justify-between gap-4 rounded-xl py-2">
+              <label
+                htmlFor={ALWAYS_INCLUDE_EVERYONE_ID}
+                aria-label={t`Always include everyone`}
+                className="flex min-w-0 cursor-pointer flex-col select-none"
+              >
+                <span className="text-sm font-medium">
+                  <Trans>Always include everyone</Trans>
+                </span>
+                <span
+                  id={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
+                  className="text-accent-500 text-sm"
+                >
+                  <Trans>Select everyone now and automatically include new participants.</Trans>
+                </span>
+              </label>
+              <Switch
+                id={ALWAYS_INCLUDE_EVERYONE_ID}
+                aria-label={t`Always include everyone`}
+                aria-describedby={ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID}
+                isSelected={participantSelection === "all"}
+                onChange={includeAllParticipants}
+              />
+            </div>
+
+            <ExpenseParticipantsSection
+              className="mt-0"
+              amount={amount}
+              autoOpenCalculator={false}
+              calculatorAttachmentPhotoIds={[]}
+              enableCalculator={false}
+              onSharesChange={setShares}
+              participants={activeParticipants}
+              shares={shares}
+            />
+
+            <ArchivedParticipantsAlert isVisible={archivedReferencedParticipants.length > 0} />
           </div>
-
-          <ExpenseParticipantsSection
-            amount={amount}
-            autoOpenCalculator={false}
-            calculatorAttachmentPhotoIds={[]}
-            enableCalculator={false}
-            onIncludeAllChange={includeAllParticipants}
-            onSharesChange={setShares}
-            participants={activeParticipants}
-            shares={shares}
-          />
-
-          <ArchivedParticipantsAlert isVisible={archivedReferencedParticipants.length > 0} />
-        </section>
+        </PartySettingsSection>
 
         {!isNew ? (
           <Button

@@ -53,8 +53,8 @@ function PartySettings() {
             to="/party/$partyId/settings/expense-templates"
             partyId={partyId}
             badge={
-              <span className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50 flex size-12 shrink-0 items-center justify-center rounded-full text-xl">
-                🧾
+              <span className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50 flex size-12 shrink-0 items-center justify-center rounded-full">
+                <Icon icon="lucide.layout-template" width={22} height={22} />
               </span>
             }
             title={<Trans>Expense templates</Trans>}
