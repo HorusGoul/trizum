@@ -1,4 +1,23 @@
 import { screenshot } from "#src/screenshot.ts";
+import type { Page } from "playwright";
+
+async function waitForSelectedTabPanel(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const selectedTab = document.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+    const panelId = selectedTab?.getAttribute("aria-controls");
+    const selectedPanel = panelId ? document.getElementById(panelId) : null;
+    const scroller = selectedPanel?.parentElement;
+
+    if (!selectedPanel || !scroller) {
+      return false;
+    }
+
+    return (
+      scroller.style.scrollSnapType !== "none" &&
+      Math.abs(scroller.scrollLeft - selectedPanel.offsetLeft) < 1
+    );
+  });
+}
 
 screenshot("balances", async ({ page, takeScreenshot, setupParty }) => {
   await setupParty();
@@ -9,6 +28,7 @@ screenshot("balances", async ({ page, takeScreenshot, setupParty }) => {
     })
     .click();
   await page.getByText(/how should i balance|cómo debería equilibrar/i).waitFor();
+  await waitForSelectedTabPanel(page);
 
   await takeScreenshot();
 });
