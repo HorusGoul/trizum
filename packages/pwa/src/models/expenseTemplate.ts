@@ -6,6 +6,13 @@ export const MAX_EXPENSE_TEMPLATES = 4;
 export const BLANK_EXPENSE_TEMPLATE_SYMBOL = "📄";
 export const DEFAULT_EXPENSE_TEMPLATE_SYMBOL = "🧾";
 
+export class ExpenseTemplateLimitError extends Error {
+  constructor() {
+    super("Expense template limit reached");
+    this.name = "ExpenseTemplateLimitError";
+  }
+}
+
 export type ExpenseTemplatePayer =
   | { type: "current-participant" }
   | { type: "participant"; participantId: ExpenseUser };

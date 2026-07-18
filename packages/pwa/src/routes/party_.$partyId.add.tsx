@@ -87,6 +87,7 @@ function AddExpense() {
 
   // Track photos for gallery - updates when form changes
   const [photos, setPhotos] = useState<string[]>([]);
+  // Custom-only affects the picker; direct add URLs intentionally fall back to Blank.
   const [initialExpense] = useState(() => ({
     defaultValues: resolveExpenseTemplateValues({
       currentParticipantId: participant.id,

@@ -11,7 +11,9 @@ import { useBackNavigation } from "#src/hooks/useBackNavigation.ts";
 import { useParty } from "#src/hooks/useParty.ts";
 import { convertToUnits } from "#src/lib/expenses.ts";
 import {
+  ExpenseTemplateLimitError,
   getExpenseTemplateEditorValues,
+  MAX_EXPENSE_TEMPLATES,
   type ExpenseTemplate,
   type ExpenseTemplateEditorValues,
 } from "#src/models/expenseTemplate.ts";
@@ -35,6 +37,10 @@ interface PayerOption {
 
 const ALWAYS_INCLUDE_EVERYONE_ID = "always-include-everyone";
 const ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID = `${ALWAYS_INCLUDE_EVERYONE_ID}-description`;
+
+function announceTemplateLimit() {
+  toast(t`You can create up to ${MAX_EXPENSE_TEMPLATES} custom templates.`);
+}
 
 function ExpenseTemplateEditor() {
   const { partyId, templateId } = Route.useParams();
@@ -97,6 +103,11 @@ function ExpenseTemplateEditor() {
       activeParticipants.map((participant) => participant.id),
     ),
     onSubmit: ({ value }) => {
+      if (isNew && Object.keys(party.expenseTemplates ?? {}).length >= MAX_EXPENSE_TEMPLATES) {
+        announceTemplateLimit();
+        return;
+      }
+
       const normalizedName = value.name.trim();
 
       const savedTemplate: ExpenseTemplate = {
@@ -113,7 +124,16 @@ function ExpenseTemplateEditor() {
         shares: value.shares,
       };
 
-      saveExpenseTemplate(savedTemplate);
+      try {
+        saveExpenseTemplate(savedTemplate);
+      } catch (error) {
+        if (error instanceof ExpenseTemplateLimitError) {
+          announceTemplateLimit();
+          return;
+        }
+
+        throw error;
+      }
       form.reset(value);
       toast.success(isNew ? t`Expense template created` : t`Expense template saved`);
       returnToTemplates();

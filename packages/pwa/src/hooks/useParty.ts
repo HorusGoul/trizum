@@ -22,6 +22,7 @@ import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
 import { createKeyedCoalescedQueue } from "#src/lib/coalescedQueue.ts";
 import {
+  ExpenseTemplateLimitError,
   getFirstExpenseTemplateId,
   MAX_EXPENSE_TEMPLATES,
   type ExpenseTemplate,
@@ -172,7 +173,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       const isNewTemplate = !doc.expenseTemplates[template.id];
 
       if (isNewTemplate && Object.keys(doc.expenseTemplates).length >= MAX_EXPENSE_TEMPLATES) {
-        throw new Error("Expense template limit reached");
+        throw new ExpenseTemplateLimitError();
       }
 
       doc.expenseTemplates[template.id] = template;

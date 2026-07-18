@@ -333,4 +333,37 @@ test.describe("Expense templates", () => {
     await harness.navigate(`/party/${seededParty.partyId}`);
     await expect(await openExpenseTemplatePicker(page, seededParty.partyId)).toBeVisible();
   });
+
+  test("announces the four-template limit from settings and direct editor routes", async ({
+    harness,
+    page,
+  }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    for (const name of ["Breakfast", "Coffee", "Dinner", "Groceries"]) {
+      await createExpenseTemplate(harness, page, seededParty.partyId, { name });
+    }
+
+    const limitMessage = "You can create up to 4 custom templates.";
+    await expect(page.getByRole("link", { name: "Add" })).toHaveCount(0);
+    const addButton = page.getByRole("button", { name: "Add" });
+    await expect(addButton).toBeEnabled();
+    await addButton.click();
+    await expect(page.getByText(limitMessage).last()).toBeVisible();
+    await expect(page.getByText(limitMessage)).toBeHidden({ timeout: 10_000 });
+
+    await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates/new`);
+    await expect(page.getByRole("heading", { name: "New template" })).toBeVisible();
+    await page.getByLabel("Name").fill("Fifth template");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText(limitMessage).last()).toBeVisible();
+    await expect(page).toHaveURL(
+      new RegExp(`/party/${seededParty.partyId}/settings/expense-templates/new(?:\\?.*)?$`),
+    );
+    await expect(page.getByLabel("Name")).toHaveValue("Fifth template");
+  });
 });

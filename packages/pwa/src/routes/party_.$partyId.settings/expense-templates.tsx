@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useParty } from "#src/hooks/useParty.ts";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import {
@@ -9,6 +10,7 @@ import {
   MAX_EXPENSE_TEMPLATES,
 } from "#src/models/expenseTemplate.ts";
 import { Icon } from "#src/ui/Icon.tsx";
+import { Button } from "#src/ui/Button.tsx";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Switch } from "#src/ui/Switch.tsx";
 import { cn } from "#src/ui/utils.ts";
@@ -31,6 +33,10 @@ const ALWAYS_USE_DEFAULT_TEMPLATE_ID = "always-use-default-expense-template";
 const ALWAYS_USE_DEFAULT_TEMPLATE_DESCRIPTION_ID = `${ALWAYS_USE_DEFAULT_TEMPLATE_ID}-description`;
 const ONLY_USE_CUSTOM_TEMPLATES_ID = "only-use-custom-expense-templates";
 const ONLY_USE_CUSTOM_TEMPLATES_DESCRIPTION_ID = `${ONLY_USE_CUSTOM_TEMPLATES_ID}-description`;
+
+function announceTemplateLimit() {
+  toast(t`You can create up to ${MAX_EXPENSE_TEMPLATES} custom templates.`);
+}
 
 function ExpenseTemplatesSettings() {
   const { partyId } = Route.useParams();
@@ -215,20 +221,25 @@ function ExpenseTemplatesSettings() {
                   </p>
                 </div>
 
-                <Link
-                  to="/party/$partyId/settings/expense-templates/$templateId"
-                  params={{ partyId, templateId: "new" }}
-                  aria-disabled={!canAddTemplate}
-                  className={cn(
-                    "bg-accent-500 text-accent-50 focus-visible:ring-accent-500 flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-all focus-visible:ring-2 focus-visible:ring-offset-2",
-                    canAddTemplate
-                      ? "hover:bg-accent-600 active:scale-95"
-                      : "pointer-events-none opacity-50",
-                  )}
-                >
-                  <Icon icon="lucide.plus" className="size-3.5" />
-                  <Trans>Add</Trans>
-                </Link>
+                {canAddTemplate ? (
+                  <Link
+                    to="/party/$partyId/settings/expense-templates/$templateId"
+                    params={{ partyId, templateId: "new" }}
+                    className="bg-accent-500 text-accent-50 focus-visible:ring-accent-500 hover:bg-accent-600 flex h-8 items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-all focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-95"
+                  >
+                    <Icon icon="lucide.plus" className="size-3.5" />
+                    <Trans>Add</Trans>
+                  </Link>
+                ) : (
+                  <Button
+                    color="accent"
+                    className="h-8 w-auto gap-1.5 px-3 text-sm font-medium"
+                    onPress={announceTemplateLimit}
+                  >
+                    <Icon icon="lucide.plus" className="size-3.5" />
+                    <Trans>Add</Trans>
+                  </Button>
+                )}
               </div>
 
               {templates.length === 0 ? (
