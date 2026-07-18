@@ -140,3 +140,74 @@ test.describe("Settings forms", () => {
     await expect(page.getByText("A name for the participant is required")).toBeVisible();
   });
 });
+
+test.describe("Expense templates", () => {
+  test("creates a default template and prefills a new expense", async ({ harness, page }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}`);
+    await page.getByRole("button", { name: "Add an expense" }).click();
+    await expect(page.getByRole("heading", { name: "Add an expense" })).toBeVisible();
+    await page.getByRole("button", { name: "Expense template options" }).click();
+    await page.getByRole("menuitem", { name: "Manage expense templates" }).click();
+
+    await expect(page.getByRole("heading", { name: "Expense templates" })).toBeVisible();
+    await page.getByRole("link", { name: "Add" }).click();
+    await page.getByLabel("Template name").fill("Weekly groceries");
+    await page.getByLabel("Expense title").fill("Groceries");
+    await page.getByLabel("Amount").fill("48.50");
+    await page.getByRole("checkbox", { name: "Include all" }).setChecked(true, { force: true });
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Expense template created")).toBeVisible();
+    await page.getByRole("button", { name: /Blank expense Default template/ }).click();
+    await page.getByRole("option", { name: /Weekly groceries/ }).click();
+    await expect(page.getByRole("link", { name: /Weekly groceries Default/ })).toBeVisible();
+
+    await page.getByRole("button", { name: "Go Back" }).click();
+    await page.getByRole("button", { name: "Add an expense" }).click();
+    await expect(
+      page.getByRole("button", { name: /Weekly groceries Groceries Default/ }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: /Weekly groceries Groceries Default/ }).click();
+
+    await expect(page.getByLabel("Title")).toHaveValue("Groceries");
+    await expect(page.getByRole("textbox", { name: "Amount", exact: true })).toHaveValue("48.5");
+    await expect(page.getByRole("checkbox", { name: "Alex" })).toBeChecked();
+    await expect(page.getByRole("checkbox", { name: "Blair" })).toBeChecked();
+    await expect(page.getByRole("checkbox", { name: "Casey" })).toBeChecked();
+  });
+
+  test("can skip the picker and restore it from settings", async ({ harness, page }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}`);
+    await page.getByRole("button", { name: "Add an expense" }).click();
+    await page.getByRole("button", { name: "Expense template options" }).click();
+    await page.getByRole("menuitem", { name: /Always use default template/ }).click();
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("heading", { name: "Add an expense" })).toBeHidden();
+    await page.getByRole("button", { name: "Add an expense" }).click();
+
+    await expect(page.getByRole("heading", { name: "New expense" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Add an expense" })).toBeHidden();
+
+    await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates`);
+    const preferenceSwitch = page.getByRole("switch", {
+      name: "Always use default template",
+    });
+    await expect(preferenceSwitch).toBeChecked();
+    await preferenceSwitch.setChecked(false, { force: true });
+
+    await harness.navigate(`/party/${seededParty.partyId}`);
+    await page.getByRole("button", { name: "Add an expense" }).click();
+    await expect(page.getByRole("heading", { name: "Add an expense" })).toBeVisible();
+  });
+});

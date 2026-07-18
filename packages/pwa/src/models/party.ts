@@ -3,6 +3,7 @@ import type { ExpenseUser } from "#src/lib/expenses.js";
 import type { BalancesByParticipant, Expense } from "./expense";
 import type { CurrencyCode } from "#src/lib/money.ts";
 import type { MediaFile } from "./media";
+import type { ExpenseTemplate } from "./expenseTemplate";
 
 export interface Party {
   id: DocumentId;
@@ -13,6 +14,8 @@ export interface Party {
   currency: CurrencyCode;
   participants: Record<ExpenseUser, PartyParticipant>;
   chunkRefs: PartyExpenseChunkRef[];
+  expenseTemplates?: Record<ExpenseTemplate["id"], ExpenseTemplate>;
+  defaultExpenseTemplateId?: ExpenseTemplate["id"];
 }
 
 export const DEFAULT_PARTY_SYMBOL = "🏝️";
@@ -27,6 +30,7 @@ export interface PartyParticipant {
   isArchived?: boolean;
   personalMode?: boolean;
   balancesSortedBy?: BalancesSortedBy;
+  alwaysUseDefaultExpenseTemplate?: boolean;
 }
 
 export interface PartyExpenseChunkRef {

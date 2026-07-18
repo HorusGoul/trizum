@@ -15,10 +15,12 @@ import { RouteMediaGallery } from "#src/components/RouteMediaGallery.tsx";
 import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
+import { resolveExpenseTemplateValues } from "#src/models/expenseTemplate.ts";
 
 interface AddExpenseSearchParams {
   calculator?: string;
   media?: number;
+  template?: string;
 }
 
 const logger = getLogger("routes", "AddExpense");
@@ -34,6 +36,10 @@ export const Route = createFileRoute("/party_/$partyId/add")({
           ? search.calculator
           : undefined,
       media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
+      template:
+        typeof search.template === "string" && search.template.length > 0
+          ? search.template
+          : undefined,
     };
   },
 
@@ -43,7 +49,7 @@ export const Route = createFileRoute("/party_/$partyId/add")({
 });
 
 function AddExpense() {
-  const { partyId, addExpenseToParty } = useCurrentParty();
+  const { party, partyId, addExpenseToParty } = useCurrentParty();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
@@ -81,7 +87,14 @@ function AddExpense() {
 
   // Track photos for gallery - updates when form changes
   const [photos, setPhotos] = useState<string[]>([]);
-  const [paidAt] = useState(() => new Date());
+  const [defaultValues] = useState(() =>
+    resolveExpenseTemplateValues({
+      currentParticipantId: participant.id,
+      now: new Date(),
+      party,
+      templateId: search.template,
+    }),
+  );
 
   async function onCreateExpense(values: ExpenseEditorFormValues) {
     try {
@@ -139,14 +152,7 @@ function AddExpense() {
         title={t`New expense`}
         onSubmit={onCreateExpense}
         onChange={(_prev, current) => setPhotos(current.photos)}
-        defaultValues={{
-          name: "",
-          amount: 0,
-          paidBy: participant.id,
-          shares: {},
-          paidAt,
-          photos: [],
-        }}
+        defaultValues={defaultValues}
         goBackFallbackOptions={{ to: "/party/$partyId" }}
         activeCalculatorId={activeCalculatorId}
         onCloseCalculator={closeCalculator}

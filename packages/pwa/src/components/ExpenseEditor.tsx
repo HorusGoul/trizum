@@ -541,11 +541,12 @@ function ExpenseDetailsFields({
   );
 }
 
-function ExpenseParticipantsSection({
+export function ExpenseParticipantsSection({
   activeCalculatorId,
   amount,
   autoOpenCalculator,
   calculatorAttachmentPhotoIds,
+  enableCalculator = true,
   onCloseCalculator,
   onIncludeAllChange,
   onOpenCalculator,
@@ -557,6 +558,7 @@ function ExpenseParticipantsSection({
   amount: number;
   autoOpenCalculator: boolean;
   calculatorAttachmentPhotoIds: MediaFile["id"][];
+  enableCalculator?: boolean;
   onCloseCalculator?: () => void;
   onIncludeAllChange: (include: boolean) => void;
   onOpenCalculator?: (calculatorId: string) => void;
@@ -588,6 +590,7 @@ function ExpenseParticipantsSection({
             activeCalculatorId={activeCalculatorId}
             autoOpenCalculator={autoOpenCalculator}
             calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
+            enableCalculator={enableCalculator}
             onCloseCalculator={onCloseCalculator}
             onOpenCalculator={onOpenCalculator}
             onSharesChange={onSharesChange}
@@ -605,6 +608,7 @@ interface ParticipantItemProps {
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
   calculatorAttachmentPhotoIds: MediaFile["id"][];
+  enableCalculator?: boolean;
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
   onSharesChange: (
@@ -619,6 +623,7 @@ function ParticipantItem({
   activeCalculatorId,
   autoOpenCalculator,
   calculatorAttachmentPhotoIds,
+  enableCalculator,
   onCloseCalculator,
   onOpenCalculator,
   onSharesChange,
@@ -740,6 +745,7 @@ function ParticipantItem({
               <>
                 <IconButton
                   icon="lucide.minus"
+                  aria-label={t({ message: `Decrease shares for ${participantName}` })}
                   className="h-7 w-7"
                   iconClassName="size-3.5"
                   onPress={onDecrementSharesPress}
@@ -774,6 +780,7 @@ function ParticipantItem({
                 />
                 <IconButton
                   icon="lucide.plus"
+                  aria-label={t({ message: `Increase shares for ${participantName}` })}
                   className="h-7 w-7"
                   iconClassName="size-3.5"
                   onPress={onIncrementSharesPress}
@@ -785,6 +792,7 @@ function ParticipantItem({
                 <IconButton
                   color="input-like"
                   icon="lucide.split"
+                  aria-label={t`Switch to fractional split`}
                   onPress={() => {
                     onShareTypeChange("divide");
                   }}
@@ -809,6 +817,7 @@ function ParticipantItem({
               activeCalculatorId={activeCalculatorId}
               autoOpenCalculator={autoOpenCalculator}
               calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
+              enableCalculator={enableCalculator}
               onCloseCalculator={onCloseCalculator}
               onOpenCalculator={onOpenCalculator}
               onChange={onExactAmountChange}
@@ -827,6 +836,7 @@ interface ParticipantSplitAmountFieldProps {
   activeCalculatorId?: string;
   autoOpenCalculator?: boolean;
   calculatorAttachmentPhotoIds: MediaFile["id"][];
+  enableCalculator?: boolean;
   onCloseCalculator?: () => void;
   onOpenCalculator?: (calculatorId: string) => void;
   onChange: (value: number) => void;
@@ -840,6 +850,7 @@ function ParticipantSplitAmountField({
   activeCalculatorId,
   autoOpenCalculator,
   calculatorAttachmentPhotoIds,
+  enableCalculator = true,
   onCloseCalculator,
   onOpenCalculator,
   onChange,
@@ -850,7 +861,7 @@ function ParticipantSplitAmountField({
 
   return (
     <CurrencyField
-      calculator
+      calculator={enableCalculator}
       calculatorId={`share-${participantId}`}
       calculatorAttachmentPhotoIds={calculatorAttachmentPhotoIds}
       activeCalculatorId={activeCalculatorId}

@@ -3,6 +3,7 @@ import { Repo } from "@automerge/automerge-repo";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { Expense } from "#src/models/expense.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
+import type { ExpenseTemplate } from "#src/models/expenseTemplate.ts";
 
 const appWorkerMock = vi.hoisted(() => ({
   recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<boolean>>(),
@@ -111,6 +112,31 @@ describe("getPartyHelpers", () => {
       participants,
     });
   });
+
+  test("clears the default when deleting its expense template", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const template = createExpenseTemplate("groceries");
+
+    helpers.saveExpenseTemplate(template);
+    helpers.setDefaultExpenseTemplate(template.id);
+    helpers.deleteExpenseTemplate(template.id);
+
+    expect(partyHandle.doc().expenseTemplates).toEqual({});
+    expect(partyHandle.doc().defaultExpenseTemplateId).toBeUndefined();
+  });
+
+  test("limits each party to four expense templates", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+
+    for (const id of ["one", "two", "three", "four"]) {
+      helpers.saveExpenseTemplate(createExpenseTemplate(id));
+    }
+
+    expect(() => helpers.saveExpenseTemplate(createExpenseTemplate("five"))).toThrow(
+      "Expense template limit reached",
+    );
+    expect(Object.keys(partyHandle.doc().expenseTemplates ?? {})).toHaveLength(4);
+  });
 });
 
 function createPartyHelpers() {
@@ -171,6 +197,17 @@ function createExpenseInput(): Omit<Expense, "id" | "__hash"> {
       },
     },
     photos: [],
+  };
+}
+
+function createExpenseTemplate(id: string): ExpenseTemplate {
+  return {
+    id,
+    name: id,
+    symbol: "🧾",
+    paidBy: { type: "current-participant" },
+    participantSelection: "specific",
+    shares: {},
   };
 }
 

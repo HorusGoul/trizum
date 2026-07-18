@@ -21,6 +21,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
 import { createKeyedCoalescedQueue } from "#src/lib/coalescedQueue.ts";
+import { MAX_EXPENSE_TEMPLATES, type ExpenseTemplate } from "#src/models/expenseTemplate.ts";
 
 const logger = getLogger("hooks", "useParty");
 
@@ -128,7 +129,14 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function setParticipantDetails(
     participantId: PartyParticipant["id"],
     details: Partial<
-      Pick<PartyParticipant, "phone" | "personalMode" | "avatarId" | "balancesSortedBy">
+      Pick<
+        PartyParticipant,
+        | "phone"
+        | "personalMode"
+        | "avatarId"
+        | "balancesSortedBy"
+        | "alwaysUseDefaultExpenseTemplate"
+      >
     >,
   ) {
     handle.change((doc) => {
@@ -148,6 +156,51 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
           participant[key] = value;
         }
       }
+    });
+  }
+
+  function saveExpenseTemplate(template: ExpenseTemplate) {
+    handle.change((doc) => {
+      if (!doc.expenseTemplates) {
+        doc.expenseTemplates = {};
+      }
+
+      const isNewTemplate = !doc.expenseTemplates[template.id];
+
+      if (isNewTemplate && Object.keys(doc.expenseTemplates).length >= MAX_EXPENSE_TEMPLATES) {
+        throw new Error("Expense template limit reached");
+      }
+
+      doc.expenseTemplates[template.id] = template;
+    });
+  }
+
+  function deleteExpenseTemplate(templateId: ExpenseTemplate["id"]) {
+    handle.change((doc) => {
+      if (!doc.expenseTemplates?.[templateId]) {
+        return;
+      }
+
+      delete doc.expenseTemplates[templateId];
+
+      if (doc.defaultExpenseTemplateId === templateId) {
+        delete doc.defaultExpenseTemplateId;
+      }
+    });
+  }
+
+  function setDefaultExpenseTemplate(templateId?: ExpenseTemplate["id"]) {
+    handle.change((doc) => {
+      if (!templateId) {
+        delete doc.defaultExpenseTemplateId;
+        return;
+      }
+
+      if (!doc.expenseTemplates?.[templateId]) {
+        return;
+      }
+
+      doc.defaultExpenseTemplateId = templateId;
     });
   }
 
@@ -422,6 +475,9 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     updateDetails,
     updateParticipants,
     setParticipantDetails,
+    saveExpenseTemplate,
+    deleteExpenseTemplate,
+    setDefaultExpenseTemplate,
     addExpenseToParty,
     transferDebtToParty,
     updateExpense,

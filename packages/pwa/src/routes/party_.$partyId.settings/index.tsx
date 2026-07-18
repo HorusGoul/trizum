@@ -47,6 +47,20 @@ function PartySettings() {
             description={<Trans>Add, edit, and archive participants</Trans>}
           />
         </PartySettingsSection>
+
+        <PartySettingsSection icon="lucide.receipt-text" title={<Trans>Expenses</Trans>}>
+          <PartySettingsLink
+            to="/party/$partyId/settings/expense-templates"
+            partyId={partyId}
+            badge={
+              <span className="bg-accent-100 text-accent-700 dark:bg-accent-900 dark:text-accent-50 flex size-12 shrink-0 items-center justify-center rounded-full text-xl">
+                🧾
+              </span>
+            }
+            title={<Trans>Expense templates</Trans>}
+            description={<Trans>Configure reusable defaults for new expenses</Trans>}
+          />
+        </PartySettingsSection>
       </main>
     </div>
   );
