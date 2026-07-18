@@ -1,5 +1,19 @@
 # @trizum/pwa
 
+## 1.12.0
+
+### Minor Changes
+
+- [#415](https://github.com/HorusGoul/trizum/pull/415) [`c28948a`](https://github.com/HorusGoul/trizum/commit/c28948a3440c8dd40b907b9e0c93e21a8313453b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add party expense templates with configurable defaults for titles, amounts, payers, participants, and split ratios.
+
+  New expense creation now offers a template picker, a personal option to always use the party's default template, and a party-wide option to require custom templates.
+
+### Patch Changes
+
+- [#417](https://github.com/HorusGoul/trizum/pull/417) [`218d2ae`](https://github.com/HorusGoul/trizum/commit/218d2aea7d7969dc4bb346e671c7ec359a64a59a) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Ask for confirmation before permanently deleting an expense.
+
+- [#398](https://github.com/HorusGoul/trizum/pull/398) [`114e14d`](https://github.com/HorusGoul/trizum/commit/114e14d49bc5e159257a7d582a927892fd5524b8) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Generate deterministic App Store and Google Play screenshots, localized feature graphics, and review previews for every supported device size.
+
 ## 1.11.0
 
 ### Minor Changes
