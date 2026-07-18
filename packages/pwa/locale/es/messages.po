@@ -36,7 +36,7 @@ msgid "{0, plural, one {and # other} other {and # others}}"
 msgstr "{0, plural, one {y # más} other {y # más}}"
 
 #. placeholder {0}: participant.name
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:72
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:97
 msgid "{0} (archived)"
 msgstr "{0} (archivado)"
 
@@ -108,7 +108,7 @@ msgstr "<0>{fromName}</0> deja de deber dinero a <1>{toName}</1>"
 msgid "A name for the participant is required"
 msgstr "Se requiere un nombre para el participante"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:96
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:133
 msgid "A template with this name already exists"
 msgstr "Ya existe una plantilla con este nombre"
 
@@ -229,9 +229,9 @@ msgstr "Todas las comprobaciones del gasto se han superado"
 msgid "All time"
 msgstr "Todo el tiempo"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:297
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:301
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:312
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:335
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:339
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:350
 msgid "Always include everyone"
 msgstr "Incluir siempre a todos"
 
@@ -243,7 +243,7 @@ msgid "Always use default template"
 msgstr "Usar siempre la plantilla predeterminada"
 
 #: src/components/ExpenseEditor.tsx:475
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:266
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:304
 msgid "Amount"
 msgstr "Cantidad"
 
@@ -879,7 +879,7 @@ msgstr "Moneda"
 msgid "Current month"
 msgstr "Mes actual"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:66
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:91
 msgid "Current participant"
 msgstr "Participante actual"
 
@@ -970,7 +970,7 @@ msgid "Delete expense template?"
 msgstr "¿Eliminar la plantilla de gasto?"
 
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:38
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:340
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:378
 msgid "Delete template"
 msgstr "Eliminar plantilla"
 
@@ -1149,7 +1149,7 @@ msgstr "Las cantidades de los gastos no coinciden con el total. Por favor, revis
 msgid "Expense checks"
 msgstr "Comprobaciones del gasto"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:239
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:277
 msgid "Expense defaults"
 msgstr "Valores predeterminados del gasto"
 
@@ -1157,11 +1157,11 @@ msgstr "Valores predeterminados del gasto"
 msgid "Expense template"
 msgstr "Plantilla de gasto"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:138
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:176
 msgid "Expense template created"
 msgstr "Plantilla de gasto creada"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:182
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:220
 msgid "Expense template deleted"
 msgstr "Plantilla de gasto eliminada"
 
@@ -1169,7 +1169,7 @@ msgstr "Plantilla de gasto eliminada"
 msgid "Expense template options"
 msgstr "Opciones de plantilla de gasto"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:138
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:176
 msgid "Expense template saved"
 msgstr "Plantilla de gasto guardada"
 
@@ -1420,7 +1420,7 @@ msgstr "Forinto Húngaro"
 msgid "Icelandic Króna"
 msgstr "Corona Islandesa"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:226
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:264
 msgid "Icon"
 msgstr "Icono"
 
@@ -1805,7 +1805,7 @@ msgstr "Kyat Birmano"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:24
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:208
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:246
 #: src/routes/party.$partyId/route.tsx:128
 msgid "Name"
 msgstr "Nombre"
@@ -1814,7 +1814,7 @@ msgstr "Nombre"
 msgid "Name is required"
 msgstr "El nombre es obligatorio"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:85
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:122
 msgid "Name is too long"
 msgstr "El nombre es demasiado largo"
 
@@ -2074,7 +2074,7 @@ msgstr "Pagado el"
 
 #: src/components/ExpenseEditor.tsx:503
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:48
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:279
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:317
 msgid "Paid by"
 msgstr "Pagado por"
 
@@ -2317,7 +2317,7 @@ msgstr "Por favor, corrígelo antes de guardar."
 msgid "Please don't close the app while we migrate your data"
 msgstr "Por favor, no cierres la aplicación mientras migramos tus datos"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:81
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:118
 msgid "Please give this template a name"
 msgstr "Ponle un nombre a esta plantilla"
 
@@ -2512,7 +2512,7 @@ msgstr "Ver totales y clasificación de gasto"
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:345
 msgid "Select everyone now and automatically include new participants."
 msgstr "Selecciona a todos ahora e incluye automáticamente a los nuevos participantes."
 
@@ -2906,11 +2906,15 @@ msgstr "Chelín Tanzano"
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:198
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:236
 msgid "Template"
 msgstr "Plantilla"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:231
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:40
+msgid "Template {number}"
+msgstr "Plantilla {number}"
+
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:269
 msgid "Template icon"
 msgstr "Icono de la plantilla"
 
@@ -3034,7 +3038,7 @@ msgid "Timeframe"
 msgstr "Período"
 
 #: src/components/ExpenseEditor.tsx:438
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:251
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:289
 msgid "Title"
 msgstr "Título"
 
@@ -3042,7 +3046,7 @@ msgstr "Título"
 msgid "Title is required"
 msgstr "Se requiere un título"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:245
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:283
 msgid "Title is too long"
 msgstr "El título es demasiado largo"
 
@@ -3422,7 +3426,7 @@ msgstr "¡Sí! Tus datos se almacenan localmente en tu dispositivo y solo se sin
 msgid "You can add photos to your expenses for better tracking."
 msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:42
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:67
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:38
 msgid "You can create up to {MAX_EXPENSE_TEMPLATES} custom templates."
 msgstr "Puedes crear hasta {MAX_EXPENSE_TEMPLATES} plantillas personalizadas."

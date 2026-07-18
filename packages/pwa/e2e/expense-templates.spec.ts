@@ -82,10 +82,11 @@ test.describe("Expense templates", () => {
     await expect(page.getByRole("heading", { name: "Expense defaults", level: 2 })).toBeVisible();
     await expect(page.getByLabel("Template icon")).toHaveText("🧾");
 
-    await page.getByRole("button", { name: "Save" }).click();
+    const nameField = page.getByLabel("Name");
+    await expect(nameField).toHaveValue("Template 1");
+    await nameField.clear();
     await expect(page.getByText("Please give this template a name")).toBeVisible();
 
-    const nameField = page.getByLabel("Name");
     const iconButton = page.getByLabel("Template icon");
     const [nameBox, iconBox] = await Promise.all([
       nameField.boundingBox(),
@@ -105,8 +106,27 @@ test.describe("Expense templates", () => {
 
     await expect(page.getByText("Expense template created")).toBeVisible();
     await page.getByRole("link", { name: "Add" }).click();
+    await expect(page.getByLabel("Name")).toHaveValue("Template 2");
     await page.getByLabel("Name").fill(" weekly GROCERIES ");
     await expect(page.getByText("A template with this name already exists")).toBeVisible();
+  });
+
+  test("saves edits to a template with existing participant shares", async ({ harness, page }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await createExpenseTemplate(harness, page, seededParty.partyId, {
+      includeEveryone: true,
+      name: "Shared dinner",
+    });
+    await page.getByRole("link", { name: /Shared dinner/ }).click();
+    await page.getByLabel("Name").fill("Team dinner");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page.getByText("Expense template saved").last()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Team dinner/ })).toBeVisible();
   });
 
   test("keeps explicit participants distinct from always including everyone", async ({

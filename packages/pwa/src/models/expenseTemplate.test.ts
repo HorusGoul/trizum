@@ -155,6 +155,7 @@ describe("getExpenseTemplateEditorValues", () => {
     expect(template.shares).toEqual({
       alex: { type: "divide", value: 2 },
     });
+    expect(editorValues.shares.alex).not.toBe(template.shares.alex);
   });
 });
 

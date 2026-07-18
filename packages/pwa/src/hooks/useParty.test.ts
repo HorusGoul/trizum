@@ -3,7 +3,10 @@ import { Repo } from "@automerge/automerge-repo";
 import type { DocumentId } from "@automerge/automerge-repo/slim";
 import type { Expense } from "#src/models/expense.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
-import type { ExpenseTemplate } from "#src/models/expenseTemplate.ts";
+import {
+  getExpenseTemplateEditorValues,
+  type ExpenseTemplate,
+} from "#src/models/expenseTemplate.ts";
 
 const appWorkerMock = vi.hoisted(() => ({
   recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<boolean>>(),
@@ -196,6 +199,32 @@ describe("getPartyHelpers", () => {
       "Expense template limit reached",
     );
     expect(Object.keys(partyHandle.doc().expenseTemplates ?? {})).toHaveLength(4);
+  });
+
+  test("saves edits built from an existing document template", () => {
+    const { helpers, partyHandle } = createPartyHelpers();
+    const template = createExpenseTemplate("groceries");
+    template.shares = {
+      alice: { type: "divide", value: 1 },
+      bob: { type: "divide", value: 2 },
+    };
+    helpers.saveExpenseTemplate(template);
+
+    const storedTemplate = partyHandle.doc().expenseTemplates?.[template.id];
+    expect(storedTemplate).toBeDefined();
+    const editorValues = getExpenseTemplateEditorValues(storedTemplate, ["alice", "bob"]);
+
+    expect(() =>
+      helpers.saveExpenseTemplate({
+        id: template.id,
+        name: "Updated groceries",
+        symbol: editorValues.symbol,
+        paidBy: { type: "current-participant" },
+        participantSelection: editorValues.participantSelection,
+        shares: editorValues.shares,
+      }),
+    ).not.toThrow();
+    expect(partyHandle.doc().expenseTemplates?.[template.id]?.name).toBe("Updated groceries");
   });
 });
 

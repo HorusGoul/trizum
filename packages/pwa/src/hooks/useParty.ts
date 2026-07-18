@@ -22,6 +22,7 @@ import { createDebtTransferExpenses } from "#src/lib/debtTransfer.ts";
 import { appWorker } from "#src/lib/appWorker/client.ts";
 import { createKeyedCoalescedQueue } from "#src/lib/coalescedQueue.ts";
 import {
+  copyExpenseTemplate,
   ExpenseTemplateLimitError,
   getFirstExpenseTemplateId,
   MAX_EXPENSE_TEMPLATES,
@@ -176,7 +177,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         throw new ExpenseTemplateLimitError();
       }
 
-      doc.expenseTemplates[template.id] = template;
+      doc.expenseTemplates[template.id] = copyExpenseTemplate(template);
 
       if (doc.onlyUseCustomExpenseTemplates && !doc.defaultExpenseTemplateId) {
         doc.defaultExpenseTemplateId = template.id;

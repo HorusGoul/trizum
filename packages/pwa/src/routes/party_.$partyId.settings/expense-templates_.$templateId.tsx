@@ -1,4 +1,4 @@
-import { t } from "@lingui/core/macro";
+import { msg, t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm, useStore } from "@tanstack/react-form";
 import { createFileRoute, notFound } from "@tanstack/react-router";
@@ -37,6 +37,31 @@ interface PayerOption {
 
 const ALWAYS_INCLUDE_EVERYONE_ID = "always-include-everyone";
 const ALWAYS_INCLUDE_EVERYONE_DESCRIPTION_ID = `${ALWAYS_INCLUDE_EVERYONE_ID}-description`;
+const DEFAULT_TEMPLATE_NAME = msg`Template {number}`;
+
+function getNextTemplateName({
+  existingNames,
+  formatName,
+  locale,
+  templateCount,
+}: {
+  existingNames: Set<string>;
+  formatName: (number: number) => string;
+  locale: string;
+  templateCount: number;
+}) {
+  let number = templateCount + 1;
+
+  while (true) {
+    const candidate = formatName(number);
+
+    if (!existingNames.has(candidate.toLocaleLowerCase(locale))) {
+      return candidate;
+    }
+
+    number += 1;
+  }
+}
 
 function announceTemplateLimit() {
   toast(t`You can create up to ${MAX_EXPENSE_TEMPLATES} custom templates.`);
@@ -73,6 +98,18 @@ function ExpenseTemplateEditor() {
           : participant.name,
       })),
   ];
+  const existingTemplates = Object.values(party.expenseTemplates ?? {});
+  const existingTemplateNames = new Set(
+    existingTemplates.map((existingTemplate) =>
+      existingTemplate.name.trim().toLocaleLowerCase(i18n.locale),
+    ),
+  );
+  const defaultTemplateName = getNextTemplateName({
+    existingNames: existingTemplateNames,
+    formatName: (number) => i18n._({ ...DEFAULT_TEMPLATE_NAME, values: { number } }),
+    locale: i18n.locale,
+    templateCount: existingTemplates.length,
+  });
 
   function validateTemplateName(name: string) {
     const normalizedName = name.trim();
@@ -101,6 +138,7 @@ function ExpenseTemplateEditor() {
     defaultValues: getExpenseTemplateEditorValues(
       template,
       activeParticipants.map((participant) => participant.id),
+      defaultTemplateName,
     ),
     onSubmit: ({ value }) => {
       if (isNew && Object.keys(party.expenseTemplates ?? {}).length >= MAX_EXPENSE_TEMPLATES) {

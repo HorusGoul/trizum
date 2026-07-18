@@ -48,6 +48,25 @@ export interface ResolvedExpenseTemplateValues {
   photos: [];
 }
 
+function copyExpenseShares(shares: Expense["shares"]): Expense["shares"] {
+  return Object.fromEntries(
+    Object.entries(shares).map(([participantId, share]) => [participantId, { ...share }]),
+  );
+}
+
+export function copyExpenseTemplate(template: ExpenseTemplate): ExpenseTemplate {
+  const paidBy: ExpenseTemplatePayer =
+    template.paidBy.type === "participant"
+      ? { type: "participant", participantId: template.paidBy.participantId }
+      : { type: "current-participant" };
+
+  return {
+    ...template,
+    paidBy,
+    shares: copyExpenseShares(template.shares),
+  };
+}
+
 export function shouldOpenExpenseTemplatePicker({
   alwaysUseDefaultTemplate,
   customTemplateCount,
@@ -72,8 +91,9 @@ export function getFirstExpenseTemplateId(
 export function getExpenseTemplateEditorValues(
   template?: ExpenseTemplate,
   activeParticipantIds: ExpenseUser[] = [],
+  defaultName = "",
 ): ExpenseTemplateEditorValues {
-  const shares = { ...(template?.shares ?? {}) };
+  const shares = copyExpenseShares(template?.shares ?? {});
 
   if (template?.participantSelection === "all") {
     for (const participantId of activeParticipantIds) {
@@ -82,7 +102,7 @@ export function getExpenseTemplateEditorValues(
   }
 
   return {
-    name: template?.name ?? "",
+    name: template?.name ?? defaultName,
     symbol: template?.symbol ?? DEFAULT_EXPENSE_TEMPLATE_SYMBOL,
     expenseName: template?.expenseName ?? "",
     amount: template?.amount === undefined ? 0 : convertFromUnits(template.amount),
