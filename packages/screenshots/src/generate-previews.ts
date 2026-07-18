@@ -8,6 +8,7 @@ import {
   STORE_SCENES,
   STORE_SCREENSHOT_ORDER,
   type StoreLocale,
+  type StoreScreenshotName,
 } from "./store-design.ts";
 
 const ROOT_DIR = path.resolve(import.meta.dirname, "..");
@@ -81,6 +82,13 @@ export const STORE_PREVIEW_SETS = [
   slot: string;
 }[];
 
+export function getStorePreviewScreenshotFilename(
+  device: keyof typeof STORE_DEVICE_OUTPUTS,
+  name: StoreScreenshotName,
+): string {
+  return `${name}.${STORE_DEVICE_OUTPUTS[device].suffix}.png`;
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")
@@ -105,7 +113,12 @@ async function main(): Promise<void> {
       const cards = await Promise.all(
         STORE_SCREENSHOT_ORDER.map(async (name) => {
           const screenshot = await readFile(
-            path.resolve(SCREENSHOTS_DIR, preview.locale, preview.device, `${name}.portrait.png`),
+            path.resolve(
+              SCREENSHOTS_DIR,
+              preview.locale,
+              preview.device,
+              getStorePreviewScreenshotFilename(preview.device, name),
+            ),
           );
           const scene = STORE_SCENES.find((candidate) => candidate.name === name);
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vite-plus/test";
-import { STORE_PREVIEW_SETS } from "./generate-previews.ts";
+import { getStorePreviewScreenshotFilename, STORE_PREVIEW_SETS } from "./generate-previews.ts";
 
 describe("store preview sets", () => {
   test("covers every generated store device in every locale", () => {
@@ -20,5 +20,14 @@ describe("store preview sets", () => {
 
     expect(tabletPreviews).toHaveLength(2);
     expect(tabletPreviews.every(({ slot }) => slot.includes("7″ and 10″ slots"))).toBe(true);
+  });
+
+  test("uses each device's generated screenshot orientation", () => {
+    expect(getStorePreviewScreenshotFilename("android", "expense-log")).toBe(
+      "expense-log.portrait.png",
+    );
+    expect(getStorePreviewScreenshotFilename("android-tablet", "expense-log")).toBe(
+      "expense-log.landscape.png",
+    );
   });
 });
