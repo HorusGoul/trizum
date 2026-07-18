@@ -93,6 +93,8 @@ and [`package.json`](./package.json):
 - `vp run feature-graphic` to regenerate only the feature graphics from existing
   Android captures
 - `vp run preview` to generate App Store and Google Play contact sheets after a
-  full capture
+  full capture; this includes phone and tablet sheets for every locale and
+  labels the shared Google Play tablet artwork used for both 7-inch and 10-inch
+  slots
 - `vp run organize:fastlane --platform <ios|android> --output <path>` to prepare
   store-upload assets; Android output includes the localized feature graphic

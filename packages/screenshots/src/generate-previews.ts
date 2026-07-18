@@ -1,8 +1,14 @@
 import { chromium } from "playwright";
 import { mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { FEATURE_GRAPHICS_DIR } from "./feature-graphic.ts";
-import { STORE_SCENES, STORE_SCREENSHOT_ORDER, type StoreLocale } from "./store-design.ts";
+import {
+  STORE_DEVICE_OUTPUTS,
+  STORE_SCENES,
+  STORE_SCREENSHOT_ORDER,
+  type StoreLocale,
+} from "./store-design.ts";
 
 const ROOT_DIR = path.resolve(import.meta.dirname, "..");
 const SCREENSHOTS_DIR = path.resolve(ROOT_DIR, "screenshots");
@@ -10,16 +16,69 @@ const PREVIEWS_DIR = path.resolve(ROOT_DIR, "previews");
 const INTER_REGULAR_PATH = path.resolve(ROOT_DIR, "../pwa/api/assets/inter/Inter-Regular.ttf");
 const INTER_BOLD_PATH = path.resolve(ROOT_DIR, "../pwa/api/assets/inter/Inter-Bold.ttf");
 
-const previewSets = [
-  { device: "iphone-6.9", locale: "en", name: "app-store-en", platform: "App Store" },
-  { device: "iphone-6.9", locale: "es", name: "app-store-es", platform: "App Store" },
-  { device: "android", locale: "en", name: "google-play-en", platform: "Google Play" },
-  { device: "android", locale: "es", name: "google-play-es", platform: "Google Play" },
+export const STORE_PREVIEW_SETS = [
+  {
+    device: "iphone-6.9",
+    locale: "en",
+    name: "app-store-iphone-6.9-en",
+    platform: "App Store · iPhone 6.9″",
+    slot: "1320×2868",
+  },
+  {
+    device: "iphone-6.9",
+    locale: "es",
+    name: "app-store-iphone-6.9-es",
+    platform: "App Store · iPhone 6.9″",
+    slot: "1320×2868",
+  },
+  {
+    device: "ipad-13",
+    locale: "en",
+    name: "app-store-ipad-13-en",
+    platform: "App Store · iPad 13″",
+    slot: "2064×2752",
+  },
+  {
+    device: "ipad-13",
+    locale: "es",
+    name: "app-store-ipad-13-es",
+    platform: "App Store · iPad 13″",
+    slot: "2064×2752",
+  },
+  {
+    device: "android",
+    locale: "en",
+    name: "google-play-phone-en",
+    platform: "Google Play · Phone",
+    slot: "1080×1920",
+  },
+  {
+    device: "android",
+    locale: "es",
+    name: "google-play-phone-es",
+    platform: "Google Play · Phone",
+    slot: "1080×1920",
+  },
+  {
+    device: "android-tablet",
+    locale: "en",
+    name: "google-play-tablet-en",
+    platform: "Google Play · Tablet",
+    slot: "2560×1600 · 7″ and 10″ slots",
+  },
+  {
+    device: "android-tablet",
+    locale: "es",
+    name: "google-play-tablet-es",
+    platform: "Google Play · Tablet",
+    slot: "2560×1600 · 7″ and 10″ slots",
+  },
 ] as const satisfies readonly {
-  device: string;
+  device: keyof typeof STORE_DEVICE_OUTPUTS;
   locale: StoreLocale;
   name: string;
   platform: string;
+  slot: string;
 }[];
 
 function escapeHtml(value: string): string {
@@ -42,7 +101,7 @@ async function main(): Promise<void> {
   try {
     await mkdir(PREVIEWS_DIR, { recursive: true });
 
-    for (const preview of previewSets) {
+    for (const preview of STORE_PREVIEW_SETS) {
       const cards = await Promise.all(
         STORE_SCREENSHOT_ORDER.map(async (name) => {
           const screenshot = await readFile(
@@ -57,7 +116,13 @@ async function main(): Promise<void> {
           return `<article><img alt="${escapeHtml(scene.copy[preview.locale].title.replaceAll("\n", " "))}" src="data:image/png;base64,${screenshot.toString("base64")}"></article>`;
         }),
       );
-      const page = await browser.newPage({ viewport: { width: 2820, height: 1120 } });
+      const output = STORE_DEVICE_OUTPUTS[preview.device];
+      const cardWidth = (2820 - 74 * 2 - 26 * 5) / 6;
+      const viewportHeight = Math.max(
+        760,
+        Math.ceil(64 + 66 + 42 + cardWidth * (output.height / output.width) + 64),
+      );
+      const page = await browser.newPage({ viewport: { width: 2820, height: viewportHeight } });
 
       try {
         await page.setContent(`<!doctype html><html><head><style>
@@ -73,7 +138,7 @@ async function main(): Promise<void> {
           article { overflow: hidden; border: 1px solid #27272a; border-radius: 28px; background: #18181b; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
           img { display: block; width: 100%; }
         </style></head><body>
-          <header><h1>${preview.platform} · ${preview.locale === "en" ? "English" : "Español"}</h1><p>Upload-ready assets in store order</p></header>
+          <header><h1>${preview.platform} · ${preview.locale === "en" ? "English" : "Español"}</h1><p>${preview.slot} · upload-ready store order</p></header>
           <main>${cards.join("")}</main>
         </body></html>`);
         await page.evaluate(async () => await document.fonts.ready);
@@ -130,4 +195,6 @@ async function main(): Promise<void> {
   }
 }
 
-void main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  void main();
+}
