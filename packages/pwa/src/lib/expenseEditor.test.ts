@@ -86,6 +86,28 @@ describe("expense editor validation status", () => {
     });
   });
 
+  test("validates a complete prefilled create form before it changes", () => {
+    expect(
+      getExpenseEditorValidationResult(completeExpense, {
+        isDirty: false,
+        isPrefilled: true,
+        mode: "create",
+      }),
+    ).toMatchObject({ issues: [], status: "valid" });
+  });
+
+  test("reports an incomplete prefilled create form before it changes", () => {
+    expect(
+      getExpenseEditorValidationResult(
+        {
+          ...completeExpense,
+          amount: 0,
+        },
+        { isDirty: false, isPrefilled: true, mode: "create" },
+      ),
+    ).toMatchObject({ issues: [], status: "incomplete" });
+  });
+
   test("validates an existing expense before it changes", () => {
     expect(
       getExpenseEditorValidationResult(completeExpense, { isDirty: false, mode: "edit" }),

@@ -36,6 +36,7 @@ export type ExpenseEditorMode = "create" | "edit";
 
 export interface ExpenseEditorValidationOptions {
   isDirty: boolean;
+  isPrefilled?: boolean;
   mode: ExpenseEditorMode;
 }
 
@@ -74,7 +75,7 @@ export function getExpenseEditorValidationIssues(values: ExpenseEditorValidation
 
 export function getExpenseEditorValidationResult(
   values: ExpenseEditorValidationValues,
-  { isDirty, mode }: ExpenseEditorValidationOptions,
+  { isDirty, isPrefilled = false, mode }: ExpenseEditorValidationOptions,
 ): ExpenseEditorValidationResult {
   const issues = getExpenseEditorValidationIssues(values);
   const hasErrors = issues.some((issue) => issue.severity === "error");
@@ -88,7 +89,7 @@ export function getExpenseEditorValidationResult(
     return { issues, status: "warning" };
   }
 
-  if (!isDirty && mode === "create") {
+  if (!isDirty && !isPrefilled && mode === "create") {
     return { issues, status: "pristine" };
   }
 

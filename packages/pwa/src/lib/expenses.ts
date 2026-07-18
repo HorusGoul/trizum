@@ -107,3 +107,7 @@ export function convertToUnits(amount: number) {
   // Use Math.round to avoid floating-point precision issues
   return Math.round(amount * 100);
 }
+
+export function convertFromUnits(amount: number) {
+  return amount / 100;
+}

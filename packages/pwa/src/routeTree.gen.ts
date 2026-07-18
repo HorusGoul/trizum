@@ -32,8 +32,10 @@ import { Route as PartyPartyIdSettingsRouteRouteImport } from './routes/party_.$
 import { Route as PartyPartyIdPayRouteRouteImport } from './routes/party_.$partyId.pay/route'
 import { Route as PartyPartyIdSettingsIndexRouteImport } from './routes/party_.$partyId.settings/index'
 import { Route as PartyPartyIdSettingsParticipantsRouteImport } from './routes/party_.$partyId.settings/participants'
+import { Route as PartyPartyIdSettingsExpenseTemplatesRouteImport } from './routes/party_.$partyId.settings/expense-templates'
 import { Route as PartyPartyIdSettingsDetailsRouteImport } from './routes/party_.$partyId.settings/details'
 import { Route as PartyPartyIdExpenseExpenseIdRouteRouteImport } from './routes/party_.$partyId.expense.$expenseId/route'
+import { Route as PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport } from './routes/party_.$partyId.settings/expense-templates_.$templateId'
 import { Route as PartyPartyIdExpenseExpenseIdEditRouteRouteImport } from './routes/party_.$partyId.expense.$expenseId_.edit/route'
 
 const SettingsRoute = SettingsRouteImport.update({
@@ -154,6 +156,12 @@ const PartyPartyIdSettingsParticipantsRoute =
     path: '/participants',
     getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
+const PartyPartyIdSettingsExpenseTemplatesRoute =
+  PartyPartyIdSettingsExpenseTemplatesRouteImport.update({
+    id: '/expense-templates',
+    path: '/expense-templates',
+    getParentRoute: () => PartyPartyIdSettingsRouteRoute,
+  } as any)
 const PartyPartyIdSettingsDetailsRoute =
   PartyPartyIdSettingsDetailsRouteImport.update({
     id: '/details',
@@ -165,6 +173,12 @@ const PartyPartyIdExpenseExpenseIdRouteRoute =
     id: '/party_/$partyId/expense/$expenseId',
     path: '/party/$partyId/expense/$expenseId',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute =
+  PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport.update({
+    id: '/expense-templates_/$templateId',
+    path: '/expense-templates/$templateId',
+    getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
 const PartyPartyIdExpenseExpenseIdEditRouteRoute =
   PartyPartyIdExpenseExpenseIdEditRouteRouteImport.update({
@@ -196,9 +210,11 @@ export interface FileRoutesByFullPath {
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRouteRoute
   '/party/$partyId/settings/details': typeof PartyPartyIdSettingsDetailsRoute
+  '/party/$partyId/settings/expense-templates': typeof PartyPartyIdSettingsExpenseTemplatesRoute
   '/party/$partyId/settings/participants': typeof PartyPartyIdSettingsParticipantsRoute
   '/party/$partyId/settings/': typeof PartyPartyIdSettingsIndexRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRouteRoute
+  '/party/$partyId/settings/expense-templates/$templateId': typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute
 }
 export interface FileRoutesByTo {
   '/about': typeof AboutRouteRoute
@@ -222,9 +238,11 @@ export interface FileRoutesByTo {
   '/party/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRouteRoute
   '/party/$partyId/settings/details': typeof PartyPartyIdSettingsDetailsRoute
+  '/party/$partyId/settings/expense-templates': typeof PartyPartyIdSettingsExpenseTemplatesRoute
   '/party/$partyId/settings/participants': typeof PartyPartyIdSettingsParticipantsRoute
   '/party/$partyId/settings': typeof PartyPartyIdSettingsIndexRoute
   '/party/$partyId/expense/$expenseId/edit': typeof PartyPartyIdExpenseExpenseIdEditRouteRoute
+  '/party/$partyId/settings/expense-templates/$templateId': typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,9 +269,11 @@ export interface FileRoutesById {
   '/party_/$partyId/who': typeof PartyPartyIdWhoRoute
   '/party_/$partyId/expense/$expenseId': typeof PartyPartyIdExpenseExpenseIdRouteRoute
   '/party_/$partyId/settings/details': typeof PartyPartyIdSettingsDetailsRoute
+  '/party_/$partyId/settings/expense-templates': typeof PartyPartyIdSettingsExpenseTemplatesRoute
   '/party_/$partyId/settings/participants': typeof PartyPartyIdSettingsParticipantsRoute
   '/party_/$partyId/settings/': typeof PartyPartyIdSettingsIndexRoute
   '/party_/$partyId/expense/$expenseId_/edit': typeof PartyPartyIdExpenseExpenseIdEditRouteRoute
+  '/party_/$partyId/settings/expense-templates_/$templateId': typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -280,9 +300,11 @@ export interface FileRouteTypes {
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/settings/details'
+    | '/party/$partyId/settings/expense-templates'
     | '/party/$partyId/settings/participants'
     | '/party/$partyId/settings/'
     | '/party/$partyId/expense/$expenseId/edit'
+    | '/party/$partyId/settings/expense-templates/$templateId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
@@ -306,9 +328,11 @@ export interface FileRouteTypes {
     | '/party/$partyId/who'
     | '/party/$partyId/expense/$expenseId'
     | '/party/$partyId/settings/details'
+    | '/party/$partyId/settings/expense-templates'
     | '/party/$partyId/settings/participants'
     | '/party/$partyId/settings'
     | '/party/$partyId/expense/$expenseId/edit'
+    | '/party/$partyId/settings/expense-templates/$templateId'
   id:
     | '__root__'
     | '/_home'
@@ -334,9 +358,11 @@ export interface FileRouteTypes {
     | '/party_/$partyId/who'
     | '/party_/$partyId/expense/$expenseId'
     | '/party_/$partyId/settings/details'
+    | '/party_/$partyId/settings/expense-templates'
     | '/party_/$partyId/settings/participants'
     | '/party_/$partyId/settings/'
     | '/party_/$partyId/expense/$expenseId_/edit'
+    | '/party_/$partyId/settings/expense-templates_/$templateId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -526,6 +552,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdSettingsParticipantsRouteImport
       parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
+    '/party_/$partyId/settings/expense-templates': {
+      id: '/party_/$partyId/settings/expense-templates'
+      path: '/expense-templates'
+      fullPath: '/party/$partyId/settings/expense-templates'
+      preLoaderRoute: typeof PartyPartyIdSettingsExpenseTemplatesRouteImport
+      parentRoute: typeof PartyPartyIdSettingsRouteRoute
+    }
     '/party_/$partyId/settings/details': {
       id: '/party_/$partyId/settings/details'
       path: '/details'
@@ -539,6 +572,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/party/$partyId/expense/$expenseId'
       preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/settings/expense-templates_/$templateId': {
+      id: '/party_/$partyId/settings/expense-templates_/$templateId'
+      path: '/expense-templates/$templateId'
+      fullPath: '/party/$partyId/settings/expense-templates/$templateId'
+      preLoaderRoute: typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport
+      parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
     '/party_/$partyId/expense/$expenseId_/edit': {
       id: '/party_/$partyId/expense/$expenseId_/edit'
@@ -566,16 +606,22 @@ const HomeRouteRouteWithChildren = HomeRouteRoute._addFileChildren(
 
 interface PartyPartyIdSettingsRouteRouteChildren {
   PartyPartyIdSettingsDetailsRoute: typeof PartyPartyIdSettingsDetailsRoute
+  PartyPartyIdSettingsExpenseTemplatesRoute: typeof PartyPartyIdSettingsExpenseTemplatesRoute
   PartyPartyIdSettingsParticipantsRoute: typeof PartyPartyIdSettingsParticipantsRoute
   PartyPartyIdSettingsIndexRoute: typeof PartyPartyIdSettingsIndexRoute
+  PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute: typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute
 }
 
 const PartyPartyIdSettingsRouteRouteChildren: PartyPartyIdSettingsRouteRouteChildren =
   {
     PartyPartyIdSettingsDetailsRoute: PartyPartyIdSettingsDetailsRoute,
+    PartyPartyIdSettingsExpenseTemplatesRoute:
+      PartyPartyIdSettingsExpenseTemplatesRoute,
     PartyPartyIdSettingsParticipantsRoute:
       PartyPartyIdSettingsParticipantsRoute,
     PartyPartyIdSettingsIndexRoute: PartyPartyIdSettingsIndexRoute,
+    PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute:
+      PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute,
   }
 
 const PartyPartyIdSettingsRouteRouteWithChildren =

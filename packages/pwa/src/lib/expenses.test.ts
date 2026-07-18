@@ -2,6 +2,7 @@ import { describe, expect, test } from "vite-plus/test";
 import {
   calculateLogStatsBetweenTwoUsers,
   calculateLogStatsOfUser,
+  convertFromUnits,
   convertToUnits,
   type ExpenseInput,
 } from "./expenses";
@@ -20,6 +21,14 @@ describe("convertToUnits", () => {
     // These are common floating-point precision issues
     expect(convertToUnits(0.1 + 0.2)).toBe(30); // 0.1 + 0.2 = 0.30000000000000004
     expect(convertToUnits(0.3)).toBe(30);
+  });
+});
+
+describe("convertFromUnits", () => {
+  test("should convert integer minor units to display amounts", () => {
+    expect(convertFromUnits(1050)).toBe(10.5);
+    expect(convertFromUnits(1)).toBe(0.01);
+    expect(convertFromUnits(0)).toBe(0);
   });
 });
 
