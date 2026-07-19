@@ -49,12 +49,12 @@ svgexport $TEMP_ICON_ONLY_SVG $ASSETS_DIR/icon-only.png 1024:1024
 
 echo "Exporting icon-foreground.png"
 # Remove black background from temporary icon foreground SVG
-sed -i 's/fill="black"/fill="transparent"/g' $TEMP_ICON_FOREGROUND_SVG
+sed -i.bak 's/fill="black"/fill="transparent"/g' $TEMP_ICON_FOREGROUND_SVG
 svgexport $TEMP_ICON_FOREGROUND_SVG $ASSETS_DIR/icon-foreground.png 1024:1024
 
 echo "Exporting icon-background.png"
 # Remove white foreground from temporary icon background SVG
-sed -i 's/stroke="white"/stroke="transparent"/g' $TEMP_ICON_BACKGROUND_SVG
+sed -i.bak 's/stroke="white"/stroke="transparent"/g' $TEMP_ICON_BACKGROUND_SVG
 svgexport $TEMP_ICON_BACKGROUND_SVG $ASSETS_DIR/icon-background.png 1024:1024
 
 echo "Exporting splash.png"
@@ -66,6 +66,9 @@ svgexport $TEMP_SPLASH_DARK_SVG $ASSETS_DIR/splash-dark.png 2732:2732
 echo "Done generating base icons!"
 
 capacitor-assets generate --ios --android
+
+echo "Generating Android splash vector drawable..."
+node "$SCRIPT_DIR/src/generate-android-splash-icon.ts"
 
 # Generate Play Store icon (512x512) for fastlane metadata
 echo "Exporting Play Store icon..."

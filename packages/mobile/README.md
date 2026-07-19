@@ -122,6 +122,7 @@ packages/mobile/
 | `dev:android`     | Run in dev mode with live reload (Android)             |
 | `dev:ios`         | Run in dev mode with live reload (iOS)                 |
 | `assets:generate` | Generate app icons and splash screens                  |
+| `assets:check`    | Check the generated Android splash vector for drift    |
 | `sync:check`      | Fail if Capacitor sync changes mobile files            |
 | `check:android`   | Validate Android sync, lint, tests, APK, and AAB build |
 | `ruby:check`      | Dry-run Ruby bundles used by mobile CI                 |
@@ -489,3 +490,7 @@ vp run assets:generate
 ```
 
 Source assets are in `packages/mobile/assets/`.
+
+The Android launch theme uses a native vector drawable generated from the
+canonical mark in `packages/pwa/public/maskable.svg`. Run `assets:check` to
+verify that the checked-in drawable matches that source.
