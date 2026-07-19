@@ -3,6 +3,10 @@ import * as path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ANDROID_SPLASH_ICON_SIZE_DP = 288;
+const SOURCE_ICON_VIEWPORT_SIZE = 512;
+const ANDROID_SPLASH_ICON_VIEWPORT_SIZE = 576;
+const ANDROID_SPLASH_ICON_INSET =
+  (ANDROID_SPLASH_ICON_VIEWPORT_SIZE - SOURCE_ICON_VIEWPORT_SIZE) / 2;
 
 type SvgAttributes = Record<string, string>;
 
@@ -100,14 +104,18 @@ export function generateAndroidSplashIcon(svgSource: string) {
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="${ANDROID_SPLASH_ICON_SIZE_DP}dp"
     android:height="${ANDROID_SPLASH_ICON_SIZE_DP}dp"
-    android:viewportWidth="512"
-    android:viewportHeight="512">
-    <path
-        android:fillColor="#00000000"
-        android:pathData="${escapeXmlAttribute(pathData)}"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeLineCap="round"
-        android:strokeWidth="${strokeWidth}" />
+    android:viewportWidth="${ANDROID_SPLASH_ICON_VIEWPORT_SIZE}"
+    android:viewportHeight="${ANDROID_SPLASH_ICON_VIEWPORT_SIZE}">
+    <group
+        android:translateX="${ANDROID_SPLASH_ICON_INSET}"
+        android:translateY="${ANDROID_SPLASH_ICON_INSET}">
+        <path
+            android:fillColor="#00000000"
+            android:pathData="${escapeXmlAttribute(pathData)}"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeLineCap="round"
+            android:strokeWidth="${strokeWidth}" />
+    </group>
 </vector>
 `;
 }
