@@ -1,5 +1,14 @@
 # @trizum/mobile
 
+## 1.12.0
+
+### Patch Changes
+
+- [#410](https://github.com/HorusGoul/trizum/pull/410) [`fa7d905`](https://github.com/HorusGoul/trizum/commit/fa7d90510f9404fd34f1e73e944845d8f9d4a98c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Configure iOS production submissions to release automatically after App Store approval while keeping phased rollout disabled.
+
+- Updated dependencies [[`c28948a`](https://github.com/HorusGoul/trizum/commit/c28948a3440c8dd40b907b9e0c93e21a8313453b), [`218d2ae`](https://github.com/HorusGoul/trizum/commit/218d2aea7d7969dc4bb346e671c7ec359a64a59a), [`114e14d`](https://github.com/HorusGoul/trizum/commit/114e14d49bc5e159257a7d582a927892fd5524b8)]:
+  - @trizum/pwa@1.12.0
+
 ## 1.11.0
 
 ### Patch Changes
