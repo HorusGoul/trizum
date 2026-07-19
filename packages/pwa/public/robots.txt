@@ -1,5 +1,3 @@
-User-agent: Google-adstxt
-Disallow:
-
 User-agent: *
 Allow: /
+Disallow: /party/

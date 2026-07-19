@@ -2,4 +2,4 @@
 "@trizum/pwa": patch
 ---
 
-Publish a robots policy that allows crawlers to access the PWA's public content.
+Publish a robots policy that allows public content while keeping party routes out of crawlers.
