@@ -12,12 +12,14 @@ import { validatePartyParticipantName, validatePhoneNumber } from "#src/lib/vali
 import type { MediaFile } from "#src/models/media.ts";
 import { ColorSlider, ColorThumb, SliderTrack } from "#src/ui/Color.tsx";
 import { IconButton } from "#src/ui/IconButton.js";
+import { Button } from "#src/ui/Button.tsx";
 import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
 import { Label } from "#src/ui/fields/Field.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
 import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
+import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -136,6 +138,8 @@ function SettingsFormFields({
   formId: string;
   localeOptions: LocaleOption[];
 }) {
+  const { privacyOptionsRequired, showPrivacyOptions } = useAdvertising();
+
   return (
     <form
       id={formId}
@@ -271,6 +275,17 @@ function SettingsFormFields({
           </div>
         )}
       </form.Field>
+
+      {privacyOptionsRequired ? (
+        <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
+          <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
+            <Trans>Privacy</Trans>
+          </h2>
+          <Button type="button" color="input-like" pressAction={showPrivacyOptions}>
+            <Trans>Privacy and cookie settings</Trans>
+          </Button>
+        </section>
+      ) : null}
     </form>
   );
 }

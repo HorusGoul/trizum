@@ -327,6 +327,39 @@ uploader.
 | `APP_STORE_CONNECT_API_ISSUER_ID`       | App Store Connect API Issuer ID                |
 | `APP_STORE_CONNECT_API_KEY_CONTENT`     | Base64-encoded App Store Connect API Key (.p8) |
 
+### AdMob configuration
+
+The native iOS and Android apps use `@capacitor-community/admob` for UMP
+privacy choices, ATT, SDK initialization, and interstitial ads. The published
+8.0.0 package does not expose App Open ads, so each platform also contains a
+small `NativeAppOpenAd` Capacitor bridge over the same Google Mobile Ads SDK.
+The browser app and installed PWA never initialize AdMob.
+
+Test and live app/ad-unit IDs are public configuration in `admob.config.json`.
+Builds use Google's test IDs unless
+`TRIZUM_LIVE_ADS=true` is explicitly set. The official production App Store,
+Google Play production, and signed GitHub Release APK workflows are the only
+workflows that select live IDs. Manual builds, pull-request builds, internal
+tracks, TestFlight, and ad-hoc builds use test IDs. A selected platform's build
+fails when its chosen app ID or ad-unit ID is missing.
+
+The PWA-side entitlement defaults to `unknown`, which suppresses SDK loading and
+all ads. The subscription implementation must provide `AdEntitlementContext`
+with an explicit `adFree` or `adSupported` result after entitlement resolution.
+Subscription purchase UI should call `useAdProtectedFlow(true)` while active so
+App Open ads cannot cover it. Android also delays Google app measurement until
+the consent-aware coordinator explicitly initializes Mobile Ads.
+
+Do not enable live ads until the Premium entitlement has landed, the privacy
+policy and store disclosures match the resolved SDK behavior, UMP messages are
+published and verified, and the focused legal review described in
+[`docs/research/admob-privacy-policy-requirements.md`](../../docs/research/admob-privacy-policy-requirements.md)
+is complete. AdMob console
+configuration must keep mediation disabled, keep Publisher First-Party ID
+subject to privacy signals, and disable optional third-party identifier sharing,
+Firebase enrichment, user-insight surveys, publisher-provided user IDs, and
+content mapping.
+
 ## GitHub Actions
 
 The `CI` workflow includes a `Check Android` job that performs an Android
@@ -475,6 +508,7 @@ For local development, just open the project in Xcode and ensure **"Automaticall
 
 ## Capacitor Plugins
 
+- `@capacitor-community/admob` - consent, tracking permission, and interstitial ads
 - `@capacitor/app` - App state and URL handling
 - `@capacitor/splash-screen` - Native splash screen
 - `@capawesome/capacitor-app-update` - In-app updates

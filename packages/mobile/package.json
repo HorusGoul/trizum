@@ -37,6 +37,7 @@
     "version:update": "vp exec capver set $(node -p \"require('./package.json').version\")"
   },
   "dependencies": {
+    "@capacitor-community/admob": "catalog:",
     "@capacitor/android": "catalog:",
     "@capacitor/app": "catalog:",
     "@capacitor/camera": "catalog:",

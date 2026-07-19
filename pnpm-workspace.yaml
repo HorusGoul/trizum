@@ -49,6 +49,7 @@ catalog:
   "@capacitor/ios": 8.4.1
   "@capacitor/share": 8.0.1
   "@capacitor/splash-screen": 8.0.1
+  "@capacitor-community/admob": 8.0.0
   "@capawesome/capacitor-app-update": 8.0.3
   "@capawesome/capacitor-apple-sign-in": 0.1.1
   "@capawesome/capacitor-google-sign-in": 0.1.2
