@@ -256,6 +256,7 @@ ios/App/fastlane/
 │   │   ├── keywords.txt           # Keywords, comma-separated (max 100 chars)
 │   │   ├── promotional_text.txt   # Promotional text (max 170 chars)
 │   │   ├── release_notes.txt      # What's new
+│   │   ├── marketing_url.txt      # Developer website URL
 │   │   ├── support_url.txt        # Support URL
 │   │   └── privacy_url.txt        # Privacy policy URL (required)
 │   └── review_information/        # App Review contact info
