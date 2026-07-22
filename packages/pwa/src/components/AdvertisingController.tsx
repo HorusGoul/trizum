@@ -1,10 +1,11 @@
 import { App } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getLogger } from "#src/lib/log.ts";
 import { createAdMobSdk } from "#src/lib/advertising/adMobSdk.ts";
 import {
   AdvertisingCoordinator,
+  type AdEntitlement,
   type AdHistoryStore,
   type AdvertisingState,
 } from "#src/lib/advertising/AdvertisingCoordinator.ts";
@@ -32,6 +33,56 @@ const historyStore: AdHistoryStore = {
   },
 };
 
+class AdvertisingRuntime {
+  private coordinator: AdvertisingCoordinator | null = null;
+  private routeProtected = false;
+  private readonly protectedFlowTokens = new Set<symbol>();
+
+  readonly presentInterstitialOpportunity = () =>
+    this.coordinator?.presentInterstitialOpportunity() ?? false;
+
+  readonly registerProtectedFlow = () => {
+    const token = Symbol("protected-ad-flow");
+    this.protectedFlowTokens.add(token);
+    this.updateProtectedFlow();
+
+    return () => {
+      this.protectedFlowTokens.delete(token);
+      this.updateProtectedFlow();
+    };
+  };
+
+  readonly showPrivacyOptions = async () => {
+    await this.coordinator?.showPrivacyOptions();
+  };
+
+  attachCoordinator(coordinator: AdvertisingCoordinator) {
+    this.coordinator = coordinator;
+    this.updateProtectedFlow();
+  }
+
+  detachCoordinator(coordinator: AdvertisingCoordinator) {
+    if (this.coordinator === coordinator) {
+      this.coordinator = null;
+    }
+  }
+
+  setEntitlement(entitlement: AdEntitlement) {
+    return this.coordinator?.setEntitlement(entitlement);
+  }
+
+  setRouteProtected(protectedFlow: boolean) {
+    this.routeProtected = protectedFlow;
+    this.updateProtectedFlow();
+  }
+
+  private updateProtectedFlow() {
+    this.coordinator?.setProtectedFlow(this.routeProtected || this.protectedFlowTokens.size > 0);
+  }
+}
+
+const advertisingRuntime = new AdvertisingRuntime();
+
 export function AdvertisingController({
   children,
   protectedFlow,
@@ -40,28 +91,7 @@ export function AdvertisingController({
   protectedFlow: boolean;
 }) {
   const entitlement = useAdEntitlement();
-  const coordinatorRef = useRef<AdvertisingCoordinator | null>(null);
-  const routeProtectedRef = useRef(protectedFlow);
-  const protectedFlowTokensRef = useRef(new Set<symbol>());
-  const registerProtectedFlowRef = useRef<(() => () => void) | null>(null);
   const [state, setState] = useState<AdvertisingState>({ privacyOptionsRequired: false });
-
-  registerProtectedFlowRef.current ??= () => {
-    const token = Symbol("protected-ad-flow");
-    protectedFlowTokensRef.current.add(token);
-    updateProtectedFlow();
-
-    return () => {
-      protectedFlowTokensRef.current.delete(token);
-      updateProtectedFlow();
-    };
-  };
-
-  function updateProtectedFlow() {
-    coordinatorRef.current?.setProtectedFlow(
-      routeProtectedRef.current || protectedFlowTokensRef.current.size > 0,
-    );
-  }
 
   useEffect(() => {
     const platform = Capacitor.getPlatform();
@@ -79,9 +109,9 @@ export function AdvertisingController({
         logger.error("AdMob operation failed", { ...diagnostic });
       },
     });
-    coordinatorRef.current = coordinator;
-    updateProtectedFlow();
-    void coordinator.setEntitlement(entitlement);
+    advertisingRuntime.setRouteProtected(protectedFlow);
+    advertisingRuntime.attachCoordinator(coordinator);
+    void advertisingRuntime.setEntitlement(entitlement);
 
     const interactiveFrame = requestAnimationFrame(() => coordinator.markInteractive());
     const appStateListener = App.addListener("appStateChange", ({ isActive }) => {
@@ -93,7 +123,7 @@ export function AdvertisingController({
     });
 
     return () => {
-      coordinatorRef.current = null;
+      advertisingRuntime.detachCoordinator(coordinator);
       cancelAnimationFrame(interactiveFrame);
       void appStateListener.then((listener) => listener.remove());
       void coordinator.destroy();
@@ -103,22 +133,20 @@ export function AdvertisingController({
   }, []);
 
   useEffect(() => {
-    void coordinatorRef.current?.setEntitlement(entitlement);
+    void advertisingRuntime.setEntitlement(entitlement);
   }, [entitlement]);
 
   useEffect(() => {
-    routeProtectedRef.current = protectedFlow;
-    updateProtectedFlow();
+    advertisingRuntime.setRouteProtected(protectedFlow);
   }, [protectedFlow]);
 
   return (
     <AdvertisingProvider
       value={{
         privacyOptionsRequired: state.privacyOptionsRequired,
-        presentInterstitialOpportunity: () =>
-          coordinatorRef.current?.presentInterstitialOpportunity() ?? false,
-        registerProtectedFlow: registerProtectedFlowRef.current,
-        showPrivacyOptions: async () => coordinatorRef.current?.showPrivacyOptions(),
+        presentInterstitialOpportunity: advertisingRuntime.presentInterstitialOpportunity,
+        registerProtectedFlow: advertisingRuntime.registerProtectedFlow,
+        showPrivacyOptions: advertisingRuntime.showPrivacyOptions,
       }}
     >
       {children}
