@@ -16,27 +16,34 @@ interface AdMobConfig {
 }
 
 describe("AdMob release configuration", () => {
-  test("contains distinct public test and live IDs for both platforms", async () => {
+  test("pairs trizum app IDs with distinct test and live ad units", async () => {
     const config = JSON.parse(
       await readFile(new URL("admob.config.json", packageRoot), "utf8"),
     ) as AdMobConfig;
-    const ids = new Set<string>();
+    const adUnitIds = new Set<string>();
 
     for (const environment of [config.test, config.live]) {
       for (const platform of [environment.android, environment.ios]) {
         expect(platform.appId).toMatch(/^ca-app-pub-\d+~\d+$/);
         expect(platform.appOpen).toMatch(/^ca-app-pub-\d+\/\d+$/);
         expect(platform.interstitial).toMatch(/^ca-app-pub-\d+\/\d+$/);
-        ids.add(platform.appId);
-        ids.add(platform.appOpen);
-        ids.add(platform.interstitial);
+        adUnitIds.add(platform.appOpen);
+        adUnitIds.add(platform.interstitial);
       }
     }
 
-    expect(ids.size).toBe(12);
+    expect(config.test.android.appId).toBe(config.live.android.appId);
+    expect(config.test.ios.appId).toBe(config.live.ios.appId);
+    expect(config.test.android.appId).toContain("ca-app-pub-8039329288910865~");
+    expect(config.test.ios.appId).toContain("ca-app-pub-8039329288910865~");
+    expect(config.test.android.appOpen).toContain("ca-app-pub-3940256099942544/");
+    expect(config.test.android.interstitial).toContain("ca-app-pub-3940256099942544/");
+    expect(config.test.ios.appOpen).toContain("ca-app-pub-3940256099942544/");
+    expect(config.test.ios.interstitial).toContain("ca-app-pub-3940256099942544/");
+    expect(adUnitIds.size).toBe(8);
   });
 
-  test("selects live IDs only in official production artifact workflows", async () => {
+  test("selects live ad units only in official production artifact workflows", async () => {
     const [mobileBuild, release, androidStore, iosStore] = await Promise.all([
       readWorkflow("mobile-build.yml"),
       readWorkflow("release.yml"),

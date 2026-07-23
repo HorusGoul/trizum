@@ -335,13 +335,14 @@ privacy choices, ATT, SDK initialization, and interstitial ads. The published
 small `NativeAppOpenAd` Capacitor bridge over the same Google Mobile Ads SDK.
 The browser app and installed PWA never initialize AdMob.
 
-Test and live app/ad-unit IDs are public configuration in `admob.config.json`.
-Builds use Google's test IDs unless
+The trizum app IDs and test/live ad-unit IDs are public configuration in
+`admob.config.json`. Builds always use trizum's app IDs so UMP resolves the
+published consent message, and use Google's test ad-unit IDs unless
 `TRIZUM_LIVE_ADS=true` is explicitly set. The official production App Store,
 Google Play production, and signed GitHub Release APK workflows are the only
-workflows that select live IDs. Manual builds, pull-request builds, internal
-tracks, TestFlight, and ad-hoc builds use test IDs. A selected platform's build
-fails when its chosen app ID or ad-unit ID is missing.
+workflows that select live ad-unit IDs. Manual builds, pull-request builds,
+internal tracks, TestFlight, and ad-hoc builds use test ad-unit IDs. A selected
+platform's build fails when its chosen app ID or ad-unit ID is missing.
 
 The PWA-side entitlement defaults to `unknown`, which suppresses SDK loading and
 all ads. The subscription implementation must provide `AdEntitlementContext`
