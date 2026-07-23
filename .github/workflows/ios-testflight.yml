@@ -48,6 +48,7 @@ jobs:
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          TRIZUM_LIVE_ADS: "true"
 
       - name: Deploy to TestFlight
         timeout-minutes: 20

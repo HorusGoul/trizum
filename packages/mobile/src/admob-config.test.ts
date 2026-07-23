@@ -43,19 +43,24 @@ describe("AdMob release configuration", () => {
     expect(adUnitIds.size).toBe(8);
   });
 
-  test("selects live ad units only in official production artifact workflows", async () => {
-    const [mobileBuild, release, androidStore, iosStore] = await Promise.all([
-      readWorkflow("mobile-build.yml"),
-      readWorkflow("release.yml"),
-      readWorkflow("android-playstore-deploy.yml"),
-      readWorkflow("ios-appstore-deploy.yml"),
-    ]);
+  test("selects live ad units only in production and registered-device review workflows", async () => {
+    const [mobileBuild, release, androidStore, iosStore, androidReview, iosReview] =
+      await Promise.all([
+        readWorkflow("mobile-build.yml"),
+        readWorkflow("release.yml"),
+        readWorkflow("android-playstore-deploy.yml"),
+        readWorkflow("ios-appstore-deploy.yml"),
+        readWorkflow("android-internal-testing.yml"),
+        readWorkflow("ios-testflight.yml"),
+      ]);
 
     expect(mobileBuild).toContain("default: false");
     expect(mobileBuild).toContain("TRIZUM_LIVE_ADS: ${{ inputs.live_ads");
     expect(release).toContain("live_ads: true");
     expect(androidStore).toContain("inputs.track == 'production'");
     expect(iosStore).toContain('TRIZUM_LIVE_ADS: "true"');
+    expect(androidReview).toContain('TRIZUM_LIVE_ADS: "true"');
+    expect(iosReview).toContain('TRIZUM_LIVE_ADS: "true"');
   });
 });
 
