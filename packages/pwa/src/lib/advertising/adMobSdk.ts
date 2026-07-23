@@ -1,4 +1,4 @@
-import { Capacitor, registerPlugin, type PluginListenerHandle } from "@capacitor/core";
+import { registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import type { AdmobConsentInfo } from "@capacitor-community/admob";
 
 export type AdFormat = "appOpen" | "interstitial";
@@ -35,13 +35,7 @@ interface NativeAppOpenAdPlugin {
   ): Promise<PluginListenerHandle>;
 }
 
-interface NativeAdMobPrivacyPlugin {
-  showRequiredForm(): Promise<AdmobConsentInfo>;
-  showPrivacyOptionsForm(): Promise<void>;
-}
-
 const NativeAppOpenAd = registerPlugin<NativeAppOpenAdPlugin>("NativeAppOpenAd");
-const NativeAdMobPrivacy = registerPlugin<NativeAdMobPrivacyPlugin>("NativeAdMobPrivacy");
 
 export async function createAdMobSdk(
   onFullScreenEvent: (format: AdFormat, event: FullScreenAdEvent, errorCode?: number) => void,
@@ -75,16 +69,10 @@ export async function createAdMobSdk(
     throw error;
   }
 
-  const usesNativePrivacyBridge = Capacitor.getPlatform() === "ios";
-
   return {
     requestConsentInfo: () => AdMob.requestConsentInfo({ tagForUnderAgeOfConsent: false }),
-    showConsentForm: () =>
-      usesNativePrivacyBridge ? NativeAdMobPrivacy.showRequiredForm() : AdMob.showConsentForm(),
-    showPrivacyOptionsForm: () =>
-      usesNativePrivacyBridge
-        ? NativeAdMobPrivacy.showPrivacyOptionsForm()
-        : AdMob.showPrivacyOptionsForm(),
+    showConsentForm: () => AdMob.showConsentForm(),
+    showPrivacyOptionsForm: () => AdMob.showPrivacyOptionsForm(),
     async trackingAuthorizationStatus() {
       return (await AdMob.trackingAuthorizationStatus()).status;
     },

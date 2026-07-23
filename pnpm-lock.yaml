@@ -388,6 +388,9 @@ overrides:
   esbuild: 0.28.1
   vitest: 4.1.10
 
+patchedDependencies:
+  '@capacitor-community/admob@8.0.0': 8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4
+
 importers:
 
   .:
@@ -524,7 +527,7 @@ importers:
     dependencies:
       '@capacitor-community/admob':
         specifier: 'catalog:'
-        version: 8.0.0
+        version: 8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)
       '@capacitor/android':
         specifier: 'catalog:'
         version: 8.4.1(@capacitor/core@8.4.1)
@@ -612,7 +615,7 @@ importers:
         version: 2.5.6
       '@capacitor-community/admob':
         specifier: 'catalog:'
-        version: 8.0.0
+        version: 8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)
       '@capacitor/app':
         specifier: 'catalog:'
         version: 8.1.0(@capacitor/core@8.4.1)
@@ -10504,7 +10507,7 @@ snapshots:
 
   '@canvas/image-data@1.0.0': {}
 
-  '@capacitor-community/admob@8.0.0':
+  '@capacitor-community/admob@8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)':
     dependencies:
       '@capacitor/core': 8.4.1
       '@rdlabo/capacitor-docgen': 0.4.1
@@ -12995,7 +12998,7 @@ snapshots:
       '@automerge/automerge-repo-network-messagechannel': 2.5.6
       '@automerge/automerge-repo-network-websocket': 2.5.6
       '@automerge/automerge-repo-storage-indexeddb': 2.5.6
-      '@capacitor-community/admob': 8.0.0
+      '@capacitor-community/admob': 8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)
       '@capacitor/app': 8.1.0(@capacitor/core@8.4.1)
       '@capacitor/camera': 8.2.0(@capacitor/core@8.4.1)
       '@capacitor/core': 8.4.1

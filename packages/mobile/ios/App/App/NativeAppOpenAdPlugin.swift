@@ -2,7 +2,6 @@ import Capacitor
 import Foundation
 import GoogleMobileAds
 import UIKit
-import UserMessagingPlatform
 
 @objc(NativeAppOpenAdPlugin)
 public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenContentDelegate {
@@ -122,88 +121,9 @@ public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenConte
     }
 }
 
-@objc(NativeAdMobPrivacyPlugin)
-public class NativeAdMobPrivacyPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "NativeAdMobPrivacyPlugin"
-    public let jsName = "NativeAdMobPrivacy"
-    public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "showRequiredForm", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "showPrivacyOptionsForm", returnType: CAPPluginReturnPromise)
-    ]
-
-    @objc public func showRequiredForm(_ call: CAPPluginCall) {
-        Task { @MainActor in
-            do {
-                try await ConsentForm.loadAndPresentIfRequired(from: nil)
-                resolveConsentInfo(call)
-            } catch {
-                reject(call, error: error)
-            }
-        }
-    }
-
-    @objc public func showPrivacyOptionsForm(_ call: CAPPluginCall) {
-        Task { @MainActor in
-            do {
-                try await ConsentForm.presentPrivacyOptionsForm(from: nil)
-                call.resolve()
-            } catch {
-                reject(call, error: error)
-            }
-        }
-    }
-
-    @MainActor
-    private func resolveConsentInfo(_ call: CAPPluginCall) {
-        call.resolve([
-            "status": consentStatusName(ConsentInformation.shared.consentStatus),
-            "isConsentFormAvailable": ConsentInformation.shared.formStatus == .available,
-            "canRequestAds": ConsentInformation.shared.canRequestAds,
-            "privacyOptionsRequirementStatus": privacyOptionsStatusName(
-                ConsentInformation.shared.privacyOptionsRequirementStatus
-            )
-        ])
-    }
-
-    @MainActor
-    private func reject(_ call: CAPPluginCall, error: Error) {
-        let nativeError = error as NSError
-        call.reject(
-            error.localizedDescription,
-            "\(nativeError.domain):\(nativeError.code)",
-            error
-        )
-    }
-
-    private func consentStatusName(_ status: ConsentStatus) -> String {
-        switch status {
-        case .required:
-            return "REQUIRED"
-        case .notRequired:
-            return "NOT_REQUIRED"
-        case .obtained:
-            return "OBTAINED"
-        default:
-            return "UNKNOWN"
-        }
-    }
-
-    private func privacyOptionsStatusName(_ status: PrivacyOptionsRequirementStatus) -> String {
-        switch status {
-        case .required:
-            return "REQUIRED"
-        case .notRequired:
-            return "NOT_REQUIRED"
-        default:
-            return "UNKNOWN"
-        }
-    }
-}
-
 @objc(BridgeViewController)
 public class BridgeViewController: CAPBridgeViewController {
     public override func capacitorDidLoad() {
         bridge?.registerPluginInstance(NativeAppOpenAdPlugin())
-        bridge?.registerPluginInstance(NativeAdMobPrivacyPlugin())
     }
 }
