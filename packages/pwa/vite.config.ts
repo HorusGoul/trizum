@@ -30,6 +30,7 @@ const buildTarget = ["chrome111", "edge111", "firefox114", "safari16.4", "ios16.
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
+const adMobConfig = readAdMobConfig();
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
 const linguiConfig = getLinguiConfig({
   cwd: packageRoot,
@@ -81,6 +82,10 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
   process.env.VITE_APP_FULL_VERSION = fullVersion;
+  process.env.VITE_APP_ADMOB_ANDROID_APP_OPEN_ID = adMobConfig.android.appOpen;
+  process.env.VITE_APP_ADMOB_ANDROID_INTERSTITIAL_ID = adMobConfig.android.interstitial;
+  process.env.VITE_APP_ADMOB_IOS_APP_OPEN_ID = adMobConfig.ios.appOpen;
+  process.env.VITE_APP_ADMOB_IOS_INTERSTITIAL_ID = adMobConfig.ios.interstitial;
 
   return {
     run: {
@@ -93,7 +98,7 @@ export default defineConfig(({ mode }) => {
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
-          env: ["SENTRY_AUTH_TOKEN", "VITE_APP_AUTH_URL"],
+          env: ["SENTRY_AUTH_TOKEN", "TRIZUM_LIVE_ADS", "VITE_APP_AUTH_URL"],
           output: ["dist/**"],
         },
         check: {
@@ -318,6 +323,34 @@ export default defineConfig(({ mode }) => {
     ],
   };
 });
+
+interface AdMobPlatformConfig {
+  appId: string;
+  appOpen: string;
+  interstitial: string;
+}
+
+interface AdMobConfigFile {
+  test: { android: AdMobPlatformConfig; ios: AdMobPlatformConfig };
+  live: { android: AdMobPlatformConfig; ios: AdMobPlatformConfig };
+}
+
+function readAdMobConfig() {
+  const configPath = path.resolve(packageRoot, "../mobile/admob.config.json");
+  const config = JSON.parse(readFileSync(configPath, "utf-8")) as AdMobConfigFile;
+  const isLive = process.env.TRIZUM_LIVE_ADS === "true";
+  const selected = isLive ? config.live : config.test;
+
+  for (const [platform, values] of Object.entries(selected)) {
+    for (const [name, value] of Object.entries(values)) {
+      if (typeof value !== "string" || value.trim().length === 0) {
+        throw new Error(`Missing ${isLive ? "live" : "test"} AdMob ${platform} ${name}`);
+      }
+    }
+  }
+
+  return selected;
+}
 
 /**
  * Plugin to append //# sourceMappingURL= comments at the end of every JS asset.

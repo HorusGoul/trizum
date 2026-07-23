@@ -1,5 +1,6 @@
 import { BackButton } from "#src/components/BackButton.js";
 import { createFileRoute } from "@tanstack/react-router";
+import { Trans } from "@lingui/react/macro";
 
 export const Route = createFileRoute("/privacy-policy")({
   component: PrivacyPolicy,
@@ -21,7 +22,9 @@ function renderPrivacyPolicyContent() {
       </div>
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
-        <p className="text-accent-600 dark:text-accent-400 text-sm">Last updated: June 23, 2026</p>
+        <p className="text-accent-600 dark:text-accent-400 text-sm">
+          <Trans>Last updated: July 19, 2026</Trans>
+        </p>
 
         <p className="text-accent-700 dark:text-accent-300">
           This Privacy Policy describes how trizum (&quot;we&quot;, &quot;our&quot;, or
@@ -121,6 +124,39 @@ function renderPrivacyPolicyContent() {
               </li>
             </ul>
           </div>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+              <Trans>1.3 Mobile Advertising Data</Trans>
+            </h3>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                The installed Android and iOS apps may display advertising supplied through Google
+                AdMob. The browser app and installed Progressive Web App do not display ads. Subject
+                to your consent choices and device settings, the Google Mobile Ads SDK may
+                automatically process IP-address-derived approximate location, device and operating
+                system information, app interactions, advertising interactions, diagnostics,
+                performance data, and device or advertising identifiers. On iOS, the advertising
+                identifier (IDFA) is available only if you grant Apple&apos;s tracking permission.
+              </Trans>
+            </p>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                AdMob may create a pseudonymous Publisher First-Party ID that recognizes a device
+                within our apps when third-party identifiers are unavailable. We do not connect
+                Firebase Analytics, user-insight surveys, trizum account identifiers, or expense
+                data to this identifier, and we disable optional third-party identifier sharing.
+              </Trans>
+            </p>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                We do not intentionally provide Google AdMob with group names, participant names,
+                expense descriptions or amounts, currencies, receipts or other attached media, phone
+                numbers, email addresses, trizum account IDs, authentication data, or synced
+                document contents for advertising, targeting, or content mapping.
+              </Trans>
+            </p>
+          </div>
         </section>
 
         <section className="flex flex-col gap-4">
@@ -141,7 +177,30 @@ function renderPrivacyPolicyContent() {
             <li>Store your data locally on your device for offline access</li>
             <li>Identify and fix technical issues through error reporting</li>
             <li>Improve and optimize the Service</li>
+            <li>
+              <Trans>
+                Deliver, personalize where permitted, measure, and limit the frequency of mobile
+                advertising, and detect advertising fraud and abuse
+              </Trans>
+            </li>
           </ul>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+              <Trans>2.1 Legal Bases for Advertising</Trans>
+            </h3>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                Where applicable law requires consent, we use Google&apos;s User Messaging Platform
+                to request it before using local storage or personal data for personalized
+                advertising. You may withdraw that consent through Privacy and cookie settings when
+                that control is required. Where permitted without consent, non-personalized ad
+                delivery, frequency control, measurement, security, and fraud prevention may be
+                based on our legitimate interests in funding and protecting the Service, subject to
+                your applicable rights and choices.
+              </Trans>
+            </p>
+          </div>
         </section>
 
         <section className="flex flex-col gap-4">
@@ -287,6 +346,44 @@ function renderPrivacyPolicyContent() {
                 </a>
                 .
               </li>
+              <li>
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
+                  <Trans>Google AdMob:</Trans>
+                </strong>{" "}
+                <Trans>
+                  The installed mobile apps use Google AdMob to request, display, personalize where
+                  permitted, measure, and protect advertising. Google and authorized buyers or
+                  advertising partners may receive ad-request data for these purposes even though
+                  trizum does not integrate separate third-party mediation SDKs. See
+                </Trans>{" "}
+                <a
+                  href="https://policies.google.com/technologies/partner-sites"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
+                >
+                  <Trans>How Google uses information from partner apps</Trans>
+                </a>{" "}
+                <Trans>and</Trans>{" "}
+                <a
+                  href="https://policies.google.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
+                >
+                  <Trans>Google&apos;s Privacy Policy</Trans>
+                </a>{" "}
+                <Trans>and its</Trans>{" "}
+                <a
+                  href="https://business.safety.google/privacy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
+                >
+                  <Trans>Business Data Responsibility information</Trans>
+                </a>
+                .
+              </li>
             </ul>
           </div>
 
@@ -351,6 +448,23 @@ function renderPrivacyPolicyContent() {
               logging.
             </p>
           </div>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+              <Trans>5.4 Advertising and Tracking Choices</Trans>
+            </h3>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                When required, the mobile app displays Privacy and cookie settings so you can review
+                or withdraw consent and exercise applicable opt-out rights. Under some US state
+                laws, personalized advertising may be considered a sale or sharing of personal
+                information; covered users can opt out through that control. On iOS, Apple&apos;s
+                tracking permission is separate and can be changed in iOS Settings. Declining
+                personalized advertising or tracking does not prevent you from using trizum, and ads
+                may still be shown without the declined signals.
+              </Trans>
+            </p>
+          </div>
         </section>
 
         <section className="flex flex-col gap-4">
@@ -376,6 +490,15 @@ function renderPrivacyPolicyContent() {
             access the group. Please note that this policy may change in the future with the
             introduction of paid plans and freemium limits.
           </p>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              The mobile app keeps a device-local record of first-use completion and the most recent
+              full-screen ad to enforce advertising frequency limits. It is not synchronized and
+              remains until you clear the app&apos;s data or uninstall it. Google controls retention
+              of data processed by AdMob according to its published retention practices and your
+              advertising choices.
+            </Trans>
+          </p>
         </section>
 
         <section className="flex flex-col gap-4">
@@ -394,10 +517,14 @@ function renderPrivacyPolicyContent() {
             8. International Data Transfers
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
-            Your data may be stored and processed in servers located outside your country of
-            residence, including by infrastructure and sign-in providers used to operate the
-            Service. By using the Service, you consent to the transfer of your data to these
-            locations.
+            <Trans>
+              Our infrastructure, sign-in, monitoring, and advertising providers may process data
+              outside your country of residence. Where required, these transfers rely on applicable
+              legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy
+              Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices
+              describe their specific locations and safeguards. Contact us if you need more
+              information about safeguards relevant to your data.
+            </Trans>
           </p>
         </section>
 
