@@ -48,6 +48,7 @@ interface AdvertisingCoordinatorOptions {
   ) => Promise<AdMobSdk>;
   reportDiagnostic: (diagnostic: AdDiagnostic) => void;
   onStateChange: (state: AdvertisingState) => void;
+  bypassFirstUseSession?: boolean;
   now?: () => number;
 }
 
@@ -84,6 +85,9 @@ export class AdvertisingCoordinator {
       this.history = resumed.history;
     } else {
       this.history = createAdHistory();
+    }
+    if (options.bypassFirstUseSession) {
+      this.history = { ...this.history, firstUseCompleted: true };
     }
     this.persistHistory();
   }

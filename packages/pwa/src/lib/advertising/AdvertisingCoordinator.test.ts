@@ -17,7 +17,10 @@ const consentReady = {
     "NOT_REQUIRED" as AdmobConsentInfo["privacyOptionsRequirementStatus"],
 } satisfies AdmobConsentInfo;
 
-function createHarness({ firstUseCompleted = true }: { firstUseCompleted?: boolean } = {}) {
+function createHarness({
+  firstUseCompleted = true,
+  bypassFirstUseSession = false,
+}: { firstUseCompleted?: boolean; bypassFirstUseSession?: boolean } = {}) {
   let now = 10_000;
   let stored: AdHistory | undefined = firstUseCompleted
     ? { version: 1, firstUseCompleted: true }
@@ -67,6 +70,7 @@ function createHarness({ firstUseCompleted = true }: { firstUseCompleted?: boole
     reportDiagnostic,
     onStateChange,
     now: () => now,
+    bypassFirstUseSession,
   });
 
   return {
@@ -74,6 +78,7 @@ function createHarness({ firstUseCompleted = true }: { firstUseCompleted?: boole
     createSdk,
     sdk,
     reportDiagnostic,
+    onStateChange,
     get history() {
       return stored;
     },
@@ -107,6 +112,28 @@ describe("AdvertisingCoordinator", () => {
 
     expect(harness.history?.firstUseCompleted).toBe(true);
     expect(harness.createSdk).toHaveBeenCalledOnce();
+  });
+
+  it("requests consent immediately when first-use protection is bypassed", async () => {
+    const harness = createHarness({
+      firstUseCompleted: false,
+      bypassFirstUseSession: true,
+    });
+    const consentRequired = {
+      ...consentReady,
+      status: AdmobConsentStatus.REQUIRED,
+      isConsentFormAvailable: true,
+      privacyOptionsRequirementStatus:
+        "REQUIRED" as AdmobConsentInfo["privacyOptionsRequirementStatus"],
+    } satisfies AdmobConsentInfo;
+    vi.mocked(harness.sdk.requestConsentInfo).mockResolvedValue(consentRequired);
+    vi.mocked(harness.sdk.showConsentForm).mockResolvedValue(consentRequired);
+
+    await harness.coordinator.setEntitlement("adSupported");
+
+    expect(harness.sdk.requestConsentInfo).toHaveBeenCalledOnce();
+    expect(harness.sdk.showConsentForm).toHaveBeenCalledOnce();
+    expect(harness.onStateChange).toHaveBeenCalledWith({ privacyOptionsRequired: true });
   });
 
   it("starts the shared cooldown only after an ad becomes visible", async () => {
