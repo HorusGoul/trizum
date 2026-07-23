@@ -1,5 +1,16 @@
 # @trizum/mobile
 
+## 1.12.1
+
+### Patch Changes
+
+- [#422](https://github.com/HorusGoul/trizum/pull/422) [`fc02094`](https://github.com/HorusGoul/trizum/commit/fc0209465459586b34eac8e245d5623a182262a7) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Render the Android launch splash from a native vector drawable for crisp output at every screen density.
+
+- [#420](https://github.com/HorusGoul/trizum/pull/420) [`b8bba3e`](https://github.com/HorusGoul/trizum/commit/b8bba3e8fd53da62126a77c267440b6ef7987354) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Publish the trizum developer website as the iOS App Store Marketing URL.
+
+- Updated dependencies [[`0f9a1e1`](https://github.com/HorusGoul/trizum/commit/0f9a1e1a13504e867036ed70c0e50838c56b7945)]:
+  - @trizum/pwa@1.12.1
+
 ## 1.12.0
 
 ### Patch Changes

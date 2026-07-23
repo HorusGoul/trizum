@@ -1,5 +1,11 @@
 # @trizum/pwa
 
+## 1.12.1
+
+### Patch Changes
+
+- [#418](https://github.com/HorusGoul/trizum/pull/418) [`0f9a1e1`](https://github.com/HorusGoul/trizum/commit/0f9a1e1a13504e867036ed70c0e50838c56b7945) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Publish the Google advertising seller declaration at `/app-ads.txt`.
+
 ## 1.12.0
 
 ### Minor Changes
