@@ -24,6 +24,7 @@
     }
   },
   "scripts": {
+    "assets:check": "node src/generate-android-splash-icon.ts --check",
     "capacitor:copy:before": "./copy-client.sh",
     "cleanup": "rm -rf dist",
     "dev": "tsc --watch",
