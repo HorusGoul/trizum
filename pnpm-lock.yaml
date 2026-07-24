@@ -62,14 +62,14 @@ catalogs:
       specifier: 8.0.3
       version: 8.0.3
     '@capawesome/capacitor-apple-sign-in':
-      specifier: 0.1.1
-      version: 0.1.1
+      specifier: 0.1.2
+      version: 0.1.2
     '@capawesome/capacitor-google-sign-in':
       specifier: 0.1.2
       version: 0.1.2
     '@capawesome/capver':
-      specifier: 0.1.4
-      version: 0.1.4
+      specifier: 0.1.5
+      version: 0.1.5
     '@changesets/changelog-github':
       specifier: 0.7.0
       version: 0.7.0
@@ -125,8 +125,8 @@ catalogs:
       specifier: 2.2.4
       version: 2.2.4
     '@openai/codex':
-      specifier: 0.144.3
-      version: 0.144.3
+      specifier: 0.145.0
+      version: 0.145.0
     '@playwright/test':
       specifier: 1.61.1
       version: 1.61.1
@@ -191,8 +191,8 @@ catalogs:
       specifier: 4.1.10
       version: 4.1.10
     agent-browser:
-      specifier: 0.31.2
-      version: 0.31.2
+      specifier: 0.32.4
+      version: 0.32.4
     all-contributors-cli:
       specifier: 6.26.1
       version: 6.26.1
@@ -397,7 +397,7 @@ importers:
         version: 3.6.0
       agent-browser:
         specifier: 'catalog:'
-        version: 0.31.2
+        version: 0.32.4
       all-contributors-cli:
         specifier: 'catalog:'
         version: 6.26.1
@@ -452,7 +452,7 @@ importers:
         version: 0.4.0(zod@4.4.3)
       '@openai/codex':
         specifier: 'catalog:'
-        version: 0.144.3
+        version: 0.145.0
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -545,7 +545,7 @@ importers:
         version: 8.0.3(@capacitor/core@8.4.1)
       '@capawesome/capacitor-apple-sign-in':
         specifier: 'catalog:'
-        version: 0.1.1(@capacitor/core@8.4.1)
+        version: 0.1.2(@capacitor/core@8.4.1)
       '@capawesome/capacitor-google-sign-in':
         specifier: 'catalog:'
         version: 0.1.2(@capacitor/core@8.4.1)
@@ -567,7 +567,7 @@ importers:
         version: 8.4.1
       '@capawesome/capver':
         specifier: 'catalog:'
-        version: 0.1.4(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)
+        version: 0.1.5(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)
       '@trizum/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -624,7 +624,7 @@ importers:
         version: 8.0.3(@capacitor/core@8.4.1)
       '@capawesome/capacitor-apple-sign-in':
         specifier: 'catalog:'
-        version: 0.1.1(@capacitor/core@8.4.1)
+        version: 0.1.2(@capacitor/core@8.4.1)
       '@capawesome/capacitor-google-sign-in':
         specifier: 'catalog:'
         version: 0.1.2(@capacitor/core@8.4.1)
@@ -1822,8 +1822,8 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
-  '@capawesome/capacitor-apple-sign-in@0.1.1':
-    resolution: {integrity: sha512-4CkO5YYn/CkJXOPFjKMZbGgHQyyGWVj5BafwffG4w3Ye5uRJ5VkijbR18WrjtLM8mQLjdGZAt6bquA03MontUQ==}
+  '@capawesome/capacitor-apple-sign-in@0.1.2':
+    resolution: {integrity: sha512-qux8WBnoDYe8axpVkXYSsPPfl0Wy+bXddmhJ5GLx4V7AR2LVP7YZnl/AN0xbQI1pGJv234hAgrFGdZnUwhVyxw==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -1832,8 +1832,8 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
-  '@capawesome/capver@0.1.4':
-    resolution: {integrity: sha512-FY3zre+9A3yeBHf1fXCvjUyAcH0RsEmJL4pvHwB4uAlOZDrIbWmQWQQTrseKk4+tVFjM+uhFY2Pqqe0hLm5UdA==}
+  '@capawesome/capver@0.1.5':
+    resolution: {integrity: sha512-XSqWpEN7HRAg67GyM2yc9eTxERRIqauRmJxI+DE0ZqCMqzDhcqu/w4IaHt7jMEtEUQHav5+zbxsHqH7XEzLAjQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
@@ -3022,43 +3022,43 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@openai/codex@0.144.3':
-    resolution: {integrity: sha512-8Re3wp5CdYiM7nsF4StFa5js6IT11N7srhxfvwtol7ENHDht05C+HS4e1CTmYjqkhgsUzl2R1gB27iN2pdbVnA==}
+  '@openai/codex@0.145.0':
+    resolution: {integrity: sha512-/PSPSFujjjmiyVFvG2yu/grOFhsWdokTH8t2KGWhXSo/M5n/dIDsnbsnO82/7bLtIoDuzQf7ATBUMWqPWQINlQ==}
     engines: {node: '>=16'}
     hasBin: true
 
-  '@openai/codex@0.144.3-darwin-arm64':
-    resolution: {integrity: sha512-v/yT1wqslBcwquUvUPZvAdYyiZcCBIUL+pE4ymHpbUMVduwDJBw1EjLroOhe9FkYFDHzWGyv7YEw7iIV4k+0dA==}
+  '@openai/codex@0.145.0-darwin-arm64':
+    resolution: {integrity: sha512-h6aQ0UxnaP8mIM/9/qPAH9MNkRliJo88toq1T36IxNM2L5JSU0TFamu+MZn7YkFgDsrp0RfiI+97Tm8AVVxqtA==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
 
-  '@openai/codex@0.144.3-darwin-x64':
-    resolution: {integrity: sha512-308U0s7AeRg3AlnxJtmJk03yRRriEplC6ceFoB3OpWh+przqt8/u6MKDVU3KHdjb+vasa0IpmDWv5VrFw3oJAw==}
+  '@openai/codex@0.145.0-darwin-x64':
+    resolution: {integrity: sha512-FCYzVKCa9VoLtg9gVyzKpqylonfgZrfcWZN6HsXAZPeuo8CukdMqdgTUOhDn2V6h3MbqS0z6VqQVKUllN/yKhA==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [darwin]
 
-  '@openai/codex@0.144.3-linux-arm64':
-    resolution: {integrity: sha512-mJgDUmoPMry9a7g6ywsMQ4uQko2K0uHLqzEITUJMXiNNbCRBQKS+PxDWBlSK0bF0v72uAhWRRRGvPXslwhIdyg==}
+  '@openai/codex@0.145.0-linux-arm64':
+    resolution: {integrity: sha512-8OLcPXaAol/FOrRoDxWhIiHIFa73KRsM41EKocjRZOwiT4TcelzJWn3dHyiuSb7teWF25rrslvSPyvhULYRRCQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
-  '@openai/codex@0.144.3-linux-x64':
-    resolution: {integrity: sha512-xtDY5sWQPbYBj2lLWZJvc0jBre0XQ7ZmN4VbSEvazbQ2X7uHhm1D/0oZ7AI+SgC/VfZrUhvxRHd43/AmXSaAzA==}
+  '@openai/codex@0.145.0-linux-x64':
+    resolution: {integrity: sha512-u8w8LLv3DvsfrDCoswLIemZ0SoNEXyi511WsfFsSiYUazk9qMsB/NtU8N9vhAfN7mZAxLFoMex4v66JjHuZWwA==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [linux]
 
-  '@openai/codex@0.144.3-win32-arm64':
-    resolution: {integrity: sha512-uvgBLuBX58GIq58CquhvhEmwLlH9Lc46rLmE5/CkEf1vQiCvWqVHxL28t7P9cmWGoeMuxsrIwqJgyzmRu6wZMQ==}
+  '@openai/codex@0.145.0-win32-arm64':
+    resolution: {integrity: sha512-sub61rjEFevi1i3Zx7nAd4JM5XxoNFqMqFc5LfTo2xSI8ixHjFvEYDFDXwXOftT04n3Ht1Wh271ioUZpDiEjEg==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [win32]
 
-  '@openai/codex@0.144.3-win32-x64':
-    resolution: {integrity: sha512-0o8LpbZuBvqcAdIqMh96pECFTtfkgMT2sP/Q2IKYUOOlSudq3ulvdDW6zARq04HhbOxSsU9TBYDkdqtDs2YcYQ==}
+  '@openai/codex@0.145.0-win32-x64':
+    resolution: {integrity: sha512-u0h9lk094CaXRSqE34SBW2dRaQTPa6fASXqehczWH9QdsU62mBsiAgAdp6tCG4i+YzPmmhjD8FdXNnYGNmwuMg==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -5263,8 +5263,8 @@ packages:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
 
-  agent-browser@0.31.2:
-    resolution: {integrity: sha512-TkqqlFIIs9XFR7GCX92syuWdbWy3pcGkTsBKk/oncofVfICmaMJHnAeXk2MciE1SEUonzRqVNUCnYCqcO8rqWA==}
+  agent-browser@0.32.4:
+    resolution: {integrity: sha512-RaOWqNkYbnMCjsCSMY57bD0gsc5JGuJ+hjzDv73US9+uNVARdjhmJMpit35IGsdlpWGePN3WOSuqiStJnI2QJg==}
     engines: {node: '>=24.0.0', pnpm: '>=11.0.0'}
     hasBin: true
 
@@ -10579,7 +10579,7 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.4.1
 
-  '@capawesome/capacitor-apple-sign-in@0.1.1(@capacitor/core@8.4.1)':
+  '@capawesome/capacitor-apple-sign-in@0.1.2(@capacitor/core@8.4.1)':
     dependencies:
       '@capacitor/core': 8.4.1
 
@@ -10587,7 +10587,7 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.4.1
 
-  '@capawesome/capver@0.1.4(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)':
+  '@capawesome/capver@0.1.5(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)':
     dependencies:
       '@robingenz/zli': 0.2.0(zod@4.0.17)
       '@trapezedev/project': 7.1.4(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)
@@ -11748,31 +11748,31 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@openai/codex@0.144.3':
+  '@openai/codex@0.145.0':
     optionalDependencies:
-      '@openai/codex-darwin-arm64': '@openai/codex@0.144.3-darwin-arm64'
-      '@openai/codex-darwin-x64': '@openai/codex@0.144.3-darwin-x64'
-      '@openai/codex-linux-arm64': '@openai/codex@0.144.3-linux-arm64'
-      '@openai/codex-linux-x64': '@openai/codex@0.144.3-linux-x64'
-      '@openai/codex-win32-arm64': '@openai/codex@0.144.3-win32-arm64'
-      '@openai/codex-win32-x64': '@openai/codex@0.144.3-win32-x64'
+      '@openai/codex-darwin-arm64': '@openai/codex@0.145.0-darwin-arm64'
+      '@openai/codex-darwin-x64': '@openai/codex@0.145.0-darwin-x64'
+      '@openai/codex-linux-arm64': '@openai/codex@0.145.0-linux-arm64'
+      '@openai/codex-linux-x64': '@openai/codex@0.145.0-linux-x64'
+      '@openai/codex-win32-arm64': '@openai/codex@0.145.0-win32-arm64'
+      '@openai/codex-win32-x64': '@openai/codex@0.145.0-win32-x64'
 
-  '@openai/codex@0.144.3-darwin-arm64':
+  '@openai/codex@0.145.0-darwin-arm64':
     optional: true
 
-  '@openai/codex@0.144.3-darwin-x64':
+  '@openai/codex@0.145.0-darwin-x64':
     optional: true
 
-  '@openai/codex@0.144.3-linux-arm64':
+  '@openai/codex@0.145.0-linux-arm64':
     optional: true
 
-  '@openai/codex@0.144.3-linux-x64':
+  '@openai/codex@0.145.0-linux-x64':
     optional: true
 
-  '@openai/codex@0.144.3-win32-arm64':
+  '@openai/codex@0.145.0-win32-arm64':
     optional: true
 
-  '@openai/codex@0.144.3-win32-x64':
+  '@openai/codex@0.145.0-win32-x64':
     optional: true
 
   '@opentelemetry/api-logs@0.220.0':
@@ -12963,7 +12963,7 @@ snapshots:
       '@capacitor/share': 8.0.1(@capacitor/core@8.4.1)
       '@capacitor/splash-screen': 8.0.1(@capacitor/core@8.4.1)
       '@capawesome/capacitor-app-update': 8.0.3(@capacitor/core@8.4.1)
-      '@capawesome/capacitor-apple-sign-in': 0.1.1(@capacitor/core@8.4.1)
+      '@capawesome/capacitor-apple-sign-in': 0.1.2(@capacitor/core@8.4.1)
       '@capawesome/capacitor-google-sign-in': 0.1.2(@capacitor/core@8.4.1)
       '@fontsource-variable/fira-code': 5.2.7
       '@fontsource-variable/inter': 5.2.8
@@ -13612,7 +13612,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  agent-browser@0.31.2: {}
+  agent-browser@0.32.4: {}
 
   agent-install@0.0.5:
     dependencies:
