@@ -82,6 +82,8 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_VERSION = appVersion;
   process.env.VITE_APP_COMMIT = appCommit;
   process.env.VITE_APP_FULL_VERSION = fullVersion;
+  process.env.VITE_APP_REVENUECAT_TEST_STORE =
+    process.env.TRIZUM_REVENUECAT_TEST_STORE === "true" ? "true" : "false";
   process.env.VITE_APP_ADMOB_ANDROID_APP_OPEN_ID = adMobConfig.android.appOpen;
   process.env.VITE_APP_ADMOB_ANDROID_INTERSTITIAL_ID = adMobConfig.android.interstitial;
   process.env.VITE_APP_ADMOB_IOS_APP_OPEN_ID = adMobConfig.ios.appOpen;
@@ -98,7 +100,12 @@ export default defineConfig(({ mode }) => {
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
-          env: ["SENTRY_AUTH_TOKEN", "TRIZUM_LIVE_ADS", "VITE_APP_AUTH_URL"],
+          env: [
+            "SENTRY_AUTH_TOKEN",
+            "TRIZUM_LIVE_ADS",
+            "TRIZUM_REVENUECAT_TEST_STORE",
+            "VITE_APP_AUTH_URL",
+          ],
           output: ["dist/**"],
         },
         check: {

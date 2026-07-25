@@ -10,6 +10,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_ADMOB_ANDROID_INTERSTITIAL_ID: string;
   readonly VITE_APP_ADMOB_IOS_APP_OPEN_ID: string;
   readonly VITE_APP_ADMOB_IOS_INTERSTITIAL_ID: string;
+  readonly VITE_APP_REVENUECAT_TEST_STORE: "false" | "true";
 }
 
 interface ImportMeta {

@@ -112,11 +112,15 @@ msgstr "<0>{fromName}</0> stops owing <1>{toName}</1>"
 msgid "1.3 Mobile Advertising Data"
 msgstr "1.3 Mobile Advertising Data"
 
-#: src/routes/privacy-policy.tsx:190
+#: src/routes/privacy-policy.tsx:163
+msgid "1.4 Purchase and Premium Data"
+msgstr "1.4 Purchase and Premium Data"
+
+#: src/routes/privacy-policy.tsx:218
 msgid "2.1 Legal Bases for Advertising"
 msgstr "2.1 Legal Bases for Advertising"
 
-#: src/routes/privacy-policy.tsx:454
+#: src/routes/privacy-policy.tsx:502
 msgid "5.4 Advertising and Tracking Choices"
 msgstr "5.4 Advertising and Tracking Choices"
 
@@ -137,7 +141,7 @@ msgstr "About"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 
-#: src/routes/settings.tsx:259
+#: src/routes/settings.tsx:262
 msgid "Accent color"
 msgstr "Accent color"
 
@@ -283,11 +287,11 @@ msgstr "Amount for {participantName}"
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
-#: src/routes/privacy-policy.tsx:367
+#: src/routes/privacy-policy.tsx:395
 msgid "and"
 msgstr "and"
 
-#: src/routes/privacy-policy.tsx:376
+#: src/routes/privacy-policy.tsx:404
 msgid "and its"
 msgstr "and its"
 
@@ -306,6 +310,10 @@ msgstr "Apple connected"
 #: src/components/CloudSyncAccountSettings.tsx:42
 msgid "Apple is connected to this account"
 msgstr "Apple is connected to this account"
+
+#: src/routes/privacy-policy.tsx:176
+msgid "Apple or Google processes your payment through your store account. trizum and RevenueCat do not receive your full payment card details."
+msgstr "Apple or Google processes your payment through your store account. trizum and RevenueCat do not receive your full payment card details."
 
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:56
 msgid "Archive"
@@ -393,15 +401,15 @@ msgid "Authentication failed"
 msgstr "Authentication failed"
 
 #: src/components/ExpenseEditor.tsx:371
-#: src/routes/settings.tsx:246
+#: src/routes/settings.tsx:249
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
 
-#: src/routes/settings.tsx:248
+#: src/routes/settings.tsx:251
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Automatically open the calculator when focusing amount fields"
 
-#: src/routes/settings.tsx:235
+#: src/routes/settings.tsx:238
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
@@ -535,7 +543,7 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/routes/privacy-policy.tsx:383
+#: src/routes/privacy-policy.tsx:411
 msgid "Business Data Responsibility information"
 msgstr "Business Data Responsibility information"
 
@@ -628,6 +636,10 @@ msgstr "Check your email for the sign-in link"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
+#: src/routes/settings.tsx:372
+msgid "Checking Premium status…"
+msgstr "Checking Premium status…"
+
 #: src/routes/settings.tsx:483
 msgid "Checking..."
 msgstr "Checking..."
@@ -647,6 +659,10 @@ msgstr "Chinese Yuan"
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:528
 msgid "Choose a destination party"
 msgstr "Choose a destination party"
+
+#: src/routes/settings.tsx:387
+msgid "Choose monthly, annual, or lifetime access."
+msgstr "Choose monthly, annual, or lifetime access."
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:92
 msgid "Choose the currency for expenses in this party"
@@ -855,6 +871,10 @@ msgstr "Could not load sign-in methods"
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
+#: src/routes/settings.tsx:325
+msgid "Could not open Premium. Please try again."
+msgstr "Could not open Premium. Please try again."
+
 #: src/routes/reset-password.tsx:57
 msgid "Could not reset password"
 msgstr "Could not reset password"
@@ -1040,7 +1060,7 @@ msgstr "Delete expense?"
 msgid "Delete template"
 msgstr "Delete template"
 
-#: src/routes/privacy-policy.tsx:181
+#: src/routes/privacy-policy.tsx:209
 msgid "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 msgstr "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 
@@ -1158,7 +1178,7 @@ msgstr "Emoji list"
 msgid "End date"
 msgstr "End date"
 
-#: src/routes/settings.tsx:46
+#: src/routes/settings.tsx:49
 msgid "English"
 msgstr "English"
 
@@ -1178,7 +1198,7 @@ msgstr "Enter the link or code of the trizum party you want to join"
 msgid "Eritrean Nakfa"
 msgstr "Eritrean Nakfa"
 
-#: src/routes/settings.tsx:47
+#: src/routes/settings.tsx:50
 msgid "Español"
 msgstr "Español"
 
@@ -1364,7 +1384,7 @@ msgstr "Filter totals and rankings"
 msgid "Finishing sign in"
 msgstr "Finishing sign in"
 
-#: src/routes/settings.tsx:197
+#: src/routes/settings.tsx:200
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -1425,7 +1445,7 @@ msgstr "Gold (troy ounce)"
 msgid "Google"
 msgstr "Google"
 
-#: src/routes/privacy-policy.tsx:351
+#: src/routes/privacy-policy.tsx:379
 msgid "Google AdMob:"
 msgstr "Google AdMob:"
 
@@ -1437,7 +1457,7 @@ msgstr "Google connected"
 msgid "Google is connected to this account"
 msgstr "Google is connected to this account"
 
-#: src/routes/privacy-policy.tsx:374
+#: src/routes/privacy-policy.tsx:402
 msgid "Google's Privacy Policy"
 msgstr "Google's Privacy Policy"
 
@@ -1514,7 +1534,7 @@ msgstr "How do you want to call this party?"
 msgid "How does offline sync work?"
 msgstr "How does offline sync work?"
 
-#: src/routes/privacy-policy.tsx:365
+#: src/routes/privacy-policy.tsx:393
 msgid "How Google uses information from partner apps"
 msgstr "How Google uses information from partner apps"
 
@@ -1708,7 +1728,7 @@ msgstr "Kuwaiti Dinar"
 msgid "Kyrgystani Som"
 msgstr "Kyrgystani Som"
 
-#: src/routes/settings.tsx:212
+#: src/routes/settings.tsx:215
 msgid "Language"
 msgstr "Language"
 
@@ -1723,6 +1743,10 @@ msgstr "Last synced {lastSyncedAt}"
 #: src/routes/privacy-policy.tsx:26
 msgid "Last updated: July 19, 2026"
 msgstr "Last updated: July 19, 2026"
+
+#: src/routes/privacy-policy.tsx:26
+msgid "Last updated: July 25, 2026"
+msgstr "Last updated: July 25, 2026"
 
 #: src/components/PartyListCard.tsx:132
 msgid "Last used"
@@ -1811,6 +1835,10 @@ msgstr "Manage"
 #: src/routes/party.$partyId/-components/ExpenseLog.tsx:167
 msgid "Manage expense templates"
 msgstr "Manage expense templates"
+
+#: src/routes/settings.tsx:348
+msgid "Manage Premium"
+msgstr "Manage Premium"
 
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:20
 msgid "Manage the participants list. Existing members can only be archived."
@@ -2099,6 +2127,10 @@ msgstr "Not signed in"
 msgid "of total spending"
 msgstr "of total spending"
 
+#: src/routes/privacy-policy.tsx:203
+msgid "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
+msgstr "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
+
 #: src/routes/about/route.tsx:64
 msgid "Offline-First"
 msgstr "Offline-First"
@@ -2153,7 +2185,7 @@ msgstr "Open calculator when focusing amount fields"
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
 
-#: src/routes/settings.tsx:233
+#: src/routes/settings.tsx:236
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
@@ -2188,6 +2220,10 @@ msgstr "Other operations"
 #: src/routes/privacy-policy.tsx:520
 msgid "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
+
+#: src/routes/privacy-policy.tsx:576
+msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
+msgstr "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
 #: src/routes/party_.$partyId.pay/route.tsx:106
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
@@ -2407,7 +2443,7 @@ msgstr "Peruvian Sol"
 msgid "Philippine Peso"
 msgstr "Philippine Peso"
 
-#: src/routes/settings.tsx:196
+#: src/routes/settings.tsx:199
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -2479,15 +2515,27 @@ msgstr "Point your camera at a trizum QR code"
 msgid "Polish Zloty"
 msgstr "Polish Zloty"
 
+#: src/routes/settings.tsx:334
+msgid "Premium"
+msgstr "Premium"
+
+#: src/routes/settings.tsx:380
+msgid "Premium is active on this account."
+msgstr "Premium is active on this account."
+
+#: src/routes/settings.tsx:384
+msgid "Premium status could not be checked. Try again."
+msgstr "Premium status could not be checked. Try again."
+
 #: src/components/MediaGallery.tsx:262
 msgid "Previous"
 msgstr "Previous"
 
-#: src/routes/settings.tsx:282
+#: src/routes/settings.tsx:287
 msgid "Privacy"
 msgstr "Privacy"
 
-#: src/routes/settings.tsx:285
+#: src/routes/settings.tsx:290
 msgid "Privacy and cookie settings"
 msgstr "Privacy and cookie settings"
 
@@ -2581,6 +2629,18 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
+#: src/routes/privacy-policy.tsx:551
+msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
+msgstr "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
+
+#: src/routes/privacy-policy.tsx:417
+msgid "RevenueCat:"
+msgstr "RevenueCat:"
+
+#: src/routes/privacy-policy.tsx:431
+msgid "RevenueCat's Privacy Policy"
+msgstr "RevenueCat's Privacy Policy"
+
 #: src/components/ExpenseEditorValidationStatus.tsx:213
 msgid "Review expense"
 msgstr "Review expense"
@@ -2625,7 +2685,7 @@ msgstr "Saudi Riyal"
 #: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:100
+#: src/routes/settings.tsx:103
 msgid "Save"
 msgstr "Save"
 
@@ -2696,11 +2756,11 @@ msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/_home/route.tsx:81
 #: src/routes/party.$partyId/route.tsx:259
-#: src/routes/settings.tsx:123
+#: src/routes/settings.tsx:126
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:67
+#: src/routes/settings.tsx:70
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -2770,6 +2830,14 @@ msgstr "Sign in"
 #: src/routes/_home/settings_.cloud-sync.tsx:985
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
+
+#: src/routes/settings.tsx:353
+msgid "Sign in to get Premium"
+msgstr "Sign in to get Premium"
+
+#: src/routes/settings.tsx:376
+msgid "Sign in to purchase or restore Premium across your devices."
+msgstr "Sign in to purchase or restore Premium across your devices."
 
 #: src/components/CloudSyncDialogs.tsx:225
 #: src/routes/_home/route.tsx:99
@@ -2962,7 +3030,7 @@ msgstr "Submit a Request"
 #: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:100
+#: src/routes/settings.tsx:103
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -3037,7 +3105,7 @@ msgstr "Syncing party information..."
 msgid "Syrian Pound"
 msgstr "Syrian Pound"
 
-#: src/routes/settings.tsx:45
+#: src/routes/settings.tsx:48
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 
@@ -3108,11 +3176,15 @@ msgstr "The app works offline too!"
 msgid "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 msgstr "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 
-#: src/routes/privacy-policy.tsx:353
+#: src/routes/privacy-policy.tsx:381
 msgid "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 msgstr "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 
-#: src/routes/privacy-policy.tsx:494
+#: src/routes/privacy-policy.tsx:419
+msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
+msgstr "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
+
+#: src/routes/privacy-policy.tsx:542
 msgid "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 msgstr "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 
@@ -3487,7 +3559,7 @@ msgstr "Use your camera to scan a trizum invite"
 msgid "Used to prefill new expenses. Blank expense keeps the current empty form."
 msgstr "Used to prefill new expenses. Blank expense keeps the current empty form."
 
-#: src/routes/settings.tsx:174
+#: src/routes/settings.tsx:177
 msgid "Username"
 msgstr "Username"
 
@@ -3535,6 +3607,10 @@ msgstr "View party"
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "View photo"
+
+#: src/routes/settings.tsx:350
+msgid "View Premium options"
+msgstr "View Premium options"
 
 #: src/routes/about/route.tsx:138
 msgid "View Third-Party Licenses"
@@ -3585,15 +3661,19 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:175
+#: src/routes/settings.tsx:178
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
-#: src/routes/privacy-policy.tsx:457
+#: src/routes/privacy-policy.tsx:505
 msgid "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 msgstr "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 
-#: src/routes/privacy-policy.tsx:193
+#: src/routes/privacy-policy.tsx:166
+msgid "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
+msgstr "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
+
+#: src/routes/privacy-policy.tsx:221
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 
