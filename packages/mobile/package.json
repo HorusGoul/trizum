@@ -49,6 +49,8 @@
     "@capawesome/capacitor-app-update": "catalog:",
     "@capawesome/capacitor-apple-sign-in": "catalog:",
     "@capawesome/capacitor-google-sign-in": "catalog:",
+    "@revenuecat/purchases-capacitor": "catalog:",
+    "@revenuecat/purchases-capacitor-ui": "catalog:",
     "@trizum/logging": "workspace:*",
     "@trizum/pwa": "workspace:*",
     "capacitor-plugin-safe-area": "catalog:"

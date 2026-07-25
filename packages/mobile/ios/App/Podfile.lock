@@ -61,7 +61,21 @@ PODS:
   - PromisesObjC (2.4.1)
   - PromisesSwift (2.4.1):
     - PromisesObjC (= 2.4.1)
+  - PurchasesHybridCommon (18.22.2):
+    - RevenueCat (= 5.81.1)
+  - PurchasesHybridCommonUI (18.22.2):
+    - PurchasesHybridCommon (= 18.22.2)
+    - RevenueCatUI (= 5.81.1)
   - RecaptchaInterop (101.0.0)
+  - RevenueCat (5.81.1)
+  - RevenuecatPurchasesCapacitor (13.2.4):
+    - Capacitor
+    - PurchasesHybridCommon (= 18.22.2)
+  - RevenuecatPurchasesCapacitorUi (13.2.4):
+    - Capacitor
+    - PurchasesHybridCommonUI (= 18.22.2)
+  - RevenueCatUI (5.81.1):
+    - RevenueCat (= 5.81.1)
 
 DEPENDENCIES:
   - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios`)"
@@ -75,6 +89,8 @@ DEPENDENCIES:
   - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in`)"
   - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update`)"
   - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in`)"
+  - "RevenuecatPurchasesCapacitor (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.4.1/node_modules/@revenuecat/purchases-capacitor`)"
+  - "RevenuecatPurchasesCapacitorUi (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.4.1_@revenuecat+purchases-c_eda6bbee9cd735f048779ddc11714625/node_modules/@revenuecat/purchases-capacitor-ui`)"
 
 SPEC REPOS:
   trunk:
@@ -89,7 +105,11 @@ SPEC REPOS:
     - IONCameraLib
     - PromisesObjC
     - PromisesSwift
+    - PurchasesHybridCommon
+    - PurchasesHybridCommonUI
     - RecaptchaInterop
+    - RevenueCat
+    - RevenueCatUI
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -114,6 +134,10 @@ EXTERNAL SOURCES:
     :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update"
   CapawesomeCapacitorGoogleSignIn:
     :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in"
+  RevenuecatPurchasesCapacitor:
+    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.4.1/node_modules/@revenuecat/purchases-capacitor"
+  RevenuecatPurchasesCapacitorUi:
+    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.4.1_@revenuecat+purchases-c_eda6bbee9cd735f048779ddc11714625/node_modules/@revenuecat/purchases-capacitor-ui"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
@@ -138,8 +162,14 @@ SPEC CHECKSUMS:
   IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
   PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
+  PurchasesHybridCommon: e47bc4f611e86fcf8295bf1c984f187982270f02
+  PurchasesHybridCommonUI: e6756576ad454c6c15a4679f57446115382ff791
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
+  RevenueCat: 693b033863262f9776130cc6c1f9255a74ab23ff
+  RevenuecatPurchasesCapacitor: cfbab60a6bcc32d5050f6802e49b884beb2d936c
+  RevenuecatPurchasesCapacitorUi: f6c60a6466f873b15f9a4492bf9f7a62edabe938
+  RevenueCatUI: 2c7092fa0a485454d2a474e80f241e6db591dd36
 
-PODFILE CHECKSUM: cecacfad935560c25b28d93c67dd6ab82899a9db
+PODFILE CHECKSUM: 2edf2d7ea8acb5cb229536d2fcf1a2789bd8c89a
 
 COCOAPODS: 1.17.0

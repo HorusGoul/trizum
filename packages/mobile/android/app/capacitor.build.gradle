@@ -17,6 +17,8 @@ dependencies {
     implementation project(':capawesome-capacitor-app-update')
     implementation project(':capawesome-capacitor-apple-sign-in')
     implementation project(':capawesome-capacitor-google-sign-in')
+    implementation project(':revenuecat-purchases-capacitor')
+    implementation project(':revenuecat-purchases-capacitor-ui')
     implementation project(':capacitor-plugin-safe-area')
 
 }

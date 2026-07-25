@@ -46,6 +46,36 @@ _Avoid_: Website
 
 ## Monetization
 
+**Premium**:
+The person-owned paid access level for trizum's enhanced experience and
+capabilities.
+_Avoid_: Pro, paid plan
+
+**Premium Owner**:
+A signed-in person whose account holds Premium access through a trial,
+subscription, or Lifetime Premium. An active trial grants the complete Premium
+benefit, including Party Boost. Store-level family sharing does not create
+additional Premium owners.
+_Avoid_: Subscriber, purchaser
+
+**Lifetime Premium**:
+A non-expiring purchase of the same core access granted by Premium. Explicitly
+usage-metered services may remain outside this access. It is not offered while
+the person has an active Premium subscription, because buying it does not
+cancel that subscription.
+_Avoid_: Reduced lifetime tier, permanent subscription
+
+**Party Boost**:
+A benefit included with Premium that enables party-scoped capabilities for one
+selected party while its Premium owner remains a member. A boost does not make
+the other members Premium and does not, by itself, promise them a completely
+ad-free experience. Each party accepts only one active boost. The owner may
+move the boost once every seven days, while person-scoped access remains with
+them. It is the only way Premium benefits are shared collectively. Activating
+a boost is an explicit action separate from purchasing Premium; a purchase
+made inside a party may suggest that party but never boosts it automatically.
+_Avoid_: Group subscription, shared account
+
 **Intended Audience**:
 Adults aged 18 and over. trizum is not designed or directed toward children or
 people under 18.
