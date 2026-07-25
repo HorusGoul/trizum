@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -131,5 +133,34 @@ describe("generateIconSpriteArtifacts", () => {
     });
 
     expect(result.usedIds).toEqual(["lucide.arrow-left"]);
+  });
+
+  it("rejects local fragment references that Safari cannot render from external sprites", () => {
+    const rootDir = createTempProject();
+    tempDirectories.push(rootDir);
+
+    writeFile(rootDir, "src/app.tsx", 'const icon = "illustration.gradient";\n');
+    writeFile(
+      rootDir,
+      "src/icons/illustration/gradient.svg",
+      [
+        '<svg viewBox="0 0 24 24">',
+        '<defs><linearGradient id="paint"><stop stop-color="#fff"/></linearGradient></defs>',
+        '<circle cx="12" cy="12" r="10" fill="url(#paint)"/>',
+        "</svg>",
+        "",
+      ].join("\n"),
+    );
+
+    expect(() =>
+      generateIconSpriteArtifacts({
+        rootDir,
+        config: {
+          generatedSpriteFile: "src/generated/iconSprite.svg",
+          generatedTypesFile: "src/generated/iconSprite.gen.ts",
+          iconSources: [createSetDirectoryIconSource({ directory: "src/icons" })],
+        },
+      }),
+    ).toThrow(/cannot reliably resolve url\(#…\) references in Safari/u);
   });
 });

@@ -37,6 +37,7 @@ const STRING_LITERAL_REGEX = /(["'`])([^"'`\r\n]+)\1/g;
 const SVG_ROOT_REGEX = /<svg\b([^>]*)>([\s\S]*?)<\/svg>/i;
 const SVG_ATTRIBUTE_REGEX = /\b([a-zA-Z_:][-a-zA-Z0-9_:.]*)=(["'])(.*?)\2/g;
 const VIEWBOX_REGEX = /\bviewBox=(["'])([^"']+)\1/i;
+const LOCAL_FRAGMENT_REFERENCE_REGEX = /url\(\s*["']?#[^)]+/u;
 const STRIPPED_SVG_ATTRIBUTES = new Set(["class", "height", "role", "width", "xmlns"]);
 
 export function defineIconSpriteConfig(config: IconSpriteConfig) {
@@ -290,6 +291,12 @@ function createSymbolSource(id: string, filePath: string) {
 
   if ("error" in optimized) {
     throw new Error(`Failed to optimize icon "${id}" from ${filePath}: ${String(optimized.error)}`);
+  }
+
+  if (LOCAL_FRAGMENT_REFERENCE_REGEX.test(optimized.data)) {
+    throw new Error(
+      `Icon "${id}" contains a local SVG fragment reference. External SVG sprites cannot reliably resolve url(#…) references in Safari; use direct paint values instead.`,
+    );
   }
 
   const svgMatch = optimized.data.match(SVG_ROOT_REGEX);
