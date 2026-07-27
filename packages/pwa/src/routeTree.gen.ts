@@ -14,6 +14,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ArchivedRouteImport } from './routes/archived'
+import { Route as TermsRouteRouteImport } from './routes/terms/route'
 import { Route as SupportRouteRouteImport } from './routes/support/route'
 import { Route as NewRouteRouteImport } from './routes/new/route'
 import { Route as AboutRouteRouteImport } from './routes/about/route'
@@ -61,6 +62,11 @@ const JoinRoute = JoinRouteImport.update({
 const ArchivedRoute = ArchivedRouteImport.update({
   id: '/archived',
   path: '/archived',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRouteRoute = TermsRouteRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SupportRouteRoute = SupportRouteRouteImport.update({
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRouteRoute
   '/new': typeof NewRouteRoute
   '/support': typeof SupportRouteRoute
+  '/terms': typeof TermsRouteRoute
   '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRouteRoute
   '/new': typeof NewRouteRoute
   '/support': typeof SupportRouteRoute
+  '/terms': typeof TermsRouteRoute
   '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRouteRoute
   '/new': typeof NewRouteRoute
   '/support': typeof SupportRouteRoute
+  '/terms': typeof TermsRouteRoute
   '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/new'
     | '/support'
+    | '/terms'
     | '/archived'
     | '/join'
     | '/privacy-policy'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/new'
     | '/support'
+    | '/terms'
     | '/archived'
     | '/join'
     | '/privacy-policy'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/new'
     | '/support'
+    | '/terms'
     | '/archived'
     | '/join'
     | '/privacy-policy'
@@ -370,6 +382,7 @@ export interface RootRouteChildren {
   AboutRouteRoute: typeof AboutRouteRoute
   NewRouteRoute: typeof NewRouteRoute
   SupportRouteRoute: typeof SupportRouteRoute
+  TermsRouteRoute: typeof TermsRouteRoute
   ArchivedRoute: typeof ArchivedRoute
   JoinRoute: typeof JoinRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       path: '/archived'
       fullPath: '/archived'
       preLoaderRoute: typeof ArchivedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support': {
@@ -634,6 +654,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRouteRoute: AboutRouteRoute,
   NewRouteRoute: NewRouteRoute,
   SupportRouteRoute: SupportRouteRoute,
+  TermsRouteRoute: TermsRouteRoute,
   ArchivedRoute: ArchivedRoute,
   JoinRoute: JoinRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,

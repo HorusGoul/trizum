@@ -92,7 +92,7 @@ msgstr "{title} preview"
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
-#: src/routes/about/route.tsx:146
+#: src/routes/about/route.tsx:152
 msgid "© {currentYear} trizum"
 msgstr "© {currentYear} trizum"
 
@@ -108,6 +108,10 @@ msgstr "<0>{destinationCreditorName}</0> is owed by <1>{destinationDebtorName}</
 msgid "<0>{fromName}</0> stops owing <1>{toName}</1>"
 msgstr "<0>{fromName}</0> stops owing <1>{toName}</1>"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:9
+msgid "1. Acceptance of These Terms"
+msgstr "1. Acceptance of These Terms"
+
 #: src/routes/privacy-policy.tsx:130
 msgid "1.3 Mobile Advertising Data"
 msgstr "1.3 Mobile Advertising Data"
@@ -116,13 +120,87 @@ msgstr "1.3 Mobile Advertising Data"
 msgid "1.4 Purchase and Premium Data"
 msgstr "1.4 Purchase and Premium Data"
 
+#: src/routes/terms/-components/ServiceTerms.tsx:41
+msgid "10. Third-Party Services"
+msgstr "10. Third-Party Services"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:55
+msgid "11. Availability and Changes to the Service"
+msgstr "11. Availability and Changes to the Service"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:75
+msgid "12. Suspension and Termination"
+msgstr "12. Suspension and Termination"
+
+#: src/routes/terms/-components/LegalTerms.tsx:8
+msgid "13. Disclaimers and Liability"
+msgstr "13. Disclaimers and Liability"
+
+#: src/routes/terms/-components/LegalTerms.tsx:31
+msgid "14. Governing Law and Consumer Rights"
+msgstr "14. Governing Law and Consumer Rights"
+
+#: src/routes/terms/-components/LegalTerms.tsx:45
+msgid "15. Changes to These Terms"
+msgstr "15. Changes to These Terms"
+
+#: src/routes/terms/-components/LegalTerms.tsx:60
+msgid "16. Contact Us"
+msgstr "16. Contact Us"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:34
+msgid "2. What trizum Does"
+msgstr "2. What trizum Does"
+
 #: src/routes/privacy-policy.tsx:218
 msgid "2.1 Legal Bases for Advertising"
 msgstr "2.1 Legal Bases for Advertising"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:56
+msgid "3. Accounts, Devices, and Group Access"
+msgstr "3. Accounts, Devices, and Group Access"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:87
+msgid "4. Your Content and Responsibilities"
+msgstr "4. Your Content and Responsibilities"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:110
+msgid "5. Acceptable Use"
+msgstr "5. Acceptable Use"
+
 #: src/routes/privacy-policy.tsx:502
 msgid "5.4 Advertising and Tracking Choices"
 msgstr "5.4 Advertising and Tracking Choices"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:8
+msgid "6. Premium Purchases"
+msgstr "6. Premium Purchases"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:29
+msgid "6.1 Monthly and Annual Subscriptions"
+msgstr "6.1 Monthly and Annual Subscriptions"
+
+#. Lifetime means a one-time Premium purchase, not the user's lifespan
+#: src/routes/terms/-components/PremiumTerms.tsx:51
+msgid "6.2 Lifetime Purchase"
+msgstr "6.2 Lifetime Purchase"
+
+#. Party Boost means Premium benefits assigned to one shared-expense group
+#: src/routes/terms/-components/PremiumTerms.tsx:67
+msgid "6.3 Premium Ownership and Party Boosts"
+msgstr "6.3 Premium Ownership and Party Boosts"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:85
+msgid "7. Cancellation, Refunds, and Price Changes"
+msgstr "7. Cancellation, Refunds, and Price Changes"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:8
+msgid "8. Advertising"
+msgstr "8. Advertising"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:21
+msgid "9. Our Software and Intellectual Property"
+msgstr "9. Our Software and Intellectual Property"
 
 #: src/lib/validation.ts:67
 msgid "A name for the participant is required"
@@ -519,6 +597,10 @@ msgstr "Botswanan Pula"
 msgid "Brazilian Real"
 msgstr "Brazilian Real"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:117
+msgid "Break the law or infringe another person's rights"
+msgstr "Break the law or infringe another person's rights"
+
 #: src/routes/new/route.tsx:164
 msgid "British Pound"
 msgstr "British Pound"
@@ -546,6 +628,10 @@ msgstr "Burundian Franc"
 #: src/routes/privacy-policy.tsx:411
 msgid "Business Data Responsibility information"
 msgstr "Business Data Responsibility information"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:12
+msgid "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
+msgstr "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 
 #: src/components/CalculatorToolbar.tsx:1596
 msgid "Calculate result"
@@ -591,6 +677,10 @@ msgstr "Canadian Dollar"
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
 msgid "Cancel"
 msgstr "Cancel"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:95
+msgid "Cancellation normally takes effect at the end of the current paid billing period. Refunds and immediate cancellation requests are handled under the applicable store's rules and mandatory consumer law. Nothing in these Terms limits any refund, withdrawal, cancellation, or other right that applicable law gives you."
+msgstr "Cancellation normally takes effect at the end of the current paid billing period. Refunds and immediate cancellation requests are handled under the applicable store's rules and mandatory consumer law. Nothing in these Terms limits any refund, withdrawal, cancellation, or other right that applicable law gives you."
 
 #: src/routes/new/route.tsx:226
 msgid "Cape Verdean Escudo"
@@ -830,7 +920,7 @@ msgstr "Continue with Apple"
 msgid "Continue with Google"
 msgstr "Continue with Google"
 
-#: src/routes/about/route.tsx:119
+#: src/routes/about/route.tsx:125
 msgid "Contributors"
 msgstr "Contributors"
 
@@ -932,7 +1022,7 @@ msgstr "Created with ❤️ by the open source community. Special thanks to all 
 msgid "Creditor"
 msgstr "Creditor"
 
-#: src/routes/about/route.tsx:130
+#: src/routes/about/route.tsx:136
 msgid "Credits"
 msgstr "Credits"
 
@@ -1167,6 +1257,10 @@ msgstr "Email password setup link"
 #: src/routes/support/route.tsx:51
 msgid "Email Support"
 msgstr "Email Support"
+
+#: src/routes/terms/-components/LegalTerms.tsx:75
+msgid "Email:"
+msgstr "Email:"
 
 #: src/components/EmojiPicker.tsx:330
 #: src/components/EmojiPicker.tsx:515
@@ -1465,6 +1559,10 @@ msgstr "Google's Privacy Policy"
 msgid "Got it"
 msgstr "Got it"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:66
+msgid "Group access is shared through links. Anyone with a valid group link may be able to access and change that group, so only share links with people you trust."
+msgstr "Group access is shared through links. Anyone with a valid group link may be able to access and change that group, so only share links with people you trust."
+
 #: src/routes/about.tsx:38
 msgid "Group expense sharing made simple. Track, split and settle shared costs effortlessly."
 msgstr "Group expense sharing made simple. Track, split and settle shared costs effortlessly."
@@ -1484,6 +1582,10 @@ msgstr "Guyanaese Dollar"
 #: src/routes/new/route.tsx:243
 msgid "Haitian Gourde"
 msgstr "Haitian Gourde"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:120
+msgid "Harass, threaten, defraud, impersonate, or harm another person"
+msgstr "Harass, threaten, defraud, impersonate, or harm another person"
 
 #: src/routes/support/route.tsx:76
 msgid "Have an idea to improve trizum? We'd love to hear it."
@@ -1561,6 +1663,14 @@ msgstr "Icon"
 #: src/lib/validation.ts:11
 msgid "ID is required"
 msgstr "ID is required"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:66
+msgid "If the Service is discontinued, we will provide notice and any remedy required by applicable law or the store through which you purchased Premium."
+msgstr "If the Service is discontinued, we will provide notice and any remedy required by applicable law or the store through which you purchased Premium."
+
+#: src/routes/terms/-components/LegalTerms.tsx:64
+msgid "If you have questions about these Terms, please contact us:"
+msgstr "If you have questions about these Terms, please contact us:"
 
 #: src/components/AvatarPicker.tsx:53
 msgid "Image must be smaller than 10MB"
@@ -1748,6 +1858,10 @@ msgstr "Last updated: July 19, 2026"
 msgid "Last updated: July 25, 2026"
 msgstr "Last updated: July 25, 2026"
 
+#: src/routes/terms/route.tsx:26
+msgid "Last updated: July 27, 2026"
+msgstr "Last updated: July 27, 2026"
+
 #: src/components/PartyListCard.tsx:132
 msgid "Last used"
 msgstr "Last used"
@@ -1916,6 +2030,10 @@ msgstr "Moldovan Leu"
 #: src/routes/new/route.tsx:269
 msgid "Mongolian Tugrik"
 msgstr "Mongolian Tugrik"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:32
+msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
+msgstr "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 
 #: src/routes/new/route.tsx:264
 msgid "Moroccan Dirham"
@@ -2519,9 +2637,18 @@ msgstr "Polish Zloty"
 msgid "Premium"
 msgstr "Premium"
 
+#. Party means a shared-expense group, not a celebration
+#: src/routes/terms/-components/PremiumTerms.tsx:72
+msgid "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
+msgstr "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
+
 #: src/routes/settings.tsx:380
 msgid "Premium is active on this account."
 msgstr "Premium is active on this account."
+
+#: src/routes/terms/-components/PremiumTerms.tsx:11
+msgid "Premium is optional. The purchase screen describes the features included with Premium and displays the price and billing period that apply in your store and region. Features may differ by platform when required by platform capabilities or store rules."
+msgstr "Premium is optional. The purchase screen describes the features included with Premium and displays the price and billing period that apply in your store and region. Features may differ by platform when required by platform capabilities or store rules."
 
 #: src/routes/settings.tsx:384
 msgid "Premium status could not be checked. Try again."
@@ -2543,9 +2670,17 @@ msgstr "Privacy and cookie settings"
 msgid "Privacy Policy"
 msgstr "Privacy Policy"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:126
+msgid "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
+msgstr "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
+
 #: src/routes/_home/route.tsx:74
 msgid "Profile and app menu"
 msgstr "Profile and app menu"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:18
+msgid "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
+msgstr "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
 
 #: src/routes/new/route.tsx:289
 msgid "Qatari Rial"
@@ -2697,6 +2832,10 @@ msgstr "Save to cloud"
 #: src/routes/join.tsx:137
 msgid "Scan QR code"
 msgstr "Scan QR code"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:132
+msgid "Scrape, reverse engineer, or automatically access the Service except as permitted by applicable law or an open-source license"
+msgstr "Scrape, reverse engineer, or automatically access the Service except as permitted by applicable law or an open-source license"
 
 #: src/components/EmojiPicker.tsx:171
 msgid "Search emoji"
@@ -2933,6 +3072,10 @@ msgstr "Solomon Islands Dollar"
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
 
+#: src/routes/terms/-components/ServiceTerms.tsx:31
+msgid "Some trizum source code and third-party components are available under open-source licenses. Those licenses continue to govern the code and components they cover, and nothing in these Terms restricts rights granted by those licenses."
+msgstr "Some trizum source code and third-party components are available under open-source licenses. Those licenses continue to govern the code and components they cover, and nothing in these Terms restricts rights granted by those licenses."
+
 #: src/components/AppRecoveryDialog.tsx:62
 msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 msgstr "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
@@ -3160,6 +3303,13 @@ msgstr "Template names must be unique"
 msgid "Templates"
 msgstr "Templates"
 
+#. Link to the legal terms page
+#. Title of the legal terms page
+#: src/routes/about/route.tsx:116
+#: src/routes/terms/route.tsx:20
+msgid "Terms of Service"
+msgstr "Terms of Service"
+
 #: src/routes/new/route.tsx:188
 msgid "Thai Baht"
 msgstr "Thai Baht"
@@ -3172,6 +3322,10 @@ msgstr "Thank you for using trizum. Your feedback helps us improve!"
 msgid "The app works offline too!"
 msgstr "The app works offline too!"
 
+#: src/routes/terms/-components/ServiceTerms.tsx:11
+msgid "The free installed Android and iOS apps may display advertising. Premium may remove advertising for the Premium owner as described on the purchase screen. Advertising and related privacy choices are explained in our Privacy Policy."
+msgstr "The free installed Android and iOS apps may display advertising. Premium may remove advertising for the Premium owner as described on the purchase screen. Advertising and related privacy choices are explained in our Privacy Policy."
+
 #: src/routes/privacy-policy.tsx:133
 msgid "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 msgstr "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
@@ -3183,6 +3337,10 @@ msgstr "The installed mobile apps use Google AdMob to request, display, personal
 #: src/routes/privacy-policy.tsx:419
 msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 msgstr "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:56
+msgid "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
+msgstr "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 
 #: src/routes/privacy-policy.tsx:542
 msgid "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
@@ -3203,6 +3361,22 @@ msgstr "The party link may be invalid or expired."
 #: src/components/PartyPendingComponent.tsx:23
 msgid "The party may have been deleted by another member."
 msgstr "The party may have been deleted by another member."
+
+#: src/routes/terms/-components/ServiceTerms.tsx:44
+msgid "The Service relies on or links to third-party services, including Apple, Google, RevenueCat, authentication providers, hosting providers, and error monitoring services. Their own terms and policies govern your use of their services. We are not responsible for third-party services that we do not control."
+msgstr "The Service relies on or links to third-party services, including Apple, Google, RevenueCat, authentication providers, hosting providers, and error monitoring services. Their own terms and policies govern your use of their services. We are not responsible for third-party services that we do not control."
+
+#: src/routes/terms/-components/ServiceTerms.tsx:24
+msgid "The Service, its branding, and its original content are protected by intellectual property laws. Subject to these Terms, we grant you a limited, personal, non-exclusive, non-transferable right to use the Service."
+msgstr "The Service, its branding, and its original content are protected by intellectual property laws. Subject to these Terms, we grant you a limited, personal, non-exclusive, non-transferable right to use the Service."
+
+#: src/routes/terms/-components/LegalTerms.tsx:34
+msgid "These Terms are governed by the laws of Spain. If you are a consumer, you also keep the protections of mandatory consumer law in the country where you live, and you may bring a claim in any court available to you under that law. Before starting formal proceedings, we encourage you to contact us so we can try to resolve the issue."
+msgstr "These Terms are governed by the laws of Spain. If you are a consumer, you also keep the protections of mandatory consumer law in the country where you live, and you may bring a claim in any court available to you under that law. Before starting formal proceedings, we encourage you to contact us so we can try to resolve the issue."
+
+#: src/routes/terms/route.tsx:30
+msgid "These Terms of Service (\"Terms\") govern your access to and use of trizum, including its website, installed Progressive Web App, Android and iOS applications, synchronization services, and related features (collectively, the \"Service\")."
+msgstr "These Terms of Service (\"Terms\") govern your access to and use of trizum, including its website, installed Progressive Web App, Android and iOS applications, synchronization services, and related features (collectively, the \"Service\")."
 
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:217
 msgid "These values prefill the new expense form and can still be edited."
@@ -3258,7 +3432,7 @@ msgstr "This party needs another active participant besides you to receive the t
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 
-#: src/routes/about/route.tsx:133
+#: src/routes/about/route.tsx:139
 msgid "This project uses various open source libraries and tools."
 msgstr "This project uses various open source libraries and tools."
 
@@ -3307,6 +3481,14 @@ msgstr "To join the <0>{0}</0>, please select who you are so that we can show yo
 #: src/routes/party_.$partyId.who.tsx:130
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
+
+#: src/routes/terms/-components/LegalTerms.tsx:11
+msgid "To the extent permitted by law, the Service is provided \"as is\" and \"as available\" without warranties that are not expressly stated in these Terms. You remain responsible for keeping appropriate records and backups and for verifying information before acting on it."
+msgstr "To the extent permitted by law, the Service is provided \"as is\" and \"as available\" without warranties that are not expressly stated in these Terms. You remain responsible for keeping appropriate records and backups and for verifying information before acting on it."
+
+#: src/routes/terms/-components/LegalTerms.tsx:19
+msgid "To the extent permitted by law, we are not liable for indirect, incidental, special, consequential, or punitive losses, or for losses caused by inaccurate User Content, disputes between participants, third-party services, or events outside our reasonable control. Nothing in these Terms excludes or limits liability that cannot legally be excluded or limited."
+msgstr "To the extent permitted by law, we are not liable for indirect, incidental, special, consequential, or punitive losses, or for losses caused by inaccurate User Content, disputes between participants, third-party services, or events outside our reasonable control. Nothing in these Terms excludes or limits liability that cannot legally be excluded or limited."
 
 #: src/routes/new/route.tsx:307
 msgid "Tongan Paʻanga"
@@ -3383,6 +3565,10 @@ msgstr "trizum cloud started"
 #: src/lib/authCallbackErrors.ts:23
 msgid "trizum could not finish connecting that sign-in method. Please try again."
 msgstr "trizum could not finish connecting that sign-in method. Please try again."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:37
+msgid "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
+msgstr "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
 
 #: src/routes/support/route.tsx:91
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
@@ -3482,6 +3668,10 @@ msgstr "Updating expense..."
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:123
+msgid "Upload malware or content designed to disrupt or damage the Service"
+msgstr "Upload malware or content designed to disrupt or damage the Service"
+
 #: src/components/ExpenseEditor.tsx:921
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
@@ -3545,6 +3735,10 @@ msgstr "Use it on this device to continue with your cloud data."
 #: src/components/PartyPendingComponent.tsx:13
 msgid "Use personal mode to filter only your expenses."
 msgstr "Use personal mode to filter only your expenses."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:138
+msgid "Use the Service to store or distribute unlawful or infringing content"
+msgstr "Use the Service to store or distribute unlawful or infringing content"
 
 #: src/components/CloudSyncDialogs.tsx:52
 #: src/components/CloudSyncDialogs.tsx:62
@@ -3612,7 +3806,7 @@ msgstr "View photo"
 msgid "View Premium options"
 msgstr "View Premium options"
 
-#: src/routes/about/route.tsx:138
+#: src/routes/about/route.tsx:144
 msgid "View Third-Party Licenses"
 msgstr "View Third-Party Licenses"
 
@@ -3631,6 +3825,18 @@ msgstr "Warning: Split amounts don't match total expense"
 #: src/routes/privacy-policy.tsx:152
 msgid "We do not intentionally provide Google AdMob with group names, participant names, expense descriptions or amounts, currencies, receipts or other attached media, phone numbers, email addresses, trizum account IDs, authentication data, or synced document contents for advertising, targeting, or content mapping."
 msgstr "We do not intentionally provide Google AdMob with group names, participant names, expense descriptions or amounts, currencies, receipts or other attached media, phone numbers, email addresses, trizum account IDs, authentication data, or synced document contents for advertising, targeting, or content mapping."
+
+#: src/routes/terms/-components/PremiumTerms.tsx:103
+msgid "We may change subscription prices for valid reasons such as changes to features, operating costs, taxes, exchange rates, inflation, or legal requirements. Price changes apply to future billing periods and will be communicated in advance through the applicable store or in the Service when required. You may cancel before the new price takes effect."
+msgstr "We may change subscription prices for valid reasons such as changes to features, operating costs, taxes, exchange rates, inflation, or legal requirements. Price changes apply to future billing periods and will be communicated in advance through the applicable store or in the Service when required. You may cancel before the new price takes effect."
+
+#: src/routes/terms/-components/ServiceTerms.tsx:58
+msgid "We may maintain, update, add, remove, or change parts of the Service. We do not guarantee that the Service will always be available, uninterrupted, secure, or free of errors. We will not materially reduce an active paid subscription's recurring value without taking the steps required by applicable law and store rules."
+msgstr "We may maintain, update, add, remove, or change parts of the Service. We do not guarantee that the Service will always be available, uninterrupted, secure, or free of errors. We will not materially reduce an active paid subscription's recurring value without taking the steps required by applicable law and store rules."
+
+#: src/routes/terms/-components/LegalTerms.tsx:48
+msgid "We may update these Terms to reflect changes to the Service, law, security, or our business. We will post the updated Terms and change the \"Last updated\" date. If a change materially affects your rights, we will provide additional notice when required. Your continued use after the updated Terms take effect means you accept them, except where applicable law requires another form of consent."
+msgstr "We may update these Terms to reflect changes to the Service, law, security, or our business. We will post the updated Terms and change the \"Last updated\" date. If a change materially affects your rights, we will provide additional notice when required. Your continued use after the updated Terms take effect means you accept them, except where applicable law requires another form of consent."
 
 #: src/components/CloudSyncDialogs.tsx:314
 msgid "We sent a sign-in link to {email}. Open it to finish signing in."
@@ -3664,6 +3870,10 @@ msgstr "What is this party about?"
 #: src/routes/settings.tsx:178
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:40
+msgid "When an eligible annual subscription includes a seven-day free trial, the purchase screen will show the trial and post-trial price. Unless you cancel before the trial ends, the subscription automatically converts to a paid annual subscription. Trial eligibility is determined by the applicable store."
+msgstr "When an eligible annual subscription includes a seven-day free trial, the purchase screen will show the trial and post-trial price. Unless you cancel before the trial ends, the subscription automatically converts to a paid annual subscription. Trial eligibility is determined by the applicable store."
 
 #: src/routes/privacy-policy.tsx:505
 msgid "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
@@ -3709,6 +3919,18 @@ msgstr "Yemeni Rial"
 msgid "Yes! Your data is stored locally on your device and only synced with people you explicitly share your groups with. We don't have access to your expense data."
 msgstr "Yes! Your data is stored locally on your device and only synced with people you explicitly share your groups with. We don't have access to your expense data."
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:45
+msgid "You are responsible for checking expense entries, balances, exchange rates, and settlement instructions before relying on them or making a payment. trizum does not guarantee that information entered by you or another participant is accurate or complete."
+msgstr "You are responsible for checking expense entries, balances, exchange rates, and settlement instructions before relying on them or making a payment. trizum does not guarantee that information entered by you or another participant is accurate or complete."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:60
+msgid "You are responsible for keeping your account credentials, devices, and sign-in methods secure and for activity performed through your account."
+msgstr "You are responsible for keeping your account credentials, devices, and sign-in methods secure and for activity performed through your account."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:99
+msgid "You are responsible for User Content you add or share. You must have the necessary rights and permissions to use it, including permission to share personal information about other participants. Do not upload sensitive information that is unnecessary for splitting expenses."
+msgstr "You are responsible for User Content you add or share. You must have the necessary rights and permissions to use it, including permission to share personal information about other participants. Do not upload sensitive information that is unnecessary for splitting expenses."
+
 #: src/components/PartyPendingComponent.tsx:12
 msgid "You can add photos to your expenses for better tracking."
 msgstr "You can add photos to your expenses for better tracking."
@@ -3718,6 +3940,10 @@ msgstr "You can add photos to your expenses for better tracking."
 msgid "You can create up to {MAX_EXPENSE_TEMPLATES} custom templates."
 msgstr "You can create up to {MAX_EXPENSE_TEMPLATES} custom templates."
 
+#: src/routes/terms/-components/PremiumTerms.tsx:88
+msgid "You can manage or cancel a subscription through the Customer Center in trizum or through your Apple App Store or Google Play account. Deleting trizum or deleting your trizum account does not cancel a store subscription."
+msgstr "You can manage or cancel a subscription through the Customer Center in trizum or through your Apple App Store or Google Play account. Deleting trizum or deleting your trizum account does not cancel a store subscription."
+
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:315
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "You can only transfer debt from actions where you are the one who owes the money."
@@ -3726,6 +3952,26 @@ msgstr "You can only transfer debt from actions where you are the one who owes t
 msgid "You left the party!"
 msgstr "You left the party!"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:113
+msgid "You may not use the Service to:"
+msgstr "You may not use the Service to:"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:78
+msgid "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
+msgstr "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:24
+msgid "You must be at least 18 years old to use trizum. If you use the Service on behalf of an organization, you confirm that you have authority to accept these Terms for that organization."
+msgstr "You must be at least 18 years old to use trizum. If you use the Service on behalf of an organization, you confirm that you have authority to accept these Terms for that organization."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:77
+msgid "You must notify us promptly if you believe your account, device, or a group link has been compromised."
+msgstr "You must notify us promptly if you believe your account, device, or a group link has been compromised."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:72
+msgid "You must provide accurate account information and promptly update it when it changes."
+msgstr "You must provide accurate account information and promptly update it when it changes."
+
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:521
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr "You need another active party with the same currency to transfer this debt."
@@ -3733,6 +3979,10 @@ msgstr "You need another active party with the same currency to transfer this de
 #: src/routes/party.$partyId/-components/Balances.tsx:130
 msgid "You owe money to people"
 msgstr "You owe money to people"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:90
+msgid "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
+msgstr "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
 
 #: src/routes/party.$partyId/-components/Balances.tsx:149
 msgid "You're debt free!"
