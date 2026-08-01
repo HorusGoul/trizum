@@ -18,7 +18,11 @@ export function getRevenueCatPlatform(): RevenueCatPlatform | undefined {
 }
 
 export function getRevenueCatPublicApiKey(platform: RevenueCatPlatform) {
-  return import.meta.env.VITE_APP_REVENUECAT_TEST_STORE === "true"
+  return isRevenueCatTestStoreEnabled()
     ? REVENUECAT_PUBLIC_API_KEYS.test
     : REVENUECAT_PUBLIC_API_KEYS[platform];
+}
+
+export function isRevenueCatTestStoreEnabled() {
+  return import.meta.env.VITE_APP_REVENUECAT_TEST_STORE === "true";
 }

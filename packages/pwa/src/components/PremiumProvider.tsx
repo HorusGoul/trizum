@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { authClient } from "#src/lib/auth-client.ts";
 import { AdEntitlementContext } from "#src/lib/advertising/AdEntitlementContext.tsx";
 import { getLogger } from "#src/lib/log.ts";
+import type { PremiumEntitlementState } from "#src/lib/premium/premiumCommerce.ts";
 import { PremiumContextProvider, type PremiumStatus } from "#src/lib/premium/PremiumContext.ts";
 import { getPremiumAccess } from "#src/lib/premium/premiumAccess.ts";
 import {
   addRevenueCatCustomerInfoListener,
   clearRevenueCatUser,
   presentRevenueCatCustomerCenter,
-  presentRevenueCatPaywall,
   refreshRevenueCatCustomerInfo,
   removeRevenueCatCustomerInfoListener,
   synchronizeRevenueCatUser,
 } from "#src/lib/premium/revenueCatClient.ts";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
+import { PremiumPaywall } from "./PremiumPaywall.tsx";
 
 interface PremiumState {
   hasActiveSubscription: boolean;
@@ -24,6 +25,11 @@ interface ResolvedPremiumState extends PremiumState {
   userId: string;
 }
 
+interface PaywallRequest {
+  promise: Promise<void>;
+  resolve: () => void;
+}
+
 const logger = getLogger("components", "PremiumProvider");
 
 export function PremiumProvider({ children }: { children: React.ReactNode }) {
@@ -31,6 +37,8 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   const userId = session.data?.user.id ?? null;
   const platform = getRevenueCatPlatform();
   const [resolvedState, setResolvedState] = useState<ResolvedPremiumState | null>(null);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const paywallRequestRef = useRef<PaywallRequest | null>(null);
   const state = getCurrentPremiumState({
     isSessionPending: session.isPending,
     platform,
@@ -105,18 +113,42 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   const isPremium = state.status === "premium";
   const adEntitlement = state.status === "free" ? "adSupported" : isPremium ? "adFree" : "unknown";
 
-  async function presentPaywall() {
-    await presentRevenueCatPaywall(userId);
-    const customerInfo = await refreshRevenueCatCustomerInfo();
-    const access = getPremiumAccess(customerInfo);
+  function updatePremiumEntitlement(entitlement: PremiumEntitlementState) {
     if (!userId) {
       return;
     }
+
     setResolvedState({
-      hasActiveSubscription: access.hasActiveSubscription,
-      status: access.isPremium ? "premium" : "free",
+      hasActiveSubscription: entitlement.hasActiveSubscription,
+      status: entitlement.isPremium ? "premium" : "free",
       userId,
     });
+  }
+
+  async function presentPaywall() {
+    if (!userId) {
+      throw new Error("A signed-in trizum account is required to purchase Premium.");
+    }
+
+    if (paywallRequestRef.current) {
+      return paywallRequestRef.current.promise;
+    }
+
+    let resolveRequest: () => void = () => undefined;
+    const promise = new Promise<void>((resolve) => {
+      resolveRequest = resolve;
+    });
+    paywallRequestRef.current = { promise, resolve: resolveRequest };
+    setIsPaywallOpen(true);
+    return promise;
+  }
+
+  function setPaywallOpen(open: boolean) {
+    setIsPaywallOpen(open);
+    if (!open) {
+      paywallRequestRef.current?.resolve();
+      paywallRequestRef.current = null;
+    }
   }
 
   async function presentCustomerCenter() {
@@ -143,7 +175,15 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
         status: state.status,
       }}
     >
-      <AdEntitlementContext value={adEntitlement}>{children}</AdEntitlementContext>
+      <AdEntitlementContext value={adEntitlement}>
+        {children}
+        <PremiumPaywall
+          isOpen={isPaywallOpen}
+          onEntitlementChange={updatePremiumEntitlement}
+          onOpenChange={setPaywallOpen}
+          userId={userId}
+        />
+      </AdEntitlementContext>
     </PremiumContextProvider>
   );
 }
