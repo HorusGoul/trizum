@@ -342,7 +342,12 @@ function PremiumSection() {
           />
         </p>
       </div>
-      <Button type="button" color="input-like" isDisabled={isLoading} pressAction={openPremium}>
+      <Button
+        type="button"
+        color="input-like"
+        isDisabled={isLoading}
+        onPress={() => void openPremium()}
+      >
         {isSignedIn ? (
           isPremium ? (
             <Trans>Manage Premium</Trans>

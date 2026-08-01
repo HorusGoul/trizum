@@ -365,10 +365,12 @@ content mapping.
 
 ### RevenueCat configuration
 
-The native apps use `@revenuecat/purchases-capacitor` and
-`@revenuecat/purchases-capacitor-ui`. Public iOS, Android, and Test Store API
-keys are selected in `packages/pwa/src/lib/premium/revenueCatConfig.ts`; do not
-add a RevenueCat secret key to either client package.
+The native apps use `@revenuecat/purchases-capacitor` for offerings, purchases,
+restores, and entitlement state. The paywall itself is shared React UI so it
+can use trizum's design system; `@revenuecat/purchases-capacitor-ui` remains in
+use for RevenueCat Customer Center. Public iOS, Android, and Test Store API keys
+are selected in `packages/pwa/src/lib/premium/revenueCatConfig.ts`; do not add a
+RevenueCat secret key to either client package.
 
 Production builds use the iOS or Android project. To build a local native app
 against RevenueCat Test Store instead:
@@ -386,8 +388,9 @@ entitlement source.
 Before a production purchase build, connect App Store Connect and Google Play
 credentials to the RevenueCat project, create or import the matching store
 products and localized prices, configure the annual trial, and keep Apple
-Family Sharing disabled. Review, attach, and publish the RevenueCat paywall only
-after the real store products resolve in both sandboxes. Test purchase, restore,
+Family Sharing disabled. The app paywall reads the current RevenueCat offering,
+so package availability, localized prices, and eligible introductory trials
+must resolve in both sandboxes. Test purchase, cancellation, restore,
 expiration, account switching, and lifetime access before enabling live ads.
 
 ## GitHub Actions

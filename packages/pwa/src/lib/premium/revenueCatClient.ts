@@ -1,6 +1,5 @@
 import type { CustomerInfo, PurchasesCallbackId } from "@revenuecat/purchases-capacitor";
 import { getRevenueCatPlatform, getRevenueCatPublicApiKey } from "./revenueCatConfig.ts";
-import { PREMIUM_ENTITLEMENT_IDENTIFIER } from "./premiumAccess.ts";
 
 type CustomerInfoListener = (customerInfo: CustomerInfo) => void;
 
@@ -33,24 +32,6 @@ export async function addRevenueCatCustomerInfoListener(listener: CustomerInfoLi
 export async function removeRevenueCatCustomerInfoListener(listenerId: PurchasesCallbackId) {
   const { Purchases } = await import("@revenuecat/purchases-capacitor");
   await Purchases.removeCustomerInfoUpdateListener({ listenerToRemove: listenerId });
-}
-
-export async function presentRevenueCatPaywall(userId: string | null) {
-  if (!userId) {
-    throw new PremiumSignInRequiredError();
-  }
-
-  await synchronizeRevenueCatUser(userId);
-  const { RevenueCatUI } = await import("@revenuecat/purchases-capacitor-ui");
-
-  return RevenueCatUI.presentPaywallIfNeeded({
-    requiredEntitlementIdentifier: PREMIUM_ENTITLEMENT_IDENTIFIER,
-    listener: {
-      onPurchaseInitiated({ resumable }) {
-        resumable.resume(identifiedUserId === userId);
-      },
-    },
-  });
 }
 
 export async function presentRevenueCatCustomerCenter(userId: string | null) {
