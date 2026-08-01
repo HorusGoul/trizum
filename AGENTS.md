@@ -47,6 +47,8 @@ Canonical examples:
 - [`.agents/skills/creating-changesets/SKILL.md`](./.agents/skills/creating-changesets/SKILL.md)
   is the source of truth for creating changesets when a user-facing change
   needs release notes or a version bump.
+- [`docs/refactor-docs.md`](./docs/refactor-docs.md) is the source of truth for
+  creating, maintaining, and completing refactor planning documents.
 - [`packages/pwa/README.md`](./packages/pwa/README.md) is the package entry
   point for most product work.
 - [`packages/pwa/locale/AGENTS.md`](./packages/pwa/locale/AGENTS.md) is the
