@@ -80,23 +80,19 @@ export function PremiumPaywall({
     setActiveAction("purchase");
     try {
       const result = await purchasePremiumPlan(userId, selectedPlanId);
-      if (result.status === "cancelled") {
-        return;
+      if (result.status !== "cancelled") {
+        onEntitlementChange(result.entitlement);
+        if (result.entitlement.isPremium) {
+          toast.success(t`Premium is now active.`);
+          onOpenChange(false);
+        } else {
+          toast.error(t`Your purchase is still syncing. Try restoring it in a moment.`);
+        }
       }
-
-      onEntitlementChange(result.entitlement);
-      if (!result.entitlement.isPremium) {
-        toast.error(t`Your purchase is still syncing. Try restoring it in a moment.`);
-        return;
-      }
-
-      toast.success(t`Premium is now active.`);
-      onOpenChange(false);
     } catch {
       toast.error(t`Premium could not be purchased. Please try again.`);
-    } finally {
-      setActiveAction(null);
     }
+    setActiveAction(null);
   }
 
   async function restore() {
@@ -105,18 +101,16 @@ export function PremiumPaywall({
       const entitlement = await restorePremiumPurchases(userId);
       onEntitlementChange(entitlement);
 
-      if (!entitlement.isPremium) {
+      if (entitlement.isPremium) {
+        toast.success(t`Premium purchases restored.`);
+        onOpenChange(false);
+      } else {
         toast.error(t`No Premium purchase was found for this account.`);
-        return;
       }
-
-      toast.success(t`Premium purchases restored.`);
-      onOpenChange(false);
     } catch {
       toast.error(t`Purchases could not be restored. Please try again.`);
-    } finally {
-      setActiveAction(null);
     }
+    setActiveAction(null);
   }
 
   function retryLoading() {
