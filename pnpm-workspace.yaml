@@ -118,7 +118,7 @@ catalog:
   jsdom: 29.1.1
   lucide-static: 1.23.0
   mathjs: 15.2.0
-  motion: 12.42.2
+  motion: 13.0.0
   oxlint-plugin-react-doctor: 0.7.4
   playwright: 1.61.1
   qr-code-styling: 1.9.2
