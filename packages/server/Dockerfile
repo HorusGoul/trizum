@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Keep the variant suffix in this ARG so Renovate can update the shared image tag.
-ARG NODE_IMAGE_TAG=24.18.0-slim
+ARG NODE_IMAGE_TAG=24.19.0-slim
 ARG LITESTREAM_VERSION=0.5.2
 ARG VITE_PLUS_VERSION=0.1.24
 FROM node:${NODE_IMAGE_TAG} AS build
