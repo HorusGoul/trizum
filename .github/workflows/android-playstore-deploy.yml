@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      TRIZUM_LIVE_ADS: ${{ inputs.track == 'production' && 'true' || 'false' }}
+      TRIZUM_LIVE_ADS: ${{ inputs.track == 'production' && vars.TRIZUM_LIVE_ADS_ENABLED == 'true' && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v7
         with:

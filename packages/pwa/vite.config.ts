@@ -98,7 +98,12 @@ export default defineConfig(({ mode }) => {
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
-          env: ["SENTRY_AUTH_TOKEN", "TRIZUM_LIVE_ADS", "VITE_APP_AUTH_URL"],
+          env: [
+            "SENTRY_AUTH_TOKEN",
+            "TRIZUM_LIVE_ADS",
+            "VITE_APP_AD_TEST_MODE",
+            "VITE_APP_AUTH_URL",
+          ],
           output: ["dist/**"],
         },
         check: {

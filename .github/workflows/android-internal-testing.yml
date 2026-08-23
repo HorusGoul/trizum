@@ -55,6 +55,7 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           TRIZUM_LIVE_ADS: "true"
+          VITE_APP_AD_TEST_MODE: "true"
 
       - name: Decode Android keystore
         timeout-minutes: 2

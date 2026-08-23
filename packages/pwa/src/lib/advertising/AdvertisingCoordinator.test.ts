@@ -20,7 +20,12 @@ const consentReady = {
 function createHarness({
   firstUseCompleted = true,
   bypassFirstUseSession = false,
-}: { firstUseCompleted?: boolean; bypassFirstUseSession?: boolean } = {}) {
+  platform = "android",
+}: {
+  firstUseCompleted?: boolean;
+  bypassFirstUseSession?: boolean;
+  platform?: "android" | "ios";
+} = {}) {
   let now = 10_000;
   let stored: AdHistory | undefined = firstUseCompleted
     ? { version: 1, firstUseCompleted: true }
@@ -63,7 +68,7 @@ function createHarness({
   const reportDiagnostic = vi.fn<(diagnostic: AdDiagnostic) => void>();
   const onStateChange = vi.fn<(state: AdvertisingState) => void>();
   const coordinator = new AdvertisingCoordinator({
-    platform: "android",
+    platform,
     adUnitIds: { appOpen: "app-open", interstitial: "interstitial" },
     historyStore,
     createSdk,
@@ -100,6 +105,28 @@ describe("AdvertisingCoordinator", () => {
 
     expect(harness.createSdk).not.toHaveBeenCalled();
   });
+
+  it.each(["unknown", "adFree"] as const)(
+    "cancels an in-flight consent refresh when entitlement becomes %s",
+    async (entitlement) => {
+      const harness = createHarness({ platform: "ios" });
+      const consentRequest = createDeferred<AdmobConsentInfo>();
+      vi.mocked(harness.sdk.requestConsentInfo).mockReturnValue(consentRequest.promise);
+
+      const refresh = harness.coordinator.setEntitlement("adSupported");
+      await vi.waitFor(() => expect(harness.sdk.requestConsentInfo).toHaveBeenCalledOnce());
+
+      await harness.coordinator.setEntitlement(entitlement);
+      consentRequest.resolve(consentReady);
+      await refresh;
+
+      expect(harness.sdk.trackingAuthorizationStatus).not.toHaveBeenCalled();
+      expect(harness.sdk.requestTrackingAuthorization).not.toHaveBeenCalled();
+      expect(harness.sdk.initialize).not.toHaveBeenCalled();
+      expect(harness.sdk.prepareInterstitial).not.toHaveBeenCalled();
+      expect(harness.sdk.loadAppOpen).not.toHaveBeenCalled();
+    },
+  );
 
   it("keeps new and upgraded installations ad-free for their first session", async () => {
     const harness = createHarness({ firstUseCompleted: false });
@@ -202,3 +229,11 @@ describe("AdvertisingCoordinator", () => {
     expect(harness.sdk.initialize).toHaveBeenCalledOnce();
   });
 });
+
+function createDeferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((promiseResolve) => {
+    resolve = promiseResolve;
+  });
+  return { promise, resolve };
+}

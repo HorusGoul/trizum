@@ -339,11 +339,11 @@ The browser app and installed PWA never initialize AdMob.
 The trizum app IDs and test/live ad-unit IDs are public configuration in
 `admob.config.json`. Builds always use trizum's app IDs so UMP resolves the
 published consent message, and use Google's test ad-unit IDs unless
-`TRIZUM_LIVE_ADS=true` is explicitly set. The official production App Store,
-Google Play production, and signed GitHub Release APK workflows are the only
-workflows that select live ad-unit IDs. Manual builds, pull-request builds,
-internal tracks, TestFlight, and ad-hoc builds use test ad-unit IDs. A selected
-platform's build fails when its chosen app ID or ad-unit ID is missing.
+`TRIZUM_LIVE_ADS=true` is explicitly set. Production App Store, Google Play,
+and signed GitHub Release APK workflows can select live ad-unit IDs only while
+the `TRIZUM_LIVE_ADS_ENABLED` repository variable is `true`; it must remain
+disabled until the live-ad release gate is complete. A selected platform's
+build fails when its chosen app ID or ad-unit ID is missing.
 
 The PWA-side entitlement defaults to `unknown`, which suppresses SDK loading and
 all ads. The subscription implementation must provide `AdEntitlementContext`

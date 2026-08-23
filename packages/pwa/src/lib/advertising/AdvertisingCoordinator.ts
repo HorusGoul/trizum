@@ -57,6 +57,7 @@ export class AdvertisingCoordinator {
   private readonly now: () => number;
   private history: AdHistory;
   private entitlement: AdEntitlement = "unknown";
+  private entitlementRevision = 0;
   private sdk: AdMobSdk | undefined;
   private sdkPromise: Promise<AdMobSdk> | undefined;
   private consentRefresh: Promise<void> | undefined;
@@ -93,7 +94,11 @@ export class AdvertisingCoordinator {
   }
 
   async setEntitlement(entitlement: AdEntitlement) {
+    const entitlementChanged = entitlement !== this.entitlement;
     this.entitlement = entitlement;
+    if (entitlementChanged) {
+      this.entitlementRevision += 1;
+    }
     if (entitlement !== "adSupported" || !this.history.firstUseCompleted) {
       return;
     }
@@ -101,6 +106,15 @@ export class AdvertisingCoordinator {
     if (!this.coldLaunchStarted) {
       this.coldLaunchStarted = true;
       await this.refreshForLaunch("cold", false);
+      return;
+    }
+
+    if (entitlementChanged) {
+      await this.consentRefresh;
+      const entitlementRevision = this.entitlementRevision;
+      if (this.isEligibilityCurrent(entitlementRevision)) {
+        await this.refreshForLaunch("cold", false);
+      }
     }
   }
 
@@ -159,15 +173,25 @@ export class AdvertisingCoordinator {
       return;
     }
 
+    const entitlementRevision = this.entitlementRevision;
     try {
       await this.sdk.showPrivacyOptionsForm();
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       const consent = await this.sdk.requestConsentInfo();
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       this.updatePrivacyOptionsRequirement(consent);
       this.consentReady = consent.canRequestAds;
       if (consent.canRequestAds) {
-        await this.initializeAndPrepare();
+        await this.initializeAndPrepare(false, entitlementRevision);
       }
     } catch (error) {
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       this.suppressAdsForSession("privacyOptions", error);
     }
   }
@@ -184,22 +208,43 @@ export class AdvertisingCoordinator {
       return this.consentRefresh;
     }
 
-    this.consentRefresh = this.performConsentRefresh(kind, hadPreparedAppOpen).finally(() => {
+    const entitlementRevision = this.entitlementRevision;
+    this.consentRefresh = this.performConsentRefresh(
+      kind,
+      hadPreparedAppOpen,
+      entitlementRevision,
+    ).finally(() => {
       this.consentRefresh = undefined;
     });
     return this.consentRefresh;
   }
 
-  private async performConsentRefresh(kind: "cold" | "warm", hadPreparedAppOpen: boolean) {
+  private async performConsentRefresh(
+    kind: "cold" | "warm",
+    hadPreparedAppOpen: boolean,
+    entitlementRevision: number,
+  ) {
     try {
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       const sdk = await this.getSdk();
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       let consent = await sdk.requestConsentInfo();
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       this.updatePrivacyOptionsRequirement(consent);
 
       let trackingStatus =
         this.options.platform === "ios"
           ? await sdk.trackingAuthorizationStatus()
           : ("restricted" as const);
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       const shouldPresentConsentForm =
         consent.isConsentFormAvailable === true &&
         (consent.status === "REQUIRED" ||
@@ -207,17 +252,29 @@ export class AdvertisingCoordinator {
 
       if (shouldPresentConsentForm) {
         consent = await sdk.showConsentForm();
+        if (!this.isEligibilityCurrent(entitlementRevision)) {
+          return;
+        }
         this.privacySurfacePresentedOnLaunch = true;
         this.updatePrivacyOptionsRequirement(consent);
       }
 
       if (this.options.platform === "ios") {
         trackingStatus = await sdk.trackingAuthorizationStatus();
+        if (!this.isEligibilityCurrent(entitlementRevision)) {
+          return;
+        }
         if (trackingStatus === "notDetermined") {
           try {
             await sdk.requestTrackingAuthorization();
+            if (!this.isEligibilityCurrent(entitlementRevision)) {
+              return;
+            }
             this.privacySurfacePresentedOnLaunch = true;
           } catch (error) {
+            if (!this.isEligibilityCurrent(entitlementRevision)) {
+              return;
+            }
             this.reportDiagnostic("trackingPermission", error);
           }
         }
@@ -231,6 +288,7 @@ export class AdvertisingCoordinator {
       this.consentReady = true;
       await this.initializeAndPrepare(
         kind === "cold" && !this.privacySurfacePresentedOnLaunch && this.coldLaunchWindowOpen,
+        entitlementRevision,
       );
 
       if (
@@ -242,15 +300,30 @@ export class AdvertisingCoordinator {
         await this.presentAppOpenOpportunity();
       }
     } catch (error) {
+      if (!this.isEligibilityCurrent(entitlementRevision)) {
+        return;
+      }
       this.suppressAdsForSession("consent", error);
     }
   }
 
-  private async initializeAndPrepare(showColdAppOpenWhenReady = false) {
+  private async initializeAndPrepare(
+    showColdAppOpenWhenReady = false,
+    entitlementRevision = this.entitlementRevision,
+  ) {
+    if (!this.isEligibilityCurrent(entitlementRevision)) {
+      return;
+    }
     const sdk = await this.getSdk();
+    if (!this.isEligibilityCurrent(entitlementRevision)) {
+      return;
+    }
     if (!this.initialized) {
       try {
         await sdk.initialize();
+        if (!this.isEligibilityCurrent(entitlementRevision)) {
+          return;
+        }
         this.initialized = true;
       } catch (error) {
         this.suppressAdsForSession("initialization", error);
@@ -368,6 +441,15 @@ export class AdvertisingCoordinator {
       this.consentReady &&
       !this.consentFailedForSession &&
       this.initialized
+    );
+  }
+
+  private isEligibilityCurrent(entitlementRevision: number) {
+    return (
+      entitlementRevision === this.entitlementRevision &&
+      !this.destroyed &&
+      this.entitlement === "adSupported" &&
+      this.history.firstUseCompleted
     );
   }
 

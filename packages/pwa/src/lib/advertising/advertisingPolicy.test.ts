@@ -66,8 +66,25 @@ describe("advertising policy", () => {
     expect(parseAdHistory("not json")).toBeUndefined();
   });
 
-  it("protects editing, payment, authentication, and media surfaces", () => {
-    expect(isProtectedAdRoute("/party/one/add", {})).toBe(true);
+  it.each([
+    "/new",
+    "/settings",
+    "/party/one/add",
+    "/party/one/who",
+    "/party/one/settings/details",
+    "/party/one/settings/participants",
+    "/party/one/settings/expense-templates/template",
+    "/party/one/expense/expense/edit",
+    "/party/one/pay",
+    "/party/one/transfer-debt",
+    "/migrate/tricount",
+    "/join",
+    "/reset-password",
+  ])("protects the in-progress flow at %s", (pathname) => {
+    expect(isProtectedAdRoute(pathname, {})).toBe(true);
+  });
+
+  it("protects transient media and calculator surfaces", () => {
     expect(isProtectedAdRoute("/party/one", { media: 0 })).toBe(true);
     expect(isProtectedAdRoute("/party/one", { calculator: "amount" })).toBe(true);
     expect(isProtectedAdRoute("/party/one", {})).toBe(false);

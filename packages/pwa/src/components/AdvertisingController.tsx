@@ -14,7 +14,7 @@ import { useAdEntitlement } from "#src/lib/advertising/AdEntitlementContext.tsx"
 import { AdvertisingProvider } from "#src/lib/advertising/AdvertisingContext.ts";
 
 const AD_HISTORY_STORAGE_KEY = "trizum.advertising.history:v1";
-const BYPASS_FIRST_USE_SESSION_FOR_AD_TESTING = true;
+const BYPASS_FIRST_USE_SESSION_FOR_AD_TESTING = import.meta.env.VITE_APP_AD_TEST_MODE === "true";
 const logger = getLogger("components", "AdvertisingController");
 
 const historyStore: AdHistoryStore = {
