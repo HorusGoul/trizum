@@ -133,6 +133,12 @@ catalogs:
     '@playwright/test':
       specifier: 1.61.1
       version: 1.61.1
+    '@revenuecat/purchases-capacitor':
+      specifier: 13.2.4
+      version: 13.2.4
+    '@revenuecat/purchases-capacitor-ui':
+      specifier: 13.2.4
+      version: 13.2.4
     '@rolldown/plugin-babel':
       specifier: 0.2.3
       version: 0.2.3
@@ -561,6 +567,12 @@ importers:
       '@capawesome/capacitor-google-sign-in':
         specifier: 'catalog:'
         version: 0.1.2(@capacitor/core@8.4.1)
+      '@revenuecat/purchases-capacitor':
+        specifier: 'catalog:'
+        version: 13.2.4(@capacitor/core@8.4.1)
+      '@revenuecat/purchases-capacitor-ui':
+        specifier: 'catalog:'
+        version: 13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -667,6 +679,12 @@ importers:
       '@opentf/std':
         specifier: jsr:0.12.0
         version: '@jsr/opentf__std@0.12.0'
+      '@revenuecat/purchases-capacitor':
+        specifier: 'catalog:'
+        version: 13.2.4(@capacitor/core@8.4.1)
+      '@revenuecat/purchases-capacitor-ui':
+        specifier: 'catalog:'
+        version: 13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))
       '@sentry/react':
         specifier: 'catalog:'
         version: 10.64.0(react@19.2.8)
@@ -3942,6 +3960,20 @@ packages:
   '@resvg/resvg-wasm@2.4.0':
     resolution: {integrity: sha512-C7c51Nn4yTxXFKvgh2txJFNweaVcfUPQxwEUFw4aWsCmfiBDJsTSwviIF8EcwjQ6k8bPyMWCl1vw4BdxE569Cg==}
     engines: {node: '>= 10'}
+
+  '@revenuecat/purchases-capacitor-ui@13.2.4':
+    resolution: {integrity: sha512-TWqicXtE/3ycZYwoD+bCH1SgSBt7cTi0IPPX0avj/+cGgSd/SxwsAHIRcXEIk3HoCq/3IyRz0wO+snrNie7cfg==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+      '@revenuecat/purchases-capacitor': 13.2.4
+
+  '@revenuecat/purchases-capacitor@13.2.4':
+    resolution: {integrity: sha512-0ql1SBLYq3ldh+I8zsUU2bx1ml59s8rlt2wXYydzXTVj0/OJ12ntHAh3n95d9a+Iuwt89kZ6uTWTwu4LvzE+UA==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+
+  '@revenuecat/purchases-typescript-internal-esm@18.22.2':
+    resolution: {integrity: sha512-JdMGKUX4n/WWIxN1WjcwL8VsECQCtYW7X9iYO/YBqEqFnBPKqbOK3O/QX+Tu53JA881Jo/Y8wvPiK4EoNJmQmg==}
 
   '@robingenz/zli@0.2.0':
     resolution: {integrity: sha512-LME7G4xkEFuqyVg/MYTB3xoJnvWb955aEfZ7J7yRstzyULs3HBdxz0l5QiP8gmMMMZ434cb8Wn/DdHqeNTT2fA==}
@@ -12304,6 +12336,19 @@ snapshots:
 
   '@resvg/resvg-wasm@2.4.0': {}
 
+  '@revenuecat/purchases-capacitor-ui@13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))':
+    dependencies:
+      '@capacitor/core': 8.4.1
+      '@revenuecat/purchases-capacitor': 13.2.4(@capacitor/core@8.4.1)
+      '@revenuecat/purchases-typescript-internal-esm': 18.22.2
+
+  '@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1)':
+    dependencies:
+      '@capacitor/core': 8.4.1
+      '@revenuecat/purchases-typescript-internal-esm': 18.22.2
+
+  '@revenuecat/purchases-typescript-internal-esm@18.22.2': {}
+
   '@robingenz/zli@0.2.0(zod@4.0.17)':
     dependencies:
       zod: 4.0.17
@@ -13037,6 +13082,8 @@ snapshots:
       '@logtape/sentry': 2.2.4(@logtape/logtape@2.2.4)(@sentry/core@10.65.0)
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
+      '@revenuecat/purchases-capacitor': 13.2.4(@capacitor/core@8.4.1)
+      '@revenuecat/purchases-capacitor-ui': 13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))
       '@sentry/react': 10.64.0(react@19.2.8)
       '@sentry/vite-plugin': 5.4.0(rollup@4.62.2)
       '@takker/md5': '@jsr/takker__md5@0.1.0'

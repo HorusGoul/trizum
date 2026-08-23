@@ -14,7 +14,6 @@ import { useAdEntitlement } from "#src/lib/advertising/AdEntitlementContext.tsx"
 import { AdvertisingProvider } from "#src/lib/advertising/AdvertisingContext.ts";
 
 const AD_HISTORY_STORAGE_KEY = "trizum.advertising.history:v1";
-const BYPASS_FIRST_USE_SESSION_FOR_AD_TESTING = true;
 const logger = getLogger("components", "AdvertisingController");
 
 const historyStore: AdHistoryStore = {
@@ -106,7 +105,6 @@ export function AdvertisingController({
       historyStore,
       createSdk: createAdMobSdk,
       onStateChange: setState,
-      bypassFirstUseSession: BYPASS_FIRST_USE_SESSION_FOR_AD_TESTING,
       reportDiagnostic(diagnostic) {
         logger.error("AdMob operation failed", { ...diagnostic });
       },

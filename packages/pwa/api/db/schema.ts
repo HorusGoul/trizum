@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").notNull().primaryKey(),
@@ -70,3 +70,18 @@ export const cloudUserSettings = sqliteTable("cloud_user_settings", {
   partyListDocumentId: text("partyListDocumentId").notNull(),
   updatedAt: integer("updatedAt").notNull(),
 });
+
+export const partyBoost = sqliteTable(
+  "party_boost",
+  {
+    ownerUserId: text("ownerUserId")
+      .notNull()
+      .primaryKey()
+      .references(() => user.id, { onDelete: "cascade" }),
+    partyDocumentId: text("partyDocumentId").notNull(),
+    assignedAt: integer("assignedAt").notNull(),
+    transferableAt: integer("transferableAt").notNull(),
+    updatedAt: integer("updatedAt").notNull(),
+  },
+  (table) => [uniqueIndex("party_boost_partyDocumentId_unique").on(table.partyDocumentId)],
+);

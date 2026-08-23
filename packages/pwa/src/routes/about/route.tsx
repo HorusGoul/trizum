@@ -110,6 +110,12 @@ function About() {
               label={<Trans>Privacy Policy</Trans>}
               isInternal
             />
+            <AboutLink
+              href="/terms"
+              icon="lucide.scroll-text"
+              label={<Trans comment="Link to the legal terms page">Terms of Service</Trans>}
+              isInternal
+            />
           </div>
         </section>
 

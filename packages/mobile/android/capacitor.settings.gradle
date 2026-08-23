@@ -26,5 +26,11 @@ project(':capawesome-capacitor-apple-sign-in').projectDir = new File('../../../n
 include ':capawesome-capacitor-google-sign-in'
 project(':capawesome-capacitor-google-sign-in').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in/android')
 
+include ':revenuecat-purchases-capacitor'
+project(':revenuecat-purchases-capacitor').projectDir = new File('../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.4.1/node_modules/@revenuecat/purchases-capacitor/android')
+
+include ':revenuecat-purchases-capacitor-ui'
+project(':revenuecat-purchases-capacitor-ui').projectDir = new File('../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.4.1_@revenuecat+purchases-c_eda6bbee9cd735f048779ddc11714625/node_modules/@revenuecat/purchases-capacitor-ui/android')
+
 include ':capacitor-plugin-safe-area'
 project(':capacitor-plugin-safe-area').projectDir = new File('../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area/android')

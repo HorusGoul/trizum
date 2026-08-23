@@ -24,10 +24,30 @@ msgstr "(yo)"
 msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
+#. placeholder {0}: trial.duration
+#: src/components/PremiumPaywall.tsx:381
+msgid "{0, plural, one {# day free} other {# days free}}"
+msgstr "{0, plural, one {# día gratis} other {# días gratis}}"
+
 #. placeholder {0}: issues.length
 #: src/components/ExpenseEditorValidationStatus.tsx:206
 msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues must be resolved before saving.}}"
 msgstr "{0, plural, one {Se debe resolver # problema antes de guardar.} other {Se deben resolver # problemas antes de guardar.}}"
+
+#. placeholder {0}: trial.duration
+#: src/components/PremiumPaywall.tsx:385
+msgid "{0, plural, one {# month free} other {# months free}}"
+msgstr "{0, plural, one {# mes gratis} other {# meses gratis}}"
+
+#. placeholder {0}: trial.duration
+#: src/components/PremiumPaywall.tsx:383
+msgid "{0, plural, one {# week free} other {# weeks free}}"
+msgstr "{0, plural, one {# semana gratis} other {# semanas gratis}}"
+
+#. placeholder {0}: trial.duration
+#: src/components/PremiumPaywall.tsx:387
+msgid "{0, plural, one {# year free} other {# years free}}"
+msgstr "{0, plural, one {# año gratis} other {# años gratis}}"
 
 #. placeholder {0}: preview.remainingCount
 #: src/components/PartyListCard.tsx:324
@@ -72,6 +92,14 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
+#: src/components/PremiumPaywall.tsx:416
+msgid "{price} is charged automatically until canceled."
+msgstr "Se cobrarán {price} automáticamente hasta que canceles."
+
+#: src/components/PremiumPaywall.tsx:372
+msgid "{pricePerMonth} per month"
+msgstr "{pricePerMonth} al mes"
+
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:218
 msgid "{templateCount} of {MAX_EXPENSE_TEMPLATES} custom templates"
 msgstr "{templateCount} de {MAX_EXPENSE_TEMPLATES} plantillas personalizadas"
@@ -92,7 +120,7 @@ msgstr "Vista previa de {title}"
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
-#: src/routes/about/route.tsx:146
+#: src/routes/about/route.tsx:152
 msgid "© {currentYear} trizum"
 msgstr "© {currentYear} trizum"
 
@@ -104,17 +132,99 @@ msgstr "<1>{destinationDebtorName}</1> debe dinero a <0>{destinationCreditorName
 msgid "<0>{fromName}</0> stops owing <1>{toName}</1>"
 msgstr "<0>{fromName}</0> deja de deber dinero a <1>{toName}</1>"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:9
+msgid "1. Acceptance of These Terms"
+msgstr "1. Aceptación de estos Términos"
+
 #: src/routes/privacy-policy.tsx:130
 msgid "1.3 Mobile Advertising Data"
 msgstr "1.3 Datos de publicidad móvil"
 
-#: src/routes/privacy-policy.tsx:190
+#: src/routes/privacy-policy.tsx:163
+msgid "1.4 Purchase and Premium Data"
+msgstr "1.4 Datos de compra y Premium"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:41
+msgid "10. Third-Party Services"
+msgstr "10. Servicios de terceros"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:55
+msgid "11. Availability and Changes to the Service"
+msgstr "11. Disponibilidad y cambios en el Servicio"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:75
+msgid "12. Suspension and Termination"
+msgstr "12. Suspensión y terminación"
+
+#: src/routes/terms/-components/LegalTerms.tsx:8
+msgid "13. Disclaimers and Liability"
+msgstr "13. Exclusiones de garantías y responsabilidad"
+
+#: src/routes/terms/-components/LegalTerms.tsx:31
+msgid "14. Governing Law and Consumer Rights"
+msgstr "14. Legislación aplicable y derechos de los consumidores"
+
+#: src/routes/terms/-components/LegalTerms.tsx:45
+msgid "15. Changes to These Terms"
+msgstr "15. Cambios en estos Términos"
+
+#: src/routes/terms/-components/LegalTerms.tsx:60
+msgid "16. Contact Us"
+msgstr "16. Contacto"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:34
+msgid "2. What trizum Does"
+msgstr "2. Qué hace trizum"
+
+#: src/routes/privacy-policy.tsx:218
 msgid "2.1 Legal Bases for Advertising"
 msgstr "2.1 Bases jurídicas para la publicidad"
 
-#: src/routes/privacy-policy.tsx:454
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:56
+msgid "3. Accounts, Devices, and Group Access"
+msgstr "3. Cuentas, dispositivos y acceso a grupos"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:87
+msgid "4. Your Content and Responsibilities"
+msgstr "4. Tu contenido y tus responsabilidades"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:110
+msgid "5. Acceptable Use"
+msgstr "5. Uso aceptable"
+
+#: src/routes/privacy-policy.tsx:502
 msgid "5.4 Advertising and Tracking Choices"
 msgstr "5.4 Opciones de publicidad y seguimiento"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:8
+msgid "6. Premium Purchases"
+msgstr "6. Compras de Premium"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:29
+msgid "6.1 Monthly and Annual Subscriptions"
+msgstr "6.1 Suscripciones mensuales y anuales"
+
+#. Lifetime means a one-time Premium purchase, not the user's lifespan
+#: src/routes/terms/-components/PremiumTerms.tsx:51
+msgid "6.2 Lifetime Purchase"
+msgstr "6.2 Compra de por vida"
+
+#. Party Boost means Premium benefits assigned to one shared-expense group
+#: src/routes/terms/-components/PremiumTerms.tsx:67
+msgid "6.3 Premium Ownership and Party Boosts"
+msgstr "6.3 Titularidad de Premium e impulsos de grupo"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:85
+msgid "7. Cancellation, Refunds, and Price Changes"
+msgstr "7. Cancelaciones, reembolsos y cambios de precio"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:8
+msgid "8. Advertising"
+msgstr "8. Publicidad"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:21
+msgid "9. Our Software and Intellectual Property"
+msgstr "9. Nuestro software y propiedad intelectual"
 
 #: src/lib/validation.ts:67
 msgid "A name for the participant is required"
@@ -133,7 +243,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:259
+#: src/routes/settings.tsx:262
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -156,6 +266,10 @@ msgstr "Activos"
 #: src/routes/settings.tsx:495
 msgid "Active on this device"
 msgstr "Activo en este dispositivo"
+
+#: src/components/PremiumPaywall.tsx:182
+msgid "Ad-free for you"
+msgstr "Sin anuncios para ti"
 
 #: src/routes/new/route.tsx:337
 msgid "ADB Unit of Account"
@@ -221,6 +335,10 @@ msgstr "AdMob puede crear un ID propio del editor seudónimo que reconoce un dis
 msgid "Afghan Afghani"
 msgstr "Afgani Afgano"
 
+#: src/components/PremiumPaywall.tsx:409
+msgid "After the free trial, {price} is charged automatically until canceled."
+msgstr "Tras la prueba gratuita, se cobrarán {price} automáticamente hasta que canceles."
+
 #: src/routes/new/route.tsx:195
 msgid "Albanian Lek"
 msgstr "Lek Albanés"
@@ -275,17 +393,21 @@ msgstr "Cantidad para {participantName}"
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
-#: src/routes/privacy-policy.tsx:367
+#: src/routes/privacy-policy.tsx:395
 msgid "and"
 msgstr "y"
 
-#: src/routes/privacy-policy.tsx:376
+#: src/routes/privacy-policy.tsx:404
 msgid "and its"
 msgstr "así como su"
 
 #: src/routes/new/route.tsx:198
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
+
+#: src/components/PremiumPaywall.tsx:355
+msgid "Annual"
+msgstr "Anual"
 
 #: src/components/CloudSyncAccountSettings.tsx:39
 msgid "Apple"
@@ -298,6 +420,10 @@ msgstr "Apple conectado"
 #: src/components/CloudSyncAccountSettings.tsx:42
 msgid "Apple is connected to this account"
 msgstr "Apple está conectado a esta cuenta"
+
+#: src/routes/privacy-policy.tsx:176
+msgid "Apple or Google processes your payment through your store account. trizum and RevenueCat do not receive your full payment card details."
+msgstr "Apple o Google procesa el pago a través de tu cuenta de la tienda. trizum y RevenueCat no reciben los datos completos de tu tarjeta de pago."
 
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantRow.tsx:56
 msgid "Archive"
@@ -381,15 +507,15 @@ msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
 #: src/components/ExpenseEditor.tsx:371
-#: src/routes/settings.tsx:246
+#: src/routes/settings.tsx:249
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
-#: src/routes/settings.tsx:248
+#: src/routes/settings.tsx:251
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:235
+#: src/routes/settings.tsx:238
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -499,6 +625,10 @@ msgstr "Pula Botsuano"
 msgid "Brazilian Real"
 msgstr "Real Brasileño"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:117
+msgid "Break the law or infringe another person's rights"
+msgstr "Infringir la ley o los derechos de otra persona"
+
 #: src/routes/new/route.tsx:164
 msgid "British Pound"
 msgstr "Libra Esterlina"
@@ -519,9 +649,13 @@ msgstr "Lev Búlgaro"
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
-#: src/routes/privacy-policy.tsx:383
+#: src/routes/privacy-policy.tsx:411
 msgid "Business Data Responsibility information"
 msgstr "información sobre la responsabilidad de datos empresariales"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:12
+msgid "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
+msgstr "Al acceder al Servicio o utilizarlo, aceptas estos Términos y nuestra <0>Política de privacidad</0>. Si no estás de acuerdo, no utilices el Servicio."
 
 #: src/components/CalculatorToolbar.tsx:1596
 msgid "Calculate result"
@@ -564,6 +698,10 @@ msgstr "Dólar Canadiense"
 msgid "Cancel"
 msgstr "Cancelar"
 
+#: src/routes/terms/-components/PremiumTerms.tsx:95
+msgid "Cancellation normally takes effect at the end of the current paid billing period. Refunds and immediate cancellation requests are handled under the applicable store's rules and mandatory consumer law. Nothing in these Terms limits any refund, withdrawal, cancellation, or other right that applicable law gives you."
+msgstr "La cancelación normalmente entra en vigor al final del periodo de facturación pagado en curso. Los reembolsos y las solicitudes de cancelación inmediata se gestionan conforme a las normas de la tienda correspondiente y a la legislación imperativa de protección de los consumidores. Nada de lo dispuesto en estos Términos limita los derechos de reembolso, desistimiento, cancelación u otros derechos que te reconozca la legislación aplicable."
+
 #: src/routes/new/route.tsx:226
 msgid "Cape Verdean Escudo"
 msgstr "Escudo Caboverdiano"
@@ -596,6 +734,10 @@ msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
+#: src/components/PremiumPaywall.tsx:200
+msgid "Check your connection and try again."
+msgstr "Comprueba tu conexión e inténtalo de nuevo."
+
 #: src/routes/_home/settings_.cloud-sync.tsx:578
 msgid "Check your email for the password link"
 msgstr "Revisa tu correo para encontrar el enlace de contraseña"
@@ -603,6 +745,10 @@ msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 #: src/routes/_home/settings_.cloud-sync.tsx:438
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
+
+#: src/routes/settings.tsx:377
+msgid "Checking Premium status…"
+msgstr "Comprobando el estado de Premium…"
 
 #: src/routes/settings.tsx:483
 msgid "Checking..."
@@ -623,6 +769,10 @@ msgstr "Yuan Chino"
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:528
 msgid "Choose a destination party"
 msgstr "Elige un grupo de destino"
+
+#: src/routes/settings.tsx:392
+msgid "Choose monthly, annual, or lifetime access."
+msgstr "Elige acceso mensual, anual o de por vida."
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:92
 msgid "Choose the currency for expenses in this party"
@@ -660,6 +810,10 @@ msgstr "Cerrar calculadora"
 #: src/components/CalculatorToolbar.tsx:1495
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
+
+#: src/components/PremiumPaywall.tsx:153
+msgid "Close Premium"
+msgstr "Cerrar Premium"
 
 #: src/components/CloudSyncDialogs.tsx:209
 msgid "Close sign-in"
@@ -790,7 +944,11 @@ msgstr "Continuar con Apple"
 msgid "Continue with Google"
 msgstr "Continuar con Google"
 
-#: src/routes/about/route.tsx:119
+#: src/components/PremiumPaywall.tsx:240
+msgid "Continue with Premium"
+msgstr "Continuar con Premium"
+
+#: src/routes/about/route.tsx:125
 msgid "Contributors"
 msgstr "Colaboradores"
 
@@ -830,6 +988,10 @@ msgstr "No se pudieron cargar los métodos de inicio de sesión"
 #: src/hooks/useCloudSyncAccountState.ts:301
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
+
+#: src/routes/settings.tsx:325
+msgid "Could not open Premium. Please try again."
+msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
 
 #: src/routes/reset-password.tsx:57
 msgid "Could not reset password"
@@ -884,7 +1046,7 @@ msgstr "Crea una para rellenar automáticamente los detalles y repartos habitual
 msgid "Creditor"
 msgstr "Acreedor"
 
-#: src/routes/about/route.tsx:130
+#: src/routes/about/route.tsx:136
 msgid "Credits"
 msgstr "Créditos"
 
@@ -1012,7 +1174,7 @@ msgstr "¿Eliminar gasto?"
 msgid "Delete template"
 msgstr "Eliminar plantilla"
 
-#: src/routes/privacy-policy.tsx:181
+#: src/routes/privacy-policy.tsx:209
 msgid "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 msgstr "Ofrecer y, cuando esté permitido, personalizar y medir la publicidad móvil, limitar su frecuencia y detectar el fraude y el abuso publicitarios"
 
@@ -1120,6 +1282,10 @@ msgstr "Enviar enlace para crear contraseña"
 msgid "Email Support"
 msgstr "Soporte por email"
 
+#: src/routes/terms/-components/LegalTerms.tsx:75
+msgid "Email:"
+msgstr "Correo electrónico:"
+
 #: src/components/EmojiPicker.tsx:330
 #: src/components/EmojiPicker.tsx:515
 msgid "Emoji list"
@@ -1130,7 +1296,7 @@ msgstr "Lista de emojis"
 msgid "End date"
 msgstr "Fecha de fin"
 
-#: src/routes/settings.tsx:46
+#: src/routes/settings.tsx:49
 msgid "English"
 msgstr "Inglés"
 
@@ -1146,7 +1312,7 @@ msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
-#: src/routes/settings.tsx:47
+#: src/routes/settings.tsx:50
 msgid "Español"
 msgstr "Español"
 
@@ -1320,7 +1486,7 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
-#: src/routes/settings.tsx:197
+#: src/routes/settings.tsx:200
 msgid "For payments through Bizum or similar services"
 msgstr "Para pagos mediante Bizum o servicios similares"
 
@@ -1381,7 +1547,7 @@ msgstr "Oro (onza troy)"
 msgid "Google"
 msgstr "Google"
 
-#: src/routes/privacy-policy.tsx:351
+#: src/routes/privacy-policy.tsx:379
 msgid "Google AdMob:"
 msgstr "Google AdMob:"
 
@@ -1393,13 +1559,17 @@ msgstr "Google conectado"
 msgid "Google is connected to this account"
 msgstr "Google está conectado a esta cuenta"
 
-#: src/routes/privacy-policy.tsx:374
+#: src/routes/privacy-policy.tsx:402
 msgid "Google's Privacy Policy"
 msgstr "Política de Privacidad de Google"
 
 #: src/components/CloudSyncDialogs.tsx:157
 msgid "Got it"
 msgstr "Entendido"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:66
+msgid "Group access is shared through links. Anyone with a valid group link may be able to access and change that group, so only share links with people you trust."
+msgstr "El acceso a los grupos se comparte mediante enlaces. Cualquier persona que tenga un enlace válido de un grupo podría acceder a él y modificarlo, por lo que solo debes compartir enlaces con personas de confianza."
 
 #: src/routes/new/route.tsx:240
 msgid "Guatemalan Quetzal"
@@ -1416,6 +1586,10 @@ msgstr "Dólar Guyanés"
 #: src/routes/new/route.tsx:243
 msgid "Haitian Gourde"
 msgstr "Gourde Haitiano"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:120
+msgid "Harass, threaten, defraud, impersonate, or harm another person"
+msgstr "Acosar, amenazar, defraudar, suplantar o perjudicar a otra persona"
 
 #: src/routes/support/route.tsx:76
 msgid "Have an idea to improve trizum? We'd love to hear it."
@@ -1462,7 +1636,7 @@ msgstr "¿Cómo quieres llamar a este grupo?"
 msgid "How does offline sync work?"
 msgstr "¿Cómo funciona la sincronización sin conexión?"
 
-#: src/routes/privacy-policy.tsx:365
+#: src/routes/privacy-policy.tsx:393
 msgid "How Google uses information from partner apps"
 msgstr "Cómo utiliza Google la información de aplicaciones asociadas"
 
@@ -1489,6 +1663,14 @@ msgstr "Icono"
 #: src/lib/validation.ts:11
 msgid "ID is required"
 msgstr "Se requiere un ID"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:66
+msgid "If the Service is discontinued, we will provide notice and any remedy required by applicable law or the store through which you purchased Premium."
+msgstr "Si se interrumpe el Servicio, te avisaremos y ofreceremos las medidas que exijan la legislación aplicable o la tienda a través de la cual compraste Premium."
+
+#: src/routes/terms/-components/LegalTerms.tsx:64
+msgid "If you have questions about these Terms, please contact us:"
+msgstr "Si tienes preguntas sobre estos Términos, ponte en contacto con nosotros:"
 
 #: src/components/AvatarPicker.tsx:53
 msgid "Image must be smaller than 10MB"
@@ -1656,7 +1838,7 @@ msgstr "Dinar Kuwaití"
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
-#: src/routes/settings.tsx:212
+#: src/routes/settings.tsx:215
 msgid "Language"
 msgstr "Idioma"
 
@@ -1671,6 +1853,14 @@ msgstr "Última sincronización: {lastSyncedAt}"
 #: src/routes/privacy-policy.tsx:26
 msgid "Last updated: July 19, 2026"
 msgstr "Última actualización: 19 de julio de 2026"
+
+#: src/routes/privacy-policy.tsx:26
+msgid "Last updated: July 25, 2026"
+msgstr "Última actualización: 25 de julio de 2026"
+
+#: src/routes/terms/route.tsx:26
+msgid "Last updated: July 27, 2026"
+msgstr "Última actualización: 27 de julio de 2026"
 
 #: src/components/PartyListCard.tsx:132
 msgid "Last used"
@@ -1708,6 +1898,10 @@ msgstr "Dinar Libio"
 msgid "License"
 msgstr "Licencia"
 
+#: src/components/PremiumPaywall.tsx:357
+msgid "Lifetime"
+msgstr "De por vida"
+
 #: src/routes/join.tsx:172
 msgid "Link or code"
 msgstr "Enlace o código"
@@ -1719,6 +1913,10 @@ msgstr "Enlaces"
 #: src/routes/about_.third-party-licenses.tsx:34
 msgid "Loading licenses..."
 msgstr "Cargando licencias..."
+
+#: src/components/PremiumPaywall.tsx:423
+msgid "Loading Premium options"
+msgstr "Cargando opciones de Premium"
 
 #: src/components/PartyListCard.tsx:96
 msgid "Long press for party actions"
@@ -1759,6 +1957,10 @@ msgstr "Gestionar"
 #: src/routes/party.$partyId/-components/ExpenseLog.tsx:167
 msgid "Manage expense templates"
 msgstr "Gestionar plantillas de gasto"
+
+#: src/routes/settings.tsx:353
+msgid "Manage Premium"
+msgstr "Gestionar Premium"
 
 #: src/routes/party_.$partyId.settings/-components/PartyParticipantsField.tsx:20
 msgid "Manage the participants list. Existing members can only be archived."
@@ -1836,6 +2038,14 @@ msgstr "Leu Moldavo"
 #: src/routes/new/route.tsx:269
 msgid "Mongolian Tugrik"
 msgstr "Tugrik Mongol"
+
+#: src/components/PremiumPaywall.tsx:353
+msgid "Monthly"
+msgstr "Mensual"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:32
+msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
+msgstr "Las suscripciones mensuales y anuales se renuevan automáticamente por otro periodo de facturación salvo que las canceles a través de la tienda correspondiente antes de la renovación. El importe se carga en tu cuenta de la tienda al confirmar la compra y en cada renovación, según el precio mostrado por la tienda y sujeto a cualquier aviso previo o consentimiento que exijan la tienda o la legislación aplicable."
 
 #: src/routes/new/route.tsx:264
 msgid "Moroccan Dirham"
@@ -1985,6 +2195,10 @@ msgstr "No se encontraron emojis"
 msgid "No expense templates yet"
 msgstr "Todavía no hay plantillas de gasto"
 
+#: src/components/PremiumPaywall.tsx:108
+msgid "No Premium purchase was found for this account."
+msgstr "No se ha encontrado ninguna compra de Premium para esta cuenta."
+
 #: src/components/PartyStatsView.tsx:299
 #: src/components/PartyStatsView.tsx:513
 msgid "No spending in this timeframe"
@@ -2043,6 +2257,10 @@ msgstr "No has iniciado sesión"
 msgid "of total spending"
 msgstr "del gasto total"
 
+#: src/routes/privacy-policy.tsx:203
+msgid "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
+msgstr "Ofrecer compras, restaurar compras, verificar el acceso Premium en los dispositivos donde hayas iniciado sesión, gestionar suscripciones y analizar el rendimiento de las compras"
+
 #: src/routes/about/route.tsx:64
 msgid "Offline-First"
 msgstr "Sin Conexión Primero"
@@ -2054,6 +2272,18 @@ msgstr "Los grupos antiguos quedan apartados, no desaparecen"
 #: src/routes/new/route.tsx:282
 msgid "Omani Rial"
 msgstr "Rial Omaní"
+
+#: src/components/PremiumPaywall.tsx:185
+msgid "One Party Boost"
+msgstr "Un Party Boost"
+
+#: src/components/PremiumPaywall.tsx:401
+msgid "One payment. No recurring charge."
+msgstr "Un solo pago. Sin cargos recurrentes."
+
+#: src/components/PremiumPaywall.tsx:375
+msgid "one-time"
+msgstr "pago único"
 
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:88
 msgid "Only affects you. Skip the template picker when you add an expense."
@@ -2097,7 +2327,7 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:233
+#: src/routes/settings.tsx:236
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
@@ -2128,6 +2358,10 @@ msgstr "Otras operaciones"
 #: src/routes/privacy-policy.tsx:520
 msgid "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Nuestros proveedores de infraestructura, inicio de sesión, monitorización y publicidad pueden tratar datos fuera de tu país de residencia. Cuando sea necesario, estas transferencias se basan en garantías jurídicas aplicables, como decisiones de adecuación, los Marcos de Privacidad de Datos UE-EE. UU. y Suiza-EE. UU. y su Extensión al Reino Unido, o Cláusulas Contractuales Tipo. Los avisos de privacidad de los proveedores describen sus ubicaciones y garantías específicas. Contacta con nosotros si necesitas más información sobre las garantías aplicables a tus datos."
+
+#: src/routes/privacy-policy.tsx:576
+msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
+msgstr "Nuestros proveedores de infraestructura, inicio de sesión, compras, supervisión y publicidad pueden tratar datos fuera de tu país de residencia. Cuando sea necesario, estas transferencias se basan en garantías legales aplicables, como decisiones de adecuación, los marcos de privacidad de datos UE-EE. UU. y Suiza-EE. UU. y su extensión al Reino Unido, o cláusulas contractuales tipo. Los avisos de privacidad de los proveedores describen sus ubicaciones y garantías específicas. Contacta con nosotros si necesitas más información sobre las garantías aplicables a tus datos."
 
 #: src/routes/party_.$partyId.pay/route.tsx:106
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
@@ -2319,6 +2553,14 @@ msgstr "Personas"
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
+#: src/components/PremiumPaywall.tsx:367
+msgid "per month"
+msgstr "al mes"
+
+#: src/components/PremiumPaywall.tsx:372
+msgid "per year"
+msgstr "al año"
+
 #: src/components/CloudSyncAccountSettings.tsx:96
 msgid "Permanently delete your trizum cloud account"
 msgstr "Eliminar permanentemente tu cuenta de trizum cloud"
@@ -2339,7 +2581,7 @@ msgstr "Sol Peruano"
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
-#: src/routes/settings.tsx:196
+#: src/routes/settings.tsx:199
 msgid "Phone number"
 msgstr "Número de teléfono"
 
@@ -2411,25 +2653,84 @@ msgstr "Apunta tu cámara a un código QR de trizum"
 msgid "Polish Zloty"
 msgstr "Zloty Polaco"
 
+#: src/components/PremiumPaywall.tsx:169
+#: src/routes/settings.tsx:334
+msgid "Premium"
+msgstr "Premium"
+
+#. Party means a shared-expense group, not a celebration
+#: src/routes/terms/-components/PremiumTerms.tsx:72
+msgid "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
+msgstr "Premium pertenece a la persona que realiza la compra y no puede transferirse, revenderse ni compartirse como un derecho independiente de la cuenta. El titular de Premium puede asignar un Party Boost (impulso de grupo) a un grupo que cumpla los requisitos, conforme a las reglas que se muestran en la aplicación. Un Party Boost concede a ese grupo las ventajas colectivas descritas en la aplicación; no convierte a todos los miembros del grupo en titulares de Premium ni elimina toda la publicidad para ellos."
+
+#: src/components/PremiumPaywall.tsx:93
+msgid "Premium could not be purchased. Please try again."
+msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
+
+#: src/routes/settings.tsx:385
+msgid "Premium is active on this account."
+msgstr "Premium está activo en esta cuenta."
+
+#: src/components/PremiumPaywall.tsx:86
+msgid "Premium is now active."
+msgstr "Premium ya está activo."
+
+#: src/routes/terms/-components/PremiumTerms.tsx:11
+msgid "Premium is optional. The purchase screen describes the features included with Premium and displays the price and billing period that apply in your store and region. Features may differ by platform when required by platform capabilities or store rules."
+msgstr "Premium es opcional. La pantalla de compra describe las funciones incluidas con Premium y muestra el precio y el periodo de facturación aplicables en tu tienda y región. Las funciones pueden variar según la plataforma cuando así lo exijan sus capacidades o las normas de la tienda."
+
+#: src/components/PremiumPaywall.tsx:197
+msgid "Premium options are unavailable"
+msgstr "Las opciones de Premium no están disponibles"
+
+#: src/components/PremiumPaywall.tsx:215
+msgid "Premium plan"
+msgstr "Plan Premium"
+
+#: src/components/PremiumPaywall.tsx:105
+msgid "Premium purchases restored."
+msgstr "Se han restaurado las compras de Premium."
+
+#: src/routes/settings.tsx:389
+msgid "Premium status could not be checked. Try again."
+msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
+
+#: src/components/PremiumPaywall.tsx:177
+msgid "Premium, made for sharing."
+msgstr "Premium, pensado para compartir."
+
 #: src/components/MediaGallery.tsx:262
 msgid "Previous"
 msgstr "Anterior"
 
-#: src/routes/settings.tsx:282
+#: src/routes/settings.tsx:287
 msgid "Privacy"
 msgstr "Privacidad"
 
-#: src/routes/settings.tsx:285
+#: src/routes/settings.tsx:290
 msgid "Privacy and cookie settings"
 msgstr "Privacidad y configuración de cookies"
 
+#: src/components/PremiumPaywall.tsx:275
 #: src/routes/about/route.tsx:110
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:126
+msgid "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
+msgstr "Sondear, eludir o interferir con la seguridad, los controles de acceso, los límites de uso o las restricciones de las cuentas"
+
 #: src/routes/_home/route.tsx:74
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:18
+msgid "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
+msgstr "Apple o Google procesan las compras a través de la cuenta de la tienda que utilices para adquirir Premium. Los precios pueden incluir o excluir impuestos según tu ubicación y la configuración de la tienda. La compra también se asocia a la cuenta de trizum que tenga la sesión iniciada en el momento de la compra, para que el acceso a Premium que corresponda pueda restaurarse en los dispositivos en los que hayas iniciado sesión."
+
+#: src/components/PremiumPaywall.tsx:111
+msgid "Purchases could not be restored. Please try again."
+msgstr "No se han podido restaurar las compras. Inténtalo de nuevo."
 
 #: src/routes/new/route.tsx:289
 msgid "Qatari Rial"
@@ -2501,6 +2802,10 @@ msgstr "Reiniciar trizum"
 msgid "Restore"
 msgstr "Restaurar"
 
+#: src/components/PremiumPaywall.tsx:251
+msgid "Restore purchases"
+msgstr "Restaurar compras"
+
 #: src/routes/archived.tsx:41
 msgid "Restore to home"
 msgstr "Restaurar al inicio"
@@ -2508,6 +2813,18 @@ msgstr "Restaurar al inicio"
 #: src/components/PartyPendingComponent.tsx:141
 msgid "Retry"
 msgstr "Reintentar"
+
+#: src/routes/privacy-policy.tsx:551
+msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
+msgstr "RevenueCat conserva los registros de compras y derechos de acceso conforme a su acuerdo y sus prácticas de privacidad, mientras que Apple y Google conservan los registros de transacciones de la tienda de acuerdo con sus propios requisitos. Eliminar tu cuenta de trizum no cancela por sí mismo una suscripción, emite un reembolso ni elimina los registros de transacciones que una tienda deba conservar."
+
+#: src/routes/privacy-policy.tsx:417
+msgid "RevenueCat:"
+msgstr "RevenueCat:"
+
+#: src/routes/privacy-policy.tsx:431
+msgid "RevenueCat's Privacy Policy"
+msgstr "Política de privacidad de RevenueCat"
 
 #: src/components/ExpenseEditorValidationStatus.tsx:213
 msgid "Review expense"
@@ -2553,7 +2870,7 @@ msgstr "Riyal Saudí"
 #: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:100
+#: src/routes/settings.tsx:103
 msgid "Save"
 msgstr "Guardar"
 
@@ -2565,6 +2882,10 @@ msgstr "Guardar en la nube"
 #: src/routes/join.tsx:137
 msgid "Scan QR code"
 msgstr "Escanear código QR"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:132
+msgid "Scrape, reverse engineer, or automatically access the Service except as permitted by applicable law or an open-source license"
+msgstr "Extraer datos, aplicar ingeniería inversa o acceder automáticamente al Servicio, salvo en la medida permitida por la legislación aplicable o una licencia de código abierto"
 
 #: src/components/EmojiPicker.tsx:171
 msgid "Search emoji"
@@ -2624,11 +2945,11 @@ msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/_home/route.tsx:81
 #: src/routes/party.$partyId/route.tsx:259
-#: src/routes/settings.tsx:123
+#: src/routes/settings.tsx:126
 msgid "Settings"
 msgstr "Configuración"
 
-#: src/routes/settings.tsx:67
+#: src/routes/settings.tsx:70
 msgid "Settings saved"
 msgstr "Configuración guardada"
 
@@ -2698,6 +3019,14 @@ msgstr "Iniciar sesión"
 #: src/routes/_home/settings_.cloud-sync.tsx:985
 msgid "Sign in again before deleting your account"
 msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
+
+#: src/routes/settings.tsx:358
+msgid "Sign in to get Premium"
+msgstr "Inicia sesión para obtener Premium"
+
+#: src/routes/settings.tsx:381
+msgid "Sign in to purchase or restore Premium across your devices."
+msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 
 #: src/components/CloudSyncDialogs.tsx:225
 #: src/routes/_home/route.tsx:99
@@ -2789,6 +3118,10 @@ msgstr "Dólar de las Islas Salomón"
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
+#: src/routes/terms/-components/ServiceTerms.tsx:31
+msgid "Some trizum source code and third-party components are available under open-source licenses. Those licenses continue to govern the code and components they cover, and nothing in these Terms restricts rights granted by those licenses."
+msgstr "Parte del código fuente de trizum y algunos componentes de terceros están disponibles con licencias de código abierto. Esas licencias siguen rigiendo el código y los componentes que abarcan, y nada de lo dispuesto en estos Términos restringe los derechos que conceden."
+
 #: src/components/AppRecoveryDialog.tsx:62
 msgid "Something is not working properly. Restart trizum to recover. If this keeps happening, check for updates or contact support."
 msgstr "Algo no está funcionando correctamente. Reinicia trizum para recuperarlo. Si sigue ocurriendo, comprueba si hay actualizaciones o contacta con soporte."
@@ -2858,6 +3191,10 @@ msgstr "Rupia de Sri Lanka"
 msgid "Start date"
 msgstr "Fecha de inicio"
 
+#: src/components/PremiumPaywall.tsx:238
+msgid "Start free trial"
+msgstr "Iniciar prueba gratuita"
+
 #: src/routes/index/-components/EmptyState.tsx:26
 msgid "Start tracking expenses with your group"
 msgstr "Comienza a registrar gastos con tu grupo"
@@ -2886,7 +3223,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:100
+#: src/routes/settings.tsx:103
 msgid "Submitting..."
 msgstr "Enviando..."
 
@@ -2961,7 +3298,7 @@ msgstr "Sincronizando información del grupo..."
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
-#: src/routes/settings.tsx:45
+#: src/routes/settings.tsx:48
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
@@ -3016,6 +3353,17 @@ msgstr "Los nombres de las plantillas deben ser únicos"
 msgid "Templates"
 msgstr "Plantillas"
 
+#: src/components/PremiumPaywall.tsx:266
+msgid "Terms"
+msgstr "Términos"
+
+#. Link to the legal terms page
+#. Title of the legal terms page
+#: src/routes/about/route.tsx:116
+#: src/routes/terms/route.tsx:20
+msgid "Terms of Service"
+msgstr "Términos del servicio"
+
 #: src/routes/new/route.tsx:188
 msgid "Thai Baht"
 msgstr "Baht Tailandés"
@@ -3028,15 +3376,27 @@ msgstr "Gracias por usar trizum. ¡Tus comentarios nos ayudan a mejorar!"
 msgid "The app works offline too!"
 msgstr "¡La app también funciona sin conexión!"
 
+#: src/routes/terms/-components/ServiceTerms.tsx:11
+msgid "The free installed Android and iOS apps may display advertising. Premium may remove advertising for the Premium owner as described on the purchase screen. Advertising and related privacy choices are explained in our Privacy Policy."
+msgstr "Las aplicaciones gratuitas instaladas en Android e iOS pueden mostrar publicidad. Premium puede eliminar la publicidad para su titular según se describe en la pantalla de compra. La publicidad y las opciones de privacidad relacionadas se explican en nuestra Política de privacidad."
+
 #: src/routes/privacy-policy.tsx:133
 msgid "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 msgstr "Las aplicaciones instaladas en Android y iOS pueden mostrar publicidad proporcionada mediante Google AdMob. La aplicación web en el navegador y la Aplicación Web Progresiva instalada no muestran anuncios. En función de tus opciones de consentimiento y de la configuración del dispositivo, el SDK de anuncios para móviles de Google puede tratar automáticamente la ubicación aproximada derivada de la dirección IP, información del dispositivo y del sistema operativo, interacciones con la aplicación y con la publicidad, datos de diagnóstico y rendimiento e identificadores del dispositivo o publicitarios. En iOS, el identificador publicitario (IDFA) solo está disponible si concedes el permiso de seguimiento de Apple."
 
-#: src/routes/privacy-policy.tsx:353
+#: src/routes/privacy-policy.tsx:381
 msgid "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 msgstr "Las aplicaciones móviles instaladas usan Google AdMob para solicitar, mostrar, personalizar cuando esté permitido, medir y proteger la publicidad. Google y los compradores autorizados o socios publicitarios pueden recibir datos de las solicitudes de anuncios para estos fines, aunque trizum no integra SDK de mediación de terceros independientes. Consulta"
 
-#: src/routes/privacy-policy.tsx:494
+#: src/routes/privacy-policy.tsx:419
+msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
+msgstr "Las aplicaciones móviles instaladas usan RevenueCat para presentar ofertas Premium, procesar y restaurar compras mediante Apple o Google, determinar el estado del derecho de acceso y ofrecer gestión de suscripciones. RevenueCat recibe el ID de tu cuenta de trizum e información relacionada con las compras para estos fines. Consulta"
+
+#: src/routes/terms/-components/PremiumTerms.tsx:56
+msgid "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
+msgstr "La opción De por vida es una compra única y no consumible que proporciona a la cuenta compradora acceso sin caducidad al derecho Premium mientras trizum siga ofreciendo y operando el Servicio. No es una suscripción y no se renueva automáticamente."
+
+#: src/routes/privacy-policy.tsx:542
 msgid "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 msgstr "La aplicación móvil conserva en el dispositivo un registro de la finalización del primer uso y del anuncio a pantalla completa más reciente para aplicar los límites de frecuencia publicitaria. No se sincroniza y se conserva hasta que borras los datos de la aplicación o la desinstalas. Google controla la conservación de los datos tratados por AdMob de acuerdo con sus prácticas de conservación publicadas y tus opciones de publicidad."
 
@@ -3055,6 +3415,22 @@ msgstr "El enlace del grupo puede ser inválido o haber expirado."
 #: src/components/PartyPendingComponent.tsx:23
 msgid "The party may have been deleted by another member."
 msgstr "El grupo puede haber sido eliminado por otro miembro."
+
+#: src/routes/terms/-components/ServiceTerms.tsx:44
+msgid "The Service relies on or links to third-party services, including Apple, Google, RevenueCat, authentication providers, hosting providers, and error monitoring services. Their own terms and policies govern your use of their services. We are not responsible for third-party services that we do not control."
+msgstr "El Servicio depende de servicios de terceros o incluye enlaces a ellos, entre otros Apple, Google, RevenueCat, proveedores de autenticación, proveedores de alojamiento y servicios de supervisión de errores. El uso de esos servicios se rige por sus propios términos y políticas. No somos responsables de los servicios de terceros que no controlamos."
+
+#: src/routes/terms/-components/ServiceTerms.tsx:24
+msgid "The Service, its branding, and its original content are protected by intellectual property laws. Subject to these Terms, we grant you a limited, personal, non-exclusive, non-transferable right to use the Service."
+msgstr "El Servicio, su marca y su contenido original están protegidos por las leyes de propiedad intelectual. Con sujeción a estos Términos, te concedemos un derecho limitado, personal, no exclusivo e intransferible para utilizar el Servicio."
+
+#: src/routes/terms/-components/LegalTerms.tsx:34
+msgid "These Terms are governed by the laws of Spain. If you are a consumer, you also keep the protections of mandatory consumer law in the country where you live, and you may bring a claim in any court available to you under that law. Before starting formal proceedings, we encourage you to contact us so we can try to resolve the issue."
+msgstr "Estos Términos se rigen por las leyes de España. Si eres consumidor, también conservas la protección de las normas imperativas de consumo del país en el que resides y puedes presentar una reclamación ante cualquier tribunal que esté disponible para ti conforme a dicha legislación. Antes de iniciar un procedimiento formal, te animamos a ponerte en contacto con nosotros para intentar resolver el problema."
+
+#: src/routes/terms/route.tsx:30
+msgid "These Terms of Service (\"Terms\") govern your access to and use of trizum, including its website, installed Progressive Web App, Android and iOS applications, synchronization services, and related features (collectively, the \"Service\")."
+msgstr "Estos Términos del servicio (los «Términos») rigen tu acceso a trizum y su uso, incluido su sitio web, la aplicación web progresiva instalada, las aplicaciones para Android e iOS, los servicios de sincronización y las funciones relacionadas (en conjunto, el «Servicio»)."
 
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:217
 msgid "These values prefill the new expense form and can still be edited."
@@ -3110,7 +3486,7 @@ msgstr "Este grupo necesita otro participante activo además de ti para recibir 
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 msgstr "Esto elimina permanentemente tu cuenta de trizum cloud, los métodos de inicio de sesión y la configuración en la nube. Tus datos locales en este dispositivo se conservarán."
 
-#: src/routes/about/route.tsx:133
+#: src/routes/about/route.tsx:139
 msgid "This project uses various open source libraries and tools."
 msgstr "Este proyecto utiliza varias bibliotecas y herramientas de código abierto."
 
@@ -3159,6 +3535,14 @@ msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que pod
 #: src/routes/party_.$partyId.who.tsx:130
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{partyName}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
+
+#: src/routes/terms/-components/LegalTerms.tsx:11
+msgid "To the extent permitted by law, the Service is provided \"as is\" and \"as available\" without warranties that are not expressly stated in these Terms. You remain responsible for keeping appropriate records and backups and for verifying information before acting on it."
+msgstr "En la medida permitida por la ley, el Servicio se proporciona «tal cual» y «según disponibilidad», sin garantías que no estén expresamente indicadas en estos Términos. Sigues siendo responsable de conservar registros y copias de seguridad adecuados y de verificar la información antes de actuar basándote en ella."
+
+#: src/routes/terms/-components/LegalTerms.tsx:19
+msgid "To the extent permitted by law, we are not liable for indirect, incidental, special, consequential, or punitive losses, or for losses caused by inaccurate User Content, disputes between participants, third-party services, or events outside our reasonable control. Nothing in these Terms excludes or limits liability that cannot legally be excluded or limited."
+msgstr "En la medida permitida por la ley, no respondemos de pérdidas indirectas, incidentales, especiales, consecuentes o punitivas, ni de pérdidas causadas por Contenido de usuario inexacto, disputas entre participantes, servicios de terceros o acontecimientos fuera de nuestro control razonable. Nada de lo dispuesto en estos Términos excluye o limita responsabilidades que legalmente no puedan excluirse o limitarse."
 
 #: src/routes/new/route.tsx:307
 msgid "Tongan Paʻanga"
@@ -3224,6 +3608,14 @@ msgstr "trizum cloud iniciado"
 msgid "trizum could not finish connecting that sign-in method. Please try again."
 msgstr "trizum no pudo terminar de conectar ese método de inicio de sesión. Inténtalo de nuevo."
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:37
+msgid "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
+msgstr "trizum ayuda a registrar gastos compartidos, calcular balances y coordinar liquidaciones dentro de grupos. El Servicio es una herramienta de registro y cálculo. No es un banco, una entidad de pago, un asesor financiero, un servicio contable ni un servicio de cobro de deudas, y no custodia ni transfiere dinero entre participantes."
+
+#: src/components/PremiumPaywall.tsx:149
+msgid "trizum Premium"
+msgstr "trizum Premium"
+
 #: src/routes/support/route.tsx:91
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum almacena todos tus datos localmente en tu dispositivo. Cuando estás conectado y compartes un grupo con otros, los cambios se sincronizan automáticamente en todos los dispositivos en tiempo real."
@@ -3236,8 +3628,7 @@ msgstr "trizum abrirá Apple para que puedas añadirlo como método de inicio de
 msgid "trizum will open Google so you can add it as a sign-in method for this account."
 msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio de sesión para esta cuenta."
 
-#: src/components/QRCodeScanner.tsx:186
-#: src/components/QRCodeScanner.tsx:204
+#: src/components/PremiumPaywall.tsx:208
 msgid "Try again"
 msgstr "Reintentar"
 
@@ -3322,6 +3713,10 @@ msgstr "Actualizando gasto..."
 msgid "Updating trizum..."
 msgstr "Actualizando trizum..."
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:123
+msgid "Upload malware or content designed to disrupt or damage the Service"
+msgstr "Subir software malicioso o contenido diseñado para interrumpir o dañar el Servicio"
+
 #: src/components/ExpenseEditor.tsx:921
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
@@ -3377,6 +3772,10 @@ msgstr "Úsala en este dispositivo para continuar con tus datos en la nube."
 msgid "Use personal mode to filter only your expenses."
 msgstr "Usa el modo personal para filtrar solo tus gastos."
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:138
+msgid "Use the Service to store or distribute unlawful or infringing content"
+msgstr "Utilizar el Servicio para almacenar o distribuir contenido ilícito o que vulnere derechos"
+
 #: src/components/CloudSyncDialogs.tsx:52
 #: src/components/CloudSyncDialogs.tsx:62
 msgid "Use trizum cloud on this device?"
@@ -3390,7 +3789,7 @@ msgstr "Usa tu cámara para escanear una invitación de trizum"
 msgid "Used to prefill new expenses. Blank expense keeps the current empty form."
 msgstr "Se usa para rellenar automáticamente los nuevos gastos. Gasto en blanco mantiene el formulario actual vacío."
 
-#: src/routes/settings.tsx:174
+#: src/routes/settings.tsx:177
 msgid "Username"
 msgstr "Nombre de usuario"
 
@@ -3439,7 +3838,11 @@ msgstr "Ver grupo"
 msgid "View photo"
 msgstr "Ver foto"
 
-#: src/routes/about/route.tsx:138
+#: src/routes/settings.tsx:355
+msgid "View Premium options"
+msgstr "Ver opciones de Premium"
+
+#: src/routes/about/route.tsx:144
 msgid "View Third-Party Licenses"
 msgstr "Ver Licencias de Terceros"
 
@@ -3454,6 +3857,18 @@ msgstr "Viendo como {participantName}"
 #: src/routes/privacy-policy.tsx:152
 msgid "We do not intentionally provide Google AdMob with group names, participant names, expense descriptions or amounts, currencies, receipts or other attached media, phone numbers, email addresses, trizum account IDs, authentication data, or synced document contents for advertising, targeting, or content mapping."
 msgstr "No proporcionamos intencionadamente a Google AdMob nombres de grupos, nombres de participantes, descripciones o importes de gastos, monedas, recibos u otros archivos multimedia adjuntos, números de teléfono, direcciones de correo electrónico, identificadores de cuentas de trizum, datos de autenticación ni el contenido de documentos sincronizados para publicidad, segmentación o correspondencia de contenido."
+
+#: src/routes/terms/-components/PremiumTerms.tsx:103
+msgid "We may change subscription prices for valid reasons such as changes to features, operating costs, taxes, exchange rates, inflation, or legal requirements. Price changes apply to future billing periods and will be communicated in advance through the applicable store or in the Service when required. You may cancel before the new price takes effect."
+msgstr "Podemos cambiar los precios de las suscripciones por motivos válidos, como cambios en las funciones, los costes operativos, los impuestos, los tipos de cambio, la inflación o los requisitos legales. Los cambios de precio se aplican a periodos de facturación futuros y se comunicarán con antelación a través de la tienda correspondiente o del Servicio cuando sea necesario. Puedes cancelar la suscripción antes de que entre en vigor el nuevo precio."
+
+#: src/routes/terms/-components/ServiceTerms.tsx:58
+msgid "We may maintain, update, add, remove, or change parts of the Service. We do not guarantee that the Service will always be available, uninterrupted, secure, or free of errors. We will not materially reduce an active paid subscription's recurring value without taking the steps required by applicable law and store rules."
+msgstr "Podemos mantener, actualizar, añadir, eliminar o modificar partes del Servicio. No garantizamos que el Servicio esté siempre disponible, sea ininterrumpido, seguro o esté libre de errores. No reduciremos de forma sustancial el valor recurrente de una suscripción de pago activa sin adoptar las medidas exigidas por la legislación aplicable y las normas de la tienda."
+
+#: src/routes/terms/-components/LegalTerms.tsx:48
+msgid "We may update these Terms to reflect changes to the Service, law, security, or our business. We will post the updated Terms and change the \"Last updated\" date. If a change materially affects your rights, we will provide additional notice when required. Your continued use after the updated Terms take effect means you accept them, except where applicable law requires another form of consent."
+msgstr "Podemos actualizar estos Términos para reflejar cambios en el Servicio, la legislación, la seguridad o nuestro negocio. Publicaremos los Términos actualizados y modificaremos la fecha de «Última actualización». Si un cambio afecta de forma sustancial a tus derechos, ofreceremos un aviso adicional cuando sea necesario. El uso continuado después de que entren en vigor los Términos actualizados implica que los aceptas, salvo cuando la legislación aplicable exija otra forma de consentimiento."
 
 #: src/components/CloudSyncDialogs.tsx:314
 msgid "We sent a sign-in link to {email}. Open it to finish signing in."
@@ -3484,15 +3899,23 @@ msgstr "Bienvenid@ a trizum"
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 
-#: src/routes/settings.tsx:175
+#: src/routes/settings.tsx:178
 msgid "What's your preferred way to be addressed?"
 msgstr "¿Cuál es tu forma preferida de que te llamen?"
 
-#: src/routes/privacy-policy.tsx:457
+#: src/routes/terms/-components/PremiumTerms.tsx:40
+msgid "When an eligible annual subscription includes a seven-day free trial, the purchase screen will show the trial and post-trial price. Unless you cancel before the trial ends, the subscription automatically converts to a paid annual subscription. Trial eligibility is determined by the applicable store."
+msgstr "Cuando una suscripción anual que cumpla los requisitos incluya una prueba gratuita de siete días, la pantalla de compra mostrará la prueba y el precio posterior. Salvo que canceles antes de que finalice la prueba, la suscripción se convertirá automáticamente en una suscripción anual de pago. La tienda correspondiente determina si cumples los requisitos para la prueba."
+
+#: src/routes/privacy-policy.tsx:505
 msgid "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 msgstr "Cuando sea necesario, la aplicación móvil muestra Privacidad y configuración de cookies para que puedas revisar o retirar el consentimiento y ejercer los derechos de exclusión aplicables. Según algunas leyes estatales de EE. UU., la publicidad personalizada puede considerarse una venta o cesión de información personal; los usuarios amparados pueden excluirse mediante ese control. En iOS, el permiso de seguimiento de Apple es independiente y puede cambiarse en los Ajustes de iOS. Rechazar la publicidad personalizada o el seguimiento no impide usar trizum, y pueden seguir mostrándose anuncios sin las señales rechazadas."
 
-#: src/routes/privacy-policy.tsx:193
+#: src/routes/privacy-policy.tsx:166
+msgid "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
+msgstr "Cuando usas Premium en la aplicación instalada para Android o iOS, proporcionamos a RevenueCat el ID de tu cuenta de trizum y tratamos información de compra, como el producto, el estado de la compra y la suscripción, el estado de la prueba y la renovación, la fecha de vencimiento, el derecho de acceso, la tienda, la plataforma, las versiones de la aplicación y del SDK, y datos limitados de rendimiento o diagnóstico de errores del SDK. No enviamos a RevenueCat el contenido de tus grupos, participantes, gastos, recibos ni documentos sincronizados."
+
+#: src/routes/privacy-policy.tsx:221
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Cuando la legislación aplicable exige consentimiento, usamos la Plataforma de Gestión del Consentimiento de Google para solicitarlo antes de usar el almacenamiento local o datos personales para publicidad personalizada. Puedes retirar ese consentimiento mediante Privacidad y configuración de cookies cuando ese control sea obligatorio. Cuando esté permitido sin consentimiento, la entrega de anuncios no personalizados, el control de frecuencia, la medición, la seguridad y la prevención del fraude pueden basarse en nuestro interés legítimo en financiar y proteger el Servicio, sin perjuicio de tus derechos y opciones aplicables."
 
@@ -3528,6 +3951,18 @@ msgstr "Rial Yemení"
 msgid "Yes! Your data is stored locally on your device and only synced with people you explicitly share your groups with. We don't have access to your expense data."
 msgstr "¡Sí! Tus datos se almacenan localmente en tu dispositivo y solo se sincronizan con las personas con las que compartes explícitamente tus grupos. No tenemos acceso a tus datos de gastos."
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:45
+msgid "You are responsible for checking expense entries, balances, exchange rates, and settlement instructions before relying on them or making a payment. trizum does not guarantee that information entered by you or another participant is accurate or complete."
+msgstr "Eres responsable de revisar los registros de gastos, los balances, los tipos de cambio y las instrucciones de liquidación antes de confiar en ellos o realizar un pago. trizum no garantiza que la información introducida por ti o por otro participante sea exacta o completa."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:60
+msgid "You are responsible for keeping your account credentials, devices, and sign-in methods secure and for activity performed through your account."
+msgstr "Eres responsable de mantener seguros las credenciales de tu cuenta, tus dispositivos y tus métodos de inicio de sesión, así como de la actividad realizada a través de tu cuenta."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:99
+msgid "You are responsible for User Content you add or share. You must have the necessary rights and permissions to use it, including permission to share personal information about other participants. Do not upload sensitive information that is unnecessary for splitting expenses."
+msgstr "Eres responsable del Contenido de usuario que añadas o compartas. Debes tener los derechos y permisos necesarios para utilizarlo, incluido el permiso para compartir información personal sobre otros participantes. No subas información sensible que no sea necesaria para repartir gastos."
+
 #: src/components/PartyPendingComponent.tsx:12
 msgid "You can add photos to your expenses for better tracking."
 msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
@@ -3537,6 +3972,10 @@ msgstr "Puedes añadir fotos a tus gastos para un mejor seguimiento."
 msgid "You can create up to {MAX_EXPENSE_TEMPLATES} custom templates."
 msgstr "Puedes crear hasta {MAX_EXPENSE_TEMPLATES} plantillas personalizadas."
 
+#: src/routes/terms/-components/PremiumTerms.tsx:88
+msgid "You can manage or cancel a subscription through the Customer Center in trizum or through your Apple App Store or Google Play account. Deleting trizum or deleting your trizum account does not cancel a store subscription."
+msgstr "Puedes gestionar o cancelar una suscripción mediante el Centro de atención al cliente de trizum o a través de tu cuenta del App Store de Apple o de Google Play. Eliminar trizum o tu cuenta de trizum no cancela una suscripción de la tienda."
+
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:315
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe el dinero."
@@ -3545,6 +3984,26 @@ msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:113
+msgid "You may not use the Service to:"
+msgstr "No puedes utilizar el Servicio para:"
+
+#: src/routes/terms/-components/ServiceTerms.tsx:78
+msgid "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
+msgstr "Puedes dejar de utilizar el Servicio en cualquier momento. Podemos restringir o suspender el acceso cuando sea razonablemente necesario para proteger a los usuarios o al Servicio, investigar un uso indebido, cumplir la ley o responder a un incumplimiento sustancial de estos Términos. Cuando corresponda, avisaremos y ofreceremos la oportunidad de resolver el problema."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:24
+msgid "You must be at least 18 years old to use trizum. If you use the Service on behalf of an organization, you confirm that you have authority to accept these Terms for that organization."
+msgstr "Debes tener al menos 18 años para utilizar trizum. Si utilizas el Servicio en nombre de una organización, confirmas que tienes autoridad para aceptar estos Términos en nombre de dicha organización."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:77
+msgid "You must notify us promptly if you believe your account, device, or a group link has been compromised."
+msgstr "Debes avisarnos de inmediato si crees que tu cuenta, tu dispositivo o el enlace de un grupo se han visto comprometidos."
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:72
+msgid "You must provide accurate account information and promptly update it when it changes."
+msgstr "Debes proporcionar información exacta sobre tu cuenta y actualizarla de inmediato cuando cambie."
+
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:521
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr "Necesitas otro grupo activo con la misma moneda para transferir esta deuda."
@@ -3552,6 +4011,10 @@ msgstr "Necesitas otro grupo activo con la misma moneda para transferir esta deu
 #: src/routes/party.$partyId/-components/Balances.tsx:130
 msgid "You owe money to people"
 msgstr "Debes dinero a personas"
+
+#: src/routes/terms/-components/AccountAndUsageTerms.tsx:90
+msgid "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
+msgstr "Conservas la titularidad de la información y los archivos que añadas al Servicio, incluidos los datos de los grupos, la información de los participantes, los gastos, las descripciones, los recibos y las imágenes (el «Contenido de usuario»). Nos concedes una licencia limitada, mundial y no exclusiva para alojar, procesar, reproducir y transmitir el Contenido de usuario únicamente en la medida necesaria para operar, proteger, mantener y mejorar el Servicio."
 
 #: src/routes/party.$partyId/-components/Balances.tsx:149
 msgid "You're debt free!"
@@ -3576,6 +4039,10 @@ msgstr "Tu conexión a internet puede ser demasiado lenta."
 #: src/routes/index.tsx:190
 msgid "Your parties"
 msgstr "Tus grupos"
+
+#: src/components/PremiumPaywall.tsx:89
+msgid "Your purchase is still syncing. Try restoring it in a moment."
+msgstr "Tu compra todavía se está sincronizando. Prueba a restaurarla dentro de un momento."
 
 #: src/components/PartyStatsView.tsx:341
 msgid "Your total"

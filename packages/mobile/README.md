@@ -346,11 +346,12 @@ internal tracks, TestFlight, and ad-hoc builds use test ad-unit IDs. A selected
 platform's build fails when its chosen app ID or ad-unit ID is missing.
 
 The PWA-side entitlement defaults to `unknown`, which suppresses SDK loading and
-all ads. The subscription implementation must provide `AdEntitlementContext`
-with an explicit `adFree` or `adSupported` result after entitlement resolution.
-Subscription purchase UI should call `useAdProtectedFlow(true)` while active so
-App Open ads cannot cover it. Android also delays Google app measurement until
-the consent-aware coordinator explicitly initializes Mobile Ads.
+all ads. `PremiumProvider` supplies `AdEntitlementContext` with an explicit
+`adFree` or `adSupported` result after RevenueCat resolves the signed-in
+account. Subscription purchase UI registers a protected advertising flow while
+active so App Open ads cannot cover it. Android also delays Google app
+measurement until the consent-aware coordinator explicitly initializes Mobile
+Ads.
 
 Do not enable live ads until the Premium entitlement has landed, the privacy
 policy and store disclosures match the resolved SDK behavior, UMP messages are
@@ -359,6 +360,36 @@ configuration must keep mediation disabled, keep Publisher First-Party ID
 subject to privacy signals, and disable optional third-party identifier sharing,
 Firebase enrichment, user-insight surveys, publisher-provided user IDs, and
 content mapping.
+
+### RevenueCat configuration
+
+The native apps use `@revenuecat/purchases-capacitor` for offerings, purchases,
+restores, and entitlement state. The paywall itself is shared React UI so it
+can use trizum's design system; `@revenuecat/purchases-capacitor-ui` remains in
+use for RevenueCat Customer Center. Public iOS, Android, and Test Store API keys
+are selected in `packages/pwa/src/lib/premium/revenueCatConfig.ts`; do not add a
+RevenueCat secret key to either client package.
+
+Production builds use the iOS or Android project. To build a local native app
+against RevenueCat Test Store instead:
+
+```bash
+TRIZUM_REVENUECAT_TEST_STORE=true vp run --filter @trizum/mobile build
+```
+
+Purchases require a signed-in trizum account. The `premium` entitlement maps to
+monthly, annual, and lifetime packages in the current `default` offering. The
+annual package is the default paywall choice and is intended to have a seven-day
+introductory trial. A Premium owner is ad-free; store family sharing is not an
+entitlement source.
+
+Before a production purchase build, connect App Store Connect and Google Play
+credentials to the RevenueCat project, create or import the matching store
+products and localized prices, configure the annual trial, and keep Apple
+Family Sharing disabled. The app paywall reads the current RevenueCat offering,
+so package availability, localized prices, and eligible introductory trials
+must resolve in both sandboxes. Test purchase, cancellation, restore,
+expiration, account switching, and lifetime access before enabling live ads.
 
 ## GitHub Actions
 

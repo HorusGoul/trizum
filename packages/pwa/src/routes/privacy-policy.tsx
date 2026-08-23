@@ -23,7 +23,7 @@ function renderPrivacyPolicyContent() {
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
         <p className="text-accent-600 dark:text-accent-400 text-sm">
-          <Trans>Last updated: July 19, 2026</Trans>
+          <Trans>Last updated: July 25, 2026</Trans>
         </p>
 
         <p className="text-accent-700 dark:text-accent-300">
@@ -157,6 +157,28 @@ function renderPrivacyPolicyContent() {
               </Trans>
             </p>
           </div>
+
+          <div className="flex flex-col gap-3">
+            <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+              <Trans>1.4 Purchase and Premium Data</Trans>
+            </h3>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                When you use Premium in the installed Android or iOS app, we provide RevenueCat with
+                your trizum account ID and process purchase information such as the product,
+                purchase and subscription status, trial and renewal status, expiration date,
+                entitlement, store, platform, app and SDK versions, and limited SDK performance or
+                error diagnostics. We do not send RevenueCat your party, participant, expense,
+                receipt, or synced document contents.
+              </Trans>
+            </p>
+            <p className="text-accent-700 dark:text-accent-300">
+              <Trans>
+                Apple or Google processes your payment through your store account. trizum and
+                RevenueCat do not receive your full payment card details.
+              </Trans>
+            </p>
+          </div>
         </section>
 
         <section className="flex flex-col gap-4">
@@ -177,6 +199,12 @@ function renderPrivacyPolicyContent() {
             <li>Store your data locally on your device for offline access</li>
             <li>Identify and fix technical issues through error reporting</li>
             <li>Improve and optimize the Service</li>
+            <li>
+              <Trans>
+                Offer purchases, restore purchases, verify Premium access across your signed-in
+                devices, provide subscription management, and analyze purchase performance
+              </Trans>
+            </li>
             <li>
               <Trans>
                 Deliver, personalize where permitted, measure, and limit the frequency of mobile
@@ -384,6 +412,26 @@ function renderPrivacyPolicyContent() {
                 </a>
                 .
               </li>
+              <li>
+                <strong className="text-accent-900 dark:text-accent-100 font-semibold">
+                  <Trans>RevenueCat:</Trans>
+                </strong>{" "}
+                <Trans>
+                  The installed mobile apps use RevenueCat to present Premium offers, process and
+                  restore purchases through Apple or Google, determine entitlement status, and
+                  provide subscription management. RevenueCat receives your trizum account ID and
+                  purchase-related information for these purposes. See
+                </Trans>{" "}
+                <a
+                  href="https://www.revenuecat.com/privacy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline"
+                >
+                  <Trans>RevenueCat&apos;s Privacy Policy</Trans>
+                </a>
+                .
+              </li>
             </ul>
           </div>
 
@@ -499,6 +547,14 @@ function renderPrivacyPolicyContent() {
               advertising choices.
             </Trans>
           </p>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              RevenueCat retains purchase and entitlement records under its agreement and privacy
+              practices, while Apple and Google retain store transaction records under their own
+              requirements. Deleting your trizum account does not by itself cancel a subscription,
+              issue a refund, or delete transaction records that a store must retain.
+            </Trans>
+          </p>
         </section>
 
         <section className="flex flex-col gap-4">
@@ -518,11 +574,11 @@ function renderPrivacyPolicyContent() {
           </h2>
           <p className="text-accent-700 dark:text-accent-300">
             <Trans>
-              Our infrastructure, sign-in, monitoring, and advertising providers may process data
-              outside your country of residence. Where required, these transfers rely on applicable
-              legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy
-              Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices
-              describe their specific locations and safeguards. Contact us if you need more
+              Our infrastructure, sign-in, purchase, monitoring, and advertising providers may
+              process data outside your country of residence. Where required, these transfers rely
+              on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data
+              Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy
+              notices describe their specific locations and safeguards. Contact us if you need more
               information about safeguards relevant to your data.
             </Trans>
           </p>

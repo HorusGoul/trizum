@@ -1,0 +1,6 @@
+---
+"@trizum/mobile": minor
+"@trizum/pwa": minor
+---
+
+Add RevenueCat-powered Premium purchasing and subscription management to the installed Android and iOS apps, including a native-feeling trizum paywall, signed-in cross-device entitlements, ad-free owners, monthly/annual/lifetime packages, the server-side Party Boost allocation foundation, and in-app Terms of Service.
