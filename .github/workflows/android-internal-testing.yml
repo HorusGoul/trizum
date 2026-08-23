@@ -54,6 +54,7 @@ jobs:
         run: vp run --filter @trizum/mobile build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          TRIZUM_LIVE_ADS: "true"
 
       - name: Decode Android keystore
         timeout-minutes: 2

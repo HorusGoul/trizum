@@ -96,6 +96,7 @@ jobs:
       platform: android
       build_type: release
       android_artifact: apk
+      live_ads: true
     secrets: inherit
 
   deploy-mobile-android-production:

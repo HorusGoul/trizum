@@ -1,10 +1,23 @@
+import groovy.json.JsonSlurper
+
 apply plugin: 'com.android.application'
 
 def trizumVersionCodeOverride = findProperty("trizumVersionCode")
+def adMobConfigFile = file("${rootProject.projectDir}/../admob.config.json")
+def adMobConfig = new JsonSlurper().parse(adMobConfigFile)
+def useLiveAds = System.getenv("TRIZUM_LIVE_ADS") == "true"
+def selectedAdMobConfig = useLiveAds ? adMobConfig.live.android : adMobConfig.test.android
+
+if (!(selectedAdMobConfig.appId instanceof String) || selectedAdMobConfig.appId.trim().isEmpty()) {
+    throw new GradleException("Missing ${useLiveAds ? 'live' : 'test'} Android AdMob app ID")
+}
 
 android {
     namespace "app.trizum.capacitor"
     compileSdk rootProject.ext.compileSdkVersion
+    buildFeatures {
+        resValues true
+    }
     defaultConfig {
         applicationId "app.trizum.capacitor"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -14,6 +27,7 @@ android {
             versionCode trizumVersionCodeOverride.toString().toInteger()
         }
         versionName "1.12.0"
+        resValue "string", "admob_app_id", selectedAdMobConfig.appId
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -42,6 +56,7 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation "com.google.android.play:app-update:$androidPlayAppUpdateVersion"
     implementation "com.google.android.gms:play-services-base:$androidPlayServicesBaseVersion"
+    implementation "com.google.android.gms:play-services-ads:$playServicesAdsVersion"
     implementation project(':capacitor-android')
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"

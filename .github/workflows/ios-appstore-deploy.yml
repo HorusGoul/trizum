@@ -48,6 +48,8 @@ jobs:
     needs: [check-pending-changesets, screenshots]
     runs-on: macos-26
     timeout-minutes: 20
+    env:
+      TRIZUM_LIVE_ADS: "true"
     steps:
       - uses: actions/checkout@v7
         with:

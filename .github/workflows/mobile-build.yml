@@ -56,6 +56,11 @@ on:
         required: false
         default: "app-store"
         type: string
+      live_ads:
+        description: "Use live AdMob IDs for an official production artifact"
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -67,6 +72,8 @@ jobs:
     if: ${{ inputs.platform == 'android' || inputs.platform == 'both' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      TRIZUM_LIVE_ADS: ${{ inputs.live_ads && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -153,6 +160,8 @@ jobs:
     if: ${{ inputs.platform == 'ios' || inputs.platform == 'both' }}
     runs-on: macos-26
     timeout-minutes: 25
+    env:
+      TRIZUM_LIVE_ADS: ${{ inputs.live_ads && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v7
         with:

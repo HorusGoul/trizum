@@ -55,6 +55,8 @@ jobs:
     needs: [check-pending-changesets, screenshots]
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      TRIZUM_LIVE_ADS: ${{ inputs.track == 'production' && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v7
         with:

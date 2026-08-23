@@ -12,6 +12,7 @@
 
 require "fastlane_core/build_watcher"
 require "deliver/sync_screenshots"
+require "json"
 require "plist"
 require "spaceship/connect_api"
 require "timeout"
@@ -22,6 +23,7 @@ IOS_BUILD_PROCESSING_TIMEOUT_SECONDS = 10 * 60
 IOS_SCREENSHOT_PROCESSING_TIMEOUT_SECONDS = 5 * 60
 IOS_VERSION_CHECK_WAIT_RETRY_LIMIT = 5
 IOS_ENTITLEMENTS_PATH = File.expand_path("../App/App.entitlements", __dir__)
+ADMOB_CONFIG_PATH = File.expand_path("../../../admob.config.json", __dir__)
 
 # Fastlane's screenshot sync makes reruns idempotent, but its beta
 # implementation has no processing timeout. Bound the entire sync operation so
@@ -140,13 +142,15 @@ platform :ios do
     end
 
     # Configure manual signing for CI builds
-    build_settings = {}
+    build_settings = {
+      "ADMOB_APP_ID" => selected_admob_ios_app_id
+    }
     if ENV["CI"] && ENV["PROVISIONING_PROFILE_NAME"]
-      build_settings = {
+      build_settings.merge!({
         "CODE_SIGN_STYLE" => "Manual",
         "CODE_SIGN_IDENTITY" => "Apple Distribution",
         "PROVISIONING_PROFILE_SPECIFIER" => ENV["PROVISIONING_PROFILE_NAME"]
-      }
+      })
     end
 
     build_app(
@@ -605,11 +609,23 @@ platform :ios do
 
   def app_store_submission_information
     {
-      add_id_info_uses_idfa: false,
+      add_id_info_uses_idfa: true,
       export_compliance_uses_encryption: false,
       export_compliance_is_exempt: true,
       content_rights_contains_third_party_content: false,
       content_rights_has_rights: true
     }
   end
+end
+
+def selected_admob_ios_app_id
+  config = JSON.parse(File.read(ADMOB_CONFIG_PATH))
+  environment = ENV["TRIZUM_LIVE_ADS"] == "true" ? "live" : "test"
+  app_id = config.dig(environment, "ios", "appId")
+
+  if !app_id.is_a?(String) || app_id.strip.empty?
+    UI.user_error!("Missing #{environment} iOS AdMob app ID")
+  end
+
+  app_id
 end
