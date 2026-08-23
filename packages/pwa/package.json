@@ -20,6 +20,7 @@
     "@automerge/automerge-repo-network-messagechannel": "catalog:",
     "@automerge/automerge-repo-network-websocket": "catalog:",
     "@automerge/automerge-repo-storage-indexeddb": "catalog:",
+    "@capacitor-community/admob": "catalog:",
     "@capacitor/app": "catalog:",
     "@capacitor/camera": "catalog:",
     "@capacitor/core": "catalog:",
