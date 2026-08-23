@@ -354,9 +354,7 @@ the consent-aware coordinator explicitly initializes Mobile Ads.
 
 Do not enable live ads until the Premium entitlement has landed, the privacy
 policy and store disclosures match the resolved SDK behavior, UMP messages are
-published and verified, and the focused legal review described in
-[`docs/research/admob-privacy-policy-requirements.md`](../../docs/research/admob-privacy-policy-requirements.md)
-is complete. AdMob console
+published and verified, and the focused legal review is complete. AdMob console
 configuration must keep mediation disabled, keep Publisher First-Party ID
 subject to privacy signals, and disable optional third-party identifier sharing,
 Firebase enrichment, user-insight surveys, publisher-provided user IDs, and
