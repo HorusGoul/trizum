@@ -122,12 +122,10 @@ export function decodeExpenseId(expenseId: string): {
 /**
  * Find an expense by its ID.
  *
- * This function uses a binary search to find the expense with the given ID
- * within the given array of expenses.
+ * Expense order cannot be relied on because Automerge may interleave concurrent
+ * insertions differently when documents merge.
  *
- * This is the best way to find expenses within chunks.
- *
- * @param expenses The array of expenses to search in, must be sorted in descending order.
+ * @param expenses The array of expenses to search in.
  * @param encodedId The encoded ID of the expense to find.
  */
 export function findExpenseById(
@@ -135,27 +133,11 @@ export function findExpenseById(
   encodedId: string,
 ): [Expense | undefined, index: number] {
   const { expenseId } = decodeExpenseId(encodedId);
+  const index = expenses.findIndex(
+    (expense) => decodeExpenseId(expense.id).expenseId === expenseId,
+  );
 
-  let start = 0;
-  let end = expenses.length - 1;
-
-  while (start <= end) {
-    const mid = Math.floor((start + end) / 2);
-    const expense = expenses[mid];
-    const { expenseId: midExpenseId } = decodeExpenseId(expense.id);
-
-    if (midExpenseId === expenseId) {
-      return [expense, mid];
-    }
-
-    if (midExpenseId > expenseId) {
-      start = mid + 1;
-    } else {
-      end = mid - 1;
-    }
-  }
-
-  return [undefined, -1];
+  return [expenses[index], index];
 }
 
 export function getExpenseTotalAmount(expense: Pick<Expense, "paidBy">) {
