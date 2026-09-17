@@ -244,7 +244,7 @@ jobs:
 
       - name: Load Codex auth from Bitwarden
         if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
-        uses: bitwarden/sm-action@v3.0.0
+        uses: bitwarden/sm-action@v3.0.1
         with:
           access_token: ${{ secrets.BW_ACCESS_TOKEN }}
           secrets: |
