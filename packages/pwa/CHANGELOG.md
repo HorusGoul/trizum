@@ -1,5 +1,15 @@
 # @trizum/pwa
 
+## 1.12.1
+
+### Patch Changes
+
+- [#427](https://github.com/HorusGoul/trizum/pull/427) [`3aa6539`](https://github.com/HorusGoul/trizum/commit/3aa6539799d8e32a9b8d7bc71f9e03b5883cecd4) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Render the home illustration correctly in Safari.
+
+- [#438](https://github.com/HorusGoul/trizum/pull/438) [`6d0c131`](https://github.com/HorusGoul/trizum/commit/6d0c1315644eb2ea5e9605893345b7c242f16bc0) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix expense detail and edit pages failing to find expenses after concurrent changes merge out of chronological order.
+
+- [#418](https://github.com/HorusGoul/trizum/pull/418) [`0f9a1e1`](https://github.com/HorusGoul/trizum/commit/0f9a1e1a13504e867036ed70c0e50838c56b7945) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Publish the Google advertising seller declaration at `/app-ads.txt`.
+
 ## 1.12.0
 
 ### Minor Changes
