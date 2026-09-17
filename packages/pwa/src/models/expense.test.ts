@@ -375,6 +375,16 @@ describe("findExpenseById", () => {
     expect(result).toStrictEqual(expense);
     expect(index).toBe(0);
   });
+
+  test("finds an expense when concurrent prepends merge out of order", () => {
+    const targetExpense = createMockExpense(1);
+    const expenses = [targetExpense, createMockExpense(2), createMockExpense(0)];
+
+    const [result, index] = findExpenseById(expenses, targetExpense.id);
+
+    expect(result).toStrictEqual(targetExpense);
+    expect(index).toBe(0);
+  });
 });
 
 describe("getImpactOnBalanceForUser", () => {
