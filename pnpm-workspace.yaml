@@ -115,7 +115,7 @@ catalog:
   hono: 4.12.28
   isomorphic-ws: 5.0.0
   jose: 6.2.3
-  jsdom: 29.1.1
+  jsdom: 30.0.1
   lucide-static: 1.23.0
   mathjs: 15.2.0
   motion: 12.42.2
