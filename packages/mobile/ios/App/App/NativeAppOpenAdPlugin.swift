@@ -21,6 +21,17 @@ public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenConte
     private var showCall: CAPPluginCall?
 
     @objc public func load(_ call: CAPPluginCall) {
+        Task { @MainActor [weak self] in
+            guard let self else {
+                call.reject("App Open plugin is unavailable")
+                return
+            }
+            await self.loadOnMainActor(call)
+        }
+    }
+
+    @MainActor
+    private func loadOnMainActor(_ call: CAPPluginCall) async {
         guard let adId = call.getString("adId"), !adId.isEmpty else {
             call.reject("adId is required")
             return
@@ -38,32 +49,47 @@ public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenConte
         }
 
         isLoading = true
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                let ad = try await AppOpenAd.load(with: adId, request: Request())
-                await MainActor.run {
-                    self.appOpenAd = ad
-                    self.loadedAt = Date()
-                    self.isLoading = false
-                    call.resolve()
-                }
-            } catch {
-                await MainActor.run {
-                    self.clearAd()
-                    self.isLoading = false
-                    call.reject(error.localizedDescription)
-                }
-            }
+        do {
+            let ad = try await AppOpenAd.load(with: adId, request: Request())
+            appOpenAd = ad
+            loadedAt = Date()
+            isLoading = false
+            call.resolve()
+        } catch {
+            clearAd()
+            isLoading = false
+            call.reject(error.localizedDescription)
         }
     }
 
     @objc public func isLoaded(_ call: CAPPluginCall) {
+        Task { @MainActor [weak self] in
+            guard let self else {
+                call.reject("App Open plugin is unavailable")
+                return
+            }
+            self.resolveIsLoaded(call)
+        }
+    }
+
+    @MainActor
+    private func resolveIsLoaded(_ call: CAPPluginCall) {
         clearExpiredAd()
         call.resolve(["value": hasFreshAd])
     }
 
     @objc public func show(_ call: CAPPluginCall) {
+        Task { @MainActor [weak self] in
+            guard let self else {
+                call.reject("App Open plugin is unavailable")
+                return
+            }
+            self.showOnMainActor(call)
+        }
+    }
+
+    @MainActor
+    private func showOnMainActor(_ call: CAPPluginCall) {
         clearExpiredAd()
         guard let appOpenAd, hasFreshAd, !isShowing else {
             call.reject("App Open ad is not ready")
@@ -80,10 +106,12 @@ public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenConte
         appOpenAd.present(from: viewController)
     }
 
+    @MainActor
     public func adWillPresentFullScreenContent(_ ad: FullScreenPresentingAd) {
         notifyListeners("nativeAppOpenAdShown", data: [:])
     }
 
+    @MainActor
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         let call = showCall
         clearAd()
@@ -91,6 +119,7 @@ public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenConte
         call?.resolve()
     }
 
+    @MainActor
     public func ad(
         _ ad: FullScreenPresentingAd,
         didFailToPresentFullScreenContentWithError error: Error
@@ -102,17 +131,20 @@ public class NativeAppOpenAdPlugin: CAPPlugin, CAPBridgedPlugin, FullScreenConte
         call?.reject(error.localizedDescription)
     }
 
+    @MainActor
     private var hasFreshAd: Bool {
         guard appOpenAd != nil, let loadedAt else { return false }
         return Date().timeIntervalSince(loadedAt) < Self.maximumAdAge
     }
 
+    @MainActor
     private func clearExpiredAd() {
         if !hasFreshAd {
             clearAd()
         }
     }
 
+    @MainActor
     private func clearAd() {
         appOpenAd = nil
         loadedAt = nil

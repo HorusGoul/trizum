@@ -96,7 +96,7 @@ jobs:
       platform: android
       build_type: release
       android_artifact: apk
-      live_ads: true
+      live_ads: ${{ vars.TRIZUM_LIVE_ADS_ENABLED == 'true' }}
     secrets: inherit
 
   deploy-mobile-android-production:

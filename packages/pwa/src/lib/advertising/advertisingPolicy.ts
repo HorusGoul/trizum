@@ -2,6 +2,19 @@ export const AD_SESSION_GAP_MS = 30 * 60 * 1_000;
 export const FULL_SCREEN_AD_COOLDOWN_MS = 30 * 60 * 1_000;
 export const APP_OPEN_AD_MAX_AGE_MS = 4 * 60 * 60 * 1_000;
 
+const PROTECTED_AD_ROUTE_SEGMENTS = new Set([
+  "add",
+  "edit",
+  "join",
+  "migrate",
+  "new",
+  "pay",
+  "reset-password",
+  "settings",
+  "transfer-debt",
+  "who",
+]);
+
 export interface AdHistory {
   version: 1;
   firstUseCompleted: boolean;
@@ -85,16 +98,7 @@ export function isProtectedAdRoute(pathname: string, search: Record<string, unkn
     return true;
   }
 
-  return [
-    "/add",
-    "/edit",
-    "/pay",
-    "/transfer-debt",
-    "/migrate",
-    "/join",
-    "/reset-password",
-    "/settings/cloud-sync",
-  ].some((segment) => pathname.includes(segment));
+  return pathname.split("/").some((segment) => PROTECTED_AD_ROUTE_SEGMENTS.has(segment));
 }
 
 function isTimestamp(value: unknown): value is number {
