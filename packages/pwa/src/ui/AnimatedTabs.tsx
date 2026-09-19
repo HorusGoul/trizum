@@ -35,6 +35,12 @@ function getIndex(tabCount: number, scrollProgress: number) {
   return Math.max(0, Math.floor((tabCount - 1) * scrollProgress));
 }
 
+function getNearestIndex(tabCount: number, scrollProgress: number) {
+  const lastIndex = Math.max(0, tabCount - 1);
+
+  return Math.min(lastIndex, Math.max(0, Math.round(lastIndex * scrollProgress)));
+}
+
 function getIndicatorValue(
   tabElements: HTMLElement[],
   scrollProgress: number,
@@ -152,7 +158,7 @@ export function AnimatedTabs({
       return;
     }
 
-    const nextTab = tabs[getIndex(tabElements.length, scrollProgress)];
+    const nextTab = tabs[getNearestIndex(tabElements.length, scrollProgress)];
 
     if (nextTab) {
       runSelectionChange(nextTab.id);
