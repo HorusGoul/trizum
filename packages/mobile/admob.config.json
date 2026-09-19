@@ -1,0 +1,26 @@
+{
+  "test": {
+    "android": {
+      "appId": "ca-app-pub-8039329288910865~2611371950",
+      "appOpen": "ca-app-pub-3940256099942544/9257395921",
+      "interstitial": "ca-app-pub-3940256099942544/1033173712"
+    },
+    "ios": {
+      "appId": "ca-app-pub-8039329288910865~7663699729",
+      "appOpen": "ca-app-pub-3940256099942544/5575463023",
+      "interstitial": "ca-app-pub-3940256099942544/4411468910"
+    }
+  },
+  "live": {
+    "android": {
+      "appId": "ca-app-pub-8039329288910865~2611371950",
+      "appOpen": "ca-app-pub-8039329288910865/9915981059",
+      "interstitial": "ca-app-pub-8039329288910865/3106909987"
+    },
+    "ios": {
+      "appId": "ca-app-pub-8039329288910865~7663699729",
+      "appOpen": "ca-app-pub-8039329288910865/5916337932",
+      "interstitial": "ca-app-pub-8039329288910865/9393116732"
+    }
+  }
+}

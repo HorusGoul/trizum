@@ -29,7 +29,6 @@ import { SafeArea } from "capacitor-plugin-safe-area";
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { UpdateControllerNative } from "./components/UpdateControllerNative.tsx";
-import { AppRecoveryDialog } from "./components/AppRecoveryDialog.tsx";
 import { AuthSessionController } from "./components/AuthSessionController.tsx";
 import { useEffect } from "react";
 import { SplashScreen } from "@capacitor/splash-screen";
@@ -328,7 +327,6 @@ if (!rootElement.innerHTML) {
             <MediaGalleryController>
               <AuthSessionController />
               <RouterProvider router={router} InnerWrap={InnerWrap} />
-              <AppRecoveryDialog />
               <Toaster />
             </MediaGalleryController>
           </RepoContext>

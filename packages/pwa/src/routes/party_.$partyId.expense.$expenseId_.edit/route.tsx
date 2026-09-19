@@ -34,6 +34,7 @@ import {
   getOrCreateExpenseEditCopy,
 } from "./-expenseEditValues.ts";
 import { hasExpenseEditOpenedFromDetailState } from "./-expenseEditRouteState.ts";
+import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 
 interface EditExpenseSearchParams {
   calculator?: string;
@@ -77,6 +78,7 @@ function EditExpense() {
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
   const currentLocation = useLocation();
+  const { presentInterstitialOpportunity } = useAdvertising();
 
   function mergeSearchOptions<TOptions extends { search: Partial<EditExpenseSearchParams> }>(
     options: TOptions,
@@ -188,6 +190,7 @@ function EditExpense() {
           },
         });
       }
+      requestAnimationFrame(() => presentInterstitialOpportunity());
 
       toast.success(t`Expense updated`, {
         id: "update-expense",

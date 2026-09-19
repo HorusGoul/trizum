@@ -33,12 +33,23 @@
 	<false/>
 	<key>GIDClientID</key>
 	<string>554871818976-adac4tobqolhrgp7e64siieslsc2jf84.apps.googleusercontent.com</string>
+	<key>GADApplicationIdentifier</key>
+	<string>$(ADMOB_APP_ID)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>trizum uses the camera to capture receipt photos and scan QR codes to join parties</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>trizum uses your photo library to attach receipt and avatar images you choose</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>trizum uses this permission to show more relevant ads and measure ad performance. You can continue using the app if you decline.</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

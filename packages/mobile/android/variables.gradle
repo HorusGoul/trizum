@@ -15,4 +15,6 @@ ext {
     cordovaAndroidVersion = '10.1.1'
     androidPlayAppUpdateVersion = '2.1.0'
     androidPlayServicesBaseVersion = '18.10.0'
+    playServicesAdsVersion = '24.9.0'
+    userMessagingPlatformVersion = '4.0.0'
 }
