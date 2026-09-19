@@ -1,5 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
+import { Capacitor } from "@capacitor/core";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Suspense, useId } from "react";
@@ -20,6 +21,8 @@ import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
+import { authClient } from "#src/lib/auth-client.ts";
+import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 
 export const Route = createFileRoute("/settings")({
   component: Settings,
@@ -276,6 +279,8 @@ function SettingsFormFields({
         )}
       </form.Field>
 
+      <PremiumSection />
+
       {privacyOptionsRequired ? (
         <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
           <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
@@ -288,4 +293,101 @@ function SettingsFormFields({
       ) : null}
     </form>
   );
+}
+
+function PremiumSection() {
+  const session = authClient.useSession();
+  const navigate = useNavigate();
+  const { isPremium, presentCustomerCenter, presentPaywall, status } = usePremium();
+  const { registerProtectedFlow } = useAdvertising();
+
+  if (!Capacitor.isNativePlatform()) {
+    return null;
+  }
+
+  const isSignedIn = Boolean(session.data?.user);
+  const isLoading = session.isPending || status === "loading";
+
+  async function openPremium() {
+    if (!isSignedIn) {
+      await navigate({ to: "/settings/cloud-sync" });
+      return;
+    }
+
+    const unregisterProtectedFlow = registerProtectedFlow();
+    try {
+      if (isPremium) {
+        await presentCustomerCenter();
+      } else {
+        await presentPaywall();
+      }
+    } catch {
+      toast.error(t`Could not open Premium. Please try again.`);
+    }
+    unregisterProtectedFlow();
+  }
+
+  return (
+    <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
+          <Trans>Premium</Trans>
+        </h2>
+        <p className="text-accent-700 dark:text-accent-300 text-sm">
+          <PremiumStatusDescription
+            isLoading={isLoading}
+            isPremium={isPremium}
+            isSignedIn={isSignedIn}
+            status={status}
+          />
+        </p>
+      </div>
+      <Button
+        type="button"
+        color="input-like"
+        isDisabled={isLoading}
+        onPress={() => void openPremium()}
+      >
+        {isSignedIn ? (
+          isPremium ? (
+            <Trans>Manage Premium</Trans>
+          ) : (
+            <Trans>View Premium options</Trans>
+          )
+        ) : (
+          <Trans>Sign in to get Premium</Trans>
+        )}
+      </Button>
+    </section>
+  );
+}
+
+function PremiumStatusDescription({
+  isLoading,
+  isPremium,
+  isSignedIn,
+  status,
+}: {
+  isLoading: boolean;
+  isPremium: boolean;
+  isSignedIn: boolean;
+  status: ReturnType<typeof usePremium>["status"];
+}) {
+  if (isLoading) {
+    return <Trans>Checking Premium status…</Trans>;
+  }
+
+  if (!isSignedIn) {
+    return <Trans>Sign in to purchase or restore Premium across your devices.</Trans>;
+  }
+
+  if (isPremium) {
+    return <Trans>Premium is active on this account.</Trans>;
+  }
+
+  if (status === "error") {
+    return <Trans>Premium status could not be checked. Try again.</Trans>;
+  }
+
+  return <Trans>Choose monthly, annual, or lifetime access.</Trans>;
 }
