@@ -1,5 +1,13 @@
 # @trizum/pwa
 
+## 1.12.2
+
+### Patch Changes
+
+- [#440](https://github.com/HorusGoul/trizum/pull/440) [`6fd2101`](https://github.com/HorusGoul/trizum/commit/6fd21013aa105820b1032d0868a95ea55489a125) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep swiped tab panels interactive when mobile browsers settle just before a scroll snap point.
+
+  Fixes [#439](https://github.com/HorusGoul/trizum/issues/439).
+
 ## 1.12.1
 
 ### Patch Changes

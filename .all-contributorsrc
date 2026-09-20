@@ -29,6 +29,13 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/598416?v=4",
       "profile": "https://mario.nachbaur.dev/contact/",
       "contributions": ["ideas", "code", "design", "test", "review", "bug"]
+    },
+    {
+      "login": "ddavestic",
+      "name": "ddavestic",
+      "avatar_url": "https://avatars.githubusercontent.com/u/322580291?v=4",
+      "profile": "https://github.com/ddavestic",
+      "contributions": ["bug"]
     }
   ]
 }
