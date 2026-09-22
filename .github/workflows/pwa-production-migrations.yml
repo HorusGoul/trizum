@@ -15,6 +15,7 @@ permissions:
 concurrency:
   group: pwa-production
   cancel-in-progress: false
+  queue: max
 
 jobs:
   migrate:
