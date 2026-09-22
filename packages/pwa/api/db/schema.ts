@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
@@ -81,7 +82,16 @@ export const partyBoost = sqliteTable(
     partyDocumentId: text("partyDocumentId").notNull(),
     assignedAt: integer("assignedAt").notNull(),
     transferableAt: integer("transferableAt").notNull(),
+    revokedAt: integer("revokedAt"),
+    revocationReason: text("revocationReason", {
+      enum: ["owner_not_member", "premium_inactive"],
+    }),
     updatedAt: integer("updatedAt").notNull(),
+    version: integer("version").notNull().default(0),
   },
-  (table) => [uniqueIndex("party_boost_partyDocumentId_unique").on(table.partyDocumentId)],
+  (table) => [
+    uniqueIndex("party_boost_active_partyDocumentId_unique")
+      .on(table.partyDocumentId)
+      .where(sql`${table.revokedAt} is null`),
+  ],
 );

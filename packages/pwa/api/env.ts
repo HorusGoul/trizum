@@ -26,7 +26,9 @@ export interface ApiEnv {
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_IOS_CLIENT_ID?: string;
   GOOGLE_WEB_CLIENT_ID?: string;
+  PARTY_MEMBERSHIP_TIMEOUT_MS?: string;
   PARTY_SHARE_PREVIEW_TIMEOUT_MS?: string;
+  REVENUECAT_SECRET_API_KEY?: string;
 }
 
 export interface ApiHonoEnv {

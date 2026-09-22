@@ -600,7 +600,9 @@ export function DeleteAccountDialog({
               <p className="text-accent-700 dark:text-accent-50 text-sm">
                 <Trans>
                   This permanently deletes your trizum cloud account, sign-in methods, and cloud
-                  settings. Your local data on this device will remain.
+                  settings. Your local data on this device will remain. Deleting your account does
+                  not cancel a store subscription, and Premium purchases cannot be moved to a new
+                  trizum account. Manage any active subscription before continuing.
                 </Trans>
               </p>
             </div>

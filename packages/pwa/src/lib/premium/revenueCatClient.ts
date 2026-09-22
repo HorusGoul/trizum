@@ -77,6 +77,7 @@ async function synchronizeUser(userId: string) {
     return Purchases.getCustomerInfo().then(({ customerInfo }) => customerInfo);
   }
 
+  await Purchases.logOut();
   const { customerInfo } = await Purchases.logIn({ appUserID: userId });
   identifiedUserId = userId;
   return customerInfo;

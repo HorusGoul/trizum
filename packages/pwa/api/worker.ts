@@ -7,6 +7,7 @@ import { getRedactedPath, workerLogger } from "./log";
 import { createApiCorsMiddleware } from "./cors";
 import { partySharePreviewRoute } from "./routes/party-share-preview";
 import { createApiI18nMiddleware } from "./i18n";
+import { premiumRoute } from "./routes/premium";
 
 const app = new Hono<ApiHonoEnv>();
 
@@ -43,5 +44,6 @@ app.on(["GET", "POST"], "/api/auth/*", (c) =>
 );
 app.route("/api/cloud-sync", cloudSyncRoute);
 app.route("/api/migrate", apiMigrateRoute);
+app.route("/api/premium", premiumRoute);
 
 export default app;
