@@ -104,6 +104,7 @@ export default defineConfig(({ mode }) => {
             "SENTRY_AUTH_TOKEN",
             "TRIZUM_LIVE_ADS",
             "TRIZUM_REVENUECAT_TEST_STORE",
+            "VITE_APP_AD_TEST_MODE",
             "VITE_APP_AUTH_URL",
           ],
           output: ["dist/**"],

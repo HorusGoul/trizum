@@ -29,7 +29,9 @@ vp exec wrangler d1 migrations apply DB --remote
 ```
 
 CI validates migrations as part of `@trizum/pwa#check`. Production releases
-apply remote D1 migrations before deploying the Worker.
+apply remote D1 migrations before deploying the Worker. To apply migrations
+without deploying, run the `PWA Production Migrations` GitHub Actions workflow
+manually and enter the branch, tag, or commit SHA containing the migrations.
 
 ## Email
 
