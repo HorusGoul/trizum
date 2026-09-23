@@ -1,0 +1,57 @@
+diff --git a/ios/Sources/AdMobPlugin/AdMobPlugin.swift b/ios/Sources/AdMobPlugin/AdMobPlugin.swift
+index 6b200750b205b44e0d28b165d1ee647407690f49..fb475eb7371f89008f3b3c91391e7bceb0635bba 100644
+--- a/ios/Sources/AdMobPlugin/AdMobPlugin.swift
++++ b/ios/Sources/AdMobPlugin/AdMobPlugin.swift
+@@ -1,6 +1,7 @@
+ import Foundation
+ import Capacitor
+ import GoogleMobileAds
++import UserMessagingPlatform
+ #if canImport(AppTrackingTransparency)
+ import AppTrackingTransparency
+ #endif
+@@ -231,14 +232,40 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
+     }
+ 
+     @objc func showConsentForm(_ call: CAPPluginCall) {
+-        DispatchQueue.main.async {
+-            self.consentExecutor.showConsentForm(call)
++        Task { @MainActor in
++            guard let viewController = self.bridge?.viewController else {
++                call.reject("No ViewController")
++                return
++            }
++
++            do {
++                try await ConsentForm.loadAndPresentIfRequired(from: viewController)
++                call.resolve([
++                    "status": self.consentExecutor.getConsentStatusString(ConsentInformation.shared.consentStatus),
++                    "canRequestAds": ConsentInformation.shared.canRequestAds,
++                    "privacyOptionsRequirementStatus": self.consentExecutor.getPrivacyOptionsRequirementStatus(
++                        ConsentInformation.shared.privacyOptionsRequirementStatus
++                    )
++                ])
++            } catch {
++                call.reject("Request consent info failed")
++            }
+         }
+     }
+ 
+     @objc func showPrivacyOptionsForm(_ call: CAPPluginCall) {
+-        DispatchQueue.main.async {
+-            self.consentExecutor.showPrivacyOptionsForm(call)
++        Task { @MainActor in
++            guard let viewController = self.bridge?.viewController else {
++                call.reject("No ViewController")
++                return
++            }
++
++            do {
++                try await ConsentForm.presentPrivacyOptionsForm(from: viewController)
++                call.resolve()
++            } catch {
++                call.reject("Failed to show privacy options form: \(error.localizedDescription)")
++            }
+         }
+     }
+ 

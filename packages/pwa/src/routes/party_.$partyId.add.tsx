@@ -16,6 +16,7 @@ import { useRouteCalculator } from "#src/components/useRouteCalculator.ts";
 import { useRouteMediaGallery } from "#src/components/useRouteMediaGallery.ts";
 import { useState } from "react";
 import { resolveExpenseTemplateValues } from "#src/models/expenseTemplate.ts";
+import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 
 interface AddExpenseSearchParams {
   calculator?: string;
@@ -55,6 +56,7 @@ function AddExpense() {
   const router = useRouter();
   const currentLocation = useLocation();
   const participant = useCurrentParticipant();
+  const { presentInterstitialOpportunity } = useAdvertising();
 
   function mergeSearchOptions<TOptions extends { search: Partial<AddExpenseSearchParams> }>(
     options: TOptions,
@@ -128,6 +130,7 @@ function AddExpense() {
           expenseId: expense.id,
         },
       });
+      requestAnimationFrame(() => presentInterstitialOpportunity());
 
       toast.success(t`Expense added`, {
         id: "add-expense",
