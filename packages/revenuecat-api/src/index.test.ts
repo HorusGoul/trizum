@@ -84,6 +84,10 @@ describe("RevenueCatApiClient", () => {
     ).toBe(true);
   });
 
+  it("does not interpret a missing project as inactive access", async () => {
+    await expect(hasPremium({ missingProject: true })).rejects.toBeInstanceOf(RevenueCatApiError);
+  });
+
   it("does not interpret an upstream failure as inactive access", async () => {
     await expect(hasPremium({ subscriptionStatus: 503 })).rejects.toBeInstanceOf(
       RevenueCatApiError,
@@ -107,6 +111,7 @@ describe("RevenueCatApiClient", () => {
 interface FetcherOptions {
   invalidPagination?: boolean;
   missingCustomer?: boolean;
+  missingProject?: boolean;
   purchases?: unknown[][];
   requests?: Request[];
   subscriptions?: unknown[][];
@@ -127,6 +132,7 @@ function hasPremium(options: FetcherOptions) {
 function createFetcher({
   invalidPagination = false,
   missingCustomer = false,
+  missingProject = false,
   purchases = [[]],
   requests,
   subscriptions = [[]],
@@ -136,8 +142,17 @@ function createFetcher({
     const request = input instanceof Request ? input : new Request(input, init);
     requests?.push(request);
 
-    if (missingCustomer) {
-      return createJsonResponse({ object: "error" }, 404);
+    if (missingCustomer || missingProject) {
+      return createJsonResponse(
+        {
+          message: "Resource not found.",
+          object: "error",
+          param: missingCustomer ? "customer_id" : "project_id",
+          retryable: false,
+          type: "resource_missing",
+        },
+        404,
+      );
     }
 
     const url = new URL(request.url);

@@ -96,7 +96,7 @@ async function getSubscriptionsPage(
   client: Client<paths>,
   { customerId, projectId, startingAfter }: PageRequest,
 ): Promise<RevenueCatPage<RevenueCatSubscription> | null> {
-  const { data, response } = await client.GET(
+  const { data, error, response } = await client.GET(
     "/projects/{project_id}/customers/{customer_id}/subscriptions",
     {
       params: {
@@ -106,14 +106,14 @@ async function getSubscriptionsPage(
     },
   );
 
-  return parsePageResponse(data, response, "subscriptions");
+  return parsePageResponse(data, error, response, "subscriptions");
 }
 
 async function getPurchasesPage(
   client: Client<paths>,
   { customerId, projectId, startingAfter }: PageRequest,
 ): Promise<RevenueCatPage<RevenueCatPurchase> | null> {
-  const { data, response } = await client.GET(
+  const { data, error, response } = await client.GET(
     "/projects/{project_id}/customers/{customer_id}/purchases",
     {
       params: {
@@ -123,16 +123,23 @@ async function getPurchasesPage(
     },
   );
 
-  return parsePageResponse(data, response, "purchases");
+  return parsePageResponse(data, error, response, "purchases");
 }
 
 function parsePageResponse<T>(
   data: unknown,
+  error: unknown,
   response: Response,
   resourceName: string,
 ): RevenueCatPage<T> | null {
   if (response.status === 404) {
-    return null;
+    if (isMissingCustomerError(error)) {
+      return null;
+    }
+
+    throw new RevenueCatApiError(
+      `RevenueCat ${resourceName} request could not find the configured resource.`,
+    );
   }
 
   if (!response.ok) {
@@ -150,6 +157,10 @@ function parsePageResponse<T>(
   }
 
   return data as unknown as RevenueCatPage<T>;
+}
+
+function isMissingCustomerError(value: unknown) {
+  return isRecord(value) && value.type === "resource_missing" && value.param === "customer_id";
 }
 
 async function listAllRevenueCatResources<T>(
@@ -234,7 +245,11 @@ function assertRecord(
   value: unknown,
   resourceName: string,
 ): asserts value is Record<string, unknown> {
-  if (!value || typeof value !== "object") {
+  if (!isRecord(value)) {
     throw new RevenueCatApiError(`RevenueCat returned an invalid ${resourceName}.`);
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object";
 }
