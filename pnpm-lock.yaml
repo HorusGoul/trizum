@@ -280,6 +280,9 @@ catalogs:
     motion:
       specifier: 12.42.2
       version: 12.42.2
+    openapi-fetch:
+      specifier: 0.17.0
+      version: 0.17.0
     oxlint-plugin-react-doctor:
       specifier: 0.7.4
       version: 0.7.4
@@ -706,6 +709,9 @@ importers:
       '@trizum/react-suspense-cache':
         specifier: workspace:*
         version: link:../react-suspense-cache
+      '@trizum/revenuecat-api':
+        specifier: workspace:*
+        version: link:../revenuecat-api
       '@trizum/tw-dynamic-themes':
         specifier: workspace:*
         version: link:../tw-dynamic-themes
@@ -933,6 +939,25 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.8(react@19.2.8)
+      vite:
+        specifier: npm:@voidzero-dev/vite-plus-core@0.2.4
+        version: '@voidzero-dev/vite-plus-core@0.2.4(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)'
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.2.4(@opentelemetry/api@1.9.1)(@types/node@26.0.1)(@vitest/coverage-v8@4.1.10)(@voidzero-dev/vite-plus-core@0.2.4(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0))(esbuild@0.28.1)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@2.2.0))(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)
+
+  packages/revenuecat-api:
+    dependencies:
+      openapi-fetch:
+        specifier: 'catalog:'
+        version: 0.17.0
+    devDependencies:
+      '@trizum/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@typescript/native':
+        specifier: 'catalog:'
+        version: typescript@7.0.2
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@0.2.4
         version: '@voidzero-dev/vite-plus-core@0.2.4(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.0)(typescript@6.0.3)(yaml@2.9.0)'
@@ -4816,6 +4841,9 @@ packages:
     peerDependencies:
       react: '>=19.0.0'
 
+  '@trizum/revenuecat-api@file:packages/revenuecat-api':
+    resolution: {directory: packages/revenuecat-api, type: directory}
+
   '@trizum/tw-dynamic-themes@file:packages/tw-dynamic-themes':
     resolution: {directory: packages/tw-dynamic-themes, type: directory}
     hasBin: true
@@ -7774,6 +7802,12 @@ packages:
   open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
+
+  openapi-fetch@0.17.0:
+    resolution: {integrity: sha512-PsbZR1wAPcG91eEthKhN+Zn92FMHxv+/faECIwjXdxfTODGSGegYv0sc1Olz+HYPvKOuoXfp+0pA2XVt2cI0Ig==}
+
+  openapi-typescript-helpers@0.1.0:
+    resolution: {integrity: sha512-OKTGPthhivLw/fHz6c3OPtg72vi86qaMlqbJuVJ23qOvQ+53uw1n7HdmkJFibloF7QEjDrDkzJiOJuockM/ljw==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -13091,6 +13125,7 @@ snapshots:
       '@tanstack/react-router': 1.170.17(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@trizum/logging': file:packages/logging
       '@trizum/react-suspense-cache': file:packages/react-suspense-cache(react@19.2.8)
+      '@trizum/revenuecat-api': file:packages/revenuecat-api
       '@trizum/tw-dynamic-themes': file:packages/tw-dynamic-themes
       '@use-gesture/react': 10.3.1(react@19.2.8)
       barcode-detector: 3.0.8(@types/emscripten@1.41.5)
@@ -13181,6 +13216,10 @@ snapshots:
     dependencies:
       '@trizum/logging': file:packages/logging
       react: 19.2.8
+
+  '@trizum/revenuecat-api@file:packages/revenuecat-api':
+    dependencies:
+      openapi-fetch: 0.17.0
 
   '@trizum/tw-dynamic-themes@file:packages/tw-dynamic-themes':
     dependencies:
@@ -16107,6 +16146,12 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
+
+  openapi-fetch@0.17.0:
+    dependencies:
+      openapi-typescript-helpers: 0.1.0
+
+  openapi-typescript-helpers@0.1.0: {}
 
   optionator@0.9.4:
     dependencies:

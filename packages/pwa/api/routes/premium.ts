@@ -46,6 +46,7 @@ premiumRoute.get("/party-boost", async (c) => {
       db: getApiDb(c.env.DB),
       env: c.env,
       partyDocumentId,
+      projectId: c.env.REVENUECAT_PROJECT_ID,
       request: c.req.raw,
       userId: c.get("user").id,
     });
@@ -86,6 +87,7 @@ premiumRoute.put("/party-boost", async (c) => {
 
     const premium = await verifyRevenueCatPremium({
       apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+      projectId: c.env.REVENUECAT_PROJECT_ID,
       userId,
     });
 
@@ -101,6 +103,7 @@ premiumRoute.put("/party-boost", async (c) => {
         assignment: existingPartyAssignment,
         db,
         env: c.env,
+        projectId: c.env.REVENUECAT_PROJECT_ID,
         request: c.req.raw,
       });
 
@@ -174,6 +177,7 @@ async function getPartyBoostStatus({
   db,
   env,
   partyDocumentId,
+  projectId,
   request,
   userId,
 }: {
@@ -181,6 +185,7 @@ async function getPartyBoostStatus({
   db: ApiDb;
   env: ApiHonoEnv["Bindings"];
   partyDocumentId: string;
+  projectId: string | undefined;
   request: Request;
   userId: string;
 }): Promise<PartyBoostStatus | null> {
@@ -196,8 +201,10 @@ async function getPartyBoostStatus({
     return null;
   }
 
-  const premium = await verifyRevenueCatPremium({ apiKey, userId });
   let assignment = await getUserAssignment(db, userId);
+  const premium = assignment
+    ? await verifyRevenueCatPremium({ apiKey, projectId, userId })
+    : { isPremium: false };
 
   if (assignment?.revokedAt === null) {
     if (!premium.isPremium) {
@@ -224,6 +231,7 @@ async function getPartyBoostStatus({
       assignment: partyAssignment,
       db,
       env,
+      projectId,
       request,
     });
 
@@ -248,15 +256,21 @@ async function validateActiveAssignment({
   assignment,
   db,
   env,
+  projectId,
   request,
 }: {
   apiKey: string | undefined;
   assignment: PartyBoostRow;
   db: ApiDb;
   env: ApiHonoEnv["Bindings"];
+  projectId: string | undefined;
   request: Request;
 }) {
-  const premium = await verifyRevenueCatPremium({ apiKey, userId: assignment.ownerUserId });
+  const premium = await verifyRevenueCatPremium({
+    apiKey,
+    projectId,
+    userId: assignment.ownerUserId,
+  });
   if (!premium.isPremium) {
     await revokeAssignment(db, assignment, "premium_inactive", Date.now());
     return false;

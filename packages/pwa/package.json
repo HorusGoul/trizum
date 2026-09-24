@@ -46,6 +46,7 @@
     "@tanstack/react-router": "catalog:",
     "@trizum/logging": "workspace:*",
     "@trizum/react-suspense-cache": "workspace:*",
+    "@trizum/revenuecat-api": "workspace:*",
     "@trizum/tw-dynamic-themes": "workspace:*",
     "@use-gesture/react": "catalog:",
     "barcode-detector": "catalog:",

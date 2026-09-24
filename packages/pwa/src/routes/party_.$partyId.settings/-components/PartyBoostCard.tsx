@@ -49,7 +49,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   const navigate = useNavigate();
   const session = authClient.useSession();
   const userId = session.data?.user.id ?? null;
-  const { presentPaywall } = usePremium();
+  const { isPremium: isDevicePremium, presentPaywall } = usePremium();
   const [isActivating, setIsActivating] = useState(false);
   const [isTransferConfirmationOpen, setIsTransferConfirmationOpen] = useState(false);
   const [now, setNow] = useState(0);
@@ -204,6 +204,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   const actionState = getPartyBoostActionState({
     canTransfer,
     isActivating,
+    isPremium: Boolean(status?.currentUser.isPremium || isDevicePremium),
     isRefreshing: viewState.isRefreshing,
     isSignedIn: Boolean(userId),
     status,
@@ -446,12 +447,14 @@ function PartyBoostAction({
 function getPartyBoostActionState({
   canTransfer,
   isActivating,
+  isPremium,
   isRefreshing,
   isSignedIn,
   status,
 }: {
   canTransfer: boolean;
   isActivating: boolean;
+  isPremium: boolean;
   isRefreshing: boolean;
   isSignedIn: boolean;
   status: PartyBoostStatus | null;
@@ -472,7 +475,7 @@ function getPartyBoostActionState({
     return { type: "boosted_by_other" };
   }
 
-  if (!status.currentUser.isPremium) {
+  if (!isPremium) {
     return { type: Capacitor.isNativePlatform() ? "upgrade" : "hidden" };
   }
 

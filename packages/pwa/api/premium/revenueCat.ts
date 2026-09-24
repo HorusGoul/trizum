@@ -1,121 +1,49 @@
-const REVENUECAT_API_URL = "https://api.revenuecat.com/v1";
+import { createRevenueCatApiClient } from "@trizum/revenuecat-api";
+
 const PREMIUM_ENTITLEMENT_ID = "premium";
 
 export interface PremiumVerification {
-  expiresAt: number | null;
   isPremium: boolean;
 }
 
 export class PremiumVerificationUnavailableError extends Error {
-  constructor(message: string, options?: ErrorOptions) {
-    super(message, options);
-    this.name = "PremiumVerificationUnavailableError";
-  }
+  override readonly name = "PremiumVerificationUnavailableError";
 }
 
 export async function verifyRevenueCatPremium({
   apiKey,
-  fetcher = fetch,
-  now = Date.now(),
+  fetcher,
+  projectId,
   userId,
 }: {
   apiKey: string | undefined;
   fetcher?: typeof fetch;
-  now?: number;
+  projectId: string | undefined;
   userId: string;
 }): Promise<PremiumVerification> {
   if (!apiKey?.trim()) {
     throw new PremiumVerificationUnavailableError("REVENUECAT_SECRET_API_KEY is not configured.");
   }
 
-  let response: Response;
+  if (!projectId?.trim()) {
+    throw new PremiumVerificationUnavailableError("REVENUECAT_PROJECT_ID is not configured.");
+  }
 
   try {
-    response = await fetcher(`${REVENUECAT_API_URL}/subscribers/${encodeURIComponent(userId)}`, {
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
+    const client = createRevenueCatApiClient({
+      ...(fetcher ? { fetcher } : {}),
+      secretApiKey: apiKey,
     });
+    const isPremium = await client.hasDirectEntitlement({
+      customerId: userId,
+      entitlementLookupKey: PREMIUM_ENTITLEMENT_ID,
+      projectId,
+    });
+
+    return { isPremium };
   } catch (error) {
-    throw new PremiumVerificationUnavailableError("RevenueCat could not be reached.", {
+    throw new PremiumVerificationUnavailableError("RevenueCat Premium verification failed.", {
       cause: error,
     });
   }
-
-  if (response.status === 404) {
-    return { expiresAt: null, isPremium: false };
-  }
-
-  if (!response.ok) {
-    throw new PremiumVerificationUnavailableError(
-      `RevenueCat returned an unexpected ${response.status} response.`,
-    );
-  }
-
-  const payload = await response.json().catch((error) => {
-    throw new PremiumVerificationUnavailableError("RevenueCat returned invalid JSON.", {
-      cause: error,
-    });
-  });
-  const entitlement = getPremiumEntitlement(payload);
-
-  if (!entitlement) {
-    return { expiresAt: null, isPremium: false };
-  }
-
-  if (entitlement.expires_date === null) {
-    return { expiresAt: null, isPremium: true };
-  }
-
-  if (typeof entitlement.expires_date !== "string") {
-    throw new PremiumVerificationUnavailableError(
-      "RevenueCat returned an invalid Premium entitlement.",
-    );
-  }
-
-  const expiresAt = Date.parse(entitlement.expires_date);
-
-  if (!Number.isFinite(expiresAt)) {
-    throw new PremiumVerificationUnavailableError(
-      "RevenueCat returned an invalid Premium expiration date.",
-    );
-  }
-
-  return {
-    expiresAt,
-    isPremium: expiresAt > now,
-  };
-}
-
-function getPremiumEntitlement(payload: unknown): { expires_date: unknown } | null {
-  if (!payload || typeof payload !== "object") {
-    throw new PremiumVerificationUnavailableError("RevenueCat returned an invalid subscriber.");
-  }
-
-  const subscriber = (payload as { subscriber?: unknown }).subscriber;
-
-  if (!subscriber || typeof subscriber !== "object") {
-    throw new PremiumVerificationUnavailableError("RevenueCat returned an invalid subscriber.");
-  }
-
-  const entitlements = (subscriber as { entitlements?: unknown }).entitlements;
-
-  if (!entitlements || typeof entitlements !== "object") {
-    return null;
-  }
-
-  const entitlement = (entitlements as Record<string, unknown>)[PREMIUM_ENTITLEMENT_ID];
-
-  if (entitlement === undefined) {
-    return null;
-  }
-
-  if (!entitlement || typeof entitlement !== "object" || !("expires_date" in entitlement)) {
-    throw new PremiumVerificationUnavailableError(
-      "RevenueCat returned an invalid Premium entitlement.",
-    );
-  }
-
-  return entitlement as { expires_date: unknown };
 }

@@ -180,7 +180,7 @@ msgstr "16. Contact Us"
 msgid "2. What trizum Does"
 msgstr "2. What trizum Does"
 
-#: src/routes/privacy-policy.tsx:218
+#: src/routes/privacy-policy.tsx:219
 msgid "2.1 Legal Bases for Advertising"
 msgstr "2.1 Legal Bases for Advertising"
 
@@ -196,7 +196,7 @@ msgstr "4. Your Content and Responsibilities"
 msgid "5. Acceptable Use"
 msgstr "5. Acceptable Use"
 
-#: src/routes/privacy-policy.tsx:502
+#: src/routes/privacy-policy.tsx:504
 msgid "5.4 Advertising and Tracking Choices"
 msgstr "5.4 Advertising and Tracking Choices"
 
@@ -234,7 +234,7 @@ msgstr "9. Our Software and Intellectual Property"
 msgid "A name for the participant is required"
 msgstr "A name for the participant is required"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:348
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:349
 msgid "A Premium member is boosting this party."
 msgstr "A Premium member is boosting this party."
 
@@ -267,7 +267,7 @@ msgstr "Account deleted"
 msgid "Across the selected timeframe"
 msgstr "Across the selected timeframe"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:226
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:227
 msgid "Active"
 msgstr "Active"
 
@@ -405,11 +405,11 @@ msgstr "Amount for {participantName}"
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
-#: src/routes/privacy-policy.tsx:395
+#: src/routes/privacy-policy.tsx:396
 msgid "and"
 msgstr "and"
 
-#: src/routes/privacy-policy.tsx:404
+#: src/routes/privacy-policy.tsx:405
 msgid "and its"
 msgstr "and its"
 
@@ -629,7 +629,7 @@ msgstr "Bolivian Boliviano"
 msgid "Bolivian Mvdol"
 msgstr "Bolivian Mvdol"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:441
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:442
 msgid "Boost this party"
 msgstr "Boost this party"
 
@@ -673,7 +673,7 @@ msgstr "Bulgarian Lev"
 msgid "Burundian Franc"
 msgstr "Burundian Franc"
 
-#: src/routes/privacy-policy.tsx:411
+#: src/routes/privacy-policy.tsx:412
 msgid "Business Data Responsibility information"
 msgstr "Business Data Responsibility information"
 
@@ -723,7 +723,7 @@ msgstr "Canadian Dollar"
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:227
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:287
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:288
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -779,7 +779,7 @@ msgstr "Check your email for the sign-in link"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:324
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:325
 msgid "Checking Party Boost…"
 msgstr "Checking Party Boost…"
 
@@ -1216,7 +1216,7 @@ msgstr "Delete expense?"
 msgid "Delete template"
 msgstr "Delete template"
 
-#: src/routes/privacy-policy.tsx:209
+#: src/routes/privacy-policy.tsx:210
 msgid "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 msgstr "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 
@@ -1605,7 +1605,7 @@ msgstr "Gold (troy ounce)"
 msgid "Google"
 msgstr "Google"
 
-#: src/routes/privacy-policy.tsx:379
+#: src/routes/privacy-policy.tsx:380
 msgid "Google AdMob:"
 msgstr "Google AdMob:"
 
@@ -1617,7 +1617,7 @@ msgstr "Google connected"
 msgid "Google is connected to this account"
 msgstr "Google is connected to this account"
 
-#: src/routes/privacy-policy.tsx:402
+#: src/routes/privacy-policy.tsx:403
 msgid "Google's Privacy Policy"
 msgstr "Google's Privacy Policy"
 
@@ -1702,7 +1702,7 @@ msgstr "How do you want to call this party?"
 msgid "How does offline sync work?"
 msgstr "How does offline sync work?"
 
-#: src/routes/privacy-policy.tsx:393
+#: src/routes/privacy-policy.tsx:394
 msgid "How Google uses information from partner apps"
 msgstr "How Google uses information from partner apps"
 
@@ -1928,6 +1928,10 @@ msgstr "Last updated: July 25, 2026"
 msgid "Last updated: July 27, 2026"
 msgstr "Last updated: July 27, 2026"
 
+#: src/routes/privacy-policy.tsx:26
+msgid "Last updated: September 25, 2026"
+msgstr "Last updated: September 25, 2026"
+
 #: src/components/PartyListCard.tsx:132
 msgid "Last used"
 msgstr "Last used"
@@ -2125,16 +2129,16 @@ msgstr "Move cursor left"
 msgid "Move cursor right"
 msgstr "Move cursor right"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:284
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:285
 msgid "Move Party Boost"
 msgstr "Move Party Boost"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:434
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:435
 msgid "Move Party Boost here"
 msgstr "Move Party Boost here"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:251
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:258
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:252
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:259
 msgid "Move Party Boost here?"
 msgstr "Move Party Boost here?"
 
@@ -2341,6 +2345,10 @@ msgid "of total spending"
 msgstr "of total spending"
 
 #: src/routes/privacy-policy.tsx:203
+msgid "Offer purchases, restore purchases, verify Premium access across your signed-in devices and for Party Boost, provide subscription management, and analyze purchase performance"
+msgstr "Offer purchases, restore purchases, verify Premium access across your signed-in devices and for Party Boost, provide subscription management, and analyze purchase performance"
+
+#: src/routes/privacy-policy.tsx:203
 msgid "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
 msgstr "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
 
@@ -2446,7 +2454,7 @@ msgstr "Other operations"
 msgid "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
-#: src/routes/privacy-policy.tsx:576
+#: src/routes/privacy-policy.tsx:578
 msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
@@ -2534,11 +2542,11 @@ msgstr "Party actions"
 msgid "Party archived"
 msgstr "Party archived"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:222
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:223
 msgid "Party Boost"
 msgstr "Party Boost"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:406
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:407
 msgid "Party Boost active"
 msgstr "Party Boost active"
 
@@ -2546,7 +2554,7 @@ msgstr "Party Boost active"
 msgid "Party Boost can only move once every seven days."
 msgstr "Party Boost can only move once every seven days."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:332
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:333
 msgid "Party Boost could not be checked. Try again when you are online."
 msgstr "Party Boost could not be checked. Try again when you are online."
 
@@ -2558,7 +2566,7 @@ msgstr "Party Boost is active."
 msgid "Party Boost is unavailable. Please try again."
 msgstr "Party Boost is unavailable. Please try again."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:426
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:427
 msgid "Party Boost unavailable"
 msgstr "Party Boost unavailable"
 
@@ -2811,7 +2819,7 @@ msgstr "Premium is required for Party Boost."
 msgid "Premium options are unavailable"
 msgstr "Premium options are unavailable"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:368
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:369
 msgid "Premium owners can boost one party at a time and move it every seven days."
 msgstr "Premium owners can boost one party at a time and move it every seven days."
 
@@ -2950,15 +2958,15 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/routes/privacy-policy.tsx:551
+#: src/routes/privacy-policy.tsx:553
 msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
 msgstr "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
 
-#: src/routes/privacy-policy.tsx:417
+#: src/routes/privacy-policy.tsx:418
 msgid "RevenueCat:"
 msgstr "RevenueCat:"
 
-#: src/routes/privacy-policy.tsx:431
+#: src/routes/privacy-policy.tsx:433
 msgid "RevenueCat's Privacy Policy"
 msgstr "RevenueCat's Privacy Policy"
 
@@ -3149,7 +3157,7 @@ msgstr "Sierra Leonean Leone"
 
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:389
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:390
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -3157,7 +3165,7 @@ msgstr "Sign in"
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:316
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:317
 msgid "Sign in to activate Premium benefits for this party."
 msgstr "Sign in to activate Premium benefits for this party."
 
@@ -3529,7 +3537,7 @@ msgstr "The free installed Android and iOS apps may display advertising. Premium
 msgid "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 msgstr "The installed Android and iOS apps may display advertising supplied through Google AdMob. The browser app and installed Progressive Web App do not display ads. Subject to your consent choices and device settings, the Google Mobile Ads SDK may automatically process IP-address-derived approximate location, device and operating system information, app interactions, advertising interactions, diagnostics, performance data, and device or advertising identifiers. On iOS, the advertising identifier (IDFA) is available only if you grant Apple's tracking permission."
 
-#: src/routes/privacy-policy.tsx:381
+#: src/routes/privacy-policy.tsx:382
 msgid "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 msgstr "The installed mobile apps use Google AdMob to request, display, personalize where permitted, measure, and protect advertising. Google and authorized buyers or advertising partners may receive ad-request data for these purposes even though trizum does not integrate separate third-party mediation SDKs. See"
 
@@ -3537,11 +3545,15 @@ msgstr "The installed mobile apps use Google AdMob to request, display, personal
 msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 msgstr "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
 
+#: src/routes/privacy-policy.tsx:420
+msgid "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. trizum's servers also use RevenueCat to verify Premium access for Party Boost. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
+msgstr "The installed mobile apps use RevenueCat to present Premium offers, process and restore purchases through Apple or Google, determine entitlement status, and provide subscription management. trizum's servers also use RevenueCat to verify Premium access for Party Boost. RevenueCat receives your trizum account ID and purchase-related information for these purposes. See"
+
 #: src/routes/terms/-components/PremiumTerms.tsx:56
 msgid "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 msgstr "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 
-#: src/routes/privacy-policy.tsx:542
+#: src/routes/privacy-policy.tsx:544
 msgid "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 msgstr "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 
@@ -3561,7 +3573,7 @@ msgstr "The party link may be invalid or expired."
 msgid "The party may have been deleted by another member."
 msgstr "The party may have been deleted by another member."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:266
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:267
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 
@@ -3635,7 +3647,7 @@ msgstr "This party already has an active Party Boost."
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "This party needs another active participant besides you to receive the transferred debt."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:272
 msgid "This party will receive your Party Boost. You will not be able to move it again for seven days."
 msgstr "This party will receive your Party Boost. You will not be able to move it again for seven days."
 
@@ -3802,7 +3814,7 @@ msgid "trizum will open Google so you can add it as a sign-in method for this ac
 msgstr "trizum will open Google so you can add it as a sign-in method for this account."
 
 #: src/components/PremiumPaywall.tsx:208
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:397
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:398
 msgid "Try again"
 msgstr "Try again"
 
@@ -4021,7 +4033,7 @@ msgstr "View party"
 msgid "View photo"
 msgstr "View photo"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:418
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:419
 #: src/routes/settings.tsx:355
 msgid "View Premium options"
 msgstr "View Premium options"
@@ -4095,15 +4107,19 @@ msgstr "What's your preferred way to be addressed?"
 msgid "When an eligible annual subscription includes a seven-day free trial, the purchase screen will show the trial and post-trial price. Unless you cancel before the trial ends, the subscription automatically converts to a paid annual subscription. Trial eligibility is determined by the applicable store."
 msgstr "When an eligible annual subscription includes a seven-day free trial, the purchase screen will show the trial and post-trial price. Unless you cancel before the trial ends, the subscription automatically converts to a paid annual subscription. Trial eligibility is determined by the applicable store."
 
-#: src/routes/privacy-policy.tsx:505
+#: src/routes/privacy-policy.tsx:507
 msgid "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 msgstr "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
+
+#: src/routes/privacy-policy.tsx:166
+msgid "When you sign in to the installed Android or iOS app, purchase, restore, or manage Premium, or use Party Boost, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
+msgstr "When you sign in to the installed Android or iOS app, purchase, restore, or manage Premium, or use Party Boost, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
 
 #: src/routes/privacy-policy.tsx:166
 msgid "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
 msgstr "When you use Premium in the installed Android or iOS app, we provide RevenueCat with your trizum account ID and process purchase information such as the product, purchase and subscription status, trial and renewal status, expiration date, entitlement, store, platform, app and SDK versions, and limited SDK performance or error diagnostics. We do not send RevenueCat your party, participant, expense, receipt, or synced document contents."
 
-#: src/routes/privacy-policy.tsx:221
+#: src/routes/privacy-policy.tsx:222
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 
@@ -4232,15 +4248,15 @@ msgstr "Your internet connection might be too slow."
 msgid "Your parties"
 msgstr "Your parties"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:360
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:361
 msgid "Your Party Boost can be moved again on {transferableDate}."
 msgstr "Your Party Boost can be moved again on {transferableDate}."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:358
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:359
 msgid "Your Party Boost is active elsewhere and can be moved here."
 msgstr "Your Party Boost is active elsewhere and can be moved here."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:340
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:341
 msgid "Your Premium is boosting this party for everyone in it."
 msgstr "Your Premium is boosting this party for everyone in it."
 
