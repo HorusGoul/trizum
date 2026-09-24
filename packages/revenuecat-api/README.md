@@ -2,15 +2,17 @@
 
 `@trizum/revenuecat-api` is trizum's server-side client for the RevenueCat
 Developer API v2. It uses RevenueCat's official customer-resources OpenAPI
-schema to type requests and responses while exposing a small entitlement-check
-interface to the rest of the monorepo.
+schema and `@hey-api/openapi-ts` to generate a typed Fetch client while
+exposing a small entitlement-check interface to the rest of the monorepo.
 
 ## Key files
 
 - `src/index.ts` owns authentication, pagination, response validation, and
   direct-entitlement access rules.
-- `src/generated/customerResources.gen.ts` is an ignored build artifact
-  generated from RevenueCat's official OpenAPI schema.
+- `openapi-ts.config.ts` pins the RevenueCat schema input and Node-compatible
+  generated module specifiers.
+- `src/generated/` contains ignored SDK build artifacts generated from
+  RevenueCat's official OpenAPI schema.
 
 ## Tasks
 

@@ -14,7 +14,7 @@ export default defineConfig({
       },
       generate: {
         command: "vp run generate:client",
-        output: ["src/generated/customerResources.gen.ts"],
+        output: ["src/generated/**"],
       },
       test: {
         command: "vp test .",

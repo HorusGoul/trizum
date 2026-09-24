@@ -1,15 +1,12 @@
-import createClient, { type Client } from "openapi-fetch";
-import type { paths } from "./generated/customerResources.gen.js";
+import { createClient, type Client } from "./generated/client/index.js";
+import { listPurchases, listSubscriptions } from "./generated/sdk.gen.js";
+import type {
+  Purchase as RevenueCatPurchase,
+  Subscription as RevenueCatSubscription,
+} from "./generated/types.gen.js";
 
 const REVENUECAT_API_URL = "https://api.revenuecat.com/v2";
 const PAGE_SIZE = 100;
-
-type RevenueCatPurchasePage =
-  paths["/projects/{project_id}/customers/{customer_id}/purchases"]["get"]["responses"][200]["content"]["application/json"];
-type RevenueCatSubscriptionPage =
-  paths["/projects/{project_id}/customers/{customer_id}/subscriptions"]["get"]["responses"][200]["content"]["application/json"];
-type RevenueCatPurchase = RevenueCatPurchasePage["items"][number];
-type RevenueCatSubscription = RevenueCatSubscriptionPage["items"][number];
 
 interface RevenueCatPage<T> {
   items: T[];
@@ -39,12 +36,12 @@ export function createRevenueCatApiClient({
     throw new RevenueCatApiError("A RevenueCat v2 secret API key is required.");
   }
 
-  const client = createClient<paths>({
+  const client = createClient({
+    auth: secretApiKey,
     baseUrl: REVENUECAT_API_URL,
     fetch: fetcher,
     headers: {
       Accept: "application/json",
-      Authorization: `Bearer ${secretApiKey}`,
     },
   });
 
@@ -93,45 +90,41 @@ interface PageRequest {
 }
 
 async function getSubscriptionsPage(
-  client: Client<paths>,
+  client: Client,
   { customerId, projectId, startingAfter }: PageRequest,
 ): Promise<RevenueCatPage<RevenueCatSubscription> | null> {
-  const { data, error, response } = await client.GET(
-    "/projects/{project_id}/customers/{customer_id}/subscriptions",
-    {
-      params: {
-        path: { customer_id: customerId, project_id: projectId },
-        query: { limit: PAGE_SIZE, starting_after: startingAfter },
-      },
-    },
-  );
+  const { data, error, response } = await listSubscriptions({
+    client,
+    path: { customer_id: customerId, project_id: projectId },
+    query: { limit: PAGE_SIZE, starting_after: startingAfter },
+  });
 
-  return parsePageResponse(data, error, response, "subscriptions");
+  return parsePageResponse<RevenueCatSubscription>(data, error, response, "subscriptions");
 }
 
 async function getPurchasesPage(
-  client: Client<paths>,
+  client: Client,
   { customerId, projectId, startingAfter }: PageRequest,
 ): Promise<RevenueCatPage<RevenueCatPurchase> | null> {
-  const { data, error, response } = await client.GET(
-    "/projects/{project_id}/customers/{customer_id}/purchases",
-    {
-      params: {
-        path: { customer_id: customerId, project_id: projectId },
-        query: { limit: PAGE_SIZE, starting_after: startingAfter },
-      },
-    },
-  );
+  const { data, error, response } = await listPurchases({
+    client,
+    path: { customer_id: customerId, project_id: projectId },
+    query: { limit: PAGE_SIZE, starting_after: startingAfter },
+  });
 
-  return parsePageResponse(data, error, response, "purchases");
+  return parsePageResponse<RevenueCatPurchase>(data, error, response, "purchases");
 }
 
 function parsePageResponse<T>(
   data: unknown,
   error: unknown,
-  response: Response,
+  response: Response | undefined,
   resourceName: string,
 ): RevenueCatPage<T> | null {
+  if (!response) {
+    throw new RevenueCatApiError(`RevenueCat ${resourceName} request did not return a response.`);
+  }
+
   if (response.status === 404) {
     if (isMissingCustomerError(error)) {
       return null;

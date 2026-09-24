@@ -26,15 +26,12 @@
   "scripts": {
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch",
-    "generate:client": "openapi-typescript https://www.revenuecat.com/docs/redocusaurus/openapi-v2-customer-resources.yaml --output src/generated/customerResources.gen.ts && vp check --fix src/generated/customerResources.gen.ts"
-  },
-  "dependencies": {
-    "openapi-fetch": "catalog:"
+    "generate:client": "openapi-ts && vp check --fix src/generated"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "catalog:",
     "@trizum/tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
-    "openapi-typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   }
