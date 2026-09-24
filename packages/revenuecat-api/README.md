@@ -9,12 +9,13 @@ interface to the rest of the monorepo.
 
 - `src/index.ts` owns authentication, pagination, response validation, and
   direct-entitlement access rules.
-- `src/generated/customerResources.gen.ts` is generated from RevenueCat's
-  official OpenAPI schema and committed to the repository.
+- `src/generated/customerResources.gen.ts` is an ignored build artifact
+  generated from RevenueCat's official OpenAPI schema.
 
 ## Tasks
 
-- `vp run generate`: regenerate the OpenAPI types.
+- `vp run generate`: regenerate the OpenAPI types. This runs automatically
+  before this package's check, test, and build tasks.
 - `vp run check`: format, lint, and type-check the package.
 - `vp run test`: run the package unit tests.
 - `vp run build`: build the package into `dist`.

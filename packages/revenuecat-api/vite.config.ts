@@ -5,17 +5,20 @@ export default defineConfig({
     tasks: {
       build: {
         command: "NODE_ENV=production tsc -b tsconfig.json --force",
+        dependsOn: ["generate"],
         output: ["dist/**"],
       },
       check: {
         command: "vp check .",
+        dependsOn: ["generate"],
       },
       generate: {
         command: "vp run generate:client",
-        cache: false,
+        output: ["src/generated/customerResources.gen.ts"],
       },
       test: {
         command: "vp test .",
+        dependsOn: ["generate"],
       },
     },
   },
