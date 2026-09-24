@@ -48,13 +48,12 @@ vp exec wrangler secret put GOOGLE_CLIENT_SECRET
 vp exec wrangler secret put APPLE_TEAM_ID
 vp exec wrangler secret put APPLE_KEY_ID
 vp exec wrangler secret put APPLE_PRIVATE_KEY
-vp exec wrangler secret put REVENUECAT_PROJECT_ID
 vp exec wrangler secret put REVENUECAT_SECRET_API_KEY
 ```
 
-`REVENUECAT_PROJECT_ID` is the RevenueCat project ID. `REVENUECAT_SECRET_API_KEY`
-must be a RevenueCat v2 secret key restricted to
-`customer_information:subscriptions:read` and
+`REVENUECAT_PROJECT_ID` is the non-secret RevenueCat project ID configured in
+`wrangler.jsonc`. `REVENUECAT_SECRET_API_KEY` must be a RevenueCat v2 secret key
+restricted to `customer_information:subscriptions:read` and
 `customer_information:purchases:read`. They are used only by the Worker to
 verify Premium and must never be exposed through `VITE_` variables or committed
 to the repo.
