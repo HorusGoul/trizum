@@ -13,7 +13,8 @@ export default defineConfig({
         dependsOn: ["generate"],
       },
       generate: {
-        command: "vp run generate:client",
+        command: ["openapi-ts", "vp check --fix src/generated"],
+        input: [{ auto: true }, "!src/generated/**"],
         output: ["src/generated/**"],
       },
       test: {
