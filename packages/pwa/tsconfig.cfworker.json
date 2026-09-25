@@ -14,7 +14,7 @@
     "./src/lib/locales.ts",
     "./src/lib/log.ts",
     "./src/lib/partySharePreviewMessages.ts",
-    "./src/lib/premium/partyBoostTypes.ts",
+    "./src/lib/api/premiumContract.ts",
     "./src/lib/tricountMigration.ts",
     "./src/models/migrationData.ts",
     "./src/models/party.ts"

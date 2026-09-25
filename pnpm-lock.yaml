@@ -94,6 +94,9 @@ catalogs:
     '@hono/node-server':
       specifier: 2.0.8
       version: 2.0.8
+    '@hono/zod-openapi':
+      specifier: 1.6.3
+      version: 1.6.3
     '@internationalized/date':
       specifier: 3.12.2
       version: 3.12.2
@@ -664,6 +667,9 @@ importers:
       '@fontsource-variable/inter':
         specifier: 'catalog:'
         version: 5.2.8
+      '@hono/zod-openapi':
+        specifier: 'catalog:'
+        version: 1.6.3(hono@4.12.28)(zod@4.4.3)
       '@internationalized/date':
         specifier: 'catalog:'
         version: 3.12.2
@@ -808,6 +814,9 @@ importers:
       workers-og:
         specifier: 'catalog:'
         version: 0.0.27
+      zod:
+        specifier: 'catalog:'
+        version: 4.4.3
     devDependencies:
       '@babel/core':
         specifier: 'catalog:'
@@ -1159,6 +1168,11 @@ packages:
 
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
+
+  '@asteasolutions/zod-to-openapi@9.1.0':
+    resolution: {integrity: sha512-pLMeRgRYS7/vZIgAAkOe2P6+XGTifR1MT9pqDoxZ11EmcJJ+DPmdPqLN8ZZF4U8R9KHCCQCS9c2wtuE8wSrfkw==}
+    peerDependencies:
+      zod: ^4.0.0
 
   '@automerge/automerge-repo-network-messagechannel@2.5.6':
     resolution: {integrity: sha512-0xd8UMD3hMS3XnC5Rl40pAGqpkaW06Ox/GgEabKGkJM2d8bcVe2w1eklzOr7zJUIhDGrzPwFdCDNq1iNUHo5VA==}
@@ -2354,6 +2368,19 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
+
+  '@hono/zod-openapi@1.6.3':
+    resolution: {integrity: sha512-VYR82Y60plu8g3pN60OUXMVKpmxh3R04Qs++3DY9vtwZ9/sA/BRY0PcRIR+Z37/3itWtM7pYwT9bKiH9JhqV6Q==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      hono: '>=4.10.0'
+      zod: ^4.0.0
+
+  '@hono/zod-validator@0.9.1':
+    resolution: {integrity: sha512-iiv6w0qrIc0arfvCtUqBWsvl4fXjzaTcQcCJTTtCnkawF9HHGE+KjEl0ox3gQJ6rKZEgE3mLExlQCF72M+mNuw==}
+    peerDependencies:
+      hono: '>=4.11.2'
+      zod: ^3.25.0 || ^4.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -7912,6 +7939,9 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
+  openapi3-ts@4.6.1:
+    resolution: {integrity: sha512-XW9MOldkhoICNeXVzzmXzmOW5G73ppOEGmh7fLCqHjgfdEYCGGN+00MlVCeUZgovjjfC56j9tvtDt1zGabNjjA==}
+
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -9868,6 +9898,11 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
+  '@asteasolutions/zod-to-openapi@9.1.0(zod@4.4.3)':
+    dependencies:
+      openapi3-ts: 4.6.1
+      zod: 4.4.3
+
   '@automerge/automerge-repo-network-messagechannel@2.5.6':
     dependencies:
       '@automerge/automerge-repo': 2.5.6
@@ -11316,6 +11351,19 @@ snapshots:
   '@hono/node-server@2.0.8(hono@4.12.28)':
     dependencies:
       hono: 4.12.28
+
+  '@hono/zod-openapi@1.6.3(hono@4.12.28)(zod@4.4.3)':
+    dependencies:
+      '@asteasolutions/zod-to-openapi': 9.1.0(zod@4.4.3)
+      '@hono/zod-validator': 0.9.1(hono@4.12.28)(zod@4.4.3)
+      hono: 4.12.28
+      openapi3-ts: 4.6.1
+      zod: 4.4.3
+
+  '@hono/zod-validator@0.9.1(hono@4.12.28)(zod@4.4.3)':
+    dependencies:
+      hono: 4.12.28
+      zod: 4.4.3
 
   '@humanfs/core@0.19.1': {}
 
@@ -13293,6 +13341,7 @@ snapshots:
       '@capawesome/capacitor-google-sign-in': 0.1.2(@capacitor/core@8.4.1)
       '@fontsource-variable/fira-code': 5.2.7
       '@fontsource-variable/inter': 5.2.8
+      '@hono/zod-openapi': 1.6.3(hono@4.12.28)(zod@4.4.3)
       '@internationalized/date': 3.12.2
       '@lingui/core': 6.5.0(babel-plugin-macros@3.1.0)
       '@lingui/react': 6.5.0(babel-plugin-macros@3.1.0)(react@19.2.8)
@@ -13341,6 +13390,7 @@ snapshots:
       workbox-build: 7.4.1(@types/babel__core@7.20.5)
       workbox-window: 7.4.1
       workers-og: 0.0.27
+      zod: 4.4.3
     transitivePeerDependencies:
       - '@aws-sdk/client-rds-data'
       - '@cloudflare/workers-types'
@@ -16398,6 +16448,10 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
+
+  openapi3-ts@4.6.1:
+    dependencies:
+      yaml: 2.9.0
 
   optionator@0.9.4:
     dependencies:
