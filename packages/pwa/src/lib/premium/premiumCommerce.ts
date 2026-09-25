@@ -50,7 +50,7 @@ const TEST_STORE_TRIAL_FALLBACKS = {
   annual: { duration: 1, unit: "week" },
 } satisfies Partial<Record<PremiumPlanId, PremiumTrial>>;
 
-let cachedOffering: CachedOffering | null = null;
+const packagesByOffering = new WeakMap<PremiumOffering, CachedOffering>();
 
 export async function loadPremiumOffering(userId: string | null): Promise<PremiumOffering> {
   requireUserId(userId);
@@ -89,29 +89,27 @@ export async function loadPremiumOffering(userId: string | null): Promise<Premiu
     }
   }
 
-  cachedOffering = { packages, userId };
-
-  return createPremiumOffering({
+  const premiumOffering = createPremiumOffering({
     eligibleStatus: INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE,
     eligibilityByProductId,
     offering,
     trialFallbacks: isRevenueCatTestStoreEnabled() ? TEST_STORE_TRIAL_FALLBACKS : undefined,
   });
+  packagesByOffering.set(premiumOffering, { packages, userId });
+  return premiumOffering;
 }
 
 export async function purchasePremiumPlan(
   userId: string | null,
+  offering: PremiumOffering,
   planId: PremiumPlanId,
 ): Promise<PremiumPurchaseResult> {
   requireUserId(userId);
   await synchronizeRevenueCatUser(userId);
 
-  if (cachedOffering?.userId !== userId || !cachedOffering.packages.has(planId)) {
-    await loadPremiumOffering(userId);
-  }
-
-  const selectedPackage = cachedOffering?.packages.get(planId);
-  if (!selectedPackage) {
+  const loadedOffering = packagesByOffering.get(offering);
+  const selectedPackage = loadedOffering?.packages.get(planId);
+  if (loadedOffering?.userId !== userId || !selectedPackage) {
     throw new Error(`Premium package "${planId}" is not available.`);
   }
 

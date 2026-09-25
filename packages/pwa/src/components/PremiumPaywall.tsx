@@ -80,13 +80,13 @@ export function PremiumPaywall({
       : undefined;
 
   async function purchase() {
-    if (!selectedPlan) {
+    if (!selectedPlan || currentLoadState.status !== "ready") {
       return;
     }
 
     setActiveAction("purchase");
     try {
-      const result = await purchasePremiumPlan(userId, selectedPlan.id);
+      const result = await purchasePremiumPlan(userId, currentLoadState.offering, selectedPlan.id);
       if (result.status !== "cancelled") {
         onEntitlementChange(result.entitlement);
         if (result.entitlement.isPremium) {
