@@ -31,6 +31,7 @@
     "@capawesome/capacitor-google-sign-in": "catalog:",
     "@fontsource-variable/fira-code": "catalog:",
     "@fontsource-variable/inter": "catalog:",
+    "@hono/zod-openapi": "catalog:",
     "@internationalized/date": "catalog:",
     "@lingui/core": "catalog:",
     "@lingui/react": "catalog:",
@@ -78,7 +79,8 @@
     "ulidx": "catalog:",
     "workbox-build": "catalog:",
     "workbox-window": "catalog:",
-    "workers-og": "catalog:"
+    "workers-og": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@babel/core": "catalog:",

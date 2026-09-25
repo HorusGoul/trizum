@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { apiMigrateRoute } from "./routes/migrate";
 import { createAuth } from "./auth";
 import { cloudSyncRoute } from "./routes/cloud-sync";
@@ -9,7 +9,7 @@ import { partySharePreviewRoute } from "./routes/party-share-preview";
 import { createApiI18nMiddleware } from "./i18n";
 import { premiumRoute } from "./routes/premium";
 
-const app = new Hono<ApiHonoEnv>();
+const app = new OpenAPIHono<ApiHonoEnv>();
 
 app.use("*", async (c, next) => {
   const startedAt = Date.now();
@@ -45,5 +45,13 @@ app.on(["GET", "POST"], "/api/auth/*", (c) =>
 app.route("/api/cloud-sync", cloudSyncRoute);
 app.route("/api/migrate", apiMigrateRoute);
 app.route("/api/premium", premiumRoute);
+app.doc31("/api/openapi.json", {
+  info: {
+    description: "The HTTP contract used by trizum's first-party clients.",
+    title: "trizum API",
+    version: "1.0.0",
+  },
+  openapi: "3.1.0",
+});
 
 export default app;

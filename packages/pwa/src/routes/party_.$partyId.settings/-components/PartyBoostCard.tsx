@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "#src/lib/auth-client.ts";
+import type { PartyBoostStatus } from "#src/lib/api/premiumContract.ts";
 import {
   getPartyBoostActionState,
   type PartyBoostActionState,
@@ -14,12 +15,10 @@ import {
 } from "#src/lib/premium/partyBoostRequestState.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import {
-  activatePartyBoost,
-  fetchPartyBoostStatus,
   isPartyBoostStatus,
   PartyBoostApiError,
-  type PartyBoostStatus,
-} from "#src/lib/premium/partyBoostApi.ts";
+  trizumApiClient,
+} from "#src/lib/trizumApiClient.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import {
@@ -76,7 +75,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     async function refresh() {
       const request = statusRequests.beginRead(requestContext);
       try {
-        const status = await fetchPartyBoostStatus(partyDocumentId);
+        const status = await trizumApiClient.premium.getPartyBoostStatus(partyDocumentId);
         if (!active || !statusRequests.isCurrent(request)) {
           return;
         }
@@ -137,7 +136,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     setViewState((current) => ({ ...current, error: null, isRefreshing: true }));
     const request = statusRequests.beginRead(requestContext);
     try {
-      const status = await fetchPartyBoostStatus(partyDocumentId);
+      const status = await trizumApiClient.premium.getPartyBoostStatus(partyDocumentId);
       if (!statusRequests.isCurrent(request)) {
         return;
       }
@@ -176,7 +175,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     setActivatingContext(mutationContext);
     statusRequests.beginMutation(mutationContext);
     try {
-      const status = await activatePartyBoost(partyDocumentId);
+      const status = await trizumApiClient.premium.activatePartyBoost(partyDocumentId);
       if (!statusRequests.finishMutation(mutationContext)) {
         setActivatingContext((current) => (current === mutationContext ? null : current));
         return;

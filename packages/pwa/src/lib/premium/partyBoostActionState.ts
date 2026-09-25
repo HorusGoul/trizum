@@ -1,4 +1,4 @@
-import type { PartyBoostStatus } from "./partyBoostApi.ts";
+import type { PartyBoostStatus } from "../api/premiumContract.ts";
 
 export type PartyBoostActionState =
   | { type: "active" }
