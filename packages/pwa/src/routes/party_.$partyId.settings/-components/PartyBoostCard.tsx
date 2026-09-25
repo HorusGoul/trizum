@@ -8,6 +8,10 @@ import {
   getPartyBoostActionState,
   type PartyBoostActionState,
 } from "#src/lib/premium/partyBoostActionState.ts";
+import {
+  PartyBoostRequestGate,
+  shouldInvalidatePartyBoostCache,
+} from "#src/lib/premium/partyBoostRequestState.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import {
   activatePartyBoost,
@@ -43,6 +47,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   const session = authClient.useSession();
   const userId = session.data?.user.id ?? null;
   const { isPremium: isDevicePremium, presentPaywall } = usePremium();
+  const [statusRequests] = useState(() => new PartyBoostRequestGate());
   const [isActivating, setIsActivating] = useState(false);
   const [isTransferConfirmationOpen, setIsTransferConfirmationOpen] = useState(false);
   const [now, setNow] = useState(0);
@@ -54,33 +59,43 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
 
   useEffect(() => {
     if (!userId) {
-      setViewState({ error: null, isRefreshing: false, status: null });
+      statusRequests.invalidateReads();
       return;
     }
 
     let active = true;
     const activeUserId = userId;
     const cachedStatus = readCachedPartyBoostStatus(activeUserId, partyDocumentId);
-    setViewState({ error: null, isRefreshing: true, status: cachedStatus });
+    queueMicrotask(() => {
+      if (active) {
+        setViewState({ error: null, isRefreshing: true, status: cachedStatus });
+      }
+    });
 
     async function refresh() {
+      const request = statusRequests.beginRead();
       try {
         const status = await fetchPartyBoostStatus(partyDocumentId);
-        if (!active) {
+        if (!active || !statusRequests.isCurrent(request)) {
           return;
         }
 
         writeCachedPartyBoostStatus(activeUserId, partyDocumentId, status);
         setViewState({ error: null, isRefreshing: false, status });
       } catch (error) {
-        if (!active) {
+        if (!active || !statusRequests.isCurrent(request)) {
           return;
         }
 
+        const partyBoostError = toPartyBoostApiError(error);
+        const invalidateCache = shouldInvalidatePartyBoostCache(partyBoostError.code);
+        if (invalidateCache) {
+          clearCachedPartyBoostStatus(activeUserId, partyDocumentId);
+        }
         setViewState((current) => ({
-          ...current,
-          error: toPartyBoostApiError(error),
+          error: partyBoostError,
           isRefreshing: false,
+          status: invalidateCache ? null : current.status,
         }));
       }
     }
@@ -95,21 +110,20 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
 
     return () => {
       active = false;
+      statusRequests.invalidateReads();
       window.removeEventListener("online", handleOnline);
     };
-  }, [partyDocumentId, userId]);
+  }, [partyDocumentId, statusRequests, userId]);
 
   useEffect(() => {
-    setNow(Date.now());
-
     const transferableAt = viewState.status?.currentUser.assignment?.transferableAt;
-    if (!transferableAt || transferableAt <= Date.now()) {
+    if (!transferableAt) {
       return;
     }
 
     const timeoutId = window.setTimeout(
       () => setNow(Date.now()),
-      Math.min(transferableAt - Date.now() + 1, 2_147_483_647),
+      Math.min(Math.max(transferableAt - Date.now() + 1, 0), 2_147_483_647),
     );
     return () => window.clearTimeout(timeoutId);
   }, [viewState.status?.currentUser.assignment?.transferableAt]);
@@ -120,15 +134,28 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     }
 
     setViewState((current) => ({ ...current, error: null, isRefreshing: true }));
+    const request = statusRequests.beginRead();
     try {
       const status = await fetchPartyBoostStatus(partyDocumentId);
+      if (!statusRequests.isCurrent(request)) {
+        return;
+      }
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState({ error: null, isRefreshing: false, status });
     } catch (error) {
+      if (!statusRequests.isCurrent(request)) {
+        return;
+      }
+
+      const partyBoostError = toPartyBoostApiError(error);
+      const invalidateCache = shouldInvalidatePartyBoostCache(partyBoostError.code);
+      if (invalidateCache) {
+        clearCachedPartyBoostStatus(userId, partyDocumentId);
+      }
       setViewState((current) => ({
-        ...current,
-        error: toPartyBoostApiError(error),
+        error: partyBoostError,
         isRefreshing: false,
+        status: invalidateCache ? null : current.status,
       }));
     }
   }
@@ -144,13 +171,16 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     }
 
     setIsActivating(true);
+    statusRequests.invalidateReads();
     try {
       const status = await activatePartyBoost(partyDocumentId);
+      statusRequests.invalidateReads();
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState({ error: null, isRefreshing: false, status });
       setIsTransferConfirmationOpen(false);
       toast.success(t`Party Boost is active.`);
     } catch (error) {
+      statusRequests.invalidateReads();
       const partyBoostError = toPartyBoostApiError(error);
       clearCachedPartyBoostStatus(userId, partyDocumentId);
       setIsTransferConfirmationOpen(false);
@@ -171,9 +201,8 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
         default:
           toast.error(t`Party Boost is unavailable. Please try again.`);
       }
-    } finally {
-      setIsActivating(false);
     }
+    setIsActivating(false);
   }
 
   async function openPremium() {
@@ -190,7 +219,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     }
   }
 
-  const status = viewState.status;
+  const status = userId ? viewState.status : null;
   const assignment = status?.currentUser.assignment ?? null;
   const isAssignedElsewhere = Boolean(assignment && assignment.partyDocumentId !== partyDocumentId);
   const canTransfer = Boolean(
