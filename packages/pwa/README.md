@@ -13,6 +13,12 @@ then use this document to decide where to work inside the PWA.
 - [`src/components`](./src/components) contains app-specific UI.
 - [`src/lib`](./src/lib) and [`src/models`](./src/models) contain business logic
   and domain models.
+- [`api/contracts`](./api/contracts) declares validated HTTP routes and their
+  OpenAPI metadata. The Worker publishes the resulting OpenAPI 3.1 document at
+  `/api/openapi.json`.
+- [`src/lib/trizumApiClient.ts`](./src/lib/trizumApiClient.ts) is the typed
+  first-party client. UI code should call its domain methods instead of issuing
+  raw requests to Worker routes.
 - [`docs/cloudflare.md`](./docs/cloudflare.md) documents Worker account, D1,
   Email, secrets, migrations, and observability setup.
 - [`docs/oauth.md`](./docs/oauth.md) documents Google/Apple OAuth, account

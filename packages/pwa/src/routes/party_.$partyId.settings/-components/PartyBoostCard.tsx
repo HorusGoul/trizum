@@ -4,14 +4,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "#src/lib/auth-client.ts";
+import type { PartyBoostStatus } from "#src/lib/api/premiumContract.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import {
-  activatePartyBoost,
-  fetchPartyBoostStatus,
   isPartyBoostStatus,
   PartyBoostApiError,
-  type PartyBoostStatus,
-} from "#src/lib/premium/partyBoostApi.ts";
+  trizumApiClient,
+} from "#src/lib/trizumApiClient.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import {
@@ -72,7 +71,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
 
     async function refresh() {
       try {
-        const status = await fetchPartyBoostStatus(partyDocumentId);
+        const status = await trizumApiClient.premium.getPartyBoostStatus(partyDocumentId);
         if (!active) {
           return;
         }
@@ -128,7 +127,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
 
     setViewState((current) => ({ ...current, error: null, isRefreshing: true }));
     try {
-      const status = await fetchPartyBoostStatus(partyDocumentId);
+      const status = await trizumApiClient.premium.getPartyBoostStatus(partyDocumentId);
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState({ error: null, isRefreshing: false, status });
     } catch (error) {
@@ -152,7 +151,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
 
     setIsActivating(true);
     try {
-      const status = await activatePartyBoost(partyDocumentId);
+      const status = await trizumApiClient.premium.activatePartyBoost(partyDocumentId);
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState({ error: null, isRefreshing: false, status });
       setIsTransferConfirmationOpen(false);

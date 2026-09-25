@@ -1,7 +1,8 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { $, OpenAPIHono } from "@hono/zod-openapi";
 import { and, eq, isNull } from "drizzle-orm";
-import { Hono, type Context } from "hono";
+import type { Context } from "hono";
 import { createAuth } from "../auth";
+import { activatePartyBoostRoute, getPartyBoostRoute } from "../contracts/premium";
 import { getApiDb, schema } from "../db/client";
 import type { ApiHonoEnv } from "../env";
 import { getPartyBoostAssignmentAction, getPartyBoostTransferableAt } from "../premium/partyBoost";
@@ -12,165 +13,180 @@ import {
 } from "../premium/revenueCat";
 import type {
   PartyBoostAssignmentStatus,
+  PartyBoostErrorCode,
   PartyBoostRevocationReason,
   PartyBoostStatus,
-} from "../../src/lib/premium/partyBoostTypes.js";
-
+} from "../../src/lib/api/premiumContract";
 type ApiDb = ReturnType<typeof getApiDb>;
 type PartyBoostRow = typeof schema.partyBoost.$inferSelect;
 
-export const premiumRoute = new Hono<ApiHonoEnv>();
+const premiumApp = $(
+  new OpenAPIHono<ApiHonoEnv>().use("*", async (c, next) => {
+    const auth = createAuth(c.env, c.executionCtx, c.req.raw);
+    const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
-premiumRoute.use("*", async (c, next) => {
-  const auth = createAuth(c.env, c.executionCtx, c.req.raw);
-  const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
-  if (!session) {
-    return c.json({ error: { code: "unauthorized", message: "Sign in is required." } }, 401);
-  }
-
-  c.set("session", session.session);
-  c.set("user", session.user);
-  await next();
-});
-
-premiumRoute.get("/party-boost", async (c) => {
-  const partyDocumentId = c.req.query("partyDocumentId");
-  if (!partyDocumentId || !isValidDocumentId(partyDocumentId)) {
-    return partyBoostError(c, "invalid_party", "Party document ID is invalid.", 400);
-  }
-
-  try {
-    const status = await getPartyBoostStatus({
-      apiKey: c.env.REVENUECAT_SECRET_API_KEY,
-      db: getApiDb(c.env.DB),
-      env: c.env,
-      partyDocumentId,
-      projectId: c.env.REVENUECAT_PROJECT_ID,
-      request: c.req.raw,
-      userId: c.get("user").id,
-    });
-
-    if (!status) {
-      return partyBoostError(c, "membership_required", "Party membership is required.", 403);
+    if (!session) {
+      return c.json({ error: { code: "unauthorized", message: "Sign in is required." } }, 401);
     }
 
-    return c.json(status);
-  } catch (error) {
-    return handleVerificationError(c, error);
-  }
-});
+    c.set("session", session.session);
+    c.set("user", session.user);
+    await next();
+  }),
+);
 
-premiumRoute.put("/party-boost", async (c) => {
-  const body = (await c.req.json().catch(() => null)) as { partyDocumentId?: unknown } | null;
-  const partyDocumentId = body?.partyDocumentId;
+export const premiumRoute = premiumApp
+  .openapi(
+    getPartyBoostRoute,
+    async (c) => {
+      const { partyDocumentId } = c.req.valid("query");
 
-  if (typeof partyDocumentId !== "string" || !isValidDocumentId(partyDocumentId)) {
-    return partyBoostError(c, "invalid_party", "Party document ID is invalid.", 400);
-  }
+      try {
+        const status = await getPartyBoostStatus({
+          apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+          db: getApiDb(c.env.DB),
+          env: c.env,
+          partyDocumentId,
+          projectId: c.env.REVENUECAT_PROJECT_ID,
+          request: c.req.raw,
+          userId: c.get("user").id,
+        });
 
-  const userId = c.get("user").id;
-  const db = getApiDb(c.env.DB);
+        if (!status) {
+          return partyBoostError(c, "membership_required", "Party membership is required.", 403);
+        }
 
-  try {
-    const isMember = await verifyUserPartyMembership({
-      db,
-      env: c.env,
-      partyDocumentId,
-      request: c.req.raw,
-      userId,
-    });
-
-    if (!isMember) {
-      return partyBoostError(c, "membership_required", "Party membership is required.", 403);
-    }
-
-    const premium = await verifyRevenueCatPremium({
-      apiKey: c.env.REVENUECAT_SECRET_API_KEY,
-      projectId: c.env.REVENUECAT_PROJECT_ID,
-      userId,
-    });
-
-    if (!premium.isPremium) {
-      await revokeActiveAssignment(db, userId, "premium_inactive", Date.now());
-      return partyBoostError(c, "premium_required", "Premium is required for Party Boost.", 403);
-    }
-
-    const existingPartyAssignment = await getActivePartyAssignment(db, partyDocumentId);
-    if (existingPartyAssignment && existingPartyAssignment.ownerUserId !== userId) {
-      const remainsActive = await validateActiveAssignment({
-        apiKey: c.env.REVENUECAT_SECRET_API_KEY,
-        assignment: existingPartyAssignment,
-        db,
-        env: c.env,
-        projectId: c.env.REVENUECAT_PROJECT_ID,
-        request: c.req.raw,
-      });
-
-      if (remainsActive) {
-        return partyBoostError(
-          c,
-          "already_boosted",
-          "This party already has an active Party Boost.",
-          409,
-        );
+        return c.json(status, 200);
+      } catch (error) {
+        return handleVerificationError(c, error);
       }
-    }
+    },
+    (result, c) => {
+      if (!result.success) {
+        return partyBoostError(c, "invalid_party", "Party document ID is invalid.", 400);
+      }
+    },
+  )
+  .openapi(
+    activatePartyBoostRoute,
+    async (c) => {
+      const { partyDocumentId } = c.req.valid("json");
+      const userId = c.get("user").id;
+      const db = getApiDb(c.env.DB);
 
-    const now = Date.now();
-    const assignment = await getUserAssignment(db, userId);
-    const action = getPartyBoostAssignmentAction({ assignment, now, partyDocumentId });
+      try {
+        const isMember = await verifyUserPartyMembership({
+          db,
+          env: c.env,
+          partyDocumentId,
+          request: c.req.raw,
+          userId,
+        });
 
-    if (action.type === "transfer_locked") {
-      return partyBoostError(
-        c,
-        "transfer_locked",
-        "Party Boost can only move once every seven days.",
-        409,
-        action.transferableAt,
-      );
-    }
+        if (!isMember) {
+          return partyBoostError(c, "membership_required", "Party membership is required.", 403);
+        }
 
-    const storedAssignment = await applyAssignmentAction({
-      action: action.type,
-      assignment,
-      db,
-      now,
-      partyDocumentId,
-      userId,
-    });
+        const premium = await verifyRevenueCatPremium({
+          apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+          projectId: c.env.REVENUECAT_PROJECT_ID,
+          userId,
+        });
 
-    if (!storedAssignment) {
-      return partyBoostError(
-        c,
-        "already_boosted",
-        "Party Boost changed on another device. Refresh and try again.",
-        409,
-      );
-    }
+        if (!premium.isPremium) {
+          await revokeActiveAssignment(db, userId, "premium_inactive", Date.now());
+          return partyBoostError(
+            c,
+            "premium_required",
+            "Premium is required for Party Boost.",
+            403,
+          );
+        }
 
-    return c.json(
-      createPartyBoostStatus({
-        assignment: storedAssignment,
-        isPartyBoostActive: true,
-        isPremium: true,
-        partyDocumentId,
-        userId,
-      }),
-    );
-  } catch (error) {
-    if (isUniqueConstraintError(error)) {
-      return partyBoostError(
-        c,
-        "already_boosted",
-        "This party already has an active Party Boost.",
-        409,
-      );
-    }
+        const existingPartyAssignment = await getActivePartyAssignment(db, partyDocumentId);
+        if (existingPartyAssignment && existingPartyAssignment.ownerUserId !== userId) {
+          const remainsActive = await validateActiveAssignment({
+            apiKey: c.env.REVENUECAT_SECRET_API_KEY,
+            assignment: existingPartyAssignment,
+            db,
+            env: c.env,
+            projectId: c.env.REVENUECAT_PROJECT_ID,
+            request: c.req.raw,
+          });
 
-    return handleVerificationError(c, error);
-  }
-});
+          if (remainsActive) {
+            return partyBoostError(
+              c,
+              "already_boosted",
+              "This party already has an active Party Boost.",
+              409,
+            );
+          }
+        }
+
+        const now = Date.now();
+        const assignment = await getUserAssignment(db, userId);
+        const action = getPartyBoostAssignmentAction({ assignment, now, partyDocumentId });
+
+        if (action.type === "transfer_locked") {
+          return partyBoostError(
+            c,
+            "transfer_locked",
+            "Party Boost can only move once every seven days.",
+            409,
+            action.transferableAt,
+          );
+        }
+
+        const storedAssignment = await applyAssignmentAction({
+          action: action.type,
+          assignment,
+          db,
+          now,
+          partyDocumentId,
+          userId,
+        });
+
+        if (!storedAssignment) {
+          return partyBoostError(
+            c,
+            "already_boosted",
+            "Party Boost changed on another device. Refresh and try again.",
+            409,
+          );
+        }
+
+        return c.json(
+          createPartyBoostStatus({
+            assignment: storedAssignment,
+            isPartyBoostActive: true,
+            isPremium: true,
+            partyDocumentId,
+            userId,
+          }),
+          200,
+        );
+      } catch (error) {
+        if (isUniqueConstraintError(error)) {
+          return partyBoostError(
+            c,
+            "already_boosted",
+            "This party already has an active Party Boost.",
+            409,
+          );
+        }
+
+        return handleVerificationError(c, error);
+      }
+    },
+    (result, c) => {
+      if (!result.success) {
+        return partyBoostError(c, "invalid_party", "Party document ID is invalid.", 400);
+      }
+    },
+  );
+
+export type PremiumRoute = typeof premiumRoute;
 
 async function getPartyBoostStatus({
   apiKey,
@@ -500,11 +516,11 @@ function handleVerificationError(c: Context<ApiHonoEnv>, error: unknown) {
   throw error;
 }
 
-function partyBoostError(
+function partyBoostError<Status extends 400 | 403 | 409 | 503>(
   c: Context<ApiHonoEnv>,
-  code: string,
+  code: PartyBoostErrorCode,
   message: string,
-  status: 400 | 403 | 409 | 503,
+  status: Status,
   transferableAt?: number,
 ) {
   return c.json(

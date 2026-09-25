@@ -2,6 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { AUTH_PROVIDER_CONFIG } from "./authConfig";
+import { getAuthBaseURL } from "./authBaseUrl";
 import {
   clearNativeAuthToken,
   fetchWithNativeAuth,
@@ -60,17 +61,7 @@ type AuthSession = ReturnType<typeof authClient.useSession>;
 
 export type AuthSessionUser = NonNullable<NonNullable<AuthSession["data"]>["user"]>;
 
-export function getAuthBaseURL() {
-  if (import.meta.env.VITE_APP_AUTH_URL) {
-    return import.meta.env.VITE_APP_AUTH_URL;
-  }
-
-  if (Capacitor.isNativePlatform()) {
-    return "https://trizum.app";
-  }
-
-  return window.location.origin;
-}
+export { getAuthBaseURL } from "./authBaseUrl";
 
 export function getAuthSettingsCallbackURL(searchParams?: Record<string, string | undefined>) {
   const url = new URL(
