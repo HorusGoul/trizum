@@ -4,6 +4,10 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "#src/lib/auth-client.ts";
+import {
+  getPartyBoostActionState,
+  type PartyBoostActionState,
+} from "#src/lib/premium/partyBoostActionState.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import {
   activatePartyBoost,
@@ -30,17 +34,6 @@ interface PartyBoostViewState {
   isRefreshing: boolean;
   status: PartyBoostStatus | null;
 }
-
-type PartyBoostActionState =
-  | { type: "active" }
-  | { disabled: boolean; type: "activate" }
-  | { type: "boosted_by_other" }
-  | { type: "hidden" }
-  | { type: "locked" }
-  | { disabled: boolean; type: "retry" }
-  | { type: "signed_out" }
-  | { disabled: boolean; type: "transfer" }
-  | { type: "upgrade" };
 
 const transferDateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
@@ -159,7 +152,9 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
       toast.success(t`Party Boost is active.`);
     } catch (error) {
       const partyBoostError = toPartyBoostApiError(error);
-      setViewState((current) => ({ ...current, error: partyBoostError }));
+      clearCachedPartyBoostStatus(userId, partyDocumentId);
+      setIsTransferConfirmationOpen(false);
+      setViewState({ error: partyBoostError, isRefreshing: false, status: null });
       switch (partyBoostError.code) {
         case "already_boosted":
           toast.error(t`This party already has an active Party Boost.`);
@@ -202,11 +197,13 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     isAssignedElsewhere && assignment && assignment.transferableAt <= now,
   );
   const actionState = getPartyBoostActionState({
-    canTransfer,
     isActivating,
-    isPremium: Boolean(status?.currentUser.isPremium || isDevicePremium),
+    isDevicePremium,
+    isNativePlatform: Capacitor.isNativePlatform(),
     isRefreshing: viewState.isRefreshing,
     isSignedIn: Boolean(userId),
+    now,
+    partyDocumentId,
     status,
   });
 
@@ -409,7 +406,7 @@ function PartyBoostAction({
     );
   }
 
-  if (state.type === "boosted_by_other" || state.type === "hidden") {
+  if (state.type === "boosted_by_other") {
     return null;
   }
 
@@ -444,53 +441,6 @@ function PartyBoostAction({
   );
 }
 
-function getPartyBoostActionState({
-  canTransfer,
-  isActivating,
-  isPremium,
-  isRefreshing,
-  isSignedIn,
-  status,
-}: {
-  canTransfer: boolean;
-  isActivating: boolean;
-  isPremium: boolean;
-  isRefreshing: boolean;
-  isSignedIn: boolean;
-  status: PartyBoostStatus | null;
-}): PartyBoostActionState {
-  if (!isSignedIn) {
-    return { type: "signed_out" };
-  }
-
-  if (!status) {
-    return { disabled: isRefreshing, type: "retry" };
-  }
-
-  if (status.party.isBoostedByCurrentUser) {
-    return { type: "active" };
-  }
-
-  if (status.party.isBoosted) {
-    return { type: "boosted_by_other" };
-  }
-
-  if (!isPremium) {
-    return { type: Capacitor.isNativePlatform() ? "upgrade" : "hidden" };
-  }
-
-  const assignment = status.currentUser.assignment;
-  if (assignment && !canTransfer) {
-    return { type: "locked" };
-  }
-
-  if (canTransfer) {
-    return { disabled: isActivating, type: "transfer" };
-  }
-
-  return { disabled: isActivating, type: "activate" };
-}
-
 function formatTransferDate(value: number) {
   return transferDateFormatter.format(value);
 }
@@ -518,6 +468,14 @@ function writeCachedPartyBoostStatus(
     localStorage.setItem(getCacheKey(userId, partyDocumentId), JSON.stringify(status));
   } catch {
     // The authoritative state is still available from the server when storage is unavailable.
+  }
+}
+
+function clearCachedPartyBoostStatus(userId: string, partyDocumentId: string) {
+  try {
+    localStorage.removeItem(getCacheKey(userId, partyDocumentId));
+  } catch {
+    // The stale cache is ignored for the rest of this mounted view.
   }
 }
 
