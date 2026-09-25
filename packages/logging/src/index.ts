@@ -3,6 +3,7 @@ import {
   getConfig,
   getConsoleSink,
   getLogger,
+  jsonLinesFormatter,
   type ContextLocalStorage,
   type LogLevel,
   type Logger,
@@ -25,6 +26,7 @@ export type TrizumLoggerConfig<TSinkId extends string = never> = LoggerConfig<
 export interface ConfigureTrizumLoggingOptions<TSinkId extends string = never> {
   surface: TrizumSurface;
   lowestLevel?: LogLevel | null;
+  consoleFormat?: "default" | "json";
   extraSinks?: Record<TSinkId, Sink>;
   extraLoggers?: TrizumLoggerConfig<TSinkId>[];
   surfaceSinks?: readonly TrizumSinkId<TSinkId>[];
@@ -50,6 +52,7 @@ export function getTrizumLogger<TSurface extends string>(
 export function configureTrizumLogging<TSinkId extends string = never>({
   surface,
   lowestLevel = "info",
+  consoleFormat = "default",
   extraSinks,
   extraLoggers = [],
   surfaceSinks = ["console"],
@@ -62,7 +65,9 @@ export function configureTrizumLogging<TSinkId extends string = never>({
   }
 
   const sinks = {
-    console: getConsoleSink() as Sink,
+    console: getConsoleSink({
+      formatter: consoleFormat === "json" ? jsonLinesFormatter : undefined,
+    }) as Sink,
     ...(extraSinks ?? {}),
   } as Record<TrizumSinkId<TSinkId>, Sink>;
 

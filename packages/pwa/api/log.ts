@@ -1,6 +1,7 @@
 import { configurePwaLogging, getLogger } from "../src/lib/log.js";
 
 configurePwaLogging({
+  consoleFormat: "json",
   lowestLevel: "info",
 });
 
