@@ -3,27 +3,20 @@ import { authClient } from "#src/lib/auth-client.ts";
 import { AdEntitlementContext } from "#src/lib/advertising/AdEntitlementContext.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { PremiumEntitlementState } from "#src/lib/premium/premiumCommerce.ts";
-import { PremiumContextProvider, type PremiumStatus } from "#src/lib/premium/PremiumContext.ts";
+import { PremiumContextProvider } from "#src/lib/premium/PremiumContext.ts";
 import { getPremiumAccess } from "#src/lib/premium/premiumAccess.ts";
+import { connectRevenueCatPremium } from "#src/lib/premium/revenueCatPremiumConnection.ts";
 import {
   addRevenueCatCustomerInfoListener,
   clearRevenueCatUser,
+  prepareRevenueCatUser,
   presentRevenueCatCustomerCenter,
   refreshRevenueCatCustomerInfo,
   removeRevenueCatCustomerInfoListener,
-  synchronizeRevenueCatUser,
 } from "#src/lib/premium/revenueCatClient.ts";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { PremiumPaywall } from "./PremiumPaywall.tsx";
-
-interface PremiumState {
-  hasActiveSubscription: boolean;
-  status: PremiumStatus;
-}
-
-interface ResolvedPremiumState extends PremiumState {
-  userId: string;
-}
+import { getCurrentPremiumState, type ResolvedPremiumState } from "./premiumProviderState.ts";
 
 interface PaywallRequest {
   promise: Promise<void>;
@@ -35,12 +28,14 @@ const logger = getLogger("components", "PremiumProvider");
 export function PremiumProvider({ children }: { children: React.ReactNode }) {
   const session = authClient.useSession();
   const userId = session.data?.user.id ?? null;
+  const hasSessionError = Boolean(session.error);
   const platform = getRevenueCatPlatform();
   const [resolvedState, setResolvedState] = useState<ResolvedPremiumState | null>(null);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [paywallSessionId, setPaywallSessionId] = useState(0);
   const paywallRequestRef = useRef<PaywallRequest | null>(null);
   const state = getCurrentPremiumState({
+    hasSessionError,
     isSessionPending: session.isPending,
     platform,
     resolvedState,
@@ -48,7 +43,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    if (!platform || session.isPending) {
+    if (!platform || session.isPending || hasSessionError) {
       return;
     }
 
@@ -60,14 +55,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     }
 
     const identifiedUserId = userId;
-    let active = true;
-    let listenerId: string | undefined;
-
     function updateFromCustomerInfo(customerInfo: Parameters<typeof getPremiumAccess>[0]) {
-      if (!active) {
-        return;
-      }
-
       const access = getPremiumAccess(customerInfo);
       setResolvedState({
         hasActiveSubscription: access.hasActiveSubscription,
@@ -76,40 +64,32 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
-    void synchronizeRevenueCatUser(identifiedUserId)
-      .then((customerInfo) => {
-        if (customerInfo) {
-          updateFromCustomerInfo(customerInfo);
-        }
-
-        return addRevenueCatCustomerInfoListener(updateFromCustomerInfo);
-      })
-      .then((registeredListenerId) => {
-        if (active) {
-          listenerId = registeredListenerId;
-          return;
-        }
-
-        return removeRevenueCatCustomerInfoListener(registeredListenerId);
-      })
-      .catch((error) => {
+    const connection = connectRevenueCatPremium({
+      addListener: addRevenueCatCustomerInfoListener,
+      onCustomerInfo: updateFromCustomerInfo,
+      onListenerError(error) {
+        logger.error("Failed to listen for Premium status", { error });
+      },
+      onRefreshError(error) {
         logger.error("Failed to resolve Premium status", { error });
-        if (active) {
-          setResolvedState({
-            hasActiveSubscription: false,
-            status: "error",
-            userId: identifiedUserId,
-          });
-        }
-      });
+        setResolvedState({
+          hasActiveSubscription: false,
+          status: "error",
+          userId: identifiedUserId,
+        });
+      },
+      prepare: () => prepareRevenueCatUser(identifiedUserId),
+      refresh: refreshRevenueCatCustomerInfo,
+      removeListener: removeRevenueCatCustomerInfoListener,
+    });
+
+    window.addEventListener("online", connection.reconnect);
 
     return () => {
-      active = false;
-      if (listenerId) {
-        void removeRevenueCatCustomerInfoListener(listenerId);
-      }
+      window.removeEventListener("online", connection.reconnect);
+      connection.disconnect();
     };
-  }, [platform, session.isPending, userId]);
+  }, [hasSessionError, platform, session.isPending, userId]);
 
   const isPremium = state.status === "premium";
   const adEntitlement = state.status === "free" ? "adSupported" : isPremium ? "adFree" : "unknown";
@@ -189,34 +169,4 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       </AdEntitlementContext>
     </PremiumContextProvider>
   );
-}
-
-function getCurrentPremiumState({
-  isSessionPending,
-  platform,
-  resolvedState,
-  userId,
-}: {
-  isSessionPending: boolean;
-  platform: ReturnType<typeof getRevenueCatPlatform>;
-  resolvedState: ResolvedPremiumState | null;
-  userId: string | null;
-}): PremiumState {
-  if (!platform) {
-    return { hasActiveSubscription: false, status: "unavailable" };
-  }
-
-  if (isSessionPending) {
-    return { hasActiveSubscription: false, status: "loading" };
-  }
-
-  if (!userId) {
-    return { hasActiveSubscription: false, status: "free" };
-  }
-
-  if (resolvedState?.userId !== userId) {
-    return { hasActiveSubscription: false, status: "loading" };
-  }
-
-  return resolvedState;
 }

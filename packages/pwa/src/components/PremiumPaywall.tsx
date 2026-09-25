@@ -3,6 +3,7 @@ import { Plural, Trans } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
 import { Dialog, Modal, ModalOverlay, Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
+import { getAppLink } from "#src/lib/link.ts";
 import {
   loadPremiumOffering,
   type PremiumEntitlementState,
@@ -266,7 +267,7 @@ export function PremiumPaywall({
                 <p>
                   <a
                     className="decoration-accent-400 underline underline-offset-2"
-                    href="/terms"
+                    href={getAppLink("/terms")}
                     rel="noopener noreferrer"
                     target="_blank"
                   >
@@ -275,7 +276,7 @@ export function PremiumPaywall({
                   <span aria-hidden="true"> · </span>
                   <a
                     className="decoration-accent-400 underline underline-offset-2"
-                    href="/privacy-policy"
+                    href={getAppLink("/privacy-policy")}
                     rel="noopener noreferrer"
                     target="_blank"
                   >

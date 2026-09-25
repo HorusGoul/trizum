@@ -15,7 +15,12 @@ export class PremiumSignInRequiredError extends Error {
 }
 
 export async function synchronizeRevenueCatUser(userId: string) {
-  identityOperation = identityOperation.catch(() => undefined).then(() => synchronizeUser(userId));
+  const customerInfo = await prepareRevenueCatUser(userId);
+  return customerInfo ?? refreshRevenueCatCustomerInfo();
+}
+
+export async function prepareRevenueCatUser(userId: string) {
+  identityOperation = identityOperation.catch(() => undefined).then(() => identifyUser(userId));
   return identityOperation;
 }
 
@@ -49,7 +54,7 @@ export async function refreshRevenueCatCustomerInfo() {
   return Purchases.getCustomerInfo().then(({ customerInfo }) => customerInfo);
 }
 
-async function synchronizeUser(userId: string) {
+async function identifyUser(userId: string) {
   const platform = getRevenueCatPlatform();
   if (!platform) {
     return;
@@ -70,11 +75,11 @@ async function synchronizeUser(userId: string) {
     configured = true;
     identifiedUserId = userId;
 
-    return Purchases.getCustomerInfo().then(({ customerInfo }) => customerInfo);
+    return;
   }
 
   if (identifiedUserId === userId) {
-    return Purchases.getCustomerInfo().then(({ customerInfo }) => customerInfo);
+    return;
   }
 
   const { customerInfo } = await Purchases.logIn({ appUserID: userId });
