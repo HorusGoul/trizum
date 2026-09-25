@@ -82,7 +82,6 @@ async function identifyUser(userId: string) {
     return;
   }
 
-  await Purchases.logOut();
   const { customerInfo } = await Purchases.logIn({ appUserID: userId });
   identifiedUserId = userId;
   return customerInfo;
