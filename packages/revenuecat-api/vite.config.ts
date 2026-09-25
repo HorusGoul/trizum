@@ -6,6 +6,7 @@ export default defineConfig({
       build: {
         command: "NODE_ENV=production tsc -b tsconfig.json --force",
         dependsOn: ["generate"],
+        input: [{ auto: true }, "src/**", "!dist/**", "!**/*.tsbuildinfo"],
         output: ["dist/**"],
       },
       check: {
