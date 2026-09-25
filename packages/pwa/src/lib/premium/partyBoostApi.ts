@@ -131,6 +131,7 @@ function isPartyBoostErrorCode(value: unknown): value is PartyBoostErrorCode {
     value === "membership_required" ||
     value === "premium_required" ||
     value === "transfer_locked" ||
+    value === "unauthorized" ||
     value === "unavailable"
   );
 }
