@@ -33,7 +33,8 @@
     "dev": "tsc -b tsconfig.json --watch"
   },
   "dependencies": {
-    "@logtape/logtape": "catalog:"
+    "@logtape/logtape": "catalog:",
+    "bs58check": "catalog:"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
+import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
 import { getLogger } from "../src/lib/log";
 import { getRedactedPath, workerLogger } from "./log";
 
@@ -7,6 +8,44 @@ afterEach(() => {
 });
 
 describe("Worker console logging", () => {
+  test("redacts document IDs everywhere in emitted errors", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { documentId } = parseAutomergeUrl(generateAutomergeUrl());
+    const cause = new TypeError(`Document ${documentId} is unavailable`);
+    const error = new Error(`Could not load automerge:${documentId}`, { cause });
+    error.stack = `${error.name}: ${error.message}\n    at loadPreview (worker.js:42:7)`;
+
+    getLogger("api", "partySharePreview").warning(
+      "Could not load party share preview: {errorMessage}",
+      {
+        error,
+        errorMessage: error.message,
+        requestId: "test-request",
+        nested: [{ url: `https://trizum.app/party/${documentId}/share` }],
+      },
+    );
+
+    const output = warn.mock.calls[0]![0] as string;
+    expect(output).not.toContain(documentId);
+    expect(JSON.parse(output)).toMatchObject({
+      level: "WARN",
+      logger: "trizum.pwa.api.partySharePreview",
+      properties: {
+        requestId: "test-request",
+        error: {
+          name: "Error",
+          message: "Could not load automerge:[REDACTED_DOCUMENT_ID]",
+          stack: expect.stringContaining("at loadPreview (worker.js:42:7)"),
+          cause: {
+            name: "TypeError",
+            message: "Document [REDACTED_DOCUMENT_ID] is unavailable",
+          },
+        },
+      },
+    });
+    expect(error.message).toContain(documentId);
+  });
+
   test("emits one readable JSON argument with structured error details", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const cause = new TypeError("Connection closed");

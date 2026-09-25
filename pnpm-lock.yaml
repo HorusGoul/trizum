@@ -223,6 +223,9 @@ catalogs:
     browser-image-compression:
       specifier: 2.0.2
       version: 2.0.2
+    bs58check:
+      specifier: 3.0.1
+      version: 3.0.1
     capacitor-plugin-safe-area:
       specifier: 5.0.0
       version: 5.0.0
@@ -524,6 +527,9 @@ importers:
       '@logtape/logtape':
         specifier: 'catalog:'
         version: 2.2.4
+      bs58check:
+        specifier: 'catalog:'
+        version: 3.0.1
     devDependencies:
       '@trizum/tsconfig':
         specifier: workspace:*
@@ -13328,6 +13334,7 @@ snapshots:
   '@trizum/logging@file:packages/logging':
     dependencies:
       '@logtape/logtape': 2.2.4
+      bs58check: 3.0.1
 
   '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.2.4)(@opentelemetry/api@1.9.1)(@sentry/core@10.65.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.10)':
     dependencies:

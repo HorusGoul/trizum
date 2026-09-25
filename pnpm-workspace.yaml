@@ -31,6 +31,7 @@ peerDependencyRules:
     vite: "*"
     vitest: "*"
 catalog:
+  bs58check: 3.0.1
   "@typescript/native": npm:typescript@7.0.2
   "@automerge/automerge": 3.2.6
   "@automerge/automerge-repo": 2.5.6

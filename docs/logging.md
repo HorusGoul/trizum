@@ -153,6 +153,22 @@ Follow these rules:
 - use the shared helpers from [`@trizum/logging`](../packages/logging),
 - and do not use raw `console.*` in normal repo code.
 
+`configureTrizumLogging()` wraps every sink with document-ID redaction, including
+extra monitoring sinks and LogTape's meta logger. It recognizes Base58Check
+document IDs with 16-byte payloads in strings and redacts explicit document-ID
+fields. Sanitization covers templates, rendered message values, categories,
+nested properties, error causes, aggregate errors, and stacks. It keeps error
+classification and stack locations and does not mutate application errors.
+Circular values are marked, and custom serializers/accessors are not invoked.
+
+This boundary also covers the PWA browser and sync server. The Worker logging
+audit includes share-preview load/shutdown errors, Party Boost membership
+shutdown errors and nested failures, request errors, migration errors, and
+cloud-sync settings logs. Avoid recording identifiers at the call site even
+with this protection; the cloud-sync success log deliberately omits its
+party-list document ID. Redaction is separate from JSON console formatting and
+does not cover direct SDK telemetry outside the configured LogTape sinks.
+
 The shared category convention is:
 
 - `["trizum", surface, ...scope]`

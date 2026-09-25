@@ -217,7 +217,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     });
     const trizumMarkUrl = await loadTrizumMarkDataUrl(c.env, c.req.raw).catch((error) => {
       logger.warning("Could not load trizum mark for party share preview: {errorMessage}", {
-        error: getErrorDetails(error),
+        error,
         errorMessage: getErrorMessage(error),
       });
 
@@ -475,7 +475,7 @@ async function getPartySharePreview(partyId: string, context: PartySharePreviewL
   const preview = await loadPartySharePreviewFromAutomerge(partyId, context.documents, i18n).catch(
     (error) => {
       logger.warning("Could not load party share preview: {errorMessage}", {
-        error: getErrorDetails(error),
+        error,
         errorMessage: getErrorMessage(error),
       });
       return createFallbackPartySharePreview(i18n);
@@ -749,18 +749,6 @@ function createPreviewVersion(value: unknown) {
   }
 
   return (hash >>> 0).toString(36);
-}
-
-function getErrorDetails(error: unknown) {
-  if (error instanceof Error) {
-    return {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-    };
-  }
-
-  return { message: String(error) };
 }
 
 function getErrorMessage(error: unknown) {

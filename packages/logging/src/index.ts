@@ -10,6 +10,7 @@ import {
   type LoggerConfig,
   type Sink,
 } from "@logtape/logtape";
+import { withDocumentIdRedaction } from "./redaction.js";
 
 export type TrizumSurface = string;
 export type TrizumCategory<TSurface extends string = TrizumSurface> = [
@@ -70,6 +71,10 @@ export function configureTrizumLogging<TSinkId extends string = never>({
     }) as Sink,
     ...(extraSinks ?? {}),
   } as Record<TrizumSinkId<TSinkId>, Sink>;
+
+  for (const id of Object.keys(sinks) as TrizumSinkId<TSinkId>[]) {
+    sinks[id] = withDocumentIdRedaction(sinks[id]);
+  }
 
   configureSync({
     sinks,
