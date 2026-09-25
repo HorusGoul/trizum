@@ -40,6 +40,7 @@ interface ModalSheetProps extends Omit<
   SheetProps,
   "children" | "className" | "isOpen" | "onClose" | "onContextMenu" | "unstyled"
 > {
+  "aria-label"?: string;
   children: ReactNode;
   className?: ClassName;
   isDismissable?: boolean;
@@ -50,6 +51,7 @@ interface ModalSheetProps extends Omit<
 }
 
 export function ModalSheet({
+  "aria-label": ariaLabel,
   children,
   className,
   detent = "content",
@@ -78,6 +80,7 @@ export function ModalSheet({
       <OverlayProvider>
         <FocusScope contain restoreFocus>
           <AccessibleSheetContainer
+            ariaLabel={ariaLabel}
             className={className}
             close={close}
             isDismissable={isDismissable}
@@ -101,12 +104,14 @@ export function ModalSheet({
 }
 
 function AccessibleSheetContainer({
+  ariaLabel,
   children,
   className,
   close,
   isDismissable,
   isOpen,
 }: {
+  ariaLabel?: string;
   children: ReactNode;
   className?: ClassName;
   close: () => void;
@@ -135,7 +140,7 @@ function AccessibleSheetContainer({
     containerRef,
   );
   const { modalProps } = useModal();
-  const { dialogProps } = useDialog({}, containerRef);
+  const { dialogProps } = useDialog({ "aria-label": ariaLabel }, containerRef);
 
   return (
     <ModalSheetContext value={contextValue}>
