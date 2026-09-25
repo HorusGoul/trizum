@@ -37,6 +37,7 @@ export async function verifyRevenueCatPremium({
     const isPremium = await client.hasDirectEntitlement({
       customerId: userId,
       entitlementLookupKey: PREMIUM_ENTITLEMENT_ID,
+      environment: "production",
       projectId,
     });
 

@@ -3,6 +3,7 @@ import { and, eq, isNull } from "drizzle-orm";
 import { Hono, type Context } from "hono";
 import { createAuth } from "../auth";
 import { getApiDb, schema } from "../db/client";
+import { isUniqueConstraintError } from "../db/errors";
 import type { ApiHonoEnv } from "../env";
 import { getPartyBoostAssignmentAction, getPartyBoostTransferableAt } from "../premium/partyBoost";
 import { PartyMembershipUnavailableError, verifyPartyMembership } from "../premium/partyMembership";
@@ -517,8 +518,4 @@ function partyBoostError(
     },
     status,
   );
-}
-
-function isUniqueConstraintError(error: unknown) {
-  return error instanceof Error && /unique constraint/i.test(error.message);
 }
