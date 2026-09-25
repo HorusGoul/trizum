@@ -54,8 +54,9 @@ _Avoid_: Pro, paid plan
 **Premium Owner**:
 A signed-in person whose account holds Premium access through a trial,
 subscription, or Lifetime Premium. An active trial grants the complete Premium
-benefit, including Party Boost. Store-level family sharing does not create
-additional Premium owners.
+benefit, including Party Boost. The purchase stays with the original trizum
+account and cannot be restored into a different account. Store-level family
+sharing does not create additional Premium owners.
 _Avoid_: Subscriber, purchaser
 
 **Lifetime Premium**:

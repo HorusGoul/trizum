@@ -97,6 +97,7 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -114,6 +115,7 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -133,6 +135,7 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -152,6 +155,7 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -162,6 +166,7 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
@@ -172,6 +177,7 @@ export default defineConfig(({ mode }) => {
           dependsOn: [
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
