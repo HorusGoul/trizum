@@ -38,6 +38,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   const platform = getRevenueCatPlatform();
   const [resolvedState, setResolvedState] = useState<ResolvedPremiumState | null>(null);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [paywallSessionId, setPaywallSessionId] = useState(0);
   const paywallRequestRef = useRef<PaywallRequest | null>(null);
   const state = getCurrentPremiumState({
     isSessionPending: session.isPending,
@@ -139,6 +140,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       resolveRequest = resolve;
     });
     paywallRequestRef.current = { promise, resolve: resolveRequest };
+    setPaywallSessionId((sessionId) => sessionId + 1);
     setIsPaywallOpen(true);
     return promise;
   }
@@ -181,6 +183,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
           isOpen={isPaywallOpen}
           onEntitlementChange={updatePremiumEntitlement}
           onOpenChange={setPaywallOpen}
+          sessionId={paywallSessionId}
           userId={userId}
         />
       </AdEntitlementContext>

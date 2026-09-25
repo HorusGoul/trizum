@@ -6,12 +6,16 @@ import { toast } from "sonner";
 import {
   loadPremiumOffering,
   type PremiumEntitlementState,
-  type PremiumOffering,
   type PremiumPlan,
   type PremiumPlanId,
   purchasePremiumPlan,
   restorePremiumPurchases,
 } from "#src/lib/premium/premiumCommerce.ts";
+import {
+  createPremiumPaywallLoadKey,
+  getCurrentPremiumPaywallLoadState,
+  type PremiumPaywallLoadState,
+} from "#src/lib/premium/premiumPaywallState.ts";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
@@ -21,21 +25,22 @@ interface PremiumPaywallProps {
   isOpen: boolean;
   onEntitlementChange: (entitlement: PremiumEntitlementState) => void;
   onOpenChange: (isOpen: boolean) => void;
+  sessionId: number;
   userId: string | null;
 }
-
-type LoadState =
-  | { status: "loading" }
-  | { offering: PremiumOffering; status: "ready" }
-  | { status: "error" };
 
 export function PremiumPaywall({
   isOpen,
   onEntitlementChange,
   onOpenChange,
+  sessionId,
   userId,
 }: PremiumPaywallProps) {
-  const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
+  const loadKey = createPremiumPaywallLoadKey(sessionId, userId);
+  const [loadState, setLoadState] = useState<PremiumPaywallLoadState>({
+    loadKey,
+    status: "loading",
+  });
   const [selectedPlanId, setSelectedPlanId] = useState<PremiumPlanId | null>(null);
   const [activeAction, setActiveAction] = useState<"purchase" | "restore" | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
@@ -53,33 +58,35 @@ export function PremiumPaywall({
           return;
         }
 
-        setLoadState({ offering, status: "ready" });
+        setLoadState({ loadKey, offering, status: "ready" });
         setSelectedPlanId(offering.defaultPlanId);
       })
       .catch(() => {
         if (active) {
-          setLoadState({ status: "error" });
+          setLoadState({ loadKey, status: "error" });
         }
       });
 
     return () => {
       active = false;
     };
-  }, [isOpen, loadAttempt, userId]);
+  }, [isOpen, loadAttempt, loadKey, userId]);
+
+  const currentLoadState = getCurrentPremiumPaywallLoadState(loadState, loadKey);
 
   const selectedPlan =
-    loadState.status === "ready"
-      ? loadState.offering.plans.find(({ id }) => id === selectedPlanId)
+    currentLoadState.status === "ready"
+      ? currentLoadState.offering.plans.find(({ id }) => id === selectedPlanId)
       : undefined;
 
   async function purchase() {
-    if (!selectedPlanId) {
+    if (!selectedPlan) {
       return;
     }
 
     setActiveAction("purchase");
     try {
-      const result = await purchasePremiumPlan(userId, selectedPlanId);
+      const result = await purchasePremiumPlan(userId, selectedPlan.id);
       if (result.status !== "cancelled") {
         onEntitlementChange(result.entitlement);
         if (result.entitlement.isPremium) {
@@ -114,7 +121,7 @@ export function PremiumPaywall({
   }
 
   function retryLoading() {
-    setLoadState({ status: "loading" });
+    setLoadState({ loadKey, status: "loading" });
     setLoadAttempt((attempt) => attempt + 1);
   }
 
@@ -188,9 +195,9 @@ export function PremiumPaywall({
                 </div>
 
                 <div className="flex flex-col gap-3.5">
-                  {loadState.status === "loading" ? <PremiumPlansSkeleton /> : null}
+                  {currentLoadState.status === "loading" ? <PremiumPlansSkeleton /> : null}
 
-                  {loadState.status === "error" ? (
+                  {currentLoadState.status === "error" ? (
                     <div className="border-accent-200 bg-accent-50 dark:border-accent-800 dark:bg-accent-900 flex min-h-40 flex-col items-center justify-center gap-4 rounded-3xl border p-5 text-center">
                       <div className="flex flex-col gap-1.5">
                         <p className="font-semibold">
@@ -210,7 +217,7 @@ export function PremiumPaywall({
                     </div>
                   ) : null}
 
-                  {loadState.status === "ready" ? (
+                  {currentLoadState.status === "ready" ? (
                     <RadioGroup
                       aria-label={t`Premium plan`}
                       className="flex flex-col gap-2"
@@ -219,7 +226,7 @@ export function PremiumPaywall({
                       orientation="vertical"
                       value={selectedPlanId}
                     >
-                      {loadState.offering.plans.map((plan) => (
+                      {currentLoadState.offering.plans.map((plan) => (
                         <PremiumPlanOption key={plan.id} plan={plan} />
                       ))}
                     </RadioGroup>
