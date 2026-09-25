@@ -7,6 +7,7 @@ import type {
 
 const REVENUECAT_API_URL = "https://api.revenuecat.com/v2";
 const PAGE_SIZE = 100;
+export type RevenueCatEnvironment = "production" | "sandbox";
 
 interface RevenueCatPage<T> {
   items: T[];
@@ -17,6 +18,7 @@ export interface RevenueCatApiClient {
   hasDirectEntitlement(request: {
     customerId: string;
     entitlementLookupKey: string;
+    environment: RevenueCatEnvironment;
     projectId: string;
   }): Promise<boolean>;
 }
@@ -46,7 +48,7 @@ export function createRevenueCatApiClient({
   });
 
   return {
-    async hasDirectEntitlement({ customerId, entitlementLookupKey, projectId }) {
+    async hasDirectEntitlement({ customerId, entitlementLookupKey, environment, projectId }) {
       if (!customerId.trim() || !entitlementLookupKey.trim() || !projectId.trim()) {
         throw new RevenueCatApiError(
           "RevenueCat project, customer, and entitlement identifiers are required.",
@@ -56,10 +58,10 @@ export function createRevenueCatApiClient({
       try {
         const [subscriptions, purchases] = await Promise.all([
           listAllRevenueCatResources((startingAfter) =>
-            getSubscriptionsPage(client, { customerId, projectId, startingAfter }),
+            getSubscriptionsPage(client, { customerId, environment, projectId, startingAfter }),
           ),
           listAllRevenueCatResources((startingAfter) =>
-            getPurchasesPage(client, { customerId, projectId, startingAfter }),
+            getPurchasesPage(client, { customerId, environment, projectId, startingAfter }),
           ),
         ]);
 
@@ -69,8 +71,11 @@ export function createRevenueCatApiClient({
 
         return (
           subscriptions.some((subscription) =>
-            isEligibleSubscription(subscription, entitlementLookupKey),
-          ) || purchases.some((purchase) => isEligiblePurchase(purchase, entitlementLookupKey))
+            isEligibleSubscription(subscription, entitlementLookupKey, environment),
+          ) ||
+          purchases.some((purchase) =>
+            isEligiblePurchase(purchase, entitlementLookupKey, environment),
+          )
         );
       } catch (error) {
         if (error instanceof RevenueCatApiError) {
@@ -85,18 +90,19 @@ export function createRevenueCatApiClient({
 
 interface PageRequest {
   customerId: string;
+  environment: RevenueCatEnvironment;
   projectId: string;
   startingAfter: string | undefined;
 }
 
 async function getSubscriptionsPage(
   client: Client,
-  { customerId, projectId, startingAfter }: PageRequest,
+  { customerId, environment, projectId, startingAfter }: PageRequest,
 ): Promise<RevenueCatPage<RevenueCatSubscription> | null> {
   const { data, error, response } = await listSubscriptions({
     client,
     path: { customer_id: customerId, project_id: projectId },
-    query: { limit: PAGE_SIZE, starting_after: startingAfter },
+    query: { environment, limit: PAGE_SIZE, starting_after: startingAfter },
   });
 
   return parsePageResponse<RevenueCatSubscription>(data, error, response, "subscriptions");
@@ -104,12 +110,12 @@ async function getSubscriptionsPage(
 
 async function getPurchasesPage(
   client: Client,
-  { customerId, projectId, startingAfter }: PageRequest,
+  { customerId, environment, projectId, startingAfter }: PageRequest,
 ): Promise<RevenueCatPage<RevenueCatPurchase> | null> {
   const { data, error, response } = await listPurchases({
     client,
     path: { customer_id: customerId, project_id: projectId },
-    query: { limit: PAGE_SIZE, starting_after: startingAfter },
+    query: { environment, limit: PAGE_SIZE, starting_after: startingAfter },
   });
 
   return parsePageResponse<RevenueCatPurchase>(data, error, response, "purchases");
@@ -189,11 +195,14 @@ async function listAllRevenueCatResources<T>(
 function isEligibleSubscription(
   subscription: RevenueCatSubscription,
   entitlementLookupKey: string,
+  environment: RevenueCatEnvironment,
 ) {
   assertRecord(subscription, "subscription");
   if (
     typeof subscription.gives_access !== "boolean" ||
-    typeof subscription.ownership !== "string"
+    typeof subscription.ownership !== "string" ||
+    typeof subscription.environment !== "string" ||
+    typeof subscription.store !== "string"
   ) {
     throw new RevenueCatApiError("RevenueCat returned an invalid subscription.");
   }
@@ -201,20 +210,41 @@ function isEligibleSubscription(
   return (
     subscription.gives_access &&
     subscription.ownership === "purchased" &&
+    isEligibleEnvironment(subscription, environment) &&
     hasActiveEntitlement(subscription.entitlements, entitlementLookupKey)
   );
 }
 
-function isEligiblePurchase(purchase: RevenueCatPurchase, entitlementLookupKey: string) {
+function isEligiblePurchase(
+  purchase: RevenueCatPurchase,
+  entitlementLookupKey: string,
+  environment: RevenueCatEnvironment,
+) {
   assertRecord(purchase, "purchase");
-  if (typeof purchase.status !== "string" || typeof purchase.ownership !== "string") {
+  if (
+    typeof purchase.status !== "string" ||
+    typeof purchase.ownership !== "string" ||
+    typeof purchase.environment !== "string" ||
+    typeof purchase.store !== "string"
+  ) {
     throw new RevenueCatApiError("RevenueCat returned an invalid purchase.");
   }
 
   return (
     purchase.status === "owned" &&
     purchase.ownership === "purchased" &&
+    isEligibleEnvironment(purchase, environment) &&
     hasActiveEntitlement(purchase.entitlements, entitlementLookupKey)
+  );
+}
+
+function isEligibleEnvironment(
+  resource: { environment: string; store: string },
+  environment: RevenueCatEnvironment,
+) {
+  return (
+    resource.environment === environment &&
+    (environment !== "production" || resource.store !== "test_store")
   );
 }
 

@@ -44,6 +44,16 @@ describe("RevenueCatApiClient", () => {
     ).resolves.toBe(false);
   });
 
+  it("rejects a sandbox Test Store lifetime product for production access", async () => {
+    await expect(
+      hasPremium({
+        purchases: [
+          [createPurchase({ environment: "sandbox", status: "owned", store: "test_store" })],
+        ],
+      }),
+    ).resolves.toBe(false);
+  });
+
   it("accepts a direct lifetime product alongside a family-shared subscription", async () => {
     await expect(
       hasPremium({
@@ -91,6 +101,11 @@ describe("RevenueCatApiClient", () => {
     expect(
       requests.every((request) => request.headers.get("Authorization") === "Bearer secret"),
     ).toBe(true);
+    expect(
+      requests.every(
+        (request) => new URL(request.url).searchParams.get("environment") === "production",
+      ),
+    ).toBe(true);
   });
 
   it("does not interpret a missing project as inactive access", async () => {
@@ -111,6 +126,7 @@ describe("RevenueCatApiClient", () => {
       client.hasDirectEntitlement({
         customerId: "person",
         entitlementLookupKey: "premium",
+        environment: "production",
         projectId: "",
       }),
     ).rejects.toBeInstanceOf(RevenueCatApiError);
@@ -135,6 +151,7 @@ function hasPremium(options: FetcherOptions) {
   }).hasDirectEntitlement({
     customerId: "person",
     entitlementLookupKey: "premium",
+    environment: "production",
     projectId: "project",
   });
 }
@@ -206,36 +223,48 @@ function createEntitlements() {
 }
 
 function createSubscription({
+  environment = "production",
   givesAccess,
   id = "subscription",
   ownership = "purchased",
   status = "active",
+  store = "app_store",
 }: {
+  environment?: "production" | "sandbox";
   givesAccess: boolean;
   id?: string;
   ownership?: "family_shared" | "purchased";
   status?: string;
+  store?: "app_store" | "test_store";
 }) {
   return {
     entitlements: createEntitlements(),
+    environment,
     gives_access: givesAccess,
     id,
     ownership,
     status,
+    store,
   };
 }
 
 function createPurchase({
+  environment = "production",
   ownership = "purchased",
   status,
+  store = "app_store",
 }: {
+  environment?: "production" | "sandbox";
   ownership?: "family_shared" | "purchased";
   status: "owned" | "refunded";
+  store?: "app_store" | "test_store";
 }) {
   return {
     entitlements: createEntitlements(),
+    environment,
     id: "purchase",
     ownership,
     status,
+    store,
   };
 }
