@@ -160,6 +160,9 @@ test-results/
 # Generated icon sprite artifacts
 packages/pwa/src/generated/
 
+# Generated RevenueCat API types
+packages/revenuecat-api/src/generated/
+
 # Packed server runtime
 packages/server/build/
 
