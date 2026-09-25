@@ -22,6 +22,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./sentry": {
+      "types": "./dist/sentry.d.ts",
+      "import": "./dist/sentry.js",
+      "default": "./dist/sentry.js"
+    },
     "./github-actions": {
       "types": "./dist/github-actions.d.ts",
       "import": "./dist/github-actions.js",

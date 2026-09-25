@@ -17,6 +17,9 @@ For repo-wide guidance on what to log and which severity level to use, see
   configuration helpers.
 - [`src/github-actions.ts`](./src/github-actions.ts) contains the GitHub
   Actions annotation sink entrypoint.
+- [`src/sentry.ts`](./src/sentry.ts) exports `sentryDocumentIdRedaction` from
+  `@trizum/logging/sentry`. Spread it into `Sentry.init()` to sanitize errors,
+  breadcrumbs, logs, spans, and transactions that bypass LogTape sinks.
 - [`tsconfig.json`](./tsconfig.json) is the source of truth for emitted package
   output.
 - [`tsconfig.test.json`](./tsconfig.test.json) is the source of truth for the

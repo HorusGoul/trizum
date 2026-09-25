@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 import packageJson from "#package.json" with { type: "json" };
 import { configureServerLogging, rootLogger } from "./log.ts";
@@ -7,6 +8,7 @@ configureServerLogging();
 
 if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {
   Sentry.init({
+    ...sentryDocumentIdRedaction,
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV ?? "development",
     integrations: [nodeProfilingIntegration()],
