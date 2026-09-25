@@ -23,7 +23,7 @@ function renderPrivacyPolicyContent() {
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
         <p className="text-accent-600 dark:text-accent-400 text-sm">
-          <Trans>Last updated: July 25, 2026</Trans>
+          <Trans>Last updated: September 25, 2026</Trans>
         </p>
 
         <p className="text-accent-700 dark:text-accent-300">
@@ -164,12 +164,12 @@ function renderPrivacyPolicyContent() {
             </h3>
             <p className="text-accent-700 dark:text-accent-300">
               <Trans>
-                When you use Premium in the installed Android or iOS app, we provide RevenueCat with
-                your trizum account ID and process purchase information such as the product,
-                purchase and subscription status, trial and renewal status, expiration date,
-                entitlement, store, platform, app and SDK versions, and limited SDK performance or
-                error diagnostics. We do not send RevenueCat your party, participant, expense,
-                receipt, or synced document contents.
+                When you sign in to the installed Android or iOS app, purchase, restore, or manage
+                Premium, or use Party Boost, we provide RevenueCat with your trizum account ID and
+                process purchase information such as the product, purchase and subscription status,
+                trial and renewal status, expiration date, entitlement, store, platform, app and SDK
+                versions, and limited SDK performance or error diagnostics. We do not send
+                RevenueCat your party, participant, expense, receipt, or synced document contents.
               </Trans>
             </p>
             <p className="text-accent-700 dark:text-accent-300">
@@ -202,7 +202,8 @@ function renderPrivacyPolicyContent() {
             <li>
               <Trans>
                 Offer purchases, restore purchases, verify Premium access across your signed-in
-                devices, provide subscription management, and analyze purchase performance
+                devices and for Party Boost, provide subscription management, and analyze purchase
+                performance
               </Trans>
             </li>
             <li>
@@ -419,8 +420,9 @@ function renderPrivacyPolicyContent() {
                 <Trans>
                   The installed mobile apps use RevenueCat to present Premium offers, process and
                   restore purchases through Apple or Google, determine entitlement status, and
-                  provide subscription management. RevenueCat receives your trizum account ID and
-                  purchase-related information for these purposes. See
+                  provide subscription management. trizum&apos;s servers also use RevenueCat to
+                  verify Premium access for Party Boost. RevenueCat receives your trizum account ID
+                  and purchase-related information for these purposes. See
                 </Trans>{" "}
                 <a
                   href="https://www.revenuecat.com/privacy/"

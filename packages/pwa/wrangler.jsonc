@@ -45,6 +45,8 @@
     "GOOGLE_ANDROID_GOOGLE_PLAY_CLIENT_ID": "554871818976-bps9ha7q5qhop0i8nt8jfa2l2mu48a6a.apps.googleusercontent.com",
     "GOOGLE_IOS_CLIENT_ID": "554871818976-adac4tobqolhrgp7e64siieslsc2jf84.apps.googleusercontent.com",
     "GOOGLE_WEB_CLIENT_ID": "554871818976-e3p8ou802d8746n0se8dv20ba3gnfi0g.apps.googleusercontent.com",
+    "PARTY_MEMBERSHIP_TIMEOUT_MS": "10000",
+    "REVENUECAT_PROJECT_ID": "proj4f8e1968",
   },
   "routes": [
     {

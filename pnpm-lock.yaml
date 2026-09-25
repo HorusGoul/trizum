@@ -709,6 +709,9 @@ importers:
       '@trizum/react-suspense-cache':
         specifier: workspace:*
         version: link:../react-suspense-cache
+      '@trizum/revenuecat-api':
+        specifier: workspace:*
+        version: link:../revenuecat-api
       '@trizum/tw-dynamic-themes':
         specifier: workspace:*
         version: link:../tw-dynamic-themes
@@ -4869,6 +4872,9 @@ packages:
     peerDependencies:
       react: '>=19.0.0'
 
+  '@trizum/revenuecat-api@file:packages/revenuecat-api':
+    resolution: {directory: packages/revenuecat-api, type: directory}
+
   '@trizum/tw-dynamic-themes@file:packages/tw-dynamic-themes':
     resolution: {directory: packages/tw-dynamic-themes, type: directory}
     hasBin: true
@@ -6862,9 +6868,6 @@ packages:
   get-symbol-description@1.1.0:
     resolution: {integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==}
     engines: {node: '>= 0.4'}
-
-  get-tsconfig@4.13.0:
-    resolution: {integrity: sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==}
 
   get-tsconfig@4.14.0:
     resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
@@ -11142,7 +11145,7 @@ snapshots:
   '@esbuild-kit/esm-loader@2.6.5':
     dependencies:
       '@esbuild-kit/core-utils': 3.3.2
-      get-tsconfig: 4.13.0
+      get-tsconfig: 4.14.0
 
   '@esbuild/aix-ppc64@0.28.1':
     optional: true
@@ -13305,6 +13308,7 @@ snapshots:
       '@tanstack/react-router': 1.170.17(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@trizum/logging': file:packages/logging
       '@trizum/react-suspense-cache': file:packages/react-suspense-cache(react@19.2.8)
+      '@trizum/revenuecat-api': file:packages/revenuecat-api
       '@trizum/tw-dynamic-themes': file:packages/tw-dynamic-themes
       '@use-gesture/react': 10.3.1(react@19.2.8)
       barcode-detector: 3.0.8(@types/emscripten@1.41.5)
@@ -13395,6 +13399,8 @@ snapshots:
     dependencies:
       '@trizum/logging': file:packages/logging
       react: 19.2.8
+
+  '@trizum/revenuecat-api@file:packages/revenuecat-api': {}
 
   '@trizum/tw-dynamic-themes@file:packages/tw-dynamic-themes':
     dependencies:
@@ -15415,10 +15421,6 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
-
-  get-tsconfig@4.13.0:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
 
   get-tsconfig@4.14.0:
     dependencies:
