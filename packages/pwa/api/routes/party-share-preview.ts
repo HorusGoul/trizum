@@ -1,11 +1,12 @@
-import { isValidDocumentId, Repo, type DocumentId, type PeerId } from "@automerge/automerge-repo";
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
+import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
+import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo";
 import type { I18n } from "@lingui/core";
 import { Hono } from "hono";
 import interBoldFontUrl from "../assets/inter/Inter-Bold.ttf?url";
 import interExtraBoldFontUrl from "../assets/inter/Inter-ExtraBold.ttf?url";
 import interRegularFontUrl from "../assets/inter/Inter-Regular.ttf?url";
 import type { ApiEnv, ApiHonoEnv } from "../env";
+import { getAutomergeWssUrl, type AutomergeDocuments } from "../automergeDocuments";
 import { createApiI18n } from "../i18n";
 import { DEFAULT_LOCALE, type SupportedLocale } from "../../src/lib/locales.js";
 import { getLogger } from "../../src/lib/log.js";
@@ -23,8 +24,6 @@ import { DEFAULT_PARTY_SYMBOL, type Party } from "../../src/models/party.js";
 
 const logger = getLogger("api", "partySharePreview");
 
-const DEFAULT_AUTOMERGE_WSS_URL = "wss://server.trizum.app/sync";
-const DEFAULT_PREVIEW_TIMEOUT_MS = 10_000;
 const PREVIEW_CACHE_SUCCESS_TTL_MS = 60_000;
 const PREVIEW_CACHE_FALLBACK_TTL_MS = 5_000;
 const MAX_DESCRIPTION_LENGTH = 180;
@@ -127,6 +126,7 @@ interface PartyShareImageResponseContext {
 }
 
 export interface PartySharePreviewLoadContext {
+  documents: AutomergeDocuments;
   env: ApiEnv;
   i18n: I18n;
   locale: SupportedLocale;
@@ -154,6 +154,11 @@ export const partySharePreviewRoute = createPartySharePreviewRoute();
 
 export function createPartySharePreviewRoute(options: PartySharePreviewRouteOptions = {}) {
   const route = new Hono<ApiHonoEnv>();
+  const documentsMiddleware = createAutomergeDocumentsMiddleware(
+    (env) => env.PARTY_SHARE_PREVIEW_TIMEOUT_MS,
+  );
+  route.use("/party/:partyId", documentsMiddleware);
+  route.use("/api/og/party/:partyId", documentsMiddleware);
   const loadPreview = options.loadPreview ?? getPartySharePreview;
   const createImageResponse = options.createImageResponse ?? createWorkersOgImageResponse;
 
@@ -176,6 +181,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const i18n = c.get("i18n");
     const locale = c.get("locale");
     const preview = await loadPreview(partyId, {
+      documents: c.get("documents"),
       env: c.env,
       i18n,
       locale,
@@ -203,6 +209,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const i18n = c.get("i18n");
     const locale = c.get("locale");
     const preview = await loadPreview(partyId, {
+      documents: c.get("documents"),
       env: c.env,
       i18n,
       locale,
@@ -465,7 +472,7 @@ async function getPartySharePreview(partyId: string, context: PartySharePreviewL
     return cachedPreview.preview;
   }
 
-  const preview = await loadPartySharePreviewFromAutomerge(partyId, env, request, i18n).catch(
+  const preview = await loadPartySharePreviewFromAutomerge(partyId, context.documents, i18n).catch(
     (error) => {
       logger.warning("Could not load party share preview: {errorMessage}", {
         error: getErrorDetails(error),
@@ -486,78 +493,18 @@ async function getPartySharePreview(partyId: string, context: PartySharePreviewL
 
 async function loadPartySharePreviewFromAutomerge(
   partyId: string,
-  env: ApiEnv,
-  request: Request,
+  documents: AutomergeDocuments,
   i18n: I18n,
 ) {
   if (!isValidDocumentId(partyId)) {
     return createFallbackPartySharePreview(i18n);
   }
 
-  const documentId = partyId as DocumentId;
-  const timeoutMs = getPreviewTimeoutMs(env);
-  const abortController = new AbortController();
-  const timeoutId = setTimeout(() => abortController.abort(), timeoutMs);
-  let repo: Repo | undefined;
-
-  try {
-    repo = new Repo({
-      isEphemeral: true,
-      network: [new BrowserWebSocketClientAdapter(getAutomergeWssUrl(env, request))],
-      peerId: `party-share-preview:${crypto.randomUUID()}` as PeerId,
-      shareConfig: {
-        access: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
-        announce: (_peerId, nextDocumentId) => Promise.resolve(nextDocumentId === documentId),
-      },
-    });
-
-    const handle = await repo.find<PartyPreviewDocument>(documentId, {
-      allowableStates: ["ready"],
-      signal: abortController.signal,
-    });
-    const party = handle.doc();
-
-    if (!party || party.type !== "party") {
-      return createFallbackPartySharePreview(i18n);
-    }
-
-    return createPartySharePreviewFromParty(party, i18n);
-  } finally {
-    clearTimeout(timeoutId);
-    await repo?.shutdown().catch((error) => {
-      logger.warning("Could not shut down party share preview repo: {errorMessage}", {
-        error: getErrorDetails(error),
-        errorMessage: getErrorMessage(error),
-      });
-    });
+  const party = await documents.read<PartyPreviewDocument>(partyId as DocumentId);
+  if (!party || party.type !== "party") {
+    return createFallbackPartySharePreview(i18n);
   }
-}
-
-function getAutomergeWssUrl(env: ApiEnv, request: Request) {
-  const configuredUrl = env.AUTOMERGE_WSS_URL?.trim();
-
-  if (configuredUrl) {
-    return configuredUrl;
-  }
-
-  const requestUrl = new URL(request.url);
-
-  if (requestUrl.hostname === "localhost" || requestUrl.hostname === "127.0.0.1") {
-    return "wss://dev-sync.trizum.app";
-  }
-
-  return DEFAULT_AUTOMERGE_WSS_URL;
-}
-
-function getPreviewTimeoutMs(env: ApiEnv) {
-  const value = env.PARTY_SHARE_PREVIEW_TIMEOUT_MS;
-  const parsedValue = value ? Number.parseInt(value, 10) : NaN;
-
-  if (Number.isFinite(parsedValue) && parsedValue > 0) {
-    return parsedValue;
-  }
-
-  return DEFAULT_PREVIEW_TIMEOUT_MS;
+  return createPartySharePreviewFromParty(party, i18n);
 }
 
 function getPublicAssetUrl(request: Request, path: string) {
