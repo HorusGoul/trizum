@@ -234,7 +234,7 @@ msgstr "9. Our Software and Intellectual Property"
 msgid "A name for the participant is required"
 msgstr "A name for the participant is required"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:349
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:346
 msgid "A Premium member is boosting this party."
 msgstr "A Premium member is boosting this party."
 
@@ -267,7 +267,7 @@ msgstr "Account deleted"
 msgid "Across the selected timeframe"
 msgstr "Across the selected timeframe"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:227
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:224
 msgid "Active"
 msgstr "Active"
 
@@ -629,7 +629,7 @@ msgstr "Bolivian Boliviano"
 msgid "Bolivian Mvdol"
 msgstr "Bolivian Mvdol"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:442
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:439
 msgid "Boost this party"
 msgstr "Boost this party"
 
@@ -723,7 +723,7 @@ msgstr "Canadian Dollar"
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:227
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:288
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:285
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -779,7 +779,7 @@ msgstr "Check your email for the sign-in link"
 msgid "Checking for updates..."
 msgstr "Checking for updates..."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:325
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:322
 msgid "Checking Party Boost…"
 msgstr "Checking Party Boost…"
 
@@ -1026,7 +1026,7 @@ msgstr "Could not load sign-in methods"
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:194
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:189
 #: src/routes/settings.tsx:325
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
@@ -2129,16 +2129,16 @@ msgstr "Move cursor left"
 msgid "Move cursor right"
 msgstr "Move cursor right"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:285
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:282
 msgid "Move Party Boost"
 msgstr "Move Party Boost"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:435
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:432
 msgid "Move Party Boost here"
 msgstr "Move Party Boost here"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:252
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:259
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:249
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:256
 msgid "Move Party Boost here?"
 msgstr "Move Party Boost here?"
 
@@ -2542,31 +2542,31 @@ msgstr "Party actions"
 msgid "Party archived"
 msgstr "Party archived"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:223
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:220
 msgid "Party Boost"
 msgstr "Party Boost"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:407
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:404
 msgid "Party Boost active"
 msgstr "Party Boost active"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:174
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:169
 msgid "Party Boost can only move once every seven days."
 msgstr "Party Boost can only move once every seven days."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:333
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:330
 msgid "Party Boost could not be checked. Try again when you are online."
 msgstr "Party Boost could not be checked. Try again when you are online."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:159
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:152
 msgid "Party Boost is active."
 msgstr "Party Boost is active."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:177
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:172
 msgid "Party Boost is unavailable. Please try again."
 msgstr "Party Boost is unavailable. Please try again."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:427
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:424
 msgid "Party Boost unavailable"
 msgstr "Party Boost unavailable"
 
@@ -2811,7 +2811,7 @@ msgstr "Premium is now active."
 msgid "Premium is optional. The purchase screen describes the features included with Premium and displays the price and billing period that apply in your store and region. Features may differ by platform when required by platform capabilities or store rules."
 msgstr "Premium is optional. The purchase screen describes the features included with Premium and displays the price and billing period that apply in your store and region. Features may differ by platform when required by platform capabilities or store rules."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:171
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:166
 msgid "Premium is required for Party Boost."
 msgstr "Premium is required for Party Boost."
 
@@ -2819,7 +2819,7 @@ msgstr "Premium is required for Party Boost."
 msgid "Premium options are unavailable"
 msgstr "Premium options are unavailable"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:369
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:366
 msgid "Premium owners can boost one party at a time and move it every seven days."
 msgstr "Premium owners can boost one party at a time and move it every seven days."
 
@@ -3157,7 +3157,7 @@ msgstr "Sierra Leonean Leone"
 
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:390
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:387
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -3165,7 +3165,7 @@ msgstr "Sign in"
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:317
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:314
 msgid "Sign in to activate Premium benefits for this party."
 msgstr "Sign in to activate Premium benefits for this party."
 
@@ -3573,7 +3573,7 @@ msgstr "The party link may be invalid or expired."
 msgid "The party may have been deleted by another member."
 msgstr "The party may have been deleted by another member."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:267
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:264
 msgid "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 msgstr "The previous party will lose its boost. You will not be able to move Party Boost again for seven days."
 
@@ -3639,7 +3639,7 @@ msgstr "This HEIC or HEIF image could not be processed. Try another photo or exp
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:165
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:160
 msgid "This party already has an active Party Boost."
 msgstr "This party already has an active Party Boost."
 
@@ -3647,7 +3647,7 @@ msgstr "This party already has an active Party Boost."
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "This party needs another active participant besides you to receive the transferred debt."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:272
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:269
 msgid "This party will receive your Party Boost. You will not be able to move it again for seven days."
 msgstr "This party will receive your Party Boost. You will not be able to move it again for seven days."
 
@@ -4033,7 +4033,7 @@ msgstr "View party"
 msgid "View photo"
 msgstr "View photo"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:419
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:416
 #: src/routes/settings.tsx:355
 msgid "View Premium options"
 msgstr "View Premium options"
@@ -4196,7 +4196,7 @@ msgstr "You may not use the Service to:"
 msgid "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
 msgstr "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:168
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:163
 msgid "You must be a member of this party to boost it."
 msgstr "You must be a member of this party to boost it."
 
@@ -4248,15 +4248,15 @@ msgstr "Your internet connection might be too slow."
 msgid "Your parties"
 msgstr "Your parties"
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:361
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:358
 msgid "Your Party Boost can be moved again on {transferableDate}."
 msgstr "Your Party Boost can be moved again on {transferableDate}."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:359
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:356
 msgid "Your Party Boost is active elsewhere and can be moved here."
 msgstr "Your Party Boost is active elsewhere and can be moved here."
 
-#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:341
+#: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:338
 msgid "Your Premium is boosting this party for everyone in it."
 msgstr "Your Premium is boosting this party for everyone in it."
 
