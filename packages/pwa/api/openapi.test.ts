@@ -1,18 +1,51 @@
-import { describe, expect, test } from "vite-plus/test";
-import { activatePartyBoostRoute, getPartyBoostRoute } from "./contracts/premium";
+import { describe, expect, test, vi } from "vite-plus/test";
 import {
   partyBoostErrorResponseSchema,
   partyBoostStatusSchema,
 } from "../src/lib/api/premiumContract";
+import app from "./worker";
+
+vi.mock("cloudflare:email", () => ({
+  EmailMessage: class EmailMessage {},
+}));
+vi.mock("./i18n", () => ({
+  createApiI18nMiddleware: () => async (_context: unknown, next: () => Promise<void>) => next(),
+}));
+vi.mock("./routes/party-share-preview", async () => {
+  const { Hono } = await import("hono");
+  return { partySharePreviewRoute: new Hono() };
+});
 
 describe("trizum OpenAPI contract", () => {
-  test("publishes the Party Boost request and response contract", () => {
-    expect(getPartyBoostRoute.path).toBe("/party-boost");
-    expect(getPartyBoostRoute.operationId).toBe("getPartyBoostStatus");
-    expect(Object.keys(getPartyBoostRoute.responses)).toEqual(["200", "400", "401", "403", "503"]);
-    expect(activatePartyBoostRoute.operationId).toBe("activatePartyBoost");
-    expect(activatePartyBoostRoute.request.body.required).toBe(true);
-    expect(Object.keys(activatePartyBoostRoute.responses)).toEqual([
+  test("publishes the assembled Party Boost operations", async () => {
+    const response = await app.request("https://trizum.test/api/openapi.json");
+    const document = (await response.json()) as {
+      paths?: Record<
+        string,
+        Record<
+          string,
+          {
+            operationId?: string;
+            requestBody?: { required?: boolean };
+            responses?: Record<string, unknown>;
+          }
+        >
+      >;
+    };
+
+    expect(response.status).toBe(200);
+    const partyBoostPath = document.paths?.["/api/premium/party-boost"];
+    expect(partyBoostPath?.get?.operationId).toBe("getPartyBoostStatus");
+    expect(Object.keys(partyBoostPath?.get?.responses ?? {})).toEqual([
+      "200",
+      "400",
+      "401",
+      "403",
+      "503",
+    ]);
+    expect(partyBoostPath?.put?.operationId).toBe("activatePartyBoost");
+    expect(partyBoostPath?.put?.requestBody?.required).toBe(true);
+    expect(Object.keys(partyBoostPath?.put?.responses ?? {})).toEqual([
       "200",
       "400",
       "401",

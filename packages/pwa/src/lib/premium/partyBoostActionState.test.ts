@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import type {
-  PartyBoostAssignmentStatus,
-  PartyBoostStatus,
-} from "../api/premiumContract.ts";
+import type { PartyBoostAssignmentStatus, PartyBoostStatus } from "../api/premiumContract.ts";
 import { getPartyBoostActionState } from "./partyBoostActionState.ts";
 
 const currentPartyId = "current-party";
