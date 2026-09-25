@@ -10,7 +10,7 @@ const PAGE_SIZE = 100;
 
 interface RevenueCatPage<T> {
   items: T[];
-  next_page: string | null;
+  next_page?: string | null;
 }
 
 export interface RevenueCatApiClient {
@@ -144,7 +144,7 @@ function parsePageResponse<T>(
   assertRecord(data, `${resourceName} list`);
   if (
     !Array.isArray(data.items) ||
-    (data.next_page !== null && typeof data.next_page !== "string")
+    (data.next_page !== undefined && data.next_page !== null && typeof data.next_page !== "string")
   ) {
     throw new RevenueCatApiError(`RevenueCat returned an invalid ${resourceName} list.`);
   }

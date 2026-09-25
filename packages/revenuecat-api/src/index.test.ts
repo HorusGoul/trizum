@@ -64,6 +64,15 @@ describe("RevenueCatApiClient", () => {
     ).resolves.toBe(true);
   });
 
+  it("accepts a final page that omits the optional pagination link", async () => {
+    await expect(
+      hasPremium({
+        omitTerminalNextPage: true,
+        subscriptions: [[createSubscription({ givesAccess: true })]],
+      }),
+    ).resolves.toBe(true);
+  });
+
   it("rejects an invalid pagination cursor", async () => {
     await expect(
       hasPremium({
@@ -112,6 +121,7 @@ interface FetcherOptions {
   invalidPagination?: boolean;
   missingCustomer?: boolean;
   missingProject?: boolean;
+  omitTerminalNextPage?: boolean;
   purchases?: unknown[][];
   requests?: Request[];
   subscriptions?: unknown[][];
@@ -133,6 +143,7 @@ function createFetcher({
   invalidPagination = false,
   missingCustomer = false,
   missingProject = false,
+  omitTerminalNextPage = false,
   purchases = [[]],
   requests,
   subscriptions = [[]],
@@ -169,7 +180,12 @@ function createFetcher({
         ? `${url.pathname}${invalidPagination ? "" : "?starting_after=next"}`
         : null;
 
-    return createJsonResponse({ items, next_page: nextPage, object: "list", url: url.pathname });
+    return createJsonResponse({
+      items,
+      ...(omitTerminalNextPage && nextPage === null ? {} : { next_page: nextPage }),
+      object: "list",
+      url: url.pathname,
+    });
   };
 }
 
