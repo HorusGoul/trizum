@@ -80,6 +80,8 @@ catalog:
   "@sentry/profiling-node": 10.64.0
   "@sentry/react": 10.64.0
   "@sentry/vite-plugin": 5.4.0
+  "@revenuecat/purchases-capacitor": 13.2.4
+  "@revenuecat/purchases-capacitor-ui": 13.2.4
   "@tanstack/react-form": 1.33.0
   "@tanstack/react-router": 1.170.17
   "@tanstack/router-plugin": 1.168.19
