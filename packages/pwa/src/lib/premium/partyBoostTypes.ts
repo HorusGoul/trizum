@@ -26,4 +26,5 @@ export type PartyBoostErrorCode =
   | "membership_required"
   | "premium_required"
   | "transfer_locked"
+  | "unauthorized"
   | "unavailable";
