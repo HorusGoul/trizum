@@ -59,7 +59,9 @@ catalog:
   "@cloudflare/vite-plugin": 1.51.0
   "@fontsource-variable/fira-code": 5.2.7
   "@fontsource-variable/inter": 5.2.8
+  "@hey-api/openapi-ts": 0.99.0
   "@hono/node-server": 2.0.8
+  "@hono/zod-openapi": 1.6.3
   "@internationalized/date": 3.12.2
   "@kubiks/otel-drizzle": 2.1.0
   "@libsql/client": 0.17.4

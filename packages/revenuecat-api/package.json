@@ -1,0 +1,37 @@
+{
+  "name": "@trizum/revenuecat-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Typed RevenueCat Developer API v2 client for trizum services.",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "catalog:",
+    "@trizum/tsconfig": "workspace:*",
+    "@typescript/native": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
