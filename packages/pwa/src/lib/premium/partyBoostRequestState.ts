@@ -1,17 +1,44 @@
 export class PartyBoostRequestGate {
+  #context: string | null = null;
   #latestRequest = 0;
 
-  beginRead() {
+  enterContext(context: string) {
+    if (this.#context === context) {
+      return;
+    }
+
+    this.#context = context;
     this.#latestRequest += 1;
-    return this.#latestRequest;
   }
 
-  invalidateReads() {
+  beginRead(context: string) {
+    this.enterContext(context);
+    this.#latestRequest += 1;
+    return { context, request: this.#latestRequest };
+  }
+
+  beginMutation(context: string) {
+    this.enterContext(context);
     this.#latestRequest += 1;
   }
 
-  isCurrent(request: number) {
-    return request === this.#latestRequest;
+  finishMutation(context: string) {
+    if (this.#context !== context) {
+      return false;
+    }
+
+    this.#latestRequest += 1;
+    return true;
+  }
+
+  invalidateReads(context: string) {
+    if (this.#context === context) {
+      this.#latestRequest += 1;
+    }
+  }
+
+  isCurrent(candidate: { context: string; request: number }) {
+    return candidate.context === this.#context && candidate.request === this.#latestRequest;
   }
 }
 

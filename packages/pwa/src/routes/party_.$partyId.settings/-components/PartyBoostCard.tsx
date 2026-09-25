@@ -46,9 +46,10 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   const navigate = useNavigate();
   const session = authClient.useSession();
   const userId = session.data?.user.id ?? null;
+  const requestContext = JSON.stringify([userId, partyDocumentId]);
   const { isPremium: isDevicePremium, presentPaywall } = usePremium();
   const [statusRequests] = useState(() => new PartyBoostRequestGate());
-  const [isActivating, setIsActivating] = useState(false);
+  const [activatingContext, setActivatingContext] = useState<string | null>(null);
   const [isTransferConfirmationOpen, setIsTransferConfirmationOpen] = useState(false);
   const [now, setNow] = useState(0);
   const [viewState, setViewState] = useState<PartyBoostViewState>({
@@ -58,8 +59,8 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   });
 
   useEffect(() => {
+    statusRequests.enterContext(requestContext);
     if (!userId) {
-      statusRequests.invalidateReads();
       return;
     }
 
@@ -73,7 +74,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     });
 
     async function refresh() {
-      const request = statusRequests.beginRead();
+      const request = statusRequests.beginRead(requestContext);
       try {
         const status = await fetchPartyBoostStatus(partyDocumentId);
         if (!active || !statusRequests.isCurrent(request)) {
@@ -110,10 +111,10 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
 
     return () => {
       active = false;
-      statusRequests.invalidateReads();
+      statusRequests.invalidateReads(requestContext);
       window.removeEventListener("online", handleOnline);
     };
-  }, [partyDocumentId, statusRequests, userId]);
+  }, [partyDocumentId, requestContext, statusRequests, userId]);
 
   useEffect(() => {
     const transferableAt = viewState.status?.currentUser.assignment?.transferableAt;
@@ -134,7 +135,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     }
 
     setViewState((current) => ({ ...current, error: null, isRefreshing: true }));
-    const request = statusRequests.beginRead();
+    const request = statusRequests.beginRead(requestContext);
     try {
       const status = await fetchPartyBoostStatus(partyDocumentId);
       if (!statusRequests.isCurrent(request)) {
@@ -161,6 +162,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   }
 
   async function activate() {
+    const isActivating = activatingContext === requestContext;
     if (isActivating) {
       return;
     }
@@ -170,17 +172,24 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
       return;
     }
 
-    setIsActivating(true);
-    statusRequests.invalidateReads();
+    const mutationContext = requestContext;
+    setActivatingContext(mutationContext);
+    statusRequests.beginMutation(mutationContext);
     try {
       const status = await activatePartyBoost(partyDocumentId);
-      statusRequests.invalidateReads();
+      if (!statusRequests.finishMutation(mutationContext)) {
+        setActivatingContext((current) => (current === mutationContext ? null : current));
+        return;
+      }
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState({ error: null, isRefreshing: false, status });
       setIsTransferConfirmationOpen(false);
       toast.success(t`Party Boost is active.`);
     } catch (error) {
-      statusRequests.invalidateReads();
+      if (!statusRequests.finishMutation(mutationContext)) {
+        setActivatingContext((current) => (current === mutationContext ? null : current));
+        return;
+      }
       const partyBoostError = toPartyBoostApiError(error);
       clearCachedPartyBoostStatus(userId, partyDocumentId);
       setIsTransferConfirmationOpen(false);
@@ -202,7 +211,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
           toast.error(t`Party Boost is unavailable. Please try again.`);
       }
     }
-    setIsActivating(false);
+    setActivatingContext((current) => (current === mutationContext ? null : current));
   }
 
   async function openPremium() {
@@ -220,6 +229,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   }
 
   const status = userId ? viewState.status : null;
+  const isActivating = activatingContext === requestContext;
   const assignment = status?.currentUser.assignment ?? null;
   const isAssignedElsewhere = Boolean(assignment && assignment.partyDocumentId !== partyDocumentId);
   const canTransfer = Boolean(
