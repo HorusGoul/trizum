@@ -6,6 +6,7 @@ import { Icon } from "#src/ui/Icon.js";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 import { PartySettingsLink } from "./-components/PartySettingsLink.js";
 import { PartySettingsSection } from "./-components/PartySettingsSection.js";
+import { PartyBoostCard } from "./-components/PartyBoostCard.js";
 
 export const Route = createFileRoute("/party_/$partyId/settings/")({
   component: PartySettings,
@@ -60,6 +61,10 @@ function PartySettings() {
             title={<Trans>Expense templates</Trans>}
             description={<Trans>Configure reusable defaults for new expenses</Trans>}
           />
+        </PartySettingsSection>
+
+        <PartySettingsSection icon="lucide.sparkles" title={<Trans>Premium</Trans>}>
+          <PartyBoostCard partyDocumentId={partyId} />
         </PartySettingsSection>
       </main>
     </div>
