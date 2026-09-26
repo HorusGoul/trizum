@@ -49,9 +49,8 @@ export class AutomergeDocuments {
     this.#controller.abort();
     clearTimeout(this.#timeoutId);
     this.#closing ??=
-      this.#repo?.shutdown().catch(() => {
-        // Raw Automerge errors can contain document IDs.
-        logger.warning("Could not shut down Worker document repo");
+      this.#repo?.shutdown().catch((error) => {
+        logger.warning("Could not shut down Worker document repo", { error });
       }) ?? Promise.resolve();
     return this.#closing;
   }

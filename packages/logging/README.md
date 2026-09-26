@@ -31,6 +31,11 @@ For repo-wide guidance on what to log and which severity level to use, see
 - Cloudflare Workers select `consoleFormat: "json"` to emit JSON Lines with
   severity, category, message, and structured properties (including error
   details). The default retains browser developer-console formatting.
+- Every configured sink receives a sanitized copy of each record. Automerge
+  document IDs are redacted from messages, templates, categories, nested
+  properties, error messages, causes, and stacks before console or monitoring
+  sinks see them. Error names and stack locations are retained; application
+  exceptions are not mutated. See `src/redaction.ts` and its regression tests.
 - Runtime-specific integrations like GitHub Actions annotations should be
   modeled as opt-in sinks configured by the owning surface via separate
   entrypoints.

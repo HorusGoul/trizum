@@ -122,7 +122,6 @@ cloudSyncRoute.put("/settings", async (c) => {
   }
 
   logger.info("Saved cloud user settings", {
-    partyListDocumentId: storedSettings.partyListDocumentId,
     userId: user.id,
   });
 
