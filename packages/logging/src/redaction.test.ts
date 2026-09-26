@@ -112,6 +112,49 @@ describe("document ID redaction at every sink", () => {
     });
   });
 
+  test("retains stacks when the runtime exposes them through an inherited accessor", async () => {
+    const stacks = new WeakMap<Error, string | undefined>();
+    class InheritedStackError extends Error {
+      constructor(message?: string) {
+        super(message);
+        stacks.set(this, this.stack);
+        delete this.stack;
+      }
+    }
+    // Model Firefox's native layout without changing Error.prototype globally.
+    Object.defineProperty(InheritedStackError.prototype, "stack", {
+      get(this: Error) {
+        return stacks.get(this);
+      },
+    });
+    vi.stubGlobal("Error", InheritedStackError);
+    vi.resetModules();
+    try {
+      const { withDocumentIdRedaction } = await import("./redaction.js");
+      const error = new InheritedStackError(`Document ${documentId} is unavailable`);
+      const records: LogRecord[] = [];
+      withDocumentIdRedaction((record) => records.push(record))({
+        category: ["trizum", "pwa"],
+        level: "warning",
+        timestamp: Date.now(),
+        message: ["Lookup failed"],
+        rawMessage: "Lookup failed",
+        properties: { error },
+      });
+
+      expect(records).toHaveLength(1);
+      expect(records[0]!.properties.error).toMatchObject({
+        message: `Document ${redactedId} is unavailable`,
+        stack: expect.stringContaining("redaction.test.ts:"),
+      });
+      expect(inspect(records, { depth: null })).not.toContain(documentId);
+      expect(error.stack).toContain(documentId);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
+  });
+
   test("sanitizes messages, templates, categories, properties, and nested errors", () => {
     const records: LogRecord[] = [];
     configureTrizumLogging({

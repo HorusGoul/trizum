@@ -4,7 +4,7 @@ import type { LogRecord, Sink } from "@logtape/logtape";
 const REDACTED_DOCUMENT_ID = "[REDACTED_DOCUMENT_ID]";
 const DOCUMENT_ID_FIELD =
   /^(?:documentId|partyId|partyDocumentId|partyListDocumentId|automergeUrl)$/i;
-const nativeErrorStackDescriptor = Object.getOwnPropertyDescriptor(new Error(), "stack");
+const nativeErrorStackDescriptor = getPropertyDescriptor(new Error(), "stack");
 
 function getPropertyDescriptor(value: object, key: string): PropertyDescriptor | undefined {
   for (let current: object | null = value; current; current = Object.getPrototypeOf(current)) {
@@ -15,8 +15,8 @@ function getPropertyDescriptor(value: object, key: string): PropertyDescriptor |
 
 function readErrorField(error: Error, key: string, descriptor: PropertyDescriptor): unknown {
   if ("value" in descriptor) return descriptor.value;
-  // V8 exposes ordinary stacks through a native lazy getter. It formats name
-  // and message, so only use it when neither field can execute user code.
+  // Native stack getters can live on the instance (V8) or prototype (Firefox).
+  // They may format name and message, so neither field may execute user code.
   if (
     key === "stack" &&
     nativeErrorStackDescriptor?.get &&
