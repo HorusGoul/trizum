@@ -2,17 +2,14 @@ import { Capacitor } from "@capacitor/core";
 import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { useSyncExternalStore } from "react";
-import { createRememberedAuthSession, createRememberedSessionFetch } from "./rememberedAuthSession";
+import { fetchAuth, rememberedSession } from "./authSession.ts";
 import { AUTH_PROVIDER_CONFIG } from "./authConfig";
 import { getAuthBaseURL } from "./authBaseUrl";
 import {
   clearNativeAuthToken,
   fetchWithNativeAuth,
   getNativeAuthHeaders,
-  getNativeAuthToken,
-  subscribeNativeAuthTokenClear,
   setNativeAuthToken,
-  setNativeAuthTokenFromResponse,
 } from "./nativeAuthSession";
 
 const AUTH_SESSION_REFETCH_INTERVAL_SECONDS = 60 * 60;
@@ -38,26 +35,6 @@ interface NativeSocialIdToken {
     email?: string;
   };
 }
-
-const rememberedSession = createRememberedAuthSession({
-  storage: () => (typeof localStorage === "undefined" ? undefined : localStorage),
-  canRestore: () => !Capacitor.isNativePlatform() || Boolean(getNativeAuthToken()),
-  isOnline: () => typeof navigator === "undefined" || navigator.onLine,
-});
-subscribeNativeAuthTokenClear(rememberedSession.clear);
-
-const fetchAuth = createRememberedSessionFetch({
-  session: rememberedSession,
-  fetch: (...args) => fetch(...args),
-  clearToken: clearNativeAuthToken,
-  captureToken(response, body) {
-    setNativeAuthTokenFromResponse(response);
-    if (!response.headers.has("set-auth-token")) {
-      const token = getAuthResultToken(body);
-      if (token) setNativeAuthToken(token);
-    }
-  },
-});
 
 export const authClient = createAuthClient({
   baseURL: getAuthBaseURL(),
@@ -382,14 +359,6 @@ export function getAuthRedirectUrl(data: unknown): string | undefined {
   }
 
   return typeof data.url === "string" ? data.url : undefined;
-}
-
-function getAuthResultToken(data: unknown) {
-  if (!data || typeof data !== "object" || !("token" in data)) {
-    return undefined;
-  }
-
-  return typeof data.token === "string" ? data.token : undefined;
 }
 
 async function getAuthErrorMessage(response: Response, fallback: string) {

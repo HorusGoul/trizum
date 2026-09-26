@@ -170,7 +170,8 @@ export function createRememberedSessionFetch({
   return async (input, init) => {
     const url = new URL(input instanceof Request ? input.url : input.toString());
     const sessionRequest = url.pathname.endsWith("/get-session");
-    const signingIn = /\/(sign-in|sign-up)\//.test(url.pathname);
+    const signingIn =
+      /\/(sign-in|sign-up)\//.test(url.pathname) || url.pathname.endsWith("/magic-link/verify");
     const signingOut = url.pathname.endsWith("/sign-out");
     const deletingAccount = url.pathname.endsWith("/delete-user");
     if (signingIn || signingOut) {
