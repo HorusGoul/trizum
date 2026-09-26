@@ -3,7 +3,7 @@
   "name": "trizum",
   "account_id": "0386b05d89cdce85a2ff1f9439795ac2",
   "compatibility_date": "2025-11-18",
-  "compatibility_flags": ["nodejs_als", "nodejs_compat"],
+  "compatibility_flags": ["nodejs_als", "nodejs_compat", "global_fetch_strictly_public"],
   "main": "api/worker.ts",
   "assets": {
     "directory": "./dist/client",

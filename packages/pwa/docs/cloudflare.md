@@ -4,6 +4,18 @@ This document records how the PWA Worker Cloudflare resources are wired. The
 source of truth for account, route, binding, public OAuth identifier, and
 observability values is [`../wrangler.jsonc`](../wrangler.jsonc).
 
+## Outbound sync routing
+
+Keep `global_fetch_strictly_public` enabled so outbound requests from
+`trizum.app` to `server.trizum.app` follow public routing. Without this flag,
+Cloudflare uses a different origin route for requests within the Worker's own
+zone. See [Cloudflare's compatibility flag documentation](https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public).
+
+Verify sync-dependent routes on `trizum.app` after deployment. A personalized
+party preview succeeding on the Worker's `workers.dev` hostname does not prove
+that the production custom domain can reach sync. Local workerd does not
+reproduce Cloudflare's same-zone routing behavior either.
+
 ## D1
 
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party
