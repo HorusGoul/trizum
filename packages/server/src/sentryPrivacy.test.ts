@@ -10,14 +10,15 @@ afterEach(async () => {
   Sentry.getIsolationScope().clear();
 });
 
-test("redacts direct server exceptions and causes before transport", async () => {
+test("redacts server exceptions, causes, scope attributes, and formatted logs before transport", async () => {
   const documentId = "p3u5PhN9wrNpsGCwfkeef2LzF9";
   const envelopes: CapturedEnvelope[] = [];
   Sentry.init({
     ...sentryDocumentIdRedaction,
     dsn: "https://public@example.com/1",
     defaultIntegrations: false,
-    integrations: [Sentry.linkedErrorsIntegration()],
+    integrations: [Sentry.linkedErrorsIntegration(), ...sentryDocumentIdRedaction.integrations],
+    enableLogs: true,
     skipOpenTelemetrySetup: true,
     sendClientReports: false,
     transport: () => ({
@@ -36,11 +37,13 @@ test("redacts direct server exceptions and causes before transport", async () =>
     contexts: { request: { url: `https://trizum.app/party/${documentId}` } },
     extra: { documentId },
   });
+  Sentry.setAttribute("partyDocumentId", documentId);
+  Sentry.logger.warn(Sentry.logger.fmt`Document ${documentId} unavailable`, { documentId });
   expect(await Sentry.flush(2000)).toBe(true);
 
-  expect(envelopes).toHaveLength(1);
   expect(JSON.stringify(envelopes)).not.toContain(documentId);
-  const event = envelopes[0]![1][0]![1];
+  const items = envelopes.flatMap(([, envelopeItems]) => envelopeItems);
+  const event = items.find(([header]) => header.type === "event")![1];
   expect(event).toMatchObject({
     level: "error",
     exception: {
@@ -56,6 +59,20 @@ test("redacts direct server exceptions and causes before transport", async () =>
       ]),
     },
   });
+  expect(items.find(([header]) => header.type === "log")![1]).toMatchObject({
+    items: [
+      {
+        body: "Document [REDACTED_DOCUMENT_ID] unavailable",
+        attributes: {
+          partyDocumentId: { value: "[REDACTED_DOCUMENT_ID]", type: "string" },
+          documentId: { value: "[REDACTED_DOCUMENT_ID]", type: "string" },
+          "sentry.message.template": { value: "Document %s unavailable", type: "string" },
+          "sentry.message.parameter.0": { value: "[REDACTED_DOCUMENT_ID]", type: "string" },
+        },
+      },
+    ],
+  });
+  expect(Sentry.getIsolationScope().getScopeData().attributes?.partyDocumentId).toBe(documentId);
   expect(error.cause).toBe(cause);
   expect(cause.message).toContain(documentId);
 });

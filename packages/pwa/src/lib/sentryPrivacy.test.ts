@@ -13,7 +13,7 @@ afterEach(async () => {
   Sentry.getIsolationScope().clear();
 });
 
-test("removes document IDs from outgoing Sentry errors, breadcrumbs, logs, and traces", async () => {
+function initializeRecordingClient() {
   const envelopes: CapturedEnvelope[] = [];
   Sentry.init({
     ...sentryDocumentIdRedaction,
@@ -30,7 +30,11 @@ test("removes document IDs from outgoing Sentry errors, breadcrumbs, logs, and t
       flush: async () => true,
     }),
   });
+  return envelopes;
+}
 
+test("removes document IDs from outgoing Sentry errors, breadcrumbs, logs, and traces", async () => {
+  const envelopes = initializeRecordingClient();
   Sentry.addBreadcrumb({ category: "navigation", data: { to: partyUrl } });
   expect(JSON.stringify(Sentry.getCurrentScope().getScopeData().breadcrumbs)).not.toContain(
     documentId,
@@ -103,4 +107,48 @@ test("removes document IDs from outgoing Sentry errors, breadcrumbs, logs, and t
     ],
   });
   expect(error.message).toContain(documentId);
+});
+
+test("redacts scope and per-log attributes without changing the application scope", async () => {
+  const envelopes = initializeRecordingClient();
+  Sentry.setAttribute("partyDocumentId", documentId);
+  const attributes = { partyUrl };
+  Sentry.logger.warn("Membership unavailable", attributes);
+  expect(await Sentry.flush(2000)).toBe(true);
+
+  expect(JSON.stringify(envelopes)).not.toContain(documentId);
+  expect(envelopes[0]![1][0]![1]).toMatchObject({
+    items: [
+      {
+        body: "Membership unavailable",
+        attributes: {
+          partyDocumentId: { value: "[REDACTED_DOCUMENT_ID]", type: "string" },
+          partyUrl: { value: "https://trizum.app/party/[REDACTED_DOCUMENT_ID]", type: "string" },
+        },
+      },
+    ],
+  });
+  expect(Sentry.getIsolationScope().getScopeData().attributes?.partyDocumentId).toBe(documentId);
+  expect(attributes.partyUrl).toBe(partyUrl);
+});
+
+test("preserves formatted log text and template attributes while redacting parameters", async () => {
+  const envelopes = initializeRecordingClient();
+  const message = Sentry.logger.fmt`Document ${documentId} unavailable`;
+  Sentry.logger.warn(message);
+  expect(await Sentry.flush(2000)).toBe(true);
+
+  expect(JSON.stringify(envelopes)).not.toContain(documentId);
+  expect(envelopes[0]![1][0]![1]).toMatchObject({
+    items: [
+      {
+        body: "Document [REDACTED_DOCUMENT_ID] unavailable",
+        attributes: {
+          "sentry.message.template": { value: "Document %s unavailable", type: "string" },
+          "sentry.message.parameter.0": { value: "[REDACTED_DOCUMENT_ID]", type: "string" },
+        },
+      },
+    ],
+  });
+  expect(String(message)).toBe(`Document ${documentId} unavailable`);
 });

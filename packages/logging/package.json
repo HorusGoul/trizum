@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@logtape/logtape": "catalog:",
+    "@sentry/core": "catalog:",
     "bs58check": "catalog:"
   },
   "devDependencies": {

@@ -170,13 +170,17 @@ party-list document ID. Redaction is separate from JSON console formatting.
 
 The browser and sync server also spread `sentryDocumentIdRedaction` from
 `@trizum/logging/sentry` into `Sentry.init()`. Its `beforeSend`, `beforeBreadcrumb`,
-`beforeSendLog`, `beforeSendSpan`, and `beforeSendTransaction` hooks apply the same
-sanitizer to direct and automatically captured SDK payloads. This covers error
-values, request/navigation URLs, tags, contexts, breadcrumbs, structured logs,
+`beforeSendSpan`, and `beforeSendTransaction` hooks apply the same sanitizer to
+direct and automatically captured SDK payloads. Its integration sanitizes log
+envelope payloads immediately before transport, after Sentry renders formatted
+messages and merges scope attributes. Retain
+`...sentryDocumentIdRedaction.integrations` when configuring other integrations.
+This covers error values, request/navigation URLs, tags, contexts, breadcrumbs,
+structured logs,
 span descriptions and attributes, and transaction sampling metadata. Error
 types, frame locations, severity, event IDs, and trace/span IDs remain available.
-These hooks do not process binary attachments or profiling payloads; adding new
-telemetry channels requires checking their own data boundary.
+These hooks and the integration do not process binary attachments or profiling
+payloads; adding new telemetry channels requires checking their own data boundary.
 
 The shared category convention is:
 

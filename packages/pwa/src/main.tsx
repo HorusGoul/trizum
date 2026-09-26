@@ -69,6 +69,7 @@ if (shouldInitializeSentry) {
       Sentry.browserTracingIntegration(),
       // eslint-disable-next-line import/namespace
       Sentry.browserProfilingIntegration(),
+      ...sentryDocumentIdRedaction.integrations,
     ],
     tracesSampleRate: 1,
     profileSessionSampleRate: 1,
