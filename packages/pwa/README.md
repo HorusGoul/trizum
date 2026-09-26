@@ -16,6 +16,16 @@ then use this document to decide where to work inside the PWA.
 - [`api/contracts`](./api/contracts) declares validated HTTP routes and their
   OpenAPI metadata. The Worker publishes the resulting OpenAPI 3.1 document at
   `/api/openapi.json`.
+- [`api/automergeDocuments.ts`](./api/automergeDocuments.ts) owns request-scoped
+  Worker document reads. Its `AutomergeDocuments` object initializes one repo
+  on the first `read`, shares it across concurrent and later reads, and only
+  syncs explicitly requested documents. The timeout starts with the first read
+  and applies to subsequent reads in that request.
+- [`api/automergeDocumentsMiddleware.ts`](./api/automergeDocumentsMiddleware.ts)
+  supplies that object as `c.get("documents")` and closes it when the handler
+  finishes. Register it on routes that need sync, then pass the object into
+  domain functions. Unused objects open no connection. Reads return snapshots;
+  future writes must define sync acknowledgement before request cleanup.
 - [`src/lib/trizumApiClient.ts`](./src/lib/trizumApiClient.ts) is the typed
   first-party client. UI code should call its domain methods instead of issuing
   raw requests to Worker routes.

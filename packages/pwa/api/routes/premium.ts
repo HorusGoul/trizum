@@ -1,3 +1,5 @@
+import type { AutomergeDocuments } from "../automergeDocuments";
+import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { $, OpenAPIHono } from "@hono/zod-openapi";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Context } from "hono";
@@ -22,18 +24,23 @@ type ApiDb = ReturnType<typeof getApiDb>;
 type PartyBoostRow = typeof schema.partyBoost.$inferSelect;
 
 const premiumApp = $(
-  new OpenAPIHono<ApiHonoEnv>().use("*", async (c, next) => {
-    const auth = createAuth(c.env, c.executionCtx, c.req.raw);
-    const session = await auth.api.getSession({ headers: c.req.raw.headers });
+  new OpenAPIHono<ApiHonoEnv>()
+    .use(
+      "*",
+      createAutomergeDocumentsMiddleware((env) => env.PARTY_MEMBERSHIP_TIMEOUT_MS),
+    )
+    .use("*", async (c, next) => {
+      const auth = createAuth(c.env, c.executionCtx, c.req.raw);
+      const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
-    if (!session) {
-      return c.json({ error: { code: "unauthorized", message: "Sign in is required." } }, 401);
-    }
+      if (!session) {
+        return c.json({ error: { code: "unauthorized", message: "Sign in is required." } }, 401);
+      }
 
-    c.set("session", session.session);
-    c.set("user", session.user);
-    await next();
-  }),
+      c.set("session", session.session);
+      c.set("user", session.user);
+      await next();
+    }),
 );
 
 export const premiumRoute = premiumApp
@@ -46,10 +53,9 @@ export const premiumRoute = premiumApp
         const status = await getPartyBoostStatus({
           apiKey: c.env.REVENUECAT_SECRET_API_KEY,
           db: getApiDb(c.env.DB),
-          env: c.env,
+          documents: c.get("documents"),
           partyDocumentId,
           projectId: c.env.REVENUECAT_PROJECT_ID,
-          request: c.req.raw,
           userId: c.get("user").id,
         });
 
@@ -78,9 +84,8 @@ export const premiumRoute = premiumApp
       try {
         const isMember = await verifyUserPartyMembership({
           db,
-          env: c.env,
+          documents: c.get("documents"),
           partyDocumentId,
-          request: c.req.raw,
           userId,
         });
 
@@ -110,9 +115,8 @@ export const premiumRoute = premiumApp
             apiKey: c.env.REVENUECAT_SECRET_API_KEY,
             assignment: existingPartyAssignment,
             db,
-            env: c.env,
+            documents: c.get("documents"),
             projectId: c.env.REVENUECAT_PROJECT_ID,
-            request: c.req.raw,
           });
 
           if (remainsActive) {
@@ -192,25 +196,22 @@ export type PremiumRoute = typeof premiumRoute;
 async function getPartyBoostStatus({
   apiKey,
   db,
-  env,
+  documents,
   partyDocumentId,
   projectId,
-  request,
   userId,
 }: {
   apiKey: string | undefined;
   db: ApiDb;
-  env: ApiHonoEnv["Bindings"];
+  documents: AutomergeDocuments;
   partyDocumentId: string;
   projectId: string | undefined;
-  request: Request;
   userId: string;
 }): Promise<PartyBoostStatus | null> {
   const isMember = await verifyUserPartyMembership({
     db,
-    env,
+    documents,
     partyDocumentId,
-    request,
     userId,
   });
 
@@ -229,9 +230,8 @@ async function getPartyBoostStatus({
     } else if (assignment.partyDocumentId !== partyDocumentId) {
       const ownsAssignedParty = await verifyUserPartyMembership({
         db,
-        env,
+        documents,
         partyDocumentId: assignment.partyDocumentId,
-        request,
         userId,
       });
 
@@ -247,9 +247,8 @@ async function getPartyBoostStatus({
       apiKey,
       assignment: partyAssignment,
       db,
-      env,
+      documents,
       projectId,
-      request,
     });
 
     if (!remainsActive) {
@@ -272,16 +271,14 @@ async function validateActiveAssignment({
   apiKey,
   assignment,
   db,
-  env,
+  documents,
   projectId,
-  request,
 }: {
   apiKey: string | undefined;
   assignment: PartyBoostRow;
   db: ApiDb;
-  env: ApiHonoEnv["Bindings"];
+  documents: AutomergeDocuments;
   projectId: string | undefined;
-  request: Request;
 }) {
   const premium = await verifyRevenueCatPremium({
     apiKey,
@@ -295,9 +292,8 @@ async function validateActiveAssignment({
 
   const isMember = await verifyUserPartyMembership({
     db,
-    env,
+    documents,
     partyDocumentId: assignment.partyDocumentId,
-    request,
     userId: assignment.ownerUserId,
   });
 
@@ -311,15 +307,13 @@ async function validateActiveAssignment({
 
 async function verifyUserPartyMembership({
   db,
-  env,
+  documents,
   partyDocumentId,
-  request,
   userId,
 }: {
   db: ApiDb;
-  env: ApiHonoEnv["Bindings"];
+  documents: AutomergeDocuments;
   partyDocumentId: string;
-  request: Request;
   userId: string;
 }) {
   const [settings] = await db
@@ -333,10 +327,9 @@ async function verifyUserPartyMembership({
   }
 
   return verifyPartyMembership({
-    env,
+    documents,
     partyDocumentId,
     partyListDocumentId: settings.partyListDocumentId,
-    request,
   });
 }
 

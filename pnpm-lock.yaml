@@ -869,6 +869,9 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.4(@types/react@19.2.18)
+      '@types/ws':
+        specifier: 'catalog:'
+        version: 8.18.1
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
@@ -917,6 +920,9 @@ importers:
       wrangler:
         specifier: 'catalog:'
         version: 4.119.0
+      ws:
+        specifier: 'catalog:'
+        version: 8.21.0
 
   packages/react-suspense-cache:
     dependencies:
