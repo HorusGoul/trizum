@@ -1,5 +1,45 @@
 # @trizum/pwa
 
+## 1.13.0
+
+### Minor Changes
+
+- [#446](https://github.com/HorusGoul/trizum/pull/446) [`6586d74`](https://github.com/HorusGoul/trizum/commit/6586d741577d903a9e60e6e90bf8854f5ceae63f) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add RevenueCat-powered Premium purchasing and subscription management to the installed Android and iOS apps, including a native-feeling trizum paywall, signed-in cross-device entitlements, ad-free owners, monthly/annual/lifetime packages, the server-side Party Boost allocation foundation, and in-app Terms of Service.
+  Add server-verified Party Boost activation, seven-day transfers, membership and Premium revalidation, automatic revocation, and party-settings controls.
+
+- [#423](https://github.com/HorusGoul/trizum/pull/423) [`2a7d0d1`](https://github.com/HorusGoul/trizum/commit/2a7d0d1f943238536e6e96568ce015c25d3fe76b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add consent-aware App Open and interstitial advertising to the installed Android and iOS apps, with shared frequency limits, test-by-default release configuration, and an ad-free entitlement integration point.
+
+### Patch Changes
+
+- [#457](https://github.com/HorusGoul/trizum/pull/457) [`ed5912f`](https://github.com/HorusGoul/trizum/commit/ed5912fa301dac4cfe85f22a59d9defd2a67bf77) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Redact Automerge document IDs from direct and automatic Sentry errors,
+  breadcrumbs, structured logs, and traces in the browser and sync server.
+  Preserve error classification, stack locations, and trace correlation.
+
+- [#461](https://github.com/HorusGoul/trizum/pull/461) [`d4839e4`](https://github.com/HorusGoul/trizum/commit/d4839e4e19c75f0ebaee221d8d39a01b7e37f653) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Refresh Premium status while the app stays open and when returning to it, so expired or revoked subscriptions update without a restart. Keep the last known account entitlement when a refresh fails or the device is offline.
+
+- [#459](https://github.com/HorusGoul/trizum/pull/459) [`2f5a0d9`](https://github.com/HorusGoul/trizum/commit/2f5a0d93c685e579ec8766273b137e3f130d81fd) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use public outbound routing for Worker sync connections from the production custom domain.
+
+- [#458](https://github.com/HorusGoul/trizum/pull/458) [`8e95035`](https://github.com/HorusGoul/trizum/commit/8e95035edc8ea1dd8c103e5ff588703d788edd34) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Wait for the sync peer before loading server-side party documents so slower WebSocket handshakes do not prematurely fail Party Boost membership checks or share previews.
+
+  Initialize the sync connection only when needed and reuse it for document reads throughout each Worker request.
+
+- [#454](https://github.com/HorusGoul/trizum/pull/454) [`5f1b5fe`](https://github.com/HorusGoul/trizum/commit/5f1b5fe9afc79b57ed44529e5adf0f7fea1a9aa5) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use structured JSON logging in Cloudflare Workers so messages and error details
+  remain readable in Observability while browser console formatting is preserved.
+
+  Fixes [#453](https://github.com/HorusGoul/trizum/issues/453).
+
+- [#460](https://github.com/HorusGoul/trizum/pull/460) [`6f42714`](https://github.com/HorusGoul/trizum/commit/6f427142d19890f0f0ab389679bf0d524b030ff4) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow restoring Premium purchases when store products cannot load. Preserve the remembered account and store-cached Premium access during offline startup, with a notice in settings. Refresh account status when connectivity returns. Native magic links can sign back in after signing out without restarting the app.
+
+- [#455](https://github.com/HorusGoul/trizum/pull/455) [`46c6f53`](https://github.com/HorusGoul/trizum/commit/46c6f53ca280f0ac09648ddb41ce3a787b776268) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Redact Automerge document IDs before logs reach console or monitoring sinks,
+  including nested error causes and stacks, while preserving diagnostic context.
+  Remove the document ID from cloud-sync success logs.
+
+  Fixes [#452](https://github.com/HorusGoul/trizum/issues/452).
+
+- Updated dependencies [[`ed5912f`](https://github.com/HorusGoul/trizum/commit/ed5912fa301dac4cfe85f22a59d9defd2a67bf77), [`46c6f53`](https://github.com/HorusGoul/trizum/commit/46c6f53ca280f0ac09648ddb41ce3a787b776268)]:
+  - @trizum/logging@1.0.1
+  - @trizum/react-suspense-cache@0.1.1
+
 ## 1.12.2
 
 ### Patch Changes
