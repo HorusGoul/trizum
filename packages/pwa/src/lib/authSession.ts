@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { createRememberedAuthSession, createRememberedSessionFetch } from "./rememberedAuthSession";
+import { createRememberedAuthSession } from "./rememberedAuthSession";
 import {
   clearNativeAuthToken,
   getNativeAuthToken,
@@ -12,11 +12,6 @@ export const rememberedSession = createRememberedAuthSession({
   storage: () => (typeof localStorage === "undefined" ? undefined : localStorage),
   canRestore: () => !Capacitor.isNativePlatform() || Boolean(getNativeAuthToken()),
   isOnline: () => typeof navigator === "undefined" || navigator.onLine,
-});
-subscribeNativeAuthTokenClear(rememberedSession.clear);
-
-export const fetchAuth = createRememberedSessionFetch({
-  session: rememberedSession,
   fetch: (...args) => fetch(...args),
   clearToken: clearNativeAuthToken,
   captureToken(response, body) {
@@ -27,6 +22,9 @@ export const fetchAuth = createRememberedSessionFetch({
     }
   },
 });
+subscribeNativeAuthTokenClear(rememberedSession.clear);
+
+export const fetchAuth = rememberedSession.fetch;
 
 function getAuthResultToken(data: unknown) {
   if (!data || typeof data !== "object" || !("token" in data)) {
