@@ -20,6 +20,7 @@ import { EmptyState } from "#src/routes/index/-components/EmptyState.js";
 import { NoActivePartiesCard } from "#src/routes/index/-components/NoActivePartiesCard.js";
 import { ProfileSetupCard } from "#src/routes/index/-components/ProfileSetupCard.js";
 import { authClient } from "#src/lib/auth-client.ts";
+import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 
 export const Route = createFileRoute("/_home")({
   component: Home,
@@ -35,7 +36,7 @@ function Home() {
   const showPartyHub = activeCount > 0 || archivedCount > 0;
   const needsProfileSetup = !partyList.username || partyList.username.trim() === "";
   const hasCloudSyncChild = location.pathname === "/settings/cloud-sync";
-  const isSignedIn = Boolean(session.data?.user);
+  const sessionStatus = getAuthSessionStatus(session);
 
   return (
     <>
@@ -87,16 +88,18 @@ function Home() {
                   routerOptions={{ resetScroll: false }}
                 >
                   <Icon
-                    icon={isSignedIn ? "lucide.cloud-cog" : "lucide.log-in"}
+                    icon={sessionStatus === "signed-out" ? "lucide.log-in" : "lucide.cloud-cog"}
                     width={20}
                     height={20}
                     className="mr-3"
                   />
                   <span className="h-3.5 leading-none">
-                    {isSignedIn ? (
+                    {sessionStatus === "signed-in" ? (
                       <Trans>Manage trizum cloud</Trans>
-                    ) : (
+                    ) : sessionStatus === "signed-out" ? (
                       <Trans>Sign in to trizum cloud</Trans>
+                    ) : (
+                      <Trans>trizum cloud</Trans>
                     )}
                   </span>
                 </MenuItem>

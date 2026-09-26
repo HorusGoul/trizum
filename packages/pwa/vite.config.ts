@@ -216,7 +216,7 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       exclude: [...configDefaults.exclude, "e2e/**"],
-      include: ["api/**/*.test.ts", "src/**/*.test.ts"],
+      include: ["api/**/*.test.ts", "src/**/*.test.{ts,tsx}"],
       name: "pwa",
     },
     plugins: [

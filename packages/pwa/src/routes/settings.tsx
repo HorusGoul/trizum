@@ -22,6 +22,7 @@ import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
 import { authClient } from "#src/lib/auth-client.ts";
+import { getAuthSessionStatus, type AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 
 export const Route = createFileRoute("/settings")({
@@ -305,10 +306,18 @@ function PremiumSection() {
     return null;
   }
 
-  const isSignedIn = Boolean(session.data?.user);
-  const isLoading = session.isPending || status === "loading";
+  const sessionStatus = getAuthSessionStatus(session);
+  const isSignedIn = sessionStatus === "signed-in";
+  const isLoading = sessionStatus === "pending" || status === "loading";
 
   async function openPremium() {
+    if (sessionStatus === "unavailable") {
+      await session.refetch();
+      return;
+    }
+    if (sessionStatus === "pending") {
+      return;
+    }
     if (!isSignedIn) {
       await navigate({ to: "/settings/cloud-sync" });
       return;
@@ -337,7 +346,7 @@ function PremiumSection() {
           <PremiumStatusDescription
             isLoading={isLoading}
             isPremium={isPremium}
-            isSignedIn={isSignedIn}
+            sessionStatus={sessionStatus}
             status={status}
           />
         </p>
@@ -346,9 +355,14 @@ function PremiumSection() {
         type="button"
         color="input-like"
         isDisabled={isLoading}
-        onPress={() => void openPremium()}
+        onPress={sessionStatus === "unavailable" ? undefined : () => void openPremium()}
+        pressAction={sessionStatus === "unavailable" ? openPremium : undefined}
       >
-        {isSignedIn ? (
+        {sessionStatus === "pending" ? (
+          <Trans>Checking account…</Trans>
+        ) : sessionStatus === "unavailable" ? (
+          <Trans>Retry account check</Trans>
+        ) : isSignedIn ? (
           isPremium ? (
             <Trans>Manage Premium</Trans>
           ) : (
@@ -365,19 +379,23 @@ function PremiumSection() {
 function PremiumStatusDescription({
   isLoading,
   isPremium,
-  isSignedIn,
+  sessionStatus,
   status,
 }: {
   isLoading: boolean;
   isPremium: boolean;
-  isSignedIn: boolean;
+  sessionStatus: AuthSessionStatus;
   status: ReturnType<typeof usePremium>["status"];
 }) {
   if (isLoading) {
     return <Trans>Checking Premium status…</Trans>;
   }
 
-  if (!isSignedIn) {
+  if (sessionStatus === "unavailable") {
+    return <Trans>Your account could not be checked. Connect to the internet and try again.</Trans>;
+  }
+
+  if (sessionStatus === "signed-out") {
     return <Trans>Sign in to purchase or restore Premium across your devices.</Trans>;
   }
 
