@@ -166,8 +166,21 @@ audit includes share-preview load/shutdown errors, Party Boost membership
 shutdown errors and nested failures, request errors, migration errors, and
 cloud-sync settings logs. Avoid recording identifiers at the call site even
 with this protection; the cloud-sync success log deliberately omits its
-party-list document ID. Redaction is separate from JSON console formatting and
-does not cover direct SDK telemetry outside the configured LogTape sinks.
+party-list document ID. Redaction is separate from JSON console formatting.
+
+The browser and sync server also spread `sentryDocumentIdRedaction` from
+`@trizum/logging/sentry` into `Sentry.init()`. Its `beforeSend`, `beforeBreadcrumb`,
+`beforeSendSpan`, and `beforeSendTransaction` hooks apply the same sanitizer to
+direct and automatically captured SDK payloads. Its integration sanitizes log
+envelope payloads immediately before transport, after Sentry renders formatted
+messages and merges scope attributes. Retain
+`...sentryDocumentIdRedaction.integrations` when configuring other integrations.
+This covers error values, request/navigation URLs, tags, contexts, breadcrumbs,
+structured logs,
+span descriptions and attributes, and transaction sampling metadata. Error
+types, frame locations, severity, event IDs, and trace/span IDs remain available.
+These hooks and the integration do not process binary attachments or profiling
+payloads; adding new telemetry channels requires checking their own data boundary.
 
 The shared category convention is:
 

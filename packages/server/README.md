@@ -28,6 +28,7 @@ Run the package tasks and scripts defined in [`vite.config.ts`](./vite.config.ts
 and [`package.json`](./package.json):
 
 - `vp run check`
+- `vp run test`
 - `vp run dev` or `vp run start` when validating runtime behavior
 
 ## Deployment

@@ -45,7 +45,7 @@ function redactString(value: string): string {
   );
 }
 
-function redactValue(value: unknown, ancestors = new Set<object>()): unknown {
+export function redactValue(value: unknown, ancestors = new Set<object>()): unknown {
   if (typeof value === "string") return redactString(value);
   if (typeof value === "bigint" || typeof value === "symbol") return redactString(String(value));
   if (typeof value === "function") return "[Function]";
