@@ -10,6 +10,17 @@ export interface ResolvedPremiumState extends PremiumState {
   userId: string;
 }
 
+export function getPremiumStateAfterRefreshError(
+  previous: ResolvedPremiumState | null,
+  userId: string,
+): ResolvedPremiumState {
+  if (previous?.userId === userId) {
+    return previous;
+  }
+
+  return { hasActiveSubscription: false, status: "error", userId };
+}
+
 export function getCurrentPremiumState({
   hasSessionError,
   isSessionPending,

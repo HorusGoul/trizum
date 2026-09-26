@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vite-plus/test";
-import { getCurrentPremiumState } from "./premiumProviderState.ts";
+import {
+  getCurrentPremiumState,
+  getPremiumStateAfterRefreshError,
+} from "./premiumProviderState.ts";
 
 describe("getCurrentPremiumState", () => {
   it("keeps advertising suppressed when authentication could not be resolved", () => {
@@ -72,5 +75,30 @@ describe("getCurrentPremiumState", () => {
         userId: null,
       }),
     ).toEqual({ hasActiveSubscription: false, status: "free" });
+  });
+});
+
+describe("Premium refresh failures", () => {
+  it.each(["premium", "free"] as const)(
+    "preserves known %s access for the same account",
+    (status) => {
+      const previous = { userId: "account-a", status, hasActiveSubscription: status === "premium" };
+      expect(getPremiumStateAfterRefreshError(previous, "account-a")).toBe(previous);
+    },
+  );
+
+  it("does not reuse a previous account's entitlement or invent one on initial failure", () => {
+    const previous = {
+      userId: "account-a",
+      status: "premium" as const,
+      hasActiveSubscription: true,
+    };
+    for (const state of [previous, null]) {
+      expect(getPremiumStateAfterRefreshError(state, "account-b")).toEqual({
+        userId: "account-b",
+        status: "error",
+        hasActiveSubscription: false,
+      });
+    }
   });
 });
