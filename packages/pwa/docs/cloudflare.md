@@ -71,3 +71,17 @@ GitHub Actions still need these repository or environment secrets:
 Worker Logs and Traces are configured in `wrangler.jsonc`. The Worker also
 routes request, auth, and cloud-sync logs through Logtape so local development
 and Cloudflare logs use the same logging categories.
+
+`api/log.ts` explicitly selects JSON console output. Each event retains its
+console severity and includes `@timestamp`, `level`, `logger`, `message`, and
+`properties`. Error properties include their name, message, stack, and causes;
+request correlation properties are preserved alongside Cloudflare's invocation
+metadata. Browser logging keeps the default developer-console formatter.
+
+To verify a preview deployment, request `/api/health` and inspect its
+`Worker request completed` event in Workers Observability. Confirm that the
+event contains one JSON message, `INFO` severity, the `trizum.pwa.api.worker`
+category, and request method, redacted path, status, and duration properties.
+There should be no formatter-generated `%c`/`%o`, CSS styles, or ANSI escapes.
+Formatting does not itself redact sensitive values; see the
+[logging policy](../../../docs/logging.md).

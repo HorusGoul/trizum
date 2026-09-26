@@ -28,6 +28,9 @@ For repo-wide guidance on what to log and which severity level to use, see
 - It should not auto-configure logging on import.
 - Runtime entry points should call `configureTrizumLogging()`, and shared code
   should use `getTrizumLogger()` elsewhere.
+- Cloudflare Workers select `consoleFormat: "json"` to emit JSON Lines with
+  severity, category, message, and structured properties (including error
+  details). The default retains browser developer-console formatting.
 - Runtime-specific integrations like GitHub Actions annotations should be
   modeled as opt-in sinks configured by the owning surface via separate
   entrypoints.

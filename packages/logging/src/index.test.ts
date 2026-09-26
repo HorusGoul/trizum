@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "vite-plus/test";
+import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import {
   getConfig,
   resetSync,
@@ -24,9 +24,21 @@ function createRecordingSink() {
 
 afterEach(() => {
   resetSync();
+  vi.restoreAllMocks();
 });
 
 describe("@trizum/logging", () => {
+  test("keeps developer-console formatting by default", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    configureTrizumLogging({ surface: "pwa" });
+
+    getTrizumLogger("pwa").warning("Preview {status}", { status: "unavailable" });
+
+    expect(warn).toHaveBeenCalledOnce();
+    expect(warn.mock.calls[0]![0]).toContain("%c");
+    expect(warn.mock.calls[0]).toContain("unavailable");
+  });
+
   test("builds canonical trizum categories and logger hierarchies", () => {
     expect(getTrizumCategory("screenshots", "capture")).toEqual([
       "trizum",
