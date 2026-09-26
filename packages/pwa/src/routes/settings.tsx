@@ -1,3 +1,4 @@
+import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { Capacitor } from "@capacitor/core";
@@ -21,7 +22,7 @@ import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import { useAdvertising } from "#src/lib/advertising/AdvertisingContext.ts";
-import { authClient } from "#src/lib/auth-client.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus, type AuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 
@@ -153,6 +154,7 @@ function SettingsFormFields({
       }}
       className="pb-safe container mt-6 flex flex-col gap-6 px-4 pb-8"
     >
+      <OfflineAccountNotice />
       <form.Field name="avatarId">
         {(field) => (
           <form.Subscribe selector={(state) => state.values.username}>
@@ -297,7 +299,7 @@ function SettingsFormFields({
 }
 
 function PremiumSection() {
-  const session = authClient.useSession();
+  const session = useAppSession();
   const navigate = useNavigate();
   const { isPremium, presentCustomerCenter, presentPaywall, status } = usePremium();
   const { registerProtectedFlow } = useAdvertising();

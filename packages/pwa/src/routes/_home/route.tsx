@@ -19,7 +19,7 @@ import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
 import { EmptyState } from "#src/routes/index/-components/EmptyState.js";
 import { NoActivePartiesCard } from "#src/routes/index/-components/NoActivePartiesCard.js";
 import { ProfileSetupCard } from "#src/routes/index/-components/ProfileSetupCard.js";
-import { authClient } from "#src/lib/auth-client.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 
 export const Route = createFileRoute("/_home")({
@@ -30,7 +30,7 @@ function Home() {
   const { partyList, setPartyArchived, setPartyPinned } = usePartyList();
   const { activePartyIds, activeCount, archivedCount } = usePartySections(partyList);
   const { update, isUpdateAvailable, isUpdating, checkForUpdate } = use(UpdateContext);
-  const session = authClient.useSession();
+  const session = useAppSession();
   const location = useLocation();
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;

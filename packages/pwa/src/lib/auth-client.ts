@@ -1,12 +1,16 @@
 import { Capacitor } from "@capacitor/core";
 import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { useSyncExternalStore } from "react";
+import { createRememberedAuthSession, createRememberedSessionFetch } from "./rememberedAuthSession";
 import { AUTH_PROVIDER_CONFIG } from "./authConfig";
 import { getAuthBaseURL } from "./authBaseUrl";
 import {
   clearNativeAuthToken,
   fetchWithNativeAuth,
   getNativeAuthHeaders,
+  getNativeAuthToken,
+  subscribeNativeAuthTokenClear,
   setNativeAuthToken,
   setNativeAuthTokenFromResponse,
 } from "./nativeAuthSession";
@@ -35,18 +39,36 @@ interface NativeSocialIdToken {
   };
 }
 
+const rememberedSession = createRememberedAuthSession({
+  storage: () => (typeof localStorage === "undefined" ? undefined : localStorage),
+  canRestore: () => !Capacitor.isNativePlatform() || Boolean(getNativeAuthToken()),
+  isOnline: () => typeof navigator === "undefined" || navigator.onLine,
+});
+subscribeNativeAuthTokenClear(rememberedSession.clear);
+
+const fetchAuth = createRememberedSessionFetch({
+  session: rememberedSession,
+  fetch: (...args) => fetch(...args),
+  clearToken: clearNativeAuthToken,
+  captureToken(response, body) {
+    setNativeAuthTokenFromResponse(response);
+    if (!response.headers.has("set-auth-token")) {
+      const token = getAuthResultToken(body);
+      if (token) setNativeAuthToken(token);
+    }
+  },
+});
+
 export const authClient = createAuthClient({
   baseURL: getAuthBaseURL(),
   fetchOptions: {
     credentials: "include",
+    customFetchImpl: fetchAuth,
     onRequest(context) {
       return {
         ...context,
         headers: getNativeAuthHeaders(context.headers),
       };
-    },
-    onResponse(context) {
-      setNativeAuthTokenFromResponse(context.response);
     },
   },
   plugins: [magicLinkClient()],
@@ -60,6 +82,38 @@ export const authClient = createAuthClient({
 type AuthSession = ReturnType<typeof authClient.useSession>;
 
 export type AuthSessionUser = NonNullable<NonNullable<AuthSession["data"]>["user"]>;
+
+/** Keeps the last confirmed account available while network authentication is unavailable. */
+export function useAppSession() {
+  const session = authClient.useSession();
+  const remembered = useSyncExternalStore(
+    rememberedSession.subscribe,
+    rememberedSession.getSnapshot,
+  );
+  const offline = remembered.isOffline;
+  return {
+    ...session,
+    data: remembered.user ? { user: remembered.user } : null,
+    error: remembered.user && offline ? null : remembered.error,
+    isPending: !remembered.user && !remembered.isResolved && !offline && session.isPending,
+    isOffline: offline,
+  };
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("offline", rememberedSession.connectivityChanged);
+  window.addEventListener("storage", (event) => {
+    // Clearing the identity in another tab also invalidates our in-flight session reads.
+    // A new identity may revalidate; a sign-out must not revive an old cookie mid-request.
+    if (rememberedSession.storageChanged(event.key, event.newValue) && navigator.onLine) {
+      void authClient.getSession({ query: { disableCookieCache: true } });
+    }
+  });
+  window.addEventListener("online", () => {
+    rememberedSession.connectivityChanged();
+    void authClient.getSession({ query: { disableCookieCache: true } });
+  });
+}
 
 export { getAuthBaseURL } from "./authBaseUrl";
 
@@ -106,14 +160,10 @@ export async function signInWithSocialAuthAccount(provider: SocialAuthProvider) 
 
     const idToken = await getNativeSocialIdToken(provider);
 
-    const result = await authClient.signIn.social({
+    return authClient.signIn.social({
       idToken,
       provider,
     });
-
-    setNativeAuthToken(getAuthResultToken(result.data));
-
-    return result;
   }
 
   return authClient.signIn.social({
@@ -288,14 +338,12 @@ export async function resetPasswordWithToken({
 }
 
 export async function deleteAuthUserAccount() {
-  const response = await fetchWithNativeAuth(getAuthEndpointURL("/delete-user"), {
+  const response = await fetchAuth(getAuthEndpointURL("/delete-user"), {
     body: JSON.stringify({
       callbackURL: getAuthSettingsCallbackURL(),
     }),
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: getNativeAuthHeaders({ "Content-Type": "application/json" }),
     method: "POST",
   });
 

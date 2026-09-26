@@ -251,7 +251,7 @@ msgstr "About"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 
-#: src/routes/settings.tsx:263
+#: src/routes/settings.tsx:265
 msgid "Accent color"
 msgstr "Accent color"
 
@@ -259,7 +259,7 @@ msgstr "Accent color"
 msgid "Account created"
 msgstr "Account created"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:685
+#: src/routes/_home/settings_.cloud-sync.tsx:688
 msgid "Account deleted"
 msgstr "Account deleted"
 
@@ -515,23 +515,23 @@ msgstr "Australian Dollar"
 msgid "Authentication error"
 msgstr "Authentication error"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:479
-#: src/routes/_home/settings_.cloud-sync.tsx:495
-#: src/routes/_home/settings_.cloud-sync.tsx:519
-#: src/routes/_home/settings_.cloud-sync.tsx:530
+#: src/routes/_home/settings_.cloud-sync.tsx:482
+#: src/routes/_home/settings_.cloud-sync.tsx:498
+#: src/routes/_home/settings_.cloud-sync.tsx:522
+#: src/routes/_home/settings_.cloud-sync.tsx:533
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
 #: src/components/ExpenseEditor.tsx:371
-#: src/routes/settings.tsx:250
+#: src/routes/settings.tsx:252
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
 
-#: src/routes/settings.tsx:252
+#: src/routes/settings.tsx:254
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Automatically open the calculator when focusing amount fields"
 
-#: src/routes/settings.tsx:239
+#: src/routes/settings.tsx:241
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Automatically open the last visited party when you open the app"
 
@@ -767,16 +767,16 @@ msgstr "Check for updates"
 msgid "Check your connection and try again."
 msgstr "Check your connection and try again."
 
-#: src/routes/_home/settings_.cloud-sync.tsx:580
+#: src/routes/_home/settings_.cloud-sync.tsx:583
 msgid "Check your email for the password link"
 msgstr "Check your email for the password link"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:440
+#: src/routes/_home/settings_.cloud-sync.tsx:443
 msgid "Check your email for the sign-in link"
 msgstr "Check your email for the sign-in link"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:742
-#: src/routes/settings.tsx:362
+#: src/routes/_home/settings_.cloud-sync.tsx:745
+#: src/routes/settings.tsx:364
 msgid "Checking account…"
 msgstr "Checking account…"
 
@@ -788,7 +788,7 @@ msgstr "Checking for updates..."
 msgid "Checking Party Boost…"
 msgstr "Checking Party Boost…"
 
-#: src/routes/settings.tsx:391
+#: src/routes/settings.tsx:393
 msgid "Checking Premium status…"
 msgstr "Checking Premium status…"
 
@@ -812,7 +812,7 @@ msgstr "Chinese Yuan"
 msgid "Choose a destination party"
 msgstr "Choose a destination party"
 
-#: src/routes/settings.tsx:410
+#: src/routes/settings.tsx:412
 msgid "Choose monthly, annual, or lifetime access."
 msgstr "Choose monthly, annual, or lifetime access."
 
@@ -1010,11 +1010,11 @@ msgstr "Costa Rican Colón"
 msgid "Could not apply cloud settings"
 msgstr "Could not apply cloud settings"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:556
+#: src/routes/_home/settings_.cloud-sync.tsx:559
 msgid "Could not connect sign-in method"
 msgstr "Could not connect sign-in method"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:694
+#: src/routes/_home/settings_.cloud-sync.tsx:697
 msgid "Could not delete account"
 msgstr "Could not delete account"
 
@@ -1026,13 +1026,13 @@ msgstr "Could not load cloud settings"
 msgid "Could not load sign-in methods"
 msgstr "Could not load sign-in methods"
 
-#: src/hooks/useCloudSyncAccountState.ts:240
-#: src/hooks/useCloudSyncAccountState.ts:301
+#: src/hooks/useCloudSyncAccountState.ts:242
+#: src/hooks/useCloudSyncAccountState.ts:308
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:226
-#: src/routes/settings.tsx:334
+#: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
 
@@ -1044,15 +1044,15 @@ msgstr "Could not reset password"
 msgid "Could not save cloud settings"
 msgstr "Could not save cloud settings"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:585
+#: src/routes/_home/settings_.cloud-sync.tsx:588
 msgid "Could not send password email"
 msgstr "Could not send password email"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:445
+#: src/routes/_home/settings_.cloud-sync.tsx:448
 msgid "Could not send sign-in link"
 msgstr "Could not send sign-in link"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:616
+#: src/routes/_home/settings_.cloud-sync.tsx:619
 msgid "Could not sign out"
 msgstr "Could not sign out"
 
@@ -1343,7 +1343,7 @@ msgstr "Emoji list"
 msgid "End date"
 msgstr "End date"
 
-#: src/routes/settings.tsx:50
+#: src/routes/settings.tsx:51
 msgid "English"
 msgstr "English"
 
@@ -1363,7 +1363,7 @@ msgstr "Enter the link or code of the trizum party you want to join"
 msgid "Eritrean Nakfa"
 msgstr "Eritrean Nakfa"
 
-#: src/routes/settings.tsx:51
+#: src/routes/settings.tsx:52
 msgid "Español"
 msgstr "Español"
 
@@ -1549,7 +1549,7 @@ msgstr "Filter totals and rankings"
 msgid "Finishing sign in"
 msgstr "Finishing sign in"
 
-#: src/routes/settings.tsx:201
+#: src/routes/settings.tsx:203
 msgid "For payments through Bizum or similar services"
 msgstr "For payments through Bizum or similar services"
 
@@ -1909,7 +1909,7 @@ msgstr "Kuwaiti Dinar"
 msgid "Kyrgystani Som"
 msgstr "Kyrgystani Som"
 
-#: src/routes/settings.tsx:216
+#: src/routes/settings.tsx:218
 msgid "Language"
 msgstr "Language"
 
@@ -2033,7 +2033,7 @@ msgstr "Manage"
 msgid "Manage expense templates"
 msgstr "Manage expense templates"
 
-#: src/routes/settings.tsx:367
+#: src/routes/settings.tsx:369
 msgid "Manage Premium"
 msgstr "Manage Premium"
 
@@ -2423,7 +2423,7 @@ msgstr "Open calculator when focusing amount fields"
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
 
-#: src/routes/settings.tsx:237
+#: src/routes/settings.tsx:239
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
@@ -2640,7 +2640,7 @@ msgstr "Party unpinned"
 msgid "Password"
 msgstr "Password"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:583
+#: src/routes/_home/settings_.cloud-sync.tsx:586
 msgid "Password email sent"
 msgstr "Password email sent"
 
@@ -2717,7 +2717,7 @@ msgstr "Peruvian Sol"
 msgid "Philippine Peso"
 msgstr "Philippine Peso"
 
-#: src/routes/settings.tsx:200
+#: src/routes/settings.tsx:202
 msgid "Phone number"
 msgstr "Phone number"
 
@@ -2791,7 +2791,7 @@ msgstr "Polish Zloty"
 
 #: src/components/PremiumPaywall.tsx:181
 #: src/routes/party_.$partyId.settings/index.tsx:66
-#: src/routes/settings.tsx:343
+#: src/routes/settings.tsx:345
 msgid "Premium"
 msgstr "Premium"
 
@@ -2804,7 +2804,7 @@ msgstr "Premium belongs to the purchasing person and may not be transferred, res
 msgid "Premium could not be purchased. Please try again."
 msgstr "Premium could not be purchased. Please try again."
 
-#: src/routes/settings.tsx:403
+#: src/routes/settings.tsx:405
 msgid "Premium is active on this account."
 msgstr "Premium is active on this account."
 
@@ -2836,7 +2836,7 @@ msgstr "Premium plan"
 msgid "Premium purchases restored."
 msgstr "Premium purchases restored."
 
-#: src/routes/settings.tsx:407
+#: src/routes/settings.tsx:409
 msgid "Premium status could not be checked. Try again."
 msgstr "Premium status could not be checked. Try again."
 
@@ -2848,11 +2848,11 @@ msgstr "Premium, made for sharing."
 msgid "Previous"
 msgstr "Previous"
 
-#: src/routes/settings.tsx:288
+#: src/routes/settings.tsx:290
 msgid "Privacy"
 msgstr "Privacy"
 
-#: src/routes/settings.tsx:291
+#: src/routes/settings.tsx:293
 msgid "Privacy and cookie settings"
 msgstr "Privacy and cookie settings"
 
@@ -2963,8 +2963,8 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:756
-#: src/routes/settings.tsx:364
+#: src/routes/_home/settings_.cloud-sync.tsx:759
+#: src/routes/settings.tsx:366
 msgid "Retry account check"
 msgstr "Retry account check"
 
@@ -3024,7 +3024,7 @@ msgstr "Saudi Riyal"
 #: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:104
+#: src/routes/settings.tsx:105
 msgid "Save"
 msgstr "Save"
 
@@ -3099,11 +3099,11 @@ msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/_home/route.tsx:82
 #: src/routes/party.$partyId/route.tsx:259
-#: src/routes/settings.tsx:127
+#: src/routes/settings.tsx:128
 msgid "Settings"
 msgstr "Settings"
 
-#: src/routes/settings.tsx:71
+#: src/routes/settings.tsx:72
 msgid "Settings saved"
 msgstr "Settings saved"
 
@@ -3171,7 +3171,7 @@ msgstr "Sierra Leonean Leone"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:1022
+#: src/routes/_home/settings_.cloud-sync.tsx:1029
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
@@ -3179,11 +3179,11 @@ msgstr "Sign in again before deleting your account"
 msgid "Sign in to activate Premium benefits for this party."
 msgstr "Sign in to activate Premium benefits for this party."
 
-#: src/routes/settings.tsx:372
+#: src/routes/settings.tsx:374
 msgid "Sign in to get Premium"
 msgstr "Sign in to get Premium"
 
-#: src/routes/settings.tsx:399
+#: src/routes/settings.tsx:401
 msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Sign in to purchase or restore Premium across your devices."
 
@@ -3219,15 +3219,15 @@ msgstr "Sign-in link expired"
 msgid "Sign-in link is invalid or expired"
 msgstr "Sign-in link is invalid or expired"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:443
+#: src/routes/_home/settings_.cloud-sync.tsx:446
 msgid "Sign-in link sent"
 msgstr "Sign-in link sent"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:553
+#: src/routes/_home/settings_.cloud-sync.tsx:556
 msgid "Sign-in method connected"
 msgstr "Sign-in method connected"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:492
+#: src/routes/_home/settings_.cloud-sync.tsx:495
 msgid "Sign-in method is not configured"
 msgstr "Sign-in method is not configured"
 
@@ -3237,11 +3237,11 @@ msgstr "Sign-in methods"
 
 #: src/components/CloudSyncAccountSettings.tsx:70
 #: src/components/CloudSyncDialogs.tsx:375
-#: src/routes/_home/settings_.cloud-sync.tsx:404
+#: src/routes/_home/settings_.cloud-sync.tsx:407
 msgid "Signed in"
 msgstr "Signed in"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:613
+#: src/routes/_home/settings_.cloud-sync.tsx:616
 msgid "Signed out"
 msgstr "Signed out"
 
@@ -3386,7 +3386,7 @@ msgstr "Submit a Request"
 #: src/routes/party_.$partyId.settings/participants.tsx:90
 #: src/routes/party_.$partyId.who.tsx:109
 #: src/routes/reset-password.tsx:79
-#: src/routes/settings.tsx:104
+#: src/routes/settings.tsx:105
 msgid "Submitting..."
 msgstr "Submitting..."
 
@@ -3461,7 +3461,7 @@ msgstr "Syncing party information..."
 msgid "Syrian Pound"
 msgstr "Syrian Pound"
 
-#: src/routes/settings.tsx:49
+#: src/routes/settings.tsx:50
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "System (fallbacks to {DEFAULT_LOCALE})"
 
@@ -3629,7 +3629,7 @@ msgstr "This debt is no longer available"
 msgid "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 msgstr "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 
-#: src/hooks/useCloudSyncAccountState.ts:294
+#: src/hooks/useCloudSyncAccountState.ts:301
 msgid "This device is already using trizum cloud"
 msgstr "This device is already using trizum cloud"
 
@@ -3778,26 +3778,26 @@ msgid "Trinidad and Tobago Dollar"
 msgstr "Trinidad and Tobago Dollar"
 
 #: src/routes/_home/route.tsx:102
-#: src/routes/_home/settings_.cloud-sync.tsx:736
-#: src/routes/_home/settings_.cloud-sync.tsx:897
+#: src/routes/_home/settings_.cloud-sync.tsx:739
+#: src/routes/_home/settings_.cloud-sync.tsx:900
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/hooks/useCloudSyncAccountState.ts:214
-#: src/hooks/useCloudSyncAccountState.ts:289
+#: src/hooks/useCloudSyncAccountState.ts:216
+#: src/hooks/useCloudSyncAccountState.ts:296
 msgid "trizum cloud data is invalid"
 msgstr "trizum cloud data is invalid"
 
-#: src/hooks/useCloudSyncAccountState.ts:234
-#: src/hooks/useCloudSyncAccountState.ts:318
+#: src/hooks/useCloudSyncAccountState.ts:236
+#: src/hooks/useCloudSyncAccountState.ts:325
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud enabled on this device"
 
-#: src/hooks/useCloudSyncAccountState.ts:284
+#: src/hooks/useCloudSyncAccountState.ts:291
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud is not set up yet"
 
-#: src/hooks/useCloudSyncAccountState.ts:175
+#: src/hooks/useCloudSyncAccountState.ts:177
 msgid "trizum cloud started"
 msgstr "trizum cloud started"
 
@@ -3996,7 +3996,7 @@ msgstr "Use your camera to scan a trizum invite"
 msgid "Used to prefill new expenses. Blank expense keeps the current empty form."
 msgstr "Used to prefill new expenses. Blank expense keeps the current empty form."
 
-#: src/routes/settings.tsx:178
+#: src/routes/settings.tsx:180
 msgid "Username"
 msgstr "Username"
 
@@ -4046,7 +4046,7 @@ msgid "View photo"
 msgstr "View photo"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:454
-#: src/routes/settings.tsx:369
+#: src/routes/settings.tsx:371
 msgid "View Premium options"
 msgstr "View Premium options"
 
@@ -4111,7 +4111,7 @@ msgstr "Welcome to trizum"
 msgid "What is this party about?"
 msgstr "What is this party about?"
 
-#: src/routes/settings.tsx:179
+#: src/routes/settings.tsx:181
 msgid "What's your preferred way to be addressed?"
 msgstr "What's your preferred way to be addressed?"
 
@@ -4154,6 +4154,10 @@ msgstr "WIR Euro"
 #: src/routes/new/route.tsx:218
 msgid "WIR Franc"
 msgstr "WIR Franc"
+
+#: src/components/OfflineAccountNotice.tsx:13
+msgid "Working offline. Your account will refresh when you reconnect."
+msgstr "Working offline. Your account will refresh when you reconnect."
 
 #: src/routes/about/route.tsx:65
 msgid "Works seamlessly offline with automatic sync when online"
@@ -4248,8 +4252,8 @@ msgstr "You're now seeing the party as {0}"
 msgid "You're now seeing the party as {participantName}"
 msgstr "You're now seeing the party as {participantName}"
 
-#: src/routes/_home/settings_.cloud-sync.tsx:744
-#: src/routes/settings.tsx:395
+#: src/routes/_home/settings_.cloud-sync.tsx:747
+#: src/routes/settings.tsx:397
 msgid "Your account could not be checked. Connect to the internet and try again."
 msgstr "Your account could not be checked. Connect to the internet and try again."
 

@@ -42,7 +42,7 @@ describe("getCurrentPremiumState", () => {
     },
   );
 
-  it("only recovers a resolved entitlement for the verified account after reconnect", () => {
+  it("uses the SDK entitlement for the remembered account and never for a different account", () => {
     const resolvedState = {
       hasActiveSubscription: true,
       status: "premium" as const,

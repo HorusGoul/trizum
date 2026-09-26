@@ -1,3 +1,4 @@
+import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
@@ -23,6 +24,7 @@ import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
 import { clearNativeAuthToken } from "#src/lib/nativeAuthSession.ts";
 import {
   authClient,
+  useAppSession,
   deleteAuthUserAccount,
   fetchLinkedAuthAccounts,
   getAuthRedirectUrl,
@@ -240,7 +242,7 @@ function useCloudSyncSettingsView() {
   const currentLocation = useLocation();
   const navigate = useNavigate({ from: Route.fullPath });
   const { auth, error: authCallbackError } = Route.useSearch();
-  const session = authClient.useSession();
+  const session = useAppSession();
   const sessionUser = session.data?.user;
   const [routeState, dispatchRouteState] = useReducer(
     cloudSyncRouteReducer,
@@ -292,6 +294,7 @@ function useCloudSyncSettingsView() {
     saveLinkedAccounts,
     setIsCloudSyncSwitchOpen,
   } = useCloudSyncAccountState({
+    isOffline: session.isOffline,
     isSignInSuccessVisibleRef,
     onCloudDataActivated,
     partyList,
@@ -463,7 +466,7 @@ function useCloudSyncSettingsView() {
         authPasswordError: null,
         magicLinkMessage: null,
         passwordResetMessage: null,
-        isSignInSuccessVisible: false,
+        isSignInSuccessVisible: true,
         authPendingAction: "password",
       },
     });
@@ -507,7 +510,7 @@ function useCloudSyncSettingsView() {
         authEmailError: null,
         authPasswordError: null,
         magicLinkMessage: null,
-        isSignInSuccessVisible: false,
+        isSignInSuccessVisible: true,
         authPendingAction: provider,
       },
     });
@@ -896,6 +899,10 @@ function useCloudSyncSettingsView() {
         <h1 className="max-h-12 truncate px-4 text-xl font-medium">
           <Trans>trizum cloud</Trans>
         </h1>
+      </div>
+
+      <div className="container px-4">
+        <OfflineAccountNotice />
       </div>
 
       <CloudSyncAccountSettings

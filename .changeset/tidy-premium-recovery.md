@@ -3,4 +3,4 @@
 "@trizum/mobile": patch
 ---
 
-Allow restoring Premium purchases when store products cannot load. Show account verification and retry guidance when a session cannot be checked, instead of asking signed-in users to sign in again during offline startup.
+Allow restoring Premium purchases when store products cannot load. Preserve the remembered account and store-cached Premium access during offline startup, with a notice in settings. Refresh account status when connectivity returns.

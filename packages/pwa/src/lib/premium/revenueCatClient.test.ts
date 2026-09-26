@@ -52,4 +52,21 @@ describe("RevenueCat identity", () => {
 
     expect(revenueCat.logOut).toHaveBeenCalledOnce();
   });
+
+  it("reads SDK-cached access for a remembered account without logging in or out", async () => {
+    const cachedInfo = { id: "cached-premium" };
+    revenueCat.getCustomerInfo.mockResolvedValue({ customerInfo: cachedInfo });
+    revenueCat.logIn.mockRejectedValue(new Error("offline"));
+    revenueCat.logOut.mockRejectedValue(new Error("offline"));
+    const { synchronizeRevenueCatUser } = await import("./revenueCatClient.ts");
+
+    expect(await synchronizeRevenueCatUser("remembered-user")).toEqual(cachedInfo);
+    expect(await synchronizeRevenueCatUser("remembered-user")).toEqual(cachedInfo);
+    expect(revenueCat.configure).toHaveBeenCalledOnce();
+    expect(revenueCat.configure).toHaveBeenCalledWith(
+      expect.objectContaining({ appUserID: "remembered-user" }),
+    );
+    expect(revenueCat.logIn).not.toHaveBeenCalled();
+    expect(revenueCat.logOut).not.toHaveBeenCalled();
+  });
 });
