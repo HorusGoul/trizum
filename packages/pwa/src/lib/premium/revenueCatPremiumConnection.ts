@@ -1,4 +1,8 @@
 import type { CustomerInfo, PurchasesCallbackId } from "@revenuecat/purchases-capacitor";
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
+
+const REFRESH_INTERVAL_MS = 60_000;
 
 interface RevenueCatPremiumConnectionOptions {
   addListener: (listener: (customerInfo: CustomerInfo) => void) => Promise<PurchasesCallbackId>;
@@ -23,6 +27,7 @@ export function connectRevenueCatPremium({
   let connectionAttempt: Promise<void> | undefined;
   let listenerId: PurchasesCallbackId | undefined;
   let listenerRegistration: Promise<void> | undefined;
+  let appActive = true;
 
   function update(customerInfo: CustomerInfo) {
     if (active) {
@@ -80,11 +85,34 @@ export function connectRevenueCatPremium({
     });
   }
 
+  function refreshWhileActive() {
+    if (appActive && document.visibilityState === "visible" && navigator.onLine) {
+      reconnect();
+    }
+  }
+
+  // CustomerInfo listeners do not receive server pushes. Ask the SDK regularly;
+  // its cache controls network frequency and remains usable during offline startup.
+  const refreshTimer = setInterval(refreshWhileActive, REFRESH_INTERVAL_MS);
+  window.addEventListener("online", refreshWhileActive);
+  document.addEventListener("visibilitychange", refreshWhileActive);
+  const appStateListener = Capacitor.isNativePlatform()
+    ? App.addListener("appStateChange", ({ isActive }) => {
+        appActive = isActive;
+        refreshWhileActive();
+      })
+    : undefined;
+  void appStateListener?.catch(onListenerError);
+
   reconnect();
 
   return {
     disconnect() {
       active = false;
+      clearInterval(refreshTimer);
+      window.removeEventListener("online", refreshWhileActive);
+      document.removeEventListener("visibilitychange", refreshWhileActive);
+      void appStateListener?.then((handle) => handle.remove()).catch(onListenerError);
       if (listenerId) {
         void removeListener(listenerId).catch(onListenerError);
         listenerId = undefined;

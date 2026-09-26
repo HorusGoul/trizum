@@ -16,7 +16,11 @@ import {
 } from "#src/lib/premium/revenueCatClient.ts";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { PremiumPaywall } from "./PremiumPaywall.tsx";
-import { getCurrentPremiumState, type ResolvedPremiumState } from "./premiumProviderState.ts";
+import {
+  getCurrentPremiumState,
+  getPremiumStateAfterRefreshError,
+  type ResolvedPremiumState,
+} from "./premiumProviderState.ts";
 
 interface PaywallRequest {
   promise: Promise<void>;
@@ -72,21 +76,16 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       },
       onRefreshError(error) {
         logger.error("Failed to resolve Premium status", { error });
-        setResolvedState({
-          hasActiveSubscription: false,
-          status: "error",
-          userId: identifiedUserId,
-        });
+        setResolvedState((previous) =>
+          getPremiumStateAfterRefreshError(previous, identifiedUserId),
+        );
       },
       prepare: () => prepareRevenueCatUser(identifiedUserId),
       refresh: refreshRevenueCatCustomerInfo,
       removeListener: removeRevenueCatCustomerInfoListener,
     });
 
-    window.addEventListener("online", connection.reconnect);
-
     return () => {
-      window.removeEventListener("online", connection.reconnect);
       connection.disconnect();
     };
   }, [hasSessionError, platform, session.isPending, userId]);
