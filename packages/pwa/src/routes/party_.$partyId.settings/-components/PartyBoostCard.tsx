@@ -3,7 +3,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { authClient } from "#src/lib/auth-client.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
 import type { PartyBoostStatus } from "#src/lib/api/premiumContract.ts";
 import {
   getPartyBoostActionState,
@@ -43,7 +43,7 @@ const transferDateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "m
 export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string }) {
   const { t } = useLingui();
   const navigate = useNavigate();
-  const session = authClient.useSession();
+  const session = useAppSession();
   const userId = session.data?.user.id ?? null;
   const requestContext = JSON.stringify([userId, partyDocumentId]);
   const { isPremium: isDevicePremium, presentPaywall } = usePremium();

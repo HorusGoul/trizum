@@ -7,6 +7,7 @@ import {
   getNativeAuthToken,
   setNativeAuthToken,
   setNativeAuthTokenFromResponse,
+  subscribeNativeAuthTokenClear,
 } from "./nativeAuthSession.ts";
 
 describe("native auth session", () => {
@@ -82,5 +83,50 @@ describe("native auth session", () => {
     await fetchWithNativeAuth("https://trizum.app/api/cloud-sync/settings");
 
     expect(getNativeAuthToken()).toBe("new-session-token");
+  });
+
+  test("notifies remembered identity when a native token is explicitly cleared", () => {
+    const listener = vi.fn<() => void>();
+    const unsubscribe = subscribeNativeAuthTokenClear(listener);
+    setNativeAuthToken("session-token");
+    expect(listener).not.toHaveBeenCalled();
+    clearNativeAuthToken();
+    expect(listener).toHaveBeenCalledOnce();
+    unsubscribe();
+  });
+
+  test("ignores a token from an in-flight response after sign-out", async () => {
+    let complete!: (response: Response) => void;
+    const response = new Promise<Response>((resolve) => {
+      complete = resolve;
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() => response),
+    );
+    setNativeAuthToken("old-token");
+    const request = fetchWithNativeAuth("https://trizum.app/api/cloud-sync/settings");
+    clearNativeAuthToken();
+    complete(new Response(null, { headers: { "set-auth-token": "old-token" } }));
+    await request;
+    expect(getNativeAuthToken()).toBeUndefined();
+  });
+
+  test("ignores an older response after switching native accounts", async () => {
+    let complete!: (response: Response) => void;
+    const response = new Promise<Response>((resolve) => {
+      complete = resolve;
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() => response),
+    );
+    setNativeAuthToken("alice-token");
+    const request = fetchWithNativeAuth("https://trizum.app/api/cloud-sync/settings");
+    clearNativeAuthToken();
+    setNativeAuthToken("bob-token");
+    complete(new Response(null, { headers: { "set-auth-token": "alice-token" } }));
+    await request;
+    expect(getNativeAuthToken()).toBe("bob-token");
   });
 });

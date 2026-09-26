@@ -34,6 +34,8 @@ test.describe("Browser harness", () => {
   test("opens cloud sign-in from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
 
+    await page.route("**/api/auth/get-session**", (route) => route.fulfill({ json: null }));
+
     await page.setViewportSize({ width: 390, height: 700 });
     await harness.gotoHome();
     const homeHeading = page.getByRole("heading", { name: "Split expenses, stay even." });

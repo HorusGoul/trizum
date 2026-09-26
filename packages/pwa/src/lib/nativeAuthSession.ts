@@ -2,6 +2,13 @@ import { Capacitor } from "@capacitor/core";
 
 const NATIVE_AUTH_TOKEN_STORAGE_KEY = "trizumNativeAuthToken";
 const AUTH_TOKEN_RESPONSE_HEADER = "set-auth-token";
+const tokenClearListeners = new Set<() => void>();
+let tokenRevision = 0;
+
+export function subscribeNativeAuthTokenClear(listener: () => void) {
+  tokenClearListeners.add(listener);
+  return () => tokenClearListeners.delete(listener);
+}
 
 export function getNativeAuthToken() {
   if (!Capacitor.isNativePlatform()) {
@@ -18,6 +25,11 @@ export function getNativeAuthToken() {
 export function setNativeAuthToken(token: string | undefined) {
   if (!Capacitor.isNativePlatform()) {
     return;
+  }
+
+  tokenRevision += 1;
+  if (!token) {
+    for (const listener of tokenClearListeners) listener();
   }
 
   try {
@@ -56,13 +68,16 @@ export function setNativeAuthTokenFromResponse(response: Response) {
 }
 
 export async function fetchWithNativeAuth(input: RequestInfo | URL, init?: RequestInit) {
+  const requestRevision = tokenRevision;
   const response = await fetch(input, {
     ...init,
     credentials: init?.credentials ?? "include",
     headers: getNativeAuthHeaders(init?.headers),
   });
 
-  setNativeAuthTokenFromResponse(response);
+  if (requestRevision === tokenRevision) {
+    setNativeAuthTokenFromResponse(response);
+  }
 
   return response;
 }

@@ -105,11 +105,13 @@ function cloudSyncAccountStateReducer(
 }
 
 export function useCloudSyncAccountState({
+  isOffline,
   isSignInSuccessVisibleRef,
   onCloudDataActivated,
   partyList,
   userId,
 }: {
+  isOffline: boolean;
   isSignInSuccessVisibleRef: RefObject<boolean>;
   onCloudDataActivated: (shouldDelay: boolean) => void;
   partyList: PartyList;
@@ -249,6 +251,11 @@ export function useCloudSyncAccountState({
       cloudSettings: cachedAccountState?.cloudSettings ?? null,
     });
 
+    if (isOffline) {
+      dispatch({ type: "accountDataResolved" });
+      return;
+    }
+
     void loadAccountState({
       showErrorToast: !cachedAccountState,
       showStartToast: true,
@@ -262,7 +269,7 @@ export function useCloudSyncAccountState({
       isCancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [isSignInSuccessVisibleRef, repo, userId]);
+  }, [isOffline, isSignInSuccessVisibleRef, repo, userId]);
 
   function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
     dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });

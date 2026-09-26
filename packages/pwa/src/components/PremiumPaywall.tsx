@@ -81,7 +81,7 @@ export function PremiumPaywall({
       : undefined;
 
   async function purchase() {
-    if (!selectedPlan || currentLoadState.status !== "ready") {
+    if (!userId || activeAction !== null || !selectedPlan || currentLoadState.status !== "ready") {
       return;
     }
 
@@ -104,6 +104,10 @@ export function PremiumPaywall({
   }
 
   async function restore() {
+    if (!userId || activeAction !== null) {
+      return;
+    }
+
     setActiveAction("restore");
     try {
       const entitlement = await restorePremiumPurchases(userId);
@@ -211,6 +215,7 @@ export function PremiumPaywall({
                       <Button
                         className="max-w-40 font-semibold"
                         color="input-like"
+                        isDisabled={activeAction !== null}
                         onPress={retryLoading}
                       >
                         <Trans>Try again</Trans>
@@ -237,7 +242,7 @@ export function PremiumPaywall({
                     <Button
                       className="h-12 text-base font-bold"
                       color="accent"
-                      isDisabled={!selectedPlan || activeAction !== null}
+                      isDisabled={!userId || !selectedPlan || activeAction !== null}
                       isPending={activeAction === "purchase"}
                       pressAction={purchase}
                       type="button"
@@ -251,7 +256,7 @@ export function PremiumPaywall({
 
                     <Button
                       className="text-accent-600 dark:text-accent-300 mx-auto h-9 w-auto px-4 text-sm font-semibold"
-                      isDisabled={activeAction !== null || loadState.status !== "ready"}
+                      isDisabled={!userId || activeAction !== null}
                       isPending={activeAction === "restore"}
                       pressAction={restore}
                       type="button"

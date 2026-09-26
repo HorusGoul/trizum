@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { authClient } from "#src/lib/auth-client.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
 import { AdEntitlementContext } from "#src/lib/advertising/AdEntitlementContext.tsx";
 import { getLogger } from "#src/lib/log.ts";
 import type { PremiumEntitlementState } from "#src/lib/premium/premiumCommerce.ts";
@@ -26,7 +26,7 @@ interface PaywallRequest {
 const logger = getLogger("components", "PremiumProvider");
 
 export function PremiumProvider({ children }: { children: React.ReactNode }) {
-  const session = authClient.useSession();
+  const session = useAppSession();
   const userId = session.data?.user.id ?? null;
   const hasSessionError = Boolean(session.error);
   const platform = getRevenueCatPlatform();
