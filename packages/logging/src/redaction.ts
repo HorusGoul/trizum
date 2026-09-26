@@ -4,6 +4,36 @@ import type { LogRecord, Sink } from "@logtape/logtape";
 const REDACTED_DOCUMENT_ID = "[REDACTED_DOCUMENT_ID]";
 const DOCUMENT_ID_FIELD =
   /^(?:documentId|partyId|partyDocumentId|partyListDocumentId|automergeUrl)$/i;
+const nativeErrorStackDescriptor = Object.getOwnPropertyDescriptor(new Error(), "stack");
+
+function getPropertyDescriptor(value: object, key: string): PropertyDescriptor | undefined {
+  for (let current: object | null = value; current; current = Object.getPrototypeOf(current)) {
+    const descriptor = Object.getOwnPropertyDescriptor(current, key);
+    if (descriptor) return descriptor;
+  }
+}
+
+function readErrorField(error: Error, key: string, descriptor: PropertyDescriptor): unknown {
+  if ("value" in descriptor) return descriptor.value;
+  // V8 exposes ordinary stacks through a native lazy getter. It formats name
+  // and message, so only use it when neither field can execute user code.
+  if (
+    key === "stack" &&
+    nativeErrorStackDescriptor?.get &&
+    descriptor.get === nativeErrorStackDescriptor.get &&
+    ["name", "message"].every((field) => {
+      const property = getPropertyDescriptor(error, field);
+      return property && "value" in property && typeof property.value === "string";
+    })
+  ) {
+    try {
+      return nativeErrorStackDescriptor.get.call(error);
+    } catch {
+      return "[Unavailable]";
+    }
+  }
+  return "[Accessor]";
+}
 
 function redactString(value: string): string {
   // Automerge document IDs are Base58Check-encoded 16-byte UUIDs. Checking the
@@ -25,7 +55,18 @@ function redactValue(value: unknown, ancestors = new Set<object>()): unknown {
 
   ancestors.add(value);
   try {
-    if (Array.isArray(value)) return value.map((item) => redactValue(item, ancestors));
+    if (Array.isArray(value)) {
+      const result: unknown[] = [];
+      for (let index = 0; index < value.length; index++) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+        result.push(
+          descriptor && !("value" in descriptor)
+            ? "[Accessor]"
+            : redactValue(descriptor?.value, ancestors),
+        );
+      }
+      return result;
+    }
     if (value instanceof Date) {
       return Number.isFinite(Date.prototype.getTime.call(value))
         ? Date.prototype.toISOString.call(value)
@@ -36,17 +77,17 @@ function redactValue(value: unknown, ancestors = new Set<object>()): unknown {
 
     // Keep Error instances useful to error-monitoring sinks, without retaining
     // custom prototypes or mutating the exception used by application code.
-    const result: Record<string, unknown> | Error =
-      value instanceof Error ? new Error(redactString(value.message)) : {};
+    const result: Record<string, unknown> | Error = value instanceof Error ? new Error() : {};
     if (value instanceof Error && result instanceof Error) {
-      result.name = redactString(value.name);
-      result.stack = value.stack === undefined ? undefined : redactString(value.stack);
-      if ("cause" in value) result.cause = redactValue(value.cause, ancestors);
-      if (value instanceof AggregateError) {
-        Object.defineProperty(result, "errors", {
+      delete result.stack;
+      for (const key of ["name", "message", "stack", "cause", "errors"]) {
+        const descriptor = getPropertyDescriptor(value, key);
+        if (!descriptor) continue;
+        Object.defineProperty(result, key, {
           configurable: true,
-          enumerable: true,
-          value: redactValue(value.errors, ancestors),
+          enumerable: key === "errors",
+          writable: true,
+          value: redactValue(readErrorField(value, key, descriptor), ancestors),
         });
       }
     }

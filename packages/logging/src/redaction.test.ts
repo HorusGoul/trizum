@@ -14,6 +14,104 @@ afterEach(() => {
 });
 
 describe("document ID redaction at every sink", () => {
+  test("does not retain an array subclass's inherited serializer", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const serializer = vi.fn<() => unknown>(() => ({ documentId }));
+    class Values extends Array<unknown> {
+      toJSON() {
+        return serializer();
+      }
+    }
+    const values = new Values(documentId);
+    values.push(values);
+    configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
+
+    getTrizumLogger("pwa").warning("Lookup failed", { values });
+
+    expect(serializer).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    const output = warn.mock.calls[0]![0] as string;
+    expect(output).not.toContain(documentId);
+    expect(JSON.parse(output)).toMatchObject({
+      properties: { values: [redactedId, "[Circular]"] },
+    });
+  });
+
+  test("copies array subclasses without invoking methods, species, or element getters", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const serializer = vi.fn<() => unknown>(() => ({ documentId }));
+    const species = vi.fn<() => ArrayConstructor>(() => Array);
+    const map = vi.fn<() => unknown[]>(() => [documentId]);
+    const getter = vi.fn<() => never>(() => {
+      throw new Error("getter invoked");
+    });
+    class Values extends Array<unknown> {
+      toJSON = serializer;
+      static get [Symbol.species]() {
+        return species();
+      }
+    }
+    const values = new Values(documentId);
+    Object.defineProperty(values, "map", { value: map });
+    Object.defineProperty(values, "1", { get: getter });
+    values.push(values);
+    configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
+
+    getTrizumLogger("pwa").warning("Lookup failed", { values });
+
+    expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    const output = warn.mock.calls[0]![0] as string;
+    expect(output).not.toContain(documentId);
+    expect(JSON.parse(output)).toMatchObject({
+      properties: { values: [redactedId, "[Accessor]", "[Circular]"] },
+    });
+    expect(serializer).not.toHaveBeenCalled();
+    expect(species).not.toHaveBeenCalled();
+    expect(map).not.toHaveBeenCalled();
+    expect(getter).not.toHaveBeenCalled();
+  });
+
+  test.each(["message", "name", "stack", "cause", "errors"])(
+    "does not invoke custom Error.%s accessors or drop the warning",
+    (field) => {
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      const getter = vi.fn<() => never>(() => {
+        throw new Error("getter invoked");
+      });
+      const error = new AggregateError([], "Lookup failed");
+      Object.defineProperty(error, field, { configurable: true, get: getter });
+      configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
+
+      getTrizumLogger("pwa").warning("Lookup failed", { error, requestId: "request-123" });
+
+      expect(getter).not.toHaveBeenCalled();
+      expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+      expect(JSON.parse(warn.mock.calls[0]![0] as string)).toMatchObject({
+        message: "Lookup failed",
+        properties: { error: { [field]: "[Accessor]" }, requestId: "request-123" },
+      });
+    },
+  );
+
+  test("retains an ordinary native error stack", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const error = new TypeError(`Document ${documentId} is unavailable`);
+    configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
+
+    getTrizumLogger("pwa").warning("Lookup failed", { error });
+
+    expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    expect(JSON.parse(warn.mock.calls[0]![0] as string)).toMatchObject({
+      properties: {
+        error: {
+          name: "TypeError",
+          message: `Document ${redactedId} is unavailable`,
+          stack: expect.stringContaining("redaction.test.ts:"),
+        },
+      },
+    });
+  });
+
   test("sanitizes messages, templates, categories, properties, and nested errors", () => {
     const records: LogRecord[] = [];
     configureTrizumLogging({
