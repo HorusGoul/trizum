@@ -109,6 +109,25 @@ packages/mobile/
 └── package.json
 ```
 
+## iOS Scene Lifecycle
+
+The iOS wrapper uses a single `UIWindowScene`, required for apps built with
+the iOS 27 SDK. `Info.plist` assigns `Main.storyboard` to `SceneDelegate`;
+UIKit creates the window and the existing `BridgeViewController`, which
+registers the custom App Open ad plugin. Do not create a second bridge in
+`SceneDelegate`.
+
+Scene connection, URL contexts, and universal links are forwarded to
+Capacitor's `SceneDelegateProxy`. This preserves cold-start link delivery
+after plugin registration and the App plugin's `getLaunchUrl` behavior.
+Capacitor also forwards scene background/foreground transitions to the web
+view. Keep the Capacitor core, CLI, iOS, and Android versions aligned.
+
+When changing this integration, verify a cold launch on iOS 27, background
+and resume events, and custom-scheme/universal links with the app both
+running and stopped. Check that native sign-in and the custom ad plugin
+still use the storyboard's bridge controller.
+
 ## Scripts
 
 | Script            | Description                                            |
