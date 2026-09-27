@@ -35,8 +35,8 @@ catalogs:
       specifier: 8.0.0
       version: 8.0.0
     '@capacitor/android':
-      specifier: 8.4.1
-      version: 8.4.1
+      specifier: 8.5.2
+      version: 8.5.2
     '@capacitor/app':
       specifier: 8.1.0
       version: 8.1.0
@@ -47,14 +47,14 @@ catalogs:
       specifier: 8.2.0
       version: 8.2.0
     '@capacitor/cli':
-      specifier: 8.4.1
-      version: 8.4.1
+      specifier: 8.5.2
+      version: 8.5.2
     '@capacitor/core':
-      specifier: 8.4.1
-      version: 8.4.1
+      specifier: 8.5.2
+      version: 8.5.2
     '@capacitor/ios':
-      specifier: 8.4.1
-      version: 8.4.1
+      specifier: 8.5.2
+      version: 8.5.2
     '@capacitor/share':
       specifier: 8.0.1
       version: 8.0.1
@@ -557,40 +557,40 @@ importers:
         version: 8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)
       '@capacitor/android':
         specifier: 'catalog:'
-        version: 8.4.1(@capacitor/core@8.4.1)
+        version: 8.5.2(@capacitor/core@8.5.2)
       '@capacitor/app':
         specifier: 'catalog:'
-        version: 8.1.0(@capacitor/core@8.4.1)
+        version: 8.1.0(@capacitor/core@8.5.2)
       '@capacitor/camera':
         specifier: 'catalog:'
-        version: 8.2.0(@capacitor/core@8.4.1)
+        version: 8.2.0(@capacitor/core@8.5.2)
       '@capacitor/core':
         specifier: 'catalog:'
-        version: 8.4.1
+        version: 8.5.2
       '@capacitor/ios':
         specifier: 'catalog:'
-        version: 8.4.1(@capacitor/core@8.4.1)
+        version: 8.5.2(@capacitor/core@8.5.2)
       '@capacitor/share':
         specifier: 'catalog:'
-        version: 8.0.1(@capacitor/core@8.4.1)
+        version: 8.0.1(@capacitor/core@8.5.2)
       '@capacitor/splash-screen':
         specifier: 'catalog:'
-        version: 8.0.1(@capacitor/core@8.4.1)
+        version: 8.0.1(@capacitor/core@8.5.2)
       '@capawesome/capacitor-app-update':
         specifier: 'catalog:'
-        version: 8.0.3(@capacitor/core@8.4.1)
+        version: 8.0.3(@capacitor/core@8.5.2)
       '@capawesome/capacitor-apple-sign-in':
         specifier: 'catalog:'
-        version: 0.1.1(@capacitor/core@8.4.1)
+        version: 0.1.1(@capacitor/core@8.5.2)
       '@capawesome/capacitor-google-sign-in':
         specifier: 'catalog:'
-        version: 0.1.2(@capacitor/core@8.4.1)
+        version: 0.1.2(@capacitor/core@8.5.2)
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.2.4(@capacitor/core@8.4.1)
+        version: 13.2.4(@capacitor/core@8.5.2)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))
+        version: 13.2.4(@capacitor/core@8.5.2)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.5.2))
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -599,14 +599,14 @@ importers:
         version: file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.2.4)(@opentelemetry/api@1.9.1)(@sentry/core@10.65.0)(@types/pg@8.15.6)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(vitest@4.1.10)
       capacitor-plugin-safe-area:
         specifier: 'catalog:'
-        version: 5.0.0(@capacitor/core@8.4.1)
+        version: 5.0.0(@capacitor/core@8.5.2)
     devDependencies:
       '@capacitor/assets':
         specifier: 'catalog:'
         version: 3.0.5(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)
       '@capacitor/cli':
         specifier: 'catalog:'
-        version: 8.4.1
+        version: 8.5.2
       '@capawesome/capver':
         specifier: 'catalog:'
         version: 0.1.4(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)
@@ -651,28 +651,28 @@ importers:
         version: 8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)
       '@capacitor/app':
         specifier: 'catalog:'
-        version: 8.1.0(@capacitor/core@8.4.1)
+        version: 8.1.0(@capacitor/core@8.5.2)
       '@capacitor/camera':
         specifier: 'catalog:'
-        version: 8.2.0(@capacitor/core@8.4.1)
+        version: 8.2.0(@capacitor/core@8.5.2)
       '@capacitor/core':
         specifier: 'catalog:'
-        version: 8.4.1
+        version: 8.5.2
       '@capacitor/share':
         specifier: 'catalog:'
-        version: 8.0.1(@capacitor/core@8.4.1)
+        version: 8.0.1(@capacitor/core@8.5.2)
       '@capacitor/splash-screen':
         specifier: 'catalog:'
-        version: 8.0.1(@capacitor/core@8.4.1)
+        version: 8.0.1(@capacitor/core@8.5.2)
       '@capawesome/capacitor-app-update':
         specifier: 'catalog:'
-        version: 8.0.3(@capacitor/core@8.4.1)
+        version: 8.0.3(@capacitor/core@8.5.2)
       '@capawesome/capacitor-apple-sign-in':
         specifier: 'catalog:'
-        version: 0.1.1(@capacitor/core@8.4.1)
+        version: 0.1.1(@capacitor/core@8.5.2)
       '@capawesome/capacitor-google-sign-in':
         specifier: 'catalog:'
-        version: 0.1.2(@capacitor/core@8.4.1)
+        version: 0.1.2(@capacitor/core@8.5.2)
       '@fontsource-variable/fira-code':
         specifier: 'catalog:'
         version: 5.2.7
@@ -702,10 +702,10 @@ importers:
         version: '@jsr/opentf__std@0.12.0'
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.2.4(@capacitor/core@8.4.1)
+        version: 13.2.4(@capacitor/core@8.5.2)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))
+        version: 13.2.4(@capacitor/core@8.5.2)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.5.2))
       '@sentry/react':
         specifier: 'catalog:'
         version: 10.64.0(react@19.2.8)
@@ -747,7 +747,7 @@ importers:
         version: 2.0.2
       capacitor-plugin-safe-area:
         specifier: 'catalog:'
-        version: 5.0.0(@capacitor/core@8.4.1)
+        version: 5.0.0(@capacitor/core@8.5.2)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -1862,10 +1862,10 @@ packages:
     resolution: {integrity: sha512-+ZIq+UtcNvTMFwjvuhOuGvCjwK2Wu36lTIl9o1/CEjfp2Aj3m4b9zQGx0vXrERYqQmJp/Ven7ee3gGuh2Ym8nA==}
     engines: {node: '>=22.0.0'}
 
-  '@capacitor/android@8.4.1':
-    resolution: {integrity: sha512-igtDCJ7QQn0P2qHFD9p4KXaa6V1b2PRNt+MxjVwtjTm/BJvqmiazOJq6rPjwFSZnfHm6iFoZk8TfzHd44pyBGw==}
+  '@capacitor/android@8.5.2':
+    resolution: {integrity: sha512-rtiaz78egCcS+vs29wkWCL3C+RhazKMSygXcjutwWP8NmO6r5UBxOvGf3Wjz5+ahobyQ723tn9gCePwRwcNDZQ==}
     peerDependencies:
-      '@capacitor/core': ^8.4.0
+      '@capacitor/core': ^8.5.0
 
   '@capacitor/app@8.1.0':
     resolution: {integrity: sha512-MlmttTOWHDedr/G4SrhNRxsXMqY+R75S4MM4eIgzsgCzOYhb/MpCkA5Q3nuOCfL1oHm26xjUzqZ5aupbOwdfYg==}
@@ -1887,18 +1887,18 @@ packages:
     engines: {node: '>=16.0.0'}
     hasBin: true
 
-  '@capacitor/cli@8.4.1':
-    resolution: {integrity: sha512-t7F2s7fFHCq113xgrggrmK6ctV0/8E5YfLNVLfPHp4GCTDO+tly9fZvWPf2/sOI8lMm18dLT43qbXLRTz/OZgw==}
+  '@capacitor/cli@8.5.2':
+    resolution: {integrity: sha512-O2kpA5ZPJUAmliDCcmpMf8xnJwMezxlFPUrlyOAjbL3U9MFNY3l4ZpPI/UXwvyPmR8ETcVF9pFr+VdWq61rqTQ==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
-  '@capacitor/core@8.4.1':
-    resolution: {integrity: sha512-xqhOGLbTAYeOWK+IDUNSjQJAPapQjRHrIcgk9PYp52or9zFTaaMko31uNi16N6W+CRJ8VrRram6fOYILkBG2Hg==}
+  '@capacitor/core@8.5.2':
+    resolution: {integrity: sha512-agnQbGdhGw/KZFuLf7H9SY2o+oE7upkr/WPQsYaokXP6f9chaE8iVmbKkfN6SVl4w3pmz7oZ3Ur1hbkmy1hx+w==}
 
-  '@capacitor/ios@8.4.1':
-    resolution: {integrity: sha512-EgcAk7NYheHMTyP3CUrA65qKs4D2UEAKgw44HI6Uk3dTw6KjLQkdLOQWvbeRncHaZ2gklfOojUoc5DlSw2lhYg==}
+  '@capacitor/ios@8.5.2':
+    resolution: {integrity: sha512-eOT2S67AfTFG7KN0T3oxwAajrJz4rSye+ODfvChiwrk0F/+kWufFM1qU6cDjGJUOfwdAoeuEpZyWHSwZlu4GFg==}
     peerDependencies:
-      '@capacitor/core': ^8.4.0
+      '@capacitor/core': ^8.5.0
 
   '@capacitor/share@8.0.1':
     resolution: {integrity: sha512-3cSBKBCJVon54rKDROP2rqGyeGks4pBh9TbaEk9S375Kbek/ZHe72N50zIa0Vn9Eac/SuhwgehO/mmA4CsUOiw==}
@@ -10769,16 +10769,16 @@ snapshots:
 
   '@capacitor-community/admob@8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
       '@rdlabo/capacitor-docgen': 0.4.1
 
-  '@capacitor/android@8.4.1(@capacitor/core@8.4.1)':
+  '@capacitor/android@8.5.2(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
-  '@capacitor/app@8.1.0(@capacitor/core@8.4.1)':
+  '@capacitor/app@8.1.0(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
   '@capacitor/assets@3.0.5(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)':
     dependencies:
@@ -10805,9 +10805,9 @@ snapshots:
       - supports-color
       - typescript
 
-  '@capacitor/camera@8.2.0(@capacitor/core@8.4.1)':
+  '@capacitor/camera@8.2.0(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
   '@capacitor/cli@5.7.8':
     dependencies:
@@ -10831,7 +10831,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/cli@8.4.1':
+  '@capacitor/cli@8.5.2':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8
       '@ionic/utils-subprocess': 3.0.1
@@ -10849,37 +10849,38 @@ snapshots:
       semver: 7.8.5
       tar: 7.5.19
       tslib: 2.8.1
+      xcode: 3.0.1
       xml2js: 0.6.2
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/core@8.4.1':
+  '@capacitor/core@8.5.2':
     dependencies:
       tslib: 2.8.1
 
-  '@capacitor/ios@8.4.1(@capacitor/core@8.4.1)':
+  '@capacitor/ios@8.5.2(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
-  '@capacitor/share@8.0.1(@capacitor/core@8.4.1)':
+  '@capacitor/share@8.0.1(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
-  '@capacitor/splash-screen@8.0.1(@capacitor/core@8.4.1)':
+  '@capacitor/splash-screen@8.0.1(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
-  '@capawesome/capacitor-app-update@8.0.3(@capacitor/core@8.4.1)':
+  '@capawesome/capacitor-app-update@8.0.3(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
-  '@capawesome/capacitor-apple-sign-in@0.1.1(@capacitor/core@8.4.1)':
+  '@capawesome/capacitor-apple-sign-in@0.1.1(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
-  '@capawesome/capacitor-google-sign-in@0.1.2(@capacitor/core@8.4.1)':
+  '@capawesome/capacitor-google-sign-in@0.1.2(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
   '@capawesome/capver@0.1.4(@swc/core@1.13.3(@swc/helpers@0.5.23))(@swc/wasm@1.13.3)(@types/node@24.13.3)(@typescript/typescript6@6.0.2)':
     dependencies:
@@ -12619,15 +12620,15 @@ snapshots:
 
   '@resvg/resvg-wasm@2.4.0': {}
 
-  '@revenuecat/purchases-capacitor-ui@13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))':
+  '@revenuecat/purchases-capacitor-ui@13.2.4(@capacitor/core@8.5.2)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.5.2))':
     dependencies:
-      '@capacitor/core': 8.4.1
-      '@revenuecat/purchases-capacitor': 13.2.4(@capacitor/core@8.4.1)
+      '@capacitor/core': 8.5.2
+      '@revenuecat/purchases-capacitor': 13.2.4(@capacitor/core@8.5.2)
       '@revenuecat/purchases-typescript-internal-esm': 18.22.2
 
-  '@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1)':
+  '@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.5.2)':
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
       '@revenuecat/purchases-typescript-internal-esm': 18.22.2
 
   '@revenuecat/purchases-typescript-internal-esm@18.22.2': {}
@@ -13351,14 +13352,14 @@ snapshots:
       '@automerge/automerge-repo-network-websocket': 2.5.6
       '@automerge/automerge-repo-storage-indexeddb': 2.5.6
       '@capacitor-community/admob': 8.0.0(patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4)
-      '@capacitor/app': 8.1.0(@capacitor/core@8.4.1)
-      '@capacitor/camera': 8.2.0(@capacitor/core@8.4.1)
-      '@capacitor/core': 8.4.1
-      '@capacitor/share': 8.0.1(@capacitor/core@8.4.1)
-      '@capacitor/splash-screen': 8.0.1(@capacitor/core@8.4.1)
-      '@capawesome/capacitor-app-update': 8.0.3(@capacitor/core@8.4.1)
-      '@capawesome/capacitor-apple-sign-in': 0.1.1(@capacitor/core@8.4.1)
-      '@capawesome/capacitor-google-sign-in': 0.1.2(@capacitor/core@8.4.1)
+      '@capacitor/app': 8.1.0(@capacitor/core@8.5.2)
+      '@capacitor/camera': 8.2.0(@capacitor/core@8.5.2)
+      '@capacitor/core': 8.5.2
+      '@capacitor/share': 8.0.1(@capacitor/core@8.5.2)
+      '@capacitor/splash-screen': 8.0.1(@capacitor/core@8.5.2)
+      '@capawesome/capacitor-app-update': 8.0.3(@capacitor/core@8.5.2)
+      '@capawesome/capacitor-apple-sign-in': 0.1.1(@capacitor/core@8.5.2)
+      '@capawesome/capacitor-google-sign-in': 0.1.2(@capacitor/core@8.5.2)
       '@fontsource-variable/fira-code': 5.2.7
       '@fontsource-variable/inter': 5.2.8
       '@hono/zod-openapi': 1.6.3(hono@4.12.28)(zod@4.4.3)
@@ -13368,8 +13369,8 @@ snapshots:
       '@logtape/sentry': 2.2.4(@logtape/logtape@2.2.4)(@sentry/core@10.65.0)
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
-      '@revenuecat/purchases-capacitor': 13.2.4(@capacitor/core@8.4.1)
-      '@revenuecat/purchases-capacitor-ui': 13.2.4(@capacitor/core@8.4.1)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.4.1))
+      '@revenuecat/purchases-capacitor': 13.2.4(@capacitor/core@8.5.2)
+      '@revenuecat/purchases-capacitor-ui': 13.2.4(@capacitor/core@8.5.2)(@revenuecat/purchases-capacitor@13.2.4(@capacitor/core@8.5.2))
       '@sentry/react': 10.64.0(react@19.2.8)
       '@sentry/vite-plugin': 5.4.0(rollup@4.62.2)
       '@takker/md5': '@jsr/takker__md5@0.1.0'
@@ -13383,7 +13384,7 @@ snapshots:
       barcode-detector: 3.0.8(@types/emscripten@1.41.5)
       better-auth: 1.6.23(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@libsql/client@0.17.4)(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(kysely@0.29.2))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(vitest@4.1.10)
       browser-image-compression: 2.0.2
-      capacitor-plugin-safe-area: 5.0.0(@capacitor/core@8.4.1)
+      capacitor-plugin-safe-area: 5.0.0(@capacitor/core@8.5.2)
       clsx: 2.1.1
       comctx: 1.7.5
       dinero.js: 2.0.2
@@ -14422,9 +14423,9 @@ snapshots:
 
   caniuse-lite@1.0.30001799: {}
 
-  capacitor-plugin-safe-area@5.0.0(@capacitor/core@8.4.1):
+  capacitor-plugin-safe-area@5.0.0(@capacitor/core@8.5.2):
     dependencies:
-      '@capacitor/core': 8.4.1
+      '@capacitor/core': 8.5.2
 
   cbor-extract@2.2.2:
     dependencies:

@@ -11,7 +11,7 @@ PODS:
     - PromisesObjC (~> 2.4)
     - PromisesSwift (~> 2.4)
     - RecaptchaInterop (~> 101.0)
-  - Capacitor (8.4.1):
+  - Capacitor (8.5.2):
     - CapacitorCordova
   - CapacitorApp (8.1.0):
     - Capacitor
@@ -22,7 +22,7 @@ PODS:
     - Capacitor
     - Google-Mobile-Ads-SDK (~> 12.14)
     - GoogleUserMessagingPlatform (~> 3.1)
-  - CapacitorCordova (8.4.1)
+  - CapacitorCordova (8.5.2)
   - CapacitorPluginSafeArea (5.0.0):
     - Capacitor
   - CapacitorShare (8.0.1):
@@ -78,19 +78,19 @@ PODS:
     - RevenueCat (= 5.81.1)
 
 DEPENDENCIES:
-  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios`)"
-  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.4.1/node_modules/@capacitor/app`)"
-  - "CapacitorCamera (from `../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.4.1/node_modules/@capacitor/camera`)"
+  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.5.2/node_modules/@capacitor/app`)"
+  - "CapacitorCamera (from `../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.5.2/node_modules/@capacitor/camera`)"
   - "CapacitorCommunityAdmob (from `../../../../node_modules/.pnpm/@capacitor-community+admob@8.0.0_patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4/node_modules/@capacitor-community/admob`)"
-  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios`)"
-  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area`)"
-  - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/share`)"
-  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/splash-screen`)"
-  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in`)"
-  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update`)"
-  - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in`)"
-  - "RevenuecatPurchasesCapacitor (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.4.1/node_modules/@revenuecat/purchases-capacitor`)"
-  - "RevenuecatPurchasesCapacitorUi (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.4.1_@revenuecat+purchases-c_eda6bbee9cd735f048779ddc11714625/node_modules/@revenuecat/purchases-capacitor-ui`)"
+  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios`)"
+  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.5.2/node_modules/capacitor-plugin-safe-area`)"
+  - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/share`)"
+  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen`)"
+  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in`)"
+  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update`)"
+  - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in`)"
+  - "RevenuecatPurchasesCapacitor (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor`)"
+  - "RevenuecatPurchasesCapacitorUi (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.5.2_@revenuecat+purchases-c_92542bf63b788266b8aa9b5d964e034c/node_modules/@revenuecat/purchases-capacitor-ui`)"
 
 SPEC REPOS:
   trunk:
@@ -113,40 +113,40 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Capacitor:
-    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios"
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios"
   CapacitorApp:
-    :path: "../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.4.1/node_modules/@capacitor/app"
+    :path: "../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.5.2/node_modules/@capacitor/app"
   CapacitorCamera:
-    :path: "../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.4.1/node_modules/@capacitor/camera"
+    :path: "../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.5.2/node_modules/@capacitor/camera"
   CapacitorCommunityAdmob:
     :path: "../../../../node_modules/.pnpm/@capacitor-community+admob@8.0.0_patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4/node_modules/@capacitor-community/admob"
   CapacitorCordova:
-    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.4.1_@capacitor+core@8.4.1/node_modules/@capacitor/ios"
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios"
   CapacitorPluginSafeArea:
-    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.4.1/node_modules/capacitor-plugin-safe-area"
+    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.5.2/node_modules/capacitor-plugin-safe-area"
   CapacitorShare:
-    :path: "../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/share"
+    :path: "../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/share"
   CapacitorSplashScreen:
-    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.4.1/node_modules/@capacitor/splash-screen"
+    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen"
   CapawesomeCapacitorAppleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-apple-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in"
   CapawesomeCapacitorAppUpdate:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-app-update"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update"
   CapawesomeCapacitorGoogleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.4.1/node_modules/@capawesome/capacitor-google-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in"
   RevenuecatPurchasesCapacitor:
-    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.4.1/node_modules/@revenuecat/purchases-capacitor"
+    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor"
   RevenuecatPurchasesCapacitorUi:
-    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.4.1_@revenuecat+purchases-c_eda6bbee9cd735f048779ddc11714625/node_modules/@revenuecat/purchases-capacitor-ui"
+    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.5.2_@revenuecat+purchases-c_92542bf63b788266b8aa9b5d964e034c/node_modules/@revenuecat/purchases-capacitor-ui"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   AppCheckCore: 214137f5c378d1dec88a68425c467fe65aaff637
-  Capacitor: 35242afe195b1e53c58ca1b827d1b444c5e6602b
+  Capacitor: 89067779e14fb7ea56af07b4817f45d1f0c2a269
   CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
   CapacitorCamera: 8f6acf83664118321111e76acef86390211ccb08
   CapacitorCommunityAdmob: 9c36b466f46da413e5c105f7484e7603178c6223
-  CapacitorCordova: eebe6bcf807b1b06f3f48237650f96bbcd0eef09
+  CapacitorCordova: 5bec5648cbd09a176ce34ce5e7b6cdabb2c8a327
   CapacitorPluginSafeArea: 9d0682951c011bf0b36e513a89103c5fbff7ac49
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
   CapacitorSplashScreen: 4b46c72298db552b3c57ce021ef028b6dc7f1fa7
@@ -170,6 +170,6 @@ SPEC CHECKSUMS:
   RevenuecatPurchasesCapacitorUi: f6c60a6466f873b15f9a4492bf9f7a62edabe938
   RevenueCatUI: 2c7092fa0a485454d2a474e80f241e6db591dd36
 
-PODFILE CHECKSUM: 2edf2d7ea8acb5cb229536d2fcf1a2789bd8c89a
+PODFILE CHECKSUM: 5e5fb12a7d80e4ca6a7efdb530ede80b8ff9418e
 
 COCOAPODS: 1.17.0
