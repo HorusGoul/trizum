@@ -296,7 +296,7 @@ function PartyBoostAction({
 
   if (state.type === "upgrade") {
     return (
-      <Button color="accent" pressAction={onOpenPremium}>
+      <Button color="accent" onPress={() => void onOpenPremium()}>
         <Trans>View Premium options</Trans>
       </Button>
     );

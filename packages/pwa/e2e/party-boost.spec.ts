@@ -232,6 +232,13 @@ test("a Premium denial survives a stale background read and recovers after verif
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect.poll(() => reads).toBe(3);
   await expect(upgrade).toBeVisible();
+  await upgrade.click();
+  const paywall = page.getByRole("dialog", { name: "trizum Premium", exact: true });
+  await expect(paywall).toBeVisible();
+  await paywall.getByRole("button", { name: "Close Premium", exact: true }).click();
+  await expect(paywall).toHaveCount(0);
+  await expect.poll(() => reads).toBe(4);
+  await expect(upgrade).toBeEnabled();
   renewed = true;
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(activate).toBeEnabled();
