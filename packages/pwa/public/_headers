@@ -3,3 +3,11 @@
 
 /party/*
   X-Robots-Tag: noindex, nofollow
+
+# Promo links must stay out of search results, including code query parameters.
+/redeem
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+/redeem/*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer

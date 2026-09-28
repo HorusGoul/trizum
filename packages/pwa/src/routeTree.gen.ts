@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RedeemRouteImport } from './routes/redeem'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as ArchivedRouteImport } from './routes/archived'
@@ -47,6 +48,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedeemRoute = RedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/redeem': typeof RedeemRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/migrate/tricount': typeof MigrateTricountRouteRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByTo {
   '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/redeem': typeof RedeemRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/migrate/tricount': typeof MigrateTricountRouteRoute
@@ -262,6 +270,7 @@ export interface FileRoutesById {
   '/archived': typeof ArchivedRoute
   '/join': typeof JoinRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/redeem': typeof RedeemRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/migrate_/tricount': typeof MigrateTricountRouteRoute
@@ -295,6 +304,7 @@ export interface FileRouteTypes {
     | '/archived'
     | '/join'
     | '/privacy-policy'
+    | '/redeem'
     | '/reset-password'
     | '/settings'
     | '/migrate/tricount'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/archived'
     | '/join'
     | '/privacy-policy'
+    | '/redeem'
     | '/reset-password'
     | '/settings'
     | '/migrate/tricount'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/archived'
     | '/join'
     | '/privacy-policy'
+    | '/redeem'
     | '/reset-password'
     | '/settings'
     | '/migrate_/tricount'
@@ -386,6 +398,7 @@ export interface RootRouteChildren {
   ArchivedRoute: typeof ArchivedRoute
   JoinRoute: typeof JoinRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  RedeemRoute: typeof RedeemRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   MigrateTricountRouteRoute: typeof MigrateTricountRouteRoute
@@ -416,6 +429,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redeem': {
+      id: '/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof RedeemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -658,6 +678,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArchivedRoute: ArchivedRoute,
   JoinRoute: JoinRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  RedeemRoute: RedeemRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   MigrateTricountRouteRoute: MigrateTricountRouteRoute,

@@ -101,3 +101,40 @@ owner status check reconciles that destination before clearing the marker. New
 transfers must finish pending cleanup first, so a failed sync write cannot lose
 the old destination. Personal status remains unknown until loaded; an empty
 shared map cannot authorize the UI to skip transfer confirmation.
+
+## Premium Promo Codes
+
+The Premium paywall includes a **Redeem code** action, available even when
+products fail to load. Native redemption requires a signed-in trizum account.
+Apple opens the native sheet without a code, or the App Store offer-code URL
+when a code is supplied. Google Play's external redemption supports one-time
+codes; custom subscription codes must be entered under the payment method in
+Google Play checkout before confirming the purchase. Custom Google codes do not
+provide lifetime access and cannot be redeemed through the external URL.
+
+Share a branded link such as `https://trizum.app/redeem?code=FRIENDS`.
+The native platform takes priority; browsers detect iOS/iPadOS or Android and
+show the corresponding store. Other devices see both options. Codes remain
+store-specific; the same text only works on both stores if separately configured
+there. The landing page does not redeem automatically. Native universal/app links already cover
+this route, including cold launches. Browser users can follow the documented
+store links; Google custom codes require opening trizum on Android and selecting
+the subscription plan. Apple/Google's own redemption URLs continue to open their
+stores directly, not a trizum route.
+
+`public/_headers` sets `X-Robots-Tag: noindex, nofollow` on `/redeem` and its
+subpaths, including query variants; the rendered page also emits a robots meta
+tag. Do not add a robots.txt disallow for this path: crawlers must be able to
+read the noindex response. Codes are not included in sitemaps.
+
+Opening native redemption records only the trizum account and a 15-minute retry
+window locally, never the code. Existing foreground/startup refreshes sync store
+purchases and invalidate the RevenueCat cache while that redemption is pending.
+Delayed receipts retry until Premium appears or the window expires. Offline
+failures preserve cached access, and another signed-in account cannot consume
+the pending sync. External redemptions started outside trizum rely on the SDK's
+normal transaction discovery; **Restore purchases** remains the explicit
+recovery path. Code submission alone never grants Premium or Party Boost.
+
+Create codes, eligibility, usage limits and expiry in App Store Connect or Play
+Console. This UI does not create offers or validate redemption counts itself.

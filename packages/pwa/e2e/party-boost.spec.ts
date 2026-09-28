@@ -235,6 +235,11 @@ test("a Premium denial survives a stale background read and recovers after verif
   await upgrade.click();
   const paywall = page.getByRole("dialog", { name: "trizum Premium", exact: true });
   await expect(paywall).toBeVisible();
+  await paywall.getByRole("button", { name: "Redeem code", exact: true }).click();
+  await paywall.getByRole("textbox", { name: "Promo code", exact: true }).fill("FRIENDS");
+  await expect(
+    paywall.getByRole("link", { name: "Redeem in App Store", exact: true }),
+  ).toHaveAttribute("href", /code=FRIENDS$/);
   await paywall.getByRole("button", { name: "Close Premium", exact: true }).click();
   await expect(paywall).toHaveCount(0);
   await expect.poll(() => reads).toBe(4);
