@@ -310,6 +310,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   }
 
   async function setPartyBoost(partyId: string, boost: Party["boost"]) {
+    await page.waitForFunction(() => typeof window.__internal_setPartyBoost === "function");
     await page.evaluate(
       async ({ partyId, boost }) => {
         const internalWindow = window as unknown as InternalHarnessWindow;
