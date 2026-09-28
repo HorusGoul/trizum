@@ -1,3 +1,4 @@
+import type { PremiumEntitlementState } from "./premiumCommerce.ts";
 import { createContext, useContext } from "react";
 
 export type PremiumStatus = "error" | "free" | "loading" | "premium" | "unavailable";
@@ -6,7 +7,7 @@ export interface PremiumContextValue {
   hasActiveSubscription: boolean;
   isPremium: boolean;
   presentCustomerCenter: () => Promise<void>;
-  presentPaywall: () => Promise<void>;
+  presentPaywall: () => Promise<PremiumEntitlementState | null>;
   status: PremiumStatus;
 }
 
@@ -14,7 +15,7 @@ const PremiumContext = createContext<PremiumContextValue>({
   hasActiveSubscription: false,
   isPremium: false,
   presentCustomerCenter: async () => undefined,
-  presentPaywall: async () => undefined,
+  presentPaywall: async () => null,
   status: "unavailable",
 });
 

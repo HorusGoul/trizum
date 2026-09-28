@@ -18,6 +18,7 @@ export function getPartyBoostActionState({
   isSignedIn,
   now,
   partyDocumentId,
+  premiumRequired = false,
   status,
 }: {
   isActivating: boolean;
@@ -27,8 +28,13 @@ export function getPartyBoostActionState({
   isSignedIn: boolean;
   now: number;
   partyDocumentId: string;
+  premiumRequired?: boolean;
   status: PartyBoostViewStatus | null;
 }): PartyBoostActionState {
+  if (isSignedIn && premiumRequired && !status?.party.isBoosted) {
+    return { type: "upgrade" };
+  }
+
   if (!status) {
     if (!isSignedIn) return { type: "signed_out" };
     return { disabled: isRefreshing, type: "retry" };
@@ -51,7 +57,9 @@ export function getPartyBoostActionState({
   }
 
   const assignment = status.currentUser.assignment;
-  const isPremium = status.currentUser.isPremium || isDevicePremium;
+  // An existing assignment means the server has verified eligibility.
+  // Only first-time native activation needs the SDK fallback.
+  const isPremium = status.currentUser.isPremium || (assignment === null && isDevicePremium);
   const isInitialWebActivation = !isNativePlatform && assignment === null;
   if (!isPremium && !isInitialWebActivation) {
     return { type: "upgrade" };

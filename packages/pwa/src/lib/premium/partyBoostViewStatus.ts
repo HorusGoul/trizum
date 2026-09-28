@@ -26,3 +26,12 @@ export function getPartyBoostViewStatus(
 export function getPartyBoostCount(shared: PartyBoostSnapshot | undefined): number {
   return Object.keys(shared ?? {}).length;
 }
+
+/** Refresh eligibility on contributions/ownership changes, never on verification timestamps. */
+export function getPartyBoostMembershipKey(shared: PartyBoostSnapshot | undefined): string {
+  return JSON.stringify(
+    Object.entries(shared ?? {})
+      .map(([id, boost]) => [id, boost.participantId])
+      .sort(([a], [b]) => a.localeCompare(b)),
+  );
+}

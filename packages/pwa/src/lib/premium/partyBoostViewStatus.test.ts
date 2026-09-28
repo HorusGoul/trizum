@@ -1,6 +1,10 @@
 import type { PartyBoost } from "../../models/party";
 import { describe, expect, it } from "vite-plus/test";
-import { getPartyBoostViewStatus, getPartyBoostCount } from "./partyBoostViewStatus";
+import {
+  getPartyBoostViewStatus,
+  getPartyBoostCount,
+  getPartyBoostMembershipKey,
+} from "./partyBoostViewStatus";
 
 const boost: PartyBoost = {
   boostId: "first",
@@ -46,4 +50,21 @@ it("totals multiple contributions for future local feature limits", () => {
     }),
   ).toBe(3);
   expect(getPartyBoostCount(undefined)).toBe(0);
+});
+
+it("refreshes only for contribution and owner changes, independent of ordering or timestamps", () => {
+  const initial = { first: boost, second: { ...boost, boostId: "second", participantId: "bob" } };
+  const key = getPartyBoostMembershipKey(initial);
+  expect(
+    getPartyBoostMembershipKey({
+      second: initial.second,
+      first: { ...boost, checkedAt: "later", boostedAt: "later" },
+    }),
+  ).toBe(key);
+  expect(
+    getPartyBoostMembershipKey({ ...initial, first: { ...boost, participantId: "carol" } }),
+  ).not.toBe(key);
+  expect(getPartyBoostMembershipKey({ first: boost })).not.toBe(key);
+  expect(getPartyBoostMembershipKey({})).not.toBe(key);
+  expect(getPartyBoostMembershipKey(undefined)).toBe(getPartyBoostMembershipKey({}));
 });
