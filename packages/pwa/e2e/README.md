@@ -36,7 +36,10 @@ setup and reusable journey state.
   local copy.
 
 `harness.setPartyBoost(...)` seeds a server-observed boost snapshot directly in
-Automerge for shared-state UI tests. Importing an expense file does not copy boosts.
+Automerge for shared-state UI tests. Playwright's local build enables
+`VITE_E2E_HARNESS=true` to include this fixture module; normal builds omit it and
+expose no boost setter. When using `PLAYWRIGHT_BASE_URL`, serve an E2E build for
+these fixture-based tests. Importing an expense file does not copy boosts.
 
 ## Helper Boundaries
 

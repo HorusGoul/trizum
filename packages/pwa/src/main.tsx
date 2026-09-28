@@ -171,7 +171,6 @@ declare global {
     __internal_createDeferredPartyListState: (
       seed: InternalPartyListSeed,
     ) => Promise<InternalPartyListSeedResult>;
-    __internal_setPartyBoost: (partyId: Party["id"], boost: Party["boost"]) => Promise<void>;
     __internal_getDocumentState: (documentId: DocumentId) => string | undefined;
     __internal_releaseDeferredPartyListState: (partyListId: DocumentId) => void;
     __internal_seedPartyListState: (
@@ -208,14 +207,10 @@ window.__internal_createDeferredPartyListState = async (seed: InternalPartyListS
   return result;
 };
 
-window.__internal_setPartyBoost = async (partyId, boost) => {
-  const handle = await repo.find<Party>(partyId);
-  handle.change((party) => {
-    if (boost === undefined) delete party.boost;
-    else party.boost = boost;
-  });
-  await repo.flush();
-};
+if (import.meta.env.VITE_E2E_HARNESS === "true") {
+  const { installPartyBoostBrowserSeed } = await import("../e2e/harness/partyBoostBrowserSeed");
+  installPartyBoostBrowserSeed(repo);
+}
 
 window.__internal_getDocumentState = (documentId: DocumentId) => {
   return repo.handles[documentId]?.state;
