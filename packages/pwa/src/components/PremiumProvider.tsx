@@ -23,8 +23,9 @@ import {
 } from "./premiumProviderState.ts";
 
 interface PaywallRequest {
-  promise: Promise<void>;
-  resolve: () => void;
+  promise: Promise<PremiumEntitlementState | null>;
+  resolve: (entitlement: PremiumEntitlementState | null) => void;
+  entitlement: PremiumEntitlementState | null;
 }
 
 const logger = getLogger("components", "PremiumProvider");
@@ -98,6 +99,9 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (paywallRequestRef.current) {
+      paywallRequestRef.current.entitlement = entitlement;
+    }
     setResolvedState({
       hasActiveSubscription: entitlement.hasActiveSubscription,
       status: entitlement.isPremium ? "premium" : "free",
@@ -114,11 +118,11 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       return paywallRequestRef.current.promise;
     }
 
-    let resolveRequest: () => void = () => undefined;
-    const promise = new Promise<void>((resolve) => {
+    let resolveRequest: PaywallRequest["resolve"] = () => undefined;
+    const promise = new Promise<PremiumEntitlementState | null>((resolve) => {
       resolveRequest = resolve;
     });
-    paywallRequestRef.current = { promise, resolve: resolveRequest };
+    paywallRequestRef.current = { promise, resolve: resolveRequest, entitlement: null };
     setPaywallSessionId((sessionId) => sessionId + 1);
     setIsPaywallOpen(true);
     return promise;
@@ -127,7 +131,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   function setPaywallOpen(open: boolean) {
     setIsPaywallOpen(open);
     if (!open) {
-      paywallRequestRef.current?.resolve();
+      paywallRequestRef.current?.resolve(paywallRequestRef.current.entitlement);
       paywallRequestRef.current = null;
     }
   }

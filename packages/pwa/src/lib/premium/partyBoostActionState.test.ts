@@ -87,6 +87,47 @@ describe("getPartyBoostActionState", () => {
     });
   });
 
+  it.each([true, false])(
+    "offers Premium after explicit denial despite stale SDK status (native=%s)",
+    (isNativePlatform) => {
+      expect(
+        getActionState({
+          premiumRequired: true,
+          isDevicePremium: true,
+          isNativePlatform,
+          status: null,
+        }),
+      ).toEqual({ type: "upgrade" });
+    },
+  );
+
+  it("honors verified revocation despite a stale native entitlement", () => {
+    expect(
+      getActionState({
+        isDevicePremium: true,
+        status: createStatus({
+          isPremium: false,
+          assignment: createAssignment({ partyDocumentId: currentPartyId, active: false }),
+        }),
+      }),
+    ).toEqual({ type: "upgrade" });
+  });
+
+  it("keeps activation available during a background refresh", () => {
+    expect(
+      getActionState({
+        isRefreshing: true,
+        status: createStatus({ isPremium: true, assignment: null }),
+      }),
+    ).toEqual({ type: "activate", disabled: false });
+  });
+
+  it("preserves shared benefits even after personal Premium is denied", () => {
+    const status = createStatus({ isPremium: false, assignment: null });
+    status.party.isBoosted = true;
+    expect(getActionState({ premiumRequired: true, status })).toEqual({ type: "boosted_by_other" });
+  });
+
   it("disables retry while status is refreshing", () => {
     expect(getActionState({ isRefreshing: true, status: null })).toEqual({
       disabled: true,
@@ -96,6 +137,7 @@ describe("getPartyBoostActionState", () => {
 });
 
 function getActionState({
+  premiumRequired = false,
   isDevicePremium = false,
   isNativePlatform = true,
   isRefreshing = false,
@@ -103,6 +145,7 @@ function getActionState({
   now = 100,
   status,
 }: {
+  premiumRequired?: boolean;
   isDevicePremium?: boolean;
   isNativePlatform?: boolean;
   isRefreshing?: boolean;
@@ -111,6 +154,7 @@ function getActionState({
   status: PartyBoostViewStatus | null;
 }) {
   return getPartyBoostActionState({
+    premiumRequired,
     isActivating: false,
     isDevicePremium,
     isNativePlatform,

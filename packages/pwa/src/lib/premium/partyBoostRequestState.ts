@@ -11,6 +11,10 @@ export class PartyBoostRequestGate {
     this.#latestRequest += 1;
   }
 
+  isInContext(context: string) {
+    return this.#context === context;
+  }
+
   beginRead(context: string) {
     this.enterContext(context);
     this.#latestRequest += 1;
