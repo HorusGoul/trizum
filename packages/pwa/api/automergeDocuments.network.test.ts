@@ -124,6 +124,62 @@ describe("Worker document reads over WebSocket", () => {
     await vi.waitFor(() => expect(sockets!.clients.size).toBe(0));
   });
 
+  it("waits for sync acknowledgement so writes survive closing the Worker request", async () => {
+    const env = await startServer();
+    const first = server!.create({ value: 0 });
+    const second = server!.create({ value: 0 });
+    const documents = new AutomergeDocuments({
+      env,
+      request: new Request("https://trizum.example.test"),
+    });
+    try {
+      await Promise.all([
+        documents.change<{ value: number }>(first.documentId, (doc) => {
+          doc.value = 1;
+        }),
+        documents.change<{ value: number }>(second.documentId, (doc) => {
+          doc.value = 2;
+        }),
+      ]);
+      expect(first.doc().value).toBe(1);
+      expect(second.doc().value).toBe(2);
+    } finally {
+      await documents.close();
+    }
+    const next = new AutomergeDocuments({
+      env,
+      request: new Request("https://trizum.example.test"),
+    });
+    try {
+      expect(await next.read(first.documentId)).toMatchObject({ value: 1 });
+      expect(await next.read(second.documentId)).toMatchObject({ value: 2 });
+    } finally {
+      await next.close();
+    }
+  });
+
+  it("rejects a write when the sync peer never acknowledges it", async () => {
+    const env = await startServer();
+    const party = server!.create({ value: 0 });
+    const documents = new AutomergeDocuments({
+      env,
+      request: new Request("https://trizum.example.test"),
+      timeoutMs: "500",
+    });
+    try {
+      await documents.read(party.documentId);
+      for (const socket of sockets!.clients) socket.removeAllListeners("message");
+      await expect(
+        documents.change<{ value: number }>(party.documentId, (doc) => {
+          doc.value = 1;
+        }),
+      ).rejects.toMatchObject({ name: "AbortError" });
+      expect(party.doc().value).toBe(0);
+    } finally {
+      await documents.close();
+    }
+  });
+
   it.each(["timeout", "request abort"])(
     "closes a connection that never advertises a sync peer on %s",
     async (reason) => {

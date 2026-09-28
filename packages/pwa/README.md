@@ -17,15 +17,16 @@ then use this document to decide where to work inside the PWA.
   OpenAPI metadata. The Worker publishes the resulting OpenAPI 3.1 document at
   `/api/openapi.json`.
 - [`api/automergeDocuments.ts`](./api/automergeDocuments.ts) owns request-scoped
-  Worker document reads. Its `AutomergeDocuments` object initializes one repo
-  on the first `read`, shares it across concurrent and later reads, and only
-  syncs explicitly requested documents. The timeout starts with the first read
-  and applies to subsequent reads in that request.
+  Worker document reads and writes. Its `AutomergeDocuments` object initializes
+  one repo on the first `read` or `change`, shares it across operations, and
+  only syncs explicitly requested documents. The timeout starts with the first
+  operation and applies to subsequent operations in that request.
 - [`api/automergeDocumentsMiddleware.ts`](./api/automergeDocumentsMiddleware.ts)
   supplies that object as `c.get("documents")` and closes it when the handler
   finishes. Register it on routes that need sync, then pass the object into
   domain functions. Unused objects open no connection. Reads return snapshots;
-  future writes must define sync acknowledgement before request cleanup.
+  `change` waits until the connected sync peer acknowledges the changes before
+  request cleanup. This confirms receipt, not a durable storage flush.
 - [`src/lib/trizumApiClient.ts`](./src/lib/trizumApiClient.ts) is the typed
   first-party client. UI code should call its domain methods instead of issuing
   raw requests to Worker routes.
@@ -72,3 +73,31 @@ connected repository builds.
   preview URL.
 - The workflows require `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
   repository secrets.
+
+## Shared Party Boost State
+
+A party may contain `boost?: Record<BoostId, { boostId, participantId, boostedAt,
+checkedAt }>`. Each entry represents one boost, keyed by its opaque database ID.
+Both timestamps are ISO strings: `boostedAt` is the current party assignment time,
+and `checkedAt` is the last server verification. The participant ID belongs to
+this party; auth user IDs are never published in the shared document.
+
+Missing state means the party has not been checked yet. An empty map means no
+active boosts were found. Signed-out members can use this shared cache for local
+features, including offline, and its size can support future boost-based limits.
+It is client-editable and may be stale: server operations still require sign-in,
+membership and authoritative entitlement checks. Successful checks publish the
+current state; transfer and revocation remove the previous party's entry.
+
+Migration `0005_party_boost_id.sql` gives existing assignments stable random IDs.
+The current one-boost-per-owner and one-active-boost-per-party limits remain in
+the database until the product supports stacking boosts. Transfers retain the
+boost ID and reset the assignment time; reactivation retains both ID and original
+assignment time, preserving the existing cooldown behavior.
+
+Migration `0006_party_boost_pending_cleanup.sql` records a transfer's previous
+party in the same database update as the assignment move. A successful retry or
+owner status check reconciles that destination before clearing the marker. New
+transfers must finish pending cleanup first, so a failed sync write cannot lose
+the old destination. Personal status remains unknown until loaded; an empty
+shared map cannot authorize the UI to skip transfer confirmation.

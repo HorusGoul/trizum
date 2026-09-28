@@ -1,4 +1,4 @@
-import type { PartyBoostStatus } from "../api/premiumContract.ts";
+import type { PartyBoostViewStatus } from "./partyBoostViewStatus.ts";
 
 export type PartyBoostActionState =
   | { type: "active" }
@@ -27,13 +27,10 @@ export function getPartyBoostActionState({
   isSignedIn: boolean;
   now: number;
   partyDocumentId: string;
-  status: PartyBoostStatus | null;
+  status: PartyBoostViewStatus | null;
 }): PartyBoostActionState {
-  if (!isSignedIn) {
-    return { type: "signed_out" };
-  }
-
   if (!status) {
+    if (!isSignedIn) return { type: "signed_out" };
     return { disabled: isRefreshing, type: "retry" };
   }
 
@@ -43,6 +40,14 @@ export function getPartyBoostActionState({
 
   if (status.party.isBoosted) {
     return { type: "boosted_by_other" };
+  }
+
+  if (!isSignedIn) {
+    return { type: "signed_out" };
+  }
+
+  if (!status.currentUser) {
+    return { disabled: isRefreshing, type: "retry" };
   }
 
   const assignment = status.currentUser.assignment;

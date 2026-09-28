@@ -4,6 +4,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSession } from "#src/lib/auth-client.ts";
+import type { PartyBoostSnapshot } from "#src/models/party.ts";
+import {
+  getPartyBoostViewStatus,
+  type PartyBoostViewStatus,
+} from "#src/lib/premium/partyBoostViewStatus.ts";
 import type { PartyBoostStatus } from "#src/lib/api/premiumContract.ts";
 import {
   getPartyBoostActionState,
@@ -33,6 +38,7 @@ import {
 } from "#src/ui/ModalSheet.tsx";
 
 interface PartyBoostViewState {
+  context: string;
   error: PartyBoostApiError | null;
   isRefreshing: boolean;
   status: PartyBoostStatus | null;
@@ -40,7 +46,13 @@ interface PartyBoostViewState {
 
 const transferDateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
-export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string }) {
+export function PartyBoostCard({
+  partyDocumentId,
+  boost,
+}: {
+  partyDocumentId: string;
+  boost?: PartyBoostSnapshot;
+}) {
   const { t } = useLingui();
   const navigate = useNavigate();
   const session = useAppSession();
@@ -51,24 +63,32 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   const [activatingContext, setActivatingContext] = useState<string | null>(null);
   const [isTransferConfirmationOpen, setIsTransferConfirmationOpen] = useState(false);
   const [now, setNow] = useState(0);
-  const [viewState, setViewState] = useState<PartyBoostViewState>({
+  const [storedViewState, setViewState] = useState<PartyBoostViewState>({
+    context: requestContext,
     error: null,
-    isRefreshing: false,
+    isRefreshing: true,
     status: null,
   });
+  const viewState: PartyBoostViewState =
+    storedViewState.context === requestContext
+      ? storedViewState
+      : { context: requestContext, error: null, isRefreshing: true, status: null };
 
   useEffect(() => {
     statusRequests.enterContext(requestContext);
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
 
     let active = true;
     const activeUserId = userId;
     const cachedStatus = readCachedPartyBoostStatus(activeUserId, partyDocumentId);
     queueMicrotask(() => {
       if (active) {
-        setViewState({ error: null, isRefreshing: true, status: cachedStatus });
+        setViewState({
+          context: requestContext,
+          error: null,
+          isRefreshing: true,
+          status: cachedStatus,
+        });
       }
     });
 
@@ -81,7 +101,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
         }
 
         writeCachedPartyBoostStatus(activeUserId, partyDocumentId, status);
-        setViewState({ error: null, isRefreshing: false, status });
+        setViewState({ context: requestContext, error: null, isRefreshing: false, status });
       } catch (error) {
         if (!active || !statusRequests.isCurrent(request)) {
           return;
@@ -93,6 +113,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
           clearCachedPartyBoostStatus(activeUserId, partyDocumentId);
         }
         setViewState((current) => ({
+          context: requestContext,
           error: partyBoostError,
           isRefreshing: false,
           status: invalidateCache ? null : current.status,
@@ -116,7 +137,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
   }, [partyDocumentId, requestContext, statusRequests, userId]);
 
   useEffect(() => {
-    const transferableAt = viewState.status?.currentUser.assignment?.transferableAt;
+    const transferableAt = viewState.status?.currentUser?.assignment?.transferableAt;
     if (!transferableAt) {
       return;
     }
@@ -126,13 +147,10 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
       Math.min(Math.max(transferableAt - Date.now() + 1, 0), 2_147_483_647),
     );
     return () => window.clearTimeout(timeoutId);
-  }, [viewState.status?.currentUser.assignment?.transferableAt]);
+  }, [viewState.status?.currentUser?.assignment?.transferableAt]);
 
   async function refreshStatus() {
-    if (!userId) {
-      return;
-    }
-
+    if (!userId) return;
     setViewState((current) => ({ ...current, error: null, isRefreshing: true }));
     const request = statusRequests.beginRead(requestContext);
     try {
@@ -141,7 +159,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
         return;
       }
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
-      setViewState({ error: null, isRefreshing: false, status });
+      setViewState({ context: requestContext, error: null, isRefreshing: false, status });
     } catch (error) {
       if (!statusRequests.isCurrent(request)) {
         return;
@@ -153,6 +171,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
         clearCachedPartyBoostStatus(userId, partyDocumentId);
       }
       setViewState((current) => ({
+        context: requestContext,
         error: partyBoostError,
         isRefreshing: false,
         status: invalidateCache ? null : current.status,
@@ -181,7 +200,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
         return;
       }
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
-      setViewState({ error: null, isRefreshing: false, status });
+      setViewState({ context: requestContext, error: null, isRefreshing: false, status });
       setIsTransferConfirmationOpen(false);
       toast.success(t`Party Boost is active.`);
     } catch (error) {
@@ -192,7 +211,12 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
       const partyBoostError = toPartyBoostApiError(error);
       clearCachedPartyBoostStatus(userId, partyDocumentId);
       setIsTransferConfirmationOpen(false);
-      setViewState({ error: partyBoostError, isRefreshing: false, status: null });
+      setViewState({
+        context: requestContext,
+        error: partyBoostError,
+        isRefreshing: false,
+        status: null,
+      });
       switch (partyBoostError.code) {
         case "already_boosted":
           toast.error(t`This party already has an active Party Boost.`);
@@ -227,9 +251,9 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
     }
   }
 
-  const status = userId ? viewState.status : null;
+  const status = getPartyBoostViewStatus(userId ? viewState.status : null, boost);
   const isActivating = activatingContext === requestContext;
-  const assignment = status?.currentUser.assignment ?? null;
+  const assignment = status?.currentUser?.assignment ?? null;
   const isAssignedElsewhere = Boolean(assignment && assignment.partyDocumentId !== partyDocumentId);
   const canTransfer = Boolean(
     isAssignedElsewhere && assignment && assignment.transferableAt <= now,
@@ -271,6 +295,7 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
               status={status}
               userId={userId}
             />
+            <PartyBoostCheckedAt boost={boost} />
           </div>
         </div>
 
@@ -283,49 +308,90 @@ export function PartyBoostCard({ partyDocumentId }: { partyDocumentId: string })
         />
       </div>
 
-      <ModalSheet
-        aria-label={t`Move Party Boost here?`}
+      <PartyBoostTransferConfirmation
         isOpen={isTransferConfirmationOpen}
         onOpenChange={setIsTransferConfirmationOpen}
-      >
-        <ModalSheetHeader>
-          <ModalSheetSection>
-            <ModalSheetTitle>
-              <Trans>Move Party Boost here?</Trans>
-            </ModalSheetTitle>
-          </ModalSheetSection>
-        </ModalSheetHeader>
-        <ModalSheetContent>
-          <ModalSheetSection>
-            <ModalSheetDescription>
-              {assignment?.active ? (
-                <Trans>
-                  The previous party will lose its boost. You will not be able to move Party Boost
-                  again for seven days.
-                </Trans>
-              ) : (
-                <Trans>
-                  This party will receive your Party Boost. You will not be able to move it again
-                  for seven days.
-                </Trans>
-              )}
-            </ModalSheetDescription>
-          </ModalSheetSection>
-          <ModalSheetActions className="mt-3">
-            <ModalSheetAction
-              icon="lucide.sparkles"
-              isDisabled={isActivating}
-              onPress={() => void activate()}
-            >
-              <Trans>Move Party Boost</Trans>
-            </ModalSheetAction>
-            <ModalSheetAction icon="lucide.x" onPress={() => setIsTransferConfirmationOpen(false)}>
-              <Trans>Cancel</Trans>
-            </ModalSheetAction>
-          </ModalSheetActions>
-        </ModalSheetContent>
-      </ModalSheet>
+        hasActiveAssignment={Boolean(assignment?.active)}
+        isActivating={isActivating}
+        onActivate={activate}
+      />
     </>
+  );
+}
+
+function PartyBoostCheckedAt({ boost }: { boost?: PartyBoostSnapshot }) {
+  const { i18n } = useLingui();
+  // Use the oldest verification when several boosts contribute to this party.
+  const dates: number[] = [];
+  for (const entry of Object.values(boost ?? {})) {
+    const timestamp = Date.parse(entry?.checkedAt);
+    if (Number.isFinite(timestamp)) dates.push(timestamp);
+  }
+  if (!dates.length) return null;
+  const date = new Date(Math.min(...dates));
+  const checkedAt = i18n.date(date, { dateStyle: "medium", timeStyle: "short" });
+  return (
+    <p className="text-accent-600 dark:text-accent-300 text-xs">
+      <time dateTime={date.toISOString()}>
+        <Trans>Last checked {checkedAt}</Trans>
+      </time>
+    </p>
+  );
+}
+
+function PartyBoostTransferConfirmation({
+  isOpen,
+  onOpenChange,
+  hasActiveAssignment,
+  isActivating,
+  onActivate,
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  hasActiveAssignment: boolean;
+  isActivating: boolean;
+  onActivate: () => Promise<void>;
+}) {
+  const { t } = useLingui();
+  return (
+    <ModalSheet aria-label={t`Move Party Boost here?`} isOpen={isOpen} onOpenChange={onOpenChange}>
+      <ModalSheetHeader>
+        <ModalSheetSection>
+          <ModalSheetTitle>
+            <Trans>Move Party Boost here?</Trans>
+          </ModalSheetTitle>
+        </ModalSheetSection>
+      </ModalSheetHeader>
+      <ModalSheetContent>
+        <ModalSheetSection>
+          <ModalSheetDescription>
+            {hasActiveAssignment ? (
+              <Trans>
+                The previous party will lose its boost. You will not be able to move Party Boost
+                again for seven days.
+              </Trans>
+            ) : (
+              <Trans>
+                This party will receive your Party Boost. You will not be able to move it again for
+                seven days.
+              </Trans>
+            )}
+          </ModalSheetDescription>
+        </ModalSheetSection>
+        <ModalSheetActions className="mt-3">
+          <ModalSheetAction
+            icon="lucide.sparkles"
+            isDisabled={isActivating}
+            onPress={() => void onActivate()}
+          >
+            <Trans>Move Party Boost</Trans>
+          </ModalSheetAction>
+          <ModalSheetAction icon="lucide.x" onPress={() => onOpenChange(false)}>
+            <Trans>Cancel</Trans>
+          </ModalSheetAction>
+        </ModalSheetActions>
+      </ModalSheetContent>
+    </ModalSheet>
   );
 }
 
@@ -341,20 +407,12 @@ function PartyBoostDescription({
   error: PartyBoostApiError | null;
   isRefreshing: boolean;
   partyDocumentId: string;
-  status: PartyBoostStatus | null;
+  status: PartyBoostViewStatus | null;
   userId: string | null;
 }) {
-  const assignment = status?.currentUser.assignment ?? null;
+  const assignment = status?.currentUser?.assignment ?? null;
 
-  if (!userId) {
-    return (
-      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
-        <Trans>Sign in to activate Premium benefits for this party.</Trans>
-      </p>
-    );
-  }
-
-  if (!status && isRefreshing) {
+  if (!status && isRefreshing && userId) {
     return (
       <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
         <Trans>Checking Party Boost…</Trans>
@@ -382,6 +440,14 @@ function PartyBoostDescription({
     return (
       <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
         <Trans>A Premium member is boosting this party.</Trans>
+      </p>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
+        <Trans>Sign in to activate Premium benefits for this party.</Trans>
       </p>
     );
   }

@@ -75,11 +75,16 @@ export const cloudUserSettings = sqliteTable("cloud_user_settings", {
 export const partyBoost = sqliteTable(
   "party_boost",
   {
-    ownerUserId: text("ownerUserId")
+    boostId: text("boostId")
       .notNull()
       .primaryKey()
+      .default(sql`(lower(hex(randomblob(16))))`),
+    ownerUserId: text("ownerUserId")
+      .notNull()
+      .unique()
       .references(() => user.id, { onDelete: "cascade" }),
     partyDocumentId: text("partyDocumentId").notNull(),
+    pendingCleanupPartyDocumentId: text("pendingCleanupPartyDocumentId"),
     assignedAt: integer("assignedAt").notNull(),
     transferableAt: integer("transferableAt").notNull(),
     revokedAt: integer("revokedAt"),

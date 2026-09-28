@@ -64,7 +64,7 @@ function PartySettings() {
         </PartySettingsSection>
 
         <PartySettingsSection icon="lucide.sparkles" title={<Trans>Premium</Trans>}>
-          <PartyBoostCard partyDocumentId={partyId} />
+          <PartyBoostCard partyDocumentId={partyId} boost={party.boost} />
         </PartySettingsSection>
       </main>
     </div>

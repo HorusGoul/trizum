@@ -1,10 +1,41 @@
 import { describe, expect, it } from "vite-plus/test";
 import type { PartyBoostAssignmentStatus, PartyBoostStatus } from "../api/premiumContract.ts";
+import { getPartyBoostViewStatus, type PartyBoostViewStatus } from "./partyBoostViewStatus";
 import { getPartyBoostActionState } from "./partyBoostActionState.ts";
 
 const currentPartyId = "current-party";
 
 describe("getPartyBoostActionState", () => {
+  it.each([true, false])(
+    "does not activate with unknown personal status (refreshing=%s)",
+    (isRefreshing) => {
+      const status = getPartyBoostViewStatus(null, {});
+      expect(getActionState({ status, isRefreshing, isNativePlatform: false })).toEqual({
+        type: "retry",
+        disabled: isRefreshing,
+      });
+    },
+  );
+
+  it("requires transfer confirmation after an empty shared snapshot loads the personal assignment", () => {
+    const status = getPartyBoostViewStatus(
+      createStatus({
+        assignment: createAssignment({ partyDocumentId: "other-party", transferableAt: 50 }),
+        isPremium: true,
+      }),
+      {},
+    );
+    expect(getActionState({ status, isNativePlatform: false })).toEqual({
+      type: "transfer",
+      disabled: false,
+    });
+  });
+  it("shows shared benefits to a signed-out viewer instead of asking them to sign in", () => {
+    const status = createStatus({ assignment: null, isPremium: false });
+    status.party.isBoosted = true;
+    expect(getActionState({ status, isSignedIn: false })).toEqual({ type: "boosted_by_other" });
+  });
+
   it("reactivates a revoked assignment on the same party without applying the transfer lock", () => {
     const status = createStatus({
       assignment: createAssignment({
@@ -68,21 +99,23 @@ function getActionState({
   isDevicePremium = false,
   isNativePlatform = true,
   isRefreshing = false,
+  isSignedIn = true,
   now = 100,
   status,
 }: {
   isDevicePremium?: boolean;
   isNativePlatform?: boolean;
   isRefreshing?: boolean;
+  isSignedIn?: boolean;
   now?: number;
-  status: PartyBoostStatus | null;
+  status: PartyBoostViewStatus | null;
 }) {
   return getPartyBoostActionState({
     isActivating: false,
     isDevicePremium,
     isNativePlatform,
     isRefreshing,
-    isSignedIn: true,
+    isSignedIn,
     now,
     partyDocumentId: currentPartyId,
     status,

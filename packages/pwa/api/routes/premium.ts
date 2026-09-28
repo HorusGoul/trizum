@@ -9,7 +9,14 @@ import { getApiDb, schema } from "../db/client";
 import { isUniqueConstraintError } from "../db/errors";
 import type { ApiHonoEnv } from "../env";
 import { getPartyBoostAssignmentAction, getPartyBoostTransferableAt } from "../premium/partyBoost";
-import { PartyMembershipUnavailableError, verifyPartyMembership } from "../premium/partyMembership";
+import {
+  PartyBoostSnapshotUnavailableError,
+  publishPartyBoostSnapshot,
+} from "../premium/partyBoostSnapshot";
+import {
+  PartyMembershipUnavailableError,
+  getPartyMemberParticipantId,
+} from "../premium/partyMembership";
 import {
   PremiumVerificationUnavailableError,
   verifyRevenueCatPremium,
@@ -83,7 +90,7 @@ export const premiumRoute = premiumApp
       const db = getApiDb(c.env.DB);
 
       try {
-        const isMember = await verifyUserPartyMembership({
+        const isMember = await getUserPartyParticipantId({
           db,
           documents: c.get("documents"),
           partyDocumentId,
@@ -102,7 +109,13 @@ export const premiumRoute = premiumApp
         });
 
         if (!premium.isPremium) {
-          await revokeActiveAssignment(db, userId, "premium_inactive", Date.now());
+          await revokeActiveAssignment(
+            db,
+            c.get("documents"),
+            userId,
+            "premium_inactive",
+            Date.now(),
+          );
           return partyBoostError(
             c,
             "premium_required",
@@ -123,6 +136,7 @@ export const premiumRoute = premiumApp
           });
 
           if (remainsActive) {
+            await publishPartyBoostState(db, c.get("documents"), partyDocumentId);
             return partyBoostError(
               c,
               "already_boosted",
@@ -133,7 +147,10 @@ export const premiumRoute = premiumApp
         }
 
         const now = Date.now();
-        const assignment = await getUserAssignment(db, userId);
+        let assignment = await getUserAssignment(db, userId);
+        if (assignment) {
+          assignment = await reconcilePreviousPartyBoost(db, c.get("documents"), assignment);
+        }
         const action = getPartyBoostAssignmentAction({ assignment, now, partyDocumentId });
 
         if (action.type === "transfer_locked") {
@@ -163,6 +180,9 @@ export const premiumRoute = premiumApp
             409,
           );
         }
+
+        await reconcilePreviousPartyBoost(db, c.get("documents"), storedAssignment);
+        await publishPartyBoostState(db, c.get("documents"), partyDocumentId);
 
         return c.json(
           createPartyBoostStatus({
@@ -213,7 +233,7 @@ async function getPartyBoostStatus({
   sandboxUserId?: string;
   userId: string;
 }): Promise<PartyBoostStatus | null> {
-  const isMember = await verifyUserPartyMembership({
+  const isMember = await getUserPartyParticipantId({
     db,
     documents,
     partyDocumentId,
@@ -225,15 +245,24 @@ async function getPartyBoostStatus({
   }
 
   let assignment = await getUserAssignment(db, userId);
+  if (assignment) {
+    assignment = await reconcilePreviousPartyBoost(db, documents, assignment);
+  }
   const premium = assignment
     ? await verifyRevenueCatPremium({ apiKey, projectId, sandboxUserId, userId })
     : { isPremium: false };
 
   if (assignment?.revokedAt === null) {
     if (!premium.isPremium) {
-      assignment = await revokeAssignment(db, assignment, "premium_inactive", Date.now());
+      assignment = await revokeAssignment(
+        db,
+        documents,
+        assignment,
+        "premium_inactive",
+        Date.now(),
+      );
     } else if (assignment.partyDocumentId !== partyDocumentId) {
-      const ownsAssignedParty = await verifyUserPartyMembership({
+      const ownsAssignedParty = await getUserPartyParticipantId({
         db,
         documents,
         partyDocumentId: assignment.partyDocumentId,
@@ -241,7 +270,13 @@ async function getPartyBoostStatus({
       });
 
       if (!ownsAssignedParty) {
-        assignment = await revokeAssignment(db, assignment, "owner_not_member", Date.now());
+        assignment = await revokeAssignment(
+          db,
+          documents,
+          assignment,
+          "owner_not_member",
+          Date.now(),
+        );
       }
     }
   }
@@ -263,6 +298,8 @@ async function getPartyBoostStatus({
   } else if (partyAssignment && assignment?.revokedAt !== null) {
     partyAssignment = null;
   }
+
+  await publishPartyBoostState(db, documents, partyDocumentId);
 
   return createPartyBoostStatus({
     assignment,
@@ -295,11 +332,11 @@ async function validateActiveAssignment({
     userId: assignment.ownerUserId,
   });
   if (!premium.isPremium) {
-    await revokeAssignment(db, assignment, "premium_inactive", Date.now());
+    await revokeAssignment(db, documents, assignment, "premium_inactive", Date.now());
     return false;
   }
 
-  const isMember = await verifyUserPartyMembership({
+  const isMember = await getUserPartyParticipantId({
     db,
     documents,
     partyDocumentId: assignment.partyDocumentId,
@@ -307,14 +344,14 @@ async function validateActiveAssignment({
   });
 
   if (!isMember) {
-    await revokeAssignment(db, assignment, "owner_not_member", Date.now());
+    await revokeAssignment(db, documents, assignment, "owner_not_member", Date.now());
     return false;
   }
 
   return true;
 }
 
-async function verifyUserPartyMembership({
+async function getUserPartyParticipantId({
   db,
   documents,
   partyDocumentId,
@@ -332,14 +369,67 @@ async function verifyUserPartyMembership({
     .limit(1);
 
   if (!settings) {
-    return false;
+    return null;
   }
 
-  return verifyPartyMembership({
+  return getPartyMemberParticipantId({
     documents,
     partyDocumentId,
     partyListDocumentId: settings.partyListDocumentId,
   });
+}
+
+async function publishPartyBoostState(
+  db: ApiDb,
+  documents: AutomergeDocuments,
+  partyDocumentId: string,
+) {
+  const assignment = await getActivePartyAssignment(db, partyDocumentId);
+  const participantId = assignment
+    ? await getUserPartyParticipantId({
+        db,
+        documents,
+        partyDocumentId,
+        userId: assignment.ownerUserId,
+      })
+    : null;
+  await publishPartyBoostSnapshot(
+    documents,
+    partyDocumentId,
+    assignment && participantId
+      ? {
+          [assignment.boostId]: {
+            boostId: assignment.boostId,
+            participantId,
+            checkedAt: new Date().toISOString(),
+            boostedAt: new Date(assignment.assignedAt).toISOString(),
+          },
+        }
+      : {},
+  );
+}
+
+/** Keep the previous destination durable until the sync peer acknowledges its cleanup. */
+async function reconcilePreviousPartyBoost(
+  db: ApiDb,
+  documents: AutomergeDocuments,
+  assignment: PartyBoostRow,
+): Promise<PartyBoostRow> {
+  const previousPartyId = assignment.pendingCleanupPartyDocumentId;
+  if (!previousPartyId) return assignment;
+  await publishPartyBoostState(db, documents, previousPartyId);
+  const [updated] = await db
+    .update(schema.partyBoost)
+    .set({ pendingCleanupPartyDocumentId: null })
+    .where(
+      and(
+        eq(schema.partyBoost.boostId, assignment.boostId),
+        eq(schema.partyBoost.version, assignment.version),
+        eq(schema.partyBoost.pendingCleanupPartyDocumentId, previousPartyId),
+      ),
+    )
+    .returning();
+  return updated ?? (await getUserAssignment(db, assignment.ownerUserId)) ?? assignment;
 }
 
 async function getUserAssignment(db: ApiDb, userId: string) {
@@ -367,18 +457,20 @@ async function getActivePartyAssignment(db: ApiDb, partyDocumentId: string) {
 
 async function revokeActiveAssignment(
   db: ApiDb,
+  documents: AutomergeDocuments,
   userId: string,
   reason: PartyBoostRevocationReason,
   now: number,
 ) {
   const assignment = await getUserAssignment(db, userId);
   if (assignment?.revokedAt === null) {
-    await revokeAssignment(db, assignment, reason, now);
+    await revokeAssignment(db, documents, assignment, reason, now);
   }
 }
 
 async function revokeAssignment(
   db: ApiDb,
+  documents: AutomergeDocuments,
   assignment: PartyBoostRow,
   reason: PartyBoostRevocationReason,
   now: number,
@@ -400,6 +492,7 @@ async function revokeAssignment(
     )
     .returning();
 
+  await publishPartyBoostState(db, documents, assignment.partyDocumentId);
   return updated ?? (await getUserAssignment(db, assignment.ownerUserId));
 }
 
@@ -422,6 +515,7 @@ async function applyAssignmentAction({
     const [created] = await db
       .insert(schema.partyBoost)
       .values({
+        boostId: crypto.randomUUID(),
         assignedAt: now,
         ownerUserId: userId,
         partyDocumentId,
@@ -446,6 +540,9 @@ async function applyAssignmentAction({
     .set({
       assignedAt: isTransfer ? now : assignment.assignedAt,
       partyDocumentId,
+      pendingCleanupPartyDocumentId: isTransfer
+        ? assignment.partyDocumentId
+        : assignment.pendingCleanupPartyDocumentId,
       revocationReason: null,
       revokedAt: null,
       transferableAt: isTransfer ? getPartyBoostTransferableAt(now) : assignment.transferableAt,
@@ -506,7 +603,8 @@ function toPublicAssignment(assignment: PartyBoostRow): PartyBoostAssignmentStat
 function handleVerificationError(c: Context<ApiHonoEnv>, error: unknown) {
   if (
     error instanceof PremiumVerificationUnavailableError ||
-    error instanceof PartyMembershipUnavailableError
+    error instanceof PartyMembershipUnavailableError ||
+    error instanceof PartyBoostSnapshotUnavailableError
   ) {
     return partyBoostError(
       c,

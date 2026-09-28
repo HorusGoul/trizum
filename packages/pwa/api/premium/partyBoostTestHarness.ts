@@ -22,7 +22,7 @@ export type TestCustomerAccess =
   | "family_shared"
   | "test_store";
 
-/** Real routes, auth, migrations and local D1; only sync reads and RevenueCat HTTP are fixtures. */
+/** Real routes, auth, migrations and local D1; only sync documents and RevenueCat HTTP are fixtures. */
 export async function createPartyBoostTestHarness() {
   const directory = await mkdtemp(join(tmpdir(), "trizum-party-boost-test-"));
   const configPath = join(directory, "wrangler.json");
@@ -65,12 +65,22 @@ export async function createPartyBoostTestHarness() {
   const requests: Request[] = [];
   let revenueCatStatus = 200;
   let syncUnavailable = false;
+  let writesUnavailable = false;
   const read = vi.spyOn(AutomergeDocuments.prototype, "read").mockImplementation(async (id) => {
     if (syncUnavailable) throw new Error("Test sync outage");
     const document = documents.get(id);
     if (!document) throw new Error("Missing test document");
     return structuredClone(document);
   });
+  const change = vi
+    .spyOn(AutomergeDocuments.prototype, "change")
+    .mockImplementation(async (id, update) => {
+      if (writesUnavailable || syncUnavailable) throw new Error("Test sync write outage");
+      const document = documents.get(id);
+      if (!document) throw new Error("Missing test document");
+      update(document);
+      return structuredClone(document);
+    });
   const nativeFetch = globalThis.fetch;
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
     const request = input instanceof Request ? input : new Request(input, init);
@@ -117,6 +127,9 @@ export async function createPartyBoostTestHarness() {
     setSyncUnavailable(value: boolean) {
       syncUnavailable = value;
     },
+    setWritesUnavailable(value: boolean) {
+      writesUnavailable = value;
+    },
     createParty() {
       const id = createDocumentId();
       documents.set(id, { type: "party", id, participants: {} });
@@ -152,20 +165,22 @@ export async function createPartyBoostTestHarness() {
       )
         .bind(user.id, listId, Date.now())
         .run();
+      const participantId = crypto.randomUUID();
       return {
+        participantId,
         id: user.id,
         cookie,
         join(partyId: DocumentId) {
           const party = documents.get(partyId)!;
           const participants = party.participants as Record<string, unknown>;
-          participants[user.id] = { id: user.id, isArchived: false };
+          participants[participantId] = { id: participantId, isArchived: false };
           list.parties[partyId] = true;
-          list.participantInParties[partyId] = user.id;
+          list.participantInParties[partyId] = participantId;
         },
         leave(partyId: DocumentId) {
           const party = documents.get(partyId)!;
           const participants = party.participants as Record<string, unknown>;
-          participants[user.id] = { id: user.id, isArchived: true };
+          participants[participantId] = { id: participantId, isArchived: true };
         },
       };
     },
@@ -184,6 +199,8 @@ export async function createPartyBoostTestHarness() {
     },
     async assignment(userId: string) {
       return env.DB.prepare("SELECT * FROM party_boost WHERE ownerUserId = ?").bind(userId).first<{
+        pendingCleanupPartyDocumentId: string | null;
+        boostId: string;
         partyDocumentId: string;
         assignedAt: number;
         transferableAt: number;
@@ -194,6 +211,7 @@ export async function createPartyBoostTestHarness() {
     },
     async dispose() {
       read.mockRestore();
+      change.mockRestore();
       vi.unstubAllGlobals();
       await platform.dispose();
       await rm(directory, { recursive: true, force: true });
