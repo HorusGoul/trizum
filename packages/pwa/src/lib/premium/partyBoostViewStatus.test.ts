@@ -12,7 +12,7 @@ const boost: PartyBoost = {
 describe("shared local Party Boost state", () => {
   it("shows the shared cache without granting personal Premium or ownership", () => {
     expect(getPartyBoostViewStatus(null, { first: boost })).toEqual({
-      currentUser: { isPremium: false, assignment: null },
+      currentUser: null,
       party: { isBoosted: true, isBoostedByCurrentUser: false },
     });
   });

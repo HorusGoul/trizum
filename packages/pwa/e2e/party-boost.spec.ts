@@ -44,3 +44,67 @@ test("a signed-out party member sees a shared boost without a sign-in or activat
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   expect(serverChecks).toBe(0);
 });
+
+test("waits for personal status and confirms a transfer even when shared state is empty", async ({
+  harness,
+  page,
+}) => {
+  const user = { id: "boost-owner", name: "Alex", email: "alex@example.test" };
+  await page.route("**/api/auth/get-session**", (route) =>
+    route.fulfill({ json: { user, session: { userId: user.id } } }),
+  );
+  const { partyId } = await harness.joinSeededParty({
+    fixture: createPartyFixture(),
+    participantName: defaultParticipants.alex.name,
+  });
+  const other = await harness.seedParty(createPartyFixture());
+  await harness.setPartyBoost(partyId, {});
+  let releaseFirstRead = () => {};
+  const firstRead = new Promise<void>((resolve) => {
+    releaseFirstRead = resolve;
+  });
+  let reads = 0;
+  let writes = 0;
+  page.on("request", (request) => {
+    if (request.method() === "PUT" && request.url().includes("/api/premium/party-boost")) writes++;
+  });
+  await page.route("**/api/premium/party-boost?**", async (route) => {
+    if (++reads === 1) {
+      await firstRead;
+      await route.fulfill({
+        status: 503,
+        json: { error: { code: "unavailable", message: "Try again" } },
+      });
+      return;
+    }
+    await route.fulfill({
+      json: {
+        currentUser: {
+          isPremium: true,
+          assignment: {
+            active: true,
+            partyDocumentId: other.partyId,
+            assignedAt: 0,
+            transferableAt: 1,
+            revokedAt: null,
+            revocationReason: null,
+          },
+        },
+        party: { isBoosted: false, isBoostedByCurrentUser: false },
+      },
+    });
+  });
+  await harness.navigate(`/party/${partyId}/settings`);
+  const retry = page.getByRole("button", { name: "Try again", exact: true });
+  await expect(retry).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Boost this party", exact: true })).toHaveCount(0);
+  releaseFirstRead();
+  await expect(retry).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Boost this party", exact: true })).toHaveCount(0);
+  await retry.click();
+  await page.getByRole("button", { name: "Move Party Boost here", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Move Party Boost here?", exact: true }),
+  ).toBeVisible();
+  expect(writes).toBe(0);
+});

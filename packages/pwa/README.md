@@ -94,3 +94,10 @@ The current one-boost-per-owner and one-active-boost-per-party limits remain in
 the database until the product supports stacking boosts. Transfers retain the
 boost ID and reset the assignment time; reactivation retains both ID and original
 assignment time, preserving the existing cooldown behavior.
+
+Migration `0006_party_boost_pending_cleanup.sql` records a transfer's previous
+party in the same database update as the assignment move. A successful retry or
+owner status check reconciles that destination before clearing the marker. New
+transfers must finish pending cleanup first, so a failed sync write cannot lose
+the old destination. Personal status remains unknown until loaded; an empty
+shared map cannot authorize the UI to skip transfer confirmation.

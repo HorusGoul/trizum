@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import type { PartyBoostSnapshot } from "#src/models/party.ts";
-import { getPartyBoostViewStatus } from "#src/lib/premium/partyBoostViewStatus.ts";
+import {
+  getPartyBoostViewStatus,
+  type PartyBoostViewStatus,
+} from "#src/lib/premium/partyBoostViewStatus.ts";
 import type { PartyBoostStatus } from "#src/lib/api/premiumContract.ts";
 import {
   getPartyBoostActionState,
@@ -134,7 +137,7 @@ export function PartyBoostCard({
   }, [partyDocumentId, requestContext, statusRequests, userId]);
 
   useEffect(() => {
-    const transferableAt = viewState.status?.currentUser.assignment?.transferableAt;
+    const transferableAt = viewState.status?.currentUser?.assignment?.transferableAt;
     if (!transferableAt) {
       return;
     }
@@ -144,7 +147,7 @@ export function PartyBoostCard({
       Math.min(Math.max(transferableAt - Date.now() + 1, 0), 2_147_483_647),
     );
     return () => window.clearTimeout(timeoutId);
-  }, [viewState.status?.currentUser.assignment?.transferableAt]);
+  }, [viewState.status?.currentUser?.assignment?.transferableAt]);
 
   async function refreshStatus() {
     if (!userId) return;
@@ -250,7 +253,7 @@ export function PartyBoostCard({
 
   const status = getPartyBoostViewStatus(userId ? viewState.status : null, boost);
   const isActivating = activatingContext === requestContext;
-  const assignment = status?.currentUser.assignment ?? null;
+  const assignment = status?.currentUser?.assignment ?? null;
   const isAssignedElsewhere = Boolean(assignment && assignment.partyDocumentId !== partyDocumentId);
   const canTransfer = Boolean(
     isAssignedElsewhere && assignment && assignment.transferableAt <= now,
@@ -404,10 +407,10 @@ function PartyBoostDescription({
   error: PartyBoostApiError | null;
   isRefreshing: boolean;
   partyDocumentId: string;
-  status: PartyBoostStatus | null;
+  status: PartyBoostViewStatus | null;
   userId: string | null;
 }) {
-  const assignment = status?.currentUser.assignment ?? null;
+  const assignment = status?.currentUser?.assignment ?? null;
 
   if (!status && isRefreshing && userId) {
     return (

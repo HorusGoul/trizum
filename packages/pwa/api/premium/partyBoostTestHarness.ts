@@ -199,6 +199,7 @@ export async function createPartyBoostTestHarness() {
     },
     async assignment(userId: string) {
       return env.DB.prepare("SELECT * FROM party_boost WHERE ownerUserId = ?").bind(userId).first<{
+        pendingCleanupPartyDocumentId: string | null;
         boostId: string;
         partyDocumentId: string;
         assignedAt: number;

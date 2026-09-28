@@ -84,6 +84,7 @@ export const partyBoost = sqliteTable(
       .unique()
       .references(() => user.id, { onDelete: "cascade" }),
     partyDocumentId: text("partyDocumentId").notNull(),
+    pendingCleanupPartyDocumentId: text("pendingCleanupPartyDocumentId"),
     assignedAt: integer("assignedAt").notNull(),
     transferableAt: integer("transferableAt").notNull(),
     revokedAt: integer("revokedAt"),

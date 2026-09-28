@@ -250,6 +250,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       revokedAt: null,
     });
     expect(stored!.transferableAt - stored!.assignedAt).toBe(PARTY_BOOST_TRANSFER_INTERVAL_MS);
+    expect(harness.documents.get(party)?.boost).toEqual({});
     const previous = await harness.request("GET", party, owner.cookie);
     expect(await previous.json()).toMatchObject({
       party: { isBoosted: false, isBoostedByCurrentUser: false },
@@ -264,6 +265,41 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       },
     });
   });
+
+  test.each(["PUT", "GET"] as const)(
+    "recovers previous-party cleanup on %s after a failed transfer",
+    async (method) => {
+      const { owner, party } = await activate();
+      const other = harness.createParty();
+      owner.join(other);
+      await harness.env.DB.prepare(
+        "UPDATE party_boost SET transferableAt = ? WHERE ownerUserId = ?",
+      )
+        .bind(Date.now() - 1, owner.id)
+        .run();
+      harness.setWritesUnavailable(true);
+      expect((await harness.request("PUT", other, owner.cookie)).status).toBe(503);
+      const transferred = (await harness.assignment(owner.id))!;
+      expect(transferred).toMatchObject({
+        partyDocumentId: other,
+        pendingCleanupPartyDocumentId: party,
+      });
+      expect(Object.keys(harness.documents.get(party)!.boost as object)).toEqual([
+        transferred.boostId,
+      ]);
+      harness.setWritesUnavailable(false);
+      expect((await harness.request(method, other, owner.cookie)).status).toBe(200);
+      // No independent read of the old party is allowed to repair this assertion.
+      expect(harness.documents.get(party)?.boost).toEqual({});
+      expect(Object.keys(harness.documents.get(other)!.boost as object)).toEqual([
+        transferred.boostId,
+      ]);
+      expect(await harness.assignment(owner.id)).toEqual({
+        ...transferred,
+        pendingCleanupPartyDocumentId: null,
+      });
+    },
+  );
 
   test("revokes expired Premium on a member's status request and lets another eligible owner take over", async () => {
     const { owner, party } = await activate();

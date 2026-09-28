@@ -147,7 +147,10 @@ export const premiumRoute = premiumApp
         }
 
         const now = Date.now();
-        const assignment = await getUserAssignment(db, userId);
+        let assignment = await getUserAssignment(db, userId);
+        if (assignment) {
+          assignment = await reconcilePreviousPartyBoost(db, c.get("documents"), assignment);
+        }
         const action = getPartyBoostAssignmentAction({ assignment, now, partyDocumentId });
 
         if (action.type === "transfer_locked") {
@@ -178,9 +181,7 @@ export const premiumRoute = premiumApp
           );
         }
 
-        if (assignment && assignment.partyDocumentId !== partyDocumentId) {
-          await publishPartyBoostState(db, c.get("documents"), assignment.partyDocumentId);
-        }
+        await reconcilePreviousPartyBoost(db, c.get("documents"), storedAssignment);
         await publishPartyBoostState(db, c.get("documents"), partyDocumentId);
 
         return c.json(
@@ -244,6 +245,9 @@ async function getPartyBoostStatus({
   }
 
   let assignment = await getUserAssignment(db, userId);
+  if (assignment) {
+    assignment = await reconcilePreviousPartyBoost(db, documents, assignment);
+  }
   const premium = assignment
     ? await verifyRevenueCatPremium({ apiKey, projectId, sandboxUserId, userId })
     : { isPremium: false };
@@ -405,6 +409,29 @@ async function publishPartyBoostState(
   );
 }
 
+/** Keep the previous destination durable until the sync peer acknowledges its cleanup. */
+async function reconcilePreviousPartyBoost(
+  db: ApiDb,
+  documents: AutomergeDocuments,
+  assignment: PartyBoostRow,
+): Promise<PartyBoostRow> {
+  const previousPartyId = assignment.pendingCleanupPartyDocumentId;
+  if (!previousPartyId) return assignment;
+  await publishPartyBoostState(db, documents, previousPartyId);
+  const [updated] = await db
+    .update(schema.partyBoost)
+    .set({ pendingCleanupPartyDocumentId: null })
+    .where(
+      and(
+        eq(schema.partyBoost.boostId, assignment.boostId),
+        eq(schema.partyBoost.version, assignment.version),
+        eq(schema.partyBoost.pendingCleanupPartyDocumentId, previousPartyId),
+      ),
+    )
+    .returning();
+  return updated ?? (await getUserAssignment(db, assignment.ownerUserId)) ?? assignment;
+}
+
 async function getUserAssignment(db: ApiDb, userId: string) {
   const [assignment] = await db
     .select()
@@ -513,6 +540,9 @@ async function applyAssignmentAction({
     .set({
       assignedAt: isTransfer ? now : assignment.assignedAt,
       partyDocumentId,
+      pendingCleanupPartyDocumentId: isTransfer
+        ? assignment.partyDocumentId
+        : assignment.pendingCleanupPartyDocumentId,
       revocationReason: null,
       revokedAt: null,
       transferableAt: isTransfer ? getPartyBoostTransferableAt(now) : assignment.transferableAt,
