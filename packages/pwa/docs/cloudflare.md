@@ -72,6 +72,22 @@ to the repo.
 
 Google and Apple setup details live in [`oauth.md`](./oauth.md).
 
+### Party Boost sandbox account
+
+`PARTY_BOOST_SANDBOX_USER_ID` optionally identifies one test account by its
+immutable Better Auth user ID (also its RevenueCat App User ID). That account
+may activate Party Boost with an active, directly owned sandbox Premium
+entitlement. Production purchases are checked first; all other accounts still
+require production purchases. This value is Worker-only configuration, never a
+client-supplied parameter or an email match.
+
+The same rule applies when rechecking a boost's owner on another member's
+request. Membership, transfer cooldown, expiry, and revocation rules still
+apply. Sandbox boosts use the normal database and benefit the party's members;
+use disposable test parties for the audit. Removing this setting and deploying
+disables the exception; existing sandbox-only boosts are revoked on their next
+server verification. No migration or native rebuild is needed.
+
 GitHub Actions still need these repository or environment secrets:
 
 - `CLOUDFLARE_API_TOKEN`

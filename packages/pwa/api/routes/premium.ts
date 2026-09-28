@@ -56,6 +56,7 @@ export const premiumRoute = premiumApp
           documents: c.get("documents"),
           partyDocumentId,
           projectId: c.env.REVENUECAT_PROJECT_ID,
+          sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
           userId: c.get("user").id,
         });
 
@@ -96,6 +97,7 @@ export const premiumRoute = premiumApp
         const premium = await verifyRevenueCatPremium({
           apiKey: c.env.REVENUECAT_SECRET_API_KEY,
           projectId: c.env.REVENUECAT_PROJECT_ID,
+          sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
           userId,
         });
 
@@ -117,6 +119,7 @@ export const premiumRoute = premiumApp
             db,
             documents: c.get("documents"),
             projectId: c.env.REVENUECAT_PROJECT_ID,
+            sandboxUserId: c.env.PARTY_BOOST_SANDBOX_USER_ID,
           });
 
           if (remainsActive) {
@@ -199,6 +202,7 @@ async function getPartyBoostStatus({
   documents,
   partyDocumentId,
   projectId,
+  sandboxUserId,
   userId,
 }: {
   apiKey: string | undefined;
@@ -206,6 +210,7 @@ async function getPartyBoostStatus({
   documents: AutomergeDocuments;
   partyDocumentId: string;
   projectId: string | undefined;
+  sandboxUserId?: string;
   userId: string;
 }): Promise<PartyBoostStatus | null> {
   const isMember = await verifyUserPartyMembership({
@@ -221,7 +226,7 @@ async function getPartyBoostStatus({
 
   let assignment = await getUserAssignment(db, userId);
   const premium = assignment
-    ? await verifyRevenueCatPremium({ apiKey, projectId, userId })
+    ? await verifyRevenueCatPremium({ apiKey, projectId, sandboxUserId, userId })
     : { isPremium: false };
 
   if (assignment?.revokedAt === null) {
@@ -249,6 +254,7 @@ async function getPartyBoostStatus({
       db,
       documents,
       projectId,
+      sandboxUserId,
     });
 
     if (!remainsActive) {
@@ -273,16 +279,19 @@ async function validateActiveAssignment({
   db,
   documents,
   projectId,
+  sandboxUserId,
 }: {
   apiKey: string | undefined;
   assignment: PartyBoostRow;
   db: ApiDb;
   documents: AutomergeDocuments;
   projectId: string | undefined;
+  sandboxUserId?: string;
 }) {
   const premium = await verifyRevenueCatPremium({
     apiKey,
     projectId,
+    sandboxUserId,
     userId: assignment.ownerUserId,
   });
   if (!premium.isPremium) {

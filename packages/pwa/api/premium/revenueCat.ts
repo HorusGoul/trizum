@@ -14,11 +14,13 @@ export async function verifyRevenueCatPremium({
   apiKey,
   fetcher,
   projectId,
+  sandboxUserId,
   userId,
 }: {
   apiKey: string | undefined;
   fetcher?: typeof fetch;
   projectId: string | undefined;
+  sandboxUserId?: string;
   userId: string;
 }): Promise<PremiumVerification> {
   if (!apiKey?.trim()) {
@@ -34,12 +36,16 @@ export async function verifyRevenueCatPremium({
       ...(fetcher ? { fetcher } : {}),
       secretApiKey: apiKey,
     });
-    const isPremium = await client.hasDirectEntitlement({
+    const customer = {
       customerId: userId,
       entitlementLookupKey: PREMIUM_ENTITLEMENT_ID,
-      environment: "production",
       projectId,
-    });
+    };
+    const isPremium =
+      (await client.hasDirectEntitlement({ ...customer, environment: "production" })) ||
+      (Boolean(sandboxUserId) &&
+        userId === sandboxUserId &&
+        (await client.hasDirectEntitlement({ ...customer, environment: "sandbox" })));
 
     return { isPremium };
   } catch (error) {

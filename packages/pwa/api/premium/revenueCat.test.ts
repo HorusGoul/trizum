@@ -33,4 +33,41 @@ describe("verifyRevenueCatPremium", () => {
       verifyRevenueCatPremium({ apiKey: "secret", projectId: undefined, userId: "person" }),
     ).rejects.toBeInstanceOf(PremiumVerificationUnavailableError);
   });
+
+  it.each([undefined, "", "other", "person-extra", "*", " person "])(
+    "does not query sandbox without an exact configured account match (%s)",
+    async (sandboxUserId) => {
+      const environments: Array<string | null> = [];
+      await verifyRevenueCatPremium({
+        apiKey: "secret",
+        projectId: "project",
+        sandboxUserId,
+        userId: "person",
+        fetcher: async (input) => {
+          const url = new URL(input instanceof Request ? input.url : String(input));
+          environments.push(url.searchParams.get("environment"));
+          return Response.json({ items: [], next_page: null, object: "list", url: url.pathname });
+        },
+      });
+      expect(environments).toEqual(["production", "production"]);
+    },
+  );
+
+  it("does not fall back to sandbox when production verification fails", async () => {
+    const environments: Array<string | null> = [];
+    await expect(
+      verifyRevenueCatPremium({
+        apiKey: "secret",
+        projectId: "project",
+        sandboxUserId: "person",
+        userId: "person",
+        fetcher: async (input) => {
+          const url = new URL(input instanceof Request ? input.url : String(input));
+          environments.push(url.searchParams.get("environment"));
+          return Response.json({ object: "error" }, { status: 503 });
+        },
+      }),
+    ).rejects.toBeInstanceOf(PremiumVerificationUnavailableError);
+    expect(environments).toEqual(["production", "production"]);
+  });
 });
