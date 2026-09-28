@@ -28,6 +28,7 @@ export interface ApiEnv {
   GOOGLE_IOS_CLIENT_ID?: string;
   GOOGLE_WEB_CLIENT_ID?: string;
   PARTY_MEMBERSHIP_TIMEOUT_MS?: string;
+  PARTY_BOOST_SANDBOX_USER_ID?: string;
   PARTY_SHARE_PREVIEW_TIMEOUT_MS?: string;
   REVENUECAT_PROJECT_ID?: string;
   REVENUECAT_SECRET_API_KEY?: string;

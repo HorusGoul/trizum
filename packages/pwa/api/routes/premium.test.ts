@@ -28,6 +28,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
     harness.setRevenueCatStatus(200);
     harness.setSyncUnavailable(false);
     harness.env.REVENUECAT_SECRET_API_KEY = "test-only-key";
+    harness.env.PARTY_BOOST_SANDBOX_USER_ID = undefined;
   });
 
   test("activates for a signed-in Premium member and exposes the boost to another member", async () => {
@@ -100,6 +101,106 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       revokedAt: null,
     });
   });
+
+  test("allows sandbox for the configured owner and preserves the boost when another member reads it", async () => {
+    const owner = await harness.createUser();
+    const member = await harness.createUser();
+    const party = harness.createParty();
+    owner.join(party);
+    member.join(party);
+    harness.env.PARTY_BOOST_SANDBOX_USER_ID = owner.id;
+    harness.customers.set(owner.id, "sandbox");
+    const activated = await harness.request("PUT", party, owner.cookie);
+    expect(activated.status).toBe(200);
+    expect(await activated.json()).toMatchObject({
+      currentUser: { isPremium: true },
+      party: { isBoosted: true, isBoostedByCurrentUser: true },
+    });
+    const ownStatus = await harness.request("GET", party, owner.cookie);
+    expect(await ownStatus.json()).toMatchObject({
+      currentUser: { isPremium: true, assignment: { active: true } },
+    });
+    const shared = await harness.request("GET", party, member.cookie);
+    expect(await shared.json()).toMatchObject({
+      currentUser: { isPremium: false },
+      party: { isBoosted: true, isBoostedByCurrentUser: false },
+    });
+
+    // A production subscriber cannot displace the sandbox owner either.
+    harness.customers.set(member.id, "subscription");
+    const competing = await harness.request("PUT", party, member.cookie);
+    expect(competing.status).toBe(409);
+    expect(await competing.json()).toMatchObject({ error: { code: "already_boosted" } });
+
+    const otherParty = harness.createParty();
+    owner.join(otherParty);
+    const transfer = await harness.request("PUT", otherParty, owner.cookie);
+    expect(transfer.status).toBe(409);
+    expect(await transfer.json()).toMatchObject({ error: { code: "transfer_locked" } });
+    expect(await harness.assignment(owner.id)).toMatchObject({
+      partyDocumentId: party,
+      revokedAt: null,
+    });
+  });
+
+  test("does not grant another sandbox purchaser the configured account's exception", async () => {
+    const allowed = await harness.createUser();
+    const other = await harness.createUser();
+    const party = harness.createParty();
+    other.join(party);
+    harness.env.PARTY_BOOST_SANDBOX_USER_ID = allowed.id;
+    harness.customers.set(other.id, "sandbox");
+    const response = await harness.request("PUT", party, other.cookie);
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({ error: { code: "premium_required" } });
+    expect(await harness.assignment(other.id)).toBeNull();
+    expect(harness.requests).toHaveLength(2);
+  });
+
+  test("keeps production access for the configured account without querying sandbox", async () => {
+    const owner = await harness.createUser();
+    const party = harness.createParty();
+    owner.join(party);
+    harness.env.PARTY_BOOST_SANDBOX_USER_ID = owner.id;
+    harness.customers.set(owner.id, "subscription");
+    expect((await harness.request("PUT", party, owner.cookie)).status).toBe(200);
+    expect(harness.requests).toHaveLength(2);
+    expect(
+      harness.requests.every(
+        (request) => new URL(request.url).searchParams.get("environment") === "production",
+      ),
+    ).toBe(true);
+  });
+
+  test.each(["expired", "exception_removed", "different_allowed_viewer"] as const)(
+    "revokes sandbox access when %s, including when another member checks the owner",
+    async (change) => {
+      const owner = await harness.createUser();
+      const member = await harness.createUser();
+      const party = harness.createParty();
+      owner.join(party);
+      member.join(party);
+      harness.env.PARTY_BOOST_SANDBOX_USER_ID = owner.id;
+      harness.customers.set(owner.id, "sandbox");
+      expect((await harness.request("PUT", party, owner.cookie)).status).toBe(200);
+
+      if (change === "expired") harness.customers.set(owner.id, "inactive");
+      if (change === "exception_removed") harness.env.PARTY_BOOST_SANDBOX_USER_ID = undefined;
+      if (change === "different_allowed_viewer")
+        harness.env.PARTY_BOOST_SANDBOX_USER_ID = member.id;
+
+      const status = await harness.request("GET", party, member.cookie);
+      expect(status.status).toBe(200);
+      expect(await status.json()).toMatchObject({ party: { isBoosted: false } });
+      expect(await harness.assignment(owner.id)).toMatchObject({
+        revocationReason: "premium_inactive",
+        version: 1,
+      });
+      const retry = await harness.request("PUT", party, owner.cookie);
+      expect(retry.status).toBe(403);
+      expect(await retry.json()).toMatchObject({ error: { code: "premium_required" } });
+    },
+  );
 
   test("keeps repeat activation idempotent and blocks moving during cooldown", async () => {
     const { owner, party } = await activate();
