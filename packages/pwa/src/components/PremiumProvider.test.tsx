@@ -17,13 +17,14 @@ vi.mock("./PremiumPaywall.tsx", () => ({
   },
 }));
 
-let premium: PremiumContextValue;
+const capturePremium = vi.fn<(value: PremiumContextValue) => void>();
 function CapturePremium() {
-  premium = usePremium();
+  capturePremium(usePremium());
   return null;
 }
 
 beforeEach(() => {
+  capturePremium.mockClear();
   renderToStaticMarkup(
     <PremiumProvider>
       <CapturePremium />
@@ -32,12 +33,14 @@ beforeEach(() => {
 });
 
 it("returns no new entitlement when the paywall is dismissed", async () => {
+  const premium = capturePremium.mock.lastCall![0];
   const result = premium.presentPaywall();
   paywall.props!.onOpenChange(false);
   await expect(result).resolves.toBeNull();
 });
 
 it("returns the purchase or restore result and clears it when reopening", async () => {
+  const premium = capturePremium.mock.lastCall![0];
   const result = premium.presentPaywall();
   const entitlement = { isPremium: true, hasActiveSubscription: true };
   paywall.props!.onEntitlementChange(entitlement);
