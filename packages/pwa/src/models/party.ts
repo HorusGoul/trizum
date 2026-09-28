@@ -17,6 +17,19 @@ export interface Party {
   expenseTemplates?: Record<ExpenseTemplate["id"], ExpenseTemplate>;
   defaultExpenseTemplateId?: ExpenseTemplate["id"];
   onlyUseCustomExpenseTemplates?: boolean;
+  /** Shared local-feature cache, never authorization for server-side operations. */
+  boost?: PartyBoostSnapshot;
+}
+
+export type BoostId = string;
+export type ParticipantId = PartyParticipant["id"];
+export type PartyBoostSnapshot = Record<BoostId, PartyBoost>;
+
+export interface PartyBoost {
+  boostId: BoostId;
+  participantId: ParticipantId;
+  checkedAt: string;
+  boostedAt: string;
 }
 
 export const DEFAULT_PARTY_SYMBOL = "🏝️";

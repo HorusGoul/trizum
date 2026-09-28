@@ -27,6 +27,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
   afterEach(() => {
     harness.setRevenueCatStatus(200);
     harness.setSyncUnavailable(false);
+    harness.setWritesUnavailable(false);
     harness.env.REVENUECAT_SECRET_API_KEY = "test-only-key";
     harness.env.PARTY_BOOST_SANDBOX_USER_ID = undefined;
   });
@@ -40,6 +41,16 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
     harness.customers.set(owner.id, "subscription");
     const response = await harness.request("PUT", party, owner.cookie);
     expect(response.status).toBe(200);
+    const assignment = (await harness.assignment(owner.id))!;
+    expect(harness.documents.get(party)?.boost).toEqual({
+      [assignment.boostId]: {
+        boostId: assignment.boostId,
+        participantId: owner.participantId,
+        boostedAt: new Date(assignment.assignedAt).toISOString(),
+        checkedAt: expect.any(String),
+      },
+    });
+    expect(owner.participantId).not.toBe(owner.id);
     expect(await response.json()).toMatchObject({
       currentUser: { isPremium: true, assignment: { active: true, partyDocumentId: party } },
       party: { isBoosted: true, isBoostedByCurrentUser: true },
@@ -220,6 +231,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
 
   test("moves after cooldown and clears the original party boost", async () => {
     const { owner, party } = await activate();
+    const original = (await harness.assignment(owner.id))!;
     const other = harness.createParty();
     owner.join(other);
     await harness.env.DB.prepare("UPDATE party_boost SET transferableAt = ? WHERE ownerUserId = ?")
@@ -231,11 +243,25 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       party: { isBoosted: true, isBoostedByCurrentUser: true },
     });
     const stored = await harness.assignment(owner.id);
-    expect(stored).toMatchObject({ partyDocumentId: other, version: 1, revokedAt: null });
+    expect(stored).toMatchObject({
+      boostId: original.boostId,
+      partyDocumentId: other,
+      version: 1,
+      revokedAt: null,
+    });
     expect(stored!.transferableAt - stored!.assignedAt).toBe(PARTY_BOOST_TRANSFER_INTERVAL_MS);
     const previous = await harness.request("GET", party, owner.cookie);
     expect(await previous.json()).toMatchObject({
       party: { isBoosted: false, isBoostedByCurrentUser: false },
+    });
+    expect(harness.documents.get(party)?.boost).toEqual({});
+    expect(harness.documents.get(other)?.boost).toEqual({
+      [stored!.boostId]: {
+        boostId: stored!.boostId,
+        participantId: owner.participantId,
+        boostedAt: new Date(stored!.assignedAt).toISOString(),
+        checkedAt: expect.any(String),
+      },
     });
   });
 
@@ -251,6 +277,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       revocationReason: "premium_inactive",
       version: 1,
     });
+    expect(harness.documents.get(party)?.boost).toEqual({});
     harness.customers.set(member.id, "subscription");
     expect((await harness.request("PUT", party, member.cookie)).status).toBe(200);
     expect(await harness.assignment(member.id)).toMatchObject({
@@ -381,6 +408,42 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
     const response = await harness.request("GET", party, owner.cookie);
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ party: { isBoosted: true } });
+  });
+
+  test("does not trust a forged shared boost snapshot when authorizing activation", async () => {
+    const user = await harness.createUser();
+    const party = harness.createParty();
+    user.join(party);
+    harness.documents.get(party)!.boost = {
+      forged: {
+        boostId: "forged",
+        participantId: user.participantId,
+        checkedAt: "2099-01-01T00:00:00.000Z",
+        boostedAt: "2026-01-01T00:00:00.000Z",
+      },
+    };
+    expect((await harness.request("PUT", party, user.cookie)).status).toBe(403);
+    expect(await harness.assignment(user.id)).toBeNull();
+    expect((await harness.request("GET", party, user.cookie)).status).toBe(200);
+    expect(harness.documents.get(party)?.boost).toEqual({});
+  });
+
+  test("repairs a failed snapshot publication on retry without resetting the assignment", async () => {
+    const user = await harness.createUser();
+    const party = harness.createParty();
+    user.join(party);
+    harness.customers.set(user.id, "subscription");
+    harness.setWritesUnavailable(true);
+    expect((await harness.request("PUT", party, user.cookie)).status).toBe(503);
+    const assignment = await harness.assignment(user.id);
+    expect(assignment).toMatchObject({ revokedAt: null });
+    expect(harness.documents.get(party)?.boost).toBeUndefined();
+    harness.setWritesUnavailable(false);
+    expect((await harness.request("PUT", party, user.cookie)).status).toBe(200);
+    expect(await harness.assignment(user.id)).toEqual(assignment);
+    expect(Object.keys(harness.documents.get(party)!.boost as object)).toEqual([
+      assignment!.boostId,
+    ]);
   });
 
   async function activate() {

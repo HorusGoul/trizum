@@ -1,6 +1,8 @@
+import type { Party } from "../../src/models/party";
 import { expect, test as base, type Page } from "@playwright/test";
 
 export interface InternalHarnessWindow extends Window {
+  __internal_setPartyBoost: (partyId: string, boost: Party["boost"]) => Promise<void>;
   __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
   __internal_createDeferredPartyListState: (seed: unknown) => Promise<{
     partyListId: string;
@@ -57,6 +59,7 @@ interface PartyListSnapshot {
 }
 
 export interface BrowserHarness {
+  setPartyBoost(partyId: string, boost: Party["boost"]): Promise<void>;
   goto(path?: string): Promise<void>;
   gotoHome(): Promise<void>;
   navigate(path: string): Promise<void>;
@@ -306,6 +309,16 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await page.getByRole("button", { name: /save|guardar/i }).click();
   }
 
+  async function setPartyBoost(partyId: string, boost: Party["boost"]) {
+    await page.evaluate(
+      async ({ partyId, boost }) => {
+        const internalWindow = window as unknown as InternalHarnessWindow;
+        await internalWindow.__internal_setPartyBoost(partyId, boost);
+      },
+      { partyId, boost },
+    );
+  }
+
   async function createParty(fixture: unknown) {
     return page.evaluate(async (data) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
@@ -337,6 +350,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   }
 
   return {
+    setPartyBoost,
     goto,
     gotoHome: () => goto("/"),
     navigate,

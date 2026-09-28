@@ -29,11 +29,8 @@ export function getPartyBoostActionState({
   partyDocumentId: string;
   status: PartyBoostStatus | null;
 }): PartyBoostActionState {
-  if (!isSignedIn) {
-    return { type: "signed_out" };
-  }
-
   if (!status) {
+    if (!isSignedIn) return { type: "signed_out" };
     return { disabled: isRefreshing, type: "retry" };
   }
 
@@ -43,6 +40,10 @@ export function getPartyBoostActionState({
 
   if (status.party.isBoosted) {
     return { type: "boosted_by_other" };
+  }
+
+  if (!isSignedIn) {
+    return { type: "signed_out" };
   }
 
   const assignment = status.currentUser.assignment;

@@ -35,6 +35,9 @@ setup and reusable journey state.
   locally, then drive the `/join` and `/party/$partyId/who` UI on top of that
   local copy.
 
+`harness.setPartyBoost(...)` seeds a server-observed boost snapshot directly in
+Automerge for shared-state UI tests. Importing an expense file does not copy boosts.
+
 ## Helper Boundaries
 
 - Fixture methods own browser boot, seeded Automerge docs, and direct

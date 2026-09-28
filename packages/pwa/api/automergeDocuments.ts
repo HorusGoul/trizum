@@ -1,4 +1,10 @@
-import type { Doc } from "@automerge/automerge";
+import {
+  getHeads,
+  hasOurChanges,
+  type ChangeFn,
+  type Doc,
+  type SyncState,
+} from "@automerge/automerge";
 import { isValidDocumentId, Repo, type DocumentId, type PeerId } from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { getLogger } from "../src/lib/log.js";
@@ -23,6 +29,7 @@ export class AutomergeDocuments {
   #ready?: Promise<Repo>;
   #closing?: Promise<void>;
   #timeoutId?: ReturnType<typeof setTimeout>;
+  #syncPeerId?: PeerId;
 
   constructor(options: AutomergeDocumentsOptions) {
     this.#options = options;
@@ -30,6 +37,54 @@ export class AutomergeDocuments {
   }
 
   async read<T>(documentId: DocumentId): Promise<Doc<T>> {
+    return (await this.#find<T>(documentId)).doc();
+  }
+
+  /** Wait for the connected sync peer to acknowledge the change before returning. */
+  async change<T>(documentId: DocumentId, change: ChangeFn<T>): Promise<Doc<T>> {
+    const handle = await this.#find<T>(documentId);
+    const repo = this.#repo!;
+    const previousHeads = getHeads(handle.doc()).join(",");
+    await new Promise<void>((resolve, reject) => {
+      let changed: Doc<T> | undefined;
+      const cleanup = () => {
+        repo.synchronizer.off("sync-state", onSync);
+        this.#signal.removeEventListener("abort", onAbort);
+      };
+      const onSync = (event: { documentId: DocumentId; peerId: PeerId; syncState: SyncState }) => {
+        if (
+          event.documentId === documentId &&
+          event.peerId === this.#syncPeerId &&
+          changed &&
+          hasOurChanges(changed, event.syncState)
+        ) {
+          cleanup();
+          resolve();
+        }
+      };
+      const onAbort = () => {
+        cleanup();
+        reject(this.#signal.reason);
+      };
+      repo.synchronizer.on("sync-state", onSync);
+      this.#signal.addEventListener("abort", onAbort, { once: true });
+      try {
+        this.#signal.throwIfAborted();
+        handle.change(change);
+        changed = handle.doc();
+        if (getHeads(changed).join(",") === previousHeads) {
+          cleanup();
+          resolve();
+        }
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
+    });
+    return handle.doc();
+  }
+
+  async #find<T>(documentId: DocumentId) {
     this.#signal.throwIfAborted();
     if (!isValidDocumentId(documentId)) {
       throw new Error("Invalid document ID.");
@@ -38,11 +93,10 @@ export class AutomergeDocuments {
     // Share the initialization promise as well as the repo across concurrent reads.
     const repo = await (this.#ready ??= this.#connect());
     this.#signal.throwIfAborted();
-    const handle = await repo.find<T>(documentId, {
+    return repo.find<T>(documentId, {
       allowableStates: ["ready"],
       signal: this.#signal,
     });
-    return handle.doc();
   }
 
   close(): Promise<void> {
@@ -75,6 +129,7 @@ export class AutomergeDocuments {
     });
     this.#repo = repo;
     await waitForAutomergePeer(network, this.#signal);
+    this.#syncPeerId = network.remotePeerId;
     return repo;
   }
 }

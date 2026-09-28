@@ -15,7 +15,7 @@ export class PartyMembershipUnavailableError extends Error {
   }
 }
 
-export async function verifyPartyMembership({
+export async function getPartyMemberParticipantId({
   documents,
   partyDocumentId,
   partyListDocumentId,
@@ -25,7 +25,7 @@ export async function verifyPartyMembership({
   partyListDocumentId: string;
 }) {
   if (!isValidDocumentId(partyDocumentId) || !isValidDocumentId(partyListDocumentId)) {
-    return false;
+    return null;
   }
 
   const partyId = partyDocumentId as DocumentId;
@@ -35,20 +35,16 @@ export async function verifyPartyMembership({
     const participantId = partyList?.participantInParties?.[partyId];
 
     if (!partyList || partyList.type !== "partyList" || partyList.parties?.[partyId] !== true) {
-      return false;
+      return null;
     }
 
     if (!participantId) {
-      return false;
+      return null;
     }
 
     const party = await documents.read<Party>(partyId);
 
-    return isPartyMembershipValid({
-      participantId,
-      party,
-      partyDocumentId,
-    });
+    return isPartyMembershipValid({ participantId, party, partyDocumentId }) ? participantId : null;
   } catch (error) {
     throw new PartyMembershipUnavailableError("Party membership could not be verified.", {
       cause: error,
@@ -71,4 +67,10 @@ export function isPartyMembershipValid({
 
   const participant = party.participants?.[participantId];
   return Boolean(participant && participant.id === participantId && !participant.isArchived);
+}
+
+export async function verifyPartyMembership(
+  options: Parameters<typeof getPartyMemberParticipantId>[0],
+) {
+  return (await getPartyMemberParticipantId(options)) !== null;
 }
