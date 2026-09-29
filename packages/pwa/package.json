@@ -105,6 +105,7 @@
     "@vite-pwa/assets-generator": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
+    "jsdom": "catalog:",
     "lucide-static": "catalog:",
     "rollup": "catalog:",
     "rollup-plugin-license": "catalog:",

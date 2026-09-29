@@ -1,8 +1,6 @@
 import { Trans } from "@lingui/react/macro";
-import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState } from "react";
-import { toast } from "sonner";
+import { lazy, Suspense, useState } from "react";
 import { PremiumCodeRedemption } from "#src/components/PremiumCodeRedemption.tsx";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
@@ -10,6 +8,7 @@ import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
 import { PremiumBrowserHelp } from "#src/components/PremiumBrowserHelp.tsx";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
+import { useRedemptionDialogs } from "#src/hooks/useRedemptionDialogs.ts";
 import { Icon } from "#src/ui/Icon.tsx";
 
 const CloudSyncSettingsView = lazy(() =>
@@ -30,52 +29,16 @@ function RedeemCode() {
 
 function RedemptionPage({ initialCode }: { initialCode: string }) {
   const [code, setCode] = useState(initialCode);
-  const [isBrowserHelpOpen, setBrowserHelpOpen] = useState(false);
-  const [isSignInOpen, setSignInOpen] = useState(false);
-  const openPremiumAfterSignIn = useRef(false);
-  const [premiumUserId, setPremiumUserId] = useState<string | null>(null);
-  const openedPremiumUser = useRef<string | null>(null);
   const session = useAppSession();
   const user = session.data?.user;
   const email = user?.email;
   const premium = usePremium();
 
-  function showPremium() {
-    // Paywall promises resolve on dismissal; do not hold a React action transition open.
-    void premium
-      .presentPaywall()
-      .catch(() => toast.error(t`Could not open Premium. Please try again.`));
-  }
-
-  const resumePremium = useEffectEvent(showPremium);
-  useEffect(() => {
-    // Wait for PremiumProvider to observe the account before opening its dialog.
-    if (!premiumUserId || user?.id !== premiumUserId || openedPremiumUser.current === premiumUserId)
-      return;
-    openedPremiumUser.current = premiumUserId;
-    resumePremium();
-  }, [premiumUserId, user?.id]);
-
-  function requestSignIn() {
-    setSignInOpen(true);
-  }
-
-  function openPremium() {
-    if (!getRevenueCatPlatform()) {
-      setBrowserHelpOpen(true);
-      return;
-    }
-    if (user) showPremium();
-    else {
-      openPremiumAfterSignIn.current = true;
-      requestSignIn();
-    }
-  }
-
-  function closeSignIn() {
-    setSignInOpen(false);
-    openPremiumAfterSignIn.current = false;
-  }
+  const dialogs = useRedemptionDialogs({
+    userId: user?.id ?? null,
+    isNative: Boolean(getRevenueCatPlatform()),
+    presentPaywall: premium.presentPaywall,
+  });
 
   return (
     <div className="pb-safe flex min-h-full flex-col">
@@ -99,8 +62,8 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           userId={user?.id ?? null}
           code={code}
           onCodeChange={setCode}
-          onSignIn={requestSignIn}
-          onOpenPremium={openPremium}
+          onSignIn={dialogs.signIn}
+          onOpenPremium={dialogs.openPremium}
         />
         {premium.isPremium ? (
           <output className="text-accent-900 dark:text-accent-100 mt-4 flex items-center gap-2 text-sm font-medium">
@@ -109,8 +72,10 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           </output>
         ) : null}
       </main>
-      {isBrowserHelpOpen ? <PremiumBrowserHelp onClose={() => setBrowserHelpOpen(false)} /> : null}
-      {isSignInOpen ? (
+      {dialogs.dialog.kind === "browserHelp" ? (
+        <PremiumBrowserHelp onClose={dialogs.close} />
+      ) : null}
+      {dialogs.dialog.kind === "signIn" ? (
         <Suspense
           fallback={
             <output className="px-4">
@@ -120,10 +85,8 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
         >
           <CloudSyncSettingsView
             search={{ returnTo: `/redeem?${new URLSearchParams({ code })}` }}
-            onClose={closeSignIn}
-            onSignedIn={(userId) => {
-              if (openPremiumAfterSignIn.current) setPremiumUserId(userId);
-            }}
+            onClose={dialogs.close}
+            onSignedIn={dialogs.signedIn}
           />
         </Suspense>
       ) : null}

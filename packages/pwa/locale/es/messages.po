@@ -1056,8 +1056,8 @@ msgstr "No se pudieron cargar los métodos de inicio de sesión"
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
+#: src/hooks/useRedemptionDialogs.ts:26
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:47
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
@@ -2019,7 +2019,7 @@ msgstr "Cargando licencias..."
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
-#: src/routes/redeem.tsx:117
+#: src/routes/redeem.tsx:82
 msgid "Loading sign-in…"
 msgstr "Cargando inicio de sesión…"
 
@@ -2862,7 +2862,7 @@ msgstr "Premium en la app móvil"
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
-#: src/routes/redeem.tsx:108
+#: src/routes/redeem.tsx:71
 msgid "Premium is active."
 msgstr "Premium está activo."
 
@@ -2976,7 +2976,7 @@ msgstr "Canjear un código de un solo uso en Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:63
 #: src/components/PremiumPaywall.tsx:279
-#: src/routes/redeem.tsx:86
+#: src/routes/redeem.tsx:49
 msgid "Redeem code"
 msgstr "Canjear código"
 
@@ -3356,7 +3356,7 @@ msgstr "Métodos de inicio de sesión"
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/redeem.tsx:94
+#: src/routes/redeem.tsx:57
 msgid "Signed in as {email}"
 msgstr "Sesión iniciada como {email}"
 
