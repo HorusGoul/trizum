@@ -10,3 +10,5 @@ Open Apple offer-code redemption or Google Play one-time-code redemption from th
 Show the signed-in account on the redemption page. Store links open directly without requiring sign-in. Keep optional sign-in and direct Premium settings actions in the FAQs, preserving the entered code through authentication.
 
 Keep redemption codes editable offline and explain the connection requirement only when redemption is attempted, without a warning above the form.
+
+Preserve numeric-looking promo codes exactly in shared links. Keep failed or pending FAQ sign-in dismissible without losing edited codes, and explain mobile-app purchase and restore steps when opening Premium help in a browser.

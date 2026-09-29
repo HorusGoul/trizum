@@ -8,6 +8,8 @@ import { BackButton } from "#src/components/BackButton.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
+import { PremiumBrowserHelp } from "#src/components/PremiumBrowserHelp.tsx";
+import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { Icon } from "#src/ui/Icon.tsx";
 
 const CloudSyncSettingsView = lazy(() =>
@@ -28,6 +30,7 @@ function RedeemCode() {
 
 function RedemptionPage({ initialCode }: { initialCode: string }) {
   const [code, setCode] = useState(initialCode);
+  const [isBrowserHelpOpen, setBrowserHelpOpen] = useState(false);
   const [isSignInOpen, setSignInOpen] = useState(false);
   const openPremiumAfterSignIn = useRef(false);
   const [premiumUserId, setPremiumUserId] = useState<string | null>(null);
@@ -58,6 +61,10 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
   }
 
   function openPremium() {
+    if (!getRevenueCatPlatform()) {
+      setBrowserHelpOpen(true);
+      return;
+    }
     if (user) showPremium();
     else {
       openPremiumAfterSignIn.current = true;
@@ -102,6 +109,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           </output>
         ) : null}
       </main>
+      {isBrowserHelpOpen ? <PremiumBrowserHelp onClose={() => setBrowserHelpOpen(false)} /> : null}
       {isSignInOpen ? (
         <Suspense
           fallback={

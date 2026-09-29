@@ -752,6 +752,34 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
 
   const sessionStatus = getAuthSessionStatus(session);
   if (!optimisticAuthUser && (sessionStatus === "pending" || sessionStatus === "unavailable")) {
+    const accountStatus = (
+      <div className="container flex flex-col gap-4 p-4">
+        <output className="text-accent-700 dark:text-accent-300 text-sm">
+          {sessionStatus === "pending" ? (
+            <Trans>Checking account…</Trans>
+          ) : (
+            <Trans>Your account could not be checked. Connect to the internet and try again.</Trans>
+          )}
+        </output>
+        {sessionStatus === "unavailable" ? (
+          <Button
+            color="input-like"
+            pressAction={async () => {
+              await session.refetch();
+            }}
+          >
+            <Trans>Retry account check</Trans>
+          </Button>
+        ) : null}
+      </div>
+    );
+    if (onClose) {
+      return (
+        <CloudSyncSignInDialog isOpen onOpenChange={onClose} showHeader={false}>
+          {accountStatus}
+        </CloudSyncSignInDialog>
+      );
+    }
     return (
       <div className="bg-accent-50 dark:bg-accent-950 fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto">
         <div className="mt-safe container flex h-16 items-center px-2">
@@ -760,27 +788,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
             <Trans>trizum cloud</Trans>
           </h1>
         </div>
-        <div className="container flex flex-col gap-4 p-4">
-          <output className="text-accent-700 dark:text-accent-300 text-sm">
-            {sessionStatus === "pending" ? (
-              <Trans>Checking account…</Trans>
-            ) : (
-              <Trans>
-                Your account could not be checked. Connect to the internet and try again.
-              </Trans>
-            )}
-          </output>
-          {sessionStatus === "unavailable" ? (
-            <Button
-              color="input-like"
-              pressAction={async () => {
-                await session.refetch();
-              }}
-            >
-              <Trans>Retry account check</Trans>
-            </Button>
-          ) : null}
-        </div>
+        {accountStatus}
       </div>
     );
   }

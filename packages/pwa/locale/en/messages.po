@@ -783,7 +783,7 @@ msgstr "Check your email for the password link"
 msgid "Check your email for the sign-in link"
 msgstr "Check your email for the sign-in link"
 
-#: src/components/CloudSyncSettingsView.tsx:766
+#: src/components/CloudSyncSettingsView.tsx:759
 #: src/routes/settings.tsx:364
 msgid "Checking account…"
 msgstr "Checking account…"
@@ -861,6 +861,7 @@ msgstr "Close calculator"
 msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
+#: src/components/PremiumBrowserHelp.tsx:23
 #: src/components/PremiumPaywall.tsx:168
 msgid "Close Premium"
 msgstr "Close Premium"
@@ -1080,7 +1081,7 @@ msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:44
+#: src/routes/redeem.tsx:47
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
@@ -1659,6 +1660,10 @@ msgstr "Go back and try again from the balances list."
 msgid "Go back to home"
 msgstr "Go back to home"
 
+#: src/components/PremiumBrowserHelp.tsx:44
+msgid "Go to Settings → Premium to choose a plan, or use Restore purchases if you already redeemed your code."
+msgstr "Go to Settings → Premium to choose a plan, or use Restore purchases if you already redeemed your code."
+
 #: src/routes/new/route.tsx:324
 msgid "Gold (troy ounce)"
 msgstr "Gold (troy ounce)"
@@ -2066,7 +2071,7 @@ msgstr "Loading licenses..."
 msgid "Loading Premium options"
 msgstr "Loading Premium options"
 
-#: src/routes/redeem.tsx:109
+#: src/routes/redeem.tsx:117
 msgid "Loading sign-in…"
 msgstr "Loading sign-in…"
 
@@ -2516,6 +2521,10 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
+#: src/components/PremiumBrowserHelp.tsx:38
+msgid "Open the installed trizum app and sign in to the account you want to use for Premium."
+msgstr "Open the installed trizum app and sign in to the account you want to use for Premium."
+
 #: src/components/PremiumRedemptionHelp.tsx:77
 msgid "Open this link on your phone and copy your code. Choose <0>App Store</0> for iPhone or iPad, or <1>Google Play</1> for Android."
 msgstr "Open this link on your phone and copy your code. Choose <0>App Store</0> for iPhone or iPad, or <1>Google Play</1> for Android."
@@ -2913,11 +2922,15 @@ msgstr "Premium belongs to the purchasing person and may not be transferred, res
 msgid "Premium could not be purchased. Please try again."
 msgstr "Premium could not be purchased. Please try again."
 
+#: src/components/PremiumBrowserHelp.tsx:28
+msgid "Premium in the mobile app"
+msgstr "Premium in the mobile app"
+
 #: src/routes/settings.tsx:405
 msgid "Premium is active on this account."
 msgstr "Premium is active on this account."
 
-#: src/routes/redeem.tsx:101
+#: src/routes/redeem.tsx:108
 msgid "Premium is active."
 msgstr "Premium is active."
 
@@ -2988,6 +3001,10 @@ msgstr "Profile and app menu"
 msgid "Promo code"
 msgstr "Promo code"
 
+#: src/components/PremiumBrowserHelp.tsx:31
+msgid "Purchases and restores are available in the trizum app installed from the App Store or Google Play."
+msgstr "Purchases and restores are available in the trizum app installed from the App Store or Google Play."
+
 #: src/routes/terms/-components/PremiumTerms.tsx:18
 msgid "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
 msgstr "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
@@ -3031,7 +3048,7 @@ msgstr "Redeem a one-time code in Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:71
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:79
+#: src/routes/redeem.tsx:86
 msgid "Redeem code"
 msgstr "Redeem code"
 
@@ -3107,7 +3124,7 @@ msgstr "Restore to home"
 msgid "Retry"
 msgstr "Retry"
 
-#: src/components/CloudSyncSettingsView.tsx:780
+#: src/components/CloudSyncSettingsView.tsx:771
 #: src/routes/settings.tsx:366
 msgid "Retry account check"
 msgstr "Retry account check"
@@ -3323,7 +3340,7 @@ msgstr "Sierra Leonean Leone"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/components/CloudSyncSettingsView.tsx:1050
+#: src/components/CloudSyncSettingsView.tsx:1058
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
@@ -3413,7 +3430,7 @@ msgstr "Sign-in methods"
 msgid "Signed in"
 msgstr "Signed in"
 
-#: src/routes/redeem.tsx:87
+#: src/routes/redeem.tsx:94
 msgid "Signed in as {email}"
 msgstr "Signed in as {email}"
 
@@ -3961,8 +3978,8 @@ msgstr "Tricount URL or key"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Trinidad and Tobago Dollar"
 
-#: src/components/CloudSyncSettingsView.tsx:760
-#: src/components/CloudSyncSettingsView.tsx:921
+#: src/components/CloudSyncSettingsView.tsx:788
+#: src/components/CloudSyncSettingsView.tsx:929
 #: src/routes/_home/route.tsx:102
 msgid "trizum cloud"
 msgstr "trizum cloud"
@@ -3993,6 +4010,7 @@ msgstr "trizum could not finish connecting that sign-in method. Please try again
 msgid "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
 msgstr "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
 
+#: src/components/PremiumBrowserHelp.tsx:18
 #: src/components/PremiumPaywall.tsx:164
 msgid "trizum Premium"
 msgstr "trizum Premium"
@@ -4452,7 +4470,7 @@ msgstr "You're now seeing the party as {0}"
 msgid "You're now seeing the party as {participantName}"
 msgstr "You're now seeing the party as {participantName}"
 
-#: src/components/CloudSyncSettingsView.tsx:768
+#: src/components/CloudSyncSettingsView.tsx:761
 #: src/routes/settings.tsx:397
 msgid "Your account could not be checked. Connect to the internet and try again."
 msgstr "Your account could not be checked. Connect to the internet and try again."

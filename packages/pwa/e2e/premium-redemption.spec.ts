@@ -76,10 +76,9 @@ test("FAQ sign-in preserves the edited code without opening a store", async ({ h
   await expect(signIn).toBeHidden();
   await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("UPDATED");
   await page.getByRole("button", { name: "Premium settings", exact: true }).click();
-  await expect(signIn).toBeVisible();
-  await expect(page).toHaveURL(
-    (url) => url.pathname === "/redeem" && url.searchParams.get("code") === "FRIENDS",
-  );
+  await expect(page.getByRole("dialog", { name: "trizum Premium", exact: true })).toBeVisible();
+  await expect(signIn).toBeHidden();
+  await expect(page.getByText("Premium in the mobile app", { exact: true })).toBeVisible();
 });
 
 test("signed-in visitors open Premium directly without a redundant sign-in step", async ({
@@ -110,7 +109,7 @@ test("signed-in visitors open Premium directly without a redundant sign-in step"
   );
 });
 
-test("signing in from Premium help opens Premium and keeps the edited redemption code", async ({
+test("optional FAQ sign-in keeps the edited code and browser Premium explains recovery", async ({
   harness,
   page,
 }) => {
@@ -144,14 +143,21 @@ test("signing in from Premium help opens Premium and keeps the edited redemption
   });
   await harness.goto("/redeem?code=FRIENDS");
   await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");
-  await page.getByText("Already redeemed?", { exact: true }).click();
-  await page.getByRole("button", { name: "Premium settings", exact: true }).click();
+  await page.getByText("How do I redeem my code?", { exact: true }).click();
+  await page.getByRole("button", { name: "sign in", exact: true }).click();
   const signIn = page.getByRole("dialog", { name: "Sign in", exact: true });
   await signIn.getByRole("button", { name: "Sign in with password", exact: true }).click();
   await signIn.getByRole("textbox", { name: "Email", exact: true }).fill(user.email);
   await signIn.getByLabel("Password", { exact: true }).fill("example-test-password");
   await signIn.getByRole("button", { name: "Sign in with password", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "trizum Premium", exact: true })).toBeVisible();
+  await expect(signIn).toBeHidden();
+  await page.getByRole("button", { name: "Premium settings", exact: true }).click();
+  const help = page.getByRole("dialog", { name: "trizum Premium", exact: true });
+  await expect(help).toBeVisible();
+  await expect(
+    help.getByText(/Purchases and restores are available in the trizum app/),
+  ).toBeVisible();
+  await expect(help.getByRole("button", { name: "Restore purchases", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Close Premium", exact: true }).click();
   await expect(page.getByText("Signed in as alex@example.com", { exact: true })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("UPDATED");
@@ -281,3 +287,67 @@ for (const store of [
     });
   }
 }
+
+for (const code of ["123E45", "12345678", "123456789012345678901234567890", "001234"]) {
+  test(`shared code ${code} retains its exact text at the router boundary`, async ({
+    harness,
+    page,
+  }) => {
+    await harness.goto(`/redeem?code=${code}`);
+    await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue(code);
+    await expect(page.getByRole("link", { name: "Redeem in Google Play" })).toHaveAttribute(
+      "href",
+      `https://play.google.com/redeem?code=${code}`,
+    );
+  });
+}
+
+for (const status of ["pending", "unavailable"] as const) {
+  test(`FAQ sign-in can be cancelled while account status is ${status}`, async ({
+    harness,
+    page,
+  }) => {
+    await page.route("**/api/auth/get-session**", async (route) => {
+      if (status === "pending") return;
+      await route.fulfill({ status: 503, json: { message: "Unavailable" } });
+    });
+    await harness.goto("/redeem?code=FRIENDS");
+    await page.getByRole("textbox", { name: "Promo code" }).fill("EDITED-CODE");
+    await page.getByText("How do I redeem my code?", { exact: true }).click();
+    for (const dismiss of ["escape", "close"]) {
+      await page.getByRole("button", { name: "sign in", exact: true }).click();
+      const dialog = page.getByRole("dialog", { name: "Sign in", exact: true });
+      await expect(dialog).toBeVisible();
+      await expect(
+        dialog.getByText(
+          status === "pending"
+            ? "Checking account…"
+            : "Your account could not be checked. Connect to the internet and try again.",
+          { exact: true },
+        ),
+      ).toBeVisible();
+      if (dismiss === "escape") await page.keyboard.press("Escape");
+      else await dialog.getByRole("button", { name: "Close sign-in", exact: true }).click();
+      await expect(dialog).toBeHidden();
+      await expect(page).toHaveURL((url) => url.pathname === "/redeem");
+      await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("EDITED-CODE");
+    }
+  });
+}
+
+test("standalone unavailable account still uses route-backed Back navigation", async ({
+  harness,
+  page,
+}) => {
+  await page.route("**/api/auth/get-session**", (route) =>
+    route.fulfill({ status: 503, json: { message: "Unavailable" } }),
+  );
+  await harness.goto("/settings/cloud-sync");
+  await expect(
+    page.getByText("Your account could not be checked. Connect to the internet and try again.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Go Back", exact: true }).click();
+  await expect(page).not.toHaveURL((url) => url.pathname === "/settings/cloud-sync");
+});

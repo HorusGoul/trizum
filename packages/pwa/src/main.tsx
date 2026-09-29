@@ -14,6 +14,7 @@ import {
   type ToOptions,
   type RegisteredRouter,
 } from "@tanstack/react-router";
+import { parseAppSearch, stringifyAppSearch } from "./lib/routerSearch.ts";
 import "./index.css";
 import { I18nProvider, useLingui } from "@lingui/react";
 import { I18nProvider as AriaI18nProvider } from "react-aria-components";
@@ -247,6 +248,8 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
 // Create a new router instance
 const history = preventDuplicateHistoryEntries(createBrowserHistory());
 const router = createRouter({
+  parseSearch: parseAppSearch,
+  stringifySearch: stringifyAppSearch,
   routeTree,
   history,
   context: { repo },
