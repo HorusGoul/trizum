@@ -26,15 +26,12 @@ function RedeemCode() {
       <meta name="robots" content="noindex, nofollow" />
       <header className="mt-safe mx-auto flex h-16 w-full max-w-[480px] items-center gap-2 px-2">
         <BackButton fallbackOptions={{ to: "/settings" }} />
-        <span className="text-lg font-bold tracking-tight">
-          <Trans>trizum Premium</Trans>
-        </span>
-      </header>
-      <main className="mx-auto w-full max-w-[480px] px-6 pt-6 pb-8">
-        <h1 className="text-2xl leading-tight font-bold tracking-tight">
+        <h1 className="text-lg font-bold tracking-tight">
           <Trans>Redeem code</Trans>
         </h1>
-        <p className="text-accent-600 dark:text-accent-300 mt-2 mb-7 text-sm leading-relaxed">
+      </header>
+      <main className="mx-auto w-full max-w-[480px] px-6 pt-6 pb-8">
+        <p className="text-accent-600 dark:text-accent-300 mb-7 text-sm leading-relaxed">
           <Trans>Use a promo code for trizum Premium.</Trans>
         </p>
         {platform && !userId ? (

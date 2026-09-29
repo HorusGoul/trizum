@@ -14,6 +14,9 @@ import {
   getStoreRedemptionUrl,
 } from "#src/lib/premium/premiumRedemption.ts";
 
+const storeButtonClassName =
+  "border-accent-200 bg-accent-50 text-accent-950 hover:border-accent-400 hover:bg-accent-100 focus-visible:ring-accent-500 dark:border-accent-800 dark:bg-accent-900 dark:text-accent-50 dark:hover:border-accent-600 dark:hover:bg-accent-800 flex h-auto min-h-18 items-center justify-start gap-4 rounded-2xl border px-4 py-3 text-left outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2";
+
 export function PremiumCodeRedemption({
   userId,
   initialCode = "",
@@ -88,16 +91,12 @@ export function PremiumCodeRedemption({
       <div className="flex flex-col gap-3">
         {platform ? (
           <Button
-            className="h-auto min-h-12 px-4 py-3 text-sm font-semibold"
-            color="accent"
+            className={storeButtonClassName}
+            aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
             isDisabled={!userId || isDisabled}
             pressAction={redeem}
           >
-            {platform === "ios" ? (
-              <Trans>Redeem in App Store</Trans>
-            ) : (
-              <Trans>Redeem in Google Play</Trans>
-            )}
+            <StoreRedemptionContent platform={platform} />
           </Button>
         ) : (
           <>
@@ -143,17 +142,33 @@ export function PremiumCodeRedemption({
 function StoreRedemptionLink({ platform, code }: { platform: "ios" | "android"; code: string }) {
   return (
     <a
-      className="bg-accent-500 text-accent-50 hover:bg-accent-600 focus-visible:ring-accent-500 dark:bg-accent-500 dark:hover:bg-accent-400 flex min-h-12 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2"
+      className={storeButtonClassName}
+      aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
       href={getStoreRedemptionUrl(platform, code)}
       rel="noreferrer"
       target="_blank"
     >
-      {platform === "ios" ? (
-        <Trans>Redeem in App Store</Trans>
-      ) : (
-        <Trans>Redeem in Google Play</Trans>
-      )}
-      <Icon icon="lucide.arrow-up-right" className="size-4" />
+      <StoreRedemptionContent platform={platform} />
     </a>
+  );
+}
+
+function StoreRedemptionContent({ platform }: { platform: "ios" | "android" }) {
+  return (
+    <>
+      <Icon
+        icon={platform === "ios" ? "brand.app-store" : "brand.google-play"}
+        className="text-accent-600 dark:text-accent-300 size-7 shrink-0"
+      />
+      <span className="flex-1">
+        <span className="block text-sm font-bold">
+          {platform === "ios" ? <Trans>App Store</Trans> : <Trans>Google Play</Trans>}
+        </span>
+        <span className="text-accent-600 dark:text-accent-300 block text-xs">
+          <Trans>Redeem your offer</Trans>
+        </span>
+      </span>
+      <Icon icon="lucide.arrow-up-right" className="text-accent-500 dark:text-accent-400 size-4" />
+    </>
   );
 }
