@@ -375,7 +375,7 @@ msgstr "All expense checks passed"
 msgid "All time"
 msgstr "All time"
 
-#: src/components/PremiumCodeRedemption.tsx:126
+#: src/components/PremiumCodeRedemption.tsx:128
 msgid "Already redeemed?"
 msgstr "Already redeemed?"
 
@@ -885,6 +885,10 @@ msgstr "Code copied."
 msgid "Code for testing"
 msgstr "Code for testing"
 
+#: src/components/PremiumCodeRedemption.tsx:114
+msgid "Code not working in Google Play?"
+msgstr "Code not working in Google Play?"
+
 #: src/components/PremiumCodeRedemption.tsx:42
 msgid "Code redemption could not be opened. Please try again."
 msgstr "Code redemption could not be opened. Please try again."
@@ -1010,7 +1014,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/components/PremiumCodeRedemption.tsx:79
+#: src/components/PremiumCodeRedemption.tsx:80
 msgid "Copy code"
 msgstr "Copy code"
 
@@ -2475,7 +2479,7 @@ msgstr "Open parenthesis"
 msgid "Open this party to split expenses and settle up together on trizum."
 msgstr "Open this party to split expenses and settle up together on trizum."
 
-#: src/components/PremiumCodeRedemption.tsx:130
+#: src/components/PremiumCodeRedemption.tsx:132
 msgid "Open trizum on your phone and sign in to your account. Use Restore purchases if Premium has not appeared yet."
 msgstr "Open trizum on your phone and sign in to your account. Use Restore purchases if Premium has not appeared yet."
 
@@ -2835,7 +2839,6 @@ msgstr "Polish Zloty"
 
 #: src/components/PremiumPaywall.tsx:184
 #: src/routes/party_.$partyId.settings/index.tsx:66
-#: src/routes/redeem.tsx:37
 #: src/routes/settings.tsx:345
 msgid "Premium"
 msgstr "Premium"
@@ -2853,7 +2856,7 @@ msgstr "Premium could not be purchased. Please try again."
 msgid "Premium is active on this account."
 msgstr "Premium is active on this account."
 
-#: src/routes/redeem.tsx:78
+#: src/routes/redeem.tsx:66
 msgid "Premium is active."
 msgstr "Premium is active."
 
@@ -2920,6 +2923,7 @@ msgid "Profile and app menu"
 msgstr "Profile and app menu"
 
 #: src/components/PremiumCodeRedemption.tsx:67
+#: src/components/PremiumCodeRedemption.tsx:72
 msgid "Promo code"
 msgstr "Promo code"
 
@@ -2966,14 +2970,19 @@ msgstr "Redeem a one-time code in Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:57
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:44
+#: src/routes/redeem.tsx:35
 msgid "Redeem code"
 msgstr "Redeem code"
 
-#: src/components/PremiumCodeRedemption.tsx:96
-#: src/components/PremiumCodeRedemption.tsx:149
+#: src/components/PremiumCodeRedemption.tsx:97
+#: src/components/PremiumCodeRedemption.tsx:152
 msgid "Redeem in App Store"
 msgstr "Redeem in App Store"
+
+#: src/components/PremiumCodeRedemption.tsx:99
+#: src/components/PremiumCodeRedemption.tsx:154
+msgid "Redeem in Google Play"
+msgstr "Redeem in Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:160
 msgid "Redeem your offer"
@@ -3242,7 +3251,7 @@ msgstr "Sierra Leonean Leone"
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
-#: src/routes/redeem.tsx:56
+#: src/routes/redeem.tsx:44
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -3267,7 +3276,7 @@ msgstr "Sign in to purchase or restore Premium across your devices."
 msgid "Sign in to trizum cloud"
 msgstr "Sign in to trizum cloud"
 
-#: src/routes/redeem.tsx:51
+#: src/routes/redeem.tsx:42
 msgid "Sign in to your trizum account before redeeming."
 msgstr "Sign in to your trizum account before redeeming."
 
@@ -3359,6 +3368,10 @@ msgstr "Solomon Islands Dollar"
 #: src/routes/new/route.tsx:297
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
+
+#: src/components/PremiumCodeRedemption.tsx:118
+msgid "Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan for your offer, then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
+msgstr "Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan for your offer, then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 
 #: src/routes/terms/-components/ServiceTerms.tsx:31
 msgid "Some trizum source code and third-party components are available under open-source licenses. Those licenses continue to govern the code and components they cover, and nothing in these Terms restricts rights granted by those licenses."
@@ -3889,6 +3902,7 @@ msgid "trizum helps people record shared expenses, calculate balances, and coord
 msgstr "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
 
 #: src/components/PremiumPaywall.tsx:164
+#: src/routes/redeem.tsx:30
 msgid "trizum Premium"
 msgstr "trizum Premium"
 
@@ -4038,7 +4052,7 @@ msgstr "US Dollar"
 msgid "US Dollar (Next day)"
 msgstr "US Dollar (Next day)"
 
-#: src/routes/redeem.tsx:47
+#: src/routes/redeem.tsx:38
 msgid "Use a promo code for trizum Premium."
 msgstr "Use a promo code for trizum Premium."
 
@@ -4133,7 +4147,7 @@ msgid "View photo"
 msgstr "View photo"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:300
-#: src/routes/redeem.tsx:72
+#: src/routes/redeem.tsx:60
 #: src/routes/settings.tsx:371
 msgid "View Premium options"
 msgstr "View Premium options"

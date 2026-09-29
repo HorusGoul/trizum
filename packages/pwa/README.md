@@ -108,8 +108,8 @@ The Premium paywall includes a **Redeem code** action, available even when
 products fail to load. Native redemption requires a signed-in trizum account.
 Apple opens the native sheet without a code, or the App Store offer-code URL
 when a code is supplied. Google Play's external redemption supports one-time
-codes; custom subscription codes must be entered under the payment method in
-Google Play checkout before confirming the purchase. Custom Google codes do not
+codes; checkout help explains how to redeem offers that need the payment-method
+menu in Google Play, without asking customers to identify their code type. Custom Google codes do not
 provide lifetime access and cannot be redeemed through the external URL.
 
 Share a branded link such as `https://trizum.app/redeem?code=FRIENDS`.

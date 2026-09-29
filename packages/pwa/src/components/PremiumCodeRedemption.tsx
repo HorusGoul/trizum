@@ -63,12 +63,13 @@ export function PremiumCodeRedemption({
         isDisabled={isDisabled}
         className="flex flex-col gap-2"
       >
-        <Label className="text-accent-700 dark:text-accent-200 text-sm font-semibold">
+        <Label className="sr-only">
           <Trans>Promo code</Trans>
         </Label>
         <div className="relative">
           <Input
             className="border-accent-200 bg-accent-50 dark:border-accent-700 dark:bg-accent-900 h-14 rounded-2xl pr-14 font-mono text-base tracking-wider"
+            placeholder={t`Promo code`}
             autoCapitalize="characters"
             spellCheck={false}
           />
@@ -95,7 +96,7 @@ export function PremiumCodeRedemption({
             {platform === "ios" ? (
               <Trans>Redeem in App Store</Trans>
             ) : (
-              <Trans>Redeem a one-time code in Google Play</Trans>
+              <Trans>Redeem in Google Play</Trans>
             )}
           </Button>
         ) : (
@@ -110,13 +111,14 @@ export function PremiumCodeRedemption({
         {showGoogle ? (
           <details className="group">
             <summary className="text-accent-700 dark:text-accent-200 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
-              <Trans>Using a custom Google Play code?</Trans>
+              <Trans>Code not working in Google Play?</Trans>
               <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
             </summary>
             <p className="text-accent-600 dark:text-accent-300 pb-3 leading-relaxed">
               <Trans>
-                For a custom subscription code, choose a plan and continue to Google Play checkout.
-                Tap the payment method, then Redeem code. Check the offer before confirming.
+                Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan
+                for your offer, then tap the payment method in Google Play and select Redeem code.
+                Check that your offer appears before confirming.
               </Trans>
             </p>
           </details>
@@ -141,26 +143,17 @@ export function PremiumCodeRedemption({
 function StoreRedemptionLink({ platform, code }: { platform: "ios" | "android"; code: string }) {
   return (
     <a
-      className="border-accent-200 bg-accent-50 text-accent-950 hover:border-accent-400 hover:bg-accent-100 focus-visible:ring-accent-500 dark:border-accent-800 dark:bg-accent-900 dark:text-accent-50 dark:hover:border-accent-600 dark:hover:bg-accent-800 flex min-h-18 items-center gap-3 rounded-2xl border px-4 py-3 outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2"
+      className="bg-accent-500 text-accent-50 hover:bg-accent-600 focus-visible:ring-accent-500 dark:bg-accent-500 dark:hover:bg-accent-400 flex min-h-12 items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2"
       href={getStoreRedemptionUrl(platform, code)}
       rel="noreferrer"
       target="_blank"
-      aria-label={
-        platform === "ios" ? t`Redeem in App Store` : t`Redeem a one-time code in Google Play`
-      }
     >
-      <span className="bg-accent-100 text-accent-700 dark:bg-accent-800 dark:text-accent-200 flex size-10 shrink-0 items-center justify-center rounded-xl">
-        <Icon icon={platform === "ios" ? "lucide.smartphone" : "lucide.play"} className="size-5" />
-      </span>
-      <span className="flex-1">
-        <span className="block text-sm font-bold">
-          {platform === "ios" ? <Trans>App Store</Trans> : <Trans>Google Play</Trans>}
-        </span>
-        <span className="text-accent-600 dark:text-accent-300 block text-xs">
-          {platform === "ios" ? <Trans>Redeem your offer</Trans> : <Trans>One-time codes</Trans>}
-        </span>
-      </span>
-      <Icon icon="lucide.arrow-up-right" className="text-accent-500 dark:text-accent-400 size-4" />
+      {platform === "ios" ? (
+        <Trans>Redeem in App Store</Trans>
+      ) : (
+        <Trans>Redeem in Google Play</Trans>
+      )}
+      <Icon icon="lucide.arrow-up-right" className="size-4" />
     </a>
   );
 }
