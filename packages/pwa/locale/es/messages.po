@@ -764,7 +764,6 @@ msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
 #: src/components/CloudSyncSettingsView.tsx:763
-#: src/routes/redeem.tsx:79
 #: src/routes/settings.tsx:364
 msgid "Checking account…"
 msgstr "Comprobando la cuenta…"
@@ -1057,7 +1056,7 @@ msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:53
+#: src/routes/redeem.tsx:54
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
@@ -2011,7 +2010,8 @@ msgstr "Cargando licencias..."
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
-#: src/routes/redeem.tsx:130
+#: src/routes/redeem.tsx:82
+#: src/routes/redeem.tsx:139
 msgid "Loading sign-in…"
 msgstr "Cargando inicio de sesión…"
 
@@ -2846,7 +2846,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
-#: src/routes/redeem.tsx:122
+#: src/routes/redeem.tsx:131
 msgid "Premium is active."
 msgstr "Premium está activo."
 
@@ -2956,7 +2956,7 @@ msgstr "Canjear un código de un solo uso en Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:71
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:67
+#: src/routes/redeem.tsx:68
 msgid "Redeem code"
 msgstr "Canjear código"
 
@@ -3029,7 +3029,6 @@ msgid "Restore to home"
 msgstr "Restaurar al inicio"
 
 #: src/components/PartyPendingComponent.tsx:141
-#: src/routes/redeem.tsx:92
 msgid "Retry"
 msgstr "Reintentar"
 
@@ -3246,7 +3245,7 @@ msgstr "Leone de Sierra Leona"
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
-#: src/routes/redeem.tsx:107
+#: src/routes/redeem.tsx:116
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
@@ -3271,6 +3270,14 @@ msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 msgid "Sign in to trizum cloud"
 msgstr "Iniciar sesión en trizum cloud"
 
+#: src/routes/redeem.tsx:92
+msgid "Sign in to trizum to link Premium to your account."
+msgstr ""
+
+#: src/routes/redeem.tsx:92
+msgid "Sign in to trizum to link your redeemed offer to your account."
+msgstr "Inicia sesión en trizum para vincular la oferta que has canjeado a tu cuenta."
+
 #: src/routes/redeem.tsx:36
 msgid "Sign in to your trizum account before redeeming."
 msgstr "Inicia sesión en tu cuenta de trizum antes de canjear el código."
@@ -3293,6 +3300,10 @@ msgstr "Cerrar sesión"
 #: src/components/CloudSyncDialogs.tsx:545
 msgid "Sign out?"
 msgstr "¿Cerrar sesión?"
+
+#: src/routes/redeem.tsx:88
+msgid "Sign-in is temporarily unavailable."
+msgstr "El inicio de sesión no está disponible temporalmente."
 
 #: src/lib/authCallbackErrors.ts:17
 msgid "Sign-in link expired"
@@ -3324,7 +3335,7 @@ msgstr "Métodos de inicio de sesión"
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/redeem.tsx:99
+#: src/routes/redeem.tsx:108
 msgid "Signed in as {email}"
 msgstr "Sesión iniciada como {email}"
 
@@ -3906,6 +3917,7 @@ msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio d
 
 #: src/components/PremiumPaywall.tsx:224
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:279
+#: src/routes/redeem.tsx:100
 msgid "Try again"
 msgstr "Reintentar"
 
@@ -4318,7 +4330,7 @@ msgstr "Debes dinero a personas"
 msgid "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
 msgstr "Conservas la titularidad de la información y los archivos que añadas al Servicio, incluidos los datos de los grupos, la información de los participantes, los gastos, las descripciones, los recibos y las imágenes (el «Contenido de usuario»). Nos concedes una licencia limitada, mundial y no exclusiva para alojar, procesar, reproducir y transmitir el Contenido de usuario únicamente en la medida necesaria para operar, proteger, mantener y mejorar el Servicio."
 
-#: src/routes/redeem.tsx:75
+#: src/routes/redeem.tsx:77
 msgid "You seem to be offline."
 msgstr "Parece que no tienes conexión."
 

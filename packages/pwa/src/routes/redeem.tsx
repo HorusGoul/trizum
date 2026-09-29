@@ -11,6 +11,7 @@ import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
 import { Icon } from "#src/ui/Icon.tsx";
+import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
 import { Button } from "#src/ui/Button.tsx";
 
 const CloudSyncSettingsView = lazy(() =>
@@ -70,28 +71,36 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
       <main className="mx-auto w-full max-w-[480px] px-4 pt-2 pb-8">
         <div className="text-accent-800 dark:text-accent-200 mb-4 flex min-h-10 items-center gap-2 text-sm">
           {!isOnline ? (
-            <output className="flex items-center gap-2">
-              <Icon icon="lucide.wifi-off" className="size-4 shrink-0" />
-              <Trans>You seem to be offline.</Trans>
-            </output>
+            <Alert variant="warning">
+              <Icon icon="lucide.wifi-off" />
+              <AlertDescription>
+                <Trans>You seem to be offline.</Trans>
+              </AlertDescription>
+            </Alert>
           ) : sessionStatus === "pending" ? (
             <output>
-              <Trans>Checking account…</Trans>
+              <Trans>Loading sign-in…</Trans>
             </output>
           ) : sessionStatus === "unavailable" ? (
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <output>
-                <Trans>We couldn’t check your account.</Trans>
-              </output>
-              <Button
-                className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
-                pressAction={async () => {
-                  await session.refetch();
-                }}
-              >
-                <Trans>Retry</Trans>
-              </Button>
-            </div>
+            <Alert variant="warning">
+              <Icon icon="lucide.triangle-alert" />
+              <AlertTitle className="line-clamp-none">
+                <Trans>Sign-in is temporarily unavailable.</Trans>
+              </AlertTitle>
+              <AlertDescription>
+                <p>
+                  <Trans>Sign in to trizum to link your redeemed offer to your account.</Trans>
+                </p>
+                <Button
+                  className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
+                  pressAction={async () => {
+                    await session.refetch();
+                  }}
+                >
+                  <Trans>Try again</Trans>
+                </Button>
+              </AlertDescription>
+            </Alert>
           ) : user ? (
             <output className="flex min-w-0 items-center gap-2">
               <Icon icon="lucide.check" className="size-4 shrink-0" />

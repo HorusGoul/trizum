@@ -196,7 +196,7 @@ test("offline redemption explains the connection requirement and preserves the c
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   await context.setOffline(true);
   await expect(page.getByText("You seem to be offline.", { exact: true })).toBeVisible();
-  await expect(page.getByText("We couldn’t check your account.", { exact: true })).toBeHidden();
+  await expect(page.getByText("Sign-in is temporarily unavailable.", { exact: true })).toBeHidden();
   await page.getByRole("textbox", { name: "Promo code" }).fill("OFFLINE-CODE");
   await page.getByRole("link", { name: "Redeem in App Store", exact: true }).click();
   await expect(
@@ -227,11 +227,17 @@ test("an account service failure has its own retry without claiming the device i
     }),
   );
   await harness.goto("/redeem?code=FRIENDS");
-  await expect(page.getByText("We couldn’t check your account.", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Sign-in is temporarily unavailable.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("alert")).toContainText(
+    "Sign in to trizum to link your redeemed offer to your account.",
+  );
+  await expect(page.getByRole("link", { name: "Redeem in App Store", exact: true })).toBeVisible();
   await expect(page.getByText("You seem to be offline.", { exact: true })).toBeHidden();
   await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");
   available = true;
-  await page.getByRole("button", { name: "Retry", exact: true }).click();
+  await page.getByRole("button", { name: "Try again", exact: true }).click();
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("UPDATED");
 });
