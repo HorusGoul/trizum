@@ -50,6 +50,10 @@ export function PremiumCodeRedemption({
 
   async function redeem() {
     if (!checkRedemptionConnection()) return;
+    if (!userId && onSignIn) {
+      onSignIn();
+      return;
+    }
     onBusyChange?.(true);
     await openPremiumCodeRedemption(userId, code)
       .catch(() => {
@@ -107,7 +111,7 @@ export function PremiumCodeRedemption({
           <Button
             className={storeButtonClassName}
             aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
-            isDisabled={(!userId && isOnline) || isDisabled}
+            isDisabled={(!userId && !onSignIn && isOnline) || isDisabled}
             pressAction={redeem}
           >
             <StoreRedemptionContent platform={platform} />

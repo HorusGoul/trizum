@@ -196,7 +196,11 @@ test("offline redemption explains the connection requirement and preserves the c
   await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
   await context.setOffline(true);
   await expect(page.getByText("You seem to be offline.", { exact: true })).toBeVisible();
-  await expect(page.getByText("Sign-in is temporarily unavailable.", { exact: true })).toBeHidden();
+  await expect(
+    page.getByText("Sign-in is unavailable, so we can’t link your offer to trizum yet.", {
+      exact: true,
+    }),
+  ).toBeHidden();
   await page.getByRole("textbox", { name: "Promo code" }).fill("OFFLINE-CODE");
   await page.getByRole("link", { name: "Redeem in App Store", exact: true }).click();
   await expect(
@@ -215,7 +219,7 @@ test("offline redemption explains the connection requirement and preserves the c
   ).toHaveAttribute("href", /code=OFFLINE-CODE$/);
 });
 
-test("an account service failure has its own retry without claiming the device is offline", async ({
+test("an account service failure stays hidden until sign-in is requested", async ({
   harness,
   page,
 }) => {
@@ -227,12 +231,14 @@ test("an account service failure has its own retry without claiming the device i
     }),
   );
   await harness.goto("/redeem?code=FRIENDS");
+  await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(
-    page.getByText("Sign-in is temporarily unavailable.", { exact: true }),
+    page.getByText("Sign-in is unavailable, so we can’t link your offer to trizum yet.", {
+      exact: true,
+    }),
   ).toBeVisible();
-  await expect(page.getByRole("alert")).toContainText(
-    "Sign in to trizum to link your redeemed offer to your account.",
-  );
   await expect(page.getByRole("link", { name: "Redeem in App Store", exact: true })).toBeVisible();
   await expect(page.getByText("You seem to be offline.", { exact: true })).toBeHidden();
   await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");

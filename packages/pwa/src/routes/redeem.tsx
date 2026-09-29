@@ -11,7 +11,7 @@ import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
 import { Icon } from "#src/ui/Icon.tsx";
-import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
+import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
 import { Button } from "#src/ui/Button.tsx";
 
 const CloudSyncSettingsView = lazy(() =>
@@ -33,6 +33,7 @@ function RedeemCode() {
 function RedemptionPage({ initialCode }: { initialCode: string }) {
   const [code, setCode] = useState(initialCode);
   const [isSignInOpen, setSignInOpen] = useState(false);
+  const [hasRequestedSignIn, setHasRequestedSignIn] = useState(false);
   const openPremiumAfterSignIn = useRef(false);
   const session = useAppSession();
   const isOnline = useOnlineStatus();
@@ -42,10 +43,15 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
   const premium = usePremium();
   const isAccountUnavailable = sessionStatus === "pending" || sessionStatus === "unavailable";
 
+  function requestSignIn() {
+    setHasRequestedSignIn(true);
+    if (!isAccountUnavailable) setSignInOpen(true);
+  }
+
   function openPremium() {
     if (!user) {
       openPremiumAfterSignIn.current = true;
-      setSignInOpen(true);
+      requestSignIn();
       return;
     }
     // Paywall promises resolve on dismissal; do not hold a React action transition open.
@@ -56,6 +62,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
 
   function closeSignIn() {
     setSignInOpen(false);
+    setHasRequestedSignIn(false);
     openPremiumAfterSignIn.current = false;
   }
 
@@ -81,15 +88,12 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
             <output>
               <Trans>Loading sign-in…</Trans>
             </output>
-          ) : sessionStatus === "unavailable" ? (
+          ) : hasRequestedSignIn && sessionStatus === "unavailable" ? (
             <Alert variant="warning">
               <Icon icon="lucide.triangle-alert" />
-              <AlertTitle className="line-clamp-none">
-                <Trans>Sign-in is temporarily unavailable.</Trans>
-              </AlertTitle>
               <AlertDescription>
                 <p>
-                  <Trans>Sign in to trizum to link your redeemed offer to your account.</Trans>
+                  <Trans>Sign-in is unavailable, so we can’t link your offer to trizum yet.</Trans>
                 </p>
                 <Button
                   className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
@@ -111,7 +115,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           ) : (
             <Button
               className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
-              onPress={() => setSignInOpen(true)}
+              onPress={requestSignIn}
             >
               <Trans>Sign in</Trans>
             </Button>
@@ -121,8 +125,8 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           userId={user?.id ?? null}
           initialCode={initialCode}
           onCodeChange={setCode}
-          isDisabled={isOnline && isAccountUnavailable}
-          onSignIn={() => setSignInOpen(true)}
+          isDisabled={isOnline && sessionStatus === "pending"}
+          onSignIn={requestSignIn}
           onOpenPremium={openPremium}
         />
         {premium.isPremium ? (

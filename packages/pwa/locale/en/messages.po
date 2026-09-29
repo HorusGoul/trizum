@@ -425,7 +425,7 @@ msgstr "Angolan Kwanza"
 msgid "Annual"
 msgstr "Annual"
 
-#: src/components/PremiumCodeRedemption.tsx:163
+#: src/components/PremiumCodeRedemption.tsx:167
 msgid "App Store"
 msgstr "App Store"
 
@@ -877,7 +877,7 @@ msgstr "Cloud settings applied"
 msgid "Cloud settings saved"
 msgstr "Cloud settings saved"
 
-#: src/components/PremiumCodeRedemption.tsx:64
+#: src/components/PremiumCodeRedemption.tsx:68
 msgid "Code copied."
 msgstr "Code copied."
 
@@ -889,7 +889,7 @@ msgstr "Code for testing"
 msgid "Code not working in Google Play?"
 msgstr "Code not working in Google Play?"
 
-#: src/components/PremiumCodeRedemption.tsx:56
+#: src/components/PremiumCodeRedemption.tsx:60
 msgid "Code redemption could not be opened. Please try again."
 msgstr "Code redemption could not be opened. Please try again."
 
@@ -1018,7 +1018,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/components/PremiumCodeRedemption.tsx:97
+#: src/components/PremiumCodeRedemption.tsx:101
 msgid "Copy code"
 msgstr "Copy code"
 
@@ -1058,7 +1058,7 @@ msgstr "Could not apply cloud settings"
 msgid "Could not connect sign-in method"
 msgstr "Could not connect sign-in method"
 
-#: src/components/PremiumCodeRedemption.tsx:66
+#: src/components/PremiumCodeRedemption.tsx:70
 msgid "Could not copy the code. Select and copy it from the field above."
 msgstr "Could not copy the code. Select and copy it from the field above."
 
@@ -1080,7 +1080,7 @@ msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:54
+#: src/routes/redeem.tsx:60
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
@@ -1679,7 +1679,7 @@ msgstr "Google connected"
 msgid "Google is connected to this account"
 msgstr "Google is connected to this account"
 
-#: src/components/PremiumCodeRedemption.tsx:163
+#: src/components/PremiumCodeRedemption.tsx:167
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -2062,8 +2062,8 @@ msgstr "Loading licenses..."
 msgid "Loading Premium options"
 msgstr "Loading Premium options"
 
-#: src/routes/redeem.tsx:82
-#: src/routes/redeem.tsx:139
+#: src/routes/redeem.tsx:89
+#: src/routes/redeem.tsx:143
 msgid "Loading sign-in…"
 msgstr "Loading sign-in…"
 
@@ -2914,7 +2914,7 @@ msgstr "Premium could not be purchased. Please try again."
 msgid "Premium is active on this account."
 msgstr "Premium is active on this account."
 
-#: src/routes/redeem.tsx:131
+#: src/routes/redeem.tsx:135
 msgid "Premium is active."
 msgstr "Premium is active."
 
@@ -2980,8 +2980,8 @@ msgstr "Probe, bypass, or interfere with security, access controls, rate limits,
 msgid "Profile and app menu"
 msgstr "Profile and app menu"
 
-#: src/components/PremiumCodeRedemption.tsx:84
-#: src/components/PremiumCodeRedemption.tsx:89
+#: src/components/PremiumCodeRedemption.tsx:88
+#: src/components/PremiumCodeRedemption.tsx:93
 msgid "Promo code"
 msgstr "Promo code"
 
@@ -3026,23 +3026,23 @@ msgstr "Recommended match"
 msgid "Redeem a one-time code in Google Play"
 msgstr "Redeem a one-time code in Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:71
+#: src/components/PremiumCodeRedemption.tsx:75
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:68
+#: src/routes/redeem.tsx:75
 msgid "Redeem code"
 msgstr "Redeem code"
 
-#: src/components/PremiumCodeRedemption.tsx:109
-#: src/components/PremiumCodeRedemption.tsx:141
+#: src/components/PremiumCodeRedemption.tsx:113
+#: src/components/PremiumCodeRedemption.tsx:145
 msgid "Redeem in App Store"
 msgstr "Redeem in App Store"
 
-#: src/components/PremiumCodeRedemption.tsx:109
-#: src/components/PremiumCodeRedemption.tsx:141
+#: src/components/PremiumCodeRedemption.tsx:113
+#: src/components/PremiumCodeRedemption.tsx:145
 msgid "Redeem in Google Play"
 msgstr "Redeem in Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:166
+#: src/components/PremiumCodeRedemption.tsx:170
 msgid "Redeem your offer"
 msgstr "Redeem your offer"
 
@@ -3317,7 +3317,7 @@ msgstr "Sierra Leonean Leone"
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
-#: src/routes/redeem.tsx:116
+#: src/routes/redeem.tsx:120
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -3377,6 +3377,10 @@ msgstr "Sign out?"
 msgid "Sign-in is temporarily unavailable."
 msgstr "Sign-in is temporarily unavailable."
 
+#: src/routes/redeem.tsx:96
+msgid "Sign-in is unavailable, so we can’t link your offer to trizum yet."
+msgstr "Sign-in is unavailable, so we can’t link your offer to trizum yet."
+
 #: src/lib/authCallbackErrors.ts:17
 msgid "Sign-in link expired"
 msgstr "Sign-in link expired"
@@ -3407,7 +3411,7 @@ msgstr "Sign-in methods"
 msgid "Signed in"
 msgstr "Signed in"
 
-#: src/routes/redeem.tsx:108
+#: src/routes/redeem.tsx:112
 msgid "Signed in as {email}"
 msgstr "Signed in as {email}"
 
@@ -4005,7 +4009,7 @@ msgstr "trizum will open Google so you can add it as a sign-in method for this a
 
 #: src/components/PremiumPaywall.tsx:224
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:279
-#: src/routes/redeem.tsx:100
+#: src/routes/redeem.tsx:104
 msgid "Try again"
 msgstr "Try again"
 
@@ -4431,7 +4435,7 @@ msgstr "You owe money to people"
 msgid "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
 msgstr "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
 
-#: src/routes/redeem.tsx:77
+#: src/routes/redeem.tsx:84
 msgid "You seem to be offline."
 msgstr "You seem to be offline."
 

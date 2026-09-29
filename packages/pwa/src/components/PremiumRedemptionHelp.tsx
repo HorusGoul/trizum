@@ -54,7 +54,7 @@ export function PremiumRedemptionHelp({
                   platform="ios"
                   code={code}
                   redeemAction={redeemAction}
-                  isDisabled={(!isSignedIn && !isOffline) || isDisabled}
+                  isDisabled={(!isSignedIn && !onSignIn && !isOffline) || isDisabled}
                 >
                   App Store
                 </InlineStoreLink>
@@ -67,7 +67,7 @@ export function PremiumRedemptionHelp({
                   platform="android"
                   code={code}
                   redeemAction={redeemAction}
-                  isDisabled={(!isSignedIn && !isOffline) || isDisabled}
+                  isDisabled={(!isSignedIn && !onSignIn && !isOffline) || isDisabled}
                 >
                   Google Play
                 </InlineStoreLink>

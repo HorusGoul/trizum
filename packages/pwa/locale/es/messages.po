@@ -417,7 +417,7 @@ msgstr "Kwanza Angoleño"
 msgid "Annual"
 msgstr "Anual"
 
-#: src/components/PremiumCodeRedemption.tsx:163
+#: src/components/PremiumCodeRedemption.tsx:167
 msgid "App Store"
 msgstr "App Store"
 
@@ -853,7 +853,7 @@ msgstr "Configuración en la nube aplicada"
 msgid "Cloud settings saved"
 msgstr "Configuración en la nube guardada"
 
-#: src/components/PremiumCodeRedemption.tsx:64
+#: src/components/PremiumCodeRedemption.tsx:68
 msgid "Code copied."
 msgstr "Código copiado."
 
@@ -865,7 +865,7 @@ msgstr "Código para pruebas"
 msgid "Code not working in Google Play?"
 msgstr "¿El código no funciona en Google Play?"
 
-#: src/components/PremiumCodeRedemption.tsx:56
+#: src/components/PremiumCodeRedemption.tsx:60
 msgid "Code redemption could not be opened. Please try again."
 msgstr "No se pudo abrir el canje de códigos. Inténtalo de nuevo."
 
@@ -994,7 +994,7 @@ msgstr "Continuar con Premium"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/components/PremiumCodeRedemption.tsx:97
+#: src/components/PremiumCodeRedemption.tsx:101
 msgid "Copy code"
 msgstr "Copiar código"
 
@@ -1034,7 +1034,7 @@ msgstr "No se pudo aplicar la configuración en la nube"
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/components/PremiumCodeRedemption.tsx:66
+#: src/components/PremiumCodeRedemption.tsx:70
 msgid "Could not copy the code. Select and copy it from the field above."
 msgstr "No se pudo copiar el código. Selecciónalo y cópialo del campo de arriba."
 
@@ -1056,7 +1056,7 @@ msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:54
+#: src/routes/redeem.tsx:60
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
@@ -1635,7 +1635,7 @@ msgstr "Google conectado"
 msgid "Google is connected to this account"
 msgstr "Google está conectado a esta cuenta"
 
-#: src/components/PremiumCodeRedemption.tsx:163
+#: src/components/PremiumCodeRedemption.tsx:167
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -2010,8 +2010,8 @@ msgstr "Cargando licencias..."
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
-#: src/routes/redeem.tsx:82
-#: src/routes/redeem.tsx:139
+#: src/routes/redeem.tsx:89
+#: src/routes/redeem.tsx:143
 msgid "Loading sign-in…"
 msgstr "Cargando inicio de sesión…"
 
@@ -2846,7 +2846,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
-#: src/routes/redeem.tsx:131
+#: src/routes/redeem.tsx:135
 msgid "Premium is active."
 msgstr "Premium está activo."
 
@@ -2912,8 +2912,8 @@ msgstr "Sondear, eludir o interferir con la seguridad, los controles de acceso, 
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
-#: src/components/PremiumCodeRedemption.tsx:84
-#: src/components/PremiumCodeRedemption.tsx:89
+#: src/components/PremiumCodeRedemption.tsx:88
+#: src/components/PremiumCodeRedemption.tsx:93
 msgid "Promo code"
 msgstr "Código promocional"
 
@@ -2954,23 +2954,23 @@ msgstr "Coincidencia recomendada"
 msgid "Redeem a one-time code in Google Play"
 msgstr "Canjear un código de un solo uso en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:71
+#: src/components/PremiumCodeRedemption.tsx:75
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:68
+#: src/routes/redeem.tsx:75
 msgid "Redeem code"
 msgstr "Canjear código"
 
-#: src/components/PremiumCodeRedemption.tsx:109
-#: src/components/PremiumCodeRedemption.tsx:141
+#: src/components/PremiumCodeRedemption.tsx:113
+#: src/components/PremiumCodeRedemption.tsx:145
 msgid "Redeem in App Store"
 msgstr "Canjear en el App Store"
 
-#: src/components/PremiumCodeRedemption.tsx:109
-#: src/components/PremiumCodeRedemption.tsx:141
+#: src/components/PremiumCodeRedemption.tsx:113
+#: src/components/PremiumCodeRedemption.tsx:145
 msgid "Redeem in Google Play"
 msgstr "Canjear en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:166
+#: src/components/PremiumCodeRedemption.tsx:170
 msgid "Redeem your offer"
 msgstr "Canjea tu oferta"
 
@@ -3245,7 +3245,7 @@ msgstr "Leone de Sierra Leona"
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
-#: src/routes/redeem.tsx:116
+#: src/routes/redeem.tsx:120
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
@@ -3305,6 +3305,10 @@ msgstr "¿Cerrar sesión?"
 msgid "Sign-in is temporarily unavailable."
 msgstr "El inicio de sesión no está disponible temporalmente."
 
+#: src/routes/redeem.tsx:96
+msgid "Sign-in is unavailable, so we can’t link your offer to trizum yet."
+msgstr "El inicio de sesión no está disponible, así que aún no podemos vincular tu oferta a trizum."
+
 #: src/lib/authCallbackErrors.ts:17
 msgid "Sign-in link expired"
 msgstr "El enlace de inicio de sesión ha caducado"
@@ -3335,7 +3339,7 @@ msgstr "Métodos de inicio de sesión"
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/redeem.tsx:108
+#: src/routes/redeem.tsx:112
 msgid "Signed in as {email}"
 msgstr "Sesión iniciada como {email}"
 
@@ -3917,7 +3921,7 @@ msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio d
 
 #: src/components/PremiumPaywall.tsx:224
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:279
-#: src/routes/redeem.tsx:100
+#: src/routes/redeem.tsx:104
 msgid "Try again"
 msgstr "Reintentar"
 
@@ -4330,7 +4334,7 @@ msgstr "Debes dinero a personas"
 msgid "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
 msgstr "Conservas la titularidad de la información y los archivos que añadas al Servicio, incluidos los datos de los grupos, la información de los participantes, los gastos, las descripciones, los recibos y las imágenes (el «Contenido de usuario»). Nos concedes una licencia limitada, mundial y no exclusiva para alojar, procesar, reproducir y transmitir el Contenido de usuario únicamente en la medida necesaria para operar, proteger, mantener y mejorar el Servicio."
 
-#: src/routes/redeem.tsx:77
+#: src/routes/redeem.tsx:84
 msgid "You seem to be offline."
 msgstr "Parece que no tienes conexión."
 

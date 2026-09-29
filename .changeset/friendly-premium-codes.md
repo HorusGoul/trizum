@@ -9,4 +9,4 @@ Open Apple offer-code redemption or Google Play one-time-code redemption from th
 
 Show the signed-in account on the redemption page and open sign-in or Premium directly from its help, preserving the entered code through authentication.
 
-Keep redemption codes editable offline, explain why sign-in is needed with consistent warning alerts, distinguish connection loss from sign-in failures, and explain the connection requirement when redeeming.
+Keep redemption codes editable offline, show concise, contextual sign-in warnings only after an action needs authentication, distinguish connection loss from sign-in failures, and explain the connection requirement when redeeming.
