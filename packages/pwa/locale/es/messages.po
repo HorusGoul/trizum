@@ -367,7 +367,7 @@ msgstr "Todas las comprobaciones del gasto se han superado"
 msgid "All time"
 msgstr "Todo el tiempo"
 
-#: src/components/PremiumRedemptionHelp.tsx:137
+#: src/components/PremiumRedemptionHelp.tsx:128
 msgid "Already redeemed?"
 msgstr "¿Ya lo has canjeado?"
 
@@ -417,7 +417,7 @@ msgstr "Kwanza Angoleño"
 msgid "Annual"
 msgstr "Anual"
 
-#: src/components/PremiumCodeRedemption.tsx:197
+#: src/components/PremiumCodeRedemption.tsx:177
 msgid "App Store"
 msgstr "App Store"
 
@@ -853,7 +853,7 @@ msgstr "Configuración en la nube aplicada"
 msgid "Cloud settings saved"
 msgstr "Configuración en la nube guardada"
 
-#: src/components/PremiumCodeRedemption.tsx:69
+#: src/components/PremiumCodeRedemption.tsx:64
 msgid "Code copied."
 msgstr "Código copiado."
 
@@ -861,12 +861,11 @@ msgstr "Código copiado."
 msgid "Code for testing"
 msgstr "Código para pruebas"
 
-#: src/components/PremiumRedemptionHelp.tsx:119
+#: src/components/PremiumRedemptionHelp.tsx:110
 msgid "Code not working in Google Play?"
 msgstr "¿El código no funciona en Google Play?"
 
-#: src/components/PremiumCodeRedemption.tsx:61
-#: src/routes/redeem.tsx:128
+#: src/components/PremiumCodeRedemption.tsx:56
 msgid "Code redemption could not be opened. Please try again."
 msgstr "No se pudo abrir el canje de códigos. Inténtalo de nuevo."
 
@@ -995,7 +994,7 @@ msgstr "Continuar con Premium"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/components/PremiumCodeRedemption.tsx:102
+#: src/components/PremiumCodeRedemption.tsx:97
 msgid "Copy code"
 msgstr "Copiar código"
 
@@ -1007,11 +1006,11 @@ msgstr "Copiar enlace del grupo"
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
 
-#: src/components/PremiumRedemptionHelp.tsx:48
+#: src/components/PremiumRedemptionHelp.tsx:51
 msgid "Copy your code, then open <0>App Store</0>."
 msgstr "Copia tu código y abre <0>App Store</0>."
 
-#: src/components/PremiumRedemptionHelp.tsx:62
+#: src/components/PremiumRedemptionHelp.tsx:64
 msgid "Copy your code, then open <0>Google Play</0>."
 msgstr "Copia tu código y abre <0>Google Play</0>."
 
@@ -1035,7 +1034,7 @@ msgstr "No se pudo aplicar la configuración en la nube"
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/components/PremiumCodeRedemption.tsx:71
+#: src/components/PremiumCodeRedemption.tsx:66
 msgid "Could not copy the code. Select and copy it from the field above."
 msgstr "No se pudo copiar el código. Selecciónalo y cópialo del campo de arriba."
 
@@ -1057,8 +1056,7 @@ msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:72
-#: src/routes/redeem.tsx:127
+#: src/routes/redeem.tsx:44
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
@@ -1556,7 +1554,7 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
-#: src/components/PremiumRedemptionHelp.tsx:100
+#: src/components/PremiumRedemptionHelp.tsx:91
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 msgstr "Sigue las instrucciones de la tienda e introduce tu código si te lo pide. Revisa la oferta antes de confirmar."
 
@@ -1637,7 +1635,7 @@ msgstr "Google conectado"
 msgid "Google is connected to this account"
 msgstr "Google está conectado a esta cuenta"
 
-#: src/components/PremiumCodeRedemption.tsx:197
+#: src/components/PremiumCodeRedemption.tsx:177
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -1709,7 +1707,7 @@ msgstr "Lempira Hondureño"
 msgid "Hong Kong Dollar"
 msgstr "Dólar de Hong Kong"
 
-#: src/components/PremiumRedemptionHelp.tsx:37
+#: src/components/PremiumRedemptionHelp.tsx:34
 msgid "How do I redeem my code?"
 msgstr "¿Cómo canjeo mi código?"
 
@@ -2016,8 +2014,7 @@ msgstr "Cargando licencias..."
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
-#: src/routes/redeem.tsx:182
-#: src/routes/redeem.tsx:237
+#: src/routes/redeem.tsx:109
 msgid "Loading sign-in…"
 msgstr "Cargando inicio de sesión…"
 
@@ -2435,7 +2432,7 @@ msgstr "¿Usar solo plantillas personalizadas?"
 msgid "Only your own debt can be transferred"
 msgstr "Solo puedes transferir tus propias deudas"
 
-#: src/components/PremiumRedemptionHelp.tsx:141
+#: src/components/PremiumRedemptionHelp.tsx:132
 msgid "Open <0>Premium settings</0> and use Restore purchases if Premium has not appeared yet."
 msgstr "Abre los <0>ajustes de Premium</0> y usa Restaurar compras si Premium aún no aparece."
 
@@ -2463,7 +2460,7 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/components/PremiumRedemptionHelp.tsx:76
+#: src/components/PremiumRedemptionHelp.tsx:77
 msgid "Open this link on your phone and copy your code. Choose <0>App Store</0> for iPhone or iPad, or <1>Google Play</1> for Android."
 msgstr "Abre este enlace en tu teléfono y copia tu código. Elige <0>App Store</0> para iPhone o iPad, o <1>Google Play</1> para Android."
 
@@ -2852,7 +2849,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
-#: src/routes/redeem.tsx:229
+#: src/routes/redeem.tsx:101
 msgid "Premium is active."
 msgstr "Premium está activo."
 
@@ -2918,8 +2915,8 @@ msgstr "Sondear, eludir o interferir con la seguridad, los controles de acceso, 
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
+#: src/components/PremiumCodeRedemption.tsx:84
 #: src/components/PremiumCodeRedemption.tsx:89
-#: src/components/PremiumCodeRedemption.tsx:94
 msgid "Promo code"
 msgstr "Código promocional"
 
@@ -2960,23 +2957,23 @@ msgstr "Coincidencia recomendada"
 msgid "Redeem a one-time code in Google Play"
 msgstr "Canjear un código de un solo uso en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:76
+#: src/components/PremiumCodeRedemption.tsx:71
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:167
+#: src/routes/redeem.tsx:79
 msgid "Redeem code"
 msgstr "Canjear código"
 
-#: src/components/PremiumCodeRedemption.tsx:114
-#: src/components/PremiumCodeRedemption.tsx:170
+#: src/components/PremiumCodeRedemption.tsx:109
+#: src/components/PremiumCodeRedemption.tsx:153
 msgid "Redeem in App Store"
 msgstr "Canjear en el App Store"
 
-#: src/components/PremiumCodeRedemption.tsx:114
-#: src/components/PremiumCodeRedemption.tsx:170
+#: src/components/PremiumCodeRedemption.tsx:109
+#: src/components/PremiumCodeRedemption.tsx:153
 msgid "Redeem in Google Play"
 msgstr "Canjear en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:200
+#: src/components/PremiumCodeRedemption.tsx:180
 msgid "Redeem your offer"
 msgstr "Canjea tu oferta"
 
@@ -3043,7 +3040,7 @@ msgstr "Reintentar"
 msgid "Retry account check"
 msgstr "Volver a comprobar la cuenta"
 
-#: src/components/PremiumRedemptionHelp.tsx:106
+#: src/components/PremiumRedemptionHelp.tsx:97
 msgid "Return to trizum on your phone. Open <0>Premium settings</0> and use Restore purchases if Premium has not appeared yet."
 msgstr "Vuelve a trizum en tu teléfono. Abre los <0>ajustes de Premium</0> y usa Restaurar compras si Premium aún no aparece."
 
@@ -3344,7 +3341,7 @@ msgstr "Métodos de inicio de sesión"
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/redeem.tsx:212
+#: src/routes/redeem.tsx:87
 msgid "Signed in as {email}"
 msgstr "Sesión iniciada como {email}"
 
@@ -3384,7 +3381,7 @@ msgstr "Dólar de las Islas Salomón"
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
-#: src/components/PremiumRedemptionHelp.tsx:123
+#: src/components/PremiumRedemptionHelp.tsx:114
 msgid "Some offers need to be redeemed at checkout. Open <0>Premium settings</0> in trizum on Android and choose the plan for your offer. Then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 msgstr "Algunas ofertas se canjean al pagar. Abre los <0>ajustes de Premium</0> en trizum en Android y elige el plan de tu oferta. Después pulsa el método de pago en Google Play y selecciona Canjear código. Comprueba que aparezca tu oferta antes de confirmar."
 
@@ -3926,7 +3923,6 @@ msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio d
 
 #: src/components/PremiumPaywall.tsx:224
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:279
-#: src/routes/redeem.tsx:204
 msgid "Try again"
 msgstr "Reintentar"
 

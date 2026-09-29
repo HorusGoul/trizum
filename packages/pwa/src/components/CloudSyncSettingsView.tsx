@@ -340,7 +340,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     }
 
     if (onClose) {
-      // Authentication completion resumes an external store action for this exact account.
+      // Authentication completion can open Premium for this exact account.
       // oxlint-disable-next-line react-doctor/no-pass-data-to-parent
       if (userId) onSignedIn?.(userId);
       onClose();

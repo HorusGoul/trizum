@@ -1,24 +1,14 @@
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState, useTransition } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useEffectEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PremiumCodeRedemption } from "#src/components/PremiumCodeRedemption.tsx";
 import { BackButton } from "#src/components/BackButton.tsx";
-import { useOnlineStatus } from "#src/hooks/useOnlineStatus.ts";
-import { authClient, useAppSession } from "#src/lib/auth-client.ts";
+import { useAppSession } from "#src/lib/auth-client.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
-import {
-  getStoreRedemptionUrl,
-  parseRedemptionSearch,
-  type PremiumRedemptionRequest,
-} from "#src/lib/premium/premiumRedemption.ts";
-import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
-import { openPremiumCodeRedemption } from "#src/lib/premium/revenueCatClient.ts";
-import { checkRedemptionConnection } from "#src/lib/premium/redemptionConnection.ts";
+import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
 import { Icon } from "#src/ui/Icon.tsx";
-import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
-import { Button } from "#src/ui/Button.tsx";
 
 const CloudSyncSettingsView = lazy(() =>
   import("#src/components/CloudSyncSettingsView.tsx").then((module) => ({
@@ -26,41 +16,23 @@ const CloudSyncSettingsView = lazy(() =>
   })),
 );
 
-type PendingAction = { kind: "redeem"; request: PremiumRedemptionRequest } | { kind: "premium" };
-
 export const Route = createFileRoute("/redeem")({
   component: RedeemCode,
   validateSearch: parseRedemptionSearch,
 });
 
 function RedeemCode() {
-  const { code, store } = Route.useSearch();
-  return <RedemptionPage key={`${code}:${store ?? ""}`} initialCode={code} resumeStore={store} />;
+  const { code } = Route.useSearch();
+  return <RedemptionPage key={code} initialCode={code} />;
 }
 
-function RedemptionPage({
-  initialCode,
-  resumeStore,
-}: {
-  initialCode: string;
-  resumeStore?: "ios" | "android";
-}) {
+function RedemptionPage({ initialCode }: { initialCode: string }) {
   const [code, setCode] = useState(initialCode);
   const [isSignInOpen, setSignInOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<PendingAction | null>(() =>
-    resumeStore ? { kind: "redeem", request: { platform: resumeStore, code: initialCode } } : null,
-  );
-  const requestedAction = useRef(pendingAction);
-  const resumed = useRef(false);
-  const completedAction = useRef<PendingAction | null>(null);
-  const [readyAction, setReadyAction] = useState<{ action: PendingAction; userId: string } | null>(
-    null,
-  );
-  const [authError, setAuthError] = useState(false);
-  const [isChecking, startChecking] = useTransition();
-  const navigate = useNavigate();
+  const openPremiumAfterSignIn = useRef(false);
+  const [premiumUserId, setPremiumUserId] = useState<string | null>(null);
+  const openedPremiumUser = useRef<string | null>(null);
   const session = useAppSession();
-  const isOnline = useOnlineStatus();
   const user = session.data?.user;
   const email = user?.email;
   const premium = usePremium();
@@ -72,91 +44,31 @@ function RedemptionPage({
       .catch(() => toast.error(t`Could not open Premium. Please try again.`));
   }
 
-  function completeAction(action: PendingAction, userId: string) {
-    setReadyAction({ action, userId });
-    setPendingAction(null);
-  }
-
-  async function authenticate(action: PendingAction) {
-    try {
-      const result = await authClient.getSession({ query: { disableCookieCache: true } });
-      if (requestedAction.current !== action) return;
-      if (result.error) {
-        setAuthError(true);
-        return;
-      }
-      if (result.data?.user) completeAction(action, result.data.user.id);
-      else setSignInOpen(true);
-    } catch {
-      if (requestedAction.current === action) setAuthError(true);
-    }
-  }
-
-  function requestAction(action: PendingAction) {
-    requestedAction.current = action;
-    setPendingAction(action);
-    setAuthError(false);
-    startChecking(async () => {
-      await authenticate(action);
-    });
-  }
-
-  const resumeAuthentication = useEffectEvent(() => {
-    if (pendingAction) void authenticate(pendingAction);
-  });
+  const resumePremium = useEffectEvent(showPremium);
   useEffect(() => {
-    if (!resumeStore || resumed.current) return;
-    resumed.current = true;
-    resumeAuthentication();
-  }, [resumeStore]);
+    // Wait for PremiumProvider to observe the account before opening its dialog.
+    if (!premiumUserId || user?.id !== premiumUserId || openedPremiumUser.current === premiumUserId)
+      return;
+    openedPremiumUser.current = premiumUserId;
+    resumePremium();
+  }, [premiumUserId, user?.id]);
 
-  const launchAction = useEffectEvent(async (action: PendingAction, userId: string) => {
-    try {
-      if (resumeStore) await navigate({ to: "/redeem", search: { code }, replace: true });
-      if (action.kind === "premium") await premium.presentPaywall();
-      else if (checkRedemptionConnection()) {
-        if (getRevenueCatPlatform()) await openPremiumCodeRedemption(userId, action.request.code);
-        else
-          window.location.assign(
-            getStoreRedemptionUrl(action.request.platform, action.request.code),
-          );
-      }
-    } catch {
-      toast.error(
-        action.kind === "premium"
-          ? t`Could not open Premium. Please try again.`
-          : t`Code redemption could not be opened. Please try again.`,
-      );
-    }
-  });
-  useEffect(() => {
-    if (!readyAction || completedAction.current === readyAction.action) return;
-    // PremiumProvider must have observed the authenticated session before opening its dialog.
-    if (readyAction.action.kind === "premium" && user?.id !== readyAction.userId) return;
-    completedAction.current = readyAction.action;
-    void launchAction(readyAction.action, readyAction.userId).then(() => setReadyAction(null));
-  }, [readyAction, user?.id]);
-
-  function requestSignIn(request: PremiumRedemptionRequest) {
-    requestAction({ kind: "redeem", request });
+  function requestSignIn() {
+    setSignInOpen(true);
   }
 
   function openPremium() {
     if (user) showPremium();
-    else requestAction({ kind: "premium" });
+    else {
+      openPremiumAfterSignIn.current = true;
+      requestSignIn();
+    }
   }
 
   function closeSignIn() {
-    requestedAction.current = null;
     setSignInOpen(false);
-    setPendingAction(null);
-    setAuthError(false);
-    if (resumeStore) void navigate({ to: "/redeem", search: { code }, replace: true });
+    openPremiumAfterSignIn.current = false;
   }
-
-  const returnSearch = new URLSearchParams({ code });
-  if (pendingAction?.kind === "redeem") returnSearch.set("store", pendingAction.request.platform);
-  const showAccountStatus = !isOnline || Boolean(user) || Boolean(pendingAction);
 
   return (
     <div className="pb-safe flex min-h-full flex-col">
@@ -168,58 +80,18 @@ function RedemptionPage({
         </h1>
       </header>
       <main className="mx-auto w-full max-w-[480px] px-4 pt-2 pb-8">
-        {showAccountStatus ? (
-          <div className="text-accent-800 dark:text-accent-200 mb-4 flex min-h-10 items-center gap-2 text-sm">
-            {!isOnline ? (
-              <Alert variant="warning">
-                <Icon icon="lucide.wifi-off" />
-                <AlertDescription>
-                  <Trans>You seem to be offline.</Trans>
-                </AlertDescription>
-              </Alert>
-            ) : pendingAction && !authError && !isSignInOpen ? (
-              <output>
-                <Trans>Loading sign-in…</Trans>
-              </output>
-            ) : pendingAction && authError ? (
-              <Alert variant="warning">
-                <Icon icon="lucide.triangle-alert" />
-                <AlertDescription>
-                  <p>
-                    <Trans>
-                      Sign-in is unavailable, so we can’t link your offer to trizum yet.
-                    </Trans>
-                  </p>
-                  <Button
-                    className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
-                    onPress={() => {
-                      if (pendingAction)
-                        requestAction(
-                          pendingAction.kind === "redeem"
-                            ? { kind: "redeem", request: { ...pendingAction.request, code } }
-                            : pendingAction,
-                        );
-                    }}
-                  >
-                    <Trans>Try again</Trans>
-                  </Button>
-                </AlertDescription>
-              </Alert>
-            ) : user ? (
-              <output className="flex min-w-0 items-center gap-2">
-                <Icon icon="lucide.check" className="size-4 shrink-0" />
-                <span className="min-w-0 break-words">
-                  <Trans>Signed in as {email}</Trans>
-                </span>
-              </output>
-            ) : null}
-          </div>
+        {user ? (
+          <output className="text-accent-800 dark:text-accent-200 mb-4 flex min-h-10 min-w-0 items-center gap-2 text-sm">
+            <Icon icon="lucide.check" className="size-4 shrink-0" />
+            <span className="min-w-0 break-words">
+              <Trans>Signed in as {email}</Trans>
+            </span>
+          </output>
         ) : null}
         <PremiumCodeRedemption
           userId={user?.id ?? null}
           initialCode={initialCode}
           onCodeChange={setCode}
-          isDisabled={isChecking}
           onSignIn={requestSignIn}
           onOpenPremium={openPremium}
         />
@@ -239,10 +111,10 @@ function RedemptionPage({
           }
         >
           <CloudSyncSettingsView
-            search={{ returnTo: `/redeem?${returnSearch}` }}
+            search={{ returnTo: `/redeem?${new URLSearchParams({ code })}` }}
             onClose={closeSignIn}
             onSignedIn={(userId) => {
-              if (pendingAction) completeAction(pendingAction, userId);
+              if (openPremiumAfterSignIn.current) setPremiumUserId(userId);
             }}
           />
         </Suspense>

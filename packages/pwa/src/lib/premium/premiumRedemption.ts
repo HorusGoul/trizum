@@ -4,19 +4,8 @@ export const APPLE_APP_ID = "6755971747";
 const PENDING_REDEMPTION_KEY = "trizum:pending-premium-redemption:v1";
 const REDEMPTION_SYNC_WINDOW_MS = 15 * 60_000;
 
-export interface PremiumRedemptionRequest {
-  platform: RevenueCatPlatform;
-  code: string;
-}
-
-export function parseRedemptionSearch(search: Record<string, unknown>): {
-  code: string;
-  store?: RevenueCatPlatform;
-} {
-  return {
-    code: typeof search.code === "string" ? search.code.trim().slice(0, 128) : "",
-    ...(search.store === "ios" || search.store === "android" ? { store: search.store } : {}),
-  };
+export function parseRedemptionSearch(search: Record<string, unknown>) {
+  return { code: typeof search.code === "string" ? search.code.trim().slice(0, 128) : "" };
 }
 
 export function detectRedemptionPlatform(

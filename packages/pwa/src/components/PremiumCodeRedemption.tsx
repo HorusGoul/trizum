@@ -13,7 +13,6 @@ import { Label } from "#src/ui/fields/Field.tsx";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { openPremiumCodeRedemption } from "#src/lib/premium/revenueCatClient.ts";
 import {
-  type PremiumRedemptionRequest,
   detectRedemptionPlatform,
   getStoreRedemptionUrl,
 } from "#src/lib/premium/premiumRedemption.ts";
@@ -34,7 +33,7 @@ export function PremiumCodeRedemption({
   initialCode?: string;
   isDisabled?: boolean;
   onBusyChange?: (busy: boolean) => void;
-  onSignIn?: (redemption: PremiumRedemptionRequest) => void;
+  onSignIn?: () => void;
   onOpenPremium: () => void;
   onCodeChange?: (code: string) => void;
 }) {
@@ -51,10 +50,6 @@ export function PremiumCodeRedemption({
 
   async function redeem() {
     if (!checkRedemptionConnection()) return;
-    if (!userId && onSignIn) {
-      if (platform) onSignIn({ platform, code });
-      return;
-    }
     onBusyChange?.(true);
     await openPremiumCodeRedemption(userId, code)
       .catch(() => {
@@ -108,11 +103,11 @@ export function PremiumCodeRedemption({
       </TextField>
 
       <div className="flex flex-col gap-3">
-        {platform ? (
+        {platform && userId ? (
           <Button
             className={storeButtonClassName}
             aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
-            isDisabled={(!userId && !onSignIn && isOnline) || isDisabled}
+            isDisabled={isDisabled}
             pressAction={redeem}
           >
             <StoreRedemptionContent platform={platform} />
@@ -120,20 +115,10 @@ export function PremiumCodeRedemption({
         ) : (
           <>
             {showApple ? (
-              <StoreRedemptionLink
-                platform="ios"
-                code={code}
-                onSignIn={!userId ? onSignIn : undefined}
-                isDisabled={isDisabled}
-              />
+              <StoreRedemptionLink platform="ios" code={code} isDisabled={isDisabled} />
             ) : null}
             {showGoogle ? (
-              <StoreRedemptionLink
-                platform="android"
-                code={code}
-                onSignIn={!userId ? onSignIn : undefined}
-                isDisabled={isDisabled}
-              />
+              <StoreRedemptionLink platform="android" code={code} isDisabled={isDisabled} />
             ) : null}
           </>
         )}
@@ -142,7 +127,7 @@ export function PremiumCodeRedemption({
       <PremiumRedemptionHelp
         code={code}
         devicePlatform={devicePlatform}
-        redeemAction={platform ? redeem : undefined}
+        redeemAction={platform && userId ? redeem : undefined}
         isDisabled={isDisabled}
         isSignedIn={Boolean(userId)}
         isOffline={!isOnline}
@@ -156,12 +141,10 @@ export function PremiumCodeRedemption({
 function StoreRedemptionLink({
   platform,
   code,
-  onSignIn,
   isDisabled,
 }: {
   platform: "ios" | "android";
   code: string;
-  onSignIn?: (redemption: PremiumRedemptionRequest) => void;
   isDisabled: boolean;
 }) {
   return (
@@ -172,9 +155,6 @@ function StoreRedemptionLink({
       onClick={(event) => {
         if (isDisabled || !checkRedemptionConnection()) {
           event.preventDefault();
-        } else if (onSignIn) {
-          event.preventDefault();
-          onSignIn({ platform, code });
         }
       }}
       rel="noreferrer"

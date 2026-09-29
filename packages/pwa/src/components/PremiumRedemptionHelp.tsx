@@ -3,10 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
-import {
-  getStoreRedemptionUrl,
-  type PremiumRedemptionRequest,
-} from "#src/lib/premium/premiumRedemption.ts";
+import { getStoreRedemptionUrl } from "#src/lib/premium/premiumRedemption.ts";
 
 const helpLinkClassName =
   "font-semibold underline decoration-current underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2";
@@ -27,7 +24,7 @@ export function PremiumRedemptionHelp({
   isDisabled: boolean;
   isSignedIn: boolean;
   isOffline: boolean;
-  onSignIn?: (redemption: PremiumRedemptionRequest) => void;
+  onSignIn?: () => void;
   onOpenPremium: () => void;
 }) {
   return (
@@ -40,7 +37,13 @@ export function PremiumRedemptionHelp({
         <ol className="text-accent-900 dark:text-accent-100 list-decimal space-y-2 pb-3 pl-5 leading-relaxed">
           {!isSignedIn ? (
             <li>
-              <Trans>If asked, sign in to the trizum account you want to use for Premium.</Trans>
+              <Trans>
+                Open trizum on your phone and{" "}
+                <HelpButton onPress={onSignIn} isDisabled={isDisabled || isOffline}>
+                  sign in
+                </HelpButton>{" "}
+                to the account you want to use for Premium.
+              </Trans>
             </li>
           ) : null}
           <li>
@@ -50,9 +53,8 @@ export function PremiumRedemptionHelp({
                 <InlineStoreLink
                   platform="ios"
                   code={code}
-                  onSignIn={!isSignedIn ? onSignIn : undefined}
                   redeemAction={redeemAction}
-                  isDisabled={(!isSignedIn && !onSignIn && !isOffline) || isDisabled}
+                  isDisabled={isDisabled}
                 >
                   App Store
                 </InlineStoreLink>
@@ -64,9 +66,8 @@ export function PremiumRedemptionHelp({
                 <InlineStoreLink
                   platform="android"
                   code={code}
-                  onSignIn={!isSignedIn ? onSignIn : undefined}
                   redeemAction={redeemAction}
-                  isDisabled={(!isSignedIn && !onSignIn && !isOffline) || isDisabled}
+                  isDisabled={isDisabled}
                 >
                   Google Play
                 </InlineStoreLink>
@@ -75,21 +76,11 @@ export function PremiumRedemptionHelp({
             ) : (
               <Trans>
                 Open this link on your phone and copy your code. Choose{" "}
-                <InlineStoreLink
-                  platform="ios"
-                  code={code}
-                  onSignIn={!isSignedIn ? onSignIn : undefined}
-                  isDisabled={isDisabled}
-                >
+                <InlineStoreLink platform="ios" code={code}>
                   App Store
                 </InlineStoreLink>{" "}
                 for iPhone or iPad, or{" "}
-                <InlineStoreLink
-                  platform="android"
-                  code={code}
-                  onSignIn={!isSignedIn ? onSignIn : undefined}
-                  isDisabled={isDisabled}
-                >
+                <InlineStoreLink platform="android" code={code}>
                   Google Play
                 </InlineStoreLink>{" "}
                 for Android.
@@ -157,14 +148,12 @@ function InlineStoreLink({
   redeemAction,
   isDisabled,
   children,
-  onSignIn,
 }: {
   platform: "ios" | "android";
   code: string;
   redeemAction?: () => Promise<void>;
   isDisabled?: boolean;
   children: ReactNode;
-  onSignIn?: (redemption: PremiumRedemptionRequest) => void;
 }) {
   if (redeemAction) {
     return (
@@ -182,12 +171,7 @@ function InlineStoreLink({
       className={helpLinkClassName}
       href={getStoreRedemptionUrl(platform, code)}
       onClick={(event) => {
-        if (isDisabled || !checkRedemptionConnection()) {
-          event.preventDefault();
-        } else if (onSignIn) {
-          event.preventDefault();
-          onSignIn({ platform, code });
-        }
+        if (!checkRedemptionConnection()) event.preventDefault();
       }}
       target="_blank"
       rel="noreferrer"

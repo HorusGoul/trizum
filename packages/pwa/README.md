@@ -105,7 +105,9 @@ shared map cannot authorize the UI to skip transfer confirmation.
 ## Premium Promo Codes
 
 The Premium paywall includes a **Redeem code** action, available even when
-products fail to load. Native redemption requires a signed-in trizum account.
+products fail to load. Signed-in native redemption identifies the trizum account before opening the store.
+Signed-out visitors can open store links directly; optional sign-in and Premium
+settings actions remain in the FAQs.
 Apple opens the native sheet without a code, or the App Store offer-code URL
 when a code is supplied. Google Play's external redemption supports one-time
 codes; checkout help explains how to redeem offers that need the payment-method
