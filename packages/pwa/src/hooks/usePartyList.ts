@@ -216,6 +216,12 @@ export function usePartyList() {
     }
   }
 
+  function dismissPremiumBanner() {
+    partyListHandle.change((list) => {
+      list.premiumBannerDismissed = true;
+    });
+  }
+
   function setAutoOpenCalculator(value: boolean) {
     partyListHandle.change((list) => {
       list.autoOpenCalculator = value;
@@ -231,5 +237,6 @@ export function usePartyList() {
     setPartyPinned,
     setPartyArchived,
     setAutoOpenCalculator,
+    dismissPremiumBanner,
   };
 }

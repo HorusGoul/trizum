@@ -18,7 +18,7 @@ import { UpdateContext } from "#src/components/UpdateContext.tsx";
 import { showUpdateResultFeedback } from "#src/lib/updateResultFeedback.ts";
 import { EmptyState } from "#src/routes/index/-components/EmptyState.js";
 import { NoActivePartiesCard } from "#src/routes/index/-components/NoActivePartiesCard.js";
-import { ProfileSetupCard } from "#src/routes/index/-components/ProfileSetupCard.js";
+import { HomeBanner } from "#src/routes/index/-components/HomeBanner.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 
@@ -34,7 +34,6 @@ function Home() {
   const location = useLocation();
 
   const showPartyHub = activeCount > 0 || archivedCount > 0;
-  const needsProfileSetup = !partyList.username || partyList.username.trim() === "";
   const hasCloudSyncChild = location.pathname === "/settings/cloud-sync";
   const sessionStatus = getAuthSessionStatus(session);
 
@@ -135,10 +134,10 @@ function Home() {
 
         <div className="h-2" />
 
+        <HomeBanner isVisible={showPartyHub} />
+
         {showPartyHub ? (
           <div className="container flex flex-1 flex-col gap-4 px-2">
-            {needsProfileSetup ? <ProfileSetupCard /> : null}
-
             {activeCount > 0 ? (
               <section className="flex flex-col gap-3">
                 {activePartyIds.map((partyId) => {
