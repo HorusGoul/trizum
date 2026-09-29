@@ -2788,7 +2788,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
-#: src/routes/redeem.tsx:63
+#: src/routes/redeem.tsx:60
 msgid "Premium is active."
 msgstr "Premium está activo."
 
@@ -3179,7 +3179,7 @@ msgstr "Leone de Sierra Leona"
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
-#: src/routes/redeem.tsx:41
+#: src/routes/redeem.tsx:38
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
@@ -3204,7 +3204,7 @@ msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 msgid "Sign in to trizum cloud"
 msgstr "Iniciar sesión en trizum cloud"
 
-#: src/routes/redeem.tsx:39
+#: src/routes/redeem.tsx:36
 msgid "Sign in to your trizum account before redeeming."
 msgstr "Inicia sesión en tu cuenta de trizum antes de canjear el código."
 
@@ -4049,7 +4049,7 @@ msgid "View photo"
 msgstr "Ver foto"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:300
-#: src/routes/redeem.tsx:57
+#: src/routes/redeem.tsx:54
 #: src/routes/settings.tsx:371
 msgid "View Premium options"
 msgstr "Ver opciones de Premium"

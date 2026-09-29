@@ -30,10 +30,7 @@ function RedeemCode() {
           <Trans>Redeem code</Trans>
         </h1>
       </header>
-      <main className="mx-auto w-full max-w-[480px] px-6 pt-6 pb-8">
-        <p className="text-accent-600 dark:text-accent-300 mb-7 text-sm leading-relaxed">
-          <Trans>Use a promo code for trizum Premium.</Trans>
-        </p>
+      <main className="mx-auto w-full max-w-[480px] px-4 pt-6 pb-8">
         {platform && !userId ? (
           <p className="text-accent-700 dark:text-accent-200 mb-5 text-sm">
             <Trans>Sign in to your trizum account before redeeming.</Trans>{" "}
