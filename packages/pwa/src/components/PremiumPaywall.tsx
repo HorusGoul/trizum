@@ -48,6 +48,7 @@ export function PremiumPaywall({
   const [activeAction, setActiveAction] = useState<"purchase" | "restore" | "redeem" | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showRedemption, setShowRedemption] = useState(false);
+  const [redemptionCode, setRedemptionCode] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
@@ -270,13 +271,18 @@ export function PremiumPaywall({
                       className="text-accent-600 dark:text-accent-300 mx-auto h-9 w-auto px-4 text-sm font-semibold"
                       isDisabled={activeAction !== null}
                       aria-expanded={showRedemption}
-                      onPress={() => setShowRedemption((shown) => !shown)}
+                      onPress={() => {
+                        setRedemptionCode("");
+                        setShowRedemption((shown) => !shown);
+                      }}
                     >
                       <Trans>Redeem code</Trans>
                     </Button>
                   </div>
                   {showRedemption ? (
                     <PremiumCodeRedemption
+                      code={redemptionCode}
+                      onCodeChange={setRedemptionCode}
                       userId={userId}
                       isDisabled={activeAction !== null}
                       onBusyChange={(busy) => setActiveAction(busy ? "redeem" : null)}

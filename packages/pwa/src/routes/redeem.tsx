@@ -97,7 +97,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
         ) : null}
         <PremiumCodeRedemption
           userId={user?.id ?? null}
-          initialCode={initialCode}
+          code={code}
           onCodeChange={setCode}
           onSignIn={requestSignIn}
           onOpenPremium={openPremium}

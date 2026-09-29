@@ -2,7 +2,7 @@ import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
-import { useEffect, useReducer, useRef, type FormEvent } from "react";
+import { useEffect, useEffectEvent, useReducer, useRef, type FormEvent } from "react";
 import { AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
@@ -329,6 +329,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     };
   }, [isSignInSuccessVisible, userId]);
 
+  const completeAnimatedSignIn = useEffectEvent(completeSignIn);
   useEffect(() => {
     if (
       !isSignInSuccessVisible ||
@@ -339,23 +340,12 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
       return;
     }
 
-    if (onClose) {
-      // Authentication completion can open Premium for this exact account.
-      // oxlint-disable-next-line react-doctor/no-pass-data-to-parent
-      if (userId) onSignedIn?.(userId);
-      onClose();
-    } else {
-      void navigate({ href: returnTo ?? "/", replace: true });
-    }
+    completeAnimatedSignIn();
   }, [
     isAccountStateResolved,
     isCloudSyncSwitchOpen,
     isSignInSuccessAnimationComplete,
     isSignInSuccessVisible,
-    navigate,
-    onClose,
-    onSignedIn,
-    returnTo,
     userId,
   ]);
 
@@ -742,6 +732,10 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
       return;
     }
 
+    completeSignIn();
+  }
+
+  function completeSignIn() {
     if (onClose) {
       if (userId) onSignedIn?.(userId);
       onClose();

@@ -1,9 +1,8 @@
-import { checkRedemptionConnection } from "#src/lib/premium/redemptionConnection.ts";
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
-import { getStoreRedemptionUrl } from "#src/lib/premium/premiumRedemption.ts";
+import { StoreRedemptionAction } from "./StoreRedemptionAction.tsx";
 
 const helpLinkClassName =
   "font-semibold underline decoration-current underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2";
@@ -50,39 +49,49 @@ export function PremiumRedemptionHelp({
             {devicePlatform === "ios" ? (
               <Trans>
                 Copy your code, then open{" "}
-                <InlineStoreLink
+                <StoreRedemptionAction
+                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
                   platform="ios"
                   code={code}
                   redeemAction={redeemAction}
                   isDisabled={isDisabled}
                 >
                   App Store
-                </InlineStoreLink>
+                </StoreRedemptionAction>
                 .
               </Trans>
             ) : devicePlatform === "android" ? (
               <Trans>
                 Copy your code, then open{" "}
-                <InlineStoreLink
+                <StoreRedemptionAction
+                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
                   platform="android"
                   code={code}
                   redeemAction={redeemAction}
                   isDisabled={isDisabled}
                 >
                   Google Play
-                </InlineStoreLink>
+                </StoreRedemptionAction>
                 .
               </Trans>
             ) : (
               <Trans>
                 Open this link on your phone and copy your code. Choose{" "}
-                <InlineStoreLink platform="ios" code={code}>
+                <StoreRedemptionAction
+                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+                  platform="ios"
+                  code={code}
+                >
                   App Store
-                </InlineStoreLink>{" "}
+                </StoreRedemptionAction>{" "}
                 for iPhone or iPad, or{" "}
-                <InlineStoreLink platform="android" code={code}>
+                <StoreRedemptionAction
+                  className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+                  platform="android"
+                  code={code}
+                >
                   Google Play
-                </InlineStoreLink>{" "}
+                </StoreRedemptionAction>{" "}
                 for Android.
               </Trans>
             )}
@@ -139,45 +148,6 @@ export function PremiumRedemptionHelp({
         </p>
       </details>
     </div>
-  );
-}
-
-function InlineStoreLink({
-  platform,
-  code,
-  redeemAction,
-  isDisabled,
-  children,
-}: {
-  platform: "ios" | "android";
-  code: string;
-  redeemAction?: () => Promise<void>;
-  isDisabled?: boolean;
-  children: ReactNode;
-}) {
-  if (redeemAction) {
-    return (
-      <Button
-        className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
-        pressAction={redeemAction}
-        isDisabled={isDisabled}
-      >
-        {children}
-      </Button>
-    );
-  }
-  return (
-    <a
-      className={helpLinkClassName}
-      href={getStoreRedemptionUrl(platform, code)}
-      onClick={(event) => {
-        if (!checkRedemptionConnection()) event.preventDefault();
-      }}
-      target="_blank"
-      rel="noreferrer"
-    >
-      {children}
-    </a>
   );
 }
 
