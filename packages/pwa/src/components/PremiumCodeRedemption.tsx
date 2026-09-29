@@ -1,5 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
+import { useOnlineStatus } from "#src/hooks/useOnlineStatus.ts";
+import { checkRedemptionConnection } from "#src/lib/premium/redemptionConnection.ts";
 import { useState } from "react";
 import { PremiumRedemptionHelp } from "./PremiumRedemptionHelp.tsx";
 import { toast } from "sonner";
@@ -35,6 +37,7 @@ export function PremiumCodeRedemption({
   onOpenPremium: () => void;
   onCodeChange?: (code: string) => void;
 }) {
+  const isOnline = useOnlineStatus();
   const [code, setCode] = useState(initialCode);
   const platform = getRevenueCatPlatform();
   const devicePlatform =
@@ -46,6 +49,7 @@ export function PremiumCodeRedemption({
   const showGoogle = devicePlatform !== "ios";
 
   async function redeem() {
+    if (!checkRedemptionConnection()) return;
     onBusyChange?.(true);
     await openPremiumCodeRedemption(userId, code)
       .catch(() => {
@@ -103,7 +107,7 @@ export function PremiumCodeRedemption({
           <Button
             className={storeButtonClassName}
             aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
-            isDisabled={!userId || isDisabled}
+            isDisabled={(!userId && isOnline) || isDisabled}
             pressAction={redeem}
           >
             <StoreRedemptionContent platform={platform} />
@@ -122,6 +126,7 @@ export function PremiumCodeRedemption({
         redeemAction={platform ? redeem : undefined}
         isDisabled={isDisabled}
         isSignedIn={Boolean(userId)}
+        isOffline={!isOnline}
         onSignIn={onSignIn}
         onOpenPremium={onOpenPremium}
       />
@@ -135,6 +140,9 @@ function StoreRedemptionLink({ platform, code }: { platform: "ios" | "android"; 
       className={storeButtonClassName}
       aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
       href={getStoreRedemptionUrl(platform, code)}
+      onClick={(event) => {
+        if (!checkRedemptionConnection()) event.preventDefault();
+      }}
       rel="noreferrer"
       target="_blank"
     >

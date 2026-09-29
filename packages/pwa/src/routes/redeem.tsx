@@ -5,6 +5,7 @@ import { lazy, Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PremiumCodeRedemption } from "#src/components/PremiumCodeRedemption.tsx";
 import { BackButton } from "#src/components/BackButton.tsx";
+import { useOnlineStatus } from "#src/hooks/useOnlineStatus.ts";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
@@ -33,6 +34,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
   const [isSignInOpen, setSignInOpen] = useState(false);
   const openPremiumAfterSignIn = useRef(false);
   const session = useAppSession();
+  const isOnline = useOnlineStatus();
   const sessionStatus = getAuthSessionStatus(session);
   const user = session.data?.user;
   const email = user?.email;
@@ -65,36 +67,43 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           <Trans>Redeem code</Trans>
         </h1>
       </header>
-      <main className="mx-auto w-full max-w-[480px] px-4 pt-6 pb-8">
-        <div className="text-accent-900 dark:text-accent-100 mb-5 text-sm">
-          {sessionStatus === "pending" ? (
+      <main className="mx-auto w-full max-w-[480px] px-4 pt-2 pb-8">
+        <div className="text-accent-800 dark:text-accent-200 mb-4 flex min-h-10 items-center gap-2 text-sm">
+          {!isOnline ? (
+            <output className="flex items-center gap-2">
+              <Icon icon="lucide.wifi-off" className="size-4 shrink-0" />
+              <Trans>You seem to be offline.</Trans>
+            </output>
+          ) : sessionStatus === "pending" ? (
             <output>
               <Trans>Checking account…</Trans>
             </output>
           ) : sessionStatus === "unavailable" ? (
-            <>
-              <p>
-                <Trans>
-                  Your account could not be checked. Connect to the internet and try again.
-                </Trans>
-              </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <output>
+                <Trans>We couldn’t check your account.</Trans>
+              </output>
               <Button
-                className="mt-2"
-                color="input-like"
+                className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
                 pressAction={async () => {
                   await session.refetch();
                 }}
               >
-                <Trans>Retry account check</Trans>
+                <Trans>Retry</Trans>
               </Button>
-            </>
+            </div>
           ) : user ? (
-            <output className="flex items-center gap-2">
+            <output className="flex min-w-0 items-center gap-2">
               <Icon icon="lucide.check" className="size-4 shrink-0" />
-              <Trans>Signed in as {email}</Trans>
+              <span className="min-w-0 break-words">
+                <Trans>Signed in as {email}</Trans>
+              </span>
             </output>
           ) : (
-            <Button color="input-like" onPress={() => setSignInOpen(true)}>
+            <Button
+              className="h-auto w-auto rounded-sm py-1 font-semibold underline underline-offset-4"
+              onPress={() => setSignInOpen(true)}
+            >
               <Trans>Sign in</Trans>
             </Button>
           )}
@@ -103,7 +112,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
           userId={user?.id ?? null}
           initialCode={initialCode}
           onCodeChange={setCode}
-          isDisabled={isAccountUnavailable}
+          isDisabled={isOnline && isAccountUnavailable}
           onSignIn={() => setSignInOpen(true)}
           onOpenPremium={openPremium}
         />
