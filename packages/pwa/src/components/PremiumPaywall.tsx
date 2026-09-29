@@ -280,6 +280,7 @@ export function PremiumPaywall({
                       userId={userId}
                       isDisabled={activeAction !== null}
                       onBusyChange={(busy) => setActiveAction(busy ? "redeem" : null)}
+                      onNavigate={() => onOpenChange(false)}
                     />
                   ) : null}
                 </div>

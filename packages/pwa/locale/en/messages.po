@@ -25,7 +25,7 @@ msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:412
+#: src/components/PremiumPaywall.tsx:413
 msgid "{0, plural, one {# day free} other {# days free}}"
 msgstr "{0, plural, one {# day free} other {# days free}}"
 
@@ -35,17 +35,17 @@ msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues
 msgstr "{0, plural, one {# issue must be resolved before saving.} other {# issues must be resolved before saving.}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:416
+#: src/components/PremiumPaywall.tsx:417
 msgid "{0, plural, one {# month free} other {# months free}}"
 msgstr "{0, plural, one {# month free} other {# months free}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:414
+#: src/components/PremiumPaywall.tsx:415
 msgid "{0, plural, one {# week free} other {# weeks free}}"
 msgstr "{0, plural, one {# week free} other {# weeks free}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:418
+#: src/components/PremiumPaywall.tsx:419
 msgid "{0, plural, one {# year free} other {# years free}}"
 msgstr "{0, plural, one {# year free} other {# years free}}"
 
@@ -92,11 +92,11 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
-#: src/components/PremiumPaywall.tsx:447
+#: src/components/PremiumPaywall.tsx:448
 msgid "{price} is charged automatically until canceled."
 msgstr "{price} is charged automatically until canceled."
 
-#: src/components/PremiumPaywall.tsx:403
+#: src/components/PremiumPaywall.tsx:404
 msgid "{pricePerMonth} per month"
 msgstr "{pricePerMonth} per month"
 
@@ -347,7 +347,7 @@ msgstr "Advanced"
 msgid "Afghan Afghani"
 msgstr "Afghan Afghani"
 
-#: src/components/PremiumPaywall.tsx:440
+#: src/components/PremiumPaywall.tsx:441
 msgid "After the free trial, {price} is charged automatically until canceled."
 msgstr "After the free trial, {price} is charged automatically until canceled."
 
@@ -375,7 +375,7 @@ msgstr "All expense checks passed"
 msgid "All time"
 msgstr "All time"
 
-#: src/components/PremiumCodeRedemption.tsx:163
+#: src/components/PremiumRedemptionHelp.tsx:119
 msgid "Already redeemed?"
 msgstr "Already redeemed?"
 
@@ -421,11 +421,11 @@ msgstr "and its"
 msgid "Angolan Kwanza"
 msgstr "Angolan Kwanza"
 
-#: src/components/PremiumPaywall.tsx:386
+#: src/components/PremiumPaywall.tsx:387
 msgid "Annual"
 msgstr "Annual"
 
-#: src/components/PremiumCodeRedemption.tsx:201
+#: src/components/PremiumCodeRedemption.tsx:146
 msgid "App Store"
 msgstr "App Store"
 
@@ -784,7 +784,7 @@ msgid "Check your email for the sign-in link"
 msgstr "Check your email for the sign-in link"
 
 #: src/routes/_home/settings_.cloud-sync.tsx:745
-#: src/routes/settings.tsx:364
+#: src/routes/settings.tsx:367
 msgid "Checking account…"
 msgstr "Checking account…"
 
@@ -796,7 +796,7 @@ msgstr "Checking for updates..."
 msgid "Checking Party Boost…"
 msgstr "Checking Party Boost…"
 
-#: src/routes/settings.tsx:393
+#: src/routes/settings.tsx:396
 msgid "Checking Premium status…"
 msgstr "Checking Premium status…"
 
@@ -820,7 +820,7 @@ msgstr "Chinese Yuan"
 msgid "Choose a destination party"
 msgstr "Choose a destination party"
 
-#: src/routes/settings.tsx:412
+#: src/routes/settings.tsx:415
 msgid "Choose monthly, annual, or lifetime access."
 msgstr "Choose monthly, annual, or lifetime access."
 
@@ -877,7 +877,7 @@ msgstr "Cloud settings applied"
 msgid "Cloud settings saved"
 msgstr "Cloud settings saved"
 
-#: src/components/PremiumCodeRedemption.tsx:53
+#: src/components/PremiumCodeRedemption.tsx:56
 msgid "Code copied."
 msgstr "Code copied."
 
@@ -885,11 +885,11 @@ msgstr "Code copied."
 msgid "Code for testing"
 msgstr "Code for testing"
 
-#: src/components/PremiumCodeRedemption.tsx:149
+#: src/components/PremiumRedemptionHelp.tsx:101
 msgid "Code not working in Google Play?"
 msgstr "Code not working in Google Play?"
 
-#: src/components/PremiumCodeRedemption.tsx:45
+#: src/components/PremiumCodeRedemption.tsx:48
 msgid "Code redemption could not be opened. Please try again."
 msgstr "Code redemption could not be opened. Please try again."
 
@@ -1014,7 +1014,7 @@ msgstr "Continue with Premium"
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/components/PremiumCodeRedemption.tsx:83
+#: src/components/PremiumCodeRedemption.tsx:86
 msgid "Copy code"
 msgstr "Copy code"
 
@@ -1025,6 +1025,14 @@ msgstr "Copy party link"
 #: src/routes/party_.$partyId.pay/-components/BizumItem.tsx:12
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copy the phone number and pay through Bizum using your bank app."
+
+#: src/components/PremiumRedemptionHelp.tsx:42
+msgid "Copy your code, then open <0>App Store</0>."
+msgstr "Copy your code, then open <0>App Store</0>."
+
+#: src/components/PremiumRedemptionHelp.tsx:55
+msgid "Copy your code, then open <0>Google Play</0>."
+msgstr "Copy your code, then open <0>Google Play</0>."
 
 #: src/components/PremiumCodeRedemption.tsx:123
 msgid "Copy your code, then tap App Store above."
@@ -1046,7 +1054,7 @@ msgstr "Could not apply cloud settings"
 msgid "Could not connect sign-in method"
 msgstr "Could not connect sign-in method"
 
-#: src/components/PremiumCodeRedemption.tsx:55
+#: src/components/PremiumCodeRedemption.tsx:58
 msgid "Could not copy the code. Select and copy it from the field above."
 msgstr "Could not copy the code. Select and copy it from the field above."
 
@@ -1585,7 +1593,7 @@ msgstr "Filter totals and rankings"
 msgid "Finishing sign in"
 msgstr "Finishing sign in"
 
-#: src/components/PremiumCodeRedemption.tsx:134
+#: src/components/PremiumRedemptionHelp.tsx:82
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 msgstr "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 
@@ -1666,7 +1674,7 @@ msgstr "Google connected"
 msgid "Google is connected to this account"
 msgstr "Google is connected to this account"
 
-#: src/components/PremiumCodeRedemption.tsx:201
+#: src/components/PremiumCodeRedemption.tsx:146
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -1742,7 +1750,7 @@ msgstr "Honduran Lempira"
 msgid "Hong Kong Dollar"
 msgstr "Hong Kong Dollar"
 
-#: src/components/PremiumCodeRedemption.tsx:112
+#: src/components/PremiumRedemptionHelp.tsx:27
 msgid "How do I redeem my code?"
 msgstr "How do I redeem my code?"
 
@@ -2029,7 +2037,7 @@ msgstr "Libyan Dinar"
 msgid "License"
 msgstr "License"
 
-#: src/components/PremiumPaywall.tsx:388
+#: src/components/PremiumPaywall.tsx:389
 msgid "Lifetime"
 msgstr "Lifetime"
 
@@ -2045,7 +2053,7 @@ msgstr "Links"
 msgid "Loading licenses..."
 msgstr "Loading licenses..."
 
-#: src/components/PremiumPaywall.tsx:454
+#: src/components/PremiumPaywall.tsx:455
 msgid "Loading Premium options"
 msgstr "Loading Premium options"
 
@@ -2089,7 +2097,7 @@ msgstr "Manage"
 msgid "Manage expense templates"
 msgstr "Manage expense templates"
 
-#: src/routes/settings.tsx:369
+#: src/routes/settings.tsx:372
 msgid "Manage Premium"
 msgstr "Manage Premium"
 
@@ -2170,7 +2178,7 @@ msgstr "Moldovan Leu"
 msgid "Mongolian Tugrik"
 msgstr "Mongolian Tugrik"
 
-#: src/components/PremiumPaywall.tsx:384
+#: src/components/PremiumPaywall.tsx:385
 msgid "Monthly"
 msgstr "Monthly"
 
@@ -2429,11 +2437,11 @@ msgstr "Omani Rial"
 msgid "One Party Boost"
 msgstr "One Party Boost"
 
-#: src/components/PremiumPaywall.tsx:432
+#: src/components/PremiumPaywall.tsx:433
 msgid "One payment. No recurring charge."
 msgstr "One payment. No recurring charge."
 
-#: src/components/PremiumPaywall.tsx:406
+#: src/components/PremiumPaywall.tsx:407
 msgid "one-time"
 msgstr "one-time"
 
@@ -2491,6 +2499,10 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
+#: src/components/PremiumRedemptionHelp.tsx:68
+msgid "Open this link on your phone and copy your code. Choose <0>App Store</0> for iPhone or iPad, or <1>Google Play</1> for Android."
+msgstr "Open this link on your phone and copy your code. Choose <0>App Store</0> for iPhone or iPad, or <1>Google Play</1> for Android."
+
 #: src/components/PremiumCodeRedemption.tsx:127
 msgid "Open this link on your phone and copy your code. Choose App Store for iPhone or iPad, or Google Play for Android."
 msgstr "Open this link on your phone and copy your code. Choose App Store for iPhone or iPad, or Google Play for Android."
@@ -2498,6 +2510,14 @@ msgstr "Open this link on your phone and copy your code. Choose App Store for iP
 #: src/lib/partySharePreviewMessages.ts:7
 msgid "Open this party to split expenses and settle up together on trizum."
 msgstr "Open this party to split expenses and settle up together on trizum."
+
+#: src/components/PremiumRedemptionHelp.tsx:32
+msgid "Open trizum on your phone and <0>sign in</0> to the account you want to use for Premium."
+msgstr "Open trizum on your phone and <0>sign in</0> to the account you want to use for Premium."
+
+#: src/components/PremiumRedemptionHelp.tsx:123
+msgid "Open trizum on your phone and <0>sign in</0> to your account. Open <1>Premium settings</1> and use Restore purchases if Premium has not appeared yet."
+msgstr "Open trizum on your phone and <0>sign in</0> to your account. Open <1>Premium settings</1> and use Restore purchases if Premium has not appeared yet."
 
 #: src/components/PremiumCodeRedemption.tsx:117
 msgid "Open trizum on your phone and sign in to the account you want to use for Premium."
@@ -2761,11 +2781,11 @@ msgstr "People"
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
-#: src/components/PremiumPaywall.tsx:398
+#: src/components/PremiumPaywall.tsx:399
 msgid "per month"
 msgstr "per month"
 
-#: src/components/PremiumPaywall.tsx:403
+#: src/components/PremiumPaywall.tsx:404
 msgid "per year"
 msgstr "per year"
 
@@ -2863,7 +2883,7 @@ msgstr "Polish Zloty"
 
 #: src/components/PremiumPaywall.tsx:184
 #: src/routes/party_.$partyId.settings/index.tsx:66
-#: src/routes/settings.tsx:345
+#: src/routes/settings.tsx:348
 msgid "Premium"
 msgstr "Premium"
 
@@ -2876,7 +2896,7 @@ msgstr "Premium belongs to the purchasing person and may not be transferred, res
 msgid "Premium could not be purchased. Please try again."
 msgstr "Premium could not be purchased. Please try again."
 
-#: src/routes/settings.tsx:405
+#: src/routes/settings.tsx:408
 msgid "Premium is active on this account."
 msgstr "Premium is active on this account."
 
@@ -2913,7 +2933,7 @@ msgstr "Premium plan"
 msgid "Premium purchases restored."
 msgstr "Premium purchases restored."
 
-#: src/routes/settings.tsx:409
+#: src/routes/settings.tsx:412
 msgid "Premium status could not be checked. Try again."
 msgstr "Premium status could not be checked. Try again."
 
@@ -2933,7 +2953,7 @@ msgstr "Privacy"
 msgid "Privacy and cookie settings"
 msgstr "Privacy and cookie settings"
 
-#: src/components/PremiumPaywall.tsx:306
+#: src/components/PremiumPaywall.tsx:307
 #: src/routes/about/route.tsx:110
 msgid "Privacy Policy"
 msgstr "Privacy Policy"
@@ -2946,8 +2966,8 @@ msgstr "Probe, bypass, or interfere with security, access controls, rate limits,
 msgid "Profile and app menu"
 msgstr "Profile and app menu"
 
-#: src/components/PremiumCodeRedemption.tsx:70
-#: src/components/PremiumCodeRedemption.tsx:75
+#: src/components/PremiumCodeRedemption.tsx:73
+#: src/components/PremiumCodeRedemption.tsx:78
 msgid "Promo code"
 msgstr "Promo code"
 
@@ -2992,23 +3012,23 @@ msgstr "Recommended match"
 msgid "Redeem a one-time code in Google Play"
 msgstr "Redeem a one-time code in Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:60
+#: src/components/PremiumCodeRedemption.tsx:63
 #: src/components/PremiumPaywall.tsx:275
 #: src/routes/redeem.tsx:30
 msgid "Redeem code"
 msgstr "Redeem code"
 
-#: src/components/PremiumCodeRedemption.tsx:95
-#: src/components/PremiumCodeRedemption.tsx:182
+#: src/components/PremiumCodeRedemption.tsx:98
+#: src/components/PremiumCodeRedemption.tsx:127
 msgid "Redeem in App Store"
 msgstr "Redeem in App Store"
 
-#: src/components/PremiumCodeRedemption.tsx:95
-#: src/components/PremiumCodeRedemption.tsx:182
+#: src/components/PremiumCodeRedemption.tsx:98
+#: src/components/PremiumCodeRedemption.tsx:127
 msgid "Redeem in Google Play"
 msgstr "Redeem in Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:204
+#: src/components/PremiumCodeRedemption.tsx:149
 msgid "Redeem your offer"
 msgstr "Redeem your offer"
 
@@ -3071,9 +3091,13 @@ msgid "Retry"
 msgstr "Retry"
 
 #: src/routes/_home/settings_.cloud-sync.tsx:759
-#: src/routes/settings.tsx:366
+#: src/routes/settings.tsx:369
 msgid "Retry account check"
 msgstr "Retry account check"
+
+#: src/components/PremiumRedemptionHelp.tsx:88
+msgid "Return to trizum on your phone. Open <0>Premium settings</0> and use Restore purchases if Premium has not appeared yet."
+msgstr "Return to trizum on your phone. Open <0>Premium settings</0> and use Restore purchases if Premium has not appeared yet."
 
 #: src/components/PremiumCodeRedemption.tsx:140
 msgid "Return to trizum. If Premium has not appeared yet, use Restore purchases."
@@ -3291,11 +3315,11 @@ msgstr "Sign in again before deleting your account"
 msgid "Sign in to activate Premium benefits for this party."
 msgstr "Sign in to activate Premium benefits for this party."
 
-#: src/routes/settings.tsx:374
+#: src/routes/settings.tsx:377
 msgid "Sign in to get Premium"
 msgstr "Sign in to get Premium"
 
-#: src/routes/settings.tsx:401
+#: src/routes/settings.tsx:404
 msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Sign in to purchase or restore Premium across your devices."
 
@@ -3396,6 +3420,10 @@ msgstr "Solomon Islands Dollar"
 #: src/routes/new/route.tsx:297
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
+
+#: src/components/PremiumRedemptionHelp.tsx:105
+msgid "Some offers need to be redeemed at checkout. Open <0>Premium settings</0> in trizum on Android and choose the plan for your offer. Then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
+msgstr "Some offers need to be redeemed at checkout. Open <0>Premium settings</0> in trizum on Android and choose the plan for your offer. Then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 
 #: src/components/PremiumCodeRedemption.tsx:153
 msgid "Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan for your offer, then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
@@ -3636,7 +3664,7 @@ msgstr "Template names must be unique"
 msgid "Templates"
 msgstr "Templates"
 
-#: src/components/PremiumPaywall.tsx:297
+#: src/components/PremiumPaywall.tsx:298
 msgid "Terms"
 msgstr "Terms"
 
@@ -4175,7 +4203,7 @@ msgstr "View photo"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:300
 #: src/routes/redeem.tsx:54
-#: src/routes/settings.tsx:371
+#: src/routes/settings.tsx:374
 msgid "View Premium options"
 msgstr "View Premium options"
 
@@ -4382,7 +4410,7 @@ msgid "You're now seeing the party as {participantName}"
 msgstr "You're now seeing the party as {participantName}"
 
 #: src/routes/_home/settings_.cloud-sync.tsx:747
-#: src/routes/settings.tsx:397
+#: src/routes/settings.tsx:400
 msgid "Your account could not be checked. Connect to the internet and try again."
 msgstr "Your account could not be checked. Connect to the internet and try again."
 

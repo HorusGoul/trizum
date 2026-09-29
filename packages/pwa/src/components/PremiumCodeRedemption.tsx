@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
+import { PremiumRedemptionHelp } from "./PremiumRedemptionHelp.tsx";
 import { toast } from "sonner";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
@@ -22,11 +23,13 @@ export function PremiumCodeRedemption({
   initialCode = "",
   isDisabled = false,
   onBusyChange,
+  onNavigate,
 }: {
   userId: string | null;
   initialCode?: string;
   isDisabled?: boolean;
   onBusyChange?: (busy: boolean) => void;
+  onNavigate?: () => void;
 }) {
   const [code, setCode] = useState(initialCode);
   const platform = getRevenueCatPlatform();
@@ -106,71 +109,13 @@ export function PremiumCodeRedemption({
         )}
       </div>
 
-      <div className="border-accent-200 dark:border-accent-800 divide-accent-200 dark:divide-accent-800 divide-y border-t text-sm">
-        <details className="group">
-          <summary className="text-accent-700 dark:text-accent-200 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
-            <Trans>How do I redeem my code?</Trans>
-            <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
-          </summary>
-          <ol className="text-accent-600 dark:text-accent-300 list-decimal space-y-2 pb-3 pl-5 leading-relaxed">
-            <li>
-              <Trans>
-                Open trizum on your phone and sign in to the account you want to use for Premium.
-              </Trans>
-            </li>
-            <li>
-              {devicePlatform === "ios" ? (
-                <Trans>Copy your code, then tap App Store above.</Trans>
-              ) : devicePlatform === "android" ? (
-                <Trans>Copy your code, then tap Google Play above.</Trans>
-              ) : (
-                <Trans>
-                  Open this link on your phone and copy your code. Choose App Store for iPhone or
-                  iPad, or Google Play for Android.
-                </Trans>
-              )}
-            </li>
-            <li>
-              <Trans>
-                Follow the store's instructions and enter your code if asked. Check the offer before
-                confirming.
-              </Trans>
-            </li>
-            <li>
-              <Trans>
-                Return to trizum. If Premium has not appeared yet, use Restore purchases.
-              </Trans>
-            </li>
-          </ol>
-        </details>
-        {showGoogle ? (
-          <details className="group">
-            <summary className="text-accent-700 dark:text-accent-200 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
-              <Trans>Code not working in Google Play?</Trans>
-              <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
-            </summary>
-            <p className="text-accent-600 dark:text-accent-300 pb-3 leading-relaxed">
-              <Trans>
-                Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan
-                for your offer, then tap the payment method in Google Play and select Redeem code.
-                Check that your offer appears before confirming.
-              </Trans>
-            </p>
-          </details>
-        ) : null}
-        <details className="group">
-          <summary className="text-accent-700 dark:text-accent-200 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
-            <Trans>Already redeemed?</Trans>
-            <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
-          </summary>
-          <p className="text-accent-600 dark:text-accent-300 pb-3 leading-relaxed">
-            <Trans>
-              Open trizum on your phone and sign in to your account. Use Restore purchases if
-              Premium has not appeared yet.
-            </Trans>
-          </p>
-        </details>
-      </div>
+      <PremiumRedemptionHelp
+        code={code}
+        devicePlatform={devicePlatform}
+        redeemAction={platform ? redeem : undefined}
+        isDisabled={!userId || isDisabled}
+        onNavigate={onNavigate}
+      />
     </section>
   );
 }
@@ -200,7 +145,7 @@ function StoreRedemptionContent({ platform }: { platform: "ios" | "android" }) {
         <span className="block text-sm font-bold">
           {platform === "ios" ? <Trans>App Store</Trans> : <Trans>Google Play</Trans>}
         </span>
-        <span className="text-accent-600 dark:text-accent-300 block text-xs">
+        <span className="text-accent-800 dark:text-accent-200 block text-xs">
           <Trans>Redeem your offer</Trans>
         </span>
       </span>

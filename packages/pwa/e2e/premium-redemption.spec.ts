@@ -52,3 +52,28 @@ test("desktop visitors see both stores for the same branded link", async ({ harn
   await expect(page.getByRole("link", { name: "Redeem in App Store" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Redeem in Google Play" })).toBeVisible();
 });
+
+test("redemption FAQs link to sign-in, Premium settings, and the current code in each store", async ({
+  harness,
+  page,
+}) => {
+  await harness.goto("/redeem?code=FRIENDS");
+  await page.getByText("How do I redeem my code?", { exact: true }).click();
+  await expect(page.getByRole("link", { name: "sign in", exact: true })).toHaveAttribute(
+    "href",
+    "/settings/cloud-sync",
+  );
+  await expect(page.getByRole("link", { name: "Premium settings", exact: true })).toHaveAttribute(
+    "href",
+    "/settings#premium",
+  );
+  await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");
+  await expect(page.getByRole("link", { name: "App Store", exact: true })).toHaveAttribute(
+    "href",
+    /code=UPDATED$/,
+  );
+  await expect(page.getByRole("link", { name: "Google Play", exact: true })).toHaveAttribute(
+    "href",
+    "https://play.google.com/redeem?code=UPDATED",
+  );
+});

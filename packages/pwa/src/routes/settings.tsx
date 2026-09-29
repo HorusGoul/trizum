@@ -339,7 +339,10 @@ function PremiumSection() {
   }
 
   return (
-    <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
+    <section
+      id="premium"
+      className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6"
+    >
       <div className="flex flex-col gap-1">
         <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
           <Trans>Premium</Trans>
