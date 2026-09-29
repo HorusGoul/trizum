@@ -13,6 +13,7 @@ import { Label } from "#src/ui/fields/Field.tsx";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { openPremiumCodeRedemption } from "#src/lib/premium/revenueCatClient.ts";
 import {
+  type PremiumRedemptionRequest,
   detectRedemptionPlatform,
   getStoreRedemptionUrl,
 } from "#src/lib/premium/premiumRedemption.ts";
@@ -33,7 +34,7 @@ export function PremiumCodeRedemption({
   initialCode?: string;
   isDisabled?: boolean;
   onBusyChange?: (busy: boolean) => void;
-  onSignIn?: () => void;
+  onSignIn?: (redemption: PremiumRedemptionRequest) => void;
   onOpenPremium: () => void;
   onCodeChange?: (code: string) => void;
 }) {
@@ -51,7 +52,7 @@ export function PremiumCodeRedemption({
   async function redeem() {
     if (!checkRedemptionConnection()) return;
     if (!userId && onSignIn) {
-      onSignIn();
+      if (platform) onSignIn({ platform, code });
       return;
     }
     onBusyChange?.(true);
@@ -118,8 +119,22 @@ export function PremiumCodeRedemption({
           </Button>
         ) : (
           <>
-            {showApple ? <StoreRedemptionLink platform="ios" code={code} /> : null}
-            {showGoogle ? <StoreRedemptionLink platform="android" code={code} /> : null}
+            {showApple ? (
+              <StoreRedemptionLink
+                platform="ios"
+                code={code}
+                onSignIn={!userId ? onSignIn : undefined}
+                isDisabled={isDisabled}
+              />
+            ) : null}
+            {showGoogle ? (
+              <StoreRedemptionLink
+                platform="android"
+                code={code}
+                onSignIn={!userId ? onSignIn : undefined}
+                isDisabled={isDisabled}
+              />
+            ) : null}
           </>
         )}
       </div>
@@ -138,14 +153,29 @@ export function PremiumCodeRedemption({
   );
 }
 
-function StoreRedemptionLink({ platform, code }: { platform: "ios" | "android"; code: string }) {
+function StoreRedemptionLink({
+  platform,
+  code,
+  onSignIn,
+  isDisabled,
+}: {
+  platform: "ios" | "android";
+  code: string;
+  onSignIn?: (redemption: PremiumRedemptionRequest) => void;
+  isDisabled: boolean;
+}) {
   return (
     <a
       className={storeButtonClassName}
       aria-label={platform === "ios" ? t`Redeem in App Store` : t`Redeem in Google Play`}
       href={getStoreRedemptionUrl(platform, code)}
       onClick={(event) => {
-        if (!checkRedemptionConnection()) event.preventDefault();
+        if (isDisabled || !checkRedemptionConnection()) {
+          event.preventDefault();
+        } else if (onSignIn) {
+          event.preventDefault();
+          onSignIn({ platform, code });
+        }
       }}
       rel="noreferrer"
       target="_blank"

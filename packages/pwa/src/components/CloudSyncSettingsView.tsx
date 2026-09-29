@@ -228,7 +228,7 @@ function cloudSyncRouteReducer(
 interface CloudSyncSettingsViewProps {
   search: CloudSyncSearchParams;
   onClose?: () => void;
-  onSignedIn?: () => void;
+  onSignedIn?: (userId: string) => void;
 }
 
 export function CloudSyncSettingsView(props: CloudSyncSettingsViewProps) {
@@ -340,7 +340,9 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     }
 
     if (onClose) {
-      onSignedIn?.();
+      // Authentication completion resumes an external store action for this exact account.
+      // oxlint-disable-next-line react-doctor/no-pass-data-to-parent
+      if (userId) onSignedIn?.(userId);
       onClose();
     } else {
       void navigate({ href: returnTo ?? "/", replace: true });
@@ -354,6 +356,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     onClose,
     onSignedIn,
     returnTo,
+    userId,
   ]);
 
   useEffect(() => {
@@ -740,7 +743,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     }
 
     if (onClose) {
-      onSignedIn?.();
+      if (userId) onSignedIn?.(userId);
       onClose();
     } else {
       void navigate({ href: returnTo ?? "/", replace: true });

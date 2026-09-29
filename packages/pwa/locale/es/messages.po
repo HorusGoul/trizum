@@ -255,7 +255,7 @@ msgstr "Color de acento"
 msgid "Account created"
 msgstr "Cuenta creada"
 
-#: src/components/CloudSyncSettingsView.tsx:697
+#: src/components/CloudSyncSettingsView.tsx:700
 msgid "Account deleted"
 msgstr "Cuenta eliminada"
 
@@ -367,7 +367,7 @@ msgstr "Todas las comprobaciones del gasto se han superado"
 msgid "All time"
 msgstr "Todo el tiempo"
 
-#: src/components/PremiumRedemptionHelp.tsx:128
+#: src/components/PremiumRedemptionHelp.tsx:137
 msgid "Already redeemed?"
 msgstr "¿Ya lo has canjeado?"
 
@@ -417,7 +417,7 @@ msgstr "Kwanza Angoleño"
 msgid "Annual"
 msgstr "Anual"
 
-#: src/components/PremiumCodeRedemption.tsx:167
+#: src/components/PremiumCodeRedemption.tsx:197
 msgid "App Store"
 msgstr "App Store"
 
@@ -511,10 +511,10 @@ msgstr "Dólar Australiano"
 msgid "Authentication error"
 msgstr "Error de autenticación"
 
-#: src/components/CloudSyncSettingsView.tsx:490
-#: src/components/CloudSyncSettingsView.tsx:506
-#: src/components/CloudSyncSettingsView.tsx:530
-#: src/components/CloudSyncSettingsView.tsx:541
+#: src/components/CloudSyncSettingsView.tsx:493
+#: src/components/CloudSyncSettingsView.tsx:509
+#: src/components/CloudSyncSettingsView.tsx:533
+#: src/components/CloudSyncSettingsView.tsx:544
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
@@ -755,15 +755,15 @@ msgstr "Comprobar actualizaciones"
 msgid "Check your connection and try again."
 msgstr "Comprueba tu conexión e inténtalo de nuevo."
 
-#: src/components/CloudSyncSettingsView.tsx:591
+#: src/components/CloudSyncSettingsView.tsx:594
 msgid "Check your email for the password link"
 msgstr "Revisa tu correo para encontrar el enlace de contraseña"
 
-#: src/components/CloudSyncSettingsView.tsx:451
+#: src/components/CloudSyncSettingsView.tsx:454
 msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
-#: src/components/CloudSyncSettingsView.tsx:763
+#: src/components/CloudSyncSettingsView.tsx:766
 #: src/routes/settings.tsx:364
 msgid "Checking account…"
 msgstr "Comprobando la cuenta…"
@@ -853,7 +853,7 @@ msgstr "Configuración en la nube aplicada"
 msgid "Cloud settings saved"
 msgstr "Configuración en la nube guardada"
 
-#: src/components/PremiumCodeRedemption.tsx:68
+#: src/components/PremiumCodeRedemption.tsx:69
 msgid "Code copied."
 msgstr "Código copiado."
 
@@ -861,11 +861,12 @@ msgstr "Código copiado."
 msgid "Code for testing"
 msgstr "Código para pruebas"
 
-#: src/components/PremiumRedemptionHelp.tsx:110
+#: src/components/PremiumRedemptionHelp.tsx:119
 msgid "Code not working in Google Play?"
 msgstr "¿El código no funciona en Google Play?"
 
-#: src/components/PremiumCodeRedemption.tsx:60
+#: src/components/PremiumCodeRedemption.tsx:61
+#: src/routes/redeem.tsx:128
 msgid "Code redemption could not be opened. Please try again."
 msgstr "No se pudo abrir el canje de códigos. Inténtalo de nuevo."
 
@@ -994,7 +995,7 @@ msgstr "Continuar con Premium"
 msgid "Contributors"
 msgstr "Colaboradores"
 
-#: src/components/PremiumCodeRedemption.tsx:101
+#: src/components/PremiumCodeRedemption.tsx:102
 msgid "Copy code"
 msgstr "Copiar código"
 
@@ -1006,11 +1007,11 @@ msgstr "Copiar enlace del grupo"
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
 
-#: src/components/PremiumRedemptionHelp.tsx:51
+#: src/components/PremiumRedemptionHelp.tsx:48
 msgid "Copy your code, then open <0>App Store</0>."
 msgstr "Copia tu código y abre <0>App Store</0>."
 
-#: src/components/PremiumRedemptionHelp.tsx:64
+#: src/components/PremiumRedemptionHelp.tsx:62
 msgid "Copy your code, then open <0>Google Play</0>."
 msgstr "Copia tu código y abre <0>Google Play</0>."
 
@@ -1030,15 +1031,15 @@ msgstr "Colón Costarricense"
 msgid "Could not apply cloud settings"
 msgstr "No se pudo aplicar la configuración en la nube"
 
-#: src/components/CloudSyncSettingsView.tsx:567
+#: src/components/CloudSyncSettingsView.tsx:570
 msgid "Could not connect sign-in method"
 msgstr "No se pudo conectar el método de inicio de sesión"
 
-#: src/components/PremiumCodeRedemption.tsx:70
+#: src/components/PremiumCodeRedemption.tsx:71
 msgid "Could not copy the code. Select and copy it from the field above."
 msgstr "No se pudo copiar el código. Selecciónalo y cópialo del campo de arriba."
 
-#: src/components/CloudSyncSettingsView.tsx:706
+#: src/components/CloudSyncSettingsView.tsx:709
 msgid "Could not delete account"
 msgstr "No se pudo eliminar la cuenta"
 
@@ -1056,7 +1057,8 @@ msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:284
-#: src/routes/redeem.tsx:60
+#: src/routes/redeem.tsx:72
+#: src/routes/redeem.tsx:127
 #: src/routes/settings.tsx:336
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
@@ -1069,15 +1071,15 @@ msgstr "No se pudo restablecer la contraseña"
 msgid "Could not save cloud settings"
 msgstr "No se pudo guardar la configuración en la nube"
 
-#: src/components/CloudSyncSettingsView.tsx:596
+#: src/components/CloudSyncSettingsView.tsx:599
 msgid "Could not send password email"
 msgstr "No se pudo enviar el correo de contraseña"
 
-#: src/components/CloudSyncSettingsView.tsx:456
+#: src/components/CloudSyncSettingsView.tsx:459
 msgid "Could not send sign-in link"
 msgstr "No se pudo enviar el enlace de inicio de sesión"
 
-#: src/components/CloudSyncSettingsView.tsx:628
+#: src/components/CloudSyncSettingsView.tsx:631
 msgid "Could not sign out"
 msgstr "No se pudo cerrar sesión"
 
@@ -1554,7 +1556,7 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
-#: src/components/PremiumRedemptionHelp.tsx:91
+#: src/components/PremiumRedemptionHelp.tsx:100
 msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
 msgstr "Sigue las instrucciones de la tienda e introduce tu código si te lo pide. Revisa la oferta antes de confirmar."
 
@@ -1635,7 +1637,7 @@ msgstr "Google conectado"
 msgid "Google is connected to this account"
 msgstr "Google está conectado a esta cuenta"
 
-#: src/components/PremiumCodeRedemption.tsx:167
+#: src/components/PremiumCodeRedemption.tsx:197
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -1707,7 +1709,7 @@ msgstr "Lempira Hondureño"
 msgid "Hong Kong Dollar"
 msgstr "Dólar de Hong Kong"
 
-#: src/components/PremiumRedemptionHelp.tsx:34
+#: src/components/PremiumRedemptionHelp.tsx:37
 msgid "How do I redeem my code?"
 msgstr "¿Cómo canjeo mi código?"
 
@@ -1747,6 +1749,10 @@ msgstr "Icono"
 #: src/lib/validation.ts:11
 msgid "ID is required"
 msgstr "Se requiere un ID"
+
+#: src/components/PremiumRedemptionHelp.tsx:43
+msgid "If asked, sign in to the trizum account you want to use for Premium."
+msgstr "Si se te pide, inicia sesión en la cuenta de trizum que quieras usar para Premium."
 
 #: src/routes/terms/-components/ServiceTerms.tsx:66
 msgid "If the Service is discontinued, we will provide notice and any remedy required by applicable law or the store through which you purchased Premium."
@@ -2010,8 +2016,8 @@ msgstr "Cargando licencias..."
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
-#: src/routes/redeem.tsx:89
-#: src/routes/redeem.tsx:143
+#: src/routes/redeem.tsx:182
+#: src/routes/redeem.tsx:237
 msgid "Loading sign-in…"
 msgstr "Cargando inicio de sesión…"
 
@@ -2429,7 +2435,7 @@ msgstr "¿Usar solo plantillas personalizadas?"
 msgid "Only your own debt can be transferred"
 msgstr "Solo puedes transferir tus propias deudas"
 
-#: src/components/PremiumRedemptionHelp.tsx:132
+#: src/components/PremiumRedemptionHelp.tsx:141
 msgid "Open <0>Premium settings</0> and use Restore purchases if Premium has not appeared yet."
 msgstr "Abre los <0>ajustes de Premium</0> y usa Restaurar compras si Premium aún no aparece."
 
@@ -2457,7 +2463,7 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
-#: src/components/PremiumRedemptionHelp.tsx:77
+#: src/components/PremiumRedemptionHelp.tsx:76
 msgid "Open this link on your phone and copy your code. Choose <0>App Store</0> for iPhone or iPad, or <1>Google Play</1> for Android."
 msgstr "Abre este enlace en tu teléfono y copia tu código. Elige <0>App Store</0> para iPhone o iPad, o <1>Google Play</1> para Android."
 
@@ -2678,7 +2684,7 @@ msgstr "Grupo desfijado"
 msgid "Password"
 msgstr "Contraseña"
 
-#: src/components/CloudSyncSettingsView.tsx:594
+#: src/components/CloudSyncSettingsView.tsx:597
 msgid "Password email sent"
 msgstr "Correo de contraseña enviado"
 
@@ -2846,7 +2852,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
-#: src/routes/redeem.tsx:135
+#: src/routes/redeem.tsx:229
 msgid "Premium is active."
 msgstr "Premium está activo."
 
@@ -2912,8 +2918,8 @@ msgstr "Sondear, eludir o interferir con la seguridad, los controles de acceso, 
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
-#: src/components/PremiumCodeRedemption.tsx:88
-#: src/components/PremiumCodeRedemption.tsx:93
+#: src/components/PremiumCodeRedemption.tsx:89
+#: src/components/PremiumCodeRedemption.tsx:94
 msgid "Promo code"
 msgstr "Código promocional"
 
@@ -2954,23 +2960,23 @@ msgstr "Coincidencia recomendada"
 msgid "Redeem a one-time code in Google Play"
 msgstr "Canjear un código de un solo uso en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:75
+#: src/components/PremiumCodeRedemption.tsx:76
 #: src/components/PremiumPaywall.tsx:275
-#: src/routes/redeem.tsx:75
+#: src/routes/redeem.tsx:167
 msgid "Redeem code"
 msgstr "Canjear código"
 
-#: src/components/PremiumCodeRedemption.tsx:113
-#: src/components/PremiumCodeRedemption.tsx:145
+#: src/components/PremiumCodeRedemption.tsx:114
+#: src/components/PremiumCodeRedemption.tsx:170
 msgid "Redeem in App Store"
 msgstr "Canjear en el App Store"
 
-#: src/components/PremiumCodeRedemption.tsx:113
-#: src/components/PremiumCodeRedemption.tsx:145
+#: src/components/PremiumCodeRedemption.tsx:114
+#: src/components/PremiumCodeRedemption.tsx:170
 msgid "Redeem in Google Play"
 msgstr "Canjear en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:170
+#: src/components/PremiumCodeRedemption.tsx:200
 msgid "Redeem your offer"
 msgstr "Canjea tu oferta"
 
@@ -3032,12 +3038,12 @@ msgstr "Restaurar al inicio"
 msgid "Retry"
 msgstr "Reintentar"
 
-#: src/components/CloudSyncSettingsView.tsx:777
+#: src/components/CloudSyncSettingsView.tsx:780
 #: src/routes/settings.tsx:366
 msgid "Retry account check"
 msgstr "Volver a comprobar la cuenta"
 
-#: src/components/PremiumRedemptionHelp.tsx:97
+#: src/components/PremiumRedemptionHelp.tsx:106
 msgid "Return to trizum on your phone. Open <0>Premium settings</0> and use Restore purchases if Premium has not appeared yet."
 msgstr "Vuelve a trizum en tu teléfono. Abre los <0>ajustes de Premium</0> y usa Restaurar compras si Premium aún no aparece."
 
@@ -3245,11 +3251,10 @@ msgstr "Leone de Sierra Leona"
 #: src/components/CloudSyncDialogs.tsx:205
 #: src/routes/index/-components/EmptyState.tsx:74
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:271
-#: src/routes/redeem.tsx:120
 msgid "Sign in"
 msgstr "Iniciar sesión"
 
-#: src/components/CloudSyncSettingsView.tsx:1047
+#: src/components/CloudSyncSettingsView.tsx:1050
 msgid "Sign in again before deleting your account"
 msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 
@@ -3272,7 +3277,7 @@ msgstr "Iniciar sesión en trizum cloud"
 
 #: src/routes/redeem.tsx:92
 msgid "Sign in to trizum to link Premium to your account."
-msgstr ""
+msgstr "Inicia sesión en trizum para vincular Premium a tu cuenta."
 
 #: src/routes/redeem.tsx:92
 msgid "Sign in to trizum to link your redeemed offer to your account."
@@ -3305,7 +3310,7 @@ msgstr "¿Cerrar sesión?"
 msgid "Sign-in is temporarily unavailable."
 msgstr "El inicio de sesión no está disponible temporalmente."
 
-#: src/routes/redeem.tsx:96
+#: src/routes/redeem.tsx:189
 msgid "Sign-in is unavailable, so we can’t link your offer to trizum yet."
 msgstr "El inicio de sesión no está disponible, así que aún no podemos vincular tu oferta a trizum."
 
@@ -3317,15 +3322,15 @@ msgstr "El enlace de inicio de sesión ha caducado"
 msgid "Sign-in link is invalid or expired"
 msgstr "El enlace de inicio de sesión no es válido o ha caducado"
 
-#: src/components/CloudSyncSettingsView.tsx:454
+#: src/components/CloudSyncSettingsView.tsx:457
 msgid "Sign-in link sent"
 msgstr "Enlace de inicio de sesión enviado"
 
-#: src/components/CloudSyncSettingsView.tsx:564
+#: src/components/CloudSyncSettingsView.tsx:567
 msgid "Sign-in method connected"
 msgstr "Método de inicio de sesión conectado"
 
-#: src/components/CloudSyncSettingsView.tsx:503
+#: src/components/CloudSyncSettingsView.tsx:506
 msgid "Sign-in method is not configured"
 msgstr "El método de inicio de sesión no está configurado"
 
@@ -3335,15 +3340,15 @@ msgstr "Métodos de inicio de sesión"
 
 #: src/components/CloudSyncAccountSettings.tsx:70
 #: src/components/CloudSyncDialogs.tsx:375
-#: src/components/CloudSyncSettingsView.tsx:414
+#: src/components/CloudSyncSettingsView.tsx:417
 msgid "Signed in"
 msgstr "Sesión iniciada"
 
-#: src/routes/redeem.tsx:112
+#: src/routes/redeem.tsx:212
 msgid "Signed in as {email}"
 msgstr "Sesión iniciada como {email}"
 
-#: src/components/CloudSyncSettingsView.tsx:624
+#: src/components/CloudSyncSettingsView.tsx:627
 msgid "Signed out"
 msgstr "Sesión cerrada"
 
@@ -3379,7 +3384,7 @@ msgstr "Dólar de las Islas Salomón"
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
-#: src/components/PremiumRedemptionHelp.tsx:114
+#: src/components/PremiumRedemptionHelp.tsx:123
 msgid "Some offers need to be redeemed at checkout. Open <0>Premium settings</0> in trizum on Android and choose the plan for your offer. Then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 msgstr "Algunas ofertas se canjean al pagar. Abre los <0>ajustes de Premium</0> en trizum en Android y elige el plan de tu oferta. Después pulsa el método de pago en Google Play y selecciona Canjear código. Comprueba que aparezca tu oferta antes de confirmar."
 
@@ -3871,8 +3876,8 @@ msgstr "URL o clave de Tricount"
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
-#: src/components/CloudSyncSettingsView.tsx:757
-#: src/components/CloudSyncSettingsView.tsx:918
+#: src/components/CloudSyncSettingsView.tsx:760
+#: src/components/CloudSyncSettingsView.tsx:921
 #: src/routes/_home/route.tsx:102
 msgid "trizum cloud"
 msgstr "trizum cloud"
@@ -3921,7 +3926,7 @@ msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio d
 
 #: src/components/PremiumPaywall.tsx:224
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:279
-#: src/routes/redeem.tsx:104
+#: src/routes/redeem.tsx:204
 msgid "Try again"
 msgstr "Reintentar"
 
@@ -4334,7 +4339,7 @@ msgstr "Debes dinero a personas"
 msgid "You retain ownership of information and files you add to the Service, including group details, participant information, expenses, descriptions, receipts, and images (\"User Content\"). You grant us a limited, worldwide, non-exclusive license to host, process, reproduce, and transmit User Content only as needed to operate, secure, support, and improve the Service."
 msgstr "Conservas la titularidad de la información y los archivos que añadas al Servicio, incluidos los datos de los grupos, la información de los participantes, los gastos, las descripciones, los recibos y las imágenes (el «Contenido de usuario»). Nos concedes una licencia limitada, mundial y no exclusiva para alojar, procesar, reproducir y transmitir el Contenido de usuario únicamente en la medida necesaria para operar, proteger, mantener y mejorar el Servicio."
 
-#: src/routes/redeem.tsx:84
+#: src/routes/redeem.tsx:177
 msgid "You seem to be offline."
 msgstr "Parece que no tienes conexión."
 
@@ -4350,7 +4355,7 @@ msgstr "Ahora estás viendo el grupo como {0}"
 msgid "You're now seeing the party as {participantName}"
 msgstr "Ahora estás viendo el grupo como {participantName}"
 
-#: src/components/CloudSyncSettingsView.tsx:765
+#: src/components/CloudSyncSettingsView.tsx:768
 #: src/routes/settings.tsx:397
 msgid "Your account could not be checked. Connect to the internet and try again."
 msgstr "No se pudo comprobar tu cuenta. Conéctate a internet y vuelve a intentarlo."

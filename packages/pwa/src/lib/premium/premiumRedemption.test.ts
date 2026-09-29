@@ -22,6 +22,16 @@ afterEach(() => {
 });
 
 describe("store redemption links", () => {
+  it("retains only a supported store when returning from sign-in", () => {
+    expect(parseRedemptionSearch({ code: " FRIENDS ", store: "android" })).toEqual({
+      code: "FRIENDS",
+      store: "android",
+    });
+    expect(parseRedemptionSearch({ code: "FRIENDS", store: "ios" })).toEqual({
+      code: "FRIENDS",
+      store: "ios",
+    });
+  });
   it("targets trizum's Apple offer-code redemption and encodes the whole code", () => {
     const url = new URL(getStoreRedemptionUrl("ios", " FRIENDS&redirect=https://evil.test "));
     expect(url.origin + url.pathname).toBe("https://apps.apple.com/redeem");
