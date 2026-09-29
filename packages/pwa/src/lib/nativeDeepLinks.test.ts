@@ -107,3 +107,10 @@ describe("native deep links", () => {
     );
   });
 });
+
+test("preserves branded promo codes when routing a native app link", async () => {
+  await expect(resolveNativeDeepLink("https://trizum.app/redeem?code=FRIENDS")).resolves.toEqual({
+    isAppLink: true,
+    href: "/redeem?code=FRIENDS",
+  });
+});

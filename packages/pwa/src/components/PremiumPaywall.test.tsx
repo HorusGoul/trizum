@@ -84,6 +84,14 @@ function renderPaywall(userId: string | null = "user-1") {
 }
 
 describe("Premium paywall restore recovery", () => {
+  it.each(["error", "loading"] as const)(
+    "keeps code redemption available when offerings are %s",
+    (status) => {
+      vi.mocked(getCurrentPremiumPaywallLoadState).mockReturnValue({ loadKey: "1:user-1", status });
+      renderPaywall();
+      expect(buttons.get("<span>Redeem code</span>")?.isDisabled).toBe(false);
+    },
+  );
   it.each(["error", "loading"] as const)("allows restore when offerings are %s", (status) => {
     vi.mocked(getCurrentPremiumPaywallLoadState).mockReturnValue({ loadKey: "1:user-1", status });
     const { restoreButton } = renderPaywall();

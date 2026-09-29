@@ -10,6 +10,7 @@ const PROTECTED_AD_ROUTE_SEGMENTS = new Set([
   "new",
   "pay",
   "reset-password",
+  "redeem",
   "settings",
   "transfer-debt",
   "who",

@@ -22,6 +22,8 @@ import { Icon } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { cn } from "#src/ui/utils.ts";
 
+import { PremiumCodeRedemption } from "./PremiumCodeRedemption.tsx";
+
 interface PremiumPaywallProps {
   isOpen: boolean;
   onEntitlementChange: (entitlement: PremiumEntitlementState) => void;
@@ -43,8 +45,10 @@ export function PremiumPaywall({
     status: "loading",
   });
   const [selectedPlanId, setSelectedPlanId] = useState<PremiumPlanId | null>(null);
-  const [activeAction, setActiveAction] = useState<"purchase" | "restore" | null>(null);
+  const [activeAction, setActiveAction] = useState<"purchase" | "restore" | "redeem" | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
+  const [showRedemption, setShowRedemption] = useState(false);
+  const [redemptionCode, setRedemptionCode] = useState("");
 
   useEffect(() => {
     if (!isOpen) {
@@ -263,7 +267,28 @@ export function PremiumPaywall({
                     >
                       <Trans>Restore purchases</Trans>
                     </Button>
+                    <Button
+                      className="text-accent-600 dark:text-accent-300 mx-auto h-9 w-auto px-4 text-sm font-semibold"
+                      isDisabled={activeAction !== null}
+                      aria-expanded={showRedemption}
+                      onPress={() => {
+                        setRedemptionCode("");
+                        setShowRedemption((shown) => !shown);
+                      }}
+                    >
+                      <Trans>Redeem code</Trans>
+                    </Button>
                   </div>
+                  {showRedemption ? (
+                    <PremiumCodeRedemption
+                      code={redemptionCode}
+                      onCodeChange={setRedemptionCode}
+                      userId={userId}
+                      isDisabled={activeAction !== null}
+                      onBusyChange={(busy) => setActiveAction(busy ? "redeem" : null)}
+                      onOpenPremium={() => setShowRedemption(false)}
+                    />
+                  ) : null}
                 </div>
               </div>
 

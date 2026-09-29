@@ -131,7 +131,7 @@ export async function fetchLinkedAuthAccounts() {
   return (await response.json()) as LinkedAuthAccount[];
 }
 
-export async function signInWithSocialAuthAccount(provider: SocialAuthProvider) {
+export async function signInWithSocialAuthAccount(provider: SocialAuthProvider, returnTo?: string) {
   if (Capacitor.isNativePlatform()) {
     clearNativeAuthToken();
 
@@ -144,8 +144,8 @@ export async function signInWithSocialAuthAccount(provider: SocialAuthProvider) 
   }
 
   return authClient.signIn.social({
-    callbackURL: getAuthSettingsCallbackURL({ auth: "success" }),
-    errorCallbackURL: getAuthSettingsCallbackURL(),
+    callbackURL: getAuthSettingsCallbackURL({ auth: "success", returnTo }),
+    errorCallbackURL: getAuthSettingsCallbackURL({ returnTo }),
     provider,
   });
 }
@@ -276,13 +276,21 @@ export async function requestPasswordResetEmail(email: string) {
   }
 }
 
-export async function requestMagicLinkEmail({ email, name }: { email: string; name: string }) {
+export async function requestMagicLinkEmail({
+  email,
+  name,
+  returnTo,
+}: {
+  email: string;
+  name: string;
+  returnTo?: string;
+}) {
   const result = await authClient.signIn.magicLink({
-    callbackURL: getAuthSettingsCallbackURL({ auth: "success" }),
+    callbackURL: getAuthSettingsCallbackURL({ auth: "success", returnTo }),
     email,
-    errorCallbackURL: getAuthSettingsCallbackURL(),
+    errorCallbackURL: getAuthSettingsCallbackURL({ returnTo }),
     name,
-    newUserCallbackURL: getAuthSettingsCallbackURL({ auth: "success" }),
+    newUserCallbackURL: getAuthSettingsCallbackURL({ auth: "success", returnTo }),
   });
 
   if (result.error) {
