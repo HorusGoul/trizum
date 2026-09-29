@@ -53,20 +53,13 @@ test("desktop visitors see both stores for the same branded link", async ({ harn
   await expect(page.getByRole("link", { name: "Redeem in Google Play" })).toBeVisible();
 });
 
-test("redemption FAQs link to sign-in, Premium settings, and the current code in each store", async ({
+test("redemption FAQs open sign-in directly and preserve the edited code", async ({
   harness,
   page,
 }) => {
+  await page.route("**/api/auth/get-session**", (route) => route.fulfill({ json: null }));
   await harness.goto("/redeem?code=FRIENDS");
   await page.getByText("How do I redeem my code?", { exact: true }).click();
-  await expect(page.getByRole("link", { name: "sign in", exact: true })).toHaveAttribute(
-    "href",
-    "/settings/cloud-sync",
-  );
-  await expect(page.getByRole("link", { name: "Premium settings", exact: true })).toHaveAttribute(
-    "href",
-    "/settings#premium",
-  );
   await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");
   await expect(page.getByRole("link", { name: "App Store", exact: true })).toHaveAttribute(
     "href",
@@ -76,4 +69,119 @@ test("redemption FAQs link to sign-in, Premium settings, and the current code in
     "href",
     "https://play.google.com/redeem?code=UPDATED",
   );
+  await page.getByRole("button", { name: "sign in", exact: true }).last().click();
+  const signIn = page.getByRole("dialog", { name: "Sign in", exact: true });
+  await expect(signIn).toBeVisible();
+  await expect(page).toHaveURL(
+    (url) => url.pathname === "/redeem" && url.searchParams.get("code") === "FRIENDS",
+  );
+  await page.keyboard.press("Escape");
+  await expect(signIn).toBeHidden();
+  await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("UPDATED");
+  await page.getByRole("button", { name: "Premium settings", exact: true }).click();
+  await expect(signIn).toBeVisible();
+  await expect(page).toHaveURL(
+    (url) => url.pathname === "/redeem" && url.searchParams.get("code") === "FRIENDS",
+  );
+});
+
+test("signed-in visitors open Premium directly without a redundant sign-in step", async ({
+  harness,
+  page,
+}) => {
+  const user = {
+    id: "redemption-account",
+    name: "Alex",
+    email: "alex@example.com",
+    emailVerified: true,
+    image: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  await page.route("**/api/auth/get-session**", (route) =>
+    route.fulfill({ json: { user, session: { userId: user.id } } }),
+  );
+  await page.route("**/api/auth/list-accounts", (route) => route.fulfill({ json: [] }));
+  await harness.goto("/redeem?code=FRIENDS");
+  await expect(page.getByText("Signed in as alex@example.com", { exact: true })).toBeVisible();
+  await page.getByText("How do I redeem my code?", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "sign in", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Premium settings", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "trizum Premium", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(
+    (url) => url.pathname === "/redeem" && url.searchParams.get("code") === "FRIENDS",
+  );
+});
+
+test("signing in from Premium help opens Premium and keeps the edited redemption code", async ({
+  harness,
+  page,
+}) => {
+  let signedIn = false;
+  const user = {
+    id: "redemption-login",
+    name: "Alex",
+    email: "alex@example.com",
+    emailVerified: true,
+    image: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  await page.route("**/api/auth/get-session**", (route) =>
+    route.fulfill({ json: signedIn ? { user, session: { userId: user.id } } : null }),
+  );
+  await page.route("**/api/auth/list-accounts", (route) => route.fulfill({ json: [] }));
+  await page.route("**/api/cloud-sync/settings", (route) =>
+    route.fulfill({
+      json: {
+        settings:
+          route.request().method() === "PUT"
+            ? { ...route.request().postDataJSON(), updatedAt: Date.now() }
+            : null,
+      },
+    }),
+  );
+  await page.route("**/api/auth/sign-in/email", (route) => {
+    signedIn = true;
+    return route.fulfill({ json: { user } });
+  });
+  await harness.goto("/redeem?code=FRIENDS");
+  await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");
+  await page.getByText("Already redeemed?", { exact: true }).click();
+  await page.getByRole("button", { name: "Premium settings", exact: true }).click();
+  const signIn = page.getByRole("dialog", { name: "Sign in", exact: true });
+  await signIn.getByRole("button", { name: "Sign in with password", exact: true }).click();
+  await signIn.getByRole("textbox", { name: "Email", exact: true }).fill(user.email);
+  await signIn.getByLabel("Password", { exact: true }).fill("example-test-password");
+  await signIn.getByRole("button", { name: "Sign in with password", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "trizum Premium", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Close Premium", exact: true }).click();
+  await expect(page.getByText("Signed in as alex@example.com", { exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("UPDATED");
+  await expect(page).toHaveURL((url) => url.pathname === "/redeem");
+});
+
+test("magic-link sign-in returns to redemption with the current code", async ({
+  harness,
+  page,
+}) => {
+  await page.route("**/api/auth/get-session**", (route) => route.fulfill({ json: null }));
+  await page.route("**/api/auth/sign-in/magic-link", (route) =>
+    route.fulfill({ json: { status: true } }),
+  );
+  await harness.goto("/redeem?code=FRIENDS");
+  await page.getByRole("textbox", { name: "Promo code" }).fill("NEW&FAMILY");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  const signIn = page.getByRole("dialog", { name: "Sign in", exact: true });
+  await signIn.getByRole("textbox", { name: "Email", exact: true }).fill("alex@example.com");
+  const requestPromise = page.waitForRequest("**/api/auth/sign-in/magic-link");
+  await signIn.getByRole("button", { name: "Email me a sign-in link", exact: true }).click();
+  const request = await requestPromise;
+  const { callbackURL, newUserCallbackURL, errorCallbackURL } = request.postDataJSON();
+  for (const callback of [callbackURL, newUserCallbackURL, errorCallbackURL]) {
+    const callbackUrl = new URL(callback, page.url());
+    expect(callbackUrl.pathname).toBe("/settings/cloud-sync");
+    expect(callbackUrl.searchParams.get("returnTo")).toBe("/redeem?code=NEW%26FAMILY");
+  }
+  await expect(signIn.getByText(/Check your email/)).toBeVisible();
 });

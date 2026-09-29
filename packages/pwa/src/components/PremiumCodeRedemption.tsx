@@ -23,13 +23,17 @@ export function PremiumCodeRedemption({
   initialCode = "",
   isDisabled = false,
   onBusyChange,
-  onNavigate,
+  onSignIn,
+  onOpenPremium,
+  onCodeChange,
 }: {
   userId: string | null;
   initialCode?: string;
   isDisabled?: boolean;
   onBusyChange?: (busy: boolean) => void;
-  onNavigate?: () => void;
+  onSignIn?: () => void;
+  onOpenPremium: () => void;
+  onCodeChange?: (code: string) => void;
 }) {
   const [code, setCode] = useState(initialCode);
   const platform = getRevenueCatPlatform();
@@ -63,10 +67,13 @@ export function PremiumCodeRedemption({
     <section aria-label={t`Redeem code`} className="flex flex-col gap-5">
       <TextField
         value={code}
-        onChange={setCode}
+        onChange={(value) => {
+          setCode(value);
+          onCodeChange?.(value);
+        }}
         maxLength={128}
         autoComplete="off"
-        isDisabled={isDisabled}
+        isDisabled={isDisabled && Boolean(platform)}
         className="flex flex-col gap-2"
       >
         <Label className="sr-only">
@@ -84,7 +91,7 @@ export function PremiumCodeRedemption({
               className="absolute top-2 right-2"
               icon="lucide.copy"
               aria-label={t`Copy code`}
-              isDisabled={isDisabled}
+              isDisabled={isDisabled && Boolean(platform)}
               pressAction={copyCode}
             />
           ) : null}
@@ -113,8 +120,10 @@ export function PremiumCodeRedemption({
         code={code}
         devicePlatform={devicePlatform}
         redeemAction={platform ? redeem : undefined}
-        isDisabled={!userId || isDisabled}
-        onNavigate={onNavigate}
+        isDisabled={isDisabled}
+        isSignedIn={Boolean(userId)}
+        onSignIn={onSignIn}
+        onOpenPremium={onOpenPremium}
       />
     </section>
   );

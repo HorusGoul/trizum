@@ -12,13 +12,17 @@ export function PremiumRedemptionHelp({
   devicePlatform,
   redeemAction,
   isDisabled,
-  onNavigate,
+  isSignedIn,
+  onSignIn,
+  onOpenPremium,
 }: {
   code: string;
   devicePlatform: "ios" | "android" | undefined;
   redeemAction?: () => Promise<void>;
   isDisabled: boolean;
-  onNavigate?: () => void;
+  isSignedIn: boolean;
+  onSignIn?: () => void;
+  onOpenPremium: () => void;
 }) {
   return (
     <div className="border-accent-200 dark:border-accent-800 divide-accent-200 dark:divide-accent-800 divide-y border-t text-sm">
@@ -28,15 +32,17 @@ export function PremiumRedemptionHelp({
           <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
         </summary>
         <ol className="text-accent-900 dark:text-accent-100 list-decimal space-y-2 pb-3 pl-5 leading-relaxed">
-          <li>
-            <Trans>
-              Open trizum on your phone and{" "}
-              <a href="/settings/cloud-sync" onClick={onNavigate} className={helpLinkClassName}>
-                sign in
-              </a>{" "}
-              to the account you want to use for Premium.
-            </Trans>
-          </li>
+          {!isSignedIn ? (
+            <li>
+              <Trans>
+                Open trizum on your phone and{" "}
+                <HelpButton onPress={onSignIn} isDisabled={isDisabled}>
+                  sign in
+                </HelpButton>{" "}
+                to the account you want to use for Premium.
+              </Trans>
+            </li>
+          ) : null}
           <li>
             {devicePlatform === "ios" ? (
               <Trans>
@@ -45,7 +51,7 @@ export function PremiumRedemptionHelp({
                   platform="ios"
                   code={code}
                   redeemAction={redeemAction}
-                  isDisabled={isDisabled}
+                  isDisabled={!isSignedIn || isDisabled}
                 >
                   App Store
                 </InlineStoreLink>
@@ -58,7 +64,7 @@ export function PremiumRedemptionHelp({
                   platform="android"
                   code={code}
                   redeemAction={redeemAction}
-                  isDisabled={isDisabled}
+                  isDisabled={!isSignedIn || isDisabled}
                 >
                   Google Play
                 </InlineStoreLink>
@@ -87,9 +93,9 @@ export function PremiumRedemptionHelp({
           <li>
             <Trans>
               Return to trizum on your phone. Open{" "}
-              <a href="/settings#premium" onClick={onNavigate} className={helpLinkClassName}>
+              <HelpButton onPress={onOpenPremium} isDisabled={isDisabled}>
                 Premium settings
-              </a>{" "}
+              </HelpButton>{" "}
               and use Restore purchases if Premium has not appeared yet.
             </Trans>
           </li>
@@ -104,9 +110,9 @@ export function PremiumRedemptionHelp({
           <p className="text-accent-900 dark:text-accent-100 pb-3 leading-relaxed">
             <Trans>
               Some offers need to be redeemed at checkout. Open{" "}
-              <a href="/settings#premium" onClick={onNavigate} className={helpLinkClassName}>
+              <HelpButton onPress={onOpenPremium} isDisabled={isDisabled}>
                 Premium settings
-              </a>{" "}
+              </HelpButton>{" "}
               in trizum on Android and choose the plan for your offer. Then tap the payment method
               in Google Play and select Redeem code. Check that your offer appears before
               confirming.
@@ -121,14 +127,10 @@ export function PremiumRedemptionHelp({
         </summary>
         <p className="text-accent-900 dark:text-accent-100 pb-3 leading-relaxed">
           <Trans>
-            Open trizum on your phone and{" "}
-            <a href="/settings/cloud-sync" onClick={onNavigate} className={helpLinkClassName}>
-              sign in
-            </a>{" "}
-            to your account. Open{" "}
-            <a href="/settings#premium" onClick={onNavigate} className={helpLinkClassName}>
+            Open{" "}
+            <HelpButton onPress={onOpenPremium} isDisabled={isDisabled}>
               Premium settings
-            </a>{" "}
+            </HelpButton>{" "}
             and use Restore purchases if Premium has not appeared yet.
           </Trans>
         </p>
@@ -170,5 +172,25 @@ function InlineStoreLink({
     >
       {children}
     </a>
+  );
+}
+
+function HelpButton({
+  children,
+  onPress,
+  isDisabled,
+}: {
+  children: ReactNode;
+  onPress?: () => void;
+  isDisabled: boolean;
+}) {
+  return (
+    <Button
+      className={`inline h-auto w-auto rounded-sm text-inherit ${helpLinkClassName}`}
+      onPress={onPress}
+      isDisabled={isDisabled || !onPress}
+    >
+      {children}
+    </Button>
   );
 }
