@@ -107,6 +107,42 @@ export function PremiumCodeRedemption({
       </div>
 
       <div className="border-accent-200 dark:border-accent-800 divide-accent-200 dark:divide-accent-800 divide-y border-t text-sm">
+        <details className="group">
+          <summary className="text-accent-700 dark:text-accent-200 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">
+            <Trans>How do I redeem my code?</Trans>
+            <Icon icon="lucide.chevron-down" className="size-4 shrink-0 group-open:rotate-180" />
+          </summary>
+          <ol className="text-accent-600 dark:text-accent-300 list-decimal space-y-2 pb-3 pl-5 leading-relaxed">
+            <li>
+              <Trans>
+                Open trizum on your phone and sign in to the account you want to use for Premium.
+              </Trans>
+            </li>
+            <li>
+              {devicePlatform === "ios" ? (
+                <Trans>Copy your code, then tap App Store above.</Trans>
+              ) : devicePlatform === "android" ? (
+                <Trans>Copy your code, then tap Google Play above.</Trans>
+              ) : (
+                <Trans>
+                  Open this link on your phone and copy your code. Choose App Store for iPhone or
+                  iPad, or Google Play for Android.
+                </Trans>
+              )}
+            </li>
+            <li>
+              <Trans>
+                Follow the store's instructions and enter your code if asked. Check the offer before
+                confirming.
+              </Trans>
+            </li>
+            <li>
+              <Trans>
+                Return to trizum. If Premium has not appeared yet, use Restore purchases.
+              </Trans>
+            </li>
+          </ol>
+        </details>
         {showGoogle ? (
           <details className="group">
             <summary className="text-accent-700 dark:text-accent-200 flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 py-3 font-medium [&::-webkit-details-marker]:hidden">

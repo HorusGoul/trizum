@@ -375,7 +375,7 @@ msgstr "All expense checks passed"
 msgid "All time"
 msgstr "All time"
 
-#: src/components/PremiumCodeRedemption.tsx:127
+#: src/components/PremiumCodeRedemption.tsx:163
 msgid "Already redeemed?"
 msgstr "Already redeemed?"
 
@@ -425,7 +425,7 @@ msgstr "Angolan Kwanza"
 msgid "Annual"
 msgstr "Annual"
 
-#: src/components/PremiumCodeRedemption.tsx:165
+#: src/components/PremiumCodeRedemption.tsx:201
 msgid "App Store"
 msgstr "App Store"
 
@@ -885,7 +885,7 @@ msgstr "Code copied."
 msgid "Code for testing"
 msgstr "Code for testing"
 
-#: src/components/PremiumCodeRedemption.tsx:113
+#: src/components/PremiumCodeRedemption.tsx:149
 msgid "Code not working in Google Play?"
 msgstr "Code not working in Google Play?"
 
@@ -1025,6 +1025,14 @@ msgstr "Copy party link"
 #: src/routes/party_.$partyId.pay/-components/BizumItem.tsx:12
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copy the phone number and pay through Bizum using your bank app."
+
+#: src/components/PremiumCodeRedemption.tsx:123
+msgid "Copy your code, then tap App Store above."
+msgstr "Copy your code, then tap App Store above."
+
+#: src/components/PremiumCodeRedemption.tsx:125
+msgid "Copy your code, then tap Google Play above."
+msgstr "Copy your code, then tap Google Play above."
 
 #: src/routes/new/route.tsx:223
 msgid "Costa Rican Colón"
@@ -1577,6 +1585,10 @@ msgstr "Filter totals and rankings"
 msgid "Finishing sign in"
 msgstr "Finishing sign in"
 
+#: src/components/PremiumCodeRedemption.tsx:134
+msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
+msgstr "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
+
 #: src/components/PremiumCodeRedemption.tsx:117
 msgid "For a custom subscription code, choose a plan and continue to Google Play checkout. Tap the payment method, then Redeem code. Check the offer before confirming."
 msgstr "For a custom subscription code, choose a plan and continue to Google Play checkout. Tap the payment method, then Redeem code. Check the offer before confirming."
@@ -1654,7 +1666,7 @@ msgstr "Google connected"
 msgid "Google is connected to this account"
 msgstr "Google is connected to this account"
 
-#: src/components/PremiumCodeRedemption.tsx:165
+#: src/components/PremiumCodeRedemption.tsx:201
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -1729,6 +1741,10 @@ msgstr "Honduran Lempira"
 #: src/routes/new/route.tsx:187
 msgid "Hong Kong Dollar"
 msgstr "Hong Kong Dollar"
+
+#: src/components/PremiumCodeRedemption.tsx:112
+msgid "How do I redeem my code?"
+msgstr "How do I redeem my code?"
 
 #: src/components/ExpenseEditor.tsx:174
 msgid "How do you want to call this expense ?"
@@ -2475,11 +2491,19 @@ msgstr "Open last party on launch"
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
+#: src/components/PremiumCodeRedemption.tsx:127
+msgid "Open this link on your phone and copy your code. Choose App Store for iPhone or iPad, or Google Play for Android."
+msgstr "Open this link on your phone and copy your code. Choose App Store for iPhone or iPad, or Google Play for Android."
+
 #: src/lib/partySharePreviewMessages.ts:7
 msgid "Open this party to split expenses and settle up together on trizum."
 msgstr "Open this party to split expenses and settle up together on trizum."
 
-#: src/components/PremiumCodeRedemption.tsx:131
+#: src/components/PremiumCodeRedemption.tsx:117
+msgid "Open trizum on your phone and sign in to the account you want to use for Premium."
+msgstr "Open trizum on your phone and sign in to the account you want to use for Premium."
+
+#: src/components/PremiumCodeRedemption.tsx:167
 msgid "Open trizum on your phone and sign in to your account. Use Restore purchases if Premium has not appeared yet."
 msgstr "Open trizum on your phone and sign in to your account. Use Restore purchases if Premium has not appeared yet."
 
@@ -2975,16 +2999,16 @@ msgid "Redeem code"
 msgstr "Redeem code"
 
 #: src/components/PremiumCodeRedemption.tsx:95
-#: src/components/PremiumCodeRedemption.tsx:146
+#: src/components/PremiumCodeRedemption.tsx:182
 msgid "Redeem in App Store"
 msgstr "Redeem in App Store"
 
 #: src/components/PremiumCodeRedemption.tsx:95
-#: src/components/PremiumCodeRedemption.tsx:146
+#: src/components/PremiumCodeRedemption.tsx:182
 msgid "Redeem in Google Play"
 msgstr "Redeem in Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:168
+#: src/components/PremiumCodeRedemption.tsx:204
 msgid "Redeem your offer"
 msgstr "Redeem your offer"
 
@@ -3050,6 +3074,10 @@ msgstr "Retry"
 #: src/routes/settings.tsx:366
 msgid "Retry account check"
 msgstr "Retry account check"
+
+#: src/components/PremiumCodeRedemption.tsx:140
+msgid "Return to trizum. If Premium has not appeared yet, use Restore purchases."
+msgstr "Return to trizum. If Premium has not appeared yet, use Restore purchases."
 
 #: src/routes/privacy-policy.tsx:553
 msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
@@ -3369,7 +3397,7 @@ msgstr "Solomon Islands Dollar"
 msgid "Somali Shilling"
 msgstr "Somali Shilling"
 
-#: src/components/PremiumCodeRedemption.tsx:117
+#: src/components/PremiumCodeRedemption.tsx:153
 msgid "Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan for your offer, then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 msgstr "Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan for your offer, then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 

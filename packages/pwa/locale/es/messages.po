@@ -367,7 +367,7 @@ msgstr "Todas las comprobaciones del gasto se han superado"
 msgid "All time"
 msgstr "Todo el tiempo"
 
-#: src/components/PremiumCodeRedemption.tsx:127
+#: src/components/PremiumCodeRedemption.tsx:163
 msgid "Already redeemed?"
 msgstr "¿Ya lo has canjeado?"
 
@@ -417,7 +417,7 @@ msgstr "Kwanza Angoleño"
 msgid "Annual"
 msgstr "Anual"
 
-#: src/components/PremiumCodeRedemption.tsx:165
+#: src/components/PremiumCodeRedemption.tsx:201
 msgid "App Store"
 msgstr "App Store"
 
@@ -861,7 +861,7 @@ msgstr "Código copiado."
 msgid "Code for testing"
 msgstr "Código para pruebas"
 
-#: src/components/PremiumCodeRedemption.tsx:113
+#: src/components/PremiumCodeRedemption.tsx:149
 msgid "Code not working in Google Play?"
 msgstr "¿El código no funciona en Google Play?"
 
@@ -1001,6 +1001,14 @@ msgstr "Copiar enlace del grupo"
 #: src/routes/party_.$partyId.pay/-components/BizumItem.tsx:12
 msgid "Copy the phone number and pay through Bizum using your bank app."
 msgstr "Copia el número de teléfono y paga mediante Bizum usando la aplicación de tu banco."
+
+#: src/components/PremiumCodeRedemption.tsx:123
+msgid "Copy your code, then tap App Store above."
+msgstr "Copia tu código y pulsa App Store arriba."
+
+#: src/components/PremiumCodeRedemption.tsx:125
+msgid "Copy your code, then tap Google Play above."
+msgstr "Copia tu código y pulsa Google Play arriba."
 
 #: src/routes/new/route.tsx:223
 msgid "Costa Rican Colón"
@@ -1533,6 +1541,10 @@ msgstr "Filtra totales y rankings"
 msgid "Finishing sign in"
 msgstr "Terminando el inicio de sesión"
 
+#: src/components/PremiumCodeRedemption.tsx:134
+msgid "Follow the store's instructions and enter your code if asked. Check the offer before confirming."
+msgstr "Sigue las instrucciones de la tienda e introduce tu código si te lo pide. Revisa la oferta antes de confirmar."
+
 #: src/components/PremiumCodeRedemption.tsx:117
 msgid "For a custom subscription code, choose a plan and continue to Google Play checkout. Tap the payment method, then Redeem code. Check the offer before confirming."
 msgstr "Para un código de suscripción personalizado, elige un plan y continúa al pago de Google Play. Pulsa el método de pago y luego Canjear código. Revisa la oferta antes de confirmar."
@@ -1610,7 +1622,7 @@ msgstr "Google conectado"
 msgid "Google is connected to this account"
 msgstr "Google está conectado a esta cuenta"
 
-#: src/components/PremiumCodeRedemption.tsx:165
+#: src/components/PremiumCodeRedemption.tsx:201
 msgid "Google Play"
 msgstr "Google Play"
 
@@ -1681,6 +1693,10 @@ msgstr "Lempira Hondureño"
 #: src/routes/new/route.tsx:187
 msgid "Hong Kong Dollar"
 msgstr "Dólar de Hong Kong"
+
+#: src/components/PremiumCodeRedemption.tsx:112
+msgid "How do I redeem my code?"
+msgstr "¿Cómo canjeo mi código?"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:33
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:25
@@ -2419,11 +2435,19 @@ msgstr "Abrir el último grupo al abrir la app"
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
+#: src/components/PremiumCodeRedemption.tsx:127
+msgid "Open this link on your phone and copy your code. Choose App Store for iPhone or iPad, or Google Play for Android."
+msgstr "Abre este enlace en tu teléfono y copia tu código. Elige App Store para iPhone o iPad, o Google Play para Android."
+
 #: src/lib/partySharePreviewMessages.ts:7
 msgid "Open this party to split expenses and settle up together on trizum."
 msgstr "Abre este grupo para dividir gastos y saldar cuentas juntos en trizum."
 
-#: src/components/PremiumCodeRedemption.tsx:131
+#: src/components/PremiumCodeRedemption.tsx:117
+msgid "Open trizum on your phone and sign in to the account you want to use for Premium."
+msgstr "Abre trizum en tu teléfono e inicia sesión en la cuenta que quieras usar para Premium."
+
+#: src/components/PremiumCodeRedemption.tsx:167
 msgid "Open trizum on your phone and sign in to your account. Use Restore purchases if Premium has not appeared yet."
 msgstr "Abre trizum en tu teléfono e inicia sesión en tu cuenta. Usa Restaurar compras si Premium aún no aparece."
 
@@ -2903,16 +2927,16 @@ msgid "Redeem code"
 msgstr "Canjear código"
 
 #: src/components/PremiumCodeRedemption.tsx:95
-#: src/components/PremiumCodeRedemption.tsx:146
+#: src/components/PremiumCodeRedemption.tsx:182
 msgid "Redeem in App Store"
 msgstr "Canjear en el App Store"
 
 #: src/components/PremiumCodeRedemption.tsx:95
-#: src/components/PremiumCodeRedemption.tsx:146
+#: src/components/PremiumCodeRedemption.tsx:182
 msgid "Redeem in Google Play"
 msgstr "Canjear en Google Play"
 
-#: src/components/PremiumCodeRedemption.tsx:168
+#: src/components/PremiumCodeRedemption.tsx:204
 msgid "Redeem your offer"
 msgstr "Canjea tu oferta"
 
@@ -2978,6 +3002,10 @@ msgstr "Reintentar"
 #: src/routes/settings.tsx:366
 msgid "Retry account check"
 msgstr "Volver a comprobar la cuenta"
+
+#: src/components/PremiumCodeRedemption.tsx:140
+msgid "Return to trizum. If Premium has not appeared yet, use Restore purchases."
+msgstr "Vuelve a trizum. Si Premium aún no aparece, usa Restaurar compras."
 
 #: src/routes/privacy-policy.tsx:553
 msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
@@ -3293,7 +3321,7 @@ msgstr "Dólar de las Islas Salomón"
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
-#: src/components/PremiumCodeRedemption.tsx:117
+#: src/components/PremiumCodeRedemption.tsx:153
 msgid "Some offers need to be redeemed at checkout. Open trizum on Android, choose the plan for your offer, then tap the payment method in Google Play and select Redeem code. Check that your offer appears before confirming."
 msgstr "Algunas ofertas se canjean al pagar. Abre trizum en Android, elige el plan de tu oferta, pulsa el método de pago en Google Play y selecciona Canjear código. Comprueba que aparezca tu oferta antes de confirmar."
 
