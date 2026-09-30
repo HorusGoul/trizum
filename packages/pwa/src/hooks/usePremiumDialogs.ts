@@ -2,13 +2,13 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { t } from "@lingui/core/macro";
 import { toast } from "sonner";
 
-type RedemptionDialog =
+type PremiumDialog =
   | { kind: "closed" }
   | { kind: "browserHelp" }
   | { kind: "signIn"; intent: "account" | "premium" }
   | { kind: "premium"; userId: string };
 
-export function useRedemptionDialogs({
+export function usePremiumDialogs({
   userId,
   isNative,
   presentPaywall,
@@ -17,7 +17,7 @@ export function useRedemptionDialogs({
   isNative: boolean;
   presentPaywall: () => Promise<unknown>;
 }) {
-  const [dialog, setDialog] = useState<RedemptionDialog>({ kind: "closed" });
+  const [dialog, setDialog] = useState<PremiumDialog>({ kind: "closed" });
   const readyPremium = dialog.kind === "premium" && dialog.userId === userId ? dialog : null;
   const openPaywall = useEffectEvent(async () => {
     try {

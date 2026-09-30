@@ -6,9 +6,15 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 let hasRedirectedThisSession = false;
 
 export const Route = createFileRoute("/_home/")({
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, search }) => {
     // Only redirect once per session (on app launch)
     if (hasRedirectedThisSession) {
+      return;
+    }
+
+    // An explicit Premium return takes priority over the launch shortcut.
+    if (search.premium) {
+      hasRedirectedThisSession = true;
       return;
     }
 

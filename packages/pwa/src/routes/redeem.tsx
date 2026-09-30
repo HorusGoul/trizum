@@ -8,7 +8,7 @@ import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
 import { PremiumBrowserHelp } from "#src/components/PremiumBrowserHelp.tsx";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
-import { useRedemptionDialogs } from "#src/hooks/useRedemptionDialogs.ts";
+import { usePremiumDialogs } from "#src/hooks/usePremiumDialogs.ts";
 import { Icon } from "#src/ui/Icon.tsx";
 
 const CloudSyncSettingsView = lazy(() =>
@@ -34,7 +34,7 @@ function RedemptionPage({ initialCode }: { initialCode: string }) {
   const email = user?.email;
   const premium = usePremium();
 
-  const dialogs = useRedemptionDialogs({
+  const dialogs = usePremiumDialogs({
     userId: user?.id ?? null,
     isNative: Boolean(getRevenueCatPlatform()),
     presentPaywall: premium.presentPaywall,
