@@ -224,8 +224,6 @@ export function parseTricountData(data: TricountResponse): MigrationData {
       shares,
       photos: expensePhotos,
       isTransfer,
-      __editCopy: undefined,
-      __editCopyLastUpdatedAt: undefined,
     };
 
     expenses.push(expense);

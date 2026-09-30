@@ -17,7 +17,7 @@ vi.mock("./routes/party-share-preview", async () => {
 });
 
 describe("trizum OpenAPI contract", () => {
-  test("publishes the assembled Party Boost operations", async () => {
+  test("publishes the assembled first-party operations", async () => {
     const response = await app.request("https://trizum.test/api/openapi.json");
     const document = (await response.json()) as {
       paths?: Record<
@@ -53,6 +53,23 @@ describe("trizum OpenAPI contract", () => {
       "409",
       "503",
     ]);
+
+    const cloudSync = document.paths?.["/api/cloud-sync/settings"];
+    expect(cloudSync?.get?.operationId).toBe("getCloudUserSettings");
+    expect(Object.keys(cloudSync?.get?.responses ?? {})).toEqual(["200", "401", "500"]);
+    expect(cloudSync?.put?.operationId).toBe("saveCloudUserSettings");
+    expect(cloudSync?.put?.requestBody?.required).toBe(true);
+    expect(Object.keys(cloudSync?.put?.responses ?? {})).toEqual([
+      "200",
+      "400",
+      "401",
+      "409",
+      "500",
+    ]);
+
+    const migration = document.paths?.["/api/migrate"];
+    expect(migration?.get?.operationId).toBe("migrateTricount");
+    expect(Object.keys(migration?.get?.responses ?? {})).toEqual(["200", "400", "500"]);
   });
 
   test("rejects malformed Party Boost response bodies", () => {
