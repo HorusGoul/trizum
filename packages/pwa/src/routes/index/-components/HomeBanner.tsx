@@ -1,6 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
-import { lazy, Suspense } from "react";
+import { useEffect, useEffectEvent } from "react";
+import { useLocation, useNavigate, useSearch } from "@tanstack/react-router";
 import { Button } from "react-aria-components";
 import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { usePremiumDialogs } from "#src/hooks/usePremiumDialogs.ts";
@@ -12,14 +13,11 @@ import { Icon } from "#src/ui/Icon.tsx";
 import { IconButton } from "#src/ui/IconButton.tsx";
 import { ProfileSetupCard } from "./ProfileSetupCard.tsx";
 
-const CloudSyncSettingsView = lazy(() =>
-  import("#src/components/CloudSyncSettingsView.tsx").then((module) => ({
-    default: module.CloudSyncSettingsView,
-  })),
-);
-
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {
   const { partyList, dismissPremiumBanner } = usePartyList();
+  const navigate = useNavigate();
+  const isHome = useLocation({ select: (location) => location.pathname === "/" });
+  const resumePremium = useSearch({ strict: false, select: (search) => search.premium });
   const session = useAppSession();
   const premium = usePremium();
   const isNative = Boolean(getRevenueCatPlatform());
@@ -29,6 +27,24 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
     presentPaywall: premium.presentPaywall,
   });
   useAdProtectedFlow(dialogs.dialog.kind !== "closed");
+
+  const resumeAfterSignIn = useEffectEvent(() => {
+    // Consume the return intent so navigation and later sign-ins cannot replay it.
+    void navigate({ to: "/", search: { premium: undefined }, replace: true });
+    if (isNative && session.data?.user) dialogs.openPremium();
+  });
+  useEffect(() => {
+    if (isHome && resumePremium && !session.isPending) resumeAfterSignIn();
+  }, [isHome, resumePremium, session.isPending]);
+
+  function openPremium() {
+    if (session.data?.user) {
+      dialogs.openPremium();
+    } else {
+      // The route owns sign-in, including magic-link callbacks and cloud-profile choice.
+      void navigate({ to: "/settings/cloud-sync", search: { returnTo: "/?premium=true" } });
+    }
+  }
 
   const needsProfileSetup = !partyList.username?.trim();
   const showPremium = isNative && premium.status === "free" && !partyList.premiumBannerDismissed;
@@ -42,7 +58,7 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
           ) : (
             <div className="border-accent-400 bg-accent-50 dark:border-accent-500 dark:bg-accent-950 flex items-start rounded-xl border">
               <Button
-                onPress={dialogs.openPremium}
+                onPress={openPremium}
                 isDisabled={dialogs.dialog.kind !== "closed"}
                 className="text-accent-950 dark:text-accent-50 hover:bg-accent-100 focus-visible:bg-accent-100 dark:hover:bg-accent-900 dark:focus-visible:bg-accent-900 focus-visible:ring-accent-500 flex min-w-0 flex-1 cursor-pointer items-start gap-4 rounded-xl p-4 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
               >
@@ -69,21 +85,6 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
             </div>
           )}
         </div>
-      ) : null}
-      {dialogs.dialog.kind === "signIn" ? (
-        <Suspense
-          fallback={
-            <output>
-              <Trans>Loading sign-in…</Trans>
-            </output>
-          }
-        >
-          <CloudSyncSettingsView
-            search={{ returnTo: "/" }}
-            onClose={dialogs.close}
-            onSignedIn={dialogs.signedIn}
-          />
-        </Suspense>
       ) : null}
     </>
   );

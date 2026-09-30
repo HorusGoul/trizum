@@ -29,23 +29,11 @@ vi.mock("#src/lib/auth-client.ts", () => ({
 vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({
   getRevenueCatPlatform: () => (state.isNative ? "android" : undefined),
 }));
-vi.mock("#src/components/CloudSyncSettingsView.tsx", () => ({
-  CloudSyncSettingsView: ({
-    onSignedIn,
-    onClose,
-  }: {
-    onSignedIn: (id: string) => void;
-    onClose: () => void;
-  }) => (
-    <button
-      onClick={() => {
-        onSignedIn("account-a");
-        onClose();
-      }}
-    >
-      Finish sign-in
-    </button>
-  ),
+const navigate = vi.hoisted(() => vi.fn<() => Promise<void>>());
+vi.mock("@tanstack/react-router", () => ({
+  useNavigate: () => navigate,
+  useLocation: () => true,
+  useSearch: () => undefined,
 }));
 
 let root: Root;
@@ -162,16 +150,13 @@ it("opens Premium directly and protects the flow from ads until the paywall clos
   expect(releaseAdProtection).toHaveBeenCalledOnce();
 });
 
-it("continues to Premium after sign-in even if the cloud profile changes the home content", async () => {
+it("carries the Premium destination into the sign-in route", async () => {
   state.userId = null;
   await render();
   await click("Enjoy trizum ad-free");
-  expect(container.textContent).toContain("Finish sign-in");
+  expect(navigate).toHaveBeenCalledWith({
+    to: "/settings/cloud-sync",
+    search: { returnTo: "/?premium=true" },
+  });
   expect(presentPaywall).not.toHaveBeenCalled();
-  await render("loading", false);
-  await click("Finish sign-in");
-  expect(presentPaywall).not.toHaveBeenCalled();
-  state.userId = "account-a";
-  await render("loading", false);
-  expect(presentPaywall).toHaveBeenCalledOnce();
 });

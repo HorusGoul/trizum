@@ -23,6 +23,9 @@ import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 
 export const Route = createFileRoute("/_home")({
+  validateSearch: (search: Record<string, unknown>): { premium?: boolean } => ({
+    premium: search.premium === true ? true : undefined,
+  }),
   component: Home,
 });
 

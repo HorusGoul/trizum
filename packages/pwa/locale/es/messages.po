@@ -238,7 +238,7 @@ msgstr "Un miembro Premium está impulsando este grupo."
 msgid "A template with this name already exists"
 msgstr "Ya existe una plantilla con este nombre"
 
-#: src/routes/_home/route.tsx:127
+#: src/routes/_home/route.tsx:130
 #: src/routes/about/route.tsx:23
 msgid "About"
 msgstr "Acerca de"
@@ -306,7 +306,7 @@ msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto in
 msgid "Add Google as a sign-in method"
 msgstr "Añadir Google como método de inicio de sesión"
 
-#: src/routes/_home/route.tsx:175
+#: src/routes/_home/route.tsx:178
 msgid "Add or create"
 msgstr "Añadir o crear"
 
@@ -449,7 +449,7 @@ msgstr "Archiva un grupo desde la pantalla de inicio cuando quieras despejar esp
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/_home/route.tsx:245
+#: src/routes/_home/route.tsx:248
 msgid "Archive party"
 msgstr "Archivar grupo"
 
@@ -465,7 +465,7 @@ msgstr "Participantes archivados"
 msgid "Archived participants are still configured"
 msgstr "Los participantes archivados siguen configurados"
 
-#: src/routes/_home/route.tsx:109
+#: src/routes/_home/route.tsx:112
 msgid "Archived parties"
 msgstr "Grupos archivados"
 
@@ -747,7 +747,7 @@ msgstr "Franco CFP"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/_home/route.tsx:120
+#: src/routes/_home/route.tsx:123
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
@@ -1090,7 +1090,7 @@ msgstr "No se pudo conectar el método de inicio de sesión"
 msgid "Create a custom template to enable this setting."
 msgstr "Crea una plantilla personalizada para activar esta opción."
 
-#: src/routes/_home/route.tsx:192
+#: src/routes/_home/route.tsx:195
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -1268,7 +1268,7 @@ msgstr "Acciones destructivas"
 msgid "Did you know?"
 msgstr "¿Sabías que?"
 
-#: src/routes/index/-components/HomeBanner.tsx:63
+#: src/routes/index/-components/HomeBanner.tsx:79
 msgid "Dismiss Premium banner"
 msgstr "Ocultar el banner de Premium"
 
@@ -1373,7 +1373,7 @@ msgstr "Fecha de fin"
 msgid "English"
 msgstr "Inglés"
 
-#: src/routes/index/-components/HomeBanner.tsx:54
+#: src/routes/index/-components/HomeBanner.tsx:70
 msgid "Enjoy trizum ad-free"
 msgstr "Disfruta de trizum sin anuncios"
 
@@ -1488,7 +1488,7 @@ msgstr "Gastos"
 msgid "Expenses counted"
 msgstr "Gastos contabilizados"
 
-#: src/routes/index/-components/HomeBanner.tsx:57
+#: src/routes/index/-components/HomeBanner.tsx:73
 msgid "Explore Premium"
 msgstr "Descubre Premium"
 
@@ -1891,7 +1891,7 @@ msgstr "Únete a {partyName} en trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
-#: src/routes/_home/route.tsx:186
+#: src/routes/_home/route.tsx:189
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
@@ -2031,7 +2031,6 @@ msgstr "Cargando licencias..."
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
-#: src/routes/index/-components/HomeBanner.tsx:77
 #: src/routes/redeem.tsx:82
 msgid "Loading sign-in…"
 msgstr "Cargando inicio de sesión…"
@@ -2084,7 +2083,7 @@ msgstr "Gestionar Premium"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden ser archivados."
 
-#: src/routes/_home/route.tsx:97
+#: src/routes/_home/route.tsx:100
 msgid "Manage trizum cloud"
 msgstr "Gestionar trizum cloud"
 
@@ -2131,7 +2130,7 @@ msgstr "Unidad de Inversión Mexicana"
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
-#: src/routes/_home/route.tsx:198
+#: src/routes/_home/route.tsx:201
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:39
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -2614,7 +2613,7 @@ msgstr "Grupo"
 msgid "Party actions"
 msgstr "Acciones del grupo"
 
-#: src/routes/_home/route.tsx:266
+#: src/routes/_home/route.tsx:269
 msgid "Party archived"
 msgstr "Grupo archivado"
 
@@ -2666,7 +2665,7 @@ msgstr "Clasificación del grupo"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/_home/route.tsx:258
+#: src/routes/_home/route.tsx:261
 msgid "Party pinned"
 msgstr "Grupo fijado"
 
@@ -2694,7 +2693,7 @@ msgstr "Estadísticas del grupo"
 msgid "Party title, description and icon"
 msgstr "Título, descripción e icono del grupo"
 
-#: src/routes/_home/route.tsx:258
+#: src/routes/_home/route.tsx:261
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
@@ -2796,7 +2795,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/_home/route.tsx:239
+#: src/routes/_home/route.tsx:242
 msgid "Pin party"
 msgstr "Fijar grupo"
 
@@ -2937,7 +2936,7 @@ msgstr "Política de Privacidad"
 msgid "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
 msgstr "Sondear, eludir o interferir con la seguridad, los controles de acceso, los límites de uso o las restricciones de las cuentas"
 
-#: src/routes/_home/route.tsx:74
+#: src/routes/_home/route.tsx:77
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
@@ -3205,7 +3204,7 @@ msgstr "¿Configurar contraseña?"
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/_home/route.tsx:81
+#: src/routes/_home/route.tsx:84
 #: src/routes/party.$partyId/route.tsx:259
 #: src/routes/settings.tsx:128
 msgid "Settings"
@@ -3296,7 +3295,7 @@ msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 
 #: src/components/CloudSyncDialogs.tsx:225
-#: src/routes/_home/route.tsx:99
+#: src/routes/_home/route.tsx:102
 msgid "Sign in to trizum cloud"
 msgstr "Iniciar sesión en trizum cloud"
 
@@ -3903,7 +3902,7 @@ msgstr "Dólar de Trinidad y Tobago"
 
 #: src/components/CloudSyncSettingsView.tsx:782
 #: src/components/CloudSyncSettingsView.tsx:923
-#: src/routes/_home/route.tsx:101
+#: src/routes/_home/route.tsx:104
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -3999,12 +3998,12 @@ msgstr "Grivna Ucraniana"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/_home/route.tsx:239
+#: src/routes/_home/route.tsx:242
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
 #: src/components/UpdateController.tsx:28
-#: src/routes/_home/route.tsx:62
+#: src/routes/_home/route.tsx:65
 msgid "Update available"
 msgstr "Actualización disponible"
 
