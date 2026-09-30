@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { createPartyFromMigrationData } from "#src/models/migration.ts";
-import { trizumApiClient } from "#src/lib/trizumApiClient.ts";
+import { MigrationApiError, trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Party } from "#src/models/party.ts";
 import { ErrorState, SuccessState } from "./-components/FinishedStates.js";
 import { IdleState } from "./-components/IdleState.js";
@@ -78,7 +78,12 @@ function useMigrateTricount() {
     } catch (error) {
       setState({
         type: "error",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message:
+          error instanceof MigrationApiError && error.status === "invalid_response"
+            ? t`Tricount import returned an invalid response.`
+            : error instanceof Error
+              ? error.message
+              : "Unknown error",
       });
     }
   }
