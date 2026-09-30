@@ -1,23 +1,15 @@
-import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo/slim";
+import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import type { PartyList } from "#src/models/partyList.js";
-import { getAuthBaseURL } from "./auth-client";
-import { fetchWithNativeAuth } from "./nativeAuthSession";
+import { CloudSyncApiError, trizumApiClient } from "./trizumApiClient";
+import type { CloudUserSettings, CloudUserSettingsInput } from "./api/cloudSyncContract";
+export type { CloudUserSettings, CloudUserSettingsInput } from "./api/cloudSyncContract";
 
 const CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX = "trizumCloudUserSettings:v1:";
 const LAST_CLOUD_USER_SETTINGS_CACHE_KEY = "trizumCloudUserSettings:last:v1";
 
-export interface CloudUserSettings {
-  partyListDocumentId: DocumentId;
-  updatedAt: number;
-}
-
 export interface CachedCloudUserSettings {
   cachedAt: number;
   settings: CloudUserSettings | null;
-}
-
-export interface CloudUserSettingsInput {
-  partyListDocumentId: DocumentId;
 }
 
 export function getCloudUserSettingsInput(partyList: PartyList): CloudUserSettingsInput {
@@ -27,42 +19,25 @@ export function getCloudUserSettingsInput(partyList: PartyList): CloudUserSettin
 }
 
 export async function fetchCloudUserSettings() {
-  const response = await fetchWithNativeAuth(getCloudSyncSettingsURL());
-
-  if (response.status === 401) {
-    return { settings: null, status: "unauthenticated" as const };
+  try {
+    return await trizumApiClient.cloudSync.getSettings();
+  } catch (error) {
+    if (error instanceof CloudSyncApiError && error.status === 401) {
+      return { settings: null, status: "unauthenticated" as const };
+    }
+    throw new Error("Failed to load trizum cloud settings.", { cause: error });
   }
-
-  if (!response.ok) {
-    throw new Error("Failed to load trizum cloud settings.");
-  }
-
-  return (await response.json()) as {
-    settings: CloudUserSettings | null;
-  };
 }
 
 export async function saveCloudUserSettings(settings: CloudUserSettingsInput) {
-  const response = await fetchWithNativeAuth(getCloudSyncSettingsURL(), {
-    body: JSON.stringify(settings),
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PUT",
-  });
-
-  if (response.status === 401) {
-    throw new Error("Sign in before syncing settings.");
+  try {
+    return await trizumApiClient.cloudSync.saveSettings(settings);
+  } catch (error) {
+    if (error instanceof CloudSyncApiError && error.status === 401) {
+      throw new Error("Sign in before syncing settings.", { cause: error });
+    }
+    throw new Error("Failed to save trizum cloud settings.", { cause: error });
   }
-
-  if (!response.ok) {
-    throw new Error("Failed to save trizum cloud settings.");
-  }
-
-  return (await response.json()) as {
-    settings: CloudUserSettings;
-  };
 }
 
 export function readCachedCloudUserSettings(userId: string) {
@@ -126,10 +101,6 @@ export function clearCachedCloudUserSettings(userId: string) {
   } catch {
     // localStorage can be unavailable in restricted browser contexts.
   }
-}
-
-function getCloudSyncSettingsURL() {
-  return new URL("/api/cloud-sync/settings", getAuthBaseURL()).toString();
 }
 
 function getCloudUserSettingsCacheKey(userId: string) {

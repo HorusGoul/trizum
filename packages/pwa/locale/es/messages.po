@@ -3888,6 +3888,10 @@ msgstr "Transferir deuda"
 msgid "Transfer to another party"
 msgstr "Transferir a otro grupo"
 
+#: src/routes/migrate_.tricount/route.tsx:83
+msgid "Tricount import returned an invalid response."
+msgstr "La importación de Tricount devolvió una respuesta no válida."
+
 #: src/routes/migrate_.tricount/-components/validation.ts:6
 msgid "Tricount key or URL is required"
 msgstr "Se requiere la clave o URL de Tricount"

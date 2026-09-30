@@ -39,6 +39,19 @@ then use this document to decide where to work inside the PWA.
 - [`locale/AGENTS.md`](./locale/AGENTS.md) contains translation terminology and
   localization guardrails.
 
+The first-party contract covers Party Boost, Cloud Sync settings and Tricount
+imports. Shared runtime schemas live in `src/lib/api`; route definitions live in
+`api/contracts`. Cloud Sync's cache helpers retain the v1 local storage format
+and signed-out read behavior while delegating HTTP to the client. Tricount keeps
+its existing preview/production host selection and plain-text missing-key error.
+Both migrated routes validate successful responses before sending them, and the
+client validates incoming payloads before they reach app state. Unexpected Cloud
+Sync failures use the documented JSON 500 response.
+
+The endpoint audit excludes Better Auth (owned by its auth client), health and
+OpenAPI discovery (not consumed by app code), static assets, HTML/social previews,
+and third-party requests such as Tricount's upstream API and attachment downloads.
+
 ## Package Notes
 
 - The app is offline-first and uses Automerge for shared, persisted data.

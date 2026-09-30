@@ -1,4 +1,9 @@
-import { Hono } from "hono";
+import { $, OpenAPIHono } from "@hono/zod-openapi";
+import { migrateTricountRoute } from "../contracts/migrate";
+import {
+  migrationDataSchema,
+  migrationErrorResponseSchema,
+} from "../../src/lib/api/migrationContract";
 import { cors } from "hono/cors";
 
 import { getLogger } from "../../src/lib/log.js";
@@ -6,54 +11,48 @@ import { parseTricountData, type TricountResponse } from "../../src/lib/tricount
 
 const logger = getLogger("api", "migrate");
 
-export const apiMigrateRoute = new Hono();
-
-apiMigrateRoute.use(
-  "*",
-  cors({
-    origin: "*",
-    allowMethods: ["GET", "OPTIONS"],
-    allowHeaders: ["*"],
-  }),
+const migrateApp = $(
+  new OpenAPIHono().use(
+    "*",
+    cors({
+      origin: "*",
+      allowMethods: ["GET", "OPTIONS"],
+      allowHeaders: ["*"],
+    }),
+  ),
 );
 
-apiMigrateRoute.get("/", async (c) => {
-  let data: TricountResponse | null = null;
-  try {
-    const url = new URL(c.req.url);
-    const tricountKey = url.searchParams.get("key");
+export const apiMigrateRoute = migrateApp.openapi(
+  migrateTricountRoute,
+  async (c) => {
+    let data: TricountResponse | null = null;
+    try {
+      const { key: tricountKey } = c.req.valid("query");
 
-    if (!tricountKey) {
-      return new Response("Missing 'key' query parameter", { status: 400 });
+      const api = new TricountAPIClient();
+      await api.initializeKeys();
+      await api.authenticate();
+      data = await api.fetchTricountData(tricountKey);
+      const migrationData = parseTricountData(data);
+
+      return c.json(migrationDataSchema.parse(migrationData), 200);
+    } catch (error) {
+      logger.error("Migration error", { error });
+      return c.json(
+        migrationErrorResponseSchema.parse({
+          error: error instanceof Error ? error.message : "Unknown error",
+          data,
+        }),
+        500,
+      );
     }
+  },
+  (result, c) => {
+    if (!result.success) return c.text("Missing 'key' query parameter", 400);
+  },
+);
 
-    const api = new TricountAPIClient();
-    await api.initializeKeys();
-    await api.authenticate();
-    data = await api.fetchTricountData(tricountKey);
-    const migrationData = parseTricountData(data);
-
-    return new Response(JSON.stringify(migrationData), {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error) {
-    logger.error("Migration error", { error });
-    return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
-        data,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-  }
-});
+export type MigrateRoute = typeof apiMigrateRoute;
 
 class TricountAPIClient {
   private base_url = "https://api.tricount.bunq.com";

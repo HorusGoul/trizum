@@ -2,8 +2,8 @@ import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { createPartyFromMigrationData, type MigrationData } from "#src/models/migration.ts";
-import { getAppLink } from "#src/lib/link.ts";
+import { createPartyFromMigrationData } from "#src/models/migration.ts";
+import { MigrationApiError, trizumApiClient } from "#src/lib/trizumApiClient.ts";
 import type { Party } from "#src/models/party.ts";
 import { ErrorState, SuccessState } from "./-components/FinishedStates.js";
 import { IdleState } from "./-components/IdleState.js";
@@ -59,21 +59,11 @@ function useMigrateTricount() {
     });
 
     try {
-      const response = await fetch(getAppLink(`/api/migrate?key=${encodeURIComponent(key)}`));
-      const data = (await response.json()) as MigrationData | { error?: unknown };
-
-      if (!response.ok) {
-        const message =
-          typeof data === "object" && data && "error" in data && typeof data.error === "string"
-            ? data.error
-            : response.statusText;
-        setState({ type: "error", message });
-        return;
-      }
+      const data = await trizumApiClient.migration.importTricount(key);
 
       const partyId = await createPartyFromMigrationData({
         repo,
-        data: data as MigrationData,
+        data,
         importAttachments,
         onProgress: (progress) => {
           setState({
@@ -88,7 +78,12 @@ function useMigrateTricount() {
     } catch (error) {
       setState({
         type: "error",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message:
+          error instanceof MigrationApiError && error.status === "invalid_response"
+            ? t`Tricount import returned an invalid response.`
+            : error instanceof Error
+              ? error.message
+              : "Unknown error",
       });
     }
   }

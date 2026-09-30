@@ -1,161 +1,165 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { $, OpenAPIHono } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
+import { getCloudUserSettingsRoute, saveCloudUserSettingsRoute } from "../contracts/cloud-sync";
+import {
+  getCloudUserSettingsResponseSchema,
+  saveCloudUserSettingsResponseSchema,
+} from "../../src/lib/api/cloudSyncContract";
 import { eq } from "drizzle-orm";
-import { Hono } from "hono";
 import { createAuth } from "../auth";
 import { getApiDb, schema } from "../db/client";
 import type { ApiHonoEnv } from "../env";
 import { getLogger } from "../../src/lib/log.js";
 
-export interface CloudUserSettings {
-  partyListDocumentId: string;
-  updatedAt: number;
-}
-
 const logger = getLogger("api", "cloudSync");
 
-export const cloudSyncRoute = new Hono<ApiHonoEnv>();
+const cloudSyncApp = $(
+  new OpenAPIHono<ApiHonoEnv>().use("*", async (c, next) => {
+    const auth = createAuth(c.env, c.executionCtx, c.req.raw);
+    const session = await auth.api.getSession({
+      headers: c.req.raw.headers,
+    });
 
-cloudSyncRoute.use("*", async (c, next) => {
-  const auth = createAuth(c.env, c.executionCtx, c.req.raw);
-  const session = await auth.api.getSession({
-    headers: c.req.raw.headers,
-  });
+    if (!session) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
 
-  if (!session) {
-    return c.json({ error: "Unauthorized" }, 401);
+    c.set("session", session.session);
+    c.set("user", session.user);
+
+    // The existing endpoint reads JSON regardless of Content-Type. Preserve that
+    // behavior before OpenAPI's media-type gate and JSON validator run.
+    if (c.req.method === "PUT") {
+      const headers = new Headers(c.req.raw.headers);
+      headers.set("Content-Type", "application/json");
+      c.req.raw = new Request(c.req.raw, { headers });
+    }
+
+    await next();
+  }),
+);
+
+cloudSyncApp.onError((error, c) => {
+  if (error instanceof HTTPException && error.status === 400) {
+    return c.json({ error: "Expected a settings object." }, 400);
   }
-
-  c.set("session", session.session);
-  c.set("user", session.user);
-
-  await next();
+  logger.error("Cloud Sync settings request failed", { error });
+  return c.json(
+    {
+      error:
+        c.req.method === "PUT"
+          ? "Could not save trizum cloud settings."
+          : "Failed to load trizum cloud settings.",
+    },
+    500,
+  );
 });
 
-cloudSyncRoute.get("/settings", async (c) => {
-  const user = c.get("user");
-  const db = getApiDb(c.env.DB);
-  const [settings] = await db
-    .select({
-      partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
-      updatedAt: schema.cloudUserSettings.updatedAt,
-    })
-    .from(schema.cloudUserSettings)
-    .where(eq(schema.cloudUserSettings.userId, user.id))
-    .limit(1);
+export const cloudSyncRoute = cloudSyncApp
+  .openapi(getCloudUserSettingsRoute, async (c) => {
+    const user = c.get("user");
+    const db = getApiDb(c.env.DB);
+    const [settings] = await db
+      .select({
+        partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
+        updatedAt: schema.cloudUserSettings.updatedAt,
+      })
+      .from(schema.cloudUserSettings)
+      .where(eq(schema.cloudUserSettings.userId, user.id))
+      .limit(1);
 
-  return c.json({
-    settings: settings ?? null,
-  });
-});
+    return c.json(getCloudUserSettingsResponseSchema.parse({ settings: settings ?? null }), 200);
+  })
+  .openapi(
+    saveCloudUserSettingsRoute,
+    async (c) => {
+      const user = c.get("user");
+      const settings = {
+        ...c.req.valid("json"),
+        updatedAt: Date.now(),
+      };
+      const db = getApiDb(c.env.DB);
+      const [existingSettings] = await db
+        .select({
+          partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
+          updatedAt: schema.cloudUserSettings.updatedAt,
+        })
+        .from(schema.cloudUserSettings)
+        .where(eq(schema.cloudUserSettings.userId, user.id))
+        .limit(1);
 
-cloudSyncRoute.put("/settings", async (c) => {
-  const user = c.get("user");
-  const body = await c.req.json().catch(() => null);
-  const parsedSettings = parseCloudUserSettingsInput(body);
+      if (existingSettings) {
+        if (existingSettings.partyListDocumentId !== settings.partyListDocumentId) {
+          logger.warning("Rejected cloud user settings document change", {
+            userId: user.id,
+          });
 
-  if (!parsedSettings.ok) {
-    return c.json({ error: parsedSettings.error }, 400);
-  }
+          return c.json({ error: "trizum cloud is already set up for this account." }, 409);
+        }
 
-  const settings = {
-    ...parsedSettings.value,
-    updatedAt: Date.now(),
-  };
-  const db = getApiDb(c.env.DB);
-  const [existingSettings] = await db
-    .select({
-      partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
-      updatedAt: schema.cloudUserSettings.updatedAt,
-    })
-    .from(schema.cloudUserSettings)
-    .where(eq(schema.cloudUserSettings.userId, user.id))
-    .limit(1);
+        return c.json(
+          saveCloudUserSettingsResponseSchema.parse({ settings: existingSettings }),
+          200,
+        );
+      }
 
-  if (existingSettings) {
-    if (existingSettings.partyListDocumentId !== settings.partyListDocumentId) {
-      logger.warning("Rejected cloud user settings document change", {
+      await db
+        .insert(schema.cloudUserSettings)
+        .values({
+          partyListDocumentId: settings.partyListDocumentId,
+          updatedAt: settings.updatedAt,
+          userId: user.id,
+        })
+        .onConflictDoNothing({
+          target: schema.cloudUserSettings.userId,
+        });
+
+      const [storedSettings] = await db
+        .select({
+          partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
+          updatedAt: schema.cloudUserSettings.updatedAt,
+        })
+        .from(schema.cloudUserSettings)
+        .where(eq(schema.cloudUserSettings.userId, user.id))
+        .limit(1);
+
+      if (!storedSettings) {
+        logger.error("Could not read cloud user settings after insert", {
+          userId: user.id,
+        });
+
+        return c.json({ error: "Could not save trizum cloud settings." }, 500);
+      }
+
+      if (storedSettings.partyListDocumentId !== settings.partyListDocumentId) {
+        logger.warning("Rejected cloud user settings document change", {
+          userId: user.id,
+        });
+
+        return c.json({ error: "trizum cloud is already set up for this account." }, 409);
+      }
+
+      logger.info("Saved cloud user settings", {
         userId: user.id,
       });
 
-      return c.json({ error: "trizum cloud is already set up for this account." }, 409);
-    }
-
-    return c.json({
-      settings: existingSettings,
-    });
-  }
-
-  await db
-    .insert(schema.cloudUserSettings)
-    .values({
-      partyListDocumentId: settings.partyListDocumentId,
-      updatedAt: settings.updatedAt,
-      userId: user.id,
-    })
-    .onConflictDoNothing({
-      target: schema.cloudUserSettings.userId,
-    });
-
-  const [storedSettings] = await db
-    .select({
-      partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
-      updatedAt: schema.cloudUserSettings.updatedAt,
-    })
-    .from(schema.cloudUserSettings)
-    .where(eq(schema.cloudUserSettings.userId, user.id))
-    .limit(1);
-
-  if (!storedSettings) {
-    logger.error("Could not read cloud user settings after insert", {
-      userId: user.id,
-    });
-
-    return c.json({ error: "Could not save trizum cloud settings." }, 500);
-  }
-
-  if (storedSettings.partyListDocumentId !== settings.partyListDocumentId) {
-    logger.warning("Rejected cloud user settings document change", {
-      userId: user.id,
-    });
-
-    return c.json({ error: "trizum cloud is already set up for this account." }, 409);
-  }
-
-  logger.info("Saved cloud user settings", {
-    userId: user.id,
-  });
-
-  return c.json({
-    settings: storedSettings,
-  });
-});
-
-function parseCloudUserSettingsInput(value: unknown):
-  | {
-      ok: true;
-      value: Omit<CloudUserSettings, "updatedAt">;
-    }
-  | {
-      error: string;
-      ok: false;
-    } {
-  if (!value || typeof value !== "object") {
-    return { error: "Expected a settings object.", ok: false };
-  }
-
-  const candidate = value as Record<string, unknown>;
-
-  if (
-    typeof candidate.partyListDocumentId !== "string" ||
-    !isValidDocumentId(candidate.partyListDocumentId)
-  ) {
-    return { error: "Party list document ID is invalid.", ok: false };
-  }
-
-  return {
-    ok: true,
-    value: {
-      partyListDocumentId: candidate.partyListDocumentId,
+      return c.json(saveCloudUserSettingsResponseSchema.parse({ settings: storedSettings }), 200);
     },
-  };
-}
+    (result, c) => {
+      if (!result.success) {
+        return c.req.json<unknown>().then((body) => {
+          const isObject = body !== null && typeof body === "object";
+          return c.json(
+            {
+              error: isObject
+                ? "Party list document ID is invalid."
+                : "Expected a settings object.",
+            },
+            400,
+          );
+        });
+      }
+    },
+  );
+
+export type CloudSyncRoute = typeof cloudSyncRoute;

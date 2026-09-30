@@ -1,46 +1,12 @@
-import type { CurrencyCode } from "#src/lib/money.ts";
+import type { z } from "zod";
+import type {
+  migrationDataSchema,
+  migrationExpenseSchema,
+  migrationExpenseShareSchema,
+  migrationParticipantSchema,
+} from "#src/lib/api/migrationContract.ts";
 
-export interface MigrationData {
-  party: {
-    currency: CurrencyCode;
-    description: string;
-    name: string;
-    participants: Record<string, MigrationParticipant>;
-    symbol?: string;
-    type: "party";
-  };
-  expenses: MigrationExpense[];
-  photos: { id: string; url: string }[];
-}
-
-export interface MigrationParticipant {
-  avatarId?: string | null;
-  balancesSortedBy?: "name" | "balance-ascending" | "balance-descending";
-  id: string;
-  isArchived?: boolean;
-  name: string;
-  personalMode?: boolean;
-  phone?: string;
-}
-
-export interface MigrationExpense {
-  __editCopy?: undefined;
-  __editCopyLastUpdatedAt?: undefined;
-  isTransfer?: boolean;
-  name: string;
-  paidAt: string;
-  paidBy: Record<string, number>;
-  photos: string[];
-  shares: Record<string, MigrationExpenseShare>;
-}
-
-export type MigrationExpenseShare =
-  | {
-      type: "divide";
-      value: number;
-      calculatedExact?: number;
-    }
-  | {
-      type: "exact";
-      value: number;
-    };
+export type MigrationData = z.infer<typeof migrationDataSchema>;
+export type MigrationParticipant = z.infer<typeof migrationParticipantSchema>;
+export type MigrationExpense = z.infer<typeof migrationExpenseSchema>;
+export type MigrationExpenseShare = z.infer<typeof migrationExpenseShareSchema>;

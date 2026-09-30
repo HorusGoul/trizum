@@ -3968,6 +3968,10 @@ msgstr "Transfer debt"
 msgid "Transfer to another party"
 msgstr "Transfer to another party"
 
+#: src/routes/migrate_.tricount/route.tsx:83
+msgid "Tricount import returned an invalid response."
+msgstr "Tricount import returned an invalid response."
+
 #: src/routes/migrate_.tricount.tsx:218
 msgid "Tricount key"
 msgstr "Tricount key"
