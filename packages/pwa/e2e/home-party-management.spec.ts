@@ -251,3 +251,20 @@ function createNamedPartyFixture(name: string, description: string) {
     photos: [],
   };
 }
+
+test("Premium returns take priority over opening the last party on launch", async ({
+  harness,
+  page,
+}) => {
+  await page.route("**/api/auth/get-session**", (route) => route.fulfill({ json: null }));
+  const { partyId } = await harness.seedJoinedParty({
+    fixture: createNamedPartyFixture("Premium return party", "Launch shortcut"),
+    memberParticipantId: defaultParticipants.alex.id,
+    openLastPartyOnLaunch: true,
+  });
+  await harness.goto("/?premium=true");
+  await expect(page.getByRole("link", { name: "Premium return party", exact: true })).toBeVisible();
+  await expect(page).toHaveURL((url) => url.pathname === "/" && !url.searchParams.has("premium"));
+  await harness.goto("/");
+  await expect(page).toHaveURL((url) => url.pathname === `/party/${partyId}`);
+});

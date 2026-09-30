@@ -14,6 +14,7 @@ export interface PartyList {
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
   autoOpenCalculator?: boolean;
+  premiumBannerDismissed?: boolean;
   hue?: number;
   lastOpenedPartyId?: DocumentId | null;
   parties: Record<Party["id"], true | undefined>;
