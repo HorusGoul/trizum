@@ -1,6 +1,8 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 import { getLogger } from "#src/lib/log.ts";
+import type { Party } from "#src/models/party.ts";
+import { getBalanceCalculationDependencies } from "./balanceCalculationSync.ts";
 import { WorkerAdapter } from "./WorkerAdapter.ts";
 import { injectAppWorker, type AppWorkerApi } from "./proxy.ts";
 
@@ -19,8 +21,6 @@ interface AppWorkerClient {
   worker: Worker;
 }
 
-type AppWorkerClientApi = Omit<AppWorkerApi, "initialize">;
-
 export const APP_WORKER_FULL_RESTART_REQUIRED_EVENT = "trizum:app-worker-full-restart-required";
 
 export interface AppWorkerFullRestartRequiredEventDetail {
@@ -32,25 +32,15 @@ let appWorkerClient: AppWorkerClient | null = null;
 let appWorkerOptions: InitializeAppWorkerOptions | null = null;
 let isFullAppRestartRequired = false;
 
-export const appWorker = new Proxy({} as AppWorkerClientApi, {
-  get(_target, property) {
-    if (typeof property !== "string" || property === "then") {
-      return undefined;
-    }
-
-    return (...args: unknown[]) => {
-      return callAppWorker(property, (api) => {
-        const method = api[property as keyof AppWorkerClientApi];
-
-        if (typeof method !== "function") {
-          throw new Error(`App worker method ${property} is not available`);
-        }
-
-        return (method as (...args: unknown[]) => Promise<unknown>).apply(api, args);
-      });
-    };
+export const appWorker = {
+  async recalculateBalances(partyId: Party["id"]) {
+    const { repo } = requireAppWorkerOptions();
+    const dependencies = await getBalanceCalculationDependencies(repo, partyId);
+    return callAppWorker("recalculateBalances", (api) =>
+      api.recalculateBalances(partyId, dependencies),
+    );
   },
-});
+};
 
 export function initializeAppWorker(options: InitializeAppWorkerOptions) {
   appWorkerOptions = options;
