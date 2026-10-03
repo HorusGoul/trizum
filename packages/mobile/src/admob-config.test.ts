@@ -43,7 +43,7 @@ describe("AdMob release configuration", () => {
     expect(adUnitIds.size).toBe(8);
   });
 
-  test("selects live ad units only in production and registered-device review workflows", async () => {
+  test("gates production ads and always uses test ad units for testing workflows", async () => {
     const [mobileBuild, release, androidStore, iosStore, androidReview, iosReview] =
       await Promise.all([
         readWorkflow("mobile-build.yml"),
@@ -57,11 +57,13 @@ describe("AdMob release configuration", () => {
     expect(mobileBuild).toContain("default: false");
     expect(mobileBuild).toContain("TRIZUM_LIVE_ADS: ${{ inputs.live_ads");
     expect(release).toContain("live_ads: ${{ vars.TRIZUM_LIVE_ADS_ENABLED == 'true' }}");
-    expect(androidStore).toContain("vars.TRIZUM_LIVE_ADS_ENABLED == 'true'");
+    expect(androidStore).toContain(
+      "inputs.track == 'production' && vars.TRIZUM_LIVE_ADS_ENABLED == 'true'",
+    );
     expect(iosStore).toContain("vars.TRIZUM_LIVE_ADS_ENABLED == 'true'");
-    expect(androidReview).toContain('TRIZUM_LIVE_ADS: "true"');
+    expect(androidReview).toContain('TRIZUM_LIVE_ADS: "false"');
     expect(androidReview).toContain('VITE_APP_AD_TEST_MODE: "true"');
-    expect(iosReview).toContain('TRIZUM_LIVE_ADS: "true"');
+    expect(iosReview).toContain('TRIZUM_LIVE_ADS: "false"');
     expect(iosReview).toContain('VITE_APP_AD_TEST_MODE: "true"');
   });
 });

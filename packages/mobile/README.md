@@ -358,11 +358,13 @@ The browser app and installed PWA never initialize AdMob.
 The trizum app IDs and test/live ad-unit IDs are public configuration in
 `admob.config.json`. Builds always use trizum's app IDs so UMP resolves the
 published consent message, and use Google's test ad-unit IDs unless
-`TRIZUM_LIVE_ADS=true` is explicitly set. Production App Store, Google Play,
-and signed GitHub Release APK workflows can select live ad-unit IDs only while
-the `TRIZUM_LIVE_ADS_ENABLED` repository variable is `true`; it must remain
-disabled until the live-ad release gate is complete. A selected platform's
-build fails when its chosen app ID or ad-unit ID is missing.
+`TRIZUM_LIVE_ADS=true` is explicitly set. Set the `TRIZUM_LIVE_ADS_ENABLED`
+repository variable to `true` for production App Store, Google Play, and signed
+GitHub Release APK builds. TestFlight PR builds, Android internal-testing PR
+builds, and non-production Play Store tracks use test ad-unit IDs regardless of
+that variable. Ad-unit selection happens at build time: rebuild for production
+instead of promoting a test-ad binary unchanged. A selected platform's build
+fails when its chosen app ID or ad-unit ID is missing.
 
 The PWA-side entitlement defaults to `unknown`, which suppresses SDK loading and
 all ads. `PremiumProvider` supplies `AdEntitlementContext` with an explicit
@@ -381,6 +383,22 @@ Firebase enrichment, user-insight surveys, publisher-provided user IDs, and
 content mapping.
 
 ### RevenueCat configuration
+
+Ads and billing are optional capabilities, including for sideloaded Android APKs
+on systems such as GrapheneOS. Do not gate app startup, navigation, expense
+storage, or sync on either SDK, and do not disable ads solely because Play
+billing is unavailable. Attempt ads only after consent permits them and the
+account is known to be ad-supported; an unknown entitlement must still suppress
+ads to protect existing Premium customers. Failed or blocked ad requests are
+skipped without waiting in the expense-save flow.
+
+Google Play purchases require a working Play Store setup. GrapheneOS users can
+optionally install sandboxed Google Play in the app's profile; absence of that
+setup must leave the rest of trizum usable. The paywall stays dismissible during
+store requests. Dismissal does not cancel a store transaction, so purchase and
+restore controls remain busy until it settles, including after reopening. Late
+results must not close a newer paywall or update another account; the Premium
+provider continues listening for entitlement updates independently.
 
 The native apps use `@revenuecat/purchases-capacitor` for offerings, purchases,
 restores, and entitlement state. The paywall itself is shared React UI so it
