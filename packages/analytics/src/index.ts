@@ -11,6 +11,8 @@ export interface AnalyticsOptions {
   siteId: string;
   hostname: string;
   routes: readonly string[];
+  /** Native custom-scheme origins may need a simple POST with an opaque response. */
+  collectionMode?: "cors" | "no-cors";
   /** Rechecked at collection time, including after asynchronous bootstrap. */
   canCollect: () => boolean;
   fetch?: typeof globalThis.fetch;
@@ -68,13 +70,19 @@ export function createAnalytics(options: AnalyticsOptions) {
       if (signal.aborted || !allowed()) return;
       const response = await fetch(collectUrl, {
         method: "POST",
+        mode: options.collectionMode ?? "cors",
         credentials: "omit",
         referrerPolicy: "no-referrer",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": options.collectionMode === "no-cors" ? "text/plain" : "application/json",
+        },
         signal: requestSignal,
         body: JSON.stringify({ ...payload, collectToken: token.value }),
       });
-      if (!response.ok) token = undefined;
+      // An opaque response exposes no status; it is not proof of ingestion.
+      if (!response.ok && !(options.collectionMode === "no-cors" && response.type === "opaque")) {
+        token = undefined;
+      }
     } catch {
       // Offline, ad blockers and server errors must never affect app actions.
       token = undefined;

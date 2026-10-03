@@ -21,6 +21,7 @@ export function initializeAnalytics(routes: readonly string[]) {
       siteId: "9cf3da44-3ae9-478d-95aa-7015e864557e",
       hostname: "trizum.app",
       routes,
+      collectionMode: Capacitor.getPlatform() === "ios" ? "no-cors" : "cors",
       canCollect: () => !hasPrivacySignal(navigator) && navigator.onLine,
     });
   } catch {

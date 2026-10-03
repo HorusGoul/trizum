@@ -40,6 +40,14 @@ executed. Tokens are held in memory for at most five minutes, and failed request
 invalidate them. The queue is bounded to 20 events, with five-second request
 limits. Tracking never delays application actions.
 
+iOS uses a simple `text/plain` JSON POST in `no-cors` mode because the collector
+reflects `capacitor://localhost` as `null` in its CORS headers. InsightFlare parses
+the JSON body independently of its content type. Bootstrap stays readable through
+its wildcard CORS response. Collection responses on iOS are opaque: HTTP failures
+cannot be distinguished from acceptance, and delivery is not acknowledged. The
+same credentials, referrer, abort, privacy, and five-minute token rules apply;
+there are no fallback retries. Web and Android retain readable CORS responses.
+
 This intentionally depends on InsightFlare's current internal bootstrap/collector
 contract, rather than its public `window.insightflare` API. An incompatible
 bootstrap change stops tracking; it never falls back to running the remote SDK.

@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vite-plus/test";
-import { createAnalytics, hasPrivacySignal, type AnalyticsEvent } from "./index.js";
+import {
+  createAnalytics,
+  hasPrivacySignal,
+  type AnalyticsEvent,
+  type AnalyticsOptions,
+} from "./index.js";
 import { redactPathname } from "./privacy.js";
 import { readCollectToken } from "./insightflare.js";
 
@@ -17,7 +22,7 @@ const bootstrap = (site = siteId) =>
   JSON.stringify({ siteId: site, collectToken: "test.token.signature", ignoreDoNotTrack: true }) +
   ';\nthrow new Error("This code must never execute");';
 
-function harness() {
+function harness(collectionMode: AnalyticsOptions["collectionMode"] = "cors") {
   const fetch = vi.fn<typeof globalThis.fetch>(async (_url, init) =>
     init?.method === "POST" ? new Response(null, { status: 204 }) : new Response(bootstrap()),
   );
@@ -27,6 +32,7 @@ function harness() {
     endpoint: "https://analytics.example",
     hostname: "trizum.app",
     routes,
+    collectionMode,
     fetch,
     canCollect,
   });
@@ -79,6 +85,39 @@ describe("privacy boundary", () => {
 });
 
 describe("analytics collection", () => {
+  it("uses a simple credential-free POST for native custom-scheme origins", async () => {
+    const { client, fetch, payloads } = harness("no-cors");
+    fetch.mockImplementation(async (_url, init) => {
+      if (init?.method !== "POST") return new Response(bootstrap());
+      return new Proxy(new Response(), {
+        get(target, property, receiver) {
+          if (property === "type") return "opaque";
+          if (property === "ok") return false;
+          if (property === "status") return 0;
+          return Reflect.get(target, property, receiver);
+        },
+      });
+    });
+    client.setEnabled(true);
+    client.page(`/party/${documentId}`);
+    client.track("party_created");
+    await client.flush();
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(payloads()).toHaveLength(2);
+    expect(payloads()[1]).toMatchObject({
+      pathname: "/party/:redacted",
+      eventName: "party_created",
+      eventData: {},
+    });
+    for (const [url, init] of fetch.mock.calls.filter(([, init]) => init?.method === "POST")) {
+      const request = new Request(url, init);
+      expect(request.mode).toBe("no-cors");
+      expect(request.headers.get("content-type")).toBe("text/plain");
+      expect(request.credentials).toBe("omit");
+      expect(request.referrerPolicy).toBe("no-referrer");
+    }
+  });
+
   it("collects on WebViews without AbortSignal static helpers", async () => {
     vi.stubGlobal("AbortSignal", {});
     try {
@@ -202,6 +241,20 @@ describe("analytics collection", () => {
     });
   });
 
+  it("establishes a visit after an offline cold launch", async () => {
+    const { client, canCollect, payloads } = harness();
+    canCollect.mockReturnValue(false);
+    client.page("/settings");
+    client.track("settings_saved");
+    canCollect.mockReturnValue(true);
+    client.setEnabled(true);
+    client.page("/settings");
+    client.track("settings_saved");
+    await client.flush();
+    expect(payloads().map((payload) => payload.kind)).toEqual(["pageview", "custom_event"]);
+    expect(payloads()[1]).toMatchObject({ pathname: "/settings", eventName: "settings_saved" });
+  });
+
   it("rechecks privacy signals before bootstrap and collection", async () => {
     const { client, canCollect, fetch, payloads } = harness();
     client.setEnabled(true);
@@ -219,29 +272,32 @@ describe("analytics collection", () => {
     expect(payloads()).toHaveLength(0);
   });
 
-  it("aborts pending bootstrap and discards queued events on opt-out", async () => {
-    const { client, fetch, payloads } = harness();
-    let resolve!: (response: Response) => void;
-    fetch.mockImplementationOnce(
-      () =>
-        new Promise((done) => {
-          resolve = done;
-        }),
-    );
-    client.setEnabled(true);
-    client.page("/");
-    client.track("party_created");
-    await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-    client.setEnabled(false);
-    expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
-    resolve(new Response(bootstrap()));
-    await client.flush();
-    expect(payloads()).toHaveLength(0);
-    client.setEnabled(true);
-    client.page("/settings");
-    await client.flush();
-    expect(payloads()).toHaveLength(1);
-  });
+  it.each(["cors", "no-cors"] as const)(
+    "aborts pending bootstrap and discards queued %s events on opt-out",
+    async (mode) => {
+      const { client, fetch, payloads } = harness(mode);
+      let resolve!: (response: Response) => void;
+      fetch.mockImplementationOnce(
+        () =>
+          new Promise((done) => {
+            resolve = done;
+          }),
+      );
+      client.setEnabled(true);
+      client.page("/");
+      client.track("party_created");
+      await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+      client.setEnabled(false);
+      expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+      resolve(new Response(bootstrap()));
+      await client.flush();
+      expect(payloads()).toHaveLength(0);
+      client.setEnabled(true);
+      client.page("/settings");
+      await client.flush();
+      expect(payloads()).toHaveLength(1);
+    },
+  );
 
   it.each(["network", "http", "format"])("fails closed on %s failures", async (failure) => {
     const { client, fetch, payloads } = harness();
