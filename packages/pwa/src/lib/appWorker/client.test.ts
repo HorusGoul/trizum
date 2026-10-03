@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
+import { from, getHeads } from "@automerge/automerge";
 import type { Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "#src/models/party.ts";
-import type { AppWorkerInitializeOptions } from "./proxy.ts";
+import type { AppWorkerApi, AppWorkerInitializeOptions } from "./proxy.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
-type RecalculateBalances = (partyId: Party["id"]) => Promise<boolean>;
+type RecalculateBalances = AppWorkerApi["recalculateBalances"];
 type DispatchEvent = (event: Event) => boolean;
 
 const proxyMock = vi.hoisted(() => {
@@ -82,7 +83,7 @@ describe("app worker client", () => {
     });
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
-    const { repo, networkSubsystem } = createRepoMock();
+    const { repo, networkSubsystem, dependencies } = createRepoMock();
     const { appWorker, initializeAppWorker } = await import("./client.ts");
 
     await initializeAppWorker({
@@ -92,8 +93,8 @@ describe("app worker client", () => {
     });
 
     await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
-    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId);
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
+    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId, dependencies);
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId, dependencies);
     expect(secondApi.initialize).toHaveBeenCalledWith(
       expect.objectContaining({
         wssUrl: "wss://sync.example.test",
@@ -132,7 +133,7 @@ describe("app worker client", () => {
     });
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
-    const { repo, networkSubsystem } = createRepoMock();
+    const { repo, networkSubsystem, dependencies } = createRepoMock();
     const { appWorker, initializeAppWorker } = await import("./client.ts");
 
     await expect(
@@ -145,7 +146,7 @@ describe("app worker client", () => {
 
     await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).not.toHaveBeenCalled();
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId, dependencies);
     expect(TestWorker.instances).toHaveLength(2);
     expect(TestWorker.instances[0]?.terminate).toHaveBeenCalledOnce();
     expect(networkSubsystem.addNetworkAdapter).toHaveBeenCalledTimes(2);
@@ -160,7 +161,7 @@ describe("app worker client", () => {
       recalculateBalances: () => Promise.reject(new Error("worker still failed")),
     });
     proxyMock.workerApis.push(firstApi, secondApi);
-    const { repo, networkSubsystem } = createRepoMock();
+    const { repo, networkSubsystem, dependencies } = createRepoMock();
     const { APP_WORKER_FULL_RESTART_REQUIRED_EVENT, appWorker, initializeAppWorker } =
       await import("./client.ts");
 
@@ -172,8 +173,8 @@ describe("app worker client", () => {
 
     await expect(appWorker.recalculateBalances(partyId)).rejects.toThrow("worker still failed");
 
-    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId);
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
+    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId, dependencies);
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId, dependencies);
     expect(TestWorker.instances).toHaveLength(2);
     expect(TestWorker.instances[0]?.terminate).toHaveBeenCalledOnce();
     expect(TestWorker.instances[1]?.terminate).toHaveBeenCalledOnce();
@@ -215,15 +216,19 @@ function createWorkerApiMock({
 }
 
 function createRepoMock() {
+  const doc = from({ chunkRefs: [] });
+  const dependencies = [{ documentId: "party-id", heads: getHeads(doc) }];
   const networkSubsystem = {
     addNetworkAdapter: vi.fn<(adapter: unknown) => void>(),
     removeNetworkAdapter: vi.fn<(adapter: unknown) => void>(),
   };
 
   return {
+    dependencies,
     networkSubsystem,
     repo: {
       networkSubsystem,
+      find: vi.fn<() => Promise<{ doc: () => typeof doc }>>().mockResolvedValue({ doc: () => doc }),
     } as unknown as Repo,
   };
 }
