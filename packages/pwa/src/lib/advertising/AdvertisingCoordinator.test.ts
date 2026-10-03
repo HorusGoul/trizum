@@ -97,6 +97,52 @@ function createHarness({
 }
 
 describe("AdvertisingCoordinator", () => {
+  it.each(["requestConsentInfo", "initialize"] as const)(
+    "skips ads when %s fails without rejecting the app's background setup",
+    async (operation) => {
+      const harness = createHarness();
+      vi.mocked(harness.sdk[operation]).mockRejectedValue(new Error("Service unavailable"));
+
+      await expect(harness.coordinator.setEntitlement("adSupported")).resolves.toBeUndefined();
+
+      expect(harness.coordinator.presentInterstitialOpportunity()).toBe(false);
+      expect(harness.sdk.prepareInterstitial).not.toHaveBeenCalled();
+      expect(harness.sdk.showInterstitial).not.toHaveBeenCalled();
+      expect(harness.sdk.showAppOpen).not.toHaveBeenCalled();
+    },
+  );
+
+  it("skips blocked ad loads and recovers when a later opportunity can load", async () => {
+    const harness = createHarness();
+    vi.mocked(harness.sdk.prepareInterstitial).mockRejectedValueOnce(new Error("Blocked"));
+    vi.mocked(harness.sdk.loadAppOpen).mockRejectedValueOnce(new Error("Blocked"));
+
+    await expect(harness.coordinator.setEntitlement("adSupported")).resolves.toBeUndefined();
+    expect(harness.coordinator.presentInterstitialOpportunity()).toBe(false);
+    expect(harness.sdk.showInterstitial).not.toHaveBeenCalled();
+    expect(harness.sdk.showAppOpen).not.toHaveBeenCalled();
+
+    await vi.waitFor(() => expect(harness.sdk.prepareInterstitial).toHaveBeenCalledTimes(2));
+    expect(harness.coordinator.presentInterstitialOpportunity()).toBe(true);
+    expect(harness.sdk.showInterstitial).toHaveBeenCalledOnce();
+  });
+
+  it("returns immediately from an ad opportunity while a blocked load never responds", async () => {
+    const harness = createHarness();
+    vi.mocked(harness.sdk.prepareInterstitial).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(harness.sdk.loadAppOpen).mockImplementation(() => new Promise(() => {}));
+    void harness.coordinator.setEntitlement("adSupported");
+    await vi.waitFor(() => expect(harness.sdk.prepareInterstitial).toHaveBeenCalledOnce());
+    harness.coordinator.markInteractive();
+
+    expect(harness.coordinator.presentInterstitialOpportunity()).toBe(false);
+    expect(harness.coordinator.presentInterstitialOpportunity()).toBe(false);
+    expect(harness.sdk.prepareInterstitial).toHaveBeenCalledOnce();
+    expect(harness.sdk.showInterstitial).not.toHaveBeenCalled();
+    expect(harness.sdk.showAppOpen).not.toHaveBeenCalled();
+    await harness.coordinator.destroy();
+  });
+
   it("does not load the SDK for unknown or ad-free entitlements", async () => {
     const harness = createHarness();
 

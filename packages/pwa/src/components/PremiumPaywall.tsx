@@ -1,12 +1,13 @@
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, Modal, ModalOverlay, Radio, RadioGroup } from "react-aria-components";
 import { toast } from "sonner";
 import { getAppLink } from "#src/lib/link.ts";
 import {
   loadPremiumOffering,
   type PremiumEntitlementState,
+  type PremiumOffering,
   type PremiumPlan,
   type PremiumPlanId,
   purchasePremiumPlan,
@@ -45,10 +46,16 @@ export function PremiumPaywall({
     status: "loading",
   });
   const [selectedPlanId, setSelectedPlanId] = useState<PremiumPlanId | null>(null);
-  const [activeAction, setActiveAction] = useState<"purchase" | "restore" | "redeem" | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showRedemption, setShowRedemption] = useState(false);
   const [redemptionCode, setRedemptionCode] = useState("");
+  const { activeAction, setActiveAction, close, purchase, restore } = usePremiumPaywallActions({
+    isOpen,
+    onEntitlementChange,
+    onOpenChange,
+    sessionId,
+    userId,
+  });
 
   useEffect(() => {
     if (!isOpen) {
@@ -84,51 +91,6 @@ export function PremiumPaywall({
       ? currentLoadState.offering.plans.find(({ id }) => id === selectedPlanId)
       : undefined;
 
-  async function purchase() {
-    if (!userId || activeAction !== null || !selectedPlan || currentLoadState.status !== "ready") {
-      return;
-    }
-
-    setActiveAction("purchase");
-    try {
-      const result = await purchasePremiumPlan(userId, currentLoadState.offering, selectedPlan.id);
-      if (result.status !== "cancelled") {
-        onEntitlementChange(result.entitlement);
-        if (result.entitlement.isPremium) {
-          toast.success(t`Premium is now active.`);
-          onOpenChange(false);
-        } else {
-          toast.error(t`Your purchase is still syncing. Try restoring it in a moment.`);
-        }
-      }
-    } catch {
-      toast.error(t`Premium could not be purchased. Please try again.`);
-    }
-    setActiveAction(null);
-  }
-
-  async function restore() {
-    if (!userId || activeAction !== null) {
-      return;
-    }
-
-    setActiveAction("restore");
-    try {
-      const entitlement = await restorePremiumPurchases(userId);
-      onEntitlementChange(entitlement);
-
-      if (entitlement.isPremium) {
-        toast.success(t`Premium purchases restored.`);
-        onOpenChange(false);
-      } else {
-        toast.error(t`No Premium purchase was found for this account.`);
-      }
-    } catch {
-      toast.error(t`Purchases could not be restored. Please try again.`);
-    }
-    setActiveAction(null);
-  }
-
   function retryLoading() {
     setLoadState({ loadKey, status: "loading" });
     setLoadAttempt((attempt) => attempt + 1);
@@ -136,12 +98,11 @@ export function PremiumPaywall({
 
   return (
     <ModalOverlay
-      isDismissable={activeAction === null}
-      isKeyboardDismissDisabled={activeAction !== null}
+      isDismissable
       isOpen={isOpen}
       onOpenChange={(open) => {
-        if (!open && activeAction === null) {
-          onOpenChange(false);
+        if (!open) {
+          close();
         }
       }}
       className={({ isEntering, isExiting }) =>
@@ -170,8 +131,7 @@ export function PremiumPaywall({
             className="right-safe-offset-3 top-safe-offset-3 text-accent-700 dark:text-accent-200 absolute z-10 sm:top-3 sm:right-3"
             icon="lucide.x"
             iconClassName="size-5"
-            isDisabled={activeAction !== null}
-            onPress={() => onOpenChange(false)}
+            onPress={close}
           />
 
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -248,7 +208,11 @@ export function PremiumPaywall({
                       color="accent"
                       isDisabled={!userId || !selectedPlan || activeAction !== null}
                       isPending={activeAction === "purchase"}
-                      pressAction={purchase}
+                      pressAction={() => {
+                        if (currentLoadState.status === "ready" && selectedPlan) {
+                          return purchase(currentLoadState.offering, selectedPlan.id);
+                        }
+                      }}
                       type="button"
                     >
                       {selectedPlan?.trial ? (
@@ -454,6 +418,86 @@ function PremiumRenewalDisclosure({ plan }: { plan: PremiumPlan | undefined }) {
       <Trans>{price} is charged automatically until canceled.</Trans>
     </p>
   );
+}
+
+function usePremiumPaywallActions({
+  isOpen,
+  onEntitlementChange,
+  onOpenChange,
+  sessionId,
+  userId,
+}: PremiumPaywallProps) {
+  const [activeAction, setActiveAction] = useState<"purchase" | "restore" | "redeem" | null>(null);
+  const sessionRef = useRef({ active: isOpen });
+
+  useEffect(() => {
+    const session = { active: isOpen };
+    sessionRef.current = session;
+    return () => {
+      session.active = false;
+    };
+  }, [isOpen, sessionId, userId]);
+
+  function close() {
+    // Dismissal does not cancel a native store transaction. Keep activeAction until
+    // it settles to prevent duplicates; the provider still receives SDK updates.
+    sessionRef.current.active = false;
+    onOpenChange(false);
+  }
+
+  async function purchase(offering: PremiumOffering, planId: PremiumPlanId) {
+    if (!userId || activeAction !== null) {
+      return;
+    }
+
+    const session = sessionRef.current;
+    setActiveAction("purchase");
+    try {
+      const result = await purchasePremiumPlan(userId, offering, planId);
+      if (session.active && result.status !== "cancelled") {
+        onEntitlementChange(result.entitlement);
+        if (result.entitlement.isPremium) {
+          toast.success(t`Premium is now active.`);
+          close();
+        } else {
+          toast.error(t`Your purchase is still syncing. Try restoring it in a moment.`);
+        }
+      }
+    } catch {
+      if (session.active) {
+        toast.error(t`Premium could not be purchased. Please try again.`);
+      }
+    }
+    setActiveAction(null);
+  }
+
+  async function restore() {
+    if (!userId || activeAction !== null) {
+      return;
+    }
+
+    const session = sessionRef.current;
+    setActiveAction("restore");
+    try {
+      const entitlement = await restorePremiumPurchases(userId);
+      if (session.active) {
+        onEntitlementChange(entitlement);
+        if (entitlement.isPremium) {
+          toast.success(t`Premium purchases restored.`);
+          close();
+        } else {
+          toast.error(t`No Premium purchase was found for this account.`);
+        }
+      }
+    } catch {
+      if (session.active) {
+        toast.error(t`Purchases could not be restored. Please try again.`);
+      }
+    }
+    setActiveAction(null);
+  }
+
+  return { activeAction, setActiveAction, close, purchase, restore };
 }
 
 function PremiumPlansSkeleton() {
