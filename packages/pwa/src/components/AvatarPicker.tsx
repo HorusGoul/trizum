@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { Avatar } from "#src/ui/Avatar.js";
@@ -66,6 +67,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
 
       // Pass the media file ID directly
       onChange(mediaFileId);
+      trackEvent("avatar_selected");
 
       toast.dismiss(toastId);
       toast.success(t`Avatar updated successfully`);
@@ -92,6 +94,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
 
   function handleRemoveAvatar() {
     onChange(null);
+    trackEvent("avatar_removed");
     toast.success(t`Avatar removed`);
   }
 

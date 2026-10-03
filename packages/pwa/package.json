@@ -45,6 +45,7 @@
     "@takker/md5": "jsr:^0.1.0",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-router": "catalog:",
+    "@trizum/analytics": "workspace:*",
     "@trizum/logging": "workspace:*",
     "@trizum/react-suspense-cache": "workspace:*",
     "@trizum/revenuecat-api": "workspace:*",

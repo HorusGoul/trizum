@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -377,6 +378,7 @@ function useTransferDebtRouteView() {
         destinationExpenseName: t`Debt transfer from another party`,
       });
 
+      trackEvent("debt_transferred");
       dispatch({ type: "submitSucceeded" });
       scheduleSuccessRedirect(originExpense.id);
     } catch {

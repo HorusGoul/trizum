@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -52,6 +53,7 @@ function useMigrateTricount() {
   const repo = useRepo();
 
   async function migrate({ key, importAttachments }: MigrateParams) {
+    trackEvent("tricount_import_started");
     setState({
       type: "in-progress",
       name: t`Importing Tricount data...`,
@@ -74,8 +76,10 @@ function useMigrateTricount() {
         },
       });
 
+      trackEvent("tricount_import_completed");
       setState({ type: "success", partyId });
     } catch (error) {
+      trackEvent("tricount_import_failed");
       setState({
         type: "error",
         message:

@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { usePartyList } from "#src/hooks/usePartyList.js";
 import { DEFAULT_PARTY_SYMBOL, type Party, type PartyParticipant } from "#src/models/party.js";
@@ -57,6 +58,7 @@ function New() {
       chunkRefs: [],
     });
     handle.change((doc) => (doc.id = handle.documentId));
+    trackEvent("party_created");
     void navigate({
       to: "/party/$partyId",
       params: { partyId: handle.documentId },

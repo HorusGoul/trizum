@@ -228,6 +228,12 @@ export function usePartyList() {
     });
   }
 
+  function setUsageAnalyticsEnabled(value: boolean) {
+    partyListHandle.change((list) => {
+      list.usageAnalyticsEnabled = value;
+    });
+  }
+
   return {
     partyList,
     addPartyToList,
@@ -237,6 +243,7 @@ export function usePartyList() {
     setPartyPinned,
     setPartyArchived,
     setAutoOpenCalculator,
+    setUsageAnalyticsEnabled,
     dismissPremiumBanner,
   };
 }

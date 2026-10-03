@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
@@ -122,6 +123,8 @@ function AddExpense() {
         photos: values.photos,
       });
 
+      trackEvent("expense_created");
+      if (initialExpense.isPrefilled) trackEvent("expense_template_used");
       await navigate({
         to: "/party/$partyId/expense/$expenseId",
         replace: true,

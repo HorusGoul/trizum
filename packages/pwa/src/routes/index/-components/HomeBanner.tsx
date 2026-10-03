@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useEffect, useEffectEvent } from "react";
@@ -77,7 +78,10 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
               <IconButton
                 icon="lucide.x"
                 aria-label={t`Dismiss Premium banner`}
-                onPress={dismissPremiumBanner}
+                onPress={() => {
+                  dismissPremiumBanner();
+                  trackEvent("premium_banner_dismissed");
+                }}
                 isDisabled={dialogs.dialog.kind !== "closed"}
                 className="text-accent-600 dark:text-accent-400 mt-2 mr-2 shrink-0"
                 iconClassName="size-5"

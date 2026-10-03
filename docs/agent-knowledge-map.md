@@ -41,6 +41,12 @@ Until the repo has formal code ownership, the maintainer who changes one of
 these surfaces in a PR is responsible for keeping its adjacent agent-facing docs
 current.
 
+The analytics privacy boundary, event allowlist, and InsightFlare transport contract
+are documented in [`packages/analytics/README.md`](../packages/analytics/README.md).
+Use [the analytics-events skill](../.agents/skills/analytics-events/SKILL.md) when
+adding or changing product flows; approved names and trigger meanings live in
+[`packages/analytics/src/events.ts`](../packages/analytics/src/events.ts).
+
 ## What Belongs Where
 
 ### Root `AGENTS.md`

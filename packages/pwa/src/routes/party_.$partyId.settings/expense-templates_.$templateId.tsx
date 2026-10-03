@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { msg, t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm, useStore } from "@tanstack/react-form";
@@ -172,6 +173,7 @@ function ExpenseTemplateEditor() {
 
         throw error;
       }
+      trackEvent(isNew ? "expense_template_created" : "expense_template_updated");
       form.reset(value);
       toast.success(isNew ? t`Expense template created` : t`Expense template saved`);
       returnToTemplates();
@@ -216,6 +218,7 @@ function ExpenseTemplateEditor() {
     }
 
     deleteExpenseTemplate(template.id);
+    trackEvent("expense_template_deleted");
     setIsDeleteSheetOpen(false);
     toast.success(t`Expense template deleted`);
     returnToTemplates();

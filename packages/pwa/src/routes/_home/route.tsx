@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
@@ -258,6 +259,7 @@ function togglePartyPinned(
 ) {
   const currentlyPinned = isPartyPinned(partyList, partyId);
   setPartyPinned(partyId, !currentlyPinned);
+  trackEvent(currentlyPinned ? "party_unpinned" : "party_pinned");
   toast.success(currentlyPinned ? t`Party unpinned` : t`Party pinned`);
 }
 
@@ -266,5 +268,6 @@ function archiveParty(
   setPartyArchived: ReturnType<typeof usePartyList>["setPartyArchived"],
 ) {
   setPartyArchived(partyId, true);
+  trackEvent("party_archived");
   toast.success(t`Party archived`);
 }

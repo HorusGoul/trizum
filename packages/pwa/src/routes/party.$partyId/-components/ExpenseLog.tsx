@@ -72,6 +72,11 @@ export function ExpenseLog() {
     setParticipantDetails(participant.id, {
       alwaysUseDefaultExpenseTemplate: !participant.alwaysUseDefaultExpenseTemplate,
     });
+    trackEvent(
+      participant.alwaysUseDefaultExpenseTemplate
+        ? "expense_template_shortcut_disabled"
+        : "expense_template_shortcut_enabled",
+    );
   }
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -250,3 +255,4 @@ function ExpenseTemplateSheetAction({
     </AriaButton>
   );
 }
+import { trackEvent } from "#src/lib/analytics.ts";

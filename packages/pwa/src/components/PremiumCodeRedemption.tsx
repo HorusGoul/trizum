@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useOnlineStatus } from "#src/hooks/useOnlineStatus.ts";
@@ -43,6 +44,7 @@ export function PremiumCodeRedemption({
 
   async function redeem() {
     onBusyChange?.(true);
+    trackEvent("premium_redemption_requested");
     await openPremiumCodeRedemption(userId, code)
       .catch(() => {
         toast.error(t`Code redemption could not be opened. Please try again.`);
@@ -53,6 +55,7 @@ export function PremiumCodeRedemption({
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(code.trim());
+      trackEvent("premium_code_copied");
       toast.success(t`Code copied.`);
     } catch {
       toast.error(t`Could not copy the code. Select and copy it from the field above.`);

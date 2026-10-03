@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import type { ReactNode } from "react";
 import { Button } from "#src/ui/Button.tsx";
 import { getStoreRedemptionUrl } from "#src/lib/premium/premiumRedemption.ts";
@@ -42,7 +43,11 @@ export function StoreRedemptionAction({
       aria-disabled={isDisabled || undefined}
       href={getStoreRedemptionUrl(platform, code)}
       onClick={(event) => {
-        if (isDisabled || !checkRedemptionConnection()) event.preventDefault();
+        if (isDisabled || !checkRedemptionConnection()) {
+          event.preventDefault();
+          return;
+        }
+        trackEvent("premium_redemption_requested");
       }}
       target="_blank"
       rel="noreferrer"
