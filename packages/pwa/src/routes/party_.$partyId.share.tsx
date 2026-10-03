@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { useLingui } from "@lingui/react";
 import { t } from "@lingui/core/macro";
@@ -32,6 +33,7 @@ function RouteComponent() {
 
   async function onShareParty() {
     if (canShare) {
+      trackEvent("party_share_requested");
       await Share.share({
         title: t({ message: `Join ${partyName} on trizum!` }),
         url: shareUrl,
@@ -43,6 +45,7 @@ function RouteComponent() {
 
     try {
       await navigator.clipboard.writeText(shareUrl);
+      trackEvent("party_link_copied");
       toast.success(t`Party link copied to clipboard!`);
     } catch {
       prompt(t`Failed to copy party link to clipboard, please copy it manually`, shareUrl);

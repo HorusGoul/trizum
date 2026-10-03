@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -404,6 +405,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
   }
 
   function handleSignInSuccess(user: AuthSessionUser | undefined) {
+    if (user) trackEvent("auth_signed_in");
     toast.success(t`Signed in`);
     dispatchRouteState({ type: "signInSucceeded", user });
     void session.refetch();
@@ -444,6 +446,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
           magicLinkMessage: t`Check your email for the sign-in link`,
         },
       });
+      trackEvent("auth_magic_link_requested");
       toast.success(t`Sign-in link sent`);
     } catch (error) {
       setAuthFailure(error, t`Could not send sign-in link`);
@@ -517,6 +520,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     });
 
     try {
+      trackEvent("auth_social_sign_in_requested");
       const result = await signInWithSocialAuthAccount(provider, returnTo);
 
       if (result?.error) {
@@ -547,6 +551,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     });
 
     try {
+      trackEvent("auth_account_link_requested");
       const result = await linkSocialAuthAccount(provider);
 
       if (result.url) {
@@ -578,6 +583,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
 
     try {
       await requestPasswordResetEmail(email);
+      trackEvent("auth_password_reset_requested");
       dispatchRouteState({
         type: "patch",
         values: {
@@ -610,7 +616,8 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     });
 
     try {
-      await authClient.signOut();
+      const result = await authClient.signOut();
+      if (!result.error) trackEvent("auth_signed_out");
       clearNativeAuthToken();
       clearCloudSyncState();
       await session.refetch();
@@ -673,6 +680,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
 
     try {
       await deleteAuthUserAccount();
+      trackEvent("auth_account_deleted");
       if (userId) {
         clearCachedCloudUserSettings(userId);
         clearCachedCloudAccountState(userId);

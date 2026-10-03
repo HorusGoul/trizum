@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Plural, Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
@@ -469,8 +470,12 @@ function usePremiumPaywallActions({
 
     const session = sessionRef.current;
     setActiveAction("purchase");
+    trackEvent("premium_purchase_started");
     try {
       const result = await purchasePremiumPlan(userId, offering, planId);
+      trackEvent(
+        result.status === "cancelled" ? "premium_purchase_cancelled" : "premium_purchase_completed",
+      );
       if (session.active && result.status !== "cancelled") {
         onEntitlementChange(result.entitlement);
         if (result.entitlement.isPremium) {
@@ -481,6 +486,7 @@ function usePremiumPaywallActions({
         }
       }
     } catch {
+      trackEvent("premium_purchase_failed");
       if (session.active) {
         toast.error(t`Premium could not be purchased. Please try again.`);
       }
@@ -495,8 +501,10 @@ function usePremiumPaywallActions({
 
     const session = sessionRef.current;
     setActiveAction("restore");
+    trackEvent("premium_restore_started");
     try {
       const entitlement = await restorePremiumPurchases(userId);
+      trackEvent(entitlement.isPremium ? "premium_restore_completed" : "premium_restore_empty");
       if (session.active) {
         onEntitlementChange(entitlement);
         if (entitlement.isPremium) {
@@ -507,6 +515,7 @@ function usePremiumPaywallActions({
         }
       }
     } catch {
+      trackEvent("premium_restore_failed");
       if (session.active) {
         toast.error(t`Purchases could not be restored. Please try again.`);
       }

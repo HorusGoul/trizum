@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import {
   ExpenseEditor,
@@ -263,8 +264,10 @@ function useExpense() {
 
   const [expense] = findExpenseById(chunk.expenses, expenseId);
 
-  function onUpdateExpense(expense: Expense) {
-    return updateExpense(expense);
+  async function onUpdateExpense(expense: Expense) {
+    const result = await updateExpense(expense);
+    trackEvent("expense_updated");
+    return result;
   }
 
   function onChangeExpense(patches: DiffResult[]) {

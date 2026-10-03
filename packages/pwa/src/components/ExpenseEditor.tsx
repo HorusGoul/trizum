@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import type { ExpenseUser } from "#src/lib/expenses.js";
@@ -267,7 +268,12 @@ export function ExpenseEditor({
         autoOpenCalculator={autoOpenCalculator}
         formId={formId}
         goBackFallbackOptions={goBackFallbackOptions}
-        onToggleAutoOpenCalculator={() => setAutoOpenCalculator(!autoOpenCalculator)}
+        onToggleAutoOpenCalculator={() => {
+          setAutoOpenCalculator(!autoOpenCalculator);
+          trackEvent(
+            autoOpenCalculator ? "calculator_auto_open_disabled" : "calculator_auto_open_enabled",
+          );
+        }}
         submitButton={
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) =>
@@ -930,6 +936,7 @@ function PhotosField({ value, onChange, onViewPhoto }: PhotosFieldProps) {
             photoId={photoId}
             onRemove={() => {
               onChange((prevPhotos) => prevPhotos.filter((current) => current !== photoId));
+              trackEvent("receipt_attachment_removed");
             }}
             onViewPhoto={onViewPhoto ? () => onViewPhoto(index) : undefined}
           />
@@ -969,6 +976,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       );
 
       onPhoto(photoIds);
+      trackEvent("receipt_attachments_added");
 
       toast.dismiss(toastId);
     } catch (error) {

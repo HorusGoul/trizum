@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -57,13 +58,25 @@ function PartyById() {
   const balancesTabPanelRef = useRef<HTMLDivElement>(null);
   const [balancesSortedBy, setBalancesSortedBy] = useBalancesSortedBy();
 
-  function selectedTabChangeAction(tab: Key) {
-    return navigate({
+  function changeBalancesSort(value: typeof balancesSortedBy) {
+    if (value === balancesSortedBy) return;
+    setBalancesSortedBy(value);
+    trackEvent("balances_sort_changed");
+  }
+
+  async function refreshBalances() {
+    if (await recalculateBalances()) trackEvent("balances_recalculated");
+  }
+
+  async function selectedTabChangeAction(tab: Key) {
+    await navigate({
       to: "/party/$partyId",
       params: { partyId },
       search: { tab: tab as "expenses" | "balances" },
       replace: true,
     });
+    if (tab !== selectedTab)
+      trackEvent(tab === "balances" ? "party_balances_selected" : "party_expenses_selected");
   }
 
   const { setLastOpenedPartyId } = usePartyList();
@@ -82,6 +95,7 @@ function PartyById() {
     if (!partyId) return;
     await navigate({ to: "/", replace: true });
     removeParty(partyId);
+    trackEvent("party_left");
     toast.success(t`You left the party!`);
   }
 
@@ -103,6 +117,7 @@ function PartyById() {
     setParticipantDetails(participant.id, {
       personalMode: !participant.personalMode,
     });
+    trackEvent(participant.personalMode ? "personal_mode_disabled" : "personal_mode_enabled");
   }
 
   return (
@@ -122,7 +137,7 @@ function PartyById() {
             />
             <Popover placement="bottom end">
               <Menu className="min-w-60">
-                <MenuItem onAction={() => setBalancesSortedBy("name")}>
+                <MenuItem onAction={() => changeBalancesSort("name")}>
                   <Icon icon="lucide.arrow-down-a-z" width={20} height={20} className="mr-3" />
                   <span className="h-3.5 leading-none">
                     <Trans>Name</Trans>
@@ -133,7 +148,7 @@ function PartyById() {
                   ) : null}
                 </MenuItem>
 
-                <MenuItem onAction={() => setBalancesSortedBy("balance-ascending")}>
+                <MenuItem onAction={() => changeBalancesSort("balance-ascending")}>
                   <Icon
                     icon="lucide.arrow-down-narrow-wide"
                     width={20}
@@ -149,7 +164,7 @@ function PartyById() {
                   ) : null}
                 </MenuItem>
 
-                <MenuItem onAction={() => setBalancesSortedBy("balance-descending")}>
+                <MenuItem onAction={() => changeBalancesSort("balance-descending")}>
                   <Icon
                     icon="lucide.arrow-up-narrow-wide"
                     width={20}
@@ -291,7 +306,7 @@ function PartyById() {
                   <Balances
                     panelRef={balancesTabPanelRef}
                     sortedBy={balancesSortedBy}
-                    onRefresh={recalculateBalances}
+                    onRefresh={refreshBalances}
                   />
                 </Suspense>
               ),

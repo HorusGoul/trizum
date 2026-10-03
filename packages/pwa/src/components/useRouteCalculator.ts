@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { shouldReplaceNavigation } from "#src/lib/navigationHistory.ts";
 import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
 
@@ -83,6 +84,7 @@ export function useRouteCalculator({
         calculatorId !== undefined ||
         shouldReplaceNavigation(currentLocation.href, buildLocation(options).href),
     });
+    if (calculatorId === undefined) trackEvent("calculator_opened");
   }
 
   function closeCalculator() {

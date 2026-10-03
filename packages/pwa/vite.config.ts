@@ -95,6 +95,7 @@ export default defineConfig(({ mode }) => {
         build: {
           command: "NODE_ENV=production vp build",
           dependsOn: [
+            "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
@@ -107,12 +108,16 @@ export default defineConfig(({ mode }) => {
             "TRIZUM_REVENUECAT_TEST_STORE",
             "VITE_APP_AD_TEST_MODE",
             "VITE_APP_AUTH_URL",
+            "VITE_APP_ANALYTICS_URL",
+            "VITE_APP_DISABLE_ANALYTICS",
+            "VITE_APP_ENABLE_ANALYTICS",
           ],
           output: ["dist/**"],
         },
         check: {
           command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
           dependsOn: [
+            "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
@@ -133,6 +138,7 @@ export default defineConfig(({ mode }) => {
           command: "vp dev",
           cache: false,
           dependsOn: [
+            "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
@@ -153,6 +159,7 @@ export default defineConfig(({ mode }) => {
         test: {
           command: "vp test .",
           dependsOn: [
+            "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
@@ -164,6 +171,7 @@ export default defineConfig(({ mode }) => {
           command: "vp exec playwright test",
           cache: false,
           dependsOn: [
+            "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
@@ -175,6 +183,7 @@ export default defineConfig(({ mode }) => {
           command: "vp exec playwright test --headed",
           cache: false,
           dependsOn: [
+            "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",

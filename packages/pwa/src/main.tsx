@@ -15,6 +15,8 @@ import {
   type RegisteredRouter,
 } from "@tanstack/react-router";
 import { parseAppSearch, stringifyAppSearch } from "./lib/routerSearch.ts";
+import { initializeAnalytics, setAnalyticsEnabled, trackPage } from "./lib/analytics.ts";
+import { useOnlineStatus } from "./hooks/useOnlineStatus.ts";
 import "./index.css";
 import { I18nProvider, useLingui } from "@lingui/react";
 import { I18nProvider as AriaI18nProvider } from "react-aria-components";
@@ -257,6 +259,9 @@ const router = createRouter({
   defaultStaleTime: Infinity,
 });
 
+initializeAnalytics(Object.values(router.routesById).map((route) => route.fullPath));
+router.subscribe("onResolved", () => trackPage(router.state.location.pathname));
+
 router.subscribe("onBeforeNavigate", (event) => {
   if (shouldPreserveCalculatorSearchScroll(event)) {
     // Browser back/forward does not carry the calculator's resetScroll: false option.
@@ -356,7 +361,15 @@ function AriaProviders({ children }: { children: React.ReactNode }) {
 function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
-  usePartyList();
+  const { partyList } = usePartyList();
+  const isOnline = useOnlineStatus();
+  const analyticsEnabled = partyList.usageAnalyticsEnabled !== false && isOnline;
+
+  useEffect(() => {
+    setAnalyticsEnabled(analyticsEnabled);
+    if (analyticsEnabled) trackPage(router.state.location.pathname);
+    return () => setAnalyticsEnabled(false);
+  }, [analyticsEnabled]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

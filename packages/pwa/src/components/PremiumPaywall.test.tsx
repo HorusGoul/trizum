@@ -14,6 +14,9 @@ import {
 import { getCurrentPremiumPaywallLoadState } from "#src/lib/premium/premiumPaywallState.ts";
 import type { Button } from "#src/ui/Button.tsx";
 import { PremiumPaywall } from "./PremiumPaywall.tsx";
+import { trackEvent } from "#src/lib/analytics.ts";
+
+vi.mock("#src/lib/analytics.ts", () => ({ trackEvent: vi.fn<typeof trackEvent>() }));
 
 const buttons = vi.hoisted(() => new Map<string, ComponentProps<typeof Button>>());
 
@@ -99,8 +102,11 @@ describe("Premium paywall restore recovery", () => {
     expect(buttons.get("<span>Continue with Premium</span>")?.isDisabled).toBe(true);
   });
 
-  it("keeps restore unavailable without a signed-in account", () => {
-    expect(renderPaywall(null).restoreButton.isDisabled).toBe(true);
+  it("keeps restore unavailable without a signed-in account", async () => {
+    const { restoreButton } = renderPaywall(null);
+    expect(restoreButton.isDisabled).toBe(true);
+    await restoreButton.pressAction?.({} as never);
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 
   it("applies a restored entitlement and closes the unavailable-offerings paywall", async () => {
@@ -112,6 +118,10 @@ describe("Premium paywall restore recovery", () => {
     expect(onEntitlementChange).toHaveBeenCalledWith(entitlement);
     expect(toast.success).toHaveBeenCalledWith("Premium purchases restored.");
     expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(vi.mocked(trackEvent).mock.calls).toEqual([
+      ["premium_restore_started"],
+      ["premium_restore_completed"],
+    ]);
   });
 
   it("explains an empty restore without dismissing the paywall", async () => {
@@ -123,6 +133,10 @@ describe("Premium paywall restore recovery", () => {
     await restoreButton.pressAction?.({} as never);
     expect(toast.error).toHaveBeenCalledWith("No Premium purchase was found for this account.");
     expect(onOpenChange).not.toHaveBeenCalled();
+    expect(vi.mocked(trackEvent).mock.calls).toEqual([
+      ["premium_restore_started"],
+      ["premium_restore_empty"],
+    ]);
   });
 
   it("offers retry feedback when restoring fails", async () => {
@@ -132,5 +146,9 @@ describe("Premium paywall restore recovery", () => {
     expect(toast.error).toHaveBeenCalledWith("Purchases could not be restored. Please try again.");
     expect(onEntitlementChange).not.toHaveBeenCalled();
     expect(onOpenChange).not.toHaveBeenCalled();
+    expect(vi.mocked(trackEvent).mock.calls).toEqual([
+      ["premium_restore_started"],
+      ["premium_restore_failed"],
+    ]);
   });
 });

@@ -18,6 +18,7 @@ import {
 import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.js";
+import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
 
@@ -178,15 +179,16 @@ export function useCloudSyncAccountState({
           }
         }
 
+        let cloudAnalyticsEnabled = true;
         if (
           activeSettings &&
           isValidDocumentId(activeSettings.partyListDocumentId) &&
           activeSettings.partyListDocumentId !== currentPartyList.id
         ) {
-          const cloudPartyList = await documentCache.readAsync(
+          const cloudPartyList = (await documentCache.readAsync(
             repo,
             activeSettings.partyListDocumentId,
-          );
+          )) as PartyList | undefined;
 
           if (isCancelled) {
             return;
@@ -195,6 +197,7 @@ export function useCloudSyncAccountState({
           if (!cloudPartyList) {
             throw new Error("Cloud party list is unavailable");
           }
+          cloudAnalyticsEnabled = cloudPartyList.usageAnalyticsEnabled !== false;
         }
 
         dispatch({
@@ -226,6 +229,7 @@ export function useCloudSyncAccountState({
           return;
         }
 
+        if (!cloudAnalyticsEnabled) setAnalyticsEnabled(false);
         setPartyListId(activeSettings.partyListDocumentId);
         dispatch({ type: "cloudSettingsActivated", cloudSettings: activeSettings });
         writeCachedCloudUserSettings(currentUserId, activeSettings);
@@ -302,14 +306,24 @@ export function useCloudSyncAccountState({
       return;
     }
 
-    const cloudPartyList = await documentCache.readAsync(repo, settings.partyListDocumentId);
+    const cloudPartyList = (await documentCache.readAsync(repo, settings.partyListDocumentId)) as
+      | PartyList
+      | undefined;
 
     if (!cloudPartyList) {
       toast.error(t`Could not load trizum cloud state`);
       return;
     }
 
+    // Apply the destination's opt-out before switching can trigger router events.
+    if (cloudPartyList.usageAnalyticsEnabled === false) setAnalyticsEnabled(false);
     setPartyListId(settings.partyListDocumentId);
+    if (
+      partyList.usageAnalyticsEnabled !== false &&
+      cloudPartyList.usageAnalyticsEnabled !== false
+    ) {
+      trackEvent("cloud_sync_activated");
+    }
 
     if (userId) {
       dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });

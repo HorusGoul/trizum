@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -82,6 +83,7 @@ function ExpenseTemplatesSettings() {
   function changeOnlyUseCustomTemplates(isSelected: boolean) {
     if (!isSelected) {
       setOnlyUseCustomExpenseTemplates(false);
+      trackEvent("custom_templates_only_disabled");
       return;
     }
 
@@ -93,6 +95,7 @@ function ExpenseTemplatesSettings() {
 
     if (configuredDefaultTemplate) {
       setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      trackEvent("custom_templates_only_enabled");
       return;
     }
 
@@ -104,6 +107,7 @@ function ExpenseTemplatesSettings() {
 
     if (firstTemplate) {
       setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
+      trackEvent("custom_templates_only_enabled");
     }
 
     setIsOnlyCustomTemplatesSheetOpen(false);
@@ -146,6 +150,11 @@ function ExpenseTemplatesSettings() {
                 setParticipantDetails(participant.id, {
                   alwaysUseDefaultExpenseTemplate: isSelected,
                 });
+                trackEvent(
+                  isSelected
+                    ? "expense_template_shortcut_enabled"
+                    : "expense_template_shortcut_disabled",
+                );
               }}
             />
           </div>
@@ -164,6 +173,8 @@ function ExpenseTemplatesSettings() {
                   setDefaultExpenseTemplate(
                     templateId === BLANK_TEMPLATE_ID ? undefined : templateId,
                   );
+                  if (templateId !== selectedDefaultId)
+                    trackEvent("expense_template_default_changed");
                 }}
               >
                 {(option) => (

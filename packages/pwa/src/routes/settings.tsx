@@ -1,3 +1,4 @@
+import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
 import { OfflineAccountNotice } from "#src/components/OfflineAccountNotice.tsx";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -68,6 +69,7 @@ export function Settings() {
       autoOpenCalculator: values.autoOpenCalculator,
       hue: values.hue,
     });
+    trackEvent("settings_saved");
     form.reset(values);
     toast.success(t`Settings saved`);
     void navigate({ to: "..", replace: true });
@@ -284,17 +286,38 @@ function SettingsFormFields({
 
       <PremiumSection />
 
-      {privacyOptionsRequired ? (
-        <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
-          <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
-            <Trans>Privacy</Trans>
-          </h2>
+      <section className="border-accent-200 dark:border-accent-800 flex flex-col gap-3 border-t pt-6">
+        <h2 className="text-accent-900 dark:text-accent-100 text-lg font-semibold">
+          <Trans>Privacy</Trans>
+        </h2>
+        <UsageAnalyticsSetting />
+        {privacyOptionsRequired ? (
           <Button type="button" color="input-like" pressAction={showPrivacyOptions}>
             <Trans>Privacy and cookie settings</Trans>
           </Button>
-        </section>
-      ) : null}
+        ) : null}
+      </section>
     </form>
+  );
+}
+
+function UsageAnalyticsSetting() {
+  const { partyList, setUsageAnalyticsEnabled } = usePartyList();
+  return (
+    <SwitchField
+      label={<Trans>Share usage analytics</Trans>}
+      description={
+        <Trans>
+          Help improve trizum with page visits and feature usage, without names, amounts, or sharing
+          links. Changes apply immediately. Browser privacy signals are respected.
+        </Trans>
+      }
+      isSelected={partyList.usageAnalyticsEnabled !== false}
+      onChange={(enabled) => {
+        if (!enabled) setAnalyticsEnabled(false);
+        setUsageAnalyticsEnabled(enabled);
+      }}
+    />
   );
 }
 

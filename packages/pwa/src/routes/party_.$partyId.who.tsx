@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
@@ -58,6 +59,7 @@ function Who() {
     addPartyToList(party.id, participant.id);
 
     if (needsToJoin) {
+      trackEvent("party_joined");
       setParticipantDetails(participant.id, {
         phone: partyList.phone,
         avatarId: partyList.avatarId,
@@ -65,6 +67,8 @@ function Who() {
 
       toast.success(t({ message: `Welcome to the party, ${participantName}!` }));
     } else {
+      if (partyList.participantInParties[party.id] !== participant.id)
+        trackEvent("party_participant_switched");
       toast.success(t({ message: `You're now seeing the party as ${participantName}` }));
     }
 

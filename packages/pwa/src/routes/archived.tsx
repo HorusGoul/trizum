@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute } from "@tanstack/react-router";
@@ -41,6 +42,7 @@ function ArchivedParties() {
                 label: <Trans>Restore to home</Trans>,
                 onAction: () => {
                   setPartyArchived(partyId, false);
+                  trackEvent("party_restored");
                   toast.success(t`Party restored to home`);
                 },
               },

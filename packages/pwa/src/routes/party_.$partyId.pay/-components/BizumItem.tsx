@@ -3,6 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { toast } from "sonner";
 import { Button } from "#src/ui/Button.tsx";
 import { Icon } from "#src/ui/Icon.tsx";
+import { trackEvent } from "#src/lib/analytics.ts";
 
 export function BizumItem({ phoneNumber }: { phoneNumber: string }) {
   return (
@@ -18,6 +19,7 @@ export function BizumItem({ phoneNumber }: { phoneNumber: string }) {
           navigator.clipboard
             .writeText(phoneNumber)
             .then(() => {
+              trackEvent("payment_contact_copied");
               toast.success(t`Phone number copied to clipboard!`);
             })
             .catch(() => {

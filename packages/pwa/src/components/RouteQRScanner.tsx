@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { QRCodeScanner, type ScanResult, type ValidationResult } from "./QRCodeScanner.js";
@@ -37,6 +38,7 @@ export function RouteQRScanner({ isOpen, onScan, onClose, validate }: RouteQRSca
     }
 
     onScan(result.value);
+    trackEvent("join_qr_scanned");
   }
 
   return (

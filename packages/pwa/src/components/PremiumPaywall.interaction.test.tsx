@@ -14,6 +14,9 @@ import {
 } from "#src/lib/premium/premiumCommerce.ts";
 import type { IconButton } from "#src/ui/IconButton.tsx";
 import { PremiumPaywall } from "./PremiumPaywall.tsx";
+import { trackEvent } from "#src/lib/analytics.ts";
+
+vi.mock("#src/lib/analytics.ts", () => ({ trackEvent: vi.fn<typeof trackEvent>() }));
 
 vi.mock("react-aria-components", async (importOriginal) => ({
   ...(await importOriginal<typeof ReactAriaComponents>()),
@@ -129,6 +132,35 @@ it.each(["purchase", "restore"] as const)(
     await act(async () => pending.resolve({ isPremium: false, hasActiveSubscription: false }));
     expect(button("Continue with Premium").disabled).toBe(false);
     expect(button("Restore purchases").disabled).toBe(false);
+    expect(vi.mocked(trackEvent).mock.calls).toEqual(
+      action === "purchase"
+        ? [["premium_purchase_started"], ["premium_purchase_completed"]]
+        : [["premium_restore_started"], ["premium_restore_empty"]],
+    );
+  },
+);
+
+it.each(["purchased", "cancelled", "failed"] as const)(
+  "reports the %s purchase outcome without transaction properties",
+  async (outcome) => {
+    if (outcome === "failed") {
+      vi.mocked(purchasePremiumPlan).mockRejectedValue(new Error("Private store error"));
+    } else if (outcome === "cancelled") {
+      vi.mocked(purchasePremiumPlan).mockResolvedValue({ status: "cancelled" });
+    } else {
+      vi.mocked(purchasePremiumPlan).mockResolvedValue({
+        status: "purchased",
+        entitlement: { isPremium: true, hasActiveSubscription: true },
+      });
+    }
+    await render();
+    expect(trackEvent).not.toHaveBeenCalled();
+    await act(async () => button("Continue with Premium").click());
+    expect(vi.mocked(trackEvent).mock.calls).toEqual([
+      ["premium_purchase_started"],
+      [outcome === "purchased" ? "premium_purchase_completed" : `premium_purchase_${outcome}`],
+    ]);
+    expect(onEntitlementChange).toHaveBeenCalledTimes(outcome === "purchased" ? 1 : 0);
   },
 );
 
