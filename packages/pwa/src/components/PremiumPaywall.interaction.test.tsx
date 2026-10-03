@@ -12,7 +12,6 @@ import {
   purchasePremiumPlan,
   restorePremiumPurchases,
 } from "#src/lib/premium/premiumCommerce.ts";
-import type { Button } from "#src/ui/Button.tsx";
 import type { IconButton } from "#src/ui/IconButton.tsx";
 import { PremiumPaywall } from "./PremiumPaywall.tsx";
 
@@ -22,13 +21,6 @@ vi.mock("react-aria-components", async (importOriginal) => ({
   Modal: ({ children }: { children: ReactNode }) => children,
   ModalOverlay: ({ children, isOpen }: { children: ReactNode; isOpen: boolean }) =>
     isOpen ? children : null,
-}));
-vi.mock("#src/ui/Button.tsx", () => ({
-  Button: (props: ComponentProps<typeof Button>) => (
-    <button disabled={props.isDisabled} onClick={() => void props.pressAction?.({} as never)}>
-      {props.children as ReactNode}
-    </button>
-  ),
 }));
 vi.mock("#src/ui/IconButton.tsx", () => ({
   IconButton: (props: ComponentProps<typeof IconButton>) => (
@@ -103,11 +95,22 @@ it.each(["purchase", "restore"] as const)(
   "can close while a %s is stalled without starting a duplicate on reopen",
   async (action) => {
     const operation = action === "purchase" ? purchasePremiumPlan : restorePremiumPurchases;
-    vi.mocked(operation).mockImplementation(() => new Promise<never>(() => {}));
+    const pending = deferred<Awaited<ReturnType<typeof restorePremiumPurchases>>>();
+    vi.mocked(restorePremiumPurchases).mockReturnValue(pending.promise);
+    vi.mocked(purchasePremiumPlan).mockImplementation(async () => ({
+      status: "purchased",
+      entitlement: await pending.promise,
+    }));
     const label = action === "purchase" ? "Continue with Premium" : "Restore purchases";
     await render();
-    await act(async () => button(label).click());
+    await act(async () => {
+      button(label).click();
+      button("Continue with Premium").click();
+      button("Restore purchases").click();
+    });
     expect(operation).toHaveBeenCalledTimes(1);
+    expect(button("Continue with Premium").disabled).toBe(true);
+    expect(button("Restore purchases").disabled).toBe(true);
     expect(button("Close Premium").disabled).toBe(false);
     await act(async () => button("Close Premium").click());
     expect(onOpenChange).toHaveBeenCalledWith(false);
@@ -115,7 +118,17 @@ it.each(["purchase", "restore"] as const)(
     await render(true, 2);
     expect(button(label).disabled).toBe(true);
     expect(button("Close Premium").disabled).toBe(false);
+    await act(async () => {
+      button("Continue with Premium").click();
+      button("Restore purchases").click();
+    });
     expect(operation).toHaveBeenCalledTimes(1);
+    expect(
+      action === "purchase" ? restorePremiumPurchases : purchasePremiumPlan,
+    ).not.toHaveBeenCalled();
+    await act(async () => pending.resolve({ isPremium: false, hasActiveSubscription: false }));
+    expect(button("Continue with Premium").disabled).toBe(false);
+    expect(button("Restore purchases").disabled).toBe(false);
   },
 );
 
@@ -154,6 +167,9 @@ it("does not show a late billing failure after returning to the app", async () =
   await act(async () => pending.reject(new Error("Billing unavailable")));
   expect(toast.error).not.toHaveBeenCalled();
   expect(onEntitlementChange).not.toHaveBeenCalled();
+  await render(true, 2);
+  expect(button("Continue with Premium").disabled).toBe(false);
+  expect(button("Restore purchases").disabled).toBe(false);
 });
 
 it("keeps a failed or stalled product lookup dismissible", async () => {

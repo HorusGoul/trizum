@@ -49,13 +49,14 @@ export function PremiumPaywall({
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showRedemption, setShowRedemption] = useState(false);
   const [redemptionCode, setRedemptionCode] = useState("");
-  const { activeAction, setActiveAction, close, purchase, restore } = usePremiumPaywallActions({
-    isOpen,
-    onEntitlementChange,
-    onOpenChange,
-    sessionId,
-    userId,
-  });
+  const { activeAction, setActiveAction, onActionPress, close, purchase, restore } =
+    usePremiumPaywallActions({
+      isOpen,
+      onEntitlementChange,
+      onOpenChange,
+      sessionId,
+      userId,
+    });
 
   useEffect(() => {
     if (!isOpen) {
@@ -208,6 +209,7 @@ export function PremiumPaywall({
                       color="accent"
                       isDisabled={!userId || !selectedPlan || activeAction !== null}
                       isPending={activeAction === "purchase"}
+                      onPress={() => onActionPress("purchase")}
                       pressAction={() => {
                         if (currentLoadState.status === "ready" && selectedPlan) {
                           return purchase(currentLoadState.offering, selectedPlan.id);
@@ -226,6 +228,7 @@ export function PremiumPaywall({
                       className="text-accent-600 dark:text-accent-300 mx-auto h-9 w-auto px-4 text-sm font-semibold"
                       isDisabled={!userId || activeAction !== null}
                       isPending={activeAction === "restore"}
+                      onPress={() => onActionPress("restore")}
                       pressAction={restore}
                       type="button"
                     >
@@ -427,7 +430,8 @@ function usePremiumPaywallActions({
   sessionId,
   userId,
 }: PremiumPaywallProps) {
-  const [activeAction, setActiveAction] = useState<"purchase" | "restore" | "redeem" | null>(null);
+  const [activeAction, setActionState] = useState<"purchase" | "restore" | "redeem" | null>(null);
+  const actionRef = useRef<typeof activeAction>(null);
   const sessionRef = useRef({ active: isOpen });
 
   useEffect(() => {
@@ -438,6 +442,19 @@ function usePremiumPaywallActions({
     };
   }, [isOpen, sessionId, userId]);
 
+  function setActiveAction(action: typeof activeAction) {
+    actionRef.current = action;
+    setActionState(action);
+  }
+
+  function onActionPress(action: "purchase" | "restore") {
+    // onPress runs before Button's async transition, so shared pending UI commits
+    // immediately and survives dismissal. The action acquires its own ref lock.
+    if (actionRef.current === null) {
+      setActionState(action);
+    }
+  }
+
   function close() {
     // Dismissal does not cancel a native store transaction. Keep activeAction until
     // it settles to prevent duplicates; the provider still receives SDK updates.
@@ -446,7 +463,7 @@ function usePremiumPaywallActions({
   }
 
   async function purchase(offering: PremiumOffering, planId: PremiumPlanId) {
-    if (!userId || activeAction !== null) {
+    if (!userId || actionRef.current !== null) {
       return;
     }
 
@@ -472,7 +489,7 @@ function usePremiumPaywallActions({
   }
 
   async function restore() {
-    if (!userId || activeAction !== null) {
+    if (!userId || actionRef.current !== null) {
       return;
     }
 
@@ -497,7 +514,7 @@ function usePremiumPaywallActions({
     setActiveAction(null);
   }
 
-  return { activeAction, setActiveAction, close, purchase, restore };
+  return { activeAction, setActiveAction, onActionPress, close, purchase, restore };
 }
 
 function PremiumPlansSkeleton() {
