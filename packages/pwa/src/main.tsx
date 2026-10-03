@@ -16,6 +16,7 @@ import {
 } from "@tanstack/react-router";
 import { parseAppSearch, stringifyAppSearch } from "./lib/routerSearch.ts";
 import { initializeAnalytics, setAnalyticsEnabled, trackPage } from "./lib/analytics.ts";
+import { useOnlineStatus } from "./hooks/useOnlineStatus.ts";
 import "./index.css";
 import { I18nProvider, useLingui } from "@lingui/react";
 import { I18nProvider as AriaI18nProvider } from "react-aria-components";
@@ -361,7 +362,8 @@ function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
   const { partyList } = usePartyList();
-  const analyticsEnabled = partyList.usageAnalyticsEnabled !== false;
+  const isOnline = useOnlineStatus();
+  const analyticsEnabled = partyList.usageAnalyticsEnabled !== false && isOnline;
 
   useEffect(() => {
     setAnalyticsEnabled(analyticsEnabled);

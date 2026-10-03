@@ -14,6 +14,8 @@ owns the outbound data boundary and transport.
   signals are checked again after asynchronous work. Disabling aborts requests
   and invalidates queued events and the in-memory token. Already delivered events
   cannot be withdrawn by aborting a request.
+- The PWA observes connectivity changes, ends collection while offline, and starts
+  a fresh visit for the current route on reconnect. Offline activity is not replayed.
 - Paths are matched against **trusted build-time router templates**. Every dynamic
   segment becomes `:redacted`, including party, expense, and template identifiers.
   Unknown paths become `/:unknown`; arbitrary static-looking input is never sent.

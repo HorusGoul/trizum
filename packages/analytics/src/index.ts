@@ -44,10 +44,15 @@ export function createAnalytics(options: AnalyticsOptions) {
   }
 
   async function send(payload: Record<string, unknown>, signal: AbortSignal) {
+    if (signal.aborted || !allowed()) return;
+    const request = new AbortController();
+    const abortRequest = () => request.abort();
+    signal.addEventListener("abort", abortRequest, { once: true });
+    // Compose cancellation without AbortSignal.any/timeout (older iOS WebViews).
+    const timeout = setTimeout(abortRequest, 5000);
     try {
-      if (signal.aborted || !allowed()) return;
       // Bound individual requests so an unavailable collector cannot hold the queue.
-      const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(5000)]);
+      const requestSignal = request.signal;
       if (!token || token.expiresAt <= Date.now()) {
         const response = await fetch(scriptUrl, {
           credentials: "omit",
@@ -73,6 +78,9 @@ export function createAnalytics(options: AnalyticsOptions) {
     } catch {
       // Offline, ad blockers and server errors must never affect app actions.
       token = undefined;
+    } finally {
+      clearTimeout(timeout);
+      signal.removeEventListener("abort", abortRequest);
     }
   }
 

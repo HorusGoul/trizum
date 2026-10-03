@@ -79,6 +79,44 @@ describe("privacy boundary", () => {
 });
 
 describe("analytics collection", () => {
+  it("collects on WebViews without AbortSignal static helpers", async () => {
+    vi.stubGlobal("AbortSignal", {});
+    try {
+      const { client, payloads } = harness();
+      client.setEnabled(true);
+      client.page("/settings");
+      client.track("settings_saved");
+      await client.flush();
+      expect(payloads().map((payload) => payload.kind)).toEqual(["pageview", "custom_event"]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("aborts stalled requests after five seconds without rejecting app actions", async () => {
+    vi.useFakeTimers();
+    try {
+      const { client, fetch } = harness();
+      fetch.mockImplementation(
+        (_url, init) =>
+          new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener("abort", () => reject(new Error("Aborted")), {
+              once: true,
+            });
+          }),
+      );
+      client.setEnabled(true);
+      client.page("/settings");
+      await vi.advanceTimersByTimeAsync(5000);
+      await expect(client.flush()).resolves.toBeUndefined();
+      expect(fetch).toHaveBeenCalledOnce();
+      expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("makes no requests until preferences are loaded and explicitly applied", async () => {
     const { client, fetch } = harness();
     client.page("/settings");
@@ -137,6 +175,31 @@ describe("analytics collection", () => {
     expect(payloads()).toHaveLength(2);
     expect(payloads()[0].pathname).toBe(payloads()[1].pathname);
     expect(payloads()[0].visitId).not.toBe(payloads()[1].visitId);
+  });
+
+  it("starts a fresh current-route visit on reconnect without replaying offline activity", async () => {
+    const { client, canCollect, payloads } = harness();
+    client.setEnabled(true);
+    client.page("/settings");
+    await client.flush();
+    const previousVisit = payloads()[0].visitId;
+    canCollect.mockReturnValue(false);
+    client.setEnabled(false);
+    client.page(`/party/${documentId}`);
+    client.track("party_pinned");
+    canCollect.mockReturnValue(true);
+    client.setEnabled(true);
+    client.page(`/party/${documentId}`);
+    client.track("party_unpinned");
+    await client.flush();
+    expect(payloads()).toHaveLength(3);
+    expect(payloads()[1]).toMatchObject({ kind: "pageview", pathname: "/party/:redacted" });
+    expect(payloads()[1].visitId).not.toBe(previousVisit);
+    expect(payloads()[2]).toMatchObject({
+      eventName: "party_unpinned",
+      pathname: "/party/:redacted",
+      visitId: payloads()[1].visitId,
+    });
   });
 
   it("rechecks privacy signals before bootstrap and collection", async () => {
