@@ -270,8 +270,10 @@ describe("analytics collection", () => {
       canCollect.mockReturnValue(false);
       return new Response(bootstrap());
     });
+    client.setEnabled(true, telemetryId);
     client.page("/settings");
     await client.flush();
+    expect(fetch).toHaveBeenCalledOnce();
     expect(payloads()).toHaveLength(0);
   });
 
