@@ -92,8 +92,8 @@ catalog:
   "@tailwindcss/vite": 4.3.2
   "@types/culori": 4.0.1
   "@types/node": 24.13.3
-  "@types/react": 19.2.18
-  "@types/react-dom": 19.2.4
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
   "@types/ws": 8.18.1
   "@use-gesture/react": 10.3.1
   "@vite-pwa/assets-generator": 1.0.2
@@ -129,11 +129,11 @@ catalog:
   oxlint-plugin-react-doctor: 0.7.4
   playwright: 1.61.1
   qr-code-styling: 1.9.2
-  react: 19.2.8
+  react: 19.3.0
   react-aria: ^3.42.0
   react-aria-components: 1.19.0
   react-doctor: 0.7.4
-  react-dom: 19.2.8
+  react-dom: 19.3.0
   react-modal-sheet: 5.6.0
   react-window: 2.2.7
   rollup: 4.62.2
