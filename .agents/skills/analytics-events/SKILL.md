@@ -15,7 +15,7 @@ click or render.
 - [`packages/analytics/src/events.ts`](../../../packages/analytics/src/events.ts):
   approved names and precise trigger meanings. Read it before choosing a name.
 - [`packages/analytics/README.md`](../../../packages/analytics/README.md): privacy
-  boundary, collection controls, transport contract, and coverage decisions.
+  design rationale and links to the implementation sources of truth.
 - [`packages/pwa/src/lib/analytics.ts`](../../../packages/pwa/src/lib/analytics.ts):
   the app's `trackEvent` facade. Product code uses this facade.
 
@@ -71,8 +71,9 @@ only while preferences are unknown, never while explicitly disabled.
 
 ## Verification and maintenance
 
-Update the catalog descriptions and the README's coverage decisions if behavior
-changes. Test meaningful boundaries: a completed operation emits once; validation
+Update catalog descriptions when trigger meanings change. Keep the README focused
+on design rationale and source links, without duplicating the catalog or code.
+Test meaningful boundaries: a completed operation emits once; validation
 failures, cancellation, rejected requests, and stale callbacks do not masquerade
 as success. Extend existing action tests where available. Use a mocked analytics
 facade/transport so tests never contact the live collector.
