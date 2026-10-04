@@ -1,5 +1,73 @@
 # @trizum/pwa
 
+## 1.13.0
+
+### Minor Changes
+
+- [#446](https://github.com/HorusGoul/trizum/pull/446) [`6586d74`](https://github.com/HorusGoul/trizum/commit/6586d741577d903a9e60e6e90bf8854f5ceae63f) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add RevenueCat-powered Premium purchasing and subscription management to the installed Android and iOS apps, including a native-feeling trizum paywall, signed-in cross-device entitlements, ad-free owners, monthly/annual/lifetime packages, the server-side Party Boost allocation foundation, and in-app Terms of Service.
+  Add server-verified Party Boost activation, seven-day transfers, membership and Premium revalidation, automatic revocation, and party-settings controls.
+
+- [#423](https://github.com/HorusGoul/trizum/pull/423) [`2a7d0d1`](https://github.com/HorusGoul/trizum/commit/2a7d0d1f943238536e6e96568ce015c25d3fe76b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add consent-aware App Open and interstitial advertising to the installed Android and iOS apps, with shared frequency limits, test-by-default release configuration, and an ad-free entitlement integration point.
+
+- [#472](https://github.com/HorusGoul/trizum/pull/472) [`8a786c8`](https://github.com/HorusGoul/trizum/commit/8a786c8d87f637acbaf10b4130aced9f0e8eaa4b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Show a dismissible ad-free Premium banner on the mobile home screen once profile setup is complete. Open the paywall directly, with sign-in first when needed, and remember dismissal with profile preferences.
+
+- [#469](https://github.com/HorusGoul/trizum/pull/469) [`638a4b1`](https://github.com/HorusGoul/trizum/commit/638a4b158d81051860cb5c6885fe145b163b2347) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add Premium code redemption and shareable promo links.
+
+  Open Apple offer-code redemption or Google Play one-time-code redemption from the paywall, with guidance for custom subscription codes at Google Play checkout. Shared trizum.app/redeem links prefill the code and are excluded from search indexing. Refresh pending native redemptions when returning to trizum.
+
+  Show the signed-in account on the redemption page. Store links open directly without requiring sign-in. Keep optional sign-in and direct Premium settings actions in the FAQs, preserving the entered code through authentication.
+
+  Keep redemption codes editable offline and explain the connection requirement only when redemption is attempted, without a warning above the form.
+
+  Preserve numeric-looking promo codes exactly in shared links. Keep failed or pending FAQ sign-in dismissible without losing edited codes, and explain mobile-app purchase and restore steps when opening Premium help in a browser.
+
+- [#464](https://github.com/HorusGoul/trizum/pull/464) [`cccbb87`](https://github.com/HorusGoul/trizum/commit/cccbb87b52ef2f4bba1c88e0cedf5bc0d00a1619) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow one server-configured test account to verify sandbox Premium purchases for Party Boost, while retaining production purchase requirements for other accounts and normal membership, expiry, and transfer rules.
+
+### Patch Changes
+
+- [#457](https://github.com/HorusGoul/trizum/pull/457) [`ed5912f`](https://github.com/HorusGoul/trizum/commit/ed5912fa301dac4cfe85f22a59d9defd2a67bf77) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Redact Automerge document IDs from direct and automatic Sentry errors,
+  breadcrumbs, structured logs, and traces in the browser and sync server.
+  Preserve error classification, stack locations, and trace correlation.
+
+- [#473](https://github.com/HorusGoul/trizum/pull/473) [`3f772e8`](https://github.com/HorusGoul/trizum/commit/3f772e8c10e3683d7f7926f9d2f7ec074b7761e3) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Validate Cloud Sync and Tricount API responses before using them, and localize the error shown when a Tricount import returns invalid data.
+
+  Fixes [#445](https://github.com/HorusGoul/trizum/issues/445).
+
+- [#468](https://github.com/HorusGoul/trizum/pull/468) [`880a306`](https://github.com/HorusGoul/trizum/commit/880a306d136ce33cd6502c16567e0b1ddcc8bda0) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Refresh Party Boost eligibility when shared boosts or native Premium change. After a Premium rejection, offer Premium options instead of retrying the same activation, while keeping shared party benefits visible.
+
+- [#461](https://github.com/HorusGoul/trizum/pull/461) [`d4839e4`](https://github.com/HorusGoul/trizum/commit/d4839e4e19c75f0ebaee221d8d39a01b7e37f653) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Refresh Premium status while the app stays open and when returning to it, so expired or revoked subscriptions update without a restart. Keep the last known account entitlement when a refresh fails or the device is offline.
+
+- [#459](https://github.com/HorusGoul/trizum/pull/459) [`2f5a0d9`](https://github.com/HorusGoul/trizum/commit/2f5a0d93c685e579ec8766273b137e3f130d81fd) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use public outbound routing for Worker sync connections from the production custom domain.
+
+- [#458](https://github.com/HorusGoul/trizum/pull/458) [`8e95035`](https://github.com/HorusGoul/trizum/commit/8e95035edc8ea1dd8c103e5ff588703d788edd34) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Wait for the sync peer before loading server-side party documents so slower WebSocket handshakes do not prematurely fail Party Boost membership checks or share previews.
+
+  Initialize the sync connection only when needed and reuse it for document reads throughout each Worker request.
+
+- [#474](https://github.com/HorusGoul/trizum/pull/474) [`3d75041`](https://github.com/HorusGoul/trizum/commit/3d750411c9ae00a96019991b1feb5c510f10d958) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep the Premium paywall dismissible while store operations are pending so unavailable billing services or blocked requests cannot trap users. Ignore results from dismissed paywall sessions and prevent duplicate purchases while the original request is still running.
+
+- [#454](https://github.com/HorusGoul/trizum/pull/454) [`5f1b5fe`](https://github.com/HorusGoul/trizum/commit/5f1b5fe9afc79b57ed44529e5adf0f7fea1a9aa5) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use structured JSON logging in Cloudflare Workers so messages and error details
+  remain readable in Observability while browser console formatting is preserved.
+
+  Fixes [#453](https://github.com/HorusGoul/trizum/issues/453).
+
+- [#467](https://github.com/HorusGoul/trizum/pull/467) [`7f808ea`](https://github.com/HorusGoul/trizum/commit/7f808ea0fb42d3f970360ce2dcef855a44a6272c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep Party Boost updates server-owned in production by excluding the browser test fixture setter from normal app builds.
+
+- [#466](https://github.com/HorusGoul/trizum/pull/466) [`b43c0bb`](https://github.com/HorusGoul/trizum/commit/b43c0bb26fcb3853b3fee8df26f28eb62e5907f4) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Show shared Party Boost status to signed-out members and offline users. Store each boost with a stable ID, participant attribution, assignment time and latest verification time, while keeping server features independently verified.
+
+- [#460](https://github.com/HorusGoul/trizum/pull/460) [`6f42714`](https://github.com/HorusGoul/trizum/commit/6f427142d19890f0f0ab389679bf0d524b030ff4) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow restoring Premium purchases when store products cannot load. Preserve the remembered account and store-cached Premium access during offline startup, with a notice in settings. Refresh account status when connectivity returns. Native magic links can sign back in after signing out without restarting the app.
+
+- [#455](https://github.com/HorusGoul/trizum/pull/455) [`46c6f53`](https://github.com/HorusGoul/trizum/commit/46c6f53ca280f0ac09648ddb41ce3a787b776268) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Redact Automerge document IDs before logs reach console or monitoring sinks,
+  including nested error causes and stacks, while preserving diagnostic context.
+  Remove the document ID from cloud-sync success logs.
+
+  Fixes [#452](https://github.com/HorusGoul/trizum/issues/452).
+
+- [#470](https://github.com/HorusGoul/trizum/pull/470) [`21bb8ca`](https://github.com/HorusGoul/trizum/commit/21bb8ca7f0fb9f0b548f9e86f62686939a9633e3) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep Premium sign-in continuation tied to each redemption attempt so cancellation and repeated sign-in to the same account can recover cleanly.
+
+- Updated dependencies [[`ed5912f`](https://github.com/HorusGoul/trizum/commit/ed5912fa301dac4cfe85f22a59d9defd2a67bf77), [`46c6f53`](https://github.com/HorusGoul/trizum/commit/46c6f53ca280f0ac09648ddb41ce3a787b776268)]:
+  - @trizum/logging@1.0.1
+  - @trizum/react-suspense-cache@0.1.1
+
 ## 1.12.2
 
 ### Patch Changes
