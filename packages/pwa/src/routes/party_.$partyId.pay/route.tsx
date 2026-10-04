@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.tsx";
@@ -76,6 +77,7 @@ function RouteComponent() {
     });
 
     void expensePromise.then((expense) => {
+      trackEvent("settlement_recorded");
       return navigate({
         to: "/party/$partyId/expense/$expenseId",
         params: {

@@ -15,6 +15,8 @@ import {
   type RegisteredRouter,
 } from "@tanstack/react-router";
 import { parseAppSearch, stringifyAppSearch } from "./lib/routerSearch.ts";
+import { initializeAnalytics, bindAnalytics, trackPage } from "./lib/analytics.ts";
+import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
 import { I18nProvider, useLingui } from "@lingui/react";
 import { I18nProvider as AriaI18nProvider } from "react-aria-components";
@@ -71,6 +73,7 @@ if (shouldInitializeSentry) {
       // eslint-disable-next-line import/namespace
       Sentry.browserProfilingIntegration(),
       ...sentryDocumentIdRedaction.integrations,
+      sentryTelemetryIntegration,
     ],
     tracesSampleRate: 1,
     profileSessionSampleRate: 1,
@@ -81,6 +84,7 @@ if (shouldInitializeSentry) {
   });
 
   configurePwaLogging({
+    getContext: () => ({ telemetryId: getTelemetryId() }),
     lowestLevel: "info",
     extraSinks: {
       sentry: getSentrySink(),
@@ -89,6 +93,7 @@ if (shouldInitializeSentry) {
   });
 } else {
   configurePwaLogging({
+    getContext: () => ({ telemetryId: getTelemetryId() }),
     lowestLevel: isProduction ? "info" : "debug",
   });
 }
@@ -257,6 +262,9 @@ const router = createRouter({
   defaultStaleTime: Infinity,
 });
 
+initializeAnalytics(Object.values(router.routesById).map((route) => route.fullPath));
+router.subscribe("onResolved", () => trackPage(router.state.location.pathname));
+
 router.subscribe("onBeforeNavigate", (event) => {
   if (shouldPreserveCalculatorSearchScroll(event)) {
     // Browser back/forward does not carry the calculator's resetScroll: false option.
@@ -356,7 +364,11 @@ function AriaProviders({ children }: { children: React.ReactNode }) {
 function InnerWrap({ children }: { children: React.ReactNode }) {
   // Initialize the party list to set the locale and other
   // settings on bootstrap.
-  usePartyList();
+  const { partyListHandle } = usePartyList();
+
+  useEffect(() => {
+    return bindAnalytics(partyListHandle, () => router.state.location.pathname);
+  }, [partyListHandle]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

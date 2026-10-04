@@ -8,6 +8,8 @@ import { createApiCorsMiddleware } from "./cors";
 import { partySharePreviewRoute } from "./routes/party-share-preview";
 import { createApiI18nMiddleware } from "./i18n";
 import { premiumRoute } from "./routes/premium";
+import { spycatRoute } from "./routes/spycat";
+import { ANALYTICS_PROXY_PATH } from "../src/lib/api/analyticsConfig";
 
 const app = new OpenAPIHono<ApiHonoEnv>();
 
@@ -45,6 +47,7 @@ app.on(["GET", "POST"], "/api/auth/*", (c) =>
 app.route("/api/cloud-sync", cloudSyncRoute);
 app.route("/api/migrate", apiMigrateRoute);
 app.route("/api/premium", premiumRoute);
+app.route(ANALYTICS_PROXY_PATH, spycatRoute);
 app.doc31("/api/openapi.json", {
   info: {
     description: "The HTTP contract used by trizum's first-party clients.",

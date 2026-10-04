@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { decodeExpenseId, findExpenseById, getExpenseTotalAmount } from "#src/models/expense.js";
@@ -268,6 +269,7 @@ function useExpense() {
         replace: true,
       });
     });
+    trackEvent("expense_deleted");
     toast.success(t`Expense deleted`);
   }
 

@@ -1,0 +1,35 @@
+{
+  "name": "@trizum/analytics",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Privacy-aware InsightFlare analytics for trizum",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "@typescript/native": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

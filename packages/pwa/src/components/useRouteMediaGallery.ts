@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { closeRouteState, navigateWithoutDuplicateEntry } from "#src/lib/navigationHistory.ts";
 import type { ParsedLocation, RouterHistory } from "@tanstack/react-router";
 
@@ -45,6 +46,7 @@ export function useRouteMediaGallery({
     navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
       search: { media: index },
     });
+    if (!isOpen) trackEvent("receipt_gallery_opened");
   }
 
   function closeGallery() {

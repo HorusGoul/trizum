@@ -1,4 +1,10 @@
-import { isValidDocumentId, type Repo, type DocumentId } from "@automerge/automerge-repo/slim";
+import {
+  isValidDocumentId,
+  type Repo,
+  type DocumentId,
+  type DocHandle,
+} from "@automerge/automerge-repo/slim";
+import { isTelemetryId } from "@trizum/analytics";
 import type { SupportedLocale } from "#src/lib/locales.js";
 import type { Party, PartyParticipant } from "./party";
 
@@ -14,6 +20,9 @@ export interface PartyList {
   locale?: SupportedLocale;
   openLastPartyOnLaunch?: boolean;
   autoOpenCalculator?: boolean;
+  usageAnalyticsEnabled?: boolean;
+  /** Random, synced pseudonym; unrelated to the shareable document ID. */
+  telemetryId?: string;
   premiumBannerDismissed?: boolean;
   hue?: number;
   lastOpenedPartyId?: DocumentId | null;
@@ -22,6 +31,16 @@ export interface PartyList {
   archivedParties?: Record<Party["id"], true | undefined>;
   lastUsedAt?: Record<Party["id"], number | undefined>;
   participantInParties: Record<Party["id"], PartyParticipant["id"]>;
+}
+
+export function ensureTelemetryId(handle: DocHandle<PartyList>): string {
+  const existing = handle.doc().telemetryId;
+  if (isTelemetryId(existing)) return existing;
+  const generated = crypto.randomUUID();
+  handle.change((doc) => {
+    if (!isTelemetryId(doc.telemetryId)) doc.telemetryId = generated;
+  });
+  return handle.doc().telemetryId!;
 }
 
 function createPartyListHandle(repo: Repo) {

@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { useEffect, useRef, useState } from "react";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { AdEntitlementContext } from "#src/lib/advertising/AdEntitlementContext.tsx";
@@ -125,6 +126,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     paywallRequestRef.current = { promise, resolve: resolveRequest, entitlement: null };
     setPaywallSessionId((sessionId) => sessionId + 1);
     setIsPaywallOpen(true);
+    trackEvent("premium_paywall_opened");
     return promise;
   }
 
@@ -137,6 +139,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function presentCustomerCenter() {
+    trackEvent("premium_customer_center_requested");
     await presentRevenueCatCustomerCenter(userId);
     const customerInfo = await refreshRevenueCatCustomerInfo();
     const access = getPremiumAccess(customerInfo);

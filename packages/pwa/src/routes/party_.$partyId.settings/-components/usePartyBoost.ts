@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Capacitor } from "@capacitor/core";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -231,6 +232,7 @@ export function usePartyBoost({
         status,
       });
       setIsTransferConfirmationOpen(false);
+      trackEvent("party_boost_applied");
       toast.success(t`Party Boost is active.`);
     } catch (error) {
       if (!statusRequests.finishMutation(mutationContext)) {

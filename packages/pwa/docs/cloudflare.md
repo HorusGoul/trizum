@@ -16,6 +16,15 @@ party preview succeeding on the Worker's `workers.dev` hostname does not prove
 that the production custom domain can reach sync. Local workerd does not
 reproduce Cloudflare's same-zone routing behavior either.
 
+## Analytics proxy
+
+The `SPYCAT` service binding targets the existing InsightFlare Worker in this
+account; its name is configured in `wrangler.jsonc`. Keep bootstrap and collection
+on this binding so IP-bound tokens and visitor metadata remain consistent.
+Local development does not contact it unless a local service is supplied;
+analytics remains disabled by default. Verify the binding through a deployed
+preview when testing the integration. See [`api/routes/spycat.ts`](../api/routes/spycat.ts).
+
 ## D1
 
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party

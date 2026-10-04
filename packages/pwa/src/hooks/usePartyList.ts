@@ -228,8 +228,15 @@ export function usePartyList() {
     });
   }
 
+  function setUsageAnalyticsEnabled(value: boolean) {
+    partyListHandle.change((list) => {
+      list.usageAnalyticsEnabled = value;
+    });
+  }
+
   return {
     partyList,
+    partyListHandle,
     addPartyToList,
     removeParty,
     updateSettings,
@@ -237,6 +244,7 @@ export function usePartyList() {
     setPartyPinned,
     setPartyArchived,
     setAutoOpenCalculator,
+    setUsageAnalyticsEnabled,
     dismissPremiumBanner,
   };
 }

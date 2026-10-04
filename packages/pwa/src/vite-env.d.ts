@@ -6,6 +6,9 @@ interface ImportMetaEnv {
   readonly VITE_APP_WSS_URL: string;
   readonly VITE_APP_AUTH_URL?: string;
   readonly VITE_APP_DISABLE_SENTRY?: string;
+  readonly VITE_APP_ANALYTICS_URL?: string;
+  readonly VITE_APP_DISABLE_ANALYTICS?: string;
+  readonly VITE_APP_ENABLE_ANALYTICS?: string;
   readonly VITE_APP_AD_TEST_MODE?: string;
   readonly VITE_APP_ADMOB_ANDROID_APP_OPEN_ID: string;
   readonly VITE_APP_ADMOB_ANDROID_INTERSTITIAL_ID: string;

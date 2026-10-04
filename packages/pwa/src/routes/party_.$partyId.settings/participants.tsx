@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
@@ -37,6 +38,7 @@ function PartyParticipantSettings() {
       const participants = toPartyParticipantRecord(value.participants);
 
       updateParticipants(participants);
+      trackEvent("party_participants_updated");
       form.reset({ participants: Object.values(participants) });
       toast.success(t`Participants saved!`);
       returnToSettings();

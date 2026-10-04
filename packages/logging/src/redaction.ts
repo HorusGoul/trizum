@@ -130,9 +130,15 @@ function redactRecord(record: LogRecord): LogRecord {
   };
 }
 
-export function withDocumentIdRedaction(sink: Sink): Sink {
+export function withDocumentIdRedaction(
+  sink: Sink,
+  getContext?: () => Record<string, unknown>,
+): Sink {
   const redacted: Sink & Partial<Disposable & AsyncDisposable> = (record) => {
-    sink(redactRecord(record));
+    const contextual = getContext
+      ? { ...record, properties: { ...record.properties, ...getContext() } }
+      : record;
+    sink(redactRecord(contextual));
   };
   const disposable = sink as Sink & Partial<Disposable & AsyncDisposable>;
   const dispose = disposable[Symbol.dispose];

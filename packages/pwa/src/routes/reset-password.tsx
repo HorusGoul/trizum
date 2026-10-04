@@ -1,3 +1,4 @@
+import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -51,6 +52,7 @@ function ResetPassword() {
           newPassword: value.password,
           token,
         });
+        trackEvent("auth_password_reset_completed");
         toast.success(t`Password updated`);
         void navigate({ to: "/settings", replace: true });
       } catch {

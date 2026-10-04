@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/react";
 import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
-import { afterEach, expect, test } from "vite-plus/test";
+import { afterEach, expect, test, vi } from "vite-plus/test";
+import { setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
 
 const documentId = "p3u5PhN9wrNpsGCwfkeef2LzF9";
 const partyUrl = `https://trizum.app/party/${documentId}`;
@@ -11,13 +12,17 @@ afterEach(async () => {
   await Sentry.close();
   Sentry.getCurrentScope().clear();
   Sentry.getIsolationScope().clear();
+  setTelemetryIdentity();
+  vi.unstubAllGlobals();
 });
 
 function initializeRecordingClient() {
   const envelopes: CapturedEnvelope[] = [];
   Sentry.init({
     ...sentryDocumentIdRedaction,
+    integrations: [...sentryDocumentIdRedaction.integrations, sentryTelemetryIntegration],
     dsn: "https://public@example.com/1",
+    release: "telemetry-test",
     defaultIntegrations: false,
     enableLogs: true,
     tracesSampleRate: 1,
@@ -32,6 +37,35 @@ function initializeRecordingClient() {
   });
   return envelopes;
 }
+
+test("shares telemetry identity with Sentry and removes buffered log and session identity on opt-out", async () => {
+  vi.stubGlobal("navigator", {});
+  const envelopes = initializeRecordingClient();
+  const id = crypto.randomUUID();
+  setTelemetryIdentity(() => id);
+  Sentry.captureMessage("Identified error");
+  Sentry.logger.warn("Identified log");
+  Sentry.startSession();
+  Sentry.captureSession();
+  await Sentry.flush(2000);
+  const identified = envelopes.flatMap(([, items]) => items);
+  expect(identified.find(([header]) => header.type === "event")?.[1]).toMatchObject({
+    user: { id },
+  });
+  expect(identified.find(([header]) => header.type === "session")?.[1]).toMatchObject({ did: id });
+  expect(JSON.stringify(identified.find(([header]) => header.type === "log")?.[1])).toContain(id);
+
+  envelopes.length = 0;
+  Sentry.logger.warn("Buffered before opt-out", { telemetryId: id });
+  setTelemetryIdentity();
+  Sentry.captureSession();
+  Sentry.captureMessage("Unidentified error");
+  await Sentry.flush(2000);
+  expect(envelopes.flatMap(([, items]) => items.map(([header]) => header.type))).toEqual(
+    expect.arrayContaining(["event", "log", "session"]),
+  );
+  expect(JSON.stringify(envelopes)).not.toContain(id);
+});
 
 test("removes document IDs from outgoing Sentry errors, breadcrumbs, logs, and traces", async () => {
   const envelopes = initializeRecordingClient();

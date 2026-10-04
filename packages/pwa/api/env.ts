@@ -6,6 +6,7 @@ export interface ApiEnv {
   ASSETS: Fetcher;
   DB: D1Database;
   EMAIL: SendEmail;
+  SPYCAT?: Pick<Fetcher, "fetch">;
   APPLE_APP_BUNDLE_IDENTIFIER?: string;
   APPLE_CLIENT_SECRET?: string;
   APPLE_KEY_ID?: string;

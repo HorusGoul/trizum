@@ -33,6 +33,10 @@ For repo-wide guidance on what to log and which severity level to use, see
 - It should not auto-configure logging on import.
 - Runtime entry points should call `configureTrizumLogging()`, and shared code
   should use `getTrizumLogger()` elsewhere.
+- `getContext()` supplies runtime-owned properties at each emission, before
+  document-ID redaction. Context properties override caller properties. The PWA
+  uses it for its privacy-gated `telemetryId`; Worker/server runtimes do not
+  inherit the browser's identity. Avoid capturing identity in a long-lived logger.
 - Cloudflare Workers select `consoleFormat: "json"` to emit JSON Lines with
   severity, category, message, and structured properties (including error
   details). The default retains browser developer-console formatting.

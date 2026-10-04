@@ -32,6 +32,8 @@ export interface ConfigureTrizumLoggingOptions<TSinkId extends string = never> {
   extraLoggers?: TrizumLoggerConfig<TSinkId>[];
   surfaceSinks?: readonly TrizumSinkId<TSinkId>[];
   contextLocalStorage?: ContextLocalStorage<Record<string, unknown>>;
+  /** Runtime-owned context, read for each record before document-ID redaction. */
+  getContext?: () => Record<string, unknown>;
   metaLowestLevel?: LogLevel | null;
   reset?: boolean;
 }
@@ -58,6 +60,7 @@ export function configureTrizumLogging<TSinkId extends string = never>({
   extraLoggers = [],
   surfaceSinks = ["console"],
   contextLocalStorage,
+  getContext,
   metaLowestLevel = "warning",
   reset = false,
 }: ConfigureTrizumLoggingOptions<TSinkId>): void {
@@ -73,7 +76,7 @@ export function configureTrizumLogging<TSinkId extends string = never>({
   } as Record<TrizumSinkId<TSinkId>, Sink>;
 
   for (const id of Object.keys(sinks) as TrizumSinkId<TSinkId>[]) {
-    sinks[id] = withDocumentIdRedaction(sinks[id]);
+    sinks[id] = withDocumentIdRedaction(sinks[id], getContext);
   }
 
   configureSync({
