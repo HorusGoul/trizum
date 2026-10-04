@@ -306,7 +306,7 @@ function UsageAnalyticsSetting() {
   return (
     <SwitchField
       label={<Trans>Share usage analytics</Trans>}
-      description={<Trans>Help improve trizum. No names or amounts shared.</Trans>}
+      description={<Trans>Help us understand how trizum is used.</Trans>}
       isSelected={partyList.usageAnalyticsEnabled !== false}
       onChange={(enabled) => {
         if (!enabled) setAnalyticsEnabled(false);

@@ -1745,8 +1745,8 @@ msgid "Heads up!"
 msgstr "Heads up!"
 
 #: src/routes/settings.tsx:309
-msgid "Help improve trizum. No names or amounts shared."
-msgstr "Help improve trizum. No names or amounts shared."
+msgid "Help us understand how trizum is used."
+msgstr "Help us understand how trizum is used."
 
 #: src/routes/party.$partyId/-components/Balances.tsx:115
 msgid "Here is a list of operations you and other party members can do to balance your position."
