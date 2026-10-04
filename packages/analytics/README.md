@@ -6,9 +6,14 @@ owns the outbound data boundary and transport.
 
 ## Privacy boundary
 
-- The client starts disabled. The PWA enables it only after loading the Automerge
+- The client starts pending. The PWA enables requests only after loading the Automerge
   party list; `usageAnalyticsEnabled` defaults to true and Settings can disable it
   immediately. The preference follows the party list when it is synced.
+- While preferences are unknown, at most 20 sanitized events stay in memory for
+  up to ten seconds after initialization. Enabling with a valid `telemetryId`
+  flushes them in order with their original timestamps. Opt-out, privacy signals,
+  offline state, profile switching, or expiry discard them. Explicitly disabled
+  activity is never buffered. No bootstrap request is made while pending.
 - Do Not Track (`1` or `yes`), Global Privacy Control, offline state, and the
   application opt-out prevent requests, including the bootstrap request. Privacy
   signals are checked again after asynchronous work. Disabling aborts requests
@@ -23,11 +28,34 @@ owns the outbound data boundary and transport.
   bootstrap and collection use `referrerPolicy: "no-referrer"` and
   `credentials: "omit"`. Never supply user data as `routes`, `hostname`, or `siteId`.
 - Custom events accept only the names in `AnalyticsEvent`, checked again at
-  runtime. There is no arbitrary property bag, identity API, or DOM auto-capture.
+  runtime. There is no arbitrary property bag, arbitrary identity string, or DOM auto-capture.
 - Visit IDs are random and held only in memory. There are no cookies, stored
-  visitor IDs, persistent queues, or retries of offline events. Cloudflare still
+  visitor cookies, persistent queues, or retries of offline events. Cloudflare still
   receives IP addresses and browser request headers; the server can derive its
   normal visitor/location statistics. This is data minimization, not anonymity.
+
+## Shared telemetry identity
+
+The PWA lazily creates a random UUID v4 `telemetryId` in the Automerge party list
+when preferences allow identification. Existing profiles migrate once; a synced
+ID is reused across devices. It is independent of the document ID, never a hash
+of a sharing secret. Concurrent offline migrations converge with Automerge, but
+events sent before convergence can carry different IDs.
+
+Every collected pageview and custom event supplies this value as InsightFlare's
+`userId`; no user name is supplied. Sentry uses the same value as its user ID,
+and the PWA's LogTape sinks include it as `telemetryId`. Opt-out and DNT/GPC clear
+correlation, including buffered Sentry event, log, and session identities.
+Existing error reporting remains enabled without this identifier. Offline logs
+can retain the ID; offline analytics are dropped. Server and Worker logs do not
+automatically receive client identity.
+
+Changing party lists cancels queued analytics and clears the old identity before
+the destination loads. A synced ID change starts a new visit. The PWA exports
+`getTelemetryId()` from `src/lib/telemetry.ts` for future logger integrations;
+read it at emission time and preserve opt-out at any buffering/delivery boundary.
+Keep all document-ID redaction in place. This is pseudonymous cross-device
+correlation, not anonymous tracking.
 
 ## InsightFlare compatibility
 
@@ -58,7 +86,7 @@ Recheck this contract when upgrading the private deployment:
 - [Collector](https://github.com/RavelloH/InsightFlare/blob/main/src/lib/edge/collector/collect.ts)
 
 Only pageviews and custom events are implemented. Automatic outbound-link
-tracking, browser client hints, performance metrics, identity, visit duration,
+tracking, browser client hints, performance metrics, visit duration,
 and visibility/leave events are deliberately outside this integration.
 
 ## PWA configuration
@@ -100,7 +128,8 @@ empty results. Store results can arrive after dismissing the paywall and still
 count the original operation once; they do not imply entitlement activation.
 Draft receipt/avatar events describe editing activity, not saved documents.
 Cloud activation is counted only when both source and destination lists allow
-analytics; a destination opt-out takes effect before switching lists.
+analytics. It waits up to ten seconds for the destination binding, then emits
+under that profile; rejection, offline state, or expiry drops it.
 
 Deliberate exclusions: ordinary route navigation (already pageviews), individual
 form fields and keystrokes, financial values, automatic sync/recalculations,

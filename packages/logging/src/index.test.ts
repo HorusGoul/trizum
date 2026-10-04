@@ -28,6 +28,33 @@ afterEach(() => {
 });
 
 describe("@trizum/logging", () => {
+  test("reads changing runtime context for existing loggers and redacts it before every sink", () => {
+    const first = createRecordingSink();
+    const second = createRecordingSink();
+    const logger = getTrizumLogger("pwa", "test");
+    let telemetryId: string | undefined = crypto.randomUUID();
+    const original = telemetryId;
+    configureTrizumLogging({
+      surface: "pwa",
+      extraSinks: { first: first.sink, second: second.sink },
+      surfaceSinks: ["first", "second"],
+      getContext: () => ({ telemetryId, documentId: "private-document" }),
+    });
+    logger.info("First");
+    telemetryId = crypto.randomUUID();
+    logger.info("Switched");
+    telemetryId = undefined;
+    logger.info("Opted out", { telemetryId: original });
+    for (const { records } of [first, second]) {
+      expect(records[0].properties.telemetryId).toBe(original);
+      expect(records[1].properties.telemetryId).not.toBe(original);
+      expect(records[2].properties.telemetryId).toBeUndefined();
+      expect(
+        records.every((record) => record.properties.documentId === "[REDACTED_DOCUMENT_ID]"),
+      ).toBe(true);
+    }
+  });
+
   test("keeps developer-console formatting by default", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     configureTrizumLogging({ surface: "pwa" });

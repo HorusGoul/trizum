@@ -18,7 +18,7 @@ import {
 import { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.js";
-import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
+import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics.ts";
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
 
@@ -322,7 +322,7 @@ export function useCloudSyncAccountState({
       partyList.usageAnalyticsEnabled !== false &&
       cloudPartyList.usageAnalyticsEnabled !== false
     ) {
-      trackEvent("cloud_sync_activated");
+      trackCloudSyncActivated(settings.partyListDocumentId);
     }
 
     if (userId) {

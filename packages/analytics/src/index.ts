@@ -1,8 +1,8 @@
 import { readCollectToken } from "./insightflare.js";
-import { redactPathname } from "./privacy.js";
+import { isTelemetryId, redactPathname } from "./privacy.js";
 import { analyticsEvents, type AnalyticsEvent } from "./events.js";
 
-export { hasPrivacySignal } from "./privacy.js";
+export { hasPrivacySignal, isTelemetryId } from "./privacy.js";
 
 export type { AnalyticsEvent } from "./events.js";
 
@@ -33,16 +33,45 @@ export function createAnalytics(options: AnalyticsOptions) {
   scriptUrl.searchParams.set("siteId", options.siteId);
   const collectUrl = new URL("/collect", endpoint.origin);
   const fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
-  let enabled = false;
+  let state: "pending" | "enabled" | "disabled" = "pending";
+  let telemetryId: string | undefined;
+  let startup: Record<string, unknown>[] = [];
+  const startupDeadline = Date.now() + 10_000;
+  let startupTimer: ReturnType<typeof setTimeout> | undefined;
   let controller = new AbortController();
   let visit: Visit | undefined;
   let lastPathname: string | undefined;
   let token: { value: string; expiresAt: number } | undefined;
-  let pending = 0;
-  let tail = Promise.resolve();
+  let queue = { pending: 0, tail: Promise.resolve() };
 
   function allowed() {
-    return enabled && options.canCollect();
+    return state === "enabled" && options.canCollect();
+  }
+
+  function discardStartup() {
+    startup = [];
+    clearTimeout(startupTimer);
+    startupTimer = undefined;
+  }
+
+  function disable() {
+    state = "disabled";
+    telemetryId = undefined;
+    discardStartup();
+    controller.abort();
+    controller = new AbortController();
+    queue = { pending: 0, tail: Promise.resolve() };
+    token = undefined;
+    visit = undefined;
+    lastPathname = undefined;
+  }
+
+  function canRecord() {
+    if (!options.canCollect()) {
+      disable();
+      return false;
+    }
+    return state === "enabled" || (state === "pending" && Date.now() < startupDeadline);
   }
 
   async function send(payload: Record<string, unknown>, signal: AbortSignal) {
@@ -93,13 +122,28 @@ export function createAnalytics(options: AnalyticsOptions) {
   }
 
   function enqueue(payload: Record<string, unknown>) {
-    if (!allowed() || pending >= 20) return;
+    if (state === "pending") {
+      if (startup.length >= 20) return;
+      startup.push(payload);
+      startupTimer ??= setTimeout(
+        () => {
+          discardStartup();
+          visit = undefined;
+          lastPathname = undefined;
+        },
+        Math.max(0, startupDeadline - Date.now()),
+      );
+      return;
+    }
+    if (!allowed() || queue.pending >= 20) return;
+    const identified = { ...payload, userId: telemetryId };
     const signal = controller.signal;
-    pending++;
-    tail = tail
-      .then(() => send(payload, signal))
+    const currentQueue = queue;
+    currentQueue.pending++;
+    currentQueue.tail = currentQueue.tail
+      .then(() => send(identified, signal))
       .finally(() => {
-        pending--;
+        currentQueue.pending--;
       });
   }
 
@@ -117,20 +161,44 @@ export function createAnalytics(options: AnalyticsOptions) {
     };
   }
 
+  function track(event: AnalyticsEvent) {
+    if (
+      !canRecord() ||
+      !visit ||
+      typeof event !== "string" ||
+      !Object.hasOwn(analyticsEvents, event)
+    )
+      return;
+    enqueue({
+      ...base(visit),
+      kind: "custom_event",
+      eventId: crypto.randomUUID(),
+      eventName: event,
+      eventData: {},
+    });
+  }
+
   return {
-    setEnabled(value: boolean) {
-      if (enabled === value) return;
-      enabled = value;
-      if (!value) {
-        controller.abort();
-        controller = new AbortController();
-        token = undefined;
+    setEnabled(value: boolean, id?: string) {
+      if (!value || !isTelemetryId(id) || !options.canCollect()) {
+        disable();
+        return;
+      }
+      if (state === "enabled" && telemetryId === id) return;
+      if (state === "enabled") disable();
+      const buffered = Date.now() < startupDeadline ? startup : [];
+      if (state === "pending" && buffered.length === 0) {
         visit = undefined;
         lastPathname = undefined;
       }
+      discardStartup();
+      telemetryId = id;
+      state = "enabled";
+      for (const payload of buffered) enqueue(payload);
     },
     page(pathname: string) {
-      if (!allowed() || pathname === lastPathname) return;
+      if (!canRecord() || pathname === lastPathname) return;
+      if (state === "pending" && startup.length >= 20) return;
       lastPathname = pathname;
       visit = {
         pathname: redactPathname(pathname, options.routes),
@@ -139,24 +207,9 @@ export function createAnalytics(options: AnalyticsOptions) {
       };
       enqueue({ ...base(visit), kind: "pageview" });
     },
-    track(event: AnalyticsEvent) {
-      if (
-        !allowed() ||
-        !visit ||
-        typeof event !== "string" ||
-        !Object.hasOwn(analyticsEvents, event)
-      )
-        return;
-      enqueue({
-        ...base(visit),
-        kind: "custom_event",
-        eventId: crypto.randomUUID(),
-        eventName: event,
-        eventData: {},
-      });
-    },
+    track,
     /** Useful for deterministic checks; collection remains fire-and-forget in the UI. */
-    flush: () => tail,
+    flush: () => queue.tail,
   };
 }
 

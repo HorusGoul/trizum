@@ -23,7 +23,7 @@ function renderPrivacyPolicyContent() {
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
         <p className="text-accent-600 dark:text-accent-400 text-sm">
-          <Trans>Last updated: October 3, 2026</Trans>
+          <Trans>Last updated: October 4, 2026</Trans>
         </p>
 
         <p className="text-accent-700 dark:text-accent-300">
@@ -42,6 +42,14 @@ function renderPrivacyPolicyContent() {
               understand page visits and feature usage. We exclude names, amounts, expense details,
               and sharing identifiers. Analytics can be disabled in Settings, and we respect browser
               privacy signals.
+            </Trans>
+          </p>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              When analytics are enabled, a random identifier links usage across your synced devices
+              and connects it with diagnostic logs and error reports sent to Sentry. Turning off
+              analytics or enabling browser privacy signals stops this linking. Error reporting can
+              continue without this identifier.
             </Trans>
           </p>
         </section>

@@ -236,6 +236,7 @@ export function usePartyList() {
 
   return {
     partyList,
+    partyListHandle,
     addPartyToList,
     removeParty,
     updateSettings,

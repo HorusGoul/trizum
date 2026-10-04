@@ -2,7 +2,7 @@ import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-re
 import { i18n } from "@lingui/core";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vite-plus/test";
-import { setAnalyticsEnabled, trackEvent } from "#src/lib/analytics.ts";
+import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics.ts";
 import type { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.ts";
 import type * as CloudSettings from "#src/lib/cloudSyncSettings.ts";
@@ -15,7 +15,7 @@ const readDocument = vi.hoisted(() => vi.fn<typeof documentCache.readAsync>());
 
 vi.mock("#src/lib/analytics.ts", () => ({
   setAnalyticsEnabled: vi.fn<typeof setAnalyticsEnabled>(),
-  trackEvent: vi.fn<typeof trackEvent>(),
+  trackCloudSyncActivated: vi.fn<typeof trackCloudSyncActivated>(),
 }));
 vi.mock("#src/lib/automerge/useRepo.ts", () => ({ useRepo: () => ({}) }));
 vi.mock("#src/lib/automerge/suspense-hooks.ts", () => ({
@@ -87,7 +87,7 @@ it.each([undefined, true])("counts activation for destination preference %s", as
   await activateCloudSyncOnDevice({ partyListDocumentId: destination.id, updatedAt: 123 });
   expect(setPartyListId).toHaveBeenCalledWith(destination.id);
   expect(onCloudDataActivated).toHaveBeenCalledOnce();
-  expect(vi.mocked(trackEvent).mock.calls).toEqual([["cloud_sync_activated"]]);
+  expect(vi.mocked(trackCloudSyncActivated).mock.calls).toEqual([[destination.id]]);
   expect(setAnalyticsEnabled).not.toHaveBeenCalled();
 });
 
@@ -97,7 +97,7 @@ it("disables analytics before switching to an opted-out destination", async () =
   const { activateCloudSyncOnDevice } = renderAccount(partyList());
   await activateCloudSyncOnDevice({ partyListDocumentId: destination.id, updatedAt: 123 });
   expect(setPartyListId).toHaveBeenCalledWith(destination.id);
-  expect(trackEvent).not.toHaveBeenCalled();
+  expect(trackCloudSyncActivated).not.toHaveBeenCalled();
   expect(setAnalyticsEnabled).toHaveBeenCalledWith(false);
   expect(vi.mocked(setAnalyticsEnabled).mock.invocationCallOrder[0]).toBeLessThan(
     vi.mocked(setPartyListId).mock.invocationCallOrder[0],
@@ -110,7 +110,7 @@ it("does not enable analytics or emit activation when the source list opted out"
   const { activateCloudSyncOnDevice } = renderAccount(partyList(false));
   await activateCloudSyncOnDevice({ partyListDocumentId: destination.id, updatedAt: 123 });
   expect(setPartyListId).toHaveBeenCalledWith(destination.id);
-  expect(trackEvent).not.toHaveBeenCalled();
+  expect(trackCloudSyncActivated).not.toHaveBeenCalled();
   expect(setAnalyticsEnabled).not.toHaveBeenCalled();
 });
 
@@ -125,5 +125,5 @@ it("does not count an already active list, unavailable list, or failed load", as
   readDocument.mockRejectedValue(new Error("Unavailable"));
   await expect(activateCloudSyncOnDevice(settings)).rejects.toThrow("Unavailable");
   expect(setPartyListId).not.toHaveBeenCalled();
-  expect(trackEvent).not.toHaveBeenCalled();
+  expect(trackCloudSyncActivated).not.toHaveBeenCalled();
 });

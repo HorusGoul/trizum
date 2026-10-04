@@ -62,6 +62,13 @@ accounts or cloud party lists must respect the destination's analytics preferenc
 Do not temporarily enable analytics, persist retries, or bypass gates to improve
 coverage. Analytics failures must never change the outcome of the user's action.
 
+The shared `telemetryId` is a random UUID synced in the party list. The analytics
+facade owns its use as InsightFlare `userId`; never attach it to event names or
+properties, derive it from document IDs, or substitute account IDs. New logger
+integrations should read the privacy-gated `getTelemetryId()` at emission time
+and clear buffered identity on opt-out. Startup buffering is bounded and applies
+only while preferences are unknown, never while explicitly disabled.
+
 ## Verification and maintenance
 
 Update the catalog descriptions and the README's coverage decisions if behavior

@@ -22,3 +22,10 @@ export function hasPrivacySignal(navigator: {
   const dnt = navigator.doNotTrack?.trim().toLowerCase();
   return navigator.globalPrivacyControl === true || dnt === "1" || dnt === "yes";
 }
+/** Random UUID v4 only: never accept a document ID or arbitrary identity string. */
+export function isTelemetryId(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value)
+  );
+}

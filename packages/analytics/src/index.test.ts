@@ -8,6 +8,7 @@ import {
 import { redactPathname } from "./privacy.js";
 import { readCollectToken } from "./insightflare.js";
 
+const telemetryId = "d97261e3-d471-4960-86e6-e205d1d84c7a";
 const siteId = "test-site";
 const routes = [
   "/",
@@ -98,7 +99,7 @@ describe("analytics collection", () => {
         },
       });
     });
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page(`/party/${documentId}`);
     client.track("party_created");
     await client.flush();
@@ -122,7 +123,7 @@ describe("analytics collection", () => {
     vi.stubGlobal("AbortSignal", {});
     try {
       const { client, payloads } = harness();
-      client.setEnabled(true);
+      client.setEnabled(true, telemetryId);
       client.page("/settings");
       client.track("settings_saved");
       await client.flush();
@@ -144,7 +145,7 @@ describe("analytics collection", () => {
             });
           }),
       );
-      client.setEnabled(true);
+      client.setEnabled(true, telemetryId);
       client.page("/settings");
       await vi.advanceTimersByTimeAsync(5000);
       await expect(client.flush()).resolves.toBeUndefined();
@@ -162,11 +163,12 @@ describe("analytics collection", () => {
     client.track("party_created");
     await client.flush();
     expect(fetch).not.toHaveBeenCalled();
+    client.setEnabled(false);
   });
 
   it("sends only safe page metadata and approved events with no extra properties", async () => {
     const { client, fetch, payloads } = harness();
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page(`/party/${documentId}?name=Alice#secret`);
     client.track("expense_created");
     client.track(documentId as AnalyticsEvent);
@@ -185,6 +187,7 @@ describe("analytics collection", () => {
       startedAt: expect.any(Number),
       timestamp: expect.any(Number),
       visitorId: "",
+      userId: telemetryId,
       query: "",
       hash: "",
       title: "",
@@ -206,7 +209,7 @@ describe("analytics collection", () => {
 
   it("deduplicates router notifications but counts different documents using the same template", async () => {
     const { client, payloads } = harness();
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page("/party/first");
     client.page("/party/first");
     client.page("/party/second");
@@ -218,7 +221,7 @@ describe("analytics collection", () => {
 
   it("starts a fresh current-route visit on reconnect without replaying offline activity", async () => {
     const { client, canCollect, payloads } = harness();
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page("/settings");
     await client.flush();
     const previousVisit = payloads()[0].visitId;
@@ -227,7 +230,7 @@ describe("analytics collection", () => {
     client.page(`/party/${documentId}`);
     client.track("party_pinned");
     canCollect.mockReturnValue(true);
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page(`/party/${documentId}`);
     client.track("party_unpinned");
     await client.flush();
@@ -247,7 +250,7 @@ describe("analytics collection", () => {
     client.page("/settings");
     client.track("settings_saved");
     canCollect.mockReturnValue(true);
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page("/settings");
     client.track("settings_saved");
     await client.flush();
@@ -257,7 +260,7 @@ describe("analytics collection", () => {
 
   it("rechecks privacy signals before bootstrap and collection", async () => {
     const { client, canCollect, fetch, payloads } = harness();
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     canCollect.mockReturnValue(false);
     client.page("/");
     await client.flush();
@@ -283,7 +286,7 @@ describe("analytics collection", () => {
             resolve = done;
           }),
       );
-      client.setEnabled(true);
+      client.setEnabled(true, telemetryId);
       client.page("/");
       client.track("party_created");
       await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
@@ -292,7 +295,7 @@ describe("analytics collection", () => {
       resolve(new Response(bootstrap()));
       await client.flush();
       expect(payloads()).toHaveLength(0);
-      client.setEnabled(true);
+      client.setEnabled(true, telemetryId);
       client.page("/settings");
       await client.flush();
       expect(payloads()).toHaveLength(1);
@@ -305,7 +308,7 @@ describe("analytics collection", () => {
       if (failure === "network") throw new Error("offline");
       return new Response("unexpected", { status: failure === "http" ? 503 : 200 });
     });
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page("/");
     await expect(client.flush()).resolves.toBeUndefined();
     expect(payloads()).toHaveLength(0);
@@ -313,10 +316,126 @@ describe("analytics collection", () => {
 
   it("bounds queued events", async () => {
     const { client, payloads } = harness();
-    client.setEnabled(true);
+    client.setEnabled(true, telemetryId);
     client.page("/");
     for (let index = 0; index < 100; index++) client.track("expense_created");
     await client.flush();
     expect(payloads()).toHaveLength(20);
+  });
+});
+
+describe("startup buffering and telemetry identity", () => {
+  it("flushes sanitized startup activity in order with its original timestamps", async () => {
+    const { client, fetch, payloads } = harness();
+    client.page(`/party/${documentId}?name=Alice#secret`);
+    client.track("party_created");
+    client.track("Alice" as AnalyticsEvent);
+    const recordedBy = Date.now();
+    await client.flush();
+    expect(fetch).not.toHaveBeenCalled();
+    client.setEnabled(true, telemetryId);
+    client.page(`/party/${documentId}?name=Alice#secret`);
+    await client.flush();
+    expect(payloads().map(({ kind }) => kind)).toEqual(["pageview", "custom_event"]);
+    for (const payload of payloads()) {
+      expect(payload).toMatchObject({ userId: telemetryId, pathname: "/party/:redacted" });
+      expect(payload.timestamp).toBeLessThanOrEqual(recordedBy);
+    }
+    expect(JSON.stringify(payloads())).not.toMatch(/Alice|secret|2f9Vysj/);
+  });
+
+  it("drops startup and explicitly disabled activity on opt-out", async () => {
+    const { client, payloads } = harness();
+    client.page("/");
+    client.track("party_created");
+    client.setEnabled(false);
+    client.page("/settings");
+    client.track("settings_saved");
+    client.setEnabled(true, telemetryId);
+    client.page("/settings");
+    await client.flush();
+    expect(payloads()).toHaveLength(1);
+    expect(payloads()[0].kind).toBe("pageview");
+  });
+
+  it("expires the startup buffer after ten seconds and starts a fresh visit", async () => {
+    vi.useFakeTimers();
+    try {
+      const { client, payloads } = harness();
+      client.page("/settings");
+      client.track("settings_saved");
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(vi.getTimerCount()).toBe(0);
+      client.track("party_created");
+      client.setEnabled(true, telemetryId);
+      client.page("/settings");
+      await client.flush();
+      expect(payloads()).toHaveLength(1);
+      expect(payloads()[0].kind).toBe("pageview");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("bounds the startup buffer to twenty events", async () => {
+    const { client, payloads } = harness();
+    client.page("/");
+    for (let i = 0; i < 100; i++) client.track("party_created");
+    client.setEnabled(true, telemetryId);
+    await client.flush();
+    expect(payloads()).toHaveLength(20);
+  });
+
+  it("discards buffered activity when a privacy signal blocks collection", async () => {
+    const { client, canCollect, fetch, payloads } = harness();
+    client.page("/");
+    client.track("party_created");
+    canCollect.mockReturnValue(false);
+    client.setEnabled(true, telemetryId);
+    await client.flush();
+    expect(fetch).not.toHaveBeenCalled();
+    canCollect.mockReturnValue(true);
+    client.setEnabled(true, telemetryId);
+    client.page("/settings");
+    await client.flush();
+    expect(payloads()).toHaveLength(1);
+  });
+
+  it.each([undefined, documentId, "Alice", "00000000-0000-0000-0000-000000000000"])(
+    "rejects invalid telemetry identity %s",
+    async (id) => {
+      const { client, fetch } = harness();
+      client.page("/");
+      client.setEnabled(true, id);
+      client.page("/settings");
+      await client.flush();
+      expect(fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it("cancels old-profile work without attaching a new ID to it or blocking the new queue", async () => {
+    const { client, fetch, payloads } = harness();
+    let resolve!: (response: Response) => void;
+    fetch.mockImplementationOnce(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    );
+    client.setEnabled(true, telemetryId);
+    client.page("/");
+    for (let i = 0; i < 30; i++) client.track("party_created");
+    const previousQueue = client.flush();
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    const nextId = crypto.randomUUID();
+    client.setEnabled(true, nextId);
+    expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    client.page("/settings");
+    client.track("settings_saved");
+    await client.flush();
+    resolve(new Response(bootstrap()));
+    await previousQueue;
+    expect(payloads().map(({ userId }) => userId)).toEqual([nextId, nextId]);
+    expect(payloads()[1].eventName).toBe("settings_saved");
   });
 });
