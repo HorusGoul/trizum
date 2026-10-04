@@ -764,7 +764,7 @@ msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
 #: src/components/CloudSyncSettingsView.tsx:761
-#: src/routes/settings.tsx:387
+#: src/routes/settings.tsx:382
 msgid "Checking account…"
 msgstr "Comprobando la cuenta…"
 
@@ -772,7 +772,7 @@ msgstr "Comprobando la cuenta…"
 msgid "Checking Party Boost…"
 msgstr "Comprobando Party Boost…"
 
-#: src/routes/settings.tsx:416
+#: src/routes/settings.tsx:411
 msgid "Checking Premium status…"
 msgstr "Comprobando el estado de Premium…"
 
@@ -796,7 +796,7 @@ msgstr "Yuan Chino"
 msgid "Choose a destination party"
 msgstr "Elige un grupo de destino"
 
-#: src/routes/settings.tsx:435
+#: src/routes/settings.tsx:430
 msgid "Choose monthly, annual, or lifetime access."
 msgstr "Elige acceso mensual, anual o de por vida."
 
@@ -1058,7 +1058,7 @@ msgstr "No se pudo cargar el estado de trizum cloud"
 
 #: src/hooks/usePremiumDialogs.ts:26
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:286
-#: src/routes/settings.tsx:359
+#: src/routes/settings.tsx:354
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
 
@@ -1696,9 +1696,9 @@ msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 msgid "Heads up!"
 msgstr "¡Atención!"
 
-#: src/routes/settings.tsx:310
-msgid "Help improve trizum with page visits and feature usage, without names, amounts, or sharing links. Changes apply immediately. Browser privacy signals are respected."
-msgstr "Ayuda a mejorar trizum con visitas a páginas y uso de funciones, sin nombres, importes ni enlaces para compartir. Los cambios se aplican inmediatamente. Se respetan las señales de privacidad del navegador."
+#: src/routes/settings.tsx:309
+msgid "Help improve trizum. No names or amounts shared."
+msgstr "Ayuda a mejorar trizum sin compartir nombres ni importes."
 
 #: src/routes/party.$partyId/-components/Balances.tsx:115
 msgid "Here is a list of operations you and other party members can do to balance your position."
@@ -2087,7 +2087,7 @@ msgstr "Gestionar"
 msgid "Manage expense templates"
 msgstr "Gestionar plantillas de gasto"
 
-#: src/routes/settings.tsx:392
+#: src/routes/settings.tsx:387
 msgid "Manage Premium"
 msgstr "Gestionar Premium"
 
@@ -2865,7 +2865,7 @@ msgstr "Zloty Polaco"
 
 #: src/components/PremiumPaywall.tsx:147
 #: src/routes/party_.$partyId.settings/index.tsx:66
-#: src/routes/settings.tsx:368
+#: src/routes/settings.tsx:363
 msgid "Premium"
 msgstr "Premium"
 
@@ -2882,7 +2882,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium in the mobile app"
 msgstr "Premium en la app móvil"
 
-#: src/routes/settings.tsx:428
+#: src/routes/settings.tsx:423
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
@@ -2919,7 +2919,7 @@ msgstr "Plan Premium"
 msgid "Premium purchases restored."
 msgstr "Se han restaurado las compras de Premium."
 
-#: src/routes/settings.tsx:432
+#: src/routes/settings.tsx:427
 msgid "Premium status could not be checked. Try again."
 msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 
@@ -3075,7 +3075,7 @@ msgid "Retry"
 msgstr "Reintentar"
 
 #: src/components/CloudSyncSettingsView.tsx:773
-#: src/routes/settings.tsx:389
+#: src/routes/settings.tsx:384
 msgid "Retry account check"
 msgstr "Volver a comprobar la cuenta"
 
@@ -3302,11 +3302,11 @@ msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 msgid "Sign in to activate Premium benefits for this party."
 msgstr "Inicia sesión para activar las ventajas de Premium en este grupo."
 
-#: src/routes/settings.tsx:397
+#: src/routes/settings.tsx:392
 msgid "Sign in to get Premium"
 msgstr "Inicia sesión para obtener Premium"
 
-#: src/routes/settings.tsx:424
+#: src/routes/settings.tsx:419
 msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 
@@ -4193,7 +4193,7 @@ msgid "View photo"
 msgstr "Ver foto"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:300
-#: src/routes/settings.tsx:394
+#: src/routes/settings.tsx:389
 msgid "View Premium options"
 msgstr "Ver opciones de Premium"
 
@@ -4412,7 +4412,7 @@ msgid "You're now seeing the party as {participantName}"
 msgstr "Ahora estás viendo el grupo como {participantName}"
 
 #: src/components/CloudSyncSettingsView.tsx:763
-#: src/routes/settings.tsx:420
+#: src/routes/settings.tsx:415
 msgid "Your account could not be checked. Connect to the internet and try again."
 msgstr "No se pudo comprobar tu cuenta. Conéctate a internet y vuelve a intentarlo."
 

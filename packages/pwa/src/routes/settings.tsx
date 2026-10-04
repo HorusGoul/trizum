@@ -154,7 +154,7 @@ function SettingsFormFields({
         event.preventDefault();
         void form.handleSubmit();
       }}
-      className="pb-safe container mt-6 flex flex-col gap-6 px-4 pb-8"
+      className="pb-safe-offset-8 container mt-6 flex flex-col gap-6 px-4"
     >
       <OfflineAccountNotice />
       <form.Field name="avatarId">
@@ -306,12 +306,7 @@ function UsageAnalyticsSetting() {
   return (
     <SwitchField
       label={<Trans>Share usage analytics</Trans>}
-      description={
-        <Trans>
-          Help improve trizum with page visits and feature usage, without names, amounts, or sharing
-          links. Changes apply immediately. Browser privacy signals are respected.
-        </Trans>
-      }
+      description={<Trans>Help improve trizum. No names or amounts shared.</Trans>}
       isSelected={partyList.usageAnalyticsEnabled !== false}
       onChange={(enabled) => {
         if (!enabled) setAnalyticsEnabled(false);

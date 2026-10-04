@@ -11,3 +11,5 @@ Cover group management, expenses and templates, imports, sharing, editing tools,
 Buffer sanitized startup events briefly until preferences load. Sync a random telemetryId with the party list and reuse it for analytics, Sentry, and PWA logs, honoring opt-out and browser privacy signals. Disclose cross-device correlation in the privacy policy.
 
 Proxy analytics through trizum's API with a Cloudflare service binding, preserving visitor metadata and supporting native CORS with readable responses.
+
+Keep the Settings analytics description concise and preserve bottom spacing above device safe areas.
