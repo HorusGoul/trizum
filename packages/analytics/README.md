@@ -12,6 +12,7 @@ lifecycle.
   boundaries.
 - [PWA integration](../pwa/src/lib/analytics.ts): endpoint, build flags,
   preferences, connectivity, and profile switching.
+- [First-party proxy](../pwa/api/routes/spycat.ts): upstream forwarding and header filtering.
 - [Telemetry integration](../pwa/src/lib/telemetry.ts): shared identity and Sentry
   privacy handling.
 - [Analytics-events skill](../../.agents/skills/analytics-events/SKILL.md):
@@ -28,9 +29,9 @@ on an internal protocol: when upgrading the deployment, check the upstream
 and [collector](https://github.com/RavelloH/InsightFlare/blob/main/src/lib/edge/collector/collect.ts).
 Never fall back to executing the remote SDK.
 
-iOS uses a simple POST because the collector's CORS response does not accept its
-custom-scheme origin. Its opaque response cannot confirm ingestion; a successful
-request alone is not evidence of dashboard persistence.
+The first-party proxy handles native CORS. A Cloudflare service binding preserves
+the client IP and location metadata that public cross-zone fetches can replace;
+bootstrap and collection must use the same forwarding path for IP-bound tokens.
 
 The synced `telemetryId` is random rather than derived from a document ID because
 document IDs grant sharing access. It enables pseudonymous cross-device

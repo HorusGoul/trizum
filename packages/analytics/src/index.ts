@@ -11,8 +11,6 @@ export interface AnalyticsOptions {
   siteId: string;
   hostname: string;
   routes: readonly string[];
-  /** Native custom-scheme origins may need a simple POST with an opaque response. */
-  collectionMode?: "cors" | "no-cors";
   /** Rechecked at collection time, including after asynchronous bootstrap. */
   canCollect: () => boolean;
   fetch?: typeof globalThis.fetch;
@@ -29,9 +27,12 @@ export function createAnalytics(options: AnalyticsOptions) {
   if (endpoint.protocol !== "https:" || endpoint.username || endpoint.password) {
     throw new Error("Analytics requires an HTTPS endpoint without credentials");
   }
-  const scriptUrl = new URL("/script.js", endpoint.origin);
+  endpoint.pathname = `${endpoint.pathname.replace(/\/+$/, "")}/`;
+  endpoint.search = "";
+  endpoint.hash = "";
+  const scriptUrl = new URL("script.js", endpoint);
   scriptUrl.searchParams.set("siteId", options.siteId);
-  const collectUrl = new URL("/collect", endpoint.origin);
+  const collectUrl = new URL("collect", endpoint);
   const fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
   let state: "pending" | "enabled" | "disabled" = "pending";
   let telemetryId: string | undefined;
@@ -99,17 +100,14 @@ export function createAnalytics(options: AnalyticsOptions) {
       if (signal.aborted || !allowed()) return;
       const response = await fetch(collectUrl, {
         method: "POST",
-        mode: options.collectionMode ?? "cors",
+        mode: "cors",
         credentials: "omit",
         referrerPolicy: "no-referrer",
-        headers: {
-          "content-type": options.collectionMode === "no-cors" ? "text/plain" : "application/json",
-        },
+        headers: { "content-type": "application/json" },
         signal: requestSignal,
         body: JSON.stringify({ ...payload, collectToken: token.value }),
       });
-      // An opaque response exposes no status; it is not proof of ingestion.
-      if (!response.ok && !(options.collectionMode === "no-cors" && response.type === "opaque")) {
+      if (!response.ok) {
         token = undefined;
       }
     } catch {

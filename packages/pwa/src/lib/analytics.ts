@@ -12,6 +12,7 @@ import {
   type PartyList,
 } from "#src/models/partyList.ts";
 import { getTelemetryId, setTelemetryIdentity } from "./telemetry.ts";
+import { ANALYTICS_PROXY_PATH, ANALYTICS_SITE_ID } from "./api/analyticsConfig.ts";
 
 let client: Analytics | undefined;
 let activation: { destination: DocumentId; expiresAt: number } | undefined;
@@ -25,11 +26,15 @@ export function initializeAnalytics(routes: readonly string[]) {
 
   try {
     client = createAnalytics({
-      endpoint: import.meta.env.VITE_APP_ANALYTICS_URL || "https://spycat.horus.dev",
-      siteId: "9cf3da44-3ae9-478d-95aa-7015e864557e",
+      endpoint:
+        import.meta.env.VITE_APP_ANALYTICS_URL ||
+        new URL(
+          ANALYTICS_PROXY_PATH,
+          Capacitor.isNativePlatform() ? "https://trizum.app" : window.location.origin,
+        ).href,
+      siteId: ANALYTICS_SITE_ID,
       hostname: "trizum.app",
       routes,
-      collectionMode: Capacitor.getPlatform() === "ios" ? "no-cors" : "cors",
       canCollect: () => !hasPrivacySignal(navigator) && navigator.onLine,
     });
   } catch {

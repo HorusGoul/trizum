@@ -2,6 +2,7 @@ import { Repo } from "@automerge/automerge-repo";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 import { isTelemetryId } from "@trizum/analytics";
 import * as Sentry from "@sentry/react";
+import { Capacitor } from "@capacitor/core";
 import { ensureTelemetryId, setPartyListId, type PartyList } from "#src/models/partyList.ts";
 import {
   bindAnalytics,
@@ -13,17 +14,23 @@ import {
 import { getTelemetryId, setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
 
 vi.mock("@sentry/react", () => ({ setUser: vi.fn<typeof Sentry.setUser>() }));
+vi.mock("@capacitor/core", () => ({
+  Capacitor: { isNativePlatform: vi.fn<typeof Capacitor.isNativePlatform>(() => false) },
+}));
 
 let repo: Repo;
 let cleanups: (() => void)[];
-let browser: EventTarget & { location: { hostname: string } };
+let browser: EventTarget & { location: { hostname: string; origin: string } };
 let preferences: { onLine: boolean; doNotTrack?: string; globalPrivacyControl?: boolean };
 let fetch: ReturnType<typeof vi.fn<typeof globalThis.fetch>>;
 
 beforeEach(() => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
   repo = new Repo({ network: [] });
   cleanups = [];
-  browser = Object.assign(new EventTarget(), { location: { hostname: "trizum.app" } });
+  browser = Object.assign(new EventTarget(), {
+    location: { hostname: "trizum.app", origin: "https://trizum.app" },
+  });
   preferences = { onLine: true };
   vi.stubGlobal("window", browser);
   vi.stubGlobal("navigator", preferences);
@@ -74,6 +81,19 @@ function payloads() {
     .filter(([, init]) => init?.method === "POST")
     .map(([, init]) => JSON.parse(init?.body as string));
 }
+
+it.each([false, true])("uses the first-party proxy on native=%s", async (native) => {
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(native);
+  browser.location.origin = native ? "capacitor://localhost" : "https://preview.trizum.app";
+  initializeAnalytics(["/"]);
+  cleanups.push(bindAnalytics(profile(), () => "/"));
+  await vi.waitFor(() => expect(payloads()).toHaveLength(1));
+  const origin = native ? "https://trizum.app" : browser.location.origin;
+  expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+    new URL(`${origin}/api/spycat/script.js?siteId=9cf3da44-3ae9-478d-95aa-7015e864557e`),
+    new URL(`${origin}/api/spycat/collect`),
+  ]);
+});
 
 it("creates a random synced ID once and shares it with analytics and Sentry", async () => {
   const handle = profile();

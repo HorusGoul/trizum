@@ -1,10 +1,5 @@
 import { describe, expect, it, vi } from "vite-plus/test";
-import {
-  createAnalytics,
-  hasPrivacySignal,
-  type AnalyticsEvent,
-  type AnalyticsOptions,
-} from "./index.js";
+import { createAnalytics, hasPrivacySignal, type AnalyticsEvent } from "./index.js";
 import { redactPathname } from "./privacy.js";
 import { readCollectToken } from "./insightflare.js";
 
@@ -23,17 +18,16 @@ const bootstrap = (site = siteId) =>
   JSON.stringify({ siteId: site, collectToken: "test.token.signature", ignoreDoNotTrack: true }) +
   ';\nthrow new Error("This code must never execute");';
 
-function harness(collectionMode: AnalyticsOptions["collectionMode"] = "cors") {
+function harness(endpoint = "https://analytics.example") {
   const fetch = vi.fn<typeof globalThis.fetch>(async (_url, init) =>
     init?.method === "POST" ? new Response(null, { status: 204 }) : new Response(bootstrap()),
   );
   const canCollect = vi.fn<() => boolean>(() => true);
   const client = createAnalytics({
     siteId,
-    endpoint: "https://analytics.example",
+    endpoint,
     hostname: "trizum.app",
     routes,
-    collectionMode,
     fetch,
     canCollect,
   });
@@ -86,38 +80,29 @@ describe("privacy boundary", () => {
 });
 
 describe("analytics collection", () => {
-  it("uses a simple credential-free POST for native custom-scheme origins", async () => {
-    const { client, fetch, payloads } = harness("no-cors");
-    fetch.mockImplementation(async (_url, init) => {
-      if (init?.method !== "POST") return new Response(bootstrap());
-      return new Proxy(new Response(), {
-        get(target, property, receiver) {
-          if (property === "type") return "opaque";
-          if (property === "ok") return false;
-          if (property === "status") return 0;
-          return Reflect.get(target, property, receiver);
-        },
-      });
-    });
-    client.setEnabled(true, telemetryId);
-    client.page(`/party/${documentId}`);
-    client.track("party_created");
-    await client.flush();
-    expect(fetch).toHaveBeenCalledTimes(3);
-    expect(payloads()).toHaveLength(2);
-    expect(payloads()[1]).toMatchObject({
-      pathname: "/party/:redacted",
-      eventName: "party_created",
-      eventData: {},
-    });
-    for (const [url, init] of fetch.mock.calls.filter(([, init]) => init?.method === "POST")) {
-      const request = new Request(url, init);
-      expect(request.mode).toBe("no-cors");
-      expect(request.headers.get("content-type")).toBe("text/plain");
-      expect(request.credentials).toBe("omit");
-      expect(request.referrerPolicy).toBe("no-referrer");
-    }
-  });
+  it.each(["https://trizum.app/api/spycat", "https://trizum.app/api/spycat/"])(
+    "keeps proxy paths and uses readable CORS responses for %s",
+    async (endpoint) => {
+      const { client, fetch, payloads } = harness(endpoint);
+      client.setEnabled(true, telemetryId);
+      client.page(`/party/${documentId}`);
+      client.track("party_created");
+      await client.flush();
+      expect(fetch.mock.calls[0][0]).toEqual(
+        new URL("https://trizum.app/api/spycat/script.js?siteId=test-site"),
+      );
+      expect(payloads()).toHaveLength(2);
+      for (const [url, init] of fetch.mock.calls.filter(([, init]) => init?.method === "POST")) {
+        expect(url).toEqual(new URL("https://trizum.app/api/spycat/collect"));
+        expect(init).toMatchObject({
+          mode: "cors",
+          credentials: "omit",
+          referrerPolicy: "no-referrer",
+          headers: { "content-type": "application/json" },
+        });
+      }
+    },
+  );
 
   it("collects on WebViews without AbortSignal static helpers", async () => {
     vi.stubGlobal("AbortSignal", {});
@@ -277,32 +262,29 @@ describe("analytics collection", () => {
     expect(payloads()).toHaveLength(0);
   });
 
-  it.each(["cors", "no-cors"] as const)(
-    "aborts pending bootstrap and discards queued %s events on opt-out",
-    async (mode) => {
-      const { client, fetch, payloads } = harness(mode);
-      let resolve!: (response: Response) => void;
-      fetch.mockImplementationOnce(
-        () =>
-          new Promise((done) => {
-            resolve = done;
-          }),
-      );
-      client.setEnabled(true, telemetryId);
-      client.page("/");
-      client.track("party_created");
-      await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-      client.setEnabled(false);
-      expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
-      resolve(new Response(bootstrap()));
-      await client.flush();
-      expect(payloads()).toHaveLength(0);
-      client.setEnabled(true, telemetryId);
-      client.page("/settings");
-      await client.flush();
-      expect(payloads()).toHaveLength(1);
-    },
-  );
+  it("aborts pending bootstrap and discards queued events on opt-out", async () => {
+    const { client, fetch, payloads } = harness();
+    let resolve!: (response: Response) => void;
+    fetch.mockImplementationOnce(
+      () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    );
+    client.setEnabled(true, telemetryId);
+    client.page("/");
+    client.track("party_created");
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    client.setEnabled(false);
+    expect(fetch.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    resolve(new Response(bootstrap()));
+    await client.flush();
+    expect(payloads()).toHaveLength(0);
+    client.setEnabled(true, telemetryId);
+    client.page("/settings");
+    await client.flush();
+    expect(payloads()).toHaveLength(1);
+  });
 
   it.each(["network", "http", "format"])("fails closed on %s failures", async (failure) => {
     const { client, fetch, payloads } = harness();
