@@ -140,7 +140,7 @@ catalog:
   rollup-plugin-license: 3.7.1
   sharp: 0.35.3
   skills: 1.5.15
-  skills-npm: 1.2.0
+  skills-npm: 4.0.0
   sonner: 2.0.7
   svgexport: 0.4.2
   svgo: 4.0.1
