@@ -25,7 +25,8 @@ planning documents, so it is extremely important that you do this correctly.
     for work that is still under active discussion.
   - Paragraphs of text are useless. Prefer code snippets.
   - Follow the coding standards in
-    [`AGENTS.md`](../AGENTS.md#code-and-product-guardrails).
+    [coding conventions](./agents/coding.md) and, for application UI or client
+    state, [PWA conventions](./agents/pwa.md).
 - The docs may have two parts (which may be split across multiple docs):
   - An overall discussion of the problem being worked on, and
   - An ordered list of changes. Each change should be self-contained and
