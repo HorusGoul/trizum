@@ -15,11 +15,15 @@ description:
 - Squash-merge the PR once checks pass.
 - Do not yield to the user until the PR is merged; keep the watcher loop running
   unless blocked.
-- No need to delete remote branches after merge; the repo auto-deletes head
-  branches.
+- Merged PR branches may be deleted without asking; the repo already
+  auto-deletes remote head branches. Ask before deleting any unmerged branch.
 
 ## Preconditions
 
+- The user explicitly requested merging or landing this PR. A request to
+  create, update, review, or monitor a PR does not authorize merging it; stop
+  after the requested work when merge authorization is absent.
+- Follow the repo's [Git workflow](../../../docs/agents/git-workflow.md).
 - `gh` CLI is authenticated.
 - You are on the PR branch with a clean working tree.
 
@@ -38,8 +42,9 @@ description:
    while the PR is still open.
 8. If checks fail, pull logs, fix the issue, commit with the `commit` skill,
    push with the `push` skill, and re-run checks.
-9. When all checks are green and review feedback is addressed, squash-merge and
-   delete the branch using the PR title/body for the merge subject/body.
+9. When all checks are green and review feedback is addressed, squash-merge
+   using the PR title/body for the merge subject/body. Remaining local or remote
+   branches for the merged PR may then be deleted without asking.
 10. **Context guard:** Before implementing review feedback, confirm it does not
     conflict with the user’s stated intent or task context. If it conflicts,
     respond inline with a justification and ask the user before changing code.

@@ -1,8 +1,8 @@
 # Agent Knowledge Map
 
 This document defines the smallest useful map of agent-facing knowledge in the
-`trizum` repo. The goal is to keep agent context easy to find, hard to stale,
-and owned close to the code it describes.
+`trizum` repo. Use it when locating package guidance or maintaining agent-facing docs; other
+tasks can follow the relevant links directly from the root guide.
 
 ## Principles
 
@@ -20,8 +20,13 @@ and owned close to the code it describes.
 
 | Surface                                                                                                                                            | Canonical for                                                                                                  | Owner                   | Freshness expectation                                                                   |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
-| [`/AGENTS.md`](../AGENTS.md)                                                                                                                       | Repo entry point, repo-wide workflow, and routing to deeper sources                                            | Repo maintainer         | Update in the same PR when repo-wide workflow, package entry points, or routing changes |
+| [`/AGENTS.md`](../AGENTS.md)                                                                                                                       | Minimal repo entry point, workspace commands, and task-based routing                                           | Repo maintainer         | Update in the same PR when repo-wide workflow, package entry points, or routing changes |
 | [`/docs/agent-knowledge-map.md`](./agent-knowledge-map.md)                                                                                         | Source-of-truth map for agent-facing surfaces and ownership model                                              | Repo maintainer         | Update in the same PR when a surface is added, removed, or re-scoped                    |
+| [`/docs/agents/git-workflow.md`](./agents/git-workflow.md)                                                                                         | Branch naming, Git safety, PR titles, merge and deletion authorization                                         | Repo maintainer         | Update when Git or PR policy changes                                                    |
+| [`/docs/agents/coding.md`](./agents/coding.md)                                                                                                     | Cross-package code and critical-logic testing conventions                                                      | Repo maintainer         | Update when shared coding rules change                                                  |
+| [`/docs/agents/pwa.md`](./agents/pwa.md)                                                                                                           | React, client state, localization, and PWA styling conventions                                                 | PWA maintainer          | Update when product conventions change                                                  |
+| [`/docs/agents/toolchain.md`](./agents/toolchain.md)                                                                                               | Setup, toolchain sources of truth, and diagnostics                                                             | Workspace maintainer    | Update when setup or toolchain behavior changes                                         |
+| [`/docs/agents/validation-and-releases.md`](./agents/validation-and-releases.md)                                                                   | Validation requirements and changeset policy                                                                   | Repo maintainer         | Update when validation or release requirements change                                   |
 | [`/docs/logging.md`](./logging.md)                                                                                                                 | Repo-wide logging policy, severity guidance, and redaction expectations                                        | Repo maintainer         | Update in the same PR as repo-wide logging policy or observability expectations change  |
 | [`/docs/package-authoring.md`](./package-authoring.md)                                                                                             | Standard workflow and defaults for authoring new workspace packages                                            | Repo maintainer         | Update in the same PR as new-package conventions or template defaults change            |
 | [`/docs/refactor-docs.md`](./refactor-docs.md)                                                                                                     | Protocol for creating, maintaining, and completing refactor planning documents                                 | Repo maintainer         | Update in the same PR as refactor planning conventions change                           |
@@ -53,10 +58,10 @@ adding or changing product flows; approved names and trigger meanings live in
 
 Keep only:
 
-- repo purpose and major package layout,
-- repo-wide workflow rules,
-- the short list of canonical deeper entry points,
-- stable guardrails that apply across most work.
+- a one-sentence project description,
+- the package manager and non-standard workspace commands,
+- instructions that apply to every task,
+- links to focused guides with explicit read triggers.
 
 Do not keep:
 
@@ -99,23 +104,27 @@ check. Docs should explain the rule, not be the only place it lives.
 
 ### Cross-Cutting Repo Policies
 
-Use `docs/*.md` for stable, repo-wide policies that cut across multiple
-packages but do not belong in the root routing guide. The logging policy in
-[`/docs/logging.md`](./logging.md) is the model for this kind of document.
+Use `docs/agents/*.md` for the focused coding, PWA, toolchain, validation, and
+Git guidance linked from the root guide. Each file states when it applies;
+agents should not load the whole directory for every task.
+
+Other stable policies keep their existing `docs/*.md` paths, such as
+[logging](./logging.md), [package authoring](./package-authoring.md), and
+[refactor planning](./refactor-docs.md). Keep project-local workflow procedures
+in `.agents/skills` rather than duplicating them in these documents.
 
 ## Default Read Path
 
-For most coding tasks, an agent should read in this order:
+1. Read [`/AGENTS.md`](../AGENTS.md).
+2. Follow only the links whose task triggers apply.
+3. For package work, read that package's README and any deeper `AGENTS.md` in
+   the affected domain.
+4. Read the relevant skill when the task matches its workflow.
+5. Consult the package's `vite.config.ts` and `package.json` for exact commands.
 
-1. [`/AGENTS.md`](../AGENTS.md)
-2. this file
-3. the package README for the area being changed
-4. any deeper subdirectory `AGENTS.md` for that domain
-5. the relevant skill, if the task matches one
-6. the package's `vite.config.ts` and `package.json` for the exact runnable commands
-
-The screenshots package is intentionally not part of the default path for normal
-app or server work. It is a specialist package and should say so explicitly.
+This map is a lookup and maintenance reference, not a mandatory second read.
+The screenshots, mobile, server, and agent-workflows READMEs are specialist entry
+points; read them when working in those areas.
 
 ## When A Rule Graduates To Automation
 
