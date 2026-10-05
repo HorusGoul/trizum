@@ -1,5 +1,40 @@
 # @trizum/mobile
 
+## 1.13.0
+
+### Minor Changes
+
+- [#446](https://github.com/HorusGoul/trizum/pull/446) [`6586d74`](https://github.com/HorusGoul/trizum/commit/6586d741577d903a9e60e6e90bf8854f5ceae63f) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add RevenueCat-powered Premium purchasing and subscription management to the installed Android and iOS apps, including a native-feeling trizum paywall, signed-in cross-device entitlements, ad-free owners, monthly/annual/lifetime packages, the server-side Party Boost allocation foundation, and in-app Terms of Service.
+  Add server-verified Party Boost activation, seven-day transfers, membership and Premium revalidation, automatic revocation, and party-settings controls.
+
+- [#423](https://github.com/HorusGoul/trizum/pull/423) [`2a7d0d1`](https://github.com/HorusGoul/trizum/commit/2a7d0d1f943238536e6e96568ce015c25d3fe76b) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add consent-aware App Open and interstitial advertising to the installed Android and iOS apps, with shared frequency limits, test-by-default release configuration, and an ad-free entitlement integration point.
+
+- [#469](https://github.com/HorusGoul/trizum/pull/469) [`638a4b1`](https://github.com/HorusGoul/trizum/commit/638a4b158d81051860cb5c6885fe145b163b2347) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Add Premium code redemption and shareable promo links.
+
+  Open Apple offer-code redemption or Google Play one-time-code redemption from the paywall, with guidance for custom subscription codes at Google Play checkout. Shared trizum.app/redeem links prefill the code and are excluded from search indexing. Refresh pending native redemptions when returning to trizum.
+
+  Show the signed-in account on the redemption page. Store links open directly without requiring sign-in. Keep optional sign-in and direct Premium settings actions in the FAQs, preserving the entered code through authentication.
+
+  Keep redemption codes editable offline and explain the connection requirement only when redemption is attempted, without a warning above the form.
+
+  Preserve numeric-looking promo codes exactly in shared links. Keep failed or pending FAQ sign-in dismissible without losing edited codes, and explain mobile-app purchase and restore steps when opening Premium help in a browser.
+
+### Patch Changes
+
+- [#461](https://github.com/HorusGoul/trizum/pull/461) [`d4839e4`](https://github.com/HorusGoul/trizum/commit/d4839e4e19c75f0ebaee221d8d39a01b7e37f653) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Refresh Premium status while the app stays open and when returning to it, so expired or revoked subscriptions update without a restart. Keep the last known account entitlement when a refresh fails or the device is offline.
+
+- [#462](https://github.com/HorusGoul/trizum/pull/462) [`8fb60ae`](https://github.com/HorusGoul/trizum/commit/8fb60aecafc8f887cda6cc1dd5634934bba41e5e) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix iOS 27 startup when built with Xcode 27 by adopting the scene-based lifecycle. Preserve native sign-in links, party links, and app resume handling with Capacitor's scene routing.
+
+- [#474](https://github.com/HorusGoul/trizum/pull/474) [`3d75041`](https://github.com/HorusGoul/trizum/commit/3d750411c9ae00a96019991b1feb5c510f10d958) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Keep the Premium paywall dismissible while store operations are pending so unavailable billing services or blocked requests cannot trap users. Ignore results from dismissed paywall sessions and prevent duplicate purchases while the original request is still running.
+
+- [#474](https://github.com/HorusGoul/trizum/pull/474) [`3d75041`](https://github.com/HorusGoul/trizum/commit/3d750411c9ae00a96019991b1feb5c510f10d958) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use Google test ad units for TestFlight and Android internal-testing PR builds, independently of the production live-ad setting.
+
+- [#460](https://github.com/HorusGoul/trizum/pull/460) [`6f42714`](https://github.com/HorusGoul/trizum/commit/6f427142d19890f0f0ab389679bf0d524b030ff4) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow restoring Premium purchases when store products cannot load. Preserve the remembered account and store-cached Premium access during offline startup, with a notice in settings. Refresh account status when connectivity returns. Native magic links can sign back in after signing out without restarting the app.
+
+- Updated dependencies [[`6586d74`](https://github.com/HorusGoul/trizum/commit/6586d741577d903a9e60e6e90bf8854f5ceae63f), [`ed5912f`](https://github.com/HorusGoul/trizum/commit/ed5912fa301dac4cfe85f22a59d9defd2a67bf77), [`3f772e8`](https://github.com/HorusGoul/trizum/commit/3f772e8c10e3683d7f7926f9d2f7ec074b7761e3), [`2a7d0d1`](https://github.com/HorusGoul/trizum/commit/2a7d0d1f943238536e6e96568ce015c25d3fe76b), [`880a306`](https://github.com/HorusGoul/trizum/commit/880a306d136ce33cd6502c16567e0b1ddcc8bda0), [`d4839e4`](https://github.com/HorusGoul/trizum/commit/d4839e4e19c75f0ebaee221d8d39a01b7e37f653), [`8a786c8`](https://github.com/HorusGoul/trizum/commit/8a786c8d87f637acbaf10b4130aced9f0e8eaa4b), [`638a4b1`](https://github.com/HorusGoul/trizum/commit/638a4b158d81051860cb5c6885fe145b163b2347), [`2f5a0d9`](https://github.com/HorusGoul/trizum/commit/2f5a0d93c685e579ec8766273b137e3f130d81fd), [`cccbb87`](https://github.com/HorusGoul/trizum/commit/cccbb87b52ef2f4bba1c88e0cedf5bc0d00a1619), [`a637690`](https://github.com/HorusGoul/trizum/commit/a63769028e562dcf4f0a190ff5e9521b8190b470), [`8e95035`](https://github.com/HorusGoul/trizum/commit/8e95035edc8ea1dd8c103e5ff588703d788edd34), [`3d75041`](https://github.com/HorusGoul/trizum/commit/3d750411c9ae00a96019991b1feb5c510f10d958), [`5f1b5fe`](https://github.com/HorusGoul/trizum/commit/5f1b5fe9afc79b57ed44529e5adf0f7fea1a9aa5), [`7f808ea`](https://github.com/HorusGoul/trizum/commit/7f808ea0fb42d3f970360ce2dcef855a44a6272c), [`b43c0bb`](https://github.com/HorusGoul/trizum/commit/b43c0bb26fcb3853b3fee8df26f28eb62e5907f4), [`6f42714`](https://github.com/HorusGoul/trizum/commit/6f427142d19890f0f0ab389679bf0d524b030ff4), [`46c6f53`](https://github.com/HorusGoul/trizum/commit/46c6f53ca280f0ac09648ddb41ce3a787b776268), [`21bb8ca`](https://github.com/HorusGoul/trizum/commit/21bb8ca7f0fb9f0b548f9e86f62686939a9633e3)]:
+  - @trizum/pwa@1.13.0
+  - @trizum/logging@1.1.0
+
 ## 1.12.2
 
 ### Patch Changes
