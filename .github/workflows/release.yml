@@ -117,7 +117,9 @@ jobs:
       contents: read
     uses: ./.github/workflows/ios-appstore-deploy.yml
     with:
-      submit_for_review: true
+      # Submit the first Premium app and products together in App Store Connect.
+      # Restore automatic submission after that combined review is approved.
+      submit_for_review: false
       automatic_release: true
     secrets: inherit
 
