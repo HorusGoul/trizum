@@ -464,17 +464,9 @@ removes the label.
 Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
 trigger the shared release workflow. That path reuses the mobile build and
 store deployment workflows to generate store screenshots, publish Android to the
-Play Store production track with `release_status` `completed`, upload the iOS
-build and store metadata with `automatic_release` enabled, and
+Play Store production track with `release_status` `completed`, submit iOS to
+App Store review with immediate rollout and `automatic_release` enabled, and
 attach the signed Android APK and AAB to the GitHub release.
-
-iOS review submission is temporarily manual for the first Premium release.
-After the uploaded build finishes processing, select it in App Store Connect
-and add the app version to the prepared review submission containing the Premium
-products, then submit them together. Restore `submit_for_review: true` in the
-release workflow after Apple approves the combined submission and no pending
-review submission remains. Repository metadata, including release and review
-notes, continues to overwrite the corresponding App Store Connect fields.
 
 ### Required Secrets
 
