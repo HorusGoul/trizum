@@ -56,3 +56,19 @@ trizum-server`:
 
 `DB_FILE_NAME`, `PORT`, and the persistent volume mount are configured in
 [`fly.toml`](./fly.toml).
+
+CI builds both the production image (including Litestream) and the Dockerfile's
+`runtime-local` target. It checks migrations, `/health`, and native profiler
+loading using `runtime-local`, without production secrets or replication.
+Run the smoke-test image locally from the workspace root:
+
+```sh
+docker build --file packages/server/Dockerfile --target runtime-local --tag trizum-server-smoke .
+docker run --rm --publish 127.0.0.1:3000:3000 --env DB_FILE_NAME=file:/tmp/trizum.db trizum-server-smoke
+```
+
+The dependency install layer copies `patches/` and automatically includes every
+workspace manifest matching `packages/*/package.json`, mirroring the workspace glob.
+The native Sentry profiler stays external to the bundle;
+[`scripts/copy-profiler.ts`](./scripts/copy-profiler.ts) copies it and its
+dependencies using pnpm's resolved versions, without hardcoded store paths.

@@ -150,6 +150,42 @@ jobs:
             packages/pwa/test-results
           if-no-files-found: ignore
 
+  server-container:
+    name: Server Container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build production and smoke-test images
+        run: |
+          docker build --file packages/server/Dockerfile --target runtime --tag trizum-server-production .
+          docker build --file packages/server/Dockerfile --target runtime-local --tag trizum-server-smoke .
+
+      - name: Check migrations and server health
+        run: |
+          docker run --detach --name trizum-server-smoke \
+            --publish 127.0.0.1:3000:3000 \
+            --env DB_FILE_NAME=file:/tmp/trizum.db \
+            trizum-server-smoke
+          curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 1 \
+            --max-time 5 --retry-max-time 60 \
+            http://127.0.0.1:3000/health --output /tmp/server-health.json
+          node --input-type=module -e '
+            import assert from "node:assert/strict";
+            import { readFileSync } from "node:fs";
+            const health = JSON.parse(readFileSync("/tmp/server-health.json", "utf8"));
+            assert.equal(health.http.ok, true);
+            assert.equal(health.automerge.ok, true);
+          '
+          docker exec trizum-server-smoke node -e 'require("@sentry/node-cpu-profiler")'
+
+      - name: Show server logs and remove container
+        if: always()
+        run: |
+          docker logs trizum-server-smoke || true
+          docker rm --force trizum-server-smoke || true
+
   mobile-ruby-android:
     name: Mobile Ruby (android)
     runs-on: ubuntu-latest
