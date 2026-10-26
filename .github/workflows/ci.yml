@@ -168,7 +168,8 @@ jobs:
             --publish 127.0.0.1:3000:3000 \
             --env DB_FILE_NAME=file:/tmp/trizum.db \
             trizum-server-smoke
-          curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1 \
+          curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 1 \
+            --max-time 5 --retry-max-time 60 \
             http://127.0.0.1:3000/health --output /tmp/server-health.json
           node --input-type=module -e '
             import assert from "node:assert/strict";
