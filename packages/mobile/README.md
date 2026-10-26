@@ -311,7 +311,7 @@ mkdir -p ios/App/fastlane/metadata/de-DE
 #### App Privacy Questionnaire
 
 `ios/App/fastlane/app_privacy_details.json` is the complete set of App Privacy
-answers published in App Store Connect. Fastlane's `deliver` uploads the privacy
+answers maintained for publication in App Store Connect. Fastlane's `deliver` uploads the privacy
 policy URL, but does not upload these questionnaire answers. Use the dedicated
 [App Privacy action](https://docs.fastlane.tools/uploading-app-privacy-details/)
 through this lane when the answers change:
@@ -331,9 +331,17 @@ Regular metadata and binary uploads do not overwrite the questionnaire.
 The answers retain the existing app disclosures and include AdMob's Device ID,
 coarse location, advertising data, product interaction, and diagnostic uses.
 Device IDs are linked to the user and used for tracking when permission allows;
-the other AdMob tracking flags follow its installed privacy manifest. Purchases
-are linked to the user for app functionality because the RevenueCat client uses
-the signed-in account's ID. No payment-card details are collected by the app.
+the other AdMob tracking flags follow its installed privacy manifest. Account
+email is linked to the user for authentication (app functionality). User IDs
+also cover the persistent telemetry identifier used for analytics. Purchases
+are linked to the user for app functionality and RevenueCat analytics because
+the RevenueCat client uses the signed-in account's ID. No payment-card details
+are collected by the app. RevenueCat's [Apple App Privacy guidance](https://www.revenuecat.com/docs/platform-resources/apple-platform-resources/apple-app-privacy)
+requires both purchase purposes. [Apple's definitions](https://developer.apple.com/app-store/app-privacy-details/)
+cover account email and user-level identifiers.
+
+Repository changes take effect in App Store Connect when the privacy lane is
+run. Verify the published answers after uploading.
 
 Review these answers when SDKs or data flows change. The current advertising
 disclosures follow Google's [iOS data disclosure guide](https://developers.google.com/admob/ios/privacy/data-disclosure)
