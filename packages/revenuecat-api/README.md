@@ -26,8 +26,10 @@ exposing a small entitlement-check and customer-deletion interface to the rest o
 
 `requestCustomerDeletion` uses the v2 customer DELETE endpoint (outside the
 generated customer-resources schema). It validates the asynchronous acceptance
-response and treats only a customer-specific missing-resource error as already
-deleted. Requests have a 10-second timeout and no automatic retries. Callers
+response and accepts a customer-specific missing-resource error as already
+deleted. For errors without a resource parameter, it confirms customer absence
+with a GET and verifies project access through the customer-list endpoint.
+The full operation shares a 10-second timeout and has no automatic retries. Callers
 must retain the customer identity on failure and authorize deletion themselves.
 The secret key needs `customer_information:customers:read_write`. This does not
 cancel Apple or Google subscriptions. See the PWA

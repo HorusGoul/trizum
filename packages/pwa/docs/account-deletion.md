@@ -6,6 +6,17 @@ fresh sign-in (or valid password) before running `beforeDelete`. The hook uses
 only the authenticated user's immutable ID, which is also the RevenueCat App
 User ID. Neither a request body ID nor an email selects the customer.
 
+## Browser deletion and store declarations
+
+The existing `https://trizum.app/settings/cloud-sync` flow supports sign-in and
+account deletion in a browser without installing the mobile app. The privacy
+policy links directly to this flow. There is no separate deletion page.
+
+A working account deletion URL does not establish that every collected data type
+is erased. Review retained shared documents, telemetry, backups, and provider
+records against the Data safety questions; do not assert full deletion coverage
+or a retention deadline that the implementation does not establish.
+
 ## Cleanup and retry boundary
 
 Before deleting any cloud account data, the Worker calls RevenueCat v2
@@ -17,8 +28,11 @@ production data.
 
 - HTTP 200 with the documented deletion response means RevenueCat **queued**
   deletion. It does not establish when erasure finishes.
-- HTTP 404 is accepted only when the error identifies the missing `customer_id`.
-  An unknown project or an ambiguous 404 does not count as cleanup.
+- HTTP 404 is accepted when the error identifies the missing `customer_id`.
+  If the error omits `param` or sets it to null, a customer GET must also confirm
+  absence. When that GET is also unscoped, a successful project-scoped customer
+  list verifies project access. Missing/inaccessible projects and inconclusive
+  checks stop deletion. These checks share the original 10-second timeout.
 - Missing configuration, permission errors, rate limits, conflicts, network
   errors, malformed responses, and a 10-second timeout stop cloud deletion with
   a retryable user-facing error. The account, sign-in methods, sessions, settings,

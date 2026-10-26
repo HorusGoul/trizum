@@ -56,24 +56,45 @@ export function createRevenueCatApiClient({
 
       // The customer deletion endpoint is outside the generated customer-resources schema.
       // A 200 acknowledges RevenueCat's asynchronous deletion, not completed erasure.
-      let response: Response;
-      let body: unknown;
-      try {
-        response = await fetcher(
-          `${REVENUECAT_API_URL}/projects/${encodeURIComponent(projectId)}/customers/${encodeURIComponent(customerId)}`,
-          {
-            method: "DELETE",
+      const customersUrl = `${REVENUECAT_API_URL}/projects/${encodeURIComponent(projectId)}/customers`;
+      const customerUrl = `${customersUrl}/${encodeURIComponent(customerId)}`;
+      const signal = AbortSignal.timeout(10_000);
+      async function request(url: string, method: "DELETE" | "GET") {
+        try {
+          const response = await fetcher(url, {
+            method,
             headers: { Authorization: `Bearer ${secretApiKey}`, Accept: "application/json" },
-            signal: AbortSignal.timeout(10_000),
-          },
-        );
-        body = await response.json();
-      } catch {
-        throw new RevenueCatApiError("RevenueCat customer deletion could not be confirmed.");
+            signal,
+          });
+          const body: unknown = await response.json();
+          return { response, body };
+        } catch {
+          throw new RevenueCatApiError("RevenueCat customer deletion could not be confirmed.");
+        }
       }
 
+      const { response, body } = await request(customerUrl, "DELETE");
       if (response.status === 404 && isMissingCustomerError(body)) {
         return;
+      }
+      if (response.status === 404 && isUnscopedMissingResourceError(body)) {
+        // Error.param is optional. Confirm absence separately, then verify that
+        // the project is accessible without needing extra project permissions.
+        const customer = await request(customerUrl, "GET");
+        if (customer.response.status === 404 && isMissingCustomerError(customer.body)) {
+          return;
+        }
+        if (customer.response.status === 404 && isUnscopedMissingResourceError(customer.body)) {
+          const project = await request(`${customersUrl}?limit=1`, "GET");
+          if (
+            project.response.status === 200 &&
+            isRecord(project.body) &&
+            project.body.object === "list" &&
+            Array.isArray(project.body.items)
+          ) {
+            return;
+          }
+        }
       }
 
       if (
@@ -200,6 +221,10 @@ function parsePageResponse<T>(
 
 function isMissingCustomerError(value: unknown) {
   return isRecord(value) && value.type === "resource_missing" && value.param === "customer_id";
+}
+
+function isUnscopedMissingResourceError(value: unknown) {
+  return isRecord(value) && value.type === "resource_missing" && value.param == null;
 }
 
 async function listAllRevenueCatResources<T>(

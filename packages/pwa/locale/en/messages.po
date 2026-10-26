@@ -196,7 +196,7 @@ msgstr "4. Your Content and Responsibilities"
 msgid "5. Acceptable Use"
 msgstr "5. Acceptable Use"
 
-#: src/routes/privacy-policy.tsx:526
+#: src/routes/privacy-policy.tsx:540
 msgid "5.4 Advertising and Tracking Choices"
 msgstr "5.4 Advertising and Tracking Choices"
 
@@ -602,6 +602,10 @@ msgstr "Bangladeshi Taka"
 #: src/routes/new/route.tsx:205
 msgid "Barbadian Dollar"
 msgstr "Barbadian Dollar"
+
+#: src/routes/privacy-policy.tsx:489
+msgid "Before cloud account deletion, we request deletion of your RevenueCat customer record, purchase history, and attributes. RevenueCat processes deletion asynchronously. If the request cannot be confirmed, your cloud account is kept so you can retry."
+msgstr "Before cloud account deletion, we request deletion of your RevenueCat customer record, purchase history, and attributes. RevenueCat processes deletion asynchronously. If the request cannot be confirmed, your cloud account is kept so you can retry."
 
 #: src/routes/new/route.tsx:216
 msgid "Belarusian Ruble"
@@ -2032,6 +2036,10 @@ msgid "Last updated: July 27, 2026"
 msgstr "Last updated: July 27, 2026"
 
 #: src/routes/privacy-policy.tsx:26
+msgid "Last updated: October 26, 2026"
+msgstr "Last updated: October 26, 2026"
+
+#: src/routes/privacy-policy.tsx:26
 msgid "Last updated: October 3, 2026"
 msgstr "Last updated: October 3, 2026"
 
@@ -2537,6 +2545,10 @@ msgstr "Open calculator"
 msgid "Open calculator when focusing amount fields"
 msgstr "Open calculator when focusing amount fields"
 
+#: src/routes/privacy-policy.tsx:486
+msgid "Open cloud settings to delete your account"
+msgstr "Open cloud settings to delete your account"
+
 #: src/routes/support/route.tsx:69
 msgid "Open GitHub Issues"
 msgstr "Open GitHub Issues"
@@ -2605,7 +2617,7 @@ msgstr "Other operations"
 msgid "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
-#: src/routes/privacy-policy.tsx:600
+#: src/routes/privacy-policy.tsx:614
 msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 
@@ -3163,7 +3175,7 @@ msgstr "Return to trizum on your phone. Open <0>Premium settings</0> and use Res
 msgid "Return to trizum. If Premium has not appeared yet, use Restore purchases."
 msgstr "Return to trizum. If Premium has not appeared yet, use Restore purchases."
 
-#: src/routes/privacy-policy.tsx:575
+#: src/routes/privacy-policy.tsx:589
 msgid "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
 msgstr "RevenueCat retains purchase and entitlement records under its agreement and privacy practices, while Apple and Google retain store transaction records under their own requirements. Deleting your trizum account does not by itself cancel a subscription, issue a refund, or delete transaction records that a store must retain."
 
@@ -3794,7 +3806,7 @@ msgstr "The installed mobile apps use RevenueCat to present Premium offers, proc
 msgid "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 msgstr "The Lifetime option is a one-time, non-consumable purchase that provides non-expiring access to the Premium entitlement for the purchasing account while trizum continues to offer and operate the Service. It is not a subscription and does not renew automatically."
 
-#: src/routes/privacy-policy.tsx:566
+#: src/routes/privacy-policy.tsx:580
 msgid "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 msgstr "The mobile app keeps a device-local record of first-use completion and the most recent full-screen ad to enforce advertising frequency limits. It is not synchronized and remains until you clear the app's data or uninstall it. Google controls retention of data processed by AdMob according to its published retention practices and your advertising choices."
 
@@ -4383,7 +4395,7 @@ msgstr "When an eligible annual subscription includes a seven-day free trial, th
 msgid "When analytics are enabled, a random identifier links usage across your synced devices and connects it with diagnostic logs and error reports sent to Sentry. Turning off analytics or enabling browser privacy signals stops this linking. Error reporting can continue without this identifier."
 msgstr "When analytics are enabled, a random identifier links usage across your synced devices and connects it with diagnostic logs and error reports sent to Sentry. Turning off analytics or enabling browser privacy signals stops this linking. Error reporting can continue without this identifier."
 
-#: src/routes/privacy-policy.tsx:529
+#: src/routes/privacy-policy.tsx:543
 msgid "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 msgstr "When required, the mobile app displays Privacy and cookie settings so you can review or withdraw consent and exercise applicable opt-out rights. Under some US state laws, personalized advertising may be considered a sale or sharing of personal information; covered users can opt out through that control. On iOS, Apple's tracking permission is separate and can be changed in iOS Settings. Declining personalized advertising or tracking does not prevent you from using trizum, and ads may still be shown without the declined signals."
 

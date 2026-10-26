@@ -191,6 +191,26 @@ describe("authenticated account deletion", () => {
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
+  it("completes a retry after a lost response and an unscoped missing-customer error", async () => {
+    fetcher.mockRejectedValueOnce(new Error("connection lost after remote deletion"));
+    expect((await handle()).status).toBe(503);
+    expectAccount("owner", 1);
+    const missing = {
+      object: "error",
+      type: "resource_missing",
+      message: "Resource not found",
+      retryable: false,
+    };
+    fetcher
+      .mockResolvedValueOnce(Response.json(missing, { status: 404 }))
+      .mockResolvedValueOnce(Response.json(missing, { status: 404 }))
+      .mockResolvedValueOnce(Response.json({ object: "list", items: [] }));
+    expect((await handle()).status).toBe(200);
+    expectAccount("owner", 0);
+    expectAccount("other", 1);
+    expect(fetcher).toHaveBeenCalledTimes(4);
+  });
+
   it.each(["REVENUECAT_PROJECT_ID", "REVENUECAT_SECRET_API_KEY"] as const)(
     "keeps the account when %s is missing",
     async (key) => {
