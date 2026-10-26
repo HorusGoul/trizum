@@ -250,6 +250,17 @@ platform :ios do
 
   desc "Publish App Privacy answers using an Apple ID session"
   lane :upload_privacy do
+    if ENV["CI"]
+      missing = %w[FASTLANE_USER FASTLANE_SESSION].select { |name| ENV[name].to_s.strip.empty? }
+      unless missing.empty?
+        UI.user_error!(
+          "App Privacy publication requires CI secrets: #{missing.join(', ')}. " \
+          "Generate an Apple ID session with fastlane spaceauth and configure FASTLANE_SESSION. " \
+          "The App Store Connect API key cannot publish privacy answers."
+        )
+      end
+    end
+
     upload_app_privacy_details_to_app_store(
       app_identifier: IOS_APP_IDENTIFIER,
       json_path: File.expand_path("app_privacy_details.json", __dir__),
@@ -308,6 +319,7 @@ platform :ios do
     automatic_release = options[:automatic_release] || false
     skip_screenshots = options[:skip_screenshots].nil? ? true : options[:skip_screenshots]
 
+    upload_privacy
     build_release(build_number: options[:build_number])
 
     deliver(

@@ -311,10 +311,12 @@ mkdir -p ios/App/fastlane/metadata/de-DE
 #### App Privacy Questionnaire
 
 `ios/App/fastlane/app_privacy_details.json` is the complete set of App Privacy
-answers maintained for publication in App Store Connect. Fastlane's `deliver` uploads the privacy
-policy URL, but does not upload these questionnaire answers. Use the dedicated
+answers maintained for publication in App Store Connect. Every
+`deploy_appstore_full` release publishes these answers before building and
+uploading the app, including releases that defer review submission. Fastlane's
+`deliver` uploads the privacy policy URL; the questionnaire uses the dedicated
 [App Privacy action](https://docs.fastlane.tools/uploading-app-privacy-details/)
-through this lane when the answers change:
+through `upload_privacy`. To publish updated answers independently of a release:
 
 ```bash
 cd packages/mobile/ios/App
@@ -323,10 +325,20 @@ mise exec -- bundle exec fastlane upload_privacy
 
 This action requires an Apple ID login (`FASTLANE_USER`, with two-factor
 authentication or an existing `FASTLANE_SESSION`). The pinned Fastlane action
-does not support App Store Connect API-key authentication, so it runs separately
-from the API-key-based release workflow. It replaces all questionnaire answers
+does not support App Store Connect API-key authentication. Configure both
+`FASTLANE_USER` and `FASTLANE_SESSION` as GitHub Actions secrets for production
+releases. Missing credentials or a failed privacy upload stop the release before
+the native build and binary upload. The action replaces all questionnaire answers
 and publishes them immediately; keep the JSON complete when updating it.
-Regular metadata and binary uploads do not overwrite the questionnaire.
+TestFlight lanes and standalone metadata or binary uploads do not publish the
+questionnaire.
+
+Generate a session with `mise exec -- bundle exec fastlane spaceauth -u <apple-id>`
+from `packages/mobile/ios/App`, using an Apple ID with account holder or admin
+access. Store its session output privately as `FASTLANE_SESSION` and the Apple ID
+as `FASTLANE_USER`. Apple sessions expire and can be region-bound; renew the
+secret when authentication fails, then rerun the release. See Fastlane's
+[session guidance](https://docs.fastlane.tools/getting-started/ios/authentication/#storing-a-manually-verified-session-using-spaceauth).
 
 The answers retain the existing app disclosures and include AdMob's Device ID,
 coarse location, advertising data, product interaction, and diagnostic uses.
@@ -340,8 +352,8 @@ are collected by the app. RevenueCat's [Apple App Privacy guidance](https://www.
 requires both purchase purposes. [Apple's definitions](https://developer.apple.com/app-store/app-privacy-details/)
 cover account email and user-level identifiers.
 
-Repository changes take effect in App Store Connect when the privacy lane is
-run. Verify the published answers after uploading.
+Repository changes take effect in App Store Connect on the next full App Store
+release or manual privacy upload. Verify the published answers after uploading.
 
 Review these answers when SDKs or data flows change. The current advertising
 disclosures follow Google's [iOS data disclosure guide](https://developers.google.com/admob/ios/privacy/data-disclosure)
@@ -381,15 +393,17 @@ uploader.
 
 #### iOS
 
-| Variable                                | Description                                    |
-| --------------------------------------- | ---------------------------------------------- |
-| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`   | Base64-encoded distribution certificate (.p12) |
-| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password for the .p12 certificate              |
-| `IOS_PROVISIONING_PROFILE_BASE64`       | Optional base64-encoded provisioning profile   |
-| `IOS_REFRESH_PROVISIONING_PROFILE`      | Set to `true` to refresh the App Store profile |
-| `APP_STORE_CONNECT_API_KEY_ID`          | App Store Connect API Key ID                   |
-| `APP_STORE_CONNECT_API_ISSUER_ID`       | App Store Connect API Issuer ID                |
-| `APP_STORE_CONNECT_API_KEY_CONTENT`     | Base64-encoded App Store Connect API Key (.p8) |
+| Variable                                | Description                                        |
+| --------------------------------------- | -------------------------------------------------- |
+| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`   | Base64-encoded distribution certificate (.p12)     |
+| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD` | Password for the .p12 certificate                  |
+| `IOS_PROVISIONING_PROFILE_BASE64`       | Optional base64-encoded provisioning profile       |
+| `IOS_REFRESH_PROVISIONING_PROFILE`      | Set to `true` to refresh the App Store profile     |
+| `APP_STORE_CONNECT_API_KEY_ID`          | App Store Connect API Key ID                       |
+| `APP_STORE_CONNECT_API_ISSUER_ID`       | App Store Connect API Issuer ID                    |
+| `APP_STORE_CONNECT_API_KEY_CONTENT`     | Base64-encoded App Store Connect API Key (.p8)     |
+| `FASTLANE_USER`                         | Apple ID for App Privacy publication               |
+| `FASTLANE_SESSION`                      | Apple ID session for App Privacy publication in CI |
 
 ### AdMob configuration
 
@@ -509,7 +523,7 @@ Published, non-prerelease GitHub releases tagged as `@trizum/mobile@*` also
 trigger the shared release workflow. That path reuses the mobile build and
 store deployment workflows to generate store screenshots, publish Android to the
 Play Store production track with `release_status` `completed`, upload the iOS
-build and store metadata with `automatic_release` enabled, and
+App Privacy answers, then the build and store metadata with `automatic_release` enabled, and
 attach the signed Android APK and AAB to the GitHub release.
 
 iOS review submission is temporarily manual for the first Premium release.
@@ -543,15 +557,17 @@ base64 -i your-release.keystore | tr -d '\n'
 
 #### iOS Secrets
 
-| Secret                                     | Description                                           |
-| ------------------------------------------ | ----------------------------------------------------- |
-| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`      | Base64-encoded distribution certificate (.p12)        |
-| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`    | Password used when exporting the .p12                 |
-| `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64` | Optional fallback App Store provisioning profile      |
-| `IOS_ADHOC_PROVISIONING_PROFILE_BASE64`    | Base64-encoded Ad Hoc provisioning profile (optional) |
-| `APP_STORE_CONNECT_API_KEY_ID`             | App Store Connect API Key ID                          |
-| `APP_STORE_CONNECT_API_ISSUER_ID`          | App Store Connect API Issuer ID                       |
-| `APP_STORE_CONNECT_API_KEY_CONTENT`        | Base64-encoded API Key content (.p8 file)             |
+| Secret                                     | Description                                                          |
+| ------------------------------------------ | -------------------------------------------------------------------- |
+| `IOS_DISTRIBUTION_CERTIFICATE_BASE64`      | Base64-encoded distribution certificate (.p12)                       |
+| `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`    | Password used when exporting the .p12                                |
+| `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64` | Optional fallback App Store provisioning profile                     |
+| `IOS_ADHOC_PROVISIONING_PROFILE_BASE64`    | Base64-encoded Ad Hoc provisioning profile (optional)                |
+| `APP_STORE_CONNECT_API_KEY_ID`             | App Store Connect API Key ID                                         |
+| `APP_STORE_CONNECT_API_ISSUER_ID`          | App Store Connect API Issuer ID                                      |
+| `APP_STORE_CONNECT_API_KEY_CONTENT`        | Base64-encoded API Key content (.p8 file)                            |
+| `FASTLANE_USER`                            | Apple ID with account holder or admin access for privacy publication |
+| `FASTLANE_SESSION`                         | Renewable Apple ID session generated with `fastlane spaceauth`       |
 
 ### How to Get iOS Secrets
 
