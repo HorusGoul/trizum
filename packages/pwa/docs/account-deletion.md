@@ -9,8 +9,7 @@ User ID. Neither a request body ID nor an email selects the customer.
 ## Browser deletion and store declarations
 
 The existing `https://trizum.app/settings/cloud-sync` flow supports sign-in and
-account deletion in a browser without installing the mobile app. This change
-does not add a deletion page or change the existing client.
+account deletion in a browser without installing the mobile app.
 
 A working account deletion URL does not establish that every collected data type
 is erased. Review retained shared documents, telemetry, backups, and provider
@@ -97,9 +96,7 @@ Without the permission/key/project, deletion fails closed for every account;
 it must not silently skip RevenueCat. Never put the secret in client variables.
 
 Deploy the Worker before claiming RevenueCat cleanup in store disclosures.
-The existing PWA and native account-deletion action already calls this endpoint;
-no mobile binary change is required for the backend cleanup. The fix is
-prospective: accounts deleted before this release are not backfilled, because
+The fix is prospective: accounts deleted before this release are not backfilled, because
 their identity may already be lost.
 No live customer deletion or store-console change was performed to validate it.
 Unit tests mock RevenueCat; integration tests run the real Better Auth handler
