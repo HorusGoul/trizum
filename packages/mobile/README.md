@@ -289,6 +289,7 @@ ios/App/fastlane/
 │   └── en-US/
 │       └── *.png
 ├── rating_config.json             # Age rating configuration
+├── app_privacy_details.json       # App Privacy questionnaire answers
 └── Deliverfile                    # Deliver configuration
 ```
 
@@ -306,6 +307,41 @@ mkdir -p ios/App/fastlane/metadata/de-DE
 1. Edit the text files in `metadata/`
 2. Run `bundle exec fastlane upload_metadata` to push changes
 3. Changes to `promotional_text.txt` don't require a new app version
+
+#### App Privacy Questionnaire
+
+`ios/App/fastlane/app_privacy_details.json` is the complete set of App Privacy
+answers published in App Store Connect. Fastlane's `deliver` uploads the privacy
+policy URL, but does not upload these questionnaire answers. Use the dedicated
+[App Privacy action](https://docs.fastlane.tools/uploading-app-privacy-details/)
+through this lane when the answers change:
+
+```bash
+cd packages/mobile/ios/App
+mise exec -- bundle exec fastlane upload_privacy
+```
+
+This action requires an Apple ID login (`FASTLANE_USER`, with two-factor
+authentication or an existing `FASTLANE_SESSION`). The pinned Fastlane action
+does not support App Store Connect API-key authentication, so it runs separately
+from the API-key-based release workflow. It replaces all questionnaire answers
+and publishes them immediately; keep the JSON complete when updating it.
+Regular metadata and binary uploads do not overwrite the questionnaire.
+
+The answers retain the existing app disclosures and include AdMob's Device ID,
+coarse location, advertising data, product interaction, and diagnostic uses.
+Device IDs are linked to the user and used for tracking when permission allows;
+the other AdMob tracking flags follow its installed privacy manifest. Purchases
+are linked to the user for app functionality because the RevenueCat client uses
+the signed-in account's ID. No payment-card details are collected by the app.
+
+Review these answers when SDKs or data flows change. The current advertising
+disclosures follow Google's [iOS data disclosure guide](https://developers.google.com/admob/ios/privacy/data-disclosure)
+and the Google Mobile Ads SDK's `PrivacyInfo.xcprivacy`. Existing linked crash
+and performance disclosures are retained for the app's own diagnostics.
+Developer advertising is not selected because trizum does not run first-party
+advertising or marketing through the SDK. The `Deliverfile` IDFA declaration
+must remain consistent with `app_store_submission_information` in `Fastfile`.
 
 #### Screenshots
 

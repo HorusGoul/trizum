@@ -1,0 +1,129 @@
+[
+  {
+    "category": "ADVERTISING_DATA",
+    "purposes": [
+      "ANALYTICS",
+      "THIRD_PARTY_ADVERTISING"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "COARSE_LOCATION",
+    "purposes": [
+      "ANALYTICS",
+      "THIRD_PARTY_ADVERTISING"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "CRASH_DATA",
+    "purposes": [
+      "ANALYTICS",
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "DEVICE_ID",
+    "purposes": [
+      "ANALYTICS",
+      "THIRD_PARTY_ADVERTISING"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU",
+      "DATA_USED_TO_TRACK_YOU"
+    ]
+  },
+  {
+    "category": "NAME",
+    "purposes": [
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "OTHER_DIAGNOSTIC_DATA",
+    "purposes": [
+      "ANALYTICS",
+      "APP_FUNCTIONALITY",
+      "THIRD_PARTY_ADVERTISING"
+    ],
+    "data_protections": [
+      "DATA_NOT_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "OTHER_USER_CONTENT",
+    "purposes": [
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_NOT_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "PERFORMANCE_DATA",
+    "purposes": [
+      "ANALYTICS",
+      "APP_FUNCTIONALITY",
+      "THIRD_PARTY_ADVERTISING"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "PHONE_NUMBER",
+    "purposes": [
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "PHOTOS_OR_VIDEOS",
+    "purposes": [
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_NOT_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "PRODUCT_INTERACTION",
+    "purposes": [
+      "ANALYTICS",
+      "THIRD_PARTY_ADVERTISING"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "PURCHASE_HISTORY",
+    "purposes": [
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  },
+  {
+    "category": "USER_ID",
+    "purposes": [
+      "APP_FUNCTIONALITY"
+    ],
+    "data_protections": [
+      "DATA_LINKED_TO_YOU"
+    ]
+  }
+]
