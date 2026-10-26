@@ -15,6 +15,7 @@ interface RevenueCatPage<T> {
 }
 
 export interface RevenueCatApiClient {
+  requestCustomerDeletion(request: { customerId: string; projectId: string }): Promise<void>;
   hasDirectEntitlement(request: {
     customerId: string;
     entitlementLookupKey: string;
@@ -48,6 +49,66 @@ export function createRevenueCatApiClient({
   });
 
   return {
+    async requestCustomerDeletion({ customerId, projectId }) {
+      if (!customerId.trim() || !projectId.trim()) {
+        throw new RevenueCatApiError("RevenueCat project and customer identifiers are required.");
+      }
+
+      // The customer deletion endpoint is outside the generated customer-resources schema.
+      // A 200 acknowledges RevenueCat's asynchronous deletion, not completed erasure.
+      const customersUrl = `${REVENUECAT_API_URL}/projects/${encodeURIComponent(projectId)}/customers`;
+      const customerUrl = `${customersUrl}/${encodeURIComponent(customerId)}`;
+      const signal = AbortSignal.timeout(10_000);
+      async function request(url: string, method: "DELETE" | "GET") {
+        try {
+          const response = await fetcher(url, {
+            method,
+            headers: { Authorization: `Bearer ${secretApiKey}`, Accept: "application/json" },
+            signal,
+          });
+          const body: unknown = await response.json();
+          return { response, body };
+        } catch {
+          throw new RevenueCatApiError("RevenueCat customer deletion could not be confirmed.");
+        }
+      }
+
+      const { response, body } = await request(customerUrl, "DELETE");
+      if (response.status === 404 && isMissingCustomerError(body)) {
+        return;
+      }
+      if (response.status === 404 && isUnscopedMissingResourceError(body)) {
+        // Error.param is optional. Confirm absence separately, then verify that
+        // the project is accessible without needing extra project permissions.
+        const customer = await request(customerUrl, "GET");
+        if (customer.response.status === 404 && isMissingCustomerError(customer.body)) {
+          return;
+        }
+        if (customer.response.status === 404 && isUnscopedMissingResourceError(customer.body)) {
+          const project = await request(`${customersUrl}?limit=1`, "GET");
+          if (
+            project.response.status === 200 &&
+            isRecord(project.body) &&
+            project.body.object === "list" &&
+            Array.isArray(project.body.items)
+          ) {
+            return;
+          }
+        }
+      }
+
+      if (
+        response.status !== 200 ||
+        !isRecord(body) ||
+        body.object !== "customer" ||
+        typeof body.id !== "string" ||
+        typeof body.deleted_at !== "number"
+      ) {
+        throw new RevenueCatApiError(
+          `RevenueCat customer deletion was not acknowledged (status ${response.status}).`,
+        );
+      }
+    },
     async hasDirectEntitlement({ customerId, entitlementLookupKey, environment, projectId }) {
       if (!customerId.trim() || !entitlementLookupKey.trim() || !projectId.trim()) {
         throw new RevenueCatApiError(
@@ -160,6 +221,10 @@ function parsePageResponse<T>(
 
 function isMissingCustomerError(value: unknown) {
   return isRecord(value) && value.type === "resource_missing" && value.param === "customer_id";
+}
+
+function isUnscopedMissingResourceError(value: unknown) {
+  return isRecord(value) && value.type === "resource_missing" && value.param == null;
 }
 
 async function listAllRevenueCatResources<T>(

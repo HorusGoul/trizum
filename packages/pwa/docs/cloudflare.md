@@ -74,10 +74,14 @@ vp exec wrangler secret put REVENUECAT_SECRET_API_KEY
 
 `REVENUECAT_PROJECT_ID` is the non-secret RevenueCat project ID configured in
 `wrangler.jsonc`. `REVENUECAT_SECRET_API_KEY` must be a RevenueCat v2 secret key
-restricted to `customer_information:subscriptions:read` and
-`customer_information:purchases:read`. They are used only by the Worker to
-verify Premium and must never be exposed through `VITE_` variables or committed
-to the repo.
+restricted to `customer_information:subscriptions:read`,
+`customer_information:purchases:read`, and
+`customer_information:customers:read_write`. The Worker uses it to verify
+Premium and request customer deletion before deleting a cloud account. Grant
+the customer permission before deploying this change: missing configuration or
+permissions block account deletion so the identity remains available for retry.
+See [account deletion](./account-deletion.md) for retry behavior and data scope.
+The key must never be exposed through `VITE_` variables or committed to the repo.
 
 Google and Apple setup details live in [`oauth.md`](./oauth.md).
 
