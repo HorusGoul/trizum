@@ -15,6 +15,7 @@ interface RevenueCatPage<T> {
 }
 
 export interface RevenueCatApiClient {
+  requestCustomerDeletion(request: { customerId: string; projectId: string }): Promise<void>;
   hasDirectEntitlement(request: {
     customerId: string;
     entitlementLookupKey: string;
@@ -48,6 +49,45 @@ export function createRevenueCatApiClient({
   });
 
   return {
+    async requestCustomerDeletion({ customerId, projectId }) {
+      if (!customerId.trim() || !projectId.trim()) {
+        throw new RevenueCatApiError("RevenueCat project and customer identifiers are required.");
+      }
+
+      // The customer deletion endpoint is outside the generated customer-resources schema.
+      // A 200 acknowledges RevenueCat's asynchronous deletion, not completed erasure.
+      let response: Response;
+      let body: unknown;
+      try {
+        response = await fetcher(
+          `${REVENUECAT_API_URL}/projects/${encodeURIComponent(projectId)}/customers/${encodeURIComponent(customerId)}`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${secretApiKey}`, Accept: "application/json" },
+            signal: AbortSignal.timeout(10_000),
+          },
+        );
+        body = await response.json();
+      } catch {
+        throw new RevenueCatApiError("RevenueCat customer deletion could not be confirmed.");
+      }
+
+      if (response.status === 404 && isMissingCustomerError(body)) {
+        return;
+      }
+
+      if (
+        response.status !== 200 ||
+        !isRecord(body) ||
+        body.object !== "customer" ||
+        typeof body.id !== "string" ||
+        typeof body.deleted_at !== "number"
+      ) {
+        throw new RevenueCatApiError(
+          `RevenueCat customer deletion was not acknowledged (status ${response.status}).`,
+        );
+      }
+    },
     async hasDirectEntitlement({ customerId, entitlementLookupKey, environment, projectId }) {
       if (!customerId.trim() || !entitlementLookupKey.trim() || !projectId.trim()) {
         throw new RevenueCatApiError(

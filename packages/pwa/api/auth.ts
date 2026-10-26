@@ -1,4 +1,6 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
+import { APIError } from "better-auth/api";
+import { createRevenueCatApiClient } from "@trizum/revenuecat-api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, magicLink } from "better-auth/plugins";
 import { EmailMessage } from "cloudflare:email";
@@ -93,6 +95,26 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
       deleteUser: {
         enabled: true,
         beforeDelete: async (user) => {
+          // Better Auth checks the session and reauthentication before this hook.
+          // Keep the user (and stable RevenueCat identity) until cleanup is accepted.
+          try {
+            if (!env.REVENUECAT_PROJECT_ID?.trim() || !env.REVENUECAT_SECRET_API_KEY?.trim()) {
+              throw new Error("RevenueCat account deletion is not configured.");
+            }
+            await createRevenueCatApiClient({
+              secretApiKey: env.REVENUECAT_SECRET_API_KEY,
+            }).requestCustomerDeletion({
+              customerId: user.id,
+              projectId: env.REVENUECAT_PROJECT_ID,
+            });
+          } catch (error) {
+            authLogger.error("RevenueCat account deletion was not accepted", { error });
+            throw new APIError("SERVICE_UNAVAILABLE", {
+              code: "ACCOUNT_DELETION_UNAVAILABLE",
+              message: "Account deletion is temporarily unavailable. Please try again later.",
+            });
+          }
+
           authLogger.info("Deleting user account", { userId: user.id });
 
           await db

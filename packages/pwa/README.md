@@ -32,6 +32,8 @@ then use this document to decide where to work inside the PWA.
   raw requests to Worker routes.
 - [`docs/cloudflare.md`](./docs/cloudflare.md) documents Worker account, D1,
   Email, secrets, migrations, and observability setup.
+- [`docs/account-deletion.md`](./docs/account-deletion.md) documents RevenueCat
+  cleanup, retries, deployment permissions, and retained shared data.
 - [`docs/oauth.md`](./docs/oauth.md) documents Google/Apple OAuth, account
   linking, and native callback setup.
 - [`e2e/README.md`](./e2e/README.md) defines the shared Playwright browser

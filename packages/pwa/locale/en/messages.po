@@ -263,6 +263,10 @@ msgstr "Account created"
 msgid "Account deleted"
 msgstr "Account deleted"
 
+#: src/components/CloudSyncSettingsView.tsx:1060
+msgid "Account deletion could not be completed. Your cloud account is still available. Please try again later."
+msgstr "Account deletion could not be completed. Your cloud account is still available. Please try again later."
+
 #: src/components/PartyStatsView.tsx:304
 msgid "Across the selected timeframe"
 msgstr "Across the selected timeframe"
@@ -727,7 +731,7 @@ msgid "Canadian Dollar"
 msgstr "Canadian Dollar"
 
 #: src/components/CloudSyncDialogs.tsx:470
-#: src/components/CloudSyncDialogs.tsx:640
+#: src/components/CloudSyncDialogs.tsx:641
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:228
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
@@ -940,7 +944,7 @@ msgstr "Confirm action"
 msgid "Confirm transfer"
 msgstr "Confirm transfer"
 
-#: src/components/CloudSyncDialogs.tsx:615
+#: src/components/CloudSyncDialogs.tsx:616
 msgid "Confirmation"
 msgstr "Confirmation"
 
@@ -1245,7 +1249,7 @@ msgstr "Delete"
 
 #: src/components/CloudSyncAccountSettings.tsx:95
 #: src/components/CloudSyncDialogs.tsx:592
-#: src/components/CloudSyncDialogs.tsx:629
+#: src/components/CloudSyncDialogs.tsx:630
 msgid "Delete account"
 msgstr "Delete account"
 
@@ -3366,7 +3370,7 @@ msgstr "Sierra Leonean Leone"
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/components/CloudSyncSettingsView.tsx:1060
+#: src/components/CloudSyncSettingsView.tsx:1064
 msgid "Sign in again before deleting your account"
 msgstr "Sign in again before deleting your account"
 
@@ -3889,6 +3893,10 @@ msgid "This party will receive your Party Boost. You will not be able to move it
 msgstr "This party will receive your Party Boost. You will not be able to move it again for seven days."
 
 #: src/components/CloudSyncDialogs.tsx:601
+msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings, and requests deletion of your RevenueCat customer data. Your local data and shared groups will remain. This does not cancel Apple or Google subscriptions. Manage any active subscription in the store before continuing. Premium access may be lost; restoring purchases later may recreate purchase data."
+msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings, and requests deletion of your RevenueCat customer data. Your local data and shared groups will remain. This does not cancel Apple or Google subscriptions. Manage any active subscription in the store before continuing. Premium access may be lost; restoring purchases later may recreate purchase data."
+
+#: src/components/CloudSyncDialogs.tsx:601
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 
@@ -4086,7 +4094,7 @@ msgstr "Turkish Lira"
 msgid "Turkmenistani Manat"
 msgstr "Turkmenistani Manat"
 
-#: src/components/CloudSyncDialogs.tsx:613
+#: src/components/CloudSyncDialogs.tsx:614
 msgid "Type \"delete account\" to confirm."
 msgstr "Type \"delete account\" to confirm."
 
