@@ -129,6 +129,39 @@ platform :android do
   # Metadata Management Lanes
   # ============================================
 
+  desc "Upload a complete Google Play Data safety CSV (no binary or listing upload)"
+  desc "Options: csv (absolute path to the reviewed Play Console export)"
+  lane :upload_data_safety do |options|
+    require "csv"
+    require "supply"
+    require "supply/options"
+
+    csv_path = options[:csv].to_s
+    UI.user_error!("Pass csv:/absolute/path/to/data_safety.csv") unless csv_path.start_with?("/")
+    UI.user_error!("Data safety CSV does not exist") unless File.file?(csv_path)
+    safety_labels = File.read(csv_path, encoding: "bom|utf-8")
+    begin
+      rows = CSV.parse(safety_labels, headers: true)
+      UI.user_error!("Data safety CSV must contain questionnaire responses") if rows.empty?
+    rescue CSV::MalformedCSVError
+      UI.user_error!("Data safety CSV is malformed")
+    end
+
+    # Reuse Supply's Appfile credentials and bundled Android Publisher client.
+    # This endpoint is outside release edits; it has no validate_only option.
+    config = FastlaneCore::Configuration.create(
+      Supply::Options.available_options,
+      package_name: "app.trizum.capacitor",
+      timeout: GOOGLE_PLAY_API_TIMEOUT_SECONDS
+    )
+    client = Supply::Client.make_from_config(params: config)
+    request = Google::Apis::AndroidpublisherV3::SafetyLabelsUpdateRequest.new(
+      safety_labels: safety_labels
+    )
+    client.client.data_application_safety(config[:package_name], request)
+    UI.success("Data safety CSV uploaded. Verify review/publication status in Play Console.")
+  end
+
   desc "Download existing metadata from Google Play"
   lane :download_metadata do
     download_from_play_store(
