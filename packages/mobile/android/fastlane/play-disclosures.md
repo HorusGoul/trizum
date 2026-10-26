@@ -157,10 +157,15 @@ the URL and answers only after the deployed behavior and retention explanation
 are verified. Deleting a RevenueCat customer is also not a subscription
 cancellation or refund.
 
-App Store Connect's actual review-detail records for both submitted 1.13.0 and
-released 1.12.2 contained no reviewer username or password. They were inspected
-read-only. Public local expense use needs no account; cloud sign-in and purchase
-flows need a dedicated account. Do not assume that a cloud account is Premium.
+The owner confirms that App Store reviewer credentials were supplied previously.
+Read-only inspection of App Store Connect did not expose reusable credentials;
+empty returned fields do not establish that no credentials are configured.
+Android reviewer credentials were requested through a private secret form.
+Public local expense use needs no account; cloud sign-in and purchase flows
+need a dedicated account. Do not assume that a cloud account is Premium.
+Pre-existing Premium is not required to inspect sign-in and purchase screens.
+Premium entitlement status remains unknown: no RevenueCat customer tools or
+authenticated dedicated reviewer session were available for verification.
 Google says reviewers cannot create accounts, use their own payment accounts,
 or rely on a free trial. If full Premium feature review needs an entitlement,
 resolve that separately without granting one as an incidental disclosure edit.
