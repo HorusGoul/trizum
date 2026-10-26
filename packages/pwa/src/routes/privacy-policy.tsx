@@ -1,5 +1,5 @@
 import { BackButton } from "#src/components/BackButton.js";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Trans } from "@lingui/react/macro";
 
 export const Route = createFileRoute("/privacy-policy")({
@@ -23,7 +23,7 @@ function renderPrivacyPolicyContent() {
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
         <p className="text-accent-600 dark:text-accent-400 text-sm">
-          <Trans>Last updated: October 26, 2026</Trans>
+          <Trans>Last updated: October 4, 2026</Trans>
         </p>
 
         <p className="text-accent-700 dark:text-accent-300">
@@ -479,20 +479,6 @@ function renderPrivacyPolicyContent() {
             <h3 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
               5.1 Access and Deletion
             </h3>
-            <Link
-              to="/settings/cloud-sync"
-              className="text-accent-900 dark:text-accent-100 font-semibold underline"
-            >
-              <Trans>Open cloud settings to delete your account</Trans>
-            </Link>
-            <p className="text-accent-700 dark:text-accent-300">
-              <Trans>
-                Before cloud account deletion, we request deletion of your RevenueCat customer
-                record, purchase history, and attributes. RevenueCat processes deletion
-                asynchronously. If the request cannot be confirmed, your cloud account is kept so
-                you can retry.
-              </Trans>
-            </p>
             <p className="text-accent-700 dark:text-accent-300">
               You can access, modify, or delete your data at any time through the Service. To delete
               your data:

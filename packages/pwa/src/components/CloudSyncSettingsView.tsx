@@ -1056,10 +1056,6 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
 }
 
 function getDeleteAccountErrorMessage(message: string) {
-  if (message === "Account deletion is temporarily unavailable. Please try again later.") {
-    return t`Account deletion could not be completed. Your cloud account is still available. Please try again later.`;
-  }
-
   if (message.toLowerCase().includes("session")) {
     return t`Sign in again before deleting your account`;
   }
