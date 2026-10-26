@@ -19,7 +19,7 @@ Appfile authentication, including `GOOGLE_PLAY_JSON_KEY_FILE`.
 2. Complete and review the questionnaire in Play Console. Export the complete
    Google CSV once and retain it as `fastlane/data_safety.csv` after resolving
    all outstanding declarations. This repository currently has no finalized
-   CSV: the audit below is a draft with unresolved deletion and review access.
+   CSV. The audit below records the original draft and its submission status.
 3. To upload a reviewed CSV using the existing service account:
 
    ```bash
@@ -77,7 +77,21 @@ java -jar /path/to/bundletool.jar dump manifest \
   --bundle=/path/to/trizum-mobile-1.13.0-signed.aab --module=base
 ```
 
-### Console findings and saved changes
+### Submission status
+
+Later on 26 October 2026, Play Console showed Data safety, Contains ads,
+Advertising ID, and sign-in details **In review**. Reviewer credentials and
+instructions were saved, and the account-deletion URL submitted with Data safety
+is `https://trizum.app/privacy-policy`. The optional question about deleting some
+or all data without deleting the account is answered **No**.
+
+RevenueCat cleanup is tracked in [PR #490](https://github.com/HorusGoul/trizum/pull/490)
+and still needs production deployment. The existing browser account-deletion
+flow is `https://trizum.app/settings/cloud-sync`. Verify the deployed cleanup
+before claiming that RevenueCat customer data is included. Review submission
+does not establish approval or public label availability.
+
+### Initial Console findings and saved changes
 
 | Declaration | Before audit | Audit result |
 | --- | --- | --- |
@@ -97,7 +111,7 @@ told us". No review submission or publication was performed by this audit.
 
 The public Play listing still showed no Contains ads label, "No data shared
 with third parties", the original three data categories, and "Data can't be
-deleted". The expanded questionnaire is a saved draft, not the public label.
+deleted". At the initial audit, the expanded questionnaire was a saved draft.
 
 ### Data safety draft
 
@@ -139,9 +153,9 @@ The usage-analytics opt-out does not disable Sentry diagnostics. Expense and
 shared-document sync also operates without cloud sign-in, so anonymous use is
 not evidence of local-only processing.
 
-### Outstanding deletion and review-access work
+### Deletion scope
 
-The draft's required account-deletion URL remains unresolved. The deployed
+At the initial audit, the required account-deletion URL was unresolved. The deployed
 `packages/pwa/api/auth.ts` deletion hook removes cloud settings alongside the
 authentication account. It does not delete a RevenueCat customer. SDK logout is
 not customer deletion. Removing a party in `usePartyList.ts` only removes the
@@ -152,23 +166,17 @@ participants' collaborative data as part of this disclosure work.
 The live policy describes cloud account deletion and retention limits, but does
 not establish an implemented cross-provider erasure procedure. Its general
 "regular security assessments" wording is not evidence of Google's independent
-security-review badge. A separate account-deletion change is pending; update
-the URL and answers only after the deployed behavior and retention explanation
-are verified. Deleting a RevenueCat customer is also not a subscription
-cancellation or refund.
+security-review badge. PR #490 implements RevenueCat cleanup; verify the deployed
+behavior and retention explanation when updating the answers. Deleting a
+RevenueCat customer is also not a subscription cancellation or refund.
 
-The owner confirms that App Store reviewer credentials were supplied previously.
-Read-only inspection of App Store Connect did not expose reusable credentials;
-empty returned fields do not establish that no credentials are configured.
-Android reviewer credentials were requested through a private secret form.
-Public local expense use needs no account; cloud sign-in and purchase flows
-need a dedicated account. Do not assume that a cloud account is Premium.
-Pre-existing Premium is not required to inspect sign-in and purchase screens.
-Premium entitlement status remains unknown: no RevenueCat customer tools or
-authenticated dedicated reviewer session were available for verification.
-Google says reviewers cannot create accounts, use their own payment accounts,
-or rely on a free trial. If full Premium feature review needs an entitlement,
-resolve that separately without granting one as an incidental disclosure edit.
+### Reviewer access
+
+Google Play has dedicated reviewer credentials and sign-in instructions saved.
+Keep credentials out of the repository and logs. Public local expense use needs
+no account; cloud sign-in and purchase flows require the supplied account.
+Premium access was handled separately from the disclosure audit. Review the
+instructions whenever sign-in or Premium access changes.
 
 ### Evidence to revisit when behavior changes
 
