@@ -166,6 +166,11 @@ bundle install
 
 #### Android (`packages/mobile/android`)
 
+Google Play app-content declarations are managed separately from listing and
+binary uploads. See the [Android disclosure guide](./android/fastlane/play-disclosures.md)
+for the Data safety CSV lane, the 1.13.0 audit, submission status, and deletion
+requirements.
+
 | Lane                | Description                         |
 | ------------------- | ----------------------------------- |
 | `build_debug`       | Build debug APK                     |
