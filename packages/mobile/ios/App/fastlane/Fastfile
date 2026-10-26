@@ -248,6 +248,15 @@ platform :ios do
   # Metadata Management Lanes
   # ============================================
 
+  desc "Publish App Privacy answers using an Apple ID session"
+  lane :upload_privacy do
+    upload_app_privacy_details_to_app_store(
+      app_identifier: IOS_APP_IDENTIFIER,
+      json_path: File.expand_path("app_privacy_details.json", __dir__),
+      skip_publish: false
+    )
+  end
+
   desc "Download existing metadata from App Store Connect"
   lane :download_metadata do
     load_api_key

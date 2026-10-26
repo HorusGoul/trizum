@@ -20,7 +20,7 @@ precheck_include_in_app_purchases false
 # Default submission information
 submission_information({
   # IDFA (Identifier for Advertisers)
-  add_id_info_uses_idfa: false,
+  add_id_info_uses_idfa: true,
   
   # Export compliance (encryption)
   export_compliance_uses_encryption: false,
