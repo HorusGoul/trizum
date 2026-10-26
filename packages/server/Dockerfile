@@ -3,7 +3,7 @@
 # Keep the variant suffix in this ARG so Renovate can update the shared image tag.
 ARG NODE_IMAGE_TAG=24.18.0-slim
 ARG LITESTREAM_VERSION=0.5.2
-ARG VITE_PLUS_VERSION=0.1.24
+ARG VITE_PLUS_VERSION=0.2.4
 FROM node:${NODE_IMAGE_TAG} AS build
 ARG TARGETARCH
 ARG VITE_PLUS_VERSION
@@ -23,19 +23,14 @@ WORKDIR /app
 
 # Copy workspace configuration files from monorepo root
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches ./patches
 
-# Copy workspace manifests before sources so dependency install stays cached.
-COPY packages/icon-sprite/package.json ./packages/icon-sprite/package.json
-COPY packages/logging/package.json ./packages/logging/package.json
-COPY packages/mobile/package.json ./packages/mobile/package.json
-COPY packages/pwa/package.json ./packages/pwa/package.json
-COPY packages/screenshots/package.json ./packages/screenshots/package.json
-COPY packages/server/package.json ./packages/server/package.json
-COPY packages/ts-template/package.json ./packages/ts-template/package.json
-COPY packages/tsconfig/package.json ./packages/tsconfig/package.json
+# Match pnpm's packages/* workspace glob, preserving each manifest's directory.
+# New packages are included automatically without invalidating this layer for source edits.
+COPY --parents packages/*/package.json ./
 
-# Install all dependencies through Vite+
-RUN vp install --frozen-lockfile
+# CI mode allows prepare hooks to skip local agent setup in the image.
+RUN CI=true vp install --frozen-lockfile
 
 # Copy all package sources after dependencies are installed.
 COPY packages ./packages
@@ -46,6 +41,7 @@ RUN vp run --filter @trizum/logging build
 # Pack the server and migrator as a standalone Node module
 WORKDIR /app/packages/server
 RUN vp pack
+RUN node scripts/copy-profiler.ts /app/runtime-node-modules
 
 # Normalize target-specific native packages into a stable path for runtime COPY.
 RUN set -eux; \
@@ -77,10 +73,6 @@ COPY packages/server/entrypoint.sh ./entrypoint.sh
 COPY packages/server/drizzle ./drizzle
 COPY --from=build /app/packages/server/build/cli.mjs ./server.mjs
 COPY --from=build /app/runtime-node-modules ./node_modules
-COPY --from=build /app/node_modules/.pnpm/@sentry-internal+node-cpu-profiler@2.2.0/node_modules/@sentry-internal/node-cpu-profiler ./node_modules/@sentry-internal/node-cpu-profiler
-COPY --from=build /app/node_modules/.pnpm/detect-libc@2.1.2/node_modules/detect-libc ./node_modules/detect-libc
-COPY --from=build /app/node_modules/.pnpm/node-abi@3.85.0/node_modules/node-abi ./node_modules/node-abi
-COPY --from=build /app/node_modules/.pnpm/semver@7.7.3/node_modules/semver ./node_modules/semver
 
 RUN chmod +x ./entrypoint.sh
 
