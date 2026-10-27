@@ -1,5 +1,12 @@
 # @trizum/mobile
 
+## 1.13.1
+
+### Patch Changes
+
+- Updated dependencies [[`5acfdbc`](https://github.com/HorusGoul/trizum/commit/5acfdbce9a6f64a0d107ffa7d858378e3470c84e)]:
+  - @trizum/pwa@1.13.1
+
 ## 1.13.0
 
 ### Minor Changes

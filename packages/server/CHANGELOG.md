@@ -1,5 +1,11 @@
 # @trizum/server
 
+## 1.0.4
+
+### Patch Changes
+
+- [#489](https://github.com/HorusGoul/trizum/pull/489) [`786fe83`](https://github.com/HorusGoul/trizum/commit/786fe8340495c8799d84031fc65da09af2bfcac0) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix server releases by including dependency patches and all workspace manifests in the Docker build, and packaging the current Sentry native profiler with its resolved dependencies.
+
 ## 1.0.3
 
 ### Patch Changes
