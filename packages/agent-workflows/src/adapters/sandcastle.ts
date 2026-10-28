@@ -1,6 +1,7 @@
 import { rm } from "node:fs/promises";
-import { codex, Output, run, type AgentProvider } from "@ai-hero/sandcastle";
+import { codex, Output, run } from "@ai-hero/sandcastle";
 import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
+import { trackCodexAuthentication } from "./codex-auth.js";
 import {
   reviewResultSchema,
   type CodexReviewResult,
@@ -33,10 +34,11 @@ export async function runSandcastleCodexReview(
   repoRoot: string,
 ): Promise<CodexReviewResult> {
   const branchName = `agent/review-renovate-pr-${context.pr.number}-${Date.now()}`;
+  const agent = createCodexAgent();
 
   try {
     const result = await run({
-      agent: createCodexAgent(),
+      agent,
       branchStrategy: {
         branch: branchName,
         type: "branch",
@@ -66,6 +68,7 @@ export async function runSandcastleCodexReview(
       ran: true,
     };
   } catch (error) {
+    agent.throwIfAuthenticationFailed(error);
     return {
       affectedAreas: [],
       automatedTestSuggestions: [],
@@ -91,8 +94,9 @@ export async function runSandcastleCodexFix(
   branchName: string,
   reviewReport?: string,
 ): Promise<SandcastleFixRun> {
+  const agent = createCodexAgent();
   const result = await run({
-    agent: createCodexAgent(),
+    agent,
     branchStrategy: {
       branch: branchName,
       type: "branch",
@@ -122,6 +126,9 @@ export async function runSandcastleCodexFix(
       gitSetupMs: 30_000,
       mergeToHostMs: 60_000,
     },
+  }).catch((error: unknown) => {
+    agent.throwIfAuthenticationFailed(error);
+    throw error;
   });
 
   return {
@@ -137,7 +144,7 @@ function resolveCodexModel(): string {
   return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || "gpt-5.6-sol";
 }
 
-function createCodexAgent(): AgentProvider {
+function createCodexAgent(): ReturnType<typeof trackCodexAuthentication> {
   const model = resolveCodexModel();
   const agent = codex(model, {
     env: createSecretScrubEnvironmentOverrides({
@@ -146,7 +153,7 @@ function createCodexAgent(): AgentProvider {
     effort: resolveCodexEffort(),
   });
 
-  return {
+  return trackCodexAuthentication({
     ...agent,
     buildPrintCommand(options) {
       const command = agent.buildPrintCommand(options);
@@ -155,7 +162,7 @@ function createCodexAgent(): AgentProvider {
         command: addCodexExecFlags(command.command, ["--ignore-user-config"]),
       };
     },
-  };
+  });
 }
 
 function addCodexExecFlags(command: string, flags: readonly string[]): string {
