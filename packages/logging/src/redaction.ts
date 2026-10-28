@@ -1,3 +1,5 @@
+/// <reference lib="esnext.disposable" />
+
 import bs58check from "bs58check";
 import type { LogRecord, Sink } from "@logtape/logtape";
 
