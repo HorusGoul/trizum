@@ -5,38 +5,38 @@ PODS:
   - AppAuth/Core (1.7.6)
   - AppAuth/ExternalUserAgent (1.7.6):
     - AppAuth/Core
-  - AppCheckCore (11.3.0):
+  - AppCheckCore (11.3.2):
     - GoogleUtilities/Environment (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
     - PromisesSwift (~> 2.4)
     - RecaptchaInterop (~> 101.0)
-  - Capacitor (8.5.2):
+  - Capacitor (8.5.3):
     - CapacitorCordova
-  - CapacitorApp (8.1.0):
+  - CapacitorApp (8.1.2):
     - Capacitor
-  - CapacitorCamera (8.2.0):
+  - CapacitorCamera (8.2.6):
     - Capacitor
-    - IONCameraLib (~> 1.0.4)
-  - CapacitorCommunityAdmob (8.0.0):
+    - IONCameraLib (~> 2.0.0)
+  - CapacitorCommunityAdmob (8.2.1):
     - Capacitor
-    - Google-Mobile-Ads-SDK (~> 12.14)
+    - Google-Mobile-Ads-SDK (= 13.11.0)
     - GoogleUserMessagingPlatform (~> 3.1)
-  - CapacitorCordova (8.5.2)
-  - CapacitorPluginSafeArea (5.0.0):
+  - CapacitorCordova (8.5.3)
+  - CapacitorPluginSafeArea (5.0.1):
     - Capacitor
-  - CapacitorShare (8.0.1):
+  - CapacitorShare (8.0.3):
     - Capacitor
-  - CapacitorSplashScreen (8.0.1):
+  - CapacitorSplashScreen (8.0.2):
     - Capacitor
   - CapawesomeCapacitorAppleSignIn (0.1.1):
     - Capacitor
-  - CapawesomeCapacitorAppUpdate (8.0.3):
+  - CapawesomeCapacitorAppUpdate (8.1.1):
     - Capacitor
   - CapawesomeCapacitorGoogleSignIn (0.1.2):
     - Capacitor
     - GoogleSignIn (~> 8.0)
-  - Google-Mobile-Ads-SDK (12.14.0):
+  - Google-Mobile-Ads-SDK (13.11.0):
     - GoogleUserMessagingPlatform (>= 1.1)
   - GoogleSignIn (8.0.0):
     - AppAuth (< 2.0, >= 1.7.3)
@@ -44,53 +44,53 @@ PODS:
     - GTMAppAuth (< 5.0, >= 4.1.1)
     - GTMSessionFetcher/Core (~> 3.3)
   - GoogleUserMessagingPlatform (3.1.0)
-  - GoogleUtilities/Environment (8.1.1):
+  - GoogleUtilities/Environment (8.1.5):
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Logger (8.1.1):
+  - GoogleUtilities/Logger (8.1.5):
     - GoogleUtilities/Environment
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Privacy (8.1.1)
-  - GoogleUtilities/UserDefaults (8.1.1):
+  - GoogleUtilities/Privacy (8.1.5)
+  - GoogleUtilities/UserDefaults (8.1.5):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - GTMAppAuth (4.1.1):
     - AppAuth/Core (~> 1.7)
     - GTMSessionFetcher/Core (< 4.0, >= 3.3)
   - GTMSessionFetcher/Core (3.5.0)
-  - IONCameraLib (1.0.4)
+  - IONCameraLib (2.0.0)
   - PromisesObjC (2.4.1)
   - PromisesSwift (2.4.1):
     - PromisesObjC (= 2.4.1)
-  - PurchasesHybridCommon (18.22.2):
-    - RevenueCat (= 5.81.1)
-  - PurchasesHybridCommonUI (18.22.2):
-    - PurchasesHybridCommon (= 18.22.2)
-    - RevenueCatUI (= 5.81.1)
+  - PurchasesHybridCommon (19.15.0):
+    - RevenueCat (= 5.98.0)
+  - PurchasesHybridCommonUI (19.15.0):
+    - PurchasesHybridCommon (= 19.15.0)
+    - RevenueCatUI (= 5.98.0)
   - RecaptchaInterop (101.0.0)
-  - RevenueCat (5.81.1)
-  - RevenuecatPurchasesCapacitor (13.2.4):
+  - RevenueCat (5.98.0)
+  - RevenuecatPurchasesCapacitor (13.7.6):
     - Capacitor
-    - PurchasesHybridCommon (= 18.22.2)
-  - RevenuecatPurchasesCapacitorUi (13.2.4):
+    - PurchasesHybridCommon (= 19.15.0)
+  - RevenuecatPurchasesCapacitorUi (13.7.6):
     - Capacitor
-    - PurchasesHybridCommonUI (= 18.22.2)
-  - RevenueCatUI (5.81.1):
-    - RevenueCat (= 5.81.1)
+    - PurchasesHybridCommonUI (= 19.15.0)
+  - RevenueCatUI (5.98.0):
+    - RevenueCat (= 5.98.0)
 
 DEPENDENCIES:
-  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios`)"
-  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.5.2/node_modules/@capacitor/app`)"
-  - "CapacitorCamera (from `../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.5.2/node_modules/@capacitor/camera`)"
-  - "CapacitorCommunityAdmob (from `../../../../node_modules/.pnpm/@capacitor-community+admob@8.0.0_patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4/node_modules/@capacitor-community/admob`)"
-  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios`)"
-  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.5.2/node_modules/capacitor-plugin-safe-area`)"
-  - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/share`)"
-  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen`)"
-  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in`)"
-  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update`)"
-  - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in`)"
-  - "RevenuecatPurchasesCapacitor (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor`)"
-  - "RevenuecatPurchasesCapacitorUi (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.5.2_@revenuecat+purchases-c_92542bf63b788266b8aa9b5d964e034c/node_modules/@revenuecat/purchases-capacitor-ui`)"
+  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@8.1.2_@capacitor+core@8.5.3/node_modules/@capacitor/app`)"
+  - "CapacitorCamera (from `../../../../node_modules/.pnpm/@capacitor+camera@8.2.6_@capacitor+core@8.5.3/node_modules/@capacitor/camera`)"
+  - "CapacitorCommunityAdmob (from `../../../../node_modules/.pnpm/@capacitor-community+admob@8.2.1/node_modules/@capacitor-community/admob`)"
+  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios`)"
+  - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.1_@capacitor+core@8.5.3/node_modules/capacitor-plugin-safe-area`)"
+  - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.3_@capacitor+core@8.5.3/node_modules/@capacitor/share`)"
+  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.2_@capacitor+core@8.5.3/node_modules/@capacitor/splash-screen`)"
+  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-apple-sign-in`)"
+  - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.1.1_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-app-update`)"
+  - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-google-sign-in`)"
+  - "RevenuecatPurchasesCapacitor (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.7.6_@capacitor+core@8.5.3/node_modules/@revenuecat/purchases-capacitor`)"
+  - "RevenuecatPurchasesCapacitorUi (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.7.6_@capacitor+core@8.5.3_@revenuecat+purchases-c_38ffea0f6cc7f67989844c25b772113a/node_modules/@revenuecat/purchases-capacitor-ui`)"
 
 SPEC REPOS:
   trunk:
@@ -113,63 +113,63 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Capacitor:
-    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios"
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios"
   CapacitorApp:
-    :path: "../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.5.2/node_modules/@capacitor/app"
+    :path: "../../../../node_modules/.pnpm/@capacitor+app@8.1.2_@capacitor+core@8.5.3/node_modules/@capacitor/app"
   CapacitorCamera:
-    :path: "../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.5.2/node_modules/@capacitor/camera"
+    :path: "../../../../node_modules/.pnpm/@capacitor+camera@8.2.6_@capacitor+core@8.5.3/node_modules/@capacitor/camera"
   CapacitorCommunityAdmob:
-    :path: "../../../../node_modules/.pnpm/@capacitor-community+admob@8.0.0_patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4/node_modules/@capacitor-community/admob"
+    :path: "../../../../node_modules/.pnpm/@capacitor-community+admob@8.2.1/node_modules/@capacitor-community/admob"
   CapacitorCordova:
-    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios"
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios"
   CapacitorPluginSafeArea:
-    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.5.2/node_modules/capacitor-plugin-safe-area"
+    :path: "../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.1_@capacitor+core@8.5.3/node_modules/capacitor-plugin-safe-area"
   CapacitorShare:
-    :path: "../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/share"
+    :path: "../../../../node_modules/.pnpm/@capacitor+share@8.0.3_@capacitor+core@8.5.3/node_modules/@capacitor/share"
   CapacitorSplashScreen:
-    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen"
+    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.2_@capacitor+core@8.5.3/node_modules/@capacitor/splash-screen"
   CapawesomeCapacitorAppleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-apple-sign-in"
   CapawesomeCapacitorAppUpdate:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.1.1_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-app-update"
   CapawesomeCapacitorGoogleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-google-sign-in"
   RevenuecatPurchasesCapacitor:
-    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor"
+    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.7.6_@capacitor+core@8.5.3/node_modules/@revenuecat/purchases-capacitor"
   RevenuecatPurchasesCapacitorUi:
-    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.5.2_@revenuecat+purchases-c_92542bf63b788266b8aa9b5d964e034c/node_modules/@revenuecat/purchases-capacitor-ui"
+    :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.7.6_@capacitor+core@8.5.3_@revenuecat+purchases-c_38ffea0f6cc7f67989844c25b772113a/node_modules/@revenuecat/purchases-capacitor-ui"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
-  AppCheckCore: 214137f5c378d1dec88a68425c467fe65aaff637
-  Capacitor: 89067779e14fb7ea56af07b4817f45d1f0c2a269
-  CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
-  CapacitorCamera: 8f6acf83664118321111e76acef86390211ccb08
-  CapacitorCommunityAdmob: 9c36b466f46da413e5c105f7484e7603178c6223
-  CapacitorCordova: 5bec5648cbd09a176ce34ce5e7b6cdabb2c8a327
-  CapacitorPluginSafeArea: 9d0682951c011bf0b36e513a89103c5fbff7ac49
-  CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
-  CapacitorSplashScreen: 4b46c72298db552b3c57ce021ef028b6dc7f1fa7
+  AppCheckCore: be8fce5469f68d7f6a29aa94b25f097409ff7fdc
+  Capacitor: 2f67eaeb8ed79909cd35b5e7439a5c2a9ca58e0f
+  CapacitorApp: 7b7e43debe505bc61beedb83796aa1368c86078b
+  CapacitorCamera: 09e51f52c079eaf731a5528a1c3455c074ccc24c
+  CapacitorCommunityAdmob: 9171f46bded6d5106629941fbbfb722929047f20
+  CapacitorCordova: 0b7326439c7a09fc5d20eced5e0dab986327a493
+  CapacitorPluginSafeArea: 874619c00586248f1694210e72038123d422c2d9
+  CapacitorShare: 5b5e53347556bee89ae6163ed20b5b3c25fe75f1
+  CapacitorSplashScreen: 7bf61c2001557ff9e195e601c6b87344480d3c65
   CapawesomeCapacitorAppleSignIn: c793d6d2b2cb22d0a029d758dcf33484f385f382
-  CapawesomeCapacitorAppUpdate: 3a7537c6a6696837b51d06f26b2e909fd7b9226f
+  CapawesomeCapacitorAppUpdate: c952614bc2c82c43ec3c12c06cd8a07b60da6d53
   CapawesomeCapacitorGoogleSignIn: 7d9ecee5c88e500f7fd364b22cfbfd8386724534
-  Google-Mobile-Ads-SDK: 4534fd2dfcd3f705c5485a6633c5188d03d4eed2
+  Google-Mobile-Ads-SDK: 09d0868abe43b9f851b7b340a245679f0eafc96c
   GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
-  GoogleUtilities: 4f2618a4a1e762a1ee134a1e2323bba9843e06da
+  GoogleUtilities: 7dc09b3fa9ecb5c2298b952313d14628b61b9da3
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
-  IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
+  IONCameraLib: 729cae576e1a952602ce750a9790b6dc7d7e2e95
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
   PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
-  PurchasesHybridCommon: e47bc4f611e86fcf8295bf1c984f187982270f02
-  PurchasesHybridCommonUI: e6756576ad454c6c15a4679f57446115382ff791
+  PurchasesHybridCommon: 896c922f222ffde889a96568e02268b5ca9db85a
+  PurchasesHybridCommonUI: 843d45949325d6cf4c4abe285fa15876ca16f910
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
-  RevenueCat: 693b033863262f9776130cc6c1f9255a74ab23ff
-  RevenuecatPurchasesCapacitor: cfbab60a6bcc32d5050f6802e49b884beb2d936c
-  RevenuecatPurchasesCapacitorUi: f6c60a6466f873b15f9a4492bf9f7a62edabe938
-  RevenueCatUI: 2c7092fa0a485454d2a474e80f241e6db591dd36
+  RevenueCat: d2d6a98d8e1d53cc1c6362cc1fdfb64ca99b8735
+  RevenuecatPurchasesCapacitor: 0e5dca853b6dabbcc3519b6b6a14d230c581f444
+  RevenuecatPurchasesCapacitorUi: 53ebdc22abd8868344aa36b49fe8aa13c8176b93
+  RevenueCatUI: 8f089ba531a2393465cb5062e2009eb3a6e42927
 
-PODFILE CHECKSUM: 5e5fb12a7d80e4ca6a7efdb530ede80b8ff9418e
+PODFILE CHECKSUM: e9a0f63907ae559dafe19b072c4c0f7a94ca44c3
 
 COCOAPODS: 1.17.0
