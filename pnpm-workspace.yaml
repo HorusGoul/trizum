@@ -130,8 +130,8 @@ catalog:
   playwright: 1.64.1
   qr-code-styling: 1.9.2
   react: 19.3.0
-  react-aria: 3.53.1
-  react-aria-components: 1.22.1
+  react-aria: 3.50.0
+  react-aria-components: 1.19.0
   react-doctor: 0.7.4
   react-dom: 19.3.0
   react-modal-sheet: 5.6.0
