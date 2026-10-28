@@ -29,48 +29,18 @@
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Vite+ (`vp`) installed locally
-- Node.js version from [`.node-version`](./.node-version)
-- pnpm version from the root [`package.json`](./package.json), managed through
-  Vite+
-
-### Installation
+Use pnpm through Vite+ (`vp`). Install Vite+ and the Node version recorded in
+[`.node-version`](./.node-version), then run from the repository root:
 
 ```bash
-# Clone the repository
-git clone https://github.com/HorusGoul/trizum.git
-cd trizum
-
-# Install dependencies
 vp install
-```
-
-### Development
-
-```bash
-# Start the PWA development server from the repo root
 vp run dev
-
-# Run checks and build scripts from the repo root
-vp run check                           # Format, lint, and type check
-vp run test                            # Run unit tests
-vp run --filter @trizum/pwa build      # Build the PWA package script
-vp run build                           # Run workspace build scripts
 ```
 
-### Running Mobile Apps
-
-```bash
-cd packages/mobile
-
-# Android
-vp run dev:android
-
-# iOS
-vp run dev:ios
-```
+- **Check or build:** `vp run check`, `vp run test`, and `vp run build`.
+- **Set up or troubleshoot tooling:** [Toolchain guide](./docs/agents/toolchain.md).
+- **Run native apps:** [Mobile setup](./packages/mobile/docs/development.md).
+- **Understand the data flow:** [Architecture](./docs/architecture.md).
 
 ## 🤝 Contributing
 
@@ -80,17 +50,6 @@ We welcome contributions! See our [Contributing Guide](./CONTRIBUTING.md) for de
 - Code style guidelines
 - Testing requirements
 - Pull request process
-
-## 🏗️ Architecture
-
-trizum is built as a **monorepo** with a local-first architecture. The core principle is that all data lives on the client first, with optional synchronization to a server for cross-device access.
-
-### Data Flow
-
-1. **Local Changes**. All user actions immediately update the local Automerge document
-2. **Persistence**. Documents are stored in IndexedDB for offline access
-3. **Sync**. When online, changes are synchronized via WebSocket to the server
-4. **Conflict Resolution**. Automerge CRDTs automatically merge changes from multiple devices
 
 ## 📦 Packages
 

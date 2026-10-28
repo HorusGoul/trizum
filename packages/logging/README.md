@@ -2,7 +2,7 @@
 
 Shared LogTape helpers for `trizum` logging surfaces.
 
-Read the repo [AGENTS guide](../../AGENTS.md) first. This package exists to
+This package exists to
 standardize LogTape categories and configuration across the monorepo while
 keeping configuration ownership in runtime entry points.
 
@@ -29,7 +29,6 @@ For repo-wide guidance on what to log and which severity level to use, see
 
 ## Package Notes
 
-- This package should help each runtime surface configure LogTape consistently.
 - It should not auto-configure logging on import.
 - Runtime entry points should call `configureTrizumLogging()`, and shared code
   should use `getTrizumLogger()` elsewhere.
