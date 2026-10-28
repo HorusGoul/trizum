@@ -136,12 +136,22 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install Playwright Browsers
+      - name: Build E2E app and install browsers
         timeout-minutes: 5
-        run: vp run --filter @trizum/pwa test:e2e:install:ci
+        run: |
+          # Browser installation does not touch workspace build/codegen outputs.
+          vp run --filter @trizum/pwa test:e2e:install:ci &
+          browser_pid=$!
+          build_status=0
+          VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true \
+            vp run --filter @trizum/pwa build || build_status=$?
+          browser_status=0
+          wait "$browser_pid" || browser_status=$?
+          echo "E2E build status: $build_status; browser install status: $browser_status"
+          (( build_status == 0 && browser_status == 0 ))
 
       - name: Run Playwright E2E
-        run: vp run --filter @trizum/pwa test:e2e --shard=${{ matrix.shard }}/4
+        run: vp run --filter @trizum/pwa test:e2e:prebuilt --shard=${{ matrix.shard }}/4
 
       - name: Upload Playwright Blob Report
         if: ${{ !cancelled() }}

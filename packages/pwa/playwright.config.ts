@@ -4,14 +4,16 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const port = 4173;
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4173);
 const host = "127.0.0.1";
 const localBaseURL = `http://${host}:${port}`;
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 const cwd = path.dirname(fileURLToPath(import.meta.url));
 const webServerCommand = [
-  "VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true vp run build",
-  `vp run preview -- --host ${host} --port ${port} --strictPort --outDir dist/client`,
+  ...(process.env.PLAYWRIGHT_SKIP_BUILD === "true"
+    ? []
+    : ["VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true vp run build"]),
+  `vp run preview --host ${host} --port ${port} --strictPort --outDir dist/client`,
 ].join(" && ");
 
 export default defineConfig({
