@@ -197,38 +197,28 @@ test.describe("Browser harness", () => {
       .toBe(false);
   });
 
-  test("initializes the auth session when booting directly on a party route", async ({
-    context,
-    harness,
-    page,
-  }) => {
-    await page.route("**/api/auth/get-session", async (route) => {
+  test("initializes the auth session on party routes", async ({ context, harness, page }) => {
+    const partyPage = new PartyPage(page);
+    let sessionRequestCount = 0;
+    let fulfilledSessionRequestCount = 0;
+
+    await context.route("**/api/auth/get-session", async (route) => {
+      sessionRequestCount += 1;
       await route.fulfill({ json: null });
+      fulfilledSessionRequestCount += 1;
     });
+
     const seededParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
+    sessionRequestCount = 0;
+    fulfilledSessionRequestCount = 0;
 
-    // Keep the home-page boot needed for seeding out of the page under test.
-    const partyRoutePage = await context.newPage();
-    let sessionRequestCount = 0;
-    let fulfilledSessionRequestCount = 0;
-    try {
-      await partyRoutePage.route("**/api/auth/get-session", async (route) => {
-        sessionRequestCount += 1;
-        await route.fulfill({ json: null });
-        fulfilledSessionRequestCount += 1;
-      });
-      await partyRoutePage.goto(
-        `/party/${seededParty.partyId}?tab=expenses&__internal_offline_only=true`,
-      );
-      await new PartyPage(partyRoutePage).expectLoaded(seededParty.partyId, "Weekend trip");
-      await expect.poll(() => sessionRequestCount).toBeGreaterThan(0);
-      await expect.poll(() => fulfilledSessionRequestCount).toBeGreaterThan(0);
-    } finally {
-      await partyRoutePage.close();
-    }
+    await harness.gotoParty(seededParty.partyId);
+    await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+    await expect.poll(() => sessionRequestCount).toBeGreaterThan(0);
+    await expect.poll(() => fulfilledSessionRequestCount).toBeGreaterThan(0);
   });
 
   test("keeps an open party bound to the list that admitted it", async ({
