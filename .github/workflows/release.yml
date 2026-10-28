@@ -40,11 +40,12 @@ jobs:
 
       - name: Create Release Pull Request or Publish
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2.1.2
         with:
-          branch: main
-          version: vp run update-version
-          publish: vp run publish-packages
+          pr-base-branch: main
+          version-script: vp run update-version
+          publish-script: vp run publish-packages
+          push-with-git-cli: true
           github-token: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
