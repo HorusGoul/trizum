@@ -57,6 +57,16 @@ these fixture-based tests. Importing an expense file does not copy boosts.
 
 ## Validation
 
+CI runs the full Chromium and WebKit suite across four shards, with one worker
+per shard, alongside the check/build/unit-test jobs. To run a shard locally,
+use `vp run --filter @trizum/pwa test:e2e --shard=1/4` (replace `1` with
+`2`, `3`, or `4` for the other shards).
+
+Each CI shard uploads a blob report, including retry traces and failure
+screenshots. The `E2E` job merges these into the `playwright-report` artifact
+on successful and failed runs and requires every shard to pass. Reports are
+retained for seven days.
+
 - `vp run --filter @trizum/pwa test:e2e:install` installs the local browser set.
 - `vp run --filter @trizum/pwa test:e2e:install:ci` installs the CI browser set
   with system dependencies and the smaller Chromium headless shell.
