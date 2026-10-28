@@ -65,16 +65,24 @@ reviewed together.
 version, and update-type matchers there instead of duplicating them in this
 document.
 
-The repo intentionally uses Renovate-managed PR automerge instead of
-platform-native automerge because `main` is not protected with required status
-checks. Renovate's platform-native automerge can merge immediately when the
-platform has no required checks configured. With Renovate-managed automerge,
-Renovate waits until it sees passing branch status checks before merging.
+For eligible updates, Renovate waits for passing branch status checks and posts
+`@mergifyio queue` using `automergeType: "pr-comment"`. Mergify performs the merge
+using the CI gates, review requirements, and squash commit settings in
+[`.mergify.yml`](../.mergify.yml). GitHub platform-native automerge remains
+disabled, and Renovate does not merge these PRs directly.
+The queue command restriction explicitly permits `renovate[bot]` on its own
+same-repository `renovate/` PRs; other senders still need repository write access.
 
 This also keeps the behavior compatible with the lockfile repair workflow:
 Renovate opens the branch, the `Renovate Lockfiles` workflow commits the
-Vite+-generated `pnpm-lock.yaml`, and Renovate can then merge the PR after the
-updated branch passes checks.
+Vite+-generated `pnpm-lock.yaml`, and Renovate can then request queueing after the
+updated branch passes checks. If a later contributor push cancels the pending
+command or removes the PR from the queue, a fresh queue request is needed after
+the new head passes checks.
+
+Agent-created replacement PRs retain the `ready for human review` label and
+require a separate merge decision; this Renovate handoff does not auto-queue
+them.
 
 ## Agent Review
 

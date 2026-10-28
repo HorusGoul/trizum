@@ -211,7 +211,20 @@ def dedupe_check_runs(check_runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return list(latest_by_name.values())
 
 
+def prerequisite_check_runs(check_runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    # Queue status is reset by the queue command; it is not prerequisite CI.
+    return [
+        check
+        for check in check_runs
+        if not (
+            check.get("name") == "Mergify Merge Queue"
+            and (check.get("app") or {}).get("slug") == "mergify"
+        )
+    ]
+
+
 def summarize_checks(check_runs: list[dict[str, Any]]) -> tuple[bool, bool, list[str]]:
+    check_runs = prerequisite_check_runs(check_runs)
     if not check_runs:
         return True, False, ["no checks reported"]
     check_runs = dedupe_check_runs(check_runs)
@@ -570,7 +583,7 @@ async def wait_for_checks(head_sha: str, checks_done: asyncio.Event) -> None:
     print("Waiting for CI checks...", flush=True)
     empty_seconds = 0
     while True:
-        check_runs = await get_check_runs(head_sha)
+        check_runs = prerequisite_check_runs(await get_check_runs(head_sha))
         if not check_runs:
             empty_seconds += POLL_SECONDS
             if empty_seconds >= CHECKS_APPEAR_TIMEOUT_SECONDS:
@@ -598,7 +611,7 @@ async def watch_pr() -> None:
     pr = await get_pr_info()
     if is_merge_conflicting(pr):
         print(
-            "PR has merge conflicts. Resolve/rebase against main and push before "
+            "PR has merge conflicts. Merge main, resolve conflicts, and push before "
             "running land_watch again.",
         )
         raise SystemExit(5)
@@ -612,12 +625,12 @@ async def watch_pr() -> None:
             current = await get_pr_info()
             if is_merge_conflicting(current):
                 print(
-                    "PR has merge conflicts. Resolve/rebase against main and push "
+                    "PR has merge conflicts. Merge main, resolve conflicts, and push "
                     "before running land_watch again.",
                 )
                 raise SystemExit(5)
             if current.head_sha != head_sha:
-                print("PR head updated; pull/amend/force-push to retrigger CI")
+                print("PR head updated; inspect the new head and re-check CI and reviews")
                 raise SystemExit(4)
             await asyncio.sleep(POLL_SECONDS)
 
