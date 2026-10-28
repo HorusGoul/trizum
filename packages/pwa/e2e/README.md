@@ -70,5 +70,21 @@ retained for seven days.
 - `vp run --filter @trizum/pwa test:e2e:install` installs the local browser set.
 - `vp run --filter @trizum/pwa test:e2e:install:ci` installs the CI browser set
   with system dependencies and the smaller Chromium headless shell.
-- `vp run --filter @trizum/pwa test:e2e -- e2e/harness.spec.ts`
-- `vp run --filter @trizum/pwa test:e2e -- e2e/smoke.spec.ts`
+- `vp run --filter @trizum/pwa test:e2e e2e/harness.spec.ts`
+- `vp run --filter @trizum/pwa test:e2e e2e/smoke.spec.ts`
+
+### CI build/setup path
+
+Each shard builds the E2E app while installing browsers, then runs
+`test:e2e:prebuilt` against that build. Both preparation steps must succeed.
+The usual `test:e2e` command builds automatically; to reuse a harness build:
+
+```sh
+VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true vp run --filter @trizum/pwa build
+PLAYWRIGHT_PORT=4188 vp run --filter @trizum/pwa test:e2e:prebuilt e2e/smoke.spec.ts --workers=1
+```
+
+`PLAYWRIGHT_PORT` overrides the preview port (default 4173). Pass Playwright
+flags directly, without a literal `--` separator. See the
+[CI workflow](../../../.github/workflows/ci.yml) and
+[Playwright config](../playwright.config.ts) for implementation details.
