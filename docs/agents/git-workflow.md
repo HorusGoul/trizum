@@ -21,8 +21,12 @@ Read this before editing files or performing branch, commit, or PR operations.
 - Follow [validation and release requirements](./validation-and-releases.md)
   before opening a PR.
 - Do not push directly to `main` or use `git push --force`.
-- Merge a PR only when the user explicitly requests merging or landing it.
-  Creating, updating, or reviewing a PR does not authorize merging it.
+- Queue a PR for merging only when the user explicitly requests merging,
+  landing, or queueing it. Creating, updating, reviewing, or monitoring a PR
+  does not authorize queueing it: Mergify can merge automatically.
+- Use a PR comment containing exactly `@mergifyio queue` through the `land`
+  skill. Let Mergify perform the merge; do not merge directly with `gh pr merge`
+  or enable GitHub auto-merge.
 - Merged PR branches may be deleted without asking. Ask before deleting other
   branches. GitHub's automatic deletion of merged head branches needs no
   additional approval.

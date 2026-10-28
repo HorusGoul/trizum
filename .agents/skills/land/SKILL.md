@@ -1,152 +1,64 @@
 ---
 name: land
 description:
-  Land a PR by monitoring conflicts, resolving them, waiting for checks, and
-  squash-merging when green; use when asked to land, merge, or shepherd a PR to
-  completion.
+  Queue a PR for merging by commenting @mergifyio queue; use when asked to
+  land, merge, or queue a PR for merging.
 ---
 
 # Land
 
-## Goals
+Follow the repo's [Git workflow](../../../docs/agents/git-workflow.md).
+Mergify handles CI gates, review requirements, branch updates, and squash
+merging according to [`.mergify.yml`](../../../.mergify.yml).
 
-- Ensure the PR is conflict-free with main.
-- Keep CI green and fix failures when they occur.
-- Squash-merge the PR once checks pass.
-- Do not yield to the user until the PR is merged; keep the watcher loop running
-  unless blocked.
-- Merged PR branches may be deleted without asking; the repo already
-  auto-deletes remote head branches. Ask before deleting any unmerged branch.
+1. Identify the requested PR, or find the current branch's PR with `gh pr view`.
+2. Monitor CI, reviews, and changes to the PR head before queueing. Address
+   feedback and failures, resolve conflicts, and push any fixes. A new head
+   needs fresh checks and review. Reply to review feedback with `[codex]`.
+   Use the host's PR watcher while waiting. Where no host watcher is available,
+   run `python3 .agents/skills/land/land_watch.py` from the PR branch. It exits
+   with 0 when checks pass and feedback is addressed, 2 for review feedback,
+   3 for failed/missing checks, 4 for a new head, or 5 for conflicts.
+3. Once the current head has passing CI and no outstanding feedback, post a
+   comment containing exactly `@mergifyio queue`:
 
-## Preconditions
+   ```sh
+   gh pr comment <number-or-url> --body '@mergifyio queue'
+   ```
 
-- The user explicitly requested merging or landing this PR. A request to
-  create, update, review, or monitor a PR does not authorize merging it; stop
-  after the requested work when merge authorization is absent.
-- Follow the repo's [Git workflow](../../../docs/agents/git-workflow.md).
-- `gh` CLI is authenticated.
-- You are on the PR branch with a clean working tree.
+   Do not prepend `[codex]` or add surrounding prose. Do not merge directly
+   with `gh pr merge` or enable GitHub auto-merge.
+4. Check Mergify's response and report the PR link and queue state. If the
+   request is pending or rejected, report the reason; do not bypass the queue.
+   Report the PR as merged only when GitHub confirms it.
 
-## Steps
+Queueing is the handoff to Mergify. Monitor until merge only when requested,
+using the host's PR watcher when available.
 
-1. Locate the PR for the current branch.
-2. Confirm the full gauntlet is green locally before any push.
-3. If the working tree has uncommitted changes, commit with the `commit` skill
-   and push with the `push` skill before proceeding.
-4. Check mergeability and conflicts against main.
-5. If conflicts exist, use the `pull` skill to fetch/merge `origin/main` and
-   resolve conflicts, then use the `push` skill to publish the updated branch.
-6. Ensure Codex review comments (if present) are acknowledged and any required
-   fixes are handled before merging.
-7. Watch checks until complete and keep polling the PR for new review feedback
-   while the PR is still open.
-8. If checks fail, pull logs, fix the issue, commit with the `commit` skill,
-   push with the `push` skill, and re-run checks.
-9. When all checks are green and review feedback is addressed, squash-merge
-   using the PR title/body for the merge subject/body. Remaining local or remote
-   branches for the merged PR may then be deleted without asking.
-10. **Context guard:** Before implementing review feedback, confirm it does not
-    conflict with the user’s stated intent or task context. If it conflicts,
-    respond inline with a justification and ask the user before changing code.
-11. **Pushback template:** When disagreeing, reply inline with: acknowledge +
-    rationale + offer alternative.
-12. **Ambiguity gate:** When ambiguity blocks progress, use the clarification
-    flow (assign PR to current GH user, mention them, wait for response). Do not
-    implement until ambiguity is resolved.
-    - If you are confident you know better than the reviewer, you may proceed
-      without asking the user, but reply inline with your rationale.
-13. **Per-comment mode:** For each review comment, choose one of: accept,
-    clarify, or push back. Reply inline (or in the issue thread for Codex
-    reviews) stating the mode before changing code.
-14. **Reply before change:** Always respond with intended action before pushing
-    code changes (inline for review comments, issue thread for Codex reviews).
+## Checks and Head Changes
 
-## Commands
-
-```
-# Ensure branch and PR context
-branch=$(git branch --show-current)
-pr_number=$(gh pr view --json number -q .number)
-pr_title=$(gh pr view --json title -q .title)
-pr_body=$(gh pr view --json body -q .body)
-
-# Check mergeability and conflicts
-mergeable=$(gh pr view --json mergeable -q .mergeable)
-
-if [ "$mergeable" = "CONFLICTING" ]; then
-  # Run the `pull` skill to handle fetch + merge + conflict resolution.
-  # Then run the `push` skill to publish the updated branch.
-fi
-
-# Preferred: use the Async Watch Helper below. The manual loop is a fallback
-# when Python cannot run or the helper script is unavailable.
-# Wait for review feedback: Codex reviews arrive as issue comments that start
-# with "## Codex Review — <persona>". Treat them like reviewer feedback: reply
-# with a `[codex]` issue comment acknowledging the findings and whether you're
-# addressing or deferring them.
-while true; do
-  gh api repos/{owner}/{repo}/issues/"$pr_number"/comments \
-    --jq '.[] | select(.body | startswith("## Codex Review")) | .id' | rg -q '.' \
-    && break
-  sleep 10
-done
-
-# Watch checks
-if ! gh pr checks --watch; then
-  gh pr checks
-  # Identify failing run and inspect logs
-  # gh run list --branch "$branch"
-  # gh run view <run-id> --log
-  exit 1
-fi
-
-# Squash-merge (remote branches auto-delete on merge in this repo)
-gh pr merge --squash --subject "$pr_title" --body "$pr_body"
-```
-
-## Async Watch Helper
-
-Preferred: use the asyncio watcher to monitor review comments, CI, and head
-updates in parallel:
-
-```
-python3 .agents/skills/land/land_watch.py
-```
-
-Exit codes:
-
-- 2: Review comments detected (address feedback)
-- 3: CI checks failed
-- 4: PR head updated (autofix commit detected)
-
-## Failure Handling
-
-- If checks fail, pull details with `gh pr checks` and `gh run view --log`, then
-  fix locally, commit with the `commit` skill, push with the `push` skill, and
-  re-run the watch.
-- Use judgment to identify flaky failures. If a failure is a flake (e.g., a
-  timeout on only one platform), you may proceed without fixing it.
-- If CI pushes an auto-fix commit (authored by GitHub Actions), it does not
-  trigger a fresh CI run. Detect the updated PR head, pull locally, merge
-  `origin/main` if needed, add a real author commit, and force-push to retrigger
-  CI, then restart the checks loop.
-- If all jobs fail with corrupted pnpm lockfile errors on the merge commit, the
-  remediation is to fetch latest `origin/main`, merge, force-push, and rerun CI.
-- If mergeability is `UNKNOWN`, wait and re-check.
-- Do not merge while review comments (human or Codex review) are outstanding.
-- A clean review sweep is not terminal while the PR is still open; keep polling
-  until the merge succeeds or new feedback/check failures block you.
-- Codex review jobs retry on failure and are non-blocking; use the presence of
-  `## Codex Review — <persona>` issue comments (not job status) as the signal
-  that review feedback is available.
-- Do not enable auto-merge; this repo has no required checks so auto-merge can
-  skip tests.
-- If the remote PR branch advanced due to your own prior force-push or merge,
-  avoid redundant merges; re-run the formatter locally if needed and
-  `git push --force-with-lease`.
+- Inspect failures with `gh pr checks` and `gh run view --log`. Fix and validate
+  locally, then use the `commit` and `push` skills before checking again.
+- Use the `pull` skill to merge main and resolve conflicts. If mergeability is
+  `UNKNOWN`, wait for GitHub to compute it before queueing.
+- If CI adds an autofix commit, fetch and integrate the new head, then check its
+  CI and reviews again. Do not force-push merely to retry CI.
+- Treat a clean watcher result as a snapshot: confirm the head has not changed
+  and check for new feedback immediately before posting the queue comment.
+- Codex review jobs are non-blocking. Read their review comments rather than
+  treating a green job as proof that there are no findings.
+- A failed `Mergify Merge Queue` check describes the previous queue attempt,
+  not prerequisite CI; the fallback watcher excludes that check. Inspect why
+  the PR was dequeued and resolve the cause before reissuing `@mergifyio queue`.
+  The command resets the queue status; other failed checks still block queueing.
 
 ## Review Handling
 
+- Before implementing feedback, check it against the user's intent and task
+  context. If it conflicts or needs clarification, explain the issue in the
+  review thread and ask before changing code.
+- For each comment, accept, clarify, or push back. When disagreeing, acknowledge
+  the feedback, explain the rationale, and offer an alternative.
 - Codex reviews now arrive as issue comments posted by GitHub Actions. They
   start with `## Codex Review — <persona>` and include the reviewer’s
   methodology + guardrails used. Treat these as feedback that must be
@@ -179,7 +91,8 @@ Exit codes:
 - If GraphQL review reply mutation is forbidden, use REST.
 - A 404 on reply typically means the wrong endpoint (missing PR number) or
   insufficient scope; verify by listing comments first.
-- All GitHub comments generated by this agent must be prefixed with `[codex]`.
+- Prefix explanatory GitHub comments with `[codex]`. Post the Mergify queue
+  command without that prefix so Mergify can recognize it.
 - For Codex review issue comments, reply in the issue thread (not a review
   thread) with `[codex]` and state whether you will address the feedback now or
   defer it (include rationale).
@@ -196,7 +109,7 @@ Exit codes:
     newer `[codex]` issue comment is posted acknowledging the findings.
 - Only request a new Codex review when you need a rerun (e.g., after new
   commits). Do not request one without changes since the last review.
-  - Before requesting a new Codex review, re-run the land watcher and ensure
+  - Before requesting a new Codex review, inspect current feedback and ensure
     there are zero outstanding review comments (all have `[codex]` inline
     replies).
   - After pushing new commits, the Codex review workflow will rerun on PR
