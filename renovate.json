@@ -1,8 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "automergeType": "pr",
-  "automergeStrategy": "squash",
+  "automergeType": "pr-comment",
+  "automergeComment": "@mergifyio queue",
   "platformAutomerge": false,
   "minimumReleaseAge": "1 day",
   "gitIgnoredAuthors": ["259750894+PUNK-02@users.noreply.github.com"],
@@ -13,7 +13,7 @@
       "skipArtifactsUpdate": true
     },
     {
-      "description": "Automerge non-major dependency updates after status checks pass, excluding 0.x current versions and TypeScript.",
+      "description": "Queue non-major dependency updates through Mergify after status checks pass, excluding 0.x current versions and TypeScript.",
       "matchUpdateTypes": ["patch", "minor"],
       "matchPackageNames": ["!typescript"],
       "matchCurrentVersion": "!/^0\\./",
