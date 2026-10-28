@@ -35,7 +35,7 @@ describe("balance synchronization", () => {
       completed = true;
       return result;
     });
-    await expect.poll(() => on.mock.calls.some(([event]) => event === "change")).toBe(true);
+    await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(completed).toBe(false);
     expect(balances.doc().balances).toEqual({});
 
@@ -44,7 +44,7 @@ describe("balance synchronization", () => {
     await waitForDocumentHeads(main, result, AbortSignal.timeout(1000));
     expect(balances.doc().balances.alice.stats.balance).toBe(3000);
     expect(balances.doc().balances.bob.stats.balance).toBe(-3000);
-    expect(off).toHaveBeenCalledWith("change", expect.any(Function));
+    expect(off).toHaveBeenCalledWith("heads-changed", expect.any(Function));
     expect(off).toHaveBeenCalledWith("delete", expect.any(Function));
   });
 
@@ -61,7 +61,7 @@ describe("balance synchronization", () => {
       completed = true;
       return result;
     });
-    await expect.poll(() => on.mock.calls.some(([event]) => event === "change")).toBe(true);
+    await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(completed).toBe(false);
     release();
     await waitForDocumentHeads(main, await calculation, AbortSignal.timeout(1000));
@@ -81,10 +81,44 @@ describe("balance synchronization", () => {
     const pending = waitForDocumentHeads(main, result, AbortSignal.timeout(1000)).then(() => {
       completed = true;
     });
-    await expect.poll(() => on.mock.calls.some(([event]) => event === "change")).toBe(true);
+    await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(completed).toBe(false);
     releaseReverse();
     await pending;
+    expect(balances.doc().balances.bob.stats.balance).toBe(-3000);
+  });
+
+  test("synchronizes history-only expense heads without visible changes", async () => {
+    const { main, worker, party, chunk, balances, release } = await createPeers(true);
+    const cached = await worker.find<PartyExpenseChunk>(chunk.documentId);
+    const visibleChanges = vi.fn();
+    const headsChanged = vi.fn();
+    cached.on("change", visibleChanges);
+    cached.on("heads-changed", headsChanged);
+    const on = vi.spyOn(cached, "on");
+    chunk.change((doc) => {
+      doc.expenses.push({
+        id: "synthetic-transient",
+        name: "Transient expense",
+        paidAt: new Date(),
+        paidBy: { alice: 100 },
+        shares: { alice: { type: "divide", value: 1 } },
+        photos: [],
+        __hash: "",
+      });
+      doc.expenses.pop();
+    });
+    const request = await createRecalculateBalancesRequest(main, party.documentId);
+    const calculation = recalculateSynchronizedBalances(worker, request, AbortSignal.timeout(1000));
+    await expect
+      .poll(() => on.mock.calls.some(([event]) => event === "change" || event === "heads-changed"))
+      .toBe(true);
+    release();
+    const result = await calculation;
+    await waitForDocumentHeads(main, result, AbortSignal.timeout(1000));
+    expect(headsChanged).toHaveBeenCalled();
+    expect(visibleChanges).not.toHaveBeenCalled();
+    expect(balances.doc().balances.alice.stats.balance).toBe(3000);
     expect(balances.doc().balances.bob.stats.balance).toBe(-3000);
   });
 
@@ -103,9 +137,9 @@ describe("balance synchronization", () => {
       signal,
     );
     const rejected = pending.catch((error: unknown) => error);
-    await expect.poll(() => on.mock.calls.some(([event]) => event === "change")).toBe(true);
+    await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(await rejected).toMatchObject({ name: "TimeoutError" });
-    expect(off).toHaveBeenCalledWith("change", expect.any(Function));
+    expect(off).toHaveBeenCalledWith("heads-changed", expect.any(Function));
     expect(off).toHaveBeenCalledWith("delete", expect.any(Function));
     release();
   });

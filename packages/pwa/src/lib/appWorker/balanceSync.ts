@@ -54,7 +54,7 @@ export async function waitForDocumentHeads(
 
         await new Promise<void>((resolve, reject) => {
           function cleanup() {
-            handle.off("change", check);
+            handle.off("heads-changed", check);
             handle.off("delete", onDelete);
             waitingSignal.removeEventListener("abort", onAbort);
           }
@@ -73,7 +73,8 @@ export async function waitForDocumentHeads(
             reject(new Error("Balance input was deleted during synchronization"));
           }
 
-          handle.on("change", check);
+          // History can synchronize without producing visible patches.
+          handle.on("heads-changed", check);
           handle.on("delete", onDelete);
           waitingSignal.addEventListener("abort", onAbort, { once: true });
           if (waitingSignal.aborted) onAbort();
