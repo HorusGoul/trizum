@@ -15,6 +15,7 @@ Read only the guidance relevant to the task:
 - **Changing application UI or client state:** [PWA conventions](./docs/agents/pwa.md).
 - **Validating changes or preparing a release/PR:** [Validation and releases](./docs/agents/validation-and-releases.md).
 - **Setting up or troubleshooting tooling:** [Toolchain setup](./docs/agents/toolchain.md).
+- **Writing or reorganizing documentation:** [Documentation writing](./docs/agent-knowledge-map.md#writing-and-updating-documentation).
 - **Finding package docs or maintaining agent guidance:** [Agent knowledge map](./docs/agent-knowledge-map.md).
 - **Writing refactor plans:** [Refactor document protocol](./docs/refactor-docs.md).
 
