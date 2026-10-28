@@ -39,7 +39,7 @@ export async function copyCodexAuth(): Promise<void> {
     const clipboard = spawnSync(command, args, {
       env: createSanitizedEnvironment(),
       input: JSON.stringify(credentials),
-      stdio: ["pipe", "ignore", "pipe"],
+      stdio: ["pipe", "ignore", "ignore"],
       timeout: 5_000,
     });
     if (clipboard.error != null || clipboard.status !== 0) {

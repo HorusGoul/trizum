@@ -1,3 +1,8 @@
+/// <reference types="node" />
+import { execFileSync } from "node:child_process";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { beforeEach, expect, test, vi } from "vite-plus/test";
 import { run } from "@ai-hero/sandcastle";
 import type * as SandcastleModule from "@ai-hero/sandcastle";
@@ -88,3 +93,56 @@ test("reports authentication failure during a repair without exposing the raw er
     /^CI login needs renewal\./,
   );
 });
+
+test.each(["review", "repair"])(
+  "stops a real Sandcastle %s when the auth error is only on stdout",
+  async (mode) => {
+    const { run: realRun } = await vi.importActual<typeof SandcastleModule>("@ai-hero/sandcastle");
+    const { runCommand: realRunCommand } = await vi.importActual<typeof ExecModule>("./exec.js");
+    vi.mocked(run).mockImplementation(realRun);
+    vi.mocked(runCommand).mockImplementation(realRunCommand);
+    const directory = await mkdtemp(path.join(tmpdir(), "trizum-codex-boundary-"));
+    try {
+      execFileSync("git", ["init", "-b", "main", directory], { stdio: "ignore" });
+      execFileSync(
+        "git",
+        [
+          "-c",
+          "user.name=Test",
+          "-c",
+          "user.email=test@example.com",
+          "-c",
+          "core.hooksPath=/dev/null",
+          "commit",
+          "--allow-empty",
+          "-m",
+          "fixture",
+        ],
+        { cwd: directory, stdio: "ignore" },
+      );
+      await writeFile(
+        path.join(directory, "codex"),
+        `#!/usr/bin/env node
+require('node:fs').readFileSync(0);
+process.stderr.write('Reading prompt from stdin...\\n');
+process.stdout.write(JSON.stringify({type: 'turn.failed', error: {
+  message: 'Your access token could not be refreshed. Please log out and sign in again.'
+}}) + '\\n');
+process.exitCode = 1;
+`,
+        { mode: 0o700 },
+      );
+      await writeFile(path.join(directory, "vp"), "#!/bin/sh\nexit 0\n", { mode: 0o700 });
+      vi.stubEnv("PATH", `${directory}:${process.env.PATH}`);
+      const result =
+        mode === "review"
+          ? runSandcastleCodexReview(context, directory)
+          : runSandcastleCodexFix(context, directory, "agent/fix");
+      await expect(result).rejects.toThrow("CI login needs renewal");
+    } finally {
+      vi.unstubAllEnvs();
+      await rm(directory, { force: true, recursive: true });
+    }
+  },
+  15_000,
+);

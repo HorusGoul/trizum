@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { spawnSync } from "node:child_process";
+import type * as ChildProcessModule from "node:child_process";
 import { existsSync, writeFileSync } from "node:fs";
 import { platform } from "node:os";
 import type * as OsModule from "node:os";
@@ -113,5 +114,35 @@ test("cleans up after clipboard failure without including captured credentials i
     return { ...success, status: 1, stderr: JSON.stringify(credentials) };
   });
   await expect(copyCodexAuth()).rejects.toThrow(/^Could not copy credentials using pbcopy\./);
+  expect(existsSync(ciAuthDirectory)).toBe(false);
+});
+
+test("returns after the X11 clipboard parent exits while its background owner keeps stderr", async () => {
+  const { spawnSync: realSpawnSync } =
+    await vi.importActual<typeof ChildProcessModule>("node:child_process");
+  vi.mocked(platform).mockReturnValue("linux");
+  vi.stubEnv("WAYLAND_DISPLAY", "");
+  const login = vi.mocked(spawnSync).getMockImplementation();
+  vi.mocked(spawnSync).mockImplementation((command, args, options) => {
+    if (command === "codex" && login != null) return login(command, args, options);
+    return realSpawnSync(
+      process.execPath,
+      [
+        "-e",
+        `require('node:fs').readFileSync(0);
+         require('node:child_process').spawn(process.execPath,
+           ['-e', 'setTimeout(() => {}, 1000)'],
+           { detached: true, stdio: ['ignore', 'ignore', 2] }).unref();`,
+      ],
+      { ...options, encoding: "utf8", timeout: 500 },
+    );
+  });
+
+  await expect(copyCodexAuth()).resolves.toBeUndefined();
+  expect(spawnSync).toHaveBeenLastCalledWith(
+    "xclip",
+    ["-selection", "clipboard"],
+    expect.objectContaining({ input: JSON.stringify(credentials) }),
+  );
   expect(existsSync(ciAuthDirectory)).toBe(false);
 });
