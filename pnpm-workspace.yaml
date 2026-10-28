@@ -100,7 +100,7 @@ catalog:
   "@vitejs/plugin-react": 6.1.2
   "@vitest/coverage-v8": 4.1.11
   agent-browser: 0.31.2
-  all-contributors-cli: 6.26.1
+  all-contributors-cli: 7.0.0
   babel-plugin-react-compiler: 1.0.0
   barcode-detector: 3.0.8
   better-auth: 1.6.23
