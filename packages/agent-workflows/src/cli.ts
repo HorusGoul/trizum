@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import path from "node:path";
+import { copyCodexAuth } from "./copy-codex-auth.js";
 import {
   REVIEW_LABEL,
   workflowOptionsSchema,
@@ -17,6 +18,9 @@ const helpText = `trizum-agent-workflows
 
 Usage:
   trizum-agent-workflows renovate-pr-review [options]
+  trizum-agent-workflows copy-codex-auth
+
+copy-codex-auth signs in with a temporary CI session and copies auth.json to the clipboard.
 
 Options:
   --pr <number>              Review a specific Renovate PR.
@@ -44,6 +48,18 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
 
   if (command === "--help" || command === "-h" || command === "help") {
     process.stdout.write(helpText);
+    return 0;
+  }
+
+  if (command === "copy-codex-auth") {
+    if (args.includes("--help") || args.includes("-h")) {
+      process.stdout.write(helpText);
+      return 0;
+    }
+    if (args.some((arg) => arg !== "--")) {
+      throw new Error("copy-codex-auth does not accept arguments.");
+    }
+    await copyCodexAuth();
     return 0;
   }
 
