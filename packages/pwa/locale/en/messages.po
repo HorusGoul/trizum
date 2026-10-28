@@ -1280,7 +1280,7 @@ msgid "Deliver, personalize where permitted, measure, and limit the frequency of
 msgstr "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:74
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:66
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:69
 msgid "Description"
 msgstr "Description"
 
@@ -4363,7 +4363,7 @@ msgid "Welcome to trizum"
 msgstr "Welcome to trizum"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:75
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:67
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:70
 msgid "What is this party about?"
 msgstr "What is this party about?"
 

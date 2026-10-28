@@ -61,6 +61,14 @@ test("a failed details save keeps the draft available for retry", async ({
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Retry this save");
     await expect(page.getByRole("button", { name: "Save", exact: true })).toBeEnabled();
     await expect(page.getByText("Party details saved!", { exact: true })).toBeHidden();
+    await expect
+      .poll(async () => {
+        const bounds = await page
+          .getByText("Could not save party details. Please try again.", { exact: true })
+          .boundingBox();
+        return Boolean(bounds && bounds.y >= 0 && bounds.y + bounds.height <= 812);
+      })
+      .toBe(true);
     await page.screenshot({ path: testInfo.outputPath("save-error-retains-draft.png") });
   } finally {
     await page.evaluate(() => {
