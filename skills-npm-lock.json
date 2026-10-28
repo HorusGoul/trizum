@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "skills": {
+    "react-doctor": {
+      "package": "react-doctor",
+      "version": "0.7.4",
+      "skillPath": "dist/skills/react-doctor/SKILL.md"
+    }
+  }
+}

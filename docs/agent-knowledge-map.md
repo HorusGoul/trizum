@@ -16,6 +16,32 @@ tasks can follow the relevant links directly from the root guide.
 - Placeholder docs are noise. A package doc should either describe the package
   accurately or not exist.
 
+## Writing and Updating Documentation
+
+Apply these rules when adding or editing READMEs, agent instructions, or supporting
+guides. Use [What Belongs Where](#what-belongs-where) to choose the destination.
+
+- Search for existing coverage before creating a file. Extend the existing guide
+  when it serves the same reader and task; link to it from other entry points.
+- Keep each rule or procedure authoritative in one place. A short summary or
+  example may help readers, but must not become a second copy of the policy.
+- Split by reader task, not by heading or line count. Create a supporting guide
+  only when readers can use it independently and skip it for unrelated work.
+  Keep short, single-topic documents together.
+- Give links a read trigger, such as “Releasing mobile builds,” and make new
+  guides reachable from the relevant entry point. Avoid circular mandatory reads.
+- Preserve requirements when moving prose. If instructions conflict, ask the
+  user which to keep; do not silently choose a policy during reorganization.
+- Remove repeated reminders, placeholders, and generic advice. Make vague rules
+  concrete when the intended behavior is known; otherwise flag them for the user.
+- Keep one-time audits, migration inventories, and decision summaries in the PR
+  or conversation unless a maintained document is explicitly requested. Do not
+  add a second documentation index merely to describe a reorganization.
+- Before finishing, check moved file links and heading anchors, update incoming
+  links, and verify that command examples state the correct working directory.
+  Check that no unique requirement was lost or duplicated. Inspect release and
+  upload examples without executing their side effects just to validate prose.
+
 ## Canonical Surfaces
 
 | Surface                                                                                                                                            | Canonical for                                                                                                  | Owner                   | Freshness expectation                                                                   |
@@ -35,10 +61,10 @@ tasks can follow the relevant links directly from the root guide.
 | [`/packages/*/package.json`](../packages)                                                                                                          | Package-local scripts and executable package metadata                                                          | Package maintainer      | Update in the same PR as script or runtime changes                                      |
 | [`/packages/pwa/README.md`](../packages/pwa/README.md)                                                                                             | Main app package map, PWA-specific validation, and where common app work lives                                 | PWA maintainer          | Update in the same PR as package structure or workflow changes                          |
 | [`/packages/pwa/e2e/README.md`](../packages/pwa/e2e/README.md)                                                                                     | Browser journey harness strategy, seeded-state conventions, and E2E setup seams                                | PWA maintainer          | Update in the same PR as the Playwright harness shape or setup strategy changes         |
-| [`/packages/pwa/locale/AGENTS.md`](../packages/pwa/locale/AGENTS.md)                                                                               | Translation terminology and locale-specific guardrails                                                         | Localization maintainer | Update in the same PR as translation rules or product terminology changes               |
-| [`/packages/agent-workflows/README.md`](../packages/agent-workflows/README.md)                                                                     | Barnum-based agent workflow entry points, CLI usage, and Renovate review automation                            | Workspace maintainer    | Update in the same PR as agent workflow commands or behavior changes                    |
-| [`/packages/mobile/README.md`](../packages/mobile/README.md)                                                                                       | Native wrapper workflow and package-specific operational details                                               | Mobile maintainer       | Update in the same PR as mobile setup or release workflow changes                       |
-| [`/packages/server/README.md`](../packages/server/README.md)                                                                                       | Sync server architecture, runbook entry points, and package-specific validation                                | Server maintainer       | Update in the same PR as server structure, run flow, or deployment assumptions change   |
+| [`/packages/pwa/locale/AGENTS.md`](../packages/pwa/locale/AGENTS.md)                                                                               | Locale entry point linking terminology, formatting, and language guides                                        | Localization maintainer | Update in the same PR as translation rules or product terminology changes               |
+| [`/packages/agent-workflows/README.md`](../packages/agent-workflows/README.md)                                                                     | Barnum workflow entry point and CLI usage; runtime and CI auth in package docs                                 | Workspace maintainer    | Update in the same PR as agent workflow commands or behavior changes                    |
+| [`/packages/mobile/README.md`](../packages/mobile/README.md)                                                                                       | Native wrapper entry point linking setup, lifecycle, monetization, signing, and releases                       | Mobile maintainer       | Update in the same PR as mobile setup or release workflow changes                       |
+| [`/packages/server/README.md`](../packages/server/README.md)                                                                                       | Sync server package map and validation; deployment runbook in package docs                                     | Server maintainer       | Update in the same PR as server structure, run flow, or deployment assumptions change   |
 | [`/packages/screenshots/README.md`](../packages/screenshots/README.md)                                                                             | Store-screenshot workflow and Fastlane handoff details                                                         | Release maintainer      | Update in the same PR as screenshot capture or organization flow changes                |
 | [`/.agents/skills/*/SKILL.md`](../.agents/skills)                                                                                                  | Named, reusable workflows with tool-specific procedures                                                        | Skill owner             | Update in the same PR as the workflow, tools, or assumptions change                     |
 
@@ -84,6 +110,11 @@ Do not use package docs for:
 - repo-wide branching or PR policy,
 - global tool versions,
 - deep workflow scripts that are better expressed as a skill.
+
+For longer package READMEs, keep the purpose, key files, local validation, and
+links with task triggers in the entry point. Move setup, deployment, and feature
+contracts into that package's `docs/` directory. Keep short, single-topic
+READMEs self-contained.
 
 ### Subdirectory `AGENTS.md`
 

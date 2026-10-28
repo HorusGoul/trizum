@@ -228,14 +228,13 @@ export function AnimatedTabs({
                   <>
                     <Icon icon={tab.icon} width={20} height={20} className="mr-3" />
                     <span className="h-4.5 text-lg leading-none">{tab.label}</span>
-                    {isFocusVisible &&
-                      isSelected && (
-                        // Focus ring.
-                        <motion.span
-                          className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
-                          style={{ x, width }}
-                        />
-                      )}
+                    {isFocusVisible && isSelected && (
+                      // Focus ring.
+                      <motion.span
+                        className="absolute inset-0 z-10 rounded-full ring-2 ring-black ring-offset-2"
+                        style={{ x, width }}
+                      />
+                    )}
                   </>
                 )}
               </Tab>

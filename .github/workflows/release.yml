@@ -40,11 +40,12 @@ jobs:
 
       - name: Create Release Pull Request or Publish
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2.1.2
         with:
-          branch: main
-          version: vp run update-version
-          publish: vp run publish-packages
+          pr-base-branch: main
+          version-script: vp run update-version
+          publish-script: vp run publish-packages
+          push-with-git-cli: true
           github-token: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN || github.token }}
@@ -117,9 +118,7 @@ jobs:
       contents: read
     uses: ./.github/workflows/ios-appstore-deploy.yml
     with:
-      # Submit the first Premium app and products together in App Store Connect.
-      # Restore automatic submission after that combined review is approved.
-      submit_for_review: false
+      submit_for_review: true
       automatic_release: true
     secrets: inherit
 
