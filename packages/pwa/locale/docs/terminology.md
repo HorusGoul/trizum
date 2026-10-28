@@ -107,7 +107,8 @@ When an expense is marked as paid after a transaction occurs.
 
 ### Settle / Balance (verbs)
 
-**Settle:** To resolve a debt between participants  
+**Settle:** To resolve a debt between participants
+
 **Balance:** To adjust one's position, see balance view
 
 **Translation considerations:**
