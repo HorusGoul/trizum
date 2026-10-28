@@ -239,7 +239,7 @@ export function AuthErrorAlert({ message }: { message: string }) {
   return (
     <Alert variant="destructive">
       <Icon icon="lucide.circle-alert" />
-      <AlertDescription>{message}</AlertDescription>
+      <AlertDescription className="min-w-0 [overflow-wrap:anywhere]">{message}</AlertDescription>
     </Alert>
   );
 }

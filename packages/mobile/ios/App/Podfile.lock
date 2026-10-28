@@ -29,11 +29,11 @@ PODS:
     - Capacitor
   - CapacitorSplashScreen (8.0.1):
     - Capacitor
-  - CapawesomeCapacitorAppleSignIn (0.1.1):
+  - CapawesomeCapacitorAppleSignIn (0.1.4):
     - Capacitor
   - CapawesomeCapacitorAppUpdate (8.0.3):
     - Capacitor
-  - CapawesomeCapacitorGoogleSignIn (0.1.2):
+  - CapawesomeCapacitorGoogleSignIn (0.1.4):
     - Capacitor
     - GoogleSignIn (~> 8.0)
   - Google-Mobile-Ads-SDK (12.14.0):
@@ -86,9 +86,9 @@ DEPENDENCIES:
   - "CapacitorPluginSafeArea (from `../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.5.2/node_modules/capacitor-plugin-safe-area`)"
   - "CapacitorShare (from `../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen`)"
-  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in`)"
+  - "CapawesomeCapacitorAppleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.4_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in`)"
   - "CapawesomeCapacitorAppUpdate (from `../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update`)"
-  - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in`)"
+  - "CapawesomeCapacitorGoogleSignIn (from `../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.4_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in`)"
   - "RevenuecatPurchasesCapacitor (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor`)"
   - "RevenuecatPurchasesCapacitorUi (from `../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.5.2_@revenuecat+purchases-c_92542bf63b788266b8aa9b5d964e034c/node_modules/@revenuecat/purchases-capacitor-ui`)"
 
@@ -129,11 +129,11 @@ EXTERNAL SOURCES:
   CapacitorSplashScreen:
     :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen"
   CapawesomeCapacitorAppleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.1_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.4_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in"
   CapawesomeCapacitorAppUpdate:
     :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update"
   CapawesomeCapacitorGoogleSignIn:
-    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.2_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in"
+    :path: "../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.4_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in"
   RevenuecatPurchasesCapacitor:
     :path: "../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor"
   RevenuecatPurchasesCapacitorUi:
@@ -150,9 +150,9 @@ SPEC CHECKSUMS:
   CapacitorPluginSafeArea: 9d0682951c011bf0b36e513a89103c5fbff7ac49
   CapacitorShare: 0c58305114538568059bfc07111f22dcb9cb2a82
   CapacitorSplashScreen: 4b46c72298db552b3c57ce021ef028b6dc7f1fa7
-  CapawesomeCapacitorAppleSignIn: c793d6d2b2cb22d0a029d758dcf33484f385f382
+  CapawesomeCapacitorAppleSignIn: 2fe248ec1d96a40529476c829ef6221db0a150b9
   CapawesomeCapacitorAppUpdate: 3a7537c6a6696837b51d06f26b2e909fd7b9226f
-  CapawesomeCapacitorGoogleSignIn: 7d9ecee5c88e500f7fd364b22cfbfd8386724534
+  CapawesomeCapacitorGoogleSignIn: e344503ac9a37afc8dc2651757ede5143dc0c3a9
   Google-Mobile-Ads-SDK: 4534fd2dfcd3f705c5485a6633c5188d03d4eed2
   GoogleSignIn: ce8c89bb9b37fb624b92e7514cc67335d1e277e4
   GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
@@ -170,6 +170,6 @@ SPEC CHECKSUMS:
   RevenuecatPurchasesCapacitorUi: f6c60a6466f873b15f9a4492bf9f7a62edabe938
   RevenueCatUI: 2c7092fa0a485454d2a474e80f241e6db591dd36
 
-PODFILE CHECKSUM: 5e5fb12a7d80e4ca6a7efdb530ede80b8ff9418e
+PODFILE CHECKSUM: 7cba49377a13fda79e4a309c8a6fbbe9b71b5f06
 
 COCOAPODS: 1.17.0
