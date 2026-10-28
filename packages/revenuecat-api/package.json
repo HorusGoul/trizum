@@ -1,6 +1,6 @@
 {
   "name": "@trizum/revenuecat-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Typed RevenueCat Developer API v2 client for trizum services.",
   "keywords": [],

@@ -1,8 +1,20 @@
-# Cloudflare Setup
+# Cloudflare setup and deployment
 
 This document records how the PWA Worker Cloudflare resources are wired. The
 source of truth for account, route, binding, public OAuth identifier, and
 observability values is [`../wrangler.jsonc`](../wrangler.jsonc).
+
+## Deployment
+
+Cloudflare deployments are managed by GitHub Actions instead of Cloudflare's
+connected repository builds.
+
+- Production deploys run after a changeset release updates the PWA version or
+  changelog on `main`.
+- Pull requests get Cloudflare preview deployments from the `PWA Preview`
+  workflow, which updates a PR comment with the latest preview URL.
+
+Configure the [GitHub Actions secrets](#github-actions-secrets) before deploying.
 
 ## Outbound sync routing
 
@@ -74,10 +86,14 @@ vp exec wrangler secret put REVENUECAT_SECRET_API_KEY
 
 `REVENUECAT_PROJECT_ID` is the non-secret RevenueCat project ID configured in
 `wrangler.jsonc`. `REVENUECAT_SECRET_API_KEY` must be a RevenueCat v2 secret key
-restricted to `customer_information:subscriptions:read` and
-`customer_information:purchases:read`. They are used only by the Worker to
-verify Premium and must never be exposed through `VITE_` variables or committed
-to the repo.
+restricted to `customer_information:subscriptions:read`,
+`customer_information:purchases:read`, and
+`customer_information:customers:read_write`. The Worker uses it to verify
+Premium and request customer deletion before deleting a cloud account. Grant
+the customer permission before deploying this change: missing configuration or
+permissions block account deletion so the identity remains available for retry.
+See [account deletion](./account-deletion.md) for retry behavior and data scope.
+The key must never be exposed through `VITE_` variables or committed to the repo.
 
 Google and Apple setup details live in [`oauth.md`](./oauth.md).
 
@@ -97,7 +113,9 @@ use disposable test parties for the audit. Removing this setting and deploying
 disables the exception; existing sandbox-only boosts are revoked on their next
 server verification. No migration or native rebuild is needed.
 
-GitHub Actions still need these repository or environment secrets:
+### GitHub Actions secrets
+
+Configure these repository or environment secrets:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`

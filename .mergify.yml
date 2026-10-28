@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://docs.mergify.com/mergify-configuration-schema.json
+# Install the Mergify GitHub App and add it to applicable GitHub rulesets'
+# bypass lists with Exempt mode. Those permissions cannot be set in this file.
+
+merge_queue:
+  # Validate up to five cumulative queue candidates concurrently, then merge
+  # in order. Each candidate includes the PRs ahead of it in the queue.
+  mode: serial
+  max_parallel_checks: 5
+  reset_on_external_merge: always
+  status_comments: all
+
+merge_protections_settings:
+  # Queue explicitly with @mergifyio queue; do not auto-queue approved PRs.
+  auto_merge_conditions: null
+
+commands_restrictions:
+  queue:
+    conditions:
+      - or:
+          - sender-permission >= write
+          # GitHub App bots need an explicit allowance; restrict Renovate to
+          # its own same-repository update PRs.
+          - and:
+              - sender = renovate[bot]
+              - author = renovate[bot]
+              - head ~= ^renovate/
+              - -from-fork
+  dequeue:
+    conditions:
+      - sender-permission >= write
+
+queue_rules:
+  - name: default
+    merge_method: squash
+    update_method: merge
+    commit_message_format:
+      title: pr-title
+      body: pr-body
+    # Continue honoring GitHub's required checks and reviews as they evolve.
+    branch_protection_injection_mode: queue
+    batch_size: 1
+    max_checks_retries: 0
+    # Covers the 30-minute E2E jobs plus setup and runner scheduling.
+    checks_timeout: 45 min
+
+    # Keep these names aligned with .github/workflows/ci.yml. Require the
+    # GitHub Actions app's results both before queueing and before merging.
+    queue_conditions: &ready
+      - base = main
+      - -draft
+      - "#changes-requested-reviews-by = 0"
+      - "#review-threads-unresolved = 0"
+      - check-success = @github-actions/Check (check)
+      - check-success = @github-actions/Check (build)
+      - check-success = @github-actions/Check (test)
+      - check-success = @github-actions/Mobile Changes
+      - check-success = @github-actions/E2E
+      - check-success = @github-actions/Server Container
+      - check-success = @github-actions/Autofix & Extract Messages
+      # Mobile jobs explicitly skip when their platform is unaffected.
+      - or:
+          - check-success = @github-actions/Mobile Ruby (android)
+          - check-skipped = @github-actions/Mobile Ruby (android)
+      - or:
+          - check-success = @github-actions/Mobile Ruby (ios)
+          - check-skipped = @github-actions/Mobile Ruby (ios)
+      - or:
+          - check-success = @github-actions/Check Android
+          - check-skipped = @github-actions/Check Android
+      - or:
+          - check-success = @github-actions/Mobile Sync (android)
+          - check-skipped = @github-actions/Mobile Sync (android)
+      - or:
+          - check-success = @github-actions/Mobile Sync (ios)
+          - check-skipped = @github-actions/Mobile Sync (ios)
+    merge_conditions: *ready

@@ -10,8 +10,6 @@ Read this when validating changes or preparing a PR or release.
   applying formatting and lint fixes.
 - Check the affected package's `vite.config.ts`, `package.json`, and README for
   additional validation tasks; run them with `vp run <task-or-script>`.
-- Expense calculations and other critical business logic require tests; see
-  [coding conventions](./coding.md).
 - For user-facing copy changes, follow the extraction and localization rules
   in [PWA conventions](./pwa.md).
 

@@ -16,8 +16,10 @@ on:
       - completed
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && format('pr-{0}', inputs.pr) || format('branch-{0}', github.event.workflow_run.head_branch) }}
-  cancel-in-progress: true
+  # Every workflow using this secret must share this group through auth write-back.
+  group: codex-auth-${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }}
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   review:
@@ -31,7 +33,7 @@ jobs:
         startsWith(github.event.workflow_run.head_branch, 'renovate/')
       )
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Resolve Renovate PR
         id: pr
@@ -251,6 +253,7 @@ jobs:
             ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }} > CODEX_AUTH_JSON
 
       - name: Restore Codex auth cache
+        id: restore_codex_auth
         if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           CODEX_HOME: ${{ runner.temp }}/codex
@@ -276,9 +279,16 @@ jobs:
             exit 1
           fi
 
+          jq -e '
+            (.tokens.access_token | type == "string" and length > 0) and
+            (.tokens.refresh_token | type == "string" and length > 0)
+          ' "$auth_file" > /dev/null
+          cp "$auth_file" "$codex_home/auth.original.json"
           echo "CODEX_AUTH_JSON=" >> "$GITHUB_ENV"
 
       - name: Run Renovate agent review
+        # Leave time for auth write-back even when the agent times out.
+        timeout-minutes: 25
         if: steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
         env:
           CODEX_HOME: ${{ runner.temp }}/codex
@@ -306,7 +316,8 @@ jobs:
             --codex required
 
       - name: Save refreshed Codex auth to Bitwarden
-        if: success() && steps.pr.outputs.found == 'true' && steps.review_gate.outputs.should_run == 'true' && steps.lockfile.outputs.ready == 'true'
+        if: always() && steps.restore_codex_auth.outcome == 'success'
+        timeout-minutes: 3
         env:
           BWS_ACCESS_TOKEN: ${{ secrets.BW_ACCESS_TOKEN }}
           BITWARDEN_CODEX_AUTH_JSON_SECRET_ID: ${{ vars.BITWARDEN_CODEX_AUTH_JSON_SECRET_ID }}
@@ -316,7 +327,12 @@ jobs:
 
           auth_file="${CODEX_HOME:-$HOME/.codex}/auth.json"
           if [[ ! -s "$auth_file" ]]; then
-            echo "::warning::Codex auth cache is missing at $auth_file; skipping Bitwarden refresh."
+            echo "::error::Codex auth cache is missing; refreshed credentials could not be saved."
+            exit 1
+          fi
+
+          if cmp -s "$auth_file" "${CODEX_HOME:-$HOME/.codex}/auth.original.json"; then
+            echo "Codex auth was not changed; no Bitwarden update needed."
             exit 0
           fi
 
@@ -328,22 +344,32 @@ jobs:
           jq -e '
             type == "object" and
             .auth_mode == "chatgpt" and
-            (
-              (.tokens | type == "object") or
-              (.access_token | type == "string") or
-              (.refresh_token | type == "string") or
-              ([.. | objects | has("access_token") or has("refresh_token")] | any)
-            )
+            (.tokens.access_token | type == "string" and length > 0) and
+            (.tokens.refresh_token | type == "string" and length > 0)
           ' "$auth_file" > /dev/null
 
           compact_auth="$(jq -c . "$auth_file")"
           echo "::add-mask::$compact_auth"
-          docker run --rm \
-            -e BWS_ACCESS_TOKEN \
-            ghcr.io/bitwarden/bws@sha256:3927158c53ac5a17d6cbe59fc3e1353e426f168bf246dbfe3668f6de5eaa107f \
-            secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
-            --value "$compact_auth" \
-            --output none
+          while IFS= read -r token; do
+            echo "::add-mask::$token"
+          done < <(jq -r '.tokens | .access_token, .refresh_token, .id_token // empty' "$auth_file")
+
+          for attempt in 1 2 3; do
+            if docker run --rm \
+              -e BWS_ACCESS_TOKEN \
+              ghcr.io/bitwarden/bws@sha256:3927158c53ac5a17d6cbe59fc3e1353e426f168bf246dbfe3668f6de5eaa107f \
+              secret edit "$BITWARDEN_CODEX_AUTH_JSON_SECRET_ID" \
+              --value "$compact_auth" \
+              --output none; then
+              echo "Saved refreshed Codex credentials to Bitwarden."
+              exit 0
+            fi
+            if (( attempt < 3 )); then
+              sleep "$((attempt * 2))"
+            fi
+          done
+          echo "::error::Could not save refreshed Codex credentials to Bitwarden after 3 attempts. CI login may need renewal; run vp run codex:auth."
+          exit 1
 
       - name: Remove Codex auth cache
         if: always()

@@ -1,6 +1,6 @@
 {
   "name": "@trizum/agent-workflows",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Agentic maintenance workflows for the trizum workspace.",
   "keywords": [
@@ -43,6 +43,7 @@
   },
   "scripts": {
     "cleanup": "rm -rf dist",
+    "codex:auth": "tsx src/cli.ts copy-codex-auth",
     "dev": "tsc -b tsconfig.json --watch",
     "renovate-pr-review": "tsx src/cli.ts renovate-pr-review"
   },

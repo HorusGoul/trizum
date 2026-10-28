@@ -6,7 +6,6 @@ mobile wrappers, and a sync server.
 Use **pnpm through Vite+ (`vp`)**; run `vp install` before starting work and after
 pulling remote changes. From the workspace root, use `vp run check` for formatting,
 linting, and type checks, `vp run test` for tests, and `vp run build` for builds.
-Use `vp run dev` and `vp run preview` for the PWA.
 
 Read only the guidance relevant to the task:
 

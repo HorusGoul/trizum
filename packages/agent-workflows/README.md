@@ -36,26 +36,10 @@ By default the workflow is a dry run. Use `--write` to create labels/comments.
 Use `--supersede` to let the workflow create and push a replacement PR when
 checks are failing.
 
-## Codex And Sandcastle
+## Runtime and CI setup
 
-Codex runs through `@ai-hero/sandcastle` for both review and superseding PR
-fixes. Review runs use a disposable Sandcastle branch that is removed after the
-run. Superseding fixes use the branch that becomes the replacement PR. The
-workflow passes `--ignore-user-config` to `codex exec` so automation uses Codex
-auth from `CODEX_HOME` without inheriting personal MCP, hook, or local config.
-By default, Codex uses `gpt-5.6-sol` with `high` reasoning effort. Set
-`TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL` or
-`TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT` to override either setting.
-
-Use `--no-codex` or `--codex off` to run only the deterministic review.
-Use `--codex required` to treat a failed Codex review as a blocker.
-
-The Renovate GitHub Actions workflow uses Bitwarden Secrets Manager to restore
-a copied Codex ChatGPT login cache at `~/.codex/auth.json` before Sandcastle
-invokes Codex. After Codex runs, the workflow writes the refreshed auth cache
-back to the same Bitwarden secret so token refreshes survive ephemeral runners.
-
-Treat `auth.json` like a password. It contains Codex account tokens.
+For model overrides, review failure modes, credential persistence, and login
+renewal, read [Codex and CI authentication](./docs/codex-ci.md).
 
 ## Labels
 

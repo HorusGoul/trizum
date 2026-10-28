@@ -122,10 +122,13 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
   e2e:
-    name: E2E
+    name: E2E (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
-    needs: [check]
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: voidzero-dev/setup-vp@v1
@@ -133,22 +136,103 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Install Playwright Browsers
+      - name: Build E2E app and install browsers
         timeout-minutes: 5
-        run: vp run --filter @trizum/pwa test:e2e:install:ci
+        run: |
+          # Browser installation does not touch workspace build/codegen outputs.
+          vp run --filter @trizum/pwa test:e2e:install:ci &
+          browser_pid=$!
+          build_status=0
+          VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true \
+            vp run --filter @trizum/pwa build || build_status=$?
+          browser_status=0
+          wait "$browser_pid" || browser_status=$?
+          echo "E2E build status: $build_status; browser install status: $browser_status"
+          (( build_status == 0 && browser_status == 0 ))
 
       - name: Run Playwright E2E
-        run: vp run --filter @trizum/pwa test:e2e
+        run: vp run --filter @trizum/pwa test:e2e:prebuilt --shard=${{ matrix.shard }}/4
+
+      - name: Upload Playwright Blob Report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-blob-report-${{ matrix.shard }}
+          path: packages/pwa/blob-report
+          retention-days: 7
+          if-no-files-found: error
+
+  e2e-report:
+    name: E2E
+    runs-on: ubuntu-latest
+    needs: [e2e]
+    if: ${{ !cancelled() }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Download Playwright Blob Reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: playwright-blob-report-*
+          path: packages/pwa/all-blob-reports
+          merge-multiple: true
+
+      - name: Merge Playwright Reports
+        working-directory: packages/pwa
+        run: vp exec playwright merge-reports --reporter=html ./all-blob-reports
 
       - name: Upload Playwright Report
-        if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
-          path: |
-            packages/pwa/playwright-report
-            packages/pwa/test-results
-          if-no-files-found: ignore
+          path: packages/pwa/playwright-report
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Require all E2E shards to pass
+        if: ${{ always() && needs.e2e.result != 'success' }}
+        run: exit 1
+
+  server-container:
+    name: Server Container
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build production and smoke-test images
+        run: |
+          docker build --file packages/server/Dockerfile --target runtime --tag trizum-server-production .
+          docker build --file packages/server/Dockerfile --target runtime-local --tag trizum-server-smoke .
+
+      - name: Check migrations and server health
+        run: |
+          docker run --detach --name trizum-server-smoke \
+            --publish 127.0.0.1:3000:3000 \
+            --env DB_FILE_NAME=file:/tmp/trizum.db \
+            trizum-server-smoke
+          curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 1 \
+            --max-time 5 --retry-max-time 60 \
+            http://127.0.0.1:3000/health --output /tmp/server-health.json
+          node --input-type=module -e '
+            import assert from "node:assert/strict";
+            import { readFileSync } from "node:fs";
+            const health = JSON.parse(readFileSync("/tmp/server-health.json", "utf8"));
+            assert.equal(health.http.ok, true);
+            assert.equal(health.automerge.ok, true);
+          '
+          docker exec trizum-server-smoke node -e 'require("@sentry/node-cpu-profiler")'
+
+      - name: Show server logs and remove container
+        if: always()
+        run: |
+          docker logs trizum-server-smoke || true
+          docker rm --force trizum-server-smoke || true
 
   mobile-ruby-android:
     name: Mobile Ruby (android)
