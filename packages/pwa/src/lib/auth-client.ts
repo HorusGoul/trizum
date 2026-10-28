@@ -245,7 +245,7 @@ async function getNativeAppleIdToken(): Promise<NativeSocialIdToken> {
 
   const result = await AppleSignIn.signIn({
     nonce,
-    redirectUrl: getAuthSettingsCallbackURL(),
+    redirectUrl: getAuthEndpointURL("/callback/apple"),
     scopes: [SignInScope.Email],
   });
 
