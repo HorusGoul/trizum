@@ -18,7 +18,9 @@ async function createExpenseTemplate(
     name: string;
   },
 ) {
-  await harness.navigate(`/party/${partyId}/settings/expense-templates/new`);
+  // Save returns through browser history, so enter from the real template list.
+  await harness.navigate(`/party/${partyId}/settings/expense-templates`);
+  await page.getByRole("link", { name: "Add", exact: true }).click();
   await expect(page.getByRole("heading", { name: "New template" })).toBeVisible();
   await page.getByLabel("Name").fill(name);
 
@@ -36,7 +38,7 @@ async function createExpenseTemplate(
 
   await page.getByRole("button", { name: "Save" }).click();
   await expect(page.getByText("Expense template created").last()).toBeVisible();
-  await harness.navigate(`/party/${partyId}/settings/expense-templates`);
+  // The toast appears before Back finishes; wait for its destination before continuing.
   await expect(page.getByRole("heading", { name: "Expense templates" })).toBeVisible();
 }
 
@@ -138,7 +140,8 @@ test.describe("Expense templates", () => {
       memberParticipantId: defaultParticipants.blair.id,
     });
 
-    await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates/new`);
+    await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates`);
+    await page.getByRole("link", { name: "Add", exact: true }).click();
     await page.getByLabel("Name").fill("Weekly groceries");
     await page.getByLabel("Title").fill("Groceries");
     await page.getByLabel("Amount").fill("48.50");
@@ -165,12 +168,14 @@ test.describe("Expense templates", () => {
 
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByText("Expense template created")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Expense templates" })).toBeVisible();
 
     await harness.navigate(`/party/${seededParty.partyId}/settings/participants`);
     await page.getByLabel("New participant name").fill("Morgan");
     await page.getByRole("button", { name: "Add participant" }).click();
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByText("Participants saved!")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Expense templates" })).toBeVisible();
 
     await harness.navigate(`/party/${seededParty.partyId}`);
     const dialog = await openExpenseTemplatePicker(page, seededParty.partyId);
