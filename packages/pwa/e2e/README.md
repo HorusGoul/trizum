@@ -75,28 +75,16 @@ retained for seven days.
 
 ### CI build/setup path
 
-Each shard builds the app while installing browser binaries and OS dependencies.
-These operations have separate outputs; workspace check/test/build tasks must
-still run sequentially because they share generated code. Both preparation
-processes must succeed before Playwright runs. The normal production build stays
-in the independent check matrix.
-
-`test:e2e:prebuilt` starts only the preview server and Playwright, without build
-or codegen dependencies. Use it only after building this checkout with both
-harness flags; a normal production build cannot supply the fixture API:
+Each shard builds the E2E app while installing browsers, then runs
+`test:e2e:prebuilt` against that build. Both preparation steps must succeed.
+The usual `test:e2e` command builds automatically; to reuse a harness build:
 
 ```sh
 VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true vp run --filter @trizum/pwa build
-PLAYWRIGHT_PORT=4188 vp run --filter @trizum/pwa test:e2e:prebuilt e2e/harness.spec.ts e2e/smoke.spec.ts --workers=1
+PLAYWRIGHT_PORT=4188 vp run --filter @trizum/pwa test:e2e:prebuilt e2e/smoke.spec.ts --workers=1
 ```
 
-`PLAYWRIGHT_PORT` selects the managed preview port (default 4173). The usual
-`test:e2e` command still builds automatically. `PLAYWRIGHT_BASE_URL` continues
-to use an externally managed server. Pass Playwright flags directly, without a
-literal `--` separator.
-
-A dedicated shared build artifact was considered but is not used: it adds a
-second dependency installation plus upload/download and job scheduling to the
-critical path. See the CI improvement PR for the measured baseline and cost
-comparison. Browser caching and containers also remain unchanged; browser
-archive downloads were a small part of installation time in the sampled log.
+`PLAYWRIGHT_PORT` overrides the preview port (default 4173). Pass Playwright
+flags directly, without a literal `--` separator. See the
+[CI workflow](../../../.github/workflows/ci.yml) and
+[Playwright config](../playwright.config.ts) for implementation details.
