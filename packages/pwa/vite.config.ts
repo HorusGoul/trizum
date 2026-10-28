@@ -110,6 +110,8 @@ export default defineConfig(({ mode }) => {
             "VITE_APP_AUTH_URL",
             "VITE_APP_ANALYTICS_URL",
             "VITE_APP_DISABLE_ANALYTICS",
+            "VITE_APP_DISABLE_SENTRY",
+            "VITE_E2E_HARNESS",
             "VITE_APP_ENABLE_ANALYTICS",
           ],
           output: ["dist/**"],
@@ -178,6 +180,10 @@ export default defineConfig(({ mode }) => {
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
+        },
+        "test:e2e:prebuilt": {
+          command: "PLAYWRIGHT_SKIP_BUILD=true vp exec playwright test",
+          cache: false,
         },
         "test:e2e:headed": {
           command: "vp exec playwright test --headed",
