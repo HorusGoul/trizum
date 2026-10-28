@@ -91,7 +91,7 @@ catalog:
   "@tanstack/router-plugin": 1.168.19
   "@tailwindcss/vite": 4.3.2
   "@types/culori": 4.0.1
-  "@types/node": 24.13.3
+  "@types/node": 26.6.5
   "@types/react": 19.3.0
   "@types/react-dom": 19.3.0
   "@types/ws": 8.18.1
