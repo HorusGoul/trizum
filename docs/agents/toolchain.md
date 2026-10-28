@@ -19,6 +19,11 @@ and package scripts run their prerequisites. The workspace root rejects direct
 The root `prepare` script uses `vp config --no-agent` to install hooks without
 rewriting `AGENTS.md`. Keep that flag so installs preserve the minimal guide.
 
+## T3 Code worktrees
+
+See [`t3.json`](../../t3.json) for worktree actions and
+[`scripts/setup-worktree.sh`](../../scripts/setup-worktree.sh) for setup.
+
 ## Troubleshooting
 
 If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor`
