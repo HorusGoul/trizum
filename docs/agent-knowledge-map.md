@@ -16,6 +16,32 @@ tasks can follow the relevant links directly from the root guide.
 - Placeholder docs are noise. A package doc should either describe the package
   accurately or not exist.
 
+## Writing and Updating Documentation
+
+Apply these rules when adding or editing READMEs, agent instructions, or supporting
+guides. Use [What Belongs Where](#what-belongs-where) to choose the destination.
+
+- Search for existing coverage before creating a file. Extend the existing guide
+  when it serves the same reader and task; link to it from other entry points.
+- Keep each rule or procedure authoritative in one place. A short summary or
+  example may help readers, but must not become a second copy of the policy.
+- Split by reader task, not by heading or line count. Create a supporting guide
+  only when readers can use it independently and skip it for unrelated work.
+  Keep short, single-topic documents together.
+- Give links a read trigger, such as “Releasing mobile builds,” and make new
+  guides reachable from the relevant entry point. Avoid circular mandatory reads.
+- Preserve requirements when moving prose. If instructions conflict, ask the
+  user which to keep; do not silently choose a policy during reorganization.
+- Remove repeated reminders, placeholders, and generic advice. Make vague rules
+  concrete when the intended behavior is known; otherwise flag them for the user.
+- Keep one-time audits, migration inventories, and decision summaries in the PR
+  or conversation unless a maintained document is explicitly requested. Do not
+  add a second documentation index merely to describe a reorganization.
+- Before finishing, check moved file links and heading anchors, update incoming
+  links, and verify that command examples state the correct working directory.
+  Check that no unique requirement was lost or duplicated. Inspect release and
+  upload examples without executing their side effects just to validate prose.
+
 ## Canonical Surfaces
 
 | Surface                                                                                                                                            | Canonical for                                                                                                  | Owner                   | Freshness expectation                                                                   |
@@ -88,8 +114,7 @@ Do not use package docs for:
 For longer package READMEs, keep the purpose, key files, local validation, and
 links with task triggers in the entry point. Move setup, deployment, and feature
 contracts into that package's `docs/` directory. Keep short, single-topic
-READMEs self-contained. A move must preserve working directories for commands
-and update relative links.
+READMEs self-contained.
 
 ### Subdirectory `AGENTS.md`
 
