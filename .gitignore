@@ -155,6 +155,8 @@ dist
 
 # Playwright
 playwright-report/
+blob-report/
+all-blob-reports/
 test-results/
 
 # Generated icon sprite artifacts

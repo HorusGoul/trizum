@@ -122,10 +122,13 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
   e2e:
-    name: E2E
+    name: E2E (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
-    needs: [check]
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v7
       - uses: voidzero-dev/setup-vp@v1
@@ -138,17 +141,52 @@ jobs:
         run: vp run --filter @trizum/pwa test:e2e:install:ci
 
       - name: Run Playwright E2E
-        run: vp run --filter @trizum/pwa test:e2e
+        run: vp run --filter @trizum/pwa test:e2e --shard=${{ matrix.shard }}/4
+
+      - name: Upload Playwright Blob Report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-blob-report-${{ matrix.shard }}
+          path: packages/pwa/blob-report
+          retention-days: 7
+          if-no-files-found: error
+
+  e2e-report:
+    name: E2E
+    runs-on: ubuntu-latest
+    needs: [e2e]
+    if: ${{ !cancelled() }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
+      - name: Download Playwright Blob Reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: playwright-blob-report-*
+          path: packages/pwa/all-blob-reports
+          merge-multiple: true
+
+      - name: Merge Playwright Reports
+        working-directory: packages/pwa
+        run: vp exec playwright merge-reports --reporter=html ./all-blob-reports
 
       - name: Upload Playwright Report
-        if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
-          path: |
-            packages/pwa/playwright-report
-            packages/pwa/test-results
-          if-no-files-found: ignore
+          path: packages/pwa/playwright-report
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Require all E2E shards to pass
+        if: ${{ always() && needs.e2e.result != 'success' }}
+        run: exit 1
 
   server-container:
     name: Server Container
