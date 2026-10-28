@@ -283,7 +283,7 @@ msgstr "Ad-free for you"
 msgid "ADB Unit of Account"
 msgstr "ADB Unit of Account"
 
-#: src/components/CalculatorToolbar.tsx:1563
+#: src/components/CalculatorToolbar.tsx:1565
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:242
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:251
 msgid "Add"
@@ -506,11 +506,11 @@ msgstr "At least one participant is required"
 msgid "Attach photos of receipts to your expenses"
 msgstr "Attach photos of receipts to your expenses"
 
-#: src/components/CalculatorToolbar.tsx:1187
+#: src/components/CalculatorToolbar.tsx:1189
 msgid "Attachment preview"
 msgstr "Attachment preview"
 
-#: src/components/CalculatorToolbar.tsx:1156
+#: src/components/CalculatorToolbar.tsx:1158
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Attachments"
@@ -567,7 +567,7 @@ msgstr "Back to settings"
 msgid "Back to sign in"
 msgstr "Back to sign in"
 
-#: src/components/CalculatorToolbar.tsx:1588
+#: src/components/CalculatorToolbar.tsx:1590
 msgid "Backspace"
 msgstr "Backspace"
 
@@ -689,16 +689,16 @@ msgstr "Business Data Responsibility information"
 msgid "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 msgstr "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 
-#: src/components/CalculatorToolbar.tsx:1596
+#: src/components/CalculatorToolbar.tsx:1598
 msgid "Calculate result"
 msgstr "Calculate result"
 
-#: src/components/CalculatorToolbar.tsx:1027
-#: src/components/CalculatorToolbar.tsx:1046
+#: src/components/CalculatorToolbar.tsx:1028
+#: src/components/CalculatorToolbar.tsx:1047
 msgid "Calculator"
 msgstr "Calculator"
 
-#: src/components/CalculatorToolbar.tsx:1428
+#: src/components/CalculatorToolbar.tsx:1430
 msgid "Calculator expression"
 msgstr "Calculator expression"
 
@@ -832,7 +832,7 @@ msgstr "Choose the currency for expenses in this party"
 msgid "Choose who receives it"
 msgstr "Choose who receives it"
 
-#: src/components/CalculatorToolbar.tsx:1479
+#: src/components/CalculatorToolbar.tsx:1481
 msgid "Clear all"
 msgstr "Clear all"
 
@@ -849,7 +849,7 @@ msgstr "Clear search"
 msgid "Close"
 msgstr "Close"
 
-#: src/components/CalculatorToolbar.tsx:1175
+#: src/components/CalculatorToolbar.tsx:1177
 msgid "Close attachment preview"
 msgstr "Close attachment preview"
 
@@ -857,7 +857,7 @@ msgstr "Close attachment preview"
 msgid "Close calculator"
 msgstr "Close calculator"
 
-#: src/components/CalculatorToolbar.tsx:1495
+#: src/components/CalculatorToolbar.tsx:1497
 msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
@@ -1223,7 +1223,7 @@ msgstr "Debt transfer to another party"
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
-#: src/components/CalculatorToolbar.tsx:1580
+#: src/components/CalculatorToolbar.tsx:1582
 msgid "Decimal point"
 msgstr "Decimal point"
 
@@ -1300,7 +1300,7 @@ msgstr "Did you know?"
 msgid "Dismiss Premium banner"
 msgstr "Dismiss Premium banner"
 
-#: src/components/CalculatorToolbar.tsx:1503
+#: src/components/CalculatorToolbar.tsx:1505
 msgid "Divide"
 msgstr "Divide"
 
@@ -1328,7 +1328,7 @@ msgstr "Edit template"
 msgid "Editing {0}"
 msgstr "Editing {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:232
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:233
 msgid "Editing {expenseName}"
 msgstr "Editing {expenseName}"
 
@@ -1515,7 +1515,7 @@ msgstr "Expense title"
 msgid "Expense title is too long"
 msgstr "Expense title is too long"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:196
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:197
 msgid "Expense updated"
 msgstr "Expense updated"
 
@@ -1574,7 +1574,7 @@ msgstr "Failed to mark expense as paid"
 msgid "Failed to transfer debt"
 msgstr "Failed to transfer debt"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:201
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:202
 msgid "Failed to update expense"
 msgstr "Failed to update expense"
 
@@ -2265,7 +2265,7 @@ msgstr "Mozambican Metical"
 msgid "Multi-Party Splitting"
 msgstr "Multi-Party Splitting"
 
-#: src/components/CalculatorToolbar.tsx:1523
+#: src/components/CalculatorToolbar.tsx:1525
 msgid "Multiply"
 msgstr "Multiply"
 
@@ -2541,7 +2541,7 @@ msgstr "Open GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
-#: src/components/CalculatorToolbar.tsx:1487
+#: src/components/CalculatorToolbar.tsx:1489
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
@@ -3617,7 +3617,7 @@ msgstr "Submit a Request"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/CalculatorToolbar.tsx:1543
+#: src/components/CalculatorToolbar.tsx:1545
 msgid "Subtract"
 msgstr "Subtract"
 
@@ -4135,7 +4135,7 @@ msgstr "Update password"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:164
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:165
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
