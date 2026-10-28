@@ -66,6 +66,7 @@ export async function runSandcastleCodexReview(
       ran: true,
     };
   } catch (error) {
+    throwIfCodexAuthenticationFailed(error);
     return {
       affectedAreas: [],
       automatedTestSuggestions: [],
@@ -122,6 +123,9 @@ export async function runSandcastleCodexFix(
       gitSetupMs: 30_000,
       mergeToHostMs: 60_000,
     },
+  }).catch((error: unknown) => {
+    throwIfCodexAuthenticationFailed(error);
+    throw error;
   });
 
   return {
@@ -131,6 +135,19 @@ export async function runSandcastleCodexFix(
     preservedWorktreePath: result.preservedWorktreePath,
     summary: summarizeSandcastleOutput(result.stdout),
   };
+}
+
+function throwIfCodexAuthenticationFailed(error: unknown): void {
+  const message = error instanceof Error ? error.message : String(error);
+  if (
+    /invalid_refresh_token|refresh_token_(?:reused|expired|invalidated)|Your access token could not be refreshed|Could not parse your authentication token/i.test(
+      message,
+    )
+  ) {
+    throw new Error(
+      "CI login needs renewal. Run `vp run codex:auth`, replace the Bitwarden secret referenced by BITWARDEN_CODEX_AUTH_JSON_SECRET_ID, then rerun the workflow. Codex authentication failed; no further agent operations will be attempted.",
+    );
+  }
 }
 
 function resolveCodexModel(): string {

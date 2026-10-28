@@ -9,6 +9,7 @@
     "agent-browser:install": "agent-browser install",
     "browserslist:update-db": "vp dlx update-browserslist-db@latest",
     "build": "vp run -r build",
+    "codex:auth": "vp run --filter @trizum/agent-workflows codex:auth",
     "lingui:extract": "vp run --filter @trizum/pwa lingui:extract",
     "lint": "vp lint",
     "lint:fix": "vp lint --fix",
