@@ -1,5 +1,6 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
-import { recalculateSynchronizedBalances, type RecalculateBalancesRequest } from "./balanceSync.ts";
+import { recalculatePartyBalances } from "#src/lib/recalculatePartyBalances.ts";
+import type { Party } from "#src/models/party.ts";
 import { createAppWorkerRepo } from "./createAppWorkerRepo.ts";
 import type { AppWorkerApi, AppWorkerInitializeOptions } from "./proxy.ts";
 
@@ -16,12 +17,12 @@ export class AppWorkerService implements AppWorkerApi {
     await this.repo.networkSubsystem.whenReady();
   }
 
-  async recalculateBalances(request: RecalculateBalancesRequest) {
+  async recalculateBalances(partyId: Party["id"]) {
     const repo = this.requireRepo();
 
     await repo.networkSubsystem.whenReady();
 
-    return recalculateSynchronizedBalances(repo, request);
+    return recalculatePartyBalances(repo, partyId);
   }
 
   private requireRepo() {

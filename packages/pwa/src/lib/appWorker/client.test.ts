@@ -1,11 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "#src/models/party.ts";
-import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
 import type { AppWorkerInitializeOptions } from "./proxy.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
-type RecalculateBalances = (request: RecalculateBalancesRequest) => Promise<DocumentHeads[]>;
+type RecalculateBalances = (partyId: Party["id"]) => Promise<boolean>;
 type DispatchEvent = (event: Event) => boolean;
 
 const proxyMock = vi.hoisted(() => {
@@ -39,13 +38,6 @@ vi.mock("#src/lib/log.ts", () => ({
 
 vi.mock("./proxy.ts", () => ({
   injectAppWorker: proxyMock.injectAppWorker,
-}));
-
-vi.mock("./balanceSync.ts", () => ({
-  balanceSyncTimeout: 10_000,
-  createRecalculateBalancesRequest: (_repo: Repo, partyId: Party["id"]) =>
-    Promise.resolve({ partyId, documents: [] }),
-  waitForDocumentHeads: () => Promise.resolve(),
 }));
 
 class TestWorker {
@@ -100,8 +92,8 @@ describe("app worker client", () => {
     });
 
     await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
-    expect(firstApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
+    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId);
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(secondApi.initialize).toHaveBeenCalledWith(
       expect.objectContaining({
         wssUrl: "wss://sync.example.test",
@@ -153,7 +145,7 @@ describe("app worker client", () => {
 
     await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).not.toHaveBeenCalled();
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(TestWorker.instances).toHaveLength(2);
     expect(TestWorker.instances[0]?.terminate).toHaveBeenCalledOnce();
     expect(networkSubsystem.addNetworkAdapter).toHaveBeenCalledTimes(2);
@@ -180,8 +172,8 @@ describe("app worker client", () => {
 
     await expect(appWorker.recalculateBalances(partyId)).rejects.toThrow("worker still failed");
 
-    expect(firstApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
+    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(partyId);
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(partyId);
     expect(TestWorker.instances).toHaveLength(2);
     expect(TestWorker.instances[0]?.terminate).toHaveBeenCalledOnce();
     expect(TestWorker.instances[1]?.terminate).toHaveBeenCalledOnce();
@@ -211,7 +203,7 @@ describe("app worker client", () => {
 
 function createWorkerApiMock({
   initialize = () => Promise.resolve(),
-  recalculateBalances = () => Promise.resolve([]),
+  recalculateBalances = () => Promise.resolve(true),
 }: {
   initialize?: InitializeWorker;
   recalculateBalances?: RecalculateBalances;

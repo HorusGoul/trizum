@@ -1,19 +1,12 @@
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
+import type { Repo } from "@automerge/automerge-repo/slim";
 import { clone } from "@opentf/std";
 import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import { calculateBalancesByParticipant } from "#src/models/expense.ts";
 import type { Party, PartyExpenseChunk, PartyExpenseChunkBalances } from "#src/models/party.ts";
 
-export async function recalculatePartyBalances(
-  repo: Repo,
-  partyId: Party["id"],
-  signal?: AbortSignal,
-) {
-  function find<T>(id: DocumentId) {
-    return signal ? repo.find<T>(id, { signal }) : repo.find<T>(id);
-  }
-  const partyHandle = await find<Party>(partyId);
+export async function recalculatePartyBalances(repo: Repo, partyId: Party["id"]) {
+  const partyHandle = await repo.find<Party>(partyId);
   const party = partyHandle.doc();
 
   if (!party) {
@@ -23,8 +16,8 @@ export async function recalculatePartyBalances(
   const chunkEntries = await Promise.all(
     party.chunkRefs.map(async (chunkRef) => {
       const [chunkHandle, chunkBalancesHandle] = await Promise.all([
-        find<PartyExpenseChunk>(chunkRef.chunkId),
-        find<PartyExpenseChunkBalances>(chunkRef.balancesId),
+        repo.find<PartyExpenseChunk>(chunkRef.chunkId),
+        repo.find<PartyExpenseChunkBalances>(chunkRef.balancesId),
       ]);
 
       const chunk = chunkHandle.doc();
