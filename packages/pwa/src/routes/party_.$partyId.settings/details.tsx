@@ -32,8 +32,13 @@ function PartyDetailsSettings() {
       symbol: party.symbol || DEFAULT_PARTY_SYMBOL,
       description: party.description,
     } satisfies PartyDetailsFormValues,
-    onSubmit: ({ value }) => {
-      updateDetails(value);
+    onSubmit: async ({ value }) => {
+      try {
+        await updateDetails(value);
+      } catch {
+        toast.error(t`Could not save party details. Please try again.`);
+        return;
+      }
       trackEvent("party_details_updated");
       form.reset(value);
       toast.success(t`Party details saved!`);
@@ -54,14 +59,14 @@ function PartyDetailsSettings() {
             selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}
           >
             {([canSubmit, isSubmitting, isDirty]) =>
-              canSubmit && isDirty ? (
+              isSubmitting || (canSubmit && isDirty) ? (
                 <Suspense fallback={null}>
                   <IconButton
                     icon="lucide.check"
                     aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                     type="submit"
                     form={formId}
-                    isDisabled={isSubmitting}
+                    isPending={isSubmitting}
                   />
                 </Suspense>
               ) : null

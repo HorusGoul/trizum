@@ -118,12 +118,13 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     void recalculateBalances();
   }
 
-  function updateDetails(values: Pick<Party, "name" | "symbol" | "description">) {
+  async function updateDetails(values: Pick<Party, "name" | "symbol" | "description">) {
     handle.change((doc) => {
       doc.name = values.name;
       doc.symbol = values.symbol;
       doc.description = values.description;
     });
+    await repo.flush([handle.documentId]);
   }
 
   function updateParticipants(participants: Party["participants"]) {
