@@ -98,7 +98,7 @@ catalog:
   "@use-gesture/react": 10.3.1
   "@vite-pwa/assets-generator": 1.0.4
   "@vitejs/plugin-react": 6.1.2
-  "@vitest/coverage-v8": 4.1.11
+  "@vitest/coverage-v8": 4.1.12
   agent-browser: 0.31.2
   all-contributors-cli: 6.26.1
   babel-plugin-react-compiler: 1.0.0
@@ -156,7 +156,7 @@ catalog:
   vite-plugin-top-level-await: 1.6.0
   vite-plugin-wasm: 3.6.0
   vite-plus: 0.3.3
-  vitest: 4.1.11
+  vitest: 4.1.12
   workbox-build: 7.4.1
   workbox-window: 7.4.1
   workers-og: 0.0.27
