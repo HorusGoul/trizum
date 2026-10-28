@@ -22,7 +22,11 @@ test("a confirmed details save survives an immediate document reload", async ({
   await expect(page.getByRole("button", { name: "Symbol", exact: true })).toHaveText("🏕️");
 });
 
-test("a failed details save keeps the draft available for retry", async ({ harness, page }) => {
+test("a failed details save keeps the draft available for retry", async ({
+  harness,
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 375, height: 812 });
   const { partyId } = await harness.seedJoinedParty({
     fixture: createPartyFixture(),
     memberParticipantId: defaultParticipants.blair.id,
@@ -57,6 +61,7 @@ test("a failed details save keeps the draft available for retry", async ({ harne
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Retry this save");
     await expect(page.getByRole("button", { name: "Save", exact: true })).toBeEnabled();
     await expect(page.getByText("Party details saved!", { exact: true })).toBeHidden();
+    await page.screenshot({ path: testInfo.outputPath("save-error-retains-draft.png") });
   } finally {
     await page.evaluate(() => {
       (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
@@ -67,4 +72,77 @@ test("a failed details save keeps the draft available for retry", async ({ harne
   await expect(page.getByRole("link", { name: /Retry this save/ })).toBeVisible();
   await harness.goto(details);
   await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Retry this save");
+});
+
+test("details cannot change while their save acknowledgment is pending", async ({
+  harness,
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const { partyId } = await harness.seedJoinedParty({
+    fixture: createPartyFixture(),
+    memberParticipantId: defaultParticipants.blair.id,
+  });
+  await harness.goto(`/party/${partyId}/settings`);
+  await page.locator(`a[href="/party/${partyId}/settings/details"]`).click();
+  await page.getByLabel("Name", { exact: true }).fill("Pending save");
+  await page.evaluate(() => {
+    const original = Reflect.get(
+      IDBDatabase.prototype,
+      "transaction",
+    ) as IDBDatabase["transaction"];
+    const testWindow = window as Window & {
+      releasePersistenceTest?: () => void;
+      restorePersistenceTest?: () => void;
+    };
+    let holdNextWrite = true;
+    testWindow.restorePersistenceTest = () => {
+      IDBDatabase.prototype.transaction = original;
+      testWindow.releasePersistenceTest?.();
+      delete testWindow.restorePersistenceTest;
+    };
+    IDBDatabase.prototype.transaction = function (...args) {
+      const transaction = original.apply(this, args);
+      if (this.name === "trizum" && args[1] === "readwrite" && holdNextWrite) {
+        holdNextWrite = false;
+        // The adapter's oncomplete is installed after this listener. Hold only
+        // its acknowledgment, while allowing the real IndexedDB write to commit.
+        transaction.addEventListener("complete", (event) => {
+          event.stopImmediatePropagation();
+          testWindow.releasePersistenceTest = () => {
+            transaction.oncomplete?.call(transaction, event);
+            delete testWindow.releasePersistenceTest;
+          };
+        });
+      }
+      return transaction;
+    };
+  });
+  try {
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Submitting...", exact: true })).toBeVisible();
+    await expect(page.getByLabel("Name", { exact: true })).toBeDisabled();
+    await expect(page.getByLabel("Description", { exact: true })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Symbol", exact: true })).toBeDisabled();
+    await page.screenshot({ path: testInfo.outputPath("save-pending-protected-fields.png") });
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          Boolean(
+            (window as Window & { releasePersistenceTest?: () => void }).releasePersistenceTest,
+          ),
+        ),
+      )
+      .toBe(true);
+    await page.evaluate(() => {
+      (window as Window & { releasePersistenceTest?: () => void }).releasePersistenceTest?.();
+    });
+    await expect(page).toHaveURL(new RegExp(`/party/${partyId}/settings(?:[?].*)?$`));
+  } finally {
+    await page.evaluate(() => {
+      (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
+    });
+  }
+  await harness.goto(`/party/${partyId}/settings/details`);
+  await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Pending save");
 });

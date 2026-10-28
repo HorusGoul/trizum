@@ -83,7 +83,13 @@ function PartyDetailsSettings() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <PartySettingsDetailsFields form={form} />
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isSubmitting) => (
+            <fieldset disabled={isSubmitting} className="contents">
+              <PartySettingsDetailsFields form={form} />
+            </fieldset>
+          )}
+        </form.Subscribe>
       </form>
     </div>
   );
