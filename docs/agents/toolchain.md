@@ -16,6 +16,9 @@ Use pnpm through Vite+ (`vp`). Workspace commands are listed in the
 and package scripts run their prerequisites. The workspace root rejects direct
 `vp dev` and `vp build` commands.
 
+For local PWA development and preview, run `vp run dev` and `vp run preview`
+from the workspace root.
+
 The root `prepare` script uses `vp config --no-agent` to install hooks without
 rewriting `AGENTS.md`. Keep that flag so installs preserve the minimal guide.
 
