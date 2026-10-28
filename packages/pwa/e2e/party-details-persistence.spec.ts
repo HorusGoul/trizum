@@ -1,5 +1,67 @@
+import type { Page } from "@playwright/test";
 import { createPartyFixture, defaultParticipants } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
+
+async function holdNextSaveAcknowledgment(page: Page) {
+  await page.evaluate(() => {
+    const original = Reflect.get(
+      IDBDatabase.prototype,
+      "transaction",
+    ) as IDBDatabase["transaction"];
+    const testWindow = window as Window & {
+      releasePersistenceTest?: () => void;
+      restorePersistenceTest?: () => void;
+    };
+    let holdNextWrite = true;
+    testWindow.restorePersistenceTest = () => {
+      IDBDatabase.prototype.transaction = original;
+      testWindow.releasePersistenceTest?.();
+      delete testWindow.restorePersistenceTest;
+    };
+    IDBDatabase.prototype.transaction = function (...args) {
+      const transaction = original.apply(this, args);
+      if (this.name === "trizum" && args[1] === "readwrite" && holdNextWrite) {
+        holdNextWrite = false;
+        // The adapter's oncomplete is installed after this listener. Hold only
+        // its acknowledgment, while allowing the real IndexedDB write to commit.
+        transaction.addEventListener("complete", (event) => {
+          event.stopImmediatePropagation();
+          testWindow.releasePersistenceTest = () => {
+            transaction.oncomplete?.call(transaction, event);
+            delete testWindow.releasePersistenceTest;
+          };
+        });
+      }
+      return transaction;
+    };
+  });
+}
+
+async function releaseSaveAcknowledgment(page: Page) {
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Boolean(
+          (window as Window & { releasePersistenceTest?: () => void }).releasePersistenceTest,
+        ),
+      ),
+    )
+    .toBe(true);
+  await page.evaluate(async () => {
+    (window as Window & { releasePersistenceTest?: () => void }).releasePersistenceTest?.();
+    // Complete the submit microtasks and a render/history cycle before asserting
+    // that a departed form cannot move the user's current history entry.
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
+  });
+}
+
+async function restoreSaveAcknowledgment(page: Page) {
+  await page.evaluate(() => {
+    (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
+  });
+}
 
 test("a confirmed details save survives an immediate document reload", async ({
   harness,
@@ -94,38 +156,7 @@ test("details cannot change while their save acknowledgment is pending", async (
   await harness.goto(`/party/${partyId}/settings`);
   await page.locator(`a[href="/party/${partyId}/settings/details"]`).click();
   await page.getByLabel("Name", { exact: true }).fill("Pending save");
-  await page.evaluate(() => {
-    const original = Reflect.get(
-      IDBDatabase.prototype,
-      "transaction",
-    ) as IDBDatabase["transaction"];
-    const testWindow = window as Window & {
-      releasePersistenceTest?: () => void;
-      restorePersistenceTest?: () => void;
-    };
-    let holdNextWrite = true;
-    testWindow.restorePersistenceTest = () => {
-      IDBDatabase.prototype.transaction = original;
-      testWindow.releasePersistenceTest?.();
-      delete testWindow.restorePersistenceTest;
-    };
-    IDBDatabase.prototype.transaction = function (...args) {
-      const transaction = original.apply(this, args);
-      if (this.name === "trizum" && args[1] === "readwrite" && holdNextWrite) {
-        holdNextWrite = false;
-        // The adapter's oncomplete is installed after this listener. Hold only
-        // its acknowledgment, while allowing the real IndexedDB write to commit.
-        transaction.addEventListener("complete", (event) => {
-          event.stopImmediatePropagation();
-          testWindow.releasePersistenceTest = () => {
-            transaction.oncomplete?.call(transaction, event);
-            delete testWindow.releasePersistenceTest;
-          };
-        });
-      }
-      return transaction;
-    };
-  });
+  await holdNextSaveAcknowledgment(page);
   try {
     await page.getByRole("button", { name: "Save", exact: true }).click();
     await expect(page.getByRole("button", { name: "Submitting...", exact: true })).toBeVisible();
@@ -154,3 +185,44 @@ test("details cannot change while their save acknowledgment is pending", async (
   await harness.goto(`/party/${partyId}/settings/details`);
   await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Pending save");
 });
+
+for (const back of ["header", "browser", "native-style"] as const) {
+  test(`a pending save respects ${back} Back departure`, async ({ harness, page }) => {
+    const { partyId } = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+    const settings = `/party/${partyId}/settings`;
+    const details = `${settings}/details`;
+    await harness.goto(settings);
+    await page.locator(`a[href="${details}"]`).click();
+    await page.getByLabel("Name", { exact: true }).fill("Saved after leaving");
+    await holdNextSaveAcknowledgment(page);
+    try {
+      await page.getByRole("button", { name: "Save", exact: true }).click();
+      await expect(page.getByRole("button", { name: "Submitting...", exact: true })).toBeVisible();
+      if (back === "header") {
+        await page.getByRole("button", { name: "Go Back", exact: true }).click();
+      } else if (back === "browser") {
+        await page.goBack();
+      } else {
+        await page.evaluate(() => window.history.go(-1));
+      }
+      await expect(page).toHaveURL(new RegExp(`${settings}(?:[?].*)?$`));
+      await expect(
+        page.getByRole("heading", { name: "Party Settings", exact: true }),
+      ).toBeVisible();
+      const departedEntry = await page.evaluate(() => window.history.state.__TSR_key);
+      await releaseSaveAcknowledgment(page);
+      await expect(page).toHaveURL(new RegExp(`${settings}(?:[?].*)?$`));
+      await expect(
+        page.getByRole("heading", { name: "Party Settings", exact: true }),
+      ).toBeVisible();
+      expect(await page.evaluate(() => window.history.state.__TSR_key)).toBe(departedEntry);
+    } finally {
+      await restoreSaveAcknowledgment(page);
+    }
+    await harness.goto(details);
+    await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Saved after leaving");
+  });
+}

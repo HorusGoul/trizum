@@ -1094,7 +1094,7 @@ msgstr "Could not reset password"
 msgid "Could not save cloud settings"
 msgstr "Could not save cloud settings"
 
-#: src/routes/party_.$partyId.settings/details.tsx:39
+#: src/routes/party_.$partyId.settings/details.tsx:54
 msgid "Could not save party details. Please try again."
 msgstr "Could not save party details. Please try again."
 
@@ -2729,11 +2729,11 @@ msgstr "Party created"
 msgid "Party deleted"
 msgstr "Party deleted"
 
-#: src/routes/party_.$partyId.settings/details.tsx:52
+#: src/routes/party_.$partyId.settings/details.tsx:73
 msgid "Party details"
 msgstr "Party details"
 
-#: src/routes/party_.$partyId.settings/details.tsx:44
+#: src/routes/party_.$partyId.settings/details.tsx:65
 msgid "Party details saved!"
 msgstr "Party details saved!"
 
@@ -3215,7 +3215,7 @@ msgstr "Saudi Riyal"
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:126
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
-#: src/routes/party_.$partyId.settings/details.tsx:66
+#: src/routes/party_.$partyId.settings/details.tsx:87
 #: src/routes/party_.$partyId.settings/participants.tsx:92
 #: src/routes/party_.$partyId.who.tsx:113
 #: src/routes/reset-password.tsx:81
@@ -3613,7 +3613,7 @@ msgstr "Submit a Request"
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:126
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
-#: src/routes/party_.$partyId.settings/details.tsx:66
+#: src/routes/party_.$partyId.settings/details.tsx:87
 #: src/routes/party_.$partyId.settings/participants.tsx:92
 #: src/routes/party_.$partyId.who.tsx:113
 #: src/routes/reset-password.tsx:81
