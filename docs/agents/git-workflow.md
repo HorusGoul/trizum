@@ -6,10 +6,9 @@ Read this before editing files or performing branch, commit, or PR operations.
 
 - Create a new branch before editing. Never work directly on `main` or another
   base branch.
-- If the user does not specify a base branch, choose a sensible default
-  (usually the current `main` or remote default branch) and mention the
-  assumption in a progress update. Ask only when the starting point is
-  ambiguous or risky.
+- Default to `main` as the base branch; use another base when the user or
+  task context calls for it. Mention the chosen base in a progress update.
+  Ask only when the starting point is ambiguous or risky.
 - Use `type/description` names: `feature/`, `fix/`, `refactor/` (no behavior
   changes), `docs/`, `chore/`, or `test/`.
 

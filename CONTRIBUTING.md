@@ -70,7 +70,8 @@ This project is currently maintained by one person. Response times may vary — 
 
 ### Making Changes
 
-1. **Create a branch** from `main`
+1. **Create a branch**, defaulting to `main` unless the task calls for another
+   base. See the [Git workflow](./docs/agents/git-workflow.md).
 2. **Make your changes** following the code style guidelines below
 3. **Test your changes** locally
 4. **Run checks** before committing:

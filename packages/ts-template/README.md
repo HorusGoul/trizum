@@ -1,36 +1,15 @@
-# TypeScript Template
+# TypeScript package template
 
-This is a package generated using the `ts-template` template of the trizum monorepo.
+Starting point for new workspace libraries, with shared TypeScript configuration,
+Vite+ tasks, tests, and a package-local logging facade.
 
-It's the best starting point for a new package, as it provides the following out of the box:
+For copying and customizing this template, follow [package authoring](../../docs/package-authoring.md).
+Replace this README with the new package's purpose, key files, and validation commands.
 
-- `@trizum/tsconfig`
-- Common Vite+ tasks for developing, building, testing, and checking.
-- A built-package TypeScript setup with a separate test-inclusive `tsconfig.test.json`.
+- [`package.json`](./package.json): package identity and exports.
+- [`vite.config.ts`](./vite.config.ts): check, test, build, and dev tasks.
+- [`tsconfig.json`](./tsconfig.json): emitted library build.
+- [`tsconfig.test.json`](./tsconfig.test.json): test-inclusive type checking.
 
-## Usage
-
-To use this package from another package or app in the monorepo, you can install it using the following command:
-
-```bash
-vp add ts-template
-```
-
-## Development
-
-If you want to work on this package, you can clone the monorepo and run the following commands:
-
-```bash
-vp install
-cd packages/ts-template
-vp run dev
-```
-
-## Tasks
-
-The following Vite+ tasks are available:
-
-- `vp run dev`. Starts the compiler in watch mode.
-- `vp run check`. Runs the package validation script.
-- `vp run test`. Runs the package unit tests.
-- `vp run build`. Builds the package.
+Run `vp run check`, `vp run test`, or `vp run build` from this directory when
+changing the template; `vp run dev` starts the compiler in watch mode.

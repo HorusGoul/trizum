@@ -1,8 +1,20 @@
-# Cloudflare Setup
+# Cloudflare setup and deployment
 
 This document records how the PWA Worker Cloudflare resources are wired. The
 source of truth for account, route, binding, public OAuth identifier, and
 observability values is [`../wrangler.jsonc`](../wrangler.jsonc).
+
+## Deployment
+
+Cloudflare deployments are managed by GitHub Actions instead of Cloudflare's
+connected repository builds.
+
+- Production deploys run after a changeset release updates the PWA version or
+  changelog on `main`.
+- Pull requests get Cloudflare preview deployments from the `PWA Preview`
+  workflow, which updates a PR comment with the latest preview URL.
+
+Configure the [GitHub Actions secrets](#github-actions-secrets) before deploying.
 
 ## Outbound sync routing
 
@@ -101,7 +113,9 @@ use disposable test parties for the audit. Removing this setting and deploying
 disables the exception; existing sandbox-only boosts are revoked on their next
 server verification. No migration or native rebuild is needed.
 
-GitHub Actions still need these repository or environment secrets:
+### GitHub Actions secrets
+
+Configure these repository or environment secrets:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`

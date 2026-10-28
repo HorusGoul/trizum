@@ -2,7 +2,7 @@
 
 Reusable SVG sprite generation and Vite integration for workspace apps.
 
-Read the repo [AGENTS guide](../../AGENTS.md) first. This package exists to
+This package exists to
 collect SVG catalogs, statically discover icon usage, emit typed sprite IDs,
 and keep generated sprite assets in sync during Vite development and builds.
 
