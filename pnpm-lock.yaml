@@ -611,7 +611,7 @@ importers:
         version: link:../logging
       '@trizum/pwa':
         specifier: workspace:*
-        version: file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(rollup@4.65.1)(supports-color@10.2.2)(vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.0))(jsdom@29.1.1(@noble/hashes@2.2.0)))
+        version: file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(supports-color@10.2.2)(vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.0))(jsdom@29.1.1(@noble/hashes@2.2.0)))
       capacitor-plugin-safe-area:
         specifier: 'catalog:'
         version: 5.0.1(@capacitor/core@8.5.3)
@@ -925,7 +925,7 @@ importers:
         version: 4.65.1
       rollup-plugin-license:
         specifier: 'catalog:'
-        version: 3.7.1(picomatch@4.0.4)(rollup@4.65.1)
+        version: 3.7.1(picomatch@4.0.7)(rollup@4.65.1)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.3.3
@@ -4389,18 +4389,6 @@ packages:
     resolution: {integrity: sha512-dFyuWYjDs0/LetQZqK5IHj0/wIC8sBYADyMjU5Fo0nt2vzT11CPPG2AKeITIQcoRRs9IZ8ahtDMqWMvBPfDs1w==}
     engines: {node: '>=18'}
 
-  '@sentry/bundler-plugins@10.65.0':
-    resolution: {integrity: sha512-AYgv31l4wY/CwYAD/2Og59RT+TNjvhatcLOrEe5tFOpi9VcPAQ4xfPZIM6fXYGawofT52p6LhUECNSfNkNnc7Q==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      rollup: '>=3.2.0'
-      webpack: '>=5.0.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      webpack:
-        optional: true
-
   '@sentry/bundler-plugins@10.76.2':
     resolution: {integrity: sha512-5ovSYkHaTTDwe6p9vq0AzE+W9likkINBpzCv7VychGqYUfBGNzr+0YVkAt9//saJI9BKs+lWud5qX5iASf6wkw==}
     engines: {node: '>= 18'}
@@ -4517,17 +4505,9 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
 
-  '@sentry/conventions@0.15.1':
-    resolution: {integrity: sha512-ZLP8bRdMON3prWE2tJyImuYscCxdcJeIPIhrOs/rgyFm3C1nCh1B6gdvPj3AZ5zW08oSFFCsq7T+tYEW3h8MNA==}
-    engines: {node: '>=14'}
-
   '@sentry/conventions@0.16.0':
     resolution: {integrity: sha512-fO9PLmHdVURcSPUpWCItWAtgKiMwGdJHbovoSEyLplX5sxs2ugvI4CBPTrkkgqhObnZOD0CnWBKDzSVQYBKEyQ==}
     engines: {node: '>=14'}
-
-  '@sentry/core@10.65.0':
-    resolution: {integrity: sha512-3aqtmM5NgNGo45BNaaBzi0LPQZAw//NEL4HKS5fXm12pJMa4KEkze8DEKnkTEIrGnWaOJKamecHKlnNg/Mqf/Q==}
-    engines: {node: '>=18'}
 
   '@sentry/core@10.76.2':
     resolution: {integrity: sha512-vndrQalRiwYatTkjlLWvyf69KocXIb9TKJ4A9oiyWguL8PJYtqIRTlRe4OpkpjLrxS18fvRdV0jEm29c/9p3hQ==}
@@ -4596,10 +4576,6 @@ packages:
   '@sentry/server-utils@10.76.2':
     resolution: {integrity: sha512-wogj6Trj8fAu+aD7HbpvHEBlyANMOvvO9MP5NFJaiQbprLKugtCdE6rFTxDhofXvRo4nswL9m4Cvysg3k5KcvQ==}
     engines: {node: '>=18'}
-
-  '@sentry/vite-plugin@5.4.0':
-    resolution: {integrity: sha512-fFJgCxs5hDyAm9BbZJ+LbA+LK2tjX5OoD0v0ARU4StR6KQmGUduoPs69yJ9AfqZ0om3Rlp5JDliiwFcNkasORA==}
-    engines: {node: '>= 18'}
 
   '@sentry/vite-plugin@5.4.1':
     resolution: {integrity: sha512-poFfn3sQbSFaZpXH8CG27D0eNtDD64wFEniQCb853e7huko9vOl4UP3BjT3vsrnmVuRqagnbxItza10MOC7ysA==}
@@ -8390,10 +8366,6 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  picomatch@4.0.4:
-    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
-    engines: {node: '>=12'}
-
   picomatch@4.0.7:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
@@ -9333,10 +9305,6 @@ packages:
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
-
-  tinypool@2.1.0:
-    resolution: {integrity: sha512-Pugqs6M0m7Lv1I7FtxN4aoyToKg1C4tu+/381vH35y8oENM/Ai7f7C4StcoK4/+BSw9ebcS8jRiVrORFKCALLw==}
-    engines: {node: ^20.0.0 || >=22.0.0}
 
   tinypool@2.1.2:
     resolution: {integrity: sha512-9YodfrxS9g9IbFr/KOjE5bAeJ0p61n3bW6mqvy0jtoeKd1kTW1Cxm0oulm6KX2lyM9Gl6WIe8nEbY7LWv5ZJww==}
@@ -12162,7 +12130,7 @@ snapshots:
       ora: 9.4.1
       pseudolocale: 3.1.0
       source-map: 0.7.6
-      tinypool: 2.1.0
+      tinypool: 2.1.2
     optionalDependencies:
       esbuild: 0.28.1
       rolldown: 1.2.15
@@ -12961,7 +12929,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.9
       estree-walker: 2.0.2
-      picomatch: 4.0.4
+      picomatch: 4.0.7
     optionalDependencies:
       rollup: 4.65.1
 
@@ -13053,21 +13021,6 @@ snapshots:
       '@sentry/feedback': 10.76.2
       '@sentry/replay': 10.76.2
       '@sentry/replay-canvas': 10.76.2
-
-  '@sentry/bundler-plugins@10.65.0(rollup@4.65.1)(supports-color@10.2.2)':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@10.2.2)
-      '@sentry/cli': 2.58.6(supports-color@10.2.2)
-      '@sentry/core': 10.65.0
-      dotenv: 17.4.2
-      find-up: 5.0.0
-      glob: 13.0.6
-      magic-string: 0.30.21
-    optionalDependencies:
-      rollup: 4.65.1
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
 
   '@sentry/bundler-plugins@10.76.2(rollup@4.65.1)(supports-color@10.2.2)':
     dependencies:
@@ -13168,13 +13121,7 @@ snapshots:
       '@sentry/cli-win32-i686': 3.8.2
       '@sentry/cli-win32-x64': 3.8.2
 
-  '@sentry/conventions@0.15.1': {}
-
   '@sentry/conventions@0.16.0': {}
-
-  '@sentry/core@10.65.0':
-    dependencies:
-      '@sentry/conventions': 0.15.1
 
   '@sentry/core@10.76.2':
     dependencies:
@@ -13256,15 +13203,6 @@ snapshots:
     dependencies:
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.76.2
-
-  '@sentry/vite-plugin@5.4.0(rollup@4.65.1)(supports-color@10.2.2)':
-    dependencies:
-      '@sentry/bundler-plugins': 10.65.0(rollup@4.65.1)(supports-color@10.2.2)
-    transitivePeerDependencies:
-      - encoding
-      - rollup
-      - supports-color
-      - webpack
 
   '@sentry/vite-plugin@5.4.1(rollup@4.65.1)(supports-color@10.2.2)':
     dependencies:
@@ -13577,7 +13515,7 @@ snapshots:
       '@sentry/core': 10.76.2
       bs58check: 3.0.1
 
-  '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(rollup@4.65.1)(supports-color@10.2.2)(vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.0))(jsdom@29.1.1(@noble/hashes@2.2.0)))':
+  '@trizum/pwa@file:packages/pwa(@libsql/client@0.17.4)(@logtape/logtape@2.4.2)(@opentelemetry/api@1.9.1)(@sentry/core@10.76.2)(@types/emscripten@1.41.5)(@types/pg@8.15.6)(@types/react@19.3.0)(babel-plugin-macros@3.1.0)(drizzle-kit@0.31.10)(kysely@0.29.2)(supports-color@10.2.2)(vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@vitest/browser-preview@4.1.11)(@vitest/coverage-v8@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.0))(jsdom@29.1.1(@noble/hashes@2.2.0)))':
     dependencies:
       '@automerge/automerge': 3.5.0
       '@automerge/automerge-repo': 2.5.6(supports-color@10.2.2)
@@ -13605,7 +13543,7 @@ snapshots:
       '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
       '@sentry/react': 10.76.2(react@19.3.0)
-      '@sentry/vite-plugin': 5.4.0(rollup@4.65.1)(supports-color@10.2.2)
+      '@sentry/vite-plugin': 5.4.1(rollup@4.65.1)(supports-color@10.2.2)
       '@takker/md5': '@jsr/takker__md5@0.1.0'
       '@tanstack/react-form': 1.33.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@tanstack/react-router': 1.170.46(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -15635,9 +15573,9 @@ snapshots:
     dependencies:
       pend: 1.2.0
 
-  fdir@6.5.0(picomatch@4.0.4):
+  fdir@6.5.0(picomatch@4.0.7):
     optionalDependencies:
-      picomatch: 4.0.4
+      picomatch: 4.0.7
 
   fflate@0.7.4: {}
 
@@ -17187,8 +17125,6 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  picomatch@4.0.4: {}
-
   picomatch@4.0.7: {}
 
   pify@2.3.0: {}
@@ -17624,10 +17560,10 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.2.15
       '@rolldown/binding-win32-x64-msvc': 1.2.15
 
-  rollup-plugin-license@3.7.1(picomatch@4.0.4)(rollup@4.65.1):
+  rollup-plugin-license@3.7.1(picomatch@4.0.7)(rollup@4.65.1):
     dependencies:
       commenting: 1.1.0
-      fdir: 6.5.0(picomatch@4.0.4)
+      fdir: 6.5.0(picomatch@4.0.7)
       lodash: 4.17.21
       magic-string: 0.30.21
       moment: 2.30.1
@@ -18341,10 +18277,8 @@ snapshots:
 
   tinyglobby@0.2.17:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
-
-  tinypool@2.1.0: {}
+      fdir: 6.5.0(picomatch@4.0.7)
+      picomatch: 4.0.7
 
   tinypool@2.1.2: {}
 
@@ -18590,7 +18524,7 @@ snapshots:
   unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.3.3(@types/node@24.19.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.44.1)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.15)(rollup@4.65.1):
     dependencies:
       '@jridgewell/remapping': 2.3.5
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       webpack-virtual-modules: 0.6.2
     optionalDependencies:
       esbuild: 0.28.1
@@ -18791,7 +18725,7 @@ snapshots:
       magic-string: 0.30.21
       obug: 2.1.1
       pathe: 2.0.3
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       std-env: 4.0.0
       tinybench: 2.9.0
       tinyexec: 1.0.4
@@ -18822,7 +18756,7 @@ snapshots:
       magic-string: 0.30.21
       obug: 2.1.1
       pathe: 2.0.3
-      picomatch: 4.0.4
+      picomatch: 4.0.7
       std-env: 4.0.0
       tinybench: 2.9.0
       tinyexec: 1.0.4
