@@ -17,6 +17,10 @@ import {
 } from "./harness/scenarios";
 import { expect, test } from "./harness/trizum.fixture";
 
+type PartyAuthProbeWindow = typeof window & {
+  __partyAuthRequests: { method: string; credentials: RequestCredentials }[];
+};
+
 function formatAmountText(amount: number) {
   return amount.toFixed(2).replace(".", ",");
 }
@@ -197,28 +201,48 @@ test.describe("Browser harness", () => {
       .toBe(false);
   });
 
-  test("initializes the auth session on party routes", async ({ context, harness, page }) => {
+  test("initializes the auth client on party routes", async ({ harness, page }) => {
     const partyPage = new PartyPage(page);
-    let sessionRequestCount = 0;
-    let fulfilledSessionRequestCount = 0;
-
-    await context.route("**/api/auth/get-session", async (route) => {
-      sessionRequestCount += 1;
+    let authEndpoint: string | undefined;
+    await page.route("**/api/auth/get-session", async (route) => {
+      authEndpoint = route.request().url();
       await route.fulfill({ json: null });
-      fulfilledSessionRequestCount += 1;
     });
-
     const seededParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
-    sessionRequestCount = 0;
-    fulfilledSessionRequestCount = 0;
+    if (!authEndpoint) throw new Error("Expected a session endpoint during fixture boot");
+
+    // Probe the client boundary: WebKit can skip HTTP interception after navigation.
+    await page.addInitScript((endpoint) => {
+      const requests: PartyAuthProbeWindow["__partyAuthRequests"] = [];
+      (window as PartyAuthProbeWindow).__partyAuthRequests = requests;
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (input, init) => {
+        let url: string;
+        try {
+          url = new URL(input instanceof Request ? input.url : String(input), location.href).href;
+        } catch {
+          return originalFetch(input, init);
+        }
+        if (url !== endpoint) return originalFetch(input, init);
+        const request = new Request(input, init);
+        const response = Response.json(null);
+        requests.push({ method: request.method, credentials: request.credentials });
+        return Promise.resolve(response);
+      };
+    }, authEndpoint);
 
     await harness.gotoParty(seededParty.partyId);
     await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
-    await expect.poll(() => sessionRequestCount).toBeGreaterThan(0);
-    await expect.poll(() => fulfilledSessionRequestCount).toBeGreaterThan(0);
+    const sessionRequests = () =>
+      page.evaluate(() => (window as PartyAuthProbeWindow).__partyAuthRequests);
+    await expect.poll(async () => (await sessionRequests()).length).toBeGreaterThan(0);
+    for (const request of await sessionRequests()) {
+      expect(request.method).toBe("GET");
+      expect(request.credentials).toBe("include");
+    }
   });
 
   test("keeps an open party bound to the list that admitted it", async ({
