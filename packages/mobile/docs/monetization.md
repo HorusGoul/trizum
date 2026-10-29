@@ -6,9 +6,18 @@
 
 The native iOS and Android apps use `@capacitor-community/admob` for UMP
 privacy choices, ATT, SDK initialization, and interstitial ads. The published
-8.0.0 package does not expose App Open ads, so each platform also contains a
+8.2.1 package does not expose App Open ads, so each platform also contains a
 small `NativeAppOpenAd` Capacitor bridge over the same Google Mobile Ads SDK.
 The browser app and installed PWA never initialize AdMob.
+
+The AdMob 8.2.1 package retains a local iOS consent patch from #423. Consent
+and privacy forms use the active Capacitor bridge view controller, rather than
+a root controller selected globally from application windows. The patch also
+lets UMP `loadAndPresentIfRequired` decide whether to present, without the
+upstream executor's separate form-availability guard. Upstream 8.2.1 fixes
+executor binding before initialization but does not replace these behaviors.
+Retain the patch until both behaviors are covered upstream and required-consent
+and privacy-options presentation have been verified on the native wrapper.
 
 The trizum app IDs and test/live ad-unit IDs are public configuration in
 `admob.config.json`. Builds always use trizum's app IDs so UMP resolves the
