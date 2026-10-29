@@ -124,12 +124,6 @@ const WSS_URL = getAutomergeWssUrl();
 const isOfflineOnly = getIsAutomergeOfflineOnly(initialUrl.href);
 const logger = getLogger("main");
 
-type RouterWithScrollReset = {
-  _scroll?: {
-    next: boolean;
-  };
-};
-
 type CalculatorSearchLocation = Pick<ParsedLocation<Record<string, unknown>>, "search">;
 
 function hasCalculatorSearch(location: CalculatorSearchLocation | undefined) {
@@ -268,10 +262,7 @@ router.subscribe("onResolved", () => trackPage(router.state.location.pathname));
 router.subscribe("onBeforeNavigate", (event) => {
   if (shouldPreserveCalculatorSearchScroll(event)) {
     // Browser back/forward does not carry the calculator's resetScroll: false option.
-    const scrollState = (router as RouterWithScrollReset)._scroll;
-    if (scrollState) {
-      scrollState.next = false;
-    }
+    router._scroll.n = false;
   }
 });
 

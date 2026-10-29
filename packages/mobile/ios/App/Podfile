@@ -1,4 +1,4 @@
-require_relative '../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios/scripts/pods_helpers'
+require_relative '../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios/scripts/pods_helpers'
 
 platform :ios, '16.4'
 use_frameworks!
@@ -9,19 +9,19 @@ use_frameworks!
 install! 'cocoapods', :disable_input_output_paths => true
 
 def capacitor_pods
-  pod 'Capacitor', :path => '../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../../../node_modules/.pnpm/@capacitor+ios@8.5.2_@capacitor+core@8.5.2/node_modules/@capacitor/ios'
-  pod 'CapacitorCommunityAdmob', :path => '../../../../node_modules/.pnpm/@capacitor-community+admob@8.0.0_patch_hash=8d5167c66809ee7b609bbae16b1f0bc214a925f1023f448269eeef06539a79d4/node_modules/@capacitor-community/admob'
-  pod 'CapacitorApp', :path => '../../../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.5.2/node_modules/@capacitor/app'
-  pod 'CapacitorCamera', :path => '../../../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.5.2/node_modules/@capacitor/camera'
-  pod 'CapacitorShare', :path => '../../../../node_modules/.pnpm/@capacitor+share@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/share'
-  pod 'CapacitorSplashScreen', :path => '../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/splash-screen'
-  pod 'CapawesomeCapacitorAppUpdate', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.0.3_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-app-update'
-  pod 'CapawesomeCapacitorAppleSignIn', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.4_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-apple-sign-in'
-  pod 'CapawesomeCapacitorGoogleSignIn', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.4_@capacitor+core@8.5.2/node_modules/@capawesome/capacitor-google-sign-in'
-  pod 'RevenuecatPurchasesCapacitor', :path => '../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.2.4_@capacitor+core@8.5.2/node_modules/@revenuecat/purchases-capacitor'
-  pod 'RevenuecatPurchasesCapacitorUi', :path => '../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.2.4_@capacitor+core@8.5.2_@revenuecat+purchases-c_92542bf63b788266b8aa9b5d964e034c/node_modules/@revenuecat/purchases-capacitor-ui'
-  pod 'CapacitorPluginSafeArea', :path => '../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.0_@capacitor+core@8.5.2/node_modules/capacitor-plugin-safe-area'
+  pod 'Capacitor', :path => '../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../../../node_modules/.pnpm/@capacitor+ios@8.5.3_@capacitor+core@8.5.3/node_modules/@capacitor/ios'
+  pod 'CapacitorCommunityAdmob', :path => '../../../../node_modules/.pnpm/@capacitor-community+admob@8.2.1_patch_hash=15953e1082871e5c959242e397a132e2d2a806c5145380e2a872b5fb98f4d93d/node_modules/@capacitor-community/admob'
+  pod 'CapacitorApp', :path => '../../../../node_modules/.pnpm/@capacitor+app@8.1.2_@capacitor+core@8.5.3/node_modules/@capacitor/app'
+  pod 'CapacitorCamera', :path => '../../../../node_modules/.pnpm/@capacitor+camera@8.2.6_@capacitor+core@8.5.3/node_modules/@capacitor/camera'
+  pod 'CapacitorShare', :path => '../../../../node_modules/.pnpm/@capacitor+share@8.0.3_@capacitor+core@8.5.3/node_modules/@capacitor/share'
+  pod 'CapacitorSplashScreen', :path => '../../../../node_modules/.pnpm/@capacitor+splash-screen@8.0.2_@capacitor+core@8.5.3/node_modules/@capacitor/splash-screen'
+  pod 'CapawesomeCapacitorAppUpdate', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-app-update@8.1.1_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-app-update'
+  pod 'CapawesomeCapacitorAppleSignIn', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-apple-sign-in@0.1.4_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-apple-sign-in'
+  pod 'CapawesomeCapacitorGoogleSignIn', :path => '../../../../node_modules/.pnpm/@capawesome+capacitor-google-sign-in@0.1.4_@capacitor+core@8.5.3/node_modules/@capawesome/capacitor-google-sign-in'
+  pod 'RevenuecatPurchasesCapacitor', :path => '../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor@13.7.6_@capacitor+core@8.5.3/node_modules/@revenuecat/purchases-capacitor'
+  pod 'RevenuecatPurchasesCapacitorUi', :path => '../../../../node_modules/.pnpm/@revenuecat+purchases-capacitor-ui@13.7.6_@capacitor+core@8.5.3_@revenuecat+purchases-c_38ffea0f6cc7f67989844c25b772113a/node_modules/@revenuecat/purchases-capacitor-ui'
+  pod 'CapacitorPluginSafeArea', :path => '../../../../node_modules/.pnpm/capacitor-plugin-safe-area@5.0.1_@capacitor+core@8.5.3/node_modules/capacitor-plugin-safe-area'
 end
 
 target 'App' do
