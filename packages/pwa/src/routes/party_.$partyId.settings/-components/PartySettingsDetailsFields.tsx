@@ -47,7 +47,10 @@ export function PartySettingsDetailsFields({ form }: { form: AppFormApi<PartyDet
               label={t`Symbol`}
               visuallyHideLabel
               value={field.state.value}
-              onChange={field.handleChange}
+              onChange={(value) => {
+                // Exiting picker options live in a portal outside the disabled fieldset.
+                if (!form.state.isSubmitting) field.handleChange(value);
+              }}
               errorMessage={field.state.meta.errors?.join(", ")}
               isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             />
