@@ -2,8 +2,8 @@ import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
-import { Suspense, useId } from "react";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { Suspense, useEffect, useId, useRef } from "react";
 import { toast } from "sonner";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
 import { useParty } from "#src/hooks/useParty.js";
@@ -19,12 +19,16 @@ export const Route = createFileRoute("/party_/$partyId/settings/details")({
 
 function PartyDetailsSettings() {
   const { partyId } = Route.useParams();
+  const router = useRouter();
   const { party, updateDetails } = useParty(partyId);
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",
     params: { partyId },
   });
   const formId = useId();
+  // Finish persistence after departure, but discard this form's completion UI.
+  const cancelSaveCompletion = useRef<(() => void) | undefined>(undefined);
+  useEffect(() => () => cancelSaveCompletion.current?.(), []);
 
   const form = useForm({
     defaultValues: {
@@ -32,9 +36,31 @@ function PartyDetailsSettings() {
       symbol: party.symbol || DEFAULT_PARTY_SYMBOL,
       description: party.description,
     } satisfies PartyDetailsFormValues,
-    onSubmit: ({ value }) => {
-      updateDetails(value);
+    onSubmit: async ({ value }) => {
+      let canCompleteHere = true;
+      const unsubscribe = router.history.subscribe(() => {
+        canCompleteHere = false;
+      });
+      const cancelCompletion = () => {
+        canCompleteHere = false;
+        unsubscribe();
+      };
+      cancelSaveCompletion.current = cancelCompletion;
+      let didSave = false;
+      try {
+        await updateDetails(value);
+        didSave = true;
+      } catch {
+        if (canCompleteHere) toast.error(t`Could not save party details. Please try again.`);
+      }
+      const shouldCompleteHere = canCompleteHere;
+      cancelCompletion();
+      if (cancelSaveCompletion.current === cancelCompletion) {
+        cancelSaveCompletion.current = undefined;
+      }
+      if (!didSave) return;
       trackEvent("party_details_updated");
+      if (!shouldCompleteHere) return;
       form.reset(value);
       toast.success(t`Party details saved!`);
       returnToSettings();
@@ -54,14 +80,14 @@ function PartyDetailsSettings() {
             selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}
           >
             {([canSubmit, isSubmitting, isDirty]) =>
-              canSubmit && isDirty ? (
+              isSubmitting || (canSubmit && isDirty) ? (
                 <Suspense fallback={null}>
                   <IconButton
                     icon="lucide.check"
                     aria-label={isSubmitting ? t`Submitting...` : t`Save`}
                     type="submit"
                     form={formId}
-                    isDisabled={isSubmitting}
+                    isPending={isSubmitting}
                   />
                 </Suspense>
               ) : null
@@ -78,7 +104,13 @@ function PartyDetailsSettings() {
         }}
         className="container mt-4 flex flex-col gap-6 px-4"
       >
-        <PartySettingsDetailsFields form={form} />
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isSubmitting) => (
+            <fieldset disabled={isSubmitting} className="contents">
+              <PartySettingsDetailsFields form={form} />
+            </fieldset>
+          )}
+        </form.Subscribe>
       </form>
     </div>
   );
