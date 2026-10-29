@@ -9,80 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RedeemRouteImport } from './routes/redeem'
-import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
-import { Route as JoinRouteImport } from './routes/join'
-import { Route as ArchivedRouteImport } from './routes/archived'
-import { Route as TermsRouteRouteImport } from './routes/terms/route'
-import { Route as SupportRouteRouteImport } from './routes/support/route'
-import { Route as NewRouteRouteImport } from './routes/new/route'
-import { Route as AboutRouteRouteImport } from './routes/about/route'
 import { Route as HomeRouteRouteImport } from './routes/_home/route'
+import { Route as AboutRouteRouteImport } from './routes/about/route'
+import { Route as ArchivedRouteImport } from './routes/archived'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as NewRouteRouteImport } from './routes/new/route'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as RedeemRouteImport } from './routes/redeem'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SupportRouteRouteImport } from './routes/support/route'
+import { Route as TermsRouteRouteImport } from './routes/terms/route'
 import { Route as HomeIndexRouteImport } from './routes/_home/index'
 import { Route as AboutThirdPartyLicensesRouteImport } from './routes/about_.third-party-licenses'
-import { Route as PartyPartyIdRouteRouteImport } from './routes/party.$partyId/route'
 import { Route as MigrateTricountRouteRouteImport } from './routes/migrate_.tricount/route'
-import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
-import { Route as PartyPartyIdStatsRouteImport } from './routes/party_.$partyId.stats'
-import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
-import { Route as PartyPartyIdAddRouteImport } from './routes/party_.$partyId.add'
+import { Route as PartyPartyIdRouteRouteImport } from './routes/party.$partyId/route'
 import { Route as HomeSettingsCloudSyncRouteImport } from './routes/_home/settings_.cloud-sync'
-import { Route as PartyPartyIdTransferDebtRouteRouteImport } from './routes/party_.$partyId.transfer-debt/route'
-import { Route as PartyPartyIdSettingsRouteRouteImport } from './routes/party_.$partyId.settings/route'
+import { Route as PartyPartyIdAddRouteImport } from './routes/party_.$partyId.add'
 import { Route as PartyPartyIdPayRouteRouteImport } from './routes/party_.$partyId.pay/route'
-import { Route as PartyPartyIdSettingsIndexRouteImport } from './routes/party_.$partyId.settings/index'
-import { Route as PartyPartyIdSettingsParticipantsRouteImport } from './routes/party_.$partyId.settings/participants'
-import { Route as PartyPartyIdSettingsExpenseTemplatesRouteImport } from './routes/party_.$partyId.settings/expense-templates'
-import { Route as PartyPartyIdSettingsDetailsRouteImport } from './routes/party_.$partyId.settings/details'
+import { Route as PartyPartyIdSettingsRouteRouteImport } from './routes/party_.$partyId.settings/route'
+import { Route as PartyPartyIdShareRouteImport } from './routes/party_.$partyId.share'
+import { Route as PartyPartyIdStatsRouteImport } from './routes/party_.$partyId.stats'
+import { Route as PartyPartyIdTransferDebtRouteRouteImport } from './routes/party_.$partyId.transfer-debt/route'
+import { Route as PartyPartyIdWhoRouteImport } from './routes/party_.$partyId.who'
 import { Route as PartyPartyIdExpenseExpenseIdRouteRouteImport } from './routes/party_.$partyId.expense.$expenseId/route'
-import { Route as PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport } from './routes/party_.$partyId.settings/expense-templates_.$templateId'
+import { Route as PartyPartyIdSettingsIndexRouteImport } from './routes/party_.$partyId.settings/index'
+import { Route as PartyPartyIdSettingsDetailsRouteImport } from './routes/party_.$partyId.settings/details'
+import { Route as PartyPartyIdSettingsExpenseTemplatesRouteImport } from './routes/party_.$partyId.settings/expense-templates'
+import { Route as PartyPartyIdSettingsParticipantsRouteImport } from './routes/party_.$partyId.settings/participants'
 import { Route as PartyPartyIdExpenseExpenseIdEditRouteRouteImport } from './routes/party_.$partyId.expense.$expenseId_.edit/route'
+import { Route as PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport } from './routes/party_.$partyId.settings/expense-templates_.$templateId'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RedeemRoute = RedeemRouteImport.update({
-  id: '/redeem',
-  path: '/redeem',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinRoute = JoinRouteImport.update({
-  id: '/join',
-  path: '/join',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArchivedRoute = ArchivedRouteImport.update({
-  id: '/archived',
-  path: '/archived',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRouteRoute = TermsRouteRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SupportRouteRoute = SupportRouteRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NewRouteRoute = NewRouteRouteImport.update({
-  id: '/new',
-  path: '/new',
+const HomeRouteRoute = HomeRouteRouteImport.update({
+  id: '/_home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRouteRoute = AboutRouteRouteImport.update({
@@ -90,8 +49,49 @@ const AboutRouteRoute = AboutRouteRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeRouteRoute = HomeRouteRouteImport.update({
-  id: '/_home',
+const ArchivedRoute = ArchivedRouteImport.update({
+  id: '/archived',
+  path: '/archived',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewRouteRoute = NewRouteRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedeemRoute = RedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRouteRoute = SupportRouteRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRouteRoute = TermsRouteRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeIndexRoute = HomeIndexRouteImport.update({
@@ -104,34 +104,14 @@ const AboutThirdPartyLicensesRoute = AboutThirdPartyLicensesRouteImport.update({
   path: '/about/third-party-licenses',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PartyPartyIdRouteRoute = PartyPartyIdRouteRouteImport.update({
-  id: '/party/$partyId',
-  path: '/party/$partyId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MigrateTricountRouteRoute = MigrateTricountRouteRouteImport.update({
   id: '/migrate_/tricount',
   path: '/migrate/tricount',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PartyPartyIdWhoRoute = PartyPartyIdWhoRouteImport.update({
-  id: '/party_/$partyId/who',
-  path: '/party/$partyId/who',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartyPartyIdStatsRoute = PartyPartyIdStatsRouteImport.update({
-  id: '/party_/$partyId/stats',
-  path: '/party/$partyId/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartyPartyIdShareRoute = PartyPartyIdShareRouteImport.update({
-  id: '/party_/$partyId/share',
-  path: '/party/$partyId/share',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PartyPartyIdAddRoute = PartyPartyIdAddRouteImport.update({
-  id: '/party_/$partyId/add',
-  path: '/party/$partyId/add',
+const PartyPartyIdRouteRoute = PartyPartyIdRouteRouteImport.update({
+  id: '/party/$partyId',
+  path: '/party/$partyId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HomeSettingsCloudSyncRoute = HomeSettingsCloudSyncRouteImport.update({
@@ -139,39 +119,53 @@ const HomeSettingsCloudSyncRoute = HomeSettingsCloudSyncRouteImport.update({
   path: '/settings/cloud-sync',
   getParentRoute: () => HomeRouteRoute,
 } as any)
-const PartyPartyIdTransferDebtRouteRoute =
-  PartyPartyIdTransferDebtRouteRouteImport.update({
-    id: '/party_/$partyId/transfer-debt',
-    path: '/party/$partyId/transfer-debt',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const PartyPartyIdAddRoute = PartyPartyIdAddRouteImport.update({
+  id: '/party_/$partyId/add',
+  path: '/party/$partyId/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartyPartyIdPayRouteRoute = PartyPartyIdPayRouteRouteImport.update({
+  id: '/party_/$partyId/pay',
+  path: '/party/$partyId/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartyPartyIdSettingsRouteRoute =
   PartyPartyIdSettingsRouteRouteImport.update({
     id: '/party_/$partyId/settings',
     path: '/party/$partyId/settings',
     getParentRoute: () => rootRouteImport,
   } as any)
-const PartyPartyIdPayRouteRoute = PartyPartyIdPayRouteRouteImport.update({
-  id: '/party_/$partyId/pay',
-  path: '/party/$partyId/pay',
+const PartyPartyIdShareRoute = PartyPartyIdShareRouteImport.update({
+  id: '/party_/$partyId/share',
+  path: '/party/$partyId/share',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartyPartyIdStatsRoute = PartyPartyIdStatsRouteImport.update({
+  id: '/party_/$partyId/stats',
+  path: '/party/$partyId/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartyPartyIdTransferDebtRouteRoute =
+  PartyPartyIdTransferDebtRouteRouteImport.update({
+    id: '/party_/$partyId/transfer-debt',
+    path: '/party/$partyId/transfer-debt',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PartyPartyIdWhoRoute = PartyPartyIdWhoRouteImport.update({
+  id: '/party_/$partyId/who',
+  path: '/party/$partyId/who',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartyPartyIdExpenseExpenseIdRouteRoute =
+  PartyPartyIdExpenseExpenseIdRouteRouteImport.update({
+    id: '/party_/$partyId/expense/$expenseId',
+    path: '/party/$partyId/expense/$expenseId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PartyPartyIdSettingsIndexRoute =
   PartyPartyIdSettingsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => PartyPartyIdSettingsRouteRoute,
-  } as any)
-const PartyPartyIdSettingsParticipantsRoute =
-  PartyPartyIdSettingsParticipantsRouteImport.update({
-    id: '/participants',
-    path: '/participants',
-    getParentRoute: () => PartyPartyIdSettingsRouteRoute,
-  } as any)
-const PartyPartyIdSettingsExpenseTemplatesRoute =
-  PartyPartyIdSettingsExpenseTemplatesRouteImport.update({
-    id: '/expense-templates',
-    path: '/expense-templates',
     getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
 const PartyPartyIdSettingsDetailsRoute =
@@ -180,16 +174,16 @@ const PartyPartyIdSettingsDetailsRoute =
     path: '/details',
     getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
-const PartyPartyIdExpenseExpenseIdRouteRoute =
-  PartyPartyIdExpenseExpenseIdRouteRouteImport.update({
-    id: '/party_/$partyId/expense/$expenseId',
-    path: '/party/$partyId/expense/$expenseId',
-    getParentRoute: () => rootRouteImport,
+const PartyPartyIdSettingsExpenseTemplatesRoute =
+  PartyPartyIdSettingsExpenseTemplatesRouteImport.update({
+    id: '/expense-templates',
+    path: '/expense-templates',
+    getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
-const PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute =
-  PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport.update({
-    id: '/expense-templates_/$templateId',
-    path: '/expense-templates/$templateId',
+const PartyPartyIdSettingsParticipantsRoute =
+  PartyPartyIdSettingsParticipantsRouteImport.update({
+    id: '/participants',
+    path: '/participants',
     getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
 const PartyPartyIdExpenseExpenseIdEditRouteRoute =
@@ -197,6 +191,12 @@ const PartyPartyIdExpenseExpenseIdEditRouteRoute =
     id: '/party_/$partyId/expense/$expenseId_/edit',
     path: '/party/$partyId/expense/$expenseId/edit',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const PartyPartyIdSettingsExpenseTemplatesTemplateIdRoute =
+  PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport.update({
+    id: '/expense-templates_/$templateId',
+    path: '/expense-templates/$templateId',
+    getParentRoute: () => PartyPartyIdSettingsRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -417,67 +417,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/redeem': {
-      id: '/redeem'
-      path: '/redeem'
-      fullPath: '/redeem'
-      preLoaderRoute: typeof RedeemRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy-policy': {
-      id: '/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof PrivacyPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join': {
-      id: '/join'
-      path: '/join'
-      fullPath: '/join'
-      preLoaderRoute: typeof JoinRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/archived': {
-      id: '/archived'
-      path: '/archived'
-      fullPath: '/archived'
-      preLoaderRoute: typeof ArchivedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/support': {
-      id: '/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof SupportRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/new': {
-      id: '/new'
-      path: '/new'
-      fullPath: '/new'
-      preLoaderRoute: typeof NewRouteRouteImport
+    '/_home': {
+      id: '/_home'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof HomeRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -487,11 +431,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_home': {
-      id: '/_home'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof HomeRouteRouteImport
+    '/archived': {
+      id: '/archived'
+      path: '/archived'
+      fullPath: '/archived'
+      preLoaderRoute: typeof ArchivedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/new': {
+      id: '/new'
+      path: '/new'
+      fullPath: '/new'
+      preLoaderRoute: typeof NewRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redeem': {
+      id: '/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof RedeemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_home/': {
@@ -508,13 +508,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutThirdPartyLicensesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/party/$partyId': {
-      id: '/party/$partyId'
-      path: '/party/$partyId'
-      fullPath: '/party/$partyId'
-      preLoaderRoute: typeof PartyPartyIdRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/migrate_/tricount': {
       id: '/migrate_/tricount'
       path: '/migrate/tricount'
@@ -522,32 +515,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MigrateTricountRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/party_/$partyId/who': {
-      id: '/party_/$partyId/who'
-      path: '/party/$partyId/who'
-      fullPath: '/party/$partyId/who'
-      preLoaderRoute: typeof PartyPartyIdWhoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/party_/$partyId/stats': {
-      id: '/party_/$partyId/stats'
-      path: '/party/$partyId/stats'
-      fullPath: '/party/$partyId/stats'
-      preLoaderRoute: typeof PartyPartyIdStatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/party_/$partyId/share': {
-      id: '/party_/$partyId/share'
-      path: '/party/$partyId/share'
-      fullPath: '/party/$partyId/share'
-      preLoaderRoute: typeof PartyPartyIdShareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/party_/$partyId/add': {
-      id: '/party_/$partyId/add'
-      path: '/party/$partyId/add'
-      fullPath: '/party/$partyId/add'
-      preLoaderRoute: typeof PartyPartyIdAddRouteImport
+    '/party/$partyId': {
+      id: '/party/$partyId'
+      path: '/party/$partyId'
+      fullPath: '/party/$partyId'
+      preLoaderRoute: typeof PartyPartyIdRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_home/settings_/cloud-sync': {
@@ -557,18 +529,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeSettingsCloudSyncRouteImport
       parentRoute: typeof HomeRouteRoute
     }
-    '/party_/$partyId/transfer-debt': {
-      id: '/party_/$partyId/transfer-debt'
-      path: '/party/$partyId/transfer-debt'
-      fullPath: '/party/$partyId/transfer-debt'
-      preLoaderRoute: typeof PartyPartyIdTransferDebtRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/party_/$partyId/settings': {
-      id: '/party_/$partyId/settings'
-      path: '/party/$partyId/settings'
-      fullPath: '/party/$partyId/settings'
-      preLoaderRoute: typeof PartyPartyIdSettingsRouteRouteImport
+    '/party_/$partyId/add': {
+      id: '/party_/$partyId/add'
+      path: '/party/$partyId/add'
+      fullPath: '/party/$partyId/add'
+      preLoaderRoute: typeof PartyPartyIdAddRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/party_/$partyId/pay': {
@@ -578,25 +543,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdPayRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/party_/$partyId/settings': {
+      id: '/party_/$partyId/settings'
+      path: '/party/$partyId/settings'
+      fullPath: '/party/$partyId/settings'
+      preLoaderRoute: typeof PartyPartyIdSettingsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/share': {
+      id: '/party_/$partyId/share'
+      path: '/party/$partyId/share'
+      fullPath: '/party/$partyId/share'
+      preLoaderRoute: typeof PartyPartyIdShareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/stats': {
+      id: '/party_/$partyId/stats'
+      path: '/party/$partyId/stats'
+      fullPath: '/party/$partyId/stats'
+      preLoaderRoute: typeof PartyPartyIdStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/transfer-debt': {
+      id: '/party_/$partyId/transfer-debt'
+      path: '/party/$partyId/transfer-debt'
+      fullPath: '/party/$partyId/transfer-debt'
+      preLoaderRoute: typeof PartyPartyIdTransferDebtRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/who': {
+      id: '/party_/$partyId/who'
+      path: '/party/$partyId/who'
+      fullPath: '/party/$partyId/who'
+      preLoaderRoute: typeof PartyPartyIdWhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/expense/$expenseId': {
+      id: '/party_/$partyId/expense/$expenseId'
+      path: '/party/$partyId/expense/$expenseId'
+      fullPath: '/party/$partyId/expense/$expenseId'
+      preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/party_/$partyId/settings/': {
       id: '/party_/$partyId/settings/'
       path: '/'
       fullPath: '/party/$partyId/settings/'
       preLoaderRoute: typeof PartyPartyIdSettingsIndexRouteImport
-      parentRoute: typeof PartyPartyIdSettingsRouteRoute
-    }
-    '/party_/$partyId/settings/participants': {
-      id: '/party_/$partyId/settings/participants'
-      path: '/participants'
-      fullPath: '/party/$partyId/settings/participants'
-      preLoaderRoute: typeof PartyPartyIdSettingsParticipantsRouteImport
-      parentRoute: typeof PartyPartyIdSettingsRouteRoute
-    }
-    '/party_/$partyId/settings/expense-templates': {
-      id: '/party_/$partyId/settings/expense-templates'
-      path: '/expense-templates'
-      fullPath: '/party/$partyId/settings/expense-templates'
-      preLoaderRoute: typeof PartyPartyIdSettingsExpenseTemplatesRouteImport
       parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
     '/party_/$partyId/settings/details': {
@@ -606,18 +599,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartyPartyIdSettingsDetailsRouteImport
       parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
-    '/party_/$partyId/expense/$expenseId': {
-      id: '/party_/$partyId/expense/$expenseId'
-      path: '/party/$partyId/expense/$expenseId'
-      fullPath: '/party/$partyId/expense/$expenseId'
-      preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdRouteRouteImport
-      parentRoute: typeof rootRouteImport
+    '/party_/$partyId/settings/expense-templates': {
+      id: '/party_/$partyId/settings/expense-templates'
+      path: '/expense-templates'
+      fullPath: '/party/$partyId/settings/expense-templates'
+      preLoaderRoute: typeof PartyPartyIdSettingsExpenseTemplatesRouteImport
+      parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
-    '/party_/$partyId/settings/expense-templates_/$templateId': {
-      id: '/party_/$partyId/settings/expense-templates_/$templateId'
-      path: '/expense-templates/$templateId'
-      fullPath: '/party/$partyId/settings/expense-templates/$templateId'
-      preLoaderRoute: typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport
+    '/party_/$partyId/settings/participants': {
+      id: '/party_/$partyId/settings/participants'
+      path: '/participants'
+      fullPath: '/party/$partyId/settings/participants'
+      preLoaderRoute: typeof PartyPartyIdSettingsParticipantsRouteImport
       parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
     '/party_/$partyId/expense/$expenseId_/edit': {
@@ -626,6 +619,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/party/$partyId/expense/$expenseId/edit'
       preLoaderRoute: typeof PartyPartyIdExpenseExpenseIdEditRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/party_/$partyId/settings/expense-templates_/$templateId': {
+      id: '/party_/$partyId/settings/expense-templates_/$templateId'
+      path: '/expense-templates/$templateId'
+      fullPath: '/party/$partyId/settings/expense-templates/$templateId'
+      preLoaderRoute: typeof PartyPartyIdSettingsExpenseTemplatesTemplateIdRouteImport
+      parentRoute: typeof PartyPartyIdSettingsRouteRoute
     }
   }
 }

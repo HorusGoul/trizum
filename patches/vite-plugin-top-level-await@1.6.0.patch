@@ -1,0 +1,37 @@
+diff --git a/dist/transform.js b/dist/transform.js
+index 18a8e9f5aeadb92aa6eac1697f56bc7a9ef1f4d0..557e1c12c872bcfe1ecf474546fe6b8b445ac2f8 100644
+--- a/dist/transform.js
++++ b/dist/transform.js
+@@ -165,6 +165,7 @@ function transformModule(code, ast, moduleName, bundleInfo, options) {
+         }
+     })));
+     const exportedNamesDeclaration = (0, make_node_1.makeVariablesDeclaration)(exportedNames.filter(name => !importedNames.has(name) && !exportFromedNames.has(name)));
++    const hoistedFunctions = [];
+     const warppedStatements = topLevelStatements.flatMap(stmt => {
+         if (stmt.type === "VariableDeclaration") {
+             const declaredNames = stmt.declarations.flatMap(decl => (0, resolve_pattern_1.resolvePattern)(decl.id));
+@@ -185,7 +186,15 @@ function transformModule(code, ast, moduleName, bundleInfo, options) {
+             const name = stmt.identifier.value;
+             if (!exportedNameSet.has(name))
+                 return stmt;
+-            return (0, make_node_1.makeAssignmentStatement)((0, make_node_1.makeIdentifier)(name), declarationToExpression(stmt));
++            const assignment = (0, make_node_1.makeAssignmentStatement)((0, make_node_1.makeIdentifier)(name), declarationToExpression(stmt));
++            // Function declarations are available before their source position.
++            // Preserve that hoisting when replacing exported declarations with assignments.
++            // Classes must retain their original initialization order.
++            if (stmt.type === "FunctionDeclaration") {
++                hoistedFunctions.push(assignment);
++                return [];
++            }
++            return assignment;
+         }
+         else {
+             return stmt;
+@@ -216,6 +225,7 @@ function transformModule(code, ast, moduleName, bundleInfo, options) {
+      * ]
+      * ```
+      */
++    warppedStatements.unshift(...hoistedFunctions);
+     transformByType(warppedStatements, "CallExpression", (call) => {
+         var _a;
+         if (call.callee.type === "Import") {
