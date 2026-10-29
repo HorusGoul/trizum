@@ -1094,6 +1094,10 @@ msgstr "Could not reset password"
 msgid "Could not save cloud settings"
 msgstr "Could not save cloud settings"
 
+#: src/routes/party_.$partyId.settings/details.tsx:54
+msgid "Could not save party details. Please try again."
+msgstr "Could not save party details. Please try again."
+
 #: src/components/CloudSyncSettingsView.tsx:595
 msgid "Could not send password email"
 msgstr "Could not send password email"
@@ -1276,7 +1280,7 @@ msgid "Deliver, personalize where permitted, measure, and limit the frequency of
 msgstr "Deliver, personalize where permitted, measure, and limit the frequency of mobile advertising, and detect advertising fraud and abuse"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:74
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:66
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:69
 msgid "Description"
 msgstr "Description"
 
@@ -2725,11 +2729,11 @@ msgstr "Party created"
 msgid "Party deleted"
 msgstr "Party deleted"
 
-#: src/routes/party_.$partyId.settings/details.tsx:47
+#: src/routes/party_.$partyId.settings/details.tsx:73
 msgid "Party details"
 msgstr "Party details"
 
-#: src/routes/party_.$partyId.settings/details.tsx:39
+#: src/routes/party_.$partyId.settings/details.tsx:65
 msgid "Party details saved!"
 msgstr "Party details saved!"
 
@@ -3211,7 +3215,7 @@ msgstr "Saudi Riyal"
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:126
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
-#: src/routes/party_.$partyId.settings/details.tsx:61
+#: src/routes/party_.$partyId.settings/details.tsx:87
 #: src/routes/party_.$partyId.settings/participants.tsx:92
 #: src/routes/party_.$partyId.who.tsx:113
 #: src/routes/reset-password.tsx:81
@@ -3609,7 +3613,7 @@ msgstr "Submit a Request"
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:126
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
-#: src/routes/party_.$partyId.settings/details.tsx:61
+#: src/routes/party_.$partyId.settings/details.tsx:87
 #: src/routes/party_.$partyId.settings/participants.tsx:92
 #: src/routes/party_.$partyId.who.tsx:113
 #: src/routes/reset-password.tsx:81
@@ -4359,7 +4363,7 @@ msgid "Welcome to trizum"
 msgstr "Welcome to trizum"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:75
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:67
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:70
 msgid "What is this party about?"
 msgstr "What is this party about?"
 

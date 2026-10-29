@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { Repo } from "@automerge/automerge-repo";
-import type { DocumentId } from "@automerge/automerge-repo/slim";
+import type { Chunk, DocumentId, StorageAdapterInterface } from "@automerge/automerge-repo/slim";
 import type { Expense } from "#src/models/expense.ts";
 import type { Party, PartyParticipant } from "#src/models/party.ts";
 import {
@@ -79,11 +79,11 @@ describe("getPartyHelpers", () => {
     expect(appWorkerMock.recalculateBalances).toHaveBeenLastCalledWith(partyHandle.documentId);
   });
 
-  test("updates party details without replacing participants", () => {
+  test("updates party details without replacing participants", async () => {
     const { helpers, partyHandle } = createPartyHelpers();
     const originalParticipants = structuredClone(partyHandle.doc().participants);
 
-    helpers.updateDetails({
+    await helpers.updateDetails({
       name: "Updated party",
       symbol: "🏕️",
       description: "Updated description",
@@ -95,6 +95,68 @@ describe("getPartyHelpers", () => {
       description: "Updated description",
       participants: originalParticipants,
     });
+  });
+
+  test("acknowledges updated details only after storage can reopen them", async () => {
+    const chunks = new Map<string, Chunk>();
+    const commit = createDeferred<void>();
+    let holdWrites = false;
+    let saving = false;
+    const storage: StorageAdapterInterface = {
+      async load(key) {
+        return chunks.get(JSON.stringify(key))?.data;
+      },
+      async save(key, data) {
+        if (holdWrites && key[0] === partyHandle.documentId) {
+          saving = true;
+          await commit.promise;
+        }
+        chunks.set(JSON.stringify(key), { key, data });
+      },
+      async remove(key) {
+        chunks.delete(JSON.stringify(key));
+      },
+      async loadRange(prefix) {
+        return [...chunks.values()].filter(({ key }) =>
+          prefix.every((segment, index) => key[index] === segment),
+        );
+      },
+      async removeRange(prefix) {
+        for (const [id, { key }] of chunks) {
+          if (prefix.every((segment, index) => key[index] === segment)) chunks.delete(id);
+        }
+      },
+    };
+    const { helpers, partyHandle, repo } = createPartyHelpers(storage);
+    await repo.flush([partyHandle.documentId]);
+    holdWrites = true;
+    let acknowledged = false;
+    const save = Promise.resolve(
+      helpers.updateDetails({ name: "Durable party", symbol: "🏕️", description: "Saved details" }),
+    ).then(() => {
+      acknowledged = true;
+    });
+
+    try {
+      await expect.poll(() => saving).toBe(true);
+      expect(acknowledged).toBe(false);
+    } finally {
+      commit.resolve();
+      await save;
+      await repo.shutdown();
+    }
+
+    const reopened = new Repo({ storage, network: [] });
+    try {
+      const persisted = await reopened.find<Party>(partyHandle.documentId);
+      expect(persisted.doc()).toMatchObject({
+        name: "Durable party",
+        symbol: "🏕️",
+        description: "Saved details",
+      });
+    } finally {
+      await reopened.shutdown();
+    }
   });
 
   test("updates participants without replacing party details", () => {
@@ -228,9 +290,10 @@ describe("getPartyHelpers", () => {
   });
 });
 
-function createPartyHelpers() {
+function createPartyHelpers(storage?: StorageAdapterInterface) {
   const repo = new Repo({
     network: [],
+    storage,
   });
   const partyHandle = repo.create<Party>(createParty());
 
