@@ -126,13 +126,13 @@ catalog:
   lucide-static: 1.61.0
   mathjs: 15.2.0
   motion: 14.6.0
-  oxlint-plugin-react-doctor: 0.7.4
+  oxlint-plugin-react-doctor: 0.9.18
   playwright: 1.64.1
   qr-code-styling: 1.9.2
   react: 19.3.1
   react-aria: 3.50.0
   react-aria-components: 1.19.0
-  react-doctor: 0.7.4
+  react-doctor: 0.9.18
   react-dom: 19.3.1
   react-modal-sheet: 5.6.0
   react-window: 2.5.1

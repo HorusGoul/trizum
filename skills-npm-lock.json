@@ -1,9 +1,24 @@
 {
   "version": 3,
   "skills": {
+    "improve-react": {
+      "package": "react-doctor",
+      "version": "0.9.18",
+      "skillPath": "dist/skills/improve-react/SKILL.md"
+    },
+    "improve-threejs": {
+      "package": "react-doctor",
+      "version": "0.9.18",
+      "skillPath": "dist/skills/improve-threejs/SKILL.md"
+    },
+    "performance": {
+      "package": "react-doctor",
+      "version": "0.9.18",
+      "skillPath": "dist/skills/performance/SKILL.md"
+    },
     "react-doctor": {
       "package": "react-doctor",
-      "version": "0.7.4",
+      "version": "0.9.18",
       "skillPath": "dist/skills/react-doctor/SKILL.md"
     }
   }
