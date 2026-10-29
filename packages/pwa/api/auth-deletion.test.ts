@@ -9,20 +9,27 @@ import { createAuth } from "./auth";
 import type { ApiEnv } from "./env";
 import * as schema from "./db/schema";
 
-const state = vi.hoisted(() => ({ db: undefined as unknown }));
+const state = vi.hoisted(() => ({ db: undefined as unknown, sentEmail: "" }));
 vi.mock("./db/client", async (importOriginal) => ({
   ...(await importOriginal<typeof DbClient>()),
   getApiDb: () => state.db,
 }));
-vi.mock("cloudflare:email", () => ({ EmailMessage: class {} }));
+vi.mock("cloudflare:email", () => ({
+  EmailMessage: class {
+    constructor(_from: string, _to: string, raw: string) {
+      state.sentEmail = raw;
+    }
+  },
+}));
 
 let sqlite: DatabaseSync;
 const fetcher = vi.fn<typeof fetch>();
-const env = {
+const env: Partial<ApiEnv> = {
   BETTER_AUTH_SECRET: "test-account-deletion-secret-at-least-32-characters",
+  EMAIL: { send: async () => ({ messageId: "synthetic-message" }) } satisfies ApiEnv["EMAIL"],
   REVENUECAT_PROJECT_ID: "test-project",
   REVENUECAT_SECRET_API_KEY: "test-secret",
-} as ApiEnv;
+};
 
 function authRequest(
   body: Record<string, unknown> = {},
@@ -41,12 +48,15 @@ function authRequest(
 }
 
 async function handle(request = authRequest(), config = env) {
-  const auth = createAuth(config, { waitUntil: () => {} }, request);
+  const pending: Promise<unknown>[] = [];
+  const auth = createAuth(config as ApiEnv, { waitUntil: (task) => pending.push(task) }, request);
   // Better Auth disables origin checks in tests; exercise deployed protections.
   const context = await auth.$context;
   context.skipOriginCheck = false;
   context.skipCSRFCheck = false;
-  return auth.handler(request);
+  const response = await auth.handler(request);
+  await Promise.all(pending);
+  return response;
 }
 
 function count(table: string, userId: string) {
@@ -63,6 +73,7 @@ function expectAccount(userId: string, expected: number) {
 }
 
 beforeEach(() => {
+  state.sentEmail = "";
   sqlite = new DatabaseSync(":memory:");
   sqlite.exec("PRAGMA foreign_keys = ON");
   const migrations = new URL("../migrations/", import.meta.url);
@@ -219,4 +230,107 @@ describe("authenticated account deletion", () => {
       expectAccount("owner", 1);
     },
   );
+});
+
+describe("persisted authentication compatibility", () => {
+  const fixtureEmail = "upgrade-fixture@example.invalid";
+  const fixturePassword = "synthetic-upgrade-password-123";
+
+  function request(path: string, body?: Record<string, unknown>, token?: string) {
+    return new Request(`http://localhost/api/auth/${path}`, {
+      method: body ? "POST" : "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "http://localhost",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+  }
+
+  async function signUp() {
+    const response = await handle(
+      request("sign-up/email", {
+        email: fixtureEmail,
+        password: fixturePassword,
+        name: "Synthetic fixture",
+      }),
+    );
+    expect(response.status).toBe(200);
+    return response.json() as Promise<{ token: string; user: { id: string } }>;
+  }
+
+  it("reopens a password account and authenticates its bearer session", async () => {
+    const created = await signUp();
+    const response = await handle(
+      request("sign-in/email", {
+        email: fixtureEmail,
+        password: fixturePassword,
+      }),
+    );
+    expect(response.status).toBe(200);
+    const signedIn = (await response.json()) as { token: string; user: { id: string } };
+    expect(signedIn.user.id).toBe(created.user.id);
+    const session = await handle(request("get-session", undefined, signedIn.token));
+    expect(session.status).toBe(200);
+    expect(((await session.json()) as { user: { id: string } }).user.id).toBe(created.user.id);
+    const rejected = await handle(
+      request("sign-in/email", {
+        email: fixtureEmail,
+        password: "incorrect-synthetic-password",
+      }),
+    );
+    expect(rejected.status).toBe(401);
+  });
+
+  it("revokes unverified credentials and sessions after proving ownership with a magic link", async () => {
+    const created = await signUp();
+    const response = await handle(
+      request("sign-in/magic-link", {
+        email: fixtureEmail,
+        callbackURL: "http://localhost/",
+      }),
+    );
+    expect(response.status).toBe(200);
+    const link = state.sentEmail.match(/https?:\/\/[^\s<]+\/magic-link\/verify\?[^\s<]+/)?.[0];
+    expect(link).toBeDefined();
+    const verified = await handle(new Request(link!));
+    expect(verified.status).toBe(302);
+    expect(
+      sqlite.prepare("SELECT emailVerified FROM user WHERE id = ?").get(created.user.id)
+        ?.emailVerified,
+    ).toBe(1);
+    expect(
+      sqlite
+        .prepare(
+          "SELECT count(*) AS count FROM account WHERE userId = ? AND providerId = 'credential'",
+        )
+        .get(created.user.id)?.count,
+    ).toBe(0);
+    const oldSession = await handle(request("get-session", undefined, created.token));
+    expect(await oldSession.json()).toBeNull();
+    const resetRequest = await handle(
+      request("request-password-reset", {
+        email: fixtureEmail,
+        redirectTo: "http://localhost/reset-password",
+      }),
+    );
+    expect(resetRequest.status).toBe(200);
+    const resetToken = state.sentEmail.match(/\/reset-password\/([^?\s<]+)/)?.[1];
+    expect(resetToken).toBeDefined();
+    const reset = await handle(
+      request("reset-password", {
+        token: resetToken,
+        newPassword: fixturePassword,
+      }),
+    );
+    expect(reset.status).toBe(200);
+    const recovered = await handle(
+      request("sign-in/email", {
+        email: fixtureEmail,
+        password: fixturePassword,
+      }),
+    );
+    expect(recovered.status).toBe(200);
+  });
 });
