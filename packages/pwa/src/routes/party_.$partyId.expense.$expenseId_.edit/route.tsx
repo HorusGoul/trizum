@@ -120,6 +120,7 @@ function EditExpense() {
   const editorRef = useRef<ExpenseEditorRef>(null);
   const currentHashRef = useRef<string | null>(null);
   if (currentHashRef.current === null) {
+    // oxlint-disable-next-line react-doctor/no-ref-current-in-render -- Guarded deterministic initial dirty-state baseline; follow-up: https://github.com/HorusGoul/trizum/issues/508
     currentHashRef.current = getExpenseEditHash(expense);
   }
 
