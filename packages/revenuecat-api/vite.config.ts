@@ -6,8 +6,10 @@ export default defineConfig({
       build: {
         command: "NODE_ENV=production tsc -b tsconfig.json --force",
         dependsOn: ["generate"],
-        input: [{ auto: true }, "src/**", "!dist/**", "!**/*.tsbuildinfo"],
-        output: ["dist/**"],
+        cache: {
+          input: [{ auto: true }, "src/**", "!dist/**", "!**/*.tsbuildinfo"],
+          output: ["dist/**"],
+        },
       },
       check: {
         command: "vp check .",
@@ -15,8 +17,10 @@ export default defineConfig({
       },
       generate: {
         command: ["openapi-ts", "vp check --fix src/generated"],
-        input: [{ auto: true }, "!src/generated/**"],
-        output: ["src/generated/**"],
+        cache: {
+          input: [{ auto: true }, "!src/generated/**"],
+          output: ["src/generated/**"],
+        },
       },
       test: {
         command: "vp test .",

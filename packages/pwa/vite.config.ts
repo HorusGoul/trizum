@@ -102,19 +102,21 @@ export default defineConfig(({ mode }) => {
             "@trizum/tailwindcss-safe-area-capacitor#build",
             "codegen",
           ],
-          env: [
-            "SENTRY_AUTH_TOKEN",
-            "TRIZUM_LIVE_ADS",
-            "TRIZUM_REVENUECAT_TEST_STORE",
-            "VITE_APP_AD_TEST_MODE",
-            "VITE_APP_AUTH_URL",
-            "VITE_APP_ANALYTICS_URL",
-            "VITE_APP_DISABLE_ANALYTICS",
-            "VITE_APP_DISABLE_SENTRY",
-            "VITE_E2E_HARNESS",
-            "VITE_APP_ENABLE_ANALYTICS",
-          ],
-          output: ["dist/**"],
+          cache: {
+            env: [
+              "SENTRY_AUTH_TOKEN",
+              "TRIZUM_LIVE_ADS",
+              "TRIZUM_REVENUECAT_TEST_STORE",
+              "VITE_APP_AD_TEST_MODE",
+              "VITE_APP_AUTH_URL",
+              "VITE_APP_ANALYTICS_URL",
+              "VITE_APP_DISABLE_ANALYTICS",
+              "VITE_APP_DISABLE_SENTRY",
+              "VITE_E2E_HARNESS",
+              "VITE_APP_ENABLE_ANALYTICS",
+            ],
+            output: ["dist/**"],
+          },
         },
         check: {
           command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
@@ -151,8 +153,10 @@ export default defineConfig(({ mode }) => {
         "icons:generate": {
           command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
           dependsOn: ["@trizum/icon-sprite#build"],
-          input: [{ auto: true }, "!src/generated/**"],
-          output: ["src/generated/iconSprite.svg", "src/generated/iconSprite.gen.ts"],
+          cache: {
+            input: [{ auto: true }, "!src/generated/**"],
+            output: ["src/generated/iconSprite.svg", "src/generated/iconSprite.gen.ts"],
+          },
         },
         preview: {
           command: "vp preview",
@@ -200,8 +204,10 @@ export default defineConfig(({ mode }) => {
         "theme:generate": {
           command: "vp exec twdt accent 250 src/generated/tw-dynamic-themes.css",
           dependsOn: ["@trizum/tw-dynamic-themes#build"],
-          input: ["../tw-dynamic-themes/src/**"],
-          output: ["src/generated/tw-dynamic-themes.css"],
+          cache: {
+            input: ["../tw-dynamic-themes/src/**"],
+            output: ["src/generated/tw-dynamic-themes.css"],
+          },
         },
       },
     },

@@ -67,6 +67,10 @@ screenshots. The `E2E` job merges these into the `playwright-report` artifact
 on successful and failed runs and requires every shard to pass. Reports are
 retained for seven days.
 
+`pwa-offline.spec.ts` explicitly allows real service workers in Chromium to
+verify activation, cached offline reload, and deep navigation with a synthetic
+party. Other journeys keep service workers blocked for independent contexts.
+
 - `vp run --filter @trizum/pwa test:e2e:install` installs the local browser set.
 - `vp run --filter @trizum/pwa test:e2e:install:ci` installs the CI browser set
   with system dependencies and the smaller Chromium headless shell.

@@ -182,3 +182,5 @@ packages/server/build/
 
 # skills-npm generated agent skill symlinks
 **/skills/npm-*
+
+.vitest/
