@@ -140,6 +140,7 @@ function getCurrentWindowScrollPosition(): WindowScrollPosition | null {
 function getCalculatorLayout(
   fieldContainerRef: React.RefObject<HTMLDivElement | null>,
 ): CalculatorLayout {
+  // oxlint-disable-next-line react-doctor/no-hydration-branch-on-browser-global -- Client-only createRoot layout, without hydration; follow-up: https://github.com/HorusGoul/trizum/issues/508
   if (typeof window === "undefined") {
     return {
       isLargeScreen: false,
@@ -1055,6 +1056,7 @@ export function CalculatorToolbar({
     >
       {calculatorContent}
     </div>,
+    // oxlint-disable-next-line react-doctor/no-unguarded-browser-global-in-render-or-hook-init -- Client-only portal target; follow-up: https://github.com/HorusGoul/trizum/issues/508
     document.body,
   );
 }

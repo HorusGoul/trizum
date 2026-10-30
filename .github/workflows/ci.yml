@@ -219,13 +219,13 @@ jobs:
           curl --fail --silent --show-error --retry 30 --retry-all-errors --retry-delay 1 \
             --max-time 5 --retry-max-time 60 \
             http://127.0.0.1:3000/health --output /tmp/server-health.json
-          node --input-type=module -e '
+          docker exec -i trizum-server-smoke node --input-type=module -e '
             import assert from "node:assert/strict";
             import { readFileSync } from "node:fs";
-            const health = JSON.parse(readFileSync("/tmp/server-health.json", "utf8"));
+            const health = JSON.parse(readFileSync(0, "utf8"));
             assert.equal(health.http.ok, true);
             assert.equal(health.automerge.ok, true);
-          '
+          ' < /tmp/server-health.json
           docker exec trizum-server-smoke node -e 'require("@sentry/node-cpu-profiler")'
 
       - name: Show server logs and remove container
@@ -298,7 +298,7 @@ jobs:
           cache: true
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: "temurin"
           java-version: "21"
@@ -387,7 +387,7 @@ jobs:
             exit 1
           fi
 
-      - uses: EndBug/add-and-commit@v10
+      - uses: EndBug/add-and-commit@v11
         with:
           commit: --signoff
           add: --all

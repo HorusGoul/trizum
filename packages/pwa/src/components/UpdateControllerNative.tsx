@@ -43,6 +43,7 @@ export function UpdateControllerNative({ children }: { children: React.ReactNode
     void checkForNativeUpdate(setIsUpdateAvailable);
   }, []);
 
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Cleanup awaits and removes the promised Capacitor listener; follow-up: https://github.com/HorusGoul/trizum/issues/508
   useEffect(() => {
     void resumeNativeUpdateAndRefresh(setIsUpdateAvailable);
     const listener = App.addListener("appStateChange", ({ isActive }) => {

@@ -1,5 +1,5 @@
 diff --git a/ios/Sources/AdMobPlugin/AdMobPlugin.swift b/ios/Sources/AdMobPlugin/AdMobPlugin.swift
-index 6b200750b205b44e0d28b165d1ee647407690f49..fb475eb7371f89008f3b3c91391e7bceb0635bba 100644
+index 59bcbdee834b1f2eac10204bb32c22a83a8b6698..5e9fb864f303fa01826ec2f2830635659842da35 100644
 --- a/ios/Sources/AdMobPlugin/AdMobPlugin.swift
 +++ b/ios/Sources/AdMobPlugin/AdMobPlugin.swift
 @@ -1,6 +1,7 @@
@@ -10,7 +10,7 @@ index 6b200750b205b44e0d28b165d1ee647407690f49..fb475eb7371f89008f3b3c91391e7bce
  #if canImport(AppTrackingTransparency)
  import AppTrackingTransparency
  #endif
-@@ -231,14 +232,40 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
+@@ -258,14 +259,40 @@ public class AdMobPlugin: CAPPlugin, CAPBridgedPlugin {
      }
  
      @objc func showConsentForm(_ call: CAPPluginCall) {

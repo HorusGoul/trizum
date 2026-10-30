@@ -94,6 +94,7 @@ export function AdvertisingController({
   const entitlement = useAdEntitlement();
   const [state, setState] = useState<AdvertisingState>({ privacyOptionsRequired: false });
 
+  // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Cleanup removes the promised listener, frame and coordinator; follow-up: https://github.com/HorusGoul/trizum/issues/508
   useEffect(() => {
     const platform = Capacitor.getPlatform();
     if (!Capacitor.isNativePlatform() || (platform !== "android" && platform !== "ios")) {

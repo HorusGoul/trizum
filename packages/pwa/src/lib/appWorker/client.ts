@@ -1,3 +1,9 @@
+import type { Party } from "#src/models/party.ts";
+import {
+  balanceSyncTimeout,
+  createRecalculateBalancesRequest,
+  waitForDocumentHeads,
+} from "./balanceSync.ts";
 import type { Repo } from "@automerge/automerge-repo/slim";
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
 import { getLogger } from "#src/lib/log.ts";
@@ -19,7 +25,9 @@ interface AppWorkerClient {
   worker: Worker;
 }
 
-type AppWorkerClientApi = Omit<AppWorkerApi, "initialize">;
+interface AppWorkerClientApi {
+  recalculateBalances(partyId: Party["id"]): Promise<boolean>;
+}
 
 export const APP_WORKER_FULL_RESTART_REQUIRED_EVENT = "trizum:app-worker-full-restart-required";
 
@@ -32,25 +40,17 @@ let appWorkerClient: AppWorkerClient | null = null;
 let appWorkerOptions: InitializeAppWorkerOptions | null = null;
 let isFullAppRestartRequired = false;
 
-export const appWorker = new Proxy({} as AppWorkerClientApi, {
-  get(_target, property) {
-    if (typeof property !== "string" || property === "then") {
-      return undefined;
-    }
-
-    return (...args: unknown[]) => {
-      return callAppWorker(property, (api) => {
-        const method = api[property as keyof AppWorkerClientApi];
-
-        if (typeof method !== "function") {
-          throw new Error(`App worker method ${property} is not available`);
-        }
-
-        return (method as (...args: unknown[]) => Promise<unknown>).apply(api, args);
-      });
-    };
+export const appWorker: AppWorkerClientApi = {
+  async recalculateBalances(partyId) {
+    const { repo } = requireAppWorkerOptions();
+    const request = await createRecalculateBalancesRequest(repo, partyId);
+    return callAppWorker("recalculateBalances", async (api) => {
+      const documents = await api.recalculateBalances(request);
+      await waitForDocumentHeads(repo, documents, AbortSignal.timeout(balanceSyncTimeout));
+      return true;
+    });
   },
-});
+};
 
 export function initializeAppWorker(options: InitializeAppWorkerOptions) {
   appWorkerOptions = options;
