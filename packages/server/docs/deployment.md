@@ -4,6 +4,12 @@
 
 ## Deployment
 
+The server uses Node.js 26 in development, CI, and both Docker build and
+runtime stages. The root `.node-version` and `engines.node` declare workspace
+support; keep the Docker image tag and Node type catalog aligned with them.
+The container health assertions and native profiler check execute inside the
+image so they exercise the deployed runtime.
+
 Production deploys are managed by the repo `Release` GitHub Actions workflow.
 When Changesets publishes a non-prerelease `@trizum/server@...` GitHub release,
 the workflow deploys the tagged server revision to Fly.io. Backend preview

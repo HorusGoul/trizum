@@ -11,6 +11,12 @@ runtime and package-manager problems.
 - [`vite.config.ts`](../../vite.config.ts): Vite+ configuration and workspace tasks.
 - Each package's `package.json` and `vite.config.ts`: package commands.
 
+The workspace supports Node.js 26. Development and CI use `.node-version`;
+both server Docker stages use the matching Node 26 image tag. Keep the root
+`engines.node`, Node type catalog, runtime pin, and Docker tag coordinated.
+Native TypeScript scripts use Node's type stripping and must use erasable
+syntax. Node 26 removed `--experimental-transform-types`.
+
 Use pnpm through Vite+ (`vp`). Workspace commands are listed in the
 [root guide](../../AGENTS.md); use `vp run <task-or-script>` so workspace tasks
 and package scripts run their prerequisites. The workspace root rejects direct

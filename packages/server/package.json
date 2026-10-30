@@ -22,13 +22,13 @@
   "scripts": {
     "cleanup": "rm -rf dist",
     "dev": "vp run node --watch src/main.ts",
-    "start": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types --import ./src/instrument.ts src/main.ts",
-    "node": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types",
-    "db:drizzle": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs",
-    "db:generate": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs generate",
-    "db:migrate": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs migrate",
-    "db:studio": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs studio",
-    "db:push": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --experimental-transform-types node_modules/drizzle-kit/bin.cjs push",
+    "start": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node --import ./src/instrument.ts src/main.ts",
+    "node": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node",
+    "db:drizzle": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node node_modules/drizzle-kit/bin.cjs",
+    "db:generate": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node node_modules/drizzle-kit/bin.cjs generate",
+    "db:migrate": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node node_modules/drizzle-kit/bin.cjs migrate",
+    "db:studio": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node node_modules/drizzle-kit/bin.cjs studio",
+    "db:push": "NODE_OPTIONS=--disable-warning=ExperimentalWarning node node_modules/drizzle-kit/bin.cjs push",
     "deploy": "./deploy.sh"
   },
   "dependencies": {
