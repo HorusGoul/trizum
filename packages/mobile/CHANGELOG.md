@@ -1,5 +1,13 @@
 # @trizum/mobile
 
+## 1.13.2
+
+### Patch Changes
+
+- [#385](https://github.com/HorusGoul/trizum/pull/385) [`3ae52b4`](https://github.com/HorusGoul/trizum/commit/3ae52b4cfd60967209754c0a2bd3c585c3d56fe9) Thanks [@renovate](https://github.com/apps/renovate)! - Preserve presentation of iOS consent and privacy forms from the active Capacitor bridge when upgrading AdMob.
+- Updated dependencies [[`4fd77e7`](https://github.com/HorusGoul/trizum/commit/4fd77e733428dc642d041bc8274dd4e9aca688da), [`cfbaff8`](https://github.com/HorusGoul/trizum/commit/cfbaff8629602957fe931571532edeb0fcb357f9), [`7a7c833`](https://github.com/HorusGoul/trizum/commit/7a7c833b576423da23987736fd5c815fee5a7000), [`6dff5d9`](https://github.com/HorusGoul/trizum/commit/6dff5d9792f7561bb983c8b045a75d85845dbb7d), [`babe0e5`](https://github.com/HorusGoul/trizum/commit/babe0e52ec8766add22dc1f12a8d83edd96c8327), [`3ae52b4`](https://github.com/HorusGoul/trizum/commit/3ae52b4cfd60967209754c0a2bd3c585c3d56fe9), [`39805ae`](https://github.com/HorusGoul/trizum/commit/39805ae25687acb96d534358c68c7ea1141699bc), [`86ecda7`](https://github.com/HorusGoul/trizum/commit/86ecda73713a3d5a7e4860f9d120ef35e90cf2ed), [`dc79d53`](https://github.com/HorusGoul/trizum/commit/dc79d5340e978d569b60ce136378490e33f80012)]:
+  - @trizum/pwa@1.13.2
+
 ## 1.13.1
 
 ### Patch Changes

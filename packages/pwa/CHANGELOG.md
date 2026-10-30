@@ -1,5 +1,30 @@
 # @trizum/pwa
 
+## 1.13.2
+
+### Patch Changes
+
+- [#518](https://github.com/HorusGoul/trizum/pull/518) [`4fd77e7`](https://github.com/HorusGoul/trizum/commit/4fd77e733428dc642d041bc8274dd4e9aca688da) Thanks [@renovate](https://github.com/apps/renovate)! - Refresh emoji data and localized picker search while preserving support for previously saved party symbols.
+
+- [#532](https://github.com/HorusGoul/trizum/pull/532) [`cfbaff8`](https://github.com/HorusGoul/trizum/commit/cfbaff8629602957fe931571532edeb0fcb357f9) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use the registered Apple OAuth callback URL for Android sign-in instead of the post-login settings route.
+
+- [#522](https://github.com/HorusGoul/trizum/pull/522) [`7a7c833`](https://github.com/HorusGoul/trizum/commit/7a7c833b576423da23987736fd5c815fee5a7000) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Wait for expense edits to reach the calculation worker before calculating balances, and for the resulting balances to synchronize back before reporting completion.
+
+- [#535](https://github.com/HorusGoul/trizum/pull/535) [`6dff5d9`](https://github.com/HorusGoul/trizum/commit/6dff5d9792f7561bb983c8b045a75d85845dbb7d) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Wait for party details to persist locally before confirming a save, so an immediate reload keeps the changes.
+
+  Keep the user's chosen destination when a pending save finishes after they navigate away.
+
+- [#538](https://github.com/HorusGoul/trizum/pull/538) [`babe0e5`](https://github.com/HorusGoul/trizum/commit/babe0e52ec8766add22dc1f12a8d83edd96c8327) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Upgrade Vite+, the PWA plugin, and asset generation together while preserving
+  service-worker offline reloads and native wrapper asset delivery.
+
+- [#385](https://github.com/HorusGoul/trizum/pull/385) [`3ae52b4`](https://github.com/HorusGoul/trizum/commit/3ae52b4cfd60967209754c0a2bd3c585c3d56fe9) Thanks [@renovate](https://github.com/apps/renovate)! - Preserve calculator scroll behavior with the updated router and prevent production startup failures when building profiling helpers.
+
+- [#407](https://github.com/HorusGoul/trizum/pull/407) [`39805ae`](https://github.com/HorusGoul/trizum/commit/39805ae25687acb96d534358c68c7ea1141699bc) Thanks [@renovate](https://github.com/apps/renovate)! - Keep long native sign-in error messages inside the authentication alert.
+
+- [#399](https://github.com/HorusGoul/trizum/pull/399) [`86ecda7`](https://github.com/HorusGoul/trizum/commit/86ecda73713a3d5a7e4860f9d120ef35e90cf2ed) Thanks [@renovate](https://github.com/apps/renovate)! - Remove the expense editor window-focus listener when its presence controller unmounts, preventing stale presence updates after leaving the editor.
+
+- [#482](https://github.com/HorusGoul/trizum/pull/482) [`dc79d53`](https://github.com/HorusGoul/trizum/commit/dc79d5340e978d569b60ce136378490e33f80012) Thanks [@renovate](https://github.com/apps/renovate)! - Update the motion engine used by calculator sheets, tabs, galleries, and interface transitions while preserving their existing interactions.
+
 ## 1.13.1
 
 ### Patch Changes
