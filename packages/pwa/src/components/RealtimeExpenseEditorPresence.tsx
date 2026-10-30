@@ -282,6 +282,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
       window.removeEventListener("focusin", onFocusIn, { capture: true });
       document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("blur", onWindowBlur);
+      window.removeEventListener("focus", onWindowFocus);
       clearInterval(interval);
     };
   }, [expenseId, handle, participant.id]);

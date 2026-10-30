@@ -279,7 +279,7 @@ msgstr "Sin anuncios para ti"
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:1563
+#: src/components/CalculatorToolbar.tsx:1565
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:242
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:251
 msgid "Add"
@@ -494,11 +494,11 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/components/CalculatorToolbar.tsx:1187
+#: src/components/CalculatorToolbar.tsx:1189
 msgid "Attachment preview"
 msgstr "Vista previa del adjunto"
 
-#: src/components/CalculatorToolbar.tsx:1156
+#: src/components/CalculatorToolbar.tsx:1158
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Adjuntos"
@@ -555,7 +555,7 @@ msgstr "Volver a configuración"
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
-#: src/components/CalculatorToolbar.tsx:1588
+#: src/components/CalculatorToolbar.tsx:1590
 msgid "Backspace"
 msgstr "Retroceso"
 
@@ -673,16 +673,16 @@ msgstr "información sobre la responsabilidad de datos empresariales"
 msgid "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 msgstr "Al acceder al Servicio o utilizarlo, aceptas estos Términos y nuestra <0>Política de privacidad</0>. Si no estás de acuerdo, no utilices el Servicio."
 
-#: src/components/CalculatorToolbar.tsx:1596
+#: src/components/CalculatorToolbar.tsx:1598
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:1027
-#: src/components/CalculatorToolbar.tsx:1046
+#: src/components/CalculatorToolbar.tsx:1028
+#: src/components/CalculatorToolbar.tsx:1047
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1428
+#: src/components/CalculatorToolbar.tsx:1430
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
@@ -808,7 +808,7 @@ msgstr "Elige la moneda para los gastos de este grupo"
 msgid "Choose who receives it"
 msgstr "Elige quién la recibe"
 
-#: src/components/CalculatorToolbar.tsx:1479
+#: src/components/CalculatorToolbar.tsx:1481
 msgid "Clear all"
 msgstr "Borrar todo"
 
@@ -825,7 +825,7 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:1175
+#: src/components/CalculatorToolbar.tsx:1177
 msgid "Close attachment preview"
 msgstr "Cerrar vista previa del adjunto"
 
@@ -833,7 +833,7 @@ msgstr "Cerrar vista previa del adjunto"
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1495
+#: src/components/CalculatorToolbar.tsx:1497
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
 
@@ -1070,6 +1070,10 @@ msgstr "No se pudo restablecer la contraseña"
 msgid "Could not save cloud settings"
 msgstr "No se pudo guardar la configuración en la nube"
 
+#: src/routes/party_.$partyId.settings/details.tsx:54
+msgid "Could not save party details. Please try again."
+msgstr "No se han podido guardar los detalles del Grupo. Inténtalo de nuevo."
+
 #: src/components/CloudSyncSettingsView.tsx:595
 msgid "Could not send password email"
 msgstr "No se pudo enviar el correo de contraseña"
@@ -1195,7 +1199,7 @@ msgstr "Transferencia de deuda a otro grupo"
 msgid "Debt transferred"
 msgstr "Deuda transferida"
 
-#: src/components/CalculatorToolbar.tsx:1580
+#: src/components/CalculatorToolbar.tsx:1582
 msgid "Decimal point"
 msgstr "Punto decimal"
 
@@ -1248,7 +1252,7 @@ msgid "Deliver, personalize where permitted, measure, and limit the frequency of
 msgstr "Ofrecer y, cuando esté permitido, personalizar y medir la publicidad móvil, limitar su frecuencia y detectar el fraude y el abuso publicitarios"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:74
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:66
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:69
 msgid "Description"
 msgstr "Descripción"
 
@@ -1272,7 +1276,7 @@ msgstr "¿Sabías que?"
 msgid "Dismiss Premium banner"
 msgstr "Ocultar el banner de Premium"
 
-#: src/components/CalculatorToolbar.tsx:1503
+#: src/components/CalculatorToolbar.tsx:1505
 msgid "Divide"
 msgstr "Dividir"
 
@@ -1300,7 +1304,7 @@ msgstr "Editar plantilla"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:232
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:233
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -1475,7 +1479,7 @@ msgstr "Título del gasto"
 msgid "Expense title is too long"
 msgstr "El título del gasto es demasiado largo"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:196
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:197
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -1530,7 +1534,7 @@ msgstr "Error al marcar el gasto como pagado"
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:201
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:202
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -2213,7 +2217,7 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:1523
+#: src/components/CalculatorToolbar.tsx:1525
 msgid "Multiply"
 msgstr "Multiplicar"
 
@@ -2485,7 +2489,7 @@ msgstr "Abrir GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
-#: src/components/CalculatorToolbar.tsx:1487
+#: src/components/CalculatorToolbar.tsx:1489
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
@@ -2661,11 +2665,11 @@ msgstr "Party Boost no disponible"
 msgid "Party created"
 msgstr "Grupo creado"
 
-#: src/routes/party_.$partyId.settings/details.tsx:47
+#: src/routes/party_.$partyId.settings/details.tsx:73
 msgid "Party details"
 msgstr "Detalles del grupo"
 
-#: src/routes/party_.$partyId.settings/details.tsx:39
+#: src/routes/party_.$partyId.settings/details.tsx:65
 msgid "Party details saved!"
 msgstr "¡Detalles del grupo guardados!"
 
@@ -3139,7 +3143,7 @@ msgstr "Riyal Saudí"
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:126
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
-#: src/routes/party_.$partyId.settings/details.tsx:61
+#: src/routes/party_.$partyId.settings/details.tsx:87
 #: src/routes/party_.$partyId.settings/participants.tsx:92
 #: src/routes/party_.$partyId.who.tsx:113
 #: src/routes/reset-password.tsx:81
@@ -3533,7 +3537,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:50
 #: src/routes/new/route.tsx:126
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
-#: src/routes/party_.$partyId.settings/details.tsx:61
+#: src/routes/party_.$partyId.settings/details.tsx:87
 #: src/routes/party_.$partyId.settings/participants.tsx:92
 #: src/routes/party_.$partyId.who.tsx:113
 #: src/routes/reset-password.tsx:81
@@ -3541,7 +3545,7 @@ msgstr "Enviar sugerencia"
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:1543
+#: src/components/CalculatorToolbar.tsx:1545
 msgid "Subtract"
 msgstr "Restar"
 
@@ -4047,7 +4051,7 @@ msgstr "Actualizar contraseña"
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:164
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:165
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
@@ -4258,7 +4262,7 @@ msgid "Welcome to trizum"
 msgstr "Bienvenid@ a trizum"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:75
-#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:67
+#: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:70
 msgid "What is this party about?"
 msgstr "¿De qué trata este grupo?"
 

@@ -6,7 +6,9 @@ export default defineConfig({
       build: {
         command: "NODE_ENV=production tsc -b tsconfig.json --force",
         dependsOn: ["@trizum/logging#build"],
-        output: ["dist/**"],
+        cache: {
+          output: ["dist/**"],
+        },
       },
       check: {
         command: "vp check .",
