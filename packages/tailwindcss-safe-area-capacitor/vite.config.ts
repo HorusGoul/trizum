@@ -5,7 +5,9 @@ export default defineConfig({
     tasks: {
       build: {
         command: "NODE_ENV=production tsc -b tsconfig.json --force",
-        output: ["dist/**"],
+        cache: {
+          output: ["dist/**"],
+        },
       },
       check: {
         command: "vp check .",

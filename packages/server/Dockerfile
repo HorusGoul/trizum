@@ -3,7 +3,7 @@
 # Keep the variant suffix in this ARG so Renovate can update the shared image tag.
 ARG NODE_IMAGE_TAG=24.22.1-slim
 ARG LITESTREAM_VERSION=0.5.2
-ARG VITE_PLUS_VERSION=0.2.4
+ARG VITE_PLUS_VERSION=1.4.0
 FROM node:${NODE_IMAGE_TAG} AS build
 ARG TARGETARCH
 ARG VITE_PLUS_VERSION
