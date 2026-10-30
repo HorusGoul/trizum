@@ -1,5 +1,13 @@
 # @trizum/server
 
+## 2.0.0
+
+### Major Changes
+
+- [#521](https://github.com/HorusGoul/trizum/pull/521) [`66cdc73`](https://github.com/HorusGoul/trizum/commit/66cdc73e45167f91b9d7b5a39c6af10d265cfbeb) Thanks [@renovate](https://github.com/apps/renovate)! - Require Node.js 26 for server development and deployment, aligning the workspace
+  engine, CI runtime, Node types, and Docker stages. Replace the removed TypeScript
+  transform flag with native type stripping and erasable server syntax.
+
 ## 1.0.4
 
 ### Patch Changes
