@@ -29,7 +29,8 @@
 
 ## 🚀 Getting Started
 
-Use pnpm through Vite+ (`vp`). Install Vite+ and the Node version recorded in
+Development, CI, and server containers use Node.js 26. Use pnpm through Vite+
+(`vp`). Install Vite+ and the Node version recorded in
 [`.node-version`](./.node-version), then run from the repository root:
 
 ```bash

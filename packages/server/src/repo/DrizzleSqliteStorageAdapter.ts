@@ -6,7 +6,11 @@ import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
-  constructor(private readonly db: Database) {}
+  private readonly db: Database;
+
+  constructor(db: Database) {
+    this.db = db;
+  }
 
   async load(key: StorageKey): Promise<Uint8Array | undefined> {
     const dbKey = storageKeyToDbKey(key);
