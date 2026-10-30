@@ -1005,7 +1005,7 @@ importers:
     devDependencies:
       '@hey-api/openapi-ts':
         specifier: 'catalog:'
-        version: 0.99.0(@typescript/typescript6@6.0.2)(magicast@0.5.3)
+        version: 0.99.0(@typescript/typescript6@6.0.2)(magicast@0.5.5)
       '@trizum/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -7572,9 +7572,6 @@ packages:
   magic-string@1.4.5:
     resolution: {integrity: sha512-oLLC2+YvQUfAa+vxoufE/yc1icb87M9iXIRqAoR/2EhE/8cb3SF/+Gi0c2By1B+5Vz2e2vQtUvHiu1+63Znh+w==}
 
-  magicast@0.5.3:
-    resolution: {integrity: sha512-pVKE4UdSQ7DvHzivsCIFx2BJn1mHG6KsyrFcaxFx6tONdneEuThrDx0Cj3AMg58KyN4pzYT+LHOotxDQDjNvkw==}
-
   magicast@0.5.5:
     resolution: {integrity: sha512-UicdXN8zQ3JHlxVq+28afMXPr1z7WNY6+7EJnzTdQWkTAlMLF5fNCCKxJHBQwGaNGR11581EiQmQzx73+MvszA==}
 
@@ -8598,10 +8595,6 @@ packages:
       '@types/react':
         optional: true
 
-  source-map-js@1.2.1:
-    resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
-    engines: {node: '>=0.10.0'}
-
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
     engines: {node: '>=0.10.0'}
@@ -8925,10 +8918,6 @@ packages:
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
-
-  tinypool@2.1.2:
-    resolution: {integrity: sha512-9YodfrxS9g9IbFr/KOjE5bAeJ0p61n3bW6mqvy0jtoeKd1kTW1Cxm0oulm6KX2lyM9Gl6WIe8nEbY7LWv5ZJww==}
-    engines: {node: ^20.0.0 || >=22.0.0}
 
   tinypool@2.2.0:
     resolution: {integrity: sha512-jBrmx4lYmaC9k/mgPbylxs7kBUxHtD8256up+HjLaDFfXScKJQyil+SWXSvhAtT7XHo+yTVlpB81PGmHP8oLSQ==}
@@ -11086,11 +11075,11 @@ snapshots:
 
   '@fontsource-variable/inter@5.3.0': {}
 
-  '@hey-api/codegen-core@0.9.1(magicast@0.5.3)':
+  '@hey-api/codegen-core@0.9.1(magicast@0.5.5)':
     dependencies:
       '@hey-api/types': 0.1.4
       ansi-colors: 4.1.3
-      c12: 3.3.4(magicast@0.5.3)
+      c12: 3.3.4(magicast@0.5.5)
       color-support: 1.1.3
     transitivePeerDependencies:
       - magicast
@@ -11101,11 +11090,11 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.2.0
 
-  '@hey-api/openapi-ts@0.99.0(@typescript/typescript6@6.0.2)(magicast@0.5.3)':
+  '@hey-api/openapi-ts@0.99.0(@typescript/typescript6@6.0.2)(magicast@0.5.5)':
     dependencies:
-      '@hey-api/codegen-core': 0.9.1(magicast@0.5.3)
+      '@hey-api/codegen-core': 0.9.1(magicast@0.5.5)
       '@hey-api/json-schema-ref-parser': 1.4.4
-      '@hey-api/shared': 0.5.0(magicast@0.5.3)
+      '@hey-api/shared': 0.5.0(magicast@0.5.5)
       '@hey-api/spec-types': 0.2.0
       '@hey-api/types': 0.1.4
       '@lukeed/ms': 2.0.2
@@ -11117,9 +11106,9 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@hey-api/shared@0.5.0(magicast@0.5.3)':
+  '@hey-api/shared@0.5.0(magicast@0.5.5)':
     dependencies:
-      '@hey-api/codegen-core': 0.9.1(magicast@0.5.3)
+      '@hey-api/codegen-core': 0.9.1(magicast@0.5.5)
       '@hey-api/json-schema-ref-parser': 1.4.4
       '@hey-api/spec-types': 0.2.0
       '@hey-api/types': 0.1.4
@@ -11708,7 +11697,7 @@ snapshots:
       ora: 9.4.1
       pseudolocale: 3.1.0
       source-map: 0.7.6
-      tinypool: 2.1.2
+      tinypool: 2.2.0
     optionalDependencies:
       esbuild: 0.28.2
       rolldown: 1.2.15
@@ -12779,7 +12768,7 @@ snapshots:
       jiti: 2.7.0
       lightningcss: 1.32.0
       magic-string: 0.30.21
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
       tailwindcss: 4.3.3
 
   '@tailwindcss/oxide-android-arm64@4.3.3':
@@ -14053,7 +14042,7 @@ snapshots:
     dependencies:
       run-applescript: 7.1.0
 
-  c12@3.3.4(magicast@0.5.3):
+  c12@3.3.4(magicast@0.5.5):
     dependencies:
       chokidar: 5.0.0
       confbox: 0.2.4
@@ -14068,7 +14057,7 @@ snapshots:
       pkg-types: 2.3.3
       rc9: 3.1.0
     optionalDependencies:
-      magicast: 0.5.3
+      magicast: 0.5.5
 
   cac@7.0.0: {}
 
@@ -14453,12 +14442,12 @@ snapshots:
   css-tree@2.2.1:
     dependencies:
       mdn-data: 2.0.28
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
 
   css-tree@3.2.1:
     dependencies:
       mdn-data: 2.27.1
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
 
   css-what@6.2.2: {}
 
@@ -15827,17 +15816,11 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  magicast@0.5.3:
-    dependencies:
-      '@babel/parser': 7.29.11
-      '@babel/types': 7.29.11
-      source-map-js: 1.2.1
-
   magicast@0.5.5:
     dependencies:
       '@babel/parser': 7.29.11
       '@babel/types': 7.29.11
-      source-map-js: 1.2.1
+      source-map-js: 1.2.2
 
   make-error@1.3.6: {}
 
@@ -16635,7 +16618,7 @@ snapshots:
       eslint-plugin-react-hooks: 7.1.1(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       is-unicode-supported: 2.1.0
       jiti: 2.7.0
-      magicast: 0.5.3
+      magicast: 0.5.5
       oxc-parser: 0.148.0
       oxc-resolver: 11.24.2
       oxlint: 1.81.0(oxlint-tsgolint@7.0.2004)(vite-plus@1.4.0(@opentelemetry/api@1.9.1)(@types/node@24.19.2)(@typescript/typescript6@6.0.2)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.3(@noble/hashes@2.2.0))(playwright@1.64.1)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))
@@ -17153,8 +17136,6 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
-  source-map-js@1.2.1: {}
-
   source-map-js@1.2.2: {}
 
   source-map-support@0.5.21:
@@ -17527,8 +17508,6 @@ snapshots:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.7)
       picomatch: 4.0.7
-
-  tinypool@2.1.2: {}
 
   tinypool@2.2.0: {}
 
