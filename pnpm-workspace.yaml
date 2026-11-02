@@ -72,12 +72,12 @@ catalog:
   "@lingui/core": 6.10.1
   "@lingui/format-po": 6.10.1
   "@lingui/react": 6.10.1
-  "@lingui/vite-plugin": 6.10.1
+  "@lingui/vite-plugin": 6.11.0
   "@logtape/logtape": 2.4.2
   "@logtape/sentry": 2.4.2
   "@openai/codex": 0.164.0
   "@playwright/test": 1.64.1
-  "@rolldown/plugin-babel": 0.2.4
+  "@rolldown/plugin-babel": 0.3.0
   "@sentry/cli": 3.8.2
   "@sentry/core": 10.76.2
   "@sentry/node": 10.76.2
