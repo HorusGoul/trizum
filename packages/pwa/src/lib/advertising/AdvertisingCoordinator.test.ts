@@ -97,6 +97,20 @@ function createHarness({
 }
 
 describe("AdvertisingCoordinator", () => {
+  it.each(["requestConsentInfo", "initialize", "prepareInterstitial", "loadAppOpen"] as const)(
+    "handles null rejections from %s with a sanitized diagnostic",
+    async (operation) => {
+      const harness = createHarness({ platform: "ios" });
+      vi.mocked(harness.sdk[operation]).mockRejectedValue(null);
+      await expect(harness.coordinator.setEntitlement("adSupported")).resolves.toBeUndefined();
+      await vi.waitFor(() =>
+        expect(harness.reportDiagnostic).toHaveBeenCalledWith(
+          expect.objectContaining({ platform: "ios", code: "unknown" }),
+        ),
+      );
+      await harness.coordinator.destroy();
+    },
+  );
   it.each(["requestConsentInfo", "initialize"] as const)(
     "skips ads when %s fails without rejecting the app's background setup",
     async (operation) => {

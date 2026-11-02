@@ -1,4 +1,6 @@
 import * as Sentry from "@sentry/react";
+import { getSentrySink } from "@logtape/sentry";
+import { configureTrizumLogging, getTrizumLogger } from "@trizum/logging";
 import { sentryDocumentIdRedaction } from "@trizum/logging/sentry";
 import { afterEach, expect, test, vi } from "vite-plus/test";
 import { setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
@@ -9,11 +11,37 @@ const partyUrl = `https://trizum.app/party/${documentId}`;
 type CapturedEnvelope = [header: unknown, items: [header: { type: string }, payload: unknown][]];
 
 afterEach(async () => {
+  configureTrizumLogging({ surface: "pwa", lowestLevel: null, reset: true });
   await Sentry.close();
   Sentry.getCurrentScope().clear();
   Sentry.getIsolationScope().clear();
   setTelemetryIdentity();
   vi.unstubAllGlobals();
+});
+
+test("captures the AdMob console message and diagnostic as its own Sentry event", async () => {
+  const envelopes = initializeRecordingClient();
+  configureTrizumLogging({
+    surface: "pwa",
+    reset: true,
+    surfaceSinks: ["sentry"],
+    extraSinks: { sentry: getSentrySink() },
+  });
+  getTrizumLogger("pwa", "components", "AdvertisingController").error("AdMob operation failed", {
+    platform: "ios",
+    stage: "consent",
+    code: "unknown",
+  });
+  await Sentry.flush(2000);
+  const events = envelopes
+    .flatMap(([, items]) => items)
+    .filter(([header]) => header.type === "event");
+  expect(events).toHaveLength(1);
+  expect(events[0][1]).toMatchObject({
+    level: "error",
+    logentry: { message: "AdMob operation failed" },
+    extra: { platform: "ios", stage: "consent", code: "unknown" },
+  });
 });
 
 function initializeRecordingClient() {

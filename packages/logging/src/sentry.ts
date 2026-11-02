@@ -1,10 +1,43 @@
-import type { Integration } from "@sentry/core";
+import { safeJoin, type Breadcrumb, type Integration } from "@sentry/core";
 
 import { redactValue } from "./redaction.js";
 
 function redactSentryPayload<T extends object>(payload: T): T {
   // Keep payload schemas and correlation fields while sanitizing strings.
   return redactValue(payload) as T;
+}
+
+function sanitizeBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
+  const sanitized = redactSentryPayload(breadcrumb);
+  const args: unknown = sanitized.data?.arguments;
+  if (sanitized.category !== "console" || !Array.isArray(args) || typeof args[0] !== "string") {
+    return sanitized;
+  }
+  // Browser-specific directives (such as %.2f) can consume arguments too.
+  // Preserve unfamiliar formats rather than mistake a diagnostic value for CSS.
+  if (/%(?![csdifoO])/.test(args[0].replace(/%%/g, ""))) return sanitized;
+
+  const remaining: unknown[] = [];
+  let argumentIndex = 1;
+  let removedStyle = false;
+  const message = args[0].replace(/%[%csdifoO]/g, (token: string) => {
+    if (token === "%%" || argumentIndex >= args.length) return token;
+    const argument = args[argumentIndex++];
+    if (token === "%c") {
+      removedStyle = true;
+      return "";
+    }
+    remaining.push(argument);
+    return token;
+  });
+  if (!removedStyle) return sanitized;
+
+  const cleanedArgs = [message, ...remaining, ...args.slice(argumentIndex)];
+  return {
+    ...sanitized,
+    message: safeJoin(cleanedArgs, " "),
+    data: { ...sanitized.data, arguments: cleanedArgs },
+  };
 }
 
 const logRedactionIntegration: Integration = {
@@ -24,7 +57,7 @@ const logRedactionIntegration: Integration = {
 
 /** Spread into Sentry.init(), retaining these integrations when adding others. */
 export const sentryDocumentIdRedaction = {
-  beforeBreadcrumb: redactSentryPayload,
+  beforeBreadcrumb: sanitizeBreadcrumb,
   beforeSend: redactSentryPayload,
   beforeSendSpan: redactSentryPayload,
   beforeSendTransaction: redactSentryPayload,
