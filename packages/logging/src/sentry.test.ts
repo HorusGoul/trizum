@@ -40,11 +40,21 @@ test("preserves non-style arguments and redacts them without mutating the input"
 });
 
 test.each([
+  {
+    category: "console",
+    message: "elapsed=%.2f %cfailed 1.234 color: red",
+    data: { arguments: ["elapsed=%.2f %cfailed", 1.234, "color: red"] },
+  },
+  {
+    category: "console",
+    message: "%cstart %.2f %cfailed color: gray 1.234 color: red",
+    data: { arguments: ["%cstart %.2f %cfailed", "color: gray", 1.234, "color: red"] },
+  },
   { category: "console", message: "literal %%c", data: { arguments: ["literal %%c", "text"] } },
   { category: "console", message: "missing %c", data: { arguments: ["missing %c"] } },
   { category: "console", message: "plain", data: { arguments: ["plain", { code: 7 }] } },
   { category: "console", message: "%c without arguments" },
   { category: "navigation", message: "%c route", data: { arguments: ["%c route", "color: red"] } },
-])("preserves breadcrumbs without console style arguments: $message", (breadcrumb) => {
+])("preserves breadcrumbs without safely removable styles: $message", (breadcrumb) => {
   expect(sentryDocumentIdRedaction.beforeBreadcrumb(breadcrumb)).toEqual(breadcrumb);
 });

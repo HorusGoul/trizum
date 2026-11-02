@@ -13,6 +13,9 @@ function sanitizeBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
   if (sanitized.category !== "console" || !Array.isArray(args) || typeof args[0] !== "string") {
     return sanitized;
   }
+  // Browser-specific directives (such as %.2f) can consume arguments too.
+  // Preserve unfamiliar formats rather than mistake a diagnostic value for CSS.
+  if (/%(?![csdifoO])/.test(args[0].replace(/%%/g, ""))) return sanitized;
 
   const remaining: unknown[] = [];
   let argumentIndex = 1;
