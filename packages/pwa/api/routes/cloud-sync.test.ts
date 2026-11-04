@@ -139,17 +139,16 @@ function documentId() {
 }
 
 function request(method: "GET" | "PUT", body?: string, contentType = "application/json") {
-  return cloudSyncRoute.fetch(
-    new Request("https://trizum.test/settings", {
-      method,
-      headers: { "Content-Type": contentType, Authorization: "Bearer test-token" },
-      ...(method === "PUT" ? { body } : {}),
-    }),
-    {} as ApiEnv,
-    {
-      waitUntil: vi.fn<ExecutionContext["waitUntil"]>(),
-      passThroughOnException: vi.fn<ExecutionContext["passThroughOnException"]>(),
-      props: {},
-    },
-  );
+  const init: RequestInit = {
+    method,
+    headers: { "Content-Type": contentType, Authorization: "Bearer test-token" },
+  };
+
+  if (method === "PUT") init.body = body;
+
+  return cloudSyncRoute.fetch(new Request("https://trizum.test/settings", init), {} as ApiEnv, {
+    waitUntil: vi.fn<ExecutionContext["waitUntil"]>(),
+    passThroughOnException: vi.fn<ExecutionContext["passThroughOnException"]>(),
+    props: {},
+  });
 }

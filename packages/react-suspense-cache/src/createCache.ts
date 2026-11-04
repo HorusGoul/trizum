@@ -50,8 +50,12 @@ export function createCache<Params extends Array<any>, Value>(
   const subscriberMap = new Map<string, Set<SubscriptionCallback<Value>>>();
 
   function debugLog(operation: string, properties: Record<string, unknown> = {}) {
+    const labels: Record<string, string> = {};
+
+    if (debugLabel) labels.cacheLabel = debugLabel;
+
     logger.debug("React suspense cache {operation}", {
-      ...(debugLabel ? { cacheLabel: debugLabel } : {}),
+      ...labels,
       operation,
       ...properties,
     });

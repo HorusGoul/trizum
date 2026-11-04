@@ -648,14 +648,9 @@ function partyBoostError<Status extends 400 | 403 | 409 | 503>(
   status: Status,
   transferableAt?: number,
 ) {
-  return c.json(
-    {
-      error: {
-        code,
-        message,
-        ...(transferableAt === undefined ? {} : { transferableAt }),
-      },
-    },
-    status,
-  );
+  const error = { code, message };
+
+  if (transferableAt === undefined) return c.json({ error }, status);
+
+  return c.json({ error: { ...error, transferableAt } }, status);
 }

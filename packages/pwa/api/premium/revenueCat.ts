@@ -32,10 +32,13 @@ export async function verifyRevenueCatPremium({
   }
 
   try {
-    const client = createRevenueCatApiClient({
-      ...(fetcher ? { fetcher } : {}),
+    const options: Parameters<typeof createRevenueCatApiClient>[0] = {
       secretApiKey: apiKey,
-    });
+    };
+
+    if (fetcher) options.fetcher = fetcher;
+
+    const client = createRevenueCatApiClient(options);
 
     const customer = {
       customerId: userId,

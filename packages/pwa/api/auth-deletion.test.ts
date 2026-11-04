@@ -253,15 +253,18 @@ describe("persisted authentication compatibility", () => {
   const fixturePassword = "synthetic-upgrade-password-123";
 
   function request(path: string, body?: Record<string, unknown>, token?: string) {
-    return new Request(`http://localhost/api/auth/${path}`, {
-      method: body ? "POST" : "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Origin: "http://localhost",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      ...(body ? { body: JSON.stringify(body) } : {}),
+    const headers = new Headers({
+      "Content-Type": "application/json",
+      Origin: "http://localhost",
     });
+
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
+    const init: RequestInit = { method: body ? "POST" : "GET", headers };
+
+    if (body) init.body = JSON.stringify(body);
+
+    return new Request(`http://localhost/api/auth/${path}`, init);
   }
 
   async function signUp() {

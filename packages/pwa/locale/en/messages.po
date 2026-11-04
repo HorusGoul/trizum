@@ -379,9 +379,9 @@ msgstr "All time"
 msgid "Already redeemed?"
 msgstr "Already redeemed?"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:349
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:353
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:364
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:357
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:368
 msgid "Always include everyone"
 msgstr "Always include everyone"
 
@@ -393,7 +393,7 @@ msgid "Always use default template"
 msgstr "Always use default template"
 
 #: src/components/ExpenseEditor.tsx:489
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:318
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:322
 msgid "Amount"
 msgstr "Amount"
 
@@ -1276,7 +1276,7 @@ msgid "Delete expense?"
 msgstr "Delete expense?"
 
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:38
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:392
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:396
 msgid "Delete template"
 msgstr "Delete template"
 
@@ -1479,7 +1479,7 @@ msgstr "Expense amounts don't match total. Please check your split configuration
 msgid "Expense checks"
 msgstr "Expense checks"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:291
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:295
 msgid "Expense defaults"
 msgstr "Expense defaults"
 
@@ -1495,11 +1495,11 @@ msgstr "Expense Split Mode"
 msgid "Expense template"
 msgstr "Expense template"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:187
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
 msgid "Expense template created"
 msgstr "Expense template created"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:234
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:238
 msgid "Expense template deleted"
 msgstr "Expense template deleted"
 
@@ -1507,7 +1507,7 @@ msgstr "Expense template deleted"
 msgid "Expense template options"
 msgstr "Expense template options"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:187
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:191
 msgid "Expense template saved"
 msgstr "Expense template saved"
 
@@ -1822,7 +1822,7 @@ msgstr "Hungarian Forint"
 msgid "Icelandic Króna"
 msgstr "Icelandic Króna"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:278
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:282
 msgid "Icon"
 msgstr "Icon"
 
@@ -2284,7 +2284,7 @@ msgstr "Myanma Kyat"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:24
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:260
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:264
 #: src/routes/party.$partyId/route.tsx:146
 msgid "Name"
 msgstr "Name"
@@ -2629,7 +2629,7 @@ msgstr "Paid at"
 
 #: src/components/ExpenseEditor.tsx:517
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:49
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:331
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:335
 msgid "Paid by"
 msgstr "Paid by"
 
@@ -3265,7 +3265,7 @@ msgstr "See spending totals and rankings"
 msgid "Select emoji"
 msgstr "Select emoji"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:359
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:363
 msgid "Select everyone now and automatically include new participants."
 msgstr "Select everyone now and automatically include new participants."
 
@@ -3720,7 +3720,7 @@ msgstr "Tanzanian Shilling"
 msgid "Tap to change"
 msgstr "Tap to change"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:250
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:254
 msgid "Template"
 msgstr "Template"
 
@@ -3728,7 +3728,7 @@ msgstr "Template"
 msgid "Template {number}"
 msgstr "Template {number}"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:283
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:287
 msgid "Template icon"
 msgstr "Template icon"
 
@@ -3927,7 +3927,7 @@ msgid "Timeframe"
 msgstr "Timeframe"
 
 #: src/components/ExpenseEditor.tsx:452
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:303
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Title"
 
@@ -3935,7 +3935,7 @@ msgstr "Title"
 msgid "Title is required"
 msgstr "Title is required"
 
-#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:297
+#: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:301
 msgid "Title is too long"
 msgstr "Title is too long"
 

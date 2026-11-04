@@ -71,31 +71,30 @@ if (process.argv.includes("--pwa-config")) {
 
 const oxlintConfigPath = path.join(reproductionDirectory, ".oxlintrc.json");
 
-writeFileSync(
-  oxlintConfigPath,
-  JSON.stringify(
+const oxlintConfig = {
+  jsPlugins: [
     {
-      jsPlugins: [
-        {
-          name: "react-doctor",
-          specifier: fileURLToPath(import.meta.resolve("oxlint-plugin-react-doctor")),
-        },
-      ],
-      rules: {
-        "react-doctor/effect-needs-cleanup": "error",
-        "react-doctor/no-ref-current-in-render": "error",
-        "react-doctor/no-hydration-branch-on-browser-global": "error",
-        "react-doctor/no-unguarded-browser-global-in-render-or-hook-init": "error",
-        ...(process.argv.includes("--pwa-config") ? reactDoctorConfig.rules : {}),
-      },
-      ...(process.argv.includes("--pwa-config")
-        ? { settings: { "react-doctor": reactDoctorSettings } }
-        : {}),
+      name: "react-doctor",
+      specifier: fileURLToPath(import.meta.resolve("oxlint-plugin-react-doctor")),
     },
-    null,
-    2,
-  ),
-);
+  ],
+  rules: {
+    "react-doctor/effect-needs-cleanup": "error",
+    "react-doctor/no-ref-current-in-render": "error",
+    "react-doctor/no-hydration-branch-on-browser-global": "error",
+    "react-doctor/no-unguarded-browser-global-in-render-or-hook-init": "error",
+  },
+};
+
+if (process.argv.includes("--pwa-config")) {
+  Object.assign(oxlintConfig.rules, reactDoctorConfig.rules);
+}
+
+const reproductionConfig = process.argv.includes("--pwa-config")
+  ? { ...oxlintConfig, settings: { "react-doctor": reactDoctorSettings } }
+  : oxlintConfig;
+
+writeFileSync(oxlintConfigPath, JSON.stringify(reproductionConfig, null, 2));
 
 const result = spawnSync(
   "vp",
