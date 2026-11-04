@@ -4,7 +4,7 @@ import type { AppleSignInPlugin } from "@capawesome/capacitor-apple-sign-in";
 const { initializeApple, appleSignIn, socialSignIn } = vi.hoisted(() => ({
   initializeApple: vi.fn<AppleSignInPlugin["initialize"]>(),
   appleSignIn: vi.fn<AppleSignInPlugin["signIn"]>(),
-  socialSignIn: vi.fn<(request: unknown) => Promise<unknown>>(),
+  socialSignIn: vi.fn<(request: unknown) => Promise<{ data: null; error: null }>>(),
 }));
 
 vi.mock("@capacitor/core", () => ({

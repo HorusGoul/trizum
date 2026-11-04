@@ -28,7 +28,7 @@ export function PullToRefresh({
   scrollElementRef,
 }: {
   children: ReactNode;
-  refreshAction: () => Promise<unknown>;
+  refreshAction: () => Promise<void>;
   scrollElementRef: RefObject<HTMLDivElement | null>;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);

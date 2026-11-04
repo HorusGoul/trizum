@@ -17,11 +17,24 @@ export function setTelemetryIdentity(source?: () => string | undefined) {
   Sentry.setUser(id ? { id } : null);
 }
 
-// Check again at delivery: SDK buffers can outlive an opt-out or profile switch.
-function scrubIdentity(value: unknown, id: string | undefined): unknown {
-  if (Array.isArray(value)) return value.map((item) => scrubIdentity(item, id));
+type ScrubbedIdentity<Value> = Value extends readonly (infer Item)[]
+  ? ScrubbedIdentity<Item>[]
+  : Value extends object
+    ? Partial<{ [Key in keyof Value]: ScrubbedIdentity<Value[Key]> }>
+    : Value;
 
-  if (!value || typeof value !== "object") return value;
+// Check again at delivery: SDK buffers can outlive an opt-out or profile switch.
+function scrubIdentity<Value>(value: Value, id: string | undefined): ScrubbedIdentity<Value> {
+  if (Array.isArray(value)) {
+    // SAFETY: Mapping retains the array's order and recursively scrubs each source element.
+    return value.map((item) => scrubIdentity(item, id)) as ScrubbedIdentity<Value>;
+  }
+
+  if (!value || typeof value !== "object") {
+    // SAFETY: This branch returns primitives and functions unchanged.
+    return value as ScrubbedIdentity<Value>;
+  }
+
   const result: Record<string, unknown> = {};
 
   for (const [key, field] of Object.entries(value)) {
@@ -36,7 +49,8 @@ function scrubIdentity(value: unknown, id: string | undefined): unknown {
     }
   }
 
-  return result;
+  // SAFETY: The result contains only source keys; recursion can remove identity fields.
+  return result as ScrubbedIdentity<Value>;
 }
 
 export const sentryTelemetryIntegration: Parameters<typeof Sentry.addIntegration>[0] = {

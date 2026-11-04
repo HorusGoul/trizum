@@ -18,7 +18,7 @@ export function Balances({
 }: {
   panelRef: React.RefObject<HTMLDivElement | null>;
   sortedBy: BalancesSortedBy;
-  onRefresh: () => Promise<unknown>;
+  onRefresh: () => Promise<void>;
 }) {
   const { party } = useCurrentParty();
   const participant = useCurrentParticipant();

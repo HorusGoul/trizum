@@ -8,6 +8,20 @@ const REDACTED_DOCUMENT_ID = "[REDACTED_DOCUMENT_ID]";
 const DOCUMENT_ID_FIELD =
   /^(?:documentId|partyId|partyDocumentId|partyListDocumentId|automergeUrl)$/i;
 
+type RedactedValue =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Error
+  | RedactedValue[]
+  | RedactedProperties;
+
+interface RedactedProperties {
+  [property: string]: RedactedValue;
+}
+
 const nativeErrorStackDescriptor = getPropertyDescriptor(new Error(), "stack");
 
 function getPropertyDescriptor(value: Error, key: string): PropertyDescriptor | undefined {
@@ -18,8 +32,13 @@ function getPropertyDescriptor(value: Error, key: string): PropertyDescriptor | 
   }
 }
 
-function readErrorField(error: Error, key: string, descriptor: PropertyDescriptor): unknown {
-  if ("value" in descriptor) return descriptor.value;
+function redactErrorField(
+  error: Error,
+  key: string,
+  descriptor: PropertyDescriptor,
+  ancestors: Set<object>,
+): RedactedValue {
+  if ("value" in descriptor) return redactValue(descriptor.value, ancestors);
 
   // Native stack getters can live on the instance (V8) or prototype (Firefox).
   // They may format name and message, so neither field may execute user code.
@@ -33,11 +52,15 @@ function readErrorField(error: Error, key: string, descriptor: PropertyDescripto
       return property && "value" in property && typeof property.value === "string";
     })
   ) {
+    let value: unknown;
+
     try {
-      return nativeErrorStackDescriptor.get.call(error);
+      value = nativeErrorStackDescriptor.get.call(error);
     } catch {
       return "[Unavailable]";
     }
+
+    return redactValue(value, ancestors);
   }
 
   return "[Accessor]";
@@ -53,14 +76,20 @@ function redactString(value: string): string {
   );
 }
 
-export function redactValue(value: unknown, ancestors = new Set<object>()): unknown {
+export function redactValue(value: unknown, ancestors = new Set<object>()): RedactedValue {
   if (typeof value === "string") return redactString(value);
 
   if (typeof value === "bigint" || typeof value === "symbol") return redactString(String(value));
 
   if (typeof value === "function") return "[Function]";
 
-  if (value === null || typeof value !== "object") return value;
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  )
+    return value;
 
   if (ancestors.has(value)) return "[Circular]";
 
@@ -70,7 +99,7 @@ export function redactValue(value: unknown, ancestors = new Set<object>()): unkn
 
   try {
     if (Array.isArray(value)) {
-      const result: unknown[] = [];
+      const result: RedactedValue[] = [];
 
       for (let index = 0; index < value.length; index++) {
         const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
@@ -96,7 +125,7 @@ export function redactValue(value: unknown, ancestors = new Set<object>()): unkn
 
     // Keep Error instances useful to error-monitoring sinks, without retaining
     // custom prototypes or mutating the exception used by application code.
-    const result: Record<string, unknown> | Error = value instanceof Error ? new Error() : {};
+    const result: RedactedProperties | Error = value instanceof Error ? new Error() : {};
 
     if (value instanceof Error && result instanceof Error) {
       delete result.stack;
@@ -109,7 +138,7 @@ export function redactValue(value: unknown, ancestors = new Set<object>()): unkn
           configurable: true,
           enumerable: key === "errors",
           writable: true,
-          value: redactValue(readErrorField(value, key, descriptor), ancestors),
+          value: redactErrorField(value, key, descriptor, ancestors),
         });
       }
     }
