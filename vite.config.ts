@@ -17,7 +17,19 @@ const rootAppCommandMessage = [
 // package-relative and workspace-relative generated paths here so root checks
 // and package-local `vp check .` commands skip the same generated outputs.
 const ignorePatterns = [
+  ".agent/**",
+  ".agents/**",
+  ".claude/**",
+  ".codex/**",
+  ".continue/**",
+  ".cursor/**",
+  ".gemini/**",
+  ".opencode/**",
+  ".pi/**",
+  ".roo/**",
+  ".windsurf/**",
   ".vite-hooks/**",
+  "tools/oxlint/anti-slop/**",
   "**/dist/**",
   "**/node_modules/**",
   "**/coverage/**",
@@ -38,10 +50,6 @@ const ignorePatterns = [
   "packages/server/drizzle/meta/**",
 ];
 
-// Agent skill docs are maintained outside the app/tooling source tree; keep
-// them out of formatting checks so routine validation does not reflow them.
-const formatIgnorePatterns = [".agents/**", ...ignorePatterns];
-
 function rootAppCommandGuard() {
   return {
     config() {
@@ -60,7 +68,7 @@ function rootAppCommandGuard() {
 
 const toolingConfig = {
   fmt: {
-    ignorePatterns: formatIgnorePatterns,
+    ignorePatterns,
     sortPackageJson: true,
     sortTailwindcss: true,
   },
@@ -75,6 +83,10 @@ const toolingConfig = {
     },
     ignorePatterns,
     jsPlugins: [
+      {
+        name: "anti-slop",
+        specifier: "./tools/oxlint/anti-slop/index.ts",
+      },
       {
         name: "vite-plus",
         specifier: "vite-plus/oxlint-plugin",
@@ -94,6 +106,24 @@ const toolingConfig = {
     },
     plugins: ["import", "jsx-a11y", "react", "typescript", "vitest"],
     rules: {
+      "anti-slop/no-array-filter-map": "off", // https://github.com/HorusGoul/trizum/issues/559
+      "anti-slop/no-reduce-accumulator-copy": "error",
+      "anti-slop/no-chained-type-assertions": "off", // https://github.com/HorusGoul/trizum/issues/565
+      "anti-slop/no-conditional-empty-object-spread": "off", // https://github.com/HorusGoul/trizum/issues/561
+      "anti-slop/no-known-value-widening": "off", // https://github.com/HorusGoul/trizum/issues/562
+      "anti-slop/no-module-mocking": "off", // https://github.com/HorusGoul/trizum/issues/584
+      "anti-slop/no-object-parameters": "off", // https://github.com/HorusGoul/trizum/issues/563
+      "anti-slop/no-reflect-apply": "error",
+      "anti-slop/no-reflect-get": "off", // https://github.com/HorusGoul/trizum/issues/560
+      "anti-slop/no-runtime-typeof": "off", // https://github.com/HorusGoul/trizum/issues/569
+      "anti-slop/no-shape-in-symbol-names": "error",
+      "anti-slop/no-unknown-parameters": "off", // https://github.com/HorusGoul/trizum/issues/568
+      "anti-slop/no-unknown-returns": "off", // https://github.com/HorusGoul/trizum/issues/567
+      "anti-slop/no-unknown-type-aliases": "error",
+      "anti-slop/no-unsafe-dictionary-type": "off", // https://github.com/HorusGoul/trizum/issues/564
+      "anti-slop/no-widen-then-assert": "error",
+      "anti-slop/require-readable-spacing": "off", // https://github.com/HorusGoul/trizum/issues/558
+      "anti-slop/require-safety-comment-for-type-assertion": "off", // https://github.com/HorusGoul/trizum/issues/566
       "import/no-named-as-default": "off",
       "import/no-named-as-default-member": "off",
       "lingui/no-expression-in-message": "error",
@@ -103,6 +133,7 @@ const toolingConfig = {
       "lingui/t-call-in-function": "error",
       "no-console": "error",
       "no-unused-vars": "off",
+      "oxc/no-accumulating-spread": "error",
       "react/exhaustive-deps": "error",
       "react/only-export-components": "error",
       "react/react-in-jsx-scope": "off",
@@ -170,6 +201,10 @@ const toolingConfig = {
       },
       test: {
         command: "vp run --filter './packages/*' test",
+        dependsOn: ["test:lint-plugins"],
+      },
+      "test:lint-plugins": {
+        command: "node --test tools/oxlint/*.test.ts",
       },
       "test:coverage": {
         command: "vp run --filter './packages/*' test --coverage",
