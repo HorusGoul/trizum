@@ -5,6 +5,18 @@ import type {
   Subscription as RevenueCatSubscription,
 } from "./generated/types.gen.js";
 
+type RevenueCatJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | RevenueCatJsonValue[]
+  | RevenueCatJsonObject;
+
+interface RevenueCatJsonObject {
+  [key: string]: RevenueCatJsonValue | undefined;
+}
+
 const REVENUECAT_API_URL = "https://api.revenuecat.com/v2";
 const PAGE_SIZE = 100;
 
@@ -349,12 +361,12 @@ function hasActiveEntitlement(value: unknown, entitlementLookupKey: string) {
 function assertRecord<Value>(
   value: Value,
   resourceName: string,
-): asserts value is Value & Record<string, unknown> {
+): asserts value is Value & RevenueCatJsonObject {
   if (!isRecord(value)) {
     throw new RevenueCatApiError(`RevenueCat returned an invalid ${resourceName}.`);
   }
 }
 
-function isRecord<Value>(value: Value): value is Value & Record<string, unknown> {
+function isRecord<Value>(value: Value): value is Value & RevenueCatJsonObject {
   return Boolean(value) && typeof value === "object";
 }

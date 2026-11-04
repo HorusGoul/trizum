@@ -1,3 +1,4 @@
+import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { BackButton } from "#src/components/BackButton.js";
@@ -19,7 +20,7 @@ interface JoinSearchParams {
 
 export const Route = createFileRoute("/join")({
   component: Join,
-  validateSearch: (search: Record<string, unknown>): JoinSearchParams => ({
+  validateSearch: (search: AppSearch): JoinSearchParams => ({
     scanning: search.scanning === true || search.scanning === "true",
   }),
 });

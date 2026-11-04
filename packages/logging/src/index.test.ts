@@ -82,7 +82,7 @@ describe("@trizum/logging", () => {
   });
 
   test("configures default surface and meta loggers", () => {
-    const contextLocalStorage: ContextLocalStorage<Record<string, unknown>> = {
+    const contextLocalStorage: ContextLocalStorage<LogRecord["properties"]> = {
       run(_store, callback) {
         return callback();
       },

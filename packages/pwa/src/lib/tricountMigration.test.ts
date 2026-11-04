@@ -1,3 +1,4 @@
+import type { LogRecord } from "@trizum/logging";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import {
   calculateBalancesByParticipant,
@@ -11,7 +12,7 @@ const warningRecords = vi.hoisted(
   () =>
     [] as Array<{
       message: string;
-      properties?: Record<string, unknown>;
+      properties?: LogRecord["properties"];
     }>,
 );
 
@@ -20,7 +21,7 @@ vi.mock("#src/lib/log.ts", () => ({
     debug() {},
     error() {},
     info() {},
-    warning(message: string, properties?: Record<string, unknown>) {
+    warning(message: string, properties?: LogRecord["properties"]) {
       warningRecords.push({ message, properties });
     },
   }),

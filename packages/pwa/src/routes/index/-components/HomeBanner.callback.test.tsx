@@ -1,3 +1,4 @@
+import type { AppSearch } from "#src/lib/routerSearch.ts";
 // @vitest-environment jsdom
 
 import { act } from "react";
@@ -99,7 +100,7 @@ function makeRouter(returnTo: string) {
         <Outlet />
       </>
     ),
-    validateSearch: (search: Record<string, unknown>) => ({
+    validateSearch: (search: AppSearch) => ({
       premium: search.premium === true ? true : undefined,
     }),
   });
@@ -109,7 +110,7 @@ function makeRouter(returnTo: string) {
   const callbackRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/settings/cloud-sync",
-    validateSearch: (search: Record<string, unknown>) => ({
+    validateSearch: (search: AppSearch) => ({
       auth: search.auth === "success" ? ("success" as const) : undefined,
       returnTo: typeof search.returnTo === "string" ? search.returnTo : undefined,
     }),

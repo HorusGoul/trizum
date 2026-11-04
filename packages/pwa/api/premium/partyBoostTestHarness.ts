@@ -1,3 +1,4 @@
+import type { Party, PartyParticipant } from "../../src/models/party";
 import {
   generateAutomergeUrl,
   parseAutomergeUrl,
@@ -13,6 +14,15 @@ import { AutomergeDocuments } from "../automergeDocuments";
 import { createAuth } from "../auth";
 import type { ApiEnv } from "../env";
 import { premiumRoute } from "../routes/premium";
+
+interface TestSyncDocument {
+  type: "party" | "partyList";
+  id?: DocumentId;
+  participants?: Record<string, Pick<PartyParticipant, "id" | "isArchived">>;
+  parties?: Record<DocumentId, true>;
+  participantInParties?: Record<DocumentId, PartyParticipant["id"]>;
+  boost?: Party["boost"];
+}
 
 export type TestCustomerAccess =
   | "subscription"
@@ -65,7 +75,7 @@ export async function createPartyBoostTestHarness() {
     }
   }
 
-  const documents = new Map<DocumentId, Record<string, unknown>>();
+  const documents = new Map<DocumentId, TestSyncDocument>();
   const customers = new Map<string, TestCustomerAccess>();
   const requests: Request[] = [];
   let revenueCatStatus = 200;
@@ -178,7 +188,7 @@ export async function createPartyBoostTestHarness() {
       const listId = createDocumentId();
 
       const list = {
-        type: "partyList",
+        type: "partyList" as const,
         parties: {} as Record<string, true>,
         participantInParties: {} as Record<string, string>,
       };
@@ -197,14 +207,14 @@ export async function createPartyBoostTestHarness() {
         cookie,
         join(partyId: DocumentId) {
           const party = documents.get(partyId)!;
-          const participants = party.participants as Record<string, unknown>;
+          const participants = party.participants!;
           participants[participantId] = { id: participantId, isArchived: false };
           list.parties[partyId] = true;
           list.participantInParties[partyId] = participantId;
         },
         leave(partyId: DocumentId) {
           const party = documents.get(partyId)!;
-          const participants = party.participants as Record<string, unknown>;
+          const participants = party.participants!;
           participants[participantId] = { id: participantId, isArchived: true };
         },
       };

@@ -22,6 +22,30 @@ interface Visit {
   startedAt: number;
 }
 
+interface AnalyticsVisitPayload extends Visit {
+  siteId: string;
+  hostname: string;
+  timestamp: number;
+  visitorId: string;
+  query: string;
+  hash: string;
+  title: string;
+  referrerUrl: string;
+  userId?: string;
+  collectToken?: string;
+}
+
+export type AnalyticsPayload = AnalyticsVisitPayload &
+  (
+    | { kind: "pageview"; eventId?: never; eventName?: never; eventData?: never }
+    | {
+        kind: "custom_event";
+        eventId: string;
+        eventName: AnalyticsEvent;
+        eventData: Record<string, never>;
+      }
+  );
+
 export function createAnalytics(options: AnalyticsOptions) {
   const endpoint = new URL(options.endpoint);
 
@@ -38,7 +62,7 @@ export function createAnalytics(options: AnalyticsOptions) {
   const fetch = options.fetch ?? globalThis.fetch.bind(globalThis);
   let state: "pending" | "enabled" | "disabled" = "pending";
   let telemetryId: string | undefined;
-  let startup: Record<string, unknown>[] = [];
+  let startup: AnalyticsPayload[] = [];
   const startupDeadline = Date.now() + 10_000;
   let startupTimer: ReturnType<typeof setTimeout> | undefined;
   let controller = new AbortController();
@@ -79,7 +103,7 @@ export function createAnalytics(options: AnalyticsOptions) {
     return state === "enabled" || (state === "pending" && Date.now() < startupDeadline);
   }
 
-  async function send(payload: Record<string, unknown>, signal: AbortSignal) {
+  async function send(payload: AnalyticsPayload, signal: AbortSignal) {
     if (signal.aborted || !allowed()) return;
     const request = new AbortController();
     const abortRequest = () => request.abort();
@@ -130,7 +154,7 @@ export function createAnalytics(options: AnalyticsOptions) {
     }
   }
 
-  function enqueue(payload: Record<string, unknown>) {
+  function enqueue(payload: AnalyticsPayload) {
     if (state === "pending") {
       if (startup.length >= 20) return;
       startup.push(payload);

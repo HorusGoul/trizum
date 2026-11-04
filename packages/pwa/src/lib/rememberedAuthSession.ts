@@ -1,5 +1,15 @@
 import type { AuthSessionUser } from "./auth-client";
 
+interface StoredUserFields {
+  id?: unknown;
+  email?: unknown;
+  name?: unknown;
+  emailVerified?: unknown;
+  image?: unknown;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
 const STORAGE_KEY = "trizumRememberedAccount.v1";
 
 type AccountStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
@@ -251,7 +261,7 @@ function readUser(value: unknown): AuthSessionUser | null {
   const candidate = "user" in value ? value.user : value;
 
   if (!candidate || typeof candidate !== "object") return null;
-  const user = candidate as Record<string, unknown>;
+  const user = candidate as StoredUserFields;
 
   if (typeof user.id !== "string" || !user.id || typeof user.email !== "string") return null;
   const createdAt = new Date(typeof user.createdAt === "string" ? user.createdAt : 0);

@@ -14,7 +14,7 @@ import {
   type ToOptions,
   type RegisteredRouter,
 } from "@tanstack/react-router";
-import { parseAppSearch, stringifyAppSearch } from "./lib/routerSearch.ts";
+import { parseAppSearch, stringifyAppSearch, type AppSearch } from "./lib/routerSearch.ts";
 import { initializeAnalytics, bindAnalytics, trackPage } from "./lib/analytics.ts";
 import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
@@ -125,7 +125,7 @@ const WSS_URL = getAutomergeWssUrl();
 const isOfflineOnly = getIsAutomergeOfflineOnly(initialUrl.href);
 const logger = getLogger("main");
 
-type CalculatorSearchLocation = Pick<ParsedLocation<Record<string, unknown>>, "search">;
+type CalculatorSearchLocation = Pick<ParsedLocation<AppSearch>, "search">;
 
 function hasCalculatorSearch(location: CalculatorSearchLocation | undefined) {
   const calculator = location?.search.calculator;

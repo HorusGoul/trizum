@@ -98,7 +98,7 @@ export function isPasswordFieldErrorMessage(message: string) {
   );
 }
 
-function hasRecordData(record: Record<string, unknown> | undefined) {
+function hasRecordData<Value>(record: Record<string, Value> | undefined) {
   return Object.values(record ?? {}).some(Boolean);
 }
 

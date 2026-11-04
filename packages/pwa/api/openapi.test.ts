@@ -31,7 +31,7 @@ describe("trizum OpenAPI contract", () => {
           {
             operationId?: string;
             requestBody?: { required?: boolean };
-            responses?: Record<string, unknown>;
+            responses?: Record<string, { description?: string }>;
           }
         >
       >;

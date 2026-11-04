@@ -1,3 +1,5 @@
+import type { AppSearch } from "#src/lib/routerSearch.ts";
+
 export const AD_SESSION_GAP_MS = 30 * 60 * 1_000;
 export const FULL_SCREEN_AD_COOLDOWN_MS = 30 * 60 * 1_000;
 export const APP_OPEN_AD_MAX_AGE_MS = 4 * 60 * 60 * 1_000;
@@ -99,7 +101,7 @@ export function isPreparedAppOpenFresh(preparedAt: number | undefined, now: numb
   return preparedAt !== undefined && now - preparedAt < APP_OPEN_AD_MAX_AGE_MS;
 }
 
-export function isProtectedAdRoute(pathname: string, search: Record<string, unknown>) {
+export function isProtectedAdRoute(pathname: string, search: AppSearch) {
   if (typeof search.media === "number" || typeof search.calculator === "string") {
     return true;
   }

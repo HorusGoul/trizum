@@ -57,6 +57,13 @@ import {
   type RawGhPullRequest,
 } from "../review/helpers.js";
 
+interface NpmPackageMetadata {
+  "repository.url"?: unknown;
+  "bugs.url"?: unknown;
+  homepage?: unknown;
+  version?: unknown;
+}
+
 const MAX_DIFF_BYTES = 180_000;
 const MAX_LOG_BYTES = 40_000;
 const MAX_USAGE_MATCHES = 200;
@@ -593,7 +600,7 @@ async function gatherDependencyMetadata(
         };
       }
 
-      const raw = JSON.parse(result.stdout) as Record<string, unknown>;
+      const raw = JSON.parse(result.stdout) as NpmPackageMetadata;
       const repositoryUrl = stringFromUnknown(raw["repository.url"]);
       const bugsUrl = stringFromUnknown(raw["bugs.url"]);
 

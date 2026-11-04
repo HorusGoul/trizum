@@ -1,3 +1,4 @@
+import type { LogRecord } from "@trizum/logging";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "#src/models/party.ts";
@@ -30,10 +31,10 @@ const proxyMock = vi.hoisted(() => {
 });
 
 const loggerMock = vi.hoisted(() => ({
-  debug: vi.fn<(message: string, properties?: Record<string, unknown>) => void>(),
-  error: vi.fn<(message: string, properties?: Record<string, unknown>) => void>(),
-  info: vi.fn<(message: string, properties?: Record<string, unknown>) => void>(),
-  warning: vi.fn<(message: string, properties?: Record<string, unknown>) => void>(),
+  debug: vi.fn<(message: string, properties?: LogRecord["properties"]) => void>(),
+  error: vi.fn<(message: string, properties?: LogRecord["properties"]) => void>(),
+  info: vi.fn<(message: string, properties?: LogRecord["properties"]) => void>(),
+  warning: vi.fn<(message: string, properties?: LogRecord["properties"]) => void>(),
 }));
 
 vi.mock("#src/lib/log.ts", () => ({

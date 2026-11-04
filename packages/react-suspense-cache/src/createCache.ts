@@ -31,6 +31,14 @@ import type {
   UnsubscribeCallback,
 } from "./types.js";
 
+interface CacheDebugProperties {
+  paramsCount?: number;
+  subscriberCount?: number;
+  previousStatus?: string;
+  status?: string;
+  aborted?: boolean;
+}
+
 const logger = getLogger("createCache");
 
 function createInvalidatedPendingRecordError(operation: string): Error {
@@ -49,7 +57,7 @@ export function createCache<Params extends Array<any>, Value>(
   const recordMap = getCache(onExternalCacheEviction);
   const subscriberMap = new Map<string, Set<SubscriptionCallback<Value>>>();
 
-  function debugLog(operation: string, properties: Record<string, unknown> = {}) {
+  function debugLog(operation: string, properties: CacheDebugProperties = {}) {
     const labels: Record<string, string> = {};
 
     if (debugLabel) labels.cacheLabel = debugLabel;

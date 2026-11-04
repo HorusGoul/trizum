@@ -35,17 +35,17 @@ function scrubIdentity<Value>(value: Value, id: string | undefined): ScrubbedIde
     return value as ScrubbedIdentity<Value>;
   }
 
-  const result: Record<string, unknown> = {};
+  const result: Partial<{ [Key in keyof Value]: ScrubbedIdentity<Value[Key]> }> = {};
 
   for (const [key, field] of Object.entries(value)) {
     if (key === "user" && field && typeof field === "object" && "id" in field) {
-      if (id && field.id === id) result[key] = field;
+      if (id && field.id === id) Object.assign(result, { [key]: field });
     } else if (["telemetryId", "user.id", "sentry.user.id", "did"].includes(key)) {
       const identity = field && typeof field === "object" && "value" in field ? field.value : field;
 
-      if (id && identity === id) result[key] = field;
+      if (id && identity === id) Object.assign(result, { [key]: field });
     } else {
-      result[key] = scrubIdentity(field, id);
+      Object.assign(result, { [key]: scrubIdentity(field, id) });
     }
   }
 

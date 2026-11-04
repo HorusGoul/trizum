@@ -1,9 +1,10 @@
+import type { LogRecord } from "@logtape/logtape";
 import { getSentrySink } from "@logtape/sentry";
 import { getTrizumLogger, configureTrizumLogging } from "@trizum/logging";
 import { AsyncLocalStorage } from "node:async_hooks";
 import packageJson from "#package.json" with { type: "json" };
 
-const contextLocalStorage = new AsyncLocalStorage<Record<string, unknown>>();
+const contextLocalStorage = new AsyncLocalStorage<LogRecord["properties"]>();
 
 const version = process.env.COMMIT_HASH
   ? `${packageJson.version}-${process.env.COMMIT_HASH}`

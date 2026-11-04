@@ -1,10 +1,11 @@
+import type { AppSearch } from "#src/lib/routerSearch.ts";
 import type { RevenueCatPlatform } from "./revenueCatConfig.ts";
 
 export const APPLE_APP_ID = "6755971747";
 const PENDING_REDEMPTION_KEY = "trizum:pending-premium-redemption:v1";
 const REDEMPTION_SYNC_WINDOW_MS = 15 * 60_000;
 
-export function parseRedemptionSearch(search: Record<string, unknown>) {
+export function parseRedemptionSearch(search: AppSearch) {
   return { code: typeof search.code === "string" ? search.code.trim().slice(0, 128) : "" };
 }
 
