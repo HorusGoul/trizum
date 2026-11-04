@@ -33,21 +33,21 @@ const logger = getLogger("organizeForFastlane");
 type Platform = "ios" | "android";
 
 // Map from our locale codes to App Store Connect locale codes
-const IOS_LOCALE_MAPPING: Record<string, string[]> = {
+const IOS_LOCALE_MAPPING = {
   en: ["en-US", "en-GB", "en-AU", "en-CA"],
   es: ["es-ES", "es-MX"],
-};
+} satisfies Record<string, string[]>;
 
 // Map from our locale codes to Google Play Store locale codes
-const ANDROID_LOCALE_MAPPING: Record<string, string[]> = {
+const ANDROID_LOCALE_MAPPING = {
   en: ["en-US"],
   es: ["es-ES"],
-};
+} satisfies Record<string, string[]>;
 
 // Map from our device folders to App Store Connect device frame names
 // Based on: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications
 // Fastlane uses human-readable names in screenshot filenames
-const IOS_DEVICE_FRAME_MAPPING: Record<string, string | null> = {
+const IOS_DEVICE_FRAME_MAPPING = {
   // iPhone 6.9" Display (1320×2868)
   "iphone-6.9": 'iPhone 6.9" Display',
   // iPad 13" Display (2064×2752) - Required if app runs on iPad
@@ -55,7 +55,7 @@ const IOS_DEVICE_FRAME_MAPPING: Record<string, string | null> = {
   // Skip android and desktop for iOS fastlane
   android: null,
   "android-tablet": null,
-};
+} satisfies Record<string, string | null>;
 
 // Map from our device folders to Android screenshot types
 // Android uses specific folder names for different device types:
@@ -64,13 +64,13 @@ const IOS_DEVICE_FRAME_MAPPING: Record<string, string | null> = {
 // - tenInchScreenshots: 10" tablet screenshots
 // - tvScreenshots: TV screenshots
 // - wearScreenshots: Wear OS screenshots
-const ANDROID_DEVICE_MAPPING: Record<string, string[] | null> = {
+const ANDROID_DEVICE_MAPPING = {
   android: ["phoneScreenshots"],
   "android-tablet": ["sevenInchScreenshots", "tenInchScreenshots"],
   // Skip iOS-specific devices
   "iphone-6.9": null,
   "ipad-13": null,
-};
+} satisfies Record<string, string[] | null>;
 
 export interface OrganizeScreenshotsOptions {
   platform: Platform;
@@ -155,7 +155,9 @@ async function organizeForIOS(
   locales: string[],
 ): Promise<void> {
   for (const locale of locales) {
-    const appStoreLocales = IOS_LOCALE_MAPPING[locale];
+    const appStoreLocales = hasMappingKey(IOS_LOCALE_MAPPING, locale)
+      ? IOS_LOCALE_MAPPING[locale]
+      : undefined;
 
     if (!appStoreLocales) {
       logger.warning("Unknown locale {locale}; skipping", { locale });
@@ -167,7 +169,9 @@ async function organizeForIOS(
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
-      const deviceFrame = IOS_DEVICE_FRAME_MAPPING[device];
+      const deviceFrame = hasMappingKey(IOS_DEVICE_FRAME_MAPPING, device)
+        ? IOS_DEVICE_FRAME_MAPPING[device]
+        : undefined;
 
       if (deviceFrame === null) {
         logger.info("Skipping {locale}/{device}; not for iOS", {
@@ -231,7 +235,9 @@ async function organizeForAndroid(
   locales: string[],
 ): Promise<void> {
   for (const locale of locales) {
-    const playStoreLocales = ANDROID_LOCALE_MAPPING[locale];
+    const playStoreLocales = hasMappingKey(ANDROID_LOCALE_MAPPING, locale)
+      ? ANDROID_LOCALE_MAPPING[locale]
+      : undefined;
 
     if (!playStoreLocales) {
       logger.warning("Unknown locale {locale}; skipping", { locale });
@@ -253,7 +259,9 @@ async function organizeForAndroid(
     const devices = await readdir(localeDir);
 
     for (const device of devices) {
-      const screenshotTypes = ANDROID_DEVICE_MAPPING[device];
+      const screenshotTypes = hasMappingKey(ANDROID_DEVICE_MAPPING, device)
+        ? ANDROID_DEVICE_MAPPING[device]
+        : undefined;
 
       if (screenshotTypes === null) {
         logger.info("Skipping {locale}/{device}; not for Android", {
@@ -373,4 +381,11 @@ export async function organizeScreenshots(options: OrganizeScreenshotsOptions): 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const options = parseOptions();
   void organizeScreenshots(options);
+}
+
+function hasMappingKey<Mapping extends object>(
+  mapping: Mapping,
+  key: PropertyKey,
+): key is keyof Mapping {
+  return Object.hasOwn(mapping, key);
 }

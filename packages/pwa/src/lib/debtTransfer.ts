@@ -23,6 +23,11 @@ export interface DebtTransferParticipantMatch {
   recommendedParticipantIds: PartyParticipant["id"][];
 }
 
+interface DebtTransferExpenses {
+  originExpense: Omit<Expense, "id" | "__hash">;
+  destinationExpense: Omit<Expense, "id" | "__hash">;
+}
+
 export function createDebtTransferExpenses({
   amount,
   originDebtorId,
@@ -32,10 +37,7 @@ export function createDebtTransferExpenses({
   paidAt,
   originExpenseName,
   destinationExpenseName,
-}: CreateDebtTransferExpensesOptions): {
-  originExpense: Omit<Expense, "id" | "__hash">;
-  destinationExpense: Omit<Expense, "id" | "__hash">;
-} {
+}: CreateDebtTransferExpensesOptions): DebtTransferExpenses {
   if (amount <= 0) {
     throw new Error("Debt transfer amount must be greater than 0");
   }

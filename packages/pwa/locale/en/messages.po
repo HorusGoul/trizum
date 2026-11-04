@@ -242,7 +242,7 @@ msgstr "A Premium member is boosting this party."
 msgid "A template with this name already exists"
 msgstr "A template with this name already exists"
 
-#: src/routes/_home/route.tsx:131
+#: src/routes/_home/route.tsx:135
 #: src/routes/about/route.tsx:24
 msgid "About"
 msgstr "About"
@@ -310,7 +310,7 @@ msgstr "Add expenses to this party to unlock totals, rankings, and individual sp
 msgid "Add Google as a sign-in method"
 msgstr "Add Google as a sign-in method"
 
-#: src/routes/_home/route.tsx:180
+#: src/routes/_home/route.tsx:184
 msgid "Add or create"
 msgstr "Add or create"
 
@@ -457,7 +457,7 @@ msgstr "Archive a party from the home screen when you want to clear some space w
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archive participants who left to keep balances clean."
 
-#: src/routes/_home/route.tsx:250
+#: src/routes/_home/route.tsx:254
 msgid "Archive party"
 msgstr "Archive party"
 
@@ -473,7 +473,7 @@ msgstr "Archived participants"
 msgid "Archived participants are still configured"
 msgstr "Archived participants are still configured"
 
-#: src/routes/_home/route.tsx:113
+#: src/routes/_home/route.tsx:117
 msgid "Archived parties"
 msgstr "Archived parties"
 
@@ -727,7 +727,7 @@ msgid "Canadian Dollar"
 msgstr "Canadian Dollar"
 
 #: src/components/CloudSyncDialogs.tsx:470
-#: src/components/CloudSyncDialogs.tsx:640
+#: src/components/CloudSyncDialogs.tsx:642
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:229
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
@@ -767,7 +767,7 @@ msgstr "CFP Franc"
 msgid "Changes sync automatically across all your devices"
 msgstr "Changes sync automatically across all your devices"
 
-#: src/routes/_home/route.tsx:124
+#: src/routes/_home/route.tsx:128
 msgid "Check for updates"
 msgstr "Check for updates"
 
@@ -940,7 +940,7 @@ msgstr "Confirm action"
 msgid "Confirm transfer"
 msgstr "Confirm transfer"
 
-#: src/components/CloudSyncDialogs.tsx:615
+#: src/components/CloudSyncDialogs.tsx:617
 msgid "Confirmation"
 msgstr "Confirmation"
 
@@ -957,15 +957,15 @@ msgstr "Congolese Franc"
 msgid "Connect"
 msgstr "Connect"
 
-#: src/components/CloudSyncDialogs.tsx:499
+#: src/components/CloudSyncDialogs.tsx:501
 msgid "Connect Apple"
 msgstr "Connect Apple"
 
-#: src/components/CloudSyncDialogs.tsx:506
+#: src/components/CloudSyncDialogs.tsx:508
 msgid "Connect Apple?"
 msgstr "Connect Apple?"
 
-#: src/components/CloudSyncDialogs.tsx:510
+#: src/components/CloudSyncDialogs.tsx:512
 msgid "Connect Google"
 msgstr "Connect Google"
 
@@ -973,7 +973,7 @@ msgstr "Connect Google"
 msgid "Connect Google, Apple, or a password to the same account."
 msgstr "Connect Google, Apple, or a password to the same account."
 
-#: src/components/CloudSyncDialogs.tsx:517
+#: src/components/CloudSyncDialogs.tsx:519
 msgid "Connect Google?"
 msgstr "Connect Google?"
 
@@ -1123,7 +1123,7 @@ msgstr "Couldn't connect sign-in method"
 msgid "Create a custom template to enable this setting."
 msgstr "Create a custom template to enable this setting."
 
-#: src/routes/_home/route.tsx:197
+#: src/routes/_home/route.tsx:201
 msgid "Create a new Party"
 msgstr "Create a new Party"
 
@@ -1253,12 +1253,12 @@ msgid "Delete"
 msgstr "Delete"
 
 #: src/components/CloudSyncAccountSettings.tsx:95
-#: src/components/CloudSyncDialogs.tsx:592
-#: src/components/CloudSyncDialogs.tsx:629
+#: src/components/CloudSyncDialogs.tsx:594
+#: src/components/CloudSyncDialogs.tsx:631
 msgid "Delete account"
 msgstr "Delete account"
 
-#: src/components/CloudSyncDialogs.tsx:598
+#: src/components/CloudSyncDialogs.tsx:600
 msgid "Delete account?"
 msgstr "Delete account?"
 
@@ -1372,11 +1372,11 @@ msgstr "Email link"
 msgid "Email me a sign-in link"
 msgstr "Email me a sign-in link"
 
-#: src/components/CloudSyncDialogs.tsx:521
+#: src/components/CloudSyncDialogs.tsx:523
 msgid "Email password link"
 msgstr "Email password link"
 
-#: src/components/CloudSyncDialogs.tsx:534
+#: src/components/CloudSyncDialogs.tsx:536
 msgid "Email password link?"
 msgstr "Email password link?"
 
@@ -1397,7 +1397,7 @@ msgid "Email:"
 msgstr "Email:"
 
 #: src/components/EmojiPicker.tsx:342
-#: src/components/EmojiPicker.tsx:530
+#: src/components/EmojiPicker.tsx:534
 msgid "Emoji list"
 msgstr "Emoji list"
 
@@ -1952,7 +1952,7 @@ msgstr "Join {partyName} on trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "Join {partyName} on trizum!"
 
-#: src/routes/_home/route.tsx:191
+#: src/routes/_home/route.tsx:195
 msgid "Join a Party"
 msgstr "Join a Party"
 
@@ -2156,7 +2156,7 @@ msgstr "Manage Premium"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Manage the participants list. Existing members can only be archived."
 
-#: src/routes/_home/route.tsx:101
+#: src/routes/_home/route.tsx:105
 msgid "Manage trizum cloud"
 msgstr "Manage trizum cloud"
 
@@ -2203,7 +2203,7 @@ msgstr "Mexican Investment Unit"
 msgid "Mexican Peso"
 msgstr "Mexican Peso"
 
-#: src/routes/_home/route.tsx:203
+#: src/routes/_home/route.tsx:207
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:41
 msgid "Migrate from Tricount"
 msgstr "Migrate from Tricount"
@@ -2694,7 +2694,7 @@ msgstr "Party"
 msgid "Party actions"
 msgstr "Party actions"
 
-#: src/routes/_home/route.tsx:273
+#: src/routes/_home/route.tsx:277
 msgid "Party archived"
 msgstr "Party archived"
 
@@ -2754,7 +2754,7 @@ msgstr "Party leaderboard"
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
 
-#: src/routes/_home/route.tsx:264
+#: src/routes/_home/route.tsx:268
 msgid "Party pinned"
 msgstr "Party pinned"
 
@@ -2782,7 +2782,7 @@ msgstr "Party stats"
 msgid "Party title, description and icon"
 msgstr "Party title, description and icon"
 
-#: src/routes/_home/route.tsx:264
+#: src/routes/_home/route.tsx:268
 msgid "Party unpinned"
 msgstr "Party unpinned"
 
@@ -2884,7 +2884,7 @@ msgstr "Phone number is required"
 msgid "Phone number must be less than 20 characters"
 msgstr "Phone number must be less than 20 characters"
 
-#: src/routes/_home/route.tsx:244
+#: src/routes/_home/route.tsx:248
 msgid "Pin party"
 msgstr "Pin party"
 
@@ -3025,7 +3025,7 @@ msgstr "Privacy Policy"
 msgid "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
 msgstr "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
 
-#: src/routes/_home/route.tsx:78
+#: src/routes/_home/route.tsx:82
 msgid "Profile and app menu"
 msgstr "Profile and app menu"
 
@@ -3289,7 +3289,7 @@ msgstr "Set up"
 msgid "Set up password sign-in"
 msgstr "Set up password sign-in"
 
-#: src/components/CloudSyncDialogs.tsx:534
+#: src/components/CloudSyncDialogs.tsx:536
 msgid "Set up password?"
 msgstr "Set up password?"
 
@@ -3297,7 +3297,7 @@ msgstr "Set up password?"
 msgid "Set up your username, avatar, and preferences"
 msgstr "Set up your username, avatar, and preferences"
 
-#: src/routes/_home/route.tsx:85
+#: src/routes/_home/route.tsx:89
 #: src/routes/party.$partyId/route.tsx:277
 #: src/routes/settings.tsx:130
 msgid "Settings"
@@ -3392,7 +3392,7 @@ msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Sign in to purchase or restore Premium across your devices."
 
 #: src/components/CloudSyncDialogs.tsx:225
-#: src/routes/_home/route.tsx:103
+#: src/routes/_home/route.tsx:107
 msgid "Sign in to trizum cloud"
 msgstr "Sign in to trizum cloud"
 
@@ -3419,11 +3419,11 @@ msgstr "Sign in with password"
 
 #: src/components/CloudSyncAccountSettings.tsx:85
 #: src/components/CloudSyncDialogs.tsx:87
-#: src/components/CloudSyncDialogs.tsx:538
+#: src/components/CloudSyncDialogs.tsx:540
 msgid "Sign out"
 msgstr "Sign out"
 
-#: src/components/CloudSyncDialogs.tsx:545
+#: src/components/CloudSyncDialogs.tsx:547
 msgid "Sign out?"
 msgstr "Sign out?"
 
@@ -3901,7 +3901,7 @@ msgstr "This party will receive your Party Boost. You will not be able to move i
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain."
 
-#: src/components/CloudSyncDialogs.tsx:601
+#: src/components/CloudSyncDialogs.tsx:603
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain. Deleting your account does not cancel a store subscription, and Premium purchases cannot be moved to a new trizum account. Manage any active subscription before continuing."
 msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain. Deleting your account does not cancel a store subscription, and Premium purchases cannot be moved to a new trizum account. Manage any active subscription before continuing."
 
@@ -3917,7 +3917,7 @@ msgstr "This removes the template for everyone in the party. Existing expenses a
 msgid "This sign-in link is invalid or expired. Request a new link and try again."
 msgstr "This sign-in link is invalid or expired. Request a new link and try again."
 
-#: src/components/CloudSyncDialogs.tsx:540
+#: src/components/CloudSyncDialogs.tsx:542
 msgid "This stops trizum cloud on this device. Your local data stays on this device."
 msgstr "This stops trizum cloud on this device. Your local data stays on this device."
 
@@ -4019,7 +4019,7 @@ msgstr "Trinidad and Tobago Dollar"
 
 #: src/components/CloudSyncSettingsView.tsx:812
 #: src/components/CloudSyncSettingsView.tsx:953
-#: src/routes/_home/route.tsx:105
+#: src/routes/_home/route.tsx:109
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -4058,11 +4058,11 @@ msgstr "trizum Premium"
 msgid "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 msgstr "trizum stores all your data locally on your device. When you're online and share a group with others, changes sync automatically across all devices in real-time."
 
-#: src/components/CloudSyncDialogs.tsx:501
+#: src/components/CloudSyncDialogs.tsx:503
 msgid "trizum will open Apple so you can add it as a sign-in method for this account."
 msgstr "trizum will open Apple so you can add it as a sign-in method for this account."
 
-#: src/components/CloudSyncDialogs.tsx:512
+#: src/components/CloudSyncDialogs.tsx:514
 msgid "trizum will open Google so you can add it as a sign-in method for this account."
 msgstr "trizum will open Google so you can add it as a sign-in method for this account."
 
@@ -4095,7 +4095,7 @@ msgstr "Turkish Lira"
 msgid "Turkmenistani Manat"
 msgstr "Turkmenistani Manat"
 
-#: src/components/CloudSyncDialogs.tsx:613
+#: src/components/CloudSyncDialogs.tsx:615
 msgid "Type \"delete account\" to confirm."
 msgstr "Type \"delete account\" to confirm."
 
@@ -4115,12 +4115,12 @@ msgstr "Ukrainian Hryvnia"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/_home/route.tsx:244
+#: src/routes/_home/route.tsx:248
 msgid "Unpin party"
 msgstr "Unpin party"
 
 #: src/components/UpdateController.tsx:29
-#: src/routes/_home/route.tsx:66
+#: src/routes/_home/route.tsx:70
 msgid "Update available"
 msgstr "Update available"
 
@@ -4347,11 +4347,11 @@ msgstr "We sent a sign-in link to {email}. Open it to finish signing in."
 msgid "We use self-hosted, cookie-free analytics on our Cloudflare infrastructure to understand page visits and feature usage. We exclude names, amounts, expense details, and sharing identifiers. Analytics can be disabled in Settings, and we respect browser privacy signals."
 msgstr "We use self-hosted, cookie-free analytics on our Cloudflare infrastructure to understand page visits and feature usage. We exclude names, amounts, expense details, and sharing identifiers. Analytics can be disabled in Settings, and we respect browser privacy signals."
 
-#: src/components/CloudSyncDialogs.tsx:523
+#: src/components/CloudSyncDialogs.tsx:525
 msgid "We will email a password link to {email}. Your current password keeps working until you change it."
 msgstr "We will email a password link to {email}. Your current password keeps working until you change it."
 
-#: src/components/CloudSyncDialogs.tsx:528
+#: src/components/CloudSyncDialogs.tsx:530
 msgid "We will email a password setup link to {email}. Password sign-in starts working after you add one."
 msgstr "We will email a password setup link to {email}. Password sign-in starts working after you add one."
 

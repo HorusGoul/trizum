@@ -245,7 +245,7 @@ describe("document ID redaction at every sink", () => {
     const date = new Date("2026-01-01T00:00:00Z");
     date.toJSON = () => documentId;
 
-    const payload: Record<string, unknown> = {
+    const payload = {
       documentId,
       toJSON: () => ({ secret: documentId }),
       map: new Map([[documentId, new Set([otherDocumentId])]]),
@@ -254,7 +254,7 @@ describe("document ID redaction at every sink", () => {
       date,
     };
 
-    payload.self = payload;
+    Object.assign(payload, { self: payload });
     Object.defineProperty(payload, "unsafe", {
       enumerable: true,
       get() {

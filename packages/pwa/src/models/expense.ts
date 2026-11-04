@@ -116,10 +116,7 @@ export function createExpenseId(chunkId: string, timestamp?: number): string {
   return `${ulid(timestamp)}:${chunkId}`;
 }
 
-export function decodeExpenseId(expenseId: string): {
-  chunkId: DocumentId;
-  expenseId: string;
-} {
+export function decodeExpenseId(expenseId: string) {
   const [id, chunkId] = expenseId.split(":");
 
   return { chunkId: chunkId as DocumentId, expenseId: id };

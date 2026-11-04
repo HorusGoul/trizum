@@ -478,6 +478,14 @@ export function CloudActionConfirmationDialog({
   );
 }
 
+interface CloudActionDialogConfig {
+  actionLabel: string;
+  description: ReactNode;
+  icon: IconProps["icon"];
+  title: string;
+  tone?: "danger";
+}
+
 function getCloudActionDialogConfig({
   action,
   email,
@@ -486,13 +494,7 @@ function getCloudActionDialogConfig({
   action: CloudActionDialogType;
   email: string;
   hasPasswordAccount: boolean;
-}): {
-  actionLabel: string;
-  description: ReactNode;
-  icon: IconProps["icon"];
-  title: string;
-  tone?: "danger";
-} {
+}): CloudActionDialogConfig {
   switch (action) {
     case "connect-apple":
       return {

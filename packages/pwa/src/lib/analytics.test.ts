@@ -22,7 +22,14 @@ vi.mock("@capacitor/core", () => ({
 let repo: Repo;
 let cleanups: (() => void)[];
 let browser: EventTarget & { location: { hostname: string; origin: string } };
-let preferences: { onLine: boolean; doNotTrack?: string; globalPrivacyControl?: boolean };
+
+interface TestPrivacyPreferences {
+  onLine: boolean;
+  doNotTrack?: string;
+  globalPrivacyControl?: boolean;
+}
+
+let preferences: TestPrivacyPreferences;
 let fetch: ReturnType<typeof vi.fn<typeof globalThis.fetch>>;
 
 beforeEach(() => {

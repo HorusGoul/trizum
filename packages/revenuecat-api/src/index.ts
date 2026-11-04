@@ -346,15 +346,15 @@ function hasActiveEntitlement(value: unknown, entitlementLookupKey: string) {
   });
 }
 
-function assertRecord(
-  value: unknown,
+function assertRecord<Value>(
+  value: Value,
   resourceName: string,
-): asserts value is Record<string, unknown> {
+): asserts value is Value & Record<string, unknown> {
   if (!isRecord(value)) {
     throw new RevenueCatApiError(`RevenueCat returned an invalid ${resourceName}.`);
   }
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+function isRecord<Value>(value: Value): value is Value & Record<string, unknown> {
   return Boolean(value) && typeof value === "object";
 }

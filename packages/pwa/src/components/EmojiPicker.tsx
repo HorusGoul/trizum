@@ -359,7 +359,7 @@ const HEADER_HEIGHT = 28;
 const CATEGORY_TAB_HEIGHT = 36;
 
 // Representative emoji icons for each category
-const CATEGORY_ICONS: Record<number, string> = {
+const CATEGORY_ICONS = {
   0: "😀", // Smileys & Emotion
   1: "👋", // People & Body
   3: "🐻", // Animals & Nature
@@ -369,7 +369,11 @@ const CATEGORY_ICONS: Record<number, string> = {
   7: "💡", // Objects
   8: "💕", // Symbols
   9: "🏳️", // Flags
-};
+} satisfies Record<number, string>;
+
+function hasCategoryIcon(group: number): group is keyof typeof CATEGORY_ICONS {
+  return Object.hasOwn(CATEGORY_ICONS, group);
+}
 
 type VirtualRow = { type: "header"; group: number } | { type: "emojis"; emojis: Emoji[] };
 
@@ -521,7 +525,7 @@ function CategorizedEmojiGrid({
               activeGroup === group && "bg-accent-100 dark:bg-accent-800",
             )}
           >
-            {CATEGORY_ICONS[group] || "📁"}
+            {hasCategoryIcon(group) ? CATEGORY_ICONS[group] : "📁"}
           </button>
         ))}
       </div>
