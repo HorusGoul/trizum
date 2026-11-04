@@ -161,12 +161,13 @@ async function correctOrientation(
   const img = new Image();
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
-  const objectUrl = URL.createObjectURL(file);
 
   if (!ctx) {
     throw new Error("Could not get canvas context");
   }
 
+  // oxlint-disable-next-line react-doctor/no-create-object-url-without-revoke -- The onload finally and onerror handlers both revoke this exact URL.
+  const objectUrl = URL.createObjectURL(file);
   return new Promise((resolve, reject) => {
     img.onload = () => {
       try {

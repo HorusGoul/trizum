@@ -1,9 +1,14 @@
 import type { Repo } from "@automerge/automerge-repo/slim";
-import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
+import type { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
+import { i18n } from "@lingui/core";
 
 const addExpenseToPartyMock =
   vi.fn<(expense: MigrationData["expenses"][number]) => Promise<unknown>>();
+const createMediaFileMock = vi.hoisted(() =>
+  vi.fn<ReturnType<typeof getMediaFileHelpers>["createMediaFile"]>(),
+);
 
 vi.mock("#src/hooks/useParty.ts", () => ({
   getPartyHelpers: () => ({
@@ -13,13 +18,7 @@ vi.mock("#src/hooks/useParty.ts", () => ({
 
 vi.mock("#src/hooks/useMediaFileActions.ts", () => ({
   getMediaFileHelpers: () => ({
-    createMediaFile:
-      vi.fn<
-        (
-          blob: Blob,
-          metadata: Record<string, unknown>,
-        ) => Promise<readonly [mediaFileId: string, handle: unknown]>
-      >(),
+    createMediaFile: createMediaFileMock,
   }),
 }));
 
@@ -105,7 +104,33 @@ function createMigrationData(
 
 describe("createPartyFromMigrationData", () => {
   beforeEach(() => {
+    i18n.load("en", {});
+    i18n.activate("en");
     addExpenseToPartyMock.mockReset();
+    createMediaFileMock.mockReset();
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  test("rejects failed attachment downloads before creating media", async () => {
+    const mockRepo = createMockRepo();
+    const response = new Response("Not found", { status: 404 });
+    const readBlob = vi.spyOn(response, "blob");
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>().mockResolvedValue(response));
+
+    await expect(
+      createPartyFromMigrationData({
+        repo: mockRepo.repo,
+        data: createMigrationData(
+          {},
+          { photos: [{ id: "receipt", url: "https://example.com/receipt.jpg" }] },
+        ),
+        importAttachments: true,
+      }),
+    ).rejects.toThrow("Error importing photos: Could not import attachment (HTTP 404)");
+    expect(readBlob).not.toHaveBeenCalled();
+    expect(createMediaFileMock).not.toHaveBeenCalled();
+    expect(addExpenseToPartyMock).not.toHaveBeenCalled();
   });
 
   test("omits an undefined party symbol before creating the Automerge document", async () => {

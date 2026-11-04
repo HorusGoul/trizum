@@ -67,6 +67,7 @@ export function usePartyBoost({
           status: null,
         };
 
+  // oxlint-disable-next-line react-doctor/no-set-state-after-await-in-effect -- Both completion paths reject inactive effects and stale request tokens before updating state.
   useEffect(() => {
     statusRequests.enterContext(requestContext);
     if (!userId) return;

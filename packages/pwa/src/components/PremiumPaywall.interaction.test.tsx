@@ -28,6 +28,7 @@ vi.mock("react-aria-components", async (importOriginal) => ({
 vi.mock("#src/ui/IconButton.tsx", () => ({
   IconButton: (props: ComponentProps<typeof IconButton>) => (
     <button
+      type="button"
       aria-label={props["aria-label"]}
       disabled={props.isDisabled}
       onClick={() => props.onPress?.({} as never)}

@@ -1,23 +1,29 @@
+// @vitest-environment jsdom
+
 import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
 import { i18n } from "@lingui/core";
 import { renderToStaticMarkup } from "react-dom/server";
+import { createRoot } from "react-dom/client";
+import { act } from "react";
 import { beforeEach, expect, it, vi } from "vite-plus/test";
 import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics.ts";
 import type { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
 import { setPartyListId, type PartyList } from "#src/models/partyList.ts";
 import type * as CloudSettings from "#src/lib/cloudSyncSettings.ts";
 import type * as CloudRouteState from "#src/lib/cloudSyncRouteState.ts";
-import type { fetchLinkedAuthAccounts } from "#src/lib/auth-client.ts";
-import type { toast } from "sonner";
+import { fetchLinkedAuthAccounts } from "#src/lib/auth-client.ts";
+import { toast } from "sonner";
 import { useCloudSyncAccountState } from "./useCloudSyncAccountState.ts";
+import { fetchCloudUserSettings } from "#src/lib/cloudSyncSettings.ts";
 
 const readDocument = vi.hoisted(() => vi.fn<typeof documentCache.readAsync>());
+const repo = vi.hoisted(() => ({}));
 
 vi.mock("#src/lib/analytics.ts", () => ({
   setAnalyticsEnabled: vi.fn<typeof setAnalyticsEnabled>(),
   trackCloudSyncActivated: vi.fn<typeof trackCloudSyncActivated>(),
 }));
-vi.mock("#src/lib/automerge/useRepo.ts", () => ({ useRepo: () => ({}) }));
+vi.mock("#src/lib/automerge/useRepo.ts", () => ({ useRepo: () => repo }));
 vi.mock("#src/lib/automerge/suspense-hooks.ts", () => ({
   documentCache: { readAsync: readDocument },
 }));
@@ -78,7 +84,52 @@ beforeEach(() => {
   vi.resetAllMocks();
   i18n.load("en", {});
   i18n.activate("en");
+  (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 });
+
+it.each(["missing", "rejected"])(
+  "resolves account loading without activating an unavailable cloud list (%s)",
+  async (failure) => {
+    const source = partyList();
+    const destination = partyList();
+    vi.mocked(fetchLinkedAuthAccounts).mockResolvedValue([]);
+    vi.mocked(fetchCloudUserSettings).mockResolvedValue({
+      settings: { partyListDocumentId: destination.id, updatedAt: 123 },
+    });
+    if (failure === "missing") {
+      readDocument.mockResolvedValue(undefined);
+    } else {
+      readDocument.mockRejectedValue(new Error("Unavailable"));
+    }
+    let account!: ReturnType<typeof useCloudSyncAccountState>;
+    const onCloudDataActivated = vi.fn<(shouldDelay: boolean) => void>();
+    const isSignInSuccessVisibleRef = { current: false };
+    function Harness() {
+      account = useCloudSyncAccountState({
+        isOffline: false,
+        isSignInSuccessVisibleRef,
+        onCloudDataActivated,
+        partyList: source,
+        userId: "test-user",
+      });
+      return null;
+    }
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    try {
+      await act(async () => root.render(<Harness />));
+      expect(readDocument).toHaveBeenCalledWith(repo, destination.id);
+      expect(account.isAccountStateResolved).toBe(true);
+      expect(account.isCloudSyncSwitchOpen).toBe(false);
+      expect(setPartyListId).not.toHaveBeenCalled();
+      expect(onCloudDataActivated).not.toHaveBeenCalled();
+      expect(setAnalyticsEnabled).not.toHaveBeenCalled();
+      expect(toast.error).toHaveBeenCalledWith("Could not load trizum cloud state");
+    } finally {
+      await act(async () => root.unmount());
+    }
+  },
+);
 
 it.each([undefined, true])("counts activation for destination preference %s", async (enabled) => {
   const destination = partyList(enabled);

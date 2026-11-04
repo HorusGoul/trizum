@@ -7,6 +7,7 @@ import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
 import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
 import type { MigrationData } from "./migrationData";
+import { t } from "@lingui/core/macro";
 
 export type { MigrationData } from "./migrationData";
 
@@ -54,6 +55,16 @@ export async function createPartyFromMigrationData({
       await Promise.all(
         data.photos.map(async (photo) => {
           const response = await fetch(photo.url);
+          if (!response.ok) {
+            const status = response.status;
+            throw new Error(
+              t({
+                comment:
+                  "Error shown when a receipt attachment download fails during a Tricount import. HTTP status is a technical error code.",
+                message: `Could not import attachment (HTTP ${status})`,
+              }),
+            );
+          }
           const blob = await response.blob();
           const [mediaFileId] = await createMediaFile(
             blob,

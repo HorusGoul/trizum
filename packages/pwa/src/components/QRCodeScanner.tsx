@@ -44,11 +44,7 @@ const QRCodeFrameHandle = ({ className, ...props }: React.HTMLAttributes<HTMLDiv
   />
 );
 
-/**
- * QR Code Scanner component that uses the device camera to scan QR codes.
- * Uses barcode-detector (ZXing-C++ WebAssembly) for cross-platform scanning.
- */
-export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
+function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
   const [state, setState] = useState<ScannerState>({ status: "initializing" });
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -56,7 +52,9 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
   const scanningRef = useRef(false);
 
   useEffect(() => {
+    let isCancelled = false;
     let animationFrameId: number;
+    let feedbackTimeoutId: ReturnType<typeof setTimeout> | undefined;
     let detector: InstanceType<typeof BarcodeDetector> | null = null;
 
     async function initScanner() {
@@ -76,16 +74,23 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
           audio: false,
         });
 
+        if (isCancelled) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
         streamRef.current = stream;
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play();
+          if (isCancelled) return;
           setState({ status: "scanning" });
           scanningRef.current = true;
           void scanFrame();
         }
       } catch (err) {
+        if (isCancelled) return;
         logger.error("Camera initialization error", { error: err });
 
         if (err instanceof Error) {
@@ -114,7 +119,13 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
     }
 
     async function scanFrame() {
-      if (!scanningRef.current || !videoRef.current || !canvasRef.current || !detector) {
+      if (
+        isCancelled ||
+        !scanningRef.current ||
+        !videoRef.current ||
+        !canvasRef.current ||
+        !detector
+      ) {
         return;
       }
 
@@ -137,6 +148,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
       try {
         // Detect barcodes in the frame
         const barcodes = await detector.detect(canvas);
+        if (isCancelled) return;
 
         if (barcodes.length > 0 && barcodes[0].rawValue) {
           const scannedValue = barcodes[0].rawValue;
@@ -150,7 +162,7 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
               setState({ status: "error", message: validationResult });
 
               // Return to scanning after showing error
-              setTimeout(() => {
+              feedbackTimeoutId = setTimeout(() => {
                 setState({ status: "scanning" });
                 scanningRef.current = true;
                 void scanFrame();
@@ -164,13 +176,14 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
           setState({ status: "success" });
 
           // Show success animation before calling onResult
-          setTimeout(() => {
+          feedbackTimeoutId = setTimeout(() => {
             stopCamera();
             onResult({ type: "success", value: scannedValue });
           }, 1500);
           return;
         }
       } catch (err) {
+        if (isCancelled) return;
         logger.error("Barcode detection error", { error: err });
       }
 
@@ -188,11 +201,23 @@ export function QRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
     void initScanner();
 
     return () => {
+      isCancelled = true;
       scanningRef.current = false;
       cancelAnimationFrame(animationFrameId);
+      clearTimeout(feedbackTimeoutId);
       stopCamera();
     };
   }, [onResult, validate]);
+
+  return { state, videoRef, canvasRef };
+}
+
+/**
+ * QR Code Scanner component that uses the device camera to scan QR codes.
+ * Uses barcode-detector (ZXing-C++ WebAssembly) for cross-platform scanning.
+ */
+export function QRCodeScanner(props: QRCodeScannerProps) {
+  const { state, videoRef, canvasRef } = useQRCodeScanner(props);
 
   return (
     <LazyMotion features={domAnimation}>

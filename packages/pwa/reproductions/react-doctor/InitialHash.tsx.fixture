@@ -1,0 +1,14 @@
+import { useRef } from "react";
+
+export function InitialHash({ expense }: { expense: { name: string } }) {
+  const initialHashRef = useRef<string | null>(null);
+  if (initialHashRef.current === null) {
+    initialHashRef.current = JSON.stringify(expense);
+  }
+
+  return (
+    <button type="button" onClick={() => { initialHashRef.current = JSON.stringify(expense); }}>
+      Update baseline
+    </button>
+  );
+}
