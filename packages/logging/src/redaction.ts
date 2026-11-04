@@ -40,6 +40,10 @@ const redactedPrimitiveSchema = z.union([
 const logFunctionSchema = z.function();
 const logObjectSchema = z.custom<object>((value) => value !== null && Object(value) === value);
 
+// Zod's default type errors inspect constructor.name on rejected objects.
+// Classification must leave diagnostic accessors untouched, even on failure.
+const diagnosticParseOptions = { error: () => "Invalid diagnostic value" };
+
 const nativeErrorStackDescriptor = getPropertyDescriptor(new Error(), "stack");
 
 function getPropertyDescriptor(value: Error, key: string): PropertyDescriptor | undefined {
@@ -67,7 +71,11 @@ function redactErrorField(
     ["name", "message"].every((field) => {
       const property = getPropertyDescriptor(error, field);
 
-      return property && "value" in property && logStringSchema.safeParse(property.value).success;
+      return (
+        property &&
+        "value" in property &&
+        logStringSchema.safeParse(property.value, diagnosticParseOptions).success
+      );
     })
   ) {
     let value: unknown;
@@ -98,12 +106,12 @@ const redactValueSchema = z.unknown().transform((input): RedactedValue => {
   const ancestors = new Set<object>();
 
   const redactor = z.unknown().transform((value): RedactedValue => {
-    const primitive = redactedPrimitiveSchema.safeParse(value);
+    const primitive = redactedPrimitiveSchema.safeParse(value, diagnosticParseOptions);
 
     if (primitive.success) return primitive.data;
 
-    if (logFunctionSchema.safeParse(value).success) return "[Function]";
-    const object = logObjectSchema.parse(value);
+    if (logFunctionSchema.safeParse(value, diagnosticParseOptions).success) return "[Function]";
+    const object = logObjectSchema.parse(value, diagnosticParseOptions);
 
     if (ancestors.has(object)) return "[Circular]";
 
@@ -162,7 +170,8 @@ const redactValueSchema = z.unknown().transform((input): RedactedValue => {
 
         const nextValue =
           "value" in descriptor
-            ? DOCUMENT_ID_FIELD.test(key) && logStringSchema.safeParse(descriptor.value).success
+            ? DOCUMENT_ID_FIELD.test(key) &&
+              logStringSchema.safeParse(descriptor.value, diagnosticParseOptions).success
               ? REDACTED_DOCUMENT_ID
               : redactor.parse(descriptor.value)
             : "[Accessor]";

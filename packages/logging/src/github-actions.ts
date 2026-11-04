@@ -58,7 +58,10 @@ function getGitHubActionsErrorSummary(cause: unknown): string | null {
     return `${cause.name}: ${cause.message}`;
   }
 
-  const primitive = annotationErrorSummarySchema.safeParse(cause);
+  // Rejected diagnostics may have constructor getters; avoid Zod's type formatter.
+  const primitive = annotationErrorSummarySchema.safeParse(cause, {
+    error: () => "Not a primitive error summary",
+  });
 
   if (primitive.success) return String(primitive.data);
 

@@ -1,4 +1,6 @@
-import { redactValue } from "./redaction.js";
+/// <reference types="node" />
+
+import { redactValue, withDocumentIdRedaction } from "./redaction.js";
 import { inspect } from "node:util";
 import bs58check from "bs58check";
 import { getLogger, resetSync, type LogRecord } from "@logtape/logtape";
@@ -15,6 +17,47 @@ afterEach(() => {
 });
 
 describe("document ID redaction at every sink", () => {
+  test.each(["object", "error"])(
+    "delivers redacted %s diagnostics without reading constructor accessors",
+    (kind) => {
+      const getter = vi.fn<() => never>(() => {
+        throw new Error("constructor getter invoked");
+      });
+
+      const diagnostic = kind === "error" ? new Error("Lookup failed") : Object.create({});
+      Object.defineProperty(diagnostic, "constructor", { get: getter });
+      Object.defineProperty(diagnostic, "documentId", { enumerable: true, value: documentId });
+      const records: LogRecord[] = [];
+
+      withDocumentIdRedaction((record) => records.push(record))({
+        category: ["trizum"],
+        level: "warning",
+        timestamp: 0,
+        message: ["Lookup failed"],
+        rawMessage: "Lookup failed",
+        properties: { diagnostic, documentId: diagnostic },
+      });
+
+      expect(getter).not.toHaveBeenCalled();
+      expect(records).toHaveLength(1);
+      expect(records[0]?.properties.diagnostic).toMatchObject({ documentId: redactedId });
+      expect(records[0]?.properties.documentId).toMatchObject({ documentId: redactedId });
+    },
+  );
+
+  test("redacts diagnostics without reading constructor names", () => {
+    const getter = vi.fn<() => never>(() => {
+      throw new Error("constructor.name getter invoked");
+    });
+
+    const constructor = Object.defineProperty({}, "name", { get: getter });
+    const diagnostic = Object.create({ constructor });
+    Object.defineProperty(diagnostic, "documentId", { enumerable: true, value: documentId });
+
+    expect(redactValue(diagnostic)).toEqual({ documentId: redactedId });
+    expect(getter).not.toHaveBeenCalled();
+  });
+
   test("preserves non-finite numbers and decodes other primitive log values", () => {
     expect(
       redactValue({

@@ -51,6 +51,27 @@ afterEach(() => {
 });
 
 describe("@trizum/logging/github-actions", () => {
+  test("emits annotations without inspecting diagnostic constructors", () => {
+    const getter = vi.fn<() => never>(() => {
+      throw new Error("constructor getter invoked");
+    });
+
+    const diagnostic = Object.create({});
+    Object.defineProperty(diagnostic, "constructor", { get: getter });
+    const commands: string[] = [];
+
+    emitWithSink(
+      getGitHubActionsAnnotationSink({
+        enabled: true,
+        writeCommand: (command) => commands.push(command),
+      }),
+      (logger) => logger.error("Screenshot capture failed", { error: diagnostic }),
+    );
+
+    expect(getter).not.toHaveBeenCalled();
+    expect(commands).toEqual(["::error::trizum.screenshots.capture: Screenshot capture failed\n"]);
+  });
+
   test("does not emit annotations outside GitHub Actions by default", () => {
     const processRef = getTestProcess();
     originalGitHubActions = processRef.env.GITHUB_ACTIONS;
