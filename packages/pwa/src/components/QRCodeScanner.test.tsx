@@ -39,7 +39,15 @@ const getUserMedia = vi.fn<typeof navigator.mediaDevices.getUserMedia>();
 function stream() {
   const stop = vi.fn<() => void>();
 
-  return { media: { getTracks: () => [{ stop }] } as unknown as MediaStream, stop };
+  const track: Pick<MediaStreamTrack, "stop"> = { stop };
+
+  const media: Pick<MediaStream, "getTracks"> = {
+    // SAFETY: The scanner only stops the tracks returned by this controlled camera fixture.
+    getTracks: () => [track as MediaStreamTrack],
+  };
+
+  // SAFETY: Camera teardown reads getTracks; the video element accepts this fixture's stream reference.
+  return { media: media as MediaStream, stop };
 }
 
 function deferred<T>() {
@@ -78,9 +86,15 @@ beforeEach(() => {
   vi.stubGlobal("cancelAnimationFrame", vi.fn<typeof cancelAnimationFrame>());
   vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue();
   vi.spyOn(HTMLMediaElement.prototype, "readyState", "get").mockReturnValue(4);
-  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
-    drawImage: vi.fn<CanvasRenderingContext2D["drawImage"]>(),
-  } as unknown as CanvasRenderingContext2D);
+
+  const context: Pick<CanvasRenderingContext2D, "drawImage"> = {
+    drawImage: vi.fn<(image: CanvasImageSource, ...coordinates: number[]) => void>(),
+  };
+
+  // SAFETY: The scanner draws to the canvas; BarcodeDetector reads the canvas without other context calls.
+  vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(
+    context as CanvasRenderingContext2D,
+  );
   detect.mockResolvedValue([]);
   container = document.createElement("div");
   root = createRoot(container);

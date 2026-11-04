@@ -3,9 +3,23 @@ export interface PresenceBubblePosition {
   left: number;
 }
 
+interface PresenceAnchor {
+  dataset?: Partial<DOMStringMap>;
+  getBoundingClientRect(): Pick<DOMRectReadOnly, "right" | "top">;
+}
+
+interface PresenceOverlay {
+  getBoundingClientRect(): Pick<DOMRectReadOnly, "left" | "top">;
+}
+
+export interface PresenceTarget {
+  dataset?: Partial<DOMStringMap>;
+  parentElement: PresenceTarget | null;
+}
+
 export function getPresenceBubblePosition(
-  element: HTMLElement,
-  overlayElement: HTMLElement,
+  element: PresenceAnchor,
+  overlayElement: PresenceOverlay,
 ): PresenceBubblePosition {
   const elementRect = element.getBoundingClientRect();
   const overlayRect = overlayElement.getBoundingClientRect();
@@ -33,12 +47,12 @@ export function arePresenceBubblePositionsEqual(
   return first.top === second.top && first.left === second.left;
 }
 
-export function getPresenceElementIdFromTarget(target: Element | null): string | null {
+export function getPresenceElementIdFromTarget(target: PresenceTarget | null): string | null {
   if (!target) {
     return null;
   }
 
-  const dataset = "dataset" in target ? (target.dataset as DOMStringMap) : undefined;
+  const dataset = target.dataset;
   const presenceElementId = dataset?.presenceElementId ?? dataset?.presenceProxyElementId;
 
   if (presenceElementId) {

@@ -248,14 +248,17 @@ describe("Worker document reads over WebSocket", () => {
 
     if (!address || typeof address === "string") throw new Error("Expected a local TCP server");
 
+    const assets: Pick<ApiEnv["ASSETS"], "fetch"> = {
+      fetch: async () =>
+        new Response("<html><head><title>Fallback</title></head><body></body></html>"),
+    };
+
+    // SAFETY: These preview and membership routes use the configured sync URL, timeouts, and asset fetcher only.
     return {
       AUTOMERGE_WSS_URL: `ws://127.0.0.1:${address.port}`,
       PARTY_MEMBERSHIP_TIMEOUT_MS: "5000",
       PARTY_SHARE_PREVIEW_TIMEOUT_MS: "5000",
-      ASSETS: {
-        fetch: async () =>
-          new Response("<html><head><title>Fallback</title></head><body></body></html>"),
-      },
-    } as unknown as ApiEnv;
+      ASSETS: assets,
+    } as ApiEnv;
   }
 });

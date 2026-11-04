@@ -1,105 +1,70 @@
+import type { MigrationData } from "../../src/models/migrationData.ts";
 import type { Party } from "../../src/models/party";
 import { expect, test as base, type Page } from "@playwright/test";
 
-export interface InternalHarnessWindow extends Window {
-  __internal_setPartyBoost: (partyId: string, boost: Party["boost"]) => Promise<void>;
-  __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
-  __internal_createDeferredPartyListState: (seed: unknown) => Promise<{
-    partyListId: string;
-  }>;
-  __internal_getDocumentState: (documentId: string) => string | undefined;
-  __internal_releaseDeferredPartyListState: (partyListId: string) => void;
-  __internal_seedPartyListState: (seed: unknown) => Promise<{
-    partyListId: string;
-  }>;
-  __internal_readPartyListState: () => Promise<{
-    partyListId: string;
-    lastOpenedPartyId: string | null;
-    parties: Record<string, true | undefined>;
-    pinnedParties: Record<string, true | undefined>;
-    archivedParties: Record<string, true | undefined>;
-    lastUsedAt: Record<string, number | undefined>;
-    participantInParties: Record<string, string>;
-  }>;
-  __internal_recalculatePartyBalances: (partyId: string) => Promise<boolean>;
-}
+import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo/slim";
+import type {
+  InternalPartyListSeed,
+  InternalPartyListSnapshot,
+} from "../../src/lib/testing/browserHarness.ts";
 
-interface PartyListSeed {
-  username?: string;
-  phone?: string;
-  autoOpenCalculator?: boolean;
-  openLastPartyOnLaunch?: boolean;
-  lastOpenedPartyId?: string | null;
-  parties?: Record<string, true>;
-  pinnedParties?: Record<string, true>;
-  archivedParties?: Record<string, true>;
-  lastUsedAt?: Record<string, number>;
-  participantInParties?: Record<string, string>;
-}
+type PartyListSeed = InternalPartyListSeed;
 
 interface JoinedPartySeed {
-  fixture: unknown;
+  fixture: MigrationData;
   memberParticipantId: string;
   openLastPartyOnLaunch?: boolean;
 }
 
 interface JoinedPartyThroughUiSeed {
-  fixture: unknown;
+  fixture: MigrationData;
   participantName: string;
 }
 
-interface PartyListSnapshot {
-  partyListId: string;
-  lastOpenedPartyId: string | null;
-  parties: Record<string, true | undefined>;
-  pinnedParties: Record<string, true | undefined>;
-  archivedParties: Record<string, true | undefined>;
-  lastUsedAt: Record<string, number | undefined>;
-  participantInParties: Record<string, string>;
-}
+type PartyListSnapshot = InternalPartyListSnapshot;
 
 export interface BrowserHarness {
-  setPartyBoost(partyId: string, boost: Party["boost"]): Promise<void>;
+  setPartyBoost(partyId: DocumentId, boost: Party["boost"]): Promise<void>;
   goto(path?: string): Promise<void>;
   gotoHome(): Promise<void>;
   navigate(path: string): Promise<void>;
   gotoParty(partyId: string, tab?: "expenses" | "balances" | "stats"): Promise<void>;
-  seedParty(fixture: unknown): Promise<{
+  seedParty(fixture: MigrationData): Promise<{
     joinCode: string;
     joinUrl: string;
-    partyId: string;
+    partyId: DocumentId;
   }>;
-  seedParties(fixtures: unknown[]): Promise<
+  seedParties(fixtures: MigrationData[]): Promise<
     {
       joinCode: string;
       joinUrl: string;
-      partyId: string;
+      partyId: DocumentId;
     }[]
   >;
   seedPartyList(seed: PartyListSeed): Promise<{
-    partyListId: string;
+    partyListId: DocumentId;
   }>;
   createDeferredPartyList(seed: PartyListSeed): Promise<{
-    partyListId: string;
+    partyListId: DocumentId;
   }>;
   getDocumentState(documentId: string): Promise<string | undefined>;
   releaseDeferredPartyList(partyListId: string): Promise<void>;
-  seedJoinableParty(fixture: unknown): Promise<{
+  seedJoinableParty(fixture: MigrationData): Promise<{
     joinCode: string;
     joinUrl: string;
-    partyId: string;
+    partyId: DocumentId;
   }>;
   joinSeededParty(seed: JoinedPartyThroughUiSeed): Promise<{
     joinCode: string;
     joinUrl: string;
-    partyId: string;
+    partyId: DocumentId;
   }>;
   seedJoinedParty(seed: JoinedPartySeed): Promise<{
     joinCode: string;
     joinUrl: string;
-    partyId: string;
+    partyId: DocumentId;
   }>;
-  recalculatePartyBalances(partyId: string): Promise<void>;
+  recalculatePartyBalances(partyId: DocumentId): Promise<void>;
   readPartyList(): Promise<PartyListSnapshot>;
   selectParticipantIdentity(participantName: string): Promise<void>;
 }
@@ -119,7 +84,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   async function hasInternalHooks() {
     return page
       .evaluate(() => {
-        const internalWindow = window as Partial<InternalHarnessWindow>;
+        const internalWindow = window;
 
         return (
           typeof internalWindow.__internal_createPartyFromMigrationData === "function" &&
@@ -178,7 +143,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await waitForInternalHooks();
   }
 
-  function buildPartySeedResult(partyId: string) {
+  function buildPartySeedResult(partyId: DocumentId) {
     return {
       joinCode: partyId,
       joinUrl: `/party/${partyId}`,
@@ -186,7 +151,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     };
   }
 
-  async function seedParty(fixture: unknown) {
+  async function seedParty(fixture: MigrationData) {
     await bootstrapForSeeding();
 
     const partyId = await createPartyWithRecalculatedBalances(fixture);
@@ -194,10 +159,10 @@ function createBrowserHarness(page: Page): BrowserHarness {
     return buildPartySeedResult(partyId);
   }
 
-  async function seedParties(fixtures: unknown[]) {
+  async function seedParties(fixtures: MigrationData[]) {
     await bootstrapForSeeding();
 
-    const partyIds: string[] = [];
+    const partyIds: DocumentId[] = [];
 
     for (const fixture of fixtures) {
       partyIds.push(await createPartyWithRecalculatedBalances(fixture));
@@ -216,32 +181,37 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await bootstrapForSeeding();
 
     return page.evaluate(async (nextSeed) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
 
       return internalWindow.__internal_createDeferredPartyListState(nextSeed);
     }, seed);
   }
 
   async function getDocumentState(documentId: string) {
+    if (!isValidDocumentId(documentId)) return undefined;
+
     await waitForInternalHooks();
 
     return page.evaluate((nextDocumentId) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
 
       return internalWindow.__internal_getDocumentState(nextDocumentId);
     }, documentId);
   }
 
   async function releaseDeferredPartyList(partyListId: string) {
+    if (!isValidDocumentId(partyListId))
+      throw new Error("Expected a valid deferred party-list document ID");
+
     await waitForInternalHooks();
 
     await page.evaluate((nextPartyListId) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
       internalWindow.__internal_releaseDeferredPartyListState(nextPartyListId);
     }, partyListId);
   }
 
-  async function seedJoinableParty(fixture: unknown) {
+  async function seedJoinableParty(fixture: MigrationData) {
     return seedParty(fixture);
   }
 
@@ -299,7 +269,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await waitForInternalHooks();
 
     return page.evaluate(async () => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
 
       return internalWindow.__internal_readPartyListState();
     });
@@ -316,44 +286,47 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await page.getByRole("button", { name: /save|guardar/i }).click();
   }
 
-  async function setPartyBoost(partyId: string, boost: Party["boost"]) {
+  async function setPartyBoost(partyId: DocumentId, boost: Party["boost"]) {
     await page.waitForFunction(() => typeof window.__internal_setPartyBoost === "function");
     await page.evaluate(
       async ({ partyId, boost }) => {
-        const internalWindow = window as unknown as InternalHarnessWindow;
-        await internalWindow.__internal_setPartyBoost(partyId, boost);
+        const setPartyBoost = window.__internal_setPartyBoost;
+
+        if (!setPartyBoost) throw new Error("Expected the E2E party boost hook to be installed");
+
+        await setPartyBoost(partyId, boost);
       },
       { partyId, boost },
     );
   }
 
-  async function createParty(fixture: unknown) {
+  async function createParty(fixture: MigrationData) {
     return page.evaluate(async (data) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
 
       return internalWindow.__internal_createPartyFromMigrationData(data);
     }, fixture);
   }
 
-  async function createPartyWithRecalculatedBalances(fixture: unknown) {
+  async function createPartyWithRecalculatedBalances(fixture: MigrationData) {
     const partyId = await createParty(fixture);
     await recalculatePartyBalances(partyId);
 
     return partyId;
   }
 
-  async function recalculatePartyBalances(partyId: string) {
+  async function recalculatePartyBalances(partyId: DocumentId) {
     await waitForInternalHooks();
 
     await page.evaluate(async (nextPartyId) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
       await internalWindow.__internal_recalculatePartyBalances(nextPartyId);
     }, partyId);
   }
 
   async function writePartyList(seed: PartyListSeed) {
     return page.evaluate(async (nextSeed) => {
-      const internalWindow = window as unknown as InternalHarnessWindow;
+      const internalWindow = window;
 
       return internalWindow.__internal_seedPartyListState(nextSeed);
     }, seed);

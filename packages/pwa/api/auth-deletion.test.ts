@@ -100,12 +100,13 @@ beforeEach(() => {
         return { rows: [] };
       }
 
-      return {
-        rows:
-          method === "get"
-            ? ((statement.get(...params) as unknown as unknown[] | undefined) ?? [])
-            : statement.all(...params),
-      };
+      if (method === "get") {
+        const row = statement.get(...params);
+
+        return { rows: row ? Object.values(row) : [] };
+      }
+
+      return { rows: statement.all(...params) };
     },
     { schema },
   );

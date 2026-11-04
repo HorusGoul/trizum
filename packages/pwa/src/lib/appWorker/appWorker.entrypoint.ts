@@ -4,4 +4,7 @@ import { defineAppWorkerProvider } from "./proxy.ts";
 
 const provideAppWorker = defineAppWorkerProvider(() => new AppWorkerService());
 
-provideAppWorker(new WorkerAdapter(self as unknown as WorkerEndpoint, "app-worker"));
+// This module runs in the app worker, whose endpoint differs from the window global.
+declare const self: WorkerEndpoint;
+
+provideAppWorker(new WorkerAdapter(self, "app-worker"));

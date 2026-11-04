@@ -1,11 +1,6 @@
+import type {} from "../../src/lib/testing/browserHarnessApi.ts";
 import type { Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "../../src/models/party";
-
-declare global {
-  interface Window {
-    __internal_setPartyBoost?: (partyId: Party["id"], boost: Party["boost"]) => Promise<void>;
-  }
-}
 
 /** Test fixture only: normal builds omit this module and its global setter. */
 export function installPartyBoostBrowserSeed(repo: Repo) {

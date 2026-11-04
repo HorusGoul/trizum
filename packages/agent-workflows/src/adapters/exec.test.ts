@@ -8,8 +8,7 @@ import {
 
 type TestEnvironment = Record<string, string | undefined>;
 
-const testEnvironment = (globalThis as unknown as { process: { env: TestEnvironment } }).process
-  .env;
+const testEnvironment: TestEnvironment = process.env;
 
 const previousGhToken = testEnvironment.GH_TOKEN;
 const previousCodexHome = testEnvironment.CODEX_HOME;

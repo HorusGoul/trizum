@@ -1,6 +1,6 @@
 import { i18n } from "@lingui/core";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
-import type { Repo } from "@automerge/automerge-repo";
+import { Repo, type DocHandle } from "@automerge/automerge-repo";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
 import type * as imageCompressionModule from "#src/lib/imageCompression.ts";
 
@@ -22,65 +22,25 @@ import {
   processImage,
 } from "#src/lib/imageCompression.ts";
 
-function assertNoUndefinedValues(value: unknown, path: string) {
-  if (value === undefined) {
-    throw new RangeError(
-      `Cannot assign undefined value at ${path}, because \`undefined\` is not a valid JSON data type. You might consider setting the property's value to \`null\`, or using \`delete\` to remove it altogether.`,
-    );
-  }
-
-  if (Array.isArray(value)) {
-    for (const [index, item] of value.entries()) {
-      assertNoUndefinedValues(item, `${path}/${index}`);
-    }
-
-    return;
-  }
-
-  if (value && typeof value === "object") {
-    for (const [key, item] of Object.entries(value)) {
-      assertNoUndefinedValues(item, `${path}/${key}`);
-    }
-  }
-}
+const testRepos: Repo[] = [];
 
 function createMockRepo() {
-  let nextId = 0;
-
-  let lastCreatedHandle:
-    | {
-        doc: MediaFile;
-        documentId: string;
-        change: (changeFn: (nextDoc: MediaFile) => void) => void;
-      }
-    | undefined;
+  const repo = new Repo({ network: [] });
+  testRepos.push(repo);
+  const create = vi.spyOn(repo, "create");
 
   return {
-    repo: {
-      create<T>(doc: T) {
-        if (doc && typeof doc === "object" && "metadata" in doc) {
-          assertNoUndefinedValues((doc as { metadata: unknown }).metadata, "/metadata");
-        }
+    repo,
+    getLastCreatedHandle() {
+      const result = create.mock.results.at(-1);
 
-        const handle = {
-          doc,
-          documentId: `mock-doc-${++nextId}`,
-          change(changeFn: (nextDoc: T) => void) {
-            changeFn(handle.doc);
-          },
-        };
+      if (!result || result.type !== "return")
+        throw new Error("Expected a created document handle");
 
-        lastCreatedHandle = handle as unknown as typeof lastCreatedHandle;
+      // SAFETY: This fixture observes only the MediaFile created by the helper under test.
+      const handle = result.value as DocHandle<MediaFile>;
 
-        return handle;
-      },
-    } as unknown as Repo,
-    getLastCreatedHandle: () => {
-      if (!lastCreatedHandle) {
-        throw new Error("Expected a created media file handle");
-      }
-
-      return lastCreatedHandle;
+      return { documentId: handle.documentId, doc: handle.doc() };
     },
   };
 }
@@ -98,7 +58,8 @@ describe("getMediaFileHelpers", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await Promise.all(testRepos.splice(0).map((repo) => repo.shutdown()));
     vi.restoreAllMocks();
   });
 

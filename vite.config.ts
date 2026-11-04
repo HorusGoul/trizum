@@ -108,7 +108,7 @@ const toolingConfig = {
     rules: {
       "anti-slop/no-array-filter-map": "error",
       "anti-slop/no-reduce-accumulator-copy": "error",
-      "anti-slop/no-chained-type-assertions": "off", // https://github.com/HorusGoul/trizum/issues/565
+      "anti-slop/no-chained-type-assertions": "error",
       "anti-slop/no-conditional-empty-object-spread": "error",
       "anti-slop/no-known-value-widening": "error",
       "anti-slop/no-module-mocking": "off", // https://github.com/HorusGoul/trizum/issues/584

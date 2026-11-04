@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vite-plus/test";
-import type { DocHandle, DocumentId, Repo } from "@automerge/automerge-repo/slim";
+import type { DocHandle, DocumentId } from "@automerge/automerge-repo/slim";
 import { calculateBalancesByParticipant, type Expense } from "#src/models/expense.ts";
 import type {
   Party,
@@ -96,28 +96,33 @@ describe("recalculatePartyBalances", () => {
 function createRepoMock() {
   const handles = new Map<DocumentId, TestDocHandle<unknown>>();
 
-  const find = vi.fn<(documentId: DocumentId) => Promise<TestDocHandle<unknown>>>(
+  type Find = Parameters<typeof recalculatePartyBalances>[0]["find"];
+
+  const find = vi.fn<(...args: Parameters<Find>) => Promise<TestDocHandle<unknown>>>(
     async (documentId) => {
       const handle = handles.get(documentId);
 
-      if (!handle) {
-        throw new Error(`Missing test handle: ${documentId}`);
-      }
+      if (!handle) throw new Error(`Missing test handle: ${documentId}`);
 
       return handle;
     },
   );
 
-  const flush = vi.fn<(_documentIds: DocumentId[]) => Promise<void>>(async () => {});
+  const flush = vi.fn<Parameters<typeof recalculatePartyBalances>[0]["flush"]>(async () => {});
 
   return {
     handles,
     find,
     flush,
     repo: {
-      find,
+      async find<Document>(...args: Parameters<Find>) {
+        const handle = await find(...args);
+
+        // SAFETY: Setup registers each typed handle under the document ID requested by the calculation.
+        return handle as TestDocHandle<Document>;
+      },
       flush,
-    } as unknown as Repo,
+    },
   };
 }
 

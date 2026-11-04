@@ -1,4 +1,6 @@
+import { createCustomerInfo } from "./revenueCatTestFixtures.ts";
 import type { PluginListenerHandle } from "@capacitor/core";
+import type * as CapacitorCore from "@capacitor/core";
 import type { CustomerInfo } from "@revenuecat/purchases-capacitor";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { connectRevenueCatPremium } from "./revenueCatPremiumConnection.ts";
@@ -16,7 +18,10 @@ const native = vi.hoisted(() => ({
 
 vi.mock("@capacitor/app", () => ({ App: { addListener: native.addListener } }));
 
-vi.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: native.isNativePlatform } }));
+vi.mock("@capacitor/core", async (importOriginal) => ({
+  ...(await importOriginal<typeof CapacitorCore>()),
+  Capacitor: { isNativePlatform: native.isNativePlatform },
+}));
 
 beforeEach(() => {
   vi.stubGlobal("window", new EventTarget());
@@ -31,7 +36,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-const customerInfo = { id: "premium" } as unknown as CustomerInfo;
+const customerInfo = createCustomerInfo({ originalAppUserId: "premium" });
 
 describe("connectRevenueCatPremium", () => {
   it("subscribes even when the initial customer refresh fails", async () => {
@@ -101,7 +106,7 @@ describe("connectRevenueCatPremium", () => {
 });
 
 describe("foreground refresh", () => {
-  const expiredInfo = { id: "free" } as unknown as CustomerInfo;
+  const expiredInfo = createCustomerInfo({ originalAppUserId: "free" });
 
   function setup() {
     vi.useFakeTimers();
