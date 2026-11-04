@@ -91,6 +91,7 @@ export function getMediaFileHelpers(repo: Repo) {
       }
     }
 
+    // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
     const handle = repo.create<MediaFile>({
       id: "id" as DocumentId,
       type: "mediaFile",

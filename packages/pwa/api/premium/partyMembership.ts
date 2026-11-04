@@ -28,7 +28,9 @@ export async function getPartyMemberParticipantId({
     return null;
   }
 
+  // SAFETY: Both document IDs have passed the isValidDocumentId checks above before entering the repository.
   const partyId = partyDocumentId as DocumentId;
+  // SAFETY: Both document IDs have passed the isValidDocumentId checks above before entering the repository.
   const partyListId = partyListDocumentId as DocumentId;
 
   try {

@@ -105,7 +105,7 @@ function parseOptions(): OrganizeScreenshotsOptions {
     process.exit(1);
   }
 
-  const platform = values.platform as Platform;
+  const platform = values.platform;
 
   if (platform !== "ios" && platform !== "android") {
     logger.error('Invalid platform; expected "ios" or "android"');
@@ -138,7 +138,7 @@ async function getScreenshotFiles(
 function getScreenshotIndex(filename: string): number {
   // Extract the name from filename (e.g., "expense-log.portrait.png" -> "expense-log")
   const name = filename.split(".")[0];
-  const index = STORE_SCREENSHOT_ORDER.indexOf(name as (typeof STORE_SCREENSHOT_ORDER)[number]);
+  const index = STORE_SCREENSHOT_ORDER.findIndex((entry) => entry === name);
 
   return index === -1 ? 999 : index;
 }

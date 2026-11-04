@@ -13,6 +13,7 @@ const require = createRequire(import.meta.url);
 const profilingRequire = createRequire(require.resolve("@sentry/profiling-node"));
 
 function copyPackage(manifestPath: string, nodeModules: string) {
+  // SAFETY: This manifest is installed by the package manager; the copy routine consumes its package name and dependency map.
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
     name: string;
     dependencies?: Record<string, string>;

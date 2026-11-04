@@ -70,6 +70,7 @@ class TestWorker {
 }
 
 describe("app worker client", () => {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   const partyId = "party-id" as Party["id"];
   let dispatchEvent: ReturnType<typeof vi.fn<DispatchEvent>>;
 
@@ -209,6 +210,7 @@ describe("app worker client", () => {
     const [event] = dispatchEvent.mock.calls[0] ?? [];
     expect(event).toBeInstanceOf(CustomEvent);
     expect(event?.type).toBe(APP_WORKER_FULL_RESTART_REQUIRED_EVENT);
+    // SAFETY: The previous assertions verify this is the full-restart CustomEvent emitted by the worker client.
     expect((event as CustomEvent).detail).toEqual({
       methodName: "recalculateBalances",
     });

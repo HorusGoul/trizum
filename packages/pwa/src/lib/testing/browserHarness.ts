@@ -85,6 +85,7 @@ export function createInactivePartyListState({
   repo: Repo;
   seed: InternalPartyListSeed;
 }): InternalPartyListSeedResult {
+  // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
   const partyListHandle = repo.create<PartyList>({
     id: "" as DocumentId,
     type: "partyList",

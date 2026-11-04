@@ -5,7 +5,9 @@ import { usePremium, type PremiumContextValue } from "#src/lib/premium/PremiumCo
 import type { PremiumPaywall } from "./PremiumPaywall.tsx";
 import { PremiumProvider } from "./PremiumProvider.tsx";
 
-const paywall = vi.hoisted(() => ({ props: null as ComponentProps<typeof PremiumPaywall> | null }));
+const paywall = vi.hoisted<{ props: ComponentProps<typeof PremiumPaywall> | null }>(() => ({
+  props: null,
+}));
 
 vi.mock("#src/lib/auth-client.ts", () => ({
   useAppSession: () => ({ data: { user: { id: "test-user" } }, isPending: false, error: null }),

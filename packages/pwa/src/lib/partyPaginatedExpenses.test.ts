@@ -37,6 +37,7 @@ const {
   subscribeToPartyPaginatedExpenses,
 } = await import("./partyPaginatedExpenses");
 
+// SAFETY: All cache operations are mocked in this test; the repo is only an identity key and no Repo method is called.
 const repo = {} as Repo;
 const chunk1 = toChunkId("chunk-1");
 const chunk2 = toChunkId("chunk-2");
@@ -219,6 +220,7 @@ function cacheChunk(chunkId: DocumentId) {
 }
 
 function createExpenseWithPaidAt(id: string, paidAt: string): Expense {
+  // SAFETY: This pagination fixture is read only for id and paidAt by the ordering code under test.
   return {
     id,
     paidAt: new Date(paidAt),
@@ -239,5 +241,6 @@ function appendExpenseToCachedChunk(chunkId: DocumentId, paidAt: string) {
 }
 
 function toChunkId(value: string): DocumentId {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return value as DocumentId;
 }

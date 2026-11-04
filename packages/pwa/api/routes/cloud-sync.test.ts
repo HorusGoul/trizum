@@ -168,6 +168,7 @@ function request(method: "GET" | "PUT", body?: string, contentType = "applicatio
 
   if (method === "PUT") init.body = body;
 
+  // SAFETY: Both auth and database bindings are mocked; the route under test does not read environment bindings.
   return cloudSyncRoute.fetch(new Request("https://trizum.test/settings", init), {} as ApiEnv, {
     waitUntil: vi.fn<ExecutionContext["waitUntil"]>(),
     passThroughOnException: vi.fn<ExecutionContext["passThroughOnException"]>(),

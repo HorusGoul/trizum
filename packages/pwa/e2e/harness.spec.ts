@@ -165,6 +165,7 @@ test.describe("Browser harness", () => {
     await page.getByLabel("Email").fill(user.email);
     await page.getByLabel("Password").fill("test-password");
     await page.evaluate(() => {
+      // SAFETY: This test installs and reads only its own optional window probe fields; they are not application APIs.
       const testWindow = window as Window & { __cloudSettingsRendered?: boolean };
       testWindow.__cloudSettingsRendered = false;
       new MutationObserver(() => {
@@ -199,6 +200,7 @@ test.describe("Browser harness", () => {
       .toBe(true);
     await homePage.menuButton.click();
     await expect(page.getByRole("menuitem", { name: "Manage trizum cloud" })).toBeVisible();
+    // SAFETY: This test installs and reads only its own optional window probe fields; they are not application APIs.
     await expect
       .poll(() =>
         page.evaluate(
@@ -226,6 +228,7 @@ test.describe("Browser harness", () => {
     // Probe the client boundary: WebKit can skip HTTP interception after navigation.
     await page.addInitScript((endpoint) => {
       const requests: PartyAuthProbeWindow["__partyAuthRequests"] = [];
+      // SAFETY: This test installs and reads only its own optional window probe fields; they are not application APIs.
       (window as PartyAuthProbeWindow).__partyAuthRequests = requests;
       const originalFetch = window.fetch.bind(window);
       window.fetch = (input, init) => {
@@ -249,6 +252,7 @@ test.describe("Browser harness", () => {
     await harness.gotoParty(seededParty.partyId);
     await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
 
+    // SAFETY: This test installs and reads only its own optional window probe fields; they are not application APIs.
     const sessionRequests = () =>
       page.evaluate(() => (window as PartyAuthProbeWindow).__partyAuthRequests);
 

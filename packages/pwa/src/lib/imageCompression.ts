@@ -113,6 +113,7 @@ export function isSupportedImageFile(blob: Blob): boolean {
 
 async function readOrientation(file: File): Promise<number | undefined> {
   try {
+    // SAFETY: exifr returns its orientation field for this file; the helper reads only that optional field.
     const exif = (await parse(file)) as ParseResult;
 
     return exif?.Orientation;
@@ -442,7 +443,7 @@ export const compressionPresets = {
     maxWidthOrHeight: 2560,
     initialQuality: 0.9,
     maxSizeBeforeCompress: 10,
-  } as ImageCompressionOptions,
+  } satisfies ImageCompressionOptions,
 
   /** Balanced quality and file size (default) */
   balanced: {
@@ -450,7 +451,7 @@ export const compressionPresets = {
     maxWidthOrHeight: 1920,
     initialQuality: 0.8,
     maxSizeBeforeCompress: 5,
-  } as ImageCompressionOptions,
+  } satisfies ImageCompressionOptions,
 
   /** High compression, smaller file size */
   compressed: {
@@ -458,7 +459,7 @@ export const compressionPresets = {
     maxWidthOrHeight: 1280,
     initialQuality: 0.6,
     maxSizeBeforeCompress: 3,
-  } as ImageCompressionOptions,
+  } satisfies ImageCompressionOptions,
 
   /** Maximum compression for very small file sizes */
   maximum: {
@@ -466,7 +467,7 @@ export const compressionPresets = {
     maxWidthOrHeight: 800,
     initialQuality: 0.4,
     maxSizeBeforeCompress: 1,
-  } as ImageCompressionOptions,
+  } satisfies ImageCompressionOptions,
 } as const;
 
 /**

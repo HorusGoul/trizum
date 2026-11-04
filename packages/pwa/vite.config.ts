@@ -57,6 +57,7 @@ const reactCompilerPreset = defineRolldownBabelPreset({
 });
 
 // Read package.json version
+// SAFETY: This repository-owned package manifest supplies the build version and description.
 const packageJson = JSON.parse(
   readFileSync(path.resolve(packageRoot, "package.json"), "utf-8"),
 ) as { version: string; description: string };
@@ -96,6 +97,8 @@ export default defineConfig(({ mode }) => {
   process.env.VITE_APP_ADMOB_IOS_APP_OPEN_ID = adMobConfig.ios.appOpen;
   process.env.VITE_APP_ADMOB_IOS_INTERSTITIAL_ID = adMobConfig.ios.interstitial;
 
+  // SAFETY: These plugins implement the Vite hooks accepted by Vite+; their published types refer to a separate Vite package version.
+  // SAFETY: The WASM plugin implements Vite hooks accepted by Vite+; its published types refer to a separate Vite package version.
   return {
     run: {
       tasks: {
@@ -379,6 +382,7 @@ interface AdMobConfigFile {
 
 function readAdMobConfig() {
   const configPath = path.resolve(packageRoot, "../mobile/admob.config.json");
+  // SAFETY: This repository-owned AdMob JSON file uses the shared mobile build-config shape; CI validates the app/ad-unit IDs.
   const config = JSON.parse(readFileSync(configPath, "utf-8")) as AdMobConfigFile;
   const isLive = process.env.TRIZUM_LIVE_ADS === "true";
   const selected = isLive ? config.live : config.test;

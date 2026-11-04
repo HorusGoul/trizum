@@ -197,6 +197,7 @@ export function useCloudSyncAccountState({
           isValidDocumentId(activeSettings.partyListDocumentId) &&
           activeSettings.partyListDocumentId !== currentPartyList.id
         ) {
+          // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
           const cloudPartyList = (await documentCache.readAsync(
             repo,
             activeSettings.partyListDocumentId,
@@ -323,6 +324,7 @@ export function useCloudSyncAccountState({
       return;
     }
 
+    // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
     const cloudPartyList = (await documentCache.readAsync(repo, settings.partyListDocumentId)) as
       | PartyList
       | undefined;

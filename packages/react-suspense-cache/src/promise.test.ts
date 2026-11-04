@@ -7,7 +7,6 @@ import {
   markReactPromisePending,
   markReactPromiseRejected,
 } from "./promise.js";
-import type { ReactUsePromise } from "./types.js";
 
 describe("isPromiseLike", () => {
   test("detects promises and thenables", () => {
@@ -22,7 +21,7 @@ describe("isPromiseLike", () => {
   });
 
   test("marks React promise status fields", () => {
-    const promise = Promise.resolve("initial") as ReactUsePromise<string>;
+    const promise = Promise.resolve("initial");
     const error = new Error("failed");
 
     markReactPromisePending(promise);

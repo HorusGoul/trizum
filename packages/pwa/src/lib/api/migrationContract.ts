@@ -29,6 +29,7 @@ export const migrationExpenseSchema = z.object({
   shares: z.record(z.string(), migrationExpenseShareSchema),
 });
 
+// SAFETY: The preceding refine has validated this string against the supported currency codes.
 export const migrationDataSchema = z.object({
   party: z.object({
     currency: z

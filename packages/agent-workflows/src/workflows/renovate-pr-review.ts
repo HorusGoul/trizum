@@ -476,6 +476,7 @@ function getWorkflowOptionsFromEnv(): WorkflowOptions {
 async function ghJson<T>(options: WorkflowOptions, ...args: string[]): Promise<T> {
   const result = await gh(options, args);
 
+  // SAFETY: The selected gh command owns the JSON response shape supplied by each caller; a failed command is rejected before parsing.
   return JSON.parse(result.stdout) as T;
 }
 
@@ -600,6 +601,7 @@ async function gatherDependencyMetadata(
         };
       }
 
+      // SAFETY: npm view supplies a JSON object; each optional metadata field is still checked by stringFromUnknown before use.
       const raw = JSON.parse(result.stdout) as NpmPackageMetadata;
       const repositoryUrl = stringFromUnknown(raw["repository.url"]);
       const bugsUrl = stringFromUnknown(raw["bugs.url"]);
@@ -1563,6 +1565,7 @@ async function readPullRequestNumberFromUrl(
     return undefined;
   }
 
+  // SAFETY: gh pr view selects the number field; only that field is converted and returned here.
   return Number.parseInt(String((JSON.parse(result.stdout) as { number?: number }).number), 10);
 }
 

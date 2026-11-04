@@ -175,6 +175,7 @@ function redactRecord(record: LogRecord): LogRecord {
           raw: record.rawMessage.raw.map(redactString),
         });
 
+  // SAFETY: record.properties is a plain property map; redaction retains its string keys and replaces only values.
   return {
     ...record,
     category: record.category.map(redactString),
@@ -196,6 +197,7 @@ export function withDocumentIdRedaction(
     sink(redactRecord(contextual));
   };
 
+  // SAFETY: Disposal is optional on a callable sink; both symbol properties are checked before forwarding them.
   const disposable = sink as Sink & Partial<Disposable & AsyncDisposable>;
   const dispose = disposable[Symbol.dispose];
   const asyncDispose = disposable[Symbol.asyncDispose];

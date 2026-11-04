@@ -74,20 +74,17 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
     );
 
     // Group emojis by category
-    const groupedEmojis = emojis.reduce(
-      (acc, emoji) => {
-        const group = emoji.group ?? 0;
+    const groupedEmojis = emojis.reduce<Record<number, Emoji[]>>((acc, emoji) => {
+      const group = emoji.group ?? 0;
 
-        if (!acc[group]) {
-          acc[group] = [];
-        }
+      if (!acc[group]) {
+        acc[group] = [];
+      }
 
-        acc[group].push(emoji);
+      acc[group].push(emoji);
 
-        return acc;
-      },
-      {} as Record<number, Emoji[]>,
-    );
+      return acc;
+    }, {});
 
     // Get ordered list of groups that have emojis
     const orderedGroups: number[] = [];
@@ -114,6 +111,7 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
 function useEmojiData(): EmojiData {
   const { i18n } = useLingui();
 
+  // SAFETY: The locale was found among emojiImports keys immediately above.
   const locale = Object.keys(emojiImports).includes(i18n.locale)
     ? (i18n.locale as SupportedLocale)
     : DEFAULT_LOCALE;

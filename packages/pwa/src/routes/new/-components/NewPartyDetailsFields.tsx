@@ -94,6 +94,7 @@ export function NewPartyDetailsFields({
             selectedKey={field.state.value}
             onSelectionChange={(value) => {
               if (value) {
+                // SAFETY: The currency select items are generated from supported currency codes; React Aria widens their keys.
                 field.handleChange(value as CurrencyCode);
               }
             }}

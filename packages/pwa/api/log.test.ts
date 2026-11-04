@@ -25,6 +25,7 @@ describe("Worker console logging", () => {
       },
     );
 
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     const output = warn.mock.calls[0]![0] as string;
     expect(output).not.toContain(documentId);
     expect(JSON.parse(output)).toMatchObject({
@@ -57,6 +58,7 @@ describe("Worker console logging", () => {
     );
 
     expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     const output = warn.mock.calls[0]![0] as string;
     expect(output).not.toMatch(/%[co]|color:/);
     expect(output).not.toContain(String.fromCharCode(27));
@@ -83,6 +85,7 @@ describe("Worker console logging", () => {
     workerLogger[level]("Worker request completed", { status: 200 });
 
     expect(output).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     expect(JSON.parse(output.mock.calls[0]![0] as string)).toMatchObject({
       level: level.toUpperCase(),
       properties: { status: 200 },

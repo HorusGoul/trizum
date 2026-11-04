@@ -44,6 +44,7 @@ describe("getEligibleDebtTransferParticipants", () => {
 });
 
 function createParty(participants: Party["participants"]): Party {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return {
     id: "party-id" as Party["id"],
     type: "party",

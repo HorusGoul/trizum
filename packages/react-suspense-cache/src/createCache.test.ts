@@ -257,6 +257,7 @@ describe("createCache", () => {
 
     expect(isPromiseLike(thrown)).toBe(false);
     expect(thrown).toBeInstanceOf(Error);
+    // SAFETY: The previous assertion verifies the caught value is an Error before inspecting its message.
     expect((thrown as Error).message).toBe('Record found with status "pending"');
     expect(cache.getValueIfCached("a")).toBeUndefined();
     expect(() => cache.getValue("a")).toThrow('Record found with status "pending"');
@@ -516,6 +517,7 @@ function createTestDeferred<Value>() {
       if (reject) {
         rejectPromise(valueOrError);
       } else {
+        // SAFETY: This branch resolves the test promise; callers supply Value when reject is false and an error when it is true.
         resolvePromise(valueOrError as Value);
       }
 

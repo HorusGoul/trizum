@@ -9,10 +9,15 @@ import { PremiumContextProvider, type PremiumStatus } from "#src/lib/premium/Pre
 import { AdvertisingProvider } from "#src/lib/advertising/AdvertisingContext.ts";
 import { HomeBanner } from "./HomeBanner.tsx";
 
-const state = vi.hoisted(() => ({
+const state = vi.hoisted<{
+  username: string;
+  premiumBannerDismissed: boolean;
+  userId: string | null;
+  isNative: boolean;
+}>(() => ({
   username: "Alex",
   premiumBannerDismissed: false,
-  userId: "account-a" as string | null,
+  userId: "account-a",
   isNative: true,
 }));
 
@@ -97,6 +102,7 @@ beforeEach(() => {
   presentPaywall.mockResolvedValue(null);
   i18n.load("en", {});
   i18n.activate("en");
+  // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   container = document.createElement("div");
   document.body.append(container);

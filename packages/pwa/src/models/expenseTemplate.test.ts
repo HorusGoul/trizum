@@ -9,6 +9,7 @@ import {
 } from "./expenseTemplate.ts";
 
 function createParty(template?: ExpenseTemplate): Party {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return {
     id: "party" as DocumentId,
     type: "party",

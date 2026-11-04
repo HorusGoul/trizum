@@ -59,6 +59,7 @@ it("adds the object to request context without connecting when the handler does 
     return c.text("No documents needed");
   });
 
+  // SAFETY: This route short-circuits before accessing any binding other than AUTOMERGE_WSS_URL; the partial fixture exercises that path.
   const response = await app.request("https://trizum.app", {}, {
     AUTOMERGE_WSS_URL: "not a URL",
   } as ApiEnv);

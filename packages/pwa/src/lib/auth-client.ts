@@ -131,6 +131,7 @@ export async function fetchLinkedAuthAccounts() {
     throw new Error(await getAuthErrorMessage(response, "Could not load sign-in methods."));
   }
 
+  // SAFETY: Better Auth's first-party list-accounts endpoint owns this response contract.
   return (await response.json()) as LinkedAuthAccount[];
 }
 
@@ -178,6 +179,7 @@ export async function linkSocialAuthAccount(provider: SocialAuthProvider) {
     throw new Error(await getAuthErrorMessage(response, "Could not connect sign-in method."));
   }
 
+  // SAFETY: Better Auth's first-party link endpoint owns this redirect/status response contract.
   return (await response.json()) as {
     redirect: boolean;
     status?: boolean;
@@ -205,6 +207,7 @@ async function linkSocialAuthAccountWithIdToken(
     throw new Error(await getAuthErrorMessage(response, "Could not connect sign-in method."));
   }
 
+  // SAFETY: Better Auth's first-party social-sign-in endpoint owns this redirect/status response contract.
   return (await response.json()) as {
     redirect: boolean;
     status?: boolean;
@@ -361,6 +364,7 @@ export function getAuthResultUser(data: unknown): AuthSessionUser | undefined {
     return undefined;
   }
 
+  // SAFETY: The checks above validate the required id/email fields; the remaining session-user fields are optional.
   return user as AuthSessionUser;
 }
 

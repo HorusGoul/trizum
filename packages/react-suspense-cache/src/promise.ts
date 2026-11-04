@@ -27,7 +27,7 @@ export function isPromiseLike<Type>(value: PromiseLike<Type> | Type): value is P
 export function markReactPromisePending<Type>(
   promise: Promise<Type>,
 ): asserts promise is PendingReactUsePromise<Type> {
-  const reactPromise = promise as MutableReactUsePromise<Type>;
+  const reactPromise: MutableReactUsePromise<Type> = promise;
 
   reactPromise.status = STATUS_PENDING;
   delete reactPromise.value;
@@ -38,7 +38,7 @@ export function markReactPromiseFulfilled<Type>(
   promise: Promise<Type>,
   value: Type,
 ): asserts promise is FulfilledReactUsePromise<Type> {
-  const reactPromise = promise as MutableReactUsePromise<Type>;
+  const reactPromise: MutableReactUsePromise<Type> = promise;
 
   reactPromise.status = STATUS_FULFILLED;
   reactPromise.value = value;
@@ -49,7 +49,7 @@ export function markReactPromiseRejected<Type>(
   promise: Promise<Type>,
   reason: unknown,
 ): asserts promise is RejectedReactUsePromise<Type> {
-  const reactPromise = promise as MutableReactUsePromise<Type>;
+  const reactPromise: MutableReactUsePromise<Type> = promise;
 
   reactPromise.status = STATUS_REJECTED;
   reactPromise.reason = reason;
@@ -65,7 +65,7 @@ export function createFulfilledReactPromise<Type>(value: Type): ReactUsePromise<
 }
 
 export function createRejectedReactPromise<Type = never>(reason: unknown): ReactUsePromise<Type> {
-  const promise = Promise.reject(reason) as Promise<Type>;
+  const promise = Promise.reject<Type>(reason);
 
   markReactPromiseRejected(promise, reason);
   void promise.catch(() => {

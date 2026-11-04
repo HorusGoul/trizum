@@ -129,6 +129,7 @@ export class AutomergeDocuments {
     );
     const network = new BrowserWebSocketClientAdapter(getAutomergeWssUrl(env, request));
 
+    // SAFETY: Automerge peer IDs are opaque strings; this worker-specific prefix and random UUID identify the ephemeral repo.
     const repo = new Repo({
       isEphemeral: true,
       network: [network],

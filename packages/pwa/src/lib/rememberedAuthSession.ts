@@ -261,6 +261,7 @@ function readUser(value: unknown): AuthSessionUser | null {
   const candidate = "user" in value ? value.user : value;
 
   if (!candidate || typeof candidate !== "object") return null;
+  // SAFETY: The value was checked as an object above; StoredUserFields leaves every raw field unknown for the checks below.
   const user = candidate as StoredUserFields;
 
   if (typeof user.id !== "string" || !user.id || typeof user.email !== "string") return null;

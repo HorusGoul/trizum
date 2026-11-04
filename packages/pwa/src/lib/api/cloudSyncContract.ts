@@ -1,6 +1,7 @@
 import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo/slim";
 import { z } from "zod";
 
+// SAFETY: The preceding refine has validated this string with Automerge isValidDocumentId.
 export const cloudUserSettingsInputSchema = z.object({
   partyListDocumentId: z
     .string()

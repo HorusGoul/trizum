@@ -25,6 +25,7 @@ export const Route = createFileRoute("/_home/")({
       return;
     }
 
+    // SAFETY: getPartyListId selects the local PartyList document; the shared cache erases its document type.
     const partyList = (await documentCache.readAsync(context.repo, partyListId)) as
       | PartyList
       | undefined;

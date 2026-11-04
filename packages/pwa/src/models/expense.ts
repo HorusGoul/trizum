@@ -119,6 +119,7 @@ export function createExpenseId(chunkId: string, timestamp?: number): string {
 export function decodeExpenseId(expenseId: string) {
   const [id, chunkId] = expenseId.split(":");
 
+  // SAFETY: createExpenseId stores the owning chunk DocumentId after the colon; this reverses that internal encoding.
   return { chunkId: chunkId as DocumentId, expenseId: id };
 }
 
@@ -196,7 +197,7 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
     );
 
     // First pass: calculate proportional amounts
-    const proportionalAmounts = activeParticipants.reduce(
+    const proportionalAmounts = activeParticipants.reduce<Record<string, number>>(
       (acc, participantId) => {
         const share = shares[participantId];
         let participantAmount = 0;
@@ -212,7 +213,7 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
 
         return acc;
       },
-      {} as Record<string, number>,
+      {},
     );
 
     return proportionalAmounts;

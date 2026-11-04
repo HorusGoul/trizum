@@ -333,6 +333,7 @@ test.describe("Expense log", () => {
     await expect(overlay).toHaveAttribute("data-exiting", "true");
     await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
 
+    // SAFETY: attachmentButton is a button locator; evaluate invokes its native click during the overlay exit animation.
     await attachmentButton.evaluate((element) => (element as HTMLElement).click());
 
     await expect(page).toHaveURL(/\?media=0$/);

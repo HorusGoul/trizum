@@ -71,6 +71,7 @@ function PartyById() {
   }
 
   async function selectedTabChangeAction(tab: Key) {
+    // SAFETY: The tabs rendered by this route have only expenses and balances values; the tab primitive widens them to strings.
     await navigate({
       to: "/party/$partyId",
       params: { partyId },

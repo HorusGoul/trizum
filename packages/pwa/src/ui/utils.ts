@@ -97,13 +97,13 @@ export const cva =
             defaultVariants[variantName]
         ];
       }),
-      compoundVariants.reduce((list, { classes, ...compoundVariantOptions }) => {
+      compoundVariants.reduce<string[]>((list, { classes, ...compoundVariantOptions }) => {
         if (isSimpleSubset<SchemaVariants>(compoundVariantOptions, currentOptions)) {
           list.push(classes);
         }
 
         return list;
-      }, [] as string[]),
+      }, []),
       classNames,
     ]);
   };

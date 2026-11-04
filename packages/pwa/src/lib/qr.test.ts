@@ -36,8 +36,9 @@ const QR_SCANNER_TEST_MODULES = [
 ] as const;
 
 class TestImageData {
+  readonly colorSpace = "srgb" as const;
   constructor(
-    public data: Uint8ClampedArray,
+    public data: Uint8ClampedArray<ArrayBuffer>,
     public width: number,
     public height: number,
   ) {}
@@ -91,7 +92,7 @@ function createQRCodeImageData(rows: readonly string[]): ImageData {
     });
   });
 
-  return new TestImageData(data, width, width) as ImageData;
+  return new TestImageData(data, width, width);
 }
 
 describe("BarcodeDetector", () => {

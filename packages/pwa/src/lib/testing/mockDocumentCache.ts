@@ -108,10 +108,5 @@ export function createMockDocumentCacheCollection<
 }
 
 function createFulfilledReadPromise<TValue>(value: TValue): ReactUsePromise<TValue> {
-  const promise = Promise.resolve(value) as ReactUsePromise<TValue>;
-
-  promise.status = "fulfilled";
-  promise.value = value;
-
-  return promise;
+  return Object.assign(Promise.resolve(value), { status: "fulfilled" as const, value });
 }

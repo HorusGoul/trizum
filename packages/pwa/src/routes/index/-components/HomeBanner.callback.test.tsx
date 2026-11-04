@@ -19,11 +19,17 @@ import { PremiumContextProvider } from "#src/lib/premium/PremiumContext.ts";
 import { CloudSyncSettingsView } from "#src/components/CloudSyncSettingsView.tsx";
 import { HomeBanner } from "./HomeBanner.tsx";
 
-const state = vi.hoisted(() => ({
+const state = vi.hoisted<{
   session: {
-    data: { user: { id: "account-a", email: "test@example.com" } } as {
-      user: { id: string; email: string };
-    } | null,
+    data: { user: { id: string; email: string } } | null;
+    isPending: boolean;
+    isOffline: boolean;
+    error: null;
+  };
+  cloudChoiceOpen: boolean;
+}>(() => ({
+  session: {
+    data: { user: { id: "account-a", email: "test@example.com" } },
     isPending: false,
     isOffline: false,
     error: null,
@@ -161,6 +167,7 @@ beforeEach(() => {
   presentPaywall.mockResolvedValue(null);
   i18n.load("en", {});
   i18n.activate("en");
+  // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   container = document.createElement("div");
   document.body.append(container);

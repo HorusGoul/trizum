@@ -23,14 +23,21 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
   component: RouteComponent,
   pendingComponent: PartyPendingComponent,
   validateSearch: (search): PaySearchParams => {
-    if (!search.fromId || !search.toId || !search.amount) {
+    if (
+      typeof search.fromId !== "string" ||
+      !search.fromId ||
+      typeof search.toId !== "string" ||
+      !search.toId ||
+      typeof search.amount !== "number" ||
+      !search.amount
+    ) {
       throw new Error(t`Missing search params`);
     }
 
     return {
-      fromId: search.fromId as string,
-      toId: search.toId as string,
-      amount: search.amount as number,
+      fromId: search.fromId,
+      toId: search.toId,
+      amount: search.amount,
     };
   },
 });

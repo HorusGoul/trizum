@@ -13,6 +13,7 @@ export async function guardPartyExists(
   partyId: string,
   { repo }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"],
 ) {
+  // SAFETY: The router owns this document ID and its Party/PartyList contract; the shared cache erases those document types.
   const party = (await documentCache.readAsync(repo, partyId as DocumentId)) as Party | undefined;
 
   if (!party) {
@@ -26,6 +27,7 @@ export async function guardPartyListExists({
   repo,
 }: RouterContextOptions<RegisteredRouter["routeTree"]>["context"]) {
   const partyListId = getPartyListId(repo);
+  // SAFETY: The router owns this document ID and its Party/PartyList contract; the shared cache erases those document types.
   const partyList = (await documentCache.readAsync(repo, partyListId)) as PartyList | undefined;
 
   if (!partyList) {

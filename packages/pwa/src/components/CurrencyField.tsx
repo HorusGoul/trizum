@@ -46,7 +46,7 @@ const CALCULATOR_FIELD_BUTTON_ATTRIBUTE = "data-calculator-field-button";
 const CALCULATOR_BUTTON_FOCUS_IGNORE_MS = 750;
 
 function getCalculatorFieldLabel(props: React.ComponentProps<typeof AppCurrencyField>) {
-  const ariaLabel = (props as { "aria-label"?: unknown })["aria-label"];
+  const ariaLabel = props["aria-label"];
 
   return props.label || (typeof ariaLabel === "string" ? ariaLabel : undefined);
 }
@@ -98,6 +98,8 @@ export function CurrencyField({
 }
 
 /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state, react-doctor/no-chain-state-updates, react-doctor/no-event-handler -- Browser back/forward changes route calculator state outside press handlers. */
+// SAFETY: This captured DOM pointer event targets a node inside or outside the field container.
+// SAFETY: This captured DOM focus event targets a node inside or outside the field container.
 function useCurrencyFieldCalculator({
   activeCalculatorId,
   autoOpenCalculator,
@@ -117,6 +119,7 @@ function useCurrencyFieldCalculator({
   onOpenCalculator?: (calculatorId: string) => void;
   onPointerDownCapture?: React.PointerEventHandler<HTMLDivElement>;
 }) {
+  // SAFETY: React Aria forwards these optional data attributes; the calculator reads only the string presence IDs set by its caller.
   const configuredPresenceElementId =
     (fieldProps as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
     (fieldProps as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];

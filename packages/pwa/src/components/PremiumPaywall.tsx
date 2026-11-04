@@ -101,6 +101,7 @@ export function PremiumPaywall({
     setLoadAttempt((attempt) => attempt + 1);
   }
 
+  // SAFETY: The radio items are generated only from the typed PremiumPlanId plans; React Aria widens their values to strings.
   return (
     <ModalOverlay
       isDismissable

@@ -26,6 +26,7 @@ vi.mock("react-aria-components", async (importOriginal) => ({
     isOpen ? children : null,
 }));
 
+// SAFETY: The mocked button invokes a callback that ignores its press event; no event fields are read by the tested paywall.
 vi.mock("#src/ui/IconButton.tsx", () => ({
   IconButton: (props: ComponentProps<typeof IconButton>) => (
     <button
@@ -87,6 +88,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   i18n.load("en", {});
   i18n.activate("en");
+  // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   vi.mocked(loadPremiumOffering).mockResolvedValue({
     defaultPlanId: "annual",

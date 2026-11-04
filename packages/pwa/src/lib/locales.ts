@@ -6,11 +6,7 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export function normalizeSupportedLocale(value: string | null | undefined): SupportedLocale | null {
   const normalizedLocale = value?.split("-")[0]?.toLowerCase();
 
-  if (normalizedLocale && SUPPORTED_LOCALES.includes(normalizedLocale as SupportedLocale)) {
-    return normalizedLocale as SupportedLocale;
-  }
-
-  return null;
+  return SUPPORTED_LOCALES.find((locale) => locale === normalizedLocale) ?? null;
 }
 
 export function getSupportedLocale(value: string | null | undefined): SupportedLocale {

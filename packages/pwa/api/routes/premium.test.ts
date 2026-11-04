@@ -286,6 +286,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
         partyDocumentId: other,
         pendingCleanupPartyDocumentId: party,
       });
+      // SAFETY: The harness stores the party boost map on this document; the test checks its exact remaining assignment keys.
       expect(Object.keys(harness.documents.get(party)!.boost as object)).toEqual([
         transferred.boostId,
       ]);
@@ -293,6 +294,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       expect((await harness.request(method, other, owner.cookie)).status).toBe(200);
       // No independent read of the old party is allowed to repair this assertion.
       expect(harness.documents.get(party)?.boost).toEqual({});
+      // SAFETY: The harness stores the party boost map on this document; the test checks its exact remaining assignment keys.
       expect(Object.keys(harness.documents.get(other)!.boost as object)).toEqual([
         transferred.boostId,
       ]);
@@ -487,6 +489,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
     harness.setWritesUnavailable(false);
     expect((await harness.request("PUT", party, user.cookie)).status).toBe(200);
     expect(await harness.assignment(user.id)).toEqual(assignment);
+    // SAFETY: The harness stores the party boost map on this document; the test checks its exact remaining assignment keys.
     expect(Object.keys(harness.documents.get(party)!.boost as object)).toEqual([
       assignment!.boostId,
     ]);

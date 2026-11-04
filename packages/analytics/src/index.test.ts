@@ -42,6 +42,7 @@ function harness(endpoint = "https://analytics.example") {
     canCollect,
   });
 
+  // SAFETY: These bodies were emitted by the analytics client under test; POST payload assertions below verify their contract.
   const payloads = () =>
     fetch.mock.calls
       .filter(([, init]) => init?.method === "POST")
@@ -168,9 +169,11 @@ describe("analytics collection", () => {
     client.setEnabled(true, telemetryId);
     client.page(`/party/${documentId}?name=Alice#secret`);
     client.track("expense_created");
+    // SAFETY: Deliberately bypass the event union to verify runtime rejection of document identifiers.
     client.track(documentId as AnalyticsEvent);
 
     for (const name of ["__proto__", "constructor", "toString", { name: "expense_created" }]) {
+      // SAFETY: Deliberately supply unsupported event names and an object to verify the runtime allowlist.
       client.track(name as AnalyticsEvent);
     }
 
@@ -331,6 +334,7 @@ describe("startup buffering and telemetry identity", () => {
     const { client, fetch, payloads } = harness();
     client.page(`/party/${documentId}?name=Alice#secret`);
     client.track("party_created");
+    // SAFETY: Deliberately supply a private unsupported event while collection is disabled to verify no request is emitted.
     client.track("Alice" as AnalyticsEvent);
     const recordedBy = Date.now();
     await client.flush();

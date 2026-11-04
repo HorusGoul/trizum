@@ -38,6 +38,7 @@ export function parseAdHistory(value: string | null): AdHistory | undefined {
   }
 
   try {
+    // SAFETY: This assertion exposes optional fields only; version and every value used below are checked before returning history.
     const parsed = JSON.parse(value) as Partial<AdHistory>;
 
     if (parsed.version !== 1 || typeof parsed.firstUseCompleted !== "boolean") {

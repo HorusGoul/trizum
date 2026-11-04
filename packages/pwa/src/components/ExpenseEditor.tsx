@@ -128,13 +128,13 @@ export function ExpenseEditor({
       ...defaultValues,
       shares:
         defaultValues.shares ||
-        participants.reduce(
+        participants.reduce<Record<ExpenseUser, { type: "divide" | "exact"; value: number }>>(
           (acc, { id }) => {
             acc[id] = { type: "divide" as const, value: 1 };
 
             return acc;
           },
-          {} as Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
+          {},
         ),
     },
     onSubmit: async ({ value }) => {
@@ -205,6 +205,7 @@ export function ExpenseEditor({
   function createFieldFocusHandlers(field: { name: string; handleBlur: () => void }) {
     return {
       onFocus: () => {
+        // SAFETY: Only this form's registered field names are passed to createFieldFocusHandlers.
         focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
       },
       onBlur: () => {
@@ -229,10 +230,12 @@ export function ExpenseEditor({
             continue;
           }
 
+          // SAFETY: keys comes from this form's values object; Object.keys erases the known form-field key union.
           form.setFieldValue(
             key as keyof ExpenseEditorFormValues,
             values[key as keyof ExpenseEditorFormValues],
           );
+          // SAFETY: keys comes from this form's values object; Object.keys erases the known form-field key union.
           void form.validateField(key as keyof ExpenseEditorFormValues, "server");
         }
 
@@ -499,8 +502,9 @@ function ExpenseDetailsFields({
             isInvalid={field.state.meta.isTouched && field.state.meta.errors?.length > 0}
             className="col-span-2"
             onFocus={(event) => {
-              const input = event.target as HTMLInputElement;
+              const input = event.currentTarget;
               input.select();
+              // SAFETY: This TanStack field is a registered ExpenseEditorFormValues field.
               focusedFieldRef.current = field.name as keyof ExpenseEditorFormValues;
             }}
             inputMode="decimal"
@@ -660,6 +664,7 @@ function ParticipantItem({
       ...shares,
     };
 
+    // SAFETY: The radio group contains only divide and exact items; its callback widens their values to strings.
     const newType = value as "divide" | "exact";
 
     if (newType === "exact") {
@@ -786,8 +791,9 @@ function ParticipantItem({
                   inputMode="numeric"
                   onFocus={(event) => {
                     // Select all text
-                    const input = event.target as HTMLInputElement;
-                    input.select();
+                    const input = event.currentTarget;
+
+                    if (input instanceof HTMLInputElement) input.select();
                   }}
                   onChange={(value) => {
                     const newShares = {
@@ -902,7 +908,7 @@ function ParticipantSplitAmountField({
       inputClassName="h-7 px-0 text-right border-t-0 border-x-0 rounded-none border-b"
       onFocus={(event) => {
         // Select all text
-        const input = event.target as HTMLInputElement;
+        const input = event.currentTarget;
         input.select();
       }}
       inputMode="decimal"

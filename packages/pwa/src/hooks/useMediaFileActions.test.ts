@@ -94,7 +94,7 @@ describe("getMediaFileHelpers", () => {
     await createMediaFile(file, { source: "test" });
     const handle = getLastCreatedHandle();
     const mediaFile = handle.doc;
-    const blob = decodeBlob(mediaFile.encodedBlob.val, mediaFile.metadata.mimeType as string);
+    const blob = decodeBlob(mediaFile.encodedBlob.val, mediaFile.metadata.mimeType ?? "");
 
     expect(mediaFile.id).toBe(handle.documentId);
     expect(mediaFile.metadata).toMatchObject({

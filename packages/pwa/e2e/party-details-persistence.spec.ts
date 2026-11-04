@@ -7,6 +7,7 @@ async function holdNextSaveAcknowledgment(page: Page) {
     // oxlint-disable-next-line typescript/unbound-method -- Preserve the method for restoration; calls below use apply(this, args).
     const original = IDBDatabase.prototype.transaction;
 
+    // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
     const testWindow = window as Window & {
       releasePersistenceTest?: () => void;
       restorePersistenceTest?: () => void;
@@ -41,6 +42,7 @@ async function holdNextSaveAcknowledgment(page: Page) {
 }
 
 async function releaseSaveAcknowledgment(page: Page) {
+  // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -51,6 +53,7 @@ async function releaseSaveAcknowledgment(page: Page) {
     )
     .toBe(true);
   await page.evaluate(async () => {
+    // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
     (window as Window & { releasePersistenceTest?: () => void }).releasePersistenceTest?.();
     // Complete the submit microtasks and a render/history cycle before asserting
     // that a departed form cannot move the user's current history entry.
@@ -62,6 +65,7 @@ async function releaseSaveAcknowledgment(page: Page) {
 
 async function restoreSaveAcknowledgment(page: Page) {
   await page.evaluate(() => {
+    // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
     (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
   });
 }
@@ -108,6 +112,7 @@ test("a failed details save keeps the draft available for retry", async ({
     // oxlint-disable-next-line typescript/unbound-method -- Preserve the method for restoration; calls below use apply(this, args).
     const original = IDBDatabase.prototype.transaction;
 
+    // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
     const testWindow = window as Window & { restorePersistenceTest?: () => void };
     testWindow.restorePersistenceTest = () => {
       IDBDatabase.prototype.transaction = original;
@@ -144,6 +149,7 @@ test("a failed details save keeps the draft available for retry", async ({
     await page.screenshot({ path: testInfo.outputPath("save-error-retains-draft.png") });
   } finally {
     await page.evaluate(() => {
+      // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
       (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
     });
   }
@@ -178,6 +184,7 @@ test("details cannot change while their save acknowledgment is pending", async (
     await expect(page.getByLabel("Description", { exact: true })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Symbol", exact: true })).toBeDisabled();
     await page.screenshot({ path: testInfo.outputPath("save-pending-protected-fields.png") });
+    // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
     await expect
       .poll(() =>
         page.evaluate(() =>
@@ -188,11 +195,13 @@ test("details cannot change while their save acknowledgment is pending", async (
       )
       .toBe(true);
     await page.evaluate(() => {
+      // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
       (window as Window & { releasePersistenceTest?: () => void }).releasePersistenceTest?.();
     });
     await expect(page).toHaveURL(new RegExp(`/party/${partyId}/settings(?:[?].*)?$`));
   } finally {
     await page.evaluate(() => {
+      // SAFETY: The persistence test installs these optional release/restore hooks on window and removes them during cleanup.
       (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
     });
   }
