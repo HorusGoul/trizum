@@ -35,7 +35,7 @@ const env: Partial<ApiEnv> = {
 };
 
 function authRequest(
-  body: Record<string, unknown> = {},
+  body: Record<string, string | undefined> = {},
   token = "owner-token",
   origin = "http://localhost",
 ) {
@@ -252,7 +252,7 @@ describe("persisted authentication compatibility", () => {
   const fixtureEmail = "upgrade-fixture@example.invalid";
   const fixturePassword = "synthetic-upgrade-password-123";
 
-  function request(path: string, body?: Record<string, unknown>, token?: string) {
+  function request(path: string, body?: Record<string, string | undefined>, token?: string) {
     const headers = new Headers({
       "Content-Type": "application/json",
       Origin: "http://localhost",

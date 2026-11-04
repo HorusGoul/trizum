@@ -6,6 +6,7 @@ import {
   jsonLinesFormatter,
   type ContextLocalStorage,
   type LogLevel,
+  type LogRecord,
   type Logger,
   type LoggerConfig,
   type Sink,
@@ -34,9 +35,9 @@ export interface ConfigureTrizumLoggingOptions<TSinkId extends string = never> {
   extraSinks?: Record<TSinkId, Sink>;
   extraLoggers?: TrizumLoggerConfig<TSinkId>[];
   surfaceSinks?: readonly TrizumSinkId<TSinkId>[];
-  contextLocalStorage?: ContextLocalStorage<Record<string, unknown>>;
+  contextLocalStorage?: ContextLocalStorage<LogRecord["properties"]>;
   /** Runtime-owned context, read for each record before document-ID redaction. */
-  getContext?: () => Record<string, unknown>;
+  getContext?: () => LogRecord["properties"];
   metaLowestLevel?: LogLevel | null;
   reset?: boolean;
 }
@@ -102,3 +103,5 @@ export function configureTrizumLogging<TSinkId extends string = never>({
     reset,
   });
 }
+
+export type { LogRecord } from "@logtape/logtape";

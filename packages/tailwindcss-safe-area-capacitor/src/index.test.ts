@@ -2,6 +2,8 @@ import { describe, expect, it } from "vite-plus/test";
 import safeArea from "./index.js";
 import type { PluginAPI } from "tailwindcss/plugin";
 
+type CapturedUtilities = Exclude<Parameters<PluginAPI["addUtilities"]>[0], readonly unknown[]>;
+
 type MatcherUtilities = Parameters<PluginAPI["matchUtilities"]>[0];
 
 interface CapturedMatcher {
@@ -10,7 +12,7 @@ interface CapturedMatcher {
 
 describe("tailwindcss-safe-area-capacitor", () => {
   it("registers base, offset, and fallback safe-area utilities", () => {
-    const utilities: Record<string, unknown> = {};
+    const utilities: CapturedUtilities = {};
     const matchers: CapturedMatcher[] = [];
 
     safeArea.handler({

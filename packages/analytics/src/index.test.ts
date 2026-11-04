@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vite-plus/test";
-import { createAnalytics, hasPrivacySignal, type AnalyticsEvent } from "./index.js";
+import {
+  createAnalytics,
+  hasPrivacySignal,
+  type AnalyticsEvent,
+  type AnalyticsPayload,
+} from "./index.js";
 import { redactPathname } from "./privacy.js";
 import { readCollectToken } from "./insightflare.js";
 
@@ -42,10 +47,7 @@ function harness(endpoint = "https://analytics.example") {
       .filter(([, init]) => init?.method === "POST")
       .map(
         ([, init]) =>
-          JSON.parse(typeof init?.body === "string" ? init.body : "null") as Record<
-            string,
-            unknown
-          >,
+          JSON.parse(typeof init?.body === "string" ? init.body : "null") as AnalyticsPayload,
       );
 
   return { client, fetch, canCollect, payloads };

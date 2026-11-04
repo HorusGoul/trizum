@@ -238,7 +238,7 @@ msgstr "Un miembro Premium está impulsando este grupo."
 msgid "A template with this name already exists"
 msgstr "Ya existe una plantilla con este nombre"
 
-#: src/routes/_home/route.tsx:135
+#: src/routes/_home/route.tsx:136
 #: src/routes/about/route.tsx:24
 msgid "About"
 msgstr "Acerca de"
@@ -306,7 +306,7 @@ msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto in
 msgid "Add Google as a sign-in method"
 msgstr "Añadir Google como método de inicio de sesión"
 
-#: src/routes/_home/route.tsx:184
+#: src/routes/_home/route.tsx:185
 msgid "Add or create"
 msgstr "Añadir o crear"
 
@@ -449,7 +449,7 @@ msgstr "Archiva un grupo desde la pantalla de inicio cuando quieras despejar esp
 msgid "Archive participants who left to keep balances clean."
 msgstr "Archiva a los participantes que se fueron para mantener el balance limpio."
 
-#: src/routes/_home/route.tsx:254
+#: src/routes/_home/route.tsx:255
 msgid "Archive party"
 msgstr "Archivar grupo"
 
@@ -465,7 +465,7 @@ msgstr "Participantes archivados"
 msgid "Archived participants are still configured"
 msgstr "Los participantes archivados siguen configurados"
 
-#: src/routes/_home/route.tsx:117
+#: src/routes/_home/route.tsx:118
 msgid "Archived parties"
 msgstr "Grupos archivados"
 
@@ -547,7 +547,7 @@ msgstr "Manat Azerbaiyano"
 msgid "Back to home"
 msgstr "Volver al inicio"
 
-#: src/routes/reset-password.tsx:105
+#: src/routes/reset-password.tsx:106
 msgid "Back to settings"
 msgstr "Volver a configuración"
 
@@ -747,7 +747,7 @@ msgstr "Franco CFP"
 msgid "Changes sync automatically across all your devices"
 msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 
-#: src/routes/_home/route.tsx:128
+#: src/routes/_home/route.tsx:129
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
@@ -1067,7 +1067,7 @@ msgstr "No se pudo cargar el estado de trizum cloud"
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
 
-#: src/routes/reset-password.tsx:60
+#: src/routes/reset-password.tsx:61
 msgid "Could not reset password"
 msgstr "No se pudo restablecer la contraseña"
 
@@ -1099,7 +1099,7 @@ msgstr "No se pudo conectar el método de inicio de sesión"
 msgid "Create a custom template to enable this setting."
 msgstr "Crea una plantilla personalizada para activar esta opción."
 
-#: src/routes/_home/route.tsx:201
+#: src/routes/_home/route.tsx:202
 msgid "Create a new Party"
 msgstr "Crear un nuevo Grupo"
 
@@ -1390,7 +1390,7 @@ msgstr "Disfruta de trizum sin anuncios"
 msgid "Enter a party link or code to join"
 msgstr "Introduce un enlace o código de grupo para unirte"
 
-#: src/routes/join.tsx:170
+#: src/routes/join.tsx:171
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
@@ -1854,13 +1854,13 @@ msgstr "Código QR no válido. No parece ser un código de grupo de trizum."
 msgid "Invalid tricount URL or key"
 msgstr "URL o clave de Tricount no válida"
 
-#: src/routes/join.tsx:46
-#: src/routes/join.tsx:85
+#: src/routes/join.tsx:47
+#: src/routes/join.tsx:86
 msgid "Invalid trizum party code"
 msgstr "Código de grupo de trizum no válido"
 
-#: src/routes/join.tsx:46
-#: src/routes/join.tsx:85
+#: src/routes/join.tsx:47
+#: src/routes/join.tsx:86
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
@@ -1888,7 +1888,7 @@ msgstr "Dólar Jamaicano"
 msgid "Japanese Yen"
 msgstr "Yen Japonés"
 
-#: src/routes/join.tsx:190
+#: src/routes/join.tsx:191
 msgid "Join"
 msgstr "Unirse"
 
@@ -1904,11 +1904,11 @@ msgstr "Únete a {partyName} en trizum"
 msgid "Join {partyName} on trizum!"
 msgstr "¡Únete a {partyName} en trizum!"
 
-#: src/routes/_home/route.tsx:195
+#: src/routes/_home/route.tsx:196
 msgid "Join a Party"
 msgstr "Unirse a un Grupo"
 
-#: src/routes/join.tsx:119
+#: src/routes/join.tsx:120
 msgid "Join a trizum"
 msgstr "Unirse a un trizum"
 
@@ -2036,7 +2036,7 @@ msgstr "Licencia"
 msgid "Lifetime"
 msgstr "De por vida"
 
-#: src/routes/join.tsx:169
+#: src/routes/join.tsx:170
 msgid "Link or code"
 msgstr "Enlace o código"
 
@@ -2104,7 +2104,7 @@ msgstr "Gestionar Premium"
 msgid "Manage the participants list. Existing members can only be archived."
 msgstr "Gestiona la lista de participantes. Los miembros existentes solo pueden ser archivados."
 
-#: src/routes/_home/route.tsx:105
+#: src/routes/_home/route.tsx:106
 msgid "Manage trizum cloud"
 msgstr "Gestionar trizum cloud"
 
@@ -2151,7 +2151,7 @@ msgstr "Unidad de Inversión Mexicana"
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
-#: src/routes/_home/route.tsx:207
+#: src/routes/_home/route.tsx:208
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:41
 msgid "Migrate from Tricount"
 msgstr "Migrar desde Tricount"
@@ -2278,7 +2278,7 @@ msgstr "Nuevo gasto"
 msgid "New participant name"
 msgstr "Nombre del nuevo participante"
 
-#: src/routes/reset-password.tsx:128
+#: src/routes/reset-password.tsx:129
 msgid "New password"
 msgstr "Nueva contraseña"
 
@@ -2387,7 +2387,7 @@ msgstr "Won Norcoreano"
 msgid "Norwegian Krone"
 msgstr "Corona Noruega"
 
-#: src/routes/join.tsx:35
+#: src/routes/join.tsx:36
 msgid "Not a valid trizum party code"
 msgstr "No es un código de grupo de trizum válido"
 
@@ -2534,7 +2534,7 @@ msgstr "Abre trizum en tu teléfono e inicia sesión en tu cuenta. Usa Restaurar
 msgid "Optional"
 msgstr "Opcional"
 
-#: src/routes/join.tsx:147
+#: src/routes/join.tsx:148
 msgid "or enter code"
 msgstr "o introduce código"
 
@@ -2634,7 +2634,7 @@ msgstr "Grupo"
 msgid "Party actions"
 msgstr "Acciones del grupo"
 
-#: src/routes/_home/route.tsx:277
+#: src/routes/_home/route.tsx:278
 msgid "Party archived"
 msgstr "Grupo archivado"
 
@@ -2686,7 +2686,7 @@ msgstr "Clasificación del grupo"
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
 
-#: src/routes/_home/route.tsx:268
+#: src/routes/_home/route.tsx:269
 msgid "Party pinned"
 msgstr "Grupo fijado"
 
@@ -2714,7 +2714,7 @@ msgstr "Estadísticas del grupo"
 msgid "Party title, description and icon"
 msgstr "Título, descripción e icono del grupo"
 
-#: src/routes/_home/route.tsx:268
+#: src/routes/_home/route.tsx:269
 msgid "Party unpinned"
 msgstr "Grupo desfijado"
 
@@ -2731,15 +2731,15 @@ msgstr "Correo de contraseña enviado"
 msgid "Password enabled"
 msgstr "Contraseña activada"
 
-#: src/routes/reset-password.tsx:122
+#: src/routes/reset-password.tsx:123
 msgid "Password must be at least 8 characters"
 msgstr "La contraseña debe tener al menos 8 caracteres"
 
-#: src/routes/reset-password.tsx:44
+#: src/routes/reset-password.tsx:45
 msgid "Password reset link is invalid or expired"
 msgstr "El enlace para restablecer la contraseña no es válido o ha caducado"
 
-#: src/routes/reset-password.tsx:95
+#: src/routes/reset-password.tsx:96
 msgid "Password reset link is invalid or expired."
 msgstr "El enlace para restablecer la contraseña no es válido o ha caducado."
 
@@ -2751,7 +2751,7 @@ msgstr "El inicio de sesión con contraseña solo funciona después de añadir u
 msgid "Password sign-in is enabled"
 msgstr "El inicio de sesión con contraseña está activado"
 
-#: src/routes/reset-password.tsx:57
+#: src/routes/reset-password.tsx:58
 msgid "Password updated"
 msgstr "Contraseña actualizada"
 
@@ -2816,7 +2816,7 @@ msgstr "Se requiere el número de teléfono"
 msgid "Phone number must be less than 20 characters"
 msgstr "El número de teléfono debe tener menos de 20 caracteres"
 
-#: src/routes/_home/route.tsx:248
+#: src/routes/_home/route.tsx:249
 msgid "Pin party"
 msgstr "Fijar grupo"
 
@@ -2957,7 +2957,7 @@ msgstr "Política de Privacidad"
 msgid "Probe, bypass, or interfere with security, access controls, rate limits, or account restrictions"
 msgstr "Sondear, eludir o interferir con la seguridad, los controles de acceso, los límites de uso o las restricciones de las cuentas"
 
-#: src/routes/_home/route.tsx:82
+#: src/routes/_home/route.tsx:83
 msgid "Profile and app menu"
 msgstr "Menú de perfil y aplicación"
 
@@ -3050,7 +3050,7 @@ msgstr "Reportar un Problema"
 msgid "Report Issues"
 msgstr "Reportar problemas"
 
-#: src/routes/reset-password.tsx:73
+#: src/routes/reset-password.tsx:74
 msgid "Reset password"
 msgstr "Restablecer contraseña"
 
@@ -3151,7 +3151,7 @@ msgstr "Riyal Saudí"
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:94
 #: src/routes/party_.$partyId.who.tsx:114
-#: src/routes/reset-password.tsx:82
+#: src/routes/reset-password.tsx:83
 #: src/routes/settings.tsx:107
 msgid "Save"
 msgstr "Guardar"
@@ -3161,7 +3161,7 @@ msgid "Save to cloud"
 msgstr "Guardar en la nube"
 
 #: src/components/RouteQRScanner.tsx:70
-#: src/routes/join.tsx:134
+#: src/routes/join.tsx:135
 msgid "Scan QR code"
 msgstr "Escanear código QR"
 
@@ -3225,7 +3225,7 @@ msgstr "¿Configurar contraseña?"
 msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
-#: src/routes/_home/route.tsx:89
+#: src/routes/_home/route.tsx:90
 #: src/routes/party.$partyId/route.tsx:277
 #: src/routes/settings.tsx:130
 msgid "Settings"
@@ -3320,7 +3320,7 @@ msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 
 #: src/components/CloudSyncDialogs.tsx:225
-#: src/routes/_home/route.tsx:107
+#: src/routes/_home/route.tsx:108
 msgid "Sign in to trizum cloud"
 msgstr "Iniciar sesión en trizum cloud"
 
@@ -3545,7 +3545,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:94
 #: src/routes/party_.$partyId.who.tsx:114
-#: src/routes/reset-password.tsx:82
+#: src/routes/reset-password.tsx:83
 #: src/routes/settings.tsx:107
 msgid "Submitting..."
 msgstr "Enviando..."
@@ -3931,7 +3931,7 @@ msgstr "Dólar de Trinidad y Tobago"
 
 #: src/components/CloudSyncSettingsView.tsx:812
 #: src/components/CloudSyncSettingsView.tsx:953
-#: src/routes/_home/route.tsx:109
+#: src/routes/_home/route.tsx:110
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
@@ -4027,12 +4027,12 @@ msgstr "Grivna Ucraniana"
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
-#: src/routes/_home/route.tsx:248
+#: src/routes/_home/route.tsx:249
 msgid "Unpin party"
 msgstr "Desfijar grupo"
 
 #: src/components/UpdateController.tsx:29
-#: src/routes/_home/route.tsx:70
+#: src/routes/_home/route.tsx:71
 msgid "Update available"
 msgstr "Actualización disponible"
 
@@ -4048,7 +4048,7 @@ msgstr "No se ha podido actualizar. Inténtalo de nuevo."
 msgid "Update is no longer available."
 msgstr "La actualización ya no está disponible."
 
-#: src/routes/reset-password.tsx:143
+#: src/routes/reset-password.tsx:144
 msgid "Update password"
 msgstr "Actualizar contraseña"
 
@@ -4140,7 +4140,7 @@ msgstr "Utilizar el Servicio para almacenar o distribuir contenido ilícito o qu
 msgid "Use trizum cloud on this device?"
 msgstr "¿Usar trizum cloud en este dispositivo?"
 
-#: src/routes/join.tsx:137
+#: src/routes/join.tsx:138
 msgid "Use your camera to scan a trizum invite"
 msgstr "Usa tu cámara para escanear una invitación de trizum"
 

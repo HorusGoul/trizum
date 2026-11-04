@@ -180,13 +180,13 @@ function redactRecord(record: LogRecord): LogRecord {
     category: record.category.map(redactString),
     message: record.message.map((value) => redactValue(value)),
     rawMessage,
-    properties: redactValue(record.properties) as Record<string, unknown>,
+    properties: redactValue(record.properties) as LogRecord["properties"],
   };
 }
 
 export function withDocumentIdRedaction(
   sink: Sink,
-  getContext?: () => Record<string, unknown>,
+  getContext?: () => LogRecord["properties"],
 ): Sink {
   const redacted: Sink & Partial<Disposable & AsyncDisposable> = (record) => {
     const contextual = getContext

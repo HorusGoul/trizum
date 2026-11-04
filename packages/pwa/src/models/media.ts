@@ -1,10 +1,28 @@
 import type { DocumentId, RawString } from "@automerge/automerge-repo/slim";
 
+export interface MediaMetadata {
+  type?: "avatar";
+  partyId?: DocumentId;
+  source?: string;
+  cameraModel?: string;
+  mimeType?: string;
+  originalMimeType?: string;
+  originalFilename?: string;
+  lastModified?: number;
+  originalSize?: number;
+  compressedSize?: number;
+  compressionRatio?: number;
+  orientation?: number;
+  convertedFromHeic?: boolean;
+  processed?: boolean;
+  error?: string;
+}
+
 export interface MediaFile {
   id: DocumentId;
   type: "mediaFile";
   encodedBlob: RawString;
-  metadata: Record<string, unknown>;
+  metadata: MediaMetadata;
 }
 
 export async function encodeBlob(blob: Blob) {

@@ -120,7 +120,7 @@ const toolingConfig = {
       "anti-slop/no-unknown-parameters": "off", // https://github.com/HorusGoul/trizum/issues/568
       "anti-slop/no-unknown-returns": "error",
       "anti-slop/no-unknown-type-aliases": "error",
-      "anti-slop/no-unsafe-dictionary-type": "off", // https://github.com/HorusGoul/trizum/issues/564
+      "anti-slop/no-unsafe-dictionary-type": "error",
       "anti-slop/no-widen-then-assert": "error",
       "anti-slop/require-readable-spacing": "error",
       "anti-slop/require-safety-comment-for-type-assertion": "off", // https://github.com/HorusGoul/trizum/issues/566

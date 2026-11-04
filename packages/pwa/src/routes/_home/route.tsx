@@ -1,3 +1,4 @@
+import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -28,7 +29,7 @@ interface HomeSearch {
 }
 
 export const Route = createFileRoute("/_home")({
-  validateSearch: (search: Record<string, unknown>): HomeSearch => ({
+  validateSearch: (search: AppSearch): HomeSearch => ({
     premium: search.premium === true ? true : undefined,
   }),
   component: Home,

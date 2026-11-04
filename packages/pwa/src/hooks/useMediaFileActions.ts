@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { encodeBlob, type MediaFile } from "#src/models/media.ts";
+import { encodeBlob, type MediaFile, type MediaMetadata } from "#src/models/media.ts";
 import {
   ImageProcessingError,
   processImage,
@@ -31,14 +31,14 @@ export function getImageUploadErrorMessage(error: unknown): string | null {
   }
 }
 
-function omitUndefinedMetadataValues(metadata: Record<string, unknown>) {
+function omitUndefinedMetadataValues(metadata: MediaMetadata): MediaMetadata {
   return Object.fromEntries(Object.entries(metadata).filter(([, value]) => value !== undefined));
 }
 
 export function getMediaFileHelpers(repo: Repo) {
   async function createMediaFile(
     blob: Blob,
-    metadata: Record<string, unknown>,
+    metadata: MediaMetadata,
     compressionOptions?: ImageCompressionOptions,
   ) {
     let processedBlob = blob;

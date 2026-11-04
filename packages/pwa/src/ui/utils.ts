@@ -12,8 +12,15 @@ const isBoolean = (maybeBoolean: unknown): maybeBoolean is boolean =>
 
 const toStringIfBoolean = (value: unknown) => (isBoolean(value) ? String(value) : value);
 
-const isSimpleSubset = (a: Record<string, unknown>, b: Record<string, unknown>) =>
-  Object.entries(a).every(([key, value]) => b[key] === value);
+function isSimpleSubset<SchemaVariants extends Variants>(
+  a: Omit<CompoundVariant<SchemaVariants>, "classes">,
+  b: Options<SchemaVariants>,
+) {
+  return Object.entries(a).every(([key, value]) => {
+    // SAFETY: Removing classes from CompoundVariant leaves only keys supplied by the variant schema.
+    return b[key as keyof SchemaVariants] === value;
+  });
+}
 
 type Variants = {
   [key: string]: {
@@ -62,18 +69,16 @@ export const cva =
   (options: Options<SchemaVariants> = {}, classNames: ClassName = []) => {
     const { base, defaultVariants = {}, variants = {}, compoundVariants = [] } = schema;
 
-    const optionsWithUndefinedsRemoved = Object.entries(options).reduce(
-      (acc, [key, value]) => {
-        if (value === undefined) {
-          return acc;
-        }
+    const optionsWithUndefinedsRemoved = { ...options };
 
-        acc[key] = value;
-
-        return acc;
-      },
-      {} as Record<string, unknown>,
-    );
+    for (const key in optionsWithUndefinedsRemoved) {
+      if (
+        Object.hasOwn(optionsWithUndefinedsRemoved, key) &&
+        optionsWithUndefinedsRemoved[key] === undefined
+      ) {
+        delete optionsWithUndefinedsRemoved[key];
+      }
+    }
 
     const currentOptions = {
       ...defaultVariants,
@@ -93,7 +98,7 @@ export const cva =
         ];
       }),
       compoundVariants.reduce((list, { classes, ...compoundVariantOptions }) => {
-        if (isSimpleSubset(compoundVariantOptions, currentOptions)) {
+        if (isSimpleSubset<SchemaVariants>(compoundVariantOptions, currentOptions)) {
           list.push(classes);
         }
 
