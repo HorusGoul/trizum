@@ -13,8 +13,8 @@ export function isNativeCameraCancel(cause: unknown) {
   return /cancel|cancelled|canceled/i.test(cause.message);
 }
 
-export async function getNativeCameraCaptureFile() {
-  const photo = await Camera.getPhoto({
+export async function getNativeCameraCaptureFile(camera: Pick<typeof Camera, "getPhoto"> = Camera) {
+  const photo = await camera.getPhoto({
     quality: 90,
     resultType: CameraResultType.Uri,
     source: CameraSource.Camera,

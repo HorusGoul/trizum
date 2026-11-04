@@ -25,7 +25,7 @@ msgid "[DEV] Create expenses"
 msgstr "[DEV] Create expenses"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:392
+#: src/components/PremiumPaywall.tsx:405
 msgid "{0, plural, one {# day free} other {# days free}}"
 msgstr "{0, plural, one {# day free} other {# days free}}"
 
@@ -35,17 +35,17 @@ msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues
 msgstr "{0, plural, one {# issue must be resolved before saving.} other {# issues must be resolved before saving.}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:396
+#: src/components/PremiumPaywall.tsx:409
 msgid "{0, plural, one {# month free} other {# months free}}"
 msgstr "{0, plural, one {# month free} other {# months free}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:394
+#: src/components/PremiumPaywall.tsx:407
 msgid "{0, plural, one {# week free} other {# weeks free}}"
 msgstr "{0, plural, one {# week free} other {# weeks free}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:398
+#: src/components/PremiumPaywall.tsx:411
 msgid "{0, plural, one {# year free} other {# years free}}"
 msgstr "{0, plural, one {# year free} other {# years free}}"
 
@@ -92,11 +92,11 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
-#: src/components/PremiumPaywall.tsx:427
+#: src/components/PremiumPaywall.tsx:440
 msgid "{price} is charged automatically until canceled."
 msgstr "{price} is charged automatically until canceled."
 
-#: src/components/PremiumPaywall.tsx:383
+#: src/components/PremiumPaywall.tsx:396
 msgid "{pricePerMonth} per month"
 msgstr "{pricePerMonth} per month"
 
@@ -275,7 +275,7 @@ msgstr "Active"
 msgid "Active on this device"
 msgstr "Active on this device"
 
-#: src/components/PremiumPaywall.tsx:164
+#: src/components/PremiumPaywall.tsx:177
 msgid "Ad-free for you"
 msgstr "Ad-free for you"
 
@@ -347,7 +347,7 @@ msgstr "Advanced"
 msgid "Afghan Afghani"
 msgstr "Afghan Afghani"
 
-#: src/components/PremiumPaywall.tsx:420
+#: src/components/PremiumPaywall.tsx:433
 msgid "After the free trial, {price} is charged automatically until canceled."
 msgstr "After the free trial, {price} is charged automatically until canceled."
 
@@ -359,7 +359,7 @@ msgstr "Albanian Lek"
 msgid "Algerian Dinar"
 msgstr "Algerian Dinar"
 
-#: src/components/QRCodeScanner.tsx:295
+#: src/components/QRCodeScanner.tsx:304
 msgid "Align QR code here"
 msgstr "Align QR code here"
 
@@ -421,7 +421,7 @@ msgstr "and its"
 msgid "Angolan Kwanza"
 msgstr "Angolan Kwanza"
 
-#: src/components/PremiumPaywall.tsx:365
+#: src/components/PremiumPaywall.tsx:378
 msgid "Annual"
 msgstr "Annual"
 
@@ -706,11 +706,11 @@ msgstr "Calculator expression"
 msgid "Cambodian Riel"
 msgstr "Cambodian Riel"
 
-#: src/components/QRCodeScanner.tsx:102
+#: src/components/QRCodeScanner.tsx:111
 msgid "Camera permission was denied"
 msgstr "Camera permission was denied"
 
-#: src/components/QRCodeScanner.tsx:248
+#: src/components/QRCodeScanner.tsx:257
 msgid "Camera preview"
 msgstr "Camera preview"
 
@@ -771,7 +771,7 @@ msgstr "Changes sync automatically across all your devices"
 msgid "Check for updates"
 msgstr "Check for updates"
 
-#: src/components/PremiumPaywall.tsx:182
+#: src/components/PremiumPaywall.tsx:195
 msgid "Check your connection and try again."
 msgstr "Check your connection and try again."
 
@@ -862,7 +862,7 @@ msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
 #: src/components/PremiumBrowserHelp.tsx:23
-#: src/components/PremiumPaywall.tsx:136
+#: src/components/PremiumPaywall.tsx:149
 msgid "Close Premium"
 msgstr "Close Premium"
 
@@ -1011,7 +1011,7 @@ msgstr "Continue with Apple"
 msgid "Continue with Google"
 msgstr "Continue with Google"
 
-#: src/components/PremiumPaywall.tsx:228
+#: src/components/PremiumPaywall.tsx:241
 msgid "Continue with Premium"
 msgstr "Continue with Premium"
 
@@ -1080,8 +1080,8 @@ msgstr "Could not load cloud settings"
 msgid "Could not load sign-in methods"
 msgstr "Could not load sign-in methods"
 
-#: src/hooks/useCloudSyncAccountState.ts:260
-#: src/hooks/useCloudSyncAccountState.ts:333
+#: src/hooks/useCloudSyncAccountState.ts:304
+#: src/hooks/useCloudSyncAccountState.ts:375
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
@@ -1543,7 +1543,7 @@ msgstr "Explore Premium"
 
 #: src/components/AvatarPicker.tsx:119
 #: src/components/ExpenseEditor.tsx:1031
-#: src/components/QRCodeScanner.tsx:120
+#: src/components/QRCodeScanner.tsx:129
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
 
@@ -2084,7 +2084,7 @@ msgstr "Libyan Dinar"
 msgid "License"
 msgstr "License"
 
-#: src/components/PremiumPaywall.tsx:367
+#: src/components/PremiumPaywall.tsx:380
 msgid "Lifetime"
 msgstr "Lifetime"
 
@@ -2100,7 +2100,7 @@ msgstr "Links"
 msgid "Loading licenses..."
 msgstr "Loading licenses..."
 
-#: src/components/PremiumPaywall.tsx:547
+#: src/components/PremiumPaywall.tsx:562
 msgid "Loading Premium options"
 msgstr "Loading Premium options"
 
@@ -2229,7 +2229,7 @@ msgstr "Moldovan Leu"
 msgid "Mongolian Tugrik"
 msgstr "Mongolian Tugrik"
 
-#: src/components/PremiumPaywall.tsx:363
+#: src/components/PremiumPaywall.tsx:376
 msgid "Monthly"
 msgstr "Monthly"
 
@@ -2370,7 +2370,7 @@ msgstr "No active parties right now"
 msgid "No archived parties"
 msgstr "No archived parties"
 
-#: src/components/QRCodeScanner.tsx:111
+#: src/components/QRCodeScanner.tsx:120
 msgid "No camera found on this device"
 msgstr "No camera found on this device"
 
@@ -2398,7 +2398,7 @@ msgstr "No emoji found"
 msgid "No expense templates yet"
 msgstr "No expense templates yet"
 
-#: src/components/PremiumPaywall.tsx:528
+#: src/components/PremiumPaywall.tsx:543
 msgid "No Premium purchase was found for this account."
 msgstr "No Premium purchase was found for this account."
 
@@ -2484,15 +2484,15 @@ msgstr "Older parties stay tucked away, not gone"
 msgid "Omani Rial"
 msgstr "Omani Rial"
 
-#: src/components/PremiumPaywall.tsx:167
+#: src/components/PremiumPaywall.tsx:180
 msgid "One Party Boost"
 msgstr "One Party Boost"
 
-#: src/components/PremiumPaywall.tsx:412
+#: src/components/PremiumPaywall.tsx:425
 msgid "One payment. No recurring charge."
 msgstr "One payment. No recurring charge."
 
-#: src/components/PremiumPaywall.tsx:386
+#: src/components/PremiumPaywall.tsx:399
 msgid "one-time"
 msgstr "one-time"
 
@@ -2840,11 +2840,11 @@ msgstr "People"
 msgid "People that owe you money"
 msgstr "People that owe you money"
 
-#: src/components/PremiumPaywall.tsx:377
+#: src/components/PremiumPaywall.tsx:390
 msgid "per month"
 msgstr "per month"
 
-#: src/components/PremiumPaywall.tsx:383
+#: src/components/PremiumPaywall.tsx:396
 msgid "per year"
 msgstr "per year"
 
@@ -2932,7 +2932,7 @@ msgstr "Please select an image file"
 msgid "Please wait while we fetch the latest data"
 msgstr "Please wait while we fetch the latest data"
 
-#: src/components/QRCodeScanner.tsx:360
+#: src/components/QRCodeScanner.tsx:369
 msgid "Point your camera at a trizum QR code"
 msgstr "Point your camera at a trizum QR code"
 
@@ -2940,7 +2940,7 @@ msgstr "Point your camera at a trizum QR code"
 msgid "Polish Zloty"
 msgstr "Polish Zloty"
 
-#: src/components/PremiumPaywall.tsx:151
+#: src/components/PremiumPaywall.tsx:164
 #: src/routes/party_.$partyId.settings/index.tsx:66
 #: src/routes/settings.tsx:371
 msgid "Premium"
@@ -2951,7 +2951,7 @@ msgstr "Premium"
 msgid "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
 msgstr "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
 
-#: src/components/PremiumPaywall.tsx:501
+#: src/components/PremiumPaywall.tsx:516
 msgid "Premium could not be purchased. Please try again."
 msgstr "Premium could not be purchased. Please try again."
 
@@ -2967,7 +2967,7 @@ msgstr "Premium is active on this account."
 msgid "Premium is active."
 msgstr "Premium is active."
 
-#: src/components/PremiumPaywall.tsx:491
+#: src/components/PremiumPaywall.tsx:506
 msgid "Premium is now active."
 msgstr "Premium is now active."
 
@@ -2980,7 +2980,7 @@ msgstr "Premium is optional. The purchase screen describes the features included
 msgid "Premium is required for Party Boost."
 msgstr "Premium is required for Party Boost."
 
-#: src/components/PremiumPaywall.tsx:179
+#: src/components/PremiumPaywall.tsx:192
 msgid "Premium options are unavailable"
 msgstr "Premium options are unavailable"
 
@@ -2988,11 +2988,11 @@ msgstr "Premium options are unavailable"
 msgid "Premium owners can boost one party at a time and move it every seven days."
 msgstr "Premium owners can boost one party at a time and move it every seven days."
 
-#: src/components/PremiumPaywall.tsx:198
+#: src/components/PremiumPaywall.tsx:211
 msgid "Premium plan"
 msgstr "Premium plan"
 
-#: src/components/PremiumPaywall.tsx:525
+#: src/components/PremiumPaywall.tsx:540
 msgid "Premium purchases restored."
 msgstr "Premium purchases restored."
 
@@ -3000,7 +3000,7 @@ msgstr "Premium purchases restored."
 msgid "Premium status could not be checked. Try again."
 msgstr "Premium status could not be checked. Try again."
 
-#: src/components/PremiumPaywall.tsx:159
+#: src/components/PremiumPaywall.tsx:172
 msgid "Premium, made for sharing."
 msgstr "Premium, made for sharing."
 
@@ -3016,7 +3016,7 @@ msgstr "Privacy"
 msgid "Privacy and cookie settings"
 msgstr "Privacy and cookie settings"
 
-#: src/components/PremiumPaywall.tsx:285
+#: src/components/PremiumPaywall.tsx:298
 #: src/routes/about/route.tsx:111
 msgid "Privacy Policy"
 msgstr "Privacy Policy"
@@ -3042,7 +3042,7 @@ msgstr "Purchases and restores are available in the trizum app installed from th
 msgid "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
 msgstr "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
 
-#: src/components/PremiumPaywall.tsx:535
+#: src/components/PremiumPaywall.tsx:550
 msgid "Purchases could not be restored. Please try again."
 msgstr "Purchases could not be restored. Please try again."
 
@@ -3050,7 +3050,7 @@ msgstr "Purchases could not be restored. Please try again."
 msgid "Qatari Rial"
 msgstr "Qatari Rial"
 
-#: src/components/QRCodeScanner.tsx:239
+#: src/components/QRCodeScanner.tsx:248
 msgid "QR code frame capture"
 msgstr "QR code frame capture"
 
@@ -3080,7 +3080,7 @@ msgid "Redeem a one-time code in Google Play"
 msgstr "Redeem a one-time code in Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:68
-#: src/components/PremiumPaywall.tsx:251
+#: src/components/PremiumPaywall.tsx:264
 #: src/routes/redeem.tsx:50
 msgid "Redeem code"
 msgstr "Redeem code"
@@ -3143,7 +3143,7 @@ msgstr "Restart trizum"
 msgid "Restore"
 msgstr "Restore"
 
-#: src/components/PremiumPaywall.tsx:240
+#: src/components/PremiumPaywall.tsx:253
 msgid "Restore purchases"
 msgstr "Restore purchases"
 
@@ -3590,7 +3590,7 @@ msgstr "Sri Lankan Rupee"
 msgid "Start date"
 msgstr "Start date"
 
-#: src/components/PremiumPaywall.tsx:226
+#: src/components/PremiumPaywall.tsx:239
 msgid "Start free trial"
 msgstr "Start free trial"
 
@@ -3752,7 +3752,7 @@ msgstr "Template names must be unique"
 msgid "Templates"
 msgstr "Templates"
 
-#: src/components/PremiumPaywall.tsx:276
+#: src/components/PremiumPaywall.tsx:289
 msgid "Terms"
 msgstr "Terms"
 
@@ -3865,7 +3865,7 @@ msgstr "This debt is no longer available"
 msgid "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 msgstr "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 
-#: src/hooks/useCloudSyncAccountState.ts:322
+#: src/hooks/useCloudSyncAccountState.ts:366
 msgid "This device is already using trizum cloud"
 msgstr "This device is already using trizum cloud"
 
@@ -4023,21 +4023,21 @@ msgstr "Trinidad and Tobago Dollar"
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/hooks/useCloudSyncAccountState.ts:230
-#: src/hooks/useCloudSyncAccountState.ts:316
+#: src/hooks/useCloudSyncAccountState.ts:274
+#: src/hooks/useCloudSyncAccountState.ts:360
 msgid "trizum cloud data is invalid"
 msgstr "trizum cloud data is invalid"
 
-#: src/hooks/useCloudSyncAccountState.ts:253
-#: src/hooks/useCloudSyncAccountState.ts:360
+#: src/hooks/useCloudSyncAccountState.ts:297
+#: src/hooks/useCloudSyncAccountState.ts:402
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud enabled on this device"
 
-#: src/hooks/useCloudSyncAccountState.ts:310
+#: src/hooks/useCloudSyncAccountState.ts:354
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud is not set up yet"
 
-#: src/hooks/useCloudSyncAccountState.ts:189
+#: src/hooks/useCloudSyncAccountState.ts:236
 msgid "trizum cloud started"
 msgstr "trizum cloud started"
 
@@ -4050,7 +4050,7 @@ msgid "trizum helps people record shared expenses, calculate balances, and coord
 msgstr "trizum helps people record shared expenses, calculate balances, and coordinate settlements within groups. The Service is a record-keeping and calculation tool. It is not a bank, payment institution, financial adviser, accounting service, or debt collection service, and it does not hold or transfer money between participants."
 
 #: src/components/PremiumBrowserHelp.tsx:18
-#: src/components/PremiumPaywall.tsx:132
+#: src/components/PremiumPaywall.tsx:145
 msgid "trizum Premium"
 msgstr "trizum Premium"
 
@@ -4066,7 +4066,7 @@ msgstr "trizum will open Apple so you can add it as a sign-in method for this ac
 msgid "trizum will open Google so you can add it as a sign-in method for this account."
 msgstr "trizum will open Google so you can add it as a sign-in method for this account."
 
-#: src/components/PremiumPaywall.tsx:191
+#: src/components/PremiumPaywall.tsx:204
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:285
 msgid "Try again"
 msgstr "Try again"
@@ -4079,7 +4079,7 @@ msgstr "Try another email"
 msgid "Try another timeframe to compare a different period of your party."
 msgstr "Try another timeframe to compare a different period of your party."
 
-#: src/components/QRCodeScanner.tsx:358
+#: src/components/QRCodeScanner.tsx:367
 msgid "Try scanning another code"
 msgstr "Try scanning another code"
 
@@ -4550,7 +4550,7 @@ msgstr "Your Party Boost is active elsewhere and can be moved here."
 msgid "Your Premium is boosting this party for everyone in it."
 msgstr "Your Premium is boosting this party for everyone in it."
 
-#: src/components/PremiumPaywall.tsx:494
+#: src/components/PremiumPaywall.tsx:509
 msgid "Your purchase is still syncing. Try restoring it in a moment."
 msgstr "Your purchase is still syncing. Try restoring it in a moment."
 

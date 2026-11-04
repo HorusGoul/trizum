@@ -21,7 +21,12 @@ export type ScanResult =
  */
 export type ValidationResult = true | string;
 
+interface QRCodeDetector {
+  detect(image: HTMLCanvasElement): Promise<{ rawValue: string }[]>;
+}
+
 interface QRCodeScannerProps {
+  createDetector?: () => QRCodeDetector;
   onResult: (result: ScanResult) => void;
   /**
    * Optional validation function to check if the scanned value is valid.
@@ -44,7 +49,13 @@ const QRCodeFrameHandle = ({ className, ...props }: React.HTMLAttributes<HTMLDiv
   />
 );
 
-function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
+const createQRCodeDetector = () => new BarcodeDetector({ formats: ["qr_code"] });
+
+function useQRCodeScanner({
+  onResult,
+  validate,
+  createDetector = createQRCodeDetector,
+}: QRCodeScannerProps) {
   const [state, setState] = useState<ScannerState>({ status: "initializing" });
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,14 +66,12 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
     let isCancelled = false;
     let animationFrameId: number;
     let feedbackTimeoutId: ReturnType<typeof setTimeout> | undefined;
-    let detector: InstanceType<typeof BarcodeDetector> | null = null;
+    let detector: QRCodeDetector | null = null;
 
     async function initScanner() {
       try {
         // Create barcode detector
-        detector = new BarcodeDetector({
-          formats: ["qr_code"],
-        });
+        detector = createDetector();
 
         // Request camera access
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -216,7 +225,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
       clearTimeout(feedbackTimeoutId);
       stopCamera();
     };
-  }, [onResult, validate]);
+  }, [onResult, validate, createDetector]);
 
   return { state, videoRef, canvasRef };
 }

@@ -11,8 +11,6 @@ import {
 import { createPartyBoostTestHarness } from "../premium/partyBoostTestHarness";
 import { PARTY_BOOST_TRANSFER_INTERVAL_MS } from "../premium/partyBoost";
 
-vi.mock("cloudflare:email", () => ({ EmailMessage: class EmailMessage {} }));
-
 describe("Party Boost HTTP lifecycle with local D1", () => {
   let harness: Awaited<ReturnType<typeof createPartyBoostTestHarness>>;
   beforeAll(async () => {

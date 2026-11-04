@@ -1,4 +1,4 @@
-import { App } from "@capacitor/app";
+import { listenForAppState, type ListenForAppState } from "#src/lib/nativeAppLifecycle.ts";
 import { Capacitor } from "@capacitor/core";
 import { useEffect, useState } from "react";
 import { getLogger } from "#src/lib/log.ts";
@@ -34,8 +34,24 @@ const historyStore: AdHistoryStore = {
   },
 };
 
+export type AdvertisingCoordinatorHandle = Pick<
+  AdvertisingCoordinator,
+  | "presentInterstitialOpportunity"
+  | "showPrivacyOptions"
+  | "setProtectedFlow"
+  | "setEntitlement"
+  | "markInteractive"
+  | "onActive"
+  | "onInactive"
+  | "destroy"
+>;
+
+const createAdvertisingCoordinator = (
+  options: ConstructorParameters<typeof AdvertisingCoordinator>[0],
+): AdvertisingCoordinatorHandle => new AdvertisingCoordinator(options);
+
 class AdvertisingRuntime {
-  private coordinator: AdvertisingCoordinator | null = null;
+  private coordinator: AdvertisingCoordinatorHandle | null = null;
   private routeProtected = false;
   private readonly protectedFlowTokens = new Set<symbol>();
 
@@ -57,12 +73,12 @@ class AdvertisingRuntime {
     await this.coordinator?.showPrivacyOptions();
   };
 
-  attachCoordinator(coordinator: AdvertisingCoordinator) {
+  attachCoordinator(coordinator: AdvertisingCoordinatorHandle) {
     this.coordinator = coordinator;
     this.updateProtectedFlow();
   }
 
-  detachCoordinator(coordinator: AdvertisingCoordinator) {
+  detachCoordinator(coordinator: AdvertisingCoordinatorHandle) {
     if (this.coordinator === coordinator) {
       this.coordinator = null;
     }
@@ -87,9 +103,13 @@ const advertisingRuntime = new AdvertisingRuntime();
 export function AdvertisingController({
   children,
   protectedFlow,
+  createCoordinator = createAdvertisingCoordinator,
+  subscribeToAppState = listenForAppState,
 }: {
   children: React.ReactNode;
   protectedFlow: boolean;
+  createCoordinator?: typeof createAdvertisingCoordinator;
+  subscribeToAppState?: ListenForAppState;
 }) {
   const entitlement = useAdEntitlement();
   const [state, setState] = useState<AdvertisingState>({ privacyOptionsRequired: false });
@@ -102,7 +122,7 @@ export function AdvertisingController({
       return;
     }
 
-    const coordinator = new AdvertisingCoordinator({
+    const coordinator = createCoordinator({
       platform,
       adUnitIds: getAdUnitIds(platform),
       historyStore,
@@ -120,7 +140,7 @@ export function AdvertisingController({
 
     const interactiveFrame = requestAnimationFrame(() => coordinator.markInteractive());
 
-    const appStateListener = App.addListener("appStateChange", ({ isActive }) => {
+    const appStateListener = subscribeToAppState(({ isActive }) => {
       if (isActive) {
         void coordinator.onActive();
       } else {
@@ -136,7 +156,7 @@ export function AdvertisingController({
     };
     // The coordinator has dedicated effects below for live entitlement and route changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [createCoordinator, subscribeToAppState]);
 
   useEffect(() => {
     void advertisingRuntime.setEntitlement(entitlement);

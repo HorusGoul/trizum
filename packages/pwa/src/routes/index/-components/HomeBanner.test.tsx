@@ -9,43 +9,29 @@ import { PremiumContextProvider, type PremiumStatus } from "#src/lib/premium/Pre
 import { AdvertisingProvider } from "#src/lib/advertising/AdvertisingContext.ts";
 import { HomeBanner } from "./HomeBanner.tsx";
 
-const state = vi.hoisted<{
-  username: string;
-  premiumBannerDismissed: boolean;
-  userId: string | null;
-  isNative: boolean;
-}>(() => ({
-  username: "Alex",
-  premiumBannerDismissed: false,
-  userId: "account-a",
-  isNative: true,
-}));
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  createMemoryHistory,
+  RouterProvider,
+} from "@tanstack/react-router";
+import { Capacitor } from "@capacitor/core";
+import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
+import { createProfileRuntime } from "#src/lib/testing/profileRuntime.ts";
 
-const dismiss = vi.hoisted(() =>
-  vi.fn<() => void>(() => {
-    state.premiumBannerDismissed = true;
-  }),
-);
+let runtime: Awaited<ReturnType<typeof createProfileRuntime>>;
+let status: PremiumStatus = "free";
+let isVisible = true;
+const rootRoute = createRootRoute({ component: () => <HomeBanner isVisible={isVisible} /> });
+const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: "/" });
 
-vi.mock("#src/hooks/usePartyList.ts", () => ({
-  usePartyList: () => ({ partyList: state, dismissPremiumBanner: dismiss }),
-}));
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/settings/cloud-sync",
+});
 
-vi.mock("#src/lib/auth-client.ts", () => ({
-  useAppSession: () => ({ data: state.userId ? { user: { id: state.userId } } : null }),
-}));
-
-vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({
-  getRevenueCatPlatform: () => (state.isNative ? "android" : undefined),
-}));
-
-const navigate = vi.hoisted(() => vi.fn<() => Promise<void>>());
-
-vi.mock("@tanstack/react-router", () => ({
-  useNavigate: () => navigate,
-  useLocation: () => true,
-  useSearch: () => undefined,
-}));
+let router: ReturnType<typeof createRouter>;
 
 let root: Root;
 let container: HTMLDivElement;
@@ -53,7 +39,12 @@ const presentPaywall = vi.fn<() => Promise<null>>();
 const releaseAdProtection = vi.fn<() => void>();
 const registerProtectedFlow = vi.fn<() => () => void>(() => releaseAdProtection);
 
-async function render(status: PremiumStatus = "free", isVisible = true) {
+async function render(nextStatus: PremiumStatus = "free", nextVisible = true) {
+  status = nextStatus;
+  isVisible = nextVisible;
+  await act(async () => {
+    await router.invalidate();
+  });
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
@@ -74,7 +65,9 @@ async function render(status: PremiumStatus = "free", isVisible = true) {
               presentCustomerCenter: async () => undefined,
             }}
           >
-            <HomeBanner isVisible={isVisible} />
+            <RepoContext value={runtime.repo}>
+              <RouterProvider router={router} />
+            </RepoContext>
           </PremiumContextProvider>
         </AdvertisingProvider>
       </I18nProvider>,
@@ -91,14 +84,15 @@ async function click(label: string) {
   await act(async () => button!.click());
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   vi.clearAllMocks();
-  Object.assign(state, {
-    username: "Alex",
-    premiumBannerDismissed: false,
-    userId: "account-a",
-    isNative: true,
+  localStorage.clear();
+  runtime = await createProfileRuntime();
+  router = createRouter({
+    routeTree: rootRoute.addChildren([homeRoute, settingsRoute]),
+    history: createMemoryHistory({ initialEntries: ["/"] }),
   });
+  await router.load();
   presentPaywall.mockResolvedValue(null);
   i18n.load("en", {});
   i18n.activate("en");
@@ -112,14 +106,25 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  await runtime.dispose();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 it("gives incomplete profiles priority over the Premium offer", async () => {
-  state.username = "   ";
+  await act(async () => {
+    runtime.local.change((doc) => {
+      doc.username = "   ";
+    });
+  });
   await render();
   expect(container.textContent).toContain("Complete your profile");
   expect(container.textContent).not.toContain("Enjoy trizum ad-free");
-  state.username = "Alex";
+  await act(async () => {
+    runtime.local.change((doc) => {
+      doc.username = "Alex";
+    });
+  });
   await render();
   expect(container.textContent).toContain("Enjoy trizum ad-free");
 });
@@ -132,7 +137,7 @@ it("only promotes a resolved free native account", async () => {
 });
 
 it("does not promote native purchases on the web", async () => {
-  state.isNative = false;
+  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
   await render();
   expect(container.textContent).toBe("");
 });
@@ -140,7 +145,7 @@ it("does not promote native purchases on the web", async () => {
 it("dismisses independently of opening the paywall and respects the saved preference", async () => {
   await render();
   await click("Dismiss Premium banner");
-  expect(dismiss).toHaveBeenCalledOnce();
+  expect(runtime.local.doc().premiumBannerDismissed).toBe(true);
   expect(presentPaywall).not.toHaveBeenCalled();
   await render();
   expect(container.textContent).toBe("");
@@ -164,12 +169,10 @@ it("opens Premium directly and protects the flow from ads until the paywall clos
 });
 
 it("carries the Premium destination into the sign-in route", async () => {
-  state.userId = null;
+  runtime.setSession(null);
   await render();
   await click("Enjoy trizum ad-free");
-  expect(navigate).toHaveBeenCalledWith({
-    to: "/settings/cloud-sync",
-    search: { returnTo: "/?premium=true" },
-  });
+  expect(router.state.location.pathname).toBe("/settings/cloud-sync");
+  expect(router.state.location.search).toMatchObject({ returnTo: "/?premium=true" });
   expect(presentPaywall).not.toHaveBeenCalled();
 });

@@ -1,56 +1,24 @@
 // @vitest-environment jsdom
 
-import type * as ReactAriaComponents from "react-aria-components";
-import { act, type ComponentProps, type ReactNode } from "react";
+import { act, type ComponentProps } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 import { toast } from "sonner";
 import {
-  loadPremiumOffering,
-  purchasePremiumPlan,
-  restorePremiumPurchases,
+  type loadPremiumOffering as LoadPremiumOffering,
+  type purchasePremiumPlan as PurchasePremiumPlan,
+  type restorePremiumPurchases as RestorePremiumPurchases,
 } from "#src/lib/premium/premiumCommerce.ts";
-import type { IconButton } from "#src/ui/IconButton.tsx";
 import { PremiumPaywall } from "./PremiumPaywall.tsx";
-import { trackEvent } from "#src/lib/analytics.ts";
+import type { trackEvent as TrackEvent } from "#src/lib/analytics.ts";
 
-vi.mock("#src/lib/analytics.ts", () => ({ trackEvent: vi.fn<typeof trackEvent>() }));
-
-vi.mock("react-aria-components", async (importOriginal) => ({
-  ...(await importOriginal<typeof ReactAriaComponents>()),
-  Dialog: ({ children }: { children: ReactNode }) => children,
-  Modal: ({ children }: { children: ReactNode }) => children,
-  ModalOverlay: ({ children, isOpen }: { children: ReactNode; isOpen: boolean }) =>
-    isOpen ? children : null,
-}));
-
-// SAFETY: The mocked button invokes a callback that ignores its press event; no event fields are read by the tested paywall.
-vi.mock("#src/ui/IconButton.tsx", () => ({
-  IconButton: (props: ComponentProps<typeof IconButton>) => (
-    <button
-      type="button"
-      aria-label={props["aria-label"]}
-      disabled={props.isDisabled}
-      onClick={() => props.onPress?.({} as never)}
-    />
-  ),
-}));
-
-vi.mock("#src/ui/Icon.tsx", () => ({ Icon: () => null }));
-
-vi.mock("#src/lib/link.ts", () => ({ getAppLink: (path: string) => path }));
-
-vi.mock("#src/lib/premium/premiumCommerce.ts", () => ({
-  loadPremiumOffering: vi.fn<typeof loadPremiumOffering>(),
-  purchasePremiumPlan: vi.fn<typeof purchasePremiumPlan>(),
-  restorePremiumPurchases: vi.fn<typeof restorePremiumPurchases>(),
-}));
-
-vi.mock("sonner", () => ({
-  toast: { error: vi.fn<typeof toast.error>(), success: vi.fn<typeof toast.success>() },
-}));
+const loadPremiumOffering = vi.fn<typeof LoadPremiumOffering>();
+const purchasePremiumPlan = vi.fn<typeof PurchasePremiumPlan>();
+const restorePremiumPurchases = vi.fn<typeof RestorePremiumPurchases>();
+const trackEvent = vi.fn<typeof TrackEvent>();
+const services = { loadPremiumOffering, purchasePremiumPlan, restorePremiumPurchases, trackEvent };
 
 let root: Root;
 let container: HTMLDivElement;
@@ -62,6 +30,7 @@ async function render(isOpen = true, sessionId = 1, userId = "user-1") {
     root.render(
       <I18nProvider i18n={i18n}>
         <PremiumPaywall
+          services={services}
           isOpen={isOpen}
           onEntitlementChange={onEntitlementChange}
           onOpenChange={onOpenChange}
@@ -74,7 +43,7 @@ async function render(isOpen = true, sessionId = 1, userId = "user-1") {
 }
 
 function button(label: string) {
-  const element = Array.from(container.querySelectorAll("button")).find(
+  const element = Array.from(document.querySelectorAll("button")).find(
     (candidate) =>
       candidate.getAttribute("aria-label") === label || candidate.textContent === label,
   );
@@ -86,6 +55,8 @@ function button(label: string) {
 
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.spyOn(toast, "success").mockReturnValue("success");
+  vi.spyOn(toast, "error").mockReturnValue("error");
   i18n.load("en", {});
   i18n.activate("en");
   // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
@@ -102,6 +73,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  vi.restoreAllMocks();
 });
 
 it.each(["purchase", "restore"] as const)(
@@ -224,7 +196,7 @@ it("keeps a failed or stalled product lookup dismissible", async () => {
   await render(false);
   vi.mocked(loadPremiumOffering).mockRejectedValueOnce(new Error("Billing unavailable"));
   await render(true, 2);
-  expect(container.textContent).toContain("Premium options are unavailable");
+  expect(document.body.textContent).toContain("Premium options are unavailable");
   expect(button("Close Premium").disabled).toBe(false);
 });
 

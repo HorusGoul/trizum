@@ -1,7 +1,6 @@
 import { createHmac } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import type * as DbClient from "./db/client";
 import { DatabaseSync } from "node:sqlite";
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
@@ -9,23 +8,8 @@ import { createAuth } from "./auth";
 import type { ApiEnv } from "./env";
 import * as schema from "./db/schema";
 
-const state = vi.hoisted<{ db: unknown; sentEmail: string }>(() => ({
-  db: undefined,
-  sentEmail: "",
-}));
-
-vi.mock("./db/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof DbClient>()),
-  getApiDb: () => state.db,
-}));
-
-vi.mock("cloudflare:email", () => ({
-  EmailMessage: class {
-    constructor(_from: string, _to: string, raw: string) {
-      state.sentEmail = raw;
-    }
-  },
-}));
+let database: ReturnType<typeof drizzle>;
+const state = { sentEmail: "" };
 
 let sqlite: DatabaseSync;
 const fetcher = vi.fn<typeof fetch>();
@@ -55,8 +39,15 @@ function authRequest(
 
 async function handle(request = authRequest(), config = env) {
   const pending: Promise<unknown>[] = [];
-  // SAFETY: The database client is mocked; this fixture supplies every environment binding read by the auth factory.
-  const auth = createAuth(config as ApiEnv, { waitUntil: (task) => pending.push(task) }, request);
+
+  // SAFETY: The fixture supplies the auth bindings; services provide an in-memory database and email delivery.
+  const auth = createAuth(config as ApiEnv, { waitUntil: (task) => pending.push(task) }, request, {
+    database,
+    sendEmail: async (message) => {
+      state.sentEmail = message.text;
+    },
+  });
+
   // Better Auth disables origin checks in tests; exercise deployed protections.
   const context = await auth.$context;
   context.skipOriginCheck = false;
@@ -93,7 +84,7 @@ beforeEach(() => {
     sqlite.exec(readFileSync(fileURLToPath(new URL(file, migrations).href), "utf8"));
   }
 
-  state.db = drizzle(
+  database = drizzle(
     async (query, params, method) => {
       const statement = sqlite.prepare(query);
       statement.setReturnArrays(true);

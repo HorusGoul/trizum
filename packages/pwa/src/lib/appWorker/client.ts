@@ -36,213 +36,222 @@ export interface AppWorkerFullRestartRequiredEventDetail {
 }
 
 const logger = getLogger("appWorker", "client");
-let appWorkerClient: AppWorkerClient | null = null;
-let appWorkerOptions: InitializeAppWorkerOptions | null = null;
-let isFullAppRestartRequired = false;
 
-export const appWorker: AppWorkerClientApi = {
-  async recalculateBalances(partyId) {
-    const { repo } = requireAppWorkerOptions();
-    const request = await createRecalculateBalancesRequest(repo, partyId);
+export function createAppWorkerClient({
+  connect = injectAppWorker,
+}: { connect?: (adapter: WorkerAdapter) => AppWorkerApi } = {}) {
+  let appWorkerClient: AppWorkerClient | null = null;
+  let appWorkerOptions: InitializeAppWorkerOptions | null = null;
+  let isFullAppRestartRequired = false;
 
-    return callAppWorker("recalculateBalances", async (api) => {
-      const documents = await api.recalculateBalances(request);
-      await waitForDocumentHeads(repo, documents, AbortSignal.timeout(balanceSyncTimeout));
+  const appWorker: AppWorkerClientApi = {
+    async recalculateBalances(partyId) {
+      const { repo } = requireAppWorkerOptions();
+      const request = await createRecalculateBalancesRequest(repo, partyId);
 
-      return true;
+      return callAppWorker("recalculateBalances", async (api) => {
+        const documents = await api.recalculateBalances(request);
+        await waitForDocumentHeads(repo, documents, AbortSignal.timeout(balanceSyncTimeout));
+
+        return true;
+      });
+    },
+  };
+
+  function initializeAppWorker(options: InitializeAppWorkerOptions) {
+    appWorkerOptions = options;
+    const client = getAppWorkerClient(options);
+
+    return client.initializePromise;
+  }
+
+  function getAppWorkerClient({ repo, wssUrl, isOfflineOnly }: InitializeAppWorkerOptions) {
+    if (appWorkerClient) {
+      return appWorkerClient;
+    }
+
+    if (typeof Worker === "undefined") {
+      throw new Error("App worker is not available in this environment");
+    }
+
+    const worker = new Worker(new URL("./appWorker.entrypoint.ts", import.meta.url), {
+      type: "module",
     });
-  },
-};
 
-export function initializeAppWorker(options: InitializeAppWorkerOptions) {
-  appWorkerOptions = options;
-  const client = getAppWorkerClient(options);
+    const api = connect(new WorkerAdapter(worker, "app-worker-injector"));
+    const repoChannel = new MessageChannel();
+    const repoNetworkAdapter = new MessageChannelNetworkAdapter(repoChannel.port1);
 
-  return client.initializePromise;
-}
+    repo.networkSubsystem.addNetworkAdapter(repoNetworkAdapter);
 
-function getAppWorkerClient({ repo, wssUrl, isOfflineOnly }: InitializeAppWorkerOptions) {
-  if (appWorkerClient) {
+    const initializePromise = api.initialize({
+      repoPort: repoChannel.port2,
+      wssUrl,
+      isOfflineOnly,
+    });
+
+    appWorkerClient = {
+      api,
+      initializePromise,
+      options: { repo, wssUrl, isOfflineOnly },
+      repoNetworkAdapter,
+      repoPort: repoChannel.port1,
+      worker,
+    };
+
     return appWorkerClient;
   }
 
-  if (typeof Worker === "undefined") {
-    throw new Error("App worker is not available in this environment");
-  }
+  async function callAppWorker<Result>(
+    methodName: string,
+    call: (api: AppWorkerApi) => Promise<Result>,
+  ) {
+    if (isFullAppRestartRequired) {
+      logger.warning("Skipping app worker method call because an app restart is required", {
+        methodName,
+      });
+      notifyFullAppRestartRequired(methodName);
+      throw new Error("App restart required before calling app worker");
+    }
 
-  const worker = new Worker(new URL("./appWorker.entrypoint.ts", import.meta.url), {
-    type: "module",
-  });
-
-  const api = injectAppWorker(new WorkerAdapter(worker, "app-worker-injector"));
-  const repoChannel = new MessageChannel();
-  const repoNetworkAdapter = new MessageChannelNetworkAdapter(repoChannel.port1);
-
-  repo.networkSubsystem.addNetworkAdapter(repoNetworkAdapter);
-
-  const initializePromise = api.initialize({
-    repoPort: repoChannel.port2,
-    wssUrl,
-    isOfflineOnly,
-  });
-
-  appWorkerClient = {
-    api,
-    initializePromise,
-    options: { repo, wssUrl, isOfflineOnly },
-    repoNetworkAdapter,
-    repoPort: repoChannel.port1,
-    worker,
-  };
-
-  return appWorkerClient;
-}
-
-async function callAppWorker<Result>(
-  methodName: string,
-  call: (api: AppWorkerApi) => Promise<Result>,
-) {
-  if (isFullAppRestartRequired) {
-    logger.warning("Skipping app worker method call because an app restart is required", {
-      methodName,
-    });
-    notifyFullAppRestartRequired(methodName);
-    throw new Error("App restart required before calling app worker");
-  }
-
-  const client = getAppWorkerClient(requireAppWorkerOptions());
-
-  try {
-    return await callAppWorkerApi(client, methodName, 1, call);
-  } catch (error) {
-    logger.warning("Restarting app worker after failed method call", {
-      methodName,
-      attempt: 1,
-      error,
-    });
-
-    let restartedClient: AppWorkerClient | null = null;
+    const client = getAppWorkerClient(requireAppWorkerOptions());
 
     try {
-      restartedClient = restartAppWorkerClient(client);
-      const result = await callAppWorkerApi(restartedClient, methodName, 2, call);
-
-      logger.info("App worker method call succeeded after restart", {
+      return await callAppWorkerApi(client, methodName, 1, call);
+    } catch (error) {
+      logger.warning("Restarting app worker after failed method call", {
         methodName,
-        attempt: 2,
+        attempt: 1,
+        error,
+      });
+
+      let restartedClient: AppWorkerClient | null = null;
+
+      try {
+        restartedClient = restartAppWorkerClient(client);
+        const result = await callAppWorkerApi(restartedClient, methodName, 2, call);
+
+        logger.info("App worker method call succeeded after restart", {
+          methodName,
+          attempt: 2,
+        });
+
+        return result;
+      } catch (restartError) {
+        logger.error("App worker method call failed after restart", {
+          methodName,
+          attempt: 2,
+          error: restartError,
+        });
+        markFullAppRestartRequired(methodName);
+
+        if (restartedClient) {
+          clearAppWorkerClient(restartedClient);
+        }
+
+        throw restartError;
+      }
+    }
+  }
+
+  async function callAppWorkerApi<Result>(
+    client: AppWorkerClient,
+    methodName: string,
+    attempt: number,
+    call: (api: AppWorkerApi) => Promise<Result>,
+  ) {
+    const startedAt = getCurrentTime();
+
+    logger.debug("App worker method call started", { methodName, attempt });
+
+    try {
+      await client.initializePromise;
+      const result = await call(client.api);
+
+      logger.debug("App worker method call succeeded", {
+        methodName,
+        attempt,
+        durationMs: getDurationMs(startedAt),
       });
 
       return result;
-    } catch (restartError) {
-      logger.error("App worker method call failed after restart", {
+    } catch (error) {
+      logger.debug("App worker method call failed", {
         methodName,
-        attempt: 2,
-        error: restartError,
+        attempt,
+        durationMs: getDurationMs(startedAt),
+        error,
       });
-      markFullAppRestartRequired(methodName);
 
-      if (restartedClient) {
-        clearAppWorkerClient(restartedClient);
-      }
-
-      throw restartError;
+      throw error;
     }
   }
-}
 
-async function callAppWorkerApi<Result>(
-  client: AppWorkerClient,
-  methodName: string,
-  attempt: number,
-  call: (api: AppWorkerApi) => Promise<Result>,
-) {
-  const startedAt = getCurrentTime();
+  function restartAppWorkerClient(failedClient: AppWorkerClient) {
+    if (appWorkerClient !== failedClient) {
+      return getAppWorkerClient(requireAppWorkerOptions());
+    }
 
-  logger.debug("App worker method call started", { methodName, attempt });
+    destroyAppWorkerClient(failedClient);
+    appWorkerClient = null;
 
-  try {
-    await client.initializePromise;
-    const result = await call(client.api);
-
-    logger.debug("App worker method call succeeded", {
-      methodName,
-      attempt,
-      durationMs: getDurationMs(startedAt),
-    });
-
-    return result;
-  } catch (error) {
-    logger.debug("App worker method call failed", {
-      methodName,
-      attempt,
-      durationMs: getDurationMs(startedAt),
-      error,
-    });
-
-    throw error;
-  }
-}
-
-function restartAppWorkerClient(failedClient: AppWorkerClient) {
-  if (appWorkerClient !== failedClient) {
     return getAppWorkerClient(requireAppWorkerOptions());
   }
 
-  destroyAppWorkerClient(failedClient);
-  appWorkerClient = null;
+  function clearAppWorkerClient(client: AppWorkerClient) {
+    if (appWorkerClient === client) {
+      appWorkerClient = null;
+    }
 
-  return getAppWorkerClient(requireAppWorkerOptions());
-}
-
-function clearAppWorkerClient(client: AppWorkerClient) {
-  if (appWorkerClient === client) {
-    appWorkerClient = null;
+    destroyAppWorkerClient(client);
   }
 
-  destroyAppWorkerClient(client);
-}
-
-function destroyAppWorkerClient(client: AppWorkerClient) {
-  try {
-    client.options.repo.networkSubsystem.removeNetworkAdapter(client.repoNetworkAdapter);
-  } finally {
-    client.repoPort.close();
-    client.worker.terminate();
-  }
-}
-
-function requireAppWorkerOptions() {
-  if (!appWorkerOptions) {
-    throw new Error("App worker has not been initialized");
+  function destroyAppWorkerClient(client: AppWorkerClient) {
+    try {
+      client.options.repo.networkSubsystem.removeNetworkAdapter(client.repoNetworkAdapter);
+    } finally {
+      client.repoPort.close();
+      client.worker.terminate();
+    }
   }
 
-  return appWorkerOptions;
-}
+  function requireAppWorkerOptions() {
+    if (!appWorkerOptions) {
+      throw new Error("App worker has not been initialized");
+    }
 
-function markFullAppRestartRequired(methodName: string) {
-  isFullAppRestartRequired = true;
-  notifyFullAppRestartRequired(methodName);
-}
-
-function notifyFullAppRestartRequired(methodName: string) {
-  if (typeof window === "undefined") {
-    return;
+    return appWorkerOptions;
   }
 
-  window.dispatchEvent(
-    new CustomEvent<AppWorkerFullRestartRequiredEventDetail>(
-      APP_WORKER_FULL_RESTART_REQUIRED_EVENT,
-      {
-        detail: { methodName },
-      },
-    ),
-  );
+  function markFullAppRestartRequired(methodName: string) {
+    isFullAppRestartRequired = true;
+    notifyFullAppRestartRequired(methodName);
+  }
+
+  function notifyFullAppRestartRequired(methodName: string) {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent<AppWorkerFullRestartRequiredEventDetail>(
+        APP_WORKER_FULL_RESTART_REQUIRED_EVENT,
+        {
+          detail: { methodName },
+        },
+      ),
+    );
+  }
+
+  function getCurrentTime() {
+    return typeof performance === "undefined" ? Date.now() : performance.now();
+  }
+
+  function getDurationMs(startedAt: number) {
+    return Math.round(Math.max(0, getCurrentTime() - startedAt));
+  }
+
+  return { appWorker, initializeAppWorker };
 }
 
-function getCurrentTime() {
-  return typeof performance === "undefined" ? Date.now() : performance.now();
-}
-
-function getDurationMs(startedAt: number) {
-  return Math.round(Math.max(0, getCurrentTime() - startedAt));
-}
+export const { appWorker, initializeAppWorker } = createAppWorkerClient();

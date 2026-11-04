@@ -1,12 +1,6 @@
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import { getRouteHref, isNativeAppLink, resolveNativeDeepLink } from "./nativeDeepLinks.ts";
 
-vi.mock("./log.ts", () => ({
-  getLogger: () => ({
-    warning() {},
-  }),
-}));
-
 describe("native deep links", () => {
   afterEach(() => {
     vi.restoreAllMocks();

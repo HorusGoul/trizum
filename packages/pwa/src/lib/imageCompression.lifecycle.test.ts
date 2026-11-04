@@ -1,10 +1,6 @@
 import { afterEach, expect, it, vi } from "vite-plus/test";
 import { processImage } from "./imageCompression.ts";
 
-vi.mock("exifr", () => ({
-  parse: vi.fn<(file: File) => Promise<undefined>>().mockResolvedValue(undefined),
-}));
-
 afterEach(() => vi.unstubAllGlobals());
 
 it("does not allocate a blob URL when canvas is unavailable", async () => {

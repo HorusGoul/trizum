@@ -2,39 +2,35 @@ import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 
 const assign = vi.fn<(url: string) => void>();
 
-// SAFETY: Tests mutate this platform slot between both native stores and the web case.
-const store = vi.hoisted(() => ({
-  platform: "ios" as "ios" | "android" | undefined,
-  configure: vi.fn<(options: { appUserID: string }) => Promise<void>>(),
-  setLogLevel: vi.fn<() => Promise<void>>(),
-  logIn:
-    vi.fn<() => Promise<{ customerInfo: { entitlements: { active: Record<string, never> } } }>>(),
-  getCustomerInfo: vi.fn<
-    () => Promise<{
-      customerInfo: {
-        entitlements: { active: Record<string, { ownershipType: string }> };
-        activeSubscriptions?: string[];
-      };
-    }>
-  >(),
-  syncPurchases: vi.fn<() => Promise<void>>(),
-  invalidateCustomerInfoCache: vi.fn<() => Promise<void>>(),
-  presentCodeRedemptionSheet: vi.fn<() => Promise<void>>(),
-}));
+import {
+  createRevenueCatStore,
+  createCustomerInfo,
+  createEntitlement,
+} from "./revenueCatTestFixtures.ts";
+import { createRevenueCatClient } from "./revenueCatClient.ts";
+import type { RevenueCatPlatform } from "./revenueCatConfig.ts";
 
-vi.mock("./revenueCatConfig.ts", () => ({
-  getRevenueCatPlatform: () => store.platform,
-  getRevenueCatPublicApiKey: () => "public-test-key",
-}));
+interface StorePlatform {
+  platform: RevenueCatPlatform | undefined;
+}
 
-vi.mock("@revenuecat/purchases-capacitor", () => ({ LOG_LEVEL: {}, Purchases: store }));
+const platformState: StorePlatform = { platform: "ios" };
+let store = Object.assign(createRevenueCatStore(), platformState);
+
+let client = createClient();
+
+function createClient() {
+  return createRevenueCatClient({
+    getStore: async () => store,
+    getPlatform: () => store.platform,
+    getPublicApiKey: () => "public-test-key",
+  });
+}
 
 beforeEach(() => {
-  vi.resetModules();
-  vi.resetAllMocks();
-  store.platform = "ios";
-  store.logIn.mockResolvedValue({ customerInfo: { entitlements: { active: {} } } });
-  store.getCustomerInfo.mockResolvedValue({ customerInfo: { entitlements: { active: {} } } });
+  store = Object.assign(createRevenueCatStore(), platformState);
+  client = createClient();
+  vi.clearAllMocks();
   const data = new Map<string, string>();
   vi.stubGlobal("localStorage", {
     getItem: (key: string) => data.get(key) ?? null,
@@ -47,7 +43,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 it("identifies the account before opening Apple's native sheet", async () => {
-  const { openPremiumCodeRedemption } = await import("./revenueCatClient.ts");
+  const { openPremiumCodeRedemption } = client;
   await openPremiumCodeRedemption("friend", "");
   expect(store.configure).toHaveBeenCalledWith(expect.objectContaining({ appUserID: "friend" }));
   expect(store.configure.mock.invocationCallOrder[0]).toBeLessThan(
@@ -61,7 +57,7 @@ it.each(["ios", "android"] as const)(
   "opens the documented %s link with a prefilled code",
   async (platform) => {
     store.platform = platform;
-    const { openPremiumCodeRedemption } = await import("./revenueCatClient.ts");
+    const { openPremiumCodeRedemption } = client;
     await openPremiumCodeRedemption("friend", "FRIENDS");
     const url = new URL(assign.mock.calls[0]![0].toString());
     expect(url.hostname).toBe(platform === "ios" ? "apps.apple.com" : "play.google.com");
@@ -70,7 +66,7 @@ it.each(["ios", "android"] as const)(
 );
 
 it("does not open a store before sign-in or on web", async () => {
-  const { openPremiumCodeRedemption } = await import("./revenueCatClient.ts");
+  const { openPremiumCodeRedemption } = client;
   await expect(openPremiumCodeRedemption(null, "FRIENDS")).rejects.toThrow("signed-in");
   store.platform = undefined;
   await expect(openPremiumCodeRedemption("friend", "FRIENDS")).rejects.toThrow("native store");
@@ -79,17 +75,18 @@ it("does not open a store before sign-in or on web", async () => {
 });
 
 it("syncs external purchases on refresh, retries delayed receipts, and stops once Premium arrives", async () => {
-  const { openPremiumCodeRedemption, refreshRevenueCatCustomerInfo } =
-    await import("./revenueCatClient.ts");
+  const { openPremiumCodeRedemption, refreshRevenueCatCustomerInfo } = client;
 
   await openPremiumCodeRedemption("friend", "FRIENDS");
   await refreshRevenueCatCustomerInfo();
   expect(store.syncPurchases).toHaveBeenCalledOnce();
 
-  const customerInfo = {
-    entitlements: { active: { premium: { ownershipType: "PURCHASED" } } },
-    activeSubscriptions: [],
-  };
+  const customerInfo = createCustomerInfo({
+    entitlements: {
+      ...createCustomerInfo().entitlements,
+      active: { premium: createEntitlement() },
+    },
+  });
 
   store.getCustomerInfo.mockResolvedValue({ customerInfo });
   expect(await refreshRevenueCatCustomerInfo()).toBe(customerInfo);
@@ -99,17 +96,16 @@ it("syncs external purchases on refresh, retries delayed receipts, and stops onc
 });
 
 it("preserves SDK-cached access if receipt sync fails offline", async () => {
-  const { openPremiumCodeRedemption, refreshRevenueCatCustomerInfo } =
-    await import("./revenueCatClient.ts");
+  const { openPremiumCodeRedemption, refreshRevenueCatCustomerInfo } = client;
 
   await openPremiumCodeRedemption("friend", "FRIENDS");
   store.syncPurchases.mockRejectedValue(new Error("offline"));
-  await expect(refreshRevenueCatCustomerInfo()).resolves.toEqual({ entitlements: { active: {} } });
+  await expect(refreshRevenueCatCustomerInfo()).resolves.toEqual(createCustomerInfo());
 });
 
 it("does not sync a pending redemption into a different account", async () => {
   const { openPremiumCodeRedemption, prepareRevenueCatUser, refreshRevenueCatCustomerInfo } =
-    await import("./revenueCatClient.ts");
+    client;
 
   await openPremiumCodeRedemption("friend", "FRIENDS");
   await prepareRevenueCatUser("other");

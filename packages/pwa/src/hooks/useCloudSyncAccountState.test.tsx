@@ -5,57 +5,36 @@ import { i18n } from "@lingui/core";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createRoot } from "react-dom/client";
 import { act } from "react";
-import { beforeEach, expect, it, vi } from "vite-plus/test";
-import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics.ts";
-import type { documentCache } from "#src/lib/automerge/suspense-hooks.ts";
-import { setPartyListId, type PartyList } from "#src/models/partyList.ts";
-import type * as CloudSettings from "#src/lib/cloudSyncSettings.ts";
-import type * as CloudRouteState from "#src/lib/cloudSyncRouteState.ts";
-import { fetchLinkedAuthAccounts } from "#src/lib/auth-client.ts";
+import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
+import type {
+  setAnalyticsEnabled as setAnalyticsEnabledType,
+  trackCloudSyncActivated as trackCloudSyncActivatedType,
+} from "#src/lib/analytics.ts";
+import type { setPartyListId as setPartyListIdType, PartyList } from "#src/models/partyList.ts";
+import type { fetchLinkedAuthAccounts as fetchLinkedAuthAccountsType } from "#src/lib/auth-client.ts";
 import { toast } from "sonner";
-import { useCloudSyncAccountState } from "./useCloudSyncAccountState.ts";
-import { fetchCloudUserSettings } from "#src/lib/cloudSyncSettings.ts";
+import { createUseCloudSyncAccountState } from "./useCloudSyncAccountState.ts";
+import type { fetchCloudUserSettings as fetchCloudUserSettingsType } from "#src/lib/cloudSyncSettings.ts";
 
-const readDocument = vi.hoisted(() => vi.fn<typeof documentCache.readAsync>());
-const repo = vi.hoisted(() => ({}));
+import { Repo } from "@automerge/automerge-repo";
+import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
 
-vi.mock("#src/lib/analytics.ts", () => ({
-  setAnalyticsEnabled: vi.fn<typeof setAnalyticsEnabled>(),
-  trackCloudSyncActivated: vi.fn<typeof trackCloudSyncActivated>(),
-}));
+let repo: Repo;
+const readDocument = vi.fn<(repo: Repo, id: PartyList["id"]) => Promise<PartyList | undefined>>();
+const setAnalyticsEnabled = vi.fn<typeof setAnalyticsEnabledType>();
+const trackCloudSyncActivated = vi.fn<typeof trackCloudSyncActivatedType>();
+const setPartyListId = vi.fn<typeof setPartyListIdType>();
+const fetchLinkedAuthAccounts = vi.fn<typeof fetchLinkedAuthAccountsType>();
+const fetchCloudUserSettings = vi.fn<typeof fetchCloudUserSettingsType>();
 
-vi.mock("#src/lib/automerge/useRepo.ts", () => ({ useRepo: () => repo }));
-
-vi.mock("#src/lib/automerge/suspense-hooks.ts", () => ({
-  documentCache: { readAsync: readDocument },
-}));
-
-vi.mock("#src/models/partyList.js", () => ({ setPartyListId: vi.fn<typeof setPartyListId>() }));
-
-vi.mock("#src/lib/auth-client.ts", () => ({
-  fetchLinkedAuthAccounts: vi.fn<typeof fetchLinkedAuthAccounts>(),
-}));
-
-vi.mock("#src/lib/cloudSyncSettings.ts", () => ({
-  fetchCloudUserSettings: vi.fn<typeof CloudSettings.fetchCloudUserSettings>(),
-  getCloudUserSettingsInput: vi.fn<typeof CloudSettings.getCloudUserSettingsInput>(),
-  saveCloudUserSettings: vi.fn<typeof CloudSettings.saveCloudUserSettings>(),
-  writeCachedCloudUserSettings: vi.fn<typeof CloudSettings.writeCachedCloudUserSettings>(),
-}));
-
-vi.mock("#src/lib/cloudSyncRouteState.ts", () => ({
-  hasLocalPartyListData: vi.fn<typeof CloudRouteState.hasLocalPartyListData>(),
-  readCachedCloudAccountState: vi.fn<typeof CloudRouteState.readCachedCloudAccountState>(),
-  writeCachedCloudAccountState: vi.fn<typeof CloudRouteState.writeCachedCloudAccountState>(),
-}));
-
-vi.mock("sonner", () => ({
-  toast: {
-    message: vi.fn<typeof toast.message>(),
-    error: vi.fn<typeof toast.error>(),
-    success: vi.fn<typeof toast.success>(),
-  },
-}));
+const useCloudSyncAccountState = createUseCloudSyncAccountState({
+  readPartyList: readDocument,
+  setAnalyticsEnabled,
+  trackCloudSyncActivated,
+  setPartyListId,
+  fetchLinkedAuthAccounts,
+  fetchCloudUserSettings,
+});
 
 function partyList(usageAnalyticsEnabled?: boolean): PartyList {
   return {
@@ -86,13 +65,22 @@ function renderAccount(source: PartyList) {
   }
 
   // Effects are irrelevant to the explicit activation action under test.
-  renderToStaticMarkup(<Harness />);
+  renderToStaticMarkup(
+    <RepoContext value={repo}>
+      <Harness />
+    </RepoContext>,
+  );
 
   return { ...account, onCloudDataActivated };
 }
 
 beforeEach(() => {
+  localStorage.clear();
   vi.resetAllMocks();
+  repo = new Repo({ network: [] });
+  vi.spyOn(toast, "error").mockReturnValue("error");
+  vi.spyOn(toast, "message").mockReturnValue("message");
+  vi.spyOn(toast, "success").mockReturnValue("success");
   i18n.load("en", {});
   i18n.activate("en");
   // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
@@ -135,7 +123,13 @@ it.each(["missing", "rejected"])(
     const root = createRoot(container);
 
     try {
-      await act(async () => root.render(<Harness />));
+      await act(async () =>
+        root.render(
+          <RepoContext value={repo}>
+            <Harness />
+          </RepoContext>,
+        ),
+      );
       expect(readDocument).toHaveBeenCalledWith(repo, destination.id);
       expect(account.isAccountStateResolved).toBe(true);
       expect(account.isCloudSyncSwitchOpen).toBe(false);
@@ -195,4 +189,10 @@ it("does not count an already active list, unavailable list, or failed load", as
   await expect(activateCloudSyncOnDevice(settings)).rejects.toThrow("Unavailable");
   expect(setPartyListId).not.toHaveBeenCalled();
   expect(trackCloudSyncActivated).not.toHaveBeenCalled();
+});
+
+afterEach(async () => {
+  await repo.shutdown();
+  localStorage.clear();
+  vi.restoreAllMocks();
 });

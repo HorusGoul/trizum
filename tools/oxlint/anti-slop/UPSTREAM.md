@@ -24,13 +24,18 @@ This provenance record is repository-owned. Preserve the nested
 updating.
 
 The root Vite+ configuration registers all generic rules and the native
-`oxc/no-accumulating-spread` companion rule. Rules with existing violations start
-at `off`, with their rollout issues linked beside the configuration entries.
-The six rules without findings remain enabled at `error`. The corrected Vite+
-module-mocking baseline has 87 findings in 32 files and is explicitly deferred
-under [#584](https://github.com/HorusGoul/trizum/issues/584), alongside the
-original twelve failing rules. Each cleanup PR resolves one rule’s findings and
-enables it in the same change. Linting and formatting exclude the vendored
-directory and project-local agent assets. `oxlint` and `@oxlint/plugins`
-are pinned together in the workspace catalog to match Vite+'s Oxlint version;
-update them together when upgrading Vite+.
+`oxc/no-accumulating-spread` companion rule. The installation initially enabled
+the six rules without findings and disabled the failing rules, linking their
+rollout issues beside the configuration entries. Each cleanup PR fixes one
+rule and enables it in the same change.
+
+The corrected installation baseline contained 87 module-mocking findings in
+32 files, tracked under [#584](https://github.com/HorusGoul/trizum/issues/584).
+The module-mocking cleanup layer replaces those mocks with explicit service
+interfaces and real test implementations. All generic rules and the native
+companion are now enabled at `error` at the top of the cleanup stack.
+
+Linting and formatting exclude the vendored directory and project-local agent
+assets. `oxlint` and `@oxlint/plugins` are pinned together in the workspace
+catalog to match Vite+'s Oxlint version; update them together when upgrading
+Vite+.

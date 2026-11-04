@@ -18,12 +18,6 @@ import {
   type TelemetryEnvelope,
 } from "./telemetry.ts";
 
-vi.mock("@sentry/react", () => ({ setUser: vi.fn<typeof Sentry.setUser>() }));
-
-vi.mock("@capacitor/core", () => ({
-  Capacitor: { isNativePlatform: vi.fn<typeof Capacitor.isNativePlatform>(() => false) },
-}));
-
 let repo: Repo;
 let cleanups: (() => void)[];
 let browser: EventTarget & { location: { hostname: string; origin: string } };
@@ -38,7 +32,7 @@ let preferences: TestPrivacyPreferences;
 let fetch: ReturnType<typeof vi.fn<typeof globalThis.fetch>>;
 
 beforeEach(() => {
-  vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+  vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(false);
   repo = new Repo({ network: [] });
   cleanups = [];
   browser = Object.assign(new EventTarget(), {
@@ -70,7 +64,7 @@ afterEach(async () => {
   await repo.shutdown();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
-  vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 function profile(enabled?: boolean) {
@@ -126,7 +120,7 @@ it("creates a random synced ID once and shares it with analytics and Sentry", as
   expect(id).not.toBe(handle.documentId);
   expect(ensureTelemetryId(handle)).toBe(id);
   expect(getTelemetryId()).toBe(id);
-  expect(Sentry.setUser).toHaveBeenLastCalledWith({ id });
+  expect(Sentry.getIsolationScope().getUser()).toEqual({ id });
   await vi.waitFor(() => expect(payloads()).toHaveLength(2));
   expect(payloads().every((payload) => payload.userId === id)).toBe(true);
   expect(JSON.stringify(payloads())).not.toMatch(/Alice|private/);
@@ -150,7 +144,7 @@ it.each(["opt-out", "DNT", "GPC"])("does not generate or expose identity for %s"
   cleanups.push(bindAnalytics(handle, () => "/"));
   expect(handle.doc().telemetryId).toBeUndefined();
   expect(getTelemetryId()).toBeUndefined();
-  expect(Sentry.setUser).toHaveBeenLastCalledWith(null);
+  expect(Sentry.getIsolationScope().getUser()).toEqual({});
   await new Promise((resolve) => setTimeout(resolve, 0));
   expect(fetch).not.toHaveBeenCalled();
 });
@@ -164,7 +158,7 @@ it("immediately clears identity and pending events when opt-out arrives through 
     doc.usageAnalyticsEnabled = false;
   });
   expect(getTelemetryId()).toBeUndefined();
-  expect(Sentry.setUser).toHaveBeenLastCalledWith(null);
+  expect(Sentry.getIsolationScope().getUser()).toEqual({});
   await new Promise((resolve) => setTimeout(resolve, 0));
   expect(fetch).not.toHaveBeenCalled();
   handle.change((doc) => {
@@ -182,7 +176,7 @@ it("clears the old profile synchronously and counts activation against the desti
   trackEvent("party_created");
   setPartyListId(destination.documentId);
   expect(getTelemetryId()).toBeUndefined();
-  expect(Sentry.setUser).toHaveBeenLastCalledWith(null);
+  expect(Sentry.getIsolationScope().getUser()).toEqual({});
   trackCloudSyncActivated(destination.documentId);
   trackEvent("settings_saved");
   unbind();

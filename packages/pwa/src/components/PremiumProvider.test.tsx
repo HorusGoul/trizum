@@ -1,27 +1,21 @@
+// @vitest-environment jsdom
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vite-plus/test";
 import type { ComponentProps } from "react";
 import { usePremium, type PremiumContextValue } from "#src/lib/premium/PremiumContext.ts";
 import type { PremiumPaywall } from "./PremiumPaywall.tsx";
-import { PremiumProvider } from "./PremiumProvider.tsx";
+import { PremiumProviderState } from "./PremiumProvider.tsx";
 
 const paywall = vi.hoisted<{ props: ComponentProps<typeof PremiumPaywall> | null }>(() => ({
   props: null,
 }));
 
-vi.mock("#src/lib/auth-client.ts", () => ({
-  useAppSession: () => ({ data: { user: { id: "test-user" } }, isPending: false, error: null }),
-}));
+function Paywall(props: ComponentProps<typeof PremiumPaywall>) {
+  paywall.props = props;
 
-vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({ getRevenueCatPlatform: () => null }));
-
-vi.mock("./PremiumPaywall.tsx", () => ({
-  PremiumPaywall: (props: ComponentProps<typeof PremiumPaywall>) => {
-    paywall.props = props;
-
-    return null;
-  },
-}));
+  return null;
+}
 
 const capturePremium = vi.fn<(value: PremiumContextValue) => void>();
 
@@ -34,9 +28,15 @@ function CapturePremium() {
 beforeEach(() => {
   capturePremium.mockClear();
   renderToStaticMarkup(
-    <PremiumProvider>
+    <PremiumProviderState
+      userId="test-user"
+      hasSessionError={false}
+      isSessionPending={false}
+      platform={undefined}
+      Paywall={Paywall}
+    >
       <CapturePremium />
-    </PremiumProvider>,
+    </PremiumProviderState>,
   );
 });
 

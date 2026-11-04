@@ -2,25 +2,10 @@ import { i18n } from "@lingui/core";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { Repo, type DocHandle } from "@automerge/automerge-repo";
 import { decodeBlob, type MediaFile } from "#src/models/media.ts";
-import type * as imageCompressionModule from "#src/lib/imageCompression.ts";
-
-vi.mock("#src/lib/imageCompression.ts", async () => {
-  const actual = await vi.importActual<typeof imageCompressionModule>(
-    "#src/lib/imageCompression.ts",
-  );
-
-  return {
-    ...actual,
-    processImage: vi.fn<typeof imageCompressionModule.processImage>(),
-  };
-});
 
 import { getImageUploadErrorMessage, getMediaFileHelpers } from "./useMediaFileActions";
-import {
-  ImageProcessingError,
-  type ProcessedImage,
-  processImage,
-} from "#src/lib/imageCompression.ts";
+import type { processImage } from "#src/lib/imageCompression.ts";
+import { ImageProcessingError, type ProcessedImage } from "#src/lib/imageCompression.ts";
 
 const testRepos: Repo[] = [];
 
@@ -46,7 +31,7 @@ function createMockRepo() {
 }
 
 describe("getMediaFileHelpers", () => {
-  const processImageMock = vi.mocked(processImage);
+  const processImageMock = vi.fn<typeof processImage>();
 
   beforeEach(() => {
     i18n.load("en", {});
@@ -67,7 +52,7 @@ describe("getMediaFileHelpers", () => {
     processImageMock.mockRejectedValue(new Error("decode failed"));
 
     const { repo } = createMockRepo();
-    const { createMediaFile } = getMediaFileHelpers(repo);
+    const { createMediaFile } = getMediaFileHelpers(repo, { processImage: processImageMock });
 
     const file = new File(["heic"], "receipt.heic", {
       type: "",
@@ -84,7 +69,7 @@ describe("getMediaFileHelpers", () => {
     processImageMock.mockRejectedValue(new Error("canvas failed"));
 
     const { repo, getLastCreatedHandle } = createMockRepo();
-    const { createMediaFile } = getMediaFileHelpers(repo);
+    const { createMediaFile } = getMediaFileHelpers(repo, { processImage: processImageMock });
 
     const file = new File(["jpeg-data"], "receipt.jpg", {
       type: "image/jpeg",
@@ -125,7 +110,7 @@ describe("getMediaFileHelpers", () => {
     processImageMock.mockResolvedValue(processedImage);
 
     const { repo, getLastCreatedHandle } = createMockRepo();
-    const { createMediaFile } = getMediaFileHelpers(repo);
+    const { createMediaFile } = getMediaFileHelpers(repo, { processImage: processImageMock });
 
     const file = new File(["heic-input"], "receipt.heic", {
       type: "image/heic",
@@ -165,7 +150,7 @@ describe("getMediaFileHelpers", () => {
     processImageMock.mockResolvedValue(processedImage);
 
     const { repo, getLastCreatedHandle } = createMockRepo();
-    const { createMediaFile } = getMediaFileHelpers(repo);
+    const { createMediaFile } = getMediaFileHelpers(repo, { processImage: processImageMock });
 
     const file = new File(["heic-input"], "receipt.heic", {
       type: "",

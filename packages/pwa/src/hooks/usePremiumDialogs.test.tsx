@@ -7,8 +7,6 @@ import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 import { toast } from "sonner";
 import { usePremiumDialogs } from "./usePremiumDialogs.ts";
 
-vi.mock("sonner", () => ({ toast: { error: vi.fn<typeof toast.error>() } }));
-
 let root: Root;
 let container: HTMLDivElement;
 const dialogHandle = createRef<ReturnType<typeof usePremiumDialogs>>();
@@ -44,7 +42,8 @@ async function render(userId: string | null = null, isNative = true) {
 }
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.restoreAllMocks();
+  vi.spyOn(toast, "error").mockReturnValue("test-toast");
   i18n.load("en", {});
   i18n.activate("en");
   // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.

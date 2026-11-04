@@ -12,12 +12,6 @@ import {
   resumeNativeAppUpdate,
 } from "./nativeAppUpdate.ts";
 
-vi.mock("#src/lib/log.ts", () => ({
-  getLogger: () => ({
-    warning() {},
-  }),
-}));
-
 describe("native app updates", () => {
   test("does not call Play update APIs when Android has no Google Play support", async () => {
     const getAppUpdateInfo = createGetAppUpdateInfoMock();

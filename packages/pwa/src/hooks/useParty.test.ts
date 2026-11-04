@@ -12,15 +12,14 @@ const appWorkerMock = vi.hoisted(() => ({
   recalculateBalances: vi.fn<(partyId: Party["id"]) => Promise<boolean>>(),
 }));
 
-vi.mock("#src/lib/appWorker/client.ts", () => ({
-  appWorker: appWorkerMock,
-}));
+import { createPartyHelperFactory } from "./useParty.ts";
 
-const { getPartyHelpers } = await import("./useParty.ts");
+let getPartyHelpers = createPartyHelperFactory(appWorkerMock);
 
 describe("getPartyHelpers", () => {
   beforeEach(() => {
     appWorkerMock.recalculateBalances.mockReset();
+    getPartyHelpers = createPartyHelperFactory(appWorkerMock);
   });
 
   test("schedules balance recalculation after expense mutations", async () => {

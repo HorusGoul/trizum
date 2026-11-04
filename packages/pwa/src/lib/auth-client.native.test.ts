@@ -1,36 +1,21 @@
+// @vitest-environment jsdom
+
 import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
-import type { authClient } from "./auth-client.ts";
-import type { AppleSignInPlugin } from "@capawesome/capacitor-apple-sign-in";
-
-const { initializeApple, appleSignIn, socialSignIn } = vi.hoisted(() => ({
-  initializeApple: vi.fn<AppleSignInPlugin["initialize"]>(),
-  appleSignIn: vi.fn<AppleSignInPlugin["signIn"]>(),
-  socialSignIn:
-    vi.fn<
-      (
-        request: Parameters<typeof authClient.signIn.social>[0],
-      ) => Promise<{ data: null; error: null }>
-    >(),
-}));
-
-vi.mock("@capacitor/core", () => ({
-  Capacitor: { isNativePlatform: () => true, getPlatform: () => "android" },
-}));
-
-vi.mock("@capawesome/capacitor-apple-sign-in", () => ({
-  AppleSignIn: { initialize: initializeApple, signIn: appleSignIn },
-  SignInScope: { Email: "email" },
-}));
-
-vi.mock("better-auth/react", () => ({
-  createAuthClient: () => ({ signIn: { social: socialSignIn } }),
-}));
-
+import { Capacitor } from "@capacitor/core";
+import { SignInScope, type AppleSignInPlugin } from "@capawesome/capacitor-apple-sign-in";
 import { getAuthSettingsCallbackURL, signInWithSocialAuthAccount } from "./auth-client.ts";
 import { AUTH_PROVIDER_CONFIG } from "./authConfig.ts";
 
+const initializeApple = vi.fn<AppleSignInPlugin["initialize"]>();
+const appleSignIn = vi.fn<AppleSignInPlugin["signIn"]>();
+const fetcher = vi.fn<typeof fetch>();
+const apple = { initialize: initializeApple, signIn: appleSignIn };
+
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.resetAllMocks();
+  vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
+  vi.spyOn(Capacitor, "getPlatform").mockReturnValue("android");
+  vi.stubGlobal("fetch", fetcher);
   initializeApple.mockResolvedValue(undefined);
   appleSignIn.mockResolvedValue({
     authorizationCode: "apple-code",
@@ -40,28 +25,34 @@ beforeEach(() => {
     givenName: "Alex",
     familyName: "Example",
   });
-  socialSignIn.mockResolvedValue({ data: null, error: null });
+  fetcher.mockImplementation(async () =>
+    Response.json({ redirect: false, url: "https://trizum.app" }),
+  );
 });
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 test.each(["https://trizum.app", "https://preview.example"])(
   "uses the provider callback at %s while keeping post-login navigation separate",
   async (baseURL) => {
     vi.stubEnv("VITE_APP_AUTH_URL", baseURL);
-    await signInWithSocialAuthAccount("apple");
-
+    await signInWithSocialAuthAccount("apple", undefined, apple);
     expect(initializeApple).toHaveBeenCalledWith({
       clientId: AUTH_PROVIDER_CONFIG.apple.serviceId,
     });
     expect(appleSignIn).toHaveBeenCalledWith({
       nonce: expect.any(String),
       redirectUrl: `${baseURL}/api/auth/callback/apple`,
-      scopes: ["email"],
+      scopes: [SignInScope.Email],
     });
-    expect(socialSignIn).toHaveBeenCalledWith({
+    expect(fetcher).toHaveBeenCalledOnce();
+    const [, init] = fetcher.mock.calls[0]!;
+    const body = await new Response(init?.body).json();
+    expect(body).toMatchObject({
       provider: "apple",
       idToken: {
         nonce: appleSignIn.mock.calls[0]?.[0]?.nonce,
@@ -75,7 +66,8 @@ test.each(["https://trizum.app", "https://preview.example"])(
 
 test("does not submit a backend sign-in when native Apple authorization is cancelled", async () => {
   appleSignIn.mockRejectedValue(new Error("Sign in was canceled."));
-
-  await expect(signInWithSocialAuthAccount("apple")).rejects.toThrow("Sign in was canceled.");
-  expect(socialSignIn).not.toHaveBeenCalled();
+  await expect(signInWithSocialAuthAccount("apple", undefined, apple)).rejects.toThrow(
+    "Sign in was canceled.",
+  );
+  expect(fetcher).not.toHaveBeenCalled();
 });

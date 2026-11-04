@@ -3,7 +3,6 @@ import { APIError } from "better-auth/api";
 import { createRevenueCatApiClient } from "@trizum/revenuecat-api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, magicLink } from "better-auth/plugins";
-import { EmailMessage } from "cloudflare:email";
 import { eq } from "drizzle-orm";
 import { importPKCS8, SignJWT } from "jose";
 import { getApiDb, schema } from "./db/client";
@@ -20,7 +19,24 @@ interface BackgroundTaskContext {
   waitUntil(promise: Promise<unknown>): void;
 }
 
-export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Request) {
+interface AuthEmail {
+  html: string;
+  subject: string;
+  text: string;
+  to: string;
+}
+
+interface AuthServices {
+  database?: Parameters<typeof drizzleAdapter>[0];
+  sendEmail?: (message: AuthEmail) => Promise<void>;
+}
+
+export function createAuth(
+  env: ApiEnv,
+  ctx: BackgroundTaskContext,
+  request: Request,
+  services: AuthServices = {},
+) {
   const requestUrl = new URL(request.url);
   const isLocalRequest = isLocalhost(requestUrl.hostname);
   const secret = env.BETTER_AUTH_SECRET ?? (isLocalRequest ? LOCAL_DEVELOPMENT_SECRET : undefined);
@@ -32,7 +48,8 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
   const socialProviders = createSocialProviders(env);
   const trustedOrigins = getTrustedOrigins(env);
   const requireEmailVerification = shouldRequireEmailVerification(env);
-  const db = getApiDb(env.DB);
+  const db = services.database ?? getApiDb(env.DB);
+  const sendEmail = services.sendEmail ?? ((message: AuthEmail) => sendAuthEmail(env, message));
 
   if (socialProviders.apple) {
     trustedOrigins.push("https://appleid.apple.com");
@@ -66,7 +83,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
       autoSignIn: !requireEmailVerification,
       requireEmailVerification,
       sendResetPassword: async ({ user, url }) => {
-        await sendAuthEmail(env, {
+        await sendEmail({
           subject: "Reset your trizum password",
           text: `Use this link to reset your trizum password: ${url}`,
           html: `<p>Use this link to reset your trizum password:</p><p><a href="${escapeHtml(
@@ -81,7 +98,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
       sendOnSignIn: requireEmailVerification,
       sendOnSignUp: requireEmailVerification,
       sendVerificationEmail: async ({ user, url }) => {
-        await sendAuthEmail(env, {
+        await sendEmail({
           subject: "Verify your trizum email",
           text: `Use this link to verify your trizum email address: ${url}`,
           html: `<p>Use this link to verify your trizum email address:</p><p><a href="${escapeHtml(
@@ -131,7 +148,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
       bearer(),
       magicLink({
         sendMagicLink: async ({ email, url }) => {
-          await sendAuthEmail(env, {
+          await sendEmail({
             subject: "Sign in to trizum",
             text: `Use this link to sign in to trizum: ${url}`,
             html: `<p>Use this link to sign in to trizum:</p><p><a href="${escapeHtml(
@@ -271,6 +288,7 @@ async function sendAuthEmail(
     to: string;
   },
 ) {
+  const { EmailMessage } = await import("cloudflare:email");
   const from = env.AUTH_EMAIL_FROM ?? "trizum <noreply@trizum.app>";
 
   await env.EMAIL.send(

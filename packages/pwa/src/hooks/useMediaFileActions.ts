@@ -35,7 +35,10 @@ function omitUndefinedMetadataValues(metadata: MediaMetadata): MediaMetadata {
   return Object.fromEntries(Object.entries(metadata).filter(([, value]) => value !== undefined));
 }
 
-export function getMediaFileHelpers(repo: Repo) {
+export function getMediaFileHelpers(
+  repo: Repo,
+  images: { processImage: typeof processImage } = { processImage },
+) {
   async function createMediaFile(
     blob: Blob,
     metadata: MediaMetadata,
@@ -50,7 +53,7 @@ export function getMediaFileHelpers(repo: Repo) {
 
       try {
         // Process the image with compression
-        const processed = await processImage(
+        const processed = await images.processImage(
           file,
           compressionOptions || compressionPresets.balanced,
         );

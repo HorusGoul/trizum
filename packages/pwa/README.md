@@ -31,3 +31,14 @@ The main React application, with offline-first Automerge state and a Cloudflare 
 Follow [workspace validation](../../docs/agents/validation-and-releases.md).
 Run package tasks from this directory with `vp run`; copy changes also require
 `vp run lingui:extract` from the workspace root.
+
+## Test boundaries
+
+Tests use the real router, React Aria controls, auth state, logging sinks, and
+in-memory Automerge documents. Native SDKs, worker connections, process runners,
+and other external I/O are supplied through their owning service interfaces or
+factories. Module mocking is rejected by `anti-slop/no-module-mocking`.
+
+`src/lib/testing/profileRuntime.ts` supplies HTTP responses and real local
+profiles for account flows. `api/routes/cloud-sync.integration.test.ts` exercises
+real authentication and D1 storage alongside the route's focused contract tests.

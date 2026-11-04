@@ -1,10 +1,11 @@
 import type { CustomerInfo, PurchasesCallbackId } from "@revenuecat/purchases-capacitor";
-import { App } from "@capacitor/app";
+import { listenForAppState, type ListenForAppState } from "../nativeAppLifecycle.ts";
 import { Capacitor } from "@capacitor/core";
 
 const REFRESH_INTERVAL_MS = 60_000;
 
 interface RevenueCatPremiumConnectionOptions {
+  listenForAppState?: ListenForAppState;
   addListener: (listener: (customerInfo: CustomerInfo) => void) => Promise<PurchasesCallbackId>;
   onCustomerInfo: (customerInfo: CustomerInfo) => void;
   onListenerError: (cause: unknown) => void;
@@ -16,6 +17,7 @@ interface RevenueCatPremiumConnectionOptions {
 
 export function connectRevenueCatPremium({
   addListener,
+  listenForAppState: subscribeToAppState = listenForAppState,
   onCustomerInfo,
   onListenerError,
   onRefreshError,
@@ -100,7 +102,7 @@ export function connectRevenueCatPremium({
   document.addEventListener("visibilitychange", refreshWhileActive);
 
   const appStateListener = Capacitor.isNativePlatform()
-    ? App.addListener("appStateChange", ({ isActive }) => {
+    ? subscribeToAppState(({ isActive }) => {
         appActive = isActive;
         refreshWhileActive();
       })

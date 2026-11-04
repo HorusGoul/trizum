@@ -8,41 +8,62 @@ import type {
   CustomerInfo,
   PurchasesOffering,
   PurchasesPackage,
+  PurchasesPlugin,
 } from "@revenuecat/purchases-capacitor";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
-import { loadPremiumOffering, purchasePremiumPlan } from "./premiumCommerce.ts";
+import { createPremiumCommerce } from "./premiumCommerce.ts";
 
 const revenueCat = vi.hoisted(() => ({
-  getOfferings: vi.fn<() => Promise<{ current: PurchasesOffering | null }>>(),
-  purchasePackage:
-    vi.fn<(options: { aPackage: PurchasesPackage }) => Promise<{ customerInfo: CustomerInfo }>>(),
+  getOfferings:
+    vi.fn<
+      () => Promise<{ current: PurchasesOffering | null; all: Record<string, PurchasesOffering> }>
+    >(),
+  purchasePackage: vi.fn<
+    (options: { aPackage: PurchasesPackage }) => Promise<{
+      customerInfo: CustomerInfo;
+      productIdentifier: string;
+      transaction: {
+        transactionIdentifier: string;
+        productIdentifier: string;
+        purchaseDate: string;
+        purchaseToken: string | null;
+        originalJson: string | null;
+        signature: string | null;
+      };
+    }>
+  >(),
 }));
 
 const identity = vi.hoisted(() => ({
   synchronizeUser: vi.fn<(userId: string) => Promise<void>>(),
 }));
 
-vi.mock("@revenuecat/purchases-capacitor", () => ({
-  INTRO_ELIGIBILITY_STATUS: { INTRO_ELIGIBILITY_STATUS_ELIGIBLE: 2 },
-  PURCHASES_ERROR_CODE: { PURCHASE_CANCELLED_ERROR: "purchase_cancelled" },
-  Purchases: revenueCat,
-}));
-
-vi.mock("./revenueCatClient.ts", () => ({
-  PremiumSignInRequiredError: class PremiumSignInRequiredError extends Error {},
-  synchronizeRevenueCatUser: identity.synchronizeUser,
-}));
-
-vi.mock("./revenueCatConfig.ts", () => ({
-  getRevenueCatPlatform: () => undefined,
-  isRevenueCatTestStoreEnabled: () => false,
-}));
+const { loadPremiumOffering, purchasePremiumPlan } = createPremiumCommerce({
+  getStore: async () => ({
+    ...revenueCat,
+    restorePurchases: vi.fn<PurchasesPlugin["restorePurchases"]>(),
+    checkTrialOrIntroductoryPriceEligibility:
+      vi.fn<PurchasesPlugin["checkTrialOrIntroductoryPriceEligibility"]>(),
+  }),
+  synchronizeUser: identity.synchronizeUser,
+  getPlatform: () => undefined,
+  isTestStoreEnabled: () => false,
+});
 
 describe("Premium offering purchase binding", () => {
   beforeEach(() => {
     revenueCat.getOfferings.mockReset();
     revenueCat.purchasePackage.mockReset().mockResolvedValue({
       customerInfo: createCustomerInfo(),
+      productIdentifier: "premium-monthly",
+      transaction: {
+        transactionIdentifier: "transaction",
+        productIdentifier: "premium-monthly",
+        purchaseDate: "2026-01-01",
+        purchaseToken: null,
+        originalJson: null,
+        signature: null,
+      },
     });
     identity.synchronizeUser.mockReset().mockResolvedValue(undefined);
   });
@@ -50,8 +71,17 @@ describe("Premium offering purchase binding", () => {
   it("purchases the displayed package when an older load resolves last", async () => {
     const olderPackage = createPackage("older-package", "$3.99");
     const displayedPackage = createPackage("displayed-package", "$4.99");
-    const olderResponse = createDeferred<{ current: PurchasesOffering }>();
-    const displayedResponse = createDeferred<{ current: PurchasesOffering }>();
+
+    const olderResponse = createDeferred<{
+      current: PurchasesOffering;
+      all: Record<string, PurchasesOffering>;
+    }>();
+
+    const displayedResponse = createDeferred<{
+      current: PurchasesOffering;
+      all: Record<string, PurchasesOffering>;
+    }>();
+
     revenueCat.getOfferings
       .mockReturnValueOnce(olderResponse.promise)
       .mockReturnValueOnce(displayedResponse.promise);
@@ -61,9 +91,9 @@ describe("Premium offering purchase binding", () => {
     const displayedLoad = loadPremiumOffering("user-1");
     await waitForOfferingRequest(2);
 
-    displayedResponse.resolve({ current: createOffering({ monthly: displayedPackage }) });
+    displayedResponse.resolve({ current: createOffering({ monthly: displayedPackage }), all: {} });
     const displayedOffering = await displayedLoad;
-    olderResponse.resolve({ current: createOffering({ monthly: olderPackage }) });
+    olderResponse.resolve({ current: createOffering({ monthly: olderPackage }), all: {} });
     await olderLoad;
 
     await purchasePremiumPlan("user-1", displayedOffering, "monthly");

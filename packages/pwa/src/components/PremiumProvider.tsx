@@ -1,5 +1,5 @@
 import { trackEvent } from "#src/lib/analytics.ts";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType, type ComponentProps } from "react";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { AdEntitlementContext } from "#src/lib/advertising/AdEntitlementContext.tsx";
 import { getLogger } from "#src/lib/log.ts";
@@ -33,9 +33,35 @@ const logger = getLogger("components", "PremiumProvider");
 
 export function PremiumProvider({ children }: { children: React.ReactNode }) {
   const session = useAppSession();
-  const userId = session.data?.user.id ?? null;
-  const hasSessionError = Boolean(session.error);
-  const platform = getRevenueCatPlatform();
+
+  return (
+    <PremiumProviderState
+      userId={session.data?.user.id ?? null}
+      hasSessionError={Boolean(session.error)}
+      isSessionPending={session.isPending}
+      platform={getRevenueCatPlatform()}
+    >
+      {children}
+    </PremiumProviderState>
+  );
+}
+
+/** Composes session state with the store connection and the paywall presentation. */
+export function PremiumProviderState({
+  children,
+  userId,
+  hasSessionError,
+  isSessionPending,
+  platform,
+  Paywall = PremiumPaywall,
+}: {
+  children: React.ReactNode;
+  userId: string | null;
+  hasSessionError: boolean;
+  isSessionPending: boolean;
+  platform: ReturnType<typeof getRevenueCatPlatform>;
+  Paywall?: ComponentType<ComponentProps<typeof PremiumPaywall>>;
+}) {
   const [resolvedState, setResolvedState] = useState<ResolvedPremiumState | null>(null);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [paywallSessionId, setPaywallSessionId] = useState(0);
@@ -43,14 +69,14 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
 
   const state = getCurrentPremiumState({
     hasSessionError,
-    isSessionPending: session.isPending,
+    isSessionPending,
     platform,
     resolvedState,
     userId,
   });
 
   useEffect(() => {
-    if (!platform || session.isPending || hasSessionError) {
+    if (!platform || isSessionPending || hasSessionError) {
       return;
     }
 
@@ -93,7 +119,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     return () => {
       connection.disconnect();
     };
-  }, [hasSessionError, platform, session.isPending, userId]);
+  }, [hasSessionError, platform, isSessionPending, userId]);
 
   const isPremium = state.status === "premium";
   const adEntitlement = state.status === "free" ? "adSupported" : isPremium ? "adFree" : "unknown";
@@ -175,7 +201,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     >
       <AdEntitlementContext value={adEntitlement}>
         {children}
-        <PremiumPaywall
+        <Paywall
           isOpen={isPaywallOpen}
           onEntitlementChange={updatePremiumEntitlement}
           onOpenChange={setPaywallOpen}

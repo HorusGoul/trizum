@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import type { PluginListenerHandle } from "@capacitor/core";
-import type * as CapacitorCore from "@capacitor/core";
+import { Capacitor } from "@capacitor/core";
 import { StrictMode, act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
@@ -9,7 +9,6 @@ import { AdvertisingController } from "./AdvertisingController.tsx";
 import { UpdateControllerNative } from "./UpdateControllerNative.tsx";
 import { AdEntitlementContext } from "#src/lib/advertising/AdEntitlementContext.tsx";
 import type { AdvertisingCoordinator as Coordinator } from "#src/lib/advertising/AdvertisingCoordinator.ts";
-import type { createAdMobSdk } from "#src/lib/advertising/adMobSdk.ts";
 import type {
   getNativeAppUpdateState,
   resumeNativeAppUpdate,
@@ -26,18 +25,7 @@ const coordinators = vi.hoisted(
   }[] => [],
 );
 
-vi.mock("@capacitor/app", () => ({ App: { addListener } }));
-
-vi.mock("@capacitor/core", async (importOriginal) => ({
-  ...(await importOriginal<typeof CapacitorCore>()),
-  Capacitor: { getPlatform: () => "android", isNativePlatform: () => true },
-}));
-
-vi.mock("#src/lib/advertising/adMobSdk.ts", () => ({
-  createAdMobSdk: vi.fn<typeof createAdMobSdk>(),
-}));
-
-vi.mock("#src/lib/nativeAppUpdate.ts", () => ({
+const updates = {
   getNativeAppUpdateState: vi
     .fn<typeof getNativeAppUpdateState>()
     .mockResolvedValue({ isUpdateAvailable: false }),
@@ -47,22 +35,28 @@ vi.mock("#src/lib/nativeAppUpdate.ts", () => ({
   performNativeAppUpdate: vi
     .fn<typeof performNativeAppUpdate>()
     .mockResolvedValue({ status: "unavailable" }),
-}));
+};
 
-vi.mock("#src/lib/advertising/AdvertisingCoordinator.ts", () => ({
-  AdvertisingCoordinator: class {
-    destroy = vi.fn<Coordinator["destroy"]>().mockResolvedValue(undefined);
-    setEntitlement = vi.fn<Coordinator["setEntitlement"]>().mockResolvedValue(undefined);
-    setProtectedFlow = vi.fn<Coordinator["setProtectedFlow"]>();
-    markInteractive = vi.fn<Coordinator["markInteractive"]>();
-    onActive = vi.fn<Coordinator["onActive"]>().mockResolvedValue(undefined);
-    onInactive = vi.fn<Coordinator["onInactive"]>();
+const createCoordinator = () => {
+  const coordinator = {
+    destroy: vi.fn<Coordinator["destroy"]>().mockResolvedValue(undefined),
+    setEntitlement: vi.fn<Coordinator["setEntitlement"]>().mockResolvedValue(undefined),
+    setProtectedFlow: vi.fn<Coordinator["setProtectedFlow"]>(),
+    markInteractive: vi.fn<Coordinator["markInteractive"]>(),
+    onActive: vi.fn<Coordinator["onActive"]>().mockResolvedValue(undefined),
+    onInactive: vi.fn<Coordinator["onInactive"]>(),
+    presentInterstitialOpportunity: vi
+      .fn<Coordinator["presentInterstitialOpportunity"]>()
+      .mockReturnValue(false),
+    showPrivacyOptions: vi.fn<Coordinator["showPrivacyOptions"]>().mockResolvedValue(undefined),
+  };
 
-    constructor() {
-      coordinators.push(this);
-    }
-  },
-}));
+  coordinators.push(coordinator);
+
+  return coordinator;
+};
+
+const subscribeToAppState = () => addListener();
 
 let root: Root;
 let unmounted: boolean;
@@ -80,10 +74,18 @@ function deferred<T>() {
 async function render(kind: "updates" | "advertising", strict = false) {
   const controller =
     kind === "updates" ? (
-      <UpdateControllerNative>{null}</UpdateControllerNative>
+      <UpdateControllerNative updates={updates} subscribeToAppState={subscribeToAppState}>
+        {null}
+      </UpdateControllerNative>
     ) : (
       <AdEntitlementContext value="adFree">
-        <AdvertisingController protectedFlow>{null}</AdvertisingController>
+        <AdvertisingController
+          protectedFlow
+          createCoordinator={createCoordinator}
+          subscribeToAppState={subscribeToAppState}
+        >
+          {null}
+        </AdvertisingController>
       </AdEntitlementContext>
     );
 
@@ -97,6 +99,8 @@ async function unmount() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.spyOn(Capacitor, "getPlatform").mockReturnValue("android");
+  vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
   coordinators.length = 0;
   addListener.mockReset();
   // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
@@ -110,6 +114,7 @@ beforeEach(() => {
 afterEach(async () => {
   if (!unmounted) await unmount();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 it.each([

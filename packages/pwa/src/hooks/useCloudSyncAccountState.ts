@@ -113,262 +113,310 @@ function cloudSyncAccountStateReducer(
   }
 }
 
-export function useCloudSyncAccountState({
-  isOffline,
-  isSignInSuccessVisibleRef,
-  onCloudDataActivated,
-  partyList,
-  userId,
-}: {
-  isOffline: boolean;
-  isSignInSuccessVisibleRef: RefObject<boolean>;
-  onCloudDataActivated: (shouldDelay: boolean) => void;
-  partyList: PartyList;
-  userId: string | undefined;
-}) {
-  const repo = useRepo();
-  const [state, dispatch] = useReducer(cloudSyncAccountStateReducer, initialCloudSyncAccountState);
-  const { cloudSettings, isAccountStateResolved, isCloudSyncSwitchOpen, linkedAccounts } = state;
-  const partyListRef = useRef(partyList);
-  const onCloudDataActivatedRef = useRef(onCloudDataActivated);
-  const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
-  const hasPasswordAccount = linkedProviderIds.has("credential");
+async function readCloudPartyList(
+  repo: Parameters<typeof documentCache.readAsync>[0],
+  id: PartyList["id"],
+) {
+  // SAFETY: This gateway reads only IDs supplied by the cloud party-list settings contract.
+  return (await documentCache.readAsync(repo, id)) as PartyList | undefined;
+}
 
-  useEffect(() => {
-    partyListRef.current = partyList;
-  }, [partyList]);
+const cloudAccountServices = {
+  fetchLinkedAuthAccounts,
+  fetchCloudUserSettings,
+  saveCloudUserSettings,
+  getCloudUserSettingsInput,
+  writeCachedCloudUserSettings,
+  readCachedCloudAccountState,
+  writeCachedCloudAccountState,
+  hasLocalPartyListData,
+  setPartyListId,
+  setAnalyticsEnabled,
+  trackCloudSyncActivated,
+  readPartyList: readCloudPartyList,
+};
 
-  useEffect(() => {
-    onCloudDataActivatedRef.current = onCloudDataActivated;
-  }, [onCloudDataActivated]);
+/** Bind account I/O once; each hook invocation still owns its own React lifecycle. */
+export function createUseCloudSyncAccountState(
+  overrides: Partial<typeof cloudAccountServices> = {},
+) {
+  const {
+    fetchLinkedAuthAccounts,
+    fetchCloudUserSettings,
+    saveCloudUserSettings,
+    getCloudUserSettingsInput,
+    writeCachedCloudUserSettings,
+    readCachedCloudAccountState,
+    writeCachedCloudAccountState,
+    hasLocalPartyListData,
+    setPartyListId,
+    setAnalyticsEnabled,
+    trackCloudSyncActivated,
+    readPartyList,
+  } = { ...cloudAccountServices, ...overrides };
 
-  useEffect(() => {
-    if (!userId) {
-      dispatch({ type: "cleared" });
+  function useCloudSyncAccountState({
+    isOffline,
+    isSignInSuccessVisibleRef,
+    onCloudDataActivated,
+    partyList,
+    userId,
+  }: {
+    isOffline: boolean;
+    isSignInSuccessVisibleRef: RefObject<boolean>;
+    onCloudDataActivated: (shouldDelay: boolean) => void;
+    partyList: PartyList;
+    userId: string | undefined;
+  }) {
+    const repo = useRepo();
 
-      return;
-    }
+    const [state, dispatch] = useReducer(
+      cloudSyncAccountStateReducer,
+      initialCloudSyncAccountState,
+    );
 
-    let isCancelled = false;
-    const currentUserId = userId;
-    const cachedAccountState = readCachedCloudAccountState(currentUserId);
+    const { cloudSettings, isAccountStateResolved, isCloudSyncSwitchOpen, linkedAccounts } = state;
+    const partyListRef = useRef(partyList);
+    const onCloudDataActivatedRef = useRef(onCloudDataActivated);
+    const linkedProviderIds = new Set(linkedAccounts.map((account) => account.providerId));
+    const hasPasswordAccount = linkedProviderIds.has("credential");
 
-    async function loadAccountState({
-      showErrorToast,
-      showStartToast,
-    }: {
-      showErrorToast: boolean;
-      showStartToast: boolean;
-    }) {
-      try {
-        const currentPartyList = partyListRef.current;
+    useEffect(() => {
+      partyListRef.current = partyList;
+    }, [partyList]);
 
-        const [accounts, { settings }] = await Promise.all([
-          fetchLinkedAuthAccounts(),
-          fetchCloudUserSettings(),
-        ]);
+    useEffect(() => {
+      onCloudDataActivatedRef.current = onCloudDataActivated;
+    }, [onCloudDataActivated]);
 
-        if (isCancelled) {
-          return;
-        }
+    useEffect(() => {
+      if (!userId) {
+        dispatch({ type: "cleared" });
 
-        let activeSettings = settings;
+        return;
+      }
 
-        if (!activeSettings) {
-          const { settings: savedSettings } = await saveCloudUserSettings(
-            getCloudUserSettingsInput(currentPartyList),
-          );
+      let isCancelled = false;
+      const currentUserId = userId;
+      const cachedAccountState = readCachedCloudAccountState(currentUserId);
+
+      async function loadAccountState({
+        showErrorToast,
+        showStartToast,
+      }: {
+        showErrorToast: boolean;
+        showStartToast: boolean;
+      }) {
+        try {
+          const currentPartyList = partyListRef.current;
+
+          const [accounts, { settings }] = await Promise.all([
+            fetchLinkedAuthAccounts(),
+            fetchCloudUserSettings(),
+          ]);
 
           if (isCancelled) {
             return;
           }
 
-          activeSettings = savedSettings;
+          let activeSettings = settings;
 
-          if (showStartToast) {
-            toast.success(t`trizum cloud started`);
+          if (!activeSettings) {
+            const { settings: savedSettings } = await saveCloudUserSettings(
+              getCloudUserSettingsInput(currentPartyList),
+            );
+
+            if (isCancelled) {
+              return;
+            }
+
+            activeSettings = savedSettings;
+
+            if (showStartToast) {
+              toast.success(t`trizum cloud started`);
+            }
           }
-        }
 
-        let cloudAnalyticsEnabled = true;
+          let cloudAnalyticsEnabled = true;
 
-        if (
-          activeSettings &&
-          isValidDocumentId(activeSettings.partyListDocumentId) &&
-          activeSettings.partyListDocumentId !== currentPartyList.id
-        ) {
-          // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
-          const cloudPartyList = (await documentCache.readAsync(
-            repo,
-            activeSettings.partyListDocumentId,
-          )) as PartyList | undefined;
+          if (
+            activeSettings &&
+            isValidDocumentId(activeSettings.partyListDocumentId) &&
+            activeSettings.partyListDocumentId !== currentPartyList.id
+          ) {
+            // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
+            const cloudPartyList = await readPartyList(repo, activeSettings.partyListDocumentId);
 
-          if (isCancelled) {
+            if (isCancelled) {
+              return;
+            }
+
+            cloudAnalyticsEnabled =
+              requireCloudPartyList(cloudPartyList).usageAnalyticsEnabled !== false;
+          }
+
+          dispatch({
+            type: "accountDataLoaded",
+            cloudSettings: activeSettings,
+            linkedAccounts: accounts,
+          });
+          writeCachedCloudUserSettings(currentUserId, activeSettings);
+          writeCachedCloudAccountState(currentUserId, {
+            cloudSettings: activeSettings,
+            linkedAccounts: accounts,
+          });
+
+          if (!activeSettings) {
             return;
           }
 
-          cloudAnalyticsEnabled =
-            requireCloudPartyList(cloudPartyList).usageAnalyticsEnabled !== false;
-        }
+          if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
+            toast.error(t`trizum cloud data is invalid`);
 
-        dispatch({
-          type: "accountDataLoaded",
-          cloudSettings: activeSettings,
-          linkedAccounts: accounts,
-        });
-        writeCachedCloudUserSettings(currentUserId, activeSettings);
-        writeCachedCloudAccountState(currentUserId, {
-          cloudSettings: activeSettings,
-          linkedAccounts: accounts,
-        });
+            return;
+          }
 
-        if (!activeSettings) {
-          return;
-        }
+          if (activeSettings.partyListDocumentId === currentPartyList.id) {
+            return;
+          }
 
-        if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
-          toast.error(t`trizum cloud data is invalid`);
+          if (hasLocalPartyListData(currentPartyList)) {
+            dispatch({ type: "switchOpenChanged", isOpen: true });
 
-          return;
-        }
+            return;
+          }
 
-        if (activeSettings.partyListDocumentId === currentPartyList.id) {
-          return;
-        }
+          if (!cloudAnalyticsEnabled) setAnalyticsEnabled(false);
+          setPartyListId(activeSettings.partyListDocumentId);
+          dispatch({ type: "cloudSettingsActivated", cloudSettings: activeSettings });
+          writeCachedCloudUserSettings(currentUserId, activeSettings);
+          writeCachedCloudAccountState(currentUserId, {
+            cloudSettings: activeSettings,
+            linkedAccounts: accounts,
+          });
+          toast.success(t`trizum cloud enabled on this device`);
+          onCloudDataActivatedRef.current(isSignInSuccessVisibleRef.current);
+        } catch {
+          if (!isCancelled) {
+            dispatch({ type: "accountDataResolved" });
 
-        if (hasLocalPartyListData(currentPartyList)) {
-          dispatch({ type: "switchOpenChanged", isOpen: true });
-
-          return;
-        }
-
-        if (!cloudAnalyticsEnabled) setAnalyticsEnabled(false);
-        setPartyListId(activeSettings.partyListDocumentId);
-        dispatch({ type: "cloudSettingsActivated", cloudSettings: activeSettings });
-        writeCachedCloudUserSettings(currentUserId, activeSettings);
-        writeCachedCloudAccountState(currentUserId, {
-          cloudSettings: activeSettings,
-          linkedAccounts: accounts,
-        });
-        toast.success(t`trizum cloud enabled on this device`);
-        onCloudDataActivatedRef.current(isSignInSuccessVisibleRef.current);
-      } catch {
-        if (!isCancelled) {
-          dispatch({ type: "accountDataResolved" });
-
-          if (showErrorToast) {
-            toast.error(t`Could not load trizum cloud state`);
+            if (showErrorToast) {
+              toast.error(t`Could not load trizum cloud state`);
+            }
           }
         }
       }
+
+      dispatch({
+        type: "accountChanged",
+        linkedAccounts: cachedAccountState?.linkedAccounts ?? [],
+        cloudSettings: cachedAccountState?.cloudSettings ?? null,
+      });
+
+      if (isOffline) {
+        dispatch({ type: "accountDataResolved" });
+
+        return;
+      }
+
+      void loadAccountState({
+        showErrorToast: !cachedAccountState,
+        showStartToast: true,
+      });
+
+      const intervalId = window.setInterval(() => {
+        void loadAccountState({ showErrorToast: false, showStartToast: false });
+      }, CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS);
+
+      return () => {
+        isCancelled = true;
+        window.clearInterval(intervalId);
+      };
+    }, [isOffline, isSignInSuccessVisibleRef, repo, userId]);
+
+    function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
+      dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
+
+      if (userId) {
+        writeCachedCloudAccountState(userId, {
+          cloudSettings,
+          linkedAccounts: accounts,
+        });
+      }
     }
 
-    dispatch({
-      type: "accountChanged",
-      linkedAccounts: cachedAccountState?.linkedAccounts ?? [],
-      cloudSettings: cachedAccountState?.cloudSettings ?? null,
-    });
-
-    if (isOffline) {
-      dispatch({ type: "accountDataResolved" });
-
-      return;
+    function clearCloudSyncState() {
+      dispatch({ type: "cleared" });
     }
 
-    void loadAccountState({
-      showErrorToast: !cachedAccountState,
-      showStartToast: true,
-    });
+    async function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
+      if (!settings) {
+        toast.message(t`trizum cloud is not set up yet`);
 
-    const intervalId = window.setInterval(() => {
-      void loadAccountState({ showErrorToast: false, showStartToast: false });
-    }, CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS);
+        return;
+      }
 
-    return () => {
-      isCancelled = true;
-      window.clearInterval(intervalId);
+      if (!isValidDocumentId(settings.partyListDocumentId)) {
+        toast.error(t`trizum cloud data is invalid`);
+
+        return;
+      }
+
+      if (settings.partyListDocumentId === partyList.id) {
+        toast.message(t`This device is already using trizum cloud`);
+
+        return;
+      }
+
+      // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
+      const cloudPartyList = await readPartyList(repo, settings.partyListDocumentId);
+
+      if (!cloudPartyList) {
+        toast.error(t`Could not load trizum cloud state`);
+
+        return;
+      }
+
+      // Apply the destination's opt-out before switching can trigger router events.
+      if (cloudPartyList.usageAnalyticsEnabled === false) setAnalyticsEnabled(false);
+      setPartyListId(settings.partyListDocumentId);
+
+      if (
+        partyList.usageAnalyticsEnabled !== false &&
+        cloudPartyList.usageAnalyticsEnabled !== false
+      ) {
+        trackCloudSyncActivated(settings.partyListDocumentId);
+      }
+
+      if (userId) {
+        dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
+        writeCachedCloudUserSettings(userId, settings);
+        writeCachedCloudAccountState(userId, {
+          cloudSettings: settings,
+          linkedAccounts,
+        });
+      } else {
+        dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
+      }
+
+      toast.success(t`trizum cloud enabled on this device`);
+      onCloudDataActivatedRef.current(isSignInSuccessVisibleRef.current);
+    }
+
+    return {
+      activateCloudSyncOnDevice,
+      clearCloudSyncState,
+      hasPasswordAccount,
+      isAccountStateResolved,
+      isCloudSyncSwitchOpen,
+      linkedProviderIds,
+      saveLinkedAccounts,
+      setIsCloudSyncSwitchOpen: (isOpen: boolean) =>
+        dispatch({ type: "switchOpenChanged", isOpen }),
     };
-  }, [isOffline, isSignInSuccessVisibleRef, repo, userId]);
-
-  function saveLinkedAccounts(accounts: LinkedAuthAccount[]) {
-    dispatch({ type: "linkedAccountsSaved", linkedAccounts: accounts });
-
-    if (userId) {
-      writeCachedCloudAccountState(userId, {
-        cloudSettings,
-        linkedAccounts: accounts,
-      });
-    }
   }
 
-  function clearCloudSyncState() {
-    dispatch({ type: "cleared" });
-  }
-
-  async function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
-    if (!settings) {
-      toast.message(t`trizum cloud is not set up yet`);
-
-      return;
-    }
-
-    if (!isValidDocumentId(settings.partyListDocumentId)) {
-      toast.error(t`trizum cloud data is invalid`);
-
-      return;
-    }
-
-    if (settings.partyListDocumentId === partyList.id) {
-      toast.message(t`This device is already using trizum cloud`);
-
-      return;
-    }
-
-    // SAFETY: The ID belongs to the cloud settings party-list field and passed document-ID validation; the cache erases document types.
-    const cloudPartyList = (await documentCache.readAsync(repo, settings.partyListDocumentId)) as
-      | PartyList
-      | undefined;
-
-    if (!cloudPartyList) {
-      toast.error(t`Could not load trizum cloud state`);
-
-      return;
-    }
-
-    // Apply the destination's opt-out before switching can trigger router events.
-    if (cloudPartyList.usageAnalyticsEnabled === false) setAnalyticsEnabled(false);
-    setPartyListId(settings.partyListDocumentId);
-
-    if (
-      partyList.usageAnalyticsEnabled !== false &&
-      cloudPartyList.usageAnalyticsEnabled !== false
-    ) {
-      trackCloudSyncActivated(settings.partyListDocumentId);
-    }
-
-    if (userId) {
-      dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
-      writeCachedCloudUserSettings(userId, settings);
-      writeCachedCloudAccountState(userId, {
-        cloudSettings: settings,
-        linkedAccounts,
-      });
-    } else {
-      dispatch({ type: "cloudSettingsActivated", cloudSettings: settings });
-    }
-
-    toast.success(t`trizum cloud enabled on this device`);
-    onCloudDataActivatedRef.current(isSignInSuccessVisibleRef.current);
-  }
-
-  return {
-    activateCloudSyncOnDevice,
-    clearCloudSyncState,
-    hasPasswordAccount,
-    isAccountStateResolved,
-    isCloudSyncSwitchOpen,
-    linkedProviderIds,
-    saveLinkedAccounts,
-    setIsCloudSyncSwitchOpen: (isOpen: boolean) => dispatch({ type: "switchOpenChanged", isOpen }),
-  };
+  return useCloudSyncAccountState;
 }
+
+export const useCloudSyncAccountState = createUseCloudSyncAccountState();
