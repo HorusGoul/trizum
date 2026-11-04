@@ -1,3 +1,4 @@
+import type { SubscriptionData } from "./types.js";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { resetSync, type LogRecord, type Sink } from "@logtape/logtape";
 import { configureTrizumLogging } from "@trizum/logging";
@@ -129,7 +130,7 @@ describe("createCache", () => {
       load: async ([id]) => `value:${id}`,
     });
 
-    const subscriber = vi.fn<(data: unknown) => void>();
+    const subscriber = vi.fn<(data: SubscriptionData<string>) => void>();
     const unsubscribe = cache.subscribe(subscriber, "a");
 
     expect(subscriber).toHaveBeenLastCalledWith({ status: STATUS_NOT_FOUND });
@@ -191,7 +192,7 @@ describe("createCache", () => {
       },
     });
 
-    const subscriber = vi.fn<(data: unknown) => void>();
+    const subscriber = vi.fn<(data: SubscriptionData<string>) => void>();
 
     cache.subscribe(subscriber, "a");
     const pending = cache.readAsync("a");
@@ -311,8 +312,8 @@ describe("createCache", () => {
       },
     });
 
-    const resolvedSubscriber = vi.fn<(data: unknown) => void>();
-    const pendingSubscriber = vi.fn<(data: unknown) => void>();
+    const resolvedSubscriber = vi.fn<(data: SubscriptionData<string>) => void>();
+    const pendingSubscriber = vi.fn<(data: SubscriptionData<string>) => void>();
 
     cache.subscribe(resolvedSubscriber, "resolved");
     cache.subscribe(pendingSubscriber, "pending");
@@ -383,7 +384,7 @@ describe("createCache", () => {
       load: async ([id]) => `value:${id}`,
     });
 
-    const subscriber = vi.fn<(data: unknown) => void>();
+    const subscriber = vi.fn<(data: SubscriptionData<string>) => void>();
 
     cache.cache("value:a", "a");
     cache.subscribe(subscriber, "a");
@@ -448,7 +449,7 @@ describe("createCache", () => {
 
     void cache.readAsync("a");
     cache.evict("a");
-    await deferred.settle(error, true);
+    await deferred.reject(error);
 
     expect(cache.getStatus("a")).toBe(STATUS_NOT_FOUND);
   });
@@ -501,7 +502,7 @@ class BasicCacheMap<Key, Value> implements CacheMap<Key, Value> {
 }
 
 function createTestDeferred<Value>() {
-  let rejectPromise: (error: unknown) => void = () => {};
+  let rejectPromise: (cause: unknown) => void = () => {};
   let resolvePromise: (value: Value) => void = () => {};
 
   const promise = new Promise<Value>((resolve, reject) => {
@@ -511,21 +512,25 @@ function createTestDeferred<Value>() {
 
   promise.catch(() => {});
 
+  async function waitForSettlement() {
+    try {
+      await promise;
+    } catch {
+      // The cache intentionally ignores stale rejections after eviction.
+    }
+  }
+
   return {
     promise,
-    async settle(valueOrError: unknown, reject = false) {
-      if (reject) {
-        rejectPromise(valueOrError);
-      } else {
-        // SAFETY: This branch resolves the test promise; callers supply Value when reject is false and an error when it is true.
-        resolvePromise(valueOrError as Value);
-      }
+    settle(value: Value) {
+      resolvePromise(value);
 
-      try {
-        await promise;
-      } catch {
-        // The cache intentionally ignores stale rejections after eviction.
-      }
+      return waitForSettlement();
+    },
+    reject(cause: unknown) {
+      rejectPromise(cause);
+
+      return waitForSettlement();
     },
   };
 }

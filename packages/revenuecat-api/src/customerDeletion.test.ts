@@ -1,10 +1,11 @@
+import type { RevenueCatJsonValue } from "./index.js";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { createRevenueCatApiClient } from "./index.js";
 
 const customer = { customerId: "user/with space", projectId: "project/id" };
 const accepted = { object: "customer", id: customer.customerId, deleted_at: 123 };
 
-function setup(status: number, body: unknown) {
+function setup(status: number, body: RevenueCatJsonValue) {
   const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(body, { status }));
 
   return { fetcher, client: createRevenueCatApiClient({ fetcher, secretApiKey: "test-secret" }) };
@@ -67,7 +68,7 @@ describe("RevenueCat customer deletion", () => {
     }
   });
 
-  it.each<[number, unknown]>([
+  it.each<[number, RevenueCatJsonValue]>([
     [200, { object: "customer", id: customer.customerId }],
     [404, { type: "resource_missing", param: "project_id" }],
     [403, { type: "permissions_error" }],
@@ -81,7 +82,7 @@ describe("RevenueCat customer deletion", () => {
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
-  it.each<[number, unknown]>([
+  it.each<[number, RevenueCatJsonValue]>([
     [404, { type: "resource_missing" }],
     [403, { type: "permissions_error" }],
     [503, { type: "server_error" }],
@@ -108,11 +109,11 @@ describe("RevenueCat customer deletion", () => {
     );
   });
 
-  it.each<[number, unknown]>([
+  it.each<[number, RevenueCatJsonValue]>([
     [404, { type: "resource_missing", param: "project_id" }],
     [200, {}],
     [200, { object: "customer", id: "user", deleted_at: null }],
-    ...[401, 403, 409, 423, 429, 500, 503].map((status): [number, unknown] => [
+    ...[401, 403, 409, 423, 429, 500, 503].map((status): [number, RevenueCatJsonValue] => [
       status,
       { message: "remote failure" },
     ]),

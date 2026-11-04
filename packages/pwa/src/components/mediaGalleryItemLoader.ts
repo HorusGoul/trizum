@@ -16,9 +16,9 @@ export function createMediaGalleryItemLoader(loadItem: LoadMediaGalleryItem) {
 
     const promise = loadItem(item).then(
       (loadedItem) => loadedItem,
-      (error: unknown) => {
+      (cause: unknown) => {
         itemPromiseCacheBySrc.delete(item.src);
-        throw error;
+        throw cause;
       },
     );
 

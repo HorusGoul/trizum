@@ -1,15 +1,6 @@
-import {
-  toGamut as _toGamut,
-  type Color,
-  type Oklch,
-  converter,
-  differenceEuclidean,
-} from "culori";
+import { toGamut, type Oklch, converter } from "culori";
 
 import { makeVariable, shades } from "./common.js";
-
-// SAFETY: Culori's toGamut is curried at runtime; its shipped overload omits the callable returned for the selected color space.
-const toGamut = _toGamut as (...args: unknown[]) => (color: string) => Color;
 
 /**
  * A map of CSS varable name to color
@@ -63,7 +54,7 @@ export const highestChroma = (shadeIndex: number, hue: number) => {
   const color = `oklch(${lightness[shadeIndex]} 0.4 ${hue})`;
 
   // Clamping it to the highest chroma possible
-  return serializeColor(oklch(toGamut("p3", "oklch", differenceEuclidean("oklch"), 0)(color)));
+  return serializeColor(oklch(toGamut("p3", "oklch", null, 0)(color)));
 };
 
 export const consistentChroma = (i: number, hue: number) => {
@@ -72,7 +63,7 @@ export const consistentChroma = (i: number, hue: number) => {
   // Using a pinned chroma
   const color = `oklch(${lightness[i]} ${chromaData[i]} ${hue})`;
 
-  return serializeColor(oklch(toGamut("p3", "oklch", differenceEuclidean("oklch"), 0)(color)));
+  return serializeColor(oklch(toGamut("p3", "oklch", null, 0)(color)));
 };
 
 const chromaData = [

@@ -32,15 +32,15 @@ async function main() {
   });
 }
 
-main().catch((error: unknown) => {
-  process.stderr.write(`${formatError(error)}\n`);
+main().catch((cause: unknown) => {
+  process.stderr.write(`${formatError(cause)}\n`);
   process.exitCode = 1;
 });
 
-function formatError(error: unknown) {
-  if (error instanceof Error) {
-    return error.stack ?? error.message;
+function formatError(cause: unknown) {
+  if (cause instanceof Error) {
+    return cause.stack ?? cause.message;
   }
 
-  return String(error);
+  return String(cause);
 }

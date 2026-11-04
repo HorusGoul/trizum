@@ -147,7 +147,7 @@ describe("balance synchronization", () => {
       signal,
     );
 
-    const rejected = pending.catch((error: unknown) => error);
+    const rejected = pending.catch((cause: unknown) => cause);
     await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(await rejected).toMatchObject({ name: "TimeoutError" });
     expect(off).toHaveBeenCalledWith("heads-changed", expect.any(Function));

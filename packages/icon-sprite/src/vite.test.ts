@@ -18,18 +18,6 @@ function writeFile(rootDir: string, relativePath: string, contents: string) {
   return filePath;
 }
 
-function getHookHandler(hook: unknown) {
-  if (typeof hook === "function") {
-    return hook;
-  }
-
-  if (hook && typeof hook === "object" && "handler" in hook && typeof hook.handler === "function") {
-    return hook.handler;
-  }
-
-  return undefined;
-}
-
 const tempDirectories: string[] = [];
 
 afterEach(() => {
@@ -65,10 +53,10 @@ describe("createIconSpritePlugin", () => {
     const watcherAdd = vi.fn<(paths: string[]) => void>();
     const wsSend = vi.fn<(payload: { type: "full-reload" }) => void>();
 
-    getHookHandler(plugin.configResolved)?.({
+    plugin.configResolved({
       root: rootDir,
     });
-    getHookHandler(plugin.configureServer)?.({
+    plugin.configureServer({
       watcher: {
         add: watcherAdd,
       },
@@ -83,7 +71,7 @@ describe("createIconSpritePlugin", () => {
       '<svg viewBox="0 0 24 24"><path d="M6 12h10"/></svg>\n',
     );
 
-    getHookHandler(plugin.handleHotUpdate)?.({
+    plugin.handleHotUpdate({
       file: iconFile,
       server: {
         ws: {
@@ -120,13 +108,13 @@ describe("createIconSpritePlugin", () => {
 
     const wsSend = vi.fn<(payload: { type: "full-reload" }) => void>();
 
-    getHookHandler(plugin.configResolved)?.({
+    plugin.configResolved({
       root: rootDir,
     });
-    getHookHandler(plugin.buildStart)?.();
+    plugin.buildStart();
     writeFile(rootDir, "src/generated/iconSprite.svg", "<svg />\n");
 
-    getHookHandler(plugin.handleHotUpdate)?.({
+    plugin.handleHotUpdate({
       file: path.join(rootDir, "src/generated/iconSprite.svg"),
       server: {
         ws: {

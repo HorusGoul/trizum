@@ -8,7 +8,7 @@ import type { Deferred, StatusPending, StatusRejected, StatusResolved } from "./
 
 export function createDeferred<Type>(debugLabel?: string): Deferred<Type> {
   let status: StatusPending | StatusRejected | StatusResolved = STATUS_PENDING;
-  let rejectPromise: (error: unknown) => void = () => {};
+  let rejectPromise: (cause: unknown) => void = () => {};
   let resolvePromise: (value: Type) => void = () => {};
 
   const promise = new Promise<Type>((resolve, reject) => {

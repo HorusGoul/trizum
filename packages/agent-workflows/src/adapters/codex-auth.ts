@@ -7,7 +7,7 @@ const failureEventSchema = z.union([
 ]);
 
 export function trackCodexAuthentication(agent: AgentProvider): AgentProvider & {
-  throwIfAuthenticationFailed(error: unknown): void;
+  throwIfAuthenticationFailed(cause: unknown): void;
 } {
   let authenticationError: string | undefined;
 
@@ -48,8 +48,8 @@ function isAuthenticationError(message: string): boolean {
   );
 }
 
-function throwIfCodexAuthenticationFailed(error: unknown): void {
-  const message = error instanceof Error ? error.message : String(error);
+function throwIfCodexAuthenticationFailed(cause: unknown): void {
+  const message = cause instanceof Error ? cause.message : String(cause);
 
   if (isAuthenticationError(message)) {
     throw new Error(

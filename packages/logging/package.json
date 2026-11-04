@@ -40,7 +40,8 @@
   "dependencies": {
     "@logtape/logtape": "catalog:",
     "@sentry/core": "catalog:",
-    "bs58check": "catalog:"
+    "bs58check": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",

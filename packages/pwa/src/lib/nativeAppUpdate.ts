@@ -185,8 +185,8 @@ function performAndroidImmediateUpdate(
   pendingAndroidImmediateUpdate = nativeUpdateEnvironment
     .performAndroidImmediateUpdate()
     .then(mapAppUpdateResult)
-    .catch((error: unknown) => {
-      logger.warning("Native Android immediate update failed", { error });
+    .catch((cause: unknown) => {
+      logger.warning("Native Android immediate update failed", { error: cause });
 
       return { status: "failed" } satisfies NativeAppUpdateResult;
     })

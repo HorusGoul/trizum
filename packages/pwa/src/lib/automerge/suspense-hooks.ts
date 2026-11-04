@@ -26,11 +26,10 @@ class RetryAbortedError extends Error {
 }
 
 class MaxRetriesExceededError extends Error {
-  constructor(
-    attempts: number,
-    public readonly lastError: unknown,
-  ) {
-    super(`Max retries exceeded after ${attempts} attempts`);
+  readonly lastError: unknown;
+  constructor(attempts: number, cause: unknown) {
+    super(`Max retries exceeded after ${attempts} attempts`, { cause });
+    this.lastError = cause;
     this.name = "MaxRetriesExceededError";
   }
 }

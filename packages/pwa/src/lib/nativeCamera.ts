@@ -5,12 +5,12 @@ export function shouldUseNativeCameraCapture() {
   return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
 }
 
-export function isNativeCameraCancel(error: unknown) {
-  if (!(error instanceof Error)) {
+export function isNativeCameraCancel(cause: unknown) {
+  if (!(cause instanceof Error)) {
     return false;
   }
 
-  return /cancel|cancelled|canceled/i.test(error.message);
+  return /cancel|cancelled|canceled/i.test(cause.message);
 }
 
 export async function getNativeCameraCaptureFile() {

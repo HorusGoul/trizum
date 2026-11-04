@@ -7,8 +7,8 @@ const REFRESH_INTERVAL_MS = 60_000;
 interface RevenueCatPremiumConnectionOptions {
   addListener: (listener: (customerInfo: CustomerInfo) => void) => Promise<PurchasesCallbackId>;
   onCustomerInfo: (customerInfo: CustomerInfo) => void;
-  onListenerError: (error: unknown) => void;
-  onRefreshError: (error: unknown) => void;
+  onListenerError: (cause: unknown) => void;
+  onRefreshError: (cause: unknown) => void;
   prepare: () => Promise<CustomerInfo | undefined>;
   refresh: () => Promise<CustomerInfo>;
   removeListener: (listenerId: PurchasesCallbackId) => Promise<void>;

@@ -128,9 +128,9 @@ export async function runSandcastleCodexFix(
       gitSetupMs: 30_000,
       mergeToHostMs: 60_000,
     },
-  }).catch((error: unknown) => {
-    agent.throwIfAuthenticationFailed(error);
-    throw error;
+  }).catch((cause: unknown) => {
+    agent.throwIfAuthenticationFailed(cause);
+    throw cause;
   });
 
   return {

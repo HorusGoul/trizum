@@ -25,13 +25,13 @@ export function createPendingRecordData<Type>(
   };
 }
 
-export function createResolvedRecordData<Type>(
+export function createResolvedRecordData<Type, Metadata = null>(
   value: Type,
-  metadata: unknown = null,
+  metadata?: Metadata,
   promise = createFulfilledReactPromise(value),
-): ResolvedRecordData<Type> {
+): ResolvedRecordData<Type> & { readonly metadata: Metadata | null } {
   return {
-    metadata,
+    metadata: metadata === undefined ? null : metadata,
     promise,
     status: STATUS_RESOLVED,
     value,
@@ -39,11 +39,11 @@ export function createResolvedRecordData<Type>(
 }
 
 export function createRejectedRecordData<Type = never>(
-  error: unknown,
-  promise = createRejectedReactPromise<Type>(error),
+  cause: unknown,
+  promise = createRejectedReactPromise<Type>(cause),
 ): RejectedRecordData<Type> {
   return {
-    error,
+    error: cause,
     promise,
     status: STATUS_REJECTED,
   };
@@ -60,8 +60,8 @@ export function createResolvedRecord<Type>(value: Type): ResolvedRecord<Type> {
   return { data: createResolvedRecordData(value) };
 }
 
-export function createRejectedRecord<Type = never>(error: unknown): RejectedRecord<Type> {
-  return { data: createRejectedRecordData(error) };
+export function createRejectedRecord<Type = never>(cause: unknown): RejectedRecord<Type> {
+  return { data: createRejectedRecordData(cause) };
 }
 
 export function updateRecordToResolved<Type>(record: Record<Type>, value: Type): void {
@@ -71,11 +71,11 @@ export function updateRecordToResolved<Type>(record: Record<Type>, value: Type):
   record.data = createResolvedRecordData(value, null, pendingData?.promise);
 }
 
-export function updateRecordToRejected<Type>(record: Record<Type>, error: unknown): void {
+export function updateRecordToRejected<Type>(record: Record<Type>, cause: unknown): void {
   const pendingData = isPendingRecord(record) ? record.data : undefined;
 
-  pendingData?.deferred.reject(error);
-  record.data = createRejectedRecordData<Type>(error, pendingData?.promise);
+  pendingData?.deferred.reject(cause);
+  record.data = createRejectedRecordData<Type>(cause, pendingData?.promise);
 }
 
 export function isPendingRecord<Type>(record: Record<Type>): record is PendingRecord<Type> {

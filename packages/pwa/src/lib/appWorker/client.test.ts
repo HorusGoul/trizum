@@ -3,7 +3,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/tes
 import { Repo } from "@automerge/automerge-repo";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
-import type { AppWorkerApi, AppWorkerInitializeOptions } from "./proxy.ts";
+import type {
+  AppWorkerApi,
+  AppWorkerInitializeOptions,
+  injectAppWorker as injectWorkerProxy,
+} from "./proxy.ts";
+import type { WorkerEndpoint } from "./WorkerAdapter.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
 
@@ -14,7 +19,7 @@ type DispatchEvent = (event: Event) => boolean;
 const proxyMock = vi.hoisted(() => {
   const workerApis: AppWorkerApi[] = [];
 
-  const injectAppWorker = vi.fn<(adapter: unknown) => AppWorkerApi>(() => {
+  const injectAppWorker = vi.fn<typeof injectWorkerProxy>(() => {
     const api = workerApis.shift();
 
     if (!api) {
@@ -56,7 +61,7 @@ class TestWorker {
   static instances: TestWorker[] = [];
 
   addEventListener = vi.fn<(type: string, listener: EventListenerOrEventListenerObject) => void>();
-  postMessage = vi.fn<(message: unknown, transfer?: Transferable[]) => void>();
+  postMessage = vi.fn<WorkerEndpoint["postMessage"]>();
   removeEventListener =
     vi.fn<(type: string, listener: EventListenerOrEventListenerObject) => void>();
   terminate = vi.fn<() => void>();

@@ -52,18 +52,18 @@ function escapeGitHubActionsCommandValue(value: string): string {
   return value.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
 }
 
-function getGitHubActionsErrorSummary(error: unknown): string | null {
-  if (error instanceof Error) {
-    return `${error.name}: ${error.message}`;
+function getGitHubActionsErrorSummary(cause: unknown): string | null {
+  if (cause instanceof Error) {
+    return `${cause.name}: ${cause.message}`;
   }
 
   if (
-    typeof error === "string" ||
-    typeof error === "number" ||
-    typeof error === "boolean" ||
-    typeof error === "bigint"
+    typeof cause === "string" ||
+    typeof cause === "number" ||
+    typeof cause === "boolean" ||
+    typeof cause === "bigint"
   ) {
-    return String(error);
+    return String(cause);
   }
 
   return null;

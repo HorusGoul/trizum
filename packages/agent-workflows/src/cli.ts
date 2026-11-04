@@ -213,9 +213,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     (exitCode) => {
       process.exitCode = exitCode;
     },
-    (error: unknown) => {
+    (cause: unknown) => {
       process.stderr.write(
-        `${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`,
+        `${cause instanceof Error ? (cause.stack ?? cause.message) : String(cause)}\n`,
       );
       process.exitCode = 1;
     },

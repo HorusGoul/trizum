@@ -8,7 +8,12 @@ import {
   shouldRegenerateIconSprite,
 } from "./index.js";
 
-export function createIconSpritePlugin(config: IconSpriteConfig): Plugin {
+interface SpriteServer {
+  watcher: { add(paths: string[]): void };
+  ws: { send(payload: { type: "full-reload" }): void };
+}
+
+export function createIconSpritePlugin(config: IconSpriteConfig) {
   let root = "";
 
   const regenerate = () => {
@@ -22,7 +27,7 @@ export function createIconSpritePlugin(config: IconSpriteConfig): Plugin {
   return {
     name: "vite-plugin-icon-sprite",
 
-    configResolved(resolvedConfig) {
+    configResolved(resolvedConfig: { root: string }) {
       root = resolvedConfig.root;
     },
 
@@ -30,7 +35,7 @@ export function createIconSpritePlugin(config: IconSpriteConfig): Plugin {
       regenerate();
     },
 
-    configureServer(server) {
+    configureServer(server: SpriteServer) {
       if (!root) {
         return;
       }
@@ -43,7 +48,7 @@ export function createIconSpritePlugin(config: IconSpriteConfig): Plugin {
       regenerate();
     },
 
-    handleHotUpdate({ file, server }) {
+    handleHotUpdate({ file, server }: { file: string; server: Pick<SpriteServer, "ws"> }) {
       if (!root) {
         return;
       }
@@ -58,5 +63,5 @@ export function createIconSpritePlugin(config: IconSpriteConfig): Plugin {
         server.ws.send({ type: "full-reload" });
       }
     },
-  };
+  } satisfies Plugin;
 }

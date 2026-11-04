@@ -349,32 +349,7 @@ function getAuthEndpointURL(path: string) {
   return new URL(`/api/auth${path}`, getAuthBaseURL()).toString();
 }
 
-export function getAuthResultUser(data: unknown): AuthSessionUser | undefined {
-  if (!data || typeof data !== "object" || !("user" in data)) {
-    return undefined;
-  }
-
-  const user = data.user;
-
-  if (!user || typeof user !== "object" || !("id" in user) || !("email" in user)) {
-    return undefined;
-  }
-
-  if (typeof user.id !== "string" || typeof user.email !== "string") {
-    return undefined;
-  }
-
-  // SAFETY: The checks above validate the required id/email fields; the remaining session-user fields are optional.
-  return user as AuthSessionUser;
-}
-
-export function getAuthRedirectUrl(data: unknown): string | undefined {
-  if (!data || typeof data !== "object" || !("url" in data)) {
-    return undefined;
-  }
-
-  return typeof data.url === "string" ? data.url : undefined;
-}
+export { getAuthResultUser, getAuthRedirectUrl } from "./authResponse.ts";
 
 async function getAuthErrorMessage(response: Response, fallback: string) {
   const body = await response.json().catch(() => null);

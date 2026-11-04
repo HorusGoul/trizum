@@ -5,7 +5,7 @@ interface CoalescedQueueState<Result> {
 
 interface KeyedCoalescedQueueOptions<Key, Result> {
   run: (key: Key) => Promise<Result>;
-  recover?: (error: unknown, key: Key) => Result;
+  recover?: (cause: unknown, key: Key) => Result;
 }
 
 export function createKeyedCoalescedQueue<Key, Result>({
@@ -47,7 +47,7 @@ async function runQueuedWork<Key, Result>({
   states: Map<Key, CoalescedQueueState<Result>>;
   state: CoalescedQueueState<Result>;
   run: (key: Key) => Promise<Result>;
-  recover?: (error: unknown, key: Key) => Result;
+  recover?: (cause: unknown, key: Key) => Result;
 }) {
   try {
     return await runRequestedWork({ key, state, run });

@@ -47,12 +47,12 @@ export function markReactPromiseFulfilled<Type>(
 
 export function markReactPromiseRejected<Type>(
   promise: Promise<Type>,
-  reason: unknown,
+  cause: unknown,
 ): asserts promise is RejectedReactUsePromise<Type> {
   const reactPromise: MutableReactUsePromise<Type> = promise;
 
   reactPromise.status = STATUS_REJECTED;
-  reactPromise.reason = reason;
+  reactPromise.reason = cause;
   delete reactPromise.value;
 }
 
@@ -64,10 +64,10 @@ export function createFulfilledReactPromise<Type>(value: Type): ReactUsePromise<
   return promise;
 }
 
-export function createRejectedReactPromise<Type = never>(reason: unknown): ReactUsePromise<Type> {
-  const promise = Promise.reject<Type>(reason);
+export function createRejectedReactPromise<Type = never>(cause: unknown): ReactUsePromise<Type> {
+  const promise = Promise.reject<Type>(cause);
 
-  markReactPromiseRejected(promise, reason);
+  markReactPromiseRejected(promise, cause);
   void promise.catch(() => {
     // Prevent unhandled rejections for records that are read imperatively.
   });

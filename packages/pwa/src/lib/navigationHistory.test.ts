@@ -1,3 +1,4 @@
+import type { RouterHistory } from "@tanstack/react-router";
 import { describe, expect, test, vi } from "vite-plus/test";
 import {
   closeRouteState,
@@ -64,8 +65,8 @@ describe("navigationHistory", () => {
 
   test("wraps history push to replace duplicate hrefs", () => {
     const location = { href: "/settings" };
-    const push = vi.fn<(href: string, state?: unknown, navigateOptions?: unknown) => void>();
-    const replace = vi.fn<(href: string, state?: unknown, navigateOptions?: unknown) => void>();
+    const push = vi.fn<RouterHistory["push"]>();
+    const replace = vi.fn<RouterHistory["push"]>();
 
     const history = {
       get location() {

@@ -1,3 +1,4 @@
+import type { RevenueCatJsonValue } from "./index.js";
 import { describe, expect, it } from "vite-plus/test";
 import { createRevenueCatApiClient, RevenueCatApiError } from "./index.js";
 
@@ -138,9 +139,9 @@ interface FetcherOptions {
   missingCustomer?: boolean;
   missingProject?: boolean;
   omitTerminalNextPage?: boolean;
-  purchases?: unknown[][];
+  purchases?: RevenueCatJsonValue[][];
   requests?: Request[];
-  subscriptions?: unknown[][];
+  subscriptions?: RevenueCatJsonValue[][];
   subscriptionStatus?: number;
 }
 
@@ -207,7 +208,7 @@ function createFetcher({
   };
 }
 
-function createJsonResponse(value: unknown, status = 200) {
+function createJsonResponse(value: RevenueCatJsonValue, status = 200) {
   return new Response(JSON.stringify(value), {
     headers: { "Content-Type": "application/json" },
     status,
