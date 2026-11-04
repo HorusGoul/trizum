@@ -62,15 +62,18 @@ afterEach(async () => {
 });
 
 function profile(enabled?: boolean) {
-  const handle = repo.create<PartyList>({
+  const initialProfile: PartyList = {
     id: "" as PartyList["id"],
     type: "partyList",
     username: "Alice",
     phone: "private",
     parties: {},
     participantInParties: {},
-    ...(enabled === undefined ? {} : { usageAnalyticsEnabled: enabled }),
-  });
+  };
+
+  if (enabled !== undefined) initialProfile.usageAnalyticsEnabled = enabled;
+
+  const handle = repo.create<PartyList>(initialProfile);
 
   handle.change((doc) => {
     doc.id = handle.documentId;

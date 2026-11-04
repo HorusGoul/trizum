@@ -42,14 +42,18 @@ export function parseAdHistory(value: string | null): AdHistory | undefined {
       return undefined;
     }
 
-    return {
+    const history: AdHistory = {
       version: 1,
       firstUseCompleted: parsed.firstUseCompleted,
-      ...(isTimestamp(parsed.inactiveAt) ? { inactiveAt: parsed.inactiveAt } : {}),
-      ...(isTimestamp(parsed.lastFullScreenShownAt)
-        ? { lastFullScreenShownAt: parsed.lastFullScreenShownAt }
-        : {}),
     };
+
+    if (isTimestamp(parsed.inactiveAt)) history.inactiveAt = parsed.inactiveAt;
+
+    if (isTimestamp(parsed.lastFullScreenShownAt)) {
+      history.lastFullScreenShownAt = parsed.lastFullScreenShownAt;
+    }
+
+    return history;
   } catch {
     return undefined;
   }

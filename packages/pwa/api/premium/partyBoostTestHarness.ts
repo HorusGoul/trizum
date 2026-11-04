@@ -214,15 +214,15 @@ export async function createPartyBoostTestHarness() {
 
       if (method === "GET") url.searchParams.set("partyDocumentId", partyId);
 
-      return premiumRoute.fetch(
-        new Request(url, {
-          method,
-          headers: { "Content-Type": "application/json", ...(cookie ? { Cookie: cookie } : {}) },
-          ...(method === "PUT" ? { body: JSON.stringify({ partyDocumentId: partyId }) } : {}),
-        }),
-        env,
-        platform.ctx,
-      );
+      const headers = new Headers({ "Content-Type": "application/json" });
+
+      if (cookie) headers.set("Cookie", cookie);
+
+      const init: RequestInit = { method, headers };
+
+      if (method === "PUT") init.body = JSON.stringify({ partyDocumentId: partyId });
+
+      return premiumRoute.fetch(new Request(url, init), env, platform.ctx);
     },
     async assignment(userId: string) {
       return env.DB.prepare("SELECT * FROM party_boost WHERE ownerUserId = ?").bind(userId).first<{

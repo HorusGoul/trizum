@@ -160,8 +160,6 @@ function ExpenseTemplateEditor() {
         id: template?.id ?? crypto.randomUUID(),
         name: normalizedName,
         symbol: value.symbol,
-        ...(value.expenseName.trim() ? { expenseName: value.expenseName.trim() } : {}),
-        ...(value.amount > 0 ? { amount: convertToUnits(value.amount) } : {}),
         paidBy:
           value.paidBy === "current-participant"
             ? { type: "current-participant" }
@@ -169,6 +167,12 @@ function ExpenseTemplateEditor() {
         participantSelection: value.participantSelection,
         shares: value.shares,
       };
+
+      const expenseName = value.expenseName.trim();
+
+      if (expenseName) savedTemplate.expenseName = expenseName;
+
+      if (value.amount > 0) savedTemplate.amount = convertToUnits(value.amount);
 
       try {
         saveExpenseTemplate(savedTemplate);

@@ -1,3 +1,5 @@
+import type { Party } from "../../src/models/party";
+
 export const defaultParticipants = {
   alex: {
     id: "participant-alex",
@@ -168,6 +170,22 @@ export function createDebtTransferDestinationFixture({
   includeCreditor?: boolean;
   includeExtraParticipant?: boolean;
 } = {}) {
+  const participants: Party["participants"] = {
+    [debtTransferJourney.destinationMemberParticipant.id]: {
+      ...debtTransferJourney.destinationMemberParticipant,
+    },
+  };
+
+  if (includeCreditor) {
+    participants[debtTransferJourney.destinationCreditorParticipant.id] = {
+      ...debtTransferJourney.destinationCreditorParticipant,
+    };
+  }
+
+  if (includeExtraParticipant) {
+    participants[defaultParticipants.casey.id] = { ...defaultParticipants.casey };
+  }
+
   return {
     party: {
       type: "party" as const,
@@ -175,25 +193,7 @@ export function createDebtTransferDestinationFixture({
       symbol: "🌆",
       description: "Costs for the city break.",
       currency: "EUR" as const,
-      participants: {
-        [debtTransferJourney.destinationMemberParticipant.id]: {
-          ...debtTransferJourney.destinationMemberParticipant,
-        },
-        ...(includeCreditor
-          ? {
-              [debtTransferJourney.destinationCreditorParticipant.id]: {
-                ...debtTransferJourney.destinationCreditorParticipant,
-              },
-            }
-          : {}),
-        ...(includeExtraParticipant
-          ? {
-              [defaultParticipants.casey.id]: {
-                ...defaultParticipants.casey,
-              },
-            }
-          : {}),
-      },
+      participants,
     },
     expenses: [],
     photos: [],

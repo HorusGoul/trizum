@@ -803,11 +803,16 @@ async function findExistingPullRequestReviewComment(
     repositoryApiPath(options, `issues/${prNumber}/comments?per_page=100`),
   );
 
-  const comments = rawComments.map((comment) => ({
-    body: comment.body ?? "",
-    ...(comment.created_at == null ? {} : { createdAt: comment.created_at }),
-    id: comment.id,
-  }));
+  const comments = rawComments.map((comment) => {
+    const candidate: PullRequestReviewCommentCandidate = {
+      body: comment.body ?? "",
+      id: comment.id,
+    };
+
+    if (comment.created_at != null) candidate.createdAt = comment.created_at;
+
+    return candidate;
+  });
 
   return selectExistingPullRequestReviewComment(comments, prNumber);
 }
@@ -1299,14 +1304,19 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
     await codexAuthCache.restore();
   }
 
-  return {
+  const validation: LocalValidationResult = {
     commands: commandResults,
-    ...(failedCommand == null ? {} : { failedCommand }),
-    ...(failedExitCode == null ? {} : { failedExitCode }),
-    ...(failureSummary == null ? {} : { failureSummary }),
     output: output.join("\n\n"),
     passed,
   };
+
+  if (failedCommand != null) validation.failedCommand = failedCommand;
+
+  if (failedExitCode != null) validation.failedExitCode = failedExitCode;
+
+  if (failureSummary != null) validation.failureSummary = failureSummary;
+
+  return validation;
 }
 
 async function removeWorkspaceNodeModules(worktreeRoot: string): Promise<void> {

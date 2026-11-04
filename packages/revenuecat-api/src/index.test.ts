@@ -199,12 +199,11 @@ function createFetcher({
         ? `${url.pathname}${invalidPagination ? "" : "?starting_after=next"}`
         : null;
 
-    return createJsonResponse({
-      items,
-      ...(omitTerminalNextPage && nextPage === null ? {} : { next_page: nextPage }),
-      object: "list",
-      url: url.pathname,
-    });
+    const page = { items, object: "list", url: url.pathname };
+
+    if (omitTerminalNextPage && nextPage === null) return createJsonResponse(page);
+
+    return createJsonResponse({ ...page, next_page: nextPage });
   };
 }
 
