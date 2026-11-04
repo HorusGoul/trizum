@@ -31,9 +31,11 @@
   },
   "devDependencies": {
     "@changesets/changelog-github": "catalog:",
+    "@oxlint/plugins": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "eslint": "catalog:",
     "eslint-plugin-lingui": "catalog:",
+    "oxlint": "catalog:",
     "oxlint-plugin-react-doctor": "catalog:",
     "react-doctor": "catalog:",
     "skills-npm": "catalog:",

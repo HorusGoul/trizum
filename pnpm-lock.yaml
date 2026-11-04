@@ -136,6 +136,9 @@ catalogs:
     '@openai/codex':
       specifier: 0.164.0
       version: 0.164.0
+    '@oxlint/plugins':
+      specifier: 1.89.0
+      version: 1.89.0
     '@playwright/test':
       specifier: 1.64.1
       version: 1.64.1
@@ -292,6 +295,9 @@ catalogs:
     motion:
       specifier: 14.6.0
       version: 14.6.0
+    oxlint:
+      specifier: 1.89.0
+      version: 1.89.0
     oxlint-plugin-react-doctor:
       specifier: 0.9.18
       version: 0.9.18
@@ -442,6 +448,9 @@ importers:
       '@changesets/changelog-github':
         specifier: 'catalog:'
         version: 1.0.1
+      '@oxlint/plugins':
+        specifier: 'catalog:'
+        version: 1.89.0
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 5.0.5(@vitest/browser@5.0.5)(vitest@5.0.5)
@@ -451,6 +460,9 @@ importers:
       eslint-plugin-lingui:
         specifier: 'catalog:'
         version: 0.16.0(@typescript/typescript6@6.0.2)(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
+      oxlint:
+        specifier: 'catalog:'
+        version: 1.89.0(oxlint-tsgolint@7.0.2004)(vite-plus@1.4.0(@opentelemetry/api@1.9.1)(@types/node@26.6.5)(@typescript/typescript6@6.0.2)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(esbuild@0.28.2)(jiti@2.7.0)(jsdom@30.1.3(@noble/hashes@2.4.0))(playwright@1.64.1)(terser@5.44.1)(tsx@4.23.15)(yaml@2.9.1))
       oxlint-plugin-react-doctor:
         specifier: 'catalog:'
         version: 0.9.18
