@@ -37,17 +37,25 @@ app.use("*", async (c, next) => {
 });
 
 app.use("*", createApiI18nMiddleware());
+
 app.use("/api/*", createApiCorsMiddleware());
 
 app.get("/api/health", (c) => c.json({ ok: true }));
+
 app.route("/", partySharePreviewRoute);
+
 app.on(["GET", "POST"], "/api/auth/*", (c) =>
   createAuth(c.env, c.executionCtx, c.req.raw).handler(c.req.raw),
 );
+
 app.route("/api/cloud-sync", cloudSyncRoute);
+
 app.route("/api/migrate", apiMigrateRoute);
+
 app.route("/api/premium", premiumRoute);
+
 app.route(ANALYTICS_PROXY_PATH, spycatRoute);
+
 app.doc31("/api/openapi.json", {
   info: {
     description: "The HTTP contract used by trizum's first-party clients.",

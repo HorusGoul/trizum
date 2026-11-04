@@ -15,6 +15,7 @@ export function createDeferred<Type>(debugLabel?: string): Deferred<Type> {
     rejectPromise = reject;
     resolvePromise = resolve;
   });
+
   markReactPromisePending(promise);
   const reactPromise = promise;
 

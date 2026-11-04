@@ -303,6 +303,7 @@ function SettingsFormFields({
 
 function UsageAnalyticsSetting() {
   const { partyList, setUsageAnalyticsEnabled } = usePartyList();
+
   return (
     <SwitchField
       label={<Trans>Share usage analytics</Trans>}
@@ -333,17 +334,22 @@ function PremiumSection() {
   async function openPremium() {
     if (sessionStatus === "unavailable") {
       await session.refetch();
+
       return;
     }
+
     if (sessionStatus === "pending") {
       return;
     }
+
     if (!isSignedIn) {
       await navigate({ to: "/settings/cloud-sync" });
+
       return;
     }
 
     const unregisterProtectedFlow = registerProtectedFlow();
+
     try {
       if (isPremium) {
         await presentCustomerCenter();
@@ -353,6 +359,7 @@ function PremiumSection() {
     } catch {
       toast.error(t`Could not open Premium. Please try again.`);
     }
+
     unregisterProtectedFlow();
   }
 

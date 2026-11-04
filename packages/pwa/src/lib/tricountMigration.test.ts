@@ -205,6 +205,7 @@ describe("parseTricountData", () => {
   test("deduplicates attachment URLs and maps photo IDs back to each expense", () => {
     const sharedUrl = "https://img.example.test/shared.jpg";
     const secondUrl = "https://img.example.test/second.jpg";
+
     const data = createTricountResponse({
       memberships: [createMembership(1, "Alice"), createMembership(2, "Bob")],
       entries: [
@@ -242,6 +243,7 @@ describe("parseTricountData", () => {
 
   test("keeps balances stable when Tricount returns allocations in a different order", () => {
     const memberships = [createMembership(1, "Alice"), createMembership(2, "Bob")];
+
     const data = createTricountResponse({
       memberships,
       entries: [
@@ -257,6 +259,7 @@ describe("parseTricountData", () => {
         }),
       ],
     });
+
     const dataWithReversedAllocations = createTricountResponse({
       memberships: memberships.slice().reverse(),
       entries: [
@@ -288,6 +291,7 @@ describe("parseTricountData", () => {
       createMembership(2, "Bob"),
       createMembership(3, "Cora"),
     ];
+
     const data = createTricountResponse({
       memberships: memberships.slice().reverse(),
       entries: [
@@ -325,6 +329,7 @@ describe("parseTricountData", () => {
       createMembership(2, "Bob"),
       createMembership(3, "Cora"),
     ];
+
     const data = createTricountResponse({
       memberships,
       entries: [
@@ -341,6 +346,7 @@ describe("parseTricountData", () => {
         }),
       ],
     });
+
     const dataWithReversedAllocations = createTricountResponse({
       memberships: memberships.slice().reverse(),
       entries: [
@@ -415,6 +421,7 @@ describe("parseTricountData", () => {
 
 function getBalancesByParticipantName(data: TricountResponse): Record<string, number> {
   const migrationData = parseTricountData(data);
+
   const expenses: Expense[] = migrationData.expenses.map((expense, index) => ({
     id: `expense-${index}`,
     name: expense.name,
@@ -425,6 +432,7 @@ function getBalancesByParticipantName(data: TricountResponse): Record<string, nu
     isTransfer: expense.isTransfer,
     __hash: "",
   }));
+
   const balances = calculateBalancesByParticipant(
     expenses,
     migrationData.party.participants as Party["participants"],
@@ -463,9 +471,13 @@ type TricountResponseMigrationParticipants = ReturnType<
 >["party"]["participants"];
 
 type TricountRegistry = TricountResponse["Response"][number]["Registry"];
+
 type TricountMembership = TricountRegistry["memberships"][number];
+
 type TricountEntry = TricountRegistry["all_registry_entry"][number]["RegistryEntry"];
+
 type TricountAllocation = TricountEntry["allocations"][number];
+
 type TricountAttachment = TricountEntry["attachment"][number];
 
 function createTricountResponse({

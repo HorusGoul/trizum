@@ -6,6 +6,7 @@ test("keeps a remembered account after an offline reload and clears a revoked se
   page,
 }) => {
   let sessionState: "signed-in" | "offline" | "signed-out" = "signed-in";
+
   const user = {
     id: "offline-account",
     name: "Alex",
@@ -15,11 +16,14 @@ test("keeps a remembered account after an offline reload and clears a revoked se
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+
   await page.route("**/api/auth/get-session**", async (route) => {
     if (sessionState === "offline") {
       await route.abort("internetdisconnected");
+
       return;
     }
+
     await route.fulfill({
       json: sessionState === "signed-in" ? { user, session: { userId: user.id } } : null,
     });

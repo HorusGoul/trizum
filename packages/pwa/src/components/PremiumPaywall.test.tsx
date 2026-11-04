@@ -26,6 +26,7 @@ vi.mock("react-aria-components", async (importOriginal) => ({
   Modal: ({ children }: { children: ReactNode }) => children,
   ModalOverlay: ({ children }: { children: ReactNode }) => children,
 }));
+
 vi.mock("#src/ui/Button.tsx", () => ({
   Button: (props: ComponentProps<typeof Button>) => {
     buttons.set(
@@ -36,20 +37,26 @@ vi.mock("#src/ui/Button.tsx", () => ({
       ),
       props,
     );
+
     return null;
   },
 }));
+
 vi.mock("#src/ui/IconButton.tsx", () => ({ IconButton: () => null }));
+
 vi.mock("#src/lib/link.ts", () => ({ getAppLink: (path: string) => path }));
+
 vi.mock("#src/lib/premium/premiumCommerce.ts", () => ({
   loadPremiumOffering: vi.fn<typeof loadPremiumOffering>(),
   purchasePremiumPlan: vi.fn<typeof purchasePremiumPlan>(),
   restorePremiumPurchases: vi.fn<typeof restorePremiumPurchases>(),
 }));
+
 vi.mock("#src/lib/premium/premiumPaywallState.ts", async (importOriginal) => ({
   ...(await importOriginal<typeof PremiumPaywallState>()),
   getCurrentPremiumPaywallLoadState: vi.fn<typeof getCurrentPremiumPaywallLoadState>(),
 }));
+
 vi.mock("sonner", () => ({
   toast: { error: vi.fn<typeof toast.error>(), success: vi.fn<typeof toast.success>() },
 }));
@@ -80,9 +87,11 @@ function renderPaywall(userId: string | null = "user-1") {
     </I18nProvider>,
   );
   const restoreButton = buttons.get("<span>Restore purchases</span>");
+
   if (!restoreButton) {
     throw new Error("Restore purchases button was not rendered");
   }
+
   return { onEntitlementChange, onOpenChange, restoreButton };
 }
 

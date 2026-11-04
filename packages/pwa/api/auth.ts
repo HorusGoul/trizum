@@ -101,6 +101,7 @@ export function createAuth(env: ApiEnv, ctx: BackgroundTaskContext, request: Req
             if (!env.REVENUECAT_PROJECT_ID?.trim() || !env.REVENUECAT_SECRET_API_KEY?.trim()) {
               throw new Error("RevenueCat account deletion is not configured.");
             }
+
             await createRevenueCatApiClient({
               secretApiKey: env.REVENUECAT_SECRET_API_KEY,
             }).requestCustomerDeletion({
@@ -176,6 +177,7 @@ function createSocialProviders(env: ApiEnv): NonNullable<BetterAuthOptions["soci
   }
 
   const appleClientId = getAppleClientId(env);
+
   const appleAppBundleIdentifier =
     env.APPLE_APP_BUNDLE_IDENTIFIER ?? AUTH_PROVIDER_CONFIG.apple.appBundleIdentifier;
 
@@ -207,6 +209,7 @@ function getGoogleClientId(env: ApiEnv) {
     env.GOOGLE_ANDROID_CLIENT_ID,
     ...splitList(env.GOOGLE_CLIENT_IDS),
   ].filter((clientId): clientId is string => Boolean(clientId));
+
   const uniqueClientIds = [...new Set(clientIds)];
 
   if (uniqueClientIds.length === 0) {

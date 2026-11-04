@@ -42,6 +42,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
 
   validateSearch: (search): ExpenseSearchParams => {
     const media = search.media;
+
     return {
       media: typeof media === "number" ? media : undefined,
     };
@@ -248,6 +249,7 @@ function useExpense() {
   const [chunk, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
     required: true,
   });
+
   const { removeExpense } = useCurrentParty();
 
   const [expense, _expenseIndex] = findExpenseById(chunk.expenses, expenseId);
@@ -260,6 +262,7 @@ function useExpense() {
     } catch (error) {
       logger.error("Failed to delete expense", { error });
       toast.error(t`Failed to delete expense. Please try again.`);
+
       return;
     }
 

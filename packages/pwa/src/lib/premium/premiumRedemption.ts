@@ -13,9 +13,11 @@ export function detectRedemptionPlatform(
   maxTouchPoints = 0,
 ): RevenueCatPlatform | undefined {
   if (/android/i.test(userAgent)) return "android";
+
   // iPadOS can request desktop sites and identify as a Mac.
   if (/iPad|iPhone|iPod/i.test(userAgent) || (/Macintosh/i.test(userAgent) && maxTouchPoints > 1))
     return "ios";
+
   return undefined;
 }
 
@@ -23,13 +25,16 @@ export function getStoreRedemptionUrl(platform: RevenueCatPlatform, code: string
   const url = new URL(
     platform === "ios" ? "https://apps.apple.com/redeem" : "https://play.google.com/redeem",
   );
+
   if (platform === "ios") {
     url.searchParams.set("ctx", "offercodes");
     url.searchParams.set("id", APPLE_APP_ID);
   }
+
   if (code.trim()) {
     url.searchParams.set("code", code.trim());
   }
+
   return url.toString();
 }
 
@@ -44,6 +49,7 @@ export function rememberPremiumRedemption(userId: string) {
 export function hasPendingPremiumRedemption(userId: string) {
   try {
     const value = JSON.parse(localStorage.getItem(PENDING_REDEMPTION_KEY) ?? "null");
+
     return (
       value?.userId === userId &&
       typeof value.expiresAt === "number" &&

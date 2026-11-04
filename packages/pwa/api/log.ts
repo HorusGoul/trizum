@@ -17,15 +17,19 @@ export function createBetterAuthLogger() {
       switch (level) {
         case "debug":
           authLogger.debug(message, context);
+
           return;
         case "error":
           authLogger.error(message, context);
+
           return;
         case "warn":
           authLogger.warning(message, context);
+
           return;
         case "info":
           authLogger.info(message, context);
+
           return;
       }
     },

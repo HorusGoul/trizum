@@ -11,6 +11,7 @@ const revenueCat = vi.hoisted(() => ({
   purchasePackage:
     vi.fn<(options: { aPackage: PurchasesPackage }) => Promise<{ customerInfo: CustomerInfo }>>(),
 }));
+
 const identity = vi.hoisted(() => ({
   synchronizeUser: vi.fn<(userId: string) => Promise<void>>(),
 }));
@@ -73,8 +74,10 @@ async function waitForOfferingRequest(count: number) {
     if (revenueCat.getOfferings.mock.calls.length >= count) {
       return;
     }
+
     await Promise.resolve();
   }
+
   throw new Error(`RevenueCat offering request ${count} did not start.`);
 }
 
@@ -97,8 +100,10 @@ function createPackage(identifier: string, priceString: string) {
 
 function createDeferred<T>() {
   let resolve: (value: T) => void = () => undefined;
+
   const promise = new Promise<T>((resolvePromise) => {
     resolve = resolvePromise;
   });
+
   return { promise, resolve };
 }

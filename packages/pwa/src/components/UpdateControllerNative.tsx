@@ -17,11 +17,13 @@ async function checkForNativeUpdate(setIsUpdateAvailable: SetUpdateAvailable) {
 async function performNativeUpdateAndRefresh(setIsUpdateAvailable: SetUpdateAvailable) {
   const result = await performNativeAppUpdate();
   await checkForNativeUpdate(setIsUpdateAvailable);
+
   return result;
 }
 
 async function resumeNativeUpdateAndRefresh(setIsUpdateAvailable: SetUpdateAvailable) {
   const result = await resumeNativeAppUpdate();
+
   if (result.status === "started") {
     await checkForNativeUpdate(setIsUpdateAvailable);
   }
@@ -33,6 +35,7 @@ export function UpdateControllerNative({ children }: { children: React.ReactNode
 
   function update() {
     setIsUpdating(true);
+
     return performNativeUpdateAndRefresh(setIsUpdateAvailable).finally(() => {
       setIsUpdating(false);
     });
@@ -46,6 +49,7 @@ export function UpdateControllerNative({ children }: { children: React.ReactNode
   // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Cleanup awaits and removes the promised Capacitor listener; follow-up: https://github.com/HorusGoul/trizum/issues/508
   useEffect(() => {
     void resumeNativeUpdateAndRefresh(setIsUpdateAvailable);
+
     const listener = App.addListener("appStateChange", ({ isActive }) => {
       if (isActive) {
         void resumeNativeUpdateAndRefresh(setIsUpdateAvailable);

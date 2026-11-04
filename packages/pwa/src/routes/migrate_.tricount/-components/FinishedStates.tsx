@@ -31,6 +31,7 @@ export function SuccessState({ partyId }: { partyId: Party["id"] }) {
 
 export function ErrorState({ message }: { message: string }) {
   const navigate = useNavigate();
+
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="w-full max-w-sm p-4 text-center">

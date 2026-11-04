@@ -8,13 +8,17 @@ import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 import { QRCodeScanner, type ScanResult } from "./QRCodeScanner.tsx";
 
 const detect = vi.hoisted(() => vi.fn<() => Promise<{ rawValue: string }[]>>());
+
 vi.mock("#src/lib/qr.js", () => ({
   BarcodeDetector: class {
     detect = detect;
   },
 }));
+
 vi.mock("#src/ui/Icon.js", () => ({ Icon: () => null }));
+
 vi.mock("./TrizumSpinner.js", () => ({ TrizumSpinner: () => null }));
+
 vi.mock("motion/react", () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => children,
   LazyMotion: ({ children }: { children: ReactNode }) => children,
@@ -34,14 +38,17 @@ const getUserMedia = vi.fn<typeof navigator.mediaDevices.getUserMedia>();
 
 function stream() {
   const stop = vi.fn<() => void>();
+
   return { media: { getTracks: () => [{ stop }] } as unknown as MediaStream, stop };
 }
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
+
   const promise = new Promise<T>((resolvePromise) => {
     resolve = resolvePromise;
   });
+
   return { promise, resolve };
 }
 

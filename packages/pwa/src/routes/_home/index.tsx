@@ -15,10 +15,12 @@ export const Route = createFileRoute("/_home/")({
     // An explicit Premium return takes priority over the launch shortcut.
     if (search.premium) {
       hasRedirectedThisSession = true;
+
       return;
     }
 
     const partyListId = localStorage.getItem("partyListId");
+
     if (!partyListId || !isValidDocumentId(partyListId)) {
       return;
     }

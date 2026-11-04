@@ -150,6 +150,7 @@ describe("Renovate PR review workflow", () => {
       },
       usageMatches: [],
     } satisfies PullRequestContext;
+
     const report = [
       "### Summary",
       "The catalog and lockfile update is coherent, but tracked Capacitor native files still reference removed pnpm package paths.",
@@ -157,6 +158,7 @@ describe("Renovate PR review workflow", () => {
       "### Findings",
       "- [blocker] iOS Podfile and Podfile.lock still pin old Capacitor package paths: Refresh iOS with cap sync ios and pod install, then commit Podfile plus Podfile.lock.",
     ].join("\n");
+
     const localValidation = {
       commands: [
         { command: "vp install --frozen-lockfile", exitCode: 0 },
@@ -171,6 +173,7 @@ describe("Renovate PR review workflow", () => {
       output: "",
       passed: false,
     } satisfies LocalValidationResult;
+
     const body = renderSupersedingPullRequestBody(
       context,
       report,

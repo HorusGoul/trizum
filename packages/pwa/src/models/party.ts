@@ -22,7 +22,9 @@ export interface Party {
 }
 
 export type BoostId = string;
+
 export type ParticipantId = PartyParticipant["id"];
+
 export type PartyBoostSnapshot = Record<BoostId, PartyBoost>;
 
 export interface PartyBoost {

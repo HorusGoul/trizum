@@ -15,6 +15,7 @@ import { cancelIdleCallback, requestIdleCallback } from "#src/lib/requestIdleCal
 const refreshThreshold = 72;
 const maxPullDistance = 96;
 const refreshingIndicatorHeight = 64;
+
 const indicatorSpring = {
   type: "spring",
   stiffness: 420,
@@ -38,15 +39,19 @@ export function PullToRefresh({
   const finishRefreshFrameRef = useRef<number | null>(null);
   const isRefreshingRef = useRef(false);
   const pullDistance = useMotionValue(0);
+
   const indicatorScale = useTransform(pullDistance, [0, refreshThreshold], [0.85, 1], {
     clamp: true,
   });
+
   const indicatorOpacity = useTransform(pullDistance, [0, 1], [0, 1], {
     clamp: true,
   });
+
   const iconRotate = useTransform(pullDistance, [0, refreshThreshold], [0, 180], {
     clamp: true,
   });
+
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
@@ -65,6 +70,7 @@ export function PullToRefresh({
 
   function animatePullDistance(value: number, onComplete?: () => void) {
     stopPullAnimation();
+
     const animation = animate(pullDistance, value, {
       ...indicatorSpring,
       onComplete: () => {
@@ -152,17 +158,20 @@ export function PullToRefresh({
     if (Math.abs(xDistance) > Math.abs(yDistance)) {
       touchStartRef.current = null;
       animatePullDistance(0);
+
       return;
     }
 
     if (yDistance <= 0) {
       setPullDistance(0);
+
       return;
     }
 
     if (!isScrolledToTop()) {
       touchStartRef.current = null;
       setPullDistance(0);
+
       return;
     }
 
@@ -180,6 +189,7 @@ export function PullToRefresh({
 
     if (shouldRefresh) {
       void refresh().catch(() => undefined);
+
       return;
     }
 

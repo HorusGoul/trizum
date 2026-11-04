@@ -6,6 +6,7 @@ const accepted = { object: "customer", id: customer.customerId, deleted_at: 123 
 
 function setup(status: number, body: unknown) {
   const fetcher = vi.fn<typeof fetch>().mockResolvedValue(Response.json(body, { status }));
+
   return { fetcher, client: createRevenueCatApiClient({ fetcher, secretApiKey: "test-secret" }) };
 }
 
@@ -41,6 +42,7 @@ describe("RevenueCat customer deletion", () => {
       doc_url: "https://errors.rev.cat/resource-missing",
       param,
     };
+
     const { client, fetcher } = setup(404, missing);
     fetcher
       .mockResolvedValueOnce(Response.json(missing, { status: 404 }))
@@ -55,6 +57,7 @@ describe("RevenueCat customer deletion", () => {
       ["https://api.revenuecat.com/v2/projects/project%2Fid/customers/user%2Fwith%20space", "GET"],
       ["https://api.revenuecat.com/v2/projects/project%2Fid/customers?limit=1", "GET"],
     ]);
+
     for (const [, init] of fetcher.mock.calls) {
       expect(init?.signal).toBe(fetcher.mock.calls[0]?.[1]?.signal);
       expect(init?.headers).toEqual({

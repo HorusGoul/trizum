@@ -12,7 +12,9 @@ export const STORE_SCREENSHOT_ORDER = [
 ] as const;
 
 export type StoreScreenshotName = (typeof STORE_SCREENSHOT_ORDER)[number];
+
 export type StoreLocale = "en" | "es";
+
 export type StorePlatform = "app-store" | "google-play" | "marketing";
 
 export const STORE_COLOR_SYSTEM = {
@@ -233,6 +235,7 @@ export async function composeStoreScreenshot({
     getStoreFontFaces(),
     readFile(rawScreenshotPath),
   ]);
+
   const copy = scene.copy[locale];
   const isTablet = width / height > 0.6;
   const isGooglePlay = platform === "google-play";
@@ -242,6 +245,7 @@ export async function composeStoreScreenshot({
   const deviceTop = isTablet ? 650 : isGooglePlay ? 500 : 690;
   const frameRadius = isTablet ? 68 : isGooglePlay ? 58 : 74;
   const framePadding = isTablet ? 22 : 18;
+
   const texture = encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".72" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#n)" opacity=".22"/></svg>`,
   );

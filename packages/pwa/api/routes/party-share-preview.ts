@@ -41,12 +41,15 @@ const PARTY_SHARE_IMAGE_BRAND_MARK_SIZE = 72;
 const TITLE_TAG_PATTERN = /<title\b[^>]*>[\s\S]*?<\/title>/i;
 const PARTY_SHARE_LOCALE_PARAM = "lang";
 const PARTY_SHARE_HTML_VARY_HEADERS = ["Accept", "Accept-Language", "User-Agent"] as const;
+
 const INTER_FONT_FACES = [
   { path: interRegularFontUrl, weight: 400 },
   { path: interBoldFontUrl, weight: 700 },
   { path: interExtraBoldFontUrl, weight: 800 },
 ] as const;
+
 const TRIZUM_MARK_PATH = "/maskable.svg";
+
 const PARTY_SHARE_IMAGE_STYLES = {
   canvas:
     "display: flex; flex-direction: column; width: 1200px; height: 630px; padding: 0 88px; font-family: Inter, sans-serif; color: #FFFFFF; background: linear-gradient(180deg, #050505 0%, #000000 100%);",
@@ -154,9 +157,11 @@ export const partySharePreviewRoute = createPartySharePreviewRoute();
 
 export function createPartySharePreviewRoute(options: PartySharePreviewRouteOptions = {}) {
   const route = new Hono<ApiHonoEnv>();
+
   const documentsMiddleware = createAutomergeDocumentsMiddleware(
     (env) => env.PARTY_SHARE_PREVIEW_TIMEOUT_MS,
   );
+
   route.use("/party/:partyId", documentsMiddleware);
   route.use("/api/og/party/:partyId", documentsMiddleware);
   const loadPreview = options.loadPreview ?? getPartySharePreview;
@@ -180,6 +185,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const html = await assetResponse.text();
     const i18n = c.get("i18n");
     const locale = c.get("locale");
+
     const preview = await loadPreview(partyId, {
       documents: c.get("documents"),
       env: c.env,
@@ -187,6 +193,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
       locale,
       request,
     });
+
     const headTags = renderPartyShareHeadTags({
       i18n,
       locale,
@@ -208,6 +215,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
     const partyId = c.req.param("partyId");
     const i18n = c.get("i18n");
     const locale = c.get("locale");
+
     const preview = await loadPreview(partyId, {
       documents: c.get("documents"),
       env: c.env,
@@ -215,6 +223,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
       locale,
       request: c.req.raw,
     });
+
     const trizumMarkUrl = await loadTrizumMarkDataUrl(c.env, c.req.raw).catch((error) => {
       logger.warning("Could not load trizum mark for party share preview: {errorMessage}", {
         error,
@@ -223,6 +232,7 @@ export function createPartySharePreviewRoute(options: PartySharePreviewRouteOpti
 
       return getPublicAssetUrl(c.req.raw, TRIZUM_MARK_PATH);
     });
+
     const html = renderPartyShareImageHtml(preview, {
       i18n,
       trizumMarkUrl,
@@ -397,6 +407,7 @@ export function renderPartyShareImageHtml(
   const i18n = options.i18n ?? createApiI18n(DEFAULT_LOCALE);
   const trizumMarkUrl = options.trizumMarkUrl ?? TRIZUM_MARK_PATH;
   const title = formatImageTitle(preview.name, i18n);
+
   const descriptionLines = wrapTextForLines(
     preview.description || i18n._(partyShareImageFallbackDescriptionMessage),
     PARTY_SHARE_IMAGE_DESCRIPTION_MAX_WIDTH,
@@ -478,9 +489,11 @@ async function getPartySharePreview(partyId: string, context: PartySharePreviewL
         error,
         errorMessage: getErrorMessage(error),
       });
+
       return createFallbackPartySharePreview(i18n);
     },
   );
+
   const ttl = preview.isFallback ? PREVIEW_CACHE_FALLBACK_TTL_MS : PREVIEW_CACHE_SUCCESS_TTL_MS;
 
   previewCache.set(cacheKey, {
@@ -501,9 +514,11 @@ async function loadPartySharePreviewFromAutomerge(
   }
 
   const party = await documents.read<PartyPreviewDocument>(partyId as DocumentId);
+
   if (!party || party.type !== "party") {
     return createFallbackPartySharePreview(i18n);
   }
+
   return createPartySharePreviewFromParty(party, i18n);
 }
 
@@ -548,6 +563,7 @@ function renderDescriptionLines(lines: string[]) {
 
 function formatImageTitle(value: string, i18n: I18n) {
   const text = normalizePreviewText(value) || i18n._(partyShareFallbackNameMessage);
+
   const fontSize = getFittingFontSize(
     text,
     PARTY_SHARE_IMAGE_TITLE_MAX_WIDTH,
@@ -601,6 +617,7 @@ function wrapTextForLines(
     normalizePreviewText(value),
     options.maxLength ?? Number.POSITIVE_INFINITY,
   );
+
   const maxUnitsPerLine = maxWidth / fontSize;
   const lines: string[] = [];
   let remainingText = text;
@@ -784,6 +801,7 @@ function withPartyShareHtmlVaryHeaders(headers: Headers) {
 
 function withVaryHeader(headers: Headers, value: string) {
   const nextHeaders = new Headers(headers);
+
   const existingValues = nextHeaders
     .get("Vary")
     ?.split(",")

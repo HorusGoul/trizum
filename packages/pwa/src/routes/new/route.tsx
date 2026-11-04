@@ -53,10 +53,12 @@ function New() {
           id: next.id,
           name: next.name,
         };
+
         return result;
       }, {}),
       chunkRefs: [],
     });
+
     handle.change((doc) => (doc.id = handle.documentId));
     trackEvent("party_created");
     void navigate({

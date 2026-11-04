@@ -78,6 +78,7 @@ function RouteComponent() {
 
     void expensePromise.then((expense) => {
       trackEvent("settlement_recorded");
+
       return navigate({
         to: "/party/$partyId/expense/$expenseId",
         params: {

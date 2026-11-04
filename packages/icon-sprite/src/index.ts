@@ -91,6 +91,7 @@ export function generateIconSpriteArtifacts(
   fs.mkdirSync(path.dirname(spriteFile), { recursive: true });
 
   const nextTypesSource = createTypesSource(availableIds);
+
   const nextSpriteSource = createSpriteSource(
     usedIds.map((id) => {
       const entry = spriteById.get(id);
@@ -272,6 +273,7 @@ function createSpriteSource(symbols: readonly string[]) {
 
 function createSymbolSource(id: string, filePath: string) {
   const source = fs.readFileSync(filePath, "utf8");
+
   const optimized = optimize(source, {
     multipass: true,
     plugins: [
@@ -331,6 +333,7 @@ function createSymbolSource(id: string, filePath: string) {
   const renderedAttributes = Array.from(symbolAttributes.entries())
     .map(([name, value]) => `${name}="${escapeAttribute(value)}"`)
     .join(" ");
+
   const trailingAttributes = renderedAttributes ? ` ${renderedAttributes}` : "";
 
   return `  <symbol id="${escapeAttribute(id)}" viewBox="${escapeAttribute(viewBox)}"${trailingAttributes}>${innerContent}</symbol>`;

@@ -14,6 +14,7 @@ export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
 
   async load(key: StorageKey): Promise<Uint8Array | undefined> {
     const dbKey = storageKeyToDbKey(key);
+
     const result = await this.db.query.automergeKV.findFirst({
       where: (table, { eq }) => eq(table.key, dbKey),
     });
@@ -51,6 +52,7 @@ export class DrizzleSqliteStorageAdapter implements StorageAdapterInterface {
 
   async loadRange(keyPrefix: StorageKey): Promise<Chunk[]> {
     const dbKey = storageKeyToDbKey(keyPrefix);
+
     const result = await this.db.query.automergeKV.findMany({
       where: (table) => sql`${table.key} GLOB ${`${dbKey}*`}`,
     });
@@ -77,6 +79,7 @@ function dbKeyToStorageKey(key: string): StorageKey {
 }
 
 export type AutomergeDocumentChunkType = "snapshot" | "incremental" | "sync-state";
+
 export type AutomergeDocumentKey = [string, AutomergeDocumentChunkType, string];
 
 const AutomergeDocumentKeySchema = z.tuple([

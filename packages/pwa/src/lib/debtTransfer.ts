@@ -89,6 +89,7 @@ export function getDebtTransferParticipantMatch({
   }
 
   const normalizedSourceTokens = tokenizeParticipantName(normalizedSourceName);
+
   const participantsWithMatchScore = participants.map((participant) => {
     const normalizedParticipantName = normalizeParticipantName(participant.name);
 
@@ -148,9 +149,11 @@ function getParticipantMatchScore({
   }
 
   const participantTokens = new Set(tokenizeParticipantName(normalizedParticipantName));
+
   const sharedTokens = normalizedSourceTokens.filter((token) =>
     participantTokens.has(token),
   ).length;
+
   const hasContainedName =
     normalizedParticipantName.includes(normalizedSourceName) ||
     normalizedSourceName.includes(normalizedParticipantName);

@@ -27,18 +27,22 @@ function createHarness({
   platform?: "android" | "ios";
 } = {}) {
   let now = 10_000;
+
   let stored: AdHistory | undefined = firstUseCompleted
     ? { version: 1, firstUseCompleted: true }
     : undefined;
+
   let fullScreenEvent:
     | ((format: AdFormat, event: FullScreenAdEvent, errorCode?: number) => void)
     | undefined;
+
   const historyStore: AdHistoryStore = {
     read: () => stored,
     write: (history) => {
       stored = structuredClone(history);
     },
   };
+
   const sdk: AdMobSdk = {
     requestConsentInfo: vi.fn<AdMobSdk["requestConsentInfo"]>(async () => consentReady),
     showConsentForm: vi.fn<AdMobSdk["showConsentForm"]>(async () => consentReady),
@@ -57,16 +61,20 @@ function createHarness({
     isAppOpenLoaded: vi.fn<AdMobSdk["isAppOpenLoaded"]>(async () => true),
     removeListeners: vi.fn<AdMobSdk["removeListeners"]>(async () => undefined),
   };
+
   const createSdk = vi.fn<
     (
       listener: (format: AdFormat, event: FullScreenAdEvent, errorCode?: number) => void,
     ) => Promise<AdMobSdk>
   >(async (listener: (format: AdFormat, event: FullScreenAdEvent, errorCode?: number) => void) => {
     fullScreenEvent = listener;
+
     return sdk;
   });
+
   const reportDiagnostic = vi.fn<(diagnostic: AdDiagnostic) => void>();
   const onStateChange = vi.fn<(state: AdvertisingState) => void>();
+
   const coordinator = new AdvertisingCoordinator({
     platform,
     adUnitIds: { appOpen: "app-open", interstitial: "interstitial" },
@@ -206,6 +214,7 @@ describe("AdvertisingCoordinator", () => {
       firstUseCompleted: false,
       bypassFirstUseSession: true,
     });
+
     const consentRequired = {
       ...consentReady,
       status: AdmobConsentStatus.REQUIRED,
@@ -213,6 +222,7 @@ describe("AdvertisingCoordinator", () => {
       privacyOptionsRequirementStatus:
         "REQUIRED" as AdmobConsentInfo["privacyOptionsRequirementStatus"],
     } satisfies AdmobConsentInfo;
+
     vi.mocked(harness.sdk.requestConsentInfo).mockResolvedValue(consentRequired);
     vi.mocked(harness.sdk.showConsentForm).mockResolvedValue(consentRequired);
 
@@ -292,8 +302,10 @@ describe("AdvertisingCoordinator", () => {
 
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
+
   const promise = new Promise<T>((promiseResolve) => {
     resolve = promiseResolve;
   });
+
   return { promise, resolve };
 }

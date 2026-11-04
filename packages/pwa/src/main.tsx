@@ -109,6 +109,7 @@ declare module "@tanstack/react-router" {
 }
 
 type Routes = NonNullable<ToOptions["to"]>;
+
 type Href = {
   [To in Routes]: ToOptions<RegisteredRouter, string, To>;
 }[Routes];
@@ -155,6 +156,7 @@ const repo = new Repo({
   storage: new IndexedDBStorageAdapter("trizum"),
   network: [isOfflineOnly ? null : new BrowserWebSocketClientAdapter(WSS_URL)].filter(isNonNull),
 });
+
 const deferredPartyListImports = new Map<DocumentId, Uint8Array>();
 
 void initializeAppWorker({
@@ -190,6 +192,7 @@ window.__internal_createPartyFromMigrationData = async (data: MigrationData) => 
   });
 
   await repo.flush();
+
   return partyId;
 };
 
@@ -204,6 +207,7 @@ window.__internal_createDeferredPartyListState = async (seed: InternalPartyListS
   }
 
   deferredPartyListImports.set(result.partyListId, binary);
+
   return result;
 };
 
@@ -246,6 +250,7 @@ window.__internal_recalculatePartyBalances = async (partyId: Party["id"]) => {
 
 // Create a new router instance
 const history = preventDuplicateHistoryEntries(createBrowserHistory());
+
 const router = createRouter({
   parseSearch: parseAppSearch,
   stringifySearch: stringifyAppSearch,
@@ -257,6 +262,7 @@ const router = createRouter({
 });
 
 initializeAnalytics(Object.values(router.routesById).map((route) => route.fullPath));
+
 router.subscribe("onResolved", () => trackPage(router.state.location.pathname));
 
 router.subscribe("onBeforeNavigate", (event) => {
@@ -327,6 +333,7 @@ if (Capacitor.isNativePlatform()) {
 
 // Render the app
 const rootElement = document.getElementById("root")!;
+
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
@@ -349,6 +356,7 @@ if (!rootElement.innerHTML) {
 
 function AriaProviders({ children }: { children: React.ReactNode }) {
   const { i18n } = useLingui();
+
   return <AriaI18nProvider locale={i18n.locale}>{children}</AriaI18nProvider>;
 }
 

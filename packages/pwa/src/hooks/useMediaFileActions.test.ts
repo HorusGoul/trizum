@@ -46,6 +46,7 @@ function assertNoUndefinedValues(value: unknown, path: string) {
 
 function createMockRepo() {
   let nextId = 0;
+
   let lastCreatedHandle:
     | {
         doc: MediaFile;
@@ -68,6 +69,7 @@ function createMockRepo() {
             changeFn(handle.doc);
           },
         };
+
         lastCreatedHandle = handle as unknown as typeof lastCreatedHandle;
 
         return handle;
@@ -158,6 +160,7 @@ describe("getMediaFileHelpers", () => {
       originalMimeType: "image/heic",
       convertedFromHeic: true,
     };
+
     processImageMock.mockResolvedValue(processedImage);
 
     const { repo, getLastCreatedHandle } = createMockRepo();
@@ -197,6 +200,7 @@ describe("getMediaFileHelpers", () => {
       originalMimeType: undefined,
       convertedFromHeic: true,
     };
+
     processImageMock.mockResolvedValue(processedImage);
 
     const { repo, getLastCreatedHandle } = createMockRepo();

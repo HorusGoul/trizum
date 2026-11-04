@@ -24,6 +24,7 @@ const envSchema = z.object({
     .default("3000")
     .refine((port) => {
       const num = parseInt(port);
+
       return !isNaN(num) && num > 0 && num < 65536;
     }, "PORT must be a valid port number"),
   NODE_ENV: z.enum(["development", "production"]).default("development"),

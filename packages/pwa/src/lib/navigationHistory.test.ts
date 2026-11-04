@@ -67,6 +67,7 @@ describe("navigationHistory", () => {
     const location = { href: "/settings" };
     const push = vi.fn<(href: string, state?: unknown, navigateOptions?: unknown) => void>();
     const replace = vi.fn<(href: string, state?: unknown, navigateOptions?: unknown) => void>();
+
     const history = {
       get location() {
         return location;

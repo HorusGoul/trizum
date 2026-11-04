@@ -1,8 +1,10 @@
 /** Only trusted, build-time route templates may supply text to analytics URLs. */
 export function redactPathname(pathname: string, routes: readonly string[]): string {
   const parts = pathname.split(/[?#]/, 1)[0].replace(/\/$/, "").split("/");
+
   for (const route of routes) {
     const template = route.replace(/\/$/, "").split("/");
+
     if (
       parts.length === template.length &&
       template.every((part, index) =>
@@ -12,6 +14,7 @@ export function redactPathname(pathname: string, routes: readonly string[]): str
       return template.map((part) => (part.startsWith("$") ? ":redacted" : part)).join("/") || "/";
     }
   }
+
   return "/:unknown";
 }
 
@@ -20,8 +23,10 @@ export function hasPrivacySignal(navigator: {
   globalPrivacyControl?: boolean;
 }): boolean {
   const dnt = navigator.doNotTrack?.trim().toLowerCase();
+
   return navigator.globalPrivacyControl === true || dnt === "1" || dnt === "yes";
 }
+
 /** Random UUID v4 only: never accept a document ID or arbitrary identity string. */
 export function isTelemetryId(value: unknown): value is string {
   return (

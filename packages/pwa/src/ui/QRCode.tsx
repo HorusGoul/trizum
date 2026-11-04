@@ -62,6 +62,7 @@ export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) 
 
   useEffect(() => {
     const element = ref.current;
+
     if (!element) return;
 
     const qrCode = new QRCodeStyling({
@@ -80,6 +81,7 @@ export const QRCode = ({ size = "md", value, options, className }: QRCodeProps) 
       if (qrCodeRef.current === qrCode) {
         qrCodeRef.current = null;
       }
+
       element.replaceChildren();
     };
   }, [options, size, value]);

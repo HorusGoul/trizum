@@ -22,9 +22,13 @@ interface TricountMembershipReference {
 }
 
 type TricountRegistry = TricountResponse["Response"][number]["Registry"];
+
 type TricountRegistryMembership = TricountRegistry["memberships"][number];
+
 type TricountRegistryEntry = TricountRegistry["all_registry_entry"][number];
+
 type TricountEntry = TricountRegistryEntry["RegistryEntry"];
+
 type TricountAllocation = TricountRegistryEntry["RegistryEntry"]["allocations"][number];
 
 interface RatioAllocationSortMetadata {
@@ -96,9 +100,11 @@ export function parseTricountData(data: TricountResponse): MigrationData {
   // Extract all photos from transactions
   for (const entry of registryEntries) {
     const transaction = entry.RegistryEntry;
+
     for (const attachment of transaction.attachment) {
       if (attachment.urls && attachment.urls.length > 0) {
         const url = attachment.urls[0].url;
+
         if (!photoMap.has(url)) {
           const tempId = `TCA_${photoMap.size + 1}`;
           photoMap.set(url, tempId);
@@ -142,6 +148,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
     const totalAmountInCents = parseAmountInCents(transaction.amount.value);
     const paidByMember = transaction.membership_owned.RegistryMembershipNonUser;
     const paidByName = paidByMember.alias.display_name;
+
     const paidById = getParticipantId(
       paidByMember,
       participantIdByMembershipId,
@@ -170,6 +177,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
       .sort(createAllocationComparator(transaction))) {
       const participantMember = allocation.membership.RegistryMembershipNonUser;
       const participantName = participantMember.alias.display_name;
+
       const participantId = getParticipantId(
         participantMember,
         participantIdByMembershipId,
@@ -204,10 +212,12 @@ export function parseTricountData(data: TricountResponse): MigrationData {
 
     // Create photos array for this expense
     const expensePhotos: string[] = [];
+
     for (const attachment of transaction.attachment) {
       if (attachment.urls && attachment.urls.length > 0) {
         const url = attachment.urls[0].url;
         const photoId = photoMap.get(url);
+
         if (photoId) {
           expensePhotos.push(photoId);
         }
@@ -303,6 +313,7 @@ function compareAllocations(
 
       const leftSourceAmount = ratioMetadata.sourceAmountByAllocation.get(left) ?? 0;
       const rightSourceAmount = ratioMetadata.sourceAmountByAllocation.get(right) ?? 0;
+
       const sourceAmountDifference =
         ratioMetadata.roundingError > 0
           ? rightSourceAmount - leftSourceAmount
@@ -327,9 +338,11 @@ function getAllocationTypeSortRank(allocation: TricountAllocation) {
 function getRatioAllocationSortMetadata(transaction: TricountEntry): RatioAllocationSortMetadata {
   const preliminaryAmountByAllocation = new Map<TricountAllocation, number>();
   const sourceAmountByAllocation = new Map<TricountAllocation, number>();
+
   const ratioAllocations = transaction.allocations.filter(
     (allocation) => allocation.type === "RATIO",
   );
+
   const totalRatio = ratioAllocations.reduce(
     (total, allocation) => total + (allocation.share_ratio ?? 1),
     0,
@@ -350,14 +363,17 @@ function getRatioAllocationSortMetadata(transaction: TricountEntry): RatioAlloca
 
     return total + parseAmountInCents(allocation.amount.value);
   }, 0);
+
   const amountLeftForRatioAllocations =
     parseAmountInCents(transaction.amount.value) - exactAmountInCents;
+
   let preliminaryTotal = 0;
 
   for (const allocation of ratioAllocations) {
     const preliminaryAmount = Math.round(
       amountLeftForRatioAllocations * ((allocation.share_ratio ?? 1) / totalRatio),
     );
+
     preliminaryAmountByAllocation.set(allocation, preliminaryAmount);
     sourceAmountByAllocation.set(allocation, parseAmountInCents(allocation.amount.value));
     preliminaryTotal += preliminaryAmount;
@@ -398,6 +414,7 @@ function compareRegistryEntries(left: TricountRegistryEntry, right: TricountRegi
 
 function getDateTimestamp(date: string) {
   const timestamp = Date.parse(date);
+
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 

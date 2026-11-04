@@ -27,21 +27,25 @@ export class PremiumSignInRequiredError extends Error {
 
 export async function synchronizeRevenueCatUser(userId: string) {
   const customerInfo = await prepareRevenueCatUser(userId);
+
   return customerInfo ?? refreshRevenueCatCustomerInfo();
 }
 
 export async function prepareRevenueCatUser(userId: string) {
   identityOperation = identityOperation.catch(() => undefined).then(() => identifyUser(userId));
+
   return identityOperation;
 }
 
 export async function clearRevenueCatUser() {
   identityOperation = identityOperation.catch(() => undefined).then(logOutIdentifiedUser);
+
   return identityOperation;
 }
 
 export async function addRevenueCatCustomerInfoListener(listener: CustomerInfoListener) {
   const { Purchases } = await import("@revenuecat/purchases-capacitor");
+
   return Purchases.addCustomerInfoUpdateListener(listener);
 }
 
@@ -65,6 +69,7 @@ export async function refreshRevenueCatCustomerInfo() {
   const userId = identifiedUserId;
   const pendingRedemption = userId && hasPendingPremiumRedemption(userId);
   let redemptionSynced = false;
+
   if (pendingRedemption) {
     try {
       await Purchases.syncPurchases();
@@ -75,15 +80,19 @@ export async function refreshRevenueCatCustomerInfo() {
       logger.warning("Could not sync pending code redemption");
     }
   }
+
   const { customerInfo } = await Purchases.getCustomerInfo();
+
   if (userId && redemptionSynced && getPremiumAccess(customerInfo).isPremium) {
     finishPremiumRedemption(userId);
   }
+
   return customerInfo;
 }
 
 async function identifyUser(userId: string) {
   const platform = getRevenueCatPlatform();
+
   if (!platform) {
     return;
   }
@@ -112,6 +121,7 @@ async function identifyUser(userId: string) {
 
   const { customerInfo } = await Purchases.logIn({ appUserID: userId });
   identifiedUserId = userId;
+
   return customerInfo;
 }
 
@@ -123,6 +133,7 @@ async function logOutIdentifiedUser() {
   const { Purchases } = await import("@revenuecat/purchases-capacitor");
   const { customerInfo } = await Purchases.logOut();
   identifiedUserId = null;
+
   return customerInfo;
 }
 
@@ -130,12 +141,16 @@ export async function openPremiumCodeRedemption(userId: string | null, code: str
   if (!userId) {
     throw new PremiumSignInRequiredError();
   }
+
   const platform = getRevenueCatPlatform();
+
   if (!platform) {
     throw new Error("Code redemption requires a native store.");
   }
+
   await prepareRevenueCatUser(userId);
   rememberPremiumRedemption(userId);
+
   if (platform === "ios" && !code.trim()) {
     const { Purchases } = await import("@revenuecat/purchases-capacitor");
     await Purchases.presentCodeRedemptionSheet();

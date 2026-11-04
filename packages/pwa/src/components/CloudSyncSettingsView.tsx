@@ -244,11 +244,13 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
   const { auth, error: authCallbackError, returnTo } = search;
   const session = useAppSession();
   const sessionUser = session.data?.user;
+
   const [routeState, dispatchRouteState] = useReducer(
     cloudSyncRouteReducer,
     { auth, error: authCallbackError },
     createInitialCloudSyncRouteState,
   );
+
   const {
     optimisticAuthUser,
     authEmail,
@@ -271,19 +273,25 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     deleteAccountError,
     isDeleteAccountPending,
   } = routeState;
+
   const user = sessionUser ?? optimisticAuthUser;
   const userId = user?.id;
+
   const isSignInSuccessVisible =
     userId || auth === "success" ? routeState.isSignInSuccessVisible || auth === "success" : false;
+
   const isSignInSuccessVisibleRef = useRef(isSignInSuccessVisible);
   const isAuthPending = authPendingAction !== null;
+
   const signInFormMode = isPasswordResetMode
     ? "password-reset"
     : isPasswordLoginMode
       ? "password"
       : "magic-link";
+
   const canDeleteAccount =
     deleteAccountConfirmation.trim().toLowerCase() === DELETE_ACCOUNT_CONFIRMATION_TEXT;
+
   const {
     activateCloudSyncOnDevice,
     clearCloudSyncState,
@@ -358,6 +366,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
           isPasswordSignInEnabled: true,
         },
       });
+
       return;
     }
 
@@ -617,11 +626,13 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
 
     try {
       const result = await authClient.signOut();
+
       if (!result.error) trackEvent("auth_signed_out");
       clearNativeAuthToken();
       clearCloudSyncState();
       await session.refetch();
       toast.success(t`Signed out`);
+
       if (onClose) onClose();
       else void navigate({ href: returnTo ?? "/", replace: true });
     } catch {
@@ -646,15 +657,19 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     switch (action) {
       case "connect-apple":
         await onLinkSocialAccount("apple");
+
         return;
       case "connect-google":
         await onLinkSocialAccount("google");
+
         return;
       case "password-link":
         await onRequestPasswordReset(user.email);
+
         return;
       case "sign-out":
         await onSignOut();
+
         return;
     }
   }
@@ -681,10 +696,12 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     try {
       await deleteAuthUserAccount();
       trackEvent("auth_account_deleted");
+
       if (userId) {
         clearCachedCloudUserSettings(userId);
         clearCachedCloudAccountState(userId);
       }
+
       clearCloudSyncState();
       dispatchRouteState({
         type: "patch",
@@ -727,8 +744,10 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     window.setTimeout(() => {
       if (onClose) {
         onClose();
+
         return;
       }
+
       closeRouteState(currentLocation, router.history, () => {
         void navigate({ to: "/", replace: true });
       });
@@ -753,6 +772,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
   }
 
   const sessionStatus = getAuthSessionStatus(session);
+
   if (!optimisticAuthUser && (sessionStatus === "pending" || sessionStatus === "unavailable")) {
     const accountStatus = (
       <div className="container flex flex-col gap-4 p-4">
@@ -775,6 +795,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
         ) : null}
       </div>
     );
+
     if (onClose) {
       return (
         <CloudSyncSignInDialog isOpen onOpenChange={onClose} showHeader={false}>
@@ -782,6 +803,7 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
         </CloudSyncSignInDialog>
       );
     }
+
     return (
       <div className="bg-accent-50 dark:bg-accent-950 fixed inset-0 z-40 flex min-h-full flex-col overflow-y-auto">
         <div className="mt-safe container flex h-16 items-center px-2">

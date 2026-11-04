@@ -4,6 +4,7 @@ import { Icon, type IconProps } from "./Icon";
 import { useActionProp, type AsyncAction } from "./useActionProp";
 
 type IconButtonColorScheme = "transparent" | "accent" | "input-like";
+
 type IconButtonPressArgs = Parameters<NonNullable<ButtonProps["onPress"]>>;
 
 const colorSchemes: Record<
@@ -47,10 +48,12 @@ export function IconButton({
   pressAction?: AsyncAction<IconButtonPressArgs>;
 }) {
   const colorStyles = colorSchemes[color];
+
   const [isActionPending, onPressWithAction] = useActionProp<IconButtonPressArgs>({
     action: pressAction,
     onAction: onPress,
   });
+
   const isButtonPending = isPending || isActionPending;
 
   return (

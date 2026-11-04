@@ -146,6 +146,7 @@ function Home() {
               <section className="flex flex-col gap-3">
                 {activePartyIds.map((partyId) => {
                   const pinned = isPartyPinned(partyList, partyId);
+
                   const actions = createPartyActions({
                     isPinned: pinned,
                     onTogglePinned: () => {

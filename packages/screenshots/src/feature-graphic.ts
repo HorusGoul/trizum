@@ -63,11 +63,13 @@ async function composeFeatureGraphic(
   outputPath: string,
 ): Promise<void> {
   const copy = FEATURE_GRAPHIC_COPY[locale];
+
   const [fontFaces, expenseLog, balances] = await Promise.all([
     getStoreFontFaces(),
     readFile(path.resolve(RAW_SCREENSHOTS_DIR, locale, "android", "expense-log.portrait.png")),
     readFile(path.resolve(RAW_SCREENSHOTS_DIR, locale, "android", "balances.portrait.png")),
   ]);
+
   const texture = encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#n)" opacity=".18"/></svg>`,
   );

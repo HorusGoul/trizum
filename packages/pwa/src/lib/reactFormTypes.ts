@@ -5,6 +5,7 @@ import type {
 } from "@tanstack/react-form";
 
 type AppFormValidate<TFormData> = FormValidateOrFn<TFormData> | undefined;
+
 type AppFormAsyncValidate<TFormData> = FormAsyncValidateOrFn<TFormData> | undefined;
 
 export type AppFormApi<TFormData> = ReactFormExtendedApi<

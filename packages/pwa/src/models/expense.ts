@@ -49,6 +49,7 @@ export interface ExpenseShareDivide {
 export function exportIntoInput(expense: Expense): ExpenseInput[] {
   if (Object.keys(expense.paidBy).length === 0) {
     logger.warning("No one paid for this expense");
+
     return [];
   }
 
@@ -61,6 +62,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
 
     const exacts: Record<ExpenseUser, ExpenseShareExact> = {};
     const divides: Record<ExpenseUser, ExpenseShareDivide> = {};
+
     for (const [participantId, share] of Object.entries(expense.shares)) {
       if (share.type === "exact") {
         exacts[participantId] = share;
@@ -86,6 +88,7 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     if (totalDivides > 0) {
       const totalLeftForDivides = getMoneyAmount(amountLeft);
       const divideUsers = Object.keys(divides);
+
       const divideAmounts = allocateMinorUnitsByNearest(
         totalLeftForDivides,
         divideUsers.map((divide) => divides[divide].value),
@@ -118,6 +121,7 @@ export function decodeExpenseId(expenseId: string): {
   expenseId: string;
 } {
   const [id, chunkId] = expenseId.split(":");
+
   return { chunkId: chunkId as DocumentId, expenseId: id };
 }
 
@@ -135,6 +139,7 @@ export function findExpenseById(
   encodedId: string,
 ): [Expense | undefined, index: number] {
   const { expenseId } = decodeExpenseId(encodedId);
+
   const index = expenses.findIndex(
     (expense) => decodeExpenseId(expense.id).expenseId === expenseId,
   );
@@ -165,23 +170,29 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
     // First, calculate the total amount taken by exact shares using Dinero.js
     const exactTotal = activeParticipants.reduce((total, participantId) => {
       const share = shares[participantId];
+
       if (share?.type === "exact") {
         // Use Math.round to handle any floating point precision issues
         return add(total, createMoney(Math.round(share.value)));
       }
+
       return total;
     }, createMoney(0));
 
     // Remaining amount to be split among divide shares using Dinero.js
     const remainingAmount = subtract(totalAmount, exactTotal);
+
     const divideParticipants = activeParticipants.filter((participantId) => {
       const share = shares[participantId];
+
       return share?.type === "divide";
     });
+
     const divideAmounts = allocateMinorUnitsByNearest(
       getMoneyAmount(remainingAmount),
       divideParticipants.map((participantId) => {
         const share = shares[participantId];
+
         return share?.type === "divide" ? share.value : 0;
       }),
       roundHalfEven,
@@ -201,6 +212,7 @@ export function getExpenseUnitShares({ shares, paidBy }: Pick<Expense, "shares" 
         }
 
         acc[participantId] = participantAmount;
+
         return acc;
       },
       {} as Record<string, number>,
@@ -390,6 +402,7 @@ export function simplifyBalanceTransactions(
     if (debtor.amount === 0) {
       debtorIndex++;
     }
+
     if (creditor.amount === 0) {
       creditorIndex++;
     }
@@ -463,6 +476,7 @@ export function mergeBalancesByParticipant(
   }
 
   const balancesArray = Object.values(merged);
+
   const withVisualRatios =
     balancesArray.length > 0 ? calculateVisualRatioForBalances(balancesArray) : [];
 

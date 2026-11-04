@@ -56,6 +56,7 @@ function broadcastPresenceUpdate({
 }) {
   if (!value) {
     lastSentElementIdRef.current = null;
+
     const payload: ExpensePresenceDeletePayload = {
       type: "expense-presence-delete",
       data: {
@@ -65,10 +66,12 @@ function broadcastPresenceUpdate({
     };
 
     handle.broadcast(payload);
+
     return;
   }
 
   lastSentElementIdRef.current = value.elementId;
+
   const payload: ExpensePresenceUpdatePayload = {
     type: "expense-presence-update",
     data: {
@@ -84,9 +87,11 @@ function broadcastPresenceUpdate({
 
 export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEditorPresenceProps) {
   const { chunkId } = decodeExpenseId(expenseId);
+
   const [, handle] = useSuspenseDocument<PartyExpenseChunk>(chunkId, {
     required: true,
   });
+
   const participant = useCurrentParticipant();
   const overlayRef = useRef<HTMLDivElement>(null);
   const presenceElementIdRef = useRef<string | null>(null);
@@ -155,6 +160,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
         }
       } catch {
         logger.error("Failed to handle ephemeral message", { payload });
+
         return;
       }
     };
@@ -180,6 +186,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
           value: { elementId: presenceElementId },
         });
         presenceElementIdRef.current = presenceElementId;
+
         return;
       }
 
@@ -307,6 +314,7 @@ function Bubble({
 }) {
   const { party } = useCurrentParty();
   const participant = party.participants[presence.participantId];
+
   const [position, setPosition] = useState<{
     top: number;
     left: number;
@@ -333,6 +341,7 @@ function Bubble({
 
       if (!element || !overlayElement) {
         setNextPosition(null);
+
         return;
       }
 
@@ -387,6 +396,7 @@ function AvatarWithAvatarId({
   left: number;
 }) {
   const { url } = useMediaFile(avatarId);
+
   return <AvatarWrapper url={url} name={name} top={top} left={left} />;
 }
 

@@ -1,7 +1,9 @@
 import plugin, { type PluginAPI } from "tailwindcss/plugin";
 
 type UtilityProperties = Record<string, string | string[]>;
+
 type BaseUtilities = Record<`.${string}`, UtilityProperties>;
+
 type DynamicUtilities = Record<string, (value: string) => UtilityProperties>;
 
 const baseUtilities = {

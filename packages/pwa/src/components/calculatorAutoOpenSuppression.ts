@@ -19,6 +19,7 @@ export function isCalculatorAutoOpenSuppressed() {
   }
 
   const now = performance.now();
+
   return now >= allowCalculatorAutoOpenUntil && now < suppressCalculatorAutoOpenUntil;
 }
 

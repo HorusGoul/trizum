@@ -12,6 +12,7 @@ describe("createExternallyManagedCache", () => {
     const cache = createExternallyManagedCache<[string], string>({
       getKey: ([id]) => id,
     });
+
     const subscriber = vi.fn<(data: unknown) => void>();
 
     cache.subscribe(subscriber, "a");
@@ -34,6 +35,7 @@ describe("createExternallyManagedCache", () => {
     const cache = createExternallyManagedCache<[string], string>({
       getKey: ([id]) => id,
     });
+
     const error = new Error("external failure");
 
     const pending = cache.readAsync("a");
@@ -48,6 +50,7 @@ describe("createExternallyManagedCache", () => {
     const cache = createExternallyManagedCache<[string], string>({
       getKey: ([id]) => id,
     });
+
     const error = new Error("external replacement");
 
     cache.cacheValue("old:a", "a");
@@ -66,6 +69,7 @@ describe("createExternallyManagedCache", () => {
     const cache = createExternallyManagedCache<[string], string>({
       getKey: ([id]) => id,
     });
+
     const subscriber = vi.fn<(data: unknown) => void>();
 
     cache.cacheValue("value:a", "a");
@@ -106,6 +110,7 @@ describe("createExternallyManagedCache", () => {
       timeout: 100,
       timeoutMessage: "external timeout",
     });
+
     const pending = cache.readAsync("a");
 
     await vi.advanceTimersByTimeAsync(100);

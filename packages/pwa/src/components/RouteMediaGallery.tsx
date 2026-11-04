@@ -35,6 +35,7 @@ export function RouteMediaGallery({
 
   if (isOpen !== wasOpen) {
     setWasOpen(isOpen);
+
     if (isOpen) {
       setDragProgress(0);
     }
@@ -82,6 +83,7 @@ function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
   const [mediaFile] = useSuspenseDocument<MediaFile>(photoId as MediaFile["id"], {
     required: true,
   });
+
   const [url] = useMediaFileObjectUrls([mediaFile]);
 
   return (

@@ -18,11 +18,13 @@ test.describe("Debt transfer", () => {
     const originPartyPage = new PartyPage(page);
     const destinationPartyPage = new PartyPage(page);
     const transferDebtPage = new TransferDebtPage(page);
+
     const originAction = {
       actionLabel: "Pay" as const,
       fromLabel: `${defaultParticipants.blair.name} (me)`,
       toLabel: defaultParticipants.alex.name,
     };
+
     const destinationAction = {
       actionLabel: "Pay" as const,
       fromLabel: `${debtTransferJourney.destinationMemberParticipant.name} (me)`,
@@ -109,6 +111,7 @@ test.describe("Debt transfer", () => {
   }) => {
     const originPartyPage = new PartyPage(page);
     const transferDebtPage = new TransferDebtPage(page);
+
     const originAction = {
       actionLabel: "Pay" as const,
       fromLabel: `${defaultParticipants.blair.name} (me)`,
@@ -147,6 +150,7 @@ test.describe("Debt transfer", () => {
     page,
   }) => {
     const originPartyPage = new PartyPage(page);
+
     const originAction = {
       actionLabel: "Pay" as const,
       fromLabel: `${defaultParticipants.blair.name} (me)`,

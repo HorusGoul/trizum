@@ -160,25 +160,30 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
   const { party } = useCurrentParty();
   const currentParticipant = useCurrentParticipant();
   const { i18n } = useLingui();
+
   const chunkDocuments = useMultipleSuspenseDocument<PartyExpenseChunk>(
     party.chunkRefs.map((chunkRef) => chunkRef.chunkId),
     { required: true },
   );
+
   const expenses = chunkDocuments.flatMap(({ doc }) => doc.expenses);
   const timezone = getLocalTimeZone();
   const pastYears = getPartyStatsAvailablePastYears({ expenses });
   const [timeframeKey, setTimeframeKey] = useState<PartyStatsTimeframeKey>("all-time");
+
   const [customRange, setCustomRange] = useState<StatsCustomRange>(() =>
     getDefaultCustomRange({
       locale: i18n.locale,
       timezone,
     }),
   );
+
   const allTimeStats = calculatePartyStats({
     expenses,
     participants: party.participants,
     timeframe: "all-time",
   });
+
   const timeframeOptions: StatsTimeframeOption[] = [
     { id: "all-time", label: t`All time` },
     { id: "current-month", label: t`Current month` },
@@ -195,10 +200,13 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
       }),
     },
   ];
+
   const selectedTimeframeKey = timeframeOptions.some((option) => option.id === timeframeKey)
     ? timeframeKey
     : "all-time";
+
   const timeframe = getStatsTimeframe(selectedTimeframeKey, customRange, timezone);
+
   const stats =
     selectedTimeframeKey === "all-time"
       ? allTimeStats
@@ -207,11 +215,13 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
           participants: party.participants,
           timeframe,
         });
+
   const hasAnyTrackedExpense = allTimeStats.totalExpenseCount > 0;
   const leaderboard = stats.ranking;
   const winner = leaderboard[0] ?? null;
   const podium = leaderboard.slice(0, 3);
   const restOfLeaderboard = leaderboard.slice(3);
+
   const firstPlace = winner
     ? {
         avatarId: party.participants[winner.participantId]?.avatarId,
@@ -221,6 +231,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         tier: "first" as const,
       }
     : undefined;
+
   const secondPlace = podium[1]
     ? {
         avatarId: party.participants[podium[1].participantId]?.avatarId,
@@ -230,6 +241,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         tier: "second" as const,
       }
     : undefined;
+
   const thirdPlace = podium[2]
     ? {
         avatarId: party.participants[podium[2].participantId]?.avatarId,
@@ -239,6 +251,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
         tier: "third" as const,
       }
     : undefined;
+
   useScrollRestoration({
     cacheKey: `party-${party.id}-stats`,
     scrollElementRef,
@@ -585,6 +598,7 @@ function StatsPodiumColumnShell({
   const { participant, rank, shareOfTotal } = entry;
   const isCurrentParticipant = participant.participantId === currentParticipantId;
   const nameSizeClassName = getRankingNameClassName(participant.name, "podium");
+
   const amountSizeClassName = getRankingAmountClassName(
     participant.totalSpent,
     rank === 1 ? "winner" : "podium",
@@ -903,6 +917,7 @@ const shortDateFormatter = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
   month: "short",
 });
+
 const shortDateWithYearFormatter = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
   month: "short",
@@ -917,6 +932,7 @@ function formatRangeLabel(range: StatsCustomRange) {
   if (sameYear) {
     const startLabel = shortDateFormatter.format(startDate);
     const endLabel = shortDateWithYearFormatter.format(endDate);
+
     return `${startLabel} - ${endLabel}`;
   }
 

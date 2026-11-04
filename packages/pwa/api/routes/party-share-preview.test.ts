@@ -15,6 +15,7 @@ import {
 } from "./party-share-preview";
 
 type AssetFetch = (request: Request) => Promise<Response>;
+
 type LoadPreview = (
   partyId: string,
   context: PartySharePreviewLoadContext,
@@ -63,11 +64,13 @@ describe("party share preview metadata", () => {
       name: "Lisbon & Porto",
       symbol: "<>",
     });
+
     const tags = renderPartyShareHeadTags({
       partyId: createDocumentId(),
       preview,
       requestUrl: new URL("https://trizum.app/party/example?preview=1"),
     });
+
     const html = injectPartyShareHeadTags("<html><head><title>trizum</title></head></html>", tags);
 
     expect(html).toContain("<title>Join Lisbon &amp; Porto on trizum</title>");
@@ -91,6 +94,7 @@ describe("party share preview metadata", () => {
       description: "Cena compartida",
       name: "Viaje a Lisboa",
     });
+
     const tags = renderPartyShareHeadTags({
       i18n: createApiI18n("es"),
       locale: "es",
@@ -192,6 +196,7 @@ describe("party share preview route", () => {
           },
         }),
     );
+
     const loadPreview = vi.fn<LoadPreview>(async () => createPreview());
     const app = createTestApp(assetFetch, loadPreview);
 
@@ -218,6 +223,7 @@ describe("party share preview route", () => {
     const assetFetch = vi.fn<AssetFetch>(
       async () => new Response("<html><head></head><body>app</body></html>"),
     );
+
     const loadPreview = vi.fn<LoadPreview>(async () =>
       createPreview({
         description: "Weekend costs",
@@ -225,6 +231,7 @@ describe("party share preview route", () => {
         symbol: "C",
       }),
     );
+
     const app = createTestApp(assetFetch, loadPreview);
 
     const response = await app.request(
@@ -237,6 +244,7 @@ describe("party share preview route", () => {
       },
       createEnv(assetFetch),
     );
+
     const html = await response.text();
 
     expect(response.status).toBe(200);
@@ -254,6 +262,7 @@ describe("party share preview route", () => {
     const assetFetch = vi.fn<AssetFetch>(
       async () => new Response("<html><head></head><body>app</body></html>"),
     );
+
     const loadPreview = vi.fn<LoadPreview>(async () =>
       createPreview({
         description: "Costes del fin de semana",
@@ -261,6 +270,7 @@ describe("party share preview route", () => {
         symbol: "C",
       }),
     );
+
     const app = createTestApp(assetFetch, loadPreview);
 
     const response = await app.request(
@@ -273,6 +283,7 @@ describe("party share preview route", () => {
       },
       createEnv(assetFetch),
     );
+
     const html = await response.text();
 
     expect(response.status).toBe(200);
@@ -306,6 +317,7 @@ describe("party share preview route", () => {
       {},
       createEnv(assetFetch),
     );
+
     const html = await response.text();
 
     expect(response.status).toBe(200);

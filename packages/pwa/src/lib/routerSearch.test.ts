@@ -19,11 +19,13 @@ describe("opaque code search values", () => {
     "A+B&CODE",
   ])("preserves %s through route matching and generated URLs", async (code) => {
     const root = createRootRoute();
+
     const redeem = createRoute({
       getParentRoute: () => root,
       path: "/redeem",
       validateSearch: parseRedemptionSearch,
     });
+
     const router = createRouter({
       routeTree: root.addChildren([redeem]),
       history: createMemoryHistory({
@@ -32,6 +34,7 @@ describe("opaque code search values", () => {
       parseSearch: parseAppSearch,
       stringifySearch: stringifyAppSearch,
     });
+
     await router.load();
     expect(router.state.matches.at(-1)?.search).toEqual({ code });
     const generated = router.buildLocation({ to: "/redeem", search: { code } });

@@ -37,6 +37,7 @@ export function getPartyBoostActionState({
 
   if (!status) {
     if (!isSignedIn) return { type: "signed_out" };
+
     return { disabled: isRefreshing, type: "retry" };
   }
 
@@ -61,6 +62,7 @@ export function getPartyBoostActionState({
   // Only first-time native activation needs the SDK fallback.
   const isPremium = status.currentUser.isPremium || (assignment === null && isDevicePremium);
   const isInitialWebActivation = !isNativePlatform && assignment === null;
+
   if (!isPremium && !isInitialWebActivation) {
     return { type: "upgrade" };
   }

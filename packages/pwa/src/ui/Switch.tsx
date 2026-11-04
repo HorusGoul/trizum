@@ -18,12 +18,14 @@ const Switch = ({
   ...props
 }: AriaSwitchProps & { changeAction?: AsyncAction<[boolean]> }) => {
   const [optimisticSelected, setOptimisticSelected] = useOptimistic(isSelected);
+
   const [isPending, onChangeWithAction] = useActionProp<[boolean]>({
     action: changeAction
       ? (nextSelected) => {
           if (isSelected !== undefined) {
             setOptimisticSelected(nextSelected);
           }
+
           return changeAction(nextSelected);
         }
       : undefined,

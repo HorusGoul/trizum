@@ -29,11 +29,15 @@ const state = vi.hoisted(() => ({
   },
   cloudChoiceOpen: false,
 }));
+
 vi.mock("#src/hooks/usePartyList.ts", () => ({
   usePartyList: () => ({ partyList: { id: "same-profile", username: "Alex", phone: "" } }),
 }));
+
 vi.mock("#src/lib/auth-client.ts", () => ({ useAppSession: () => state.session }));
+
 vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({ getRevenueCatPlatform: () => "android" }));
+
 // An unchanged cloud profile resolves without calling onCloudDataActivated.
 vi.mock("#src/hooks/useCloudSyncAccountState.ts", () => ({
   useCloudSyncAccountState: ({
@@ -47,9 +51,11 @@ vi.mock("#src/hooks/useCloudSyncAccountState.ts", () => ({
     linkedProviderIds: new Set<string>(),
   }),
 }));
+
 vi.mock("#src/components/CloudSyncAccountSettings.tsx", () => ({
   CloudSyncAccountSettings: () => <p>Account settings</p>,
 }));
+
 vi.mock("#src/components/CloudSyncDialogs.tsx", () => ({
   CloudSyncSignInDialog: ({
     isOpen,
@@ -97,7 +103,9 @@ function makeRouter(returnTo: string) {
       premium: search.premium === true ? true : undefined,
     }),
   });
+
   const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: "/" });
+
   const callbackRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/settings/cloud-sync",
@@ -107,9 +115,11 @@ function makeRouter(returnTo: string) {
     }),
     component: function Callback() {
       const search = useSearch({ strict: false });
+
       return <CloudSyncSettingsView search={search} />;
     },
   });
+
   return createRouter({
     routeTree: rootRoute.addChildren([homeRoute, callbackRoute]),
     history: createMemoryHistory({
@@ -121,6 +131,7 @@ function makeRouter(returnTo: string) {
 }
 
 type TestRouter = ReturnType<typeof makeRouter>;
+
 async function render(router: TestRouter) {
   await act(async () =>
     root.render(
@@ -154,6 +165,7 @@ beforeEach(() => {
   document.body.append(container);
   root = createRoot(container);
 });
+
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
@@ -195,9 +207,11 @@ it("waits for the cloud-profile choice before resuming Premium", async () => {
   });
   expect(router.state.location.pathname).toBe("/settings/cloud-sync");
   expect(presentPaywall).not.toHaveBeenCalled();
+
   const chooseCloud = [...container.querySelectorAll("button")].find(
     (button) => button.textContent === "Use cloud data",
   );
+
   expect(chooseCloud).toBeDefined();
   await act(async () => chooseCloud!.click());
   expect(router.state.location.pathname).toBe("/");
@@ -209,9 +223,11 @@ it("cancels sign-in without leaving an intent that a later account resolution ca
   const router = makeRouter("/?premium=true");
   await router.load();
   await render(router);
+
   const cancel = [...container.querySelectorAll("button")].find(
     (button) => button.textContent === "Cancel sign-in",
   );
+
   expect(cancel).toBeDefined();
   await act(async () => cancel!.click());
   await act(async () => {

@@ -5,11 +5,14 @@ import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts
 import type { AppWorkerInitializeOptions } from "./proxy.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
+
 type RecalculateBalances = (request: RecalculateBalancesRequest) => Promise<DocumentHeads[]>;
+
 type DispatchEvent = (event: Event) => boolean;
 
 const proxyMock = vi.hoisted(() => {
   const workerApis: unknown[] = [];
+
   const injectAppWorker = vi.fn<(adapter: unknown) => unknown>(() => {
     const api = workerApis.shift();
 
@@ -88,6 +91,7 @@ describe("app worker client", () => {
     const firstApi = createWorkerApiMock({
       recalculateBalances: () => Promise.reject(new Error("worker failed")),
     });
+
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
@@ -138,6 +142,7 @@ describe("app worker client", () => {
     const firstApi = createWorkerApiMock({
       initialize: () => Promise.reject(new Error("worker init failed")),
     });
+
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
@@ -164,11 +169,14 @@ describe("app worker client", () => {
     const firstApi = createWorkerApiMock({
       recalculateBalances: () => Promise.reject(new Error("worker failed")),
     });
+
     const secondApi = createWorkerApiMock({
       recalculateBalances: () => Promise.reject(new Error("worker still failed")),
     });
+
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
+
     const { APP_WORKER_FULL_RESTART_REQUIRED_EVENT, appWorker, initializeAppWorker } =
       await import("./client.ts");
 

@@ -5,6 +5,7 @@ export async function loadDocumentsByIds<T>(repo: Repo, ids: DocumentId[]): Prom
     await Promise.all(
       ids.map(async (id) => {
         const handle = await repo.find<T>(id);
+
         return handle.doc();
       }),
     )

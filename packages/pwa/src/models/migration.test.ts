@@ -6,6 +6,7 @@ import { i18n } from "@lingui/core";
 
 const addExpenseToPartyMock =
   vi.fn<(expense: MigrationData["expenses"][number]) => Promise<unknown>>();
+
 const createMediaFileMock = vi.hoisted(() =>
   vi.fn<ReturnType<typeof getMediaFileHelpers>["createMediaFile"]>(),
 );
@@ -48,6 +49,7 @@ function assertNoUndefinedValues(value: unknown, path: string) {
 
 function createMockRepo() {
   let nextId = 0;
+
   let lastCreatedHandle:
     | {
         doc: () => Party;

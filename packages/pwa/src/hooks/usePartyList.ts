@@ -38,6 +38,7 @@ function ensureLastUsedAt(list: PartyList) {
 export function usePartyList() {
   const repo = useRepo();
   const [partyListId, setPartyListId] = useState<DocumentId>(() => getPartyListId(repo));
+
   const [partyList, partyListHandle] = useSuspenseDocument<PartyList>(partyListId, {
     required: true,
   });
@@ -67,6 +68,7 @@ export function usePartyList() {
       list.participantInParties[partyId] = participantId;
     });
   }
+
   function removeParty(partyId: Party["id"]) {
     // TODO: mark for deletion during next boot
 
@@ -111,6 +113,7 @@ export function usePartyList() {
         }
 
         pinnedParties[partyId] = true;
+
         return;
       }
 
@@ -154,11 +157,13 @@ export function usePartyList() {
       list.username = values.username;
       list.phone = values.phone;
       list.avatarId = values.avatarId;
+
       if (values.locale) {
         list.locale = values.locale;
       } else {
         delete list["locale"];
       }
+
       list.openLastPartyOnLaunch = values.openLastPartyOnLaunch;
       list.autoOpenCalculator = values.autoOpenCalculator;
       list.hue = values.hue;
@@ -200,6 +205,7 @@ export function usePartyList() {
 
             // Only update participant-relevant fields, not user-local settings
             const participantFields = ["phone", "avatarId"] as const;
+
             for (const key of participantFields) {
               const value = values[key];
 

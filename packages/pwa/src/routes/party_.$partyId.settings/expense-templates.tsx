@@ -42,24 +42,30 @@ function announceTemplateLimit() {
 function ExpenseTemplatesSettings() {
   const { partyId } = Route.useParams();
   const { t: translate, i18n } = useLingui();
+
   const {
     party,
     setDefaultExpenseTemplate,
     setOnlyUseCustomExpenseTemplates,
     setParticipantDetails,
   } = useParty(partyId);
+
   const participant = useCurrentParticipant();
   const [isOnlyCustomTemplatesSheetOpen, setIsOnlyCustomTemplatesSheetOpen] = useState(false);
+
   const templates = Object.values(party.expenseTemplates ?? {}).sort((left, right) =>
     left.name.localeCompare(right.name, i18n.locale),
   );
+
   const templateCount = templates.length;
   const onlyUseCustomTemplates = Boolean(party.onlyUseCustomExpenseTemplates && templateCount > 0);
+
   const customTemplateOptions = templates.map((template) => ({
     id: template.id,
     label: template.name,
     symbol: template.symbol,
   }));
+
   const defaultOptions: DefaultTemplateOption[] = onlyUseCustomTemplates
     ? customTemplateOptions
     : [
@@ -70,20 +76,24 @@ function ExpenseTemplatesSettings() {
         },
         ...customTemplateOptions,
       ];
+
   const configuredDefaultTemplate = party.defaultExpenseTemplateId
     ? party.expenseTemplates?.[party.defaultExpenseTemplateId]
     : undefined;
+
   const selectedDefaultId = configuredDefaultTemplate
     ? configuredDefaultTemplate.id
     : onlyUseCustomTemplates
       ? templates[0]!.id
       : BLANK_TEMPLATE_ID;
+
   const canAddTemplate = templateCount < MAX_EXPENSE_TEMPLATES;
 
   function changeOnlyUseCustomTemplates(isSelected: boolean) {
     if (!isSelected) {
       setOnlyUseCustomExpenseTemplates(false);
       trackEvent("custom_templates_only_disabled");
+
       return;
     }
 
@@ -96,6 +106,7 @@ function ExpenseTemplatesSettings() {
     if (configuredDefaultTemplate) {
       setOnlyUseCustomExpenseTemplates(true, firstTemplate.id);
       trackEvent("custom_templates_only_enabled");
+
       return;
     }
 
@@ -173,6 +184,7 @@ function ExpenseTemplatesSettings() {
                   setDefaultExpenseTemplate(
                     templateId === BLANK_TEMPLATE_ID ? undefined : templateId,
                   );
+
                   if (templateId !== selectedDefaultId)
                     trackEvent("expense_template_default_changed");
                 }}

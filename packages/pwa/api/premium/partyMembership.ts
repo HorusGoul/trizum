@@ -30,6 +30,7 @@ export async function getPartyMemberParticipantId({
 
   const partyId = partyDocumentId as DocumentId;
   const partyListId = partyListDocumentId as DocumentId;
+
   try {
     const partyList = await documents.read<PartyListMembershipDocument>(partyListId);
     const participantId = partyList?.participantInParties?.[partyId];
@@ -66,6 +67,7 @@ export function isPartyMembershipValid({
   }
 
   const participant = party.participants?.[participantId];
+
   return Boolean(participant && participant.id === participantId && !participant.isArchived);
 }
 

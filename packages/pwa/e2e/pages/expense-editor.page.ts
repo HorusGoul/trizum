@@ -51,6 +51,7 @@ export class ExpenseEditorPage {
 
     if (included) {
       await expect(checkbox).toBeChecked();
+
       return;
     }
 

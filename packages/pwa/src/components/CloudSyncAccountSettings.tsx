@@ -208,6 +208,7 @@ function CloudSettingsItem({
       ) : null}
     </span>
   );
+
   const className = cn(
     "-mx-3 h-auto min-h-16 w-[calc(100%+1.5rem)] justify-start rounded-xl px-3 py-3 text-left",
     "hover:bg-accent-100/70 dark:hover:bg-accent-900/70",

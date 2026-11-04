@@ -16,6 +16,7 @@ beforeEach(() => {
     removeItem: (key: string) => data.delete(key),
   });
 });
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();

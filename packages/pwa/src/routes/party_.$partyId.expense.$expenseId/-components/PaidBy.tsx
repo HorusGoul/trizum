@@ -14,6 +14,7 @@ export function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
   const paidByElements = Object.entries(paidBy).map(([userId, amount]) => {
     const participant = party.participants[userId];
     const isMe = participant.id === currentParticipant.id;
+
     const nameNode = (
       <div className="inline-flex items-center gap-1">
         {participant.name}

@@ -95,13 +95,17 @@ function PartyBoostCheckedAt({ boost }: { boost?: PartyBoostSnapshot }) {
   const { i18n } = useLingui();
   // Use the oldest verification when several boosts contribute to this party.
   const dates: number[] = [];
+
   for (const entry of Object.values(boost ?? {})) {
     const timestamp = Date.parse(entry?.checkedAt);
+
     if (Number.isFinite(timestamp)) dates.push(timestamp);
   }
+
   if (!dates.length) return null;
   const date = new Date(Math.min(...dates));
   const checkedAt = i18n.date(date, { dateStyle: "medium", timeStyle: "short" });
+
   return (
     <p className="text-accent-600 dark:text-accent-300 text-xs">
       <time dateTime={date.toISOString()}>
@@ -125,6 +129,7 @@ function PartyBoostTransferConfirmation({
   onActivate: () => Promise<void>;
 }) {
   const { t } = useLingui();
+
   return (
     <ModalSheet aria-label={t`Move Party Boost here?`} isOpen={isOpen} onOpenChange={onOpenChange}>
       <ModalSheetHeader>
@@ -234,6 +239,7 @@ function PartyBoostDescription({
 
   if (assignment && assignment.partyDocumentId !== partyDocumentId) {
     const transferableDate = formatTransferDate(assignment.transferableAt);
+
     return (
       <p className="text-accent-700 dark:text-accent-200 text-sm leading-snug">
         {canTransfer ? (

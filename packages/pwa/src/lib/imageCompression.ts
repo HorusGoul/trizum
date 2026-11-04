@@ -49,6 +49,7 @@ const logger = getLogger("lib", "imageCompression");
 
 export const imageUploadAccept =
   "image/*,.heic,.heif,image/heic,image/heif,image/heic-sequence,image/heif-sequence";
+
 export const imageCaptureAccept = "image/*";
 
 export type ImageProcessingErrorCode = "heic_conversion_failed";
@@ -74,6 +75,7 @@ type ParseResult =
 
 function getFileExtension(fileName: string): string | undefined {
   const lastDot = fileName.lastIndexOf(".");
+
   if (lastDot < 0) {
     return undefined;
   }
@@ -112,9 +114,11 @@ export function isSupportedImageFile(blob: Blob): boolean {
 async function readOrientation(file: File): Promise<number | undefined> {
   try {
     const exif = (await parse(file)) as ParseResult;
+
     return exif?.Orientation;
   } catch (exifError) {
     logger.warning("EXIF parsing failed for metadata", { error: exifError });
+
     return undefined;
   }
 }
@@ -122,6 +126,7 @@ async function readOrientation(file: File): Promise<number | undefined> {
 async function convertHeicImage(file: File): Promise<File> {
   try {
     const { heicTo } = await import("heic-to/csp");
+
     const convertedBlob = await heicTo({
       blob: file,
       type: "image/jpeg",
@@ -168,6 +173,7 @@ async function correctOrientation(
 
   // oxlint-disable-next-line react-doctor/no-create-object-url-without-revoke -- The onload finally and onerror handlers both revoke this exact URL.
   const objectUrl = URL.createObjectURL(file);
+
   return new Promise((resolve, reject) => {
     img.onload = () => {
       try {
@@ -246,6 +252,7 @@ async function correctOrientation(
       URL.revokeObjectURL(objectUrl);
       reject(new Error("Failed to load image"));
     };
+
     img.src = objectUrl;
   });
 }
@@ -285,6 +292,7 @@ function supportsImageFormat(mimeType: string): boolean {
   // Test if the browser can convert to this format
   try {
     canvas.toBlob(() => {}, mimeType, 0.9);
+
     return true;
   } catch {
     return false;
@@ -359,6 +367,7 @@ export async function processImage(
   try {
     const originalOrientation = await readOrientation(file);
     const { file: normalizedFile, convertedFromHeic } = await normalizeImageFile(file);
+
     const normalizedOrientation =
       normalizedFile === file ? originalOrientation : await readOrientation(normalizedFile);
 
@@ -412,6 +421,7 @@ export async function processImage(
     };
   } catch (error) {
     logger.error("Image processing failed", { error });
+
     if (error instanceof ImageProcessingError) {
       throw error;
     }

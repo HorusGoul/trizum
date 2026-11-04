@@ -16,6 +16,7 @@ const logger = getLogger("api", "cloudSync");
 const cloudSyncApp = $(
   new OpenAPIHono<ApiHonoEnv>().use("*", async (c, next) => {
     const auth = createAuth(c.env, c.executionCtx, c.req.raw);
+
     const session = await auth.api.getSession({
       headers: c.req.raw.headers,
     });
@@ -43,7 +44,9 @@ cloudSyncApp.onError((error, c) => {
   if (error instanceof HTTPException && error.status === 400) {
     return c.json({ error: "Expected a settings object." }, 400);
   }
+
   logger.error("Cloud Sync settings request failed", { error });
+
   return c.json(
     {
       error:
@@ -59,6 +62,7 @@ export const cloudSyncRoute = cloudSyncApp
   .openapi(getCloudUserSettingsRoute, async (c) => {
     const user = c.get("user");
     const db = getApiDb(c.env.DB);
+
     const [settings] = await db
       .select({
         partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
@@ -74,11 +78,14 @@ export const cloudSyncRoute = cloudSyncApp
     saveCloudUserSettingsRoute,
     async (c) => {
       const user = c.get("user");
+
       const settings = {
         ...c.req.valid("json"),
         updatedAt: Date.now(),
       };
+
       const db = getApiDb(c.env.DB);
+
       const [existingSettings] = await db
         .select({
           partyListDocumentId: schema.cloudUserSettings.partyListDocumentId,
@@ -149,6 +156,7 @@ export const cloudSyncRoute = cloudSyncApp
       if (!result.success) {
         return c.req.json<unknown>().then((body) => {
           const isObject = body !== null && typeof body === "object";
+
           return c.json(
             {
               error: isObject

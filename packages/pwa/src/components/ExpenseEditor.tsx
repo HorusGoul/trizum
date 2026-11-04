@@ -86,6 +86,7 @@ interface ExpenseEditorProps {
 }
 
 type ExpenseEditorFormApi = AppFormApi<ExpenseEditorFormValues>;
+
 type FieldFocusHandlersFactory = (field: { name: string; handleBlur: () => void }) => {
   onFocus: () => void;
   onBlur: () => void;
@@ -111,12 +112,14 @@ export function ExpenseEditor({
   const autoOpenCalculator = partyList.autoOpenCalculator ?? false;
   const saveInFlightRef = useRef(false);
   const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false);
+
   const unsortedParticipants = useExpenseParticipants({
     paidBy: {
       [defaultValues.paidBy]: 1,
     },
     shares: defaultValues.shares,
   });
+
   const participants = unsortedParticipants.slice();
   participants.sort((a, b) => a.name.localeCompare(b.name, i18n.locale));
 
@@ -128,6 +131,7 @@ export function ExpenseEditor({
         participants.reduce(
           (acc, { id }) => {
             acc[id] = { type: "divide" as const, value: 1 };
+
             return acc;
           },
           {} as Record<ExpenseUser, { type: "divide" | "exact"; value: number }>,
@@ -145,6 +149,7 @@ export function ExpenseEditor({
 
       if (submissionValidation.status === "error") {
         setIsValidationDialogOpen(true);
+
         return;
       }
 
@@ -187,6 +192,7 @@ export function ExpenseEditor({
   const paidBy = useStore(form.store, (state) => state.values.paidBy);
   const photos = useStore(form.store, (state) => state.values.photos);
   const isDirty = useStore(form.store, (state) => state.isDirty);
+
   const validation = getExpenseEditorValidationResult(
     { amount, name, paidBy, shares },
     { isDirty, isPrefilled, mode },
@@ -653,6 +659,7 @@ function ParticipantItem({
     const newShares = {
       ...shares,
     };
+
     const newType = value as "divide" | "exact";
 
     if (newType === "exact") {
@@ -714,9 +721,11 @@ function ParticipantItem({
     if (!participantShare || participantShare.type !== "divide") {
       return;
     }
+
     const newShares = {
       ...shares,
     };
+
     newShares[participant.id] = {
       type: "divide",
       value: Math.max(participantShare.value - 1, 0),
@@ -728,6 +737,7 @@ function ParticipantItem({
     const newShares = {
       ...shares,
     };
+
     newShares[participant.id] = {
       type: "exact",
       value: convertToUnits(value || 0),
@@ -844,6 +854,7 @@ function ParticipantItem({
     </div>
   );
 }
+
 interface ParticipantSplitAmountFieldProps {
   amount: number;
   shares: Record<ExpenseUser, { type: "divide" | "exact"; value: number }>;
@@ -973,6 +984,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
       const photoIds = await Promise.all(
         files.map(async (blob) => {
           const [mediaFileId] = await createMediaFile(blob, {}, compressionPresets.balanced);
+
           return mediaFileId;
         }),
       );
@@ -999,10 +1011,12 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
   async function openCamera() {
     if (!shouldUseNativeCameraCapture()) {
       cameraInputRef.current?.click();
+
       return;
     }
 
     let file: File;
+
     try {
       file = await getNativeCameraCaptureFile();
     } catch (error) {
@@ -1010,6 +1024,7 @@ function AddPhotoButton({ onPhoto }: AddPhotoButtonProps) {
         logger.error("Failed to capture expense attachment", { error });
         toast.error(t`Failed to access camera`);
       }
+
       return;
     }
 

@@ -15,21 +15,27 @@ const state = vi.hoisted(() => ({
   userId: "account-a" as string | null,
   isNative: true,
 }));
+
 const dismiss = vi.hoisted(() =>
   vi.fn<() => void>(() => {
     state.premiumBannerDismissed = true;
   }),
 );
+
 vi.mock("#src/hooks/usePartyList.ts", () => ({
   usePartyList: () => ({ partyList: state, dismissPremiumBanner: dismiss }),
 }));
+
 vi.mock("#src/lib/auth-client.ts", () => ({
   useAppSession: () => ({ data: state.userId ? { user: { id: state.userId } } : null }),
 }));
+
 vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({
   getRevenueCatPlatform: () => (state.isNative ? "android" : undefined),
 }));
+
 const navigate = vi.hoisted(() => vi.fn<() => Promise<void>>());
+
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => navigate,
   useLocation: () => true,
@@ -75,6 +81,7 @@ async function click(label: string) {
   const button = [...container.querySelectorAll("button")].find(
     (button) => button.textContent?.includes(label) || button.getAttribute("aria-label") === label,
   );
+
   expect(button).toBeDefined();
   await act(async () => button!.click());
 }

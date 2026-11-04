@@ -7,6 +7,7 @@ export function useBackNavigation(fallbackOptions: Omit<ToOptions, "replace">) {
   return function goBack() {
     if (canGoBack) {
       history.go(-1);
+
       return;
     }
 

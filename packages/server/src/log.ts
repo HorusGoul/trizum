@@ -4,6 +4,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import packageJson from "#package.json" with { type: "json" };
 
 const contextLocalStorage = new AsyncLocalStorage<Record<string, unknown>>();
+
 const version = process.env.COMMIT_HASH
   ? `${packageJson.version}-${process.env.COMMIT_HASH}`
   : packageJson.version;

@@ -5,6 +5,7 @@ import { readCollectToken } from "./insightflare.js";
 
 const telemetryId = "d97261e3-d471-4960-86e6-e205d1d84c7a";
 const siteId = "test-site";
+
 const routes = [
   "/",
   "/settings",
@@ -12,7 +13,9 @@ const routes = [
   "/party/$partyId",
   "/party/$partyId/expense/$expenseId",
 ];
+
 const documentId = "2f9VysjLKxYjBX7hQKQhEy1T2A5B";
+
 const bootstrap = (site = siteId) =>
   '"use strict";globalThis["__insightflare_tracker_runtime_config__"] = ' +
   JSON.stringify({ siteId: site, collectToken: "test.token.signature", ignoreDoNotTrack: true }) +
@@ -22,7 +25,9 @@ function harness(endpoint = "https://analytics.example") {
   const fetch = vi.fn<typeof globalThis.fetch>(async (_url, init) =>
     init?.method === "POST" ? new Response(null, { status: 204 }) : new Response(bootstrap()),
   );
+
   const canCollect = vi.fn<() => boolean>(() => true);
+
   const client = createAnalytics({
     siteId,
     endpoint,
@@ -31,6 +36,7 @@ function harness(endpoint = "https://analytics.example") {
     fetch,
     canCollect,
   });
+
   const payloads = () =>
     fetch.mock.calls
       .filter(([, init]) => init?.method === "POST")
@@ -41,6 +47,7 @@ function harness(endpoint = "https://analytics.example") {
             unknown
           >,
       );
+
   return { client, fetch, canCollect, payloads };
 }
 
@@ -92,6 +99,7 @@ describe("analytics collection", () => {
         new URL("https://trizum.app/api/spycat/script.js?siteId=test-site"),
       );
       expect(payloads()).toHaveLength(2);
+
       for (const [url, init] of fetch.mock.calls.filter(([, init]) => init?.method === "POST")) {
         expect(url).toEqual(new URL("https://trizum.app/api/spycat/collect"));
         expect(init).toMatchObject({
@@ -106,6 +114,7 @@ describe("analytics collection", () => {
 
   it("collects on WebViews without AbortSignal static helpers", async () => {
     vi.stubGlobal("AbortSignal", {});
+
     try {
       const { client, payloads } = harness();
       client.setEnabled(true, telemetryId);
@@ -120,6 +129,7 @@ describe("analytics collection", () => {
 
   it("aborts stalled requests after five seconds without rejecting app actions", async () => {
     vi.useFakeTimers();
+
     try {
       const { client, fetch } = harness();
       fetch.mockImplementation(
@@ -157,9 +167,11 @@ describe("analytics collection", () => {
     client.page(`/party/${documentId}?name=Alice#secret`);
     client.track("expense_created");
     client.track(documentId as AnalyticsEvent);
+
     for (const name of ["__proto__", "constructor", "toString", { name: "expense_created" }]) {
       client.track(name as AnalyticsEvent);
     }
+
     await client.flush();
     expect(fetch).toHaveBeenCalledTimes(3);
     const [page, event] = payloads();
@@ -187,6 +199,7 @@ describe("analytics collection", () => {
     });
     expect(JSON.stringify(payloads())).not.toContain(documentId);
     expect(JSON.stringify(payloads())).not.toContain("Alice");
+
     for (const [, init] of fetch.mock.calls) {
       expect(init).toMatchObject({ credentials: "omit", referrerPolicy: "no-referrer" });
     }
@@ -253,6 +266,7 @@ describe("analytics collection", () => {
     canCollect.mockReturnValue(true);
     fetch.mockImplementationOnce(async () => {
       canCollect.mockReturnValue(false);
+
       return new Response(bootstrap());
     });
     client.setEnabled(true, telemetryId);
@@ -290,6 +304,7 @@ describe("analytics collection", () => {
     const { client, fetch, payloads } = harness();
     fetch.mockImplementation(async () => {
       if (failure === "network") throw new Error("offline");
+
       return new Response("unexpected", { status: failure === "http" ? 503 : 200 });
     });
     client.setEnabled(true, telemetryId);
@@ -302,6 +317,7 @@ describe("analytics collection", () => {
     const { client, payloads } = harness();
     client.setEnabled(true, telemetryId);
     client.page("/");
+
     for (let index = 0; index < 100; index++) client.track("expense_created");
     await client.flush();
     expect(payloads()).toHaveLength(20);
@@ -321,10 +337,12 @@ describe("startup buffering and telemetry identity", () => {
     client.page(`/party/${documentId}?name=Alice#secret`);
     await client.flush();
     expect(payloads().map(({ kind }) => kind)).toEqual(["pageview", "custom_event"]);
+
     for (const payload of payloads()) {
       expect(payload).toMatchObject({ userId: telemetryId, pathname: "/party/:redacted" });
       expect(payload.timestamp).toBeLessThanOrEqual(recordedBy);
     }
+
     expect(JSON.stringify(payloads())).not.toMatch(/Alice|secret|2f9Vysj/);
   });
 
@@ -344,6 +362,7 @@ describe("startup buffering and telemetry identity", () => {
 
   it("expires the startup buffer after ten seconds and starts a fresh visit", async () => {
     vi.useFakeTimers();
+
     try {
       const { client, payloads } = harness();
       client.page("/settings");
@@ -364,6 +383,7 @@ describe("startup buffering and telemetry identity", () => {
   it("bounds the startup buffer to twenty events", async () => {
     const { client, payloads } = harness();
     client.page("/");
+
     for (let i = 0; i < 100; i++) client.track("party_created");
     client.setEnabled(true, telemetryId);
     await client.flush();
@@ -408,6 +428,7 @@ describe("startup buffering and telemetry identity", () => {
     );
     client.setEnabled(true, telemetryId);
     client.page("/");
+
     for (let i = 0; i < 30; i++) client.track("party_created");
     const previousQueue = client.flush();
     await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());

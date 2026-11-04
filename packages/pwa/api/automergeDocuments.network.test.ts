@@ -36,15 +36,18 @@ describe("Worker document reads over WebSocket", () => {
     "loads membership and previews with a %i ms WebSocket handshake",
     async (delay) => {
       const env = await startServer(delay);
+
       const party = server!.create({
         type: "party",
         id: "",
         name: "Handshake regression party",
         participants: { member: { id: "member", name: "Member" } },
       });
+
       party.change((doc) => {
         doc.id = party.documentId;
       });
+
       const list = server!.create({
         type: "partyList",
         parties: { [party.documentId]: true },
@@ -55,6 +58,7 @@ describe("Worker document reads over WebSocket", () => {
         env,
         request: new Request("https://trizum.example.test"),
       });
+
       try {
         await expect(
           verifyPartyMembership({
@@ -70,11 +74,13 @@ describe("Worker document reads over WebSocket", () => {
       const app = new Hono<ApiHonoEnv>();
       app.use("*", createApiI18nMiddleware());
       app.route("/", createPartySharePreviewRoute());
+
       const response = await app.request(
         `https://trizum.example.test/party/${party.documentId}?preview=1`,
         {},
         env,
       );
+
       expect(response.status).toBe(200);
       expect(await response.text()).toContain("Handshake regression party");
       await vi.waitFor(() => expect(sockets!.clients.size).toBe(0));
@@ -93,14 +99,18 @@ describe("Worker document reads over WebSocket", () => {
     app.use("*", createAutomergeDocumentsMiddleware());
     app.get("/", async (c) => {
       const documents = c.get("documents");
+
       const pair = await Promise.all([
         documents.read<{ name: string }>(first.documentId),
         documents.read<{ name: string }>(second.documentId),
       ]);
+
       const later = await documents.read<{ name: string }>(third.documentId);
       const again = await documents.read<{ name: string }>(first.documentId);
+
       return c.json([...pair.map((doc) => doc.name), later.name, again.name]);
     });
+
     for (let request = 1; request <= 2; request++) {
       const response = await app.request("https://trizum.example.test", {}, env);
       expect(await response.json()).toEqual(["First", "Second", "Third", "First"]);
@@ -128,10 +138,12 @@ describe("Worker document reads over WebSocket", () => {
     const env = await startServer();
     const first = server!.create({ value: 0 });
     const second = server!.create({ value: 0 });
+
     const documents = new AutomergeDocuments({
       env,
       request: new Request("https://trizum.example.test"),
     });
+
     try {
       await Promise.all([
         documents.change<{ value: number }>(first.documentId, (doc) => {
@@ -146,10 +158,12 @@ describe("Worker document reads over WebSocket", () => {
     } finally {
       await documents.close();
     }
+
     const next = new AutomergeDocuments({
       env,
       request: new Request("https://trizum.example.test"),
     });
+
     try {
       expect(await next.read(first.documentId)).toMatchObject({ value: 1 });
       expect(await next.read(second.documentId)).toMatchObject({ value: 2 });
@@ -161,13 +175,16 @@ describe("Worker document reads over WebSocket", () => {
   it("rejects a write when the sync peer never acknowledges it", async () => {
     const env = await startServer();
     const party = server!.create({ value: 0 });
+
     const documents = new AutomergeDocuments({
       env,
       request: new Request("https://trizum.example.test"),
       timeoutMs: "500",
     });
+
     try {
       await documents.read(party.documentId);
+
       for (const socket of sockets!.clients) socket.removeAllListeners("message");
       await expect(
         documents.change<{ value: number }>(party.documentId, (doc) => {
@@ -187,12 +204,15 @@ describe("Worker document reads over WebSocket", () => {
       const controller = new AbortController();
       // The client's join proves it has processed the HTTP upgrade too.
       const connected = once(sockets!, "connection").then(([socket]) => once(socket, "message"));
+
       const documents = new AutomergeDocuments({
         env,
         request: new Request("https://trizum.example.test", { signal: controller.signal }),
         timeoutMs: reason === "timeout" ? "200" : "5000",
       });
+
       const reading = documents.read(parseAutomergeUrl(generateAutomergeUrl()).documentId);
+
       try {
         await Promise.all([
           expect(reading).rejects.toMatchObject({ name: "AbortError" }),
@@ -203,6 +223,7 @@ describe("Worker document reads over WebSocket", () => {
       } finally {
         await documents.close();
       }
+
       await vi.waitFor(() => expect(sockets!.clients.size).toBe(0));
     },
   );
@@ -214,15 +235,19 @@ describe("Worker document reads over WebSocket", () => {
         setTimeout(() => done(true), delay);
       },
     });
+
     if (sync) {
       server = new Repo({
         network: [new NodeWSServerAdapter(sockets)],
         sharePolicy: async () => false,
       });
     }
+
     await once(sockets, "listening");
     const address = sockets.address();
+
     if (!address || typeof address === "string") throw new Error("Expected a local TCP server");
+
     return {
       AUTOMERGE_WSS_URL: `ws://127.0.0.1:${address.port}`,
       PARTY_MEMBERSHIP_TIMEOUT_MS: "5000",

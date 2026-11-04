@@ -64,9 +64,11 @@ test.describe("Expense templates", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);
     await expect(page.getByRole("heading", { name: "Expenses", level: 2 })).toBeVisible();
+
     const expenseTemplatesLink = page.getByRole("link", {
       name: /Expense templates Configure reusable defaults for new expenses/,
     });
+
     await expect(
       expenseTemplatesLink.locator('use[href$="#lucide.layout-template"]'),
     ).toBeVisible();
@@ -90,6 +92,7 @@ test.describe("Expense templates", () => {
     await expect(page.getByText("Please give this template a name")).toBeVisible();
 
     const iconButton = page.getByLabel("Template icon");
+
     const [nameBox, iconBox] = await Promise.all([
       nameField.boundingBox(),
       iconButton.boundingBox(),
@@ -149,6 +152,7 @@ test.describe("Expense templates", () => {
     const alwaysIncludeEveryone = page.getByRole("switch", {
       name: "Always include everyone",
     });
+
     await expect(page.getByRole("checkbox", { name: "Include all" })).toHaveCount(0);
     await expect(alwaysIncludeEveryone).not.toBeChecked();
 
@@ -157,11 +161,13 @@ test.describe("Expense templates", () => {
         force: true,
       });
     }
+
     await expect(alwaysIncludeEveryone).not.toBeChecked();
 
     await page.getByRole("checkbox", { name: "Alex" }).setChecked(false, { force: true });
     await page.getByText("Always include everyone", { exact: true }).click();
     await expect(alwaysIncludeEveryone).toBeChecked();
+
     for (const participantName of ["Alex", "Blair", "Casey"]) {
       await expect(page.getByRole("checkbox", { name: participantName })).toBeChecked();
     }
@@ -179,9 +185,11 @@ test.describe("Expense templates", () => {
 
     await harness.navigate(`/party/${seededParty.partyId}`);
     const dialog = await openExpenseTemplatePicker(page, seededParty.partyId);
+
     const blankExpense = dialog.getByRole("button", {
       name: /Blank Start with empty expense values/,
     });
+
     await expect(blankExpense).toContainText("📄");
     await expect(dialog.getByText("Default", { exact: true })).toHaveCount(0);
 
@@ -201,6 +209,7 @@ test.describe("Expense templates", () => {
     await expect(page.getByLabel("Title")).toHaveValue("Groceries");
     await expect(page.getByRole("textbox", { name: "Amount", exact: true })).toHaveValue("48.5");
     await expect(page.getByText("All expense checks passed")).toBeVisible();
+
     for (const participantName of ["Alex", "Blair", "Casey", "Morgan"]) {
       await expect(page.getByRole("checkbox", { name: participantName })).toBeChecked();
     }
@@ -213,9 +222,11 @@ test.describe("Expense templates", () => {
     });
 
     await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates`);
+
     const onlyUseCustomTemplates = page.getByRole("switch", {
       name: "Only use custom templates",
     });
+
     await expect(onlyUseCustomTemplates).toBeDisabled();
     await expect(page.getByText("Create a custom template to enable this setting.")).toBeVisible();
 
@@ -228,6 +239,7 @@ test.describe("Expense templates", () => {
     const confirmation = page.getByRole("dialog", {
       name: "Only use custom templates?",
     });
+
     await expect(confirmation).toContainText(
       "Coffee run will become the default. New expenses will always start from a custom template.",
     );
@@ -348,9 +360,11 @@ test.describe("Expense templates", () => {
     await expect(page.getByLabel("Title")).toHaveValue("Lunch");
 
     await harness.navigate(`/party/${seededParty.partyId}/settings/expense-templates`);
+
     const preferenceSwitch = page.getByRole("switch", {
       name: "Always use default template",
     });
+
     await expect(preferenceSwitch).toBeChecked();
     await page.getByText("Always use default template", { exact: true }).click();
     await expect(preferenceSwitch).not.toBeChecked();

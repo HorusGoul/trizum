@@ -14,7 +14,9 @@ export function createAutomergeDocumentsMiddleware(
       request: c.req.raw,
       timeoutMs: getTimeoutMs?.(c.env),
     });
+
     c.set("documents", documents);
+
     try {
       await next();
     } finally {

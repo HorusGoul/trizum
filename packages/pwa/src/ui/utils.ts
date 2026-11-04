@@ -9,7 +9,9 @@ export function cn(...className: ClassName[]) {
 
 const isBoolean = (maybeBoolean: unknown): maybeBoolean is boolean =>
   typeof maybeBoolean === "boolean";
+
 const toStringIfBoolean = (value: unknown) => (isBoolean(value) ? String(value) : value);
+
 const isSimpleSubset = (a: Record<string, unknown>, b: Record<string, unknown>) =>
   Object.entries(a).every(([key, value]) => b[key] === value);
 
@@ -67,6 +69,7 @@ export const cva =
         }
 
         acc[key] = value;
+
         return acc;
       },
       {} as Record<string, unknown>,
@@ -93,6 +96,7 @@ export const cva =
         if (isSimpleSubset(compoundVariantOptions, currentOptions)) {
           list.push(classes);
         }
+
         return list;
       }, [] as string[]),
       classNames,

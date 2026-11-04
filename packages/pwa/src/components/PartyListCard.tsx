@@ -47,6 +47,7 @@ interface PartyListCardProps {
 }
 
 const EMPTY_PARTY_LIST_CARD_ACTIONS: PartyListCardAction[] = [];
+
 const suppressNativeLongPress = {
   WebkitTouchCallout: "none",
   WebkitUserSelect: "none",
@@ -67,12 +68,15 @@ export function PartyListCard({
   const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
   const { hoverProps, isHovered } = useHover({});
+
   const { focusProps, isFocusVisible } = useFocusRing({
     within: true,
   });
+
   const { focusWithinProps } = useFocusWithin({
     onFocusWithinChange: setIsFocusWithin,
   });
+
   const { pressProps, isPressed } = usePress({
     onPress: () => {
       if (!party) {
@@ -90,7 +94,9 @@ export function PartyListCard({
       });
     },
   });
+
   const hasActions = actions.length > 0;
+
   const { longPressProps } = useLongPress({
     isDisabled: !hasActions || isLargeScreen,
     accessibilityDescription: t`Long press for party actions`,
@@ -112,11 +118,14 @@ export function PartyListCard({
   const participantPreview = getParticipantPreview(party, currentParticipantId);
   const hasDescription = description.length > 0;
   const hasSupportingCopy = hasDescription || participantPreview !== null;
+
   const showDesktopActionButton =
     hasActions && isLargeScreen && (isHovered || isFocusWithin || isDesktopMenuOpen);
+
   const partyRouteParams = {
     partyId: party.id,
   };
+
   const statusBadge = isArchived
     ? {
         icon: "lucide.archive" as const,
@@ -128,6 +137,7 @@ export function PartyListCard({
           label: <Trans>Pinned</Trans>,
         }
       : null;
+
   return (
     <div
       data-testid="party-list-card"

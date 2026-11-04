@@ -76,6 +76,7 @@ const CalendarGridBody = ({ className, ...props }: AriaCalendarGridBodyProps) =>
 
 const CalendarCell = ({ className, ...props }: AriaCalendarCellProps) => {
   const isRange = Boolean(use(AriaRangeCalendarStateContext));
+
   return (
     <AriaCalendarCell
       className={composeRenderProps(className, (className, renderProps) =>

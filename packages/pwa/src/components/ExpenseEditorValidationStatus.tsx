@@ -68,6 +68,7 @@ export function ExpenseEditorValidationStatus({
 }: ExpenseEditorValidationStatusProps) {
   const appearance = statusAppearances[validation.status];
   const shouldReduceMotion = useReducedMotion();
+
   const content = (
     <>
       <Icon icon={appearance.icon} className="size-5 shrink-0" />

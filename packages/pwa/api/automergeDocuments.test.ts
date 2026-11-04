@@ -27,6 +27,7 @@ it("rejects an already cancelled request before opening a connection", async () 
     env: { AUTOMERGE_WSS_URL: "not a URL" },
     request: new Request("https://trizum.app", { signal: AbortSignal.abort() }),
   });
+
   try {
     await expect(
       documents.read(parseAutomergeUrl(generateAutomergeUrl()).documentId),
@@ -41,6 +42,7 @@ it("does not initialize an unused repo and prevents reads after close", async ()
     env: { AUTOMERGE_WSS_URL: "not a URL" },
     request: new Request("https://trizum.app"),
   });
+
   await documents.close();
   await documents.close();
   await expect(
@@ -53,10 +55,13 @@ it("adds the object to request context without connecting when the handler does 
   app.use("*", createAutomergeDocumentsMiddleware());
   app.get("/", (c) => {
     expect(c.get("documents")).toBeInstanceOf(AutomergeDocuments);
+
     return c.text("No documents needed");
   });
+
   const response = await app.request("https://trizum.app", {}, {
     AUTOMERGE_WSS_URL: "not a URL",
   } as ApiEnv);
+
   expect(await response.text()).toBe("No documents needed");
 });

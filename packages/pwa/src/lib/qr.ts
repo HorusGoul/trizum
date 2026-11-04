@@ -8,6 +8,7 @@ prepareZXingModule({
       if (path.endsWith(".wasm")) {
         return `/zxing_reader.wasm`;
       }
+
       return prefix + path;
     },
   },
@@ -41,9 +42,11 @@ export function parseQRCodeForPartyId(value: string): string | null {
   if (isUrl) {
     // Extract party ID from URL like https://trizum.app/party/DOCUMENT_ID
     const partyPathMatch = trimmed.split("/party/")[1];
+
     if (!partyPathMatch) {
       return null;
     }
+
     // Take only the ID part (before any query params or additional path segments)
     partyId = partyPathMatch.split("/")[0].split("?")[0].split("#")[0];
   } else {

@@ -77,6 +77,7 @@ describe("native auth session", () => {
         }),
       );
     });
+
     vi.stubGlobal("fetch", fetchMock);
     setNativeAuthToken("session-token");
 
@@ -97,9 +98,11 @@ describe("native auth session", () => {
 
   test("ignores a token from an in-flight response after sign-out", async () => {
     let complete!: (response: Response) => void;
+
     const response = new Promise<Response>((resolve) => {
       complete = resolve;
     });
+
     vi.stubGlobal(
       "fetch",
       vi.fn<typeof fetch>(() => response),
@@ -114,9 +117,11 @@ describe("native auth session", () => {
 
   test("ignores an older response after switching native accounts", async () => {
     let complete!: (response: Response) => void;
+
     const response = new Promise<Response>((resolve) => {
       complete = resolve;
     });
+
     vi.stubGlobal(
       "fetch",
       vi.fn<typeof fetch>(() => response),

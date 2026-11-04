@@ -23,6 +23,9 @@ export const saveCloudUserSettingsResponseSchema = z.object({
 export const cloudSyncErrorResponseSchema = z.object({ error: z.string() });
 
 export type CloudUserSettings = z.infer<typeof cloudUserSettingsSchema>;
+
 export type CloudUserSettingsInput = z.infer<typeof cloudUserSettingsInputSchema>;
+
 export type GetCloudUserSettingsResponse = z.infer<typeof getCloudUserSettingsResponseSchema>;
+
 export type SaveCloudUserSettingsResponse = z.infer<typeof saveCloudUserSettingsResponseSchema>;

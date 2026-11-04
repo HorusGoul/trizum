@@ -27,6 +27,7 @@ export async function createRecalculateBalancesRequest(
   const partyHandle = await repo.find<Party>(partyId, { signal });
   const party = partyHandle.doc();
   const partyHeads = snapshotHeads(partyHandle);
+
   const chunks = await Promise.all(
     party.chunkRefs.map((ref) => repo.find<PartyExpenseChunk>(ref.chunkId, { signal })),
   );
@@ -44,12 +45,15 @@ export async function waitForDocumentHeads(
   const waitingSignal = controller.signal;
   const onParentAbort = () => controller.abort(signal.reason);
   signal.addEventListener("abort", onParentAbort, { once: true });
+
   if (signal.aborted) onParentAbort();
+
   try {
     await Promise.all(
       documents.map(async ({ documentId, heads }) => {
         const handle = await repo.find(documentId, { signal: waitingSignal });
         waitingSignal.throwIfAborted();
+
         if (hasHeads(handle.doc(), heads)) return;
 
         await new Promise<void>((resolve, reject) => {
@@ -58,16 +62,19 @@ export async function waitForDocumentHeads(
             handle.off("delete", onDelete);
             waitingSignal.removeEventListener("abort", onAbort);
           }
+
           function check() {
             if (hasHeads(handle.doc(), heads)) {
               cleanup();
               resolve();
             }
           }
+
           function onAbort() {
             cleanup();
             reject(waitingSignal.reason);
           }
+
           function onDelete() {
             cleanup();
             reject(new Error("Balance input was deleted during synchronization"));
@@ -77,6 +84,7 @@ export async function waitForDocumentHeads(
           handle.on("heads-changed", check);
           handle.on("delete", onDelete);
           waitingSignal.addEventListener("abort", onAbort, { once: true });
+
           if (waitingSignal.aborted) onAbort();
           else check();
         });
@@ -96,8 +104,10 @@ export async function recalculateSynchronizedBalances(
   await waitForDocumentHeads(repo, request.documents, signal);
   await recalculatePartyBalances(repo, request.partyId, signal);
   const party = (await repo.find<Party>(request.partyId, { signal })).doc();
+
   const balances = await Promise.all(
     party.chunkRefs.map((ref) => repo.find(ref.balancesId, { signal })),
   );
+
   return balances.map(snapshotHeads);
 }

@@ -1,6 +1,7 @@
 import type { ParsedLocation, RouterHistory, ToOptions } from "@tanstack/react-router";
 
 type NavigateWithReplace<TOptions> = (options: TOptions & { replace?: boolean }) => void;
+
 type HrefLocation = Pick<RouterHistory["location"], "href">;
 
 export function shouldReplaceNavigation(currentHref: string, nextHref: string) {
@@ -30,6 +31,7 @@ export function pushHistoryWithoutDuplicateEntry(
 ) {
   if (shouldReplaceNavigation(history.location.href, href)) {
     history.replace(href);
+
     return;
   }
 
@@ -43,6 +45,7 @@ export function preventDuplicateHistoryEntries(history: RouterHistory): RouterHi
   history.push = (path, state, navigateOptions) => {
     if (shouldReplaceNavigation(history.location.href, path)) {
       replace(path, state, navigateOptions);
+
       return;
     }
 
@@ -59,6 +62,7 @@ export function closeRouteState(
 ) {
   if (currentLocation.state.__TSR_index > 0) {
     history.go(-1);
+
     return;
   }
 

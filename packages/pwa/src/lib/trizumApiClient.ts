@@ -97,6 +97,7 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
 
   function getTransport() {
     transport ??= createPremiumTransport(options);
+
     return transport;
   }
 
@@ -105,6 +106,7 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
       new URL("/api/cloud-sync/", options.baseUrl()).toString(),
       { fetch: options.fetch },
     );
+
     return cloudSyncTransport;
   }
 
@@ -118,6 +120,7 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
       },
       async saveSettings(settings) {
         const json = cloudUserSettingsInputSchema.parse(settings);
+
         return parseCloudSyncResponse(
           await getCloudSyncTransport().settings.$put({ json }),
           saveCloudUserSettingsResponseSchema,
@@ -131,6 +134,7 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
           new URL("/api/migrate", (options.migrationBaseUrl ?? options.baseUrl)()).toString(),
           { fetch: options.publicFetch ?? options.fetch },
         );
+
         return parseMigrationResponse(await migrationTransport.index.$get({ query }));
       },
     },
@@ -139,12 +143,14 @@ export function createTrizumApiClient(options: TrizumApiClientOptions): TrizumAp
         const response = await getTransport()["party-boost"].$put({
           json: { partyDocumentId },
         });
+
         return parsePartyBoostResponse(response);
       },
       async getPartyBoostStatus(partyDocumentId) {
         const response = await getTransport()["party-boost"].$get({
           query: { partyDocumentId },
         });
+
         return parsePartyBoostResponse(response);
       },
     },
@@ -173,8 +179,10 @@ async function parseCloudSyncResponse<Schema extends z.ZodType>(
   schema: Schema,
 ): Promise<z.output<Schema>> {
   const body: unknown = await response.json().catch(() => null);
+
   if (response.status === 200) {
     const parsed = schema.safeParse(body);
+
     if (parsed.success) return parsed.data;
   } else if (
     response.status === 400 ||
@@ -183,27 +191,34 @@ async function parseCloudSyncResponse<Schema extends z.ZodType>(
     response.status === 500
   ) {
     const parsed = cloudSyncErrorResponseSchema.safeParse(body);
+
     if (parsed.success) {
       throw new CloudSyncApiError(response.status, parsed.data.error);
     }
   }
+
   throw new CloudSyncApiError("invalid_response", "Cloud Sync returned an invalid response.");
 }
 
 async function parseMigrationResponse(response: Response): Promise<MigrationData> {
   if (response.status === 400) {
     const parsed = migrationBadRequestSchema.safeParse(await response.text());
+
     if (parsed.success) throw new MigrationApiError(400, parsed.data);
   } else {
     const body: unknown = await response.json().catch(() => null);
+
     if (response.status === 200) {
       const parsed = migrationDataSchema.safeParse(body);
+
       if (parsed.success) return parsed.data;
     } else if (response.status === 500) {
       const parsed = migrationErrorResponseSchema.safeParse(body);
+
       if (parsed.success) throw new MigrationApiError(500, parsed.data.error);
     }
   }
+
   throw new MigrationApiError("invalid_response", "Tricount import returned an invalid response.");
 }
 
@@ -212,11 +227,13 @@ async function parsePartyBoostResponse(response: Response) {
 
   if (response.ok) {
     const status = partyBoostStatusSchema.safeParse(body);
+
     if (status.success) {
       return status.data;
     }
   } else {
     const errorResponse = partyBoostErrorResponseSchema.safeParse(body);
+
     if (errorResponse.success) {
       throw new PartyBoostApiError(errorResponse.data.error);
     }

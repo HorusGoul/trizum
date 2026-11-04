@@ -102,6 +102,7 @@ describe("getPartyHelpers", () => {
     const commit = createDeferred<void>();
     let holdWrites = false;
     let saving = false;
+
     const storage: StorageAdapterInterface = {
       async load(key) {
         return chunks.get(JSON.stringify(key))?.data;
@@ -111,6 +112,7 @@ describe("getPartyHelpers", () => {
           saving = true;
           await commit.promise;
         }
+
         chunks.set(JSON.stringify(key), { key, data });
       },
       async remove(key) {
@@ -127,10 +129,12 @@ describe("getPartyHelpers", () => {
         }
       },
     };
+
     const { helpers, partyHandle, repo } = createPartyHelpers(storage);
     await repo.flush([partyHandle.documentId]);
     holdWrites = true;
     let acknowledged = false;
+
     const save = Promise.resolve(
       helpers.updateDetails({ name: "Durable party", symbol: "🏕️", description: "Saved details" }),
     ).then(() => {
@@ -147,6 +151,7 @@ describe("getPartyHelpers", () => {
     }
 
     const reopened = new Repo({ storage, network: [] });
+
     try {
       const persisted = await reopened.find<Party>(partyHandle.documentId);
       expect(persisted.doc()).toMatchObject({
@@ -161,11 +166,13 @@ describe("getPartyHelpers", () => {
 
   test("updates participants without replacing party details", () => {
     const { helpers, partyHandle } = createPartyHelpers();
+
     const originalDetails = {
       name: partyHandle.doc().name,
       symbol: partyHandle.doc().symbol,
       description: partyHandle.doc().description,
     };
+
     const participants = {
       charlie: createParticipant("charlie", "Charlie"),
     };
@@ -295,6 +302,7 @@ function createPartyHelpers(storage?: StorageAdapterInterface) {
     network: [],
     storage,
   });
+
   const partyHandle = repo.create<Party>(createParty());
 
   partyHandle.change((party) => {
@@ -365,6 +373,7 @@ function createExpenseTemplate(id: string): ExpenseTemplate {
 
 function createDeferred<T>() {
   let resolve: (value: T) => void;
+
   const promise = new Promise<T>((promiseResolve) => {
     resolve = promiseResolve;
   });

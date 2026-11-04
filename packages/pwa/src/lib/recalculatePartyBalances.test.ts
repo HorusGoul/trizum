@@ -13,23 +13,28 @@ import { recalculatePartyBalances } from "./recalculatePartyBalances.ts";
 describe("recalculatePartyBalances", () => {
   test("checks every chunk and writes only changed chunk balance documents", async () => {
     const { repo, handles, find, flush } = createRepoMock();
+
     const party = createParty([
       createChunkRef("chunk-1", "balances-1"),
       createChunkRef("chunk-2", "balances-2"),
     ]);
+
     const chunk1 = createChunk("chunk-1", [
       createExpense("expense-1", {
         paidBy: "alice",
         amount: 1000,
       }),
     ]);
+
     const chunk2 = createChunk("chunk-2", [
       createExpense("expense-2", {
         paidBy: "bob",
         amount: 2000,
       }),
     ]);
+
     const chunk1Balances = createChunkBalances("balances-1");
+
     const chunk2Balances = createChunkBalances(
       "balances-2",
       structuredClone(calculateBalancesByParticipant(chunk2.expenses, party.participants)),
@@ -65,12 +70,14 @@ describe("recalculatePartyBalances", () => {
     const { repo, handles, flush } = createRepoMock();
     const chunkRef = createChunkRef("chunk-1", "balances-1");
     const party = createParty([chunkRef]);
+
     const chunk = createChunk("chunk-1", [
       createExpense("expense-1", {
         paidBy: "alice",
         amount: 1000,
       }),
     ]);
+
     const existingBalances = calculateBalancesByParticipant(chunk.expenses, party.participants);
     const chunkBalances = createChunkBalances("balances-1", structuredClone(existingBalances));
 
@@ -88,6 +95,7 @@ describe("recalculatePartyBalances", () => {
 
 function createRepoMock() {
   const handles = new Map<DocumentId, TestDocHandle<unknown>>();
+
   const find = vi.fn<(documentId: DocumentId) => Promise<TestDocHandle<unknown>>>(
     async (documentId) => {
       const handle = handles.get(documentId);
@@ -99,6 +107,7 @@ function createRepoMock() {
       return handle;
     },
   );
+
   const flush = vi.fn<(_documentIds: DocumentId[]) => Promise<void>>(async () => {});
 
   return {

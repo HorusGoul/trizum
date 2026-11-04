@@ -69,6 +69,7 @@ export async function runSandcastleCodexReview(
     };
   } catch (error) {
     agent.throwIfAuthenticationFailed(error);
+
     return {
       affectedAreas: [],
       automatedTestSuggestions: [],
@@ -95,6 +96,7 @@ export async function runSandcastleCodexFix(
   reviewReport?: string,
 ): Promise<SandcastleFixRun> {
   const agent = createCodexAgent();
+
   const result = await run({
     agent,
     branchStrategy: {
@@ -146,6 +148,7 @@ function resolveCodexModel(): string {
 
 function createCodexAgent(): ReturnType<typeof trackCodexAuthentication> {
   const model = resolveCodexModel();
+
   const agent = codex(model, {
     env: createSecretScrubEnvironmentOverrides({
       preserveCodexHome: true,
@@ -157,6 +160,7 @@ function createCodexAgent(): ReturnType<typeof trackCodexAuthentication> {
     ...agent,
     buildPrintCommand(options) {
       const command = agent.buildPrintCommand(options);
+
       return {
         ...command,
         command: addCodexExecFlags(command.command, ["--ignore-user-config"]),
@@ -171,6 +175,7 @@ function addCodexExecFlags(command: string, flags: readonly string[]): string {
   }
 
   const missingFlags = flags.filter((flag) => !command.includes(` ${flag}`));
+
   if (missingFlags.length === 0) {
     return command;
   }
@@ -180,6 +185,7 @@ function addCodexExecFlags(command: string, flags: readonly string[]): string {
 
 function resolveCodexEffort(): CodexEffort | undefined {
   const effort = process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_EFFORT?.trim();
+
   if (effort === "low" || effort === "medium" || effort === "high" || effort === "xhigh") {
     return effort;
   }
@@ -314,6 +320,7 @@ async function removeWorktreesForBranch(repoRoot: string, branchName: string): P
     allowFailure: true,
     cwd: repoRoot,
   });
+
   const refName = `refs/heads/${branchName}`;
   const paths = parseWorktreePathsForBranch(result.stdout, refName);
 
@@ -341,6 +348,7 @@ function parseWorktreePathsForBranch(output: string, refName: string): string[] 
       if (currentPath != null && currentBranch === refName) {
         paths.push(currentPath);
       }
+
       currentPath = undefined;
       currentBranch = undefined;
       continue;

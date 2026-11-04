@@ -10,6 +10,7 @@ type TestEnvironment = Record<string, string | undefined>;
 
 const testEnvironment = (globalThis as unknown as { process: { env: TestEnvironment } }).process
   .env;
+
 const previousGhToken = testEnvironment.GH_TOKEN;
 const previousCodexHome = testEnvironment.CODEX_HOME;
 
@@ -65,6 +66,7 @@ describe("command environment helpers", () => {
 function restoreEnv(key: string, value: string | undefined): void {
   if (value == null) {
     delete testEnvironment[key];
+
     return;
   }
 

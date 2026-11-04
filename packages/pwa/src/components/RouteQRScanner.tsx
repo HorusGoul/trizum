@@ -28,12 +28,14 @@ export function RouteQRScanner({ isOpen, onScan, onClose, validate }: RouteQRSca
   function handleResult(result: ScanResult) {
     if (result.type === "cancelled") {
       onClose();
+
       return;
     }
 
     if (result.type === "error") {
       toast.error(result.message);
       onClose();
+
       return;
     }
 

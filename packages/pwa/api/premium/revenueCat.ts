@@ -36,11 +36,13 @@ export async function verifyRevenueCatPremium({
       ...(fetcher ? { fetcher } : {}),
       secretApiKey: apiKey,
     });
+
     const customer = {
       customerId: userId,
       entitlementLookupKey: PREMIUM_ENTITLEMENT_ID,
       projectId,
     };
+
     const isPremium =
       (await client.hasDirectEntitlement({ ...customer, environment: "production" })) ||
       (Boolean(sandboxUserId) &&

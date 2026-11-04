@@ -47,6 +47,7 @@ export const migrationDataSchema = z.object({
 
 export const migrationQuerySchema = z.object({ key: z.string().min(1) });
 export const migrationBadRequestSchema = z.literal("Missing 'key' query parameter");
+
 export const migrationErrorResponseSchema = z.object({
   error: z.string(),
   // The legacy error includes the upstream response for diagnostics, when available.

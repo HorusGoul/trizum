@@ -41,8 +41,10 @@ const CLOSE_THRESHOLD = 150;
 export default function MediaGallery(props: MediaGalleryProps) {
   const { index, onClose, onChange, onDragProgress, showCloseButton = true } = props;
   const itemCount = props.items !== undefined ? props.items.length : props.itemCount;
+
   const currentItemKey =
     props.items !== undefined ? props.items[index]?.src : props.getItemKey(index);
+
   const maxIndex = itemCount - 1;
 
   function goToPrevious() {
@@ -105,6 +107,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
     if (!nextOrigin || currentScale <= 0) {
       scale.set(nextScale);
       previousPinchOriginRef.current = nextOrigin;
+
       return;
     }
 
@@ -158,6 +161,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
             onDragProgress?.(0);
           }
         }
+
         isClosingDragRef.current = false;
       },
       onPinchStart: ({ origin }) => {
@@ -170,6 +174,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
       },
       onPinchEnd: ({ offset: [s] }) => {
         previousPinchOriginRef.current = null;
+
         if (s <= 1) {
           void animate(x, 0, { type: "spring", stiffness: 400, damping: 30 });
           void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
@@ -189,6 +194,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
         bounds: () => {
           // Check scale directly - when at normal scale (not zoomed), allow free vertical drag
           const currentScale = scale.get();
+
           if (currentScale <= 1) {
             return { left: 0, right: 0, top: -Infinity, bottom: Infinity };
           }
@@ -207,6 +213,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
             elementRect.width > viewportRect.width
               ? elementRect.width - viewportRect.width
               : viewportRect.width - elementRect.width;
+
           const height =
             elementRect.height > viewportRect.height
               ? elementRect.height - viewportRect.height

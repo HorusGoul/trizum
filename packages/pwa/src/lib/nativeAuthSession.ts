@@ -7,6 +7,7 @@ let tokenRevision = 0;
 
 export function subscribeNativeAuthTokenClear(listener: () => void) {
   tokenClearListeners.add(listener);
+
   return () => tokenClearListeners.delete(listener);
 }
 
@@ -28,6 +29,7 @@ export function setNativeAuthToken(token: string | undefined) {
   }
 
   tokenRevision += 1;
+
   if (!token) {
     for (const listener of tokenClearListeners) listener();
   }
@@ -69,6 +71,7 @@ export function setNativeAuthTokenFromResponse(response: Response) {
 
 export async function fetchWithNativeAuth(input: RequestInfo | URL, init?: RequestInit) {
   const requestRevision = tokenRevision;
+
   const response = await fetch(input, {
     ...init,
     credentials: init?.credentials ?? "include",

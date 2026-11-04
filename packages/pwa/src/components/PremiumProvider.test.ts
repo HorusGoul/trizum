@@ -25,6 +25,7 @@ describe("getCurrentPremiumState", () => {
         status: "premium" as const,
         userId: "account-a",
       };
+
       expect(
         getCurrentPremiumState({
           isSessionPending: true,
@@ -51,6 +52,7 @@ describe("getCurrentPremiumState", () => {
       status: "premium" as const,
       userId: "account-a",
     };
+
     expect(
       getCurrentPremiumState({
         isSessionPending: false,
@@ -93,6 +95,7 @@ describe("Premium refresh failures", () => {
       status: "premium" as const,
       hasActiveSubscription: true,
     };
+
     for (const state of [previous, null]) {
       expect(getPremiumStateAfterRefreshError(state, "account-b")).toEqual({
         userId: "account-b",

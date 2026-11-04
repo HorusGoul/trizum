@@ -54,6 +54,7 @@ export function getMediaFileHelpers(repo: Repo) {
           file,
           compressionOptions || compressionPresets.balanced,
         );
+
         processedBlob = processed.blob;
 
         // Add compression metadata

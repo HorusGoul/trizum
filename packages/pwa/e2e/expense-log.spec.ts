@@ -299,6 +299,7 @@ test.describe("Expense log", () => {
 
     const overlay = page.locator("[data-media-gallery-overlay]");
     const image = page.locator("[data-media-gallery-image]");
+
     const slowExitAnimation = await page.addStyleTag({
       content: `
         [data-media-gallery-overlay][data-exiting] {
@@ -306,10 +307,12 @@ test.describe("Expense log", () => {
         }
       `,
     });
+
     await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
     await expect(image).toBeVisible();
 
     const imageBox = await image.boundingBox();
+
     if (!imageBox) {
       throw new Error("Expected the gallery image to have a bounding box");
     }

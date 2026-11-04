@@ -8,17 +8,21 @@ import app from "./worker";
 vi.mock("cloudflare:email", () => ({
   EmailMessage: class EmailMessage {},
 }));
+
 vi.mock("./i18n", () => ({
   createApiI18nMiddleware: () => async (_context: unknown, next: () => Promise<void>) => next(),
 }));
+
 vi.mock("./routes/party-share-preview", async () => {
   const { Hono } = await import("hono");
+
   return { partySharePreviewRoute: new Hono() };
 });
 
 describe("trizum OpenAPI contract", () => {
   test("publishes the assembled first-party operations", async () => {
     const response = await app.request("https://trizum.test/api/openapi.json");
+
     const document = (await response.json()) as {
       paths?: Record<
         string,

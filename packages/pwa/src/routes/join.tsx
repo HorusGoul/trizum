@@ -30,9 +30,11 @@ interface JoinFormValues {
 
 function validateQRCode(value: string) {
   const partyId = parseQRCodeForPartyId(value);
+
   if (!partyId) {
     return t`Not a valid trizum party code`;
   }
+
   return true as const;
 }
 
@@ -81,8 +83,10 @@ function Join() {
 
     if (!partyId) {
       toast.error(isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`);
+
       return;
     }
+
     void navigate({
       to: "/party/$partyId",
       replace: true,

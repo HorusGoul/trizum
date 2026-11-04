@@ -30,9 +30,11 @@ export function ExpenseLog() {
   const participant = useCurrentParticipant();
   const navigate = useNavigate();
   const [isAddExpenseSheetOpen, setIsAddExpenseSheetOpen] = useState(false);
+
   const templates = Object.values(party.expenseTemplates ?? {}).sort((left, right) =>
     left.name.localeCompare(right.name),
   );
+
   const onlyUseCustomTemplates = Boolean(
     party.onlyUseCustomExpenseTemplates && templates.length > 0,
   );
@@ -55,15 +57,19 @@ export function ExpenseLog() {
       })
     ) {
       setIsAddExpenseSheetOpen(true);
+
       return;
     }
 
     const shouldUseDefaultTemplate =
       participant.alwaysUseDefaultExpenseTemplate || onlyUseCustomTemplates;
+
     const defaultTemplateId = shouldUseDefaultTemplate ? party.defaultExpenseTemplateId : undefined;
+
     const hasDefaultTemplate = Boolean(
       defaultTemplateId && party.expenseTemplates?.[defaultTemplateId],
     );
+
     const fallbackTemplateId = onlyUseCustomTemplates ? templates[0]?.id : undefined;
     openExpenseEditor(hasDefaultTemplate ? defaultTemplateId : fallbackTemplateId);
   }
@@ -255,4 +261,5 @@ function ExpenseTemplateSheetAction({
     </AriaButton>
   );
 }
+
 import { trackEvent } from "#src/lib/analytics.ts";

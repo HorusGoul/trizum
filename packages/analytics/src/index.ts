@@ -24,9 +24,11 @@ interface Visit {
 
 export function createAnalytics(options: AnalyticsOptions) {
   const endpoint = new URL(options.endpoint);
+
   if (endpoint.protocol !== "https:" || endpoint.username || endpoint.password) {
     throw new Error("Analytics requires an HTTPS endpoint without credentials");
   }
+
   endpoint.pathname = `${endpoint.pathname.replace(/\/+$/, "")}/`;
   endpoint.search = "";
   endpoint.hash = "";
@@ -70,8 +72,10 @@ export function createAnalytics(options: AnalyticsOptions) {
   function canRecord() {
     if (!options.canCollect()) {
       disable();
+
       return false;
     }
+
     return state === "enabled" || (state === "pending" && Date.now() < startupDeadline);
   }
 
@@ -82,9 +86,11 @@ export function createAnalytics(options: AnalyticsOptions) {
     signal.addEventListener("abort", abortRequest, { once: true });
     // Compose cancellation without AbortSignal.any/timeout (older iOS WebViews).
     const timeout = setTimeout(abortRequest, 5000);
+
     try {
       // Bound individual requests so an unavailable collector cannot hold the queue.
       const requestSignal = request.signal;
+
       if (!token || token.expiresAt <= Date.now()) {
         const response = await fetch(scriptUrl, {
           credentials: "omit",
@@ -92,12 +98,16 @@ export function createAnalytics(options: AnalyticsOptions) {
           cache: "no-store",
           signal: requestSignal,
         });
+
         if (!response.ok || signal.aborted || !allowed()) return;
         const value = readCollectToken(await response.text(), options.siteId);
+
         if (!value || signal.aborted || !allowed()) return;
         token = { value, expiresAt: Date.now() + 5 * 60_000 };
       }
+
       if (signal.aborted || !allowed()) return;
+
       const response = await fetch(collectUrl, {
         method: "POST",
         mode: "cors",
@@ -107,6 +117,7 @@ export function createAnalytics(options: AnalyticsOptions) {
         signal: requestSignal,
         body: JSON.stringify({ ...payload, collectToken: token.value }),
       });
+
       if (!response.ok) {
         token = undefined;
       }
@@ -131,8 +142,10 @@ export function createAnalytics(options: AnalyticsOptions) {
         },
         Math.max(0, startupDeadline - Date.now()),
       );
+
       return;
     }
+
     if (!allowed() || queue.pending >= 20) return;
     const identified = { ...payload, userId: telemetryId };
     const signal = controller.signal;
@@ -180,22 +193,29 @@ export function createAnalytics(options: AnalyticsOptions) {
     setEnabled(value: boolean, id?: string) {
       if (!value || !isTelemetryId(id) || !options.canCollect()) {
         disable();
+
         return;
       }
+
       if (state === "enabled" && telemetryId === id) return;
+
       if (state === "enabled") disable();
       const buffered = Date.now() < startupDeadline ? startup : [];
+
       if (state === "pending" && buffered.length === 0) {
         visit = undefined;
         lastPathname = undefined;
       }
+
       discardStartup();
       telemetryId = id;
       state = "enabled";
+
       for (const payload of buffered) enqueue(payload);
     },
     page(pathname: string) {
       if (!canRecord() || pathname === lastPathname) return;
+
       if (state === "pending" && startup.length >= 20) return;
       lastPathname = pathname;
       visit = {

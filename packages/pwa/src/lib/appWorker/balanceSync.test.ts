@@ -11,6 +11,7 @@ import {
 } from "./balanceSync.ts";
 
 const cleanups: (() => Promise<void>)[] = [];
+
 afterEach(async () => {
   await Promise.all(cleanups.splice(0).map((cleanup) => cleanup()));
 });
@@ -31,10 +32,13 @@ describe("balance synchronization", () => {
     const off = vi.spyOn(cached, "off");
     const on = vi.spyOn(cached, "on");
     let completed = false;
+
     const calculation = recalculateSynchronizedBalances(worker, request).then((result) => {
       completed = true;
+
       return result;
     });
+
     await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(completed).toBe(false);
     expect(balances.doc().balances).toEqual({});
@@ -57,10 +61,13 @@ describe("balance synchronization", () => {
     });
     const request = await createRecalculateBalancesRequest(main, party.documentId);
     let completed = false;
+
     const calculation = recalculateSynchronizedBalances(worker, request).then((result) => {
       completed = true;
+
       return result;
     });
+
     await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(completed).toBe(false);
     release();
@@ -78,9 +85,11 @@ describe("balance synchronization", () => {
     expect(balances.doc().balances).toEqual({});
     const on = vi.spyOn(balances, "on");
     let completed = false;
+
     const pending = waitForDocumentHeads(main, result, AbortSignal.timeout(1000)).then(() => {
       completed = true;
     });
+
     await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(completed).toBe(false);
     releaseReverse();
@@ -131,11 +140,13 @@ describe("balance synchronization", () => {
       doc.name = "Updated synthetic party";
     });
     const signal = AbortSignal.timeout(50);
+
     const pending = waitForDocumentHeads(
       worker,
       [{ documentId: party.documentId, heads: getHeads(party.doc()) }],
       signal,
     );
+
     const rejected = pending.catch((error: unknown) => error);
     await expect.poll(() => on.mock.calls.some(([event]) => event === "heads-changed")).toBe(true);
     expect(await rejected).toMatchObject({ name: "TimeoutError" });
@@ -148,6 +159,7 @@ describe("balance synchronization", () => {
 async function createPeers(withExistingChunk = false) {
   const main = new Repo({ network: [] });
   const worker = new Repo({ network: [] });
+
   const party = main.create<Party>({
     id: "" as Party["id"],
     type: "party",
@@ -160,9 +172,11 @@ async function createPeers(withExistingChunk = false) {
     },
     chunkRefs: [],
   });
+
   party.change((doc) => {
     doc.id = party.documentId;
   });
+
   const expense: Expense = {
     id: "synthetic-expense",
     name: "Synthetic groceries",
@@ -172,6 +186,7 @@ async function createPeers(withExistingChunk = false) {
     photos: [],
     __hash: "",
   };
+
   const chunk = main.create<PartyExpenseChunk>({
     id: "" as PartyExpenseChunk["id"],
     type: "expenseChunk",
@@ -180,18 +195,22 @@ async function createPeers(withExistingChunk = false) {
     maxSize: 500,
     createdAt: new Date(),
   });
+
   chunk.change((doc) => {
     doc.id = chunk.documentId;
   });
+
   const balances = main.create<PartyExpenseChunkBalances>({
     id: "" as PartyExpenseChunkBalances["id"],
     type: "expenseChunkBalances",
     partyId: party.documentId,
     balances: {},
   });
+
   balances.change((doc) => {
     doc.id = balances.documentId;
   });
+
   if (withExistingChunk)
     party.change((doc) => {
       doc.chunkRefs.push({
@@ -200,11 +219,14 @@ async function createPeers(withExistingChunk = false) {
         createdAt: new Date(),
       });
     });
+
   for (const handle of [party, chunk, balances]) {
     const binary = await main.export(handle.documentId);
+
     if (!binary) throw new Error("Expected synthetic document export");
     worker.import(binary, { docId: handle.documentId });
   }
+
   const channel = new MessageChannel();
   let held = true;
   const queued: (() => void)[] = [];
@@ -214,6 +236,7 @@ async function createPeers(withExistingChunk = false) {
     if (held) queued.push(() => send(message));
     else send(message);
   };
+
   main.networkSubsystem.addNetworkAdapter(adapter);
   const reverseAdapter = new MessageChannelNetworkAdapter(channel.port2);
   const reverseSend = reverseAdapter.send.bind(reverseAdapter);
@@ -223,23 +246,29 @@ async function createPeers(withExistingChunk = false) {
     if (reverseHeld) reverseQueue.push(() => reverseSend(message));
     else reverseSend(message);
   };
+
   worker.networkSubsystem.addNetworkAdapter(reverseAdapter);
+
   function holdReverse() {
     reverseHeld = true;
+
     return () => {
       reverseHeld = false;
       reverseQueue.splice(0).forEach((deliver) => deliver());
     };
   }
+
   function release() {
     held = false;
     queued.splice(0).forEach((deliver) => deliver());
   }
+
   cleanups.push(async () => {
     release();
     await Promise.all([main.shutdown(), worker.shutdown()]);
     channel.port1.close();
     channel.port2.close();
   });
+
   return { main, worker, party, chunk, balances, release, holdReverse };
 }

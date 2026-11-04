@@ -10,12 +10,14 @@ test("removes console styling from the reported AdMob breadcrumb", () => {
     "color: gray;",
     "color: default;",
   ];
+
   const breadcrumb = {
     category: "console",
     level: "error" as const,
     message: args.join(" "),
     data: { arguments: args, logger: "console" },
   };
+
   const cleaned = sentryDocumentIdRedaction.beforeBreadcrumb(breadcrumb);
   expect(cleaned.message).toBe(
     "09:35:58.704 ERR trizum·pwa·components·AdvertisingController AdMob operation failed",
@@ -26,10 +28,12 @@ test("removes console styling from the reported AdMob breadcrumb", () => {
 
 test("preserves non-style arguments and redacts them without mutating the input", () => {
   const details = { documentId: "private", code: 7 };
+
   const cleaned = sentryDocumentIdRedaction.beforeBreadcrumb({
     category: "console",
     data: { arguments: ["%s %cfailed%c %o", "load", "color: red", "", details, "tail"] },
   });
+
   expect(cleaned.data?.arguments).toEqual([
     "%s failed %o",
     "load",

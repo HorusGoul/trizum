@@ -48,23 +48,29 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
 
   if (command === "--help" || command === "-h" || command === "help") {
     process.stdout.write(helpText);
+
     return 0;
   }
 
   if (command === "copy-codex-auth") {
     if (args.includes("--help") || args.includes("-h")) {
       process.stdout.write(helpText);
+
       return 0;
     }
+
     if (args.some((arg) => arg !== "--")) {
       throw new Error("copy-codex-auth does not accept arguments.");
     }
+
     await copyCodexAuth();
+
     return 0;
   }
 
   if (command !== "renovate-pr-review") {
     process.stderr.write(`Unknown workflow: ${command}\n\n${helpText}`);
+
     return 1;
   }
 
@@ -73,22 +79,27 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
 
   if (parsed.json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+
     return 0;
   }
 
   process.stdout.write(`${result.report}\n`);
+
   if (result.supersedingPullRequest?.prUrl != null) {
     const label =
       result.supersedingPullRequest.updatedOriginalPr === true
         ? "Updated original PR"
         : "Superseding PR";
+
     process.stdout.write(`\n${label}: ${result.supersedingPullRequest.prUrl}\n`);
   }
+
   if (result.labelAppliedTo != null) {
     process.stdout.write(
       `\nApplied label "${parsed.workflowOptions.readyForHumanReviewLabel}" to PR #${result.labelAppliedTo}.\n`,
     );
   }
+
   if (result.dryRun) {
     process.stdout.write(
       "\nDry run only. Re-run with --write to label/comment, or --supersede to create replacement PRs.\n",
@@ -108,6 +119,7 @@ export function parseCliOptions(args: readonly string[]): CliOptions {
     runLocalValidation: true,
     supersede: false,
   });
+
   let json = false;
 
   for (let index = 0; index < args.length; index += 1) {
@@ -170,17 +182,21 @@ export function parseCliOptions(args: readonly string[]): CliOptions {
 
 function readValue(args: readonly string[], index: number, option: string): string {
   const value = args[index];
+
   if (value == null || value.startsWith("--")) {
     throw new Error(`Missing value for ${option}.`);
   }
+
   return value;
 }
 
 function parsePositiveInteger(value: string, option: string): number {
   const parsed = Number.parseInt(value, 10);
+
   if (!Number.isInteger(parsed) || parsed <= 0) {
     throw new Error(`${option} must be a positive integer.`);
   }
+
   return parsed;
 }
 
@@ -188,6 +204,7 @@ function parseCodexMode(value: string): CodexMode {
   if (value === "auto" || value === "off" || value === "required") {
     return value;
   }
+
   throw new Error("--codex must be one of: auto, off, required.");
 }
 

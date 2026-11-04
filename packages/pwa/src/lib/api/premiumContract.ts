@@ -54,7 +54,11 @@ export const partyBoostRequestSchema = z.strictObject({
 });
 
 export type PartyBoostAssignmentStatus = z.infer<typeof partyBoostAssignmentStatusSchema>;
+
 export type PartyBoostErrorCode = z.infer<typeof partyBoostErrorCodeSchema>;
+
 export type PartyBoostErrorResponse = z.infer<typeof partyBoostErrorResponseSchema>;
+
 export type PartyBoostRevocationReason = z.infer<typeof partyBoostRevocationReasonSchema>;
+
 export type PartyBoostStatus = z.infer<typeof partyBoostStatusSchema>;

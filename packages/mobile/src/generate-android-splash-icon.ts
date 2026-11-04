@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const ANDROID_SPLASH_ICON_SIZE_DP = 288;
 const SOURCE_ICON_VIEWPORT_SIZE = 512;
 const ANDROID_SPLASH_ICON_VIEWPORT_SIZE = 576;
+
 const ANDROID_SPLASH_ICON_INSET =
   (ANDROID_SPLASH_ICON_VIEWPORT_SIZE - SOURCE_ICON_VIEWPORT_SIZE) / 2;
 
@@ -16,13 +17,16 @@ function parseAttributes(source: string, elementName: string): SvgAttributes {
 
   for (const match of source.matchAll(attributePattern)) {
     const [, name, value] = match;
+
     if (!name || value === undefined) {
       continue;
     }
+
     attributes[name] = value;
   }
 
   const unsupportedSyntax = source.replace(attributePattern, "").trim();
+
   if (unsupportedSyntax) {
     throw new Error(`${elementName} contains unsupported attribute syntax: ${unsupportedSyntax}`);
   }
@@ -32,6 +36,7 @@ function parseAttributes(source: string, elementName: string): SvgAttributes {
 
 function assertAttributes(elementName: string, attributes: SvgAttributes, supported: string[]) {
   const unsupported = Object.keys(attributes).filter((attribute) => !supported.includes(attribute));
+
   if (unsupported.length > 0) {
     throw new Error(`${elementName} contains unsupported attributes: ${unsupported.join(", ")}`);
   }
@@ -44,6 +49,7 @@ function assertAttribute(
   expectedValue: string,
 ) {
   const actualValue = attributes[attributeName];
+
   if (actualValue !== expectedValue) {
     throw new Error(
       `${elementName} must have ${attributeName}="${expectedValue}", received ${JSON.stringify(actualValue)}`,
@@ -61,6 +67,7 @@ function escapeXmlAttribute(value: string) {
 
 export function generateAndroidSplashIcon(svgSource: string) {
   const normalizedSource = svgSource.replaceAll(/<!--[\s\S]*?-->/g, "").trim();
+
   const match = normalizedSource.match(
     /^<svg(?<svgAttributes>[^>]*)>\s*<rect(?<rectAttributes>[^>]*)\/>\s*<path(?<pathAttributes>[^>]*)\/>\s*<\/svg>$/,
   );
@@ -90,11 +97,13 @@ export function generateAndroidSplashIcon(svgSource: string) {
   assertAttribute("path", pathAttributes, "stroke-linecap", "round");
 
   const pathData = pathAttributes.d;
+
   if (!pathData) {
     throw new Error("Logo path must contain path data");
   }
 
   const strokeWidth = Number(pathAttributes["stroke-width"]);
+
   if (!Number.isFinite(strokeWidth) || strokeWidth <= 0) {
     throw new Error("Logo path stroke-width must be a positive number");
   }
@@ -123,21 +132,25 @@ export function generateAndroidSplashIcon(svgSource: string) {
 async function run() {
   const packageDirectory = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
   const sourcePath = path.resolve(packageDirectory, "../pwa/public/maskable.svg");
+
   const outputPath = path.resolve(
     packageDirectory,
     "android/app/src/main/res/drawable/splash_icon.xml",
   );
+
   const checkOnly = process.argv.slice(2).includes("--check");
   const source = await readFile(sourcePath, "utf8");
   const generated = generateAndroidSplashIcon(source);
 
   if (checkOnly) {
     const existing = await readFile(outputPath, "utf8").catch(() => "");
+
     if (existing !== generated) {
       throw new Error(
         "Android splash icon is out of date. Run `vp run --filter @trizum/mobile assets:generate`.",
       );
     }
+
     return;
   }
 
@@ -148,6 +161,7 @@ async function run() {
 const executedPath = process.argv[1]
   ? pathToFileURL(path.resolve(process.argv[1])).href
   : undefined;
+
 if (executedPath === import.meta.url) {
   await run();
 }

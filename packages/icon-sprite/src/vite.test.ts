@@ -44,11 +44,13 @@ describe("createIconSpritePlugin", () => {
     tempDirectories.push(rootDir);
 
     writeFile(rootDir, "src/app.tsx", 'const icon = "lucide.arrow-left";\n');
+
     const iconFile = writeFile(
       rootDir,
       "vendor/lucide/arrow-left.svg",
       '<svg viewBox="0 0 24 24"><path d="M4 12h12"/></svg>\n',
     );
+
     const plugin = createIconSpritePlugin({
       generatedSpriteFile: "src/generated/iconSprite.svg",
       generatedTypesFile: "src/generated/iconSprite.gen.ts",
@@ -59,6 +61,7 @@ describe("createIconSpritePlugin", () => {
         }),
       ],
     });
+
     const watcherAdd = vi.fn<(paths: string[]) => void>();
     const wsSend = vi.fn<(payload: { type: "full-reload" }) => void>();
 
@@ -103,6 +106,7 @@ describe("createIconSpritePlugin", () => {
       "vendor/lucide/arrow-left.svg",
       '<svg viewBox="0 0 24 24"><path d="M4 12h12"/></svg>\n',
     );
+
     const plugin = createIconSpritePlugin({
       generatedSpriteFile: "src/generated/iconSprite.svg",
       generatedTypesFile: "src/generated/iconSprite.gen.ts",
@@ -113,6 +117,7 @@ describe("createIconSpritePlugin", () => {
         }),
       ],
     });
+
     const wsSend = vi.fn<(payload: { type: "full-reload" }) => void>();
 
     getHookHandler(plugin.configResolved)?.({

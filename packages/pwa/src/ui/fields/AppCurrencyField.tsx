@@ -38,6 +38,7 @@ export function AppCurrencyField({
   ...props
 }: AppCurrencyFieldProps) {
   const constrainedValue = value === undefined ? undefined : clampCurrencyValue(value, minValue);
+
   const [internalValue, setInternalValue] = React.useState(
     () => constrainedValue?.toString() || "",
   );
@@ -83,6 +84,7 @@ export function AppCurrencyField({
 
         if (lastDotIndex !== -1) {
           const decimalPart = withoutDots.substring(lastDotIndex + 1);
+
           if (decimalPart.length > decimalPrecision) {
             withoutDots = withoutDots.substring(0, lastDotIndex + 1 + decimalPrecision);
           }
@@ -100,10 +102,12 @@ export function AppCurrencyField({
         setInternalValue(value);
 
         const trimmedValue = value.trim();
+
         if (trimmedValue === "" || trimmedValue === ".") {
           onChange?.(clampCurrencyValue(0, minValue));
         } else {
           const parsed = parseFloat(trimmedValue);
+
           if (!isNaN(parsed)) {
             onChange?.(clampCurrencyValue(parsed, minValue));
           }

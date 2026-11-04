@@ -75,6 +75,7 @@ function EditExpense() {
     onChangeExpense,
     subscribeToExpenseChanges,
   } = useExpense();
+
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const router = useRouter();
@@ -101,6 +102,7 @@ function EditExpense() {
     navigate: (options) => void navigate(mergeSearchOptions(options)),
     history: router.history,
   });
+
   const { activeCalculatorId, openCalculator, closeCalculator } = useRouteCalculator({
     calculatorId: search.calculator,
     currentLocation,
@@ -119,6 +121,7 @@ function EditExpense() {
 
   const editorRef = useRef<ExpenseEditorRef>(null);
   const currentHashRef = useRef<string | null>(null);
+
   if (currentHashRef.current === null) {
     // oxlint-disable-next-line react-doctor/no-ref-current-in-render -- Guarded deterministic initial dirty-state baseline; follow-up: https://github.com/HorusGoul/trizum/issues/508
     currentHashRef.current = getExpenseEditHash(expense);
@@ -192,6 +195,7 @@ function EditExpense() {
           },
         });
       }
+
       requestAnimationFrame(() => presentInterstitialOpportunity());
 
       toast.success(t`Expense updated`, {
@@ -268,6 +272,7 @@ function useExpense() {
   async function onUpdateExpense(expense: Expense) {
     const result = await updateExpense(expense);
     trackEvent("expense_updated");
+
     return result;
   }
 

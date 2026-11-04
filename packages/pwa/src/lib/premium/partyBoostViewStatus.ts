@@ -13,6 +13,7 @@ export function getPartyBoostViewStatus(
 ): PartyBoostViewStatus | null {
   if (!shared) return personal;
   const isBoosted = getPartyBoostCount(shared) > 0;
+
   return {
     currentUser: personal?.currentUser ?? null,
     party: {

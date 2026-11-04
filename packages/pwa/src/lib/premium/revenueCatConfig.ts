@@ -14,6 +14,7 @@ export function getRevenueCatPlatform(): RevenueCatPlatform | undefined {
   }
 
   const platform = Capacitor.getPlatform();
+
   return platform === "android" || platform === "ios" ? platform : undefined;
 }
 

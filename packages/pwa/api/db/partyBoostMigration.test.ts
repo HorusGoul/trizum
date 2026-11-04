@@ -5,10 +5,12 @@ import { expect, test } from "vite-plus/test";
 
 test("boost IDs backfill active and revoked assignments without changing their lifecycle", () => {
   const db = new DatabaseSync(":memory:");
+
   try {
     db.exec("PRAGMA foreign_keys = ON");
     // Only the user key is relevant to this migration's foreign key.
     db.exec('CREATE TABLE "user" (id TEXT PRIMARY KEY)');
+
     for (const name of ["0003_party_boost", "0004_party_boost_lifecycle"]) {
       db.exec(
         readFileSync(
@@ -17,6 +19,7 @@ test("boost IDs backfill active and revoked assignments without changing their l
         ),
       );
     }
+
     db.exec("INSERT INTO user VALUES ('active-owner'), ('revoked-owner')");
     db.exec(`INSERT INTO party_boost
       (ownerUserId, partyDocumentId, assignedAt, transferableAt, updatedAt, revokedAt, revocationReason, version)
@@ -33,6 +36,7 @@ test("boost IDs backfill active and revoked assignments without changing their l
     expect(
       migrated.map(({ boostId, ...row }) => {
         expect(boostId).toMatch(/^[a-f0-9]{32}$/);
+
         return row;
       }),
     ).toEqual(original);

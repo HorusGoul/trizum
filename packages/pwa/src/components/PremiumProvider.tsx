@@ -40,6 +40,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [paywallSessionId, setPaywallSessionId] = useState(0);
   const paywallRequestRef = useRef<PaywallRequest | null>(null);
+
   const state = getCurrentPremiumState({
     hasSessionError,
     isSessionPending: session.isPending,
@@ -57,10 +58,12 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
       void clearRevenueCatUser().catch((error) => {
         logger.error("Failed to clear RevenueCat user", { error });
       });
+
       return;
     }
 
     const identifiedUserId = userId;
+
     function updateFromCustomerInfo(customerInfo: Parameters<typeof getPremiumAccess>[0]) {
       const access = getPremiumAccess(customerInfo);
       setResolvedState({
@@ -103,6 +106,7 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     if (paywallRequestRef.current) {
       paywallRequestRef.current.entitlement = entitlement;
     }
+
     setResolvedState({
       hasActiveSubscription: entitlement.hasActiveSubscription,
       status: entitlement.isPremium ? "premium" : "free",
@@ -120,18 +124,22 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     }
 
     let resolveRequest: PaywallRequest["resolve"] = () => undefined;
+
     const promise = new Promise<PremiumEntitlementState | null>((resolve) => {
       resolveRequest = resolve;
     });
+
     paywallRequestRef.current = { promise, resolve: resolveRequest, entitlement: null };
     setPaywallSessionId((sessionId) => sessionId + 1);
     setIsPaywallOpen(true);
     trackEvent("premium_paywall_opened");
+
     return promise;
   }
 
   function setPaywallOpen(open: boolean) {
     setIsPaywallOpen(open);
+
     if (!open) {
       paywallRequestRef.current?.resolve(paywallRequestRef.current.entitlement);
       paywallRequestRef.current = null;
@@ -143,9 +151,11 @@ export function PremiumProvider({ children }: { children: React.ReactNode }) {
     await presentRevenueCatCustomerCenter(userId);
     const customerInfo = await refreshRevenueCatCustomerInfo();
     const access = getPremiumAccess(customerInfo);
+
     if (!userId) {
       return;
     }
+
     setResolvedState({
       hasActiveSubscription: access.hasActiveSubscription,
       status: access.isPremium ? "premium" : "free",

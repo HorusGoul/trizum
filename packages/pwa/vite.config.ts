@@ -23,6 +23,7 @@ import iconSpriteConfig from "./iconSprite.config.mjs";
 const ReactCompilerConfig = {};
 const sentryOrg = "horusdev";
 const sentryProject = "trizum-pwa";
+
 // Resolve Vite's Baseline target because vite-plugin-top-level-await forwards
 // build.target to esbuild, which does not accept Vite's special target string.
 const buildTarget = ["chrome111", "edge111", "firefox114", "safari16.4", "ios16.4"];
@@ -32,12 +33,15 @@ const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
 const adMobConfig = readAdMobConfig();
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
+
 const linguiConfig = getLinguiConfig({
   cwd: packageRoot,
   configPath: linguiConfigPath,
 });
+
 const linguiBabelPlugin = packageRequire.resolve("@lingui/babel-plugin-lingui-macro");
 const reactCompilerBabelPlugin = packageRequire.resolve("babel-plugin-react-compiler");
+
 const reactCompilerPreset = defineRolldownBabelPreset({
   preset: () => ({
     plugins: [[reactCompilerBabelPlugin, ReactCompilerConfig]],
@@ -56,11 +60,13 @@ const reactCompilerPreset = defineRolldownBabelPreset({
 const packageJson = JSON.parse(
   readFileSync(path.resolve(packageRoot, "package.json"), "utf-8"),
 ) as { version: string; description: string };
+
 const appVersion = packageJson.version;
 const description = packageJson.description;
 
 // Get git commit hash
 let appCommit = "unknown";
+
 try {
   appCommit = execSync("git rev-parse --short HEAD").toString().trim();
 } catch {
@@ -69,6 +75,7 @@ try {
 }
 
 const fullVersion = `${appVersion}-${appCommit}`;
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
@@ -423,9 +430,11 @@ function automergeRepoImportMethodPlugin(): Plugin {
     enforce: "pre",
     transform(code, id) {
       const normalizedId = id.split("?")[0];
+
       const isAutomergeRepoSourceFile = normalizedId.endsWith(
         "/node_modules/@automerge/automerge-repo/dist/Repo.js",
       );
+
       const isAutomergeRepoOptimizedChunk =
         normalizedId.includes("/node_modules/.vite/deps/") &&
         code.includes("node_modules/.pnpm/@automerge+automerge-repo@");
@@ -476,6 +485,7 @@ function sentrySourcemapsPlugin(): Plugin {
 
       if (!process.env.SENTRY_AUTH_TOKEN?.trim()) {
         process.stdout.write("SENTRY_AUTH_TOKEN is not set, skipping sourcemaps upload\n");
+
         return;
       }
 

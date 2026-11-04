@@ -2,6 +2,7 @@ import { registerPlugin, type PluginListenerHandle } from "@capacitor/core";
 import type { AdmobConsentInfo } from "@capacitor-community/admob";
 
 export type AdFormat = "appOpen" | "interstitial";
+
 export type FullScreenAdEvent = "shown" | "dismissed" | "failedToShow";
 
 export interface AdMobSdk {
@@ -42,7 +43,9 @@ export async function createAdMobSdk(
 ): Promise<AdMobSdk> {
   const { AdMob, InterstitialAdPluginEvents, MaxAdContentRating } =
     await import("@capacitor-community/admob");
+
   const handles: PluginListenerHandle[] = [];
+
   try {
     handles.push(
       await AdMob.addListener(InterstitialAdPluginEvents.Showed, () => {

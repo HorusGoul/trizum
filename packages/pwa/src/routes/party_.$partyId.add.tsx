@@ -79,6 +79,7 @@ function AddExpense() {
     navigate: (options) => void navigate(mergeSearchOptions(options)),
     history: router.history,
   });
+
   const { activeCalculatorId, openCalculator, closeCalculator } = useRouteCalculator({
     calculatorId: search.calculator,
     currentLocation,
@@ -90,6 +91,7 @@ function AddExpense() {
 
   // Track photos for gallery - updates when form changes
   const [photos, setPhotos] = useState<string[]>([]);
+
   // Custom-only affects the picker; direct add URLs intentionally fall back to Blank.
   const [initialExpense] = useState(() => ({
     defaultValues: resolveExpenseTemplateValues({
@@ -124,6 +126,7 @@ function AddExpense() {
       });
 
       trackEvent("expense_created");
+
       if (initialExpense.isPrefilled) trackEvent("expense_template_used");
       await navigate({
         to: "/party/$partyId/expense/$expenseId",

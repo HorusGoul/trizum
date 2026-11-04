@@ -23,6 +23,7 @@ describe("native app updates", () => {
     const getAppUpdateInfo = createGetAppUpdateInfoMock();
     const appUpdate = createAppUpdate({ getAppUpdateInfo });
     const getAndroidAppUpdateInfo = createGetAndroidAppUpdateInfoMock();
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       getAndroidAppUpdateInfo,
       support: createUnsupportedAndroidUpdateSupport(),
@@ -109,6 +110,7 @@ describe("native app updates", () => {
 
   test("does not start Android updates when Google Play support is missing", async () => {
     const performAndroidImmediateUpdate = createPerformAndroidImmediateUpdateMock();
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       performAndroidImmediateUpdate,
       support: createUnsupportedAndroidUpdateSupport(),
@@ -127,6 +129,7 @@ describe("native app updates", () => {
 
   test("does not start Android updates when immediate updates are not allowed", async () => {
     const performAndroidImmediateUpdate = createPerformAndroidImmediateUpdateMock();
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       appUpdateInfo: createAppUpdateInfo({
         immediateUpdateAllowed: false,
@@ -148,6 +151,7 @@ describe("native app updates", () => {
 
   test("starts Android immediate updates when they are allowed", async () => {
     const performAndroidImmediateUpdate = createPerformAndroidImmediateUpdateMock();
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       appUpdateInfo: createAppUpdateInfo({
         immediateUpdateAllowed: true,
@@ -169,9 +173,11 @@ describe("native app updates", () => {
 
   test("shares one Android immediate update start across concurrent requests", async () => {
     const immediateUpdateResult = createDeferred<AppUpdateResult>();
+
     const performAndroidImmediateUpdate = vi.fn<() => Promise<AppUpdateResult>>(
       () => immediateUpdateResult.promise,
     );
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       appUpdateInfo: createAppUpdateInfo({
         immediateUpdateAllowed: true,
@@ -185,6 +191,7 @@ describe("native app updates", () => {
       nativeUpdateEnvironment,
       platform: "android",
     });
+
     const resumedUpdate = resumeNativeAppUpdate({
       nativeUpdateEnvironment,
       platform: "android",
@@ -242,6 +249,7 @@ describe("native app updates", () => {
 
   test("resumes in-progress Android immediate updates", async () => {
     const performAndroidImmediateUpdate = createPerformAndroidImmediateUpdateMock();
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       appUpdateInfo: createAppUpdateInfo({
         immediateUpdateAllowed: false,
@@ -262,6 +270,7 @@ describe("native app updates", () => {
 
   test("does not resume newly available Android immediate updates", async () => {
     const performAndroidImmediateUpdate = createPerformAndroidImmediateUpdateMock();
+
     const nativeUpdateEnvironment = createNativeUpdateEnvironment({
       appUpdateInfo: createAppUpdateInfo({
         immediateUpdateAllowed: true,
@@ -360,6 +369,7 @@ function createPerformAndroidImmediateUpdateMock(code = AppUpdateResultCode.OK) 
 
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
+
   const promise = new Promise<T>((nextResolve) => {
     resolve = nextResolve;
   });
@@ -369,9 +379,11 @@ function createDeferred<T>() {
 
 async function waitUntil(assertion: () => void) {
   let error: unknown;
+
   for (let attempt = 0; attempt < 10; attempt += 1) {
     try {
       assertion();
+
       return;
     } catch (nextError) {
       error = nextError;

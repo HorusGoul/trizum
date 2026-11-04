@@ -13,6 +13,7 @@ export async function encodeBlob(blob: Blob) {
 
   // Use a more efficient encoding method that doesn't spread large arrays
   let binaryString = "";
+
   for (let i = 0; i < uint8Array.length; i++) {
     binaryString += String.fromCharCode(uint8Array[i]);
   }
@@ -24,6 +25,7 @@ export function decodeBlob(encodedBlob: string, mimeType?: string) {
   const encodedBlobString = atob(encodedBlob);
 
   const uint8Array = new Uint8Array(encodedBlobString.length);
+
   for (let i = 0; i < encodedBlobString.length; i++) {
     uint8Array[i] = encodedBlobString.charCodeAt(i);
   }

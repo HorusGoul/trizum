@@ -9,6 +9,7 @@ describe("getCurrentPremiumPaywallLoadState", () => {
   it("hides a previous offering when the paywall is reopened", () => {
     const previousLoadKey = createPremiumPaywallLoadKey(1, "user-1");
     const nextLoadKey = createPremiumPaywallLoadKey(2, "user-1");
+
     const previousState = {
       loadKey: previousLoadKey,
       offering: {
@@ -33,6 +34,7 @@ describe("getCurrentPremiumPaywallLoadState", () => {
       },
       status: "ready",
     } satisfies PremiumPaywallLoadState;
+
     const nextLoadKey = createPremiumPaywallLoadKey(1, "user-2");
 
     expect(getCurrentPremiumPaywallLoadState(previousState, nextLoadKey).status).toBe("loading");

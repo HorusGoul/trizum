@@ -55,6 +55,7 @@ export function PartyPendingComponent() {
   // Track elapsed time
   useEffect(() => {
     const startTime = Date.now();
+
     const interval = setInterval(() => {
       setElapsedTime(Date.now() - startTime);
     }, 500);

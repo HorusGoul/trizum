@@ -16,12 +16,15 @@ export const rememberedSession = createRememberedAuthSession({
   clearToken: clearNativeAuthToken,
   captureToken(response, body) {
     setNativeAuthTokenFromResponse(response);
+
     if (!response.headers.has("set-auth-token")) {
       const token = getAuthResultToken(body);
+
       if (token) setNativeAuthToken(token);
     }
   },
 });
+
 subscribeNativeAuthTokenClear(rememberedSession.clear);
 
 export const fetchAuth = rememberedSession.fetch;

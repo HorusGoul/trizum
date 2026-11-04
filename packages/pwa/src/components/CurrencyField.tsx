@@ -120,46 +120,58 @@ function useCurrencyFieldCalculator({
   const configuredPresenceElementId =
     (fieldProps as { "data-presence-element-id"?: string })["data-presence-element-id"] ??
     (fieldProps as { "data-presence-proxy-element-id"?: string })["data-presence-proxy-element-id"];
+
   const fieldContainerRef = useRef<HTMLDivElement>(null);
   const isClosingFromCalculatorRef = useRef(false);
   const lastCalculatorButtonInteractionTimeRef = useRef<number | null>(null);
   const pendingRouteOpenCalculatorIdRef = useRef<string | null>(null);
   const scheduledOpenTimeoutRef = useRef<number | null>(null);
+
   const [calculatorPresenceElementId, setCalculatorPresenceElementId] = useState(
     configuredPresenceElementId ?? null,
   );
+
   const [calculatorCloseState, setCalculatorCloseState] = useState<CurrencyFieldCalculatorState>({
     requestId: 0,
     isClosedFromCalculator: false,
     isClosingFromRouteChange: false,
   });
+
   const { requestId, isClosedFromCalculator, isClosingFromRouteChange } = calculatorCloseState;
+
   const [state, actions] = useCalculatorMode({
     value: clampCurrencyValue(fieldProps.value ?? 0, fieldProps.minValue),
     onChange: (value) => fieldProps.onChange?.(clampCurrencyValue(value, fieldProps.minValue)),
     currency: fieldProps.currency,
   });
+
   const calculatorFieldId =
     calculatorId ?? configuredPresenceElementId ?? fieldProps.name ?? "currency";
+
   const isRouteControlled =
     activeCalculatorId !== undefined ||
     onOpenCalculator !== undefined ||
     onCloseCalculator !== undefined;
+
   const isCalculatorRouteActive = isRouteControlled && activeCalculatorId === calculatorFieldId;
+
   const isRouteClosePending =
     isRouteControlled &&
     activeCalculatorId === undefined &&
     state.isActive &&
     !isClosedFromCalculator;
+
   const shouldRenderCalculator = isRouteControlled
     ? state.isActive &&
       !isClosedFromCalculator &&
       (isCalculatorRouteActive || isClosingFromRouteChange || isRouteClosePending)
     : state.isActive;
+
   const isCalculatorActive = isRouteControlled
     ? !isClosedFromCalculator &&
       (isCalculatorRouteActive || isClosingFromRouteChange || isRouteClosePending)
     : state.isActive;
+
   const shouldPreventNativeKeyboard = autoOpenCalculator || isCalculatorActive;
   const fieldLabel = getCalculatorFieldLabel(fieldProps);
 
@@ -179,11 +191,13 @@ function useCurrencyFieldCalculator({
         ...currentState,
         isClosedFromCalculator: false,
       }));
+
       return;
     }
 
     if (activeCalculatorId === calculatorFieldId) {
       pendingRouteOpenCalculatorIdRef.current = null;
+
       if (state.isActive || isClosedFromCalculator || isClosingFromCalculatorRef.current) {
         return;
       }
@@ -193,6 +207,7 @@ function useCurrencyFieldCalculator({
         configuredPresenceElementId ?? getPresenceElementIdFromTarget(fieldContainerRef.current),
       );
       actions.activate({ selectAll: true });
+
       return;
     }
 
@@ -220,6 +235,7 @@ function useCurrencyFieldCalculator({
             isClosingFromRouteChange: true,
           }));
         }
+
         return;
       }
 
@@ -278,12 +294,15 @@ function useCurrencyFieldCalculator({
   function closeCalculator({ suppressAutoOpen = false }: { suppressAutoOpen?: boolean } = {}) {
     const shouldCloseRoute = !isClosingFromRouteChange;
     pendingRouteOpenCalculatorIdRef.current = null;
+
     if (shouldCloseRoute) {
       isClosingFromCalculatorRef.current = true;
     }
+
     if (suppressAutoOpen) {
       suppressCalculatorAutoOpen();
     }
+
     setCalculatorCloseState((currentState) => ({
       ...currentState,
       isClosedFromCalculator: shouldCloseRoute || currentState.isClosedFromCalculator,
@@ -292,6 +311,7 @@ function useCurrencyFieldCalculator({
     blurFocusedCalculatorField();
     actions.deactivate();
     window.requestAnimationFrame(blurFocusedCalculatorField);
+
     if (shouldCloseRoute) {
       const closeRouteCalculator = onCloseCalculator;
       window.requestAnimationFrame(() => closeRouteCalculator?.());
@@ -334,6 +354,7 @@ function useCurrencyFieldCalculator({
     allowCalculatorAutoOpenFromUserInteraction();
 
     const hasActiveCalculatorRoute = new URLSearchParams(window.location.search).has("calculator");
+
     if (
       isRouteControlled &&
       !hasActiveCalculatorRoute &&
@@ -372,35 +393,41 @@ function useCurrencyFieldCalculator({
 
     lastCalculatorButtonInteractionTimeRef.current = performance.now();
     clearScheduledOpenCalculator();
+
     return true;
   }
 
   function handlePointerDownCapture(event: React.PointerEvent<HTMLDivElement>) {
     if (shouldIgnoreAutoOpenFromTarget(event.target)) {
       onPointerDownCapture?.(event);
+
       return;
     }
 
     if (fieldContainerRef.current?.contains(event.target as Node)) {
       scheduleOpenCalculatorFromUserInteraction();
     }
+
     onPointerDownCapture?.(event);
   }
 
   function handleMouseDownCapture(event: React.MouseEvent<HTMLDivElement>) {
     if (shouldIgnoreAutoOpenFromTarget(event.target)) {
       onMouseDownCapture?.(event);
+
       return;
     }
 
     if (fieldContainerRef.current?.contains(event.target as Node)) {
       scheduleOpenCalculatorFromUserInteraction();
     }
+
     onMouseDownCapture?.(event);
   }
 
   useEffect(() => {
     const fieldContainer = fieldContainerRef.current;
+
     if (!fieldContainer) {
       return;
     }

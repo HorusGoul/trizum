@@ -14,6 +14,7 @@ test.describe("Home smoke @smoke", () => {
 
   test("fits the empty state in compact mobile viewports", async ({ page }) => {
     const homePage = new HomePage(page);
+
     const viewports = [
       { width: 375, height: 667 },
       { width: 320, height: 568 },
@@ -58,6 +59,7 @@ test.describe("Home smoke @smoke", () => {
 
   test("reopens an existing party from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
+
     const seededParty = await harness.joinSeededParty({
       fixture: createImbalancedPartyFixture(),
       participantName: defaultParticipants.blair.name,

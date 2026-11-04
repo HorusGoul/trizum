@@ -34,12 +34,14 @@ export async function createPartyBoostTestHarness() {
       d1_databases: [{ binding: "DB", database_name: "test", database_id: "test" }],
     }),
   );
+
   const platform = await getPlatformProxy<ApiEnv>({
     configPath,
     envFiles: [],
     persist: false,
     remoteBindings: false,
   });
+
   const env: ApiEnv = {
     ...platform.env,
     BETTER_AUTH_SECRET: "isolated-party-boost-test-secret-at-least-32-characters",
@@ -47,11 +49,14 @@ export async function createPartyBoostTestHarness() {
     REVENUECAT_PROJECT_ID: "test-project",
     REVENUECAT_SECRET_API_KEY: "test-only-key",
   };
+
   const migrations = fileURLToPath(new URL("../../migrations/", import.meta.url).href);
+
   for (const filename of (await readdir(migrations))
     .filter((name) => name.endsWith(".sql"))
     .sort()) {
     const sql = await readFile(join(migrations, filename), "utf8");
+
     for (const statement of sql
       .split(";")
       .map((part) => part.trim())
@@ -66,37 +71,49 @@ export async function createPartyBoostTestHarness() {
   let revenueCatStatus = 200;
   let syncUnavailable = false;
   let writesUnavailable = false;
+
   const read = vi.spyOn(AutomergeDocuments.prototype, "read").mockImplementation(async (id) => {
     if (syncUnavailable) throw new Error("Test sync outage");
     const document = documents.get(id);
+
     if (!document) throw new Error("Missing test document");
+
     return structuredClone(document);
   });
+
   const change = vi
     .spyOn(AutomergeDocuments.prototype, "change")
     .mockImplementation(async (id, update) => {
       if (writesUnavailable || syncUnavailable) throw new Error("Test sync write outage");
       const document = documents.get(id);
+
       if (!document) throw new Error("Missing test document");
       update(document);
+
       return structuredClone(document);
     });
+
   const nativeFetch = globalThis.fetch;
   vi.stubGlobal("fetch", async (input: RequestInfo | URL, init?: RequestInit) => {
     const request = input instanceof Request ? input : new Request(input, init);
     const url = new URL(request.url);
+
     if (url.hostname === "localhost" || url.hostname === "127.0.0.1")
       return nativeFetch(input, init);
+
     if (url.origin !== "https://api.revenuecat.com")
       throw new Error("Unexpected external test request");
     requests.push(request);
+
     if (revenueCatStatus !== 200)
       return Response.json({ object: "error" }, { status: revenueCatStatus });
     const userId = decodeURIComponent(url.pathname.split("/").at(-2) ?? "");
     const access = customers.get(userId) ?? "inactive";
     const purchase = url.pathname.endsWith("/purchases");
+
     const included =
       access !== "inactive" && (purchase ? access === "lifetime" : access !== "lifetime");
+
     return Response.json({
       object: "list",
       next_page: null,
@@ -133,6 +150,7 @@ export async function createPartyBoostTestHarness() {
     createParty() {
       const id = createDocumentId();
       documents.set(id, { type: "party", id, participants: {} });
+
       return id;
     },
     async createUser() {
@@ -145,20 +163,26 @@ export async function createPartyBoostTestHarness() {
           password: "test-password-only",
         }),
       });
+
       const response = await createAuth(env, platform.ctx, request).handler(request);
+
       if (!response.ok)
         throw new Error(`Test signup failed: ${response.status} ${await response.text()}`);
       const { user } = (await response.json()) as { user: { id: string } };
+
       const cookie = response.headers
         .getSetCookie()
         .map((value) => value.split(";")[0])
         .join("; ");
+
       const listId = createDocumentId();
+
       const list = {
         type: "partyList",
         parties: {} as Record<string, true>,
         participantInParties: {} as Record<string, string>,
       };
+
       documents.set(listId, list);
       await env.DB.prepare(
         "INSERT INTO cloud_user_settings (userId, partyListDocumentId, updatedAt) VALUES (?, ?, ?)",
@@ -166,6 +190,7 @@ export async function createPartyBoostTestHarness() {
         .bind(user.id, listId, Date.now())
         .run();
       const participantId = crypto.randomUUID();
+
       return {
         participantId,
         id: user.id,
@@ -186,7 +211,9 @@ export async function createPartyBoostTestHarness() {
     },
     async request(method: "GET" | "PUT", partyId: string, cookie?: string) {
       const url = new URL("http://localhost:8787/party-boost");
+
       if (method === "GET") url.searchParams.set("partyDocumentId", partyId);
+
       return premiumRoute.fetch(
         new Request(url, {
           method,

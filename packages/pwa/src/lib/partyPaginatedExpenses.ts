@@ -96,6 +96,7 @@ export function getPartyPaginatedExpensesSnapshot(
 ): PartyPaginatedExpensesSnapshot {
   const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
   const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
+
   const expenses = loadedChunkIds.flatMap((chunkId) => {
     const chunk = getCachedPartyExpenseChunk(repo, chunkId);
 
@@ -122,10 +123,13 @@ export function subscribeToPartyPaginatedExpenses(
   const loadedChunkIds = getVisibleLoadedPartyExpenseChunkIds(repo, chunkIds);
   const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds);
   const nextChunkId = getNextPartyExpenseChunkIds(repo, chunkIds).at(0);
+
   const chunkIdsToSubscribe = nextChunkId
     ? [...loadedChunkIds, ...visibleChunkIdsToLoad, nextChunkId]
     : [...loadedChunkIds, ...visibleChunkIdsToLoad];
+
   const uniqueChunkIds = new Set(chunkIdsToSubscribe);
+
   const unsubscribeCallbacks = Array.from(uniqueChunkIds, (chunkId) =>
     documentCache.subscribe(onStoreChange, repo, chunkId),
   );

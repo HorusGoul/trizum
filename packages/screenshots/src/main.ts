@@ -106,9 +106,11 @@ function requestedValues(environmentValue: string | undefined): Set<string> | nu
 const requestedDevices = requestedValues(process.env.SCREENSHOTS_DEVICES);
 const requestedLanguages = requestedValues(process.env.SCREENSHOTS_LOCALES);
 const requestedScenes = requestedValues(process.env.SCREENSHOTS_SCENES);
+
 const selectedDevices = requestedDevices
   ? allDevices.filter(({ folder }) => requestedDevices.has(folder))
   : allDevices;
+
 const languages = requestedLanguages
   ? allLanguages.filter((language) => requestedLanguages.has(language))
   : allLanguages;
@@ -127,6 +129,7 @@ async function main() {
   try {
     logger.info("Starting browser");
     browser = await chromium.launch({ headless: true });
+
     if (process.env.SCREENSHOTS_CLEAN !== "false") {
       await Promise.all([
         rm(SCREENSHOTS_OUTPUT_DIR, { force: true, recursive: true }),
@@ -141,6 +144,7 @@ async function main() {
           language,
           selectedDevice.folder,
         );
+
         const rawScreenshotsFolder = path.resolve(
           RAW_SCREENSHOTS_OUTPUT_DIR,
           language,
@@ -183,6 +187,7 @@ async function main() {
                 reducedMotion: "reduce",
                 baseURL: BASE_URL,
               });
+
               context.setDefaultTimeout(15_000);
 
               try {
@@ -212,6 +217,7 @@ async function main() {
                   await page.evaluate(async () => {
                     for (const animation of document.getAnimations()) {
                       const timing = animation.effect?.getComputedTiming();
+
                       if (Number.isFinite(timing?.endTime)) {
                         animation.finish();
                       }
@@ -222,16 +228,19 @@ async function main() {
                     });
                     await document.fonts.ready;
                   });
+
                   const rawScreenshotPath = path.resolve(
                     rawScreenshotsFolder,
                     [name, selectedDevice.suffix, "png"].filter(Boolean).join("."),
                   );
+
                   await page.screenshot({
                     animations: "disabled",
                     path: rawScreenshotPath,
                   });
 
                   const scene = STORE_SCENES.find((candidate) => candidate.name === name);
+
                   if (!scene) {
                     throw new Error(`Missing store design for screenshot ${name}`);
                   }
@@ -259,6 +268,7 @@ async function main() {
                       .waitFor({
                         state: "visible",
                       });
+
                     const partyId = await page.evaluate(async (data) => {
                       // @ts-expect-error - Internal function
                       // eslint-disable-next-line @typescript-eslint/no-unsafe-call

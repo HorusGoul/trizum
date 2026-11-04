@@ -17,6 +17,7 @@ afterEach(async () => {
 async function createTemporaryDirectory(): Promise<string> {
   const directory = await mkdtemp(path.join(os.tmpdir(), "trizum-screenshots-"));
   temporaryDirectories.push(directory);
+
   return directory;
 }
 

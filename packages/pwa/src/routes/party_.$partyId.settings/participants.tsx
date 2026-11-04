@@ -24,10 +24,12 @@ export const Route = createFileRoute("/party_/$partyId/settings/participants")({
 function PartyParticipantSettings() {
   const { partyId } = Route.useParams();
   const { party, updateParticipants } = useParty(partyId);
+
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",
     params: { partyId },
   });
+
   const formId = useId();
 
   const form = useForm({

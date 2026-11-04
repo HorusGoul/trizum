@@ -44,9 +44,11 @@ export const appWorker: AppWorkerClientApi = {
   async recalculateBalances(partyId) {
     const { repo } = requireAppWorkerOptions();
     const request = await createRecalculateBalancesRequest(repo, partyId);
+
     return callAppWorker("recalculateBalances", async (api) => {
       const documents = await api.recalculateBalances(request);
       await waitForDocumentHeads(repo, documents, AbortSignal.timeout(balanceSyncTimeout));
+
       return true;
     });
   },
@@ -71,6 +73,7 @@ function getAppWorkerClient({ repo, wssUrl, isOfflineOnly }: InitializeAppWorker
   const worker = new Worker(new URL("./appWorker.entrypoint.ts", import.meta.url), {
     type: "module",
   });
+
   const api = injectAppWorker(new WorkerAdapter(worker, "app-worker-injector"));
   const repoChannel = new MessageChannel();
   const repoNetworkAdapter = new MessageChannelNetworkAdapter(repoChannel.port1);
@@ -137,9 +140,11 @@ async function callAppWorker<Result>(
         error: restartError,
       });
       markFullAppRestartRequired(methodName);
+
       if (restartedClient) {
         clearAppWorkerClient(restartedClient);
       }
+
       throw restartError;
     }
   }

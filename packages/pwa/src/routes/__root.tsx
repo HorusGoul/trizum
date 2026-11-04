@@ -32,6 +32,7 @@ function Root() {
                 options?.replace ??
                 shouldReplaceNavigation(router.state.location.href, nextLocation.href),
             });
+
             return;
           }
 
@@ -39,6 +40,7 @@ function Root() {
             ...to,
             ...options,
           };
+
           const nextLocation = router.buildLocation(navigationOptions);
 
           void router.navigate({

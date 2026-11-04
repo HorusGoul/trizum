@@ -9,13 +9,16 @@ test("a signed-out party member sees a shared boost without a sign-in or activat
   let serverChecks = 0;
   await page.route("**/api/premium/party-boost?**", (route) => {
     serverChecks++;
+
     return route.fulfill({ status: 401, json: { error: { code: "unauthorized" } } });
   });
   const fixture = createPartyFixture();
+
   const { partyId } = await harness.joinSeededParty({
     fixture,
     participantName: defaultParticipants.alex.name,
   });
+
   await harness.setPartyBoost(partyId, {
     "test-boost": {
       boostId: "test-boost",
@@ -53,16 +56,20 @@ test("waits for personal status and confirms a transfer even when shared state i
   await page.route("**/api/auth/get-session**", (route) =>
     route.fulfill({ json: { user, session: { userId: user.id } } }),
   );
+
   const { partyId } = await harness.joinSeededParty({
     fixture: createPartyFixture(),
     participantName: defaultParticipants.alex.name,
   });
+
   const other = await harness.seedParty(createPartyFixture());
   await harness.setPartyBoost(partyId, {});
   let releaseFirstRead = () => {};
+
   const firstRead = new Promise<void>((resolve) => {
     releaseFirstRead = resolve;
   });
+
   let reads = 0;
   let writes = 0;
   page.on("request", (request) => {
@@ -75,8 +82,10 @@ test("waits for personal status and confirms a transfer even when shared state i
         status: 503,
         json: { error: { code: "unavailable", message: "Try again" } },
       });
+
       return;
     }
+
     await route.fulfill({
       json: {
         currentUser: {
@@ -117,24 +126,30 @@ test("refreshes eligibility after shared revocation and ignores timestamp-only u
   await page.route("**/api/auth/get-session**", (route) =>
     route.fulfill({ json: { user, session: { userId: user.id } } }),
   );
+
   const { partyId } = await harness.joinSeededParty({
     fixture: createPartyFixture(),
     participantName: defaultParticipants.alex.name,
   });
+
   const boost = {
     boostId: "test-boost",
     participantId: defaultParticipants.alex.id,
     checkedAt: "2026-09-28T10:00:00.000Z",
     boostedAt: "2026-09-27T10:00:00.000Z",
   };
+
   await harness.setPartyBoost(partyId, { "test-boost": boost });
   let reads = 0;
   let releaseRefresh = () => {};
+
   const refresh = new Promise<void>((resolve) => {
     releaseRefresh = resolve;
   });
+
   await page.route("**/api/premium/party-boost?**", async (route) => {
     const first = ++reads === 1;
+
     if (!first) await refresh;
     await route.fulfill({
       json: {
@@ -178,19 +193,24 @@ test("a Premium denial survives a stale background read and recovers after verif
   await page.route("**/api/auth/get-session**", (route) =>
     route.fulfill({ json: { user, session: { userId: user.id } } }),
   );
+
   const { partyId } = await harness.joinSeededParty({
     fixture: createPartyFixture(),
     participantName: defaultParticipants.alex.name,
   });
+
   await harness.setPartyBoost(partyId, {});
   let releaseStaleRead = () => {};
+
   const staleRead = new Promise<void>((resolve) => {
     releaseStaleRead = resolve;
   });
+
   let reads = 0;
   let renewed = false;
   await page.route("**/api/premium/party-boost?**", async (route) => {
     const read = ++reads;
+
     if (read === 2) await staleRead;
     await route.fulfill({
       json: {
@@ -221,10 +241,12 @@ test("a Premium denial survives a stale background read and recovers after verif
       .locator("[data-sonner-toast]")
       .getByText("Premium is required for Party Boost.", { exact: true }),
   ).toBeVisible();
+
   const staleResponse = page.waitForResponse(
     (response) =>
       response.url().includes("/api/premium/party-boost?") && response.request().method() === "GET",
   );
+
   releaseStaleRead();
   await staleResponse;
   await expect(upgrade).toBeVisible();

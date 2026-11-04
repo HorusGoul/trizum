@@ -16,11 +16,15 @@ test.describe("Home party management", () => {
           __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
           __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
         };
+
         const [pinnedFixture, recentFixture, archivedFixture] = fixtures;
+
         const pinnedPartyId =
           await internalWindow.__internal_createPartyFromMigrationData(pinnedFixture);
+
         const recentPartyId =
           await internalWindow.__internal_createPartyFromMigrationData(recentFixture);
+
         const archivedPartyId =
           await internalWindow.__internal_createPartyFromMigrationData(archivedFixture);
 
@@ -95,6 +99,7 @@ test.describe("Home party management", () => {
 
     await test.step("show the desktop action button only while the card is hovered", async () => {
       const recentPartyCard = page.locator('[data-testid="party-list-card"]').nth(1);
+
       const recentPartyActionButton = recentPartyCard.getByRole("button", {
         name: "Party actions",
       });
@@ -129,6 +134,7 @@ test.describe("Home party management", () => {
 
     await test.step("restore an archived party back to the home screen", async () => {
       const archivedPartyCard = page.locator('[data-testid="party-list-card"]').nth(0);
+
       const archivedPartyActionButton = archivedPartyCard.getByRole("button", {
         name: "Party actions",
       });
@@ -163,6 +169,7 @@ test.describe("Home party management", () => {
           __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
           __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
         };
+
         const partyId = await internalWindow.__internal_createPartyFromMigrationData(fixture);
 
         await internalWindow.__internal_seedPartyListState({
@@ -200,6 +207,7 @@ test.describe("Home party management", () => {
     const partyActionsDialog = page.getByRole("dialog", {
       name: "Camping weekend",
     });
+
     const archivePartyButton = page.getByRole("button", {
       name: "Archive party",
     });
@@ -257,11 +265,13 @@ test("Premium returns take priority over opening the last party on launch", asyn
   page,
 }) => {
   await page.route("**/api/auth/get-session**", (route) => route.fulfill({ json: null }));
+
   const { partyId } = await harness.seedJoinedParty({
     fixture: createNamedPartyFixture("Premium return party", "Launch shortcut"),
     memberParticipantId: defaultParticipants.alex.id,
     openLastPartyOnLaunch: true,
   });
+
   await harness.goto("/?premium=true");
   await expect(page.getByRole("link", { name: "Premium return party", exact: true })).toBeVisible();
   await expect(page).toHaveURL((url) => url.pathname === "/" && !url.searchParams.has("premium"));

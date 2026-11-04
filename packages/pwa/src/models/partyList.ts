@@ -35,11 +35,13 @@ export interface PartyList {
 
 export function ensureTelemetryId(handle: DocHandle<PartyList>): string {
   const existing = handle.doc().telemetryId;
+
   if (isTelemetryId(existing)) return existing;
   const generated = crypto.randomUUID();
   handle.change((doc) => {
     if (!isTelemetryId(doc.telemetryId)) doc.telemetryId = generated;
   });
+
   return handle.doc().telemetryId!;
 }
 
@@ -60,6 +62,7 @@ function createPartyListHandle(repo: Repo) {
   handle.change((doc) => (doc.id = handle.documentId));
 
   localStorage.setItem(PARTY_LIST_ID_STORAGE_KEY, handle.documentId);
+
   return handle;
 }
 

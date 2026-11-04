@@ -43,6 +43,7 @@ function createPresenceTarget({
 describe("getPresenceBubblePosition", () => {
   test("positions the bubble relative to the overlay instead of the element offset parent", () => {
     const overlay = createElement({ left: 40, right: 440, top: 100 });
+
     const amountField = createElement({
       dataset: {
         presenceOffsetLeft: "-10",
@@ -63,6 +64,7 @@ describe("getPresenceBubblePosition", () => {
     const overlay = createElement({ left: 40, right: 440, top: 100 });
     let anchorTop = 260;
     let anchorRight = 360;
+
     const amountField = {
       dataset: {
         presenceOffsetLeft: "-10",
@@ -115,6 +117,7 @@ describe("getPresenceElementIdFromTarget", () => {
     const toolbar = createPresenceTarget({
       dataset: { presenceProxyElementId: "participant-alice" },
     });
+
     const button = createPresenceTarget({ parentElement: toolbar });
 
     expect(getPresenceElementIdFromTarget(button)).toBe("participant-alice");
@@ -124,6 +127,7 @@ describe("getPresenceElementIdFromTarget", () => {
     const toolbar = createPresenceTarget({
       dataset: { presenceProxyElementId: "participant-alice" },
     });
+
     const button = createPresenceTarget({ parentElement: toolbar });
     const icon = { parentElement: button } as Element;
 
@@ -134,6 +138,7 @@ describe("getPresenceElementIdFromTarget", () => {
     const row = createPresenceTarget({
       dataset: { presenceElementId: "participant-alice" },
     });
+
     const input = createPresenceTarget({ parentElement: row });
 
     expect(getPresenceElementIdFromTarget(input)).toBe("participant-alice");

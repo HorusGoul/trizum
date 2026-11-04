@@ -4,10 +4,12 @@ import { createKeyedCoalescedQueue } from "./coalescedQueue.ts";
 describe("createKeyedCoalescedQueue", () => {
   test("coalesces same-key requests into one follow-up run", async () => {
     const firstRun = createDeferred<string>();
+
     const run = vi
       .fn<(key: string) => Promise<string>>()
       .mockReturnValueOnce(firstRun.promise)
       .mockResolvedValueOnce("second");
+
     const enqueue = createKeyedCoalescedQueue({ run });
 
     const firstRequest = enqueue("party");
@@ -29,6 +31,7 @@ describe("createKeyedCoalescedQueue", () => {
   test("runs different keys independently", async () => {
     const firstRun = createDeferred<string>();
     const secondRun = createDeferred<string>();
+
     const run = vi.fn<(key: string) => Promise<string>>((key) => {
       if (key === "first") {
         return firstRun.promise;
@@ -36,6 +39,7 @@ describe("createKeyedCoalescedQueue", () => {
 
       return secondRun.promise;
     });
+
     const enqueue = createKeyedCoalescedQueue({ run });
 
     const firstRequest = enqueue("first");
@@ -56,6 +60,7 @@ describe("createKeyedCoalescedQueue", () => {
       .fn<(key: string) => Promise<string>>()
       .mockResolvedValueOnce("first")
       .mockResolvedValueOnce("second");
+
     const enqueue = createKeyedCoalescedQueue({ run });
 
     await expect(enqueue("party")).resolves.toBe("first");
@@ -67,10 +72,12 @@ describe("createKeyedCoalescedQueue", () => {
   test("recovers from errors and clears the queued state", async () => {
     const error = new Error("failed");
     const recover = vi.fn<(error: unknown, key: string) => string>(() => "fallback");
+
     const run = vi
       .fn<(key: string) => Promise<string>>()
       .mockRejectedValueOnce(error)
       .mockResolvedValueOnce("next");
+
     const enqueue = createKeyedCoalescedQueue({ run, recover });
 
     await expect(enqueue("party")).resolves.toBe("fallback");
@@ -83,6 +90,7 @@ describe("createKeyedCoalescedQueue", () => {
 
 function createDeferred<T>() {
   let resolve: (value: T) => void;
+
   const promise = new Promise<T>((promiseResolve) => {
     resolve = promiseResolve;
   });

@@ -65,13 +65,16 @@ export async function loadPremiumOffering(userId: string | null): Promise<Premiu
   }
 
   const packages = getPremiumPackages(offering);
+
   if (packages.size === 0) {
     throw new Error("The current RevenueCat offering has no supported Premium packages.");
   }
 
   let eligibilityByProductId: Record<string, IntroEligibility> = {};
+
   if (getRevenueCatPlatform() === "ios") {
     const productIdentifiers: string[] = [];
+
     for (const { product } of packages.values()) {
       if (product.introPrice?.price === 0) {
         productIdentifiers.push(product.identifier);
@@ -95,7 +98,9 @@ export async function loadPremiumOffering(userId: string | null): Promise<Premiu
     offering,
     trialFallbacks: isRevenueCatTestStoreEnabled() ? TEST_STORE_TRIAL_FALLBACKS : undefined,
   });
+
   packagesByOffering.set(premiumOffering, { packages, userId });
+
   return premiumOffering;
 }
 
@@ -109,6 +114,7 @@ export async function purchasePremiumPlan(
 
   const loadedOffering = packagesByOffering.get(offering);
   const selectedPackage = loadedOffering?.packages.get(planId);
+
   if (loadedOffering?.userId !== userId || !selectedPackage) {
     throw new Error(`Premium package "${planId}" is not available.`);
   }
@@ -117,6 +123,7 @@ export async function purchasePremiumPlan(
 
   try {
     const { customerInfo } = await Purchases.purchasePackage({ aPackage: selectedPackage });
+
     return {
       entitlement: getPremiumEntitlementState(customerInfo),
       status: "purchased",
@@ -138,6 +145,7 @@ export async function restorePremiumPurchases(
 
   const { Purchases } = await import("@revenuecat/purchases-capacitor");
   const { customerInfo } = await Purchases.restorePurchases();
+
   return getPremiumEntitlementState(customerInfo);
 }
 
@@ -153,8 +161,10 @@ export function createPremiumOffering({
   trialFallbacks?: Partial<Record<PremiumPlanId, PremiumTrial>>;
 }): PremiumOffering {
   const packages = getPremiumPackages(offering);
+
   const plans = (["monthly", "annual", "lifetime"] as const).flatMap((planId) => {
     const premiumPackage = packages.get(planId);
+
     if (!premiumPackage) {
       return [];
     }
@@ -163,6 +173,7 @@ export function createPremiumOffering({
     const introPrice = product.introPrice;
     const eligibility = eligibilityByProductId[product.identifier];
     const introUnit = getTrialUnit(introPrice?.periodUnit);
+
     const eligibleAppleTrial =
       introPrice?.price === 0 && eligibility?.status === eligibleStatus && introUnit
         ? {
@@ -170,7 +181,9 @@ export function createPremiumOffering({
             unit: introUnit,
           }
         : null;
+
     const eligibleGoogleTrial = getGoogleDefaultOptionTrial(product.defaultOption);
+
     const trial =
       eligibleGoogleTrial ?? (introPrice ? eligibleAppleTrial : (trialFallbacks?.[planId] ?? null));
 
@@ -192,20 +205,25 @@ export function createPremiumOffering({
 
 function getPremiumPackages(offering: PurchasesOffering) {
   const packages = new Map<PremiumPlanId, PurchasesPackage>();
+
   if (offering.monthly) {
     packages.set("monthly", offering.monthly);
   }
+
   if (offering.annual) {
     packages.set("annual", offering.annual);
   }
+
   if (offering.lifetime) {
     packages.set("lifetime", offering.lifetime);
   }
+
   return packages;
 }
 
 function getPremiumEntitlementState(customerInfo: CustomerInfo): PremiumEntitlementState {
   const access = getPremiumAccess(customerInfo);
+
   return {
     hasActiveSubscription: access.hasActiveSubscription,
     isPremium: access.isPremium,
@@ -232,11 +250,13 @@ function getGoogleDefaultOptionTrial(
 ): PremiumTrial | null {
   const freePhase = defaultOption?.freePhase;
   const unit = getTrialUnit(freePhase?.billingPeriod.unit);
+
   if (!freePhase || !unit) {
     return null;
   }
 
   const billingCycleCount = freePhase.billingCycleCount ?? 1;
+
   return {
     duration: freePhase.billingPeriod.value * billingCycleCount,
     unit,
@@ -249,6 +269,7 @@ function isPurchaseCancellation(error: unknown, cancellationCode: string) {
   }
 
   const purchaseError = error as { code?: unknown; userCancelled?: unknown };
+
   return purchaseError.userCancelled === true || purchaseError.code === cancellationCode;
 }
 

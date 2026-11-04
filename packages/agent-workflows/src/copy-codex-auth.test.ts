@@ -9,6 +9,7 @@ import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test";
 import { copyCodexAuth } from "./copy-codex-auth.js";
 
 vi.mock("node:child_process", () => ({ spawnSync: vi.fn<typeof spawnSync>() }));
+
 vi.mock("node:os", async (importOriginal) => ({
   ...(await importOriginal<typeof OsModule>()),
   platform: vi.fn<typeof platform>(() => "darwin"),
@@ -24,6 +25,7 @@ const credentials = {
   },
   last_refresh: "2026-10-28T00:00:00Z",
 };
+
 const success = {
   pid: 1,
   output: [],
@@ -32,6 +34,7 @@ const success = {
   status: 0,
   signal: null,
 };
+
 let ciAuthDirectory: string;
 const output = vi.fn<(...args: unknown[]) => boolean>(() => true);
 
@@ -48,6 +51,7 @@ beforeEach(() => {
       ciAuthDirectory = options?.env?.CODEX_HOME ?? "";
       writeFileSync(path.join(ciAuthDirectory, "auth.json"), JSON.stringify(credentials));
     }
+
     return success;
   });
 });
@@ -89,6 +93,7 @@ test.each(["invalid json", JSON.stringify({ auth_mode: "chatgpt", tokens: {} })]
     vi.mocked(spawnSync).mockImplementationOnce((_command, _args, options) => {
       ciAuthDirectory = options?.env?.CODEX_HOME ?? "";
       writeFileSync(path.join(ciAuthDirectory, "auth.json"), contents);
+
       return success;
     });
     await expect(copyCodexAuth()).rejects.toThrow("Codex did not create");
@@ -100,6 +105,7 @@ test.each(["invalid json", JSON.stringify({ auth_mode: "chatgpt", tokens: {} })]
 test("does not attempt clipboard access after a failed login", async () => {
   vi.mocked(spawnSync).mockImplementationOnce((_command, _args, options) => {
     ciAuthDirectory = options?.env?.CODEX_HOME ?? "";
+
     return { ...success, status: 1 };
   });
   await expect(copyCodexAuth()).rejects.toThrow("Codex login did not complete");
@@ -111,6 +117,7 @@ test("cleans up after clipboard failure without including captured credentials i
   const login = vi.mocked(spawnSync).getMockImplementation();
   vi.mocked(spawnSync).mockImplementation((command, args, options) => {
     if (command === "codex" && login != null) return login(command, args, options);
+
     return { ...success, status: 1, stderr: JSON.stringify(credentials) };
   });
   await expect(copyCodexAuth()).rejects.toThrow(/^Could not copy credentials using pbcopy\./);
@@ -120,11 +127,13 @@ test("cleans up after clipboard failure without including captured credentials i
 test("returns after the X11 clipboard parent exits while its background owner keeps stderr", async () => {
   const { spawnSync: realSpawnSync } =
     await vi.importActual<typeof ChildProcessModule>("node:child_process");
+
   vi.mocked(platform).mockReturnValue("linux");
   vi.stubEnv("WAYLAND_DISPLAY", "");
   const login = vi.mocked(spawnSync).getMockImplementation();
   vi.mocked(spawnSync).mockImplementation((command, args, options) => {
     if (command === "codex" && login != null) return login(command, args, options);
+
     return realSpawnSync(
       process.execPath,
       [

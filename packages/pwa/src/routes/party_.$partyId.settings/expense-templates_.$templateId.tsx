@@ -83,11 +83,14 @@ function ExpenseTemplateEditor() {
     to: "/party/$partyId/settings/expense-templates",
     params: { partyId },
   });
+
   const [isDeleteSheetOpen, setIsDeleteSheetOpen] = useState(false);
   const formId = useId();
+
   const activeParticipants = Object.values(party.participants)
     .filter((participant) => !participant.isArchived)
     .sort((left, right) => left.name.localeCompare(right.name, i18n.locale));
+
   const payerOptions: PayerOption[] = [
     { id: "current-participant", label: translate`Current participant` },
     ...Object.values(party.participants)
@@ -99,12 +102,15 @@ function ExpenseTemplateEditor() {
           : participant.name,
       })),
   ];
+
   const existingTemplates = Object.values(party.expenseTemplates ?? {});
+
   const existingTemplateNames = new Set(
     existingTemplates.map((existingTemplate) =>
       existingTemplate.name.trim().toLocaleLowerCase(i18n.locale),
     ),
   );
+
   const defaultTemplateName = getNextTemplateName({
     existingNames: existingTemplateNames,
     formatName: (number) => i18n._({ ...DEFAULT_TEMPLATE_NAME, values: { number } }),
@@ -144,6 +150,7 @@ function ExpenseTemplateEditor() {
     onSubmit: ({ value }) => {
       if (isNew && Object.keys(party.expenseTemplates ?? {}).length >= MAX_EXPENSE_TEMPLATES) {
         announceTemplateLimit();
+
         return;
       }
 
@@ -168,11 +175,13 @@ function ExpenseTemplateEditor() {
       } catch (error) {
         if (error instanceof ExpenseTemplateLimitError) {
           announceTemplateLimit();
+
           return;
         }
 
         throw error;
       }
+
       trackEvent(isNew ? "expense_template_created" : "expense_template_updated");
       form.reset(value);
       toast.success(isNew ? t`Expense template created` : t`Expense template saved`);
@@ -183,6 +192,7 @@ function ExpenseTemplateEditor() {
   const amount = useStore(form.store, (state) => state.values.amount);
   const shares = useStore(form.store, (state) => state.values.shares);
   const participantSelection = useStore(form.store, (state) => state.values.participantSelection);
+
   const archivedReferencedParticipants = Object.values(party.participants).filter(
     (participant) => participant.isArchived && shares[participant.id],
   );
@@ -198,6 +208,7 @@ function ExpenseTemplateEditor() {
   function includeAllParticipants(include: boolean) {
     if (!include) {
       form.setFieldValue("participantSelection", "specific");
+
       return;
     }
 

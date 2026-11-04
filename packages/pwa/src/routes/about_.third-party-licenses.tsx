@@ -17,6 +17,7 @@ export const Route = createFileRoute("/about_/third-party-licenses")({
   component: ThirdPartyLicenses,
   loader: async () => {
     const content = await fetchLicenses();
+
     return { content };
   },
   pendingComponent: () => (

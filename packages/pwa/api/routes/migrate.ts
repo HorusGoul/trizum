@@ -26,6 +26,7 @@ export const apiMigrateRoute = migrateApp.openapi(
   migrateTricountRoute,
   async (c) => {
     let data: TricountResponse | null = null;
+
     try {
       const { key: tricountKey } = c.req.valid("query");
 
@@ -38,6 +39,7 @@ export const apiMigrateRoute = migrateApp.openapi(
       return c.json(migrationDataSchema.parse(migrationData), 200);
     } catch (error) {
       logger.error("Migration error", { error });
+
       return c.json(
         migrationErrorResponseSchema.parse({
           error: error instanceof Error ? error.message : "Unknown error",
@@ -91,6 +93,7 @@ class TricountAPIClient {
       "spki",
       keyPair.publicKey,
     )) as ArrayBuffer;
+
     const publicKeyArray = new Uint8Array(publicKeyBuffer);
     const publicKeyBase64 = btoa(String.fromCharCode(...publicKeyArray));
     this.public_key = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`;
@@ -100,6 +103,7 @@ class TricountAPIClient {
       "pkcs8",
       keyPair.privateKey,
     )) as ArrayBuffer;
+
     const privateKeyArray = new Uint8Array(privateKeyBuffer);
     const privateKeyBase64 = btoa(String.fromCharCode(...privateKeyArray));
     this.private_key = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64}\n-----END PRIVATE KEY-----`;
@@ -107,6 +111,7 @@ class TricountAPIClient {
 
   async authenticate(): Promise<void> {
     const auth_url = `${this.base_url}/v1/session-registry-installation`;
+
     const auth_payload = {
       app_installation_uuid: this.app_installation_id,
       client_public_key: this.public_key,
@@ -134,6 +139,7 @@ class TricountAPIClient {
       if ("Token" in item) {
         this.auth_token = item.Token.token;
       }
+
       if ("UserPerson" in item) {
         this.user_id = item.UserPerson.id.toString();
       }
@@ -152,6 +158,7 @@ class TricountAPIClient {
     }
 
     const tricount_url = `${this.base_url}/v1/user/${this.user_id}/registry?public_identifier_token=${tricount_key}`;
+
     const response = await fetch(tricount_url, {
       headers: this.headers,
     });

@@ -19,6 +19,7 @@ export class PayPage {
     await expect
       .poll(() => {
         const url = new URL(this.page.url());
+
         return {
           amount: url.searchParams.get("amount"),
           fromId: url.searchParams.get("fromId"),

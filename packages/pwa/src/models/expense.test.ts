@@ -23,7 +23,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         "3": { type: "exact", value: 15 },
       },
     });
+
     const result = exportIntoInput(expense);
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
@@ -36,6 +38,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 50,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
   test("single divide", () => {
@@ -49,7 +52,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         "3": { type: "divide", value: 2 },
       },
     });
+
     const result = exportIntoInput(expense);
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
@@ -62,6 +67,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 100,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
   test("single exact + divide", () => {
@@ -75,7 +81,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         "3": { type: "divide", value: 2 },
       },
     });
+
     const result = exportIntoInput(expense);
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
@@ -88,6 +96,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 40,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
   test("multiple exact", () => {
@@ -102,7 +111,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         "3": { type: "exact", value: 30 },
       },
     });
+
     const result = exportIntoInput(expense);
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
@@ -125,6 +136,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 20,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
   test("multiple divide", () => {
@@ -139,7 +151,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         "3": { type: "divide", value: 2 },
       },
     });
+
     const result = exportIntoInput(expense);
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
@@ -162,6 +176,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 20,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
   test("multiple exact + divide", () => {
@@ -176,7 +191,9 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         "3": { type: "divide", value: 2 },
       },
     });
+
     const result = exportIntoInput(expense);
+
     const expected: ExpenseInput[] = [
       {
         version: 1,
@@ -199,6 +216,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 20,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
 
@@ -230,6 +248,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 1000,
       },
     ];
+
     expect(result).toStrictEqual(expected);
   });
 
@@ -264,6 +283,7 @@ describe("exportIntoInput(Expense): ExpenseInput[]", () => {
         expense: 1000,
       },
     ];
+
     expect(result).toStrictEqual(expected);
 
     // Verify the total adds up exactly

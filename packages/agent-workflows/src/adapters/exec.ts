@@ -39,6 +39,7 @@ export async function runCommand(
 
   const result = await new Promise<CommandResult>((resolve, reject) => {
     let settled = false;
+
     const child = spawn(command, args, {
       cwd: options.cwd,
       env: resolveCommandEnvironment(options),
@@ -67,10 +68,13 @@ export async function runCommand(
       if (settled) {
         return;
       }
+
       settled = true;
+
       if (timeout != null) {
         clearTimeout(timeout);
       }
+
       resolve(result);
     };
 
@@ -82,12 +86,14 @@ export async function runCommand(
           stderr: error instanceof Error ? error.message : String(error),
           stdout: "",
         });
+
         return;
       }
 
       if (timeout != null) {
         clearTimeout(timeout);
       }
+
       reject(error);
     });
 
@@ -152,6 +158,7 @@ export function redactSecrets(text: string): string {
 
   for (const key of credentialEnvironmentKeys({ preserveCodexHome: true })) {
     const value = process.env[key];
+
     if (value != null && value.length >= 8) {
       redacted = redacted.replaceAll(value, "[redacted]");
     }
