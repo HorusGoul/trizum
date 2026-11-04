@@ -5,7 +5,7 @@ import type { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import { i18n } from "@lingui/core";
 
 const addExpenseToPartyMock =
-  vi.fn<(expense: MigrationData["expenses"][number]) => Promise<unknown>>();
+  vi.fn<(expense: MigrationData["expenses"][number]) => Promise<void>>();
 
 const createMediaFileMock = vi.hoisted(() =>
   vi.fn<ReturnType<typeof getMediaFileHelpers>["createMediaFile"]>(),

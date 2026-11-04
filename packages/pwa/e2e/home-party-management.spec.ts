@@ -12,10 +12,7 @@ test.describe("Home party management", () => {
 
     const partyIds = await page.evaluate(
       async ({ fixtures, memberParticipantId }) => {
-        const internalWindow = window as unknown as InternalHarnessWindow & {
-          __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
-          __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
-        };
+        const internalWindow = window as unknown as InternalHarnessWindow;
 
         const [pinnedFixture, recentFixture, archivedFixture] = fixtures;
 
@@ -165,10 +162,7 @@ test.describe("Home party management", () => {
 
     await page.evaluate(
       async ({ fixture, memberParticipantId }) => {
-        const internalWindow = window as unknown as InternalHarnessWindow & {
-          __internal_createPartyFromMigrationData: (data: unknown) => Promise<string>;
-          __internal_seedPartyListState: (seed: unknown) => Promise<unknown>;
-        };
+        const internalWindow = window as unknown as InternalHarnessWindow;
 
         const partyId = await internalWindow.__internal_createPartyFromMigrationData(fixture);
 

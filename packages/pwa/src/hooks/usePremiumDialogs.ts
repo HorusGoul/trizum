@@ -8,14 +8,14 @@ type PremiumDialog =
   | { kind: "signIn"; intent: "account" | "premium" }
   | { kind: "premium"; userId: string };
 
-export function usePremiumDialogs({
+export function usePremiumDialogs<PaywallResult>({
   userId,
   isNative,
   presentPaywall,
 }: {
   userId: string | null;
   isNative: boolean;
-  presentPaywall: () => Promise<unknown>;
+  presentPaywall: () => Promise<PaywallResult>;
 }) {
   const [dialog, setDialog] = useState<PremiumDialog>({ kind: "closed" });
   const readyPremium = dialog.kind === "premium" && dialog.userId === userId ? dialog : null;

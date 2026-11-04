@@ -4,14 +4,36 @@ import type * as DbClient from "../db/client";
 import type { ApiEnv } from "../env";
 import { cloudSyncRoute } from "./cloud-sync";
 
-const { getSession, select, insert, limit, values, onConflictDoNothing } = vi.hoisted(() => ({
-  getSession: vi.fn<(input: { headers: Headers }) => Promise<unknown>>(),
-  select: vi.fn<() => unknown>(),
-  insert: vi.fn<() => unknown>(),
-  limit: vi.fn<() => Promise<unknown[]>>(),
-  values: vi.fn<(value: unknown) => unknown>(),
-  onConflictDoNothing: vi.fn<() => Promise<void>>(),
-}));
+interface TestCloudSettings {
+  partyListDocumentId: string;
+  updatedAt: number;
+}
+
+interface TestCloudSession {
+  session: { id: string };
+  user: { id: string };
+}
+
+const { getSession, select, insert, limit, values, onConflictDoNothing } = vi.hoisted(() => {
+  const onConflictDoNothing = vi.fn<() => Promise<void>>();
+
+  const values = vi.fn<
+    (value: TestCloudSettings & { userId: string }) => {
+      onConflictDoNothing: typeof onConflictDoNothing;
+    }
+  >();
+
+  const limit = vi.fn<() => Promise<TestCloudSettings[]>>();
+
+  return {
+    getSession: vi.fn<(input: { headers: Headers }) => Promise<TestCloudSession | null>>(),
+    select: vi.fn<() => { from(): { where(): { limit: typeof limit } } }>(),
+    insert: vi.fn<() => { values: typeof values }>(),
+    limit,
+    values,
+    onConflictDoNothing,
+  };
+});
 
 vi.mock("../auth", () => ({ createAuth: () => ({ api: { getSession } }) }));
 
@@ -23,7 +45,7 @@ vi.mock("../db/client", async (importOriginal) => ({
 describe("Cloud Sync contract", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    getSession.mockResolvedValue({ session: {}, user: { id: "test-user" } });
+    getSession.mockResolvedValue({ session: { id: "test-session" }, user: { id: "test-user" } });
     select.mockReturnValue({ from: () => ({ where: () => ({ limit }) }) });
     insert.mockReturnValue({ values });
     values.mockReturnValue({ onConflictDoNothing });

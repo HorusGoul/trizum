@@ -118,7 +118,7 @@ const toolingConfig = {
       "anti-slop/no-runtime-typeof": "off", // https://github.com/HorusGoul/trizum/issues/569
       "anti-slop/no-shape-in-symbol-names": "error",
       "anti-slop/no-unknown-parameters": "off", // https://github.com/HorusGoul/trizum/issues/568
-      "anti-slop/no-unknown-returns": "off", // https://github.com/HorusGoul/trizum/issues/567
+      "anti-slop/no-unknown-returns": "error",
       "anti-slop/no-unknown-type-aliases": "error",
       "anti-slop/no-unsafe-dictionary-type": "off", // https://github.com/HorusGoul/trizum/issues/564
       "anti-slop/no-widen-then-assert": "error",

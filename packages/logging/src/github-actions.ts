@@ -18,7 +18,7 @@ export interface GitHubActionsAnnotationSinkOptions {
 interface GitHubActionsProcess {
   env?: Record<string, string | undefined>;
   stdout?: {
-    write(chunk: string): unknown;
+    write(chunk: string): void;
   };
 }
 

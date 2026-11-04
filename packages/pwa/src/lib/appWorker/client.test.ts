@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/tes
 import type { Repo } from "@automerge/automerge-repo/slim";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
-import type { AppWorkerInitializeOptions } from "./proxy.ts";
+import type { AppWorkerApi, AppWorkerInitializeOptions } from "./proxy.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
 
@@ -11,9 +11,9 @@ type RecalculateBalances = (request: RecalculateBalancesRequest) => Promise<Docu
 type DispatchEvent = (event: Event) => boolean;
 
 const proxyMock = vi.hoisted(() => {
-  const workerApis: unknown[] = [];
+  const workerApis: AppWorkerApi[] = [];
 
-  const injectAppWorker = vi.fn<(adapter: unknown) => unknown>(() => {
+  const injectAppWorker = vi.fn<(adapter: unknown) => AppWorkerApi>(() => {
     const api = workerApis.shift();
 
     if (!api) {

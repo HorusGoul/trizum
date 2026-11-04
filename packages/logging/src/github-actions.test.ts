@@ -5,7 +5,7 @@ import { getGitHubActionsAnnotationSink } from "./github-actions.js";
 interface TestProcess {
   env: Record<string, string | undefined>;
   stdout: {
-    write(chunk: string): unknown;
+    write(chunk: string): void;
   };
 }
 

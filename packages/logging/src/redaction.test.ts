@@ -16,7 +16,7 @@ afterEach(() => {
 describe("document ID redaction at every sink", () => {
   test("does not retain an array subclass's inherited serializer", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const serializer = vi.fn<() => unknown>(() => ({ documentId }));
+    const serializer = vi.fn<() => { documentId: string }>(() => ({ documentId }));
 
     class Values extends Array<unknown> {
       toJSON() {
@@ -41,7 +41,7 @@ describe("document ID redaction at every sink", () => {
 
   test("copies array subclasses without invoking methods, species, or element getters", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const serializer = vi.fn<() => unknown>(() => ({ documentId }));
+    const serializer = vi.fn<() => { documentId: string }>(() => ({ documentId }));
     const species = vi.fn<() => ArrayConstructor>(() => Array);
     const map = vi.fn<() => unknown[]>(() => [documentId]);
 
