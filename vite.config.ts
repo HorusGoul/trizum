@@ -110,7 +110,7 @@ const toolingConfig = {
       "anti-slop/no-reduce-accumulator-copy": "error",
       "anti-slop/no-chained-type-assertions": "off", // https://github.com/HorusGoul/trizum/issues/565
       "anti-slop/no-conditional-empty-object-spread": "error",
-      "anti-slop/no-known-value-widening": "off", // https://github.com/HorusGoul/trizum/issues/562
+      "anti-slop/no-known-value-widening": "error",
       "anti-slop/no-module-mocking": "off", // https://github.com/HorusGoul/trizum/issues/584
       "anti-slop/no-object-parameters": "error",
       "anti-slop/no-reflect-apply": "error",

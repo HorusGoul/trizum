@@ -12,7 +12,7 @@ const ANDROID_SPLASH_ICON_INSET =
 type SvgAttributes = Record<string, string>;
 
 function parseAttributes(source: string, elementName: string): SvgAttributes {
-  const attributes: SvgAttributes = {};
+  const attributes = new Map<string, string>();
   const attributePattern = /([\w:-]+)="([^"]*)"/g;
 
   for (const match of source.matchAll(attributePattern)) {
@@ -22,7 +22,7 @@ function parseAttributes(source: string, elementName: string): SvgAttributes {
       continue;
     }
 
-    attributes[name] = value;
+    attributes.set(name, value);
   }
 
   const unsupportedSyntax = source.replace(attributePattern, "").trim();
@@ -31,7 +31,7 @@ function parseAttributes(source: string, elementName: string): SvgAttributes {
     throw new Error(`${elementName} contains unsupported attribute syntax: ${unsupportedSyntax}`);
   }
 
-  return attributes;
+  return Object.fromEntries(attributes);
 }
 
 function assertAttributes(elementName: string, attributes: SvgAttributes, supported: string[]) {

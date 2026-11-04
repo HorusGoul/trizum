@@ -74,19 +74,9 @@ export const consistentChroma = (i: number, hue: number) => {
   return serializeColor(oklch(toGamut("p3", "oklch", differenceEuclidean("oklch"), 0)(color)));
 };
 
-const chromaData: Record<number, number> = {
-  0: 0.0114,
-  1: 0.0331,
-  2: 0.0774,
-  3: 0.1275,
-  4: 0.1547,
-  5: 0.1355,
-  6: 0.1164,
-  7: 0.0974,
-  8: 0.0782,
-  9: 0.0588,
-  10: 0.0491,
-};
+const chromaData = [
+  0.0114, 0.0331, 0.0774, 0.1275, 0.1547, 0.1355, 0.1164, 0.0974, 0.0782, 0.0588, 0.0491,
+] as const;
 
 const serializeColor = (c: Oklch): string =>
   `${c.l.toFixed(3)} ${c.c.toFixed(3)} ${c.h?.toFixed(3)}`;

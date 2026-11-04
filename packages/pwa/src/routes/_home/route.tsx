@@ -23,8 +23,12 @@ import { HomeBanner } from "#src/routes/index/-components/HomeBanner.tsx";
 import { useAppSession } from "#src/lib/auth-client.ts";
 import { getAuthSessionStatus } from "#src/lib/authSessionStatus.ts";
 
+interface HomeSearch {
+  premium?: boolean;
+}
+
 export const Route = createFileRoute("/_home")({
-  validateSearch: (search: Record<string, unknown>): { premium?: boolean } => ({
+  validateSearch: (search: Record<string, unknown>): HomeSearch => ({
     premium: search.premium === true ? true : undefined,
   }),
   component: Home,

@@ -406,7 +406,7 @@ export const migrationData: MigrationData = {
   photos: [],
 };
 
-const spanishExpenseNames: Record<string, string> = {
+const spanishExpenseNames = {
   Pizza: "Pizza",
   "Beers at La Bodega": "Cervezas en La Bodega",
   "Gas - Seville to Cádiz": "Gasolina - Sevilla a Cádiz",
@@ -427,7 +427,7 @@ const spanishExpenseNames: Record<string, string> = {
   "Highway snacks & drinks": "Picoteo y bebidas para el camino",
   "Final beers at the airport": "Últimas cervezas en el aeropuerto",
   "Sandwiches for the road": "Bocadillos para el camino",
-};
+} satisfies Record<string, string>;
 
 export function getMigrationData(locale: "en" | "es"): MigrationData {
   const data = structuredClone(migrationData);
@@ -437,9 +437,13 @@ export function getMigrationData(locale: "en" | "es"): MigrationData {
     data.party.description = "Un viaje con la mejor compañía";
     data.expenses = data.expenses.map((expense) => ({
       ...expense,
-      name: spanishExpenseNames[expense.name] ?? expense.name,
+      name: hasSpanishExpenseName(expense.name) ? spanishExpenseNames[expense.name] : expense.name,
     }));
   }
 
   return data;
+}
+
+function hasSpanishExpenseName(name: string): name is keyof typeof spanishExpenseNames {
+  return Object.hasOwn(spanishExpenseNames, name);
 }

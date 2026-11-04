@@ -338,11 +338,12 @@ function createTestApp(assetFetch: AssetFetch, loadPreview: LoadPreview) {
 }
 
 function createEnv(assetFetch: AssetFetch) {
+  // SAFETY: This test app only reads ASSETS.fetch; its middleware and preview route need no other bindings.
   return {
     ASSETS: {
       fetch: assetFetch,
     },
-  } as unknown as { Bindings: ApiEnv };
+  } as ApiEnv;
 }
 
 function createPartyUrl() {
