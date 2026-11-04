@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { defaultParseSearch, defaultStringifySearch } from "@tanstack/react-router";
 
 export type AppSearchValue =
@@ -27,9 +28,21 @@ export function parseAppSearch(search: string): AppSearch {
 export function stringifyAppSearch(search: AppSearch): string {
   const serialized = defaultStringifySearch(search);
 
-  if (typeof search.code !== "string") return serialized;
+  const code = optionalSearchTextSchema.parse(search.code);
+
+  if (code === undefined) return serialized;
   const params = new URLSearchParams(serialized);
-  params.set("code", search.code);
+  params.set("code", code);
 
   return `?${params}`;
 }
+
+export const optionalSearchTextSchema = z.string().optional().catch(undefined);
+export const optionalNonemptySearchTextSchema = z.string().min(1).optional().catch(undefined);
+export const optionalSearchNumberSchema = z.number().optional().catch(undefined);
+export const optionalMediaIndexSchema = z.number().min(0).optional().catch(undefined);
+
+export const expenseEditorSearchSchema = z.object({
+  calculator: optionalNonemptySearchTextSchema,
+  media: optionalMediaIndexSchema,
+});

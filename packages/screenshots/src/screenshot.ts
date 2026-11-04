@@ -41,6 +41,6 @@ export function screenshot(name: string, fn: ScreenshotUserFunction): Screenshot
 
 export function isScreenshotFunction(fn: unknown): fn is ScreenshotFunction {
   return (
-    typeof fn === "function" && "__isScreenshotFunction" in fn && fn.__isScreenshotFunction === true
+    fn instanceof Function && "__isScreenshotFunction" in fn && fn.__isScreenshotFunction === true
   );
 }

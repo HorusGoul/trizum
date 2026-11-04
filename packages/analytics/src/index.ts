@@ -2,6 +2,8 @@ import { readCollectToken } from "./insightflare.js";
 import { isTelemetryId, redactPathname } from "./privacy.js";
 import { analyticsEvents, type AnalyticsEvent } from "./events.js";
 
+const allowedAnalyticsEvents = new Set(Object.keys(analyticsEvents));
+
 export { hasPrivacySignal, isTelemetryId } from "./privacy.js";
 
 export type { AnalyticsEvent } from "./events.js";
@@ -197,13 +199,7 @@ export function createAnalytics(options: AnalyticsOptions) {
   }
 
   function track(event: AnalyticsEvent) {
-    if (
-      !canRecord() ||
-      !visit ||
-      typeof event !== "string" ||
-      !Object.hasOwn(analyticsEvents, event)
-    )
-      return;
+    if (!canRecord() || !visit || !allowedAnalyticsEvents.has(event)) return;
     enqueue({
       ...base(visit),
       kind: "custom_event",

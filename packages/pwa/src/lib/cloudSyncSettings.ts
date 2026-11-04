@@ -1,4 +1,5 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { z } from "zod";
+import { cloudUserSettingsSchema } from "./api/cloudSyncContract.ts";
 import type { PartyList } from "#src/models/partyList.js";
 import { CloudSyncApiError, trizumApiClient } from "./trizumApiClient";
 import type { CloudUserSettings, CloudUserSettingsInput } from "./api/cloudSyncContract";
@@ -110,27 +111,11 @@ function getCloudUserSettingsCacheKey(userId: string) {
   return `${CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX}${userId}`;
 }
 
+const cachedCloudUserSettingsSchema = z.object({
+  cachedAt: z.number(),
+  settings: cloudUserSettingsSchema.nullable(),
+});
+
 function isCachedCloudUserSettings(value: unknown): value is CachedCloudUserSettings {
-  if (
-    !value ||
-    typeof value !== "object" ||
-    !("cachedAt" in value) ||
-    typeof value.cachedAt !== "number" ||
-    !("settings" in value)
-  ) {
-    return false;
-  }
-
-  const { settings } = value;
-
-  return (
-    settings === null ||
-    (typeof settings === "object" &&
-      settings !== null &&
-      "updatedAt" in settings &&
-      typeof settings.updatedAt === "number" &&
-      "partyListDocumentId" in settings &&
-      typeof settings.partyListDocumentId === "string" &&
-      isValidDocumentId(settings.partyListDocumentId))
-  );
+  return cachedCloudUserSettingsSchema.safeParse(value).success;
 }

@@ -1,3 +1,4 @@
+import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -26,7 +27,7 @@ export const Route = createFileRoute("/party_/$partyId/who")({
   validateSearch: (search): WhoSearchParams => {
     // Save redirectTo path search param if it exists
     return {
-      redirectTo: typeof search.redirectTo === "string" ? search.redirectTo : undefined,
+      redirectTo: optionalSearchTextSchema.parse(search.redirectTo),
     };
   },
   async loader({ context, params }) {

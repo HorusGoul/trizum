@@ -1,4 +1,4 @@
-import { Button, type ButtonProps } from "react-aria-components";
+import { Button, composeRenderProps, type ButtonProps } from "react-aria-components";
 import { cn, type ClassName } from "./utils";
 import { Icon, type IconProps } from "./Icon";
 import { useActionProp, type AsyncAction } from "./useActionProp";
@@ -58,25 +58,19 @@ export function IconButton({
 
   return (
     <Button
-      className={({ isPressed, isFocusVisible, isHovered, defaultClassName, ...state }) =>
-        cn(
-          defaultClassName,
-          "flex h-10 w-10 scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-hidden transition-all duration-200 ease-in-out",
-          colorStyles.base,
-          (isHovered || isFocusVisible) && colorStyles.focus,
-          isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
-          "data-[disabled]:cursor-not-allowed",
-          typeof className === "function"
-            ? className({
-                isPressed,
-                isFocusVisible,
-                isHovered,
-                defaultClassName,
-                ...state,
-              })
-            : className,
-        )
-      }
+      className={composeRenderProps(
+        className,
+        (className, { isPressed, isFocusVisible, isHovered, defaultClassName }) =>
+          cn(
+            defaultClassName,
+            "flex h-10 w-10 scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-hidden transition-all duration-200 ease-in-out",
+            colorStyles.base,
+            (isHovered || isFocusVisible) && colorStyles.focus,
+            isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
+            "data-[disabled]:cursor-not-allowed",
+            className,
+          ),
+      )}
       isPending={isButtonPending}
       onPress={onPressWithAction}
       {...props}

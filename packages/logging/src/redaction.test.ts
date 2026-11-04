@@ -1,3 +1,4 @@
+import { redactValue } from "./redaction.js";
 import { inspect } from "node:util";
 import bs58check from "bs58check";
 import { getLogger, resetSync, type LogRecord } from "@logtape/logtape";
@@ -14,6 +15,28 @@ afterEach(() => {
 });
 
 describe("document ID redaction at every sink", () => {
+  test("preserves non-finite numbers and decodes other primitive log values", () => {
+    expect(
+      redactValue({
+        nan: NaN,
+        positive: Infinity,
+        negative: -Infinity,
+        bigint: 2n,
+        symbol: Symbol("test"),
+        fn: () => {},
+        empty: undefined,
+      }),
+    ).toEqual({
+      nan: NaN,
+      positive: Infinity,
+      negative: -Infinity,
+      bigint: "2",
+      symbol: "Symbol(test)",
+      fn: "[Function]",
+      empty: undefined,
+    });
+  });
+
   test("does not retain an array subclass's inherited serializer", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const serializer = vi.fn<() => { documentId: string }>(() => ({ documentId }));

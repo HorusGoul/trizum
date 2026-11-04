@@ -1,3 +1,5 @@
+import { expenseEditorSearchSchema } from "#src/lib/routerSearch.ts";
+import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import {
@@ -47,13 +49,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId_/edit"
   pendingComponent: PartyPendingComponent,
 
   validateSearch: (search): EditExpenseSearchParams => {
-    return {
-      calculator:
-        typeof search.calculator === "string" && search.calculator.length > 0
-          ? search.calculator
-          : undefined,
-      media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
-    };
+    return expenseEditorSearchSchema.parse(search);
   },
 
   async loader({ location, context, params: { expenseId, partyId } }) {
@@ -205,13 +201,7 @@ function EditExpense() {
       logger.error("Failed to update expense", { error });
       toast.error(t`Failed to update expense`, {
         id: "update-expense",
-        description:
-          typeof error === "object" &&
-          error &&
-          "message" in error &&
-          typeof error.message === "string"
-            ? error.message
-            : undefined,
+        description: getFailureMessage(error),
       });
     }
   }

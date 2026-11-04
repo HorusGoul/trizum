@@ -27,6 +27,9 @@
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch"
   },
+  "dependencies": {
+    "zod": "catalog:"
+  },
   "devDependencies": {
     "@hey-api/openapi-ts": "catalog:",
     "@trizum/tsconfig": "workspace:*",

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { safeJoin, type Breadcrumb, type Integration } from "@sentry/core";
 
 import { redactValue } from "./redaction.js";
@@ -12,19 +13,23 @@ function sanitizeBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
   const sanitized = redactSentryPayload(breadcrumb);
   const args: unknown = sanitized.data?.arguments;
 
-  if (sanitized.category !== "console" || !Array.isArray(args) || typeof args[0] !== "string") {
+  if (sanitized.category !== "console" || !Array.isArray(args)) {
     return sanitized;
   }
 
+  const format = consoleFormatSchema.safeParse(args[0]);
+
+  if (!format.success) return sanitized;
+
   // Browser-specific directives (such as %.2f) can consume arguments too.
   // Preserve unfamiliar formats rather than mistake a diagnostic value for CSS.
-  if (/%(?![csdifoO])/.test(args[0].replace(/%%/g, ""))) return sanitized;
+  if (/%(?![csdifoO])/.test(format.data.replace(/%%/g, ""))) return sanitized;
 
   const remaining: unknown[] = [];
   let argumentIndex = 1;
   let removedStyle = false;
 
-  const message = args[0].replace(/%[%csdifoO]/g, (token: string) => {
+  const message = format.data.replace(/%[%csdifoO]/g, (token: string) => {
     if (token === "%%" || argumentIndex >= args.length) return token;
     const argument = args[argumentIndex++];
 
@@ -74,3 +79,5 @@ export const sentryDocumentIdRedaction = {
   beforeSendTransaction: redactSentryPayload,
   integrations: [logRedactionIntegration],
 };
+
+const consoleFormatSchema = z.string();

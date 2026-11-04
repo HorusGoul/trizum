@@ -206,28 +206,6 @@ function isExpenseWithinTimeframe(
 }
 
 function getTimeframeRange(timeframe: PartyStatsTimeframe, now: Date) {
-  if (typeof timeframe !== "string") {
-    if (timeframe.type === "calendar-year") {
-      return {
-        start: new Date(timeframe.year, 0, 1),
-        end: new Date(timeframe.year + 1, 0, 1),
-      };
-    }
-
-    const [start, end] =
-      timeframe.start.getTime() <= timeframe.end.getTime()
-        ? [timeframe.start, timeframe.end]
-        : [timeframe.end, timeframe.start];
-
-    const normalizedStart = startOfDay(start);
-    const normalizedEnd = startOfDay(end);
-
-    return {
-      start: normalizedStart,
-      end: addDays(normalizedEnd, 1),
-    };
-  }
-
   switch (timeframe) {
     case "current-month":
       return {
@@ -250,6 +228,26 @@ function getTimeframeRange(timeframe: PartyStatsTimeframe, now: Date) {
         end: new Date(Number.MAX_SAFE_INTEGER),
       };
   }
+
+  if (timeframe.type === "calendar-year") {
+    return {
+      start: new Date(timeframe.year, 0, 1),
+      end: new Date(timeframe.year + 1, 0, 1),
+    };
+  }
+
+  const [start, end] =
+    timeframe.start.getTime() <= timeframe.end.getTime()
+      ? [timeframe.start, timeframe.end]
+      : [timeframe.end, timeframe.start];
+
+  const normalizedStart = startOfDay(start);
+  const normalizedEnd = startOfDay(end);
+
+  return {
+    start: normalizedStart,
+    end: addDays(normalizedEnd, 1),
+  };
 }
 
 function startOfDay(date: Date) {

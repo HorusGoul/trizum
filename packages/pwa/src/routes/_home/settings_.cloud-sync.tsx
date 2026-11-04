@@ -1,3 +1,4 @@
+import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -9,7 +10,7 @@ import { parseAuthReturnTo } from "#src/lib/authReturnTo.ts";
 export const Route = createFileRoute("/_home/settings_/cloud-sync")({
   validateSearch: (search: AppSearch): CloudSyncSearchParams => ({
     auth: search.auth === "success" ? ("success" as const) : undefined,
-    error: typeof search.error === "string" ? search.error : undefined,
+    error: optionalSearchTextSchema.parse(search.error),
     returnTo: parseAuthReturnTo(search.returnTo),
   }),
   component: CloudSyncSettings,

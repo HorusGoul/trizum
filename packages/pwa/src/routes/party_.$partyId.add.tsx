@@ -1,3 +1,8 @@
+import {
+  expenseEditorSearchSchema,
+  optionalNonemptySearchTextSchema,
+} from "#src/lib/routerSearch.ts";
+import { getFailureMessage } from "#src/lib/failureMessage.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
@@ -32,17 +37,9 @@ export const Route = createFileRoute("/party_/$partyId/add")({
   pendingComponent: PartyPendingComponent,
 
   validateSearch: (search): AddExpenseSearchParams => {
-    return {
-      calculator:
-        typeof search.calculator === "string" && search.calculator.length > 0
-          ? search.calculator
-          : undefined,
-      media: typeof search.media === "number" && search.media >= 0 ? search.media : undefined,
-      template:
-        typeof search.template === "string" && search.template.length > 0
-          ? search.template
-          : undefined,
-    };
+    return expenseEditorSearchSchema
+      .extend({ template: optionalNonemptySearchTextSchema })
+      .parse(search);
   },
 
   async loader({ context, params, location }) {
@@ -145,13 +142,7 @@ function AddExpense() {
       logger.error("Failed to add expense", { error });
       toast.error(t`Failed to add expense`, {
         id: "add-expense",
-        description:
-          typeof error === "object" &&
-          error &&
-          "message" in error &&
-          typeof error.message === "string"
-            ? error.message
-            : undefined,
+        description: getFailureMessage(error),
       });
     }
   }

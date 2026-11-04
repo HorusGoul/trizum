@@ -1,3 +1,4 @@
+import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
@@ -25,8 +26,8 @@ interface ResetPasswordFormValues {
 export const Route = createFileRoute("/reset-password")({
   component: ResetPassword,
   validateSearch: (search: AppSearch): ResetPasswordSearchParams => ({
-    error: typeof search.error === "string" ? search.error : undefined,
-    token: typeof search.token === "string" ? search.token : undefined,
+    error: optionalSearchTextSchema.parse(search.error),
+    token: optionalSearchTextSchema.parse(search.token),
   }),
 });
 

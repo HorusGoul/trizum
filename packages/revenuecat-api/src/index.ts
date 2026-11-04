@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createClient, type Client } from "./generated/client/index.js";
 import { listPurchases, listSubscriptions } from "./generated/sdk.gen.js";
 import type {
@@ -122,8 +123,7 @@ export function createRevenueCatApiClient({
         response.status !== 200 ||
         !isRecord(body) ||
         body.object !== "customer" ||
-        typeof body.id !== "string" ||
-        typeof body.deleted_at !== "number"
+        !deletedCustomerSchema.safeParse(body).success
       ) {
         throw new RevenueCatApiError(
           `RevenueCat customer deletion was not acknowledged (status ${response.status}).`,
@@ -231,10 +231,7 @@ function parsePageResponse<T>(
 
   assertRecord(data, `${resourceName} list`);
 
-  if (
-    !Array.isArray(data.items) ||
-    (data.next_page !== undefined && data.next_page !== null && typeof data.next_page !== "string")
-  ) {
+  if (!resourcePageSchema.safeParse(data).success) {
     throw new RevenueCatApiError(`RevenueCat returned an invalid ${resourceName} list.`);
   }
 
@@ -293,12 +290,7 @@ function isEligibleSubscription(
 ) {
   assertRecord(subscription, "subscription");
 
-  if (
-    typeof subscription.gives_access !== "boolean" ||
-    typeof subscription.ownership !== "string" ||
-    typeof subscription.environment !== "string" ||
-    typeof subscription.store !== "string"
-  ) {
+  if (!subscriptionAccessSchema.safeParse(subscription).success) {
     throw new RevenueCatApiError("RevenueCat returned an invalid subscription.");
   }
 
@@ -317,12 +309,7 @@ function isEligiblePurchase(
 ) {
   assertRecord(purchase, "purchase");
 
-  if (
-    typeof purchase.status !== "string" ||
-    typeof purchase.ownership !== "string" ||
-    typeof purchase.environment !== "string" ||
-    typeof purchase.store !== "string"
-  ) {
+  if (!purchaseAccessSchema.safeParse(purchase).success) {
     throw new RevenueCatApiError("RevenueCat returned an invalid purchase.");
   }
 
@@ -357,7 +344,7 @@ function hasActiveEntitlement(
   return value.items.some((entitlement) => {
     assertRecord(entitlement, "entitlement");
 
-    if (typeof entitlement.lookup_key !== "string" || typeof entitlement.state !== "string") {
+    if (!entitlementAccessSchema.safeParse(entitlement).success) {
       throw new RevenueCatApiError("RevenueCat returned an invalid entitlement.");
     }
 
@@ -375,5 +362,34 @@ function assertRecord<Value>(
 }
 
 function isRecord<Value>(value: Value): value is Value & RevenueCatJsonObject {
-  return Boolean(value) && typeof value === "object";
+  return revenueCatObjectSchema.safeParse(value).success;
 }
+
+const revenueCatObjectSchema = z.record(z.string(), z.json().optional());
+
+const deletedCustomerSchema = z.object({
+  object: z.literal("customer"),
+  id: z.string(),
+  deleted_at: z.number(),
+});
+
+const resourcePageSchema = z.object({
+  items: z.array(z.unknown()),
+  next_page: z.string().nullish(),
+});
+
+const subscriptionAccessSchema = z.object({
+  gives_access: z.boolean(),
+  ownership: z.string(),
+  environment: z.string(),
+  store: z.string(),
+});
+
+const purchaseAccessSchema = z.object({
+  status: z.string(),
+  ownership: z.string(),
+  environment: z.string(),
+  store: z.string(),
+});
+
+const entitlementAccessSchema = z.object({ lookup_key: z.string(), state: z.string() });

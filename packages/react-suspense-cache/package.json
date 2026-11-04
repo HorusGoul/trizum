@@ -32,7 +32,8 @@
     "dev": "tsc -b tsconfig.json --watch"
   },
   "dependencies": {
-    "@trizum/logging": "workspace:*"
+    "@trizum/logging": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@logtape/logtape": "catalog:",

@@ -26,6 +26,9 @@
     "cleanup": "rm -rf dist",
     "dev": "tsc -b tsconfig.json --watch"
   },
+  "dependencies": {
+    "zod": "catalog:"
+  },
   "devDependencies": {
     "@trizum/tsconfig": "workspace:*",
     "@typescript/native": "catalog:",

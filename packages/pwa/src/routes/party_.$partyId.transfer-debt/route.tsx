@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
@@ -225,20 +226,13 @@ export const Route = createFileRoute("/party_/$partyId/transfer-debt")({
   component: RouteComponent,
   pendingComponent: PartyPendingComponent,
   validateSearch: (search): TransferDebtSearchParams => {
-    if (
-      typeof search.fromId !== "string" ||
-      typeof search.toId !== "string" ||
-      typeof search.amount !== "number" ||
-      search.amount <= 0
-    ) {
-      throw new Error(t`Missing search params`);
-    }
+    const result = z
+      .object({ fromId: z.string(), toId: z.string(), amount: z.number().positive() })
+      .safeParse(search);
 
-    return {
-      fromId: search.fromId,
-      toId: search.toId,
-      amount: search.amount,
-    };
+    if (!result.success) throw new Error(t`Missing search params`);
+
+    return result.data;
   },
   async loader({ context, params, location }) {
     await guardParticipatingInParty(params.partyId, context, location);

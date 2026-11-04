@@ -265,7 +265,7 @@ function getParticipantId(
   participantIdByMembershipId: Map<number, string>,
   participantIdByName: Map<string, string>,
 ) {
-  if (typeof member.id === "number") {
+  if (member.id !== undefined) {
     return participantIdByMembershipId.get(member.id);
   }
 

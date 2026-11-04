@@ -1,4 +1,5 @@
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
+import { z } from "zod";
+import { cloudUserSettingsSchema } from "./api/cloudSyncContract.ts";
 import type { LinkedAuthAccount } from "#src/lib/auth-client.ts";
 import type { CloudUserSettings } from "#src/lib/cloudSyncSettings.ts";
 import type { PartyList } from "#src/models/partyList.js";
@@ -106,44 +107,14 @@ function getCloudAccountStateCacheKey(userId: string) {
   return `${CLOUD_ACCOUNT_STATE_CACHE_KEY_PREFIX}${userId}`;
 }
 
+const cachedCloudAccountStateSchema = z.object({
+  cachedAt: z.number(),
+  cloudSettings: cloudUserSettingsSchema.nullable(),
+  linkedAccounts: z.array(
+    z.object({ accountId: z.string(), id: z.string(), providerId: z.string(), userId: z.string() }),
+  ),
+});
+
 function isCachedCloudAccountState(value: unknown): value is CachedCloudAccountState {
-  if (
-    !value ||
-    typeof value !== "object" ||
-    !("cachedAt" in value) ||
-    typeof value.cachedAt !== "number" ||
-    !("cloudSettings" in value) ||
-    !("linkedAccounts" in value)
-  ) {
-    return false;
-  }
-
-  return (
-    (value.cloudSettings === null ||
-      (typeof value.cloudSettings === "object" &&
-        value.cloudSettings !== null &&
-        "updatedAt" in value.cloudSettings &&
-        typeof value.cloudSettings.updatedAt === "number" &&
-        "partyListDocumentId" in value.cloudSettings &&
-        typeof value.cloudSettings.partyListDocumentId === "string" &&
-        isValidDocumentId(value.cloudSettings.partyListDocumentId))) &&
-    Array.isArray(value.linkedAccounts) &&
-    value.linkedAccounts.every(isLinkedAuthAccount)
-  );
-}
-
-function isLinkedAuthAccount(value: unknown): value is LinkedAuthAccount {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  // SAFETY: The value was checked as an object above; every account field is validated before this type guard returns true.
-  const account = value as Partial<LinkedAuthAccount>;
-
-  return (
-    typeof account.accountId === "string" &&
-    typeof account.id === "string" &&
-    typeof account.providerId === "string" &&
-    typeof account.userId === "string"
-  );
+  return cachedCloudAccountStateSchema.safeParse(value).success;
 }

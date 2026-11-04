@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 
 export const AD_SESSION_GAP_MS = 30 * 60 * 1_000;
@@ -38,12 +39,10 @@ export function parseAdHistory(value: string | null): AdHistory | undefined {
   }
 
   try {
-    // SAFETY: This assertion exposes optional fields only; version and every value used below are checked before returning history.
-    const parsed = JSON.parse(value) as Partial<AdHistory>;
+    const result = adHistorySchema.safeParse(JSON.parse(value));
 
-    if (parsed.version !== 1 || typeof parsed.firstUseCompleted !== "boolean") {
-      return undefined;
-    }
+    if (!result.success) return undefined;
+    const parsed = result.data;
 
     const history: AdHistory = {
       version: 1,
@@ -103,7 +102,10 @@ export function isPreparedAppOpenFresh(preparedAt: number | undefined, now: numb
 }
 
 export function isProtectedAdRoute(pathname: string, search: AppSearch) {
-  if (typeof search.media === "number" || typeof search.calculator === "string") {
+  if (
+    adMediaSearchSchema.safeParse(search).success ||
+    adCalculatorSearchSchema.safeParse(search).success
+  ) {
     return true;
   }
 
@@ -111,5 +113,17 @@ export function isProtectedAdRoute(pathname: string, search: AppSearch) {
 }
 
 function isTimestamp(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0;
+  return adTimestampSchema.safeParse(value).success;
 }
+
+const adTimestampSchema = z.number().min(0);
+
+const adHistorySchema = z.object({
+  version: z.literal(1),
+  firstUseCompleted: z.boolean(),
+  inactiveAt: adTimestampSchema.optional().catch(undefined),
+  lastFullScreenShownAt: adTimestampSchema.optional().catch(undefined),
+});
+
+const adMediaSearchSchema = z.object({ media: z.number() });
+const adCalculatorSearchSchema = z.object({ calculator: z.string() });

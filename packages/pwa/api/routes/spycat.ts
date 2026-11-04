@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import type { ApiHonoEnv } from "../env";
@@ -40,14 +41,7 @@ spycatRoute.post("/collect", bodyLimit({ maxSize: 16_384 }), async (c) => {
     return c.body(null, 400);
   }
 
-  if (
-    !payload ||
-    typeof payload !== "object" ||
-    !("siteId" in payload) ||
-    payload.siteId !== ANALYTICS_SITE_ID
-  ) {
-    return c.body(null, 400);
-  }
+  if (!collectPayloadSchema.safeParse(payload).success) return c.body(null, 400);
 
   return forward(c.req.raw, c.env.SPYCAT, "collect", JSON.stringify(payload));
 });
@@ -105,3 +99,5 @@ async function forward(
     return new Response(null, { status: 502 });
   }
 }
+
+const collectPayloadSchema = z.object({ siteId: z.literal(ANALYTICS_SITE_ID) });

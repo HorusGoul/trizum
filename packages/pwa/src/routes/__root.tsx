@@ -23,25 +23,14 @@ function Root() {
     <AdvertisingController protectedFlow={protectedFlow}>
       <RouterProvider
         navigate={(to, options) => {
-          if (typeof to === "string") {
-            const nextLocation = router.buildLocation({ to });
-            void router.navigate({
-              to,
-              ...options,
-              replace:
-                options?.replace ??
-                shouldReplaceNavigation(router.state.location.href, nextLocation.href),
-            });
-
-            return;
-          }
-
           const navigationOptions = {
-            ...to,
+            ...(to instanceof Object ? to : { to }),
             ...options,
           };
 
-          const nextLocation = router.buildLocation(navigationOptions);
+          const nextLocation = router.buildLocation(
+            to instanceof Object ? navigationOptions : { to },
+          );
 
           void router.navigate({
             ...navigationOptions,
@@ -51,11 +40,7 @@ function Root() {
           });
         }}
         useHref={(to) => {
-          if (typeof to === "string") {
-            return router.buildLocation({ to }).href;
-          }
-
-          return router.buildLocation(to).href;
+          return router.buildLocation(to instanceof Object ? to : { to }).href;
         }}
       >
         <Outlet />

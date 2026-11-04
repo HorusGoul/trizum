@@ -1,3 +1,4 @@
+import { optionalSearchNumberSchema } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/party_/$partyId/expense/$expenseId")({
     const media = search.media;
 
     return {
-      media: typeof media === "number" ? media : undefined,
+      media: optionalSearchNumberSchema.parse(media),
     };
   },
 

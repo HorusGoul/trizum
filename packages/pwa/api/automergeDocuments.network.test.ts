@@ -247,7 +247,7 @@ describe("Worker document reads over WebSocket", () => {
     await once(sockets, "listening");
     const address = sockets.address();
 
-    if (!address || typeof address === "string") throw new Error("Expected a local TCP server");
+    if (!address || !(address instanceof Object)) throw new Error("Expected a local TCP server");
 
     const assets: Pick<ApiEnv["ASSETS"], "fetch"> = {
       fetch: async () =>

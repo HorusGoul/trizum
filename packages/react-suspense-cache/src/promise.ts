@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { STATUS_PENDING, STATUS_REJECTED } from "./constants.js";
 import type {
   FulfilledReactUsePromise,
@@ -16,12 +17,7 @@ type MutableReactUsePromise<Type> = Promise<Type> & {
 };
 
 export function isPromiseLike<Type>(value: PromiseLike<Type> | Type): value is PromiseLike<Type> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "then" in value &&
-    typeof value.then === "function"
-  );
+  return thenableSchema.safeParse(value).success;
 }
 
 export function markReactPromisePending<Type>(
@@ -74,3 +70,12 @@ export function createRejectedReactPromise<Type = never>(cause: unknown): ReactU
 
   return promise;
 }
+
+const callableSchema = z.function();
+
+const thenableSchema = z
+  .custom<object>(
+    (value) =>
+      value !== null && Object(value) === value && !callableSchema.safeParse(value).success,
+  )
+  .refine((value) => "then" in value && callableSchema.safeParse(value.then).success);

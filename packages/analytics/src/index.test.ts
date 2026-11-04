@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { describe, expect, it, vi } from "vite-plus/test";
 import {
   createAnalytics,
@@ -46,10 +47,7 @@ function harness(endpoint = "https://analytics.example") {
   const payloads = () =>
     fetch.mock.calls
       .filter(([, init]) => init?.method === "POST")
-      .map(
-        ([, init]) =>
-          JSON.parse(typeof init?.body === "string" ? init.body : "null") as AnalyticsPayload,
-      );
+      .map(([, init]) => JSON.parse(requestBodySchema.parse(init?.body)) as AnalyticsPayload);
 
   return { client, fetch, canCollect, payloads };
 }
@@ -450,3 +448,5 @@ describe("startup buffering and telemetry identity", () => {
     expect(payloads()[1].eventName).toBe("settings_saved");
   });
 });
+
+const requestBodySchema = z.string().catch("null");

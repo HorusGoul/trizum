@@ -8,7 +8,7 @@ export function cn(...className: ClassName[]) {
 }
 
 const isBoolean = <Value>(maybeBoolean: Value): maybeBoolean is Value & boolean =>
-  typeof maybeBoolean === "boolean";
+  maybeBoolean === true || maybeBoolean === false;
 
 const toStringIfBoolean = <Value>(value: Value): string | Exclude<Value, boolean> => {
   if (isBoolean(value)) return String(value);

@@ -13,8 +13,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party_.$partyId.pay/route.tsx:113
-#: src/routes/party_.$partyId.pay/route.tsx:119
+#: src/routes/party_.$partyId.pay/route.tsx:109
+#: src/routes/party_.$partyId.pay/route.tsx:115
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:36
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:42
 msgid "(me)"
@@ -327,7 +327,7 @@ msgstr "Añade tu nombre para que otros sepan quién eres y cómo pagarte"
 msgid "Add, edit, and archive participants"
 msgstr "Añadir, editar y archivar participantes"
 
-#: src/routes/party_.$partyId.add.tsx:116
+#: src/routes/party_.$partyId.add.tsx:113
 msgid "Adding expense..."
 msgstr "Añadiendo gasto..."
 
@@ -547,7 +547,7 @@ msgstr "Manat Azerbaiyano"
 msgid "Back to home"
 msgstr "Volver al inicio"
 
-#: src/routes/reset-password.tsx:106
+#: src/routes/reset-password.tsx:107
 msgid "Back to settings"
 msgstr "Volver a configuración"
 
@@ -708,7 +708,7 @@ msgstr "Dólar Canadiense"
 
 #: src/components/CloudSyncDialogs.tsx:470
 #: src/components/CloudSyncDialogs.tsx:642
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:229
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:230
 #: src/routes/party_.$partyId.settings/-components/DeleteExpenseTemplateSheet.tsx:41
 #: src/routes/party_.$partyId.settings/-components/OnlyUseCustomTemplatesSheet.tsx:44
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:167
@@ -792,7 +792,7 @@ msgstr "Unidad de Fomento Chilena (UF)"
 msgid "Chinese Yuan"
 msgstr "Yuan Chino"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:546
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:540
 msgid "Choose a destination party"
 msgstr "Elige un grupo de destino"
 
@@ -804,7 +804,7 @@ msgstr "Elige acceso mensual, anual o de por vida."
 msgid "Choose the currency for expenses in this party"
 msgstr "Elige la moneda para los gastos de este grupo"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:497
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:491
 msgid "Choose who receives it"
 msgstr "Elige quién la recibe"
 
@@ -910,9 +910,9 @@ msgstr "Configura valores predeterminados reutilizables para nuevos gastos"
 msgid "Confirm action"
 msgstr "Confirmar acción"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:347
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:437
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:475
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:341
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:431
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:469
 msgid "Confirm transfer"
 msgstr "Confirmar transferencia"
 
@@ -920,7 +920,7 @@ msgstr "Confirmar transferencia"
 msgid "Confirmation"
 msgstr "Confirmación"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:468
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:462
 msgid "Confirming..."
 msgstr "Confirmando..."
 
@@ -1067,7 +1067,7 @@ msgstr "No se pudo cargar el estado de trizum cloud"
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
 
-#: src/routes/reset-password.tsx:61
+#: src/routes/reset-password.tsx:62
 msgid "Could not reset password"
 msgstr "No se pudo restablecer la contraseña"
 
@@ -1120,7 +1120,7 @@ msgstr "Crear cuenta"
 msgid "Create one to prefill common expense details and splits."
 msgstr "Crea una para rellenar automáticamente los detalles y repartos habituales."
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:495
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:489
 msgid "Creditor"
 msgstr "Acreedor"
 
@@ -1187,20 +1187,20 @@ msgstr "Deuda que se va a mover"
 msgid "Debt settled between {0} and {1}!"
 msgstr "¡Deuda saldada entre {0} y {1}!"
 
-#: src/routes/party_.$partyId.pay/route.tsx:82
+#: src/routes/party_.$partyId.pay/route.tsx:78
 msgid "Debt settled between {fromName} and {toName}!"
 msgstr "¡Deuda saldada entre {fromName} y {toName}!"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:394
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:388
 msgid "Debt transfer from another party"
 msgstr "Transferencia de deuda desde otro grupo"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:393
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:387
 msgid "Debt transfer to another party"
 msgstr "Transferencia de deuda a otro grupo"
 
 #: src/routes/party_.$partyId.transfer-debt/-components/TransferSuccessState.tsx:40
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:349
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:343
 msgid "Debt transferred"
 msgstr "Deuda transferida"
 
@@ -1220,7 +1220,7 @@ msgstr "Predeterminada"
 msgid "Default template"
 msgstr "Plantilla predeterminada"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:118
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:119
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -1234,8 +1234,8 @@ msgstr "Eliminar cuenta"
 msgid "Delete account?"
 msgstr "¿Eliminar cuenta?"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:188
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:218
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:189
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:219
 msgid "Delete expense"
 msgstr "Eliminar gasto"
 
@@ -1243,7 +1243,7 @@ msgstr "Eliminar gasto"
 msgid "Delete expense template?"
 msgstr "¿Eliminar la plantilla de gasto?"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:198
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:199
 msgid "Delete expense?"
 msgstr "¿Eliminar gasto?"
 
@@ -1265,7 +1265,7 @@ msgstr "Descripción"
 msgid "Description must be less than 500 characters"
 msgstr "La descripción debe tener menos de 500 caracteres"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:544
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:538
 msgid "Destination party"
 msgstr "Grupo de destino"
 
@@ -1297,7 +1297,7 @@ msgstr "Peso Dominicano"
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:112
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:113
 msgid "Edit"
 msgstr "Editar"
 
@@ -1309,7 +1309,7 @@ msgstr "Editar plantilla"
 msgid "Editing {0}"
 msgstr "Editando {0}"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:237
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:227
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
@@ -1430,7 +1430,7 @@ msgstr "Unidad de Cuenta Europea 9"
 msgid "Everything is archived for now. You can reopen any party from the archived screen whenever you need it."
 msgstr "Por ahora todo está archivado. Puedes reabrir cualquier grupo desde la pantalla de archivados cuando lo necesites."
 
-#: src/routes/party_.$partyId.add.tsx:141
+#: src/routes/party_.$partyId.add.tsx:138
 msgid "Expense added"
 msgstr "Gasto añadido"
 
@@ -1447,7 +1447,7 @@ msgstr "Comprobaciones del gasto"
 msgid "Expense defaults"
 msgstr "Valores predeterminados del gasto"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:276
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:277
 msgid "Expense deleted"
 msgstr "Gasto eliminado"
 
@@ -1484,7 +1484,7 @@ msgstr "Título del gasto"
 msgid "Expense title is too long"
 msgstr "El título del gasto es demasiado largo"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:201
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:197
 msgid "Expense updated"
 msgstr "Gasto actualizado"
 
@@ -1507,7 +1507,7 @@ msgstr "Descubre Premium"
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
 
-#: src/routes/party_.$partyId.add.tsx:146
+#: src/routes/party_.$partyId.add.tsx:143
 msgid "Failed to add expense"
 msgstr "Error al añadir el gasto"
 
@@ -1519,7 +1519,7 @@ msgstr "Error al copiar el enlace del grupo al portapapeles, por favor cópialo 
 msgid "Failed to copy phone number to clipboard, please copy it manually"
 msgstr "Error al copiar el número de teléfono al portapapeles, por favor cópialo manualmente"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:264
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:265
 msgid "Failed to delete expense. Please try again."
 msgstr "No se pudo eliminar el gasto. Inténtalo de nuevo."
 
@@ -1531,15 +1531,15 @@ msgstr "Error al cargar las licencias"
 msgid "Failed to load licenses. Please try again later."
 msgstr "Error al cargar las licencias. Por favor, inténtalo más tarde."
 
-#: src/routes/party_.$partyId.pay/route.tsx:83
+#: src/routes/party_.$partyId.pay/route.tsx:79
 msgid "Failed to mark expense as paid"
 msgstr "Error al marcar el gasto como pagado"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:402
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:396
 msgid "Failed to transfer debt"
 msgstr "No se pudo transferir la deuda"
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:206
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:202
 msgid "Failed to update expense"
 msgstr "Error al actualizar el gasto"
 
@@ -1629,7 +1629,7 @@ msgstr "Volver"
 msgid "Go Back"
 msgstr "Volver"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:318
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:312
 msgid "Go back and try again from the balances list."
 msgstr "Vuelve atrás e inténtalo de nuevo desde la lista de saldos."
 
@@ -1713,7 +1713,7 @@ msgstr "Ayúdanos a entender cómo se usa trizum."
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo podéis hacer para equilibrar vuestra posición."
 
-#: src/routes/party_.$partyId.pay/route.tsx:138
+#: src/routes/party_.$partyId.pay/route.tsx:134
 msgid "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 msgstr "Aquí tienes una lista de formas en las que puedes pagar, una vez hecho, pulsa el botón de arriba para marcar el gasto como pagado en este grupo de trizum."
 
@@ -1758,7 +1758,7 @@ msgstr "Cómo utiliza Google la información de aplicaciones asociadas"
 msgid "How should I balance?"
 msgstr "¿Cómo debería equilibrar?"
 
-#: src/routes/party_.$partyId.pay/route.tsx:134
+#: src/routes/party_.$partyId.pay/route.tsx:130
 msgid "How to pay?"
 msgstr "¿Cómo pagar?"
 
@@ -2084,7 +2084,7 @@ msgstr "Ringgit Malasio"
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:245
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:246
 msgid "Malformed Party ID"
 msgstr "ID de grupo mal formado"
 
@@ -2112,13 +2112,13 @@ msgstr "Gestionar trizum cloud"
 msgid "Manage your cloud account and synced data."
 msgstr "Gestiona tu cuenta en la nube y tus datos sincronizados."
 
-#: src/routes/party_.$partyId.pay/route.tsx:105
-#: src/routes/party_.$partyId.pay/route.tsx:130
+#: src/routes/party_.$partyId.pay/route.tsx:101
+#: src/routes/party_.$partyId.pay/route.tsx:126
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Mark as paid"
 msgstr "Marcar como pagado"
 
-#: src/routes/party_.$partyId.pay/route.tsx:81
+#: src/routes/party_.$partyId.pay/route.tsx:77
 msgid "Marking expense as paid..."
 msgstr "Marcando gasto como pagado..."
 
@@ -2138,7 +2138,7 @@ msgid "Me"
 msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:381
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:97
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:98
 #: src/routes/party.$partyId/route.tsx:191
 msgid "Menu"
 msgstr "Menú"
@@ -2164,8 +2164,8 @@ msgstr "Migración en progreso"
 msgid "Migration successful"
 msgstr "Migración exitosa"
 
-#: src/routes/party_.$partyId.pay/route.tsx:34
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:234
+#: src/routes/party_.$partyId.pay/route.tsx:35
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:233
 msgid "Missing search params"
 msgstr "Faltan parámetros de búsqueda"
 
@@ -2269,7 +2269,7 @@ msgstr "Rupia Nepalí"
 msgid "Netherlands Antillean Guilder"
 msgstr "Florín de las Antillas Neerlandesas"
 
-#: src/routes/party_.$partyId.add.tsx:164
+#: src/routes/party_.$partyId.add.tsx:155
 msgid "New expense"
 msgstr "Nuevo gasto"
 
@@ -2278,7 +2278,7 @@ msgstr "Nuevo gasto"
 msgid "New participant name"
 msgstr "Nombre del nuevo participante"
 
-#: src/routes/reset-password.tsx:129
+#: src/routes/reset-password.tsx:130
 msgid "New password"
 msgstr "Nueva contraseña"
 
@@ -2334,7 +2334,7 @@ msgstr "Sin moneda"
 msgid "No custom templates yet"
 msgstr "Todavía no hay plantillas personalizadas"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:538
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:532
 msgid "No destination party available"
 msgstr "No hay ningún grupo de destino disponible"
 
@@ -2363,7 +2363,7 @@ msgstr "No hay estadísticas de gastos para este período"
 msgid "No spending stats yet"
 msgstr "Aún no hay estadísticas de gastos"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:502
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:496
 msgid "Nobody else is available in this party"
 msgstr "No hay nadie más disponible en este grupo"
 
@@ -2466,7 +2466,7 @@ msgstr "Usar solo plantillas personalizadas"
 msgid "Only use custom templates?"
 msgstr "¿Usar solo plantillas personalizadas?"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:328
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:322
 msgid "Only your own debt can be transferred"
 msgstr "Solo puedes transferir tus propias deudas"
 
@@ -2554,7 +2554,7 @@ msgstr "Nuestros proveedores de infraestructura, inicio de sesión, monitorizaci
 msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Nuestros proveedores de infraestructura, inicio de sesión, compras, supervisión y publicidad pueden tratar datos fuera de tu país de residencia. Cuando sea necesario, estas transferencias se basan en garantías legales aplicables, como decisiones de adecuación, los marcos de privacidad de datos UE-EE. UU. y Suiza-EE. UU. y su extensión al Reino Unido, o cláusulas contractuales tipo. Los avisos de privacidad de los proveedores describen sus ubicaciones y garantías específicas. Contacta con nosotros si necesitas más información sobre las garantías aplicables a tus datos."
 
-#: src/routes/party_.$partyId.pay/route.tsx:116
+#: src/routes/party_.$partyId.pay/route.tsx:112
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
 msgid "owes"
 msgstr "le debe"
@@ -2577,7 +2577,7 @@ msgstr "Pagado por"
 msgid "Paid debt to {0}"
 msgstr "Deuda pagada a {0}"
 
-#: src/routes/party_.$partyId.pay/route.tsx:72
+#: src/routes/party_.$partyId.pay/route.tsx:68
 msgid "Paid debt to {toName}"
 msgstr "Deuda pagada a {toName}"
 
@@ -2731,15 +2731,15 @@ msgstr "Correo de contraseña enviado"
 msgid "Password enabled"
 msgstr "Contraseña activada"
 
-#: src/routes/reset-password.tsx:123
+#: src/routes/reset-password.tsx:124
 msgid "Password must be at least 8 characters"
 msgstr "La contraseña debe tener al menos 8 caracteres"
 
-#: src/routes/reset-password.tsx:45
+#: src/routes/reset-password.tsx:46
 msgid "Password reset link is invalid or expired"
 msgstr "El enlace para restablecer la contraseña no es válido o ha caducado"
 
-#: src/routes/reset-password.tsx:96
+#: src/routes/reset-password.tsx:97
 msgid "Password reset link is invalid or expired."
 msgstr "El enlace para restablecer la contraseña no es válido o ha caducado."
 
@@ -2751,7 +2751,7 @@ msgstr "El inicio de sesión con contraseña solo funciona después de añadir u
 msgid "Password sign-in is enabled"
 msgstr "El inicio de sesión con contraseña está activado"
 
-#: src/routes/reset-password.tsx:58
+#: src/routes/reset-password.tsx:59
 msgid "Password updated"
 msgstr "Contraseña actualizada"
 
@@ -2759,7 +2759,7 @@ msgstr "Contraseña actualizada"
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
-#: src/routes/party_.$partyId.pay/route.tsx:105
+#: src/routes/party_.$partyId.pay/route.tsx:101
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pagar"
@@ -3050,7 +3050,7 @@ msgstr "Reportar un Problema"
 msgid "Report Issues"
 msgstr "Reportar problemas"
 
-#: src/routes/reset-password.tsx:74
+#: src/routes/reset-password.tsx:75
 msgid "Reset password"
 msgstr "Restablecer contraseña"
 
@@ -3150,8 +3150,8 @@ msgstr "Riyal Saudí"
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:96
-#: src/routes/party_.$partyId.who.tsx:114
-#: src/routes/reset-password.tsx:83
+#: src/routes/party_.$partyId.who.tsx:115
+#: src/routes/reset-password.tsx:84
 #: src/routes/settings.tsx:107
 msgid "Save"
 msgstr "Guardar"
@@ -3544,8 +3544,8 @@ msgstr "Enviar sugerencia"
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:96
-#: src/routes/party_.$partyId.who.tsx:114
-#: src/routes/reset-password.tsx:83
+#: src/routes/party_.$partyId.who.tsx:115
+#: src/routes/reset-password.tsx:84
 #: src/routes/settings.tsx:107
 msgid "Submitting..."
 msgstr "Enviando..."
@@ -3781,7 +3781,7 @@ msgstr "Licencias de Terceros"
 msgid "This application uses the following open source libraries and tools. Below are their licenses and attributions."
 msgstr "Esta aplicación utiliza las siguientes bibliotecas y herramientas de código abierto. A continuación se muestran sus licencias y atribuciones."
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:317
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:311
 msgid "This debt is no longer available"
 msgstr "Esta deuda ya no está disponible"
 
@@ -3797,7 +3797,7 @@ msgstr "Este dispositivo ya usa trizum cloud"
 msgid "This device is synced"
 msgstr "Este dispositivo está sincronizado"
 
-#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:201
+#: src/routes/party_.$partyId.expense.$expenseId/route.tsx:202
 msgid "This expense will be permanently deleted. This action cannot be undone."
 msgstr "Este gasto se eliminará permanentemente. Esta acción no se puede deshacer."
 
@@ -3813,7 +3813,7 @@ msgstr "Este no es un ID válido"
 msgid "This party already has an active Party Boost."
 msgstr "Este grupo ya tiene un Party Boost activo."
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:503
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:497
 msgid "This party needs another active participant besides you to receive the transferred debt."
 msgstr "Este grupo necesita otro participante activo además de ti para recibir la deuda transferida."
 
@@ -3875,7 +3875,7 @@ msgstr "Para conectar Google o Apple, elige una cuenta con el mismo correo que t
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.who.tsx:135
+#: src/routes/party_.$partyId.who.tsx:136
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{partyName}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
@@ -3903,9 +3903,9 @@ msgstr "Total pagado por cada participante en el período seleccionado."
 msgid "Total spent"
 msgstr "Total gastado"
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:315
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:326
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:350
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:309
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:320
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:344
 msgid "Transfer debt"
 msgstr "Transferir deuda"
 
@@ -4048,15 +4048,15 @@ msgstr "No se ha podido actualizar. Inténtalo de nuevo."
 msgid "Update is no longer available."
 msgstr "La actualización ya no está disponible."
 
-#: src/routes/reset-password.tsx:144
+#: src/routes/reset-password.tsx:145
 msgid "Update password"
 msgstr "Actualizar contraseña"
 
-#: src/routes/party_.$partyId.who.tsx:140
+#: src/routes/party_.$partyId.who.tsx:141
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:168
+#: src/routes/party_.$partyId.expense.$expenseId_.edit/route.tsx:164
 msgid "Updating expense..."
 msgstr "Actualizando gasto..."
 
@@ -4258,7 +4258,7 @@ msgstr "Enviaremos un enlace para configurar la contraseña a {email}. El inicio
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/party_.$partyId.who.tsx:68
+#: src/routes/party_.$partyId.who.tsx:69
 msgid "Welcome to the party, {participantName}!"
 msgstr "¡Bienvenido al grupo, {participantName}!"
 
@@ -4299,7 +4299,7 @@ msgstr "Cuando usas Premium en la aplicación instalada para Android o iOS, prop
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Cuando la legislación aplicable exige consentimiento, usamos la Plataforma de Gestión del Consentimiento de Google para solicitarlo antes de usar el almacenamiento local o datos personales para publicidad personalizada. Puedes retirar ese consentimiento mediante Privacidad y configuración de cookies cuando ese control sea obligatorio. Cuando esté permitido sin consentimiento, la entrega de anuncios no personalizados, el control de frecuencia, la medición, la seguridad y la prevención del fraude pueden basarse en nuestro interés legítimo en financiar y proteger el Servicio, sin perjuicio de tus derechos y opciones aplicables."
 
-#: src/routes/party_.$partyId.who.tsx:103
+#: src/routes/party_.$partyId.who.tsx:104
 msgid "Who are you?"
 msgstr "¿Quién eres?"
 
@@ -4360,7 +4360,7 @@ msgstr "Puedes crear hasta {MAX_EXPENSE_TEMPLATES} plantillas personalizadas."
 msgid "You can manage or cancel a subscription through the Customer Center in trizum or through your Apple App Store or Google Play account. Deleting trizum or deleting your trizum account does not cancel a store subscription."
 msgstr "Puedes gestionar o cancelar una suscripción mediante el Centro de atención al cliente de trizum o a través de tu cuenta del App Store de Apple o de Google Play. Eliminar trizum o tu cuenta de trizum no cancela una suscripción de la tienda."
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:329
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:323
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe el dinero."
 
@@ -4392,7 +4392,7 @@ msgstr "Debes avisarnos de inmediato si crees que tu cuenta, tu dispositivo o el
 msgid "You must provide accurate account information and promptly update it when it changes."
 msgstr "Debes proporcionar información exacta sobre tu cuenta y actualizarla de inmediato cuando cambie."
 
-#: src/routes/party_.$partyId.transfer-debt/route.tsx:539
+#: src/routes/party_.$partyId.transfer-debt/route.tsx:533
 msgid "You need another active party with the same currency to transfer this debt."
 msgstr "Necesitas otro grupo activo con la misma moneda para transferir esta deuda."
 
@@ -4416,7 +4416,7 @@ msgstr "¡Estás libre de deudas!"
 msgid "You're now seeing the party as {0}"
 msgstr "Ahora estás viendo el grupo como {0}"
 
-#: src/routes/party_.$partyId.who.tsx:72
+#: src/routes/party_.$partyId.who.tsx:73
 msgid "You're now seeing the party as {participantName}"
 msgstr "Ahora estás viendo el grupo como {participantName}"
 

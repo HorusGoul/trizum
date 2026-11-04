@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type {
   CustomerInfo,
   IntroEligibility,
@@ -264,15 +265,17 @@ function getGoogleDefaultOptionTrial(
 }
 
 function isPurchaseCancellation(cause: unknown, cancellationCode: string) {
-  if (!cause || typeof cause !== "object") {
-    return false;
-  }
+  const result = purchaseCancellationSchema.safeParse(cause);
 
-  // SAFETY: The error was checked as a non-null object above; only these two optional cancellation markers are compared.
-  const purchaseError = cause as { code?: unknown; userCancelled?: unknown };
-
-  return purchaseError.userCancelled === true || purchaseError.code === cancellationCode;
+  return (
+    result.success && (result.data.userCancelled === true || result.data.code === cancellationCode)
+  );
 }
+
+const purchaseCancellationSchema = z.object({
+  userCancelled: z.boolean().optional().catch(undefined),
+  code: z.string().optional().catch(undefined),
+});
 
 function requireUserId(userId: string | null): asserts userId is string {
   if (!userId) {
