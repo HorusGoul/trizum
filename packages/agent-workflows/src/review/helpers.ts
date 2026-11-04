@@ -530,7 +530,15 @@ export function hasBlockingFindings(review: Pick<ReviewResult, "findings">): boo
 }
 
 export function dedupeStrings(values: readonly string[]): string[] {
-  return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      values.flatMap((value) => {
+        const trimmed = value.trim();
+
+        return trimmed === "" ? [] : [trimmed];
+      }),
+    ),
+  ];
 }
 
 export function parseRgUsage(stdout: string): UsageMatch[] {

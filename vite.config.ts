@@ -106,7 +106,7 @@ const toolingConfig = {
     },
     plugins: ["import", "jsx-a11y", "react", "typescript", "vitest"],
     rules: {
-      "anti-slop/no-array-filter-map": "off", // https://github.com/HorusGoul/trizum/issues/559
+      "anti-slop/no-array-filter-map": "error",
       "anti-slop/no-reduce-accumulator-copy": "error",
       "anti-slop/no-chained-type-assertions": "off", // https://github.com/HorusGoul/trizum/issues/565
       "anti-slop/no-conditional-empty-object-spread": "off", // https://github.com/HorusGoul/trizum/issues/561
