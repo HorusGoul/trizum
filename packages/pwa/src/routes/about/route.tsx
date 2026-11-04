@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AboutLink } from "./-components/AboutLink.js";
 import { Contributor } from "./-components/Contributor.js";
 import { FeatureItem } from "./-components/FeatureItem.js";
+import { useState } from "react";
 
 export const Route = createFileRoute("/about")({
   component: About,
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/about")({
 function About() {
   const version = import.meta.env.VITE_APP_VERSION;
   const commit = import.meta.env.VITE_APP_COMMIT;
-  const currentYear = new Date().getFullYear();
+  const [currentYear] = useState(() => new Date().getFullYear());
 
   return (
     <div className="flex min-h-full flex-col">

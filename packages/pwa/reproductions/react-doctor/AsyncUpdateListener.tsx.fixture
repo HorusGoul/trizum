@@ -1,0 +1,12 @@
+import { App } from "@capacitor/app";
+import { useEffect } from "react";
+
+export function AsyncUpdateListener() {
+  useEffect(() => {
+    const registration = App.addListener("appStateChange", () => undefined);
+    return () => {
+      void registration.then((handle) => handle.remove());
+    };
+  }, []);
+  return null;
+}

@@ -59,13 +59,15 @@ export function exportIntoInput(expense: Expense): ExpenseInput[] {
     const paidFor: Record<ExpenseUser, number> = {};
     let amountLeft = createMoney(partial);
 
-    const exacts: Record<ExpenseUser, ExpenseShareExact> = Object.keys(expense.shares)
-      .filter((share) => expense.shares[share].type === "exact")
-      .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
-
-    const divides: Record<ExpenseUser, ExpenseShareDivide> = Object.keys(expense.shares)
-      .filter((share) => expense.shares[share].type === "divide")
-      .reduce((acc, curr) => ({ ...acc, [curr]: expense.shares[curr] }), {});
+    const exacts: Record<ExpenseUser, ExpenseShareExact> = {};
+    const divides: Record<ExpenseUser, ExpenseShareDivide> = {};
+    for (const [participantId, share] of Object.entries(expense.shares)) {
+      if (share.type === "exact") {
+        exacts[participantId] = share;
+      } else if (share.type === "divide") {
+        divides[participantId] = share;
+      }
+    }
 
     for (const exact of Object.keys(exacts)) {
       const amount = createMoney(roundHalfEven((exacts[exact].value * partial) / total));

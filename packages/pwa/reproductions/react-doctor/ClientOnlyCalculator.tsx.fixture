@@ -1,0 +1,25 @@
+import { useState, type RefObject } from "react";
+import { createPortal } from "react-dom";
+
+function getLayout(fieldRef: RefObject<HTMLDivElement | null>) {
+  if (typeof window === "undefined") {
+    return { isLargeScreen: false, popoverPosition: null };
+  }
+  const isLargeScreen = window.matchMedia("(min-width: 768px)").matches;
+  if (!isLargeScreen || !fieldRef.current) {
+    return { isLargeScreen, popoverPosition: null };
+  }
+  return { isLargeScreen: true, popoverPosition: { width: window.innerWidth } };
+}
+
+function useCalculatorLayout(fieldRef: RefObject<HTMLDivElement | null>) {
+  const [layout] = useState(() => getLayout(fieldRef));
+  return layout;
+}
+
+export function ClientOnlyCalculator({ fieldRef }: { fieldRef: RefObject<HTMLDivElement | null> }) {
+  const { isLargeScreen, popoverPosition } = useCalculatorLayout(fieldRef);
+  if (!isLargeScreen) return <div>Mobile calculator</div>;
+  if (!popoverPosition) return null;
+  return createPortal(<div style={popoverPosition}>Calculator</div>, document.body);
+}

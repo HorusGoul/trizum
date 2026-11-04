@@ -31,12 +31,8 @@ export function calculateLogStatsBetweenTwoUsers(
     .reduce(
       (prev, next) => {
         const user = next.paidBy;
-        const prevExpenses = prev[user] ?? [];
-
-        return {
-          ...prev,
-          [user]: [...prevExpenses, next],
-        };
+        (prev[user] ??= []).push(next);
+        return prev;
       },
       {} as Record<string, ExpenseInput[]>,
     );

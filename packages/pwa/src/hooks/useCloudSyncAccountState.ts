@@ -22,6 +22,13 @@ import { setAnalyticsEnabled, trackCloudSyncActivated } from "#src/lib/analytics
 
 const CLOUD_ACCOUNT_STATE_POLL_INTERVAL_MS = 30_000;
 
+function requireCloudPartyList(partyList: PartyList | undefined): PartyList {
+  if (!partyList) {
+    throw new Error("Cloud party list is unavailable");
+  }
+  return partyList;
+}
+
 interface CloudSyncAccountState {
   cloudSettings: CloudUserSettings | null;
   isAccountStateResolved: boolean;
@@ -194,10 +201,8 @@ export function useCloudSyncAccountState({
             return;
           }
 
-          if (!cloudPartyList) {
-            throw new Error("Cloud party list is unavailable");
-          }
-          cloudAnalyticsEnabled = cloudPartyList.usageAnalyticsEnabled !== false;
+          cloudAnalyticsEnabled =
+            requireCloudPartyList(cloudPartyList).usageAnalyticsEnabled !== false;
         }
 
         dispatch({

@@ -120,7 +120,7 @@ msgstr "{title} preview"
 msgid "© {0} trizum"
 msgstr "© {0} trizum"
 
-#: src/routes/about/route.tsx:152
+#: src/routes/about/route.tsx:153
 msgid "© {currentYear} trizum"
 msgstr "© {currentYear} trizum"
 
@@ -243,7 +243,7 @@ msgid "A template with this name already exists"
 msgstr "A template with this name already exists"
 
 #: src/routes/_home/route.tsx:131
-#: src/routes/about/route.tsx:23
+#: src/routes/about/route.tsx:24
 msgid "About"
 msgstr "About"
 
@@ -283,7 +283,7 @@ msgstr "Ad-free for you"
 msgid "ADB Unit of Account"
 msgstr "ADB Unit of Account"
 
-#: src/components/CalculatorToolbar.tsx:1565
+#: src/components/CalculatorToolbar.tsx:1563
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:242
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:251
 msgid "Add"
@@ -359,7 +359,7 @@ msgstr "Albanian Lek"
 msgid "Algerian Dinar"
 msgstr "Algerian Dinar"
 
-#: src/components/QRCodeScanner.tsx:261
+#: src/components/QRCodeScanner.tsx:286
 msgid "Align QR code here"
 msgstr "Align QR code here"
 
@@ -392,7 +392,7 @@ msgstr "Always include everyone"
 msgid "Always use default template"
 msgstr "Always use default template"
 
-#: src/components/ExpenseEditor.tsx:481
+#: src/components/ExpenseEditor.tsx:483
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Amount"
 msgstr "Amount"
@@ -401,11 +401,11 @@ msgstr "Amount"
 msgid "Amount for {0}"
 msgstr "Amount for {0}"
 
-#: src/components/ExpenseEditor.tsx:837
+#: src/components/ExpenseEditor.tsx:839
 msgid "Amount for {participantName}"
 msgstr "Amount for {participantName}"
 
-#: src/components/ExpenseEditor.tsx:468
+#: src/components/ExpenseEditor.tsx:470
 msgid "Amount must be greater than 0"
 msgstr "Amount must be greater than 0"
 
@@ -506,11 +506,11 @@ msgstr "At least one participant is required"
 msgid "Attach photos of receipts to your expenses"
 msgstr "Attach photos of receipts to your expenses"
 
-#: src/components/CalculatorToolbar.tsx:1189
+#: src/components/CalculatorToolbar.tsx:1187
 msgid "Attachment preview"
 msgstr "Attachment preview"
 
-#: src/components/CalculatorToolbar.tsx:1158
+#: src/components/CalculatorToolbar.tsx:1156
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Attachments"
@@ -530,7 +530,7 @@ msgstr "Authentication error"
 msgid "Authentication failed"
 msgstr "Authentication failed"
 
-#: src/components/ExpenseEditor.tsx:377
+#: src/components/ExpenseEditor.tsx:379
 #: src/routes/settings.tsx:254
 msgid "Auto-open calculator"
 msgstr "Auto-open calculator"
@@ -567,7 +567,7 @@ msgstr "Back to settings"
 msgid "Back to sign in"
 msgstr "Back to sign in"
 
-#: src/components/CalculatorToolbar.tsx:1590
+#: src/components/CalculatorToolbar.tsx:1588
 msgid "Backspace"
 msgstr "Backspace"
 
@@ -689,16 +689,16 @@ msgstr "Business Data Responsibility information"
 msgid "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 msgstr "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 
-#: src/components/CalculatorToolbar.tsx:1598
+#: src/components/CalculatorToolbar.tsx:1596
 msgid "Calculate result"
 msgstr "Calculate result"
 
-#: src/components/CalculatorToolbar.tsx:1028
-#: src/components/CalculatorToolbar.tsx:1047
+#: src/components/CalculatorToolbar.tsx:1027
+#: src/components/CalculatorToolbar.tsx:1046
 msgid "Calculator"
 msgstr "Calculator"
 
-#: src/components/CalculatorToolbar.tsx:1430
+#: src/components/CalculatorToolbar.tsx:1428
 msgid "Calculator expression"
 msgstr "Calculator expression"
 
@@ -706,11 +706,11 @@ msgstr "Calculator expression"
 msgid "Cambodian Riel"
 msgstr "Cambodian Riel"
 
-#: src/components/QRCodeScanner.tsx:95
+#: src/components/QRCodeScanner.tsx:100
 msgid "Camera permission was denied"
 msgstr "Camera permission was denied"
 
-#: src/components/QRCodeScanner.tsx:214
+#: src/components/QRCodeScanner.tsx:239
 msgid "Camera preview"
 msgstr "Camera preview"
 
@@ -763,7 +763,7 @@ msgstr "CFA Franc BEAC"
 msgid "CFP Franc"
 msgstr "CFP Franc"
 
-#: src/routes/about/route.tsx:70
+#: src/routes/about/route.tsx:71
 msgid "Changes sync automatically across all your devices"
 msgstr "Changes sync automatically across all your devices"
 
@@ -832,7 +832,7 @@ msgstr "Choose the currency for expenses in this party"
 msgid "Choose who receives it"
 msgstr "Choose who receives it"
 
-#: src/components/CalculatorToolbar.tsx:1481
+#: src/components/CalculatorToolbar.tsx:1479
 msgid "Clear all"
 msgstr "Clear all"
 
@@ -849,7 +849,7 @@ msgstr "Clear search"
 msgid "Close"
 msgstr "Close"
 
-#: src/components/CalculatorToolbar.tsx:1177
+#: src/components/CalculatorToolbar.tsx:1175
 msgid "Close attachment preview"
 msgstr "Close attachment preview"
 
@@ -857,7 +857,7 @@ msgstr "Close attachment preview"
 msgid "Close calculator"
 msgstr "Close calculator"
 
-#: src/components/CalculatorToolbar.tsx:1497
+#: src/components/CalculatorToolbar.tsx:1495
 msgid "Close parenthesis"
 msgstr "Close parenthesis"
 
@@ -1015,7 +1015,7 @@ msgstr "Continue with Google"
 msgid "Continue with Premium"
 msgstr "Continue with Premium"
 
-#: src/routes/about/route.tsx:125
+#: src/routes/about/route.tsx:126
 msgid "Contributors"
 msgstr "Contributors"
 
@@ -1067,6 +1067,11 @@ msgstr "Could not copy the code. Select and copy it from the field above."
 msgid "Could not delete account"
 msgstr "Could not delete account"
 
+#. Error shown when a receipt attachment download fails during a Tricount import. HTTP status is a technical error code.
+#: src/models/migration.ts:61
+msgid "Could not import attachment (HTTP {status})"
+msgstr "Could not import attachment (HTTP {status})"
+
 #: src/routes/settings.tsx:328
 msgid "Could not load cloud settings"
 msgstr "Could not load cloud settings"
@@ -1075,13 +1080,13 @@ msgstr "Could not load cloud settings"
 msgid "Could not load sign-in methods"
 msgstr "Could not load sign-in methods"
 
-#: src/hooks/useCloudSyncAccountState.ts:246
-#: src/hooks/useCloudSyncAccountState.ts:314
+#: src/hooks/useCloudSyncAccountState.ts:251
+#: src/hooks/useCloudSyncAccountState.ts:319
 msgid "Could not load trizum cloud state"
 msgstr "Could not load trizum cloud state"
 
 #: src/hooks/usePremiumDialogs.ts:26
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:286
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:287
 #: src/routes/settings.tsx:354
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
@@ -1147,7 +1152,7 @@ msgstr "Created with ❤️ by the open source community. Special thanks to all 
 msgid "Creditor"
 msgstr "Creditor"
 
-#: src/routes/about/route.tsx:136
+#: src/routes/about/route.tsx:137
 msgid "Credits"
 msgstr "Credits"
 
@@ -1198,7 +1203,7 @@ msgstr "Czech Koruna"
 msgid "Danish Krone"
 msgstr "Danish Krone"
 
-#: src/components/ExpenseEditor.tsx:534
+#: src/components/ExpenseEditor.tsx:536
 msgid "Date"
 msgstr "Date"
 
@@ -1227,11 +1232,11 @@ msgstr "Debt transfer to another party"
 msgid "Debt transferred"
 msgstr "Debt transferred"
 
-#: src/components/CalculatorToolbar.tsx:1582
+#: src/components/CalculatorToolbar.tsx:1580
 msgid "Decimal point"
 msgstr "Decimal point"
 
-#: src/components/ExpenseEditor.tsx:761
+#: src/components/ExpenseEditor.tsx:763
 msgid "Decrease shares for {participantName}"
 msgstr "Decrease shares for {participantName}"
 
@@ -1304,7 +1309,7 @@ msgstr "Did you know?"
 msgid "Dismiss Premium banner"
 msgstr "Dismiss Premium banner"
 
-#: src/components/CalculatorToolbar.tsx:1505
+#: src/components/CalculatorToolbar.tsx:1503
 msgid "Divide"
 msgstr "Divide"
 
@@ -1417,7 +1422,7 @@ msgstr "Enter a party link or code to join"
 msgid "Enter the key of the Tricount account you want to migrate from"
 msgstr "Enter the key of the Tricount account you want to migrate from"
 
-#: src/routes/join.tsx:173
+#: src/routes/join.tsx:166
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Enter the link or code of the trizum party you want to join"
 
@@ -1537,8 +1542,8 @@ msgid "Explore Premium"
 msgstr "Explore Premium"
 
 #: src/components/AvatarPicker.tsx:113
-#: src/components/ExpenseEditor.tsx:1009
-#: src/components/QRCodeScanner.tsx:111
+#: src/components/ExpenseEditor.tsx:1011
+#: src/components/QRCodeScanner.tsx:116
 msgid "Failed to access camera"
 msgstr "Failed to access camera"
 
@@ -1586,7 +1591,7 @@ msgstr "Failed to update expense"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Failed to upload avatar. Please try again."
 
-#: src/components/ExpenseEditor.tsx:984
+#: src/components/ExpenseEditor.tsx:986
 msgid "Failed to upload, please try again"
 msgstr "Failed to upload, please try again"
 
@@ -1598,7 +1603,7 @@ msgstr "Falkland Islands Pound"
 msgid "Feature Requests"
 msgstr "Feature Requests"
 
-#: src/routes/about/route.tsx:59
+#: src/routes/about/route.tsx:60
 msgid "Features"
 msgstr "Features"
 
@@ -1869,11 +1874,11 @@ msgstr "Importing attachments ({0} of {1})"
 msgid "Importing Tricount data..."
 msgstr "Importing Tricount data..."
 
-#: src/components/ExpenseEditor.tsx:591
+#: src/components/ExpenseEditor.tsx:593
 msgid "Include all"
 msgstr "Include all"
 
-#: src/components/ExpenseEditor.tsx:796
+#: src/components/ExpenseEditor.tsx:798
 msgid "Increase shares for {participantName}"
 msgstr "Increase shares for {participantName}"
 
@@ -1897,13 +1902,13 @@ msgstr "Invalid QR code. This doesn't appear to be a trizum party code."
 msgid "Invalid tricount URL or key"
 msgstr "Invalid tricount URL or key"
 
-#: src/routes/join.tsx:51
-#: src/routes/join.tsx:90
+#: src/routes/join.tsx:44
+#: src/routes/join.tsx:83
 msgid "Invalid trizum party code"
 msgstr "Invalid trizum party code"
 
-#: src/routes/join.tsx:51
-#: src/routes/join.tsx:90
+#: src/routes/join.tsx:44
+#: src/routes/join.tsx:83
 msgid "Invalid trizum party link"
 msgstr "Invalid trizum party link"
 
@@ -1931,7 +1936,7 @@ msgstr "Jamaican Dollar"
 msgid "Japanese Yen"
 msgstr "Japanese Yen"
 
-#: src/routes/join.tsx:193
+#: src/routes/join.tsx:186
 msgid "Join"
 msgstr "Join"
 
@@ -1951,7 +1956,7 @@ msgstr "Join {partyName} on trizum!"
 msgid "Join a Party"
 msgstr "Join a Party"
 
-#: src/routes/join.tsx:122
+#: src/routes/join.tsx:115
 msgid "Join a trizum"
 msgstr "Join a trizum"
 
@@ -2075,7 +2080,7 @@ msgstr "Liberian Dollar"
 msgid "Libyan Dinar"
 msgstr "Libyan Dinar"
 
-#: src/routes/about/route.tsx:99
+#: src/routes/about/route.tsx:100
 msgid "License"
 msgstr "License"
 
@@ -2083,11 +2088,11 @@ msgstr "License"
 msgid "Lifetime"
 msgstr "Lifetime"
 
-#: src/routes/join.tsx:172
+#: src/routes/join.tsx:165
 msgid "Link or code"
 msgstr "Link or code"
 
-#: src/routes/about/route.tsx:83
+#: src/routes/about/route.tsx:84
 msgid "Links"
 msgstr "Links"
 
@@ -2184,7 +2189,7 @@ msgstr "Mauritian Rupee"
 msgid "Me"
 msgstr "Me"
 
-#: src/components/ExpenseEditor.tsx:370
+#: src/components/ExpenseEditor.tsx:372
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:96
 #: src/routes/party.$partyId/route.tsx:187
 msgid "Menu"
@@ -2265,11 +2270,11 @@ msgstr "Moved to"
 msgid "Mozambican Metical"
 msgstr "Mozambican Metical"
 
-#: src/routes/about/route.tsx:74
+#: src/routes/about/route.tsx:75
 msgid "Multi-Party Splitting"
 msgstr "Multi-Party Splitting"
 
-#: src/components/CalculatorToolbar.tsx:1525
+#: src/components/CalculatorToolbar.tsx:1523
 msgid "Multiply"
 msgstr "Multiply"
 
@@ -2365,7 +2370,7 @@ msgstr "No active parties right now"
 msgid "No archived parties"
 msgstr "No archived parties"
 
-#: src/components/QRCodeScanner.tsx:103
+#: src/components/QRCodeScanner.tsx:108
 msgid "No camera found on this device"
 msgstr "No camera found on this device"
 
@@ -2438,7 +2443,7 @@ msgstr "North Korean Won"
 msgid "Norwegian Krone"
 msgstr "Norwegian Krone"
 
-#: src/routes/join.tsx:35
+#: src/routes/join.tsx:34
 msgid "Not a valid trizum party code"
 msgstr "Not a valid trizum party code"
 
@@ -2467,7 +2472,7 @@ msgstr "Offer purchases, restore purchases, verify Premium access across your si
 msgid "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
 msgstr "Offer purchases, restore purchases, verify Premium access across your signed-in devices, provide subscription management, and analyze purchase performance"
 
-#: src/routes/about/route.tsx:64
+#: src/routes/about/route.tsx:65
 msgid "Offline-First"
 msgstr "Offline-First"
 
@@ -2533,7 +2538,7 @@ msgstr "Open archived parties"
 msgid "Open calculator"
 msgstr "Open calculator"
 
-#: src/components/ExpenseEditor.tsx:380
+#: src/components/ExpenseEditor.tsx:382
 msgid "Open calculator when focusing amount fields"
 msgstr "Open calculator when focusing amount fields"
 
@@ -2545,7 +2550,7 @@ msgstr "Open GitHub Issues"
 msgid "Open last party on launch"
 msgstr "Open last party on launch"
 
-#: src/components/CalculatorToolbar.tsx:1489
+#: src/components/CalculatorToolbar.tsx:1487
 msgid "Open parenthesis"
 msgstr "Open parenthesis"
 
@@ -2589,7 +2594,7 @@ msgstr "Optional"
 msgid "Optional description for this expense"
 msgstr "Optional description for this expense"
 
-#: src/routes/join.tsx:150
+#: src/routes/join.tsx:143
 msgid "or enter code"
 msgstr "or enter code"
 
@@ -2622,7 +2627,7 @@ msgstr "Paid as {currentParticipantName}"
 msgid "Paid at"
 msgstr "Paid at"
 
-#: src/components/ExpenseEditor.tsx:509
+#: src/components/ExpenseEditor.tsx:511
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:48
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:320
 msgid "Paid by"
@@ -2701,7 +2706,7 @@ msgstr "Party Boost"
 msgid "Party Boost active"
 msgstr "Party Boost active"
 
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:263
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:264
 msgid "Party Boost can only move once every seven days."
 msgstr "Party Boost can only move once every seven days."
 
@@ -2709,11 +2714,11 @@ msgstr "Party Boost can only move once every seven days."
 msgid "Party Boost could not be checked. Try again when you are online."
 msgstr "Party Boost could not be checked. Try again when you are online."
 
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:236
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:237
 msgid "Party Boost is active."
 msgstr "Party Boost is active."
 
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:266
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:267
 msgid "Party Boost is unavailable. Please try again."
 msgstr "Party Boost is unavailable. Please try again."
 
@@ -2927,7 +2932,7 @@ msgstr "Please select an image file"
 msgid "Please wait while we fetch the latest data"
 msgstr "Please wait while we fetch the latest data"
 
-#: src/components/QRCodeScanner.tsx:326
+#: src/components/QRCodeScanner.tsx:351
 msgid "Point your camera at a trizum QR code"
 msgstr "Point your camera at a trizum QR code"
 
@@ -2971,7 +2976,7 @@ msgid "Premium is optional. The purchase screen describes the features included 
 msgstr "Premium is optional. The purchase screen describes the features included with Premium and displays the price and billing period that apply in your store and region. Features may differ by platform when required by platform capabilities or store rules."
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:198
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:260
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:261
 msgid "Premium is required for Party Boost."
 msgstr "Premium is required for Party Boost."
 
@@ -3012,7 +3017,7 @@ msgid "Privacy and cookie settings"
 msgstr "Privacy and cookie settings"
 
 #: src/components/PremiumPaywall.tsx:281
-#: src/routes/about/route.tsx:110
+#: src/routes/about/route.tsx:111
 msgid "Privacy Policy"
 msgstr "Privacy Policy"
 
@@ -3045,7 +3050,7 @@ msgstr "Purchases could not be restored. Please try again."
 msgid "Qatari Rial"
 msgstr "Qatari Rial"
 
-#: src/components/QRCodeScanner.tsx:205
+#: src/components/QRCodeScanner.tsx:230
 msgid "QR code frame capture"
 msgstr "QR code frame capture"
 
@@ -3057,7 +3062,7 @@ msgstr "Ranking based on how much each participant paid in the selected timefram
 msgid "Ready on another device"
 msgstr "Ready on another device"
 
-#: src/routes/about/route.tsx:69
+#: src/routes/about/route.tsx:70
 msgid "Real-Time Sync"
 msgstr "Real-Time Sync"
 
@@ -3105,11 +3110,11 @@ msgstr "Remove"
 msgid "Remove avatar"
 msgstr "Remove avatar"
 
-#: src/components/ExpenseEditor.tsx:1101
+#: src/components/ExpenseEditor.tsx:1103
 msgid "Remove photo"
 msgstr "Remove photo"
 
-#: src/routes/about/route.tsx:94
+#: src/routes/about/route.tsx:95
 msgid "Report an Issue"
 msgstr "Report an Issue"
 
@@ -3228,7 +3233,7 @@ msgid "Save to cloud"
 msgstr "Save to cloud"
 
 #: src/components/RouteQRScanner.tsx:68
-#: src/routes/join.tsx:137
+#: src/routes/join.tsx:130
 msgid "Scan QR code"
 msgstr "Scan QR code"
 
@@ -3344,7 +3349,7 @@ msgstr "Shares"
 msgid "Shares for {0}"
 msgstr "Shares for {0}"
 
-#: src/components/ExpenseEditor.tsx:792
+#: src/components/ExpenseEditor.tsx:794
 msgid "Shares for {participantName}"
 msgstr "Shares for {participantName}"
 
@@ -3548,7 +3553,7 @@ msgstr "Special Drawing Rights"
 msgid "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 msgstr "Split bills with friends and family. Track expenses, calculate balances, and settle up together."
 
-#: src/routes/about/route.tsx:50
+#: src/routes/about/route.tsx:51
 msgid "Split bills with friends and family. Track, calculate, and settle expenses together."
 msgstr "Split bills with friends and family. Track, calculate, and settle expenses together."
 
@@ -3564,7 +3569,7 @@ msgstr "Split defaults"
 msgid "Split expenses and settle up together on trizum."
 msgstr "Split expenses and settle up together on trizum."
 
-#: src/routes/about/route.tsx:75
+#: src/routes/about/route.tsx:76
 msgid "Split expenses fairly among multiple participants"
 msgstr "Split expenses fairly among multiple participants"
 
@@ -3621,7 +3626,7 @@ msgstr "Submit a Request"
 msgid "Submitting..."
 msgstr "Submitting..."
 
-#: src/components/CalculatorToolbar.tsx:1545
+#: src/components/CalculatorToolbar.tsx:1543
 msgid "Subtract"
 msgstr "Subtract"
 
@@ -3633,7 +3638,7 @@ msgstr "Sucre"
 msgid "Sudanese Pound"
 msgstr "Sudanese Pound"
 
-#: src/routes/about/route.tsx:104
+#: src/routes/about/route.tsx:105
 #: src/routes/support/route.tsx:20
 msgid "Support"
 msgstr "Support"
@@ -3658,12 +3663,12 @@ msgstr "Swipe between expenses and balances tabs."
 msgid "Swiss Franc"
 msgstr "Swiss Franc"
 
-#: src/components/ExpenseEditor.tsx:818
+#: src/components/ExpenseEditor.tsx:820
 msgid "Switch to a set amount"
 msgstr "Switch to a set amount"
 
-#: src/components/ExpenseEditor.tsx:808
-#: src/components/ExpenseEditor.tsx:819
+#: src/components/ExpenseEditor.tsx:810
+#: src/components/ExpenseEditor.tsx:821
 msgid "Switch to fractional split"
 msgstr "Switch to fractional split"
 
@@ -3702,8 +3707,8 @@ msgstr "Tajikistani Somoni"
 
 #: src/components/AvatarPicker.tsx:160
 #: src/components/AvatarPicker.tsx:175
-#: src/components/ExpenseEditor.tsx:1029
-#: src/components/ExpenseEditor.tsx:1043
+#: src/components/ExpenseEditor.tsx:1031
+#: src/components/ExpenseEditor.tsx:1045
 msgid "Take photo"
 msgstr "Take photo"
 
@@ -3753,7 +3758,7 @@ msgstr "Terms"
 
 #. Link to the legal terms page
 #. Title of the legal terms page
-#: src/routes/about/route.tsx:116
+#: src/routes/about/route.tsx:117
 #: src/routes/terms/route.tsx:20
 msgid "Terms of Service"
 msgstr "Terms of Service"
@@ -3860,7 +3865,7 @@ msgstr "This debt is no longer available"
 msgid "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 msgstr "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 
-#: src/hooks/useCloudSyncAccountState.ts:305
+#: src/hooks/useCloudSyncAccountState.ts:310
 msgid "This device is already using trizum cloud"
 msgstr "This device is already using trizum cloud"
 
@@ -3880,7 +3885,7 @@ msgstr "This HEIC or HEIF image could not be processed. Try another photo or exp
 msgid "This isn't a valid ID"
 msgstr "This isn't a valid ID"
 
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:254
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:255
 msgid "This party already has an active Party Boost."
 msgstr "This party already has an active Party Boost."
 
@@ -3900,7 +3905,7 @@ msgstr "This permanently deletes your trizum cloud account, sign-in methods, and
 msgid "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain. Deleting your account does not cancel a store subscription, and Premium purchases cannot be moved to a new trizum account. Manage any active subscription before continuing."
 msgstr "This permanently deletes your trizum cloud account, sign-in methods, and cloud settings. Your local data on this device will remain. Deleting your account does not cancel a store subscription, and Premium purchases cannot be moved to a new trizum account. Manage any active subscription before continuing."
 
-#: src/routes/about/route.tsx:139
+#: src/routes/about/route.tsx:140
 msgid "This project uses various open source libraries and tools."
 msgstr "This project uses various open source libraries and tools."
 
@@ -3921,7 +3926,7 @@ msgstr "This stops trizum cloud on this device. Your local data stays on this de
 msgid "Timeframe"
 msgstr "Timeframe"
 
-#: src/components/ExpenseEditor.tsx:444
+#: src/components/ExpenseEditor.tsx:446
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:292
 msgid "Title"
 msgstr "Title"
@@ -4018,21 +4023,21 @@ msgstr "Trinidad and Tobago Dollar"
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/hooks/useCloudSyncAccountState.ts:219
-#: src/hooks/useCloudSyncAccountState.ts:300
+#: src/hooks/useCloudSyncAccountState.ts:224
+#: src/hooks/useCloudSyncAccountState.ts:305
 msgid "trizum cloud data is invalid"
 msgstr "trizum cloud data is invalid"
 
-#: src/hooks/useCloudSyncAccountState.ts:240
-#: src/hooks/useCloudSyncAccountState.ts:339
+#: src/hooks/useCloudSyncAccountState.ts:245
+#: src/hooks/useCloudSyncAccountState.ts:344
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud enabled on this device"
 
-#: src/hooks/useCloudSyncAccountState.ts:295
+#: src/hooks/useCloudSyncAccountState.ts:300
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud is not set up yet"
 
-#: src/hooks/useCloudSyncAccountState.ts:178
+#: src/hooks/useCloudSyncAccountState.ts:185
 msgid "trizum cloud started"
 msgstr "trizum cloud started"
 
@@ -4074,7 +4079,7 @@ msgstr "Try another email"
 msgid "Try another timeframe to compare a different period of your party."
 msgstr "Try another timeframe to compare a different period of your party."
 
-#: src/components/QRCodeScanner.tsx:324
+#: src/components/QRCodeScanner.tsx:349
 msgid "Try scanning another code"
 msgstr "Try scanning another code"
 
@@ -4143,7 +4148,7 @@ msgstr "Update who you are in this party so that we can show you the expenses an
 msgid "Updating expense..."
 msgstr "Updating expense..."
 
-#: src/components/UpdateController.tsx:69
+#: src/components/UpdateController.tsx:70
 msgid "Updating trizum..."
 msgstr "Updating trizum..."
 
@@ -4151,14 +4156,14 @@ msgstr "Updating trizum..."
 msgid "Upload malware or content designed to disrupt or damage the Service"
 msgstr "Upload malware or content designed to disrupt or damage the Service"
 
-#: src/components/ExpenseEditor.tsx:927
+#: src/components/ExpenseEditor.tsx:929
 msgid "Upload or capture an image of your receipt"
 msgstr "Upload or capture an image of your receipt"
 
 #: src/components/AvatarPicker.tsx:169
 #: src/components/AvatarPicker.tsx:187
-#: src/components/ExpenseEditor.tsx:1038
-#: src/components/ExpenseEditor.tsx:1055
+#: src/components/ExpenseEditor.tsx:1040
+#: src/components/ExpenseEditor.tsx:1057
 msgid "Upload photo"
 msgstr "Upload photo"
 
@@ -4171,7 +4176,7 @@ msgstr "Uploading avatar..."
 msgid "Uploading pictures..."
 msgstr "Uploading pictures..."
 
-#: src/components/ExpenseEditor.tsx:968
+#: src/components/ExpenseEditor.tsx:970
 msgid "Uploading..."
 msgstr "Uploading..."
 
@@ -4232,7 +4237,7 @@ msgstr "Use the Service to store or distribute unlawful or infringing content"
 msgid "Use trizum cloud on this device?"
 msgstr "Use trizum cloud on this device?"
 
-#: src/routes/join.tsx:140
+#: src/routes/join.tsx:133
 msgid "Use your camera to scan a trizum invite"
 msgstr "Use your camera to scan a trizum invite"
 
@@ -4264,7 +4269,7 @@ msgstr "Vanuatu Vatu"
 msgid "Venezuelan Bolívar Soberano"
 msgstr "Venezuelan Bolívar Soberano"
 
-#: src/routes/about/route.tsx:34
+#: src/routes/about/route.tsx:35
 msgid "Version"
 msgstr "Version"
 
@@ -4280,7 +4285,7 @@ msgstr "Vietnamese Dong"
 msgid "View attachment {attachmentNumber}"
 msgstr "View attachment {attachmentNumber}"
 
-#: src/routes/about/route.tsx:89
+#: src/routes/about/route.tsx:90
 msgid "View on GitHub"
 msgstr "View on GitHub"
 
@@ -4288,7 +4293,7 @@ msgstr "View on GitHub"
 msgid "View party"
 msgstr "View party"
 
-#: src/components/ExpenseEditor.tsx:1090
+#: src/components/ExpenseEditor.tsx:1092
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "View photo"
@@ -4298,7 +4303,7 @@ msgstr "View photo"
 msgid "View Premium options"
 msgstr "View Premium options"
 
-#: src/routes/about/route.tsx:144
+#: src/routes/about/route.tsx:145
 msgid "View Third-Party Licenses"
 msgstr "View Third-Party Licenses"
 
@@ -4419,7 +4424,7 @@ msgstr "WIR Franc"
 msgid "Working offline. Your account will refresh when you reconnect."
 msgstr "Working offline. Your account will refresh when you reconnect."
 
-#: src/routes/about/route.tsx:65
+#: src/routes/about/route.tsx:66
 msgid "Works seamlessly offline with automatic sync when online"
 msgstr "Works seamlessly offline with automatic sync when online"
 
@@ -4472,7 +4477,7 @@ msgstr "You may not use the Service to:"
 msgid "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
 msgstr "You may stop using the Service at any time. We may restrict or suspend access when reasonably necessary to protect users or the Service, investigate misuse, comply with law, or address a material breach of these Terms. When appropriate, we will give notice and an opportunity to resolve the issue."
 
-#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:257
+#: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:258
 msgid "You must be a member of this party to boost it."
 msgstr "You must be a member of this party to boost it."
 

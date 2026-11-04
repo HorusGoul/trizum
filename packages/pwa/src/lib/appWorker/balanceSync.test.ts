@@ -91,8 +91,8 @@ describe("balance synchronization", () => {
   test("synchronizes history-only expense heads without visible changes", async () => {
     const { main, worker, party, chunk, balances, release } = await createPeers(true);
     const cached = await worker.find<PartyExpenseChunk>(chunk.documentId);
-    const visibleChanges = vi.fn();
-    const headsChanged = vi.fn();
+    const visibleChanges = vi.fn<() => void>();
+    const headsChanged = vi.fn<() => void>();
     cached.on("change", visibleChanges);
     cached.on("heads-changed", headsChanged);
     const on = vi.spyOn(cached, "on");

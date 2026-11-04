@@ -57,7 +57,12 @@ vi.mock("#src/components/CloudSyncDialogs.tsx", () => ({
   }: {
     isOpen: boolean;
     onOpenChange: (open: boolean) => void;
-  }) => (isOpen ? <button onClick={() => onOpenChange(false)}>Cancel sign-in</button> : null),
+  }) =>
+    isOpen ? (
+      <button type="button" onClick={() => onOpenChange(false)}>
+        Cancel sign-in
+      </button>
+    ) : null,
   AuthCallbackErrorDialog: () => null,
   CloudActionConfirmationDialog: () => null,
   DeleteAccountDialog: () => null,
@@ -67,7 +72,12 @@ vi.mock("#src/components/CloudSyncDialogs.tsx", () => ({
   }: {
     isOpen: boolean;
     onUseCloudData: () => void;
-  }) => (isOpen ? <button onClick={onUseCloudData}>Use cloud data</button> : null),
+  }) =>
+    isOpen ? (
+      <button type="button" onClick={onUseCloudData}>
+        Use cloud data
+      </button>
+    ) : null,
   SignInSuccessOverlay: () => <p>Sign-in complete</p>,
 }));
 

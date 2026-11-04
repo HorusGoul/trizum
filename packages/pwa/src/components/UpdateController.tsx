@@ -43,6 +43,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
       return { status: "started" };
     } catch {
       toast.dismiss(UPDATE_TOAST_ID);
+      // oxlint-disable-next-line react-doctor/no-loading-flag-reset-outside-finally -- Failure resets here; success stays busy until the service-worker reload.
       setIsUpdating(false);
       return { status: "failed" };
     }

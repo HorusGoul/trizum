@@ -1,5 +1,5 @@
-import { RECOMMENDED_RULES as RECOMMENDED_REACT_DOCTOR_RULES } from "oxlint-plugin-react-doctor";
 import { defineConfig, type UserConfig } from "vite-plus";
+import reactDoctorConfig, { reactDoctorSettings } from "./doctor.config.ts";
 
 const rootAppCommandMessage = [
   "The workspace root is not an app package.",
@@ -42,13 +42,6 @@ const ignorePatterns = [
 // them out of formatting checks so routine validation does not reflow them.
 const formatIgnorePatterns = [".agents/**", ...ignorePatterns];
 
-const pwaReactDoctorRules = {
-  ...RECOMMENDED_REACT_DOCTOR_RULES,
-  "react-doctor/no-multi-comp": "off" as const,
-  // TanStack Form handles submission in JS and requires cancelling the native browser submit.
-  "react-doctor/no-prevent-default": "off" as const,
-};
-
 function rootAppCommandGuard() {
   return {
     config() {
@@ -72,6 +65,9 @@ const toolingConfig = {
     sortTailwindcss: true,
   },
   lint: {
+    categories: {
+      correctness: "error",
+    },
     env: {
       browser: true,
       es2024: true,
@@ -100,21 +96,22 @@ const toolingConfig = {
     rules: {
       "import/no-named-as-default": "off",
       "import/no-named-as-default-member": "off",
-      "lingui/no-expression-in-message": "warn",
-      "lingui/no-single-tag-to-translate": "warn",
-      "lingui/no-single-variables-to-translate": "warn",
-      "lingui/no-trans-inside-trans": "warn",
+      "lingui/no-expression-in-message": "error",
+      "lingui/no-single-tag-to-translate": "error",
+      "lingui/no-single-variables-to-translate": "error",
+      "lingui/no-trans-inside-trans": "error",
       "lingui/t-call-in-function": "error",
       "no-console": "error",
       "no-unused-vars": "off",
       "react/exhaustive-deps": "error",
-      "react/only-export-components": "warn",
+      "react/only-export-components": "error",
       "react/react-in-jsx-scope": "off",
       "react/rules-of-hooks": "error",
       "typescript/consistent-type-imports": "error",
       "vite-plus/prefer-vite-plus-imports": "error",
     },
     settings: {
+      "react-doctor": reactDoctorSettings,
       react: {
         version: "19.0.0",
       },
@@ -122,12 +119,25 @@ const toolingConfig = {
     overrides: [
       {
         files: ["packages/pwa/src/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
-        rules: pwaReactDoctorRules,
+        rules: reactDoctorConfig.rules,
       },
       {
-        files: ["packages/pwa/src/main.tsx", "packages/pwa/src/routes/**/*.tsx"],
+        files: [
+          "packages/pwa/src/main.tsx",
+          "packages/pwa/src/routes/**/*.tsx",
+          "src/main.tsx",
+          "src/routes/**/*.tsx",
+        ],
         rules: {
           "react/only-export-components": "off",
+        },
+      },
+      {
+        files: ["**/*.test.{ts,tsx}"],
+        rules: {
+          // Test harnesses expose hook results during render and inspect mocks.
+          "react/globals": "off",
+          "typescript/unbound-method": "off",
         },
       },
     ],

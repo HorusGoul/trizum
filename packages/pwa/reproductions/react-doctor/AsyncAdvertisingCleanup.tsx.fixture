@@ -1,0 +1,23 @@
+import { App } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
+import { useEffect } from "react";
+
+interface Coordinator {
+  markInteractive(): void;
+  onActive(): Promise<void>;
+  destroy(): Promise<void>;
+}
+
+export function AsyncAdvertisingCleanup({ coordinator }: { coordinator: Coordinator }) {
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const frame = requestAnimationFrame(() => coordinator.markInteractive());
+    const registration = App.addListener("appStateChange", () => { void coordinator.onActive(); });
+    return () => {
+      cancelAnimationFrame(frame);
+      void registration.then((handle) => handle.remove());
+      void coordinator.destroy();
+    };
+  }, [coordinator]);
+  return null;
+}

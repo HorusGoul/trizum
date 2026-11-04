@@ -1,0 +1,8 @@
+import { createRoot } from "react-dom/client";
+import { createRef } from "react";
+import { ClientOnlyCalculator } from "./ClientOnlyCalculator";
+
+const container = document.getElementById("root");
+if (container) {
+  createRoot(container).render(<ClientOnlyCalculator fieldRef={createRef<HTMLDivElement>()} />);
+}

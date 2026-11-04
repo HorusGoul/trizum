@@ -301,6 +301,7 @@ export function ExpenseEditor({
         validation={validation}
       />
 
+      {/* oxlint-disable react-doctor/tanstack-form-on-submit-requires-prevent-default -- preventDefault runs before the duplicate-submit guard and handleSubmit. */}
       <form
         id={formId}
         onSubmit={(event) => {
@@ -342,6 +343,7 @@ export function ExpenseEditor({
 
         <div className="h-[calc(4rem+var(--calculator-mobile-scroll-allowance,0px))] shrink-0 transition-[height] duration-200 ease-out md:h-16" />
       </form>
+      {/* oxlint-enable react-doctor/tanstack-form-on-submit-requires-prevent-default */}
     </div>
   );
 }

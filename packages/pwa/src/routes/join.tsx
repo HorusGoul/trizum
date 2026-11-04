@@ -8,7 +8,6 @@ import { useRouteQRScanner } from "#src/components/useRouteQRScanner.js";
 import { Button } from "#src/ui/Button.js";
 import { Icon } from "#src/ui/Icon.js";
 import { AppTextField } from "#src/ui/fields/TextField.js";
-import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { useId } from "react";
@@ -37,17 +36,11 @@ function validateQRCode(value: string) {
   return true as const;
 }
 
-function getPartyIdFromLinkOrCode(id: string) {
-  const isUrl = id.includes("/");
-  return isUrl ? id.split("/party/")[1].split("/")[0] : id;
-}
-
 function validateId(id: string) {
   const isUrl = id.includes("/");
-  const partyId = getPartyIdFromLinkOrCode(id);
-  const valid = isValidDocumentId(partyId);
+  const partyId = parseQRCodeForPartyId(id);
 
-  if (!valid) {
+  if (!partyId) {
     return isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`;
   }
 }
@@ -84,9 +77,9 @@ function Join() {
 
   function onJoinParty(value: JoinFormValues) {
     const isUrl = value.id.includes("/");
-    const partyId = getPartyIdFromLinkOrCode(value.id);
+    const partyId = parseQRCodeForPartyId(value.id);
 
-    if (!isValidDocumentId(partyId)) {
+    if (!partyId) {
       toast.error(isUrl ? t`Invalid trizum party link` : t`Invalid trizum party code`);
       return;
     }
