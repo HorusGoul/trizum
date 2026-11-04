@@ -75,6 +75,7 @@ function renderAccount(source: PartyList) {
 }
 
 beforeEach(() => {
+  localStorage.clear();
   vi.resetAllMocks();
   repo = new Repo({ network: [] });
   vi.spyOn(toast, "error").mockReturnValue("error");
@@ -192,5 +193,6 @@ it("does not count an already active list, unavailable list, or failed load", as
 
 afterEach(async () => {
   await repo.shutdown();
+  localStorage.clear();
   vi.restoreAllMocks();
 });

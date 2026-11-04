@@ -15,7 +15,7 @@ interface StorePlatform {
 }
 
 const platformState: StorePlatform = { platform: "ios" };
-const store = Object.assign(createRevenueCatStore(), platformState);
+let store = Object.assign(createRevenueCatStore(), platformState);
 
 let client = createClient();
 
@@ -28,11 +28,9 @@ function createClient() {
 }
 
 beforeEach(() => {
+  store = Object.assign(createRevenueCatStore(), platformState);
   client = createClient();
   vi.clearAllMocks();
-  store.platform = "ios";
-  store.logIn.mockResolvedValue({ customerInfo: createCustomerInfo(), created: false });
-  store.getCustomerInfo.mockResolvedValue({ customerInfo: createCustomerInfo() });
   const data = new Map<string, string>();
   vi.stubGlobal("localStorage", {
     getItem: (key: string) => data.get(key) ?? null,
