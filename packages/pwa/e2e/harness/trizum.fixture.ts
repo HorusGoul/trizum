@@ -1,3 +1,4 @@
+import type {} from "../../src/lib/testing/browserHarnessApi.ts";
 import type { MigrationData } from "../../src/models/migrationData.ts";
 import type { Party } from "../../src/models/party";
 import { expect, test as base, type Page } from "@playwright/test";
@@ -87,13 +88,13 @@ function createBrowserHarness(page: Page): BrowserHarness {
         const internalWindow = window;
 
         return (
-          typeof internalWindow.__internal_createPartyFromMigrationData === "function" &&
-          typeof internalWindow.__internal_createDeferredPartyListState === "function" &&
-          typeof internalWindow.__internal_getDocumentState === "function" &&
-          typeof internalWindow.__internal_releaseDeferredPartyListState === "function" &&
-          typeof internalWindow.__internal_seedPartyListState === "function" &&
-          typeof internalWindow.__internal_readPartyListState === "function" &&
-          typeof internalWindow.__internal_recalculatePartyBalances === "function"
+          internalWindow.__internal_createPartyFromMigrationData instanceof Function &&
+          internalWindow.__internal_createDeferredPartyListState instanceof Function &&
+          internalWindow.__internal_getDocumentState instanceof Function &&
+          internalWindow.__internal_releaseDeferredPartyListState instanceof Function &&
+          internalWindow.__internal_seedPartyListState instanceof Function &&
+          internalWindow.__internal_readPartyListState instanceof Function &&
+          internalWindow.__internal_recalculatePartyBalances instanceof Function
         );
       })
       .catch(() => false);
@@ -287,7 +288,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   }
 
   async function setPartyBoost(partyId: DocumentId, boost: Party["boost"]) {
-    await page.waitForFunction(() => typeof window.__internal_setPartyBoost === "function");
+    await page.waitForFunction(() => window.__internal_setPartyBoost instanceof Function);
     await page.evaluate(
       async ({ partyId, boost }) => {
         const setPartyBoost = window.__internal_setPartyBoost;

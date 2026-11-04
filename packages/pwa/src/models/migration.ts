@@ -40,7 +40,7 @@ export async function createPartyFromMigrationData({
     chunkRefs: [],
   };
 
-  if (typeof data.party.symbol === "string") {
+  if (data.party.symbol !== undefined) {
     party.symbol = data.party.symbol;
   }
 

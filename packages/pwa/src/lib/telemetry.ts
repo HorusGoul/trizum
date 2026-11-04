@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { hasPrivacySignal, isTelemetryId } from "@trizum/analytics";
 import * as Sentry from "@sentry/react";
 
@@ -30,7 +31,7 @@ function scrubIdentity<Value>(value: Value, id: string | undefined): ScrubbedIde
     return value.map((item) => scrubIdentity(item, id)) as ScrubbedIdentity<Value>;
   }
 
-  if (!value || typeof value !== "object") {
+  if (!isTelemetryObject(value)) {
     // SAFETY: This branch returns primitives and functions unchanged.
     return value as ScrubbedIdentity<Value>;
   }
@@ -38,10 +39,10 @@ function scrubIdentity<Value>(value: Value, id: string | undefined): ScrubbedIde
   const result: Partial<{ [Key in keyof Value]: ScrubbedIdentity<Value[Key]> }> = {};
 
   for (const [key, field] of Object.entries(value)) {
-    if (key === "user" && field && typeof field === "object" && "id" in field) {
+    if (key === "user" && isTelemetryObject(field) && "id" in field) {
       if (id && field.id === id) Object.assign(result, { [key]: field });
     } else if (["telemetryId", "user.id", "sentry.user.id", "did"].includes(key)) {
-      const identity = field && typeof field === "object" && "value" in field ? field.value : field;
+      const identity = isTelemetryObject(field) && "value" in field ? field.value : field;
 
       if (id && identity === id) Object.assign(result, { [key]: field });
     } else {
@@ -78,3 +79,14 @@ export const sentryTelemetryIntegration = {
     });
   },
 } satisfies Parameters<typeof Sentry.addIntegration>[0];
+
+const telemetryCallableSchema = z.function();
+
+const telemetryObjectSchema = z.custom<object>(
+  (value) =>
+    value !== null && Object(value) === value && !telemetryCallableSchema.safeParse(value).success,
+);
+
+function isTelemetryObject<Value>(value: Value): value is Value & object {
+  return telemetryObjectSchema.safeParse(value).success;
+}

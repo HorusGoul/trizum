@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { $, OpenAPIHono } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { getCloudUserSettingsRoute, saveCloudUserSettingsRoute } from "../contracts/cloud-sync";
@@ -155,7 +156,7 @@ export const cloudSyncRoute = cloudSyncApp
     (result, c) => {
       if (!result.success) {
         return c.req.json<unknown>().then((body) => {
-          const isObject = body !== null && typeof body === "object";
+          const isObject = settingsContainerSchema.safeParse(body).success;
 
           return c.json(
             {
@@ -171,3 +172,5 @@ export const cloudSyncRoute = cloudSyncApp
   );
 
 export type CloudSyncRoute = typeof cloudSyncRoute;
+
+const settingsContainerSchema = z.union([z.object({}), z.array(z.unknown())]);

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
@@ -23,22 +24,17 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
   component: RouteComponent,
   pendingComponent: PartyPendingComponent,
   validateSearch: (search): PaySearchParams => {
-    if (
-      typeof search.fromId !== "string" ||
-      !search.fromId ||
-      typeof search.toId !== "string" ||
-      !search.toId ||
-      typeof search.amount !== "number" ||
-      !search.amount
-    ) {
-      throw new Error(t`Missing search params`);
-    }
+    const result = z
+      .object({
+        fromId: z.string().min(1),
+        toId: z.string().min(1),
+        amount: z.number().refine((amount) => amount !== 0),
+      })
+      .safeParse(search);
 
-    return {
-      fromId: search.fromId,
-      toId: search.toId,
-      amount: search.amount,
-    };
+    if (!result.success) throw new Error(t`Missing search params`);
+
+    return result.data;
   },
 });
 

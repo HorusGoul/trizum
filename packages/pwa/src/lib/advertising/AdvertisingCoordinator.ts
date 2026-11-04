@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { AdmobConsentInfo } from "@capacitor-community/admob";
 import type { AdFormat, AdMobSdk, FullScreenAdEvent } from "./adMobSdk.ts";
 import {
@@ -581,14 +582,9 @@ export class AdvertisingCoordinator {
 }
 
 function getSanitizedErrorCode(cause: unknown) {
-  if (
-    typeof cause === "object" &&
-    cause !== null &&
-    "code" in cause &&
-    (typeof cause.code === "number" || typeof cause.code === "string")
-  ) {
-    return String(cause.code);
-  }
+  const result = adDiagnosticCodeSchema.safeParse(cause);
 
-  return "unknown";
+  return result.success ? String(result.data.code) : "unknown";
 }
+
+const adDiagnosticCodeSchema = z.object({ code: z.union([z.string(), z.number()]) });

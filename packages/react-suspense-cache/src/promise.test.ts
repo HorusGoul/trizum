@@ -14,6 +14,11 @@ describe("isPromiseLike", () => {
     expect(isPromiseLike({ then() {} })).toBe(true);
   });
 
+  test("keeps array thenables and excludes callable objects", () => {
+    expect(isPromiseLike(Object.assign([], { then() {} }))).toBe(true);
+    expect(isPromiseLike(Object.assign(() => {}, { then() {} }))).toBe(false);
+  });
+
   test("rejects plain values and non-callable then properties", () => {
     expect(isPromiseLike("value")).toBe(false);
     expect(isPromiseLike(null)).toBe(false);

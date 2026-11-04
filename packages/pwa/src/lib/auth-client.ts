@@ -1,3 +1,4 @@
+import { getFailureMessage } from "./failureMessage.ts";
 import { Capacitor } from "@capacitor/core";
 import { magicLinkClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
@@ -354,9 +355,5 @@ export { getAuthResultUser, getAuthRedirectUrl } from "./authResponse.ts";
 async function getAuthErrorMessage(response: Response, fallback: string) {
   const body = await response.json().catch(() => null);
 
-  if (body && typeof body === "object" && "message" in body && typeof body.message === "string") {
-    return body.message;
-  }
-
-  return fallback;
+  return getFailureMessage(body) ?? fallback;
 }

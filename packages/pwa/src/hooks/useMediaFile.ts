@@ -12,7 +12,7 @@ interface MediaFileObjectUrlEntry {
 const mediaFileObjectUrlCache = new Map<string, MediaFileObjectUrlEntry>();
 
 function getMediaFileMimeType(mediaFile: MediaFile) {
-  return typeof mediaFile.metadata.mimeType === "string" ? mediaFile.metadata.mimeType : undefined;
+  return mediaFile.metadata.mimeType;
 }
 
 function getMediaFileObjectUrlKey(mediaFile: MediaFile) {

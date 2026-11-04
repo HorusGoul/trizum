@@ -24,6 +24,26 @@ interface RedactedProperties {
   [property: string]: RedactedValue;
 }
 
+const logStringSchema = z.string();
+const logNumberSchema = z.union([z.number(), z.nan(), z.literal(Infinity), z.literal(-Infinity)]);
+
+const redactedPrimitiveSchema = z.union([
+  z.string().transform(redactString),
+  z.bigint().transform((value) => redactString(String(value))),
+  z.symbol().transform((value) => redactString(String(value))),
+  logNumberSchema,
+  z.boolean(),
+  z.null(),
+  z.undefined(),
+]);
+
+const logFunctionSchema = z.function();
+const logObjectSchema = z.custom<object>((value) => value !== null && Object(value) === value);
+
+// Zod's default type errors inspect constructor.name on rejected objects.
+// Classification must leave diagnostic accessors untouched, even on failure.
+const diagnosticParseOptions = { error: () => "Invalid diagnostic value" };
+
 const nativeErrorStackDescriptor = getPropertyDescriptor(new Error(), "stack");
 
 function getPropertyDescriptor(value: Error, key: string): PropertyDescriptor | undefined {
@@ -51,7 +71,11 @@ function redactErrorField(
     ["name", "message"].every((field) => {
       const property = getPropertyDescriptor(error, field);
 
-      return property && "value" in property && typeof property.value === "string";
+      return (
+        property &&
+        "value" in property &&
+        logStringSchema.safeParse(property.value, diagnosticParseOptions).success
+      );
     })
   ) {
     let value: unknown;
@@ -82,32 +106,25 @@ const redactValueSchema = z.unknown().transform((input): RedactedValue => {
   const ancestors = new Set<object>();
 
   const redactor = z.unknown().transform((value): RedactedValue => {
-    if (typeof value === "string") return redactString(value);
+    const primitive = redactedPrimitiveSchema.safeParse(value, diagnosticParseOptions);
 
-    if (typeof value === "bigint" || typeof value === "symbol") return redactString(String(value));
+    if (primitive.success) return primitive.data;
 
-    if (typeof value === "function") return "[Function]";
+    if (logFunctionSchema.safeParse(value, diagnosticParseOptions).success) return "[Function]";
+    const object = logObjectSchema.parse(value, diagnosticParseOptions);
 
-    if (
-      value === null ||
-      value === undefined ||
-      typeof value === "number" ||
-      typeof value === "boolean"
-    )
-      return value;
-
-    if (ancestors.has(value)) return "[Circular]";
+    if (ancestors.has(object)) return "[Circular]";
 
     if (ancestors.size >= 20) return "[Truncated]";
 
-    ancestors.add(value);
+    ancestors.add(object);
 
     try {
-      if (Array.isArray(value)) {
+      if (Array.isArray(object)) {
         const result: RedactedValue[] = [];
 
-        for (let index = 0; index < value.length; index++) {
-          const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+        for (let index = 0; index < object.length; index++) {
+          const descriptor = Object.getOwnPropertyDescriptor(object, String(index));
           result.push(
             descriptor && !("value" in descriptor)
               ? "[Accessor]"
@@ -118,42 +135,43 @@ const redactValueSchema = z.unknown().transform((input): RedactedValue => {
         return result;
       }
 
-      if (value instanceof Date) {
-        return Number.isFinite(Date.prototype.getTime.call(value))
-          ? Date.prototype.toISOString.call(value)
+      if (object instanceof Date) {
+        return Number.isFinite(Date.prototype.getTime.call(object))
+          ? Date.prototype.toISOString.call(object)
           : null;
       }
 
-      if (value instanceof Map) return redactor.parse([...value.entries()]);
+      if (object instanceof Map) return redactor.parse([...object.entries()]);
 
-      if (value instanceof Set) return redactor.parse([...value]);
+      if (object instanceof Set) return redactor.parse([...object]);
 
       // Keep Error instances useful to error-monitoring sinks, without retaining
       // custom prototypes or mutating the exception used by application code.
-      const result: RedactedProperties | Error = value instanceof Error ? new Error() : {};
+      const result: RedactedProperties | Error = object instanceof Error ? new Error() : {};
 
-      if (value instanceof Error && result instanceof Error) {
+      if (object instanceof Error && result instanceof Error) {
         delete result.stack;
 
         for (const key of ["name", "message", "stack", "cause", "errors"]) {
-          const descriptor = getPropertyDescriptor(value, key);
+          const descriptor = getPropertyDescriptor(object, key);
 
           if (!descriptor) continue;
           Object.defineProperty(result, key, {
             configurable: true,
             enumerable: key === "errors",
             writable: true,
-            value: redactErrorField(value, key, descriptor, redactor),
+            value: redactErrorField(object, key, descriptor, redactor),
           });
         }
       }
 
-      for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
+      for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(object))) {
         if (!descriptor.enumerable) continue;
 
         const nextValue =
           "value" in descriptor
-            ? DOCUMENT_ID_FIELD.test(key) && typeof descriptor.value === "string"
+            ? DOCUMENT_ID_FIELD.test(key) &&
+              logStringSchema.safeParse(descriptor.value, diagnosticParseOptions).success
               ? REDACTED_DOCUMENT_ID
               : redactor.parse(descriptor.value)
             : "[Accessor]";
@@ -168,7 +186,7 @@ const redactValueSchema = z.unknown().transform((input): RedactedValue => {
 
       return result;
     } finally {
-      ancestors.delete(value);
+      ancestors.delete(object);
     }
   });
 
@@ -178,12 +196,11 @@ const redactValueSchema = z.unknown().transform((input): RedactedValue => {
 export const redactValue = redactValueSchema.parse.bind(redactValueSchema);
 
 function redactRecord(record: LogRecord): LogRecord {
-  const rawMessage =
-    typeof record.rawMessage === "string"
-      ? redactString(record.rawMessage)
-      : Object.assign(record.rawMessage.map(redactString), {
-          raw: record.rawMessage.raw.map(redactString),
-        });
+  const rawMessage = isTemplateMessage(record.rawMessage)
+    ? Object.assign(record.rawMessage.map(redactString), {
+        raw: record.rawMessage.raw.map(redactString),
+      })
+    : redactString(record.rawMessage);
 
   // SAFETY: record.properties is a plain property map; redaction retains its string keys and replaces only values.
   return {
@@ -221,4 +238,8 @@ export function withDocumentIdRedaction(
   }
 
   return redacted;
+}
+
+function isTemplateMessage(message: LogRecord["rawMessage"]): message is TemplateStringsArray {
+  return Array.isArray(message);
 }

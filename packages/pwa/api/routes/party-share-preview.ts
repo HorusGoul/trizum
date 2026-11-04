@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo";
 import type { I18n } from "@lingui/core";
@@ -738,11 +739,7 @@ function renderFooterBrand(trizumMarkUrl: string, i18n: I18n) {
 }
 
 function sanitizePlainText(value: PartyPreviewDocument["name"] | undefined, maxLength: number) {
-  if (typeof value !== "string") {
-    return "";
-  }
-
-  return limitText(normalizePreviewText(value), maxLength);
+  return limitText(normalizePreviewText(previewTextSchema.parse(value)), maxLength);
 }
 
 function normalizePreviewText(value: string) {
@@ -815,3 +812,5 @@ function withVaryHeader(headers: Headers, value: string) {
 
   return nextHeaders;
 }
+
+const previewTextSchema = z.string().catch("");

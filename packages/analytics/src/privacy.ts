@@ -1,3 +1,9 @@
+import { z } from "zod";
+
+const telemetryIdSchema = z
+  .string()
+  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+
 /** Only trusted, build-time route templates may supply text to analytics URLs. */
 export function redactPathname(pathname: string, routes: readonly string[]): string {
   const parts = pathname.split(/[?#]/, 1)[0].replace(/\/$/, "").split("/");
@@ -29,8 +35,5 @@ export function hasPrivacySignal(navigator: {
 
 /** Random UUID v4 only: never accept a document ID or arbitrary identity string. */
 export function isTelemetryId(value: unknown): value is string {
-  return (
-    typeof value === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value)
-  );
+  return telemetryIdSchema.safeParse(value).success;
 }

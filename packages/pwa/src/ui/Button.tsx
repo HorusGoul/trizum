@@ -59,25 +59,19 @@ export function Button({
 
   return (
     <AriaButton
-      className={({ isPressed, isFocusVisible, isHovered, defaultClassName, ...state }) =>
-        cn(
-          defaultClassName,
-          "relative flex h-10 w-full scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-hidden transition-all duration-200 ease-in-out",
-          colorStyles.base,
-          (isHovered || isFocusVisible) && colorStyles.focus,
-          isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
-          "data-[disabled]:cursor-not-allowed",
-          typeof className === "function"
-            ? className({
-                isPressed,
-                isFocusVisible,
-                isHovered,
-                defaultClassName,
-                ...state,
-              })
-            : className,
-        )
-      }
+      className={composeRenderProps(
+        className,
+        (className, { isPressed, isFocusVisible, isHovered, defaultClassName }) =>
+          cn(
+            defaultClassName,
+            "relative flex h-10 w-full scale-100 cursor-pointer select-none items-center justify-center rounded-full outline-hidden transition-all duration-200 ease-in-out",
+            colorStyles.base,
+            (isHovered || isFocusVisible) && colorStyles.focus,
+            isPressed && !isButtonPending && ["scale-90", colorStyles.pressed],
+            "data-[disabled]:cursor-not-allowed",
+            className,
+          ),
+      )}
       isPending={isButtonPending}
       onPress={onPressWithAction}
       {...props}

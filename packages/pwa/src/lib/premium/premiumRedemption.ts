@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 import type { RevenueCatPlatform } from "./revenueCatConfig.ts";
 
@@ -6,7 +8,7 @@ const PENDING_REDEMPTION_KEY = "trizum:pending-premium-redemption:v1";
 const REDEMPTION_SYNC_WINDOW_MS = 15 * 60_000;
 
 export function parseRedemptionSearch(search: AppSearch) {
-  return { code: typeof search.code === "string" ? search.code.trim().slice(0, 128) : "" };
+  return { code: optionalSearchTextSchema.parse(search.code)?.trim().slice(0, 128) ?? "" };
 }
 
 export function detectRedemptionPlatform(
@@ -49,13 +51,11 @@ export function rememberPremiumRedemption(userId: string) {
 
 export function hasPendingPremiumRedemption(userId: string) {
   try {
-    const value = JSON.parse(localStorage.getItem(PENDING_REDEMPTION_KEY) ?? "null");
-
-    return (
-      value?.userId === userId &&
-      typeof value.expiresAt === "number" &&
-      value.expiresAt > Date.now()
+    const value = pendingRedemptionSchema.safeParse(
+      JSON.parse(localStorage.getItem(PENDING_REDEMPTION_KEY) ?? "null"),
     );
+
+    return value.success && value.data.userId === userId && value.data.expiresAt > Date.now();
   } catch {
     return false;
   }
@@ -66,3 +66,5 @@ export function finishPremiumRedemption(userId: string) {
     localStorage.removeItem(PENDING_REDEMPTION_KEY);
   }
 }
+
+const pendingRedemptionSchema = z.object({ userId: z.string(), expiresAt: z.number() });

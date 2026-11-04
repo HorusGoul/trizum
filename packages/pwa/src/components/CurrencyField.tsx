@@ -48,7 +48,7 @@ const CALCULATOR_BUTTON_FOCUS_IGNORE_MS = 750;
 function getCalculatorFieldLabel(props: React.ComponentProps<typeof AppCurrencyField>) {
   const ariaLabel = props["aria-label"];
 
-  return props.label || (typeof ariaLabel === "string" ? ariaLabel : undefined);
+  return props.label || ariaLabel;
 }
 
 function blurFocusedCalculatorField() {

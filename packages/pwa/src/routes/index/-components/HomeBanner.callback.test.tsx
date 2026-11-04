@@ -1,3 +1,4 @@
+import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
 // @vitest-environment jsdom
 
@@ -118,7 +119,7 @@ function makeRouter(returnTo: string) {
     path: "/settings/cloud-sync",
     validateSearch: (search: AppSearch) => ({
       auth: search.auth === "success" ? ("success" as const) : undefined,
-      returnTo: typeof search.returnTo === "string" ? search.returnTo : undefined,
+      returnTo: optionalSearchTextSchema.parse(search.returnTo),
     }),
     component: function Callback() {
       const search = useSearch({ strict: false });

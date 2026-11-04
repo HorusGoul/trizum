@@ -1,3 +1,4 @@
+import { z } from "zod";
 import path from "node:path";
 import { execFileSync, execSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -31,6 +32,7 @@ const buildTarget = ["chrome111", "edge111", "firefox114", "safari16.4", "ios16.
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const packageRequire = createRequire(new URL("package.json", import.meta.url));
 const sentryCliBin = packageRequire.resolve("@sentry/cli/bin/sentry-cli");
+const adMobIdentifierSchema = z.string().trim().min(1);
 const adMobConfig = readAdMobConfig();
 const linguiConfigPath = path.resolve(packageRoot, "lingui.config.ts");
 
@@ -319,7 +321,7 @@ export default defineConfig(({ mode }) => {
               return dependencies
                 .map((dep) => {
                   const repository =
-                    typeof dep.repository === "string" ? dep.repository : dep.repository?.url;
+                    dep.repository instanceof Object ? dep.repository.url : dep.repository;
 
                   const lines = [
                     `${dep.name}${dep.version ? `@${dep.version}` : ""}`,
@@ -389,7 +391,7 @@ function readAdMobConfig() {
 
   for (const [platform, values] of Object.entries(selected)) {
     for (const [name, value] of Object.entries(values)) {
-      if (typeof value !== "string" || value.trim().length === 0) {
+      if (!adMobIdentifierSchema.safeParse(value).success) {
         throw new Error(`Missing ${isLive ? "live" : "test"} AdMob ${platform} ${name}`);
       }
     }

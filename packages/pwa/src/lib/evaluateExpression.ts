@@ -1,4 +1,7 @@
+import { z } from "zod";
 import { evaluate } from "mathjs";
+
+const expressionResultSchema = z.number();
 
 export function evaluateExpression(expr: string): number | null {
   const trimmed = expr.trim();
@@ -13,9 +16,9 @@ export function evaluateExpression(expr: string): number | null {
   try {
     const result: unknown = evaluate(cleaned);
 
-    if (typeof result !== "number" || !isFinite(result)) return null;
+    const parsed = expressionResultSchema.safeParse(result);
 
-    return result;
+    return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }

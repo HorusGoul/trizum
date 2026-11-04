@@ -5,7 +5,7 @@ import {
   createRoute,
   createRouter,
 } from "@tanstack/react-router";
-import { parseAppSearch, stringifyAppSearch } from "./routerSearch.ts";
+import { parseAppSearch, stringifyAppSearch, expenseEditorSearchSchema } from "./routerSearch.ts";
 import { parseRedemptionSearch } from "./premium/premiumRedemption.ts";
 
 describe("opaque code search values", () => {
@@ -47,5 +47,21 @@ describe("opaque code search values", () => {
     expect(parseAppSearch(stringifyAppSearch(search))).toEqual(search);
     expect(parseRedemptionSearch(parseAppSearch("?code=ONE&code=TWO"))).toEqual({ code: "" });
     expect(stringifyAppSearch({})).toBe("");
+  });
+});
+
+describe("expense editor query decoding", () => {
+  it("keeps valid fields and rejects values of the wrong domain", () => {
+    expect(
+      expenseEditorSearchSchema.parse({ calculator: "amount", media: 2, extra: true }),
+    ).toEqual({ calculator: "amount", media: 2 });
+    expect(expenseEditorSearchSchema.parse({ calculator: ["amount"], media: "2" })).toEqual({
+      calculator: undefined,
+      media: undefined,
+    });
+    expect(expenseEditorSearchSchema.parse({ calculator: "", media: -1 })).toEqual({
+      calculator: undefined,
+      media: undefined,
+    });
   });
 });

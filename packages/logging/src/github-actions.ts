@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   getTextFormatter,
   type LogLevel,
@@ -57,14 +58,12 @@ function getGitHubActionsErrorSummary(cause: unknown): string | null {
     return `${cause.name}: ${cause.message}`;
   }
 
-  if (
-    typeof cause === "string" ||
-    typeof cause === "number" ||
-    typeof cause === "boolean" ||
-    typeof cause === "bigint"
-  ) {
-    return String(cause);
-  }
+  // Rejected diagnostics may have constructor getters; avoid Zod's type formatter.
+  const primitive = annotationErrorSummarySchema.safeParse(cause, {
+    error: () => "Not a primitive error summary",
+  });
+
+  if (primitive.success) return String(primitive.data);
 
   return null;
 }
@@ -110,3 +109,13 @@ export function getGitHubActionsAnnotationSink({
     writeCommand(`::${annotationCommand}::${escapeGitHubActionsCommandValue(message)}\n`);
   };
 }
+
+const annotationErrorSummarySchema = z.union([
+  z.string(),
+  z.number(),
+  z.nan(),
+  z.literal(Infinity),
+  z.literal(-Infinity),
+  z.boolean(),
+  z.bigint(),
+]);

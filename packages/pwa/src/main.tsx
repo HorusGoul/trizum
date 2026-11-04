@@ -1,3 +1,4 @@
+import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
 import type {} from "./lib/testing/browserHarnessApi.ts";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
@@ -129,7 +130,7 @@ type CalculatorSearchLocation = Pick<ParsedLocation<AppSearch>, "search">;
 function hasCalculatorSearch(location: CalculatorSearchLocation | undefined) {
   const calculator = location?.search.calculator;
 
-  return typeof calculator === "string" && calculator.length > 0;
+  return optionalNonemptySearchTextSchema.parse(calculator) !== undefined;
 }
 
 function shouldPreserveCalculatorSearchScroll({
