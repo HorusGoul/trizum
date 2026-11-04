@@ -10,7 +10,7 @@ const DOCUMENT_ID_FIELD =
 
 const nativeErrorStackDescriptor = getPropertyDescriptor(new Error(), "stack");
 
-function getPropertyDescriptor(value: object, key: string): PropertyDescriptor | undefined {
+function getPropertyDescriptor(value: Error, key: string): PropertyDescriptor | undefined {
   for (let current: object | null = value; current; current = Object.getPrototypeOf(current)) {
     const descriptor = Object.getOwnPropertyDescriptor(current, key);
 
