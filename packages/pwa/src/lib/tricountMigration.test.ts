@@ -1,5 +1,5 @@
 import type { LogRecord } from "@trizum/logging";
-import { afterEach, describe, expect, test, vi } from "vite-plus/test";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import {
   calculateBalancesByParticipant,
   getExpenseUnitShares,
@@ -15,20 +15,21 @@ const warningRecords = vi.hoisted(
   }> => [],
 );
 
-vi.mock("#src/lib/log.ts", () => ({
-  getLogger: () => ({
-    debug() {},
-    error() {},
-    info() {},
-    warning(message: string, properties?: LogRecord["properties"]) {
-      warningRecords.push({ message, properties });
-    },
-  }),
-}));
+import { capturePwaLogs } from "./testing/captureLogs.ts";
+
+let stopLogging: () => void;
+
+beforeEach(() => {
+  stopLogging = capturePwaLogs((record) => {
+    if (record.level === "warning")
+      warningRecords.push({ message: String(record.rawMessage), properties: record.properties });
+  });
+});
 
 describe("parseTricountData", () => {
   afterEach(() => {
     warningRecords.length = 0;
+    stopLogging();
   });
 
   test("preserves Tricount ratio allocations as divide part counts", () => {

@@ -1,9 +1,16 @@
 import { createCustomerInfo } from "./revenueCatTestFixtures.ts";
 import type { PluginListenerHandle } from "@capacitor/core";
-import type * as CapacitorCore from "@capacitor/core";
+import { Capacitor } from "@capacitor/core";
+import { connectRevenueCatPremium as connectPremium } from "./revenueCatPremiumConnection.ts";
 import type { CustomerInfo } from "@revenuecat/purchases-capacitor";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
-import { connectRevenueCatPremium } from "./revenueCatPremiumConnection.ts";
+
+function connectRevenueCatPremium(options: Parameters<typeof connectPremium>[0]) {
+  return connectPremium({
+    ...options,
+    listenForAppState: (listener) => native.addListener("appStateChange", listener),
+  });
+}
 
 const native = vi.hoisted(() => ({
   addListener:
@@ -16,24 +23,19 @@ const native = vi.hoisted(() => ({
   isNativePlatform: vi.fn<() => boolean>(() => false),
 }));
 
-vi.mock("@capacitor/app", () => ({ App: { addListener: native.addListener } }));
-
-vi.mock("@capacitor/core", async (importOriginal) => ({
-  ...(await importOriginal<typeof CapacitorCore>()),
-  Capacitor: { isNativePlatform: native.isNativePlatform },
-}));
-
 beforeEach(() => {
   vi.stubGlobal("window", new EventTarget());
   vi.stubGlobal("document", Object.assign(new EventTarget(), { visibilityState: "visible" }));
   vi.stubGlobal("navigator", { onLine: true });
   native.isNativePlatform.mockReturnValue(false);
+  vi.spyOn(Capacitor, "isNativePlatform").mockImplementation(native.isNativePlatform);
 });
 
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 
 const customerInfo = createCustomerInfo({ originalAppUserId: "premium" });

@@ -2,33 +2,12 @@
 
 import { I18nProvider } from "@lingui/react";
 import { i18n } from "@lingui/core";
-import { act, type ReactNode } from "react";
+import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 import { QRCodeScanner, type ScanResult } from "./QRCodeScanner.tsx";
 
 const detect = vi.hoisted(() => vi.fn<() => Promise<{ rawValue: string }[]>>());
-
-vi.mock("#src/lib/qr.js", () => ({
-  BarcodeDetector: class {
-    detect = detect;
-  },
-}));
-
-vi.mock("#src/ui/Icon.js", () => ({ Icon: () => null }));
-
-vi.mock("./TrizumSpinner.js", () => ({ TrizumSpinner: () => null }));
-
-vi.mock("motion/react", () => ({
-  AnimatePresence: ({ children }: { children: ReactNode }) => children,
-  LazyMotion: ({ children }: { children: ReactNode }) => children,
-  domAnimation: {},
-  m: {
-    div: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    p: ({ children }: { children: ReactNode }) => <p>{children}</p>,
-    span: ({ children }: { children: ReactNode }) => <span>{children}</span>,
-  },
-}));
 
 let root: Root;
 let container: HTMLDivElement;
@@ -64,7 +43,11 @@ async function render(validate?: (value: string) => true | string) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <QRCodeScanner onResult={onResult} validate={validate} />
+        <QRCodeScanner
+          onResult={onResult}
+          validate={validate}
+          createDetector={() => ({ detect })}
+        />
       </I18nProvider>,
     ),
   );

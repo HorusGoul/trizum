@@ -4,6 +4,7 @@ import type {
   IntroEligibility,
   PurchasesOffering,
   PurchasesPackage,
+  PurchasesPlugin,
 } from "@revenuecat/purchases-capacitor";
 import { getPremiumAccess } from "./premiumAccess.ts";
 import { getRevenueCatPlatform, isRevenueCatTestStoreEnabled } from "./revenueCatConfig.ts";
@@ -51,104 +52,131 @@ const TEST_STORE_TRIAL_FALLBACKS = {
   annual: { duration: 1, unit: "week" },
 } satisfies Partial<Record<PremiumPlanId, PremiumTrial>>;
 
-const packagesByOffering = new WeakMap<PremiumOffering, CachedOffering>();
+type PremiumStore = Pick<
+  PurchasesPlugin,
+  | "getOfferings"
+  | "purchasePackage"
+  | "restorePurchases"
+  | "checkTrialOrIntroductoryPriceEligibility"
+>;
 
-export async function loadPremiumOffering(userId: string | null): Promise<PremiumOffering> {
-  requireUserId(userId);
-  await synchronizeRevenueCatUser(userId);
+export function createPremiumCommerce({
+  getStore = async (): Promise<PremiumStore> =>
+    (await import("@revenuecat/purchases-capacitor")).Purchases,
+  synchronizeUser = synchronizeRevenueCatUser,
+  getPlatform = getRevenueCatPlatform,
+  isTestStoreEnabled = isRevenueCatTestStoreEnabled,
+}: {
+  getStore?: () => Promise<PremiumStore>;
+  synchronizeUser?: (userId: string) => Promise<CustomerInfo | void>;
+  getPlatform?: typeof getRevenueCatPlatform;
+  isTestStoreEnabled?: typeof isRevenueCatTestStoreEnabled;
+} = {}) {
+  const packagesByOffering = new WeakMap<PremiumOffering, CachedOffering>();
 
-  const { INTRO_ELIGIBILITY_STATUS, Purchases } = await import("@revenuecat/purchases-capacitor");
-  const offerings = await Purchases.getOfferings();
-  const offering = offerings.current;
+  async function loadPremiumOffering(userId: string | null): Promise<PremiumOffering> {
+    requireUserId(userId);
+    await synchronizeUser(userId);
 
-  if (!offering) {
-    throw new Error("RevenueCat did not return a current Premium offering.");
-  }
+    const { INTRO_ELIGIBILITY_STATUS } = await import("@revenuecat/purchases-capacitor");
+    const Purchases = await getStore();
+    const offerings = await Purchases.getOfferings();
+    const offering = offerings.current;
 
-  const packages = getPremiumPackages(offering);
+    if (!offering) {
+      throw new Error("RevenueCat did not return a current Premium offering.");
+    }
 
-  if (packages.size === 0) {
-    throw new Error("The current RevenueCat offering has no supported Premium packages.");
-  }
+    const packages = getPremiumPackages(offering);
 
-  let eligibilityByProductId: Record<string, IntroEligibility> = {};
+    if (packages.size === 0) {
+      throw new Error("The current RevenueCat offering has no supported Premium packages.");
+    }
 
-  if (getRevenueCatPlatform() === "ios") {
-    const productIdentifiers: string[] = [];
+    let eligibilityByProductId: Record<string, IntroEligibility> = {};
 
-    for (const { product } of packages.values()) {
-      if (product.introPrice?.price === 0) {
-        productIdentifiers.push(product.identifier);
+    if (getPlatform() === "ios") {
+      const productIdentifiers: string[] = [];
+
+      for (const { product } of packages.values()) {
+        if (product.introPrice?.price === 0) {
+          productIdentifiers.push(product.identifier);
+        }
+      }
+
+      if (productIdentifiers.length > 0) {
+        try {
+          eligibilityByProductId = await Purchases.checkTrialOrIntroductoryPriceEligibility({
+            productIdentifiers,
+          });
+        } catch {
+          // Eligibility is optional presentation data. StoreKit still applies valid offers at checkout.
+        }
       }
     }
 
-    if (productIdentifiers.length > 0) {
-      try {
-        eligibilityByProductId = await Purchases.checkTrialOrIntroductoryPriceEligibility({
-          productIdentifiers,
-        });
-      } catch {
-        // Eligibility is optional presentation data. StoreKit still applies valid offers at checkout.
+    const premiumOffering = createPremiumOffering({
+      eligibleStatus: INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE,
+      eligibilityByProductId,
+      offering,
+      trialFallbacks: isTestStoreEnabled() ? TEST_STORE_TRIAL_FALLBACKS : undefined,
+    });
+
+    packagesByOffering.set(premiumOffering, { packages, userId });
+
+    return premiumOffering;
+  }
+
+  async function purchasePremiumPlan(
+    userId: string | null,
+    offering: PremiumOffering,
+    planId: PremiumPlanId,
+  ): Promise<PremiumPurchaseResult> {
+    requireUserId(userId);
+    await synchronizeUser(userId);
+
+    const loadedOffering = packagesByOffering.get(offering);
+    const selectedPackage = loadedOffering?.packages.get(planId);
+
+    if (loadedOffering?.userId !== userId || !selectedPackage) {
+      throw new Error(`Premium package "${planId}" is not available.`);
+    }
+
+    const { PURCHASES_ERROR_CODE } = await import("@revenuecat/purchases-capacitor");
+
+    const Purchases = await getStore();
+
+    try {
+      const { customerInfo } = await Purchases.purchasePackage({ aPackage: selectedPackage });
+
+      return {
+        entitlement: getPremiumEntitlementState(customerInfo),
+        status: "purchased",
+      };
+    } catch (error) {
+      if (isPurchaseCancellation(error, PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR)) {
+        return { status: "cancelled" };
       }
+
+      throw error;
     }
   }
 
-  const premiumOffering = createPremiumOffering({
-    eligibleStatus: INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE,
-    eligibilityByProductId,
-    offering,
-    trialFallbacks: isRevenueCatTestStoreEnabled() ? TEST_STORE_TRIAL_FALLBACKS : undefined,
-  });
+  async function restorePremiumPurchases(userId: string | null): Promise<PremiumEntitlementState> {
+    requireUserId(userId);
+    await synchronizeUser(userId);
 
-  packagesByOffering.set(premiumOffering, { packages, userId });
+    const Purchases = await getStore();
+    const { customerInfo } = await Purchases.restorePurchases();
 
-  return premiumOffering;
-}
-
-export async function purchasePremiumPlan(
-  userId: string | null,
-  offering: PremiumOffering,
-  planId: PremiumPlanId,
-): Promise<PremiumPurchaseResult> {
-  requireUserId(userId);
-  await synchronizeRevenueCatUser(userId);
-
-  const loadedOffering = packagesByOffering.get(offering);
-  const selectedPackage = loadedOffering?.packages.get(planId);
-
-  if (loadedOffering?.userId !== userId || !selectedPackage) {
-    throw new Error(`Premium package "${planId}" is not available.`);
+    return getPremiumEntitlementState(customerInfo);
   }
 
-  const { PURCHASES_ERROR_CODE, Purchases } = await import("@revenuecat/purchases-capacitor");
-
-  try {
-    const { customerInfo } = await Purchases.purchasePackage({ aPackage: selectedPackage });
-
-    return {
-      entitlement: getPremiumEntitlementState(customerInfo),
-      status: "purchased",
-    };
-  } catch (error) {
-    if (isPurchaseCancellation(error, PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR)) {
-      return { status: "cancelled" };
-    }
-
-    throw error;
-  }
+  return { loadPremiumOffering, purchasePremiumPlan, restorePremiumPurchases };
 }
 
-export async function restorePremiumPurchases(
-  userId: string | null,
-): Promise<PremiumEntitlementState> {
-  requireUserId(userId);
-  await synchronizeRevenueCatUser(userId);
-
-  const { Purchases } = await import("@revenuecat/purchases-capacitor");
-  const { customerInfo } = await Purchases.restorePurchases();
-
-  return getPremiumEntitlementState(customerInfo);
-}
+export const { loadPremiumOffering, purchasePremiumPlan, restorePremiumPurchases } =
+  createPremiumCommerce();
 
 export function createPremiumOffering({
   eligibleStatus,

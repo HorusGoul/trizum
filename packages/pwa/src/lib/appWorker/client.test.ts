@@ -3,12 +3,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/tes
 import { Repo } from "@automerge/automerge-repo";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
-import type {
-  AppWorkerApi,
-  AppWorkerInitializeOptions,
-  injectAppWorker as injectWorkerProxy,
-} from "./proxy.ts";
-import type { WorkerEndpoint } from "./WorkerAdapter.ts";
+import type { AppWorkerApi, AppWorkerInitializeOptions } from "./proxy.ts";
+import type { WorkerAdapter, WorkerEndpoint } from "./WorkerAdapter.ts";
 
 type InitializeWorker = (options: AppWorkerInitializeOptions) => Promise<void>;
 
@@ -19,7 +15,7 @@ type DispatchEvent = (event: Event) => boolean;
 const proxyMock = vi.hoisted(() => {
   const workerApis: AppWorkerApi[] = [];
 
-  const injectAppWorker = vi.fn<typeof injectWorkerProxy>(() => {
+  const injectAppWorker = vi.fn<(adapter: WorkerAdapter) => AppWorkerApi>(() => {
     const api = workerApis.shift();
 
     if (!api) {
@@ -42,21 +38,6 @@ const loggerMock = vi.hoisted(() => ({
   warning: vi.fn<(message: string, properties?: LogRecord["properties"]) => void>(),
 }));
 
-vi.mock("#src/lib/log.ts", () => ({
-  getLogger: () => loggerMock,
-}));
-
-vi.mock("./proxy.ts", () => ({
-  injectAppWorker: proxyMock.injectAppWorker,
-}));
-
-vi.mock("./balanceSync.ts", () => ({
-  balanceSyncTimeout: 10_000,
-  createRecalculateBalancesRequest: (_repo: Repo, partyId: Party["id"]) =>
-    Promise.resolve({ partyId, documents: [] }),
-  waitForDocumentHeads: () => Promise.resolve(),
-}));
-
 class TestWorker {
   static instances: TestWorker[] = [];
 
@@ -74,13 +55,31 @@ class TestWorker {
   }
 }
 
+import { createAppWorkerClient, APP_WORKER_FULL_RESTART_REQUIRED_EVENT } from "./client.ts";
+import { capturePwaLogs } from "../testing/captureLogs.ts";
+
+let stopLogging: () => void;
+
+function createClient() {
+  return createAppWorkerClient({ connect: proxyMock.injectAppWorker });
+}
+
 describe("app worker client", () => {
   // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
-  const partyId = "party-id" as Party["id"];
+
   let dispatchEvent: ReturnType<typeof vi.fn<DispatchEvent>>;
 
   beforeEach(() => {
-    vi.resetModules();
+    stopLogging = capturePwaLogs((record) => {
+      if (
+        record.level === "debug" ||
+        record.level === "info" ||
+        record.level === "warning" ||
+        record.level === "error"
+      ) {
+        loggerMock[record.level](String(record.rawMessage), record.properties);
+      }
+    });
     vi.clearAllMocks();
     dispatchEvent = vi.fn<DispatchEvent>(() => true);
     vi.stubGlobal("Worker", TestWorker);
@@ -92,6 +91,7 @@ describe("app worker client", () => {
 
   afterEach(async () => {
     await Promise.all(testRepos.splice(0).map((repo) => repo.shutdown()));
+    stopLogging();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -104,7 +104,7 @@ describe("app worker client", () => {
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
-    const { appWorker, initializeAppWorker } = await import("./client.ts");
+    const { appWorker, initializeAppWorker } = createClient();
 
     await initializeAppWorker({
       repo,
@@ -113,8 +113,18 @@ describe("app worker client", () => {
     });
 
     await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
-    expect(firstApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
+    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(
+      expect.objectContaining({
+        partyId,
+        documents: [{ documentId: partyId, heads: expect.any(Array) }],
+      }),
+    );
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(
+      expect.objectContaining({
+        partyId,
+        documents: [{ documentId: partyId, heads: expect.any(Array) }],
+      }),
+    );
     expect(secondApi.initialize).toHaveBeenCalledWith(
       expect.objectContaining({
         wssUrl: "wss://sync.example.test",
@@ -155,7 +165,7 @@ describe("app worker client", () => {
     const secondApi = createWorkerApiMock();
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
-    const { appWorker, initializeAppWorker } = await import("./client.ts");
+    const { appWorker, initializeAppWorker } = createClient();
 
     await expect(
       initializeAppWorker({
@@ -167,7 +177,12 @@ describe("app worker client", () => {
 
     await expect(appWorker.recalculateBalances(partyId)).resolves.toBe(true);
     expect(firstApi.recalculateBalances).not.toHaveBeenCalled();
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(
+      expect.objectContaining({
+        partyId,
+        documents: [{ documentId: partyId, heads: expect.any(Array) }],
+      }),
+    );
     expect(TestWorker.instances).toHaveLength(2);
     expect(TestWorker.instances[0]?.terminate).toHaveBeenCalledOnce();
     expect(networkSubsystem.addNetworkAdapter).toHaveBeenCalledTimes(2);
@@ -186,8 +201,7 @@ describe("app worker client", () => {
     proxyMock.workerApis.push(firstApi, secondApi);
     const { repo, networkSubsystem } = createRepoMock();
 
-    const { APP_WORKER_FULL_RESTART_REQUIRED_EVENT, appWorker, initializeAppWorker } =
-      await import("./client.ts");
+    const { appWorker, initializeAppWorker } = createClient();
 
     await initializeAppWorker({
       repo,
@@ -197,8 +211,18 @@ describe("app worker client", () => {
 
     await expect(appWorker.recalculateBalances(partyId)).rejects.toThrow("worker still failed");
 
-    expect(firstApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
-    expect(secondApi.recalculateBalances).toHaveBeenCalledWith({ partyId, documents: [] });
+    expect(firstApi.recalculateBalances).toHaveBeenCalledWith(
+      expect.objectContaining({
+        partyId,
+        documents: [{ documentId: partyId, heads: expect.any(Array) }],
+      }),
+    );
+    expect(secondApi.recalculateBalances).toHaveBeenCalledWith(
+      expect.objectContaining({
+        partyId,
+        documents: [{ documentId: partyId, heads: expect.any(Array) }],
+      }),
+    );
     expect(TestWorker.instances).toHaveLength(2);
     expect(TestWorker.instances[0]?.terminate).toHaveBeenCalledOnce();
     expect(TestWorker.instances[1]?.terminate).toHaveBeenCalledOnce();
@@ -240,11 +264,28 @@ function createWorkerApiMock({
   };
 }
 
+let partyId: Party["id"];
 const testRepos: Repo[] = [];
 
 function createRepoMock() {
   const repo = new Repo({ network: [] });
   testRepos.push(repo);
+
+  const party = repo.create<Party>({
+    // SAFETY: Repo.create replaces the initial placeholder with its allocated document ID immediately below.
+    id: "" as Party["id"],
+    type: "party",
+    name: "Test party",
+    description: "",
+    currency: "EUR",
+    participants: {},
+    chunkRefs: [],
+  });
+
+  party.change((doc) => {
+    doc.id = party.documentId;
+  });
+  partyId = party.documentId;
 
   const addNetworkAdapter = vi
     .spyOn(repo.networkSubsystem, "addNetworkAdapter")

@@ -1,55 +1,30 @@
 import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
-import type * as DbClient from "../db/client";
 import type { ApiEnv } from "../env";
-import { cloudSyncRoute } from "./cloud-sync";
+import { createCloudSyncRoute, type CloudSettingsStore } from "./cloud-sync";
 
 interface TestCloudSettings {
   partyListDocumentId: string;
   updatedAt: number;
 }
 
-interface TestCloudSession {
-  session: { id: string };
-  user: { id: string };
-}
+const getSession =
+  vi.fn<(input: { headers: Headers }) => Promise<{ user: { id: string } } | null>>();
 
-const { getSession, select, insert, limit, values, onConflictDoNothing } = vi.hoisted(() => {
-  const onConflictDoNothing = vi.fn<() => Promise<void>>();
+const select = vi.fn<CloudSettingsStore["read"]>();
+const insert = vi.fn<CloudSettingsStore["insertIfMissing"]>();
 
-  const values = vi.fn<
-    (value: TestCloudSettings & { userId: string }) => {
-      onConflictDoNothing: typeof onConflictDoNothing;
-    }
-  >();
-
-  const limit = vi.fn<() => Promise<TestCloudSettings[]>>();
-
-  return {
-    getSession: vi.fn<(input: { headers: Headers }) => Promise<TestCloudSession | null>>(),
-    select: vi.fn<() => { from(): { where(): { limit: typeof limit } } }>(),
-    insert: vi.fn<() => { values: typeof values }>(),
-    limit,
-    values,
-    onConflictDoNothing,
-  };
+const cloudSyncRoute = createCloudSyncRoute({
+  authenticate: async (_env, _context, request) =>
+    (await getSession({ headers: request.headers }))?.user.id ?? null,
+  settingsStore: () => ({ read: select, insertIfMissing: insert }),
 });
-
-vi.mock("../auth", () => ({ createAuth: () => ({ api: { getSession } }) }));
-
-vi.mock("../db/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof DbClient>()),
-  getApiDb: () => ({ select, insert }),
-}));
 
 describe("Cloud Sync contract", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    getSession.mockResolvedValue({ session: { id: "test-session" }, user: { id: "test-user" } });
-    select.mockReturnValue({ from: () => ({ where: () => ({ limit }) }) });
-    insert.mockReturnValue({ values });
-    values.mockReturnValue({ onConflictDoNothing });
-    limit.mockResolvedValue([]);
+    getSession.mockResolvedValue({ user: { id: "test-user" } });
+    select.mockResolvedValue(undefined);
   });
 
   test.each(["GET", "PUT"] as const)(
@@ -68,7 +43,7 @@ describe("Cloud Sync contract", () => {
     expect(empty.status).toBe(200);
     await expect(empty.json()).resolves.toEqual({ settings: null });
     const settings = { partyListDocumentId: documentId(), updatedAt: 123 };
-    limit.mockResolvedValue([settings]);
+    select.mockResolvedValue(settings);
     const response = await request("GET");
     await expect(response.json()).resolves.toEqual({ settings });
     expect(getSession.mock.lastCall?.[0].headers.get("Authorization")).toBe("Bearer test-token");
@@ -89,21 +64,21 @@ describe("Cloud Sync contract", () => {
 
   test("saves settings and preserves JSON requests without a JSON content type", async () => {
     const settings = { partyListDocumentId: documentId(), updatedAt: 123 };
-    limit.mockResolvedValueOnce([]).mockResolvedValueOnce([settings]);
+    select.mockResolvedValueOnce(undefined).mockResolvedValueOnce(settings);
     const response = await request("PUT", JSON.stringify(settings), "text/plain");
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ settings });
-    expect(values).toHaveBeenCalledWith({
+    expect(insert).toHaveBeenCalledWith({
       partyListDocumentId: settings.partyListDocumentId,
       updatedAt: expect.any(Number),
       userId: "test-user",
     });
-    expect(onConflictDoNothing).toHaveBeenCalledOnce();
+    expect(insert).toHaveBeenCalledOnce();
   });
 
   test("repeated setup keeps the original timestamp and does not write", async () => {
     const settings = { partyListDocumentId: documentId(), updatedAt: 123 };
-    limit.mockResolvedValue([settings]);
+    select.mockResolvedValue(settings);
 
     const response = await request(
       "PUT",
@@ -120,8 +95,8 @@ describe("Cloud Sync contract", () => {
     async (race) => {
       const existing = { partyListDocumentId: documentId(), updatedAt: 123 };
 
-      if (race) limit.mockResolvedValueOnce([]);
-      limit.mockResolvedValue([existing]);
+      if (race) select.mockResolvedValueOnce(undefined);
+      select.mockResolvedValue(existing);
       const response = await request("PUT", JSON.stringify({ partyListDocumentId: documentId() }));
       expect(response.status).toBe(409);
       await expect(response.json()).resolves.toEqual({
@@ -139,7 +114,7 @@ describe("Cloud Sync contract", () => {
   });
 
   test.each(["GET", "PUT"] as const)("types unexpected database errors for %s", async (method) => {
-    limit.mockRejectedValue(new Error("Database unavailable"));
+    select.mockRejectedValue(new Error("Database unavailable"));
     const response = await request(method, JSON.stringify({ partyListDocumentId: documentId() }));
     expect(response.status).toBe(500);
     await expect(response.json()).resolves.toEqual({
@@ -151,7 +126,7 @@ describe("Cloud Sync contract", () => {
   });
 
   test("does not return malformed stored settings as a success", async () => {
-    limit.mockResolvedValue([{ partyListDocumentId: "invalid", updatedAt: 1 }]);
+    select.mockResolvedValue({ partyListDocumentId: "invalid", updatedAt: 1 });
     expect((await request("GET")).status).toBe(500);
   });
 });
@@ -168,7 +143,7 @@ function request(method: "GET" | "PUT", body?: string, contentType = "applicatio
 
   if (method === "PUT") init.body = body;
 
-  // SAFETY: Both auth and database bindings are mocked; the route under test does not read environment bindings.
+  // SAFETY: The explicit authentication and settings ports supply the bindings this route reads.
   return cloudSyncRoute.fetch(new Request("https://trizum.test/settings", init), {} as ApiEnv, {
     waitUntil: vi.fn<ExecutionContext["waitUntil"]>(),
     passThroughOnException: vi.fn<ExecutionContext["passThroughOnException"]>(),

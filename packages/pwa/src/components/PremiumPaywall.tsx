@@ -26,7 +26,17 @@ import { cn } from "#src/ui/utils.ts";
 
 import { PremiumCodeRedemption } from "./PremiumCodeRedemption.tsx";
 
+const premiumPaywallServices = {
+  loadPremiumOffering,
+  purchasePremiumPlan,
+  restorePremiumPurchases,
+  trackEvent,
+};
+
+export type PremiumPaywallServices = typeof premiumPaywallServices;
+
 interface PremiumPaywallProps {
+  services?: PremiumPaywallServices;
   isOpen: boolean;
   onEntitlementChange: (entitlement: PremiumEntitlementState) => void;
   onOpenChange: (isOpen: boolean) => void;
@@ -40,7 +50,9 @@ export function PremiumPaywall({
   onOpenChange,
   sessionId,
   userId,
+  services = premiumPaywallServices,
 }: PremiumPaywallProps) {
+  const { loadPremiumOffering } = services;
   const loadKey = createPremiumPaywallLoadKey(sessionId, userId);
 
   const [loadState, setLoadState] = useState<PremiumPaywallLoadState>({
@@ -60,6 +72,7 @@ export function PremiumPaywall({
       onOpenChange,
       sessionId,
       userId,
+      services,
     });
 
   useEffect(() => {
@@ -87,7 +100,7 @@ export function PremiumPaywall({
     return () => {
       active = false;
     };
-  }, [isOpen, loadAttempt, loadKey, userId]);
+  }, [isOpen, loadAttempt, loadKey, userId, loadPremiumOffering]);
 
   const currentLoadState = getCurrentPremiumPaywallLoadState(loadState, loadKey);
 
@@ -435,7 +448,9 @@ function usePremiumPaywallActions({
   onOpenChange,
   sessionId,
   userId,
+  services = premiumPaywallServices,
 }: PremiumPaywallProps) {
+  const { purchasePremiumPlan, restorePremiumPurchases, trackEvent } = services;
   const [activeAction, setActionState] = useState<"purchase" | "restore" | "redeem" | null>(null);
   const actionRef = useRef<typeof activeAction>(null);
   const sessionRef = useRef({ active: isOpen });

@@ -1,3 +1,4 @@
+import type { AppleSignInPlugin } from "@capawesome/capacitor-apple-sign-in";
 import { getFailureMessage } from "./failureMessage.ts";
 import { Capacitor } from "@capacitor/core";
 import { magicLinkClient } from "better-auth/client/plugins";
@@ -136,11 +137,17 @@ export async function fetchLinkedAuthAccounts() {
   return (await response.json()) as LinkedAuthAccount[];
 }
 
-export async function signInWithSocialAuthAccount(provider: SocialAuthProvider, returnTo?: string) {
+type AppleAuthorization = Pick<AppleSignInPlugin, "initialize" | "signIn">;
+
+export async function signInWithSocialAuthAccount(
+  provider: SocialAuthProvider,
+  returnTo?: string,
+  apple?: AppleAuthorization,
+) {
   if (Capacitor.isNativePlatform()) {
     clearNativeAuthToken();
 
-    const idToken = await getNativeSocialIdToken(provider);
+    const idToken = await getNativeSocialIdToken(provider, apple);
 
     return authClient.signIn.social({
       idToken,
@@ -216,10 +223,13 @@ async function linkSocialAuthAccountWithIdToken(
   };
 }
 
-async function getNativeSocialIdToken(provider: SocialAuthProvider): Promise<NativeSocialIdToken> {
+async function getNativeSocialIdToken(
+  provider: SocialAuthProvider,
+  apple?: AppleAuthorization,
+): Promise<NativeSocialIdToken> {
   switch (provider) {
     case "apple":
-      return getNativeAppleIdToken();
+      return getNativeAppleIdToken(apple);
     case "google":
       return getNativeGoogleIdToken();
   }
@@ -240,8 +250,11 @@ async function getNativeGoogleIdToken(): Promise<NativeSocialIdToken> {
   };
 }
 
-async function getNativeAppleIdToken(): Promise<NativeSocialIdToken> {
-  const { AppleSignIn, SignInScope } = await import("@capawesome/capacitor-apple-sign-in");
+async function getNativeAppleIdToken(apple?: AppleAuthorization): Promise<NativeSocialIdToken> {
+  const { AppleSignIn: nativeAppleSignIn, SignInScope } =
+    await import("@capawesome/capacitor-apple-sign-in");
+
+  const AppleSignIn = apple ?? nativeAppleSignIn;
   const nonce = crypto.randomUUID();
 
   if (Capacitor.getPlatform() !== "ios") {

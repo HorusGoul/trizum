@@ -4,22 +4,19 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { beforeEach, expect, test, vi } from "vite-plus/test";
-import { run } from "@ai-hero/sandcastle";
-import type * as SandcastleModule from "@ai-hero/sandcastle";
 import type { PullRequestContext } from "../schemas.js";
-import { runCommand } from "./exec.js";
 import type * as ExecModule from "./exec.js";
-import { runSandcastleCodexFix, runSandcastleCodexReview } from "./sandcastle.js";
+import { createSandcastleRunner, type SandcastleExecution } from "./sandcastle.js";
 
-vi.mock("@ai-hero/sandcastle", async (importOriginal) => ({
-  ...(await importOriginal<typeof SandcastleModule>()),
-  run: vi.fn<typeof run>(),
-}));
+const runReview = vi.fn<SandcastleExecution["runReview"]>();
+const runFix = vi.fn<SandcastleExecution["runFix"]>();
+const runCommand = vi.fn<typeof ExecModule.runCommand>();
 
-vi.mock("./exec.js", async (importOriginal) => ({
-  ...(await importOriginal<typeof ExecModule>()),
-  runCommand: vi.fn<typeof runCommand>(),
-}));
+const { runSandcastleCodexFix, runSandcastleCodexReview } = createSandcastleRunner({
+  runReview,
+  runFix,
+  runCommand,
+});
 
 const context: PullRequestContext = {
   affectedAreas: [],
@@ -66,12 +63,12 @@ test.each([
   "refresh_token_reused",
   "Could not parse your authentication token. Please try signing in again.",
 ])("stops the review pipeline on an authentication failure: %s", async (message) => {
-  vi.mocked(run).mockRejectedValue(new Error(message));
+  runReview.mockRejectedValue(new Error(message));
 
   await expect(runSandcastleCodexReview(context, "/repo")).rejects.toThrow(
     "CI login needs renewal",
   );
-  expect(run).toHaveBeenCalledTimes(1);
+  expect(runReview).toHaveBeenCalledTimes(1);
   expect(runCommand).toHaveBeenCalledWith("git", ["branch", "-D", expect.any(String)], {
     allowFailure: true,
     cwd: "/repo",
@@ -79,7 +76,7 @@ test.each([
 });
 
 test("keeps ordinary review failures available for the existing repair flow", async () => {
-  vi.mocked(run).mockRejectedValue(new Error("GitHub returned 401 Unauthorized"));
+  runReview.mockRejectedValue(new Error("GitHub returned 401 Unauthorized"));
   await expect(runSandcastleCodexReview(context, "/repo")).resolves.toMatchObject({
     ran: false,
     error: "GitHub returned 401 Unauthorized",
@@ -87,7 +84,7 @@ test("keeps ordinary review failures available for the existing repair flow", as
 });
 
 test("reports authentication failure during a repair without exposing the raw error", async () => {
-  vi.mocked(run).mockRejectedValue(
+  runFix.mockRejectedValue(
     new Error('invalid_refresh_token {"refresh_token":"sensitive-test-value"}'),
   );
   await expect(runSandcastleCodexFix(context, "/repo", "agent/fix")).rejects.toThrow(
@@ -98,10 +95,7 @@ test("reports authentication failure during a repair without exposing the raw er
 test.each(["review", "repair"])(
   "stops a real Sandcastle %s when the auth error is only on stdout",
   async (mode) => {
-    const { run: realRun } = await vi.importActual<typeof SandcastleModule>("@ai-hero/sandcastle");
-    const { runCommand: realRunCommand } = await vi.importActual<typeof ExecModule>("./exec.js");
-    vi.mocked(run).mockImplementation(realRun);
-    vi.mocked(runCommand).mockImplementation(realRunCommand);
+    const realRunner = createSandcastleRunner();
     const directory = await mkdtemp(path.join(tmpdir(), "trizum-codex-boundary-"));
 
     try {
@@ -139,8 +133,8 @@ process.exitCode = 1;
 
       const result =
         mode === "review"
-          ? runSandcastleCodexReview(context, directory)
-          : runSandcastleCodexFix(context, directory, "agent/fix");
+          ? realRunner.runSandcastleCodexReview(context, directory)
+          : realRunner.runSandcastleCodexFix(context, directory, "agent/fix");
 
       await expect(result).rejects.toThrow("CI login needs renewal");
     } finally {

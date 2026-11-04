@@ -1,26 +1,9 @@
-import type { Context } from "hono";
-import type { ApiHonoEnv } from "./env";
-import { describe, expect, test, vi } from "vite-plus/test";
+import { describe, expect, test } from "vite-plus/test";
 import {
   partyBoostErrorResponseSchema,
   partyBoostStatusSchema,
 } from "../src/lib/api/premiumContract";
 import app from "./worker";
-
-vi.mock("cloudflare:email", () => ({
-  EmailMessage: class EmailMessage {},
-}));
-
-vi.mock("./i18n", () => ({
-  createApiI18nMiddleware: () => async (_context: Context<ApiHonoEnv>, next: () => Promise<void>) =>
-    next(),
-}));
-
-vi.mock("./routes/party-share-preview", async () => {
-  const { Hono } = await import("hono");
-
-  return { partySharePreviewRoute: new Hono() };
-});
 
 describe("trizum OpenAPI contract", () => {
   test("publishes the assembled first-party operations", async () => {

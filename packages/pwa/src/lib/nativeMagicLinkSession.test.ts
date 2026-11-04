@@ -1,10 +1,5 @@
+import { Capacitor } from "@capacitor/core";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
-
-vi.mock("@capacitor/core", () => ({
-  Capacitor: { isNativePlatform: () => true },
-}));
-
-vi.mock("./log.ts", () => ({ getLogger: () => ({ warning() {} }) }));
 
 const user = { id: "magic-link-user", email: "alex@example.com", name: "Alex" };
 const magicLink = "https://trizum.app/api/auth/magic-link/verify?token=test-magic-link";
@@ -25,6 +20,7 @@ describe("native magic-link session completion", () => {
 
   beforeEach(() => {
     vi.resetModules();
+    vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
     storage.clear();
     fetchMock.mockReset();
     vi.stubGlobal("fetch", fetchMock);
@@ -35,7 +31,10 @@ describe("native magic-link session completion", () => {
     });
   });
 
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
 
   test("accepts a link requested elsewhere after signing out without restarting", async () => {
     const { authClient } = await import("./auth-client.ts");

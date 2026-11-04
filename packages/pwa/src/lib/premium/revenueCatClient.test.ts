@@ -1,37 +1,38 @@
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
-const revenueCat = vi.hoisted(() => ({
-  configure: vi.fn<(options: { appUserID: string }) => Promise<void>>(),
-  getCustomerInfo: vi.fn<() => Promise<{ customerInfo: { id: string } }>>(),
-  logIn: vi.fn<(options: { appUserID: string }) => Promise<{ customerInfo: { id: string } }>>(),
-  logOut: vi.fn<() => Promise<{ customerInfo: { id: string } }>>(),
-  setLogLevel: vi.fn<(options: { level: string }) => Promise<void>>(),
-}));
+import { createRevenueCatStore, createCustomerInfo } from "./revenueCatTestFixtures.ts";
+import { createRevenueCatClient } from "./revenueCatClient.ts";
 
-vi.mock("@capacitor/core", () => ({
-  Capacitor: {
+const revenueCat = createRevenueCatStore();
+let client = createClient();
+
+function createClient() {
+  return createRevenueCatClient({
+    getStore: async () => revenueCat,
     getPlatform: () => "ios",
-    isNativePlatform: () => true,
-  },
-}));
-
-vi.mock("@revenuecat/purchases-capacitor", () => ({
-  LOG_LEVEL: { DEBUG: "DEBUG", WARN: "WARN" },
-  Purchases: revenueCat,
-}));
+    getPublicApiKey: () => "public-test-key",
+  });
+}
 
 describe("RevenueCat identity", () => {
   beforeEach(() => {
-    vi.resetModules();
+    client = createClient();
     revenueCat.configure.mockReset().mockResolvedValue(undefined);
-    revenueCat.getCustomerInfo.mockReset().mockResolvedValue({ customerInfo: { id: "first" } });
-    revenueCat.logIn.mockReset().mockResolvedValue({ customerInfo: { id: "second" } });
-    revenueCat.logOut.mockReset().mockResolvedValue({ customerInfo: { id: "anonymous" } });
+    revenueCat.getCustomerInfo
+      .mockReset()
+      .mockResolvedValue({ customerInfo: createCustomerInfo({ originalAppUserId: "first" }) });
+    revenueCat.logIn.mockReset().mockResolvedValue({
+      customerInfo: createCustomerInfo({ originalAppUserId: "second" }),
+      created: false,
+    });
+    revenueCat.logOut
+      .mockReset()
+      .mockResolvedValue({ customerInfo: createCustomerInfo({ originalAppUserId: "anonymous" }) });
     revenueCat.setLogLevel.mockReset().mockResolvedValue(undefined);
   });
 
   it("switches identified accounts directly without creating an anonymous user", async () => {
-    const { synchronizeRevenueCatUser } = await import("./revenueCatClient.ts");
+    const { synchronizeRevenueCatUser } = client;
 
     await synchronizeRevenueCatUser("user-1");
     await synchronizeRevenueCatUser("user-2");
@@ -44,8 +45,7 @@ describe("RevenueCat identity", () => {
   });
 
   it("logs out only when the trizum session is cleared", async () => {
-    const { clearRevenueCatUser, synchronizeRevenueCatUser } =
-      await import("./revenueCatClient.ts");
+    const { clearRevenueCatUser, synchronizeRevenueCatUser } = client;
 
     await synchronizeRevenueCatUser("user-1");
     await clearRevenueCatUser();
@@ -54,11 +54,11 @@ describe("RevenueCat identity", () => {
   });
 
   it("reads SDK-cached access for a remembered account without logging in or out", async () => {
-    const cachedInfo = { id: "cached-premium" };
+    const cachedInfo = createCustomerInfo({ originalAppUserId: "cached-premium" });
     revenueCat.getCustomerInfo.mockResolvedValue({ customerInfo: cachedInfo });
     revenueCat.logIn.mockRejectedValue(new Error("offline"));
     revenueCat.logOut.mockRejectedValue(new Error("offline"));
-    const { synchronizeRevenueCatUser } = await import("./revenueCatClient.ts");
+    const { synchronizeRevenueCatUser } = client;
 
     expect(await synchronizeRevenueCatUser("remembered-user")).toEqual(cachedInfo);
     expect(await synchronizeRevenueCatUser("remembered-user")).toEqual(cachedInfo);

@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawnSync, type SpawnSyncOptions } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { platform, tmpdir } from "node:os";
 import path from "node:path";
@@ -13,11 +13,22 @@ const authSchema = z.object({
   }),
 });
 
-export async function copyCodexAuth(): Promise<void> {
+export interface CodexAuthRuntime {
+  spawnSync(
+    command: string,
+    args: readonly string[],
+    options: SpawnSyncOptions,
+  ): { status: number | null; error?: Error };
+  platform: typeof platform;
+}
+
+export async function copyCodexAuth(
+  runtime: CodexAuthRuntime = { spawnSync, platform },
+): Promise<void> {
   const ciAuthDirectory = await mkdtemp(path.join(tmpdir(), "trizum-codex-auth-"));
 
   try {
-    const login = spawnSync("codex", ["login", "-c", 'cli_auth_credentials_store="file"'], {
+    const login = runtime.spawnSync("codex", ["login", "-c", 'cli_auth_credentials_store="file"'], {
       env: { ...createSanitizedEnvironment(), CODEX_HOME: ciAuthDirectory },
       stdio: "inherit",
     });
@@ -39,9 +50,9 @@ export async function copyCodexAuth(): Promise<void> {
       throw new Error("Codex did not create a ChatGPT login with refresh credentials.");
     }
 
-    const [command, ...args] = clipboardCommand();
+    const [command, ...args] = clipboardCommand(runtime.platform());
 
-    const clipboard = spawnSync(command, args, {
+    const clipboard = runtime.spawnSync(command, args, {
       env: createSanitizedEnvironment(),
       input: JSON.stringify(credentials),
       stdio: ["pipe", "ignore", "ignore"],
@@ -62,8 +73,8 @@ export async function copyCodexAuth(): Promise<void> {
   }
 }
 
-function clipboardCommand(): [string, ...string[]] {
-  switch (platform()) {
+function clipboardCommand(platformName: NodeJS.Platform): [string, ...string[]] {
+  switch (platformName) {
     case "darwin":
       return ["pbcopy"];
     case "win32":

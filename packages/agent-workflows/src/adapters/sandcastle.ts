@@ -1,5 +1,12 @@
 import { rm } from "node:fs/promises";
-import { codex, Output, run } from "@ai-hero/sandcastle";
+import {
+  codex,
+  Output,
+  run as runAgent,
+  type RunOptions,
+  type RunResult,
+  type OutputObjectDefinition,
+} from "@ai-hero/sandcastle";
 import { noSandbox } from "@ai-hero/sandcastle/sandboxes/no-sandbox";
 import { trackCodexAuthentication } from "./codex-auth.js";
 import {
@@ -12,7 +19,7 @@ import {
 import {
   createSecretScrubEnvironmentOverrides,
   redactSecrets,
-  runCommand,
+  runCommand as executeCommand,
   truncateText,
 } from "./exec.js";
 
@@ -29,28 +36,109 @@ export interface SandcastleFixRun {
   summary: string;
 }
 
-export async function runSandcastleCodexReview(
-  context: PullRequestContext,
-  repoRoot: string,
-): Promise<CodexReviewResult> {
-  const branchName = `agent/review-renovate-pr-${context.pr.number}-${Date.now()}`;
-  const agent = createCodexAgent();
+export interface SandcastleExecution {
+  runReview(
+    options: RunOptions & { output: OutputObjectDefinition<ReviewResult> },
+  ): Promise<RunResult & { output: ReviewResult }>;
+  runFix(options: RunOptions): Promise<RunResult>;
+  runCommand: typeof executeCommand;
+}
 
-  try {
-    const result = await run({
+export function createSandcastleRunner({
+  runReview = (options) => runAgent(options),
+  runFix = (options) => runAgent(options),
+  runCommand = executeCommand,
+}: Partial<SandcastleExecution> = {}) {
+  async function runSandcastleCodexReview(
+    context: PullRequestContext,
+    repoRoot: string,
+  ): Promise<CodexReviewResult> {
+    const branchName = `agent/review-renovate-pr-${context.pr.number}-${Date.now()}`;
+    const agent = createCodexAgent();
+
+    try {
+      const result = await runReview({
+        agent,
+        branchStrategy: {
+          branch: branchName,
+          type: "branch",
+        },
+        cwd: repoRoot,
+        idleTimeoutSeconds: 20 * 60,
+        name: `review-renovate-pr-${context.pr.number}`,
+        output: Output.object({
+          schema: reviewResultSchema,
+          tag: REVIEW_OUTPUT_TAG,
+        }),
+        prompt: buildSandcastleReviewPrompt(context),
+        sandbox: noSandbox({
+          maxOutputTailChars: 256_000,
+        }),
+        timeouts: {
+          commitCollectionMs: 60_000,
+          copyToWorktreeMs: 120_000,
+          gitSetupMs: 30_000,
+          mergeToHostMs: 60_000,
+        },
+      });
+
+      return {
+        ...withReviewRunWarnings(result.output, result.commits),
+        rawOutput: redactSecrets(result.stdout),
+        ran: true,
+      };
+    } catch (error) {
+      agent.throwIfAuthenticationFailed(error);
+
+      return {
+        affectedAreas: [],
+        automatedTestSuggestions: [],
+        changelogNotes: [],
+        error: error instanceof Error ? error.message : String(error),
+        findings: [],
+        manualTestPlan: [],
+        ran: false,
+        summary: "Sandcastle Codex review did not complete.",
+      };
+    } finally {
+      await removeWorktreesForBranch(repoRoot, branchName, runCommand);
+      await runCommand("git", ["branch", "-D", branchName], {
+        allowFailure: true,
+        cwd: repoRoot,
+      });
+    }
+  }
+
+  async function runSandcastleCodexFix(
+    context: PullRequestContext,
+    repoRoot: string,
+    branchName: string,
+    reviewReport?: string,
+  ): Promise<SandcastleFixRun> {
+    const agent = createCodexAgent();
+
+    const result = await runFix({
       agent,
       branchStrategy: {
         branch: branchName,
         type: "branch",
       },
+      completionSignal: CODEX_COMPLETION_SIGNAL,
+      completionTimeoutSeconds: 30,
       cwd: repoRoot,
+      hooks: {
+        host: {
+          onWorktreeReady: [
+            {
+              command: `${buildCredentialEnvUnsetPrefix()} vp install --lockfile-only --no-frozen-lockfile --ignore-scripts || true`,
+              timeoutMs: 10 * 60 * 1000,
+            },
+          ],
+        },
+      },
       idleTimeoutSeconds: 20 * 60,
-      name: `review-renovate-pr-${context.pr.number}`,
-      output: Output.object({
-        schema: reviewResultSchema,
-        tag: REVIEW_OUTPUT_TAG,
-      }),
-      prompt: buildSandcastleReviewPrompt(context),
+      name: `renovate-pr-${context.pr.number}`,
+      prompt: buildSandcastleFixPrompt(context, reviewReport),
       sandbox: noSandbox({
         maxOutputTailChars: 256_000,
       }),
@@ -60,87 +148,24 @@ export async function runSandcastleCodexReview(
         gitSetupMs: 30_000,
         mergeToHostMs: 60_000,
       },
+    }).catch((cause: unknown) => {
+      agent.throwIfAuthenticationFailed(cause);
+      throw cause;
     });
 
     return {
-      ...withReviewRunWarnings(result.output, result.commits),
-      rawOutput: redactSecrets(result.stdout),
-      ran: true,
+      branchName: result.branch,
+      commits: result.commits.map((commit) => commit.sha),
+      logFilePath: result.logFilePath,
+      preservedWorktreePath: result.preservedWorktreePath,
+      summary: summarizeSandcastleOutput(result.stdout),
     };
-  } catch (error) {
-    agent.throwIfAuthenticationFailed(error);
-
-    return {
-      affectedAreas: [],
-      automatedTestSuggestions: [],
-      changelogNotes: [],
-      error: error instanceof Error ? error.message : String(error),
-      findings: [],
-      manualTestPlan: [],
-      ran: false,
-      summary: "Sandcastle Codex review did not complete.",
-    };
-  } finally {
-    await removeWorktreesForBranch(repoRoot, branchName);
-    await runCommand("git", ["branch", "-D", branchName], {
-      allowFailure: true,
-      cwd: repoRoot,
-    });
   }
+
+  return { runSandcastleCodexReview, runSandcastleCodexFix };
 }
 
-export async function runSandcastleCodexFix(
-  context: PullRequestContext,
-  repoRoot: string,
-  branchName: string,
-  reviewReport?: string,
-): Promise<SandcastleFixRun> {
-  const agent = createCodexAgent();
-
-  const result = await run({
-    agent,
-    branchStrategy: {
-      branch: branchName,
-      type: "branch",
-    },
-    completionSignal: CODEX_COMPLETION_SIGNAL,
-    completionTimeoutSeconds: 30,
-    cwd: repoRoot,
-    hooks: {
-      host: {
-        onWorktreeReady: [
-          {
-            command: `${buildCredentialEnvUnsetPrefix()} vp install --lockfile-only --no-frozen-lockfile --ignore-scripts || true`,
-            timeoutMs: 10 * 60 * 1000,
-          },
-        ],
-      },
-    },
-    idleTimeoutSeconds: 20 * 60,
-    name: `renovate-pr-${context.pr.number}`,
-    prompt: buildSandcastleFixPrompt(context, reviewReport),
-    sandbox: noSandbox({
-      maxOutputTailChars: 256_000,
-    }),
-    timeouts: {
-      commitCollectionMs: 60_000,
-      copyToWorktreeMs: 120_000,
-      gitSetupMs: 30_000,
-      mergeToHostMs: 60_000,
-    },
-  }).catch((cause: unknown) => {
-    agent.throwIfAuthenticationFailed(cause);
-    throw cause;
-  });
-
-  return {
-    branchName: result.branch,
-    commits: result.commits.map((commit) => commit.sha),
-    logFilePath: result.logFilePath,
-    preservedWorktreePath: result.preservedWorktreePath,
-    summary: summarizeSandcastleOutput(result.stdout),
-  };
-}
+export const { runSandcastleCodexReview, runSandcastleCodexFix } = createSandcastleRunner();
 
 function resolveCodexModel(): string {
   return process.env.TRIZUM_AGENT_WORKFLOWS_CODEX_MODEL?.trim() || "gpt-5.6-sol";
@@ -316,7 +341,11 @@ function withReviewRunWarnings(
   };
 }
 
-async function removeWorktreesForBranch(repoRoot: string, branchName: string): Promise<void> {
+async function removeWorktreesForBranch(
+  repoRoot: string,
+  branchName: string,
+  runCommand: typeof executeCommand,
+): Promise<void> {
   const result = await runCommand("git", ["worktree", "list", "--porcelain"], {
     allowFailure: true,
     cwd: repoRoot,

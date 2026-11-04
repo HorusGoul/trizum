@@ -1,6 +1,7 @@
+// @vitest-environment jsdom
+
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
 import type { AppSearch } from "#src/lib/routerSearch.ts";
-// @vitest-environment jsdom
 
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -20,80 +21,10 @@ import { PremiumContextProvider } from "#src/lib/premium/PremiumContext.ts";
 import { CloudSyncSettingsView } from "#src/components/CloudSyncSettingsView.tsx";
 import { HomeBanner } from "./HomeBanner.tsx";
 
-const state = vi.hoisted<{
-  session: {
-    data: { user: { id: string; email: string } } | null;
-    isPending: boolean;
-    isOffline: boolean;
-    error: null;
-  };
-  cloudChoiceOpen: boolean;
-}>(() => ({
-  session: {
-    data: { user: { id: "account-a", email: "test@example.com" } },
-    isPending: false,
-    isOffline: false,
-    error: null,
-  },
-  cloudChoiceOpen: false,
-}));
+import { RepoContext } from "#src/lib/automerge/RepoContext.ts";
+import { createProfileRuntime } from "#src/lib/testing/profileRuntime.ts";
 
-vi.mock("#src/hooks/usePartyList.ts", () => ({
-  usePartyList: () => ({ partyList: { id: "same-profile", username: "Alex", phone: "" } }),
-}));
-
-vi.mock("#src/lib/auth-client.ts", () => ({ useAppSession: () => state.session }));
-
-vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({ getRevenueCatPlatform: () => "android" }));
-
-// An unchanged cloud profile resolves without calling onCloudDataActivated.
-vi.mock("#src/hooks/useCloudSyncAccountState.ts", () => ({
-  useCloudSyncAccountState: ({
-    onCloudDataActivated,
-  }: {
-    onCloudDataActivated: (delay: boolean) => void;
-  }) => ({
-    activateCloudSyncOnDevice: () => onCloudDataActivated(false),
-    isAccountStateResolved: true,
-    isCloudSyncSwitchOpen: state.cloudChoiceOpen,
-    linkedProviderIds: new Set<string>(),
-  }),
-}));
-
-vi.mock("#src/components/CloudSyncAccountSettings.tsx", () => ({
-  CloudSyncAccountSettings: () => <p>Account settings</p>,
-}));
-
-vi.mock("#src/components/CloudSyncDialogs.tsx", () => ({
-  CloudSyncSignInDialog: ({
-    isOpen,
-    onOpenChange,
-  }: {
-    isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
-  }) =>
-    isOpen ? (
-      <button type="button" onClick={() => onOpenChange(false)}>
-        Cancel sign-in
-      </button>
-    ) : null,
-  AuthCallbackErrorDialog: () => null,
-  CloudActionConfirmationDialog: () => null,
-  DeleteAccountDialog: () => null,
-  CloudSyncSwitchDialog: ({
-    isOpen,
-    onUseCloudData,
-  }: {
-    isOpen: boolean;
-    onUseCloudData: () => void;
-  }) =>
-    isOpen ? (
-      <button type="button" onClick={onUseCloudData}>
-        Use cloud data
-      </button>
-    ) : null,
-  SignInSuccessOverlay: () => <p>Sign-in complete</p>,
-}));
+let runtime: Awaited<ReturnType<typeof createProfileRuntime>>;
 
 const presentPaywall = vi.fn<() => Promise<null>>();
 let root: Root;
@@ -153,18 +84,20 @@ async function render(router: TestRouter) {
             presentCustomerCenter: async () => undefined,
           }}
         >
-          <RouterProvider router={router} />
+          <RepoContext value={runtime.repo}>
+            <RouterProvider router={router} />
+          </RepoContext>
         </PremiumContextProvider>
       </I18nProvider>,
     ),
   );
 }
 
-beforeEach(() => {
+beforeEach(async () => {
   vi.clearAllMocks();
   vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
-  state.session.data = { user: { id: "account-a", email: "test@example.com" } };
-  state.cloudChoiceOpen = false;
+  localStorage.clear();
+  runtime = await createProfileRuntime();
   presentPaywall.mockResolvedValue(null);
   i18n.load("en", {});
   i18n.activate("en");
@@ -178,7 +111,9 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  await runtime.dispose();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 it("resumes Premium after the real callback view completes with an unchanged cloud profile", async () => {
@@ -207,7 +142,7 @@ it("does not open Premium after an unrelated sign-in", async () => {
 });
 
 it("waits for the cloud-profile choice before resuming Premium", async () => {
-  state.cloudChoiceOpen = true;
+  runtime.requireCloudChoice();
   const router = makeRouter("/?premium=true");
   await router.load();
   await render(router);
@@ -217,8 +152,8 @@ it("waits for the cloud-profile choice before resuming Premium", async () => {
   expect(router.state.location.pathname).toBe("/settings/cloud-sync");
   expect(presentPaywall).not.toHaveBeenCalled();
 
-  const chooseCloud = [...container.querySelectorAll("button")].find(
-    (button) => button.textContent === "Use cloud data",
+  const chooseCloud = [...document.querySelectorAll("button")].find(
+    (button) => button.textContent?.trim() === "Use cloud data",
   );
 
   expect(chooseCloud).toBeDefined();
@@ -228,13 +163,13 @@ it("waits for the cloud-profile choice before resuming Premium", async () => {
 });
 
 it("cancels sign-in without leaving an intent that a later account resolution can replay", async () => {
-  state.session.data = null;
+  runtime.setSession(null);
   const router = makeRouter("/?premium=true");
   await router.load();
   await render(router);
 
-  const cancel = [...container.querySelectorAll("button")].find(
-    (button) => button.textContent === "Cancel sign-in",
+  const cancel = [...document.querySelectorAll("button")].find(
+    (button) => button.getAttribute("aria-label") === "Close sign-in",
   );
 
   expect(cancel).toBeDefined();
@@ -244,7 +179,9 @@ it("cancels sign-in without leaving an intent that a later account resolution ca
   });
   expect(router.state.location.pathname).toBe("/");
   expect(router.state.location.search).not.toHaveProperty("premium", true);
-  state.session.data = { user: { id: "account-a", email: "test@example.com" } };
+  await act(async () => {
+    runtime.setSession("account-a");
+  });
   await render(router);
   expect(presentPaywall).not.toHaveBeenCalled();
 });

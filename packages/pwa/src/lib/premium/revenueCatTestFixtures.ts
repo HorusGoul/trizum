@@ -6,11 +6,37 @@ import type {
   PurchasesStoreProduct,
 } from "@revenuecat/purchases-capacitor";
 import { vi } from "vite-plus/test";
-import type * as RevenueCatSdk from "@revenuecat/purchases-capacitor";
+import { PACKAGE_TYPE, PRODUCT_TYPE, VERIFICATION_RESULT } from "@revenuecat/purchases-capacitor";
+import type { RevenueCatStore } from "./revenueCatClient.ts";
 
-const { PACKAGE_TYPE, PRODUCT_TYPE, VERIFICATION_RESULT } = await vi.importActual<
-  typeof RevenueCatSdk
->("@revenuecat/purchases-capacitor");
+export function createRevenueCatStore() {
+  return {
+    configure: vi.fn<RevenueCatStore["configure"]>().mockResolvedValue(undefined),
+    setLogLevel: vi.fn<RevenueCatStore["setLogLevel"]>().mockResolvedValue(undefined),
+    getCustomerInfo: vi
+      .fn<RevenueCatStore["getCustomerInfo"]>()
+      .mockResolvedValue({ customerInfo: createCustomerInfo() }),
+    logIn: vi
+      .fn<RevenueCatStore["logIn"]>()
+      .mockResolvedValue({ customerInfo: createCustomerInfo(), created: false }),
+    logOut: vi
+      .fn<RevenueCatStore["logOut"]>()
+      .mockResolvedValue({ customerInfo: createCustomerInfo() }),
+    syncPurchases: vi.fn<RevenueCatStore["syncPurchases"]>().mockResolvedValue(undefined),
+    invalidateCustomerInfoCache: vi
+      .fn<RevenueCatStore["invalidateCustomerInfoCache"]>()
+      .mockResolvedValue(undefined),
+    presentCodeRedemptionSheet: vi
+      .fn<RevenueCatStore["presentCodeRedemptionSheet"]>()
+      .mockResolvedValue(undefined),
+    addCustomerInfoUpdateListener: vi
+      .fn<RevenueCatStore["addCustomerInfoUpdateListener"]>()
+      .mockResolvedValue("listener"),
+    removeCustomerInfoUpdateListener: vi
+      .fn<RevenueCatStore["removeCustomerInfoUpdateListener"]>()
+      .mockResolvedValue({ wasRemoved: true }),
+  } satisfies RevenueCatStore;
+}
 
 const purchaseDate = "2026-01-01T00:00:00.000Z";
 

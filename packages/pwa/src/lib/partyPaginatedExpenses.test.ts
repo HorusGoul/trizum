@@ -22,9 +22,7 @@ const {
   reset,
 } = mockDocumentCacheCollection;
 
-vi.mock("#src/lib/automerge/suspense-hooks.ts", () => {
-  return { documentCache: mockDocumentCacheCollection.documentCache };
-});
+import { createPartyExpensePagination } from "./partyPaginatedExpenses";
 
 const {
   getLoadedPartyExpenseChunkIds,
@@ -35,7 +33,12 @@ const {
   loadNextPartyExpenseChunks,
   loadVisiblePartyExpenseChunks,
   subscribeToPartyPaginatedExpenses,
-} = await import("./partyPaginatedExpenses");
+} = createPartyExpensePagination({
+  getCachedChunk: documentCache.getValueIfCached,
+  readChunk: (repo, id) => documentCache.readAsync(repo, id).then(() => undefined),
+  getStatus: documentCache.getStatus,
+  subscribe: documentCache.subscribe,
+});
 
 // SAFETY: All cache operations are mocked in this test; the repo is only an identity key and no Repo method is called.
 const repo = {} as Repo;

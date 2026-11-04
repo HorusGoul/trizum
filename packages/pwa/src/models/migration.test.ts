@@ -1,27 +1,7 @@
 import { Repo, type DocHandle } from "@automerge/automerge-repo";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
-import type { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import { i18n } from "@lingui/core";
-
-const addExpenseToPartyMock =
-  vi.fn<(expense: MigrationData["expenses"][number]) => Promise<void>>();
-
-const createMediaFileMock = vi.hoisted(() =>
-  vi.fn<ReturnType<typeof getMediaFileHelpers>["createMediaFile"]>(),
-);
-
-vi.mock("#src/hooks/useParty.ts", () => ({
-  getPartyHelpers: () => ({
-    addExpenseToParty: addExpenseToPartyMock,
-  }),
-}));
-
-vi.mock("#src/hooks/useMediaFileActions.ts", () => ({
-  getMediaFileHelpers: () => ({
-    createMediaFile: createMediaFileMock,
-  }),
-}));
 
 import { createPartyFromMigrationData, type MigrationData } from "./migration";
 
@@ -34,6 +14,7 @@ function createMockRepo() {
 
   return {
     repo,
+    create,
     getLastCreatedHandle() {
       const result = create.mock.results.at(-1);
 
@@ -70,8 +51,6 @@ describe("createPartyFromMigrationData", () => {
   beforeEach(() => {
     i18n.load("en", {});
     i18n.activate("en");
-    addExpenseToPartyMock.mockReset();
-    createMediaFileMock.mockReset();
   });
 
   afterEach(async () => {
@@ -97,8 +76,8 @@ describe("createPartyFromMigrationData", () => {
       }),
     ).rejects.toThrow("Error importing photos: Could not import attachment (HTTP 404)");
     expect(readBlob).not.toHaveBeenCalled();
-    expect(createMediaFileMock).not.toHaveBeenCalled();
-    expect(addExpenseToPartyMock).not.toHaveBeenCalled();
+    expect(mockRepo.create).toHaveBeenCalledOnce();
+    expect(mockRepo.getLastCreatedHandle().doc().chunkRefs).toEqual([]);
   });
 
   test("omits an undefined party symbol before creating the Automerge document", async () => {
