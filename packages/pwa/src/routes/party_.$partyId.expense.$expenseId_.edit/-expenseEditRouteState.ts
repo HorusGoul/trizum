@@ -7,7 +7,9 @@ export function markExpenseEditOpenedFromDetailState<TState extends object>(stat
   };
 }
 
-export function hasExpenseEditOpenedFromDetailState(state: unknown) {
+export function hasExpenseEditOpenedFromDetailState(
+  state: unknown,
+): state is { [EXPENSE_EDIT_OPENED_FROM_DETAIL_STATE_KEY]: true } {
   return (
     typeof state === "object" &&
     state !== null &&

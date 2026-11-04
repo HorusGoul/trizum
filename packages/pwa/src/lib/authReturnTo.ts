@@ -1,7 +1,8 @@
+import { z } from "zod";
+
 /** Authentication may return to an app path, never an external destination. */
-export function parseAuthReturnTo(value: unknown): string | undefined {
+function normalizeAuthReturnTo(value: string): string | undefined {
   if (
-    typeof value !== "string" ||
     !value.startsWith("/") ||
     value.startsWith("//") ||
     value.includes("\\") ||
@@ -19,3 +20,11 @@ export function parseAuthReturnTo(value: unknown): string | undefined {
     return undefined;
   }
 }
+
+const parseAuthReturnToSchema = z
+  .string()
+  .transform(normalizeAuthReturnTo)
+  .optional()
+  .catch(undefined);
+
+export const parseAuthReturnTo = parseAuthReturnToSchema.parse.bind(parseAuthReturnToSchema);

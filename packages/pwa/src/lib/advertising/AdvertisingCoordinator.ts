@@ -560,18 +560,18 @@ export class AdvertisingCoordinator {
     this.options.onStateChange({ privacyOptionsRequired: required });
   }
 
-  private suppressAdsForSession(stage: AdDiagnosticStage, error: unknown) {
+  private suppressAdsForSession(stage: AdDiagnosticStage, cause: unknown) {
     this.consentReady = false;
     this.consentFailedForSession = true;
-    this.reportDiagnostic(stage, error);
+    this.reportDiagnostic(stage, cause);
   }
 
-  private reportDiagnostic(stage: AdDiagnosticStage, error: unknown, format?: AdFormat) {
+  private reportDiagnostic(stage: AdDiagnosticStage, cause: unknown, format?: AdFormat) {
     this.options.reportDiagnostic({
       platform: this.options.platform,
       format,
       stage,
-      code: getSanitizedErrorCode(error),
+      code: getSanitizedErrorCode(cause),
     });
   }
 
@@ -580,14 +580,14 @@ export class AdvertisingCoordinator {
   }
 }
 
-function getSanitizedErrorCode(error: unknown) {
+function getSanitizedErrorCode(cause: unknown) {
   if (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (typeof error.code === "number" || typeof error.code === "string")
+    typeof cause === "object" &&
+    cause !== null &&
+    "code" in cause &&
+    (typeof cause.code === "number" || typeof cause.code === "string")
   ) {
-    return String(error.code);
+    return String(cause.code);
   }
 
   return "unknown";

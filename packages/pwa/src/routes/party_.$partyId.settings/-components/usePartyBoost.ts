@@ -388,8 +388,8 @@ function clearCachedPartyBoostStatus(userId: string, partyDocumentId: string) {
   }
 }
 
-function toPartyBoostApiError(error: unknown) {
-  return error instanceof PartyBoostApiError
-    ? error
+function toPartyBoostApiError(cause: unknown) {
+  return cause instanceof PartyBoostApiError
+    ? cause
     : new PartyBoostApiError({ code: "unavailable", message: "Party Boost is unavailable." });
 }

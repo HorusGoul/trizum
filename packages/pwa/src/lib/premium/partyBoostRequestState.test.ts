@@ -6,7 +6,7 @@ import {
 
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
-  let reject!: (reason: unknown) => void;
+  let reject!: (cause: unknown) => void;
 
   const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;

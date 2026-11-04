@@ -14,12 +14,10 @@ export const rememberedSession = createRememberedAuthSession({
   isOnline: () => typeof navigator === "undefined" || navigator.onLine,
   fetch: (...args) => fetch(...args),
   clearToken: clearNativeAuthToken,
-  captureToken(response, body) {
+  captureToken(response, token) {
     setNativeAuthTokenFromResponse(response);
 
     if (!response.headers.has("set-auth-token")) {
-      const token = getAuthResultToken(body);
-
       if (token) setNativeAuthToken(token);
     }
   },
@@ -28,11 +26,3 @@ export const rememberedSession = createRememberedAuthSession({
 subscribeNativeAuthTokenClear(rememberedSession.clear);
 
 export const fetchAuth = rememberedSession.fetch;
-
-function getAuthResultToken(data: unknown) {
-  if (!data || typeof data !== "object" || !("token" in data)) {
-    return undefined;
-  }
-
-  return typeof data.token === "string" ? data.token : undefined;
-}

@@ -20,12 +20,12 @@ export function useMediaFileActions() {
   return getMediaFileHelpers(repo);
 }
 
-export function getImageUploadErrorMessage(error: unknown): string | null {
-  if (!(error instanceof ImageProcessingError)) {
+export function getImageUploadErrorMessage(cause: unknown): string | null {
+  if (!(cause instanceof ImageProcessingError)) {
     return null;
   }
 
-  switch (error.code) {
+  switch (cause.code) {
     case "heic_conversion_failed":
       return t`This HEIC or HEIF image could not be processed. Try another photo or export it as JPEG or PNG.`;
   }

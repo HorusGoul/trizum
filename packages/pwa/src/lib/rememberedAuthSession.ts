@@ -1,14 +1,5 @@
+import { getAuthResultToken, readRememberedAuthUser as readUser } from "./authResponse.ts";
 import type { AuthSessionUser } from "./auth-client";
-
-interface StoredUserFields {
-  id?: unknown;
-  email?: unknown;
-  name?: unknown;
-  emailVerified?: unknown;
-  image?: unknown;
-  createdAt?: unknown;
-  updatedAt?: unknown;
-}
 
 const STORAGE_KEY = "trizumRememberedAccount.v1";
 
@@ -35,7 +26,7 @@ export function createRememberedAuthSession({
   isOnline?: () => boolean;
   fetch: typeof fetch;
   clearToken: () => void;
-  captureToken: (response: Response, body?: unknown) => void;
+  captureToken: (response: Response, token?: string) => void;
 }) {
   const listeners = new Set<() => void>();
   let nextRequestId = 0;
@@ -171,7 +162,7 @@ export function createRememberedAuthSession({
     if (!isCurrent(requestId)) return response;
 
     if (operation === "session" && sessionReadsBlocked) return response;
-    captureToken(response, body);
+    captureToken(response, getAuthResultToken(body));
 
     if (body === undefined) {
       // A malformed success body is not evidence that the user signed out.
@@ -253,28 +244,4 @@ function getAuthOperation(input: RequestInfo | URL) {
   if (pathname.endsWith("/delete-user")) return "delete-account";
 
   return "other";
-}
-
-/** Persist only the public user fields used by the UI, never the session or bearer token. */
-function readUser(value: unknown): AuthSessionUser | null {
-  if (!value || typeof value !== "object") return null;
-  const candidate = "user" in value ? value.user : value;
-
-  if (!candidate || typeof candidate !== "object") return null;
-  // SAFETY: The value was checked as an object above; StoredUserFields leaves every raw field unknown for the checks below.
-  const user = candidate as StoredUserFields;
-
-  if (typeof user.id !== "string" || !user.id || typeof user.email !== "string") return null;
-  const createdAt = new Date(typeof user.createdAt === "string" ? user.createdAt : 0);
-  const updatedAt = new Date(typeof user.updatedAt === "string" ? user.updatedAt : 0);
-
-  return {
-    id: user.id,
-    email: user.email,
-    name: typeof user.name === "string" ? user.name : "",
-    emailVerified: user.emailVerified === true,
-    image: typeof user.image === "string" ? user.image : null,
-    createdAt: Number.isNaN(createdAt.getTime()) ? new Date(0) : createdAt,
-    updatedAt: Number.isNaN(updatedAt.getTime()) ? new Date(0) : updatedAt,
-  };
 }

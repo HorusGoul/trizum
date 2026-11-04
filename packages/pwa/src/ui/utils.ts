@@ -7,10 +7,15 @@ export function cn(...className: ClassName[]) {
   return twMerge(clsx(className));
 }
 
-const isBoolean = (maybeBoolean: unknown): maybeBoolean is boolean =>
+const isBoolean = <Value>(maybeBoolean: Value): maybeBoolean is Value & boolean =>
   typeof maybeBoolean === "boolean";
 
-const toStringIfBoolean = (value: unknown) => (isBoolean(value) ? String(value) : value);
+const toStringIfBoolean = <Value>(value: Value): string | Exclude<Value, boolean> => {
+  if (isBoolean(value)) return String(value);
+
+  // SAFETY: The boolean branch returned above, leaving only the non-boolean members of Value.
+  return value as Exclude<Value, boolean>;
+};
 
 function isSimpleSubset<SchemaVariants extends Variants>(
   a: Omit<CompoundVariant<SchemaVariants>, "classes">,

@@ -1,5 +1,7 @@
 /// <reference lib="esnext.disposable" />
 
+import { z } from "zod";
+
 import bs58check from "bs58check";
 import type { LogRecord, Sink } from "@logtape/logtape";
 
@@ -36,9 +38,9 @@ function redactErrorField(
   error: Error,
   key: string,
   descriptor: PropertyDescriptor,
-  ancestors: Set<object>,
+  redactor: z.ZodType<RedactedValue>,
 ): RedactedValue {
-  if ("value" in descriptor) return redactValue(descriptor.value, ancestors);
+  if ("value" in descriptor) return redactor.parse(descriptor.value);
 
   // Native stack getters can live on the instance (V8) or prototype (Firefox).
   // They may format name and message, so neither field may execute user code.
@@ -60,7 +62,7 @@ function redactErrorField(
       return "[Unavailable]";
     }
 
-    return redactValue(value, ancestors);
+    return redactor.parse(value);
   }
 
   return "[Accessor]";
@@ -76,96 +78,104 @@ function redactString(value: string): string {
   );
 }
 
-export function redactValue(value: unknown, ancestors = new Set<object>()): RedactedValue {
-  if (typeof value === "string") return redactString(value);
+const redactValueSchema = z.unknown().transform((input): RedactedValue => {
+  const ancestors = new Set<object>();
 
-  if (typeof value === "bigint" || typeof value === "symbol") return redactString(String(value));
+  const redactor = z.unknown().transform((value): RedactedValue => {
+    if (typeof value === "string") return redactString(value);
 
-  if (typeof value === "function") return "[Function]";
+    if (typeof value === "bigint" || typeof value === "symbol") return redactString(String(value));
 
-  if (
-    value === null ||
-    value === undefined ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  )
-    return value;
+    if (typeof value === "function") return "[Function]";
 
-  if (ancestors.has(value)) return "[Circular]";
+    if (
+      value === null ||
+      value === undefined ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    )
+      return value;
 
-  if (ancestors.size >= 20) return "[Truncated]";
+    if (ancestors.has(value)) return "[Circular]";
 
-  ancestors.add(value);
+    if (ancestors.size >= 20) return "[Truncated]";
 
-  try {
-    if (Array.isArray(value)) {
-      const result: RedactedValue[] = [];
+    ancestors.add(value);
 
-      for (let index = 0; index < value.length; index++) {
-        const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
-        result.push(
-          descriptor && !("value" in descriptor)
-            ? "[Accessor]"
-            : redactValue(descriptor?.value, ancestors),
-        );
+    try {
+      if (Array.isArray(value)) {
+        const result: RedactedValue[] = [];
+
+        for (let index = 0; index < value.length; index++) {
+          const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+          result.push(
+            descriptor && !("value" in descriptor)
+              ? "[Accessor]"
+              : redactor.parse(descriptor?.value),
+          );
+        }
+
+        return result;
+      }
+
+      if (value instanceof Date) {
+        return Number.isFinite(Date.prototype.getTime.call(value))
+          ? Date.prototype.toISOString.call(value)
+          : null;
+      }
+
+      if (value instanceof Map) return redactor.parse([...value.entries()]);
+
+      if (value instanceof Set) return redactor.parse([...value]);
+
+      // Keep Error instances useful to error-monitoring sinks, without retaining
+      // custom prototypes or mutating the exception used by application code.
+      const result: RedactedProperties | Error = value instanceof Error ? new Error() : {};
+
+      if (value instanceof Error && result instanceof Error) {
+        delete result.stack;
+
+        for (const key of ["name", "message", "stack", "cause", "errors"]) {
+          const descriptor = getPropertyDescriptor(value, key);
+
+          if (!descriptor) continue;
+          Object.defineProperty(result, key, {
+            configurable: true,
+            enumerable: key === "errors",
+            writable: true,
+            value: redactErrorField(value, key, descriptor, redactor),
+          });
+        }
+      }
+
+      for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
+        if (!descriptor.enumerable) continue;
+
+        const nextValue =
+          "value" in descriptor
+            ? DOCUMENT_ID_FIELD.test(key) && typeof descriptor.value === "string"
+              ? REDACTED_DOCUMENT_ID
+              : redactor.parse(descriptor.value)
+            : "[Accessor]";
+
+        Object.defineProperty(result, redactString(key), {
+          configurable: true,
+          enumerable: true,
+          writable: true,
+          value: nextValue,
+        });
       }
 
       return result;
+    } finally {
+      ancestors.delete(value);
     }
+  });
 
-    if (value instanceof Date) {
-      return Number.isFinite(Date.prototype.getTime.call(value))
-        ? Date.prototype.toISOString.call(value)
-        : null;
-    }
+  return redactor.parse(input);
+});
 
-    if (value instanceof Map) return redactValue([...value.entries()], ancestors);
-
-    if (value instanceof Set) return redactValue([...value], ancestors);
-
-    // Keep Error instances useful to error-monitoring sinks, without retaining
-    // custom prototypes or mutating the exception used by application code.
-    const result: RedactedProperties | Error = value instanceof Error ? new Error() : {};
-
-    if (value instanceof Error && result instanceof Error) {
-      delete result.stack;
-
-      for (const key of ["name", "message", "stack", "cause", "errors"]) {
-        const descriptor = getPropertyDescriptor(value, key);
-
-        if (!descriptor) continue;
-        Object.defineProperty(result, key, {
-          configurable: true,
-          enumerable: key === "errors",
-          writable: true,
-          value: redactErrorField(value, key, descriptor, ancestors),
-        });
-      }
-    }
-
-    for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
-      if (!descriptor.enumerable) continue;
-
-      const nextValue =
-        "value" in descriptor
-          ? DOCUMENT_ID_FIELD.test(key) && typeof descriptor.value === "string"
-            ? REDACTED_DOCUMENT_ID
-            : redactValue(descriptor.value, ancestors)
-          : "[Accessor]";
-
-      Object.defineProperty(result, redactString(key), {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        value: nextValue,
-      });
-    }
-
-    return result;
-  } finally {
-    ancestors.delete(value);
-  }
-}
+export const redactValue = redactValueSchema.parse.bind(redactValueSchema);
 
 function redactRecord(record: LogRecord): LogRecord {
   const rawMessage =

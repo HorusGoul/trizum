@@ -300,9 +300,9 @@ export function createCache<Params extends Array<any>, Value>(
     }
   }
 
-  function rejectPendingRecord(record: PendingRecord<Value>, error: unknown): void {
+  function rejectPendingRecord(record: PendingRecord<Value>, cause: unknown): void {
     record.data.abortController.abort();
-    updateRecordToRejected(record, error);
+    updateRecordToRejected(record, cause);
   }
 
   async function processPendingRecord(

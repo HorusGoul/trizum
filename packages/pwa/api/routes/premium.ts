@@ -624,11 +624,11 @@ function toPublicAssignment(assignment: PartyBoostRow): PartyBoostAssignmentStat
   };
 }
 
-function handleVerificationError(c: Context<ApiHonoEnv>, error: unknown) {
+function handleVerificationError(c: Context<ApiHonoEnv>, cause: unknown) {
   if (
-    error instanceof PremiumVerificationUnavailableError ||
-    error instanceof PartyMembershipUnavailableError ||
-    error instanceof PartyBoostSnapshotUnavailableError
+    cause instanceof PremiumVerificationUnavailableError ||
+    cause instanceof PartyMembershipUnavailableError ||
+    cause instanceof PartyBoostSnapshotUnavailableError
   ) {
     return partyBoostError(
       c,
@@ -638,7 +638,7 @@ function handleVerificationError(c: Context<ApiHonoEnv>, error: unknown) {
     );
   }
 
-  throw error;
+  throw cause;
 }
 
 function partyBoostError<Status extends 400 | 403 | 409 | 503>(

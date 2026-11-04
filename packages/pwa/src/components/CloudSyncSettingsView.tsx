@@ -409,8 +409,8 @@ function useCloudSyncSettingsView({ search, onClose, onSignedIn }: CloudSyncSett
     dispatchRouteState({ type: "authFailureMessage", message });
   }
 
-  function setAuthFailure(error: unknown, fallbackMessage: string) {
-    setAuthFailureMessage(error instanceof Error ? error.message : fallbackMessage);
+  function setAuthFailure(cause: unknown, fallbackMessage: string) {
+    setAuthFailureMessage(cause instanceof Error ? cause.message : fallbackMessage);
   }
 
   function handleSignInSuccess(user: AuthSessionUser | undefined) {

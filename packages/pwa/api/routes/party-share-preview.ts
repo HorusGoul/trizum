@@ -737,7 +737,7 @@ function renderFooterBrand(trizumMarkUrl: string, i18n: I18n) {
   ].join("");
 }
 
-function sanitizePlainText(value: unknown, maxLength: number) {
+function sanitizePlainText(value: PartyPreviewDocument["name"] | undefined, maxLength: number) {
   if (typeof value !== "string") {
     return "";
   }
@@ -757,7 +757,7 @@ function limitText(value: string, maxLength: number) {
   return `${value.slice(0, Math.max(0, maxLength - 3)).trimEnd()}...`;
 }
 
-function createPreviewVersion(value: unknown) {
+function createPreviewVersion(value: Pick<PartySharePreview, "description" | "name" | "symbol">) {
   const serializedValue = JSON.stringify(value);
   let hash = 2166136261;
 
@@ -769,12 +769,12 @@ function createPreviewVersion(value: unknown) {
   return (hash >>> 0).toString(36);
 }
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return `${error.name}: ${error.message}`;
+function getErrorMessage(cause: unknown) {
+  if (cause instanceof Error) {
+    return `${cause.name}: ${cause.message}`;
   }
 
-  return String(error);
+  return String(cause);
 }
 
 function escapeHtmlAttribute(value: string) {

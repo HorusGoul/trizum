@@ -1,3 +1,4 @@
+import type { SubscriptionData } from "./types.js";
 import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import { STATUS_NOT_FOUND, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED } from "./constants.js";
 import { createExternallyManagedCache } from "./createExternallyManagedCache.js";
@@ -13,7 +14,7 @@ describe("createExternallyManagedCache", () => {
       getKey: ([id]) => id,
     });
 
-    const subscriber = vi.fn<(data: unknown) => void>();
+    const subscriber = vi.fn<(data: SubscriptionData<string>) => void>();
 
     cache.subscribe(subscriber, "a");
     const pending = cache.readAsync("a");
@@ -70,7 +71,7 @@ describe("createExternallyManagedCache", () => {
       getKey: ([id]) => id,
     });
 
-    const subscriber = vi.fn<(data: unknown) => void>();
+    const subscriber = vi.fn<(data: SubscriptionData<string>) => void>();
 
     cache.cacheValue("value:a", "a");
 

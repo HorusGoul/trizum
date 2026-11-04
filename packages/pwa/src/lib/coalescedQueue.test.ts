@@ -71,7 +71,7 @@ describe("createKeyedCoalescedQueue", () => {
 
   test("recovers from errors and clears the queued state", async () => {
     const error = new Error("failed");
-    const recover = vi.fn<(error: unknown, key: string) => string>(() => "fallback");
+    const recover = vi.fn<(cause: unknown, key: string) => string>(() => "fallback");
 
     const run = vi
       .fn<(key: string) => Promise<string>>()

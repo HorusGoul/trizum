@@ -5,7 +5,7 @@ import type {
   Subscription as RevenueCatSubscription,
 } from "./generated/types.gen.js";
 
-type RevenueCatJsonValue =
+export type RevenueCatJsonValue =
   | string
   | number
   | boolean
@@ -205,7 +205,7 @@ async function getPurchasesPage(
 
 function parsePageResponse<T>(
   data: RevenueCatPage<T> | undefined,
-  error: unknown,
+  cause: unknown,
   response: Response | undefined,
   resourceName: string,
 ): RevenueCatPage<T> | null {
@@ -214,7 +214,7 @@ function parsePageResponse<T>(
   }
 
   if (response.status === 404) {
-    if (isMissingCustomerError(error)) {
+    if (isMissingCustomerError(cause)) {
       return null;
     }
 
@@ -241,11 +241,15 @@ function parsePageResponse<T>(
   return { items: data.items, next_page: data.next_page };
 }
 
-function isMissingCustomerError(value: unknown) {
+function isMissingCustomerError(
+  value: unknown,
+): value is { type: "resource_missing"; param: "customer_id" } {
   return isRecord(value) && value.type === "resource_missing" && value.param === "customer_id";
 }
 
-function isUnscopedMissingResourceError(value: unknown) {
+function isUnscopedMissingResourceError(
+  value: unknown,
+): value is { type: "resource_missing"; param?: null } {
   return isRecord(value) && value.type === "resource_missing" && value.param == null;
 }
 
@@ -340,14 +344,17 @@ function isEligibleEnvironment(
   );
 }
 
-function hasActiveEntitlement(value: unknown, entitlementLookupKey: string) {
+function hasActiveEntitlement(
+  value: RevenueCatSubscription["entitlements"] | RevenueCatPurchase["entitlements"],
+  entitlementLookupKey: string,
+) {
   assertRecord(value, "entitlements");
 
   if (!Array.isArray(value.items)) {
     throw new RevenueCatApiError("RevenueCat returned invalid entitlements.");
   }
 
-  return value.items.some((entitlement: unknown) => {
+  return value.items.some((entitlement) => {
     assertRecord(entitlement, "entitlement");
 
     if (typeof entitlement.lookup_key !== "string" || typeof entitlement.state !== "string") {

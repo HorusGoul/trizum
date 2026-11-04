@@ -115,12 +115,12 @@ const languages = requestedLanguages
   ? allLanguages.filter((language) => requestedLanguages.has(language))
   : allLanguages;
 
-function toError(error: unknown): Error {
-  if (error instanceof Error) {
-    return error;
+function toError(cause: unknown): Error {
+  if (cause instanceof Error) {
+    return cause;
   }
 
-  return new Error(String(error));
+  return new Error(String(cause));
 }
 
 async function main() {

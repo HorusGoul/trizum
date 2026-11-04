@@ -55,7 +55,7 @@ export type ReactUsePromise<Type> =
 export interface Deferred<Type> {
   readonly debugLabel: string | undefined;
   readonly promise: ReactUsePromise<Type>;
-  reject(error: unknown): void;
+  reject(cause: unknown): void;
   resolve(value: Type): void;
   readonly status: StatusPending | StatusRejected | StatusResolved;
 }
@@ -176,6 +176,6 @@ export type ExternallyManagedCache<Params extends Array<any>, Value> = Omit<
   Cache<Params, Value>,
   "cache"
 > & {
-  cacheError(error: unknown, ...params: Params): void;
+  cacheError(cause: unknown, ...params: Params): void;
   cacheValue(value: Value, ...params: Params): void;
 };

@@ -263,13 +263,13 @@ function getGoogleDefaultOptionTrial(
   };
 }
 
-function isPurchaseCancellation(error: unknown, cancellationCode: string) {
-  if (!error || typeof error !== "object") {
+function isPurchaseCancellation(cause: unknown, cancellationCode: string) {
+  if (!cause || typeof cause !== "object") {
     return false;
   }
 
   // SAFETY: The error was checked as a non-null object above; only these two optional cancellation markers are compared.
-  const purchaseError = error as { code?: unknown; userCancelled?: unknown };
+  const purchaseError = cause as { code?: unknown; userCancelled?: unknown };
 
   return purchaseError.userCancelled === true || purchaseError.code === cancellationCode;
 }

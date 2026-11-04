@@ -1,3 +1,5 @@
+import type { Context } from "hono";
+import type { ApiHonoEnv } from "./env";
 import { describe, expect, test, vi } from "vite-plus/test";
 import {
   partyBoostErrorResponseSchema,
@@ -10,7 +12,8 @@ vi.mock("cloudflare:email", () => ({
 }));
 
 vi.mock("./i18n", () => ({
-  createApiI18nMiddleware: () => async (_context: unknown, next: () => Promise<void>) => next(),
+  createApiI18nMiddleware: () => async (_context: Context<ApiHonoEnv>, next: () => Promise<void>) =>
+    next(),
 }));
 
 vi.mock("./routes/party-share-preview", async () => {

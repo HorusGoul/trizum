@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import { afterEach, describe, expect, test, vi } from "vite-plus/test";
 import {
   migrationDataSchema,
@@ -89,7 +90,7 @@ describe("Tricount migration contract", () => {
   });
 });
 
-function stubUpstream(data: unknown) {
+function stubUpstream(data: z.infer<ReturnType<typeof z.json>>) {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: RequestInfo | URL) => {

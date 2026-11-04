@@ -1,7 +1,7 @@
 import type { Adapter, OnMessage, SendMessage } from "comctx";
 
 export type WorkerEndpoint = {
-  postMessage(message: unknown, transfer?: Transferable[]): void;
+  postMessage(message: Parameters<SendMessage>[0], transfer?: Transferable[]): void;
   addEventListener(type: "message", listener: (event: MessageEvent) => void): void;
   removeEventListener(type: "message", listener: (event: MessageEvent) => void): void;
 };

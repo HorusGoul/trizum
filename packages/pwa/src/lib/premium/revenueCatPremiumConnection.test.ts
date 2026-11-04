@@ -42,7 +42,7 @@ describe("connectRevenueCatPremium", () => {
   it("subscribes even when the initial customer refresh fails", async () => {
     let listener: ((value: CustomerInfo) => void) | undefined;
     const onCustomerInfo = vi.fn<(value: CustomerInfo) => void>();
-    const onRefreshError = vi.fn<(error: unknown) => void>();
+    const onRefreshError = vi.fn<(cause: unknown) => void>();
 
     const connection = connectRevenueCatPremium({
       addListener: vi.fn<(registeredListener: (value: CustomerInfo) => void) => Promise<string>>(
@@ -53,7 +53,7 @@ describe("connectRevenueCatPremium", () => {
         },
       ),
       onCustomerInfo,
-      onListenerError: vi.fn<(error: unknown) => void>(),
+      onListenerError: vi.fn<(cause: unknown) => void>(),
       onRefreshError,
       prepare: vi.fn<() => Promise<CustomerInfo | undefined>>(async () => undefined),
       refresh: vi.fn<() => Promise<CustomerInfo>>(async () => {
@@ -81,8 +81,8 @@ describe("connectRevenueCatPremium", () => {
 
     const refresh = vi.fn<() => Promise<CustomerInfo>>().mockResolvedValue(customerInfo);
     const onCustomerInfo = vi.fn<(value: CustomerInfo) => void>();
-    const onListenerError = vi.fn<(error: unknown) => void>();
-    const onRefreshError = vi.fn<(error: unknown) => void>();
+    const onListenerError = vi.fn<(cause: unknown) => void>();
+    const onRefreshError = vi.fn<(cause: unknown) => void>();
 
     const connection = connectRevenueCatPremium({
       addListener,
@@ -111,7 +111,7 @@ describe("foreground refresh", () => {
   function setup() {
     vi.useFakeTimers();
     const onCustomerInfo = vi.fn<(value: CustomerInfo) => void>();
-    const onRefreshError = vi.fn<(error: unknown) => void>();
+    const onRefreshError = vi.fn<(cause: unknown) => void>();
     const refresh = vi.fn<() => Promise<CustomerInfo>>().mockResolvedValue(customerInfo);
     const removeListener = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
 
@@ -120,7 +120,7 @@ describe("foreground refresh", () => {
         .fn<(listener: (value: CustomerInfo) => void) => Promise<string>>()
         .mockResolvedValue("listener"),
       onCustomerInfo,
-      onListenerError: vi.fn<(error: unknown) => void>(),
+      onListenerError: vi.fn<(cause: unknown) => void>(),
       onRefreshError,
       prepare: vi.fn<() => Promise<CustomerInfo | undefined>>().mockResolvedValue(undefined),
       refresh,

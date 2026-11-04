@@ -21,7 +21,7 @@ function setup({ storageUnavailable = false } = {}) {
   let nativeTokenAvailable = true;
   const fetchMock = vi.fn<typeof fetch>();
   const clearToken = vi.fn<() => void>();
-  const captureToken = vi.fn<(response: Response, body?: unknown) => void>();
+  const captureToken = vi.fn<(response: Response, token?: string) => void>();
 
   const createSession = () =>
     createRememberedAuthSession({
@@ -168,9 +168,9 @@ describe("remembered account continuity", () => {
     const app = setup();
     await app.signIn();
     const response = Response.json({ user: alice });
-    let resolveBody!: (value: unknown) => void;
+    let resolveBody!: (value: { user: typeof alice }) => void;
 
-    const body = new Promise<unknown>((resolve) => {
+    const body = new Promise<{ user: typeof alice }>((resolve) => {
       resolveBody = resolve;
     });
 

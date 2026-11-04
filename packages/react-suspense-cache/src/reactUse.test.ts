@@ -94,7 +94,7 @@ function createCacheReader(cache: ReturnType<typeof createCache<[string], string
 }
 
 function createTestDeferred<Value>() {
-  let rejectPromise: (error: unknown) => void = () => {};
+  let rejectPromise: (cause: unknown) => void = () => {};
   let resolvePromise: (value: Value) => void = () => {};
 
   const promise = new Promise<Value>((resolve, reject) => {

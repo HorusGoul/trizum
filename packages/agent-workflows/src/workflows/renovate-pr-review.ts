@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { chmod, mkdtemp, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -686,9 +687,13 @@ function inferChangelogUrl(
   return normalized;
 }
 
-function stringFromUnknown(value: unknown): string | undefined {
-  return typeof value === "string" && value.trim() ? value : undefined;
-}
+const stringFromUnknownSchema = z
+  .string()
+  .refine((value) => Boolean(value.trim()))
+  .optional()
+  .catch(undefined);
+
+const stringFromUnknown = stringFromUnknownSchema.parse.bind(stringFromUnknownSchema);
 
 async function ensureReadyLabel(options: WorkflowOptions): Promise<void> {
   const body = JSON.stringify({
