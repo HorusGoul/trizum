@@ -47,6 +47,7 @@ export function ensureTelemetryId(handle: DocHandle<PartyList>): string {
 
 function createPartyListHandle(repo: Repo) {
   // Can't explicity set `locale: undefined` because of automerge...
+  // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
   const handle = repo.create<PartyList>({
     id: "" as DocumentId,
     type: "partyList",
@@ -98,6 +99,7 @@ export function setPartyListId(id: DocumentId) {
 
 export function subscribeToPartyListId(onPartyListIdChanged: (partyListId: DocumentId) => void) {
   function handlePartyListIdChanged(event: Event) {
+    // SAFETY: Only dispatchPartyListIdChanged emits this named event, with a DocumentId in CustomEvent.detail.
     onPartyListIdChanged((event as CustomEvent<DocumentId>).detail);
   }
 

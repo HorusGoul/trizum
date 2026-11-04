@@ -240,6 +240,7 @@ export function parseTricountData(data: TricountResponse): MigrationData {
   }
 
   // Create party
+  // SAFETY: The Tricount registry owns the ISO currency code; imported parties use the same code domain as MigrationData.
   const party: MigrationData["party"] = {
     type: "party",
     name: registry.title,

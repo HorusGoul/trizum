@@ -123,7 +123,7 @@ const toolingConfig = {
       "anti-slop/no-unsafe-dictionary-type": "error",
       "anti-slop/no-widen-then-assert": "error",
       "anti-slop/require-readable-spacing": "error",
-      "anti-slop/require-safety-comment-for-type-assertion": "off", // https://github.com/HorusGoul/trizum/issues/566
+      "anti-slop/require-safety-comment-for-type-assertion": "error",
       "import/no-named-as-default": "off",
       "import/no-named-as-default-member": "off",
       "lingui/no-expression-in-message": "error",

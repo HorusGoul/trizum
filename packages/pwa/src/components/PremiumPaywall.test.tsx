@@ -29,6 +29,7 @@ vi.mock("react-aria-components", async (importOriginal) => ({
 
 vi.mock("#src/ui/Button.tsx", () => ({
   Button: (props: ComponentProps<typeof Button>) => {
+    // SAFETY: These paywall buttons use static ReactNode children; the render-prop alternative is not used in this fixture.
     buttons.set(
       renderToStaticMarkup(
         <I18nProvider i18n={i18n}>
@@ -114,6 +115,7 @@ describe("Premium paywall restore recovery", () => {
   it("keeps restore unavailable without a signed-in account", async () => {
     const { restoreButton } = renderPaywall(null);
     expect(restoreButton.isDisabled).toBe(true);
+    // SAFETY: The tested restore action ignores its press event; this fixture does not exercise React Aria event dispatch.
     await restoreButton.pressAction?.({} as never);
     expect(trackEvent).not.toHaveBeenCalled();
   });
@@ -122,6 +124,7 @@ describe("Premium paywall restore recovery", () => {
     const entitlement = { hasActiveSubscription: true, isPremium: true };
     vi.mocked(restorePremiumPurchases).mockResolvedValue(entitlement);
     const { restoreButton, onEntitlementChange, onOpenChange } = renderPaywall();
+    // SAFETY: The tested restore action ignores its press event; this fixture does not exercise React Aria event dispatch.
     await restoreButton.pressAction?.({} as never);
     expect(restorePremiumPurchases).toHaveBeenCalledWith("user-1");
     expect(onEntitlementChange).toHaveBeenCalledWith(entitlement);
@@ -139,6 +142,7 @@ describe("Premium paywall restore recovery", () => {
       isPremium: false,
     });
     const { restoreButton, onOpenChange } = renderPaywall();
+    // SAFETY: The tested restore action ignores its press event; this fixture does not exercise React Aria event dispatch.
     await restoreButton.pressAction?.({} as never);
     expect(toast.error).toHaveBeenCalledWith("No Premium purchase was found for this account.");
     expect(onOpenChange).not.toHaveBeenCalled();
@@ -151,6 +155,7 @@ describe("Premium paywall restore recovery", () => {
   it("offers retry feedback when restoring fails", async () => {
     vi.mocked(restorePremiumPurchases).mockRejectedValue(new Error("Store unavailable"));
     const { restoreButton, onEntitlementChange, onOpenChange } = renderPaywall();
+    // SAFETY: The tested restore action ignores its press event; this fixture does not exercise React Aria event dispatch.
     await restoreButton.pressAction?.({} as never);
     expect(toast.error).toHaveBeenCalledWith("Purchases could not be restored. Please try again.");
     expect(onEntitlementChange).not.toHaveBeenCalled();

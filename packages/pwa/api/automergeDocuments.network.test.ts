@@ -17,6 +17,7 @@ import { AutomergeDocuments } from "./automergeDocuments";
 import { createAutomergeDocumentsMiddleware } from "./automergeDocumentsMiddleware";
 
 // Match the server adapter's CommonJS ws export and bypass the browser alias.
+// SAFETY: createRequire resolves the installed ws CommonJS module; WebSocketModule describes that same package export.
 const WebSocket = createRequire(import.meta.url)("ws") as typeof WebSocketModule;
 
 describe("Worker document reads over WebSocket", () => {

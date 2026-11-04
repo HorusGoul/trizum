@@ -51,7 +51,7 @@ export function readCachedCloudUserSettings(userId: string) {
       return null;
     }
 
-    const cachedValue = JSON.parse(value) as Partial<CachedCloudUserSettings> | null;
+    const cachedValue: unknown = JSON.parse(value);
 
     if (!isCachedCloudUserSettings(cachedValue)) {
       return null;
@@ -71,7 +71,7 @@ export function readLastCachedCloudUserSettings() {
       return null;
     }
 
-    const cachedValue = JSON.parse(value) as Partial<CachedCloudUserSettings> | null;
+    const cachedValue: unknown = JSON.parse(value);
 
     if (!isCachedCloudUserSettings(cachedValue)) {
       return null;
@@ -110,10 +110,14 @@ function getCloudUserSettingsCacheKey(userId: string) {
   return `${CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX}${userId}`;
 }
 
-function isCachedCloudUserSettings(
-  value: Partial<CachedCloudUserSettings> | null,
-): value is CachedCloudUserSettings {
-  if (!value || typeof value.cachedAt !== "number") {
+function isCachedCloudUserSettings(value: unknown): value is CachedCloudUserSettings {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    !("cachedAt" in value) ||
+    typeof value.cachedAt !== "number" ||
+    !("settings" in value)
+  ) {
     return false;
   }
 
@@ -122,7 +126,10 @@ function isCachedCloudUserSettings(
   return (
     settings === null ||
     (typeof settings === "object" &&
+      settings !== null &&
+      "updatedAt" in settings &&
       typeof settings.updatedAt === "number" &&
+      "partyListDocumentId" in settings &&
       typeof settings.partyListDocumentId === "string" &&
       isValidDocumentId(settings.partyListDocumentId))
   );

@@ -74,6 +74,7 @@ export function useMediaFileObjectUrls(mediaFiles: MediaFile[]) {
   const entryKeysKey = JSON.stringify(entryKeys);
 
   useEffect(() => {
+    // SAFETY: entryKeysKey was JSON.stringify'd from the string entryKeys array in this render; it is not external JSON.
     const keys = JSON.parse(entryKeysKey) as string[];
 
     for (const key of keys) {

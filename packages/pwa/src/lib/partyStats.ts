@@ -60,12 +60,13 @@ export function calculatePartyStats({
   timeframe,
   now = new Date(),
 }: CalculatePartyStatsOptions): PartyStatsResult {
-  const participantStatsById = Object.fromEntries(
-    Object.values(participants).map((participant) => [
-      participant.id,
-      createParticipantStat(participant),
-    ]),
-  ) as Record<PartyParticipant["id"], PartyStatsParticipantStat>;
+  const participantStatsById: Record<PartyParticipant["id"], PartyStatsParticipantStat> =
+    Object.fromEntries(
+      Object.values(participants).map((participant) => [
+        participant.id,
+        createParticipantStat(participant),
+      ]),
+    );
 
   let totalSpent = 0;
   let totalExpenseCount = 0;

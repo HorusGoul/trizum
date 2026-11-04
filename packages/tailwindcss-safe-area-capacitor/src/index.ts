@@ -127,6 +127,7 @@ function createDynamicUtilities(
 const safeArea = plugin((api: PluginAPI) => {
   api.addUtilities(baseUtilities);
 
+  // SAFETY: Tailwind's spacing theme is the configured map of spacing names to CSS length strings; theme() erases that value type.
   api.matchUtilities(
     createDynamicUtilities(
       "offset",
@@ -138,6 +139,7 @@ const safeArea = plugin((api: PluginAPI) => {
     },
   );
 
+  // SAFETY: Tailwind's spacing theme is the configured map of spacing names to CSS length strings; theme() erases that value type.
   api.matchUtilities(
     createDynamicUtilities(
       "or",

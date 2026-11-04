@@ -16,6 +16,7 @@ async function main() {
 
   const resolvedConfigPath = path.resolve(process.cwd(), configPath);
   const moduleUrl = pathToFileURL(resolvedConfigPath).href;
+  // SAFETY: The loaded local config module follows the documented default/iconSpriteConfig export contract; missing exports are rejected below.
   const importedModule = (await import(moduleUrl)) as IconSpriteConfigModule;
   const config = importedModule.default ?? importedModule.iconSpriteConfig;
 

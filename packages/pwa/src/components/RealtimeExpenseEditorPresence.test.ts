@@ -128,7 +128,7 @@ describe("getPresenceElementIdFromTarget", () => {
     });
 
     const button = createPresenceTarget({ parentElement: toolbar });
-    const icon = { parentElement: button } as Element;
+    const icon = { parentElement: button };
 
     expect(getPresenceElementIdFromTarget(icon)).toBe("participant-alice");
   });

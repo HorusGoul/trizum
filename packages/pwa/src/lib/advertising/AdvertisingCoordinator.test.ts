@@ -9,6 +9,7 @@ import {
 } from "./AdvertisingCoordinator.ts";
 import { AD_SESSION_GAP_MS, type AdHistory } from "./advertisingPolicy.ts";
 
+// SAFETY: These literals match the installed AdMob privacy-option enum values; the SDK field is a string-valued enum.
 const consentReady = {
   status: AdmobConsentStatus.NOT_REQUIRED,
   isConsentFormAvailable: false,
@@ -215,6 +216,7 @@ describe("AdvertisingCoordinator", () => {
       bypassFirstUseSession: true,
     });
 
+    // SAFETY: These literals match the installed AdMob privacy-option enum values; the SDK field is a string-valued enum.
     const consentRequired = {
       ...consentReady,
       status: AdmobConsentStatus.REQUIRED,

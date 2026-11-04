@@ -28,15 +28,12 @@ export function calculateLogStatsBetweenTwoUsers(
         ((expense.paidBy === userUid && otherUserUid in expense.paidFor) ||
           (expense.paidBy === otherUserUid && userUid in expense.paidFor)),
     )
-    .reduce(
-      (prev, next) => {
-        const user = next.paidBy;
-        (prev[user] ??= []).push(next);
+    .reduce<Record<string, ExpenseInput[]>>((prev, next) => {
+      const user = next.paidBy;
+      (prev[user] ??= []).push(next);
 
-        return prev;
-      },
-      {} as Record<string, ExpenseInput[]>,
-    );
+      return prev;
+    }, {});
 
   const { [userUid]: userExpenses = [], [otherUserUid]: otherUserExpenses = [] } = groupedExpenses;
 

@@ -8,6 +8,7 @@ import {
 
 import { makeVariable, shades } from "./common.js";
 
+// SAFETY: Culori's toGamut is curried at runtime; its shipped overload omits the callable returned for the selected color space.
 const toGamut = _toGamut as (...args: unknown[]) => (color: string) => Color;
 
 /**

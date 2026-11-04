@@ -23,6 +23,7 @@ describe("trizum OpenAPI contract", () => {
   test("publishes the assembled first-party operations", async () => {
     const response = await app.request("https://trizum.test/api/openapi.json");
 
+    // SAFETY: This JSON comes from the in-process OpenAPI endpoint; the assertions below verify the generated paths and responses.
     const document = (await response.json()) as {
       paths?: Record<
         string,

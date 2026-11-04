@@ -128,6 +128,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
   useEffect(() => {
     const listener = ({ message }: DocHandleEphemeralMessagePayload<PartyExpenseChunk>) => {
+      // SAFETY: The ephemeral channel is owned by the expense-presence sender; the following try block checks fields and ignores malformed messages.
       const payload = message as ExpensePresenceDeletePayload | ExpensePresenceUpdatePayload;
 
       try {
@@ -253,7 +254,7 @@ export function RealtimeExpenseEditorPresence({ expenseId }: RealtimeExpenseEdit
 
     function onWindowFocus() {
       // Grab element in focus
-      const element = document.activeElement as HTMLElement;
+      const element = document.activeElement;
       const presenceElementId = getPresenceElementIdFromTarget(element);
 
       if (presenceElementId) {

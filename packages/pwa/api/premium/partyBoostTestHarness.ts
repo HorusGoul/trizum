@@ -178,6 +178,7 @@ export async function createPartyBoostTestHarness() {
 
       if (!response.ok)
         throw new Error(`Test signup failed: ${response.status} ${await response.text()}`);
+      // SAFETY: The in-process signup route succeeded; the harness needs only the generated user ID from that response.
       const { user } = (await response.json()) as { user: { id: string } };
 
       const cookie = response.headers
@@ -187,10 +188,16 @@ export async function createPartyBoostTestHarness() {
 
       const listId = createDocumentId();
 
-      const list = {
+      type MembershipListFixture = {
+        type: "partyList";
+        parties: Record<string, true>;
+        participantInParties: Record<string, string>;
+      };
+
+      const list: MembershipListFixture = {
         type: "partyList" as const,
-        parties: {} as Record<string, true>,
-        participantInParties: {} as Record<string, string>,
+        parties: {},
+        participantInParties: {},
       };
 
       documents.set(listId, list);

@@ -28,6 +28,8 @@ export async function createPartyFromMigrationData({
 }: CreatePartyFromMigrationDataParams) {
   const { createMediaFile } = getMediaFileHelpers(repo);
 
+  // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
+  // SAFETY: Migration participants carry the party participant fields; avatar IDs are rewritten to created media document IDs below.
   const party: Party = {
     id: "" as DocumentId,
     type: "party",

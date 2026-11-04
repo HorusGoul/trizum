@@ -107,6 +107,7 @@ describe("Cloud Sync client", () => {
   test("rejects invalid input before making a request", async () => {
     const fetch = vi.fn<typeof globalThis.fetch>();
     const client = createClient(fetch);
+    // SAFETY: Deliberately bypass the branded ID type to verify invalid input is rejected by the client boundary schema.
     await expect(
       client.cloudSync.saveSettings({
         partyListDocumentId: "invalid" as ReturnType<typeof documentId>,

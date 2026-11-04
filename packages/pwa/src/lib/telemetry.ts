@@ -71,6 +71,7 @@ export const sentryTelemetryIntegration = {
 
       for (const item of envelope[1]) {
         if (["event", "transaction", "log", "span", "session", "sessions"].includes(item[0].type)) {
+          // SAFETY: The SDK owns the envelope item schema; scrubIdentity recursively preserves payload fields while replacing identity attributes.
           item[1] = scrubIdentity(item[1], id) as (typeof item)[1];
         }
       }

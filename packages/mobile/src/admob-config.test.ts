@@ -17,6 +17,7 @@ interface AdMobConfig {
 
 describe("AdMob release configuration", () => {
   test("pairs trizum app IDs with distinct test and live ad units", async () => {
+    // SAFETY: This repository-owned JSON fixture is validated by the app-ID and ad-unit assertions in this test.
     const config = JSON.parse(
       await readFile(new URL("admob.config.json", packageRoot), "utf8"),
     ) as AdMobConfig;

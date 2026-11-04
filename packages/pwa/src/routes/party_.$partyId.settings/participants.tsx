@@ -32,10 +32,12 @@ function PartyParticipantSettings() {
 
   const formId = useId();
 
+  const defaultValues: PartyParticipantsFormValues = {
+    participants: Object.values(party.participants),
+  };
+
   const form = useForm({
-    defaultValues: {
-      participants: Object.values(party.participants),
-    } as PartyParticipantsFormValues,
+    defaultValues,
     onSubmit: ({ value }) => {
       const participants = toPartyParticipantRecord(value.participants);
 

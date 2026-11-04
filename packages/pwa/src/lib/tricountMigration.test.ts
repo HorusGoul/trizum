@@ -9,11 +9,10 @@ import type { Party } from "#src/models/party.ts";
 import { parseTricountData, type TricountResponse } from "./tricountMigration.ts";
 
 const warningRecords = vi.hoisted(
-  () =>
-    [] as Array<{
-      message: string;
-      properties?: LogRecord["properties"];
-    }>,
+  (): Array<{
+    message: string;
+    properties?: LogRecord["properties"];
+  }> => [],
 );
 
 vi.mock("#src/lib/log.ts", () => ({
@@ -434,6 +433,7 @@ function getBalancesByParticipantName(data: TricountResponse): Record<string, nu
     __hash: "",
   }));
 
+  // SAFETY: The migration produced this participant map using the same participant fields consumed by balance calculation.
   const balances = calculateBalancesByParticipant(
     expenses,
     migrationData.party.participants as Party["participants"],

@@ -10,6 +10,7 @@ interface TestProcess {
 }
 
 function getTestProcess(): TestProcess {
+  // SAFETY: beforeEach installs this test process shape with vi.stubGlobal before any sink reads it.
   return (globalThis as typeof globalThis & { process: TestProcess }).process;
 }
 

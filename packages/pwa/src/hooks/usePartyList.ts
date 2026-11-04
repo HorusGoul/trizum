@@ -181,12 +181,14 @@ export function usePartyList() {
 
       await Promise.all(
         Object.keys(partyList.participantInParties).map(async (partyId) => {
+          // SAFETY: These keys come from the party-list map keyed by DocumentId; Object.keys erases that branded key type.
           const party = await documentCache.readAsync(repo, partyId as DocumentId);
 
           if (!party) {
             return;
           }
 
+          // SAFETY: This ID comes from the party-list membership map and identifies a Party; the shared cache erases document types.
           const partyHandle = (await handleCache.readAsync(repo, partyId as DocumentId)) as
             | DocHandle<Party>
             | undefined;
@@ -196,6 +198,7 @@ export function usePartyList() {
           }
 
           partyHandle.change((doc) => {
+            // SAFETY: partyId is a key enumerated from this same DocumentId-keyed membership map.
             const participantId = partyList.participantInParties[partyId as DocumentId];
             const participant = doc.participants[participantId];
 
@@ -210,6 +213,7 @@ export function usePartyList() {
               const value = values[key];
 
               if (value === undefined) {
+                // SAFETY: Only optional participant detail fields from the typed values update are deleted.
                 delete participant[key as keyof typeof participant];
               } else {
                 // @ts-expect-error -- idk tbh

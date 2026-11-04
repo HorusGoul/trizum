@@ -4,6 +4,7 @@ import type { Party } from "../../src/models/party";
 import { isPartyMembershipValid } from "./partyMembership";
 
 describe("isPartyMembershipValid", () => {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   const party = {
     chunkRefs: [],
     currency: "EUR",

@@ -17,6 +17,7 @@ const proxyOptions = {
   transfer: true,
 };
 
+// SAFETY: This factory is never provided on the client side; comctx injects the AppWorkerApi implemented by the matching worker provider.
 export const [, injectAppWorker] = defineProxy(() => ({}) as AppWorkerApi, proxyOptions);
 
 export function defineAppWorkerProvider(factory: () => AppWorkerApi) {

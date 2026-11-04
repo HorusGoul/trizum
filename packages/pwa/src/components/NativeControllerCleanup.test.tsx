@@ -19,12 +19,11 @@ import type {
 const addListener = vi.hoisted(() => vi.fn<() => Promise<PluginListenerHandle>>());
 
 const coordinators = vi.hoisted(
-  () =>
-    [] as {
-      destroy: ReturnType<typeof vi.fn>;
-      setProtectedFlow: ReturnType<typeof vi.fn>;
-      setEntitlement: ReturnType<typeof vi.fn>;
-    }[],
+  (): {
+    destroy: ReturnType<typeof vi.fn>;
+    setProtectedFlow: ReturnType<typeof vi.fn>;
+    setEntitlement: ReturnType<typeof vi.fn>;
+  }[] => [],
 );
 
 vi.mock("@capacitor/app", () => ({ App: { addListener } }));
@@ -100,6 +99,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   coordinators.length = 0;
   addListener.mockReset();
+  // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   vi.stubGlobal("requestAnimationFrame", vi.fn<typeof requestAnimationFrame>().mockReturnValue(42));
   vi.stubGlobal("cancelAnimationFrame", vi.fn<typeof cancelAnimationFrame>());

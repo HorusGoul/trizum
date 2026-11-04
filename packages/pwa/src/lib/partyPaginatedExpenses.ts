@@ -145,6 +145,7 @@ function getCachedPartyExpenseChunk(
   repo: Repo,
   chunkId: DocumentId,
 ): PartyExpenseChunk | undefined {
+  // SAFETY: chunkId comes from a PartyExpenseChunkRef; this cache slot therefore contains its expense chunk document.
   return documentCache.getValueIfCached(repo, chunkId) as PartyExpenseChunk | undefined;
 }
 

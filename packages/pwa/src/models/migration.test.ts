@@ -57,7 +57,7 @@ function createMigrationData(
       type: "party",
       name: "Andalusian Point",
       description: "Trip to the best place in the world",
-      currency: "EUR" as Party["currency"],
+      currency: "EUR",
       participants: {},
       ...partyOverrides,
     },

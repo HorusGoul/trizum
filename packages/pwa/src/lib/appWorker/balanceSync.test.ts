@@ -160,6 +160,7 @@ async function createPeers(withExistingChunk = false) {
   const main = new Repo({ network: [] });
   const worker = new Repo({ network: [] });
 
+  // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
   const party = main.create<Party>({
     id: "" as Party["id"],
     type: "party",
@@ -187,6 +188,7 @@ async function createPeers(withExistingChunk = false) {
     __hash: "",
   };
 
+  // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
   const chunk = main.create<PartyExpenseChunk>({
     id: "" as PartyExpenseChunk["id"],
     type: "expenseChunk",
@@ -200,6 +202,7 @@ async function createPeers(withExistingChunk = false) {
     doc.id = chunk.documentId;
   });
 
+  // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
   const balances = main.create<PartyExpenseChunkBalances>({
     id: "" as PartyExpenseChunkBalances["id"],
     type: "expenseChunkBalances",

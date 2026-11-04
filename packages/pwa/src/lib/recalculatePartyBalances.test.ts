@@ -137,6 +137,7 @@ function createHandle<T>(documentId: DocumentId, document: T): TestDocHandle<T> 
 }
 
 function createParty(chunkRefs: PartyExpenseChunkRef[]): Party {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return {
     id: "party-id" as DocumentId,
     type: "party",
@@ -159,6 +160,7 @@ function createParticipant(id: PartyParticipant["id"], name: PartyParticipant["n
 }
 
 function createChunkRef(chunkId: string, balancesId: string): PartyExpenseChunkRef {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return {
     chunkId: chunkId as DocumentId,
     balancesId: balancesId as DocumentId,
@@ -167,6 +169,7 @@ function createChunkRef(chunkId: string, balancesId: string): PartyExpenseChunkR
 }
 
 function createChunk(id: string, expenses: Expense[]): PartyExpenseChunk {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return {
     id: id as DocumentId,
     type: "expenseChunk",
@@ -181,6 +184,7 @@ function createChunkBalances(
   id: string,
   balances: PartyExpenseChunkBalances["balances"] = {},
 ): PartyExpenseChunkBalances {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   return {
     id: id as DocumentId,
     type: "expenseChunkBalances",

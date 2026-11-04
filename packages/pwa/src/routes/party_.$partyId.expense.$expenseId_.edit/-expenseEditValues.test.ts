@@ -7,8 +7,14 @@ import {
 } from "./-expenseEditValues.ts";
 
 const NOW = new Date("2026-07-15T12:00:00.000Z");
+
+// SAFETY: These photo IDs are synthetic fixture keys; the hash/value tests do not read media documents.
 const UNSAVED_PHOTO = "unsaved-photo" as Expense["photos"][number];
+
+// SAFETY: These photo IDs are synthetic fixture keys; the hash/value tests do not read media documents.
 const SAVED_PHOTO = "saved-photo" as Expense["photos"][number];
+
+// SAFETY: These photo IDs are synthetic fixture keys; the hash/value tests do not read media documents.
 const EXPIRED_PHOTO = "expired-photo" as Expense["photos"][number];
 
 describe("getExpenseEditHash", () => {

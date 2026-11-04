@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vite-plus/test";
 
 const assign = vi.fn<(url: string) => void>();
 
+// SAFETY: Tests mutate this platform slot between both native stores and the web case.
 const store = vi.hoisted(() => ({
   platform: "ios" as "ios" | "android" | undefined,
   configure: vi.fn<(options: { appUserID: string }) => Promise<void>>(),

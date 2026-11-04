@@ -3,6 +3,7 @@ import type { IntroEligibility, PurchasesPackage } from "@revenuecat/purchases-c
 import { describe, expect, it } from "vite-plus/test";
 import { createPremiumOffering } from "./premiumCommerce.ts";
 
+// SAFETY: The installed RevenueCat enum uses 2 for eligible; this fixture checks introductory-offer behavior.
 const eligibleStatus = 2 as IntroEligibility["status"];
 
 describe("createPremiumOffering", () => {
@@ -70,6 +71,7 @@ describe("createPremiumOffering", () => {
       }),
     });
 
+    // SAFETY: The installed RevenueCat enum uses 0 for unknown eligibility; this fixture verifies trials are hidden.
     const result = createPremiumOffering({
       eligibleStatus,
       eligibilityByProductId: {
@@ -230,6 +232,7 @@ function createPackage({
       }
     : null;
 
+  // SAFETY: The offering mapper reads only these product pricing/trial fields; purchase SDK methods are not called by this fixture.
   return {
     product: {
       defaultOption: googleTrial?.isDefault === false ? null : googleTrialOption,

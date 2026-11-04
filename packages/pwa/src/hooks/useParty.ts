@@ -158,9 +158,11 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       }
 
       for (const key in details) {
+        // SAFETY: The enumerated keys come from the typed details update object; for-in erases its property union.
         const value = details[key as keyof typeof details];
 
         if (value === undefined) {
+          // SAFETY: Only optional participant detail fields from the details object are deleted here.
           delete participant[key as keyof typeof participant];
         } else {
           // @ts-expect-error -- idk tbh
@@ -277,6 +279,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
   function createChunk() {
     const party = handle.doc();
 
+    // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
     const chunkHandle = repo.create<PartyExpenseChunk>({
       id: "" as DocumentId,
       type: "expenseChunk",
@@ -288,6 +291,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
     chunkHandle.change((doc) => (doc.id = chunkHandle.documentId));
 
+    // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
     const balancesHandle = repo.create<PartyExpenseChunkBalances>({
       id: "" as DocumentId,
       type: "expenseChunkBalances",

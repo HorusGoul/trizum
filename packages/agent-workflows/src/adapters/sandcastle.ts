@@ -149,6 +149,7 @@ function resolveCodexModel(): string {
 function createCodexAgent(): ReturnType<typeof trackCodexAuthentication> {
   const model = resolveCodexModel();
 
+  // SAFETY: The Codex subprocess accepts string overrides; undefined entries intentionally unset inherited secrets in the process environment.
   const agent = codex(model, {
     env: createSecretScrubEnvironmentOverrides({
       preserveCodexHome: true,

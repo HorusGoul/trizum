@@ -25,6 +25,7 @@ export function configureScreenshotsLogging<TSinkId extends string = never>(
 ): void {
   const { extraSinks, surfaceSinks, ...rest } = options;
 
+  // SAFETY: The composed sink registry adds the annotation sink to every caller-provided sink; the generic TSinkId union is preserved at this boundary.
   configureTrizumLogging({
     surface: "screenshots",
     ...rest,

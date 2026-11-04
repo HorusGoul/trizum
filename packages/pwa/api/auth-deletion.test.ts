@@ -9,7 +9,10 @@ import { createAuth } from "./auth";
 import type { ApiEnv } from "./env";
 import * as schema from "./db/schema";
 
-const state = vi.hoisted(() => ({ db: undefined as unknown, sentEmail: "" }));
+const state = vi.hoisted<{ db: unknown; sentEmail: string }>(() => ({
+  db: undefined,
+  sentEmail: "",
+}));
 
 vi.mock("./db/client", async (importOriginal) => ({
   ...(await importOriginal<typeof DbClient>()),
@@ -52,6 +55,7 @@ function authRequest(
 
 async function handle(request = authRequest(), config = env) {
   const pending: Promise<unknown>[] = [];
+  // SAFETY: The database client is mocked; this fixture supplies every environment binding read by the auth factory.
   const auth = createAuth(config as ApiEnv, { waitUntil: (task) => pending.push(task) }, request);
   // Better Auth disables origin checks in tests; exercise deployed protections.
   const context = await auth.$context;
@@ -279,6 +283,7 @@ describe("persisted authentication compatibility", () => {
 
     expect(response.status).toBe(200);
 
+    // SAFETY: The in-process auth route returned status 200; this test consumes and asserts the signup token/user response.
     return response.json() as Promise<{ token: string; user: { id: string } }>;
   }
 
@@ -293,10 +298,12 @@ describe("persisted authentication compatibility", () => {
     );
 
     expect(response.status).toBe(200);
+    // SAFETY: The in-process auth route returned status 200; the assertions below verify its token and user contract.
     const signedIn = (await response.json()) as { token: string; user: { id: string } };
     expect(signedIn.user.id).toBe(created.user.id);
     const session = await handle(request("get-session", undefined, signedIn.token));
     expect(session.status).toBe(200);
+    // SAFETY: The in-process session route returned status 200; the assertion verifies the signed-in user identity.
     expect(((await session.json()) as { user: { id: string } }).user.id).toBe(created.user.id);
 
     const rejected = await handle(

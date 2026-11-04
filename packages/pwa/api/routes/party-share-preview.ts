@@ -513,6 +513,7 @@ async function loadPartySharePreviewFromAutomerge(
     return createFallbackPartySharePreview(i18n);
   }
 
+  // SAFETY: isValidDocumentId rejected malformed route IDs above before this read.
   const party = await documents.read<PartyPreviewDocument>(partyId as DocumentId);
 
   if (!party || party.type !== "party") {

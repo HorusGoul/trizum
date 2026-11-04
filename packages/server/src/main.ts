@@ -33,6 +33,7 @@ export async function startServer() {
 
   const hostname = os.hostname();
 
+  // SAFETY: Automerge peer IDs are opaque strings; the server prefix and hostname form the configured server identity.
   const repo = new Repo({
     storage: new DrizzleSqliteStorageAdapter(db),
     network: [new NodeWSServerAdapter(webSocketServer)],

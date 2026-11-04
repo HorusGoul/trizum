@@ -77,6 +77,7 @@ class TricountAPIClient {
   }
 
   async initializeKeys(): Promise<void> {
+    // SAFETY: RSA-OAEP generates a public/private key pair; the algorithm-specific overload is lost in the worker Crypto API declaration.
     const keyPair = (await crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
@@ -89,6 +90,7 @@ class TricountAPIClient {
     )) as CryptoKeyPair;
 
     // Export public key in PEM format
+    // SAFETY: The spki format exports binary DER; the worker declaration also includes the JWK overload.
     const publicKeyBuffer = (await crypto.subtle.exportKey(
       "spki",
       keyPair.publicKey,
@@ -99,6 +101,7 @@ class TricountAPIClient {
     this.public_key = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64}\n-----END PUBLIC KEY-----`;
 
     // Export private key in PEM format
+    // SAFETY: The pkcs8 format exports binary DER; the worker declaration also includes the JWK overload.
     const privateKeyBuffer = (await crypto.subtle.exportKey(
       "pkcs8",
       keyPair.privateKey,
@@ -131,6 +134,7 @@ class TricountAPIClient {
       throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
     }
 
+    // SAFETY: The Tricount authentication endpoint owns this response shape; required response items are located and checked below.
     const auth_data = (await response.json()) as TricountResponse;
     const response_items = auth_data.Response;
 

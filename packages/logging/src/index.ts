@@ -56,6 +56,7 @@ export function getTrizumLogger<TSurface extends string>(
   return getLogger(getTrizumCategory(surface, ...scope));
 }
 
+// SAFETY: Only the console and supplied TSinkId keys were inserted into this local registry.
 export function configureTrizumLogging<TSinkId extends string = never>({
   surface,
   lowestLevel = "info",
@@ -72,10 +73,11 @@ export function configureTrizumLogging<TSinkId extends string = never>({
     return;
   }
 
+  // SAFETY: The registry contains the built-in console sink plus every caller-supplied TSinkId sink; Object.keys erases that key union.
   const sinks = {
     console: getConsoleSink({
       formatter: consoleFormat === "json" ? jsonLinesFormatter : undefined,
-    }) as Sink,
+    }),
     ...(extraSinks ?? {}),
   } as Record<TrizumSinkId<TSinkId>, Sink>;
 

@@ -23,6 +23,7 @@ test("activates a tab panel when scrolling settles just before its snap point", 
   await expect(balancesPanel).toHaveAttribute("inert", "");
 
   const scrollProgress = await horizontalScroller.evaluate((element) => {
+    // SAFETY: The locator selects the horizontal div scroller; this callback reads its metrics and changes its scroll styles.
     const scroller = element as HTMLDivElement;
     const maximum = scroller.scrollWidth - scroller.clientWidth;
 

@@ -266,6 +266,7 @@ for (const store of [
               "click",
               (event) => {
                 document.documentElement.dataset.storeClickBlocked = String(event.defaultPrevented);
+                // SAFETY: This listener is registered on an anchor; click targets are DOM elements used to locate that anchor.
                 document.documentElement.dataset.storeClickUrl = (event.target as Element).closest(
                   "a",
                 )?.href;

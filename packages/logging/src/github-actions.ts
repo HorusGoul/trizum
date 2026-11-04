@@ -40,6 +40,7 @@ const defaultGitHubActionsAnnotationBaseFormatter = getTextFormatter({
 });
 
 function getGitHubActionsProcess(): GitHubActionsProcess | undefined {
+  // SAFETY: Node and the test harness provide process; browser runtimes may omit it, so every use checks optional capabilities.
   return (globalThis as typeof globalThis & { process?: GitHubActionsProcess }).process;
 }
 

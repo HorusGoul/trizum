@@ -26,7 +26,7 @@ export const Route = createFileRoute("/party_/$partyId/who")({
   validateSearch: (search): WhoSearchParams => {
     // Save redirectTo path search param if it exists
     return {
-      redirectTo: search.redirectTo as string | undefined,
+      redirectTo: typeof search.redirectTo === "string" ? search.redirectTo : undefined,
     };
   },
   async loader({ context, params }) {

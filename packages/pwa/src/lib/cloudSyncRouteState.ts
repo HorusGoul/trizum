@@ -36,7 +36,7 @@ export function readCachedCloudAccountState(userId: string) {
       return null;
     }
 
-    const cachedValue = JSON.parse(value) as Partial<CachedCloudAccountState> | null;
+    const cachedValue: unknown = JSON.parse(value);
 
     if (!isCachedCloudAccountState(cachedValue)) {
       return null;
@@ -106,17 +106,25 @@ function getCloudAccountStateCacheKey(userId: string) {
   return `${CLOUD_ACCOUNT_STATE_CACHE_KEY_PREFIX}${userId}`;
 }
 
-function isCachedCloudAccountState(
-  value: Partial<CachedCloudAccountState> | null,
-): value is CachedCloudAccountState {
-  if (!value || typeof value.cachedAt !== "number") {
+function isCachedCloudAccountState(value: unknown): value is CachedCloudAccountState {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    !("cachedAt" in value) ||
+    typeof value.cachedAt !== "number" ||
+    !("cloudSettings" in value) ||
+    !("linkedAccounts" in value)
+  ) {
     return false;
   }
 
   return (
     (value.cloudSettings === null ||
       (typeof value.cloudSettings === "object" &&
+        value.cloudSettings !== null &&
+        "updatedAt" in value.cloudSettings &&
         typeof value.cloudSettings.updatedAt === "number" &&
+        "partyListDocumentId" in value.cloudSettings &&
         typeof value.cloudSettings.partyListDocumentId === "string" &&
         isValidDocumentId(value.cloudSettings.partyListDocumentId))) &&
     Array.isArray(value.linkedAccounts) &&
@@ -129,6 +137,7 @@ function isLinkedAuthAccount(value: unknown): value is LinkedAuthAccount {
     return false;
   }
 
+  // SAFETY: The value was checked as an object above; every account field is validated before this type guard returns true.
   const account = value as Partial<LinkedAuthAccount>;
 
   return (

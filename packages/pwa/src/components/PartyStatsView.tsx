@@ -274,6 +274,7 @@ function PartyStatsContent({ scrollElementRef }: PartyStatsViewProps) {
             }
 
             startTransition(() => {
+              // SAFETY: The selected key passed the timeframe lookup above; React Aria widens the declared item keys.
               setTimeframeKey(nextTimeframe as PartyStatsTimeframeKey);
             });
           }}

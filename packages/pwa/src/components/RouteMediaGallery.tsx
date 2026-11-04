@@ -80,6 +80,7 @@ export function RouteMediaGallery({
 }
 
 function RouteMediaGalleryImage({ photoId }: { photoId: string }) {
+  // SAFETY: photoId comes from an Automerge media document referenced by the expense; it is passed back to the same repository.
   const [mediaFile] = useSuspenseDocument<MediaFile>(photoId as MediaFile["id"], {
     required: true,
   });

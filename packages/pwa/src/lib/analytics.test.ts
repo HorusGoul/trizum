@@ -74,6 +74,7 @@ afterEach(async () => {
 });
 
 function profile(enabled?: boolean) {
+  // SAFETY: Synthetic document IDs only key the in-memory fixture; this test never decodes them or opens a network document.
   const initialProfile: PartyList = {
     id: "" as PartyList["id"],
     type: "partyList",
@@ -95,6 +96,7 @@ function profile(enabled?: boolean) {
 }
 
 function payloads() {
+  // SAFETY: These POST bodies were JSON-encoded by the analytics client under test.
   return fetch.mock.calls
     .filter(([, init]) => init?.method === "POST")
     .map(([, init]) => JSON.parse(init?.body as string));

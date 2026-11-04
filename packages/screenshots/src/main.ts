@@ -272,6 +272,7 @@ async function main() {
                     const partyId = await page.evaluate(async (data) => {
                       // @ts-expect-error - Internal function
                       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                      // SAFETY: The browser harness function returns its newly created party document ID as a string; this separate package does not import browser globals.
                       return (await window.__internal_createPartyFromMigrationData(data)) as string;
                     }, getMigrationData(language));
 

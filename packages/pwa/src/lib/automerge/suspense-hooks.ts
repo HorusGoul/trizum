@@ -274,6 +274,7 @@ export const multipleDocumentCache = withLiveSubscription<
 export function useSuspenseHandle<T>(id: AnyDocumentId): DocHandle<T> | undefined {
   const repo = useRepo();
 
+  // SAFETY: The caller chooses T for the document ID it owns; these shared caches erase document types while preserving the matching handle/document pair.
   return use(handleCache.readAsync(repo, id)) as DocHandle<T> | undefined;
 }
 
@@ -315,6 +316,7 @@ export function useSuspenseDocument<
     throw new Error(`Document not found: ${String(id)}`);
   }
 
+  // SAFETY: The caller chooses T for the document ID it owns; these shared caches erase document types while preserving the matching handle/document pair.
   return [doc as Doc<T> | undefined, handle] as const;
 }
 
@@ -350,6 +352,7 @@ export function useMultipleSuspenseDocument<
     throw new Error(`Document not found: ${ids.join(", ")}`);
   }
 
+  // SAFETY: The caller chooses T for the document ID it owns; these shared caches erase document types while preserving the matching handle/document pair.
   return (docs ?? []).map((doc, index) => ({
     doc: doc as Doc<T> | undefined,
     handle: handleCache.getValueIfCached(repo, ids[index]) as DocHandle<T>,

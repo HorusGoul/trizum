@@ -13,8 +13,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/routes/party_.$partyId.pay/route.tsx:106
-#: src/routes/party_.$partyId.pay/route.tsx:112
+#: src/routes/party_.$partyId.pay/route.tsx:113
+#: src/routes/party_.$partyId.pay/route.tsx:119
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:36
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:42
 msgid "(me)"
@@ -25,7 +25,7 @@ msgid "[DEV] Create expenses"
 msgstr "[DEV] Crear gastos"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:391
+#: src/components/PremiumPaywall.tsx:392
 msgid "{0, plural, one {# day free} other {# days free}}"
 msgstr "{0, plural, one {# día gratis} other {# días gratis}}"
 
@@ -35,17 +35,17 @@ msgid "{0, plural, one {# issue must be resolved before saving.} other {# issues
 msgstr "{0, plural, one {Se debe resolver # problema antes de guardar.} other {Se deben resolver # problemas antes de guardar.}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:395
+#: src/components/PremiumPaywall.tsx:396
 msgid "{0, plural, one {# month free} other {# months free}}"
 msgstr "{0, plural, one {# mes gratis} other {# meses gratis}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:393
+#: src/components/PremiumPaywall.tsx:394
 msgid "{0, plural, one {# week free} other {# weeks free}}"
 msgstr "{0, plural, one {# semana gratis} other {# semanas gratis}}"
 
 #. placeholder {0}: trial.duration
-#: src/components/PremiumPaywall.tsx:397
+#: src/components/PremiumPaywall.tsx:398
 msgid "{0, plural, one {# year free} other {# years free}}"
 msgstr "{0, plural, one {# año gratis} other {# años gratis}}"
 
@@ -92,11 +92,11 @@ msgstr "{message}"
 msgid "{name}"
 msgstr "{name}"
 
-#: src/components/PremiumPaywall.tsx:426
+#: src/components/PremiumPaywall.tsx:427
 msgid "{price} is charged automatically until canceled."
 msgstr "Se cobrarán {price} automáticamente hasta que canceles."
 
-#: src/components/PremiumPaywall.tsx:382
+#: src/components/PremiumPaywall.tsx:383
 msgid "{pricePerMonth} per month"
 msgstr "{pricePerMonth} al mes"
 
@@ -247,7 +247,7 @@ msgstr "Acerca de"
 msgid "Absolutely! trizum works without requiring any account or sign-up. Just create a group and start tracking expenses."
 msgstr "¡Por supuesto! trizum funciona sin necesidad de crear una cuenta o registrarte. Solo crea un grupo y empieza a registrar gastos."
 
-#: src/routes/settings.tsx:267
+#: src/routes/settings.tsx:268
 msgid "Accent color"
 msgstr "Color de acento"
 
@@ -259,7 +259,7 @@ msgstr "Cuenta creada"
 msgid "Account deleted"
 msgstr "Cuenta eliminada"
 
-#: src/components/PartyStatsView.tsx:317
+#: src/components/PartyStatsView.tsx:318
 msgid "Across the selected timeframe"
 msgstr "En el período seleccionado"
 
@@ -271,15 +271,15 @@ msgstr "Activos"
 msgid "Active on this device"
 msgstr "Activo en este dispositivo"
 
-#: src/components/PremiumPaywall.tsx:163
+#: src/components/PremiumPaywall.tsx:164
 msgid "Ad-free for you"
 msgstr "Sin anuncios para ti"
 
-#: src/routes/new/route.tsx:341
+#: src/routes/new/route.tsx:343
 msgid "ADB Unit of Account"
 msgstr "Unidad de Cuenta del BAsD"
 
-#: src/components/CalculatorToolbar.tsx:1616
+#: src/components/CalculatorToolbar.tsx:1617
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:254
 #: src/routes/party_.$partyId.settings/expense-templates.tsx:263
 msgid "Add"
@@ -298,7 +298,7 @@ msgstr "Añadir Apple como método de inicio de sesión"
 msgid "Add expense details to get started"
 msgstr "Añade los detalles del gasto para empezar"
 
-#: src/components/PartyStatsView.tsx:864
+#: src/components/PartyStatsView.tsx:865
 msgid "Add expenses to this party to unlock totals, rankings, and individual spend."
 msgstr "Añade gastos a este grupo para desbloquear totales, rankings y gasto individual."
 
@@ -335,19 +335,19 @@ msgstr "Añadiendo gasto..."
 msgid "AdMob may create a pseudonymous Publisher First-Party ID that recognizes a device within our apps when third-party identifiers are unavailable. We do not connect Firebase Analytics, user-insight surveys, trizum account identifiers, or expense data to this identifier, and we disable optional third-party identifier sharing."
 msgstr "AdMob puede crear un ID propio del editor seudónimo que reconoce un dispositivo dentro de nuestras aplicaciones cuando los identificadores de terceros no están disponibles. No vinculamos Firebase Analytics, encuestas de información de usuarios, identificadores de cuentas de trizum ni datos de gastos con este identificador, y desactivamos el intercambio opcional de identificadores de terceros."
 
-#: src/routes/new/route.tsx:198
+#: src/routes/new/route.tsx:200
 msgid "Afghan Afghani"
 msgstr "Afgani Afgano"
 
-#: src/components/PremiumPaywall.tsx:419
+#: src/components/PremiumPaywall.tsx:420
 msgid "After the free trial, {price} is charged automatically until canceled."
 msgstr "Tras la prueba gratuita, se cobrarán {price} automáticamente hasta que canceles."
 
-#: src/routes/new/route.tsx:199
+#: src/routes/new/route.tsx:201
 msgid "Albanian Lek"
 msgstr "Lek Albanés"
 
-#: src/routes/new/route.tsx:233
+#: src/routes/new/route.tsx:235
 msgid "Algerian Dinar"
 msgstr "Dinar Argelino"
 
@@ -384,7 +384,7 @@ msgstr "Incluir siempre a todos"
 msgid "Always use default template"
 msgstr "Usar siempre la plantilla predeterminada"
 
-#: src/components/ExpenseEditor.tsx:489
+#: src/components/ExpenseEditor.tsx:492
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:322
 msgid "Amount"
 msgstr "Cantidad"
@@ -393,11 +393,11 @@ msgstr "Cantidad"
 msgid "Amount for {0}"
 msgstr "Cantidad para {0}"
 
-#: src/components/ExpenseEditor.tsx:849
+#: src/components/ExpenseEditor.tsx:855
 msgid "Amount for {participantName}"
 msgstr "Cantidad para {participantName}"
 
-#: src/components/ExpenseEditor.tsx:476
+#: src/components/ExpenseEditor.tsx:479
 msgid "Amount must be greater than 0"
 msgstr "La cantidad debe ser mayor que 0"
 
@@ -409,11 +409,11 @@ msgstr "y"
 msgid "and its"
 msgstr "así como su"
 
-#: src/routes/new/route.tsx:202
+#: src/routes/new/route.tsx:204
 msgid "Angolan Kwanza"
 msgstr "Kwanza Angoleño"
 
-#: src/components/PremiumPaywall.tsx:364
+#: src/components/PremiumPaywall.tsx:365
 msgid "Annual"
 msgstr "Anual"
 
@@ -477,15 +477,15 @@ msgstr "Grupos archivados"
 msgid "Archived parties live here until you restore them to the home screen."
 msgstr "Los grupos archivados se quedan aquí hasta que los restaures al inicio."
 
-#: src/routes/new/route.tsx:203
+#: src/routes/new/route.tsx:205
 msgid "Argentine Peso"
 msgstr "Peso Argentino"
 
-#: src/routes/new/route.tsx:200
+#: src/routes/new/route.tsx:202
 msgid "Armenian Dram"
 msgstr "Dram Armenio"
 
-#: src/routes/new/route.tsx:204
+#: src/routes/new/route.tsx:206
 msgid "Aruban Florin"
 msgstr "Florín Arubeño"
 
@@ -494,16 +494,16 @@ msgstr "Florín Arubeño"
 msgid "At least one participant is required"
 msgstr "Se requiere al menos un participante"
 
-#: src/components/CalculatorToolbar.tsx:1239
+#: src/components/CalculatorToolbar.tsx:1240
 msgid "Attachment preview"
 msgstr "Vista previa del adjunto"
 
-#: src/components/CalculatorToolbar.tsx:1208
+#: src/components/CalculatorToolbar.tsx:1209
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Photos.tsx:26
 msgid "Attachments"
 msgstr "Adjuntos"
 
-#: src/routes/new/route.tsx:172
+#: src/routes/new/route.tsx:174
 msgid "Australian Dollar"
 msgstr "Dólar Australiano"
 
@@ -518,16 +518,16 @@ msgstr "Error de autenticación"
 msgid "Authentication failed"
 msgstr "No se pudo autenticar"
 
-#: src/components/ExpenseEditor.tsx:385
-#: src/routes/settings.tsx:254
+#: src/components/ExpenseEditor.tsx:388
+#: src/routes/settings.tsx:255
 msgid "Auto-open calculator"
 msgstr "Abrir calculadora automáticamente"
 
-#: src/routes/settings.tsx:256
+#: src/routes/settings.tsx:257
 msgid "Automatically open the calculator when focusing amount fields"
 msgstr "Abrir automáticamente la calculadora al enfocar campos de importe"
 
-#: src/routes/settings.tsx:243
+#: src/routes/settings.tsx:244
 msgid "Automatically open the last visited party when you open the app"
 msgstr "Abrir automáticamente el último grupo visitado cuando abras la app"
 
@@ -539,7 +539,7 @@ msgstr "Avatar eliminado"
 msgid "Avatar updated successfully"
 msgstr "Avatar actualizado correctamente"
 
-#: src/routes/new/route.tsx:205
+#: src/routes/new/route.tsx:207
 msgid "Azerbaijani Manat"
 msgstr "Manat Azerbaiyano"
 
@@ -555,51 +555,51 @@ msgstr "Volver a configuración"
 msgid "Back to sign in"
 msgstr "Volver a iniciar sesión"
 
-#: src/components/CalculatorToolbar.tsx:1641
+#: src/components/CalculatorToolbar.tsx:1642
 msgid "Backspace"
 msgstr "Retroceso"
 
-#: src/routes/new/route.tsx:215
+#: src/routes/new/route.tsx:217
 msgid "Bahamian Dollar"
 msgstr "Dólar Bahameño"
 
-#: src/routes/new/route.tsx:209
+#: src/routes/new/route.tsx:211
 msgid "Bahraini Dinar"
 msgstr "Dinar Bareiní"
 
-#: src/routes/party.$partyId/route.tsx:178
+#: src/routes/party.$partyId/route.tsx:179
 msgid "Balance, Highest First"
 msgstr "Balance, Mayor Primero"
 
-#: src/routes/party.$partyId/route.tsx:162
+#: src/routes/party.$partyId/route.tsx:163
 msgid "Balance, Lowest First"
 msgstr "Balance, Menor Primero"
 
-#: src/routes/party.$partyId/route.tsx:306
+#: src/routes/party.$partyId/route.tsx:307
 msgid "Balances"
 msgstr "Balance"
 
-#: src/routes/new/route.tsx:208
+#: src/routes/new/route.tsx:210
 msgid "Bangladeshi Taka"
 msgstr "Taka Bangladesí"
 
-#: src/routes/new/route.tsx:207
+#: src/routes/new/route.tsx:209
 msgid "Barbadian Dollar"
 msgstr "Dólar de Barbados"
 
-#: src/routes/new/route.tsx:218
+#: src/routes/new/route.tsx:220
 msgid "Belarusian Ruble"
 msgstr "Rublo Bielorruso"
 
-#: src/routes/new/route.tsx:219
+#: src/routes/new/route.tsx:221
 msgid "Belize Dollar"
 msgstr "Dólar Beliceño"
 
-#: src/routes/new/route.tsx:211
+#: src/routes/new/route.tsx:213
 msgid "Bermudan Dollar"
 msgstr "Dólar Bermudeño"
 
-#: src/routes/new/route.tsx:216
+#: src/routes/new/route.tsx:218
 msgid "Bhutanese Ngultrum"
 msgstr "Ngultrum Butanés"
 
@@ -617,11 +617,11 @@ msgstr "En blanco"
 msgid "Blank expense"
 msgstr "Gasto en blanco"
 
-#: src/routes/new/route.tsx:213
+#: src/routes/new/route.tsx:215
 msgid "Bolivian Boliviano"
 msgstr "Boliviano"
 
-#: src/routes/new/route.tsx:214
+#: src/routes/new/route.tsx:216
 msgid "Bolivian Mvdol"
 msgstr "Mvdol Boliviano"
 
@@ -629,15 +629,15 @@ msgstr "Mvdol Boliviano"
 msgid "Boost this party"
 msgstr "Impulsar este grupo"
 
-#: src/routes/new/route.tsx:206
+#: src/routes/new/route.tsx:208
 msgid "Bosnia-Herzegovina Convertible Mark"
 msgstr "Marco Convertible de Bosnia-Herzegovina"
 
-#: src/routes/new/route.tsx:217
+#: src/routes/new/route.tsx:219
 msgid "Botswanan Pula"
 msgstr "Pula Botsuano"
 
-#: src/routes/new/route.tsx:176
+#: src/routes/new/route.tsx:178
 msgid "Brazilian Real"
 msgstr "Real Brasileño"
 
@@ -645,11 +645,11 @@ msgstr "Real Brasileño"
 msgid "Break the law or infringe another person's rights"
 msgstr "Infringir la ley o los derechos de otra persona"
 
-#: src/routes/new/route.tsx:168
+#: src/routes/new/route.tsx:170
 msgid "British Pound"
 msgstr "Libra Esterlina"
 
-#: src/routes/new/route.tsx:212
+#: src/routes/new/route.tsx:214
 msgid "Brunei Dollar"
 msgstr "Dólar de Brunéi"
 
@@ -657,11 +657,11 @@ msgstr "Dólar de Brunéi"
 msgid "Bug Reports"
 msgstr "Reportar errores"
 
-#: src/routes/new/route.tsx:185
+#: src/routes/new/route.tsx:187
 msgid "Bulgarian Lev"
 msgstr "Lev Búlgaro"
 
-#: src/routes/new/route.tsx:210
+#: src/routes/new/route.tsx:212
 msgid "Burundian Franc"
 msgstr "Franco Burundés"
 
@@ -673,20 +673,20 @@ msgstr "información sobre la responsabilidad de datos empresariales"
 msgid "By accessing or using the Service, you agree to these Terms and our <0>Privacy Policy</0>. If you do not agree, do not use the Service."
 msgstr "Al acceder al Servicio o utilizarlo, aceptas estos Términos y nuestra <0>Política de privacidad</0>. Si no estás de acuerdo, no utilices el Servicio."
 
-#: src/components/CalculatorToolbar.tsx:1649
+#: src/components/CalculatorToolbar.tsx:1650
 msgid "Calculate result"
 msgstr "Calcular resultado"
 
-#: src/components/CalculatorToolbar.tsx:1074
-#: src/components/CalculatorToolbar.tsx:1094
+#: src/components/CalculatorToolbar.tsx:1075
+#: src/components/CalculatorToolbar.tsx:1095
 msgid "Calculator"
 msgstr "Calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1481
+#: src/components/CalculatorToolbar.tsx:1482
 msgid "Calculator expression"
 msgstr "Expresión de calculadora"
 
-#: src/routes/new/route.tsx:256
+#: src/routes/new/route.tsx:258
 msgid "Cambodian Riel"
 msgstr "Riel Camboyano"
 
@@ -702,7 +702,7 @@ msgstr "Vista previa de la cámara"
 msgid "Can I use trizum without an account?"
 msgstr "¿Puedo usar trizum sin una cuenta?"
 
-#: src/routes/new/route.tsx:171
+#: src/routes/new/route.tsx:173
 msgid "Canadian Dollar"
 msgstr "Dólar Canadiense"
 
@@ -719,7 +719,7 @@ msgstr "Cancelar"
 msgid "Cancellation normally takes effect at the end of the current paid billing period. Refunds and immediate cancellation requests are handled under the applicable store's rules and mandatory consumer law. Nothing in these Terms limits any refund, withdrawal, cancellation, or other right that applicable law gives you."
 msgstr "La cancelación normalmente entra en vigor al final del periodo de facturación pagado en curso. Los reembolsos y las solicitudes de cancelación inmediata se gestionan conforme a las normas de la tienda correspondiente y a la legislación imperativa de protección de los consumidores. Nada de lo dispuesto en estos Términos limita los derechos de reembolso, desistimiento, cancelación u otros derechos que te reconozca la legislación aplicable."
 
-#: src/routes/new/route.tsx:230
+#: src/routes/new/route.tsx:232
 msgid "Cape Verdean Escudo"
 msgstr "Escudo Caboverdiano"
 
@@ -727,19 +727,19 @@ msgstr "Escudo Caboverdiano"
 msgid "Cash or other ways"
 msgstr "Efectivo u otras formas"
 
-#: src/routes/new/route.tsx:260
+#: src/routes/new/route.tsx:262
 msgid "Cayman Islands Dollar"
 msgstr "Dólar de las Islas Caimán"
 
-#: src/routes/new/route.tsx:335
+#: src/routes/new/route.tsx:337
 msgid "CFA Franc BCEAO"
 msgstr "Franco CFA BCEAO"
 
-#: src/routes/new/route.tsx:326
+#: src/routes/new/route.tsx:328
 msgid "CFA Franc BEAC"
 msgstr "Franco CFA BEAC"
 
-#: src/routes/new/route.tsx:337
+#: src/routes/new/route.tsx:339
 msgid "CFP Franc"
 msgstr "Franco CFP"
 
@@ -751,7 +751,7 @@ msgstr "Los cambios se sincronizan automáticamente en todos tus dispositivos"
 msgid "Check for updates"
 msgstr "Comprobar actualizaciones"
 
-#: src/components/PremiumPaywall.tsx:181
+#: src/components/PremiumPaywall.tsx:182
 msgid "Check your connection and try again."
 msgstr "Comprueba tu conexión e inténtalo de nuevo."
 
@@ -764,7 +764,7 @@ msgid "Check your email for the sign-in link"
 msgstr "Revisa tu correo para encontrar el enlace de inicio de sesión"
 
 #: src/components/CloudSyncSettingsView.tsx:781
-#: src/routes/settings.tsx:389
+#: src/routes/settings.tsx:390
 msgid "Checking account…"
 msgstr "Comprobando la cuenta…"
 
@@ -772,7 +772,7 @@ msgstr "Comprobando la cuenta…"
 msgid "Checking Party Boost…"
 msgstr "Comprobando Party Boost…"
 
-#: src/routes/settings.tsx:418
+#: src/routes/settings.tsx:419
 msgid "Checking Premium status…"
 msgstr "Comprobando el estado de Premium…"
 
@@ -780,15 +780,15 @@ msgstr "Comprobando el estado de Premium…"
 msgid "Checking..."
 msgstr "Comprobando..."
 
-#: src/routes/new/route.tsx:224
+#: src/routes/new/route.tsx:226
 msgid "Chilean Peso"
 msgstr "Peso Chileno"
 
-#: src/routes/new/route.tsx:223
+#: src/routes/new/route.tsx:225
 msgid "Chilean Unit of Account (UF)"
 msgstr "Unidad de Fomento Chilena (UF)"
 
-#: src/routes/new/route.tsx:173
+#: src/routes/new/route.tsx:175
 msgid "Chinese Yuan"
 msgstr "Yuan Chino"
 
@@ -796,7 +796,7 @@ msgstr "Yuan Chino"
 msgid "Choose a destination party"
 msgstr "Elige un grupo de destino"
 
-#: src/routes/settings.tsx:437
+#: src/routes/settings.tsx:438
 msgid "Choose monthly, annual, or lifetime access."
 msgstr "Elige acceso mensual, anual o de por vida."
 
@@ -808,7 +808,7 @@ msgstr "Elige la moneda para los gastos de este grupo"
 msgid "Choose who receives it"
 msgstr "Elige quién la recibe"
 
-#: src/components/CalculatorToolbar.tsx:1532
+#: src/components/CalculatorToolbar.tsx:1533
 msgid "Clear all"
 msgstr "Borrar todo"
 
@@ -816,7 +816,7 @@ msgstr "Borrar todo"
 msgid "Clear expression"
 msgstr "Borrar expresión"
 
-#: src/components/EmojiPicker.tsx:201
+#: src/components/EmojiPicker.tsx:199
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
@@ -825,20 +825,20 @@ msgstr "Borrar búsqueda"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/components/CalculatorToolbar.tsx:1227
+#: src/components/CalculatorToolbar.tsx:1228
 msgid "Close attachment preview"
 msgstr "Cerrar vista previa del adjunto"
 
-#: src/components/CurrencyField.tsx:494
+#: src/components/CurrencyField.tsx:497
 msgid "Close calculator"
 msgstr "Cerrar calculadora"
 
-#: src/components/CalculatorToolbar.tsx:1548
+#: src/components/CalculatorToolbar.tsx:1549
 msgid "Close parenthesis"
 msgstr "Cerrar paréntesis"
 
 #: src/components/PremiumBrowserHelp.tsx:23
-#: src/components/PremiumPaywall.tsx:135
+#: src/components/PremiumPaywall.tsx:136
 msgid "Close Premium"
 msgstr "Cerrar Premium"
 
@@ -858,7 +858,7 @@ msgstr "Configuración en la nube guardada"
 msgid "Code copied."
 msgstr "Código copiado."
 
-#: src/routes/new/route.tsx:340
+#: src/routes/new/route.tsx:342
 msgid "Code for testing"
 msgstr "Código para pruebas"
 
@@ -870,11 +870,11 @@ msgstr "¿El código no funciona en Google Play?"
 msgid "Code redemption could not be opened. Please try again."
 msgstr "No se pudo abrir el canje de códigos. Inténtalo de nuevo."
 
-#: src/routes/new/route.tsx:225
+#: src/routes/new/route.tsx:227
 msgid "Colombian Peso"
 msgstr "Peso Colombiano"
 
-#: src/routes/new/route.tsx:226
+#: src/routes/new/route.tsx:228
 msgid "Colombian Real Value Unit"
 msgstr "Unidad de Valor Real Colombiana"
 
@@ -882,7 +882,7 @@ msgstr "Unidad de Valor Real Colombiana"
 msgid "Color"
 msgstr "Color"
 
-#: src/routes/new/route.tsx:257
+#: src/routes/new/route.tsx:259
 msgid "Comorian Franc"
 msgstr "Franco Comorense"
 
@@ -924,7 +924,7 @@ msgstr "Confirmación"
 msgid "Confirming..."
 msgstr "Confirmando..."
 
-#: src/routes/new/route.tsx:220
+#: src/routes/new/route.tsx:222
 msgid "Congolese Franc"
 msgstr "Franco Congoleño"
 
@@ -987,7 +987,7 @@ msgstr "Continuar con Apple"
 msgid "Continue with Google"
 msgstr "Continuar con Google"
 
-#: src/components/PremiumPaywall.tsx:227
+#: src/components/PremiumPaywall.tsx:228
 msgid "Continue with Premium"
 msgstr "Continuar con Premium"
 
@@ -1023,7 +1023,7 @@ msgstr "Copia tu código y pulsa App Store arriba."
 msgid "Copy your code, then tap Google Play above."
 msgstr "Copia tu código y pulsa Google Play arriba."
 
-#: src/routes/new/route.tsx:227
+#: src/routes/new/route.tsx:229
 msgid "Costa Rican Colón"
 msgstr "Colón Costarricense"
 
@@ -1044,7 +1044,7 @@ msgid "Could not delete account"
 msgstr "No se pudo eliminar la cuenta"
 
 #. Error shown when a receipt attachment download fails during a Tricount import. HTTP status is a technical error code.
-#: src/models/migration.ts:63
+#: src/models/migration.ts:65
 msgid "Could not import attachment (HTTP {status})"
 msgstr "No se pudo importar el adjunto (HTTP {status})"
 
@@ -1056,14 +1056,14 @@ msgstr "No se pudo cargar la configuración en la nube"
 msgid "Could not load sign-in methods"
 msgstr "No se pudieron cargar los métodos de inicio de sesión"
 
-#: src/hooks/useCloudSyncAccountState.ts:259
-#: src/hooks/useCloudSyncAccountState.ts:331
+#: src/hooks/useCloudSyncAccountState.ts:260
+#: src/hooks/useCloudSyncAccountState.ts:333
 msgid "Could not load trizum cloud state"
 msgstr "No se pudo cargar el estado de trizum cloud"
 
 #: src/hooks/usePremiumDialogs.ts:27
 #: src/routes/party_.$partyId.settings/-components/usePartyBoost.ts:315
-#: src/routes/settings.tsx:360
+#: src/routes/settings.tsx:361
 msgid "Could not open Premium. Please try again."
 msgstr "No se ha podido abrir Premium. Inténtalo de nuevo."
 
@@ -1128,15 +1128,15 @@ msgstr "Acreedor"
 msgid "Credits"
 msgstr "Créditos"
 
-#: src/routes/new/route.tsx:186
+#: src/routes/new/route.tsx:188
 msgid "Croatian Kuna"
 msgstr "Kuna Croata"
 
-#: src/routes/new/route.tsx:228
+#: src/routes/new/route.tsx:230
 msgid "Cuban Convertible Peso"
 msgstr "Peso Cubano Convertible"
 
-#: src/routes/new/route.tsx:229
+#: src/routes/new/route.tsx:231
 msgid "Cuban Peso"
 msgstr "Peso Cubano"
 
@@ -1159,7 +1159,7 @@ msgstr "Año actual"
 #. Label for the custom range calendar popover on the party stats screen
 #. Timeframe option on the party stats screen for choosing any start and end dates
 #: src/components/PartyStatsView.tsx:197
-#: src/components/PartyStatsView.tsx:819
+#: src/components/PartyStatsView.tsx:820
 msgid "Custom range"
 msgstr "Rango personalizado"
 
@@ -1167,15 +1167,15 @@ msgstr "Rango personalizado"
 msgid "Custom templates"
 msgstr "Plantillas personalizadas"
 
-#: src/routes/new/route.tsx:182
+#: src/routes/new/route.tsx:184
 msgid "Czech Koruna"
 msgstr "Corona Checa"
 
-#: src/routes/new/route.tsx:180
+#: src/routes/new/route.tsx:182
 msgid "Danish Krone"
 msgstr "Corona Danesa"
 
-#: src/components/ExpenseEditor.tsx:542
+#: src/components/ExpenseEditor.tsx:546
 msgid "Date"
 msgstr "Fecha"
 
@@ -1187,7 +1187,7 @@ msgstr "Deuda que se va a mover"
 msgid "Debt settled between {0} and {1}!"
 msgstr "¡Deuda saldada entre {0} y {1}!"
 
-#: src/routes/party_.$partyId.pay/route.tsx:75
+#: src/routes/party_.$partyId.pay/route.tsx:82
 msgid "Debt settled between {fromName} and {toName}!"
 msgstr "¡Deuda saldada entre {fromName} y {toName}!"
 
@@ -1204,11 +1204,11 @@ msgstr "Transferencia de deuda a otro grupo"
 msgid "Debt transferred"
 msgstr "Deuda transferida"
 
-#: src/components/CalculatorToolbar.tsx:1633
+#: src/components/CalculatorToolbar.tsx:1634
 msgid "Decimal point"
 msgstr "Punto decimal"
 
-#: src/components/ExpenseEditor.tsx:773
+#: src/components/ExpenseEditor.tsx:778
 msgid "Decrease shares for {participantName}"
 msgstr "Reducir las partes de {participantName}"
 
@@ -1281,19 +1281,19 @@ msgstr "¿Sabías que?"
 msgid "Dismiss Premium banner"
 msgstr "Ocultar el banner de Premium"
 
-#: src/components/CalculatorToolbar.tsx:1556
+#: src/components/CalculatorToolbar.tsx:1557
 msgid "Divide"
 msgstr "Dividir"
 
-#: src/routes/new/route.tsx:231
+#: src/routes/new/route.tsx:233
 msgid "Djiboutian Franc"
 msgstr "Franco Yibutiano"
 
-#: src/routes/new/route.tsx:232
+#: src/routes/new/route.tsx:234
 msgid "Dominican Peso"
 msgstr "Peso Dominicano"
 
-#: src/routes/new/route.tsx:333
+#: src/routes/new/route.tsx:335
 msgid "East Caribbean Dollar"
 msgstr "Dólar del Caribe Oriental"
 
@@ -1313,7 +1313,7 @@ msgstr "Editando {0}"
 msgid "Editing {expenseName}"
 msgstr "Editando {expenseName}"
 
-#: src/routes/new/route.tsx:234
+#: src/routes/new/route.tsx:236
 msgid "Egyptian Pound"
 msgstr "Libra Egipcia"
 
@@ -1368,8 +1368,8 @@ msgstr "Soporte por email"
 msgid "Email:"
 msgstr "Correo electrónico:"
 
-#: src/components/EmojiPicker.tsx:342
-#: src/components/EmojiPicker.tsx:534
+#: src/components/EmojiPicker.tsx:340
+#: src/components/EmojiPicker.tsx:532
 msgid "Emoji list"
 msgstr "Lista de emojis"
 
@@ -1394,7 +1394,7 @@ msgstr "Introduce un enlace o código de grupo para unirte"
 msgid "Enter the link or code of the trizum party you want to join"
 msgstr "Introduce el enlace o código del grupo de trizum al que quieres unirte"
 
-#: src/routes/new/route.tsx:235
+#: src/routes/new/route.tsx:237
 msgid "Eritrean Nakfa"
 msgstr "Nakfa Eritreo"
 
@@ -1402,27 +1402,27 @@ msgstr "Nakfa Eritreo"
 msgid "Español"
 msgstr "Español"
 
-#: src/routes/new/route.tsx:236
+#: src/routes/new/route.tsx:238
 msgid "Ethiopian Birr"
 msgstr "Birr Etíope"
 
-#: src/routes/new/route.tsx:166
+#: src/routes/new/route.tsx:168
 msgid "Euro"
 msgstr "Euro"
 
-#: src/routes/new/route.tsx:329
+#: src/routes/new/route.tsx:331
 msgid "European Composite Unit"
 msgstr "Unidad Compuesta Europea"
 
-#: src/routes/new/route.tsx:330
+#: src/routes/new/route.tsx:332
 msgid "European Monetary Unit"
 msgstr "Unidad Monetaria Europea"
 
-#: src/routes/new/route.tsx:332
+#: src/routes/new/route.tsx:334
 msgid "European Unit of Account 17"
 msgstr "Unidad de Cuenta Europea 17"
 
-#: src/routes/new/route.tsx:331
+#: src/routes/new/route.tsx:333
 msgid "European Unit of Account 9"
 msgstr "Unidad de Cuenta Europea 9"
 
@@ -1489,11 +1489,11 @@ msgid "Expense updated"
 msgstr "Gasto actualizado"
 
 #: src/routes/party_.$partyId.settings/index.tsx:52
-#: src/routes/party.$partyId/route.tsx:300
+#: src/routes/party.$partyId/route.tsx:301
 msgid "Expenses"
 msgstr "Gastos"
 
-#: src/components/PartyStatsView.tsx:324
+#: src/components/PartyStatsView.tsx:325
 msgid "Expenses counted"
 msgstr "Gastos contabilizados"
 
@@ -1502,7 +1502,7 @@ msgid "Explore Premium"
 msgstr "Descubre Premium"
 
 #: src/components/AvatarPicker.tsx:119
-#: src/components/ExpenseEditor.tsx:1025
+#: src/components/ExpenseEditor.tsx:1031
 #: src/components/QRCodeScanner.tsx:120
 msgid "Failed to access camera"
 msgstr "Error al acceder a la cámara"
@@ -1531,7 +1531,7 @@ msgstr "Error al cargar las licencias"
 msgid "Failed to load licenses. Please try again later."
 msgstr "Error al cargar las licencias. Por favor, inténtalo más tarde."
 
-#: src/routes/party_.$partyId.pay/route.tsx:76
+#: src/routes/party_.$partyId.pay/route.tsx:83
 msgid "Failed to mark expense as paid"
 msgstr "Error al marcar el gasto como pagado"
 
@@ -1547,11 +1547,11 @@ msgstr "Error al actualizar el gasto"
 msgid "Failed to upload avatar. Please try again."
 msgstr "Error al subir el avatar. Por favor, inténtalo de nuevo."
 
-#: src/components/ExpenseEditor.tsx:998
+#: src/components/ExpenseEditor.tsx:1004
 msgid "Failed to upload, please try again"
 msgstr "Error al subir, por favor inténtalo de nuevo"
 
-#: src/routes/new/route.tsx:238
+#: src/routes/new/route.tsx:240
 msgid "Falkland Islands Pound"
 msgstr "Libra Malvinense"
 
@@ -1563,7 +1563,7 @@ msgstr "Sugerencias"
 msgid "Features"
 msgstr "Características"
 
-#: src/routes/new/route.tsx:237
+#: src/routes/new/route.tsx:239
 msgid "Fijian Dollar"
 msgstr "Dólar Fiyiano"
 
@@ -1600,11 +1600,11 @@ msgstr "¿Encontraste un error? Avísanos en GitHub y lo solucionaremos."
 msgid "Frequently Asked Questions"
 msgstr "Preguntas frecuentes"
 
-#: src/routes/new/route.tsx:242
+#: src/routes/new/route.tsx:244
 msgid "Gambian Dalasi"
 msgstr "Dalasi Gambiano"
 
-#: src/routes/new/route.tsx:239
+#: src/routes/new/route.tsx:241
 msgid "Georgian Lari"
 msgstr "Lari Georgiano"
 
@@ -1612,11 +1612,11 @@ msgstr "Lari Georgiano"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/routes/new/route.tsx:240
+#: src/routes/new/route.tsx:242
 msgid "Ghanaian Cedi"
 msgstr "Cedi Ghanés"
 
-#: src/routes/new/route.tsx:241
+#: src/routes/new/route.tsx:243
 msgid "Gibraltar Pound"
 msgstr "Libra de Gibraltar"
 
@@ -1641,7 +1641,7 @@ msgstr "Volver al inicio"
 msgid "Go to Settings → Premium to choose a plan, or use Restore purchases if you already redeemed your code."
 msgstr "Ve a Ajustes → Premium para elegir un plan, o usa Restaurar compras si ya has canjeado tu código."
 
-#: src/routes/new/route.tsx:328
+#: src/routes/new/route.tsx:330
 msgid "Gold (troy ounce)"
 msgstr "Oro (onza troy)"
 
@@ -1677,19 +1677,19 @@ msgstr "Entendido"
 msgid "Group access is shared through links. Anyone with a valid group link may be able to access and change that group, so only share links with people you trust."
 msgstr "El acceso a los grupos se comparte mediante enlaces. Cualquier persona que tenga un enlace válido de un grupo podría acceder a él y modificarlo, por lo que solo debes compartir enlaces con personas de confianza."
 
-#: src/routes/new/route.tsx:244
+#: src/routes/new/route.tsx:246
 msgid "Guatemalan Quetzal"
 msgstr "Quetzal Guatemalteco"
 
-#: src/routes/new/route.tsx:243
+#: src/routes/new/route.tsx:245
 msgid "Guinean Franc"
 msgstr "Franco Guineano"
 
-#: src/routes/new/route.tsx:245
+#: src/routes/new/route.tsx:247
 msgid "Guyanaese Dollar"
 msgstr "Dólar Guyanés"
 
-#: src/routes/new/route.tsx:247
+#: src/routes/new/route.tsx:249
 msgid "Haitian Gourde"
 msgstr "Gourde Haitiano"
 
@@ -1705,7 +1705,7 @@ msgstr "¿Tienes una idea para mejorar trizum? Nos encantaría escucharla."
 msgid "Heads up!"
 msgstr "¡Atención!"
 
-#: src/routes/settings.tsx:310
+#: src/routes/settings.tsx:311
 msgid "Help us understand how trizum is used."
 msgstr "Ayúdanos a entender cómo se usa trizum."
 
@@ -1713,7 +1713,7 @@ msgstr "Ayúdanos a entender cómo se usa trizum."
 msgid "Here is a list of operations you and other party members can do to balance your position."
 msgstr "Aquí tienes una lista de operaciones que tú y otros miembros del grupo podéis hacer para equilibrar vuestra posición."
 
-#: src/routes/party_.$partyId.pay/route.tsx:131
+#: src/routes/party_.$partyId.pay/route.tsx:138
 msgid "Here's a list of ways you can pay, once done, press the button above to mark the expense as paid in this trizum party."
 msgstr "Aquí tienes una lista de formas en las que puedes pagar, una vez hecho, pulsa el botón de arriba para marcar el gasto como pagado en este grupo de trizum."
 
@@ -1729,11 +1729,11 @@ msgstr "Oculta la opción en blanco al añadir un gasto."
 msgid "Home"
 msgstr "Inicio"
 
-#: src/routes/new/route.tsx:246
+#: src/routes/new/route.tsx:248
 msgid "Honduran Lempira"
 msgstr "Lempira Hondureño"
 
-#: src/routes/new/route.tsx:191
+#: src/routes/new/route.tsx:193
 msgid "Hong Kong Dollar"
 msgstr "Dólar de Hong Kong"
 
@@ -1758,15 +1758,15 @@ msgstr "Cómo utiliza Google la información de aplicaciones asociadas"
 msgid "How should I balance?"
 msgstr "¿Cómo debería equilibrar?"
 
-#: src/routes/party_.$partyId.pay/route.tsx:127
+#: src/routes/party_.$partyId.pay/route.tsx:134
 msgid "How to pay?"
 msgstr "¿Cómo pagar?"
 
-#: src/routes/new/route.tsx:183
+#: src/routes/new/route.tsx:185
 msgid "Hungarian Forint"
 msgstr "Forinto Húngaro"
 
-#: src/routes/new/route.tsx:251
+#: src/routes/new/route.tsx:253
 msgid "Icelandic Króna"
 msgstr "Corona Islandesa"
 
@@ -1826,15 +1826,15 @@ msgstr "Importando adjuntos ({0} de {1})"
 msgid "Importing Tricount data..."
 msgstr "Importando datos de Tricount..."
 
-#: src/components/ExpenseEditor.tsx:599
+#: src/components/ExpenseEditor.tsx:603
 msgid "Include all"
 msgstr "Incluir todos"
 
-#: src/components/ExpenseEditor.tsx:808
+#: src/components/ExpenseEditor.tsx:814
 msgid "Increase shares for {participantName}"
 msgstr "Aumentar las partes de {participantName}"
 
-#: src/routes/new/route.tsx:174
+#: src/routes/new/route.tsx:176
 msgid "Indian Rupee"
 msgstr "Rupia India"
 
@@ -1842,7 +1842,7 @@ msgstr "Rupia India"
 msgid "Individual totals"
 msgstr "Totales individuales"
 
-#: src/routes/new/route.tsx:248
+#: src/routes/new/route.tsx:250
 msgid "Indonesian Rupiah"
 msgstr "Rupia Indonesia"
 
@@ -1864,11 +1864,11 @@ msgstr "Código de grupo de trizum no válido"
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
-#: src/routes/new/route.tsx:250
+#: src/routes/new/route.tsx:252
 msgid "Iranian Rial"
 msgstr "Rial Iraní"
 
-#: src/routes/new/route.tsx:249
+#: src/routes/new/route.tsx:251
 msgid "Iraqi Dinar"
 msgstr "Dinar Iraquí"
 
@@ -1876,15 +1876,15 @@ msgstr "Dinar Iraquí"
 msgid "Is my data secure?"
 msgstr "¿Mis datos están seguros?"
 
-#: src/routes/new/route.tsx:194
+#: src/routes/new/route.tsx:196
 msgid "Israeli Shekel"
 msgstr "Shekel Israelí"
 
-#: src/routes/new/route.tsx:252
+#: src/routes/new/route.tsx:254
 msgid "Jamaican Dollar"
 msgstr "Dólar Jamaicano"
 
-#: src/routes/new/route.tsx:169
+#: src/routes/new/route.tsx:171
 msgid "Japanese Yen"
 msgstr "Yen Japonés"
 
@@ -1920,7 +1920,7 @@ msgstr "Unirse"
 msgid "Join with a code"
 msgstr "Unirse con un código"
 
-#: src/routes/new/route.tsx:253
+#: src/routes/new/route.tsx:255
 msgid "Jordanian Dinar"
 msgstr "Dinar Jordano"
 
@@ -1928,7 +1928,7 @@ msgstr "Dinar Jordano"
 msgid "Jump back into the groups you use most"
 msgstr "Vuelve a los grupos que más usas"
 
-#: src/routes/new/route.tsx:261
+#: src/routes/new/route.tsx:263
 msgid "Kazakhstani Tenge"
 msgstr "Tenge Kazajo"
 
@@ -1944,15 +1944,15 @@ msgstr "Mantener datos locales"
 msgid "Keep your profile settings available on your signed-in devices."
 msgstr "Mantén la configuración de tu perfil disponible en los dispositivos donde has iniciado sesión."
 
-#: src/routes/new/route.tsx:254
+#: src/routes/new/route.tsx:256
 msgid "Kenyan Shilling"
 msgstr "Chelín Keniata"
 
-#: src/routes/new/route.tsx:259
+#: src/routes/new/route.tsx:261
 msgid "Kuwaiti Dinar"
 msgstr "Dinar Kuwaití"
 
-#: src/routes/new/route.tsx:255
+#: src/routes/new/route.tsx:257
 msgid "Kyrgystani Som"
 msgstr "Som Kirguís"
 
@@ -1960,7 +1960,7 @@ msgstr "Som Kirguís"
 msgid "Language"
 msgstr "Idioma"
 
-#: src/routes/new/route.tsx:262
+#: src/routes/new/route.tsx:264
 msgid "Laotian Kip"
 msgstr "Kip Laosiano"
 
@@ -2008,23 +2008,23 @@ msgstr "Año pasado"
 msgid "Leave at zero for an empty amount"
 msgstr "Déjalo en cero para que el importe quede vacío"
 
-#: src/routes/party.$partyId/route.tsx:284
+#: src/routes/party.$partyId/route.tsx:285
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
-#: src/routes/new/route.tsx:263
+#: src/routes/new/route.tsx:265
 msgid "Lebanese Pound"
 msgstr "Libra Libanesa"
 
-#: src/routes/new/route.tsx:266
+#: src/routes/new/route.tsx:268
 msgid "Lesotho Loti"
 msgstr "Loti de Lesoto"
 
-#: src/routes/new/route.tsx:265
+#: src/routes/new/route.tsx:267
 msgid "Liberian Dollar"
 msgstr "Dólar Liberiano"
 
-#: src/routes/new/route.tsx:267
+#: src/routes/new/route.tsx:269
 msgid "Libyan Dinar"
 msgstr "Dinar Libio"
 
@@ -2032,7 +2032,7 @@ msgstr "Dinar Libio"
 msgid "License"
 msgstr "Licencia"
 
-#: src/components/PremiumPaywall.tsx:366
+#: src/components/PremiumPaywall.tsx:367
 msgid "Lifetime"
 msgstr "De por vida"
 
@@ -2048,7 +2048,7 @@ msgstr "Enlaces"
 msgid "Loading licenses..."
 msgstr "Cargando licencias..."
 
-#: src/components/PremiumPaywall.tsx:546
+#: src/components/PremiumPaywall.tsx:547
 msgid "Loading Premium options"
 msgstr "Cargando opciones de Premium"
 
@@ -2060,27 +2060,27 @@ msgstr "Cargando inicio de sesión…"
 msgid "Long press for party actions"
 msgstr "Mantén pulsado para abrir las acciones del grupo"
 
-#: src/routes/new/route.tsx:274
+#: src/routes/new/route.tsx:276
 msgid "Macanese Pataca"
 msgstr "Pataca de Macao"
 
-#: src/routes/new/route.tsx:271
+#: src/routes/new/route.tsx:273
 msgid "Macedonian Denar"
 msgstr "Denar Macedonio"
 
-#: src/routes/new/route.tsx:270
+#: src/routes/new/route.tsx:272
 msgid "Malagasy Ariary"
 msgstr "Ariary Malgache"
 
-#: src/routes/new/route.tsx:278
+#: src/routes/new/route.tsx:280
 msgid "Malawian Kwacha"
 msgstr "Kwacha Malauí"
 
-#: src/routes/new/route.tsx:280
+#: src/routes/new/route.tsx:282
 msgid "Malaysian Ringgit"
 msgstr "Ringgit Malasio"
 
-#: src/routes/new/route.tsx:277
+#: src/routes/new/route.tsx:279
 msgid "Maldivian Rufiyaa"
 msgstr "Rufiyaa Maldiva"
 
@@ -2096,7 +2096,7 @@ msgstr "Gestionar"
 msgid "Manage expense templates"
 msgstr "Gestionar plantillas de gasto"
 
-#: src/routes/settings.tsx:394
+#: src/routes/settings.tsx:395
 msgid "Manage Premium"
 msgstr "Gestionar Premium"
 
@@ -2112,42 +2112,42 @@ msgstr "Gestionar trizum cloud"
 msgid "Manage your cloud account and synced data."
 msgstr "Gestiona tu cuenta en la nube y tus datos sincronizados."
 
-#: src/routes/party_.$partyId.pay/route.tsx:98
-#: src/routes/party_.$partyId.pay/route.tsx:123
+#: src/routes/party_.$partyId.pay/route.tsx:105
+#: src/routes/party_.$partyId.pay/route.tsx:130
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Mark as paid"
 msgstr "Marcar como pagado"
 
-#: src/routes/party_.$partyId.pay/route.tsx:74
+#: src/routes/party_.$partyId.pay/route.tsx:81
 msgid "Marking expense as paid..."
 msgstr "Marcando gasto como pagado..."
 
-#: src/routes/new/route.tsx:275
+#: src/routes/new/route.tsx:277
 msgid "Mauritanian Ouguiya"
 msgstr "Ouguiya Mauritano"
 
-#: src/routes/new/route.tsx:276
+#: src/routes/new/route.tsx:278
 msgid "Mauritian Rupee"
 msgstr "Rupia de Mauricio"
 
-#: src/components/PartyStatsView.tsx:621
-#: src/components/PartyStatsView.tsx:708
+#: src/components/PartyStatsView.tsx:622
+#: src/components/PartyStatsView.tsx:709
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:24
 #: src/routes/party_.$partyId.expense.$expenseId/-components/Shares.tsx:41
 msgid "Me"
 msgstr "Yo"
 
-#: src/components/ExpenseEditor.tsx:378
+#: src/components/ExpenseEditor.tsx:381
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:97
-#: src/routes/party.$partyId/route.tsx:190
+#: src/routes/party.$partyId/route.tsx:191
 msgid "Menu"
 msgstr "Menú"
 
-#: src/routes/new/route.tsx:279
+#: src/routes/new/route.tsx:281
 msgid "Mexican Investment Unit"
 msgstr "Unidad de Inversión Mexicana"
 
-#: src/routes/new/route.tsx:175
+#: src/routes/new/route.tsx:177
 msgid "Mexican Peso"
 msgstr "Peso Mexicano"
 
@@ -2164,20 +2164,20 @@ msgstr "Migración en progreso"
 msgid "Migration successful"
 msgstr "Migración exitosa"
 
-#: src/routes/party_.$partyId.pay/route.tsx:27
+#: src/routes/party_.$partyId.pay/route.tsx:34
 #: src/routes/party_.$partyId.transfer-debt/route.tsx:234
 msgid "Missing search params"
 msgstr "Faltan parámetros de búsqueda"
 
-#: src/routes/new/route.tsx:269
+#: src/routes/new/route.tsx:271
 msgid "Moldovan Leu"
 msgstr "Leu Moldavo"
 
-#: src/routes/new/route.tsx:273
+#: src/routes/new/route.tsx:275
 msgid "Mongolian Tugrik"
 msgstr "Tugrik Mongol"
 
-#: src/components/PremiumPaywall.tsx:362
+#: src/components/PremiumPaywall.tsx:363
 msgid "Monthly"
 msgstr "Mensual"
 
@@ -2185,7 +2185,7 @@ msgstr "Mensual"
 msgid "Monthly and annual subscriptions automatically renew for another billing period unless canceled through the applicable store before renewal. Your store account is charged at confirmation and at each renewal using the price shown by the store, subject to any advance notice or consent the store or applicable law requires."
 msgstr "Las suscripciones mensuales y anuales se renuevan automáticamente por otro periodo de facturación salvo que las canceles a través de la tienda correspondiente antes de la renovación. El importe se carga en tu cuenta de la tienda al confirmar la compra y en cada renovación, según el precio mostrado por la tienda y sujeto a cualquier aviso previo o consentimiento que exijan la tienda o la legislación aplicable."
 
-#: src/routes/new/route.tsx:268
+#: src/routes/new/route.tsx:270
 msgid "Moroccan Dirham"
 msgstr "Dírham Marroquí"
 
@@ -2214,7 +2214,7 @@ msgstr "¿Mover Party Boost aquí?"
 msgid "Moved to"
 msgstr "Movida a"
 
-#: src/routes/new/route.tsx:281
+#: src/routes/new/route.tsx:283
 msgid "Mozambican Metical"
 msgstr "Metical Mozambiqueño"
 
@@ -2222,18 +2222,18 @@ msgstr "Metical Mozambiqueño"
 msgid "Multi-Party Splitting"
 msgstr "División Multi-Grupo"
 
-#: src/components/CalculatorToolbar.tsx:1576
+#: src/components/CalculatorToolbar.tsx:1577
 msgid "Multiply"
 msgstr "Multiplicar"
 
-#: src/routes/new/route.tsx:272
+#: src/routes/new/route.tsx:274
 msgid "Myanma Kyat"
 msgstr "Kyat Birmano"
 
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:24
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:264
-#: src/routes/party.$partyId/route.tsx:146
+#: src/routes/party.$partyId/route.tsx:147
 msgid "Name"
 msgstr "Nombre"
 
@@ -2253,7 +2253,7 @@ msgstr "El nombre debe tener menos de 50 caracteres"
 msgid "Name, icon and description"
 msgstr "Nombre, icono y descripción"
 
-#: src/routes/new/route.tsx:282
+#: src/routes/new/route.tsx:284
 msgid "Namibian Dollar"
 msgstr "Dólar Namibio"
 
@@ -2261,11 +2261,11 @@ msgstr "Dólar Namibio"
 msgid "Need help with trizum? We're here to assist you."
 msgstr "¿Necesitas ayuda con trizum? Estamos aquí para ayudarte."
 
-#: src/routes/new/route.tsx:285
+#: src/routes/new/route.tsx:287
 msgid "Nepalese Rupee"
 msgstr "Rupia Nepalí"
 
-#: src/routes/new/route.tsx:201
+#: src/routes/new/route.tsx:203
 msgid "Netherlands Antillean Guilder"
 msgstr "Florín de las Antillas Neerlandesas"
 
@@ -2282,7 +2282,7 @@ msgstr "Nombre del nuevo participante"
 msgid "New password"
 msgstr "Nueva contraseña"
 
-#: src/routes/new/route.tsx:313
+#: src/routes/new/route.tsx:315
 msgid "New Taiwan Dollar"
 msgstr "Nuevo Dólar Taiwanés"
 
@@ -2294,7 +2294,7 @@ msgstr "Nueva plantilla"
 msgid "New trizum"
 msgstr "Nuevo trizum"
 
-#: src/routes/new/route.tsx:189
+#: src/routes/new/route.tsx:191
 msgid "New Zealand Dollar"
 msgstr "Dólar Neozelandés"
 
@@ -2302,11 +2302,11 @@ msgstr "Dólar Neozelandés"
 msgid "Next"
 msgstr "Siguiente"
 
-#: src/routes/new/route.tsx:284
+#: src/routes/new/route.tsx:286
 msgid "Nicaraguan Córdoba"
 msgstr "Córdoba Nicaragüense"
 
-#: src/routes/new/route.tsx:283
+#: src/routes/new/route.tsx:285
 msgid "Nigerian Naira"
 msgstr "Naira Nigeriano"
 
@@ -2326,7 +2326,7 @@ msgstr "No se encontró cámara en este dispositivo"
 msgid "No cloud settings saved yet"
 msgstr "Todavía no hay configuración guardada en la nube"
 
-#: src/routes/new/route.tsx:342
+#: src/routes/new/route.tsx:344
 msgid "No currency"
 msgstr "Sin moneda"
 
@@ -2338,7 +2338,7 @@ msgstr "Todavía no hay plantillas personalizadas"
 msgid "No destination party available"
 msgstr "No hay ningún grupo de destino disponible"
 
-#: src/components/EmojiPicker.tsx:335
+#: src/components/EmojiPicker.tsx:333
 msgid "No emoji found"
 msgstr "No se encontraron emojis"
 
@@ -2346,7 +2346,7 @@ msgstr "No se encontraron emojis"
 msgid "No expense templates yet"
 msgstr "Todavía no hay plantillas de gasto"
 
-#: src/components/PremiumPaywall.tsx:527
+#: src/components/PremiumPaywall.tsx:528
 msgid "No Premium purchase was found for this account."
 msgstr "No se ha encontrado ninguna compra de Premium para esta cuenta."
 
@@ -2355,11 +2355,11 @@ msgstr "No se ha encontrado ninguna compra de Premium para esta cuenta."
 msgid "No spending in this timeframe"
 msgstr "No hay gastos en este período"
 
-#: src/components/PartyStatsView.tsx:854
+#: src/components/PartyStatsView.tsx:855
 msgid "No spending stats for this timeframe"
 msgstr "No hay estadísticas de gastos para este período"
 
-#: src/components/PartyStatsView.tsx:856
+#: src/components/PartyStatsView.tsx:857
 msgid "No spending stats yet"
 msgstr "Aún no hay estadísticas de gastos"
 
@@ -2375,15 +2375,15 @@ msgstr "¡Nadie te debe dinero!"
 msgid "Nobody yet"
 msgstr "Todavía nadie"
 
-#: src/components/PartyStatsView.tsx:330
+#: src/components/PartyStatsView.tsx:331
 msgid "Non-transfer expenses in this timeframe"
 msgstr "Gastos no asociados a transferencias en este período"
 
-#: src/routes/new/route.tsx:258
+#: src/routes/new/route.tsx:260
 msgid "North Korean Won"
 msgstr "Won Norcoreano"
 
-#: src/routes/new/route.tsx:179
+#: src/routes/new/route.tsx:181
 msgid "Norwegian Krone"
 msgstr "Corona Noruega"
 
@@ -2404,7 +2404,7 @@ msgstr "No configurada"
 msgid "Not signed in"
 msgstr "No has iniciado sesión"
 
-#: src/components/PartyStatsView.tsx:718
+#: src/components/PartyStatsView.tsx:719
 msgid "of total spending"
 msgstr "del gasto total"
 
@@ -2424,19 +2424,19 @@ msgstr "Sin Conexión Primero"
 msgid "Older parties stay tucked away, not gone"
 msgstr "Los grupos antiguos quedan apartados, no desaparecen"
 
-#: src/routes/new/route.tsx:286
+#: src/routes/new/route.tsx:288
 msgid "Omani Rial"
 msgstr "Rial Omaní"
 
-#: src/components/PremiumPaywall.tsx:166
+#: src/components/PremiumPaywall.tsx:167
 msgid "One Party Boost"
 msgstr "Un Party Boost"
 
-#: src/components/PremiumPaywall.tsx:411
+#: src/components/PremiumPaywall.tsx:412
 msgid "One payment. No recurring charge."
 msgstr "Un solo pago. Sin cargos recurrentes."
 
-#: src/components/PremiumPaywall.tsx:385
+#: src/components/PremiumPaywall.tsx:386
 msgid "one-time"
 msgstr "pago único"
 
@@ -2448,7 +2448,7 @@ msgstr "Códigos de un solo uso"
 msgid "Only affects you. Skip the template picker when you add an expense."
 msgstr "Solo te afecta a ti. Omite el selector de plantillas al añadir un gasto."
 
-#: src/routes/party.$partyId/route.tsx:229
+#: src/routes/party.$partyId/route.tsx:230
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
@@ -2478,11 +2478,11 @@ msgstr "Abre los <0>ajustes de Premium</0> y usa Restaurar compras si Premium a�
 msgid "Open archived parties"
 msgstr "Abrir grupos archivados"
 
-#: src/components/CurrencyField.tsx:494
+#: src/components/CurrencyField.tsx:497
 msgid "Open calculator"
 msgstr "Abrir calculadora"
 
-#: src/components/ExpenseEditor.tsx:388
+#: src/components/ExpenseEditor.tsx:391
 msgid "Open calculator when focusing amount fields"
 msgstr "Abrir calculadora al enfocar campos de importe"
 
@@ -2490,11 +2490,11 @@ msgstr "Abrir calculadora al enfocar campos de importe"
 msgid "Open GitHub Issues"
 msgstr "Abrir GitHub Issues"
 
-#: src/routes/settings.tsx:241
+#: src/routes/settings.tsx:242
 msgid "Open last party on launch"
 msgstr "Abrir el último grupo al abrir la app"
 
-#: src/components/CalculatorToolbar.tsx:1540
+#: src/components/CalculatorToolbar.tsx:1541
 msgid "Open parenthesis"
 msgstr "Abrir paréntesis"
 
@@ -2554,7 +2554,7 @@ msgstr "Nuestros proveedores de infraestructura, inicio de sesión, monitorizaci
 msgid "Our infrastructure, sign-in, purchase, monitoring, and advertising providers may process data outside your country of residence. Where required, these transfers rely on applicable legal safeguards such as adequacy decisions, the EU-US and Swiss-US Data Privacy Frameworks and UK Extension, or Standard Contractual Clauses. Provider privacy notices describe their specific locations and safeguards. Contact us if you need more information about safeguards relevant to your data."
 msgstr "Nuestros proveedores de infraestructura, inicio de sesión, compras, supervisión y publicidad pueden tratar datos fuera de tu país de residencia. Cuando sea necesario, estas transferencias se basan en garantías legales aplicables, como decisiones de adecuación, los marcos de privacidad de datos UE-EE. UU. y Suiza-EE. UU. y su extensión al Reino Unido, o cláusulas contractuales tipo. Los avisos de privacidad de los proveedores describen sus ubicaciones y garantías específicas. Contacta con nosotros si necesitas más información sobre las garantías aplicables a tus datos."
 
-#: src/routes/party_.$partyId.pay/route.tsx:109
+#: src/routes/party_.$partyId.pay/route.tsx:116
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:39
 msgid "owes"
 msgstr "le debe"
@@ -2567,7 +2567,7 @@ msgstr "Pagado por {currentParticipantName}"
 msgid "Paid at"
 msgstr "Pagado el"
 
-#: src/components/ExpenseEditor.tsx:517
+#: src/components/ExpenseEditor.tsx:521
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PaidBy.tsx:49
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:335
 msgid "Paid by"
@@ -2577,27 +2577,27 @@ msgstr "Pagado por"
 msgid "Paid debt to {0}"
 msgstr "Deuda pagada a {0}"
 
-#: src/routes/party_.$partyId.pay/route.tsx:65
+#: src/routes/party_.$partyId.pay/route.tsx:72
 msgid "Paid debt to {toName}"
 msgstr "Deuda pagada a {toName}"
 
-#: src/routes/new/route.tsx:291
+#: src/routes/new/route.tsx:293
 msgid "Pakistani Rupee"
 msgstr "Rupia Paquistaní"
 
-#: src/routes/new/route.tsx:336
+#: src/routes/new/route.tsx:338
 msgid "Palladium (troy ounce)"
 msgstr "Paladio (onza troy)"
 
-#: src/routes/new/route.tsx:287
+#: src/routes/new/route.tsx:289
 msgid "Panamanian Balboa"
 msgstr "Balboa Panameño"
 
-#: src/routes/new/route.tsx:289
+#: src/routes/new/route.tsx:291
 msgid "Papua New Guinean Kina"
 msgstr "Kina de Papúa Nueva Guinea"
 
-#: src/routes/new/route.tsx:292
+#: src/routes/new/route.tsx:294
 msgid "Paraguayan Guarani"
 msgstr "Guaraní Paraguayo"
 
@@ -2610,18 +2610,18 @@ msgstr "participante"
 msgid "Participant name"
 msgstr "Nombre del participante"
 
-#: src/components/PartyStatsView.tsx:344
+#: src/components/PartyStatsView.tsx:345
 msgid "participants"
 msgstr "participantes"
 
-#: src/components/PartyStatsView.tsx:340
+#: src/components/PartyStatsView.tsx:341
 #: src/routes/new/-components/NewPartyParticipantsField.tsx:22
 #: src/routes/party_.$partyId.settings/index.tsx:47
-#: src/routes/party_.$partyId.settings/participants.tsx:80
+#: src/routes/party_.$partyId.settings/participants.tsx:82
 msgid "Participants"
 msgstr "Participantes"
 
-#: src/routes/party_.$partyId.settings/participants.tsx:45
+#: src/routes/party_.$partyId.settings/participants.tsx:47
 msgid "Participants saved!"
 msgstr "¡Participantes guardados!"
 
@@ -2759,7 +2759,7 @@ msgstr "Contraseña actualizada"
 msgid "Paste the Tricount sharing message, URL (e.g., https://tricount.com/abc123), or the direct key"
 msgstr "Pega el mensaje de compartir de Tricount, la URL (p. ej., https://tricount.com/abc123), o la clave directa"
 
-#: src/routes/party_.$partyId.pay/route.tsx:98
+#: src/routes/party_.$partyId.pay/route.tsx:105
 #: src/routes/party.$partyId/-components/BalanceActionItem.tsx:69
 msgid "Pay"
 msgstr "Pagar"
@@ -2772,11 +2772,11 @@ msgstr "Personas"
 msgid "People that owe you money"
 msgstr "Personas que te deben dinero"
 
-#: src/components/PremiumPaywall.tsx:376
+#: src/components/PremiumPaywall.tsx:377
 msgid "per month"
 msgstr "al mes"
 
-#: src/components/PremiumPaywall.tsx:382
+#: src/components/PremiumPaywall.tsx:383
 msgid "per year"
 msgstr "al año"
 
@@ -2788,15 +2788,15 @@ msgstr "Eliminar permanentemente tu cuenta de trizum cloud"
 msgid "Personal"
 msgstr "Personal"
 
-#: src/routes/party.$partyId/route.tsx:225
+#: src/routes/party.$partyId/route.tsx:226
 msgid "Personal mode"
 msgstr "Modo personal"
 
-#: src/routes/new/route.tsx:288
+#: src/routes/new/route.tsx:290
 msgid "Peruvian Sol"
 msgstr "Sol Peruano"
 
-#: src/routes/new/route.tsx:290
+#: src/routes/new/route.tsx:292
 msgid "Philippine Peso"
 msgstr "Peso Filipino"
 
@@ -2832,7 +2832,7 @@ msgstr "Los grupos fijados se mantienen a mano. La actividad reciente mantiene e
 msgid "Pinned parties stay on top, then the rest follow your latest activity."
 msgstr "Los grupos fijados se quedan arriba y el resto sigue tu actividad más reciente."
 
-#: src/routes/new/route.tsx:338
+#: src/routes/new/route.tsx:340
 msgid "Platinum (troy ounce)"
 msgstr "Platino (onza troy)"
 
@@ -2868,13 +2868,13 @@ msgstr "Por favor espera mientras obtenemos los datos más recientes"
 msgid "Point your camera at a trizum QR code"
 msgstr "Apunta tu cámara a un código QR de trizum"
 
-#: src/routes/new/route.tsx:181
+#: src/routes/new/route.tsx:183
 msgid "Polish Zloty"
 msgstr "Zloty Polaco"
 
-#: src/components/PremiumPaywall.tsx:150
+#: src/components/PremiumPaywall.tsx:151
 #: src/routes/party_.$partyId.settings/index.tsx:66
-#: src/routes/settings.tsx:370
+#: src/routes/settings.tsx:371
 msgid "Premium"
 msgstr "Premium"
 
@@ -2883,7 +2883,7 @@ msgstr "Premium"
 msgid "Premium belongs to the purchasing person and may not be transferred, resold, or shared as a separate account entitlement. A Premium owner may assign a Party Boost to one eligible group under the rules shown in the app. A Party Boost gives that group the group-level benefits described in the app; it does not make every group member a Premium owner or remove all advertising for them."
 msgstr "Premium pertenece a la persona que realiza la compra y no puede transferirse, revenderse ni compartirse como un derecho independiente de la cuenta. El titular de Premium puede asignar un Party Boost (impulso de grupo) a un grupo que cumpla los requisitos, conforme a las reglas que se muestran en la aplicación. Un Party Boost concede a ese grupo las ventajas colectivas descritas en la aplicación; no convierte a todos los miembros del grupo en titulares de Premium ni elimina toda la publicidad para ellos."
 
-#: src/components/PremiumPaywall.tsx:500
+#: src/components/PremiumPaywall.tsx:501
 msgid "Premium could not be purchased. Please try again."
 msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 
@@ -2891,7 +2891,7 @@ msgstr "No se ha podido completar la compra de Premium. Inténtalo de nuevo."
 msgid "Premium in the mobile app"
 msgstr "Premium en la app móvil"
 
-#: src/routes/settings.tsx:430
+#: src/routes/settings.tsx:431
 msgid "Premium is active on this account."
 msgstr "Premium está activo en esta cuenta."
 
@@ -2899,7 +2899,7 @@ msgstr "Premium está activo en esta cuenta."
 msgid "Premium is active."
 msgstr "Premium está activo."
 
-#: src/components/PremiumPaywall.tsx:490
+#: src/components/PremiumPaywall.tsx:491
 msgid "Premium is now active."
 msgstr "Premium ya está activo."
 
@@ -2912,7 +2912,7 @@ msgstr "Premium es opcional. La pantalla de compra describe las funciones inclui
 msgid "Premium is required for Party Boost."
 msgstr "Se necesita Premium para usar Party Boost."
 
-#: src/components/PremiumPaywall.tsx:178
+#: src/components/PremiumPaywall.tsx:179
 msgid "Premium options are unavailable"
 msgstr "Las opciones de Premium no están disponibles"
 
@@ -2920,19 +2920,19 @@ msgstr "Las opciones de Premium no están disponibles"
 msgid "Premium owners can boost one party at a time and move it every seven days."
 msgstr "Los titulares de Premium pueden impulsar un grupo a la vez y mover el impulso cada siete días."
 
-#: src/components/PremiumPaywall.tsx:197
+#: src/components/PremiumPaywall.tsx:198
 msgid "Premium plan"
 msgstr "Plan Premium"
 
-#: src/components/PremiumPaywall.tsx:524
+#: src/components/PremiumPaywall.tsx:525
 msgid "Premium purchases restored."
 msgstr "Se han restaurado las compras de Premium."
 
-#: src/routes/settings.tsx:434
+#: src/routes/settings.tsx:435
 msgid "Premium status could not be checked. Try again."
 msgstr "No se ha podido comprobar el estado de Premium. Inténtalo de nuevo."
 
-#: src/components/PremiumPaywall.tsx:158
+#: src/components/PremiumPaywall.tsx:159
 msgid "Premium, made for sharing."
 msgstr "Premium, pensado para compartir."
 
@@ -2940,15 +2940,15 @@ msgstr "Premium, pensado para compartir."
 msgid "Previous"
 msgstr "Anterior"
 
-#: src/routes/settings.tsx:291
+#: src/routes/settings.tsx:292
 msgid "Privacy"
 msgstr "Privacidad"
 
-#: src/routes/settings.tsx:296
+#: src/routes/settings.tsx:297
 msgid "Privacy and cookie settings"
 msgstr "Privacidad y configuración de cookies"
 
-#: src/components/PremiumPaywall.tsx:284
+#: src/components/PremiumPaywall.tsx:285
 #: src/routes/about/route.tsx:111
 msgid "Privacy Policy"
 msgstr "Política de Privacidad"
@@ -2974,11 +2974,11 @@ msgstr "Puedes comprar y restaurar compras en la app de trizum instalada desde A
 msgid "Purchases are processed by Apple or Google through the store account you use to buy Premium. Prices may include or exclude taxes depending on your location and store settings. Your purchase is also associated with the trizum account signed in at the time of purchase so that eligible Premium access can be restored across your signed-in devices."
 msgstr "Apple o Google procesan las compras a través de la cuenta de la tienda que utilices para adquirir Premium. Los precios pueden incluir o excluir impuestos según tu ubicación y la configuración de la tienda. La compra también se asocia a la cuenta de trizum que tenga la sesión iniciada en el momento de la compra, para que el acceso a Premium que corresponda pueda restaurarse en los dispositivos en los que hayas iniciado sesión."
 
-#: src/components/PremiumPaywall.tsx:534
+#: src/components/PremiumPaywall.tsx:535
 msgid "Purchases could not be restored. Please try again."
 msgstr "No se han podido restaurar las compras. Inténtalo de nuevo."
 
-#: src/routes/new/route.tsx:293
+#: src/routes/new/route.tsx:295
 msgid "Qatari Rial"
 msgstr "Rial Catarí"
 
@@ -3008,7 +3008,7 @@ msgid "Redeem a one-time code in Google Play"
 msgstr "Canjear un código de un solo uso en Google Play"
 
 #: src/components/PremiumCodeRedemption.tsx:68
-#: src/components/PremiumPaywall.tsx:250
+#: src/components/PremiumPaywall.tsx:251
 #: src/routes/redeem.tsx:50
 msgid "Redeem code"
 msgstr "Canjear código"
@@ -3038,7 +3038,7 @@ msgstr "Eliminar"
 msgid "Remove avatar"
 msgstr "Eliminar avatar"
 
-#: src/components/ExpenseEditor.tsx:1118
+#: src/components/ExpenseEditor.tsx:1124
 msgid "Remove photo"
 msgstr "Eliminar foto"
 
@@ -3071,7 +3071,7 @@ msgstr "Reiniciar trizum"
 msgid "Restore"
 msgstr "Restaurar"
 
-#: src/components/PremiumPaywall.tsx:239
+#: src/components/PremiumPaywall.tsx:240
 msgid "Restore purchases"
 msgstr "Restaurar compras"
 
@@ -3084,7 +3084,7 @@ msgid "Retry"
 msgstr "Reintentar"
 
 #: src/components/CloudSyncSettingsView.tsx:793
-#: src/routes/settings.tsx:391
+#: src/routes/settings.tsx:392
 msgid "Retry account check"
 msgstr "Volver a comprobar la cuenta"
 
@@ -3112,44 +3112,44 @@ msgstr "Política de privacidad de RevenueCat"
 msgid "Review expense"
 msgstr "Revisar gasto"
 
-#: src/routes/new/route.tsx:184
+#: src/routes/new/route.tsx:186
 msgid "Romanian Leu"
 msgstr "Leu Rumano"
 
-#: src/routes/new/route.tsx:187
+#: src/routes/new/route.tsx:189
 msgid "Russian Ruble"
 msgstr "Rublo Ruso"
 
-#: src/routes/new/route.tsx:295
+#: src/routes/new/route.tsx:297
 msgid "Rwandan Franc"
 msgstr "Franco Ruandés"
 
-#: src/routes/new/route.tsx:299
+#: src/routes/new/route.tsx:301
 msgid "Saint Helena Pound"
 msgstr "Libra de Santa Elena"
 
-#: src/routes/new/route.tsx:305
+#: src/routes/new/route.tsx:307
 msgid "Salvadoran Colón"
 msgstr "Colón Salvadoreño"
 
-#: src/routes/new/route.tsx:325
+#: src/routes/new/route.tsx:327
 msgid "Samoan Tala"
 msgstr "Tala Samoano"
 
-#: src/routes/new/route.tsx:304
+#: src/routes/new/route.tsx:306
 msgid "São Tomé and Príncipe Dobra"
 msgstr "Dobra de Santo Tomé y Príncipe"
 
-#: src/routes/new/route.tsx:196
+#: src/routes/new/route.tsx:198
 msgid "Saudi Riyal"
 msgstr "Riyal Saudí"
 
-#: src/components/ExpenseEditor.tsx:290
+#: src/components/ExpenseEditor.tsx:293
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
-#: src/routes/new/route.tsx:128
+#: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
-#: src/routes/party_.$partyId.settings/participants.tsx:94
+#: src/routes/party_.$partyId.settings/participants.tsx:96
 #: src/routes/party_.$partyId.who.tsx:114
 #: src/routes/reset-password.tsx:83
 #: src/routes/settings.tsx:107
@@ -3169,11 +3169,11 @@ msgstr "Escanear código QR"
 msgid "Scrape, reverse engineer, or automatically access the Service except as permitted by applicable law or an open-source license"
 msgstr "Extraer datos, aplicar ingeniería inversa o acceder automáticamente al Servicio, salvo en la medida permitida por la legislación aplicable o una licencia de código abierto"
 
-#: src/components/EmojiPicker.tsx:181
+#: src/components/EmojiPicker.tsx:179
 msgid "Search emoji"
 msgstr "Buscar emoji"
 
-#: src/components/EmojiPicker.tsx:192
+#: src/components/EmojiPicker.tsx:190
 msgid "Search emoji..."
 msgstr "Buscar emoji..."
 
@@ -3185,11 +3185,11 @@ msgstr "Accede de forma segura a tus datos en todos tus dispositivos."
 msgid "Security"
 msgstr "Seguridad"
 
-#: src/routes/party.$partyId/route.tsx:252
+#: src/routes/party.$partyId/route.tsx:253
 msgid "See spending totals and rankings"
 msgstr "Ver totales y clasificación de gasto"
 
-#: src/components/EmojiPicker.tsx:164
+#: src/components/EmojiPicker.tsx:162
 msgid "Select emoji"
 msgstr "Seleccionar emoji"
 
@@ -3205,7 +3205,7 @@ msgstr "Enviar enlace de contraseña"
 msgid "Send us an email and we'll get back to you as soon as possible."
 msgstr "Envíanos un email y te responderemos lo antes posible."
 
-#: src/routes/new/route.tsx:294
+#: src/routes/new/route.tsx:296
 msgid "Serbian Dinar"
 msgstr "Dinar Serbio"
 
@@ -3226,7 +3226,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/_home/route.tsx:90
-#: src/routes/party.$partyId/route.tsx:277
+#: src/routes/party.$partyId/route.tsx:278
 #: src/routes/settings.tsx:130
 msgid "Settings"
 msgstr "Configuración"
@@ -3243,13 +3243,13 @@ msgstr "Ajustes que solo te afectan a ti"
 msgid "Settled in"
 msgstr "Saldada en"
 
-#: src/routes/new/route.tsx:297
+#: src/routes/new/route.tsx:299
 msgid "Seychellois Rupee"
 msgstr "Rupia de Seychelles"
 
 #: src/routes/party_.$partyId.share.tsx:62
 #: src/routes/party_.$partyId.share.tsx:97
-#: src/routes/party.$partyId/route.tsx:265
+#: src/routes/party.$partyId/route.tsx:266
 msgid "Share party"
 msgstr "Compartir grupo"
 
@@ -3257,7 +3257,7 @@ msgstr "Compartir grupo"
 msgid "Share the party link so others can join."
 msgstr "Comparte el enlace del grupo para que otros puedan unirse."
 
-#: src/routes/settings.tsx:309
+#: src/routes/settings.tsx:310
 msgid "Share usage analytics"
 msgstr "Compartir estadísticas de uso"
 
@@ -3277,7 +3277,7 @@ msgstr "Partes"
 msgid "Shares for {0}"
 msgstr "Partes para {0}"
 
-#: src/components/ExpenseEditor.tsx:804
+#: src/components/ExpenseEditor.tsx:810
 msgid "Shares for {participantName}"
 msgstr "Partes para {participantName}"
 
@@ -3293,7 +3293,7 @@ msgstr "Las partes suman <0>{0} {1}</0> mientras que la cantidad del gasto es <1
 msgid "Shares sum up to <0>{totalAmount} {currency}</0> while the expense amount is <1>{expenseAmount} {currency}</1>."
 msgstr "Las partes suman <0>{totalAmount} {currency}</0> mientras que la cantidad del gasto es <1>{expenseAmount} {currency}</1>."
 
-#: src/routes/new/route.tsx:300
+#: src/routes/new/route.tsx:302
 msgid "Sierra Leonean Leone"
 msgstr "Leone de Sierra Leona"
 
@@ -3311,11 +3311,11 @@ msgstr "Vuelve a iniciar sesión antes de eliminar tu cuenta"
 msgid "Sign in to activate Premium benefits for this party."
 msgstr "Inicia sesión para activar las ventajas de Premium en este grupo."
 
-#: src/routes/settings.tsx:399
+#: src/routes/settings.tsx:400
 msgid "Sign in to get Premium"
 msgstr "Inicia sesión para obtener Premium"
 
-#: src/routes/settings.tsx:426
+#: src/routes/settings.tsx:427
 msgid "Sign in to purchase or restore Premium across your devices."
 msgstr "Inicia sesión para comprar o restaurar Premium en tus dispositivos."
 
@@ -3401,11 +3401,11 @@ msgstr "Sesión iniciada como {email}"
 msgid "Signed out"
 msgstr "Sesión cerrada"
 
-#: src/routes/new/route.tsx:327
+#: src/routes/new/route.tsx:329
 msgid "Silver (troy ounce)"
 msgstr "Plata (onza troy)"
 
-#: src/routes/new/route.tsx:190
+#: src/routes/new/route.tsx:192
 msgid "Singapore Dollar"
 msgstr "Dólar de Singapur"
 
@@ -3425,11 +3425,11 @@ msgstr "Omite el selector de plantillas al añadir un gasto."
 msgid "Skip this picker next time"
 msgstr "Omitir este selector la próxima vez"
 
-#: src/routes/new/route.tsx:296
+#: src/routes/new/route.tsx:298
 msgid "Solomon Islands Dollar"
 msgstr "Dólar de las Islas Salomón"
 
-#: src/routes/new/route.tsx:301
+#: src/routes/new/route.tsx:303
 msgid "Somali Shilling"
 msgstr "Chelín Somalí"
 
@@ -3453,23 +3453,23 @@ msgstr "Algo no está funcionando correctamente. Reinicia trizum para recuperarl
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/party.$partyId/route.tsx:138
+#: src/routes/party.$partyId/route.tsx:139
 msgid "Sort balances"
 msgstr "Ordenar balances"
 
-#: src/routes/new/route.tsx:193
+#: src/routes/new/route.tsx:195
 msgid "South African Rand"
 msgstr "Rand Sudafricano"
 
-#: src/routes/new/route.tsx:177
+#: src/routes/new/route.tsx:179
 msgid "South Korean Won"
 msgstr "Won Surcoreano"
 
-#: src/routes/new/route.tsx:303
+#: src/routes/new/route.tsx:305
 msgid "South Sudanese Pound"
 msgstr "Libra Sursudanesa"
 
-#: src/routes/new/route.tsx:334
+#: src/routes/new/route.tsx:336
 msgid "Special Drawing Rights"
 msgstr "Derechos Especiales de Giro"
 
@@ -3505,7 +3505,7 @@ msgstr "Reparte gastos, mantén las cuentas claras."
 msgid "Split total does not match"
 msgstr "El total de las partes no coincide"
 
-#: src/routes/new/route.tsx:264
+#: src/routes/new/route.tsx:266
 msgid "Sri Lankan Rupee"
 msgstr "Rupia de Sri Lanka"
 
@@ -3514,7 +3514,7 @@ msgstr "Rupia de Sri Lanka"
 msgid "Start date"
 msgstr "Fecha de inicio"
 
-#: src/components/PremiumPaywall.tsx:225
+#: src/components/PremiumPaywall.tsx:226
 msgid "Start free trial"
 msgstr "Iniciar prueba gratuita"
 
@@ -3526,7 +3526,7 @@ msgstr "Comienza a registrar gastos con tu grupo"
 msgid "Start with empty expense values"
 msgstr "Empezar con los valores del gasto vacíos"
 
-#: src/routes/party.$partyId/route.tsx:248
+#: src/routes/party.$partyId/route.tsx:249
 msgid "Stats"
 msgstr "Estadísticas"
 
@@ -3538,27 +3538,27 @@ msgstr "Detener trizum cloud en este dispositivo"
 msgid "Submit a Request"
 msgstr "Enviar sugerencia"
 
-#: src/components/ExpenseEditor.tsx:290
+#: src/components/ExpenseEditor.tsx:293
 #: src/routes/migrate_.tricount/-components/IdleState.tsx:52
-#: src/routes/new/route.tsx:128
+#: src/routes/new/route.tsx:130
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
-#: src/routes/party_.$partyId.settings/participants.tsx:94
+#: src/routes/party_.$partyId.settings/participants.tsx:96
 #: src/routes/party_.$partyId.who.tsx:114
 #: src/routes/reset-password.tsx:83
 #: src/routes/settings.tsx:107
 msgid "Submitting..."
 msgstr "Enviando..."
 
-#: src/components/CalculatorToolbar.tsx:1596
+#: src/components/CalculatorToolbar.tsx:1597
 msgid "Subtract"
 msgstr "Restar"
 
-#: src/routes/new/route.tsx:339
+#: src/routes/new/route.tsx:341
 msgid "Sucre"
 msgstr "Sucre"
 
-#: src/routes/new/route.tsx:298
+#: src/routes/new/route.tsx:300
 msgid "Sudanese Pound"
 msgstr "Libra Sudanesa"
 
@@ -3567,15 +3567,15 @@ msgstr "Libra Sudanesa"
 msgid "Support"
 msgstr "Soporte"
 
-#: src/routes/new/route.tsx:302
+#: src/routes/new/route.tsx:304
 msgid "Surinamese Dollar"
 msgstr "Dólar Surinamés"
 
-#: src/routes/new/route.tsx:307
+#: src/routes/new/route.tsx:309
 msgid "Swazi Lilangeni"
 msgstr "Lilangeni Suazi"
 
-#: src/routes/new/route.tsx:178
+#: src/routes/new/route.tsx:180
 msgid "Swedish Krona"
 msgstr "Corona Sueca"
 
@@ -3583,16 +3583,16 @@ msgstr "Corona Sueca"
 msgid "Swipe between expenses and balances tabs."
 msgstr "Desliza entre las pestañas de gastos y balance."
 
-#: src/routes/new/route.tsx:170
+#: src/routes/new/route.tsx:172
 msgid "Swiss Franc"
 msgstr "Franco Suizo"
 
-#: src/components/ExpenseEditor.tsx:830
+#: src/components/ExpenseEditor.tsx:836
 msgid "Switch to a set amount"
 msgstr "Cambiar a una cantidad fija"
 
-#: src/components/ExpenseEditor.tsx:820
-#: src/components/ExpenseEditor.tsx:831
+#: src/components/ExpenseEditor.tsx:826
+#: src/components/ExpenseEditor.tsx:837
 msgid "Switch to fractional split"
 msgstr "Cambiar a división fraccional"
 
@@ -3617,7 +3617,7 @@ msgstr "Sincronizar configuración del perfil"
 msgid "Syncing party information..."
 msgstr "Sincronizando información del grupo..."
 
-#: src/routes/new/route.tsx:306
+#: src/routes/new/route.tsx:308
 msgid "Syrian Pound"
 msgstr "Libra Siria"
 
@@ -3625,22 +3625,22 @@ msgstr "Libra Siria"
 msgid "System (fallbacks to {DEFAULT_LOCALE})"
 msgstr "Sistema (por defecto {DEFAULT_LOCALE})"
 
-#: src/routes/new/route.tsx:308
+#: src/routes/new/route.tsx:310
 msgid "Tajikistani Somoni"
 msgstr "Somoni Tayiko"
 
 #: src/components/AvatarPicker.tsx:167
 #: src/components/AvatarPicker.tsx:182
-#: src/components/ExpenseEditor.tsx:1046
-#: src/components/ExpenseEditor.tsx:1060
+#: src/components/ExpenseEditor.tsx:1052
+#: src/components/ExpenseEditor.tsx:1066
 msgid "Take photo"
 msgstr "Hacer foto"
 
-#: src/routes/new/route.tsx:314
+#: src/routes/new/route.tsx:316
 msgid "Tanzanian Shilling"
 msgstr "Chelín Tanzano"
 
-#: src/routes/party.$partyId/route.tsx:211
+#: src/routes/party.$partyId/route.tsx:212
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
@@ -3676,7 +3676,7 @@ msgstr "Los nombres de las plantillas deben ser únicos"
 msgid "Templates"
 msgstr "Plantillas"
 
-#: src/components/PremiumPaywall.tsx:275
+#: src/components/PremiumPaywall.tsx:276
 msgid "Terms"
 msgstr "Términos"
 
@@ -3687,7 +3687,7 @@ msgstr "Términos"
 msgid "Terms of Service"
 msgstr "Términos del servicio"
 
-#: src/routes/new/route.tsx:192
+#: src/routes/new/route.tsx:194
 msgid "Thai Baht"
 msgstr "Baht Tailandés"
 
@@ -3789,7 +3789,7 @@ msgstr "Esta deuda ya no está disponible"
 msgid "This device already has local data. Using trizum cloud here will switch this device to your cloud data. Your local data on this device will stop being used."
 msgstr "Este dispositivo ya tiene datos locales. Si usas trizum cloud aquí, este dispositivo cambiará a tus datos en la nube. Los datos locales de este dispositivo dejarán de usarse."
 
-#: src/hooks/useCloudSyncAccountState.ts:321
+#: src/hooks/useCloudSyncAccountState.ts:322
 msgid "This device is already using trizum cloud"
 msgstr "Este dispositivo ya usa trizum cloud"
 
@@ -3850,7 +3850,7 @@ msgstr "Esto detiene trizum cloud en este dispositivo. Tus datos locales se qued
 msgid "Timeframe"
 msgstr "Período"
 
-#: src/components/ExpenseEditor.tsx:452
+#: src/components/ExpenseEditor.tsx:455
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:307
 msgid "Title"
 msgstr "Título"
@@ -3887,7 +3887,7 @@ msgstr "En la medida permitida por la ley, el Servicio se proporciona «tal cual
 msgid "To the extent permitted by law, we are not liable for indirect, incidental, special, consequential, or punitive losses, or for losses caused by inaccurate User Content, disputes between participants, third-party services, or events outside our reasonable control. Nothing in these Terms excludes or limits liability that cannot legally be excluded or limited."
 msgstr "En la medida permitida por la ley, no respondemos de pérdidas indirectas, incidentales, especiales, consecuentes o punitivas, ni de pérdidas causadas por Contenido de usuario inexacto, disputas entre participantes, servicios de terceros o acontecimientos fuera de nuestro control razonable. Nada de lo dispuesto en estos Términos excluye o limita responsabilidades que legalmente no puedan excluirse o limitarse."
 
-#: src/routes/new/route.tsx:311
+#: src/routes/new/route.tsx:313
 msgid "Tongan Paʻanga"
 msgstr "Paʻanga Tongano"
 
@@ -3899,7 +3899,7 @@ msgstr "Quién más ha pagado"
 msgid "Total paid by each participant in the selected timeframe."
 msgstr "Total pagado por cada participante en el período seleccionado."
 
-#: src/components/PartyStatsView.tsx:304
+#: src/components/PartyStatsView.tsx:305
 msgid "Total spent"
 msgstr "Total gastado"
 
@@ -3925,7 +3925,7 @@ msgstr "Se requiere la clave o URL de Tricount"
 msgid "Tricount URL or key"
 msgstr "URL o clave de Tricount"
 
-#: src/routes/new/route.tsx:312
+#: src/routes/new/route.tsx:314
 msgid "Trinidad and Tobago Dollar"
 msgstr "Dólar de Trinidad y Tobago"
 
@@ -3935,17 +3935,17 @@ msgstr "Dólar de Trinidad y Tobago"
 msgid "trizum cloud"
 msgstr "trizum cloud"
 
-#: src/hooks/useCloudSyncAccountState.ts:229
-#: src/hooks/useCloudSyncAccountState.ts:315
+#: src/hooks/useCloudSyncAccountState.ts:230
+#: src/hooks/useCloudSyncAccountState.ts:316
 msgid "trizum cloud data is invalid"
 msgstr "Los datos de trizum cloud no son válidos"
 
-#: src/hooks/useCloudSyncAccountState.ts:252
-#: src/hooks/useCloudSyncAccountState.ts:358
+#: src/hooks/useCloudSyncAccountState.ts:253
+#: src/hooks/useCloudSyncAccountState.ts:360
 msgid "trizum cloud enabled on this device"
 msgstr "trizum cloud activado en este dispositivo"
 
-#: src/hooks/useCloudSyncAccountState.ts:309
+#: src/hooks/useCloudSyncAccountState.ts:310
 msgid "trizum cloud is not set up yet"
 msgstr "trizum cloud todavía no está configurado"
 
@@ -3962,7 +3962,7 @@ msgid "trizum helps people record shared expenses, calculate balances, and coord
 msgstr "trizum ayuda a registrar gastos compartidos, calcular balances y coordinar liquidaciones dentro de grupos. El Servicio es una herramienta de registro y cálculo. No es un banco, una entidad de pago, un asesor financiero, un servicio contable ni un servicio de cobro de deudas, y no custodia ni transfiere dinero entre participantes."
 
 #: src/components/PremiumBrowserHelp.tsx:18
-#: src/components/PremiumPaywall.tsx:131
+#: src/components/PremiumPaywall.tsx:132
 msgid "trizum Premium"
 msgstr "trizum Premium"
 
@@ -3978,7 +3978,7 @@ msgstr "trizum abrirá Apple para que puedas añadirlo como método de inicio de
 msgid "trizum will open Google so you can add it as a sign-in method for this account."
 msgstr "trizum abrirá Google para que puedas añadirlo como método de inicio de sesión para esta cuenta."
 
-#: src/components/PremiumPaywall.tsx:190
+#: src/components/PremiumPaywall.tsx:191
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:285
 msgid "Try again"
 msgstr "Reintentar"
@@ -3987,7 +3987,7 @@ msgstr "Reintentar"
 msgid "Try another email"
 msgstr "Probar con otro email"
 
-#: src/components/PartyStatsView.tsx:862
+#: src/components/PartyStatsView.tsx:863
 msgid "Try another timeframe to compare a different period of your party."
 msgstr "Prueba otro período para comparar otra etapa de tu grupo."
 
@@ -3995,15 +3995,15 @@ msgstr "Prueba otro período para comparar otra etapa de tu grupo."
 msgid "Try scanning another code"
 msgstr "Prueba escaneando otro código"
 
-#: src/routes/new/route.tsx:310
+#: src/routes/new/route.tsx:312
 msgid "Tunisian Dinar"
 msgstr "Dinar Tunecino"
 
-#: src/routes/new/route.tsx:188
+#: src/routes/new/route.tsx:190
 msgid "Turkish Lira"
 msgstr "Lira Turca"
 
-#: src/routes/new/route.tsx:309
+#: src/routes/new/route.tsx:311
 msgid "Turkmenistani Manat"
 msgstr "Manat Turkmeno"
 
@@ -4011,19 +4011,19 @@ msgstr "Manat Turkmeno"
 msgid "Type \"delete account\" to confirm."
 msgstr "Escribe \"delete account\" para confirmar."
 
-#: src/routes/new/route.tsx:195
+#: src/routes/new/route.tsx:197
 msgid "UAE Dirham"
 msgstr "Dírham de los EAU"
 
-#: src/routes/new/route.tsx:316
+#: src/routes/new/route.tsx:318
 msgid "Ugandan Shilling"
 msgstr "Chelín Ugandés"
 
-#: src/routes/new/route.tsx:315
+#: src/routes/new/route.tsx:317
 msgid "Ukrainian Hryvnia"
 msgstr "Grivna Ucraniana"
 
-#: src/routes/new/route.tsx:320
+#: src/routes/new/route.tsx:322
 msgid "Unidad Previsional"
 msgstr "Unidad Previsional"
 
@@ -4068,14 +4068,14 @@ msgstr "Actualizando trizum..."
 msgid "Upload malware or content designed to disrupt or damage the Service"
 msgstr "Subir software malicioso o contenido diseñado para interrumpir o dañar el Servicio"
 
-#: src/components/ExpenseEditor.tsx:940
+#: src/components/ExpenseEditor.tsx:946
 msgid "Upload or capture an image of your receipt"
 msgstr "Sube o captura una imagen de tu recibo"
 
 #: src/components/AvatarPicker.tsx:176
 #: src/components/AvatarPicker.tsx:194
-#: src/components/ExpenseEditor.tsx:1055
-#: src/components/ExpenseEditor.tsx:1072
+#: src/components/ExpenseEditor.tsx:1061
+#: src/components/ExpenseEditor.tsx:1078
 msgid "Upload photo"
 msgstr "Subir foto"
 
@@ -4083,23 +4083,23 @@ msgstr "Subir foto"
 msgid "Uploading avatar..."
 msgstr "Subiendo avatar..."
 
-#: src/components/ExpenseEditor.tsx:981
+#: src/components/ExpenseEditor.tsx:987
 msgid "Uploading..."
 msgstr "Subiendo..."
 
-#: src/routes/new/route.tsx:318
+#: src/routes/new/route.tsx:320
 msgid "Uruguay Peso en Unidades Indexadas"
 msgstr "Peso Uruguayo en Unidades Indexadas"
 
-#: src/routes/new/route.tsx:319
+#: src/routes/new/route.tsx:321
 msgid "Uruguayan Peso"
 msgstr "Peso Uruguayo"
 
-#: src/routes/new/route.tsx:167
+#: src/routes/new/route.tsx:169
 msgid "US Dollar"
 msgstr "Dólar Estadounidense"
 
-#: src/routes/new/route.tsx:317
+#: src/routes/new/route.tsx:319
 msgid "US Dollar (Next day)"
 msgstr "Dólar Estadounidense (Día siguiente)"
 
@@ -4160,15 +4160,15 @@ msgstr "Nombre de usuario, teléfono, idioma, comportamiento de inicio y color d
 msgid "Using a custom Google Play code?"
 msgstr "¿Tienes un código personalizado de Google Play?"
 
-#: src/routes/new/route.tsx:321
+#: src/routes/new/route.tsx:323
 msgid "Uzbekistan Som"
 msgstr "Som Uzbeko"
 
-#: src/routes/new/route.tsx:324
+#: src/routes/new/route.tsx:326
 msgid "Vanuatu Vatu"
 msgstr "Vatu de Vanuatu"
 
-#: src/routes/new/route.tsx:322
+#: src/routes/new/route.tsx:324
 msgid "Venezuelan Bolívar Soberano"
 msgstr "Bolívar Soberano Venezolano"
 
@@ -4180,7 +4180,7 @@ msgstr "Versión"
 msgid "via"
 msgstr "vía"
 
-#: src/routes/new/route.tsx:323
+#: src/routes/new/route.tsx:325
 msgid "Vietnamese Dong"
 msgstr "Dong Vietnamita"
 
@@ -4196,13 +4196,13 @@ msgstr "Ver en GitHub"
 msgid "View party"
 msgstr "Ver grupo"
 
-#: src/components/ExpenseEditor.tsx:1107
+#: src/components/ExpenseEditor.tsx:1113
 #: src/routes/party_.$partyId.expense.$expenseId/-components/PhotoItemById.tsx:11
 msgid "View photo"
 msgstr "Ver foto"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:306
-#: src/routes/settings.tsx:396
+#: src/routes/settings.tsx:397
 msgid "View Premium options"
 msgstr "Ver opciones de Premium"
 
@@ -4214,7 +4214,7 @@ msgstr "Ver Licencias de Terceros"
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
-#: src/routes/party.$partyId/route.tsx:207
+#: src/routes/party.$partyId/route.tsx:208
 msgid "Viewing as {participantName}"
 msgstr "Viendo como {participantName}"
 
@@ -4311,11 +4311,11 @@ msgstr "¿Quién está invitado a este grupo? Puedes añadir más participantes 
 msgid "Why is this taking so long?"
 msgstr "¿Por qué está tardando tanto?"
 
-#: src/routes/new/route.tsx:221
+#: src/routes/new/route.tsx:223
 msgid "WIR Euro"
 msgstr "Euro WIR"
 
-#: src/routes/new/route.tsx:222
+#: src/routes/new/route.tsx:224
 msgid "WIR Franc"
 msgstr "Franco WIR"
 
@@ -4327,7 +4327,7 @@ msgstr "Sin conexión. Tu cuenta se actualizará cuando vuelvas a conectarte."
 msgid "Works seamlessly offline with automatic sync when online"
 msgstr "Funciona sin problemas sin conexión con sincronización automática cuando estás en línea"
 
-#: src/routes/new/route.tsx:343
+#: src/routes/new/route.tsx:345
 msgid "Yemeni Rial"
 msgstr "Rial Yemení"
 
@@ -4364,7 +4364,7 @@ msgstr "Puedes gestionar o cancelar una suscripción mediante el Centro de atenc
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe el dinero."
 
-#: src/routes/party.$partyId/route.tsx:102
+#: src/routes/party.$partyId/route.tsx:103
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
@@ -4421,7 +4421,7 @@ msgid "You're now seeing the party as {participantName}"
 msgstr "Ahora estás viendo el grupo como {participantName}"
 
 #: src/components/CloudSyncSettingsView.tsx:783
-#: src/routes/settings.tsx:422
+#: src/routes/settings.tsx:423
 msgid "Your account could not be checked. Connect to the internet and try again."
 msgstr "No se pudo comprobar tu cuenta. Conéctate a internet y vuelve a intentarlo."
 
@@ -4449,7 +4449,7 @@ msgstr "Tu Party Boost está activo en otro grupo y puedes moverlo aquí."
 msgid "Your Premium is boosting this party for everyone in it."
 msgstr "Tu Premium está impulsando este grupo para todos sus miembros."
 
-#: src/components/PremiumPaywall.tsx:493
+#: src/components/PremiumPaywall.tsx:494
 msgid "Your purchase is still syncing. Try restoring it in a moment."
 msgstr "Tu compra todavía se está sincronizando. Prueba a restaurarla dentro de un momento."
 
@@ -4457,10 +4457,10 @@ msgstr "Tu compra todavía se está sincronizando. Prueba a restaurarla dentro d
 msgid "Your total"
 msgstr "Tu total"
 
-#: src/routes/new/route.tsx:344
+#: src/routes/new/route.tsx:346
 msgid "Zambian Kwacha"
 msgstr "Kwacha Zambiano"
 
-#: src/routes/new/route.tsx:345
+#: src/routes/new/route.tsx:347
 msgid "Zimbabwean Dollar"
 msgstr "Dólar Zimbabuense"

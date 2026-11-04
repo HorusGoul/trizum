@@ -32,6 +32,7 @@ describe("document ID redaction at every sink", () => {
 
     expect(serializer).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     const output = warn.mock.calls[0]![0] as string;
     expect(output).not.toContain(documentId);
     expect(JSON.parse(output)).toMatchObject({
@@ -65,6 +66,7 @@ describe("document ID redaction at every sink", () => {
     getTrizumLogger("pwa").warning("Lookup failed", { values });
 
     expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     const output = warn.mock.calls[0]![0] as string;
     expect(output).not.toContain(documentId);
     expect(JSON.parse(output)).toMatchObject({
@@ -93,6 +95,7 @@ describe("document ID redaction at every sink", () => {
 
       expect(getter).not.toHaveBeenCalled();
       expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+      // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
       expect(JSON.parse(warn.mock.calls[0]![0] as string)).toMatchObject({
         message: "Lookup failed",
         properties: { error: { [field]: "[Accessor]" }, requestId: "request-123" },
@@ -108,6 +111,7 @@ describe("document ID redaction at every sink", () => {
     getTrizumLogger("pwa").warning("Lookup failed", { error });
 
     expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     expect(JSON.parse(warn.mock.calls[0]![0] as string)).toMatchObject({
       properties: {
         error: {
@@ -265,6 +269,7 @@ describe("document ID redaction at every sink", () => {
     getTrizumLogger("pwa").warning("Lookup failed", { payload });
 
     expect(warn).toHaveBeenCalledExactlyOnceWith(expect.any(String));
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     const output = warn.mock.calls[0]![0] as string;
     expect(output).not.toContain(documentId);
     expect(output).not.toContain(otherDocumentId);
@@ -287,6 +292,7 @@ describe("document ID redaction at every sink", () => {
 
     getTrizumLogger("pwa").warning(message, { requestId: "9c22b0d3a451-MAD" });
 
+    // SAFETY: The JSON console formatter emits one string argument, as asserted above; the console spy retains the wider native signature.
     expect(JSON.parse(warn.mock.calls[0]![0] as string)).toMatchObject({
       message,
       properties: { requestId: "9c22b0d3a451-MAD" },

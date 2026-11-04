@@ -141,6 +141,7 @@ it("carries the real analytics client through both proxy routes with one IP and 
     "https://spycat.horus.dev/collect",
     "https://spycat.horus.dev/collect",
   ]);
+  // SAFETY: The analytics client emits a JSON string for POST bodies; the assertions below verify the emitted proxy payload.
   expect(JSON.parse(posts[1][1]?.body as string)).toMatchObject({
     userId: id,
     eventName: "expense_created",

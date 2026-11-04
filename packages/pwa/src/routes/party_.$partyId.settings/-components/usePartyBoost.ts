@@ -360,7 +360,7 @@ function getCacheKey(userId: string, partyDocumentId: string) {
 function readCachedPartyBoostStatus(userId: string, partyDocumentId: string) {
   try {
     const value = localStorage.getItem(getCacheKey(userId, partyDocumentId));
-    const parsedValue = value ? (JSON.parse(value) as unknown) : null;
+    const parsedValue: unknown = value ? JSON.parse(value) : null;
 
     return isPartyBoostStatus(parsedValue) ? parsedValue : null;
   } catch {

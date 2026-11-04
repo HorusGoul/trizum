@@ -11,6 +11,7 @@ describe("React use integration", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // SAFETY: React reads this optional test-only flag from the global object; production globals do not declare it.
     (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   });
 

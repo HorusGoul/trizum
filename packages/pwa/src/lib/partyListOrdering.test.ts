@@ -90,6 +90,7 @@ function createDocumentId(): DocumentId {
 }
 
 function createFlagMap(...partyIds: DocumentId[]) {
+  // SAFETY: Every entry is constructed from typed DocumentId keys; Object.fromEntries widens those keys to strings.
   return Object.fromEntries(partyIds.map((partyId) => [partyId, true as const])) as Record<
     DocumentId,
     true
@@ -97,5 +98,6 @@ function createFlagMap(...partyIds: DocumentId[]) {
 }
 
 function createLastUsedAtMap(...entries: [DocumentId, number][]) {
+  // SAFETY: Every entry is constructed from typed DocumentId keys; Object.fromEntries widens those keys to strings.
   return Object.fromEntries(entries) as Record<DocumentId, number>;
 }

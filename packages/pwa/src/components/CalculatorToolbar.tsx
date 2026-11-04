@@ -429,6 +429,7 @@ function useCalculatorDismiss({
 }) {
   const suppressNextDocumentClickRef = useRef(false);
 
+  // SAFETY: A document pointer event targets a DOM node or null; isOutside handles null before checking containment.
   useEffect(() => {
     if (!enabled) {
       return;

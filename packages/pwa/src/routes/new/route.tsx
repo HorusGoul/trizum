@@ -9,7 +9,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
 import { toast } from "sonner";
-import type { CurrencyCode } from "#src/lib/money.ts";
 import { NewPartyDetailsFields } from "./-components/NewPartyDetailsFields.js";
 import { NewPartyHeader } from "./-components/NewPartyHeader.js";
 import { NewPartyParticipantsField } from "./-components/NewPartyParticipantsField.js";
@@ -41,6 +40,7 @@ function New() {
   function onCreateParty(values: NewPartyFormValues) {
     const participants = values.participants.map(({ id, name }) => ({ id, name }));
 
+    // SAFETY: Repo.create allocates the document ID; the first change replaces this placeholder before the handle is exposed.
     const handle = repo.create<Party>({
       id: "" as DocumentId,
       type: "party",
@@ -75,14 +75,16 @@ function New() {
     return handle.documentId;
   }
 
+  const defaultValues: NewPartyFormValues = {
+    name: "",
+    symbol: DEFAULT_PARTY_SYMBOL,
+    description: "",
+    currency: "EUR",
+    participants: [initialParticipant],
+  };
+
   const form = useForm({
-    defaultValues: {
-      name: "",
-      symbol: DEFAULT_PARTY_SYMBOL,
-      description: "",
-      currency: "EUR" as CurrencyCode,
-      participants: [initialParticipant],
-    },
+    defaultValues,
     onSubmit: ({ value }) => {
       onCreateParty(value);
     },

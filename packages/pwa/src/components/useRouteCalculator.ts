@@ -54,6 +54,7 @@ function markCalculatorHistoryState(state: ParsedLocation["state"]): CalculatorH
 }
 
 function isCalculatorHistoryState(state: ParsedLocation["state"]) {
+  // SAFETY: This reads one optional boolean marker written by the calculator; an absent marker correctly compares false.
   return (state as CalculatorHistoryState)[CALCULATOR_HISTORY_STATE_KEY] === true;
 }
 

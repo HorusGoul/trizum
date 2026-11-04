@@ -1025,6 +1025,7 @@ test.describe("Expense calculator", () => {
       .toBeGreaterThanOrEqual(Math.round(scrollYBefore) - 8);
 
     await page.evaluate(() => {
+      // SAFETY: Both callbacks share the scroll-sampling hooks installed by this same test on window; each hook is optional after cleanup.
       const testWindow = window as typeof window & {
         __calculatorBackScrollSamples?: number[];
         __stopCalculatorBackScrollSamples?: () => void;
@@ -1063,6 +1064,7 @@ test.describe("Expense calculator", () => {
       .toBeLessThanOrEqual(8);
 
     const scrollSamplesDuringBackClose = await page.evaluate(() => {
+      // SAFETY: Both callbacks share the scroll-sampling hooks installed by this same test on window; each hook is optional after cleanup.
       const testWindow = window as typeof window & {
         __calculatorBackScrollSamples?: number[];
         __stopCalculatorBackScrollSamples?: () => void;

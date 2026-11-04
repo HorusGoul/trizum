@@ -4,6 +4,7 @@ import { redactValue } from "./redaction.js";
 
 function redactSentryPayload<T extends object>(payload: T): T {
   // Keep payload schemas and correlation fields while sanitizing strings.
+  // SAFETY: Sentry owns this payload schema; redaction preserves its object structure and sanitizes string fields at the transport boundary.
   return redactValue(payload) as T;
 }
 
@@ -57,6 +58,7 @@ const logRedactionIntegration: Integration = {
         if (item[0].type === "log") {
           // Scope attributes are merged after beforeSendLog. At this boundary,
           // formatted messages are strings and all log attributes are present.
+          // SAFETY: The SDK log item owns this payload; redaction preserves its structure while sanitizing string attributes.
           item[1] = redactValue(item[1]) as (typeof item)[1];
         }
       }

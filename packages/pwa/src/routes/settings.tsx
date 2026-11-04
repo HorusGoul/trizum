@@ -222,6 +222,7 @@ function SettingsFormFields({
             selectedKey={field.state.value}
             onSelectionChange={(value) => {
               if (value) {
+                // SAFETY: The select contains supported locales plus system; React Aria widens those declared item keys.
                 field.handleChange(value as SupportedLocale | "system");
               }
             }}

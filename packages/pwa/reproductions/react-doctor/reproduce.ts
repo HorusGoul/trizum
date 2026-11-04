@@ -18,6 +18,7 @@ const workspaceDirectory = fileURLToPath(new URL("../../../../", import.meta.url
 const reproductionDirectory = mkdtempSync(path.join(tmpdir(), "trizum-react-doctor-reproduction-"));
 
 function installedVersion(packageName: string): string {
+  // SAFETY: The installed dependency package.json owns its version string; this reproduction logs that version only.
   const manifest = JSON.parse(
     readFileSync(path.join(packageDirectory, "node_modules", packageName, "package.json"), "utf8"),
   ) as { version: string };
