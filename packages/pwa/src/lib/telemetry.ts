@@ -53,9 +53,19 @@ function scrubIdentity<Value>(value: Value, id: string | undefined): ScrubbedIde
   return result as ScrubbedIdentity<Value>;
 }
 
-export const sentryTelemetryIntegration: Parameters<typeof Sentry.addIntegration>[0] = {
+type SentryClient = NonNullable<ReturnType<typeof Sentry.getClient>>;
+
+type SentryTransport = NonNullable<ReturnType<SentryClient["getTransport"]>>;
+
+export type TelemetryEnvelope = Parameters<SentryTransport["send"]>[0];
+
+interface TelemetryEnvelopeClient {
+  on(event: "beforeEnvelope", listener: (envelope: TelemetryEnvelope) => void): void;
+}
+
+export const sentryTelemetryIntegration = {
   name: "TrizumTelemetryIdentity",
-  setup(client) {
+  setup(client: TelemetryEnvelopeClient) {
     client.on("beforeEnvelope", (envelope) => {
       const id = getTelemetryId();
 
@@ -66,4 +76,4 @@ export const sentryTelemetryIntegration: Parameters<typeof Sentry.addIntegration
       }
     });
   },
-};
+} satisfies Parameters<typeof Sentry.addIntegration>[0];

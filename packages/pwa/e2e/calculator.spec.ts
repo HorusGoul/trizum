@@ -1,3 +1,4 @@
+import type { MigrationData } from "../src/models/migrationData.ts";
 import {
   createExpenseLogFixture,
   createPartyFixture,
@@ -52,7 +53,7 @@ async function navigateToAddExpense({
   harness,
 }: {
   autoOpenCalculator: boolean;
-  fixture?: unknown;
+  fixture?: MigrationData;
   harness: BrowserHarness;
 }) {
   const seededParty = await harness.seedJoinedParty({

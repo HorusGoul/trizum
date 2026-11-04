@@ -1,5 +1,4 @@
 import { describe, expect, test, vi } from "vite-plus/test";
-import type { RouterHistory } from "@tanstack/react-router";
 import {
   closeRouteState,
   navigateWithoutDuplicateEntry,
@@ -74,7 +73,7 @@ describe("navigationHistory", () => {
       },
       push,
       replace,
-    } as unknown as RouterHistory;
+    };
 
     preventDuplicateHistoryEntries(history);
     history.push("/settings", { from: "test" });

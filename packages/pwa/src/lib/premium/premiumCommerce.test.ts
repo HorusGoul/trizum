@@ -1,8 +1,5 @@
-import type {
-  IntroEligibility,
-  PurchasesOffering,
-  PurchasesPackage,
-} from "@revenuecat/purchases-capacitor";
+import { createOffering } from "./revenueCatTestFixtures.ts";
+import type { IntroEligibility, PurchasesPackage } from "@revenuecat/purchases-capacitor";
 import { describe, expect, it } from "vite-plus/test";
 import { createPremiumOffering } from "./premiumCommerce.ts";
 
@@ -202,22 +199,6 @@ describe("createPremiumOffering", () => {
     expect(result.plans.map(({ id }) => id)).toEqual(["monthly", "lifetime"]);
   });
 });
-
-function createOffering({
-  annual = null,
-  lifetime = null,
-  monthly = null,
-}: {
-  annual?: PurchasesPackage | null;
-  lifetime?: PurchasesPackage | null;
-  monthly?: PurchasesPackage | null;
-}) {
-  return {
-    annual,
-    lifetime,
-    monthly,
-  } as unknown as PurchasesOffering;
-}
 
 function createPackage({
   googleTrial,

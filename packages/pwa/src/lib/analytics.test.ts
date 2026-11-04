@@ -11,7 +11,12 @@ import {
   trackEvent,
   trackPage,
 } from "./analytics.ts";
-import { getTelemetryId, setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
+import {
+  getTelemetryId,
+  setTelemetryIdentity,
+  sentryTelemetryIntegration,
+  type TelemetryEnvelope,
+} from "./telemetry.ts";
 
 vi.mock("@sentry/react", () => ({ setUser: vi.fn<typeof Sentry.setUser>() }));
 
@@ -233,47 +238,82 @@ it("repairs malformed stored identities without transmitting them", async () => 
 it("strips buffered Sentry user, log and session identities after privacy signals or profile changes", () => {
   const firstId = crypto.randomUUID();
   setTelemetryIdentity(() => firstId);
-  const on = vi.fn<(event: string, listener: (envelope: unknown) => void) => void>();
-  sentryTelemetryIntegration.setup!({ on } as unknown as Parameters<
-    NonNullable<typeof sentryTelemetryIntegration.setup>
-  >[0]);
-  const beforeEnvelope = on.mock.calls[0][1] as (envelope: unknown) => void;
 
-  const envelope = () => [
-    {},
+  type EnvelopeClient = Parameters<typeof sentryTelemetryIntegration.setup>[0];
+
+  const on = vi.fn<EnvelopeClient["on"]>();
+  sentryTelemetryIntegration.setup({ on });
+  const beforeEnvelope = on.mock.calls[0][1];
+
+  const timestamp = "2026-01-01T00:00:00.000Z";
+
+  const envelope = (): TelemetryEnvelope[] => [
     [
-      [{ type: "event" }, { user: { id: firstId }, message: "failure" }],
+      { event_id: "event-id", sent_at: timestamp },
+      [[{ type: "event" }, { user: { id: firstId }, message: "failure" }]],
+    ],
+    [
+      {},
       [
-        { type: "log" },
-        {
-          items: [
-            {
-              attributes: {
-                "user.id": { value: firstId, type: "string" },
-                telemetryId: { value: firstId, type: "string" },
+        [
+          { type: "log", item_count: 1, content_type: "application/vnd.sentry.items.log+json" },
+          {
+            items: [
+              {
+                timestamp: 0,
+                level: "info",
+                body: "Test log",
+                attributes: {
+                  "user.id": { value: firstId, type: "string" },
+                  telemetryId: { value: firstId, type: "string" },
+                },
               },
-            },
-          ],
-        },
+            ],
+          },
+        ],
       ],
-      [{ type: "session" }, { did: firstId, sid: "session-id" }],
-      [{ type: "sessions" }, { aggregates: [{ did: firstId }] }],
+    ],
+    [
+      { sent_at: timestamp },
+      [
+        [
+          { type: "session" },
+          {
+            did: firstId,
+            sid: "session-id",
+            init: false,
+            timestamp,
+            started: timestamp,
+            status: "ok",
+            errors: 0,
+          },
+        ],
+      ],
+    ],
+    [
+      { sent_at: timestamp },
+      [
+        [
+          { type: "sessions" },
+          { aggregates: [Object.assign({ started: timestamp }, { did: firstId })] },
+        ],
+      ],
     ],
   ];
 
   const allowed = envelope();
-  beforeEnvelope(allowed);
+  allowed.forEach(beforeEnvelope);
   expect(JSON.stringify(allowed)).toContain(firstId);
   preferences.globalPrivacyControl = true;
   expect(getTelemetryId()).toBeUndefined();
   const blocked = envelope();
-  beforeEnvelope(blocked);
+  blocked.forEach(beforeEnvelope);
   expect(JSON.stringify(blocked)).not.toContain(firstId);
   expect(JSON.stringify(blocked)).toContain("session-id");
   preferences.globalPrivacyControl = false;
   setTelemetryIdentity(() => crypto.randomUUID());
   const switched = envelope();
-  beforeEnvelope(switched);
+  switched.forEach(beforeEnvelope);
   expect(JSON.stringify(switched)).not.toContain(firstId);
 });
 

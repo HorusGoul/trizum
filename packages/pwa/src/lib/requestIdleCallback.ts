@@ -40,7 +40,7 @@ export function requestIdleCallback(
   );
 
   // Return the timeout ID as a number (compatible with native API)
-  return handle as unknown as number;
+  return Number(handle);
 }
 
 /**
@@ -53,6 +53,6 @@ export function cancelIdleCallback(handleId: number): void {
     window.cancelIdleCallback(handleId);
   } else {
     // Polyfill: clearTimeout for the setTimeout fallback
-    clearTimeout(handleId as unknown as ReturnType<typeof setTimeout>);
+    clearTimeout(handleId);
   }
 }

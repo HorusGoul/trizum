@@ -1,3 +1,4 @@
+import type {} from "./lib/testing/browserHarnessApi.ts";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
@@ -55,8 +56,6 @@ import {
   readPartyListState,
   seedPartyListState,
   type InternalPartyListSeed,
-  type InternalPartyListSnapshot,
-  type InternalPartyListSeedResult,
 } from "./lib/testing/browserHarness.ts";
 
 const initialUrl = new URL(window.location.href);
@@ -166,22 +165,6 @@ void initializeAppWorker({
 }).catch((error) => {
   logger.error("Failed to initialize app worker", { error });
 });
-
-declare global {
-  interface Window {
-    __internal_createPartyFromMigrationData: (data: MigrationData) => Promise<string>;
-    __internal_createDeferredPartyListState: (
-      seed: InternalPartyListSeed,
-    ) => Promise<InternalPartyListSeedResult>;
-    __internal_getDocumentState: (documentId: DocumentId) => string | undefined;
-    __internal_releaseDeferredPartyListState: (partyListId: DocumentId) => void;
-    __internal_seedPartyListState: (
-      seed: InternalPartyListSeed,
-    ) => Promise<InternalPartyListSeedResult>;
-    __internal_readPartyListState: () => Promise<InternalPartyListSnapshot>;
-    __internal_recalculatePartyBalances: (partyId: Party["id"]) => Promise<boolean>;
-  }
-}
 
 // For internal use only, like UI testing or screenshots
 window.__internal_createPartyFromMigrationData = async (data: MigrationData) => {

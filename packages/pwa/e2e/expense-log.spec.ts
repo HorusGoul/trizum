@@ -248,12 +248,17 @@ test.describe("Expense log", () => {
     await expect(page.getByRole("button", { name: "View photo" })).toHaveCount(2);
 
     await page.evaluate(() => {
-      window.Image = class PendingImage {
-        onerror: null = null;
-        onload: null = null;
+      window.Image = new Proxy(window.Image, {
+        construct(ImageConstructor, args, newTarget) {
+          const image = Reflect.construct(ImageConstructor, args, newTarget);
+          Object.defineProperty(image, "src", {
+            configurable: true,
+            set(_src: string) {},
+          });
 
-        set src(_src: string) {}
-      } as unknown as typeof Image;
+          return image;
+        },
+      });
     });
 
     await page.getByRole("button", { name: "View photo" }).nth(1).click();

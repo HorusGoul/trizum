@@ -1,4 +1,4 @@
-import type { Repo } from "@automerge/automerge-repo/slim";
+import { Repo, type DocHandle } from "@automerge/automerge-repo";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
 import type { Party } from "./party";
 import type { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
@@ -25,63 +25,25 @@ vi.mock("#src/hooks/useMediaFileActions.ts", () => ({
 
 import { createPartyFromMigrationData, type MigrationData } from "./migration";
 
-function assertNoUndefinedValues(value: unknown, path: string) {
-  if (value === undefined) {
-    throw new RangeError(
-      `Cannot assign undefined value at ${path}, because \`undefined\` is not a valid JSON data type. You might consider setting the property's value to \`null\`, or using \`delete\` to remove it altogether.`,
-    );
-  }
-
-  if (Array.isArray(value)) {
-    for (const [index, item] of value.entries()) {
-      assertNoUndefinedValues(item, `${path}/${index}`);
-    }
-
-    return;
-  }
-
-  if (value && typeof value === "object") {
-    for (const [key, item] of Object.entries(value)) {
-      assertNoUndefinedValues(item, `${path}/${key}`);
-    }
-  }
-}
+const testRepos: Repo[] = [];
 
 function createMockRepo() {
-  let nextId = 0;
-
-  let lastCreatedHandle:
-    | {
-        doc: () => Party;
-        documentId: string;
-        change: (changeFn: (nextDoc: Party) => void) => void;
-      }
-    | undefined;
+  const repo = new Repo({ network: [] });
+  testRepos.push(repo);
+  const create = vi.spyOn(repo, "create");
 
   return {
-    repo: {
-      create<T>(doc: T) {
-        assertNoUndefinedValues(doc, "");
+    repo,
+    getLastCreatedHandle() {
+      const result = create.mock.results.at(-1);
 
-        const handle = {
-          doc: () => doc,
-          documentId: `mock-doc-${++nextId}`,
-          change(changeFn: (nextDoc: T) => void) {
-            changeFn(doc);
-          },
-        };
+      if (!result || result.type !== "return")
+        throw new Error("Expected a created document handle");
 
-        lastCreatedHandle = handle as unknown as typeof lastCreatedHandle;
+      // SAFETY: This fixture observes only the Party created by the helper under test.
+      const handle = result.value as DocHandle<Party>;
 
-        return handle;
-      },
-    } as unknown as Repo,
-    getLastCreatedHandle: () => {
-      if (!lastCreatedHandle) {
-        throw new Error("Expected a created party handle");
-      }
-
-      return lastCreatedHandle;
+      return handle;
     },
   };
 }
@@ -112,7 +74,11 @@ describe("createPartyFromMigrationData", () => {
     createMediaFileMock.mockReset();
   });
 
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(async () => {
+    await Promise.all(testRepos.splice(0).map((repo) => repo.shutdown()));
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
 
   test("rejects failed attachment downloads before creating media", async () => {
     const mockRepo = createMockRepo();
@@ -143,7 +109,7 @@ describe("createPartyFromMigrationData", () => {
         repo: mockRepo.repo,
         data: createMigrationData(),
       }),
-    ).resolves.toBe("mock-doc-1");
+    ).resolves.toBe(mockRepo.getLastCreatedHandle().documentId);
 
     expect(mockRepo.getLastCreatedHandle().doc()).not.toHaveProperty("symbol");
   });

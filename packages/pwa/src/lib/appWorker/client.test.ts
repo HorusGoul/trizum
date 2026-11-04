@@ -1,6 +1,6 @@
 import type { LogRecord } from "@trizum/logging";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/test";
-import type { Repo } from "@automerge/automerge-repo/slim";
+import { Repo } from "@automerge/automerge-repo";
 import type { Party } from "#src/models/party.ts";
 import type { DocumentHeads, RecalculateBalancesRequest } from "./balanceSync.ts";
 import type { AppWorkerApi, AppWorkerInitializeOptions } from "./proxy.ts";
@@ -84,7 +84,9 @@ describe("app worker client", () => {
     TestWorker.instances = [];
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await Promise.all(testRepos.splice(0).map((repo) => repo.shutdown()));
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -231,16 +233,22 @@ function createWorkerApiMock({
   };
 }
 
+const testRepos: Repo[] = [];
+
 function createRepoMock() {
-  const networkSubsystem = {
-    addNetworkAdapter: vi.fn<(adapter: unknown) => void>(),
-    removeNetworkAdapter: vi.fn<(adapter: unknown) => void>(),
-  };
+  const repo = new Repo({ network: [] });
+  testRepos.push(repo);
+
+  const addNetworkAdapter = vi
+    .spyOn(repo.networkSubsystem, "addNetworkAdapter")
+    .mockImplementation(() => {});
+
+  const removeNetworkAdapter = vi
+    .spyOn(repo.networkSubsystem, "removeNetworkAdapter")
+    .mockImplementation(() => {});
 
   return {
-    networkSubsystem,
-    repo: {
-      networkSubsystem,
-    } as unknown as Repo,
+    networkSubsystem: { addNetworkAdapter, removeNetworkAdapter },
+    repo,
   };
 }

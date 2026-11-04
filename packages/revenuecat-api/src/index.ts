@@ -204,7 +204,7 @@ async function getPurchasesPage(
 }
 
 function parsePageResponse<T>(
-  data: unknown,
+  data: RevenueCatPage<T> | undefined,
   error: unknown,
   response: Response | undefined,
   resourceName: string,
@@ -238,7 +238,7 @@ function parsePageResponse<T>(
     throw new RevenueCatApiError(`RevenueCat returned an invalid ${resourceName} list.`);
   }
 
-  return data as unknown as RevenueCatPage<T>;
+  return { items: data.items, next_page: data.next_page };
 }
 
 function isMissingCustomerError(value: unknown) {

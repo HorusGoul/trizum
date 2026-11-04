@@ -3,6 +3,7 @@ import {
   arePresenceBubblePositionsEqual,
   getPresenceBubblePosition,
   getPresenceElementIdFromTarget,
+  type PresenceTarget,
 } from "./presencePosition.ts";
 
 function createElement({
@@ -18,13 +19,12 @@ function createElement({
 }) {
   return {
     dataset,
-    getBoundingClientRect: () =>
-      ({
-        left,
-        right,
-        top,
-      }) as DOMRectReadOnly,
-  } as HTMLElement;
+    getBoundingClientRect: () => ({
+      left,
+      right,
+      top,
+    }),
+  };
 }
 
 function createPresenceTarget({
@@ -32,12 +32,12 @@ function createPresenceTarget({
   parentElement = null,
 }: {
   dataset?: Partial<DOMStringMap>;
-  parentElement?: HTMLElement | null;
+  parentElement?: PresenceTarget | null;
 }) {
   return {
     dataset,
     parentElement,
-  } as HTMLElement;
+  };
 }
 
 describe("getPresenceBubblePosition", () => {
@@ -70,12 +70,11 @@ describe("getPresenceBubblePosition", () => {
         presenceOffsetLeft: "-10",
         presenceOffsetTop: "6",
       },
-      getBoundingClientRect: () =>
-        ({
-          right: anchorRight,
-          top: anchorTop,
-        }) as DOMRectReadOnly,
-    } as unknown as HTMLElement;
+      getBoundingClientRect: () => ({
+        right: anchorRight,
+        top: anchorTop,
+      }),
+    };
 
     expect(getPresenceBubblePosition(amountField, overlay)).toEqual({
       left: 310,

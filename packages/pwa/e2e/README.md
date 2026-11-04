@@ -10,6 +10,8 @@ setup and reusable journey state.
   journey fixture for offline boot, seeded state, and browser isolation.
 - [`harness/scenarios.ts`](./harness/scenarios.ts) is the source of truth for
   deterministic seeded parties used across journeys.
+- [The browser harness API](../src/lib/testing/browserHarnessApi.ts) defines the
+  hook signatures shared by the application and browser tests.
 - [`harness.spec.ts`](./harness.spec.ts) demonstrates the supported fresh,
   persisted, join, and imbalanced harness states.
 

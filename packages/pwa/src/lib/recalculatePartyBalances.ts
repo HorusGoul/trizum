@@ -1,12 +1,20 @@
-import type { DocumentId, Repo } from "@automerge/automerge-repo/slim";
+import type { DocHandle, DocumentId, Repo } from "@automerge/automerge-repo/slim";
 import { clone } from "@opentf/std";
 import { diff } from "@opentf/obj-diff";
 import { patchMutate } from "#src/lib/patchMutate.ts";
 import { calculateBalancesByParticipant } from "#src/models/expense.ts";
 import type { Party, PartyExpenseChunk, PartyExpenseChunkBalances } from "#src/models/party.ts";
 
+interface BalanceRepository {
+  find<Document>(
+    id: DocumentId,
+    options?: Parameters<Repo["find"]>[1],
+  ): Promise<Pick<DocHandle<Document>, "doc" | "change">>;
+  flush: Repo["flush"];
+}
+
 export async function recalculatePartyBalances(
-  repo: Repo,
+  repo: BalanceRepository,
   partyId: Party["id"],
   signal?: AbortSignal,
 ) {

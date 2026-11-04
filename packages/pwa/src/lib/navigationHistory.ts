@@ -38,7 +38,9 @@ export function pushHistoryWithoutDuplicateEntry(
   history.push(href);
 }
 
-export function preventDuplicateHistoryEntries(history: RouterHistory): RouterHistory {
+export function preventDuplicateHistoryEntries<
+  History extends Pick<RouterHistory, "push" | "replace"> & { location: HrefLocation },
+>(history: History): History {
   const push = history.push.bind(history);
   const replace = history.replace.bind(history);
 

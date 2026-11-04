@@ -1,3 +1,7 @@
+import {
+  createCustomerInfo as createCustomerInfoFixture,
+  createEntitlement,
+} from "./revenueCatTestFixtures.ts";
 import { describe, expect, it } from "vite-plus/test";
 import type { CustomerInfo, PurchasesEntitlementInfo } from "@revenuecat/purchases-capacitor";
 import { getPremiumAccess, PREMIUM_ENTITLEMENT_IDENTIFIER } from "./premiumAccess.ts";
@@ -56,19 +60,14 @@ function createCustomerInfo({
   activeSubscriptions?: string[];
   entitlement?: PurchasesEntitlementInfo;
 }) {
-  return {
-    activeSubscriptions,
-    entitlements: {
-      active: entitlement ? { [PREMIUM_ENTITLEMENT_IDENTIFIER]: entitlement } : {},
-    },
-  } as unknown as CustomerInfo;
-}
+  const customerInfo = createCustomerInfoFixture({ activeSubscriptions });
 
-function createEntitlement(
-  values: Pick<PurchasesEntitlementInfo, "ownershipType" | "productIdentifier">,
-) {
+  const active: CustomerInfo["entitlements"]["active"] = entitlement
+    ? { [PREMIUM_ENTITLEMENT_IDENTIFIER]: entitlement }
+    : {};
+
   return {
-    ...values,
-    isActive: true,
-  } as PurchasesEntitlementInfo;
+    ...customerInfo,
+    entitlements: { ...customerInfo.entitlements, active, all: active },
+  };
 }

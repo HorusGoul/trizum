@@ -1,3 +1,9 @@
+import {
+  createCustomerInfo,
+  createOffering,
+  createPurchasesPackage,
+  createStoreProduct,
+} from "./revenueCatTestFixtures.ts";
 import type {
   CustomerInfo,
   PurchasesOffering,
@@ -36,10 +42,7 @@ describe("Premium offering purchase binding", () => {
   beforeEach(() => {
     revenueCat.getOfferings.mockReset();
     revenueCat.purchasePackage.mockReset().mockResolvedValue({
-      customerInfo: {
-        activeSubscriptions: [],
-        entitlements: { active: {} },
-      } as unknown as CustomerInfo,
+      customerInfo: createCustomerInfo(),
     });
     identity.synchronizeUser.mockReset().mockResolvedValue(undefined);
   });
@@ -58,9 +61,9 @@ describe("Premium offering purchase binding", () => {
     const displayedLoad = loadPremiumOffering("user-1");
     await waitForOfferingRequest(2);
 
-    displayedResponse.resolve({ current: createOffering(displayedPackage) });
+    displayedResponse.resolve({ current: createOffering({ monthly: displayedPackage }) });
     const displayedOffering = await displayedLoad;
-    olderResponse.resolve({ current: createOffering(olderPackage) });
+    olderResponse.resolve({ current: createOffering({ monthly: olderPackage }) });
     await olderLoad;
 
     await purchasePremiumPlan("user-1", displayedOffering, "monthly");
@@ -81,21 +84,11 @@ async function waitForOfferingRequest(count: number) {
   throw new Error(`RevenueCat offering request ${count} did not start.`);
 }
 
-function createOffering(monthly: PurchasesPackage) {
-  return { annual: null, lifetime: null, monthly } as unknown as PurchasesOffering;
-}
-
 function createPackage(identifier: string, priceString: string) {
-  return {
+  return createPurchasesPackage({
     identifier,
-    product: {
-      defaultOption: null,
-      identifier,
-      introPrice: null,
-      pricePerMonthString: null,
-      priceString,
-    },
-  } as unknown as PurchasesPackage;
+    product: createStoreProduct({ identifier, priceString }),
+  });
 }
 
 function createDeferred<T>() {
