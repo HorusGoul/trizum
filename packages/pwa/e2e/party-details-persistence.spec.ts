@@ -4,10 +4,8 @@ import { expect, test } from "./harness/trizum.fixture";
 
 async function holdNextSaveAcknowledgment(page: Page) {
   await page.evaluate(() => {
-    const original = Reflect.get(
-      IDBDatabase.prototype,
-      "transaction",
-    ) as IDBDatabase["transaction"];
+    // oxlint-disable-next-line typescript/unbound-method -- Preserve the method for restoration; calls below use apply(this, args).
+    const original = IDBDatabase.prototype.transaction;
 
     const testWindow = window as Window & {
       releasePersistenceTest?: () => void;
@@ -107,10 +105,8 @@ test("a failed details save keeps the draft available for retry", async ({
   await page.locator(`a[href="${details}"]`).click();
   await page.getByLabel("Name", { exact: true }).fill("Retry this save");
   await page.evaluate(() => {
-    const original = Reflect.get(
-      IDBDatabase.prototype,
-      "transaction",
-    ) as IDBDatabase["transaction"];
+    // oxlint-disable-next-line typescript/unbound-method -- Preserve the method for restoration; calls below use apply(this, args).
+    const original = IDBDatabase.prototype.transaction;
 
     const testWindow = window as Window & { restorePersistenceTest?: () => void };
     testWindow.restorePersistenceTest = () => {
