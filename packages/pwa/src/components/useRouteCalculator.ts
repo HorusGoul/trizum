@@ -84,6 +84,7 @@ export function useRouteCalculator({
         calculatorId !== undefined ||
         shouldReplaceNavigation(currentLocation.href, buildLocation(options).href),
     });
+
     if (calculatorId === undefined) trackEvent("calculator_opened");
   }
 

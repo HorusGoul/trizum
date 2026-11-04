@@ -23,10 +23,12 @@ describe("React use integration", () => {
   test("readAsync suspends with React use and renders when the load resolves", async () => {
     const deferred = createTestDeferred<string>();
     const load = vi.fn<(params: [string]) => Promise<string>>(() => deferred.promise);
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load,
     });
+
     const root = createTestRoot();
     const Reader = createCacheReader(cache);
 
@@ -93,6 +95,7 @@ function createCacheReader(cache: ReturnType<typeof createCache<[string], string
 function createTestDeferred<Value>() {
   let rejectPromise: (error: unknown) => void = () => {};
   let resolvePromise: (value: Value) => void = () => {};
+
   const promise = new Promise<Value>((resolve, reject) => {
     rejectPromise = reject;
     resolvePromise = resolve;

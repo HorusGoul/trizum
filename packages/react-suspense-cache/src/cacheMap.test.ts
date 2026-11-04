@@ -54,6 +54,7 @@ class BasicCacheMap<Key, Value> implements CacheMap<Key, Value> {
 
   set(key: Key, value: Value): this {
     this.map.set(key, value);
+
     return this;
   }
 

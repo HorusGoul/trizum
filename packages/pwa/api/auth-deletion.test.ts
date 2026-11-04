@@ -10,10 +10,12 @@ import type { ApiEnv } from "./env";
 import * as schema from "./db/schema";
 
 const state = vi.hoisted(() => ({ db: undefined as unknown, sentEmail: "" }));
+
 vi.mock("./db/client", async (importOriginal) => ({
   ...(await importOriginal<typeof DbClient>()),
   getApiDb: () => state.db,
 }));
+
 vi.mock("cloudflare:email", () => ({
   EmailMessage: class {
     constructor(_from: string, _to: string, raw: string) {
@@ -24,6 +26,7 @@ vi.mock("cloudflare:email", () => ({
 
 let sqlite: DatabaseSync;
 const fetcher = vi.fn<typeof fetch>();
+
 const env: Partial<ApiEnv> = {
   BETTER_AUTH_SECRET: "test-account-deletion-secret-at-least-32-characters",
   EMAIL: { send: async () => ({ messageId: "synthetic-message" }) } satisfies ApiEnv["EMAIL"],
@@ -56,11 +59,13 @@ async function handle(request = authRequest(), config = env) {
   context.skipCSRFCheck = false;
   const response = await auth.handler(request);
   await Promise.all(pending);
+
   return response;
 }
 
 function count(table: string, userId: string) {
   const column = table === "user" ? "id" : table === "party_boost" ? "ownerUserId" : "userId";
+
   return sqlite
     .prepare(`SELECT count(*) AS count FROM "${table}" WHERE "${column}" = ?`)
     .get(userId)?.count;
@@ -77,19 +82,24 @@ beforeEach(() => {
   sqlite = new DatabaseSync(":memory:");
   sqlite.exec("PRAGMA foreign_keys = ON");
   const migrations = new URL("../migrations/", import.meta.url);
+
   for (const file of readdirSync(fileURLToPath(migrations.href))
     .filter((name) => name.endsWith(".sql"))
     .sort()) {
     sqlite.exec(readFileSync(fileURLToPath(new URL(file, migrations).href), "utf8"));
   }
+
   state.db = drizzle(
     async (query, params, method) => {
       const statement = sqlite.prepare(query);
       statement.setReturnArrays(true);
+
       if (method === "run") {
         statement.run(...params);
+
         return { rows: [] };
       }
+
       return {
         rows:
           method === "get"
@@ -100,6 +110,7 @@ beforeEach(() => {
     { schema },
   );
   const now = Date.now();
+
   for (const id of ["owner", "other"]) {
     sqlite
       .prepare(
@@ -127,6 +138,7 @@ beforeEach(() => {
       )
       .run(id, `${id}-party`, now, now, now);
   }
+
   fetcher
     .mockReset()
     .mockResolvedValue(Response.json({ object: "customer", id: "owner", deleted_at: now }));
@@ -173,9 +185,11 @@ describe("authenticated account deletion", () => {
   it("rejects an untrusted origin before any remote deletion", async () => {
     const request = authRequest({}, "owner-token", "https://attacker.example");
     request.headers.delete("Authorization");
+
     const signature = createHmac("sha256", env.BETTER_AUTH_SECRET!)
       .update("owner-token")
       .digest("base64");
+
     request.headers.set(
       "Cookie",
       `better-auth.session_token=${encodeURIComponent(`owner-token.${signature}`)}`,
@@ -206,12 +220,14 @@ describe("authenticated account deletion", () => {
     fetcher.mockRejectedValueOnce(new Error("connection lost after remote deletion"));
     expect((await handle()).status).toBe(503);
     expectAccount("owner", 1);
+
     const missing = {
       object: "error",
       type: "resource_missing",
       message: "Resource not found",
       retryable: false,
     };
+
     fetcher
       .mockResolvedValueOnce(Response.json(missing, { status: 404 }))
       .mockResolvedValueOnce(Response.json(missing, { status: 404 }))
@@ -256,41 +272,49 @@ describe("persisted authentication compatibility", () => {
         name: "Synthetic fixture",
       }),
     );
+
     expect(response.status).toBe(200);
+
     return response.json() as Promise<{ token: string; user: { id: string } }>;
   }
 
   it("reopens a password account and authenticates its bearer session", async () => {
     const created = await signUp();
+
     const response = await handle(
       request("sign-in/email", {
         email: fixtureEmail,
         password: fixturePassword,
       }),
     );
+
     expect(response.status).toBe(200);
     const signedIn = (await response.json()) as { token: string; user: { id: string } };
     expect(signedIn.user.id).toBe(created.user.id);
     const session = await handle(request("get-session", undefined, signedIn.token));
     expect(session.status).toBe(200);
     expect(((await session.json()) as { user: { id: string } }).user.id).toBe(created.user.id);
+
     const rejected = await handle(
       request("sign-in/email", {
         email: fixtureEmail,
         password: "incorrect-synthetic-password",
       }),
     );
+
     expect(rejected.status).toBe(401);
   });
 
   it("revokes unverified credentials and sessions after proving ownership with a magic link", async () => {
     const created = await signUp();
+
     const response = await handle(
       request("sign-in/magic-link", {
         email: fixtureEmail,
         callbackURL: "http://localhost/",
       }),
     );
+
     expect(response.status).toBe(200);
     const link = state.sentEmail.match(/https?:\/\/[^\s<]+\/magic-link\/verify\?[^\s<]+/)?.[0];
     expect(link).toBeDefined();
@@ -309,28 +333,34 @@ describe("persisted authentication compatibility", () => {
     ).toBe(0);
     const oldSession = await handle(request("get-session", undefined, created.token));
     expect(await oldSession.json()).toBeNull();
+
     const resetRequest = await handle(
       request("request-password-reset", {
         email: fixtureEmail,
         redirectTo: "http://localhost/reset-password",
       }),
     );
+
     expect(resetRequest.status).toBe(200);
     const resetToken = state.sentEmail.match(/\/reset-password\/([^?\s<]+)/)?.[1];
     expect(resetToken).toBeDefined();
+
     const reset = await handle(
       request("reset-password", {
         token: resetToken,
         newPassword: fixturePassword,
       }),
     );
+
     expect(reset.status).toBe(200);
+
     const recovered = await handle(
       request("sign-in/email", {
         email: fixtureEmail,
         password: fixturePassword,
       }),
     );
+
     expect(recovered.status).toBe(200);
   });
 });

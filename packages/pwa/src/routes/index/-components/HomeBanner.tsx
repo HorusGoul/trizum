@@ -22,18 +22,22 @@ export function HomeBanner({ isVisible }: { isVisible: boolean }) {
   const session = useAppSession();
   const premium = usePremium();
   const isNative = Boolean(getRevenueCatPlatform());
+
   const dialogs = usePremiumDialogs({
     userId: session.data?.user.id ?? null,
     isNative,
     presentPaywall: premium.presentPaywall,
   });
+
   useAdProtectedFlow(dialogs.dialog.kind !== "closed");
 
   const resumeAfterSignIn = useEffectEvent(() => {
     // Consume the return intent so navigation and later sign-ins cannot replay it.
     void navigate({ to: "/", search: { premium: undefined }, replace: true });
+
     if (isNative && session.data?.user) dialogs.openPremium();
   });
+
   useEffect(() => {
     if (isHome && resumePremium && !session.isPending) resumeAfterSignIn();
   }, [isHome, resumePremium, session.isPending]);

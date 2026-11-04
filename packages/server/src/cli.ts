@@ -9,10 +9,12 @@ switch (command) {
     await runMigrations();
     break;
   }
+
   case "serve": {
     await startServer();
     break;
   }
+
   default: {
     process.stderr.write(`Unknown server command: ${command}\n`);
     process.exit(1);

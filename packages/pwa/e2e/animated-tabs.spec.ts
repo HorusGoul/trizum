@@ -15,6 +15,7 @@ test("activates a tab panel when scrolling settles just before its snap point", 
     fixture: createImbalancedPartyFixture(),
     memberParticipantId: defaultParticipants.blair.id,
   });
+
   await harness.gotoParty(party.partyId);
 
   const horizontalScroller = page.getByRole("tabpanel").locator("..");

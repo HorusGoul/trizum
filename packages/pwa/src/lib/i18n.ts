@@ -12,6 +12,7 @@ import { getSupportedLocale, type SupportedLocale } from "./locales.js";
 export function getBrowserLocale(): SupportedLocale {
   // Try to get locale from browser
   const browserLocale = navigator.language ?? navigator.languages?.[0];
+
   return getSupportedLocale(browserLocale);
 }
 

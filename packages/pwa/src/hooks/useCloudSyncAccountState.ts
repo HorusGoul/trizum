@@ -26,6 +26,7 @@ function requireCloudPartyList(partyList: PartyList | undefined): PartyList {
   if (!partyList) {
     throw new Error("Cloud party list is unavailable");
   }
+
   return partyList;
 }
 
@@ -144,6 +145,7 @@ export function useCloudSyncAccountState({
   useEffect(() => {
     if (!userId) {
       dispatch({ type: "cleared" });
+
       return;
     }
 
@@ -160,6 +162,7 @@ export function useCloudSyncAccountState({
     }) {
       try {
         const currentPartyList = partyListRef.current;
+
         const [accounts, { settings }] = await Promise.all([
           fetchLinkedAuthAccounts(),
           fetchCloudUserSettings(),
@@ -181,12 +184,14 @@ export function useCloudSyncAccountState({
           }
 
           activeSettings = savedSettings;
+
           if (showStartToast) {
             toast.success(t`trizum cloud started`);
           }
         }
 
         let cloudAnalyticsEnabled = true;
+
         if (
           activeSettings &&
           isValidDocumentId(activeSettings.partyListDocumentId) &&
@@ -222,6 +227,7 @@ export function useCloudSyncAccountState({
 
         if (!isValidDocumentId(activeSettings.partyListDocumentId)) {
           toast.error(t`trizum cloud data is invalid`);
+
           return;
         }
 
@@ -231,6 +237,7 @@ export function useCloudSyncAccountState({
 
         if (hasLocalPartyListData(currentPartyList)) {
           dispatch({ type: "switchOpenChanged", isOpen: true });
+
           return;
         }
 
@@ -247,6 +254,7 @@ export function useCloudSyncAccountState({
       } catch {
         if (!isCancelled) {
           dispatch({ type: "accountDataResolved" });
+
           if (showErrorToast) {
             toast.error(t`Could not load trizum cloud state`);
           }
@@ -262,6 +270,7 @@ export function useCloudSyncAccountState({
 
     if (isOffline) {
       dispatch({ type: "accountDataResolved" });
+
       return;
     }
 
@@ -298,16 +307,19 @@ export function useCloudSyncAccountState({
   async function activateCloudSyncOnDevice(settings: CloudUserSettings | null = cloudSettings) {
     if (!settings) {
       toast.message(t`trizum cloud is not set up yet`);
+
       return;
     }
 
     if (!isValidDocumentId(settings.partyListDocumentId)) {
       toast.error(t`trizum cloud data is invalid`);
+
       return;
     }
 
     if (settings.partyListDocumentId === partyList.id) {
       toast.message(t`This device is already using trizum cloud`);
+
       return;
     }
 
@@ -317,12 +329,14 @@ export function useCloudSyncAccountState({
 
     if (!cloudPartyList) {
       toast.error(t`Could not load trizum cloud state`);
+
       return;
     }
 
     // Apply the destination's opt-out before switching can trigger router events.
     if (cloudPartyList.usageAnalyticsEnabled === false) setAnalyticsEnabled(false);
     setPartyListId(settings.partyListDocumentId);
+
     if (
       partyList.usageAnalyticsEnabled !== false &&
       cloudPartyList.usageAnalyticsEnabled !== false

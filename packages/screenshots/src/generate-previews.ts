@@ -104,6 +104,7 @@ async function main(): Promise<void> {
     readFile(INTER_REGULAR_PATH),
     readFile(INTER_BOLD_PATH),
   ]);
+
   const browser = await chromium.launch({ headless: true });
 
   try {
@@ -120,6 +121,7 @@ async function main(): Promise<void> {
               getStorePreviewScreenshotFilename(preview.device, name),
             ),
           );
+
           const scene = STORE_SCENES.find((candidate) => candidate.name === name);
 
           if (!scene) {
@@ -129,12 +131,15 @@ async function main(): Promise<void> {
           return `<article><img alt="${escapeHtml(scene.copy[preview.locale].title.replaceAll("\n", " "))}" src="data:image/png;base64,${screenshot.toString("base64")}"></article>`;
         }),
       );
+
       const output = STORE_DEVICE_OUTPUTS[preview.device];
       const cardWidth = (2820 - 74 * 2 - 26 * 5) / 6;
+
       const viewportHeight = Math.max(
         760,
         Math.ceil(64 + 66 + 42 + cardWidth * (output.height / output.width) + 64),
       );
+
       const page = await browser.newPage({ viewport: { width: 2820, height: viewportHeight } });
 
       try {
@@ -170,6 +175,7 @@ async function main(): Promise<void> {
         label: locale === "en" ? "English" : "Español",
       })),
     );
+
     const featureGraphicPage = await browser.newPage({ viewport: { width: 2280, height: 760 } });
 
     try {

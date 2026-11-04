@@ -6,20 +6,26 @@ import type { PremiumPaywall } from "./PremiumPaywall.tsx";
 import { PremiumProvider } from "./PremiumProvider.tsx";
 
 const paywall = vi.hoisted(() => ({ props: null as ComponentProps<typeof PremiumPaywall> | null }));
+
 vi.mock("#src/lib/auth-client.ts", () => ({
   useAppSession: () => ({ data: { user: { id: "test-user" } }, isPending: false, error: null }),
 }));
+
 vi.mock("#src/lib/premium/revenueCatConfig.ts", () => ({ getRevenueCatPlatform: () => null }));
+
 vi.mock("./PremiumPaywall.tsx", () => ({
   PremiumPaywall: (props: ComponentProps<typeof PremiumPaywall>) => {
     paywall.props = props;
+
     return null;
   },
 }));
 
 const capturePremium = vi.fn<(value: PremiumContextValue) => void>();
+
 function CapturePremium() {
   capturePremium(usePremium());
+
   return null;
 }
 

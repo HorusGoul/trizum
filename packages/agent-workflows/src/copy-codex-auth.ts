@@ -15,33 +15,39 @@ const authSchema = z.object({
 
 export async function copyCodexAuth(): Promise<void> {
   const ciAuthDirectory = await mkdtemp(path.join(tmpdir(), "trizum-codex-auth-"));
+
   try {
     const login = spawnSync("codex", ["login", "-c", 'cli_auth_credentials_store="file"'], {
       env: { ...createSanitizedEnvironment(), CODEX_HOME: ciAuthDirectory },
       stdio: "inherit",
     });
+
     if (login.error != null || login.status !== 0) {
       throw new Error("Codex login did not complete. Run `vp run codex:auth` to try again.");
     }
 
     // Preserve the whole bundle, including fields unknown to this helper.
     let credentials: unknown;
+
     try {
       credentials = JSON.parse(await readFile(path.join(ciAuthDirectory, "auth.json"), "utf8"));
     } catch {
       throw new Error("Codex did not create a readable auth.json. No credentials were copied.");
     }
+
     if (!authSchema.safeParse(credentials).success) {
       throw new Error("Codex did not create a ChatGPT login with refresh credentials.");
     }
 
     const [command, ...args] = clipboardCommand();
+
     const clipboard = spawnSync(command, args, {
       env: createSanitizedEnvironment(),
       input: JSON.stringify(credentials),
       stdio: ["pipe", "ignore", "ignore"],
       timeout: 5_000,
     });
+
     if (clipboard.error != null || clipboard.status !== 0) {
       throw new Error(
         `Could not copy credentials using ${command}. Ensure a desktop clipboard is available (pbcopy on macOS, PowerShell on Windows, wl-copy or xclip on Linux), then rerun \`vp run codex:auth\`.`,

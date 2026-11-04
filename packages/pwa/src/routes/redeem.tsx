@@ -24,6 +24,7 @@ export const Route = createFileRoute("/redeem")({
 
 function RedeemCode() {
   const { code } = Route.useSearch();
+
   return <RedemptionPage key={code} initialCode={code} />;
 }
 

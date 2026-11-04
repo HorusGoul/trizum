@@ -37,6 +37,7 @@ const emojiImports: Record<
       import("emojibase-data/en/data.json"),
       import("emojibase-data/en/messages.json"),
     ]);
+
     return { data: data.default, messages: messages.default };
   },
   es: async () => {
@@ -44,6 +45,7 @@ const emojiImports: Record<
       import("emojibase-data/es/data.json"),
       import("emojibase-data/es/messages.json"),
     ]);
+
     return { data: data.default, messages: messages.default };
   },
 };
@@ -53,6 +55,7 @@ const emojiDataCache: Partial<Record<SupportedLocale, Promise<EmojiData>>> = {};
 
 function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
   const cached = emojiDataCache[locale];
+
   if (cached) {
     return cached;
   }
@@ -74,10 +77,13 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
     const groupedEmojis = emojis.reduce(
       (acc, emoji) => {
         const group = emoji.group ?? 0;
+
         if (!acc[group]) {
           acc[group] = [];
         }
+
         acc[group].push(emoji);
+
         return acc;
       },
       {} as Record<number, Emoji[]>,
@@ -101,14 +107,17 @@ function loadEmojiData(locale: SupportedLocale): Promise<EmojiData> {
   })();
 
   emojiDataCache[locale] = promise;
+
   return promise;
 }
 
 function useEmojiData(): EmojiData {
   const { i18n } = useLingui();
+
   const locale = Object.keys(emojiImports).includes(i18n.locale)
     ? (i18n.locale as SupportedLocale)
     : DEFAULT_LOCALE;
+
   return use(loadEmojiData(locale));
 }
 
@@ -143,6 +152,7 @@ export function EmojiPicker({
     if (value === undefined) {
       setInternalValue(emoji);
     }
+
     onChange?.(emoji);
     setSearchQuery("");
     setIsOpen(false);
@@ -228,8 +238,10 @@ function EmojiGridContent({ searchQuery, onSelect }: EmojiGridContentProps) {
     ? emojis.filter((emoji) => {
         const query = searchQuery.toLowerCase();
         const labelMatch = emoji.label?.toLowerCase().includes(query);
+
         const tagsMatch =
           Array.isArray(emoji.tags) && emoji.tags.some((tag) => tag.toLowerCase().includes(query));
+
         return labelMatch || tagsMatch;
       })
     : null;
@@ -378,6 +390,7 @@ function buildVirtualRows(
     rows.push({ type: "header", group });
 
     const categoryEmojis = groupedEmojis[group] || [];
+
     for (let i = 0; i < categoryEmojis.length; i += GRID_COLUMNS) {
       rows.push({
         type: "emojis",
@@ -395,6 +408,7 @@ function getGroupForRowIndex(rows: VirtualRow[], orderedGroups: number[], rowInd
 
   for (let index = boundedIndex; index >= 0; index -= 1) {
     const row = rows[index];
+
     if (row.type === "header") {
       return row.group;
     }
@@ -480,6 +494,7 @@ function CategorizedEmojiGrid({
 
   function scrollToGroup(group: number) {
     const rowIndex = groupStartIndices.get(group);
+
     if (rowIndex !== undefined) {
       listRef.current?.scrollToRow({ align: "start", index: rowIndex });
     }

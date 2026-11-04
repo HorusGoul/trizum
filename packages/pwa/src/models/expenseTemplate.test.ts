@@ -116,6 +116,7 @@ describe("resolveExpenseTemplateValues", () => {
         blair: { type: "divide", value: 1 },
       },
     };
+
     const party = createParty(template);
     party.participants.devon = { id: "devon", name: "Devon" };
 

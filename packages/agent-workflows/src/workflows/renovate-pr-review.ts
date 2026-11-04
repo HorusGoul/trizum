@@ -129,6 +129,7 @@ export const listRenovatePullRequests = createHandler(
         await Promise.all(
           raw.map(async (candidate) => {
             const status = await readPrCheckStatus(options, candidate.number);
+
             return normalizeGhPullRequest(candidate, status);
           }),
         )
@@ -176,11 +177,14 @@ export const gatherPullRequestContext = createHandler(
       const diff = truncateText(redactSecrets(diffResult.stdout), MAX_DIFF_BYTES);
       const files = splitLines(nameResult.stdout);
       const body = redactSecrets(view.body ?? "");
+
       const dependencyUpdates = mergeDependencyUpdates([
         ...parseDependencyUpdatesFromDiff(diff),
         ...parseDependencyUpdatesFromRenovateBody(body),
       ]);
+
       const affectedAreas = inferAffectedAreas(files, dependencyUpdates);
+
       const [usageMatches, dependencyMetadata, failedCheckLogs] = await Promise.all([
         gatherUsageMatches(value.options, dependencyUpdates),
         gatherDependencyMetadata(value.options.repoRoot, dependencyUpdates),
@@ -231,6 +235,7 @@ export const codexReviewPullRequest = createHandler(
     }),
     handle: async ({ value }) => {
       const codex = await maybeRunCodexReview(value.context, value.options);
+
       return {
         ...value,
         codex,
@@ -290,6 +295,7 @@ export async function runRenovatePrReviewWorkflow(
 ): Promise<WorkflowResult> {
   const previousOptions = process.env.TRIZUM_AGENT_WORKFLOWS_OPTIONS_JSON;
   process.env.TRIZUM_AGENT_WORKFLOWS_OPTIONS_JSON = JSON.stringify(options);
+
   try {
     return await runPipeline(createRenovatePrReviewPipeline(), options);
   } finally {
@@ -318,6 +324,7 @@ async function maybeRunCodexReview(
   }
 
   const result = await runSandcastleCodexReview(context, options.repoRoot);
+
   if (result.ran || options.codexMode !== "required") {
     return result;
   }
@@ -411,9 +418,11 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
   if (decision.action === "label-original") {
     await ensureReadyLabel(options);
     await addLabelToIssue(options, context.pr.number, options.readyForHumanReviewLabel);
+
     if (options.postReviewComment) {
       await upsertPullRequestReviewComment(options, context.pr.number, comment);
     }
+
     return {
       decision,
       dryRun: false,
@@ -425,6 +434,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
 
   if (decision.action === "supersede-original" && options.supersede) {
     const supersedingPullRequest = await createSupersedingPullRequest(options, context, report);
+
     return {
       decision,
       dryRun: false,
@@ -448,6 +458,7 @@ async function actOnDecision(decision: ReviewDecision): Promise<WorkflowResult> 
 
 function getWorkflowOptionsFromEnv(): WorkflowOptions {
   const raw = process.env.TRIZUM_AGENT_WORKFLOWS_OPTIONS_JSON;
+
   if (raw == null) {
     throw new Error("Missing TRIZUM_AGENT_WORKFLOWS_OPTIONS_JSON.");
   }
@@ -457,6 +468,7 @@ function getWorkflowOptionsFromEnv(): WorkflowOptions {
 
 async function ghJson<T>(options: WorkflowOptions, ...args: string[]): Promise<T> {
   const result = await gh(options, args);
+
   return JSON.parse(result.stdout) as T;
 }
 
@@ -482,11 +494,13 @@ function withRepoArgsForCommand(options: WorkflowOptions, args: readonly string[
 
 function repositoryApiPath(options: WorkflowOptions, path: string): string {
   const normalizedPath = path.replace(/^\/+/, "");
+
   if (options.repository == null) {
     return `repos/:owner/:repo/${normalizedPath}`;
   }
 
   const [owner, repo, ...extra] = options.repository.split("/");
+
   if (!owner || !repo || extra.length > 0) {
     throw new Error(`Expected repository in owner/name format, received: ${options.repository}`);
   }
@@ -513,11 +527,13 @@ async function readPrCheckStatus(options: WorkflowOptions, prNumber?: number) {
 
   const parsed = result.stdout.trim() ? JSON.parse(result.stdout) : [];
   const checks = checkRunSchema.array().parse(parsed);
+
   return classifyCheckStatus(checks);
 }
 
 async function gatherUsageMatches(options: WorkflowOptions, updates: readonly { name: string }[]) {
   const matches = [];
+
   for (const name of dedupeStrings(updates.map((update) => update.name)).slice(
     0,
     MAX_DEPENDENCY_METADATA,
@@ -545,6 +561,7 @@ async function gatherUsageMatches(options: WorkflowOptions, updates: readonly { 
         cwd: options.repoRoot,
       },
     );
+
     matches.push(...parseRgUsage(result.stdout));
   }
 
@@ -579,6 +596,7 @@ async function gatherDependencyMetadata(
       const raw = JSON.parse(result.stdout) as Record<string, unknown>;
       const repositoryUrl = stringFromUnknown(raw["repository.url"]);
       const bugsUrl = stringFromUnknown(raw["bugs.url"]);
+
       return {
         changelogUrl: inferChangelogUrl(repositoryUrl, bugsUrl),
         homepage: stringFromUnknown(raw.homepage),
@@ -600,6 +618,7 @@ async function gatherFailedCheckLogs(
 
   for (const check of failingChecks.slice(0, 3)) {
     const runId = extractGitHubActionsRunId(check.link);
+
     if (runId == null) {
       logs.push({
         checkName: check.name,
@@ -611,6 +630,7 @@ async function gatherFailedCheckLogs(
     const result = await gh(options, ["run", "view", runId, "--log-failed"], {
       allowFailure: true,
     });
+
     logs.push({
       checkName: check.name,
       log: truncateText(redactSecrets(result.stdout || result.stderr), MAX_LOG_BYTES),
@@ -640,6 +660,7 @@ function inferChangelogUrl(
   bugsUrl: string | undefined,
 ): string | undefined {
   const url = repositoryUrl ?? bugsUrl;
+
   if (url == null) {
     return undefined;
   }
@@ -666,6 +687,7 @@ async function ensureReadyLabel(options: WorkflowOptions): Promise<void> {
     description: "Ready for a human reviewer after agent workflow review.",
     name: options.readyForHumanReviewLabel,
   });
+
   const createResult = await gh(
     options,
     ["api", "--method", "POST", repositoryApiPath(options, "labels"), "--input", "-"],
@@ -749,6 +771,7 @@ async function upsertPullRequestReviewComment(
         }),
       },
     );
+
     return;
   }
 
@@ -779,6 +802,7 @@ async function findExistingPullRequestReviewComment(
     "api",
     repositoryApiPath(options, `issues/${prNumber}/comments?per_page=100`),
   );
+
   const comments = rawComments.map((comment) => ({
     body: comment.body ?? "",
     ...(comment.created_at == null ? {} : { createdAt: comment.created_at }),
@@ -795,6 +819,7 @@ export function selectExistingPullRequestReviewComment(
   const markedComments = comments.filter((comment) =>
     hasReviewCommentMarker(comment.body, prNumber),
   );
+
   if (markedComments.length > 0) {
     return newestPullRequestComment(markedComments);
   }
@@ -806,6 +831,7 @@ export function selectExistingPullRequestReviewComment(
 
 function ensureReviewCommentMarker(prNumber: number, body: string): string {
   const marker = renderReviewCommentMarker(prNumber);
+
   if (body.includes(marker)) {
     return body;
   }
@@ -830,6 +856,7 @@ function newestPullRequestComment(
 ): PullRequestReviewCommentCandidate | undefined {
   return [...comments].sort((left, right) => {
     const createdAtDiff = readCommentTimestamp(left) - readCommentTimestamp(right);
+
     if (createdAtDiff !== 0) {
       return createdAtDiff;
     }
@@ -844,6 +871,7 @@ function readCommentTimestamp(comment: PullRequestReviewCommentCandidate): numbe
   }
 
   const timestamp = Date.parse(comment.createdAt);
+
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
@@ -887,8 +915,10 @@ export function selectExistingSupersedingPullRequest(
 
 function hasSupersedesMarker(body: string, originalPrNumber: number): boolean {
   const marker = `Supersedes #${originalPrNumber}`;
+
   return splitLines(body).some((line) => {
     const normalizedLine = line.trim().replace(/\.$/, "");
+
     return normalizedLine === marker;
   });
 }
@@ -916,12 +946,14 @@ async function createSupersedingPullRequest(
   await ensureReadyLabel(options);
 
   const existingSupersedingPullRequest = await findExistingSupersedingPullRequest(options, context);
+
   if (existingSupersedingPullRequest != null) {
     await addLabelToIssue(
       options,
       existingSupersedingPullRequest.number,
       options.readyForHumanReviewLabel,
     );
+
     const refresh = await refreshExistingSupersedingPullRequest(
       options,
       context,
@@ -950,11 +982,13 @@ async function createSupersedingPullRequest(
       ["fetch", "origin", context.pr.headRefName],
       options.repoRoot,
     );
+
     const originalPrHead = (
       await runCommand("git", ["rev-parse", "FETCH_HEAD"], {
         cwd: options.repoRoot,
       })
     ).stdout.trim();
+
     await runCommand("git", ["branch", branchName, "FETCH_HEAD"], {
       cwd: options.repoRoot,
     });
@@ -965,7 +999,9 @@ async function createSupersedingPullRequest(
       branchName,
       report,
     );
+
     worktreeRoot = sandcastleRun.preservedWorktreePath;
+
     if (worktreeRoot == null) {
       worktreeRoot = await mkdtemp(path.join(tmpdir(), "trizum-renovate-"));
       await runCommand("git", ["worktree", "add", worktreeRoot, branchName], {
@@ -984,6 +1020,7 @@ async function createSupersedingPullRequest(
     const fallbackCommitCreated = await commitPendingAgentChanges(worktreeRoot, context);
     const agentCommits = await ensureCoAuthorOnSupersedingCommits(worktreeRoot, originalPrHead);
     const changedFiles = await listChangedFilesAfter(worktreeRoot, originalPrHead);
+
     const sandcastleSummary = renderSandcastleSummary(
       sandcastleRun,
       fallbackCommitCreated,
@@ -996,6 +1033,7 @@ async function createSupersedingPullRequest(
         worktreeRoot,
       );
       await addLabelToIssue(options, context.pr.number, options.readyForHumanReviewLabel);
+
       if (options.postReviewComment) {
         await upsertPullRequestReviewComment(
           options,
@@ -1031,6 +1069,7 @@ async function createSupersedingPullRequest(
     await runGitWithOptionalCredentials(["push", "-u", "origin", branchName], worktreeRoot);
 
     const bodyPath = path.join(worktreeRoot, ".trizum-superseding-pr-body.md");
+
     const body = renderSupersedingPullRequestBody(
       context,
       report,
@@ -1038,7 +1077,9 @@ async function createSupersedingPullRequest(
       localValidation,
       changedFiles,
     );
+
     await writeFile(bodyPath, body, "utf8");
+
     const createResult = await gh(
       options,
       [
@@ -1060,6 +1101,7 @@ async function createSupersedingPullRequest(
 
     const prUrl = createResult.stdout.trim();
     const supersedingPrNumber = await readPullRequestNumberFromUrl(options, prUrl, worktreeRoot);
+
     if (supersedingPrNumber != null) {
       await addLabelToIssue(options, supersedingPrNumber, options.readyForHumanReviewLabel);
     }
@@ -1097,6 +1139,7 @@ async function refreshExistingSupersedingPullRequest(
       ["fetch", "origin", context.pr.headRefName],
       options.repoRoot,
     );
+
     const originalPrHead = (
       await runCommand("git", ["rev-parse", "FETCH_HEAD"], {
         cwd: options.repoRoot,
@@ -1119,8 +1162,10 @@ async function refreshExistingSupersedingPullRequest(
           output: "Local validation skipped by workflow option.",
           passed: true,
         };
+
     const changedFiles = await listChangedFilesAfter(worktreeRoot, originalPrHead);
     const bodyPath = path.join(worktreeRoot, ".trizum-superseding-pr-body.md");
+
     const body = renderSupersedingPullRequestBody(
       context,
       report,
@@ -1128,6 +1173,7 @@ async function refreshExistingSupersedingPullRequest(
       localValidation,
       changedFiles,
     );
+
     await writeFile(bodyPath, body, "utf8");
     await gh(options, ["pr", "edit", String(existingPullRequest.number), "--body-file", bodyPath], {
       cwd: worktreeRoot,
@@ -1194,6 +1240,7 @@ async function runGitWithOptionalCredentials(
 
 async function runLocalValidation(worktreeRoot: string): Promise<LocalValidationResult> {
   const codexAuthCache = await hideCodexAuthCache();
+
   const commands = [
     ["vp", "install", "--frozen-lockfile"],
     ["vp", "run", "--no-cache", "check"],
@@ -1205,6 +1252,7 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
     ...createSanitizedEnvironment(),
     GIT_TERMINAL_PROMPT: "0",
   };
+
   const output: string[] = [];
   const commandResults: LocalValidationCommandResult[] = [];
   let failedCommand: string | undefined;
@@ -1214,6 +1262,7 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
 
   try {
     await removeWorkspaceNodeModules(worktreeRoot);
+
     for (const [command, ...args] of commands) {
       const result = await runCommand(command, args, {
         allowFailure: true,
@@ -1222,6 +1271,7 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
         envMode: "replace",
         timeoutMs: 30 * 60 * 1000,
       });
+
       output.push(
         [
           `$ ${result.command}`,
@@ -1236,6 +1286,7 @@ async function runLocalValidation(worktreeRoot: string): Promise<LocalValidation
         command: result.command,
         exitCode: result.exitCode,
       });
+
       if (result.exitCode !== 0) {
         passed = false;
         failedCommand = result.command;
@@ -1264,6 +1315,7 @@ async function removeWorkspaceNodeModules(worktreeRoot: string): Promise<void> {
 
   try {
     const packageEntries = await readdir(packageRoot, { withFileTypes: true });
+
     for (const entry of packageEntries) {
       if (entry.isDirectory()) {
         nodeModulesPaths.push(path.join(packageRoot, entry.name, "node_modules"));
@@ -1287,12 +1339,15 @@ async function removeWorkspaceNodeModules(worktreeRoot: string): Promise<void> {
 
 function summarizeCommandFailure(result: CommandResult): string {
   const combinedOutput = stripAnsiCodes(redactSecrets([result.stderr, result.stdout].join("\n")));
+
   const lines = splitLines(combinedOutput)
     .map((line) => line.trimEnd())
     .filter((line) => line.trim().length > 0);
+
   const errorLines = lines.filter((line) =>
     /error|failed|could not|not found|missing|exception/i.test(line),
   );
+
   const summaryLines = (errorLines.length === 0 ? lines.slice(-6) : errorLines.slice(-6)).map(
     (line) => truncateText(line, 500),
   );
@@ -1306,11 +1361,13 @@ function summarizeCommandFailure(result: CommandResult): string {
 
 function stripAnsiCodes(value: string): string {
   const escape = String.fromCharCode(27);
+
   return value.replace(new RegExp(`${escape}\\[[0-?]*[ -/]*[@-~]`, "g"), "");
 }
 
 async function hideCodexAuthCache(): Promise<{ restore: () => Promise<void> }> {
   const codexHome = process.env.CODEX_HOME?.trim();
+
   if (!codexHome) {
     return {
       restore: async () => {},
@@ -1327,11 +1384,13 @@ async function hideCodexAuthCache(): Promise<{ restore: () => Promise<void> }> {
     moved = true;
   } catch (error) {
     await rm(backupRoot, { force: true, recursive: true });
+
     if (isNodeError(error) && error.code === "ENOENT") {
       return {
         restore: async () => {},
       };
     }
+
     throw error;
   }
 
@@ -1359,6 +1418,7 @@ async function commitPendingAgentChanges(
   const status = await runCommand("git", ["status", "--short"], {
     cwd: worktreeRoot,
   });
+
   if (!status.stdout.trim()) {
     return false;
   }
@@ -1369,6 +1429,7 @@ async function commitPendingAgentChanges(
   await runCommand("git", ["commit", "-m", buildFallbackCommitMessage(context.pr.number)], {
     cwd: worktreeRoot,
   });
+
   return true;
 }
 
@@ -1383,6 +1444,7 @@ async function ensureCoAuthorOnSupersedingCommits(
   originalPrHead: string,
 ): Promise<string[]> {
   const commitsBefore = await listCommitsAfter(worktreeRoot, originalPrHead);
+
   if (commitsBefore.length === 0) {
     return [];
   }
@@ -1430,6 +1492,7 @@ async function listCommitsAfter(worktreeRoot: string, baseCommit: string): Promi
   const result = await runCommand("git", ["rev-list", "--reverse", `${baseCommit}..HEAD`], {
     cwd: worktreeRoot,
   });
+
   return splitLines(result.stdout);
 }
 
@@ -1437,6 +1500,7 @@ async function listChangedFilesAfter(worktreeRoot: string, baseCommit: string): 
   const result = await runCommand("git", ["diff", "--name-only", `${baseCommit}..HEAD`], {
     cwd: worktreeRoot,
   });
+
   return splitLines(result.stdout);
 }
 
@@ -1455,6 +1519,7 @@ async function allCommitsHaveCoAuthor(
     const result = await runCommand("git", ["log", "-1", "--format=%B", commit], {
       cwd: worktreeRoot,
     });
+
     if (!splitLines(result.stdout).includes(BOT_COMMIT_CO_AUTHOR_TRAILER)) {
       return false;
     }
@@ -1518,6 +1583,7 @@ function renderReviewReport(decision: ReviewDecision): string {
 function renderReviewComment(decision: ReviewDecision): string {
   const combined = mergeReviewResults(decision.review.deterministic, decision.review.codex);
   const context = decision.review.context;
+
   const updates =
     context.dependencyUpdates.length === 0
       ? "No parsed dependency update."
@@ -1633,6 +1699,7 @@ function renderDependencyUpdateSummary(context: PullRequestContext): string {
 
 function renderAgentFixSummary(agentSummary: string): string {
   const summary = firstParagraph(agentSummary);
+
   if (
     !summary ||
     /^completed and committed\b/i.test(summary) ||
@@ -1650,6 +1717,7 @@ function renderChangedFilesInline(changedFiles: readonly string[]): string {
   }
 
   const visibleFiles = changedFiles.slice(0, 5).map((file) => `\`${file}\``);
+
   if (changedFiles.length <= visibleFiles.length) {
     return visibleFiles.join(", ");
   }
@@ -1674,6 +1742,7 @@ function renderValidationCommandBullets(localValidation: LocalValidationResult):
     .map((command) => {
       const status = command.exitCode === 0 ? "pass" : "fail";
       const exitCode = command.exitCode === 0 ? "" : ` (exit ${command.exitCode})`;
+
       return `- [${status}] \`${command.command}\`${exitCode}`;
     })
     .join("\n");
@@ -1685,8 +1754,10 @@ function renderValidationFailure(localValidation: LocalValidationResult): string
   }
 
   const failedCommand = localValidation.failedCommand ?? "unknown command";
+
   const exitCode =
     localValidation.failedExitCode == null ? "" : ` (exit ${localValidation.failedExitCode})`;
+
   const failureSummary = localValidation.failureSummary?.trim();
 
   return [
@@ -1708,15 +1779,18 @@ function sanitizeMarkdownCodeBlock(value: string): string {
 function extractMarkdownSection(markdown: string, heading: string): string {
   const lines = splitLines(markdown);
   const startIndex = lines.findIndex((line) => line.trim() === `### ${heading}`);
+
   if (startIndex === -1) {
     return "";
   }
 
   const sectionLines: string[] = [];
+
   for (const line of lines.slice(startIndex + 1)) {
     if (line.startsWith("### ")) {
       break;
     }
+
     sectionLines.push(line);
   }
 
@@ -1758,6 +1832,7 @@ function renderFindings(findings: readonly ReviewFinding[]): string {
   return findings
     .map((finding) => {
       const file = finding.file == null ? "" : ` (${finding.file})`;
+
       return `- [${finding.severity}] ${finding.title}${file}: ${finding.details}`;
     })
     .join("\n");
@@ -1772,6 +1847,7 @@ function renderBriefFindings(findings: readonly ReviewFinding[]): string {
     .slice(0, 3)
     .map((finding) => {
       const file = finding.file == null ? "" : ` (${finding.file})`;
+
       return `- [${finding.severity}] ${finding.title}${file}`;
     })
     .concat(
@@ -1793,6 +1869,7 @@ function renderReviewCommentValidation(
   if (automated.length > 0) {
     lines.push(`- Validate: ${automated.join("; ")}`);
   }
+
   if (manual.length > 0) {
     lines.push(`- Smoke test: ${manual.join("; ")}`);
   }

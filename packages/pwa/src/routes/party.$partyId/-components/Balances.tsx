@@ -30,6 +30,7 @@ export function Balances({
   });
 
   const sortedBalancesByParticipant = [];
+
   for (const balance of Object.values(balances)) {
     if (balance.stats.balance !== 0) {
       sortedBalancesByParticipant.push({
@@ -38,6 +39,7 @@ export function Balances({
       });
     }
   }
+
   sortedBalancesByParticipant.sort((a, b) => {
     switch (sortedBy) {
       case "name":

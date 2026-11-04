@@ -42,6 +42,7 @@ function ResetPassword() {
     onSubmit: async ({ value }) => {
       if (!token) {
         toast.error(t`Password reset link is invalid or expired`);
+
         return;
       }
 

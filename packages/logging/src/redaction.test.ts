@@ -17,11 +17,13 @@ describe("document ID redaction at every sink", () => {
   test("does not retain an array subclass's inherited serializer", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const serializer = vi.fn<() => unknown>(() => ({ documentId }));
+
     class Values extends Array<unknown> {
       toJSON() {
         return serializer();
       }
     }
+
     const values = new Values(documentId);
     values.push(values);
     configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
@@ -42,15 +44,18 @@ describe("document ID redaction at every sink", () => {
     const serializer = vi.fn<() => unknown>(() => ({ documentId }));
     const species = vi.fn<() => ArrayConstructor>(() => Array);
     const map = vi.fn<() => unknown[]>(() => [documentId]);
+
     const getter = vi.fn<() => never>(() => {
       throw new Error("getter invoked");
     });
+
     class Values extends Array<unknown> {
       toJSON = serializer;
       static get [Symbol.species]() {
         return species();
       }
     }
+
     const values = new Values(documentId);
     Object.defineProperty(values, "map", { value: map });
     Object.defineProperty(values, "1", { get: getter });
@@ -75,9 +80,11 @@ describe("document ID redaction at every sink", () => {
     "does not invoke custom Error.%s accessors or drop the warning",
     (field) => {
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
       const getter = vi.fn<() => never>(() => {
         throw new Error("getter invoked");
       });
+
       const error = new AggregateError([], "Lookup failed");
       Object.defineProperty(error, field, { configurable: true, get: getter });
       configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
@@ -114,6 +121,7 @@ describe("document ID redaction at every sink", () => {
 
   test("retains stacks when the runtime exposes them through an inherited accessor", async () => {
     const stacks = new WeakMap<Error, string | undefined>();
+
     class InheritedStackError extends Error {
       constructor(message?: string) {
         super(message);
@@ -121,6 +129,7 @@ describe("document ID redaction at every sink", () => {
         delete this.stack;
       }
     }
+
     // Model Firefox's native layout without changing Error.prototype globally.
     Object.defineProperty(InheritedStackError.prototype, "stack", {
       get(this: Error) {
@@ -129,6 +138,7 @@ describe("document ID redaction at every sink", () => {
     });
     vi.stubGlobal("Error", InheritedStackError);
     vi.resetModules();
+
     try {
       const { withDocumentIdRedaction } = await import("./redaction.js");
       const error = new InheritedStackError(`Document ${documentId} is unavailable`);
@@ -163,9 +173,11 @@ describe("document ID redaction at every sink", () => {
       surfaceSinks: ["recording"],
     });
     const cause = new TypeError(`Document ${otherDocumentId} is unavailable`);
+
     const error = new AggregateError([cause], `Document ${documentId} is unavailable`, {
       cause,
     });
+
     error.stack = `${error.name}: ${error.message}\n    at find (repo.js:12:3)`;
     const logger = getTrizumLogger("pwa", documentId).with({ requestId: "request-123" });
 
@@ -204,9 +216,11 @@ describe("document ID redaction at every sink", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const records: LogRecord[] = [];
     const dispose = vi.fn<() => void>();
+
     const sink = Object.assign((record: LogRecord) => records.push(record), {
       [Symbol.dispose]: dispose,
     });
+
     configureTrizumLogging({
       surface: "server",
       consoleFormat: "json",
@@ -230,6 +244,7 @@ describe("document ID redaction at every sink", () => {
     configureTrizumLogging({ surface: "pwa", consoleFormat: "json" });
     const date = new Date("2026-01-01T00:00:00Z");
     date.toJSON = () => documentId;
+
     const payload: Record<string, unknown> = {
       documentId,
       toJSON: () => ({ secret: documentId }),
@@ -238,6 +253,7 @@ describe("document ID redaction at every sink", () => {
       count: 2,
       date,
     };
+
     payload.self = payload;
     Object.defineProperty(payload, "unsafe", {
       enumerable: true,

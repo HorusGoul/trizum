@@ -187,6 +187,7 @@ function getDestinationPartyOptions(
   return eligibleDestinationParties.map((entry) => {
     const otherParticipants = entry.otherParticipants;
     const participantById = new Map<string, PartyParticipant>();
+
     for (const participant of otherParticipants) {
       participantById.set(participant.id, participant);
     }
@@ -195,12 +196,15 @@ function getDestinationPartyOptions(
       sourceName,
       participants: otherParticipants,
     });
+
     const exactMatchParticipant =
       participantById.get(participantMatch.exactMatchParticipantId ?? "") ?? null;
+
     const recommendedParticipants: PartyParticipant[] = [];
 
     for (const participantId of participantMatch.recommendedParticipantIds) {
       const participant = participantById.get(participantId);
+
       if (participant) {
         recommendedParticipants.push(participant);
       }
@@ -266,32 +270,41 @@ function useTransferDebtRouteView() {
     destinationPartyOptions,
     createInitialTransferDebtState,
   );
+
   const selectedDestinationParty = destinationPartyOptions.find(
     ({ id }) => id === state.destinationPartyId,
   );
+
   const destinationParticipants = selectedDestinationParty?.otherParticipants ?? [];
+
   const priorityDestinationParticipants = selectedDestinationParty
     ? [
         selectedDestinationParty.exactMatchParticipant,
         ...selectedDestinationParty.recommendedParticipants,
       ].filter((participant): participant is PartyParticipant => !!participant)
     : [];
+
   const priorityDestinationParticipantIds = new Set(
     priorityDestinationParticipants.map(({ id }) => id),
   );
+
   const orderedDestinationParticipants = [
     ...priorityDestinationParticipants,
     ...destinationParticipants.filter(({ id }) => !priorityDestinationParticipantIds.has(id)),
   ];
+
   const hasSelectedDestinationParticipant = destinationParticipants.some(
     ({ id }) => id === state.destinationParticipantId,
   );
+
   const selectedDestinationParticipantId = hasSelectedDestinationParticipant
     ? state.destinationParticipantId
     : "";
+
   const selectedDestinationCounterparty = destinationParticipants.find(
     (participant) => participant.id === selectedDestinationParticipantId,
   );
+
   const canTransfer =
     !!selectedDestinationParty &&
     !!selectedDestinationCounterparty &&
@@ -322,6 +335,7 @@ function useTransferDebtRouteView() {
   const destinationPartyName = selectedDestinationParty?.entry.party.name ?? "";
   const destinationCurrentParticipantName = selectedDestinationParty?.currentParticipant.name ?? "";
   const selectedDestinationCounterpartyName = selectedDestinationCounterparty?.name ?? "";
+
   const activeStep = getVisibleTransferStep({
     step: state.step,
     hasSelectedDestinationParty: !!selectedDestinationParty,
@@ -334,11 +348,13 @@ function useTransferDebtRouteView() {
       : activeStep === "success"
         ? t`Debt transferred`
         : t`Transfer debt`;
+
   const previousStep = getPreviousTransferStep({
     activeStep,
     partySelectionPrefilled: state.partySelectionPrefilled,
     participantSelectionPrefilled: state.participantSelectionPrefilled,
   });
+
   const onBackPress = previousStep
     ? () => {
         dispatch({ type: "stepRequested", step: previousStep });

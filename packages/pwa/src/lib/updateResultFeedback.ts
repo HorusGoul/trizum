@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 export function showUpdateResultFeedback(result: UpdateResult): void {
   const message = getUpdateResultFeedbackMessage(result);
+
   if (message) {
     toast.error(message);
   }

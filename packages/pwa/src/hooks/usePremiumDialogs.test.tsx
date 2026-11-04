@@ -8,14 +8,17 @@ import { toast } from "sonner";
 import { usePremiumDialogs } from "./usePremiumDialogs.ts";
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn<typeof toast.error>() } }));
+
 let root: Root;
 let container: HTMLDivElement;
 const dialogHandle = createRef<ReturnType<typeof usePremiumDialogs>>();
 
 function dialogs() {
   if (!dialogHandle.current) throw new Error("Dialog probe is not mounted");
+
   return dialogHandle.current;
 }
+
 const dismissals: Array<() => void> = [];
 const presentPaywall = vi.fn<() => Promise<void>>();
 
@@ -30,6 +33,7 @@ function Probe({
 }) {
   const value = usePremiumDialogs({ userId, isNative, presentPaywall });
   useImperativeHandle(ref, () => value, [value]);
+
   return <output>{value.dialog.kind}</output>;
 }
 

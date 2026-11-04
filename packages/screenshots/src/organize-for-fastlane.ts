@@ -106,6 +106,7 @@ function parseOptions(): OrganizeScreenshotsOptions {
   }
 
   const platform = values.platform as Platform;
+
   if (platform !== "ios" && platform !== "android") {
     logger.error('Invalid platform; expected "ios" or "android"');
     process.exit(1);
@@ -127,6 +128,7 @@ async function getScreenshotFiles(
 
   try {
     const files = await readdir(deviceDir);
+
     return files.filter((f) => f.endsWith(".png"));
   } catch {
     return [];
@@ -137,11 +139,13 @@ function getScreenshotIndex(filename: string): number {
   // Extract the name from filename (e.g., "expense-log.portrait.png" -> "expense-log")
   const name = filename.split(".")[0];
   const index = STORE_SCREENSHOT_ORDER.indexOf(name as (typeof STORE_SCREENSHOT_ORDER)[number]);
+
   return index === -1 ? 999 : index;
 }
 
 export function compareScreenshotFilenames(a: string, b: string): number {
   const orderDifference = getScreenshotIndex(a) - getScreenshotIndex(b);
+
   return orderDifference || (a < b ? -1 : a > b ? 1 : 0);
 }
 
@@ -152,6 +156,7 @@ async function organizeForIOS(
 ): Promise<void> {
   for (const locale of locales) {
     const appStoreLocales = IOS_LOCALE_MAPPING[locale];
+
     if (!appStoreLocales) {
       logger.warning("Unknown locale {locale}; skipping", { locale });
       continue;
@@ -163,6 +168,7 @@ async function organizeForIOS(
 
     for (const device of devices) {
       const deviceFrame = IOS_DEVICE_FRAME_MAPPING[device];
+
       if (deviceFrame === null) {
         logger.info("Skipping {locale}/{device}; not for iOS", {
           locale,
@@ -170,12 +176,14 @@ async function organizeForIOS(
         });
         continue;
       }
+
       if (deviceFrame === undefined) {
         logger.warning("Unknown device {device}; skipping", { device, locale });
         continue;
       }
 
       const files = await getScreenshotFiles(screenshotsDirectory, locale, device);
+
       if (files.length === 0) {
         logger.warning("No screenshots found for {locale}/{device}", {
           locale,
@@ -224,6 +232,7 @@ async function organizeForAndroid(
 ): Promise<void> {
   for (const locale of locales) {
     const playStoreLocales = ANDROID_LOCALE_MAPPING[locale];
+
     if (!playStoreLocales) {
       logger.warning("Unknown locale {locale}; skipping", { locale });
       continue;
@@ -245,6 +254,7 @@ async function organizeForAndroid(
 
     for (const device of devices) {
       const screenshotTypes = ANDROID_DEVICE_MAPPING[device];
+
       if (screenshotTypes === null) {
         logger.info("Skipping {locale}/{device}; not for Android", {
           locale,
@@ -252,12 +262,14 @@ async function organizeForAndroid(
         });
         continue;
       }
+
       if (screenshotTypes === undefined) {
         logger.warning("Unknown device {device}; skipping", { device, locale });
         continue;
       }
 
       const files = await getScreenshotFiles(screenshotsDirectory, locale, device);
+
       if (files.length === 0) {
         logger.warning("No screenshots found for {locale}/{device}", {
           locale,
@@ -279,6 +291,7 @@ async function organizeForAndroid(
             "images",
             screenshotType,
           );
+
           await mkdir(screenshotsOutputDir, { recursive: true });
 
           for (let i = 0; i < files.length; i++) {
@@ -310,6 +323,7 @@ async function organizeForAndroid(
 export async function organizeScreenshots(options: OrganizeScreenshotsOptions): Promise<void> {
   const outputDir = path.resolve(options.output);
   const screenshotsDirectory = path.resolve(options.screenshotsDirectory ?? SCREENSHOTS_DIR);
+
   const featureGraphicsDirectory = path.resolve(
     options.featureGraphicsDirectory ?? FEATURE_GRAPHICS_DIR,
   );
@@ -323,6 +337,7 @@ export async function organizeScreenshots(options: OrganizeScreenshotsOptions): 
   // Clean output directory if requested
   if (options.clean) {
     logger.info("Cleaning output directory");
+
     if (options.platform === "ios") {
       await rm(outputDir, { recursive: true, force: true });
     } else {

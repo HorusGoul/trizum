@@ -75,5 +75,6 @@ function getInitials(name: string) {
 
 function getColorScheme(name: string) {
   const initials = getInitials(name);
+
   return colorSchemes[initials.charCodeAt(0) % colorSchemes.length];
 }

@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 
 const destination = process.argv[2];
+
 if (!destination) {
   throw new Error("Usage: node scripts/copy-profiler.ts <node_modules destination>");
 }
@@ -16,11 +17,13 @@ function copyPackage(manifestPath: string, nodeModules: string) {
     name: string;
     dependencies?: Record<string, string>;
   };
+
   const target = resolve(nodeModules, manifest.name);
   mkdirSync(dirname(target), { recursive: true });
   cpSync(dirname(manifestPath), target, { recursive: true });
 
   const dependencyRequire = createRequire(manifestPath);
+
   for (const dependency of Object.keys(manifest.dependencies ?? {})) {
     copyPackage(
       dependencyRequire.resolve(`${dependency}/package.json`),

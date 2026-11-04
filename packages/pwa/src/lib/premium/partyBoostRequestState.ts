@@ -18,6 +18,7 @@ export class PartyBoostRequestGate {
   beginRead(context: string) {
     this.enterContext(context);
     this.#latestRequest += 1;
+
     return { context, request: this.#latestRequest };
   }
 
@@ -32,6 +33,7 @@ export class PartyBoostRequestGate {
     }
 
     this.#latestRequest += 1;
+
     return true;
   }
 

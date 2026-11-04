@@ -35,11 +35,13 @@ export function PremiumCodeRedemption({
 }) {
   const isOnline = useOnlineStatus();
   const platform = getRevenueCatPlatform();
+
   const devicePlatform =
     platform ??
     (typeof navigator === "undefined"
       ? undefined
       : detectRedemptionPlatform(navigator.userAgent, navigator.maxTouchPoints));
+
   const platforms = devicePlatform ? [devicePlatform] : (["ios", "android"] as const);
 
   async function redeem() {

@@ -11,6 +11,7 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const didCheckForUpdateRef = useRef(false);
   const [isUpdating, setIsUpdating] = useState(false);
+
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
@@ -38,13 +39,16 @@ export function UpdateController({ children }: { children: React.ReactNode }) {
   async function update(): Promise<UpdateResult> {
     setIsUpdating(true);
     showUpdatingToast();
+
     try {
       await updateServiceWorker(true);
+
       return { status: "started" };
     } catch {
       toast.dismiss(UPDATE_TOAST_ID);
       // oxlint-disable-next-line react-doctor/no-loading-flag-reset-outside-finally -- Failure resets here; success stays busy until the service-worker reload.
       setIsUpdating(false);
+
       return { status: "failed" };
     }
   }

@@ -13,9 +13,11 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 
 export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   const repo = useRepo();
+
   const [party] = useSuspenseDocument<Party>(partyId, {
     required: true,
   });
+
   const chunkIds = party.chunkRefs.map((chunkRef) => chunkRef.chunkId);
   const visibleChunkIdsToLoad = getVisiblePartyExpenseChunkIdsToLoad(repo, chunkIds);
   const snapshotRef = useRef<PartyPaginatedExpensesSnapshot | undefined>(undefined);
@@ -27,6 +29,7 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
   useEffect(() => {
     if (visibleChunkIdsToLoad.length === 0) {
       requestedVisibleChunkIdsKeyRef.current = "";
+
       return;
     }
 
@@ -53,6 +56,7 @@ export function usePartyPaginatedExpenses(partyId: Party["id"]) {
       }
 
       snapshotRef.current = nextSnapshot;
+
       return nextSnapshot;
     },
   );

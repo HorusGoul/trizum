@@ -15,6 +15,7 @@ vi.mock("@ai-hero/sandcastle", async (importOriginal) => ({
   ...(await importOriginal<typeof SandcastleModule>()),
   run: vi.fn<typeof run>(),
 }));
+
 vi.mock("./exec.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ExecModule>()),
   runCommand: vi.fn<typeof runCommand>(),
@@ -102,6 +103,7 @@ test.each(["review", "repair"])(
     vi.mocked(run).mockImplementation(realRun);
     vi.mocked(runCommand).mockImplementation(realRunCommand);
     const directory = await mkdtemp(path.join(tmpdir(), "trizum-codex-boundary-"));
+
     try {
       execFileSync("git", ["init", "-b", "main", directory], { stdio: "ignore" });
       execFileSync(
@@ -134,10 +136,12 @@ process.exitCode = 1;
       );
       await writeFile(path.join(directory, "vp"), "#!/bin/sh\nexit 0\n", { mode: 0o700 });
       vi.stubEnv("PATH", `${directory}:${process.env.PATH}`);
+
       const result =
         mode === "review"
           ? runSandcastleCodexReview(context, directory)
           : runSandcastleCodexFix(context, directory, "agent/fix");
+
       await expect(result).rejects.toThrow("CI login needs renewal");
     } finally {
       vi.unstubAllEnvs();

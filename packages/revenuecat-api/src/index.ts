@@ -7,6 +7,7 @@ import type {
 
 const REVENUECAT_API_URL = "https://api.revenuecat.com/v2";
 const PAGE_SIZE = 100;
+
 export type RevenueCatEnvironment = "production" | "sandbox";
 
 interface RevenueCatPage<T> {
@@ -59,6 +60,7 @@ export function createRevenueCatApiClient({
       const customersUrl = `${REVENUECAT_API_URL}/projects/${encodeURIComponent(projectId)}/customers`;
       const customerUrl = `${customersUrl}/${encodeURIComponent(customerId)}`;
       const signal = AbortSignal.timeout(10_000);
+
       async function request(url: string, method: "DELETE" | "GET") {
         try {
           const response = await fetcher(url, {
@@ -66,7 +68,9 @@ export function createRevenueCatApiClient({
             headers: { Authorization: `Bearer ${secretApiKey}`, Accept: "application/json" },
             signal,
           });
+
           const body: unknown = await response.json();
+
           return { response, body };
         } catch {
           throw new RevenueCatApiError("RevenueCat customer deletion could not be confirmed.");
@@ -74,18 +78,23 @@ export function createRevenueCatApiClient({
       }
 
       const { response, body } = await request(customerUrl, "DELETE");
+
       if (response.status === 404 && isMissingCustomerError(body)) {
         return;
       }
+
       if (response.status === 404 && isUnscopedMissingResourceError(body)) {
         // Error.param is optional. Confirm absence separately, then verify that
         // the project is accessible without needing extra project permissions.
         const customer = await request(customerUrl, "GET");
+
         if (customer.response.status === 404 && isMissingCustomerError(customer.body)) {
           return;
         }
+
         if (customer.response.status === 404 && isUnscopedMissingResourceError(customer.body)) {
           const project = await request(`${customersUrl}?limit=1`, "GET");
+
           if (
             project.response.status === 200 &&
             isRecord(project.body) &&
@@ -209,6 +218,7 @@ function parsePageResponse<T>(
   }
 
   assertRecord(data, `${resourceName} list`);
+
   if (
     !Array.isArray(data.items) ||
     (data.next_page !== undefined && data.next_page !== null && typeof data.next_page !== "string")
@@ -236,11 +246,13 @@ async function listAllRevenueCatResources<T>(
 
   for (;;) {
     const page = await loadPage(startingAfter);
+
     if (!page) {
       return null;
     }
 
     resources.push(...page.items);
+
     if (!page.next_page) {
       return resources;
     }
@@ -248,6 +260,7 @@ async function listAllRevenueCatResources<T>(
     const nextCursor = new URL(page.next_page, REVENUECAT_API_URL).searchParams.get(
       "starting_after",
     );
+
     if (!nextCursor || cursors.has(nextCursor)) {
       throw new RevenueCatApiError("RevenueCat returned invalid resource pagination.");
     }
@@ -263,6 +276,7 @@ function isEligibleSubscription(
   environment: RevenueCatEnvironment,
 ) {
   assertRecord(subscription, "subscription");
+
   if (
     typeof subscription.gives_access !== "boolean" ||
     typeof subscription.ownership !== "string" ||
@@ -286,6 +300,7 @@ function isEligiblePurchase(
   environment: RevenueCatEnvironment,
 ) {
   assertRecord(purchase, "purchase");
+
   if (
     typeof purchase.status !== "string" ||
     typeof purchase.ownership !== "string" ||
@@ -315,12 +330,14 @@ function isEligibleEnvironment(
 
 function hasActiveEntitlement(value: unknown, entitlementLookupKey: string) {
   assertRecord(value, "entitlements");
+
   if (!Array.isArray(value.items)) {
     throw new RevenueCatApiError("RevenueCat returned invalid entitlements.");
   }
 
   return value.items.some((entitlement: unknown) => {
     assertRecord(entitlement, "entitlement");
+
     if (typeof entitlement.lookup_key !== "string" || typeof entitlement.state !== "string") {
       throw new RevenueCatApiError("RevenueCat returned an invalid entitlement.");
     }

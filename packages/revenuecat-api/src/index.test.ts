@@ -185,6 +185,7 @@ function createFetcher({
 
     const url = new URL(request.url);
     const isSubscriptions = url.pathname.endsWith("/subscriptions");
+
     if (isSubscriptions && subscriptionStatus !== 200) {
       return createJsonResponse({ object: "error" }, subscriptionStatus);
     }
@@ -192,6 +193,7 @@ function createFetcher({
     const pages = isSubscriptions ? subscriptions : purchases;
     const pageIndex = url.searchParams.has("starting_after") ? 1 : 0;
     const items = pages[pageIndex] ?? [];
+
     const nextPage =
       pageIndex + 1 < pages.length
         ? `${url.pathname}${invalidPagination ? "" : "?starting_after=next"}`

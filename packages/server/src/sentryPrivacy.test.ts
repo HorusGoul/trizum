@@ -24,6 +24,7 @@ test("redacts server exceptions, causes, scope attributes, and formatted logs be
     transport: () => ({
       send: async (envelope) => {
         envelopes.push(envelope);
+
         return { statusCode: 200 };
       },
       flush: async () => true,

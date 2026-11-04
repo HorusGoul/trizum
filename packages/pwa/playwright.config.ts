@@ -9,6 +9,7 @@ const host = "127.0.0.1";
 const localBaseURL = `http://${host}:${port}`;
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 const cwd = path.dirname(fileURLToPath(import.meta.url));
+
 const webServerCommand = [
   ...(process.env.PLAYWRIGHT_SKIP_BUILD === "true"
     ? []

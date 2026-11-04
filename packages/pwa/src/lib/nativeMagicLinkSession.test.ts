@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vite-plus/tes
 vi.mock("@capacitor/core", () => ({
   Capacitor: { isNativePlatform: () => true },
 }));
+
 vi.mock("./log.ts", () => ({ getLogger: () => ({ warning() {} }) }));
 
 const user = { id: "magic-link-user", email: "alex@example.com", name: "Alex" };
@@ -10,9 +11,11 @@ const magicLink = "https://trizum.app/api/auth/magic-link/verify?token=test-magi
 
 function deferredResponse() {
   let resolve!: (response: Response) => void;
+
   const promise = new Promise<Response>((complete) => {
     resolve = complete;
   });
+
   return { promise, resolve };
 }
 

@@ -45,13 +45,16 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
     // Validate file type
     if (!isSupportedImageFile(file)) {
       toast.error(t`Please select an image file`);
+
       return;
     }
 
     // Validate file size (max 10MB)
     const maxSize = 10 * 1024 * 1024; // 10MB
+
     if (file.size > maxSize) {
       toast.error(t`Image must be smaller than 10MB`);
+
       return;
     }
 
@@ -84,6 +87,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
 
   async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+
     if (!file) return;
 
     await updateAvatarFromFile(file).finally(() => {
@@ -101,10 +105,12 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
   async function openCamera() {
     if (!shouldUseNativeCameraCapture()) {
       cameraInputRef.current?.click();
+
       return;
     }
 
     let file: File;
+
     try {
       file = await getNativeCameraCaptureFile();
     } catch (error) {
@@ -112,6 +118,7 @@ export function AvatarPicker({ value, name, onChange, className }: AvatarPickerP
         logger.error("Failed to capture avatar", { error });
         toast.error(t`Failed to access camera`);
       }
+
       return;
     }
 

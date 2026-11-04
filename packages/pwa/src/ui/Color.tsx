@@ -128,6 +128,7 @@ function ColorSwatch({ className, ...props }: AriaColorSwatchProps) {
 }
 
 export type { ColorWheelProps };
+
 export {
   ColorSlider,
   ColorField,

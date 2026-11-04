@@ -15,6 +15,7 @@ export function createExternallyManagedCache<Params extends Array<any>, Value>(
   },
 ): ExternallyManagedCache<Params, Value> {
   const { timeout, timeoutMessage = "Timed out", ...rest } = options;
+
   const decoratedCache = createCache<Params, Value>({
     ...rest,
     load: (_params, loadOptions) =>
@@ -30,8 +31,10 @@ export function createExternallyManagedCache<Params extends Array<any>, Value>(
         }, timeout);
       }),
   });
+
   const { __getKey, __getOrCreateRecord, __notifySubscribers, __recordMap } =
     decoratedCache as InternalCache<Params, Value>;
+
   const api: Omit<Cache<Params, Value>, "cache"> = {
     abort: (...params) => decoratedCache.abort(...params),
     evict: (...params) => decoratedCache.evict(...params),

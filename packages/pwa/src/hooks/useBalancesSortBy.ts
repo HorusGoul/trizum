@@ -11,6 +11,7 @@ function isBalanceSortedBy(sortedBy: string): sortedBy is BalancesSortedBy {
 export function useBalancesSortedBy(): [BalancesSortedBy, (sorted: BalancesSortedBy) => void] {
   const { setParticipantDetails } = useCurrentParty();
   const participant = useCurrentParticipant();
+
   const sortedBy =
     participant.balancesSortedBy && isBalanceSortedBy(participant.balancesSortedBy)
       ? participant.balancesSortedBy

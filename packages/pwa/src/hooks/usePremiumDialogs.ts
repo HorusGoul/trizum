@@ -19,6 +19,7 @@ export function usePremiumDialogs({
 }) {
   const [dialog, setDialog] = useState<PremiumDialog>({ kind: "closed" });
   const readyPremium = dialog.kind === "premium" && dialog.userId === userId ? dialog : null;
+
   const openPaywall = useEffectEvent(async () => {
     try {
       await presentPaywall();
@@ -48,6 +49,7 @@ export function usePremiumDialogs({
   function signedIn(authenticatedUserId: string) {
     setDialog((current) => {
       if (current !== dialog || current.kind !== "signIn") return current;
+
       return current.intent === "premium"
         ? { kind: "premium", userId: authenticatedUserId }
         : { kind: "closed" };

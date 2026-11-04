@@ -20,6 +20,7 @@ describe("AdMob release configuration", () => {
     const config = JSON.parse(
       await readFile(new URL("admob.config.json", packageRoot), "utf8"),
     ) as AdMobConfig;
+
     const adUnitIds = new Set<string>();
 
     for (const environment of [config.test, config.live]) {

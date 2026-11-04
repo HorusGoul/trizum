@@ -73,6 +73,7 @@ describe("Tricount migration contract", () => {
         },
       ],
     };
+
     stubUpstream(upstream);
     const response = await apiMigrateRoute.request("/?key=test-key");
     expect(response.status).toBe(500);
@@ -97,6 +98,7 @@ function stubUpstream(data: unknown) {
           Response: [{ Token: { token: "test-token" } }, { UserPerson: { id: 1 } }],
         });
       }
+
       return Response.json(data);
     }),
   );

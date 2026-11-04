@@ -49,28 +49,33 @@ export async function getNativeAppUpdateState({
 } = {}): Promise<NativeAppUpdateState> {
   if (platform === "android") {
     const androidUpdateSupport = await getAndroidUpdateSupport(nativeUpdateEnvironment);
+
     if (!androidUpdateSupport.supportsGooglePlayInAppUpdates) {
       return { isUpdateAvailable: false };
     }
 
     try {
       const result = await nativeUpdateEnvironment.getAndroidAppUpdateInfo();
+
       return {
         isUpdateAvailable: isNativeUpdateAvailable(result, platform),
       };
     } catch (error) {
       logger.warning("Native Android app update check failed", { error });
+
       return { isUpdateAvailable: false };
     }
   }
 
   try {
     const result = await appUpdate.getAppUpdateInfo();
+
     return {
       isUpdateAvailable: isNativeUpdateAvailable(result, platform),
     };
   } catch (error) {
     logger.warning("Native app update check failed", { error });
+
     return { isUpdateAvailable: false };
   }
 }
@@ -89,20 +94,24 @@ export async function performNativeAppUpdate({
       await appUpdate.openAppStore({
         appId: "6755971747",
       });
+
       return { status: "started" };
     }
 
     if (platform === "android") {
       const androidUpdateSupport = await getAndroidUpdateSupport(nativeUpdateEnvironment);
+
       if (!androidUpdateSupport.supportsGooglePlayInAppUpdates) {
         return { status: "unavailable" };
       }
 
       const result = await nativeUpdateEnvironment.getAndroidAppUpdateInfo();
       const readiness = getAndroidImmediateUpdateReadiness(result);
+
       if (readiness === "not-allowed") {
         return { status: "not-allowed" };
       }
+
       if (readiness === "unavailable") {
         return { status: "unavailable" };
       }
@@ -129,11 +138,13 @@ export async function resumeNativeAppUpdate({
 
   try {
     const androidUpdateSupport = await getAndroidUpdateSupport(nativeUpdateEnvironment);
+
     if (!androidUpdateSupport.supportsGooglePlayInAppUpdates) {
       return { status: "unavailable" };
     }
 
     const result = await nativeUpdateEnvironment.getAndroidAppUpdateInfo();
+
     if (result.updateAvailability !== AppUpdateAvailability.UPDATE_IN_PROGRESS) {
       return { status: "unavailable" };
     }
@@ -141,6 +152,7 @@ export async function resumeNativeAppUpdate({
     return await performAndroidImmediateUpdate(nativeUpdateEnvironment);
   } catch (error) {
     logger.warning("Native app update resume failed", { error });
+
     return { status: "failed" };
   }
 }
@@ -152,6 +164,7 @@ async function getAndroidUpdateSupport(
     return await nativeUpdateEnvironment.getAndroidUpdateSupport();
   } catch (error) {
     logger.warning("Android update support check failed", { error });
+
     return {
       hasAvailableGooglePlayServices: false,
       hasGooglePlayServices: false,
@@ -174,6 +187,7 @@ function performAndroidImmediateUpdate(
     .then(mapAppUpdateResult)
     .catch((error: unknown) => {
       logger.warning("Native Android immediate update failed", { error });
+
       return { status: "failed" } satisfies NativeAppUpdateResult;
     })
     .finally(() => {
@@ -238,5 +252,6 @@ function mapAppUpdateResult(result: AppUpdateResult): NativeAppUpdateResult {
   }
 
   logger.warning("Native app update did not start", { result });
+
   return { status: "failed" };
 }

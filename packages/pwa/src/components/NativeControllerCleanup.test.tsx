@@ -17,6 +17,7 @@ import type {
 } from "#src/lib/nativeAppUpdate.ts";
 
 const addListener = vi.hoisted(() => vi.fn<() => Promise<PluginListenerHandle>>());
+
 const coordinators = vi.hoisted(
   () =>
     [] as {
@@ -27,13 +28,16 @@ const coordinators = vi.hoisted(
 );
 
 vi.mock("@capacitor/app", () => ({ App: { addListener } }));
+
 vi.mock("@capacitor/core", async (importOriginal) => ({
   ...(await importOriginal<typeof CapacitorCore>()),
   Capacitor: { getPlatform: () => "android", isNativePlatform: () => true },
 }));
+
 vi.mock("#src/lib/advertising/adMobSdk.ts", () => ({
   createAdMobSdk: vi.fn<typeof createAdMobSdk>(),
 }));
+
 vi.mock("#src/lib/nativeAppUpdate.ts", () => ({
   getNativeAppUpdateState: vi
     .fn<typeof getNativeAppUpdateState>()
@@ -45,6 +49,7 @@ vi.mock("#src/lib/nativeAppUpdate.ts", () => ({
     .fn<typeof performNativeAppUpdate>()
     .mockResolvedValue({ status: "unavailable" }),
 }));
+
 vi.mock("#src/lib/advertising/AdvertisingCoordinator.ts", () => ({
   AdvertisingCoordinator: class {
     destroy = vi.fn<Coordinator["destroy"]>().mockResolvedValue(undefined);
@@ -65,9 +70,11 @@ let unmounted: boolean;
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
+
   const promise = new Promise<T>((resolvePromise) => {
     resolve = resolvePromise;
   });
+
   return { promise, resolve };
 }
 
@@ -80,6 +87,7 @@ async function render(kind: "updates" | "advertising", strict = false) {
         <AdvertisingController protectedFlow>{null}</AdvertisingController>
       </AdEntitlementContext>
     );
+
   await act(async () => root.render(strict ? <StrictMode>{controller}</StrictMode> : controller));
 }
 
@@ -117,6 +125,7 @@ it.each([
     addListener.mockReturnValue(registration.promise);
     await render(kind);
     expect(addListener).toHaveBeenCalledOnce();
+
     if (!late) await act(async () => registration.resolve({ remove }));
     expect(remove).not.toHaveBeenCalled();
 
@@ -132,6 +141,7 @@ it.each([
       })),
     ).toEqual(kind === "advertising" ? [{ destroyed: 1, protected: true, adFree: true }] : []);
     expect(remove).toHaveBeenCalledTimes(late ? 0 : 1);
+
     if (late) await act(async () => registration.resolve({ remove }));
     expect(remove).toHaveBeenCalledOnce();
   },

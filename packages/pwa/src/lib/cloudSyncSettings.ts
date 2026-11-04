@@ -2,6 +2,7 @@ import { isValidDocumentId } from "@automerge/automerge-repo/slim";
 import type { PartyList } from "#src/models/partyList.js";
 import { CloudSyncApiError, trizumApiClient } from "./trizumApiClient";
 import type { CloudUserSettings, CloudUserSettingsInput } from "./api/cloudSyncContract";
+
 export type { CloudUserSettings, CloudUserSettingsInput } from "./api/cloudSyncContract";
 
 const CLOUD_USER_SETTINGS_CACHE_KEY_PREFIX = "trizumCloudUserSettings:v1:";
@@ -25,6 +26,7 @@ export async function fetchCloudUserSettings() {
     if (error instanceof CloudSyncApiError && error.status === 401) {
       return { settings: null, status: "unauthenticated" as const };
     }
+
     throw new Error("Failed to load trizum cloud settings.", { cause: error });
   }
 }
@@ -36,6 +38,7 @@ export async function saveCloudUserSettings(settings: CloudUserSettingsInput) {
     if (error instanceof CloudSyncApiError && error.status === 401) {
       throw new Error("Sign in before syncing settings.", { cause: error });
     }
+
     throw new Error("Failed to save trizum cloud settings.", { cause: error });
   }
 }

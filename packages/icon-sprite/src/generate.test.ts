@@ -78,6 +78,7 @@ describe("generateIconSpriteArtifacts", () => {
       path.join(rootDir, "src/generated/iconSprite.gen.ts"),
       "utf8",
     );
+
     const spriteSource = fs.readFileSync(
       path.join(rootDir, "src/generated/iconSprite.svg"),
       "utf8",

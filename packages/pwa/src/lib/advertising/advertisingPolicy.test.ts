@@ -34,6 +34,7 @@ describe("advertising policy", () => {
 
   it("shares one cooldown across full-screen formats", () => {
     const shownAt = 10_000;
+
     const history = recordFullScreenAdShown(
       { ...createAdHistory(), firstUseCompleted: true },
       shownAt,

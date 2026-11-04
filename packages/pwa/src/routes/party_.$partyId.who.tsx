@@ -74,6 +74,7 @@ function Who() {
 
     if (search.redirectTo) {
       void navigate({ href: search.redirectTo, replace: true });
+
       return;
     }
 

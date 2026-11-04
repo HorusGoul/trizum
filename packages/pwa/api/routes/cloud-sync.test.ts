@@ -14,6 +14,7 @@ const { getSession, select, insert, limit, values, onConflictDoNothing } = vi.ho
 }));
 
 vi.mock("../auth", () => ({ createAuth: () => ({ api: { getSession } }) }));
+
 vi.mock("../db/client", async (importOriginal) => ({
   ...(await importOriginal<typeof DbClient>()),
   getApiDb: () => ({ select, insert }),
@@ -81,10 +82,12 @@ describe("Cloud Sync contract", () => {
   test("repeated setup keeps the original timestamp and does not write", async () => {
     const settings = { partyListDocumentId: documentId(), updatedAt: 123 };
     limit.mockResolvedValue([settings]);
+
     const response = await request(
       "PUT",
       JSON.stringify({ partyListDocumentId: settings.partyListDocumentId }),
     );
+
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ settings });
     expect(insert).not.toHaveBeenCalled();
@@ -94,6 +97,7 @@ describe("Cloud Sync contract", () => {
     "rejects a different document, including an insert race (%s)",
     async (race) => {
       const existing = { partyListDocumentId: documentId(), updatedAt: 123 };
+
       if (race) limit.mockResolvedValueOnce([]);
       limit.mockResolvedValue([existing]);
       const response = await request("PUT", JSON.stringify({ partyListDocumentId: documentId() }));

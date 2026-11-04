@@ -18,6 +18,7 @@ export function IdleState({ onSubmit }: { onSubmit: (values: MigrateParams) => v
     },
     onSubmit: ({ value }) => {
       const key = extractTricountId(value.key);
+
       if (!key) {
         throw new Error(t`Invalid tricount URL or key`);
       }
@@ -28,6 +29,7 @@ export function IdleState({ onSubmit }: { onSubmit: (values: MigrateParams) => v
       });
     },
   });
+
   const formId = useId();
 
   return (

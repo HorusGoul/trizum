@@ -36,6 +36,7 @@ export function StoreRedemptionAction({
       </Button>
     );
   }
+
   return (
     <a
       className={className}
@@ -45,8 +46,10 @@ export function StoreRedemptionAction({
       onClick={(event) => {
         if (isDisabled || !checkRedemptionConnection()) {
           event.preventDefault();
+
           return;
         }
+
         trackEvent("premium_redemption_requested");
       }}
       target="_blank"

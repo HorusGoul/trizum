@@ -7,9 +7,11 @@ import { ANALYTICS_SITE_ID } from "../../src/lib/api/analyticsConfig";
 import { spycatRoute } from "./spycat";
 
 const service = { fetch: vi.fn<Fetcher["fetch"]>() };
+
 const app = new Hono<ApiHonoEnv>()
   .use("/api/*", createApiCorsMiddleware())
   .route("/api/spycat", spycatRoute);
+
 const env = { SPYCAT: service };
 const bootstrap = `globalThis["__insightflare_tracker_runtime_config__"] = ${JSON.stringify({ siteId: ANALYTICS_SITE_ID, collectToken: "test.token.signature" })};\nthrow new Error("Do not execute");`;
 const base = "https://trizum.app/api/spycat";
@@ -43,6 +45,7 @@ it("answers native preflight locally and returns readable native responses", asy
     },
     env,
   );
+
   expect(response.status).toBe(204);
   expect(response.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");
   expect(response.headers.get("access-control-allow-headers")).toBe("content-type");
@@ -57,6 +60,7 @@ it("answers native preflight locally and returns readable native responses", asy
     },
     env,
   );
+
   expect(collected.status).toBe(204);
   expect(collected.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");
   expect(collected.headers.get("set-cookie")).toBeNull();
@@ -80,6 +84,7 @@ it("forwards only fixed URLs, allowed headers and original Cloudflare metadata",
       },
     },
   );
+
   const cf = { country: "ES", city: "Madrid", continent: "EU" };
   Object.defineProperty(request, "cf", { value: cf });
   const response = await app.fetch(request, env);
@@ -103,12 +108,15 @@ it("forwards only fixed URLs, allowed headers and original Cloudflare metadata",
 
 it("carries the real analytics client through both proxy routes with one IP and sanitized payloads", async () => {
   const id = crypto.randomUUID();
+
   const fetch: typeof globalThis.fetch = async (url, init) => {
     const request = new Request(url, init);
     request.headers.set("Origin", "capacitor://localhost");
     request.headers.set("CF-Connecting-IP", "192.0.2.1");
+
     return app.fetch(request, env);
   };
+
   const client = createAnalytics({
     endpoint: base,
     siteId: ANALYTICS_SITE_ID,
@@ -117,14 +125,17 @@ it("carries the real analytics client through both proxy routes with one IP and 
     canCollect: () => true,
     fetch,
   });
+
   client.setEnabled(true, id);
   client.page("/party/SHARING_SECRET?name=Alice#financial-data");
   client.track("expense_created");
   await client.flush();
   expect(service.fetch).toHaveBeenCalledTimes(3);
+
   for (const [, init] of service.fetch.mock.calls) {
     expect(new Headers(init?.headers).get("cf-connecting-ip")).toBe("192.0.2.1");
   }
+
   const posts = service.fetch.mock.calls.slice(1);
   expect(posts.map(([url]) => url)).toEqual([
     "https://spycat.horus.dev/collect",
@@ -148,6 +159,7 @@ it.each<Record<string, string>>([{ DNT: "1" }, { DNT: "yes" }, { "Sec-GPC": "1" 
       { headers },
       env,
     );
+
     expect(response.status).toBe(204);
     expect(service.fetch).not.toHaveBeenCalled();
   },
@@ -165,9 +177,11 @@ it("rejects untrusted origins, unsupported routes, malformed payloads and other 
   ).toBe(403);
   expect((await app.request(`${base}/script.js?siteId=other`, {}, env)).status).toBe(400);
   expect((await app.request(`${base}/admin`, {}, env)).status).toBe(404);
+
   for (const body of ["{", "null", "[]", JSON.stringify({ siteId: "other" })]) {
     expect((await app.request(`${base}/collect`, { method: "POST", body }, env)).status).toBe(400);
   }
+
   expect(service.fetch).not.toHaveBeenCalled();
 });
 
@@ -180,6 +194,7 @@ it("bounds request bodies even without a Content-Length header", async () => {
     },
     env,
   );
+
   expect(response.status).toBe(413);
   expect(service.fetch).not.toHaveBeenCalled();
 });

@@ -23,25 +23,32 @@ vi.mock("#src/lib/analytics.ts", () => ({
   setAnalyticsEnabled: vi.fn<typeof setAnalyticsEnabled>(),
   trackCloudSyncActivated: vi.fn<typeof trackCloudSyncActivated>(),
 }));
+
 vi.mock("#src/lib/automerge/useRepo.ts", () => ({ useRepo: () => repo }));
+
 vi.mock("#src/lib/automerge/suspense-hooks.ts", () => ({
   documentCache: { readAsync: readDocument },
 }));
+
 vi.mock("#src/models/partyList.js", () => ({ setPartyListId: vi.fn<typeof setPartyListId>() }));
+
 vi.mock("#src/lib/auth-client.ts", () => ({
   fetchLinkedAuthAccounts: vi.fn<typeof fetchLinkedAuthAccounts>(),
 }));
+
 vi.mock("#src/lib/cloudSyncSettings.ts", () => ({
   fetchCloudUserSettings: vi.fn<typeof CloudSettings.fetchCloudUserSettings>(),
   getCloudUserSettingsInput: vi.fn<typeof CloudSettings.getCloudUserSettingsInput>(),
   saveCloudUserSettings: vi.fn<typeof CloudSettings.saveCloudUserSettings>(),
   writeCachedCloudUserSettings: vi.fn<typeof CloudSettings.writeCachedCloudUserSettings>(),
 }));
+
 vi.mock("#src/lib/cloudSyncRouteState.ts", () => ({
   hasLocalPartyListData: vi.fn<typeof CloudRouteState.hasLocalPartyListData>(),
   readCachedCloudAccountState: vi.fn<typeof CloudRouteState.readCachedCloudAccountState>(),
   writeCachedCloudAccountState: vi.fn<typeof CloudRouteState.writeCachedCloudAccountState>(),
 }));
+
 vi.mock("sonner", () => ({
   toast: {
     message: vi.fn<typeof toast.message>(),
@@ -65,6 +72,7 @@ function partyList(usageAnalyticsEnabled?: boolean): PartyList {
 function renderAccount(source: PartyList) {
   let account!: ReturnType<typeof useCloudSyncAccountState>;
   const onCloudDataActivated = vi.fn<(shouldDelay: boolean) => void>();
+
   function Harness() {
     account = useCloudSyncAccountState({
       isOffline: false,
@@ -73,10 +81,13 @@ function renderAccount(source: PartyList) {
       partyList: source,
       userId: "test-user",
     });
+
     return null;
   }
+
   // Effects are irrelevant to the explicit activation action under test.
   renderToStaticMarkup(<Harness />);
+
   return { ...account, onCloudDataActivated };
 }
 
@@ -96,14 +107,17 @@ it.each(["missing", "rejected"])(
     vi.mocked(fetchCloudUserSettings).mockResolvedValue({
       settings: { partyListDocumentId: destination.id, updatedAt: 123 },
     });
+
     if (failure === "missing") {
       readDocument.mockResolvedValue(undefined);
     } else {
       readDocument.mockRejectedValue(new Error("Unavailable"));
     }
+
     let account!: ReturnType<typeof useCloudSyncAccountState>;
     const onCloudDataActivated = vi.fn<(shouldDelay: boolean) => void>();
     const isSignInSuccessVisibleRef = { current: false };
+
     function Harness() {
       account = useCloudSyncAccountState({
         isOffline: false,
@@ -112,10 +126,13 @@ it.each(["missing", "rejected"])(
         partyList: source,
         userId: "test-user",
       });
+
       return null;
     }
+
     const container = document.createElement("div");
     const root = createRoot(container);
+
     try {
       await act(async () => root.render(<Harness />));
       expect(readDocument).toHaveBeenCalledWith(repo, destination.id);

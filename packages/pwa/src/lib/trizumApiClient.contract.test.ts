@@ -57,6 +57,7 @@ describe("Cloud Sync client", () => {
         );
         expect(request.url).toBe("https://trizum.test/api/cloud-sync/settings");
         requests.push(request);
+
         return Response.json({ settings }, { headers: { "set-auth-token": "new-token" } });
       }),
     );
@@ -120,12 +121,15 @@ describe("Tricount migration client", () => {
     vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
     vi.stubGlobal("window", { location: { origin: "capacitor://localhost" } });
     vi.stubGlobal("localStorage", { getItem: () => "native-token" });
+
     const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
       const request = new Request(input, init);
       expect(request.credentials).toBe("same-origin");
       expect(request.headers.has("Authorization")).toBe(false);
+
       return Response.json(migrationData);
     });
+
     vi.stubGlobal("fetch", fetch);
     await expect(trizumApiClient.migration.importTricount("test-key")).resolves.toEqual(
       migrationData,
@@ -142,14 +146,17 @@ describe("Tricount migration client", () => {
         expect(url.origin).toBe("https://preview.trizum.test");
         expect(url.pathname).toBe("/api/migrate");
         expect(url.searchParams.get("key")).toBe("a+b&c");
+
         return Response.json(migrationData);
       },
     );
+
     const client = createTrizumApiClient({
       baseUrl: () => "https://trizum.test",
       migrationBaseUrl: () => "https://preview.trizum.test",
       fetch,
     });
+
     await expect(client.migration.importTricount("a+b&c")).resolves.toEqual(migrationData);
   });
 
@@ -157,6 +164,7 @@ describe("Tricount migration client", () => {
     const client = createClient(
       async () => new Response("Missing 'key' query parameter", { status: 400 }),
     );
+
     const promise = client.migration.importTricount("test-key");
     await expect(promise).rejects.toBeInstanceOf(MigrationApiError);
     await expect(promise).rejects.toMatchObject({
@@ -169,6 +177,7 @@ describe("Tricount migration client", () => {
     const client = createClient(async () =>
       Response.json({ error: "Upstream unavailable", data: null }, { status: 500 }),
     );
+
     await expect(client.migration.importTricount("test-key")).rejects.toMatchObject({
       status: 500,
       message: "Upstream unavailable",

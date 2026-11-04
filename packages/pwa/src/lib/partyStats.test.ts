@@ -81,6 +81,7 @@ describe("calculatePartyStats", () => {
       timeframe: "current-month",
       now: referenceDate,
     });
+
     expect(currentMonth.totalSpent).toBe(100);
     expect(currentMonth.totalExpenseCount).toBe(1);
     expect(currentMonth.ranking.map((participant) => participant.participantId)).toEqual(["alice"]);
@@ -91,6 +92,7 @@ describe("calculatePartyStats", () => {
       timeframe: "current-year",
       now: referenceDate,
     });
+
     expect(currentYear.totalSpent).toBe(350);
     expect(currentYear.totalExpenseCount).toBe(2);
 
@@ -100,6 +102,7 @@ describe("calculatePartyStats", () => {
       timeframe: "last-year",
       now: referenceDate,
     });
+
     expect(lastYear.totalSpent).toBe(300);
     expect(lastYear.totalExpenseCount).toBe(1);
     expect(lastYear.topSpender?.participantId).toBe("carol");

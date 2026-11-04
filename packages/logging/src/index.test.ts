@@ -15,6 +15,7 @@ import {
 
 function createRecordingSink() {
   const records: LogRecord[] = [];
+
   const sink: Sink = (record) => {
     records.push(record);
   };
@@ -45,6 +46,7 @@ describe("@trizum/logging", () => {
     logger.info("Switched");
     telemetryId = undefined;
     logger.info("Opted out", { telemetryId: original });
+
     for (const { records } of [first, second]) {
       expect(records[0].properties.telemetryId).toBe(original);
       expect(records[1].properties.telemetryId).not.toBe(original);
@@ -117,6 +119,7 @@ describe("@trizum/logging", () => {
   test("routes logs through configured surface sinks and extra loggers", () => {
     const surfaceLogs = createRecordingSink();
     const serverLogs = createRecordingSink();
+
     const extraLoggers: TrizumLoggerConfig<"surface" | "server">[] = [
       {
         category: getTrizumCategory("server"),

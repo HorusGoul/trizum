@@ -13,6 +13,7 @@ export async function recalculatePartyBalances(
   function find<T>(id: DocumentId) {
     return signal ? repo.find<T>(id, { signal }) : repo.find<T>(id);
   }
+
   const partyHandle = await find<Party>(partyId);
   const party = partyHandle.doc();
 

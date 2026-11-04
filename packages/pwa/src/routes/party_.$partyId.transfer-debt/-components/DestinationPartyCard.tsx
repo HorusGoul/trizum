@@ -89,6 +89,7 @@ function getParticipantPreview(participants: PartyParticipant[]) {
 
   for (const participant of participants) {
     const participantName = participant.name.trim();
+
     if (!participant.isArchived && participantName !== "") {
       visibleParticipantNames.push(participantName);
     }

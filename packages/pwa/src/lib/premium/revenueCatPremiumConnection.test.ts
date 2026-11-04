@@ -13,7 +13,9 @@ const native = vi.hoisted(() => ({
     >(),
   isNativePlatform: vi.fn<() => boolean>(() => false),
 }));
+
 vi.mock("@capacitor/app", () => ({ App: { addListener: native.addListener } }));
+
 vi.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform: native.isNativePlatform } }));
 
 beforeEach(() => {
@@ -36,10 +38,12 @@ describe("connectRevenueCatPremium", () => {
     let listener: ((value: CustomerInfo) => void) | undefined;
     const onCustomerInfo = vi.fn<(value: CustomerInfo) => void>();
     const onRefreshError = vi.fn<(error: unknown) => void>();
+
     const connection = connectRevenueCatPremium({
       addListener: vi.fn<(registeredListener: (value: CustomerInfo) => void) => Promise<string>>(
         async (registeredListener) => {
           listener = registeredListener;
+
           return "listener";
         },
       ),
@@ -64,14 +68,17 @@ describe("connectRevenueCatPremium", () => {
       .fn<(listener: (value: CustomerInfo) => void) => Promise<string>>()
       .mockRejectedValueOnce(new Error("offline"))
       .mockResolvedValueOnce("listener");
+
     const prepare = vi
       .fn<() => Promise<CustomerInfo | undefined>>()
       .mockRejectedValueOnce(new Error("offline"))
       .mockResolvedValueOnce(undefined);
+
     const refresh = vi.fn<() => Promise<CustomerInfo>>().mockResolvedValue(customerInfo);
     const onCustomerInfo = vi.fn<(value: CustomerInfo) => void>();
     const onListenerError = vi.fn<(error: unknown) => void>();
     const onRefreshError = vi.fn<(error: unknown) => void>();
+
     const connection = connectRevenueCatPremium({
       addListener,
       onCustomerInfo,
@@ -102,6 +109,7 @@ describe("foreground refresh", () => {
     const onRefreshError = vi.fn<(error: unknown) => void>();
     const refresh = vi.fn<() => Promise<CustomerInfo>>().mockResolvedValue(customerInfo);
     const removeListener = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
+
     const connection = connectRevenueCatPremium({
       addListener: vi
         .fn<(listener: (value: CustomerInfo) => void) => Promise<string>>()
@@ -113,6 +121,7 @@ describe("foreground refresh", () => {
       refresh,
       removeListener,
     });
+
     return { connection, onCustomerInfo, onRefreshError, refresh, removeListener };
   }
 
@@ -201,6 +210,7 @@ describe("foreground refresh", () => {
     let register!: (handle: { remove: () => Promise<void> }) => void;
     native.addListener.mockImplementation((_event, callback) => {
       onAppState = callback;
+
       return new Promise((resolve) => {
         register = resolve;
       });

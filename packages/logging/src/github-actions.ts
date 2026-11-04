@@ -100,6 +100,7 @@ export function getGitHubActionsAnnotationSink({
     }
 
     const annotationCommand = resolvedLevels[record.level];
+
     if (annotationCommand == null) {
       return;
     }

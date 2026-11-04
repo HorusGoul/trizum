@@ -20,6 +20,7 @@ let automergeWasm: Promise<void> | undefined;
 
 function initializeAutomerge() {
   automergeWasm ??= initializeBase64Wasm(automergeWasmBase64);
+
   return automergeWasm;
 }
 
@@ -31,6 +32,7 @@ export async function startServer() {
   const webSocketServer = new WebSocket.Server({ noServer: true });
 
   const hostname = os.hostname();
+
   const repo = new Repo({
     storage: new DrizzleSqliteStorageAdapter(db),
     network: [new NodeWSServerAdapter(webSocketServer)],
@@ -46,6 +48,7 @@ export async function startServer() {
     );
     process.exit(1);
   });
+
   logger.info("Automerge storage ID", { storageId });
 
   // Request logging middleware
@@ -148,6 +151,7 @@ export async function startServer() {
   });
 
   const port = parseInt(env.PORT);
+
   const _server = await new Promise<ServerType>((resolve) => {
     const server = serve(
       {
@@ -174,6 +178,7 @@ export async function startServer() {
           logger.error(err.message);
           process.exit(1);
         }
+
         process.exit(0);
       });
     });
@@ -188,6 +193,7 @@ function isSourceEntrypoint() {
   }
 
   const modulePath = fileURLToPath(import.meta.url);
+
   return (
     modulePath.endsWith(`${path.sep}src${path.sep}main.ts`) &&
     path.resolve(process.argv[1]) === modulePath

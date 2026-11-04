@@ -19,6 +19,7 @@ test("preserves hoisted function aliases when building a top-level-await module"
     await Promise.resolve();
     export { getRootSpan, getSegmentSpan, getAsyncSpan, getSegmentSpanAsync, getSpanIterator, iterateSpan, Marker, order };
   `;
+
   const result = await build({
     configFile: false,
     logLevel: "silent",
@@ -41,12 +42,16 @@ test("preserves hoisted function aliases when building a top-level-await module"
       },
     },
   });
+
   const bundle = Array.isArray(result) ? result[0] : result;
+
   if (!("output" in bundle)) throw new Error("Expected a completed fixture build");
   const output = bundle.output;
   const entry = output.find((chunk) => chunk.type === "chunk" && chunk.isEntry);
   expect(entry?.type).toBe("chunk");
+
   if (entry?.type !== "chunk") throw new Error("Missing regression fixture entry");
+
   const execution = spawnSync(
     process.execPath,
     [
@@ -61,6 +66,7 @@ test("preserves hoisted function aliases when building a top-level-await module"
     ],
     { encoding: "utf8" },
   );
+
   expect(execution.stderr).toBe("");
   expect(execution.status).toBe(0);
 });

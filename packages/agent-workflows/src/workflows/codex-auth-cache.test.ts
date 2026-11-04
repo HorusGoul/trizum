@@ -9,16 +9,20 @@ const workflow = await readFile(
   new URL("../../../../.github/workflows/renovate-agent-review.yml", import.meta.url),
   "utf8",
 );
+
 const original = {
   auth_mode: "chatgpt",
   tokens: { access_token: "test-access", refresh_token: "test-refresh" },
 };
+
 let directory: string;
 let environment: NodeJS.ProcessEnv;
 
 function step(name: string): string {
   const contents = workflow.split(`      - name: ${name}\n`)[1]?.split("      - name:")[0];
+
   if (contents == null) throw new Error(`Missing workflow step: ${name}`);
+
   return contents;
 }
 
@@ -26,7 +30,9 @@ function runStep(name: string) {
   const script = step(name)
     .split("        run: |\n")[1]
     ?.replace(/^          /gm, "");
+
   if (script == null) throw new Error(`Missing workflow script: ${name}`);
+
   return spawnSync("bash", ["-c", script], { env: environment, encoding: "utf8" });
 }
 
@@ -64,6 +70,7 @@ exit 1
     { mode: 0o700 },
   );
   await writeFile(path.join(directory, "sleep"), "#!/bin/sh\nexit 0\n", { mode: 0o700 });
+
   if (runStep("Restore Codex auth cache").status !== 0) {
     throw new Error("Could not restore the test auth cache");
   }

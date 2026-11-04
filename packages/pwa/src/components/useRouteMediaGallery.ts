@@ -46,6 +46,7 @@ export function useRouteMediaGallery({
     navigateWithoutDuplicateEntry(currentLocation, buildLocation, navigate, {
       search: { media: index },
     });
+
     if (!isOpen) trackEvent("receipt_gallery_opened");
   }
 

@@ -13,12 +13,15 @@ import {
 import { withDocumentIdRedaction } from "./redaction.js";
 
 export type TrizumSurface = string;
+
 export type TrizumCategory<TSurface extends string = TrizumSurface> = [
   "trizum",
   TSurface,
   ...string[],
 ];
+
 export type TrizumSinkId<TSinkId extends string = never> = "console" | TSinkId;
+
 export type TrizumLoggerConfig<TSinkId extends string = never> = LoggerConfig<
   TrizumSinkId<TSinkId>,
   never

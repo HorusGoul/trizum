@@ -27,9 +27,11 @@ const MOBILE_SCROLL_RESTORE_TOLERANCE = 2;
 const MOBILE_ATTACHMENT_TOOLBAR_HEIGHT_STYLE = "calc(var(--safe-area-inset-top, 0px) + 4rem)";
 const MOBILE_SCROLL_ALLOWANCE_PROPERTY = "--calculator-mobile-scroll-allowance";
 const EMPTY_ATTACHMENT_PHOTO_IDS: MediaFile["id"][] = [];
+
 const viewAttachmentMessage = msg({
   message: "View attachment {attachmentNumber}",
 });
+
 const currencyPreviewFormatterCache = new Map<string, Intl.NumberFormat>();
 let mobileScrollAllowanceOwner: symbol | null = null;
 
@@ -47,6 +49,7 @@ function getCurrencyPreviewFormatter(currency: string) {
   });
 
   currencyPreviewFormatterCache.set(currency, formatter);
+
   return formatter;
 }
 
@@ -158,10 +161,12 @@ function getCalculatorLayout(
 
   const rect = fieldContainerRef.current.getBoundingClientRect();
   const width = Math.max(rect.width, 280);
+
   const maxTop = Math.max(
     DESKTOP_POPOVER_MARGIN,
     window.innerHeight - DESKTOP_POPOVER_ESTIMATED_HEIGHT - DESKTOP_POPOVER_MARGIN,
   );
+
   const maxLeft = Math.max(
     DESKTOP_POPOVER_MARGIN,
     window.innerWidth - width - DESKTOP_POPOVER_MARGIN,
@@ -244,15 +249,19 @@ function useExpressionCursorScroll({
   useLayoutEffect(() => {
     const scrollContainer = expressionScrollRef.current;
     const contentEl = expressionContentRef.current;
+
     if (!scrollContainer || !contentEl || !expression) {
       scrollOffsetRef.current = 0;
+
       if (contentEl) {
         contentEl.style.transform = "translateX(0px)";
       }
+
       return;
     }
 
     let cursorX: number;
+
     if (cursorPosition === 0 && charRefs.current[0]) {
       cursorX = charRefs.current[0].offsetLeft;
     } else if (cursorPosition === expression.length && charRefs.current[cursorPosition - 1]) {
@@ -272,6 +281,7 @@ function useExpressionCursorScroll({
     if (contentWidth <= containerWidth) {
       scrollOffsetRef.current = 0;
       contentEl.style.transform = "translateX(0px)";
+
       return;
     }
 
@@ -316,6 +326,7 @@ function useExpressionPointerGestures({
 }) {
   useEffect(() => {
     const expressionEl = expressionRef.current;
+
     if (!expressionEl) return;
 
     function handlePointerDown(e: PointerEvent) {
@@ -338,6 +349,7 @@ function useExpressionPointerGestures({
       } else {
         dragAccumulatorRef.current = newAccumulator;
       }
+
       pointerStartRef.current.x = e.clientX;
     }
 
@@ -361,6 +373,7 @@ function useExpressionPointerGestures({
           }
 
           const distance = Math.abs(clickX - posX);
+
           if (distance < bestDistance) {
             bestDistance = distance;
             bestPosition = i;
@@ -372,6 +385,7 @@ function useExpressionPointerGestures({
 
       pointerStartRef.current = null;
       dragAccumulatorRef.current = 0;
+
       if (expressionEl!.hasPointerCapture(e.pointerId)) {
         expressionEl!.releasePointerCapture(e.pointerId);
       }
@@ -380,6 +394,7 @@ function useExpressionPointerGestures({
     function handlePointerCancel(e: PointerEvent) {
       pointerStartRef.current = null;
       dragAccumulatorRef.current = 0;
+
       if (expressionEl!.hasPointerCapture(e.pointerId)) {
         expressionEl!.releasePointerCapture(e.pointerId);
       }
@@ -433,9 +448,11 @@ function useCalculatorDismiss({
       if (isOutside(e.target as Node | null)) {
         suppressNextDocumentClickRef.current = true;
         suppressCalculatorAutoOpen();
+
         if (e.cancelable) {
           e.preventDefault();
         }
+
         e.stopPropagation();
         blurActiveElement();
         callbacksRef.current.onDismiss();
@@ -448,14 +465,17 @@ function useCalculatorDismiss({
       }
 
       suppressNextDocumentClickRef.current = false;
+
       if (e.cancelable) {
         e.preventDefault();
       }
+
       e.stopPropagation();
     }
 
     document.addEventListener("pointerdown", handlePointerDown, { capture: true });
     document.addEventListener("click", handleClick, { capture: true });
+
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown, { capture: true });
       document.removeEventListener("click", handleClick, { capture: true });
@@ -475,11 +495,14 @@ function useCalculatorKeyboard({
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       const target = e.target instanceof HTMLElement ? e.target : null;
+
       const isButtonActivation =
         (e.key === "Enter" || e.key === " " || e.key === "Spacebar") &&
         Boolean(target?.closest('button, [role="button"]'));
+
       const isEditableTarget =
         target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.isContentEditable;
+
       const isCalculatorTarget =
         target &&
         (fieldContainerRef.current?.contains(target) || toolbarRef.current?.contains(target));
@@ -491,6 +514,7 @@ function useCalculatorKeyboard({
       if (/^[0-9]$/.test(e.key)) {
         e.preventDefault();
         callbacksRef.current.onInsert(e.key);
+
         return;
       }
 
@@ -535,6 +559,7 @@ function useCalculatorKeyboard({
     }
 
     document.addEventListener("keydown", handleKeyDown, { capture: true });
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown, { capture: true });
     };
@@ -554,6 +579,7 @@ function useMobileCalculatorScroll({
   const [scrollAllowanceOwner] = useState(() => Symbol("calculator-mobile-scroll-allowance"));
   const finalFieldVisibilityCheckTimeoutRef = useRef<number | null>(null);
   const initialWindowScrollRef = useRef<WindowScrollPosition | null>(initialWindowScroll);
+
   const scrollFieldAboveMobileSheetRef = useRef<
     (behavior: ScrollBehavior, attempts?: number) => void
   >(() => {});
@@ -600,22 +626,26 @@ function useMobileCalculatorScroll({
 
     const fieldElement = fieldContainerRef.current;
     const sheetElement = toolbarRef.current;
+
     if (!fieldElement || !sheetElement) {
       if (attempts < 2) {
         window.requestAnimationFrame(() =>
           scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
         );
       }
+
       return;
     }
 
     const sheetHeight = sheetElement.offsetHeight;
+
     if (sheetHeight <= 0) {
       if (attempts < 2) {
         window.requestAnimationFrame(() =>
           scrollFieldAboveMobileSheetRef.current(behavior, attempts + 1),
         );
       }
+
       return;
     }
 
@@ -647,6 +677,7 @@ function useMobileCalculatorScroll({
 
       finalFieldVisibilityCheckTimeoutRef.current = window.setTimeout(() => {
         finalFieldVisibilityCheckTimeoutRef.current = null;
+
         if (mobileScrollAllowanceOwner === scrollAllowanceOwner) {
           scrollFieldAboveMobileSheetRef.current("auto", 4);
         }
@@ -668,6 +699,7 @@ function useMobileCalculatorScroll({
 
   function restoreInitialWindowScroll(behavior: ScrollBehavior) {
     const scrollPosition = initialWindowScrollRef.current;
+
     if (typeof window === "undefined" || !scrollPosition || isLargeScreen) {
       return;
     }
@@ -682,9 +714,11 @@ function useMobileCalculatorScroll({
 
   function waitForInitialWindowScroll() {
     const targetScrollPosition = initialWindowScrollRef.current;
+
     if (typeof window === "undefined" || !targetScrollPosition) {
       return Promise.resolve();
     }
+
     const { left, top } = targetScrollPosition;
 
     return new Promise<void>((resolve) => {
@@ -697,6 +731,7 @@ function useMobileCalculatorScroll({
 
         if (isRestored || performance.now() >= deadline) {
           resolve();
+
           return;
         }
 
@@ -738,6 +773,7 @@ function useMobileCalculatorScroll({
           () => releaseMobileScrollAllowance(scrollAllowanceOwner),
           MOBILE_SCROLL_RESTORE_TIMEOUT_MS,
         );
+
         return;
       }
 
@@ -770,9 +806,11 @@ function useElementHeight(ref: React.RefObject<HTMLElement | null>, enabled: boo
     }
 
     const maybeElement = ref.current;
+
     if (!maybeElement) {
       return;
     }
+
     const element = maybeElement;
 
     function updateHeight() {
@@ -783,6 +821,7 @@ function useElementHeight(ref: React.RefObject<HTMLElement | null>, enabled: boo
 
     if (typeof ResizeObserver === "undefined") {
       window.addEventListener("resize", updateHeight);
+
       return () => window.removeEventListener("resize", updateHeight);
     }
 
@@ -846,6 +885,7 @@ export function CalculatorToolbar({
   const mobileCloseFallbackTimeoutRef = useRef<number | null>(null);
   const finishMobileCloseRef = useRef<() => Promise<void> | void>(() => {});
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(true);
+
   const callbacksRef = useCalculatorCallbacks({
     onInsert,
     onBackspace,
@@ -855,8 +895,10 @@ export function CalculatorToolbar({
     onClear,
     onDismiss,
   });
+
   const { isLargeScreen, popoverPosition } = useCalculatorPopoverPosition(fieldContainerRef);
   const mobileSheetHeight = useElementHeight(toolbarRef, !isLargeScreen);
+
   const {
     finishInitialWindowScrollRestore,
     removeMobileScrollAllowance,
@@ -871,6 +913,7 @@ export function CalculatorToolbar({
   function finishClose(action: "commit" | "dismiss") {
     if (action === "commit") {
       callbacksRef.current.onCommit();
+
       return;
     }
 
@@ -897,14 +940,17 @@ export function CalculatorToolbar({
     if (action === "dismiss" && !isLargeScreen) {
       suppressCalculatorAutoOpen();
     }
+
     blurCalculatorFocus();
 
     if (!isLargeScreen) {
       if (!pendingMobileCloseActionRef.current) {
         pendingMobileCloseActionRef.current = action;
       }
+
       setIsMobileSheetOpen(false);
       scheduleMobileCloseFallback();
+
       return;
     }
 
@@ -913,6 +959,7 @@ export function CalculatorToolbar({
 
   async function finishMobileClose() {
     const action = pendingMobileCloseActionRef.current;
+
     if (!action) {
       return;
     }
@@ -1035,6 +1082,7 @@ export function CalculatorToolbar({
   }
 
   const desktopPopoverPosition = popoverPosition;
+
   if (!desktopPopoverPosition) {
     return null;
   }
@@ -1109,11 +1157,14 @@ function CalculatorMobileAttachmentContent({
 }) {
   const attachmentButtonIdPrefix = useId();
   const pendingAttachmentFocusIndexRef = useRef<number | null>(null);
+
   const mediaFiles = useMultipleSuspenseDocument<MediaFile>(photoIds, {
     required: true as const,
   }).map(({ doc }) => doc);
+
   const urls = useMediaFileObjectUrls(mediaFiles);
   const galleryItems: MediaGalleryItem[] = urls.map((url) => ({ src: url }));
+
   const activeIndex =
     selectedIndex !== null && selectedIndex < galleryItems.length ? selectedIndex : null;
 
@@ -1128,6 +1179,7 @@ function CalculatorMobileAttachmentContent({
 
   useEffect(() => {
     const indexToFocus = pendingAttachmentFocusIndexRef.current;
+
     if (activeIndex !== null || indexToFocus === null) {
       return;
     }
@@ -1405,6 +1457,7 @@ function CalculatorExpressionDisplay({
   const setCharRef = (index: number) => (el: HTMLSpanElement | null) => {
     charRefs.current[index] = el;
   };
+
   const activeSelectionRange =
     selectionRange && selectionRange.start !== selectionRange.end
       ? {

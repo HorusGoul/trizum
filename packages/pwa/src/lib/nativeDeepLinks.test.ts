@@ -40,6 +40,7 @@ describe("native deep links", () => {
         }),
       ),
     );
+
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(

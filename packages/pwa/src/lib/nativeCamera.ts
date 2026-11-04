@@ -25,9 +25,11 @@ export async function getNativeCameraCaptureFile() {
   }
 
   const response = await fetch(photo.webPath);
+
   if (!response.ok) {
     throw new Error(`Could not read native camera image (${response.status})`);
   }
+
   const blob = await response.blob();
   const mimeType = blob.type || getMimeTypeForPhotoFormat(photo.format);
   const extension = getFileExtensionForMimeType(mimeType);

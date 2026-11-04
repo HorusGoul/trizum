@@ -10,5 +10,6 @@ interface MakeVariableParams {
 export const makeVariable = ({ fallbackValue, name, shade, withVar }: MakeVariableParams) => {
   const variable = `--${name}-${shade}`;
   const value = fallbackValue ? variable + ", " + fallbackValue : variable;
+
   return withVar ? `var(${value})` : variable;
 };

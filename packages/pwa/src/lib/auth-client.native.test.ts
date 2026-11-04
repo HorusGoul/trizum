@@ -10,10 +10,12 @@ const { initializeApple, appleSignIn, socialSignIn } = vi.hoisted(() => ({
 vi.mock("@capacitor/core", () => ({
   Capacitor: { isNativePlatform: () => true, getPlatform: () => "android" },
 }));
+
 vi.mock("@capawesome/capacitor-apple-sign-in", () => ({
   AppleSignIn: { initialize: initializeApple, signIn: appleSignIn },
   SignInScope: { Email: "email" },
 }));
+
 vi.mock("better-auth/react", () => ({
   createAuthClient: () => ({ signIn: { social: socialSignIn } }),
 }));

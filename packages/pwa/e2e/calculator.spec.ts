@@ -9,17 +9,21 @@ const scrollTargetParticipant = {
   id: "participant-traveler-24",
   name: "Traveler 24",
 } as const;
+
 const bottomScrollTargetParticipant = {
   id: "participant-zed-last",
   name: "ZZZ Last Traveler",
 } as const;
+
 const receiptImagePath = "public/pwa-64x64.png";
 
 function createScrollableParticipantFixture() {
   const fixture = createPartyFixture();
+
   const extraParticipants = Object.fromEntries(
     Array.from({ length: 24 }, (_, index) => {
       const participantNumber = index + 1;
+
       const participant = {
         id: `participant-traveler-${participantNumber}`,
         name: `Traveler ${participantNumber}`,
@@ -108,6 +112,7 @@ test.describe("Expense calculator", () => {
       name: "Open calculator",
       exact: true,
     });
+
     await expect(calculatorButton).toBeVisible();
 
     const amountBox = await amountField.boundingBox();
@@ -261,6 +266,7 @@ test.describe("Expense calculator", () => {
         name: bottomScrollTargetParticipant.name,
         exact: true,
       });
+
       await targetCheckbox.scrollIntoViewIfNeeded();
       await targetCheckbox.setChecked(true, { force: true });
       await expect(targetCheckbox).toBeChecked();
@@ -269,6 +275,7 @@ test.describe("Expense calculator", () => {
         `Amount for ${bottomScrollTargetParticipant.name}`,
         { exact: true },
       );
+
       await participantAmountField.scrollIntoViewIfNeeded();
       await participantAmountField.evaluate((element) => {
         element.scrollIntoView({ block: "end", inline: "nearest" });
@@ -463,8 +470,10 @@ test.describe("Expense calculator", () => {
       name: defaultParticipants.blair.name,
       exact: true,
     });
+
     await blairCheckbox.setChecked(true, { force: true });
     await expect(blairCheckbox).toBeChecked();
+
     const participantAmountField = page.getByLabel(`Amount for ${defaultParticipants.blair.name}`, {
       exact: true,
     });
@@ -507,12 +516,14 @@ test.describe("Expense calculator", () => {
       name: defaultParticipants.blair.name,
       exact: true,
     });
+
     await blairCheckbox.setChecked(true, { force: true });
     await expect(blairCheckbox).toBeChecked();
 
     const blairSharesField = page.getByLabel(`Shares for ${defaultParticipants.blair.name}`, {
       exact: true,
     });
+
     const blairAmountField = page.getByLabel(`Amount for ${defaultParticipants.blair.name}`, {
       exact: true,
     });
@@ -559,6 +570,7 @@ test.describe("Expense calculator", () => {
       name: scrollTargetParticipant.name,
       exact: true,
     });
+
     await targetCheckbox.scrollIntoViewIfNeeded();
     await targetCheckbox.setChecked(true, { force: true });
     await expect(targetCheckbox).toBeChecked();
@@ -566,6 +578,7 @@ test.describe("Expense calculator", () => {
     const participantAmountField = page.getByLabel(`Amount for ${scrollTargetParticipant.name}`, {
       exact: true,
     });
+
     await participantAmountField.scrollIntoViewIfNeeded();
     await participantAmountField.evaluate((element) => {
       element.scrollIntoView({ block: "end", inline: "nearest" });
@@ -626,6 +639,7 @@ test.describe("Expense calculator", () => {
       name: bottomScrollTargetParticipant.name,
       exact: true,
     });
+
     await targetCheckbox.scrollIntoViewIfNeeded();
     await targetCheckbox.setChecked(true, { force: true });
     await expect(targetCheckbox).toBeChecked();
@@ -634,6 +648,7 @@ test.describe("Expense calculator", () => {
       `Amount for ${bottomScrollTargetParticipant.name}`,
       { exact: true },
     );
+
     await participantAmountField.scrollIntoViewIfNeeded();
     await participantAmountField.evaluate((element) => {
       element.scrollIntoView({ block: "end", inline: "nearest" });
@@ -714,23 +729,29 @@ test.describe("Expense calculator", () => {
 
     const attachmentsToolbarShell = page.locator("[data-calculator-attachment-toolbar]");
     const attachmentsToolbar = page.getByRole("toolbar", { name: "Attachments" });
+
     const firstAttachmentButton = attachmentsToolbar.getByRole("button", {
       name: "View attachment 1",
       exact: true,
     });
+
     const fourthAttachmentButton = attachmentsToolbar.getByRole("button", {
       name: "View attachment 4",
       exact: true,
     });
+
     await expect(attachmentsToolbar).toBeVisible();
+
     for (let attachmentNumber = 1; attachmentNumber <= 4; attachmentNumber++) {
       const attachmentButton = attachmentsToolbar.getByRole("button", {
         name: `View attachment ${attachmentNumber}`,
         exact: true,
       });
+
       await expect(attachmentButton).toBeVisible();
       await expect(attachmentButton).toHaveAttribute("aria-pressed", "false");
     }
+
     await expect
       .poll(async () => {
         const toolbarBox = await attachmentsToolbarShell.boundingBox();
@@ -792,10 +813,12 @@ test.describe("Expense calculator", () => {
 
     await firstAttachmentButton.click();
     const attachmentPreview = page.getByRole("region", { name: "Attachment preview" });
+
     const closeAttachmentPreviewButton = page.getByRole("button", {
       name: "Close attachment preview",
       exact: true,
     });
+
     await expect(attachmentPreview).toBeVisible();
     await expect(firstAttachmentButton).toHaveAttribute("aria-pressed", "true");
     await expect(
@@ -958,6 +981,7 @@ test.describe("Expense calculator", () => {
       name: scrollTargetParticipant.name,
       exact: true,
     });
+
     await targetCheckbox.scrollIntoViewIfNeeded();
     await targetCheckbox.setChecked(true, { force: true });
     await expect(targetCheckbox).toBeChecked();
@@ -965,6 +989,7 @@ test.describe("Expense calculator", () => {
     const participantAmountField = page.getByLabel(`Amount for ${scrollTargetParticipant.name}`, {
       exact: true,
     });
+
     await participantAmountField.scrollIntoViewIfNeeded();
     await participantAmountField.evaluate((element) => {
       element.scrollIntoView({ block: "end", inline: "nearest" });
@@ -1007,6 +1032,7 @@ test.describe("Expense calculator", () => {
       testWindow.__calculatorBackScrollSamples = [];
 
       let animationFrameId = 0;
+
       function sampleScroll() {
         testWindow.__calculatorBackScrollSamples?.push(window.scrollY);
         animationFrameId = window.requestAnimationFrame(sampleScroll);

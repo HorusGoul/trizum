@@ -7,6 +7,7 @@ test.describe("Settings forms", () => {
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
+
     const updatedPartyName = "Updated weekend trip";
 
     await harness.navigate(`/party/${seededParty.partyId}`);
@@ -42,6 +43,7 @@ test.describe("Settings forms", () => {
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
+
     const draftDescription = "Keep this description after a failed save";
 
     await harness.navigate(`/party/${seededParty.partyId}/settings`);

@@ -25,6 +25,7 @@ export function getVariables({
   mode?: "bright" | "consistent";
 }): SingleVariable[] {
   const calculator = mode === "bright" ? highestChroma : consistentChroma;
+
   return shades.map((shade, shadeIndex) => [
     makeVariable({ name: baseName, shade }),
     calculator(shadeIndex, hue),
@@ -51,6 +52,7 @@ const lightnessForShade = (shade: number) => {
 
   return (lowestL + (highestL - diffL * multiplier)) / 100;
 };
+
 const lightness = shades.map(lightnessForShade);
 
 export const highestChroma = (shadeIndex: number, hue: number) => {

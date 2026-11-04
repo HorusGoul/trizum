@@ -8,6 +8,7 @@ import { useActionProp, type AsyncAction } from "./useActionProp";
 import { cn } from "./utils";
 
 type ButtonColorScheme = "transparent" | "accent" | "input-like";
+
 type ButtonPressArgs = Parameters<NonNullable<AriaButtonProps["onPress"]>>;
 
 const colorSchemes: Record<
@@ -48,10 +49,12 @@ export function Button({
   pressAction?: AsyncAction<ButtonPressArgs>;
 }) {
   const colorStyles = colorSchemes[color];
+
   const [isActionPending, onPressWithAction] = useActionProp<ButtonPressArgs>({
     action: pressAction,
     onAction: onPress,
   });
+
   const isButtonPending = isPending || isActionPending;
 
   return (

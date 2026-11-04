@@ -76,6 +76,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
 
         if (isCancelled) {
           stream.getTracks().forEach((track) => track.stop());
+
           return;
         }
 
@@ -84,6 +85,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play();
+
           if (isCancelled) return;
           setState({ status: "scanning" });
           scanningRef.current = true;
@@ -99,6 +101,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
               type: "error",
               message: t`Camera permission was denied`,
             });
+
             return;
           }
 
@@ -107,6 +110,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
               type: "error",
               message: t`No camera found on this device`,
             });
+
             return;
           }
         }
@@ -135,6 +139,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
 
       if (!ctx || video.readyState !== video.HAVE_ENOUGH_DATA) {
         animationFrameId = requestAnimationFrame(() => void scanFrame());
+
         return;
       }
 
@@ -148,6 +153,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
       try {
         // Detect barcodes in the frame
         const barcodes = await detector.detect(canvas);
+
         if (isCancelled) return;
 
         if (barcodes.length > 0 && barcodes[0].rawValue) {
@@ -156,6 +162,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
           // Validate the scanned value if a validator is provided
           if (validate) {
             const validationResult = validate(scannedValue);
+
             if (validationResult !== true) {
               // Validation failed - show error and continue scanning
               scanningRef.current = false;
@@ -167,6 +174,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
                 scanningRef.current = true;
                 void scanFrame();
               }, 2000);
+
               return;
             }
           }
@@ -180,6 +188,7 @@ function useQRCodeScanner({ onResult, validate }: QRCodeScannerProps) {
             stopCamera();
             onResult({ type: "success", value: scannedValue });
           }, 1500);
+
           return;
         }
       } catch (err) {

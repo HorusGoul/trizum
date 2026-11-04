@@ -11,7 +11,9 @@ import {
 } from "./advertisingPolicy.ts";
 
 export type AdEntitlement = "unknown" | "adFree" | "adSupported";
+
 export type AdPlatform = "android" | "ios";
+
 export type AdDiagnosticStage =
   | "consent"
   | "initialization"
@@ -81,24 +83,29 @@ export class AdvertisingCoordinator {
     this.now = options.now ?? Date.now;
 
     const persisted = options.historyStore.read();
+
     if (persisted) {
       const resumed = resumeAdHistory(persisted, this.now());
       this.history = resumed.history;
     } else {
       this.history = createAdHistory();
     }
+
     if (options.bypassFirstUseSession) {
       this.history = { ...this.history, firstUseCompleted: true };
     }
+
     this.persistHistory();
   }
 
   async setEntitlement(entitlement: AdEntitlement) {
     const entitlementChanged = entitlement !== this.entitlement;
     this.entitlement = entitlement;
+
     if (entitlementChanged) {
       this.entitlementRevision += 1;
     }
+
     if (entitlement !== "adSupported" || !this.history.firstUseCompleted) {
       return;
     }
@@ -106,12 +113,14 @@ export class AdvertisingCoordinator {
     if (!this.coldLaunchStarted) {
       this.coldLaunchStarted = true;
       await this.refreshForLaunch("cold", false);
+
       return;
     }
 
     if (entitlementChanged) {
       await this.consentRefresh;
       const entitlementRevision = this.entitlementRevision;
+
       if (this.isEligibilityCurrent(entitlementRevision)) {
         await this.refreshForLaunch("cold", false);
       }
@@ -155,6 +164,7 @@ export class AdvertisingCoordinator {
       if (this.canPrepareAds()) {
         void this.prepareInterstitial();
       }
+
       return false;
     }
 
@@ -165,6 +175,7 @@ export class AdvertisingCoordinator {
         this.onFullScreenEvent("interstitial", "failedToShow");
       }
     });
+
     return true;
   }
 
@@ -174,17 +185,23 @@ export class AdvertisingCoordinator {
     }
 
     const entitlementRevision = this.entitlementRevision;
+
     try {
       await this.sdk.showPrivacyOptionsForm();
+
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       const consent = await this.sdk.requestConsentInfo();
+
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       this.updatePrivacyOptionsRequirement(consent);
       this.consentReady = consent.canRequestAds;
+
       if (consent.canRequestAds) {
         await this.initializeAndPrepare(false, entitlementRevision);
       }
@@ -192,12 +209,14 @@ export class AdvertisingCoordinator {
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       this.suppressAdsForSession("privacyOptions", error);
     }
   }
 
   async destroy() {
     this.destroyed = true;
+
     if (this.sdk) {
       await this.sdk.removeListeners();
     }
@@ -216,6 +235,7 @@ export class AdvertisingCoordinator {
     ).finally(() => {
       this.consentRefresh = undefined;
     });
+
     return this.consentRefresh;
   }
 
@@ -228,23 +248,30 @@ export class AdvertisingCoordinator {
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       const sdk = await this.getSdk();
+
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       let consent = await sdk.requestConsentInfo();
+
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       this.updatePrivacyOptionsRequirement(consent);
 
       let trackingStatus =
         this.options.platform === "ios"
           ? await sdk.trackingAuthorizationStatus()
           : ("restricted" as const);
+
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       const shouldPresentConsentForm =
         consent.isConsentFormAvailable === true &&
         (consent.status === "REQUIRED" ||
@@ -252,29 +279,36 @@ export class AdvertisingCoordinator {
 
       if (shouldPresentConsentForm) {
         consent = await sdk.showConsentForm();
+
         if (!this.isEligibilityCurrent(entitlementRevision)) {
           return;
         }
+
         this.privacySurfacePresentedOnLaunch = true;
         this.updatePrivacyOptionsRequirement(consent);
       }
 
       if (this.options.platform === "ios") {
         trackingStatus = await sdk.trackingAuthorizationStatus();
+
         if (!this.isEligibilityCurrent(entitlementRevision)) {
           return;
         }
+
         if (trackingStatus === "notDetermined") {
           try {
             await sdk.requestTrackingAuthorization();
+
             if (!this.isEligibilityCurrent(entitlementRevision)) {
               return;
             }
+
             this.privacySurfacePresentedOnLaunch = true;
           } catch (error) {
             if (!this.isEligibilityCurrent(entitlementRevision)) {
               return;
             }
+
             this.reportDiagnostic("trackingPermission", error);
           }
         }
@@ -282,6 +316,7 @@ export class AdvertisingCoordinator {
 
       if (!consent.canRequestAds) {
         this.consentReady = false;
+
         return;
       }
 
@@ -303,6 +338,7 @@ export class AdvertisingCoordinator {
       if (!this.isEligibilityCurrent(entitlementRevision)) {
         return;
       }
+
       this.suppressAdsForSession("consent", error);
     }
   }
@@ -314,19 +350,25 @@ export class AdvertisingCoordinator {
     if (!this.isEligibilityCurrent(entitlementRevision)) {
       return;
     }
+
     const sdk = await this.getSdk();
+
     if (!this.isEligibilityCurrent(entitlementRevision)) {
       return;
     }
+
     if (!this.initialized) {
       try {
         await sdk.initialize();
+
         if (!this.isEligibilityCurrent(entitlementRevision)) {
           return;
         }
+
         this.initialized = true;
       } catch (error) {
         this.suppressAdsForSession("initialization", error);
+
         return;
       }
     }
@@ -345,6 +387,7 @@ export class AdvertisingCoordinator {
     }
 
     this.interstitialLoading = true;
+
     try {
       await this.sdk.prepareInterstitial(this.options.adUnitIds.interstitial);
       this.interstitialPrepared = true;
@@ -362,9 +405,11 @@ export class AdvertisingCoordinator {
 
     this.appOpenPreparedAt = undefined;
     this.appOpenLoading = true;
+
     try {
       await this.sdk.loadAppOpen(this.options.adUnitIds.appOpen);
       this.appOpenPreparedAt = this.now();
+
       if (
         showWhenReady &&
         this.coldLaunchWindowOpen &&
@@ -385,6 +430,7 @@ export class AdvertisingCoordinator {
       if (this.canPrepareAds()) {
         void this.prepareAppOpen(false);
       }
+
       return false;
     }
 
@@ -392,11 +438,13 @@ export class AdvertisingCoordinator {
       if (!(await this.sdk.isAppOpenLoaded())) {
         this.appOpenPreparedAt = undefined;
         void this.prepareAppOpen(false);
+
         return false;
       }
     } catch (error) {
       this.reportDiagnostic("show", error, "appOpen");
       this.appOpenPreparedAt = undefined;
+
       return false;
     }
 
@@ -407,6 +455,7 @@ export class AdvertisingCoordinator {
         this.onFullScreenEvent("appOpen", "failedToShow");
       }
     });
+
     return true;
   }
 
@@ -414,10 +463,12 @@ export class AdvertisingCoordinator {
     if (event === "shown") {
       this.history = recordFullScreenAdShown(this.history, this.now());
       this.persistHistory();
+
       return;
     }
 
     this.presenting = false;
+
     if (event === "failedToShow") {
       this.options.reportDiagnostic({
         platform: this.options.platform,
@@ -465,8 +516,10 @@ export class AdvertisingCoordinator {
   private isAppOpenPrepared() {
     if (!isPreparedAppOpenFresh(this.appOpenPreparedAt, this.now())) {
       this.appOpenPreparedAt = undefined;
+
       return false;
     }
+
     return true;
   }
 
@@ -482,19 +535,23 @@ export class AdvertisingCoordinator {
     }
 
     const sdkPromise = this.sdkPromise;
+
     try {
       this.sdk = await sdkPromise;
+
       return this.sdk;
     } catch (error) {
       if (this.sdkPromise === sdkPromise) {
         this.sdkPromise = undefined;
       }
+
       throw error;
     }
   }
 
   private updatePrivacyOptionsRequirement(consent: AdmobConsentInfo) {
     const required = consent.privacyOptionsRequirementStatus === "REQUIRED";
+
     if (required === this.privacyOptionsRequired) {
       return;
     }
@@ -532,5 +589,6 @@ function getSanitizedErrorCode(error: unknown) {
   ) {
     return String(error.code);
   }
+
   return "unknown";
 }

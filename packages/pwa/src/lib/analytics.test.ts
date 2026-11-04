@@ -14,6 +14,7 @@ import {
 import { getTelemetryId, setTelemetryIdentity, sentryTelemetryIntegration } from "./telemetry.ts";
 
 vi.mock("@sentry/react", () => ({ setUser: vi.fn<typeof Sentry.setUser>() }));
+
 vi.mock("@capacitor/core", () => ({
   Capacitor: { isNativePlatform: vi.fn<typeof Capacitor.isNativePlatform>(() => false) },
 }));
@@ -70,9 +71,11 @@ function profile(enabled?: boolean) {
     participantInParties: {},
     ...(enabled === undefined ? {} : { usageAnalyticsEnabled: enabled }),
   });
+
   handle.change((doc) => {
     doc.id = handle.documentId;
   });
+
   return handle;
 }
 
@@ -121,7 +124,9 @@ it("creates a random synced ID once and shares it with analytics and Sentry", as
 
 it.each(["opt-out", "DNT", "GPC"])("does not generate or expose identity for %s", async (gate) => {
   const handle = profile(gate === "opt-out" ? false : true);
+
   if (gate === "DNT") preferences.doNotTrack = "1";
+
   if (gate === "GPC") preferences.globalPrivacyControl = true;
   trackPage("/");
   trackEvent("party_created");
@@ -223,6 +228,7 @@ it("strips buffered Sentry user, log and session identities after privacy signal
     NonNullable<typeof sentryTelemetryIntegration.setup>
   >[0]);
   const beforeEnvelope = on.mock.calls[0][1] as (envelope: unknown) => void;
+
   const envelope = () => [
     {},
     [
@@ -244,6 +250,7 @@ it("strips buffered Sentry user, log and session identities after privacy signal
       [{ type: "sessions" }, { aggregates: [{ did: firstId }] }],
     ],
   ];
+
   const allowed = envelope();
   beforeEnvelope(allowed);
   expect(JSON.stringify(allowed)).toContain(firstId);

@@ -40,6 +40,7 @@ function RouteComponent() {
       });
 
       toast.success(t`Party shared!`);
+
       return;
     }
 

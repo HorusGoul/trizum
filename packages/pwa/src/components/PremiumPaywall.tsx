@@ -42,14 +42,17 @@ export function PremiumPaywall({
   userId,
 }: PremiumPaywallProps) {
   const loadKey = createPremiumPaywallLoadKey(sessionId, userId);
+
   const [loadState, setLoadState] = useState<PremiumPaywallLoadState>({
     loadKey,
     status: "loading",
   });
+
   const [selectedPlanId, setSelectedPlanId] = useState<PremiumPlanId | null>(null);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [showRedemption, setShowRedemption] = useState(false);
   const [redemptionCode, setRedemptionCode] = useState("");
+
   const { activeAction, setActiveAction, onActionPress, close, purchase, restore } =
     usePremiumPaywallActions({
       isOpen,
@@ -375,6 +378,7 @@ function PremiumPlanCadence({ plan }: { plan: PremiumPlan }) {
 
   if (plan.id === "annual") {
     const pricePerMonth = plan.pricePerMonth;
+
     return pricePerMonth ? <Trans>{pricePerMonth} per month</Trans> : <Trans>per year</Trans>;
   }
 
@@ -438,6 +442,7 @@ function usePremiumPaywallActions({
   useEffect(() => {
     const session = { active: isOpen };
     sessionRef.current = session;
+
     return () => {
       session.active = false;
     };
@@ -471,13 +476,16 @@ function usePremiumPaywallActions({
     const session = sessionRef.current;
     setActiveAction("purchase");
     trackEvent("premium_purchase_started");
+
     try {
       const result = await purchasePremiumPlan(userId, offering, planId);
       trackEvent(
         result.status === "cancelled" ? "premium_purchase_cancelled" : "premium_purchase_completed",
       );
+
       if (session.active && result.status !== "cancelled") {
         onEntitlementChange(result.entitlement);
+
         if (result.entitlement.isPremium) {
           toast.success(t`Premium is now active.`);
           close();
@@ -487,10 +495,12 @@ function usePremiumPaywallActions({
       }
     } catch {
       trackEvent("premium_purchase_failed");
+
       if (session.active) {
         toast.error(t`Premium could not be purchased. Please try again.`);
       }
     }
+
     setActiveAction(null);
   }
 
@@ -502,11 +512,14 @@ function usePremiumPaywallActions({
     const session = sessionRef.current;
     setActiveAction("restore");
     trackEvent("premium_restore_started");
+
     try {
       const entitlement = await restorePremiumPurchases(userId);
       trackEvent(entitlement.isPremium ? "premium_restore_completed" : "premium_restore_empty");
+
       if (session.active) {
         onEntitlementChange(entitlement);
+
         if (entitlement.isPremium) {
           toast.success(t`Premium purchases restored.`);
           close();
@@ -516,10 +529,12 @@ function usePremiumPaywallActions({
       }
     } catch {
       trackEvent("premium_restore_failed");
+
       if (session.active) {
         toast.error(t`Purchases could not be restored. Please try again.`);
       }
     }
+
     setActiveAction(null);
   }
 

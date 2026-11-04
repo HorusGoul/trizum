@@ -49,6 +49,7 @@ export function usePartyBoost({
   const [activatingContext, setActivatingContext] = useState<string | null>(null);
   const [isTransferConfirmationOpen, setIsTransferConfirmationOpen] = useState(false);
   const [now, setNow] = useState(0);
+
   const [storedViewState, setViewState] = useState<PartyBoostViewState>({
     context: requestContext,
     error: null,
@@ -56,6 +57,7 @@ export function usePartyBoost({
     premiumRequired: false,
     status: null,
   });
+
   const viewState: PartyBoostViewState =
     storedViewState.context === requestContext
       ? storedViewState
@@ -70,6 +72,7 @@ export function usePartyBoost({
   // oxlint-disable-next-line react-doctor/no-set-state-after-await-in-effect -- Both completion paths reject inactive effects and stale request tokens before updating state.
   useEffect(() => {
     statusRequests.enterContext(requestContext);
+
     if (!userId) return;
 
     let active = true;
@@ -90,8 +93,10 @@ export function usePartyBoost({
 
     async function refresh() {
       const request = statusRequests.beginRead(requestContext);
+
       try {
         const status = await trizumApiClient.premium.getPartyBoostStatus(partyDocumentId);
+
         if (!active || !statusRequests.isCurrent(request)) {
           return;
         }
@@ -114,9 +119,11 @@ export function usePartyBoost({
 
         const partyBoostError = toPartyBoostApiError(error);
         const invalidateCache = shouldInvalidatePartyBoostCache(partyBoostError.code);
+
         if (invalidateCache) {
           clearCachedPartyBoostStatus(activeUserId, partyDocumentId);
         }
+
         setViewState((current) => ({
           context: requestContext,
           error: partyBoostError,
@@ -152,6 +159,7 @@ export function usePartyBoost({
 
   useEffect(() => {
     const transferableAt = viewState.status?.currentUser?.assignment?.transferableAt;
+
     if (!transferableAt) {
       return;
     }
@@ -160,6 +168,7 @@ export function usePartyBoost({
       () => setNow(Date.now()),
       Math.min(Math.max(transferableAt - Date.now() + 1, 0), 2_147_483_647),
     );
+
     return () => window.clearTimeout(timeoutId);
   }, [viewState.status?.currentUser?.assignment?.transferableAt]);
 
@@ -167,11 +176,14 @@ export function usePartyBoost({
     if (!userId) return;
     setViewState((current) => ({ ...current, error: null, isRefreshing: true }));
     const request = statusRequests.beginRead(requestContext);
+
     try {
       const status = await trizumApiClient.premium.getPartyBoostStatus(partyDocumentId);
+
       if (!statusRequests.isCurrent(request)) {
         return;
       }
+
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState((current) => ({
         context: requestContext,
@@ -190,9 +202,11 @@ export function usePartyBoost({
 
       const partyBoostError = toPartyBoostApiError(error);
       const invalidateCache = shouldInvalidatePartyBoostCache(partyBoostError.code);
+
       if (invalidateCache) {
         clearCachedPartyBoostStatus(userId, partyDocumentId);
       }
+
       setViewState((current) => ({
         context: requestContext,
         error: partyBoostError,
@@ -206,24 +220,30 @@ export function usePartyBoost({
 
   async function activate() {
     const isActivating = activatingContext === requestContext;
+
     if (isActivating) {
       return;
     }
 
     if (!userId) {
       await navigate({ to: "/settings/cloud-sync" });
+
       return;
     }
 
     const mutationContext = requestContext;
     setActivatingContext(mutationContext);
     statusRequests.beginMutation(mutationContext);
+
     try {
       const status = await trizumApiClient.premium.activatePartyBoost(partyDocumentId);
+
       if (!statusRequests.finishMutation(mutationContext)) {
         setActivatingContext((current) => (current === mutationContext ? null : current));
+
         return;
       }
+
       writeCachedPartyBoostStatus(userId, partyDocumentId, status);
       setViewState({
         context: requestContext,
@@ -238,8 +258,10 @@ export function usePartyBoost({
     } catch (error) {
       if (!statusRequests.finishMutation(mutationContext)) {
         setActivatingContext((current) => (current === mutationContext ? null : current));
+
         return;
       }
+
       const partyBoostError = toPartyBoostApiError(error);
       clearCachedPartyBoostStatus(userId, partyDocumentId);
       setIsTransferConfirmationOpen(false);
@@ -250,6 +272,7 @@ export function usePartyBoost({
         premiumRequired: partyBoostError.code === "premium_required",
         status: null,
       });
+
       switch (partyBoostError.code) {
         case "already_boosted":
           toast.error(t`This party already has an active Party Boost.`);
@@ -267,21 +290,26 @@ export function usePartyBoost({
           toast.error(t`Party Boost is unavailable. Please try again.`);
       }
     }
+
     setActivatingContext((current) => (current === mutationContext ? null : current));
   }
 
   async function openPremium() {
     if (!userId) {
       await navigate({ to: "/settings/cloud-sync" });
+
       return;
     }
 
     try {
       const entitlement = await presentPaywall();
+
       if (!statusRequests.isInContext(requestContext)) return;
+
       if (entitlement?.isPremium) {
         setViewState((current) => ({ ...current, premiumRequired: false }));
       }
+
       await refreshStatus();
     } catch {
       toast.error(t`Could not open Premium. Please try again.`);
@@ -292,9 +320,11 @@ export function usePartyBoost({
   const isActivating = activatingContext === requestContext;
   const assignment = status?.currentUser?.assignment ?? null;
   const isAssignedElsewhere = Boolean(assignment && assignment.partyDocumentId !== partyDocumentId);
+
   const canTransfer = Boolean(
     isAssignedElsewhere && assignment && assignment.transferableAt <= now,
   );
+
   const actionState = getPartyBoostActionState({
     isActivating,
     isDevicePremium,
@@ -331,6 +361,7 @@ function readCachedPartyBoostStatus(userId: string, partyDocumentId: string) {
   try {
     const value = localStorage.getItem(getCacheKey(userId, partyDocumentId));
     const parsedValue = value ? (JSON.parse(value) as unknown) : null;
+
     return isPartyBoostStatus(parsedValue) ? parsedValue : null;
   } catch {
     return null;

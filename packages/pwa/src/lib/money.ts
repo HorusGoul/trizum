@@ -29,6 +29,7 @@ const appCurrencies = {
 };
 
 export type CurrencyCode = keyof typeof appCurrencies;
+
 export type Money = Dinero<number>;
 
 export function createMoney(amount: number): Money {

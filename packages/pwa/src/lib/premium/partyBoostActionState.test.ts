@@ -25,6 +25,7 @@ describe("getPartyBoostActionState", () => {
       }),
       {},
     );
+
     expect(getActionState({ status, isNativePlatform: false })).toEqual({
       type: "transfer",
       disabled: false,

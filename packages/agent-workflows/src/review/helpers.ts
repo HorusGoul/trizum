@@ -12,8 +12,10 @@ import type {
 
 const manifestFilePattern = /(^|\/)(package\.json|pnpm-workspace\.yaml)$/;
 const versionLinePattern = /^[+-]\s{2,}"(?<name>[^"]+)":\s*"(?<version>[^"]+)"[,]?$/;
+
 const yamlVersionLinePattern =
   /^[+-]\s+(?<name>["']?(?:@?[\w.-]+\/)?[\w.-]+["']?):\s*(?<version>.+)$/;
+
 const ignoredManifestKeys = new Set([
   "author",
   "description",
@@ -94,6 +96,7 @@ export function classifyCheckStatus(checks: readonly CheckRun[]): CheckStatus {
   const skipping = checks.filter((check) => check.bucket === "skipping");
 
   let conclusion: CheckStatus["conclusion"] = "unknown";
+
   if (failing.length > 0) {
     conclusion = "fail";
   } else if (pending.length > 0) {
@@ -123,9 +126,11 @@ export function pickRenovatePullRequest(
 ): RenovatePullRequest {
   if (requestedNumber != null) {
     const requested = candidates.find((candidate) => candidate.number === requestedNumber);
+
     if (requested == null) {
       throw new Error(`Could not find open Renovate PR #${requestedNumber}.`);
     }
+
     return requested;
   }
 
@@ -133,16 +138,19 @@ export function pickRenovatePullRequest(
     const statusPriority =
       statusPriorityForSelection(b.status.conclusion) -
       statusPriorityForSelection(a.status.conclusion);
+
     if (statusPriority !== 0) {
       return statusPriority;
     }
 
     const aTime = Date.parse(a.updatedAt ?? a.createdAt ?? "");
     const bTime = Date.parse(b.updatedAt ?? b.createdAt ?? "");
+
     return (aTime || 0) - (bTime || 0);
   });
 
   const picked = sorted.find((candidate) => !candidate.isDraft) ?? sorted[0];
+
   if (picked == null) {
     throw new Error("No open Renovate PRs were found.");
   }
@@ -180,14 +188,17 @@ export function parseDependencyUpdatesFromDiff(diff: string): DependencyUpdate[]
     }
 
     const removedMatch = parseVersionLine(line, "-");
+
     if (removedMatch != null) {
       if (!ignoredManifestKeys.has(removedMatch.name)) {
         removed.set(removedMatch.name, removedMatch.version);
       }
+
       continue;
     }
 
     const addedMatch = parseVersionLine(line, "+");
+
     if (addedMatch == null || ignoredManifestKeys.has(addedMatch.name)) {
       continue;
     }
@@ -219,11 +230,13 @@ export function parseDependencyUpdatesFromRenovateBody(body: string): Dependency
     }
 
     const changeMatch = /`?(?<from>[^`→]+?)`?\s*→\s*`?(?<to>[^`]+?)`?$/.exec(cells[3]);
+
     if (changeMatch?.groups == null) {
       continue;
     }
 
     const name = (/\[(?<name>[^\]]+)\]/.exec(cells[0])?.groups?.name ?? cells[0]).trim();
+
     if (!name || ignoredManifestKeys.has(name)) {
       continue;
     }
@@ -253,6 +266,7 @@ export function mergeDependencyUpdates(updates: readonly DependencyUpdate[]): De
 function parseDiffFile(line: string): string {
   const parts = line.split(" ");
   const target = parts[3] ?? parts[2] ?? "";
+
   return target.replace(/^b\//, "").replace(/^a\//, "");
 }
 
@@ -265,6 +279,7 @@ function parseVersionLine(
   }
 
   const jsonMatch = versionLinePattern.exec(line);
+
   if (jsonMatch?.groups != null) {
     return {
       name: jsonMatch.groups.name,
@@ -273,11 +288,13 @@ function parseVersionLine(
   }
 
   const yamlMatch = yamlVersionLinePattern.exec(line);
+
   if (yamlMatch?.groups == null) {
     return undefined;
   }
 
   const version = yamlMatch.groups.version.trim().replace(/^["']|["']$/g, "");
+
   if (!looksLikeVersion(version)) {
     return undefined;
   }
@@ -324,24 +341,31 @@ export function inferAffectedAreas(
     if (/^@capacitor\/|^@capawesome\/|capacitor/.test(update.name)) {
       areas.add("mobile");
     }
+
     if (/^@automerge\//.test(update.name)) {
       areas.add("collaboration");
     }
+
     if (/^@lingui\/|lingui/.test(update.name)) {
       areas.add("i18n");
     }
+
     if (/^@playwright\/|playwright/.test(update.name)) {
       areas.add("e2e");
     }
+
     if (/^@sentry\/|^@logtape\//.test(update.name)) {
       areas.add("observability");
     }
+
     if (/^@tanstack\//.test(update.name)) {
       areas.add("routing-and-forms");
     }
+
     if (/^react$|^react-dom$|react-aria|react-window|motion/.test(update.name)) {
       areas.add("pwa");
     }
+
     if (/^hono$|^@hono\/|drizzle|libsql/.test(update.name)) {
       areas.add("server");
     }
@@ -399,6 +423,7 @@ export function buildDeterministicReview(context: PullRequestContext): ReviewRes
 
 function formatDependencyMetadataNote(metadata: DependencyMetadata): string {
   const source = metadata.changelogUrl ?? metadata.repositoryUrl ?? metadata.homepage;
+
   return source == null
     ? `${metadata.name}: no changelog or repository URL found from npm metadata.`
     : `${metadata.name}: inspect ${source}`;
@@ -426,31 +451,37 @@ export function buildManualTestPlan(affectedAreas: readonly string[]): string[] 
       "Run the PWA locally, create or edit a bill, split participants, and reload while offline.",
     );
   }
+
   if (affectedAreas.includes("server") || affectedAreas.includes("collaboration")) {
     plan.add(
       "Start the sync server and verify a document can sync over the Automerge websocket path.",
     );
   }
+
   if (affectedAreas.includes("mobile")) {
     plan.add(
       "Run the mobile wrapper smoke flow for sign-in, camera/share permissions, and safe-area rendering.",
     );
   }
+
   if (affectedAreas.includes("i18n")) {
     plan.add(
       "Switch locales and verify extracted Lingui messages still render on core app screens.",
     );
   }
+
   if (affectedAreas.includes("e2e")) {
     plan.add(
       "Run a representative Playwright journey in headed mode to confirm browser-driver compatibility.",
     );
   }
+
   if (affectedAreas.includes("observability")) {
     plan.add(
       "Exercise startup and one handled error path to confirm logging and Sentry initialization still work.",
     );
   }
+
   if (plan.size === 0) {
     plan.add("Smoke-test the area owning the changed package manifests.");
   }
@@ -464,12 +495,15 @@ export function buildAutomatedTestSuggestions(affectedAreas: readonly string[]):
   if (affectedAreas.includes("pwa")) {
     suggestions.add("vp run --filter @trizum/pwa test");
   }
+
   if (affectedAreas.includes("server")) {
     suggestions.add("vp run --filter @trizum/server check");
   }
+
   if (affectedAreas.includes("e2e")) {
     suggestions.add("vp run test:e2e");
   }
+
   if (affectedAreas.includes("mobile")) {
     suggestions.add("cd packages/mobile && vp run build");
   }
@@ -504,6 +538,7 @@ export function parseRgUsage(stdout: string): UsageMatch[] {
     .split(/\r?\n/)
     .map((line) => {
       const match = /^(?<file>.*?):(?<line>\d+):(?<text>.*)$/.exec(line);
+
       if (match?.groups == null) {
         return undefined;
       }

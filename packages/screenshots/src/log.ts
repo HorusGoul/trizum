@@ -8,6 +8,7 @@ import { getGitHubActionsAnnotationSink } from "@trizum/logging/github-actions";
 const GITHUB_ACTIONS_ANNOTATION_SINK_ID = "githubActionsAnnotations";
 
 type ScreenshotsBuiltInSinkId = typeof GITHUB_ACTIONS_ANNOTATION_SINK_ID;
+
 type ScreenshotsLoggingOptions<TSinkId extends string = never> = Omit<
   ConfigureTrizumLoggingOptions<ScreenshotsBuiltInSinkId | TSinkId>,
   "surface"

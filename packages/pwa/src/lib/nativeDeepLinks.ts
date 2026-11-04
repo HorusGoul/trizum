@@ -12,6 +12,7 @@ const AUTH_PATH_PREFIX = "/api/auth/";
 const CALLBACK_SEARCH_PARAMS = ["callbackURL", "newUserCallbackURL", "errorCallbackURL"];
 
 const configuredAuthOrigin = getConfiguredAuthOrigin();
+
 const appLinkOrigins = new Set(
   [DEFAULT_APP_LINK_ORIGIN, configuredAuthOrigin].filter((origin): origin is string =>
     Boolean(origin),
@@ -55,6 +56,7 @@ export async function resolveNativeDeepLink(rawUrl: string): Promise<NativeDeepL
 
   if (url.pathname.startsWith(AUTH_PATH_PREFIX)) {
     logger.warning("Ignored unsupported native auth deep link", { path: url.pathname });
+
     return { isAppLink: true };
   }
 
@@ -94,6 +96,7 @@ async function resolveNativeMagicLink(url: URL): Promise<string> {
     logger.warning("Native magic link verification failed", { error });
 
     errorCallbackUrl.searchParams.set("error", "INVALID_TOKEN");
+
     return getRouteHref(errorCallbackUrl);
   }
 }
@@ -120,6 +123,7 @@ async function resolveNativeEmailVerification(url: URL): Promise<string> {
     logger.warning("Native email verification failed", { error });
 
     callbackUrl.searchParams.set("error", "INVALID_TOKEN");
+
     return getRouteHref(callbackUrl);
   }
 }
@@ -170,6 +174,7 @@ function parseUrl(value: string, base?: string): URL | undefined {
     return new URL(value, base);
   } catch {
     logger.warning("Ignored invalid native deep link URL");
+
     return undefined;
   }
 }

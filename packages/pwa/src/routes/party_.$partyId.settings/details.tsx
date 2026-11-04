@@ -21,10 +21,12 @@ function PartyDetailsSettings() {
   const { partyId } = Route.useParams();
   const router = useRouter();
   const { party, updateDetails } = useParty(partyId);
+
   const returnToSettings = useBackNavigation({
     to: "/party/$partyId/settings",
     params: { partyId },
   });
+
   const formId = useId();
   // Finish persistence after departure, but discard this form's completion UI.
   const cancelSaveCompletion = useRef<(() => void) | undefined>(undefined);
@@ -38,28 +40,36 @@ function PartyDetailsSettings() {
     } satisfies PartyDetailsFormValues,
     onSubmit: async ({ value }) => {
       let canCompleteHere = true;
+
       const unsubscribe = router.history.subscribe(() => {
         canCompleteHere = false;
       });
+
       const cancelCompletion = () => {
         canCompleteHere = false;
         unsubscribe();
       };
+
       cancelSaveCompletion.current = cancelCompletion;
       let didSave = false;
+
       try {
         await updateDetails(value);
         didSave = true;
       } catch {
         if (canCompleteHere) toast.error(t`Could not save party details. Please try again.`);
       }
+
       const shouldCompleteHere = canCompleteHere;
       cancelCompletion();
+
       if (cancelSaveCompletion.current === cancelCompletion) {
         cancelSaveCompletion.current = undefined;
       }
+
       if (!didSave) return;
       trackEvent("party_details_updated");
+
       if (!shouldCompleteHere) return;
       form.reset(value);
       toast.success(t`Party details saved!`);

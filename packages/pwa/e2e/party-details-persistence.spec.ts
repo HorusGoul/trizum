@@ -8,18 +8,22 @@ async function holdNextSaveAcknowledgment(page: Page) {
       IDBDatabase.prototype,
       "transaction",
     ) as IDBDatabase["transaction"];
+
     const testWindow = window as Window & {
       releasePersistenceTest?: () => void;
       restorePersistenceTest?: () => void;
     };
+
     let holdNextWrite = true;
     testWindow.restorePersistenceTest = () => {
       IDBDatabase.prototype.transaction = original;
       testWindow.releasePersistenceTest?.();
       delete testWindow.restorePersistenceTest;
     };
+
     IDBDatabase.prototype.transaction = function (...args) {
       const transaction = original.apply(this, args);
+
       if (this.name === "trizum" && args[1] === "readwrite" && holdNextWrite) {
         holdNextWrite = false;
         // The adapter's oncomplete is installed after this listener. Hold only
@@ -32,6 +36,7 @@ async function holdNextSaveAcknowledgment(page: Page) {
           };
         });
       }
+
       return transaction;
     };
   });
@@ -69,10 +74,12 @@ test("a confirmed details save survives an immediate document reload", async ({
 }) => {
   const fixture = createPartyFixture();
   fixture.party.name = "Before save";
+
   const { partyId } = await harness.seedJoinedParty({
     fixture,
     memberParticipantId: defaultParticipants.blair.id,
   });
+
   await harness.goto(`/party/${partyId}/settings`);
   await page.locator(`a[href="/party/${partyId}/settings/details"]`).click();
   await page.getByLabel("Name", { exact: true }).fill("After save");
@@ -89,10 +96,12 @@ test("a failed details save keeps the draft available for retry", async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 375, height: 812 });
+
   const { partyId } = await harness.seedJoinedParty({
     fixture: createPartyFixture(),
     memberParticipantId: defaultParticipants.blair.id,
   });
+
   const details = `/party/${partyId}/settings/details`;
   await harness.goto(`/party/${partyId}/settings`);
   await page.locator(`a[href="${details}"]`).click();
@@ -102,18 +111,22 @@ test("a failed details save keeps the draft available for retry", async ({
       IDBDatabase.prototype,
       "transaction",
     ) as IDBDatabase["transaction"];
+
     const testWindow = window as Window & { restorePersistenceTest?: () => void };
     testWindow.restorePersistenceTest = () => {
       IDBDatabase.prototype.transaction = original;
       delete testWindow.restorePersistenceTest;
     };
+
     IDBDatabase.prototype.transaction = function (...args) {
       if (this.name === "trizum" && args[1] === "readwrite") {
         throw new DOMException("Synthetic storage failure", "QuotaExceededError");
       }
+
       return original.apply(this, args);
     };
   });
+
   try {
     await page.getByRole("button", { name: "Save", exact: true }).click();
     await expect(
@@ -128,6 +141,7 @@ test("a failed details save keeps the draft available for retry", async ({
         const bounds = await page
           .getByText("Could not save party details. Please try again.", { exact: true })
           .boundingBox();
+
         return Boolean(bounds && bounds.y >= 0 && bounds.y + bounds.height <= 812);
       })
       .toBe(true);
@@ -137,6 +151,7 @@ test("a failed details save keeps the draft available for retry", async ({
       (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
     });
   }
+
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/party/${partyId}/settings(?:[?].*)?$`));
   await expect(page.getByRole("link", { name: /Retry this save/ })).toBeVisible();
@@ -149,14 +164,17 @@ test("details cannot change while their save acknowledgment is pending", async (
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 375, height: 812 });
+
   const { partyId } = await harness.seedJoinedParty({
     fixture: createPartyFixture(),
     memberParticipantId: defaultParticipants.blair.id,
   });
+
   await harness.goto(`/party/${partyId}/settings`);
   await page.locator(`a[href="/party/${partyId}/settings/details"]`).click();
   await page.getByLabel("Name", { exact: true }).fill("Pending save");
   await holdNextSaveAcknowledgment(page);
+
   try {
     await page.getByRole("button", { name: "Save", exact: true }).click();
     await expect(page.getByRole("button", { name: "Submitting...", exact: true })).toBeVisible();
@@ -182,6 +200,7 @@ test("details cannot change while their save acknowledgment is pending", async (
       (window as Window & { restorePersistenceTest?: () => void }).restorePersistenceTest?.();
     });
   }
+
   await harness.goto(`/party/${partyId}/settings/details`);
   await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Pending save");
 });
@@ -192,15 +211,18 @@ for (const back of ["header", "browser", "native-style"] as const) {
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
+
     const settings = `/party/${partyId}/settings`;
     const details = `${settings}/details`;
     await harness.goto(settings);
     await page.locator(`a[href="${details}"]`).click();
     await page.getByLabel("Name", { exact: true }).fill("Saved after leaving");
     await holdNextSaveAcknowledgment(page);
+
     try {
       await page.getByRole("button", { name: "Save", exact: true }).click();
       await expect(page.getByRole("button", { name: "Submitting...", exact: true })).toBeVisible();
+
       if (back === "header") {
         await page.getByRole("button", { name: "Go Back", exact: true }).click();
       } else if (back === "browser") {
@@ -208,6 +230,7 @@ for (const back of ["header", "browser", "native-style"] as const) {
       } else {
         await page.evaluate(() => window.history.go(-1));
       }
+
       await expect(page).toHaveURL(new RegExp(`${settings}(?:[?].*)?$`));
       await expect(
         page.getByRole("heading", { name: "Party Settings", exact: true }),
@@ -222,6 +245,7 @@ for (const back of ["header", "browser", "native-style"] as const) {
     } finally {
       await restoreSaveAcknowledgment(page);
     }
+
     await harness.goto(details);
     await expect(page.getByLabel("Name", { exact: true })).toHaveValue("Saved after leaving");
   });

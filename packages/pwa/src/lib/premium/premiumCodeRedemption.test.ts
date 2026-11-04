@@ -20,10 +20,12 @@ const store = vi.hoisted(() => ({
   invalidateCustomerInfoCache: vi.fn<() => Promise<void>>(),
   presentCodeRedemptionSheet: vi.fn<() => Promise<void>>(),
 }));
+
 vi.mock("./revenueCatConfig.ts", () => ({
   getRevenueCatPlatform: () => store.platform,
   getRevenueCatPublicApiKey: () => "public-test-key",
 }));
+
 vi.mock("@revenuecat/purchases-capacitor", () => ({ LOG_LEVEL: {}, Purchases: store }));
 
 beforeEach(() => {
@@ -40,6 +42,7 @@ beforeEach(() => {
   });
   vi.stubGlobal("window", { location: { assign } });
 });
+
 afterEach(() => vi.unstubAllGlobals());
 
 it("identifies the account before opening Apple's native sheet", async () => {
@@ -77,13 +80,16 @@ it("does not open a store before sign-in or on web", async () => {
 it("syncs external purchases on refresh, retries delayed receipts, and stops once Premium arrives", async () => {
   const { openPremiumCodeRedemption, refreshRevenueCatCustomerInfo } =
     await import("./revenueCatClient.ts");
+
   await openPremiumCodeRedemption("friend", "FRIENDS");
   await refreshRevenueCatCustomerInfo();
   expect(store.syncPurchases).toHaveBeenCalledOnce();
+
   const customerInfo = {
     entitlements: { active: { premium: { ownershipType: "PURCHASED" } } },
     activeSubscriptions: [],
   };
+
   store.getCustomerInfo.mockResolvedValue({ customerInfo });
   expect(await refreshRevenueCatCustomerInfo()).toBe(customerInfo);
   await refreshRevenueCatCustomerInfo();
@@ -94,6 +100,7 @@ it("syncs external purchases on refresh, retries delayed receipts, and stops onc
 it("preserves SDK-cached access if receipt sync fails offline", async () => {
   const { openPremiumCodeRedemption, refreshRevenueCatCustomerInfo } =
     await import("./revenueCatClient.ts");
+
   await openPremiumCodeRedemption("friend", "FRIENDS");
   store.syncPurchases.mockRejectedValue(new Error("offline"));
   await expect(refreshRevenueCatCustomerInfo()).resolves.toEqual({ entitlements: { active: {} } });
@@ -102,6 +109,7 @@ it("preserves SDK-cached access if receipt sync fails offline", async () => {
 it("does not sync a pending redemption into a different account", async () => {
   const { openPremiumCodeRedemption, prepareRevenueCatUser, refreshRevenueCatCustomerInfo } =
     await import("./revenueCatClient.ts");
+
   await openPremiumCodeRedemption("friend", "FRIENDS");
   await prepareRevenueCatUser("other");
   await refreshRevenueCatCustomerInfo();

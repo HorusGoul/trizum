@@ -3,18 +3,23 @@ import { z } from "zod";
 export const REVIEW_LABEL = "ready for human review";
 
 export const workflowModeSchema = z.enum(["dry-run", "write"]);
+
 export type WorkflowMode = z.infer<typeof workflowModeSchema>;
 
 export const codexModeSchema = z.enum(["auto", "off", "required"]);
+
 export type CodexMode = z.infer<typeof codexModeSchema>;
 
 export const checkBucketSchema = z.enum(["pass", "fail", "pending", "skipping", "cancel"]);
+
 export type CheckBucket = z.infer<typeof checkBucketSchema>;
 
 export const checkConclusionSchema = z.enum(["pass", "fail", "pending", "unknown"]);
+
 export type CheckConclusion = z.infer<typeof checkConclusionSchema>;
 
 export const reviewSeveritySchema = z.enum(["blocker", "warning", "info"]);
+
 export type ReviewSeverity = z.infer<typeof reviewSeveritySchema>;
 
 export const workflowActionSchema = z.enum([
@@ -24,6 +29,7 @@ export const workflowActionSchema = z.enum([
   "needs-human",
   "wait-for-checks",
 ]);
+
 export type WorkflowAction = z.infer<typeof workflowActionSchema>;
 
 export const workflowOptionsSchema = z.object({
@@ -37,6 +43,7 @@ export const workflowOptionsSchema = z.object({
   runLocalValidation: z.boolean().default(true),
   supersede: z.boolean().default(false),
 });
+
 export type WorkflowOptions = z.infer<typeof workflowOptionsSchema>;
 
 export const checkRunSchema = z.object({
@@ -49,6 +56,7 @@ export const checkRunSchema = z.object({
   state: z.string().optional(),
   workflow: z.string().optional(),
 });
+
 export type CheckRun = z.infer<typeof checkRunSchema>;
 
 export const checkStatusSchema = z.object({
@@ -59,6 +67,7 @@ export const checkStatusSchema = z.object({
   skipping: z.array(checkRunSchema),
   summary: z.string(),
 });
+
 export type CheckStatus = z.infer<typeof checkStatusSchema>;
 
 export const renovatePullRequestSchema = z.object({
@@ -74,6 +83,7 @@ export const renovatePullRequestSchema = z.object({
   updatedAt: z.string().optional(),
   url: z.string(),
 });
+
 export type RenovatePullRequest = z.infer<typeof renovatePullRequestSchema>;
 
 export const dependencyUpdateSchema = z.object({
@@ -82,6 +92,7 @@ export const dependencyUpdateSchema = z.object({
   name: z.string(),
   to: z.string().optional(),
 });
+
 export type DependencyUpdate = z.infer<typeof dependencyUpdateSchema>;
 
 export const dependencyMetadataSchema = z.object({
@@ -91,6 +102,7 @@ export const dependencyMetadataSchema = z.object({
   registryVersion: z.string().optional(),
   repositoryUrl: z.string().optional(),
 });
+
 export type DependencyMetadata = z.infer<typeof dependencyMetadataSchema>;
 
 export const usageMatchSchema = z.object({
@@ -98,6 +110,7 @@ export const usageMatchSchema = z.object({
   line: z.number().int().positive(),
   text: z.string(),
 });
+
 export type UsageMatch = z.infer<typeof usageMatchSchema>;
 
 export const failedCheckLogSchema = z.object({
@@ -105,6 +118,7 @@ export const failedCheckLogSchema = z.object({
   log: z.string(),
   runId: z.string().optional(),
 });
+
 export type FailedCheckLog = z.infer<typeof failedCheckLogSchema>;
 
 export const pullRequestContextSchema = z.object({
@@ -118,6 +132,7 @@ export const pullRequestContextSchema = z.object({
   pr: renovatePullRequestSchema,
   usageMatches: z.array(usageMatchSchema),
 });
+
 export type PullRequestContext = z.infer<typeof pullRequestContextSchema>;
 
 export const reviewFindingSchema = z.object({
@@ -126,6 +141,7 @@ export const reviewFindingSchema = z.object({
   severity: reviewSeveritySchema,
   title: z.string(),
 });
+
 export type ReviewFinding = z.infer<typeof reviewFindingSchema>;
 
 export const reviewResultSchema = z.object({
@@ -136,6 +152,7 @@ export const reviewResultSchema = z.object({
   manualTestPlan: z.array(z.string()),
   summary: z.string(),
 });
+
 export type ReviewResult = z.infer<typeof reviewResultSchema>;
 
 export const codexReviewResultSchema = reviewResultSchema.extend({
@@ -143,6 +160,7 @@ export const codexReviewResultSchema = reviewResultSchema.extend({
   rawOutput: z.string().optional(),
   ran: z.boolean(),
 });
+
 export type CodexReviewResult = z.infer<typeof codexReviewResultSchema>;
 
 export const reviewBundleSchema = z.object({
@@ -150,6 +168,7 @@ export const reviewBundleSchema = z.object({
   context: pullRequestContextSchema,
   deterministic: reviewResultSchema,
 });
+
 export type ReviewBundle = z.infer<typeof reviewBundleSchema>;
 
 export const reviewDecisionSchema = z.object({
@@ -159,6 +178,7 @@ export const reviewDecisionSchema = z.object({
   review: reviewBundleSchema,
   summary: z.string(),
 });
+
 export type ReviewDecision = z.infer<typeof reviewDecisionSchema>;
 
 export const supersedingPullRequestSchema = z.object({
@@ -171,6 +191,7 @@ export const supersedingPullRequestSchema = z.object({
   summary: z.string(),
   updatedOriginalPr: z.boolean().optional(),
 });
+
 export type SupersedingPullRequest = z.infer<typeof supersedingPullRequestSchema>;
 
 export const workflowResultSchema = z.object({
@@ -181,22 +202,26 @@ export const workflowResultSchema = z.object({
   report: z.string(),
   supersedingPullRequest: supersedingPullRequestSchema.optional(),
 });
+
 export type WorkflowResult = z.infer<typeof workflowResultSchema>;
 
 export const listedPullRequestsStateSchema = z.object({
   candidates: z.array(renovatePullRequestSchema),
   options: workflowOptionsSchema,
 });
+
 export type ListedPullRequestsState = z.infer<typeof listedPullRequestsStateSchema>;
 
 export const selectedPullRequestStateSchema = z.object({
   options: workflowOptionsSchema,
   pr: renovatePullRequestSchema,
 });
+
 export type SelectedPullRequestState = z.infer<typeof selectedPullRequestStateSchema>;
 
 export const contextStateSchema = z.object({
   context: pullRequestContextSchema,
   options: workflowOptionsSchema,
 });
+
 export type ContextState = z.infer<typeof contextStateSchema>;

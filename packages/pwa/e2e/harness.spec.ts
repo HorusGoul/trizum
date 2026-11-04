@@ -56,6 +56,7 @@ test.describe("Browser harness", () => {
 
     const headingBeforeSignIn = await homeHeading.boundingBox();
     const homeHeadingElement = await homeHeading.elementHandle();
+
     if (!homeHeadingElement) {
       throw new Error("Expected the home heading to be mounted before opening sign-in");
     }
@@ -81,6 +82,7 @@ test.describe("Browser harness", () => {
 
   test("returns straight to home after signing in", async ({ harness, page }) => {
     const homePage = new HomePage(page);
+
     const user = {
       createdAt: new Date().toISOString(),
       email: "alex@example.com",
@@ -90,6 +92,7 @@ test.describe("Browser harness", () => {
       name: "Alex",
       updatedAt: new Date().toISOString(),
     };
+
     let isSignedIn = false;
     let cloudPartyListId = "";
 
@@ -112,17 +115,20 @@ test.describe("Browser harness", () => {
               }
             : null,
         });
+
         return;
       }
 
       if (pathname.endsWith("/sign-in/email")) {
         isSignedIn = true;
         await route.fulfill({ json: { redirect: false, token: "test-token", user } });
+
         return;
       }
 
       if (pathname.endsWith("/list-accounts")) {
         await route.fulfill({ json: [] });
+
         return;
       }
 
@@ -165,6 +171,7 @@ test.describe("Browser harness", () => {
         const cloudSettingsHeading = [...document.querySelectorAll("h1")].some(
           (heading) => heading.textContent?.trim() === "trizum cloud",
         );
+
         testWindow.__cloudSettingsRendered ||= cloudSettingsHeading;
       }).observe(document.body, { childList: true, subtree: true });
     });
@@ -208,10 +215,12 @@ test.describe("Browser harness", () => {
       authEndpoint = route.request().url();
       await route.fulfill({ json: null });
     });
+
     const seededParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
+
     if (!authEndpoint) throw new Error("Expected a session endpoint during fixture boot");
 
     // Probe the client boundary: WebKit can skip HTTP interception after navigation.
@@ -221,24 +230,30 @@ test.describe("Browser harness", () => {
       const originalFetch = window.fetch.bind(window);
       window.fetch = (input, init) => {
         let url: string;
+
         try {
           url = new URL(input instanceof Request ? input.url : String(input), location.href).href;
         } catch {
           return originalFetch(input, init);
         }
+
         if (url !== endpoint) return originalFetch(input, init);
         const request = new Request(input, init);
         const response = Response.json(null);
         requests.push({ method: request.method, credentials: request.credentials });
+
         return Promise.resolve(response);
       };
     }, authEndpoint);
 
     await harness.gotoParty(seededParty.partyId);
     await partyPage.expectLoaded(seededParty.partyId, "Weekend trip");
+
     const sessionRequests = () =>
       page.evaluate(() => (window as PartyAuthProbeWindow).__partyAuthRequests);
+
     await expect.poll(async () => (await sessionRequests()).length).toBeGreaterThan(0);
+
     for (const request of await sessionRequests()) {
       expect(request.method).toBe("GET");
       expect(request.credentials).toBe("include");
@@ -251,13 +266,16 @@ test.describe("Browser harness", () => {
     page,
   }) => {
     const partyPage = new PartyPage(page);
+
     const activeParty = await harness.seedJoinedParty({
       fixture: createPartyFixture(),
       memberParticipantId: defaultParticipants.blair.id,
     });
+
     const replacementPartyList = await harness.createDeferredPartyList({
       username: "Another tab",
     });
+
     await harness.releaseDeferredPartyList(replacementPartyList.partyListId);
 
     await harness.gotoParty(activeParty.partyId);
@@ -276,6 +294,7 @@ test.describe("Browser harness", () => {
 
   test("can reopen an existing persisted party from the home screen", async ({ harness, page }) => {
     const homePage = new HomePage(page);
+
     const seededParty = await harness.joinSeededParty({
       fixture: createImbalancedPartyFixture(),
       participantName: defaultParticipants.blair.name,
@@ -356,6 +375,7 @@ test.describe("Browser harness", () => {
         .poll(async () =>
           page.evaluate(() => {
             const search = new URLSearchParams(window.location.search);
+
             return {
               tab: search.get("tab"),
               offlineOnly: search.get("__internal_offline_only"),
@@ -481,6 +501,7 @@ test.describe("Browser harness", () => {
     const expensePage = new ExpensePage(page);
     const partyPage = new PartyPage(page);
     const payPage = new PayPage(page);
+
     const action = {
       actionLabel: "Pay" as const,
       fromLabel: `${defaultParticipants.blair.name} (me)`,

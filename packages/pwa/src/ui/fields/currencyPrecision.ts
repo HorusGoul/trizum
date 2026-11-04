@@ -17,5 +17,6 @@ export function getCurrencyDecimalPrecision(currency: string | undefined) {
       .find((part) => part.type === "fraction")?.value.length ?? 2;
 
   currencyDecimalPrecisionCache.set(cacheKey, precision);
+
   return precision;
 }

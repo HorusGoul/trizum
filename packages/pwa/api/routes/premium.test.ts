@@ -196,7 +196,9 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
       expect((await harness.request("PUT", party, owner.cookie)).status).toBe(200);
 
       if (change === "expired") harness.customers.set(owner.id, "inactive");
+
       if (change === "exception_removed") harness.env.PARTY_BOOST_SANDBOX_USER_ID = undefined;
+
       if (change === "different_allowed_viewer")
         harness.env.PARTY_BOOST_SANDBOX_USER_ID = member.id;
 
@@ -384,13 +386,16 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
   test("allows only one winner when two owners activate the same party concurrently", async () => {
     const owners = await Promise.all([harness.createUser(), harness.createUser()]);
     const party = harness.createParty();
+
     for (const owner of owners) {
       owner.join(party);
       harness.customers.set(owner.id, "subscription");
     }
+
     const responses = await Promise.all(
       owners.map((owner) => harness.request("PUT", party, owner.cookie)),
     );
+
     expect(responses.map((response) => response.status).sort((a, b) => a - b)).toEqual([200, 409]);
     const stored = await Promise.all(owners.map((owner) => harness.assignment(owner.id)));
     expect(stored.filter((row) => row?.revokedAt === null)).toHaveLength(1);
@@ -399,17 +404,22 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
   test("allows only one assignment when one owner activates two parties concurrently", async () => {
     const owner = await harness.createUser();
     const parties = [harness.createParty(), harness.createParty()];
+
     for (const party of parties) owner.join(party);
     harness.customers.set(owner.id, "subscription");
+
     const responses = await Promise.all(
       parties.map((party) => harness.request("PUT", party, owner.cookie)),
     );
+
     expect(responses.map((response) => response.status).sort((a, b) => a - b)).toEqual([200, 409]);
+
     const active = await harness.env.DB.prepare(
       "SELECT COUNT(*) AS count FROM party_boost WHERE ownerUserId = ? AND revokedAt IS NULL",
     )
       .bind(owner.id)
       .first<{ count: number }>();
+
     expect(active?.count).toBe(1);
   });
 
@@ -488,6 +498,7 @@ describe("Party Boost HTTP lifecycle with local D1", () => {
     owner.join(party);
     harness.customers.set(owner.id, "subscription");
     expect((await harness.request("PUT", party, owner.cookie)).status).toBe(200);
+
     return { owner, party };
   }
 });

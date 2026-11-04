@@ -94,6 +94,7 @@ test("signed-in visitors open Premium directly without a redundant sign-in step"
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+
   await page.route("**/api/auth/get-session**", (route) =>
     route.fulfill({ json: { user, session: { userId: user.id } } }),
   );
@@ -114,6 +115,7 @@ test("optional FAQ sign-in keeps the edited code and browser Premium explains re
   page,
 }) => {
   let signedIn = false;
+
   const user = {
     id: "redemption-login",
     name: "Alex",
@@ -123,6 +125,7 @@ test("optional FAQ sign-in keeps the edited code and browser Premium explains re
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
+
   await page.route("**/api/auth/get-session**", (route) =>
     route.fulfill({ json: signedIn ? { user, session: { userId: user.id } } : null }),
   );
@@ -139,6 +142,7 @@ test("optional FAQ sign-in keeps the edited code and browser Premium explains re
   );
   await page.route("**/api/auth/sign-in/email", (route) => {
     signedIn = true;
+
     return route.fulfill({ json: { user } });
   });
   await harness.goto("/redeem?code=FRIENDS");
@@ -182,11 +186,13 @@ test("magic-link sign-in returns to redemption with the current code", async ({
   await signIn.getByRole("button", { name: "Email me a sign-in link", exact: true }).click();
   const request = await requestPromise;
   const { callbackURL, newUserCallbackURL, errorCallbackURL } = request.postDataJSON();
+
   for (const callback of [callbackURL, newUserCallbackURL, errorCallbackURL]) {
     const callbackUrl = new URL(callback, page.url());
     expect(callbackUrl.pathname).toBe("/settings/cloud-sync");
     expect(callbackUrl.searchParams.get("returnTo")).toBe("/redeem?code=NEW%26FAMILY");
   }
+
   await expect(signIn.getByText(/Check your email/)).toBeVisible();
 });
 
@@ -250,6 +256,7 @@ for (const store of [
       await page.getByRole("textbox", { name: "Promo code" }).fill("UPDATED");
       await expect(page.getByRole("alert")).toHaveCount(0);
       await expect(page.getByRole("button", { name: "sign in", exact: true })).toBeHidden();
+
       async function followStoreLink(name: string) {
         if (browserName === "webkit" && store.name === "App Store") {
           // WebKit hands Apple URLs to the native store before Playwright sees a popup.
@@ -270,14 +277,17 @@ for (const store of [
           await page.getByRole("link", { name, exact: true }).click();
           await expect(page.locator("html")).toHaveAttribute("data-store-click-blocked", "false");
           await expect(page.locator("html")).toHaveAttribute("data-store-click-url", store.url);
+
           return;
         }
+
         const popupPromise = page.waitForEvent("popup");
         await page.getByRole("link", { name, exact: true }).click();
         const popup = await popupPromise;
         await expect(popup).toHaveURL(store.url);
         await popup.close();
       }
+
       await followStoreLink(`Redeem in ${store.name}`);
       await expect(page.getByRole("dialog", { name: "Sign in", exact: true })).toBeHidden();
       await expect(page.getByRole("textbox", { name: "Promo code" })).toHaveValue("UPDATED");
@@ -314,6 +324,7 @@ for (const status of ["pending", "unavailable"] as const) {
     await harness.goto("/redeem?code=FRIENDS");
     await page.getByRole("textbox", { name: "Promo code" }).fill("EDITED-CODE");
     await page.getByText("How do I redeem my code?", { exact: true }).click();
+
     for (const dismiss of ["escape", "close"]) {
       await page.getByRole("button", { name: "sign in", exact: true }).click();
       const dialog = page.getByRole("dialog", { name: "Sign in", exact: true });
@@ -326,6 +337,7 @@ for (const status of ["pending", "unavailable"] as const) {
           { exact: true },
         ),
       ).toBeVisible();
+
       if (dismiss === "escape") await page.keyboard.press("Escape");
       else await dialog.getByRole("button", { name: "Close sign-in", exact: true }).click();
       await expect(dialog).toBeHidden();

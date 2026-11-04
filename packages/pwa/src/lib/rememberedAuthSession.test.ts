@@ -6,6 +6,7 @@ const bob = { id: "bob", email: "bob@example.com", name: "Bob", emailVerified: t
 
 function setup({ storageUnavailable = false } = {}) {
   const values = new Map<string, string>();
+
   const storage = {
     getItem: (key: string) => values.get(key) ?? null,
     setItem: (key: string, value: string) => {
@@ -15,15 +16,18 @@ function setup({ storageUnavailable = false } = {}) {
       values.delete(key);
     },
   };
+
   let online = true;
   let nativeTokenAvailable = true;
   const fetchMock = vi.fn<typeof fetch>();
   const clearToken = vi.fn<() => void>();
   const captureToken = vi.fn<(response: Response, body?: unknown) => void>();
+
   const createSession = () =>
     createRememberedAuthSession({
       storage: () => {
         if (storageUnavailable) throw new Error("Denied");
+
         return storage;
       },
       fetch: fetchMock,
@@ -32,8 +36,10 @@ function setup({ storageUnavailable = false } = {}) {
       isOnline: () => online,
       canRestore: () => nativeTokenAvailable,
     });
+
   const session = createSession();
   const request = (path = "get-session") => session.fetch(`https://trizum.app/api/auth/${path}`);
+
   return {
     session,
     createSession,
@@ -60,9 +66,11 @@ function setup({ storageUnavailable = false } = {}) {
 
 function deferredResponse() {
   let resolve!: (response: Response) => void;
+
   const promise = new Promise<Response>((done) => {
     resolve = done;
   });
+
   return { promise, resolve };
 }
 
@@ -161,9 +169,11 @@ describe("remembered account continuity", () => {
     await app.signIn();
     const response = Response.json({ user: alice });
     let resolveBody!: (value: unknown) => void;
+
     const body = new Promise<unknown>((resolve) => {
       resolveBody = resolve;
     });
+
     const decoding = vi.spyOn(response, "json").mockReturnValue(body);
     vi.spyOn(response, "clone").mockReturnValue(response);
     app.fetchMock.mockResolvedValueOnce(response);

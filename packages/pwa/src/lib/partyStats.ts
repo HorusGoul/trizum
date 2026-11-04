@@ -80,6 +80,7 @@ export function calculatePartyStats({
 
     for (const [participantId, amount] of Object.entries(expense.paidBy)) {
       const existingParticipant = participants[participantId];
+
       const participantStat =
         participantStatsById[participantId] ??
         createParticipantStat(
@@ -131,6 +132,7 @@ export function getPartyStatsAvailablePastYears({
 
   const orderedYears = Array.from(years);
   orderedYears.sort((left, right) => right - left);
+
   return orderedYears;
 }
 
@@ -215,6 +217,7 @@ function getTimeframeRange(timeframe: PartyStatsTimeframe, now: Date) {
       timeframe.start.getTime() <= timeframe.end.getTime()
         ? [timeframe.start, timeframe.end]
         : [timeframe.end, timeframe.start];
+
     const normalizedStart = startOfDay(start);
     const normalizedEnd = startOfDay(end);
 

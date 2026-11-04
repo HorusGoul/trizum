@@ -44,6 +44,7 @@ export function connectRevenueCatPremium({
       .then(async (registeredListenerId) => {
         if (active) {
           listenerId = registeredListenerId;
+
           return;
         }
 
@@ -58,6 +59,7 @@ export function connectRevenueCatPremium({
   async function connect() {
     try {
       const customerInfo = await prepare();
+
       if (customerInfo) {
         update(customerInfo);
       }
@@ -96,12 +98,14 @@ export function connectRevenueCatPremium({
   const refreshTimer = setInterval(refreshWhileActive, REFRESH_INTERVAL_MS);
   window.addEventListener("online", refreshWhileActive);
   document.addEventListener("visibilitychange", refreshWhileActive);
+
   const appStateListener = Capacitor.isNativePlatform()
     ? App.addListener("appStateChange", ({ isActive }) => {
         appActive = isActive;
         refreshWhileActive();
       })
     : undefined;
+
   void appStateListener?.catch(onListenerError);
 
   reconnect();
@@ -113,6 +117,7 @@ export function connectRevenueCatPremium({
       window.removeEventListener("online", refreshWhileActive);
       document.removeEventListener("visibilitychange", refreshWhileActive);
       void appStateListener?.then((handle) => handle.remove()).catch(onListenerError);
+
       if (listenerId) {
         void removeListener(listenerId).catch(onListenerError);
         listenerId = undefined;

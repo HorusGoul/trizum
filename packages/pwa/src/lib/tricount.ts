@@ -21,6 +21,7 @@ function extractTricountIdFromUrl(value: string): string | null {
   try {
     const url = new URL(value.replace(/[),.;:!?]+$/, ""));
     const pathSegments = url.pathname.split("/").filter(Boolean);
+
     const idSegments =
       pathSegments.length > 1 && localeSegmentPattern.test(pathSegments[0] ?? "")
         ? pathSegments.slice(1)

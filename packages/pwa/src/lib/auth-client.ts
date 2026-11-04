@@ -63,11 +63,14 @@ export type AuthSessionUser = NonNullable<NonNullable<AuthSession["data"]>["user
 /** Keeps the last confirmed account available while network authentication is unavailable. */
 export function useAppSession() {
   const session = authClient.useSession();
+
   const remembered = useSyncExternalStore(
     rememberedSession.subscribe,
     rememberedSession.getSnapshot,
   );
+
   const offline = remembered.isOffline;
+
   return {
     ...session,
     data: remembered.user ? { user: remembered.user } : null,

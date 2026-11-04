@@ -36,6 +36,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=0 when users spend the same amount", () => {
     const user = "user1";
     const otherUser = "user2";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -65,6 +66,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=-100 when expenses splits are 50%, user1 paid 100, and user1 paid 300", () => {
     const user = "user1";
     const otherUser = "user2";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -88,6 +90,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=100 when expenses splits are 50%, user1 paid 300, and user2 paid 100", () => {
     const user = "user1";
     const otherUser = "user2";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -111,6 +114,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=0 when expenses are splitted evenly", () => {
     const user = "user1";
     const otherUser = "user2";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -134,6 +138,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=-50 when user1 pays something for themselves", () => {
     const user = "user1";
     const otherUser = "user2";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -157,6 +162,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=50 when user1 pays something for themselves", () => {
     const user = "user2";
     const otherUser = "user1";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -180,6 +186,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
   test("should return diffUnsplitted=0 when user2 pays a debt to user1", () => {
     const user = "user1";
     const otherUser = "user2";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -208,6 +215,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
     const user1 = "user1";
     const user2 = "user2";
     const user3 = "user3";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -240,6 +248,7 @@ describe("calculateLogStatsBetweenTwoUsers", () => {
     const user1 = "user1";
     const user2 = "user2";
     const user3 = "user3";
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -302,6 +311,7 @@ describe("calculateLogStatsOfUser", () => {
   test("should owe 0 to user2, and 100 to user3", () => {
     const user = "user1";
     const otherUsers = ["user2", "user3"];
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,
@@ -341,6 +351,7 @@ describe("calculateLogStatsOfUser", () => {
   test("user2 should owe 2 to user1", () => {
     const user = "user1";
     const otherUsers = ["user2"];
+
     const expenses: ExpenseInput[] = [
       {
         version: 1,

@@ -48,6 +48,7 @@ export async function createPartyFromMigrationData({
 
   // Import photos
   const photoMap = new Map<string, MediaFile["id"]>();
+
   if (importAttachments) {
     try {
       let importedPhotoCount = 0;
@@ -55,6 +56,7 @@ export async function createPartyFromMigrationData({
       await Promise.all(
         data.photos.map(async (photo) => {
           const response = await fetch(photo.url);
+
           if (!response.ok) {
             const status = response.status;
             throw new Error(
@@ -65,7 +67,9 @@ export async function createPartyFromMigrationData({
               }),
             );
           }
+
           const blob = await response.blob();
+
           const [mediaFileId] = await createMediaFile(
             blob,
             {
@@ -73,6 +77,7 @@ export async function createPartyFromMigrationData({
             },
             compressionPresets.balanced,
           );
+
           photoMap.set(photo.id, mediaFileId);
           importedPhotoCount += 1;
 

@@ -18,6 +18,7 @@ export function MediaGalleryController({ children }: MediaGalleryControllerProps
     items: [],
     index: -1,
   });
+
   const [dragProgress, setDragProgress] = useState(0);
 
   function open(state: Pick<MediaGalleryControllerState, "items" | "index">) {

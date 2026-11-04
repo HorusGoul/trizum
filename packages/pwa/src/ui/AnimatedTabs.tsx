@@ -15,6 +15,7 @@ import { Icon, type IconProps } from "./Icon";
 import { useActionProp, type AsyncAction } from "./useActionProp";
 
 const activeTabPanelAnimations = new WeakMap<HTMLDivElement, AnimationPlaybackControls>();
+
 type IndicatorProperty = "offsetLeft" | "offsetWidth";
 
 interface AnimatedTabsProps {
@@ -77,10 +78,12 @@ export function AnimatedTabs({
   const tabListRef = useRef<HTMLDivElement>(null);
   const tabPanelsRef = useRef<HTMLDivElement>(null);
   const [optimisticSelectedTab, setOptimisticSelectedTab] = useOptimistic(selectedTab);
+
   const [isSelectionPending, runSelectionChangeAction] = useActionProp<[Key]>({
     action: selectionChangeAction
       ? (tab) => {
           setOptimisticSelectedTab(tab);
+
           return selectionChangeAction(tab);
         }
       : undefined,
@@ -205,6 +208,7 @@ export function AnimatedTabs({
         },
       },
     );
+
     activeTabPanelAnimations.set(tabPanel, nextAnimation);
   };
 

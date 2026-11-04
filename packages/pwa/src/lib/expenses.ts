@@ -32,6 +32,7 @@ export function calculateLogStatsBetweenTwoUsers(
       (prev, next) => {
         const user = next.paidBy;
         (prev[user] ??= []).push(next);
+
         return prev;
       },
       {} as Record<string, ExpenseInput[]>,

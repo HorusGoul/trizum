@@ -97,6 +97,7 @@ export function AdvertisingController({
   // oxlint-disable-next-line react-doctor/effect-needs-cleanup -- Cleanup removes the promised listener, frame and coordinator; follow-up: https://github.com/HorusGoul/trizum/issues/508
   useEffect(() => {
     const platform = Capacitor.getPlatform();
+
     if (!Capacitor.isNativePlatform() || (platform !== "android" && platform !== "ios")) {
       return;
     }
@@ -112,11 +113,13 @@ export function AdvertisingController({
         logger.error("AdMob operation failed", { ...diagnostic });
       },
     });
+
     advertisingRuntime.setRouteProtected(protectedFlow);
     advertisingRuntime.attachCoordinator(coordinator);
     void advertisingRuntime.setEntitlement(entitlement);
 
     const interactiveFrame = requestAnimationFrame(() => coordinator.markInteractive());
+
     const appStateListener = App.addListener("appStateChange", ({ isActive }) => {
       if (isActive) {
         void coordinator.onActive();

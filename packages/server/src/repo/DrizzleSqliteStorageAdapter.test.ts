@@ -17,6 +17,7 @@ function openStorage() {
   client = createClient({ url: `file:${path.join(directory, "storage.db")}` });
   const db = drizzle(client, { schema });
   storage = new DrizzleSqliteStorageAdapter(db);
+
   return db;
 }
 
@@ -73,6 +74,7 @@ test("supports concurrent standalone chunk writes through the libSQL connection 
     "incremental",
     String(index),
   ]);
+
   await Promise.all(
     keys.map(async (key, index) => {
       await storage.save(key, new Uint8Array([index, 1]));

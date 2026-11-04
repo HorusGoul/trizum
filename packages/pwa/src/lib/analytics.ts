@@ -19,9 +19,11 @@ let activation: { destination: DocumentId; expiresAt: number } | undefined;
 
 export function initializeAnalytics(routes: readonly string[]) {
   const isProductionHost = window.location.hostname === "trizum.app";
+
   const isEnabledBuild =
     import.meta.env.VITE_APP_ENABLE_ANALYTICS === "true" ||
     (import.meta.env.MODE === "production" && (isProductionHost || Capacitor.isNativePlatform()));
+
   if (!isEnabledBuild || import.meta.env.VITE_APP_DISABLE_ANALYTICS === "true") return;
 
   try {
@@ -47,6 +49,7 @@ export function setAnalyticsEnabled(enabled: boolean) {
     activation = undefined;
     setTelemetryIdentity();
   }
+
   client?.setEnabled(enabled, getTelemetryId());
 }
 
@@ -59,24 +62,32 @@ export function trackCloudSyncActivated(destination: DocumentId) {
 export function bindAnalytics(handle: DocHandle<PartyList>, getPathname: () => string) {
   let active = true;
   let updating = false;
+
   function update() {
     if (!active || updating) return;
+
     if (handle.doc().usageAnalyticsEnabled === false || hasPrivacySignal(navigator)) {
       setAnalyticsEnabled(false);
+
       return;
     }
+
     updating = true;
+
     try {
       ensureTelemetryId(handle);
       setTelemetryIdentity(() => {
         const doc = handle.doc();
+
         return active && doc.usageAnalyticsEnabled !== false ? doc.telemetryId : undefined;
       });
       client?.setEnabled(navigator.onLine, getTelemetryId());
       trackPage(getPathname());
+
       if (activation) {
         const pending = activation;
         activation = undefined;
+
         if (pending.destination === handle.documentId && Date.now() < pending.expiresAt) {
           trackEvent("cloud_sync_activated");
         }
@@ -85,6 +96,7 @@ export function bindAnalytics(handle: DocHandle<PartyList>, getPathname: () => s
       updating = false;
     }
   }
+
   const unsubscribe = subscribeToPartyListId((id) => {
     if (id !== handle.documentId) {
       active = false;
@@ -92,11 +104,13 @@ export function bindAnalytics(handle: DocHandle<PartyList>, getPathname: () => s
       setAnalyticsEnabled(false);
     }
   });
+
   handle.on("change", update);
   window.addEventListener("online", update);
   window.addEventListener("offline", update);
   window.addEventListener("focus", update);
   update();
+
   return () => {
     active = false;
     unsubscribe();

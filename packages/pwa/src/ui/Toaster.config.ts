@@ -4,10 +4,12 @@ import { Icon } from "./Icon";
 import { cn } from "./utils";
 
 type Offset = NonNullable<ToasterProps["offset"]>;
+
 type CssVariableStyles = CSSProperties & Record<`--${string}`, string | number>;
 
 const desktopInset = "1.5rem";
 const mobileInset = "1rem";
+
 const mobileInlineOffset = [
   `calc(var(--safe-area-inset-left) + ${mobileInset})`,
   `calc(var(--safe-area-inset-right) + ${mobileInset})`,

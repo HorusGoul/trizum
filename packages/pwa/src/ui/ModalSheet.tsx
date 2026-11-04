@@ -123,6 +123,7 @@ function AccessibleSheetContainer({
   const descriptionId = useId();
   const [hasDescription, setHasDescription] = useState(false);
   const [hasTitle, setHasTitle] = useState(false);
+
   const [contextValue] = useState<ModalSheetContextValue>(() => ({
     descriptionId,
     setHasDescription,
@@ -139,6 +140,7 @@ function AccessibleSheetContainer({
     },
     containerRef,
   );
+
   const { modalProps } = useModal();
   const { dialogProps } = useDialog({ "aria-label": ariaLabel }, containerRef);
 

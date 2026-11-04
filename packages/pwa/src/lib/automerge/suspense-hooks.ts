@@ -39,6 +39,7 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal?.aborted) {
       reject(new RetryAbortedError());
+
       return;
     }
 
@@ -67,6 +68,7 @@ function calculateBackoffDelay(
 
   // Add jitter to prevent thundering herd
   const jitterAmount = clampedDelay * jitter * Math.random();
+
   return clampedDelay + jitterAmount;
 }
 
@@ -117,6 +119,7 @@ export async function retryWithExponentialBackoff<T>(
       // Wait before retrying
       const backoffDelay = calculateBackoffDelay(attempt, baseDelay, maxDelay, jitter);
       await delay(backoffDelay, signal);
+
       return runAttempt(attempt + 1);
     }
   }
@@ -231,6 +234,7 @@ function withLiveSubscription<Params extends unknown[], Value>({
     },
     evictAll() {
       evictionListeners.forEach((listener) => listener());
+
       return cache.evictAll();
     },
   };

@@ -69,6 +69,7 @@ export function VirtualizedExpenseList({
 
   useEffect(() => {
     const listElement = listRef.current?.element;
+
     if (!listElement) {
       return;
     }
@@ -84,6 +85,7 @@ export function VirtualizedExpenseList({
 
   useEffect(() => {
     const listElement = listRef.current?.element;
+
     if (!listElement) {
       return;
     }

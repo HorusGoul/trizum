@@ -33,9 +33,11 @@ test("captures the AdMob console message and diagnostic as its own Sentry event"
     code: "unknown",
   });
   await Sentry.flush(2000);
+
   const events = envelopes
     .flatMap(([, items]) => items)
     .filter(([header]) => header.type === "event");
+
   expect(events).toHaveLength(1);
   expect(events[0][1]).toMatchObject({
     level: "error",
@@ -58,11 +60,13 @@ function initializeRecordingClient() {
     transport: () => ({
       send: async (envelope) => {
         envelopes.push(envelope);
+
         return { statusCode: 200 };
       },
       flush: async () => true,
     }),
   });
+
   return envelopes;
 }
 
@@ -121,6 +125,7 @@ test("removes document IDs from outgoing Sentry errors, breadcrumbs, logs, and t
   const payloads = envelopes.flatMap(([, items]) =>
     items.map(([header, payload]) => ({ header, payload })),
   );
+
   expect(payloads.map(({ header }) => header.type)).toEqual(
     expect.arrayContaining(["event", "log", "transaction"]),
   );

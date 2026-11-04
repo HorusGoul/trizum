@@ -102,6 +102,7 @@ export class PartyPage {
 
       try {
         await expect(row).toBeVisible({ timeout: 1_500 });
+
         return;
       } catch {
         continue;

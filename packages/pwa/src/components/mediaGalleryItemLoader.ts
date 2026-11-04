@@ -23,6 +23,7 @@ export function createMediaGalleryItemLoader(loadItem: LoadMediaGalleryItem) {
     );
 
     itemPromiseCacheBySrc.set(item.src, promise);
+
     return promise;
   }
 
@@ -56,9 +57,11 @@ export const mediaGalleryItemLoader = createMediaGalleryItemLoader(
       image.onload = () => {
         resolve(originalItem);
       };
+
       image.onerror = () => {
         reject(new Error(`Failed to load image ${originalItem.src}`));
       };
+
       image.src = originalItem.src;
     }),
 );

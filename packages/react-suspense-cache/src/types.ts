@@ -7,9 +7,13 @@ import type {
 } from "./constants.js";
 
 export type StatusNotFound = typeof STATUS_NOT_FOUND;
+
 export type StatusPending = typeof STATUS_PENDING;
+
 export type StatusAborted = typeof STATUS_ABORTED;
+
 export type StatusRejected = typeof STATUS_REJECTED;
+
 export type StatusResolved = typeof STATUS_RESOLVED;
 
 export type Status =
@@ -125,6 +129,7 @@ export type SubscriptionData<Type> =
   | SubscriptionDataResolved<Type>;
 
 export type SubscriptionCallback<Value> = (data: SubscriptionData<Value>) => void;
+
 export type UnsubscribeCallback = () => void;
 
 export interface CacheMap<Key, Value> {

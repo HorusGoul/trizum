@@ -22,13 +22,16 @@ function getCurrencyDecimals(currency: string | undefined): number | null {
       currency,
       currencyDisplay: "code",
     });
+
     const parts = formatter.formatToParts(1.23456789);
     const fractionPart = parts.find((part) => part.type === "fraction");
     const decimals = fractionPart?.value.length ?? 2;
     currencyDecimalsCache.set(currency, decimals);
+
     return decimals;
   } catch {
     currencyDecimalsCache.set(currency, null);
+
     return null;
   }
 }
@@ -39,6 +42,7 @@ function roundToDecimals(value: number, decimals: number | null): number {
   // This ensures 0.005 -> 0.01 and -0.005 -> -0.01
   const factor = Math.pow(10, decimals);
   const sign = value < 0 ? -1 : 1;
+
   // Add a small epsilon to handle floating point precision issues
   return (sign * Math.round(Math.abs(value) * factor + 1e-10)) / factor;
 }
@@ -102,6 +106,7 @@ function getActiveSelectionRange({
   }
 
   const start = Math.max(0, Math.min(selectionRange.start, selectionRange.end, expression.length));
+
   const end = Math.max(
     0,
     Math.min(Math.max(selectionRange.start, selectionRange.end), expression.length),
@@ -121,16 +126,20 @@ export function insertCalculatorText({
   text,
 }: CalculatorTextEditOptions & { text: string }): CalculatorTextEditResult {
   const activeSelectionRange = getActiveSelectionRange({ expression, selectionRange });
+
   const shouldAppendBinaryOperator =
     activeSelectionRange?.start === 0 &&
     activeSelectionRange.end === expression.length &&
     /^[+\-*/]$/.test(text);
+
   const start = shouldAppendBinaryOperator
     ? activeSelectionRange.end
     : (activeSelectionRange?.start ?? cursorPosition);
+
   const end = shouldAppendBinaryOperator
     ? activeSelectionRange.end
     : (activeSelectionRange?.end ?? cursorPosition);
+
   const nextExpression = expression.slice(0, start) + text + expression.slice(end);
 
   return {
@@ -203,9 +212,11 @@ export function useCalculatorMode({
 
   function deactivate() {
     const result = evaluateExpression(expression);
+
     if (result !== null) {
       applyValue(result);
     }
+
     setIsActive(false);
     setExpressionRaw("");
     setCursorPositionRaw(0);
@@ -219,11 +230,13 @@ export function useCalculatorMode({
       selectionRange,
       text,
     });
+
     setExpressionRaw(edit.expression);
     setCursorPositionRaw(edit.cursorPosition);
     setSelectionRangeRaw(null);
 
     const result = evaluateExpression(edit.expression);
+
     if (result !== null) {
       applyValue(result);
     }
@@ -245,6 +258,7 @@ export function useCalculatorMode({
     setSelectionRangeRaw(null);
 
     const result = evaluateExpression(edit.expression);
+
     if (result !== null) {
       applyValue(result);
     } else if (edit.expression === "") {
@@ -270,9 +284,11 @@ export function useCalculatorMode({
 
   function commit() {
     const result = evaluateExpression(expression);
+
     if (result !== null) {
       applyValue(result);
     }
+
     setIsActive(false);
     setExpressionRaw("");
     setCursorPositionRaw(0);

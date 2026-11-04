@@ -27,7 +27,9 @@ import type {
   PartyBoostRevocationReason,
   PartyBoostStatus,
 } from "../../src/lib/api/premiumContract";
+
 type ApiDb = ReturnType<typeof getApiDb>;
+
 type PartyBoostRow = typeof schema.partyBoost.$inferSelect;
 
 const premiumApp = $(
@@ -116,6 +118,7 @@ export const premiumRoute = premiumApp
             "premium_inactive",
             Date.now(),
           );
+
           return partyBoostError(
             c,
             "premium_required",
@@ -125,6 +128,7 @@ export const premiumRoute = premiumApp
         }
 
         const existingPartyAssignment = await getActivePartyAssignment(db, partyDocumentId);
+
         if (existingPartyAssignment && existingPartyAssignment.ownerUserId !== userId) {
           const remainsActive = await validateActiveAssignment({
             apiKey: c.env.REVENUECAT_SECRET_API_KEY,
@@ -137,6 +141,7 @@ export const premiumRoute = premiumApp
 
           if (remainsActive) {
             await publishPartyBoostState(db, c.get("documents"), partyDocumentId);
+
             return partyBoostError(
               c,
               "already_boosted",
@@ -148,9 +153,11 @@ export const premiumRoute = premiumApp
 
         const now = Date.now();
         let assignment = await getUserAssignment(db, userId);
+
         if (assignment) {
           assignment = await reconcilePreviousPartyBoost(db, c.get("documents"), assignment);
         }
+
         const action = getPartyBoostAssignmentAction({ assignment, now, partyDocumentId });
 
         if (action.type === "transfer_locked") {
@@ -245,9 +252,11 @@ async function getPartyBoostStatus({
   }
 
   let assignment = await getUserAssignment(db, userId);
+
   if (assignment) {
     assignment = await reconcilePreviousPartyBoost(db, documents, assignment);
   }
+
   const premium = assignment
     ? await verifyRevenueCatPremium({ apiKey, projectId, sandboxUserId, userId })
     : { isPremium: false };
@@ -282,6 +291,7 @@ async function getPartyBoostStatus({
   }
 
   let partyAssignment: PartyBoostRow | null = await getActivePartyAssignment(db, partyDocumentId);
+
   if (partyAssignment && partyAssignment.ownerUserId !== userId) {
     const remainsActive = await validateActiveAssignment({
       apiKey,
@@ -331,8 +341,10 @@ async function validateActiveAssignment({
     sandboxUserId,
     userId: assignment.ownerUserId,
   });
+
   if (!premium.isPremium) {
     await revokeAssignment(db, documents, assignment, "premium_inactive", Date.now());
+
     return false;
   }
 
@@ -345,6 +357,7 @@ async function validateActiveAssignment({
 
   if (!isMember) {
     await revokeAssignment(db, documents, assignment, "owner_not_member", Date.now());
+
     return false;
   }
 
@@ -385,6 +398,7 @@ async function publishPartyBoostState(
   partyDocumentId: string,
 ) {
   const assignment = await getActivePartyAssignment(db, partyDocumentId);
+
   const participantId = assignment
     ? await getUserPartyParticipantId({
         db,
@@ -393,6 +407,7 @@ async function publishPartyBoostState(
         userId: assignment.ownerUserId,
       })
     : null;
+
   await publishPartyBoostSnapshot(
     documents,
     partyDocumentId,
@@ -416,8 +431,10 @@ async function reconcilePreviousPartyBoost(
   assignment: PartyBoostRow,
 ): Promise<PartyBoostRow> {
   const previousPartyId = assignment.pendingCleanupPartyDocumentId;
+
   if (!previousPartyId) return assignment;
   await publishPartyBoostState(db, documents, previousPartyId);
+
   const [updated] = await db
     .update(schema.partyBoost)
     .set({ pendingCleanupPartyDocumentId: null })
@@ -429,6 +446,7 @@ async function reconcilePreviousPartyBoost(
       ),
     )
     .returning();
+
   return updated ?? (await getUserAssignment(db, assignment.ownerUserId)) ?? assignment;
 }
 
@@ -438,6 +456,7 @@ async function getUserAssignment(db: ApiDb, userId: string) {
     .from(schema.partyBoost)
     .where(eq(schema.partyBoost.ownerUserId, userId))
     .limit(1);
+
   return assignment ?? null;
 }
 
@@ -452,6 +471,7 @@ async function getActivePartyAssignment(db: ApiDb, partyDocumentId: string) {
       ),
     )
     .limit(1);
+
   return assignment ?? null;
 }
 
@@ -463,6 +483,7 @@ async function revokeActiveAssignment(
   now: number,
 ) {
   const assignment = await getUserAssignment(db, userId);
+
   if (assignment?.revokedAt === null) {
     await revokeAssignment(db, documents, assignment, reason, now);
   }
@@ -493,6 +514,7 @@ async function revokeAssignment(
     .returning();
 
   await publishPartyBoostState(db, documents, assignment.partyDocumentId);
+
   return updated ?? (await getUserAssignment(db, assignment.ownerUserId));
 }
 
@@ -523,6 +545,7 @@ async function applyAssignmentAction({
         updatedAt: now,
       })
       .returning();
+
     return created ?? null;
   }
 
@@ -535,6 +558,7 @@ async function applyAssignmentAction({
   }
 
   const isTransfer = action === "transfer";
+
   const [updated] = await db
     .update(schema.partyBoost)
     .set({

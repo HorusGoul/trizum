@@ -47,10 +47,12 @@ export class AutomergeDocuments {
     const previousHeads = getHeads(handle.doc()).join(",");
     await new Promise<void>((resolve, reject) => {
       let changed: Doc<T> | undefined;
+
       const cleanup = () => {
         repo.synchronizer.off("sync-state", onSync);
         this.#signal.removeEventListener("abort", onAbort);
       };
+
       const onSync = (event: { documentId: DocumentId; peerId: PeerId; syncState: SyncState }) => {
         if (
           event.documentId === documentId &&
@@ -62,16 +64,20 @@ export class AutomergeDocuments {
           resolve();
         }
       };
+
       const onAbort = () => {
         cleanup();
         reject(this.#signal.reason);
       };
+
       repo.synchronizer.on("sync-state", onSync);
       this.#signal.addEventListener("abort", onAbort, { once: true });
+
       try {
         this.#signal.throwIfAborted();
         handle.change(change);
         changed = handle.doc();
+
         if (getHeads(changed).join(",") === previousHeads) {
           cleanup();
           resolve();
@@ -81,18 +87,22 @@ export class AutomergeDocuments {
         reject(error);
       }
     });
+
     return handle.doc();
   }
 
   async #find<T>(documentId: DocumentId) {
     this.#signal.throwIfAborted();
+
     if (!isValidDocumentId(documentId)) {
       throw new Error("Invalid document ID.");
     }
+
     this.#requestedIds.add(documentId);
     // Share the initialization promise as well as the repo across concurrent reads.
     const repo = await (this.#ready ??= this.#connect());
     this.#signal.throwIfAborted();
+
     return repo.find<T>(documentId, {
       allowableStates: ["ready"],
       signal: this.#signal,
@@ -106,6 +116,7 @@ export class AutomergeDocuments {
       this.#repo?.shutdown().catch((error) => {
         logger.warning("Could not shut down Worker document repo", { error });
       }) ?? Promise.resolve();
+
     return this.#closing;
   }
 
@@ -117,6 +128,7 @@ export class AutomergeDocuments {
       Number.isFinite(parsedTimeout) && parsedTimeout > 0 ? parsedTimeout : DEFAULT_TIMEOUT_MS,
     );
     const network = new BrowserWebSocketClientAdapter(getAutomergeWssUrl(env, request));
+
     const repo = new Repo({
       isEphemeral: true,
       network: [network],
@@ -127,18 +139,22 @@ export class AutomergeDocuments {
           Promise.resolve(documentId !== undefined && this.#requestedIds.has(documentId)),
       },
     });
+
     this.#repo = repo;
     await waitForAutomergePeer(network, this.#signal);
     this.#syncPeerId = network.remotePeerId;
+
     return repo;
   }
 }
 
 export function getAutomergeWssUrl(env: Pick<ApiEnv, "AUTOMERGE_WSS_URL">, request: Request) {
   const configuredUrl = env.AUTOMERGE_WSS_URL?.trim();
+
   if (configuredUrl) return configuredUrl;
 
   const { hostname } = new URL(request.url);
+
   return hostname === "localhost" || hostname === "127.0.0.1"
     ? "wss://dev-sync.trizum.app"
     : "wss://server.trizum.app/sync";
@@ -146,6 +162,7 @@ export function getAutomergeWssUrl(env: Pick<ApiEnv, "AUTOMERGE_WSS_URL">, reque
 
 async function waitForAutomergePeer(network: BrowserWebSocketClientAdapter, signal: AbortSignal) {
   signal.throwIfAborted();
+
   if (network.remotePeerId) return;
 
   // The adapter reports ready after one second even without a peer. A lookup
@@ -155,14 +172,17 @@ async function waitForAutomergePeer(network: BrowserWebSocketClientAdapter, sign
       network.off("peer-candidate", onPeer);
       signal.removeEventListener("abort", onAbort);
     };
+
     const onPeer = () => {
       cleanup();
       resolve();
     };
+
     const onAbort = () => {
       cleanup();
       reject(signal.reason);
     };
+
     network.on("peer-candidate", onPeer);
     signal.addEventListener("abort", onAbort, { once: true });
   });

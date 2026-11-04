@@ -7,10 +7,12 @@ import {
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (reason: unknown) => void;
+
   const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;
     reject = rejectPromise;
   });
+
   return { promise, reject, resolve };
 }
 
@@ -34,6 +36,7 @@ describe("PartyBoostRequestGate", () => {
       let displayedContext: string | null = null;
 
       requests.beginMutation("user-a:party-a");
+
       const activationCompletion = activation.promise.then(
         () => {
           if (requests.finishMutation("user-a:party-a")) {
@@ -48,6 +51,7 @@ describe("PartyBoostRequestGate", () => {
       );
 
       const newContextRead = requests.beginRead("user-b:party-b");
+
       const newContextCompletion = newContextStatus.promise.then((context) => {
         if (requests.isCurrent(newContextRead)) {
           displayedContext = context;
@@ -59,6 +63,7 @@ describe("PartyBoostRequestGate", () => {
       } else {
         activation.reject(new Error("activation failed"));
       }
+
       await activationCompletion;
 
       newContextStatus.resolve("user-b:party-b");

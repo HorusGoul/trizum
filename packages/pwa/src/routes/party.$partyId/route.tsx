@@ -49,9 +49,11 @@ export const Route = createFileRoute("/party/$partyId")({
 function PartyById() {
   const params = Route.useParams();
   const { tab: selectedTab } = Route.useSearch();
+
   const { party, partyId, isLoading, setParticipantDetails, recalculateBalances } = useParty(
     params.partyId,
   );
+
   const { removeParty } = usePartyList();
   const navigate = useNavigate();
   const participant = useCurrentParticipant();
@@ -75,6 +77,7 @@ function PartyById() {
       search: { tab: tab as "expenses" | "balances" },
       replace: true,
     });
+
     if (tab !== selectedTab)
       trackEvent(tab === "balances" ? "party_balances_selected" : "party_expenses_selected");
   }

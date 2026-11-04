@@ -150,6 +150,7 @@ export function createCache<Params extends Array<any>, Value>(
         paramsCount: params.length,
         status: record.data.status,
       });
+
       return record;
     }
 
@@ -306,6 +307,7 @@ export function createCache<Params extends Array<any>, Value>(
           aborted: abortController.signal.aborted,
           paramsCount: params.length,
         });
+
         return;
       }
 
@@ -321,6 +323,7 @@ export function createCache<Params extends Array<any>, Value>(
           aborted: abortController.signal.aborted,
           paramsCount: params.length,
         });
+
         return;
       }
 
@@ -338,10 +341,12 @@ export function createCache<Params extends Array<any>, Value>(
 
     if (!set) {
       debugLog("external-eviction-ignored");
+
       return;
     }
 
     debugLog("external-eviction", { subscriberCount: set.size });
+
     for (const callback of set) {
       callback({ status: STATUS_NOT_FOUND });
     }

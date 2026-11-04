@@ -4,11 +4,13 @@ import { PremiumVerificationUnavailableError, verifyRevenueCatPremium } from "./
 describe("verifyRevenueCatPremium", () => {
   it("verifies only production RevenueCat resources", async () => {
     const requests: Request[] = [];
+
     const result = await verifyRevenueCatPremium({
       apiKey: "secret",
       fetcher: async (input, init) => {
         const request = input instanceof Request ? input : new Request(input, init);
         requests.push(request);
+
         return Response.json({ items: [], next_page: null, object: "list", url: request.url });
       },
       projectId: "project",
@@ -46,6 +48,7 @@ describe("verifyRevenueCatPremium", () => {
         fetcher: async (input) => {
           const url = new URL(input instanceof Request ? input.url : String(input));
           environments.push(url.searchParams.get("environment"));
+
           return Response.json({ items: [], next_page: null, object: "list", url: url.pathname });
         },
       });
@@ -64,6 +67,7 @@ describe("verifyRevenueCatPremium", () => {
         fetcher: async (input) => {
           const url = new URL(input instanceof Request ? input.url : String(input));
           environments.push(url.searchParams.get("environment"));
+
           return Response.json({ object: "error" }, { status: 503 });
         },
       }),

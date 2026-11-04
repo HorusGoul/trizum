@@ -25,6 +25,7 @@ vi.mock("react-aria-components", async (importOriginal) => ({
   ModalOverlay: ({ children, isOpen }: { children: ReactNode; isOpen: boolean }) =>
     isOpen ? children : null,
 }));
+
 vi.mock("#src/ui/IconButton.tsx", () => ({
   IconButton: (props: ComponentProps<typeof IconButton>) => (
     <button
@@ -35,13 +36,17 @@ vi.mock("#src/ui/IconButton.tsx", () => ({
     />
   ),
 }));
+
 vi.mock("#src/ui/Icon.tsx", () => ({ Icon: () => null }));
+
 vi.mock("#src/lib/link.ts", () => ({ getAppLink: (path: string) => path }));
+
 vi.mock("#src/lib/premium/premiumCommerce.ts", () => ({
   loadPremiumOffering: vi.fn<typeof loadPremiumOffering>(),
   purchasePremiumPlan: vi.fn<typeof purchasePremiumPlan>(),
   restorePremiumPurchases: vi.fn<typeof restorePremiumPurchases>(),
 }));
+
 vi.mock("sonner", () => ({
   toast: { error: vi.fn<typeof toast.error>(), success: vi.fn<typeof toast.success>() },
 }));
@@ -72,7 +77,9 @@ function button(label: string) {
     (candidate) =>
       candidate.getAttribute("aria-label") === label || candidate.textContent === label,
   );
+
   if (!element) throw new Error(`Missing button: ${label}`);
+
   return element;
 }
 
@@ -154,6 +161,7 @@ it.each(["purchased", "cancelled", "failed"] as const)(
         entitlement: { isPremium: true, hasActiveSubscription: true },
       });
     }
+
     await render();
     expect(trackEvent).not.toHaveBeenCalled();
     await act(async () => button("Continue with Premium").click());
@@ -221,9 +229,11 @@ it("keeps a failed or stalled product lookup dismissible", async () => {
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (reason: unknown) => void;
+
   const promise = new Promise<T>((resolvePromise, rejectPromise) => {
     resolve = resolvePromise;
     reject = rejectPromise;
   });
+
   return { promise, resolve, reject };
 }

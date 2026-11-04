@@ -28,6 +28,7 @@ function getOrCreateMediaFileObjectUrlEntry(mediaFile: MediaFile) {
   }
 
   const blob = decodeBlob(mediaFile.encodedBlob.val, getMediaFileMimeType(mediaFile));
+
   const entry = {
     key,
     refCount: 0,
@@ -35,6 +36,7 @@ function getOrCreateMediaFileObjectUrlEntry(mediaFile: MediaFile) {
   };
 
   mediaFileObjectUrlCache.set(key, entry);
+
   return entry;
 }
 

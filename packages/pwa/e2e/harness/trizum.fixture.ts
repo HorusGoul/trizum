@@ -107,6 +107,7 @@ export interface BrowserHarness {
 function createOfflinePath(pathname = "/") {
   const url = new URL(pathname, "http://trizum.local");
   url.searchParams.set("__internal_offline_only", "true");
+
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
@@ -119,6 +120,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     return page
       .evaluate(() => {
         const internalWindow = window as Partial<InternalHarnessWindow>;
+
         return (
           typeof internalWindow.__internal_createPartyFromMigrationData === "function" &&
           typeof internalWindow.__internal_createDeferredPartyListState === "function" &&
@@ -206,6 +208,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
   async function seedPartyList(seed: PartyListSeed) {
     await bootstrapForSeeding();
+
     return writePartyList(seed);
   }
 
@@ -214,6 +217,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
     return page.evaluate(async (nextSeed) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
+
       return internalWindow.__internal_createDeferredPartyListState(nextSeed);
     }, seed);
   }
@@ -223,6 +227,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
     return page.evaluate((nextDocumentId) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
+
       return internalWindow.__internal_getDocumentState(nextDocumentId);
     }, documentId);
   }
@@ -257,6 +262,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
     await expect
       .poll(async () => {
         const partyList = await readPartyList();
+
         return partyList.parties[seededParty.partyId];
       })
       .toBe(true);
@@ -294,6 +300,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
 
     return page.evaluate(async () => {
       const internalWindow = window as unknown as InternalHarnessWindow;
+
       return internalWindow.__internal_readPartyListState();
     });
   }
@@ -323,6 +330,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   async function createParty(fixture: unknown) {
     return page.evaluate(async (data) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
+
       return internalWindow.__internal_createPartyFromMigrationData(data);
     }, fixture);
   }
@@ -346,6 +354,7 @@ function createBrowserHarness(page: Page): BrowserHarness {
   async function writePartyList(seed: PartyListSeed) {
     return page.evaluate(async (nextSeed) => {
       const internalWindow = window as unknown as InternalHarnessWindow;
+
       return internalWindow.__internal_seedPartyListState(nextSeed);
     }, seed);
   }

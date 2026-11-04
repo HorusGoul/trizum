@@ -9,8 +9,10 @@ export function getAuthSessionStatus(session: {
   if (session.isPending) {
     return "pending";
   }
+
   if (session.error) {
     return "unavailable";
   }
+
   return session.data?.user ? "signed-in" : "signed-out";
 }

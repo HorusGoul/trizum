@@ -21,6 +21,7 @@ function isSourceEntrypoint() {
   }
 
   const modulePath = fileURLToPath(import.meta.url);
+
   return (
     modulePath.endsWith(`${path.sep}src${path.sep}migrate.ts`) &&
     path.resolve(process.argv[1]) === modulePath

@@ -77,6 +77,7 @@ export function shouldOpenExpenseTemplatePicker({
   onlyUseCustomTemplates?: boolean;
 }) {
   const availableTemplateCount = customTemplateCount + (onlyUseCustomTemplates ? 0 : 1);
+
   return !alwaysUseDefaultTemplate && availableTemplateCount > 1;
 }
 
@@ -144,10 +145,12 @@ export function resolveExpenseTemplateValues({
       if (!participant.isArchived) {
         result.push(participant.id);
       }
+
       return result;
     },
     [],
   );
+
   const activeParticipantIdSet = new Set(activeParticipantIds);
 
   const shares =
@@ -157,6 +160,7 @@ export function resolveExpenseTemplateValues({
             type: "divide",
             value: 1,
           };
+
           return result;
         }, {})
       : Object.fromEntries(
@@ -167,6 +171,7 @@ export function resolveExpenseTemplateValues({
 
   const configuredPayerId =
     template.paidBy.type === "participant" ? template.paidBy.participantId : undefined;
+
   const paidBy =
     configuredPayerId && activeParticipantIdSet.has(configuredPayerId)
       ? configuredPayerId

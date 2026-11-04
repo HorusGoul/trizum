@@ -26,6 +26,7 @@ describe("createCache", () => {
     const load = vi.fn<(params: [string]) => Promise<string>>(
       async ([id]: [string]) => `value:${id}`,
     );
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load,
@@ -46,6 +47,7 @@ describe("createCache", () => {
     const load = vi.fn<(params: [number, string]) => string>(
       ([count, id]) => `value:${count}:${id}`,
     );
+
     const cache = createCache<[number, string], string>({ load });
 
     await expect(cache.readAsync(1, "a")).resolves.toBe("value:1:a");
@@ -57,6 +59,7 @@ describe("createCache", () => {
 
   test("writes debug logs through trizum logging", () => {
     const logs = createRecordingSink();
+
     const cache = createCache<[string], string>({
       debugLabel: "test-cache",
       getKey: ([id]) => `secret-key:${id}`,
@@ -125,6 +128,7 @@ describe("createCache", () => {
       getKey: ([id]) => id,
       load: async ([id]) => `value:${id}`,
     });
+
     const subscriber = vi.fn<(data: unknown) => void>();
     const unsubscribe = cache.subscribe(subscriber, "a");
 
@@ -153,10 +157,12 @@ describe("createCache", () => {
 
   test("cache resolves a pending record and aborts the stale load", async () => {
     let signal: AbortSignal | undefined;
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: (_params, loadOptions) => {
         signal = loadOptions.signal;
+
         return new Promise<string>(() => {});
       },
     });
@@ -175,13 +181,16 @@ describe("createCache", () => {
 
   test("aborts pending records and rejects pending read promises", async () => {
     let signal: AbortSignal | undefined;
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: (_params, loadOptions) => {
         signal = loadOptions.signal;
+
         return new Promise<string>(() => {});
       },
     });
+
     const subscriber = vi.fn<(data: unknown) => void>();
 
     cache.subscribe(subscriber, "a");
@@ -200,6 +209,7 @@ describe("createCache", () => {
 
   test("prefetch starts loads and suppresses cached read errors", async () => {
     const error = new Error("prefetch failed");
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: async () => {
@@ -215,6 +225,7 @@ describe("createCache", () => {
 
   test("stores rejected records", async () => {
     const thrown = new Error("nope");
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: async () => {
@@ -237,6 +248,7 @@ describe("createCache", () => {
     expect(() => cache.getValue("a")).toThrow("No record found");
 
     let thrown: unknown;
+
     try {
       cache.read("a");
     } catch (error) {
@@ -265,10 +277,12 @@ describe("createCache", () => {
 
   test("evicts pending records and rejects pending read promises", async () => {
     let signal: AbortSignal | undefined;
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: (_params, loadOptions) => {
         signal = loadOptions.signal;
+
         return new Promise<string>(() => {});
       },
     });
@@ -286,13 +300,16 @@ describe("createCache", () => {
 
   test("evicts all records and clears subscribers", async () => {
     let signal: AbortSignal | undefined;
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: ([id], loadOptions) => {
         signal = loadOptions.signal;
+
         return id === "pending" ? new Promise<string>(() => {}) : `value:${id}`;
       },
     });
+
     const resolvedSubscriber = vi.fn<(data: unknown) => void>();
     const pendingSubscriber = vi.fn<(data: unknown) => void>();
 
@@ -323,10 +340,12 @@ describe("createCache", () => {
 
   test("supports evictAll with non-Map cache implementations", async () => {
     let backingCache: BasicCacheMap<string, Record<string>> | undefined;
+
     const cache = createCache<[string], string>({
       config: {
         getCache() {
           backingCache = new BasicCacheMap();
+
           return backingCache;
         },
       },
@@ -350,16 +369,19 @@ describe("createCache", () => {
 
   test("notifies subscribers when an external cache evicts a record", () => {
     let backingCache: EvictingCacheMap<string, Record<string>> | undefined;
+
     const cache = createCache<[string], string>({
       config: {
         getCache(onEviction) {
           backingCache = new EvictingCacheMap(onEviction);
+
           return backingCache;
         },
       },
       getKey: ([id]) => id,
       load: async ([id]) => `value:${id}`,
     });
+
     const subscriber = vi.fn<(data: unknown) => void>();
 
     cache.cache("value:a", "a");
@@ -377,10 +399,12 @@ describe("createCache", () => {
 
   test("ignores external cache evictions with no subscribers", () => {
     let backingCache: EvictingCacheMap<string, Record<string>> | undefined;
+
     const cache = createCache<[string], string>({
       config: {
         getCache(onEviction) {
           backingCache = new EvictingCacheMap(onEviction);
+
           return backingCache;
         },
       },
@@ -395,10 +419,12 @@ describe("createCache", () => {
 
   test("ignores stale load resolutions after a pending record is manually cached", async () => {
     const deferred = createTestDeferred<string>();
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: () => deferred.promise,
     });
+
     const pending = cache.readAsync("a");
 
     cache.cache("manual:a", "a");
@@ -413,6 +439,7 @@ describe("createCache", () => {
   test("ignores stale load rejections after eviction", async () => {
     const deferred = createTestDeferred<string>();
     const error = new Error("stale failure");
+
     const cache = createCache<[string], string>({
       getKey: ([id]) => id,
       load: () => deferred.promise,
@@ -463,6 +490,7 @@ class BasicCacheMap<Key, Value> implements CacheMap<Key, Value> {
 
   set(key: Key, value: Value): this {
     this.map.set(key, value);
+
     return this;
   }
 
@@ -474,10 +502,12 @@ class BasicCacheMap<Key, Value> implements CacheMap<Key, Value> {
 function createTestDeferred<Value>() {
   let rejectPromise: (error: unknown) => void = () => {};
   let resolvePromise: (value: Value) => void = () => {};
+
   const promise = new Promise<Value>((resolve, reject) => {
     rejectPromise = reject;
     resolvePromise = resolve;
   });
+
   promise.catch(() => {});
 
   return {
@@ -500,6 +530,7 @@ function createTestDeferred<Value>() {
 
 function createRecordingSink() {
   const records: LogRecord[] = [];
+
   const sink: Sink = (record) => {
     records.push(record);
   };

@@ -11,6 +11,7 @@ import type { ApiHonoEnv } from "./env";
 
 const LOCALE_PARAM = "lang";
 const LEGACY_LOCALE_PARAM = "locale";
+
 const messagesByLocale = {
   en: catalogEn.messages,
   es: catalogEs.messages,

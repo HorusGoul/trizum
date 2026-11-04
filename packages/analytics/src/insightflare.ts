@@ -3,9 +3,12 @@ export function readCollectToken(script: string, siteId: string): string | undef
   const match = script.match(
     /^(?:"use strict";)?globalThis\["__insightflare_tracker_runtime_config__"\] = (\{[^\n]+\});\r?\n/,
   );
+
   if (!match) return;
+
   try {
     const config: unknown = JSON.parse(match[1]);
+
     if (
       config &&
       typeof config === "object" &&

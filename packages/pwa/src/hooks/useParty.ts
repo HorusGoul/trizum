@@ -38,9 +38,11 @@ const recalculatePartyBalances = createKeyedCoalescedQueue<Party["id"], boolean>
 
 export function useParty(partyId: string) {
   if (!isValidDocumentId(partyId)) throw new Error("Malformed Party ID");
+
   const [party, handle] = useSuspenseDocument<Party>(partyId, {
     required: true,
   });
+
   const repo = useRepo();
 
   const helpers = getPartyHelpers(repo, handle);
@@ -50,6 +52,7 @@ export function useParty(partyId: string) {
 
     if (!promptAnswer) {
       logger.debug("No prompt answer");
+
       return;
     }
 
@@ -63,6 +66,7 @@ export function useParty(partyId: string) {
       Array.from({ length: amount }, (_, index) => {
         const expenseNumber = index + 1;
         logger.debug("Creating test expense {index}", { index: expenseNumber });
+
         return helpers.addExpenseToParty({
           name: `Test Expense ${expenseNumber}`,
           paidAt: new Date(),
@@ -198,6 +202,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       if (!firstRemainingTemplateId) {
         delete doc.defaultExpenseTemplateId;
         delete doc.onlyUseCustomExpenseTemplates;
+
         return;
       }
 
@@ -218,12 +223,14 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     handle.change((doc) => {
       if (!onlyUseCustomTemplates) {
         delete doc.onlyUseCustomExpenseTemplates;
+
         return;
       }
 
       const hasFallbackTemplate = Boolean(
         fallbackTemplateId && doc.expenseTemplates?.[fallbackTemplateId],
       );
+
       const nextDefaultTemplateId =
         doc.defaultExpenseTemplateId && doc.expenseTemplates?.[doc.defaultExpenseTemplateId]
           ? doc.defaultExpenseTemplateId
@@ -234,6 +241,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       if (!nextDefaultTemplateId) {
         delete doc.onlyUseCustomExpenseTemplates;
         delete doc.defaultExpenseTemplateId;
+
         return;
       }
 
@@ -254,6 +262,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
         } else {
           delete doc.defaultExpenseTemplateId;
         }
+
         return;
       }
 
@@ -267,6 +276,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
 
   function createChunk() {
     const party = handle.doc();
+
     const chunkHandle = repo.create<PartyExpenseChunk>({
       id: "" as DocumentId,
       type: "expenseChunk",
@@ -284,6 +294,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       balances: {},
       partyId: party.id,
     });
+
     balancesHandle.change((doc) => (doc.id = balancesHandle.documentId));
 
     const chunkRef: PartyExpenseChunkRef = {
@@ -334,6 +345,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
       ...expense,
       id: createExpenseId(lastChunkRef.chunkId),
     };
+
     const expenseWithHash = {
       ...expenseWithId,
       __hash: calculateExpenseHash({
@@ -496,6 +508,7 @@ export function getPartyHelpers(repo: Repo, handle: DocHandle<Party>) {
     }
 
     const destinationHelpers = getPartyHelpers(repo, destinationHandle);
+
     const { originExpense, destinationExpense } = createDebtTransferExpenses({
       amount,
       originDebtorId,
