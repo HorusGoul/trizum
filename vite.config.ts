@@ -112,7 +112,7 @@ const toolingConfig = {
       "anti-slop/no-conditional-empty-object-spread": "error",
       "anti-slop/no-known-value-widening": "off", // https://github.com/HorusGoul/trizum/issues/562
       "anti-slop/no-module-mocking": "off", // https://github.com/HorusGoul/trizum/issues/584
-      "anti-slop/no-object-parameters": "off", // https://github.com/HorusGoul/trizum/issues/563
+      "anti-slop/no-object-parameters": "error",
       "anti-slop/no-reflect-apply": "error",
       "anti-slop/no-reflect-get": "error",
       "anti-slop/no-runtime-typeof": "off", // https://github.com/HorusGoul/trizum/issues/569
