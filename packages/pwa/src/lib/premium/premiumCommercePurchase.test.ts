@@ -40,10 +40,12 @@ const identity = vi.hoisted(() => ({
 
 const { loadPremiumOffering, purchasePremiumPlan } = createPremiumCommerce({
   getStore: async () => ({
-    ...revenueCat,
-    restorePurchases: vi.fn<PurchasesPlugin["restorePurchases"]>(),
-    checkTrialOrIntroductoryPriceEligibility:
-      vi.fn<PurchasesPlugin["checkTrialOrIntroductoryPriceEligibility"]>(),
+    Purchases: {
+      ...revenueCat,
+      restorePurchases: vi.fn<PurchasesPlugin["restorePurchases"]>(),
+      checkTrialOrIntroductoryPriceEligibility:
+        vi.fn<PurchasesPlugin["checkTrialOrIntroductoryPriceEligibility"]>(),
+    },
   }),
   synchronizeUser: identity.synchronizeUser,
   getPlatform: () => undefined,

@@ -8,7 +8,7 @@ let client = createClient();
 
 function createClient() {
   return createRevenueCatClient({
-    getStore: async () => revenueCat,
+    getStore: async () => ({ Purchases: revenueCat }),
     getPlatform: () => "ios",
     getPublicApiKey: () => "public-test-key",
   });
