@@ -1,0 +1,26 @@
+{
+  "name": "@trizum/infra",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pwa:plan": "alchemy plan --config pwa.run.ts --stage prod",
+    "pwa:deploy": "alchemy deploy --config pwa.run.ts --stage prod --yes",
+    "pwa:preview": "alchemy deploy --config preview.run.ts --yes",
+    "server:plan": "alchemy plan --config server.run.ts --stage prod",
+    "server:deploy": "alchemy deploy --config server.run.ts --stage prod --yes"
+  },
+  "devDependencies": {
+    "@alchemy.run/cloudflare": "2.0.0-beta.85",
+    "@alchemy.run/fly": "2.0.0-beta.85",
+    "@effect/platform-node": "4.1.2",
+    "@types/node": "catalog:",
+    "alchemy": "2.0.0-beta.85",
+    "effect": "4.1.2",
+    "jsonc-parser": "3.3.1",
+    "typescript": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
+  }
+}

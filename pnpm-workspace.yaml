@@ -7,6 +7,7 @@ publicHoistPattern:
   - workbox-window
 savePrefix: ""
 allowBuilds:
+  msgpackr-extract: false
   "@sentry-internal/node-cpu-profiler": true
   "@sentry/cli": true
   "@sentry/node-cpu-profiler": true

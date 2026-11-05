@@ -6,8 +6,9 @@ observability values is [`../wrangler.jsonc`](../wrangler.jsonc).
 
 ## Deployment
 
-Cloudflare deployments are managed by GitHub Actions instead of Cloudflare's
-connected repository builds.
+Cloudflare deployments are managed by Alchemy through GitHub Actions. For first
+resource adoption, shared state setup, and deploy commands, read the
+[infrastructure guide](../../infra/README.md).
 
 - Production deploys run after a changeset release updates the PWA version or
   changelog on `main`.
@@ -42,29 +43,15 @@ preview when testing the integration. See [`api/routes/spycat.ts`](../api/routes
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party
 list document pointer.
 
-Create the database with Wrangler, then copy the generated database name and ID
-into `wrangler.jsonc`:
+Alchemy adopts the existing database by name and imports Wrangler's applied
+migration history into `__alchemy_migrations`. Do not create a replacement
+database or apply remote migrations with Wrangler after adoption.
 
-```bash
-vp exec wrangler d1 create <database-name>
-```
-
-Validate migrations locally with the package check task:
-
-```bash
-vp run check
-```
-
-Apply migrations to the remote database with:
-
-```bash
-vp exec wrangler d1 migrations apply DB --remote
-```
-
-CI validates migrations as part of `@trizum/pwa#check`. Production releases
-apply remote D1 migrations before deploying the Worker. To apply migrations
-without deploying, run the `PWA Production Migrations` GitHub Actions workflow
-manually and enter the branch, tag, or commit SHA containing the migrations.
+Validate migrations locally with the package check task, `vp run check`.
+Production releases apply pending remote migrations through Alchemy before
+uploading the Worker. To apply migrations without deploying, run the
+`PWA Production Migrations` workflow and enter the branch, tag, or commit SHA.
+That workflow targets only the Alchemy `Database` resource.
 
 ## Email
 
@@ -120,6 +107,10 @@ Configure these repository or environment secrets:
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 - `SENTRY_AUTH_TOKEN` for production sourcemap upload
+
+The Cloudflare token also needs the access required by Alchemy shared state.
+See the [infrastructure guide](../../infra/README.md#first-deployment-and-resource-adoption)
+before switching CI to Alchemy.
 
 ## Observability
 

@@ -38,30 +38,25 @@ jobs:
         env:
           VITE_APP_AUTH_URL: ""
 
-      - name: Deploy PWA preview to Cloudflare
+      - name: Deploy PWA preview with Alchemy
         id: deploy
-        uses: cloudflare/wrangler-action@v4
+        working-directory: packages/infra
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: >-
-            versions upload
-            --preview-alias pr-${{ github.event.pull_request.number }}
-            --tag pr-${{ github.event.pull_request.number }}
-            --message "Preview for PR #${{ github.event.pull_request.number }}"
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          packageManager: npm
-          workingDirectory: packages/pwa
+          PREVIEW_ALIAS: pr-${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          vp run pwa:preview --stage "$PREVIEW_ALIAS" --no-input 2>&1 | tee "$RUNNER_TEMP/alchemy-preview.log"
+          preview_url="$(grep -Eo "https://${PREVIEW_ALIAS}-trizum\.[a-z0-9-]+\.workers\.dev" "$RUNNER_TEMP/alchemy-preview.log" | head -n 1)"
+          test -n "$preview_url"
+          echo "deployment-url=$preview_url" >> "$GITHUB_OUTPUT"
 
       - name: Comment preview URL
         env:
-          COMMAND_OUTPUT: ${{ steps.deploy.outputs.command-output }}
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PAGES_DEPLOYMENT_ALIAS_URL: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
           PREVIEW_ALIAS: pr-${{ github.event.pull_request.number }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPOSITORY: ${{ github.repository }}
@@ -69,17 +64,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          all_preview_urls="$(
-            printf '%s\n%s\n%s\n' "${PAGES_DEPLOYMENT_ALIAS_URL:-}" "${DEPLOYMENT_URL:-}" "${COMMAND_OUTPUT:-}" |
-              grep -Eo 'https://[^[:space:]]+' |
-              grep -E '(workers\.dev|pages\.dev)' || true
-          )"
-
-          preview_url="$(
-            printf '%s\n' "$all_preview_urls" |
-              grep -E "^https://${PREVIEW_ALIAS}-[^/[:space:]]+\\.(workers|pages)\\.dev" |
-              head -n 1 || true
-          )"
+          preview_url="${DEPLOYMENT_URL:-}"
 
           if [ -z "$preview_url" ]; then
             echo "::error::Cloudflare deployment did not return a ${PREVIEW_ALIAS} aliased preview URL."
