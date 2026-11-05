@@ -1100,6 +1100,10 @@ msgstr "Could not load trizum cloud state"
 msgid "Could not open Premium. Please try again."
 msgstr "Could not open Premium. Please try again."
 
+#: src/lib/mcpMessages.ts:8
+msgid "Could not open trizum. Copy this link into your browser:"
+msgstr "Could not open trizum. Copy this link into your browser:"
+
 #: src/routes/reset-password.tsx:62
 msgid "Could not reset password"
 msgstr "Could not reset password"

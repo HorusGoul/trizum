@@ -1,4 +1,5 @@
 import { once } from "node:events";
+import type { ChangeFn } from "@automerge/automerge";
 import { createRequire } from "node:module";
 import { generateAutomergeUrl, parseAutomergeUrl, Repo } from "@automerge/automerge-repo";
 import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
@@ -259,6 +260,129 @@ describe("Worker document reads over WebSocket", () => {
     }
   });
 
+  it("preserves every expense and shared balance across concurrent independent MCP writers", async () => {
+    const env = await startServer();
+    const request = () => new Request("https://trizum.app");
+    const initial = new AutomergeDocuments({ env, request: request() });
+    const service = new WorkerPartyService(initial, "https://trizum.app");
+
+    const party = await service.createParty({
+      requestId: crypto.randomUUID(),
+      name: "Concurrent expenses",
+      currency: "EUR",
+      participants: ["Alice", "Bob"],
+      description: "",
+      symbol: "🏝️",
+    });
+
+    const expense = (amount: string) => ({
+      requestId: crypto.randomUUID(),
+      partyId: party.partyId,
+      name: "Dinner",
+      amount,
+      paidBy: party.participants[0].id,
+      splitBetween: party.participants.map((person) => person.id),
+      paidAt: "2026-11-06T20:00:00Z",
+    });
+
+    await service.addExpense(expense("2.00"));
+    await initial.close();
+
+    const writers = [0, 1].map(() => new AutomergeDocuments({ env, request: request() }));
+    // Delay the first balance publication until a second independent write finishes.
+    let release!: () => void;
+
+    const delayed = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+
+    let reached!: (overwrites: boolean) => void;
+
+    const publishing = new Promise<boolean>((resolve) => {
+      reached = resolve;
+    });
+
+    // SAFETY: Repo.create allocated the party ID returned above.
+    const stored = await writers[0].read<Party>(party.partyId as Party["id"]);
+    const originalBalanceId = stored.chunkRefs[0].balancesId;
+
+    const firstDocuments = {
+      read: writers[0].read.bind(writers[0]),
+      async create<T extends object>(initialize: (id: Party["id"]) => T) {
+        const doc = await writers[0].create(initialize);
+
+        if ("type" in doc && doc.type === "expenseChunkBalances") {
+          reached(false);
+          await delayed;
+        }
+
+        return doc;
+      },
+      async change<T>(id: Party["id"], change: ChangeFn<T>) {
+        if (id === originalBalanceId) {
+          reached(true);
+          await delayed;
+        }
+
+        return writers[0].change(id, change);
+      },
+    };
+
+    const firstWrite = new WorkerPartyService(firstDocuments, "https://trizum.app").addExpense(
+      expense("10.00"),
+    );
+
+    try {
+      const overwrites = await publishing;
+      await new WorkerPartyService(writers[1], "https://trizum.app").addExpense(expense("20.00"));
+
+      if (overwrites) {
+        await vi.waitFor(async () => {
+          const balances = await writers[0].read<PartyExpenseChunkBalances>(originalBalanceId);
+
+          if (balances.balances[party.participants[0].id].stats.balance !== 1600)
+            throw new Error("Waiting for the second writer's balance publication");
+        });
+      }
+    } finally {
+      release();
+
+      try {
+        await firstWrite;
+      } finally {
+        await Promise.all(writers.map((documents) => documents.close()));
+      }
+    }
+
+    const reader = new AutomergeDocuments({ env, request: request() });
+
+    try {
+      const result = await new WorkerPartyService(reader, "https://trizum.app").getParty(
+        party.partyId,
+      );
+
+      expect(result.expenses).toHaveLength(3);
+      expect(result.participants.map((person) => person.balance)).toEqual(["16.00", "-16.00"]);
+      // Inspect exactly the shared documents the PWA consumes, without a recalculation client.
+      // SAFETY: Repo.create allocated the party ID returned above.
+      const persisted = await reader.read<Party>(party.partyId as Party["id"]);
+
+      const balances = await Promise.all(
+        persisted.chunkRefs.map((ref) => reader.read<PartyExpenseChunkBalances>(ref.balancesId)),
+      );
+
+      const total = balances.reduce(
+        (sum, doc) => sum + doc.balances[party.participants[0].id].stats.balance,
+        0,
+      );
+
+      expect(total).toBe(1600);
+      expect(new Set(persisted.chunkRefs.map((ref) => ref.balancesId)).size).toBe(3);
+    } finally {
+      await reader.close();
+    }
+  });
+
   it("syncs shared balances and recent expenses on demand without fetching unused history", async () => {
     const env = await startServer();
     const documents = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
@@ -350,14 +474,16 @@ describe("Worker document reads over WebSocket", () => {
       liveParty.change((doc) => {
         doc.name = "Updated in trizum";
       });
-      const liveChunk = await server!.find<PartyExpenseChunk>(chunk.id);
+      const updatedParty = (await server!.find<Party>(partyId)).doc();
+      const lunchRef = updatedParty.chunkRefs[0];
+      const liveChunk = await server!.find<PartyExpenseChunk>(lunchRef.chunkId);
       liveChunk.change((doc) => {
         const expense = doc.expenses.find((entry) => entry.name === "Lunch")!;
         expense.name = "Updated lunch";
         expense.paidBy[alice.id] = 1200;
         expense.__hash = calculateExpenseHash(expense);
       });
-      const liveBalances = await server!.find<PartyExpenseChunkBalances>(summary.id);
+      const liveBalances = await server!.find<PartyExpenseChunkBalances>(lunchRef.balancesId);
       liveBalances.change((doc) => {
         doc.balances = calculateBalancesByParticipant(liveChunk.doc().expenses, party.participants);
       });

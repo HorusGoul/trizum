@@ -106,65 +106,51 @@ export class WorkerPartyService implements PartyService {
 
     if (new Set(input.splitBetween).size !== input.splitBetween.length)
       throw new McpToolError("A participant can appear only once in the split.");
-    let reference = party.chunkRefs[0];
-    let chunk = reference ? await this.readChunk(party, reference.chunkId) : undefined;
-    let isNewChunk = false;
 
-    if (!chunk || chunk.expenses.length >= chunk.maxSize) {
-      isNewChunk = true;
+    if (party.chunkRefs.length >= MAX_CHUNKS)
+      throw new McpToolError(
+        "This party is too large for this integration. Open it in trizum to add the expense.",
+      );
 
-      if (party.chunkRefs.length >= MAX_CHUNKS)
-        throw new McpToolError(
-          "This party is too large for this integration. Open it in trizum to add the expense.",
-        );
-      chunk = await this.documents.create<PartyExpenseChunk>((id) => ({
+    // Independent requests must not replace the same derived balance map.
+    // Publish a completed chunk and its balance before merging its party reference.
+    // maxSize: 1 also makes normal PWA appends start a new chunk.
+    const chunk = await this.documents.create<PartyExpenseChunk>((id) => {
+      const expense: Expense = {
+        id: createExpenseId(id),
+        name: input.name,
+        paidAt: new Date(input.paidAt),
+        paidBy: { [input.paidBy]: amount },
+        shares: Object.fromEntries(
+          input.splitBetween.map((id) => [id, { type: "divide", value: 1 }]),
+        ),
+        photos: [],
+        __hash: "",
+      };
+
+      expense.__hash = calculateExpenseHash(expense);
+
+      return {
         id,
         type: "expenseChunk",
         partyId: party.id,
         createdAt: new Date(),
-        maxSize: 500,
-        expenses: [],
-      }));
-
-      const balances = await this.documents.create<PartyExpenseChunkBalances>((id) => ({
-        id,
-        type: "expenseChunkBalances",
-        partyId: party.id,
-        balances: {},
-      }));
-
-      reference = { chunkId: chunk.id, balancesId: balances.id, createdAt: chunk.createdAt };
-    }
-
-    const expense: Expense = {
-      id: createExpenseId(chunk.id),
-      name: input.name,
-      paidAt: new Date(input.paidAt),
-      paidBy: { [input.paidBy]: amount },
-      shares: Object.fromEntries(
-        input.splitBetween.map((id) => [id, { type: "divide", value: 1 }]),
-      ),
-      photos: [],
-      __hash: "",
-    };
-
-    await this.readChunkBalances(party, reference.balancesId);
-    expense.__hash = calculateExpenseHash(expense);
-
-    const updated = await this.documents.change<PartyExpenseChunk>(chunk.id, (doc) => {
-      doc.expenses.unshift(expense);
+        maxSize: 1,
+        expenses: [expense],
+      };
     });
 
-    const balances = calculateBalancesByParticipant(updated.expenses, party.participants);
-    await this.documents.change<PartyExpenseChunkBalances>(reference.balancesId, (doc) => {
-      doc.balances = balances;
-    });
+    const balances = await this.documents.create<PartyExpenseChunkBalances>((id) => ({
+      id,
+      type: "expenseChunkBalances",
+      partyId: party.id,
+      balances: calculateBalancesByParticipant(chunk.expenses, party.participants),
+    }));
 
-    if (isNewChunk) {
-      await this.documents.change<Party>(party.id, (doc) => {
-        doc.chunkRefs.unshift(reference);
-      });
-    }
+    const reference = { chunkId: chunk.id, balancesId: balances.id, createdAt: chunk.createdAt };
+    await this.documents.change<Party>(party.id, (doc) => {
+      doc.chunkRefs.unshift(reference);
+    });
 
     return this.getParty(party.id);
   }

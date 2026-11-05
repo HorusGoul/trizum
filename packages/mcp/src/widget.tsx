@@ -1,4 +1,5 @@
 import { App } from "@modelcontextprotocol/ext-apps";
+import { useState, useTransition } from "react";
 import { createRoot } from "react-dom/client";
 import { z } from "zod";
 import { partyViewSchema, type PartyView } from "./contracts.js";
@@ -11,6 +12,7 @@ const labelsSchema = z.object({
   openLabel: z.string(),
   expensesLabel: z.string(),
   balancesLabel: z.string(),
+  openErrorLabel: z.string(),
 });
 
 export function PartyCard({
@@ -20,6 +22,8 @@ export function PartyCard({
   party: PartyView;
   labels: z.infer<typeof labelsSchema>;
 }) {
+  const [isPending, startTransition] = useTransition();
+  const [openFailed, setOpenFailed] = useState(false);
   const url = new URL(party.url);
 
   if (url.protocol !== "https:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1")
@@ -57,9 +61,29 @@ export function PartyCard({
           </li>
         ))}
       </ul>
-      <a href={url.href} target="_blank" rel="noreferrer">
+      <button
+        type="button"
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            setOpenFailed(false);
+
+            try {
+              const result = await app.openLink({ url: url.href }, { timeout: 5000 });
+              setOpenFailed(result.isError === true);
+            } catch {
+              setOpenFailed(true);
+            }
+          })
+        }
+      >
         {labels.openLabel}
-      </a>
+      </button>
+      {openFailed && (
+        <p role="alert">
+          {labels.openErrorLabel} <code>{url.href}</code>
+        </p>
+      )}
     </main>
   );
 }
@@ -77,7 +101,7 @@ app.ontoolresult = (result) => {
   const labels = labelsSchema.safeParse(result._meta);
 
   if (party.success && labels.success)
-    root.render(<PartyCard party={party.data} labels={labels.data} />);
+    root.render(<PartyCard key={party.data.partyId} party={party.data} labels={labels.data} />);
 };
 
 void app.connect();

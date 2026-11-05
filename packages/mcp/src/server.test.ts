@@ -20,6 +20,7 @@ const options = {
   widgetScript: "/* bundled widget */",
   locale: "en",
   openLabel: "Open",
+  openErrorLabel: "Copy the link",
   expensesLabel: "Expenses",
   balancesLabel: "Balances",
   errorLabel: "Failed",

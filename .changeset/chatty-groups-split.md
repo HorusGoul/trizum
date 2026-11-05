@@ -18,3 +18,7 @@ documents on demand, and share analytics bootstrap across actions.
 Expire signed write tokens after 15 minutes, clean up compact retry receipts on an
 indexed schedule, and bound anonymous writes with Cloudflare's rate limiter.
 Explain agent data handling and retention in the public privacy policy.
+
+Keep concurrent MCP expense writes independent by publishing complete individual
+chunks and balances before linking them to a party. Route widget navigation
+through the MCP Apps host bridge, with a copyable link when unavailable.

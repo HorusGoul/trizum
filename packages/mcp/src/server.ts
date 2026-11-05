@@ -14,13 +14,14 @@ import {
   type PartyView,
 } from "./contracts.js";
 
-const resourceUri = "ui://trizum/party-v2.html";
+const resourceUri = "ui://trizum/party-v3.html";
 
 export interface McpAppOptions {
   appOrigin: string;
   widgetScript: string;
   locale: string;
   openLabel: string;
+  openErrorLabel: string;
   expensesLabel: string;
   balancesLabel: string;
   errorLabel: string;
@@ -40,7 +41,7 @@ export function createMcpServer(service: McpService, options: McpAppOptions) {
       {
         uri: resourceUri,
         mimeType: RESOURCE_MIME_TYPE,
-        text: `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>trizum</title><style>body{margin:0;padding:20px;font:15px system-ui;color:light-dark(#171717,#ededed);background:light-dark(#fff,#171717);color-scheme:light dark}h1{font-size:24px;margin:0 0 8px}p{line-height:1.5}ul{list-style:none;padding:0}li{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid light-dark(#eee,#333)}a{display:inline-block;margin-top:16px;padding:12px 20px;border-radius:24px;color:light-dark(#fff,#171717);background:light-dark(#171717,#ededed);text-decoration:none;font-weight:600}h2{font-size:16px;margin-top:24px}</style></head><body><div id="root"></div><script>${options.widgetScript.replaceAll("</script", "<\\/script")}</script></body></html>`,
+        text: `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>trizum</title><style>body{margin:0;padding:20px;font:15px system-ui;color:light-dark(#171717,#ededed);background:light-dark(#fff,#171717);color-scheme:light dark}h1{font-size:24px;margin:0 0 8px}p{line-height:1.5}ul{list-style:none;padding:0}li{display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid light-dark(#eee,#333)}button{border:0;font:inherit;cursor:pointer;display:inline-block;margin-top:16px;padding:12px 20px;border-radius:24px;color:light-dark(#fff,#171717);background:light-dark(#171717,#ededed);text-decoration:none;font-weight:600}button:disabled{opacity:.6;cursor:wait}code{overflow-wrap:anywhere;user-select:all}h2{font-size:16px;margin-top:24px}</style></head><body><div id="root"></div><script>${options.widgetScript.replaceAll("</script", "<\\/script")}</script></body></html>`,
         _meta: {
           ui: {
             prefersBorder: true,
@@ -106,6 +107,7 @@ export function createMcpServer(service: McpService, options: McpAppOptions) {
         _meta: {
           locale: options.locale,
           openLabel: options.openLabel,
+          openErrorLabel: options.openErrorLabel,
           expensesLabel: options.expensesLabel,
           balancesLabel: options.balancesLabel,
         },

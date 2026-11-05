@@ -96,8 +96,15 @@ views sync the existing per-chunk balance documents used by the PWA and expense
 chunks only until they have 20 recent entries. The widget displays recent
 expenses without an all-history count. Shared balances reflect the state last
 written by trizum's normal recalculation, just as in the PWA.
-`add_expense` updates its chunk and the existing balance document, plus the party
-reference when creating a new chunk. Read-only tool calls never write group data.
+`add_expense` publishes one complete expense chunk (`maxSize: 1`) and its balance
+document, then appends their reference to the party. Independent writers merge
+references without overwriting each other's derived balances. Normal PWA
+appends start a new chunk because these chunks are already full. This uses two
+new Automerge documents and a party change per expense, rather than updating a
+shared chunk. The 100-chunk boundary therefore permits at most 100 MCP-created
+expenses in a new party, fewer when it already contains other chunks. Beyond
+that, open the party in trizum. No extra D1 coordination or request cache is used.
+Read-only tool calls never write group data.
 
 The Cloudflare rate limiter allows 60 write-related attempts per minute per
 source IP, hostname, and Cloudflare location. Preparation and mutation each count
@@ -144,7 +151,9 @@ does not deploy or submit the app to the ChatGPT directory. Existing `/api/*`
 Worker routing and service-worker exclusions already cover it. No OpenAI API
 key or model API calls are needed.
 
-The widget makes no network requests and loads no external assets. The Worker
+The widget makes no network requests and loads no external assets. Its button
+requests navigation through the MCP Apps `ui/open-link` bridge, with a copyable
+URL if the host rejects or does not support navigation. The Worker
 rejects untrusted browser origins and bodies over 64 KiB. Native clients may
 omit Origin; Origin checks are not party authorization.
 

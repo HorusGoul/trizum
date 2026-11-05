@@ -13,6 +13,7 @@ import {
   mcpErrorMessage,
   mcpExpensesMessage,
   mcpOpenMessage,
+  mcpOpenErrorMessage,
 } from "../../src/lib/mcpMessages";
 import type { ApiHonoEnv } from "../env";
 
@@ -68,6 +69,7 @@ mcpRoute.on(["POST", "GET", "DELETE"], "/", (c) => {
     widgetScript,
     locale: c.get("locale"),
     openLabel: i18n._(mcpOpenMessage),
+    openErrorLabel: i18n._(mcpOpenErrorMessage),
     expensesLabel: i18n._(mcpExpensesMessage),
     balancesLabel: i18n._(mcpBalancesMessage),
     errorLabel: i18n._(mcpErrorMessage),
