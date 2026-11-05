@@ -1,6 +1,7 @@
 import {
   createAnalytics,
   hasPrivacySignal,
+  isAutomatedBrowser,
   type Analytics,
   type AnalyticsEvent,
 } from "@trizum/analytics";
@@ -37,7 +38,8 @@ export function initializeAnalytics(routes: readonly string[]) {
       siteId: ANALYTICS_SITE_ID,
       hostname: "trizum.app",
       routes,
-      canCollect: () => !hasPrivacySignal(navigator) && navigator.onLine,
+      canCollect: () =>
+        !hasPrivacySignal(navigator) && !isAutomatedBrowser(navigator) && navigator.onLine,
     });
   } catch {
     // A bad optional endpoint must not prevent the app from starting.
@@ -66,7 +68,11 @@ export function bindAnalytics(handle: DocHandle<PartyList>, getPathname: () => s
   function update() {
     if (!active || updating) return;
 
-    if (handle.doc().usageAnalyticsEnabled === false || hasPrivacySignal(navigator)) {
+    if (
+      handle.doc().usageAnalyticsEnabled === false ||
+      hasPrivacySignal(navigator) ||
+      isAutomatedBrowser(navigator)
+    ) {
       setAnalyticsEnabled(false);
 
       return;

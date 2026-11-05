@@ -166,6 +166,40 @@ it.each<Record<string, string>>([{ DNT: "1" }, { DNT: "yes" }, { "Sec-GPC": "1" 
   },
 );
 
+it.each([
+  "Mozilla/5.0 Chrome/156.0.8078.4 Safari/537.36 Playwright/trizum-screenshots",
+  "Mozilla/5.0 HeadlessChrome/156.0.8078.4 Safari/537.36",
+])(
+  "drops automation bootstrap and collection without contacting InsightFlare: %s",
+  async (userAgent) => {
+    const headers = { "User-Agent": userAgent };
+
+    const bootstrap = await app.request(
+      `${base}/script.js?siteId=${ANALYTICS_SITE_ID}`,
+      { headers },
+      env,
+    );
+
+    const collect = await app.request(
+      `${base}/collect`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          siteId: ANALYTICS_SITE_ID,
+          kind: "custom_event",
+          eventName: "party_joined",
+        }),
+      },
+      env,
+    );
+
+    expect(bootstrap.status).toBe(204);
+    expect(collect.status).toBe(204);
+    expect(service.fetch).not.toHaveBeenCalled();
+  },
+);
+
 it("rejects untrusted origins, unsupported routes, malformed payloads and other sites", async () => {
   expect(
     (

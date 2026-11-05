@@ -4,7 +4,7 @@ import { analyticsEvents, type AnalyticsEvent } from "./events.js";
 
 const allowedAnalyticsEvents = new Set(Object.keys(analyticsEvents));
 
-export { hasPrivacySignal, isTelemetryId } from "./privacy.js";
+export { hasPrivacySignal, isAutomatedBrowser, isTelemetryId } from "./privacy.js";
 
 export type { AnalyticsEvent } from "./events.js";
 
