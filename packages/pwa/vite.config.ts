@@ -107,6 +107,7 @@ export default defineConfig(({ mode }) => {
         build: {
           command: "NODE_ENV=production vp build",
           dependsOn: [
+            "@trizum/mcp#build",
             "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
@@ -133,6 +134,7 @@ export default defineConfig(({ mode }) => {
         check: {
           command: "vp check . && vp exec wrangler d1 migrations apply DB --local",
           dependsOn: [
+            "@trizum/mcp#build",
             "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
@@ -154,6 +156,7 @@ export default defineConfig(({ mode }) => {
           command: "vp dev",
           cache: false,
           dependsOn: [
+            "@trizum/mcp#build",
             "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
@@ -177,6 +180,7 @@ export default defineConfig(({ mode }) => {
         test: {
           command: "vp test .",
           dependsOn: [
+            "@trizum/mcp#build",
             "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
@@ -189,6 +193,7 @@ export default defineConfig(({ mode }) => {
           command: "vp exec playwright test",
           cache: false,
           dependsOn: [
+            "@trizum/mcp#build",
             "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
@@ -205,6 +210,7 @@ export default defineConfig(({ mode }) => {
           command: "vp exec playwright test --headed",
           cache: false,
           dependsOn: [
+            "@trizum/mcp#build",
             "@trizum/analytics#build",
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",

@@ -2,7 +2,8 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { apiMigrateRoute } from "./routes/migrate";
 import { createAuth } from "./auth";
 import { cloudSyncRoute } from "./routes/cloud-sync";
-import type { ApiHonoEnv } from "./env";
+import type { ApiEnv, ApiHonoEnv } from "./env";
+import { cleanupMcpOperations } from "./mcp/cleanup";
 import { getRedactedPath, workerLogger } from "./log";
 import { createApiCorsMiddleware } from "./cors";
 import { partySharePreviewRoute } from "./routes/party-share-preview";
@@ -10,8 +11,9 @@ import { createApiI18nMiddleware } from "./i18n";
 import { premiumRoute } from "./routes/premium";
 import { spycatRoute } from "./routes/spycat";
 import { ANALYTICS_PROXY_PATH } from "../src/lib/api/analyticsConfig";
+import { mcpRoute } from "./routes/mcp";
 
-const app = new OpenAPIHono<ApiHonoEnv>();
+export const app = new OpenAPIHono<ApiHonoEnv>();
 
 app.use("*", async (c, next) => {
   const startedAt = Date.now();
@@ -37,6 +39,9 @@ app.use("*", async (c, next) => {
 });
 
 app.use("*", createApiI18nMiddleware());
+
+// MCP owns its Origin policy and protocol preflight headers.
+app.route("/api/mcp", mcpRoute);
 
 app.use("/api/*", createApiCorsMiddleware());
 
@@ -65,4 +70,10 @@ app.doc31("/api/openapi.json", {
   openapi: "3.1.0",
 });
 
-export default app;
+export default {
+  fetch: app.fetch,
+  async scheduled(_controller: ScheduledController, env: ApiEnv) {
+    const deleted = await cleanupMcpOperations(env.DB);
+    workerLogger.info("Expired MCP receipts deleted", { deleted });
+  },
+} satisfies ExportedHandler<ApiEnv>;

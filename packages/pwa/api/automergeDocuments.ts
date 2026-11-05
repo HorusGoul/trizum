@@ -5,7 +5,13 @@ import {
   type Doc,
   type SyncState,
 } from "@automerge/automerge";
-import { isValidDocumentId, Repo, type DocumentId, type PeerId } from "@automerge/automerge-repo";
+import {
+  isValidDocumentId,
+  Repo,
+  type DocHandle,
+  type DocumentId,
+  type PeerId,
+} from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 import { getLogger } from "../src/lib/log.js";
 import type { ApiEnv } from "./env";
@@ -40,9 +46,29 @@ export class AutomergeDocuments {
     return (await this.#find<T>(documentId)).doc();
   }
 
+  /** Publish a new document and wait for the sync peer before request cleanup. */
+  async create<T extends object>(initialize: (documentId: DocumentId) => T): Promise<Doc<T>> {
+    this.#signal.throwIfAborted();
+    const repo = await (this.#ready ??= this.#connect());
+    this.#signal.throwIfAborted();
+    const handle = repo.create<T>();
+    this.#requestedIds.add(handle.documentId);
+
+    return this.#acknowledge(handle, (doc) => {
+      Object.assign(doc, initialize(handle.documentId));
+      repo.shareConfigChanged();
+    });
+  }
+
   /** Wait for the connected sync peer to acknowledge the change before returning. */
   async change<T>(documentId: DocumentId, change: ChangeFn<T>): Promise<Doc<T>> {
     const handle = await this.#find<T>(documentId);
+
+    return this.#acknowledge(handle, change);
+  }
+
+  async #acknowledge<T>(handle: DocHandle<T>, change: ChangeFn<T>): Promise<Doc<T>> {
+    const documentId = handle.documentId;
     const repo = this.#repo!;
     const previousHeads = getHeads(handle.doc()).join(",");
     await new Promise<void>((resolve, reject) => {

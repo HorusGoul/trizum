@@ -72,6 +72,19 @@ export const cloudUserSettings = sqliteTable("cloud_user_settings", {
   updatedAt: integer("updatedAt").notNull(),
 });
 
+export const mcpOperations = sqliteTable(
+  "mcp_operations",
+  {
+    requestId: text("request_id").notNull().primaryKey(),
+    fingerprint: text("fingerprint").notNull(),
+    result: text("result"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => [index("mcp_operations_created_at_idx").on(table.createdAt)],
+);
+
 export const partyBoost = sqliteTable(
   "party_boost",
   {

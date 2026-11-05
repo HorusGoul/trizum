@@ -23,7 +23,7 @@ function renderPrivacyPolicyContent() {
 
       <div className="container flex flex-1 flex-col gap-6 px-4 py-6">
         <p className="text-accent-600 dark:text-accent-400 text-sm">
-          <Trans>Last updated: October 4, 2026</Trans>
+          <Trans>Last updated: November 6, 2026</Trans>
         </p>
 
         <p className="text-accent-700 dark:text-accent-300">
@@ -50,6 +50,40 @@ function renderPrivacyPolicyContent() {
               and connects it with diagnostic logs and error reports sent to Sentry. Turning off
               analytics or enabling browser privacy signals stops this linking. Error reporting can
               continue without this identifier.
+            </Trans>
+          </p>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <h2 className="text-accent-900 dark:text-accent-100 text-xl font-semibold">
+            <Trans>ChatGPT and other agents</Trans>
+          </h2>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              You can create and use shared expense groups through connected agents without signing
+              in. The group and expense details you provide are synchronized through the same
+              service as the app. Anyone with a group link can access and edit that group. The agent
+              provider processes your conversation under its own privacy policy.
+            </Trans>
+          </p>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              To prevent duplicate writes after a network interruption, we keep a temporary retry
+              record containing a random operation identifier, a hash of the request, the resulting
+              group identifier, and a timestamp. It contains no copy of group names or expense
+              details. These records become eligible for deletion after 15 minutes and are normally
+              removed by a cleanup that runs every five minutes. Group and expense data follow the
+              normal retention rules described below.
+            </Trans>
+          </p>
+          <p className="text-accent-700 dark:text-accent-300">
+            <Trans>
+              We count completed agent actions using anonymous, self-hosted analytics. These counts
+              contain no user identifier, client network address, user agent, group identifier,
+              names, or amounts. They do not depend on an app profile or its analytics setting. We
+              respect privacy signals when the agent forwards them. Separate temporary counters
+              based on the source network address limit excessive write requests and are not used
+              for analytics.
             </Trans>
           </p>
         </section>

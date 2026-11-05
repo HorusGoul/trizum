@@ -15,6 +15,14 @@ import { verifyPartyMembership } from "./premium/partyMembership";
 import { AutomergeDocuments } from "./automergeDocuments";
 
 import { createAutomergeDocumentsMiddleware } from "./automergeDocumentsMiddleware";
+import { WorkerPartyService } from "./mcp/partyService";
+import type { Party, PartyExpenseChunk, PartyExpenseChunkBalances } from "../src/models/party";
+import {
+  calculateBalancesByParticipant,
+  calculateExpenseHash,
+  createExpenseId,
+  type Expense,
+} from "../src/models/expense";
 
 // Match the server adapter's CommonJS ws export and bypass the browser alias.
 // SAFETY: createRequire resolves the installed ws CommonJS module; WebSocketModule describes that same package export.
@@ -170,6 +178,206 @@ describe("Worker document reads over WebSocket", () => {
       expect(await next.read(second.documentId)).toMatchObject({ value: 2 });
     } finally {
       await next.close();
+    }
+  });
+
+  it("creates agent parties and expenses that survive Worker cleanup with correct shared balances", async () => {
+    const env = await startServer();
+    const documents = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+    const service = new WorkerPartyService(documents, "https://trizum.app");
+
+    const party = await service.createParty({
+      requestId: crypto.randomUUID(),
+      name: "Weekend",
+      currency: "EUR",
+      participants: ["Alice", "Bob", "Carol"],
+      description: "",
+      symbol: "🏝️",
+    });
+
+    const [alice, bob, carol] = party.participants;
+    expect(party.url).toBe(`https://trizum.app/party/${party.partyId}`);
+
+    const expenseInput = {
+      requestId: crypto.randomUUID(),
+      partyId: party.partyId,
+      name: "Dinner",
+      amount: "10.00",
+      paidBy: alice.id,
+      splitBetween: [alice.id, bob.id, carol.id],
+      paidAt: "2026-11-05T20:00:00Z",
+    };
+
+    try {
+      await expect(service.addExpense({ ...expenseInput, paidBy: "stranger" })).rejects.toThrow(
+        "active participant",
+      );
+      await expect(
+        service.addExpense({ ...expenseInput, splitBetween: [alice.id, alice.id] }),
+      ).rejects.toThrow("only once");
+      await expect(service.addExpense({ ...expenseInput, amount: "0.00" })).rejects.toThrow(
+        "positive",
+      );
+      const result = await service.addExpense(expenseInput);
+      expect(result.expenses).toHaveLength(1);
+      expect(result.expenses[0]).toMatchObject({ name: "Dinner", amount: "10.00" });
+      expect(result.participants.map((person) => person.balance)).toEqual([
+        "6.66",
+        "-3.33",
+        "-3.33",
+      ]);
+      // SAFETY: A created PartyView's partyId comes directly from Repo.create.
+      const persisted = await documents.read<Party>(party.partyId as Party["id"]);
+
+      const balances = await documents.read<PartyExpenseChunkBalances>(
+        persisted.chunkRefs[0].balancesId,
+      );
+
+      expect(balances.balances[alice.id].stats.balance).toBe(666);
+      expect(server!.handles[persisted.chunkRefs[0].chunkId]?.doc()).toMatchObject({
+        expenses: [{ __hash: expect.stringMatching(/^[a-f0-9]{32}$/) }],
+      });
+    } finally {
+      await documents.close();
+    }
+
+    const next = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+
+    try {
+      const recovered = await new WorkerPartyService(next, "https://trizum.app").getParty(
+        party.partyId,
+      );
+
+      expect(recovered.expenses).toHaveLength(1);
+      expect(recovered.participants.map((person) => person.balance)).toEqual([
+        "6.66",
+        "-3.33",
+        "-3.33",
+      ]);
+    } finally {
+      await next.close();
+    }
+  });
+
+  it("syncs shared balances and recent expenses on demand without fetching unused history", async () => {
+    const env = await startServer();
+    const documents = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+    const service = new WorkerPartyService(documents, "https://trizum.app");
+
+    try {
+      const created = await service.createParty({
+        requestId: crypto.randomUUID(),
+        name: "Long-running group",
+        currency: "EUR",
+        participants: ["Alice", "Bob"],
+        description: "",
+        symbol: "🏝️",
+      });
+
+      const [alice, bob] = created.participants;
+      // SAFETY: The created party ID is allocated by Repo.create.
+      const partyId = created.partyId as Party["id"];
+      const party = await documents.read<Party>(partyId);
+
+      const chunk = await documents.create<PartyExpenseChunk>((id) => ({
+        id,
+        type: "expenseChunk",
+        partyId,
+        createdAt: new Date(),
+        maxSize: 500,
+        expenses: Array.from({ length: 20 }, () => {
+          const expense: Expense = {
+            id: createExpenseId(id),
+            name: "Dinner",
+            paidAt: new Date(),
+            paidBy: { [alice.id]: 100 },
+            shares: {
+              [alice.id]: { type: "divide", value: 1 },
+              [bob.id]: { type: "divide", value: 1 },
+            },
+            photos: [],
+            __hash: "",
+          };
+
+          expense.__hash = calculateExpenseHash(expense);
+
+          return expense;
+        }),
+      }));
+
+      const summary = await documents.create<PartyExpenseChunkBalances>((id) => ({
+        id,
+        type: "expenseChunkBalances",
+        partyId,
+        balances: calculateBalancesByParticipant(chunk.expenses, party.participants),
+      }));
+
+      const historicalSummary = await documents.create<PartyExpenseChunkBalances>((id) => ({
+        id,
+        type: "expenseChunkBalances",
+        partyId,
+        balances: {},
+      }));
+
+      // Deliberately unavailable: touching this history would fail the request.
+      const historicalChunkId = parseAutomergeUrl(generateAutomergeUrl()).documentId;
+      await documents.change<Party>(partyId, (doc) => {
+        doc.chunkRefs = [
+          { chunkId: chunk.id, balancesId: summary.id, createdAt: chunk.createdAt },
+          { chunkId: historicalChunkId, balancesId: historicalSummary.id, createdAt: new Date(0) },
+        ];
+      });
+      const result = await service.getParty(partyId);
+      expect(result.expenses).toHaveLength(20);
+      expect(result.participants.map((person) => person.balance)).toEqual(["10.00", "-10.00"]);
+
+      const updated = await service.addExpense({
+        requestId: crypto.randomUUID(),
+        partyId,
+        name: "Lunch",
+        amount: "4.00",
+        paidBy: alice.id,
+        splitBetween: [alice.id, bob.id],
+        paidAt: "2026-11-05T12:00:00Z",
+      });
+
+      expect(updated.expenses).toHaveLength(20);
+      expect(updated.participants.map((person) => person.balance)).toEqual(["12.00", "-12.00"]);
+      await documents.close();
+
+      // Simulate edits from another client between two independent MCP requests.
+      const liveParty = await server!.find<Party>(partyId);
+      liveParty.change((doc) => {
+        doc.name = "Updated in trizum";
+      });
+      const liveChunk = await server!.find<PartyExpenseChunk>(chunk.id);
+      liveChunk.change((doc) => {
+        const expense = doc.expenses.find((entry) => entry.name === "Lunch")!;
+        expense.name = "Updated lunch";
+        expense.paidBy[alice.id] = 1200;
+        expense.__hash = calculateExpenseHash(expense);
+      });
+      const liveBalances = await server!.find<PartyExpenseChunkBalances>(summary.id);
+      liveBalances.change((doc) => {
+        doc.balances = calculateBalancesByParticipant(liveChunk.doc().expenses, party.participants);
+      });
+      const next = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+
+      try {
+        const refreshed = await new WorkerPartyService(next, "https://trizum.app").getParty(
+          partyId,
+        );
+
+        expect(refreshed.name).toBe("Updated in trizum");
+        expect(refreshed.expenses).toContainEqual(
+          expect.objectContaining({ name: "Updated lunch", amount: "12.00" }),
+        );
+        expect(refreshed.participants.map((person) => person.balance)).toEqual(["16.00", "-16.00"]);
+      } finally {
+        await next.close();
+      }
+    } finally {
+      await documents.close();
     }
   });
 

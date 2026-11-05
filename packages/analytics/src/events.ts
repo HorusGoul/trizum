@@ -1,5 +1,8 @@
 /** Approved names and meanings. No event accepts caller-supplied properties. */
 export const analyticsEvents = {
+  mcp_party_created: "An MCP create_party action completed; successful replays are excluded.",
+  mcp_party_viewed: "An explicit MCP get_party action completed; internal reads are excluded.",
+  mcp_expense_added: "An MCP add_expense action completed; successful replays are excluded.",
   party_created: "A group document was created through the new-group form.",
   party_joined: "The user selected their participant when joining a group.",
   party_left: "A group was removed from the user's group list.",
@@ -90,3 +93,5 @@ export const analyticsEvents = {
 } as const;
 
 export type AnalyticsEvent = keyof typeof analyticsEvents;
+
+export type McpAnalyticsEvent = Extract<AnalyticsEvent, `mcp_${string}`>;

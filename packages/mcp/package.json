@@ -1,0 +1,46 @@
+{
+  "name": "@trizum/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Anonymous trizum parties and expenses for ChatGPT and MCP agents",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "imports": {
+    "#*": "./*"
+  },
+  "exports": {
+    "./widget.js": "./dist/widget.js",
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "cleanup": "rm -rf dist",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "catalog:",
+    "@modelcontextprotocol/sdk": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@trizum/tsconfig": "workspace:*",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}
