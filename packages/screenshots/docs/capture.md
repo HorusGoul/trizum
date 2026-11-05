@@ -31,6 +31,9 @@ No random IDs or network images are visible in the final scenes.
 
 By default the app is captured from `https://trizum.app`. Set
 `SCREENSHOTS_BASE_URL` to capture a locally served build or a release candidate.
+Capture contexts identify themselves as Playwright, block service workers, and
+intercept analytics requests before opening a page so captures cannot reach the
+production collector, including when the deployed app predates automation detection.
 For quicker development runs, comma-separated `SCREENSHOTS_LOCALES`,
 `SCREENSHOTS_DEVICES`, and `SCREENSHOTS_SCENES` filters select a subset. Set `SCREENSHOTS_CLEAN=false` only when deliberately assembling several
 filtered development runs; full and CI runs always clean first.

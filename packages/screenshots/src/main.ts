@@ -1,5 +1,6 @@
 import type { Browser } from "playwright";
 import { chromium, devices } from "playwright";
+import { createScreenshotContext } from "./screenshotContext.ts";
 import { mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { getMigrationData } from "./data/migration-data.ts";
@@ -179,7 +180,7 @@ async function main() {
 
           for (let attempt = 1; attempt <= 3; attempt++) {
             try {
-              const context = await browser.newContext({
+              const context = await createScreenshotContext(browser, {
                 ...selectedDevice.device,
                 locale: language === "en" ? "en-US" : "es-ES",
                 timezoneId: "UTC",
