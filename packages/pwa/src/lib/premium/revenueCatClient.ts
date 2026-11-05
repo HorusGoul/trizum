@@ -39,16 +39,13 @@ export type RevenueCatStore = Pick<
   | "removeCustomerInfoUpdateListener"
 >;
 
-async function loadRevenueCatStore(): Promise<RevenueCatStore> {
-  return (await import("@revenuecat/purchases-capacitor")).Purchases;
-}
-
 export function createRevenueCatClient({
-  getStore = loadRevenueCatStore,
+  // Keep the plugin inside its module: resolving a Promise with the proxy calls Purchases.then().
+  getStore = () => import("@revenuecat/purchases-capacitor"),
   getPlatform = getRevenueCatPlatform,
   getPublicApiKey = getRevenueCatPublicApiKey,
 }: {
-  getStore?: () => Promise<RevenueCatStore>;
+  getStore?: () => Promise<{ Purchases: RevenueCatStore }>;
   getPlatform?: typeof getRevenueCatPlatform;
   getPublicApiKey?: (platform: NonNullable<ReturnType<typeof getRevenueCatPlatform>>) => string;
 } = {}) {
@@ -75,13 +72,13 @@ export function createRevenueCatClient({
   }
 
   async function addRevenueCatCustomerInfoListener(listener: CustomerInfoListener) {
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
 
     return Purchases.addCustomerInfoUpdateListener(listener);
   }
 
   async function removeRevenueCatCustomerInfoListener(listenerId: PurchasesCallbackId) {
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
     await Purchases.removeCustomerInfoUpdateListener({ listenerToRemove: listenerId });
   }
 
@@ -96,7 +93,7 @@ export function createRevenueCatClient({
   }
 
   async function refreshRevenueCatCustomerInfo() {
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
     const userId = identifiedUserId;
     const pendingRedemption = userId && hasPendingPremiumRedemption(userId);
     let redemptionSynced = false;
@@ -129,7 +126,7 @@ export function createRevenueCatClient({
     }
 
     const { LOG_LEVEL } = await import("@revenuecat/purchases-capacitor");
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
 
     if (!configured) {
       await Purchases.setLogLevel({
@@ -162,7 +159,7 @@ export function createRevenueCatClient({
       return;
     }
 
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
     const { customerInfo } = await Purchases.logOut();
     identifiedUserId = null;
 
@@ -184,7 +181,7 @@ export function createRevenueCatClient({
     rememberPremiumRedemption(userId);
 
     if (platform === "ios" && !code.trim()) {
-      const Purchases = await getStore();
+      const { Purchases } = await getStore();
       await Purchases.presentCodeRedemptionSheet();
     } else {
       // Capacitor opens external origins in the system browser/store, outside the app webview.

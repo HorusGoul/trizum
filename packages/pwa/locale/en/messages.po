@@ -3243,7 +3243,7 @@ msgstr "Saudi Riyal"
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:96
-#: src/routes/party_.$partyId.who.tsx:115
+#: src/routes/party_.$partyId.who.tsx:119
 #: src/routes/reset-password.tsx:84
 #: src/routes/settings.tsx:107
 msgid "Save"
@@ -3641,7 +3641,7 @@ msgstr "Submit a Request"
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:96
-#: src/routes/party_.$partyId.who.tsx:115
+#: src/routes/party_.$partyId.who.tsx:119
 #: src/routes/reset-password.tsx:84
 #: src/routes/settings.tsx:107
 msgid "Submitting..."
@@ -3972,7 +3972,7 @@ msgstr "To connect Google or Apple, choose an account with the same email addres
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
-#: src/routes/party_.$partyId.who.tsx:136
+#: src/routes/party_.$partyId.who.tsx:140
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 
@@ -4165,7 +4165,7 @@ msgstr "Update is no longer available."
 msgid "Update password"
 msgstr "Update password"
 
-#: src/routes/party_.$partyId.who.tsx:141
+#: src/routes/party_.$partyId.who.tsx:145
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 
@@ -4388,7 +4388,7 @@ msgstr "We will email a password setup link to {email}. Password sign-in starts 
 msgid "Welcome to the party, {0}!"
 msgstr "Welcome to the party, {0}!"
 
-#: src/routes/party_.$partyId.who.tsx:69
+#: src/routes/party_.$partyId.who.tsx:74
 msgid "Welcome to the party, {participantName}!"
 msgstr "Welcome to the party, {participantName}!"
 
@@ -4429,7 +4429,7 @@ msgstr "When you use Premium in the installed Android or iOS app, we provide Rev
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 
-#: src/routes/party_.$partyId.who.tsx:104
+#: src/routes/party_.$partyId.who.tsx:108
 msgid "Who are you?"
 msgstr "Who are you?"
 
@@ -4550,7 +4550,7 @@ msgstr "You're debt free!"
 msgid "You're now seeing the party as {0}"
 msgstr "You're now seeing the party as {0}"
 
-#: src/routes/party_.$partyId.who.tsx:73
+#: src/routes/party_.$partyId.who.tsx:77
 msgid "You're now seeing the party as {participantName}"
 msgstr "You're now seeing the party as {participantName}"
 

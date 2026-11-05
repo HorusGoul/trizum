@@ -12,6 +12,10 @@ load, with an immediate Settings opt-out and DNT/GPC overrides. Preview and dev
 builds do not collect unless explicitly enabled. See the analytics package README
 for endpoint overrides, supported events, and the upstream compatibility contract.
 
+Automated browsers are excluded through `navigator.webdriver` and explicit
+Playwright/headless user-agent markers. The proxy also drops marked automation;
+ordinary Chrome and Safari device user agents remain eligible for collection.
+
 ## Anonymous MCP server events
 
 The MCP route uses `@trizum/analytics`'s `createAnonymousServerAnalytics` for

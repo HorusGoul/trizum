@@ -21,7 +21,7 @@ let client = createClient();
 
 function createClient() {
   return createRevenueCatClient({
-    getStore: async () => store,
+    getStore: async () => ({ Purchases: store }),
     getPlatform: () => store.platform,
     getPublicApiKey: () => "public-test-key",
   });

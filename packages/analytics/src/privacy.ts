@@ -33,6 +33,16 @@ export function hasPrivacySignal(navigator: {
   return navigator.globalPrivacyControl === true || dnt === "1" || dnt === "yes";
 }
 
+/** Device emulation can hide automation in the UA, but WebDriver still identifies it. */
+export function isAutomatedBrowser(browser: {
+  webdriver?: boolean;
+  userAgent?: string | null;
+}): boolean {
+  return (
+    browser.webdriver === true || /\b(?:Playwright|HeadlessChrome)\b/i.test(browser.userAgent ?? "")
+  );
+}
+
 /** Random UUID v4 only: never accept a document ID or arbitrary identity string. */
 export function isTelemetryId(value: unknown): value is string {
   return telemetryIdSchema.safeParse(value).success;

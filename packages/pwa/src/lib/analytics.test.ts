@@ -26,6 +26,8 @@ interface TestPrivacyPreferences {
   onLine: boolean;
   doNotTrack?: string;
   globalPrivacyControl?: boolean;
+  webdriver?: boolean;
+  userAgent?: string;
 }
 
 let preferences: TestPrivacyPreferences;
@@ -107,6 +109,51 @@ it.each([false, true])("uses the first-party proxy on native=%s", async (native)
     new URL(`${origin}/api/spycat/script.js?siteId=9cf3da44-3ae9-478d-95aa-7015e864557e`),
     new URL(`${origin}/api/spycat/collect`),
   ]);
+});
+
+it.each([
+  { webdriver: true, userAgent: "Mozilla/5.0 Chrome/156.0.8078.4 Safari/537.36" },
+  { userAgent: "Mozilla/5.0 Chrome/156.0.8078.4 Safari/537.36 Playwright/trizum-screenshots" },
+  { userAgent: "Mozilla/5.0 HeadlessChrome/156.0.8078.4 Safari/537.36" },
+])("does not collect pageviews or events from automated browsers %o", async (automation) => {
+  Object.assign(preferences, automation);
+  const handle = profile();
+  trackPage("/");
+  trackEvent("party_joined");
+  cleanups.push(bindAnalytics(handle, () => "/"));
+  browser.dispatchEvent(new Event("focus"));
+  trackEvent("party_balances_selected");
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  expect(fetch).not.toHaveBeenCalled();
+  expect(handle.doc().telemetryId).toBeUndefined();
+});
+
+it.each([
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+  "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+])("collects ordinary browser traffic with an unmarked device user agent %s", async (userAgent) => {
+  preferences.webdriver = false;
+  preferences.userAgent = userAgent;
+  cleanups.push(bindAnalytics(profile(), () => "/"));
+  trackEvent("party_joined");
+  await vi.waitFor(() => expect(payloads()).toHaveLength(2));
+  expect(payloads()[1].eventName).toBe("party_joined");
+});
+
+it("rechecks automation detection after bootstrap before sending queued events", async () => {
+  fetch.mockImplementationOnce(async () => {
+    preferences.webdriver = true;
+
+    return new Response(
+      'globalThis["__insightflare_tracker_runtime_config__"] = {"siteId":"9cf3da44-3ae9-478d-95aa-7015e864557e","collectToken":"test.token.signature"};\n',
+    );
+  });
+  cleanups.push(bindAnalytics(profile(), () => "/"));
+  trackEvent("party_joined");
+  await vi.waitFor(() => expect(preferences.webdriver).toBe(true));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  expect(fetch).toHaveBeenCalledOnce();
+  expect(payloads()).toEqual([]);
 });
 
 it("creates a random synced ID once and shares it with analytics and Sentry", async () => {

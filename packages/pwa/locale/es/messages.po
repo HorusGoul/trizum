@@ -3171,7 +3171,7 @@ msgstr "Riyal Saudí"
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:96
-#: src/routes/party_.$partyId.who.tsx:115
+#: src/routes/party_.$partyId.who.tsx:119
 #: src/routes/reset-password.tsx:84
 #: src/routes/settings.tsx:107
 msgid "Save"
@@ -3565,7 +3565,7 @@ msgstr "Enviar sugerencia"
 #: src/routes/party_.$partyId.settings/-components/ExpenseTemplateEditorHeader.tsx:34
 #: src/routes/party_.$partyId.settings/details.tsx:97
 #: src/routes/party_.$partyId.settings/participants.tsx:96
-#: src/routes/party_.$partyId.who.tsx:115
+#: src/routes/party_.$partyId.who.tsx:119
 #: src/routes/reset-password.tsx:84
 #: src/routes/settings.tsx:107
 msgid "Submitting..."
@@ -3896,7 +3896,7 @@ msgstr "Para conectar Google o Apple, elige una cuenta con el mismo correo que t
 msgid "To join the <0>{0}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{0}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
-#: src/routes/party_.$partyId.who.tsx:136
+#: src/routes/party_.$partyId.who.tsx:140
 msgid "To join the <0>{partyName}</0>, please select who you are so that we can show you the expenses and stats that matter to you."
 msgstr "Para unirte al <0>{partyName}</0>, por favor selecciona quién eres para que podamos mostrarte los gastos y estadísticas que te importan."
 
@@ -4077,7 +4077,7 @@ msgstr "La actualización ya no está disponible."
 msgid "Update password"
 msgstr "Actualizar contraseña"
 
-#: src/routes/party_.$partyId.who.tsx:141
+#: src/routes/party_.$partyId.who.tsx:145
 msgid "Update who you are in this party so that we can show you the expenses and stats that matter to you."
 msgstr "Actualiza quién eres en este grupo para que podamos mostrarte los gastos y estadísticas que te importan."
 
@@ -4287,7 +4287,7 @@ msgstr "Enviaremos un enlace para configurar la contraseña a {email}. El inicio
 msgid "Welcome to the party, {0}!"
 msgstr "¡Bienvenido al grupo, {0}!"
 
-#: src/routes/party_.$partyId.who.tsx:69
+#: src/routes/party_.$partyId.who.tsx:74
 msgid "Welcome to the party, {participantName}!"
 msgstr "¡Bienvenido al grupo, {participantName}!"
 
@@ -4328,7 +4328,7 @@ msgstr "Cuando usas Premium en la aplicación instalada para Android o iOS, prop
 msgid "Where applicable law requires consent, we use Google's User Messaging Platform to request it before using local storage or personal data for personalized advertising. You may withdraw that consent through Privacy and cookie settings when that control is required. Where permitted without consent, non-personalized ad delivery, frequency control, measurement, security, and fraud prevention may be based on our legitimate interests in funding and protecting the Service, subject to your applicable rights and choices."
 msgstr "Cuando la legislación aplicable exige consentimiento, usamos la Plataforma de Gestión del Consentimiento de Google para solicitarlo antes de usar el almacenamiento local o datos personales para publicidad personalizada. Puedes retirar ese consentimiento mediante Privacidad y configuración de cookies cuando ese control sea obligatorio. Cuando esté permitido sin consentimiento, la entrega de anuncios no personalizados, el control de frecuencia, la medición, la seguridad y la prevención del fraude pueden basarse en nuestro interés legítimo en financiar y proteger el Servicio, sin perjuicio de tus derechos y opciones aplicables."
 
-#: src/routes/party_.$partyId.who.tsx:104
+#: src/routes/party_.$partyId.who.tsx:108
 msgid "Who are you?"
 msgstr "¿Quién eres?"
 
@@ -4449,7 +4449,7 @@ msgstr "¡Estás libre de deudas!"
 msgid "You're now seeing the party as {0}"
 msgstr "Ahora estás viendo el grupo como {0}"
 
-#: src/routes/party_.$partyId.who.tsx:73
+#: src/routes/party_.$partyId.who.tsx:77
 msgid "You're now seeing the party as {participantName}"
 msgstr "Ahora estás viendo el grupo como {participantName}"
 

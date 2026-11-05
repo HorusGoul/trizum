@@ -61,13 +61,13 @@ type PremiumStore = Pick<
 >;
 
 export function createPremiumCommerce({
-  getStore = async (): Promise<PremiumStore> =>
-    (await import("@revenuecat/purchases-capacitor")).Purchases,
+  // Keep the plugin inside its module: resolving a Promise with the proxy calls Purchases.then().
+  getStore = () => import("@revenuecat/purchases-capacitor"),
   synchronizeUser = synchronizeRevenueCatUser,
   getPlatform = getRevenueCatPlatform,
   isTestStoreEnabled = isRevenueCatTestStoreEnabled,
 }: {
-  getStore?: () => Promise<PremiumStore>;
+  getStore?: () => Promise<{ Purchases: PremiumStore }>;
   synchronizeUser?: (userId: string) => Promise<CustomerInfo | void>;
   getPlatform?: typeof getRevenueCatPlatform;
   isTestStoreEnabled?: typeof isRevenueCatTestStoreEnabled;
@@ -79,7 +79,7 @@ export function createPremiumCommerce({
     await synchronizeUser(userId);
 
     const { INTRO_ELIGIBILITY_STATUS } = await import("@revenuecat/purchases-capacitor");
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
     const offerings = await Purchases.getOfferings();
     const offering = offerings.current;
 
@@ -144,7 +144,7 @@ export function createPremiumCommerce({
 
     const { PURCHASES_ERROR_CODE } = await import("@revenuecat/purchases-capacitor");
 
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
 
     try {
       const { customerInfo } = await Purchases.purchasePackage({ aPackage: selectedPackage });
@@ -166,7 +166,7 @@ export function createPremiumCommerce({
     requireUserId(userId);
     await synchronizeUser(userId);
 
-    const Purchases = await getStore();
+    const { Purchases } = await getStore();
     const { customerInfo } = await Purchases.restorePurchases();
 
     return getPremiumEntitlementState(customerInfo);

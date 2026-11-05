@@ -43,7 +43,7 @@ function Who() {
   const params = Route.useParams();
   const search = Route.useSearch();
   const { party, setParticipantDetails } = useParty(params.partyId);
-  const { partyList, addPartyToList } = usePartyList();
+  const { partyList, partyListHandle, addPartyToList } = usePartyList();
   const navigate = useNavigate();
   const partyName = party.name;
 
@@ -56,10 +56,15 @@ function Who() {
   function onSaveSettings(values: WhoFormValues) {
     const participant = party.participants[values.participantId];
     const participantName = participant.name;
+    const currentPartyList = partyListHandle.doc();
+    const previousParticipantId = currentPartyList.participantInParties?.[party.id];
+
+    const isJoining =
+      currentPartyList.parties[party.id] !== true || previousParticipantId === undefined;
 
     addPartyToList(party.id, participant.id);
 
-    if (needsToJoin) {
+    if (isJoining) {
       trackEvent("party_joined");
       setParticipantDetails(participant.id, {
         phone: partyList.phone,
@@ -68,8 +73,7 @@ function Who() {
 
       toast.success(t({ message: `Welcome to the party, ${participantName}!` }));
     } else {
-      if (partyList.participantInParties[party.id] !== participant.id)
-        trackEvent("party_participant_switched");
+      if (previousParticipantId !== participant.id) trackEvent("party_participant_switched");
       toast.success(t({ message: `You're now seeing the party as ${participantName}` }));
     }
 

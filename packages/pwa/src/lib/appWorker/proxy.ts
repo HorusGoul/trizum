@@ -15,6 +15,8 @@ export interface AppWorkerApi {
 const proxyOptions = {
   namespace: "__trizum_app_worker__",
   transfer: true,
+  // Module/WASM startup and synchronous work can delay a healthy worker's heartbeat.
+  heartbeatTimeout: 10_000,
 };
 
 // SAFETY: This factory is never provided on the client side; comctx injects the AppWorkerApi implemented by the matching worker provider.

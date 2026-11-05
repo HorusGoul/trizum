@@ -4,7 +4,7 @@ import { bodyLimit } from "hono/body-limit";
 import type { ApiHonoEnv } from "../env";
 import { isTrustedOrigin } from "../auth-origins";
 import { ANALYTICS_SITE_ID } from "../../src/lib/api/analyticsConfig";
-import { hasPrivacySignal } from "@trizum/analytics";
+import { hasPrivacySignal, isAutomatedBrowser } from "@trizum/analytics";
 
 export const spycatRoute = new Hono<ApiHonoEnv>();
 
@@ -16,6 +16,7 @@ spycatRoute.use("*", async (c, next) => {
   if (origin && !isTrustedOrigin(origin, c.env)) return c.body(null, 403);
 
   if (
+    isAutomatedBrowser({ userAgent: c.req.header("User-Agent") }) ||
     hasPrivacySignal({
       doNotTrack: c.req.header("DNT"),
       globalPrivacyControl: c.req.header("Sec-GPC") === "1",
