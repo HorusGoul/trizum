@@ -106,6 +106,73 @@ function createHarness({
 }
 
 describe("AdvertisingCoordinator", () => {
+  it.each(["pending", "ready"] as const)(
+    "removes listeners once when SDK creation is %s during repeated teardown",
+    async (creationState) => {
+      const harness = createHarness();
+      const creation = createDeferred<AdMobSdk>();
+      harness.createSdk.mockReturnValueOnce(creation.promise);
+
+      const initialization = harness.coordinator.setEntitlement("adSupported");
+
+      if (creationState === "ready") {
+        creation.resolve(harness.sdk);
+        await initialization;
+      }
+
+      const firstTeardown = harness.coordinator.destroy();
+      const secondTeardown = harness.coordinator.destroy();
+
+      if (creationState === "pending") {
+        creation.resolve(harness.sdk);
+      }
+
+      await Promise.all([initialization, firstTeardown, secondTeardown]);
+      expect(harness.sdk.removeListeners).toHaveBeenCalledOnce();
+
+      await harness.coordinator.destroy();
+
+      expect(harness.sdk.removeListeners).toHaveBeenCalledOnce();
+
+      const setupCalls = creationState === "pending" ? 0 : 1;
+      expect(harness.sdk.requestConsentInfo).toHaveBeenCalledTimes(setupCalls);
+      expect(harness.sdk.initialize).toHaveBeenCalledTimes(setupCalls);
+    },
+  );
+
+  it("finishes teardown when pending SDK creation rejects", async () => {
+    const harness = createHarness();
+    const creation = createDeferred<AdMobSdk>();
+    harness.createSdk.mockReturnValueOnce(creation.promise);
+
+    const initialization = harness.coordinator.setEntitlement("adSupported");
+    const teardown = harness.coordinator.destroy();
+    creation.reject(new Error("Native plugin unavailable"));
+
+    await expect(teardown).resolves.toBeUndefined();
+    await initialization;
+    expect(harness.sdk.removeListeners).not.toHaveBeenCalled();
+    expect(harness.reportDiagnostic).not.toHaveBeenCalled();
+  });
+
+  it("ignores queued full-screen events as soon as teardown starts", async () => {
+    const harness = createHarness();
+    await harness.coordinator.setEntitlement("adSupported");
+    const historyBeforeTeardown = structuredClone(harness.history);
+    const removal = createDeferred<void>();
+    vi.mocked(harness.sdk.removeListeners).mockReturnValueOnce(removal.promise);
+
+    const teardown = harness.coordinator.destroy();
+    harness.advance(1_000);
+    harness.emit("appOpen", "shown");
+    harness.emit("interstitial", "failedToShow", 7);
+    removal.resolve();
+    await teardown;
+
+    expect(harness.history).toEqual(historyBeforeTeardown);
+    expect(harness.reportDiagnostic).not.toHaveBeenCalled();
+  });
+
   it.each(["requestConsentInfo", "initialize", "prepareInterstitial", "loadAppOpen"] as const)(
     "handles null rejections from %s with a sanitized diagnostic",
     async (operation) => {
@@ -304,10 +371,12 @@ describe("AdvertisingCoordinator", () => {
 
 function createDeferred<T>() {
   let resolve!: (value: T) => void;
+  let reject!: (cause: unknown) => void;
 
-  const promise = new Promise<T>((promiseResolve) => {
+  const promise = new Promise<T>((promiseResolve, promiseReject) => {
     resolve = promiseResolve;
+    reject = promiseReject;
   });
 
-  return { promise, resolve };
+  return { promise, resolve, reject };
 }
