@@ -1,5 +1,11 @@
 # @trizum/logging
 
+## 1.1.1
+
+### Patch Changes
+
+- [#550](https://github.com/HorusGoul/trizum/pull/550) [`08fba3d`](https://github.com/HorusGoul/trizum/commit/08fba3deef81408300c7075c0e041762911a74c1) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Remove console CSS formatting from Sentry breadcrumbs while preserving diagnostic arguments and document-ID redaction.
+
 ## 1.1.0
 
 ### Minor Changes
