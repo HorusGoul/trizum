@@ -146,7 +146,7 @@ export default defineConfig(({ mode }) => {
           cache: false,
         },
         deploy: {
-          command: "vp exec wrangler deploy",
+          command: "vp run --filter @trizum/infra pwa:deploy",
           cache: false,
           dependsOn: ["build"],
         },

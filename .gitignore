@@ -184,3 +184,6 @@ packages/server/build/
 **/skills/npm-*
 
 .vitest/
+
+# Alchemy local state, build artifacts, and credentials
+.alchemy/

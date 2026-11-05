@@ -12,11 +12,14 @@ image so they exercise the deployed runtime.
 
 Production deploys are managed by the repo `Release` GitHub Actions workflow.
 When Changesets publishes a non-prerelease `@trizum/server@...` GitHub release,
-the workflow deploys the tagged server revision to Fly.io. Backend preview
+the workflow builds the tagged server revision and deploys its immutable image
+through Alchemy to the existing Fly Machine. Backend preview
 environments are intentionally unsupported.
 
-The workflow requires one GitHub repository or `server-production` environment
-secret:
+Read the [infrastructure guide](../../infra/README.md) before adopting the
+existing app, Machine, and volume. The workflow requires `FLY_MACHINE_ID` and
+`FLY_VOLUME_ID` repository/environment variables, Cloudflare credentials for
+shared Alchemy state, and this Fly secret:
 
 - `FLY_API_TOKEN`: a Fly app-scoped deploy token for the `trizum-server` app.
   Create it with `fly tokens create deploy --app trizum-server --name "GitHub Actions server production" --expiry <duration>`.
@@ -31,8 +34,9 @@ trizum-server`:
 - `AWS_SECRET_ACCESS_KEY`
 - `SENTRY_DSN` when Sentry should be enabled in production
 
-`DB_FILE_NAME`, `PORT`, and the persistent volume mount are configured in
-[`fly.toml`](../fly.toml).
+`DB_FILE_NAME`, `PORT`, VM size, health checks, and volume auto-extension are
+configured in [the Fly deployment module](../../infra/src/fly.ts). The existing
+Machine and disk IDs are pinned; missing or changed storage stops deployment.
 
 CI builds both the production image (including Litestream) and the Dockerfile's
 `runtime-local` target. It checks migrations, `/health`, and native profiler

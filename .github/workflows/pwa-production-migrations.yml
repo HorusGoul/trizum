@@ -33,9 +33,12 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Apply PWA D1 migrations
-        working-directory: packages/pwa
-        run: vp exec wrangler d1 migrations apply DB --remote
+      - name: Build PWA deployment bundle
+        run: vp run --filter @trizum/pwa build
+
+      - name: Apply PWA D1 migrations with Alchemy
+        working-directory: packages/infra
+        run: vp run pwa:deploy --include Database
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

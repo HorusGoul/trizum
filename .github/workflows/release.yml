@@ -80,12 +80,42 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
 
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+
       - uses: superfly/flyctl-actions/setup-flyctl@v1
 
-      - name: Deploy Server to Fly.io
+      - name: Authenticate Fly image registry
+        run: flyctl auth docker
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: ./packages/server/deploy.sh
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build and push server image
+        id: image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: packages/server/Dockerfile
+          target: runtime
+          platforms: linux/amd64
+          push: true
+          tags: registry.fly.io/trizum-server:${{ github.sha }}
+
+      - name: Deploy existing Fly server with Alchemy
+        working-directory: packages/infra
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_MACHINE_ID: ${{ vars.FLY_MACHINE_ID }}
+          FLY_VOLUME_ID: ${{ vars.FLY_VOLUME_ID }}
+          SERVER_IMAGE: registry.fly.io/trizum-server@${{ steps.image.outputs.digest }}
+          COMMIT_HASH: ${{ github.sha }}
+        run: vp run server:deploy
 
   build-mobile-android-release-apk:
     name: Build Mobile Android Release APK
