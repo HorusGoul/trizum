@@ -143,8 +143,8 @@ catalogs:
       specifier: 1.64.1
       version: 1.64.1
     '@revenuecat/purchases-capacitor':
-      specifier: 13.7.6
-      version: 13.7.6
+      specifier: 14.1.0
+      version: 14.1.0
     '@revenuecat/purchases-capacitor-ui':
       specifier: 13.7.6
       version: 13.7.6
@@ -643,10 +643,10 @@ importers:
         version: 0.1.4(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)
+        version: 14.1.0(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.0(@capacitor/core@8.5.3))
       '@trizum/logging':
         specifier: workspace:*
         version: link:../logging
@@ -752,10 +752,10 @@ importers:
         version: '@jsr/opentf__std@0.12.0'
       '@revenuecat/purchases-capacitor':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)
+        version: 14.1.0(@capacitor/core@8.5.3)
       '@revenuecat/purchases-capacitor-ui':
         specifier: 'catalog:'
-        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+        version: 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.0(@capacitor/core@8.5.3))
       '@sentry/react':
         specifier: 'catalog:'
         version: 10.76.2(react@19.3.1)
@@ -4521,13 +4521,16 @@ packages:
       '@capacitor/core': '>=8.0.0'
       '@revenuecat/purchases-capacitor': 13.7.6
 
-  '@revenuecat/purchases-capacitor@13.7.6':
-    resolution: {integrity: sha512-Ynwsno3yhW1QbfICVlx8jXwmnVV933ADSl+d0kCV56tENxb4kwT7lXLReCc7HmrbVs2cfGaLYLEAVF8zYzREnw==}
+  '@revenuecat/purchases-capacitor@14.1.0':
+    resolution: {integrity: sha512-TnJF5DZFtg73ILxoyYQj2znq2fOwEmA5GaBCOvrcUwdqWXFL4p6ja3ZOne+i9eY8JAUvfijt2DVEeHL5gosl4A==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0':
     resolution: {integrity: sha512-OUTgB/sqKKr4Wu/u1MT9dYWjc2mw1FRgwes4y/xyboQb781rDZ3yy7ICb8u+B/6bMDG7s0EzcUPLRLNdRz1bJw==}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.1.0':
+    resolution: {integrity: sha512-v5m80eNfQ1mnDJJoR12+CwKyyvH/gaUQnd7QbqpCWEt+VsNlfaNvNxACyaaVlYH+5MTz47xmqrsnnOEBqq5z0Q==}
 
   '@robingenz/zli@0.2.0':
     resolution: {integrity: sha512-LME7G4xkEFuqyVg/MYTB3xoJnvWb955aEfZ7J7yRstzyULs3HBdxz0l5QiP8gmMMMZ434cb8Wn/DdHqeNTT2fA==}
@@ -13449,18 +13452,20 @@ snapshots:
 
   '@resvg/resvg-wasm@2.4.0': {}
 
-  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))':
+  '@revenuecat/purchases-capacitor-ui@13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.0(@capacitor/core@8.5.3))':
     dependencies:
       '@capacitor/core': 8.5.3
-      '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
+      '@revenuecat/purchases-capacitor': 14.1.0(@capacitor/core@8.5.3)
       '@revenuecat/purchases-typescript-internal-esm': 19.15.0
 
-  '@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3)':
+  '@revenuecat/purchases-capacitor@14.1.0(@capacitor/core@8.5.3)':
     dependencies:
       '@capacitor/core': 8.5.3
-      '@revenuecat/purchases-typescript-internal-esm': 19.15.0
+      '@revenuecat/purchases-typescript-internal-esm': 20.1.0
 
   '@revenuecat/purchases-typescript-internal-esm@19.15.0': {}
+
+  '@revenuecat/purchases-typescript-internal-esm@20.1.0': {}
 
   '@robingenz/zli@0.2.0(zod@4.0.17)':
     dependencies:
@@ -14286,8 +14291,8 @@ snapshots:
       '@logtape/sentry': 2.4.2(@logtape/logtape@2.4.2)(@sentry/core@10.76.2)
       '@opentf/obj-diff': '@jsr/opentf__obj-diff@0.11.0'
       '@opentf/std': '@jsr/opentf__std@0.12.0'
-      '@revenuecat/purchases-capacitor': 13.7.6(@capacitor/core@8.5.3)
-      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@13.7.6(@capacitor/core@8.5.3))
+      '@revenuecat/purchases-capacitor': 14.1.0(@capacitor/core@8.5.3)
+      '@revenuecat/purchases-capacitor-ui': 13.7.6(@capacitor/core@8.5.3)(@revenuecat/purchases-capacitor@14.1.0(@capacitor/core@8.5.3))
       '@sentry/react': 10.76.2(react@19.3.1)
       '@sentry/vite-plugin': 5.4.1(rollup@4.65.1)(supports-color@10.2.2)
       '@takker/md5': '@jsr/takker__md5@0.1.0'
