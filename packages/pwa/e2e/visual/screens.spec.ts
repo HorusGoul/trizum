@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { expect, type Page, type Route } from "@playwright/test";
@@ -113,6 +115,12 @@ async function prepare(page: Page, harness: BrowserHarness, screen: Screen, loca
     });
   }
 
+  // Finish the bootstrap sprite request before navigation can cancel it.
+  // SVG <use> loads are not consistently exposed by Resource Timing in WebKit.
+  const sprite = await spriteResponse;
+  expect(sprite.ok()).toBe(true);
+  expect(await sprite.finished()).toBeNull();
+
   if (screen === "home") await harness.gotoHome();
   else if (screen === "create-party") await harness.goto("/new");
   else if (screen === "user-settings") await harness.goto("/settings");
@@ -195,16 +203,33 @@ async function prepare(page: Page, harness: BrowserHarness, screen: Screen, loca
 
   await page.evaluate(() => document.fonts.ready);
   await expect(page.locator("[data-entering], [data-exiting]")).toHaveCount(0);
-  // SVG <use> loads are not consistently exposed by Resource Timing in WebKit.
-  const sprite = await spriteResponse;
-  expect(sprite.ok()).toBe(true);
-  expect(await sprite.finished()).toBeNull();
   await page.evaluate(
     () =>
       new Promise<void>((resolve) =>
         requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
       ),
   );
+
+  if (screen === "party-menu") {
+    // Recompute anchoring after the trigger's pressed state has settled.
+    await page.evaluate(() => window.dispatchEvent(new Event("resize")));
+    await expect
+      .poll(() =>
+        page.getByRole("dialog").evaluate((dialog) => {
+          const trigger = document.querySelector('[aria-expanded="true"]');
+
+          if (!trigger) return false;
+
+          const measuredWidth = parseFloat(
+            getComputedStyle(dialog).getPropertyValue("--trigger-width"),
+          );
+
+          return Math.abs(measuredWidth - trigger.getBoundingClientRect().width) < 0.1;
+        }),
+      )
+      .toBe(true);
+  }
+
   await expect(page.locator("html")).toHaveAttribute("lang", locale);
 }
 

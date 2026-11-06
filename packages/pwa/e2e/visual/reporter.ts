@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,37 +28,56 @@ async function image(file?: string) {
 }
 
 export default class VisualReporter implements Reporter {
-  private comparisons: Comparison[] = [];
-  private outputDir = fileURLToPath(new URL("../../visual-report", import.meta.url));
+  private results: {
+    name: string;
+    result: Pick<TestResult, "status" | "attachments" | "errors">;
+  }[] = [];
+  private outputDir: string;
+
+  constructor(options: { outputDir?: string } = {}) {
+    this.outputDir =
+      options.outputDir ?? fileURLToPath(new URL("../../visual-report", import.meta.url));
+  }
   private reference = "";
   private candidate = "";
 
-  onBegin(config: FullConfig) {
+  onBegin(config: Pick<FullConfig, "metadata">) {
     this.reference = String(config.metadata.reference);
     this.candidate = String(config.metadata.candidate);
   }
 
-  async onTestEnd(test: TestCase, result: TestResult) {
-    this.comparisons.push({
+  onTestEnd(
+    test: Pick<TestCase, "titlePath"> & { parent: { project(): { name: string } | undefined } },
+    result: Pick<TestResult, "status" | "attachments" | "errors">,
+  ) {
+    this.results.push({
       name: `${test.parent.project()?.name}: ${test.titlePath().slice(-2).join(" / ")}`,
-      status: result.status,
-      reference: await image(
-        result.attachments.find((attachment) => attachment.name === "origin-main")?.path,
-      ),
-      candidate: await image(
-        result.attachments.find((attachment) => attachment.name === "design-system-branch")?.path,
-      ),
-      diff: await image(
-        result.attachments.find((attachment) => attachment.path?.endsWith("-diff.png"))?.path,
-      ),
-      error: result.errors.map((error) => error.message ?? "").join("\n"),
+      result,
     });
   }
 
   async onExit() {
-    const passed = this.comparisons.filter((comparison) => comparison.status === "passed").length;
+    // Playwright does not await onTestEnd; load attachments during finalization.
+    const comparisons: Comparison[] = await Promise.all(
+      this.results.map(async ({ name, result }) => ({
+        name,
+        status: result.status,
+        reference: await image(
+          result.attachments.find((attachment) => attachment.name === "origin-main")?.path,
+        ),
+        candidate: await image(
+          result.attachments.find((attachment) => attachment.name === "design-system-branch")?.path,
+        ),
+        diff: await image(
+          result.attachments.find((attachment) => attachment.path?.endsWith("-diff.png"))?.path,
+        ),
+        error: result.errors.map((error) => error.message ?? "").join("\n"),
+      })),
+    );
 
-    const cards = this.comparisons
+    const passed = comparisons.filter((comparison) => comparison.status === "passed").length;
+
+    const cards = comparisons
       .map((comparison, index) => {
         const frame = (label: string, source?: string) =>
           `<figure><figcaption>${label}</figcaption>${source ? `<a href="${source}" target="_blank"><img src="${source}" alt="${escape(comparison.name)} — ${label}"></a>` : "<p>No image captured</p>"}</figure>`;
@@ -70,7 +91,7 @@ export default class VisualReporter implements Reporter {
       p,figcaption{color:var(--muted-foreground,GrayText)}code,pre{font-family:var(--font-mono,monospace)}
       select{max-width:100%;padding:8px;margin:8px 0 16px}section{padding:16px;border-radius:var(--radius,12px);background:var(--card,Canvas)}
       h2{font-size:16px;margin:0}figure{margin:0;min-width:0}figcaption{margin:8px 0}.images{display:grid;grid-template-columns:1fr 1fr;gap:16px}img{display:block;max-width:100%;height:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{margin-top:16px}
-    </style><p><strong>${passed}/${this.comparisons.length} comparisons passed.</strong> Same browser, viewport, fixture data, locale, hue, and fixed date.</p><p>Reference: <code>${escape(this.reference)}</code><br>Candidate: <code>${escape(this.candidate)}</code></p><label for="screen">Comparison</label><br><select id="screen">${this.comparisons.map((comparison, index) => `<option value="${index}">${escape(comparison.name)} — ${escape(comparison.status)}</option>`).join("")}</select>${cards}<script>document.getElementById('screen').addEventListener('change',event=>{for(const section of document.querySelectorAll('[data-comparison]'))section.hidden=section.dataset.comparison!==event.target.value;});</script></html>`;
+    </style><p><strong>${passed}/${comparisons.length} comparisons passed.</strong> Same browser, viewport, fixture data, locale, hue, and fixed date.</p><p>Reference: <code>${escape(this.reference)}</code><br>Candidate: <code>${escape(this.candidate)}</code></p><label for="screen">Comparison</label><br><select id="screen">${comparisons.map((comparison, index) => `<option value="${index}">${escape(comparison.name)} — ${escape(comparison.status)}</option>`).join("")}</select>${cards}<script>document.getElementById('screen').addEventListener('change',event=>{for(const section of document.querySelectorAll('[data-comparison]'))section.hidden=section.dataset.comparison!==event.target.value;});</script></html>`;
 
     await mkdir(this.outputDir, { recursive: true });
     await writeFile(path.join(this.outputDir, "comparison.html"), html);
@@ -81,8 +102,8 @@ export default class VisualReporter implements Reporter {
           reference: this.reference,
           candidate: this.candidate,
           passed,
-          total: this.comparisons.length,
-          comparisons: this.comparisons.map(({ name, status, error }) => ({ name, status, error })),
+          total: comparisons.length,
+          comparisons: comparisons.map(({ name, status, error }) => ({ name, status, error })),
         },
         null,
         2,
