@@ -42,6 +42,13 @@ preview when testing the integration. See [`api/routes/spycat.ts`](../api/routes
 The PWA Worker uses Cloudflare D1 for Better Auth data and the cloud-sync party
 list document pointer.
 
+It also stores compact MCP retry claims and party-ID receipts. Signed write
+tokens expire after 15 minutes; an indexed cleanup runs every five minutes.
+The Worker scheduled handler performs cleanup without scanning on user requests.
+Apply `0007_mcp_operations.sql` before enabling MCP writes. The MCP endpoint
+shares this Worker and its Automerge sync configuration; see the
+[MCP setup guide](../../mcp/README.md).
+
 Create the database with Wrangler, then copy the generated database name and ID
 into `wrangler.jsonc`:
 
@@ -65,6 +72,25 @@ CI validates migrations as part of `@trizum/pwa#check`. Production releases
 apply remote D1 migrations before deploying the Worker. To apply migrations
 without deploying, run the `PWA Production Migrations` GitHub Actions workflow
 manually and enter the branch, tag, or commit SHA containing the migrations.
+
+## MCP write controls
+
+The `MCP_WRITE_LIMITER` binding allows 60 write-related attempts per minute per
+source IP, hostname, and Cloudflare location. Both token preparation and mutation
+count. Cloudflare's rate limiter is approximate and agents sharing an egress IP
+share this allowance. Its namespace ID must remain unique to this limiter in the
+account. Counters contain no group data and never enter analytics.
+
+MCP write tokens use the existing `BETTER_AUTH_SECRET` with a dedicated issuer
+and key prefix. It must contain at least 32 characters. Rotating it invalidates
+outstanding tokens. Missing secret or limiter configuration fails writes closed;
+read-only MCP operations remain available.
+
+Production deployment activates the five-minute cron trigger. Version uploads
+for PR previews do not activate it. Previews use the configured production D1
+binding and Automerge peer, so apply the additive migration through the manual
+migration workflow before preview write tests and use disposable groups. The
+normal production migration job also applies it before release.
 
 ## Email
 

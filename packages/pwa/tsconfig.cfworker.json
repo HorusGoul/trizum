@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["vite/client"],
     "moduleResolution": "bundler",
     "target": "esnext",
     "module": "esnext",
@@ -16,6 +17,9 @@
     "./src/lib/partySharePreviewMessages.ts",
     "./src/lib/api/*.ts",
     "./src/lib/money.ts",
+    "./src/lib/recalculatePartyBalances.ts",
+    "./src/lib/mcpMessages.ts",
+    "./src/models/expense.ts",
     "./src/lib/tricountMigration.ts",
     "./src/models/migrationData.ts",
     "./src/models/party.ts"

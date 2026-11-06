@@ -8,6 +8,10 @@ export { hasPrivacySignal, isAutomatedBrowser, isTelemetryId } from "./privacy.j
 
 export type { AnalyticsEvent } from "./events.js";
 
+export { createAnonymousServerAnalytics } from "./server.js";
+
+export type { McpAnalyticsEvent } from "./events.js";
+
 export interface AnalyticsOptions {
   endpoint: string;
   siteId: string;
