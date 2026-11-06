@@ -160,7 +160,9 @@ that, open the party in trizum. No extra D1 coordination or request cache is use
 on-demand group view. It creates no extra documents or summaries and uses the
 same two D1 write statements and retry protection as other mutations.
 Expense edits and deletions recompute the affected chunk's existing shared
-balance document using normal domain calculations. Fresh, temporary sync repos
+balance document by calling the existing PWA `recalculatePartyBalances` through
+a Worker adapter scoped to that chunk. Browser hooks, shared models, and the
+PWA recalculation implementation stay unchanged. Fresh, temporary sync repos
 verify the projection after each write so a delayed request does not leave its
 older balance snapshot behind. Reconciliation also corrects the edited record's
 content hash after concurrent field merges. It stops after four passes and shares

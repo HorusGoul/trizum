@@ -17,6 +17,7 @@
     "./src/lib/partySharePreviewMessages.ts",
     "./src/lib/api/*.ts",
     "./src/lib/money.ts",
+    "./src/lib/recalculatePartyBalances.ts",
     "./src/lib/mcpMessages.ts",
     "./src/models/expense.ts",
     "./src/lib/tricountMigration.ts",

@@ -465,6 +465,7 @@ describe("Worker document reads over WebSocket", () => {
     const originalBalanceId = stored.chunkRefs[0].balancesId;
 
     const firstDocuments = {
+      find: writers[0].find.bind(writers[0]),
       fork: writers[0].fork.bind(writers[0]),
       read: writers[0].read.bind(writers[0]),
       async create<T extends object>(initialize: (id: Party["id"]) => T) {
@@ -658,6 +659,26 @@ describe("Worker document reads over WebSocket", () => {
           expect.objectContaining({ name: "Updated lunch", amount: "12.00" }),
         );
         expect(refreshed.participants.map((person) => person.balance)).toEqual(["16.00", "-16.00"]);
+        const api = new WorkerPartyService(next, "https://trizum.app");
+
+        const expense = await api.getExpense({
+          partyId,
+          expenseId: liveChunk.doc().expenses[0].id,
+        });
+
+        const renamed = await api.updateExpense({
+          requestId: crypto.randomUUID(),
+          partyId,
+          expenseId: expense.expenseId,
+          version: expense.version,
+          name: "Renamed through MCP",
+        });
+
+        expect(renamed.expenses).toContainEqual(
+          expect.objectContaining({ name: "Renamed through MCP", amount: "12.00" }),
+        );
+        expect(renamed.participants.map((person) => person.balance)).toEqual(["16.00", "-16.00"]);
+        expect((await next.read<Party>(partyId)).chunkRefs).toHaveLength(3);
       } finally {
         await next.close();
       }

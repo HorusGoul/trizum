@@ -379,17 +379,22 @@ it.each(["update", "delete"] as const)(
 
       if (!intercepted) {
         intercepted = true;
-        const change = fresh.change.bind(fresh);
-        vi.spyOn(fresh, "change").mockImplementation(
-          async <T>(id: Party["id"], fn: ChangeFn<T>) => {
-            if (id === f.summary.id) {
-              reached();
-              await delayed;
-            }
+        const find = fresh.find.bind(fresh);
+        vi.spyOn(fresh, "find").mockImplementation(async <T>(id: Party["id"]) => {
+          const handle = await find<T>(id);
 
-            return change(id, fn);
-          },
-        );
+          return {
+            doc: handle.doc,
+            change: async (fn: ChangeFn<T>) => {
+              if (id === f.summary.id) {
+                reached();
+                await delayed;
+              }
+
+              return handle.change(fn);
+            },
+          };
+        });
       }
 
       return fresh;
@@ -473,19 +478,26 @@ it("bounds reconciliation when another writer keeps replacing the balance projec
   const projectionWrites = vi.fn<() => void>();
   vi.spyOn(doc, "fork").mockImplementation(() => {
     const fresh = fork();
-    const change = fresh.change.bind(fresh);
-    vi.spyOn(fresh, "change").mockImplementation(async <T>(id: Party["id"], fn: ChangeFn<T>) => {
-      const result = await change(id, fn);
+    const find = fresh.find.bind(fresh);
+    vi.spyOn(fresh, "find").mockImplementation(async <T>(id: Party["id"]) => {
+      const handle = await find<T>(id);
 
-      if (id === f.summary.id) {
-        projectionWrites();
-        const handle = await server.find<PartyExpenseChunkBalances>(f.summary.id);
-        handle.change((state) => {
-          state.balances = {};
-        });
-      }
+      return {
+        doc: handle.doc,
+        change: async (fn: ChangeFn<T>) => {
+          const result = await handle.change(fn);
 
-      return result;
+          if (id === f.summary.id) {
+            projectionWrites();
+            const stored = await server.find<PartyExpenseChunkBalances>(f.summary.id);
+            stored.change((state) => {
+              state.balances = {};
+            });
+          }
+
+          return result;
+        },
+      };
     });
 
     return fresh;
@@ -512,4 +524,23 @@ it("reads and updates an expense outside the recent twenty when its ID is known"
     name: "Older lunch",
   });
   expect(await service().getExpense(input)).toMatchObject({ name: "Older lunch", amount: "1.00" });
+});
+
+it("keeps exact cents at the MCP input limit using the shared money conversion", async () => {
+  const f = await fixture([1000]);
+
+  const result = await f.api.addExpense({
+    requestId: crypto.randomUUID(),
+    partyId: f.partyId,
+    name: "Large expense",
+    amount: "9999999999.99",
+    paidBy: f.alice,
+    splitBetween: [f.alice, f.bob],
+    paidAt: "2026-11-06T20:00:00Z",
+  });
+
+  expect(result.expenses.find((expense) => expense.name === "Large expense")?.amount).toBe(
+    "9999999999.99",
+  );
+  expect(balances(result)).toEqual({ Alice: "5000000005.00", Bob: "-5000000005.00" });
 });

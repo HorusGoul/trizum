@@ -1,6 +1,10 @@
 import { deleteAt } from "@automerge/automerge-repo";
-import { diff } from "@opentf/obj-diff";
 import { clone } from "@opentf/std";
+import { toDecimal } from "dinero.js";
+import { createMoney } from "../../src/lib/money";
+import { convertToUnits } from "../../src/lib/expenses";
+import { addExpenseSchema } from "@trizum/mcp/contracts";
+import { recalculateChunkBalances } from "./recalculateChunkBalances";
 import {
   McpToolError,
   type AddExpenseInput,
@@ -17,6 +21,7 @@ import {
   createExpenseId,
   decodeExpenseId,
   getExpenseTotalAmount,
+  findExpenseById,
   type Expense,
 } from "../../src/models/expense";
 import type {
@@ -27,7 +32,10 @@ import type {
 } from "../../src/models/party";
 import type { DocumentId } from "@automerge/automerge-repo";
 
-export type PartyDocuments = Pick<AutomergeDocuments, "read" | "create" | "change" | "fork">;
+export type PartyDocuments = Pick<
+  AutomergeDocuments,
+  "read" | "create" | "change" | "fork" | "find"
+>;
 
 export const MAX_CHUNKS = 100;
 
@@ -124,7 +132,7 @@ export class PartyExpenses {
   async update(party: Party, input: UpdateExpenseInput) {
     const { reference } = await this.find(party, input.expenseId);
     await this.documents.change<PartyExpenseChunk>(reference.chunkId, (doc) => {
-      const current = this.requireExpense(doc, input.expenseId, input.version);
+      const { expense: current } = this.requireExpense(doc, input.expenseId, input.version);
       const updated = clone(current);
 
       if (input.name !== undefined) updated.name = input.name;
@@ -184,19 +192,16 @@ export class PartyExpenses {
   async delete(party: Party, input: DeleteExpenseInput) {
     const { reference } = await this.find(party, input.expenseId);
     await this.documents.change<PartyExpenseChunk>(reference.chunkId, (doc) => {
-      this.requireExpense(doc, input.expenseId, input.version);
-      deleteAt(
-        doc.expenses,
-        doc.expenses.findIndex((expense) => expense.id === input.expenseId),
-      );
+      const { index } = this.requireExpense(doc, input.expenseId, input.version);
+      deleteAt(doc.expenses, index);
     });
     await this.reconcile(party, reference, input.expenseId);
   }
 
   private requireExpense(chunk: PartyExpenseChunk, id: string, version: string) {
-    const expense = chunk.expenses.find((entry) => entry.id === id);
+    const [expense, index] = findExpenseById(chunk.expenses, id);
 
-    if (!expense)
+    if (!expense || expense.id !== id)
       throw new McpToolError("Expense not found. Read the party again before choosing an expense.");
 
     if (expense.isTransfer)
@@ -209,7 +214,7 @@ export class PartyExpenses {
         "This expense changed since it was read. Call get_expense again and confirm the intended changes before preparing another write.",
       );
 
-    return expense;
+    return { expense, index };
   }
 
   private async find(party: Party, id: string) {
@@ -221,9 +226,9 @@ export class PartyExpenses {
         "This expense does not belong to the supplied party. Use an expense ID from trizum.",
       );
     const chunk = await this.readChunk(party, reference.chunkId);
-    const expense = chunk.expenses.find((entry) => entry.id === id);
+    const [expense] = findExpenseById(chunk.expenses, id);
 
-    if (!expense)
+    if (!expense || expense.id !== id)
       throw new McpToolError("Expense not found. Read the party again before choosing an expense.");
 
     return { reference, expense };
@@ -239,24 +244,20 @@ export class PartyExpenses {
         const reader = new PartyExpenses(fresh);
         const latestParty = await fresh.read<Party>(party.id);
         const chunk = await reader.readChunk(latestParty, reference.chunkId);
-        const edited = chunk.expenses.find((expense) => expense.id === expenseId);
+        const [edited] = findExpenseById(chunk.expenses, expenseId);
 
-        if (edited && edited.__hash !== calculateExpenseHash(edited)) {
+        if (edited?.id === expenseId && edited.__hash !== calculateExpenseHash(edited)) {
           await fresh.change<PartyExpenseChunk>(reference.chunkId, (doc) => {
-            const current = doc.expenses.find((expense) => expense.id === expenseId);
+            const [current] = findExpenseById(doc.expenses, expenseId);
 
-            if (current) current.__hash = calculateExpenseHash(current);
+            if (current?.id === expenseId) current.__hash = calculateExpenseHash(current);
           });
           continue;
         }
 
-        const summary = await reader.readChunkBalances(latestParty, reference.balancesId);
-        const expected = calculateBalancesByParticipant(chunk.expenses, latestParty.participants);
+        await reader.readChunkBalances(latestParty, reference.balancesId);
 
-        if (diff(structuredClone(summary.balances), expected).length === 0) return;
-        await fresh.change<PartyExpenseChunkBalances>(reference.balancesId, (doc) => {
-          doc.balances = expected;
-        });
+        if (!(await recalculateChunkBalances(fresh, latestParty, reference))) return;
       } finally {
         await fresh.close();
       }
@@ -298,12 +299,11 @@ export class PartyExpenses {
 }
 
 function parseExpenseAmount(value: string) {
-  if (!/^(?:0|[1-9]\d{0,9})(?:\.\d{1,2})?$/.test(value))
+  if (!addExpenseSchema.shape.amount.safeParse(value).success)
     throw new McpToolError(
       "The expense amount must be positive and have at most two decimal places.",
     );
-  const [units, decimals = ""] = value.split(".");
-  const amount = Number(units) * 100 + Number(decimals.padEnd(2, "0"));
+  const amount = convertToUnits(Number(value));
 
   if (!Number.isSafeInteger(amount) || amount <= 0)
     throw new McpToolError(
@@ -316,7 +316,6 @@ function parseExpenseAmount(value: string) {
 export function formatAmount(amount: number) {
   if (!Number.isSafeInteger(amount))
     throw new McpToolError("This party contains an unsupported amount. Open it in trizum.");
-  const absolute = Math.abs(amount);
 
-  return `${amount < 0 ? "-" : ""}${Math.floor(absolute / 100)}.${String(absolute % 100).padStart(2, "0")}`;
+  return toDecimal(createMoney(amount));
 }

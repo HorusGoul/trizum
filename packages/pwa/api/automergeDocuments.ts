@@ -56,6 +56,16 @@ export class AutomergeDocuments {
     return (await this.#find<T>(documentId)).doc();
   }
 
+  /** Repo-style local reads and immediate mutations with awaitable sync receipts. */
+  async find<T>(documentId: DocumentId) {
+    const handle = await this.#find<T>(documentId);
+
+    return {
+      doc: () => handle.doc(),
+      change: (change: ChangeFn<T>) => this.#acknowledge(handle, change),
+    };
+  }
+
   /** Publish a new document and wait for the sync peer before request cleanup. */
   async create<T extends object>(initialize: (documentId: DocumentId) => T): Promise<Doc<T>> {
     this.#signal.throwIfAborted();
