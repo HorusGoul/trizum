@@ -23,6 +23,8 @@ and keep generated sprite assets in sync during Vite development and builds.
   `idFromRelativePath()` logic.
 - Generated outputs are written only when content changes so Vite reloads stay
   stable.
+- `usageExcludeRoots` excludes additional directories from usage scanning and
+  development regeneration, including generated catalogs inside shared UI source roots.
 - Usage discovery is intentionally simple and based on string-literal scanning.
 
 ## Validation

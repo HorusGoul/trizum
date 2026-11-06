@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-11-06 01:04+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: es\n"
+
+#. js-lingui-explicit-id
+#: src/Avatar.tsx:51
+msgid "ui.avatar.named"
+msgstr "Avatar de {name}"
+
+#. js-lingui-explicit-id
+#: src/Avatar.tsx:52
+msgid "ui.avatar.default"
+msgstr "Avatar"
+
+#. js-lingui-explicit-id
+#: src/MediaGallery.tsx:260
+msgid "ui.mediaGallery.close"
+msgstr "Cerrar"
+
+#. js-lingui-explicit-id
+#: src/MediaGallery.tsx:277
+msgid "ui.mediaGallery.next"
+msgstr "Siguiente"
+
+#. js-lingui-explicit-id
+#: src/MediaGallery.tsx:270
+msgid "ui.mediaGallery.previous"
+msgstr "Anterior"
