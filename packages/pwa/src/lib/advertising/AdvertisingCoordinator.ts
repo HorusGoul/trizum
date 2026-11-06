@@ -78,6 +78,7 @@ export class AdvertisingCoordinator {
   private appOpenLoading = false;
   private presenting = false;
   private destroyed = false;
+  private destroyPromise: Promise<void> | undefined;
 
   constructor(options: AdvertisingCoordinatorOptions) {
     this.options = options;
@@ -215,12 +216,17 @@ export class AdvertisingCoordinator {
     }
   }
 
-  async destroy() {
+  destroy() {
     this.destroyed = true;
 
-    if (this.sdk) {
-      await this.sdk.removeListeners();
-    }
+    this.destroyPromise ??=
+      this.sdkPromise?.then(
+        (sdk) => sdk.removeListeners(),
+        // Failed SDK creation already rolls back its partial listener registrations.
+        () => undefined,
+      ) ?? Promise.resolve();
+
+    return this.destroyPromise;
   }
 
   private async refreshForLaunch(kind: "cold" | "warm", hadPreparedAppOpen: boolean) {
@@ -461,6 +467,10 @@ export class AdvertisingCoordinator {
   }
 
   private onFullScreenEvent(format: AdFormat, event: FullScreenAdEvent, errorCode?: number) {
+    if (this.destroyed) {
+      return;
+    }
+
     if (event === "shown") {
       this.history = recordFullScreenAdShown(this.history, this.now());
       this.persistHistory();

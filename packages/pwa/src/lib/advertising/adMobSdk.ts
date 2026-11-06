@@ -51,24 +51,34 @@ export async function createAdMobSdk(
       await AdMob.addListener(InterstitialAdPluginEvents.Showed, () => {
         onFullScreenEvent("interstitial", "shown");
       }),
+    );
+    handles.push(
       await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
         onFullScreenEvent("interstitial", "dismissed");
       }),
+    );
+    handles.push(
       await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, (error) => {
         onFullScreenEvent("interstitial", "failedToShow", error.code);
       }),
+    );
+    handles.push(
       await NativeAppOpenAd.addListener("nativeAppOpenAdShown", () => {
         onFullScreenEvent("appOpen", "shown");
       }),
+    );
+    handles.push(
       await NativeAppOpenAd.addListener("nativeAppOpenAdDismissed", () => {
         onFullScreenEvent("appOpen", "dismissed");
       }),
+    );
+    handles.push(
       await NativeAppOpenAd.addListener("nativeAppOpenAdFailedToShow", (error) => {
         onFullScreenEvent("appOpen", "failedToShow", error.code);
       }),
     );
   } catch (error) {
-    await Promise.all(handles.map((handle) => handle.remove()));
+    await Promise.allSettled(handles.map((handle) => handle.remove()));
     throw error;
   }
 
