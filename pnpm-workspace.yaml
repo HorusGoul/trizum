@@ -90,7 +90,7 @@ catalog:
   "@sentry/react": 10.76.2
   "@sentry/vite-plugin": 5.4.1
   "@revenuecat/purchases-capacitor": 13.7.6
-  "@revenuecat/purchases-capacitor-ui": 13.7.6
+  "@revenuecat/purchases-capacitor-ui": 14.1.0
   "@tanstack/react-form": 1.33.5
   "@tanstack/react-router": 1.170.46
   "@tanstack/router-plugin": 1.168.48
