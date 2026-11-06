@@ -142,7 +142,9 @@ export default defineConfig(({ mode }) => {
           ],
         },
         codegen: {
-          command: "vp run icons:generate",
+          // Keep the UI build in this graph so shared prerequisites run once.
+          command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
+          dependsOn: ["@trizum/icon-sprite#build", "@trizum/ui#build"],
           cache: false,
         },
         deploy: {
