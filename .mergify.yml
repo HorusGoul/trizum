@@ -39,7 +39,9 @@ queue_rules:
       body: pr-body
     # Continue honoring GitHub's required checks and reviews as they evolve.
     branch_protection_injection_mode: queue
-    batch_size: 1
+    # Keep small stacks together while retaining a squash commit per PR.
+    batch_size: 5
+    batch_max_wait_time: 30 seconds
     max_checks_retries: 0
     # Covers the 30-minute E2E jobs plus setup and runner scheduling.
     checks_timeout: 45 min
