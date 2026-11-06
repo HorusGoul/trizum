@@ -121,6 +121,19 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
+  storybook:
+    name: Storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: ".node-version"
+          cache: true
+      - name: Build design system Storybook
+        run: vp run --filter @trizum/ui storybook:build
+
   e2e:
     name: E2E (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
@@ -382,7 +395,7 @@ jobs:
 
       - name: Guard Catalog Conflict Markers
         run: |
-          if grep -n -E '<<<<<<<|>>>>>>>|=======' packages/pwa/locale/*/messages.po; then
+          if grep -n -E '<<<<<<<|>>>>>>>|=======' packages/pwa/locale/*/messages.po packages/ui/src/locales/*/messages.po; then
             echo "::error::Refusing to auto-commit Lingui catalogs containing conflict markers."
             exit 1
           fi

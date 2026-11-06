@@ -1,0 +1,87 @@
+{
+  "name": "@trizum/ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Internal trizum React design system",
+  "keywords": [],
+  "license": "MIT",
+  "author": "Horus Lugo <hola@horus.dev> (https://horus.dev)",
+  "files": [
+    "dist",
+    "src",
+    "icons"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./styles.css": "./src/styles.css",
+    "./locales/*": {
+      "types": "./dist/locales/*/messages.d.ts",
+      "import": "./dist/locales/*/messages.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "lingui:extract": "vp exec lingui extract",
+    "lingui:compile": "vp exec lingui compile --strict",
+    "storybook": "vp run storybook:dev"
+  },
+  "dependencies": {
+    "@fontsource-variable/fira-code": "catalog:",
+    "@fontsource-variable/inter": "catalog:",
+    "@internationalized/date": "catalog:",
+    "@trizum/icon-sprite": "workspace:*",
+    "@trizum/tailwindcss-safe-area-capacitor": "workspace:*",
+    "@trizum/tw-dynamic-themes": "workspace:*",
+    "@use-gesture/react": "catalog:",
+    "clsx": "catalog:",
+    "lucide-static": "catalog:",
+    "motion": "catalog:",
+    "qr-code-styling": "catalog:",
+    "react-aria": "catalog:",
+    "react-aria-components": "catalog:",
+    "react-modal-sheet": "catalog:",
+    "sonner": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tailwindcss-animate": "catalog:",
+    "tailwindcss-react-aria-components": "catalog:"
+  },
+  "devDependencies": {
+    "@babel/core": "catalog:",
+    "@lingui/babel-plugin-lingui-macro": "catalog:",
+    "@lingui/cli": "catalog:",
+    "@lingui/conf": "catalog:",
+    "@lingui/core": "catalog:",
+    "@lingui/format-po": "catalog:",
+    "@lingui/react": "catalog:",
+    "@rolldown/plugin-babel": "catalog:",
+    "@storybook/addon-docs": "catalog:",
+    "@storybook/react-vite": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@trizum/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "storybook": "catalog:",
+    "tailwindcss": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "@lingui/core": "catalog:",
+    "@lingui/react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwindcss": "catalog:"
+  }
+}

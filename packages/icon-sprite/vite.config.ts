@@ -6,6 +6,7 @@ export default defineConfig({
       build: {
         command: "NODE_ENV=production tsc -b tsconfig.json --force",
         cache: {
+          input: ["src/**", "tsconfig.json", "package.json"],
           output: ["dist/**"],
         },
       },
