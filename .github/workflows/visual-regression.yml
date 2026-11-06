@@ -27,7 +27,14 @@ concurrency:
 jobs:
   visual:
     name: Visual parity with main
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container:
+      # Keep aligned with the Playwright catalog and the functional E2E job.
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host --init
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
@@ -41,6 +48,20 @@ jobs:
         with:
           node-version-file: .node-version
           cache: true
+      - name: Verify Playwright image version
+        working-directory: packages/pwa
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          import { createRequire } from 'node:module';
+          const require = createRequire(import.meta.url);
+          const { version } = require('@playwright/test/package.json');
+          const { driverVersion } = JSON.parse(readFileSync('/ms-playwright/.docker-info', 'utf8'));
+          assert.equal(driverVersion, version, 'Update the CI Playwright image and pnpm catalog together');
+          console.log(`Playwright package and image match: ${version}`);
+          NODE
+
       - name: Build reference from main
         id: reference
         working-directory: .visual-reference
@@ -48,8 +69,6 @@ jobs:
           vp install --frozen-lockfile
           VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true vp run --filter @trizum/pwa build
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      - name: Install browsers
-        run: vp run --filter @trizum/pwa test:e2e:install:ci
       - name: Compare reference and candidate
         run: vp run --filter @trizum/pwa test:visual
         env:

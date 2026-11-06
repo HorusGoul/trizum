@@ -137,7 +137,14 @@ jobs:
 
   e2e:
     name: E2E (shard ${{ matrix.shard }}/4)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    container:
+      # Keep this version aligned with the Playwright catalog entries.
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host --init
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -150,19 +157,25 @@ jobs:
           node-version-file: ".node-version"
           cache: true
 
-      - name: Build E2E app and install browsers
-        timeout-minutes: 10
+      - name: Verify Playwright image version
+        working-directory: packages/pwa
         run: |
-          # Browser installation does not touch workspace build/codegen outputs.
-          vp run --filter @trizum/pwa test:e2e:install:ci &
-          browser_pid=$!
-          build_status=0
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          import { createRequire } from 'node:module';
+          const require = createRequire(import.meta.url);
+          const { version } = require('@playwright/test/package.json');
+          const { driverVersion } = JSON.parse(readFileSync('/ms-playwright/.docker-info', 'utf8'));
+          assert.equal(driverVersion, version, 'Update the CI Playwright image and pnpm catalog together');
+          console.log(`Playwright package and image match: ${version}`);
+          NODE
+
+      - name: Build E2E app
+        timeout-minutes: 5
+        run: |
           VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true \
-            vp run --filter @trizum/pwa build || build_status=$?
-          browser_status=0
-          wait "$browser_pid" || browser_status=$?
-          echo "E2E build status: $build_status; browser install status: $browser_status"
-          (( build_status == 0 && browser_status == 0 ))
+            vp run --filter @trizum/pwa build
 
       - name: Run Playwright E2E
         run: vp run --filter @trizum/pwa test:e2e:prebuilt --shard=${{ matrix.shard }}/4
