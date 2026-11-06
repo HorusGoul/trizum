@@ -1,5 +1,11 @@
 # @trizum/analytics
 
+## 1.1.1
+
+### Patch Changes
+
+- [#587](https://github.com/HorusGoul/trizum/pull/587) [`16ba80f`](https://github.com/HorusGoul/trizum/commit/16ba80f38f2e85615180c09071a2048836406a8d) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Exclude automated browsers from usage analytics and prevent store screenshot captures from sending production analytics requests.
+
 ## 1.1.0
 
 ### Minor Changes

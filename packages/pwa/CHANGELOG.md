@@ -1,5 +1,21 @@
 # @trizum/pwa
 
+## 1.13.3
+
+### Patch Changes
+
+- [#587](https://github.com/HorusGoul/trizum/pull/587) [`16ba80f`](https://github.com/HorusGoul/trizum/commit/16ba80f38f2e85615180c09071a2048836406a8d) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Exclude automated browsers from usage analytics and prevent store screenshot captures from sending production analytics requests.
+
+- [#586](https://github.com/HorusGoul/trizum/pull/586) [`6e354b3`](https://github.com/HorusGoul/trizum/commit/6e354b3db8eb89698c87ffe8fc440c2b89fa59f7) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Prevent duplicate party join analytics when the participant form is saved again during navigation or membership syncs while the form is open.
+
+- [#593](https://github.com/HorusGoul/trizum/pull/593) [`42bda0a`](https://github.com/HorusGoul/trizum/commit/42bda0aa7f7d718e40ab4da7a8505a32a9122a22) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Clean up native advertising listeners when setup fails or finishes after teardown, and ignore queued ad events after teardown.
+
+- [#589](https://github.com/HorusGoul/trizum/pull/589) [`547d7de`](https://github.com/HorusGoul/trizum/commit/547d7de25f5941dd02a870090b3f41bbefa521e1) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Fix native Premium account setup, offerings, purchases, and restores failing with a Purchases.then() error on iOS and Android.
+
+- [#590](https://github.com/HorusGoul/trizum/pull/590) [`029ed00`](https://github.com/HorusGoul/trizum/commit/029ed00f9fbeb73be3e6f69482c519addae495ee) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Allow more time for app worker heartbeat responses so slow startup or a busy worker does not fail after just one second.
+- Updated dependencies [[`16ba80f`](https://github.com/HorusGoul/trizum/commit/16ba80f38f2e85615180c09071a2048836406a8d)]:
+  - @trizum/analytics@1.1.1
+
 ## 1.13.2
 
 ### Patch Changes
