@@ -35,6 +35,25 @@ merging according to [`.mergify.yml`](../../../.mergify.yml).
 Queueing is the handoff to Mergify. Monitor until merge only when requested,
 using the host's PR watcher when available.
 
+## PR Stacks
+
+- Inspect the stack with `gh stack view --json`. Check every PR the user wants
+  merged, including its current head, CI, and review feedback.
+- Once all requested layers are ready, comment `@mergifyio queue` on the highest
+  requested PR. Mergify queues it and its predecessors together. Do not queue
+  the bottom PR separately when asked to merge the whole stack.
+- Mergify uses the stack root for `base = main`; an upper PR targeting its
+  parent's branch is not a reason to wait for that parent to merge.
+- Batch limits live in [`.mergify.yml`](../../../.mergify.yml). Larger batches
+  share CI, but failures can split them and require more runs. A batch is not
+  a promise that every PR will merge atomically.
+- After a partial squash merge, retargeting alone can leave conflicts. Sync the
+  remaining branches with `gh stack sync --remote origin`, resolve conflicts,
+  and validate their new heads before queueing again.
+
+See [Mergify's stack guide](https://docs.mergify.com/merge-queue/stacks/) when
+queue behavior is unclear. Do not bypass Mergify with `gh stack merge`.
+
 ## Checks and Head Changes
 
 - Inspect failures with `gh pr checks` and `gh run view --log`. Fix and validate
@@ -45,6 +64,8 @@ using the host's PR watcher when available.
   CI and reviews again. Do not force-push merely to retry CI.
 - Treat a clean watcher result as a snapshot: confirm the head has not changed
   and check for new feedback immediately before posting the queue comment.
+- Check the current head before acting on a notification. Old CI results do not
+  describe it; review feedback still needs a response even on an older head.
 - Codex review jobs are non-blocking. Read their review comments rather than
   treating a green job as proof that there are no findings.
 - A failed `Mergify Merge Queue` check describes the previous queue attempt,
