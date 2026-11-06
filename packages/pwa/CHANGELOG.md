@@ -1,5 +1,16 @@
 # @trizum/pwa
 
+## 1.13.4
+
+### Patch Changes
+
+- [#598](https://github.com/HorusGoul/trizum/pull/598) [`6e9afc7`](https://github.com/HorusGoul/trizum/commit/6e9afc755599322bbbacddd9d3f380d767eb595c) Thanks [@HorusGoul](https://github.com/HorusGoul)! - Use the internal design system for PWA components, theme styles, fonts, and shared
+  UI utilities. Merge the package's translations into the app catalogs and supply
+  the app-generated icon sprite through the shared UI provider. Remove the PWA's
+  duplicated design-system sources and assets.
+- Updated dependencies [[`a497628`](https://github.com/HorusGoul/trizum/commit/a497628071993570116cf18d876b0c1ddc2e2949)]:
+  - @trizum/ui@0.1.0
+
 ## 1.13.3
 
 ### Patch Changes
