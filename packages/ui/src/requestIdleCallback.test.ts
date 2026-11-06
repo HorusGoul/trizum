@@ -1,7 +1,7 @@
 // @vitest-environment node
 
 import { afterEach, expect, it, vi } from "vite-plus/test";
-import { cancelIdleCallback, requestIdleCallback } from "./requestIdleCallback.ts";
+import { cancelIdleCallback, requestIdleCallback } from "@trizum/ui/requestIdleCallback";
 
 afterEach(() => {
   vi.useRealTimers();

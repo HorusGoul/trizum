@@ -13,12 +13,12 @@ import {
   composeRenderProps,
 } from "react-aria-components";
 import { List, useListRef, type RowComponentProps } from "react-window";
-import { Popover } from "#src/ui/Popover.js";
-import { cn } from "#src/ui/utils.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Popover } from "@trizum/ui/Popover";
+import { cn } from "@trizum/ui/utils";
+import { Icon } from "@trizum/ui/Icon";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.ts";
 import { DEFAULT_LOCALE, type SupportedLocale } from "#src/lib/locales.js";
-import { TrizumSpinner } from "./TrizumSpinner.js";
+import { TrizumSpinner } from "@trizum/ui/TrizumSpinner";
 
 interface EmojiData {
   emojis: Emoji[];

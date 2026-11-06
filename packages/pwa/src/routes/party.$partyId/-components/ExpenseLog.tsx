@@ -10,9 +10,9 @@ import {
   BLANK_EXPENSE_TEMPLATE_SYMBOL,
   shouldOpenExpenseTemplatePicker,
 } from "#src/models/expenseTemplate.ts";
-import { Icon } from "#src/ui/Icon.js";
-import { IconButton } from "#src/ui/IconButton.js";
-import { Menu, MenuItem } from "#src/ui/Menu.js";
+import { Icon } from "@trizum/ui/Icon";
+import { IconButton } from "@trizum/ui/IconButton";
+import { Menu, MenuItem } from "@trizum/ui/Menu";
 import {
   ModalSheet,
   ModalSheetActions,
@@ -20,8 +20,8 @@ import {
   ModalSheetHeader,
   ModalSheetSection,
   ModalSheetTitle,
-} from "#src/ui/ModalSheet.tsx";
-import { cn } from "#src/ui/utils.ts";
+} from "@trizum/ui/ModalSheet";
+import { cn } from "@trizum/ui/utils";
 import { VirtualizedExpenseList } from "./VirtualizedExpenseList.js";
 
 export function ExpenseLog() {

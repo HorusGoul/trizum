@@ -9,7 +9,7 @@ import { parseRedemptionSearch } from "#src/lib/premium/premiumRedemption.ts";
 import { PremiumBrowserHelp } from "#src/components/PremiumBrowserHelp.tsx";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
 import { usePremiumDialogs } from "#src/hooks/usePremiumDialogs.ts";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Icon } from "@trizum/ui/Icon";
 
 const CloudSyncSettingsView = lazy(() =>
   import("#src/components/CloudSyncSettingsView.tsx").then((module) => ({

@@ -1,4 +1,6 @@
 import { i18n } from "@lingui/core";
+import { messages as uiEn } from "@trizum/ui/locales/en";
+import { messages as uiEs } from "@trizum/ui/locales/es";
 import * as catalogEn from "#locale/en/messages.po";
 import * as catalogEs from "#locale/es/messages.po";
 import { getSupportedLocale, type SupportedLocale } from "./locales.js";
@@ -21,8 +23,8 @@ export function getBrowserLocale(): SupportedLocale {
  * This should be called once during app bootstrap.
  */
 export function loadAllCatalogs(): void {
-  i18n.load("en", catalogEn.messages);
-  i18n.load("es", catalogEs.messages);
+  i18n.load("en", { ...uiEn, ...catalogEn.messages });
+  i18n.load("es", { ...uiEs, ...catalogEs.messages });
 }
 
 /**

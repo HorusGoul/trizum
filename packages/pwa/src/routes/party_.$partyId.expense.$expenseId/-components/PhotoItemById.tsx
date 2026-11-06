@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
-import { Button } from "#src/ui/Button.tsx";
+import { Button } from "@trizum/ui/Button";
 
 export function PhotoItemById({ photoId, onPress }: { photoId: string; onPress: () => void }) {
   const { url } = useMediaFile(photoId);

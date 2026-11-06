@@ -18,10 +18,10 @@ import {
   type ExpenseTemplate,
   type ExpenseTemplateEditorValues,
 } from "#src/models/expenseTemplate.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import { Switch } from "#src/ui/Switch.tsx";
-import { AppTextField } from "#src/ui/fields/TextField.tsx";
+import { Button } from "@trizum/ui/Button";
+import { AppSelect, SelectItem } from "@trizum/ui/Select";
+import { Switch } from "@trizum/ui/Switch";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import { ArchivedParticipantsAlert } from "./-components/ArchivedParticipantsAlert.tsx";
 import { DeleteExpenseTemplateSheet } from "./-components/DeleteExpenseTemplateSheet.tsx";
 import { ExpenseTemplateEditorHeader } from "./-components/ExpenseTemplateEditorHeader.tsx";

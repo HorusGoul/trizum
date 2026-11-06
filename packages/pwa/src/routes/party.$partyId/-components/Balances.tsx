@@ -6,10 +6,10 @@ import { useCurrentParty } from "#src/hooks/useParty.js";
 import { useScrollRestoration } from "#src/hooks/useScrollRestoration.ts";
 import { simplifyBalanceTransactions } from "#src/models/expense.js";
 import type { BalancesSortedBy } from "#src/models/party.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon } from "@trizum/ui/Icon";
 import { BalanceActionItem } from "./BalanceActionItem.js";
 import { BalanceItem } from "./BalanceItem.js";
-import { PullToRefresh } from "./PullToRefresh.js";
+import { PullToRefresh } from "@trizum/ui/PullToRefresh";
 
 export function Balances({
   panelRef,

@@ -1,5 +1,5 @@
-import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Alert, AlertDescription, AlertTitle } from "@trizum/ui/Alert";
+import { Icon } from "@trizum/ui/Icon";
 
 export function InlineAlert({ title, description }: { title: string; description: string }) {
   return (

@@ -4,9 +4,9 @@ import { useForm } from "@tanstack/react-form";
 import { Suspense, useId } from "react";
 import { BackButton } from "#src/components/BackButton.tsx";
 import { extractTricountId } from "#src/lib/tricount.ts";
-import { Checkbox } from "#src/ui/Checkbox.tsx";
-import { IconButton } from "#src/ui/IconButton.tsx";
-import { AppTextField } from "#src/ui/fields/TextField.js";
+import { Checkbox } from "@trizum/ui/Checkbox";
+import { IconButton } from "@trizum/ui/IconButton";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import type { MigrateParams } from "./types.js";
 import { validateTricountKey } from "./validation.js";
 

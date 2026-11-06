@@ -15,9 +15,9 @@ import type {
   ExpenseEditorValidationResult,
   ExpenseEditorValidationStatus,
 } from "#src/lib/expenseEditor.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon, type IconProps } from "#src/ui/Icon.tsx";
-import { cn } from "#src/ui/utils.ts";
+import { Button } from "@trizum/ui/Button";
+import { Icon, type IconProps } from "@trizum/ui/Icon";
+import { cn } from "@trizum/ui/utils";
 
 interface ExpenseEditorValidationStatusProps {
   isOpen: boolean;

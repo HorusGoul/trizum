@@ -1,7 +1,5 @@
 import { optionalNonemptySearchTextSchema } from "./lib/routerSearch.ts";
 import type {} from "./lib/testing/browserHarnessApi.ts";
-import "@fontsource-variable/inter";
-import "@fontsource-variable/fira-code";
 import * as ReactDOM from "react-dom/client";
 import { Repo } from "@automerge/automerge-repo"; // inits automerge
 import type { DocumentId } from "@automerge/automerge-repo/slim";
@@ -20,14 +18,14 @@ import { parseAppSearch, stringifyAppSearch, type AppSearch } from "./lib/router
 import { initializeAnalytics, bindAnalytics, trackPage } from "./lib/analytics.ts";
 import { getTelemetryId, sentryTelemetryIntegration } from "./lib/telemetry.ts";
 import "./index.css";
-import { I18nProvider, useLingui } from "@lingui/react";
-import { I18nProvider as AriaI18nProvider } from "react-aria-components";
-import { Toaster } from "./ui/Toaster.js";
+import { I18nProvider } from "@lingui/react";
+import { PwaUIProvider } from "./components/PwaUIProvider.js";
+import { Toaster } from "@trizum/ui/Toaster";
 import { initializeI18n } from "./lib/i18n.js";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen.js";
 import { UpdateController } from "./components/UpdateController.tsx";
-import { MediaGalleryController } from "./components/MediaGalleryController.tsx";
+import { MediaGalleryController } from "@trizum/ui/MediaGalleryController";
 import { usePartyList } from "./hooks/usePartyList.ts";
 import { RepoContext } from "./lib/automerge/RepoContext.ts";
 import { SafeArea } from "capacitor-plugin-safe-area";
@@ -322,8 +320,8 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <I18nProvider i18n={i18n}>
-      <UpdateControllerComponent>
-        <AriaProviders>
+      <PwaUIProvider>
+        <UpdateControllerComponent>
           <RepoContext value={repo}>
             <MediaGalleryController>
               <PremiumProvider>
@@ -332,16 +330,10 @@ if (!rootElement.innerHTML) {
               <Toaster />
             </MediaGalleryController>
           </RepoContext>
-        </AriaProviders>
-      </UpdateControllerComponent>
+        </UpdateControllerComponent>
+      </PwaUIProvider>
     </I18nProvider>,
   );
-}
-
-function AriaProviders({ children }: { children: React.ReactNode }) {
-  const { i18n } = useLingui();
-
-  return <AriaI18nProvider locale={i18n.locale}>{children}</AriaI18nProvider>;
 }
 
 function InnerWrap({ children }: { children: React.ReactNode }) {

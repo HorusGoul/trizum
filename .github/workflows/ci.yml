@@ -61,6 +61,7 @@ jobs:
             '^pnpm-lock\.yaml$'
             '^pnpm-workspace\.yaml$'
             '^vite\.config\.ts$'
+            '^packages/ui/'
             '^packages/icon-sprite/'
             '^packages/logging/'
             '^packages/mobile/(assets|dist|src)/'

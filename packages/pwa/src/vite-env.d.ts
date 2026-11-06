@@ -24,7 +24,3 @@ interface ImportMeta {
 declare module "*.po" {
   export const messages: Record<string, string>;
 }
-
-declare module "@fontsource-variable/fira-code";
-
-declare module "@fontsource-variable/inter";

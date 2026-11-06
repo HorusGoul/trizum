@@ -11,8 +11,8 @@ import type { PartyList } from "#src/models/partyList.js";
 import { documentCache } from "#src/lib/automerge/suspense-hooks.js";
 import { getOrderedPartySections } from "#src/lib/partyListOrdering.ts";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
-import { Icon } from "#src/ui/Icon.js";
-import { cn } from "#src/ui/utils.js";
+import { Icon } from "@trizum/ui/Icon";
+import { cn } from "@trizum/ui/utils";
 
 export const Route = createFileRoute("/archived")({
   component: ArchivedParties,

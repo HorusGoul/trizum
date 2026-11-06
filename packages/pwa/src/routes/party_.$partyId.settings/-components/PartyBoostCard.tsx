@@ -4,8 +4,8 @@ import type { PartyBoostViewStatus } from "#src/lib/premium/partyBoostViewStatus
 import type { PartyBoostActionState } from "#src/lib/premium/partyBoostActionState.ts";
 import type { PartyBoostApiError } from "#src/lib/trizumApiClient.ts";
 import { usePartyBoost } from "./usePartyBoost.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
 import {
   ModalSheet,
   ModalSheetAction,
@@ -15,7 +15,7 @@ import {
   ModalSheetHeader,
   ModalSheetSection,
   ModalSheetTitle,
-} from "#src/ui/ModalSheet.tsx";
+} from "@trizum/ui/ModalSheet";
 
 const transferDateFormatter = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 

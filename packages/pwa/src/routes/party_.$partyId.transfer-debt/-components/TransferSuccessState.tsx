@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { m } from "motion/react";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Icon } from "@trizum/ui/Icon";
 
 export function TransferSuccessState({
   destinationPartyName,

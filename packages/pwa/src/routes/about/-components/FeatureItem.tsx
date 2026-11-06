@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Icon, type IconProps } from "#src/ui/Icon.js";
+import { Icon, type IconProps } from "@trizum/ui/Icon";
 
 interface FeatureItemProps {
   icon: IconProps["icon"];

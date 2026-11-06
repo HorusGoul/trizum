@@ -10,8 +10,8 @@ import { useAppSession } from "#src/lib/auth-client.ts";
 import { useAdProtectedFlow } from "#src/lib/advertising/AdvertisingContext.ts";
 import { usePremium } from "#src/lib/premium/PremiumContext.ts";
 import { getRevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";
-import { Icon } from "#src/ui/Icon.tsx";
-import { IconButton } from "#src/ui/IconButton.tsx";
+import { Icon } from "@trizum/ui/Icon";
+import { IconButton } from "@trizum/ui/IconButton";
 import { ProfileSetupCard } from "./ProfileSetupCard.tsx";
 
 export function HomeBanner({ isVisible }: { isVisible: boolean }) {

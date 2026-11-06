@@ -844,7 +844,6 @@ msgstr "Clear expression"
 msgid "Clear search"
 msgstr "Clear search"
 
-#: src/components/MediaGallery.tsx:259
 #: src/components/RouteQRScanner.tsx:64
 msgid "Close"
 msgstr "Close"

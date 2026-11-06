@@ -4,7 +4,7 @@ import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import { getExpenseUnitShares, type Expense } from "#src/models/expense.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon } from "@trizum/ui/Icon";
 
 export function Shares(expense: Pick<Expense, "shares" | "paidBy">) {
   const { i18n } = useLingui();

@@ -8,10 +8,10 @@ import { useForm } from "@tanstack/react-form";
 import { Suspense, useId, useState } from "react";
 import { toast } from "sonner";
 import { BackButton } from "#src/components/BackButton.js";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
-import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/fields/TextField.js";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
+import { IconButton } from "@trizum/ui/IconButton";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import { resetPasswordWithToken } from "#src/lib/auth-client.ts";
 
 interface ResetPasswordSearchParams {

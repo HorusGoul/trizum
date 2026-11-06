@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { useBackNavigation } from "#src/hooks/useBackNavigation.js";
 import { useParty } from "#src/hooks/useParty.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
-import { IconButton } from "#src/ui/IconButton.js";
+import { IconButton } from "@trizum/ui/IconButton";
 import { PartySettingsDetailsFields } from "./-components/PartySettingsDetailsFields.js";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 import type { PartyDetailsFormValues } from "./-components/types.js";

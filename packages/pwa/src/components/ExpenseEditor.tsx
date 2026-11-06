@@ -5,28 +5,28 @@ import type { ExpenseUser } from "#src/lib/expenses.js";
 import { useForm, useStore, type Updater } from "@tanstack/react-form";
 import { BackButton } from "./BackButton";
 import { Suspense, use, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
-import { IconButton } from "#src/ui/IconButton.js";
+import { IconButton } from "@trizum/ui/IconButton";
 import { useLingui } from "@lingui/react";
 import { validateExpenseTitle } from "#src/lib/validation.js";
-import { AppNumberField, AppTextField } from "#src/ui/fields/TextField.js";
+import { AppNumberField, AppTextField } from "@trizum/ui/fields/TextField";
 import { CurrencyField } from "./CurrencyField";
 import { convertToUnits } from "#src/lib/expenses.js";
 import { toast } from "sonner";
 import { useExpenseParticipants } from "#src/hooks/useExpenseParticipants.ts";
-import { Checkbox } from "#src/ui/Checkbox.tsx";
+import { Checkbox } from "@trizum/ui/Checkbox";
 import type { PartyParticipant } from "#src/models/party.ts";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import { Tooltip, TooltipTrigger } from "#src/ui/Tooltip.tsx";
-import { AppDatePicker } from "#src/ui/DatePicker.tsx";
+import { AppSelect, SelectItem } from "@trizum/ui/Select";
+import { Tooltip, TooltipTrigger } from "@trizum/ui/Tooltip";
+import { AppDatePicker } from "@trizum/ui/DatePicker";
 import { fromDate, getLocalTimeZone, type ZonedDateTime } from "@internationalized/date";
-import { Icon } from "#src/ui/Icon.tsx";
-import { Button } from "#src/ui/Button.tsx";
+import { Icon } from "@trizum/ui/Icon";
+import { Button } from "@trizum/ui/Button";
 import { MenuTrigger, Popover } from "react-aria-components";
-import { Menu, MenuItem } from "#src/ui/Menu.js";
-import { Switch } from "#src/ui/Switch.tsx";
+import { Menu, MenuItem } from "@trizum/ui/Menu";
+import { Switch } from "@trizum/ui/Switch";
 import { usePartyList } from "#src/hooks/usePartyList.ts";
 import { useMediaFile } from "#src/hooks/useMediaFile.ts";
-import { Skeleton } from "#src/ui/Skeleton.tsx";
+import { Skeleton } from "@trizum/ui/Skeleton";
 import type { MediaFile } from "#src/models/media.ts";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.ts";
 import {
@@ -40,7 +40,7 @@ import {
   shouldUseNativeCameraCapture,
 } from "#src/lib/nativeCamera.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { MediaGalleryContext } from "./MediaGalleryContext";
+import { MediaGalleryContext } from "@trizum/ui/MediaGalleryContext";
 import type { AppFormApi } from "#src/lib/reactFormTypes.ts";
 import {
   type ExpenseEditorMode,
@@ -48,7 +48,7 @@ import {
   getExpenseEditorUnitShares,
 } from "#src/lib/expenseEditor.ts";
 import { ExpenseEditorValidationStatus } from "./ExpenseEditorValidationStatus.tsx";
-import { cn } from "#src/ui/utils.ts";
+import { cn } from "@trizum/ui/utils";
 
 export interface ExpenseEditorFormValues {
   name: string;

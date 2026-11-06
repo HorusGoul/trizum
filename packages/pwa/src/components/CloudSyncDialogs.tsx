@@ -4,12 +4,12 @@ import { type FormEvent, type ReactNode } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
 import { LazyMotion, domAnimation, m as motion } from "motion/react";
 import { getAuthCallbackErrorContent } from "#src/lib/authCallbackErrors.ts";
-import { Alert, AlertDescription } from "#src/ui/Alert.tsx";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon, type IconProps } from "#src/ui/Icon.tsx";
-import { IconButton } from "#src/ui/IconButton.js";
-import { AppTextField } from "#src/ui/fields/TextField.js";
-import { cn } from "#src/ui/utils.js";
+import { Alert, AlertDescription } from "@trizum/ui/Alert";
+import { Button } from "@trizum/ui/Button";
+import { Icon, type IconProps } from "@trizum/ui/Icon";
+import { IconButton } from "@trizum/ui/IconButton";
+import { AppTextField } from "@trizum/ui/fields/TextField";
+import { cn } from "@trizum/ui/utils";
 
 export type CloudActionDialogType =
   | "connect-apple"

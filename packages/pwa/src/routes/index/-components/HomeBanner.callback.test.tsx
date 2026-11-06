@@ -1,3 +1,4 @@
+import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
 import { optionalSearchTextSchema } from "#src/lib/routerSearch.ts";
@@ -75,19 +76,21 @@ async function render(router: TestRouter) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <PremiumContextProvider
-          value={{
-            status: "free",
-            isPremium: false,
-            hasActiveSubscription: false,
-            presentPaywall,
-            presentCustomerCenter: async () => undefined,
-          }}
-        >
-          <RepoContext value={runtime.repo}>
-            <RouterProvider router={router} />
-          </RepoContext>
-        </PremiumContextProvider>
+        <PwaUIProvider>
+          <PremiumContextProvider
+            value={{
+              status: "free",
+              isPremium: false,
+              hasActiveSubscription: false,
+              presentPaywall,
+              presentCustomerCenter: async () => undefined,
+            }}
+          >
+            <RepoContext value={runtime.repo}>
+              <RouterProvider router={router} />
+            </RepoContext>
+          </PremiumContextProvider>
+        </PwaUIProvider>
       </I18nProvider>,
     ),
   );

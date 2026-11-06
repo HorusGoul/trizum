@@ -18,7 +18,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import license from "rollup-plugin-license";
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
-import { createIconSpritePlugin } from "../icon-sprite/src/vite";
+import { createIconSpritePlugin } from "@trizum/icon-sprite/vite";
 import iconSpriteConfig from "./iconSprite.config.mjs";
 
 const ReactCompilerConfig = {};
@@ -111,7 +111,7 @@ export default defineConfig(({ mode }) => {
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
-            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "@trizum/ui#build",
             "codegen",
           ],
           cache: {
@@ -137,12 +137,12 @@ export default defineConfig(({ mode }) => {
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
-            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "@trizum/ui#build",
             "codegen",
           ],
         },
         codegen: {
-          command: ["vp run icons:generate", "vp run theme:generate"],
+          command: "vp run icons:generate",
           cache: false,
         },
         deploy: {
@@ -158,15 +158,15 @@ export default defineConfig(({ mode }) => {
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
-            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "@trizum/ui#build",
             "codegen",
           ],
         },
         "icons:generate": {
           command: "node ../icon-sprite/dist/cli.js ./iconSprite.config.mjs",
-          dependsOn: ["@trizum/icon-sprite#build"],
+          dependsOn: ["@trizum/icon-sprite#build", "@trizum/ui#build"],
           cache: {
-            input: [{ auto: true }, "!src/generated/**"],
+            input: [{ auto: true }, "!src/generated/**", "../ui/src/**", "../ui/icons/**"],
             output: ["src/generated/iconSprite.svg", "src/generated/iconSprite.gen.ts"],
           },
         },
@@ -181,7 +181,7 @@ export default defineConfig(({ mode }) => {
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
-            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "@trizum/ui#build",
             "codegen",
           ],
         },
@@ -193,7 +193,7 @@ export default defineConfig(({ mode }) => {
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
-            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "@trizum/ui#build",
             "codegen",
           ],
         },
@@ -209,17 +209,9 @@ export default defineConfig(({ mode }) => {
             "@trizum/logging#build",
             "@trizum/react-suspense-cache#build",
             "@trizum/revenuecat-api#build",
-            "@trizum/tailwindcss-safe-area-capacitor#build",
+            "@trizum/ui#build",
             "codegen",
           ],
-        },
-        "theme:generate": {
-          command: "vp exec twdt accent 250 src/generated/tw-dynamic-themes.css",
-          dependsOn: ["@trizum/tw-dynamic-themes#build"],
-          cache: {
-            input: ["../tw-dynamic-themes/src/**"],
-            output: ["src/generated/tw-dynamic-themes.css"],
-          },
         },
       },
     },

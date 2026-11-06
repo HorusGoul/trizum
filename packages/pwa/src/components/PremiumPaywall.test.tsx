@@ -1,3 +1,4 @@
+import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
 import { i18n } from "@lingui/core";
@@ -54,14 +55,16 @@ async function renderPaywall(userId: string | null = "user-1") {
   await act(async () =>
     root.render(
       <I18nProvider i18n={i18n}>
-        <PremiumPaywall
-          isOpen
-          services={services}
-          onEntitlementChange={onEntitlementChange}
-          onOpenChange={onOpenChange}
-          sessionId={1}
-          userId={userId}
-        />
+        <PwaUIProvider>
+          <PremiumPaywall
+            isOpen
+            services={services}
+            onEntitlementChange={onEntitlementChange}
+            onOpenChange={onOpenChange}
+            sessionId={1}
+            userId={userId}
+          />
+        </PwaUIProvider>
       </I18nProvider>,
     ),
   );
