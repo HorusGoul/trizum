@@ -22,3 +22,7 @@ Explain agent data handling and retention in the public privacy policy.
 Keep concurrent MCP expense writes independent by publishing complete individual
 chunks and balances before linking them to a party. Route widget navigation
 through the MCP Apps host bridge, with a copyable link when unavailable.
+
+Allow agents to add participants as a group grows, including people introduced
+while recording expenses. Preserve existing identities and past splits, return
+new participant IDs, and apply the existing retry and anonymous analytics rules.

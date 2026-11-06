@@ -260,6 +260,164 @@ describe("Worker document reads over WebSocket", () => {
     }
   });
 
+  it("adds people for later expenses without changing previous splits or allowing duplicate batches", async () => {
+    const env = await startServer();
+    const documents = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+    const service = new WorkerPartyService(documents, "https://trizum.app");
+    let partyId: string;
+
+    try {
+      const party = await service.createParty({
+        requestId: crypto.randomUUID(),
+        name: "Growing group",
+        currency: "EUR",
+        participants: ["Alice", "Bob"],
+        description: "",
+        symbol: "🏝️",
+      });
+
+      partyId = party.partyId;
+      await service.addExpense({
+        requestId: crypto.randomUUID(),
+        partyId,
+        name: "First dinner",
+        amount: "2.00",
+        paidBy: party.participants.find((person) => person.name === "Alice")!.id,
+        splitBetween: party.participants.map((person) => person.id),
+        paidAt: "2026-11-06T20:00:00Z",
+      });
+      await expect(
+        service.addParticipants({
+          requestId: crypto.randomUUID(),
+          partyId,
+          participants: ["Carol", " alice "],
+        }),
+      ).rejects.toThrow("already exists");
+      await expect(
+        service.addParticipants({
+          requestId: crypto.randomUUID(),
+          partyId,
+          participants: ["Carol", "carol"],
+        }),
+      ).rejects.toThrow("already exists");
+      expect(
+        (await service.getParty(partyId)).participants.map((person) => person.name).sort(),
+      ).toEqual(["Alice", "Bob"]);
+
+      const added = await service.addParticipants({
+        requestId: crypto.randomUUID(),
+        partyId,
+        participants: ["Carol"],
+      });
+
+      expect(
+        Object.fromEntries(added.participants.map((person) => [person.name, person.balance])),
+      ).toEqual({ Alice: "1.00", Bob: "-1.00", Carol: "0.00" });
+      expect(added.participants.map((person) => person.id)).toEqual(
+        expect.arrayContaining(party.participants.map((person) => person.id)),
+      );
+      const carol = added.participants.find((person) => person.name === "Carol")!;
+
+      const expense = await service.addExpense({
+        requestId: crypto.randomUUID(),
+        partyId,
+        name: "Carol's dinner",
+        amount: "6.00",
+        paidBy: carol.id,
+        splitBetween: added.participants.map((person) => person.id),
+        paidAt: "2026-11-07T20:00:00Z",
+      });
+
+      expect(
+        Object.fromEntries(expense.participants.map((person) => [person.name, person.balance])),
+      ).toEqual({ Alice: "-1.00", Bob: "-3.00", Carol: "4.00" });
+      await expect(
+        service.addParticipants({
+          requestId: crypto.randomUUID(),
+          partyId,
+          participants: Array.from({ length: 48 }, (_, index) => `Person ${index}`),
+        }),
+      ).rejects.toThrow("too many participants");
+    } finally {
+      await documents.close();
+    }
+
+    const next = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+
+    try {
+      const refreshed = await new WorkerPartyService(next, "https://trizum.app").getParty(partyId!);
+      expect(refreshed.participants.map((person) => person.name).sort()).toEqual([
+        "Alice",
+        "Bob",
+        "Carol",
+      ]);
+      expect(
+        Object.fromEntries(refreshed.participants.map((person) => [person.name, person.balance])),
+      ).toEqual({ Alice: "-1.00", Bob: "-3.00", Carol: "4.00" });
+      expect(refreshed.expenses).toHaveLength(2);
+    } finally {
+      await next.close();
+    }
+  });
+
+  it("merges participant additions from independent requests without replacing existing people", async () => {
+    const env = await startServer();
+    const initial = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+
+    const party = await new WorkerPartyService(initial, "https://trizum.app").createParty({
+      requestId: crypto.randomUUID(),
+      name: "Concurrent additions",
+      currency: "EUR",
+      participants: ["Alice"],
+      description: "",
+      symbol: "🏝️",
+    });
+
+    await initial.close();
+
+    const writers = [0, 1].map(
+      () => new AutomergeDocuments({ env, request: new Request("https://trizum.app") }),
+    );
+
+    try {
+      // Both requests start from the same party state, as separate edge invocations do.
+      // SAFETY: Repo.create allocated this party ID.
+      await Promise.all(
+        writers.map((documents) => documents.read<Party>(party.partyId as Party["id"])),
+      );
+      await Promise.all(
+        writers.map((documents, index) =>
+          new WorkerPartyService(documents, "https://trizum.app").addParticipants({
+            requestId: crypto.randomUUID(),
+            partyId: party.partyId,
+            participants: [index === 0 ? "Bob" : "Carol"],
+          }),
+        ),
+      );
+    } finally {
+      await Promise.all(writers.map((documents) => documents.close()));
+    }
+
+    const next = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
+
+    try {
+      const refreshed = await new WorkerPartyService(next, "https://trizum.app").getParty(
+        party.partyId,
+      );
+
+      expect(refreshed.participants.map((person) => person.name).sort()).toEqual([
+        "Alice",
+        "Bob",
+        "Carol",
+      ]);
+      expect(refreshed.participants.find((person) => person.name === "Alice")).toEqual(
+        party.participants[0],
+      );
+    } finally {
+      await next.close();
+    }
+  });
+
   it("preserves every expense and shared balance across concurrent independent MCP writers", async () => {
     const env = await startServer();
     const request = () => new Request("https://trizum.app");

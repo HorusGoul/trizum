@@ -64,6 +64,7 @@ const view: PartyView = {
 async function fixture() {
   const createParty = vi.fn<PartyService["createParty"]>().mockResolvedValue(view);
   const addExpense = vi.fn<PartyService["addExpense"]>().mockResolvedValue(view);
+  const addParticipants = vi.fn<PartyService["addParticipants"]>().mockResolvedValue(view);
   const getParty = vi.fn<PartyService["getParty"]>().mockResolvedValue(view);
   const trackEvent = vi.fn<(event: McpAnalyticsEvent) => void>();
   const limitWrite = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
@@ -71,7 +72,7 @@ async function fixture() {
   const tokens = new WriteTokens("test-mcp-signing-secret-at-least-32-characters", () => now);
 
   const service = new IdempotentPartyService(
-    { createParty, addExpense, getParty },
+    { createParty, addExpense, addParticipants, getParty },
     platform.env.DB,
     { tokens, limitWrite, trackEvent },
   );
@@ -91,6 +92,7 @@ async function fixture() {
     service,
     createParty,
     addExpense,
+    addParticipants,
     getParty,
     trackEvent,
     limitWrite,
@@ -175,6 +177,51 @@ it("deduplicates expense writes and keeps request IDs separate across tool names
       symbol: "🏝️",
     }),
   ).rejects.toThrow("Invalid write request");
+});
+
+it("deduplicates participant additions and counts the completed batch once", async () => {
+  const { service, addParticipants, getParty, trackEvent, tokens } = await fixture();
+
+  const input = {
+    requestId: (await tokens.prepare("add_participants")).requestId,
+    partyId: "party",
+    participants: ["Bob", "Carol"],
+  };
+
+  await service.addParticipants(input);
+  getParty.mockResolvedValueOnce({
+    ...view,
+    participants: [{ id: "bob", name: "Bob", archived: false, balance: "0.00" }],
+  });
+  expect(await service.addParticipants(input)).toMatchObject({ participants: [{ id: "bob" }] });
+  expect(addParticipants).toHaveBeenCalledTimes(1);
+  expect(trackEvent.mock.calls).toEqual([["mcp_participants_added"]]);
+  await expect(service.addParticipants({ ...input, participants: ["Dave"] })).rejects.toThrow(
+    "different action",
+  );
+  await expect(
+    service.addParticipants({
+      ...input,
+      requestId: (await tokens.prepare("add_expense")).requestId,
+    }),
+  ).rejects.toThrow("Invalid write request");
+  expect(addParticipants).toHaveBeenCalledTimes(1);
+});
+
+it("does not count failed or unconfirmed participant additions", async () => {
+  const { service, addParticipants, trackEvent, tokens } = await fixture();
+
+  const input = {
+    requestId: (await tokens.prepare("add_participants")).requestId,
+    partyId: "party",
+    participants: ["Bob"],
+  };
+
+  addParticipants.mockRejectedValueOnce(new Error("Sync acknowledgement lost"));
+  await expect(service.addParticipants(input)).rejects.toThrow("acknowledgement lost");
+  await expect(service.addParticipants(input)).rejects.toThrow("unconfirmed");
+  expect(addParticipants).toHaveBeenCalledTimes(1);
+  expect(trackEvent).not.toHaveBeenCalled();
 });
 
 it("counts successful explicit reads, excludes failures, and ignores analytics errors", async () => {

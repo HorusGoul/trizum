@@ -2,6 +2,8 @@
 export const analyticsEvents = {
   mcp_party_created: "An MCP create_party action completed; successful replays are excluded.",
   mcp_party_viewed: "An explicit MCP get_party action completed; internal reads are excluded.",
+  mcp_participants_added:
+    "An MCP add_participants batch completed; successful replays are excluded. No names or IDs are sent.",
   mcp_expense_added: "An MCP add_expense action completed; successful replays are excluded.",
   party_created: "A group document was created through the new-group form.",
   party_joined: "The user selected their participant when joining a group.",

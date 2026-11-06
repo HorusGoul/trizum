@@ -8,6 +8,7 @@ export type {
   PartyView,
   CreatePartyInput,
   AddExpenseInput,
+  AddParticipantsInput,
   PrepareWriteInput,
   PreparedWrite,
   WriteOperation,

@@ -11,7 +11,10 @@ const requestId = z
     "The 15-minute write token returned by prepare_write for this operation. Reuse it unchanged on retries; never generate your own.",
   );
 
-export const prepareWriteSchema = z.object({ operation: z.enum(["create_party", "add_expense"]) });
+export const prepareWriteSchema = z.object({
+  operation: z.enum(["create_party", "add_participants", "add_expense"]),
+});
+
 export const preparedWriteSchema = z.object({ requestId: z.string(), expiresAt: z.iso.datetime() });
 
 export type PrepareWriteInput = z.infer<typeof prepareWriteSchema>;
@@ -49,6 +52,18 @@ export const createPartySchema = z.object({
 });
 
 export const getPartySchema = z.object({ partyId });
+
+export const addParticipantsSchema = z.object({
+  requestId,
+  partyId,
+  participants: z
+    .array(name)
+    .min(1)
+    .max(50)
+    .describe(
+      "New participant display names to add to this party. Reuse existing people from get_party; ask about ambiguous names. Adding people never changes previous expense splits.",
+    ),
+});
 
 export const addExpenseSchema = z.object({
   requestId,
@@ -92,6 +107,8 @@ export const partyViewSchema = z.object({
 
 export type CreatePartyInput = z.infer<typeof createPartySchema>;
 
+export type AddParticipantsInput = z.infer<typeof addParticipantsSchema>;
+
 export type AddExpenseInput = z.infer<typeof addExpenseSchema>;
 
 export type PartyView = z.infer<typeof partyViewSchema>;
@@ -101,6 +118,7 @@ export interface PartyService {
   createParty(input: CreatePartyInput): Promise<PartyView>;
   getParty(partyId: string): Promise<PartyView>;
   addExpense(input: AddExpenseInput): Promise<PartyView>;
+  addParticipants(input: AddParticipantsInput): Promise<PartyView>;
 }
 
 export interface McpService extends PartyService {

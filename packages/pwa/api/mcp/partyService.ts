@@ -5,6 +5,7 @@ import {
   type PartyView,
   type CreatePartyInput,
   type AddExpenseInput,
+  type AddParticipantsInput,
 } from "@trizum/mcp/index";
 import type { AutomergeDocuments } from "../automergeDocuments";
 import { isCurrencyCode } from "../../src/lib/money";
@@ -87,6 +88,37 @@ export class WorkerPartyService implements PartyService {
     );
 
     return this.view(party, expenses, balances);
+  }
+
+  async addParticipants(input: AddParticipantsInput): Promise<PartyView> {
+    const party = await this.readParty(input.partyId);
+    const participants = input.participants.map((name) => ({ id: crypto.randomUUID(), name }));
+
+    await this.documents.change<Party>(party.id, (doc) => {
+      const names = new Set(
+        Object.values(doc.participants).map((person) => person.name.trim().toLocaleLowerCase()),
+      );
+
+      for (const person of participants) {
+        const normalized = person.name.trim().toLocaleLowerCase();
+
+        if (names.has(normalized))
+          throw new McpToolError(
+            "A participant with this name already exists or appears twice. Reuse IDs from get_party, or ask for distinct display names.",
+          );
+        names.add(normalized);
+      }
+
+      if (Object.keys(doc.participants).length + participants.length > 50)
+        throw new McpToolError(
+          "This party has too many participants for this integration. Open it in trizum to add more people.",
+        );
+
+      // Add individual entries so concurrent additions preserve every existing participant.
+      for (const person of participants) doc.participants[person.id] = person;
+    });
+
+    return this.getParty(party.id);
   }
 
   async addExpense(input: AddExpenseInput): Promise<PartyView> {

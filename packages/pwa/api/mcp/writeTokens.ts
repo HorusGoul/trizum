@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify, errors } from "jose";
 import { z } from "zod";
+import { prepareWriteSchema } from "@trizum/mcp/contracts";
 import { McpToolError, type PreparedWrite, type WriteOperation } from "@trizum/mcp/index";
 
 export const WRITE_WINDOW_MS = 15 * 60_000;
@@ -7,7 +8,7 @@ const issuer = "trizum:mcp:writes";
 
 const claimsSchema = z.object({
   jti: z.uuid(),
-  operation: z.enum(["create_party", "add_expense"]),
+  operation: prepareWriteSchema.shape.operation,
 });
 
 /** Signed deadlines survive receipt deletion without storing permanent tombstones. */

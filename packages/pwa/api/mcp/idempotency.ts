@@ -7,11 +7,18 @@ import {
   type PartyView,
   type CreatePartyInput,
   type AddExpenseInput,
+  type AddParticipantsInput,
 } from "@trizum/mcp/index";
 import { partyViewSchema } from "@trizum/mcp/contracts";
 import { z } from "zod";
 import type { McpAnalyticsEvent } from "@trizum/analytics";
 import type { WriteTokens } from "./writeTokens";
+
+const writeEvents = {
+  create_party: "mcp_party_created",
+  add_participants: "mcp_participants_added",
+  add_expense: "mcp_expense_added",
+} satisfies Record<WriteOperation, McpAnalyticsEvent>;
 
 const receiptSchema = z.object({ partyId: z.string().min(1) });
 
@@ -48,9 +55,13 @@ export class IdempotentPartyService implements McpService {
     return this.once("add_expense", input, () => this.service.addExpense(input));
   }
 
+  addParticipants(input: AddParticipantsInput) {
+    return this.once("add_participants", input, () => this.service.addParticipants(input));
+  }
+
   private async once(
     tool: WriteOperation,
-    input: CreatePartyInput | AddExpenseInput,
+    input: CreatePartyInput | AddExpenseInput | AddParticipantsInput,
     operation: () => Promise<PartyView>,
   ): Promise<PartyView> {
     await this.options.limitWrite();
@@ -101,7 +112,7 @@ export class IdempotentPartyService implements McpService {
       .bind(JSON.stringify({ partyId: result.partyId }), requestKey, fingerprint)
       .run();
 
-    this.track(tool === "create_party" ? "mcp_party_created" : "mcp_expense_added");
+    this.track(writeEvents[tool]);
 
     return result;
   }

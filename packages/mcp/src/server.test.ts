@@ -40,6 +40,7 @@ async function connect() {
     createParty: vi.fn<McpService["createParty"]>().mockResolvedValue(view),
     getParty: vi.fn<McpService["getParty"]>().mockResolvedValue(view),
     addExpense: vi.fn<McpService["addExpense"]>().mockResolvedValue(view),
+    addParticipants: vi.fn<McpService["addParticipants"]>().mockResolvedValue(view),
   };
 
   const server = createMcpServer(service, options);
@@ -59,6 +60,7 @@ it("advertises narrow tools with accurate hints and a sandboxed MCP Apps resourc
     "prepare_write",
     "create_party",
     "get_party",
+    "add_participants",
     "add_expense",
   ]);
   expect(tools[0]).toMatchObject({ annotations: { readOnlyHint: true, openWorldHint: false } });
@@ -88,6 +90,7 @@ it("prepares a write without invoking party reads or mutations", async () => {
   expect(service.createParty).not.toHaveBeenCalled();
   expect(service.getParty).not.toHaveBeenCalled();
   expect(service.addExpense).not.toHaveBeenCalled();
+  expect(service.addParticipants).not.toHaveBeenCalled();
 });
 
 it("validates write arguments before touching the service and returns structured party data", async () => {
@@ -101,6 +104,48 @@ it("validates write arguments before touching the service and returns structured
       arguments: { partyId: "party", amount: "1.234" },
     }),
   ).toMatchObject({ isError: true });
+  expect(service.addExpense).not.toHaveBeenCalled();
+});
+
+it("validates participant additions and returns IDs for expense follow-ups", async () => {
+  const { client, service } = await connect();
+  service.addParticipants.mockResolvedValueOnce({
+    ...view,
+    participants: [
+      ...view.participants,
+      { id: "bob", name: "Bob", archived: false, balance: "0.00" },
+    ],
+  });
+  expect(
+    await client.callTool({ name: "prepare_write", arguments: { operation: "add_participants" } }),
+  ).toMatchObject({ structuredContent: { requestId: "server-token" } });
+
+  const added = await client.callTool({
+    name: "add_participants",
+    arguments: { requestId: "server-token", partyId: "party", participants: [" Bob "] },
+  });
+
+  expect(added.structuredContent).toMatchObject({
+    participants: [view.participants[0], { id: "bob", name: "Bob" }],
+  });
+  expect(service.addParticipants).toHaveBeenCalledWith({
+    requestId: "server-token",
+    partyId: "party",
+    participants: ["Bob"],
+  });
+  expect(
+    await client.callTool({
+      name: "add_participants",
+      arguments: { requestId: "token", partyId: "party", participants: [" "] },
+    }),
+  ).toMatchObject({ isError: true });
+  expect(
+    await client.callTool({
+      name: "add_participants",
+      arguments: { requestId: "token", partyId: "party", participants: [] },
+    }),
+  ).toMatchObject({ isError: true });
+  expect(service.addParticipants).toHaveBeenCalledTimes(1);
   expect(service.addExpense).not.toHaveBeenCalled();
 });
 

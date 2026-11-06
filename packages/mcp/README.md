@@ -1,8 +1,8 @@
 # trizum MCP and ChatGPT app
 
 An anonymous MCP Apps integration for creating expense groups, viewing balances,
-and recording expenses. It uses trizum's shared-link access model: anyone with a
-party link can access and edit that party. Creation does not send invitations or
+recording expenses, and adding people as the group grows. It uses trizum's
+shared-link access model: anyone with a party link can access and edit that party. Creation does not send invitations or
 attach a party to an account. Open its invite link in trizum and choose your
 participant to join through the normal PWA flow.
 
@@ -24,15 +24,30 @@ English and Spanish through the Worker's `Accept-Language` or `?lang=es` setting
 
 ## Tools and scope
 
-| Tool            | Purpose                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------- |
-| `prepare_write` | Issue a signed, 15-minute request token for one create or expense action.                   |
-| `create_party`  | Create a named group with a currency and 1–50 named participants; return its invite URL.    |
-| `get_party`     | Sync a known party's participants, shared balances, and up to 20 recent expenses on demand. |
-| `add_expense`   | Record a paid expense with one payer, split equally among selected participants.            |
+| Tool               | Purpose                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| `prepare_write`    | Issue a signed, 15-minute request token for one party, participant, or expense action.      |
+| `create_party`     | Create a named group with a currency and 1–50 named participants; return its invite URL.    |
+| `get_party`        | Sync a known party's participants, shared balances, and up to 20 recent expenses on demand. |
+| `add_participants` | Add named people to a party and return their IDs for subsequent expenses.                   |
+| `add_expense`      | Record a paid expense with one payer, split equally among selected participants.            |
 
 The agent resolves participant IDs from `get_party` and asks about missing
-details. Decimal strings such as `"24.50"` become integer hundredths, matching
+details. If an expense clearly introduces a new person, it can call
+`add_participants` first and use the returned IDs in `add_expense`. Ambiguous
+names or intent require clarification. The tool adds up to 50 people per batch,
+with a 50-participant total guard including archived people. This guard uses the
+request’s current Automerge state; simultaneous batches can exceed it as their
+edits merge. It rejects names
+already present in its current snapshot and duplicate names within a batch,
+ignoring case and surrounding whitespace. Independently prepared concurrent
+actions can still introduce the same display name; names are not globally unique
+identities, so agents must resolve ambiguous matches rather than guess.
+
+Participant additions preserve existing IDs, details, balances, and old expense
+splits. They merge individual participant entries instead of replacing the party's
+participant map, so concurrent additions of different people survive. Renaming,
+removing, archiving, and restoring participants remain in the PWA. Decimal strings such as `"24.50"` become integer hundredths, matching
 trizum's two-decimal convention for every currency. Balances, rounding, and
 expense hashes use the existing domain model. Positive balances mean money is
 owed to that person; negative balances mean they owe money.
@@ -104,6 +119,9 @@ new Automerge documents and a party change per expense, rather than updating a
 shared chunk. The 100-chunk boundary therefore permits at most 100 MCP-created
 expenses in a new party, fewer when it already contains other chunks. Beyond
 that, open the party in trizum. No extra D1 coordination or request cache is used.
+`add_participants` changes only the party document, followed by the normal
+on-demand group view. It creates no extra documents or summaries and uses the
+same two D1 write statements and retry protection as other mutations.
 Read-only tool calls never write group data.
 
 The Cloudflare rate limiter allows 60 write-related attempts per minute per
@@ -164,6 +182,12 @@ omit Origin; Origin checks are not party authorization.
 - Expense: “Alice paid €10 for dinner today; split equally among all three.”
   Confirm the date if ambiguous. Expect one expense and balances of €6.66,
   −€3.33, and −€3.33 with trizum's existing rounding.
+- Growing group: after creating Alice/Bob's group, “Carol paid €12 for lunch;
+  split it among Alice, Bob, and Carol.” Expect Carol to be added, then the expense
+  to use her returned ID. Previous expenses keep their original splits. Ask for
+  clarification if a name could refer to an existing participant.
+- Participant retry: replay `add_participants` unchanged. Expect the same people
+  and IDs, with no second addition or analytics event.
 - Indirect: “My partner and I want to track groceries together.” Expect
   clarification about names, group name, and currency before creation.
 - Retry: replay a completed call unchanged within 15 minutes. Expect the same
