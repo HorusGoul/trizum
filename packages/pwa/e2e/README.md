@@ -74,15 +74,26 @@ verify activation, cached offline reload, and deep navigation with a synthetic
 party. Other journeys keep service workers blocked for independent contexts.
 
 - `vp run --filter @trizum/pwa test:e2e:install` installs the local browser set.
-- `vp run --filter @trizum/pwa test:e2e:install:ci` installs the CI browser set
-  with system dependencies and the smaller Chromium headless shell.
+- `vp run --filter @trizum/pwa test:e2e:install:ci` provisions a bare Linux host
+  with system dependencies, WebKit, and the smaller Chromium headless shell.
+  CI uses the preinstalled container browsers instead.
 - `vp run --filter @trizum/pwa test:e2e e2e/harness.spec.ts`
 - `vp run --filter @trizum/pwa test:e2e e2e/smoke.spec.ts`
 
 ### CI build/setup path
 
-Each shard builds the E2E app while installing browsers, then runs
-`test:e2e:prebuilt` against that build. Both preparation steps must succeed.
+Each shard runs in the version-pinned official Playwright Noble container on
+an `ubuntu-24.04` host. The image includes browsers and their system dependencies,
+so shards do not run apt or download browsers. The setup-vp action still installs
+the repository's Node version and workspace packages; its package cache is
+independent of the browsers bundled in the image.
+
+The image tag in the [CI workflow](../../../.github/workflows/ci.yml) must match
+both Playwright catalog entries in `pnpm-workspace.yaml`. Renovate groups these
+updates, and CI checks the installed package against the image's version before
+building. See Playwright's [image version guidance](https://playwright.dev/docs/docker#image-tags).
+
+Each shard builds the E2E app, then runs `test:e2e:prebuilt` against that build.
 The usual `test:e2e` command builds automatically; to reuse a harness build:
 
 ```sh
