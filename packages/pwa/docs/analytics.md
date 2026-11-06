@@ -19,9 +19,8 @@ ordinary Chrome and Safari device user agents remain eligible for collection.
 ## Anonymous MCP server events
 
 The MCP route uses `@trizum/analytics`'s `createAnonymousServerAnalytics` for
-completed `create_party`, `add_participants`, explicit `get_party`, and
-`add_expense` actions. The
-shared event catalog defines their names and meanings. Writes emit only after
+completed party, participant, and expense mutations, plus explicit `get_party`
+and `get_expense` reads. The shared event catalog defines their names and meanings. Writes emit only after
 their D1 receipt is saved; successful replays and internal reads do not emit.
 Collection runs through `waitUntil`, with a four-second timeout and no retries.
 Failures never change the tool result.

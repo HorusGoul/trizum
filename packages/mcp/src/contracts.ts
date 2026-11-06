@@ -12,7 +12,15 @@ const requestId = z
   );
 
 export const prepareWriteSchema = z.object({
-  operation: z.enum(["create_party", "add_participants", "add_expense"]),
+  operation: z.enum([
+    "create_party",
+    "add_participants",
+    "add_expense",
+    "update_party",
+    "update_participant",
+    "update_expense",
+    "delete_expense",
+  ]),
 });
 
 export const preparedWriteSchema = z.object({ requestId: z.string(), expiresAt: z.iso.datetime() });
@@ -90,6 +98,115 @@ export const addExpenseSchema = z.object({
     .describe("The expense date/time in ISO 8601 format with a timezone."),
 });
 
+const expenseId = z
+  .string()
+  .min(1)
+  .max(180)
+  .describe("The exact expense ID returned by trizum; never guess IDs.");
+
+const version = z
+  .string()
+  .regex(/^[a-f0-9]{32}$/)
+  .describe(
+    "The current version returned by get_expense. Read again after a conflict; never silently overwrite a newer edit.",
+  );
+
+export const getExpenseSchema = z.object({ partyId, expenseId });
+
+export const updatePartySchema = z
+  .object({
+    requestId,
+    partyId,
+    name: name.optional(),
+    description: z.string().max(1000).optional(),
+    symbol: z.string().max(16).optional(),
+  })
+  .refine(
+    (input) =>
+      input.name !== undefined || input.description !== undefined || input.symbol !== undefined,
+    "Provide at least one party detail to change.",
+  );
+
+export const updateParticipantSchema = z
+  .object({
+    requestId,
+    partyId,
+    participantId,
+    name: name.optional(),
+    archived: z
+      .boolean()
+      .optional()
+      .describe(
+        "Archive to remove from the active group while preserving history, or false to restore. Never erase an existing participant.",
+      ),
+  })
+  .refine(
+    (input) => input.name !== undefined || input.archived !== undefined,
+    "Provide a name or archive state to change.",
+  );
+
+export const updateExpenseSchema = z
+  .object({
+    requestId,
+    partyId,
+    expenseId,
+    version,
+    name: addExpenseSchema.shape.name.optional(),
+    amount: addExpenseSchema.shape.amount.optional(),
+    paidBy: addExpenseSchema.shape.paidBy.optional(),
+    splitBetween: addExpenseSchema.shape.splitBetween.optional(),
+    paidAt: addExpenseSchema.shape.paidAt.optional(),
+  })
+  .refine(
+    (input) =>
+      [input.name, input.amount, input.paidBy, input.splitBetween, input.paidAt].some(
+        (value) => value !== undefined,
+      ),
+    "Provide at least one expense field to change.",
+  );
+
+export const deleteExpenseSchema = z.object({ requestId, partyId, expenseId, version });
+
+export const expenseViewSchema = z.object({
+  partyId: z.string(),
+  expenseId: z.string(),
+  version: z.string(),
+  currency: z.string(),
+  name: z.string(),
+  paidAt: z.string(),
+  amount: z.string(),
+  isTransfer: z.boolean(),
+  paidBy: z.array(z.object({ participantId: z.string(), amount: z.string() })),
+  shares: z
+    .array(
+      z.object({ participantId: z.string(), type: z.enum(["divide", "exact"]), value: z.number() }),
+    )
+    .describe(
+      "Divide values are relative weights; exact values are integer hundredths of the party currency.",
+    ),
+});
+
+export type GetExpenseInput = z.infer<typeof getExpenseSchema>;
+
+export type UpdatePartyInput = z.infer<typeof updatePartySchema>;
+
+export type UpdateParticipantInput = z.infer<typeof updateParticipantSchema>;
+
+export type UpdateExpenseInput = z.infer<typeof updateExpenseSchema>;
+
+export type DeleteExpenseInput = z.infer<typeof deleteExpenseSchema>;
+
+export type ExpenseView = z.infer<typeof expenseViewSchema>;
+
+export type PartyWriteInput =
+  | CreatePartyInput
+  | AddParticipantsInput
+  | AddExpenseInput
+  | UpdatePartyInput
+  | UpdateParticipantInput
+  | UpdateExpenseInput
+  | DeleteExpenseInput;
+
 export const partyViewSchema = z.object({
   partyId: z.string(),
   url: z.url(),
@@ -119,6 +236,11 @@ export interface PartyService {
   getParty(partyId: string): Promise<PartyView>;
   addExpense(input: AddExpenseInput): Promise<PartyView>;
   addParticipants(input: AddParticipantsInput): Promise<PartyView>;
+  getExpense(input: GetExpenseInput): Promise<ExpenseView>;
+  updateParty(input: UpdatePartyInput): Promise<PartyView>;
+  updateParticipant(input: UpdateParticipantInput): Promise<PartyView>;
+  updateExpense(input: UpdateExpenseInput): Promise<PartyView>;
+  deleteExpense(input: DeleteExpenseInput): Promise<PartyView>;
 }
 
 export interface McpService extends PartyService {

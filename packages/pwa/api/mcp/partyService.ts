@@ -6,29 +6,33 @@ import {
   type CreatePartyInput,
   type AddExpenseInput,
   type AddParticipantsInput,
+  type GetExpenseInput,
+  type UpdatePartyInput,
+  type UpdateParticipantInput,
+  type UpdateExpenseInput,
+  type DeleteExpenseInput,
 } from "@trizum/mcp/index";
-import type { AutomergeDocuments } from "../automergeDocuments";
 import { isCurrencyCode } from "../../src/lib/money";
 import {
   calculateBalancesByParticipant,
-  calculateExpenseHash,
-  createExpenseId,
   getExpenseTotalAmount,
   mergeBalancesByParticipant,
   type BalancesByParticipant,
   type Expense,
 } from "../../src/models/expense";
-import type { Party, PartyExpenseChunk, PartyExpenseChunkBalances } from "../../src/models/party";
+import type { Party } from "../../src/models/party";
 
-type PartyDocuments = Pick<AutomergeDocuments, "read" | "create" | "change">;
-
-const MAX_CHUNKS = 100;
+import { PartyExpenses, MAX_CHUNKS, formatAmount, type PartyDocuments } from "./expenseService";
 
 export class WorkerPartyService implements PartyService {
   constructor(
     private readonly documents: PartyDocuments,
     private readonly origin: string,
-  ) {}
+  ) {
+    this.expenses = new PartyExpenses(documents);
+  }
+
+  private readonly expenses: PartyExpenses;
 
   async createParty(input: CreatePartyInput): Promise<PartyView> {
     if (!isCurrencyCode(input.currency))
@@ -71,14 +75,14 @@ export class WorkerPartyService implements PartyService {
     const party = await this.readParty(partyId);
 
     const summaries = await Promise.all(
-      party.chunkRefs.map((ref) => this.readChunkBalances(party, ref.balancesId)),
+      party.chunkRefs.map((ref) => this.expenses.readChunkBalances(party, ref.balancesId)),
     );
 
     const expenses: Expense[] = [];
 
     for (const ref of party.chunkRefs) {
       if (expenses.length >= 20) break;
-      const chunk = await this.readChunk(party, ref.chunkId);
+      const chunk = await this.expenses.readChunk(party, ref.chunkId);
       const recent = chunk.expenses.toSorted((a, b) => b.id.localeCompare(a.id));
       expenses.push(...recent.slice(0, 20 - expenses.length));
     }
@@ -122,69 +126,83 @@ export class WorkerPartyService implements PartyService {
   }
 
   async addExpense(input: AddExpenseInput): Promise<PartyView> {
+    await this.expenses.add(await this.readParty(input.partyId), input);
+
+    return this.getParty(input.partyId);
+  }
+
+  async getExpense(input: GetExpenseInput) {
+    return this.expenses.get(await this.readParty(input.partyId), input);
+  }
+
+  async updateExpense(input: UpdateExpenseInput) {
+    await this.expenses.update(await this.readParty(input.partyId), input);
+
+    return this.freshView(input.partyId);
+  }
+
+  async deleteExpense(input: DeleteExpenseInput) {
+    await this.expenses.delete(await this.readParty(input.partyId), input);
+
+    return this.freshView(input.partyId);
+  }
+
+  async updateParty(input: UpdatePartyInput) {
     const party = await this.readParty(input.partyId);
-    const amount = parseExpenseAmount(input.amount);
-    const people = [input.paidBy, ...input.splitBetween];
-
-    if (
-      people.some(
-        (id) => !Object.hasOwn(party.participants, id) || party.participants[id].isArchived,
-      )
-    ) {
-      throw new McpToolError(
-        "Choose active participant IDs from get_party for the payer and everyone sharing this expense.",
-      );
-    }
-
-    if (new Set(input.splitBetween).size !== input.splitBetween.length)
-      throw new McpToolError("A participant can appear only once in the split.");
-
-    if (party.chunkRefs.length >= MAX_CHUNKS)
-      throw new McpToolError(
-        "This party is too large for this integration. Open it in trizum to add the expense.",
-      );
-
-    // Independent requests must not replace the same derived balance map.
-    // Publish a completed chunk and its balance before merging its party reference.
-    // maxSize: 1 also makes normal PWA appends start a new chunk.
-    const chunk = await this.documents.create<PartyExpenseChunk>((id) => {
-      const expense: Expense = {
-        id: createExpenseId(id),
-        name: input.name,
-        paidAt: new Date(input.paidAt),
-        paidBy: { [input.paidBy]: amount },
-        shares: Object.fromEntries(
-          input.splitBetween.map((id) => [id, { type: "divide", value: 1 }]),
-        ),
-        photos: [],
-        __hash: "",
-      };
-
-      expense.__hash = calculateExpenseHash(expense);
-
-      return {
-        id,
-        type: "expenseChunk",
-        partyId: party.id,
-        createdAt: new Date(),
-        maxSize: 1,
-        expenses: [expense],
-      };
-    });
-
-    const balances = await this.documents.create<PartyExpenseChunkBalances>((id) => ({
-      id,
-      type: "expenseChunkBalances",
-      partyId: party.id,
-      balances: calculateBalancesByParticipant(chunk.expenses, party.participants),
-    }));
-
-    const reference = { chunkId: chunk.id, balancesId: balances.id, createdAt: chunk.createdAt };
     await this.documents.change<Party>(party.id, (doc) => {
-      doc.chunkRefs.unshift(reference);
+      if (input.name !== undefined) doc.name = input.name;
+
+      if (input.description !== undefined) doc.description = input.description;
+
+      if (input.symbol !== undefined) doc.symbol = input.symbol;
     });
 
     return this.getParty(party.id);
+  }
+
+  async updateParticipant(input: UpdateParticipantInput) {
+    const party = await this.readParty(input.partyId);
+    await this.documents.change<Party>(party.id, (doc) => {
+      const person = doc.participants[input.participantId];
+
+      if (!person) throw new McpToolError("Choose a participant ID from get_party.");
+
+      if (
+        input.name !== undefined &&
+        Object.values(doc.participants).some(
+          (other) =>
+            other.id !== person.id &&
+            other.name.trim().toLocaleLowerCase() === input.name!.trim().toLocaleLowerCase(),
+        )
+      )
+        throw new McpToolError(
+          "This participant name already exists. Ask for distinct display names.",
+        );
+
+      if (
+        input.archived === true &&
+        !Object.values(doc.participants).some(
+          (other) => other.id !== person.id && !other.isArchived,
+        )
+      )
+        throw new McpToolError("Keep at least one active participant in the party.");
+
+      if (input.name !== undefined) person.name = input.name;
+
+      if (input.archived !== undefined) person.isArchived = input.archived;
+    });
+
+    return this.getParty(party.id);
+  }
+
+  private async freshView(partyId: string) {
+    const fresh = this.documents.fork();
+
+    try {
+      return await new WorkerPartyService(fresh, this.origin).getParty(partyId);
+    } finally {
+      await fresh.close();
+    }
   }
 
   private async readParty(id: string) {
@@ -208,36 +226,6 @@ export class WorkerPartyService implements PartyService {
       throw new McpToolError("This party is too large for this integration. Open it in trizum.");
 
     return party;
-  }
-
-  private async readChunk(party: Party, chunkId: DocumentId) {
-    const chunk = await this.documents.read<PartyExpenseChunk>(chunkId);
-
-    if (
-      chunk.type !== "expenseChunk" ||
-      chunk.partyId !== party.id ||
-      chunk.id !== chunkId ||
-      !Array.isArray(chunk.expenses) ||
-      chunk.expenses.length > 1000
-    ) {
-      throw new McpToolError("Invalid party expense document. Open the party in trizum.");
-    }
-
-    return chunk;
-  }
-
-  private async readChunkBalances(party: Party, balancesId: DocumentId) {
-    const summary = await this.documents.read<PartyExpenseChunkBalances>(balancesId);
-
-    if (
-      summary.type !== "expenseChunkBalances" ||
-      summary.partyId !== party.id ||
-      summary.id !== balancesId
-    ) {
-      throw new McpToolError("Invalid party balance document. Open the party in trizum.");
-    }
-
-    return summary;
   }
 
   private view(
@@ -269,28 +257,4 @@ export class WorkerPartyService implements PartyService {
         })),
     };
   }
-}
-
-function parseExpenseAmount(value: string) {
-  if (!/^(?:0|[1-9]\d{0,9})(?:\.\d{1,2})?$/.test(value))
-    throw new McpToolError(
-      "The expense amount must be positive and have at most two decimal places.",
-    );
-  const [units, decimals = ""] = value.split(".");
-  const amount = Number(units) * 100 + Number(decimals.padEnd(2, "0"));
-
-  if (!Number.isSafeInteger(amount) || amount <= 0)
-    throw new McpToolError(
-      "The expense amount must be positive and have at most two decimal places.",
-    );
-
-  return amount;
-}
-
-function formatAmount(amount: number) {
-  if (!Number.isSafeInteger(amount))
-    throw new McpToolError("This party contains an unsupported amount. Open it in trizum.");
-  const absolute = Math.abs(amount);
-
-  return `${amount < 0 ? "-" : ""}${Math.floor(absolute / 100)}.${String(absolute % 100).padStart(2, "0")}`;
 }

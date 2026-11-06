@@ -15,6 +15,19 @@ const view: PartyView = {
   expenses: [],
 };
 
+const expenseView = {
+  partyId: "party",
+  expenseId: "expense",
+  version: "a".repeat(32),
+  currency: "EUR",
+  name: "Dinner",
+  paidAt: "2026-11-06T20:00:00Z",
+  amount: "10.00",
+  isTransfer: false,
+  paidBy: [{ participantId: "alice", amount: "10.00" }],
+  shares: [{ participantId: "alice", type: "divide" as const, value: 1 }],
+};
+
 const options = {
   appOrigin: "https://trizum.app",
   widgetScript: "/* bundled widget */",
@@ -41,6 +54,11 @@ async function connect() {
     getParty: vi.fn<McpService["getParty"]>().mockResolvedValue(view),
     addExpense: vi.fn<McpService["addExpense"]>().mockResolvedValue(view),
     addParticipants: vi.fn<McpService["addParticipants"]>().mockResolvedValue(view),
+    getExpense: vi.fn<McpService["getExpense"]>().mockResolvedValue(expenseView),
+    updateParty: vi.fn<McpService["updateParty"]>().mockResolvedValue(view),
+    updateParticipant: vi.fn<McpService["updateParticipant"]>().mockResolvedValue(view),
+    updateExpense: vi.fn<McpService["updateExpense"]>().mockResolvedValue(view),
+    deleteExpense: vi.fn<McpService["deleteExpense"]>().mockResolvedValue(view),
   };
 
   const server = createMcpServer(service, options);
@@ -62,6 +80,11 @@ it("advertises narrow tools with accurate hints and a sandboxed MCP Apps resourc
     "get_party",
     "add_participants",
     "add_expense",
+    "get_expense",
+    "update_party",
+    "update_participant",
+    "update_expense",
+    "delete_expense",
   ]);
   expect(tools[0]).toMatchObject({ annotations: { readOnlyHint: true, openWorldHint: false } });
   expect(tools[0]._meta).not.toHaveProperty("ui");
@@ -147,6 +170,57 @@ it("validates participant additions and returns IDs for expense follow-ups", asy
   ).toMatchObject({ isError: true });
   expect(service.addParticipants).toHaveBeenCalledTimes(1);
   expect(service.addExpense).not.toHaveBeenCalled();
+});
+
+it("reads full expense versions without rendering a party widget", async () => {
+  const { client, service } = await connect();
+
+  const result = await client.callTool({
+    name: "get_expense",
+    arguments: { partyId: "party", expenseId: "expense" },
+  });
+
+  expect(result.structuredContent).toEqual(expenseView);
+  expect(service.getExpense).toHaveBeenCalledWith({ partyId: "party", expenseId: "expense" });
+});
+
+it("advertises destructive mutations and rejects empty updates or missing expense versions", async () => {
+  const { client, service } = await connect();
+  const { tools } = await client.listTools();
+
+  for (const name of ["update_party", "update_participant", "update_expense", "delete_expense"]) {
+    expect(tools.find((tool) => tool.name === name)).toMatchObject({
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+    });
+  }
+
+  for (const [name, args] of [
+    ["update_party", {}],
+    ["update_participant", { participantId: "alice" }],
+    ["update_expense", { expenseId: "expense", name: "Lunch" }],
+    ["delete_expense", { expenseId: "expense" }],
+  ] as const) {
+    expect(
+      await client.callTool({ name, arguments: { requestId: "token", partyId: "party", ...args } }),
+    ).toMatchObject({ isError: true });
+  }
+
+  expect(service.updateParty).not.toHaveBeenCalled();
+  expect(service.updateParticipant).not.toHaveBeenCalled();
+  expect(service.updateExpense).not.toHaveBeenCalled();
+  expect(service.deleteExpense).not.toHaveBeenCalled();
+  expect(
+    await client.callTool({
+      name: "update_expense",
+      arguments: {
+        requestId: "token",
+        partyId: "party",
+        expenseId: "expense",
+        version: expenseView.version,
+        amount: "12.00",
+      },
+    }),
+  ).toMatchObject({ structuredContent: view });
 });
 
 it("returns public domain errors and hides unexpected exception details", async () => {

@@ -8,6 +8,12 @@ import {
   type CreatePartyInput,
   type AddExpenseInput,
   type AddParticipantsInput,
+  type GetExpenseInput,
+  type UpdatePartyInput,
+  type UpdateParticipantInput,
+  type UpdateExpenseInput,
+  type DeleteExpenseInput,
+  type PartyWriteInput,
 } from "@trizum/mcp/index";
 import { partyViewSchema } from "@trizum/mcp/contracts";
 import { z } from "zod";
@@ -18,6 +24,10 @@ const writeEvents = {
   create_party: "mcp_party_created",
   add_participants: "mcp_participants_added",
   add_expense: "mcp_expense_added",
+  update_party: "mcp_party_updated",
+  update_participant: "mcp_participant_updated",
+  update_expense: "mcp_expense_updated",
+  delete_expense: "mcp_expense_deleted",
 } satisfies Record<WriteOperation, McpAnalyticsEvent>;
 
 const receiptSchema = z.object({ partyId: z.string().min(1) });
@@ -59,9 +69,28 @@ export class IdempotentPartyService implements McpService {
     return this.once("add_participants", input, () => this.service.addParticipants(input));
   }
 
+  async getExpense(input: GetExpenseInput) {
+    const result = await this.service.getExpense(input);
+    this.track("mcp_expense_viewed");
+
+    return result;
+  }
+  updateParty(input: UpdatePartyInput) {
+    return this.once("update_party", input, () => this.service.updateParty(input));
+  }
+  updateParticipant(input: UpdateParticipantInput) {
+    return this.once("update_participant", input, () => this.service.updateParticipant(input));
+  }
+  updateExpense(input: UpdateExpenseInput) {
+    return this.once("update_expense", input, () => this.service.updateExpense(input));
+  }
+  deleteExpense(input: DeleteExpenseInput) {
+    return this.once("delete_expense", input, () => this.service.deleteExpense(input));
+  }
+
   private async once(
     tool: WriteOperation,
-    input: CreatePartyInput | AddExpenseInput | AddParticipantsInput,
+    input: PartyWriteInput,
     operation: () => Promise<PartyView>,
   ): Promise<PartyView> {
     await this.options.limitWrite();

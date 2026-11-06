@@ -42,6 +42,16 @@ export class AutomergeDocuments {
     this.#signal = AbortSignal.any([this.#controller.signal, options.request.signal]);
   }
 
+  /** A fresh sync view for verifying cross-document projections, sharing this request's deadline. */
+  fork() {
+    this.#signal.throwIfAborted();
+
+    return new AutomergeDocuments({
+      ...this.#options,
+      request: new Request(this.#options.request.url, { signal: this.#signal }),
+    });
+  }
+
   async read<T>(documentId: DocumentId): Promise<Doc<T>> {
     return (await this.#find<T>(documentId)).doc();
   }

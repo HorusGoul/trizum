@@ -26,3 +26,9 @@ through the MCP Apps host bridge, with a copyable link when unavailable.
 Allow agents to add participants as a group grows, including people introduced
 while recording expenses. Preserve existing identities and past splits, return
 new participant IDs, and apply the existing retry and anonymous analytics rules.
+
+Add tools for party details, participant renaming/archival/restoration, and full
+expense reads, edits, and deletion. Require current expense versions, preserve
+unspecified fields and attachments, and reconcile shared balances after changes.
+Reuse existing write protection and anonymous completion events without a new
+migration or MCP state cache.

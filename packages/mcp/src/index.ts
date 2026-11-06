@@ -12,4 +12,11 @@ export type {
   PrepareWriteInput,
   PreparedWrite,
   WriteOperation,
+  GetExpenseInput,
+  ExpenseView,
+  UpdatePartyInput,
+  UpdateParticipantInput,
+  UpdateExpenseInput,
+  DeleteExpenseInput,
+  PartyWriteInput,
 } from "./contracts.js";

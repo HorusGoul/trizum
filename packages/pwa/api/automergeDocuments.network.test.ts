@@ -465,6 +465,7 @@ describe("Worker document reads over WebSocket", () => {
     const originalBalanceId = stored.chunkRefs[0].balancesId;
 
     const firstDocuments = {
+      fork: writers[0].fork.bind(writers[0]),
       read: writers[0].read.bind(writers[0]),
       async create<T extends object>(initialize: (id: Party["id"]) => T) {
         const doc = await writers[0].create(initialize);

@@ -1,7 +1,7 @@
 # trizum MCP and ChatGPT app
 
 An anonymous MCP Apps integration for creating expense groups, viewing balances,
-recording expenses, and adding people as the group grows. It uses trizum's
+recording and editing expenses, and managing people as the group grows. It uses trizum's
 shared-link access model: anyone with a party link can access and edit that party. Creation does not send invitations or
 attach a party to an account. Open its invite link in trizum and choose your
 participant to join through the normal PWA flow.
@@ -24,13 +24,18 @@ English and Spanish through the Worker's `Accept-Language` or `?lang=es` setting
 
 ## Tools and scope
 
-| Tool               | Purpose                                                                                     |
-| ------------------ | ------------------------------------------------------------------------------------------- |
-| `prepare_write`    | Issue a signed, 15-minute request token for one party, participant, or expense action.      |
-| `create_party`     | Create a named group with a currency and 1–50 named participants; return its invite URL.    |
-| `get_party`        | Sync a known party's participants, shared balances, and up to 20 recent expenses on demand. |
-| `add_participants` | Add named people to a party and return their IDs for subsequent expenses.                   |
-| `add_expense`      | Record a paid expense with one payer, split equally among selected participants.            |
+| Tool                 | Purpose                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `prepare_write`      | Issue a signed, 15-minute request token for one party, participant, or expense action.      |
+| `create_party`       | Create a named group with a currency and 1–50 named participants; return its invite URL.    |
+| `get_party`          | Sync a known party's participants, shared balances, and up to 20 recent expenses on demand. |
+| `add_participants`   | Add named people to a party and return their IDs for subsequent expenses.                   |
+| `add_expense`        | Record a paid expense with one payer, split equally among selected participants.            |
+| `get_expense`        | Read a specific expense's payer amounts, split rules, and version before changing it.       |
+| `update_party`       | Change the group name, description, or symbol without replacing other fields.               |
+| `update_participant` | Rename, archive, or restore a participant while retaining their ID and history.             |
+| `update_expense`     | Edit specified expense fields using a current version.                                      |
+| `delete_expense`     | Delete one explicitly requested expense using a current version.                            |
 
 The agent resolves participant IDs from `get_party` and asks about missing
 details. If an expense clearly introduces a new person, it can call
@@ -38,24 +43,56 @@ details. If an expense clearly introduces a new person, it can call
 names or intent require clarification. The tool adds up to 50 people per batch,
 with a 50-participant total guard including archived people. This guard uses the
 request’s current Automerge state; simultaneous batches can exceed it as their
-edits merge. It rejects names
-already present in its current snapshot and duplicate names within a batch,
+edits merge. It rejects names already present in its current snapshot and duplicate names within a batch,
 ignoring case and surrounding whitespace. Independently prepared concurrent
 actions can still introduce the same display name; names are not globally unique
 identities, so agents must resolve ambiguous matches rather than guess.
 
 Participant additions preserve existing IDs, details, balances, and old expense
 splits. They merge individual participant entries instead of replacing the party's
-participant map, so concurrent additions of different people survive. Renaming,
-removing, archiving, and restoring participants remain in the PWA. Decimal strings such as `"24.50"` become integer hundredths, matching
+participant map, so concurrent additions of different people survive.
+`update_participant` renames people or archives/restores them. Removing an existing
+person means archiving, matching the PWA; previous expenses and debts retain the
+same participant ID. It checks that another active person remains in the current
+snapshot. As with other offline edits, simultaneous updates merge through
+Automerge rather than a global database lock.
+
+Decimal strings such as `"24.50"` become integer hundredths, matching
 trizum's two-decimal convention for every currency. Balances, rounding, and
 expense hashes use the existing domain model. Positive balances mean money is
 owed to that person; negative balances mean they owe money.
 
 This version excludes account discovery, contacts, notifications, payments,
-attachments, currency conversion, custom splits, edits, and deletion. Reads are
-bounded to 100 expense chunks and 1,000 expenses per existing chunk; larger
+attachment editing, currency changes/conversion, custom-split creation,
+and transfer editing/deletion. Reads are bounded to 100 expense chunks and 1,000 expenses per existing chunk; larger
 parties must be opened in trizum.
+
+## Editing existing data
+
+Party updates change only supplied name, description, and symbol fields. Currency
+is fixed. Participant updates change only the named participant's display name
+and/or archive state; they never replace the shared participant map.
+
+For an expense edit or deletion, resolve the exact expense ID from recent results
+or a user-provided link, then call `get_expense`. It reads only that expense's
+owning chunk, verifies the chunk belongs to the supplied party, and returns the
+current content hash as `version`. Include that version in the mutation. A
+request that observes a different version refuses the write and asks for a fresh
+read. Concurrent requests still use normal Automerge field merge semantics;
+this is not a global compare-and-swap lock.
+
+`update_expense` patches only supplied fields using the PWA's expense diff/hash
+helpers, retaining the ID, photos, and unspecified fields. Names and dates can
+be changed on custom-split or multi-payer expenses. Financial edits support one
+payer and equal sharing: an existing custom split or multiple payers require
+explicit user instructions and both the replacement payer and split list. No
+split is silently converted. Transfers stay in trizum so paired settlement
+records are not broken.
+
+`delete_expense` removes exactly the requested record and its balance impact.
+Deleting the last record leaves its normal empty chunk in place. Destructive
+annotations identify update/delete tools, and agent instructions require clear
+user intent, disambiguation, and current versions.
 
 ## Persistence and retries
 
@@ -98,7 +135,7 @@ and payload semantics. Normal PWA telemetry gates apply when opening trizum.
 
 ## Request cost boundaries
 
-Initialization, discovery, resource reads, `prepare_write`, and `get_party`
+Initialization, discovery, resource reads, `prepare_write`, `get_party`, and `get_expense`
 do not query the application's D1 database. A new write uses one indexed claim insert and one
 receipt update; only retries look up an existing receipt. Cleanup runs separately
 from requests and uses the creation-time index. Group state stays in
@@ -122,6 +159,15 @@ that, open the party in trizum. No extra D1 coordination or request cache is use
 `add_participants` changes only the party document, followed by the normal
 on-demand group view. It creates no extra documents or summaries and uses the
 same two D1 write statements and retry protection as other mutations.
+Expense edits and deletions recompute the affected chunk's existing shared
+balance document using normal domain calculations. Fresh, temporary sync repos
+verify the projection after each write so a delayed request does not leave its
+older balance snapshot behind. Reconciliation also corrects the edited record's
+content hash after concurrent field merges. It stops after four passes and shares
+the original request deadline; unresolved contention is reported as unconfirmed,
+not repeated as a new action. The returned party view comes from a fresh sync.
+This adds bounded Automerge connections/reads and balance writes for existing
+expense changes, with no extra D1 queries, new persistent fields, or MCP cache.
 Read-only tool calls never write group data.
 
 The Cloudflare rate limiter allows 60 write-related attempts per minute per
@@ -193,6 +239,16 @@ omit Origin; Origin checks are not party authorization.
 - Retry: replay a completed call unchanged within 15 minutes. Expect the same
   party with its current state and no additional group or expense. After expiry,
   expect rejection even if its receipt has been deleted.
+- Details: “Rename this group to Summer trip and clear its description.” Expect
+  only those fields to change.
+- Participant: “Rename Bob to Robert, then remove him from the active group.”
+  Expect the same ID, archived state, and unchanged previous splits/debts.
+  “Restore Robert” must reactivate that same person.
+- Edit: “Change dinner to €12.” Expect the exact record to be read and updated
+  with a current version. Preserve photos, payer, and split unless requested.
+- Delete: “Delete that dinner expense.” Expect one deletion and updated balances.
+  Replaying it must not delete another record. Ambiguous expense names require
+  clarification; stale versions require a fresh read.
 - Negative: “Find all Bob's groups.” Expect no search or account access.
 - Negative: “Budget €100 for dinner.” Expect no paid expense to be recorded.
 - Negative: invalid party ID, unknown payer, duplicate split member, zero amount,

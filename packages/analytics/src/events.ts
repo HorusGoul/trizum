@@ -5,6 +5,12 @@ export const analyticsEvents = {
   mcp_participants_added:
     "An MCP add_participants batch completed; successful replays are excluded. No names or IDs are sent.",
   mcp_expense_added: "An MCP add_expense action completed; successful replays are excluded.",
+  mcp_expense_viewed: "An explicit MCP get_expense completed; internal edit lookups are excluded.",
+  mcp_expense_updated: "An MCP update_expense completed; successful replays are excluded.",
+  mcp_expense_deleted: "An MCP delete_expense completed; successful replays are excluded.",
+  mcp_party_updated: "An MCP update_party completed; successful replays are excluded.",
+  mcp_participant_updated:
+    "An MCP participant rename, archive, or restoration completed; successful replays are excluded.",
   party_created: "A group document was created through the new-group form.",
   party_joined: "The user selected their participant when joining a group.",
   party_left: "A group was removed from the user's group list.",

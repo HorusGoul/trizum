@@ -66,13 +66,41 @@ async function fixture() {
   const addExpense = vi.fn<PartyService["addExpense"]>().mockResolvedValue(view);
   const addParticipants = vi.fn<PartyService["addParticipants"]>().mockResolvedValue(view);
   const getParty = vi.fn<PartyService["getParty"]>().mockResolvedValue(view);
+
+  const getExpense = vi.fn<PartyService["getExpense"]>().mockResolvedValue({
+    partyId: "party",
+    expenseId: "expense",
+    version: "a".repeat(32),
+    currency: "EUR",
+    name: "Dinner",
+    amount: "10.00",
+    paidAt: "2026-11-06T20:00:00Z",
+    isTransfer: false,
+    paidBy: [],
+    shares: [],
+  });
+
+  const updateParty = vi.fn<PartyService["updateParty"]>().mockResolvedValue(view);
+  const updateParticipant = vi.fn<PartyService["updateParticipant"]>().mockResolvedValue(view);
+  const updateExpense = vi.fn<PartyService["updateExpense"]>().mockResolvedValue(view);
+  const deleteExpense = vi.fn<PartyService["deleteExpense"]>().mockResolvedValue(view);
   const trackEvent = vi.fn<(event: McpAnalyticsEvent) => void>();
   const limitWrite = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
   let now = Date.now();
   const tokens = new WriteTokens("test-mcp-signing-secret-at-least-32-characters", () => now);
 
   const service = new IdempotentPartyService(
-    { createParty, addExpense, addParticipants, getParty },
+    {
+      createParty,
+      addExpense,
+      addParticipants,
+      getParty,
+      getExpense,
+      updateParty,
+      updateParticipant,
+      updateExpense,
+      deleteExpense,
+    },
     platform.env.DB,
     { tokens, limitWrite, trackEvent },
   );
@@ -94,6 +122,11 @@ async function fixture() {
     addExpense,
     addParticipants,
     getParty,
+    getExpense,
+    updateParty,
+    updateParticipant,
+    updateExpense,
+    deleteExpense,
     trackEvent,
     limitWrite,
     input,
@@ -310,4 +343,63 @@ it("rejects forged and rate-limited writes before touching party state", async (
   limitWrite.mockRejectedValueOnce(new Error("Rate limited"));
   await expect(service.createParty(input)).rejects.toThrow("Rate limited");
   expect(createParty).not.toHaveBeenCalled();
+});
+
+it("deduplicates every edit/delete operation and emits only its completion event", async () => {
+  const f = await fixture();
+
+  const party = {
+    requestId: (await f.tokens.prepare("update_party")).requestId,
+    partyId: "party",
+    name: "Updated",
+  };
+
+  const participant = {
+    requestId: (await f.tokens.prepare("update_participant")).requestId,
+    partyId: "party",
+    participantId: "alice",
+    archived: true,
+  };
+
+  const edit = {
+    requestId: (await f.tokens.prepare("update_expense")).requestId,
+    partyId: "party",
+    expenseId: "expense",
+    version: "a".repeat(32),
+    amount: "12.00",
+  };
+
+  const remove = { ...edit, requestId: (await f.tokens.prepare("delete_expense")).requestId };
+  await f.service.updateParty(party);
+  await f.service.updateParty(party);
+  await f.service.updateParticipant(participant);
+  await f.service.updateParticipant(participant);
+  await f.service.updateExpense(edit);
+  await f.service.updateExpense(edit);
+  await f.service.deleteExpense(remove);
+  await f.service.deleteExpense(remove);
+  expect(f.updateParty).toHaveBeenCalledTimes(1);
+  expect(f.updateParticipant).toHaveBeenCalledTimes(1);
+  expect(f.updateExpense).toHaveBeenCalledTimes(1);
+  expect(f.deleteExpense).toHaveBeenCalledTimes(1);
+  expect(f.trackEvent.mock.calls).toEqual([
+    ["mcp_party_updated"],
+    ["mcp_participant_updated"],
+    ["mcp_expense_updated"],
+    ["mcp_expense_deleted"],
+  ]);
+  await expect(f.service.deleteExpense({ ...remove, requestId: edit.requestId })).rejects.toThrow(
+    "Invalid write request",
+  );
+});
+
+it("counts only successful explicit full-expense reads", async () => {
+  const f = await fixture();
+  await f.service.getExpense({ partyId: "party", expenseId: "expense" });
+  expect(f.trackEvent.mock.calls).toEqual([["mcp_expense_viewed"]]);
+  f.getExpense.mockRejectedValueOnce(new Error("Missing expense"));
+  await expect(f.service.getExpense({ partyId: "party", expenseId: "expense" })).rejects.toThrow(
+    "Missing expense",
+  );
+  expect(f.trackEvent).toHaveBeenCalledTimes(1);
 });
