@@ -137,7 +137,8 @@ jobs:
           cache: true
 
       - name: Build E2E app and install browsers
-        timeout-minutes: 5
+        # Hosted Ubuntu font downloads can take longer than five minutes.
+        timeout-minutes: 10
         run: |
           # Browser installation does not touch workspace build/codegen outputs.
           vp run --filter @trizum/pwa test:e2e:install:ci &
