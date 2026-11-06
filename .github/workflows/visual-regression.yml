@@ -1,0 +1,69 @@
+name: Design System Visual Regression
+
+on:
+  pull_request:
+    paths:
+      - "packages/ui/**"
+      - "packages/pwa/src/**"
+      - "packages/pwa/e2e/visual/**"
+      - "packages/pwa/e2e/harness/**"
+      - "packages/pwa/playwright*.ts"
+      - "packages/pwa/tsconfig.visual.json"
+      - "packages/pwa/vite.config.ts"
+      - "packages/pwa/package.json"
+      - "packages/icon-sprite/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/visual-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-regression-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    name: Visual parity with main
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          path: .visual-reference
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version-file: .node-version
+          cache: true
+      - name: Build reference from main
+        id: reference
+        working-directory: .visual-reference
+        run: |
+          vp install --frozen-lockfile
+          VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true vp run --filter @trizum/pwa build
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Install browsers
+        run: vp run --filter @trizum/pwa test:e2e:install:ci
+      - name: Compare reference and candidate
+        run: vp run --filter @trizum/pwa test:visual
+        env:
+          PLAYWRIGHT_REFERENCE_URL: http://127.0.0.1:4174
+          PLAYWRIGHT_REFERENCE_DIR: ${{ github.workspace }}/.visual-reference
+          VISUAL_REFERENCE_SHA: ${{ steps.reference.outputs.sha }}
+          VISUAL_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Upload visual comparison report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-comparison
+          path: |
+            packages/pwa/visual-report
+            packages/pwa/visual-results
+          retention-days: 7
+          if-no-files-found: error

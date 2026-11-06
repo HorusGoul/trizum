@@ -189,3 +189,8 @@ packages/server/build/
 packages/ui/src/generated/
 packages/ui/src/locales/*/messages.ts
 packages/ui/storybook-static/
+
+# Live main/branch visual comparisons
+.visual-reference/
+packages/pwa/visual-results/
+packages/pwa/visual-report/

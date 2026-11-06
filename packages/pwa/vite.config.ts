@@ -199,6 +199,19 @@ export default defineConfig(({ mode }) => {
             "codegen",
           ],
         },
+        "test:visual": {
+          command:
+            "vp exec tsc -p tsconfig.visual.json && vp exec playwright test --config playwright.visual.config.ts",
+          cache: false,
+          dependsOn: [
+            "@trizum/analytics#build",
+            "@trizum/logging#build",
+            "@trizum/react-suspense-cache#build",
+            "@trizum/revenuecat-api#build",
+            "@trizum/ui#build",
+            "codegen",
+          ],
+        },
         "test:e2e:prebuilt": {
           command: "PLAYWRIGHT_SKIP_BUILD=true vp exec playwright test",
           cache: false,
