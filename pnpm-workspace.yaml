@@ -84,11 +84,11 @@ catalog:
   "@playwright/test": 1.64.1
   "@rolldown/plugin-babel": 0.3.0
   "@sentry/cli": 3.8.2
-  "@sentry/core": 10.76.2
-  "@sentry/node": 10.76.2
-  "@sentry/profiling-node": 10.76.2
-  "@sentry/react": 10.76.2
-  "@sentry/vite-plugin": 5.4.1
+  "@sentry/core": 11.11.0
+  "@sentry/node": 11.11.0
+  "@sentry/profiling-node": 11.11.0
+  "@sentry/react": 11.11.0
+  "@sentry/vite-plugin": 11.11.0
   "@revenuecat/purchases-capacitor": 13.7.6
   "@revenuecat/purchases-capacitor-ui": 13.7.6
   "@tanstack/react-form": 1.33.5
