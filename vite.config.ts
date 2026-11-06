@@ -31,6 +31,9 @@ const ignorePatterns = [
   ".vite-hooks/**",
   "tools/oxlint/anti-slop/**",
   "**/dist/**",
+  "**/storybook-static/**",
+  "packages/ui/src/generated/**",
+  "**/locales/*/messages.ts",
   "**/node_modules/**",
   "**/coverage/**",
   "**/.tanstack/**",
@@ -187,6 +190,7 @@ const toolingConfig = {
         command: "vp run --filter @trizum/pwa check && vp check",
         dependsOn: [
           "@trizum/logging#build",
+          "@trizum/ui#build",
           "@trizum/pwa#codegen",
           "@trizum/revenuecat-api#generate",
         ],

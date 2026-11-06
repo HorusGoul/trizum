@@ -13,6 +13,8 @@ export interface IconSpriteConfig {
   iconSources: readonly IconSource[];
   usageFileExtensions?: readonly string[];
   usageRoots?: readonly string[];
+  /** Additional directories to ignore, such as shared packages’ generated catalogs. */
+  usageExcludeRoots?: readonly string[];
 }
 
 export interface GenerateIconSpriteArtifactsOptions {
@@ -141,7 +143,12 @@ export function shouldRegenerateIconSprite(
   filePath: string,
 ) {
   const resolvedFilePath = path.resolve(filePath);
-  const generatedDirectories = getIconSpriteGeneratedDirectories(config, rootDir);
+
+  const generatedDirectories = [
+    ...getIconSpriteGeneratedDirectories(config, rootDir),
+    ...(config.usageExcludeRoots ?? []).map((directory) => resolveFromRoot(rootDir, directory)),
+  ];
+
   const sourceDirectories = getIconSpriteSourceDirectories(config, rootDir);
   const usageRoots = getIconSpriteUsageRoots(config, rootDir);
 
@@ -197,7 +204,11 @@ function collectUsedSpriteIds(
   const availableIdSet = new Set(availableIds);
   const usedIds = new Set<string>();
   const usageRoots = getIconSpriteUsageRoots(config, rootDir);
-  const generatedDirectories = getIconSpriteGeneratedDirectories(config, rootDir);
+
+  const generatedDirectories = [
+    ...getIconSpriteGeneratedDirectories(config, rootDir),
+    ...(config.usageExcludeRoots ?? []).map((directory) => resolveFromRoot(rootDir, directory)),
+  ];
 
   for (const usageRoot of usageRoots) {
     for (const filePath of walkFiles(usageRoot)) {

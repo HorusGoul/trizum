@@ -184,3 +184,8 @@ packages/server/build/
 **/skills/npm-*
 
 .vitest/
+
+# Design system generated assets and Storybook build
+packages/ui/src/generated/
+packages/ui/src/locales/*/messages.ts
+packages/ui/storybook-static/

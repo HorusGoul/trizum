@@ -1,0 +1,5 @@
+{
+  "extends": "@trizum/tsconfig/vite.json",
+  "compilerOptions": { "types": ["vite/client", "node", "react"] },
+  "include": ["stories/**/*.tsx", ".storybook/**/*.ts", ".storybook/**/*.tsx", "lingui.config.ts"]
+}
