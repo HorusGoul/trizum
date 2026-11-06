@@ -16,8 +16,12 @@ brand and illustration catalog, alongside Lucide icons supplied by the icon help
 The ESM JavaScript and declarations are built into `dist`. This browser library
 uses TypeScript's Bundler resolution because its browser dependencies (including
 `qr-code-styling`) publish types that do not support NodeNext resolution. Relative
-imports still use `.js` specifiers. Lingui macros are compiled during the package
-build, so consumers do not need a macro transform for this package's JavaScript.
+imports still use `.js` specifiers. Vite builds the ESM modules with
+`@vitejs/plugin-react`'s `compiler: true` integration; TypeScript emits declarations.
+Lingui macros expand before React Compiler runs. Consumers receive compiled
+components without configuring either transform themselves. The shared
+`build/react.ts` configuration also compiles source in Storybook development;
+production Storybook consumes the already compiled package.
 
 ## Consumer setup
 

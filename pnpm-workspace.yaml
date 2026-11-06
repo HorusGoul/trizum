@@ -31,6 +31,7 @@ peerDependencyRules:
     vite: "*"
     vitest: "*"
 catalog:
+  oxc-transform-react: 0.152.0
   storybook: 10.6.5
   "@storybook/react-vite": 10.6.5
   "@storybook/addon-docs": 10.6.5

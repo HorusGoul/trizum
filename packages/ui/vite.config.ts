@@ -1,4 +1,16 @@
 import { defineConfig } from "vite-plus";
+import { readdirSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { createUIReactPlugins } from "./build/react.ts";
+
+const sourceRoot = fileURLToPath(new URL("./src", import.meta.url));
+
+const entries = Object.fromEntries(
+  readdirSync(sourceRoot, { recursive: true, encoding: "utf8" })
+    .filter((file) => /\.tsx?$/.test(file) && !/\.(test|d)\.tsx?$/.test(file))
+    .map((file) => [file.replace(/\.tsx?$/, ""), path.resolve(sourceRoot, file)]),
+);
 
 const dependencies = [
   "@trizum/icon-sprite#build",
@@ -7,6 +19,19 @@ const dependencies = [
 ];
 
 export default defineConfig({
+  plugins: [createUIReactPlugins()],
+  build: {
+    lib: { entry: entries, formats: ["es"] },
+    minify: false,
+    rolldownOptions: {
+      external: (id) => !id.startsWith(".") && !path.isAbsolute(id) && !id.startsWith("\0"),
+      output: {
+        preserveModules: true,
+        preserveModulesRoot: sourceRoot,
+        entryFileNames: "[name].js",
+      },
+    },
+  },
   run: {
     tasks: {
       codegen: {
@@ -19,10 +44,17 @@ export default defineConfig({
         cache: false,
       },
       build: {
-        command: "tsc -b tsconfig.json --force && node scripts/compile-macros.ts",
+        command: "vp build && tsc -b tsconfig.json --force --emitDeclarationOnly",
         dependsOn: ["codegen"],
         cache: {
-          input: ["src/**", "scripts/**", "tsconfig.json", "lingui.config.ts", "package.json"],
+          input: [
+            "src/**",
+            "build/**",
+            "vite.config.ts",
+            "tsconfig.json",
+            "lingui.config.ts",
+            "package.json",
+          ],
           output: ["dist/**", "src/generated/**", "src/locales/*/messages.ts"],
         },
       },
