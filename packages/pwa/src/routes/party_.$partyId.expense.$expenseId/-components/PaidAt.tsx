@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import type { Expense } from "#src/models/expense.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon } from "@trizum/ui/Icon";
 
 export function PaidAt({ paidAt }: Pick<Expense, "paidAt">) {
   const { i18n } = useLingui();

@@ -1,4 +1,4 @@
-import { Icon, type IconProps } from "#src/ui/Icon.js";
+import { Icon, type IconProps } from "@trizum/ui/Icon";
 
 interface SupportLinkProps {
   href: string;

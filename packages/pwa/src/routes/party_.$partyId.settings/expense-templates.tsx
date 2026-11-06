@@ -10,11 +10,11 @@ import {
   BLANK_EXPENSE_TEMPLATE_SYMBOL,
   MAX_EXPENSE_TEMPLATES,
 } from "#src/models/expenseTemplate.ts";
-import { Icon } from "#src/ui/Icon.tsx";
-import { Button } from "#src/ui/Button.tsx";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import { Switch } from "#src/ui/Switch.tsx";
-import { cn } from "#src/ui/utils.ts";
+import { Icon } from "@trizum/ui/Icon";
+import { Button } from "@trizum/ui/Button";
+import { AppSelect, SelectItem } from "@trizum/ui/Select";
+import { Switch } from "@trizum/ui/Switch";
+import { cn } from "@trizum/ui/utils";
 import { OnlyUseCustomTemplatesSheet } from "./-components/OnlyUseCustomTemplatesSheet.tsx";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.tsx";
 import { PartySettingsSection } from "./-components/PartySettingsSection.tsx";

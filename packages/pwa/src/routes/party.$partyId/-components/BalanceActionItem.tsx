@@ -5,8 +5,8 @@ import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { PartyParticipant } from "#src/models/party.js";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.js";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
 
 interface BalanceActionItemProps {
   fromId: PartyParticipant["id"];

@@ -4,7 +4,7 @@ import { CurrencyText } from "#src/components/CurrencyText.tsx";
 import { useCurrentParticipant } from "#src/hooks/useCurrentParticipant.ts";
 import { useCurrentParty } from "#src/hooks/useParty.ts";
 import type { Expense } from "#src/models/expense.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon } from "@trizum/ui/Icon";
 
 export function PaidBy({ paidBy }: Pick<Expense, "paidBy">) {
   const { party } = useCurrentParty();

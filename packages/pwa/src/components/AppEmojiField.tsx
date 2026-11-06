@@ -4,8 +4,8 @@ import {
   type ValidationResult as AriaValidationResult,
   Text,
 } from "react-aria-components";
-import { cn } from "#src/ui/utils.js";
-import { FieldError, Label } from "#src/ui/fields/Field.js";
+import { cn } from "@trizum/ui/utils";
+import { FieldError, Label } from "@trizum/ui/fields/Field";
 import { EmojiPicker } from "#src/components/EmojiPicker.js";
 
 const TextField = AriaTextField;

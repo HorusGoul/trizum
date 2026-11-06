@@ -1,10 +1,10 @@
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { Avatar } from "#src/ui/Avatar.js";
-import { Button } from "#src/ui/Button.js";
-import { Icon } from "#src/ui/Icon.js";
-import { Skeleton } from "#src/ui/Skeleton.js";
+import { Avatar } from "@trizum/ui/Avatar";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
+import { Skeleton } from "@trizum/ui/Skeleton";
 import { getImageUploadErrorMessage, useMediaFileActions } from "#src/hooks/useMediaFileActions.js";
 import { useMediaFile } from "#src/hooks/useMediaFile.js";
 import {
@@ -22,7 +22,7 @@ import { getLogger } from "#src/lib/log.ts";
 import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { MediaFile } from "#src/models/media.ts";
-import { TrizumSpinner } from "./TrizumSpinner.js";
+import { TrizumSpinner } from "@trizum/ui/TrizumSpinner";
 
 const logger = getLogger("components", "AvatarPicker");
 

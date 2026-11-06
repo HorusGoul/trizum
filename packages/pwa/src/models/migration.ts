@@ -5,7 +5,7 @@ import { getMediaFileHelpers } from "#src/hooks/useMediaFileActions.ts";
 import type { MediaFile } from "./media";
 import { compressionPresets } from "#src/lib/imageCompression.ts";
 import { getLogger } from "#src/lib/log.ts";
-import { requestIdleCallback } from "#src/lib/requestIdleCallback.ts";
+import { requestIdleCallback } from "@trizum/ui/requestIdleCallback";
 import type { MigrationData } from "./migrationData";
 import { t } from "@lingui/core/macro";
 

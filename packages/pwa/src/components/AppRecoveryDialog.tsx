@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { Dialog, Modal, ModalOverlay } from "react-aria-components";
 import { APP_WORKER_FULL_RESTART_REQUIRED_EVENT } from "#src/lib/appWorker/client.ts";
 import { useAdProtectedFlow } from "#src/lib/advertising/AdvertisingContext.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
-import { cn } from "#src/ui/utils.ts";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
+import { cn } from "@trizum/ui/utils";
 
 export function AppRecoveryDialog() {
   const [isOpen, setIsOpen] = useState(false);

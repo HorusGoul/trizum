@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
 import { StoreRedemptionAction } from "./StoreRedemptionAction.tsx";
 
 const helpLinkClassName =

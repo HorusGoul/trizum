@@ -8,7 +8,7 @@ import {
   getImpactOnBalanceForUser,
   type Expense,
 } from "#src/models/expense.js";
-import { cn } from "#src/ui/utils.js";
+import { cn } from "@trizum/ui/utils";
 
 export function ExpenseItem({ partyId, expense }: { partyId: string; expense: Expense }) {
   const { party } = useParty(partyId);

@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
-import { Alert, AlertDescription, AlertTitle } from "#src/ui/Alert.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
+import { Alert, AlertDescription, AlertTitle } from "@trizum/ui/Alert";
+import { Icon } from "@trizum/ui/Icon";
 
 export function ArchivedParticipantsAlert({ isVisible }: { isVisible: boolean }) {
   if (!isVisible) {

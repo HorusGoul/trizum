@@ -1,3 +1,4 @@
+import { PwaUIProvider } from "#src/components/PwaUIProvider.js";
 // @vitest-environment jsdom
 
 import { act, Suspense } from "react";
@@ -120,11 +121,13 @@ async function setup(joined = false, loader?: () => Promise<void>) {
   await act(async () =>
     root.render(
       <I18nProvider i18n={initializeI18n("en")}>
-        <RepoContext value={repo}>
-          <Suspense fallback="Loading">
-            <RouterProvider router={router} />
-          </Suspense>
-        </RepoContext>
+        <PwaUIProvider>
+          <RepoContext value={repo}>
+            <Suspense fallback="Loading">
+              <RouterProvider router={router} />
+            </Suspense>
+          </RepoContext>
+        </PwaUIProvider>
       </I18nProvider>,
     ),
   );

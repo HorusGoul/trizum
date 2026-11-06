@@ -1,7 +1,7 @@
 # trizum UI
 
 Internal React design system for the PWA and other trizum apps. This package
-initially duplicates the PWA's components; the PWA still uses its existing copies.
+owns the shared components consumed by the PWA.
 Components retain their existing APIs and styling, including `App`-prefixed names.
 Routing, persistence, preferences, and product orchestration belong to consumers.
 

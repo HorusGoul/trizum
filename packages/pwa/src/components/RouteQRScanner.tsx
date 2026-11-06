@@ -2,7 +2,7 @@ import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { Modal, ModalOverlay } from "react-aria-components";
 import { QRCodeScanner, type ScanResult, type ValidationResult } from "./QRCodeScanner.js";
-import { IconButton } from "#src/ui/IconButton.js";
+import { IconButton } from "@trizum/ui/IconButton";
 import { t } from "@lingui/core/macro";
 import { toast } from "sonner";
 

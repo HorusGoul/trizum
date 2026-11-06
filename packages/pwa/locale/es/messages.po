@@ -820,7 +820,6 @@ msgstr "Borrar expresión"
 msgid "Clear search"
 msgstr "Borrar búsqueda"
 
-#: src/components/MediaGallery.tsx:259
 #: src/components/RouteQRScanner.tsx:64
 msgid "Close"
 msgstr "Cerrar"

@@ -81,7 +81,7 @@ function isSentryUrl(url: URL) {
   return url.hostname === "sentry.io" || url.hostname.endsWith(".sentry.io");
 }
 
-function createBrowserHarness(page: Page): BrowserHarness {
+export function createBrowserHarness(page: Page): BrowserHarness {
   async function hasInternalHooks() {
     return page
       .evaluate(() => {

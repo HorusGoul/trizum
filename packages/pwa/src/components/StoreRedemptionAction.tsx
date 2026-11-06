@@ -1,6 +1,6 @@
 import { trackEvent } from "#src/lib/analytics.ts";
 import type { ReactNode } from "react";
-import { Button } from "#src/ui/Button.tsx";
+import { Button } from "@trizum/ui/Button";
 import { getStoreRedemptionUrl } from "#src/lib/premium/premiumRedemption.ts";
 import { checkRedemptionConnection } from "#src/lib/premium/redemptionConnection.ts";
 import type { RevenueCatPlatform } from "#src/lib/premium/revenueCatConfig.ts";

@@ -1,7 +1,7 @@
 import { Modal, ModalOverlay } from "react-aria-components";
 import { Suspense, useState } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
-import MediaGallery, { MediaGalleryImage } from "#src/components/MediaGallery.tsx";
+import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import type { MediaFile } from "#src/models/media.ts";
 

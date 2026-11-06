@@ -9,7 +9,7 @@ import {
 } from "#src/lib/automerge/suspense-hooks.js";
 import { useRepo } from "#src/lib/automerge/useRepo.ts";
 import { getBrowserLocale, setLocale } from "#src/lib/i18n.js";
-import { defaultThemeHue, setThemeHue } from "#src/ui/theme.ts";
+import { defaultThemeHue, setThemeHue } from "@trizum/ui/theme";
 
 function ensurePinnedParties(list: PartyList) {
   if (!list.pinnedParties) {

@@ -2,9 +2,9 @@ import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { type FormEvent } from "react";
 import type { SocialAuthProvider } from "#src/lib/auth-client.ts";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
-import { AppTextField } from "#src/ui/fields/TextField.js";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import {
   AuthButtonIcon,
   AuthErrorAlert,

@@ -2,7 +2,7 @@ import { CurrencyText } from "#src/components/CurrencyText.js";
 import { useCurrentParty } from "#src/hooks/useParty.js";
 import type { Balance } from "#src/models/expense.js";
 import type { PartyParticipant } from "#src/models/party.js";
-import { cn } from "#src/ui/utils.js";
+import { cn } from "@trizum/ui/utils";
 
 interface BalanceItemProps {
   participant: PartyParticipant;

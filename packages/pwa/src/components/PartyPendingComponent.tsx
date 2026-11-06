@@ -3,10 +3,10 @@ import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button as AriaButton, Disclosure, DisclosurePanel } from "react-aria-components";
-import { TrizumSpinner } from "./TrizumSpinner.js";
-import { Button } from "#src/ui/Button.tsx";
-import { Icon } from "#src/ui/Icon.tsx";
-import { cn } from "#src/ui/utils.ts";
+import { TrizumSpinner } from "@trizum/ui/TrizumSpinner";
+import { Button } from "@trizum/ui/Button";
+import { Icon } from "@trizum/ui/Icon";
+import { cn } from "@trizum/ui/utils";
 
 const tips = [
   () => t`You can add photos to your expenses for better tracking.`,

@@ -1,5 +1,5 @@
 import type { Party } from "#src/models/party.ts";
-import { cn } from "#src/ui/utils.ts";
+import { cn } from "@trizum/ui/utils";
 
 export function PartySymbolBadge({ party, className }: { party: Party; className?: string }) {
   const symbol = party.symbol || party.name.charAt(0).toUpperCase();

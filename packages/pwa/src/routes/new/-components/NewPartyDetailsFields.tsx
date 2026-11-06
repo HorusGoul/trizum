@@ -7,8 +7,8 @@ import {
   validatePartySymbol,
   validatePartyTitle,
 } from "#src/lib/validation.js";
-import { AppSelect, SelectItem } from "#src/ui/Select.tsx";
-import { AppTextField } from "#src/ui/fields/TextField.js";
+import { AppSelect, SelectItem } from "@trizum/ui/Select";
+import { AppTextField } from "@trizum/ui/fields/TextField";
 import type { CurrencyOption, NewPartyFormValues } from "./types.js";
 
 export function NewPartyDetailsFields({

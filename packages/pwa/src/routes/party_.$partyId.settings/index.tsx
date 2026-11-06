@@ -2,7 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { useParty } from "#src/hooks/useParty.js";
 import { DEFAULT_PARTY_SYMBOL } from "#src/models/party.js";
-import { Icon } from "#src/ui/Icon.js";
+import { Icon } from "@trizum/ui/Icon";
 import { PartySettingsHeader } from "./-components/PartySettingsHeader.js";
 import { PartySettingsLink } from "./-components/PartySettingsLink.js";
 import { PartySettingsSection } from "./-components/PartySettingsSection.js";

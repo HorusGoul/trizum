@@ -105,3 +105,43 @@ PLAYWRIGHT_PORT=4188 vp run --filter @trizum/pwa test:e2e:prebuilt e2e/smoke.spe
 flags directly, without a literal `--` separator. See the
 [CI workflow](../../../.github/workflows/ci.yml) and
 [Playwright config](../playwright.config.ts) for implementation details.
+
+## Visual parity against main
+
+The separate `test:visual` suite compares nine screens in English and Spanish,
+using mobile and desktop viewports in Chromium and WebKit (72 comparisons).
+It checks home, party creation, user settings, expenses, balances, party settings,
+expense details, the expense form, and the party actions sheet. Spanish uses a
+second accent hue. Both versions use the same fixture data, clock, fonts,
+viewport, locale, and signed-out account response. Both images must stabilize
+before comparison, using identical capture settings. CSS transitions are disabled
+before opening menus so popover positioning measures the settled trigger. No
+product content is masked.
+
+Build an isolated checkout of the desired `origin/main` SHA with
+`VITE_E2E_HARNESS=true VITE_APP_DISABLE_SENTRY=true`, then run from this workspace:
+
+```sh
+PLAYWRIGHT_REFERENCE_DIR=/absolute/path/to/reference-checkout \
+PLAYWRIGHT_REFERENCE_URL=http://127.0.0.1:4174 \
+VISUAL_REFERENCE_SHA=<reference-sha> VISUAL_CANDIDATE_SHA=<candidate-sha> \
+vp run --filter @trizum/pwa test:visual
+```
+
+The command starts previews for both builds; it builds the candidate automatically.
+`PLAYWRIGHT_SKIP_BUILD=true` reuses an existing candidate E2E build. An already
+running reference deployment can be supplied with `PLAYWRIGHT_REFERENCE_URL` alone,
+provided it exposes the E2E harness. Both URLs must use different origins so their
+local state is isolated. Keep the reference read-only apart from seeded browser
+storage. The reference checkout needs its own `vp install` and dependency builds.
+
+`visual-report/comparison.html` is a standalone before/after report with a screen
+selector. `visual-report/index.html` is the detailed Playwright report with failure
+diffs and traces. `summary.json` records exact refs and outcomes. The CI workflow
+builds current main and uploads the reports and PNGs on success or failure.
+
+Expected PNGs are captured from the reference during the same run, rather than
+committing platform-specific snapshots. The suite is intentionally separate from
+normal E2E tests and checks visual parity for refactors: intended design changes
+will produce failing comparisons for review. Do not use snapshot update flags to
+approve differences in this suite; they must be reviewed against main.

@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { AppCurrencyField } from "#src/ui/fields/TextField.js";
+import { AppCurrencyField } from "@trizum/ui/fields/TextField";
 import React, { use, useEffect, useRef, useState } from "react";
 import { CurrencyContext } from "./CurrencyContext";
 import { useCalculatorMode } from "#src/hooks/useCalculatorMode.ts";
@@ -9,11 +9,11 @@ import {
   isCalculatorAutoOpenSuppressed,
   suppressCalculatorAutoOpen,
 } from "./calculatorAutoOpenSuppression.ts";
-import { IconButton } from "#src/ui/IconButton.js";
-import { cn } from "#src/ui/utils.js";
+import { IconButton } from "@trizum/ui/IconButton";
+import { cn } from "@trizum/ui/utils";
 import { getPresenceElementIdFromTarget } from "./presencePosition.ts";
 import type { MediaFile } from "#src/models/media.ts";
-import { clampCurrencyValue } from "#src/ui/fields/currencyValue.ts";
+import { clampCurrencyValue } from "@trizum/ui/fields/currencyValue";
 
 export type CurrencyFieldProps = React.ComponentProps<typeof AppCurrencyField> & {
   calculator?: boolean;

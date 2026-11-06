@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { Suspense } from "react";
 import type { Expense } from "#src/models/expense.js";
-import { Icon } from "#src/ui/Icon.js";
-import { Skeleton } from "#src/ui/Skeleton.tsx";
+import { Icon } from "@trizum/ui/Icon";
+import { Skeleton } from "@trizum/ui/Skeleton";
 import { PhotoItemById } from "./PhotoItemById.js";
 
 interface PhotosProps extends Partial<Pick<Expense, "photos">> {
