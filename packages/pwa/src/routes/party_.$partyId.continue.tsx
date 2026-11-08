@@ -98,8 +98,8 @@ function AiInvite() {
   const appUrl = createNativePartyUrl(party.id, campaign.success ? campaign.data : undefined);
 
   return (
-    <main className="container flex min-h-full flex-col justify-center gap-8 px-5 py-10 sm:px-8">
-      <header className="space-y-4">
+    <main className="container flex min-h-full flex-col gap-8 px-5 py-8 sm:justify-center sm:px-8 sm:py-12">
+      <header className="flex flex-col gap-6">
         <img
           src="/pwa-192x192.png"
           alt="trizum"
@@ -107,15 +107,20 @@ function AiInvite() {
           height={64}
           className="size-16 rounded-2xl"
         />
-        <h1 className="text-3xl font-bold tracking-tight">
-          <Trans>Your group is ready</Trans>
-        </h1>
-        <h2 className="text-xl font-semibold wrap-anywhere">
-          {party.symbol} {party.name}
-        </h2>
-        <p className="text-accent-700 dark:text-accent-200 leading-relaxed">
-          <Trans>Get the app to track shared expenses with your group, even offline.</Trans>
-        </p>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              <Trans>Your group is ready</Trans>
+            </h1>
+            <h2 className="flex items-start gap-3 text-xl leading-7 font-semibold">
+              {party.symbol && <span className="shrink-0">{party.symbol}</span>}
+              <span className="min-w-0 wrap-anywhere">{party.name}</span>
+            </h2>
+          </div>
+          <p className="text-accent-700 dark:text-accent-200 leading-relaxed">
+            <Trans>Get the app to track shared expenses with your group, even offline.</Trans>
+          </p>
+        </div>
       </header>
 
       <div className="space-y-4">
