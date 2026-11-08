@@ -32,3 +32,7 @@ expense reads, edits, and deletion. Require current expense versions, preserve
 unspecified fields and attachments, and reconcile shared balances after changes.
 Reuse existing write protection and anonymous completion events without a new
 migration or MCP state cache.
+
+Build the embedded group widget with the shared trizum design system: buttons,
+avatars, alerts, icons, typography, and theme colors. Embed the generated assets
+and follow the MCP host’s light/dark theme while retaining sandbox-safe navigation.

@@ -31,6 +31,8 @@ const expenseView = {
 const options = {
   appOrigin: "https://trizum.app",
   widgetScript: "/* bundled widget */",
+  widgetStyles: "/* bundled styles */",
+  widgetSprite: '<svg style="display:none"></svg>',
   locale: "en",
   openLabel: "Open",
   openErrorLabel: "Copy the link",

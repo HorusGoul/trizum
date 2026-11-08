@@ -12,14 +12,14 @@ participant to join through the normal PWA flow.
   results, and the host's `McpService` interface.
 - [`src/server.ts`](./src/server.ts): tools and UI resource, using the official
   MCP SDK's fetch-native Streamable HTTP transport.
-- [`src/widget.tsx`](./src/widget.tsx): React card using the standard MCP Apps
-  bridge. Other MCP clients can use structured results without rendering UI.
+- [`src/widget.tsx`](./src/widget.tsx): React card built with `@trizum/ui` and
+  the standard MCP Apps bridge. Other MCP clients can use structured results without rendering UI.
 - [`../pwa/api/routes/mcp.ts`](../pwa/api/routes/mcp.ts): `/api/mcp` in the
   existing Cloudflare Worker, with no separate hosting.
 - [`../pwa/api/mcp`](../pwa/api/mcp): existing Automerge domain and D1 adapters.
 
-The package does not depend on the PWA. Its host supplies persistence and Lingui
-UI labels. Protocol descriptions guide agents in English; widget labels support
+The package uses the shared `@trizum/ui` design system. Its host supplies
+persistence and Lingui UI labels; it has no PWA dependency. Protocol descriptions guide agents in English; widget labels support
 English and Spanish through the Worker's `Accept-Language` or `?lang=es` setting.
 
 ## Tools and scope
@@ -187,9 +187,15 @@ live Worker client. After bootstrap, an action sends only its custom event.
 From the workspace root, run `vp install`, `vp run check`, `vp run test`, and
 `vp run build`. Package tasks also run with `vp run --filter @trizum/mcp <task>`.
 
-The build emits server code/declarations and a self-contained `dist/widget.js`.
-These are generated files. Worker tasks build this package before importing its
-server and raw widget bundle.
+The build emits server code/declarations plus `dist/widget.js`, `dist/widget.css`,
+and `dist/widget.svg`. These are generated files. The widget imports shared UI
+styles and uses Button (including its async pending state), Avatar, Alert, Icon,
+and UIProvider. Its icon sprite is generated with the UI package’s icon helper.
+Lingui loads the UI package’s English/Spanish catalogs alongside host-supplied
+labels; the host’s initial theme and theme changes select the shared light/dark
+styles. The MCP HTML embeds scripts, CSS, fonts, and the sprite, so the sandbox
+needs no network access for rendering. Worker tasks build this package before
+importing its server and raw widget assets.
 
 ## Connect a development app
 

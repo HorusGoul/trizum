@@ -11,11 +11,15 @@
     "src"
   ],
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "imports": {
     "#*": "./*"
   },
   "exports": {
+    "./widget.css": "./dist/widget.css",
+    "./widget.svg": "./dist/widget.svg",
     "./widget.js": "./dist/widget.js",
     "./package.json": "./package.json",
     "./*": {
@@ -29,17 +33,23 @@
     "dev": "tsc -b tsconfig.json --watch"
   },
   "dependencies": {
+    "@lingui/core": "catalog:",
+    "@lingui/react": "catalog:",
     "@modelcontextprotocol/ext-apps": "catalog:",
     "@modelcontextprotocol/sdk": "catalog:",
+    "@trizum/ui": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@trizum/icon-sprite": "workspace:*",
     "@trizum/tsconfig": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@typescript/native": "catalog:",
+    "tailwindcss": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
   }

@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 import { handleMcpRequest } from "@trizum/mcp/index";
 import widgetScript from "@trizum/mcp/widget.js?raw";
+import widgetStyles from "@trizum/mcp/widget.css?raw";
+import widgetSprite from "@trizum/mcp/widget.svg?raw";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { WorkerPartyService } from "../mcp/partyService";
 import { IdempotentPartyService } from "../mcp/idempotency";
@@ -67,6 +69,8 @@ mcpRoute.on(["POST", "GET", "DELETE"], "/", (c) => {
   return handleMcpRequest(c.req.raw, service, {
     appOrigin: new URL(c.req.url).origin,
     widgetScript,
+    widgetStyles,
+    widgetSprite,
     locale: c.get("locale"),
     openLabel: i18n._(mcpOpenMessage),
     openErrorLabel: i18n._(mcpOpenErrorMessage),
