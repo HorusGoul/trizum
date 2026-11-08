@@ -23,7 +23,9 @@ import {
 
 import { createWidgetHtml } from "./widgetHtml.js";
 
-const resourceUri = "ui://trizum/party-v4.html";
+// Keep published URLs readable when a host still has an earlier tool definition cached.
+const resourceVersions = [5, 4, 3, 2] as const;
+const resourceUri = `ui://trizum/party-v${resourceVersions[0]}.html`;
 
 export interface McpAppOptions {
   appOrigin: string;
@@ -47,26 +49,29 @@ export function createMcpServer(service: McpService, options: McpAppOptions) {
     },
   );
 
-  registerAppResource(server, "trizum-party", resourceUri, {}, async () => ({
-    contents: [
-      {
-        uri: resourceUri,
-        mimeType: RESOURCE_MIME_TYPE,
-        text: createWidgetHtml({
-          script: options.widgetScript,
-          styles: options.widgetStyles,
-          sprite: options.widgetSprite,
-        }),
-        _meta: {
-          ui: {
-            prefersBorder: true,
-            domain: options.appOrigin,
-            csp: { connectDomains: [], resourceDomains: [] },
+  for (const version of resourceVersions) {
+    const uri = `ui://trizum/party-v${version}.html`;
+    registerAppResource(server, `trizum-party-v${version}`, uri, {}, async () => ({
+      contents: [
+        {
+          uri,
+          mimeType: RESOURCE_MIME_TYPE,
+          text: createWidgetHtml({
+            script: options.widgetScript,
+            styles: options.widgetStyles,
+            sprite: options.widgetSprite,
+          }),
+          _meta: {
+            ui: {
+              prefersBorder: true,
+              domain: options.appOrigin,
+              csp: { connectDomains: [], resourceDomains: [] },
+            },
           },
         },
-      },
-    ],
-  }));
+      ],
+    }));
+  }
 
   const meta = {
     securitySchemes: [{ type: "noauth" }],

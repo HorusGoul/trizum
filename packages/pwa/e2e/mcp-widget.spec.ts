@@ -109,6 +109,16 @@ for (const outcome of ["success", "rejected", "unsupported"] as const) {
     await expect(frame.locator("html")).toHaveAttribute("lang", locale);
     await expect(frame.locator("html")).toHaveCSS("color-scheme", theme);
     await expect(frame.locator("main")).toHaveCSS("border-radius", "24px");
+    expect(
+      await frame.locator("main").evaluate(async () => {
+        await document.fonts.ready;
+
+        return [...document.fonts].some(
+          (font) =>
+            font.family.replaceAll('"', "") === "Inter Variable" && font.status === "loaded",
+        );
+      }),
+    ).toBe(true);
     await expect(frame.locator("li").filter({ hasText: "Alice" })).toContainText(
       locale === "es" ? "6,66" : "6.66",
     );

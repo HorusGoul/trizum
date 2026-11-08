@@ -103,6 +103,21 @@ it("advertises narrow tools with accurate hints and a sandboxed MCP Apps resourc
   });
 });
 
+it.each([2, 3, 4])(
+  "keeps published widget v%s readable for cached tool metadata",
+  async (version) => {
+    const { client } = await connect();
+    const uri = `ui://trizum/party-v${version}.html`;
+    const resource = await client.readResource({ uri });
+
+    expect(resource.contents[0]).toMatchObject({
+      uri,
+      mimeType: "text/html;profile=mcp-app",
+      text: expect.stringContaining(options.widgetScript),
+    });
+  },
+);
+
 it("prepares a write without invoking party reads or mutations", async () => {
   const { client, service } = await connect();
 

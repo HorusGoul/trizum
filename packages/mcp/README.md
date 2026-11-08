@@ -197,6 +197,13 @@ styles. The MCP HTML embeds scripts, CSS, fonts, and the sprite, so the sandbox
 needs no network access for rendering. Worker tasks build this package before
 importing its server and raw widget assets.
 
+The widget build embeds the Latin subset of the shared fonts for the supported
+English/Spanish UI; other scripts use the platform font fallback. A built-asset
+test enforces a 768 KiB HTML budget. This is a project payload budget, not a
+verified ChatGPT mobile size limit. Published resource URLs remain registered as
+compatibility aliases so cached tool definitions can still read the card after
+an update. New tool metadata advertises the latest URI.
+
 ## Connect a development app
 
 1. Run `vp run dev` from the workspace root. Use the printed local URL with

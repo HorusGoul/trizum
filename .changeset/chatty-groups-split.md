@@ -36,3 +36,6 @@ migration or MCP state cache.
 Build the embedded group widget with the shared trizum design system: buttons,
 avatars, alerts, icons, typography, and theme colors. Embed the generated assets
 and follow the MCP host’s light/dark theme while retaining sandbox-safe navigation.
+
+Keep previously published widget URLs readable for clients with cached tool
+metadata, and reduce embedded font payloads while retaining the shared UI.
