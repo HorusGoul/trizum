@@ -1,0 +1,48 @@
+name: Publish Visual Regression Report
+
+on:
+  workflow_run:
+    workflows: [Design System Visual Regression]
+    types: [completed]
+
+permissions: {}
+
+# Serialize comments for a PR branch, including reruns. Image-branch writes
+# across different PRs use optimistic retries in the publisher.
+concurrency:
+  group: visual-publication-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+jobs:
+  report:
+    if: ${{ github.event.workflow_run.event == 'pull_request' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    steps:
+      # workflow_run uses the default branch. Never check out PR code here or
+      # install dependencies / execute anything from the downloaded artifact.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+          sparse-checkout: packages/pwa/e2e/visual
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "26"
+      - name: Download data-only visual report
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: visual-pr-report-${{ github.event.workflow_run.run_attempt }}
+          path: ${{ runner.temp }}/visual-pr-report
+      - name: Publish verified PNGs and update PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPORT_DIRECTORY: ${{ runner.temp }}/visual-pr-report
+        run: node packages/pwa/e2e/visual/publish-pr-report.ts
