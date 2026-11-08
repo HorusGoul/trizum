@@ -53,6 +53,76 @@ async function openExpenseTemplatePicker(page: Page, partyId: string) {
 }
 
 test.describe("Expense templates", () => {
+  test("starts the first sheet opening at its measured edge without backdrop flashes", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createPartyFixture(),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await createExpenseTemplate(harness, page, seededParty.partyId, {
+      expenseTitle: "Groceries",
+      name: "Weekly groceries",
+    });
+    await harness.navigate(`/party/${seededParty.partyId}`);
+
+    // Capture the actual first mount, before any sheet measurements are cached.
+    const frames = await page
+      .getByRole("button", { name: "Add an expense" })
+      .evaluate(async (button) => {
+        const frames: { time: number; y: number; height: number; opacity: number }[] = [];
+        const start = performance.now();
+        // SAFETY: The locator targets the Add an expense button; native click lets sampling start in the same browser task.
+        (button as HTMLButtonElement).click();
+        await new Promise<void>((resolve) => {
+          const sample = () => {
+            const container = document.querySelector(".react-modal-sheet-container");
+            const backdrop = document.querySelector(".react-modal-sheet-backdrop");
+
+            if (container && backdrop) {
+              const style = getComputedStyle(container);
+              frames.push({
+                time: performance.now() - start,
+                y: new DOMMatrixReadOnly(style.transform).m42,
+                height: container.getBoundingClientRect().height,
+                opacity: Number(getComputedStyle(backdrop).opacity),
+              });
+            }
+
+            const latest = frames.at(-1);
+
+            if (
+              performance.now() - start < 2000 &&
+              (!latest || latest.opacity < 1 || latest.y !== 0 || frames.length < 3)
+            )
+              requestAnimationFrame(sample);
+            else resolve();
+          };
+
+          requestAnimationFrame(sample);
+        });
+
+        return frames;
+      });
+
+    await test.info().attach("first-open-frames", {
+      body: JSON.stringify(frames),
+      contentType: "application/json",
+    });
+    expect(frames.length).toBeGreaterThan(2);
+    expect(frames[0].y).toBeLessThanOrEqual(frames[0].height + 2);
+
+    for (let index = 1; index < frames.length; index++) {
+      expect(frames[index].opacity + 0.02).toBeGreaterThanOrEqual(frames[index - 1].opacity);
+    }
+
+    expect(frames.at(-1)?.opacity).toBe(1);
+  });
+
   for (const colorScheme of ["light", "dark"] as const) {
     test(`keeps the sheet border at the screen edge during overdrag in ${colorScheme} mode`, async ({
       harness,

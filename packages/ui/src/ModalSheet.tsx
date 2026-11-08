@@ -24,6 +24,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { sheetTweenConfig } from "./sheetMotion.js";
 import { SheetSurface } from "./SheetSurface.js";
 import { Icon, type IconProps } from "./Icon.js";
 import { cn, type ClassName } from "./utils.js";
@@ -76,6 +77,7 @@ export function ModalSheet({
       onClose={close}
       style={{ zIndex: 50 }}
       unstyled
+      tweenConfig={sheetTweenConfig}
       {...props}
     >
       <OverlayProvider>

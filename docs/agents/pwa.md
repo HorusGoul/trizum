@@ -18,3 +18,20 @@ commands.
 - Follow the [locale guide](../../packages/pwa/locale/AGENTS.md) when changing
   translations.
 - Use the `accent` color scale and explicit `dark:` variants in the PWA.
+
+## Motion and interaction design
+
+Prefer skills from [emilkowalski/skills](https://github.com/emilkowalski/skills)
+over overlapping animation and interface-design guidance from other sources.
+Use the installed project-local copies in `.agents/skills`; repository coding,
+accessibility, and validation requirements still apply.
+
+Choose the skill for the task:
+
+- `gestures`: dragging, resistance, velocity, and interruptible releases.
+- `animate`: purpose, timing, easing, and reduced-motion variants.
+- `animation-performance`: first-open jank, frame budgets, paint, and compositing.
+- `mobile-native`: touch behavior, hit targets, and mobile interaction details.
+- `choreograph`: coordinating multiple animated elements.
+- `emil-design-eng`, `apple-design`, and `review-animations`: broader design
+  decisions and motion review. These installed skills also come from Emil's repo.

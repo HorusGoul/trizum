@@ -8,6 +8,7 @@ import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 import { Button } from "@trizum/ui/Button";
+import { sheetTweenConfig } from "@trizum/ui/sheetMotion";
 import { SheetSurface } from "@trizum/ui/SheetSurface";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -20,7 +21,7 @@ const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
 const DESKTOP_POPOVER_MARGIN = 8;
 const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
-const MOBILE_SHEET_TWEEN_CONFIG = { duration: 0.2, ease: "easeOut" } as const;
+const MOBILE_SHEET_TWEEN_CONFIG = sheetTweenConfig;
 const MOBILE_FIELD_VISIBILITY_MARGIN = 12;
 const MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS = MOBILE_SHEET_TWEEN_CONFIG.duration * 1000;
 const MOBILE_SCROLL_RESTORE_TIMEOUT_MS = 650;

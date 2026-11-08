@@ -6,6 +6,18 @@
       "sourceType": "github",
       "computedHash": "3c1e3549339c98c44c8c75f676f56ebc0adcd4494ec27b7f1851f7c5a7c2deaf"
     },
+    "animate": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animate/SKILL.md",
+      "computedHash": "f76ddd3d4446c3c56a143ea98650c370b3e8f88e6203d1e22082d2082bf1eed7"
+    },
+    "animation-performance": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animation-performance/SKILL.md",
+      "computedHash": "333f6a387124d0eda927614671f8be3a00d1ddeb9f43cf8b7fa7032630414311"
+    },
     "animation-vocabulary": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -17,6 +29,12 @@
       "sourceType": "github",
       "skillPath": "skills/apple-design/SKILL.md",
       "computedHash": "8b94db67cb9edaad5f1501010804caa610131f1d2dfda0a27664b2e858deade3"
+    },
+    "choreograph": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/choreograph/SKILL.md",
+      "computedHash": "4c0615e0cd41ffbca0c7912dba1f1dd1d84b8a3499a5c393be53df9d1b9dec16"
     },
     "creating-changesets": {
       "source": "saleor/configurator",
@@ -57,6 +75,12 @@
       "sourceType": "github",
       "computedHash": "edc11060f1d6ad004d3db5e750bb1ccc1ddebdbf147ea1386e53ee57171f1dcf"
     },
+    "gestures": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/gestures/SKILL.md",
+      "computedHash": "d89c81c2ddb0ecb44b9f244a69e41073d74277422f80e675fb424f51ffab955b"
+    },
     "improve-animations": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -67,6 +91,12 @@
       "source": "lingui/skills",
       "sourceType": "github",
       "computedHash": "2ebeb243fa39ca3b233d7fe618cfaea89f618b619ceea6a33b708faeca7efc94"
+    },
+    "mobile-native": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mobile-native/SKILL.md",
+      "computedHash": "f221cea36642168df6d3d6d7f236237cbf1ae669138ff7df07775674223d49ad"
     },
     "playwright-best-practices": {
       "source": "currents-dev/playwright-best-practices-skill",
