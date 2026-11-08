@@ -89,8 +89,8 @@ export default function MediaGallery(props: MediaGalleryProps) {
   const ref = useRef<HTMLDivElement>(null);
   const previousPinchOriginRef = useRef<MediaGalleryPoint | null>(null);
 
-  // Track if we're in a "closing drag" gesture (dragging up at scale=1)
-  const isClosingDragRef = useRef(false);
+  // Keep dismissal feedback active through the drag and its snap-back animation.
+  const isDismissalMotionRef = useRef(false);
 
   function getLocalPinchOrigin([originX, originY]: MediaGalleryPoint) {
     const viewport = viewportRef.current;
@@ -143,13 +143,13 @@ export default function MediaGallery(props: MediaGalleryProps) {
         scale.stop();
         // Determine if this is a closing drag (only when not zoomed)
         const currentScale = scale.get();
-        isClosingDragRef.current = currentScale <= 1;
+        isDismissalMotionRef.current = currentScale <= 1;
       },
       onDrag: ({ offset: [offsetX, offsetY], pinching, cancel }) => {
         if (pinching) return cancel();
 
         // If we're in closing drag mode, track the upward movement
-        if (isClosingDragRef.current) {
+        if (isDismissalMotionRef.current) {
           // Only allow vertical movement for closing gesture
           y.set(offsetY);
         } else {
@@ -166,7 +166,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
       }) => {
         const releaseVelocity = velocityY * directionY * 1000;
 
-        if (isClosingDragRef.current) {
+        if (isDismissalMotionRef.current) {
           // Check if we crossed the threshold (dragged far enough in either direction)
           if (
             !canceled &&
@@ -187,14 +187,12 @@ export default function MediaGallery(props: MediaGalleryProps) {
             );
           }
         }
-
-        isClosingDragRef.current = false;
       },
       onPinchStart: ({ origin }) => {
         x.stop();
         y.stop();
         scale.stop();
-        isClosingDragRef.current = false;
+        isDismissalMotionRef.current = false;
         previousPinchOriginRef.current = getLocalPinchOrigin(origin);
         onDragProgress?.(0);
       },
@@ -276,7 +274,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
   );
 
   useMotionValueEvent(y, "change", (value) => {
-    if (scale.get() <= 1) {
+    if (isDismissalMotionRef.current) {
       onDragProgress?.(Math.min(1, Math.abs(value) / CLOSE_THRESHOLD));
     }
   });
@@ -285,6 +283,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
 
   useEffect(() => {
     resetDragProgress();
+    isDismissalMotionRef.current = false;
     x.stop();
     y.stop();
     scale.stop();

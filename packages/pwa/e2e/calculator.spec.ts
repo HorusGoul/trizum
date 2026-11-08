@@ -79,6 +79,47 @@ async function navigateToAddExpense({
 }
 
 test.describe("Expense calculator", () => {
+  test("preserves every cursor step in a fast swipe and clamps at both ends", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 700, height: 800 });
+    await navigateToAddExpense({ autoOpenCalculator: false, harness });
+    await page.getByRole("button", { name: "Open calculator", exact: true }).click();
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    await expect(calculator).toHaveCSS("transform", "none");
+
+    for (const digit of "123456") {
+      await calculator.getByRole("button", { name: digit, exact: true }).click();
+    }
+
+    const expression = calculator.getByLabel("Calculator expression", { exact: true });
+
+    async function swipe(distance: number) {
+      const box = await expression.boundingBox();
+
+      if (!box) throw new Error("Expected the calculator expression");
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x + distance, y);
+      await page.mouse.up();
+    }
+
+    await swipe(-60);
+    await calculator.getByRole("button", { name: "9", exact: true }).click();
+    await expect(expression).toHaveText("1239|456");
+
+    await swipe(300);
+    await calculator.getByRole("button", { name: "8", exact: true }).click();
+    await expect(expression).toHaveText("12394568|");
+
+    await swipe(-300);
+    await calculator.getByRole("button", { name: "7", exact: true }).click();
+    await expect(expression).toHaveText("7|12394568");
+  });
+
   test("keeps one continuous sheet surface during overdrag at wider mobile widths", async ({
     harness,
     page,

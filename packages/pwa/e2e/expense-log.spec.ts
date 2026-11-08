@@ -277,6 +277,49 @@ test.describe("Expense log", () => {
     await expect(page).not.toHaveURL(/[?&]media=/);
   });
 
+  test("keeps the gallery backdrop opaque during off-center pinch zoom", async ({
+    harness,
+    page,
+  }) => {
+    const seededParty = await harness.seedJoinedParty({
+      fixture: createExpenseLogFixture(1),
+      memberParticipantId: defaultParticipants.blair.id,
+    });
+
+    await harness.navigate(`/party/${seededParty.partyId}/add`);
+    await page.locator('input[aria-label="Upload photo"]').setInputFiles("public/pwa-192x192.png");
+    await page.getByRole("button", { name: "View photo" }).click();
+    const image = page.locator("[data-media-gallery-image]");
+    const overlay = page.locator("[data-media-gallery-overlay]");
+    await expect(image).toBeVisible();
+    const box = await image.boundingBox();
+
+    if (!box) throw new Error("Expected the gallery image");
+
+    for (const deltaY of [-20, -50, -100, 600]) {
+      // Ctrl+wheel is use-gesture's desktop pinch input, including rubber-banding below 1x.
+      await image.dispatchEvent("wheel", {
+        deltaY,
+        ctrlKey: true,
+        clientX: box.x + box.width / 2,
+        clientY: box.y + box.height / 2 - 70,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      const scale = expect.poll(() =>
+        image.evaluate(
+          (element) => new DOMMatrixReadOnly(getComputedStyle(element.parentElement!).transform).a,
+        ),
+      );
+
+      if (deltaY < 0) await scale.toBeGreaterThan(1);
+      else await scale.toBeLessThan(1);
+
+      await expect(overlay).toHaveCSS("background-color", "rgba(0, 0, 0, 0.25)");
+    }
+  });
+
   test("restores the gallery backdrop after closing with a drag gesture", async ({
     harness,
     page,
