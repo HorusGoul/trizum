@@ -34,8 +34,10 @@ second JSON copy, preserving the full structured data for follow-up actions.
 
 Return canonical app-associated invite URLs from all MCP hosts. Installed apps can
 open directly; browser visitors receive app-download or web choices on a separate
-custom domain hosted by the same Worker, with the existing trizum logo identifying
-the download page. Space the logo, headings and sections consistently, with a
+custom domain hosted by the same Worker. Identify the download page with the
+sign-in screen's small logo treatment beside the lowercase trizum name and a
+"Your party is ready" heading, localized in English and Spanish.
+Space the branding, headings and sections consistently, with a
 separate emoji gap and aligned wrapping for long group names. Keep mobile content
 near the top with comfortable padding. Preserve the party through desktop QR codes, invite copying
 and the existing web join flow. Track only approved campaign labels under existing

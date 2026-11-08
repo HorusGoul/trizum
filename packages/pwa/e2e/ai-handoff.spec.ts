@@ -9,7 +9,7 @@ test("AI invite offers stores and continues through the existing party join flow
 }) => {
   const seeded = await harness.seedJoinableParty(createPartyFixture());
   await harness.goto(`${seeded.joinUrl}?${campaign}`);
-  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your party is ready" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Who are you?" })).toBeHidden();
   await expect(page.getByRole("figure", { name: "Invite QR code" })).toBeVisible();
   const apple = page.getByRole("link", { name: "Download on the App Store" });
@@ -34,7 +34,7 @@ test("AI invite offers stores and continues through the existing party join flow
   await harness.selectParticipantIdentity("Alex");
   await expect(page).toHaveURL(new RegExp(`/party/${seeded.partyId}\\?tab=expenses$`));
   expect((await harness.readPartyList()).parties[seeded.partyId]).toBe(true);
-  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Your party is ready" })).toBeHidden();
 });
 
 test.describe("Android acquisition", () => {
@@ -79,7 +79,7 @@ test("campaign labels alone leave the ordinary invite flow intact", async ({ har
   const seeded = await harness.seedJoinableParty(createPartyFixture());
   await harness.goto(`${seeded.joinUrl}?${campaign.replace("entry=ai&", "")}`);
   await expect(page.getByRole("heading", { name: "Who are you?" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeHidden();
+  await expect(page.getByRole("heading", { name: "Your party is ready" })).toBeHidden();
 });
 
 test("production browser fallback crosses hosts and preserves the party for app and web choices", async ({
@@ -116,9 +116,9 @@ test("production browser fallback crosses hosts and preserves the party for app 
   await page.goto(
     `https://join.trizum.app${seeded.joinUrl}/continue?${campaign}&__internal_offline_only=true`,
   );
-  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your party is ready" })).toBeVisible();
   await page.goto(`https://trizum.app${seeded.joinUrl}?${campaign}&__internal_offline_only=true`);
-  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your party is ready" })).toBeVisible();
   await expect(page).toHaveURL(
     new RegExp(`^https://join\\.trizum\\.app/party/${seeded.partyId}/continue\\?`),
   );

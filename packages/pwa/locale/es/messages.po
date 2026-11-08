@@ -339,7 +339,7 @@ msgstr "AdMob puede crear un ID propio del editor seudónimo que reconoce un dis
 msgid "Afghan Afghani"
 msgstr "Afgani Afgano"
 
-#: src/routes/party_.$partyId.continue.tsx:132
+#: src/routes/party_.$partyId.continue.tsx:136
 msgid "After installing, reopen this invite to join your group. No account is needed."
 msgstr "Después de instalar la app, vuelve a abrir esta invitación para unirte al grupo. No necesitas una cuenta."
 
@@ -371,7 +371,7 @@ msgstr "Todas las comprobaciones del gasto se han superado"
 msgid "All time"
 msgstr "Todo el tiempo"
 
-#: src/routes/party_.$partyId.continue.tsx:143
+#: src/routes/party_.$partyId.continue.tsx:147
 msgid "Already have trizum? Open your group"
 msgstr "¿Ya tienes trizum? Abre tu grupo"
 
@@ -991,7 +991,7 @@ msgstr "Conexiones"
 msgid "Contact Us"
 msgstr "Contacto"
 
-#: src/routes/party_.$partyId.continue.tsx:178
+#: src/routes/party_.$partyId.continue.tsx:182
 msgid "Continue on the web"
 msgstr "Continuar en la web"
 
@@ -1015,7 +1015,7 @@ msgstr "Colaboradores"
 msgid "Copy code"
 msgstr "Copiar código"
 
-#: src/routes/party_.$partyId.continue.tsx:194
+#: src/routes/party_.$partyId.continue.tsx:198
 msgid "Copy invite link"
 msgstr "Copiar enlace de invitación"
 
@@ -1648,7 +1648,7 @@ msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otr
 msgid "Get it on Google Play"
 msgstr "Descargar en Google Play"
 
-#: src/routes/party_.$partyId.continue.tsx:121
+#: src/routes/party_.$partyId.continue.tsx:125
 msgid "Get the app to track shared expenses with your group, even offline."
 msgstr "Descarga la app para llevar los gastos compartidos de tu grupo, incluso sin conexión."
 
@@ -1904,7 +1904,7 @@ msgstr "Código de grupo de trizum no válido"
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
-#: src/routes/party_.$partyId.continue.tsx:152
+#: src/routes/party_.$partyId.continue.tsx:156
 msgid "Invite QR code"
 msgstr "Código QR de invitación"
 
@@ -2554,7 +2554,7 @@ msgstr "Abrir paréntesis"
 msgid "Open the installed trizum app and sign in to the account you want to use for Premium."
 msgstr "Abre la app de trizum instalada e inicia sesión en la cuenta que quieras usar para Premium."
 
-#: src/routes/party_.$partyId.continue.tsx:150
+#: src/routes/party_.$partyId.continue.tsx:154
 msgid "Open this invite on your phone"
 msgstr "Abre esta invitación en tu teléfono"
 
@@ -2738,7 +2738,7 @@ msgstr "¡Detalles del grupo guardados!"
 msgid "Party leaderboard"
 msgstr "Clasificación del grupo"
 
-#: src/routes/party_.$partyId.continue.tsx:187
+#: src/routes/party_.$partyId.continue.tsx:191
 #: src/routes/party_.$partyId.share.tsx:50
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
@@ -3258,7 +3258,7 @@ msgstr "Seleccionar emoji"
 msgid "Select everyone now and automatically include new participants."
 msgstr "Selecciona a todos ahora e incluye automáticamente a los nuevos participantes."
 
-#: src/routes/party_.$partyId.continue.tsx:199
+#: src/routes/party_.$partyId.continue.tsx:203
 msgid "Select this link to copy your invite:"
 msgstr "Selecciona este enlace para copiar la invitación:"
 
@@ -4502,10 +4502,6 @@ msgstr "No se pudo comprobar tu cuenta. Conéctate a internet y vuelve a intenta
 msgid "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 msgstr "Tus datos se almacenan localmente en tu dispositivo y se sincronizan con los servidores de trizum para colaborar. Los datos se cifran durante la transmisión. Los grupos se comparten mediante enlaces - cualquiera con el enlace puede acceder al grupo. Consulta nuestra Política de Privacidad para más detalles."
 
-#: src/routes/party_.$partyId.continue.tsx:113
-msgid "Your group is ready"
-msgstr "Tu grupo está listo"
-
 #: src/components/PartyPendingComponent.tsx:27
 msgid "Your internet connection might be too slow."
 msgstr "Tu conexión a internet puede ser demasiado lenta."
@@ -4521,6 +4517,10 @@ msgstr "Podrás volver a mover Party Boost el {transferableDate}."
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:246
 msgid "Your Party Boost is active elsewhere and can be moved here."
 msgstr "Tu Party Boost está activo en otro grupo y puedes moverlo aquí."
+
+#: src/routes/party_.$partyId.continue.tsx:117
+msgid "Your party is ready"
+msgstr "Tu Grupo está listo"
 
 #: src/routes/party_.$partyId.settings/-components/PartyBoostCard.tsx:219
 msgid "Your Premium is boosting this party for everyone in it."

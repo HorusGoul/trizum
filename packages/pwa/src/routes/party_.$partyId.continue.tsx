@@ -100,17 +100,21 @@ function AiInvite() {
   return (
     <main className="container flex min-h-full flex-col gap-8 px-5 py-8 sm:justify-center sm:px-8 sm:py-12">
       <header className="flex flex-col gap-6">
-        <img
-          src="/pwa-192x192.png"
-          alt="trizum"
-          width={64}
-          height={64}
-          className="size-16 rounded-2xl"
-        />
+        <div className="flex items-center gap-3">
+          <img
+            src="/pwa-64x64.png"
+            srcSet="/pwa-192x192.png 3x"
+            alt=""
+            width={48}
+            height={48}
+            className="size-12 rounded-xl"
+          />
+          <span className="text-2xl font-bold tracking-tight">trizum</span>
+        </div>
         <div className="space-y-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">
-              <Trans>Your group is ready</Trans>
+              <Trans>Your party is ready</Trans>
             </h1>
             <h2 className="flex items-start gap-3 text-xl leading-7 font-semibold">
               {party.symbol && <span className="shrink-0">{party.symbol}</span>}
