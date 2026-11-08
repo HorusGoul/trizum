@@ -197,7 +197,9 @@ describe("Worker document reads over WebSocket", () => {
     });
 
     const [alice, bob, carol] = party.participants;
-    expect(party.url).toBe(`https://trizum.app/party/${party.partyId}`);
+    expect(party.url).toBe(
+      `https://trizum.app/party/${party.partyId}?entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`,
+    );
 
     const expenseInput = {
       requestId: crypto.randomUUID(),

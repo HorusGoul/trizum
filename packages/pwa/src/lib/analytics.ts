@@ -41,6 +41,7 @@ export function initializeAnalytics(routes: readonly string[]) {
       canCollect: () =>
         !hasPrivacySignal(navigator) && !isAutomatedBrowser(navigator) && navigator.onLine,
     });
+    captureAnalyticsCampaign(window.location.search);
   } catch {
     // A bad optional endpoint must not prevent the app from starting.
   }
@@ -130,7 +131,12 @@ export function bindAnalytics(handle: DocHandle<PartyList>, getPathname: () => s
 }
 
 export function trackPage(pathname: string) {
+  captureAnalyticsCampaign(window.location.search);
   client?.page(pathname);
+}
+
+export function captureAnalyticsCampaign(search: string) {
+  client?.captureCampaign(search);
 }
 
 export function trackEvent(event: AnalyticsEvent) {

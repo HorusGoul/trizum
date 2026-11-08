@@ -1,7 +1,10 @@
+import type { AppSearch } from "#src/lib/routerSearch.ts";
 import { trackEvent } from "#src/lib/analytics.ts";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Capacitor } from "@capacitor/core";
+import { parseAiInviteSearch, type AiInviteSearch } from "#src/lib/aiInvite.ts";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -22,13 +25,28 @@ import { loadVisiblePartyExpenseChunks } from "#src/lib/partyPaginatedExpenses.t
 import { Balances } from "./-components/Balances.js";
 import { ExpenseLog } from "./-components/ExpenseLog.js";
 
-interface PartyByIdSearchParams {
+interface PartyByIdSearchParams extends AiInviteSearch {
   tab: "expenses" | "balances";
 }
 
 export const Route = createFileRoute("/party/$partyId")({
   component: PartyById,
   pendingComponent: PartyPendingComponent,
+  validateSearch: (search: AppSearch): PartyByIdSearchParams => {
+    const tab = search.tab === "balances" ? "balances" : "expenses";
+
+    return { tab, ...parseAiInviteSearch(search) };
+  },
+  beforeLoad: ({ search, params }) => {
+    if (search.entry === "ai" && !Capacitor.isNativePlatform()) {
+      throw redirect({
+        to: "/party/$partyId/continue",
+        params,
+        search: { ...search },
+        replace: true,
+      });
+    }
+  },
   loader: async ({ context, params: { partyId }, location }) => {
     const { party } = await guardParticipatingInParty(partyId, context, location);
 
@@ -38,11 +56,6 @@ export const Route = createFileRoute("/party/$partyId")({
     );
 
     return;
-  },
-  validateSearch: (search): PartyByIdSearchParams => {
-    const tab = search.tab === "balances" ? "balances" : "expenses";
-
-    return { tab };
   },
 });
 

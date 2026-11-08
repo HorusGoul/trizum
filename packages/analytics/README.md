@@ -32,6 +32,13 @@ on an internal protocol: when upgrading the deployment, check the upstream
 and [collector](https://github.com/RavelloH/InsightFlare/blob/main/src/lib/edge/collector/collect.ts).
 Never fall back to executing the remote SDK.
 
+Browser acquisition attribution accepts only the fixed labels in
+[`campaign.ts`](./src/campaign.ts). The client reconstructs the three approved
+UTM fields; it never forwards a raw query string. Attribution stays in memory
+through party-join redirects, is attached to visit snapshots, and is cleared when
+collection is disabled or profiles change. It does not track an invite or restore
+party context after installing an app.
+
 The first-party proxy handles native CORS. A Cloudflare service binding preserves
 the client IP and location metadata that public cross-zone fetches can replace;
 bootstrap and collection must use the same forwarding path for IP-bound tokens.

@@ -44,3 +44,9 @@ Use the host’s frame for the embedded widget, removing its nested card surface
 
 Apply trizum’s shared background colors to the widget document and include
 responsive content padding in host-driven height measurements.
+
+Guide visitors from agent-created parties to platform-specific app downloads or
+the existing web join flow. Preserve canonical invite compatibility, offer a
+desktop QR code and copyable link, and keep attribution limited to approved UTM
+labels under existing analytics privacy gates. Store clicks measure intent only;
+party context stays in the original invite without deferred-install tracking.

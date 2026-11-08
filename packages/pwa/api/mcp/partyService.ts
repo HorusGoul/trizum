@@ -1,3 +1,5 @@
+import { MCP_HANDOFF_CAMPAIGN } from "@trizum/analytics";
+import { createAiInviteUrl } from "../../src/lib/aiInvite";
 import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo";
 import {
   McpToolError,
@@ -235,7 +237,7 @@ export class WorkerPartyService implements PartyService {
   ): PartyView {
     return {
       partyId: party.id,
-      url: new URL(`/party/${party.id}`, this.origin).href,
+      url: createAiInviteUrl(this.origin, party.id, MCP_HANDOFF_CAMPAIGN),
       name: party.name,
       description: party.description,
       symbol: party.symbol ?? "🏝️",

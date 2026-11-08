@@ -19,6 +19,8 @@
     "./src/lib/money.ts",
     "./src/lib/recalculatePartyBalances.ts",
     "./src/lib/mcpMessages.ts",
+    "./src/lib/aiInvite.ts",
+    "./src/lib/routerSearch.ts",
     "./src/models/expense.ts",
     "./src/lib/tricountMigration.ts",
     "./src/models/migrationData.ts",

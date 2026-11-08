@@ -16,6 +16,25 @@ Automated browsers are excluded through `navigator.webdriver` and explicit
 Playwright/headless user-agent markers. The proxy also drops marked automation;
 ordinary Chrome and Safari device user agents remain eligible for collection.
 
+## AI invite acquisition
+
+MCP party links use `entry=ai` to show download and web choices. Campaign labels
+(`utm_source=mcp` or `chatgpt`, `utm_medium=ai_app`, and
+`utm_campaign=party_handoff`) are independently validated by `@trizum/analytics`.
+Only this fixed combination can become the outgoing visit query; party IDs,
+redirect URLs, codes, and other query values are discarded. Initial browser and
+validated native deep-link campaigns are captured before join redirects.
+Attribution stays in memory, follows subsequent pages and events, and is cleared
+when analytics is disabled, offline, or changes profiles. Existing environment,
+preference, DNT/GPC, and automation gates apply.
+
+The handoff pageview counts exposure; store, app-open, and web-continue events
+count requested actions. They do not confirm installations or native launches.
+Existing party-join events measure web activation. Store links carry neither the
+party ID nor campaign parameters and suppress the referrer. There is no deferred
+install tracking: after installing, users reopen the invite. Server action counts
+cannot be joined to individual browser sessions.
+
 ## Anonymous MCP server events
 
 The MCP route uses `@trizum/analytics`'s `createAnonymousServerAnalytics` for

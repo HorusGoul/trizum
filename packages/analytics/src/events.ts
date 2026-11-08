@@ -1,5 +1,13 @@
 /** Approved names and meanings. No event accepts caller-supplied properties. */
 export const analyticsEvents = {
+  ai_handoff_app_store_requested:
+    "The user followed the App Store link from an AI invite; installation is not confirmed.",
+  ai_handoff_play_store_requested:
+    "The user followed the Google Play link from an AI invite; installation is not confirmed.",
+  ai_handoff_app_open_requested:
+    "The user followed the existing-app party link from an AI invite; native launch is not confirmed.",
+  ai_handoff_web_continue_requested:
+    "The user chose to continue an AI invite through the normal web join flow.",
   mcp_party_created: "An MCP create_party action completed; successful replays are excluded.",
   mcp_party_viewed: "An explicit MCP get_party action completed; internal reads are excluded.",
   mcp_participants_added:

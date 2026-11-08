@@ -283,3 +283,22 @@ tests do not establish directory approval or live ChatGPT compatibility.
 - [Bring your app to ChatGPT](https://learn.chatgpt.com/use-cases/chatgpt-apps)
 - [MCP server and UI quickstart](https://developers.openai.com/plugins/build/app-quickstart)
 - [Add UI to your MCP server](https://developers.openai.com/plugins/build/chatgpt-ui)
+
+## Acquisition handoff
+
+Every returned party URL preserves `/party/<id>` and adds
+`entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`.
+Browser visitors see `/party/<id>/continue`, with platform-appropriate App Store
+or Google Play links, a desktop invite QR code, a copyable invite, and a web
+continuation. Continuing uses the existing participant selection and party route.
+The page reads only the party document; it does not load expense history or add
+membership before the visitor chooses to join. Installed native apps retain the
+existing invite behavior, including apps released before this entry flag.
+
+The entry flag controls the page independently of attribution. The shared
+analytics package accepts only approved campaign labels, under existing browser
+privacy gates. Generic MCP results identify the source as `mcp`; they do not
+claim a specific host. Store clicks are requests, not measured installs. There is
+no short-link database, server-side campaign state, or deferred-install lookup;
+users reopen the original invite after installing. Ordinary PWA share links are
+unchanged.
