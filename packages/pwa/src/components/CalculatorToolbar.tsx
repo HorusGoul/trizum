@@ -330,30 +330,34 @@ function useExpressionPointerGestures({
     if (!expressionEl) return;
 
     function handlePointerDown(e: PointerEvent) {
+      if (!e.isPrimary || e.button !== 0) return;
       pointerStartRef.current = { x: e.clientX, totalMovement: 0 };
       dragAccumulatorRef.current = 0;
       expressionEl!.setPointerCapture(e.pointerId);
     }
 
     function handlePointerMove(e: PointerEvent) {
-      if (!pointerStartRef.current) return;
+      if (!pointerStartRef.current || !expressionEl!.hasPointerCapture(e.pointerId)) return;
 
       const deltaX = e.clientX - pointerStartRef.current.x;
       pointerStartRef.current.totalMovement += Math.abs(deltaX);
       const newAccumulator = dragAccumulatorRef.current + deltaX;
 
-      if (Math.abs(newAccumulator) >= DRAG_THRESHOLD) {
-        const direction = newAccumulator > 0 ? "right" : "left";
+      const steps = Math.trunc(newAccumulator / DRAG_THRESHOLD);
+      const direction = steps > 0 ? "right" : "left";
+
+      for (let step = 0; step < Math.abs(steps); step++) {
         callbacksRef.current.onMoveCursor(direction);
-        dragAccumulatorRef.current = 0;
-      } else {
-        dragAccumulatorRef.current = newAccumulator;
       }
+
+      dragAccumulatorRef.current = newAccumulator - steps * DRAG_THRESHOLD;
 
       pointerStartRef.current.x = e.clientX;
     }
 
     function handlePointerUp(e: PointerEvent) {
+      if (!expressionEl!.hasPointerCapture(e.pointerId)) return;
+
       if (pointerStartRef.current && pointerStartRef.current.totalMovement < TAP_THRESHOLD) {
         const clickX = e.clientX;
         let bestPosition = 0;
@@ -404,12 +408,14 @@ function useExpressionPointerGestures({
     expressionEl.addEventListener("pointermove", handlePointerMove);
     expressionEl.addEventListener("pointerup", handlePointerUp);
     expressionEl.addEventListener("pointercancel", handlePointerCancel);
+    expressionEl.addEventListener("lostpointercapture", handlePointerCancel);
 
     return () => {
       expressionEl.removeEventListener("pointerdown", handlePointerDown);
       expressionEl.removeEventListener("pointermove", handlePointerMove);
       expressionEl.removeEventListener("pointerup", handlePointerUp);
       expressionEl.removeEventListener("pointercancel", handlePointerCancel);
+      expressionEl.removeEventListener("lostpointercapture", handlePointerCancel);
     };
   }, [callbacksRef, charRefs, dragAccumulatorRef, expression, expressionRef, pointerStartRef]);
 }

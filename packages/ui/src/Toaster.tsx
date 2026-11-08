@@ -18,7 +18,7 @@ export function Toaster() {
       offset={toastOffset}
       mobileOffset={toastMobileOffset}
       style={toastStyle}
-      swipeDirections={["bottom", "right", "left"]}
+      swipeDirections={["bottom"]}
       icons={toastIcons}
       toastOptions={{
         unstyled: true,

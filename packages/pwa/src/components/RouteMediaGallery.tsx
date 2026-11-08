@@ -1,5 +1,5 @@
 import { Modal, ModalOverlay } from "react-aria-components";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useRef } from "react";
 import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import MediaGallery, { MediaGalleryImage } from "@trizum/ui/MediaGallery";
 import { useSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
@@ -30,36 +30,33 @@ export function RouteMediaGallery({
   const selectedPhotoId = galleryIndex === undefined ? undefined : photoIds[galleryIndex];
 
   // Track drag progress for background opacity animation
-  const [dragProgress, setDragProgress] = useState(0);
-  const [wasOpen, setWasOpen] = useState(isOpen);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
-  if (isOpen !== wasOpen) {
-    setWasOpen(isOpen);
+  function setDragProgress(progress: number) {
+    const overlay = overlayRef.current;
 
-    if (isOpen) {
-      setDragProgress(0);
-    }
+    if (!overlay) return;
+    overlay.style.backgroundColor = `rgba(0, 0, 0, ${0.25 * (1 - progress)})`;
+    overlay.style.backdropFilter = `blur(${8 * (1 - progress)}px)`;
+    overlay.style.setProperty("-webkit-backdrop-filter", `blur(${8 * (1 - progress)}px)`);
   }
 
   function handleDragProgress(progress: number) {
     setDragProgress(progress);
   }
 
-  // Calculate background opacity and blur based on drag progress
-  const backgroundOpacity = 0.25 * (1 - dragProgress);
-  const backdropBlur = `blur(${(1 - dragProgress) * 8}px)`;
-
   return (
     <ModalOverlay
+      ref={overlayRef}
       data-media-gallery-overlay=""
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
         `fixed inset-0 isolate z-50 ${isEntering ? "animate-in fade-in duration-300 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-200 ease-in" : ""} `
       }
       style={{
-        backgroundColor: `rgba(0, 0, 0, ${backgroundOpacity})`,
-        backdropFilter: backdropBlur,
-        WebkitBackdropFilter: backdropBlur,
+        backgroundColor: "rgba(0, 0, 0, 0.25)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
       }}
     >
       <Modal className="h-full w-full">

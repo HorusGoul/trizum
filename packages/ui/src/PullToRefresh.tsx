@@ -6,6 +6,7 @@ import {
   m as motion,
   useMotionValue,
   useTransform,
+  useReducedMotion,
   type AnimationPlaybackControls,
 } from "motion/react";
 import { Icon } from "./Icon.js";
@@ -31,6 +32,7 @@ export function PullToRefresh({
   refreshAction: () => Promise<void>;
   scrollElementRef: RefObject<HTMLDivElement | null>;
 }) {
+  const reducedMotion = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const refreshActionRef = useRef(refreshAction);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -72,7 +74,7 @@ export function PullToRefresh({
     stopPullAnimation();
 
     const animation = animate(pullDistance, value, {
-      ...indicatorSpring,
+      ...(reducedMotion ? { duration: 0.1 } : indicatorSpring),
       onComplete: () => {
         if (pullAnimationRef.current === animation) {
           pullAnimationRef.current = null;
@@ -131,7 +133,7 @@ export function PullToRefresh({
   }
 
   function onTouchStart(event: TouchEvent) {
-    if (isRefreshingRef.current || !isScrolledToTop()) {
+    if (event.touches.length !== 1 || isRefreshingRef.current || !isScrolledToTop()) {
       return;
     }
 
@@ -141,10 +143,21 @@ export function PullToRefresh({
       return;
     }
 
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    const currentDistance = pullDistance.get();
+    stopPullAnimation();
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY - currentDistance / 0.55 };
   }
 
   function onTouchMove(event: TouchEvent) {
+    if (event.touches.length !== 1) {
+      if (touchStartRef.current && !isRefreshingRef.current) {
+        touchStartRef.current = null;
+        animatePullDistance(0);
+      }
+
+      return;
+    }
+
     const start = touchStartRef.current;
     const touch = event.touches[0];
 
@@ -179,10 +192,19 @@ export function PullToRefresh({
       event.preventDefault();
     }
 
-    setPullDistance(Math.min(yDistance * 0.55, maxPullDistance));
+    const distance = yDistance * 0.55;
+    setPullDistance(
+      distance <= refreshThreshold
+        ? distance
+        : refreshThreshold +
+            (maxPullDistance - refreshThreshold) *
+              (1 - Math.exp(-(distance - refreshThreshold) / (maxPullDistance - refreshThreshold))),
+    );
   }
 
   function onTouchEnd() {
+    if (!touchStartRef.current || isRefreshingRef.current) return;
+
     const shouldRefresh = pullDistance.get() >= refreshThreshold;
 
     touchStartRef.current = null;
@@ -197,6 +219,7 @@ export function PullToRefresh({
   }
 
   function onTouchCancel() {
+    if (!touchStartRef.current || isRefreshingRef.current) return;
     touchStartRef.current = null;
     animatePullDistance(0);
   }
