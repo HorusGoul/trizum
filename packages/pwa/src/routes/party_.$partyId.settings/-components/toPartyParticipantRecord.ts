@@ -15,6 +15,11 @@ export function toPartyParticipantRecord(
           }
         : { ...participant };
 
+    // Nested Automerge objects must be detached before writing the record back.
+    if (savedParticipant.paymentMethods !== undefined) {
+      savedParticipant.paymentMethods = { ...savedParticipant.paymentMethods };
+    }
+
     result[savedParticipant.id] = savedParticipant;
   }
 
