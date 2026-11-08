@@ -1,3 +1,4 @@
+import { UnconfirmedDocumentWriteError } from "../automergeDocuments";
 import { MCP_HANDOFF_CAMPAIGN } from "@trizum/analytics";
 import { createAiInviteUrl } from "../../src/lib/aiInvite";
 import { isValidDocumentId, type DocumentId } from "@automerge/automerge-repo";
@@ -59,16 +60,27 @@ export class WorkerPartyService implements PartyService {
       }),
     );
 
-    const party = await this.documents.create<Party>((id) => ({
-      id,
-      type: "party",
-      name: input.name,
-      description: input.description,
-      symbol: input.symbol,
-      currency,
-      participants,
-      chunkRefs: [],
-    }));
+    const party = await this.documents
+      .create<Party>((id) => ({
+        id,
+        type: "party",
+        name: input.name,
+        description: input.description,
+        symbol: input.symbol,
+        currency,
+        participants,
+        chunkRefs: [],
+      }))
+      .catch((error) => {
+        if (error instanceof UnconfirmedDocumentWriteError) {
+          const url = createAiInviteUrl(this.origin, error.documentId, MCP_HANDOFF_CAMPAIGN);
+          throw new McpToolError(
+            `Party creation could not be confirmed. It may have reached trizum. Check ${url} with get_party before creating another party. Reuse the same requestId on retries.`,
+          );
+        }
+
+        throw error;
+      });
 
     return this.view(party, []);
   }

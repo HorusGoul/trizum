@@ -50,3 +50,16 @@ the existing web join flow. Preserve canonical invite compatibility, offer a
 desktop QR code and copyable link, and keep attribution limited to approved UTM
 labels under existing analytics privacy gates. Store clicks measure intent only;
 party context stays in the original invite without deferred-install tracking.
+
+Keep native app links on the existing associated domain and serve production
+browser download choices from a separate custom domain on the same Worker.
+This lets Safari launch an already-installed app from the handoff page, while
+preserving the party and approved campaign labels for app and web choices.
+
+Include the known party link when creation loses its sync acknowledgement, so
+agents can check the uncertain result without creating another group. Keep the
+write unconfirmed and preserve existing retry protection without extra database
+operations.
+
+Return canonical app-associated invite URLs from preview and Worker aliases too,
+so installed apps can open directly from agent widgets without a download page.

@@ -19,6 +19,16 @@ import type { ApiEnv } from "./env";
 const logger = getLogger("api", "automergeDocuments");
 const DEFAULT_TIMEOUT_MS = 10_000;
 
+/** A new document ID exists, but the peer has not confirmed its write. */
+export class UnconfirmedDocumentWriteError extends Error {
+  constructor(
+    readonly documentId: DocumentId,
+    cause: ErrorOptions["cause"],
+  ) {
+    super("Document creation was not acknowledged by the sync peer.", { cause });
+  }
+}
+
 interface AutomergeDocumentsOptions {
   env: Pick<ApiEnv, "AUTOMERGE_WSS_URL">;
   request: Request;
@@ -74,10 +84,14 @@ export class AutomergeDocuments {
     const handle = repo.create<T>();
     this.#requestedIds.add(handle.documentId);
 
-    return this.#acknowledge(handle, (doc) => {
-      Object.assign(doc, initialize(handle.documentId));
-      repo.shareConfigChanged();
-    });
+    try {
+      return await this.#acknowledge(handle, (doc) => {
+        Object.assign(doc, initialize(handle.documentId));
+        repo.shareConfigChanged();
+      });
+    } catch (error) {
+      throw new UnconfirmedDocumentWriteError(handle.documentId, error);
+    }
   }
 
   /** Wait for the connected sync peer to acknowledge the change before returning. */

@@ -347,7 +347,7 @@ msgstr "Advanced"
 msgid "Afghan Afghani"
 msgstr "Afghan Afghani"
 
-#: src/routes/party_.$partyId.continue.tsx:107
+#: src/routes/party_.$partyId.continue.tsx:121
 msgid "After installing, reopen this invite to join your group. No account is needed."
 msgstr "After installing, reopen this invite to join your group. No account is needed."
 
@@ -379,7 +379,7 @@ msgstr "All expense checks passed"
 msgid "All time"
 msgstr "All time"
 
-#: src/routes/party_.$partyId.continue.tsx:118
+#: src/routes/party_.$partyId.continue.tsx:132
 msgid "Already have trizum? Open your group"
 msgstr "Already have trizum? Open your group"
 
@@ -587,16 +587,16 @@ msgstr "Bahamian Dollar"
 msgid "Bahraini Dinar"
 msgstr "Bahraini Dinar"
 
-#: src/routes/party.$partyId/route.tsx:192
+#: src/routes/party.$partyId/route.tsx:205
 msgid "Balance, Highest First"
 msgstr "Balance, Highest First"
 
-#: src/routes/party.$partyId/route.tsx:176
+#: src/routes/party.$partyId/route.tsx:189
 msgid "Balance, Lowest First"
 msgstr "Balance, Lowest First"
 
 #: src/lib/mcpMessages.ts:5
-#: src/routes/party.$partyId/route.tsx:320
+#: src/routes/party.$partyId/route.tsx:333
 msgid "Balances"
 msgstr "Balances"
 
@@ -1015,7 +1015,7 @@ msgstr "Connections"
 msgid "Contact Us"
 msgstr "Contact Us"
 
-#: src/routes/party_.$partyId.continue.tsx:146
+#: src/routes/party_.$partyId.continue.tsx:167
 msgid "Continue on the web"
 msgstr "Continue on the web"
 
@@ -1039,7 +1039,7 @@ msgstr "Contributors"
 msgid "Copy code"
 msgstr "Copy code"
 
-#: src/routes/party_.$partyId.continue.tsx:162
+#: src/routes/party_.$partyId.continue.tsx:183
 msgid "Copy invite link"
 msgstr "Copy invite link"
 
@@ -1349,7 +1349,7 @@ msgstr "Djiboutian Franc"
 msgid "Dominican Peso"
 msgstr "Dominican Peso"
 
-#: src/routes/party_.$partyId.continue.tsx:60
+#: src/routes/party_.$partyId.continue.tsx:75
 msgid "Download on the App Store"
 msgstr "Download on the App Store"
 
@@ -1561,7 +1561,7 @@ msgid "Expense updated"
 msgstr "Expense updated"
 
 #: src/routes/party_.$partyId.settings/index.tsx:52
-#: src/routes/party.$partyId/route.tsx:314
+#: src/routes/party.$partyId/route.tsx:327
 msgid "Expenses"
 msgstr "Expenses"
 
@@ -1688,11 +1688,11 @@ msgstr "Georgian Lari"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 
-#: src/routes/party_.$partyId.continue.tsx:62
+#: src/routes/party_.$partyId.continue.tsx:77
 msgid "Get it on Google Play"
 msgstr "Get it on Google Play"
 
-#: src/routes/party_.$partyId.continue.tsx:97
+#: src/routes/party_.$partyId.continue.tsx:111
 msgid "Get the app to track shared expenses with your group, even offline."
 msgstr "Get the app to track shared expenses with your group, even offline."
 
@@ -1952,7 +1952,7 @@ msgstr "Invalid trizum party code"
 msgid "Invalid trizum party link"
 msgstr "Invalid trizum party link"
 
-#: src/routes/party_.$partyId.continue.tsx:127
+#: src/routes/party_.$partyId.continue.tsx:141
 msgid "Invite QR code"
 msgstr "Invite QR code"
 
@@ -2108,7 +2108,7 @@ msgstr "Last year"
 msgid "Leave at zero for an empty amount"
 msgstr "Leave at zero for an empty amount"
 
-#: src/routes/party.$partyId/route.tsx:298
+#: src/routes/party.$partyId/route.tsx:311
 msgid "Leave party"
 msgstr "Leave party"
 
@@ -2239,7 +2239,7 @@ msgstr "Me"
 
 #: src/components/ExpenseEditor.tsx:381
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:98
-#: src/routes/party.$partyId/route.tsx:204
+#: src/routes/party.$partyId/route.tsx:217
 msgid "Menu"
 msgstr "Menu"
 
@@ -2333,7 +2333,7 @@ msgstr "Myanma Kyat"
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:24
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:264
-#: src/routes/party.$partyId/route.tsx:160
+#: src/routes/party.$partyId/route.tsx:173
 msgid "Name"
 msgstr "Name"
 
@@ -2552,7 +2552,7 @@ msgstr "One-time codes"
 msgid "Only affects you. Skip the template picker when you add an expense."
 msgstr "Only affects you. Skip the template picker when you add an expense."
 
-#: src/routes/party.$partyId/route.tsx:243
+#: src/routes/party.$partyId/route.tsx:256
 msgid "Only show your expenses"
 msgstr "Only show your expenses"
 
@@ -2610,7 +2610,7 @@ msgstr "Open parenthesis"
 msgid "Open the installed trizum app and sign in to the account you want to use for Premium."
 msgstr "Open the installed trizum app and sign in to the account you want to use for Premium."
 
-#: src/routes/party_.$partyId.continue.tsx:125
+#: src/routes/party_.$partyId.continue.tsx:139
 msgid "Open this invite on your phone"
 msgstr "Open this invite on your phone"
 
@@ -2806,7 +2806,7 @@ msgstr "Party is completely balanced!"
 msgid "Party leaderboard"
 msgstr "Party leaderboard"
 
-#: src/routes/party_.$partyId.continue.tsx:155
+#: src/routes/party_.$partyId.continue.tsx:176
 #: src/routes/party_.$partyId.share.tsx:50
 msgid "Party link copied to clipboard!"
 msgstr "Party link copied to clipboard!"
@@ -2913,7 +2913,7 @@ msgstr "Permanently delete your trizum cloud account"
 msgid "Personal"
 msgstr "Personal"
 
-#: src/routes/party.$partyId/route.tsx:239
+#: src/routes/party.$partyId/route.tsx:252
 msgid "Personal mode"
 msgstr "Personal mode"
 
@@ -3318,7 +3318,7 @@ msgstr "Securely access your data on all your devices."
 msgid "Security"
 msgstr "Security"
 
-#: src/routes/party.$partyId/route.tsx:266
+#: src/routes/party.$partyId/route.tsx:279
 msgid "See spending totals and rankings"
 msgstr "See spending totals and rankings"
 
@@ -3330,7 +3330,7 @@ msgstr "Select emoji"
 msgid "Select everyone now and automatically include new participants."
 msgstr "Select everyone now and automatically include new participants."
 
-#: src/routes/party_.$partyId.continue.tsx:167
+#: src/routes/party_.$partyId.continue.tsx:188
 msgid "Select this link to copy your invite:"
 msgstr "Select this link to copy your invite:"
 
@@ -3363,7 +3363,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Set up your username, avatar, and preferences"
 
 #: src/routes/_home/route.tsx:90
-#: src/routes/party.$partyId/route.tsx:291
+#: src/routes/party.$partyId/route.tsx:304
 #: src/routes/settings.tsx:130
 msgid "Settings"
 msgstr "Settings"
@@ -3386,7 +3386,7 @@ msgstr "Seychellois Rupee"
 
 #: src/routes/party_.$partyId.share.tsx:62
 #: src/routes/party_.$partyId.share.tsx:97
-#: src/routes/party.$partyId/route.tsx:279
+#: src/routes/party.$partyId/route.tsx:292
 msgid "Share party"
 msgstr "Share party"
 
@@ -3594,7 +3594,7 @@ msgstr "Something is not working properly. Restart trizum to recover. If this ke
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
-#: src/routes/party.$partyId/route.tsx:152
+#: src/routes/party.$partyId/route.tsx:165
 msgid "Sort balances"
 msgstr "Sort balances"
 
@@ -3667,7 +3667,7 @@ msgstr "Start tracking expenses with your group"
 msgid "Start with empty expense values"
 msgstr "Start with empty expense values"
 
-#: src/routes/party.$partyId/route.tsx:262
+#: src/routes/party.$partyId/route.tsx:275
 msgid "Stats"
 msgstr "Stats"
 
@@ -3781,7 +3781,7 @@ msgstr "Take photo"
 msgid "Tanzanian Shilling"
 msgstr "Tanzanian Shilling"
 
-#: src/routes/party.$partyId/route.tsx:225
+#: src/routes/party.$partyId/route.tsx:238
 msgid "Tap to change"
 msgstr "Tap to change"
 
@@ -4380,7 +4380,7 @@ msgstr "View Third-Party Licenses"
 msgid "Viewing as {0}"
 msgstr "Viewing as {0}"
 
-#: src/routes/party.$partyId/route.tsx:221
+#: src/routes/party.$partyId/route.tsx:234
 msgid "Viewing as {participantName}"
 msgstr "Viewing as {participantName}"
 
@@ -4542,7 +4542,7 @@ msgstr "You can manage or cancel a subscription through the Customer Center in t
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "You can only transfer debt from actions where you are the one who owes the money."
 
-#: src/routes/party.$partyId/route.tsx:116
+#: src/routes/party.$partyId/route.tsx:129
 msgid "You left the party!"
 msgstr "You left the party!"
 
@@ -4607,7 +4607,7 @@ msgstr "Your account could not be checked. Connect to the internet and try again
 msgid "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 msgstr "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 
-#: src/routes/party_.$partyId.continue.tsx:91
+#: src/routes/party_.$partyId.continue.tsx:105
 msgid "Your group is ready"
 msgstr "Your group is ready"
 

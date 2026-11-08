@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { NATIVE_APP_ORIGIN } from "../../src/lib/aiInvite";
 import { bodyLimit } from "hono/body-limit";
 import { handleMcpRequest } from "@trizum/mcp/index";
 import widgetScript from "@trizum/mcp/widget.js?raw";
@@ -57,7 +58,7 @@ mcpRoute.on(["POST", "GET", "DELETE"], "/", (c) => {
   const i18n = c.get("i18n");
 
   const service = new IdempotentPartyService(
-    new WorkerPartyService(c.get("documents"), new URL(c.req.url).origin),
+    new WorkerPartyService(c.get("documents"), NATIVE_APP_ORIGIN),
     c.env.DB,
     {
       tokens: new WriteTokens(c.env.BETTER_AUTH_SECRET),

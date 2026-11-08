@@ -4,7 +4,12 @@ import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Capacitor } from "@capacitor/core";
-import { parseAiInviteSearch, type AiInviteSearch } from "#src/lib/aiInvite.ts";
+import {
+  parseAiInviteSearch,
+  createAiHandoffUrl,
+  NATIVE_APP_ORIGIN,
+  type AiInviteSearch,
+} from "#src/lib/aiInvite.ts";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { MenuTrigger, Popover } from "react-aria-components";
 import { IconButton } from "@trizum/ui/IconButton";
@@ -39,6 +44,14 @@ export const Route = createFileRoute("/party/$partyId")({
   },
   beforeLoad: ({ search, params }) => {
     if (search.entry === "ai" && !Capacitor.isNativePlatform()) {
+      if (window.location.origin === NATIVE_APP_ORIGIN) {
+        throw redirect({
+          href: createAiHandoffUrl(params.partyId, search),
+          replace: true,
+          reloadDocument: true,
+        });
+      }
+
       throw redirect({
         to: "/party/$partyId/continue",
         params,

@@ -339,7 +339,7 @@ msgstr "AdMob puede crear un ID propio del editor seudónimo que reconoce un dis
 msgid "Afghan Afghani"
 msgstr "Afgani Afgano"
 
-#: src/routes/party_.$partyId.continue.tsx:107
+#: src/routes/party_.$partyId.continue.tsx:121
 msgid "After installing, reopen this invite to join your group. No account is needed."
 msgstr "Después de instalar la app, vuelve a abrir esta invitación para unirte al grupo. No necesitas una cuenta."
 
@@ -371,7 +371,7 @@ msgstr "Todas las comprobaciones del gasto se han superado"
 msgid "All time"
 msgstr "Todo el tiempo"
 
-#: src/routes/party_.$partyId.continue.tsx:118
+#: src/routes/party_.$partyId.continue.tsx:132
 msgid "Already have trizum? Open your group"
 msgstr "¿Ya tienes trizum? Abre tu grupo"
 
@@ -575,16 +575,16 @@ msgstr "Dólar Bahameño"
 msgid "Bahraini Dinar"
 msgstr "Dinar Bareiní"
 
-#: src/routes/party.$partyId/route.tsx:192
+#: src/routes/party.$partyId/route.tsx:205
 msgid "Balance, Highest First"
 msgstr "Balance, Mayor Primero"
 
-#: src/routes/party.$partyId/route.tsx:176
+#: src/routes/party.$partyId/route.tsx:189
 msgid "Balance, Lowest First"
 msgstr "Balance, Menor Primero"
 
 #: src/lib/mcpMessages.ts:5
-#: src/routes/party.$partyId/route.tsx:320
+#: src/routes/party.$partyId/route.tsx:333
 msgid "Balances"
 msgstr "Balance"
 
@@ -991,7 +991,7 @@ msgstr "Conexiones"
 msgid "Contact Us"
 msgstr "Contacto"
 
-#: src/routes/party_.$partyId.continue.tsx:146
+#: src/routes/party_.$partyId.continue.tsx:167
 msgid "Continue on the web"
 msgstr "Continuar en la web"
 
@@ -1015,7 +1015,7 @@ msgstr "Colaboradores"
 msgid "Copy code"
 msgstr "Copiar código"
 
-#: src/routes/party_.$partyId.continue.tsx:162
+#: src/routes/party_.$partyId.continue.tsx:183
 msgid "Copy invite link"
 msgstr "Copiar enlace de invitación"
 
@@ -1321,7 +1321,7 @@ msgstr "Franco Yibutiano"
 msgid "Dominican Peso"
 msgstr "Peso Dominicano"
 
-#: src/routes/party_.$partyId.continue.tsx:60
+#: src/routes/party_.$partyId.continue.tsx:75
 msgid "Download on the App Store"
 msgstr "Descargar en el App Store"
 
@@ -1521,7 +1521,7 @@ msgid "Expense updated"
 msgstr "Gasto actualizado"
 
 #: src/routes/party_.$partyId.settings/index.tsx:52
-#: src/routes/party.$partyId/route.tsx:314
+#: src/routes/party.$partyId/route.tsx:327
 msgid "Expenses"
 msgstr "Gastos"
 
@@ -1644,11 +1644,11 @@ msgstr "Lari Georgiano"
 msgid "Get in touch with the person to make the payment in cash or a different way outside of the ones described above."
 msgstr "Ponte en contacto con la persona para hacer el pago en efectivo o de otra forma diferente a las descritas anteriormente."
 
-#: src/routes/party_.$partyId.continue.tsx:62
+#: src/routes/party_.$partyId.continue.tsx:77
 msgid "Get it on Google Play"
 msgstr "Descargar en Google Play"
 
-#: src/routes/party_.$partyId.continue.tsx:97
+#: src/routes/party_.$partyId.continue.tsx:111
 msgid "Get the app to track shared expenses with your group, even offline."
 msgstr "Descarga la app para llevar los gastos compartidos de tu grupo, incluso sin conexión."
 
@@ -1904,7 +1904,7 @@ msgstr "Código de grupo de trizum no válido"
 msgid "Invalid trizum party link"
 msgstr "Enlace de grupo de trizum no válido"
 
-#: src/routes/party_.$partyId.continue.tsx:127
+#: src/routes/party_.$partyId.continue.tsx:141
 msgid "Invite QR code"
 msgstr "Código QR de invitación"
 
@@ -2056,7 +2056,7 @@ msgstr "Año pasado"
 msgid "Leave at zero for an empty amount"
 msgstr "Déjalo en cero para que el importe quede vacío"
 
-#: src/routes/party.$partyId/route.tsx:298
+#: src/routes/party.$partyId/route.tsx:311
 msgid "Leave party"
 msgstr "Dejar el grupo"
 
@@ -2187,7 +2187,7 @@ msgstr "Yo"
 
 #: src/components/ExpenseEditor.tsx:381
 #: src/routes/party_.$partyId.expense.$expenseId/route.tsx:98
-#: src/routes/party.$partyId/route.tsx:204
+#: src/routes/party.$partyId/route.tsx:217
 msgid "Menu"
 msgstr "Menú"
 
@@ -2281,7 +2281,7 @@ msgstr "Kyat Birmano"
 #: src/routes/new/-components/NewPartyDetailsFields.tsx:32
 #: src/routes/party_.$partyId.settings/-components/PartySettingsDetailsFields.tsx:24
 #: src/routes/party_.$partyId.settings/expense-templates_.$templateId.tsx:264
-#: src/routes/party.$partyId/route.tsx:160
+#: src/routes/party.$partyId/route.tsx:173
 msgid "Name"
 msgstr "Nombre"
 
@@ -2496,7 +2496,7 @@ msgstr "Códigos de un solo uso"
 msgid "Only affects you. Skip the template picker when you add an expense."
 msgstr "Solo te afecta a ti. Omite el selector de plantillas al añadir un gasto."
 
-#: src/routes/party.$partyId/route.tsx:243
+#: src/routes/party.$partyId/route.tsx:256
 msgid "Only show your expenses"
 msgstr "Mostrar solo tus gastos"
 
@@ -2554,7 +2554,7 @@ msgstr "Abrir paréntesis"
 msgid "Open the installed trizum app and sign in to the account you want to use for Premium."
 msgstr "Abre la app de trizum instalada e inicia sesión en la cuenta que quieras usar para Premium."
 
-#: src/routes/party_.$partyId.continue.tsx:125
+#: src/routes/party_.$partyId.continue.tsx:139
 msgid "Open this invite on your phone"
 msgstr "Abre esta invitación en tu teléfono"
 
@@ -2738,7 +2738,7 @@ msgstr "¡Detalles del grupo guardados!"
 msgid "Party leaderboard"
 msgstr "Clasificación del grupo"
 
-#: src/routes/party_.$partyId.continue.tsx:155
+#: src/routes/party_.$partyId.continue.tsx:176
 #: src/routes/party_.$partyId.share.tsx:50
 msgid "Party link copied to clipboard!"
 msgstr "¡Enlace del grupo copiado al portapapeles!"
@@ -2845,7 +2845,7 @@ msgstr "Eliminar permanentemente tu cuenta de trizum cloud"
 msgid "Personal"
 msgstr "Personal"
 
-#: src/routes/party.$partyId/route.tsx:239
+#: src/routes/party.$partyId/route.tsx:252
 msgid "Personal mode"
 msgstr "Modo personal"
 
@@ -3246,7 +3246,7 @@ msgstr "Accede de forma segura a tus datos en todos tus dispositivos."
 msgid "Security"
 msgstr "Seguridad"
 
-#: src/routes/party.$partyId/route.tsx:266
+#: src/routes/party.$partyId/route.tsx:279
 msgid "See spending totals and rankings"
 msgstr "Ver totales y clasificación de gasto"
 
@@ -3258,7 +3258,7 @@ msgstr "Seleccionar emoji"
 msgid "Select everyone now and automatically include new participants."
 msgstr "Selecciona a todos ahora e incluye automáticamente a los nuevos participantes."
 
-#: src/routes/party_.$partyId.continue.tsx:167
+#: src/routes/party_.$partyId.continue.tsx:188
 msgid "Select this link to copy your invite:"
 msgstr "Selecciona este enlace para copiar la invitación:"
 
@@ -3291,7 +3291,7 @@ msgid "Set up your username, avatar, and preferences"
 msgstr "Configura tu nombre de usuario, avatar y preferencias"
 
 #: src/routes/_home/route.tsx:90
-#: src/routes/party.$partyId/route.tsx:291
+#: src/routes/party.$partyId/route.tsx:304
 #: src/routes/settings.tsx:130
 msgid "Settings"
 msgstr "Configuración"
@@ -3314,7 +3314,7 @@ msgstr "Rupia de Seychelles"
 
 #: src/routes/party_.$partyId.share.tsx:62
 #: src/routes/party_.$partyId.share.tsx:97
-#: src/routes/party.$partyId/route.tsx:279
+#: src/routes/party.$partyId/route.tsx:292
 msgid "Share party"
 msgstr "Compartir grupo"
 
@@ -3518,7 +3518,7 @@ msgstr "Algo no está funcionando correctamente. Reinicia trizum para recuperarl
 msgid "Something went wrong"
 msgstr "Algo salió mal"
 
-#: src/routes/party.$partyId/route.tsx:152
+#: src/routes/party.$partyId/route.tsx:165
 msgid "Sort balances"
 msgstr "Ordenar balances"
 
@@ -3591,7 +3591,7 @@ msgstr "Comienza a registrar gastos con tu grupo"
 msgid "Start with empty expense values"
 msgstr "Empezar con los valores del gasto vacíos"
 
-#: src/routes/party.$partyId/route.tsx:262
+#: src/routes/party.$partyId/route.tsx:275
 msgid "Stats"
 msgstr "Estadísticas"
 
@@ -3705,7 +3705,7 @@ msgstr "Hacer foto"
 msgid "Tanzanian Shilling"
 msgstr "Chelín Tanzano"
 
-#: src/routes/party.$partyId/route.tsx:225
+#: src/routes/party.$partyId/route.tsx:238
 msgid "Tap to change"
 msgstr "Toca para cambiar"
 
@@ -4283,7 +4283,7 @@ msgstr "Ver Licencias de Terceros"
 msgid "Viewing as {0}"
 msgstr "Viendo como {0}"
 
-#: src/routes/party.$partyId/route.tsx:221
+#: src/routes/party.$partyId/route.tsx:234
 msgid "Viewing as {participantName}"
 msgstr "Viendo como {participantName}"
 
@@ -4441,7 +4441,7 @@ msgstr "Puedes gestionar o cancelar una suscripción mediante el Centro de atenc
 msgid "You can only transfer debt from actions where you are the one who owes the money."
 msgstr "Solo puedes transferir deudas de acciones en las que tú eres quien debe el dinero."
 
-#: src/routes/party.$partyId/route.tsx:116
+#: src/routes/party.$partyId/route.tsx:129
 msgid "You left the party!"
 msgstr "¡Has dejado el grupo!"
 
@@ -4506,7 +4506,7 @@ msgstr "No se pudo comprobar tu cuenta. Conéctate a internet y vuelve a intenta
 msgid "Your data is stored locally on your device and synced to trizum servers for collaboration. Data is encrypted during transmission. Groups are shared via links - anyone with the link can access the group. See our Privacy Policy for details."
 msgstr "Tus datos se almacenan localmente en tu dispositivo y se sincronizan con los servidores de trizum para colaborar. Los datos se cifran durante la transmisión. Los grupos se comparten mediante enlaces - cualquiera con el enlace puede acceder al grupo. Consulta nuestra Política de Privacidad para más detalles."
 
-#: src/routes/party_.$partyId.continue.tsx:91
+#: src/routes/party_.$partyId.continue.tsx:105
 msgid "Your group is ready"
 msgstr "Tu grupo está listo"
 

@@ -689,6 +689,36 @@ describe("Worker document reads over WebSocket", () => {
     }
   });
 
+  it("returns a recovery link without confirming a party whose creation acknowledgement is lost", async () => {
+    const env = await startServer();
+    const probe = server!.create({ value: 0 });
+
+    const documents = new AutomergeDocuments({
+      env,
+      request: new Request("https://trizum.app"),
+      timeoutMs: "500",
+    });
+
+    try {
+      await documents.read(probe.documentId);
+
+      for (const socket of sockets!.clients) socket.removeAllListeners("message");
+      const api = new WorkerPartyService(documents, "https://trizum.app");
+      await expect(
+        api.createParty({
+          requestId: "not-forwarded",
+          name: "Lost acknowledgement",
+          currency: "EUR",
+          description: "",
+          symbol: "🌉",
+          participants: ["Test Alex", "Test Sam"],
+        }),
+      ).rejects.toThrow(/Party creation could not be confirmed.*https:\/\/trizum\.app\/party\//);
+    } finally {
+      await documents.close();
+    }
+  });
+
   it("rejects a write when the sync peer never acknowledges it", async () => {
     const env = await startServer();
     const party = server!.create({ value: 0 });

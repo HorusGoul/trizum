@@ -1,13 +1,30 @@
 import { generateAutomergeUrl, parseAutomergeUrl } from "@automerge/automerge-repo/slim";
 import { describe, expect, it } from "vite-plus/test";
 import { MCP_HANDOFF_CAMPAIGN } from "@trizum/analytics";
-import { createAiInviteUrl, parseAiInviteSearch } from "./aiInvite.ts";
+import {
+  createAiInviteUrl,
+  parseAiInviteSearch,
+  createAiHandoffUrl,
+  createNativePartyUrl,
+} from "./aiInvite.ts";
 import { parseAppSearch } from "./routerSearch.ts";
 import { parseQRCodeForPartyId } from "./qr.ts";
 
 const partyId = parseAutomergeUrl(generateAutomergeUrl()).documentId;
 
 describe("AI invite links", () => {
+  it("keeps the browser fallback away from the existing native-associated origin", () => {
+    const handoff = new URL(createAiHandoffUrl(partyId, MCP_HANDOFF_CAMPAIGN));
+    const native = new URL(createNativePartyUrl(partyId, MCP_HANDOFF_CAMPAIGN));
+    expect(handoff.origin).toBe("https://join.trizum.app");
+    expect(native.origin).toBe("https://trizum.app");
+    expect(handoff.origin).not.toBe(native.origin);
+    expect(native.pathname).toBe(`/party/${partyId}`);
+    expect(native.searchParams.has("entry")).toBe(false);
+    expect(native.searchParams.get("utm_source")).toBe("mcp");
+    expect(new URL(createAiHandoffUrl(partyId, { utm_source: "mcp" })).search).toBe("?entry=ai");
+  });
+
   it("keeps the canonical party path readable by existing invite scanners", () => {
     const url = createAiInviteUrl("https://trizum.app", partyId, MCP_HANDOFF_CAMPAIGN);
     expect(url).toBe(

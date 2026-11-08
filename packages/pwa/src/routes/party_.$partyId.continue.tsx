@@ -9,7 +9,14 @@ import { Button } from "@trizum/ui/Button";
 import { Icon } from "@trizum/ui/Icon";
 import { QRCode } from "@trizum/ui/QRCode";
 import { Alert, AlertDescription } from "@trizum/ui/Alert";
-import { createAiInviteUrl, parseAiInviteSearch } from "#src/lib/aiInvite.ts";
+import {
+  createAiInviteUrl,
+  parseAiInviteSearch,
+  createAiHandoffUrl,
+  createNativePartyUrl,
+  NATIVE_APP_ORIGIN,
+  AI_HANDOFF_ORIGIN,
+} from "#src/lib/aiInvite.ts";
 import { detectMobilePlatform, getAppStoreUrl, type MobilePlatform } from "#src/lib/appStores.ts";
 import { getAppLink } from "#src/lib/link.ts";
 import { guardPartyExists } from "#src/lib/guards.ts";
@@ -27,11 +34,19 @@ export const Route = createFileRoute("/party_/$partyId/continue")({
   component: AiInvite,
   pendingComponent: PartyPendingComponent,
   validateSearch: parseAiInviteSearch,
-  beforeLoad: ({ params }) => {
+  beforeLoad: ({ params, search }) => {
     if (!isValidDocumentId(params.partyId)) throw redirect({ to: "/join", replace: true });
 
     if (Capacitor.isNativePlatform())
       throw redirect({ to: "/party/$partyId", params, search: { tab: "expenses" }, replace: true });
+
+    if (window.location.origin === NATIVE_APP_ORIGIN) {
+      throw redirect({
+        href: createAiHandoffUrl(params.partyId, search),
+        replace: true,
+        reloadDocument: true,
+      });
+    }
   },
   loader: async ({ context, params }) => ({
     party: await guardPartyExists(params.partyId, context),
@@ -75,13 +90,12 @@ function AiInvite() {
   const campaign = analyticsCampaignSchema.safeParse(search);
 
   const inviteUrl = createAiInviteUrl(
-    getAppLink("/"),
+    window.location.origin === AI_HANDOFF_ORIGIN ? NATIVE_APP_ORIGIN : getAppLink("/"),
     party.id,
     campaign.success ? campaign.data : undefined,
   );
 
-  const appUrl = new URL(inviteUrl);
-  appUrl.searchParams.delete("entry");
+  const appUrl = createNativePartyUrl(party.id, campaign.success ? campaign.data : undefined);
 
   return (
     <main className="container flex min-h-full flex-col justify-center gap-8 px-5 py-10 sm:px-8">
@@ -109,7 +123,7 @@ function AiInvite() {
           </Trans>
         </p>
         <a
-          href={appUrl.href}
+          href={appUrl}
           rel="noreferrer"
           referrerPolicy="no-referrer"
           className="text-accent-700 dark:text-accent-200 block text-sm underline underline-offset-4"
@@ -135,6 +149,13 @@ function AiInvite() {
           color="input-like"
           pressAction={async () => {
             trackEvent("ai_handoff_web_continue_requested");
+
+            if (window.location.origin === AI_HANDOFF_ORIGIN) {
+              window.location.replace(appUrl);
+
+              return;
+            }
+
             await navigate({
               to: "/party/$partyId",
               params: { partyId: party.id },

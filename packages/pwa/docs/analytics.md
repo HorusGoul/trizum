@@ -33,7 +33,11 @@ count requested actions. They do not confirm installations or native launches.
 Existing party-join events measure web activation. Store links carry neither the
 party ID nor campaign parameters and suppress the referrer. There is no deferred
 install tracking: after installing, users reopen the invite. Server action counts
-cannot be joined to individual browser sessions.
+cannot be joined to individual browser sessions. Production browser handoffs live
+on `join.trizum.app`; web continuation returns approved UTM labels to `trizum.app`
+without passing profile IDs. Each origin retains its own analytics preference
+and local profile, so cross-origin campaign reports are aggregate counts rather
+than individual visitor conversion tracking.
 
 ## Anonymous MCP server events
 

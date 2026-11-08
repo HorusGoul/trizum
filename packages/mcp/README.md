@@ -286,7 +286,7 @@ tests do not establish directory approval or live ChatGPT compatibility.
 
 ## Acquisition handoff
 
-Every returned party URL preserves `/party/<id>` and adds
+Every returned party URL uses the canonical `https://trizum.app/party/<id>` path and adds
 `entry=ai&utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`.
 Browser visitors see `/party/<id>/continue`, with platform-appropriate App Store
 or Google Play links, a desktop invite QR code, a copyable invite, and a web
@@ -302,3 +302,32 @@ claim a specific host. Store clicks are requests, not measured installs. There i
 no short-link database, server-side campaign state, or deferred-install lookup;
 users reopen the original invite after installing. Ordinary PWA share links are
 unchanged.
+
+### Installed-app dispatch
+
+`trizum.app` remains the native-associated domain. An installed app receives the
+canonical invite directly and skips download choices. For browser visits,
+production AI entries redirect to `join.trizum.app/party/<id>/continue`, hosted by
+the same Worker. The handoff's app link points directly back to `trizum.app`,
+which avoids Safari's same-domain universal-link navigation behavior without
+changing native entitlements or requiring existing users to update the app.
+Preview handoff pages use the canonical native target too. MCP responses always
+return the canonical app-associated origin, including calls through preview or
+Worker aliases. This lets installed apps open directly from ChatGPT. To test the
+new browser handoff before production deployment, replace only the invite's
+origin with the PR preview origin; production URLs use the deployed production
+frontend until release.
+
+The web choice returns to the canonical party route without `entry=ai`, carrying
+only approved UTM labels. Copied production invites also remain canonical. The
+redirect reads no party data and never forwards arbitrary query fields. The
+handoff and web app have separate origin-local profiles, so campaign labels
+support aggregate funnel reports, not cross-origin visitor identity matching.
+The new custom domain must be active before enabling the production redirect;
+preview deployment does not provision production routes. See the Worker setup.
+
+If a new party's write acknowledgement is lost after a document ID is allocated,
+the tool remains an error and returns that party's recovery link. Check it with
+`get_party` before considering another creation. The link is not proof that the
+write succeeded. The original retry claim stays pending; no extra D1 operation
+or receipt is written merely to expose the known document ID.

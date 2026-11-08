@@ -24,7 +24,9 @@ test("AI invite offers stores and continues through the existing party join flow
 
   const installedLink = page.getByRole("link", { name: "Already have trizum? Open your group" });
   const href = await installedLink.getAttribute("href");
-  expect(href).toContain(`/party/${seeded.partyId}?utm_source=mcp`);
+  expect(href).toBe(
+    `https://trizum.app/party/${seeded.partyId}?utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`,
+  );
   expect(href).not.toContain("entry=");
 
   await page.getByRole("button", { name: "Continue on the web", exact: true }).click();
@@ -78,4 +80,57 @@ test("campaign labels alone leave the ordinary invite flow intact", async ({ har
   await harness.goto(`${seeded.joinUrl}?${campaign.replace("entry=ai&", "")}`);
   await expect(page.getByRole("heading", { name: "Who are you?" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeHidden();
+});
+
+test("production browser fallback crosses hosts and preserves the party for app and web choices", async ({
+  harness,
+  page,
+  baseURL,
+}) => {
+  if (!baseURL) throw new Error("Expected the configured PWA test server");
+  await page.routeWebSocket(/.*/, (socket) => socket.close());
+  await page.route(/^https:\/\/(?:join\.)?trizum\.app\//, async (route) => {
+    const url = new URL(route.request().url());
+
+    if (
+      url.origin === "https://trizum.app" &&
+      url.pathname.startsWith("/party/") &&
+      !url.searchParams.has("entry")
+    ) {
+      await route.fulfill({
+        contentType: "text/html",
+        body: "<main>Canonical web continuation</main>",
+      });
+
+      return;
+    }
+
+    await route.fulfill({
+      response: await route.fetch({ url: new URL(`${url.pathname}${url.search}`, baseURL).href }),
+    });
+  });
+  await page.goto("https://join.trizum.app/?__internal_offline_only=true");
+  await page.waitForFunction(() => window.__internal_readPartyListState instanceof Function);
+  const seeded = await harness.seedJoinableParty(createPartyFixture());
+  expect(new URL(page.url()).origin).toBe("https://join.trizum.app");
+  await page.goto(
+    `https://join.trizum.app${seeded.joinUrl}/continue?${campaign}&__internal_offline_only=true`,
+  );
+  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeVisible();
+  await page.goto(`https://trizum.app${seeded.joinUrl}?${campaign}&__internal_offline_only=true`);
+  await expect(page.getByRole("heading", { name: "Your group is ready" })).toBeVisible();
+  await expect(page).toHaveURL(
+    new RegExp(`^https://join\\.trizum\\.app/party/${seeded.partyId}/continue\\?`),
+  );
+  await expect(
+    page.getByRole("link", { name: "Already have trizum? Open your group" }),
+  ).toHaveAttribute(
+    "href",
+    `https://trizum.app${seeded.joinUrl}?utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`,
+  );
+  await page.getByRole("button", { name: "Continue on the web", exact: true }).click();
+  await expect(page.getByRole("main")).toHaveText("Canonical web continuation");
+  await expect(page).toHaveURL(
+    `https://trizum.app${seeded.joinUrl}?utm_source=mcp&utm_medium=ai_app&utm_campaign=party_handoff`,
+  );
 });
