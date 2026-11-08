@@ -12,6 +12,8 @@ Read this when validating changes or preparing a PR or release.
   additional validation tasks; run them with `vp run <task-or-script>`.
 - For user-facing copy changes, follow the extraction and localization rules
   in [PWA conventions](./pwa.md).
+- For persisted model or mutation changes, verify the required
+  [Automerge persistence coverage](./coding.md#automerge-persistence-tests).
 
 ## Release notes
 
