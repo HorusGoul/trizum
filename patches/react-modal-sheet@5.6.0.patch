@@ -1,5 +1,5 @@
 diff --git a/dist/index.js b/dist/index.js
-index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d324ba62952 100644
+index c033003905791f5339535f7ce33b7914109c1d91..861ad21ccf1f7b9373a7b124d80a132bce029e46 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -689,34 +689,39 @@ function useSheetState({
@@ -70,7 +70,7 @@ index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d32
      const indicatorRotation = react.useMotionValue(0);
      const shouldReduceMotion = react.useReducedMotion();
      const reduceMotion = Boolean(prefersReducedMotion || shouldReduceMotion);
-@@ -1068,13 +1082,14 @@ var Sheet = React.forwardRef(
+@@ -1068,13 +1082,15 @@ var Sheet = React.forwardRef(
        ...reduceMotion ? REDUCED_MOTION_TWEEN_CONFIG : tweenConfig
      };
      const zIndex = react.useTransform(
@@ -81,7 +81,8 @@ index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d32
      const visibility = react.useTransform(
 -      y,
 -      (val) => val + 2 >= closedY ? "hidden" : "visible"
-+      () => !entryReady.get() || y.get() + 2 >= closedYValue.get() ? "hidden" : "visible"
++      [entryReady, y, closedYValue],
++      ([ready, position, closedPosition]) => !ready || position + 2 >= closedPosition ? "hidden" : "visible"
      );
 +    useIsomorphicLayoutEffect(() => {
 +      closedYValue.set(closedY);
@@ -89,7 +90,7 @@ index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d32
      const snapPoints = React.useMemo(() => {
        return snapPointsProp && sheetHeight > 0 ? computeSnapPoints({ sheetHeight, snapPointsProp }) : [];
      }, [sheetHeight, snapPointsProp == null ? void 0 : snapPointsProp.join("")]);
-@@ -1149,6 +1164,8 @@ var Sheet = React.forwardRef(
+@@ -1149,6 +1165,8 @@ var Sheet = React.forwardRef(
        }
      });
      const onDragStart = useStableCallback((event, info) => {
@@ -98,7 +99,7 @@ index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d32
        blurActiveInput();
        onDragStartProp == null ? void 0 : onDragStartProp(event, info);
      });
-@@ -1158,12 +1175,26 @@ var Sheet = React.forwardRef(
+@@ -1158,12 +1176,26 @@ var Sheet = React.forwardRef(
        const velocity = y.getVelocity();
        if (velocity > 0) indicatorRotation.set(10);
        if (velocity < 0) indicatorRotation.set(-10);
@@ -126,7 +127,7 @@ index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d32
        const result = classifyDragEnd({
          y: currentY,
          info,
-@@ -1204,20 +1235,56 @@ var Sheet = React.forwardRef(
+@@ -1204,20 +1236,56 @@ var Sheet = React.forwardRef(
      const state = useSheetState({
        isOpen,
        onOpen: async () => {
@@ -186,7 +187,7 @@ index c033003905791f5339535f7ce33b7914109c1d91..c9f5163ce71a3a6fa2bb744cbd4f5d32
        drag: "y",
        dragElastic: 0,
 diff --git a/dist/index.mjs b/dist/index.mjs
-index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..d361ceb35a62ad1a063219c8b7687bc67415ac99 100644
+index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..36a10c0acb355acd608741f180ffcf8187f63a58 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -682,34 +682,39 @@ function useSheetState({
@@ -257,7 +258,7 @@ index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..d361ceb35a62ad1a063219c8b7687bc6
      const indicatorRotation = useMotionValue(0);
      const shouldReduceMotion = useReducedMotion();
      const reduceMotion = Boolean(prefersReducedMotion || shouldReduceMotion);
-@@ -1061,13 +1075,14 @@ var Sheet = forwardRef(
+@@ -1061,13 +1075,15 @@ var Sheet = forwardRef(
        ...reduceMotion ? REDUCED_MOTION_TWEEN_CONFIG : tweenConfig
      };
      const zIndex = useTransform(
@@ -268,7 +269,8 @@ index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..d361ceb35a62ad1a063219c8b7687bc6
      const visibility = useTransform(
 -      y,
 -      (val) => val + 2 >= closedY ? "hidden" : "visible"
-+      () => !entryReady.get() || y.get() + 2 >= closedYValue.get() ? "hidden" : "visible"
++      [entryReady, y, closedYValue],
++      ([ready, position, closedPosition]) => !ready || position + 2 >= closedPosition ? "hidden" : "visible"
      );
 +    useIsomorphicLayoutEffect(() => {
 +      closedYValue.set(closedY);
@@ -276,7 +278,7 @@ index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..d361ceb35a62ad1a063219c8b7687bc6
      const snapPoints = useMemo(() => {
        return snapPointsProp && sheetHeight > 0 ? computeSnapPoints({ sheetHeight, snapPointsProp }) : [];
      }, [sheetHeight, snapPointsProp == null ? void 0 : snapPointsProp.join("")]);
-@@ -1142,6 +1157,8 @@ var Sheet = forwardRef(
+@@ -1142,6 +1158,8 @@ var Sheet = forwardRef(
        }
      });
      const onDragStart = useStableCallback((event, info) => {
@@ -285,7 +287,7 @@ index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..d361ceb35a62ad1a063219c8b7687bc6
        blurActiveInput();
        onDragStartProp == null ? void 0 : onDragStartProp(event, info);
      });
-@@ -1151,12 +1168,26 @@ var Sheet = forwardRef(
+@@ -1151,12 +1169,26 @@ var Sheet = forwardRef(
        const velocity = y.getVelocity();
        if (velocity > 0) indicatorRotation.set(10);
        if (velocity < 0) indicatorRotation.set(-10);
@@ -313,7 +315,7 @@ index cc8c3ebd67e6cdf1d8e0313a0bd036dfd82f172a..d361ceb35a62ad1a063219c8b7687bc6
        const result = classifyDragEnd({
          y: currentY,
          info,
-@@ -1197,20 +1228,56 @@ var Sheet = forwardRef(
+@@ -1197,20 +1229,56 @@ var Sheet = forwardRef(
      const state = useSheetState({
        isOpen,
        onOpen: async () => {

@@ -73,8 +73,12 @@ test.describe("Expense templates", () => {
     await harness.navigate(`/party/${seededParty.partyId}`);
 
     await expect(page.getByText("Expense template created")).toBeHidden();
+    await page.clock.install();
 
     for (let cycle = 0; cycle < 8; cycle++) {
+      // Drive every frame explicitly so a busy CI runner cannot skip the whole transition.
+      await page.clock.pauseAt(await page.evaluate(() => Date.now() + 100));
+
       // Record actual motion on every complete open/close cycle.
       const framesPromise = page.evaluate(async () => {
         const frames: { time: number; y: number; height: number; opacity: number }[] = [];
@@ -110,7 +114,9 @@ test.describe("Expense templates", () => {
         return frames;
       });
 
-      await page.getByRole("button", { name: "Add an expense" }).click();
+      // The paused clock cannot supply Playwright's actionability frames.
+      await page.getByRole("button", { name: "Add an expense" }).click({ force: true });
+      await page.clock.runFor(1000);
       const frames = await framesPromise;
 
       await test.info().attach(`open-cycle-${cycle}-frames`, {
@@ -127,6 +133,7 @@ test.describe("Expense templates", () => {
       const movingFrames = frames.filter((frame) => frame.y > 1 && frame.y < frame.height - 1);
       expect(movingFrames.length).toBeGreaterThan(3);
       expect(frames.at(-1)?.opacity).toBe(1);
+      await page.clock.resume();
 
       if (cycle % 2 === 0) {
         const handle = await page.locator("[data-modal-sheet-drag-handle]").boundingBox();
