@@ -1,8 +1,16 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn, type ClassName } from "./utils.js";
-import { Suspense, use, useEffect, useRef } from "react";
+import { Suspense, use, useEffect, useEffectEvent, useRef } from "react";
 import { useGesture } from "@use-gesture/react";
-import { LazyMotion, animate, domAnimation, m, useMotionValue } from "motion/react";
+import {
+  LazyMotion,
+  animate,
+  domAnimation,
+  m,
+  useMotionValue,
+  useMotionValueEvent,
+  useReducedMotion,
+} from "motion/react";
 import type { IconProps } from "./Icon.js";
 import { IconButton } from "./IconButton.js";
 import {
@@ -14,6 +22,7 @@ import { mediaGalleryItemLoader, type MediaGalleryItem } from "./mediaGalleryIte
 export type { MediaGalleryItem } from "./mediaGalleryItemLoader.js";
 
 interface MediaGalleryCommonProps {
+  isOpen?: boolean;
   index: number;
   onChange: (index: number) => void;
   onClose: () => void;
@@ -40,7 +49,7 @@ const CLOSE_THRESHOLD = 150;
 
 export default function MediaGallery(props: MediaGalleryProps) {
   const { t } = useLingui();
-  const { index, onClose, onChange, onDragProgress, showCloseButton = true } = props;
+  const { index, onClose, onChange, onDragProgress, showCloseButton = true, isOpen = true } = props;
   const itemCount = props.items !== undefined ? props.items.length : props.itemCount;
 
   const currentItemKey =
@@ -72,6 +81,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
 
   const showNavigation = itemCount > 1;
 
+  const reducedMotion = useReducedMotion();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const scale = useMotionValue(1);
@@ -80,8 +90,16 @@ export default function MediaGallery(props: MediaGalleryProps) {
   const ref = useRef<HTMLDivElement>(null);
   const previousPinchOriginRef = useRef<MediaGalleryPoint | null>(null);
 
-  // Track if we're in a "closing drag" gesture (dragging up at scale=1)
-  const isClosingDragRef = useRef(false);
+  // Keep dismissal feedback active through the drag and its snap-back animation.
+  const isDismissalMotionRef = useRef(false);
+  const dismissalDistanceRef = useRef(1);
+
+  function getDismissalDistance() {
+    const viewportHeight = viewportRef.current?.clientHeight ?? window.innerHeight;
+    const imageHeight = ref.current?.getBoundingClientRect().height ?? 0;
+
+    return (viewportHeight + imageHeight) / 2;
+  }
 
   function getLocalPinchOrigin([originX, originY]: MediaGalleryPoint) {
     const viewport = viewportRef.current;
@@ -129,44 +147,77 @@ export default function MediaGallery(props: MediaGalleryProps) {
   useGesture(
     {
       onDragStart: () => {
+        x.stop();
+        y.stop();
+        scale.stop();
         // Determine if this is a closing drag (only when not zoomed)
         const currentScale = scale.get();
-        isClosingDragRef.current = currentScale <= 1;
+        isDismissalMotionRef.current = currentScale <= 1;
+        dismissalDistanceRef.current = getDismissalDistance();
       },
       onDrag: ({ offset: [offsetX, offsetY], pinching, cancel }) => {
         if (pinching) return cancel();
 
         // If we're in closing drag mode, track the upward movement
-        if (isClosingDragRef.current) {
+        if (isDismissalMotionRef.current) {
           // Only allow vertical movement for closing gesture
           y.set(offsetY);
-
-          // Calculate progress (0 to 1) based on vertical drag distance
-          // Use absolute value so both up and down trigger close
-          const progress = Math.max(0, Math.min(1, Math.abs(offsetY) / CLOSE_THRESHOLD));
-          onDragProgress?.(progress);
         } else {
           // Normal pan behavior when zoomed
           x.set(offsetX);
           y.set(offsetY);
         }
       },
-      onDragEnd: ({ offset: [, offsetY] }) => {
-        if (isClosingDragRef.current) {
+      onDragEnd: ({
+        offset: [, offsetY],
+        velocity: [, velocityY],
+        direction: [, directionY],
+        canceled,
+      }) => {
+        const releaseVelocity = velocityY * directionY * 1000;
+
+        if (isDismissalMotionRef.current) {
           // Check if we crossed the threshold (dragged far enough in either direction)
-          if (Math.abs(offsetY) >= CLOSE_THRESHOLD) {
-            onClose();
+          if (
+            !canceled &&
+            (Math.abs(offsetY) >= CLOSE_THRESHOLD ||
+              (Math.abs(offsetY) > 10 &&
+                Math.abs(releaseVelocity) > 500 &&
+                Math.sign(offsetY) === Math.sign(releaseVelocity)))
+          ) {
+            const target =
+              Math.sign(offsetY) * Math.max(dismissalDistanceRef.current, Math.abs(y.get()));
+
+            void animate(
+              y,
+              target,
+              reducedMotion
+                ? { duration: 0.1, onComplete: onClose }
+                : {
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                    velocity: releaseVelocity,
+                    onComplete: onClose,
+                  },
+            );
           } else {
             // Animate back to center with spring effect
-            void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
-            onDragProgress?.(0);
+            void animate(
+              y,
+              0,
+              reducedMotion
+                ? { duration: 0.1 }
+                : { type: "spring", stiffness: 400, damping: 30, velocity: releaseVelocity },
+            );
           }
         }
-
-        isClosingDragRef.current = false;
       },
       onPinchStart: ({ origin }) => {
-        isClosingDragRef.current = false;
+        x.stop();
+        y.stop();
+        scale.stop();
+        isDismissalMotionRef.current = false;
         previousPinchOriginRef.current = getLocalPinchOrigin(origin);
         onDragProgress?.(0);
       },
@@ -176,9 +227,25 @@ export default function MediaGallery(props: MediaGalleryProps) {
       onPinchEnd: ({ offset: [s] }) => {
         previousPinchOriginRef.current = null;
 
+        if (s < 1 || s > 4) {
+          void animate(
+            scale,
+            Math.max(1, Math.min(4, s)),
+            reducedMotion ? { duration: 0.1 } : { type: "spring", stiffness: 400, damping: 30 },
+          );
+        }
+
         if (s <= 1) {
-          void animate(x, 0, { type: "spring", stiffness: 400, damping: 30 });
-          void animate(y, 0, { type: "spring", stiffness: 400, damping: 30 });
+          void animate(
+            x,
+            0,
+            reducedMotion ? { duration: 0.1 } : { type: "spring", stiffness: 400, damping: 30 },
+          );
+          void animate(
+            y,
+            0,
+            reducedMotion ? { duration: 0.1 } : { type: "spring", stiffness: 400, damping: 30 },
+          );
         }
       },
     },
@@ -231,16 +298,37 @@ export default function MediaGallery(props: MediaGalleryProps) {
     },
   );
 
+  useMotionValueEvent(y, "change", (value) => {
+    if (isDismissalMotionRef.current) {
+      onDragProgress?.(Math.min(1, Math.abs(value) / dismissalDistanceRef.current));
+    }
+  });
+
+  const resetDragProgress = useEffectEvent(() => onDragProgress?.(0));
+
   useEffect(() => {
+    x.stop();
+    y.stop();
+    scale.stop();
+
+    if (!isOpen) return;
+    resetDragProgress();
+    isDismissalMotionRef.current = false;
     x.set(0);
     y.set(0);
     scale.set(1);
     previousPinchOriginRef.current = null;
-  }, [index, x, y, scale]);
+  }, [index, isOpen, x, y, scale]);
 
   return (
     <LazyMotion features={domAnimation}>
-      <div ref={viewportRef} className="relative h-full w-full touch-none overflow-hidden">
+      <div
+        ref={viewportRef}
+        className={cn(
+          "relative h-full w-full touch-none overflow-hidden",
+          !isOpen && "pointer-events-none",
+        )}
+      >
         <div className="flex h-full w-full items-center justify-center select-none [-webkit-user-drag:_none]">
           <m.div ref={ref} className="relative" style={{ x, y, scale }}>
             <div className="absolute inset-0" />

@@ -8,6 +8,8 @@ import { useMediaFileObjectUrls } from "#src/hooks/useMediaFile.ts";
 import { useMultipleSuspenseDocument } from "#src/lib/automerge/suspense-hooks.ts";
 import MediaGallery, { type MediaGalleryItem } from "@trizum/ui/MediaGallery";
 import { Button } from "@trizum/ui/Button";
+import { sheetTweenConfig } from "@trizum/ui/sheetMotion";
+import { SheetSurface } from "@trizum/ui/SheetSurface";
 import { Icon } from "@trizum/ui/Icon";
 import { IconButton } from "@trizum/ui/IconButton";
 import { cn } from "@trizum/ui/utils";
@@ -19,7 +21,7 @@ const DRAG_THRESHOLD = 20; // Minimum pixels to trigger a cursor move
 const TAP_THRESHOLD = 5; // Maximum movement to consider it a tap (not drag)
 const DESKTOP_POPOVER_MARGIN = 8;
 const DESKTOP_POPOVER_ESTIMATED_HEIGHT = 360;
-const MOBILE_SHEET_TWEEN_CONFIG = { duration: 0.2, ease: "easeOut" } as const;
+const MOBILE_SHEET_TWEEN_CONFIG = sheetTweenConfig;
 const MOBILE_FIELD_VISIBILITY_MARGIN = 12;
 const MOBILE_SCROLL_ALLOWANCE_ANIMATION_MS = MOBILE_SHEET_TWEEN_CONFIG.duration * 1000;
 const MOBILE_SCROLL_RESTORE_TIMEOUT_MS = 650;
@@ -330,30 +332,34 @@ function useExpressionPointerGestures({
     if (!expressionEl) return;
 
     function handlePointerDown(e: PointerEvent) {
+      if (!e.isPrimary || e.button !== 0) return;
       pointerStartRef.current = { x: e.clientX, totalMovement: 0 };
       dragAccumulatorRef.current = 0;
       expressionEl!.setPointerCapture(e.pointerId);
     }
 
     function handlePointerMove(e: PointerEvent) {
-      if (!pointerStartRef.current) return;
+      if (!pointerStartRef.current || !expressionEl!.hasPointerCapture(e.pointerId)) return;
 
       const deltaX = e.clientX - pointerStartRef.current.x;
       pointerStartRef.current.totalMovement += Math.abs(deltaX);
       const newAccumulator = dragAccumulatorRef.current + deltaX;
 
-      if (Math.abs(newAccumulator) >= DRAG_THRESHOLD) {
-        const direction = newAccumulator > 0 ? "right" : "left";
+      const steps = Math.trunc(newAccumulator / DRAG_THRESHOLD);
+      const direction = steps > 0 ? "right" : "left";
+
+      for (let step = 0; step < Math.abs(steps); step++) {
         callbacksRef.current.onMoveCursor(direction);
-        dragAccumulatorRef.current = 0;
-      } else {
-        dragAccumulatorRef.current = newAccumulator;
       }
+
+      dragAccumulatorRef.current = newAccumulator - steps * DRAG_THRESHOLD;
 
       pointerStartRef.current.x = e.clientX;
     }
 
     function handlePointerUp(e: PointerEvent) {
+      if (!expressionEl!.hasPointerCapture(e.pointerId)) return;
+
       if (pointerStartRef.current && pointerStartRef.current.totalMovement < TAP_THRESHOLD) {
         const clickX = e.clientX;
         let bestPosition = 0;
@@ -404,12 +410,14 @@ function useExpressionPointerGestures({
     expressionEl.addEventListener("pointermove", handlePointerMove);
     expressionEl.addEventListener("pointerup", handlePointerUp);
     expressionEl.addEventListener("pointercancel", handlePointerCancel);
+    expressionEl.addEventListener("lostpointercapture", handlePointerCancel);
 
     return () => {
       expressionEl.removeEventListener("pointerdown", handlePointerDown);
       expressionEl.removeEventListener("pointermove", handlePointerMove);
       expressionEl.removeEventListener("pointerup", handlePointerUp);
       expressionEl.removeEventListener("pointercancel", handlePointerCancel);
+      expressionEl.removeEventListener("lostpointercapture", handlePointerCancel);
     };
   }, [callbacksRef, charRefs, dragAccumulatorRef, expression, expressionRef, pointerStartRef]);
 }
@@ -1074,9 +1082,9 @@ export function CalculatorToolbar({
           role="application"
           aria-label={t`Calculator`}
           data-presence-proxy-element-id={presenceElementId}
-          className="border-accent-200/80 to-accent-50/95 pb-safe dark:border-accent-800 dark:from-accent-950 dark:via-accent-950 dark:to-accent-900 w-full max-w-xl overflow-hidden rounded-t-[1.75rem] border bg-gradient-to-b from-white via-white shadow-[0_-10px_40px_rgba(15,23,42,0.24)] dark:shadow-none"
+          className="right-0 mx-auto w-full max-w-xl"
         >
-          {calculatorContent}
+          <SheetSurface contentClassName="pb-safe">{calculatorContent}</SheetSurface>
         </Sheet.Container>
       </Sheet>
     );

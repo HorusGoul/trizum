@@ -79,6 +79,111 @@ async function navigateToAddExpense({
 }
 
 test.describe("Expense calculator", () => {
+  test("preserves every cursor step in a fast swipe and clamps at both ends", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 700, height: 800 });
+    await navigateToAddExpense({ autoOpenCalculator: false, harness });
+    await page.getByRole("button", { name: "Open calculator", exact: true }).click();
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    await expect(calculator).toHaveCSS("transform", "none");
+
+    for (const digit of "123456") {
+      await calculator.getByRole("button", { name: digit, exact: true }).click();
+    }
+
+    const expression = calculator.getByLabel("Calculator expression", { exact: true });
+
+    async function swipe(distance: number) {
+      const box = await expression.boundingBox();
+
+      if (!box) throw new Error("Expected the calculator expression");
+      const x = box.x + box.width / 2;
+      const y = box.y + box.height / 2;
+      await page.mouse.move(x, y);
+      await page.mouse.down();
+      await page.mouse.move(x + distance, y);
+      await page.mouse.up();
+    }
+
+    await swipe(-60);
+    await calculator.getByRole("button", { name: "9", exact: true }).click();
+    await expect(expression).toHaveText("1239|456");
+
+    await swipe(300);
+    await calculator.getByRole("button", { name: "8", exact: true }).click();
+    await expect(expression).toHaveText("12394568|");
+
+    await swipe(-300);
+    await calculator.getByRole("button", { name: "7", exact: true }).click();
+    await expect(expression).toHaveText("7|12394568");
+  });
+
+  test("keeps one continuous sheet surface during overdrag at wider mobile widths", async ({
+    harness,
+    page,
+  }) => {
+    await page.setViewportSize({ width: 700, height: 800 });
+    await navigateToAddExpense({ autoOpenCalculator: false, harness });
+    await page.getByRole("button", { name: "Open calculator", exact: true }).click();
+
+    const calculator = page.getByRole("application", { name: "Calculator" });
+    await expect(calculator).toBeVisible();
+    await expect
+      .poll(async () => {
+        const box = await calculator.boundingBox();
+
+        return box ? Math.abs(box.y + box.height - 800) : Infinity;
+      })
+      .toBeLessThan(1);
+    const handle = page.locator("[data-calculator-sheet-drag-handle]");
+    const surface = page.locator("[data-sheet-surface]");
+    const handleBox = await handle.boundingBox();
+
+    if (!handleBox) throw new Error("Expected a visible calculator drag handle");
+    const x = handleBox.x + handleBox.width / 2;
+    const y = handleBox.y + handleBox.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x, y - 100, { steps: 10 });
+
+    await expect(calculator).toHaveCSS("border-bottom-width", "0px");
+    await expect(surface).toHaveCSS("border-bottom-width", "1px");
+    await expect
+      .poll(async () => {
+        const box = await calculator.boundingBox();
+
+        return box ? box.y + box.height : Infinity;
+      })
+      .toBeLessThan(800);
+    await expect
+      .poll(async () => {
+        const containerBox = await calculator.boundingBox();
+        const surfaceBox = await surface.boundingBox();
+
+        if (!containerBox || !surfaceBox) return Infinity;
+
+        return Math.max(
+          Math.abs(containerBox.x - surfaceBox.x),
+          Math.abs(containerBox.width - surfaceBox.width),
+          Math.abs(containerBox.y - surfaceBox.y),
+          Math.abs(surfaceBox.y + surfaceBox.height - 800),
+        );
+      })
+      .toBeLessThan(1);
+    await page.screenshot({ path: test.info().outputPath("calculator-overdrag.png") });
+
+    await page.mouse.up();
+    await expect
+      .poll(async () => {
+        const box = await calculator.boundingBox();
+
+        return box ? Math.abs(box.y + box.height - 800) : Infinity;
+      })
+      .toBeLessThan(1);
+  });
+
   test("keeps the calculator button aligned when the amount is invalid", async ({
     harness,
     page,

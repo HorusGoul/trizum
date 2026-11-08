@@ -267,13 +267,9 @@ export function useCalculatorMode({
   }
 
   function moveCursor(direction: "left" | "right") {
-    if (direction === "left" && cursorPosition > 0) {
-      setCursorPositionRaw(cursorPosition - 1);
-      setSelectionRangeRaw(null);
-    } else if (direction === "right" && cursorPosition < expression.length) {
-      setCursorPositionRaw(cursorPosition + 1);
-      setSelectionRangeRaw(null);
-    }
+    const delta = direction === "left" ? -1 : 1;
+    setCursorPositionRaw((position) => Math.max(0, Math.min(expression.length, position + delta)));
+    setSelectionRangeRaw(null);
   }
 
   function setCursorPosition(position: number) {

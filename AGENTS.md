@@ -20,3 +20,6 @@ Read only the guidance relevant to the task:
 - **Writing refactor plans:** [Refactor document protocol](./docs/refactor-docs.md).
 
 Use relevant project-local [skills](./.agents/skills) for their named workflows.
+
+For animation and interaction design, follow the skill selection guidance in
+[PWA conventions](./docs/agents/pwa.md#motion-and-interaction-design).
