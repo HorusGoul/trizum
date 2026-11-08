@@ -14,7 +14,7 @@ import { cn } from "./utils.js";
 import { cancelIdleCallback, requestIdleCallback } from "./requestIdleCallback.js";
 
 const refreshThreshold = 72;
-const maxPullDistance = 96;
+const pullRatio = 0.55;
 const refreshingIndicatorHeight = 64;
 
 const indicatorSpring = {
@@ -144,8 +144,14 @@ export function PullToRefresh({
     }
 
     const currentDistance = pullDistance.get();
+
+    const rawDistance =
+      currentDistance <= refreshThreshold
+        ? currentDistance
+        : refreshThreshold * Math.exp((currentDistance - refreshThreshold) / refreshThreshold);
+
     stopPullAnimation();
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY - currentDistance / 0.55 };
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY - rawDistance / pullRatio };
   }
 
   function onTouchMove(event: TouchEvent) {
@@ -192,13 +198,12 @@ export function PullToRefresh({
       event.preventDefault();
     }
 
-    const distance = yDistance * 0.55;
+    const distance = yDistance * pullRatio;
     setPullDistance(
       distance <= refreshThreshold
         ? distance
         : refreshThreshold +
-            (maxPullDistance - refreshThreshold) *
-              (1 - Math.exp(-(distance - refreshThreshold) / (maxPullDistance - refreshThreshold))),
+            refreshThreshold * Math.log1p((distance - refreshThreshold) / refreshThreshold),
     );
   }
 

@@ -22,6 +22,7 @@ import { mediaGalleryItemLoader, type MediaGalleryItem } from "./mediaGalleryIte
 export type { MediaGalleryItem } from "./mediaGalleryItemLoader.js";
 
 interface MediaGalleryCommonProps {
+  isOpen?: boolean;
   index: number;
   onChange: (index: number) => void;
   onClose: () => void;
@@ -48,7 +49,7 @@ const CLOSE_THRESHOLD = 150;
 
 export default function MediaGallery(props: MediaGalleryProps) {
   const { t } = useLingui();
-  const { index, onClose, onChange, onDragProgress, showCloseButton = true } = props;
+  const { index, onClose, onChange, onDragProgress, showCloseButton = true, isOpen = true } = props;
   const itemCount = props.items !== undefined ? props.items.length : props.itemCount;
 
   const currentItemKey =
@@ -91,6 +92,14 @@ export default function MediaGallery(props: MediaGalleryProps) {
 
   // Keep dismissal feedback active through the drag and its snap-back animation.
   const isDismissalMotionRef = useRef(false);
+  const dismissalDistanceRef = useRef(1);
+
+  function getDismissalDistance() {
+    const viewportHeight = viewportRef.current?.clientHeight ?? window.innerHeight;
+    const imageHeight = ref.current?.getBoundingClientRect().height ?? 0;
+
+    return (viewportHeight + imageHeight) / 2;
+  }
 
   function getLocalPinchOrigin([originX, originY]: MediaGalleryPoint) {
     const viewport = viewportRef.current;
@@ -144,6 +153,7 @@ export default function MediaGallery(props: MediaGalleryProps) {
         // Determine if this is a closing drag (only when not zoomed)
         const currentScale = scale.get();
         isDismissalMotionRef.current = currentScale <= 1;
+        dismissalDistanceRef.current = getDismissalDistance();
       },
       onDrag: ({ offset: [offsetX, offsetY], pinching, cancel }) => {
         if (pinching) return cancel();
@@ -175,7 +185,22 @@ export default function MediaGallery(props: MediaGalleryProps) {
                 Math.abs(releaseVelocity) > 500 &&
                 Math.sign(offsetY) === Math.sign(releaseVelocity)))
           ) {
-            onClose();
+            const target =
+              Math.sign(offsetY) * Math.max(dismissalDistanceRef.current, Math.abs(y.get()));
+
+            void animate(
+              y,
+              target,
+              reducedMotion
+                ? { duration: 0.1, onComplete: onClose }
+                : {
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                    velocity: releaseVelocity,
+                    onComplete: onClose,
+                  },
+            );
           } else {
             // Animate back to center with spring effect
             void animate(
@@ -275,27 +300,35 @@ export default function MediaGallery(props: MediaGalleryProps) {
 
   useMotionValueEvent(y, "change", (value) => {
     if (isDismissalMotionRef.current) {
-      onDragProgress?.(Math.min(1, Math.abs(value) / CLOSE_THRESHOLD));
+      onDragProgress?.(Math.min(1, Math.abs(value) / dismissalDistanceRef.current));
     }
   });
 
   const resetDragProgress = useEffectEvent(() => onDragProgress?.(0));
 
   useEffect(() => {
-    resetDragProgress();
-    isDismissalMotionRef.current = false;
     x.stop();
     y.stop();
     scale.stop();
+
+    if (!isOpen) return;
+    resetDragProgress();
+    isDismissalMotionRef.current = false;
     x.set(0);
     y.set(0);
     scale.set(1);
     previousPinchOriginRef.current = null;
-  }, [index, x, y, scale]);
+  }, [index, isOpen, x, y, scale]);
 
   return (
     <LazyMotion features={domAnimation}>
-      <div ref={viewportRef} className="relative h-full w-full touch-none overflow-hidden">
+      <div
+        ref={viewportRef}
+        className={cn(
+          "relative h-full w-full touch-none overflow-hidden",
+          !isOpen && "pointer-events-none",
+        )}
+      >
         <div className="flex h-full w-full items-center justify-center select-none [-webkit-user-drag:_none]">
           <m.div ref={ref} className="relative" style={{ x, y, scale }}>
             <div className="absolute inset-0" />

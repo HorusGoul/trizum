@@ -14,3 +14,5 @@ Align the calculator sheet and bottom fill across mobile widths, and restore the
 Start cold sheet openings from their measured height, synchronize backdrop visibility and progress, and use a gentler shared iOS-style opening curve.
 
 Keep repeated sheet openings animated, reverse interrupted closes without resetting position, and discard superseded transition completions.
+
+Continue gallery dismissals off-screen with release momentum, retain photos through exit fades, and let refresh pulls continue beyond the threshold with increasing resistance.

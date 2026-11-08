@@ -18,16 +18,16 @@ msgid "ui.avatar.default"
 msgstr "Avatar"
 
 #. js-lingui-explicit-id
-#: src/MediaGallery.tsx:315
+#: src/MediaGallery.tsx:348
 msgid "ui.mediaGallery.close"
 msgstr "Cerrar"
 
 #. js-lingui-explicit-id
-#: src/MediaGallery.tsx:332
+#: src/MediaGallery.tsx:365
 msgid "ui.mediaGallery.next"
 msgstr "Siguiente"
 
 #. js-lingui-explicit-id
-#: src/MediaGallery.tsx:325
+#: src/MediaGallery.tsx:358
 msgid "ui.mediaGallery.previous"
 msgstr "Anterior"

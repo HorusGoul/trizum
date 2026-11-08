@@ -27,7 +27,11 @@ export function RouteMediaGallery({
   onClose,
 }: RouteMediaGalleryProps) {
   const isOpen = galleryIndex !== undefined && galleryIndex >= 0;
-  const selectedPhotoId = galleryIndex === undefined ? undefined : photoIds[galleryIndex];
+  const [lastIndex, setLastIndex] = useState(galleryIndex);
+
+  if (isOpen && galleryIndex !== lastIndex) setLastIndex(galleryIndex);
+  const displayedIndex = isOpen ? galleryIndex : lastIndex;
+  const selectedPhotoId = displayedIndex === undefined ? undefined : photoIds[displayedIndex];
 
   // Track drag progress for background opacity animation
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -51,7 +55,7 @@ export function RouteMediaGallery({
       data-media-gallery-overlay=""
       isOpen={isOpen}
       className={({ isEntering, isExiting }) =>
-        `fixed inset-0 isolate z-50 ${isEntering ? "animate-in fade-in duration-300 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-200 ease-in" : ""} `
+        `fixed inset-0 isolate z-50 ${isEntering ? "animate-in fade-in duration-300 ease-out" : ""} ${isExiting ? "animate-out fade-out duration-200 ease-out" : ""} `
       }
       style={{
         backgroundColor: "rgba(0, 0, 0, 0.25)",
@@ -60,11 +64,12 @@ export function RouteMediaGallery({
       }}
     >
       <Modal className="h-full w-full">
-        {isOpen && selectedPhotoId && (
+        {displayedIndex !== undefined && selectedPhotoId && (
           <MediaGallery
+            isOpen={isOpen}
             getItemKey={(index) => photoIds[index]}
             itemCount={photoIds.length}
-            index={galleryIndex}
+            index={displayedIndex}
             renderItem={(index) => <RouteMediaGalleryImage photoId={photoIds[index]} />}
             onChange={onIndexChange}
             onClose={onClose}
