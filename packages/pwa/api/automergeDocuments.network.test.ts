@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { partyViewSchema, expenseViewSchema } from "@trizum/mcp/contracts";
+import { mcpRoute } from "./routes/mcp";
 import { once } from "node:events";
 import type { ChangeFn } from "@automerge/automerge";
 import { createRequire } from "node:module";
@@ -182,13 +185,85 @@ describe("Worker document reads over WebSocket", () => {
     }
   });
 
+  it("creates, lists and removes repeated expenses over HTTP without D1, tokens or preparation", async () => {
+    const env = await startServer();
+    const limit = vi.fn<RateLimit["limit"]>().mockResolvedValue({ success: true });
+    const app = new Hono<ApiHonoEnv>();
+    app.use("*", createApiI18nMiddleware());
+    app.route("/api/mcp", mcpRoute);
+    const bindings = { ...env, MCP_WRITE_LIMITER: { limit } };
+    let requestNumber = 0;
+
+    async function call<T>(
+      name: string,
+      input: Record<string, string | string[]>,
+      schema: z.ZodType<T>,
+    ) {
+      const response = await app.request(
+        "https://trizum.app/api/mcp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json, text/event-stream",
+          },
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: ++requestNumber,
+            method: "tools/call",
+            params: { name, arguments: input },
+          }),
+        },
+        bindings,
+      );
+
+      expect(response.status).toBe(200);
+
+      const body = z
+        .object({
+          result: z.object({ isError: z.boolean().optional(), structuredContent: schema }),
+        })
+        .parse(await response.json());
+
+      expect(body.result.isError).not.toBe(true);
+
+      return body.result.structuredContent;
+    }
+
+    const input = { name: "Direct MCP", currency: "EUR", participants: ["Test Alex", "Test Sam"] };
+    const first = await call("create_party", input, partyViewSchema);
+    const second = await call("create_party", input, partyViewSchema);
+    expect(first.partyId).not.toBe(second.partyId);
+
+    const expense = {
+      partyId: first.partyId,
+      name: "Dinner",
+      amount: "48.00",
+      paidAt: "2026-11-08T20:00:00Z",
+      paidBy: first.participants[0].id,
+      splitBetween: first.participants.map((person) => person.id),
+    };
+
+    await call("add_expense", expense, partyViewSchema);
+    await call("add_expense", expense, partyViewSchema);
+    const duplicated = await call("get_party", { partyId: first.partyId }, partyViewSchema);
+    expect(duplicated.expenses).toHaveLength(2);
+    expect(duplicated.expenses.map((entry) => entry.name)).toEqual(["Dinner", "Dinner"]);
+    const target = { partyId: first.partyId, expenseId: duplicated.expenses[0].id };
+    const full = await call("get_expense", target, expenseViewSchema);
+    await call("delete_expense", { ...target, version: full.version }, partyViewSchema);
+    const cleaned = await call("get_party", { partyId: first.partyId }, partyViewSchema);
+    expect(cleaned.expenses).toHaveLength(1);
+    expect(cleaned.participants.map((person) => person.balance)).toEqual(["24.00", "-24.00"]);
+    expect(limit).toHaveBeenCalledTimes(5);
+  });
+
   it("creates agent parties and expenses that survive Worker cleanup with correct shared balances", async () => {
     const env = await startServer();
     const documents = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
     const service = new WorkerPartyService(documents, "https://trizum.app");
 
     const party = await service.createParty({
-      requestId: crypto.randomUUID(),
       name: "Weekend",
       currency: "EUR",
       participants: ["Alice", "Bob", "Carol"],
@@ -202,7 +277,6 @@ describe("Worker document reads over WebSocket", () => {
     );
 
     const expenseInput = {
-      requestId: crypto.randomUUID(),
       partyId: party.partyId,
       name: "Dinner",
       amount: "10.00",
@@ -270,7 +344,6 @@ describe("Worker document reads over WebSocket", () => {
 
     try {
       const party = await service.createParty({
-        requestId: crypto.randomUUID(),
         name: "Growing group",
         currency: "EUR",
         participants: ["Alice", "Bob"],
@@ -280,7 +353,6 @@ describe("Worker document reads over WebSocket", () => {
 
       partyId = party.partyId;
       await service.addExpense({
-        requestId: crypto.randomUUID(),
         partyId,
         name: "First dinner",
         amount: "2.00",
@@ -290,14 +362,12 @@ describe("Worker document reads over WebSocket", () => {
       });
       await expect(
         service.addParticipants({
-          requestId: crypto.randomUUID(),
           partyId,
           participants: ["Carol", " alice "],
         }),
       ).rejects.toThrow("already exists");
       await expect(
         service.addParticipants({
-          requestId: crypto.randomUUID(),
           partyId,
           participants: ["Carol", "carol"],
         }),
@@ -307,7 +377,6 @@ describe("Worker document reads over WebSocket", () => {
       ).toEqual(["Alice", "Bob"]);
 
       const added = await service.addParticipants({
-        requestId: crypto.randomUUID(),
         partyId,
         participants: ["Carol"],
       });
@@ -321,7 +390,6 @@ describe("Worker document reads over WebSocket", () => {
       const carol = added.participants.find((person) => person.name === "Carol")!;
 
       const expense = await service.addExpense({
-        requestId: crypto.randomUUID(),
         partyId,
         name: "Carol's dinner",
         amount: "6.00",
@@ -335,7 +403,6 @@ describe("Worker document reads over WebSocket", () => {
       ).toEqual({ Alice: "-1.00", Bob: "-3.00", Carol: "4.00" });
       await expect(
         service.addParticipants({
-          requestId: crypto.randomUUID(),
           partyId,
           participants: Array.from({ length: 48 }, (_, index) => `Person ${index}`),
         }),
@@ -367,7 +434,6 @@ describe("Worker document reads over WebSocket", () => {
     const initial = new AutomergeDocuments({ env, request: new Request("https://trizum.app") });
 
     const party = await new WorkerPartyService(initial, "https://trizum.app").createParty({
-      requestId: crypto.randomUUID(),
       name: "Concurrent additions",
       currency: "EUR",
       participants: ["Alice"],
@@ -390,7 +456,6 @@ describe("Worker document reads over WebSocket", () => {
       await Promise.all(
         writers.map((documents, index) =>
           new WorkerPartyService(documents, "https://trizum.app").addParticipants({
-            requestId: crypto.randomUUID(),
             partyId: party.partyId,
             participants: [index === 0 ? "Bob" : "Carol"],
           }),
@@ -427,7 +492,6 @@ describe("Worker document reads over WebSocket", () => {
     const service = new WorkerPartyService(initial, "https://trizum.app");
 
     const party = await service.createParty({
-      requestId: crypto.randomUUID(),
       name: "Concurrent expenses",
       currency: "EUR",
       participants: ["Alice", "Bob"],
@@ -436,7 +500,6 @@ describe("Worker document reads over WebSocket", () => {
     });
 
     const expense = (amount: string) => ({
-      requestId: crypto.randomUUID(),
       partyId: party.partyId,
       name: "Dinner",
       amount,
@@ -552,7 +615,6 @@ describe("Worker document reads over WebSocket", () => {
 
     try {
       const created = await service.createParty({
-        requestId: crypto.randomUUID(),
         name: "Long-running group",
         currency: "EUR",
         participants: ["Alice", "Bob"],
@@ -618,7 +680,6 @@ describe("Worker document reads over WebSocket", () => {
       expect(result.participants.map((person) => person.balance)).toEqual(["10.00", "-10.00"]);
 
       const updated = await service.addExpense({
-        requestId: crypto.randomUUID(),
         partyId,
         name: "Lunch",
         amount: "4.00",
@@ -669,7 +730,6 @@ describe("Worker document reads over WebSocket", () => {
         });
 
         const renamed = await api.updateExpense({
-          requestId: crypto.randomUUID(),
           partyId,
           expenseId: expense.expenseId,
           version: expense.version,
@@ -706,7 +766,6 @@ describe("Worker document reads over WebSocket", () => {
       const api = new WorkerPartyService(documents, "https://trizum.app");
       await expect(
         api.createParty({
-          requestId: "not-forwarded",
           name: "Lost acknowledgement",
           currency: "EUR",
           description: "",

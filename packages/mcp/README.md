@@ -9,14 +9,14 @@ participant to join through the normal PWA flow.
 ## Structure
 
 - [`src/contracts.ts`](./src/contracts.ts): validated tool inputs, structured
-  results, and the host's `McpService` interface.
+  results, and the host's `PartyService` interface.
 - [`src/server.ts`](./src/server.ts): tools and UI resource, using the official
   MCP SDK's fetch-native Streamable HTTP transport.
 - [`src/widget.tsx`](./src/widget.tsx): React card built with `@trizum/ui` and
   the standard MCP Apps bridge. Other MCP clients can use structured results without rendering UI.
 - [`../pwa/api/routes/mcp.ts`](../pwa/api/routes/mcp.ts): `/api/mcp` in the
   existing Cloudflare Worker, with no separate hosting.
-- [`../pwa/api/mcp`](../pwa/api/mcp): existing Automerge domain and D1 adapters.
+- [`../pwa/api/mcp`](../pwa/api/mcp): existing Automerge domain operations.
 
 The package uses the shared `@trizum/ui` design system. Its host supplies
 persistence and Lingui UI labels; it has no PWA dependency. Protocol descriptions guide agents in English; widget labels support
@@ -26,7 +26,6 @@ English and Spanish through the Worker's `Accept-Language` or `?lang=es` setting
 
 | Tool                 | Purpose                                                                                     |
 | -------------------- | ------------------------------------------------------------------------------------------- |
-| `prepare_write`      | Issue a signed, 15-minute request token for one party, participant, or expense action.      |
 | `create_party`       | Create a named group with a currency and 1–50 named participants; return its invite URL.    |
 | `get_party`          | Sync a known party's participants, shared balances, and up to 20 recent expenses on demand. |
 | `add_participants`   | Add named people to a party and return their IDs for subsequent expenses.                   |
@@ -101,45 +100,32 @@ documents and close after each request. Creation and changes wait for the sync
 peer's acknowledgement, confirming receipt rather than a durable disk flush.
 Expense chunks and balance caches use the normal PWA document shapes.
 
-After collecting the details for a new action, the agent calls `prepare_write`
-and passes the returned token unchanged as `requestId`. The Worker signs these
-15-minute tokens using the existing `BETTER_AUTH_SECRET`, with a dedicated
-issuer and key prefix. Preparation needs no D1 or Automerge access.
+Tools execute directly after argument validation and edge rate limiting. There is
+no preparation tool, signed write token, request ID, retry receipt, or D1 access.
+Calling `create_party` or `add_expense` again performs another creation. Agents
+can inspect recent expenses with `get_party`, read an exact record with
+`get_expense`, and remove an unwanted duplicate with `delete_expense` using its
+current version. Participant name guards and expense version checks remain.
 
-D1's `mcp_operations` table claims the token's random nonce atomically before
-writing and stores a compact receipt containing the party ID. Repeating the same
-tool and arguments reads the current party from Automerge without executing the
-write again. Different arguments with the same token are rejected; concurrent
-attempts cannot both execute.
+If a call fails or times out, it can still have reached sync. Inspect the group
+when its link is known; the tool does not claim success for an unconfirmed write.
+When a party ID was allocated before acknowledgement failed, the error includes
+its recovery link. The integration does not maintain a separate operation log or
+try to identify repeated requests. Do not log party links, arguments, or results.
 
-Failures or interruptions before saving the result leave a pending claim. The
-agent must check the party before starting another action; retries with that
-token stay blocked to prevent duplicates. A failed creation can leave an
-unlinked party on sync. This version does not recover ambiguous operations.
-
-An indexed scheduled cleanup runs every five minutes and deletes claims older
-than 15 minutes. Tokens expire before their claims become eligible for deletion,
-so deleting a receipt cannot make an old request executable again. Expired tokens
-are rejected before D1 access. An expired or unconfirmed action must be checked
-before preparing a replacement. Cleanup can be delayed by scheduler failures;
-expiry is still enforced on every write.
-
-Claims retain a fingerprint and party ID, without names, amounts, or an account
-identity. Request tokens and party links are access capabilities: do not log
-arguments, results, or identifiers.
 Anonymous server action counts use `@trizum/analytics` through the existing
-InsightFlare binding. They carry no human identity, client metadata, or group
-data. Successful write replays are not counted twice; see the
-[analytics guide](../pwa/docs/analytics.md#anonymous-mcp-server-events) for gates
-and payload semantics. Normal PWA telemetry gates apply when opening trizum.
+InsightFlare binding, after the public tool completes and its result validates.
+Each successful call counts, including repeated creations. Service-internal reads
+and failures do not count. Events carry no human identity, client metadata, or
+group data; see the [analytics guide](../pwa/docs/analytics.md#anonymous-mcp-server-events).
 
 ## Request cost boundaries
 
-Initialization, discovery, resource reads, `prepare_write`, `get_party`, and `get_expense`
-do not query the application's D1 database. A new write uses one indexed claim insert and one
-receipt update; only retries look up an existing receipt. Cleanup runs separately
-from requests and uses the creation-time index. Group state stays in
-Automerge, whose sync server still incurs its normal storage and network costs.
+All MCP initialization, discovery, resource reads, party/expense reads, and
+mutations avoid D1. Automerge sync still incurs its normal storage and network
+costs, and each mutation uses the existing Cloudflare edge rate limiter. No
+signing secret or cleanup cron is needed for MCP. D1 remains in the Worker for
+unrelated app features such as accounts and cloud sync.
 
 Each party read or write syncs the Automerge documents it needs into a temporary
 repo and closes that repo at the end. MCP does not cache party state across requests
@@ -158,7 +144,7 @@ expenses in a new party, fewer when it already contains other chunks. Beyond
 that, open the party in trizum. No extra D1 coordination or request cache is used.
 `add_participants` changes only the party document, followed by the normal
 on-demand group view. It creates no extra documents or summaries and uses the
-same two D1 write statements and retry protection as other mutations.
+same direct sync and completion-event flow as other mutations.
 Expense edits and deletions recompute the affected chunk's existing shared
 balance document by calling the existing PWA `recalculatePartyBalances` through
 a Worker adapter scoped to that chunk. Browser hooks, shared models, and the
@@ -210,17 +196,16 @@ an update. New tool metadata advertises the latest URI.
 ## Connect a development app
 
 1. Run `vp run dev` from the workspace root. Use the printed local URL with
-   `/api/mcp`. If needed, apply migrations from `packages/pwa` using
-   `vp exec wrangler d1 migrations apply DB --local`.
-2. Writes require a reachable Automerge WebSocket peer. Configure
-   `AUTOMERGE_WSS_URL` and a test-only `BETTER_AUTH_SECRET` of at least 32 characters
-   in the PWA's local Worker environment; see the
+   `/api/mcp`.
+2. Writes require a reachable Automerge WebSocket peer and the
+   `MCP_WRITE_LIMITER` binding. Configure `AUTOMERGE_WSS_URL`; see the
    [Worker setup guide](../pwa/docs/cloudflare.md) for routing and defaults.
+   MCP needs no database or signing secret.
 3. Expose the dev URL through an HTTPS tunnel, or use the repository's normal PR
-   preview deployment. Apply `0007_mcp_operations.sql` in that environment before
-   testing writes. PR previews share the configured database and sync service;
-   use disposable groups. Uploaded preview versions do not activate cron triggers;
-   the cleanup schedule becomes active when the Worker is deployed to production.
+   preview deployment. Previews share the configured sync service; use disposable
+   groups. Deploy the direct-sync implementation before applying
+   `0008_drop_mcp_operations.sql` to remove the old receipt table. Keep `0007` in
+   migration history for environments where it already ran.
 4. In ChatGPT's custom MCP app setup, enter
    `https://<preview-or-tunnel-host>/api/mcp`, name it **trizum**, and select
    **No authentication**. Install it and select it in a new chat. Refresh the
@@ -250,13 +235,13 @@ omit Origin; Origin checks are not party authorization.
   split it among Alice, Bob, and Carol.” Expect Carol to be added, then the expense
   to use her returned ID. Previous expenses keep their original splits. Ask for
   clarification if a name could refer to an existing participant.
-- Participant retry: replay `add_participants` unchanged. Expect the same people
-  and IDs, with no second addition or analytics event.
+- Participant repeat: request names already present. Expect the existing name
+  guard to ask the agent to reuse participant IDs from `get_party`.
 - Indirect: “My partner and I want to track groceries together.” Expect
   clarification about names, group name, and currency before creation.
-- Retry: replay a completed call unchanged within 15 minutes. Expect the same
-  party with its current state and no additional group or expense. After expiry,
-  expect rejection even if its receipt has been deleted.
+- Repeat: call creation again with identical arguments and no tokens. Expect a
+  distinct party or expense. List the party's recent expenses, inspect an exact
+  duplicate, delete it with its current version, and verify the remaining balance.
 - Details: “Rename this group to Summer trip and clear its description.” Expect
   only those fields to change.
 - Participant: “Rename Bob to Robert, then remove him from the active group.”
@@ -275,7 +260,7 @@ omit Origin; Origin checks are not party authorization.
 
 Before directory submission, exercise these conversations inside ChatGPT, verify
 the embedded card and PWA handoff, and review the public privacy policy, branding,
-tool annotations, abuse controls, and operation retention/recovery policy. Local
+tool annotations, abuse controls, and duplicate-creation behavior and recovery guidance. Local
 tests do not establish directory approval or live ChatGPT compatibility.
 
 ## Official references
@@ -329,5 +314,5 @@ preview deployment does not provision production routes. See the Worker setup.
 If a new party's write acknowledgement is lost after a document ID is allocated,
 the tool remains an error and returns that party's recovery link. Check it with
 `get_party` before considering another creation. The link is not proof that the
-write succeeded. The original retry claim stays pending; no extra D1 operation
-or receipt is written merely to expose the known document ID.
+write succeeded. There is no retry claim or operation receipt; the known ID is
+returned directly from the uncertain Automerge write.

@@ -68,16 +68,6 @@ function renderPrivacyPolicyContent() {
           </p>
           <p className="text-accent-700 dark:text-accent-300">
             <Trans>
-              To prevent duplicate writes after a network interruption, we keep a temporary retry
-              record containing a random operation identifier, a hash of the request, the resulting
-              group identifier, and a timestamp. It contains no copy of group names or expense
-              details. These records become eligible for deletion after 15 minutes and are normally
-              removed by a cleanup that runs every five minutes. Group and expense data follow the
-              normal retention rules described below.
-            </Trans>
-          </p>
-          <p className="text-accent-700 dark:text-accent-300">
-            <Trans>
               We count completed agent actions using anonymous, self-hosted analytics. These counts
               contain no user identifier, client network address, user agent, group identifier,
               names, or amounts. They do not depend on an app profile or its analytics setting. We

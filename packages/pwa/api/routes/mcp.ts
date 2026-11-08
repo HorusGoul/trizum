@@ -1,15 +1,14 @@
 import { Hono } from "hono";
 import { NATIVE_APP_ORIGIN } from "../../src/lib/aiInvite";
 import { bodyLimit } from "hono/body-limit";
-import { handleMcpRequest } from "@trizum/mcp/index";
+import type { McpAnalyticsEvent } from "@trizum/analytics";
+import { handleMcpRequest, type PartyService } from "@trizum/mcp/index";
 import widgetScript from "@trizum/mcp/widget.js?raw";
 import widgetStyles from "@trizum/mcp/widget.css?raw";
 import widgetSprite from "@trizum/mcp/widget.svg?raw";
 import { createAutomergeDocumentsMiddleware } from "../automergeDocumentsMiddleware";
 import { WorkerPartyService } from "../mcp/partyService";
-import { IdempotentPartyService } from "../mcp/idempotency";
 import { createMcpAnalytics } from "../mcp/analytics";
-import { WriteTokens } from "../mcp/writeTokens";
 import { createMcpWriteLimit } from "../mcp/writeLimit";
 import {
   mcpBalancesMessage,
@@ -57,18 +56,13 @@ mcpRoute.use("*", createAutomergeDocumentsMiddleware());
 mcpRoute.on(["POST", "GET", "DELETE"], "/", (c) => {
   const i18n = c.get("i18n");
 
-  const service = new IdempotentPartyService(
-    new WorkerPartyService(c.get("documents"), NATIVE_APP_ORIGIN),
-    c.env.DB,
-    {
-      tokens: new WriteTokens(c.env.BETTER_AUTH_SECRET),
-      limitWrite: createMcpWriteLimit(c.env, c.req.raw),
-      trackEvent: createMcpAnalytics(c.env, c.req.raw, (task) => c.executionCtx.waitUntil(task)),
-    },
-  );
+  const service = new WorkerPartyService(c.get("documents"), NATIVE_APP_ORIGIN);
+  const trackEvent = createMcpAnalytics(c.env, c.req.raw, (task) => c.executionCtx.waitUntil(task));
 
   return handleMcpRequest(c.req.raw, service, {
     appOrigin: new URL(c.req.url).origin,
+    beforeWrite: createMcpWriteLimit(c.env, c.req.raw),
+    onActionCompleted: (action) => trackEvent(actionEvents[action]),
     widgetScript,
     widgetStyles,
     widgetSprite,
@@ -80,3 +74,15 @@ mcpRoute.on(["POST", "GET", "DELETE"], "/", (c) => {
     errorLabel: i18n._(mcpErrorMessage),
   });
 });
+
+const actionEvents = {
+  createParty: "mcp_party_created",
+  getParty: "mcp_party_viewed",
+  addParticipants: "mcp_participants_added",
+  addExpense: "mcp_expense_added",
+  getExpense: "mcp_expense_viewed",
+  updateParty: "mcp_party_updated",
+  updateParticipant: "mcp_participant_updated",
+  updateExpense: "mcp_expense_updated",
+  deleteExpense: "mcp_expense_deleted",
+} satisfies Record<keyof PartyService, McpAnalyticsEvent>;

@@ -3,7 +3,6 @@ import { apiMigrateRoute } from "./routes/migrate";
 import { createAuth } from "./auth";
 import { cloudSyncRoute } from "./routes/cloud-sync";
 import type { ApiEnv, ApiHonoEnv } from "./env";
-import { cleanupMcpOperations } from "./mcp/cleanup";
 import { getRedactedPath, workerLogger } from "./log";
 import { createApiCorsMiddleware } from "./cors";
 import { partySharePreviewRoute } from "./routes/party-share-preview";
@@ -72,8 +71,4 @@ app.doc31("/api/openapi.json", {
 
 export default {
   fetch: app.fetch,
-  async scheduled(_controller: ScheduledController, env: ApiEnv) {
-    const deleted = await cleanupMcpOperations(env.DB);
-    workerLogger.info("Expired MCP receipts deleted", { deleted });
-  },
 } satisfies ExportedHandler<ApiEnv>;

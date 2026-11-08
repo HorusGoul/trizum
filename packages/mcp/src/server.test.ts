@@ -1,8 +1,8 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { afterEach, expect, it, vi } from "vite-plus/test";
-import { createMcpServer, handleMcpRequest } from "./server.js";
-import { McpToolError, type McpService, type PartyView } from "./contracts.js";
+import { createMcpServer, handleMcpRequest, type McpAppOptions } from "./server.js";
+import { McpToolError, type PartyService, type PartyView } from "./contracts.js";
 
 const view: PartyView = {
   partyId: "party",
@@ -47,23 +47,20 @@ afterEach(async () => {
   await Promise.all(clients.splice(0).map((client) => client.close()));
 });
 
-async function connect() {
+async function connect(overrides: Partial<McpAppOptions> = {}) {
   const service = {
-    prepareWrite: vi
-      .fn<McpService["prepareWrite"]>()
-      .mockResolvedValue({ requestId: "server-token", expiresAt: "2026-11-06T12:15:00Z" }),
-    createParty: vi.fn<McpService["createParty"]>().mockResolvedValue(view),
-    getParty: vi.fn<McpService["getParty"]>().mockResolvedValue(view),
-    addExpense: vi.fn<McpService["addExpense"]>().mockResolvedValue(view),
-    addParticipants: vi.fn<McpService["addParticipants"]>().mockResolvedValue(view),
-    getExpense: vi.fn<McpService["getExpense"]>().mockResolvedValue(expenseView),
-    updateParty: vi.fn<McpService["updateParty"]>().mockResolvedValue(view),
-    updateParticipant: vi.fn<McpService["updateParticipant"]>().mockResolvedValue(view),
-    updateExpense: vi.fn<McpService["updateExpense"]>().mockResolvedValue(view),
-    deleteExpense: vi.fn<McpService["deleteExpense"]>().mockResolvedValue(view),
+    createParty: vi.fn<PartyService["createParty"]>().mockResolvedValue(view),
+    getParty: vi.fn<PartyService["getParty"]>().mockResolvedValue(view),
+    addExpense: vi.fn<PartyService["addExpense"]>().mockResolvedValue(view),
+    addParticipants: vi.fn<PartyService["addParticipants"]>().mockResolvedValue(view),
+    getExpense: vi.fn<PartyService["getExpense"]>().mockResolvedValue(expenseView),
+    updateParty: vi.fn<PartyService["updateParty"]>().mockResolvedValue(view),
+    updateParticipant: vi.fn<PartyService["updateParticipant"]>().mockResolvedValue(view),
+    updateExpense: vi.fn<PartyService["updateExpense"]>().mockResolvedValue(view),
+    deleteExpense: vi.fn<PartyService["deleteExpense"]>().mockResolvedValue(view),
   };
 
-  const server = createMcpServer(service, options);
+  const server = createMcpServer(service, { ...options, ...overrides });
   const client = new Client({ name: "test-agent", version: "1" });
   clients.push(client);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
@@ -77,7 +74,6 @@ it("advertises narrow tools with accurate hints and a sandboxed MCP Apps resourc
   const { client } = await connect();
   const { tools } = await client.listTools();
   expect(tools.map((tool) => tool.name)).toEqual([
-    "prepare_write",
     "create_party",
     "get_party",
     "add_participants",
@@ -88,13 +84,13 @@ it("advertises narrow tools with accurate hints and a sandboxed MCP Apps resourc
     "update_expense",
     "delete_expense",
   ]);
-  expect(tools[0]).toMatchObject({ annotations: { readOnlyHint: true, openWorldHint: false } });
-  expect(tools[0]._meta).not.toHaveProperty("ui");
-  expect(tools[1]).toMatchObject({
-    annotations: { readOnlyHint: false, idempotentHint: true, destructiveHint: false },
+
+  for (const tool of tools) expect(tool.inputSchema.properties).not.toHaveProperty("requestId");
+  expect(tools[0]).toMatchObject({
+    annotations: { readOnlyHint: false, idempotentHint: false, destructiveHint: false },
     _meta: { securitySchemes: [{ type: "noauth" }] },
   });
-  expect(tools[2]).toMatchObject({ annotations: { readOnlyHint: true } });
+  expect(tools[1]).toMatchObject({ annotations: { readOnlyHint: true } });
   const { resources } = await client.listResources();
   const resource = await client.readResource({ uri: resources[0].uri });
   expect(resource.contents[0]).toMatchObject({
@@ -117,21 +113,6 @@ it.each([2, 3, 4, 5, 6])(
     });
   },
 );
-
-it("prepares a write without invoking party reads or mutations", async () => {
-  const { client, service } = await connect();
-
-  const result = await client.callTool({
-    name: "prepare_write",
-    arguments: { operation: "create_party" },
-  });
-
-  expect(result.structuredContent).toMatchObject({ requestId: "server-token" });
-  expect(service.createParty).not.toHaveBeenCalled();
-  expect(service.getParty).not.toHaveBeenCalled();
-  expect(service.addExpense).not.toHaveBeenCalled();
-  expect(service.addParticipants).not.toHaveBeenCalled();
-});
 
 it("validates write arguments before touching the service and returns structured party data", async () => {
   const { client, service } = await connect();
@@ -156,33 +137,29 @@ it("validates participant additions and returns IDs for expense follow-ups", asy
       { id: "bob", name: "Bob", archived: false, balance: "0.00" },
     ],
   });
-  expect(
-    await client.callTool({ name: "prepare_write", arguments: { operation: "add_participants" } }),
-  ).toMatchObject({ structuredContent: { requestId: "server-token" } });
 
   const added = await client.callTool({
     name: "add_participants",
-    arguments: { requestId: "server-token", partyId: "party", participants: [" Bob "] },
+    arguments: { partyId: "party", participants: [" Bob "] },
   });
 
   expect(added.structuredContent).toMatchObject({
     participants: [view.participants[0], { id: "bob", name: "Bob" }],
   });
   expect(service.addParticipants).toHaveBeenCalledWith({
-    requestId: "server-token",
     partyId: "party",
     participants: ["Bob"],
   });
   expect(
     await client.callTool({
       name: "add_participants",
-      arguments: { requestId: "token", partyId: "party", participants: [" "] },
+      arguments: { partyId: "party", participants: [" "] },
     }),
   ).toMatchObject({ isError: true });
   expect(
     await client.callTool({
       name: "add_participants",
-      arguments: { requestId: "token", partyId: "party", participants: [] },
+      arguments: { partyId: "party", participants: [] },
     }),
   ).toMatchObject({ isError: true });
   expect(service.addParticipants).toHaveBeenCalledTimes(1);
@@ -207,7 +184,7 @@ it("advertises destructive mutations and rejects empty updates or missing expens
 
   for (const name of ["update_party", "update_participant", "update_expense", "delete_expense"]) {
     expect(tools.find((tool) => tool.name === name)).toMatchObject({
-      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false },
     });
   }
 
@@ -217,9 +194,9 @@ it("advertises destructive mutations and rejects empty updates or missing expens
     ["update_expense", { expenseId: "expense", name: "Lunch" }],
     ["delete_expense", { expenseId: "expense" }],
   ] as const) {
-    expect(
-      await client.callTool({ name, arguments: { requestId: "token", partyId: "party", ...args } }),
-    ).toMatchObject({ isError: true });
+    expect(await client.callTool({ name, arguments: { partyId: "party", ...args } })).toMatchObject(
+      { isError: true },
+    );
   }
 
   expect(service.updateParty).not.toHaveBeenCalled();
@@ -230,7 +207,6 @@ it("advertises destructive mutations and rejects empty updates or missing expens
     await client.callTool({
       name: "update_expense",
       arguments: {
-        requestId: "token",
         partyId: "party",
         expenseId: "expense",
         version: expenseView.version,
@@ -291,4 +267,65 @@ it("handles fetch-native stateless HTTP initialization and rejects unsupported s
   );
 
   expect(streaming.status).toBe(405);
+});
+
+it("runs repeated creations directly without preparation and counts each completed call", async () => {
+  const beforeWrite = vi.fn<NonNullable<McpAppOptions["beforeWrite"]>>().mockResolvedValue();
+  const completed = vi.fn<NonNullable<McpAppOptions["onActionCompleted"]>>();
+  const { client, service } = await connect({ beforeWrite, onActionCompleted: completed });
+  service.createParty
+    .mockResolvedValueOnce(view)
+    .mockResolvedValueOnce({ ...view, partyId: "another-party" });
+  const input = { name: "Lisbon", currency: "EUR", participants: ["Alice"] };
+  expect(await client.callTool({ name: "create_party", arguments: input })).toMatchObject({
+    structuredContent: { partyId: "party" },
+  });
+  expect(await client.callTool({ name: "create_party", arguments: input })).toMatchObject({
+    structuredContent: { partyId: "another-party" },
+  });
+  expect(service.createParty).toHaveBeenCalledTimes(2);
+  expect(service.createParty).toHaveBeenCalledWith({
+    ...input,
+    description: "",
+    symbol: "🏝️",
+  });
+  expect(beforeWrite).toHaveBeenCalledTimes(2);
+  expect(completed.mock.calls).toEqual([["createParty"], ["createParty"]]);
+});
+
+it("keeps reads available when writes are rate limited and counts only successful public actions", async () => {
+  const beforeWrite = vi
+    .fn<NonNullable<McpAppOptions["beforeWrite"]>>()
+    .mockRejectedValue(new McpToolError("Write limit reached"));
+
+  const completed = vi.fn<NonNullable<McpAppOptions["onActionCompleted"]>>();
+  const { client, service } = await connect({ beforeWrite, onActionCompleted: completed });
+  await client.callTool({ name: "get_party", arguments: { partyId: "party" } });
+  await client.callTool({
+    name: "get_expense",
+    arguments: { partyId: "party", expenseId: "expense" },
+  });
+  expect(beforeWrite).not.toHaveBeenCalled();
+  expect(
+    await client.callTool({
+      name: "create_party",
+      arguments: { name: "Trip", currency: "EUR", participants: ["Alice"] },
+    }),
+  ).toMatchObject({ isError: true, content: [{ text: "Write limit reached" }] });
+  expect(service.createParty).not.toHaveBeenCalled();
+  service.getParty.mockRejectedValueOnce(new McpToolError("Party unavailable"));
+  await client.callTool({ name: "get_party", arguments: { partyId: "party" } });
+  expect(completed.mock.calls).toEqual([["getParty"], ["getExpense"]]);
+});
+
+it("keeps completed tools successful when the optional analytics hook fails", async () => {
+  const { client } = await connect({
+    onActionCompleted: () => {
+      throw new Error("Collector unavailable");
+    },
+  });
+
+  expect(
+    await client.callTool({ name: "get_party", arguments: { partyId: "party" } }),
+  ).toMatchObject({ structuredContent: view });
 });

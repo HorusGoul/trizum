@@ -4,62 +4,31 @@
 "@trizum/analytics": minor
 ---
 
-Add an anonymous ChatGPT app and MCP endpoint for creating shared expense groups,
-viewing balances, and recording equally split expenses. Reuse Automerge sync and
-existing expense calculations, show an inline group card with a trizum invite
-link, and prevent duplicate writes when agents retry requests.
+Add an anonymous ChatGPT app and MCP endpoint for creating and managing shared
+expense groups without signing in. Support party details, participant additions,
+renaming and archival/restoration, plus expense reads, creation, edits and deletion.
+Reuse existing Automerge models, money and expense helpers, and balance calculation.
 
-Record anonymous completed MCP action counts through the shared analytics package
-without forwarding client identity, request metadata, or group data.
+Execute MCP tools directly through on-demand Automerge sync, without D1 access,
+request IDs, signed tokens, preparation calls or retry bookkeeping. Repeated
+creations produce separate groups or expenses. Existing reads and version-checked
+expense deletion let agents inspect and resolve unwanted duplicates. Keep edge
+write limits and count anonymous completed tool actions through shared analytics.
+Remove the experimental retry table with migration 0008 while preserving the
+already-applied 0007 migration in history, and remove its cleanup schedule.
 
-Keep MCP reads off D1, store compact retry receipts, sync existing Automerge
-documents on demand, and share analytics bootstrap across actions.
+Publish independent expense and balance documents before linking them to the
+group, preserving concurrent additions. Patch existing records without replacing
+identities, attachments, custom splits or unspecified fields. Return a known group
+link when a new party's sync acknowledgement cannot be confirmed.
 
-Expire signed write tokens after 15 minutes, clean up compact retry receipts on an
-indexed schedule, and bound anonymous writes with Cloudflare's rate limiter.
-Explain agent data handling and retention in the public privacy policy.
+Build the embedded widget with shared trizum UI components, fonts, icons and theme
+colors. Follow host light/dark themes, keep previously published widget URLs
+readable, embed all assets, and include responsive padding in host height
+measurements. Use host-mediated navigation and a copyable fallback.
 
-Keep concurrent MCP expense writes independent by publishing complete individual
-chunks and balances before linking them to a party. Route widget navigation
-through the MCP Apps host bridge, with a copyable link when unavailable.
-
-Allow agents to add participants as a group grows, including people introduced
-while recording expenses. Preserve existing identities and past splits, return
-new participant IDs, and apply the existing retry and anonymous analytics rules.
-
-Add tools for party details, participant renaming/archival/restoration, and full
-expense reads, edits, and deletion. Require current expense versions, preserve
-unspecified fields and attachments, and reconcile shared balances after changes.
-Reuse existing write protection and anonymous completion events without a new
-migration or MCP state cache.
-
-Build the embedded group widget with the shared trizum design system: buttons,
-avatars, alerts, icons, typography, and theme colors. Embed the generated assets
-and follow the MCP host’s light/dark theme while retaining sandbox-safe navigation.
-
-Keep previously published widget URLs readable for clients with cached tool
-metadata, and reduce embedded font payloads while retaining the shared UI.
-
-Use the host’s frame for the embedded widget, removing its nested card surface.
-
-Apply trizum’s shared background colors to the widget document and include
-responsive content padding in host-driven height measurements.
-
-Guide visitors from agent-created parties to platform-specific app downloads or
-the existing web join flow. Preserve canonical invite compatibility, offer a
-desktop QR code and copyable link, and keep attribution limited to approved UTM
-labels under existing analytics privacy gates. Store clicks measure intent only;
-party context stays in the original invite without deferred-install tracking.
-
-Keep native app links on the existing associated domain and serve production
-browser download choices from a separate custom domain on the same Worker.
-This lets Safari launch an already-installed app from the handoff page, while
-preserving the party and approved campaign labels for app and web choices.
-
-Include the known party link when creation loses its sync acknowledgement, so
-agents can check the uncertain result without creating another group. Keep the
-write unconfirmed and preserve existing retry protection without extra database
-operations.
-
-Return canonical app-associated invite URLs from preview and Worker aliases too,
-so installed apps can open directly from agent widgets without a download page.
+Return canonical app-associated invite URLs from all MCP hosts. Installed apps can
+open directly; browser visitors receive app-download or web choices on a separate
+custom domain hosted by the same Worker. Preserve the party through desktop QR
+codes, invite copying and the existing web join flow. Track only approved campaign
+labels under existing analytics privacy gates, with no deferred-install tracking.

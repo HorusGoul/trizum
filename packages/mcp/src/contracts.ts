@@ -3,34 +3,6 @@ import { z } from "zod";
 const name = z.string().trim().min(1).max(120);
 const participantId = z.string().min(1).max(100);
 
-const requestId = z
-  .string()
-  .min(1)
-  .max(2048)
-  .describe(
-    "The 15-minute write token returned by prepare_write for this operation. Reuse it unchanged on retries; never generate your own.",
-  );
-
-export const prepareWriteSchema = z.object({
-  operation: z.enum([
-    "create_party",
-    "add_participants",
-    "add_expense",
-    "update_party",
-    "update_participant",
-    "update_expense",
-    "delete_expense",
-  ]),
-});
-
-export const preparedWriteSchema = z.object({ requestId: z.string(), expiresAt: z.iso.datetime() });
-
-export type PrepareWriteInput = z.infer<typeof prepareWriteSchema>;
-
-export type PreparedWrite = z.infer<typeof preparedWriteSchema>;
-
-export type WriteOperation = PrepareWriteInput["operation"];
-
 const partyId = z
   .string()
   .min(1)
@@ -40,7 +12,6 @@ const partyId = z
   );
 
 export const createPartySchema = z.object({
-  requestId,
   name: name.describe("The group's name, such as Lisbon weekend or Home expenses."),
   currency: z
     .string()
@@ -62,7 +33,6 @@ export const createPartySchema = z.object({
 export const getPartySchema = z.object({ partyId });
 
 export const addParticipantsSchema = z.object({
-  requestId,
   partyId,
   participants: z
     .array(name)
@@ -74,7 +44,6 @@ export const addParticipantsSchema = z.object({
 });
 
 export const addExpenseSchema = z.object({
-  requestId,
   partyId,
   name: name.describe("What the expense was for."),
   amount: z
@@ -115,7 +84,6 @@ export const getExpenseSchema = z.object({ partyId, expenseId });
 
 export const updatePartySchema = z
   .object({
-    requestId,
     partyId,
     name: name.optional(),
     description: z.string().max(1000).optional(),
@@ -129,7 +97,6 @@ export const updatePartySchema = z
 
 export const updateParticipantSchema = z
   .object({
-    requestId,
     partyId,
     participantId,
     name: name.optional(),
@@ -147,7 +114,6 @@ export const updateParticipantSchema = z
 
 export const updateExpenseSchema = z
   .object({
-    requestId,
     partyId,
     expenseId,
     version,
@@ -165,7 +131,7 @@ export const updateExpenseSchema = z
     "Provide at least one expense field to change.",
   );
 
-export const deleteExpenseSchema = z.object({ requestId, partyId, expenseId, version });
+export const deleteExpenseSchema = z.object({ partyId, expenseId, version });
 
 export const expenseViewSchema = z.object({
   partyId: z.string(),
@@ -197,15 +163,6 @@ export type UpdateExpenseInput = z.infer<typeof updateExpenseSchema>;
 export type DeleteExpenseInput = z.infer<typeof deleteExpenseSchema>;
 
 export type ExpenseView = z.infer<typeof expenseViewSchema>;
-
-export type PartyWriteInput =
-  | CreatePartyInput
-  | AddParticipantsInput
-  | AddExpenseInput
-  | UpdatePartyInput
-  | UpdateParticipantInput
-  | UpdateExpenseInput
-  | DeleteExpenseInput;
 
 export const partyViewSchema = z.object({
   partyId: z.string(),
@@ -241,10 +198,6 @@ export interface PartyService {
   updateParticipant(input: UpdateParticipantInput): Promise<PartyView>;
   updateExpense(input: UpdateExpenseInput): Promise<PartyView>;
   deleteExpense(input: DeleteExpenseInput): Promise<PartyView>;
-}
-
-export interface McpService extends PartyService {
-  prepareWrite(input: PrepareWriteInput): Promise<PreparedWrite>;
 }
 
 /** Only explicitly public messages may cross the MCP error boundary. */

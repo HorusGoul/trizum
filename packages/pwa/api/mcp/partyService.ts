@@ -75,7 +75,7 @@ export class WorkerPartyService implements PartyService {
         if (error instanceof UnconfirmedDocumentWriteError) {
           const url = createAiInviteUrl(this.origin, error.documentId, MCP_HANDOFF_CAMPAIGN);
           throw new McpToolError(
-            `Party creation could not be confirmed. It may have reached trizum. Check ${url} with get_party before creating another party. Reuse the same requestId on retries.`,
+            `Party creation could not be confirmed. It may have reached trizum. Use get_party to inspect ${url}. Creating again will create a separate party.`,
           );
         }
 

@@ -1,10 +1,10 @@
+import { z } from "zod";
 import { Hono } from "hono";
 import { expect, it } from "vite-plus/test";
 import { mcpRoute } from "./mcp";
 import { createApiI18nMiddleware } from "../i18n";
-import type { ApiEnv, ApiHonoEnv } from "../env";
+import type { ApiHonoEnv } from "../env";
 import { vi } from "vite-plus/test";
-import { WriteTokens, WRITE_WINDOW_MS } from "../mcp/writeTokens";
 
 const app = new Hono<ApiHonoEnv>();
 
@@ -28,66 +28,73 @@ it("allows MCP preflights from ChatGPT and rejects untrusted browser origins", a
   expect((await request("POST", { Origin: "null" })).status).toBe(403);
 });
 
-it("prepares stateless write tokens without database access and rejects expired writes", async () => {
-  const secret = "route-test-mcp-secret-at-least-32-characters";
-  const limit = vi.fn<RateLimit["limit"]>().mockResolvedValue({ success: true });
-  const bindings = { BETTER_AUTH_SECRET: secret, MCP_WRITE_LIMITER: { limit } };
+it("advertises direct tools without a database, signing secret or preparation call", async () => {
+  const response = await request(
+    "POST",
+    { "Content-Type": "application/json", Accept: "application/json, text/event-stream" },
+    JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+  );
 
-  const headers = {
-    "Content-Type": "application/json",
-    Accept: "application/json, text/event-stream",
-  };
-
-  const prepare = await app.request(
-    "https://trizum.app/api/mcp",
-    {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 2,
-        method: "tools/call",
-        params: { name: "prepare_write", arguments: { operation: "create_party" } },
+  const result = z
+    .object({
+      result: z.object({
+        tools: z.array(
+          z.object({
+            name: z.string(),
+            inputSchema: z.object({ properties: z.record(z.string(), z.json()) }),
+          }),
+        ),
       }),
-    },
-    bindings,
-  );
+    })
+    .parse(await response.json());
 
-  expect(await prepare.json()).toMatchObject({
-    result: { structuredContent: { requestId: expect.any(String), expiresAt: expect.any(String) } },
-  });
-
-  const expired = await new WriteTokens(secret, () => Date.now() - WRITE_WINDOW_MS).prepare(
+  expect(result.result.tools.map((tool) => tool.name)).toEqual([
     "create_party",
-  );
+    "get_party",
+    "add_participants",
+    "add_expense",
+    "get_expense",
+    "update_party",
+    "update_participant",
+    "update_expense",
+    "delete_expense",
+  ]);
+
+  for (const tool of result.result.tools)
+    expect(tool.inputSchema.properties).not.toHaveProperty("requestId");
+});
+
+it("rate limits direct writes before opening sync without a database or signing secret", async () => {
+  const limit = vi.fn<RateLimit["limit"]>().mockResolvedValue({ success: false });
 
   const response = await app.request(
     "https://trizum.app/api/mcp",
     {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json, text/event-stream",
+      },
       body: JSON.stringify({
         jsonrpc: "2.0",
-        id: 3,
+        id: 1,
         method: "tools/call",
         params: {
           name: "create_party",
-          arguments: {
-            requestId: expired.requestId,
-            name: "Trip",
-            currency: "EUR",
-            participants: ["Alice"],
-          },
+          arguments: { name: "Trip", currency: "EUR", participants: ["Alice"] },
         },
       }),
     },
-    bindings,
+    { MCP_WRITE_LIMITER: { limit } },
   );
 
   expect(await response.json()).toMatchObject({
-    result: { isError: true, content: [{ text: expect.stringContaining("expired") }] },
+    result: {
+      isError: true,
+      content: [{ text: expect.stringContaining("Too many write requests") }],
+    },
   });
-  expect(limit).toHaveBeenCalledTimes(2);
+  expect(limit).toHaveBeenCalledOnce();
 });
 
 it("initializes over JSON without touching storage and returns stateless method responses", async () => {

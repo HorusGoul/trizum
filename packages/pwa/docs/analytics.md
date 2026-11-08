@@ -44,7 +44,8 @@ than individual visitor conversion tracking.
 The MCP route uses `@trizum/analytics`'s `createAnonymousServerAnalytics` for
 completed party, participant, and expense mutations, plus explicit `get_party`
 and `get_expense` reads. The shared event catalog defines their names and meanings. Writes emit only after
-their D1 receipt is saved; successful replays and internal reads do not emit.
+the public tool completes and its output validates. Repeated creations count as
+separate completed actions. Internal reads and failed calls do not emit.
 Collection runs through `waitUntil`, with a four-second timeout and no retries.
 Failures never change the tool result.
 

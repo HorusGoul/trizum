@@ -211,7 +211,7 @@ export class PartyExpenses {
 
     if (calculateExpenseHash(expense) !== version)
       throw new McpToolError(
-        "This expense changed since it was read. Call get_expense again and confirm the intended changes before preparing another write.",
+        "This expense changed since it was read. Call get_expense again and confirm the intended changes before trying again.",
       );
 
     return { expense, index };
@@ -264,7 +264,7 @@ export class PartyExpenses {
     }
 
     throw new McpToolError(
-      "The expense change reached trizum but balances are still changing. Check the party before retrying; do not repeat the write with a new requestId.",
+      "The expense change reached trizum but balances are still changing. Check the party state before retrying.",
     );
   }
   async readChunk(party: Party, chunkId: DocumentId) {

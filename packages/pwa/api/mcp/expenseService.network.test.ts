@@ -71,7 +71,6 @@ async function fixture(amounts = [1000, 2000]) {
   const api = service(docs);
 
   const view = await api.createParty({
-    requestId: crypto.randomUUID(),
     name: "Weekend",
     description: "",
     symbol: "🏝️",
@@ -138,7 +137,6 @@ it("edits metadata without changing custom splits or attachments and rejects sta
   const read = await f.api.getExpense(input);
   await f.api.updateExpense({
     ...input,
-    requestId: crypto.randomUUID(),
     version: read.version,
     name: "Lunch",
     paidAt: "2026-11-07T12:00:00Z",
@@ -159,14 +157,13 @@ it("edits metadata without changing custom splits or attachments and rejects sta
   await expect(
     service().updateExpense({
       ...input,
-      requestId: crypto.randomUUID(),
       version: read.version,
       amount: "12.00",
     }),
   ).rejects.toThrow("changed since");
-  await expect(
-    service().deleteExpense({ ...input, requestId: crypto.randomUUID(), version: read.version }),
-  ).rejects.toThrow("changed since");
+  await expect(service().deleteExpense({ ...input, version: read.version })).rejects.toThrow(
+    "changed since",
+  );
 });
 
 it("updates financial fields and deletes the final expense with correct shared balances", async () => {
@@ -176,21 +173,19 @@ it("updates financial fields and deletes the final expense with correct shared b
 
   const updated = await f.api.updateExpense({
     ...input,
-    requestId: crypto.randomUUID(),
     version: read.version,
     amount: "12.00",
   });
 
   expect(balances(updated)).toEqual({ Alice: "16.00", Bob: "-16.00" });
   read = await f.api.getExpense(input);
-  await f.api.deleteExpense({ ...input, requestId: crypto.randomUUID(), version: read.version });
+  await f.api.deleteExpense({ ...input, version: read.version });
   expect(balances(await service().getParty(f.partyId))).toEqual({ Alice: "10.00", Bob: "-10.00" });
   const other = { partyId: f.partyId, expenseId: f.chunk.expenses[1].id };
   const last = await f.api.getExpense(other);
 
   const empty = await f.api.deleteExpense({
     ...other,
-    requestId: crypto.randomUUID(),
     version: last.version,
   });
 
@@ -210,7 +205,6 @@ it("requires explicit custom-split conversion, rejects transfers, and scopes exp
   await expect(
     f.api.updateExpense({
       ...input,
-      requestId: crypto.randomUUID(),
       version: read.version,
       amount: "12.00",
     }),
@@ -218,7 +212,6 @@ it("requires explicit custom-split conversion, rejects transfers, and scopes exp
 
   const converted = await f.api.updateExpense({
     ...input,
-    requestId: crypto.randomUUID(),
     version: read.version,
     amount: "12.00",
     paidBy: f.bob,
@@ -230,7 +223,6 @@ it("requires explicit custom-split conversion, rejects transfers, and scopes exp
   await expect(
     f.api.updateExpense({
       ...input,
-      requestId: crypto.randomUUID(),
       version: currentVersion,
       paidBy: "constructor",
     }),
@@ -238,7 +230,6 @@ it("requires explicit custom-split conversion, rejects transfers, and scopes exp
   await expect(
     f.api.updateExpense({
       ...input,
-      requestId: crypto.randomUUID(),
       version: currentVersion,
       splitBetween: ["__proto__"],
     }),
@@ -257,14 +248,13 @@ it("requires explicit custom-split conversion, rejects transfers, and scopes exp
   await expect(
     f.api.updateExpense({
       ...input,
-      requestId: crypto.randomUUID(),
       version: transfer.version,
       name: "Transfer",
     }),
   ).rejects.toThrow("transfers");
-  await expect(
-    f.api.deleteExpense({ ...input, requestId: crypto.randomUUID(), version: transfer.version }),
-  ).rejects.toThrow("transfers");
+  await expect(f.api.deleteExpense({ ...input, version: transfer.version })).rejects.toThrow(
+    "transfers",
+  );
 });
 
 it("updates party details and archives/restores people while preserving IDs, history, and profile fields", async () => {
@@ -275,7 +265,6 @@ it("updates party details and archives/restores people while preserving IDs, his
 
   await expect(
     f.api.updateParticipant({
-      requestId: crypto.randomUUID(),
       partyId: f.partyId,
       participantId: "constructor",
       name: "Other",
@@ -283,7 +272,6 @@ it("updates party details and archives/restores people while preserving IDs, his
   ).rejects.toThrow("participant ID");
 
   const updated = await f.api.updateParty({
-    requestId: crypto.randomUUID(),
     partyId: f.partyId,
     name: "Trip",
     description: "Shared trip",
@@ -298,7 +286,6 @@ it("updates party details and archives/restores people while preserving IDs, his
   });
 
   const archived = await f.api.updateParticipant({
-    requestId: crypto.randomUUID(),
     partyId: f.partyId,
     participantId: f.bob,
     name: "Robert",
@@ -313,7 +300,6 @@ it("updates party details and archives/restores people while preserving IDs, his
   expect((await f.docs.read<Party>(f.partyId)).participants[f.bob].phone).toBe("test-contact");
   await expect(
     f.api.updateParticipant({
-      requestId: crypto.randomUUID(),
       partyId: f.partyId,
       participantId: f.alice,
       archived: true,
@@ -321,14 +307,12 @@ it("updates party details and archives/restores people while preserving IDs, his
   ).rejects.toThrow("at least one");
   await expect(
     f.api.updateParticipant({
-      requestId: crypto.randomUUID(),
       partyId: f.partyId,
       participantId: f.bob,
       name: "alice",
     }),
   ).rejects.toThrow("already exists");
   await f.api.updateParticipant({
-    requestId: crypto.randomUUID(),
     partyId: f.partyId,
     participantId: f.bob,
     archived: false,
@@ -401,7 +385,6 @@ it.each(["update", "delete"] as const)(
     });
 
     const firstInput = {
-      requestId: crypto.randomUUID(),
       partyId: f.partyId,
       expenseId: first.expenseId,
       version: first.version,
@@ -415,7 +398,6 @@ it.each(["update", "delete"] as const)(
     try {
       await publishing;
       await secondApi.updateExpense({
-        requestId: crypto.randomUUID(),
         partyId: f.partyId,
         expenseId: second.expenseId,
         version: second.version,
@@ -443,8 +425,8 @@ it("merges overlapping edits to separate expense fields and reconciles their con
   await second.getExpense(input);
 
   const results = await Promise.allSettled([
-    first.updateExpense({ ...input, requestId: crypto.randomUUID(), version, name: "Lunch" }),
-    second.updateExpense({ ...input, requestId: crypto.randomUUID(), version, amount: "12.00" }),
+    first.updateExpense({ ...input, version, name: "Lunch" }),
+    second.updateExpense({ ...input, version, amount: "12.00" }),
   ]);
 
   expect(results.some((result) => result.status === "fulfilled")).toBe(true);
@@ -502,9 +484,9 @@ it("bounds reconciliation when another writer keeps replacing the balance projec
 
     return fresh;
   });
-  await expect(
-    api.updateExpense({ ...input, requestId: crypto.randomUUID(), version, amount: "12.00" }),
-  ).rejects.toThrow("change reached trizum");
+  await expect(api.updateExpense({ ...input, version, amount: "12.00" })).rejects.toThrow(
+    "change reached trizum",
+  );
   expect(projectionWrites).toHaveBeenCalledTimes(4);
   const expense = await service().getExpense(input);
   expect(expense.amount).toBe("12.00");
@@ -519,7 +501,6 @@ it("reads and updates an expense outside the recent twenty when its ID is known"
   const read = await f.api.getExpense(input);
   await f.api.updateExpense({
     ...input,
-    requestId: crypto.randomUUID(),
     version: read.version,
     name: "Older lunch",
   });
@@ -530,7 +511,6 @@ it("keeps exact cents at the MCP input limit using the shared money conversion",
   const f = await fixture([1000]);
 
   const result = await f.api.addExpense({
-    requestId: crypto.randomUUID(),
     partyId: f.partyId,
     name: "Large expense",
     amount: "9999999999.99",

@@ -40,7 +40,7 @@
       "simple": { "limit": 60, "period": 60 },
     },
   ],
-  "triggers": { "crons": ["*/5 * * * *"] },
+  "triggers": { "crons": [] },
   "vars": {
     "APPLE_APP_BUNDLE_IDENTIFIER": "app.trizum.capacitor",
     "APPLE_SERVICE_ID": "app.trizum.capacitor.si",
