@@ -199,6 +199,12 @@ displayed, without repeating balances, expenses or links in a second card or
 table. Explicit requests for text or shareable links still receive them, and
 clients without UI can summarize the unchanged structured results. These are
 model-facing hints; live conversations must verify the resulting narration.
+Successful party results repeat the presentation guidance beside the result,
+instead of serializing the same party JSON into both `content` and
+`structuredContent`. Full party state remains in `structuredContent` for widgets
+and follow-up tool calls. Asking to show balances or expenses does not by itself
+request a second text breakdown. Expense reads without a widget and error
+messages retain their existing content.
 
 ## Connect a development app
 

@@ -101,7 +101,12 @@ export function createMcpServer(service: PartyService, options: McpAppOptions) {
       recordCompleted(action);
 
       return {
-        content: [{ type: "text", text: JSON.stringify(party) }],
+        content: [
+          {
+            type: "text",
+            text: 'Completed. The trizum widget presents the party, balances, recent expenses, and Open in trizum action. When this client displays the widget, give only a brief confirmation such as "Done." Do not restate balances, expenses, split amounts, settlements, or links. A request to show balances or expenses is satisfied by the widget; provide a text breakdown or shareable link only when explicitly requested in that format. If this client cannot display widgets, use structuredContent for a concise text summary and invite link.',
+          },
+        ],
         structuredContent: party,
         _meta: {
           locale: options.locale,

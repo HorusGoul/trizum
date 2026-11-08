@@ -29,6 +29,8 @@ measurements. Use host-mediated navigation and a copyable fallback.
 Describe the widget's contents to ChatGPT and request brief confirmations without
 duplicating its balances, expenses and links in the assistant response. Retain
 text summaries for explicit requests and clients without widget support.
+Return presentation guidance alongside successful party results instead of a
+second JSON copy, preserving the full structured data for follow-up actions.
 
 Return canonical app-associated invite URLs from all MCP hosts. Installed apps can
 open directly; browser visitors receive app-download or web choices on a separate
