@@ -146,6 +146,7 @@ export function usePartyList() {
       PartyList,
       | "username"
       | "phone"
+      | "paymentMethods"
       | "avatarId"
       | "locale"
       | "openLastPartyOnLaunch"
@@ -156,6 +157,8 @@ export function usePartyList() {
     partyListHandle.change((list) => {
       list.username = values.username;
       list.phone = values.phone;
+
+      if (values.paymentMethods !== undefined) list.paymentMethods = values.paymentMethods;
       list.avatarId = values.avatarId;
 
       if (values.locale) {
@@ -207,7 +210,7 @@ export function usePartyList() {
             }
 
             // Only update participant-relevant fields, not user-local settings
-            const participantFields = ["phone", "avatarId"] as const;
+            const participantFields = ["phone", "paymentMethods", "avatarId"] as const;
 
             for (const key of participantFields) {
               const value = values[key];

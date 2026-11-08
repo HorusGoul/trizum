@@ -11,7 +11,9 @@ import { Icon } from "@trizum/ui/Icon";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { PartyPendingComponent } from "#src/components/PartyPendingComponent.tsx";
 import { toast } from "sonner";
-import { BizumItem } from "./-components/BizumItem.js";
+import { PaymentMethodItem } from "./-components/PaymentMethodItem.tsx";
+import { getPaymentMethods } from "#src/lib/paymentMethods.ts";
+import { paymentMethodTypes } from "#src/models/paymentMethod.ts";
 import { CashItem } from "./-components/CashItem.js";
 
 interface PaySearchParams {
@@ -38,15 +40,6 @@ export const Route = createFileRoute("/party_/$partyId/pay")({
   },
 });
 
-type PaymentMethod =
-  | {
-      type: "bizum";
-      phoneNumber: string;
-    }
-  | {
-      type: "cash";
-    };
-
 function RouteComponent() {
   const { fromId, toId, amount } = Route.useSearch();
   const { party, addExpenseToParty } = useCurrentParty();
@@ -58,10 +51,7 @@ function RouteComponent() {
   const fromName = from.name;
   const toName = to.name;
 
-  const methods: PaymentMethod[] = [
-    to.phone ? { type: "bizum", phoneNumber: to.phone } : null,
-    { type: "cash" },
-  ].filter((method): method is PaymentMethod => !!method);
+  const methods = getPaymentMethods(to);
 
   function onMarkAsPaid() {
     const expensePromise = addExpenseToParty({
@@ -137,20 +127,14 @@ function RouteComponent() {
           </Trans>
         </p>
 
-        {methods.map((method) => {
-          let element;
+        {paymentMethodTypes.map((type) => {
+          const details = methods[type];
 
-          switch (method.type) {
-            case "bizum":
-              element = <BizumItem phoneNumber={method.phoneNumber} />;
-              break;
-            case "cash":
-              element = <CashItem />;
-              break;
-          }
-
-          return <div key={method.type}>{element}</div>;
+          return details?.trim() ? (
+            <PaymentMethodItem key={type} type={type} details={details} />
+          ) : null;
         })}
+        <CashItem />
       </div>
 
       <div className="h-16 shrink-0" />
