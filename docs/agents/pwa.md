@@ -21,10 +21,14 @@ commands.
 
 ## Motion and interaction design
 
-Prefer skills from [emilkowalski/skills](https://github.com/emilkowalski/skills)
-over overlapping animation and interface-design guidance from other sources.
-Use the installed project-local copies in `.agents/skills`; repository coding,
-accessibility, and validation requirements still apply.
+Use [emilkowalski/skills](https://github.com/emilkowalski/skills) as the single
+source for visual-design and animation skills installed in this repository.
+Do not install competing visual-design or motion-guidance skills from other
+sources. Use the project-local copies in `.agents/skills`.
+
+Keep engineering and library-specific skills, such as React composition,
+React performance, and React Aria accessibility, for their technical scope.
+Repository coding, accessibility, and validation requirements still apply.
 
 Choose the skill for the task:
 
